@@ -1,27 +1,8 @@
-net.minecraft.client.texture.atlas.AtlasSource
-net.minecraft.client.texture.atlas.AtlasSourceManager
-net.minecraft.client.texture.atlas.AtlasSource$SpriteRegions
-net.minecraft.client.texture.atlas.AtlasSource$SpriteRegion
-net.minecraft.client.texture.atlas.SingleAtlasSource
-c net.minecraft.client.texture.atlas.SingleAtlasSource
-net.minecraft.client.texture.atlas.PalettedPermutationsAtlasSource
-c net.minecraft.client.texture.atlas.PalettedPermutationsAtlasSource
-c net.minecraft.client.texture.atlas.AtlasSourceManager
-net.minecraft.client.texture.SpriteContents
-net.minecraft.client.texture.SpriteOpener
-net.minecraft.client.texture.NativeImage
-net.minecraft.client.resource.metadata.AnimationResourceMetadata
-net.minecraft.block.DoorBlock
-net.minecraft.block.PlantBlock
-net.minecraft.block.FlowerBlock
-net.minecraft.block.MushroomPlantBlock
-net.minecraft.block.ShortPlantBlock
-net.minecraft.block.FungusBlock
-net.minecraft.block.PillarBlock
-net.minecraft.block.Block
-net.minecraft.block.AbstractBlock$Settings
-net.minecraft.client.color.world.BiomeColors
-net.minecraft.world.biome.GrassColors
-net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
-net.minecraft.client.color.block.BlockColorProvider
-net.fabricmc.fabric.api.registry.StrippableBlockRegistry
+net.minecraft.client.texture.atlas.AtlasSource$SpriteSource
+net.minecraft.client.texture.atlas.AtlasSprite
+c net.minecraft.client.texture.atlas.PalettedPermutationsAtlasSource$PalettedSpriteRegion
+net.minecraft.client.texture.SpriteDimensions
+net.minecraft.resource.ResourceFinder
+net.minecraft.util.dynamic.Codecs$IdMapper
+net.minecraft.block.BlockSetType
+net.minecraft.item.TallBlockItem

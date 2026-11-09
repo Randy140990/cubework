@@ -29,8 +29,15 @@ public enum Shape {
 		this.fromStonecutter = fromStonecutter;
 	}
 
-	/** Wool already has carpet, so wool skips it. */
+	/**
+	 * Coloured blocks get every shape (wool skips carpet, which vanilla has). Natural blocks get the
+	 * shapes for shaping land: slabs both ways, slopes, layers both ways and carpet.
+	 */
 	public boolean appliesTo(Material m) {
+		if (m.nature()) return switch (this) {
+			case SLAB, VERTICAL_SLAB, SLOPE, LAYER, VERTICAL_LAYER, CARPET -> true;
+			default -> false;
+		};
 		return !(this == CARPET && m.kind() == Material.Kind.WOOL);
 	}
 }

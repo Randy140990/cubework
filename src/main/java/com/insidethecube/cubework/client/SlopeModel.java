@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.joml.Vector3f;
 
+import com.insidethecube.cubework.Material;
 import com.insidethecube.cubework.block.SlopeBlock;
 import com.insidethecube.cubework.block.SlopeGeometry;
 
@@ -27,14 +28,14 @@ import net.minecraft.util.math.random.Random;
 
 /**
  * The slope drawn as it really is: one flat sloping surface (two triangles at a corner), triangles on the
- * sides and a square underneath, using the vanilla block's texture. Built from the same heights as its
- * hit box. It goes through the game's ordinary block model, so anything that draws blocks (Voxy, shader
- * mods) draws it too.
+ * sides and a square underneath, using the vanilla block's own textures (top, sides, bottom, and grass's
+ * tinted overlay). Built from the same heights as its hit box. It goes through the game's ordinary block
+ * model, so anything that draws blocks (Voxy, shader mods) draws it too.
  */
 public final class SlopeModel {
 	private SlopeModel() {}
 
-	public record Unbaked(Identifier texture) implements BlockStateModel.UnbakedGrouped {
+	public record Unbaked(Material material) implements BlockStateModel.UnbakedGrouped {
 		@Override
 		public void resolve(ResolvableModel.Resolver resolver) {
 		}
@@ -46,11 +47,20 @@ public final class SlopeModel {
 
 		@Override
 		public BlockStateModel bake(BlockState state, Baker baker) {
-			SimpleModel named = () -> "cubework slope " + texture;
-			Sprite sprite = baker.getSpriteGetter().get(new SpriteIdentifier(Uv.BLOCK_ATLAS, texture), named);
-			return new Baked(new Part(quads(state, sprite), sprite));
+			Material.Textures t = material.textures();
+			SimpleModel named = () -> "cubework slope " + material.id();
+			Sprites s = new Sprites(sprite(baker, t.top(), named), sprite(baker, t.side(), named), sprite(baker, t.bottom(), named),
+					t.overlay() == null ? null : sprite(baker, t.overlay(), named), material.grassTinted());
+			return new Baked(new Part(quads(state, s, material.height() / 16.0), s.side()));
+		}
+
+		private static Sprite sprite(Baker baker, String texture, SimpleModel named) {
+			return baker.getSpriteGetter().get(new SpriteIdentifier(Uv.BLOCK_ATLAS, Identifier.ofVanilla("block/" + texture)), named);
 		}
 	}
+
+	/** The block's textures; tinted means the top and overlay take the biome's grass colour. */
+	private record Sprites(Sprite top, Sprite side, Sprite bottom, Sprite overlay, boolean tinted) {}
 
 	private record Baked(Part part) implements BlockStateModel {
 		@Override
@@ -64,7 +74,9 @@ public final class SlopeModel {
 		}
 	}
 
-	/** Quads by the side they're hidden from (null: never hidden). */
+	/** Quads by the side they're hidden from, and the sloping surface (never hidden). */
+	private record Quads(Map<Direction, List<BakedQuad>> sided, List<BakedQuad> free) {}
+
 	private static final class Part implements BlockModelPart {
 		private final Map<Direction, List<BakedQuad>> sided;
 		private final List<BakedQuad> free;
@@ -94,43 +106,44 @@ public final class SlopeModel {
 		}
 	}
 
-	/** Quads hidden by a neighbour on one side, and the sloping surface, which is never hidden. */
-	private record Quads(Map<Direction, List<BakedQuad>> sided, List<BakedQuad> free) {}
-
-	private static Quads quads(BlockState state, Sprite sprite) {
+	private static Quads quads(BlockState state, Sprites s, double height) {
 		Direction f = state.get(SlopeBlock.FACING);
 		StairShape shape = state.get(SlopeBlock.SHAPE);
 		boolean top = state.get(SlopeBlock.HALF) == BlockHalf.TOP;
 		Map<Direction, List<BakedQuad>> out = new EnumMap<>(Direction.class);
 		List<BakedQuad> free = new ArrayList<>();
-		Builder b = new Builder(sprite, top);
+		Builder b = new Builder(top, height);
+		int tint = s.tinted() ? 0 : -1;
 
-		// Corner heights: north-west, north-east, south-east, south-west.
+		// Corner heights (0 or 1): north-west, north-east, south-east, south-west.
 		double[][] c = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
 		double[] h = new double[4];
 		for (int i = 0; i < 4; i++) h[i] = Math.round(SlopeGeometry.height(f, shape, c[i][0], c[i][1]));
 
-		// Underneath (or on top, upside down).
-		Direction under = top ? Direction.UP : Direction.DOWN;
-		add(out, under, b.flat());
+		// The flat face: underneath, or on top when upside down (where it's the block's top).
+		Direction flat = top ? Direction.UP : Direction.DOWN;
+		add(out, flat, b.flat(top ? s.top() : s.bottom(), top ? tint : -1));
 
-		// The sloping surface: one quad when it's a single plane, else two triangles split through the odd corner.
+		// The sloping surface: the block's top texture (its bottom texture when upside down).
+		Sprite surface = top ? s.bottom() : s.top();
+		int surfaceTint = top ? -1 : tint;
 		int odd = oddCorner(h);
 		if (odd < 0) {
-			free.add(b.surface(new double[][] {v(c[0], h[0]), v(c[1], h[1]), v(c[2], h[2]), v(c[3], h[3])}));
+			free.add(b.surface(surface, surfaceTint, new double[][] {v(c[0], h[0]), v(c[1], h[1]), v(c[2], h[2]), v(c[3], h[3])}));
 		} else {
 			int a = odd, o = (odd + 2) % 4, l = (odd + 1) % 4, r = (odd + 3) % 4;
-			free.add(b.surface(new double[][] {v(c[a], h[a]), v(c[l], h[l]), v(c[o], h[o]), v(c[o], h[o])}));
-			free.add(b.surface(new double[][] {v(c[a], h[a]), v(c[o], h[o]), v(c[r], h[r]), v(c[r], h[r])}));
+			free.add(b.surface(surface, surfaceTint, new double[][] {v(c[a], h[a]), v(c[l], h[l]), v(c[o], h[o]), v(c[o], h[o])}));
+			free.add(b.surface(surface, surfaceTint, new double[][] {v(c[a], h[a]), v(c[o], h[o]), v(c[r], h[r]), v(c[r], h[r])}));
 		}
 
-		// The four sides: a square where both corners are high, a triangle where one is.
+		// The four sides: a square where both corners are high, a triangle where one is. Grass gets its
+		// tinted overlay on top, so the green edge follows the slope.
 		Direction[] sides = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 		for (int i = 0; i < 4; i++) {
 			int p = i, q = (i + 1) % 4;
 			if (h[p] == 0 && h[q] == 0) continue;
-			BakedQuad quad = b.side(sides[i], c[p], h[p], c[q], h[q]);
-			add(out, sides[i], quad);
+			add(out, sides[i], b.side(s.side(), -1, sides[i], c[p], h[p], c[q], h[q]));
+			if (s.overlay() != null) add(out, sides[i], b.side(s.overlay(), tint, sides[i], c[p], h[p], c[q], h[q]));
 		}
 		return new Quads(out, free);
 	}
@@ -153,55 +166,90 @@ public final class SlopeModel {
 		return new double[] {xz[0], y, xz[1]};
 	}
 
-	/** Makes quads in block space (0 to 1), turned upside down for the top half. */
+	/**
+	 * Makes quads in block space. Heights come in as 0 to 1 of the piece; they're scaled to the block's
+	 * height (15/16 for dirt path) and turned upside down for the top half.
+	 */
 	private static final class Builder {
-		private final Sprite sprite;
 		private final boolean top;
+		private final double height;
 
-		Builder(Sprite sprite, boolean top) {
-			this.sprite = sprite;
+		Builder(boolean top, double height) {
 			this.top = top;
+			this.height = height;
 		}
 
 		private double y(double y) {
-			return top ? 1 - y : y;
+			return top ? height - y * height : y * height;
 		}
 
-		BakedQuad flat() {
-			double y = top ? 1 : 0;
+		BakedQuad flat(Sprite sprite, int tint) {
+			double y = top ? height : 0;
 			Direction face = top ? Direction.UP : Direction.DOWN;
 			double[][] p = {{0, y, 0}, {1, y, 0}, {1, y, 1}, {0, y, 1}};
-			return quad(p, face, face, true);
+			float[][] uv = new float[4][];
+			for (int i = 0; i < 4; i++) uv[i] = texFlat(p[i], face);
+			return quad(sprite, tint, p, uv, face, face);
 		}
 
-		BakedQuad surface(double[][] pts) {
+		BakedQuad surface(Sprite sprite, int tint, double[][] pts) {
 			double[][] p = new double[4][];
-			for (int i = 0; i < 4; i++) p[i] = new double[] {pts[i][0], y(pts[i][1]), pts[i][2]};
 			Direction face = top ? Direction.DOWN : Direction.UP;
-			return quad(p, face, face, true);
+			float[][] uv = new float[4][];
+			for (int i = 0; i < 4; i++) {
+				p[i] = new double[] {pts[i][0], y(pts[i][1]), pts[i][2]};
+				uv[i] = texFlat(p[i], face);
+			}
+			return quad(sprite, tint, p, uv, face, face);
 		}
 
-		BakedQuad side(Direction d, double[] a, double ha, double[] b, double hb) {
-			List<double[]> p = new ArrayList<>();
-			p.add(new double[] {a[0], y(0), a[1]});
-			p.add(new double[] {b[0], y(0), b[1]});
-			if (hb > 0) p.add(new double[] {b[0], y(hb), b[1]});
-			if (ha > 0) p.add(new double[] {a[0], y(ha), a[1]});
-			while (p.size() < 4) p.add(p.get(p.size() - 1));
-			return quad(p.toArray(new double[0][]), d, d, false);
+		/**
+		 * A side between corners a and b (heights ha, hb). The texture is hung from the top of the piece,
+		 * so a side texture's top band (grass, a path's edge, sandstone's rim) runs along the slope.
+		 */
+		BakedQuad side(Sprite sprite, int tint, Direction d, double[] a, double ha, double[] b, double hb) {
+			List<double[]> local = new ArrayList<>();
+			List<double[]> col = new ArrayList<>();
+			local.add(new double[] {a[0], 0, a[1]});
+			col.add(new double[] {ha});
+			local.add(new double[] {b[0], 0, b[1]});
+			col.add(new double[] {hb});
+			if (hb > 0) {
+				local.add(new double[] {b[0], hb, b[1]});
+				col.add(new double[] {hb});
+			}
+			if (ha > 0) {
+				local.add(new double[] {a[0], ha, a[1]});
+				col.add(new double[] {ha});
+			}
+			while (local.size() < 4) {
+				local.add(local.get(local.size() - 1));
+				col.add(col.get(col.size() - 1));
+			}
+			double[][] p = new double[4][];
+			float[][] uv = new float[4][];
+			for (int i = 0; i < 4; i++) {
+				double[] l = local.get(i);
+				p[i] = new double[] {l[0], y(l[1]), l[2]};
+				double fromTop = top ? l[1] : col.get(i)[0] - l[1];
+				uv[i] = new float[] {texU(l, d), (float) (fromTop * height)};
+			}
+			return quad(sprite, tint, p, uv, d, d);
 		}
 
 		/** A quad facing out along normal, its corners wound so it shows from outside. */
-		private BakedQuad quad(double[][] p, Direction face, Direction normal, boolean flatTexture) {
-			if (!facesOut(p, normal)) p = new double[][] {p[0], p[3], p[2], p[1]};
+		private static BakedQuad quad(Sprite sprite, int tint, double[][] p, float[][] uv, Direction face, Direction normal) {
+			if (!facesOut(p, normal)) {
+				p = new double[][] {p[0], p[3], p[2], p[1]};
+				uv = new float[][] {uv[0], uv[3], uv[2], uv[1]};
+			}
 			Vector3f[] pos = new Vector3f[4];
-			long[] uv = new long[4];
+			long[] packed = new long[4];
 			for (int i = 0; i < 4; i++) {
 				pos[i] = new Vector3f((float) p[i][0], (float) p[i][1], (float) p[i][2]);
-				float[] t = flatTexture ? texFlat(p[i], face) : texSide(p[i], face);
-				uv[i] = Uv.pack(sprite.getFrameU(t[0]), sprite.getFrameV(t[1]));
+				packed[i] = Uv.pack(sprite.getFrameU(uv[i][0]), sprite.getFrameV(uv[i][1]));
 			}
-			return new BakedQuad(pos[0], pos[1], pos[2], pos[3], uv[0], uv[1], uv[2], uv[3], -1, face, sprite, true, 0);
+			return new BakedQuad(pos[0], pos[1], pos[2], pos[3], packed[0], packed[1], packed[2], packed[3], tint, face, sprite, true, 0);
 		}
 
 		private static boolean same(double[] a, double[] b) {
@@ -221,14 +269,13 @@ public final class SlopeModel {
 			return face == Direction.UP ? new float[] {(float) p[0], (float) p[2]} : new float[] {(float) p[0], (float) (1 - p[2])};
 		}
 
-		/** Sides: the texture as on the side of a full block. */
-		private static float[] texSide(double[] p, Direction face) {
-			float v = (float) (1 - p[1]);
+		/** Sides: across, as on the side of a full block. */
+		private static float texU(double[] p, Direction face) {
 			return switch (face) {
-				case NORTH -> new float[] {(float) (1 - p[0]), v};
-				case SOUTH -> new float[] {(float) p[0], v};
-				case WEST -> new float[] {(float) p[2], v};
-				default -> new float[] {(float) (1 - p[2]), v};
+				case NORTH -> (float) (1 - p[0]);
+				case SOUTH -> (float) p[0];
+				case WEST -> (float) p[2];
+				default -> (float) (1 - p[2]);
 			};
 		}
 	}

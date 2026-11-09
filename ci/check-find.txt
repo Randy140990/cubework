@@ -1,5 +1,1 @@
-atlas/
-SpriteSource
-AtlasSource
-ColorProvider
-Strippable
+mineable/

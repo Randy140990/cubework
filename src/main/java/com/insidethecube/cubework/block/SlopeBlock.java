@@ -44,12 +44,12 @@ public class SlopeBlock extends CwBlock implements Waterloggable {
 
 	@Override
 	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return SlopeGeometry.outline(state.get(FACING), state.get(HALF), state.get(SHAPE));
+		return SlopeGeometry.outline(state.get(FACING), state.get(HALF), state.get(SHAPE), material.height());
 	}
 
 	@Override
 	protected VoxelShape getCullingShape(BlockState state) {
-		return SlopeGeometry.inside(state.get(FACING), state.get(HALF), state.get(SHAPE));
+		return SlopeGeometry.inside(state.get(FACING), state.get(HALF), state.get(SHAPE), material.height());
 	}
 
 	@Override

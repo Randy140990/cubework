@@ -23,7 +23,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 
@@ -36,14 +35,18 @@ public class VerticalSlabBlock extends CwBlock implements Waterloggable {
 	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 	public static final BooleanProperty DOUBLE = BooleanProperty.of("double");
 
-	private static final Map<Direction, VoxelShape> SHAPES = Map.of(
-			Direction.NORTH, Block.createCuboidShape(0, 0, 0, 16, 16, 8),
-			Direction.SOUTH, Block.createCuboidShape(0, 0, 8, 16, 16, 16),
-			Direction.WEST, Block.createCuboidShape(0, 0, 0, 8, 16, 16),
-			Direction.EAST, Block.createCuboidShape(8, 0, 0, 16, 16, 16));
+	private final Map<Direction, VoxelShape> shapes;
+	private final VoxelShape full;
 
 	public VerticalSlabBlock(Material material, AbstractBlock.Settings settings) {
 		super(material, settings);
+		int h = material.height();
+		shapes = Map.of(
+				Direction.NORTH, Block.createCuboidShape(0, 0, 0, 16, h, 8),
+				Direction.SOUTH, Block.createCuboidShape(0, 0, 8, 16, h, 16),
+				Direction.WEST, Block.createCuboidShape(0, 0, 0, 8, h, 16),
+				Direction.EAST, Block.createCuboidShape(8, 0, 0, 16, h, 16));
+		full = Block.createCuboidShape(0, 0, 0, 16, h, 16);
 		setDefaultState(getDefaultState().with(FACING, Direction.NORTH).with(DOUBLE, false).with(WATERLOGGED, false));
 	}
 
@@ -54,7 +57,7 @@ public class VerticalSlabBlock extends CwBlock implements Waterloggable {
 
 	@Override
 	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return state.get(DOUBLE) ? VoxelShapes.fullCube() : SHAPES.get(state.get(FACING));
+		return state.get(DOUBLE) ? full : shapes.get(state.get(FACING));
 	}
 
 	@Override
