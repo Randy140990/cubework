@@ -2,7 +2,6 @@ package com.insidethecube.cubework.block;
 
 import com.insidethecube.cubework.CwBlocks;
 import com.insidethecube.cubework.Material;
-import com.insidethecube.cubework.Shape;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -85,10 +84,5 @@ public final class Shared {
 		VoxelShape theirs = other.getOutlineShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN).getFace(dir.getOpposite());
 		if (theirs.isEmpty()) return false;
 		return !VoxelShapes.matchesAnywhere(mine, theirs, BooleanBiFunction.ONLY_FIRST);
-	}
-
-	/** The block's id in the shape table, for the shape's block entity of a material. */
-	public static Block shapeOf(Material m, Shape s) {
-		return CwBlocks.get(m, s);
 	}
 }

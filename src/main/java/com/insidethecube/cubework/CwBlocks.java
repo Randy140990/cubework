@@ -22,6 +22,7 @@ import com.insidethecube.cubework.block.SlopeBlock;
 import com.insidethecube.cubework.block.VerticalLayerBlock;
 import com.insidethecube.cubework.block.VerticalSlabBlock;
 
+import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSetType;
@@ -58,6 +59,8 @@ public final class CwBlocks {
 				shapes.put(s, b);
 				INFO.put(b, new Info(m, s));
 				item(m.idOf(s), b);
+				// Wool shapes catch fire and burn away like wool.
+				if (m.kind() == Material.Kind.WOOL) FlammableBlockRegistry.getDefaultInstance().add(b, 30, 60);
 			}
 			BY_MATERIAL.put(m, shapes);
 		}

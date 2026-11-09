@@ -53,11 +53,6 @@ public record Material(String id, Kind kind, String colour) {
 		return kind == Kind.GLASS;
 	}
 
-	/** Coloured glass is drawn see-through; clear and tinted glass have hard edges. */
-	public boolean translucent() {
-		return kind == Kind.GLASS && !id.equals("glass");
-	}
-
 	/** For concrete powder: the concrete of the same colour, which its shapes turn into when wet. */
 	public Material hardened() {
 		if (kind != Kind.POWDER) return null;

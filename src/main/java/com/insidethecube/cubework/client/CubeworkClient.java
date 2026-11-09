@@ -15,11 +15,10 @@ import net.minecraft.util.Identifier;
 public final class CubeworkClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		// Glass shapes draw like their glass: clear glass with hard edges, coloured and tinted glass see-through.
+		// Glass shapes are drawn see-through, as the game draws all its glass.
 		for (Material m : Material.ALL) {
 			if (!m.glass()) continue;
-			BlockRenderLayer layer = m.translucent() ? BlockRenderLayer.TRANSLUCENT : BlockRenderLayer.CUTOUT;
-			for (Block b : CwBlocks.shapesOf(m).values()) BlockRenderLayerMap.putBlock(b, layer);
+			for (Block b : CwBlocks.shapesOf(m).values()) BlockRenderLayerMap.putBlock(b, BlockRenderLayer.TRANSLUCENT);
 		}
 		// Slopes have their own model, built from the vanilla block's texture.
 		ModelLoadingPlugin.register(ctx -> {
