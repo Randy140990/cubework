@@ -44,12 +44,27 @@ public class SlopeBlock extends CwBlock implements Waterloggable {
 
 	@Override
 	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return SlopeGeometry.outline(state.get(FACING), state.get(HALF), state.get(SHAPE), material.height());
+		return SlopeGeometry.outline(state.get(FACING), state.get(HALF), state.get(SHAPE), base(state), rise(state), material.height());
 	}
 
 	@Override
 	protected VoxelShape getCullingShape(BlockState state) {
-		return SlopeGeometry.inside(state.get(FACING), state.get(HALF), state.get(SHAPE), material.height());
+		return SlopeGeometry.inside(state.get(FACING), state.get(HALF), state.get(SHAPE), base(state), rise(state), material.height());
+	}
+
+	/** Where the slope starts, in pixels (gentle slopes sit on the step below). */
+	public int base(BlockState state) {
+		return 0;
+	}
+
+	/** How many pixels it rises across the block. */
+	public int rise(BlockState state) {
+		return material.height();
+	}
+
+	/** Which neighbours it turns corners with: slopes of the same kind (any material). */
+	protected boolean joins(BlockState state, BlockState other) {
+		return other.getBlock().getClass() == getClass();
 	}
 
 	@Override
@@ -59,7 +74,13 @@ public class SlopeBlock extends CwBlock implements Waterloggable {
 		boolean bottom = side != Direction.DOWN && (side == Direction.UP || !(ctx.getHitPos().y - pos.getY() > 0.5));
 		BlockState state = getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing()).with(HALF, bottom ? BlockHalf.BOTTOM : BlockHalf.TOP)
 				.with(WATERLOGGED, waterAt(ctx));
+		state = placing(state, ctx);
 		return placed(state.with(SHAPE, shapeAt(state, ctx.getWorld(), pos)), ctx);
+	}
+
+	/** A last say over a slope about to be placed (gentle slopes pick their step here). */
+	protected BlockState placing(BlockState state, ItemPlacementContext ctx) {
+		return state;
 	}
 
 	@Override
@@ -67,22 +88,18 @@ public class SlopeBlock extends CwBlock implements Waterloggable {
 		return direction.getAxis().isHorizontal() ? state.with(SHAPE, shapeAt(state, world, pos)) : state;
 	}
 
-	public static boolean isSlope(BlockState state) {
-		return state.getBlock() instanceof SlopeBlock;
-	}
-
 	/** The same rule vanilla stairs use to turn corners, applied between slopes. */
-	private static StairShape shapeAt(BlockState state, BlockView world, BlockPos pos) {
+	protected StairShape shapeAt(BlockState state, BlockView world, BlockPos pos) {
 		Direction facing = state.get(FACING);
 		BlockState front = world.getBlockState(pos.offset(facing));
-		if (isSlope(front) && state.get(HALF) == front.get(HALF)) {
+		if (joins(state, front) && state.get(HALF) == front.get(HALF)) {
 			Direction d = front.get(FACING);
 			if (d.getAxis() != facing.getAxis() && differs(state, world, pos, d.getOpposite())) {
 				return d == facing.rotateYCounterclockwise() ? StairShape.OUTER_LEFT : StairShape.OUTER_RIGHT;
 			}
 		}
 		BlockState back = world.getBlockState(pos.offset(facing.getOpposite()));
-		if (isSlope(back) && state.get(HALF) == back.get(HALF)) {
+		if (joins(state, back) && state.get(HALF) == back.get(HALF)) {
 			Direction d = back.get(FACING);
 			if (d.getAxis() != facing.getAxis() && differs(state, world, pos, d)) {
 				return d == facing.rotateYCounterclockwise() ? StairShape.INNER_LEFT : StairShape.INNER_RIGHT;
@@ -91,9 +108,9 @@ public class SlopeBlock extends CwBlock implements Waterloggable {
 		return StairShape.STRAIGHT;
 	}
 
-	private static boolean differs(BlockState state, BlockView world, BlockPos pos, Direction dir) {
+	private boolean differs(BlockState state, BlockView world, BlockPos pos, Direction dir) {
 		BlockState other = world.getBlockState(pos.offset(dir));
-		return !isSlope(other) || other.get(FACING) != state.get(FACING) || other.get(HALF) != state.get(HALF);
+		return !joins(state, other) || other.get(FACING) != state.get(FACING) || other.get(HALF) != state.get(HALF);
 	}
 
 	@Override

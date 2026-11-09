@@ -43,11 +43,14 @@ public final class CubeworkClient implements ClientModInitializer {
 		// Slopes have their own model, built from the vanilla block's textures.
 		ModelLoadingPlugin.register(ctx -> {
 			for (Material m : Material.ALL) {
-				Block slope = CwBlocks.get(m, Shape.SLOPE);
 				SlopeModel.Unbaked model = new SlopeModel.Unbaked(m);
-				ctx.registerBlockStateResolver(slope, resolver -> {
-					for (BlockState state : slope.getStateManager().getStates()) resolver.setModel(state, model);
-				});
+				for (Shape shape : new Shape[] {Shape.SLOPE, Shape.GENTLE_SLOPE}) {
+					Block slope = CwBlocks.get(m, shape);
+					if (slope == null) continue;
+					ctx.registerBlockStateResolver(slope, resolver -> {
+						for (BlockState state : slope.getStateManager().getStates()) resolver.setModel(state, model);
+					});
+				}
 			}
 		});
 	}
