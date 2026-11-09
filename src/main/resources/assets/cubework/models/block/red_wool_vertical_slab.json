@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_vertical_slab","textures":{"all":"minecraft:block/red_wool"}}
+{"parent":"cubework:block/template_vertical_slab","textures":{"top":"minecraft:block/red_wool","side":"minecraft:block/red_wool","bottom":"minecraft:block/red_wool"}}

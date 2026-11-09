@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_panel","textures":{"all":"minecraft:block/red_concrete"}}
+{"parent":"cubework:block/template_panel","textures":{"top":"minecraft:block/red_concrete","side":"minecraft:block/red_concrete","bottom":"minecraft:block/red_concrete"}}

@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_vertical_layer_1","textures":{"all":"minecraft:block/blue_stained_glass"}}
+{"parent":"cubework:block/template_vertical_layer_1","textures":{"top":"minecraft:block/blue_stained_glass","side":"minecraft:block/blue_stained_glass","bottom":"minecraft:block/blue_stained_glass"}}

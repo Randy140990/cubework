@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_vertical_slab","textures":{"all":"minecraft:block/green_glazed_terracotta"}}
+{"parent":"cubework:block/template_vertical_slab","textures":{"top":"minecraft:block/green_glazed_terracotta","side":"minecraft:block/green_glazed_terracotta","bottom":"minecraft:block/green_glazed_terracotta"}}

@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_panel","textures":{"all":"minecraft:block/light_blue_terracotta"}}
+{"parent":"cubework:block/template_panel","textures":{"top":"minecraft:block/light_blue_terracotta","side":"minecraft:block/light_blue_terracotta","bottom":"minecraft:block/light_blue_terracotta"}}

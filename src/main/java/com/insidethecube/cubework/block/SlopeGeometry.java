@@ -37,18 +37,18 @@ public final class SlopeGeometry {
 		};
 	}
 
-	private static final VoxelShape[] OUTLINE = new VoxelShape[4 * 2 * 5];
-	private static final VoxelShape[] INSIDE = new VoxelShape[4 * 2 * 5];
+	private static final VoxelShape[] OUTLINE = new VoxelShape[2 * 4 * 2 * 5];
+	private static final VoxelShape[] INSIDE = new VoxelShape[2 * 4 * 2 * 5];
 
-	private static int index(Direction f, BlockHalf half, StairShape shape) {
-		return f.getHorizontalQuarterTurns() * 10 + half.ordinal() * 5 + shape.ordinal();
+	private static int index(Direction f, BlockHalf half, StairShape shape, int height) {
+		return (height == 16 ? 0 : 40) + f.getHorizontalQuarterTurns() * 10 + half.ordinal() * 5 + shape.ordinal();
 	}
 
 	/** The hit box and the shape you stand on: steps of 2 pixels, each as high as the middle of its step. */
-	public static VoxelShape outline(Direction f, BlockHalf half, StairShape shape) {
-		int i = index(f, half, shape);
+	public static VoxelShape outline(Direction f, BlockHalf half, StairShape shape, int height) {
+		int i = index(f, half, shape, height);
 		VoxelShape s = OUTLINE[i];
-		if (s == null) OUTLINE[i] = s = build(f, half, shape, false);
+		if (s == null) OUTLINE[i] = s = build(f, half, shape, false, height);
 		return s;
 	}
 
@@ -56,22 +56,23 @@ public final class SlopeGeometry {
 	 * The part that is certainly solid (steps no higher than the surface), for hiding neighbours' faces:
 	 * nothing above the smooth surface may hide a face you can see.
 	 */
-	public static VoxelShape inside(Direction f, BlockHalf half, StairShape shape) {
-		int i = index(f, half, shape);
+	public static VoxelShape inside(Direction f, BlockHalf half, StairShape shape, int height) {
+		int i = index(f, half, shape, height);
 		VoxelShape s = INSIDE[i];
-		if (s == null) INSIDE[i] = s = build(f, half, shape, true);
+		if (s == null) INSIDE[i] = s = build(f, half, shape, true, height);
 		return s;
 	}
 
-	private static VoxelShape build(Direction f, BlockHalf half, StairShape shape, boolean inside) {
+	/** Heights scale to the block's own height (15 pixels for dirt path and farmland). */
+	private static VoxelShape build(Direction f, BlockHalf half, StairShape shape, boolean inside, int height) {
 		VoxelShape out = VoxelShapes.empty();
 		int cells = 8;
 		for (int cz = 0; cz < cells; cz++) {
 			int runStart = 0, runPx = -1;
 			for (int cx = 0; cx <= cells; cx++) {
-				int px = cx == cells ? -1 : px(f, shape, cx, cz, cells, inside);
+				int px = cx == cells ? -1 : (int) Math.round(px(f, shape, cx, cz, cells, inside) * height / 16.0);
 				if (px != runPx) {
-					if (runPx > 0) out = VoxelShapes.union(out, box(runStart, cx, cz, runPx, half, cells));
+					if (runPx > 0) out = VoxelShapes.union(out, box(runStart, cx, cz, runPx, half, cells, height));
 					runStart = cx;
 					runPx = px;
 				}
@@ -91,9 +92,9 @@ public final class SlopeGeometry {
 		return (int) Math.round(h * 16);
 	}
 
-	private static VoxelShape box(int x0, int x1, int cz, int px, BlockHalf half, int cells) {
+	private static VoxelShape box(int x0, int x1, int cz, int px, BlockHalf half, int cells, int height) {
 		double step = 16.0 / cells;
-		double y0 = half == BlockHalf.BOTTOM ? 0 : 16 - px, y1 = half == BlockHalf.BOTTOM ? px : 16;
+		double y0 = half == BlockHalf.BOTTOM ? 0 : height - px, y1 = half == BlockHalf.BOTTOM ? px : height;
 		return Block.createCuboidShape(x0 * step, y0, cz * step, x1 * step, y1, (cz + 1) * step);
 	}
 }

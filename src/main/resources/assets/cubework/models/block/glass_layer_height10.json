@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_layer_5","textures":{"all":"minecraft:block/glass"}}
+{"parent":"cubework:block/template_layer_5","textures":{"top":"minecraft:block/glass","side":"minecraft:block/glass","bottom":"minecraft:block/glass"}}

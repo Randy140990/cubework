@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_post","textures":{"all":"minecraft:block/cyan_concrete"}}
+{"parent":"cubework:block/template_post","textures":{"top":"minecraft:block/cyan_concrete","side":"minecraft:block/cyan_concrete","bottom":"minecraft:block/cyan_concrete"}}

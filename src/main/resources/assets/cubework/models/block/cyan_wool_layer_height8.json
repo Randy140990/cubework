@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_layer_4","textures":{"all":"minecraft:block/cyan_wool"}}
+{"parent":"cubework:block/template_layer_4","textures":{"top":"minecraft:block/cyan_wool","side":"minecraft:block/cyan_wool","bottom":"minecraft:block/cyan_wool"}}

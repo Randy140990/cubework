@@ -30,28 +30,25 @@ public class VerticalLayerBlock extends CwBlock {
 	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 	public static final IntProperty LAYERS = Properties.LAYERS;
 
-	private static final Map<Direction, VoxelShape[]> SHAPES = new EnumMap<>(Direction.class);
-
-	static {
-		for (Direction d : Direction.Type.HORIZONTAL) {
-			VoxelShape[] s = new VoxelShape[9];
-			for (int n = 1; n <= 8; n++) s[n] = shape(d, n * 2);
-			SHAPES.put(d, s);
-		}
-	}
+	private final Map<Direction, VoxelShape[]> shapes = new EnumMap<>(Direction.class);
 
 	/** A slab of this thickness against the wall opposite the way it grows. */
-	static VoxelShape shape(Direction grows, double t) {
+	static VoxelShape shape(Direction grows, double t, double h) {
 		return switch (grows) {
-			case SOUTH -> Block.createCuboidShape(0, 0, 0, 16, 16, t);
-			case NORTH -> Block.createCuboidShape(0, 0, 16 - t, 16, 16, 16);
-			case EAST -> Block.createCuboidShape(0, 0, 0, t, 16, 16);
-			default -> Block.createCuboidShape(16 - t, 0, 0, 16, 16, 16);
+			case SOUTH -> Block.createCuboidShape(0, 0, 0, 16, h, t);
+			case NORTH -> Block.createCuboidShape(0, 0, 16 - t, 16, h, 16);
+			case EAST -> Block.createCuboidShape(0, 0, 0, t, h, 16);
+			default -> Block.createCuboidShape(16 - t, 0, 0, 16, h, 16);
 		};
 	}
 
 	public VerticalLayerBlock(Material material, AbstractBlock.Settings settings) {
 		super(material, settings);
+		for (Direction d : Direction.Type.HORIZONTAL) {
+			VoxelShape[] s = new VoxelShape[9];
+			for (int n = 1; n <= 8; n++) s[n] = shape(d, n * 2, material.height());
+			shapes.put(d, s);
+		}
 		setDefaultState(getDefaultState().with(FACING, Direction.SOUTH).with(LAYERS, 1));
 	}
 
@@ -62,7 +59,7 @@ public class VerticalLayerBlock extends CwBlock {
 
 	@Override
 	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return SHAPES.get(state.get(FACING))[state.get(LAYERS)];
+		return shapes.get(state.get(FACING))[state.get(LAYERS)];
 	}
 
 	@Override

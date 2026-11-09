@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_layer_1","textures":{"all":"minecraft:block/gray_concrete"}}
+{"parent":"cubework:block/template_layer_1","textures":{"top":"minecraft:block/gray_concrete","side":"minecraft:block/gray_concrete","bottom":"minecraft:block/gray_concrete"}}

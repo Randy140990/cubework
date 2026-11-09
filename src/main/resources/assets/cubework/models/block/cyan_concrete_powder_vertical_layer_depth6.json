@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_vertical_layer_3","textures":{"all":"minecraft:block/cyan_concrete_powder"}}
+{"parent":"cubework:block/template_vertical_layer_3","textures":{"top":"minecraft:block/cyan_concrete_powder","side":"minecraft:block/cyan_concrete_powder","bottom":"minecraft:block/cyan_concrete_powder"}}

@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_layer_5","textures":{"all":"minecraft:block/white_stained_glass"}}
+{"parent":"cubework:block/template_layer_5","textures":{"top":"minecraft:block/white_stained_glass","side":"minecraft:block/white_stained_glass","bottom":"minecraft:block/white_stained_glass"}}

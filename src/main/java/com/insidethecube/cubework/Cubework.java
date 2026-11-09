@@ -1,6 +1,9 @@
 package com.insidethecube.cubework;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -25,42 +28,42 @@ public final class Cubework implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		CwBlocks.register();
+		Extras.register();
 		RegistryKey<Item> cube = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ID, "cube"));
 		CUBE = Registry.register(Registries.ITEM, cube, new Item(new Item.Settings().registryKey(cube)));
-		tabs();
+
+		// Four tabs, so there's little paging: coloured blocks, natural blocks, plants and doors.
+		tab("colours", () -> new ItemStack(CUBE), add -> {
+			for (Material m : Material.ALL) if (!m.nature()) shapes(m, add);
+		});
+		tab("nature", () -> new ItemStack(item("grass_block_slope")), add -> {
+			for (Material m : Material.ALL) if (m.nature()) shapes(m, add);
+			Extras.THIN_LOGS.forEach(add);
+		});
+		tab("plants", () -> new ItemStack(item("poppy_150")), add -> Extras.SIZED_PLANTS.forEach(add));
+		tab("doors", () -> new ItemStack(item("light_blue_mangrove_door")), add -> Extras.DOORS.forEach(add));
 	}
 
-	/** One tab per kind of material; each colour's shapes sit together, always in the same order. */
-	private static void tabs() {
-		for (Material.Kind kind : Material.Kind.values()) {
-			ItemGroup group = FabricItemGroup.builder()
-					.displayName(Text.translatable("itemGroup." + ID + "." + kind.tab))
-					.icon(() -> new ItemStack(icon(kind)))
-					.entries((context, entries) -> {
-						for (Material m : Material.ALL) {
-							if (m.kind() != kind) continue;
-							Map<Shape, Block> shapes = CwBlocks.shapesOf(m);
-							for (Shape s : Shape.values()) {
-								Block b = shapes.get(s);
-								if (b != null) entries.add(b);
-							}
-						}
-					})
-					.build();
-			Registry.register(Registries.ITEM_GROUP, RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(ID, kind.tab)), group);
+	/** One material's shapes, always in the same order. */
+	private static void shapes(Material m, Consumer<Block> add) {
+		Map<Shape, Block> shapes = CwBlocks.shapesOf(m);
+		for (Shape s : Shape.values()) {
+			Block b = shapes.get(s);
+			if (b != null) add.accept(b);
 		}
 	}
 
-	/** The first tab shows the cube; the others show one of their own shapes, so they're easy to tell apart. */
-	private static Item icon(Material.Kind kind) {
-		String id = switch (kind) {
-			case WOOL -> null;
-			case TERRACOTTA -> "orange_terracotta_stairs";
-			case CONCRETE -> "light_blue_concrete_slope";
-			case POWDER -> "pink_concrete_powder_vertical_slab";
-			case GLAZED -> "cyan_glazed_terracotta_stairs";
-			case GLASS -> "light_blue_stained_glass_slope";
-		};
-		return id == null ? CUBE : Registries.ITEM.get(Identifier.of(ID, id));
+	private static void tab(String name, Supplier<ItemStack> icon, Consumer<Consumer<Block>> fill) {
+		ItemGroup group = FabricItemGroup.builder()
+				.displayName(Text.translatable("itemGroup." + ID + "." + name))
+				.icon(icon)
+				.entries((context, entries) -> fill.accept(entries::add))
+				.build();
+		Registry.register(Registries.ITEM_GROUP, RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(ID, name)), group);
 	}
+
+	private static Item item(String id) {
+		return Registries.ITEM.get(Identifier.of(ID, id));
+	}
+
 }

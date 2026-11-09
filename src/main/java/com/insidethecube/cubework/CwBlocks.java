@@ -26,6 +26,8 @@ import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSetType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.MapColor;
 import net.minecraft.block.WoodType;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.BlockItem;
@@ -35,6 +37,8 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.EmptyBlockView;
 
 /** Every Cubework block, made from the material and shape tables. */
 public final class CwBlocks {
@@ -67,7 +71,12 @@ public final class CwBlocks {
 	}
 
 	private static AbstractBlock.Settings settings(Block base, Shape s) {
-		AbstractBlock.Settings set = AbstractBlock.Settings.copy(base);
+		// Map colour and light are fixed from the vanilla block, since some vanilla blocks work them out
+		// from properties our shapes don't have (a log's axis, redstone ore being lit).
+		BlockState def = base.getDefaultState();
+		MapColor colour = def.getMapColor(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
+		int light = def.getLuminance();
+		AbstractBlock.Settings set = AbstractBlock.Settings.copy(base).mapColor(colour).luminance(state -> light);
 		return switch (s) {
 			case BUTTON, PRESSURE_PLATE -> set.noCollision().pistonBehavior(PistonBehavior.DESTROY);
 			case TRAPDOOR -> set.nonOpaque().allowsSpawning((state, world, pos, type) -> false);

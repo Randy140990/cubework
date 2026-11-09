@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_slope_item","textures":{"all":"minecraft:block/red_concrete"}}
+{"parent":"cubework:block/template_slope_item","textures":{"top":"minecraft:block/red_concrete","side":"minecraft:block/red_concrete","bottom":"minecraft:block/red_concrete"}}
