@@ -60,11 +60,17 @@ TEXTURES = {
 }
 
 # (suffix, English name, how many one block makes in the stonecutter), in the order of Shape.java
-SHAPES = [("stairs", "Stairs", 1), ("slab", "Slab", 2), ("vertical_slab", "Vertical Slab", 2), ("slope", "Slope", 2),
-          ("layer", "Layer", 8), ("vertical_layer", "Vertical Layer", 8), ("carpet", "Carpet", 4), ("panel", "Panel", 4),
-          ("post", "Post", 4), ("wall", "Wall", 1), ("fence", "Fence", 1), ("fence_gate", "Fence Gate", 1),
-          ("trapdoor", "Trapdoor", 1), ("button", "Button", 4), ("pressure_plate", "Pressure Plate", 2)]
+SHAPES = [("stairs", "Stairs", 1), ("slab", "Slab", 2), ("quarter_slab", "Quarter Slab", 4), ("vertical_slab", "Vertical Slab", 2),
+          ("slope", "Slope", 2), ("gentle_slope", "Gentle Slope", 2), ("layer", "Layer", 8), ("vertical_layer", "Vertical Layer", 8),
+          ("carpet", "Carpet", 4), ("panel", "Panel", 4), ("post", "Post", 4), ("arch", "Arch", 1), ("arch_corner", "Arch Corner", 1),
+          ("wall", "Wall", 1), ("fence", "Fence", 1), ("fence_gate", "Fence Gate", 1),
+          ("trapdoor", "Trapdoor", 1), ("button", "Button", 4), ("pressure_plate", "Pressure Plate", 2)] + \
+         [("window_frame_%d" % d, "Window Frame (%d px)" % d, c) for d, c in ((4, 4), (8, 2), (12, 1), (16, 1))] + \
+         [("diamond_window_frame_%d" % d, "Diamond Window Frame (%d px)" % d, c) for d, c in ((4, 4), (8, 2), (12, 1), (16, 1))]
 NATURE_SHAPES = {"slab", "vertical_slab", "slope", "layer", "vertical_layer", "carpet"}
+# Gentle slopes, quarter slabs, arches and window frames: wool, terracotta and concrete for now.
+CASTLE_SHAPES = {"quarter_slab", "gentle_slope", "arch", "arch_corner"} | {"%swindow_frame_%d" % (p, d) for p in ("", "diamond_") for d in (4, 8, 12, 16)}
+WINDOW_DEPTHS = [4, 8, 12, 16]
 
 LOGS = ["oak_log", "spruce_log", "birch_log", "jungle_log", "acacia_log", "dark_oak_log", "mangrove_log", "cherry_log",
         "pale_oak_log", "crimson_stem", "warped_stem", "mushroom_stem"]
@@ -100,6 +106,8 @@ VANILLA_SHOVEL = load_list("vanilla_shovel.json")
 def applies(mat, kind, suffix):
     if kind == "nature":
         return suffix in NATURE_SHAPES
+    if suffix in CASTLE_SHAPES and kind not in ("wool", "terracotta", "concrete"):
+        return False
     return not (suffix == "carpet" and kind == "wool")
 
 
@@ -277,7 +285,73 @@ def plant_templates():
                   {"ambientocclusion": False, "textures": {"particle": "#cross"}, "elements": elements})
 
 
+# ---------- castle shapes: outlines (16 x 16, x across from the viewer's left, y up), as Profiles.java ----------
+
+def arch_mask():
+    return [[((x + 0.5 - 8) / 8) ** 2 + ((y + 0.5) / 12) ** 2 >= 1 for y in range(16)] for x in range(16)]
+
+
+def arch_corner_mask():
+    return [[((x + 0.5 - 16) / 16) ** 2 + ((y + 0.5) / 12) ** 2 >= 1 for y in range(16)] for x in range(16)]
+
+
+def mask_boxes(mask, z0, z1):
+    """Rows of solid pixels as boxes."""
+    out = []
+    for y in range(16):
+        start = None
+        for x in range(17):
+            solid = x < 16 and mask[x][y]
+            if solid and start is None: start = x
+            if not solid and start is not None:
+                out.append(([start, y, z0], [x, y + 1, z1]))
+                start = None
+    return out
+
+
+# Window frame pieces (facing north: against the north side, seen from the south).
+WINDOW_RECTS = {"bar_left": ((0, 4), (4, 12)), "bar_right": ((12, 16), (4, 12)), "bar_bottom": ((4, 12), (0, 4)), "bar_top": ((4, 12), (12, 16)),
+                "corner_bl": ((0, 4), (0, 4)), "corner_br": ((12, 16), (0, 4)), "corner_tl": ((0, 4), (12, 16)), "corner_tr": ((12, 16), (12, 16))}
+
+
+def window_piece_mask(piece):
+    m = [[False] * 16 for _ in range(16)]
+    if piece in WINDOW_RECTS:
+        (x0, x1), (y0, y1) = WINDOW_RECTS[piece]
+        for x in range(x0, x1):
+            for y in range(y0, y1): m[x][y] = True
+        return m
+    for x in range(4, 12):
+        for y in range(4, 12):
+            left, bottom = x < 8, y < 8
+            i = x - 4 if left else 11 - x
+            j = y - 4 if bottom else 11 - y
+            want = ("b" if bottom else "t") + ("l" if left else "r")
+            if piece == "tri_" + want and i + j <= 2: m[x][y] = True
+    return m
+
+
+WINDOW_PIECES = list(WINDOW_RECTS) + ["tri_bl", "tri_br", "tri_tl", "tri_tr"]
+
+
+def castle_templates():
+    template("template_quarter_slab", [([0, 0, 0], [16, 4, 16])], 4)
+    template("template_quarter_slab_top", [([0, 12, 0], [16, 16, 16])], 16)
+    template("template_arch", mask_boxes(arch_mask(), 0, 16))
+    template("template_arch_corner", mask_boxes(arch_corner_mask(), 0, 16))
+    # The gentle slope in the hand: one step (4 to 8 pixels), rising east like stairs.
+    template("template_gentle_slope_item", [([2 * k, 0, 0], [2 * k + 2, 4 + (k + 1) * 0.5, 16]) for k in range(8)], 8, display=STAIRS_DISPLAY)
+    for d in WINDOW_DEPTHS:
+        for piece in WINDOW_PIECES:
+            template("template_window_%d_%s" % (d, piece), mask_boxes(window_piece_mask(piece), 0, d))
+        for diamond in (False, True):
+            pieces = list(WINDOW_RECTS) + (["tri_bl", "tri_br", "tri_tl", "tri_tr"] if diamond else [])
+            boxes = [b for p in pieces for b in mask_boxes(window_piece_mask(p), 0, d)]
+            template("template_%swindow_%d_inventory" % ("diamond_" if diamond else "", d), boxes)
+
+
 def templates():
+    castle_templates()
     shape_templates(False, False, 16)
     for grass in (False, True):
         for top in (16, 15):
@@ -447,9 +521,73 @@ def pressure_plate(mat, kind, name):
     item(name, m(name))
 
 
+def quarter_slab(mat, kind, name):
+    t, _ = shape_textures(mat, kind)
+    model(name, m("template_quarter_slab"), t)
+    model(name + "_top", m("template_quarter_slab_top"), t)
+    blockstate(name, {"variants": {"half=bottom": {"model": m(name)}, "half=top": {"model": m(name + "_top")}}})
+    item(name, m(name))
+
+
+def gentle_slope(mat, kind, name):
+    # Placed gentle slopes are built in code (SlopeModel); this one is for the item.
+    t, _ = shape_textures(mat, kind)
+    model(name + "_item", m("template_gentle_slope_item"), t)
+    item(name, m(name + "_item"))
+
+
+def arch(mat, kind, name):
+    t, _ = shape_textures(mat, kind)
+    model(name, m("template_arch"), t)
+    blockstate(name, {"variants": {"axis=z": {"model": m(name)}, "axis=x": {"model": m(name), "y": 90, "uvlock": True}}})
+    item(name, m(name))
+
+
+def arch_corner(mat, kind, name):
+    t, _ = shape_textures(mat, kind)
+    model(name, m("template_arch_corner"), t)
+    # Drawn rising east.
+    y = {"east": 0, "south": 90, "west": 180, "north": 270}
+    blockstate(name, {"variants": {"facing=" + d: {"model": m(name), "y": y[d], "uvlock": True} for d in HORIZONTAL}})
+    item(name, m(name))
+
+
+def window_frame(mat, kind, name, depth, diamond):
+    t, _ = shape_textures(mat, kind)
+    pieces = list(WINDOW_RECTS) + (["tri_bl", "tri_br", "tri_tl", "tri_tr"] if diamond else [])
+    for p in pieces:
+        model("%s_%s" % (name, p), m("template_window_%d_%s" % (depth, p)), t)
+    model(name + "_inventory", m("template_%swindow_%d_inventory" % ("diamond_" if diamond else "", depth)), t)
+    side = {"l": "left", "r": "right", "b": "down", "t": "up"}
+    parts = []
+    for f in HORIZONTAL:
+        apply = lambda p: {"model": m("%s_%s" % (name, p)), "y": Y_FROM_NORTH[f], "uvlock": True}
+        for p in pieces:
+            if p.startswith("bar_"):
+                key = {"bar_left": "left", "bar_right": "right", "bar_bottom": "down", "bar_top": "up"}[p]
+                parts.append({"when": {"facing": f, key: "false"}, "apply": apply(p)})
+            elif p.startswith("corner_"):
+                v, h = side[p[-2]], side[p[-1]]
+                parts.append({"when": {"OR": [{"facing": f, v: "false"}, {"facing": f, h: "false"}]}, "apply": apply(p)})
+            else:
+                v, h = side[p[-2]], side[p[-1]]
+                parts.append({"when": {"facing": f, v: "false", h: "false"}, "apply": apply(p)})
+    blockstate(name, {"multipart": parts})
+    item(name, m(name + "_inventory"))
+
+
+for _d in WINDOW_DEPTHS:
+    for _diamond in (False, True):
+        globals()["window_%s%d" % ("d" if _diamond else "s", _d)] = (lambda d, dm: lambda mat, kind, name: window_frame(mat, kind, name, d, dm))(_d, _diamond)
+
+
 BUILDERS = {"stairs": stairs, "slab": slab, "vertical_slab": vertical_slab, "slope": slope, "layer": layer,
             "vertical_layer": vertical_layer, "carpet": carpet, "panel": panel, "post": post, "wall": wall,
-            "fence": fence, "fence_gate": fence_gate, "trapdoor": trapdoor, "button": button, "pressure_plate": pressure_plate}
+            "fence": fence, "fence_gate": fence_gate, "trapdoor": trapdoor, "button": button, "pressure_plate": pressure_plate,
+            "quarter_slab": quarter_slab, "gentle_slope": gentle_slope, "arch": arch, "arch_corner": arch_corner}
+for _d in WINDOW_DEPTHS:
+    BUILDERS["window_frame_%d" % _d] = globals()["window_s%d" % _d]
+    BUILDERS["diamond_window_frame_%d" % _d] = globals()["window_d%d" % _d]
 
 
 # ---------- loot and recipes ----------

@@ -1,0 +1,80 @@
+package com.insidethecube.cubework.block;
+
+import com.insidethecube.cubework.Material;
+
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
+import net.minecraft.block.Waterloggable;
+import net.minecraft.block.enums.BlockHalf;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Properties;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockView;
+
+/**
+ * Half of a two-wide arch: the curve rises from one side to 4 pixels below the top on the other. It rises
+ * towards your right, unless there's already an arch corner or a top quarter slab on your left (the other
+ * end of the arch), in which case it rises towards your left to meet it. Top quarter slabs between two
+ * corners make a three- or four-wide arch.
+ */
+public class ArchCornerBlock extends CwBlock implements Waterloggable {
+	/** The high side, towards the middle of the arch. */
+	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+
+	private static final VoxelShape[] SHAPES = new VoxelShape[4];
+
+	static {
+		for (int t = 0; t < 4; t++) SHAPES[t] = Profiles.shape(Profiles.archCorner(), 0, 16, t);
+	}
+
+	public ArchCornerBlock(Material material, AbstractBlock.Settings settings) {
+		super(material, settings);
+		setDefaultState(getDefaultState().with(FACING, Direction.EAST).with(WATERLOGGED, false));
+	}
+
+	@Override
+	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+		builder.add(FACING, WATERLOGGED);
+	}
+
+	/** The model is drawn rising east, so east is no turn. */
+	static int turns(Direction high) {
+		return high.getHorizontalQuarterTurns() + 1 & 3;
+	}
+
+	@Override
+	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+		return SHAPES[turns(state.get(FACING))];
+	}
+
+	@Override
+	public BlockState getPlacementState(ItemPlacementContext ctx) {
+		Direction looking = ctx.getHorizontalPlayerFacing();
+		Direction right = looking.rotateYClockwise(), left = right.getOpposite();
+		BlockPos pos = ctx.getBlockPos();
+		boolean meetLeft = archPart(ctx.getWorld().getBlockState(pos.offset(left))) && !archPart(ctx.getWorld().getBlockState(pos.offset(right)));
+		return placed(getDefaultState().with(FACING, meetLeft ? left : right).with(WATERLOGGED, waterAt(ctx)), ctx);
+	}
+
+	private static boolean archPart(BlockState s) {
+		return s.getBlock() instanceof ArchCornerBlock || (s.getBlock() instanceof QuarterSlabBlock && s.get(QuarterSlabBlock.HALF) == BlockHalf.TOP);
+	}
+
+	@Override
+	protected BlockState rotate(BlockState state, BlockRotation rotation) {
+		return state.with(FACING, rotation.rotate(state.get(FACING)));
+	}
+
+	@Override
+	protected BlockState mirror(BlockState state, BlockMirror mirror) {
+		return state.with(FACING, mirror.apply(state.get(FACING)));
+	}
+}

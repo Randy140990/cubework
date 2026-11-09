@@ -8,6 +8,7 @@ import java.util.Map;
 import org.joml.Vector3f;
 
 import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.block.GentleSlopeBlock;
 import com.insidethecube.cubework.block.SlopeBlock;
 import com.insidethecube.cubework.block.SlopeGeometry;
 
@@ -51,7 +52,9 @@ public final class SlopeModel {
 			SimpleModel named = () -> "cubework slope " + material.id();
 			Sprites s = new Sprites(sprite(baker, t.top(), named), sprite(baker, t.side(), named), sprite(baker, t.bottom(), named),
 					t.overlay() == null ? null : sprite(baker, t.overlay(), named), material.grassTinted());
-			return new Baked(new Part(quads(state, s, material.height() / 16.0), s.side()));
+			SlopeBlock block = (SlopeBlock) state.getBlock();
+			return new Baked(new Part(quads(state, s, block.base(state) / 16.0, block.rise(state) / 16.0, material.height() / 16.0,
+					block instanceof GentleSlopeBlock), s.side()));
 		}
 
 		private static Sprite sprite(Baker baker, String texture, SimpleModel named) {
@@ -106,13 +109,17 @@ public final class SlopeModel {
 		}
 	}
 
-	private static Quads quads(BlockState state, Sprites s, double height) {
+	/**
+	 * base and rise: where the slope starts and how far it climbs (as parts of a block); top: the block's
+	 * height; world: hang side textures from the block's top (gentle steps line up) rather than the slope.
+	 */
+	private static Quads quads(BlockState state, Sprites s, double base, double rise, double height, boolean world) {
 		Direction f = state.get(SlopeBlock.FACING);
 		StairShape shape = state.get(SlopeBlock.SHAPE);
 		boolean top = state.get(SlopeBlock.HALF) == BlockHalf.TOP;
 		Map<Direction, List<BakedQuad>> out = new EnumMap<>(Direction.class);
 		List<BakedQuad> free = new ArrayList<>();
-		Builder b = new Builder(top, height);
+		Builder b = new Builder(top, height, base, rise, world);
 		int tint = s.tinted() ? 0 : -1;
 
 		// Corner heights (0 or 1): north-west, north-east, south-east, south-west.
@@ -136,11 +143,13 @@ public final class SlopeModel {
 			free.add(b.surface(surface, surfaceTint, new double[][] {v(c[a], h[a]), v(c[o], h[o]), v(c[r], h[r]), v(c[r], h[r])}));
 		}
 
-		// The four sides: a square where both corners are high, a triangle where one is. Grass gets its
-		// tinted overlay on top, so the green edge follows the slope.
+		// The four sides: a square where both corners are high, a triangle where one is, on top of the
+		// solid part a gentle slope's step stands on. Grass gets its tinted overlay on top, so the green edge
+		// follows the slope.
 		Direction[] sides = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 		for (int i = 0; i < 4; i++) {
 			int p = i, q = (i + 1) % 4;
+			if (base > 0) add(out, sides[i], b.footing(s.side(), sides[i], c[p], c[q]));
 			if (h[p] == 0 && h[q] == 0) continue;
 			add(out, sides[i], b.side(s.side(), -1, sides[i], c[p], h[p], c[q], h[q]));
 			if (s.overlay() != null) add(out, sides[i], b.side(s.overlay(), tint, sides[i], c[p], h[p], c[q], h[q]));
@@ -172,15 +181,33 @@ public final class SlopeModel {
 	 */
 	private static final class Builder {
 		private final boolean top;
-		private final double height;
+		private final double height, base, rise;
+		private final boolean world;
 
-		Builder(boolean top, double height) {
+		Builder(boolean top, double height, double base, double rise, boolean world) {
 			this.top = top;
 			this.height = height;
+			this.base = base;
+			this.rise = rise;
+			this.world = world;
 		}
 
-		private double y(double y) {
-			return top ? height - y * height : y * height;
+		/** A point on the slope (0 to 1 up its rise) in block space, upside down for the top half. */
+		private double y(double t) {
+			return at(base + t * rise);
+		}
+
+		/** A height in block space, upside down for the top half. */
+		private double at(double y) {
+			return top ? height - y : y;
+		}
+
+		/** The solid part under a gentle slope's step, on one side. */
+		BakedQuad footing(Sprite sprite, Direction d, double[] a, double[] b) {
+			double[][] p = {{a[0], at(0), a[1]}, {b[0], at(0), b[1]}, {b[0], at(base), b[1]}, {a[0], at(base), a[1]}};
+			float[][] uv = new float[4][];
+			for (int i = 0; i < 4; i++) uv[i] = new float[] {texU(new double[] {p[i][0], 0, p[i][2]}, d), (float) (1 - p[i][1])};
+			return quad(sprite, -1, p, uv, d, d);
 		}
 
 		BakedQuad flat(Sprite sprite, int tint) {
@@ -231,8 +258,9 @@ public final class SlopeModel {
 			for (int i = 0; i < 4; i++) {
 				double[] l = local.get(i);
 				p[i] = new double[] {l[0], y(l[1]), l[2]};
-				double fromTop = top ? l[1] : col.get(i)[0] - l[1];
-				uv[i] = new float[] {texU(l, d), (float) (fromTop * height)};
+				double fromTop = top ? l[1] * rise : (col.get(i)[0] - l[1]) * rise;
+				float v = world ? (float) (1 - p[i][1]) : (float) fromTop;
+				uv[i] = new float[] {texU(l, d), v};
 			}
 			return quad(sprite, tint, p, uv, d, d);
 		}

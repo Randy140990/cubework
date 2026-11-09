@@ -15,6 +15,11 @@ import com.insidethecube.cubework.block.CwSlab;
 import com.insidethecube.cubework.block.CwStairs;
 import com.insidethecube.cubework.block.CwTrapdoor;
 import com.insidethecube.cubework.block.CwWall;
+import com.insidethecube.cubework.block.ArchBlock;
+import com.insidethecube.cubework.block.ArchCornerBlock;
+import com.insidethecube.cubework.block.GentleSlopeBlock;
+import com.insidethecube.cubework.block.QuarterSlabBlock;
+import com.insidethecube.cubework.block.WindowFrameBlock;
 import com.insidethecube.cubework.block.LayerBlock;
 import com.insidethecube.cubework.block.PanelBlock;
 import com.insidethecube.cubework.block.PostBlock;
@@ -102,6 +107,12 @@ public final class CwBlocks {
 			case TRAPDOOR -> set -> new CwTrapdoor(m, BlockSetType.STONE, set);
 			case BUTTON -> set -> new CwButton(m, BlockSetType.STONE, 20, set);
 			case PRESSURE_PLATE -> set -> new CwPressurePlate(m, BlockSetType.STONE, set);
+			case QUARTER_SLAB -> set -> new QuarterSlabBlock(m, set);
+			case GENTLE_SLOPE -> set -> new GentleSlopeBlock(m, set);
+			case ARCH -> set -> new ArchBlock(m, set);
+			case ARCH_CORNER -> set -> new ArchCornerBlock(m, set);
+			case WINDOW_4, WINDOW_8, WINDOW_12, WINDOW_16, DIAMOND_WINDOW_4, DIAMOND_WINDOW_8, DIAMOND_WINDOW_12, DIAMOND_WINDOW_16 ->
+					set -> new WindowFrameBlock(m, s.windowDepth(), s.diamond(), set);
 		};
 	}
 
