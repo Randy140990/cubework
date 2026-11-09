@@ -1,7 +1,4 @@
-BlockStateModel
-BakedQuad
-BlockRenderLayer
-ModelLoadingPlugin
-BlockStateResolver
-QuadEmitter
-SpriteFinder
+Atlas
+UVPair
+UvPair
+/Uv
