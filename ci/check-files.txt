@@ -1,0 +1,9 @@
+assets/minecraft/models/block/*.json
+assets/minecraft/blockstates/*.json
+data/minecraft/tags/block/mineable/*.json
+data/minecraft/tags/block/logs.json
+data/minecraft/tags/block/logs_that_burn.json
+assets/minecraft/items/copper_door.json
+assets/minecraft/items/iron_door.json
+assets/minecraft/items/tube_coral.json
+assets/minecraft/items/tube_coral_fan.json

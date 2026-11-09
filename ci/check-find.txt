@@ -1,0 +1,2 @@
+textures/block/
+textures/item/
