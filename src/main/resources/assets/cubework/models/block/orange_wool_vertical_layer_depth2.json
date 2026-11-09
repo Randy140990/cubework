@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_vertical_layer_1","textures":{"all":"minecraft:block/orange_wool"}}
+{"parent":"cubework:block/template_vertical_layer_1","textures":{"top":"minecraft:block/orange_wool","side":"minecraft:block/orange_wool","bottom":"minecraft:block/orange_wool"}}

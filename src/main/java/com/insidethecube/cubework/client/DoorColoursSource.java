@@ -51,7 +51,7 @@ public record DoorColoursSource(List<Identifier> textures, String prefix) implem
 	/** One coloured sprite, made when the atlas is built. Animated textures use their first frame. */
 	private record Region(Resource resource, Identifier id, int colour) implements AtlasSource.SpriteRegion {
 		@Override
-		public SpriteContents apply(SpriteOpener opener) {
+		public SpriteContents load(SpriteOpener opener) {
 			try (InputStream in = resource.getInputStream(); NativeImage source = NativeImage.read(in)) {
 				int w = source.getWidth(), h = Math.min(source.getHeight(), w);
 				int[] px = new int[w * h];

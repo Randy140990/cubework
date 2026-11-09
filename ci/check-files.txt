@@ -1,8 +1,0 @@
-data/minecraft/tags/block/mineable/axe.json
-data/minecraft/tags/block/mineable/hoe.json
-data/minecraft/tags/block/logs.json
-data/minecraft/tags/block/wooden_doors.json
-data/minecraft/tags/block/doors.json
-assets/minecraft/models/block/door_bottom_left.json
-assets/minecraft/models/item/oak_door.json
-assets/minecraft/models/item/poppy.json

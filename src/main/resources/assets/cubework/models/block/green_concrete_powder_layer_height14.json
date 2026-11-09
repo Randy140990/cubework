@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_layer_7","textures":{"all":"minecraft:block/green_concrete_powder"}}
+{"parent":"cubework:block/template_layer_7","textures":{"top":"minecraft:block/green_concrete_powder","side":"minecraft:block/green_concrete_powder","bottom":"minecraft:block/green_concrete_powder"}}

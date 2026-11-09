@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_slope_item","textures":{"all":"minecraft:block/cyan_concrete"}}
+{"parent":"cubework:block/template_slope_item","textures":{"top":"minecraft:block/cyan_concrete","side":"minecraft:block/cyan_concrete","bottom":"minecraft:block/cyan_concrete"}}

@@ -1,8 +1,0 @@
-net.minecraft.client.texture.atlas.AtlasSource$SpriteSource
-net.minecraft.client.texture.atlas.AtlasSprite
-c net.minecraft.client.texture.atlas.PalettedPermutationsAtlasSource$PalettedSpriteRegion
-net.minecraft.client.texture.SpriteDimensions
-net.minecraft.resource.ResourceFinder
-net.minecraft.util.dynamic.Codecs$IdMapper
-net.minecraft.block.BlockSetType
-net.minecraft.item.TallBlockItem
