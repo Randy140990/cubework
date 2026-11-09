@@ -1,14 +1,6 @@
-net.minecraft.block.Oxidizable
-net.minecraft.block.Degradable
-c net.minecraft.block.Degradable
-net.minecraft.block.OxidizableBlock
-net.minecraft.block.CoralParentBlock
-c net.minecraft.block.CoralParentBlock
-net.minecraft.block.CoralPlantBlock
-c net.minecraft.block.CoralPlantBlock
-net.minecraft.block.CoralFanBlock
-net.minecraft.block.BlockSetType
-net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry
-net.minecraft.item.HoneycombItem
-net.minecraft.block.AbstractBlock
-net.minecraft.client.render.model.BakedQuad
+net.minecraft.block.StairsBlock
+c net.minecraft.block.StairsBlock
+net.minecraft.block.AbstractBlock$Settings
+net.minecraft.block.DoorBlock
+net.minecraft.world.tick.ScheduledTickView
+net.minecraft.block.Waterloggable
