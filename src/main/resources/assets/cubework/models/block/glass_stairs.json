@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/stairs","textures":{"bottom":"minecraft:block/glass","top":"minecraft:block/glass","side":"minecraft:block/glass"}}
+{"parent":"minecraft:block/stairs","textures":{"top":"minecraft:block/glass","side":"minecraft:block/glass","bottom":"minecraft:block/glass"}}

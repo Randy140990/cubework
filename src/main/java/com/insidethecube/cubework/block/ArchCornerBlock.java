@@ -7,7 +7,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.Waterloggable;
-import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
@@ -20,19 +19,23 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 
 /**
- * Half of a two-wide arch: the curve rises from one side to 4 pixels below the top on the other. It rises
- * towards your right, unless there's already an arch corner or a top quarter slab on your left (the other
- * end of the arch), in which case it rises towards your left to meet it. Top quarter slabs between two
- * corners make a three- or four-wide arch.
+ * Half of a two-wide arch: its underside curves smoothly from the floor at its back up to 4 pixels below the
+ * top at its front. Its back goes against the block you click, so it reaches out from that wall; on a floor
+ * it backs onto the far side and reaches towards you. Two facing each other across a two-block gap make an
+ * arch; top quarter slabs between them make a three- or four-wide one.
  */
 public class ArchCornerBlock extends CwBlock implements Waterloggable {
 	/** The high side, towards the middle of the arch. */
 	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
 	private static final VoxelShape[] SHAPES = new VoxelShape[4];
+	private static final VoxelShape[] SOLID = new VoxelShape[4];
 
 	static {
-		for (int t = 0; t < 4; t++) SHAPES[t] = Profiles.shape(Profiles.archCorner(), 0, 16, t);
+		for (int t = 0; t < 4; t++) {
+			SHAPES[t] = Profiles.shape(Profiles.archCorner(), 0, 16, t);
+			SOLID[t] = Profiles.shape(ArchGeometry.inside(true), 0, 16, t);
+		}
 	}
 
 	public ArchCornerBlock(Material material, AbstractBlock.Settings settings) {
@@ -46,7 +49,7 @@ public class ArchCornerBlock extends CwBlock implements Waterloggable {
 	}
 
 	/** The model is drawn rising east, so east is no turn. */
-	static int turns(Direction high) {
+	public static int turns(Direction high) {
 		return high.getHorizontalQuarterTurns() + 1 & 3;
 	}
 
@@ -55,17 +58,17 @@ public class ArchCornerBlock extends CwBlock implements Waterloggable {
 		return SHAPES[turns(state.get(FACING))];
 	}
 
+	/** The part that's solid all over, for hiding neighbours' faces (the model's curve is smooth). */
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		Direction looking = ctx.getHorizontalPlayerFacing();
-		Direction right = looking.rotateYClockwise(), left = right.getOpposite();
-		BlockPos pos = ctx.getBlockPos();
-		boolean meetLeft = archPart(ctx.getWorld().getBlockState(pos.offset(left))) && !archPart(ctx.getWorld().getBlockState(pos.offset(right)));
-		return placed(getDefaultState().with(FACING, meetLeft ? left : right).with(WATERLOGGED, waterAt(ctx)), ctx);
+	protected VoxelShape getCullingShape(BlockState state) {
+		return SOLID[turns(state.get(FACING))];
 	}
 
-	private static boolean archPart(BlockState s) {
-		return s.getBlock() instanceof ArchCornerBlock || (s.getBlock() instanceof QuarterSlabBlock && s.get(QuarterSlabBlock.HALF) == BlockHalf.TOP);
+	@Override
+	public BlockState getPlacementState(ItemPlacementContext ctx) {
+		Direction side = ctx.getSide();
+		Direction high = side.getAxis().isHorizontal() ? side : ctx.getHorizontalPlayerFacing().getOpposite();
+		return placed(getDefaultState().with(FACING, high).with(WATERLOGGED, waterAt(ctx)), ctx);
 	}
 
 	@Override

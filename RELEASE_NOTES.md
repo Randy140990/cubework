@@ -1,5 +1,15 @@
 Cubework by Inside the Cube.
 
+0.4.0: building blocks, smooth arches, coral, tapering logs, and iron and metal doors.
+- Building tab: 98 building blocks in every shape (stairs to window frames) plus pillars 12, 8 and 4 pixels wide: stone and stone bricks, granite, diorite, andesite, deepslate, tuff, bricks, mud, resin, sandstone and red sandstone, prismarine, nether bricks, basalt, blackstone, end stone bricks, purpur, the metal and gem blocks, quartz, amethyst and copper. 2,856 new pieces.
+- Copper shapes weather like copper, take wax from honeycomb, and an axe scrapes off wax or weathering.
+- Arches are drawn with a smooth curve. An arch corner's back goes against the block you click, so two facing each other across a gap make an arch.
+- Window frames join whatever their depth (a shallower one leaves a ledge), square or diamond.
+- Thin logs: a 16 px log, and any end with another log against it shows bark, so thinner logs on thicker ones look like one tapering trunk.
+- Coral and coral fans at 50% to 150%, living and dead; living coral dies out of water like vanilla's.
+- Doors: the iron door in the 16 colours (still redstone only), and the copper door's pattern in iron, gold, redstone, emerald, lapis, diamond and netherite (opens by hand), painted from those blocks' textures.
+- The Plants tab has a fern for its icon.
+
 0.3.0: gentle slopes, quarter slabs, arches and window frames, for wool, terracotta and concrete (49 blocks, 588 new pieces).
 - Gentle slope: rises 4 pixels across the block, so four in a row climb one block. Placed in front of one facing the same way, it takes the next step by itself; use one with an empty hand to move it to the next step. Corners join like slopes.
 - Quarter slab: 4 pixels thick, at the bottom or the top of the block.

@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/slab_top","textures":{"bottom":"minecraft:block/magenta_stained_glass","top":"minecraft:block/magenta_stained_glass","side":"minecraft:block/magenta_stained_glass"}}
+{"parent":"minecraft:block/slab_top","textures":{"top":"minecraft:block/magenta_stained_glass","side":"minecraft:block/magenta_stained_glass","bottom":"minecraft:block/magenta_stained_glass"}}

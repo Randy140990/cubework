@@ -22,9 +22,9 @@ import net.minecraft.world.WorldView;
 
 /**
  * A window frame: a 4-pixel border round an 8-wide opening, 4, 8, 12 or 16 pixels deep, square or diamond.
- * It sits against the face you click. Frames of the same kind facing the same way join: where they meet
- * the border goes, so a stack makes a tall slit (sill at the bottom, lintel at the top), a row makes a long
- * one, and a square of them makes one big opening.
+ * It sits against the face you click. Frames facing the same way join, whatever their depth (a shallower
+ * one leaves a ledge) and square or diamond: where they meet the border goes, so a stack makes a tall slit
+ * (sill at the bottom, lintel at the top), a row makes a long one, and a square of them one big opening.
  */
 public class WindowFrameBlock extends CwBlock implements Waterloggable {
 	/** The side it's against. */
@@ -74,7 +74,7 @@ public class WindowFrameBlock extends CwBlock implements Waterloggable {
 		return joined(state, world, pos);
 	}
 
-	/** Which neighbours it joins: the same kind of frame (any material) facing the same way. */
+	/** Which neighbours it joins: any window frame (any material, depth, square or diamond) facing the same way. */
 	private BlockState joined(BlockState state, BlockView world, BlockPos pos) {
 		Direction f = state.get(FACING);
 		return state.with(UP, joins(state, world.getBlockState(pos.up()))).with(DOWN, joins(state, world.getBlockState(pos.down())))
@@ -83,7 +83,7 @@ public class WindowFrameBlock extends CwBlock implements Waterloggable {
 	}
 
 	private boolean joins(BlockState state, BlockState other) {
-		return other.getBlock() instanceof WindowFrameBlock w && w.depth == depth && w.diamond == diamond && other.get(FACING) == state.get(FACING);
+		return other.getBlock() instanceof WindowFrameBlock && other.get(FACING) == state.get(FACING);
 	}
 
 	@Override

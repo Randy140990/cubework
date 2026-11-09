@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_thin_log_8","textures":{"side":"minecraft:block/crimson_stem","end":"minecraft:block/crimson_stem_top"}}
+{"parent":"cubework:block/template_thin_log_8","textures":{"side":"minecraft:block/crimson_stem","top":"minecraft:block/crimson_stem_top","bottom":"minecraft:block/crimson_stem_top"}}

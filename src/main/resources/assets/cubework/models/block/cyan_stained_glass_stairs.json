@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/stairs","textures":{"bottom":"minecraft:block/cyan_stained_glass","top":"minecraft:block/cyan_stained_glass","side":"minecraft:block/cyan_stained_glass"}}
+{"parent":"minecraft:block/stairs","textures":{"top":"minecraft:block/cyan_stained_glass","side":"minecraft:block/cyan_stained_glass","bottom":"minecraft:block/cyan_stained_glass"}}

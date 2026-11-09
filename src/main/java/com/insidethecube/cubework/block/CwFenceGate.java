@@ -12,6 +12,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.server.world.ServerWorld;
 
 /** The vanilla FenceGateBlock in a Cubework material: placed, connected and used exactly like vanilla's. */
 public class CwFenceGate extends FenceGateBlock implements CwShape {
@@ -41,5 +42,11 @@ public class CwFenceGate extends FenceGateBlock implements CwShape {
 	@Override
 	protected boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
 		return Shared.hidesFace(material, state, stateFrom, direction) || super.isSideInvisible(state, stateFrom, direction);
+	}
+
+	/** Copper shapes weather like vanilla copper. */
+	@Override
+	protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+		Aging.tick(material, state, world, pos, random);
 	}
 }

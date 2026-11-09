@@ -38,8 +38,8 @@ public final class Recolour {
 		return 0;
 	}
 
-	/** Recolours ARGB pixels in place. */
-	public static void apply(int[] argb, int colour) {
+	/** Recolours ARGB pixels in place; all: every pixel is recoloured (a metal door), not only the wood. */
+	public static void apply(int[] argb, int colour, boolean all) {
 		int n = 0;
 		double[][] hsl = new double[argb.length][];
 		for (int i = 0; i < argb.length; i++) {
@@ -66,7 +66,7 @@ public final class Recolour {
 		for (int i = 0; i < argb.length; i++) {
 			double[] p = hsl[i];
 			if (p == null) continue;
-			if (isWood(p, hue, satMedian)) {
+			if (all || isWood(p, hue, satMedian)) {
 				wood[i] = true;
 				woodL[w] = p[2];
 				woodS[w] = p[1];
@@ -84,7 +84,7 @@ public final class Recolour {
 			if (!wood[i]) continue;
 			double[] p = hsl[i];
 			double l = clamp(t[2] + (p[2] - lMedian) * contrast);
-			double s = t[1] > 0.05 ? clamp(t[1] * (0.6 + 0.4 * (p[1] / Math.max(0.01, sMedian)))) : t[1];
+			double s = t[1] > 0.05 && !all ? clamp(t[1] * (0.6 + 0.4 * (p[1] / Math.max(0.01, sMedian)))) : t[1];
 			argb[i] = (argb[i] & 0xFF000000) | rgb(t[0], s, l);
 		}
 	}

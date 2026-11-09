@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/stairs","textures":{"bottom":"minecraft:block/orange_wool","top":"minecraft:block/orange_wool","side":"minecraft:block/orange_wool"}}
+{"parent":"minecraft:block/stairs","textures":{"top":"minecraft:block/orange_wool","side":"minecraft:block/orange_wool","bottom":"minecraft:block/orange_wool"}}
