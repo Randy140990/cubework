@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"cubework:block/orange_concrete_powder_panel","y":0,"uvlock":true},"facing=east":{"model":"cubework:block/orange_concrete_powder_panel","y":90,"uvlock":true},"facing=south":{"model":"cubework:block/orange_concrete_powder_panel","y":180,"uvlock":true},"facing=west":{"model":"cubework:block/orange_concrete_powder_panel","y":270,"uvlock":true}}}

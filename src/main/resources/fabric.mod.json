@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "cubework",
+  "version": "${version}",
+  "name": "Cubework",
+  "description": "Vanilla blocks in every shape: stairs, slabs, vertical slabs, snow-style layers, slopes, walls, fences and trapdoors that behave just like the originals.",
+  "authors": [
+    "Inside the Cube"
+  ],
+  "license": "All rights reserved",
+  "icon": "assets/cubework/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.insidethecube.cubework.Cubework"
+    ],
+    "client": [
+      "com.insidethecube.cubework.client.CubeworkClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "fabric-api": "*",
+    "minecraft": "~1.21.11",
+    "java": ">=21"
+  },
+  "mixins": [
+    "cubework.mixins.json"
+  ]
+}

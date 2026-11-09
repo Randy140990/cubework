@@ -1,0 +1,79 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      # Loom 1.18 needs Java 25 to run Gradle; the mod itself is compiled for Java 21.
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build the mod
+        shell: bash
+        run: |
+          chmod +x gradlew
+          mkdir -p ci-logs
+          ./gradlew build -x test --stacktrace 2>&1 | tee ci-logs/build.txt; test ${PIPESTATUS[0]} -eq 0
+
+      - name: Pick the mod jar
+        id: jar
+        shell: bash
+        run: |
+          JAR=$(ls build/libs/*.jar | grep -v -- '-sources.jar' | head -n 1)
+          echo "path=$JAR" >> "$GITHUB_OUTPUT"
+          echo "Built $JAR"
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: cubework
+          path: ${{ steps.jar.outputs.path }}
+
+      - name: Read mod version
+        id: ver
+        shell: bash
+        run: echo "version=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+      # Every push to main publishes (or refreshes) the release for the version in gradle.properties.
+      - name: Publish release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: Cubework ${{ steps.ver.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          files: ${{ steps.jar.outputs.path }}
+          body_path: RELEASE_NOTES.md
+          prerelease: true
+
+      # When a build fails, save the logs to a 'ci-logs' branch so they can be read without the Actions page.
+      - name: Save logs on failure
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p /tmp/logs && cp -r ci-logs/. /tmp/logs/ 2>/dev/null || true
+          git config user.name "cubework-ci"
+          git config user.email "cubework-ci@users.noreply.github.com"
+          git checkout --orphan ci-logs-tmp
+          git rm -rf --cached . > /dev/null 2>&1 || true
+          rm -rf ci-logs && mkdir ci-logs && cp -r /tmp/logs/. ci-logs/
+          git add ci-logs
+          git commit -m "CI logs for ${GITHUB_SHA}" > /dev/null
+          git push -f origin HEAD:ci-logs

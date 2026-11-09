@@ -1,0 +1,80 @@
+name: Compile check
+
+# Development aid: compiles a work-in-progress branch (check/...) and saves the compiler's output,
+# chosen class signatures and chosen vanilla files to the 'ci-check' branch. It never fails the run
+# (no failure emails), and it doesn't publish anything or start the game.
+on:
+  push:
+    branches: ["check/**"]
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Compile
+        shell: bash
+        run: |
+          # Never fail the run (no failure emails): every command is allowed to fail.
+          set +e +o pipefail
+          chmod +x gradlew
+          mkdir -p out
+          ./gradlew compileJava --stacktrace > out/compile.txt 2>&1; echo "exit=$?" >> out/compile.txt
+          tail -30 out/compile.txt
+          JAR=$(find ~/.gradle .gradle -name "*minecraft-merged*yarn*1.21.11*.jar" 2>/dev/null | grep -v sources | grep -v intermediary | head -n 1)
+          [ -z "$JAR" ] && JAR=$(find ~/.gradle .gradle -name "minecraft-*named*.jar" 2>/dev/null | grep -v sources | head -n 1)
+          CJAR=$(find ~/.gradle .gradle -name "minecraft-client*.jar" 2>/dev/null | grep -v sources | head -n 1)
+          [ -z "$CJAR" ] && CJAR=$(find ~/.gradle .gradle -name "*client*1.21.11*.jar" 2>/dev/null | head -n 1)
+          echo "jar: $JAR" > out/info.txt
+          echo "client jar: $CJAR" >> out/info.txt
+          # Vanilla files named in ci/check-files.txt (unzip patterns, one a line), copied out to read.
+          if [ -f ci/check-files.txt ]; then
+            mkdir -p out/files
+            while read -r pat; do
+              [ -z "$pat" ] && continue
+              for J in "$JAR" "$CJAR"; do unzip -o -q "$J" "$pat" -d out/files 2>/dev/null; done
+            done < ci/check-files.txt
+          fi
+          # Classes whose names match ci/check-find.txt (one pattern a line), in the game and in Fabric API.
+          if [ -f ci/check-find.txt ]; then
+            while read -r pat; do
+              [ -z "$pat" ] && continue
+              unzip -l "$JAR" | grep -i "$pat" >> out/found.txt || true
+              for F in $(find ~/.gradle .gradle -name "fabric-*.jar" 2>/dev/null | grep -v sources | sort -u); do
+                unzip -l "$F" 2>/dev/null | grep -i "$pat" | sed "s|^|$(basename $F): |" >> out/found.txt || true
+              done
+            done < ci/check-find.txt
+          fi
+          # Signatures of the classes in ci/check-classes.txt ("c some.Class" adds the bytecode).
+          # A class not in the game jar is looked for in the Fabric API jars.
+          if [ -f ci/check-classes.txt ]; then
+            FAB=$(find ~/.gradle .gradle -name "fabric-*.jar" 2>/dev/null | grep -v sources | sort -u | tr '\n' ':')
+            while read -r cls; do
+              [ -z "$cls" ] && continue
+              case "$cls" in
+                "c "*) c="${cls#c }"; javap -c -p -cp "$JAR:$FAB" "$c" > "out/$c.c.txt" 2>&1 || true ;;
+                *) javap -p -cp "$JAR:$FAB" "$cls" > "out/$cls.txt" 2>&1 || true ;;
+              esac
+            done < ci/check-classes.txt
+          fi
+      - name: Save
+        continue-on-error: true
+        shell: bash
+        run: |
+          git config user.name "cubework-ci"
+          git config user.email "cubework-ci@users.noreply.github.com"
+          cp -r out /tmp/out
+          git checkout --orphan ci-check-tmp
+          git rm -rf --cached . > /dev/null 2>&1 || true
+          rm -rf out && cp -r /tmp/out out
+          git add -f out
+          git commit -m "Compile check for ${GITHUB_SHA}" > /dev/null
+          git push -f origin HEAD:ci-check
