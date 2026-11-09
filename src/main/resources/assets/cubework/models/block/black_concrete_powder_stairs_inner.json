@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/inner_stairs","textures":{"bottom":"minecraft:block/black_concrete_powder","top":"minecraft:block/black_concrete_powder","side":"minecraft:block/black_concrete_powder"}}
+{"parent":"minecraft:block/inner_stairs","textures":{"top":"minecraft:block/black_concrete_powder","side":"minecraft:block/black_concrete_powder","bottom":"minecraft:block/black_concrete_powder"}}

@@ -17,6 +17,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.render.BlockRenderLayer;
+import net.minecraft.client.render.model.BlockStateModel;
 import net.minecraft.world.biome.GrassColors;
 
 public final class CubeworkClient implements ClientModInitializer {
@@ -24,6 +25,7 @@ public final class CubeworkClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		// The coloured doors' textures are made from the door textures in use, as the game loads.
 		AtlasSourceManagerAccessor.cubework$idMapper().put(DoorColoursSource.ID, DoorColoursSource.CODEC);
+		AtlasSourceManagerAccessor.cubework$idMapper().put(MetalDoorsSource.ID, MetalDoorsSource.CODEC);
 
 		List<Block> grass = new ArrayList<>(Extras.GRASSY_PLANTS);
 		for (Material m : Material.ALL) {
@@ -34,21 +36,24 @@ public final class CubeworkClient implements ClientModInitializer {
 			if (m.grassTinted()) grass.addAll(shapes);
 		}
 		for (Block b : Extras.SIZED_PLANTS) BlockRenderLayerMap.putBlock(b, BlockRenderLayer.CUTOUT);
+		for (Block b : Extras.CORAL) BlockRenderLayerMap.putBlock(b, BlockRenderLayer.CUTOUT);
 		for (Block b : Extras.DOORS) BlockRenderLayerMap.putBlock(b, BlockRenderLayer.CUTOUT);
 
 		// Grass shapes, grass, ferns and bushes take the biome's grass colour.
 		ColorProviderRegistry.BLOCK.register((state, world, pos, tint) -> world != null && pos != null ? BiomeColors.getGrassColor(world, pos)
 				: GrassColors.getDefaultColor(), grass.toArray(new Block[0]));
 
-		// Slopes have their own model, built from the vanilla block's textures.
+		// Slopes and arches have their own models, built from the vanilla block's textures.
 		ModelLoadingPlugin.register(ctx -> {
 			for (Material m : Material.ALL) {
-				SlopeModel.Unbaked model = new SlopeModel.Unbaked(m);
-				for (Shape shape : new Shape[] {Shape.SLOPE, Shape.GENTLE_SLOPE}) {
-					Block slope = CwBlocks.get(m, shape);
-					if (slope == null) continue;
-					ctx.registerBlockStateResolver(slope, resolver -> {
-						for (BlockState state : slope.getStateManager().getStates()) resolver.setModel(state, model);
+				SlopeModel.Unbaked slopeModel = new SlopeModel.Unbaked(m);
+				ArchModel.Unbaked archModel = new ArchModel.Unbaked(m);
+				for (Shape shape : new Shape[] {Shape.SLOPE, Shape.GENTLE_SLOPE, Shape.ARCH, Shape.ARCH_CORNER}) {
+					Block block = CwBlocks.get(m, shape);
+					if (block == null) continue;
+					BlockStateModel.UnbakedGrouped model = shape == Shape.ARCH || shape == Shape.ARCH_CORNER ? archModel : slopeModel;
+					ctx.registerBlockStateResolver(block, resolver -> {
+						for (BlockState state : block.getStateManager().getStates()) resolver.setModel(state, model);
 					});
 				}
 			}

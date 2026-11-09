@@ -65,7 +65,7 @@ public final class SlopeModel {
 	/** The block's textures; tinted means the top and overlay take the biome's grass colour. */
 	private record Sprites(Sprite top, Sprite side, Sprite bottom, Sprite overlay, boolean tinted) {}
 
-	private record Baked(Part part) implements BlockStateModel {
+	record Baked(Part part) implements BlockStateModel {
 		@Override
 		public void addParts(Random random, List<BlockModelPart> parts) {
 			parts.add(part);
@@ -78,9 +78,9 @@ public final class SlopeModel {
 	}
 
 	/** Quads by the side they're hidden from, and the sloping surface (never hidden). */
-	private record Quads(Map<Direction, List<BakedQuad>> sided, List<BakedQuad> free) {}
+	record Quads(Map<Direction, List<BakedQuad>> sided, List<BakedQuad> free) {}
 
-	private static final class Part implements BlockModelPart {
+	static final class Part implements BlockModelPart {
 		private final Map<Direction, List<BakedQuad>> sided;
 		private final List<BakedQuad> free;
 		final Sprite sprite;

@@ -24,10 +24,12 @@ import com.insidethecube.cubework.block.LayerBlock;
 import com.insidethecube.cubework.block.PanelBlock;
 import com.insidethecube.cubework.block.PostBlock;
 import com.insidethecube.cubework.block.SlopeBlock;
+import com.insidethecube.cubework.block.ThinPillarBlock;
 import com.insidethecube.cubework.block.VerticalLayerBlock;
 import com.insidethecube.cubework.block.VerticalSlabBlock;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSetType;
@@ -64,24 +66,35 @@ public final class CwBlocks {
 			Map<Shape, Block> shapes = new EnumMap<>(Shape.class);
 			for (Shape s : Shape.values()) {
 				if (!s.appliesTo(m)) continue;
-				Block b = block(m.idOf(s), settings(base, s), factory(m, s, base));
+				Block b = block(m.idOf(s), settings(m, base, s), factory(m, s, base));
 				shapes.put(s, b);
 				INFO.put(b, new Info(m, s));
 				item(m.idOf(s), b);
-				// Wool shapes catch fire and burn away like wool.
+				// Wool shapes catch fire and burn away like wool; coal shapes burn like coal blocks.
 				if (m.kind() == Material.Kind.WOOL) FlammableBlockRegistry.getDefaultInstance().add(b, 30, 60);
+				if (m.id().equals("coal_block")) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 5);
 			}
 			BY_MATERIAL.put(m, shapes);
 		}
+		// Copper shapes weather into the next age, take wax from honeycomb and lose it (and age) to an axe.
+		for (Material m : Material.ALL) {
+			Material next = m.nextAge(), waxed = m.waxed();
+			for (Map.Entry<Shape, Block> e : BY_MATERIAL.get(m).entrySet()) {
+				if (next != null) OxidizableBlocksRegistry.registerOxidizableBlockPair(e.getValue(), get(next, e.getKey()));
+				if (waxed != null) OxidizableBlocksRegistry.registerWaxableBlockPair(e.getValue(), get(waxed, e.getKey()));
+			}
+		}
 	}
 
-	private static AbstractBlock.Settings settings(Block base, Shape s) {
+	private static AbstractBlock.Settings settings(Material m, Block base, Shape s) {
 		// Map colour and light are fixed from the vanilla block, since some vanilla blocks work them out
 		// from properties our shapes don't have (a log's axis, redstone ore being lit).
 		BlockState def = base.getDefaultState();
 		MapColor colour = def.getMapColor(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
 		int light = def.getLuminance();
 		AbstractBlock.Settings set = AbstractBlock.Settings.copy(base).mapColor(colour).luminance(state -> light);
+		// Copper that can still weather gets random ticks (vanilla copper decides this in code, so it isn't copied).
+		if (m.copperAge() >= 0 && m.copperAge() < 3) set.ticksRandomly();
 		return switch (s) {
 			case BUTTON, PRESSURE_PLATE -> set.noCollision().pistonBehavior(PistonBehavior.DESTROY);
 			case TRAPDOOR -> set.nonOpaque().allowsSpawning((state, world, pos, type) -> false);
@@ -104,9 +117,10 @@ public final class CwBlocks {
 			case WALL -> set -> new CwWall(m, set);
 			case FENCE -> set -> new CwFence(m, set);
 			case FENCE_GATE -> set -> new CwFenceGate(m, WoodType.OAK, set);
-			case TRAPDOOR -> set -> new CwTrapdoor(m, BlockSetType.STONE, set);
-			case BUTTON -> set -> new CwButton(m, BlockSetType.STONE, 20, set);
-			case PRESSURE_PLATE -> set -> new CwPressurePlate(m, BlockSetType.STONE, set);
+			case TRAPDOOR -> set -> new CwTrapdoor(m, setType(m), set);
+			case BUTTON -> set -> new CwButton(m, setType(m), 20, set);
+			case PRESSURE_PLATE -> set -> new CwPressurePlate(m, setType(m), set);
+			case PILLAR_12, PILLAR_8, PILLAR_4 -> set -> new ThinPillarBlock(m, s.pillarWidth(), set);
 			case QUARTER_SLAB -> set -> new QuarterSlabBlock(m, set);
 			case GENTLE_SLOPE -> set -> new GentleSlopeBlock(m, set);
 			case ARCH -> set -> new ArchBlock(m, set);
@@ -114,6 +128,11 @@ public final class CwBlocks {
 			case WINDOW_4, WINDOW_8, WINDOW_12, WINDOW_16, DIAMOND_WINDOW_4, DIAMOND_WINDOW_8, DIAMOND_WINDOW_12, DIAMOND_WINDOW_16 ->
 					set -> new WindowFrameBlock(m, s.windowDepth(), s.diamond(), set);
 		};
+	}
+
+	/** Copper trapdoors, buttons and plates sound like copper; the rest like stone. All open by hand. */
+	private static BlockSetType setType(Material m) {
+		return m.copper() ? BlockSetType.COPPER : BlockSetType.STONE;
 	}
 
 	private static Block block(String name, AbstractBlock.Settings settings, Function<AbstractBlock.Settings, Block> factory) {

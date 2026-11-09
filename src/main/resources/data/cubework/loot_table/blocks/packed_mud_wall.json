@@ -1,0 +1,1 @@
+{"type":"minecraft:block","pools":[{"rolls":1.0,"bonus_rolls":0.0,"entries":[{"type":"minecraft:item","name":"cubework:packed_mud_wall","functions":[{"function":"minecraft:explosion_decay"}]}]}],"random_sequence":"cubework:blocks/packed_mud_wall"}

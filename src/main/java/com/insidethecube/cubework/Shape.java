@@ -13,6 +13,9 @@ public enum Shape {
 	CARPET("carpet", "Carpet", 4),
 	PANEL("panel", "Panel", 4),
 	POST("post", "Post", 4),
+	PILLAR_12("pillar_12", "(12 px)", 1),
+	PILLAR_8("pillar_8", "(8 px)", 2),
+	PILLAR_4("pillar_4", "(4 px)", 4),
 	ARCH("arch", "Arch", 1),
 	ARCH_CORNER("arch_corner", "Arch Corner", 1),
 	WALL("wall", "Wall", 1),
@@ -42,16 +45,34 @@ public enum Shape {
 	}
 
 	/**
-	 * Coloured blocks get every shape (wool skips carpet, which vanilla has). Natural blocks get the
-	 * shapes for shaping land: slabs both ways, slopes, layers both ways and carpet.
+	 * Building blocks get every shape, and pillars. Coloured blocks get every shape but pillars (wool skips
+	 * carpet, which vanilla has; the castle shapes are only for wool, terracotta and concrete). Natural blocks
+	 * get the shapes for shaping land: slabs both ways, slopes, layers both ways and carpet.
 	 */
 	public boolean appliesTo(Material m) {
-		if (m.nature()) return switch (this) {
+		if (pillarWidth() > 0) return m.building();
+		if (m.building()) return true;
+		if (m.nature()) return natureShape();
+		if (castle() && !(m.kind() == Material.Kind.WOOL || m.kind() == Material.Kind.TERRACOTTA || m.kind() == Material.Kind.CONCRETE)) return false;
+		return !(this == CARPET && m.kind() == Material.Kind.WOOL);
+	}
+
+	/** The shapes natural blocks get (shown in the Nature tab). */
+	public boolean natureShape() {
+		return switch (this) {
 			case SLAB, VERTICAL_SLAB, SLOPE, LAYER, VERTICAL_LAYER, CARPET -> true;
 			default -> false;
 		};
-		if (castle() && !(m.kind() == Material.Kind.WOOL || m.kind() == Material.Kind.TERRACOTTA || m.kind() == Material.Kind.CONCRETE)) return false;
-		return !(this == CARPET && m.kind() == Material.Kind.WOOL);
+	}
+
+	/** A pillar's width in pixels (it's 16 tall, in the middle of the block), or 0. */
+	public int pillarWidth() {
+		return switch (this) {
+			case PILLAR_12 -> 12;
+			case PILLAR_8 -> 8;
+			case PILLAR_4 -> 4;
+			default -> 0;
+		};
 	}
 
 	/** The castle shapes (gentle slopes, quarter slabs, arches, window frames): wool, terracotta and concrete for now. */

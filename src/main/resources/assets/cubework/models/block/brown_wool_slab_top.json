@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/slab_top","textures":{"bottom":"minecraft:block/brown_wool","top":"minecraft:block/brown_wool","side":"minecraft:block/brown_wool"}}
+{"parent":"minecraft:block/slab_top","textures":{"top":"minecraft:block/brown_wool","side":"minecraft:block/brown_wool","bottom":"minecraft:block/brown_wool"}}

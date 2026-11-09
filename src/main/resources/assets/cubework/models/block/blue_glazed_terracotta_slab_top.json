@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/slab_top","textures":{"bottom":"minecraft:block/blue_glazed_terracotta","top":"minecraft:block/blue_glazed_terracotta","side":"minecraft:block/blue_glazed_terracotta"}}
+{"parent":"minecraft:block/slab_top","textures":{"top":"minecraft:block/blue_glazed_terracotta","side":"minecraft:block/blue_glazed_terracotta","bottom":"minecraft:block/blue_glazed_terracotta"}}

@@ -1,1 +1,1 @@
-{"parent":"minecraft:block/inner_stairs","textures":{"bottom":"minecraft:block/orange_glazed_terracotta","top":"minecraft:block/orange_glazed_terracotta","side":"minecraft:block/orange_glazed_terracotta"}}
+{"parent":"minecraft:block/inner_stairs","textures":{"top":"minecraft:block/orange_glazed_terracotta","side":"minecraft:block/orange_glazed_terracotta","bottom":"minecraft:block/orange_glazed_terracotta"}}

@@ -32,24 +32,30 @@ public final class Cubework implements ModInitializer {
 		RegistryKey<Item> cube = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ID, "cube"));
 		CUBE = Registry.register(Registries.ITEM, cube, new Item(new Item.Settings().registryKey(cube)));
 
-		// Four tabs, so there's little paging: coloured blocks, natural blocks, plants and doors.
+		// Five tabs, so there's little paging: coloured blocks, building blocks, natural blocks, plants and doors.
 		tab("colours", () -> new ItemStack(CUBE), add -> {
-			for (Material m : Material.ALL) if (!m.nature()) shapes(m, add);
+			for (Material m : Material.ALL) if (!m.nature() && !m.building()) shapes(m, add, false);
+		});
+		tab("building", () -> new ItemStack(item("stone_brick_slope")), add -> {
+			for (String id : Material.BUILDING) shapes(Material.byId(id), add, false);
 		});
 		tab("nature", () -> new ItemStack(item("grass_block_slope")), add -> {
-			for (Material m : Material.ALL) if (m.nature()) shapes(m, add);
+			for (Material m : Material.ALL) if (m.nature()) shapes(m, add, true);
 			Extras.THIN_LOGS.forEach(add);
 		});
-		tab("plants", () -> new ItemStack(item("poppy_150")), add -> Extras.SIZED_PLANTS.forEach(add));
+		tab("plants", () -> new ItemStack(item("fern_175")), add -> {
+			Extras.SIZED_PLANTS.forEach(add);
+			Extras.CORAL.forEach(add);
+		});
 		tab("doors", () -> new ItemStack(item("light_blue_mangrove_door")), add -> Extras.DOORS.forEach(add));
 	}
 
-	/** One material's shapes, always in the same order. */
-	private static void shapes(Material m, Consumer<Block> add) {
+	/** One material's shapes, always in the same order (in the Nature tab, only the land-shaping ones). */
+	private static void shapes(Material m, Consumer<Block> add, boolean natureOnly) {
 		Map<Shape, Block> shapes = CwBlocks.shapesOf(m);
 		for (Shape s : Shape.values()) {
 			Block b = shapes.get(s);
-			if (b != null) add.accept(b);
+			if (b != null && (!natureOnly || s.natureShape())) add.accept(b);
 		}
 	}
 

@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.function.Function;
 
 import com.insidethecube.cubework.block.ColouredDoorBlock;
+import com.insidethecube.cubework.block.SizedCoralBlock;
 import com.insidethecube.cubework.block.SizedPlantBlock;
 import com.insidethecube.cubework.block.ThinLogBlock;
 
@@ -32,8 +33,8 @@ import net.minecraft.world.EmptyBlockView;
 public final class Extras {
 	private Extras() {}
 
-	/** Log widths, in pixels. */
-	public static final int[] LOG_WIDTHS = {12, 8, 4};
+	/** Log widths, in pixels. 16 is a full log whose ends show bark where other logs join it, to start a tapering trunk. */
+	public static final int[] LOG_WIDTHS = {16, 12, 8, 4};
 	/** Logs and stems; the ones with a stripped version are stripped by an axe, like full logs. */
 	public static final String[] LOGS = {"oak_log", "spruce_log", "birch_log", "jungle_log", "acacia_log", "dark_oak_log", "mangrove_log",
 			"cherry_log", "pale_oak_log", "crimson_stem", "warped_stem", "mushroom_stem"};
@@ -46,12 +47,21 @@ public final class Extras {
 			"allium", "azure_bluet", "red_tulip", "orange_tulip", "white_tulip", "pink_tulip", "oxeye_daisy", "cornflower", "lily_of_the_valley",
 			"torchflower", "wither_rose"};
 
+	/** Coral and coral fans (living ones die out of water into the dead ones of the same size). */
+	public static final String[] CORALS = {"tube", "brain", "bubble", "fire", "horn"};
+	/** Coral sizes, in percent (fans can't be drawn bigger than 150%). */
+	public static final int[] CORAL_SIZES = {50, 75, 125, 150};
+
+	/** Metals and gems the copper door's pattern comes in, from their blocks' colours; and what crafts each. */
+	public static final String[] METAL_DOORS = {"iron", "gold", "redstone", "emerald", "lapis", "diamond", "netherite"};
+
 	/** Woods whose door pattern comes in the 16 colours. */
 	public static final String[] DOOR_WOODS = {"oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "pale_oak", "bamboo",
 			"crimson", "warped"};
 
 	public static final List<Block> THIN_LOGS = new ArrayList<>();
 	public static final List<Block> SIZED_PLANTS = new ArrayList<>();
+	public static final List<Block> CORAL = new ArrayList<>();
 	/** Grass, fern and bush sizes, which take the biome's grass colour. */
 	public static final List<Block> GRASSY_PLANTS = new ArrayList<>();
 	public static final List<Block> DOORS = new ArrayList<>();
@@ -59,6 +69,7 @@ public final class Extras {
 	public static void register() {
 		logs();
 		plants();
+		coral();
 		doors();
 	}
 
@@ -99,6 +110,21 @@ public final class Extras {
 		if (soil == SizedPlantBlock.Soil.DIRT || soil == SizedPlantBlock.Soil.DRY) FlammableBlockRegistry.getDefaultInstance().add(b, 60, 100);
 	}
 
+	private static void coral() {
+		for (String c : CORALS) {
+			for (boolean fan : new boolean[] {false, true}) {
+				String live = c + "_coral" + (fan ? "_fan" : ""), dead = "dead_" + live;
+				for (int size : CORAL_SIZES) {
+					String deadId = dead + "_" + size;
+					CORAL.add(block(live + "_" + size, settings(vanilla(live)), set -> new SizedCoralBlock(size / 100.0, fan, () -> get(deadId), set)));
+				}
+				for (int size : CORAL_SIZES) {
+					CORAL.add(block(dead + "_" + size, settings(vanilla(dead)), set -> new SizedCoralBlock(size / 100.0, fan, null, set)));
+				}
+			}
+		}
+	}
+
 	private static void doors() {
 		for (String wood : DOOR_WOODS) {
 			Block base = vanilla(wood + "_door");
@@ -107,6 +133,18 @@ public final class Extras {
 				MapColor map = DyeColor.valueOf(colour.toUpperCase(Locale.ROOT)).getMapColor();
 				DOORS.add(block(colour + "_" + wood + "_door", AbstractBlock.Settings.copy(base).mapColor(map), set -> new ColouredDoorBlock(type, set), true));
 			}
+		}
+		// The iron door in the 16 colours: still opened only by redstone.
+		Block iron = vanilla("iron_door");
+		for (String colour : Material.COLOURS) {
+			MapColor map = DyeColor.valueOf(colour.toUpperCase(Locale.ROOT)).getMapColor();
+			DOORS.add(block(colour + "_iron_door", AbstractBlock.Settings.copy(iron).mapColor(map), set -> new ColouredDoorBlock(BlockSetType.IRON, set), true));
+		}
+		// The copper door's pattern in metals and gems: opened by hand, like copper doors.
+		Block copper = vanilla("copper_door");
+		for (String metal : METAL_DOORS) {
+			MapColor map = vanilla(metal + "_block").getDefaultMapColor();
+			DOORS.add(block(metal + "_door", AbstractBlock.Settings.copy(copper).mapColor(map), set -> new ColouredDoorBlock(BlockSetType.COPPER, set), true));
 		}
 	}
 
