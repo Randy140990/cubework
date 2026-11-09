@@ -1,1 +1,1 @@
-c net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry
+c net.fabricmc.fabric.impl.content.registry.OxidizableBlocksRegistryImpl
