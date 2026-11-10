@@ -8,6 +8,7 @@ import java.util.function.Function;
 import com.insidethecube.cubework.block.ColouredDoorBlock;
 import com.insidethecube.cubework.block.SizedCoralBlock;
 import com.insidethecube.cubework.block.SizedPlantBlock;
+import com.insidethecube.cubework.block.TableBlock;
 import com.insidethecube.cubework.block.ThinLogBlock;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
@@ -55,6 +56,25 @@ public final class Extras {
 	/** Metals and gems the copper door's pattern comes in, from their blocks' colours; and what crafts each. */
 	public static final String[] METAL_DOORS = {"iron", "gold", "redstone", "emerald", "lapis", "diamond", "netherite"};
 
+	/**
+	 * Table tops: terracotta (plain and 16 colours), glazed terracotta, stripped woods, and smooth stones,
+	 * tuff, resin and quartz. Every top comes with oak legs and with legs in each concrete colour.
+	 */
+	public static final String[] TABLE_TOPS = tableTops();
+	public static final List<Block> TABLES = new ArrayList<>();
+
+	private static String[] tableTops() {
+		List<String> out = new ArrayList<>();
+		out.add("terracotta");
+		for (String c : Material.COLOURS) out.add(c + "_terracotta");
+		for (String c : Material.COLOURS) out.add(c + "_glazed_terracotta");
+		for (String w : new String[] {"oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "pale_oak"}) out.add("stripped_" + w + "_wood");
+		out.addAll(List.of("stripped_crimson_hyphae", "stripped_warped_hyphae", "stripped_bamboo_block", "smooth_stone", "polished_granite",
+				"polished_diorite", "polished_andesite", "chiseled_deepslate", "tuff", "polished_tuff", "chiseled_tuff", "chiseled_resin_bricks",
+				"quartz_block", "chiseled_quartz_block", "quartz_bricks", "smooth_quartz"));
+		return out.toArray(String[]::new);
+	}
+
 	/** Woods whose door pattern comes in the 16 colours. */
 	public static final String[] DOOR_WOODS = {"oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "pale_oak", "bamboo",
 			"crimson", "warped"};
@@ -71,6 +91,28 @@ public final class Extras {
 		plants();
 		coral();
 		doors();
+		tables();
+	}
+
+	private static void tables() {
+		for (String top : TABLE_TOPS) {
+			Block base = vanilla(top);
+			boolean wood = top.startsWith("stripped_");
+			for (String legs : tableLegs()) {
+				String name = top + "_table" + (legs.equals("oak") ? "" : "_" + legs + "_legs");
+				Block b = block(name, settings(base).nonOpaque(), set -> new TableBlock(legs, set));
+				TABLES.add(b);
+				if (wood && !top.contains("crimson") && !top.contains("warped")) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 20);
+			}
+		}
+	}
+
+	/** Oak legs, then legs in each concrete colour. */
+	public static List<String> tableLegs() {
+		List<String> out = new ArrayList<>();
+		out.add("oak");
+		out.addAll(List.of(Material.COLOURS));
+		return out;
 	}
 
 	private static void logs() {

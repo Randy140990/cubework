@@ -4,7 +4,8 @@
   "package": "com.insidethecube.cubework.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "TranslucentBlockMixin"
+    "TranslucentBlockMixin",
+    "ShaderMapsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -32,7 +32,7 @@ public final class Cubework implements ModInitializer {
 		RegistryKey<Item> cube = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ID, "cube"));
 		CUBE = Registry.register(Registries.ITEM, cube, new Item(new Item.Settings().registryKey(cube)));
 
-		// Five tabs, so there's little paging: coloured blocks, building blocks, natural blocks, plants and doors.
+		// Six tabs, so there's little paging: coloured blocks, building blocks, natural blocks, plants, doors and tables.
 		tab("colours", () -> new ItemStack(CUBE), add -> {
 			for (Material m : Material.ALL) if (!m.nature() && !m.building()) shapes(m, add, false);
 		});
@@ -48,6 +48,7 @@ public final class Cubework implements ModInitializer {
 			Extras.CORAL.forEach(add);
 		});
 		tab("doors", () -> new ItemStack(item("light_blue_mangrove_door")), add -> Extras.DOORS.forEach(add));
+		tab("tables", () -> new ItemStack(item("cyan_glazed_terracotta_table")), add -> Extras.TABLES.forEach(add));
 	}
 
 	/** One material's shapes, always in the same order (in the Nature tab, only the land-shaping ones). */

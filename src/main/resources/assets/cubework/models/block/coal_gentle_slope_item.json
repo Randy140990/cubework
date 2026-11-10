@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/coal_block","side":"minecraft:block/coal_block","bottom":"minecraft:block/coal_block"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/coal_block","side":"minecraft:block/coal_block","bottom":"minecraft:block/coal_block"}}

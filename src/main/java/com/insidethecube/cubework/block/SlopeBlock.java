@@ -53,12 +53,12 @@ public class SlopeBlock extends CwBlock implements Waterloggable {
 	}
 
 	/** Where the slope starts, in pixels (gentle slopes sit on the step below). */
-	public int base(BlockState state) {
+	public double base(BlockState state) {
 		return 0;
 	}
 
 	/** How many pixels it rises across the block. */
-	public int rise(BlockState state) {
+	public double rise(BlockState state) {
 		return material.height();
 	}
 
