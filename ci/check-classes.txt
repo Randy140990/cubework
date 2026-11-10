@@ -1,0 +1,4 @@
+net.minecraft.resource.LifecycledResourceManagerImpl
+net.minecraft.resource.Resource
+net.minecraft.client.texture.NativeImage
+net.minecraft.resource.ReloadableResourceManagerImpl

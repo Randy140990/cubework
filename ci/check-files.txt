@@ -1,0 +1,2 @@
+assets/minecraft/textures/block/*_door_*.png
+assets/minecraft/textures/item/*_door.png
