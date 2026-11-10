@@ -123,6 +123,8 @@ public final class CwBlocks {
 			case PILLAR_12, PILLAR_8, PILLAR_4 -> set -> new ThinPillarBlock(m, s.pillarWidth(), set);
 			case QUARTER_SLAB -> set -> new QuarterSlabBlock(m, set);
 			case GENTLE_SLOPE -> set -> new GentleSlopeBlock(m, set);
+			case SLOPE_3 -> set -> new GentleSlopeBlock.Over3(m, set);
+			case SLOPE_2 -> set -> new GentleSlopeBlock.Over2(m, set);
 			case ARCH -> set -> new ArchBlock(m, set);
 			case ARCH_CORNER -> set -> new ArchCornerBlock(m, set);
 			case WINDOW_4, WINDOW_8, WINDOW_12, WINDOW_16, DIAMOND_WINDOW_4, DIAMOND_WINDOW_8, DIAMOND_WINDOW_12, DIAMOND_WINDOW_16 ->

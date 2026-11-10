@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/red_sandstone_top","side":"minecraft:block/cut_red_sandstone","bottom":"minecraft:block/red_sandstone_top"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/red_sandstone_top","side":"minecraft:block/cut_red_sandstone","bottom":"minecraft:block/red_sandstone_top"}}

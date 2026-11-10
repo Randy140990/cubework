@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/polished_andesite","side":"minecraft:block/polished_andesite","bottom":"minecraft:block/polished_andesite"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/polished_andesite","side":"minecraft:block/polished_andesite","bottom":"minecraft:block/polished_andesite"}}

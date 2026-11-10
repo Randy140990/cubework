@@ -7,7 +7,9 @@ public enum Shape {
 	QUARTER_SLAB("quarter_slab", "Quarter Slab", 4),
 	VERTICAL_SLAB("vertical_slab", "Vertical Slab", 2),
 	SLOPE("slope", "Slope", 2),
-	GENTLE_SLOPE("gentle_slope", "Gentle Slope", 2),
+	SLOPE_2("slope_2", "Slope (1 in 2)", 2),
+	SLOPE_3("slope_3", "Slope (1 in 3)", 2),
+	GENTLE_SLOPE("gentle_slope", "Slope (1 in 4)", 2),
 	LAYER("layer", "Layer", 8),
 	VERTICAL_LAYER("vertical_layer", "Vertical Layer", 8),
 	CARPET("carpet", "Carpet", 4),
@@ -78,7 +80,7 @@ public enum Shape {
 	/** The castle shapes (gentle slopes, quarter slabs, arches, window frames): wool, terracotta and concrete for now. */
 	public boolean castle() {
 		return switch (this) {
-			case QUARTER_SLAB, GENTLE_SLOPE, ARCH, ARCH_CORNER -> true;
+			case QUARTER_SLAB, SLOPE_2, SLOPE_3, GENTLE_SLOPE, ARCH, ARCH_CORNER -> true;
 			default -> windowDepth() > 0;
 		};
 	}

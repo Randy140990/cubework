@@ -4,8 +4,10 @@ import java.util.Arrays;
 
 /**
  * Repaints a wooden door in a dye colour, keeping its pattern: every wood pixel keeps how much lighter or
- * darker it is than the door's usual wood, so grain, panels and shadows stay; metal (hinges, handles,
- * bands), which is greyer than the wood or a different colour, is left exactly as it is.
+ * darker it is than the door's usual wood, so grain, panels and shadows stay. Metal (hinges, handles,
+ * bands) is left exactly as it is: pixels that are grey, paler and another colour (cherry's silver ring),
+ * another colour altogether, much darker than the wood (birch's hinges) or brighter and more vivid
+ * (dark oak's gold handle).
  */
 public final class Recolour {
 	private Recolour() {}
@@ -48,16 +50,20 @@ public final class Recolour {
 			n++;
 		}
 		if (n == 0) return;
-		double[] sats = new double[n];
+		// The door's usual wood, measured as hue, saturation and value (value doesn't fade saturation in shadow).
+		double[][] hsv = new double[argb.length][];
+		double[] sats = new double[n], vals = new double[n];
 		double sx = 0, sy = 0;
 		int k = 0;
-		for (double[] p : hsl) {
-			if (p == null) continue;
-			sats[k++] = p[1];
-			sx += p[1] * Math.cos(2 * Math.PI * p[0]);
-			sy += p[1] * Math.sin(2 * Math.PI * p[0]);
+		for (int i = 0; i < argb.length; i++) {
+			if (hsl[i] == null) continue;
+			hsv[i] = hsv(argb[i] & 0xFFFFFF);
+			sats[k] = hsv[i][1];
+			vals[k++] = hsv[i][2];
+			sx += hsv[i][1] * Math.cos(2 * Math.PI * hsv[i][0]);
+			sy += hsv[i][1] * Math.sin(2 * Math.PI * hsv[i][0]);
 		}
-		double satMedian = median(sats);
+		double satMedian = median(sats), valMedian = median(vals);
 		double hue = ((Math.atan2(sy, sx) / (2 * Math.PI)) % 1 + 1) % 1;
 
 		boolean[] wood = new boolean[argb.length];
@@ -66,7 +72,7 @@ public final class Recolour {
 		for (int i = 0; i < argb.length; i++) {
 			double[] p = hsl[i];
 			if (p == null) continue;
-			if (all || isWood(p, hue, satMedian)) {
+			if (all || isWood(hsv[i], hue, satMedian, valMedian)) {
 				wood[i] = true;
 				woodL[w] = p[2];
 				woodS[w] = p[1];
@@ -89,11 +95,27 @@ public final class Recolour {
 		}
 	}
 
-	private static boolean isWood(double[] p, double hue, double satMedian) {
-		if (satMedian > 0.06 && p[1] < 0.45 * satMedian) return false;
+	private static boolean isWood(double[] p, double hue, double satMedian, double valMedian) {
 		double d = Math.abs(p[0] - hue);
 		d = Math.min(d, 1 - d);
-		return !(p[1] > 0.15 && d > 0.12);
+		double r = p[1] / Math.max(0.01, satMedian);
+		if (satMedian > 0.06 && r < 0.25 && (p[1] < 0.03 || d > 0.05)) return false; // grey, not a pale tint of the wood
+		if (satMedian > 0.06 && r < 0.6 && d > 0.05) return false; // paler and another colour
+		if (p[1] > 0.15 && d > 0.12) return false; // another colour altogether
+		if (p[2] < valMedian - 0.4) return false; // much darker
+		return !(p[2] > valMedian + 0.3 && p[1] >= satMedian); // brighter and more vivid
+	}
+
+	/** RGB to hue, saturation, value (all 0 to 1). */
+	static double[] hsv(int rgb) {
+		double r = ((rgb >> 16) & 255) / 255.0, g = ((rgb >> 8) & 255) / 255.0, b = (rgb & 255) / 255.0;
+		double max = Math.max(r, Math.max(g, b)), min = Math.min(r, Math.min(g, b)), d = max - min, h = 0;
+		if (d > 0) {
+			if (max == r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+			else if (max == g) h = ((b - r) / d + 2) / 6;
+			else h = ((r - g) / d + 4) / 6;
+		}
+		return new double[] {h, max == 0 ? 0 : d / max, max};
 	}
 
 	private static double median(double[] v) {

@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/brown_concrete","side":"minecraft:block/brown_concrete","bottom":"minecraft:block/brown_concrete"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/brown_concrete","side":"minecraft:block/brown_concrete","bottom":"minecraft:block/brown_concrete"}}

@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/smooth_basalt","side":"minecraft:block/smooth_basalt","bottom":"minecraft:block/smooth_basalt"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/smooth_basalt","side":"minecraft:block/smooth_basalt","bottom":"minecraft:block/smooth_basalt"}}

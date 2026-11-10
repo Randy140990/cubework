@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/mossy_cobblestone","side":"minecraft:block/mossy_cobblestone","bottom":"minecraft:block/mossy_cobblestone"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/mossy_cobblestone","side":"minecraft:block/mossy_cobblestone","bottom":"minecraft:block/mossy_cobblestone"}}

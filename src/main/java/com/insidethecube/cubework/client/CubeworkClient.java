@@ -48,7 +48,7 @@ public final class CubeworkClient implements ClientModInitializer {
 			for (Material m : Material.ALL) {
 				SlopeModel.Unbaked slopeModel = new SlopeModel.Unbaked(m);
 				ArchModel.Unbaked archModel = new ArchModel.Unbaked(m);
-				for (Shape shape : new Shape[] {Shape.SLOPE, Shape.GENTLE_SLOPE, Shape.ARCH, Shape.ARCH_CORNER}) {
+				for (Shape shape : new Shape[] {Shape.SLOPE, Shape.SLOPE_2, Shape.SLOPE_3, Shape.GENTLE_SLOPE, Shape.ARCH, Shape.ARCH_CORNER}) {
 					Block block = CwBlocks.get(m, shape);
 					if (block == null) continue;
 					BlockStateModel.UnbakedGrouped model = shape == Shape.ARCH || shape == Shape.ARCH_CORNER ? archModel : slopeModel;

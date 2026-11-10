@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/polished_diorite","side":"minecraft:block/polished_diorite","bottom":"minecraft:block/polished_diorite"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/polished_diorite","side":"minecraft:block/polished_diorite","bottom":"minecraft:block/polished_diorite"}}

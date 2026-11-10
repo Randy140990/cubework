@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/cracked_polished_blackstone_bricks","side":"minecraft:block/cracked_polished_blackstone_bricks","bottom":"minecraft:block/cracked_polished_blackstone_bricks"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/cracked_polished_blackstone_bricks","side":"minecraft:block/cracked_polished_blackstone_bricks","bottom":"minecraft:block/cracked_polished_blackstone_bricks"}}

@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/chiseled_nether_bricks","side":"minecraft:block/chiseled_nether_bricks","bottom":"minecraft:block/chiseled_nether_bricks"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/chiseled_nether_bricks","side":"minecraft:block/chiseled_nether_bricks","bottom":"minecraft:block/chiseled_nether_bricks"}}

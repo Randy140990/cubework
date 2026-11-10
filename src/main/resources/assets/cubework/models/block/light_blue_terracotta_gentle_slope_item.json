@@ -1,1 +1,1 @@
-{"parent":"cubework:block/template_gentle_slope_item","textures":{"top":"minecraft:block/light_blue_terracotta","side":"minecraft:block/light_blue_terracotta","bottom":"minecraft:block/light_blue_terracotta"}}
+{"parent":"cubework:block/template_slope_4_item","textures":{"top":"minecraft:block/light_blue_terracotta","side":"minecraft:block/light_blue_terracotta","bottom":"minecraft:block/light_blue_terracotta"}}
