@@ -1,7 +1,8 @@
 name: Compile check
 
-# Development aid: compiles a work-in-progress branch (check/...) and saves the compiler's output,
-# chosen class signatures and chosen vanilla files to the 'ci-check' branch. It never fails the run
+# Development aid: for each Minecraft version (all of tools/versions.json, or those in ci/targets), makes
+# the version's project with tools/prep.py, compiles it, and saves the compiler's output, chosen class
+# signatures and chosen vanilla files to the 'ci-check' branch (out/<version>/). It never fails the run
 # (no failure emails), and it doesn't publish anything or start the game.
 on:
   push:
@@ -11,8 +12,30 @@ permissions:
   contents: write
 
 jobs:
-  check:
+  targets:
     runs-on: ubuntu-24.04
+    outputs:
+      list: ${{ steps.t.outputs.list }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: t
+        shell: bash
+        run: |
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, os
+          names = [t["name"] for t in json.load(open("tools/versions.json"))]
+          if os.path.exists("ci/targets") and open("ci/targets").read().split():
+              names = open("ci/targets").read().split()
+          print("list=" + json.dumps(names))
+          PY
+
+  check:
+    needs: targets
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.targets.outputs.list) }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
@@ -26,62 +49,77 @@ jobs:
           # Never fail the run (no failure emails): every command is allowed to fail.
           set +e +o pipefail
           chmod +x gradlew
-          mkdir -p out
-          # One-off: rewrite the sources from Yarn to Mojang names (ci/migrate names the target mappings).
-          if [ -f ci/migrate ]; then
-            ./gradlew migrateMappings --mappings "$(cat ci/migrate)" --overrideInputsIHaveABackup > out/migrate.txt 2>&1; echo "exit=$?" >> out/migrate.txt
-            [ -d remappedSrc ] && cp -r remappedSrc out/remappedSrc
-            [ -d src/main/java ] && cp -r src/main/java out/migratedJava
-          fi
-          ./gradlew compileJava --stacktrace > out/compile.txt 2>&1; echo "exit=$?" >> out/compile.txt
-          tail -30 out/compile.txt
-          JAR=$(find ~/.gradle .gradle -name "minecraft-merged*.jar" 2>/dev/null | grep -v sources | grep -E "layered|mappings|mojang" | head -n 1)
-          [ -z "$JAR" ] && JAR=$(find ~/.gradle .gradle -name "minecraft-merged*.jar" 2>/dev/null | grep -v sources | grep -v intermediary | head -n 1)
-          [ -z "$JAR" ] && JAR=$(find ~/.gradle .gradle -name "minecraft-*named*.jar" 2>/dev/null | grep -v sources | head -n 1)
-          CJAR=$(find ~/.gradle .gradle -name "minecraft-client*.jar" 2>/dev/null | grep -v sources | head -n 1)
-          [ -z "$CJAR" ] && CJAR=$(find ~/.gradle .gradle -name "*client*1.21.11*.jar" 2>/dev/null | head -n 1)
-          echo "jar: $JAR" > out/info.txt
-          echo "client jar: $CJAR" >> out/info.txt
+          T="${{ matrix.target }}"
+          O="out/$T"
+          mkdir -p "$O" vanilla
+          python3 tools/build/vanilla.py "$T" "vanilla/$T" > "$O/vanilla.txt" 2>&1
+          cp "vanilla/$T/blocks.txt" "vanilla/$T/fabric-api.txt" "$O/" 2>/dev/null
+          python3 tools/prep.py "$T" --fabric-api "$(cat vanilla/$T/fabric-api.txt)" --blocks "vanilla/$T/blocks.txt" > "$O/prep.txt" 2>&1; echo "exit=$?" >> "$O/prep.txt"
+          ./gradlew -p "build/v/$T" compileJava --stacktrace > "$O/compile.txt" 2>&1; echo "exit=$?" >> "$O/compile.txt"
+          tail -30 "$O/compile.txt"
+          MC=$(python3 -c "import json,sys; print([t['mc'] for t in json.load(open('tools/versions.json')) if t['name'] == sys.argv[1]][0])" "$T")
+          JAR=$(find ~/.gradle "build/v/$T/.gradle" -path "*$MC*" -name "minecraft-merged*.jar" 2>/dev/null | grep -v sources | grep -E "layered|mappings|mojang" | head -n 1)
+          [ -z "$JAR" ] && JAR=$(find ~/.gradle "build/v/$T/.gradle" -path "*$MC*" -name "minecraft-*.jar" 2>/dev/null | grep -v sources | grep -v client | head -n 1)
+          CJAR="vanilla/$T/client.jar"
+          echo "jar: $JAR" > "$O/info.txt"
+          find ~/.gradle "build/v/$T/.gradle" -name "minecraft*.jar" 2>/dev/null | grep -v sources >> "$O/info.txt"
           # Vanilla files named in ci/check-files.txt (unzip patterns, one a line), copied out to read.
-          if [ -f ci/check-files.txt ]; then
-            mkdir -p out/files
+          if [ -s ci/check-files.txt ]; then
+            mkdir -p "$O/files"
             while read -r pat; do
               [ -z "$pat" ] && continue
-              for J in "$JAR" "$CJAR"; do unzip -o -q "$J" "$pat" -d out/files 2>/dev/null; done
+              unzip -o -q "$CJAR" "$pat" -d "$O/files" 2>/dev/null
             done < ci/check-files.txt
           fi
-          # Classes whose names match ci/check-find.txt (one pattern a line), in the game and in Fabric API.
-          if [ -f ci/check-find.txt ]; then
+          # Entries whose names match ci/check-find.txt (one pattern a line), in the game and in Fabric API.
+          if [ -s ci/check-find.txt ]; then
             while read -r pat; do
               [ -z "$pat" ] && continue
-              unzip -l "$JAR" | grep -i "$pat" >> out/found.txt || true
-              for F in $(find ~/.gradle .gradle -name "fabric-*.jar" 2>/dev/null | grep -v sources | sort -u); do
-                unzip -l "$F" 2>/dev/null | grep -i "$pat" | sed "s|^|$(basename $F): |" >> out/found.txt || true
+              unzip -l "$JAR" | grep -i "$pat" >> "$O/found.txt" || true
+              for F in $(find ~/.gradle "build/v/$T/.gradle" -name "fabric-*.jar" 2>/dev/null | grep -v sources | sort -u); do
+                unzip -l "$F" 2>/dev/null | grep -i "$pat" | sed "s|^|$(basename $F): |" >> "$O/found.txt" || true
               done
             done < ci/check-find.txt
           fi
           # Signatures of the classes in ci/check-classes.txt ("c some.Class" adds the bytecode).
-          # A class not in the game jar is looked for in the Fabric API jars.
-          if [ -f ci/check-classes.txt ]; then
-            FAB=$(find ~/.gradle .gradle -name "fabric-*.jar" 2>/dev/null | grep -v sources | sort -u | tr '\n' ':')
+          if [ -s ci/check-classes.txt ]; then
+            FAB=$(find ~/.gradle "build/v/$T/.gradle" -name "fabric-*.jar" 2>/dev/null | grep -v sources | sort -u | tr '\n' ':')
             while read -r cls; do
               [ -z "$cls" ] && continue
               case "$cls" in
-                "c "*) c="${cls#c }"; javap -c -p -cp "$JAR:$FAB" "$c" > "out/$c.c.txt" 2>&1 || true ;;
-                *) javap -p -cp "$JAR:$FAB" "$cls" > "out/$cls.txt" 2>&1 || true ;;
+                "c "*) c="${cls#c }"; javap -c -p -cp "$JAR:$FAB" "$c" > "$O/$c.c.txt" 2>&1 || true ;;
+                *) javap -p -cp "$JAR:$FAB" "$cls" > "$O/$cls.txt" 2>&1 || true ;;
               esac
             done < ci/check-classes.txt
           fi
+          exit 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: out-${{ matrix.target }}
+          path: out/${{ matrix.target }}
+
+  save:
+    needs: check
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: out-*
+          path: /tmp/out
       - name: Save
         continue-on-error: true
         shell: bash
         run: |
+          mkdir -p /tmp/all
+          for d in /tmp/out/out-*; do cp -r "$d" "/tmp/all/${d##*/out-}"; done
           git config user.name "cubework-ci"
           git config user.email "cubework-ci@users.noreply.github.com"
-          cp -r out /tmp/out
           git checkout --orphan ci-check-tmp
           git rm -rf --cached . > /dev/null 2>&1 || true
-          rm -rf out && cp -r /tmp/out out
+          rm -rf out && mkdir out && cp -r /tmp/all/. out/
           git add -f out
           git commit -m "Compile check for ${GITHUB_SHA}" > /dev/null
           git push -f origin HEAD:ci-check

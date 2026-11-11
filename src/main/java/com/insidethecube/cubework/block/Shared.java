@@ -2,10 +2,9 @@ package com.insidethecube.cubework.block;
 
 import com.insidethecube.cubework.CwBlocks;
 import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Reg;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -54,9 +53,8 @@ public final class Shared {
 			Material hard = info.material().hardened();
 			to = hard == null ? null : CwBlocks.get(hard, info.shape());
 		} else {
-			Identifier id = BuiltInRegistries.BLOCK.getKey(b);
-			String path = id.getPath();
-			to = path.endsWith("_concrete_powder") ? BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace(path.substring(0, path.length() - "_powder".length()))) : null;
+			String path = Reg.idOf(b).getPath();
+			to = path.endsWith("_concrete_powder") ? Reg.vanilla(path.substring(0, path.length() - "_powder".length())) : null;
 		}
 		return to == null ? state : copy(state, to);
 	}

@@ -13,7 +13,23 @@ import os
 import shutil
 
 HERE = os.path.dirname(__file__)
-ROOT = os.path.join(HERE, "..", "src", "main", "resources")
+import argparse
+
+_args = argparse.ArgumentParser(description="Generates Cubework's resources for one Minecraft version.")
+_args.add_argument("--out", default=os.path.join(HERE, "..", "build", "generated"), help="resources folder to write into")
+_args.add_argument("--mc", default="1.21.11", help="Minecraft version the resources are for")
+_args.add_argument("--blocks", help="file listing the vanilla block ids in that version (blocks missing from it are left out)")
+ARGS = _args.parse_args()
+MC = tuple(int(p) for p in ARGS.mc.split("."))
+VANILLA_BLOCKS = set(open(ARGS.blocks).read().split()) if ARGS.blocks else None
+
+
+def exists(block):
+    """Whether a vanilla block is in this Minecraft version (pale oak and resin came in 1.21.4, bushes in 1.21.5)."""
+    return VANILLA_BLOCKS is None or block in VANILLA_BLOCKS
+
+
+ROOT = ARGS.out
 ASSETS = os.path.join(ROOT, "assets", "cubework")
 DATA = os.path.join(ROOT, "data")
 TEMPLATES = os.path.join(HERE, "templates")
@@ -963,6 +979,14 @@ def cube_icon():
 
 
 def main():
+    # Leave out blocks this Minecraft version doesn't have.
+    global MATERIALS, LOGS, LOW_PLANTS, PLANTS, DOOR_WOODS, TABLE_TOPS
+    MATERIALS = [(mat, kind) for mat, kind in MATERIALS if exists(mat)]
+    LOGS = [log for log in LOGS if exists(log)]
+    LOW_PLANTS = [p for p in LOW_PLANTS if exists(p)]
+    PLANTS = [p for p in PLANTS if exists(p)]
+    DOOR_WOODS = [w for w in DOOR_WOODS if exists(w + "_door")]
+    TABLE_TOPS = [t for t in TABLE_TOPS if exists(t)]
     for sub in ["blockstates", "models", "items"]:
         shutil.rmtree(os.path.join(ASSETS, sub), ignore_errors=True)
     for sub in ["loot_table", "recipe"]:

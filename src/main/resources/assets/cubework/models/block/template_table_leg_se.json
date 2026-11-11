@@ -1,1 +1,0 @@
-{"parent":"minecraft:block/block","textures":{"particle":"#legs"},"elements":[{"from":[13,0,13],"to":[16,3,16],"faces":{"down":{"texture":"#legs","cullface":"down"},"up":{"texture":"#legs"},"north":{"texture":"#legs"},"south":{"texture":"#legs"},"west":{"texture":"#legs"},"east":{"texture":"#legs"}}}]}

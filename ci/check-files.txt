@@ -1,0 +1,12 @@
+data/minecraft/recipe/oak_slab.json
+data/minecraft/recipe/stone_slab_from_stone_stonecutting.json
+data/minecraft/recipe/mossy_cobblestone_from_vine.json
+data/minecraft/loot_table/blocks/glass.json
+data/minecraft/loot_table/blocks/oak_slab.json
+data/minecraft/loot_table/blocks/oak_door.json
+assets/minecraft/items/oak_slab.json
+assets/minecraft/items/short_grass.json
+assets/minecraft/models/item/oak_slab.json
+assets/minecraft/models/item/short_grass.json
+assets/minecraft/atlases/*.json
+version.json

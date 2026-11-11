@@ -1,1 +1,0 @@
-{"type":"minecraft:block","pools":[{"rolls":1.0,"bonus_rolls":0.0,"entries":[{"type":"minecraft:item","name":"cubework:netherite_block_8","functions":[{"function":"minecraft:explosion_decay"}]}]}],"random_sequence":"cubework:blocks/netherite_block_8"}

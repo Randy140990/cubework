@@ -1,1 +1,0 @@
-{"type":"minecraft:block","pools":[{"rolls":1.0,"bonus_rolls":0.0,"entries":[{"type":"minecraft:item","name":"cubework:magenta_wool_stairs","functions":[{"function":"minecraft:explosion_decay"}]}]}],"random_sequence":"cubework:blocks/magenta_wool_stairs"}
