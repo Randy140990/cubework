@@ -4,14 +4,10 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelDebugName;
-import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.insidethecube.cubework.Material;
@@ -27,34 +23,18 @@ import com.insidethecube.cubework.block.ArchGeometry;
 public final class ArchModel {
 	private ArchModel() {}
 
-	public record Unbaked(Material material) implements BlockStateModel.UnbakedRoot {
-		@Override
-		public void resolveDependencies(ResolvableModel.Resolver resolver) {
-		}
-
-		@Override
-		public Object visualEqualityGroup(BlockState state) {
-			return state;
-		}
-
-		@Override
-		public BlockStateModel bake(BlockState state, ModelBaker baker) {
-			Material.Textures t = material.textures();
-			ModelDebugName named = () -> "cubework arch " + material.id();
-			TextureAtlasSprite top = sprite(baker, t.top(), named), side = sprite(baker, t.side(), named), bottom = sprite(baker, t.bottom(), named);
-			boolean corner = state.getBlock() instanceof ArchCornerBlock;
-			int turns = corner ? ArchCornerBlock.turns(state.getValue(ArchCornerBlock.FACING))
-					: state.getValue(ArchBlock.AXIS) == Direction.Axis.X ? 1 : 0;
-			return new SlopeModel.Baked(new SlopeModel.Part(quads(corner, turns, top, side, bottom), side));
-		}
-
-		private static TextureAtlasSprite sprite(ModelBaker baker, String texture, ModelDebugName named) {
-			return baker.sprites().get(new net.minecraft.client.resources.model.Material(Uv.BLOCK_ATLAS, Identifier.withDefaultNamespace("block/" + texture)), named);
-		}
+	/** The arch's quads for one block state, from the vanilla block's textures. */
+	static Models.Built build(Material material, BlockState state, Function<String, TextureAtlasSprite> sprite) {
+		Material.Textures t = material.textures();
+		TextureAtlasSprite top = sprite.apply(t.top()), side = sprite.apply(t.side()), bottom = sprite.apply(t.bottom());
+		boolean corner = state.getBlock() instanceof ArchCornerBlock;
+		int turns = corner ? ArchCornerBlock.turns(state.getValue(ArchCornerBlock.FACING))
+				: state.getValue(ArchBlock.AXIS) == Direction.Axis.X ? 1 : 0;
+		return new Models.Built(quads(corner, turns, top, side, bottom), side);
 	}
 
 	/** Built facing north and south (seen from the front, x across, y up), then turned clockwise. */
-	private static SlopeModel.Quads quads(boolean corner, int turns, TextureAtlasSprite top, TextureAtlasSprite side, TextureAtlasSprite bottom) {
+	private static Models.Quads quads(boolean corner, int turns, TextureAtlasSprite top, TextureAtlasSprite side, TextureAtlasSprite bottom) {
 		Map<Direction, List<BakedQuad>> out = new EnumMap<>(Direction.class);
 		List<BakedQuad> free = new ArrayList<>();
 		double[][] c = ArchGeometry.curve(corner);
@@ -87,7 +67,7 @@ public final class ArchModel {
 			double[][] p = {{x, y, 0}, {x, y, 1}, {x, 1, 1}, {x, 1, 0}};
 			add(out, turn(d, turns), quad(side, p, sideUv(p, d), d, axis(d), turns));
 		}
-		return new SlopeModel.Quads(out, free);
+		return new Models.Quads(out, free);
 	}
 
 	private static void add(Map<Direction, List<BakedQuad>> out, Direction d, BakedQuad q) {

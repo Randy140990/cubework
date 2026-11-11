@@ -44,7 +44,11 @@ public class SizedPlantBlock extends VegetationBlock {
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		//#if MC >= 1.21.2
 		Vec3 offset = state.getOffset(pos);
+		//#else
+		Vec3 offset = state.getOffset(world, pos);
+		//#endif
 		return shape.move(offset.x, offset.y, offset.z);
 	}
 

@@ -32,6 +32,7 @@ def ver(s):
 # (applies when, regex, replacement): names that differ in older or newer versions.
 SWAPS = [
     (lambda mc: mc < (1, 21, 11), r"\bIdentifier\b", "ResourceLocation"),
+    (lambda mc: mc < (1, 21, 5), r"\bVegetationBlock\b", "BushBlock"),
 ]
 
 

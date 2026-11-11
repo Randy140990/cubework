@@ -12,10 +12,8 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.renderer.BiomeColors;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.world.level.GrassColor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 
 public final class CubeworkClient implements ClientModInitializer {
 	@Override
@@ -44,19 +42,20 @@ public final class CubeworkClient implements ClientModInitializer {
 		// Grass shapes, grass, ferns and bushes take the biome's grass colour.
 		ColorProviderRegistry.BLOCK.register((state, world, pos, tint) -> world != null && pos != null ? BiomeColors.getAverageGrassColor(world, pos)
 				: GrassColor.getDefaultColor(), grass.toArray(new Block[0]));
+		//#if MC < 1.21.4
+		// Before 1.21.4 items take their tints from code too.
+		ColorProviderRegistry.ITEM.register((stack, tint) -> GrassColor.getDefaultColor(),
+				grass.stream().map(Block::asItem).toArray(net.minecraft.world.level.ItemLike[]::new));
+		//#endif
 
 		// Slopes and arches have their own models, built from the vanilla block's textures.
 		ModelLoadingPlugin.register(ctx -> {
 			for (Material m : Material.ALL) {
-				SlopeModel.Unbaked slopeModel = new SlopeModel.Unbaked(m);
-				ArchModel.Unbaked archModel = new ArchModel.Unbaked(m);
 				for (Shape shape : new Shape[] {Shape.SLOPE, Shape.SLOPE_2, Shape.SLOPE_3, Shape.GENTLE_SLOPE, Shape.ARCH, Shape.ARCH_CORNER}) {
 					Block block = CwBlocks.get(m, shape);
 					if (block == null) continue;
-					BlockStateModel.UnbakedRoot model = shape == Shape.ARCH || shape == Shape.ARCH_CORNER ? archModel : slopeModel;
-					ctx.registerBlockStateResolver(block, resolver -> {
-						for (BlockState state : block.getStateDefinition().getPossibleStates()) resolver.setModel(state, model);
-					});
+					boolean arch = shape == Shape.ARCH || shape == Shape.ARCH_CORNER;
+					Models.register(ctx, block, (state, sprites) -> arch ? ArchModel.build(m, state, sprites) : SlopeModel.build(m, state, sprites));
 				}
 			}
 		});
