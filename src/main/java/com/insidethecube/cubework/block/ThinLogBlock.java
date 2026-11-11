@@ -82,7 +82,7 @@ public class ThinLogBlock extends ThinPillarBlock {
 			BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
 		Block stripped = com.insidethecube.cubework.Extras.STRIPPED.get(this);
 		if (stripped == null || !stack.is(net.minecraft.tags.ItemTags.AXES)) return super.useItemOn(stack, state, level, pos, player, hand, hit);
-		level.playSound(player, pos, net.minecraft.sounds.SoundEvents.AXE_STRIP, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+		level.playSound(player, pos, net.minecraft.sounds.SoundEvents.AXE_STRIP.value(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
 		if (!level.isClientSide()) {
 			level.setBlock(pos, Shared.copy(state, stripped), Block.UPDATE_ALL_IMMEDIATE);
 			stack.hurtAndBreak(1, player, hand);
