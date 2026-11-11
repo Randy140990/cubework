@@ -1,1 +1,14 @@
 com.mojang.blaze3d.platform.NativeImage
+net.minecraft.world.level.block.state.BlockBehaviour
+net.minecraft.client.resources.model.UnbakedModel
+net.minecraft.client.resources.model.BakedModel
+net.minecraft.client.renderer.block.model.UnbakedBlockStateModel
+net.minecraft.client.resources.model.ModelBaker
+net.minecraft.client.resources.model.ResolvableModel
+net.minecraft.client.resources.model.ResolvableModel$Resolver
+net.fabricmc.fabric.api.client.model.loading.v1.BlockStateResolver$Context
+net.minecraft.client.resources.model.ModelState
+net.minecraft.client.renderer.block.model.ItemTransforms
+net.minecraft.client.renderer.block.model.ItemOverrides
+net.minecraft.client.resources.model.SimpleBakedModel
+net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin$Context
