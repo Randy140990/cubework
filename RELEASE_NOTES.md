@@ -1,5 +1,7 @@
 Cubework by Inside the Cube.
 
+0.6.0: Cubework for every Minecraft version from 1.21.1 to 1.21.11, one jar for each: pick the one named for your version (cubework-0.6.0+1.21.1.jar for 1.21 and 1.21.1, +1.21.3 for 1.21.2 and 1.21.3, +1.21.4, +1.21.5, +1.21.8 for 1.21.6 to 1.21.8, +1.21.10 for 1.21.9 and 1.21.10, +1.21.11). Everything from 0.5.0 is in each, except blocks the game didn't have yet: pale oak and resin arrived in 1.21.4, bushes and short dry grass in 1.21.5. 26.1, 26.2 and 26.3 are next.
+
 0.5.1: no changes in the game. The code now uses Mojang's own names for Minecraft's code (needed for 26.1 and later), the first step to versions from 1.21.1 to 26.3.
 
 0.5.0: tables, steeper and gentler slopes, door handles and door shine.
