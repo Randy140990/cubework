@@ -1,20 +1,19 @@
 package com.insidethecube.cubework.block;
 
 import com.insidethecube.cubework.Material;
-
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 
 /**
  * A slope that climbs one block over four (1 in 4): it rises 4 pixels across the block, sitting on the
@@ -24,9 +23,9 @@ import net.minecraft.world.World;
  * to the next step.
  */
 public class GentleSlopeBlock extends SlopeBlock {
-	public static final IntProperty STEP = IntProperty.of("step", 1, 4);
+	public static final IntegerProperty STEP = IntegerProperty.create("step", 1, 4);
 
-	public GentleSlopeBlock(Material material, AbstractBlock.Settings settings) {
+	public GentleSlopeBlock(Material material, BlockBehaviour.Properties settings) {
 		super(material, settings);
 	}
 
@@ -36,19 +35,19 @@ public class GentleSlopeBlock extends SlopeBlock {
 	}
 
 	/** Its step property (1 to steps()). Called while the block is being built, so it returns a constant. */
-	public IntProperty step() {
+	public IntegerProperty step() {
 		return STEP;
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-		super.appendProperties(builder);
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 		builder.add(step());
 	}
 
 	@Override
 	public double base(BlockState state) {
-		return (state.get(step()) - 1) * 16.0 / steps();
+		return (state.getValue(step()) - 1) * 16.0 / steps();
 	}
 
 	@Override
@@ -58,9 +57,9 @@ public class GentleSlopeBlock extends SlopeBlock {
 
 	/** One block over three. */
 	public static class Over3 extends GentleSlopeBlock {
-		public static final IntProperty STEP_3 = IntProperty.of("step", 1, 3);
+		public static final IntegerProperty STEP_3 = IntegerProperty.create("step", 1, 3);
 
-		public Over3(Material material, AbstractBlock.Settings settings) {
+		public Over3(Material material, BlockBehaviour.Properties settings) {
 			super(material, settings);
 		}
 
@@ -70,16 +69,16 @@ public class GentleSlopeBlock extends SlopeBlock {
 		}
 
 		@Override
-		public IntProperty step() {
+		public IntegerProperty step() {
 			return STEP_3;
 		}
 	}
 
 	/** One block over two. */
 	public static class Over2 extends GentleSlopeBlock {
-		public static final IntProperty STEP_2 = IntProperty.of("step", 1, 2);
+		public static final IntegerProperty STEP_2 = IntegerProperty.create("step", 1, 2);
 
-		public Over2(Material material, AbstractBlock.Settings settings) {
+		public Over2(Material material, BlockBehaviour.Properties settings) {
 			super(material, settings);
 		}
 
@@ -89,7 +88,7 @@ public class GentleSlopeBlock extends SlopeBlock {
 		}
 
 		@Override
-		public IntProperty step() {
+		public IntegerProperty step() {
 			return STEP_2;
 		}
 	}
@@ -97,25 +96,25 @@ public class GentleSlopeBlock extends SlopeBlock {
 	/** Corners join slopes of the same kind on the same step. */
 	@Override
 	protected boolean joins(BlockState state, BlockState other) {
-		return super.joins(state, other) && other.get(step()).equals(state.get(step()));
+		return super.joins(state, other) && other.getValue(step()).equals(state.getValue(step()));
 	}
 
 	/** The step after the one below it (downhill), or before the one above it (uphill); else the first. */
 	@Override
-	protected BlockState placing(BlockState state, ItemPlacementContext ctx) {
-		Direction facing = state.get(FACING);
-		BlockPos pos = ctx.getBlockPos();
-		BlockState below = ctx.getWorld().getBlockState(pos.offset(facing.getOpposite()));
-		IntProperty step = step();
+	protected BlockState placing(BlockState state, BlockPlaceContext ctx) {
+		Direction facing = state.getValue(FACING);
+		BlockPos pos = ctx.getClickedPos();
+		BlockState below = ctx.getLevel().getBlockState(pos.relative(facing.getOpposite()));
+		IntegerProperty step = step();
 		int n = steps();
-		if (sameKind(below) && below.get(FACING) == facing && below.get(HALF) == state.get(HALF)) {
-			return state.with(step, below.get(step) % n + 1);
+		if (sameKind(below) && below.getValue(FACING) == facing && below.getValue(HALF) == state.getValue(HALF)) {
+			return state.setValue(step, below.getValue(step) % n + 1);
 		}
-		BlockState above = ctx.getWorld().getBlockState(pos.offset(facing));
-		if (sameKind(above) && above.get(FACING) == facing && above.get(HALF) == state.get(HALF)) {
-			return state.with(step, above.get(step) == 1 ? n : above.get(step) - 1);
+		BlockState above = ctx.getLevel().getBlockState(pos.relative(facing));
+		if (sameKind(above) && above.getValue(FACING) == facing && above.getValue(HALF) == state.getValue(HALF)) {
+			return state.setValue(step, above.getValue(step) == 1 ? n : above.getValue(step) - 1);
 		}
-		return state.with(step, 1);
+		return state.setValue(step, 1);
 	}
 
 	/** A slope with the same number of steps (any material). */
@@ -124,13 +123,13 @@ public class GentleSlopeBlock extends SlopeBlock {
 	}
 
 	@Override
-	protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+	protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
 		// Only with an empty hand, so clicking one with a block still places the block.
-		if (!player.getMainHandStack().isEmpty()) return ActionResult.PASS;
-		BlockState next = state.with(step(), state.get(step()) % steps() + 1);
-		next = next.with(SHAPE, shapeAt(next, world, pos));
-		world.setBlockState(pos, next, Block.NOTIFY_ALL);
-		world.playSound(player, pos, getSoundGroup(state).getPlaceSound(), SoundCategory.BLOCKS, 0.6f, 1.2f);
-		return ActionResult.SUCCESS;
+		if (!player.getMainHandItem().isEmpty()) return InteractionResult.PASS;
+		BlockState next = state.setValue(step(), state.getValue(step()) % steps() + 1);
+		next = next.setValue(SHAPE, shapeAt(next, world, pos));
+		world.setBlock(pos, next, Block.UPDATE_ALL);
+		world.playSound(player, pos, getSoundType(state).getPlaceSound(), SoundSource.BLOCKS, 0.6f, 1.2f);
+		return InteractionResult.SUCCESS;
 	}
 }

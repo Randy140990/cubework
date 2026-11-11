@@ -1,59 +1,57 @@
 package com.insidethecube.cubework.block;
 
 import java.util.Map;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import com.insidethecube.cubework.Material;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-
 /** A thin pillar, 6 pixels across, running along the axis of the face you click (like logs). */
-public class PostBlock extends CwBlock implements Waterloggable {
-	public static final EnumProperty<Direction.Axis> AXIS = Properties.AXIS;
+public class PostBlock extends CwBlock implements SimpleWaterloggedBlock {
+	public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
 
 	private static final Map<Direction.Axis, VoxelShape> SHAPES = Map.of(
-			Direction.Axis.Y, Block.createCuboidShape(5, 0, 5, 11, 16, 11),
-			Direction.Axis.X, Block.createCuboidShape(0, 5, 5, 16, 11, 11),
-			Direction.Axis.Z, Block.createCuboidShape(5, 5, 0, 11, 11, 16));
+			Direction.Axis.Y, Block.box(5, 0, 5, 11, 16, 11),
+			Direction.Axis.X, Block.box(0, 5, 5, 16, 11, 11),
+			Direction.Axis.Z, Block.box(5, 5, 0, 11, 11, 16));
 
-	public PostBlock(Material material, AbstractBlock.Settings settings) {
+	public PostBlock(Material material, BlockBehaviour.Properties settings) {
 		super(material, settings);
-		setDefaultState(getDefaultState().with(AXIS, Direction.Axis.Y).with(WATERLOGGED, false));
+		registerDefaultState(defaultBlockState().setValue(AXIS, Direction.Axis.Y).setValue(WATERLOGGED, false));
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(AXIS, WATERLOGGED);
 	}
 
 	@Override
-	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return SHAPES.get(state.get(AXIS));
+	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		return SHAPES.get(state.getValue(AXIS));
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return placed(getDefaultState().with(AXIS, ctx.getSide().getAxis()).with(WATERLOGGED, waterAt(ctx)), ctx);
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		return placed(defaultBlockState().setValue(AXIS, ctx.getClickedFace().getAxis()).setValue(WATERLOGGED, waterAt(ctx)), ctx);
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, BlockRotation rotation) {
-		if (rotation == BlockRotation.CLOCKWISE_90 || rotation == BlockRotation.COUNTERCLOCKWISE_90) {
-			Direction.Axis a = state.get(AXIS);
-			if (a == Direction.Axis.X) return state.with(AXIS, Direction.Axis.Z);
-			if (a == Direction.Axis.Z) return state.with(AXIS, Direction.Axis.X);
+	protected BlockState rotate(BlockState state, Rotation rotation) {
+		if (rotation == Rotation.CLOCKWISE_90 || rotation == Rotation.COUNTERCLOCKWISE_90) {
+			Direction.Axis a = state.getValue(AXIS);
+			if (a == Direction.Axis.X) return state.setValue(AXIS, Direction.Axis.Z);
+			if (a == Direction.Axis.Z) return state.setValue(AXIS, Direction.Axis.X);
 		}
 		return state;
 	}

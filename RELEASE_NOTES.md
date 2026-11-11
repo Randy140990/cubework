@@ -1,5 +1,7 @@
 Cubework by Inside the Cube.
 
+0.5.1: no changes in the game. The code now uses Mojang's own names for Minecraft's code (needed for 26.1 and later), the first step to versions from 1.21.1 to 26.3.
+
 0.5.0: tables, steeper and gentler slopes, door handles and door shine.
 - Tables tab: low tables shaped like a bed (a 6-pixel top on 3-pixel legs). 58 tops (terracotta, glazed terracotta, stripped woods, smooth stone, polished granite, diorite and andesite, chiseled deepslate, tuff, chiseled resin, quartz) with oak legs or legs in any concrete colour: 986 tables. Tables with the same legs placed side by side join: legs only at the outside corners, so two make a bed-sized table, four a square one, a ring one with a hole. The top's pattern turns with the way you face as you place it. Crafting: three of the top block over two sticks (or two concrete for coloured legs) makes three.
 - Slopes over 2 and 3 blocks join the slope over 4 (now called Slope (1 in 4)): place them in a row and each takes the next step by itself; an empty hand moves one to its next step. For wool, terracotta, concrete and every building block.

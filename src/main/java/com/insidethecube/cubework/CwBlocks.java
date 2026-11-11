@@ -30,22 +30,22 @@ import com.insidethecube.cubework.block.VerticalSlabBlock;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockSetType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.WoodType;
-import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EmptyBlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 
 /** Every Cubework block, made from the material and shape tables. */
 public final class CwBlocks {
@@ -86,26 +86,26 @@ public final class CwBlocks {
 		}
 	}
 
-	private static AbstractBlock.Settings settings(Material m, Block base, Shape s) {
+	private static BlockBehaviour.Properties settings(Material m, Block base, Shape s) {
 		// Map colour and light are fixed from the vanilla block, since some vanilla blocks work them out
 		// from properties our shapes don't have (a log's axis, redstone ore being lit).
-		BlockState def = base.getDefaultState();
-		MapColor colour = def.getMapColor(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
-		int light = def.getLuminance();
-		AbstractBlock.Settings set = AbstractBlock.Settings.copy(base).mapColor(colour).luminance(state -> light);
+		BlockState def = base.defaultBlockState();
+		MapColor colour = def.getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+		int light = def.getLightEmission();
+		BlockBehaviour.Properties set = BlockBehaviour.Properties.ofFullCopy(base).mapColor(colour).lightLevel(state -> light);
 		// Copper that can still weather gets random ticks (vanilla copper decides this in code, so it isn't copied).
-		if (m.copperAge() >= 0 && m.copperAge() < 3) set.ticksRandomly();
+		if (m.copperAge() >= 0 && m.copperAge() < 3) set.randomTicks();
 		return switch (s) {
-			case BUTTON, PRESSURE_PLATE -> set.noCollision().pistonBehavior(PistonBehavior.DESTROY);
-			case TRAPDOOR -> set.nonOpaque().allowsSpawning((state, world, pos, type) -> false);
-			case WALL, FENCE, FENCE_GATE -> set.solid();
+			case BUTTON, PRESSURE_PLATE -> set.noCollision().pushReaction(PushReaction.DESTROY);
+			case TRAPDOOR -> set.noOcclusion().isValidSpawn((state, world, pos, type) -> false);
+			case WALL, FENCE, FENCE_GATE -> set.forceSolidOn();
 			default -> set;
 		};
 	}
 
-	private static Function<AbstractBlock.Settings, Block> factory(Material m, Shape s, Block base) {
+	private static Function<BlockBehaviour.Properties, Block> factory(Material m, Shape s, Block base) {
 		return switch (s) {
-			case STAIRS -> set -> new CwStairs(m, base.getDefaultState(), set);
+			case STAIRS -> set -> new CwStairs(m, base.defaultBlockState(), set);
 			case SLAB -> set -> new CwSlab(m, set);
 			case VERTICAL_SLAB -> set -> new VerticalSlabBlock(m, set);
 			case SLOPE -> set -> new SlopeBlock(m, set);
@@ -137,14 +137,14 @@ public final class CwBlocks {
 		return m.copper() ? BlockSetType.COPPER : BlockSetType.STONE;
 	}
 
-	private static Block block(String name, AbstractBlock.Settings settings, Function<AbstractBlock.Settings, Block> factory) {
-		RegistryKey<Block> key = RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Cubework.ID, name));
-		return Registry.register(Registries.BLOCK, key, factory.apply(settings.registryKey(key)));
+	private static Block block(String name, BlockBehaviour.Properties settings, Function<BlockBehaviour.Properties, Block> factory) {
+		ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Cubework.ID, name));
+		return Registry.register(BuiltInRegistries.BLOCK, key, factory.apply(settings.setId(key)));
 	}
 
 	private static void item(String name, Block block) {
-		RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Cubework.ID, name));
-		Registry.register(Registries.ITEM, key, new BlockItem(block, new Item.Settings().registryKey(key).useBlockPrefixedTranslationKey()));
+		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Cubework.ID, name));
+		Registry.register(BuiltInRegistries.ITEM, key, new BlockItem(block, new Item.Properties().setId(key).useBlockDescriptionPrefix()));
 	}
 
 	public static Block get(Material m, Shape s) {

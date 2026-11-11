@@ -1,113 +1,111 @@
 package com.insidethecube.cubework.block;
 
 import java.util.Map;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import com.insidethecube.cubework.Material;
-
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldAccess;
 
 /**
  * A slab standing on its edge. It sits against the face you click; clicked on a floor or ceiling, it
  * takes the half furthest from you. A second one in the open half makes a full block, like slabs.
  */
-public class VerticalSlabBlock extends CwBlock implements Waterloggable {
+public class VerticalSlabBlock extends CwBlock implements SimpleWaterloggedBlock {
 	/** The side it's against. */
-	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-	public static final BooleanProperty DOUBLE = BooleanProperty.of("double");
+	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+	public static final BooleanProperty DOUBLE = BooleanProperty.create("double");
 
 	private final Map<Direction, VoxelShape> shapes;
 	private final VoxelShape full;
 
-	public VerticalSlabBlock(Material material, AbstractBlock.Settings settings) {
+	public VerticalSlabBlock(Material material, BlockBehaviour.Properties settings) {
 		super(material, settings);
 		int h = material.height();
 		shapes = Map.of(
-				Direction.NORTH, Block.createCuboidShape(0, 0, 0, 16, h, 8),
-				Direction.SOUTH, Block.createCuboidShape(0, 0, 8, 16, h, 16),
-				Direction.WEST, Block.createCuboidShape(0, 0, 0, 8, h, 16),
-				Direction.EAST, Block.createCuboidShape(8, 0, 0, 16, h, 16));
-		full = Block.createCuboidShape(0, 0, 0, 16, h, 16);
-		setDefaultState(getDefaultState().with(FACING, Direction.NORTH).with(DOUBLE, false).with(WATERLOGGED, false));
+				Direction.NORTH, Block.box(0, 0, 0, 16, h, 8),
+				Direction.SOUTH, Block.box(0, 0, 8, 16, h, 16),
+				Direction.WEST, Block.box(0, 0, 0, 8, h, 16),
+				Direction.EAST, Block.box(8, 0, 0, 16, h, 16));
+		full = Block.box(0, 0, 0, 16, h, 16);
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(DOUBLE, false).setValue(WATERLOGGED, false));
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING, DOUBLE, WATERLOGGED);
 	}
 
 	@Override
-	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return state.get(DOUBLE) ? full : shapes.get(state.get(FACING));
+	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		return state.getValue(DOUBLE) ? full : shapes.get(state.getValue(FACING));
 	}
 
 	@Override
-	protected boolean hasSidedTransparency(BlockState state) {
-		return !state.get(DOUBLE);
+	protected boolean useShapeForLightOcclusion(BlockState state) {
+		return !state.getValue(DOUBLE);
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		BlockPos pos = ctx.getBlockPos();
-		BlockState existing = ctx.getWorld().getBlockState(pos);
-		if (existing.isOf(this)) return placed(existing.with(DOUBLE, true).with(WATERLOGGED, false), ctx);
-		Direction side = ctx.getSide();
-		Direction facing = side.getAxis().isHorizontal() ? side.getOpposite() : ctx.getHorizontalPlayerFacing();
-		return placed(getDefaultState().with(FACING, facing).with(WATERLOGGED, waterAt(ctx)), ctx);
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		BlockPos pos = ctx.getClickedPos();
+		BlockState existing = ctx.getLevel().getBlockState(pos);
+		if (existing.is(this)) return placed(existing.setValue(DOUBLE, true).setValue(WATERLOGGED, false), ctx);
+		Direction side = ctx.getClickedFace();
+		Direction facing = side.getAxis().isHorizontal() ? side.getOpposite() : ctx.getHorizontalDirection();
+		return placed(defaultBlockState().setValue(FACING, facing).setValue(WATERLOGGED, waterAt(ctx)), ctx);
 	}
 
 	@Override
-	protected boolean canReplace(BlockState state, ItemPlacementContext ctx) {
-		if (state.get(DOUBLE) || !ctx.getStack().isOf(asItem())) return false;
-		if (!ctx.canReplaceExisting()) return true;
-		Direction facing = state.get(FACING);
-		Direction side = ctx.getSide();
+	protected boolean canBeReplaced(BlockState state, BlockPlaceContext ctx) {
+		if (state.getValue(DOUBLE) || !ctx.getItemInHand().is(asItem())) return false;
+		if (!ctx.replacingClickedOnBlock()) return true;
+		Direction facing = state.getValue(FACING);
+		Direction side = ctx.getClickedFace();
 		if (side == facing.getOpposite()) return true;
 		if (side.getAxis().isVertical()) {
-			Vec3d hit = ctx.getHitPos();
-			BlockPos pos = ctx.getBlockPos();
+			Vec3 hit = ctx.getClickLocation();
+			BlockPos pos = ctx.getClickedPos();
 			double along = facing.getAxis() == Direction.Axis.X ? hit.x - pos.getX() : hit.z - pos.getZ();
-			return facing.getDirection() == Direction.AxisDirection.NEGATIVE ? along > 0.5 : along < 0.5;
+			return facing.getAxisDirection() == Direction.AxisDirection.NEGATIVE ? along > 0.5 : along < 0.5;
 		}
 		return false;
 	}
 
 	@Override
-	public boolean canFillWithFluid(LivingEntity filler, BlockView world, BlockPos pos, BlockState state, Fluid fluid) {
-		return !state.get(DOUBLE) && Waterloggable.super.canFillWithFluid(filler, world, pos, state, fluid);
+	public boolean canPlaceLiquid(LivingEntity filler, BlockGetter world, BlockPos pos, BlockState state, Fluid fluid) {
+		return !state.getValue(DOUBLE) && SimpleWaterloggedBlock.super.canPlaceLiquid(filler, world, pos, state, fluid);
 	}
 
 	@Override
-	public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
-		return !state.get(DOUBLE) && Waterloggable.super.tryFillWithFluid(world, pos, state, fluidState);
+	public boolean placeLiquid(LevelAccessor world, BlockPos pos, BlockState state, FluidState fluidState) {
+		return !state.getValue(DOUBLE) && SimpleWaterloggedBlock.super.placeLiquid(world, pos, state, fluidState);
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, BlockRotation rotation) {
-		return state.with(FACING, rotation.rotate(state.get(FACING)));
+	protected BlockState rotate(BlockState state, Rotation rotation) {
+		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, BlockMirror mirror) {
-		return state.rotate(mirror.getRotation(state.get(FACING)));
+	protected BlockState mirror(BlockState state, Mirror mirror) {
+		return state.rotate(mirror.getRotation(state.getValue(FACING)));
 	}
 }

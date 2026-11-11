@@ -1,6 +1,6 @@
 package com.insidethecube.cubework;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 /**
  * Shader packs give blocks shine and depth from normal and specular maps named after each texture
@@ -25,7 +25,7 @@ public final class ShaderMaps {
 		base = base.substring(0, base.length() - 2);
 		int slash = base.lastIndexOf('/');
 		String door = door(base.substring(slash + 1));
-		return door == null ? null : Identifier.ofVanilla(base.substring(0, slash + 1) + door + map + ext);
+		return door == null ? null : Identifier.withDefaultNamespace(base.substring(0, slash + 1) + door + map + ext);
 	}
 
 	/** red_oak_door_top to oak_door_top, red_iron_door to iron_door, gold_door_bottom to copper_door_bottom. */

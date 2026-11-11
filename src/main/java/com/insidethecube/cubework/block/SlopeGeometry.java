@@ -2,13 +2,12 @@ package com.insidethecube.cubework.block;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.enums.BlockHalf;
-import net.minecraft.block.enums.StairShape;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * The slope's surface, shared by its hit box (here) and its model (on the client). A straight slope
@@ -30,18 +29,18 @@ public final class SlopeGeometry {
 	}
 
 	/** How far up its rise (0 to 1) the surface is at x, z, for a slope facing f (its high side) with this shape. */
-	public static double height(Direction f, StairShape shape, double x, double z) {
+	public static double height(Direction f, StairsShape shape, double x, double z) {
 		double h = rise(f, x, z);
 		return switch (shape) {
 			case STRAIGHT -> h;
-			case OUTER_LEFT -> Math.min(h, rise(f.rotateYCounterclockwise(), x, z));
-			case OUTER_RIGHT -> Math.min(h, rise(f.rotateYClockwise(), x, z));
-			case INNER_LEFT -> Math.max(h, rise(f.rotateYCounterclockwise(), x, z));
-			case INNER_RIGHT -> Math.max(h, rise(f.rotateYClockwise(), x, z));
+			case OUTER_LEFT -> Math.min(h, rise(f.getCounterClockWise(), x, z));
+			case OUTER_RIGHT -> Math.min(h, rise(f.getClockWise(), x, z));
+			case INNER_LEFT -> Math.max(h, rise(f.getCounterClockWise(), x, z));
+			case INNER_RIGHT -> Math.max(h, rise(f.getClockWise(), x, z));
 		};
 	}
 
-	private record Key(Direction f, BlockHalf half, StairShape shape, double base, double rise, int top) {}
+	private record Key(Direction f, Half half, StairsShape shape, double base, double rise, int top) {}
 
 	private static final Map<Key, VoxelShape> OUTLINE = new ConcurrentHashMap<>();
 	private static final Map<Key, VoxelShape> INSIDE = new ConcurrentHashMap<>();
@@ -51,7 +50,7 @@ public final class SlopeGeometry {
 	 * Heights are in pixels: the slope starts at base and rises by rise; top is the block's height (15 for
 	 * dirt path), which upside-down slopes hang from.
 	 */
-	public static VoxelShape outline(Direction f, BlockHalf half, StairShape shape, double base, double rise, int top) {
+	public static VoxelShape outline(Direction f, Half half, StairsShape shape, double base, double rise, int top) {
 		return OUTLINE.computeIfAbsent(new Key(f, half, shape, base, rise, top), k -> build(f, half, shape, false, base, rise, top));
 	}
 
@@ -59,12 +58,12 @@ public final class SlopeGeometry {
 	 * The part that is certainly solid (steps no higher than the surface), for hiding neighbours' faces:
 	 * nothing above the smooth surface may hide a face you can see.
 	 */
-	public static VoxelShape inside(Direction f, BlockHalf half, StairShape shape, double base, double rise, int top) {
+	public static VoxelShape inside(Direction f, Half half, StairsShape shape, double base, double rise, int top) {
 		return INSIDE.computeIfAbsent(new Key(f, half, shape, base, rise, top), k -> build(f, half, shape, true, base, rise, top));
 	}
 
-	private static VoxelShape build(Direction f, BlockHalf half, StairShape shape, boolean inside, double base, double rise, int top) {
-		VoxelShape out = VoxelShapes.empty();
+	private static VoxelShape build(Direction f, Half half, StairsShape shape, boolean inside, double base, double rise, int top) {
+		VoxelShape out = Shapes.empty();
 		int cells = 8;
 		for (int cz = 0; cz < cells; cz++) {
 			int runStart = 0;
@@ -73,16 +72,16 @@ public final class SlopeGeometry {
 				// Heights to the nearest third of a pixel (slopes over three blocks rise 5 1/3 pixels).
 				double px = cx == cells ? -1 : Math.round((base + fraction(f, shape, cx, cz, cells, inside) * rise) * 3) / 3.0;
 				if (px != runPx) {
-					if (runPx > 0) out = VoxelShapes.union(out, box(runStart, cx, cz, runPx, half, cells, top));
+					if (runPx > 0) out = Shapes.or(out, box(runStart, cx, cz, runPx, half, cells, top));
 					runStart = cx;
 					runPx = px;
 				}
 			}
 		}
-		return out.simplify();
+		return out.optimize();
 	}
 
-	private static double fraction(Direction f, StairShape shape, int cx, int cz, int cells, boolean inside) {
+	private static double fraction(Direction f, StairsShape shape, int cx, int cz, int cells, boolean inside) {
 		double x0 = cx / (double) cells, x1 = (cx + 1) / (double) cells, z0 = cz / (double) cells, z1 = (cz + 1) / (double) cells;
 		if (inside) {
 			return Math.min(Math.min(height(f, shape, x0, z0), height(f, shape, x1, z0)), Math.min(height(f, shape, x0, z1), height(f, shape, x1, z1)));
@@ -90,9 +89,9 @@ public final class SlopeGeometry {
 		return height(f, shape, (x0 + x1) / 2, (z0 + z1) / 2);
 	}
 
-	private static VoxelShape box(int x0, int x1, int cz, double px, BlockHalf half, int cells, int top) {
+	private static VoxelShape box(int x0, int x1, int cz, double px, Half half, int cells, int top) {
 		double step = 16.0 / cells;
-		double y0 = half == BlockHalf.BOTTOM ? 0 : top - px, y1 = half == BlockHalf.BOTTOM ? px : top;
-		return Block.createCuboidShape(x0 * step, y0, cz * step, x1 * step, y1, (cz + 1) * step);
+		double y0 = half == Half.BOTTOM ? 0 : top - px, y1 = half == Half.BOTTOM ? px : top;
+		return Block.box(x0 * step, y0, cz * step, x1 * step, y1, (cz + 1) * step);
 	}
 }

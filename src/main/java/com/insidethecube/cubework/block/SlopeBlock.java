@@ -1,55 +1,54 @@
 package com.insidethecube.cubework.block;
 
 import com.insidethecube.cubework.Material;
-
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.block.enums.BlockHalf;
-import net.minecraft.block.enums.StairShape;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * A smooth ramp: placed like stairs (rising away from you, upside down on a ceiling or the top half of a
  * face), and bending into inner and outer corners by itself where slopes meet, like stairs do.
  */
-public class SlopeBlock extends CwBlock implements Waterloggable {
+public class SlopeBlock extends CwBlock implements SimpleWaterloggedBlock {
 	/** The high side. */
-	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-	public static final EnumProperty<BlockHalf> HALF = Properties.BLOCK_HALF;
-	public static final EnumProperty<StairShape> SHAPE = Properties.STAIR_SHAPE;
+	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+	public static final EnumProperty<Half> HALF = BlockStateProperties.HALF;
+	public static final EnumProperty<StairsShape> SHAPE = BlockStateProperties.STAIRS_SHAPE;
 
-	public SlopeBlock(Material material, AbstractBlock.Settings settings) {
+	public SlopeBlock(Material material, BlockBehaviour.Properties settings) {
 		super(material, settings);
-		setDefaultState(getDefaultState().with(FACING, Direction.NORTH).with(HALF, BlockHalf.BOTTOM).with(SHAPE, StairShape.STRAIGHT)
-				.with(WATERLOGGED, false));
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(HALF, Half.BOTTOM).setValue(SHAPE, StairsShape.STRAIGHT)
+				.setValue(WATERLOGGED, false));
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING, HALF, SHAPE, WATERLOGGED);
 	}
 
 	@Override
-	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return SlopeGeometry.outline(state.get(FACING), state.get(HALF), state.get(SHAPE), base(state), rise(state), material.height());
+	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		return SlopeGeometry.outline(state.getValue(FACING), state.getValue(HALF), state.getValue(SHAPE), base(state), rise(state), material.height());
 	}
 
 	@Override
-	protected VoxelShape getCullingShape(BlockState state) {
-		return SlopeGeometry.inside(state.get(FACING), state.get(HALF), state.get(SHAPE), base(state), rise(state), material.height());
+	protected VoxelShape getOcclusionShape(BlockState state) {
+		return SlopeGeometry.inside(state.getValue(FACING), state.getValue(HALF), state.getValue(SHAPE), base(state), rise(state), material.height());
 	}
 
 	/** Where the slope starts, in pixels (gentle slopes sit on the step below). */
@@ -68,69 +67,69 @@ public class SlopeBlock extends CwBlock implements Waterloggable {
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		Direction side = ctx.getSide();
-		BlockPos pos = ctx.getBlockPos();
-		boolean bottom = side != Direction.DOWN && (side == Direction.UP || !(ctx.getHitPos().y - pos.getY() > 0.5));
-		BlockState state = getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing()).with(HALF, bottom ? BlockHalf.BOTTOM : BlockHalf.TOP)
-				.with(WATERLOGGED, waterAt(ctx));
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		Direction side = ctx.getClickedFace();
+		BlockPos pos = ctx.getClickedPos();
+		boolean bottom = side != Direction.DOWN && (side == Direction.UP || !(ctx.getClickLocation().y - pos.getY() > 0.5));
+		BlockState state = defaultBlockState().setValue(FACING, ctx.getHorizontalDirection()).setValue(HALF, bottom ? Half.BOTTOM : Half.TOP)
+				.setValue(WATERLOGGED, waterAt(ctx));
 		state = placing(state, ctx);
-		return placed(state.with(SHAPE, shapeAt(state, ctx.getWorld(), pos)), ctx);
+		return placed(state.setValue(SHAPE, shapeAt(state, ctx.getLevel(), pos)), ctx);
 	}
 
 	/** A last say over a slope about to be placed (gentle slopes pick their step here). */
-	protected BlockState placing(BlockState state, ItemPlacementContext ctx) {
+	protected BlockState placing(BlockState state, BlockPlaceContext ctx) {
 		return state;
 	}
 
 	@Override
-	protected BlockState shapeUpdate(BlockState state, WorldView world, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState) {
-		return direction.getAxis().isHorizontal() ? state.with(SHAPE, shapeAt(state, world, pos)) : state;
+	protected BlockState shapeUpdate(BlockState state, LevelReader world, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState) {
+		return direction.getAxis().isHorizontal() ? state.setValue(SHAPE, shapeAt(state, world, pos)) : state;
 	}
 
 	/** The same rule vanilla stairs use to turn corners, applied between slopes. */
-	protected StairShape shapeAt(BlockState state, BlockView world, BlockPos pos) {
-		Direction facing = state.get(FACING);
-		BlockState front = world.getBlockState(pos.offset(facing));
-		if (joins(state, front) && state.get(HALF) == front.get(HALF)) {
-			Direction d = front.get(FACING);
+	protected StairsShape shapeAt(BlockState state, BlockGetter world, BlockPos pos) {
+		Direction facing = state.getValue(FACING);
+		BlockState front = world.getBlockState(pos.relative(facing));
+		if (joins(state, front) && state.getValue(HALF) == front.getValue(HALF)) {
+			Direction d = front.getValue(FACING);
 			if (d.getAxis() != facing.getAxis() && differs(state, world, pos, d.getOpposite())) {
-				return d == facing.rotateYCounterclockwise() ? StairShape.OUTER_LEFT : StairShape.OUTER_RIGHT;
+				return d == facing.getCounterClockWise() ? StairsShape.OUTER_LEFT : StairsShape.OUTER_RIGHT;
 			}
 		}
-		BlockState back = world.getBlockState(pos.offset(facing.getOpposite()));
-		if (joins(state, back) && state.get(HALF) == back.get(HALF)) {
-			Direction d = back.get(FACING);
+		BlockState back = world.getBlockState(pos.relative(facing.getOpposite()));
+		if (joins(state, back) && state.getValue(HALF) == back.getValue(HALF)) {
+			Direction d = back.getValue(FACING);
 			if (d.getAxis() != facing.getAxis() && differs(state, world, pos, d)) {
-				return d == facing.rotateYCounterclockwise() ? StairShape.INNER_LEFT : StairShape.INNER_RIGHT;
+				return d == facing.getCounterClockWise() ? StairsShape.INNER_LEFT : StairsShape.INNER_RIGHT;
 			}
 		}
-		return StairShape.STRAIGHT;
+		return StairsShape.STRAIGHT;
 	}
 
-	private boolean differs(BlockState state, BlockView world, BlockPos pos, Direction dir) {
-		BlockState other = world.getBlockState(pos.offset(dir));
-		return !joins(state, other) || other.get(FACING) != state.get(FACING) || other.get(HALF) != state.get(HALF);
-	}
-
-	@Override
-	protected BlockState rotate(BlockState state, BlockRotation rotation) {
-		return state.with(FACING, rotation.rotate(state.get(FACING)));
+	private boolean differs(BlockState state, BlockGetter world, BlockPos pos, Direction dir) {
+		BlockState other = world.getBlockState(pos.relative(dir));
+		return !joins(state, other) || other.getValue(FACING) != state.getValue(FACING) || other.getValue(HALF) != state.getValue(HALF);
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, BlockMirror mirror) {
-		Direction facing = state.get(FACING);
-		StairShape shape = state.get(SHAPE);
-		boolean flipsCorners = (mirror == BlockMirror.LEFT_RIGHT && facing.getAxis() == Direction.Axis.Z)
-				|| (mirror == BlockMirror.FRONT_BACK && facing.getAxis() == Direction.Axis.X);
+	protected BlockState rotate(BlockState state, Rotation rotation) {
+		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+	}
+
+	@Override
+	protected BlockState mirror(BlockState state, Mirror mirror) {
+		Direction facing = state.getValue(FACING);
+		StairsShape shape = state.getValue(SHAPE);
+		boolean flipsCorners = (mirror == Mirror.LEFT_RIGHT && facing.getAxis() == Direction.Axis.Z)
+				|| (mirror == Mirror.FRONT_BACK && facing.getAxis() == Direction.Axis.X);
 		if (flipsCorners) {
-			BlockState turned = state.rotate(BlockRotation.CLOCKWISE_180);
+			BlockState turned = state.rotate(Rotation.CLOCKWISE_180);
 			return switch (shape) {
-				case INNER_LEFT -> turned.with(SHAPE, StairShape.INNER_RIGHT);
-				case INNER_RIGHT -> turned.with(SHAPE, StairShape.INNER_LEFT);
-				case OUTER_LEFT -> turned.with(SHAPE, StairShape.OUTER_RIGHT);
-				case OUTER_RIGHT -> turned.with(SHAPE, StairShape.OUTER_LEFT);
+				case INNER_LEFT -> turned.setValue(SHAPE, StairsShape.INNER_RIGHT);
+				case INNER_RIGHT -> turned.setValue(SHAPE, StairsShape.INNER_LEFT);
+				case OUTER_LEFT -> turned.setValue(SHAPE, StairsShape.OUTER_RIGHT);
+				case OUTER_RIGHT -> turned.setValue(SHAPE, StairsShape.OUTER_LEFT);
 				default -> turned;
 			};
 		}

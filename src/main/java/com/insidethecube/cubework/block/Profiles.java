@@ -1,8 +1,8 @@
 package com.insidethecube.cubework.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * The flat outlines (16 x 16 pixels, as seen from the front) of arches and window frames, turned into
@@ -65,19 +65,19 @@ public final class Profiles {
 	 * to z1, then turned a number of quarter turns clockwise (seen from above), like a blockstate's y.
 	 */
 	public static VoxelShape shape(boolean[][] m, double z0, double z1, int quarterTurns) {
-		VoxelShape out = VoxelShapes.empty();
+		VoxelShape out = Shapes.empty();
 		for (int y = 0; y < 16; y++) {
 			int start = -1;
 			for (int x = 0; x <= 16; x++) {
 				boolean solid = x < 16 && m[x][y];
 				if (solid && start < 0) start = x;
 				if (!solid && start >= 0) {
-					out = VoxelShapes.union(out, turned(start, y, z0, x, y + 1, z1, quarterTurns));
+					out = Shapes.or(out, turned(start, y, z0, x, y + 1, z1, quarterTurns));
 					start = -1;
 				}
 			}
 		}
-		return out.simplify();
+		return out.optimize();
 	}
 
 	private static VoxelShape turned(double x0, double y0, double z0, double x1, double y1, double z1, int turns) {
@@ -88,6 +88,6 @@ public final class Profiles {
 			z0 = nz0;
 			z1 = nz1;
 		}
-		return Block.createCuboidShape(x0, y0, z0, x1, y1, z1);
+		return Block.box(x0, y0, z0, x1, y1, z1);
 	}
 }
