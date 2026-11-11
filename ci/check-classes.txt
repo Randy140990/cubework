@@ -1,13 +1,9 @@
-net.fabricmc.fabric.api.client.model.loading.v1.BlockStateResolver$Context
-net.minecraft.world.item.CreativeModeTab$Builder
-net.minecraft.client.color.block.BlockTintSources
-net.minecraft.client.renderer.texture.TextureAtlasSprite
-net.minecraft.client.renderer.texture.SpriteContents
-c net.minecraft.client.resources.model.geometry.BakedQuad$MaterialInfo
-net.minecraft.world.level.block.VegetationBlock
-net.minecraft.client.renderer.BiomeColors
-net.minecraft.world.item.CreativeModeTab$Output
+net.minecraft.world.level.material.PushReaction
+net.minecraft.world.level.block.HalfTransparentBlock
+net.minecraft.server.packs.resources.MultiPackResourceManager
+net.minecraft.client.resources.model.geometry.BakedQuad$MaterialInfo
+net.minecraft.world.item.AxeItem
 net.minecraft.world.level.block.state.BlockBehaviour
-com.mojang.blaze3d.platform.NativeImage
-net.minecraft.client.renderer.block.dispatch.BlockStateModel$UnbakedRoot
-net.minecraft.client.resources.model.ResolvableModel$Resolver
+net.minecraft.world.level.block.Block
+net.minecraft.world.level.block.WeatheringCopper
+net.minecraft.world.item.HoneycombItem
