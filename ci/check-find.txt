@@ -1,6 +1,6 @@
-Axe
-Conversion
-Strip
-Tooled
-ToolAction
-ToolInteraction
+Wax
+Scrap
+Interaction
+data/minecraft/
+Oxidiz
+WeatheringCopper
