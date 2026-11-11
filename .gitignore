@@ -1,4 +1,11 @@
-build/
 .gradle/
-vanilla/
-out/
+/build/
+/out/
+run/
+/vanilla/
+.idea/
+*.iml
+.vscode/
+bin/
+*.DS_Store
+Thumbs.db
