@@ -267,7 +267,7 @@ public final class SlopeModel {
 				p = new double[][] {p[0], p[3], p[2], p[1]};
 				uv = new float[][] {uv[0], uv[3], uv[2], uv[1]};
 			}
-			return Quads.of(sprite, tint, face, p, uv);
+			return QuadMaker.of(sprite, tint, face, p, uv);
 		}
 
 		private static boolean same(double[] a, double[] b) {

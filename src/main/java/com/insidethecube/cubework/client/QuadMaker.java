@@ -9,8 +9,8 @@ import org.joml.Vector3f;
 //#endif
 
 /** Makes the game's quads (how they're stored changed in 1.21.4 and again in 1.21.11). */
-final class Quads {
-	private Quads() {}
+final class QuadMaker {
+	private QuadMaker() {}
 
 	/**
 	 * A quad with corners p (block coordinates, 0 to 1) and texture positions uv (0 to 1 across the

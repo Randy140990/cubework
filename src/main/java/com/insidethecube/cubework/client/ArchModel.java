@@ -122,7 +122,7 @@ public final class ArchModel {
 			}
 			turned[i] = new double[] {x, p[i][1], z};
 		}
-		return Quads.of(sprite, -1, turn(face, turns), turned, uv);
+		return QuadMaker.of(sprite, -1, turn(face, turns), turned, uv);
 	}
 
 	/** Sides: across as on a full block's side, top of the texture at the top of the block. */
