@@ -27,6 +27,12 @@ jobs:
           set +e +o pipefail
           chmod +x gradlew
           mkdir -p out
+          # One-off: rewrite the sources from Yarn to Mojang names (ci/migrate names the target mappings).
+          if [ -f ci/migrate ]; then
+            ./gradlew migrateMappings --mappings "$(cat ci/migrate)" --overrideInputsIHaveABackup > out/migrate.txt 2>&1; echo "exit=$?" >> out/migrate.txt
+            [ -d remappedSrc ] && cp -r remappedSrc out/remappedSrc
+            [ -d src/main/java ] && cp -r src/main/java out/migratedJava
+          fi
           ./gradlew compileJava --stacktrace > out/compile.txt 2>&1; echo "exit=$?" >> out/compile.txt
           tail -30 out/compile.txt
           JAR=$(find ~/.gradle .gradle -name "*minecraft-merged*yarn*1.21.11*.jar" 2>/dev/null | grep -v sources | grep -v intermediary | head -n 1)

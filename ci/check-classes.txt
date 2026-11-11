@@ -1,0 +1,4 @@
+net.minecraft.client.renderer.texture.atlas.SpriteSources
+net.minecraft.server.packs.resources.MultiPackResourceManager
+net.minecraft.world.level.block.TransparentBlock
+net.minecraft.world.level.block.HalfTransparentBlock
