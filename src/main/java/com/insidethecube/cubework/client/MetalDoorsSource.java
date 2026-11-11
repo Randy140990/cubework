@@ -6,9 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.client.renderer.texture.SpriteContents;
-import net.minecraft.client.renderer.texture.atlas.SpriteResourceLoader;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
-import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -48,30 +46,39 @@ public record MetalDoorsSource(List<Identifier> textures, List<Identifier> metal
 		}
 	}
 
+	//#if MC >= 1.21.5
 	@Override
 	public MapCodec<? extends SpriteSource> codec() {
 		return CODEC;
 	}
+	//#else
+	static net.minecraft.client.renderer.texture.atlas.SpriteSourceType TYPE;
 
-	private record Region(Resource door, Resource metal, Identifier id) implements SpriteSource.DiscardableLoader {
+	@Override
+	public net.minecraft.client.renderer.texture.atlas.SpriteSourceType type() {
+		return TYPE;
+	}
+	//#endif
+
+	private record Region(Resource door, Resource metal, Identifier id) implements Atlas.Painted {
 		@Override
-		public SpriteContents get(SpriteResourceLoader opener) {
+		public SpriteContents paint() {
 			try (InputStream din = door.open(); NativeImage source = NativeImage.read(din);
 					InputStream min = metal.open(); NativeImage block = NativeImage.read(min)) {
 				int w = source.getWidth(), h = Math.min(source.getHeight(), w);
 				int[] px = new int[w * h];
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) px[y * w + x] = source.getPixel(x, y);
+				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) px[y * w + x] = Atlas.argb(source, x, y);
 				int bw = block.getWidth(), bh = Math.min(block.getHeight(), bw);
 				List<Integer> palette = new ArrayList<>();
 				for (int y = 0; y < bh; y++) for (int x = 0; x < bw; x++) {
-					int c = block.getPixel(x, y);
+					int c = Atlas.argb(block, x, y);
 					if ((c >>> 24) != 0) palette.add(c & 0xFFFFFF);
 				}
 				if (palette.isEmpty()) return null;
 				repaint(px, palette);
 				NativeImage out = new NativeImage(w, h, false);
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) out.setPixel(x, y, px[y * w + x]);
-				return new SpriteContents(id, new FrameSize(w, h), out);
+				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) Atlas.setArgb(out, x, y, px[y * w + x]);
+				return Atlas.contents(id, out);
 			} catch (Exception e) {
 				return null;
 			}

@@ -4,9 +4,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.client.renderer.texture.SpriteContents;
-import net.minecraft.client.renderer.texture.atlas.SpriteResourceLoader;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
-import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -42,23 +40,32 @@ public record DoorColoursSource(List<Identifier> textures, String prefix, boolea
 		}
 	}
 
+	//#if MC >= 1.21.5
 	@Override
 	public MapCodec<? extends SpriteSource> codec() {
 		return CODEC;
 	}
+	//#else
+	static net.minecraft.client.renderer.texture.atlas.SpriteSourceType TYPE;
+
+	@Override
+	public net.minecraft.client.renderer.texture.atlas.SpriteSourceType type() {
+		return TYPE;
+	}
+	//#endif
 
 	/** One coloured sprite, made when the atlas is built. Animated textures use their first frame. */
-	private record Region(Resource resource, Identifier id, int colour, boolean metal) implements SpriteSource.DiscardableLoader {
+	private record Region(Resource resource, Identifier id, int colour, boolean metal) implements Atlas.Painted {
 		@Override
-		public SpriteContents get(SpriteResourceLoader opener) {
+		public SpriteContents paint() {
 			try (InputStream in = resource.open(); NativeImage source = NativeImage.read(in)) {
 				int w = source.getWidth(), h = Math.min(source.getHeight(), w);
 				int[] px = new int[w * h];
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) px[y * w + x] = source.getPixel(x, y);
+				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) px[y * w + x] = Atlas.argb(source, x, y);
 				Recolour.apply(px, colour, metal);
 				NativeImage out = new NativeImage(w, h, false);
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) out.setPixel(x, y, px[y * w + x]);
-				return new SpriteContents(id, new FrameSize(w, h), out);
+				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) Atlas.setArgb(out, x, y, px[y * w + x]);
+				return Atlas.contents(id, out);
 			} catch (Exception e) {
 				return null;
 			}

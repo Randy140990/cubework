@@ -13,7 +13,6 @@ import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Vector3f;
 
 import com.insidethecube.cubework.Material;
 import com.insidethecube.cubework.block.ArchBlock;
@@ -113,8 +112,7 @@ public final class ArchModel {
 			p = new double[][] {p[0], p[3], p[2], p[1]};
 			uv = new float[][] {uv[0], uv[3], uv[2], uv[1]};
 		}
-		Vector3f[] pos = new Vector3f[4];
-		long[] packed = new long[4];
+		double[][] turned = new double[4][];
 		for (int i = 0; i < 4; i++) {
 			double x = p[i][0], z = p[i][2];
 			for (int t = 0; t < turns; t++) {
@@ -122,10 +120,9 @@ public final class ArchModel {
 				x = nx;
 				z = nz;
 			}
-			pos[i] = new Vector3f((float) x, (float) p[i][1], (float) z);
-			packed[i] = Uv.pack(sprite.getU(uv[i][0]), sprite.getV(uv[i][1]));
+			turned[i] = new double[] {x, p[i][1], z};
 		}
-		return new BakedQuad(pos[0], pos[1], pos[2], pos[3], packed[0], packed[1], packed[2], packed[3], -1, turn(face, turns), sprite, true, 0);
+		return Quads.of(sprite, -1, turn(face, turns), turned, uv);
 	}
 
 	/** Sides: across as on a full block's side, top of the texture at the top of the block. */

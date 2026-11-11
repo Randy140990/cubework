@@ -91,7 +91,11 @@ public final class CwBlocks {
 		// Copper that can still weather gets random ticks (vanilla copper decides this in code, so it isn't copied).
 		if (m.copperAge() >= 0 && m.copperAge() < 3) set.randomTicks();
 		return switch (s) {
+			//#if MC >= 1.21.9
 			case BUTTON, PRESSURE_PLATE -> set.noCollision().pushReaction(PushReaction.DESTROY);
+			//#else
+			case BUTTON, PRESSURE_PLATE -> set.noCollission().pushReaction(PushReaction.DESTROY);
+			//#endif
 			case TRAPDOOR -> set.noOcclusion().isValidSpawn((state, world, pos, type) -> false);
 			case WALL, FENCE, FENCE_GATE -> set.forceSolidOn();
 			default -> set;

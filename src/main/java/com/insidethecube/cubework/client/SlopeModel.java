@@ -17,7 +17,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import org.joml.Vector3f;
 
 import com.insidethecube.cubework.Material;
 import com.insidethecube.cubework.block.GentleSlopeBlock;
@@ -268,13 +267,7 @@ public final class SlopeModel {
 				p = new double[][] {p[0], p[3], p[2], p[1]};
 				uv = new float[][] {uv[0], uv[3], uv[2], uv[1]};
 			}
-			Vector3f[] pos = new Vector3f[4];
-			long[] packed = new long[4];
-			for (int i = 0; i < 4; i++) {
-				pos[i] = new Vector3f((float) p[i][0], (float) p[i][1], (float) p[i][2]);
-				packed[i] = Uv.pack(sprite.getU(uv[i][0]), sprite.getV(uv[i][1]));
-			}
-			return new BakedQuad(pos[0], pos[1], pos[2], pos[3], packed[0], packed[1], packed[2], packed[3], tint, face, sprite, true, 0);
+			return Quads.of(sprite, tint, face, p, uv);
 		}
 
 		private static boolean same(double[] a, double[] b) {
