@@ -10,7 +10,11 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+//#if MC >= 1.21.2
 import net.minecraft.world.level.ScheduledTickAccess;
+//#else
+import net.minecraft.world.level.LevelAccessor;
+//#endif
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -72,8 +76,14 @@ public class SizedCoralBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
+	//#if MC >= 1.21.2
 	protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction,
 			BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+	//#else
+	protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+		LevelAccessor tickView = world;
+		RandomSource random = world.getRandom();
+	//#endif
 		if (direction == Direction.DOWN && !canSurvive(state, world, pos)) return Blocks.AIR.defaultBlockState();
 		if (state.getValue(WATERLOGGED)) tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		if (dead != null && !inWater(state, world, pos)) tickView.scheduleTick(pos, this, 60 + random.nextInt(40));

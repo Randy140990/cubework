@@ -90,7 +90,11 @@ public class VerticalSlabBlock extends CwBlock implements SimpleWaterloggedBlock
 	}
 
 	@Override
+	//#if MC >= 1.21.5
 	public boolean canPlaceLiquid(LivingEntity filler, BlockGetter world, BlockPos pos, BlockState state, Fluid fluid) {
+	//#else
+	public boolean canPlaceLiquid(net.minecraft.world.entity.player.Player filler, BlockGetter world, BlockPos pos, BlockState state, Fluid fluid) {
+	//#endif
 		return !state.getValue(DOUBLE) && SimpleWaterloggedBlock.super.canPlaceLiquid(filler, world, pos, state, fluid);
 	}
 

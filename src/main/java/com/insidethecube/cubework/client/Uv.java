@@ -1,6 +1,5 @@
 package com.insidethecube.cubework.client;
 
-import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
 
@@ -10,7 +9,4 @@ final class Uv {
 
 	static final Identifier BLOCK_ATLAS = TextureAtlas.LOCATION_BLOCKS;
 
-	static long pack(float u, float v) {
-		return UVPair.pack(u, v);
-	}
 }

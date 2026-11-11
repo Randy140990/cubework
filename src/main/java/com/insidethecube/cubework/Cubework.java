@@ -1,6 +1,5 @@
 package com.insidethecube.cubework;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -11,7 +10,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -29,8 +27,7 @@ public final class Cubework implements ModInitializer {
 	public void onInitialize() {
 		CwBlocks.register();
 		Extras.register();
-		ResourceKey<Item> cube = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(ID, "cube"));
-		CUBE = Registry.register(BuiltInRegistries.ITEM, cube, new Item(new Item.Properties().setId(cube)));
+		CUBE = Reg.item("cube", Item::new);
 
 		// Six tabs, so there's little paging: coloured blocks, building blocks, natural blocks, plants, doors and tables.
 		tab("colours", () -> new ItemStack(CUBE), add -> {
@@ -66,11 +63,11 @@ public final class Cubework implements ModInitializer {
 				.icon(icon)
 				.displayItems((context, entries) -> fill.accept(entries::accept))
 				.build();
-		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(ID, name)), group);
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceKey.create(Registries.CREATIVE_MODE_TAB, Reg.id(name)), group);
 	}
 
 	private static Item item(String id) {
-		return BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(ID, id));
+		return Reg.item(Reg.id(id));
 	}
 
 }

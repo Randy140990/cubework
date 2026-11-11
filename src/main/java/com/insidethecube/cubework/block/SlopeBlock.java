@@ -47,7 +47,11 @@ public class SlopeBlock extends CwBlock implements SimpleWaterloggedBlock {
 	}
 
 	@Override
+	//#if MC >= 1.21.2
 	protected VoxelShape getOcclusionShape(BlockState state) {
+	//#else
+	protected VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
+	//#endif
 		return SlopeGeometry.inside(state.getValue(FACING), state.getValue(HALF), state.getValue(SHAPE), base(state), rise(state), material.height());
 	}
 

@@ -14,15 +14,8 @@ import com.insidethecube.cubework.block.ThinLogBlock;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -96,6 +89,7 @@ public final class Extras {
 
 	private static void tables() {
 		for (String top : TABLE_TOPS) {
+			if (!Reg.exists(top)) continue;
 			Block base = vanilla(top);
 			boolean wood = top.startsWith("stripped_");
 			for (String legs : tableLegs()) {
@@ -122,6 +116,7 @@ public final class Extras {
 			if (!log.equals("mushroom_stem")) all.add("stripped_" + log);
 		}
 		for (String log : all) {
+			if (!Reg.exists(log)) continue;
 			Block base = vanilla(log);
 			boolean burns = !log.contains("crimson") && !log.contains("warped");
 			for (int w : LOG_WIDTHS) {
@@ -131,7 +126,7 @@ public final class Extras {
 			}
 		}
 		for (String log : LOGS) {
-			if (log.equals("mushroom_stem")) continue;
+			if (log.equals("mushroom_stem") || !Reg.exists(log)) continue;
 			for (int w : LOG_WIDTHS) StrippableBlockRegistry.register(get(log + "_" + w), get("stripped_" + log + "_" + w));
 		}
 	}
@@ -142,6 +137,7 @@ public final class Extras {
 	}
 
 	private static void plant(String p, int size) {
+		if (!Reg.exists(p)) return;
 		Block base = vanilla(p);
 		SizedPlantBlock.Soil soil = p.equals("short_dry_grass") ? SizedPlantBlock.Soil.DRY
 				: p.endsWith("mushroom") ? SizedPlantBlock.Soil.SOLID
@@ -169,6 +165,7 @@ public final class Extras {
 
 	private static void doors() {
 		for (String wood : DOOR_WOODS) {
+			if (!Reg.exists(wood + "_door")) continue;
 			Block base = vanilla(wood + "_door");
 			BlockSetType type = BlockSetType.values().filter(t -> t.name().equals(wood)).findFirst().orElse(BlockSetType.OAK);
 			for (String colour : Material.COLOURS) {
@@ -191,11 +188,11 @@ public final class Extras {
 	}
 
 	private static Block vanilla(String id) {
-		return BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace(id));
+		return Reg.vanilla(id);
 	}
 
 	public static Block get(String id) {
-		return BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath(Cubework.ID, id));
+		return Reg.block(Reg.id(id));
 	}
 
 	/** The vanilla block's settings, with its map colour and light fixed (some work them out from properties). */
@@ -212,11 +209,9 @@ public final class Extras {
 
 	/** Doors use the two-block item, which checks there's room for the top half, like vanilla doors. */
 	private static Block block(String name, BlockBehaviour.Properties settings, Function<BlockBehaviour.Properties, Block> factory, boolean tall) {
-		ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Cubework.ID, name));
-		Block b = Registry.register(BuiltInRegistries.BLOCK, key, factory.apply(settings.setId(key)));
-		ResourceKey<Item> ik = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Cubework.ID, name));
-		Item.Properties is = new Item.Properties().setId(ik).useBlockDescriptionPrefix();
-		Registry.register(BuiltInRegistries.ITEM, ik, tall ? new DoubleHighBlockItem(b, is) : new BlockItem(b, is));
+		Block b = Reg.block(name, settings, factory);
+		if (tall) Reg.blockItem(name, b, DoubleHighBlockItem::new);
+		else Reg.blockItem(name, b);
 		return b;
 	}
 }

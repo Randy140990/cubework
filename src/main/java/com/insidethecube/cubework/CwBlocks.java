@@ -31,13 +31,6 @@ import com.insidethecube.cubework.block.VerticalSlabBlock;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -61,6 +54,7 @@ public final class CwBlocks {
 
 	public static void register() {
 		for (Material m : Material.ALL) {
+			if (!m.exists()) continue;
 			Block base = m.base();
 			BASES.put(base, m);
 			Map<Shape, Block> shapes = new EnumMap<>(Shape.class);
@@ -78,6 +72,7 @@ public final class CwBlocks {
 		}
 		// Copper shapes weather into the next age, take wax from honeycomb and lose it (and age) to an axe.
 		for (Material m : Material.ALL) {
+			if (!BY_MATERIAL.containsKey(m)) continue;
 			Material next = m.nextAge(), waxed = m.waxed();
 			for (Map.Entry<Shape, Block> e : BY_MATERIAL.get(m).entrySet()) {
 				if (next != null) OxidizableBlocksRegistry.registerOxidizableBlockPair(e.getValue(), get(next, e.getKey()));
@@ -96,7 +91,11 @@ public final class CwBlocks {
 		// Copper that can still weather gets random ticks (vanilla copper decides this in code, so it isn't copied).
 		if (m.copperAge() >= 0 && m.copperAge() < 3) set.randomTicks();
 		return switch (s) {
+			//#if MC >= 1.21.9
 			case BUTTON, PRESSURE_PLATE -> set.noCollision().pushReaction(PushReaction.DESTROY);
+			//#else
+			case BUTTON, PRESSURE_PLATE -> set.noCollission().pushReaction(PushReaction.DESTROY);
+			//#endif
 			case TRAPDOOR -> set.noOcclusion().isValidSpawn((state, world, pos, type) -> false);
 			case WALL, FENCE, FENCE_GATE -> set.forceSolidOn();
 			default -> set;
@@ -138,13 +137,11 @@ public final class CwBlocks {
 	}
 
 	private static Block block(String name, BlockBehaviour.Properties settings, Function<BlockBehaviour.Properties, Block> factory) {
-		ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Cubework.ID, name));
-		return Registry.register(BuiltInRegistries.BLOCK, key, factory.apply(settings.setId(key)));
+		return Reg.block(name, settings, factory);
 	}
 
 	private static void item(String name, Block block) {
-		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Cubework.ID, name));
-		Registry.register(BuiltInRegistries.ITEM, key, new BlockItem(block, new Item.Properties().setId(key).useBlockDescriptionPrefix()));
+		Reg.blockItem(name, block);
 	}
 
 	public static Block get(Material m, Shape s) {
@@ -152,8 +149,9 @@ public final class CwBlocks {
 		return shapes == null ? null : shapes.get(s);
 	}
 
+	/** The material's shapes (none when this Minecraft version doesn't have the block). */
 	public static Map<Shape, Block> shapesOf(Material m) {
-		return BY_MATERIAL.get(m);
+		return BY_MATERIAL.getOrDefault(m, Map.of());
 	}
 
 	/** The Cubework block's material and shape, or null for any other block. */

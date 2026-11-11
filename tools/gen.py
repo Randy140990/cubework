@@ -13,7 +13,23 @@ import os
 import shutil
 
 HERE = os.path.dirname(__file__)
-ROOT = os.path.join(HERE, "..", "src", "main", "resources")
+import argparse
+
+_args = argparse.ArgumentParser(description="Generates Cubework's resources for one Minecraft version.")
+_args.add_argument("--out", default=os.path.join(HERE, "..", "build", "generated"), help="resources folder to write into")
+_args.add_argument("--mc", default="1.21.11", help="Minecraft version the resources are for")
+_args.add_argument("--blocks", help="file listing the vanilla block ids in that version (blocks missing from it are left out)")
+ARGS = _args.parse_args()
+MC = tuple(int(p) for p in ARGS.mc.split("."))
+VANILLA_BLOCKS = set(open(ARGS.blocks).read().split()) if ARGS.blocks else None
+
+
+def exists(block):
+    """Whether a vanilla block is in this Minecraft version (pale oak and resin came in 1.21.4, bushes in 1.21.5)."""
+    return VANILLA_BLOCKS is None or block in VANILLA_BLOCKS
+
+
+ROOT = ARGS.out
 ASSETS = os.path.join(ROOT, "assets", "cubework")
 DATA = os.path.join(ROOT, "data")
 TEMPLATES = os.path.join(HERE, "templates")
@@ -227,10 +243,19 @@ def blockstate(name, obj):
 
 
 def item(name, model_id, tinted=False):
-    mdl = {"type": "minecraft:model", "model": model_id}
-    if tinted:
-        mdl["tints"] = GRASS_TINT
-    write(os.path.join(ASSETS, "items", name + ".json"), {"model": mdl})
+    """The item's look: an item model definition from 1.21.4, before that an item model (tints are set in code)."""
+    if MC >= (1, 21, 4):
+        mdl = {"type": "minecraft:model", "model": model_id}
+        if tinted:
+            mdl["tints"] = GRASS_TINT
+        write(os.path.join(ASSETS, "items", name + ".json"), {"model": mdl})
+    elif model_id != NS + ":item/" + name:
+        write(os.path.join(ASSETS, "models", "item", name + ".json"), {"parent": model_id})
+
+
+def ing(x):
+    """A recipe ingredient (an item id; 1.21.1 wants it as an object)."""
+    return x if MC >= (1, 21, 2) else {"item": x}
 
 
 def from_template(template, values):
@@ -754,7 +779,7 @@ def door_loot(name):
 
 def stonecutting(source, name, count):
     write(os.path.join(DATA, NS, "recipe", name + "_from_" + source + "_stonecutting.json"),
-          {"type": "minecraft:stonecutting", "ingredient": "minecraft:" + source, "result": {"id": NS + ":" + name, "count": count}})
+          {"type": "minecraft:stonecutting", "ingredient": ing("minecraft:" + source), "result": {"id": NS + ":" + name, "count": count}})
 
 
 def title(words, grey):
@@ -840,7 +865,7 @@ def doors(add_name, tags):
             door_loot(name)
             write(os.path.join(DATA, NS, "recipe", name + ".json"),
                   {"type": "minecraft:crafting_shapeless", "category": "redstone",
-                   "ingredients": ["minecraft:%s_door" % wood, "minecraft:%s_dye" % colour], "result": {"id": NS + ":" + name, "count": 1}})
+                   "ingredients": [ing("minecraft:%s_door" % wood), ing("minecraft:%s_dye" % colour)], "result": {"id": NS + ":" + name, "count": 1}})
             tags["wooden_doors"].append(NS + ":" + name)
             tags["mineable/axe"].append(NS + ":" + name)
             add_name(name, lambda g, c=colour, w=wood: "%s %s Door" % (title(c, g), title(w, g)))
@@ -856,7 +881,7 @@ def doors(add_name, tags):
         item(name, NS + ":item/" + name)
         door_loot(name)
         write(os.path.join(DATA, NS, "recipe", name + ".json"),
-              {"type": "minecraft:crafting_shapeless", "category": "redstone", "ingredients": recipe, "result": {"id": NS + ":" + name, "count": 1}})
+              {"type": "minecraft:crafting_shapeless", "category": "redstone", "ingredients": [ing(r) for r in recipe], "result": {"id": NS + ":" + name, "count": 1}})
         tags["doors"].append(NS + ":" + name)
         tags["mineable/pickaxe"].append(NS + ":" + name)
         add_name(name, english)
@@ -871,17 +896,23 @@ def doors(add_name, tags):
 
     # The coloured textures are made in the game from the door textures in use: wood and iron recoloured with
     # dyes, the copper door repainted with each metal block's own colours.
-    write(os.path.join(ROOT, "assets", "minecraft", "atlases", "blocks.json"), {"sources": [
+    block_sources = [
         {"type": NS + ":door_colours", "prefix": "block/",
          "textures": ["minecraft:block/%s_door_%s" % (w, p) for w in DOOR_WOODS for p in ("top", "bottom")]},
         {"type": NS + ":door_colours", "prefix": "block/", "metal": True, "textures": ["minecraft:block/iron_door_top", "minecraft:block/iron_door_bottom"]},
         {"type": NS + ":metal_doors", "prefix": "block/", "textures": ["minecraft:block/copper_door_top", "minecraft:block/copper_door_bottom"],
-         "metals": ["minecraft:block/" + b for _, b, _ in METAL_DOORS]}]})
-    write(os.path.join(ROOT, "assets", "minecraft", "atlases", "items.json"), {"sources": [
+         "metals": ["minecraft:block/" + b for _, b, _ in METAL_DOORS]}]
+    item_sources = [
         {"type": NS + ":door_colours", "prefix": "item/", "textures": ["minecraft:item/%s_door" % w for w in DOOR_WOODS]},
         {"type": NS + ":door_colours", "prefix": "item/", "metal": True, "textures": ["minecraft:item/iron_door"]},
         {"type": NS + ":metal_doors", "prefix": "item/", "textures": ["minecraft:item/copper_door"],
-         "metals": ["minecraft:block/" + b for _, b, _ in METAL_DOORS]}]})
+         "metals": ["minecraft:block/" + b for _, b, _ in METAL_DOORS]}]
+    # Items got their own atlas in 1.21.11; before that their textures are in the blocks atlas.
+    if MC >= (1, 21, 11):
+        write(os.path.join(ROOT, "assets", "minecraft", "atlases", "blocks.json"), {"sources": block_sources})
+        write(os.path.join(ROOT, "assets", "minecraft", "atlases", "items.json"), {"sources": item_sources})
+    else:
+        write(os.path.join(ROOT, "assets", "minecraft", "atlases", "blocks.json"), {"sources": block_sources + item_sources})
 
 
 TABLE_WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "pale_oak"]
@@ -929,8 +960,14 @@ def tables(add_name, tags):
               {"parent": "minecraft:block/block", "textures": {"particle": "#legs"}, "elements": [leg(box)]})
     write(os.path.join(ASSETS, "models", "block", "template_table_legs.json"),
           {"parent": "minecraft:block/block", "textures": {"particle": "#legs"}, "elements": [leg(b) for b in LEG_BOXES.values()]})
+    write(os.path.join(ASSETS, "models", "block", "template_table_item.json"),
+          {"parent": "minecraft:block/block", "textures": {"particle": "#side"},
+           "elements": [{"from": [0, 3, 0], "to": [16, 9, 16], "faces": dict({d: face("#side") for d in HORIZONTAL}, up=face("#top"), down=face("#bottom"))}]
+           + [leg(b) for b in LEG_BOXES.values()]})
+    t_legs = {}
     for legs in TABLE_LEGS:
         t = {"legs": "minecraft:block/oak_planks" if legs == "oak" else "minecraft:block/%s_concrete" % legs}
+        t_legs[legs] = t["legs"]
         for corner in LEG_BOXES:
             model("table_legs_%s_%s" % (legs, corner), m("template_table_leg_%s" % corner), t)
         model("table_legs_%s" % legs, m("template_table_legs"), t)
@@ -943,26 +980,40 @@ def tables(add_name, tags):
                 ns, ew = {"n": "north", "s": "south"}[corner[0]], {"w": "west", "e": "east"}[corner[1]]
                 parts.append({"when": {ns: "false", ew: "false"}, "apply": {"model": m("table_legs_%s_%s" % (legs, corner))}})
             blockstate(name, {"multipart": parts})
-            write(os.path.join(ASSETS, "items", name + ".json"), {"model": {"type": "minecraft:composite", "models": [
-                {"type": "minecraft:model", "model": m("table_top_" + top)}, {"type": "minecraft:model", "model": m("table_legs_" + legs)}]}})
+            if MC >= (1, 21, 4):
+                write(os.path.join(ASSETS, "items", name + ".json"), {"model": {"type": "minecraft:composite", "models": [
+                    {"type": "minecraft:model", "model": m("table_top_" + top)}, {"type": "minecraft:model", "model": m("table_legs_" + legs)}]}})
+            else:
+                # Before 1.21.4 an item has one model: the top and legs together.
+                write(os.path.join(ASSETS, "models", "item", name + ".json"),
+                      {"parent": m("template_table_item"), "textures": dict(table_top_textures(top), legs=t_legs[legs])})
             loot(name)
             leg_item = "minecraft:stick" if legs == "oak" else "minecraft:%s_concrete" % legs
             write(os.path.join(DATA, NS, "recipe", name + ".json"),
                   {"type": "minecraft:crafting_shaped", "category": "decorations", "pattern": ["TTT", "L L"],
-                   "key": {"T": "minecraft:" + top, "L": leg_item}, "result": {"id": NS + ":" + name, "count": 3}})
+                   "key": {"T": ing("minecraft:" + top), "L": ing(leg_item)}, "result": {"id": NS + ":" + name, "count": 3}})
             tags["mineable/axe" if top.startswith("stripped_") else "mineable/pickaxe"].append(NS + ":" + name)
             add_name(name, lambda g, tp=top, lg=legs: "%s Table" % title(tp, g) + ("" if lg == "oak" else " (%s Legs)" % title(lg, g)))
 
 
 def cube_icon():
     """The first tab's icon: a block in the brand colours, with gaps along its edges."""
-    write(os.path.join(ASSETS, "items", "cube.json"), {"model": {"type": "minecraft:model", "model": NS + ":item/cube"}})
+    if MC >= (1, 21, 4):
+        write(os.path.join(ASSETS, "items", "cube.json"), {"model": {"type": "minecraft:model", "model": NS + ":item/cube"}})
     write(os.path.join(ASSETS, "models", "item", "cube.json"), {"parent": "minecraft:block/cube", "textures": {
         "particle": NS + ":block/cube_top", "up": NS + ":block/cube_top", "down": NS + ":block/cube_top",
         "north": NS + ":block/cube_left", "south": NS + ":block/cube_left", "east": NS + ":block/cube_right", "west": NS + ":block/cube_right"}})
 
 
 def main():
+    # Leave out blocks this Minecraft version doesn't have.
+    global MATERIALS, LOGS, LOW_PLANTS, PLANTS, DOOR_WOODS, TABLE_TOPS
+    MATERIALS = [(mat, kind) for mat, kind in MATERIALS if exists(mat)]
+    LOGS = [log for log in LOGS if exists(log)]
+    LOW_PLANTS = [p for p in LOW_PLANTS if exists(p)]
+    PLANTS = [p for p in PLANTS if exists(p)]
+    DOOR_WOODS = [w for w in DOOR_WOODS if exists(w + "_door")]
+    TABLE_TOPS = [t for t in TABLE_TOPS if exists(t)]
     for sub in ["blockstates", "models", "items"]:
         shutil.rmtree(os.path.join(ASSETS, sub), ignore_errors=True)
     for sub in ["loot_table", "recipe"]:

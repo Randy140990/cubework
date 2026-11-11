@@ -4,20 +4,13 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelDebugName;
-import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import org.joml.Vector3f;
 
 import com.insidethecube.cubework.Material;
 import com.insidethecube.cubework.block.GentleSlopeBlock;
@@ -33,84 +26,24 @@ import com.insidethecube.cubework.block.SlopeGeometry;
 public final class SlopeModel {
 	private SlopeModel() {}
 
-	public record Unbaked(Material material) implements BlockStateModel.UnbakedRoot {
-		@Override
-		public void resolveDependencies(ResolvableModel.Resolver resolver) {
-		}
-
-		@Override
-		public Object visualEqualityGroup(BlockState state) {
-			return state;
-		}
-
-		@Override
-		public BlockStateModel bake(BlockState state, ModelBaker baker) {
-			Material.Textures t = material.textures();
-			ModelDebugName named = () -> "cubework slope " + material.id();
-			Sprites s = new Sprites(sprite(baker, t.top(), named), sprite(baker, t.side(), named), sprite(baker, t.bottom(), named),
-					t.overlay() == null ? null : sprite(baker, t.overlay(), named), material.grassTinted());
-			SlopeBlock block = (SlopeBlock) state.getBlock();
-			return new Baked(new Part(quads(state, s, block.base(state) / 16.0, block.rise(state) / 16.0, material.height() / 16.0,
-					block instanceof GentleSlopeBlock), s.side()));
-		}
-
-		private static TextureAtlasSprite sprite(ModelBaker baker, String texture, ModelDebugName named) {
-			return baker.sprites().get(new net.minecraft.client.resources.model.Material(Uv.BLOCK_ATLAS, Identifier.withDefaultNamespace("block/" + texture)), named);
-		}
+	/** The slope's quads for one block state, from the vanilla block's textures. */
+	static Models.Built build(Material material, BlockState state, Function<String, TextureAtlasSprite> sprite) {
+		Material.Textures t = material.textures();
+		Sprites s = new Sprites(sprite.apply(t.top()), sprite.apply(t.side()), sprite.apply(t.bottom()),
+				t.overlay() == null ? null : sprite.apply(t.overlay()), material.grassTinted());
+		SlopeBlock block = (SlopeBlock) state.getBlock();
+		return new Models.Built(quads(state, s, block.base(state) / 16.0, block.rise(state) / 16.0, material.height() / 16.0,
+				block instanceof GentleSlopeBlock), s.side());
 	}
 
 	/** The block's textures; tinted means the top and overlay take the biome's grass colour. */
 	private record Sprites(TextureAtlasSprite top, TextureAtlasSprite side, TextureAtlasSprite bottom, TextureAtlasSprite overlay, boolean tinted) {}
 
-	record Baked(Part part) implements BlockStateModel {
-		@Override
-		public void collectParts(RandomSource random, List<BlockModelPart> parts) {
-			parts.add(part);
-		}
-
-		@Override
-		public TextureAtlasSprite particleIcon() {
-			return part.sprite;
-		}
-	}
-
-	/** Quads by the side they're hidden from, and the sloping surface (never hidden). */
-	record Quads(Map<Direction, List<BakedQuad>> sided, List<BakedQuad> free) {}
-
-	static final class Part implements BlockModelPart {
-		private final Map<Direction, List<BakedQuad>> sided;
-		private final List<BakedQuad> free;
-		final TextureAtlasSprite sprite;
-
-		Part(Quads quads, TextureAtlasSprite sprite) {
-			this.free = List.copyOf(quads.free());
-			this.sided = quads.sided();
-			this.sprite = sprite;
-		}
-
-		@Override
-		public List<BakedQuad> getQuads(Direction side) {
-			if (side == null) return free;
-			List<BakedQuad> q = sided.get(side);
-			return q == null ? List.of() : q;
-		}
-
-		@Override
-		public boolean useAmbientOcclusion() {
-			return true;
-		}
-
-		@Override
-		public TextureAtlasSprite particleIcon() {
-			return sprite;
-		}
-	}
-
 	/**
 	 * base and rise: where the slope starts and how far it climbs (as parts of a block); top: the block's
 	 * height; world: hang side textures from the block's top (gentle steps line up) rather than the slope.
 	 */
-	private static Quads quads(BlockState state, Sprites s, double base, double rise, double height, boolean world) {
+	private static Models.Quads quads(BlockState state, Sprites s, double base, double rise, double height, boolean world) {
 		Direction f = state.getValue(SlopeBlock.FACING);
 		StairsShape shape = state.getValue(SlopeBlock.SHAPE);
 		boolean top = state.getValue(SlopeBlock.HALF) == Half.TOP;
@@ -151,7 +84,7 @@ public final class SlopeModel {
 			add(out, sides[i], b.side(s.side(), -1, sides[i], c[p], h[p], c[q], h[q]));
 			if (s.overlay() != null) add(out, sides[i], b.side(s.overlay(), tint, sides[i], c[p], h[p], c[q], h[q]));
 		}
-		return new Quads(out, free);
+		return new Models.Quads(out, free);
 	}
 
 	private static void add(Map<Direction, List<BakedQuad>> out, Direction d, BakedQuad q) {
@@ -268,13 +201,7 @@ public final class SlopeModel {
 				p = new double[][] {p[0], p[3], p[2], p[1]};
 				uv = new float[][] {uv[0], uv[3], uv[2], uv[1]};
 			}
-			Vector3f[] pos = new Vector3f[4];
-			long[] packed = new long[4];
-			for (int i = 0; i < 4; i++) {
-				pos[i] = new Vector3f((float) p[i][0], (float) p[i][1], (float) p[i][2]);
-				packed[i] = Uv.pack(sprite.getU(uv[i][0]), sprite.getV(uv[i][1]));
-			}
-			return new BakedQuad(pos[0], pos[1], pos[2], pos[3], packed[0], packed[1], packed[2], packed[3], tint, face, sprite, true, 0);
+			return QuadMaker.of(sprite, tint, face, p, uv);
 		}
 
 		private static boolean same(double[] a, double[] b) {

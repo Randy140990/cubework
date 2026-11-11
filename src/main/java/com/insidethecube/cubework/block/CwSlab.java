@@ -8,7 +8,11 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
+//#if MC >= 1.21.2
 import net.minecraft.world.level.ScheduledTickAccess;
+//#else
+import net.minecraft.world.level.LevelAccessor;
+//#endif
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -47,9 +51,19 @@ public class CwSlab extends SlabBlock implements CwShape {
 	}
 
 	@Override
+	//#if MC >= 1.21.2
 	protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction,
 			BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+	//#else
+	protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+		LevelAccessor tickView = world;
+		RandomSource random = world.getRandom();
+	//#endif
+		//#if MC >= 1.21.2
 		return Shared.updated(material, super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random), world, pos);
+		//#else
+		return Shared.updated(material, super.updateShape(state, direction, neighborState, world, pos, neighborPos), world, pos);
+		//#endif
 	}
 
 	@Override

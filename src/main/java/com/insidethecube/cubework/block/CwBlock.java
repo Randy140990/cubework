@@ -7,7 +7,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.LevelReader;
+//#if MC >= 1.21.2
 import net.minecraft.world.level.ScheduledTickAccess;
+//#else
+import net.minecraft.world.level.LevelAccessor;
+//#endif
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,8 +46,14 @@ public abstract class CwBlock extends Block implements CwShape {
 	}
 
 	@Override
+	//#if MC >= 1.21.2
 	protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction,
 			BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+	//#else
+	protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+		LevelAccessor tickView = world;
+		RandomSource random = world.getRandom();
+	//#endif
 		if (state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED)) tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		BlockState next = shapeUpdate(state, world, pos, direction, neighborPos, neighborState);
 		return Shared.updated(material, next, world, pos);

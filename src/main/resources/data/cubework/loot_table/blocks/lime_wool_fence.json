@@ -1,1 +1,0 @@
-{"type":"minecraft:block","pools":[{"rolls":1.0,"bonus_rolls":0.0,"entries":[{"type":"minecraft:item","name":"cubework:lime_wool_fence","functions":[{"function":"minecraft:explosion_decay"}]}]}],"random_sequence":"cubework:blocks/lime_wool_fence"}

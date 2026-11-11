@@ -1,1 +1,0 @@
-{"type":"minecraft:block","random_sequence":"cubework:blocks/gray_acacia_door","pools":[{"bonus_rolls":0.0,"rolls":1.0,"conditions":[{"condition":"minecraft:survives_explosion"}],"entries":[{"type":"minecraft:item","name":"cubework:gray_acacia_door","conditions":[{"condition":"minecraft:block_state_property","block":"cubework:gray_acacia_door","properties":{"half":"lower"}}]}]}]}

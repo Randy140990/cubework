@@ -1,1 +1,0 @@
-{"parent":"minecraft:block/cube","textures":{"particle":"cubework:block/cube_top","up":"cubework:block/cube_top","down":"cubework:block/cube_top","north":"cubework:block/cube_left","south":"cubework:block/cube_left","east":"cubework:block/cube_right","west":"cubework:block/cube_right"}}

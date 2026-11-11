@@ -3,8 +3,6 @@ package com.insidethecube.cubework;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
 /**
@@ -142,7 +140,12 @@ public record Material(String id, Kind kind, String colour) {
 
 	/** The vanilla block. */
 	public Block base() {
-		return BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace(id));
+		return Reg.vanilla(id);
+	}
+
+	/** Whether this Minecraft version has the block (pale moss and resin came in 1.21.4). */
+	public boolean exists() {
+		return Reg.exists(id);
 	}
 
 	public boolean glass() {

@@ -46,7 +46,11 @@ public class ArchBlock extends CwBlock implements SimpleWaterloggedBlock {
 
 	/** The part that's solid all over, for hiding neighbours' faces (the model's curve is smooth). */
 	@Override
+	//#if MC >= 1.21.2
 	protected VoxelShape getOcclusionShape(BlockState state) {
+	//#else
+	protected VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
+	//#endif
 		return state.getValue(AXIS) == Direction.Axis.X ? SOLID_X : SOLID_Z;
 	}
 
