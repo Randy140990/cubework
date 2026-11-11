@@ -48,3 +48,10 @@ jar {
 		rename { "${it}_cubework" }
 	}
 }
+
+// For the compile check: the classpath the sources compile against, to look classes up in.
+tasks.register("printClasspath") {
+	doLast {
+		file("classpath.txt").text = sourceSets.main.compileClasspath.asPath
+	}
+}

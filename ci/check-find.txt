@@ -1,5 +1,6 @@
-ChunkSectionLayer
-RenderLayer
-TextureAtlas.class
-AtlasIds
-SpriteId
+Oxidizable
+Weathering
+Strippable
+Flammable
+RenderLayerMap
+ChunkSectionLayerMap

@@ -25,3 +25,11 @@ net.minecraft.world.level.GrassColor
 net.minecraft.client.renderer.texture.TextureAtlas
 net.minecraft.client.renderer.texture.TextureAtlasSprite
 net.fabricmc.fabric.api.client.rendering.v1.ChunkSectionLayerMap
+net.minecraft.client.resources.model.sprite.MaterialBaker
+net.minecraft.client.resources.model.sprite.Material$Baked
+net.minecraft.client.resources.model.sprite.SpriteId
+net.minecraft.client.renderer.chunk.ChunkSectionLayer
+com.mojang.blaze3d.platform.Transparency
+net.fabricmc.fabric.api.client.rendering.v1.BlockTintsFactory
+net.minecraft.client.renderer.texture.atlas.SpriteSource$Output
+net.minecraft.client.resources.model.ModelDebugName

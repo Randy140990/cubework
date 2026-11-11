@@ -62,6 +62,8 @@ jobs:
           JAR=$(find ~/.gradle "build/v/$T/.gradle" -path "*$MC*" -name "minecraft-merged*.jar" 2>/dev/null | grep -v sources | grep -E "layered|mappings|mojang" | head -n 1)
           [ -z "$JAR" ] && JAR=$(find ~/.gradle "build/v/$T/.gradle" -path "*$MC*" -name "minecraft-*.jar" 2>/dev/null | grep -v sources | grep -v client | head -n 1)
           CJAR="vanilla/$T/client.jar"
+          ./gradlew -p "build/v/$T" printClasspath > /dev/null 2>&1
+          CP=$(cat "build/v/$T/classpath.txt" 2>/dev/null)
           echo "jar: $JAR" > "$O/info.txt"
           find ~/.gradle "build/v/$T/.gradle" -name "minecraft*.jar" 2>/dev/null | grep -v sources >> "$O/info.txt"
           # Vanilla files named in ci/check-files.txt (unzip patterns, one a line), copied out to read.
@@ -76,20 +78,18 @@ jobs:
           if [ -s ci/check-find.txt ]; then
             while read -r pat; do
               [ -z "$pat" ] && continue
-              unzip -l "$JAR" | grep -i "$pat" >> "$O/found.txt" || true
-              for F in $(find ~/.gradle "build/v/$T/.gradle" -name "fabric-*.jar" 2>/dev/null | grep -v sources | sort -u); do
+              for F in $(echo "$CP" | tr ':' '\n'); do
                 unzip -l "$F" 2>/dev/null | grep -i "$pat" | sed "s|^|$(basename $F): |" >> "$O/found.txt" || true
               done
             done < ci/check-find.txt
           fi
           # Signatures of the classes in ci/check-classes.txt ("c some.Class" adds the bytecode).
           if [ -s ci/check-classes.txt ]; then
-            FAB=$(find ~/.gradle "build/v/$T/.gradle" -name "fabric-*.jar" 2>/dev/null | grep -v sources | sort -u | tr '\n' ':')
             while read -r cls; do
               [ -z "$cls" ] && continue
               case "$cls" in
-                "c "*) c="${cls#c }"; javap -c -p -cp "$JAR:$FAB" "$c" > "$O/$c.c.txt" 2>&1 || true ;;
-                *) javap -p -cp "$JAR:$FAB" "$cls" > "$O/$cls.txt" 2>&1 || true ;;
+                "c "*) c="${cls#c }"; javap -c -p -cp "$CP" "$c" > "$O/$c.c.txt" 2>&1 || true ;;
+                *) javap -p -cp "$CP" "$cls" > "$O/$cls.txt" 2>&1 || true ;;
               esac
             done < ci/check-classes.txt
           fi
