@@ -1,4 +1,0 @@
-net.minecraft.client.resources.model.SpriteGetter
-net.minecraft.client.resources.model.UnbakedModel
-net.minecraft.world.level.block.BushBlock
-net.minecraft.world.level.block.state.BlockBehaviour

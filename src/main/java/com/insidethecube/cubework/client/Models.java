@@ -28,7 +28,6 @@ import net.minecraft.util.RandomSource;
 //#endif
 //#if MC >= 1.21.4 && MC < 1.21.5
 import net.minecraft.client.renderer.block.model.UnbakedBlockStateModel;
-import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.ResolvableModel;
 //#endif
 //#if MC < 1.21.4
@@ -148,8 +147,7 @@ final class Models {
 
 		@Override
 		public BakedModel bake(ModelBaker baker) {
-			ModelDebugName named = () -> "cubework " + state;
-			return new Old(maker.make(state, name -> baker.sprites().get(texture(name), named)));
+			return new Old(maker.make(state, name -> baker.sprites().get(texture(name))));
 		}
 		//#elif MC >= 1.21.2
 		@Override
