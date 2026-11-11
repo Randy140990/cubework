@@ -1,0 +1,2 @@
+textures/block/quartz_pillar
+textures/block/purpur_pillar
