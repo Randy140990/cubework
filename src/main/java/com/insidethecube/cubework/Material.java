@@ -3,10 +3,9 @@ package com.insidethecube.cubework;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.block.Block;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Block;
 
 /**
  * A vanilla block that Cubework makes shapes of. Its shapes copy its properties (sound, hardness, tool,
@@ -143,7 +142,7 @@ public record Material(String id, Kind kind, String colour) {
 
 	/** The vanilla block. */
 	public Block base() {
-		return Registries.BLOCK.get(Identifier.ofVanilla(id));
+		return BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace(id));
 	}
 
 	public boolean glass() {

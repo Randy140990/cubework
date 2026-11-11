@@ -13,22 +13,22 @@ import com.insidethecube.cubework.block.ThinLogBlock;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockSetType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.MapColor;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.TallBlockItem;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EmptyBlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DoubleHighBlockItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.material.MapColor;
 
 /** Thin logs, plants at other sizes, and doors in every colour. */
 public final class Extras {
@@ -100,7 +100,7 @@ public final class Extras {
 			boolean wood = top.startsWith("stripped_");
 			for (String legs : tableLegs()) {
 				String name = top + "_table" + (legs.equals("oak") ? "" : "_" + legs + "_legs");
-				Block b = block(name, settings(base).nonOpaque(), set -> new TableBlock(legs, set));
+				Block b = block(name, settings(base).noOcclusion(), set -> new TableBlock(legs, set));
 				TABLES.add(b);
 				if (wood && !top.contains("crimson") && !top.contains("warped")) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 20);
 			}
@@ -170,53 +170,53 @@ public final class Extras {
 	private static void doors() {
 		for (String wood : DOOR_WOODS) {
 			Block base = vanilla(wood + "_door");
-			BlockSetType type = BlockSetType.stream().filter(t -> t.name().equals(wood)).findFirst().orElse(BlockSetType.OAK);
+			BlockSetType type = BlockSetType.values().filter(t -> t.name().equals(wood)).findFirst().orElse(BlockSetType.OAK);
 			for (String colour : Material.COLOURS) {
 				MapColor map = DyeColor.valueOf(colour.toUpperCase(Locale.ROOT)).getMapColor();
-				DOORS.add(block(colour + "_" + wood + "_door", AbstractBlock.Settings.copy(base).mapColor(map), set -> new ColouredDoorBlock(type, set), true));
+				DOORS.add(block(colour + "_" + wood + "_door", BlockBehaviour.Properties.ofFullCopy(base).mapColor(map), set -> new ColouredDoorBlock(type, set), true));
 			}
 		}
 		// The iron door in the 16 colours: still opened only by redstone.
 		Block iron = vanilla("iron_door");
 		for (String colour : Material.COLOURS) {
 			MapColor map = DyeColor.valueOf(colour.toUpperCase(Locale.ROOT)).getMapColor();
-			DOORS.add(block(colour + "_iron_door", AbstractBlock.Settings.copy(iron).mapColor(map), set -> new ColouredDoorBlock(BlockSetType.IRON, set), true));
+			DOORS.add(block(colour + "_iron_door", BlockBehaviour.Properties.ofFullCopy(iron).mapColor(map), set -> new ColouredDoorBlock(BlockSetType.IRON, set), true));
 		}
 		// The copper door's pattern in metals and gems: opened by hand, like copper doors.
 		Block copper = vanilla("copper_door");
 		for (String metal : METAL_DOORS) {
-			MapColor map = vanilla(metal + "_block").getDefaultMapColor();
-			DOORS.add(block(metal + "_door", AbstractBlock.Settings.copy(copper).mapColor(map), set -> new ColouredDoorBlock(BlockSetType.COPPER, set), true));
+			MapColor map = vanilla(metal + "_block").defaultMapColor();
+			DOORS.add(block(metal + "_door", BlockBehaviour.Properties.ofFullCopy(copper).mapColor(map), set -> new ColouredDoorBlock(BlockSetType.COPPER, set), true));
 		}
 	}
 
 	private static Block vanilla(String id) {
-		return Registries.BLOCK.get(Identifier.ofVanilla(id));
+		return BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace(id));
 	}
 
 	public static Block get(String id) {
-		return Registries.BLOCK.get(Identifier.of(Cubework.ID, id));
+		return BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath(Cubework.ID, id));
 	}
 
 	/** The vanilla block's settings, with its map colour and light fixed (some work them out from properties). */
-	private static AbstractBlock.Settings settings(Block base) {
-		BlockState def = base.getDefaultState();
-		MapColor colour = def.getMapColor(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
-		int light = def.getLuminance();
-		return AbstractBlock.Settings.copy(base).mapColor(colour).luminance(state -> light);
+	private static BlockBehaviour.Properties settings(Block base) {
+		BlockState def = base.defaultBlockState();
+		MapColor colour = def.getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+		int light = def.getLightEmission();
+		return BlockBehaviour.Properties.ofFullCopy(base).mapColor(colour).lightLevel(state -> light);
 	}
 
-	private static Block block(String name, AbstractBlock.Settings settings, Function<AbstractBlock.Settings, Block> factory) {
+	private static Block block(String name, BlockBehaviour.Properties settings, Function<BlockBehaviour.Properties, Block> factory) {
 		return block(name, settings, factory, false);
 	}
 
 	/** Doors use the two-block item, which checks there's room for the top half, like vanilla doors. */
-	private static Block block(String name, AbstractBlock.Settings settings, Function<AbstractBlock.Settings, Block> factory, boolean tall) {
-		RegistryKey<Block> key = RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(Cubework.ID, name));
-		Block b = Registry.register(Registries.BLOCK, key, factory.apply(settings.registryKey(key)));
-		RegistryKey<Item> ik = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Cubework.ID, name));
-		Item.Settings is = new Item.Settings().registryKey(ik).useBlockPrefixedTranslationKey();
-		Registry.register(Registries.ITEM, ik, tall ? new TallBlockItem(b, is) : new BlockItem(b, is));
+	private static Block block(String name, BlockBehaviour.Properties settings, Function<BlockBehaviour.Properties, Block> factory, boolean tall) {
+		ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Cubework.ID, name));
+		Block b = Registry.register(BuiltInRegistries.BLOCK, key, factory.apply(settings.setId(key)));
+		ResourceKey<Item> ik = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Cubework.ID, name));
+		Item.Properties is = new Item.Properties().setId(ik).useBlockDescriptionPrefix();
+		Registry.register(BuiltInRegistries.ITEM, ik, tall ? new DoubleHighBlockItem(b, is) : new BlockItem(b, is));
 		return b;
 	}
 }

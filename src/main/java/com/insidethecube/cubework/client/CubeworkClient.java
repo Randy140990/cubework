@@ -13,12 +13,12 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.model.BlockStateModel;
-import net.minecraft.world.biome.GrassColors;
+import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.world.level.GrassColor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class CubeworkClient implements ClientModInitializer {
 	@Override
@@ -31,17 +31,17 @@ public final class CubeworkClient implements ClientModInitializer {
 		for (Material m : Material.ALL) {
 			var shapes = CwBlocks.shapesOf(m).values();
 			// Glass and ice are see-through, as the game draws them; grass needs cut-out for its side overlay.
-			if (m.seeThrough()) for (Block b : shapes) BlockRenderLayerMap.putBlock(b, BlockRenderLayer.TRANSLUCENT);
-			else if (m.grassTinted()) for (Block b : shapes) BlockRenderLayerMap.putBlock(b, BlockRenderLayer.CUTOUT);
+			if (m.seeThrough()) for (Block b : shapes) BlockRenderLayerMap.putBlock(b, ChunkSectionLayer.TRANSLUCENT);
+			else if (m.grassTinted()) for (Block b : shapes) BlockRenderLayerMap.putBlock(b, ChunkSectionLayer.CUTOUT);
 			if (m.grassTinted()) grass.addAll(shapes);
 		}
-		for (Block b : Extras.SIZED_PLANTS) BlockRenderLayerMap.putBlock(b, BlockRenderLayer.CUTOUT);
-		for (Block b : Extras.CORAL) BlockRenderLayerMap.putBlock(b, BlockRenderLayer.CUTOUT);
-		for (Block b : Extras.DOORS) BlockRenderLayerMap.putBlock(b, BlockRenderLayer.CUTOUT);
+		for (Block b : Extras.SIZED_PLANTS) BlockRenderLayerMap.putBlock(b, ChunkSectionLayer.CUTOUT);
+		for (Block b : Extras.CORAL) BlockRenderLayerMap.putBlock(b, ChunkSectionLayer.CUTOUT);
+		for (Block b : Extras.DOORS) BlockRenderLayerMap.putBlock(b, ChunkSectionLayer.CUTOUT);
 
 		// Grass shapes, grass, ferns and bushes take the biome's grass colour.
-		ColorProviderRegistry.BLOCK.register((state, world, pos, tint) -> world != null && pos != null ? BiomeColors.getGrassColor(world, pos)
-				: GrassColors.getDefaultColor(), grass.toArray(new Block[0]));
+		ColorProviderRegistry.BLOCK.register((state, world, pos, tint) -> world != null && pos != null ? BiomeColors.getAverageGrassColor(world, pos)
+				: GrassColor.getDefaultColor(), grass.toArray(new Block[0]));
 
 		// Slopes and arches have their own models, built from the vanilla block's textures.
 		ModelLoadingPlugin.register(ctx -> {
@@ -51,9 +51,9 @@ public final class CubeworkClient implements ClientModInitializer {
 				for (Shape shape : new Shape[] {Shape.SLOPE, Shape.SLOPE_2, Shape.SLOPE_3, Shape.GENTLE_SLOPE, Shape.ARCH, Shape.ARCH_CORNER}) {
 					Block block = CwBlocks.get(m, shape);
 					if (block == null) continue;
-					BlockStateModel.UnbakedGrouped model = shape == Shape.ARCH || shape == Shape.ARCH_CORNER ? archModel : slopeModel;
+					BlockStateModel.UnbakedRoot model = shape == Shape.ARCH || shape == Shape.ARCH_CORNER ? archModel : slopeModel;
 					ctx.registerBlockStateResolver(block, resolver -> {
-						for (BlockState state : block.getStateManager().getStates()) resolver.setModel(state, model);
+						for (BlockState state : block.getStateDefinition().getPossibleStates()) resolver.setModel(state, model);
 					});
 				}
 			}

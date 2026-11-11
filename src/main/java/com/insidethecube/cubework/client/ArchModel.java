@@ -4,24 +4,21 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelDebugName;
+import net.minecraft.client.resources.model.ResolvableModel;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3f;
 
 import com.insidethecube.cubework.Material;
 import com.insidethecube.cubework.block.ArchBlock;
 import com.insidethecube.cubework.block.ArchCornerBlock;
 import com.insidethecube.cubework.block.ArchGeometry;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.Baker;
-import net.minecraft.client.render.model.BlockStateModel;
-import net.minecraft.client.render.model.ResolvableModel;
-import net.minecraft.client.render.model.SimpleModel;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
 
 /**
  * Arches drawn with a smooth curve: the front and back are strips under the curve, the underside is a band
@@ -31,34 +28,34 @@ import net.minecraft.util.math.Direction;
 public final class ArchModel {
 	private ArchModel() {}
 
-	public record Unbaked(Material material) implements BlockStateModel.UnbakedGrouped {
+	public record Unbaked(Material material) implements BlockStateModel.UnbakedRoot {
 		@Override
-		public void resolve(ResolvableModel.Resolver resolver) {
+		public void resolveDependencies(ResolvableModel.Resolver resolver) {
 		}
 
 		@Override
-		public Object getEqualityGroup(BlockState state) {
+		public Object visualEqualityGroup(BlockState state) {
 			return state;
 		}
 
 		@Override
-		public BlockStateModel bake(BlockState state, Baker baker) {
+		public BlockStateModel bake(BlockState state, ModelBaker baker) {
 			Material.Textures t = material.textures();
-			SimpleModel named = () -> "cubework arch " + material.id();
-			Sprite top = sprite(baker, t.top(), named), side = sprite(baker, t.side(), named), bottom = sprite(baker, t.bottom(), named);
+			ModelDebugName named = () -> "cubework arch " + material.id();
+			TextureAtlasSprite top = sprite(baker, t.top(), named), side = sprite(baker, t.side(), named), bottom = sprite(baker, t.bottom(), named);
 			boolean corner = state.getBlock() instanceof ArchCornerBlock;
-			int turns = corner ? ArchCornerBlock.turns(state.get(ArchCornerBlock.FACING))
-					: state.get(ArchBlock.AXIS) == Direction.Axis.X ? 1 : 0;
+			int turns = corner ? ArchCornerBlock.turns(state.getValue(ArchCornerBlock.FACING))
+					: state.getValue(ArchBlock.AXIS) == Direction.Axis.X ? 1 : 0;
 			return new SlopeModel.Baked(new SlopeModel.Part(quads(corner, turns, top, side, bottom), side));
 		}
 
-		private static Sprite sprite(Baker baker, String texture, SimpleModel named) {
-			return baker.getSpriteGetter().get(new SpriteIdentifier(Uv.BLOCK_ATLAS, Identifier.ofVanilla("block/" + texture)), named);
+		private static TextureAtlasSprite sprite(ModelBaker baker, String texture, ModelDebugName named) {
+			return baker.sprites().get(new net.minecraft.client.resources.model.Material(Uv.BLOCK_ATLAS, Identifier.withDefaultNamespace("block/" + texture)), named);
 		}
 	}
 
 	/** Built facing north and south (seen from the front, x across, y up), then turned clockwise. */
-	private static SlopeModel.Quads quads(boolean corner, int turns, Sprite top, Sprite side, Sprite bottom) {
+	private static SlopeModel.Quads quads(boolean corner, int turns, TextureAtlasSprite top, TextureAtlasSprite side, TextureAtlasSprite bottom) {
 		Map<Direction, List<BakedQuad>> out = new EnumMap<>(Direction.class);
 		List<BakedQuad> free = new ArrayList<>();
 		double[][] c = ArchGeometry.curve(corner);
@@ -99,16 +96,16 @@ public final class ArchModel {
 	}
 
 	private static double[] axis(Direction d) {
-		return new double[] {d.getOffsetX(), d.getOffsetY(), d.getOffsetZ()};
+		return new double[] {d.getStepX(), d.getStepY(), d.getStepZ()};
 	}
 
 	private static Direction turn(Direction d, int turns) {
-		for (int i = 0; i < turns; i++) if (d.getAxis().isHorizontal()) d = d.rotateYClockwise();
+		for (int i = 0; i < turns; i++) if (d.getAxis().isHorizontal()) d = d.getClockWise();
 		return d;
 	}
 
 	/** A quad wound to show from the side its normal points to, then turned with the block. */
-	private static BakedQuad quad(Sprite sprite, double[][] p, float[][] uv, Direction face, double[] n, int turns) {
+	private static BakedQuad quad(TextureAtlasSprite sprite, double[][] p, float[][] uv, Direction face, double[] n, int turns) {
 		double ux = p[1][0] - p[0][0], uy = p[1][1] - p[0][1], uz = p[1][2] - p[0][2];
 		double vx = p[2][0] - p[0][0], vy = p[2][1] - p[0][1], vz = p[2][2] - p[0][2];
 		double cx = uy * vz - uz * vy, cy = uz * vx - ux * vz, cz = ux * vy - uy * vx;
@@ -126,7 +123,7 @@ public final class ArchModel {
 				z = nz;
 			}
 			pos[i] = new Vector3f((float) x, (float) p[i][1], (float) z);
-			packed[i] = Uv.pack(sprite.getFrameU(uv[i][0]), sprite.getFrameV(uv[i][1]));
+			packed[i] = Uv.pack(sprite.getU(uv[i][0]), sprite.getV(uv[i][1]));
 		}
 		return new BakedQuad(pos[0], pos[1], pos[2], pos[3], packed[0], packed[1], packed[2], packed[3], -1, turn(face, turns), sprite, true, 0);
 	}

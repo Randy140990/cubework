@@ -1,24 +1,23 @@
 package com.insidethecube.cubework.block;
 
 import com.insidethecube.cubework.Material;
-
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FenceGateBlock;
-import net.minecraft.block.WoodType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.WoodType;
 
 /** The vanilla FenceGateBlock in a Cubework material: placed, connected and used exactly like vanilla's. */
 public class CwFenceGate extends FenceGateBlock implements CwShape {
 	private final Material material;
 
-	public CwFenceGate(Material material, WoodType wood, AbstractBlock.Settings settings) {
+	public CwFenceGate(Material material, WoodType wood, BlockBehaviour.Properties settings) {
 		super(wood, settings);
 		this.material = material;
 	}
@@ -29,24 +28,24 @@ public class CwFenceGate extends FenceGateBlock implements CwShape {
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return Shared.placed(material, super.getPlacementState(ctx), ctx);
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		return Shared.placed(material, super.getStateForPlacement(ctx), ctx);
 	}
 
 	@Override
-	protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction,
-			BlockPos neighborPos, BlockState neighborState, Random random) {
-		return Shared.updated(material, super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random), world, pos);
+	protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction,
+			BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+		return Shared.updated(material, super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random), world, pos);
 	}
 
 	@Override
-	protected boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
-		return Shared.hidesFace(material, state, stateFrom, direction) || super.isSideInvisible(state, stateFrom, direction);
+	protected boolean skipRendering(BlockState state, BlockState stateFrom, Direction direction) {
+		return Shared.hidesFace(material, state, stateFrom, direction) || super.skipRendering(state, stateFrom, direction);
 	}
 
 	/** Copper shapes weather like vanilla copper. */
 	@Override
-	protected void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+	protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		Aging.tick(material, state, world, pos, random);
 	}
 }

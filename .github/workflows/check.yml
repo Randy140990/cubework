@@ -35,7 +35,7 @@ jobs:
           fi
           ./gradlew compileJava --stacktrace > out/compile.txt 2>&1; echo "exit=$?" >> out/compile.txt
           tail -30 out/compile.txt
-          JAR=$(find ~/.gradle .gradle -name "*minecraft-merged*yarn*1.21.11*.jar" 2>/dev/null | grep -v sources | grep -v intermediary | head -n 1)
+          JAR=$(find ~/.gradle .gradle -name "minecraft-merged*.jar" 2>/dev/null | grep -v sources | grep -v intermediary | head -n 1)
           [ -z "$JAR" ] && JAR=$(find ~/.gradle .gradle -name "minecraft-*named*.jar" 2>/dev/null | grep -v sources | head -n 1)
           CJAR=$(find ~/.gradle .gradle -name "minecraft-client*.jar" 2>/dev/null | grep -v sources | head -n 1)
           [ -z "$CJAR" ] && CJAR=$(find ~/.gradle .gradle -name "*client*1.21.11*.jar" 2>/dev/null | head -n 1)

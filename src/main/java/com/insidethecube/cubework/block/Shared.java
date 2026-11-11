@@ -2,46 +2,45 @@ package com.insidethecube.cubework.block;
 
 import com.insidethecube.cubework.CwBlocks;
 import com.insidethecube.cubework.Material;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.EmptyBlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** What every Cubework shape does the same way, whichever vanilla block it's built on. */
 public final class Shared {
 	private Shared() {}
 
 	/** A shape just placed: concrete powder touching water sets into concrete straight away. */
-	public static BlockState placed(Material m, BlockState state, ItemPlacementContext ctx) {
+	public static BlockState placed(Material m, BlockState state, BlockPlaceContext ctx) {
 		if (state == null || m.kind() != Material.Kind.POWDER) return state;
-		return wet(state, ctx.getWorld(), ctx.getBlockPos()) ? harden(state) : state;
+		return wet(state, ctx.getLevel(), ctx.getClickedPos()) ? harden(state) : state;
 	}
 
 	/** A neighbour changed: concrete powder sets when water reaches it. */
-	public static BlockState updated(Material m, BlockState state, BlockView world, BlockPos pos) {
+	public static BlockState updated(Material m, BlockState state, BlockGetter world, BlockPos pos) {
 		if (state == null || m.kind() != Material.Kind.POWDER) return state;
 		return wet(state, world, pos) ? harden(state) : state;
 	}
 
-	private static boolean wet(BlockState state, BlockView world, BlockPos pos) {
-		if (state.contains(Properties.WATERLOGGED) && state.get(Properties.WATERLOGGED)) return true;
-		if (world.getFluidState(pos).isIn(FluidTags.WATER)) return true;
-		BlockPos.Mutable p = new BlockPos.Mutable();
+	private static boolean wet(BlockState state, BlockGetter world, BlockPos pos) {
+		if (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED)) return true;
+		if (world.getFluidState(pos).is(FluidTags.WATER)) return true;
+		BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
 		for (Direction d : Direction.values()) {
-			p.set(pos, d);
-			if (world.getFluidState(p).isIn(FluidTags.WATER)) return true;
+			p.setWithOffset(pos, d);
+			if (world.getFluidState(p).is(FluidTags.WATER)) return true;
 		}
 		return false;
 	}
@@ -55,22 +54,22 @@ public final class Shared {
 			Material hard = info.material().hardened();
 			to = hard == null ? null : CwBlocks.get(hard, info.shape());
 		} else {
-			Identifier id = Registries.BLOCK.getId(b);
+			Identifier id = BuiltInRegistries.BLOCK.getKey(b);
 			String path = id.getPath();
-			to = path.endsWith("_concrete_powder") ? Registries.BLOCK.get(Identifier.ofVanilla(path.substring(0, path.length() - "_powder".length()))) : null;
+			to = path.endsWith("_concrete_powder") ? BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace(path.substring(0, path.length() - "_powder".length()))) : null;
 		}
 		return to == null ? state : copy(state, to);
 	}
 
 	/** The same placement (facing, layers, half...) on another block with the same properties. */
 	public static BlockState copy(BlockState from, Block to) {
-		BlockState s = to.getDefaultState();
-		for (Property<?> p : from.getProperties()) if (s.contains(p)) s = with(s, from, p);
+		BlockState s = to.defaultBlockState();
+		for (Property<?> p : from.getProperties()) if (s.hasProperty(p)) s = with(s, from, p);
 		return s;
 	}
 
 	private static <T extends Comparable<T>> BlockState with(BlockState to, BlockState from, Property<T> p) {
-		return to.with(p, from.get(p));
+		return to.setValue(p, from.getValue(p));
 	}
 
 	/**
@@ -80,9 +79,9 @@ public final class Shared {
 	public static boolean hidesFace(Material m, BlockState self, BlockState other, Direction dir) {
 		if (m == null || !m.glass()) return false;
 		if (CwBlocks.materialOf(other.getBlock()) != m) return false;
-		VoxelShape mine = self.getOutlineShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN).getFace(dir);
-		VoxelShape theirs = other.getOutlineShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN).getFace(dir.getOpposite());
+		VoxelShape mine = self.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).getFaceShape(dir);
+		VoxelShape theirs = other.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).getFaceShape(dir.getOpposite());
 		if (theirs.isEmpty()) return false;
-		return !VoxelShapes.matchesAnywhere(mine, theirs, BooleanBiFunction.ONLY_FIRST);
+		return !Shapes.joinIsNotEmpty(mine, theirs, BooleanOp.ONLY_FIRST);
 	}
 }

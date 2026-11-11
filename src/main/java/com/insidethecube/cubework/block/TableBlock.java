@@ -1,24 +1,24 @@
 package com.insidethecube.cubework.block;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * A low table shaped like a bed: a 6-pixel top on 3-pixel legs. Tables with the same legs placed side by
@@ -27,42 +27,42 @@ import net.minecraft.world.tick.ScheduledTickView;
  * with the way you face as you place it (for glazed terracotta's patterns and wood's grain).
  */
 public class TableBlock extends Block {
-	public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-	public static final BooleanProperty NORTH = Properties.NORTH;
-	public static final BooleanProperty EAST = Properties.EAST;
-	public static final BooleanProperty SOUTH = Properties.SOUTH;
-	public static final BooleanProperty WEST = Properties.WEST;
+	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
+	public static final BooleanProperty EAST = BlockStateProperties.EAST;
+	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
+	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 
-	private static final VoxelShape TOP = Block.createCuboidShape(0, 3, 0, 16, 9, 16);
-	private static final VoxelShape LEG_NW = Block.createCuboidShape(0, 0, 0, 3, 3, 3);
-	private static final VoxelShape LEG_NE = Block.createCuboidShape(13, 0, 0, 16, 3, 3);
-	private static final VoxelShape LEG_SW = Block.createCuboidShape(0, 0, 13, 3, 3, 16);
-	private static final VoxelShape LEG_SE = Block.createCuboidShape(13, 0, 13, 16, 3, 16);
+	private static final VoxelShape TOP = Block.box(0, 3, 0, 16, 9, 16);
+	private static final VoxelShape LEG_NW = Block.box(0, 0, 0, 3, 3, 3);
+	private static final VoxelShape LEG_NE = Block.box(13, 0, 0, 16, 3, 3);
+	private static final VoxelShape LEG_SW = Block.box(0, 0, 13, 3, 3, 16);
+	private static final VoxelShape LEG_SE = Block.box(13, 0, 13, 16, 3, 16);
 	private static final VoxelShape[] SHAPES = new VoxelShape[16];
 
 	static {
 		for (int i = 0; i < 16; i++) {
 			boolean n = (i & 1) != 0, e = (i & 2) != 0, s = (i & 4) != 0, w = (i & 8) != 0;
 			VoxelShape shape = TOP;
-			if (!n && !w) shape = VoxelShapes.union(shape, LEG_NW);
-			if (!n && !e) shape = VoxelShapes.union(shape, LEG_NE);
-			if (!s && !w) shape = VoxelShapes.union(shape, LEG_SW);
-			if (!s && !e) shape = VoxelShapes.union(shape, LEG_SE);
-			SHAPES[i] = shape.simplify();
+			if (!n && !w) shape = Shapes.or(shape, LEG_NW);
+			if (!n && !e) shape = Shapes.or(shape, LEG_NE);
+			if (!s && !w) shape = Shapes.or(shape, LEG_SW);
+			if (!s && !e) shape = Shapes.or(shape, LEG_SE);
+			SHAPES[i] = shape.optimize();
 		}
 	}
 
 	/** Which legs it has (oak, or a concrete colour): tables join only tables with the same legs. */
 	private final String legs;
 
-	public TableBlock(String legs, AbstractBlock.Settings settings) {
+	public TableBlock(String legs, BlockBehaviour.Properties settings) {
 		super(settings);
 		this.legs = legs;
-		setDefaultState(getDefaultState().with(FACING, Direction.NORTH).with(NORTH, false).with(EAST, false).with(SOUTH, false).with(WEST, false));
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false));
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING, NORTH, EAST, SOUTH, WEST);
 	}
 
@@ -76,8 +76,8 @@ public class TableBlock extends Block {
 	}
 
 	@Override
-	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		int i = (state.get(NORTH) ? 1 : 0) | (state.get(EAST) ? 2 : 0) | (state.get(SOUTH) ? 4 : 0) | (state.get(WEST) ? 8 : 0);
+	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		int i = (state.getValue(NORTH) ? 1 : 0) | (state.getValue(EAST) ? 2 : 0) | (state.getValue(SOUTH) ? 4 : 0) | (state.getValue(WEST) ? 8 : 0);
 		return SHAPES[i];
 	}
 
@@ -86,31 +86,31 @@ public class TableBlock extends Block {
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		BlockState state = getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
-		for (Direction d : Direction.Type.HORIZONTAL) {
-			state = state.with(side(d), joins(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(d))));
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		BlockState state = defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
+		for (Direction d : Direction.Plane.HORIZONTAL) {
+			state = state.setValue(side(d), joins(ctx.getLevel().getBlockState(ctx.getClickedPos().relative(d))));
 		}
 		return state;
 	}
 
 	@Override
-	protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction,
-			BlockPos neighborPos, BlockState neighborState, Random random) {
-		return direction.getAxis().isHorizontal() ? state.with(side(direction), joins(neighborState)) : state;
+	protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction,
+			BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+		return direction.getAxis().isHorizontal() ? state.setValue(side(direction), joins(neighborState)) : state;
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, BlockRotation rotation) {
-		BlockState out = state.with(FACING, rotation.rotate(state.get(FACING)));
-		for (Direction d : Direction.Type.HORIZONTAL) out = out.with(side(rotation.rotate(d)), state.get(side(d)));
+	protected BlockState rotate(BlockState state, Rotation rotation) {
+		BlockState out = state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+		for (Direction d : Direction.Plane.HORIZONTAL) out = out.setValue(side(rotation.rotate(d)), state.getValue(side(d)));
 		return out;
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, BlockMirror mirror) {
-		BlockState out = state.with(FACING, mirror.apply(state.get(FACING)));
-		for (Direction d : Direction.Type.HORIZONTAL) out = out.with(side(mirror.apply(d)), state.get(side(d)));
+	protected BlockState mirror(BlockState state, Mirror mirror) {
+		BlockState out = state.setValue(FACING, mirror.mirror(state.getValue(FACING)));
+		for (Direction d : Direction.Plane.HORIZONTAL) out = out.setValue(side(mirror.mirror(d)), state.getValue(side(d)));
 		return out;
 	}
 }

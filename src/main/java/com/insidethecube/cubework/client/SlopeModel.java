@@ -4,28 +4,25 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelDebugName;
+import net.minecraft.client.resources.model.ResolvableModel;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.StairsShape;
 import org.joml.Vector3f;
 
 import com.insidethecube.cubework.Material;
 import com.insidethecube.cubework.block.GentleSlopeBlock;
 import com.insidethecube.cubework.block.SlopeBlock;
 import com.insidethecube.cubework.block.SlopeGeometry;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.BlockHalf;
-import net.minecraft.block.enums.StairShape;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.Baker;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.client.render.model.BlockStateModel;
-import net.minecraft.client.render.model.ResolvableModel;
-import net.minecraft.client.render.model.SimpleModel;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
 
 /**
  * The slope drawn as it really is: one flat sloping surface (two triangles at a corner), triangles on the
@@ -36,20 +33,20 @@ import net.minecraft.util.math.random.Random;
 public final class SlopeModel {
 	private SlopeModel() {}
 
-	public record Unbaked(Material material) implements BlockStateModel.UnbakedGrouped {
+	public record Unbaked(Material material) implements BlockStateModel.UnbakedRoot {
 		@Override
-		public void resolve(ResolvableModel.Resolver resolver) {
+		public void resolveDependencies(ResolvableModel.Resolver resolver) {
 		}
 
 		@Override
-		public Object getEqualityGroup(BlockState state) {
+		public Object visualEqualityGroup(BlockState state) {
 			return state;
 		}
 
 		@Override
-		public BlockStateModel bake(BlockState state, Baker baker) {
+		public BlockStateModel bake(BlockState state, ModelBaker baker) {
 			Material.Textures t = material.textures();
-			SimpleModel named = () -> "cubework slope " + material.id();
+			ModelDebugName named = () -> "cubework slope " + material.id();
 			Sprites s = new Sprites(sprite(baker, t.top(), named), sprite(baker, t.side(), named), sprite(baker, t.bottom(), named),
 					t.overlay() == null ? null : sprite(baker, t.overlay(), named), material.grassTinted());
 			SlopeBlock block = (SlopeBlock) state.getBlock();
@@ -57,22 +54,22 @@ public final class SlopeModel {
 					block instanceof GentleSlopeBlock), s.side()));
 		}
 
-		private static Sprite sprite(Baker baker, String texture, SimpleModel named) {
-			return baker.getSpriteGetter().get(new SpriteIdentifier(Uv.BLOCK_ATLAS, Identifier.ofVanilla("block/" + texture)), named);
+		private static TextureAtlasSprite sprite(ModelBaker baker, String texture, ModelDebugName named) {
+			return baker.sprites().get(new net.minecraft.client.resources.model.Material(Uv.BLOCK_ATLAS, Identifier.withDefaultNamespace("block/" + texture)), named);
 		}
 	}
 
 	/** The block's textures; tinted means the top and overlay take the biome's grass colour. */
-	private record Sprites(Sprite top, Sprite side, Sprite bottom, Sprite overlay, boolean tinted) {}
+	private record Sprites(TextureAtlasSprite top, TextureAtlasSprite side, TextureAtlasSprite bottom, TextureAtlasSprite overlay, boolean tinted) {}
 
 	record Baked(Part part) implements BlockStateModel {
 		@Override
-		public void addParts(Random random, List<BlockModelPart> parts) {
+		public void collectParts(RandomSource random, List<BlockModelPart> parts) {
 			parts.add(part);
 		}
 
 		@Override
-		public Sprite particleSprite() {
+		public TextureAtlasSprite particleIcon() {
 			return part.sprite;
 		}
 	}
@@ -83,9 +80,9 @@ public final class SlopeModel {
 	static final class Part implements BlockModelPart {
 		private final Map<Direction, List<BakedQuad>> sided;
 		private final List<BakedQuad> free;
-		final Sprite sprite;
+		final TextureAtlasSprite sprite;
 
-		Part(Quads quads, Sprite sprite) {
+		Part(Quads quads, TextureAtlasSprite sprite) {
 			this.free = List.copyOf(quads.free());
 			this.sided = quads.sided();
 			this.sprite = sprite;
@@ -104,7 +101,7 @@ public final class SlopeModel {
 		}
 
 		@Override
-		public Sprite particleSprite() {
+		public TextureAtlasSprite particleIcon() {
 			return sprite;
 		}
 	}
@@ -114,9 +111,9 @@ public final class SlopeModel {
 	 * height; world: hang side textures from the block's top (gentle steps line up) rather than the slope.
 	 */
 	private static Quads quads(BlockState state, Sprites s, double base, double rise, double height, boolean world) {
-		Direction f = state.get(SlopeBlock.FACING);
-		StairShape shape = state.get(SlopeBlock.SHAPE);
-		boolean top = state.get(SlopeBlock.HALF) == BlockHalf.TOP;
+		Direction f = state.getValue(SlopeBlock.FACING);
+		StairsShape shape = state.getValue(SlopeBlock.SHAPE);
+		boolean top = state.getValue(SlopeBlock.HALF) == Half.TOP;
 		Map<Direction, List<BakedQuad>> out = new EnumMap<>(Direction.class);
 		List<BakedQuad> free = new ArrayList<>();
 		Builder b = new Builder(top, height, base, rise, world);
@@ -132,7 +129,7 @@ public final class SlopeModel {
 		add(out, flat, b.flat(top ? s.top() : s.bottom(), top ? tint : -1));
 
 		// The sloping surface: the block's top texture (its bottom texture when upside down).
-		Sprite surface = top ? s.bottom() : s.top();
+		TextureAtlasSprite surface = top ? s.bottom() : s.top();
 		int surfaceTint = top ? -1 : tint;
 		int odd = oddCorner(h);
 		if (odd < 0) {
@@ -203,14 +200,14 @@ public final class SlopeModel {
 		}
 
 		/** The solid part under a gentle slope's step, on one side. */
-		BakedQuad footing(Sprite sprite, Direction d, double[] a, double[] b) {
+		BakedQuad footing(TextureAtlasSprite sprite, Direction d, double[] a, double[] b) {
 			double[][] p = {{a[0], at(0), a[1]}, {b[0], at(0), b[1]}, {b[0], at(base), b[1]}, {a[0], at(base), a[1]}};
 			float[][] uv = new float[4][];
 			for (int i = 0; i < 4; i++) uv[i] = new float[] {texU(new double[] {p[i][0], 0, p[i][2]}, d), (float) (1 - p[i][1])};
 			return quad(sprite, -1, p, uv, d, d);
 		}
 
-		BakedQuad flat(Sprite sprite, int tint) {
+		BakedQuad flat(TextureAtlasSprite sprite, int tint) {
 			double y = top ? height : 0;
 			Direction face = top ? Direction.UP : Direction.DOWN;
 			double[][] p = {{0, y, 0}, {1, y, 0}, {1, y, 1}, {0, y, 1}};
@@ -219,7 +216,7 @@ public final class SlopeModel {
 			return quad(sprite, tint, p, uv, face, face);
 		}
 
-		BakedQuad surface(Sprite sprite, int tint, double[][] pts) {
+		BakedQuad surface(TextureAtlasSprite sprite, int tint, double[][] pts) {
 			double[][] p = new double[4][];
 			Direction face = top ? Direction.DOWN : Direction.UP;
 			float[][] uv = new float[4][];
@@ -234,7 +231,7 @@ public final class SlopeModel {
 		 * A side between corners a and b (heights ha, hb). The texture is hung from the top of the piece,
 		 * so a side texture's top band (grass, a path's edge, sandstone's rim) runs along the slope.
 		 */
-		BakedQuad side(Sprite sprite, int tint, Direction d, double[] a, double ha, double[] b, double hb) {
+		BakedQuad side(TextureAtlasSprite sprite, int tint, Direction d, double[] a, double ha, double[] b, double hb) {
 			List<double[]> local = new ArrayList<>();
 			List<double[]> col = new ArrayList<>();
 			local.add(new double[] {a[0], 0, a[1]});
@@ -266,7 +263,7 @@ public final class SlopeModel {
 		}
 
 		/** A quad facing out along normal, its corners wound so it shows from outside. */
-		private static BakedQuad quad(Sprite sprite, int tint, double[][] p, float[][] uv, Direction face, Direction normal) {
+		private static BakedQuad quad(TextureAtlasSprite sprite, int tint, double[][] p, float[][] uv, Direction face, Direction normal) {
 			if (!facesOut(p, normal)) {
 				p = new double[][] {p[0], p[3], p[2], p[1]};
 				uv = new float[][] {uv[0], uv[3], uv[2], uv[1]};
@@ -275,7 +272,7 @@ public final class SlopeModel {
 			long[] packed = new long[4];
 			for (int i = 0; i < 4; i++) {
 				pos[i] = new Vector3f((float) p[i][0], (float) p[i][1], (float) p[i][2]);
-				packed[i] = Uv.pack(sprite.getFrameU(uv[i][0]), sprite.getFrameV(uv[i][1]));
+				packed[i] = Uv.pack(sprite.getU(uv[i][0]), sprite.getV(uv[i][1]));
 			}
 			return new BakedQuad(pos[0], pos[1], pos[2], pos[3], packed[0], packed[1], packed[2], packed[3], tint, face, sprite, true, 0);
 		}
@@ -289,7 +286,7 @@ public final class SlopeModel {
 			double ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2];
 			double vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
 			double nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
-			return nx * normal.getOffsetX() + ny * normal.getOffsetY() + nz * normal.getOffsetZ() > 0;
+			return nx * normal.getStepX() + ny * normal.getStepY() + nz * normal.getStepZ() > 0;
 		}
 
 		/** Top and bottom: the texture seen from above (or below), as on a full block. */

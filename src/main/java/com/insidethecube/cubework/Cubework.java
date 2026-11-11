@@ -7,16 +7,16 @@ import java.util.function.Supplier;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
 /** Cubework by Inside the Cube: vanilla blocks in every shape. */
 public final class Cubework implements ModInitializer {
@@ -29,8 +29,8 @@ public final class Cubework implements ModInitializer {
 	public void onInitialize() {
 		CwBlocks.register();
 		Extras.register();
-		RegistryKey<Item> cube = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ID, "cube"));
-		CUBE = Registry.register(Registries.ITEM, cube, new Item(new Item.Settings().registryKey(cube)));
+		ResourceKey<Item> cube = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(ID, "cube"));
+		CUBE = Registry.register(BuiltInRegistries.ITEM, cube, new Item(new Item.Properties().setId(cube)));
 
 		// Six tabs, so there's little paging: coloured blocks, building blocks, natural blocks, plants, doors and tables.
 		tab("colours", () -> new ItemStack(CUBE), add -> {
@@ -61,16 +61,16 @@ public final class Cubework implements ModInitializer {
 	}
 
 	private static void tab(String name, Supplier<ItemStack> icon, Consumer<Consumer<Block>> fill) {
-		ItemGroup group = FabricItemGroup.builder()
-				.displayName(Text.translatable("itemGroup." + ID + "." + name))
+		CreativeModeTab group = FabricItemGroup.builder()
+				.title(Component.translatable("itemGroup." + ID + "." + name))
 				.icon(icon)
-				.entries((context, entries) -> fill.accept(entries::add))
+				.displayItems((context, entries) -> fill.accept(entries::accept))
 				.build();
-		Registry.register(Registries.ITEM_GROUP, RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(ID, name)), group);
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(ID, name)), group);
 	}
 
 	private static Item item(String id) {
-		return Registries.ITEM.get(Identifier.of(ID, id));
+		return BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(ID, id));
 	}
 
 }

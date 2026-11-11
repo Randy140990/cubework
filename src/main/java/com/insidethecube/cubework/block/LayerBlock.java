@@ -1,66 +1,65 @@
 package com.insidethecube.cubework.block;
 
 import com.insidethecube.cubework.Material;
-
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * Builds up from the floor like snow: 1 to 8 layers, 2 pixels each. Using it on the top of a layer adds
  * one; the eighth turns it into the full block.
  */
 public class LayerBlock extends CwBlock {
-	public static final IntProperty LAYERS = Properties.LAYERS;
+	public static final IntegerProperty LAYERS = BlockStateProperties.LAYERS;
 
 	private static final VoxelShape[] SHAPES = new VoxelShape[9];
 
 	static {
-		for (int n = 1; n <= 8; n++) SHAPES[n] = Block.createCuboidShape(0, 0, 0, 16, n * 2, 16);
+		for (int n = 1; n <= 8; n++) SHAPES[n] = Block.box(0, 0, 0, 16, n * 2, 16);
 	}
 
-	public LayerBlock(Material material, AbstractBlock.Settings settings) {
+	public LayerBlock(Material material, BlockBehaviour.Properties settings) {
 		super(material, settings);
-		setDefaultState(getDefaultState().with(LAYERS, 1));
+		registerDefaultState(defaultBlockState().setValue(LAYERS, 1));
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(LAYERS);
 	}
 
 	@Override
-	protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return SHAPES[state.get(LAYERS)];
+	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		return SHAPES[state.getValue(LAYERS)];
 	}
 
 	@Override
-	protected boolean hasSidedTransparency(BlockState state) {
-		return state.get(LAYERS) < 8;
+	protected boolean useShapeForLightOcclusion(BlockState state) {
+		return state.getValue(LAYERS) < 8;
 	}
 
 	@Override
-	protected boolean canReplace(BlockState state, ItemPlacementContext ctx) {
-		if (!ctx.getStack().isOf(asItem()) || state.get(LAYERS) >= 8) return false;
-		return !ctx.canReplaceExisting() || ctx.getSide() == Direction.UP;
+	protected boolean canBeReplaced(BlockState state, BlockPlaceContext ctx) {
+		if (!ctx.getItemInHand().is(asItem()) || state.getValue(LAYERS) >= 8) return false;
+		return !ctx.replacingClickedOnBlock() || ctx.getClickedFace() == Direction.UP;
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		BlockState existing = ctx.getWorld().getBlockState(ctx.getBlockPos());
-		if (existing.isOf(this)) {
-			int n = Math.min(8, existing.get(LAYERS) + 1);
-			return placed(n == 8 ? material.base().getDefaultState() : existing.with(LAYERS, n), ctx);
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		BlockState existing = ctx.getLevel().getBlockState(ctx.getClickedPos());
+		if (existing.is(this)) {
+			int n = Math.min(8, existing.getValue(LAYERS) + 1);
+			return placed(n == 8 ? material.base().defaultBlockState() : existing.setValue(LAYERS, n), ctx);
 		}
-		return placed(getDefaultState(), ctx);
+		return placed(defaultBlockState(), ctx);
 	}
 }

@@ -5,20 +5,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.renderer.texture.atlas.SpriteResourceLoader;
+import net.minecraft.client.renderer.texture.atlas.SpriteSource;
+import net.minecraft.client.resources.metadata.animation.FrameSize;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import com.insidethecube.cubework.Cubework;
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.client.texture.SpriteDimensions;
-import net.minecraft.client.texture.SpriteOpener;
-import net.minecraft.client.texture.atlas.AtlasSource;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
 
 /**
  * Makes the metal doors' textures while the game loads: the copper door in use, repainted with the colours
@@ -26,54 +24,54 @@ import net.minecraft.util.Identifier;
  * the block's colour that is as light, among the block's pixels, as the door pixel is among the door's.
  * Sprites are cubework:{prefix}{metal}_door..., for example cubework:block/gold_door_top.
  */
-public record MetalDoorsSource(List<Identifier> textures, List<Identifier> metals, String prefix) implements AtlasSource {
-	public static final Identifier ID = Identifier.of(Cubework.ID, "metal_doors");
+public record MetalDoorsSource(List<Identifier> textures, List<Identifier> metals, String prefix) implements SpriteSource {
+	public static final Identifier ID = Identifier.fromNamespaceAndPath(Cubework.ID, "metal_doors");
 	public static final MapCodec<MetalDoorsSource> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			Identifier.CODEC.listOf().fieldOf("textures").forGetter(MetalDoorsSource::textures),
 			Identifier.CODEC.listOf().fieldOf("metals").forGetter(MetalDoorsSource::metals),
 			Codec.STRING.fieldOf("prefix").forGetter(MetalDoorsSource::prefix)).apply(i, MetalDoorsSource::new));
 
 	@Override
-	public void load(ResourceManager manager, AtlasSource.SpriteRegions regions) {
+	public void run(ResourceManager manager, SpriteSource.Output regions) {
 		for (Identifier texture : textures) {
-			Optional<Resource> door = manager.getResource(RESOURCE_FINDER.toResourcePath(texture));
+			Optional<Resource> door = manager.getResource(TEXTURE_ID_CONVERTER.idToFile(texture));
 			if (door.isEmpty()) continue;
 			String name = texture.getPath().substring(texture.getPath().lastIndexOf('/') + 1);
 			for (Identifier metalTexture : metals) {
-				Optional<Resource> metal = manager.getResource(RESOURCE_FINDER.toResourcePath(metalTexture));
+				Optional<Resource> metal = manager.getResource(TEXTURE_ID_CONVERTER.idToFile(metalTexture));
 				if (metal.isEmpty()) continue;
 				String block = metalTexture.getPath().substring(metalTexture.getPath().lastIndexOf('/') + 1);
 				String metalName = block.endsWith("_block") ? block.substring(0, block.length() - 6) : block;
-				Identifier out = Identifier.of(Cubework.ID, prefix + name.replaceFirst("^copper", metalName));
+				Identifier out = Identifier.fromNamespaceAndPath(Cubework.ID, prefix + name.replaceFirst("^copper", metalName));
 				regions.add(out, new Region(door.get(), metal.get(), out));
 			}
 		}
 	}
 
 	@Override
-	public MapCodec<? extends AtlasSource> getCodec() {
+	public MapCodec<? extends SpriteSource> codec() {
 		return CODEC;
 	}
 
-	private record Region(Resource door, Resource metal, Identifier id) implements AtlasSource.SpriteRegion {
+	private record Region(Resource door, Resource metal, Identifier id) implements SpriteSource.DiscardableLoader {
 		@Override
-		public SpriteContents load(SpriteOpener opener) {
-			try (InputStream din = door.getInputStream(); NativeImage source = NativeImage.read(din);
-					InputStream min = metal.getInputStream(); NativeImage block = NativeImage.read(min)) {
+		public SpriteContents get(SpriteResourceLoader opener) {
+			try (InputStream din = door.open(); NativeImage source = NativeImage.read(din);
+					InputStream min = metal.open(); NativeImage block = NativeImage.read(min)) {
 				int w = source.getWidth(), h = Math.min(source.getHeight(), w);
 				int[] px = new int[w * h];
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) px[y * w + x] = source.getColorArgb(x, y);
+				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) px[y * w + x] = source.getPixel(x, y);
 				int bw = block.getWidth(), bh = Math.min(block.getHeight(), bw);
 				List<Integer> palette = new ArrayList<>();
 				for (int y = 0; y < bh; y++) for (int x = 0; x < bw; x++) {
-					int c = block.getColorArgb(x, y);
+					int c = block.getPixel(x, y);
 					if ((c >>> 24) != 0) palette.add(c & 0xFFFFFF);
 				}
 				if (palette.isEmpty()) return null;
 				repaint(px, palette);
 				NativeImage out = new NativeImage(w, h, false);
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) out.setColorArgb(x, y, px[y * w + x]);
-				return new SpriteContents(id, new SpriteDimensions(w, h), out);
+				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) out.setPixel(x, y, px[y * w + x]);
+				return new SpriteContents(id, new FrameSize(w, h), out);
 			} catch (Exception e) {
 				return null;
 			}
