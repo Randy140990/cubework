@@ -33,6 +33,18 @@ def ver(s):
 SWAPS = [
     (lambda mc: mc < (1, 21, 11), r"\bIdentifier\b", "ResourceLocation"),
     (lambda mc: mc < (1, 21, 5), r"\bVegetationBlock\b", "BushBlock"),
+    # 26.1 moved the model classes and renamed Fabric's creative tab and copper registries.
+    (lambda mc: mc >= (26, 1), r"net\.minecraft\.client\.renderer\.block\.model\.BakedQuad\b", "net.minecraft.client.resources.model.geometry.BakedQuad"),
+    (lambda mc: mc >= (26, 1), r"net\.minecraft\.client\.renderer\.block\.model\.BlockStateModel\b", "net.minecraft.client.renderer.block.dispatch.BlockStateModel"),
+    (lambda mc: mc >= (26, 1), r"net\.minecraft\.client\.renderer\.block\.model\.BlockModelPart\b", "net.minecraft.client.renderer.block.dispatch.BlockModelPart"),
+    (lambda mc: mc >= (26, 1), r"\bBlockModelPart\b", "BlockStateModelPart"),
+    (lambda mc: mc >= (26, 1), r"net\.minecraft\.client\.resources\.model\.Material\b", "net.minecraft.client.resources.model.sprite.Material"),
+    (lambda mc: mc >= (26, 1), r"net\.fabricmc\.fabric\.api\.itemgroup\.v1\.FabricItemGroup\b", "net.fabricmc.fabric.api.creativetab.v1.FabricItemGroup"),
+    (lambda mc: mc >= (26, 1), r"\bFabricItemGroup\b", "FabricCreativeModeTab"),
+    (lambda mc: mc >= (26, 1), r"\bregisterOxidizableBlockPair\b", "registerNextStage"),
+    (lambda mc: mc >= (26, 1), r"\bregisterWaxableBlockPair\b", "registerWaxable"),
+    # 26.3 renamed the push reactions.
+    (lambda mc: mc >= (26, 3), r"\bPushReaction\.DESTROY\b", "PushReaction.POPPED"),
 ]
 
 

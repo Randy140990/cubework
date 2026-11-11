@@ -23,9 +23,9 @@ public final class Aging {
 		int age = material.copperAge();
 		if (age < 0 || age == 3 || random.nextFloat() >= 0.05688889F) return;
 		int same = 0, more = 0;
-		for (BlockPos p : BlockPos.withinManhattan(pos, 4, 4, 4)) {
-			if (p.distManhattan(pos) > 4) break;
-			if (p.equals(pos)) continue;
+		// Every block within 4 steps (counted along the axes); the order doesn't change the result.
+		for (BlockPos p : BlockPos.betweenClosed(pos.offset(-4, -4, -4), pos.offset(4, 4, 4))) {
+			if (p.distManhattan(pos) > 4 || p.equals(pos)) continue;
 			int a = ageOf(world.getBlockState(p).getBlock());
 			if (a < 0) continue;
 			if (a < age) return;

@@ -7,6 +7,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.client.model.geom.builders.UVPair;
 import org.joml.Vector3f;
 //#endif
+//#if MC >= 26.1
+import net.minecraft.client.resources.model.sprite.Material;
+//#endif
 
 /** Makes the game's quads (how they're stored changed in 1.21.4 and again in 1.21.11). */
 final class QuadMaker {
@@ -17,7 +20,23 @@ final class QuadMaker {
 	 * sprite), in the order they're given; tint -1 for none.
 	 */
 	static BakedQuad of(TextureAtlasSprite sprite, int tint, Direction face, double[][] p, float[][] uv) {
-		//#if MC >= 1.21.11
+		//#if MC >= 26.1
+		Vector3f[] pos = new Vector3f[4];
+		long[] packed = new long[4];
+		for (int i = 0; i < 4; i++) {
+			pos[i] = new Vector3f((float) p[i][0], (float) p[i][1], (float) p[i][2]);
+			packed[i] = UVPair.pack(sprite.getU(uv[i][0]), sprite.getV(uv[i][1]));
+		}
+		// The layer (solid, cut-out or see-through) comes from the texture itself.
+		BakedQuad.MaterialInfo info = BakedQuad.MaterialInfo.of(new Material.Baked(sprite, false), sprite.transparency(), tint,
+				//#if MC >= 26.3
+				null,
+				//#else
+				true,
+				//#endif
+				0);
+		return new BakedQuad(pos[0], pos[1], pos[2], pos[3], packed[0], packed[1], packed[2], packed[3], face, info);
+		//#elif MC >= 1.21.11
 		Vector3f[] pos = new Vector3f[4];
 		long[] packed = new long[4];
 		for (int i = 0; i < 4; i++) {

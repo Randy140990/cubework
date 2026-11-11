@@ -12,7 +12,9 @@ import com.insidethecube.cubework.block.TableBlock;
 import com.insidethecube.cubework.block.ThinLogBlock;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+//#if MC < 26.3
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
+//#endif
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.DyeColor;
@@ -75,6 +77,8 @@ public final class Extras {
 	public static final List<Block> THIN_LOGS = new ArrayList<>();
 	public static final List<Block> SIZED_PLANTS = new ArrayList<>();
 	public static final List<Block> CORAL = new ArrayList<>();
+	/** Each thin log's stripped one (an axe strips them as it strips logs). */
+	public static final java.util.Map<Block, Block> STRIPPED = new java.util.IdentityHashMap<>();
 	/** Grass, fern and bush sizes, which take the biome's grass colour. */
 	public static final List<Block> GRASSY_PLANTS = new ArrayList<>();
 	public static final List<Block> DOORS = new ArrayList<>();
@@ -127,7 +131,12 @@ public final class Extras {
 		}
 		for (String log : LOGS) {
 			if (log.equals("mushroom_stem") || !Reg.exists(log)) continue;
-			for (int w : LOG_WIDTHS) StrippableBlockRegistry.register(get(log + "_" + w), get("stripped_" + log + "_" + w));
+			for (int w : LOG_WIDTHS) {
+				STRIPPED.put(get(log + "_" + w), get("stripped_" + log + "_" + w));
+				//#if MC < 26.3
+				StrippableBlockRegistry.register(get(log + "_" + w), get("stripped_" + log + "_" + w));
+				//#endif
+			}
 		}
 	}
 

@@ -72,6 +72,25 @@ public class ThinLogBlock extends ThinPillarBlock {
 		return next.is(this) && direction.getAxis() == next.getValue(AXIS) ? ends(next, world, pos) : next;
 	}
 
+	//#if MC >= 26.3
+	/**
+	 * From 26.3 the game strips logs by data that a mod can't add to, so thin logs strip themselves when an
+	 * axe is used on them, as logs do.
+	 */
+	@Override
+	protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, net.minecraft.world.level.Level level,
+			BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+		Block stripped = com.insidethecube.cubework.Extras.STRIPPED.get(this);
+		if (stripped == null || !stack.is(net.minecraft.tags.ItemTags.AXES)) return super.useItemOn(stack, state, level, pos, player, hand, hit);
+		level.playSound(player, pos, net.minecraft.sounds.SoundEvents.AXE_STRIP.value(), net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+		if (!level.isClientSide()) {
+			level.setBlock(pos, Shared.copy(state, stripped), Block.UPDATE_ALL_IMMEDIATE);
+			stack.hurtAndBreak(1, player, hand);
+		}
+		return net.minecraft.world.InteractionResult.SUCCESS;
+	}
+	//#endif
+
 	private static BlockState ends(BlockState state, BlockGetter world, BlockPos pos) {
 		Direction t = top(state.getValue(AXIS));
 		return state.setValue(BARK_TOP, log(world.getBlockState(pos.relative(t)))).setValue(BARK_BOTTOM, log(world.getBlockState(pos.relative(t.getOpposite()))));

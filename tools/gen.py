@@ -234,7 +234,13 @@ def m(name):
     return NS + ":block/" + name
 
 
+# Vanilla textures renamed in later versions.
+TEXTURE_RENAMES = {"minecraft:block/quartz_pillar": "minecraft:block/quartz_pillar_side",
+                   "minecraft:block/purpur_pillar": "minecraft:block/purpur_pillar_side"} if MC >= (26, 2) else {}
+
+
 def model(name, parent, textures):
+    textures = {k: TEXTURE_RENAMES.get(v, v) for k, v in textures.items()}
     write(os.path.join(ASSETS, "models", "block", name + ".json"), {"parent": parent, "textures": textures})
 
 
@@ -750,8 +756,10 @@ SILK = [{"condition": "minecraft:match_tool", "predicate": {"predicates": {"mine
 
 
 def loot(name, suffix=None, silk=False):
-    entry = {"type": "minecraft:item", "name": NS + ":" + name, "functions": []}
     block_id = NS + ":" + name
+    if MC >= (26, 3):
+        return loot_26_3(name, block_id, suffix, silk)
+    entry = {"type": "minecraft:item", "name": NS + ":" + name, "functions": []}
     if suffix in ("slab", "vertical_slab"):
         prop = {"type": "double"} if suffix == "slab" else {"double": "true"}
         entry["functions"].append({"function": "minecraft:set_count", "add": False, "count": 2.0,
@@ -769,7 +777,33 @@ def loot(name, suffix=None, silk=False):
           {"type": "minecraft:block", "pools": [pool], "random_sequence": NS + ":blocks/" + name})
 
 
+def loot_26_3(name, block_id, suffix, silk):
+    """26.3's loot tables: modifiers and conditions name their type, and silk touch is a predicate of its own."""
+    mods = []
+    if suffix in ("slab", "vertical_slab"):
+        state = {"type": "double"} if suffix == "slab" else {"double": "true"}
+        mods.append({"type": "minecraft:set_count", "condition": {"type": "minecraft:match_block", "blocks": block_id, "state": state}, "count": 2})
+    if suffix in ("layer", "vertical_layer"):
+        for n in range(2, 8):
+            mods.append({"type": "minecraft:set_count", "condition": {"type": "minecraft:match_block", "blocks": block_id,
+                                                                      "state": {"layers": str(n)}}, "count": n})
+    mods.append({"type": "minecraft:explosion_decay"})
+    pool = {"rolls": 1, "entries": [{"type": "minecraft:item", "name": block_id, "modifier": mods}]}
+    if silk:
+        pool["condition"] = "minecraft:tool/can_silk_touch"
+    write(os.path.join(DATA, NS, "loot_table", "blocks", name + ".json"),
+          {"type": "minecraft:block", "pools": [pool], "random_sequence": NS + ":blocks/" + name})
+
+
 def door_loot(name):
+    if MC >= (26, 3):
+        block_id = NS + ":" + name
+        write(os.path.join(DATA, NS, "loot_table", "blocks", name + ".json"), {
+            "type": "minecraft:block", "random_sequence": NS + ":blocks/" + name,
+            "pools": [{"rolls": 1, "condition": {"type": "minecraft:survives_explosion"},
+                       "entries": [{"type": "minecraft:item", "name": block_id,
+                                    "condition": {"type": "minecraft:match_block", "blocks": block_id, "state": {"half": "lower"}}}]}]})
+        return
     write(os.path.join(DATA, NS, "loot_table", "blocks", name + ".json"), {
         "type": "minecraft:block", "random_sequence": NS + ":blocks/" + name,
         "pools": [{"bonus_rolls": 0.0, "rolls": 1.0, "conditions": [{"condition": "minecraft:survives_explosion"}],

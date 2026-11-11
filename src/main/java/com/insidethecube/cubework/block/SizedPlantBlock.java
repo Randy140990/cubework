@@ -37,10 +37,12 @@ public class SizedPlantBlock extends VegetationBlock {
 		this.shape = Block.box(8 - half, 0, 8 - half, 8 + half, Math.max(2, h), 8 + half);
 	}
 
+	//#if MC < 26.3
 	@Override
 	protected MapCodec<? extends VegetationBlock> codec() {
 		return simpleCodec(settings -> new SizedPlantBlock(Soil.DIRT, 1, settings));
 	}
+	//#endif
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
