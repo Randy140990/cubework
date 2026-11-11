@@ -1,6 +1,1 @@
-Wax
-Scrap
-Interaction
-data/minecraft/
-Oxidiz
-WeatheringCopper
+data/minecraft/block_transformer
