@@ -70,6 +70,10 @@ final class Models {
 	}
 
 	private static net.minecraft.client.resources.model.Material texture(String name) {
+		//#if MC >= 26.2
+		// 26.2 renamed the pillars' side textures.
+		if (name.equals("quartz_pillar") || name.equals("purpur_pillar")) name += "_side";
+		//#endif
 		//#if MC >= 26.1
 		return new net.minecraft.client.resources.model.Material(Identifier.withDefaultNamespace("block/" + name));
 		//#else

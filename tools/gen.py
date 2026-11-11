@@ -234,7 +234,13 @@ def m(name):
     return NS + ":block/" + name
 
 
+# Vanilla textures renamed in later versions.
+TEXTURE_RENAMES = {"minecraft:block/quartz_pillar": "minecraft:block/quartz_pillar_side",
+                   "minecraft:block/purpur_pillar": "minecraft:block/purpur_pillar_side"} if MC >= (26, 2) else {}
+
+
 def model(name, parent, textures):
+    textures = {k: TEXTURE_RENAMES.get(v, v) for k, v in textures.items()}
     write(os.path.join(ASSETS, "models", "block", name + ".json"), {"parent": parent, "textures": textures})
 
 

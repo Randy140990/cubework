@@ -1,2 +1,0 @@
-assets/minecraft/models/block/quartz_pillar.json
-assets/minecraft/models/block/purpur_pillar.json
