@@ -1,6 +1,2 @@
-Oxidizable
-Weathering
-Strippable
-Flammable
-RenderLayerMap
-ChunkSectionLayerMap
+strip
+Strip
