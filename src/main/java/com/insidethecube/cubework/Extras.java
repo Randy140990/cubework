@@ -12,7 +12,9 @@ import com.insidethecube.cubework.block.TableBlock;
 import com.insidethecube.cubework.block.ThinLogBlock;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+//#if MC < 26.3
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
+//#endif
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.DyeColor;
@@ -125,10 +127,12 @@ public final class Extras {
 				if (burns) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 5);
 			}
 		}
+		//#if MC < 26.3
 		for (String log : LOGS) {
 			if (log.equals("mushroom_stem") || !Reg.exists(log)) continue;
 			for (int w : LOG_WIDTHS) StrippableBlockRegistry.register(get(log + "_" + w), get("stripped_" + log + "_" + w));
 		}
+		//#endif
 	}
 
 	private static void plants() {

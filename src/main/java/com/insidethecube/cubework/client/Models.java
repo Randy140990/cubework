@@ -70,7 +70,11 @@ final class Models {
 	}
 
 	private static net.minecraft.client.resources.model.Material texture(String name) {
+		//#if MC >= 26.1
+		return new net.minecraft.client.resources.model.Material(Identifier.withDefaultNamespace("block/" + name));
+		//#else
 		return new net.minecraft.client.resources.model.Material(TextureAtlas.LOCATION_BLOCKS, Identifier.withDefaultNamespace("block/" + name));
+		//#endif
 	}
 
 	private static List<BakedQuad> quads(Quads q, Direction side) {
@@ -93,7 +97,11 @@ final class Models {
 		@Override
 		public BlockStateModel bake(BlockState state, ModelBaker baker) {
 			ModelDebugName named = () -> "cubework " + state;
+			//#if MC >= 26.1
+			Built built = maker.make(state, name -> baker.materials().get(texture(name), named).sprite());
+			//#else
 			Built built = maker.make(state, name -> baker.sprites().get(texture(name), named));
+			//#endif
 			return new Baked(new Part(new Quads(built.quads().sided(), List.copyOf(built.quads().free())), built.particle()));
 		}
 	}
@@ -104,10 +112,22 @@ final class Models {
 			parts.add(part);
 		}
 
+		//#if MC >= 26.1
+		@Override
+		public net.minecraft.client.resources.model.Material.Baked particleMaterial() {
+			return part.particleMaterial();
+		}
+
+		@Override
+		public int materialFlags() {
+			return part.materialFlags();
+		}
+		//#else
 		@Override
 		public TextureAtlasSprite particleIcon() {
 			return part.particle();
 		}
+		//#endif
 	}
 
 	private record Part(Quads quads, TextureAtlasSprite particle) implements BlockModelPart {
@@ -121,10 +141,26 @@ final class Models {
 			return true;
 		}
 
+		//#if MC >= 26.1
+		@Override
+		public net.minecraft.client.resources.model.Material.Baked particleMaterial() {
+			return new net.minecraft.client.resources.model.Material.Baked(particle, false);
+		}
+
+		/** Whether any quad is see-through or animated (the game asks, to sort and redraw). */
+		@Override
+		public int materialFlags() {
+			int flags = 0;
+			for (BakedQuad q : quads.free()) flags |= q.materialInfo().flags();
+			for (List<BakedQuad> side : quads.sided().values()) for (BakedQuad q : side) flags |= q.materialInfo().flags();
+			return flags;
+		}
+		//#else
 		@Override
 		public TextureAtlasSprite particleIcon() {
 			return particle;
 		}
+		//#endif
 	}
 	//#else
 	/** Before 1.21.5 a model is baked without being told its block state, so each state gets its own. */

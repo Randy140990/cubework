@@ -33,14 +33,15 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = (project.java_release as int)
+	// Java 21 class files run on every version (26.x needs Java 25 to run, which reads them fine).
+	it.options.release = 21
 	it.options.encoding = "UTF-8"
 	it.options.compilerArgs += ["-Xmaxerrs", "2000"]
 }
 
 java {
-	sourceCompatibility = JavaVersion.toVersion(project.java_release)
-	targetCompatibility = JavaVersion.toVersion(project.java_release)
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

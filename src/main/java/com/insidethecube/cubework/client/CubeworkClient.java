@@ -10,9 +10,14 @@ import com.insidethecube.cubework.Shape;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+//#if MC >= 26.1
+import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
+import net.minecraft.client.color.block.BlockTintSources;
+//#else
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.world.level.GrassColor;
+//#endif
 import net.minecraft.world.level.block.Block;
 
 public final class CubeworkClient implements ClientModInitializer {
@@ -40,8 +45,12 @@ public final class CubeworkClient implements ClientModInitializer {
 		for (Block b : Extras.DOORS) Layers.cutout(b);
 
 		// Grass shapes, grass, ferns and bushes take the biome's grass colour.
+		//#if MC >= 26.1
+		BlockColorRegistry.register(java.util.List.of(BlockTintSources.grass()), grass.toArray(new Block[0]));
+		//#else
 		ColorProviderRegistry.BLOCK.register((state, world, pos, tint) -> world != null && pos != null ? BiomeColors.getAverageGrassColor(world, pos)
 				: GrassColor.getDefaultColor(), grass.toArray(new Block[0]));
+		//#endif
 		//#if MC < 1.21.4
 		// Before 1.21.4 items take their tints from code too.
 		ColorProviderRegistry.ITEM.register((stack, tint) -> GrassColor.getDefaultColor(),
