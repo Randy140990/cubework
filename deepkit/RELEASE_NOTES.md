@@ -1,3 +1,9 @@
+Deepkit 0.1.2 for Minecraft 1.21.11 (Fabric; needs Fabric API). Lamps redone.
+
+- Lamp beams are now drawn by your game: a soft round pool of warm light thrown onto whatever the lamp points at, bright in the middle, fading at the edge and with distance, with a little spill round you. It follows your head or hand smoothly every frame (no more jumping a block at a time), looks the same with and without shaders, and you see other players' lamps too.
+- Lamps no longer put anything in the world, so gravel and sand stay put. Flares still light the area round them as before, but quietly: they never make gravel or sand fall either.
+- The headlamp is worn as a strap round the head with the lamp on the forehead, and the chest lamp as a harness with the lamp on the chest, instead of the item sitting on your head.
+
 Deepkit 0.1.1 for Minecraft 1.21.11 (Fabric; needs Fabric API). Fixes from the first test.
 
 - The headlamp and chest lamp are worn: right-click one (or put it in the helmet or chestplate slot), then press H to switch it on. Fitting one onto a helmet or chestplate in a crafting grid still works, to keep your armour.
