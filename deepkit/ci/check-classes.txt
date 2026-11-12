@@ -57,3 +57,13 @@ net.minecraft.world.level.block.state.properties.IntegerProperty
 net.minecraft.world.level.block.state.properties.EnumProperty
 net.minecraft.world.level.block.state.properties.BooleanProperty
 net.minecraft.world.item.ItemCooldowns
+net.minecraft.client.renderer.block.model.BakedQuad
+net.minecraft.client.renderer.block.model.BlockModelPart
+net.minecraft.client.renderer.block.model.BlockStateModel
+net.minecraft.client.renderer.rendertype.RenderTypes
+net.minecraft.world.item.equipment.EquipmentAssets
+net.minecraft.world.item.equipment.Equippable$Builder
+com.mojang.blaze3d.vertex.VertexConsumer
+net.minecraft.client.renderer.LightTexture
+net.minecraft.client.renderer.texture.TextureAtlasSprite
+net.minecraft.client.DeltaTracker

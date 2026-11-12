@@ -13,12 +13,18 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Light where beams land and round flares, made of invisible light blocks (BeamLightBlock). Each is lit
+ * Light round flares, made of invisible light blocks (BeamLightBlock). Each is lit
  * for a short while every time a lamp asks; once nothing asks it switches itself off. Only air and still
  * water are lit (never another block).
  */
 public final class LightPools {
 	private LightPools() {}
+
+	/**
+	 * Lights come and go without telling the blocks round them, so gravel or sand hanging over a cave never
+	 * falls because a flare lit it.
+	 */
+	static final int QUIET = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE;
 
 	/** Ticks a light stays after its last request, and how often it checks. */
 	static final int STAY = 6, CHECK = 4;
@@ -35,12 +41,12 @@ public final class LightPools {
 		strength = Math.min(15, strength);
 		BlockState s = level.getBlockState(pos);
 		if (s.getBlock() == DK.BEAM_LIGHT) {
-			if (s.getValue(BeamLightBlock.LEVEL) < strength) level.setBlock(pos, s.setValue(BeamLightBlock.LEVEL, strength), Block.UPDATE_CLIENTS);
+			if (s.getValue(BeamLightBlock.LEVEL) < strength) level.setBlock(pos, s.setValue(BeamLightBlock.LEVEL, strength), QUIET);
 		} else {
 			boolean water = s.is(Blocks.WATER) && s.getFluidState().isSource();
 			if (!s.isAir() && !water) return;
 			level.setBlock(pos, DK.BEAM_LIGHT.defaultBlockState().setValue(BeamLightBlock.LEVEL, strength).setValue(BeamLightBlock.WATERLOGGED, water),
-					Block.UPDATE_CLIENTS);
+					QUIET);
 			level.scheduleTick(pos, DK.BEAM_LIGHT, CHECK);
 		}
 		until(level).put(pos.asLong(), level.getGameTime() + STAY);

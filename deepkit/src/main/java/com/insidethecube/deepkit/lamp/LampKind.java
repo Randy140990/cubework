@@ -9,9 +9,9 @@ public enum LampKind {
 	public final String title;
 	/** Blocks. */
 	public final int range;
-	/** Degrees across (used by shader packs; the light itself is a pool where the beam lands). */
+	/** Degrees across the beam. */
 	public final int cone;
-	/** Light level where the beam lands. */
+	/** Light level (kept for shader packs; the beam is drawn by client.Beams). */
 	public final int light;
 	/** Battery, in ticks of light. */
 	public final int battery;

@@ -18,9 +18,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Every tick, for every player: lamps that are on use battery, and each lights where its beam lands. A hand
- * torch shines while it's held in either hand; a fitted lamp while its armour is worn. Below 10% the light
- * flickers.
+ * Every tick, for every player: lamps that are on use battery. A hand torch shines while it's held in either
+ * hand; a headlamp or chest lamp while it's worn (or fitted to the armour that's worn). The beam itself is
+ * drawn by each player's game (client.Beams), smoothly and without touching the world.
  */
 public final class Lamps {
 	private Lamps() {}
@@ -52,35 +52,6 @@ public final class Lamps {
 			}
 			if (d.percent() > 10 && next.percent() <= 10) p.displayClientMessage(Component.literal(d.lamp().title + ": battery low"), true);
 		}
-		if (t % 2 != 0) return;
-		boolean low = d.percent() <= 10;
-		if (low && level.getRandom().nextFloat() < 0.35f) return;
-		beam(level, p, d.lamp());
-	}
-
-	/** Lights where the beam lands, and more faintly halfway along it. */
-	private static void beam(ServerLevel level, ServerPlayer p, LampKind kind) {
-		Vec3 from = p.getEyePosition();
-		Vec3 dir;
-		if (kind == LampKind.CHEST) {
-			// The chest lamp faces where the body faces, a little down.
-			double yaw = Math.toRadians(p.yBodyRot), pitch = Math.toRadians(10);
-			dir = new Vec3(-Math.sin(yaw) * Math.cos(pitch), -Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
-			from = from.add(0, -0.45, 0);
-		} else {
-			dir = p.getViewVector(1f);
-		}
-		double range = kind.range * (p.isEyeInFluid(FluidTags.WATER) ? 2 / 3.0 : 1);
-		Vec3 end = from.add(dir.scale(range));
-		BlockHitResult hit = level.clip(new ClipContext(from, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, p));
-		double dist = range;
-		if (hit.getType() == HitResult.Type.BLOCK) {
-			LightPools.light(level, hit.getBlockPos().relative(hit.getDirection()), kind.light);
-			dist = hit.getLocation().distanceTo(from);
-		} else {
-			LightPools.light(level, BlockPos.containing(end), kind.light - 4);
-		}
-		if (dist > 6) LightPools.light(level, BlockPos.containing(from.add(dir.scale(dist / 2))), kind.light - 3);
 	}
 
 	/** The lamp key: switches the lamps fitted to the helmet and chestplate (all off if any is on, else all on). */

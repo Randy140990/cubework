@@ -31,6 +31,7 @@ public final class DeepkitClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		LAMPS = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.deepkit.lamps", InputConstants.Type.KEYSYM, 72,
 				KeyMapping.Category.register(DK.id("deepkit"))));
+		Beams.register();
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 			while (LAMPS.consumeClick()) {
 				if (mc.player != null) ClientPlayNetworking.send(new Payloads.ToggleLamps(true));

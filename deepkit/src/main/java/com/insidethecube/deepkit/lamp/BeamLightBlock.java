@@ -26,7 +26,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * The invisible light a beam (or a flare) leaves where it lands. It can't be seen, touched or targeted,
+ * The invisible light round a flare. It can't be seen, touched or targeted,
  * and takes itself away a moment after its lamp stops lighting it (see LightPools), so nothing is left in
  * the world, even after a crash: a leftover one goes the next time it's ticked.
  */
@@ -59,6 +59,10 @@ public class BeamLightBlock extends Block implements SimpleWaterloggedBlock {
 		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
+	/**
+	 * You can build into it, but it isn't "replaceable" in its properties, so falling blocks don't treat it
+	 * as empty space and gravel or sand above it stays put.
+	 */
 	@Override
 	protected boolean canBeReplaced(BlockState state, BlockPlaceContext ctx) {
 		return true;
@@ -88,6 +92,6 @@ public class BeamLightBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	private static void clear(BlockState state, ServerLevel level, BlockPos pos) {
-		level.setBlock(pos, state.getValue(WATERLOGGED) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+		level.setBlock(pos, state.getValue(WATERLOGGED) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState(), LightPools.QUIET);
 	}
 }

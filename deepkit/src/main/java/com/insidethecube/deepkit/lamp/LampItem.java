@@ -10,7 +10,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,13 +36,21 @@ public class LampItem extends Item {
 		this.kind = kind;
 	}
 
-	/** The headlamp goes in the helmet slot and the chest lamp in the chestplate slot. */
+	/**
+	 * The headlamp goes in the helmet slot and the chest lamp in the chestplate slot, and each is drawn on
+	 * the player like armour (a strap round the head with the lamp on the forehead; a harness with the lamp
+	 * on the chest; see assets/deepkit/equipment).
+	 */
 	private static Item.Properties worn(Item.Properties props, LampKind kind) {
 		return switch (kind) {
-			case HEAD -> props.equippable(EquipmentSlot.HEAD);
-			case CHEST -> props.equippable(EquipmentSlot.CHEST);
+			case HEAD -> props.component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.HEAD).setAsset(asset("headlamp")).build());
+			case CHEST -> props.component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.CHEST).setAsset(asset("chest_lamp")).build());
 			default -> props;
 		};
+	}
+
+	private static ResourceKey<EquipmentAsset> asset(String name) {
+		return ResourceKey.create(EquipmentAssets.ROOT_ID, DK.id(name));
 	}
 
 	@Override

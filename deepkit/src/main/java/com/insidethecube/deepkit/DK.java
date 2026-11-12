@@ -75,7 +75,7 @@ public final class DK {
 		BURN_UNTIL = component("burn_until", Codec.LONG, ByteBufCodecs.VAR_LONG);
 		MARK = component("mark", Codec.INT, ByteBufCodecs.VAR_INT);
 
-		BEAM_LIGHT = block("beam_light", BlockBehaviour.Properties.of().replaceable().noCollision().noOcclusion().noLootTable().instabreak()
+		BEAM_LIGHT = block("beam_light", BlockBehaviour.Properties.of().noCollision().noOcclusion().noLootTable().instabreak()
 				.randomTicks().pushReaction(PushReaction.DESTROY).lightLevel(s -> s.getValue(BeamLightBlock.LEVEL)), BeamLightBlock::new);
 		ROPE = block("rope", BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).noCollision().noOcclusion().noLootTable().strength(0.4f)
 				.sound(SoundType.WOOL).pushReaction(PushReaction.DESTROY), RopeBlock::new);

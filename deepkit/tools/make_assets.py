@@ -369,7 +369,52 @@ def data():
     write("%s/lang/en_us.json" % A, names)
     write("%s/lang/en_gb.json" % A, names)
 
+# ---------- worn lamps (drawn like armour) ----------
+def equipment():
+    """The headlamp and chest lamp on a player: 64 x 32 armour-layer textures (the game's helmet and
+    chestplate layout), a strap round the head with the lamp on the forehead, and a harness with the lamp
+    on the chest."""
+    STRAP, STRAP_D, BUCKLE = LEATHER, LEATHER_D, IRON
+    def lamp(im, x, y):
+        # A 4 x 4 copper housing with a 2 x 2 lens.
+        for i in range(4):
+            for j in range(4):
+                edge = i in (0, 3) or j in (0, 3)
+                im.putpixel((x + i, y + j), COPPER_D if edge else COPPER)
+        im.putpixel((x + 1, y + 1), LENS_L); im.putpixel((x + 2, y + 1), LENS)
+        im.putpixel((x + 1, y + 2), LENS); im.putpixel((x + 2, y + 2), LENS)
+        im.putpixel((x + 1, y), COPPER_L); im.putpixel((x + 2, y), COPPER_L)
+
+    head = Image.new("RGBA", (64, 32), (0, 0, 0, 0))
+    # Head: right side x0-7, front x8-15, left side x16-23, back x24-31 (rows 8-15); top x8-15 (rows 0-7).
+    for x in range(0, 32):
+        head.putpixel((x, 9), STRAP)
+        head.putpixel((x, 10), STRAP_D)
+    for y in range(0, 8):
+        head.putpixel((11, y), STRAP)
+        head.putpixel((12, y), STRAP_D)
+    head.putpixel((27, 9), BUCKLE); head.putpixel((28, 9), BUCKLE); head.putpixel((27, 10), BUCKLE); head.putpixel((28, 10), BUCKLE)
+    lamp(head, 10, 8)
+    png(A + "/textures/entity/equipment/humanoid/headlamp.png", head)
+    write(A + "/equipment/headlamp.json", {"layers": {"humanoid": [{"texture": "deepkit:headlamp"}]}})
+
+    chest = Image.new("RGBA", (64, 32), (0, 0, 0, 0))
+    # Body: top x20-27 (rows 16-19), right side x16-19, front x20-27, left side x28-31, back x32-39 (rows 20-31).
+    for y in range(16, 32):
+        for x in (21, 26):
+            chest.putpixel((x, y), STRAP)
+        if y >= 20:
+            for x in (33, 38):
+                chest.putpixel((x, y), STRAP)
+    for x in range(16, 40):
+        chest.putpixel((x, 27), STRAP_D)
+    chest.putpixel((23, 27), BUCKLE); chest.putpixel((24, 27), BUCKLE)
+    lamp(chest, 22, 21)
+    png(A + "/textures/entity/equipment/humanoid/chest_lamp.png", chest)
+    write(A + "/equipment/chest_lamp.json", {"layers": {"humanoid": [{"texture": "deepkit:chest_lamp"}]}})
+
 items()
+equipment()
 blocks()
 models()
 data()
