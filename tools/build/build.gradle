@@ -10,11 +10,21 @@ base {
 	archivesName = project.archives_base_name
 }
 
+repositories {
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+		content {
+			includeGroup "maven.modrinth"
+		}
+	}
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 @MAPPINGS@	@MOD@ "net.fabricmc:fabric-loader:${project.loader_version}"
 	@MOD@ "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-}
+@CONTINUITY@}
 
 loom {
 	mods {

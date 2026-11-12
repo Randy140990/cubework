@@ -32,7 +32,16 @@ def main():
     meta = get("https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml").decode()
     versions = [v for v in re.findall(r"<version>([^<]+)</version>", meta) if v.endswith("+" + mc)]
     open(os.path.join(out, "fabric-api.txt"), "w").write(versions[-1] if versions else "")
-    print(mc, len(blocks), "blocks; Fabric API", versions[-1] if versions else "none")
+    # Continuity (connected textures), compiled against for Cubework's compatibility mixins, from Modrinth's maven.
+    cont = ""
+    try:
+        cmeta = get("https://api.modrinth.com/maven/maven/modrinth/continuity/maven-metadata.xml").decode()
+        found = [v for v in re.findall(r"<version>([^<]+)</version>", cmeta) if v.endswith("+" + mc) or v.endswith("+mc" + mc)]
+        cont = found[-1] if found else ""
+    except Exception as e:
+        print("Continuity lookup failed:", e)
+    open(os.path.join(out, "continuity.txt"), "w").write(cont)
+    print(mc, len(blocks), "blocks; Fabric API", versions[-1] if versions else "none", "; Continuity", cont or "none")
 
 
 if __name__ == "__main__":
