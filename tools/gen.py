@@ -82,6 +82,9 @@ STEMS = {"stone_bricks": "stone_brick", "cracked_stone_bricks": "cracked_stone_b
 
 
 def stem(mat):
+    if mat in PATTERN_OF:
+        p, src = PATTERN_OF[mat]
+        return p + "_" + STEMS.get(src, src)
     return STEMS.get(mat, mat)
 
 
@@ -90,8 +93,28 @@ def is_building(mat):
 
 
 def full_model(mat):
-    """The vanilla full block's model (waxed copper uses unwaxed copper's)."""
+    """The vanilla full block's model (waxed copper uses unwaxed copper's; patterns their own)."""
+    if mat in PATTERN_OF:
+        return m(mat)
     return "minecraft:block/" + (mat[6:] if mat.startswith("waxed_") else mat)
+
+
+def vanilla_of(mat):
+    """The vanilla block a material is made from (a pattern's is the block it's drawn on)."""
+    return PATTERN_OF[mat][1] if mat in PATTERN_OF else mat
+
+
+# Patterns laid over a block's own texture (made in the game, see client/Patterns.java), as Material.java.
+PATTERNS = [("tiled", "Tiled"), ("checkered", "Checkered"), ("herringbone", "Herringbone"), ("bordered", "Bordered")]
+PATTERN_SOURCES = ["stone", "smooth_stone", "cobblestone", "stone_bricks", "mossy_stone_bricks", "granite", "polished_granite", "diorite",
+                   "polished_diorite", "andesite", "polished_andesite", "cobbled_deepslate", "polished_deepslate", "deepslate_bricks",
+                   "deepslate_tiles", "tuff", "polished_tuff", "tuff_bricks", "calcite", "dripstone_block", "bricks", "mud_bricks", "packed_mud",
+                   "resin_bricks", "smooth_sandstone", "smooth_red_sandstone", "prismarine", "prismarine_bricks", "dark_prismarine",
+                   "nether_bricks", "red_nether_bricks", "smooth_basalt", "polished_blackstone", "polished_blackstone_bricks", "end_stone",
+                   "end_stone_bricks", "purpur_block", "quartz_bricks", "smooth_quartz", "obsidian", "iron_block", "gold_block", "emerald_block",
+                   "lapis_block", "diamond_block", "netherite_block", "amethyst_block", "terracotta"] + \
+                  ["%s_terracotta" % c for c in COLOURS] + ["%s_concrete" % c for c in COLOURS] + ["%s_wool" % c for c in COLOURS]
+PATTERN_OF = {p + "_" + src: (p, src) for src in PATTERN_SOURCES for p, _ in PATTERNS}
 
 
 # (id, kind), in the same order as Material.java
@@ -99,7 +122,8 @@ MATERIALS = [(c + "_wool", "wool") for c in COLOURS] + [("terracotta", "terracot
             [(c + "_terracotta", "terracotta") for c in COLOURS] + [(c + "_concrete", "concrete") for c in COLOURS] + \
             [(c + "_concrete_powder", "powder") for c in COLOURS] + [(c + "_glazed_terracotta", "glazed") for c in COLOURS] + \
             [("glass", "glass"), ("tinted_glass", "glass")] + [(c + "_stained_glass", "glass") for c in COLOURS] + \
-            [(n, "nature") for n in NATURE] + [(b, "building") for b in BUILDING if b not in NATURE]
+            [(n, "nature") for n in NATURE] + [(b, "building") for b in BUILDING if b not in NATURE] + \
+            [(p + "_" + src, "pattern") for src in PATTERN_SOURCES for p, _ in PATTERNS]
 
 # top, side, bottom, overlay (as Material.java)
 TEXTURES = {
@@ -139,12 +163,18 @@ TEXTURES = {
 SHAPES = [("stairs", "Stairs", 1), ("slab", "Slab", 2), ("quarter_slab", "Quarter Slab", 4), ("vertical_slab", "Vertical Slab", 2),
           ("slope", "Slope", 2), ("slope_2", "Slope (1 in 2)", 2), ("slope_3", "Slope (1 in 3)", 2), ("gentle_slope", "Slope (1 in 4)", 2), ("layer", "Layer", 8), ("vertical_layer", "Vertical Layer", 8),
           ("carpet", "Carpet", 4), ("panel", "Panel", 4), ("post", "Post", 4), ("pillar_12", "(12 px)", 1), ("pillar_8", "(8 px)", 2),
-          ("pillar_4", "(4 px)", 4), ("arch", "Arch", 1), ("arch_corner", "Arch Corner", 1),
+          ("pillar_4", "(4 px)", 4), ("round_column_16", "Round Column (16 px)", 1), ("round_column_12", "Round Column (12 px)", 2),
+          ("round_column_8", "Round Column (8 px)", 4), ("corner_post", "Corner Post", 4), ("arch", "Arch", 1), ("arch_corner", "Arch Corner", 1),
+          ("round_corner", "Round Corner", 1), ("round_corner_inner", "Inner Round Corner", 4),
           ("wall", "Wall", 1), ("fence", "Fence", 1), ("fence_gate", "Fence Gate", 1),
           ("trapdoor", "Trapdoor", 1), ("button", "Button", 4), ("pressure_plate", "Pressure Plate", 2)] + \
          [("window_frame_%d" % d, "Window Frame (%d px)" % d, c) for d, c in ((4, 4), (8, 2), (12, 1), (16, 1))] + \
          [("diamond_window_frame_%d" % d, "Diamond Window Frame (%d px)" % d, c) for d, c in ((4, 4), (8, 2), (12, 1), (16, 1))]
-NATURE_SHAPES = {"slab", "vertical_slab", "slope", "layer", "vertical_layer", "carpet"}
+NATURE_SHAPES = {"stairs", "slab", "quarter_slab", "vertical_slab", "slope", "slope_2", "slope_3", "gentle_slope", "layer", "vertical_layer", "carpet"}
+# Natural blocks that are building blocks too (stone, sandstone...) keep the building versions of these.
+NEW_NATURE = {"stairs", "quarter_slab", "slope_2", "slope_3", "gentle_slope"}
+PATTERN_SHAPES = {"stairs", "slab", "quarter_slab", "vertical_slab", "slope", "layer", "vertical_layer", "carpet", "panel"}
+COLUMN_WIDTHS = [16, 12, 8]
 # Gentle slopes, quarter slabs, arches and window frames: wool, terracotta and concrete for now.
 CASTLE_SHAPES = {"quarter_slab", "slope_2", "slope_3", "gentle_slope", "arch", "arch_corner"} | {"%swindow_frame_%d" % (p, d) for p in ("", "diamond_") for d in (4, 8, 12, 16)}
 WINDOW_DEPTHS = [4, 8, 12, 16]
@@ -173,7 +203,8 @@ METAL_DOORS = [("iron", "iron_block", "iron_ingot"), ("gold", "gold_block", "gol
 DOOR_WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "pale_oak", "bamboo", "crimson",
               "warped"]
 
-TABS = [("colours", "Colours"), ("building", "Building"), ("nature", "Nature"), ("plants", "Plants"), ("doors", "Doors"), ("tables", "Tables")]
+TABS = [("colours", "Colours"), ("building", "Building"), ("nature", "Nature"), ("plants", "Plants"), ("doors", "Doors"), ("tables", "Tables"),
+        ("patterns", "Patterns")]
 
 HORIZONTAL = ["north", "east", "south", "west"]
 Y_FROM_NORTH = {"north": 0, "east": 90, "south": 180, "west": 270}
@@ -191,18 +222,23 @@ VANILLA_NEEDS = {tier: load_list("vanilla_needs_%s.json" % tier) for tier in ("s
 
 
 def applies(mat, kind, suffix):
+    if kind == "pattern":
+        return suffix in PATTERN_SHAPES
     if suffix.startswith("pillar_"):
         return is_building(mat)
     if is_building(mat):
         return True
     if kind == "nature":
         return suffix in NATURE_SHAPES
-    if suffix in CASTLE_SHAPES and kind not in ("wool", "terracotta", "concrete"):
-        return False
     return not (suffix == "carpet" and kind == "wool")
 
 
 def textures_of(mat):
+    if mat in PATTERN_OF:
+        p, src = PATTERN_OF[mat]
+        t = TEXTURES.get(src, (src, src, src, None))
+        at = NS + ":block/pattern/" + p + "/"
+        return {"top": at + t[0], "side": at + t[1], "bottom": at + t[2], "overlay": None}
     if mat.startswith("waxed_"):
         mat = mat[6:]
     t = TEXTURES.get(mat, (mat, mat, mat, None))
@@ -355,6 +391,17 @@ def shape_templates(anchored, grass, top):
     template("template_carpet" + sfx, [([0, 0, 0], [16, 1, 16])], 1, anchored, grass, THIN_DISPLAY)
     template("template_panel" + sfx, [([0, 0, 0], [16, top, 1])], top, anchored, grass)
     template("template_post" + sfx, [([5, 0, 5], [11, top, 11])], top, anchored, grass)
+    # Stairs (rising east, like vanilla's), in boxes whose side textures hang from their own tops, so a
+    # grass edge runs along each step.
+    template("template_stairs" + sfx, [([0, 0, 0], [8, half, 16]), ([8, 0, 0], [16, top, 16])], top, anchored, grass, STAIRS_DISPLAY)
+    template("template_inner_stairs" + sfx, [([8, 0, 0], [16, top, 16]), ([0, 0, 8], [8, top, 16]), ([0, 0, 0], [8, half, 8])], top, anchored, grass)
+    template("template_outer_stairs" + sfx, [([8, 0, 8], [16, top, 16]), ([0, 0, 0], [16, half, 8]), ([0, 0, 8], [8, half, 16])], top, anchored, grass)
+    template("template_quarter_slab" + sfx, [([0, 0, 0], [16, 4, 16])], 4, anchored, grass)
+    template("template_quarter_slab_top" + sfx, [([0, top - 4, 0], [16, top, 16])], top, anchored, grass)
+    for n in (2, 3, 4):
+        step = top / n
+        template("template_slope_%d_item%s" % (n, sfx), [([2 * k, 0, 0], [2 * k + 2, round(step + (k + 1) * step / 8, 4), 16]) for k in range(8)],
+                 round(2 * step, 4), anchored, grass, STAIRS_DISPLAY)
     # The slope in the hand and the inventory: eight steps rising east, so it faces like vanilla stairs.
     template("template_slope_item" + sfx, [([2 * k, 0, 0], [2 * k + 2, (2 * k + 2) * top / 16, 16]) for k in range(8)], top, anchored,
              grass, STAIRS_DISPLAY)
@@ -496,7 +543,34 @@ def castle_templates():
             template("template_%swindow_%d_inventory" % ("diamond_" if diamond else "", d), boxes)
 
 
+def round_templates():
+    """Item models for the round shapes (placed ones are drawn smooth in code), and the corner post."""
+    for d in COLUMN_WIDTHS:
+        h = d / 2
+        a, b = round(h * 0.414, 3), round(h * 0.707, 3)
+        boxes = [([8 - h, 0, 8 - a], [8 + h, 16, 8 + a]), ([8 - a, 0, 8 - h], [8 + a, 16, 8 + h]), ([8 - b, 0, 8 - b], [8 + b, 16, 8 + b])]
+        template("template_round_column_%d" % d, [([round(f[0], 3), f[1], round(f[2], 3)], [round(t[0], 3), t[1], round(t[2], 3)]) for f, t in boxes])
+    # Facing north: the north-east corner (as Corners.java).
+    for inner in (False, True):
+        boxes = []
+        for z in range(16):
+            start = None
+            for x in range(17):
+                if x < 16:
+                    px, pz = (x + 0.5) / 16, (z + 0.5) / 16
+                    solid = ((px - 0) ** 2 + (pz - 1) ** 2 >= 1) if inner else ((px - 1) ** 2 + pz ** 2 <= 1)
+                else:
+                    solid = False
+                if solid and start is None: start = x
+                if not solid and start is not None:
+                    boxes.append(([start, 0, z], [x, 16, z + 1]))
+                    start = None
+        template("template_round_corner%s" % ("_inner" if inner else ""), boxes)
+    template("template_corner_post", [([8, 0, 0], [16, 16, 8])])
+
+
 def templates():
+    round_templates()
     castle_templates()
     shape_templates(False, False, 16)
     for grass in (False, True):
@@ -520,6 +594,14 @@ def shape_textures(mat, kind):
 
 
 def stairs(mat, kind, name):
+    if kind == "nature":
+        t, sfx = shape_textures(mat, kind)
+        model(name, m("template_stairs" + sfx), t)
+        model(name + "_inner", m("template_inner_stairs" + sfx), t)
+        model(name + "_outer", m("template_outer_stairs" + sfx), t)
+        blockstate(name, from_template("stairs", {"straight": m(name), "inner": m(name + "_inner"), "outer": m(name + "_outer")}))
+        item(name, m(name), mat == "grass_block")
+        return
     t = faces(mat)
     model(name, "minecraft:block/stairs", t)
     model(name + "_inner", "minecraft:block/inner_stairs", t)
@@ -669,18 +751,37 @@ def pressure_plate(mat, kind, name):
 
 
 def quarter_slab(mat, kind, name):
-    t, _ = shape_textures(mat, kind)
-    model(name, m("template_quarter_slab"), t)
-    model(name + "_top", m("template_quarter_slab_top"), t)
+    t, sfx = shape_textures(mat, kind)
+    model(name, m("template_quarter_slab" + sfx), t)
+    model(name + "_top", m("template_quarter_slab_top" + sfx), t)
     blockstate(name, {"variants": {"half=bottom": {"model": m(name)}, "half=top": {"model": m(name + "_top")}}})
-    item(name, m(name))
+    item(name, m(name), mat == "grass_block")
 
 
 def gentle_slope(mat, kind, name, n=4):
     # Placed slopes are built in code (SlopeModel); this one is for the item.
-    t, _ = shape_textures(mat, kind)
-    model(name + "_item", m("template_slope_%d_item" % n), t)
+    t, sfx = shape_textures(mat, kind)
+    model(name + "_item", m("template_slope_%d_item%s" % (n, sfx)), t)
+    item(name, m(name + "_item"), mat == "grass_block")
+
+
+def round_column(mat, kind, name, d):
+    # Placed columns are drawn round in code (RoundModel); this one is for the item.
+    model(name + "_item", m("template_round_column_%d" % d), faces(mat))
     item(name, m(name + "_item"))
+
+
+def round_corner(mat, kind, name, inner=False):
+    # Placed corners are drawn round in code (RoundModel); this stepped one is for the item.
+    model(name + "_item", m("template_round_corner" + ("_inner" if inner else "")), faces(mat))
+    item(name, m(name + "_item"))
+
+
+def corner_post(mat, kind, name):
+    model(name, m("template_corner_post"), faces(mat))
+    blockstate(name, {"variants": {"facing=%s,waterlogged=%s" % (d, w): dict({"model": m(name)}, **({"y": Y_FROM_NORTH[d]} if Y_FROM_NORTH[d] else {}))
+                                   for d in HORIZONTAL for w in ("false", "true")}})
+    item(name, m(name))
 
 
 def arch(mat, kind, name):
@@ -741,7 +842,11 @@ BUILDERS = {"stairs": stairs, "slab": slab, "vertical_slab": vertical_slab, "slo
             "vertical_layer": vertical_layer, "carpet": carpet, "panel": panel, "post": post, "wall": wall,
             "fence": fence, "fence_gate": fence_gate, "trapdoor": trapdoor, "button": button, "pressure_plate": pressure_plate,
             "quarter_slab": quarter_slab, "gentle_slope": gentle_slope, "arch": arch, "arch_corner": arch_corner,
-            "slope_2": lambda mat, kind, name: gentle_slope(mat, kind, name, 2), "slope_3": lambda mat, kind, name: gentle_slope(mat, kind, name, 3)}
+            "slope_2": lambda mat, kind, name: gentle_slope(mat, kind, name, 2), "slope_3": lambda mat, kind, name: gentle_slope(mat, kind, name, 3),
+            "corner_post": corner_post, "round_corner": round_corner,
+            "round_corner_inner": lambda mat, kind, name: round_corner(mat, kind, name, True)}
+for _d in COLUMN_WIDTHS:
+    BUILDERS["round_column_%d" % _d] = (lambda d: lambda mat, kind, name: round_column(mat, kind, name, d))(_d)
 for _w in PILLAR_WIDTHS:
     BUILDERS["pillar_%d" % _w] = (lambda w: lambda mat, kind, name: pillar(mat, kind, name, w))(_w)
 for _d in WINDOW_DEPTHS:
@@ -811,9 +916,35 @@ def door_loot(name):
                        {"condition": "minecraft:block_state_property", "block": NS + ":" + name, "properties": {"half": "lower"}}]}]}]})
 
 
-def stonecutting(source, name, count):
+def stonecutting(source, name, count, result_ns=NS):
+    """A stonecutter recipe; patterns (and their shapes) are cut from Cubework's patterned blocks."""
+    src_id = (NS if source in PATTERN_OF else "minecraft") + ":" + source
     write(os.path.join(DATA, NS, "recipe", name + "_from_" + source + "_stonecutting.json"),
-          {"type": "minecraft:stonecutting", "ingredient": ing("minecraft:" + source), "result": {"id": NS + ":" + name, "count": count}})
+          {"type": "minecraft:stonecutting", "ingredient": ing(src_id), "result": {"id": result_ns + ":" + name, "count": count}})
+
+
+def pattern_blocks(add_name, tags):
+    """The patterned full blocks: cut from the block in the stonecutter (and back), behaving like it."""
+    for src in PATTERN_SOURCES:
+        if not exists(src):
+            continue
+        for p, english in PATTERNS:
+            name = p + "_" + src
+            t = textures_of(name)
+            model(name, "minecraft:block/cube", {"particle": t["side"], "down": t["bottom"], "up": t["top"], "north": t["side"],
+                                                 "south": t["side"], "east": t["side"], "west": t["side"]})
+            blockstate(name, {"variants": {"": {"model": m(name)}}})
+            item(name, m(name))
+            loot(name)
+            stonecutting(src, name, 1)
+            stonecutting(name, src, 1, "minecraft")
+            vid = "minecraft:" + src
+            if vid in VANILLA_PICKAXE or src.endswith("_terracotta") or src.endswith("_concrete") or src == "terracotta":
+                tags["mineable/pickaxe"].append(NS + ":" + name)
+            for tier, blocks in VANILLA_NEEDS.items():
+                if vid in blocks:
+                    tags["needs_%s_tool" % tier].append(NS + ":" + name)
+            add_name(name, lambda g, e=english, s=src: e + " " + title(s, g))
 
 
 def title(words, grey):
@@ -936,6 +1067,9 @@ def doors(add_name, tags):
         {"type": NS + ":door_colours", "prefix": "block/", "metal": True, "textures": ["minecraft:block/iron_door_top", "minecraft:block/iron_door_bottom"]},
         {"type": NS + ":metal_doors", "prefix": "block/", "textures": ["minecraft:block/copper_door_top", "minecraft:block/copper_door_bottom"],
          "metals": ["minecraft:block/" + b for _, b, _ in METAL_DOORS]}]
+    # The patterned blocks' textures, made from the textures in use.
+    pattern_textures = sorted({textures_of(src)[f] for src in PATTERN_SOURCES if exists(src) for f in ("top", "side", "bottom")})
+    block_sources.append({"type": NS + ":patterns", "textures": pattern_textures, "patterns": [p for p, _ in PATTERNS]})
     item_sources = [
         {"type": NS + ":door_colours", "prefix": "item/", "textures": ["minecraft:item/%s_door" % w for w in DOOR_WOODS]},
         {"type": NS + ":door_colours", "prefix": "item/", "metal": True, "textures": ["minecraft:item/iron_door"]},
@@ -1042,7 +1176,7 @@ def cube_icon():
 def main():
     # Leave out blocks this Minecraft version doesn't have.
     global MATERIALS, LOGS, LOW_PLANTS, PLANTS, DOOR_WOODS, TABLE_TOPS
-    MATERIALS = [(mat, kind) for mat, kind in MATERIALS if exists(mat)]
+    MATERIALS = [(mat, kind) for mat, kind in MATERIALS if exists(vanilla_of(mat))]
     LOGS = [log for log in LOGS if exists(log)]
     LOW_PLANTS = [p for p in LOW_PLANTS if exists(p)]
     PLANTS = [p for p in PLANTS if exists(p)]
@@ -1072,13 +1206,15 @@ def main():
                 continue
             name = "%s_%s" % (mat, suffix[7:]) if suffix.startswith("pillar_") else stem(mat) + "_" + suffix
             # A natural block's building shapes are made like any building block's.
-            BUILDERS[suffix](mat, "building" if kind == "nature" and suffix not in NATURE_SHAPES else kind, name)
+            as_building = kind == "nature" and (suffix not in NATURE_SHAPES or (is_building(mat) and suffix in NEW_NATURE))
+            BUILDERS[suffix](mat, "building" if as_building else kind, name)
             loot(name, suffix, silk=kind == "glass" or mat == "ice" or mat == "packed_ice" or mat == "blue_ice")
             stonecutting(mat, name, cut)
             if suffix in tag_of:
                 tags[tag_of[suffix]].append(NS + ":" + name)
-            vid = "minecraft:" + mat
-            if kind in ("terracotta", "concrete", "glazed") or (kind in ("nature", "building") and vid in VANILLA_PICKAXE):
+            vid = "minecraft:" + vanilla_of(mat)
+            src_kind = next((k for mt, k in MATERIALS if mt == vanilla_of(mat)), kind) if kind == "pattern" else kind
+            if src_kind in ("terracotta", "concrete", "glazed") or (src_kind in ("nature", "building", "pattern") and vid in VANILLA_PICKAXE):
                 tags["mineable/pickaxe"].append(NS + ":" + name)
             for tier, blocks in VANILLA_NEEDS.items():
                 if vid in blocks:
@@ -1092,6 +1228,7 @@ def main():
             else:
                 add_name(name, lambda g, mt=mat, sn=shape_name: title(stem(mt), g) + " " + sn)
             count += 1
+    pattern_blocks(add_name, tags)
     thin_logs(add_name, tags)
     plants(add_name)
     coral(add_name)

@@ -20,6 +20,10 @@ import com.insidethecube.cubework.block.ArchCornerBlock;
 import com.insidethecube.cubework.block.GentleSlopeBlock;
 import com.insidethecube.cubework.block.QuarterSlabBlock;
 import com.insidethecube.cubework.block.WindowFrameBlock;
+import com.insidethecube.cubework.block.CornerPostBlock;
+import com.insidethecube.cubework.block.PatternBlock;
+import com.insidethecube.cubework.block.RoundColumnBlock;
+import com.insidethecube.cubework.block.RoundCornerBlock;
 import com.insidethecube.cubework.block.LayerBlock;
 import com.insidethecube.cubework.block.PanelBlock;
 import com.insidethecube.cubework.block.PostBlock;
@@ -52,10 +56,27 @@ public final class CwBlocks {
 	/** The vanilla blocks, back to their material (for glass faces that meet). */
 	private static final Map<Block, Material> BASES = new IdentityHashMap<>();
 
+	/** The patterned full blocks, in the order of Material.ALL. */
+	public static final java.util.List<Block> PATTERN_BLOCKS = new java.util.ArrayList<>();
+
 	public static void register() {
 		for (Material m : Material.ALL) {
 			if (!m.exists()) continue;
-			Block base = m.base();
+			Block base;
+			if (m.patterned()) {
+				// A patterned block of its own, made like the block it's drawn on.
+				Block vanilla = m.vanillaBlock();
+				BlockState def = vanilla.defaultBlockState();
+				MapColor colour = def.getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+				int light = def.getLightEmission();
+				base = block(m.id(), BlockBehaviour.Properties.ofFullCopy(vanilla).mapColor(colour).lightLevel(state -> light),
+						set -> new PatternBlock(m, set));
+				item(m.id(), base);
+				PATTERN_BLOCKS.add(base);
+				if (m.source().endsWith("_wool")) FlammableBlockRegistry.getDefaultInstance().add(base, 30, 60);
+			} else {
+				base = m.base();
+			}
 			BASES.put(base, m);
 			Map<Shape, Block> shapes = new EnumMap<>(Shape.class);
 			for (Shape s : Shape.values()) {
@@ -65,7 +86,7 @@ public final class CwBlocks {
 				INFO.put(b, new Info(m, s));
 				item(m.idOf(s), b);
 				// Wool shapes catch fire and burn away like wool; coal shapes burn like coal blocks.
-				if (m.kind() == Material.Kind.WOOL) FlammableBlockRegistry.getDefaultInstance().add(b, 30, 60);
+				if (m.kind() == Material.Kind.WOOL || (m.patterned() && m.source().endsWith("_wool"))) FlammableBlockRegistry.getDefaultInstance().add(b, 30, 60);
 				if (m.id().equals("coal_block")) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 5);
 			}
 			BY_MATERIAL.put(m, shapes);
@@ -83,11 +104,13 @@ public final class CwBlocks {
 
 	private static BlockBehaviour.Properties settings(Material m, Block base, Shape s) {
 		// Map colour and light are fixed from the vanilla block, since some vanilla blocks work them out
-		// from properties our shapes don't have (a log's axis, redstone ore being lit).
-		BlockState def = base.defaultBlockState();
+		// from properties our shapes don't have (a log's axis, redstone ore being lit). Patterns copy the
+		// vanilla block they're drawn on.
+		Block vanilla = m.patterned() ? m.vanillaBlock() : base;
+		BlockState def = vanilla.defaultBlockState();
 		MapColor colour = def.getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
 		int light = def.getLightEmission();
-		BlockBehaviour.Properties set = BlockBehaviour.Properties.ofFullCopy(base).mapColor(colour).lightLevel(state -> light);
+		BlockBehaviour.Properties set = BlockBehaviour.Properties.ofFullCopy(vanilla).mapColor(colour).lightLevel(state -> light);
 		// Copper that can still weather gets random ticks (vanilla copper decides this in code, so it isn't copied).
 		if (m.copperAge() >= 0 && m.copperAge() < 3) set.randomTicks();
 		return switch (s) {
@@ -128,6 +151,10 @@ public final class CwBlocks {
 			case ARCH_CORNER -> set -> new ArchCornerBlock(m, set);
 			case WINDOW_4, WINDOW_8, WINDOW_12, WINDOW_16, DIAMOND_WINDOW_4, DIAMOND_WINDOW_8, DIAMOND_WINDOW_12, DIAMOND_WINDOW_16 ->
 					set -> new WindowFrameBlock(m, s.windowDepth(), s.diamond(), set);
+			case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8 -> set -> new RoundColumnBlock(m, s.columnWidth(), set);
+			case CORNER_POST -> set -> new CornerPostBlock(m, set);
+			case ROUND_CORNER -> set -> new RoundCornerBlock(m, false, set);
+			case ROUND_CORNER_INNER -> set -> new RoundCornerBlock(m, true, set);
 		};
 	}
 

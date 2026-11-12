@@ -135,6 +135,8 @@ def main():
     mod = json.load(open(os.path.join(res, "fabric.mod.json")))
     mod["depends"]["minecraft"] = target["range"]
     mod["depends"]["java"] = ">=%d" % target["java"]
+    if not continuity:
+        mod["mixins"] = [x for x in mod["mixins"] if "continuity" not in str(x)]
     json.dump(mod, open(os.path.join(res, "fabric.mod.json"), "w"), indent=2)
 
     # Build files.

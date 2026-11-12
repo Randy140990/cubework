@@ -29,9 +29,9 @@ public final class Cubework implements ModInitializer {
 		Extras.register();
 		CUBE = Reg.item("cube", Item::new);
 
-		// Six tabs, so there's little paging: coloured blocks, building blocks, natural blocks, plants, doors and tables.
+		// Seven tabs: coloured blocks, building blocks, natural blocks, plants, doors, tables and patterns.
 		tab("colours", () -> new ItemStack(CUBE), add -> {
-			for (Material m : Material.ALL) if (!m.nature() && !m.building()) shapes(m, add, false);
+			for (Material m : Material.ALL) if (!m.nature() && !m.building() && !m.patterned()) shapes(m, add, false);
 		});
 		tab("building", () -> new ItemStack(item("stone_brick_slope")), add -> {
 			for (String id : Material.BUILDING) shapes(Material.byId(id), add, false);
@@ -46,6 +46,13 @@ public final class Cubework implements ModInitializer {
 		});
 		tab("doors", () -> new ItemStack(item("light_blue_mangrove_door")), add -> Extras.DOORS.forEach(add));
 		tab("tables", () -> new ItemStack(item("cyan_glazed_terracotta_table")), add -> Extras.TABLES.forEach(add));
+		tab("patterns", () -> new ItemStack(item("herringbone_stone_bricks")), add -> {
+			for (Material m : Material.ALL) {
+				if (!m.patterned() || CwBlocks.shapesOf(m).isEmpty()) continue;
+				add.accept(m.base());
+				shapes(m, add, false);
+			}
+		});
 	}
 
 	/** One material's shapes, always in the same order (in the Nature tab, only the land-shaping ones). */

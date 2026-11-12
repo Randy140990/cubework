@@ -31,6 +31,12 @@ public final class CubeworkClient implements ClientModInitializer {
 		DoorColoursSource.TYPE = Atlas.register(DoorColoursSource.ID, DoorColoursSource.CODEC);
 		MetalDoorsSource.TYPE = Atlas.register(MetalDoorsSource.ID, MetalDoorsSource.CODEC);
 		//#endif
+		//#if MC >= 1.21.5
+		Atlas.register(PatternSource.ID, PatternSource.CODEC);
+		//#else
+		PatternSource.TYPE = Atlas.register(PatternSource.ID, PatternSource.CODEC);
+		//#endif
+		com.insidethecube.cubework.ShaderMaps.painter = PatternMaps::make;
 
 		List<Block> grass = new ArrayList<>(Extras.GRASSY_PLANTS);
 		for (Material m : Material.ALL) {
@@ -57,14 +63,20 @@ public final class CubeworkClient implements ClientModInitializer {
 				grass.stream().map(Block::asItem).toArray(net.minecraft.world.level.ItemLike[]::new));
 		//#endif
 
-		// Slopes and arches have their own models, built from the vanilla block's textures.
+		// Slopes, arches and round shapes have their own models, built from the vanilla block's textures.
 		ModelLoadingPlugin.register(ctx -> {
 			for (Material m : Material.ALL) {
-				for (Shape shape : new Shape[] {Shape.SLOPE, Shape.SLOPE_2, Shape.SLOPE_3, Shape.GENTLE_SLOPE, Shape.ARCH, Shape.ARCH_CORNER}) {
+				for (Shape shape : Shape.values()) {
+					if (!shape.drawnInCode()) continue;
 					Block block = CwBlocks.get(m, shape);
 					if (block == null) continue;
-					boolean arch = shape == Shape.ARCH || shape == Shape.ARCH_CORNER;
-					Models.register(ctx, block, (state, sprites) -> arch ? ArchModel.build(m, state, sprites) : SlopeModel.build(m, state, sprites));
+					Models.Maker maker = switch (shape) {
+						case ARCH, ARCH_CORNER -> (state, sprites) -> ArchModel.build(m, state, sprites);
+						case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_CORNER, ROUND_CORNER_INNER ->
+								(state, sprites) -> RoundModel.build(m, state, sprites);
+						default -> (state, sprites) -> SlopeModel.build(m, state, sprites);
+					};
+					Models.register(ctx, block, maker);
 				}
 			}
 		});

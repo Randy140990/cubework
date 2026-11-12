@@ -70,6 +70,14 @@ final class Models {
 	}
 
 	private static net.minecraft.client.resources.model.Material texture(String name) {
+		// Full ids (patterns: cubework:block/pattern/tiled/stone) are used as they are.
+		if (name.indexOf(':') >= 0) {
+			//#if MC >= 26.1
+			return new net.minecraft.client.resources.model.Material(Identifier.parse(name));
+			//#else
+			return new net.minecraft.client.resources.model.Material(TextureAtlas.LOCATION_BLOCKS, Identifier.parse(name));
+			//#endif
+		}
 		//#if MC >= 26.2
 		// 26.2 renamed the pillars' side textures.
 		if (name.equals("quartz_pillar") || name.equals("purpur_pillar")) name += "_side";
