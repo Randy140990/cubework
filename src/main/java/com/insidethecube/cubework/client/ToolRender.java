@@ -64,7 +64,18 @@ public final class ToolRender {
 			ItemStack s = mc.player.getInventory().getItem(i);
 			if (s.getItem() instanceof BuildersGuideItem && s != main && s != off && ToolData.get(s).getBooleanOr(GuideShapes.PIN, false)) guides.add(s);
 		}
-		for (ItemStack g : guides) guide(pose, lines, cam, ToolData.get(g));
+		for (ItemStack g : guides) {
+			CompoundTag tag = ToolData.get(g);
+			// Before its middle is set, the held guide previews where you're looking.
+			if (g == main && !tag.getBooleanOr("aset", false) && mc.hitResult instanceof BlockHitResult hit && hit.getType() == HitResult.Type.BLOCK) {
+				BlockPos at = hit.getBlockPos().relative(hit.getDirection());
+				tag.putInt("ax", at.getX());
+				tag.putInt("ay", at.getY());
+				tag.putInt("az", at.getZ());
+				tag.putBoolean("aset", true);
+			}
+			guide(pose, lines, cam, tag);
+		}
 
 		// The brush's circle, on the ground it would smooth.
 		if (main.getItem() instanceof TerrainBrushItem && mc.hitResult instanceof BlockHitResult hit && hit.getType() == HitResult.Type.BLOCK) {
