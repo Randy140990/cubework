@@ -1164,6 +1164,20 @@ def tables(add_name, tags):
             add_name(name, lambda g, tp=top, lg=legs: "%s Table" % title(tp, g) + ("" if lg == "oak" else " (%s Legs)" % title(lg, g)))
 
 
+def tools(add_name):
+    """The terrain brush and the builder's guide, the wheel key's name, and the world-gen feature for smoothing new land."""
+    for name, english, recipe in (("terrain_brush", "Terrain Brush", ["minecraft:brush", "minecraft:copper_ingot", "minecraft:smooth_stone_slab"]),
+                                  ("builders_guide", "Builder's Guide", ["minecraft:paper", "minecraft:string", "minecraft:stick"])):
+        write(os.path.join(ASSETS, "models", "item", name + ".json"), {"parent": "minecraft:item/handheld", "textures": {"layer0": NS + ":item/" + name}})
+        item(name, NS + ":item/" + name)
+        write(os.path.join(DATA, NS, "recipe", name + ".json"),
+              {"type": "minecraft:crafting_shapeless", "category": "equipment", "ingredients": [ing(r) for r in recipe],
+               "result": {"id": NS + ":" + name, "count": 1}})
+        add_name(name, lambda g, e=english: e)
+    write(os.path.join(DATA, NS, "worldgen", "configured_feature", "smooth_terrain.json"), {"type": NS + ":smooth_terrain", "config": {}})
+    write(os.path.join(DATA, NS, "worldgen", "placed_feature", "smooth_terrain.json"), {"feature": NS + ":smooth_terrain", "placement": []})
+
+
 def cube_icon():
     """The first tab's icon: a block in the brand colours, with gaps along its edges."""
     if MC >= (1, 21, 4):
@@ -1184,7 +1198,7 @@ def main():
     TABLE_TOPS = [t for t in TABLE_TOPS if exists(t)]
     for sub in ["blockstates", "models", "items"]:
         shutil.rmtree(os.path.join(ASSETS, sub), ignore_errors=True)
-    for sub in ["loot_table", "recipe"]:
+    for sub in ["loot_table", "recipe", "worldgen"]:
         shutil.rmtree(os.path.join(DATA, NS, sub), ignore_errors=True)
     templates()
 
@@ -1234,6 +1248,7 @@ def main():
     coral(add_name)
     doors(add_name, tags)
     tables(add_name, tags)
+    tools(add_name)
     cube_icon()
 
     for tag, values in tags.items():
@@ -1244,6 +1259,12 @@ def main():
     for tab, name in TABS:
         us["itemGroup.%s.%s" % (NS, tab)] = gb["itemGroup.%s.%s" % (NS, tab)] = "Cubework: " + name
     us["item.%s.cube" % NS] = gb["item.%s.cube" % NS] = "Cubework"
+    for k in list(us):
+        if k in ("block.%s.terrain_brush" % NS, "block.%s.builders_guide" % NS):
+            us["item" + k[5:]] = gb["item" + k[5:]] = us.pop(k)
+            gb.pop(k, None)
+    us["key.%s.wheel" % NS] = gb["key.%s.wheel" % NS] = "Shape wheel (hold)"
+    us["key.category.%s.%s" % (NS, NS)] = gb["key.category.%s.%s" % (NS, NS)] = "Cubework"
     write(os.path.join(ASSETS, "lang", "en_us.json"), us)
     write(os.path.join(ASSETS, "lang", "en_gb.json"), gb)
     print("shapes:", count, "names:", len(us))

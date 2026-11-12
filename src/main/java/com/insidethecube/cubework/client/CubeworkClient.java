@@ -8,7 +8,15 @@ import com.insidethecube.cubework.Extras;
 import com.insidethecube.cubework.Material;
 import com.insidethecube.cubework.Shape;
 
+import com.insidethecube.cubework.client.wheel.Wheel;
+import com.insidethecube.cubework.client.wheel.WheelModels;
+import com.insidethecube.cubework.client.wheel.WheelScreen;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.network.chat.Component;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 //#if MC >= 26.1
 import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
@@ -21,8 +29,26 @@ import net.minecraft.world.level.GrassColor;
 import net.minecraft.world.level.block.Block;
 
 public final class CubeworkClient implements ClientModInitializer {
+	/** Hold for the shape wheel (G to start with). */
+	public static KeyMapping WHEEL;
+
 	@Override
 	public void onInitializeClient() {
+		WHEEL = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.cubework.wheel", InputConstants.Type.KEYSYM, 71,
+				KeyMapping.Category.register(com.insidethecube.cubework.Reg.id("cubework"))));
+		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
+			while (WHEEL.consumeClick()) {
+				if (mc.screen != null || mc.player == null) continue;
+				Wheel wheel = WheelModels.forPlayer(mc);
+				if (wheel == null) {
+					mc.player.displayClientMessage(Component.literal("Hold a block (or look at one in creative), the terrain brush or the builder's guide."), true);
+					continue;
+				}
+				mc.setScreen(new WheelScreen(wheel, WHEEL));
+			}
+		});
+		ToolRender.register();
+
 		// The coloured doors' textures are made from the door textures in use, as the game loads.
 		//#if MC >= 1.21.5
 		Atlas.register(DoorColoursSource.ID, DoorColoursSource.CODEC);

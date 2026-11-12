@@ -33,3 +33,9 @@ net.minecraft.world.item.component.TooltipDisplay
 net.minecraft.world.level.block.state.properties.StairsShape
 net.minecraft.sounds.SoundEvents
 net.minecraft.server.MinecraftServer
+net.minecraft.world.level.block.Block
+net.minecraft.world.level.Level
+net.minecraft.client.Minecraft
+net.minecraft.world.entity.Entity
+net.minecraft.core.BlockPos
+net.minecraft.core.Vec3i
