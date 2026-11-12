@@ -1,0 +1,9 @@
+Compiled from "CraftingRecipe.java"
+public interface net.minecraft.world.item.crafting.CraftingRecipe extends net.minecraft.world.item.crafting.Recipe<net.minecraft.world.item.crafting.CraftingInput> {
+  public default net.minecraft.world.item.crafting.RecipeType<net.minecraft.world.item.crafting.CraftingRecipe> getType();
+  public abstract net.minecraft.world.item.crafting.RecipeSerializer<? extends net.minecraft.world.item.crafting.CraftingRecipe> getSerializer();
+  public abstract net.minecraft.world.item.crafting.CraftingBookCategory category();
+  public default net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> getRemainingItems(net.minecraft.world.item.crafting.CraftingInput);
+  public static net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> defaultCraftingReminder(net.minecraft.world.item.crafting.CraftingInput);
+  public default net.minecraft.world.item.crafting.RecipeBookCategory recipeBookCategory();
+}

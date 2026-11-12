@@ -1,0 +1,12 @@
+Compiled from "ThrowableProjectile.java"
+public abstract class net.minecraft.world.entity.projectile.ThrowableProjectile extends net.minecraft.world.entity.projectile.Projectile {
+  private static final float MIN_CAMERA_DISTANCE_SQUARED;
+  protected net.minecraft.world.entity.projectile.ThrowableProjectile(net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.projectile.ThrowableProjectile>, net.minecraft.world.level.Level);
+  protected net.minecraft.world.entity.projectile.ThrowableProjectile(net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.projectile.ThrowableProjectile>, double, double, double, net.minecraft.world.level.Level);
+  public boolean shouldRenderAtSqrDistance(double);
+  public boolean canUsePortal(boolean);
+  public void tick();
+  private void applyInertia();
+  private void handleFirstTickBubbleColumn();
+  protected double getDefaultGravity();
+}

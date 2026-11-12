@@ -1,0 +1,16 @@
+Compiled from "IntegerProperty.java"
+public final class net.minecraft.world.level.block.state.properties.IntegerProperty extends net.minecraft.world.level.block.state.properties.Property<java.lang.Integer> {
+  private final it.unimi.dsi.fastutil.ints.IntImmutableList values;
+  private final int min;
+  private final int max;
+  private net.minecraft.world.level.block.state.properties.IntegerProperty(java.lang.String, int, int);
+  public java.util.List<java.lang.Integer> getPossibleValues();
+  public boolean equals(java.lang.Object);
+  public int generateHashCode();
+  public static net.minecraft.world.level.block.state.properties.IntegerProperty create(java.lang.String, int, int);
+  public java.util.Optional<java.lang.Integer> getValue(java.lang.String);
+  public java.lang.String getName(java.lang.Integer);
+  public int getInternalIndex(java.lang.Integer);
+  public int getInternalIndex(java.lang.Comparable);
+  public java.lang.String getName(java.lang.Comparable);
+}

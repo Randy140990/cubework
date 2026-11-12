@@ -1,0 +1,20 @@
+Compiled from "EnumProperty.java"
+public final class net.minecraft.world.level.block.state.properties.EnumProperty<T extends java.lang.Enum<T> & net.minecraft.util.StringRepresentable> extends net.minecraft.world.level.block.state.properties.Property<T> {
+  private final java.util.List<T> values;
+  private final java.util.Map<java.lang.String, T> names;
+  private final int[] ordinalToIndex;
+  private net.minecraft.world.level.block.state.properties.EnumProperty(java.lang.String, java.lang.Class<T>, java.util.List<T>);
+  public java.util.List<T> getPossibleValues();
+  public java.util.Optional<T> getValue(java.lang.String);
+  public java.lang.String getName(T);
+  public int getInternalIndex(T);
+  public boolean equals(java.lang.Object);
+  public int generateHashCode();
+  public static <T extends java.lang.Enum<T> & net.minecraft.util.StringRepresentable> net.minecraft.world.level.block.state.properties.EnumProperty<T> create(java.lang.String, java.lang.Class<T>);
+  public static <T extends java.lang.Enum<T> & net.minecraft.util.StringRepresentable> net.minecraft.world.level.block.state.properties.EnumProperty<T> create(java.lang.String, java.lang.Class<T>, java.util.function.Predicate<T>);
+  public static <T extends java.lang.Enum<T> & net.minecraft.util.StringRepresentable> net.minecraft.world.level.block.state.properties.EnumProperty<T> create(java.lang.String, java.lang.Class<T>, T...);
+  public static <T extends java.lang.Enum<T> & net.minecraft.util.StringRepresentable> net.minecraft.world.level.block.state.properties.EnumProperty<T> create(java.lang.String, java.lang.Class<T>, java.util.List<T>);
+  public int getInternalIndex(java.lang.Comparable);
+  public java.lang.String getName(java.lang.Comparable);
+  private static boolean method_38863(java.lang.Enum);
+}

@@ -1,0 +1,15 @@
+Compiled from "ThrownItemRenderer.java"
+public class net.minecraft.client.renderer.entity.ThrownItemRenderer<T extends net.minecraft.world.entity.Entity & net.minecraft.world.entity.projectile.ItemSupplier> extends net.minecraft.client.renderer.entity.EntityRenderer<T, net.minecraft.client.renderer.entity.state.ThrownItemRenderState> {
+  private final net.minecraft.client.renderer.item.ItemModelResolver itemModelResolver;
+  private final float scale;
+  private final boolean fullBright;
+  public net.minecraft.client.renderer.entity.ThrownItemRenderer(net.minecraft.client.renderer.entity.EntityRendererProvider$Context, float, boolean);
+  public net.minecraft.client.renderer.entity.ThrownItemRenderer(net.minecraft.client.renderer.entity.EntityRendererProvider$Context);
+  protected int getBlockLightLevel(T, net.minecraft.core.BlockPos);
+  public void submit(net.minecraft.client.renderer.entity.state.ThrownItemRenderState, com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.SubmitNodeCollector, net.minecraft.client.renderer.state.CameraRenderState);
+  public net.minecraft.client.renderer.entity.state.ThrownItemRenderState createRenderState();
+  public void extractRenderState(T, net.minecraft.client.renderer.entity.state.ThrownItemRenderState, float);
+  public void extractRenderState(net.minecraft.world.entity.Entity, net.minecraft.client.renderer.entity.state.EntityRenderState, float);
+  public net.minecraft.client.renderer.entity.state.EntityRenderState createRenderState();
+  public void submit(net.minecraft.client.renderer.entity.state.EntityRenderState, com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.SubmitNodeCollector, net.minecraft.client.renderer.state.CameraRenderState);
+}
