@@ -88,7 +88,15 @@ public final class Lamps {
 		ItemStack head = p.getItemBySlot(EquipmentSlot.HEAD), chest = p.getItemBySlot(EquipmentSlot.CHEST);
 		LampData h = head.get(DK.LAMP), c = chest.get(DK.LAMP);
 		if (h == null && c == null) {
-			p.displayClientMessage(Component.literal("No lamp fitted. Fit a headlamp to a helmet or a chest lamp to a chestplate."), true);
+			// Nothing worn: the key switches a hand torch in either hand instead.
+			for (InteractionHand hand : InteractionHand.values()) {
+				ItemStack s = p.getItemInHand(hand);
+				if (s.getItem() instanceof LampItem lamp && lamp.kind == LampKind.TORCH) {
+					lamp.use(p.level(), p, hand);
+					return;
+				}
+			}
+			p.displayClientMessage(Component.literal("You're not wearing a lamp. Right-click a headlamp or chest lamp to put it on."), true);
 			return;
 		}
 		boolean anyOn = (h != null && h.on()) || (c != null && c.on());
@@ -101,7 +109,13 @@ public final class Lamps {
 			chest.set(DK.LAMP, c.withOn(!anyOn));
 			flat &= c.charge() <= 0;
 		}
-		if (!anyOn && flat) p.displayClientMessage(Component.literal("The battery is flat. Charge it with glowstone dust or redstone."), true);
 		p.level().playSound(null, p.blockPosition(), SoundEvents.LEVER_CLICK, SoundSource.PLAYERS, 0.4f, anyOn ? 0.8f : 1.2f);
+		if (!anyOn && flat) {
+			p.displayClientMessage(Component.literal("The battery is flat. Charge it with glowstone dust or redstone in a crafting grid."), true);
+			return;
+		}
+		String what = h != null && c != null ? "Lamps" : h != null ? LampKind.HEAD.title : LampKind.CHEST.title;
+		int charge = h != null ? h.percent() : c.percent();
+		p.displayClientMessage(Component.literal(what + (anyOn ? " off" : " on, battery " + charge + "%")), true);
 	}
 }

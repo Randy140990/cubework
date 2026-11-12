@@ -1,3 +1,9 @@
+Deepkit 0.1.1 for Minecraft 1.21.11 (Fabric; needs Fabric API). Fixes from the first test.
+
+- The headlamp and chest lamp are worn: right-click one (or put it in the helmet or chestplate slot), then press H to switch it on. Fitting one onto a helmet or chestplate in a crafting grid still works, to keep your armour.
+- A lamp that's on shimmers like an enchanted item, so you can see it's on in daylight, and switching one says so above the hotbar with its battery.
+- H with no lamp worn switches a hand torch you're holding, or says how to put a lamp on.
+
 Deepkit 0.1.0 for Minecraft 1.21.11 (Fabric; needs Fabric API). First build, for testing.
 
 - Hand torch, headlamp and chest lamp. The hand torch switches with use, in either hand. The headlamp and chest lamp fit onto a helmet or chestplate in a crafting grid (and come off the same way), and switch with H. Battery bar; charge with glowstone dust (+50%) or redstone (+20%) in a crafting grid; flickers below 10%.
