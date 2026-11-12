@@ -12,9 +12,42 @@ import net.minecraft.resources.Identifier;
 public final class ShaderMaps {
 	private ShaderMaps() {}
 
-	/** The vanilla map to use instead, or null for anything that isn't a Cubework door's map. */
+	/** Makes a patterned map (PNG bytes, or null) from the vanilla map; set by the client. */
+	public interface Painter {
+		byte[] make(java.io.InputStream in, String pattern, boolean normal);
+	}
+
+	public static Painter painter;
+
+	/** A patterned block's map that has to be made: the vanilla map, the pattern, and whether it's a normal map. */
+	public record PatternMap(Identifier source, String pattern, boolean normal) {}
+
+	private static final String PATTERNS = "textures/block/pattern/";
+
+	/**
+	 * A patterned block's map (cubework:textures/block/pattern/{pattern}/{texture}_n.png). Patterns that keep
+	 * every pixel in place use the block's own map; herringbone's is made by laying the block's map out the
+	 * same way, so the shine and depth follow the bricks.
+	 */
+	public static PatternMap pattern(Identifier id) {
+		if (!id.getNamespace().equals(Cubework.ID) || !id.getPath().startsWith(PATTERNS) || !id.getPath().endsWith(".png")) return null;
+		String rest = id.getPath().substring(PATTERNS.length(), id.getPath().length() - 4);
+		int slash = rest.indexOf('/');
+		if (slash < 0 || !(rest.endsWith("_n") || rest.endsWith("_s"))) return null;
+		String pattern = rest.substring(0, slash), texture = rest.substring(slash + 1);
+		return new PatternMap(Identifier.withDefaultNamespace("textures/block/" + texture + ".png"), pattern, texture.endsWith("_n"));
+	}
+
+	/** Whether a pattern moves pixels (herringbone), so its maps are made rather than borrowed. */
+	public static boolean moves(String pattern) {
+		return pattern.equals("herringbone");
+	}
+
+	/** The vanilla map to use instead, or null for anything that isn't a Cubework door's (or still pattern's) map. */
 	public static Identifier source(Identifier id) {
 		if (!id.getNamespace().equals(Cubework.ID)) return null;
+		PatternMap p = pattern(id);
+		if (p != null) return moves(p.pattern()) ? null : p.source();
 		String path = id.getPath();
 		if (!path.startsWith("textures/") || !path.contains("_door")) return null;
 		String ext = path.endsWith(".png") ? ".png" : path.endsWith(".png.mcmeta") ? ".png.mcmeta" : null;

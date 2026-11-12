@@ -3,7 +3,7 @@
   "id": "cubework",
   "version": "${version}",
   "name": "Cubework",
-  "description": "Vanilla blocks in every shape: stairs, slabs, vertical slabs, snow-style layers, slopes, walls, fences and trapdoors that behave just like the originals.",
+  "description": "Vanilla blocks in every shape: stairs, slabs, slopes, arches, round columns, window frames, patterns and more, with a shape wheel, a terrain brush and builder's guides.",
   "authors": [
     "Inside the Cube"
   ],
@@ -25,6 +25,10 @@
     "java": ">=21"
   },
   "mixins": [
-    "cubework.mixins.json"
-  ]
+    "cubework.mixins.json",
+    "cubework.continuity.mixins.json"
+  ],
+  "suggests": {
+    "continuity": "*"
+  }
 }

@@ -17,7 +17,7 @@ Conditions compare MC with a version (>=, >, <, <=, ==, !=) and can be joined wi
 aren't kept (and the directive lines) become empty lines, so compiler errors keep their line numbers.
 Names Mojang renamed between versions are swapped by SWAPS below.
 
-Usage: prep.py <version name> [--fabric-api X] [--blocks blocks.txt]
+Usage: prep.py <version name> [--fabric-api X] [--blocks blocks.txt] [--continuity X]
 """
 import json, os, re, shutil, subprocess, sys
 
@@ -111,10 +111,14 @@ def main():
 
     # Java sources.
     src = os.path.join(ROOT, "src", "main", "java")
+    continuity = args.get("--continuity", "")
     for dirpath, _, files in os.walk(src):
         for f in files:
             path = os.path.join(dirpath, f)
             rel = os.path.relpath(path, src)
+            # The Continuity compatibility mixins only compile against Continuity.
+            if not continuity and "/compat/continuity/" in "/" + rel.replace(os.sep, "/"):
+                continue
             dest = os.path.join(out, "src", "main", "java", rel)
             os.makedirs(os.path.dirname(dest), exist_ok=True)
             text = open(path, encoding="utf-8").read()
@@ -131,6 +135,8 @@ def main():
     mod = json.load(open(os.path.join(res, "fabric.mod.json")))
     mod["depends"]["minecraft"] = target["range"]
     mod["depends"]["java"] = ">=%d" % target["java"]
+    if not continuity:
+        mod["mixins"] = [x for x in mod["mixins"] if "continuity" not in str(x)]
     json.dump(mod, open(os.path.join(res, "fabric.mod.json"), "w"), indent=2)
 
     # Build files.
@@ -143,6 +149,7 @@ def main():
     build = build.replace("@PLUGIN@", target["plugin"])
     remap = target["plugin"].endswith("-remap")
     build = build.replace("@MAPPINGS@", "\tmappings loom.officialMojangMappings()\n" if remap else "")
+    build = build.replace("@CONTINUITY@", ("\t%s \"maven.modrinth:continuity:%s\"\n" % ("modCompileOnly" if remap else "compileOnly", continuity)) if continuity else "")
     build = build.replace("@MOD@", "modImplementation" if remap else "implementation")
     open(os.path.join(out, "build.gradle"), "w").write(build)
     shutil.copy(os.path.join(ROOT, "settings.gradle"), os.path.join(out, "settings.gradle"))

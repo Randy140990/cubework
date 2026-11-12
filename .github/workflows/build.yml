@@ -44,7 +44,7 @@ jobs:
           T="${{ matrix.target }}"
           mkdir -p ci-logs vanilla
           python3 tools/build/vanilla.py "$T" "vanilla/$T"
-          python3 tools/prep.py "$T" --fabric-api "$(cat vanilla/$T/fabric-api.txt)" --blocks "vanilla/$T/blocks.txt"
+          python3 tools/prep.py "$T" --fabric-api "$(cat vanilla/$T/fabric-api.txt)" --blocks "vanilla/$T/blocks.txt" --continuity "$(cat vanilla/$T/continuity.txt 2>/dev/null)"
           ./gradlew -p "build/v/$T" build -x test --stacktrace 2>&1 | tee "ci-logs/build-$T.txt"; test ${PIPESTATUS[0]} -eq 0
           mkdir -p jars && cp $(ls build/v/$T/build/libs/*.jar | grep -v -- '-sources.jar') jars/
       - uses: actions/upload-artifact@v4

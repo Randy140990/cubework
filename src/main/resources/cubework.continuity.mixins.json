@@ -1,0 +1,16 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.insidethecube.cubework.compat.continuity",
+  "plugin": "com.insidethecube.cubework.compat.continuity.ContinuityPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "QuadUtilMixin",
+    "OverlayPredicateMixin",
+    "OverlayProcessorMixin",
+    "SimpleOverlayMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

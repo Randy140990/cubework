@@ -28,6 +28,10 @@ def texture(ref):
     ns, path = ref.split(":") if ":" in ref else ("minecraft", ref)
     if ns == "minecraft" and "assets/minecraft/textures/%s.png" % path not in names:
         missing_textures.add(ref)
+    elif ns == "cubework" and path.startswith("block/pattern/"):
+        # Patterned sprites are painted in the game from the vanilla texture of the same name.
+        if "assets/minecraft/textures/block/%s.png" % path.split("/")[-1] not in names:
+            missing_textures.add(ref)
     elif ns == "cubework" and not os.path.exists(os.path.join(A, "textures", path + ".png")) and "door" not in path:
         missing_textures.add(ref)
 
@@ -50,5 +54,10 @@ def walk(x):
 
 for p in glob.glob(A + "/blockstates/*.json") + glob.glob(A + "/items/*.json") + glob.glob(A + "/models/**/*.json", recursive=True):
     walk(json.load(open(p)))
+# The textures the atlas sources paint from.
+for atlas in glob.glob(os.path.join(res, "assets", "minecraft", "atlases", "*.json")):
+    for src in json.load(open(atlas)).get("sources", []):
+        for t in src.get("textures", []) + src.get("metals", []):
+            texture(t)
 print("missing models:", len(missing_models), sorted(missing_models)[:30])
 print("missing textures:", len(missing_textures), sorted(missing_textures)[:30])

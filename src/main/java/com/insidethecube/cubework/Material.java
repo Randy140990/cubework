@@ -9,11 +9,34 @@ import net.minecraft.world.level.block.Block;
  * A vanilla block that Cubework makes shapes of. Its shapes copy its properties (sound, hardness, tool,
  * light) and use its own textures, so a texture pack that changes the block changes them too.
  */
-public record Material(String id, Kind kind, String colour) {
+public record Material(String id, Kind kind, String colour, String pattern, String source) {
+
+	public Material(String id, Kind kind, String colour) {
+		this(id, kind, colour, null, null);
+	}
 
 	public enum Kind {
-		WOOL, TERRACOTTA, CONCRETE, POWDER, GLAZED, GLASS, NATURE, BUILDING;
+		WOOL, TERRACOTTA, CONCRETE, POWDER, GLAZED, GLASS, NATURE, BUILDING, PATTERN;
 	}
+
+	/** Patterns laid over a block's own texture (made in the game from the textures in use, see client.Patterns). */
+	public static final String[] PATTERNS = {"tiled", "checkered", "herringbone", "bordered"};
+
+	/** The blocks that come in patterns: floors and walls with an even texture. */
+	public static final String[] PATTERN_SOURCES = {
+			"stone", "smooth_stone", "cobblestone", "stone_bricks", "mossy_stone_bricks", "granite", "polished_granite", "diorite",
+			"polished_diorite", "andesite", "polished_andesite", "cobbled_deepslate", "polished_deepslate", "deepslate_bricks", "deepslate_tiles",
+			"tuff", "polished_tuff", "tuff_bricks", "calcite", "dripstone_block", "bricks", "mud_bricks", "packed_mud", "resin_bricks",
+			"smooth_sandstone", "smooth_red_sandstone", "prismarine", "prismarine_bricks", "dark_prismarine", "nether_bricks", "red_nether_bricks",
+			"smooth_basalt", "polished_blackstone", "polished_blackstone_bricks", "end_stone", "end_stone_bricks", "purpur_block", "quartz_bricks",
+			"smooth_quartz", "obsidian", "iron_block", "gold_block", "emerald_block", "lapis_block", "diamond_block", "netherite_block",
+			"amethyst_block", "terracotta", "white_terracotta", "light_gray_terracotta", "gray_terracotta", "black_terracotta", "brown_terracotta",
+			"red_terracotta", "orange_terracotta", "yellow_terracotta", "lime_terracotta", "green_terracotta", "cyan_terracotta",
+			"light_blue_terracotta", "blue_terracotta", "purple_terracotta", "magenta_terracotta", "pink_terracotta", "white_concrete",
+			"light_gray_concrete", "gray_concrete", "black_concrete", "brown_concrete", "red_concrete", "orange_concrete", "yellow_concrete",
+			"lime_concrete", "green_concrete", "cyan_concrete", "light_blue_concrete", "blue_concrete", "purple_concrete", "magenta_concrete",
+			"pink_concrete", "white_wool", "light_gray_wool", "gray_wool", "black_wool", "brown_wool", "red_wool", "orange_wool", "yellow_wool",
+			"lime_wool", "green_wool", "cyan_wool", "light_blue_wool", "blue_wool", "purple_wool", "magenta_wool", "pink_wool"};
 
 	/** The 16 dye colours, in the order the game's creative menu uses. */
 	public static final String[] COLOURS = {"white", "light_gray", "gray", "black", "brown", "red", "orange", "yellow", "lime", "green", "cyan",
@@ -135,17 +158,28 @@ public record Material(String id, Kind kind, String colour) {
 		for (String n : NATURE) out.add(new Material(n, Kind.NATURE, null));
 		java.util.Set<String> nature = java.util.Set.of(NATURE);
 		for (String n : BUILDING) if (!nature.contains(n)) out.add(new Material(n, Kind.BUILDING, null));
+		for (String src : PATTERN_SOURCES) for (String p : PATTERNS) out.add(new Material(p + "_" + src, Kind.PATTERN, null, p, src));
 		return List.copyOf(out);
 	}
 
-	/** The vanilla block. */
+	/** The full block: the vanilla block, or for a pattern Cubework's patterned block (once registered). */
 	public Block base() {
-		return Reg.vanilla(id);
+		return pattern != null ? Reg.block(Reg.id(id)) : Reg.vanilla(id);
+	}
+
+	/** The vanilla block it's made from, whose sound, hardness and tool it copies. */
+	public Block vanillaBlock() {
+		return Reg.vanilla(pattern != null ? source : id);
 	}
 
 	/** Whether this Minecraft version has the block (pale moss and resin came in 1.21.4). */
 	public boolean exists() {
-		return Reg.exists(id);
+		return Reg.exists(pattern != null ? source : id);
+	}
+
+	/** A patterned block (tiled stone bricks and so on). */
+	public boolean patterned() {
+		return kind == Kind.PATTERN;
 	}
 
 	public boolean glass() {
@@ -210,8 +244,14 @@ public record Material(String id, Kind kind, String colour) {
 		return id.equals("dirt_path") || id.equals("farmland") ? 15 : 16;
 	}
 
-	/** The block's textures (paths under minecraft:block/). */
+	/** The block's textures (paths under minecraft:block/, or full ids such as cubework:block/pattern/tiled/stone). */
 	public Textures textures() {
+		if (pattern != null) {
+			Textures t = TEXTURES.get(source);
+			if (t == null) t = Textures.all(source);
+			String at = Cubework.ID + ":block/pattern/" + pattern + "/";
+			return new Textures(at + t.top(), at + t.side(), at + t.bottom(), null);
+		}
 		// Waxed copper looks just like unwaxed.
 		String look = id.startsWith("waxed_") ? id.substring(6) : id;
 		Textures t = TEXTURES.get(look);
@@ -227,6 +267,7 @@ public record Material(String id, Kind kind, String colour) {
 
 	/** The start of its shapes' ids: the block's id, or a shorter name (stone_brick for stone_bricks). */
 	public String stem() {
+		if (pattern != null) return pattern + "_" + STEMS.getOrDefault(source, source);
 		return STEMS.getOrDefault(id, id);
 	}
 

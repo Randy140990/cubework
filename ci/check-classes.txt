@@ -1,0 +1,41 @@
+net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
+net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext
+net.fabricmc.fabric.api.client.rendering.v1.world.AbstractWorldRenderContext
+net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents$AfterEntities
+net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents$BeforeTranslucent
+net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents$EndMain
+net.minecraft.client.gui.render.state.GuiElementRenderState
+c net.minecraft.client.gui.render.state.ColoredRectangleRenderState
+net.minecraft.client.gui.navigation.ScreenArea
+net.minecraft.client.gui.render.TextureSetup
+c me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor
+c me.pepperbell.continuity.client.util.QuadUtil
+net.minecraft.core.Direction
+net.minecraft.world.phys.Vec3
+net.minecraft.client.player.LocalPlayer
+net.minecraft.client.gui.Gui
+net.minecraft.client.Options
+net.minecraft.world.item.BlockItem
+net.minecraft.world.level.levelgen.placement.PlacedFeature
+net.minecraft.core.registries.BuiltInRegistries
+net.minecraft.world.level.LevelAccessor
+net.minecraft.world.level.LevelReader
+net.minecraft.world.level.LevelWriter
+net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase
+net.minecraft.client.renderer.state.LevelRenderState
+net.minecraft.client.renderer.state.CameraRenderState
+net.minecraft.client.renderer.SubmitNodeCollector
+net.minecraft.client.renderer.feature.ModelFeatureRenderer
+net.minecraft.client.renderer.rendertype.RenderType
+net.minecraft.world.item.Item$TooltipContext
+net.minecraft.world.item.TooltipFlag
+net.minecraft.world.item.component.TooltipDisplay
+net.minecraft.world.level.block.state.properties.StairsShape
+net.minecraft.sounds.SoundEvents
+net.minecraft.server.MinecraftServer
+net.minecraft.world.level.block.Block
+net.minecraft.world.level.Level
+net.minecraft.client.Minecraft
+net.minecraft.world.entity.Entity
+net.minecraft.core.BlockPos
+net.minecraft.core.Vec3i

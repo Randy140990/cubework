@@ -54,7 +54,7 @@ jobs:
           mkdir -p "$O" vanilla
           python3 tools/build/vanilla.py "$T" "vanilla/$T" > "$O/vanilla.txt" 2>&1
           cp "vanilla/$T/blocks.txt" "vanilla/$T/fabric-api.txt" "$O/" 2>/dev/null
-          python3 tools/prep.py "$T" --fabric-api "$(cat vanilla/$T/fabric-api.txt)" --blocks "vanilla/$T/blocks.txt" > "$O/prep.txt" 2>&1; echo "exit=$?" >> "$O/prep.txt"
+          python3 tools/prep.py "$T" --fabric-api "$(cat vanilla/$T/fabric-api.txt)" --blocks "vanilla/$T/blocks.txt" --continuity "$(cat vanilla/$T/continuity.txt 2>/dev/null)" > "$O/prep.txt" 2>&1; echo "exit=$?" >> "$O/prep.txt"
           python3 tools/build/refs.py "build/v/$T/src/main/resources" "vanilla/$T/client.jar" > "$O/refs.txt" 2>&1
           ./gradlew -p "build/v/$T" compileJava --stacktrace > "$O/compile.txt" 2>&1; echo "exit=$?" >> "$O/compile.txt"
           tail -30 "$O/compile.txt"
