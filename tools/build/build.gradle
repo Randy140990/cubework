@@ -54,6 +54,11 @@ java {
 	targetCompatibility = JavaVersion.VERSION_21
 }
 
+// Over 65,535 files (every shape's models, loot and recipes): the jar needs the zip64 format, which the game reads fine.
+tasks.withType(AbstractArchiveTask).configureEach {
+	zip64 = true
+}
+
 jar {
 	from("LICENSE") {
 		rename { "${it}_cubework" }
