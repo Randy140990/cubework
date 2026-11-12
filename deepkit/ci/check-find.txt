@@ -1,0 +1,4 @@
+ColorProviderRegistry
+EntityRendererRegistry
+BlockColorRegistry
+HudElementRegistry

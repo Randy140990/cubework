@@ -1,0 +1,80 @@
+name: Deepkit
+
+# Deepkit (deepkit/), a separate mod kept in this repository. Every push to a deepkit/** branch builds it
+# for 1.21.11 and saves the compiler's output and chosen class signatures to the 'ci-deepkit' branch.
+# It never fails the run. A commit whose message contains [release] also publishes the jar as a
+# prerelease tagged deepkit-v<mod_version>.
+on:
+  push:
+    branches: ["deepkit/**"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build
+        id: build
+        shell: bash
+        run: |
+          set +e +o pipefail
+          chmod +x gradlew
+          O=out
+          mkdir -p $O
+          ./gradlew -p deepkit build -x test --stacktrace > $O/build.txt 2>&1; code=$?
+          echo "exit=$code" >> $O/build.txt
+          tail -40 $O/build.txt
+          echo "ok=$([ $code -eq 0 ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+          ./gradlew -p deepkit printClasspath > /dev/null 2>&1
+          CP=$(cat deepkit/classpath.txt 2>/dev/null)
+          if [ -s deepkit/ci/check-find.txt ]; then
+            while read -r pat; do
+              [ -z "$pat" ] && continue
+              for F in $(echo "$CP" | tr ':' '\n'); do
+                unzip -l "$F" 2>/dev/null | grep -i "$pat" | sed "s|^|$(basename $F): |" >> $O/found.txt || true
+              done
+            done < deepkit/ci/check-find.txt
+          fi
+          if [ -s deepkit/ci/check-classes.txt ]; then
+            while read -r cls; do
+              [ -z "$cls" ] && continue
+              case "$cls" in
+                "c "*) c="${cls#c }"; javap -c -p -cp "$CP" "$c" > "$O/$c.c.txt" 2>&1 || true ;;
+                *) javap -p -cp "$CP" "$cls" > "$O/$cls.txt" 2>&1 || true ;;
+              esac
+            done < deepkit/ci/check-classes.txt
+          fi
+          mkdir -p jars && cp $(ls deepkit/build/libs/*.jar 2>/dev/null | grep -v -- '-sources.jar') jars/ 2>/dev/null
+          echo "version=$(grep '^mod_version=' deepkit/gradle.properties | cut -d= -f2 | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Save results
+        continue-on-error: true
+        shell: bash
+        run: |
+          git config user.name "cubework-ci"
+          git config user.email "cubework-ci@users.noreply.github.com"
+          cp -r out /tmp/out
+          git checkout --orphan ci-deepkit-tmp
+          git rm -rf --cached . > /dev/null 2>&1 || true
+          rm -rf out && cp -r /tmp/out out
+          git add -f out
+          git commit -m "Deepkit build for ${GITHUB_SHA}" > /dev/null
+          git push -f origin HEAD:ci-deepkit
+      - name: Publish release
+        if: steps.build.outputs.ok == 'yes' && contains(github.event.head_commit.message, '[release]')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: deepkit-v${{ steps.build.outputs.version }}
+          name: Deepkit ${{ steps.build.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          files: jars/*.jar
+          body_path: deepkit/RELEASE_NOTES.md
+          prerelease: true

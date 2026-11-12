@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "deepkit",
+  "version": "${version}",
+  "name": "Deepkit",
+  "description": "An expedition kit for caves and the dark: headlamps, chest lamps and hand torches with real beams, flares, glow paint for marking your way, rope coils and a grappling hook.",
+  "authors": [
+    "Inside the Cube"
+  ],
+  "license": "All rights reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.insidethecube.deepkit.Deepkit"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21.11",
+    "java": ">=21"
+  }
+}
