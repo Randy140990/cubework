@@ -53,6 +53,13 @@ public class GlowPaintItem extends Item {
 		Level level = ctx.getLevel();
 		BlockPos on = ctx.getClickedPos();
 		Direction face = ctx.getClickedFace();
+		BlockState clicked = level.getBlockState(on);
+		if (clicked.getBlock() instanceof GlowMarkBlock) {
+			// Clicking a mark repaints it.
+			Direction to = clicked.getValue(GlowMarkBlock.FACING);
+			face = to.getOpposite();
+			on = on.relative(to);
+		}
 		BlockPos at = on.relative(face);
 		BlockState there = level.getBlockState(at);
 		boolean water = there.is(Blocks.WATER) && there.getFluidState().isSource();
@@ -61,7 +68,7 @@ public class GlowPaintItem extends Item {
 		}
 		if (!(level instanceof ServerLevel)) return InteractionResult.SUCCESS;
 		ItemStack stack = ctx.getItemInHand();
-		int rotation = rotation(ctx, face);
+		int rotation = rotation(ctx, face, on);
 		BlockState mark = DK.MARKS[colour.ordinal()].defaultBlockState().setValue(GlowMarkBlock.FACING, face.getOpposite())
 				.setValue(GlowMarkBlock.ROTATION, rotation).setValue(GlowMarkBlock.SYMBOL, mark(stack)).setValue(GlowMarkBlock.WATERLOGGED, water);
 		level.setBlock(at, mark, net.minecraft.world.level.block.Block.UPDATE_ALL);
@@ -72,7 +79,7 @@ public class GlowPaintItem extends Item {
 	}
 
 	/** Which way the mark is turned (0 up, 1 right, 2 down, 3 left as you look at it; on floors and ceilings, the way you face). */
-	private static int rotation(UseOnContext ctx, Direction face) {
+	private static int rotation(UseOnContext ctx, Direction face, BlockPos on) {
 		if (face.getAxis().isVertical()) {
 			return switch (ctx.getHorizontalDirection()) {
 				case NORTH -> 0;
@@ -82,16 +89,15 @@ public class GlowPaintItem extends Item {
 			};
 		}
 		Vec3 hit = ctx.getClickLocation();
-		BlockPos on = ctx.getClickedPos();
 		Direction right = face.getCounterClockWise();
 		double rx = hit.x - on.getX(), rz = hit.z - on.getZ();
-		double u = switch (right) {
+		double u = Math.max(0, Math.min(1, switch (right) {
 			case EAST -> rx;
 			case WEST -> 1 - rx;
 			case SOUTH -> rz;
 			default -> 1 - rz;
-		};
-		double v = hit.y - on.getY();
+		}));
+		double v = Math.max(0, Math.min(1, hit.y - on.getY()));
 		double up = 1 - v, down = v, left = u, rightEdge = 1 - u;
 		double min = Math.min(Math.min(up, down), Math.min(left, rightEdge));
 		if (min == up) return 0;

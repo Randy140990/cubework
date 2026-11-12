@@ -1,1 +1,8 @@
-0.1.0: first build.
+Deepkit 0.1.0 for Minecraft 1.21.11 (Fabric; needs Fabric API). First build, for testing.
+
+- Hand torch, headlamp and chest lamp. The hand torch switches with use, in either hand. The headlamp and chest lamp fit onto a helmet or chestplate in a crafting grid (and come off the same way), and switch with H. Battery bar; charge with glowstone dust (+50%) or redstone (+20%) in a crafting grid; flickers below 10%.
+- Beams light where they land (and faintly halfway), for everyone, with or without shaders. The light is invisible and cleans itself up.
+- Flares in red, green, blue and white: use to strike, use again to throw, sneak and use to drop. 60 seconds, bright light, sparks and smoke, works underwater, never starts fires.
+- Glow paint in 8 colours (64 marks a can): use on a block to paint, use in the air to choose the mark (arrow, cross, dot, circle, !, ?, tick, 0 to 9). Arrows: on floors and ceilings they point the way you face; on walls, to the edge you click nearest. Cleaned with a sponge or by breaking.
+- Rope coil: use on the edge of a drop to hang 32 blocks of climbable rope; use on a rope's bottom to add more; sneak and use (or break it) to take it back.
+- Grappling hook: hold use and let go to fire (24 blocks); it catches the top edge of a block and drops a rope to you. Hold use on a rope to winch up. Sneak and use on its rope to take it back.

@@ -73,6 +73,12 @@ public class GlowMarkBlock extends Block implements SimpleWaterloggedBlock {
 		return SHAPES.get(state.getValue(FACING));
 	}
 
+	/** Water running over a mark doesn't wash it off. */
+	@Override
+	protected boolean canBeReplaced(BlockState state, net.minecraft.world.level.material.Fluid fluid) {
+		return false;
+	}
+
 	@Override
 	protected FluidState getFluidState(BlockState state) {
 		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
