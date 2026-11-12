@@ -25,9 +25,9 @@ public final class ShaderMaps {
 	private static final String PATTERNS = "textures/block/pattern/";
 
 	/**
-	 * A patterned block's map (cubework:textures/block/pattern/{pattern}/{texture}_n.png). Patterns that keep
-	 * every pixel in place use the block's own map; herringbone's is made by laying the block's map out the
-	 * same way, so the shine and depth follow the bricks.
+	 * A patterned block's map (cubework:textures/block/pattern/{pattern}/{texture}_n.png), made from the
+	 * block's own map: herringbone's laid out the same way as its bricks, so the shine and depth follow them;
+	 * the others as they are. Made rather than borrowed so it's one frame and the patterned texture's size.
 	 */
 	public static PatternMap pattern(Identifier id) {
 		if (!id.getNamespace().equals(Cubework.ID) || !id.getPath().startsWith(PATTERNS) || !id.getPath().endsWith(".png")) return null;
@@ -46,8 +46,8 @@ public final class ShaderMaps {
 	/** The vanilla map to use instead, or null for anything that isn't a Cubework door's (or still pattern's) map. */
 	public static Identifier source(Identifier id) {
 		if (!id.getNamespace().equals(Cubework.ID)) return null;
-		PatternMap p = pattern(id);
-		if (p != null) return moves(p.pattern()) ? null : p.source();
+		// Patterned blocks' maps are always made (see PatternMap), never borrowed as they are.
+		if (pattern(id) != null) return null;
 		String path = id.getPath();
 		if (!path.startsWith("textures/") || !path.contains("_door")) return null;
 		String ext = path.endsWith(".png") ? ".png" : path.endsWith(".png.mcmeta") ? ".png.mcmeta" : null;

@@ -4,6 +4,8 @@ import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -38,10 +40,11 @@ public class BuildersGuideItem extends Item {
 			tag.putBoolean(k + "set", true);
 			if (!end) tag.putInt(GuideShapes.FACING, facing);
 		});
+		ctx.getLevel().playSound(null, at, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1f, end ? 1.4f : 1f);
 		if (player != null) {
 			int n = GuideShapes.blocks(ToolData.get(stack)).size();
-			player.displayClientMessage(Component.literal((end ? "Line end set. " : "Guide set. ") + GuideShapes.describe(ToolData.get(stack)) + ": " + n
-					+ " blocks."), true);
+			player.displayClientMessage(Component.literal((end ? "Line end placed. " : "Guide placed (gold). ") + GuideShapes.describe(ToolData.get(stack)) + ", "
+					+ n + " blocks. Hold ").append(Component.keybind("key.cubework.wheel")).append(" to change it."), true);
 		}
 		return InteractionResult.SUCCESS_SERVER;
 	}
@@ -49,6 +52,8 @@ public class BuildersGuideItem extends Item {
 	@Override
 	public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
 		tooltip.accept(Component.literal(GuideShapes.describe(ToolData.get(stack))).withStyle(net.minecraft.ChatFormatting.GRAY));
-		tooltip.accept(Component.literal("Use on a block to set the middle; the shape wheel key changes it").withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
+		tooltip.accept(Component.literal("Right-click a block to place the outline there (it turns gold)").withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
+		tooltip.accept(Component.literal("Hold ").append(Component.keybind("key.cubework.wheel")).append(" for shape and size; it never places blocks")
+				.withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
 	}
 }

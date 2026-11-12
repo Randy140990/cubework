@@ -65,9 +65,9 @@ public record MetalDoorsSource(List<Identifier> textures, List<Identifier> metal
 		public SpriteContents paint() {
 			try (InputStream din = door.open(); NativeImage source = NativeImage.read(din);
 					InputStream min = metal.open(); NativeImage block = NativeImage.read(min)) {
-				int w = source.getWidth(), h = Math.min(source.getHeight(), w);
-				int[] px = new int[w * h];
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) px[y * w + x] = Atlas.argb(source, x, y);
+				int[] size = new int[2];
+				int[] px = Atlas.pixels(source, source.getWidth(), Math.min(source.getHeight(), source.getWidth()), size);
+				int w = size[0], h = size[1];
 				int bw = block.getWidth(), bh = Math.min(block.getHeight(), bw);
 				List<Integer> palette = new ArrayList<>();
 				for (int y = 0; y < bh; y++) for (int x = 0; x < bw; x++) {
@@ -76,10 +76,8 @@ public record MetalDoorsSource(List<Identifier> textures, List<Identifier> metal
 				}
 				if (palette.isEmpty()) return null;
 				repaint(px, palette);
-				NativeImage out = new NativeImage(w, h, false);
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) Atlas.setArgb(out, x, y, px[y * w + x]);
-				return Atlas.contents(id, out);
-			} catch (Exception e) {
+				return Atlas.contents(id, Atlas.image(px, w, h));
+			} catch (Throwable e) {
 				return null;
 			}
 		}

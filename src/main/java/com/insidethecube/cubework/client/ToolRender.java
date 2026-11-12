@@ -36,6 +36,8 @@ public final class ToolRender {
 	private static final VoxelShape MARK = Shapes.box(0.3, 0.3, 0.3, 0.7, 0.7, 0.7);
 	private static final VoxelShape RING = Shapes.box(0.05, 0, 0.05, 0.95, 0.06, 0.95);
 	private static final int GUIDE = 0xC8F2C46A, GUIDE_FAR = 0x80F2C46A, ANCHOR = 0xFF7FD3C7, BRUSH = 0xD07FD3C7;
+	/** A guide not placed yet: white, following where you look, until you right-click to place it (then gold). */
+	private static final int PREVIEW = 0xB4FFFFFF, PREVIEW_FAR = 0x70FFFFFF;
 	/** Ghost blocks drawn a frame at most, nearest first. */
 	private static final int MAX_DRAWN = 12000;
 
@@ -66,15 +68,17 @@ public final class ToolRender {
 		}
 		for (ItemStack g : guides) {
 			CompoundTag tag = ToolData.get(g);
+			boolean preview = false;
 			// Before its middle is set, the held guide previews where you're looking.
 			if (g == main && !tag.getBooleanOr("aset", false) && mc.hitResult instanceof BlockHitResult hit && hit.getType() == HitResult.Type.BLOCK) {
+				preview = true;
 				BlockPos at = hit.getBlockPos().relative(hit.getDirection());
 				tag.putInt("ax", at.getX());
 				tag.putInt("ay", at.getY());
 				tag.putInt("az", at.getZ());
 				tag.putBoolean("aset", true);
 			}
-			guide(pose, lines, cam, tag);
+			guide(pose, lines, cam, tag, preview);
 		}
 
 		// The brush's circle, on the ground it would smooth.
@@ -83,7 +87,7 @@ public final class ToolRender {
 		}
 	}
 
-	private static void guide(PoseStack pose, VertexConsumer lines, Vec3 cam, CompoundTag tag) {
+	private static void guide(PoseStack pose, VertexConsumer lines, Vec3 cam, CompoundTag tag, boolean preview) {
 		List<BlockPos> blocks;
 		if (Objects.equals(tag, lastTag)) {
 			blocks = lastBlocks;
@@ -101,7 +105,7 @@ public final class ToolRender {
 		for (BlockPos b : order) {
 			if (drawn++ >= MAX_DRAWN) break;
 			double d2 = b.distToCenterSqr(cam);
-			box(pose, lines, cam, b, GHOST, d2 > far2 ? GUIDE_FAR : GUIDE);
+			box(pose, lines, cam, b, GHOST, preview ? (d2 > far2 ? PREVIEW_FAR : PREVIEW) : d2 > far2 ? GUIDE_FAR : GUIDE);
 		}
 		if (anchor != null) box(pose, lines, cam, anchor, MARK, ANCHOR);
 		BlockPos end = GuideShapes.anchor(tag, "b");

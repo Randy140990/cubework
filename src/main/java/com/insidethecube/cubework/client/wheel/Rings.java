@@ -34,6 +34,29 @@ final class Rings {
 		}
 	}
 
+	/**
+	 * A slice of a ring, like a slice of pizza: a0 to a1 between radii r0 and r1, with gap pixels left clear
+	 * along its straight sides, so slices side by side stand apart with even gaps between them.
+	 */
+	void slice(float cx, float cy, float r0, float r1, double a0, double a1, float gap, Paint paint) {
+		if (gap <= 0 || a1 - a0 >= Math.PI * 2 - 1e-6) {
+			sector(cx, cy, r0, r1, a0, a1, paint);
+			return;
+		}
+		double i0 = a0 + gap / 2 / Math.max(1, r0), i1 = a1 - gap / 2 / Math.max(1, r0);
+		double o0 = a0 + gap / 2 / Math.max(1, r1), o1 = a1 - gap / 2 / Math.max(1, r1);
+		if (i1 <= i0 || o1 <= o0) return;
+		int steps = Math.max(1, (int) Math.ceil((o1 - o0) / Math.toRadians(4)));
+		for (int i = 0; i < steps; i++) {
+			double s0 = i0 + (i1 - i0) * i / steps, t0 = i0 + (i1 - i0) * (i + 1) / steps;
+			double s1 = o0 + (o1 - o0) * i / steps, t1 = o0 + (o1 - o0) * (i + 1) / steps;
+			quad(cx + (float) Math.sin(s0) * r0, cy - (float) Math.cos(s0) * r0, paint.at(s0, false),
+					cx + (float) Math.sin(s1) * r1, cy - (float) Math.cos(s1) * r1, paint.at(s1, true),
+					cx + (float) Math.sin(t1) * r1, cy - (float) Math.cos(t1) * r1, paint.at(t1, true),
+					cx + (float) Math.sin(t0) * r0, cy - (float) Math.cos(t0) * r0, paint.at(t0, false));
+		}
+	}
+
 	void ring(float cx, float cy, float r0, float r1, Paint paint) {
 		sector(cx, cy, r0, r1, 0, Math.PI * 2, paint);
 	}

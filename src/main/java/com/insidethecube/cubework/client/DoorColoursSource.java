@@ -59,14 +59,11 @@ public record DoorColoursSource(List<Identifier> textures, String prefix, boolea
 		@Override
 		public SpriteContents paint() {
 			try (InputStream in = resource.open(); NativeImage source = NativeImage.read(in)) {
-				int w = source.getWidth(), h = Math.min(source.getHeight(), w);
-				int[] px = new int[w * h];
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) px[y * w + x] = Atlas.argb(source, x, y);
+				int[] size = new int[2];
+				int[] px = Atlas.pixels(source, source.getWidth(), Math.min(source.getHeight(), source.getWidth()), size);
 				Recolour.apply(px, colour, metal);
-				NativeImage out = new NativeImage(w, h, false);
-				for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) Atlas.setArgb(out, x, y, px[y * w + x]);
-				return Atlas.contents(id, out);
-			} catch (Exception e) {
+				return Atlas.contents(id, Atlas.image(px, size[0], size[1]));
+			} catch (Throwable e) {
 				return null;
 			}
 		}

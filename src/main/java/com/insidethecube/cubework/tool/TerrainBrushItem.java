@@ -55,6 +55,7 @@ public class TerrainBrushItem extends Item {
 	public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
 		tooltip.accept(Component.literal(MODE_NAMES[mode(stack)] + ", radius " + radius(stack) + ", " + STEEP_NAMES[steep(stack)].toLowerCase() + " slopes")
 				.withStyle(net.minecraft.ChatFormatting.GRAY));
-		tooltip.accept(Component.literal("Hold the shape wheel key to change").withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
+		tooltip.accept(Component.literal("Right-click the ground to smooth it; hold ").append(Component.keybind("key.cubework.wheel"))
+				.append(" for size, mode and undo").withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
 	}
 }

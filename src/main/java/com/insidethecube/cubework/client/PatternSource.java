@@ -28,7 +28,12 @@ public record PatternSource(List<Identifier> textures, List<String> patterns) im
 	@Override
 	public void run(ResourceManager manager, SpriteSource.Output regions) {
 		for (Identifier texture : textures) {
-			Optional<Resource> resource = manager.getResource(TEXTURE_ID_CONVERTER.idToFile(texture));
+			Optional<Resource> resource;
+			try {
+				resource = manager.getResource(TEXTURE_ID_CONVERTER.idToFile(texture));
+			} catch (Throwable e) {
+				continue;
+			}
 			if (resource.isEmpty()) continue;
 			String name = texture.getPath().substring(texture.getPath().lastIndexOf('/') + 1);
 			for (String pattern : patterns) {
@@ -57,14 +62,15 @@ public record PatternSource(List<Identifier> textures, List<String> patterns) im
 		@Override
 		public SpriteContents paint() {
 			try (InputStream in = resource.open(); NativeImage source = NativeImage.read(in)) {
-				int w = Math.min(source.getWidth(), source.getHeight());
-				int[] px = new int[w * w];
-				for (int y = 0; y < w; y++) for (int x = 0; x < w; x++) px[y * w + x] = Atlas.argb(source, x, y);
+				int side = Math.min(source.getWidth(), source.getHeight());
+				int[] size = new int[2];
+				int[] px = Atlas.pixels(source, side, side, size);
+				int w = size[0];
 				int[] made = Patterns.apply(px, w, pattern, Patterns.Kind.COLOUR);
-				NativeImage out = new NativeImage(w, w, false);
-				for (int y = 0; y < w; y++) for (int x = 0; x < w; x++) Atlas.setArgb(out, x, y, made[y * w + x]);
-				return Atlas.contents(id, out);
-			} catch (Exception e) {
+				return Atlas.contents(id, Atlas.image(made, w, w));
+			} catch (Throwable e) {
+				// A texture that can't be read or patterned leaves that one block untextured, never the whole load failing.
+				org.slf4j.LoggerFactory.getLogger("cubework").warn("Couldn't make the {} pattern for {}", pattern, id, e);
 				return null;
 			}
 		}

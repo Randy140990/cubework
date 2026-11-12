@@ -41,11 +41,15 @@ public final class CubeworkClient implements ClientModInitializer {
 				if (mc.screen != null || mc.player == null) continue;
 				Wheel wheel = WheelModels.forPlayer(mc);
 				if (wheel == null) {
-					mc.player.displayClientMessage(Component.literal("Hold a block (or look at one in creative), the terrain brush or the builder's guide."), true);
+					net.minecraft.world.item.ItemStack held = mc.player.getMainHandItem();
+					mc.player.displayClientMessage(Component.literal(held.isEmpty()
+							? "Hold a block to choose its shape (or the terrain brush or builder's guide for their settings)."
+							: held.getHoverName().getString() + " has no Cubework shapes."), true);
 					continue;
 				}
 				mc.setScreen(new WheelScreen(wheel, WHEEL));
 			}
+			ToolHints.tick(mc);
 		});
 		ToolRender.register();
 
