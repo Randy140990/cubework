@@ -56,3 +56,4 @@ net.minecraft.world.level.block.state.properties.BlockStateProperties
 net.minecraft.world.level.block.state.properties.IntegerProperty
 net.minecraft.world.level.block.state.properties.EnumProperty
 net.minecraft.world.level.block.state.properties.BooleanProperty
+net.minecraft.world.item.ItemCooldowns

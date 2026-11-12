@@ -2,3 +2,6 @@ ColorProviderRegistry
 EntityRendererRegistry
 BlockColorRegistry
 HudElementRegistry
+ThrowableItemProjectile
+ItemTooltipCallback
+BlockRenderLayerMap

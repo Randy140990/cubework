@@ -1,0 +1,7 @@
+{
+ "variants": {
+  "": {
+   "model": "deepkit:block/beam_light"
+  }
+ }
+}

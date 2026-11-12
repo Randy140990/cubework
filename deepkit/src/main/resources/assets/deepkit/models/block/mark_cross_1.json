@@ -1,0 +1,36 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "mark": "deepkit:block/mark/cross",
+  "particle": "deepkit:block/mark/cross"
+ },
+ "elements": [
+  {
+   "from": [
+    0,
+    0,
+    0.1
+   ],
+   "to": [
+    16,
+    16,
+    0.1
+   ],
+   "shade": false,
+   "light_emission": 12,
+   "faces": {
+    "south": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#mark",
+     "tintindex": 0,
+     "rotation": 90
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "equipment",
+ "ingredients": [
+  "minecraft:glass_bottle",
+  "minecraft:glow_ink_sac",
+  "minecraft:cyan_dye"
+ ],
+ "result": {
+  "id": "deepkit:cyan_glow_paint",
+  "count": 1
+ }
+}

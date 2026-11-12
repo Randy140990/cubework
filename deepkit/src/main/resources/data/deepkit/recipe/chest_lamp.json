@@ -1,0 +1,13 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "equipment",
+ "ingredients": [
+  "deepkit:hand_torch",
+  "minecraft:leather",
+  "minecraft:iron_nugget"
+ ],
+ "result": {
+  "id": "deepkit:chest_lamp",
+  "count": 1
+ }
+}

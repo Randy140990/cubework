@@ -1,0 +1,1687 @@
+{
+ "variants": {
+  "facing=north,rotation=0,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0"
+  },
+  "facing=north,rotation=0,symbol=1": {
+   "model": "deepkit:block/mark_cross_0"
+  },
+  "facing=north,rotation=0,symbol=2": {
+   "model": "deepkit:block/mark_dot_0"
+  },
+  "facing=north,rotation=0,symbol=3": {
+   "model": "deepkit:block/mark_circle_0"
+  },
+  "facing=north,rotation=0,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0"
+  },
+  "facing=north,rotation=0,symbol=5": {
+   "model": "deepkit:block/mark_question_0"
+  },
+  "facing=north,rotation=0,symbol=6": {
+   "model": "deepkit:block/mark_tick_0"
+  },
+  "facing=north,rotation=0,symbol=7": {
+   "model": "deepkit:block/mark_0_0"
+  },
+  "facing=north,rotation=0,symbol=8": {
+   "model": "deepkit:block/mark_1_0"
+  },
+  "facing=north,rotation=0,symbol=9": {
+   "model": "deepkit:block/mark_2_0"
+  },
+  "facing=north,rotation=0,symbol=10": {
+   "model": "deepkit:block/mark_3_0"
+  },
+  "facing=north,rotation=0,symbol=11": {
+   "model": "deepkit:block/mark_4_0"
+  },
+  "facing=north,rotation=0,symbol=12": {
+   "model": "deepkit:block/mark_5_0"
+  },
+  "facing=north,rotation=0,symbol=13": {
+   "model": "deepkit:block/mark_6_0"
+  },
+  "facing=north,rotation=0,symbol=14": {
+   "model": "deepkit:block/mark_7_0"
+  },
+  "facing=north,rotation=0,symbol=15": {
+   "model": "deepkit:block/mark_8_0"
+  },
+  "facing=north,rotation=0,symbol=16": {
+   "model": "deepkit:block/mark_9_0"
+  },
+  "facing=north,rotation=1,symbol=0": {
+   "model": "deepkit:block/mark_arrow_1"
+  },
+  "facing=north,rotation=1,symbol=1": {
+   "model": "deepkit:block/mark_cross_1"
+  },
+  "facing=north,rotation=1,symbol=2": {
+   "model": "deepkit:block/mark_dot_1"
+  },
+  "facing=north,rotation=1,symbol=3": {
+   "model": "deepkit:block/mark_circle_1"
+  },
+  "facing=north,rotation=1,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_1"
+  },
+  "facing=north,rotation=1,symbol=5": {
+   "model": "deepkit:block/mark_question_1"
+  },
+  "facing=north,rotation=1,symbol=6": {
+   "model": "deepkit:block/mark_tick_1"
+  },
+  "facing=north,rotation=1,symbol=7": {
+   "model": "deepkit:block/mark_0_1"
+  },
+  "facing=north,rotation=1,symbol=8": {
+   "model": "deepkit:block/mark_1_1"
+  },
+  "facing=north,rotation=1,symbol=9": {
+   "model": "deepkit:block/mark_2_1"
+  },
+  "facing=north,rotation=1,symbol=10": {
+   "model": "deepkit:block/mark_3_1"
+  },
+  "facing=north,rotation=1,symbol=11": {
+   "model": "deepkit:block/mark_4_1"
+  },
+  "facing=north,rotation=1,symbol=12": {
+   "model": "deepkit:block/mark_5_1"
+  },
+  "facing=north,rotation=1,symbol=13": {
+   "model": "deepkit:block/mark_6_1"
+  },
+  "facing=north,rotation=1,symbol=14": {
+   "model": "deepkit:block/mark_7_1"
+  },
+  "facing=north,rotation=1,symbol=15": {
+   "model": "deepkit:block/mark_8_1"
+  },
+  "facing=north,rotation=1,symbol=16": {
+   "model": "deepkit:block/mark_9_1"
+  },
+  "facing=north,rotation=2,symbol=0": {
+   "model": "deepkit:block/mark_arrow_2"
+  },
+  "facing=north,rotation=2,symbol=1": {
+   "model": "deepkit:block/mark_cross_2"
+  },
+  "facing=north,rotation=2,symbol=2": {
+   "model": "deepkit:block/mark_dot_2"
+  },
+  "facing=north,rotation=2,symbol=3": {
+   "model": "deepkit:block/mark_circle_2"
+  },
+  "facing=north,rotation=2,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_2"
+  },
+  "facing=north,rotation=2,symbol=5": {
+   "model": "deepkit:block/mark_question_2"
+  },
+  "facing=north,rotation=2,symbol=6": {
+   "model": "deepkit:block/mark_tick_2"
+  },
+  "facing=north,rotation=2,symbol=7": {
+   "model": "deepkit:block/mark_0_2"
+  },
+  "facing=north,rotation=2,symbol=8": {
+   "model": "deepkit:block/mark_1_2"
+  },
+  "facing=north,rotation=2,symbol=9": {
+   "model": "deepkit:block/mark_2_2"
+  },
+  "facing=north,rotation=2,symbol=10": {
+   "model": "deepkit:block/mark_3_2"
+  },
+  "facing=north,rotation=2,symbol=11": {
+   "model": "deepkit:block/mark_4_2"
+  },
+  "facing=north,rotation=2,symbol=12": {
+   "model": "deepkit:block/mark_5_2"
+  },
+  "facing=north,rotation=2,symbol=13": {
+   "model": "deepkit:block/mark_6_2"
+  },
+  "facing=north,rotation=2,symbol=14": {
+   "model": "deepkit:block/mark_7_2"
+  },
+  "facing=north,rotation=2,symbol=15": {
+   "model": "deepkit:block/mark_8_2"
+  },
+  "facing=north,rotation=2,symbol=16": {
+   "model": "deepkit:block/mark_9_2"
+  },
+  "facing=north,rotation=3,symbol=0": {
+   "model": "deepkit:block/mark_arrow_3"
+  },
+  "facing=north,rotation=3,symbol=1": {
+   "model": "deepkit:block/mark_cross_3"
+  },
+  "facing=north,rotation=3,symbol=2": {
+   "model": "deepkit:block/mark_dot_3"
+  },
+  "facing=north,rotation=3,symbol=3": {
+   "model": "deepkit:block/mark_circle_3"
+  },
+  "facing=north,rotation=3,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_3"
+  },
+  "facing=north,rotation=3,symbol=5": {
+   "model": "deepkit:block/mark_question_3"
+  },
+  "facing=north,rotation=3,symbol=6": {
+   "model": "deepkit:block/mark_tick_3"
+  },
+  "facing=north,rotation=3,symbol=7": {
+   "model": "deepkit:block/mark_0_3"
+  },
+  "facing=north,rotation=3,symbol=8": {
+   "model": "deepkit:block/mark_1_3"
+  },
+  "facing=north,rotation=3,symbol=9": {
+   "model": "deepkit:block/mark_2_3"
+  },
+  "facing=north,rotation=3,symbol=10": {
+   "model": "deepkit:block/mark_3_3"
+  },
+  "facing=north,rotation=3,symbol=11": {
+   "model": "deepkit:block/mark_4_3"
+  },
+  "facing=north,rotation=3,symbol=12": {
+   "model": "deepkit:block/mark_5_3"
+  },
+  "facing=north,rotation=3,symbol=13": {
+   "model": "deepkit:block/mark_6_3"
+  },
+  "facing=north,rotation=3,symbol=14": {
+   "model": "deepkit:block/mark_7_3"
+  },
+  "facing=north,rotation=3,symbol=15": {
+   "model": "deepkit:block/mark_8_3"
+  },
+  "facing=north,rotation=3,symbol=16": {
+   "model": "deepkit:block/mark_9_3"
+  },
+  "facing=east,rotation=0,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "y": 90
+  },
+  "facing=east,rotation=0,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=0": {
+   "model": "deepkit:block/mark_arrow_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=1": {
+   "model": "deepkit:block/mark_cross_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=2": {
+   "model": "deepkit:block/mark_dot_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=3": {
+   "model": "deepkit:block/mark_circle_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=5": {
+   "model": "deepkit:block/mark_question_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=6": {
+   "model": "deepkit:block/mark_tick_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=7": {
+   "model": "deepkit:block/mark_0_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=8": {
+   "model": "deepkit:block/mark_1_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=9": {
+   "model": "deepkit:block/mark_2_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=10": {
+   "model": "deepkit:block/mark_3_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=11": {
+   "model": "deepkit:block/mark_4_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=12": {
+   "model": "deepkit:block/mark_5_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=13": {
+   "model": "deepkit:block/mark_6_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=14": {
+   "model": "deepkit:block/mark_7_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=15": {
+   "model": "deepkit:block/mark_8_1",
+   "y": 90
+  },
+  "facing=east,rotation=1,symbol=16": {
+   "model": "deepkit:block/mark_9_1",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=0": {
+   "model": "deepkit:block/mark_arrow_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=1": {
+   "model": "deepkit:block/mark_cross_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=2": {
+   "model": "deepkit:block/mark_dot_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=3": {
+   "model": "deepkit:block/mark_circle_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=5": {
+   "model": "deepkit:block/mark_question_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=6": {
+   "model": "deepkit:block/mark_tick_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=7": {
+   "model": "deepkit:block/mark_0_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=8": {
+   "model": "deepkit:block/mark_1_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=9": {
+   "model": "deepkit:block/mark_2_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=10": {
+   "model": "deepkit:block/mark_3_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=11": {
+   "model": "deepkit:block/mark_4_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=12": {
+   "model": "deepkit:block/mark_5_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=13": {
+   "model": "deepkit:block/mark_6_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=14": {
+   "model": "deepkit:block/mark_7_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=15": {
+   "model": "deepkit:block/mark_8_2",
+   "y": 90
+  },
+  "facing=east,rotation=2,symbol=16": {
+   "model": "deepkit:block/mark_9_2",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=0": {
+   "model": "deepkit:block/mark_arrow_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=1": {
+   "model": "deepkit:block/mark_cross_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=2": {
+   "model": "deepkit:block/mark_dot_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=3": {
+   "model": "deepkit:block/mark_circle_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=5": {
+   "model": "deepkit:block/mark_question_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=6": {
+   "model": "deepkit:block/mark_tick_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=7": {
+   "model": "deepkit:block/mark_0_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=8": {
+   "model": "deepkit:block/mark_1_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=9": {
+   "model": "deepkit:block/mark_2_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=10": {
+   "model": "deepkit:block/mark_3_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=11": {
+   "model": "deepkit:block/mark_4_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=12": {
+   "model": "deepkit:block/mark_5_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=13": {
+   "model": "deepkit:block/mark_6_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=14": {
+   "model": "deepkit:block/mark_7_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=15": {
+   "model": "deepkit:block/mark_8_3",
+   "y": 90
+  },
+  "facing=east,rotation=3,symbol=16": {
+   "model": "deepkit:block/mark_9_3",
+   "y": 90
+  },
+  "facing=south,rotation=0,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "y": 180
+  },
+  "facing=south,rotation=0,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=0": {
+   "model": "deepkit:block/mark_arrow_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=1": {
+   "model": "deepkit:block/mark_cross_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=2": {
+   "model": "deepkit:block/mark_dot_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=3": {
+   "model": "deepkit:block/mark_circle_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=5": {
+   "model": "deepkit:block/mark_question_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=6": {
+   "model": "deepkit:block/mark_tick_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=7": {
+   "model": "deepkit:block/mark_0_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=8": {
+   "model": "deepkit:block/mark_1_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=9": {
+   "model": "deepkit:block/mark_2_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=10": {
+   "model": "deepkit:block/mark_3_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=11": {
+   "model": "deepkit:block/mark_4_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=12": {
+   "model": "deepkit:block/mark_5_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=13": {
+   "model": "deepkit:block/mark_6_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=14": {
+   "model": "deepkit:block/mark_7_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=15": {
+   "model": "deepkit:block/mark_8_1",
+   "y": 180
+  },
+  "facing=south,rotation=1,symbol=16": {
+   "model": "deepkit:block/mark_9_1",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=0": {
+   "model": "deepkit:block/mark_arrow_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=1": {
+   "model": "deepkit:block/mark_cross_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=2": {
+   "model": "deepkit:block/mark_dot_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=3": {
+   "model": "deepkit:block/mark_circle_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=5": {
+   "model": "deepkit:block/mark_question_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=6": {
+   "model": "deepkit:block/mark_tick_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=7": {
+   "model": "deepkit:block/mark_0_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=8": {
+   "model": "deepkit:block/mark_1_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=9": {
+   "model": "deepkit:block/mark_2_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=10": {
+   "model": "deepkit:block/mark_3_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=11": {
+   "model": "deepkit:block/mark_4_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=12": {
+   "model": "deepkit:block/mark_5_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=13": {
+   "model": "deepkit:block/mark_6_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=14": {
+   "model": "deepkit:block/mark_7_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=15": {
+   "model": "deepkit:block/mark_8_2",
+   "y": 180
+  },
+  "facing=south,rotation=2,symbol=16": {
+   "model": "deepkit:block/mark_9_2",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=0": {
+   "model": "deepkit:block/mark_arrow_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=1": {
+   "model": "deepkit:block/mark_cross_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=2": {
+   "model": "deepkit:block/mark_dot_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=3": {
+   "model": "deepkit:block/mark_circle_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=5": {
+   "model": "deepkit:block/mark_question_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=6": {
+   "model": "deepkit:block/mark_tick_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=7": {
+   "model": "deepkit:block/mark_0_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=8": {
+   "model": "deepkit:block/mark_1_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=9": {
+   "model": "deepkit:block/mark_2_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=10": {
+   "model": "deepkit:block/mark_3_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=11": {
+   "model": "deepkit:block/mark_4_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=12": {
+   "model": "deepkit:block/mark_5_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=13": {
+   "model": "deepkit:block/mark_6_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=14": {
+   "model": "deepkit:block/mark_7_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=15": {
+   "model": "deepkit:block/mark_8_3",
+   "y": 180
+  },
+  "facing=south,rotation=3,symbol=16": {
+   "model": "deepkit:block/mark_9_3",
+   "y": 180
+  },
+  "facing=west,rotation=0,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "y": 270
+  },
+  "facing=west,rotation=0,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=0": {
+   "model": "deepkit:block/mark_arrow_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=1": {
+   "model": "deepkit:block/mark_cross_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=2": {
+   "model": "deepkit:block/mark_dot_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=3": {
+   "model": "deepkit:block/mark_circle_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=5": {
+   "model": "deepkit:block/mark_question_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=6": {
+   "model": "deepkit:block/mark_tick_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=7": {
+   "model": "deepkit:block/mark_0_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=8": {
+   "model": "deepkit:block/mark_1_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=9": {
+   "model": "deepkit:block/mark_2_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=10": {
+   "model": "deepkit:block/mark_3_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=11": {
+   "model": "deepkit:block/mark_4_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=12": {
+   "model": "deepkit:block/mark_5_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=13": {
+   "model": "deepkit:block/mark_6_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=14": {
+   "model": "deepkit:block/mark_7_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=15": {
+   "model": "deepkit:block/mark_8_1",
+   "y": 270
+  },
+  "facing=west,rotation=1,symbol=16": {
+   "model": "deepkit:block/mark_9_1",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=0": {
+   "model": "deepkit:block/mark_arrow_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=1": {
+   "model": "deepkit:block/mark_cross_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=2": {
+   "model": "deepkit:block/mark_dot_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=3": {
+   "model": "deepkit:block/mark_circle_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=5": {
+   "model": "deepkit:block/mark_question_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=6": {
+   "model": "deepkit:block/mark_tick_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=7": {
+   "model": "deepkit:block/mark_0_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=8": {
+   "model": "deepkit:block/mark_1_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=9": {
+   "model": "deepkit:block/mark_2_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=10": {
+   "model": "deepkit:block/mark_3_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=11": {
+   "model": "deepkit:block/mark_4_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=12": {
+   "model": "deepkit:block/mark_5_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=13": {
+   "model": "deepkit:block/mark_6_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=14": {
+   "model": "deepkit:block/mark_7_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=15": {
+   "model": "deepkit:block/mark_8_2",
+   "y": 270
+  },
+  "facing=west,rotation=2,symbol=16": {
+   "model": "deepkit:block/mark_9_2",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=0": {
+   "model": "deepkit:block/mark_arrow_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=1": {
+   "model": "deepkit:block/mark_cross_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=2": {
+   "model": "deepkit:block/mark_dot_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=3": {
+   "model": "deepkit:block/mark_circle_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=5": {
+   "model": "deepkit:block/mark_question_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=6": {
+   "model": "deepkit:block/mark_tick_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=7": {
+   "model": "deepkit:block/mark_0_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=8": {
+   "model": "deepkit:block/mark_1_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=9": {
+   "model": "deepkit:block/mark_2_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=10": {
+   "model": "deepkit:block/mark_3_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=11": {
+   "model": "deepkit:block/mark_4_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=12": {
+   "model": "deepkit:block/mark_5_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=13": {
+   "model": "deepkit:block/mark_6_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=14": {
+   "model": "deepkit:block/mark_7_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=15": {
+   "model": "deepkit:block/mark_8_3",
+   "y": 270
+  },
+  "facing=west,rotation=3,symbol=16": {
+   "model": "deepkit:block/mark_9_3",
+   "y": 270
+  },
+  "facing=down,rotation=0,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "x": 90
+  },
+  "facing=down,rotation=0,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "x": 90
+  },
+  "facing=down,rotation=1,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=1,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "x": 90,
+   "y": 90
+  },
+  "facing=down,rotation=2,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=2,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "x": 90,
+   "y": 180
+  },
+  "facing=down,rotation=3,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=down,rotation=3,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "x": 90,
+   "y": 270
+  },
+  "facing=up,rotation=0,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=0,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "x": 270,
+   "y": 180
+  },
+  "facing=up,rotation=1,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=1,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "x": 270,
+   "y": 270
+  },
+  "facing=up,rotation=2,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=2,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "x": 270,
+   "y": 0
+  },
+  "facing=up,rotation=3,symbol=0": {
+   "model": "deepkit:block/mark_arrow_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=1": {
+   "model": "deepkit:block/mark_cross_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=2": {
+   "model": "deepkit:block/mark_dot_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=3": {
+   "model": "deepkit:block/mark_circle_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=4": {
+   "model": "deepkit:block/mark_exclamation_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=5": {
+   "model": "deepkit:block/mark_question_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=6": {
+   "model": "deepkit:block/mark_tick_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=7": {
+   "model": "deepkit:block/mark_0_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=8": {
+   "model": "deepkit:block/mark_1_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=9": {
+   "model": "deepkit:block/mark_2_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=10": {
+   "model": "deepkit:block/mark_3_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=11": {
+   "model": "deepkit:block/mark_4_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=12": {
+   "model": "deepkit:block/mark_5_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=13": {
+   "model": "deepkit:block/mark_6_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=14": {
+   "model": "deepkit:block/mark_7_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=15": {
+   "model": "deepkit:block/mark_8_0",
+   "x": 270,
+   "y": 90
+  },
+  "facing=up,rotation=3,symbol=16": {
+   "model": "deepkit:block/mark_9_0",
+   "x": 270,
+   "y": 90
+  }
+ }
+}

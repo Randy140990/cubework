@@ -12,6 +12,9 @@
   "entrypoints": {
     "main": [
       "com.insidethecube.deepkit.Deepkit"
+    ],
+    "client": [
+      "com.insidethecube.deepkit.client.DeepkitClient"
     ]
   },
   "depends": {

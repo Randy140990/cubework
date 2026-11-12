@@ -1,0 +1,6 @@
+{
+ "parent": "minecraft:item/generated",
+ "textures": {
+  "layer0": "deepkit:item/lime_glow_paint"
+ }
+}

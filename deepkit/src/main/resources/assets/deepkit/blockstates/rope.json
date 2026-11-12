@@ -1,0 +1,64 @@
+{
+ "variants": {
+  "facing=north,hook=false,knot=false": {
+   "model": "deepkit:block/rope"
+  },
+  "facing=north,hook=true,knot=false": {
+   "model": "deepkit:block/rope_hook"
+  },
+  "facing=north,hook=false,knot=true": {
+   "model": "deepkit:block/rope_knot"
+  },
+  "facing=north,hook=true,knot=true": {
+   "model": "deepkit:block/rope_hook"
+  },
+  "facing=east,hook=false,knot=false": {
+   "model": "deepkit:block/rope",
+   "y": 90
+  },
+  "facing=east,hook=true,knot=false": {
+   "model": "deepkit:block/rope_hook",
+   "y": 90
+  },
+  "facing=east,hook=false,knot=true": {
+   "model": "deepkit:block/rope_knot",
+   "y": 90
+  },
+  "facing=east,hook=true,knot=true": {
+   "model": "deepkit:block/rope_hook",
+   "y": 90
+  },
+  "facing=south,hook=false,knot=false": {
+   "model": "deepkit:block/rope",
+   "y": 180
+  },
+  "facing=south,hook=true,knot=false": {
+   "model": "deepkit:block/rope_hook",
+   "y": 180
+  },
+  "facing=south,hook=false,knot=true": {
+   "model": "deepkit:block/rope_knot",
+   "y": 180
+  },
+  "facing=south,hook=true,knot=true": {
+   "model": "deepkit:block/rope_hook",
+   "y": 180
+  },
+  "facing=west,hook=false,knot=false": {
+   "model": "deepkit:block/rope",
+   "y": 270
+  },
+  "facing=west,hook=true,knot=false": {
+   "model": "deepkit:block/rope_hook",
+   "y": 270
+  },
+  "facing=west,hook=false,knot=true": {
+   "model": "deepkit:block/rope_knot",
+   "y": 270
+  },
+  "facing=west,hook=true,knot=true": {
+   "model": "deepkit:block/rope_hook",
+   "y": 270
+  }
+ }
+}

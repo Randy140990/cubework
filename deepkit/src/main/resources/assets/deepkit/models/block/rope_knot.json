@@ -1,0 +1,105 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "rope": "deepkit:block/rope",
+  "particle": "deepkit:block/rope"
+ },
+ "elements": [
+  {
+   "from": [
+    7,
+    0,
+    2
+   ],
+   "to": [
+    9,
+    13,
+    4
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rope"
+    },
+    "south": {
+     "texture": "#rope"
+    },
+    "east": {
+     "texture": "#rope"
+    },
+    "west": {
+     "texture": "#rope"
+    },
+    "up": {
+     "texture": "#rope"
+    },
+    "down": {
+     "texture": "#rope"
+    }
+   }
+  },
+  {
+   "from": [
+    6.5,
+    13,
+    1
+   ],
+   "to": [
+    9.5,
+    16.5,
+    4.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rope"
+    },
+    "south": {
+     "texture": "#rope"
+    },
+    "east": {
+     "texture": "#rope"
+    },
+    "west": {
+     "texture": "#rope"
+    },
+    "up": {
+     "texture": "#rope"
+    },
+    "down": {
+     "texture": "#rope"
+    }
+   }
+  },
+  {
+   "from": [
+    6.5,
+    16,
+    -3
+   ],
+   "to": [
+    9.5,
+    17,
+    1
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rope"
+    },
+    "south": {
+     "texture": "#rope"
+    },
+    "east": {
+     "texture": "#rope"
+    },
+    "west": {
+     "texture": "#rope"
+    },
+    "up": {
+     "texture": "#rope"
+    },
+    "down": {
+     "texture": "#rope"
+    }
+   }
+  }
+ ]
+}

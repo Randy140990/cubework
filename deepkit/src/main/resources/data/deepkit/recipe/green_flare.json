@@ -1,0 +1,14 @@
+{
+ "type": "minecraft:crafting_shapeless",
+ "category": "equipment",
+ "ingredients": [
+  "minecraft:paper",
+  "minecraft:gunpowder",
+  "minecraft:redstone",
+  "minecraft:green_dye"
+ ],
+ "result": {
+  "id": "deepkit:green_flare",
+  "count": 4
+ }
+}

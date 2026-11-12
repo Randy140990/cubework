@@ -1,0 +1,41 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "rope": "deepkit:block/rope",
+  "particle": "deepkit:block/rope"
+ },
+ "elements": [
+  {
+   "from": [
+    7,
+    0,
+    2
+   ],
+   "to": [
+    9,
+    16,
+    4
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rope"
+    },
+    "south": {
+     "texture": "#rope"
+    },
+    "east": {
+     "texture": "#rope"
+    },
+    "west": {
+     "texture": "#rope"
+    },
+    "up": {
+     "texture": "#rope"
+    },
+    "down": {
+     "texture": "#rope"
+    }
+   }
+  }
+ ]
+}
