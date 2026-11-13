@@ -1,0 +1,4 @@
+1.21.11 {'blocks': 1168, 'items': 1505, 'particles': 104, 'entities': 163, 'block_textures': 1111, 'shaders': 93}
+26.1.2 {'blocks': 1170, 'items': 1506, 'particles': 106, 'entities': 163, 'block_textures': 1112, 'shaders': 91}
+26.2 {'blocks': 1198, 'items': 1537, 'particles': 112, 'entities': 164, 'block_textures': 1269, 'shaders': 83}
+26.3 {'blocks': 1288, 'items': 1658, 'particles': 115, 'entities': 167, 'block_textures': 1300, 'shaders': 92}

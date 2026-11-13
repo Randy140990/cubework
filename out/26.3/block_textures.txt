@@ -1,0 +1,1300 @@
+acacia_door_bottom	
+acacia_door_top	
+acacia_hanging_sign	Acacia Hanging Sign
+acacia_leaves	Acacia Leaves
+acacia_log	Acacia Log
+acacia_log_top	
+acacia_planks	Acacia Planks
+acacia_sapling	Acacia Sapling
+acacia_shelf	Acacia Shelf
+acacia_sign	Acacia Sign
+acacia_trapdoor	Acacia Trapdoor
+activator_rail	Activator Rail
+activator_rail_on	
+allium	Allium
+amethyst_block	Block of Amethyst
+amethyst_cluster	Amethyst Cluster
+ancient_debris_side	
+ancient_debris_top	
+andesite	Andesite
+anvil	Anvil
+anvil_top	
+attached_melon_stem	Attached Melon Stem
+attached_pumpkin_stem	Attached Pumpkin Stem
+azalea_leaves	Azalea Leaves
+azalea_plant	
+azalea_side	
+azalea_top	
+azure_bluet	Azure Bluet
+bamboo_block	Block of Bamboo
+bamboo_block_top	
+bamboo_door_bottom	
+bamboo_door_top	
+bamboo_fence	Bamboo Fence
+bamboo_fence_gate	Bamboo Fence Gate
+bamboo_fence_gate_particle	
+bamboo_fence_particle	
+bamboo_hanging_sign	Bamboo Hanging Sign
+bamboo_large_leaves	
+bamboo_mosaic	Bamboo Mosaic
+bamboo_planks	Bamboo Planks
+bamboo_shelf	Bamboo Shelf
+bamboo_sign	Bamboo Sign
+bamboo_singleleaf	
+bamboo_small_leaves	
+bamboo_stage0	
+bamboo_stalk	
+bamboo_trapdoor	Bamboo Trapdoor
+barrel_bottom	
+barrel_side	
+barrel_top	
+barrel_top_open	
+basalt_side	
+basalt_top	
+beacon	Beacon
+bed_down	
+bed_head_north	
+bedrock	Bedrock
+bee_nest_bottom	
+bee_nest_front	
+bee_nest_front_honey	
+bee_nest_side	
+bee_nest_top	
+beehive_end	
+beehive_front	
+beehive_front_honey	
+beehive_side	
+beetroots_stage0	
+beetroots_stage1	
+beetroots_stage2	
+beetroots_stage3	
+bell_bottom	
+bell_side	
+bell_top	
+big_dripleaf_side	
+big_dripleaf_stem	Big Dripleaf Stem
+big_dripleaf_tip	
+big_dripleaf_top	
+birch_door_bottom	
+birch_door_top	
+birch_hanging_sign	Birch Hanging Sign
+birch_leaves	Birch Leaves
+birch_log	Birch Log
+birch_log_top	
+birch_planks	Birch Planks
+birch_sapling	Birch Sapling
+birch_shelf	Birch Shelf
+birch_sign	Birch Sign
+birch_trapdoor	Birch Trapdoor
+black_bed_foot_east	
+black_bed_foot_south	
+black_bed_foot_up	
+black_bed_foot_west	
+black_bed_head_east	
+black_bed_head_up	
+black_bed_head_west	
+black_candle	Black Candle
+black_candle_lit	
+black_concrete	Black Concrete
+black_concrete_powder	Black Concrete Powder
+black_glazed_terracotta	Black Glazed Terracotta
+black_shulker_box	Black Shulker Box
+black_stained_glass	Black Stained Glass
+black_stained_glass_pane_top	
+black_terracotta	Black Terracotta
+black_wool	Black Wool
+blackstone	Blackstone
+blackstone_top	
+blast_furnace_front	
+blast_furnace_front_on	
+blast_furnace_side	
+blast_furnace_top	
+blue_bed_foot_east	
+blue_bed_foot_south	
+blue_bed_foot_up	
+blue_bed_foot_west	
+blue_bed_head_east	
+blue_bed_head_up	
+blue_bed_head_west	
+blue_candle	Blue Candle
+blue_candle_lit	
+blue_concrete	Blue Concrete
+blue_concrete_powder	Blue Concrete Powder
+blue_glazed_terracotta	Blue Glazed Terracotta
+blue_ice	Blue Ice
+blue_orchid	Blue Orchid
+blue_shulker_box	Blue Shulker Box
+blue_stained_glass	Blue Stained Glass
+blue_stained_glass_pane_top	
+blue_terracotta	Blue Terracotta
+blue_wool	Blue Wool
+bone_block_side	
+bone_block_top	
+bookshelf	Bookshelf
+brain_coral	Brain Coral
+brain_coral_block	Brain Coral Block
+brain_coral_fan	Brain Coral Fan
+brewing_stand	Brewing Stand
+brewing_stand_base	
+bricks	Bricks
+brown_bed_foot_east	
+brown_bed_foot_south	
+brown_bed_foot_up	
+brown_bed_foot_west	
+brown_bed_head_east	
+brown_bed_head_up	
+brown_bed_head_west	
+brown_candle	Brown Candle
+brown_candle_lit	
+brown_concrete	Brown Concrete
+brown_concrete_powder	Brown Concrete Powder
+brown_glazed_terracotta	Brown Glazed Terracotta
+brown_mushroom	Brown Mushroom
+brown_mushroom_block	Brown Mushroom Block
+brown_shulker_box	Brown Shulker Box
+brown_stained_glass	Brown Stained Glass
+brown_stained_glass_pane_top	
+brown_terracotta	Brown Terracotta
+brown_wool	Brown Wool
+bubble_coral	Bubble Coral
+bubble_coral_block	Bubble Coral Block
+bubble_coral_fan	Bubble Coral Fan
+budding_amethyst	Budding Amethyst
+bush	Bush
+cactus_bottom	
+cactus_flower	Cactus Flower
+cactus_side	
+cactus_top	
+cake_bottom	
+cake_inner	
+cake_side	
+cake_top	
+calcite	Calcite
+calibrated_sculk_sensor_amethyst	
+calibrated_sculk_sensor_input_side	
+calibrated_sculk_sensor_top	
+campfire_fire	
+campfire_log	
+campfire_log_lit	
+candle	Candle
+candle_lit	
+carrots_stage0	
+carrots_stage1	
+carrots_stage2	
+carrots_stage3	
+cartography_table_side1	
+cartography_table_side2	
+cartography_table_side3	
+cartography_table_top	
+carved_pumpkin	Carved Pumpkin
+cauldron_bottom	
+cauldron_inner	
+cauldron_side	
+cauldron_top	
+cave_vines	Cave Vines
+cave_vines_lit	
+cave_vines_plant	Cave Vines Plant
+cave_vines_plant_lit	
+chain_command_block_back	
+chain_command_block_conditional	
+chain_command_block_front	
+chain_command_block_side	
+cherry_door_bottom	
+cherry_door_top	
+cherry_hanging_sign	Cherry Hanging Sign
+cherry_leaves	Cherry Leaves
+cherry_log	Cherry Log
+cherry_log_top	
+cherry_planks	Cherry Planks
+cherry_sapling	Cherry Sapling
+cherry_shelf	Cherry Shelf
+cherry_sign	Cherry Sign
+cherry_trapdoor	Cherry Trapdoor
+chipped_anvil_top	
+chiseled_bookshelf_empty	
+chiseled_bookshelf_occupied	
+chiseled_bookshelf_side	
+chiseled_bookshelf_top	
+chiseled_cinnabar	Chiseled Cinnabar
+chiseled_copper	Chiseled Copper
+chiseled_deepslate	Chiseled Deepslate
+chiseled_nether_bricks	Chiseled Nether Bricks
+chiseled_polished_blackstone	Chiseled Polished Blackstone
+chiseled_quartz_block	Chiseled Quartz Block
+chiseled_quartz_block_top	
+chiseled_red_sandstone	Chiseled Red Sandstone
+chiseled_resin_bricks	Chiseled Resin Bricks
+chiseled_sandstone	Chiseled Sandstone
+chiseled_stone_bricks	Chiseled Stone Bricks
+chiseled_sulfur	Chiseled Sulfur
+chiseled_tuff	Chiseled Tuff
+chiseled_tuff_bricks	Chiseled Tuff Bricks
+chiseled_tuff_bricks_top	
+chiseled_tuff_top	
+chorus_flower	Chorus Flower
+chorus_flower_dead	
+chorus_plant	Chorus Plant
+cinnabar	Cinnabar
+cinnabar_bricks	Cinnabar Bricks
+clay	Clay
+closed_eyeblossom	Closed Eyeblossom
+coal_block	Block of Coal
+coal_ore	Coal Ore
+coarse_dirt	Coarse Dirt
+cobbled_deepslate	Cobbled Deepslate
+cobblestone	Cobblestone
+cobweb	Cobweb
+cocoa_stage0	
+cocoa_stage1	
+cocoa_stage2	
+command_block_back	
+command_block_conditional	
+command_block_front	
+command_block_side	
+comparator	Redstone Comparator
+comparator_on	
+composter_bottom	
+composter_compost	
+composter_ready	
+composter_side	
+composter_top	
+conduit	Conduit
+copper_bars	Copper Bars
+copper_block	Block of Copper
+copper_bulb	Copper Bulb
+copper_bulb_lit	
+copper_bulb_lit_powered	
+copper_bulb_powered	
+copper_chain	Copper Chain
+copper_door_bottom	
+copper_door_top	
+copper_grate	Copper Grate
+copper_lantern	Copper Lantern
+copper_ore	Copper Ore
+copper_torch	Copper Torch
+copper_trapdoor	Copper Trapdoor
+cornflower	Cornflower
+cracked_deepslate_bricks	Cracked Deepslate Bricks
+cracked_deepslate_tiles	Cracked Deepslate Tiles
+cracked_nether_bricks	Cracked Nether Bricks
+cracked_polished_blackstone_bricks	Cracked Polished Blackstone Bricks
+cracked_stone_bricks	Cracked Stone Bricks
+crafter_bottom	
+crafter_east	
+crafter_east_crafting	
+crafter_east_triggered	
+crafter_north	
+crafter_north_crafting	
+crafter_south	
+crafter_south_triggered	
+crafter_top	
+crafter_top_crafting	
+crafter_top_triggered	
+crafter_west	
+crafter_west_crafting	
+crafter_west_triggered	
+crafting_table_front	
+crafting_table_side	
+crafting_table_top	
+creaking_heart	Creaking Heart
+creaking_heart_awake	
+creaking_heart_dormant	
+creaking_heart_top	
+creaking_heart_top_awake	
+creaking_heart_top_dormant	
+crimson_door_bottom	
+crimson_door_top	
+crimson_fungus	Crimson Fungus
+crimson_hanging_sign	Crimson Hanging Sign
+crimson_nylium	Crimson Nylium
+crimson_nylium_side	
+crimson_planks	Crimson Planks
+crimson_roots	Crimson Roots
+crimson_roots_pot	
+crimson_shelf	Crimson Shelf
+crimson_sign	Crimson Sign
+crimson_stem	Crimson Stem
+crimson_stem_top	
+crimson_trapdoor	Crimson Trapdoor
+crying_obsidian	Crying Obsidian
+cut_copper	Cut Copper
+cut_red_sandstone	Cut Red Sandstone
+cut_sandstone	Cut Sandstone
+cyan_bed_foot_east	
+cyan_bed_foot_south	
+cyan_bed_foot_up	
+cyan_bed_foot_west	
+cyan_bed_head_east	
+cyan_bed_head_up	
+cyan_bed_head_west	
+cyan_candle	Cyan Candle
+cyan_candle_lit	
+cyan_concrete	Cyan Concrete
+cyan_concrete_powder	Cyan Concrete Powder
+cyan_glazed_terracotta	Cyan Glazed Terracotta
+cyan_shulker_box	Cyan Shulker Box
+cyan_stained_glass	Cyan Stained Glass
+cyan_stained_glass_pane_top	
+cyan_terracotta	Cyan Terracotta
+cyan_wool	Cyan Wool
+damaged_anvil_top	
+dandelion	Dandelion
+dark_oak_door_bottom	
+dark_oak_door_top	
+dark_oak_hanging_sign	Dark Oak Hanging Sign
+dark_oak_leaves	Dark Oak Leaves
+dark_oak_log	Dark Oak Log
+dark_oak_log_top	
+dark_oak_planks	Dark Oak Planks
+dark_oak_sapling	Dark Oak Sapling
+dark_oak_shelf	Dark Oak Shelf
+dark_oak_sign	Dark Oak Sign
+dark_oak_trapdoor	Dark Oak Trapdoor
+dark_prismarine	Dark Prismarine
+daylight_detector_inverted_top	
+daylight_detector_side	
+daylight_detector_top	
+dead_brain_coral	Dead Brain Coral
+dead_brain_coral_block	Dead Brain Coral Block
+dead_brain_coral_fan	Dead Brain Coral Fan
+dead_bubble_coral	Dead Bubble Coral
+dead_bubble_coral_block	Dead Bubble Coral Block
+dead_bubble_coral_fan	Dead Bubble Coral Fan
+dead_bush	Dead Bush
+dead_fire_coral	Dead Fire Coral
+dead_fire_coral_block	Dead Fire Coral Block
+dead_fire_coral_fan	Dead Fire Coral Fan
+dead_horn_coral	Dead Horn Coral
+dead_horn_coral_block	Dead Horn Coral Block
+dead_horn_coral_fan	Dead Horn Coral Fan
+dead_tube_coral	Dead Tube Coral
+dead_tube_coral_block	Dead Tube Coral Block
+dead_tube_coral_fan	Dead Tube Coral Fan
+debug	
+debug2	
+deepslate	Deepslate
+deepslate_bricks	Deepslate Bricks
+deepslate_coal_ore	Deepslate Coal Ore
+deepslate_copper_ore	Deepslate Copper Ore
+deepslate_diamond_ore	Deepslate Diamond Ore
+deepslate_emerald_ore	Deepslate Emerald Ore
+deepslate_gold_ore	Deepslate Gold Ore
+deepslate_iron_ore	Deepslate Iron Ore
+deepslate_lapis_ore	Deepslate Lapis Lazuli Ore
+deepslate_redstone_ore	Deepslate Redstone Ore
+deepslate_tiles	Deepslate Tiles
+deepslate_top	
+destroy_oit_stage_0	
+destroy_oit_stage_1	
+destroy_oit_stage_2	
+destroy_oit_stage_3	
+destroy_oit_stage_4	
+destroy_oit_stage_5	
+destroy_oit_stage_6	
+destroy_oit_stage_7	
+destroy_oit_stage_8	
+destroy_oit_stage_9	
+destroy_stage_0	
+destroy_stage_1	
+destroy_stage_2	
+destroy_stage_3	
+destroy_stage_4	
+destroy_stage_5	
+destroy_stage_6	
+destroy_stage_7	
+destroy_stage_8	
+destroy_stage_9	
+detector_rail	Detector Rail
+detector_rail_on	
+diamond_block	Block of Diamond
+diamond_ore	Diamond Ore
+diorite	Diorite
+dirt	Dirt
+dirt_path_side	
+dirt_path_top	
+dispenser_front	
+dispenser_front_vertical	
+dragon_egg	Dragon Egg
+dried_ghast_hydration_0_bottom	
+dried_ghast_hydration_0_east	
+dried_ghast_hydration_0_north	
+dried_ghast_hydration_0_south	
+dried_ghast_hydration_0_tentacles	
+dried_ghast_hydration_0_top	
+dried_ghast_hydration_0_west	
+dried_ghast_hydration_1_bottom	
+dried_ghast_hydration_1_east	
+dried_ghast_hydration_1_north	
+dried_ghast_hydration_1_south	
+dried_ghast_hydration_1_tentacles	
+dried_ghast_hydration_1_top	
+dried_ghast_hydration_1_west	
+dried_ghast_hydration_2_bottom	
+dried_ghast_hydration_2_east	
+dried_ghast_hydration_2_north	
+dried_ghast_hydration_2_south	
+dried_ghast_hydration_2_tentacles	
+dried_ghast_hydration_2_top	
+dried_ghast_hydration_2_west	
+dried_ghast_hydration_3_bottom	
+dried_ghast_hydration_3_east	
+dried_ghast_hydration_3_north	
+dried_ghast_hydration_3_south	
+dried_ghast_hydration_3_tentacles	
+dried_ghast_hydration_3_top	
+dried_ghast_hydration_3_west	
+dried_kelp_bottom	
+dried_kelp_side	
+dried_kelp_top	
+dripstone_block	Dripstone Block
+dropper_front	
+dropper_front_vertical	
+emerald_block	Block of Emerald
+emerald_ore	Emerald Ore
+enchanting_table_bottom	
+enchanting_table_side	
+enchanting_table_top	
+end_portal_frame_eye	
+end_portal_frame_side	
+end_portal_frame_top	
+end_rod	End Rod
+end_stone	End Stone
+end_stone_bricks	End Stone Bricks
+exposed_chiseled_copper	Exposed Chiseled Copper
+exposed_copper	Exposed Copper
+exposed_copper_bars	Exposed Copper Bars
+exposed_copper_bulb	Exposed Copper Bulb
+exposed_copper_bulb_lit	
+exposed_copper_bulb_lit_powered	
+exposed_copper_bulb_powered	
+exposed_copper_chain	Exposed Copper Chain
+exposed_copper_door_bottom	
+exposed_copper_door_top	
+exposed_copper_grate	Exposed Copper Grate
+exposed_copper_lantern	Exposed Copper Lantern
+exposed_copper_trapdoor	Exposed Copper Trapdoor
+exposed_cut_copper	Exposed Cut Copper
+exposed_lightning_rod	Exposed Lightning Rod
+farmland	Farmland
+farmland_moist	
+fern	Fern
+fire_0	
+fire_1	
+fire_coral	Fire Coral
+fire_coral_block	Fire Coral Block
+fire_coral_fan	Fire Coral Fan
+firefly_bush	Firefly Bush
+firefly_bush_emissive	
+fletching_table_front	
+fletching_table_side	
+fletching_table_top	
+flower_pot	Flower Pot
+flowering_azalea_leaves	Flowering Azalea Leaves
+flowering_azalea_side	
+flowering_azalea_top	
+frogspawn	Frogspawn
+frosted_ice_0	
+frosted_ice_1	
+frosted_ice_2	
+frosted_ice_3	
+furnace_front	
+furnace_front_on	
+furnace_side	
+furnace_top	
+gilded_blackstone	Gilded Blackstone
+glass	Glass
+glass_pane_top	
+glow_item_frame	Glow Item Frame
+glow_lichen	Glow Lichen
+glowstone	Glowstone
+gold_block	Block of Gold
+gold_ore	Gold Ore
+golden_dandelion	Golden Dandelion
+granite	Granite
+grass_block_side	
+grass_block_side_overlay	
+grass_block_snow	
+grass_block_top	
+gravel	Gravel
+gray_bed_foot_east	
+gray_bed_foot_south	
+gray_bed_foot_up	
+gray_bed_foot_west	
+gray_bed_head_east	
+gray_bed_head_up	
+gray_bed_head_west	
+gray_candle	Gray Candle
+gray_candle_lit	
+gray_concrete	Gray Concrete
+gray_concrete_powder	Gray Concrete Powder
+gray_glazed_terracotta	Gray Glazed Terracotta
+gray_shulker_box	Gray Shulker Box
+gray_stained_glass	Gray Stained Glass
+gray_stained_glass_pane_top	
+gray_terracotta	Gray Terracotta
+gray_wool	Gray Wool
+green_bed_foot_east	
+green_bed_foot_south	
+green_bed_foot_up	
+green_bed_foot_west	
+green_bed_head_east	
+green_bed_head_up	
+green_bed_head_west	
+green_candle	Green Candle
+green_candle_lit	
+green_concrete	Green Concrete
+green_concrete_powder	Green Concrete Powder
+green_glazed_terracotta	Green Glazed Terracotta
+green_shulker_box	Green Shulker Box
+green_stained_glass	Green Stained Glass
+green_stained_glass_pane_top	
+green_terracotta	Green Terracotta
+green_wool	Green Wool
+grindstone_pivot	
+grindstone_round	
+grindstone_side	
+hanging_roots	Hanging Roots
+hay_block_side	
+hay_block_top	
+heavy_core	Heavy Core
+honey_block_bottom	
+honey_block_side	
+honey_block_top	
+honeycomb_block	Honeycomb Block
+hopper_inside	
+hopper_outside	
+hopper_top	
+horn_coral	Horn Coral
+horn_coral_block	Horn Coral Block
+horn_coral_fan	Horn Coral Fan
+ice	Ice
+iron_bars	Iron Bars
+iron_block	Block of Iron
+iron_chain	Iron Chain
+iron_door_bottom	
+iron_door_top	
+iron_ore	Iron Ore
+iron_trapdoor	Iron Trapdoor
+item_frame	Item Frame
+jack_o_lantern	Jack o'Lantern
+jigsaw_bottom	
+jigsaw_lock	
+jigsaw_side	
+jigsaw_top	
+jukebox_side	
+jukebox_top	
+jungle_door_bottom	
+jungle_door_top	
+jungle_hanging_sign	Jungle Hanging Sign
+jungle_leaves	Jungle Leaves
+jungle_log	Jungle Log
+jungle_log_top	
+jungle_planks	Jungle Planks
+jungle_sapling	Jungle Sapling
+jungle_shelf	Jungle Shelf
+jungle_sign	Jungle Sign
+jungle_trapdoor	Jungle Trapdoor
+kelp	Kelp
+kelp_plant	Kelp Plant
+ladder	Ladder
+lantern	Lantern
+lapis_block	Block of Lapis Lazuli
+lapis_ore	Lapis Lazuli Ore
+large_amethyst_bud	Large Amethyst Bud
+large_fern_bottom	
+large_fern_top	
+lava_flow	
+lava_still	
+leaf_litter	Leaf Litter
+lectern_base	
+lectern_front	
+lectern_sides	
+lectern_top	
+lever	Lever
+light_blue_bed_foot_east	
+light_blue_bed_foot_south	
+light_blue_bed_foot_up	
+light_blue_bed_foot_west	
+light_blue_bed_head_east	
+light_blue_bed_head_up	
+light_blue_bed_head_west	
+light_blue_candle	Light Blue Candle
+light_blue_candle_lit	
+light_blue_concrete	Light Blue Concrete
+light_blue_concrete_powder	Light Blue Concrete Powder
+light_blue_glazed_terracotta	Light Blue Glazed Terracotta
+light_blue_shulker_box	Light Blue Shulker Box
+light_blue_stained_glass	Light Blue Stained Glass
+light_blue_stained_glass_pane_top	
+light_blue_terracotta	Light Blue Terracotta
+light_blue_wool	Light Blue Wool
+light_gray_bed_foot_east	
+light_gray_bed_foot_south	
+light_gray_bed_foot_up	
+light_gray_bed_foot_west	
+light_gray_bed_head_east	
+light_gray_bed_head_up	
+light_gray_bed_head_west	
+light_gray_candle	Light Gray Candle
+light_gray_candle_lit	
+light_gray_concrete	Light Gray Concrete
+light_gray_concrete_powder	Light Gray Concrete Powder
+light_gray_glazed_terracotta	Light Gray Glazed Terracotta
+light_gray_shulker_box	Light Gray Shulker Box
+light_gray_stained_glass	Light Gray Stained Glass
+light_gray_stained_glass_pane_top	
+light_gray_terracotta	Light Gray Terracotta
+light_gray_wool	Light Gray Wool
+lightning_rod	Lightning Rod
+lightning_rod_on	
+lilac_bottom	
+lilac_top	
+lily_of_the_valley	Lily of the Valley
+lily_pad	Lily Pad
+lime_bed_foot_east	
+lime_bed_foot_south	
+lime_bed_foot_up	
+lime_bed_foot_west	
+lime_bed_head_east	
+lime_bed_head_up	
+lime_bed_head_west	
+lime_candle	Lime Candle
+lime_candle_lit	
+lime_concrete	Lime Concrete
+lime_concrete_powder	Lime Concrete Powder
+lime_glazed_terracotta	Lime Glazed Terracotta
+lime_shulker_box	Lime Shulker Box
+lime_stained_glass	Lime Stained Glass
+lime_stained_glass_pane_top	
+lime_terracotta	Lime Terracotta
+lime_wool	Lime Wool
+lodestone_side	
+lodestone_top	
+loom_bottom	
+loom_front	
+loom_side	
+loom_top	
+magenta_bed_foot_east	
+magenta_bed_foot_south	
+magenta_bed_foot_up	
+magenta_bed_foot_west	
+magenta_bed_head_east	
+magenta_bed_head_up	
+magenta_bed_head_west	
+magenta_candle	Magenta Candle
+magenta_candle_lit	
+magenta_concrete	Magenta Concrete
+magenta_concrete_powder	Magenta Concrete Powder
+magenta_glazed_terracotta	Magenta Glazed Terracotta
+magenta_shulker_box	Magenta Shulker Box
+magenta_stained_glass	Magenta Stained Glass
+magenta_stained_glass_pane_top	
+magenta_terracotta	Magenta Terracotta
+magenta_wool	Magenta Wool
+magma	
+mangrove_door_bottom	
+mangrove_door_top	
+mangrove_hanging_sign	Mangrove Hanging Sign
+mangrove_leaves	Mangrove Leaves
+mangrove_log	Mangrove Log
+mangrove_log_top	
+mangrove_planks	Mangrove Planks
+mangrove_propagule	Mangrove Propagule
+mangrove_propagule_hanging	
+mangrove_roots_side	
+mangrove_roots_top	
+mangrove_shelf	Mangrove Shelf
+mangrove_sign	Mangrove Sign
+mangrove_trapdoor	Mangrove Trapdoor
+medium_amethyst_bud	Medium Amethyst Bud
+melon_side	
+melon_stem	Melon Stem
+melon_top	
+moss_block	Moss Block
+mossy_cobblestone	Mossy Cobblestone
+mossy_stone_bricks	Mossy Stone Bricks
+mud	Mud
+mud_bricks	Mud Bricks
+muddy_mangrove_roots_side	
+muddy_mangrove_roots_top	
+mushroom_block_inside	
+mushroom_stem	Mushroom Stem
+mycelium_side	
+mycelium_top	
+nether_bricks	Nether Bricks
+nether_gold_ore	Nether Gold Ore
+nether_portal	Nether Portal
+nether_quartz_ore	Nether Quartz Ore
+nether_sprouts	Nether Sprouts
+nether_wart_block	Nether Wart Block
+nether_wart_stage0	
+nether_wart_stage1	
+nether_wart_stage2	
+netherite_block	Block of Netherite
+netherrack	Netherrack
+note_block	Note Block
+oak_door_bottom	
+oak_door_top	
+oak_hanging_sign	Oak Hanging Sign
+oak_leaves	Oak Leaves
+oak_log	Oak Log
+oak_log_top	
+oak_planks	Oak Planks
+oak_sapling	Oak Sapling
+oak_shelf	Oak Shelf
+oak_sign	Oak Sign
+oak_trapdoor	Oak Trapdoor
+observer_back	
+observer_back_on	
+observer_front	
+observer_side	
+observer_top	
+obsidian	Obsidian
+ochre_froglight_side	
+ochre_froglight_top	
+open_eyeblossom	Open Eyeblossom
+open_eyeblossom_emissive	
+orange_bed_foot_east	
+orange_bed_foot_south	
+orange_bed_foot_up	
+orange_bed_foot_west	
+orange_bed_head_east	
+orange_bed_head_up	
+orange_bed_head_west	
+orange_candle	Orange Candle
+orange_candle_lit	
+orange_concrete	Orange Concrete
+orange_concrete_powder	Orange Concrete Powder
+orange_glazed_terracotta	Orange Glazed Terracotta
+orange_poplar_leaves	Orange Poplar Leaves
+orange_shulker_box	Orange Shulker Box
+orange_stained_glass	Orange Stained Glass
+orange_stained_glass_pane_top	
+orange_terracotta	Orange Terracotta
+orange_tulip	Orange Tulip
+orange_wool	Orange Wool
+oxeye_daisy	Oxeye Daisy
+oxidized_chiseled_copper	Oxidized Chiseled Copper
+oxidized_copper	Oxidized Copper
+oxidized_copper_bars	Oxidized Copper Bars
+oxidized_copper_bulb	Oxidized Copper Bulb
+oxidized_copper_bulb_lit	
+oxidized_copper_bulb_lit_powered	
+oxidized_copper_bulb_powered	
+oxidized_copper_chain	Oxidized Copper Chain
+oxidized_copper_door_bottom	
+oxidized_copper_door_top	
+oxidized_copper_grate	Oxidized Copper Grate
+oxidized_copper_lantern	Oxidized Copper Lantern
+oxidized_copper_trapdoor	Oxidized Copper Trapdoor
+oxidized_cut_copper	Oxidized Cut Copper
+oxidized_lightning_rod	Oxidized Lightning Rod
+packed_ice	Packed Ice
+packed_mud	Packed Mud
+pale_hanging_moss	Pale Hanging Moss
+pale_hanging_moss_tip	
+pale_moss_block	Pale Moss Block
+pale_moss_carpet	Pale Moss Carpet
+pale_moss_carpet_side_small	
+pale_moss_carpet_side_tall	
+pale_oak_door_bottom	
+pale_oak_door_top	
+pale_oak_hanging_sign	Pale Oak Hanging Sign
+pale_oak_leaves	Pale Oak Leaves
+pale_oak_log	Pale Oak Log
+pale_oak_log_top	
+pale_oak_planks	Pale Oak Planks
+pale_oak_sapling	Pale Oak Sapling
+pale_oak_shelf	Pale Oak Shelf
+pale_oak_sign	Pale Oak Sign
+pale_oak_trapdoor	Pale Oak Trapdoor
+pearlescent_froglight_side	
+pearlescent_froglight_top	
+peony_bottom	
+peony_top	
+pink_bed_foot_east	
+pink_bed_foot_south	
+pink_bed_foot_up	
+pink_bed_foot_west	
+pink_bed_head_east	
+pink_bed_head_up	
+pink_bed_head_west	
+pink_candle	Pink Candle
+pink_candle_lit	
+pink_concrete	Pink Concrete
+pink_concrete_powder	Pink Concrete Powder
+pink_glazed_terracotta	Pink Glazed Terracotta
+pink_petals	Pink Petals
+pink_petals_stem	
+pink_shulker_box	Pink Shulker Box
+pink_stained_glass	Pink Stained Glass
+pink_stained_glass_pane_top	
+pink_terracotta	Pink Terracotta
+pink_tulip	Pink Tulip
+pink_wool	Pink Wool
+piston_bottom	
+piston_inner	
+piston_side	
+piston_top	
+piston_top_sticky	
+pitcher_crop_bottom	
+pitcher_crop_bottom_stage_1	
+pitcher_crop_bottom_stage_2	
+pitcher_crop_bottom_stage_3	
+pitcher_crop_bottom_stage_4	
+pitcher_crop_side	
+pitcher_crop_top	
+pitcher_crop_top_stage_3	
+pitcher_crop_top_stage_4	
+podzol_side	
+podzol_top	
+pointed_dripstone_down_base	
+pointed_dripstone_down_frustum	
+pointed_dripstone_down_middle	
+pointed_dripstone_down_tip	
+pointed_dripstone_down_tip_merge	
+pointed_dripstone_up_base	
+pointed_dripstone_up_frustum	
+pointed_dripstone_up_middle	
+pointed_dripstone_up_tip	
+pointed_dripstone_up_tip_merge	
+polished_andesite	Polished Andesite
+polished_basalt_side	
+polished_basalt_top	
+polished_blackstone	Polished Blackstone
+polished_blackstone_bricks	Polished Blackstone Bricks
+polished_cinnabar	Polished Cinnabar
+polished_deepslate	Polished Deepslate
+polished_diorite	Polished Diorite
+polished_granite	Polished Granite
+polished_sulfur	Polished Sulfur
+polished_tuff	Polished Tuff
+poplar_door_bottom	
+poplar_door_top	
+poplar_hanging_sign	Poplar Hanging Sign
+poplar_log	Poplar Log
+poplar_log_top	
+poplar_planks	Poplar Planks
+poplar_sapling	Poplar Sapling
+poplar_shelf	Poplar Shelf
+poplar_sign	Poplar Sign
+poplar_trapdoor	Poplar Trapdoor
+poppy	Poppy
+potatoes_stage0	
+potatoes_stage1	
+potatoes_stage2	
+potatoes_stage3	
+potent_sulfur	Potent Sulfur
+potted_azalea_bush_plant	
+potted_azalea_bush_side	
+potted_azalea_bush_top	
+potted_flowering_azalea_bush_plant	
+potted_flowering_azalea_bush_side	
+potted_flowering_azalea_bush_top	
+powder_snow	Powder Snow
+powered_rail	Powered Rail
+powered_rail_on	
+prismarine	Prismarine
+prismarine_bricks	Prismarine Bricks
+pumpkin_side	
+pumpkin_stem	Pumpkin Stem
+pumpkin_top	
+purple_bed_foot_east	
+purple_bed_foot_south	
+purple_bed_foot_up	
+purple_bed_foot_west	
+purple_bed_head_east	
+purple_bed_head_up	
+purple_bed_head_west	
+purple_candle	Purple Candle
+purple_candle_lit	
+purple_concrete	Purple Concrete
+purple_concrete_powder	Purple Concrete Powder
+purple_glazed_terracotta	Purple Glazed Terracotta
+purple_shulker_box	Purple Shulker Box
+purple_stained_glass	Purple Stained Glass
+purple_stained_glass_pane_top	
+purple_terracotta	Purple Terracotta
+purple_wool	Purple Wool
+purpur_block	Purpur Block
+purpur_pillar_side	
+purpur_pillar_top	
+quartz_block_bottom	
+quartz_block_side	
+quartz_block_top	
+quartz_bricks	Quartz Bricks
+quartz_pillar_side	
+quartz_pillar_top	
+rail	Rail
+rail_corner	
+raw_copper_block	Block of Raw Copper
+raw_gold_block	Block of Raw Gold
+raw_iron_block	Block of Raw Iron
+red_bed_foot_east	
+red_bed_foot_south	
+red_bed_foot_up	
+red_bed_foot_west	
+red_bed_head_east	
+red_bed_head_up	
+red_bed_head_west	
+red_candle	Red Candle
+red_candle_lit	
+red_concrete	Red Concrete
+red_concrete_powder	Red Concrete Powder
+red_glazed_terracotta	Red Glazed Terracotta
+red_mushroom	Red Mushroom
+red_mushroom_block	Red Mushroom Block
+red_nether_bricks	Red Nether Bricks
+red_poplar_leaves	Red Poplar Leaves
+red_sand	Red Sand
+red_sandstone	Red Sandstone
+red_sandstone_bottom	
+red_sandstone_top	
+red_shrub	Red Shrub
+red_shulker_box	Red Shulker Box
+red_stained_glass	Red Stained Glass
+red_stained_glass_pane_top	
+red_terracotta	Red Terracotta
+red_tulip	Red Tulip
+red_wool	Red Wool
+redstone_block	Block of Redstone
+redstone_dust_dot	
+redstone_dust_line0	
+redstone_dust_line1	
+redstone_dust_overlay	
+redstone_lamp	Redstone Lamp
+redstone_lamp_on	
+redstone_ore	Redstone Ore
+redstone_torch	Redstone Torch
+redstone_torch_off	
+reinforced_deepslate_bottom	
+reinforced_deepslate_side	
+reinforced_deepslate_top	
+repeater	Redstone Repeater
+repeater_on	
+repeating_command_block_back	
+repeating_command_block_conditional	
+repeating_command_block_front	
+repeating_command_block_side	
+resin_block	Block of Resin
+resin_bricks	Resin Bricks
+resin_clump	Resin Clump
+respawn_anchor_bottom	
+respawn_anchor_side0	
+respawn_anchor_side1	
+respawn_anchor_side2	
+respawn_anchor_side3	
+respawn_anchor_side4	
+respawn_anchor_top	
+respawn_anchor_top_off	
+rooted_dirt	Rooted Dirt
+rose_bush_bottom	
+rose_bush_top	
+sand	Sand
+sandstone	Sandstone
+sandstone_bottom	
+sandstone_top	
+scaffolding_bottom	
+scaffolding_side	
+scaffolding_top	
+sculk	Sculk
+sculk_catalyst_bottom	
+sculk_catalyst_side	
+sculk_catalyst_side_bloom	
+sculk_catalyst_top	
+sculk_catalyst_top_bloom	
+sculk_sensor_bottom	
+sculk_sensor_side	
+sculk_sensor_tendril_active	
+sculk_sensor_tendril_inactive	
+sculk_sensor_top	
+sculk_shrieker_bottom	
+sculk_shrieker_can_summon_inner_top	
+sculk_shrieker_inner_top	
+sculk_shrieker_side	
+sculk_shrieker_top	
+sculk_vein	Sculk Vein
+sea_lantern	Sea Lantern
+sea_pickle	Sea Pickle
+seagrass	Seagrass
+shelf_mushroom_particle	
+shelf_mushroom_stage0	
+shelf_mushroom_stage1	
+short_dry_grass	Short Dry Grass
+short_grass	Short Grass
+shroomlight	Shroomlight
+shulker_box	Shulker Box
+slime_block	Slime Block
+small_amethyst_bud	Small Amethyst Bud
+small_dripleaf_side	
+small_dripleaf_stem_bottom	
+small_dripleaf_stem_top	
+small_dripleaf_top	
+smithing_table_bottom	
+smithing_table_front	
+smithing_table_side	
+smithing_table_top	
+smoker_bottom	
+smoker_front	
+smoker_front_on	
+smoker_side	
+smoker_top	
+smooth_basalt	Smooth Basalt
+smooth_stone	Smooth Stone
+smooth_stone_slab_side	
+sniffer_egg_not_cracked_bottom	
+sniffer_egg_not_cracked_east	
+sniffer_egg_not_cracked_north	
+sniffer_egg_not_cracked_south	
+sniffer_egg_not_cracked_top	
+sniffer_egg_not_cracked_west	
+sniffer_egg_slightly_cracked_bottom	
+sniffer_egg_slightly_cracked_east	
+sniffer_egg_slightly_cracked_north	
+sniffer_egg_slightly_cracked_south	
+sniffer_egg_slightly_cracked_top	
+sniffer_egg_slightly_cracked_west	
+sniffer_egg_very_cracked_bottom	
+sniffer_egg_very_cracked_east	
+sniffer_egg_very_cracked_north	
+sniffer_egg_very_cracked_south	
+sniffer_egg_very_cracked_top	
+sniffer_egg_very_cracked_west	
+snow	Snow
+soul_campfire_fire	
+soul_campfire_log_lit	
+soul_fire_0	
+soul_fire_1	
+soul_lantern	Soul Lantern
+soul_sand	Soul Sand
+soul_soil	Soul Soil
+soul_torch	Soul Torch
+spawner	Monster Spawner
+sponge	Sponge
+spore_blossom	Spore Blossom
+spore_blossom_base	
+spruce_door_bottom	
+spruce_door_top	
+spruce_hanging_sign	Spruce Hanging Sign
+spruce_leaves	Spruce Leaves
+spruce_log	Spruce Log
+spruce_log_top	
+spruce_planks	Spruce Planks
+spruce_sapling	Spruce Sapling
+spruce_shelf	Spruce Shelf
+spruce_sign	Spruce Sign
+spruce_trapdoor	Spruce Trapdoor
+stone	Stone
+stone_bricks	Stone Bricks
+stonecutter_bottom	
+stonecutter_saw	
+stonecutter_side	
+stonecutter_top	
+straw_bed	Straw Bed
+straw_bed_particle	
+stripped_acacia_log	Stripped Acacia Log
+stripped_acacia_log_top	
+stripped_bamboo_block	Block of Stripped Bamboo
+stripped_bamboo_block_top	
+stripped_birch_log	Stripped Birch Log
+stripped_birch_log_top	
+stripped_cherry_log	Stripped Cherry Log
+stripped_cherry_log_top	
+stripped_crimson_stem	Stripped Crimson Stem
+stripped_crimson_stem_top	
+stripped_dark_oak_log	Stripped Dark Oak Log
+stripped_dark_oak_log_top	
+stripped_jungle_log	Stripped Jungle Log
+stripped_jungle_log_top	
+stripped_mangrove_log	Stripped Mangrove Log
+stripped_mangrove_log_top	
+stripped_oak_log	Stripped Oak Log
+stripped_oak_log_top	
+stripped_pale_oak_log	Stripped Pale Oak Log
+stripped_pale_oak_log_top	
+stripped_poplar_log	Stripped Poplar Log
+stripped_poplar_log_top	
+stripped_spruce_log	Stripped Spruce Log
+stripped_spruce_log_top	
+stripped_warped_stem	Stripped Warped Stem
+stripped_warped_stem_top	
+structure_block	Structure Block
+structure_block_corner	
+structure_block_data	
+structure_block_load	
+structure_block_save	
+sugar_cane	Sugar Cane
+sulfur	Sulfur
+sulfur_bricks	Sulfur Bricks
+sulfur_spike_down_base	
+sulfur_spike_down_frustum	
+sulfur_spike_down_middle	
+sulfur_spike_down_tip	
+sulfur_spike_down_tip_merge	
+sulfur_spike_up_base	
+sulfur_spike_up_frustum	
+sulfur_spike_up_middle	
+sulfur_spike_up_tip	
+sulfur_spike_up_tip_merge	
+sunflower_back	
+sunflower_bottom	
+sunflower_front	
+sunflower_top	
+suspicious_gravel_0	
+suspicious_gravel_1	
+suspicious_gravel_2	
+suspicious_gravel_3	
+suspicious_sand_0	
+suspicious_sand_1	
+suspicious_sand_2	
+suspicious_sand_3	
+sweet_berry_bush_stage0	
+sweet_berry_bush_stage1	
+sweet_berry_bush_stage2	
+sweet_berry_bush_stage3	
+tall_dry_grass	Tall Dry Grass
+tall_grass_bottom	
+tall_grass_top	
+tall_seagrass_bottom	
+tall_seagrass_top	
+target_side	
+target_top	
+terracotta	Terracotta
+test_block_accept	
+test_block_fail	
+test_block_log	
+test_block_start	
+test_instance_block	Test Instance Block
+tinted_glass	Tinted Glass
+tnt_bottom	
+tnt_side	
+tnt_top	
+torch	Torch
+torchflower	Torchflower
+torchflower_crop_stage0	
+torchflower_crop_stage1	
+trial_spawner_bottom	
+trial_spawner_side_active	
+trial_spawner_side_active_ominous	
+trial_spawner_side_inactive	
+trial_spawner_side_inactive_ominous	
+trial_spawner_top_active	
+trial_spawner_top_active_ominous	
+trial_spawner_top_ejecting_reward	
+trial_spawner_top_ejecting_reward_ominous	
+trial_spawner_top_inactive	
+trial_spawner_top_inactive_ominous	
+tripwire	Tripwire
+tripwire_hook	Tripwire Hook
+tube_coral	Tube Coral
+tube_coral_block	Tube Coral Block
+tube_coral_fan	Tube Coral Fan
+tuff	Tuff
+tuff_bricks	Tuff Bricks
+turtle_egg	Turtle Egg
+turtle_egg_slightly_cracked	
+turtle_egg_very_cracked	
+twisting_vines	Twisting Vines
+twisting_vines_plant	Twisting Vines Plant
+vault_bottom	
+vault_bottom_ominous	
+vault_front_ejecting	
+vault_front_ejecting_ominous	
+vault_front_off	
+vault_front_off_ominous	
+vault_front_on	
+vault_front_on_ominous	
+vault_side_off	
+vault_side_off_ominous	
+vault_side_on	
+vault_side_on_ominous	
+vault_top	
+vault_top_ejecting	
+vault_top_ejecting_ominous	
+vault_top_ominous	
+verdant_froglight_side	
+verdant_froglight_top	
+vine	Vines
+warped_door_bottom	
+warped_door_top	
+warped_fungus	Warped Fungus
+warped_hanging_sign	Warped Hanging Sign
+warped_nylium	Warped Nylium
+warped_nylium_side	
+warped_planks	Warped Planks
+warped_roots	Warped Roots
+warped_roots_pot	
+warped_shelf	Warped Shelf
+warped_sign	Warped Sign
+warped_stem	Warped Stem
+warped_stem_top	
+warped_trapdoor	Warped Trapdoor
+warped_wart_block	Warped Wart Block
+water_flow	
+water_overlay	
+water_still	
+weathered_chiseled_copper	Weathered Chiseled Copper
+weathered_copper	Weathered Copper
+weathered_copper_bars	Weathered Copper Bars
+weathered_copper_bulb	Weathered Copper Bulb
+weathered_copper_bulb_lit	
+weathered_copper_bulb_lit_powered	
+weathered_copper_bulb_powered	
+weathered_copper_chain	Weathered Copper Chain
+weathered_copper_door_bottom	
+weathered_copper_door_top	
+weathered_copper_grate	Weathered Copper Grate
+weathered_copper_lantern	Weathered Copper Lantern
+weathered_copper_trapdoor	Weathered Copper Trapdoor
+weathered_cut_copper	Weathered Cut Copper
+weathered_lightning_rod	Weathered Lightning Rod
+weeping_vines	Weeping Vines
+weeping_vines_plant	Weeping Vines Plant
+wet_sponge	Wet Sponge
+wheat_stage0	
+wheat_stage1	
+wheat_stage2	
+wheat_stage3	
+wheat_stage4	
+wheat_stage5	
+wheat_stage6	
+wheat_stage7	
+white_bed_foot_east	
+white_bed_foot_south	
+white_bed_foot_up	
+white_bed_foot_west	
+white_bed_head_east	
+white_bed_head_up	
+white_bed_head_west	
+white_candle	White Candle
+white_candle_lit	
+white_concrete	White Concrete
+white_concrete_powder	White Concrete Powder
+white_glazed_terracotta	White Glazed Terracotta
+white_shulker_box	White Shulker Box
+white_stained_glass	White Stained Glass
+white_stained_glass_pane_top	
+white_terracotta	White Terracotta
+white_tulip	White Tulip
+white_wool	White Wool
+wildflowers	Wildflowers
+wildflowers_stem	
+wither_rose	Wither Rose
+yellow_bed_foot_east	
+yellow_bed_foot_south	
+yellow_bed_foot_up	
+yellow_bed_foot_west	
+yellow_bed_head_east	
+yellow_bed_head_up	
+yellow_bed_head_west	
+yellow_candle	Yellow Candle
+yellow_candle_lit	
+yellow_concrete	Yellow Concrete
+yellow_concrete_powder	Yellow Concrete Powder
+yellow_glazed_terracotta	Yellow Glazed Terracotta
+yellow_poplar_leaves	Yellow Poplar Leaves
+yellow_shulker_box	Yellow Shulker Box
+yellow_stained_glass	Yellow Stained Glass
+yellow_stained_glass_pane_top	
+yellow_terracotta	Yellow Terracotta
+yellow_wool	Yellow Wool
