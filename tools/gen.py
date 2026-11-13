@@ -160,16 +160,19 @@ TEXTURES = {
 }
 
 # (suffix, English name, how many one block makes in the stonecutter), in the order of Shape.java
-SHAPES = [("stairs", "Stairs", 1), ("slab", "Slab", 2), ("quarter_slab", "Quarter Slab", 4), ("vertical_slab", "Vertical Slab", 2),
+SHAPES = [("stairs", "Stairs", 1), ("stairs_2", "Stairs (1 in 2)", 2), ("stairs_3", "Stairs (1 in 3)", 2), ("stairs_4", "Stairs (1 in 4)", 2),
+          ("slab", "Slab", 2), ("quarter_slab", "Quarter Slab", 4), ("vertical_slab", "Vertical Slab", 2),
           ("slope", "Slope", 2), ("slope_2", "Slope (1 in 2)", 2), ("slope_3", "Slope (1 in 3)", 2), ("gentle_slope", "Slope (1 in 4)", 2), ("layer", "Layer", 8), ("vertical_layer", "Vertical Layer", 8),
           ("carpet", "Carpet", 4), ("panel", "Panel", 4), ("post", "Post", 4), ("pillar_12", "(12 px)", 1), ("pillar_8", "(8 px)", 2),
           ("pillar_4", "(4 px)", 4), ("round_column_16", "Round Column (16 px)", 1), ("round_column_12", "Round Column (12 px)", 2),
           ("round_column_8", "Round Column (8 px)", 4), ("corner_post", "Corner Post", 4), ("arch", "Arch", 1), ("arch_corner", "Arch Corner", 1),
           ("round_corner", "Round Corner", 1), ("round_corner_inner", "Inner Round Corner", 4),
           ("wall", "Wall", 1), ("fence", "Fence", 1), ("fence_gate", "Fence Gate", 1),
-          ("trapdoor", "Trapdoor", 1), ("button", "Button", 4), ("pressure_plate", "Pressure Plate", 2)] + \
+          ("trapdoor", "Trapdoor", 1), ("button", "Button", 4), ("pressure_plate", "Pressure Plate", 2),
+          ("trim_2", "Trim (2 px)", 16), ("trim_4", "Trim (4 px)", 8), ("trim_8", "Trim (8 px)", 4)] + \
          [("window_frame_%d" % d, "Window Frame (%d px)" % d, c) for d, c in ((4, 4), (8, 2), (12, 1), (16, 1))] + \
-         [("diamond_window_frame_%d" % d, "Diamond Window Frame (%d px)" % d, c) for d, c in ((4, 4), (8, 2), (12, 1), (16, 1))]
+         [("diamond_window_frame_%d" % d, "Diamond Window Frame (%d px)" % d, c) for d, c in ((4, 4), (8, 2), (12, 1), (16, 1))] + \
+         [("round_window_frame_%d" % d, "Round Window Frame (%d px)" % d, c) for d, c in ((4, 4), (8, 2), (12, 1), (16, 1))]
 NATURE_SHAPES = {"stairs", "slab", "quarter_slab", "vertical_slab", "slope", "slope_2", "slope_3", "gentle_slope", "layer", "vertical_layer", "carpet"}
 # Natural blocks that are building blocks too (stone, sandstone...) keep the building versions of these.
 NEW_NATURE = {"stairs", "quarter_slab", "slope_2", "slope_3", "gentle_slope"}
@@ -178,6 +181,8 @@ COLUMN_WIDTHS = [16, 12, 8]
 # Gentle slopes, quarter slabs, arches and window frames: wool, terracotta and concrete for now.
 CASTLE_SHAPES = {"quarter_slab", "slope_2", "slope_3", "gentle_slope", "arch", "arch_corner"} | {"%swindow_frame_%d" % (p, d) for p in ("", "diamond_") for d in (4, 8, 12, 16)}
 WINDOW_DEPTHS = [4, 8, 12, 16]
+STAIRS_PITCHES = [2, 3, 4]
+TRIM_WIDTHS = [2, 4, 8]
 
 LOGS = ["oak_log", "spruce_log", "birch_log", "jungle_log", "acacia_log", "dark_oak_log", "mangrove_log", "cherry_log",
         "pale_oak_log", "crimson_stem", "warped_stem", "mushroom_stem"]
@@ -543,6 +548,30 @@ def castle_templates():
             template("template_%swindow_%d_inventory" % ("diamond_" if diamond else "", d), boxes)
 
 
+def pitch_stairs_heights(n, step):
+    """Stairs climbing one block over n: the low (front) and high (back) step of each block, in pixels (as PitchStairsBlock)."""
+    base = (step - 1) * 16 / n
+    return round(base + 8 / n, 4), round(base + 16 / n, 4)
+
+
+def new_shape_templates():
+    """Stairs over 2, 3 and 4 blocks (rising east, like vanilla's), trims, and round window frames in the hand."""
+    for n in STAIRS_PITCHES:
+        for step in range(1, n + 1):
+            lo, hi = pitch_stairs_heights(n, step)
+            template("template_stairs_%d_%d" % (n, step), [([0, 0, 0], [8, lo, 16]), ([8, 0, 0], [16, hi, 16])], display=STAIRS_DISPLAY)
+            template("template_stairs_%d_%d_top" % (n, step), [([0, round(16 - lo, 4), 0], [8, 16, 16]), ([8, round(16 - hi, 4), 0], [16, 16, 16])])
+    for w in TRIM_WIDTHS:
+        # Along the bottom north edge, and up the north-west corner; turned in the blockstate to the other ten.
+        template("template_trim_%d" % w, [([0, 0, 0], [16, w, w])])
+        template("template_trim_%d_upright" % w, [([0, 0, 0], [w, 16, w])])
+        template("template_trim_%d_item" % w, [([0, 8 - w / 2, 8 - w / 2], [16, 8 + w / 2, 8 + w / 2])])
+    for d in WINDOW_DEPTHS:
+        # A porthole: the placed ones are drawn smooth in code (RoundWindowModel).
+        mask = [[((x + 0.5 - 8) ** 2 + (y + 0.5 - 8) ** 2) >= 16 for y in range(16)] for x in range(16)]
+        template("template_round_window_%d_inventory" % d, mask_boxes(mask, 0, d))
+
+
 def round_templates():
     """Item models for the round shapes (placed ones are drawn smooth in code), and the corner post."""
     for d in COLUMN_WIDTHS:
@@ -572,6 +601,7 @@ def round_templates():
 def templates():
     round_templates()
     castle_templates()
+    new_shape_templates()
     shape_templates(False, False, 16)
     for grass in (False, True):
         for top in (16, 15):
@@ -833,6 +863,55 @@ def window_frame(mat, kind, name, depth, diamond):
     item(name, m(name + "_inventory"))
 
 
+def pitch_stairs(mat, kind, name, n):
+    t, _ = shape_textures(mat, kind)
+    for step in range(1, n + 1):
+        model("%s_s%d" % (name, step), m("template_stairs_%d_%d" % (n, step)), t)
+        model("%s_s%d_top" % (name, step), m("template_stairs_%d_%d_top" % (n, step)), t)
+    y = {"east": 0, "south": 90, "west": 180, "north": 270}
+    v = {}
+    for f in HORIZONTAL:
+        for half in ("bottom", "top"):
+            for step in range(1, n + 1):
+                mdl = {"model": m("%s_s%d%s" % (name, step, "_top" if half == "top" else ""))}
+                if y[f]:
+                    mdl["y"] = y[f]
+                mdl["uvlock"] = True
+                v["facing=%s,half=%s,step=%d" % (f, half, step)] = mdl
+    blockstate(name, {"variants": v})
+    item(name, m("%s_s%d" % (name, min(2, n))))
+
+
+# Each edge: (model, x, y) from the strip along the bottom north edge or up the north-west corner.
+TRIM_EDGES = {"down_north": ("", 0, 0), "down_east": ("", 0, 90), "down_south": ("", 0, 180), "down_west": ("", 0, 270),
+              "up_south": ("", 180, 0), "up_west": ("", 180, 90), "up_north": ("", 180, 180), "up_east": ("", 180, 270),
+              "north_west": ("_upright", 0, 0), "north_east": ("_upright", 0, 90), "south_east": ("_upright", 0, 180),
+              "south_west": ("_upright", 0, 270)}
+
+
+def trim(mat, kind, name, w):
+    t, _ = shape_textures(mat, kind)
+    model(name, m("template_trim_%d" % w), t)
+    model(name + "_upright", m("template_trim_%d_upright" % w), t)
+    model(name + "_item", m("template_trim_%d_item" % w), t)
+    v = {}
+    for edge, (sfx, x, y) in TRIM_EDGES.items():
+        mdl = {"model": m(name + sfx)}
+        if x: mdl["x"] = x
+        if y: mdl["y"] = y
+        mdl["uvlock"] = True
+        v["edge=" + edge] = mdl
+    blockstate(name, {"variants": v})
+    item(name, m(name + "_item"))
+
+
+def round_window(mat, kind, name, depth):
+    # Placed frames are drawn smooth in code (RoundWindowModel); this porthole is for the item.
+    t, _ = shape_textures(mat, kind)
+    model(name + "_inventory", m("template_round_window_%d_inventory" % depth), t)
+    item(name, m(name + "_inventory"))
+
+
 for _d in WINDOW_DEPTHS:
     for _diamond in (False, True):
         globals()["window_%s%d" % ("d" if _diamond else "s", _d)] = (lambda d, dm: lambda mat, kind, name: window_frame(mat, kind, name, d, dm))(_d, _diamond)
@@ -849,6 +928,12 @@ for _d in COLUMN_WIDTHS:
     BUILDERS["round_column_%d" % _d] = (lambda d: lambda mat, kind, name: round_column(mat, kind, name, d))(_d)
 for _w in PILLAR_WIDTHS:
     BUILDERS["pillar_%d" % _w] = (lambda w: lambda mat, kind, name: pillar(mat, kind, name, w))(_w)
+for _n in STAIRS_PITCHES:
+    BUILDERS["stairs_%d" % _n] = (lambda n: lambda mat, kind, name: pitch_stairs(mat, kind, name, n))(_n)
+for _w in TRIM_WIDTHS:
+    BUILDERS["trim_%d" % _w] = (lambda w: lambda mat, kind, name: trim(mat, kind, name, w))(_w)
+for _d in WINDOW_DEPTHS:
+    BUILDERS["round_window_frame_%d" % _d] = (lambda d: lambda mat, kind, name: round_window(mat, kind, name, d))(_d)
 for _d in WINDOW_DEPTHS:
     BUILDERS["window_frame_%d" % _d] = globals()["window_s%d" % _d]
     BUILDERS["diamond_window_frame_%d" % _d] = globals()["window_d%d" % _d]

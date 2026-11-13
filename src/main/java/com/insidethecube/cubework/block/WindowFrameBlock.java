@@ -20,7 +20,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * A window frame: a 4-pixel border round an 8-wide opening, 4, 8, 12 or 16 pixels deep, square or diamond.
+ * A window frame: a 4-pixel border round an 8-wide opening, 4, 8, 12 or 16 pixels deep, square, diamond or
+ * round (a porthole; joined round frames make one big round or oval window, see RoundWindowGeometry).
  * It sits against the face you click. Frames facing the same way join, whatever their depth (a shallower
  * one leaves a ledge) and square or diamond: where they meet the border goes, so a stack makes a tall slit
  * (sill at the bottom, lintel at the top), a row makes a long one, and a square of them one big opening.
@@ -33,14 +34,19 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 	public static final BooleanProperty LEFT = BooleanProperty.create("left");
 	public static final BooleanProperty RIGHT = BooleanProperty.create("right");
 
+	/** The opening's shape. */
+	public enum Style {
+		SQUARE, DIAMOND, ROUND
+	}
+
 	private final int depth;
-	private final boolean diamond;
+	private final Style style;
 	private final VoxelShape[] shapes = new VoxelShape[4 * 16];
 
-	public WindowFrameBlock(Material material, int depth, boolean diamond, BlockBehaviour.Properties settings) {
+	public WindowFrameBlock(Material material, int depth, Style style, BlockBehaviour.Properties settings) {
 		super(material, settings);
 		this.depth = depth;
-		this.diamond = diamond;
+		this.style = style;
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(UP, false).setValue(DOWN, false).setValue(LEFT, false).setValue(RIGHT, false)
 				.setValue(WATERLOGGED, false));
 	}
@@ -56,8 +62,16 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 		int turns = state.getValue(FACING).get2DDataValue() + 2 & 3;
 		int i = turns * 16 + (u ? 8 : 0) + (d ? 4 : 0) + (l ? 2 : 0) + (r ? 1 : 0);
 		VoxelShape s = shapes[i];
-		if (s == null) shapes[i] = s = Profiles.shape(Profiles.window(u, d, l, r, diamond), 0, depth, turns);
+		if (s == null) {
+			boolean[][] mask = style == Style.ROUND ? RoundWindowGeometry.mask(u, d, l, r) : Profiles.window(u, d, l, r, style == Style.DIAMOND);
+			shapes[i] = s = Profiles.shape(mask, 0, depth, turns);
+		}
 		return s;
+	}
+
+	/** How deep the frame is, in pixels. */
+	public int depth() {
+		return depth;
 	}
 
 	@Override

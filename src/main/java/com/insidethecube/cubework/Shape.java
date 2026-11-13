@@ -3,6 +3,9 @@ package com.insidethecube.cubework;
 /** Every shape Cubework makes, in the order they appear in each colour's family in the creative menu. */
 public enum Shape {
 	STAIRS("stairs", "Stairs", 1),
+	STAIRS_2("stairs_2", "Stairs (1 in 2)", 2),
+	STAIRS_3("stairs_3", "Stairs (1 in 3)", 2),
+	STAIRS_4("stairs_4", "Stairs (1 in 4)", 2),
 	SLAB("slab", "Slab", 2),
 	QUARTER_SLAB("quarter_slab", "Quarter Slab", 4),
 	VERTICAL_SLAB("vertical_slab", "Vertical Slab", 2),
@@ -32,6 +35,9 @@ public enum Shape {
 	TRAPDOOR("trapdoor", "Trapdoor", 1),
 	BUTTON("button", "Button", 4),
 	PRESSURE_PLATE("pressure_plate", "Pressure Plate", 2),
+	TRIM_2("trim_2", "Trim (2 px)", 16),
+	TRIM_4("trim_4", "Trim (4 px)", 8),
+	TRIM_8("trim_8", "Trim (8 px)", 4),
 	WINDOW_4("window_frame_4", "Window Frame (4 px)", 4),
 	WINDOW_8("window_frame_8", "Window Frame (8 px)", 2),
 	WINDOW_12("window_frame_12", "Window Frame (12 px)", 1),
@@ -39,7 +45,11 @@ public enum Shape {
 	DIAMOND_WINDOW_4("diamond_window_frame_4", "Diamond Window Frame (4 px)", 4),
 	DIAMOND_WINDOW_8("diamond_window_frame_8", "Diamond Window Frame (8 px)", 2),
 	DIAMOND_WINDOW_12("diamond_window_frame_12", "Diamond Window Frame (12 px)", 1),
-	DIAMOND_WINDOW_16("diamond_window_frame_16", "Diamond Window Frame (16 px)", 1);
+	DIAMOND_WINDOW_16("diamond_window_frame_16", "Diamond Window Frame (16 px)", 1),
+	ROUND_WINDOW_4("round_window_frame_4", "Round Window Frame (4 px)", 4),
+	ROUND_WINDOW_8("round_window_frame_8", "Round Window Frame (8 px)", 2),
+	ROUND_WINDOW_12("round_window_frame_12", "Round Window Frame (12 px)", 1),
+	ROUND_WINDOW_16("round_window_frame_16", "Round Window Frame (16 px)", 1);
 
 	public final String suffix;
 	public final String title;
@@ -95,7 +105,7 @@ public enum Shape {
 	public boolean drawnInCode() {
 		return switch (this) {
 			case SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE, ARCH, ARCH_CORNER, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_CORNER,
-					ROUND_CORNER_INNER -> true;
+					ROUND_CORNER_INNER, ROUND_WINDOW_4, ROUND_WINDOW_8, ROUND_WINDOW_12, ROUND_WINDOW_16 -> true;
 			default -> false;
 		};
 	}
@@ -115,11 +125,11 @@ public enum Shape {
 	public Group group() {
 		return switch (this) {
 			case SLAB, QUARTER_SLAB, VERTICAL_SLAB, LAYER, VERTICAL_LAYER, CARPET, PANEL -> Group.SLABS;
-			case STAIRS, SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE -> Group.STAIRS;
+			case STAIRS, STAIRS_2, STAIRS_3, STAIRS_4, SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE -> Group.STAIRS;
 			case POST, PILLAR_12, PILLAR_8, PILLAR_4, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, CORNER_POST -> Group.PILLARS;
 			case ARCH, ARCH_CORNER, ROUND_CORNER, ROUND_CORNER_INNER -> Group.CURVES;
 			case WALL, FENCE, FENCE_GATE -> Group.WALLS;
-			case TRAPDOOR, BUTTON, PRESSURE_PLATE -> Group.SMALL;
+			case TRAPDOOR, BUTTON, PRESSURE_PLATE, TRIM_2, TRIM_4, TRIM_8 -> Group.SMALL;
 			default -> Group.WINDOWS;
 		};
 	}
@@ -134,7 +144,7 @@ public enum Shape {
 		};
 	}
 
-	/** The castle shapes (gentle slopes, quarter slabs, arches, window frames): wool, terracotta and concrete for now. */
+	/** The castle shapes (gentle slopes, quarter slabs, arches, window frames). Every coloured and building block has them. */
 	public boolean castle() {
 		return switch (this) {
 			case QUARTER_SLAB, SLOPE_2, SLOPE_3, GENTLE_SLOPE, ARCH, ARCH_CORNER -> true;
@@ -145,15 +155,40 @@ public enum Shape {
 	/** A window frame's depth in pixels, or 0. */
 	public int windowDepth() {
 		return switch (this) {
-			case WINDOW_4, DIAMOND_WINDOW_4 -> 4;
-			case WINDOW_8, DIAMOND_WINDOW_8 -> 8;
-			case WINDOW_12, DIAMOND_WINDOW_12 -> 12;
-			case WINDOW_16, DIAMOND_WINDOW_16 -> 16;
+			case WINDOW_4, DIAMOND_WINDOW_4, ROUND_WINDOW_4 -> 4;
+			case WINDOW_8, DIAMOND_WINDOW_8, ROUND_WINDOW_8 -> 8;
+			case WINDOW_12, DIAMOND_WINDOW_12, ROUND_WINDOW_12 -> 12;
+			case WINDOW_16, DIAMOND_WINDOW_16, ROUND_WINDOW_16 -> 16;
 			default -> 0;
 		};
 	}
 
 	public boolean diamond() {
 		return name().startsWith("DIAMOND");
+	}
+
+	/** Round window frames: the opening's corners are rounded, so one makes a porthole and joined ones a big round window. */
+	public boolean round() {
+		return name().startsWith("ROUND_WINDOW");
+	}
+
+	/** How many blocks stairs take to climb one (2, 3 or 4), or 0. */
+	public int stairsPitch() {
+		return switch (this) {
+			case STAIRS_2 -> 2;
+			case STAIRS_3 -> 3;
+			case STAIRS_4 -> 4;
+			default -> 0;
+		};
+	}
+
+	/** A trim's thickness in pixels (a square strip along one edge of the block), or 0. */
+	public int trimWidth() {
+		return switch (this) {
+			case TRIM_2 -> 2;
+			case TRIM_4 -> 4;
+			case TRIM_8 -> 8;
+			default -> 0;
+		};
 	}
 }

@@ -27,15 +27,7 @@ final class QuadMaker {
 			pos[i] = new Vector3f((float) p[i][0], (float) p[i][1], (float) p[i][2]);
 			packed[i] = UVPair.pack(sprite.getU(uv[i][0]), sprite.getV(uv[i][1]));
 		}
-		// The layer (solid, cut-out or see-through) comes from the texture itself.
-		BakedQuad.MaterialInfo info = BakedQuad.MaterialInfo.of(new Material.Baked(sprite, false), sprite.transparency(), tint,
-				//#if MC >= 26.3
-				null,
-				//#else
-				true,
-				//#endif
-				0);
-		return new BakedQuad(pos[0], pos[1], pos[2], pos[3], packed[0], packed[1], packed[2], packed[3], face, info);
+		return new BakedQuad(pos[0], pos[1], pos[2], pos[3], packed[0], packed[1], packed[2], packed[3], face, info(sprite, tint));
 		//#elif MC >= 1.21.11
 		Vector3f[] pos = new Vector3f[4];
 		long[] packed = new long[4];
@@ -62,4 +54,22 @@ final class QuadMaker {
 		//#endif
 		//#endif
 	}
+	//#if MC >= 26.1
+
+	/** The layer (solid, cut-out or see-through) comes from the texture itself. */
+	private static BakedQuad.MaterialInfo info(TextureAtlasSprite sprite, int tint) {
+		return BakedQuad.MaterialInfo.of(new Material.Baked(sprite, false), sprite.transparency(), tint,
+				//#if MC >= 26.3
+				null,
+				//#else
+				true,
+				//#endif
+				0);
+	}
+
+	/** The flags a quad with this texture gets (see-through, animated), without making the quad. */
+	static int flags(TextureAtlasSprite sprite) {
+		return info(sprite, -1).flags();
+	}
+	//#endif
 }
