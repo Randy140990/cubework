@@ -69,6 +69,23 @@ final class Models {
 		});
 	}
 
+	/**
+	 * Like register, for blocks with very many states (round window frames: every way of joining, facing and
+	 * depth): the textures are found when the game loads its models, but a state's quads are only made the
+	 * first time it's drawn, so states nobody builds with take no memory. textures: every texture the maker
+	 * uses; particle: the one breaking particles use.
+	 */
+	static void registerLazy(ModelLoadingPlugin.Context ctx, Block block, List<String> textures, String particle, Maker maker) {
+		//#if MC >= 1.21.5
+		LazyRoot root = new LazyRoot(maker, textures, particle);
+		ctx.registerBlockStateResolver(block, resolver -> {
+			for (BlockState state : block.getStateDefinition().getPossibleStates()) resolver.setModel(state, root);
+		});
+		//#else
+		register(ctx, block, maker);
+		//#endif
+	}
+
 	private static net.minecraft.client.resources.model.Material texture(String name) {
 		// Full ids (patterns: cubework:block/pattern/tiled/stone) are used as they are.
 		if (name.indexOf(':') >= 0) {
@@ -116,6 +133,112 @@ final class Models {
 			//#endif
 			return new Baked(new Part(new Quads(built.quads().sided(), List.copyOf(built.quads().free())), built.particle()));
 		}
+	}
+
+	private static TextureAtlasSprite sprite(ModelBaker baker, String name, ModelDebugName named) {
+		//#if MC >= 26.1
+		return baker.materials().get(texture(name), named).sprite();
+		//#else
+		return baker.sprites().get(texture(name), named);
+		//#endif
+	}
+
+	private record LazyRoot(Maker maker, List<String> textures, String particle) implements BlockStateModel.UnbakedRoot {
+		@Override
+		public void resolveDependencies(ResolvableModel.Resolver resolver) {
+		}
+
+		@Override
+		public Object visualEqualityGroup(BlockState state) {
+			return state;
+		}
+
+		@Override
+		public BlockStateModel bake(BlockState state, ModelBaker baker) {
+			ModelDebugName named = () -> "cubework " + state;
+			Map<String, TextureAtlasSprite> sprites = new java.util.HashMap<>();
+			for (String name : textures) sprites.put(name, sprite(baker, name, named));
+			return new LazyBaked(new LazyPart(state, maker, sprites, sprites.get(particle)));
+		}
+	}
+
+	/** One state's quads, made the first time they're asked for (from any thread; making them twice is harmless). */
+	private static final class LazyPart implements BlockModelPart {
+		private final BlockState state;
+		private final Maker maker;
+		private final Map<String, TextureAtlasSprite> sprites;
+		private final TextureAtlasSprite particle;
+		private volatile Quads quads;
+
+		LazyPart(BlockState state, Maker maker, Map<String, TextureAtlasSprite> sprites, TextureAtlasSprite particle) {
+			this.state = state;
+			this.maker = maker;
+			this.sprites = sprites;
+			this.particle = particle;
+		}
+
+		private Quads quads() {
+			Quads q = quads;
+			if (q == null) {
+				Built built = maker.make(state, sprites::get);
+				quads = q = new Quads(built.quads().sided(), List.copyOf(built.quads().free()));
+			}
+			return q;
+		}
+
+		@Override
+		public List<BakedQuad> getQuads(Direction side) {
+			return Models.quads(quads(), side);
+		}
+
+		@Override
+		public boolean useAmbientOcclusion() {
+			return true;
+		}
+
+		//#if MC >= 26.1
+		@Override
+		public net.minecraft.client.resources.model.Material.Baked particleMaterial() {
+			return new net.minecraft.client.resources.model.Material.Baked(particle, false);
+		}
+
+		/** From the textures alone, so asking doesn't make the quads. */
+		@Override
+		public int materialFlags() {
+			int flags = 0;
+			for (TextureAtlasSprite s : sprites.values()) flags |= QuadMaker.flags(s);
+			return flags;
+		}
+		//#else
+		@Override
+		public TextureAtlasSprite particleIcon() {
+			return particle;
+		}
+		//#endif
+	}
+
+	private record LazyBaked(LazyPart part) implements BlockStateModel {
+		@Override
+		public void collectParts(RandomSource random, List<BlockModelPart> parts) {
+			parts.add(part);
+		}
+
+		//#if MC >= 26.1
+		@Override
+		public net.minecraft.client.resources.model.Material.Baked particleMaterial() {
+			return part.particleMaterial();
+		}
+
+		@Override
+		public int materialFlags() {
+			return part.materialFlags();
+		}
+		//#else
+		@Override
+		public TextureAtlasSprite particleIcon() {
+			return part.particleIcon();
+		}
+		//#endif
 	}
 
 	private record Baked(Part part) implements BlockStateModel {

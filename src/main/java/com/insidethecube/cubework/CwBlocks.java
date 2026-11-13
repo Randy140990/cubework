@@ -22,6 +22,8 @@ import com.insidethecube.cubework.block.QuarterSlabBlock;
 import com.insidethecube.cubework.block.WindowFrameBlock;
 import com.insidethecube.cubework.block.CornerPostBlock;
 import com.insidethecube.cubework.block.PatternBlock;
+import com.insidethecube.cubework.block.PitchStairsBlock;
+import com.insidethecube.cubework.block.TrimBlock;
 import com.insidethecube.cubework.block.RoundColumnBlock;
 import com.insidethecube.cubework.block.RoundCornerBlock;
 import com.insidethecube.cubework.block.LayerBlock;
@@ -149,8 +151,14 @@ public final class CwBlocks {
 			case SLOPE_2 -> set -> new GentleSlopeBlock.Over2(m, set);
 			case ARCH -> set -> new ArchBlock(m, set);
 			case ARCH_CORNER -> set -> new ArchCornerBlock(m, set);
-			case WINDOW_4, WINDOW_8, WINDOW_12, WINDOW_16, DIAMOND_WINDOW_4, DIAMOND_WINDOW_8, DIAMOND_WINDOW_12, DIAMOND_WINDOW_16 ->
-					set -> new WindowFrameBlock(m, s.windowDepth(), s.diamond(), set);
+			case WINDOW_4, WINDOW_8, WINDOW_12, WINDOW_16, DIAMOND_WINDOW_4, DIAMOND_WINDOW_8, DIAMOND_WINDOW_12, DIAMOND_WINDOW_16,
+					ROUND_WINDOW_4, ROUND_WINDOW_8, ROUND_WINDOW_12, ROUND_WINDOW_16 ->
+					set -> new WindowFrameBlock(m, s.windowDepth(), s.diamond() ? WindowFrameBlock.Style.DIAMOND
+							: s.round() ? WindowFrameBlock.Style.ROUND : WindowFrameBlock.Style.SQUARE, set);
+			case STAIRS_2 -> set -> new PitchStairsBlock.Over2(m, set);
+			case STAIRS_3 -> set -> new PitchStairsBlock.Over3(m, set);
+			case STAIRS_4 -> set -> new PitchStairsBlock(m, set);
+			case TRIM_2, TRIM_4, TRIM_8 -> set -> new TrimBlock(m, s.trimWidth(), set);
 			case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8 -> set -> new RoundColumnBlock(m, s.columnWidth(), set);
 			case CORNER_POST -> set -> new CornerPostBlock(m, set);
 			case ROUND_CORNER -> set -> new RoundCornerBlock(m, false, set);
