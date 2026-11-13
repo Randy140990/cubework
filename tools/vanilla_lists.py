@@ -36,6 +36,8 @@ for mc in sys.argv[1:]:
         os.makedirs(f"{out}/models", exist_ok=True)
         os.makedirs(f"{out}/blockstates", exist_ok=True)
         for n in names:
+            if n.endswith("/"):
+                continue
             if n.startswith("assets/minecraft/models/block/"):
                 open(f"{out}/models/" + n.split("/")[-1], "wb").write(z.read(n))
             if n.startswith("assets/minecraft/blockstates/"):
