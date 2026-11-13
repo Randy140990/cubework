@@ -1,0 +1,25 @@
+name: Vanilla lists
+on:
+  push:
+    branches: ["tools/vanilla-diff"]
+permissions:
+  contents: write
+jobs:
+  lists:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Lists
+        continue-on-error: true
+        run: python3 tools/vanilla_lists.py 1.21.11 26.1.2 26.2 26.3 2>&1 | tee log.txt
+      - name: Save
+        if: always()
+        run: |
+          git config user.name "cubework-ci"
+          git config user.email "cubework-ci@users.noreply.github.com"
+          mkdir -p out && cp log.txt out/ 2>/dev/null || true
+          git checkout --orphan ci-vanilla-tmp
+          git rm -rf --cached . > /dev/null 2>&1 || true
+          git add -f out
+          git commit -m "Vanilla lists for ${GITHUB_SHA}" > /dev/null
+          git push -f origin HEAD:ci-vanilla
