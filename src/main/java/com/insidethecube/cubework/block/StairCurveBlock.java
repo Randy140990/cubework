@@ -27,26 +27,25 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * Stair Curve: goes under an ordinary flight of stairs (any stairs, any material) to give it a smooth curved
- * underside, flat along the floor at the bottom stair and sweeping up to the top one (see
- * StairCurveGeometry). Fill the blocks under the flight with it: each one finds the stairs above it, works
- * out how long the flight is and where it sits in it, and takes its own slice of the curve. It looks again
- * when the blocks round it change, or when you use it with an empty hand.
+ * Curved Stairs: a flight of stairs with a smooth S-shaped underside (see StairCurveGeometry). Lay the
+ * flight with it like ordinary stairs (it climbs away from you), then fill the blocks under the flight with
+ * the same item: a block with the flight right above it becomes the fill under its stair. Every block
+ * works out how long the flight is and where it sits in it, and takes its own part of the curve; the
+ * whole flight re-fits whenever a piece is placed, and any piece used with an empty hand re-fits too.
+ * Fill that would sit in the hollow under the curve isn't placed, so you can fill the whole space under
+ * the flight. Ordinary stairs on top work as well (the fill still curves; the steps stay square).
  */
 public class StairCurveBlock extends CwBlock implements SimpleWaterloggedBlock {
-	/** The way the flight climbs (the stairs' facing). */
+	/** The way the flight climbs. */
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final IntegerProperty PIECE = IntegerProperty.create("piece", 0, StairCurveGeometry.PIECES.length - 1);
-
-	/** A piece in the middle of a 4-stair flight, for when there are no stairs above to go by. */
-	private static final int DEFAULT_PIECE = StairCurveGeometry.index(4, 2, 0);
 
 	private static final VoxelShape[] SHAPES = new VoxelShape[StairCurveGeometry.PIECES.length * 4];
 	private static final VoxelShape[] SOLID = new VoxelShape[StairCurveGeometry.PIECES.length * 4];
 
 	public StairCurveBlock(Material material, BlockBehaviour.Properties settings) {
 		super(material, settings);
-		registerDefaultState(defaultBlockState().setValue(FACING, Direction.EAST).setValue(PIECE, DEFAULT_PIECE).setValue(WATERLOGGED, false));
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.EAST).setValue(PIECE, StairCurveGeometry.PLAIN).setValue(WATERLOGGED, false));
 	}
 
 	@Override
@@ -79,16 +78,19 @@ public class StairCurveBlock extends CwBlock implements SimpleWaterloggedBlock {
 		return s;
 	}
 
-	/**
-	 * In the hollow under the curve nothing is placed (the item stays in your hand), so you can fill
-	 * every block under a flight and the hollow keeps its shape.
-	 */
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
 		BlockState state = defaultBlockState().setValue(FACING, ctx.getHorizontalDirection()).setValue(WATERLOGGED, waterAt(ctx));
 		BlockState fit = fitted(state, ctx.getLevel(), ctx.getClickedPos());
-		if (fit != state && StairCurveGeometry.hollow(fit.getValue(PIECE))) return null;
+		if (StairCurveGeometry.hollow(fit.getValue(PIECE))) return null;
 		return placed(fit, ctx);
+	}
+
+	/** A newly placed piece re-fits the whole flight (a new stair makes it longer, so every piece changes). */
+	@Override
+	protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+		super.onPlace(state, world, pos, oldState, movedByPiston);
+		if (oldState.getBlock() != this) refit(world, pos);
 	}
 
 	@Override
@@ -98,65 +100,95 @@ public class StairCurveBlock extends CwBlock implements SimpleWaterloggedBlock {
 
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-		// With an empty hand: look at the stairs above again (after building or changing the flight).
+		// With an empty hand: fit the whole flight again (after changing it).
 		if (!player.getMainHandItem().isEmpty()) return InteractionResult.PASS;
-		BlockState next = fitted(state, world, pos);
-		if (next != state) world.setBlock(pos, next, Block.UPDATE_ALL);
+		refit(world, pos);
 		world.playSound(player, pos, getSoundType(state).getPlaceSound(), SoundSource.BLOCKS, 0.6f, 1.2f);
 		return InteractionResult.SUCCESS;
 	}
 
-	private static boolean isStair(BlockState s) {
-		return s.getBlock() instanceof StairBlock && s.getValue(StairBlock.HALF) == Half.BOTTOM;
+	/** Part of a flight climbing towards f: Curved Stairs facing f, or ordinary stairs (right way up) facing f. */
+	private static boolean member(BlockState s, Direction f) {
+		if (s.getBlock() instanceof StairCurveBlock) return s.getValue(FACING) == f;
+		return s.getBlock() instanceof StairBlock && s.getValue(StairBlock.HALF) == Half.BOTTOM && s.getValue(StairBlock.FACING) == f;
 	}
 
-	private static boolean sameFlight(BlockState s, Direction f) {
-		return isStair(s) && s.getValue(StairBlock.FACING) == f;
+	private static Direction facingOf(BlockState s) {
+		if (s.getBlock() instanceof StairCurveBlock) return s.getValue(FACING);
+		if (s.getBlock() instanceof StairBlock && s.getValue(StairBlock.HALF) == Half.BOTTOM) return s.getValue(StairBlock.FACING);
+		return null;
 	}
+
+	/** Where a flight is: its bottom stair, the way it climbs, and how many stairs it has. */
+	private record Flight(BlockPos bottom, Direction facing, int length) {}
 
 	/**
-	 * The piece for this spot: the first stairs straight above (within six blocks, through anything
-	 * else in between) belong to its column; following the flight down and up from there gives the
-	 * flight's length, which stair this column is, and so how high above the floor this block sits.
-	 * With no stairs above, it keeps what it has.
+	 * The flight this spot belongs to. With part of a flight right above, it's fill under that flight's
+	 * stair (the top of the column above); otherwise it's a stair itself, climbing the way it faces.
 	 */
-	static BlockState fitted(BlockState state, BlockGetter world, BlockPos pos) {
-		BlockPos stair = null;
-		BlockState st = null;
-		for (int k = 1; k <= StairCurveGeometry.MAX; k++) {
-			BlockState s = world.getBlockState(pos.above(k));
-			if (isStair(s)) {
-				stair = pos.above(k);
-				st = s;
-				break;
-			}
+	private static Flight flightAt(BlockState state, BlockGetter world, BlockPos pos) {
+		Direction f = facingOf(world.getBlockState(pos.above()));
+		BlockPos stair = pos;
+		if (f != null) {
+			stair = pos.above();
+			for (int k = 0; k < 8 && member(world.getBlockState(stair.above()), f); k++) stair = stair.above();
+		} else {
+			f = state.getValue(FACING);
 		}
-		if (stair == null) return state;
-		Direction f = st.getValue(StairBlock.FACING);
 		int below = 0;
 		BlockPos q = stair;
-		while (below < 32 && sameFlight(world.getBlockState(q.relative(f.getOpposite()).below()), f)) {
+		while (below < 64 && member(world.getBlockState(q.relative(f.getOpposite()).below()), f)) {
 			q = q.relative(f.getOpposite()).below();
 			below++;
 		}
-		int bottomY = q.getY();
+		BlockPos bottom = q;
 		int above = 0;
 		q = stair;
-		while (above < 32 && sameFlight(world.getBlockState(q.relative(f).above()), f)) {
+		while (above < 64 && member(world.getBlockState(q.relative(f).above()), f)) {
 			q = q.relative(f).above();
 			above++;
 		}
-		int w = below + above + 1, c = below, r = pos.getY() - bottomY;
-		// Long flights curve under their top six stairs; lower down they're solid.
+		return new Flight(bottom, f, below + above + 1);
+	}
+
+	/** The piece for this spot. */
+	static BlockState fitted(BlockState state, BlockGetter world, BlockPos pos) {
+		Flight fl = flightAt(state, world, pos);
+		Direction f = fl.facing();
+		// Column: how far along the flight; row: how high above its floor.
+		BlockPos d = pos.subtract(fl.bottom());
+		int c = d.getX() * f.getStepX() + d.getZ() * f.getStepZ(), r = d.getY();
+		int w = fl.length();
+		boolean stair = r == c;
 		if (w > StairCurveGeometry.MAX) {
-			c -= w - StairCurveGeometry.MAX;
-			r -= w - StairCurveGeometry.MAX;
+			int shift = w - StairCurveGeometry.MAX;
+			c -= shift;
+			r -= shift;
 			w = StairCurveGeometry.MAX;
-			if (c < 1 || r < 0) return state.setValue(FACING, f).setValue(PIECE, StairCurveGeometry.index(StairCurveGeometry.MAX, 2, 1));
 		}
-		int piece = c >= 1 && r >= 0 && r < c ? StairCurveGeometry.index(w, c, r) : -1;
-		if (piece < 0) return state.setValue(FACING, f);
+		int piece;
+		if (c < 0 || r < 0 || c >= w || r > c) piece = stair ? StairCurveGeometry.PLAIN : StairCurveGeometry.SOLID;
+		else piece = StairCurveGeometry.index(w, c, r);
+		if (piece < 0) piece = StairCurveGeometry.PLAIN;
 		return state.setValue(FACING, f).setValue(PIECE, piece);
+	}
+
+	/** Fits every Curved Stairs block of the flight at pos again. */
+	private static void refit(Level world, BlockPos pos) {
+		BlockState here = world.getBlockState(pos);
+		if (!(here.getBlock() instanceof StairCurveBlock)) return;
+		Flight fl = flightAt(here, world, pos);
+		Direction f = fl.facing();
+		for (int i = 0; i < fl.length(); i++) {
+			BlockPos stair = fl.bottom().relative(f, i).above(i);
+			for (int r = 0; r <= i; r++) {
+				BlockPos p = stair.below(i - r);
+				BlockState s = world.getBlockState(p);
+				if (!(s.getBlock() instanceof StairCurveBlock)) continue;
+				BlockState next = fitted(s, world, p);
+				if (next != s) world.setBlock(p, next, Block.UPDATE_ALL);
+			}
+		}
 	}
 
 	@Override
