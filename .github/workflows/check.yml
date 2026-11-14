@@ -28,6 +28,11 @@ jobs:
           mkdir -p out
           ./gradlew compileJava --stacktrace > out/compile.txt 2>&1; echo "exit=$?" >> out/compile.txt
           tail -30 out/compile.txt
+          # When it compiles, the jar too (for testing before there's a release).
+          if grep -q "exit=0" out/compile.txt; then
+            ./gradlew build -x test > out/build.txt 2>&1; echo "exit=$?" >> out/build.txt
+            cp $(ls build/libs/*.jar | grep -v -- '-sources.jar') out/ 2>/dev/null || true
+          fi
           ./gradlew printClasspath > /dev/null 2>&1
           CP=$(cat classpath.txt 2>/dev/null)
           echo "$CP" | tr ':' '\n' > out/classpath.txt
