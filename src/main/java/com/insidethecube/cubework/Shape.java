@@ -29,6 +29,9 @@ public enum Shape {
 	ROUND_COLUMN_12("round_column_12", "Round Column (12 px)", 2),
 	ROUND_COLUMN_8("round_column_8", "Round Column (8 px)", 4),
 	ROUND_COLUMN_4("round_column_4", "Round Column (4 px)", 8),
+	ROUND_PILLAR_2("round_pillar_2", "Round Pillar (2x2)", 1),
+	ROUND_PILLAR_3("round_pillar_3", "Round Pillar (3x3)", 1),
+	ROUND_PILLAR_4("round_pillar_4", "Round Pillar (4x4)", 1),
 	CORNER_POST("corner_post", "Corner Post", 4),
 	ARCH("arch", "Arch", 1),
 	ARCH_CORNER("arch_corner", "Arch Corner", 1),
@@ -40,6 +43,12 @@ public enum Shape {
 	TRAPDOOR("trapdoor", "Trapdoor", 1),
 	BUTTON("button", "Button", 4),
 	PRESSURE_PLATE("pressure_plate", "Pressure Plate", 2),
+	BORDERED("bordered", "Bordered Block", 1),
+	RAISED_FRAME("raised_frame", "Raised Frame", 1),
+	PARTITION_2("partition_2", "Partition (2 px)", 8),
+	PARTITION_4("partition_4", "Partition (4 px)", 4),
+	PARTITION_6("partition_6", "Partition (6 px)", 2),
+	PARTITION_8("partition_8", "Partition (8 px)", 2),
 	TRIM_2("trim_2", "Trim (2 px)", 16),
 	TRIM_4("trim_4", "Trim (4 px)", 8),
 	TRIM_8("trim_8", "Trim (8 px)", 4),
@@ -74,6 +83,11 @@ public enum Shape {
 	 */
 	public boolean appliesTo(Material m) {
 		if (m.patterned()) return patternShape();
+		if (m.wallpaper()) return wallpaperShape();
+		if (partitionWidth() > 0) return m.office();
+		if ((this == BORDERED || this == RAISED_FRAME) && m.glass()) return false;
+		// Big pillars are several blocks: concrete powder would set one block at a time, so it has none.
+		if (pillarSize() > 0 && m.kind() == Material.Kind.POWDER) return false;
 		if (pillarWidth() > 0) return m.building();
 		if (m.building()) return true;
 		if (m.nature()) return natureShape();
@@ -85,6 +99,30 @@ public enum Shape {
 		return switch (this) {
 			case STAIRS, SLAB, QUARTER_SLAB, VERTICAL_SLAB, SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE, LAYER, VERTICAL_LAYER, CARPET -> true;
 			default -> false;
+		};
+	}
+
+	/** The shapes wallpapers get: wall coverings, partitions and slabs. */
+	public boolean wallpaperShape() {
+		return switch (this) {
+			case SLAB, VERTICAL_SLAB, VERTICAL_LAYER, PANEL, BORDERED, RAISED_FRAME, PARTITION_2, PARTITION_4, PARTITION_6, PARTITION_8 -> true;
+			default -> false;
+		};
+	}
+
+	/** The shapes in the Office tab (bordered blocks, raised frames, partitions), not in the material tabs. */
+	public boolean officeShape() {
+		return this == BORDERED || this == RAISED_FRAME || partitionWidth() > 0;
+	}
+
+	/** A partition wall's thickness in pixels, or 0. */
+	public int partitionWidth() {
+		return switch (this) {
+			case PARTITION_2 -> 2;
+			case PARTITION_4 -> 4;
+			case PARTITION_6 -> 6;
+			case PARTITION_8 -> 8;
+			default -> 0;
 		};
 	}
 
@@ -110,7 +148,7 @@ public enum Shape {
 	/** Shapes drawn in code from the block's textures (smooth slopes, arches, round shapes). */
 	public boolean drawnInCode() {
 		return switch (this) {
-			case SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE, ARCH, ARCH_CORNER, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, ROUND_CORNER,
+			case SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE, ARCH, ARCH_CORNER, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, ROUND_PILLAR_2, ROUND_PILLAR_3, ROUND_PILLAR_4, ROUND_CORNER,
 					ROUND_CORNER_INNER, ROUND_WINDOW_4, ROUND_WINDOW_8, ROUND_WINDOW_12, ROUND_WINDOW_16, STAIR_CURVE -> true;
 			default -> false;
 		};
@@ -132,9 +170,10 @@ public enum Shape {
 		return switch (this) {
 			case SLAB, QUARTER_SLAB, VERTICAL_SLAB, LAYER, VERTICAL_LAYER, CARPET, PANEL -> Group.SLABS;
 			case STAIRS, STEPS_4, STEPS_6, STEPS_8, STAIRS_2, STAIRS_3, STAIRS_4, STAIR_CURVE, SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE -> Group.STAIRS;
-			case POST, PILLAR_12, PILLAR_8, PILLAR_4, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, CORNER_POST -> Group.PILLARS;
+			case POST, PILLAR_12, PILLAR_8, PILLAR_4, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, ROUND_PILLAR_2, ROUND_PILLAR_3, ROUND_PILLAR_4,
+					CORNER_POST -> Group.PILLARS;
 			case ARCH, ARCH_CORNER, ROUND_CORNER, ROUND_CORNER_INNER -> Group.CURVES;
-			case WALL, FENCE, FENCE_GATE -> Group.WALLS;
+			case WALL, FENCE, FENCE_GATE, BORDERED, RAISED_FRAME, PARTITION_2, PARTITION_4, PARTITION_6, PARTITION_8 -> Group.WALLS;
 			case TRAPDOOR, BUTTON, PRESSURE_PLATE, TRIM_2, TRIM_4, TRIM_8 -> Group.SMALL;
 			default -> Group.WINDOWS;
 		};
@@ -184,6 +223,16 @@ public enum Shape {
 			case STAIRS_2 -> 2;
 			case STAIRS_3 -> 3;
 			case STAIRS_4 -> 4;
+			default -> 0;
+		};
+	}
+
+	/** A big round pillar's width in blocks (2, 3 or 4), or 0. */
+	public int pillarSize() {
+		return switch (this) {
+			case ROUND_PILLAR_2 -> 2;
+			case ROUND_PILLAR_3 -> 3;
+			case ROUND_PILLAR_4 -> 4;
 			default -> 0;
 		};
 	}

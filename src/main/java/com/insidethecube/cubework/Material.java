@@ -16,7 +16,7 @@ public record Material(String id, Kind kind, String colour, String pattern, Stri
 	}
 
 	public enum Kind {
-		WOOL, TERRACOTTA, CONCRETE, POWDER, GLAZED, GLASS, NATURE, BUILDING, PATTERN;
+		WOOL, TERRACOTTA, CONCRETE, POWDER, GLAZED, GLASS, NATURE, BUILDING, PATTERN, WALLPAPER;
 	}
 
 	/** Patterns laid over a block's own texture (made in the game from the textures in use, see client.Patterns). */
@@ -37,6 +37,14 @@ public record Material(String id, Kind kind, String colour, String pattern, Stri
 			"lime_concrete", "green_concrete", "cyan_concrete", "light_blue_concrete", "blue_concrete", "purple_concrete", "magenta_concrete",
 			"pink_concrete", "white_wool", "light_gray_wool", "gray_wool", "black_wool", "brown_wool", "red_wool", "orange_wool", "yellow_wool",
 			"lime_wool", "green_wool", "cyan_wool", "light_blue_wool", "blue_wool", "purple_wool", "magenta_wool", "pink_wool"};
+
+	/** Wallpapers: Cubework's own blocks (textures in cubework:block/wallpaper/), made like birch planks. */
+	public static final String[] WALLPAPERS = {"yellow_wallpaper", "yellow_striped_wallpaper", "cream_wallpaper", "cream_striped_wallpaper",
+			"sage_wallpaper", "sage_striped_wallpaper", "rose_wallpaper", "rose_striped_wallpaper"};
+
+	/** Building blocks that get partition walls too (with concrete, terracotta and wallpaper): smooth, plain walls. */
+	private static final java.util.Set<String> OFFICE_BUILDING = java.util.Set.of("smooth_stone", "stone_bricks", "bricks", "polished_andesite",
+			"polished_diorite", "polished_granite", "polished_deepslate", "polished_tuff", "mud_bricks", "smooth_sandstone", "smooth_quartz", "quartz_bricks");
 
 	/** The 16 dye colours, in the order the game's creative menu uses. */
 	public static final String[] COLOURS = {"white", "light_gray", "gray", "black", "brown", "red", "orange", "yellow", "lime", "green", "cyan",
@@ -159,6 +167,7 @@ public record Material(String id, Kind kind, String colour, String pattern, Stri
 		java.util.Set<String> nature = java.util.Set.of(NATURE);
 		for (String n : BUILDING) if (!nature.contains(n)) out.add(new Material(n, Kind.BUILDING, null));
 		for (String src : PATTERN_SOURCES) for (String p : PATTERNS) out.add(new Material(p + "_" + src, Kind.PATTERN, null, p, src));
+		for (String w : WALLPAPERS) out.add(new Material(w, Kind.WALLPAPER, null, "wallpaper", "birch_planks"));
 		return List.copyOf(out);
 	}
 
@@ -180,6 +189,22 @@ public record Material(String id, Kind kind, String colour, String pattern, Stri
 	/** A patterned block (tiled stone bricks and so on). */
 	public boolean patterned() {
 		return kind == Kind.PATTERN;
+	}
+
+	/** A wallpaper (Cubework's own full block). */
+	public boolean wallpaper() {
+		return kind == Kind.WALLPAPER;
+	}
+
+	/** Gets partition walls: concrete, terracotta, wallpaper and the plain building blocks. */
+	public boolean office() {
+		return kind == Kind.CONCRETE || kind == Kind.TERRACOTTA || kind == Kind.WALLPAPER || OFFICE_BUILDING.contains(id);
+	}
+
+	/** Copper, and the metal and gem blocks (their own tab). */
+	public boolean metal() {
+		return copper() || java.util.Set.of("coal_block", "iron_block", "gold_block", "redstone_block", "emerald_block", "lapis_block", "diamond_block",
+				"netherite_block", "amethyst_block").contains(id);
 	}
 
 	public boolean glass() {
@@ -246,6 +271,7 @@ public record Material(String id, Kind kind, String colour, String pattern, Stri
 
 	/** The block's textures (paths under minecraft:block/, or full ids such as cubework:block/pattern/tiled/stone). */
 	public Textures textures() {
+		if (kind == Kind.WALLPAPER) return Textures.all(Cubework.ID + ":block/wallpaper/" + id);
 		if (pattern != null) {
 			Textures t = TEXTURES.get(source);
 			if (t == null) t = Textures.all(source);
@@ -267,6 +293,7 @@ public record Material(String id, Kind kind, String colour, String pattern, Stri
 
 	/** The start of its shapes' ids: the block's id, or a shorter name (stone_brick for stone_bricks). */
 	public String stem() {
+		if (kind == Kind.WALLPAPER) return id;
 		if (pattern != null) return pattern + "_" + STEMS.getOrDefault(source, source);
 		return STEMS.getOrDefault(id, id);
 	}

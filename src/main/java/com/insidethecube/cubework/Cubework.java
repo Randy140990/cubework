@@ -47,16 +47,32 @@ public final class Cubework implements ModInitializer {
 		BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Decoration.TOP_LAYER_MODIFICATION,
 				ResourceKey.create(Registries.PLACED_FEATURE, Reg.id("smooth_terrain")));
 
-		// Nine tabs: coloured blocks, building blocks, natural blocks, plants, doors, tables, patterns, lights and carpets.
-		tab("colours", () -> new ItemStack(item("magenta_glazed_terracotta_stairs")), add -> {
+		// Fourteen tabs, so everything is easy to find: the coloured blocks in three, building blocks, copper and
+		// metals, nature, logs, plants, doors and trapdoors, tables, patterns, carpets, lights, and office pieces.
+		// Carpets and the office shapes (bordered blocks, raised frames, partitions) are only in their own tabs.
+		tab("wool_concrete", () -> new ItemStack(item("light_blue_concrete_stairs")), add -> {
 			add.accept(null);
-			for (Material m : Material.ALL) if (!m.nature() && !m.building() && !m.patterned()) shapes(m, add, false);
+			for (Material m : Material.ALL) {
+				Material.Kind k = m.kind();
+				if (k == Material.Kind.WOOL || k == Material.Kind.CONCRETE || k == Material.Kind.POWDER) shapes(m, add, false);
+			}
+		});
+		tab("terracotta", () -> new ItemStack(item("magenta_glazed_terracotta_stairs")), add -> {
+			for (Material m : Material.ALL) if (m.kind() == Material.Kind.TERRACOTTA || m.kind() == Material.Kind.GLAZED) shapes(m, add, false);
+		});
+		tab("glass", () -> new ItemStack(item("cyan_stained_glass_arch")), add -> {
+			for (Material m : Material.ALL) if (m.glass()) shapes(m, add, false);
 		});
 		tab("building", () -> new ItemStack(item("stone_brick_arch")), add -> {
-			for (String id : Material.BUILDING) shapes(Material.byId(id), add, false);
+			for (String id : Material.BUILDING) if (!Material.byId(id).metal()) shapes(Material.byId(id), add, false);
+		});
+		tab("metals", () -> new ItemStack(item("copper_round_column_16")), add -> {
+			for (String id : Material.BUILDING) if (Material.byId(id).metal()) shapes(Material.byId(id), add, false);
 		});
 		tab("nature", () -> new ItemStack(item("grass_block_stairs")), add -> {
 			for (Material m : Material.ALL) if (m.nature()) shapes(m, add, true);
+		});
+		tab("logs", () -> new ItemStack(item("round_oak_log_12")), add -> {
 			Extras.THIN_LOGS.forEach(add);
 			Extras.ROUND_LOGS.forEach(add);
 		});
@@ -76,12 +92,28 @@ public final class Cubework implements ModInitializer {
 				shapes(m, add, false);
 			}
 		});
-		tab("lights", () -> new ItemStack(item("sea_lantern_panel_light_12_4")), add -> Extras.LIGHT_FITTINGS.forEach(add));
 		// Every carpet: coloured, glazed (they turn, to line up the patterns), building, natural and patterned.
 		tab("carpets", () -> new ItemStack(item("cyan_glazed_terracotta_carpet")), add -> {
 			for (Material m : Material.ALL) {
 				Block b = CwBlocks.get(m, Shape.CARPET);
 				if (b != null) add.accept(b);
+			}
+		});
+		tab("lights", () -> new ItemStack(item("sea_lantern_panel_light_12_4")), add -> Extras.LIGHT_FITTINGS.forEach(add));
+		// Wallpapers and their shapes, then every material's bordered block, raised frame and partitions.
+		tab("office", () -> new ItemStack(item("yellow_wallpaper_bordered")), add -> {
+			for (Material m : Material.ALL) {
+				if (!m.wallpaper() || CwBlocks.shapesOf(m).isEmpty()) continue;
+				add.accept(m.base());
+				Map<Shape, Block> shapes = CwBlocks.shapesOf(m);
+				for (Shape sh : Shape.values()) if (shapes.containsKey(sh)) add.accept(shapes.get(sh));
+			}
+			for (Shape sh : new Shape[] {Shape.BORDERED, Shape.RAISED_FRAME, Shape.PARTITION_2, Shape.PARTITION_4, Shape.PARTITION_6, Shape.PARTITION_8}) {
+				for (Material m : Material.ALL) {
+					if (m.wallpaper()) continue;
+					Block b = CwBlocks.get(m, sh);
+					if (b != null) add.accept(b);
+				}
 			}
 		});
 	}
@@ -91,8 +123,8 @@ public final class Cubework implements ModInitializer {
 		Map<Shape, Block> shapes = CwBlocks.shapesOf(m);
 		for (Shape s : Shape.values()) {
 			Block b = shapes.get(s);
-			// Carpets have a tab of their own.
-			if (b != null && s != Shape.CARPET && (!natureOnly || s.natureShape())) add.accept(b);
+			// Carpets and the office shapes have tabs of their own.
+			if (b != null && s != Shape.CARPET && !s.officeShape() && (!natureOnly || s.natureShape())) add.accept(b);
 		}
 	}
 

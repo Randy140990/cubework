@@ -9,6 +9,7 @@ import com.insidethecube.cubework.block.ColouredDoorBlock;
 import com.insidethecube.cubework.block.LightFixtureBlock;
 import com.insidethecube.cubework.block.RoundLogBlock;
 import com.insidethecube.cubework.block.SizedCoralBlock;
+import com.insidethecube.cubework.block.SizedHangingPlantBlock;
 import com.insidethecube.cubework.block.SizedPlantBlock;
 import com.insidethecube.cubework.block.TableBlock;
 import com.insidethecube.cubework.block.ThinLogBlock;
@@ -182,6 +183,10 @@ public final class Extras {
 	private static void plants() {
 		for (String p : LOW_PLANTS) for (int size : LOW_SIZES) plant(p, size);
 		for (String p : PLANTS) for (int size : PLANT_SIZES) plant(p, size);
+		// The spore blossom, hanging from a ceiling.
+		if (Reg.exists("spore_blossom")) for (int size : PLANT_SIZES) {
+			SIZED_PLANTS.add(block("spore_blossom_" + size, settings(vanilla("spore_blossom")), set -> new SizedHangingPlantBlock(size / 100.0, set)));
+		}
 		for (String p : TALL_PLANTS) {
 			if (!Reg.exists(p)) continue;
 			for (int size : TALL_SIZES) {

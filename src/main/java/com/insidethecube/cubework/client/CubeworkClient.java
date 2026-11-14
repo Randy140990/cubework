@@ -117,6 +117,7 @@ public final class CubeworkClient implements ClientModInitializer {
 					}
 					Models.Maker maker = switch (shape) {
 						case ARCH, ARCH_CORNER -> (state, sprites) -> ArchModel.build(m, state, sprites);
+						case ROUND_PILLAR_2, ROUND_PILLAR_3, ROUND_PILLAR_4 -> (state, sprites) -> RoundPillarModel.build(m, state, sprites);
 						case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, ROUND_CORNER, ROUND_CORNER_INNER ->
 								(state, sprites) -> RoundModel.build(m, state, sprites);
 						default -> (state, sprites) -> SlopeModel.build(m, state, sprites);
