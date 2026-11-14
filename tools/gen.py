@@ -569,13 +569,19 @@ def new_shape_templates():
         template("template_trim_%d_item" % w, [([0, 8 - w / 2, 8 - w / 2], [16, 8 + w / 2, 8 + w / 2])])
     # Curved Stairs in the hand: a stair (rising east) with the S-curve cut under its back, as the middle
     # stair of a three-stair flight (as StairCurveGeometry.curve).
+    def stair_curve_at(w, X):
+        if X <= 0: return 0.0
+        thin, flare = 0.25, 0.35
+        length = w - thin
+        waves = max(1, round(length / 3.5))
+        period = length / waves
+        swing = min(0.45, 0.8 * period / (2 * math.pi))
+        s = max(0.0, X - thin) / period
+        raw = X - (thin + swing - swing * math.cos(2 * math.pi * s))
+        hh = max(flare - abs(raw), 0.0) / flare
+        return max(0.0, min(max(raw, 0.0) + hh * hh * flare * 0.25, X - 0.2))
     def under(x):
-        X = 1 + x
-        u = X - 0.5
-        if u <= 0: return 0.0
-        a, b, k = X - 0.5 - u * math.exp(-u / 0.7), 2.0, 1.2
-        hh = max(k - abs(a - b), 0.0) / k
-        return max(0.0, min(a, b) - hh * hh * k * 0.25 - 1.0)
+        return max(0.0, stair_curve_at(3, 1 + x) - 1.0)
     curve = [[(y + 1) / 16 > max(under(x / 16), under((x + 1) / 16)) and y / 16 < (0.5 if x < 8 else 1.0) for y in range(16)] for x in range(16)]
     template("template_stair_curve", mask_boxes(curve, 0, 16), display=STAIRS_DISPLAY)
     for d in WINDOW_DEPTHS:

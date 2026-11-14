@@ -1,5 +1,9 @@
 Cubework by Inside the Cube.
 
+0.8.4: Curved Stairs with a wavy underside, as in the curved-stair builds (1.21.11 only, cubework-0.8.4-mc1.21.11.jar).
+- Curved Stairs: the underside is now a wave that rises the whole way and never dips: it flares off the floor, tucks in close under the first stair, swells out under the middle stairs, and tucks back in under the top stair. Flights of five or six stairs get two waves. The thinnest point is a quarter of a block under the steps' inner corners. Same pieces and building as before; flights you built with 0.8.3 take the new shape when you use any piece with an empty hand.
+- Jar files are now named cubework-<version>-mc<Minecraft version>.jar (the plus sign was lost on download).
+
 0.8.3: a smoother S under Curved Stairs (1.21.11 only, cubework-0.8.3+1.21.11.jar).
 - Curved Stairs: the underside is now one even S that rises all the way: it bends up off the floor under the bottom stair, follows the underside of the stairs half a block below them, and bends level under the top stair. No more sag under the second stair. Same pieces and building as 0.8.2: lay the flight with Curved Stairs, then fill under it with the same item. Flights you built with 0.8.2 take the new shape when you use any piece with an empty hand.
 
