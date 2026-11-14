@@ -1,3 +1,8 @@
-grep requiresRender|visualEqualityGroup|ModelGroupCollector net/minecraft/client/resources/model/ModelManager.java
-net/minecraft/client/renderer/block/model/BlockStateModel.java
-net/minecraft/client/multiplayer/ClientLevel.java
+net/minecraft/world/level/block/state/BlockBehaviour.java
+grep rebuildCache|initCache net/minecraft/world/level/block/Blocks.java
+grep rebuildCache|initCache net/minecraft/server/ReloadableServerResources.java
+grep rebuildCache|initCache net/minecraft/server/Bootstrap.java
+grep rebuildCache|initCache|freeze net/minecraft/core/registries/BuiltInRegistries.java
+grep rebuildCache|initCache net/minecraft/client/multiplayer/ClientCommonPacketListenerImpl.java
+grep rebuildCache|initCache net/minecraft/client/multiplayer/ClientConfigurationPacketListenerImpl.java
+grep rebuildCache|initCache net/minecraft/tags/TagLoader.java

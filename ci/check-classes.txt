@@ -1,8 +1,0 @@
-net.fabricmc.fabric.api.renderer.v1.model.FabricBlockStateModel
-net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter
-net.fabricmc.fabric.api.client.model.loading.v1.wrapper.WrapperBlockStateModel
-net.minecraft.server.packs.resources.PreparableReloadListener$SharedState
-net.minecraft.world.level.block.state.StateDefinition$Factory
-net.minecraft.util.StrictJsonParser
-net.minecraft.world.level.block.state.BlockState
-net.minecraft.client.resources.model.ModelBaker
