@@ -291,7 +291,8 @@ public final class Extras {
 		Block copper = vanilla("copper_trapdoor");
 		for (String metal : METAL_DOORS) {
 			MapColor map = vanilla(metal + "_block").defaultMapColor();
-			TRAPDOORS.add(block(metal + "_trapdoor", BlockBehaviour.Properties.ofFullCopy(copper).mapColor(map), set -> new TrapDoorBlock(BlockSetType.COPPER, set)));
+			// Not metal + "_trapdoor": that's the Trapdoor shape of the metal's block (iron_trapdoor from iron_block).
+			TRAPDOORS.add(block(metal + "_copper_style_trapdoor", BlockBehaviour.Properties.ofFullCopy(copper).mapColor(map), set -> new TrapDoorBlock(BlockSetType.COPPER, set)));
 		}
 	}
 

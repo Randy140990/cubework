@@ -1424,8 +1424,8 @@ def doors(add_name, tags):
     # Trapdoors: each wood's trapdoor and the iron one in the 16 colours (keeping their patterns), and the
     # copper trapdoor's pattern in metals and gems. Laid like vanilla's wooden trapdoors (the pattern turns
     # with the way they face).
-    def trapdoor_models(name, english, recipe, wooden, metal):
-        t = {"texture": NS + ":block/" + name}
+    def trapdoor_models(name, english, recipe, wooden, metal, texture=None):
+        t = {"texture": NS + ":block/" + (texture or name)}
         for part in ("bottom", "top", "open"):
             model(name + "_" + part, "minecraft:block/template_orientable_trapdoor_" + part, t)
         variants = {}
@@ -1458,8 +1458,9 @@ def doors(add_name, tags):
         trapdoor_models("%s_iron_trapdoor" % colour, lambda g, c=colour: "%s Iron Trapdoor" % title(c, g),
                         ["minecraft:iron_trapdoor", "minecraft:%s_dye" % colour], False, True)
     for metal, block, ingredient in METAL_DOORS:
-        trapdoor_models("%s_trapdoor" % metal, lambda g, mt=metal: "Iron Trapdoor (Copper Style)" if mt == "iron" else "%s Trapdoor" % title(mt, g),
-                        ["minecraft:copper_trapdoor", "minecraft:" + ingredient], False, True)
+        # Not metal_trapdoor: that's the Trapdoor shape of the metal's block. The texture is still <metal>_trapdoor.
+        trapdoor_models("%s_copper_style_trapdoor" % metal, lambda g, mt=metal: "%s Trapdoor (Copper Style)" % title(mt, g),
+                        ["minecraft:copper_trapdoor", "minecraft:" + ingredient], False, True, "%s_trapdoor" % metal)
 
     # The coloured textures are made in the game from the door textures in use: wood and iron recoloured with
     # dyes, the copper door repainted with each metal block's own colours.
@@ -1743,6 +1744,9 @@ def main():
     us, gb = {}, {}
 
     def add_name(name, fn):
+        # Two things with one id would stop the game at start ("Adding duplicate key ... to registry").
+        if "block.%s.%s" % (NS, name) in us:
+            raise SystemExit("duplicate id: %s:%s" % (NS, name))
         us["block.%s.%s" % (NS, name)] = fn(False)
         gb["block.%s.%s" % (NS, name)] = fn(True)
 
