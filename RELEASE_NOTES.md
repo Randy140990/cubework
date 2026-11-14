@@ -1,5 +1,14 @@
 Cubework by Inside the Cube.
 
+0.11.0: starts much faster (1.21.11 only, cubework-0.11.0-mc1.21.11.jar).
+- The game makes every block state of every block while it starts, and Cubework had about 1.3 million of them (vanilla has about 29,000). The pieces that join their neighbours now work out their joins from the blocks round them when they're drawn and when their hit box is asked for, instead of having a block state for every way of joining. That leaves under half as many.
+  - Window frames (square, diamond and round): 12 states each instead of 192.
+  - Tables: 4 instead of 64.
+  - Partitions: 78 instead of 624.
+  - Slopes (all four kinds): corners worked out the same way, 16 states instead of 80 (gentle slopes, and slopes over 2 or 3 blocks, keep their step).
+- Slopes' and round window frames' shapes are now made the first time they're drawn rather than all while the game loads, and shapes that look the same under water and out of it are made once.
+- Nothing changes in game: everything joins, turns corners and looks the same, and your builds load as they were. One small difference: a partition standing on its own (joined to nothing) remembers the way it ran as part of its last straight run, so a lone partition from an older build may turn to run east-west.
+
 0.10.1: fixes 0.10.0 not starting (1.21.11 only, cubework-0.10.1-mc1.21.11.jar).
 - 0.10.0 stopped the game at start ("Adding duplicate key cubework:iron_trapdoor"): the copper-style metal trapdoors had the same ids as the Trapdoor shapes of the iron, gold and other metal blocks. They're now <metal>_copper_style_trapdoor, named "Gold Trapdoor (Copper Style)" and so on.
 - The resource generator now refuses to build if any two things share an id, so this can't reach a release again.

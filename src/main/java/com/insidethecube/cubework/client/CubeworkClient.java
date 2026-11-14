@@ -97,7 +97,8 @@ public final class CubeworkClient implements ClientModInitializer {
 		//#endif
 
 		// Window frames, tables and partitions pick their joined look from their neighbours as they're drawn.
-		JoinedModels.register(b -> b instanceof com.insidethecube.cubework.block.WindowFrameBlock w && w.style() == com.insidethecube.cubework.block.WindowFrameBlock.Style.ROUND);
+		JoinedModels.register(b -> b instanceof com.insidethecube.cubework.block.SlopeBlock
+				|| b instanceof com.insidethecube.cubework.block.WindowFrameBlock w && w.style() == com.insidethecube.cubework.block.WindowFrameBlock.Style.ROUND);
 
 		// Slopes, arches and round shapes have their own models, built from the vanilla block's textures.
 		ModelLoadingPlugin.register(ctx -> {
@@ -118,12 +119,20 @@ public final class CubeworkClient implements ClientModInitializer {
 						Models.registerJoinedLazy(ctx, block, List.of(t.top(), t.side(), t.bottom()), t.side(), (state, joins, sprites) -> RoundWindowModel.build(m, state, joins, sprites));
 						continue;
 					}
+					if (shape == Shape.SLOPE || shape == Shape.SLOPE_2 || shape == Shape.SLOPE_3 || shape == Shape.GENTLE_SLOPE) {
+						// The corner each slope turns is picked from its neighbours as it's drawn: 5 looks, made when first drawn.
+						Material.Textures t = m.textures();
+						List<String> textures = new ArrayList<>(List.of(t.top(), t.side(), t.bottom()));
+						if (t.overlay() != null) textures.add(t.overlay());
+						Models.registerJoinedLazy(ctx, block, textures, t.side(), (state, joins, sprites) -> SlopeModel.build(m, state, joins, sprites));
+						continue;
+					}
 					Models.Maker maker = switch (shape) {
 						case ARCH, ARCH_CORNER -> (state, sprites) -> ArchModel.build(m, state, sprites);
 						case ROUND_PILLAR_2, ROUND_PILLAR_3, ROUND_PILLAR_4 -> (state, sprites) -> RoundPillarModel.build(m, state, sprites);
 						case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, ROUND_CORNER, ROUND_CORNER_INNER ->
 								(state, sprites) -> RoundModel.build(m, state, sprites);
-						default -> (state, sprites) -> SlopeModel.build(m, state, sprites);
+						default -> (state, sprites) -> SlopeModel.build(m, state, 0, sprites);
 					};
 					Models.register(ctx, block, maker);
 				}

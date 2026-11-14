@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -60,6 +61,23 @@ public final class SlopeGeometry {
 	 */
 	public static VoxelShape inside(Direction f, Half half, StairsShape shape, double base, double rise, int top) {
 		return INSIDE.computeIfAbsent(new Key(f, half, shape, base, rise, top), k -> build(f, half, shape, true, base, rise, top));
+	}
+
+	private record AnyKey(Direction f, Half half, double base, double rise, int top) {}
+
+	private static final Map<AnyKey, VoxelShape> INSIDE_ANY = new ConcurrentHashMap<>();
+
+	/**
+	 * What the slope fills whatever corner it turns (the inside of its straight and both outer corners
+	 * together; inner corners fill more): its light-blocking shape, which can't know the neighbours.
+	 */
+	public static VoxelShape insideAny(Direction f, Half half, double base, double rise, int top) {
+		return INSIDE_ANY.computeIfAbsent(new AnyKey(f, half, base, rise, top), k -> {
+			VoxelShape s = inside(f, half, StairsShape.STRAIGHT, base, rise, top);
+			s = Shapes.join(s, inside(f, half, StairsShape.OUTER_LEFT, base, rise, top), BooleanOp.AND);
+			s = Shapes.join(s, inside(f, half, StairsShape.OUTER_RIGHT, base, rise, top), BooleanOp.AND);
+			return s.optimize();
+		});
 	}
 
 	private static VoxelShape build(Direction f, Half half, StairsShape shape, boolean inside, double base, double rise, int top) {

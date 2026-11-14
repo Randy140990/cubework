@@ -127,7 +127,6 @@ public class GentleSlopeBlock extends SlopeBlock {
 		// Only with an empty hand, so clicking one with a block still places the block.
 		if (!player.getMainHandItem().isEmpty()) return InteractionResult.PASS;
 		BlockState next = state.setValue(step(), state.getValue(step()) % steps() + 1);
-		next = next.setValue(SHAPE, shapeAt(next, world, pos));
 		world.setBlock(pos, next, Block.UPDATE_ALL);
 		world.playSound(player, pos, getSoundType(state).getPlaceSound(), SoundSource.BLOCKS, 0.6f, 1.2f);
 		return InteractionResult.SUCCESS;
