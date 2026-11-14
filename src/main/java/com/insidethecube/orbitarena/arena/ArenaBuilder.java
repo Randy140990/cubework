@@ -131,7 +131,7 @@ public final class ArenaBuilder {
 		else if (r >= CENTRE - 0.8) floor = b(Blocks.WHITE_CONCRETE);
 		else if (r >= 14.4 && r < 15.0) floor = b(Blocks.SMOOTH_STONE);
 		else if (r >= LIGHT_RING_OUT && (x == 0 || z == 0 || x == -1 || z == -1)) floor = b(Blocks.SMOOTH_STONE);
-		else floor = hash(x, 0, z, 1) < 0.18 ? b(Blocks.WHITE_CONCRETE) : b(Blocks.LIGHT_GRAY_CONCRETE);
+		else floor = hash(x, 0, z, 1) < 0.07 ? b(Blocks.SMOOTH_STONE) : b(Blocks.LIGHT_GRAY_CONCRETE);
 		set(x, f, z, floor);
 		// The dais: three steps, the top one a hexagon edged with light, lit at its heart.
 		double hex = hexRadius(x + 0.5, z + 0.5, 9.0);
