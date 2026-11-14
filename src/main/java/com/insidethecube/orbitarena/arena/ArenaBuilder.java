@@ -175,7 +175,7 @@ public final class ArenaBuilder {
 
 	private void upperDeck(int x, int z, double r, double a) {
 		int f = FLOOR;
-		if (box(a) && r >= UPPER_IN + 2) {
+		if (ArenaLayout.box(a) && r >= UPPER_IN + 2) {
 			box(x, z, r, a);
 			return;
 		}

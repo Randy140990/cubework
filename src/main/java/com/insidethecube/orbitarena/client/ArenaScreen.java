@@ -42,8 +42,8 @@ public class ArenaScreen extends Screen {
 					case FIGHTERS -> "Fighters (PvP)";
 					case MOBS -> "Mob waves";
 					case BOSS -> "Boss";
-				}))
-				.withValues(Opponents.values()).withInitialValue(opponents)
+				}), opponents)
+				.withValues(Opponents.values())
 				.create(x, y, w, 20, Component.literal("Opponents"), (b, v) -> {
 					opponents = v;
 					rebuildWidgets();
@@ -57,8 +57,8 @@ public class ArenaScreen extends Screen {
 						case WITHER -> "Wither";
 						case WARDEN -> "Warden";
 						case ENDER_DRAGON -> "Ender Dragon (experimental)";
-					}))
-					.withValues(Boss.values()).withInitialValue(boss)
+					}), boss)
+					.withValues(Boss.values())
 					.create(x, y, w, 20, Component.literal("Boss"), (b, v) -> boss = v));
 			y += 24;
 			countSlider = addRenderableWidget(new Slider(x, y, w, (bossCount - 1) / 2.0, v -> bossCount = 1 + (int) Math.round(v * 2),
@@ -68,16 +68,16 @@ public class ArenaScreen extends Screen {
 					() -> "How many: " + count));
 		}
 		y += 24;
-		addRenderableWidget(CycleButton.<Kit>builder(k -> Component.translatable(k.key()))
-				.withValues(Kit.values()).withInitialValue(kit)
+		addRenderableWidget(CycleButton.<Kit>builder(k -> Component.translatable(k.key()), kit)
+				.withValues(Kit.values())
 				.create(x, y, w, 20, Component.literal("Your kit"), (b, v) -> kit = v));
 		y += 24;
-		addRenderableWidget(CycleButton.<Integer>builder(t -> Component.literal(t == 0 ? "None" : (t / 60) + " minutes"))
-				.withValues(0, 120, 300, 600).withInitialValue(timeLimit)
+		addRenderableWidget(CycleButton.<Integer>builder(t -> Component.literal(t == 0 ? "None" : (t / 60) + " minutes"), timeLimit)
+				.withValues(0, 120, 300, 600)
 				.create(x, y, w, 20, Component.literal("Time limit"), (b, v) -> timeLimit = v));
 		y += 24;
-		addRenderableWidget(CycleButton.<Float>builder(c -> Component.literal(c == 0 ? "Empty" : c < 0.3F ? "Quiet" : c < 0.6F ? "Busy" : "Packed"))
-				.withValues(0F, 0.25F, 0.5F, 0.85F).withInitialValue(nearestCrowd())
+		addRenderableWidget(CycleButton.<Float>builder(c -> Component.literal(c == 0 ? "Empty" : c < 0.3F ? "Quiet" : c < 0.6F ? "Busy" : "Packed"), nearestCrowd())
+				.withValues(0F, 0.25F, 0.5F, 0.85F)
 				.create(x, y, w, 20, Component.literal("Crowd"), (b, v) -> Crowd.density = v));
 		y += 30;
 		addRenderableWidget(Button.builder(Component.literal("Start"), b -> start()).bounds(x, y, w / 2 - 2, 20).build());

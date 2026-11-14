@@ -58,7 +58,7 @@ public final class Matches {
 		});
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
 			// Enemies never hurt each other.
-			if (entity.entityTags().contains(Match.ENEMY_TAG) && source.getEntity() != null && source.getEntity().entityTags().contains(Match.ENEMY_TAG)) return false;
+			if (entity.getTags().contains(Match.ENEMY_TAG) && source.getEntity() != null && source.getEntity().getTags().contains(Match.ENEMY_TAG)) return false;
 			// Nothing hurts a player in the arena outside a fight (the countdown, the result).
 			if (entity instanceof ServerPlayer p && p.level().dimension() == OrbitArena.ARENA) {
 				Match m = MATCHES.get(p.getUUID());
@@ -70,13 +70,13 @@ public final class Matches {
 			if (entity instanceof ServerPlayer p) {
 				Match m = MATCHES.get(p.getUUID());
 				if (m != null && m.fighting()) m.onPlayerHurt(taken);
-			} else if (entity.entityTags().contains(Match.ENEMY_TAG) && source.getEntity() instanceof ServerPlayer p) {
+			} else if (entity.getTags().contains(Match.ENEMY_TAG) && source.getEntity() instanceof ServerPlayer p) {
 				Match m = MATCHES.get(p.getUUID());
 				if (m != null && m.fighting()) m.onEnemyHurt(taken);
 			}
 		});
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
-			if (!entity.entityTags().contains(Match.ENEMY_TAG)) return;
+			if (!entity.getTags().contains(Match.ENEMY_TAG)) return;
 			for (Match m : MATCHES.values()) m.onEnemyDeath(entity);
 		});
 
