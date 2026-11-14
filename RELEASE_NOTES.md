@@ -1,5 +1,8 @@
 Cubework by Inside the Cube.
 
+0.8.3: a smoother S under Curved Stairs (1.21.11 only, cubework-0.8.3+1.21.11.jar).
+- Curved Stairs: the underside is now one even S that rises all the way: it bends up off the floor under the bottom stair, follows the underside of the stairs half a block below them, and bends level under the top stair. No more sag under the second stair. Same pieces and building as 0.8.2: lay the flight with Curved Stairs, then fill under it with the same item. Flights you built with 0.8.2 take the new shape when you use any piece with an empty hand.
+
 0.8.2: Curved Stairs (1.21.11 only, cubework-0.8.2+1.21.11.jar).
 - Curved Stairs: a flight of stairs with a smooth S-shaped underside, as in the curved-stair builds: under the first stair the underside springs up from the floor (in), under the middle stairs it sags into a belly (out), and it rises close under the top stair again (back in). Lay the flight with Curved Stairs like ordinary stairs (it climbs away from you), then fill the blocks under it with the same item: a block with the flight right above it becomes the fill. Every piece works out how long the flight is and where it sits, and the whole flight re-fits as you add pieces; fill that would sit in the hollow under the curve simply isn't placed, so you can fill the whole space under the flight. Flights of 2 to 6 stairs (longer ones curve under their top six); if you change a flight, use any piece with an empty hand to re-fit it. Ordinary stairs on top work too (the fill still curves, the steps stay square). On the shape wheel with stairs and slopes; 1 from a block in the stonecutter. For every coloured and building block.
 
