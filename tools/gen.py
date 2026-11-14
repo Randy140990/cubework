@@ -324,6 +324,14 @@ def blockstate(name, obj):
     write(os.path.join(ASSETS, "blockstates", name + ".json"), obj)
 
 
+def joined_blockstate(name, obj):
+    """The look of a block that joins its neighbours without keeping it in its block state (window frames,
+    tables, partitions: see Joining.java). It's written with the join properties (north, up, left...) as if
+    the block had them; the game never reads it as a blockstate file, Cubework's JoinedModels does, and picks
+    the joined look from the neighbours as the chunk is drawn."""
+    write(os.path.join(ASSETS, "joined", name + ".json"), obj)
+
+
 def item(name, model_id, tinted=False):
     """The item's look: an item model definition from 1.21.4, before that an item model (tints are set in code)."""
     if MC >= (1, 21, 4):
@@ -976,7 +984,7 @@ def partition(mat, kind, name, w):
             for d in HORIZONTAL:
                 parts.append({"when": {d: "true", "height": hname, "cap": wood},
                               "apply": {"model": m("partition_%d_cap_arm_%d_%s" % (w, h, wood)), "y": Y_FROM_NORTH[d], "uvlock": True}})
-    blockstate(name, {"multipart": parts})
+    joined_blockstate(name, {"multipart": parts})
     item(name, m(name + "_item"))
 
 
@@ -1068,7 +1076,7 @@ def window_frame(mat, kind, name, depth, diamond):
                 else:
                     v, h = side[p[-2]], side[p[-1]]
                     parts.append({"when": {"facing": f, v: "false", h: "false"}, "apply": apply(p)})
-    blockstate(name, {"multipart": parts})
+    joined_blockstate(name, {"multipart": parts})
     item(name, m(name + "_inventory"))
 
 
@@ -1570,7 +1578,7 @@ def tables(add_name, tags):
                 for corner in LEG_BOXES:
                     ns, ew = {"n": "north", "s": "south"}[corner[0]], {"w": "west", "e": "east"}[corner[1]]
                     parts.append({"when": {ns: "false", ew: "false"}, "apply": {"model": m("table_legs_%s_%s_%d" % (legs, corner, y0))}})
-                blockstate(name, {"multipart": parts})
+                joined_blockstate(name, {"multipart": parts})
                 if MC >= (1, 21, 4):
                     write(os.path.join(ASSETS, "items", name + ".json"), {"model": {"type": "minecraft:composite", "models": [
                         {"type": "minecraft:model", "model": m(top_model)}, {"type": "minecraft:model", "model": m("table_legs_%s_%d" % (legs, y0))}]}})
@@ -1730,7 +1738,7 @@ def main():
     TALL_PLANTS = [p for p in TALL_PLANTS if exists(p)]
     DOOR_WOODS = [w for w in DOOR_WOODS if exists(w + "_door")]
     TABLE_TOPS = [t for t in TABLE_TOPS if exists(t)]
-    for sub in ["blockstates", "models", "items"]:
+    for sub in ["blockstates", "joined", "models", "items"]:
         shutil.rmtree(os.path.join(ASSETS, sub), ignore_errors=True)
     for sub in ["loot_table", "recipe", "worldgen"]:
         shutil.rmtree(os.path.join(DATA, NS, sub), ignore_errors=True)

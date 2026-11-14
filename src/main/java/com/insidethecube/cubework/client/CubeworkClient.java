@@ -96,6 +96,9 @@ public final class CubeworkClient implements ClientModInitializer {
 				grass.stream().map(Block::asItem).toArray(net.minecraft.world.level.ItemLike[]::new));
 		//#endif
 
+		// Window frames, tables and partitions pick their joined look from their neighbours as they're drawn.
+		JoinedModels.register(b -> b instanceof com.insidethecube.cubework.block.WindowFrameBlock w && w.style() == com.insidethecube.cubework.block.WindowFrameBlock.Style.ROUND);
+
 		// Slopes, arches and round shapes have their own models, built from the vanilla block's textures.
 		ModelLoadingPlugin.register(ctx -> {
 			for (Material m : Material.ALL) {
@@ -110,9 +113,9 @@ public final class CubeworkClient implements ClientModInitializer {
 						continue;
 					}
 					if (shape.round()) {
-						// Round window frames have many states (every way of joining): their quads are made when first drawn.
+						// Round window frames: 16 ways of joining for each state, their quads made when first drawn.
 						Material.Textures t = m.textures();
-						Models.registerLazy(ctx, block, List.of(t.top(), t.side(), t.bottom()), t.side(), (state, sprites) -> RoundWindowModel.build(m, state, sprites));
+						Models.registerJoinedLazy(ctx, block, List.of(t.top(), t.side(), t.bottom()), t.side(), (state, joins, sprites) -> RoundWindowModel.build(m, state, joins, sprites));
 						continue;
 					}
 					Models.Maker maker = switch (shape) {

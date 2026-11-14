@@ -26,12 +26,13 @@ public final class RoundWindowModel {
 
 	private static final double EPS = 1e-6;
 
-	static Models.Built build(Material material, BlockState state, Function<String, TextureAtlasSprite> sprite) {
+	/** The frame in this state, joining the sides in joins (WindowFrameBlock.JOIN_UP and so on). */
+	static Models.Built build(Material material, BlockState state, int joins, Function<String, TextureAtlasSprite> sprite) {
 		Material.Textures t = material.textures();
 		TextureAtlasSprite top = sprite.apply(t.top()), side = sprite.apply(t.side()), bottom = sprite.apply(t.bottom());
 		int depth = ((WindowFrameBlock) state.getBlock()).depth();
-		boolean u = state.getValue(WindowFrameBlock.UP), d = state.getValue(WindowFrameBlock.DOWN);
-		boolean l = state.getValue(WindowFrameBlock.LEFT), r = state.getValue(WindowFrameBlock.RIGHT);
+		boolean u = (joins & WindowFrameBlock.JOIN_UP) != 0, d = (joins & WindowFrameBlock.JOIN_DOWN) != 0;
+		boolean l = (joins & WindowFrameBlock.JOIN_LEFT) != 0, r = (joins & WindowFrameBlock.JOIN_RIGHT) != 0;
 		// Quarter turns, plus 4 for lying on the floor or 8 against the ceiling (tipped first, see tilt).
 		int turns = (WindowFrameBlock.horizontal(state).get2DDataValue() + 2 & 3)
 				+ 4 * switch (WindowFrameBlock.face(state)) {

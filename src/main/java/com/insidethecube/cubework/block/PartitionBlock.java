@@ -1,5 +1,7 @@
 package com.insidethecube.cubework.block;
 
+import java.util.List;
+
 import java.util.Locale;
 
 import com.insidethecube.cubework.Material;
@@ -17,7 +19,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,8 +36,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * partitions (any material or thickness) and solid faces, like glass panes, into runs, corners and T's. An
  * empty hand changes its height (full, three quarters, half); a wooden slab puts a 1-pixel cap of that wood
  * along its top, a pixel wider each side; sneaking with an empty hand takes the cap off.
+ * <p>
+ * Its arms aren't kept in the block state (see Joining): they're worked out from the neighbours. The state
+ * keeps only the way a lone partition runs (AXIS, which follows the last straight run it was part of), its
+ * height and its cap.
  */
-public class PartitionBlock extends CwBlock {
+public class PartitionBlock extends CwBlock implements Joining {
 	public enum Height implements StringRepresentable {
 		FULL(16), THREE_QUARTERS(12), HALF(8);
 
@@ -62,6 +67,9 @@ public class PartitionBlock extends CwBlock {
 		}
 	}
 
+	/** The way it runs when nothing is there to join. */
+	public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
+	/** The arms its model is written with (blockstate under joined/): north, east, south, west (bits 1, 2, 4, 8). */
 	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
 	public static final BooleanProperty EAST = BlockStateProperties.EAST;
 	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
@@ -69,45 +77,40 @@ public class PartitionBlock extends CwBlock {
 	public static final EnumProperty<Height> HEIGHT = EnumProperty.create("height", Height.class);
 	public static final EnumProperty<Cap> CAP = EnumProperty.create("cap", Cap.class);
 
+	private static final List<BooleanProperty> JOINS = List.of(NORTH, EAST, SOUTH, WEST);
+	private static final Direction[] DIRS = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
+	private static final int ALONG_X = 2 | 8, ALONG_Z = 1 | 4;
+
 	public final int thickness;
 	private final java.util.Map<Integer, VoxelShape> shapes = new java.util.concurrent.ConcurrentHashMap<>();
 
 	public PartitionBlock(Material material, int thickness, BlockBehaviour.Properties settings) {
-		super(material, settings);
+		super(material, settings.dynamicShape());
 		this.thickness = thickness;
-		registerDefaultState(defaultBlockState().setValue(NORTH, false).setValue(EAST, true).setValue(SOUTH, false).setValue(WEST, true)
-				.setValue(HEIGHT, Height.FULL).setValue(CAP, Cap.NONE));
+		registerDefaultState(defaultBlockState().setValue(AXIS, Direction.Axis.X).setValue(HEIGHT, Height.FULL).setValue(CAP, Cap.NONE));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(NORTH, EAST, SOUTH, WEST, HEIGHT, CAP);
-	}
-
-	private static BooleanProperty side(Direction d) {
-		return switch (d) {
-			case NORTH -> NORTH;
-			case EAST -> EAST;
-			case SOUTH -> SOUTH;
-			default -> WEST;
-		};
+		builder.add(AXIS, HEIGHT, CAP);
 	}
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-		int key = (state.getValue(NORTH) ? 1 : 0) | (state.getValue(EAST) ? 2 : 0) | (state.getValue(SOUTH) ? 4 : 0) | (state.getValue(WEST) ? 8 : 0)
-				| state.getValue(HEIGHT).ordinal() << 4 | (state.getValue(CAP) == Cap.NONE ? 0 : 64);
-		return shapes.computeIfAbsent(key, k -> build(state));
+		int arms = joins(world, pos, state);
+		int key = arms | state.getValue(HEIGHT).ordinal() << 4 | (state.getValue(CAP) == Cap.NONE ? 0 : 64);
+		return shapes.computeIfAbsent(key, k -> build(state, arms));
 	}
 
-	private VoxelShape build(BlockState state) {
+	private VoxelShape build(BlockState state, int arms) {
 		double h = state.getValue(HEIGHT).pixels / 16.0, a = (8 - thickness / 2.0) / 16, b = (8 + thickness / 2.0) / 16;
 		boolean cap = state.getValue(CAP) != Cap.NONE;
 		double body = cap ? h - 1 / 16.0 : h, c = 1 / 16.0;
 		VoxelShape s = Shapes.box(a, 0, a, b, body, b);
 		if (cap) s = Shapes.or(s, Shapes.box(a - c, body, a - c, b + c, h, b + c));
-		for (Direction d : Direction.Plane.HORIZONTAL) {
-			if (!state.getValue(side(d))) continue;
+		for (int i = 0; i < 4; i++) {
+			if ((arms & 1 << i) == 0) continue;
+			Direction d = DIRS[i];
 			double x0 = d == Direction.WEST ? 0 : d == Direction.EAST ? b : a, x1 = d == Direction.WEST ? a : d == Direction.EAST ? 1 : b;
 			double z0 = d == Direction.NORTH ? 0 : d == Direction.SOUTH ? b : a, z1 = d == Direction.NORTH ? a : d == Direction.SOUTH ? 1 : b;
 			s = Shapes.or(s, Shapes.box(x0, 0, z0, x1, body, z1));
@@ -127,37 +130,52 @@ public class PartitionBlock extends CwBlock {
 		return s.getBlock() instanceof PartitionBlock || s.isFaceSturdy(world, p, d.getOpposite());
 	}
 
+	@Override
+	public List<BooleanProperty> joinProperties() {
+		return JOINS;
+	}
+
 	/**
 	 * Its arms: towards everything it joins; a run's end reaches across its block (the arm opposite too);
-	 * with nothing to join it keeps the way it ran, or runs across the way the placer faced.
+	 * with nothing to join it runs the way its AXIS says.
 	 */
-	private BlockState joined(BlockState state, BlockGetter world, BlockPos pos, Direction facing) {
-		boolean[] arm = new boolean[4];
-		int count = 0;
-		Direction[] dirs = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
+	@Override
+	public int joins(BlockGetter world, BlockPos pos, BlockState state) {
+		int arms = 0, count = 0;
 		for (int i = 0; i < 4; i++) {
-			arm[i] = joins(world, pos, dirs[i]);
-			if (arm[i]) count++;
+			if (joins(world, pos, DIRS[i])) {
+				arms |= 1 << i;
+				count++;
+			}
 		}
-		if (count == 0) {
-			boolean alongX = facing != null ? facing.getAxis() == Direction.Axis.Z : !(state.getValue(NORTH) && state.getValue(SOUTH));
-			arm[1] = arm[3] = alongX;
-			arm[0] = arm[2] = !alongX;
-		} else if (count == 1) {
-			for (int i = 0; i < 4; i++) if (arm[i]) arm[(i + 2) % 4] = true;
-		}
-		for (int i = 0; i < 4; i++) state = state.setValue(side(dirs[i]), arm[i]);
+		if (count == 0) return lone(state);
+		if (count == 1) arms |= (arms << 2 | arms >> 2) & 15;
+		return arms;
+	}
+
+	@Override
+	public int lone(BlockState state) {
+		return state.getValue(AXIS) == Direction.Axis.X ? ALONG_X : ALONG_Z;
+	}
+
+	/** Its AXIS follows a straight run it's part of, so it keeps running that way if the rest goes. */
+	private BlockState followRun(BlockState state, BlockGetter world, BlockPos pos) {
+		int arms = joins(world, pos, state);
+		if (arms == ALONG_X) return state.setValue(AXIS, Direction.Axis.X);
+		if (arms == ALONG_Z) return state.setValue(AXIS, Direction.Axis.Z);
 		return state;
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		return placed(joined(defaultBlockState(), ctx.getLevel(), ctx.getClickedPos(), ctx.getHorizontalDirection()), ctx);
+		// Alone, it runs across the way the placer faces.
+		Direction.Axis axis = ctx.getHorizontalDirection().getAxis() == Direction.Axis.Z ? Direction.Axis.X : Direction.Axis.Z;
+		return placed(followRun(defaultBlockState().setValue(AXIS, axis), ctx.getLevel(), ctx.getClickedPos()), ctx);
 	}
 
 	@Override
 	protected BlockState shapeUpdate(BlockState state, LevelReader world, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState) {
-		return direction.getAxis().isHorizontal() ? joined(state, world, pos, null) : state;
+		return direction.getAxis().isHorizontal() ? followRun(state, world, pos) : state;
 	}
 
 	@Override
@@ -198,15 +216,7 @@ public class PartitionBlock extends CwBlock {
 
 	@Override
 	protected BlockState rotate(BlockState state, Rotation rotation) {
-		BlockState out = state;
-		for (Direction d : Direction.Plane.HORIZONTAL) out = out.setValue(side(rotation.rotate(d)), state.getValue(side(d)));
-		return out;
-	}
-
-	@Override
-	protected BlockState mirror(BlockState state, Mirror mirror) {
-		BlockState out = state;
-		for (Direction d : Direction.Plane.HORIZONTAL) out = out.setValue(side(mirror.mirror(d)), state.getValue(side(d)));
-		return out;
+		boolean turns = rotation == Rotation.CLOCKWISE_90 || rotation == Rotation.COUNTERCLOCKWISE_90;
+		return turns ? state.setValue(AXIS, state.getValue(AXIS) == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X) : state;
 	}
 }

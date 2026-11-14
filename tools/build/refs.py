@@ -52,7 +52,7 @@ def walk(x):
             walk(v)
 
 
-for p in glob.glob(A + "/blockstates/*.json") + glob.glob(A + "/items/*.json") + glob.glob(A + "/models/**/*.json", recursive=True):
+for p in glob.glob(A + "/blockstates/*.json") + glob.glob(A + "/joined/*.json") + glob.glob(A + "/items/*.json") + glob.glob(A + "/models/**/*.json", recursive=True):
     walk(json.load(open(p)))
 # The textures the atlas sources paint from.
 for atlas in glob.glob(os.path.join(res, "assets", "minecraft", "atlases", "*.json")):

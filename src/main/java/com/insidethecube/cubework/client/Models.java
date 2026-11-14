@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 //#if MC >= 1.21.5
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -86,6 +87,27 @@ final class Models {
 		//#endif
 	}
 
+	/** Makes a block state's quads for one way of joining (see Joining). */
+	interface JoinedMaker {
+		Built make(BlockState state, int joins, Function<String, TextureAtlasSprite> sprites);
+	}
+
+	/**
+	 * Like registerLazy, for a block that joins its neighbours without keeping it in its block state (round
+	 * window frames): each state has its 16 joined looks, made when first drawn, and the one drawn is picked
+	 * from the neighbours (see JoinedModel).
+	 */
+	static void registerJoinedLazy(ModelLoadingPlugin.Context ctx, Block block, List<String> textures, String particle, JoinedMaker maker) {
+		//#if MC >= 1.21.5
+		JoinedLazyRoot root = new JoinedLazyRoot((com.insidethecube.cubework.block.Joining) block, maker, textures, particle, new java.util.concurrent.ConcurrentHashMap<>());
+		ctx.registerBlockStateResolver(block, resolver -> {
+			for (BlockState state : block.getStateDefinition().getPossibleStates()) resolver.setModel(state, root);
+		});
+		//#else
+		register(ctx, block, (state, sprites) -> maker.make(state, 0, sprites));
+		//#endif
+	}
+
 	private static net.minecraft.client.resources.model.Material texture(String name) {
 		// Full ids (patterns: cubework:block/pattern/tiled/stone) are used as they are.
 		if (name.indexOf(':') >= 0) {
@@ -113,7 +135,15 @@ final class Models {
 	}
 
 	//#if MC >= 1.21.5
-	private record Root(Maker maker) implements BlockStateModel.UnbakedRoot {
+	/**
+	 * One block's code-drawn model. States that look the same (under water or not) share one set of quads,
+	 * so each look is made once while the game loads.
+	 */
+	private record Root(Maker maker, Map<BlockState, BlockStateModel> looks) implements BlockStateModel.UnbakedRoot {
+		Root(Maker maker) {
+			this(maker, new java.util.concurrent.ConcurrentHashMap<>());
+		}
+
 		@Override
 		public void resolveDependencies(ResolvableModel.Resolver resolver) {
 		}
@@ -125,6 +155,10 @@ final class Models {
 
 		@Override
 		public BlockStateModel bake(BlockState state, ModelBaker baker) {
+			return looks.computeIfAbsent(dry(state), look -> make(look, baker));
+		}
+
+		private BlockStateModel make(BlockState state, ModelBaker baker) {
 			ModelDebugName named = () -> "cubework " + state;
 			//#if MC >= 26.1
 			Built built = maker.make(state, name -> baker.materials().get(texture(name), named).sprite());
@@ -135,6 +169,11 @@ final class Models {
 		}
 	}
 
+	/** The same state out of water: under water a shape looks the same (the water's drawn on its own). */
+	static BlockState dry(BlockState state) {
+		return state.hasProperty(BlockStateProperties.WATERLOGGED) ? state.setValue(BlockStateProperties.WATERLOGGED, false) : state;
+	}
+
 	private static TextureAtlasSprite sprite(ModelBaker baker, String name, ModelDebugName named) {
 		//#if MC >= 26.1
 		return baker.materials().get(texture(name), named).sprite();
@@ -143,7 +182,11 @@ final class Models {
 		//#endif
 	}
 
-	private record LazyRoot(Maker maker, List<String> textures, String particle) implements BlockStateModel.UnbakedRoot {
+	private record LazyRoot(Maker maker, List<String> textures, String particle, Map<BlockState, BlockStateModel> looks) implements BlockStateModel.UnbakedRoot {
+		LazyRoot(Maker maker, List<String> textures, String particle) {
+			this(maker, textures, particle, new java.util.concurrent.ConcurrentHashMap<>());
+		}
+
 		@Override
 		public void resolveDependencies(ResolvableModel.Resolver resolver) {
 		}
@@ -155,10 +198,43 @@ final class Models {
 
 		@Override
 		public BlockStateModel bake(BlockState state, ModelBaker baker) {
+			return looks.computeIfAbsent(dry(state), look -> make(look, baker));
+		}
+
+		private BlockStateModel make(BlockState state, ModelBaker baker) {
 			ModelDebugName named = () -> "cubework " + state;
 			Map<String, TextureAtlasSprite> sprites = new java.util.HashMap<>();
 			for (String name : textures) sprites.put(name, sprite(baker, name, named));
 			return new LazyBaked(new LazyPart(state, maker, sprites, sprites.get(particle)));
+		}
+	}
+
+	private record JoinedLazyRoot(com.insidethecube.cubework.block.Joining joining, JoinedMaker maker, List<String> textures, String particle,
+			Map<BlockState, BlockStateModel> looks) implements BlockStateModel.UnbakedRoot {
+		@Override
+		public void resolveDependencies(ResolvableModel.Resolver resolver) {
+		}
+
+		@Override
+		public Object visualEqualityGroup(BlockState state) {
+			return state;
+		}
+
+		@Override
+		public BlockStateModel bake(BlockState state, ModelBaker baker) {
+			return looks.computeIfAbsent(dry(state), look -> make(look, baker));
+		}
+
+		private BlockStateModel make(BlockState state, ModelBaker baker) {
+			ModelDebugName named = () -> "cubework " + state;
+			Map<String, TextureAtlasSprite> sprites = new java.util.HashMap<>();
+			for (String name : textures) sprites.put(name, sprite(baker, name, named));
+			BlockStateModel[] joined = new BlockStateModel[16];
+			for (int i = 0; i < 16; i++) {
+				int joins = i;
+				joined[i] = new LazyBaked(new LazyPart(state, (st, sp) -> maker.make(st, joins, sp), sprites, sprites.get(particle)));
+			}
+			return new JoinedModel(joining, joined, joining.lone(state));
 		}
 	}
 

@@ -1,16 +1,11 @@
 package com.insidethecube.cubework.block;
 
+import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelReader;
-//#if MC >= 1.21.2
-import net.minecraft.world.level.ScheduledTickAccess;
-//#else
-import net.minecraft.world.level.LevelAccessor;
-//#endif
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -30,13 +25,18 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * side join into one: the top runs on and legs stay only at the outside corners, so two make a bed-sized
  * table, four a square one, and a ring of them a table with a hole in the middle. The top's texture turns
  * with the way you face as you place it (for glazed terracotta's patterns and wood's grain).
+ * <p>
+ * Which neighbours it joins isn't kept in the block state (see Joining): only the way it faces is.
  */
-public class TableBlock extends Block {
+public class TableBlock extends Block implements Joining {
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+	/** The joins its model is written with (blockstate under joined/): north, east, south, west (bits 1, 2, 4, 8). */
 	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
 	public static final BooleanProperty EAST = BlockStateProperties.EAST;
 	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
+	private static final List<BooleanProperty> JOINS = List.of(NORTH, EAST, SOUTH, WEST);
+	private static final Direction[] SIDES = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 
 	private final VoxelShape[] shapes = new VoxelShape[16];
 
@@ -57,7 +57,7 @@ public class TableBlock extends Block {
 	}
 
 	public TableBlock(String legs, boolean tall, boolean glass, BlockBehaviour.Properties settings) {
-		super(settings);
+		super(settings.dynamicShape());
 		this.legs = legs + (tall ? "/tall" : "");
 		int y1 = topOf(tall), y0 = y1 - thicknessOf(glass);
 		VoxelShape top = Block.box(0, y0, 0, 16, y1, 16);
@@ -72,27 +72,29 @@ public class TableBlock extends Block {
 			if (!s && !e) shape = Shapes.or(shape, se);
 			shapes[i] = shape.optimize();
 		}
-		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false));
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING, NORTH, EAST, SOUTH, WEST);
+		builder.add(FACING);
 	}
 
-	private static BooleanProperty side(Direction d) {
-		return switch (d) {
-			case NORTH -> NORTH;
-			case EAST -> EAST;
-			case SOUTH -> SOUTH;
-			default -> WEST;
-		};
+	@Override
+	public List<BooleanProperty> joinProperties() {
+		return JOINS;
+	}
+
+	@Override
+	public int joins(BlockGetter world, BlockPos pos, BlockState state) {
+		int mask = 0;
+		for (int i = 0; i < 4; i++) if (joins(world.getBlockState(pos.relative(SIDES[i])))) mask |= 1 << i;
+		return mask;
 	}
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-		int i = (state.getValue(NORTH) ? 1 : 0) | (state.getValue(EAST) ? 2 : 0) | (state.getValue(SOUTH) ? 4 : 0) | (state.getValue(WEST) ? 8 : 0);
-		return shapes[i];
+		return shapes[joins(world, pos, state)];
 	}
 
 	private boolean joins(BlockState other) {
@@ -101,36 +103,16 @@ public class TableBlock extends Block {
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		BlockState state = defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
-		for (Direction d : Direction.Plane.HORIZONTAL) {
-			state = state.setValue(side(d), joins(ctx.getLevel().getBlockState(ctx.getClickedPos().relative(d))));
-		}
-		return state;
-	}
-
-	@Override
-	//#if MC >= 1.21.2
-	protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction,
-			BlockPos neighborPos, BlockState neighborState, RandomSource random) {
-	//#else
-	protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
-		LevelAccessor tickView = world;
-		RandomSource random = world.getRandom();
-	//#endif
-		return direction.getAxis().isHorizontal() ? state.setValue(side(direction), joins(neighborState)) : state;
+		return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
 	}
 
 	@Override
 	protected BlockState rotate(BlockState state, Rotation rotation) {
-		BlockState out = state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
-		for (Direction d : Direction.Plane.HORIZONTAL) out = out.setValue(side(rotation.rotate(d)), state.getValue(side(d)));
-		return out;
+		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
 	}
 
 	@Override
 	protected BlockState mirror(BlockState state, Mirror mirror) {
-		BlockState out = state.setValue(FACING, mirror.mirror(state.getValue(FACING)));
-		for (Direction d : Direction.Plane.HORIZONTAL) out = out.setValue(side(mirror.mirror(d)), state.getValue(side(d)));
-		return out;
+		return state.setValue(FACING, mirror.mirror(state.getValue(FACING)));
 	}
 }

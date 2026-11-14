@@ -1,11 +1,12 @@
 package com.insidethecube.cubework.block;
 
+import java.util.List;
+
 import com.insidethecube.cubework.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -31,14 +32,20 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * Placed while sneaking on the top of a block it lies flat on the floor, or on the underside of a block flat
  * against the ceiling: a hatch or skylight, joining other lying frames on the same side into bigger openings
  * (placing against the side of a lying frame lays the new one the same way, sneaking or not).
+ * <p>
+ * Which neighbours it joins isn't kept in the block state (see Joining): only the way it faces and whether
+ * it's under water, so a frame has 12 block states rather than 192.
  */
-public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock {
+public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock, Joining {
 	/** The side it's against: north, east, south or west on a wall; up lying on the floor, down against the ceiling. */
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
+	/** The joins its model is written with (blockstate under joined/, or RoundWindowModel): up, down, left, right (bits 1, 2, 4, 8). */
 	public static final BooleanProperty UP = BlockStateProperties.UP;
 	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 	public static final BooleanProperty LEFT = BooleanProperty.create("left");
 	public static final BooleanProperty RIGHT = BooleanProperty.create("right");
+	public static final int JOIN_UP = 1, JOIN_DOWN = 2, JOIN_LEFT = 4, JOIN_RIGHT = 8;
+	private static final List<BooleanProperty> JOINS = List.of(UP, DOWN, LEFT, RIGHT);
 
 	/** The opening's shape. */
 	public enum Style {
@@ -62,21 +69,21 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 	}
 
 	public WindowFrameBlock(Material material, int depth, Style style, BlockBehaviour.Properties settings) {
-		super(material, settings);
+		super(material, settings.dynamicShape());
 		this.depth = depth;
 		this.style = style;
-		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(UP, false).setValue(DOWN, false).setValue(LEFT, false).setValue(RIGHT, false)
-				.setValue(WATERLOGGED, false));
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING, UP, DOWN, LEFT, RIGHT, WATERLOGGED);
+		builder.add(FACING, WATERLOGGED);
 	}
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-		boolean u = state.getValue(UP), d = state.getValue(DOWN), l = state.getValue(LEFT), r = state.getValue(RIGHT);
+		int joins = joins(world, pos, state);
+		boolean u = (joins & JOIN_UP) != 0, d = (joins & JOIN_DOWN) != 0, l = (joins & JOIN_LEFT) != 0, r = (joins & JOIN_RIGHT) != 0;
 		int turns = horizontal(state).get2DDataValue() + 2 & 3;
 		AttachFace face = face(state);
 		int i = face.ordinal() * 64 + turns * 16 + (u ? 8 : 0) + (d ? 4 : 0) + (l ? 2 : 0) + (r ? 1 : 0);
@@ -116,6 +123,11 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 		return depth;
 	}
 
+	/** Square, diamond or round (round ones are drawn in code, see RoundWindowModel). */
+	public Style style() {
+		return style;
+	}
+
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
 		Direction side = ctx.getClickedFace();
@@ -130,23 +142,27 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 		// Lying frames face up (on the floor) or down (on the ceiling), so any two side by side join.
 		if (face != AttachFace.WALL) facing = face == AttachFace.FLOOR ? Direction.UP : Direction.DOWN;
 		BlockState state = defaultBlockState().setValue(FACING, facing).setValue(WATERLOGGED, waterAt(ctx));
-		return placed(joined(state, ctx.getLevel(), ctx.getClickedPos()), ctx);
+		return placed(state, ctx);
 	}
 
 	@Override
-	protected BlockState shapeUpdate(BlockState state, LevelReader world, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState) {
-		return joined(state, world, pos);
+	public List<BooleanProperty> joinProperties() {
+		return JOINS;
 	}
 
 	/** Which neighbours it joins: any window frame (any material, depth, square or diamond) facing the same way. */
-	private BlockState joined(BlockState state, BlockGetter world, BlockPos pos) {
+	@Override
+	public int joins(BlockGetter world, BlockPos pos, BlockState state) {
 		Direction f = horizontal(state);
 		AttachFace face = face(state);
 		// The frame's own up and down: on a wall, up and down; lying, the way its top was tipped and the opposite.
 		Direction up = face == AttachFace.WALL ? Direction.UP : face == AttachFace.FLOOR ? f : f.getOpposite();
-		return state.setValue(UP, joins(state, world.getBlockState(pos.relative(up)))).setValue(DOWN, joins(state, world.getBlockState(pos.relative(up.getOpposite()))))
-				.setValue(LEFT, joins(state, world.getBlockState(pos.relative(f.getCounterClockWise()))))
-				.setValue(RIGHT, joins(state, world.getBlockState(pos.relative(f.getClockWise()))));
+		int joins = 0;
+		if (joins(state, world.getBlockState(pos.relative(up)))) joins |= JOIN_UP;
+		if (joins(state, world.getBlockState(pos.relative(up.getOpposite())))) joins |= JOIN_DOWN;
+		if (joins(state, world.getBlockState(pos.relative(f.getCounterClockWise())))) joins |= JOIN_LEFT;
+		if (joins(state, world.getBlockState(pos.relative(f.getClockWise())))) joins |= JOIN_RIGHT;
+		return joins;
 	}
 
 	private boolean joins(BlockState state, BlockState other) {
