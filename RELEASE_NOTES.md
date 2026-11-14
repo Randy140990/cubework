@@ -1,7 +1,9 @@
 Cubework by Inside the Cube.
 
-0.8.1: Curved Stairs (1.21.11 only, cubework-0.8.1+1.21.11.jar).
+0.8.2: Curved Stairs (1.21.11 only, cubework-0.8.2+1.21.11.jar).
 - Curved Stairs: a flight of stairs with a smooth S-shaped underside, as in the curved-stair builds: under the first stair the underside springs up from the floor (in), under the middle stairs it sags into a belly (out), and it rises close under the top stair again (back in). Lay the flight with Curved Stairs like ordinary stairs (it climbs away from you), then fill the blocks under it with the same item: a block with the flight right above it becomes the fill. Every piece works out how long the flight is and where it sits, and the whole flight re-fits as you add pieces; fill that would sit in the hollow under the curve simply isn't placed, so you can fill the whole space under the flight. Flights of 2 to 6 stairs (longer ones curve under their top six); if you change a flight, use any piece with an empty hand to re-fit it. Ordinary stairs on top work too (the fill still curves, the steps stay square). On the shape wheel with stairs and slopes; 1 from a block in the stonecutter. For every coloured and building block.
+
+0.8.1: Stair Curve, a single sweep under ordinary stairs (replaced by Curved Stairs in 0.8.2).
 
 0.8.0: curving stairs, round windows and trims (1.21.11 only, cubework-0.8.0+1.21.11.jar). About 15,000 items, up from about 13,000.
 - Stairs (1 in 2), (1 in 3) and (1 in 4): stairs that climb one block over two, three or four. Each block has two steps half a block deep, like ordinary stairs, but lower. Lay 1 in 4 stairs, then 1 in 3, 1 in 2 and ordinary stairs, and the flight curves up from the floor; run them the other way at the top and it curves out onto a landing. Placed in a row they take the next step by themselves, and an empty hand moves one to its next step. Upside down on a ceiling or the top half of a face, like stairs. Under a flight, slopes of the same pitch placed upside down, facing back down the flight, give it a smooth underside.
