@@ -1,0 +1,11 @@
+{
+	"entity.orbitarena.fighter": "Arena Fighter",
+	"entity.orbitarena.fan": "Arena Fan",
+	"orbitarena.kit.sword": "Sword & Shield (diamond)",
+	"orbitarena.kit.axe": "Axe & Shield (diamond)",
+	"orbitarena.kit.mace": "Mace & Wind Charges (diamond)",
+	"orbitarena.kit.spear": "Spear & Shield (diamond)",
+	"orbitarena.kit.archer": "Archer (bow, crossbow, iron)",
+	"orbitarena.kit.iron": "Iron Basics",
+	"orbitarena.kit.netherite": "Netherite Max"
+}

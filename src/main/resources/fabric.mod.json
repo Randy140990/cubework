@@ -4,11 +4,18 @@
 	"version": "${version}",
 	"name": "Orbit Arena",
 	"description": "A space PvP training arena: pick your opponents, a difficulty from 1 to 10 and a kit, then fight in front of a packed crowd. By Inside the Cube.",
-	"authors": ["Insid3 Th3 Cub3"],
+	"authors": [
+		"Insid3 Th3 Cub3"
+	],
 	"license": "All-Rights-Reserved",
 	"environment": "*",
 	"entrypoints": {
-		"main": ["com.insidethecube.orbitarena.OrbitArena"]
+		"main": [
+			"com.insidethecube.orbitarena.OrbitArena"
+		],
+		"client": [
+			"com.insidethecube.orbitarena.client.OrbitArenaClient"
+		]
 	},
 	"accessWidener": "orbitarena.accesswidener",
 	"depends": {
@@ -16,5 +23,8 @@
 		"minecraft": "~1.21.11",
 		"java": ">=21",
 		"fabric-api": "*"
-	}
+	},
+	"mixins": [
+		"orbitarena.mixins.json"
+	]
 }

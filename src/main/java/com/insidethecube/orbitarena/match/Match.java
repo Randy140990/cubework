@@ -1,0 +1,335 @@
+package com.insidethecube.orbitarena.match;
+
+import static com.insidethecube.orbitarena.arena.ArenaLayout.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.insidethecube.orbitarena.OrbitArena;
+import com.insidethecube.orbitarena.arena.ArenaBuilder;
+import com.insidethecube.orbitarena.net.Payloads;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
+import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.BossEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.monster.warden.Warden;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
+/**
+ * One player's match: getting the arena ready, the fade in, "3, 2, 1, Fight!", the fight (enemies
+ * topped up in waves until all are beaten), the result, and the fade back home with everything returned.
+ */
+public final class Match {
+	enum Phase {
+		PREPARING, ENTERING, COUNTDOWN, FIGHT, RESULT, LEAVING, DONE
+	}
+
+	public static final String ENEMY_TAG = "orbitarena_enemy";
+
+	final ServerPlayer player;
+	final MatchSettings settings;
+	final int slot, centreX;
+	ArenaBuilder builder;
+	Phase phase = Phase.PREPARING;
+	int ticks, fightTicks;
+	final List<LivingEntity> alive = new ArrayList<>();
+	int spawned, kills;
+	float dealt, taken;
+	boolean won, forfeit;
+	String endReason = "";
+	private final ServerBossEvent bar = new ServerBossEvent(Component.literal("Orbit Arena"), BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.PROGRESS);
+
+	Match(ServerPlayer player, MatchSettings settings, int slot) {
+		this.player = player;
+		this.settings = settings;
+		this.slot = slot;
+		this.centreX = slot * SPACING;
+	}
+
+	ServerLevel arena() {
+		return player.level().getServer().getLevel(OrbitArena.ARENA);
+	}
+
+	Vec3 start() {
+		return new Vec3(centreX - PEDESTAL_X + 0.5, FLOOR + 2, 0.5);
+	}
+
+	AABB box() {
+		return new AABB(centreX - WALL_OUT, FLOOR - 4, -WALL_OUT, centreX + WALL_OUT, FLOOR + CEILING + 30, WALL_OUT);
+	}
+
+	int maxAlive() {
+		int d = settings.difficulty();
+		return switch (settings.opponents()) {
+			case FIGHTERS -> Math.min(settings.count(), Math.min(30, 4 + 2 * d));
+			case MOBS -> Math.min(settings.count(), Math.min(40, 4 + 3 * d));
+			case BOSS -> settings.count();
+		};
+	}
+
+	void tick() {
+		ticks++;
+		ServerLevel arena = arena();
+		if (arena == null) return;
+		switch (phase) {
+			case PREPARING -> {
+				if (ArenaBuilder.built(arena, centreX) && builder == null) {
+					enter();
+				} else {
+					if (builder == null) builder = Matches.builder(arena, centreX);
+					if (builder.done()) {
+						builder = null;
+						if (ArenaBuilder.built(arena, centreX)) enter();
+					} else {
+						player.displayClientMessage(Component.literal("Building the arena… " + (int) (builder.progress() * 100) + "%").withStyle(ChatFormatting.AQUA), true);
+					}
+				}
+			}
+			case ENTERING -> {
+				// Halfway through the fade: put things away, step through, kit up.
+				if (ticks == 12) {
+					Loadout.store(player);
+					Vec3 s = start();
+					player.teleportTo(arena, s.x, s.y, s.z, java.util.Set.of(), -90, 0, true);
+					player.setGameMode(GameType.SURVIVAL);
+					player.removeAllEffects();
+					player.setHealth(player.getMaxHealth());
+					player.getFoodData().setFoodLevel(20);
+					player.getFoodData().setSaturation(10);
+					settings.kit().give(player);
+					state(true);
+				}
+				if (ticks >= 30) {
+					phase = Phase.COUNTDOWN;
+					ticks = 0;
+					spawnUpTo(Math.min(maxAlive(), settings.count()));
+					freezeEnemies(true);
+					bar.addPlayer(player);
+				}
+			}
+			case COUNTDOWN -> {
+				hold();
+				if (ticks == 1 || ticks == 21 || ticks == 41) {
+					int n = 3 - (ticks - 1) / 20;
+					title(Component.literal(String.valueOf(n)).withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD), Component.literal(subtitle()), 0, 20, 2);
+					sound(SoundEvents.NOTE_BLOCK_PLING.value(), 0.6F + 0.2F * (3 - n));
+				}
+				if (ticks >= 60) {
+					title(Component.literal("FIGHT!").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), Component.empty(), 0, 20, 10);
+					sound(SoundEvents.PLAYER_LEVELUP, 1.4F);
+					cheer(0.8F);
+					freezeEnemies(false);
+					phase = Phase.FIGHT;
+					ticks = 0;
+					state(true);
+				}
+			}
+			case FIGHT -> fight(arena);
+			case RESULT -> {
+				if (ticks % 30 == 1 && won) cheer(1.0F);
+				if (ticks >= 100) leave();
+			}
+			case LEAVING -> {
+				if (ticks == 12) {
+					clearArena(arena);
+					Loadout.restore(player);
+					state(false);
+					bar.removeAllPlayers();
+				}
+				if (ticks >= 14) {
+					phase = Phase.DONE;
+					// Bosses and mob fights can leave scorch marks and holes: build it again, ready for next time.
+					if (settings.opponents() != MatchSettings.Opponents.FIGHTERS) Matches.builder(arena, centreX);
+				}
+			}
+			default -> {
+			}
+		}
+	}
+
+	private String subtitle() {
+		String who = switch (settings.opponents()) {
+			case FIGHTERS -> settings.count() + (settings.count() == 1 ? " fighter" : " fighters");
+			case MOBS -> settings.count() + " mobs";
+			case BOSS -> settings.count() + " × " + bossName();
+		};
+		return who + " · level " + settings.difficulty();
+	}
+
+	String bossName() {
+		return switch (settings.boss()) {
+			case WITHER -> "Wither";
+			case WARDEN -> "Warden";
+			case ENDER_DRAGON -> "Ender Dragon";
+		};
+	}
+
+	private void enter() {
+		phase = Phase.ENTERING;
+		ticks = 0;
+		ServerPlayNetworking.send(player, new Payloads.Fade(12, 6, 20));
+		player.level().playSound(null, player.blockPosition(), SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS, 0.25F, 1.6F);
+	}
+
+	private void fight(ServerLevel arena) {
+		fightTicks++;
+		alive.removeIf(e -> !e.isAlive() || e.isRemoved());
+		// Top up the enemies as they fall, until all of them have come.
+		if (alive.size() < maxAlive() && spawned < settings.count() && fightTicks % 10 == 0) spawnUpTo(Math.min(maxAlive(), alive.size() + 2));
+		for (LivingEntity e : alive) {
+			if (e instanceof Warden w) w.increaseAngerAt(player, 150, false);
+			else if (e instanceof Mob m && !(e instanceof EnderDragon) && m.getTarget() != player) m.setTarget(player);
+			if (!(e instanceof EnderDragon)) Matches.keepInside(e, centreX);
+		}
+		Matches.keepInside(player, centreX);
+		if (fightTicks % 20 == 0) com.insidethecube.orbitarena.entity.Fighter.clearDrops(arena, box());
+		int left = settings.count() - kills;
+		float progress = settings.count() == 0 ? 0 : left / (float) settings.count();
+		bar.setProgress(Math.max(0, Math.min(1, progress)));
+		String time = clock(fightTicks / 20);
+		if (settings.timeLimit() > 0) time = clock(Math.max(0, settings.timeLimit() - fightTicks / 20)) + " left";
+		bar.setName(Component.literal(left + " to beat · " + time));
+		if (kills >= settings.count()) end(true, "All beaten");
+		else if (settings.timeLimit() > 0 && fightTicks >= settings.timeLimit() * 20) end(false, "Time's up");
+	}
+
+	static String clock(int s) {
+		return s / 60 + ":" + String.format("%02d", s % 60);
+	}
+
+	private void spawnUpTo(int target) {
+		while (alive.size() < target && spawned < settings.count()) {
+			LivingEntity e = Spawns.spawn(this, arena(), spawned);
+			spawned++;
+			if (e == null) continue;
+			e.addTag(ENEMY_TAG);
+			alive.add(e);
+		}
+	}
+
+	private void freezeEnemies(boolean frozen) {
+		for (LivingEntity e : alive) if (e instanceof Mob m) m.setNoAi(frozen);
+	}
+
+	/** Holds the player on the pedestal during the countdown. */
+	private void hold() {
+		Vec3 s = start();
+		if (player.position().distanceToSqr(s) > 0.6) player.teleportTo(s.x, s.y, s.z);
+	}
+
+	void onEnemyHurt(float amount) {
+		dealt += amount;
+		cheer(0.25F);
+	}
+
+	void onEnemyDeath(LivingEntity e) {
+		if (!alive.remove(e)) return;
+		kills++;
+		cheer(0.65F);
+	}
+
+	void onPlayerHurt(float amount) {
+		taken += amount;
+		if (amount >= 4) cheer(-0.4F);
+	}
+
+	/** The player would have died: it's a loss instead. */
+	void onPlayerDown() {
+		player.setHealth(player.getMaxHealth());
+		player.removeAllEffects();
+		end(false, "You were beaten");
+	}
+
+	void end(boolean won, String reason) {
+		if (phase.ordinal() >= Phase.RESULT.ordinal()) return;
+		boolean fighting = phase == Phase.FIGHT;
+		this.won = won;
+		this.endReason = reason;
+		phase = Phase.RESULT;
+		ticks = 0;
+		freezeEnemies(true);
+		if (!fighting) {
+			// Never got going (left while it was building or counting down): straight home.
+			if (Loadout.has(player)) leave();
+			else phase = Phase.DONE;
+			return;
+		}
+		int secs = fightTicks / 20;
+		title(Component.literal(won ? "VICTORY" : forfeit ? "LEFT THE ARENA" : "DEFEAT").withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED, ChatFormatting.BOLD),
+				Component.literal(reason + " · " + clock(secs)), 5, 70, 20);
+		sound(won ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.BEACON_DEACTIVATE, 1.0F);
+		cheer(won ? 1.0F : -0.6F);
+		player.sendSystemMessage(Component.literal("Orbit Arena · " + (won ? "Victory" : "Defeat") + " · " + subtitle()).withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED));
+		player.sendSystemMessage(Component.literal(String.format(" Time %s · Beaten %d of %d · Damage dealt %.0f · Damage taken %.0f", clock(secs), kills, settings.count(), dealt, taken))
+				.withStyle(ChatFormatting.GRAY));
+		state(true);
+	}
+
+	/** Fade out and go home (from the result, or straight away when leaving). */
+	void leave() {
+		if (phase == Phase.LEAVING || phase == Phase.DONE) return;
+		phase = Phase.LEAVING;
+		ticks = 0;
+		ServerPlayNetworking.send(player, new Payloads.Fade(12, 6, 20));
+	}
+
+	/** When the player has gone (logged off): tidy up; their things come back when they're next in. */
+	void abandon() {
+		ServerLevel arena = arena();
+		if (arena != null) clearArena(arena);
+		bar.removeAllPlayers();
+		phase = Phase.DONE;
+	}
+
+	void clearArena(ServerLevel arena) {
+		for (Entity e : arena.getEntities((Entity) null, box().inflate(40), e -> !(e instanceof Player))) e.discard();
+		alive.clear();
+	}
+
+	boolean done() {
+		return phase == Phase.DONE;
+	}
+
+	boolean fighting() {
+		return phase == Phase.FIGHT;
+	}
+
+	boolean inArena() {
+		return phase.ordinal() >= Phase.COUNTDOWN.ordinal() || (phase == Phase.ENTERING && ticks >= 12);
+	}
+
+	private void state(boolean in) {
+		ServerPlayNetworking.send(player, new Payloads.State(in, centreX, phase == Phase.FIGHT || phase == Phase.COUNTDOWN));
+	}
+
+	private void cheer(float strength) {
+		ServerPlayNetworking.send(player, new Payloads.Cheer(strength));
+	}
+
+	private void title(Component title, Component sub, int in, int stay, int out) {
+		player.connection.send(new ClientboundSetTitlesAnimationPacket(in, stay, out));
+		player.connection.send(new ClientboundSetSubtitleTextPacket(sub));
+		player.connection.send(new ClientboundSetTitleTextPacket(title));
+	}
+
+	private void sound(SoundEvent sound, float pitch) {
+		player.level().playSound(null, BlockPos.containing(player.position()), sound, SoundSource.PLAYERS, 1.0F, pitch);
+	}
+}
