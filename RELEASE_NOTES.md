@@ -1,5 +1,9 @@
 Cubework by Inside the Cube.
 
+0.10.1: fixes 0.10.0 not starting (1.21.11 only, cubework-0.10.1-mc1.21.11.jar).
+- 0.10.0 stopped the game at start ("Adding duplicate key cubework:iron_trapdoor"): the copper-style metal trapdoors had the same ids as the Trapdoor shapes of the iron, gold and other metal blocks. They're now <metal>_copper_style_trapdoor, named "Gold Trapdoor (Copper Style)" and so on.
+- The resource generator now refuses to build if any two things share an id, so this can't reach a release again.
+
 0.10.0: the big pass (1.21.11 only, cubework-0.10.0-mc1.21.11.jar). About 19,000 items. Everything since 0.8.4 (0.9.0 was an in-between build):
 - Tabs: fourteen tabs, so everything is easy to find (it runs to more pages): Wool & Concrete, Terracotta, Glass, Building, Copper & Metals, Nature, Logs, Plants, Doors & Trapdoors, Tables, Patterns, Carpets, Lights and Office. New icons: an arch for Building, grass stairs for Nature, glazed terracotta stairs for Terracotta, and so on.
 - Lights tab: from glowstone, sea lanterns and the three froglights. Light rods (a rod of light on an iron bracket, like end rods); panel lights (a 12, 8 or 4 pixel square of light in a border, 16, 12, 8 or 4 pixels deep); tube lights (a strip of light in a border, 12, 8 or 4 pixels wide, joining end to end; they run the way you face on floors and ceilings, along a wall on walls, sneak for up and down); recessed lights (a round 12 or 8 pixel opening with a 2-pixel lip, the light set behind it). They fix to the face you click, ceilings included. The border starts as white concrete; use any dye on it to recolour it. From the light block in the stonecutter.
