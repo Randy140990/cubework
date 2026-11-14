@@ -1,0 +1,8 @@
+SkyRenderer
+DimensionRenderingRegistry
+WorldRenderEvents
+LevelRenderEvents
+DimensionSpecialEffects
+renderer/RenderType
+rendertype/RenderType
+net/minecraft/world/item/.*[Ss]pear

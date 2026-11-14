@@ -1,0 +1,52 @@
+plugins {
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+}
+
+version = "${project.mod_version}+1.21.11"
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/orbitarena.accesswidener")
+	mods {
+		"orbitarena" {
+			sourceSet sourceSets.main
+		}
+	}
+}
+
+processResources {
+	def version = project.version
+	inputs.property "version", version
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+	it.options.encoding = "UTF-8"
+	it.options.compilerArgs += ["-Xmaxerrs", "2000"]
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+// For the compile check: the full compile classpath (the game with Mojang names, Fabric API), to read signatures.
+tasks.register('printClasspath') {
+	doLast {
+		file("classpath.txt").text = sourceSets.main.compileClasspath.asPath
+	}
+}
