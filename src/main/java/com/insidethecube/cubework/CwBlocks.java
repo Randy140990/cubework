@@ -24,6 +24,7 @@ import com.insidethecube.cubework.block.CornerPostBlock;
 import com.insidethecube.cubework.block.PatternBlock;
 import com.insidethecube.cubework.block.PitchStairsBlock;
 import com.insidethecube.cubework.block.StairCurveBlock;
+import com.insidethecube.cubework.block.StepStairsBlock;
 import com.insidethecube.cubework.block.TrimBlock;
 import com.insidethecube.cubework.block.RoundColumnBlock;
 import com.insidethecube.cubework.block.RoundCornerBlock;
@@ -131,6 +132,7 @@ public final class CwBlocks {
 	private static Function<BlockBehaviour.Properties, Block> factory(Material m, Shape s, Block base) {
 		return switch (s) {
 			case STAIRS -> set -> new CwStairs(m, base.defaultBlockState(), set);
+			case STEPS_4, STEPS_6, STEPS_8 -> set -> new StepStairsBlock(m, base.defaultBlockState(), s.stepCount(), set);
 			case SLAB -> set -> new CwSlab(m, set);
 			case VERTICAL_SLAB -> set -> new VerticalSlabBlock(m, set);
 			case SLOPE -> set -> new SlopeBlock(m, set);
@@ -161,7 +163,7 @@ public final class CwBlocks {
 			case STAIRS_4 -> set -> new PitchStairsBlock(m, set);
 			case TRIM_2, TRIM_4, TRIM_8 -> set -> new TrimBlock(m, s.trimWidth(), set);
 			case STAIR_CURVE -> set -> new StairCurveBlock(m, set);
-			case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8 -> set -> new RoundColumnBlock(m, s.columnWidth(), set);
+			case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4 -> set -> new RoundColumnBlock(m, s.columnWidth(), set);
 			case CORNER_POST -> set -> new CornerPostBlock(m, set);
 			case ROUND_CORNER -> set -> new RoundCornerBlock(m, false, set);
 			case ROUND_CORNER_INNER -> set -> new RoundCornerBlock(m, true, set);

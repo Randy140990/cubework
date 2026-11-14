@@ -32,7 +32,13 @@ public final class RoundWindowModel {
 		int depth = ((WindowFrameBlock) state.getBlock()).depth();
 		boolean u = state.getValue(WindowFrameBlock.UP), d = state.getValue(WindowFrameBlock.DOWN);
 		boolean l = state.getValue(WindowFrameBlock.LEFT), r = state.getValue(WindowFrameBlock.RIGHT);
-		int turns = state.getValue(WindowFrameBlock.FACING).get2DDataValue() + 2 & 3;
+		// Quarter turns, plus 4 for lying on the floor or 8 against the ceiling (tipped first, see tilt).
+		int turns = (state.getValue(WindowFrameBlock.FACING).get2DDataValue() + 2 & 3)
+				+ 4 * switch (state.getValue(WindowFrameBlock.FACE)) {
+					case FLOOR -> 1;
+					case CEILING -> 2;
+					default -> 0;
+				};
 		return new Models.Built(quads(depth / 16.0, u, d, l, r, turns, top, side, bottom), side);
 	}
 
@@ -169,8 +175,33 @@ public final class RoundWindowModel {
 	}
 
 	private static Direction turn(Direction d, int turns) {
-		for (int i = 0; i < turns; i++) if (d.getAxis().isHorizontal()) d = d.getClockWise();
+		int tilt = turns >> 2;
+		if (tilt == 1) {
+			d = switch (d) {
+				case NORTH -> Direction.DOWN;
+				case SOUTH -> Direction.UP;
+				case UP -> Direction.NORTH;
+				case DOWN -> Direction.SOUTH;
+				default -> d;
+			};
+		} else if (tilt == 2) {
+			d = switch (d) {
+				case NORTH -> Direction.UP;
+				case SOUTH -> Direction.DOWN;
+				case UP -> Direction.SOUTH;
+				case DOWN -> Direction.NORTH;
+				default -> d;
+			};
+		}
+		for (int i = 0; i < (turns & 3); i++) if (d.getAxis().isHorizontal()) d = d.getClockWise();
 		return d;
+	}
+
+	/** Tips a point of the upright frame (facing north) onto the floor (tilt 1: its top towards the north) or against the ceiling (tilt 2). */
+	private static double[] tilt(double[] p, int tilt) {
+		if (tilt == 1) return new double[] {p[0], p[2], 1 - p[1]};
+		if (tilt == 2) return new double[] {p[0], 1 - p[2], p[1]};
+		return p;
 	}
 
 	/** A quad wound to show from the side its normal points to, then turned with the block. */
@@ -192,13 +223,14 @@ public final class RoundWindowModel {
 		}
 		double[][] turned = new double[4][];
 		for (int i = 0; i < 4; i++) {
-			double x = p[i][0], z = p[i][2];
-			for (int t = 0; t < turns; t++) {
+			double[] q = tilt(p[i], turns >> 2);
+			double x = q[0], z = q[2];
+			for (int t = 0; t < (turns & 3); t++) {
 				double nx = 1 - z, nz = x;
 				x = nx;
 				z = nz;
 			}
-			turned[i] = new double[] {x, p[i][1], z};
+			turned[i] = new double[] {x, q[1], z};
 		}
 		return QuadMaker.of(sprite, -1, turn(face, turns), turned, uv);
 	}

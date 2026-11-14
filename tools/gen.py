@@ -161,12 +161,12 @@ TEXTURES = {
 }
 
 # (suffix, English name, how many one block makes in the stonecutter), in the order of Shape.java
-SHAPES = [("stairs", "Stairs", 1), ("stairs_2", "Stairs (1 in 2)", 2), ("stairs_3", "Stairs (1 in 3)", 2), ("stairs_4", "Stairs (1 in 4)", 2), ("stair_curve", "Curved Stairs", 1),
+SHAPES = [("stairs", "Stairs", 1), ("steps_4", "Stairs (4 Steps)", 1), ("steps_6", "Stairs (6 Steps)", 1), ("steps_8", "Stairs (8 Steps)", 1), ("stairs_2", "Stairs (1 in 2)", 2), ("stairs_3", "Stairs (1 in 3)", 2), ("stairs_4", "Stairs (1 in 4)", 2), ("stair_curve", "Curved Stairs", 1),
           ("slab", "Slab", 2), ("quarter_slab", "Quarter Slab", 4), ("vertical_slab", "Vertical Slab", 2),
           ("slope", "Slope", 2), ("slope_2", "Slope (1 in 2)", 2), ("slope_3", "Slope (1 in 3)", 2), ("gentle_slope", "Slope (1 in 4)", 2), ("layer", "Layer", 8), ("vertical_layer", "Vertical Layer", 8),
           ("carpet", "Carpet", 4), ("panel", "Panel", 4), ("post", "Post", 4), ("pillar_12", "(12 px)", 1), ("pillar_8", "(8 px)", 2),
           ("pillar_4", "(4 px)", 4), ("round_column_16", "Round Column (16 px)", 1), ("round_column_12", "Round Column (12 px)", 2),
-          ("round_column_8", "Round Column (8 px)", 4), ("corner_post", "Corner Post", 4), ("arch", "Arch", 1), ("arch_corner", "Arch Corner", 1),
+          ("round_column_8", "Round Column (8 px)", 4), ("round_column_4", "Round Column (4 px)", 8), ("corner_post", "Corner Post", 4), ("arch", "Arch", 1), ("arch_corner", "Arch Corner", 1),
           ("round_corner", "Round Corner", 1), ("round_corner_inner", "Inner Round Corner", 4),
           ("wall", "Wall", 1), ("fence", "Fence", 1), ("fence_gate", "Fence Gate", 1),
           ("trapdoor", "Trapdoor", 1), ("button", "Button", 4), ("pressure_plate", "Pressure Plate", 2),
@@ -178,7 +178,8 @@ NATURE_SHAPES = {"stairs", "slab", "quarter_slab", "vertical_slab", "slope", "sl
 # Natural blocks that are building blocks too (stone, sandstone...) keep the building versions of these.
 NEW_NATURE = {"stairs", "quarter_slab", "slope_2", "slope_3", "gentle_slope"}
 PATTERN_SHAPES = {"stairs", "slab", "quarter_slab", "vertical_slab", "slope", "layer", "vertical_layer", "carpet", "panel"}
-COLUMN_WIDTHS = [16, 12, 8]
+COLUMN_WIDTHS = [16, 12, 8, 4]
+STEP_COUNTS = [4, 6, 8]
 # Gentle slopes, quarter slabs, arches and window frames: wool, terracotta and concrete for now.
 CASTLE_SHAPES = {"quarter_slab", "slope_2", "slope_3", "gentle_slope", "arch", "arch_corner"} | {"%swindow_frame_%d" % (p, d) for p in ("", "diamond_") for d in (4, 8, 12, 16)}
 WINDOW_DEPTHS = [4, 8, 12, 16]
@@ -190,11 +191,17 @@ LOGS = ["oak_log", "spruce_log", "birch_log", "jungle_log", "acacia_log", "dark_
 LOG_WIDTHS = [(16, 1), (12, 1), (8, 2), (4, 4)]  # width, how many one log makes
 PILLAR_WIDTHS = [12, 8, 4]
 
-LOW_PLANTS = ["short_grass", "fern", "short_dry_grass", "bush"]
+LOW_PLANTS = ["short_grass", "fern", "short_dry_grass", "tall_dry_grass", "bush"]
 LOW_SIZES = [50, 75, 125, 150, 175]
 PLANTS = ["red_mushroom", "brown_mushroom", "crimson_fungus", "warped_fungus", "dandelion", "poppy", "blue_orchid", "allium",
           "azure_bluet", "red_tulip", "orange_tulip", "white_tulip", "pink_tulip", "oxeye_daisy", "cornflower",
-          "lily_of_the_valley", "torchflower", "wither_rose"]
+          "lily_of_the_valley", "torchflower", "wither_rose", "oak_sapling", "spruce_sapling", "birch_sapling", "jungle_sapling",
+          "acacia_sapling", "dark_oak_sapling", "cherry_sapling", "pale_oak_sapling", "dead_bush", "cactus_flower", "closed_eyeblossom",
+          "open_eyeblossom", "firefly_bush", "crimson_roots", "warped_roots"]
+# Two-block plants, drawn whole inside one block (half size fits; three-quarter size reaches half a block above).
+TALL_PLANTS = ["tall_grass", "large_fern", "sunflower", "lilac", "rose_bush", "peony"]
+TALL_SIZES = [50, 75]
+TALL_GRASSY = {"tall_grass", "large_fern"}
 PLANT_SIZES = [50, 75, 125, 150]
 GRASSY = {"short_grass", "fern", "bush"}
 
@@ -210,7 +217,7 @@ DOOR_WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrov
               "warped"]
 
 TABS = [("colours", "Colours"), ("building", "Building"), ("nature", "Nature"), ("plants", "Plants"), ("doors", "Doors"), ("tables", "Tables"),
-        ("patterns", "Patterns")]
+        ("patterns", "Patterns"), ("carpets", "Carpets")]
 
 HORIZONTAL = ["north", "east", "south", "west"]
 Y_FROM_NORTH = {"north": 0, "east": 90, "south": 180, "west": 270}
@@ -479,6 +486,30 @@ def plant_templates():
             name = "template_%scross_%d" % ("tinted_" if tinted else "", size)
             write(os.path.join(ASSETS, "models", "block", name + ".json"),
                   {"ambientocclusion": False, "textures": {"particle": "#cross"}, "elements": elements})
+    # Two-block plants at a size: the bottom half's cross under the top half's, in one block.
+    for size in TALL_SIZES:
+        s = size / 100
+        lo, hi, half = round(8 - 7.2 * s, 3), round(8 + 7.2 * s, 3), round(16 * s, 3)
+        rot = {"origin": [8, 8, 8], "axis": "y", "angle": 45, "rescale": True}
+        for tinted in (False, True):
+            for head in (False, True):
+                def face(tex):
+                    f = {"uv": [0, 0, 16, 16], "texture": tex}
+                    if tinted: f["tintindex"] = 0
+                    return f
+                elements = []
+                for tex, y0, y1 in (("#bottom", 0, half), ("#top", half, round(2 * half, 3))):
+                    elements.append({"from": [lo, y0, 8], "to": [hi, y1, 8], "rotation": rot, "shade": False, "faces": {"north": face(tex), "south": face(tex)}})
+                    elements.append({"from": [8, y0, lo], "to": [8, y1, hi], "rotation": rot, "shade": False, "faces": {"west": face(tex), "east": face(tex)}})
+                if head:
+                    # The sunflower's head, tilted towards the east as vanilla's.
+                    hx, hz0, hz1 = round(8 + 1.6 * s, 3), round(8 - 7 * s, 3), round(8 + 7 * s, 3)
+                    hy0, hy1 = round(half - s, 3), round(half + 15 * s, 3)
+                    elements.append({"from": [hx, hy0, hz0], "to": [hx, hy1, hz1], "rotation": {"origin": [8, round(half + 8 * s, 3), 8], "axis": "z", "angle": 22.5, "rescale": True},
+                                     "shade": True, "faces": {"west": {"uv": [0, 0, 16, 16], "texture": "#back"}, "east": {"uv": [0, 0, 16, 16], "texture": "#front"}}})
+                name = "template_%sdouble_cross_%d%s" % ("tinted_" if tinted else "", size, "_head" if head else "")
+                write(os.path.join(ASSETS, "models", "block", name + ".json"),
+                      {"ambientocclusion": False, "textures": {"particle": "#bottom"}, "elements": elements})
 
 
 # ---------- castle shapes: outlines (16 x 16, x across from the viewer's left, y up), as Profiles.java ----------
@@ -562,6 +593,19 @@ def new_shape_templates():
             lo, hi = pitch_stairs_heights(n, step)
             template("template_stairs_%d_%d" % (n, step), [([0, 0, 0], [8, lo, 16]), ([8, 0, 0], [16, hi, 16])], display=STAIRS_DISPLAY)
             template("template_stairs_%d_%d_top" % (n, step), [([0, round(16 - lo, 4), 0], [8, 16, 16]), ([8, round(16 - hi, 4), 0], [16, 16, 16])])
+    for n in STEP_COUNTS:
+        # Stairs with n smaller steps, rising east like vanilla's: straight, inner corner (high but for the
+        # north-west quarter) and outer corner (high in the south-east quarter), turned by vanilla's blockstate.
+        w = 16 / n
+        r = lambda v: round(v, 4)
+        template("template_steps_%d" % n, [([r(k * w), 0, 0], [r((k + 1) * w), r((k + 1) * w), 16]) for k in range(n)], display=STAIRS_DISPLAY)
+        inner = []
+        for k in range(n):
+            inner.append(([r(k * w), r(k * w), 0], [16, r((k + 1) * w), 16]))
+            if k > 0:
+                inner.append(([0, r(k * w), r(k * w)], [r(k * w), r((k + 1) * w), 16]))
+        template("template_steps_%d_inner" % n, inner)
+        template("template_steps_%d_outer" % n, [([r(k * w), r(k * w), r(k * w)], [16, r((k + 1) * w), 16]) for k in range(n)])
     for w in TRIM_WIDTHS:
         # Along the bottom north edge, and up the north-west corner; turned in the blockstate to the other ten.
         template("template_trim_%d" % w, [([0, 0, 0], [16, w, w])])
@@ -723,7 +767,8 @@ def carpet(mat, kind, name):
         model(name, m("template_carpet" + sfx), t)
     else:
         model(name, "minecraft:block/carpet", {"wool": faces(mat)["top"]})
-    blockstate(name, {"variants": {"": {"model": m(name)}}})
+    # Laid facing the player and turned by an empty hand, as glazed terracotta is turned.
+    blockstate(name, {"variants": {"facing=" + d: {"model": m(name), "y": {"south": 0, "west": 90, "north": 180, "east": 270}[d]} for d in HORIZONTAL}})
     item(name, m(name), mat == "grass_block")
 
 
@@ -813,6 +858,15 @@ def gentle_slope(mat, kind, name, n=4):
     item(name, m(name + "_item"), mat == "grass_block")
 
 
+def step_stairs(mat, kind, name, n):
+    t = faces(mat)
+    model(name, m("template_steps_%d" % n), t)
+    model(name + "_inner", m("template_steps_%d_inner" % n), t)
+    model(name + "_outer", m("template_steps_%d_outer" % n), t)
+    blockstate(name, from_template("stairs", {"straight": m(name), "inner": m(name + "_inner"), "outer": m(name + "_outer")}))
+    item(name, m(name))
+
+
 def round_column(mat, kind, name, d):
     # Placed columns are drawn round in code (RoundModel); this one is for the item.
     model(name + "_item", m("template_round_column_%d" % d), faces(mat))
@@ -865,18 +919,25 @@ def window_frame(mat, kind, name, depth, diamond):
     model(name + "_inventory", m("template_%swindow_%d_inventory" % ("diamond_" if diamond else "", depth)), t)
     side = {"l": "left", "r": "right", "b": "down", "t": "up"}
     parts = []
-    for f in HORIZONTAL:
-        apply = lambda p: {"model": m("%s_%s" % (name, p)), "y": Y_FROM_NORTH[f], "uvlock": True}
-        for p in pieces:
-            if p.startswith("bar_"):
-                key = {"bar_left": "left", "bar_right": "right", "bar_bottom": "down", "bar_top": "up"}[p]
-                parts.append({"when": {"facing": f, key: "false"}, "apply": apply(p)})
-            elif p.startswith("corner_"):
-                v, h = side[p[-2]], side[p[-1]]
-                parts.append({"when": {"OR": [{"facing": f, v: "false"}, {"facing": f, h: "false"}]}, "apply": apply(p)})
-            else:
-                v, h = side[p[-2]], side[p[-1]]
-                parts.append({"when": {"facing": f, v: "false", h: "false"}, "apply": apply(p)})
+    # Upright on a wall, or tipped flat onto the floor (x 90: its top towards the north) or against the
+    # ceiling (x 270), as WindowFrameBlock's hit box.
+    for face, x in (("wall", 0), ("floor", 90), ("ceiling", 270)):
+        for f in HORIZONTAL:
+            def apply(p, f=f, x=x):
+                a = {"model": m("%s_%s" % (name, p)), "y": Y_FROM_NORTH[f], "uvlock": True}
+                if x:
+                    a["x"] = x
+                return a
+            for p in pieces:
+                if p.startswith("bar_"):
+                    key = {"bar_left": "left", "bar_right": "right", "bar_bottom": "down", "bar_top": "up"}[p]
+                    parts.append({"when": {"face": face, "facing": f, key: "false"}, "apply": apply(p)})
+                elif p.startswith("corner_"):
+                    v, h = side[p[-2]], side[p[-1]]
+                    parts.append({"when": {"OR": [{"face": face, "facing": f, v: "false"}, {"face": face, "facing": f, h: "false"}]}, "apply": apply(p)})
+                else:
+                    v, h = side[p[-2]], side[p[-1]]
+                    parts.append({"when": {"face": face, "facing": f, v: "false", h: "false"}, "apply": apply(p)})
     blockstate(name, {"multipart": parts})
     item(name, m(name + "_inventory"))
 
@@ -956,6 +1017,8 @@ for _w in PILLAR_WIDTHS:
 BUILDERS["stair_curve"] = stair_curve
 for _n in STAIRS_PITCHES:
     BUILDERS["stairs_%d" % _n] = (lambda n: lambda mat, kind, name: pitch_stairs(mat, kind, name, n))(_n)
+for _n in STEP_COUNTS:
+    BUILDERS["steps_%d" % _n] = (lambda n: lambda mat, kind, name: step_stairs(mat, kind, name, n))(_n)
 for _w in TRIM_WIDTHS:
     BUILDERS["trim_%d" % _w] = (lambda w: lambda mat, kind, name: trim(mat, kind, name, w))(_w)
 for _d in WINDOW_DEPTHS:
@@ -1090,6 +1153,22 @@ def thin_logs(add_name, tags):
                 add_name(name, lambda g, k=kind, w=w: "%s (%d px)" % (title(k, g), w))
 
 
+def round_logs(add_name, tags):
+    """Round logs and stems: drawn in code when placed (RoundModel.buildLog); item models from the round column templates."""
+    for log in LOGS:
+        for kind in ([log, "stripped_" + log] if log != "mushroom_stem" else [log]):
+            side = "minecraft:block/" + kind
+            end = "minecraft:block/mushroom_block_inside" if kind == "mushroom_stem" else "minecraft:block/" + kind + "_top"
+            for w, cut in LOG_WIDTHS:
+                name = "round_%s_%d" % (kind, w)
+                model(name + "_item", m("template_round_column_%d" % w), {"side": side, "top": end, "bottom": end})
+                item(name, m(name + "_item"))
+                loot(name)
+                stonecutting(kind, name, cut)
+                tags["mineable/axe"].append(NS + ":" + name)
+                add_name(name, lambda g, k=kind, w=w: "Round %s (%d px)" % (title(k, g), w))
+
+
 def coral(add_name):
     for c in CORALS:
         for fan in (False, True):
@@ -1119,6 +1198,22 @@ def plants(add_name):
             blockstate(name, {"variants": {"": {"model": m(name)}}})
             write(os.path.join(ASSETS, "models", "item", name + ".json"),
                   {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:block/" + plant}})
+            item(name, NS + ":item/" + name, tinted)
+            loot(name)
+            stonecutting(plant, name, 1)
+            add_name(name, lambda g, p=plant, s=size: "%s (%d%%)" % (title(p, g), s))
+    for plant in TALL_PLANTS:
+        tinted = plant in TALL_GRASSY
+        head = plant == "sunflower"
+        for size in TALL_SIZES:
+            name = "%s_%d" % (plant, size)
+            t = {"bottom": "minecraft:block/%s_bottom" % plant, "top": "minecraft:block/%s_top" % plant}
+            if head:
+                t.update(front="minecraft:block/sunflower_front", back="minecraft:block/sunflower_back")
+            model(name, m("template_%sdouble_cross_%d%s" % ("tinted_" if tinted else "", size, "_head" if head else "")), t)
+            blockstate(name, {"variants": {"": {"model": m(name)}}})
+            write(os.path.join(ASSETS, "models", "item", name + ".json"),
+                  {"parent": "minecraft:item/generated", "textures": {"layer0": "minecraft:block/" + ("sunflower_front" if head else plant + "_top")}})
             item(name, NS + ":item/" + name, tinted)
             loot(name)
             stonecutting(plant, name, 1)
@@ -1170,13 +1265,54 @@ def doors(add_name, tags):
         metal_door("%s_door" % metal, ["minecraft:copper_door", "minecraft:" + ingredient],
                    lambda g, mt=metal: "Iron Door (Copper Style)" if mt == "iron" else "%s Door" % title(mt, g))
 
+    # Trapdoors: each wood's trapdoor and the iron one in the 16 colours (keeping their patterns), and the
+    # copper trapdoor's pattern in metals and gems. Laid like vanilla's wooden trapdoors (the pattern turns
+    # with the way they face).
+    def trapdoor_models(name, english, recipe, wooden, metal):
+        t = {"texture": NS + ":block/" + name}
+        for part in ("bottom", "top", "open"):
+            model(name + "_" + part, "minecraft:block/template_orientable_trapdoor_" + part, t)
+        variants = {}
+        for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
+            variants["facing=%s,half=bottom,open=false" % f] = {"model": m(name + "_bottom"), "y": y} if y else {"model": m(name + "_bottom")}
+            variants["facing=%s,half=top,open=false" % f] = {"model": m(name + "_top"), "y": y} if y else {"model": m(name + "_top")}
+            variants["facing=%s,half=bottom,open=true" % f] = {"model": m(name + "_open"), "y": y} if y else {"model": m(name + "_open")}
+            variants["facing=%s,half=top,open=true" % f] = {"model": m(name + "_open"), "x": 180, "y": (y + 180) % 360}
+        full = {}
+        for k, v in variants.items():
+            for powered in ("false", "true"):
+                for water in ("false", "true"):
+                    full[k + ",powered=%s,waterlogged=%s" % (powered, water)] = v
+        blockstate(name, {"variants": full})
+        item(name, m(name + "_bottom"))
+        loot(name)
+        write(os.path.join(DATA, NS, "recipe", name + ".json"),
+              {"type": "minecraft:crafting_shapeless", "category": "redstone", "ingredients": [ing(r) for r in recipe], "result": {"id": NS + ":" + name, "count": 1}})
+        tags["trapdoors"].append(NS + ":" + name)
+        if wooden:
+            tags["wooden_trapdoors"].append(NS + ":" + name)
+        tags["mineable/pickaxe" if metal else "mineable/axe"].append(NS + ":" + name)
+        add_name(name, english)
+
+    for wood in DOOR_WOODS:
+        for colour in COLOURS:
+            trapdoor_models("%s_%s_trapdoor" % (colour, wood), lambda g, c=colour, w=wood: "%s %s Trapdoor" % (title(c, g), title(w, g)),
+                            ["minecraft:%s_trapdoor" % wood, "minecraft:%s_dye" % colour], True, False)
+    for colour in COLOURS:
+        trapdoor_models("%s_iron_trapdoor" % colour, lambda g, c=colour: "%s Iron Trapdoor" % title(c, g),
+                        ["minecraft:iron_trapdoor", "minecraft:%s_dye" % colour], False, True)
+    for metal, block, ingredient in METAL_DOORS:
+        trapdoor_models("%s_trapdoor" % metal, lambda g, mt=metal: "Iron Trapdoor (Copper Style)" if mt == "iron" else "%s Trapdoor" % title(mt, g),
+                        ["minecraft:copper_trapdoor", "minecraft:" + ingredient], False, True)
+
     # The coloured textures are made in the game from the door textures in use: wood and iron recoloured with
     # dyes, the copper door repainted with each metal block's own colours.
     block_sources = [
         {"type": NS + ":door_colours", "prefix": "block/",
-         "textures": ["minecraft:block/%s_door_%s" % (w, p) for w in DOOR_WOODS for p in ("top", "bottom")]},
-        {"type": NS + ":door_colours", "prefix": "block/", "metal": True, "textures": ["minecraft:block/iron_door_top", "minecraft:block/iron_door_bottom"]},
-        {"type": NS + ":metal_doors", "prefix": "block/", "textures": ["minecraft:block/copper_door_top", "minecraft:block/copper_door_bottom"],
+         "textures": ["minecraft:block/%s_door_%s" % (w, p) for w in DOOR_WOODS for p in ("top", "bottom")] + ["minecraft:block/%s_trapdoor" % w for w in DOOR_WOODS]},
+        {"type": NS + ":door_colours", "prefix": "block/", "metal": True,
+         "textures": ["minecraft:block/iron_door_top", "minecraft:block/iron_door_bottom", "minecraft:block/iron_trapdoor"]},
+        {"type": NS + ":metal_doors", "prefix": "block/", "textures": ["minecraft:block/copper_door_top", "minecraft:block/copper_door_bottom", "minecraft:block/copper_trapdoor"],
          "metals": ["minecraft:block/" + b for _, b, _ in METAL_DOORS]}]
     # The patterned blocks' textures, made from the textures in use.
     pattern_textures = sorted({textures_of(src)[f] for src in PATTERN_SOURCES if exists(src) for f in ("top", "side", "bottom")})
@@ -1199,7 +1335,8 @@ TABLE_TOPS = (["terracotta"] + ["%s_terracotta" % c for c in COLOURS] + ["%s_gla
               ["stripped_%s_wood" % w for w in TABLE_WOODS] +
               ["stripped_crimson_hyphae", "stripped_warped_hyphae", "stripped_bamboo_block", "smooth_stone", "polished_granite",
                "polished_diorite", "polished_andesite", "chiseled_deepslate", "tuff", "polished_tuff", "chiseled_tuff", "chiseled_resin_bricks",
-               "quartz_block", "chiseled_quartz_block", "quartz_bricks", "smooth_quartz"])
+               "quartz_block", "chiseled_quartz_block", "quartz_bricks", "smooth_quartz", "glass"] +
+              ["%s_stained_glass" % c for c in COLOURS])
 TABLE_LEGS = ["oak"] + COLOURS
 LEG_BOXES = {"nw": ([0, 0, 0], [3, 3, 3]), "ne": ([13, 0, 0], [16, 3, 3]), "sw": ([0, 0, 13], [3, 3, 16]), "se": ([13, 0, 13], [16, 3, 16])}
 
@@ -1225,54 +1362,75 @@ def tables(add_name, tags):
         if uv:
             f["uv"] = uv
         return f
-    # The top, 6 pixels thick, built facing north (the blockstate turns it, and its texture, to the way it was placed).
-    sides = {d: face("#side", d) for d in HORIZONTAL}
-    write(os.path.join(ASSETS, "models", "block", "template_table_top.json"),
-          {"parent": "minecraft:block/block", "textures": {"particle": "#side"},
-           "elements": [{"from": [0, 3, 0], "to": [16, 9, 16], "faces": dict(sides, up=face("#top"), down=face("#bottom"))}]})
-    # Legs, 3 pixels square and tall, one model per corner and one with all four (for the item).
+
     def leg(box):
         f, t = box
         return {"from": f, "to": t, "faces": {d: face("#legs", "down" if d == "down" else None) for d in ["down", "up", "north", "south", "west", "east"]}}
-    for corner, box in LEG_BOXES.items():
-        write(os.path.join(ASSETS, "models", "block", "template_table_leg_%s.json" % corner),
-              {"parent": "minecraft:block/block", "textures": {"particle": "#legs"}, "elements": [leg(box)]})
-    write(os.path.join(ASSETS, "models", "block", "template_table_legs.json"),
-          {"parent": "minecraft:block/block", "textures": {"particle": "#legs"}, "elements": [leg(b) for b in LEG_BOXES.values()]})
-    write(os.path.join(ASSETS, "models", "block", "template_table_item.json"),
-          {"parent": "minecraft:block/block", "textures": {"particle": "#side"},
-           "elements": [{"from": [0, 3, 0], "to": [16, 9, 16], "faces": dict({d: face("#side") for d in HORIZONTAL}, up=face("#top"), down=face("#bottom"))}]
-           + [leg(b) for b in LEG_BOXES.values()]})
+
+    def leg_boxes(h):
+        return {c: (f, [t[0], h, t[2]]) for c, (f, t) in LEG_BOXES.items()}
+
+    # (tall, glass): the top's lowest and highest pixel. Low tables' tops are at 9, tall ones' at 16 (level
+    # with a full block); stone, terracotta and wood tops are 6 pixels thick, glass ones 2. Legs reach the top.
+    kinds = {}
+    for tall in (False, True):
+        for glass in (False, True):
+            y1 = 16 if tall else 9
+            y0 = y1 - (2 if glass else 6)
+            kinds[(tall, glass)] = (y0, y1)
+            # The top, built facing north (the blockstate turns it, and its texture, to the way it was placed).
+            sides = {d: face("#side", d) for d in HORIZONTAL}
+            write(os.path.join(ASSETS, "models", "block", "template_table_top_%d_%d.json" % (y0, y1)),
+                  {"parent": "minecraft:block/block", "textures": {"particle": "#side"},
+                   "elements": [{"from": [0, y0, 0], "to": [16, y1, 16], "faces": dict(sides, up=face("#top", "up" if y1 == 16 else None), down=face("#bottom"))}]})
+            # Legs, 3 pixels square, one model per corner and one with all four.
+            for corner, box in leg_boxes(y0).items():
+                write(os.path.join(ASSETS, "models", "block", "template_table_leg_%s_%d.json" % (corner, y0)),
+                      {"parent": "minecraft:block/block", "textures": {"particle": "#legs"}, "elements": [leg(box)]})
+            write(os.path.join(ASSETS, "models", "block", "template_table_legs_%d.json" % y0),
+                  {"parent": "minecraft:block/block", "textures": {"particle": "#legs"}, "elements": [leg(b) for b in leg_boxes(y0).values()]})
+            write(os.path.join(ASSETS, "models", "block", "template_table_item_%d_%d.json" % (y0, y1)),
+                  {"parent": "minecraft:block/block", "textures": {"particle": "#side"},
+                   "elements": [{"from": [0, y0, 0], "to": [16, y1, 16], "faces": dict({d: face("#side") for d in HORIZONTAL}, up=face("#top"), down=face("#bottom"))}]
+                   + [leg(b) for b in leg_boxes(y0).values()]})
     t_legs = {}
     for legs in TABLE_LEGS:
         t = {"legs": "minecraft:block/oak_planks" if legs == "oak" else "minecraft:block/%s_concrete" % legs}
         t_legs[legs] = t["legs"]
-        for corner in LEG_BOXES:
-            model("table_legs_%s_%s" % (legs, corner), m("template_table_leg_%s" % corner), t)
-        model("table_legs_%s" % legs, m("template_table_legs"), t)
-    for top in TABLE_TOPS:
-        model("table_top_" + top, m("template_table_top"), table_top_textures(top))
-        for legs in TABLE_LEGS:
-            name = top + "_table" + ("" if legs == "oak" else "_%s_legs" % legs)
-            parts = [{"when": {"facing": f}, "apply": {"model": m("table_top_" + top), "y": Y_FROM_NORTH[f]}} for f in HORIZONTAL]
+        for y0 in sorted({k[0] for k in kinds.values()}):
             for corner in LEG_BOXES:
-                ns, ew = {"n": "north", "s": "south"}[corner[0]], {"w": "west", "e": "east"}[corner[1]]
-                parts.append({"when": {ns: "false", ew: "false"}, "apply": {"model": m("table_legs_%s_%s" % (legs, corner))}})
-            blockstate(name, {"multipart": parts})
-            if MC >= (1, 21, 4):
-                write(os.path.join(ASSETS, "items", name + ".json"), {"model": {"type": "minecraft:composite", "models": [
-                    {"type": "minecraft:model", "model": m("table_top_" + top)}, {"type": "minecraft:model", "model": m("table_legs_" + legs)}]}})
-            else:
-                # Before 1.21.4 an item has one model: the top and legs together.
-                write(os.path.join(ASSETS, "models", "item", name + ".json"),
-                      {"parent": m("template_table_item"), "textures": dict(table_top_textures(top), legs=t_legs[legs])})
-            loot(name)
-            leg_item = "minecraft:stick" if legs == "oak" else "minecraft:%s_concrete" % legs
-            write(os.path.join(DATA, NS, "recipe", name + ".json"),
-                  {"type": "minecraft:crafting_shaped", "category": "decorations", "pattern": ["TTT", "L L"],
-                   "key": {"T": ing("minecraft:" + top), "L": ing(leg_item)}, "result": {"id": NS + ":" + name, "count": 3}})
-            tags["mineable/axe" if top.startswith("stripped_") else "mineable/pickaxe"].append(NS + ":" + name)
-            add_name(name, lambda g, tp=top, lg=legs: "%s Table" % title(tp, g) + ("" if lg == "oak" else " (%s Legs)" % title(lg, g)))
+                model("table_legs_%s_%s_%d" % (legs, corner, y0), m("template_table_leg_%s_%d" % (corner, y0)), t)
+            model("table_legs_%s_%d" % (legs, y0), m("template_table_legs_%d" % y0), t)
+    for tall in (False, True):
+        for top in TABLE_TOPS:
+            glass = top.endswith("glass")
+            y0, y1 = kinds[(tall, glass)]
+            top_model = "table_top_%s%s" % (top, "_tall" if tall else "")
+            model(top_model, m("template_table_top_%d_%d" % (y0, y1)), table_top_textures(top))
+            for legs in TABLE_LEGS:
+                name = top + ("_tall" if tall else "") + "_table" + ("" if legs == "oak" else "_%s_legs" % legs)
+                parts = [{"when": {"facing": f}, "apply": {"model": m(top_model), "y": Y_FROM_NORTH[f]}} for f in HORIZONTAL]
+                for corner in LEG_BOXES:
+                    ns, ew = {"n": "north", "s": "south"}[corner[0]], {"w": "west", "e": "east"}[corner[1]]
+                    parts.append({"when": {ns: "false", ew: "false"}, "apply": {"model": m("table_legs_%s_%s_%d" % (legs, corner, y0))}})
+                blockstate(name, {"multipart": parts})
+                if MC >= (1, 21, 4):
+                    write(os.path.join(ASSETS, "items", name + ".json"), {"model": {"type": "minecraft:composite", "models": [
+                        {"type": "minecraft:model", "model": m(top_model)}, {"type": "minecraft:model", "model": m("table_legs_%s_%d" % (legs, y0))}]}})
+                else:
+                    # Before 1.21.4 an item has one model: the top and legs together.
+                    write(os.path.join(ASSETS, "models", "item", name + ".json"),
+                          {"parent": m("template_table_item_%d_%d" % (y0, y1)), "textures": dict(table_top_textures(top), legs=t_legs[legs])})
+                loot(name)
+                leg_item = "minecraft:stick" if legs == "oak" else "minecraft:%s_concrete" % legs
+                pattern = ["TTT", "L L", "L L"] if tall else ["TTT", "L L"]
+                write(os.path.join(DATA, NS, "recipe", name + ".json"),
+                      {"type": "minecraft:crafting_shaped", "category": "decorations", "pattern": pattern,
+                       "key": {"T": ing("minecraft:" + top), "L": ing(leg_item)}, "result": {"id": NS + ":" + name, "count": 3}})
+                if not glass:
+                    tags["mineable/axe" if top.startswith("stripped_") else "mineable/pickaxe"].append(NS + ":" + name)
+                add_name(name, lambda g, tp=top, lg=legs, tl=tall: "%s %sTable" % (title(tp, g), "Tall " if tl else "")
+                         + ("" if lg == "oak" else " (%s Legs)" % title(lg, g)))
 
 
 def tools(add_name):
@@ -1300,11 +1458,12 @@ def cube_icon():
 
 def main():
     # Leave out blocks this Minecraft version doesn't have.
-    global MATERIALS, LOGS, LOW_PLANTS, PLANTS, DOOR_WOODS, TABLE_TOPS
+    global MATERIALS, LOGS, LOW_PLANTS, PLANTS, TALL_PLANTS, DOOR_WOODS, TABLE_TOPS
     MATERIALS = [(mat, kind) for mat, kind in MATERIALS if exists(vanilla_of(mat))]
     LOGS = [log for log in LOGS if exists(log)]
     LOW_PLANTS = [p for p in LOW_PLANTS if exists(p)]
     PLANTS = [p for p in PLANTS if exists(p)]
+    TALL_PLANTS = [p for p in TALL_PLANTS if exists(p)]
     DOOR_WOODS = [w for w in DOOR_WOODS if exists(w + "_door")]
     TABLE_TOPS = [t for t in TABLE_TOPS if exists(t)]
     for sub in ["blockstates", "models", "items"]:
@@ -1314,9 +1473,9 @@ def main():
     templates()
 
     tags = {k: [] for k in ["stairs", "slabs", "walls", "fences", "fence_gates", "trapdoors", "buttons", "pressure_plates",
-                            "wooden_doors", "doors", "mineable/pickaxe", "mineable/shovel", "mineable/axe", "mineable/hoe",
+                            "wooden_doors", "doors", "wooden_trapdoors", "mineable/pickaxe", "mineable/shovel", "mineable/axe", "mineable/hoe",
                             "needs_stone_tool", "needs_iron_tool", "needs_diamond_tool"]}
-    tag_of = {"stairs": "stairs", "slab": "slabs", "wall": "walls", "fence": "fences", "fence_gate": "fence_gates",
+    tag_of = {"stairs": "stairs", "steps_4": "stairs", "steps_6": "stairs", "steps_8": "stairs", "slab": "slabs", "wall": "walls", "fence": "fences", "fence_gate": "fence_gates",
               "trapdoor": "trapdoors", "button": "buttons", "pressure_plate": "pressure_plates"}
     us, gb = {}, {}
 
@@ -1355,6 +1514,7 @@ def main():
             count += 1
     pattern_blocks(add_name, tags)
     thin_logs(add_name, tags)
+    round_logs(add_name, tags)
     plants(add_name)
     coral(add_name)
     doors(add_name, tags)
@@ -1364,7 +1524,7 @@ def main():
 
     for tag, values in tags.items():
         write(os.path.join(DATA, "minecraft", "tags", "block", tag + ".json"), {"replace": False, "values": values})
-    for tag in ["stairs", "slabs", "walls", "fences", "fence_gates", "trapdoors", "buttons", "wooden_doors", "doors"]:
+    for tag in ["stairs", "slabs", "walls", "fences", "fence_gates", "trapdoors", "buttons", "wooden_doors", "doors", "wooden_trapdoors"]:
         write(os.path.join(DATA, "minecraft", "tags", "item", tag + ".json"), {"replace": False, "values": tags[tag]})
 
     for tab, name in TABS:
