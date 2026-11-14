@@ -47,6 +47,9 @@ jobs:
           python3 tools/prep.py "$T" --fabric-api "$(cat vanilla/$T/fabric-api.txt)" --blocks "vanilla/$T/blocks.txt" --continuity "$(cat vanilla/$T/continuity.txt 2>/dev/null)"
           ./gradlew -p "build/v/$T" build -x test --stacktrace 2>&1 | tee "ci-logs/build-$T.txt"; test ${PIPESTATUS[0]} -eq 0
           mkdir -p jars && cp $(ls build/v/$T/build/libs/*.jar | grep -v -- '-sources.jar') jars/
+          # Download names lose a '+', so the file is cubework-<version>-mc<minecraft>.jar (the mod's own
+          # version, shown in game, stays <version>+<minecraft>).
+          for f in jars/*+*.jar; do [ -e "$f" ] && mv "$f" "${f/+/-mc}"; done
       - uses: actions/upload-artifact@v4
         with:
           name: jar-${{ matrix.target }}

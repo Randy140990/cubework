@@ -8,9 +8,9 @@ import java.util.List;
  * (client.StairCurveModel) and the hit box.
  * <p>
  * Seen from the side, with a flight of W stairs climbing to the right one block per block and x measured
- * in blocks from the front of the bottom stair, the steps are ordinary stairs and the underside is an S
- * (see curve): it bends up off the floor, follows the stairs half a block below their inner corners, and
- * bends level under the top stair.
+ * in blocks from the front of the bottom stair, the steps are ordinary stairs and the underside is a wave
+ * (see curve): flaring off the floor, tucking in close under the steps, swelling out and tucking in again,
+ * always rising.
  * <p>
  * Pieces: column c (0 to W - 1, the c-th stair from the bottom), row r (0 to c, blocks up from the
  * floor); row c is the stair itself (steps on top, cut by the curve), the rows below are the fill under it.
@@ -41,30 +41,41 @@ public final class StairCurveGeometry {
 		return -1;
 	}
 
-	/** How far below the steps' inner corners the underside runs along the flight (half a block). */
-	private static final double DEPTH = 0.5;
-	/** Where the underside leaves the floor: under the middle of the bottom stair. */
-	private static final double START = DEPTH;
-	/** How quickly it bends up off the floor, and how round its bend level under the top stair is. */
-	private static final double FOOT = 0.7, TOP_BEND = 1.2;
+	/** The thinnest the flight gets: the underside's closest approach to the steps' inner corners. */
+	private static final double THIN = 0.25;
+	/** How round the flare where the underside meets the floor is. */
+	private static final double FLARE = 0.35;
 
-	/** A smooth minimum: the lower of a and b, rounded off where they meet (k: how round). */
-	private static double smoothMin(double a, double b, double k) {
+	/** The length of one wave (thin, thick, thin) and how far it swings, for a flight of w stairs. */
+	private static double[] wave(int w) {
+		double len = w - THIN;
+		int waves = Math.max(1, (int) Math.round(len / 3.5));
+		double period = len / waves;
+		// Never so steep the other way that the underside would dip: it always rises.
+		double swing = Math.min(0.45, 0.8 * period / (2 * Math.PI));
+		return new double[] {period, swing};
+	}
+
+	/** The larger of a and b, rounded off where they meet (k: how round). */
+	private static double smoothMax(double a, double b, double k) {
 		double h = Math.max(k - Math.abs(a - b), 0) / k;
-		return Math.min(a, b) - h * h * k * 0.25;
+		return Math.max(a, b) + h * h * k * 0.25;
 	}
 
 	/**
-	 * Height of the underside (blocks above the floor) at x blocks from the front of the bottom stair. It
-	 * bends up off the floor under the bottom stair (curving in), runs half a block below the steps' inner
-	 * corners all the way up (following the underside of the stairs), and bends level under the top stair
-	 * (curving back in): an S that rises the whole way, never sagging.
+	 * Height of the underside (blocks above the floor) at x blocks from the front of the bottom stair: the
+	 * line through the steps' inner corners, less a depth that waves thin, thick, thin (the underside tucks
+	 * in close under the steps, swells out, and tucks in again, as in the curved-stair builds). It always
+	 * rises, never sagging; a flight long enough gets more than one wave, always ending tucked in under the
+	 * top stair. Where it meets the floor it flares out smoothly.
 	 */
 	public static double curve(int w, double x) {
-		double u = x - START;
-		if (u <= 0) return 0;
-		double along = x - DEPTH - u * Math.exp(-u / FOOT);
-		return Math.max(0, smoothMin(along, w - 1.0, TOP_BEND));
+		if (x <= 0) return 0;
+		double[] wv = wave(w);
+		double s = Math.max(0, x - THIN) / wv[0];
+		double depth = THIN + wv[1] - wv[1] * Math.cos(2 * Math.PI * s);
+		double raw = x - depth;
+		return Math.max(0, Math.min(smoothMax(raw, 0, FLARE), x - 0.2));
 	}
 
 	public static boolean stairCell(int piece) {
@@ -107,7 +118,6 @@ public final class StairCurveGeometry {
 		if (p[0] > 0) {
 			int w = p[0], c = p[1], r = p[2];
 			double cap = hollow(piece) ? 0.875 : 1.0;
-			if (START - c > 0 && START - c < 1) xs.add(START - c);
 			for (double level : new double[] {r, r + cap}) {
 				for (int i = 0; i < n; i++) {
 					double a = (double) i / n, b = (double) (i + 1) / n;
