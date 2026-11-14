@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.function.Function;
 
 import com.insidethecube.cubework.block.ColouredDoorBlock;
+import com.insidethecube.cubework.block.LightFixtureBlock;
 import com.insidethecube.cubework.block.RoundLogBlock;
 import com.insidethecube.cubework.block.SizedCoralBlock;
 import com.insidethecube.cubework.block.SizedPlantBlock;
@@ -93,6 +94,13 @@ public final class Extras {
 	/** Grass, fern and bush sizes, which take the biome's grass colour. */
 	public static final List<Block> GRASSY_PLANTS = new ArrayList<>();
 	public static final List<Block> DOORS = new ArrayList<>();
+	/** Light blocks the fittings are made from. */
+	public static final String[] LIGHTS = {"glowstone", "sea_lantern", "ochre_froglight", "verdant_froglight", "pearlescent_froglight"};
+	public static final int[] PANEL_LIGHTS = {12, 8, 4};
+	public static final int[] PANEL_DEPTHS = {16, 12, 8, 4};
+	public static final int[] TUBE_WIDTHS = {12, 8, 4};
+	public static final int[] RECESSED_SIZES = {12, 8};
+	public static final List<Block> LIGHT_FITTINGS = new ArrayList<>();
 	/** Trapdoors in the 16 colours (each wood keeps its pattern) and the copper trapdoor's pattern in metals and gems. */
 	public static final List<Block> TRAPDOORS = new ArrayList<>();
 
@@ -103,6 +111,7 @@ public final class Extras {
 		doors();
 		trapdoors();
 		tables();
+		lights();
 	}
 
 	/** Glass table tops (2 pixels thick): see-through, so drawn in the translucent layer. */
@@ -234,6 +243,24 @@ public final class Extras {
 			MapColor map = vanilla(metal + "_block").defaultMapColor();
 			DOORS.add(block(metal + "_door", BlockBehaviour.Properties.ofFullCopy(copper).mapColor(map), set -> new ColouredDoorBlock(BlockSetType.COPPER, set), true));
 		}
+	}
+
+	private static void lights() {
+		for (String light : LIGHTS) {
+			if (!Reg.exists(light)) continue;
+			Block base = vanilla(light);
+			fitting(light + "_light_rod", base, 14, LightFixtureBlock.Kind.ROD, 0, 0);
+			for (int size : PANEL_LIGHTS) for (int depth : PANEL_DEPTHS) {
+				fitting(light + "_panel_light_" + size + "_" + depth, base, size == 4 ? 13 : 15, LightFixtureBlock.Kind.PANEL, size, depth);
+			}
+			for (int w : TUBE_WIDTHS) fitting(light + "_tube_light_" + w, base, w == 4 ? 13 : 15, LightFixtureBlock.Kind.TUBE, w, 2);
+			for (int size : RECESSED_SIZES) fitting(light + "_recessed_light_" + size, base, 14, LightFixtureBlock.Kind.RECESSED, size, 4);
+		}
+	}
+
+	private static void fitting(String name, Block base, int light, LightFixtureBlock.Kind kind, int size, int depth) {
+		BlockBehaviour.Properties set = BlockBehaviour.Properties.ofFullCopy(base).lightLevel(state -> light).noOcclusion();
+		LIGHT_FITTINGS.add(block(name, set, s -> new LightFixtureBlock(kind, size, depth, s)));
 	}
 
 	private static void trapdoors() {

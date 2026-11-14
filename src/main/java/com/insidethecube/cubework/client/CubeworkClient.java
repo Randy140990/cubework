@@ -80,6 +80,7 @@ public final class CubeworkClient implements ClientModInitializer {
 		for (Block b : Extras.CORAL) Layers.cutout(b);
 		for (Block b : Extras.DOORS) Layers.cutout(b);
 		for (Block b : Extras.TRAPDOORS) Layers.cutout(b);
+		for (Block b : Extras.LIGHT_FITTINGS) Layers.cutout(b);
 		for (Block b : Extras.GLASS_TABLES) Layers.translucent(b);
 
 		// Grass shapes, grass, ferns and bushes take the biome's grass colour.

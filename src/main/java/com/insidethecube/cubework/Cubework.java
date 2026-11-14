@@ -47,7 +47,7 @@ public final class Cubework implements ModInitializer {
 		BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Decoration.TOP_LAYER_MODIFICATION,
 				ResourceKey.create(Registries.PLACED_FEATURE, Reg.id("smooth_terrain")));
 
-		// Eight tabs: coloured blocks, building blocks, natural blocks, plants, doors, tables, patterns and carpets.
+		// Nine tabs: coloured blocks, building blocks, natural blocks, plants, doors, tables, patterns, lights and carpets.
 		tab("colours", () -> new ItemStack(item("magenta_glazed_terracotta_stairs")), add -> {
 			add.accept(null);
 			for (Material m : Material.ALL) if (!m.nature() && !m.building() && !m.patterned()) shapes(m, add, false);
@@ -76,6 +76,7 @@ public final class Cubework implements ModInitializer {
 				shapes(m, add, false);
 			}
 		});
+		tab("lights", () -> new ItemStack(item("sea_lantern_panel_light_12_4")), add -> Extras.LIGHT_FITTINGS.forEach(add));
 		// Every carpet: coloured, glazed (they turn, to line up the patterns), building, natural and patterned.
 		tab("carpets", () -> new ItemStack(item("cyan_glazed_terracotta_carpet")), add -> {
 			for (Material m : Material.ALL) {

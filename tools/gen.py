@@ -217,7 +217,7 @@ DOOR_WOODS = ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrov
               "warped"]
 
 TABS = [("colours", "Colours"), ("building", "Building"), ("nature", "Nature"), ("plants", "Plants"), ("doors", "Doors"), ("tables", "Tables"),
-        ("patterns", "Patterns"), ("carpets", "Carpets")]
+        ("patterns", "Patterns"), ("lights", "Lights"), ("carpets", "Carpets")]
 
 HORIZONTAL = ["north", "east", "south", "west"]
 Y_FROM_NORTH = {"north": 0, "east": 90, "south": 180, "west": 270}
@@ -1433,6 +1433,113 @@ def tables(add_name, tags):
                          + ("" if lg == "oak" else " (%s Legs)" % title(lg, g)))
 
 
+LIGHTS = ["glowstone", "sea_lantern", "ochre_froglight", "verdant_froglight", "pearlescent_froglight"]
+PANEL_LIGHTS = [12, 8, 4]
+PANEL_DEPTHS = [(16, 1), (12, 1), (8, 2), (4, 4)]  # depth, how many one light block makes
+TUBE_WIDTHS = [12, 8, 4]
+RECESSED_SIZES = [12, 8]
+# Facing: the turn from facing up (fixed to the floor), as vanilla's end rods.
+FACING_TURN = {"up": (0, 0), "down": (180, 0), "north": (90, 0), "east": (90, 90), "south": (90, 180), "west": (90, 270)}
+
+
+def light_fittings(add_name):
+    """Light rods, panel lights, tube lights and recessed lights from glowstone, sea lanterns and froglights."""
+    def element(box, faces, cull_down=True):
+        f, t = box[:3], box[3:]
+        out = {}
+        for d in ("down", "up", "north", "south", "west", "east"):
+            tex = faces.get(d, faces.get("*"))
+            face = {"texture": tex}
+            if d == "down" and cull_down and f[1] == 0:
+                face["cullface"] = "down"
+            out[d] = face
+        return {"from": [round(v, 4) for v in f], "to": [round(v, 4) for v in t], "faces": out}
+
+    def save(name, elements, particle="#light"):
+        write(os.path.join(ASSETS, "models", "block", name + ".json"),
+              {"parent": "minecraft:block/block", "textures": {"particle": particle}, "elements": elements})
+
+    save("template_light_rod", [element([6, 0, 6, 10, 2, 10], {"*": "#metal"}), element([7, 2, 7, 9, 16, 9], {"*": "#light"})])
+    for size in PANEL_LIGHTS:
+        for depth, _ in PANEL_DEPTHS:
+            a, b = (16 - size) / 2, (16 + size) / 2
+            save("template_panel_light_%d_%d" % (size, depth), [
+                element([0, 0, 0, 16, depth, a], {"*": "#border"}), element([0, 0, b, 16, depth, 16], {"*": "#border"}),
+                element([0, 0, a, a, depth, b], {"*": "#border"}), element([b, 0, a, 16, depth, b], {"*": "#border"}),
+                element([a, 0, a, b, depth, b], {"*": "#light"})], "#border")
+    for w in TUBE_WIDTHS:
+        a = (16 - w) / 2
+        lo, hi = a + 1, 16 - a - 1
+        save("template_tube_light_%d" % w, [element([0, 0, a, 16, 2, lo], {"*": "#border"}), element([0, 0, hi, 16, 2, 16 - a], {"*": "#border"}),
+                                             element([0, 0, lo, 16, 2, hi], {"*": "#light"})], "#border")
+        save("template_tube_light_%d_across" % w, [element([a, 0, 0, lo, 2, 16], {"*": "#border"}), element([hi, 0, 0, 16 - a, 2, 16], {"*": "#border"}),
+                                                    element([lo, 0, 0, hi, 2, 16], {"*": "#light"})], "#border")
+    for d in RECESSED_SIZES:
+        r = d / 2
+        els = [element([0, 0, 0, 16, 2, 16], {"*": "#border", "up": "#light"})]
+        # The lip: 2 pixels of border round the round opening, in rows.
+        for z in range(16):
+            x = 0
+            while x < 16:
+                solid = lambda x: (x + 0.5 - 8) ** 2 + (z + 0.5 - 8) ** 2 >= r * r
+                if not solid(x):
+                    x += 1
+                    continue
+                x1 = x
+                while x1 < 16 and solid(x1):
+                    x1 += 1
+                els.append(element([x, 2, z, x1, 4, z + 1], {"*": "#border"}, False))
+                x = x1
+        save("template_recessed_light_%d" % d, els, "#border")
+
+    def light_tex(light):
+        return "minecraft:block/" + (light + "_side" if light.endswith("froglight") else light)
+
+    def turned(model_id, f):
+        x, y = FACING_TURN[f]
+        v = {"model": model_id}
+        if x: v["x"] = x
+        if y: v["y"] = y
+        return v
+
+    for light in LIGHTS:
+        lt = light_tex(light)
+        fittings = [("%s_light_rod" % light, "template_light_rod", 4, lambda g, l=light: "%s Light Rod" % title(l, g), None)]
+        for size in PANEL_LIGHTS:
+            for depth, cut in PANEL_DEPTHS:
+                fittings.append(("%s_panel_light_%d_%d" % (light, size, depth), "template_panel_light_%d_%d" % (size, depth), cut,
+                                 lambda g, l=light, s=size, d=depth: "%s Panel Light (%d px light, %d px deep)" % (title(l, g), s, d), None))
+        for w in TUBE_WIDTHS:
+            fittings.append(("%s_tube_light_%d" % (light, w), "template_tube_light_%d" % w, 4, lambda g, l=light, w=w: "%s Tube Light (%d px)" % (title(l, g), w), "tube"))
+        for d in RECESSED_SIZES:
+            fittings.append(("%s_recessed_light_%d" % (light, d), "template_recessed_light_%d" % d, 2,
+                             lambda g, l=light, d=d: "%s Recessed Light (%d px)" % (title(l, g), d), None))
+        for name, template, cut, english, special in fittings:
+            variants = {}
+            if template == "template_light_rod":
+                model(name, m(template), {"light": lt, "metal": "minecraft:block/iron_block"})
+                for f in FACING_TURN:
+                    variants["facing=" + f] = turned(m(name), f)
+                item(name, m(name))
+            else:
+                for colour in COLOURS:
+                    t = {"light": lt, "border": "minecraft:block/%s_concrete" % colour}
+                    model("%s_%s" % (name, colour), m(template), t)
+                    if special == "tube":
+                        model("%s_%s_across" % (name, colour), m(template + "_across"), t)
+                    for f in FACING_TURN:
+                        if special == "tube":
+                            variants["across=false,colour=%s,facing=%s" % (colour, f)] = turned(m("%s_%s" % (name, colour)), f)
+                            variants["across=true,colour=%s,facing=%s" % (colour, f)] = turned(m("%s_%s_across" % (name, colour)), f)
+                        else:
+                            variants["colour=%s,facing=%s" % (colour, f)] = turned(m("%s_%s" % (name, colour)), f)
+                item(name, m(name + "_white"))
+            blockstate(name, {"variants": variants})
+            loot(name)
+            stonecutting(light, name, cut)
+            add_name(name, english)
+
+
 def tools(add_name):
     """The terrain brush and the builder's guide, the wheel key's name, and the world-gen feature for smoothing new land."""
     for name, english, recipe in (("terrain_brush", "Terrain Brush", ["minecraft:brush", "minecraft:copper_ingot", "minecraft:smooth_stone_slab"]),
@@ -1519,6 +1626,7 @@ def main():
     coral(add_name)
     doors(add_name, tags)
     tables(add_name, tags)
+    light_fittings(add_name)
     tools(add_name)
     cube_icon()
 
