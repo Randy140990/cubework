@@ -21,12 +21,16 @@ import com.insidethecube.cubework.block.GentleSlopeBlock;
 import com.insidethecube.cubework.block.QuarterSlabBlock;
 import com.insidethecube.cubework.block.WindowFrameBlock;
 import com.insidethecube.cubework.block.CornerPostBlock;
+import com.insidethecube.cubework.block.BorderedBlock;
+import com.insidethecube.cubework.block.PartitionBlock;
+import com.insidethecube.cubework.block.PlainBlock;
 import com.insidethecube.cubework.block.PatternBlock;
 import com.insidethecube.cubework.block.PitchStairsBlock;
 import com.insidethecube.cubework.block.StairCurveBlock;
 import com.insidethecube.cubework.block.StepStairsBlock;
 import com.insidethecube.cubework.block.TrimBlock;
 import com.insidethecube.cubework.block.RoundColumnBlock;
+import com.insidethecube.cubework.block.RoundPillarBlock;
 import com.insidethecube.cubework.block.RoundCornerBlock;
 import com.insidethecube.cubework.block.LayerBlock;
 import com.insidethecube.cubework.block.PanelBlock;
@@ -62,12 +66,14 @@ public final class CwBlocks {
 
 	/** The patterned full blocks, in the order of Material.ALL. */
 	public static final java.util.List<Block> PATTERN_BLOCKS = new java.util.ArrayList<>();
+	/** The wallpapers' full blocks. */
+	public static final java.util.List<Block> WALLPAPER_BLOCKS = new java.util.ArrayList<>();
 
 	public static void register() {
 		for (Material m : Material.ALL) {
 			if (!m.exists()) continue;
 			Block base;
-			if (m.patterned()) {
+			if (m.patterned() || m.wallpaper()) {
 				// A patterned block of its own, made like the block it's drawn on.
 				Block vanilla = m.vanillaBlock();
 				BlockState def = vanilla.defaultBlockState();
@@ -76,8 +82,10 @@ public final class CwBlocks {
 				base = block(m.id(), BlockBehaviour.Properties.ofFullCopy(vanilla).mapColor(colour).lightLevel(state -> light),
 						set -> new PatternBlock(m, set));
 				item(m.id(), base);
-				PATTERN_BLOCKS.add(base);
+				if (m.patterned()) PATTERN_BLOCKS.add(base);
+				else WALLPAPER_BLOCKS.add(base);
 				if (m.source().endsWith("_wool")) FlammableBlockRegistry.getDefaultInstance().add(base, 30, 60);
+				if (m.wallpaper()) FlammableBlockRegistry.getDefaultInstance().add(base, 5, 20);
 			} else {
 				base = m.base();
 			}
@@ -92,6 +100,7 @@ public final class CwBlocks {
 				// Wool shapes catch fire and burn away like wool; coal shapes burn like coal blocks.
 				if (m.kind() == Material.Kind.WOOL || (m.patterned() && m.source().endsWith("_wool"))) FlammableBlockRegistry.getDefaultInstance().add(b, 30, 60);
 				if (m.id().equals("coal_block")) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 5);
+				if (m.wallpaper()) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 20);
 			}
 			BY_MATERIAL.put(m, shapes);
 		}
@@ -163,6 +172,10 @@ public final class CwBlocks {
 			case STAIRS_4 -> set -> new PitchStairsBlock(m, set);
 			case TRIM_2, TRIM_4, TRIM_8 -> set -> new TrimBlock(m, s.trimWidth(), set);
 			case STAIR_CURVE -> set -> new StairCurveBlock(m, set);
+			case BORDERED -> set -> new BorderedBlock(m, set);
+			case RAISED_FRAME -> set -> new PlainBlock(m, set);
+			case PARTITION_2, PARTITION_4, PARTITION_6, PARTITION_8 -> set -> new PartitionBlock(m, s.partitionWidth(), set);
+			case ROUND_PILLAR_2, ROUND_PILLAR_3, ROUND_PILLAR_4 -> set -> new RoundPillarBlock(m, s.pillarSize(), set);
 			case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4 -> set -> new RoundColumnBlock(m, s.columnWidth(), set);
 			case CORNER_POST -> set -> new CornerPostBlock(m, set);
 			case ROUND_CORNER -> set -> new RoundCornerBlock(m, false, set);

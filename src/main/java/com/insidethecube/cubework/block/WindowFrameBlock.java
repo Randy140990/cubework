@@ -33,14 +33,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * (placing against the side of a lying frame lays the new one the same way, sneaking or not).
  */
 public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock {
-	/** The side it's against. */
-	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+	/** The side it's against: north, east, south or west on a wall; up lying on the floor, down against the ceiling. */
+	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 	public static final BooleanProperty UP = BlockStateProperties.UP;
 	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 	public static final BooleanProperty LEFT = BooleanProperty.create("left");
 	public static final BooleanProperty RIGHT = BooleanProperty.create("right");
-	/** On a wall (upright), or lying flat on the floor or against the ceiling. */
-	public static final EnumProperty<AttachFace> FACE = BlockStateProperties.ATTACH_FACE;
 
 	/** The opening's shape. */
 	public enum Style {
@@ -51,24 +49,36 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 	private final Style style;
 	private final VoxelShape[] shapes = new VoxelShape[3 * 4 * 16];
 
+	/** Upright, lying on the floor or against the ceiling. */
+	public static AttachFace face(BlockState state) {
+		Direction f = state.getValue(FACING);
+		return f == Direction.UP ? AttachFace.FLOOR : f == Direction.DOWN ? AttachFace.CEILING : AttachFace.WALL;
+	}
+
+	/** The way it faces round: its facing on a wall; lying frames are built facing north. */
+	public static Direction horizontal(BlockState state) {
+		Direction f = state.getValue(FACING);
+		return f.getAxis().isVertical() ? Direction.NORTH : f;
+	}
+
 	public WindowFrameBlock(Material material, int depth, Style style, BlockBehaviour.Properties settings) {
 		super(material, settings);
 		this.depth = depth;
 		this.style = style;
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(UP, false).setValue(DOWN, false).setValue(LEFT, false).setValue(RIGHT, false)
-				.setValue(FACE, AttachFace.WALL).setValue(WATERLOGGED, false));
+				.setValue(WATERLOGGED, false));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING, UP, DOWN, LEFT, RIGHT, FACE, WATERLOGGED);
+		builder.add(FACING, UP, DOWN, LEFT, RIGHT, WATERLOGGED);
 	}
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 		boolean u = state.getValue(UP), d = state.getValue(DOWN), l = state.getValue(LEFT), r = state.getValue(RIGHT);
-		int turns = state.getValue(FACING).get2DDataValue() + 2 & 3;
-		AttachFace face = state.getValue(FACE);
+		int turns = horizontal(state).get2DDataValue() + 2 & 3;
+		AttachFace face = face(state);
 		int i = face.ordinal() * 64 + turns * 16 + (u ? 8 : 0) + (d ? 4 : 0) + (l ? 2 : 0) + (r ? 1 : 0);
 		VoxelShape s = shapes[i];
 		if (s == null) {
@@ -112,14 +122,14 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 		Direction facing = side.getAxis().isHorizontal() ? side.getOpposite() : ctx.getHorizontalDirection();
 		AttachFace face = AttachFace.WALL;
 		BlockState against = ctx.getLevel().getBlockState(ctx.getClickedPos().relative(side.getOpposite()));
-		if (against.getBlock() instanceof WindowFrameBlock && against.getValue(FACE) != AttachFace.WALL && side.getAxis().isHorizontal()) {
-			face = against.getValue(FACE);
+		if (against.getBlock() instanceof WindowFrameBlock && face(against) != AttachFace.WALL && side.getAxis().isHorizontal()) {
+			face = face(against);
 		} else if (ctx.getPlayer() != null && ctx.getPlayer().isShiftKeyDown() && !side.getAxis().isHorizontal()) {
 			face = side == Direction.UP ? AttachFace.FLOOR : AttachFace.CEILING;
 		}
-		// Lying frames all face north, so any two side by side join.
-		if (face != AttachFace.WALL) facing = Direction.NORTH;
-		BlockState state = defaultBlockState().setValue(FACING, facing).setValue(FACE, face).setValue(WATERLOGGED, waterAt(ctx));
+		// Lying frames face up (on the floor) or down (on the ceiling), so any two side by side join.
+		if (face != AttachFace.WALL) facing = face == AttachFace.FLOOR ? Direction.UP : Direction.DOWN;
+		BlockState state = defaultBlockState().setValue(FACING, facing).setValue(WATERLOGGED, waterAt(ctx));
 		return placed(joined(state, ctx.getLevel(), ctx.getClickedPos()), ctx);
 	}
 
@@ -130,8 +140,8 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 
 	/** Which neighbours it joins: any window frame (any material, depth, square or diamond) facing the same way. */
 	private BlockState joined(BlockState state, BlockGetter world, BlockPos pos) {
-		Direction f = state.getValue(FACING);
-		AttachFace face = state.getValue(FACE);
+		Direction f = horizontal(state);
+		AttachFace face = face(state);
 		// The frame's own up and down: on a wall, up and down; lying, the way its top was tipped and the opposite.
 		Direction up = face == AttachFace.WALL ? Direction.UP : face == AttachFace.FLOOR ? f : f.getOpposite();
 		return state.setValue(UP, joins(state, world.getBlockState(pos.relative(up)))).setValue(DOWN, joins(state, world.getBlockState(pos.relative(up.getOpposite()))))
@@ -140,7 +150,7 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 	}
 
 	private boolean joins(BlockState state, BlockState other) {
-		return other.getBlock() instanceof WindowFrameBlock && other.getValue(FACING) == state.getValue(FACING) && other.getValue(FACE) == state.getValue(FACE);
+		return other.getBlock() instanceof WindowFrameBlock && other.getValue(FACING) == state.getValue(FACING);
 	}
 
 	@Override
@@ -150,6 +160,6 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock 
 
 	@Override
 	protected BlockState mirror(BlockState state, Mirror mirror) {
-		return state.rotate(mirror.getRotation(state.getValue(FACING)));
+		return state.getValue(FACING).getAxis().isVertical() ? state : state.rotate(mirror.getRotation(state.getValue(FACING)));
 	}
 }

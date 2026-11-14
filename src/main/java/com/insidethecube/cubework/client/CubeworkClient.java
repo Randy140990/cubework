@@ -80,6 +80,7 @@ public final class CubeworkClient implements ClientModInitializer {
 		for (Block b : Extras.CORAL) Layers.cutout(b);
 		for (Block b : Extras.DOORS) Layers.cutout(b);
 		for (Block b : Extras.TRAPDOORS) Layers.cutout(b);
+		for (Block b : Extras.LIGHT_FITTINGS) Layers.cutout(b);
 		for (Block b : Extras.GLASS_TABLES) Layers.translucent(b);
 
 		// Grass shapes, grass, ferns and bushes take the biome's grass colour.
@@ -116,6 +117,7 @@ public final class CubeworkClient implements ClientModInitializer {
 					}
 					Models.Maker maker = switch (shape) {
 						case ARCH, ARCH_CORNER -> (state, sprites) -> ArchModel.build(m, state, sprites);
+						case ROUND_PILLAR_2, ROUND_PILLAR_3, ROUND_PILLAR_4 -> (state, sprites) -> RoundPillarModel.build(m, state, sprites);
 						case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, ROUND_CORNER, ROUND_CORNER_INNER ->
 								(state, sprites) -> RoundModel.build(m, state, sprites);
 						default -> (state, sprites) -> SlopeModel.build(m, state, sprites);

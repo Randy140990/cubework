@@ -33,8 +33,8 @@ public final class RoundWindowModel {
 		boolean u = state.getValue(WindowFrameBlock.UP), d = state.getValue(WindowFrameBlock.DOWN);
 		boolean l = state.getValue(WindowFrameBlock.LEFT), r = state.getValue(WindowFrameBlock.RIGHT);
 		// Quarter turns, plus 4 for lying on the floor or 8 against the ceiling (tipped first, see tilt).
-		int turns = (state.getValue(WindowFrameBlock.FACING).get2DDataValue() + 2 & 3)
-				+ 4 * switch (state.getValue(WindowFrameBlock.FACE)) {
+		int turns = (WindowFrameBlock.horizontal(state).get2DDataValue() + 2 & 3)
+				+ 4 * switch (WindowFrameBlock.face(state)) {
 					case FLOOR -> 1;
 					case CEILING -> 2;
 					default -> 0;
