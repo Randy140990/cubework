@@ -9,6 +9,7 @@ that changes a block changes all of its shapes too. The coloured doors' textures
 from the door textures in use (DoorColoursSource).
 """
 import json
+import math
 import os
 import shutil
 
@@ -567,19 +568,14 @@ def new_shape_templates():
         template("template_trim_%d_upright" % w, [([0, 0, 0], [w, 16, w])])
         template("template_trim_%d_item" % w, [([0, 8 - w / 2, 8 - w / 2], [16, 8 + w / 2, 8 + w / 2])])
     # Curved Stairs in the hand: a stair (rising east) with the S-curve cut under its back, as the middle
-    # stair of a three-stair flight (StairCurveGeometry: underside = x - depth(s)).
-    def depth(w, s):
-        a = min(1.0, (w - 1) / 3.0)
-        ks, d = [0.0, 0.17, 0.5, 0.85, 1.0], [0.85, 0.3, 0.3 + a, 0.35, 0.5]
-        if s <= 0: return d[0]
-        if s >= 1: return d[4]
-        for i in range(4):
-            if s <= ks[i + 1]:
-                t = (s - ks[i]) / (ks[i + 1] - ks[i]); t = t * t * (3 - 2 * t)
-                return d[i] + (d[i + 1] - d[i]) * t
+    # stair of a three-stair flight (as StairCurveGeometry.curve).
     def under(x):
         X = 1 + x
-        return 0.0 if X <= 0.85 else max(0.0, X - depth(3, min(1.0, (X - 0.85) / (3 - 0.85))) - 1)
+        u = X - 0.5
+        if u <= 0: return 0.0
+        a, b, k = X - 0.5 - u * math.exp(-u / 0.7), 2.0, 1.2
+        hh = max(k - abs(a - b), 0.0) / k
+        return max(0.0, min(a, b) - hh * hh * k * 0.25 - 1.0)
     curve = [[(y + 1) / 16 > max(under(x / 16), under((x + 1) / 16)) and y / 16 < (0.5 if x < 8 else 1.0) for y in range(16)] for x in range(16)]
     template("template_stair_curve", mask_boxes(curve, 0, 16), display=STAIRS_DISPLAY)
     for d in WINDOW_DEPTHS:

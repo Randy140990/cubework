@@ -8,11 +8,9 @@ import java.util.List;
  * (client.StairCurveModel) and the hit box.
  * <p>
  * Seen from the side, with a flight of W stairs climbing to the right one block per block and x measured
- * in blocks from the front of the bottom stair, the steps are ordinary stairs and the underside is
- * U(x) = x - depth(s): how far it sits below the line through the steps' inner corners, s running from
- * 0 where the underside leaves the floor (under the back of the bottom stair) to 1 at the back of the top
- * stair. The depth swings in-out-in: the underside springs up close under the first stair (in), sags
- * into a belly under the middle stairs (out), and rises close under the top stair again (back in).
+ * in blocks from the front of the bottom stair, the steps are ordinary stairs and the underside is an S
+ * (see curve): it bends up off the floor, follows the stairs half a block below their inner corners, and
+ * bends level under the top stair.
  * <p>
  * Pieces: column c (0 to W - 1, the c-th stair from the bottom), row r (0 to c, blocks up from the
  * floor); row c is the stair itself (steps on top, cut by the curve), the rows below are the fill under it.
@@ -43,31 +41,30 @@ public final class StairCurveGeometry {
 		return -1;
 	}
 
-	/** Where the underside leaves the floor, under the back of the bottom stair. */
-	private static final double START = 0.85;
-	private static final double[] KNOTS = {0.0, 0.17, 0.5, 0.85, 1.0};
+	/** How far below the steps' inner corners the underside runs along the flight (half a block). */
+	private static final double DEPTH = 0.5;
+	/** Where the underside leaves the floor: under the middle of the bottom stair. */
+	private static final double START = DEPTH;
+	/** How quickly it bends up off the floor, and how round its bend level under the top stair is. */
+	private static final double FOOT = 0.7, TOP_BEND = 1.2;
 
-	/** How far below the steps' inner corners the underside sits, s from 0 (the floor) to 1 (the top). */
-	static double depth(int w, double s) {
-		double a = Math.min(1.0, (w - 1) / 3.0);       // short flights get a gentler belly
-		double[] d = {START, 0.3, 0.3 + a, 0.35, 0.5};
-		if (s <= 0) return d[0];
-		if (s >= 1) return d[4];
-		for (int i = 0; i < 4; i++) {
-			if (s <= KNOTS[i + 1]) {
-				double t = (s - KNOTS[i]) / (KNOTS[i + 1] - KNOTS[i]);
-				t = t * t * (3 - 2 * t);
-				return d[i] + (d[i + 1] - d[i]) * t;
-			}
-		}
-		return d[4];
+	/** A smooth minimum: the lower of a and b, rounded off where they meet (k: how round). */
+	private static double smoothMin(double a, double b, double k) {
+		double h = Math.max(k - Math.abs(a - b), 0) / k;
+		return Math.min(a, b) - h * h * k * 0.25;
 	}
 
-	/** Height of the underside (blocks above the floor) at x blocks from the front of the bottom stair. */
+	/**
+	 * Height of the underside (blocks above the floor) at x blocks from the front of the bottom stair. It
+	 * bends up off the floor under the bottom stair (curving in), runs half a block below the steps' inner
+	 * corners all the way up (following the underside of the stairs), and bends level under the top stair
+	 * (curving back in): an S that rises the whole way, never sagging.
+	 */
 	public static double curve(int w, double x) {
-		if (x <= START) return 0;
-		double s = Math.min(1.0, (x - START) / (w - START));
-		return Math.max(0, x - depth(w, s));
+		double u = x - START;
+		if (u <= 0) return 0;
+		double along = x - DEPTH - u * Math.exp(-u / FOOT);
+		return Math.max(0, smoothMin(along, w - 1.0, TOP_BEND));
 	}
 
 	public static boolean stairCell(int piece) {
