@@ -16,6 +16,8 @@ public class Fan extends Mob {
 	/** Which of the fan textures, whether it holds a sign, and its own beat for cheering. */
 	public int look, sign = -1;
 	public float phase, height = 1;
+	/** Where its seat is round the stadium, in degrees (for the Mexican wave). */
+	public float seatAngle;
 
 	public Fan(EntityType<? extends Mob> type, Level level) {
 		super(type, level);

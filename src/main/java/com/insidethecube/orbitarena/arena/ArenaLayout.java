@@ -4,10 +4,11 @@ package com.insidethecube.orbitarena.arena;
  * The arena's shape, shared by the builder (server) and the crowd (client), all relative to the arena's
  * centre at floor level. Distances in blocks.
  * <p>
- * From the middle out: a stepped, lit dais; a pale centre floor with a white ring; a dark honeycomb floor
- * with glowing lines (the fighting floor, radius 40); a low wall; a lower deck of eight rows of stands;
- * a concourse with an orange band and floodlights; an upper deck of ten rows; the back wall and an
- * overhanging roof ring edged with light strips. Round all of it, an asteroid of rock.
+ * From the middle out: a raised, stepped dais topped with a hexagon of light, ringed by a band of light;
+ * a pale centre disc; a dark honeycomb floor with thin glowing lines and a pale rim (the fighting floor,
+ * radius 48); the two pedestals (3x3 on 5x5 on a black 7x7); a low wall; three tiers of stands, each
+ * eight rows, with a pale band between them carrying an orange stripe and lights; the back wall and an
+ * overhanging roof ring edged with light. Round all of it, an asteroid of rock.
  */
 public final class ArenaLayout {
 	private ArenaLayout() {}
@@ -15,22 +16,34 @@ public final class ArenaLayout {
 	/** Floor level (the floor blocks' y; you stand at FLOOR + 1). */
 	public static final int FLOOR = 64;
 	/** Where the fighting floor ends (the barrier keeps fighters inside it). */
-	public static final double FIGHT_RADIUS = 40.5;
+	public static final double FIGHT_RADIUS = 48.5;
 	/** How high fighters can go above the floor. */
-	public static final int CEILING = 40;
-	public static final double DAIS = 6.5, CENTRE = 15, WALL_IN = 41.5, WALL_OUT = 43;
-	public static final int LOWER_ROWS = 8, UPPER_ROWS = 10;
-	/** Each row of stands: two blocks deep, one block up. */
-	public static final int LOWER_BASE = 5, UPPER_BASE = 17;
-	public static final double LOWER_IN = 43, CONCOURSE_IN = 59, CONCOURSE_OUT = 62, UPPER_IN = 62;
-	public static final double BACK_WALL = 82, ROOF_IN = 70, ROOF_OUT = 85;
-	public static final int ROOF = 33;
-	/** The pedestals: you start on the west one, the first opponent on the east one. */
-	public static final int PEDESTAL_X = 27;
+	public static final int CEILING = 42;
+	/** The raised dais, the ring of light round it, and the pale centre disc. */
+	public static final double DAIS = 9.2, LIGHT_RING_IN = 9.6, LIGHT_RING_OUT = 11.2, CENTRE = 18;
+	/** The pale rim round the floor, and the wall. */
+	public static final double RIM = 46.4, WALL_IN = 49.5, WALL_OUT = 51;
+	/** The honeycomb: hexagons this far across (flats), lines one block wide. */
+	public static final double HEX = 9.5;
+
+	/** Three tiers of stands: where each starts (radius), its first row's top (above the floor), and its rows. */
+	public static final double[] TIER_IN = {51, 70, 89};
+	public static final int[] TIER_BASE = {5, 19, 33};
+	public static final int TIER_ROWS = 8;
+	/** Each row: two blocks deep, one block up. A tier ends at TIER_IN + 2 * TIER_ROWS. */
+	public static final double BAND = 3;
+	public static final double BACK_WALL = 105, ROOF_IN = 96, ROOF_OUT = 109;
+	public static final int ROOF = 46;
+	/** The pedestals: you start on the west one, the first opponent on the east one (on hexagon centres). */
+	public static final int PEDESTAL_X = 33;
+	/** You stand on the pedestal's top (its 3x3 is two blocks up). */
+	public static final int PEDESTAL_TOP = 3;
 	/** Arenas for different players sit this far apart along x. */
 	public static final int SPACING = 1024;
+	/** How far out the builder works (the rock's widest). */
+	public static final int SIZE = 138;
 
-	/** Angles (degrees) of the four tunnels at floor level and the four boxes in the upper deck. */
+	/** Angles (degrees) of the four tunnels at floor level and the four boxes in the middle tier. */
 	public static final double[] TUNNELS = {90, 270, 0, 180};
 	public static final double[] BOXES = {45, 135, 225, 315};
 
@@ -49,15 +62,21 @@ public final class ArenaLayout {
 		return d > 180 ? 360 - d : d;
 	}
 
-	/** Whether this angle falls in an aisle of the stands (steps every 30 degrees). */
+	/** Which tier a radius is in (0, 1, 2), or -1 outside the stands' rows. */
+	public static int tierAt(double r) {
+		for (int t = 0; t < TIER_IN.length; t++) if (r >= TIER_IN[t] && r < TIER_IN[t] + 2 * TIER_ROWS) return t;
+		return -1;
+	}
+
+	/** Whether this angle falls in an aisle of the stands (steps every 30 degrees, offset 15 so the boxes and tunnels sit between). */
 	public static boolean aisle(double angle, double r) {
-		double arc = Math.toRadians(angleDiff(angle, Math.round(angle / 30.0) * 30.0)) * r;
+		double arc = Math.toRadians(angleDiff(angle, Math.round((angle - 15) / 30.0) * 30.0 + 15)) * r;
 		return arc < 1.0;
 	}
 
-	/** Whether this angle falls in one of the boxes of the upper deck. */
+	/** Whether this angle falls in one of the boxes of the middle tier. */
 	public static boolean box(double angle) {
-		for (double b : BOXES) if (angleDiff(angle, b) < 7) return true;
+		for (double b : BOXES) if (angleDiff(angle, b) < 6) return true;
 		return false;
 	}
 
@@ -76,6 +95,12 @@ public final class ArenaLayout {
 		// Distance from the centre to the edge of a flat-topped hexagon, in the direction of p.
 		double edge = Math.max(pz, (px * Math.sqrt(3) + pz) / 2);
 		return Math.abs(size / 2 - edge);
+	}
+
+	/** How far (x, z) is from the centre of a flat-topped hexagon, in its own measure (1 at the flats). */
+	public static double hexRadius(double x, double z, double across) {
+		double px = Math.abs(x), pz = Math.abs(z);
+		return Math.max(pz, (px * Math.sqrt(3) + pz) / 2) / (across / 2);
 	}
 
 	/** A repeatable random number in [0, 1) for a position and a salt. */
@@ -101,30 +126,30 @@ public final class ArenaLayout {
 	/** The rock's outer edge at an angle (it bulges and dips round the arena). */
 	public static double rockOuter(double angleDeg) {
 		double a = Math.toRadians(angleDeg);
-		return 98 + 7 * noise(Math.cos(a) * 40, Math.sin(a) * 40, 9, 11) + 4 * noise(Math.cos(a) * 90, Math.sin(a) * 90, 6, 12);
+		return 121 + 9 * noise(Math.cos(a) * 40, Math.sin(a) * 40, 9, 11) + 5 * noise(Math.cos(a) * 90, Math.sin(a) * 90, 6, 12);
 	}
 
 	/** The rock's top surface (relative to the floor) at (x, z) beyond the back wall: rounded mounds. */
 	public static int rockTop(double x, double z) {
 		double r = radius(x, z), outer = rockOuter(angle(x, z));
 		double edge = Math.max(0, Math.min(1, (outer - r) / 10));
-		double mound = 6 * noise(x, z, 14, 21) + 3 * noise(x, z, 6, 22);
-		return (int) Math.round(ROOF - 2 + mound * edge - (1 - edge) * 8);
+		double mound = 7 * noise(x, z, 14, 21) + 3 * noise(x, z, 6, 22);
+		return (int) Math.round(ROOF - 3 + mound * edge - (1 - edge) * 10);
 	}
 
 	/** The asteroid's underside (relative to the floor) at radius r: a rounded belly. */
 	public static int rockBottom(double x, double z) {
 		double r = radius(x, z), outer = rockOuter(angle(x, z));
 		double t = Math.min(1, r / outer);
-		return (int) Math.round(-34 + 30 * t * t + 4 * noise(x, z, 8, 31));
+		return (int) Math.round(-40 + 36 * t * t + 4 * noise(x, z, 8, 31));
 	}
 
-	/** Where a fan stands: row's top surface + 1, and the row's centre radius. */
-	public static int seatY(boolean upper, int row) {
-		return (upper ? UPPER_BASE : LOWER_BASE) + row + 1;
+	/** Where a fan stands in a tier's row: the row's top surface + 1 (above the floor), and the row's centre radius. */
+	public static int seatY(int tier, int row) {
+		return TIER_BASE[tier] + row + 1;
 	}
 
-	public static double seatRadius(boolean upper, int row) {
-		return (upper ? UPPER_IN : LOWER_IN) + 2 * row + 1;
+	public static double seatRadius(int tier, int row) {
+		return TIER_IN[tier] + 2 * row + 1;
 	}
 }

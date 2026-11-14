@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -44,6 +45,10 @@ public final class Matches {
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Start.TYPE, (payload, ctx) -> start(ctx.player(), payload.settings().checked()));
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Leave.TYPE, (payload, ctx) -> forfeit(ctx.player()));
 		ServerTickEvents.END_SERVER_TICK.register(Matches::tick);
+		// The arena always fights at Normal, whatever the world's difficulty (Peaceful would delete every enemy).
+		ServerWorldEvents.LOAD.register((server, world) -> {
+			if (world.dimension() == OrbitArena.ARENA && world.getLevelData() instanceof ArenaDifficulty d) d.orbitarena$markArena();
+		});
 
 		// Losing a fight in the arena isn't dying: the match ends instead.
 		ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> {

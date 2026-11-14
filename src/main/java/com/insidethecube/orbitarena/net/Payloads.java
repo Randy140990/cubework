@@ -55,10 +55,15 @@ public final class Payloads {
 		}
 	}
 
-	/** Server to client: the crowd reacts (0 to 1: a hit, a kill, a win; negative: groans when you're hurt). */
-	public record Cheer(float strength) implements CustomPacketPayload {
+	/**
+	 * Server to client: something the crowd reacts to (one of the kinds below), and how big it was (0 to 1:
+	 * a glancing hit is small, a heavy one big).
+	 */
+	public record Cheer(int kind, float strength) implements CustomPacketPayload {
+		public static final int HIT = 0, KILL = 1, FIGHT = 2, WIN = 3, LOSS = 4, HURT = 5;
 		public static final Type<Cheer> TYPE = typeOf("cheer");
-		public static final StreamCodec<ByteBuf, Cheer> CODEC = ByteBufCodecs.FLOAT.map(Cheer::new, Cheer::strength);
+		public static final StreamCodec<ByteBuf, Cheer> CODEC = StreamCodec.composite(
+				ByteBufCodecs.VAR_INT, Cheer::kind, ByteBufCodecs.FLOAT, Cheer::strength, Cheer::new);
 
 		@Override
 		public Type<Cheer> type() {

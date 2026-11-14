@@ -46,6 +46,7 @@ public class OrbitArena implements ModInitializer {
 		FabricDefaultAttributeRegistry.register(FAN, Fan.createAttributes());
 		// Load the saved-things attachment before any player does.
 		Loadout.SAVED.identifier();
+		ArenaSounds.register();
 		Payloads.register();
 		Matches.register();
 	}

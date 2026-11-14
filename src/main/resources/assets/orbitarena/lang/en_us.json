@@ -7,5 +7,14 @@
 	"orbitarena.kit.spear": "Spear & Shield (diamond)",
 	"orbitarena.kit.archer": "Archer (bow, crossbow, iron)",
 	"orbitarena.kit.iron": "Iron Basics",
-	"orbitarena.kit.netherite": "Netherite Max"
+	"orbitarena.kit.netherite": "Netherite Max",
+	"subtitles.orbitarena.crowd.murmur": "Crowd murmurs",
+	"subtitles.orbitarena.crowd.cheer_small": "Crowd cheers",
+	"subtitles.orbitarena.crowd.cheer": "Crowd cheers",
+	"subtitles.orbitarena.crowd.roar": "Crowd roars",
+	"subtitles.orbitarena.crowd.uproar": "Crowd goes wild",
+	"subtitles.orbitarena.crowd.applause": "Crowd applauds",
+	"subtitles.orbitarena.crowd.applause_light": "Crowd claps",
+	"subtitles.orbitarena.crowd.ooh": "Crowd gasps",
+	"subtitles.orbitarena.crowd.aww": "Crowd groans"
 }

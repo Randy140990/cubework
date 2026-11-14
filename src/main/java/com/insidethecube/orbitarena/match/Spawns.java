@@ -53,11 +53,12 @@ final class Spawns {
 			x = m.centreX + PEDESTAL_X + 0.5;
 			z = 0.5;
 		} else {
-			double a = Math.toRadians(-70 + rnd.nextDouble() * 140), r = 22 + rnd.nextDouble() * 15;
+			// Round the far side of the floor, clear of the dais and its ring of light.
+			double a = Math.toRadians(-70 + rnd.nextDouble() * 140), r = 16 + rnd.nextDouble() * 28;
 			x = m.centreX + Math.cos(a) * r;
 			z = Math.sin(a) * r;
 		}
-		double y = index == 0 ? FLOOR + 2 : FLOOR + 1;
+		double y = index == 0 ? FLOOR + PEDESTAL_TOP : FLOOR + 1;
 		Mob mob = switch (m.settings.opponents()) {
 			case FIGHTERS -> fighter(level, d, rnd);
 			case MOBS -> mob(level, d, rnd);

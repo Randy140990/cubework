@@ -68,7 +68,7 @@ public final class Match {
 	}
 
 	Vec3 start() {
-		return new Vec3(centreX - PEDESTAL_X + 0.5, FLOOR + 2, 0.5);
+		return new Vec3(centreX - PEDESTAL_X + 0.5, FLOOR + PEDESTAL_TOP, 0.5);
 	}
 
 	AABB box() {
@@ -134,7 +134,7 @@ public final class Match {
 				if (ticks >= 60) {
 					title(Component.literal("FIGHT!").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), Component.empty(), 0, 20, 10);
 					sound(SoundEvents.PLAYER_LEVELUP, 1.4F);
-					cheer(0.8F);
+					cheer(Payloads.Cheer.FIGHT, 1.0F);
 					freezeEnemies(false);
 					phase = Phase.FIGHT;
 					ticks = 0;
@@ -143,7 +143,6 @@ public final class Match {
 			}
 			case FIGHT -> fight(arena);
 			case RESULT -> {
-				if (ticks % 30 == 1 && won) cheer(1.0F);
 				if (ticks >= 100) leave();
 			}
 			case LEAVING -> {
@@ -236,18 +235,18 @@ public final class Match {
 
 	void onEnemyHurt(float amount) {
 		dealt += amount;
-		cheer(0.25F);
+		cheer(Payloads.Cheer.HIT, Math.min(1, amount / 8));
 	}
 
 	void onEnemyDeath(LivingEntity e) {
 		if (!alive.remove(e)) return;
 		kills++;
-		cheer(0.65F);
+		cheer(Payloads.Cheer.KILL, kills >= settings.count() ? 1 : 0.7F);
 	}
 
 	void onPlayerHurt(float amount) {
 		taken += amount;
-		if (amount >= 4) cheer(-0.4F);
+		if (amount >= 4) cheer(Payloads.Cheer.HURT, Math.min(1, amount / 10));
 	}
 
 	/** The player would have died: it's a loss instead. */
@@ -275,7 +274,7 @@ public final class Match {
 		title(Component.literal(won ? "VICTORY" : forfeit ? "LEFT THE ARENA" : "DEFEAT").withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED, ChatFormatting.BOLD),
 				Component.literal(reason + " · " + clock(secs)), 5, 70, 20);
 		sound(won ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.BEACON_DEACTIVATE, 1.0F);
-		cheer(won ? 1.0F : -0.6F);
+		cheer(won ? Payloads.Cheer.WIN : Payloads.Cheer.LOSS, 1.0F);
 		player.sendSystemMessage(Component.literal("Orbit Arena · " + (won ? "Victory" : "Defeat") + " · " + subtitle()).withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED));
 		player.sendSystemMessage(Component.literal(String.format(" Time %s · Beaten %d of %d · Damage dealt %.0f · Damage taken %.0f", clock(secs), kills, settings.count(), dealt, taken))
 				.withStyle(ChatFormatting.GRAY));
@@ -319,8 +318,8 @@ public final class Match {
 		ServerPlayNetworking.send(player, new Payloads.State(in, centreX, phase == Phase.FIGHT || phase == Phase.COUNTDOWN));
 	}
 
-	private void cheer(float strength) {
-		ServerPlayNetworking.send(player, new Payloads.Cheer(strength));
+	private void cheer(int kind, float strength) {
+		ServerPlayNetworking.send(player, new Payloads.Cheer(kind, strength));
 	}
 
 	private void title(Component title, Component sub, int in, int stay, int out) {

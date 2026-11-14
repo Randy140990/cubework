@@ -1,0 +1,103 @@
+{
+  "crowd.murmur": {
+    "subtitle": "subtitles.orbitarena.crowd.murmur",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/murmur",
+        "stream": true
+      }
+    ]
+  },
+  "crowd.cheer_small": {
+    "subtitle": "subtitles.orbitarena.crowd.cheer_small",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/cheer_small_1",
+        "stream": false
+      },
+      {
+        "name": "orbitarena:crowd/cheer_small_2",
+        "stream": false
+      },
+      {
+        "name": "orbitarena:crowd/cheer_small_3",
+        "stream": false
+      }
+    ]
+  },
+  "crowd.cheer": {
+    "subtitle": "subtitles.orbitarena.crowd.cheer",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/cheer_1",
+        "stream": false
+      },
+      {
+        "name": "orbitarena:crowd/cheer_2",
+        "stream": false
+      },
+      {
+        "name": "orbitarena:crowd/cheer_3",
+        "stream": false
+      }
+    ]
+  },
+  "crowd.roar": {
+    "subtitle": "subtitles.orbitarena.crowd.roar",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/roar",
+        "stream": false
+      }
+    ]
+  },
+  "crowd.uproar": {
+    "subtitle": "subtitles.orbitarena.crowd.uproar",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/uproar",
+        "stream": true
+      }
+    ]
+  },
+  "crowd.applause": {
+    "subtitle": "subtitles.orbitarena.crowd.applause",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/applause",
+        "stream": true
+      }
+    ]
+  },
+  "crowd.applause_light": {
+    "subtitle": "subtitles.orbitarena.crowd.applause_light",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/applause_light",
+        "stream": false
+      }
+    ]
+  },
+  "crowd.ooh": {
+    "subtitle": "subtitles.orbitarena.crowd.ooh",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/ooh_1",
+        "stream": false
+      },
+      {
+        "name": "orbitarena:crowd/ooh_2",
+        "stream": false
+      }
+    ]
+  },
+  "crowd.aww": {
+    "subtitle": "subtitles.orbitarena.crowd.aww",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/aww",
+        "stream": false
+      }
+    ]
+  }
+}

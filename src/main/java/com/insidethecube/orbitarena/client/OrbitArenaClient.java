@@ -25,8 +25,9 @@ public class OrbitArenaClient implements ClientModInitializer {
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.State.TYPE, (p, ctx) -> {
 			if (p.inArena()) Crowd.setCentre(p.centreX());
+			Crowd.setFighting(p.inArena() && p.fighting());
 		});
-		ClientPlayNetworking.registerGlobalReceiver(Payloads.Cheer.TYPE, (p, ctx) -> Crowd.cheer(p.strength()));
+		ClientPlayNetworking.registerGlobalReceiver(Payloads.Cheer.TYPE, (p, ctx) -> Crowd.react(p.kind(), p.strength()));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fade.TYPE, (p, ctx) -> Fade.start(p.out(), p.hold(), p.in()));
 		ClientTickEvents.END_CLIENT_TICK.register(Crowd::tick);
 		HudElementRegistry.addLast(OrbitArena.id("fade"), Fade::render);

@@ -1,11 +1,14 @@
 package com.insidethecube.orbitarena.client;
 
 import com.insidethecube.orbitarena.OrbitArena;
+import com.insidethecube.orbitarena.arena.ArenaLayout;
 import com.insidethecube.orbitarena.entity.Fan;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 
 /** Draws the fans: one of the fan looks, with or without a sign, a little taller or shorter. */
 public class FanRenderer extends HumanoidMobRenderer<Fan, FanRenderState, FanModel> {
@@ -32,10 +35,36 @@ public class FanRenderer extends HumanoidMobRenderer<Fan, FanRenderState, FanMod
 		super.extractRenderState(fan, state, partial);
 		state.look = fan.look;
 		state.sign = fan.sign;
-		state.phase = fan.phase;
 		state.height = fan.height;
-		state.excitement = Crowd.excitement(fan.phase);
+		Minecraft mc = Minecraft.getInstance();
+		float now = (mc.level == null ? 0 : mc.level.getGameTime()) + partial;
+		state.time = now + fan.phase * 997;
+		state.energy = Crowd.energy();
 		state.groan = Crowd.groan();
+		// What it's doing: a new choice every 2.5 to 4.5 seconds, its own beat, livelier as the crowd is.
+		float slotLength = 50 + fan.phase * 40;
+		float at = (now + fan.phase * 1234) / slotLength;
+		long slot = (long) Math.floor(at);
+		float local = at - slot;
+		long seed = (long) (fan.phase * 1_000_003);
+		state.action = FanModel.choose(ArenaLayout.hash(seed, slot, fan.sign, 7), state.energy, Crowd.cheering(), state.groan, fan.sign >= 0);
+		float edge = Math.min(local, 1 - local) / 0.15F;
+		state.blend = edge >= 1 ? 1 : edge * edge * (3 - 2 * edge);
+		// The Mexican wave lifts the fans it's passing.
+		float wave = Crowd.waveAngle(now);
+		if (Float.isNaN(wave)) state.wave = 0;
+		else {
+			float d = (float) ArenaLayout.angleDiff(fan.seatAngle, wave);
+			state.wave = d < 14 ? 0.5F + 0.5F * Mth.cos(d / 14 * Mth.PI) : 0;
+		}
+		// Every head follows you (each a little off, and drifting).
+		if (mc.player != null) {
+			double dx = mc.player.getX() - fan.getX(), dz = mc.player.getZ() - fan.getZ(), dy = mc.player.getEyeY() - fan.getEyeY();
+			float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+			float off = (fan.phase - 0.5F) * 24 + Mth.sin(state.time * 0.02F) * 8;
+			state.yRot = Mth.clamp(Mth.wrapDegrees(yaw - state.bodyRot + off), -70, 70);
+			state.xRot = Mth.clamp((float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz))), -35, 40);
+		}
 	}
 
 	@Override
