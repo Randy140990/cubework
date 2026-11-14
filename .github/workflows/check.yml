@@ -83,6 +83,11 @@ jobs:
               done
             done < ci/check-find.txt
           fi
+          # A test jar too, when asked for (ci/jar) and the code compiles: out/<version>/*.jar.
+          if [ -f ci/jar ] && grep -q "exit=0" "$O/compile.txt"; then
+            ./gradlew -p "build/v/$T" build -x test > "$O/jar.txt" 2>&1; echo "exit=$?" >> "$O/jar.txt"
+            cp $(ls build/v/$T/build/libs/*.jar | grep -v -- '-sources.jar') "$O/" 2>/dev/null
+          fi
           # Signatures of the classes in ci/check-classes.txt ("c some.Class" adds the bytecode).
           if [ -s ci/check-classes.txt ]; then
             while read -r cls; do

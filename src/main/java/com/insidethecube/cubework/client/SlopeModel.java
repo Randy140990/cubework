@@ -27,12 +27,13 @@ public final class SlopeModel {
 	private SlopeModel() {}
 
 	/** The slope's quads for one block state, from the vanilla block's textures. */
-	static Models.Built build(Material material, BlockState state, Function<String, TextureAtlasSprite> sprite) {
+	/** The slope in this state, turning the corner given by joins (see SlopeBlock.shape). */
+	static Models.Built build(Material material, BlockState state, int joins, Function<String, TextureAtlasSprite> sprite) {
 		Material.Textures t = material.textures();
 		Sprites s = new Sprites(sprite.apply(t.top()), sprite.apply(t.side()), sprite.apply(t.bottom()),
 				t.overlay() == null ? null : sprite.apply(t.overlay()), material.grassTinted());
 		SlopeBlock block = (SlopeBlock) state.getBlock();
-		return new Models.Built(quads(state, s, block.base(state) / 16.0, block.rise(state) / 16.0, material.height() / 16.0,
+		return new Models.Built(quads(state, SlopeBlock.shape(joins), s, block.base(state) / 16.0, block.rise(state) / 16.0, material.height() / 16.0,
 				block instanceof GentleSlopeBlock), s.side());
 	}
 
@@ -43,9 +44,8 @@ public final class SlopeModel {
 	 * base and rise: where the slope starts and how far it climbs (as parts of a block); top: the block's
 	 * height; world: hang side textures from the block's top (gentle steps line up) rather than the slope.
 	 */
-	private static Models.Quads quads(BlockState state, Sprites s, double base, double rise, double height, boolean world) {
+	private static Models.Quads quads(BlockState state, StairsShape shape, Sprites s, double base, double rise, double height, boolean world) {
 		Direction f = state.getValue(SlopeBlock.FACING);
-		StairsShape shape = state.getValue(SlopeBlock.SHAPE);
 		boolean top = state.getValue(SlopeBlock.HALF) == Half.TOP;
 		Map<Direction, List<BakedQuad>> out = new EnumMap<>(Direction.class);
 		List<BakedQuad> free = new ArrayList<>();
