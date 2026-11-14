@@ -919,18 +919,25 @@ def window_frame(mat, kind, name, depth, diamond):
     model(name + "_inventory", m("template_%swindow_%d_inventory" % ("diamond_" if diamond else "", depth)), t)
     side = {"l": "left", "r": "right", "b": "down", "t": "up"}
     parts = []
-    for f in HORIZONTAL:
-        apply = lambda p: {"model": m("%s_%s" % (name, p)), "y": Y_FROM_NORTH[f], "uvlock": True}
-        for p in pieces:
-            if p.startswith("bar_"):
-                key = {"bar_left": "left", "bar_right": "right", "bar_bottom": "down", "bar_top": "up"}[p]
-                parts.append({"when": {"facing": f, key: "false"}, "apply": apply(p)})
-            elif p.startswith("corner_"):
-                v, h = side[p[-2]], side[p[-1]]
-                parts.append({"when": {"OR": [{"facing": f, v: "false"}, {"facing": f, h: "false"}]}, "apply": apply(p)})
-            else:
-                v, h = side[p[-2]], side[p[-1]]
-                parts.append({"when": {"facing": f, v: "false", h: "false"}, "apply": apply(p)})
+    # Upright on a wall, or tipped flat onto the floor (x 90: its top towards the north) or against the
+    # ceiling (x 270), as WindowFrameBlock's hit box.
+    for face, x in (("wall", 0), ("floor", 90), ("ceiling", 270)):
+        for f in HORIZONTAL:
+            def apply(p, f=f, x=x):
+                a = {"model": m("%s_%s" % (name, p)), "y": Y_FROM_NORTH[f], "uvlock": True}
+                if x:
+                    a["x"] = x
+                return a
+            for p in pieces:
+                if p.startswith("bar_"):
+                    key = {"bar_left": "left", "bar_right": "right", "bar_bottom": "down", "bar_top": "up"}[p]
+                    parts.append({"when": {"face": face, "facing": f, key: "false"}, "apply": apply(p)})
+                elif p.startswith("corner_"):
+                    v, h = side[p[-2]], side[p[-1]]
+                    parts.append({"when": {"OR": [{"face": face, "facing": f, v: "false"}, {"face": face, "facing": f, h: "false"}]}, "apply": apply(p)})
+                else:
+                    v, h = side[p[-2]], side[p[-1]]
+                    parts.append({"when": {"face": face, "facing": f, v: "false", h: "false"}, "apply": apply(p)})
     blockstate(name, {"multipart": parts})
     item(name, m(name + "_inventory"))
 

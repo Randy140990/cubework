@@ -78,7 +78,7 @@ public final class RoundModel {
 			float[][] uvTop = flatUv(capTop), uvBottom = flatUv(capBottom);
 			if (fitEnds) {
 				float k = (float) (0.5 / r);
-				for (float[][] uv : new float[][][] {uvTop, uvBottom}) for (float[] c : uv) {
+				for (float[][] cap : new float[][][] {uvTop, uvBottom}) for (float[] c : cap) {
 					c[0] = 0.5f + (c[0] - 0.5f) * k;
 					c[1] = 0.5f + (c[1] - 0.5f) * k;
 				}
