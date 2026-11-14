@@ -1,0 +1,2 @@
+grep register\(|\.(visual|gameplay)  net/minecraft/world/attribute/EnvironmentAttributes.java
+net/minecraft/world/attribute/EnvironmentAttributes.java
