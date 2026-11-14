@@ -1,6 +1,3 @@
-net/minecraft/client/renderer/block/model/BlockModelDefinition.java
-net/minecraft/client/renderer/block/model/multipart/MultiPartModel.java
+grep requiresRender|visualEqualityGroup|ModelGroupCollector net/minecraft/client/resources/model/ModelManager.java
 net/minecraft/client/renderer/block/model/BlockStateModel.java
-net/minecraft/client/resources/model/BlockStateModelLoader.java
-net/minecraft/world/level/block/state/BlockBehaviour.java
-net/minecraft/client/renderer/block/ModelBlockRenderer.java
+net/minecraft/client/multiplayer/ClientLevel.java
