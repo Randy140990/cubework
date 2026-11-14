@@ -50,6 +50,26 @@ jobs:
               esac
             done < ci/check-classes.txt
           fi
+          # Vanilla sources (Loom's decompiler, Mojang names) for the paths in ci/check-sources.txt (one a
+          # line: a class path, or "grep PATTERN path" for the matching lines only), and data files.
+          if [ -s ci/check-sources.txt ]; then
+            ./gradlew genSources > out/gensources.txt 2>&1
+            SJAR=$(find ~/.gradle .gradle -name "minecraft-merged*sources.jar" 2>/dev/null | head -n 1)
+            echo "sources: $SJAR" >> out/gensources.txt
+            mkdir -p out/src
+            while read -r line; do
+              [ -z "$line" ] && continue
+              case "$line" in
+                "grep "*) rest="${line#grep }"; pat="${rest%% *}"; f="${rest#* }"
+                  unzip -p "$SJAR" "$f" 2>/dev/null | grep -n -E "$pat" > "out/src/$(basename $f).grep.txt" ;;
+                "data "*) f="${line#data }"
+                  for J in $(find ~/.gradle .gradle -name "*.jar" 2>/dev/null | grep -i -E "minecraft|server|client" | grep -v sources); do
+                    unzip -p "$J" "$f" > "out/src/$(basename $f)" 2>/dev/null && [ -s "out/src/$(basename $f)" ] && break
+                  done ;;
+                *) unzip -p "$SJAR" "$line" > "out/src/$(basename $line)" 2>/dev/null ;;
+              esac
+            done < ci/check-sources.txt
+          fi
           exit 0
       - name: Save
         continue-on-error: true

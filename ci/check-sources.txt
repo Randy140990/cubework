@@ -1,0 +1,27 @@
+net/minecraft/client/renderer/entity/ZombieRenderer.java
+net/minecraft/client/renderer/entity/AbstractZombieRenderer.java
+net/minecraft/client/renderer/entity/HumanoidMobRenderer.java
+net/minecraft/client/renderer/entity/ArmorModelSet.java
+net/minecraft/client/renderer/entity/SkeletonRenderer.java
+net/minecraft/client/renderer/entity/AbstractSkeletonRenderer.java
+net/minecraft/client/renderer/entity/player/AvatarRenderer.java
+net/minecraft/client/renderer/entity/state/HumanoidRenderState.java
+net/minecraft/client/model/HumanoidModel.java
+net/minecraft/client/model/player/PlayerModel.java
+net/minecraft/client/model/PlayerModel.java
+net/minecraft/client/renderer/SkyRenderer.java
+net/minecraft/client/gui/screens/PauseScreen.java
+net/minecraft/world/attribute/EnvironmentAttributes.java
+net/minecraft/world/level/dimension/DimensionType.java
+net/minecraft/world/entity/monster/zombie/Zombie.java
+net/minecraft/world/entity/monster/skeleton/AbstractSkeleton.java
+net/minecraft/world/entity/ai/goal/MeleeAttackGoal.java
+net/minecraft/world/entity/monster/Monster.java
+grep (SPEAR|MACE|NETHERITE_SWORD|SHIELD) net/minecraft/world/item/Items.java
+grep (ZOMBIE|SKELETON|ARMOR_STAND) = net/minecraft/world/entity/EntityType.java
+grep (teleport|changeDimension) net/minecraft/server/level/ServerPlayer.java
+grep (addEntity|removeEntity) net/minecraft/client/multiplayer/ClientLevel.java
+grep (Builder|build|sized|of\() net/minecraft/world/entity/EntityType.java
+data data/minecraft/dimension_type/the_end.json
+data data/minecraft/dimension_type/overworld.json
+data data/minecraft/dimension/the_end.json
