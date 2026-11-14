@@ -6,6 +6,7 @@ public enum Shape {
 	STAIRS_2("stairs_2", "Stairs (1 in 2)", 2),
 	STAIRS_3("stairs_3", "Stairs (1 in 3)", 2),
 	STAIRS_4("stairs_4", "Stairs (1 in 4)", 2),
+	STAIR_CURVE("stair_curve", "Stair Curve", 1),
 	SLAB("slab", "Slab", 2),
 	QUARTER_SLAB("quarter_slab", "Quarter Slab", 4),
 	VERTICAL_SLAB("vertical_slab", "Vertical Slab", 2),
@@ -105,7 +106,7 @@ public enum Shape {
 	public boolean drawnInCode() {
 		return switch (this) {
 			case SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE, ARCH, ARCH_CORNER, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_CORNER,
-					ROUND_CORNER_INNER, ROUND_WINDOW_4, ROUND_WINDOW_8, ROUND_WINDOW_12, ROUND_WINDOW_16 -> true;
+					ROUND_CORNER_INNER, ROUND_WINDOW_4, ROUND_WINDOW_8, ROUND_WINDOW_12, ROUND_WINDOW_16, STAIR_CURVE -> true;
 			default -> false;
 		};
 	}
@@ -125,7 +126,7 @@ public enum Shape {
 	public Group group() {
 		return switch (this) {
 			case SLAB, QUARTER_SLAB, VERTICAL_SLAB, LAYER, VERTICAL_LAYER, CARPET, PANEL -> Group.SLABS;
-			case STAIRS, STAIRS_2, STAIRS_3, STAIRS_4, SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE -> Group.STAIRS;
+			case STAIRS, STAIRS_2, STAIRS_3, STAIRS_4, STAIR_CURVE, SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE -> Group.STAIRS;
 			case POST, PILLAR_12, PILLAR_8, PILLAR_4, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, CORNER_POST -> Group.PILLARS;
 			case ARCH, ARCH_CORNER, ROUND_CORNER, ROUND_CORNER_INNER -> Group.CURVES;
 			case WALL, FENCE, FENCE_GATE -> Group.WALLS;

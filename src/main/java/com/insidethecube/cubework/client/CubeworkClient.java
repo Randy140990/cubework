@@ -100,6 +100,12 @@ public final class CubeworkClient implements ClientModInitializer {
 					if (!shape.drawnInCode()) continue;
 					Block block = CwBlocks.get(m, shape);
 					if (block == null) continue;
+					if (shape == Shape.STAIR_CURVE) {
+						// 35 pieces in four facings: quads made when first drawn.
+						Material.Textures t = m.textures();
+						Models.registerLazy(ctx, block, List.of(t.top(), t.side(), t.bottom()), t.side(), (state, sprites) -> StairCurveModel.build(m, state, sprites));
+						continue;
+					}
 					if (shape.round()) {
 						// Round window frames have many states (every way of joining): their quads are made when first drawn.
 						Material.Textures t = m.textures();
