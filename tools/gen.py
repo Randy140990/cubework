@@ -95,7 +95,7 @@ def is_building(mat):
 
 def full_model(mat):
     """The vanilla full block's model (waxed copper uses unwaxed copper's; patterns their own)."""
-    if mat in PATTERN_OF:
+    if mat in PATTERN_OF or mat in WALLPAPERS:
         return m(mat)
     return "minecraft:block/" + (mat[6:] if mat.startswith("waxed_") else mat)
 
