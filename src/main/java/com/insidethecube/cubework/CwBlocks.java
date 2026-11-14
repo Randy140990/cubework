@@ -23,6 +23,7 @@ import com.insidethecube.cubework.block.WindowFrameBlock;
 import com.insidethecube.cubework.block.CornerPostBlock;
 import com.insidethecube.cubework.block.PatternBlock;
 import com.insidethecube.cubework.block.PitchStairsBlock;
+import com.insidethecube.cubework.block.StairCurveBlock;
 import com.insidethecube.cubework.block.TrimBlock;
 import com.insidethecube.cubework.block.RoundColumnBlock;
 import com.insidethecube.cubework.block.RoundCornerBlock;
@@ -159,6 +160,7 @@ public final class CwBlocks {
 			case STAIRS_3 -> set -> new PitchStairsBlock.Over3(m, set);
 			case STAIRS_4 -> set -> new PitchStairsBlock(m, set);
 			case TRIM_2, TRIM_4, TRIM_8 -> set -> new TrimBlock(m, s.trimWidth(), set);
+			case STAIR_CURVE -> set -> new StairCurveBlock(m, set);
 			case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8 -> set -> new RoundColumnBlock(m, s.columnWidth(), set);
 			case CORNER_POST -> set -> new CornerPostBlock(m, set);
 			case ROUND_CORNER -> set -> new RoundCornerBlock(m, false, set);
