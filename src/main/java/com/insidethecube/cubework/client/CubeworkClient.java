@@ -79,6 +79,8 @@ public final class CubeworkClient implements ClientModInitializer {
 		for (Block b : Extras.SIZED_PLANTS) Layers.cutout(b);
 		for (Block b : Extras.CORAL) Layers.cutout(b);
 		for (Block b : Extras.DOORS) Layers.cutout(b);
+		for (Block b : Extras.TRAPDOORS) Layers.cutout(b);
+		for (Block b : Extras.GLASS_TABLES) Layers.translucent(b);
 
 		// Grass shapes, grass, ferns and bushes take the biome's grass colour.
 		//#if MC >= 26.1
@@ -114,12 +116,17 @@ public final class CubeworkClient implements ClientModInitializer {
 					}
 					Models.Maker maker = switch (shape) {
 						case ARCH, ARCH_CORNER -> (state, sprites) -> ArchModel.build(m, state, sprites);
-						case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_CORNER, ROUND_CORNER_INNER ->
+						case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, ROUND_CORNER, ROUND_CORNER_INNER ->
 								(state, sprites) -> RoundModel.build(m, state, sprites);
 						default -> (state, sprites) -> SlopeModel.build(m, state, sprites);
 					};
 					Models.register(ctx, block, maker);
 				}
+			}
+			// Round logs: bark round the sides, rings on the ends.
+			for (java.util.Map.Entry<Block, String[]> e : Extras.ROUND_LOG_TEXTURES.entrySet()) {
+				String side = e.getValue()[0], end = e.getValue()[1];
+				Models.register(ctx, e.getKey(), (state, sprites) -> RoundModel.buildLog(side, end, state, sprites));
 			}
 		});
 	}

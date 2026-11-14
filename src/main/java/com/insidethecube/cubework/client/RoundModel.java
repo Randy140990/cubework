@@ -28,11 +28,20 @@ public final class RoundModel {
 		TextureAtlasSprite top = sprite.apply(t.top()), side = sprite.apply(t.side()), bottom = sprite.apply(t.bottom());
 		Out out = new Out();
 		if (state.getBlock() instanceof RoundColumnBlock column) {
-			column(out, column.width / 32.0, state.getValue(RoundColumnBlock.AXIS), top, side, bottom);
+			column(out, column.width / 32.0, state.getValue(RoundColumnBlock.AXIS), top, side, bottom, false);
 		} else {
 			RoundCornerBlock corner = (RoundCornerBlock) state.getBlock();
 			corner(out, state.getValue(RoundCornerBlock.FACING), corner.inner, top, side, bottom);
 		}
+		return new Models.Built(new Models.Quads(out.sided, out.free), side);
+	}
+
+	/** A round log or stem: bark round the sides, the rings shrunk to fit the ends. */
+	static Models.Built buildLog(String sideTexture, String endTexture, BlockState state, Function<String, TextureAtlasSprite> sprite) {
+		TextureAtlasSprite side = sprite.apply(sideTexture), end = sprite.apply(endTexture);
+		Out out = new Out();
+		RoundColumnBlock column = (RoundColumnBlock) state.getBlock();
+		column(out, column.width / 32.0, state.getValue(RoundColumnBlock.AXIS), end, side, end, true);
 		return new Models.Built(new Models.Quads(out.sided, out.free), side);
 	}
 
@@ -49,7 +58,8 @@ public final class RoundModel {
 
 	// ---------- columns ----------
 
-	private static void column(Out out, double r, Direction.Axis axis, TextureAtlasSprite top, TextureAtlasSprite side, TextureAtlasSprite bottom) {
+	/** fitEnds: the end texture is shrunk to the end (a log's rings) instead of cut from the middle of it. */
+	private static void column(Out out, double r, Direction.Axis axis, TextureAtlasSprite top, TextureAtlasSprite side, TextureAtlasSprite bottom, boolean fitEnds) {
 		int n = RoundGeometry.SEGMENTS;
 		// A quarter turn's length of texture, centred on the texture.
 		double span = Math.min(1, Math.PI * r / 2), u0 = 0.5 - span / 2;
@@ -65,8 +75,16 @@ public final class RoundModel {
 			// The ends, as fans of triangles from the middle.
 			double[][] capTop = {{0.5, 1, 0.5}, {p0[0], 1, p0[1]}, {p1[0], 1, p1[1]}, {p1[0], 1, p1[1]}};
 			double[][] capBottom = {{0.5, 0, 0.5}, {p0[0], 0, p0[1]}, {p1[0], 0, p1[1]}, {p1[0], 0, p1[1]}};
-			emit(out, top, capTop, flatUv(capTop), new double[] {0, 1, 0}, axis, Direction.UP);
-			emit(out, axis == Direction.Axis.Y ? bottom : top, capBottom, flatUv(capBottom), new double[] {0, -1, 0}, axis, Direction.DOWN);
+			float[][] uvTop = flatUv(capTop), uvBottom = flatUv(capBottom);
+			if (fitEnds) {
+				float k = (float) (0.5 / r);
+				for (float[][] uv : new float[][][] {uvTop, uvBottom}) for (float[] c : uv) {
+					c[0] = 0.5f + (c[0] - 0.5f) * k;
+					c[1] = 0.5f + (c[1] - 0.5f) * k;
+				}
+			}
+			emit(out, top, capTop, uvTop, new double[] {0, 1, 0}, axis, Direction.UP);
+			emit(out, axis == Direction.Axis.Y ? bottom : top, capBottom, uvBottom, new double[] {0, -1, 0}, axis, Direction.DOWN);
 		}
 	}
 

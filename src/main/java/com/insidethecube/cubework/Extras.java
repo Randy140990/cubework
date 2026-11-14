@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.function.Function;
 
 import com.insidethecube.cubework.block.ColouredDoorBlock;
+import com.insidethecube.cubework.block.RoundLogBlock;
 import com.insidethecube.cubework.block.SizedCoralBlock;
 import com.insidethecube.cubework.block.SizedPlantBlock;
 import com.insidethecube.cubework.block.TableBlock;
@@ -20,6 +21,7 @@ import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
@@ -38,10 +40,15 @@ public final class Extras {
 	/** Plant sizes, in percent. Low plants go a little taller than the rest. */
 	public static final int[] LOW_SIZES = {50, 75, 125, 150, 175};
 	public static final int[] PLANT_SIZES = {50, 75, 125, 150};
-	public static final String[] LOW_PLANTS = {"short_grass", "fern", "short_dry_grass", "bush"};
+	public static final String[] LOW_PLANTS = {"short_grass", "fern", "short_dry_grass", "tall_dry_grass", "bush"};
 	public static final String[] PLANTS = {"red_mushroom", "brown_mushroom", "crimson_fungus", "warped_fungus", "dandelion", "poppy", "blue_orchid",
 			"allium", "azure_bluet", "red_tulip", "orange_tulip", "white_tulip", "pink_tulip", "oxeye_daisy", "cornflower", "lily_of_the_valley",
-			"torchflower", "wither_rose"};
+			"torchflower", "wither_rose", "oak_sapling", "spruce_sapling", "birch_sapling", "jungle_sapling", "acacia_sapling", "dark_oak_sapling",
+			"cherry_sapling", "pale_oak_sapling", "dead_bush", "cactus_flower", "closed_eyeblossom", "open_eyeblossom", "firefly_bush",
+			"crimson_roots", "warped_roots"};
+	/** Two-block plants, drawn whole inside one block at half and three-quarter size. */
+	public static final String[] TALL_PLANTS = {"tall_grass", "large_fern", "sunflower", "lilac", "rose_bush", "peony"};
+	public static final int[] TALL_SIZES = {50, 75};
 
 	/** Coral and coral fans (living ones die out of water into the dead ones of the same size). */
 	public static final String[] CORALS = {"tube", "brain", "bubble", "fire", "horn"};
@@ -52,8 +59,8 @@ public final class Extras {
 	public static final String[] METAL_DOORS = {"iron", "gold", "redstone", "emerald", "lapis", "diamond", "netherite"};
 
 	/**
-	 * Table tops: terracotta (plain and 16 colours), glazed terracotta, stripped woods, and smooth stones,
-	 * tuff, resin and quartz. Every top comes with oak legs and with legs in each concrete colour.
+	 * Table tops: terracotta (plain and 16 colours), glazed terracotta, stripped woods, smooth stones,
+	 * tuff, resin and quartz, and glass (clear and 16 colours). Every top comes with oak legs and with legs in each concrete colour.
 	 */
 	public static final String[] TABLE_TOPS = tableTops();
 	public static final List<Block> TABLES = new ArrayList<>();
@@ -66,7 +73,8 @@ public final class Extras {
 		for (String w : new String[] {"oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "pale_oak"}) out.add("stripped_" + w + "_wood");
 		out.addAll(List.of("stripped_crimson_hyphae", "stripped_warped_hyphae", "stripped_bamboo_block", "smooth_stone", "polished_granite",
 				"polished_diorite", "polished_andesite", "chiseled_deepslate", "tuff", "polished_tuff", "chiseled_tuff", "chiseled_resin_bricks",
-				"quartz_block", "chiseled_quartz_block", "quartz_bricks", "smooth_quartz"));
+				"quartz_block", "chiseled_quartz_block", "quartz_bricks", "smooth_quartz", "glass"));
+		for (String c : Material.COLOURS) out.add(c + "_stained_glass");
 		return out.toArray(String[]::new);
 	}
 
@@ -75,6 +83,9 @@ public final class Extras {
 			"crimson", "warped"};
 
 	public static final List<Block> THIN_LOGS = new ArrayList<>();
+	/** Round logs and stems (for masts, posts and round beams), and the textures each is drawn with: {side, end}. */
+	public static final List<Block> ROUND_LOGS = new ArrayList<>();
+	public static final java.util.Map<Block, String[]> ROUND_LOG_TEXTURES = new java.util.IdentityHashMap<>();
 	public static final List<Block> SIZED_PLANTS = new ArrayList<>();
 	public static final List<Block> CORAL = new ArrayList<>();
 	/** Each thin log's stripped one (an axe strips them as it strips logs). */
@@ -82,25 +93,35 @@ public final class Extras {
 	/** Grass, fern and bush sizes, which take the biome's grass colour. */
 	public static final List<Block> GRASSY_PLANTS = new ArrayList<>();
 	public static final List<Block> DOORS = new ArrayList<>();
+	/** Trapdoors in the 16 colours (each wood keeps its pattern) and the copper trapdoor's pattern in metals and gems. */
+	public static final List<Block> TRAPDOORS = new ArrayList<>();
 
 	public static void register() {
 		logs();
 		plants();
 		coral();
 		doors();
+		trapdoors();
 		tables();
 	}
 
+	/** Glass table tops (2 pixels thick): see-through, so drawn in the translucent layer. */
+	public static final List<Block> GLASS_TABLES = new ArrayList<>();
+
 	private static void tables() {
-		for (String top : TABLE_TOPS) {
-			if (!Reg.exists(top)) continue;
-			Block base = vanilla(top);
-			boolean wood = top.startsWith("stripped_");
-			for (String legs : tableLegs()) {
-				String name = top + "_table" + (legs.equals("oak") ? "" : "_" + legs + "_legs");
-				Block b = block(name, settings(base).noOcclusion(), set -> new TableBlock(legs, set));
-				TABLES.add(b);
-				if (wood && !top.contains("crimson") && !top.contains("warped")) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 20);
+		// Low tables, then tall ones (the top level with a full block).
+		for (boolean tall : new boolean[] {false, true}) {
+			for (String top : TABLE_TOPS) {
+				if (!Reg.exists(top)) continue;
+				Block base = vanilla(top);
+				boolean wood = top.startsWith("stripped_"), glass = top.endsWith("glass");
+				for (String legs : tableLegs()) {
+					String name = top + (tall ? "_tall" : "") + "_table" + (legs.equals("oak") ? "" : "_" + legs + "_legs");
+					Block b = block(name, settings(base).noOcclusion(), set -> new TableBlock(legs, tall, glass, set));
+					TABLES.add(b);
+					if (glass) GLASS_TABLES.add(b);
+					if (wood && !top.contains("crimson") && !top.contains("warped")) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 20);
+				}
 			}
 		}
 	}
@@ -128,13 +149,22 @@ public final class Extras {
 				THIN_LOGS.add(b);
 				if (burns) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 5);
 			}
+			String end = log.equals("mushroom_stem") ? "mushroom_block_inside" : log + "_top";
+			for (int w : LOG_WIDTHS) {
+				Block b = block("round_" + log + "_" + w, settings(base).noOcclusion(), set -> new RoundLogBlock(w, set));
+				ROUND_LOGS.add(b);
+				ROUND_LOG_TEXTURES.put(b, new String[] {log, end});
+				if (burns) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 5);
+			}
 		}
 		for (String log : LOGS) {
 			if (log.equals("mushroom_stem") || !Reg.exists(log)) continue;
 			for (int w : LOG_WIDTHS) {
 				STRIPPED.put(get(log + "_" + w), get("stripped_" + log + "_" + w));
+				STRIPPED.put(get("round_" + log + "_" + w), get("round_stripped_" + log + "_" + w));
 				//#if MC < 26.3
 				StrippableBlockRegistry.register(get(log + "_" + w), get("stripped_" + log + "_" + w));
+				StrippableBlockRegistry.register(get("round_" + log + "_" + w), get("round_stripped_" + log + "_" + w));
 				//#endif
 			}
 		}
@@ -143,14 +173,24 @@ public final class Extras {
 	private static void plants() {
 		for (String p : LOW_PLANTS) for (int size : LOW_SIZES) plant(p, size);
 		for (String p : PLANTS) for (int size : PLANT_SIZES) plant(p, size);
+		for (String p : TALL_PLANTS) {
+			if (!Reg.exists(p)) continue;
+			for (int size : TALL_SIZES) {
+				// Twice as tall as a one-block plant of the same size.
+				Block b = block(p + "_" + size, settings(vanilla(p)), set -> new SizedPlantBlock(SizedPlantBlock.Soil.DIRT, size / 50.0, set));
+				SIZED_PLANTS.add(b);
+				if (p.equals("tall_grass") || p.equals("large_fern")) GRASSY_PLANTS.add(b);
+				FlammableBlockRegistry.getDefaultInstance().add(b, 60, 100);
+			}
+		}
 	}
 
 	private static void plant(String p, int size) {
 		if (!Reg.exists(p)) return;
 		Block base = vanilla(p);
-		SizedPlantBlock.Soil soil = p.equals("short_dry_grass") ? SizedPlantBlock.Soil.DRY
-				: p.endsWith("mushroom") ? SizedPlantBlock.Soil.SOLID
-				: p.endsWith("fungus") ? SizedPlantBlock.Soil.NETHER : SizedPlantBlock.Soil.DIRT;
+		SizedPlantBlock.Soil soil = p.endsWith("dry_grass") || p.equals("dead_bush") ? SizedPlantBlock.Soil.DRY
+				: p.endsWith("mushroom") || p.equals("cactus_flower") ? SizedPlantBlock.Soil.SOLID
+				: p.endsWith("fungus") || p.endsWith("_roots") ? SizedPlantBlock.Soil.NETHER : SizedPlantBlock.Soil.DIRT;
 		Block b = block(p + "_" + size, settings(base), set -> new SizedPlantBlock(soil, size / 100.0, set));
 		SIZED_PLANTS.add(b);
 		if (p.equals("short_grass") || p.equals("fern") || p.equals("bush")) GRASSY_PLANTS.add(b);
@@ -193,6 +233,33 @@ public final class Extras {
 		for (String metal : METAL_DOORS) {
 			MapColor map = vanilla(metal + "_block").defaultMapColor();
 			DOORS.add(block(metal + "_door", BlockBehaviour.Properties.ofFullCopy(copper).mapColor(map), set -> new ColouredDoorBlock(BlockSetType.COPPER, set), true));
+		}
+	}
+
+	private static void trapdoors() {
+		for (String wood : DOOR_WOODS) {
+			if (!Reg.exists(wood + "_trapdoor")) continue;
+			Block base = vanilla(wood + "_trapdoor");
+			BlockSetType type = BlockSetType.values().filter(t -> t.name().equals(wood)).findFirst().orElse(BlockSetType.OAK);
+			boolean burns = !wood.equals("crimson") && !wood.equals("warped");
+			for (String colour : Material.COLOURS) {
+				MapColor map = DyeColor.valueOf(colour.toUpperCase(Locale.ROOT)).getMapColor();
+				Block b = block(colour + "_" + wood + "_trapdoor", BlockBehaviour.Properties.ofFullCopy(base).mapColor(map), set -> new TrapDoorBlock(type, set));
+				TRAPDOORS.add(b);
+				if (burns) FlammableBlockRegistry.getDefaultInstance().add(b, 5, 20);
+			}
+		}
+		// The iron trapdoor in the 16 colours: still opened only by redstone.
+		Block iron = vanilla("iron_trapdoor");
+		for (String colour : Material.COLOURS) {
+			MapColor map = DyeColor.valueOf(colour.toUpperCase(Locale.ROOT)).getMapColor();
+			TRAPDOORS.add(block(colour + "_iron_trapdoor", BlockBehaviour.Properties.ofFullCopy(iron).mapColor(map), set -> new TrapDoorBlock(BlockSetType.IRON, set)));
+		}
+		// The copper trapdoor's pattern in metals and gems: opened by hand, like copper trapdoors.
+		Block copper = vanilla("copper_trapdoor");
+		for (String metal : METAL_DOORS) {
+			MapColor map = vanilla(metal + "_block").defaultMapColor();
+			TRAPDOORS.add(block(metal + "_trapdoor", BlockBehaviour.Properties.ofFullCopy(copper).mapColor(map), set -> new TrapDoorBlock(BlockSetType.COPPER, set)));
 		}
 	}
 

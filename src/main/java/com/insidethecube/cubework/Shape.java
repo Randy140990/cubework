@@ -3,6 +3,9 @@ package com.insidethecube.cubework;
 /** Every shape Cubework makes, in the order they appear in each colour's family in the creative menu. */
 public enum Shape {
 	STAIRS("stairs", "Stairs", 1),
+	STEPS_4("steps_4", "Stairs (4 Steps)", 1),
+	STEPS_6("steps_6", "Stairs (6 Steps)", 1),
+	STEPS_8("steps_8", "Stairs (8 Steps)", 1),
 	STAIRS_2("stairs_2", "Stairs (1 in 2)", 2),
 	STAIRS_3("stairs_3", "Stairs (1 in 3)", 2),
 	STAIRS_4("stairs_4", "Stairs (1 in 4)", 2),
@@ -25,6 +28,7 @@ public enum Shape {
 	ROUND_COLUMN_16("round_column_16", "Round Column (16 px)", 1),
 	ROUND_COLUMN_12("round_column_12", "Round Column (12 px)", 2),
 	ROUND_COLUMN_8("round_column_8", "Round Column (8 px)", 4),
+	ROUND_COLUMN_4("round_column_4", "Round Column (4 px)", 8),
 	CORNER_POST("corner_post", "Corner Post", 4),
 	ARCH("arch", "Arch", 1),
 	ARCH_CORNER("arch_corner", "Arch Corner", 1),
@@ -98,6 +102,7 @@ public enum Shape {
 			case ROUND_COLUMN_16 -> 16;
 			case ROUND_COLUMN_12 -> 12;
 			case ROUND_COLUMN_8 -> 8;
+			case ROUND_COLUMN_4 -> 4;
 			default -> 0;
 		};
 	}
@@ -105,7 +110,7 @@ public enum Shape {
 	/** Shapes drawn in code from the block's textures (smooth slopes, arches, round shapes). */
 	public boolean drawnInCode() {
 		return switch (this) {
-			case SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE, ARCH, ARCH_CORNER, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_CORNER,
+			case SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE, ARCH, ARCH_CORNER, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, ROUND_CORNER,
 					ROUND_CORNER_INNER, ROUND_WINDOW_4, ROUND_WINDOW_8, ROUND_WINDOW_12, ROUND_WINDOW_16, STAIR_CURVE -> true;
 			default -> false;
 		};
@@ -126,8 +131,8 @@ public enum Shape {
 	public Group group() {
 		return switch (this) {
 			case SLAB, QUARTER_SLAB, VERTICAL_SLAB, LAYER, VERTICAL_LAYER, CARPET, PANEL -> Group.SLABS;
-			case STAIRS, STAIRS_2, STAIRS_3, STAIRS_4, STAIR_CURVE, SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE -> Group.STAIRS;
-			case POST, PILLAR_12, PILLAR_8, PILLAR_4, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, CORNER_POST -> Group.PILLARS;
+			case STAIRS, STEPS_4, STEPS_6, STEPS_8, STAIRS_2, STAIRS_3, STAIRS_4, STAIR_CURVE, SLOPE, SLOPE_2, SLOPE_3, GENTLE_SLOPE -> Group.STAIRS;
+			case POST, PILLAR_12, PILLAR_8, PILLAR_4, ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, CORNER_POST -> Group.PILLARS;
 			case ARCH, ARCH_CORNER, ROUND_CORNER, ROUND_CORNER_INNER -> Group.CURVES;
 			case WALL, FENCE, FENCE_GATE -> Group.WALLS;
 			case TRAPDOOR, BUTTON, PRESSURE_PLATE, TRIM_2, TRIM_4, TRIM_8 -> Group.SMALL;
@@ -179,6 +184,16 @@ public enum Shape {
 			case STAIRS_2 -> 2;
 			case STAIRS_3 -> 3;
 			case STAIRS_4 -> 4;
+			default -> 0;
+		};
+	}
+
+	/** Stairs with more, smaller steps (4, 6 or 8 to the block, still climbing one block per block), or 0. */
+	public int stepCount() {
+		return switch (this) {
+			case STEPS_4 -> 4;
+			case STEPS_6 -> 6;
+			case STEPS_8 -> 8;
 			default -> 0;
 		};
 	}

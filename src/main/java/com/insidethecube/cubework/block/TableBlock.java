@@ -25,7 +25,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * A low table shaped like a bed: a 6-pixel top on 3-pixel legs. Tables with the same legs placed side by
+ * A low table shaped like a bed: a 6-pixel top on 3-pixel legs; or a tall one, its top level with a full
+ * block on 10-pixel legs. Glass tops are 2 pixels thick, on longer legs. Tables with the same legs placed side by
  * side join into one: the top runs on and legs stay only at the outside corners, so two make a bed-sized
  * table, four a square one, and a ring of them a table with a hole in the middle. The top's texture turns
  * with the way you face as you place it (for glazed terracotta's patterns and wood's grain).
@@ -37,31 +38,40 @@ public class TableBlock extends Block {
 	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 
-	private static final VoxelShape TOP = Block.box(0, 3, 0, 16, 9, 16);
-	private static final VoxelShape LEG_NW = Block.box(0, 0, 0, 3, 3, 3);
-	private static final VoxelShape LEG_NE = Block.box(13, 0, 0, 16, 3, 3);
-	private static final VoxelShape LEG_SW = Block.box(0, 0, 13, 3, 3, 16);
-	private static final VoxelShape LEG_SE = Block.box(13, 0, 13, 16, 3, 16);
-	private static final VoxelShape[] SHAPES = new VoxelShape[16];
+	private final VoxelShape[] shapes = new VoxelShape[16];
 
-	static {
-		for (int i = 0; i < 16; i++) {
-			boolean n = (i & 1) != 0, e = (i & 2) != 0, s = (i & 4) != 0, w = (i & 8) != 0;
-			VoxelShape shape = TOP;
-			if (!n && !w) shape = Shapes.or(shape, LEG_NW);
-			if (!n && !e) shape = Shapes.or(shape, LEG_NE);
-			if (!s && !w) shape = Shapes.or(shape, LEG_SW);
-			if (!s && !e) shape = Shapes.or(shape, LEG_SE);
-			SHAPES[i] = shape.optimize();
-		}
+	/** The top's height and thickness in pixels (the legs reach up to the top). */
+	public static int topOf(boolean tall) {
+		return tall ? 16 : 9;
 	}
 
-	/** Which legs it has (oak, or a concrete colour): tables join only tables with the same legs. */
+	public static int thicknessOf(boolean glass) {
+		return glass ? 2 : 6;
+	}
+
+	/** Which legs it has (oak, or a concrete colour) and how tall it is: tables join only tables with the same legs and height. */
 	private final String legs;
 
 	public TableBlock(String legs, BlockBehaviour.Properties settings) {
+		this(legs, false, false, settings);
+	}
+
+	public TableBlock(String legs, boolean tall, boolean glass, BlockBehaviour.Properties settings) {
 		super(settings);
-		this.legs = legs;
+		this.legs = legs + (tall ? "/tall" : "");
+		int y1 = topOf(tall), y0 = y1 - thicknessOf(glass);
+		VoxelShape top = Block.box(0, y0, 0, 16, y1, 16);
+		VoxelShape nw = Block.box(0, 0, 0, 3, y0, 3), ne = Block.box(13, 0, 0, 16, y0, 3);
+		VoxelShape sw = Block.box(0, 0, 13, 3, y0, 16), se = Block.box(13, 0, 13, 16, y0, 16);
+		for (int i = 0; i < 16; i++) {
+			boolean n = (i & 1) != 0, e = (i & 2) != 0, s = (i & 4) != 0, w = (i & 8) != 0;
+			VoxelShape shape = top;
+			if (!n && !w) shape = Shapes.or(shape, nw);
+			if (!n && !e) shape = Shapes.or(shape, ne);
+			if (!s && !w) shape = Shapes.or(shape, sw);
+			if (!s && !e) shape = Shapes.or(shape, se);
+			shapes[i] = shape.optimize();
+		}
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false));
 	}
 
@@ -82,7 +92,7 @@ public class TableBlock extends Block {
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 		int i = (state.getValue(NORTH) ? 1 : 0) | (state.getValue(EAST) ? 2 : 0) | (state.getValue(SOUTH) ? 4 : 0) | (state.getValue(WEST) ? 8 : 0);
-		return SHAPES[i];
+		return shapes[i];
 	}
 
 	private boolean joins(BlockState other) {

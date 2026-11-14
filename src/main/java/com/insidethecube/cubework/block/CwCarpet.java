@@ -12,17 +12,58 @@ import net.minecraft.world.level.ScheduledTickAccess;
 //#else
 import net.minecraft.world.level.LevelAccessor;
 //#endif
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CarpetBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** The vanilla CarpetBlock in a Cubework material: placed, connected and used exactly like vanilla's. */
+/**
+ * The vanilla CarpetBlock in a Cubework material, which also turns: it's laid facing you, as glazed
+ * terracotta is, and an empty hand turns it a quarter turn (so glazed patterns can be lined up).
+ */
 public class CwCarpet extends CarpetBlock implements CwShape {
 	private final Material material;
+
+	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
 	public CwCarpet(Material material, BlockBehaviour.Properties settings) {
 		super(settings);
 		this.material = material;
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
+	}
+
+	@Override
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
+		builder.add(FACING);
+	}
+
+	@Override
+	protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+		if (!player.getMainHandItem().isEmpty()) return InteractionResult.PASS;
+		world.setBlock(pos, state.setValue(FACING, state.getValue(FACING).getClockWise()), Block.UPDATE_ALL);
+		world.playSound(player, pos, getSoundType(state).getPlaceSound(), SoundSource.BLOCKS, 0.6f, 1.2f);
+		return InteractionResult.SUCCESS;
+	}
+
+	@Override
+	protected BlockState rotate(BlockState state, Rotation rotation) {
+		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+	}
+
+	@Override
+	protected BlockState mirror(BlockState state, Mirror mirror) {
+		return state.rotate(mirror.getRotation(state.getValue(FACING)));
 	}
 
 	@Override
@@ -32,7 +73,9 @@ public class CwCarpet extends CarpetBlock implements CwShape {
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		return Shared.placed(material, super.getStateForPlacement(ctx), ctx);
+		BlockState state = super.getStateForPlacement(ctx);
+		if (state != null) state = state.setValue(FACING, ctx.getHorizontalDirection().getOpposite());
+		return Shared.placed(material, state, ctx);
 	}
 
 	@Override

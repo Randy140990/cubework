@@ -23,13 +23,13 @@ public final class Shared {
 
 	/** A shape just placed: concrete powder touching water sets into concrete straight away. */
 	public static BlockState placed(Material m, BlockState state, BlockPlaceContext ctx) {
-		if (state == null || m.kind() != Material.Kind.POWDER) return state;
+		if (state == null || m == null || m.kind() != Material.Kind.POWDER) return state;
 		return wet(state, ctx.getLevel(), ctx.getClickedPos()) ? harden(state) : state;
 	}
 
 	/** A neighbour changed: concrete powder sets when water reaches it. */
 	public static BlockState updated(Material m, BlockState state, BlockGetter world, BlockPos pos) {
-		if (state == null || m.kind() != Material.Kind.POWDER) return state;
+		if (state == null || m == null || m.kind() != Material.Kind.POWDER) return state;
 		return wet(state, world, pos) ? harden(state) : state;
 	}
 
