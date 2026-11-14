@@ -6,7 +6,7 @@ public enum Shape {
 	STAIRS_2("stairs_2", "Stairs (1 in 2)", 2),
 	STAIRS_3("stairs_3", "Stairs (1 in 3)", 2),
 	STAIRS_4("stairs_4", "Stairs (1 in 4)", 2),
-	STAIR_CURVE("stair_curve", "Stair Curve", 1),
+	STAIR_CURVE("stair_curve", "Curved Stairs", 1),
 	SLAB("slab", "Slab", 2),
 	QUARTER_SLAB("quarter_slab", "Quarter Slab", 4),
 	VERTICAL_SLAB("vertical_slab", "Vertical Slab", 2),
