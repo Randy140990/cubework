@@ -1,2 +1,6 @@
-grep register\(|\.(visual|gameplay)  net/minecraft/world/attribute/EnvironmentAttributes.java
-net/minecraft/world/attribute/EnvironmentAttributes.java
+net/minecraft/client/renderer/block/model/BlockModelDefinition.java
+net/minecraft/client/renderer/block/model/multipart/MultiPartModel.java
+net/minecraft/client/renderer/block/model/BlockStateModel.java
+net/minecraft/client/resources/model/BlockStateModelLoader.java
+net/minecraft/world/level/block/state/BlockBehaviour.java
+net/minecraft/client/renderer/block/ModelBlockRenderer.java

@@ -1,8 +1,4 @@
-SkyRenderer
-DimensionRenderingRegistry
-WorldRenderEvents
-LevelRenderEvents
-DimensionSpecialEffects
-renderer/RenderType
-rendertype/RenderType
-net/minecraft/world/item/.*[Ss]pear
+MultiPartModel
+renderer/v1/model/
+model/loading/v1/
+block/model/multipart/
