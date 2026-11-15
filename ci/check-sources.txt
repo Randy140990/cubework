@@ -1,2 +1,21 @@
-grep (hat|getChild) net/minecraft/client/model/HumanoidModel.java
-grep (abstract|protected.void|public.void) net/minecraft/world/entity/Entity.java
+net/minecraft/client/renderer/RenderPipelines.java
+com/mojang/blaze3d/pipeline/BlendFunction.java
+grep (public|static|with[A-Z]) com/mojang/blaze3d/pipeline/RenderPipeline.java
+net/minecraft/client/renderer/SkyRenderer.java
+grep (getViewYRot|getViewXRot|yHeadRot) net/minecraft/world/entity/LivingEntity.java
+grep (getViewYRot|getViewXRot|public.boolean.noCulling) net/minecraft/world/entity/Entity.java
+grep (getViewYRot|getViewXRot|setRotation|void.setup|getEntity) net/minecraft/client/Camera.java
+grep (public.Properties|StatePredicate) net/minecraft/world/level/block/state/BlockBehaviour.java
+net/minecraft/world/level/block/TransparentBlock.java
+grep (public.static.NativeImage.read|PngInfo|public.void.setPixel|public.int.getPixel) com/mojang/blaze3d/platform/NativeImage.java
+grep (MAGMA_BLOCK|SEA_LANTERN|BLUE_WOOL|TINTED_GLASS|OAK_LOG.=|"glass"|always\() net/minecraft/world/level/block/Blocks.java
+grep (public.static|RenderType.[a-zA-Z]+\() net/minecraft/client/renderer/rendertype/RenderTypes.java
+grep (public|TransientEntitySectionManager) net/minecraft/client/multiplayer/ClientLevel.java
+grep (isSectionCompiled|entitiesForRendering|shouldRender) net/minecraft/client/renderer/LevelRenderer.java
+grep (public|protected) net/minecraft/client/gui/components/AbstractButton.java
+data assets/minecraft/blockstates/oak_log.json
+data assets/minecraft/items/oak_log.json
+data assets/minecraft/shaders/core/position_tex_color.vsh
+data assets/minecraft/shaders/core/position_tex_color.fsh
+data assets/minecraft/shaders/core/position_color.fsh
+data assets/minecraft/models/block/cube_column_horizontal.json
