@@ -280,6 +280,8 @@ public final class BridgeMatch implements Game, BridgeWorld {
 					} catch (RuntimeException e) {
 						LOGGER.error("Orbit Arena: couldn't put {}'s things away", player.getName().getString(), e);
 					}
+					// Into blue's cage (up already, so there's a floor to land on).
+					cages(arena, true);
 					teleport(player, arena, cageSpot(BLUE, 0, 1), yaw(BLUE));
 					kit(player, BLUE);
 					state(true);
