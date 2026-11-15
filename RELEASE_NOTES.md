@@ -7,6 +7,7 @@ Cubework by Inside the Cube.
   - Partitions: 78 instead of 624.
   - Slopes (all four kinds): corners worked out the same way, 16 states instead of 80 (gentle slopes, and slopes over 2 or 3 blocks, keep their step).
 - Slopes' and round window frames' shapes are now made the first time they're drawn rather than all while the game loads, and shapes that look the same under water and out of it are made once.
+- FerriteCore 8.2.0 (by malte0811, MIT licence) now comes inside Cubework: it makes the game's block states far lighter in memory, which a mod with this many blocks needs. If you have FerriteCore installed yourself, the game uses whichever copy is newer, so there's nothing to remove. ModernFix (by embeddedt) is worth adding too for quicker loading; leave its optional "dynamic resources" setting off.
 - Nothing changes in game: everything joins, turns corners and looks the same, and your builds load as they were. One small difference: a partition standing on its own (joined to nothing) remembers the way it ran as part of its last straight run, so a lone partition from an older build may turn to run east-west.
 
 0.10.1: fixes 0.10.0 not starting (1.21.11 only, cubework-0.10.1-mc1.21.11.jar).

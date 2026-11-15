@@ -5,7 +5,7 @@
   {"name": "1.21.5", "mc": "1.21.5", "range": "~1.21.5", "java": 21, "plugin": "net.fabricmc.fabric-loom-remap", "release": false},
   {"name": "1.21.8", "mc": "1.21.8", "range": ">=1.21.6 <1.21.9", "java": 21, "plugin": "net.fabricmc.fabric-loom-remap", "release": false},
   {"name": "1.21.10", "mc": "1.21.10", "range": ">=1.21.9 <1.21.11", "java": 21, "plugin": "net.fabricmc.fabric-loom-remap", "release": false},
-  {"name": "1.21.11", "mc": "1.21.11", "range": "~1.21.11", "java": 21, "plugin": "net.fabricmc.fabric-loom-remap", "release": true},
+  {"name": "1.21.11", "mc": "1.21.11", "range": "~1.21.11", "java": 21, "plugin": "net.fabricmc.fabric-loom-remap", "release": true, "ferritecore": "8.2.0-fabric"},
   {"name": "26.1", "mc": "26.1.2", "range": ">=26.1 <26.2", "java": 25, "plugin": "net.fabricmc.fabric-loom", "release": false},
   {"name": "26.2", "mc": "26.2", "range": ">=26.2 <26.3", "java": 25, "plugin": "net.fabricmc.fabric-loom", "release": false},
   {"name": "26.3", "mc": "26.3", "range": ">=26.3 <26.4", "java": 25, "plugin": "net.fabricmc.fabric-loom", "release": false}
