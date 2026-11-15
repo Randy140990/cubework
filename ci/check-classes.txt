@@ -1,0 +1,8 @@
+net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
+net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+net.minecraft.client.renderer.entity.EntityRenderer
+net.minecraft.client.renderer.SubmitNodeCollector
+net.minecraft.client.KeyMapping
+net.minecraft.client.KeyMapping$Category
+net.minecraft.world.entity.item.FallingBlockEntity
+net.minecraft.client.renderer.entity.state.HumanoidRenderState

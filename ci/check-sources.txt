@@ -1,0 +1,29 @@
+net/minecraft/client/model/HumanoidModel.java
+net/minecraft/client/renderer/entity/state/EntityRenderState.java
+net/minecraft/client/renderer/SubmitNodeCollector.java
+net/minecraft/world/entity/ai/goal/MeleeAttackGoal.java
+net/minecraft/world/entity/item/FallingBlockEntity.java
+net/minecraft/world/item/component/DyedItemColor.java
+net/minecraft/world/item/component/Fireworks.java
+net/minecraft/world/item/component/FireworkExplosion.java
+net/minecraft/client/gui/components/PlayerFaceRenderer.java
+net/minecraft/client/renderer/entity/EnderDragonRenderer.java
+net/minecraft/client/renderer/entity/EndCrystalRenderer.java
+grep (extractRenderState|public void submit|shouldRender|getTextureLocation) net/minecraft/client/renderer/entity/EntityRenderer.java
+grep (public static RenderType|static RenderType) net/minecraft/client/renderer/rendertype/RenderTypes.java
+grep (canBeSeenAsEnemy|isCreative|invulnerable|isInvulnerableTo) net/minecraft/world/entity/player/Player.java
+grep (isCreative|isSpectator|public boolean hurtServer) net/minecraft/server/level/ServerPlayer.java
+grep (interactsWithBlocks|createFire|boolean fire|void explode|blockInteraction) net/minecraft/world/level/ServerExplosion.java
+grep (destroyBlocksTick|MOB_GRIEFING|mobGriefing) net/minecraft/world/entity/boss/wither/WitherBoss.java
+grep (checkWalls|MOB_GRIEFING) net/minecraft/world/entity/boss/enderdragon/EnderDragon.java
+grep (setCameraEntity|getCameraEntity|cameraEntity) net/minecraft/client/Minecraft.java
+grep (public void setup|getViewYRot|getViewXRot|Mth.lerp|setPosition|setRotation) net/minecraft/client/Camera.java
+grep (public FireworkRocketEntity|public static) net/minecraft/world/entity/projectile/FireworkRocketEntity.java
+grep (renderBlurredBackground|blurBeforeThisStratum|renderMenuBackground) net/minecraft/client/gui/screens/Screen.java
+grep (setCameraType|getCameraType|hideGui) net/minecraft/client/Options.java
+grep (canTargetEntity|NO_CREATIVE) net/minecraft/world/entity/monster/warden/Warden.java
+grep (NO_CREATIVE_OR_SPECTATOR|NO_SPECTATORS) net/minecraft/world/entity/EntitySelector.java
+grep (public|isCreative) net/minecraft/world/entity/ai/goal/target/TargetGoal.java
+grep (shootFromRotation|public Arrow|public void shoot) net/minecraft/world/entity/projectile/arrow/Arrow.java
+grep (public void shoot|shootFromRotation) net/minecraft/world/entity/projectile/Projectile.java
+grep (renderItem|public void render|SPYGLASS|isUsingItem) net/minecraft/client/renderer/entity/layers/ItemInHandLayer.java
