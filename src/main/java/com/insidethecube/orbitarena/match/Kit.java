@@ -15,7 +15,10 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 
-/** The kits you can fight with. Everything in them is unbreakable, so fights are about skill, not durability. */
+/**
+ * The kits you can fight with, each with 16 ender pearls. Everything in them is unbreakable, so fights are
+ * about skill, not durability.
+ */
 public enum Kit {
 	SWORD, AXE, MACE, SPEAR, ARCHER, IRON, NETHERITE;
 
@@ -80,12 +83,13 @@ public enum Kit {
 				add(p, ench(p, ench(p, item(Items.MACE), Enchantments.DENSITY, 3), Enchantments.WIND_BURST, 1));
 				add(p, item(Items.NETHERITE_SPEAR));
 				add(p, new ItemStack(Items.WIND_CHARGE, 32));
-				add(p, new ItemStack(Items.ENDER_PEARL, 16));
 				add(p, new ItemStack(Items.TOTEM_OF_UNDYING));
 				offhand(p, item(Items.SHIELD));
 				food(p, 12);
 			}
 		}
+		// Ender pearls in every kit, to pearl round the arena.
+		add(p, new ItemStack(Items.ENDER_PEARL, 16));
 	}
 
 	private static ItemStack item(Item item) {

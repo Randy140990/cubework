@@ -1,5 +1,13 @@
 Orbit Arena by Inside the Cube (Minecraft 1.21.11, Fabric).
 
+0.3.0: go again, a sharper floor, and fixes from the first real fights.
+- After a match you choose: Go again (straight back onto the pedestal with the same settings), Change settings, or Leave arena. After a mob or boss fight the arena is put right first while you wait on the pedestal.
+- Bigger hexagons, as in the reference: about 16 blocks across (were 9.5), drawn as clean one-block lines with crisp corners instead of blobs where lines meet. The pedestals now sit in the middle of a hexagon 28 blocks out (were 33). The band of light round the dais is edged with stone inside and out. Your arena rebuilds itself the first time you use it.
+- Every kit has 16 ender pearls.
+- Pearls, wind charges, shields and bows work while you're looking at the floor (right click). The arena's protection was stopping every right click on a block; now it only stops placing blocks and the like.
+- You always fight in Survival: if anything switches you to Creative mid-fight (Axiom's editor, a command), you're switched back. In Creative mobs ignore you, which is why they couldn't hit you.
+- Entering is more reliable: you're only sent in once the arena is built and nothing is repairing it, and if the game refuses the teleport you're tried again until you're in. Fixes being left behind in your own world, falling, with the match running.
+
 0.2.1: a sharper sky and the arena button out of the way.
 - The sky is now the 8K night sky (8192 by 4096, was 4096 by 2048), so stars stay sharp points instead of soft dots. Same colours and brightness as before. The jar is about 22 MB bigger and the sky takes about 128 MB more video memory.
 - PvP Arena / Leave Arena is now at the top right of the pause menu, so it isn't covered by other mods' buttons at the top left (Lightreel's record and folder buttons).

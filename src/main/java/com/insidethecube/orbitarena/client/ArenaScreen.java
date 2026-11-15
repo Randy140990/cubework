@@ -104,9 +104,28 @@ public class ArenaScreen extends Screen {
 	}
 
 	private void start() {
-		int n = opponents == Opponents.BOSS ? bossCount : count;
-		ClientPlayNetworking.send(new Payloads.Start(new MatchSettings(opponents, difficulty, n, kit, boss, timeLimit)));
+		ClientPlayNetworking.send(new Payloads.Start(settings()));
 		this.minecraft.setScreen(null);
+	}
+
+	/** The settings as last chosen (what "Go again" uses). */
+	static MatchSettings settings() {
+		int n = opponents == Opponents.BOSS ? bossCount : count;
+		return new MatchSettings(opponents, difficulty, n, kit, boss, timeLimit);
+	}
+
+	/** The settings in a line: "10 fighters · level 10 · Netherite kit". */
+	static Component describeSettings() {
+		String who = switch (opponents) {
+			case FIGHTERS -> count + (count == 1 ? " fighter" : " fighters");
+			case MOBS -> count + " mobs";
+			case BOSS -> bossCount + " × " + switch (boss) {
+				case WITHER -> "Wither";
+				case WARDEN -> "Warden";
+				case ENDER_DRAGON -> "Ender Dragon";
+			};
+		};
+		return Component.literal(who + " · level " + difficulty + " · ").append(Component.translatable(kit.key())).append(" kit");
 	}
 
 	@Override

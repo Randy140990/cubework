@@ -31,6 +31,16 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorStandItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BoneMealItem;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.EndCrystalItem;
+import net.minecraft.world.item.FireChargeItem;
+import net.minecraft.world.item.FlintAndSteelItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -85,10 +95,13 @@ public final class Matches {
 			for (Match m : MATCHES.values()) m.onEnemyDeath(entity);
 		});
 
-		// The arena itself can't be broken or built on (except in creative).
+		// The arena itself can't be broken or built on (except in creative). Only placing things is stopped:
+		// throwing pearls and wind charges, blocking with a shield or drawing a bow while looking at the floor
+		// all still work.
 		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, be) -> !protectedFor(player));
 		AttackBlockCallback.EVENT.register((player, level, hand, pos, dir) -> protectedFor(player) ? InteractionResult.FAIL : InteractionResult.PASS);
-		UseBlockCallback.EVENT.register((player, level, hand, hit) -> protectedFor(player) ? InteractionResult.FAIL : InteractionResult.PASS);
+		UseBlockCallback.EVENT.register((player, level, hand, hit) -> protectedFor(player) && placesSomething(player.getItemInHand(hand)) ? InteractionResult.FAIL
+				: InteractionResult.PASS);
 
 		// Back in after leaving mid-fight (or a crash): everything given back.
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -124,19 +137,40 @@ public final class Matches {
 						})))));
 	}
 
+	/** Items that would put something into the arena or change it when used on a block. */
+	private static boolean placesSomething(ItemStack stack) {
+		Item i = stack.getItem();
+		return i instanceof BlockItem || i instanceof BucketItem || i instanceof FlintAndSteelItem || i instanceof FireChargeItem || i instanceof SpawnEggItem
+				|| i instanceof BoneMealItem || i instanceof EndCrystalItem || i instanceof ArmorStandItem;
+	}
+
 	private static boolean protectedFor(Player player) {
 		return player.level().dimension() == OrbitArena.ARENA && !player.isCreative();
 	}
 
 	static void start(ServerPlayer p, MatchSettings settings) {
-		if (MATCHES.containsKey(p.getUUID())) {
+		Match old = MATCHES.get(p.getUUID());
+		if (old != null) {
+			// Just finished one, still in the arena: go again straight away (putting the arena right first
+			// after a mob or boss fight).
+			if (old.phase == Match.Phase.RESULT && isArena(p.level())) {
+				old.retire();
+				if (old.settings.opponents() != MatchSettings.Opponents.FIGHTERS) builder((ServerLevel) p.level(), old.centreX);
+				MATCHES.put(p.getUUID(), new Match(p, settings, old.slot, true));
+				return;
+			}
 			p.displayClientMessage(Component.literal("You're already in a match.").withStyle(ChatFormatting.RED), true);
 			return;
 		}
 		if (Loadout.has(p)) sendHome(p);
 		int slot = 0;
 		while (slotTaken(slot)) slot++;
-		MATCHES.put(p.getUUID(), new Match(p, settings, slot));
+		MATCHES.put(p.getUUID(), new Match(p, settings, slot, false));
+	}
+
+	/** The builder at work on this arena, or null. */
+	static ArenaBuilder building(int centreX) {
+		return BUILDERS.get(centreX);
 	}
 
 	private static boolean slotTaken(int slot) {
@@ -151,8 +185,8 @@ public final class Matches {
 			return;
 		}
 		m.forfeit = true;
-		if (m.phase == Match.Phase.RESULT) m.leave();
-		else m.end(false, "You left");
+		if (m.phase != Match.Phase.RESULT) m.end(false, "You left");
+		m.leave();
 	}
 
 	/** Gives back anything put away and sends the player home (or to their spawn if nothing was saved). */

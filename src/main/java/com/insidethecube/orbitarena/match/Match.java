@@ -34,9 +34,16 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * One player's match: getting the arena ready, the fade in, "3, 2, 1, Fight!", the fight (enemies
- * topped up in waves until all are beaten), the result, and the fade back home with everything returned.
+ * topped up in waves until all are beaten), the result, and then the player's choice: go again (straight
+ * back onto the pedestal, the arena put right first if a mob or boss fight damaged it), change the
+ * settings and go again, or fade back home with everything returned.
+ * <p>
+ * The player always fights in Survival, whatever their game mode was (and if anything switches it during
+ * the fight, it's switched back), and is only let go once they're really standing in the arena.
  */
 public final class Match {
+	private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
+
 	enum Phase {
 		PREPARING, ENTERING, COUNTDOWN, FIGHT, RESULT, LEAVING, DONE
 	}
@@ -46,7 +53,8 @@ public final class Match {
 	final ServerPlayer player;
 	final MatchSettings settings;
 	final int slot, centreX;
-	ArenaBuilder builder;
+	/** Another go straight after the last match: the player is already in the arena, their things put away. */
+	final boolean again;
 	Phase phase = Phase.PREPARING;
 	int ticks, fightTicks;
 	final List<LivingEntity> alive = new ArrayList<>();
@@ -56,11 +64,12 @@ public final class Match {
 	String endReason = "";
 	private final ServerBossEvent bar = new ServerBossEvent(Component.literal("Orbit Arena"), BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.PROGRESS);
 
-	Match(ServerPlayer player, MatchSettings settings, int slot) {
+	Match(ServerPlayer player, MatchSettings settings, int slot, boolean again) {
 		this.player = player;
 		this.settings = settings;
 		this.slot = slot;
 		this.centreX = slot * SPACING;
+		this.again = again;
 	}
 
 	ServerLevel arena() {
@@ -90,42 +99,50 @@ public final class Match {
 		if (arena == null) return;
 		switch (phase) {
 			case PREPARING -> {
-				if (ArenaBuilder.built(arena, centreX) && builder == null) {
-					enter();
+				// Going again: wait on the pedestal while the arena's put right.
+				if (again) hold(arena);
+				// Wait until the arena is built and nothing is building or repairing it (stepping in while it's
+				// being rebuilt could leave you with no floor).
+				ArenaBuilder running = Matches.building(centreX);
+				if (running != null) {
+					player.displayClientMessage(Component.literal((again ? "Putting the arena right… " : "Building the arena… ") + (int) (running.progress() * 100) + "%")
+							.withStyle(ChatFormatting.AQUA), true);
+				} else if (!ArenaBuilder.built(arena, centreX)) {
+					Matches.builder(arena, centreX);
+				} else if (again) {
+					player.getInventory().clearContent();
+					arm(arena);
+					countdown();
 				} else {
-					if (builder == null) builder = Matches.builder(arena, centreX);
-					if (builder.done()) {
-						builder = null;
-						if (ArenaBuilder.built(arena, centreX)) enter();
-					} else {
-						player.displayClientMessage(Component.literal("Building the arena… " + (int) (builder.progress() * 100) + "%").withStyle(ChatFormatting.AQUA), true);
-					}
+					enter();
 				}
 			}
 			case ENTERING -> {
 				// Halfway through the fade: put things away, step through, kit up.
 				if (ticks == 12) {
-					Loadout.store(player);
-					Vec3 s = start();
-					player.teleportTo(arena, s.x, s.y, s.z, java.util.Set.of(), -90, 0, true);
-					player.setGameMode(GameType.SURVIVAL);
-					player.removeAllEffects();
-					player.setHealth(player.getMaxHealth());
-					player.getFoodData().setFoodLevel(20);
-					player.getFoodData().setSaturation(10);
-					settings.kit().give(player);
-					state(true);
+					try {
+						Loadout.store(player);
+					} catch (RuntimeException e) {
+						LOGGER.error("Orbit Arena: couldn't put {}'s things away", player.getName().getString(), e);
+					}
+					arm(arena);
 				}
+				// Not through yet (the game can refuse a teleport mid-load): try again until you are.
+				if (ticks > 12 && player.level() != arena && ticks % 10 == 0) teleportIn(arena);
 				if (ticks >= 30) {
-					phase = Phase.COUNTDOWN;
-					ticks = 0;
-					spawnUpTo(Math.min(maxAlive(), settings.count()));
-					freezeEnemies(true);
-					bar.addPlayer(player);
+					if (player.level() == arena) {
+						countdown();
+					} else if (ticks > 400) {
+						LOGGER.warn("Orbit Arena: couldn't get {} into the arena", player.getName().getString());
+						player.displayClientMessage(Component.literal("Couldn't get you into the arena. Try again.").withStyle(ChatFormatting.RED), false);
+						phase = Phase.RESULT;
+						leave();
+					}
 				}
 			}
 			case COUNTDOWN -> {
-				hold();
+				keepSurvival();
+				hold(arena);
 				if (ticks == 1 || ticks == 21 || ticks == 41) {
 					int n = 3 - (ticks - 1) / 20;
 					title(Component.literal(String.valueOf(n)).withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD), Component.literal(subtitle()), 0, 20, 2);
@@ -141,9 +158,22 @@ public final class Match {
 					state(true);
 				}
 			}
-			case FIGHT -> fight(arena);
+			case FIGHT -> {
+				keepSurvival();
+				// Somehow out of the arena (another mod's teleport, a command): that ends it.
+				if (player.level() != arena) {
+					forfeit = true;
+					end(false, "You left the arena");
+					leave();
+				} else {
+					fight(arena);
+				}
+			}
 			case RESULT -> {
-				if (ticks >= 100) leave();
+				// The player picks: go again, change the settings, or leave (see Matches.start). If they don't
+				// within five minutes, or they've gone, home they go.
+				keepSurvival();
+				if (ticks >= 6000 || player.level() != arena) leave();
 			}
 			case LEAVING -> {
 				if (ticks == 12) {
@@ -178,6 +208,43 @@ public final class Match {
 			case WARDEN -> "Warden";
 			case ENDER_DRAGON -> "Ender Dragon";
 		};
+	}
+
+	/** Into the arena (or back onto the pedestal), in Survival, healed, fed and kitted out. */
+	private void arm(ServerLevel arena) {
+		teleportIn(arena);
+		try {
+			player.setGameMode(GameType.SURVIVAL);
+			player.removeAllEffects();
+			player.setHealth(player.getMaxHealth());
+			player.getFoodData().setFoodLevel(20);
+			player.getFoodData().setSaturation(10);
+			player.setRemainingFireTicks(0);
+			settings.kit().give(player);
+		} catch (RuntimeException e) {
+			LOGGER.error("Orbit Arena: couldn't kit out {}", player.getName().getString(), e);
+		}
+		state(true);
+	}
+
+	private void teleportIn(ServerLevel arena) {
+		Vec3 s = start();
+		player.teleportTo(arena, s.x, s.y, s.z, java.util.Set.of(), -90, 0, true);
+		player.setDeltaMovement(Vec3.ZERO);
+		player.fallDistance = 0;
+	}
+
+	private void countdown() {
+		phase = Phase.COUNTDOWN;
+		ticks = 0;
+		spawnUpTo(Math.min(maxAlive(), settings.count()));
+		freezeEnemies(true);
+		bar.addPlayer(player);
+	}
+
+	/** Fights are in Survival: if anything switches the player out of it, they're switched back. */
+	private void keepSurvival() {
+		if (player.gameMode.getGameModeForPlayer() != GameType.SURVIVAL) player.setGameMode(GameType.SURVIVAL);
 	}
 
 	private void enter() {
@@ -227,10 +294,12 @@ public final class Match {
 		for (LivingEntity e : alive) if (e instanceof Mob m) m.setNoAi(frozen);
 	}
 
-	/** Holds the player on the pedestal during the countdown. */
-	private void hold() {
+	/** Holds the player on the pedestal (during the countdown, and while the arena's put right to go again). */
+	private void hold(ServerLevel arena) {
 		Vec3 s = start();
-		if (player.position().distanceToSqr(s) > 0.6) player.teleportTo(s.x, s.y, s.z);
+		if (player.level() != arena) teleportIn(arena);
+		else if (player.position().distanceToSqr(s) > 0.6) player.teleportTo(s.x, s.y, s.z);
+		player.fallDistance = 0;
 	}
 
 	void onEnemyHurt(float amount) {
@@ -276,9 +345,19 @@ public final class Match {
 		sound(won ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.BEACON_DEACTIVATE, 1.0F);
 		cheer(won ? Payloads.Cheer.WIN : Payloads.Cheer.LOSS, 1.0F);
 		player.sendSystemMessage(Component.literal("Orbit Arena · " + (won ? "Victory" : "Defeat") + " · " + subtitle()).withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED));
-		player.sendSystemMessage(Component.literal(String.format(" Time %s · Beaten %d of %d · Damage dealt %.0f · Damage taken %.0f", clock(secs), kills, settings.count(), dealt, taken))
-				.withStyle(ChatFormatting.GRAY));
+		String summary = String.format("Time %s · Beaten %d of %d · Damage dealt %.0f · Damage taken %.0f", clock(secs), kills, settings.count(), dealt, taken);
+		player.sendSystemMessage(Component.literal(" " + summary).withStyle(ChatFormatting.GRAY));
 		state(true);
+		// Go again, change the settings, or leave: the player's choice (not when they chose to leave).
+		if (!forfeit) ServerPlayNetworking.send(player, new Payloads.Result(won, reason, summary));
+	}
+
+	/** Making way for another go: the enemies cleared, this match's bar gone. */
+	void retire() {
+		ServerLevel arena = arena();
+		if (arena != null) clearArena(arena);
+		bar.removeAllPlayers();
+		phase = Phase.DONE;
 	}
 
 	/** Fade out and go home (from the result, or straight away when leaving). */
@@ -311,7 +390,7 @@ public final class Match {
 	}
 
 	boolean inArena() {
-		return phase.ordinal() >= Phase.COUNTDOWN.ordinal() || (phase == Phase.ENTERING && ticks >= 12);
+		return phase.ordinal() >= Phase.COUNTDOWN.ordinal() || (phase == Phase.ENTERING && ticks >= 12) || (again && phase == Phase.PREPARING);
 	}
 
 	private void state(boolean in) {

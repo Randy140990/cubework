@@ -25,8 +25,12 @@ public class OrbitArenaClient implements ClientModInitializer {
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.State.TYPE, (p, ctx) -> {
 			if (p.inArena()) Crowd.setCentre(p.centreX());
+			else ResultScreen.cancel();
 			Crowd.setFighting(p.inArena() && p.fighting());
 		});
+		// A match is over: go again, change the settings or leave.
+		ClientPlayNetworking.registerGlobalReceiver(Payloads.Result.TYPE, (p, ctx) -> ResultScreen.show(p));
+		ClientTickEvents.END_CLIENT_TICK.register(ResultScreen::tick);
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Cheer.TYPE, (p, ctx) -> Crowd.react(p.kind(), p.strength()));
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.Fade.TYPE, (p, ctx) -> Fade.start(p.out(), p.hold(), p.in()));
 		ClientTickEvents.END_CLIENT_TICK.register(Crowd::tick);

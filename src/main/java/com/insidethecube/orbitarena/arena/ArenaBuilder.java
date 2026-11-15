@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public final class ArenaBuilder {
 	/** Bump when the arena's design changes, so existing arenas are rebuilt. */
-	public static final int VERSION = 2;
+	public static final int VERSION = 3;
 	/** The marker under the centre that says which version an arena is. */
 	private static final BlockState MARKER = Blocks.REINFORCED_DEEPSLATE.defaultBlockState();
 
@@ -121,13 +121,15 @@ public final class ArenaBuilder {
 	}
 
 	/**
-	 * The middle: a pale disc with a cross and a ring drawn in it and a white rim, a band of light round
-	 * the dais, and the dais itself, stepped up three times to a hexagon of light.
+	 * The middle: a pale disc with a cross and a ring drawn in it and a white rim, a band of light edged
+	 * with stone round the dais, and the dais itself, stepped up three times to a hexagon of light.
 	 */
 	private void centre(int x, int z, double r) {
 		int f = FLOOR;
 		BlockState floor;
 		if (r >= LIGHT_RING_IN && r < LIGHT_RING_OUT) floor = b(Blocks.SEA_LANTERN);
+		// The band of light is edged with stone, inside and out.
+		else if ((r >= LIGHT_RING_OUT && r < LIGHT_RING_OUT + 1.0) || (r >= DAIS && r < LIGHT_RING_IN)) floor = b(Blocks.POLISHED_ANDESITE);
 		else if (r >= CENTRE - 0.8) floor = b(Blocks.WHITE_CONCRETE);
 		else if (r >= 14.4 && r < 15.0) floor = b(Blocks.SMOOTH_STONE);
 		else if (r >= LIGHT_RING_OUT && (x == 0 || z == 0 || x == -1 || z == -1)) floor = b(Blocks.SMOOTH_STONE);
@@ -149,7 +151,7 @@ public final class ArenaBuilder {
 		BlockState s;
 		if (r >= RIM + 0.8) s = b(Blocks.LIGHT_GRAY_CONCRETE);
 		else if (r >= RIM) s = b(Blocks.SMOOTH_STONE);
-		else s = hexLine(x + 0.5, z + 0.5, HEX) < 0.5 ? b(Blocks.SEA_LANTERN) : b(Blocks.GRAY_CONCRETE);
+		else s = hexLineBlock(x, z) ? b(Blocks.SEA_LANTERN) : b(Blocks.GRAY_CONCRETE);
 		set(x, f, z, s);
 		// The pedestals: a black 7x7 in the floor, a 5x5 on it and the 3x3 you stand on, lit in the middle.
 		for (int side : new int[] {-1, 1}) {

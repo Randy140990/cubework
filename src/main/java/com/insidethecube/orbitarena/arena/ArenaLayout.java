@@ -4,9 +4,10 @@ package com.insidethecube.orbitarena.arena;
  * The arena's shape, shared by the builder (server) and the crowd (client), all relative to the arena's
  * centre at floor level. Distances in blocks.
  * <p>
- * From the middle out: a raised, stepped dais topped with a hexagon of light, ringed by a band of light;
- * a pale centre disc; a dark honeycomb floor with thin glowing lines and a pale rim (the fighting floor,
- * radius 48); the two pedestals (3x3 on 5x5 on a black 7x7); a low wall; three tiers of stands, each
+ * From the middle out: a raised, stepped dais topped with a hexagon of light, ringed by a band of light
+ * edged with stone; a pale centre disc; a dark honeycomb floor with thin glowing lines and a pale rim (the
+ * fighting floor, radius 48); the two pedestals (3x3 on 5x5 on a black 7x7), each in the middle of a
+ * hexagon; a low wall; three tiers of stands, each
  * eight rows, with a pale band between them carrying an orange stripe and lights; the back wall and an
  * overhanging roof ring edged with light. Round all of it, an asteroid of rock.
  */
@@ -23,8 +24,11 @@ public final class ArenaLayout {
 	public static final double DAIS = 9.2, LIGHT_RING_IN = 9.6, LIGHT_RING_OUT = 11.2, CENTRE = 18;
 	/** The pale rim round the floor, and the wall. */
 	public static final double RIM = 46.4, WALL_IN = 49.5, WALL_OUT = 51;
-	/** The honeycomb: hexagons this far across (flats), lines one block wide. */
-	public static final double HEX = 9.5;
+	/**
+	 * The honeycomb: hexagons this far across (flat to flat), lines one block wide. Sized so the pedestals
+	 * (28 out) sit in the middle of a hexagon.
+	 */
+	public static final double HEX = 28 / Math.sqrt(3);
 
 	/** Three tiers of stands: where each starts (radius), its first row's top (above the floor), and its rows. */
 	public static final double[] TIER_IN = {51, 70, 89};
@@ -35,7 +39,7 @@ public final class ArenaLayout {
 	public static final double BACK_WALL = 105, ROOF_IN = 96, ROOF_OUT = 109;
 	public static final int ROOF = 46;
 	/** The pedestals: you start on the west one, the first opponent on the east one (on hexagon centres). */
-	public static final int PEDESTAL_X = 33;
+	public static final int PEDESTAL_X = 28;
 	/** You stand on the pedestal's top (its 3x3 is two blocks up). */
 	public static final int PEDESTAL_TOP = 3;
 	/** Arenas for different players sit this far apart along x. */
@@ -95,6 +99,34 @@ public final class ArenaLayout {
 		// Distance from the centre to the edge of a flat-topped hexagon, in the direction of p.
 		double edge = Math.max(pz, (px * Math.sqrt(3) + pz) / 2);
 		return Math.abs(size / 2 - edge);
+	}
+
+	/**
+	 * Whether the floor block at (x, z) (blocks from the centre, the centre block being 0, 0) is on a line of
+	 * the honeycomb. Each edge is drawn as a clean line one block wide, as a pixel line is drawn (one block
+	 * across the line's narrow way at each step along it), so the hexagons keep crisp straight sides and
+	 * sharp corners instead of blobs where three lines meet. Mirror images match, left and right.
+	 */
+	public static boolean hexLineBlock(int x, int z) {
+		double s = HEX, rad = s / Math.sqrt(3);
+		// The hexagon this block is in (as hexLine).
+		double q = (2.0 / 3 * x) / rad, t = (-1.0 / 3 * x + Math.sqrt(3) / 3 * z) / rad;
+		double cx = q, cz = t, cy = -q - t;
+		double rx = Math.round(cx), rz = Math.round(cz), ry = Math.round(cy);
+		double dx = Math.abs(rx - cx), dz = Math.abs(rz - cz), dy = Math.abs(ry - cy);
+		if (dx > dz && dx > dy) rx = -rz - ry;
+		else if (dz > dy) rz = -rx - ry;
+		double px = x - rad * 1.5 * rx, pz = z - s * (rz + rx / 2.0);
+		double[][] v = {{rad, 0}, {rad / 2, s / 2}, {-rad / 2, s / 2}, {-rad, 0}, {-rad / 2, -s / 2}, {rad / 2, -s / 2}};
+		for (int i = 0; i < 6; i++) {
+			double ax = v[i][0], az = v[i][1], ex = v[(i + 1) % 6][0] - ax, ez = v[(i + 1) % 6][1] - az;
+			double len = Math.sqrt(ex * ex + ez * ez), ux = ex / len, uz = ez / len;
+			double along = (px - ax) * ux + (pz - az) * uz;
+			if (along < -0.35 || along > len + 0.35) continue;
+			double off = Math.abs(ux * (pz - az) - uz * (px - ax));
+			if (off / Math.max(Math.abs(ux), Math.abs(uz)) <= 0.5) return true;
+		}
+		return false;
 	}
 
 	/** How far (x, z) is from the centre of a flat-topped hexagon, in its own measure (1 at the flats). */

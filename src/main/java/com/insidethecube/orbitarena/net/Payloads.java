@@ -18,7 +18,7 @@ public final class Payloads {
 		return new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(OrbitArena.ID, name));
 	}
 
-	/** Client to server: start a match with these settings. */
+	/** Client to server: start a match with these settings (or, when one has just ended, go again with them). */
 	public record Start(MatchSettings settings) implements CustomPacketPayload {
 		public static final Type<Start> TYPE = typeOf("start");
 		public static final StreamCodec<ByteBuf, Start> CODEC = MatchSettings.STREAM_CODEC.map(Start::new, Start::settings);
@@ -83,12 +83,28 @@ public final class Payloads {
 		}
 	}
 
+	/**
+	 * Server to client: the match is over (won or not, a line of how it went). The client offers to go
+	 * again, change the settings or leave.
+	 */
+	public record Result(boolean won, String reason, String summary) implements CustomPacketPayload {
+		public static final Type<Result> TYPE = typeOf("result");
+		public static final StreamCodec<ByteBuf, Result> CODEC = StreamCodec.composite(
+				ByteBufCodecs.BOOL, Result::won, ByteBufCodecs.STRING_UTF8, Result::reason, ByteBufCodecs.STRING_UTF8, Result::summary, Result::new);
+
+		@Override
+		public Type<Result> type() {
+			return TYPE;
+		}
+	}
+
 	public static void register() {
 		PayloadTypeRegistry.playC2S().register(Start.TYPE, codec(Start.CODEC));
 		PayloadTypeRegistry.playC2S().register(Leave.TYPE, codec(Leave.CODEC));
 		PayloadTypeRegistry.playS2C().register(State.TYPE, codec(State.CODEC));
 		PayloadTypeRegistry.playS2C().register(Cheer.TYPE, codec(Cheer.CODEC));
 		PayloadTypeRegistry.playS2C().register(Fade.TYPE, codec(Fade.CODEC));
+		PayloadTypeRegistry.playS2C().register(Result.TYPE, codec(Result.CODEC));
 	}
 
 	@SuppressWarnings("unchecked")
