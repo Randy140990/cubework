@@ -1,5 +1,8 @@
 Orbit Arena by Inside the Cube (Minecraft 1.21.11, Fabric).
 
+0.4.1: bots that get there whatever's in the way.
+- The Bridge's bots plan their way as a player would. Where something's in the way they weigh breaking through it, bridging out round it over the void, building a step and climbing over it, or pillaring straight up (and dropping down the other side, as there's no fall damage), and do whichever suits them: some are diggers, some builders, some climbers, so a team doesn't all do the same. They think again the moment their way is blocked or they're knocked off it. Attackers plan straight into your goal once they're near it, up the stairs or up the temple's side; defenders get to wherever they need to be to stop you, through or round anything. From 3 they build steps up; from 5 they pillar.
+
 0.4.0: The Bridge, waves that keep coming, celebrations and a fly-round.
 - The pause menu's button is now Orbit Arena (it was PvP Arena), and "Fighters (PvP)" on the setup screen is just Fighters.
 - The setup screen has two tabs, Arena and The Bridge, each with its own settings in the same places, so nothing jumps about when you change what you play.

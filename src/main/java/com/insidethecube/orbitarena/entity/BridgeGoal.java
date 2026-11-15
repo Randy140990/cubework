@@ -67,6 +67,11 @@ public final class BridgeGoal extends Goal {
 	private Vec3 lastPos = Vec3.ZERO, heading = Vec3.ZERO;
 	private double lastWayDist = 999;
 	private LivingEntity bowTarget;
+	/** Its plan for getting where it's going (see BridgePath), how far along it is, and when to think again. */
+	private List<BridgePath.Step> path;
+	private int pathAt, planCool, pathStall;
+	private BlockPos pathAim;
+	private BridgePath.Habits habits;
 
 	BridgeGoal(Fighter f) {
 		this.f = f;
@@ -292,7 +297,7 @@ public final class BridgeGoal extends Goal {
 				&& own * (rx(w, near.getX()) - rx(w, p.x)) < 0 && f.getRandom().nextFloat() < 0.04F * (d - 3)) {
 			wall(w, near, own, d);
 		}
-		steer(w, b, way, target, d);
+		travel(w, b, way, target, d);
 	}
 
 	/** Attack or defend, which stairs, and which way round anyone in the way on the bridge. */
@@ -616,6 +621,185 @@ public final class BridgeGoal extends Goal {
 		boolean sprint = d >= 3 && (attacking || flat(p, target) > 6) && Math.abs(lane) < 2.5;
 		f.setSprinting(sprint);
 		f.getMoveControl().setWantedPosition(wx, p.y, wz, sprint ? 1.0 : 0.85);
+	}
+
+	// ---------------------------------------------------------------- getting there, whatever's in the way
+
+	/** Its habits (from which bot it is): a digger, a builder or a climber, and what its level allows. */
+	private BridgePath.Habits habits(int d) {
+		if (habits == null) {
+			int kind = Math.floorMod(f.getUUID().hashCode(), 3);
+			double place = kind == 1 ? 2.0 : kind == 0 ? 3.4 : 2.6, mine = kind == 0 ? 1.4 : kind == 1 ? 4.5 : 3.5, climb = kind == 2 ? 0.6 : 1.6;
+			habits = new BridgePath.Habits(place + (10 - d) * 0.15, mine, climb, d >= 3, d >= 5);
+		}
+		return habits;
+	}
+
+	/**
+	 * Heads where it's going as a player would: with a plan (BridgePath) that walks, drops, breaks through,
+	 * bridges round, steps up over or pillars up past whatever's in the way, followed step by step and
+	 * thought again whenever it goes wrong. Where no plan can be made, it falls back on steering straight.
+	 */
+	private void travel(BridgeWorld w, Brain b, Vec3 way, Vec3 target, int d) {
+		ServerLevel level = w.level();
+		Vec3 p = f.position();
+		if (mining != null) {
+			hold(new ItemStack(Items.DIAMOND_PICKAXE));
+			f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
+			f.getLookControl().setLookAt(mining.getX() + 0.5, mining.getY() + 0.5, mining.getZ() + 0.5);
+			if (mineTicks % 4 == 0) f.swing(InteractionHand.MAIN_HAND);
+			if (--mineTicks <= 0) {
+				if (w.breakable(mining)) level.destroyBlock(mining, false, f);
+				mining = null;
+			}
+			return;
+		}
+		int own = side(b.team), theirs = -own;
+		Vec3 goalAt = world(w, goal(theirs));
+		// Near their goal, straight for it; otherwise to the route's next point (or where it's defending).
+		boolean forGoal = !b.defending && flat(p, goalAt) < 36;
+		Vec3 aim = forGoal ? new Vec3(goalAt.x, w.y() + TOP - 2, goalAt.z) : b.defending ? target : way;
+		BlockPos aimBlock = BlockPos.containing(aim);
+		BlockPos feet = BlockPos.containing(p.x, p.y + 0.2, p.z);
+		boolean lost = path != null && pathAt < path.size() && (flatTo(p, path.get(pathAt).at()) > 3.2 || Math.abs(p.y - path.get(pathAt).at().getY()) > 3);
+		boolean rethink = path == null || pathAt >= path.size() || --planCool <= 0 || lost || pathAim == null || pathAim.distSqr(aimBlock) > 6;
+		// (It thinks again with its feet on something: not halfway through a jump or a drop.)
+		if (rethink && f.onGround()) plan(w, b, feet, aim, forGoal, d);
+		if (path == null || path.isEmpty()) {
+			steer(w, b, way, target, d);
+			return;
+		}
+		follow(w, b, p, d);
+	}
+
+	private double flatTo(Vec3 p, BlockPos at) {
+		double dx = p.x - (at.getX() + 0.5), dz = p.z - (at.getZ() + 0.5);
+		return Math.sqrt(dx * dx + dz * dz);
+	}
+
+	private void plan(BridgeWorld w, Brain b, BlockPos feet, Vec3 aim, boolean forGoal, int d) {
+		int own = side(b.team), theirs = -own, cx = w.centreX(), cz = w.centreZ(), y0 = w.y();
+		// Never into its own goal; their goal is done the moment it's in the pit.
+		java.util.function.Predicate<BlockPos> ownPit = q -> Math.max(Math.abs(q.getX() - cx - own * GOAL_X), Math.abs(q.getZ() - cz)) <= GOAL_HALF && q.getY() - y0 <= TOP;
+		java.util.function.Predicate<BlockPos> done;
+		if (forGoal) {
+			done = q -> Math.max(Math.abs(q.getX() - cx - theirs * GOAL_X), Math.abs(q.getZ() - cz)) <= GOAL_HALF && q.getY() - y0 <= TOP;
+		} else {
+			done = q -> Math.abs(q.getX() + 0.5 - aim.x) < 1.2 && Math.abs(q.getZ() + 0.5 - aim.z) < 1.2 && Math.abs(q.getY() - aim.y) <= 1.5;
+		}
+		path = new BridgePath(w).find(feet, aim, done, ownPit, habits(d), 2200 + 380 * d);
+		pathAt = 0;
+		pathStall = 0;
+		pathAim = BlockPos.containing(aim);
+		planCool = 30 + (10 - d) * 3 + f.getRandom().nextInt(8);
+	}
+
+	/** Takes the next step of the plan: getting to it, and first whatever has to be done to make it. */
+	private void follow(BridgeWorld w, Brain b, Vec3 p, int d) {
+		ServerLevel level = w.level();
+		BridgePath.Step s = path.get(pathAt);
+		BlockPos at = s.at();
+		double hd = flatTo(p, at);
+		boolean landed = f.onGround() || s.act() == BridgePath.Act.DROP && p.y < at.getY() + 0.3;
+		if (hd < 0.42 && Math.abs(p.y - at.getY()) < 0.65 && landed) {
+			pathAt++;
+			pathStall = 0;
+			if (pathAt >= path.size()) {
+				f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
+				return;
+			}
+			s = path.get(pathAt);
+			at = s.at();
+			hd = flatTo(p, at);
+		}
+		if (!new BridgePath(w).stillGood(s)) {
+			path = null;
+			return;
+		}
+		if (++pathStall > 70) {
+			// Getting nowhere: think again (a little less keen on what it was trying).
+			path = null;
+			habits = null;
+			return;
+		}
+		double cx = at.getX() + 0.5, cz = at.getZ() + 0.5;
+		f.setShiftKeyDown(false);
+		switch (s.act()) {
+			case MINE -> {
+				for (BlockPos q : new BlockPos[] {at.above(), at}) {
+					if (solid(level, q)) {
+						if (!w.breakable(q)) {
+							path = null;
+							return;
+						}
+						mine(q, d);
+						return;
+					}
+				}
+			}
+			case BRIDGE -> {
+				BlockPos floor = at.below();
+				if (!solid(level, floor)) {
+					// At the edge, crouched, placing the next block out (low levels now and then just step off).
+					f.setShiftKeyDown(true);
+					f.setSprinting(false);
+					f.getLookControl().setLookAt(floor.getX() + 0.5, floor.getY() + 0.5, floor.getZ() + 0.5);
+					if (d <= 2 && f.getRandom().nextFloat() < 0.01F) {
+						f.getMoveControl().setWantedPosition(cx, at.getY(), cz, 1.0);
+						return;
+					}
+					if (hd > 1.5) {
+						BlockPos back = pathAt > 0 ? path.get(pathAt - 1).at() : BlockPos.containing(p);
+						f.getMoveControl().setWantedPosition(back.getX() + 0.5, back.getY(), back.getZ() + 0.5, 0.6);
+						return;
+					}
+					f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
+					if (placeCool == 0) place(w, b, floor);
+					return;
+				}
+			}
+			case STAIR -> {
+				BlockPos step = at.below();
+				if (!solid(level, step)) {
+					f.setSprinting(false);
+					f.getLookControl().setLookAt(step.getX() + 0.5, step.getY() + 0.5, step.getZ() + 0.5);
+					if (!level.getEntities(f, new AABB(step)).isEmpty()) {
+						path = null;
+						return;
+					}
+					if (hd > 2.2) break;
+					f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
+					if (placeCool == 0) place(w, b, step);
+					return;
+				}
+			}
+			case PILLAR -> {
+				BlockPos under = at.below();
+				if (!solid(level, under)) {
+					f.setSprinting(false);
+					f.getMoveControl().setWantedPosition(under.getX() + 0.5, p.y, under.getZ() + 0.5, 0.5);
+					f.getLookControl().setLookAt(under.getX() + 0.5, under.getY(), under.getZ() + 0.5);
+					if (f.onGround()) f.getJumpControl().jump();
+					else if (p.y >= under.getY() + 1.0 && placeCool == 0) place(w, b, under);
+					return;
+				}
+			}
+			default -> {
+			}
+		}
+		// On to it: jump up a block, walk, or step off the edge.
+		hold(sword());
+		f.getLookControl().setLookAt(cx, f.getEyeY(), cz);
+		boolean up = (s.act() == BridgePath.Act.UP || s.act() == BridgePath.Act.STAIR) && !level.getBlockState(at.below()).is(net.minecraft.tags.BlockTags.STAIRS);
+		if (up && f.onGround() && hd < 1.5 && at.getY() > p.y + 0.4) f.getJumpControl().jump();
+		boolean clear = true;
+		for (int k = pathAt; k < Math.min(path.size(), pathAt + 4); k++) {
+			BridgePath.Act a = path.get(k).act();
+			if (a != BridgePath.Act.WALK && a != BridgePath.Act.DROP) clear = false;
+		}
+		boolean sprint = d >= 3 && clear && (!b.defending || hd > 3);
+		f.setSprinting(sprint);
+		f.getMoveControl().setWantedPosition(cx, at.getY(), cz, sprint ? 1.0 : 0.85);
 	}
 
 	/** Starts breaking a placed block (quicker the better it is). */
