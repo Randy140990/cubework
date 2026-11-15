@@ -1,8 +1,7 @@
-net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
-net.minecraft.client.renderer.entity.EntityRenderer
-net.minecraft.client.renderer.SubmitNodeCollector
-net.minecraft.client.KeyMapping
-net.minecraft.client.KeyMapping$Category
-net.minecraft.world.entity.item.FallingBlockEntity
-net.minecraft.client.renderer.entity.state.HumanoidRenderState
+net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState
+net.minecraft.world.entity.projectile.arrow.Arrow
+net.minecraft.client.CameraType
+net.minecraft.world.entity.decoration.ArmorStand
+net.minecraft.client.renderer.entity.state.AvatarRenderState
+net.minecraft.client.resources.sounds.SimpleSoundInstance
+net.minecraft.world.level.ServerExplosion

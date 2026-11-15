@@ -1,7 +1,0 @@
-/Arrow\.class
-ArmorStand\.class
-VanillaHudElements
-HudElementRegistry
-AvatarRenderState
-/PlayerModel\.class
-CameraType\.class
