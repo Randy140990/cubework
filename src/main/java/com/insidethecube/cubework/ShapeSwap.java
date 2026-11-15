@@ -9,7 +9,11 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import com.insidethecube.cubework.block.ShapeEntity;
 
 /**
  * The shape wheel's swaps. In creative the held stack becomes the chosen shape. In survival a stack is
@@ -24,11 +28,22 @@ public final class ShapeSwap {
 
 	private static Map<Block, Kind> vanillaShapes;
 
-	/** A Cubework shape, a full block Cubework makes shapes of, or a vanilla shape of one (stone brick stairs). */
-	public static Kind of(Block b) {
+	/** A stack of a Cubework shape, of a full block Cubework makes shapes of, or of a vanilla shape of one (stone brick stairs). */
+	public static Kind of(ItemStack stack) {
+		if (stack.getItem() instanceof ShapeItem si) return new Kind(si.material(stack), si.shape());
+		return stack.getItem() instanceof BlockItem bi ? of(bi.getBlock()) : null;
+	}
+
+	/** The block placed at pos, as above. */
+	public static Kind of(BlockGetter world, BlockPos pos) {
+		BlockState state = world.getBlockState(pos);
+		CwBlocks.Info info = CwBlocks.info(state.getBlock());
+		if (info != null) return new Kind(ShapeEntity.atOrDefault(world, pos, state), info.shape());
+		return of(state.getBlock());
+	}
+
+	private static Kind of(Block b) {
 		if (b == null) return null;
-		CwBlocks.Info info = CwBlocks.info(b);
-		if (info != null) return new Kind(info.material(), info.shape());
 		Material m = CwBlocks.materialOf(b);
 		if (m != null) return new Kind(m, null);
 		return vanilla().get(b);
@@ -58,9 +73,10 @@ public final class ShapeSwap {
 		return s == null ? 1 : s.fromStonecutter;
 	}
 
-	/** The block for a material and shape (the full block for no shape). */
-	public static Block block(Material m, Shape s) {
-		return s == null ? m.base() : CwBlocks.get(m, s);
+	/** A stack of a material's shape (the full block for no shape). */
+	public static ItemStack stack(Material m, Shape s) {
+		if (s == null) return m.base() == null ? ItemStack.EMPTY : new ItemStack(m.base());
+		return CwBlocks.stack(m, s);
 	}
 
 	/** Patterns and the block they're drawn on are one family: their full blocks swap one for one. */
@@ -68,20 +84,19 @@ public final class ShapeSwap {
 		return m.patterned() ? m.source() : m.id();
 	}
 
-	/** The server's side of a pick from the wheel. */
-	public static void pick(ServerPlayer player, Identifier itemId) {
-		Item target = Reg.item(itemId);
-		if (!(target instanceof BlockItem bi)) return;
-		Kind want = of(bi.getBlock());
-		if (want == null) return;
+	/** The server's side of a pick from the wheel: a material and a shape (null for the full block). */
+	public static void pick(ServerPlayer player, Material material, Shape shape) {
+		ItemStack target = stack(material, shape);
+		if (target.isEmpty()) return;
+		Kind want = new Kind(material, shape);
 		ItemStack held = player.getMainHandItem();
-		int max = new ItemStack(target).getMaxStackSize();
+		int max = target.getMaxStackSize();
 		if (player.hasInfiniteMaterials()) {
 			int count = held.isEmpty() ? 1 : Math.min(held.getCount(), max);
-			player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(target, Math.max(1, count)));
+			player.setItemInHand(InteractionHand.MAIN_HAND, target.copyWithCount(Math.max(1, count)));
 			return;
 		}
-		Kind have = held.getItem() instanceof BlockItem hb ? of(hb.getBlock()) : null;
+		Kind have = of(held);
 		if (have == null) {
 			say(player, "Hold the block you want to change.");
 			return;
@@ -101,8 +116,8 @@ public final class ShapeSwap {
 		}
 		int used = blocks * a, made = blocks * b, left = held.getCount() - used;
 		ItemStack spare = left > 0 ? held.copyWithCount(left) : ItemStack.EMPTY;
-		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(target, Math.min(made, max)));
-		for (int rest = made - max; rest > 0; rest -= max) player.getInventory().placeItemBackInInventory(new ItemStack(target, Math.min(rest, max)));
+		player.setItemInHand(InteractionHand.MAIN_HAND, target.copyWithCount(Math.min(made, max)));
+		for (int rest = made - max; rest > 0; rest -= max) player.getInventory().placeItemBackInInventory(target.copyWithCount(Math.min(rest, max)));
 		if (!spare.isEmpty()) player.getInventory().placeItemBackInInventory(spare);
 	}
 

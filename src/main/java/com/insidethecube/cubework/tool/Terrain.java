@@ -25,6 +25,7 @@ import com.insidethecube.cubework.Shape;
 import com.insidethecube.cubework.block.CwShape;
 import com.insidethecube.cubework.block.GentleSlopeBlock;
 import com.insidethecube.cubework.block.SlopeBlock;
+import com.insidethecube.cubework.block.ShapeEntity;
 
 /**
  * Smooths stepped ground with Cubework slopes, for the terrain brush and (if switched on) new terrain.
@@ -43,7 +44,10 @@ public final class Terrain {
 	private static final int NONE = Integer.MIN_VALUE;
 
 	/** One change, so it can be undone. */
-	public record Change(BlockPos pos, BlockState before) {}
+	public record Change(BlockPos pos, BlockState before, Material beforeMaterial) {}
+
+	/** A shape to place, and its material. */
+	private record Placed(BlockState state, Material material) {}
 
 	private static final Map<UUID, Deque<List<Change>>> HISTORY = new HashMap<>();
 
@@ -68,7 +72,10 @@ public final class Terrain {
 		Deque<List<Change>> h = HISTORY.get(player.getUUID());
 		if (h == null || h.isEmpty()) return -1;
 		List<Change> last = h.pop();
-		for (int i = last.size() - 1; i >= 0; i--) level.setBlock(last.get(i).pos(), last.get(i).before(), Block.UPDATE_ALL);
+		for (int i = last.size() - 1; i >= 0; i--) {
+			Change c = last.get(i);
+			CwBlocks.place(level, c.pos(), c.before(), c.beforeMaterial(), Block.UPDATE_ALL);
+		}
 		return last.size();
 	}
 
@@ -104,7 +111,7 @@ public final class Terrain {
 				}
 			}
 		}
-		Map<BlockPos, BlockState> place = new LinkedHashMap<>();
+		Map<BlockPos, Placed> place = new LinkedHashMap<>();
 		boolean[][] done = new boolean[W][D];
 		for (int i = pad; i < pad + w; i++) {
 			for (int j = pad; j < pad + d; j++) {
@@ -115,14 +122,15 @@ public final class Terrain {
 			}
 		}
 		// Place everything, then let each slope turn its corners from its new neighbours.
-		for (Map.Entry<BlockPos, BlockState> e : place.entrySet()) {
+		for (Map.Entry<BlockPos, Placed> e : place.entrySet()) {
 			BlockState before = level.getBlockState(e.getKey());
-			BlockState state = e.getValue();
+			Material beforeMaterial = ShapeEntity.at(level, e.getKey());
+			BlockState state = e.getValue().state();
 			if (state.hasProperty(BlockStateProperties.WATERLOGGED)) {
 				state = state.setValue(BlockStateProperties.WATERLOGGED, level.getFluidState(e.getKey()).is(FluidTags.WATER)
 						&& level.getFluidState(e.getKey()).getType() == Fluids.WATER);
 			}
-			if (level.setBlock(e.getKey(), state, flags)) changes.add(new Change(e.getKey(), before));
+			if (CwBlocks.place(level, e.getKey(), state, e.getValue().material(), flags)) changes.add(new Change(e.getKey(), before, beforeMaterial));
 		}
 		for (BlockPos at : place.keySet()) {
 			BlockState s = level.getBlockState(at);
@@ -136,7 +144,7 @@ public final class Terrain {
 		Block b = s.getBlock();
 		if (b instanceof CwShape) return null;
 		Material m = CwBlocks.materialOf(b);
-		if (m == null || CwBlocks.info(b) != null || CwBlocks.get(m, Shape.SLOPE) == null) return null;
+		if (m == null || CwBlocks.get(m, Shape.SLOPE) == null) return null;
 		return m;
 	}
 
@@ -154,7 +162,7 @@ public final class Terrain {
 	}
 
 	/** Cut the top edge of a higher column into a slope falling towards a lower neighbour. */
-	private static void carve(int[][] h, Material[][] top, int i, int j, int x, int z, Map<BlockPos, BlockState> place) {
+	private static void carve(int[][] h, Material[][] top, int i, int j, int x, int z, Map<BlockPos, Placed> place) {
 		int y = h[i][j];
 		Direction drop = null;
 		int drops = 0;
@@ -181,11 +189,12 @@ public final class Terrain {
 		}
 		Block slope = CwBlocks.get(top[i][j], Shape.SLOPE);
 		if (slope == null) return;
-		place.put(new BlockPos(x, y, z), slope.defaultBlockState().setValue(SlopeBlock.FACING, drop.getOpposite()).setValue(SlopeBlock.HALF, Half.BOTTOM));
+		place.put(new BlockPos(x, y, z), new Placed(slope.defaultBlockState().setValue(SlopeBlock.FACING, drop.getOpposite()).setValue(SlopeBlock.HALF, Half.BOTTOM),
+				top[i][j]));
 	}
 
 	/** Add slopes on top of a lower column, rising towards a neighbour one block higher. */
-	private static void fill(int[][] h, Material[][] top, int i, int j, int x, int z, int steep, Map<BlockPos, BlockState> place, boolean[][] done,
+	private static void fill(int[][] h, Material[][] top, int i, int j, int x, int z, int steep, Map<BlockPos, Placed> place, boolean[][] done,
 			Area area, int ox, int oz, int pad, int w, int d) {
 		if (done[i][j]) return;
 		int y = h[i][j];
@@ -239,6 +248,7 @@ public final class Terrain {
 			slope = CwBlocks.get(m, Shape.SLOPE);
 			n = 1;
 		}
+		Material material = m;
 		if (slope == null) return;
 		Direction back = rise.getOpposite();
 		for (int k = 0; k < n; k++) {
@@ -248,7 +258,7 @@ public final class Terrain {
 			if (k > 0 && (!area.contains(bx, bz) || done[bi][bj])) break;
 			BlockState s = slope.defaultBlockState().setValue(SlopeBlock.FACING, rise).setValue(SlopeBlock.HALF, Half.BOTTOM);
 			if (slope instanceof GentleSlopeBlock g) s = s.setValue(g.step(), n - k);
-			place.put(new BlockPos(bx, y + 1, bz), s);
+			place.put(new BlockPos(bx, y + 1, bz), new Placed(s, material));
 			done[bi][bj] = true;
 		}
 	}

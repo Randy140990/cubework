@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -21,8 +21,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class CornerPostBlock extends CwBlock implements SimpleWaterloggedBlock {
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-	public CornerPostBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public CornerPostBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));
 	}
 

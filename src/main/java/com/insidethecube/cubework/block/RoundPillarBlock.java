@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,8 +32,8 @@ public class RoundPillarBlock extends CwBlock {
 	public final int size;
 	private final VoxelShape[] shapes = new VoxelShape[16];
 
-	public RoundPillarBlock(Material material, int size, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public RoundPillarBlock(Behaviour behaviour, int size, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		this.size = size;
 		registerDefaultState(defaultBlockState().setValue(PART, 0));
 	}

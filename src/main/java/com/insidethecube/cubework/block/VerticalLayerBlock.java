@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 
 /**
  * Snow-style layers on the side of a block: 1 to 8, each 2 pixels, growing out from the wall towards
@@ -40,11 +40,11 @@ public class VerticalLayerBlock extends CwBlock {
 		};
 	}
 
-	public VerticalLayerBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public VerticalLayerBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		for (Direction d : Direction.Plane.HORIZONTAL) {
 			VoxelShape[] s = new VoxelShape[9];
-			for (int n = 1; n <= 8; n++) s[n] = shape(d, n * 2, material.height());
+			for (int n = 1; n <= 8; n++) s[n] = shape(d, n * 2, behaviour.height());
 			shapes.put(d, s);
 		}
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.SOUTH).setValue(LAYERS, 1));
@@ -67,7 +67,7 @@ public class VerticalLayerBlock extends CwBlock {
 
 	@Override
 	protected boolean canBeReplaced(BlockState state, BlockPlaceContext ctx) {
-		if (!ctx.getItemInHand().is(asItem()) || state.getValue(LAYERS) >= 8) return false;
+		if (!ctx.getItemInHand().is(asItem()) || state.getValue(LAYERS) >= 8 || !Shared.sameMaterial(state, ctx)) return false;
 		return !ctx.replacingClickedOnBlock() || ctx.getClickedFace() == state.getValue(FACING);
 	}
 
@@ -76,7 +76,7 @@ public class VerticalLayerBlock extends CwBlock {
 		BlockState existing = ctx.getLevel().getBlockState(ctx.getClickedPos());
 		if (existing.is(this)) {
 			int n = Math.min(8, existing.getValue(LAYERS) + 1);
-			return placed(n == 8 ? material.base().defaultBlockState() : existing.setValue(LAYERS, n), ctx);
+			return placed(n == 8 ? com.insidethecube.cubework.CwBlocks.materialOf(ctx.getItemInHand()).base().defaultBlockState() : existing.setValue(LAYERS, n), ctx);
 		}
 		Direction side = ctx.getClickedFace();
 		Direction grows = side.getAxis().isHorizontal() ? side : ctx.getHorizontalDirection().getOpposite();

@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -29,8 +29,8 @@ public class ArchBlock extends CwBlock implements SimpleWaterloggedBlock {
 	private static final VoxelShape SOLID_Z = Profiles.shape(ArchGeometry.inside(false), 0, 16, 0);
 	private static final VoxelShape SOLID_X = Profiles.shape(ArchGeometry.inside(false), 0, 16, 1);
 
-	public ArchBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public ArchBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(AXIS, Direction.Axis.Z).setValue(WATERLOGGED, false));
 	}
 

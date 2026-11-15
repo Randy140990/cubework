@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -41,8 +41,8 @@ public class PitchStairsBlock extends CwBlock implements SimpleWaterloggedBlock 
 
 	private final VoxelShape[] shapes = new VoxelShape[4 * 4 * 2];
 
-	public PitchStairsBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public PitchStairsBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(HALF, Half.BOTTOM).setValue(step(), 1)
 				.setValue(WATERLOGGED, false));
 	}
@@ -61,8 +61,8 @@ public class PitchStairsBlock extends CwBlock implements SimpleWaterloggedBlock 
 	public static class Over3 extends PitchStairsBlock {
 		public static final IntegerProperty STEP_3 = IntegerProperty.create("step", 1, 3);
 
-		public Over3(Material material, BlockBehaviour.Properties settings) {
-			super(material, settings);
+		public Over3(Behaviour behaviour, BlockBehaviour.Properties settings) {
+			super(behaviour, settings);
 		}
 
 		@Override
@@ -80,8 +80,8 @@ public class PitchStairsBlock extends CwBlock implements SimpleWaterloggedBlock 
 	public static class Over2 extends PitchStairsBlock {
 		public static final IntegerProperty STEP_2 = IntegerProperty.create("step", 1, 2);
 
-		public Over2(Material material, BlockBehaviour.Properties settings) {
-			super(material, settings);
+		public Over2(Behaviour behaviour, BlockBehaviour.Properties settings) {
+			super(behaviour, settings);
 		}
 
 		@Override

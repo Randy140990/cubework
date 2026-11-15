@@ -2,7 +2,7 @@ package com.insidethecube.cubework.block;
 
 import java.util.Locale;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -61,8 +61,8 @@ public class TrimBlock extends CwBlock implements SimpleWaterloggedBlock {
 	private final int width;
 	private final VoxelShape[] shapes = new VoxelShape[Edge.values().length];
 
-	public TrimBlock(Material material, int width, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public TrimBlock(Behaviour behaviour, int width, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		this.width = width;
 		registerDefaultState(defaultBlockState().setValue(EDGE, Edge.DOWN_NORTH).setValue(WATERLOGGED, false));
 	}

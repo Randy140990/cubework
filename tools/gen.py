@@ -82,6 +82,88 @@ STEMS = {"stone_bricks": "stone_brick", "cracked_stone_bricks": "cracked_stone_b
          "copper_block": "copper", "waxed_copper_block": "waxed_copper"}
 
 
+# ---------- looks: one per shape and family, drawn in stand-in textures ----------
+#
+# Each shape is one block for every material of its behaviour (see Behaviour.java); a placed shape's
+# material is kept with it, and the game draws it from the look of its material's family in the material's
+# own textures (MaterialModels.java). The looks are written by the same builders as before, given a
+# stand-in material ("slot:plain" and so on) whose textures are cubework:block/slot/{top,side,bottom,overlay}.
+
+SLOT = "slot:"
+SLOT_TEX = NS + ":block/slot/"
+# As MaterialModels.Family: plain, glass, glazed, nature, nature_grass, nature_short, squeeze.
+FAMILIES = ["plain", "glass", "glazed", "nature", "nature_grass", "nature_short", "squeeze"]
+# The look being written (suffix, family), or None.
+LOOK = None
+LOOK_ITEMS = {}
+
+
+def family_of(mat):
+    return mat[len(SLOT):] if mat.startswith(SLOT) else None
+
+
+def squeezes(mat):
+    """Chiseled, smooth and pillar blocks squeeze their whole texture onto a pillar; the rest are cut from the middle."""
+    f = family_of(mat)
+    if f is not None:
+        return f == "squeeze"
+    return "chiseled" in mat or "smooth" in mat or mat.endswith("pillar")
+
+
+def is_grass(mat):
+    return mat == "grass_block" or family_of(mat) == "nature_grass"
+
+
+def family(mat, kind, suffix):
+    """Which look a material's shape uses (as MaterialModels.Family.of)."""
+    as_building = kind == "nature" and (suffix not in NATURE_SHAPES or (is_building(mat) and suffix in NEW_NATURE))
+    if kind == "nature" and not as_building:
+        if textures_of(mat)["overlay"]:
+            return "nature_grass"
+        return "nature_short" if height_of(mat) == 15 else "nature"
+    if kind == "glass":
+        return "glass"
+    if suffix.startswith("pillar_"):
+        return "squeeze" if squeezes(mat) else "plain"
+    if kind == "glazed":
+        return "glazed"
+    return "plain"
+
+
+def is_copper(mat):
+    m = mat[6:] if mat.startswith("waxed_") else mat
+    if m in ("copper_block", "chiseled_copper", "cut_copper"):
+        return True
+    for age in ("exposed_", "weathered_", "oxidized_"):
+        if m.startswith(age) and m[len(age):] in ("copper", "chiseled_copper", "cut_copper"):
+            return True
+    return False
+
+
+def behaviour(mat, kind):
+    """The behaviour a material's shapes have (as Behaviour.of): the suffix of its shapes' block ids."""
+    if kind == "glass":
+        return "tinted" if mat == "tinted_glass" else "glass"
+    if kind == "wool" or (kind == "pattern" and PATTERN_OF[mat][1].endswith("_wool")):
+        return "wool"
+    if kind == "wallpaper":
+        return "wallpaper"
+    if is_copper(mat):
+        return "copper"
+    return {"ice": "ice", "packed_ice": "packed_ice", "blue_ice": "blue_ice", "dirt_path": "short", "farmland": "short", "soul_sand": "soul",
+            "magma_block": "magma", "crying_obsidian": "crying", "glowstone": "glowing", "coal_block": "coal"}.get(mat, "")
+
+
+BEHAVIOUR_NAMES = {"short": "Short", "glass": "Glass", "tinted": "Tinted Glass", "ice": "Ice", "packed_ice": "Packed Ice", "blue_ice": "Blue Ice",
+                   "soul": "Soul Sand", "magma": "Magma", "crying": "Crying Obsidian", "glowing": "Glowstone", "wool": "Wool",
+                   "wallpaper": "Wallpaper", "coal": "Coal", "copper": "Copper"}
+
+
+def class_id(suffix, beh):
+    """A shape block's id (as Behaviour.idOf): "shape_" keeps it apart from the ids before 0.12."""
+    return "shape_" + (suffix if not beh else suffix + "_" + beh)
+
+
 def stem(mat):
     if mat in PATTERN_OF:
         p, src = PATTERN_OF[mat]
@@ -95,6 +177,9 @@ def is_building(mat):
 
 def full_model(mat):
     """The vanilla full block's model (waxed copper uses unwaxed copper's; patterns their own)."""
+    f = family_of(mat)
+    if f is not None:
+        return m("look/full_" + {"nature_grass": "grass", "nature_short": "short", "glazed": "glazed"}.get(f, "plain"))
     if mat in PATTERN_OF or mat in WALLPAPERS:
         return m(mat)
     return "minecraft:block/" + (mat[6:] if mat.startswith("waxed_") else mat)
@@ -271,6 +356,10 @@ def applies(mat, kind, suffix):
 
 
 def textures_of(mat):
+    f = family_of(mat)
+    if f is not None:
+        return {"top": SLOT_TEX + "top", "side": SLOT_TEX + "side", "bottom": SLOT_TEX + "bottom",
+                "overlay": SLOT_TEX + "overlay" if f == "nature_grass" else None}
     if mat in WALLPAPERS:
         t = NS + ":block/wallpaper/" + mat
         return {"top": t, "side": t, "bottom": t, "overlay": None}
@@ -287,7 +376,7 @@ def textures_of(mat):
 
 
 def height_of(mat):
-    return 15 if mat in ("dirt_path", "farmland") else 16
+    return 15 if mat in ("dirt_path", "farmland") or family_of(mat) == "nature_short" else 16
 
 
 def write(path, obj):
@@ -321,6 +410,9 @@ def model(name, parent, textures):
 
 
 def blockstate(name, obj):
+    if LOOK:
+        write(os.path.join(ASSETS, "looks", LOOK[0], LOOK[1] + ".json"), obj)
+        return
     write(os.path.join(ASSETS, "blockstates", name + ".json"), obj)
 
 
@@ -329,11 +421,17 @@ def joined_blockstate(name, obj):
     tables, partitions: see Joining.java). It's written with the join properties (north, up, left...) as if
     the block had them; the game never reads it as a blockstate file, Cubework's JoinedModels does, and picks
     the joined look from the neighbours as the chunk is drawn."""
+    if LOOK:
+        write(os.path.join(ASSETS, "looks", LOOK[0], LOOK[1] + ".json"), obj)
+        return
     write(os.path.join(ASSETS, "joined", name + ".json"), obj)
 
 
 def item(name, model_id, tinted=False):
     """The item's look: an item model definition from 1.21.4, before that an item model (tints are set in code)."""
+    if LOOK:
+        LOOK_ITEMS[LOOK] = {"models": [model_id], "tint": bool(tinted)}
+        return
     if MC >= (1, 21, 4):
         mdl = {"type": "minecraft:model", "model": model_id}
         if tinted:
@@ -695,6 +793,17 @@ def round_templates():
     template("template_corner_post", [([8, 0, 0], [16, 16, 8])])
 
 
+def full_looks():
+    """The full block in each family's look (a double slab, a vertical slab made whole): a cube in stand-in
+    textures; grass's with its tinted overlay, dirt path's and farmland's a pixel low, glazed terracotta's
+    with its faces turned, as the vanilla models."""
+    t = {"particle": SLOT_TEX + "side", "top": SLOT_TEX + "top", "side": SLOT_TEX + "side", "bottom": SLOT_TEX + "bottom"}
+    model("look/full_plain", "minecraft:block/cube_bottom_top", t)
+    model("look/full_grass", "minecraft:block/grass_block", dict(t, overlay=SLOT_TEX + "overlay"))
+    model("look/full_short", "minecraft:block/dirt_path", t)
+    model("look/full_glazed", "minecraft:block/template_glazed_terracotta", {"particle": SLOT_TEX + "side", "pattern": SLOT_TEX + "side"})
+
+
 def templates():
     round_templates()
     office_templates()
@@ -728,7 +837,7 @@ def stairs(mat, kind, name):
         model(name + "_inner", m("template_inner_stairs" + sfx), t)
         model(name + "_outer", m("template_outer_stairs" + sfx), t)
         blockstate(name, from_template("stairs", {"straight": m(name), "inner": m(name + "_inner"), "outer": m(name + "_outer")}))
-        item(name, m(name), mat == "grass_block")
+        item(name, m(name), is_grass(mat))
         return
     t = faces(mat)
     model(name, "minecraft:block/stairs", t)
@@ -749,7 +858,7 @@ def slab(mat, kind, name):
         model(name + "_top", "minecraft:block/slab_top", t)
     blockstate(name, {"variants": {"type=bottom": {"model": m(name)}, "type=top": {"model": m(name + "_top")},
                                    "type=double": {"model": full_model(mat)}}})
-    item(name, m(name), mat == "grass_block")
+    item(name, m(name), is_grass(mat))
 
 
 def vertical_slab(mat, kind, name):
@@ -760,7 +869,7 @@ def vertical_slab(mat, kind, name):
         v["double=false,facing=" + d] = {"model": m(name), "y": Y_FROM_NORTH[d], "uvlock": kind != "nature"}
         v["double=true,facing=" + d] = {"model": full_model(mat)}
     blockstate(name, {"variants": v})
-    item(name, m(name), mat == "grass_block")
+    item(name, m(name), is_grass(mat))
 
 
 def slope(mat, kind, name):
@@ -769,7 +878,7 @@ def slope(mat, kind, name):
     if kind != "nature":
         sfx = ""
     model(name + "_item", m("template_slope_item" + sfx), t)
-    item(name, m(name + "_item"), mat == "grass_block")
+    item(name, m(name + "_item"), is_grass(mat))
 
 
 def layer(mat, kind, name):
@@ -780,7 +889,7 @@ def layer(mat, kind, name):
         v["layers=%d" % n] = {"model": m(name + "_height%d" % (2 * n))}
     v["layers=8"] = {"model": full_model(mat)}
     blockstate(name, {"variants": v})
-    item(name, m(name + "_height2"), mat == "grass_block")
+    item(name, m(name + "_height2"), is_grass(mat))
 
 
 def vertical_layer(mat, kind, name):
@@ -794,7 +903,7 @@ def vertical_layer(mat, kind, name):
             v["facing=%s,layers=%d" % (d, n)] = {"model": m(name + "_depth%d" % (2 * n)), "y": grows_y[d], "uvlock": kind != "nature"}
         v["facing=%s,layers=8" % d] = {"model": full_model(mat)}
     blockstate(name, {"variants": v})
-    item(name, m(name + "_depth4"), mat == "grass_block")
+    item(name, m(name + "_depth4"), is_grass(mat))
 
 
 def carpet(mat, kind, name):
@@ -805,7 +914,7 @@ def carpet(mat, kind, name):
         model(name, "minecraft:block/carpet", {"wool": faces(mat)["top"]})
     # Laid facing the player and turned by an empty hand, as glazed terracotta is turned.
     blockstate(name, {"variants": {"facing=" + d: {"model": m(name), "y": {"south": 0, "west": 90, "north": 180, "east": 270}[d]} for d in HORIZONTAL}})
-    item(name, m(name), mat == "grass_block")
+    item(name, m(name), is_grass(mat))
 
 
 def panel(mat, kind, name):
@@ -884,14 +993,14 @@ def quarter_slab(mat, kind, name):
     model(name, m("template_quarter_slab" + sfx), t)
     model(name + "_top", m("template_quarter_slab_top" + sfx), t)
     blockstate(name, {"variants": {"half=bottom": {"model": m(name)}, "half=top": {"model": m(name + "_top")}}})
-    item(name, m(name), mat == "grass_block")
+    item(name, m(name), is_grass(mat))
 
 
 def gentle_slope(mat, kind, name, n=4):
     # Placed slopes are built in code (SlopeModel); this one is for the item.
     t, sfx = shape_textures(mat, kind)
     model(name + "_item", m("template_slope_%d_item%s" % (n, sfx)), t)
-    item(name, m(name + "_item"), mat == "grass_block")
+    item(name, m(name + "_item"), is_grass(mat))
 
 
 def step_stairs(mat, kind, name, n):
@@ -951,7 +1060,9 @@ def bordered(mat, kind, name):
     model(name, "minecraft:block/cube_bottom_top", faces(mat))
     blockstate(name, {"multipart": [{"apply": {"model": m(name)}}, {"when": {"border_top": "true"}, "apply": {"model": m("border_top")}},
                                     {"when": {"border_bottom": "true"}, "apply": {"model": m("border_bottom")}}]})
-    if MC >= (1, 21, 4):
+    if LOOK:
+        LOOK_ITEMS[LOOK] = {"models": [m(name), m("border_top"), m("border_bottom")], "tint": False}
+    elif MC >= (1, 21, 4):
         write(os.path.join(ASSETS, "items", name + ".json"), {"model": {"type": "minecraft:composite", "models": [
             {"type": "minecraft:model", "model": m(name)}, {"type": "minecraft:model", "model": m("border_top")},
             {"type": "minecraft:model", "model": m("border_bottom")}]}})
@@ -1040,7 +1151,7 @@ def arch_corner(mat, kind, name):
 def pillar(mat, kind, name, w):
     """Chiseled, smooth and pillar blocks squeeze their whole texture onto the pillar; the rest are cut from the middle."""
     f = faces(mat)
-    squeeze = "chiseled" in mat or "smooth" in mat or mat.endswith("pillar")
+    squeeze = squeezes(mat)
     model(name, m(("template_thin_log_%d" if squeeze else "template_pillar_%d") % w), f)
     lock = not squeeze
     blockstate(name, {"variants": {"axis=y": {"model": m(name)}, "axis=z": {"model": m(name), "x": 90, "uvlock": lock},
@@ -1179,11 +1290,15 @@ SILK = [{"condition": "minecraft:match_tool", "predicate": {"predicates": {"mine
     {"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}}]
 
 
-def loot(name, suffix=None, silk=False):
+# A shape's drop keeps the placed block's material.
+COPY_MATERIAL = {"function": "minecraft:copy_components", "source": "block_entity", "include": [NS + ":material"]}
+
+
+def loot(name, suffix=None, silk=False, copy=False):
     block_id = NS + ":" + name
     if MC >= (26, 3):
-        return loot_26_3(name, block_id, suffix, silk)
-    entry = {"type": "minecraft:item", "name": NS + ":" + name, "functions": []}
+        return loot_26_3(name, block_id, suffix, silk, copy)
+    entry = {"type": "minecraft:item", "name": NS + ":" + name, "functions": [COPY_MATERIAL] if copy else []}
     if suffix in ("slab", "vertical_slab"):
         prop = {"type": "double"} if suffix == "slab" else {"double": "true"}
         entry["functions"].append({"function": "minecraft:set_count", "add": False, "count": 2.0,
@@ -1201,9 +1316,9 @@ def loot(name, suffix=None, silk=False):
           {"type": "minecraft:block", "pools": [pool], "random_sequence": NS + ":blocks/" + name})
 
 
-def loot_26_3(name, block_id, suffix, silk):
+def loot_26_3(name, block_id, suffix, silk, copy=False):
     """26.3's loot tables: modifiers and conditions name their type, and silk touch is a predicate of its own."""
-    mods = []
+    mods = [{"type": "minecraft:copy_components", "source": "block_entity", "include": [NS + ":material"]}] if copy else []
     if suffix in ("slab", "vertical_slab"):
         state = {"type": "double"} if suffix == "slab" else {"double": "true"}
         mods.append({"type": "minecraft:set_count", "condition": {"type": "minecraft:match_block", "blocks": block_id, "state": state}, "count": 2})
@@ -1235,11 +1350,15 @@ def door_loot(name):
                        {"condition": "minecraft:block_state_property", "block": NS + ":" + name, "properties": {"half": "lower"}}]}]}]})
 
 
-def stonecutting(source, name, count, result_ns=NS):
-    """A stonecutter recipe; patterns (and their shapes) are cut from Cubework's patterned blocks."""
+def stonecutting(source, name, count, result_ns=NS, result=None, material=None):
+    """A stonecutter recipe; patterns (and their shapes) are cut from Cubework's patterned blocks. A shape's
+    recipe (named as it always was) makes its block's item with the material on it."""
     src_id = (NS if source in PATTERN_OF or source in WALLPAPERS else "minecraft") + ":" + source
+    out = {"id": result_ns + ":" + (result or name), "count": count}
+    if material:
+        out["components"] = {NS + ":material": material}
     write(os.path.join(DATA, NS, "recipe", name + "_from_" + source + "_stonecutting.json"),
-          {"type": "minecraft:stonecutting", "ingredient": ing(src_id), "result": {"id": result_ns + ":" + name, "count": count}})
+          {"type": "minecraft:stonecutting", "ingredient": ing(src_id), "result": out})
 
 
 def pattern_blocks(add_name, tags):
@@ -1738,7 +1857,7 @@ def main():
     TALL_PLANTS = [p for p in TALL_PLANTS if exists(p)]
     DOOR_WOODS = [w for w in DOOR_WOODS if exists(w + "_door")]
     TABLE_TOPS = [t for t in TABLE_TOPS if exists(t)]
-    for sub in ["blockstates", "joined", "models", "items"]:
+    for sub in ["blockstates", "joined", "looks", "models", "items"]:
         shutil.rmtree(os.path.join(ASSETS, sub), ignore_errors=True)
     for sub in ["loot_table", "recipe", "worldgen"]:
         shutil.rmtree(os.path.join(DATA, NS, sub), ignore_errors=True)
@@ -1758,37 +1877,50 @@ def main():
         us["block.%s.%s" % (NS, name)] = fn(False)
         gb["block.%s.%s" % (NS, name)] = fn(True)
 
+    global LOOK
     count = 0
+    looks = {}    # suffix -> families its materials use
+    classes = {}  # (suffix, behaviour) -> [materials]
     for mat, kind in MATERIALS:
         for suffix, shape_name, cut in SHAPES:
             if not applies(mat, kind, suffix):
                 continue
             name = "%s_%s" % (mat, suffix[7:]) if suffix.startswith("pillar_") else stem(mat) + "_" + suffix
-            # A natural block's building shapes are made like any building block's.
-            as_building = kind == "nature" and (suffix not in NATURE_SHAPES or (is_building(mat) and suffix in NEW_NATURE))
-            BUILDERS[suffix](mat, "building" if as_building else kind, name)
-            loot(name, suffix, silk=kind == "glass" or mat == "ice" or mat == "packed_ice" or mat == "blue_ice")
-            stonecutting(mat, name, cut)
-            if suffix in tag_of:
-                tags[tag_of[suffix]].append(NS + ":" + name)
-            vid = "minecraft:" + vanilla_of(mat)
-            src_kind = next((k for mt, k in MATERIALS if mt == vanilla_of(mat)), kind) if kind == "pattern" else kind
-            if src_kind in ("terracotta", "concrete", "glazed") or (src_kind in ("nature", "building", "pattern") and vid in VANILLA_PICKAXE):
-                tags["mineable/pickaxe"].append(NS + ":" + name)
-            for tier, blocks in VANILLA_NEEDS.items():
-                if vid in blocks:
-                    tags["needs_%s_tool" % tier].append(NS + ":" + name)
-            if kind == "powder" or (kind == "nature" and vid in VANILLA_SHOVEL):
-                tags["mineable/shovel"].append(NS + ":" + name)
-            if kind == "wallpaper":
-                tags["mineable/axe"].append(NS + ":" + name)
-            if mat in ("moss_block", "pale_moss_block"):
-                tags["mineable/hoe"].append(NS + ":" + name)
+            beh = behaviour(mat, kind)
+            looks.setdefault(suffix, set()).add(family(mat, kind, suffix))
+            classes.setdefault((suffix, beh), []).append(mat)
+            # The recipe keeps its old name, and makes the shape's block's item with the material on it.
+            stonecutting(mat, name, cut, result=class_id(suffix, beh), material=mat)
+            # The item's name in this material (ShapeItem names it by its old id).
             if suffix.startswith("pillar_"):
                 add_name(name, lambda g, mt=mat, sn=shape_name: title(mt, g) + " " + sn)
             else:
                 add_name(name, lambda g, mt=mat, sn=shape_name: title(stem(mt), g) + " " + sn)
             count += 1
+    # Each shape's look for each family, in stand-in textures.
+    look_kind = {"nature": "nature", "nature_grass": "nature", "nature_short": "nature", "glass": "glass"}
+    for suffix, families in looks.items():
+        for fam in sorted(families):
+            LOOK = (suffix, fam)
+            BUILDERS[suffix](SLOT + fam, look_kind.get(fam, "building"), "look/%s/%s" % (fam, suffix))
+    LOOK = None
+    full_looks()
+    # One block (and item) for each shape and behaviour.
+    shape_names = {sfx: nm for sfx, nm, _ in SHAPES}
+    for (suffix, beh), mats in classes.items():
+        cid = class_id(suffix, beh)
+        loot(cid, suffix, silk=beh in ("glass", "tinted", "ice", "packed_ice", "blue_ice"), copy=True)
+        if suffix in tag_of:
+            tags[tag_of[suffix]].append(NS + ":" + cid)
+        item_looks = {fam: LOOK_ITEMS[(suffix, fam)] for fam in sorted(looks[suffix]) if (suffix, fam) in LOOK_ITEMS}
+        write(os.path.join(ASSETS, "items", cid + ".json"), {"model": {"type": NS + ":material", "looks": item_looks}})
+        shape = ("Pillar " + shape_names[suffix]) if suffix.startswith("pillar_") else shape_names[suffix]
+        add_name(cid, lambda g, sh=shape, b=beh: sh + (" (%s)" % BEHAVIOUR_NAMES[b] if b else ""))
+    old_ids = {"%s_%s" % (mt, sfx[7:]) if sfx.startswith("pillar_") else stem(mt) + "_" + sfx for (sfx, _), ms in classes.items() for mt in ms}
+    clash = [class_id(sfx, b) for sfx, b in classes if class_id(sfx, b) in old_ids]
+    if clash:
+        raise SystemExit("shape block ids that were material shapes before: %s" % clash)
+    print("shape blocks:", len(classes))
     pattern_blocks(add_name, tags)
     wallpaper_blocks(add_name, tags)
     thin_logs(add_name, tags)

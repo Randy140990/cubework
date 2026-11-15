@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -37,8 +37,8 @@ public class ArchCornerBlock extends CwBlock implements SimpleWaterloggedBlock {
 		}
 	}
 
-	public ArchCornerBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public ArchCornerBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.EAST).setValue(WATERLOGGED, false));
 	}
 

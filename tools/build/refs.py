@@ -41,6 +41,9 @@ def walk(x):
         for k, v in x.items():
             if k in ("model", "parent") and isinstance(v, str):
                 model(v)
+            elif k == "models" and isinstance(v, list) and all(isinstance(x, str) for x in v):
+                for x in v:
+                    model(x)
             elif k == "textures" and isinstance(v, dict):
                 for t in v.values():
                     if isinstance(t, str) and not t.startswith("#"):
@@ -52,7 +55,7 @@ def walk(x):
             walk(v)
 
 
-for p in glob.glob(A + "/blockstates/*.json") + glob.glob(A + "/joined/*.json") + glob.glob(A + "/items/*.json") + glob.glob(A + "/models/**/*.json", recursive=True):
+for p in glob.glob(A + "/blockstates/*.json") + glob.glob(A + "/joined/*.json") + glob.glob(A + "/looks/**/*.json", recursive=True) + glob.glob(A + "/items/*.json") + glob.glob(A + "/models/**/*.json", recursive=True):
     walk(json.load(open(p)))
 # The textures the atlas sources paint from.
 for atlas in glob.glob(os.path.join(res, "assets", "minecraft", "atlases", "*.json")):

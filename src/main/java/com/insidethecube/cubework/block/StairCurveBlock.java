@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -43,8 +43,8 @@ public class StairCurveBlock extends CwBlock implements SimpleWaterloggedBlock {
 	private static final VoxelShape[] SHAPES = new VoxelShape[StairCurveGeometry.PIECES.length * 4];
 	private static final VoxelShape[] SOLID = new VoxelShape[StairCurveGeometry.PIECES.length * 4];
 
-	public StairCurveBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public StairCurveBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.EAST).setValue(PIECE, StairCurveGeometry.PLAIN).setValue(WATERLOGGED, false));
 	}
 

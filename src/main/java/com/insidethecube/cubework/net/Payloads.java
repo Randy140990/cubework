@@ -15,10 +15,11 @@ import net.minecraft.resources.Identifier;
 public final class Payloads {
 	private Payloads() {}
 
-	public record PickShape(String item) implements CustomPacketPayload {
+	/** A material (its id) and a shape (its suffix; empty for the full block). */
+	public record PickShape(String material, String shape) implements CustomPacketPayload {
 		public static final Type<PickShape> TYPE = new Type<>(Reg.id("pick_shape"));
-		public static final StreamCodec<RegistryFriendlyByteBuf, PickShape> CODEC = StreamCodec.composite(ByteBufCodecs.STRING_UTF8, PickShape::item,
-				PickShape::new);
+		public static final StreamCodec<RegistryFriendlyByteBuf, PickShape> CODEC = StreamCodec.composite(ByteBufCodecs.STRING_UTF8, PickShape::material,
+				ByteBufCodecs.STRING_UTF8, PickShape::shape, PickShape::new);
 
 		@Override
 		public Type<? extends CustomPacketPayload> type() {
@@ -53,8 +54,10 @@ public final class Payloads {
 		PayloadTypeRegistry.playC2S().register(ToolSetting.TYPE, ToolSetting.CODEC);
 		PayloadTypeRegistry.playC2S().register(ToolAction.TYPE, ToolAction.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(PickShape.TYPE, (payload, ctx) -> ctx.server().execute(() -> {
-			Identifier id = Identifier.tryParse(payload.item());
-			if (id != null) ShapeSwap.pick(ctx.player(), id);
+			com.insidethecube.cubework.Material m = com.insidethecube.cubework.Material.byId(payload.material());
+			com.insidethecube.cubework.Shape shape = null;
+			for (com.insidethecube.cubework.Shape s : com.insidethecube.cubework.Shape.values()) if (s.suffix.equals(payload.shape())) shape = s;
+			if (m != null && (shape != null || payload.shape().isEmpty())) ShapeSwap.pick(ctx.player(), m, shape);
 		}));
 		ServerPlayNetworking.registerGlobalReceiver(ToolSetting.TYPE, (payload, ctx) -> ctx.server().execute(() ->
 				ToolActions.setting(ctx.player(), payload.key(), payload.value())));

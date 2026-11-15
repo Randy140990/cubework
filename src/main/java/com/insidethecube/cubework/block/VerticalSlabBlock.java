@@ -22,7 +22,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 
 /**
  * A slab standing on its edge. It sits against the face you click; clicked on a floor or ceiling, it
@@ -36,9 +36,9 @@ public class VerticalSlabBlock extends CwBlock implements SimpleWaterloggedBlock
 	private final Map<Direction, VoxelShape> shapes;
 	private final VoxelShape full;
 
-	public VerticalSlabBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
-		int h = material.height();
+	public VerticalSlabBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
+		int h = behaviour.height();
 		shapes = Map.of(
 				Direction.NORTH, Block.box(0, 0, 0, 16, h, 8),
 				Direction.SOUTH, Block.box(0, 0, 8, 16, h, 16),
@@ -75,7 +75,7 @@ public class VerticalSlabBlock extends CwBlock implements SimpleWaterloggedBlock
 
 	@Override
 	protected boolean canBeReplaced(BlockState state, BlockPlaceContext ctx) {
-		if (state.getValue(DOUBLE) || !ctx.getItemInHand().is(asItem())) return false;
+		if (state.getValue(DOUBLE) || !ctx.getItemInHand().is(asItem()) || !Shared.sameMaterial(state, ctx)) return false;
 		if (!ctx.replacingClickedOnBlock()) return true;
 		Direction facing = state.getValue(FACING);
 		Direction side = ctx.getClickedFace();

@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -20,8 +20,8 @@ public class BorderedBlock extends CwBlock {
 	public static final BooleanProperty BORDER_TOP = BooleanProperty.create("border_top");
 	public static final BooleanProperty BORDER_BOTTOM = BooleanProperty.create("border_bottom");
 
-	public BorderedBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public BorderedBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(BORDER_TOP, true).setValue(BORDER_BOTTOM, true));
 	}
 

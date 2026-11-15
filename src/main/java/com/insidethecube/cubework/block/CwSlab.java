@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -22,16 +22,16 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** The vanilla SlabBlock in a Cubework material: placed, connected and used exactly like vanilla's. */
 public class CwSlab extends SlabBlock implements CwShape {
-	private final Material material;
+	private final Behaviour behaviour;
 
-	public CwSlab(Material material, BlockBehaviour.Properties settings) {
+	public CwSlab(Behaviour behaviour, BlockBehaviour.Properties settings) {
 		super(settings);
-		this.material = material;
+		this.behaviour = behaviour;
 	}
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-		int h = material.height();
+		int h = behaviour.height();
 		if (h == 16) return super.getShape(state, world, pos, context);
 		return switch (state.getValue(TYPE)) {
 			case BOTTOM -> Block.box(0, 0, 0, 16, h / 2.0, 16);
@@ -41,13 +41,19 @@ public class CwSlab extends SlabBlock implements CwShape {
 	}
 
 	@Override
-	public Material material() {
-		return material;
+	public Behaviour behaviour() {
+		return behaviour;
+	}
+
+	/** Slabs only make a double slab with a slab of the same material. */
+	@Override
+	protected boolean canBeReplaced(BlockState state, BlockPlaceContext ctx) {
+		return Shared.sameMaterial(state, ctx) && super.canBeReplaced(state, ctx);
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		return Shared.placed(material, super.getStateForPlacement(ctx), ctx);
+		return Shared.placed(behaviour, super.getStateForPlacement(ctx), ctx);
 	}
 
 	@Override
@@ -60,20 +66,16 @@ public class CwSlab extends SlabBlock implements CwShape {
 		RandomSource random = world.getRandom();
 	//#endif
 		//#if MC >= 1.21.2
-		return Shared.updated(material, super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random), world, pos);
+		return Shared.updated(behaviour, super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random), world, pos);
 		//#else
-		return Shared.updated(material, super.updateShape(state, direction, neighborState, world, pos, neighborPos), world, pos);
+		return Shared.updated(behaviour, super.updateShape(state, direction, neighborState, world, pos, neighborPos), world, pos);
 		//#endif
 	}
 
-	@Override
-	protected boolean skipRendering(BlockState state, BlockState stateFrom, Direction direction) {
-		return Shared.hidesFace(material, state, stateFrom, direction) || super.skipRendering(state, stateFrom, direction);
-	}
 
 	/** Copper shapes weather like vanilla copper. */
 	@Override
 	protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
-		Aging.tick(material, state, world, pos, random);
+		Aging.tick(behaviour, state, world, pos, random);
 	}
 }

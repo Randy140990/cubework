@@ -108,7 +108,7 @@ final class Models {
 		//#endif
 	}
 
-	private static net.minecraft.client.resources.model.Material texture(String name) {
+	static net.minecraft.client.resources.model.Material texture(String name) {
 		// Full ids (patterns: cubework:block/pattern/tiled/stone) are used as they are.
 		if (name.indexOf(':') >= 0) {
 			//#if MC >= 26.1
@@ -174,7 +174,7 @@ final class Models {
 		return state.hasProperty(BlockStateProperties.WATERLOGGED) ? state.setValue(BlockStateProperties.WATERLOGGED, false) : state;
 	}
 
-	private static TextureAtlasSprite sprite(ModelBaker baker, String name, ModelDebugName named) {
+	static TextureAtlasSprite sprite(ModelBaker baker, String name, ModelDebugName named) {
 		//#if MC >= 26.1
 		return baker.materials().get(texture(name), named).sprite();
 		//#else

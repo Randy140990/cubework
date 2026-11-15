@@ -100,6 +100,12 @@ public final class JoinedModels {
 	}
 
 	private static void resolve(BlockStateResolver.Context resolver, Block block, Joining joining, BlockModelDefinition look, Identifier id) {
+		for (Map.Entry<BlockState, BlockStateModel.UnbakedRoot> e : instantiate(block, joining, look, id + " (joined)").entrySet()) resolver.setModel(e.getKey(), e.getValue());
+	}
+
+	/** Each of the block's states, with its 16 joined looks from a look written with the join properties. */
+	static Map<BlockState, BlockStateModel.UnbakedRoot> instantiate(Block block, Joining joining, BlockModelDefinition look, String name) {
+		Map<BlockState, BlockStateModel.UnbakedRoot> out = new HashMap<>();
 		List<BooleanProperty> joins = joining.joinProperties();
 		List<Property<?>> props = new ArrayList<>(block.getStateDefinition().getProperties());
 		props.addAll(joins);
@@ -108,7 +114,7 @@ public final class JoinedModels {
 			builder.add(p.toArray(new Property<?>[0]));
 			return builder.create(Block::defaultBlockState, BlockState::new);
 		});
-		Map<BlockState, BlockStateModel.UnbakedRoot> roots = look.instantiate(lookStates, () -> id + " (joined)");
+		Map<BlockState, BlockStateModel.UnbakedRoot> roots = look.instantiate(lookStates, () -> name);
 		for (BlockState state : block.getStateDefinition().getPossibleStates()) {
 			BlockState[] looks = new BlockState[16];
 			BlockStateModel.UnbakedRoot[] lookRoots = new BlockStateModel.UnbakedRoot[16];
@@ -122,8 +128,9 @@ public final class JoinedModels {
 				lookRoots[mask] = roots.get(s);
 				if (lookRoots[mask] == null) whole = false;
 			}
-			if (whole) resolver.setModel(state, new JoinedRoot(joining, looks, lookRoots));
+			if (whole) out.put(state, new JoinedRoot(joining, looks, lookRoots));
 		}
+		return out;
 	}
 
 	private static <T extends Comparable<T>> BlockState copy(BlockState to, BlockState from, Property<T> p) {

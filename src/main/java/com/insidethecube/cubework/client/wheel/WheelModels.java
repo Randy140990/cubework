@@ -31,10 +31,10 @@ public final class WheelModels {
 		ItemStack held = mc.player.getMainHandItem();
 		if (held.getItem() instanceof TerrainBrushItem) return brush(held);
 		if (held.getItem() instanceof BuildersGuideItem) return guide(held);
-		ShapeSwap.Kind kind = held.getItem() instanceof BlockItem bi ? ShapeSwap.of(bi.getBlock()) : null;
+		ShapeSwap.Kind kind = ShapeSwap.of(held);
 		if (kind == null && (held.isEmpty() || mc.player.hasInfiniteMaterials()) && mc.hitResult instanceof BlockHitResult hit
 				&& hit.getType() == HitResult.Type.BLOCK && mc.level != null) {
-			kind = ShapeSwap.of(mc.level.getBlockState(hit.getBlockPos()).getBlock());
+			kind = ShapeSwap.of(mc.level, hit.getBlockPos());
 		}
 		if (kind == null) return null;
 		return shapes(kind, held, mc.player.hasInfiniteMaterials());
@@ -52,7 +52,7 @@ public final class WheelModels {
 				Block b = shapes.get(s);
 				if (b == null || s.group() != grp) continue;
 				if (s == kind.shape()) start = groups.size();
-				options.add(option(b, s == kind.shape(), note(kind, held, s, creative)));
+				options.add(option(m, s, s == kind.shape(), note(kind, held, s, creative)));
 			}
 			if (!options.isEmpty()) groups.add(new Wheel.Group(grp.title, new ItemStack(options.get(0).icon().getItem()), null, options));
 		}
@@ -63,25 +63,27 @@ public final class WheelModels {
 			if (!ShapeSwap.family(p).equals(family) || p == m && !m.patterned() || CwBlocks.shapesOf(p).isEmpty()) continue;
 			Block b = p.base();
 			if (b == null || b.asItem() == null) continue;
-			patterns.add(option(b, p == m && kind.shape() == null, null));
+			patterns.add(option(p, null, p == m && kind.shape() == null, null));
 		}
-		if (m.patterned() && Reg.exists(m.source())) patterns.add(0, option(Reg.vanilla(m.source()), false, null));
+		Material source = m.patterned() ? Material.byId(m.source()) : null;
+		if (source != null && source.exists()) patterns.add(0, option(source, null, false, null));
 		if (!patterns.isEmpty()) groups.add(new Wheel.Group("Patterns", new ItemStack(patterns.get(0).icon().getItem()), null, patterns));
-		Wheel.Option centre = full == null ? null : option(full, kind.shape() == null, note(kind, held, null, creative));
+		Wheel.Option centre = full == null ? null : option(m, null, kind.shape() == null, note(kind, held, null, creative));
 		String title = full == null ? m.id() : full.getName().getString();
 		return new Wheel(title, full == null ? ItemStack.EMPTY : new ItemStack(full), centre, groups, start);
 	}
 
-	private static Wheel.Option option(Block b, boolean current, String note) {
-		ItemStack stack = new ItemStack(b);
-		String id = Reg.idOf(b).toString();
-		return Wheel.Option.item(b.getName().getString(), stack, current, note, () -> ClientPlayNetworking.send(new Payloads.PickShape(id)));
+	private static Wheel.Option option(Material m, Shape s, boolean current, String note) {
+		ItemStack stack = ShapeSwap.stack(m, s);
+		String shape = s == null ? "" : s.suffix;
+		return Wheel.Option.item(stack.getHoverName().getString(), stack, current, note,
+				() -> ClientPlayNetworking.send(new Payloads.PickShape(m.id(), shape)));
 	}
 
 	/** In survival: what the stack in hand would make. */
 	private static String note(ShapeSwap.Kind kind, ItemStack held, Shape target, boolean creative) {
-		if (creative || held.isEmpty() || !(held.getItem() instanceof BlockItem bi)) return null;
-		ShapeSwap.Kind have = ShapeSwap.of(bi.getBlock());
+		if (creative || held.isEmpty()) return null;
+		ShapeSwap.Kind have = ShapeSwap.of(held);
 		if (have == null || have.material() != kind.material() || have.shape() == target) return null;
 		int a = ShapeSwap.perBlock(have.shape()), b = ShapeSwap.perBlock(target), blocks = held.getCount() / a;
 		return blocks == 0 ? "Needs " + a + " in hand" : held.getCount() - blocks * a > 0 ? (blocks * a) + " make " + (blocks * b) + " (" + (held.getCount()

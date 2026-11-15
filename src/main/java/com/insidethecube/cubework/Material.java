@@ -1,8 +1,14 @@
 package com.insidethecube.cubework;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.block.Block;
 
 /**
@@ -151,6 +157,26 @@ public record Material(String id, Kind kind, String colour, String pattern, Stri
 			Map.entry("smooth_quartz", Textures.all("quartz_block_bottom")));
 
 	public static final List<Material> ALL = build();
+	private static final Map<String, Material> BY_ID = new HashMap<>();
+	private static final Map<String, Behaviour> BEHAVIOURS = new HashMap<>();
+
+	static {
+		for (Material m : ALL) BY_ID.put(m.id, m);
+		for (Material m : ALL) BEHAVIOURS.put(m.id, Behaviour.of(m));
+	}
+
+	/** A material saved by its id (red_wool, tiled_stone_bricks). */
+	public static final Codec<Material> CODEC = Codec.STRING.comapFlatMap(
+			id -> {
+				Material m = byId(id);
+				return m != null ? DataResult.success(m) : DataResult.error(() -> "unknown Cubework material " + id);
+			}, Material::id);
+	public static final StreamCodec<ByteBuf, Material> STREAM_CODEC = ByteBufCodecs.STRING_UTF8.map(Material::byIdOrStone, Material::id);
+
+	/** What its shapes' blocks do (see Behaviour). */
+	public Behaviour behaviour() {
+		return BEHAVIOURS.get(id);
+	}
 
 	private static List<Material> build() {
 		List<Material> out = new ArrayList<>();
@@ -221,8 +247,13 @@ public record Material(String id, Kind kind, String colour, String pattern, Stri
 	}
 
 	public static Material byId(String id) {
-		for (Material m : ALL) if (m.id.equals(id)) return m;
-		return null;
+		return BY_ID.get(id);
+	}
+
+	/** For the network: a material the other side doesn't know reads as stone rather than failing. */
+	private static Material byIdOrStone(String id) {
+		Material m = BY_ID.get(id);
+		return m != null ? m : BY_ID.get("stone");
 	}
 
 	/** How weathered unwaxed copper is (0 to 3), or -1 for anything else (waxed copper too). */
@@ -242,6 +273,22 @@ public record Material(String id, Kind kind, String colour, String pattern, Stri
 		if (a < 0 || a == 3) return null;
 		String rest = a == 0 ? (id.equals("copper_block") ? "copper" : id) : id.substring(AGES[a].length());
 		return byId(AGES[a + 1] + rest);
+	}
+
+	/** Copper's age before this one (scraped with an axe), or null. */
+	public Material previousAge() {
+		int a = copperAge();
+		if (a <= 0) return null;
+		String rest = id.substring(AGES[a].length());
+		if (a == 1) return byId(rest.equals("copper") ? "copper_block" : rest);
+		return byId(AGES[a - 1] + rest);
+	}
+
+	/** Waxed copper without its wax, or null. */
+	public Material unwaxed() {
+		if (!id.startsWith("waxed_")) return null;
+		Material m = byId(id.substring(6));
+		return m != null && m.copperAge() >= 0 ? m : null;
 	}
 
 	/** Unwaxed copper's waxed version, or null. */

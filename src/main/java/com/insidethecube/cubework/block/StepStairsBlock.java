@@ -3,7 +3,7 @@ package com.insidethecube.cubework.block;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.EmptyBlockGetter;
@@ -25,8 +25,8 @@ public class StepStairsBlock extends CwStairs {
 	public final int steps;
 	private final Map<BlockState, VoxelShape> shapes = new ConcurrentHashMap<>();
 
-	public StepStairsBlock(Material material, BlockState base, int steps, BlockBehaviour.Properties settings) {
-		super(material, base, settings);
+	public StepStairsBlock(Behaviour behaviour, BlockState base, int steps, BlockBehaviour.Properties settings) {
+		super(behaviour, base, settings);
 		this.steps = steps;
 	}
 

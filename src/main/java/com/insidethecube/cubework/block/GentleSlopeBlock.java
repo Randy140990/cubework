@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -25,8 +25,8 @@ import net.minecraft.world.phys.BlockHitResult;
 public class GentleSlopeBlock extends SlopeBlock {
 	public static final IntegerProperty STEP = IntegerProperty.create("step", 1, 4);
 
-	public GentleSlopeBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public GentleSlopeBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 	}
 
 	/** How many blocks it takes to climb one. */
@@ -59,8 +59,8 @@ public class GentleSlopeBlock extends SlopeBlock {
 	public static class Over3 extends GentleSlopeBlock {
 		public static final IntegerProperty STEP_3 = IntegerProperty.create("step", 1, 3);
 
-		public Over3(Material material, BlockBehaviour.Properties settings) {
-			super(material, settings);
+		public Over3(Behaviour behaviour, BlockBehaviour.Properties settings) {
+			super(behaviour, settings);
 		}
 
 		@Override
@@ -78,8 +78,8 @@ public class GentleSlopeBlock extends SlopeBlock {
 	public static class Over2 extends GentleSlopeBlock {
 		public static final IntegerProperty STEP_2 = IntegerProperty.create("step", 1, 2);
 
-		public Over2(Material material, BlockBehaviour.Properties settings) {
-			super(material, settings);
+		public Over2(Behaviour behaviour, BlockBehaviour.Properties settings) {
+			super(behaviour, settings);
 		}
 
 		@Override

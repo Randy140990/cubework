@@ -30,7 +30,7 @@ public class ThinLogBlock extends ThinPillarBlock {
 	public static final BooleanProperty BARK_BOTTOM = BooleanProperty.create("bark_bottom");
 
 	public ThinLogBlock(int width, BlockBehaviour.Properties settings) {
-		super(null, width, settings);
+		super(width, settings);
 		registerDefaultState(defaultBlockState().setValue(BARK_TOP, false).setValue(BARK_BOTTOM, false));
 	}
 

@@ -2,7 +2,7 @@ package com.insidethecube.cubework.block;
 
 import java.util.List;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -36,8 +36,8 @@ public class SlopeBlock extends CwBlock implements SimpleWaterloggedBlock, Joini
 	/** The corners, in the order of their join numbers (StairsShape's own order: straight first). */
 	private static final StairsShape[] SHAPES = StairsShape.values();
 
-	public SlopeBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings.dynamicShape());
+	public SlopeBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings.dynamicShape());
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(HALF, Half.BOTTOM).setValue(WATERLOGGED, false));
 	}
 
@@ -48,7 +48,7 @@ public class SlopeBlock extends CwBlock implements SimpleWaterloggedBlock, Joini
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-		return SlopeGeometry.outline(state.getValue(FACING), state.getValue(HALF), shapeAt(state, world, pos), base(state), rise(state), material.height());
+		return SlopeGeometry.outline(state.getValue(FACING), state.getValue(HALF), shapeAt(state, world, pos), base(state), rise(state), behaviour.height());
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class SlopeBlock extends CwBlock implements SimpleWaterloggedBlock, Joini
 	protected VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
 	//#endif
 		// Without the neighbours: only what it fills whatever corner it turns, so nothing next to it is hidden wrongly.
-		return SlopeGeometry.insideAny(state.getValue(FACING), state.getValue(HALF), base(state), rise(state), material.height());
+		return SlopeGeometry.insideAny(state.getValue(FACING), state.getValue(HALF), base(state), rise(state), behaviour.height());
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class SlopeBlock extends CwBlock implements SimpleWaterloggedBlock, Joini
 
 	/** How many pixels it rises across the block. */
 	public double rise(BlockState state) {
-		return material.height();
+		return behaviour.height();
 	}
 
 	/** Which neighbours it turns corners with: slopes of the same kind (any material). */

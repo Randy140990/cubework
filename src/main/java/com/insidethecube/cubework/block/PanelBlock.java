@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 
 /** A carpet standing up: one pixel thick, flat against the face you click (or the far side of a floor). */
 public class PanelBlock extends CwBlock implements SimpleWaterloggedBlock {
@@ -29,8 +29,8 @@ public class PanelBlock extends CwBlock implements SimpleWaterloggedBlock {
 			Direction.WEST, Block.box(0, 0, 0, 1, 16, 16),
 			Direction.EAST, Block.box(15, 0, 0, 16, 16, 16));
 
-	public PanelBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public PanelBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));
 	}
 

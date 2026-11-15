@@ -69,12 +69,13 @@ public final class CubeworkClient implements ClientModInitializer {
 		com.insidethecube.cubework.ShaderMaps.painter = PatternMaps::make;
 
 		List<Block> grass = new ArrayList<>(Extras.GRASSY_PLANTS);
-		for (Material m : Material.ALL) {
-			var shapes = CwBlocks.shapesOf(m).values();
-			// Glass and ice are see-through, as the game draws them; grass needs cut-out for its side overlay.
-			if (m.seeThrough()) for (Block b : shapes) Layers.translucent(b);
-			else if (m.grassTinted()) for (Block b : shapes) Layers.cutout(b);
-			if (m.grassTinted()) grass.addAll(shapes);
+		// Glass and ice are see-through, as the game draws them; grass's side overlay is cut out quad by quad
+		// (see MaterialModels).
+		for (Block b : CwBlocks.all()) {
+			CwBlocks.Info info = CwBlocks.info(b);
+			if (info.behaviour().seeThrough()) Layers.translucent(b);
+			// Only grass's quads ask for a colour.
+			grass.add(b);
 		}
 		for (Block b : Extras.SIZED_PLANTS) Layers.cutout(b);
 		for (Block b : Extras.CORAL) Layers.cutout(b);
@@ -96,48 +97,15 @@ public final class CubeworkClient implements ClientModInitializer {
 				grass.stream().map(Block::asItem).toArray(net.minecraft.world.level.ItemLike[]::new));
 		//#endif
 
-		// Window frames, tables and partitions pick their joined look from their neighbours as they're drawn.
-		JoinedModels.register(b -> b instanceof com.insidethecube.cubework.block.SlopeBlock
-				|| b instanceof com.insidethecube.cubework.block.WindowFrameBlock w && w.style() == com.insidethecube.cubework.block.WindowFrameBlock.Style.ROUND);
+		// Tables pick their joined look from their neighbours as they're drawn; the shapes' window frames and
+		// partitions do too, through their materials' looks.
+		JoinedModels.register(b -> CwBlocks.info(b) != null);
+		// Every shape: its material's look, or drawn in code from its material's textures.
+		MaterialModels.register();
+		net.minecraft.client.renderer.item.ItemModels.ID_MAPPER.put(MaterialItemModel.ID, MaterialItemModel.Unbaked.MAP_CODEC);
 
-		// Slopes, arches and round shapes have their own models, built from the vanilla block's textures.
 		ModelLoadingPlugin.register(ctx -> {
-			for (Material m : Material.ALL) {
-				for (Shape shape : Shape.values()) {
-					if (!shape.drawnInCode()) continue;
-					Block block = CwBlocks.get(m, shape);
-					if (block == null) continue;
-					if (shape == Shape.STAIR_CURVE) {
-						// 35 pieces in four facings: quads made when first drawn.
-						Material.Textures t = m.textures();
-						Models.registerLazy(ctx, block, List.of(t.top(), t.side(), t.bottom()), t.side(), (state, sprites) -> StairCurveModel.build(m, state, sprites));
-						continue;
-					}
-					if (shape.round()) {
-						// Round window frames: 16 ways of joining for each state, their quads made when first drawn.
-						Material.Textures t = m.textures();
-						Models.registerJoinedLazy(ctx, block, List.of(t.top(), t.side(), t.bottom()), t.side(), (state, joins, sprites) -> RoundWindowModel.build(m, state, joins, sprites));
-						continue;
-					}
-					if (shape == Shape.SLOPE || shape == Shape.SLOPE_2 || shape == Shape.SLOPE_3 || shape == Shape.GENTLE_SLOPE) {
-						// The corner each slope turns is picked from its neighbours as it's drawn: 5 looks, made when first drawn.
-						Material.Textures t = m.textures();
-						List<String> textures = new ArrayList<>(List.of(t.top(), t.side(), t.bottom()));
-						if (t.overlay() != null) textures.add(t.overlay());
-						Models.registerJoinedLazy(ctx, block, textures, t.side(), (state, joins, sprites) -> SlopeModel.build(m, state, joins, sprites));
-						continue;
-					}
-					Models.Maker maker = switch (shape) {
-						case ARCH, ARCH_CORNER -> (state, sprites) -> ArchModel.build(m, state, sprites);
-						case ROUND_PILLAR_2, ROUND_PILLAR_3, ROUND_PILLAR_4 -> (state, sprites) -> RoundPillarModel.build(m, state, sprites);
-						case ROUND_COLUMN_16, ROUND_COLUMN_12, ROUND_COLUMN_8, ROUND_COLUMN_4, ROUND_CORNER, ROUND_CORNER_INNER ->
-								(state, sprites) -> RoundModel.build(m, state, sprites);
-						default -> (state, sprites) -> SlopeModel.build(m, state, 0, sprites);
-					};
-					Models.register(ctx, block, maker);
-				}
-			}
-			// Round logs: bark round the sides, rings on the ends.
+		// Round logs: bark round the sides, rings on the ends.
 			for (java.util.Map.Entry<Block, String[]> e : Extras.ROUND_LOG_TEXTURES.entrySet()) {
 				String side = e.getValue()[0], end = e.getValue()[1];
 				Models.register(ctx, e.getKey(), (state, sprites) -> RoundModel.buildLog(side, end, state, sprites));

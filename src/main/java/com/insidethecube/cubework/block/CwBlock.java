@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -24,21 +24,21 @@ import net.minecraft.world.level.material.Fluids;
 public abstract class CwBlock extends Block implements CwShape {
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-	protected final Material material;
+	protected final Behaviour behaviour;
 
-	protected CwBlock(Material material, BlockBehaviour.Properties settings) {
+	protected CwBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
 		super(settings);
-		this.material = material;
+		this.behaviour = behaviour;
 	}
 
 	@Override
-	public Material material() {
-		return material;
+	public Behaviour behaviour() {
+		return behaviour;
 	}
 
 	/** Called by subclasses on the state they're about to place. */
 	protected BlockState placed(BlockState state, BlockPlaceContext ctx) {
-		return Shared.placed(material, state, ctx);
+		return Shared.placed(behaviour, state, ctx);
 	}
 
 	protected static boolean waterAt(BlockPlaceContext ctx) {
@@ -56,7 +56,7 @@ public abstract class CwBlock extends Block implements CwShape {
 	//#endif
 		if (state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED)) tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		BlockState next = shapeUpdate(state, world, pos, direction, neighborPos, neighborState);
-		return Shared.updated(material, next, world, pos);
+		return Shared.updated(behaviour, next, world, pos);
 	}
 
 	/** A neighbour changed: the shape's own update (corners for slopes). */
@@ -74,14 +74,10 @@ public abstract class CwBlock extends Block implements CwShape {
 		return true;
 	}
 
-	@Override
-	protected boolean skipRendering(BlockState state, BlockState stateFrom, Direction direction) {
-		return Shared.hidesFace(material, state, stateFrom, direction) || super.skipRendering(state, stateFrom, direction);
-	}
 
 	/** Copper shapes weather like vanilla copper. */
 	@Override
 	protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
-		Aging.tick(material, state, world, pos, random);
+		Aging.tick(behaviour, state, world, pos, random);
 	}
 }

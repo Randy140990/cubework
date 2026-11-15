@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -19,21 +19,21 @@ import net.minecraft.world.level.block.state.properties.BlockSetType;
 
 /** The vanilla PressurePlateBlock in a Cubework material: placed, connected and used exactly like vanilla's. */
 public class CwPressurePlate extends PressurePlateBlock implements CwShape {
-	private final Material material;
+	private final Behaviour behaviour;
 
-	public CwPressurePlate(Material material, BlockSetType type, BlockBehaviour.Properties settings) {
+	public CwPressurePlate(Behaviour behaviour, BlockSetType type, BlockBehaviour.Properties settings) {
 		super(type, settings);
-		this.material = material;
+		this.behaviour = behaviour;
 	}
 
 	@Override
-	public Material material() {
-		return material;
+	public Behaviour behaviour() {
+		return behaviour;
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		return Shared.placed(material, super.getStateForPlacement(ctx), ctx);
+		return Shared.placed(behaviour, super.getStateForPlacement(ctx), ctx);
 	}
 
 	@Override
@@ -46,20 +46,16 @@ public class CwPressurePlate extends PressurePlateBlock implements CwShape {
 		RandomSource random = world.getRandom();
 	//#endif
 		//#if MC >= 1.21.2
-		return Shared.updated(material, super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random), world, pos);
+		return Shared.updated(behaviour, super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random), world, pos);
 		//#else
-		return Shared.updated(material, super.updateShape(state, direction, neighborState, world, pos, neighborPos), world, pos);
+		return Shared.updated(behaviour, super.updateShape(state, direction, neighborState, world, pos, neighborPos), world, pos);
 		//#endif
 	}
 
-	@Override
-	protected boolean skipRendering(BlockState state, BlockState stateFrom, Direction direction) {
-		return Shared.hidesFace(material, state, stateFrom, direction) || super.skipRendering(state, stateFrom, direction);
-	}
 
 	/** Copper shapes weather like vanilla copper. */
 	@Override
 	protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
-		Aging.tick(material, state, world, pos, random);
+		Aging.tick(behaviour, state, world, pos, random);
 	}
 }

@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -26,8 +26,8 @@ public class RoundCornerBlock extends CwBlock implements SimpleWaterloggedBlock 
 
 	public final boolean inner;
 
-	public RoundCornerBlock(Material material, boolean inner, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public RoundCornerBlock(Behaviour behaviour, boolean inner, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		this.inner = inner;
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));
 	}

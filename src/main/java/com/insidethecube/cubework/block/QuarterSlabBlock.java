@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -23,8 +23,8 @@ public class QuarterSlabBlock extends CwBlock implements SimpleWaterloggedBlock 
 	private static final VoxelShape BOTTOM = Block.box(0, 0, 0, 16, 4, 16);
 	private static final VoxelShape TOP = Block.box(0, 12, 0, 16, 16, 16);
 
-	public QuarterSlabBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public QuarterSlabBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(HALF, Half.BOTTOM).setValue(WATERLOGGED, false));
 	}
 

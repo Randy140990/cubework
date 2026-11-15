@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 
 /** A thin pillar, 6 pixels across, running along the axis of the face you click (like logs). */
 public class PostBlock extends CwBlock implements SimpleWaterloggedBlock {
@@ -26,8 +26,8 @@ public class PostBlock extends CwBlock implements SimpleWaterloggedBlock {
 			Direction.Axis.X, Block.box(0, 5, 5, 16, 11, 11),
 			Direction.Axis.Z, Block.box(5, 5, 0, 11, 11, 16));
 
-	public PostBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public PostBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(AXIS, Direction.Axis.Y).setValue(WATERLOGGED, false));
 	}
 

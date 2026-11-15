@@ -4,7 +4,7 @@ import java.util.List;
 
 import java.util.Locale;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -84,8 +84,8 @@ public class PartitionBlock extends CwBlock implements Joining {
 	public final int thickness;
 	private final java.util.Map<Integer, VoxelShape> shapes = new java.util.concurrent.ConcurrentHashMap<>();
 
-	public PartitionBlock(Material material, int thickness, BlockBehaviour.Properties settings) {
-		super(material, settings.dynamicShape());
+	public PartitionBlock(Behaviour behaviour, int thickness, BlockBehaviour.Properties settings) {
+		super(behaviour, settings.dynamicShape());
 		this.thickness = thickness;
 		registerDefaultState(defaultBlockState().setValue(AXIS, Direction.Axis.X).setValue(HEIGHT, Height.FULL).setValue(CAP, Cap.NONE));
 	}

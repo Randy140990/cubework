@@ -1,8 +1,8 @@
 package com.insidethecube.cubework.block;
 
+import com.insidethecube.cubework.Behaviour;
 import com.insidethecube.cubework.CwBlocks;
 import com.insidethecube.cubework.Material;
-import com.insidethecube.cubework.Reg;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
@@ -21,16 +21,23 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public final class Shared {
 	private Shared() {}
 
-	/** A shape just placed: concrete powder touching water sets into concrete straight away. */
-	public static BlockState placed(Material m, BlockState state, BlockPlaceContext ctx) {
-		if (state == null || m == null || m.kind() != Material.Kind.POWDER) return state;
-		return wet(state, ctx.getLevel(), ctx.getClickedPos()) ? harden(state) : state;
+	/** A shape about to be placed (its material is set just after, see ShapeEntity.applyImplicitComponents). */
+	public static BlockState placed(Behaviour b, BlockState state, BlockPlaceContext ctx) {
+		return state;
 	}
 
 	/** A neighbour changed: concrete powder sets when water reaches it. */
-	public static BlockState updated(Material m, BlockState state, BlockGetter world, BlockPos pos) {
-		if (state == null || m == null || m.kind() != Material.Kind.POWDER) return state;
-		return wet(state, world, pos) ? harden(state) : state;
+	public static BlockState updated(Behaviour b, BlockState state, BlockGetter world, BlockPos pos) {
+		if (state == null || b != Behaviour.SOLID) return state;
+		if (world.getBlockEntity(pos) instanceof ShapeEntity e) settle(world, pos, e);
+		return state;
+	}
+
+	/** Concrete powder touching water sets into concrete of its colour. */
+	static void settle(BlockGetter world, BlockPos pos, ShapeEntity e) {
+		Material m = e.material();
+		if (m == null || m.kind() != Material.Kind.POWDER) return;
+		if (wet(e.getBlockState(), world, pos)) e.setMaterial(m.hardened());
 	}
 
 	private static boolean wet(BlockState state, BlockGetter world, BlockPos pos) {
@@ -44,19 +51,10 @@ public final class Shared {
 		return false;
 	}
 
-	/** The concrete version of a concrete powder shape (or full block), keeping how it's placed. */
-	public static BlockState harden(BlockState state) {
-		Block b = state.getBlock();
-		CwBlocks.Info info = CwBlocks.info(b);
-		Block to;
-		if (info != null) {
-			Material hard = info.material().hardened();
-			to = hard == null ? null : CwBlocks.get(hard, info.shape());
-		} else {
-			String path = Reg.idOf(b).getPath();
-			to = path.endsWith("_concrete_powder") ? Reg.vanilla(path.substring(0, path.length() - "_powder".length())) : null;
-		}
-		return to == null ? state : copy(state, to);
+	/** Whether the stack in hand is the same material as the shape being added to (slabs, layers). */
+	public static boolean sameMaterial(BlockState state, BlockPlaceContext ctx) {
+		Material here = ShapeEntity.atOrDefault(ctx.getLevel(), ctx.getClickedPos(), state);
+		return here != null && here == CwBlocks.materialOf(ctx.getItemInHand());
 	}
 
 	/** The same placement (facing, layers, half...) on another block with the same properties. */
@@ -71,12 +69,10 @@ public final class Shared {
 	}
 
 	/**
-	 * Glass shapes of the same glass hide the faces where they touch, like glass blocks do, so you
-	 * don't see the inside walls through them. A face hides only where the neighbour covers all of it.
+	 * Whether the neighbour on side dir covers all of this shape's face there (glass shapes of the same glass
+	 * hide the faces where they touch, like glass blocks do, so you don't see the inside walls through them).
 	 */
-	public static boolean hidesFace(Material m, BlockState self, BlockState other, Direction dir) {
-		if (m == null || !m.glass()) return false;
-		if (CwBlocks.materialOf(other.getBlock()) != m) return false;
+	public static boolean covers(BlockState self, BlockState other, Direction dir) {
 		VoxelShape mine = self.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).getFaceShape(dir);
 		VoxelShape theirs = other.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).getFaceShape(dir.getOpposite());
 		if (theirs.isEmpty()) return false;

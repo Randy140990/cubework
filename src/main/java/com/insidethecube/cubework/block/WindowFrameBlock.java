@@ -2,7 +2,7 @@ package com.insidethecube.cubework.block;
 
 import java.util.List;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -68,8 +68,8 @@ public class WindowFrameBlock extends CwBlock implements SimpleWaterloggedBlock,
 		return f.getAxis().isVertical() ? Direction.NORTH : f;
 	}
 
-	public WindowFrameBlock(Material material, int depth, Style style, BlockBehaviour.Properties settings) {
-		super(material, settings.dynamicShape());
+	public WindowFrameBlock(Behaviour behaviour, int depth, Style style, BlockBehaviour.Properties settings) {
+		super(behaviour, settings.dynamicShape());
 		this.depth = depth;
 		this.style = style;
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));

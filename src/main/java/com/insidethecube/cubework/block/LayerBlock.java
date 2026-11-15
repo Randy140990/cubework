@@ -1,6 +1,6 @@
 package com.insidethecube.cubework.block;
 
-import com.insidethecube.cubework.Material;
+import com.insidethecube.cubework.Behaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -27,8 +27,8 @@ public class LayerBlock extends CwBlock {
 		for (int n = 1; n <= 8; n++) SHAPES[n] = Block.box(0, 0, 0, 16, n * 2, 16);
 	}
 
-	public LayerBlock(Material material, BlockBehaviour.Properties settings) {
-		super(material, settings);
+	public LayerBlock(Behaviour behaviour, BlockBehaviour.Properties settings) {
+		super(behaviour, settings);
 		registerDefaultState(defaultBlockState().setValue(LAYERS, 1));
 	}
 
@@ -49,7 +49,7 @@ public class LayerBlock extends CwBlock {
 
 	@Override
 	protected boolean canBeReplaced(BlockState state, BlockPlaceContext ctx) {
-		if (!ctx.getItemInHand().is(asItem()) || state.getValue(LAYERS) >= 8) return false;
+		if (!ctx.getItemInHand().is(asItem()) || state.getValue(LAYERS) >= 8 || !Shared.sameMaterial(state, ctx)) return false;
 		return !ctx.replacingClickedOnBlock() || ctx.getClickedFace() == Direction.UP;
 	}
 
@@ -58,7 +58,7 @@ public class LayerBlock extends CwBlock {
 		BlockState existing = ctx.getLevel().getBlockState(ctx.getClickedPos());
 		if (existing.is(this)) {
 			int n = Math.min(8, existing.getValue(LAYERS) + 1);
-			return placed(n == 8 ? material.base().defaultBlockState() : existing.setValue(LAYERS, n), ctx);
+			return placed(n == 8 ? com.insidethecube.cubework.CwBlocks.materialOf(ctx.getItemInHand()).base().defaultBlockState() : existing.setValue(LAYERS, n), ctx);
 		}
 		return placed(defaultBlockState(), ctx);
 	}
