@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public final class BridgeBuilder implements Matches.Builder {
 	/** Bump when the bridge's design changes, so existing bridges are rebuilt. */
-	public static final int VERSION = 4;
+	public static final int VERSION = 5;
 	private static final BlockState MARKER = Blocks.REINFORCED_DEEPSLATE.defaultBlockState();
 	private static final long BUDGET = 25_000_000L;
 
