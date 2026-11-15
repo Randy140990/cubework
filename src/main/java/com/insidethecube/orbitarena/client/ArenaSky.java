@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 import com.insidethecube.orbitarena.OrbitArena;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderPass;
@@ -57,39 +56,19 @@ public final class ArenaSky {
 	/** Where the planet hangs: east by north-east, low over the horizon, about 23 degrees across (radius). */
 	private static final float PLANET_AZIMUTH = 34, PLANET_ELEVATION = 13, PLANET_RADIUS_DEG = 23, PLANET_DISTANCE = 70;
 
-	private static final RenderPipeline PLANET = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
-			.withLocation(OrbitArena.id("pipeline/planet"))
-			.withVertexShader("core/position_tex_color")
-			.withFragmentShader("core/position_tex_color")
-			.withSampler("Sampler0")
-			.withBlend(BlendFunction.TRANSLUCENT)
-			.withDepthWrite(false)
-			.withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
-			.build();
-	private static final RenderPipeline PLANET_LIGHTS = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
-			.withLocation(OrbitArena.id("pipeline/planet_lights"))
-			.withVertexShader("core/position_tex_color")
-			.withFragmentShader("core/position_tex_color")
-			.withSampler("Sampler0")
-			.withBlend(BlendFunction.LIGHTNING)
-			.withDepthWrite(false)
-			.withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
-			.build();
-	private static final RenderPipeline GLOW = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
-			.withLocation(OrbitArena.id("pipeline/planet_glow"))
-			.withVertexShader("core/position_color")
-			.withFragmentShader("core/position_color")
-			.withBlend(BlendFunction.LIGHTNING)
-			.withCull(false)
-			.withDepthWrite(false)
-			.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-			.build();
+	/**
+	 * Everything is drawn with the End sky's own way of drawing (a picture, tinted and faded per corner,
+	 * blended over what's behind), so shader packs treat the planet as they treat the sky.
+	 */
+	private static final RenderPipeline SKY = RenderPipelines.END_SKY;
 
 	private static GpuBuffer sky, day, lights, clouds, glow;
 	private static int skyIndices, planetIndices, glowIndices;
 	/** The pictures once read (stars, day, night, clouds), and on the card. */
 	private static volatile NativeImage[] read;
 	private static DynamicTexture[] textures;
+	/** Plain white, for the glow (its colour and fade are in its corners). */
+	private static DynamicTexture white;
 
 	/** Starts reading the sky's pictures (in the background). */
 	public static void load() {
@@ -229,21 +208,26 @@ public final class ArenaSky {
 		// The glow: a ring round the edge, brightest on the lit side, fading out into space and in over the disc.
 		int seg = 128;
 		float[] radii = {radius * 0.94F, radius * 0.995F, radius * 1.02F, radius * 1.16F};
-		float[] alpha = {0, 0.75F, 0.5F, 0};
-		try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(seg * 3 * 4 * DefaultVertexFormat.POSITION_COLOR.getVertexSize())) {
-			BufferBuilder b = new BufferBuilder(bytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		float[] alpha = {0, 0.6F, 0.42F, 0};
+		try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(seg * 3 * 4 * DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize())) {
+			BufferBuilder b = new BufferBuilder(bytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 			for (int i = 0; i < seg; i++) {
 				for (int band = 0; band < 3; band++) {
 					double a0 = Math.PI * 2 * i / seg, a1 = Math.PI * 2 * (i + 1) / seg;
 					double[] as = {a0, a1, a1, a0};
 					int[] rs = {band, band, band + 1, band + 1};
+					float[][] p = new float[4][];
+					int[] al = new int[4];
 					for (int k = 0; k < 4; k++) {
 						Vector3f m = new Vector3f(right).mul((float) Math.cos(as[k])).add(new Vector3f(upOnDisc).mul((float) Math.sin(as[k])));
 						float lit = 0.12F + 0.88F * smooth(-0.35F, 0.7F, m.dot(sun));
 						Vector3f pos = new Vector3f(m).mul(radii[rs[k]]).add(centre);
-						int a = (int) (255 * alpha[rs[k]] * lit);
-						b.addVertex(pos.x, pos.y, pos.z).setColor(110, 172, 255, a);
+						p[k] = new float[] {pos.x, pos.y, pos.z};
+						al[k] = (int) (255 * alpha[rs[k]] * lit);
 					}
+					// Facing you (at the middle of the sky).
+					int[] order = facing(p, new float[] {0, 0, 0}, false) ? new int[] {0, 1, 2, 3} : new int[] {0, 3, 2, 1};
+					for (int k : order) b.addVertex(p[k][0], p[k][1], p[k][2]).setUv(0.5F, 0.5F).setColor(130, 185, 255, al[k]);
 				}
 			}
 			try (MeshData mesh = b.buildOrThrow()) {
@@ -281,11 +265,12 @@ public final class ArenaSky {
 							r = g = bl = (int) (255 * shade);
 							a = 255;
 						} else if (layer == 1) {
+							// The lights, laid over the dark side (and nowhere else).
 							float dark = 1 - smooth(-0.22F, 0.06F, l);
 							r = 255;
-							g = 214;
-							bl = 160;
-							a = (int) (255 * dark * 0.9F);
+							g = 226;
+							bl = 190;
+							a = (int) (255 * dark * 0.95F);
 						} else {
 							float shade = 0.02F + 0.98F * smooth(-0.12F, 0.4F, l);
 							r = g = bl = (int) (255 * shade);
@@ -308,6 +293,11 @@ public final class ArenaSky {
 		NativeImage[] r = read;
 		if (r == null || textures != null) return;
 		textures = new DynamicTexture[r.length];
+		white = new DynamicTexture(() -> "Orbit Arena white", 1, 1, false);
+		if (white.getPixels() != null) {
+			white.getPixels().setPixel(0, 0, 0xFFFFFFFF);
+			white.upload();
+		}
 		String[] names = {"stars", "planet day", "planet night", "planet clouds"};
 		for (int i = 0; i < r.length; i++) {
 			if (r[i] == null) continue;
@@ -335,14 +325,14 @@ public final class ArenaSky {
 		float angle = (float) ((time / TURN_TICKS) % 1.0 * Math.PI * 2);
 		Matrix4f still = new Matrix4f(RenderSystem.getModelViewMatrix());
 		Matrix4f turning = new Matrix4f(still).rotate(angle, AXIS);
-		if (stars != null) draw(RenderPipelines.END_SKY, sky, skyIndices, turning, stars, colour, depth);
+		if (stars != null) draw(SKY, sky, skyIndices, turning, stars, colour, depth);
 
 		if (textures == null || textures[1] == null) return;
 		if (day == null) buildPlanet();
-		draw(PLANET, day, planetIndices, still, textures[1], colour, depth);
-		if (textures[2] != null) draw(PLANET_LIGHTS, lights, planetIndices, still, textures[2], colour, depth);
-		if (textures[3] != null) draw(PLANET, clouds, planetIndices, still, textures[3], colour, depth);
-		draw(GLOW, glow, glowIndices, still, null, colour, depth);
+		draw(SKY, day, planetIndices, still, textures[1], colour, depth);
+		if (textures[2] != null) draw(SKY, lights, planetIndices, still, textures[2], colour, depth);
+		if (textures[3] != null) draw(SKY, clouds, planetIndices, still, textures[3], colour, depth);
+		draw(SKY, glow, glowIndices, still, white, colour, depth);
 	}
 
 	private static void draw(RenderPipeline pipeline, GpuBuffer buffer, int indices, Matrix4f view, AbstractTexture tex, GpuTextureView colour, GpuTextureView depth) {
