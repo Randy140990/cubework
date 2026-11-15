@@ -8,4 +8,6 @@ Cubework by Inside the Cube. Vanilla blocks in every shape: stairs, slabs, verti
 - Each shape is one block for each behaviour (`Behaviour.java`: solid, glass, wool, copper...), 437 in all, and each placed shape keeps its material in a block entity (`block/ShapeEntity.java`), as each stack keeps it in the `cubework:material` component. The client draws a shape from its material's family's look (`assets/cubework/looks/`, written in stand-in textures) in the material's own textures (`client/MaterialModels.java`). Worlds from before 0.12, when every material's shapes were blocks of their own, are converted as they load (`world/Convert.java`).
 
 ## Included mod
+The shape wheel's lettering is Cinzel (Copyright 2020 The Cinzel Project Authors) and Alegreya (Copyright 2011 The Alegreya Project Authors), both under the SIL Open Font License 1.1; the fonts and their licences are in the jar under assets/cubework/wheel.
+
 The 1.21.11 jar carries FerriteCore 8.2.0 (https://modrinth.com/mod/ferrite-core, by malte0811, MIT licence; its licence is inside its own jar under META-INF/jars). It makes the game's block states much lighter, which a mod with this many blocks needs. Fabric loads whichever copy is newer if a player also has FerriteCore installed. ModernFix (by embeddedt) is suggested but not included.
