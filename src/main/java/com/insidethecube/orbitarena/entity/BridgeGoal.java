@@ -147,7 +147,7 @@ public final class BridgeGoal extends Goal {
 				return;
 			}
 		}
-		if (near != null && nd > 9 && nd < 32 && bowCool == 0 && d >= 2 && f.hasLineOfSight(near) && f.random.nextFloat() < 0.04F + 0.012F * d) {
+		if (near != null && nd > 9 && nd < 32 && bowCool == 0 && d >= 2 && f.hasLineOfSight(near) && f.getRandom().nextFloat() < 0.04F + 0.012F * d) {
 			hold(new ItemStack(Items.BOW));
 			f.startUsingItem(InteractionHand.MAIN_HAND);
 			bowTarget = near;
@@ -163,7 +163,7 @@ public final class BridgeGoal extends Goal {
 				// Between them and the goal, and a wall in their way.
 				double toGoal = Math.signum(s * GOAL_X + 0.5 + w.centreX() - threat.getX());
 				target = new Vec3(threat.getX() + toGoal * 2.5, f.getY(), threat.getZ());
-				if (d >= 4 && wallCool == 0 && threat.distanceTo(f) < 9 && f.random.nextFloat() < 0.08F * (d - 3)) wall(w, threat, toGoal, d);
+				if (d >= 4 && wallCool == 0 && threat.distanceTo(f) < 9 && f.getRandom().nextFloat() < 0.08F * (d - 3)) wall(w, threat, toGoal, d);
 			} else {
 				target = new Vec3(w.centreX() + s * (BASE_FRONT + 1) + 0.5, f.getY(), w.centreZ() + 0.5 + lane * 0.5);
 			}
@@ -185,7 +185,7 @@ public final class BridgeGoal extends Goal {
 			// On your own: defend when someone's nearer your goal than you are and closing in (better at it as
 			// the difficulty rises), otherwise attack.
 			boolean danger = threat != null && Math.abs(threat.getX() - myGoal) < 22 && Math.abs(threat.getX() - myGoal) < Math.abs(f.getX() - myGoal) + 4;
-			b.defending = danger && f.random.nextFloat() < 0.15F + 0.085F * d;
+			b.defending = danger && f.getRandom().nextFloat() < 0.15F + 0.085F * d;
 		} else {
 			// In a team: the first always attacks, every other one defends; anyone defends when the goal's in
 			// danger and they're the nearest to it.
@@ -209,9 +209,9 @@ public final class BridgeGoal extends Goal {
 			double ahead = (near.getX() - f.getX()) * -s;
 			blocked = ahead > 2 && ahead < 14 && Math.abs(near.getZ() - (w.centreZ() + 0.5)) < 3;
 		}
-		if (blocked && d >= 4 && !b.defending) lane = f.random.nextBoolean() ? 4.5 : -4.5;
-		else if (Math.abs(lane) > 3 && f.random.nextFloat() < 0.3F) lane = 0;
-		else if (Math.abs(lane) <= 3) lane = (f.random.nextFloat() - 0.5) * 2.5;
+		if (blocked && d >= 4 && !b.defending) lane = f.getRandom().nextBoolean() ? 4.5 : -4.5;
+		else if (Math.abs(lane) > 3 && f.getRandom().nextFloat() < 0.3F) lane = 0;
+		else if (Math.abs(lane) <= 3) lane = (f.getRandom().nextFloat() - 0.5) * 2.5;
 	}
 
 	/** The enemy closest to this team's goal, if any is coming for it. */
@@ -282,7 +282,7 @@ public final class BridgeGoal extends Goal {
 		boolean intoGoal = attacking && toGoal < 4.5;
 		if (f.onGround() && !intoGoal && !solid(level, ahead)) {
 			// A gap: build across it (slower and with the odd slip at low levels), or wait at the edge.
-			if (f.random.nextFloat() < Math.max(0, 0.05F - 0.005F * d)) {
+			if (f.getRandom().nextFloat() < Math.max(0, 0.05F - 0.005F * d)) {
 				f.getMoveControl().setWantedPosition(wx, p.y, wz, 1.0);
 				return;
 			}
@@ -302,7 +302,7 @@ public final class BridgeGoal extends Goal {
 				mineTicks = Math.max(3, 13 - d);
 				return;
 			}
-			lane += f.random.nextBoolean() ? 2 : -2;
+			lane += f.getRandom().nextBoolean() ? 2 : -2;
 			lane = Mth.clamp(lane, -5, 5);
 		} else if (feetBlocked && f.onGround()) {
 			f.getJumpControl().jump();
@@ -312,7 +312,7 @@ public final class BridgeGoal extends Goal {
 		if (f.tickCount % 20 == 0) {
 			if (p.distanceToSqr(lastPos) < 0.05) {
 				if (++stuck >= 2) {
-					lane = Mth.clamp(lane + (f.random.nextBoolean() ? 2.5 : -2.5), -5, 5);
+					lane = Mth.clamp(lane + (f.getRandom().nextBoolean() ? 2.5 : -2.5), -5, 5);
 					if (f.onGround()) f.getJumpControl().jump();
 					stuck = 0;
 				}
@@ -367,7 +367,7 @@ public final class BridgeGoal extends Goal {
 		arrow.shoot(ex, ey + h * 0.18, ez, speed, Math.max(0.4F, 12 - 1.15F * d));
 		arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
 		level.addFreshEntity(arrow);
-		level.playSound(null, f.getX(), f.getY(), f.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.HOSTILE, 1.0F, 1.0F / (f.random.nextFloat() * 0.4F + 1.2F) + 0.5F);
+		level.playSound(null, f.getX(), f.getY(), f.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.HOSTILE, 1.0F, 1.0F / (f.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
 		f.stopUsingItem();
 		bowDraw = -1;
 		bowCool = 70;

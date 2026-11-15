@@ -87,7 +87,7 @@ public final class BridgeBuilder implements Matches.Builder {
 			}
 			standColumn++;
 		}
-		if (column >= areaColumns && standColumn >= standColumns && spire < SPIRES && System.nanoTime() - start < BUDGET) spire(spire++);
+		if (column >= areaColumns && standColumn >= standColumns && spire < SPIRES && System.nanoTime() - start < BUDGET) buildSpire(spire++);
 		boolean done = column >= areaColumns && standColumn >= standColumns && spire >= SPIRES;
 		if (done && full) {
 			for (int v = 1; v < VERSION; v++) set(0, -20 - v, 0, Blocks.DEEPSLATE.defaultBlockState());
@@ -97,8 +97,8 @@ public final class BridgeBuilder implements Matches.Builder {
 	}
 
 	/** A rock spire: a lumpy spindle of layered rock, standing on end. */
-	private void spire(int i) {
-		Spire s = spire(i);
+	private void buildSpire(int i) {
+		Spire s = BridgeLayout.spire(i);
 		int r = (int) Math.ceil(s.radius() * 1.3);
 		for (int y = 0; y < s.height(); y++) {
 			double t = (y + 0.5) / s.height();
