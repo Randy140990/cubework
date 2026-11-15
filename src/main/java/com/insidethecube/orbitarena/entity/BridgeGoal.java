@@ -19,18 +19,26 @@ import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * How a bot plays The Bridge. Attackers head for the other team's goal: along the bridge, round anyone in
- * the way by building a path of their own out over the void ("bridging"), jumping or breaking through
- * walls, and drop into the goal. Defenders stand between the nearest attacker and their own goal, wall them
- * off and knock them off the edge. Anyone close gets a fight (as DuelGoal fights, keeping to the middle so
- * the knockback sends the other one off); anyone far, an arrow.
+ * How a bot plays The Bridge.
  * <p>
- * How well it plays is its difficulty, 1 to 10: at 1 it bridges slowly and sometimes walks off the edge,
- * rarely defends and never walls; at 10 it bridges as fast as a good player, never falls off by mistake,
- * reads who's coming for its goal, walls them off, leads its arrows and fights to knock you into space.
+ * Attackers go for the other team's goal and keep going: out of their room, across the bridge (building a
+ * way of their own round anyone in the way, out over the void), up the other temple's stairs and into the
+ * goal. They only stop to fight someone standing in their way or hitting them; anyone they pass gets a
+ * swing. Defenders read who's coming: they meet attackers on the bridge (walling them off and knocking them
+ * into space), get between them and the stairs on the deck, and guard the goal at the top of the stairs
+ * they're coming up. Anyone far off gets an arrow.
+ * <p>
+ * The way round the map is planned in steps (room, door, the end of the bridge, the foot of the stairs, the
+ * top, the goal), so a bot never wanders into its own goal or off the side of a temple.
+ * <p>
+ * How well it plays is its difficulty, 1 to 10: at 1 it walks, bridges slowly, sometimes walks off the edge
+ * and rarely defends; from 3 it defends and eats; from 4 it bridges round you and walls you off; from 6 it
+ * plays to knock you off; at 8 to 10 it runs as fast as you, never slips, decides quickly, goes up the stairs
+ * you're not guarding, and in a 1 v 1 switches between stopping you and scoring itself.
  */
 public final class BridgeGoal extends Goal {
 	/** A bot's part in its team's game: who it plays for and how well. */
@@ -49,16 +57,17 @@ public final class BridgeGoal extends Goal {
 	}
 
 	private final Fighter f;
-	private final Fighter.DuelGoal duel;
-	private int placeCool, bowCool = 40, bowDraw = -1, decide, wallCool, stuck, mineTicks;
+	private int placeCool, bowCool = 40, bowDraw = -1, decide, wallCool, stuck, mineTicks, swing, react, strafeTicks;
+	private int stairs = 1;
+	private float strafeSide = 1;
+	private boolean jumpForCrit;
 	private double lane;
 	private BlockPos mining;
-	private Vec3 lastPos = Vec3.ZERO;
+	private Vec3 lastPos = Vec3.ZERO, heading = Vec3.ZERO;
 	private LivingEntity bowTarget;
 
 	BridgeGoal(Fighter f) {
 		this.f = f;
-		this.duel = new Fighter.DuelGoal(f);
 		this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
 	}
 
@@ -87,6 +96,113 @@ public final class BridgeGoal extends Goal {
 		return f.bridgeSword;
 	}
 
+	// ---------------------------------------------------------------- where things are (relative to the map)
+
+	private double rx(BridgeWorld w, double x) {
+		return x - w.centreX();
+	}
+
+	private double rz(BridgeWorld w, double z) {
+		return z - w.centreZ();
+	}
+
+	private double ry(BridgeWorld w, double y) {
+		return y - w.y();
+	}
+
+	private Vec3 world(BridgeWorld w, double[] rel) {
+		return new Vec3(w.centreX() + rel[0], w.y() + rel[1], w.centreZ() + rel[2]);
+	}
+
+	private static int sideOf(double rx) {
+		return rx < 0 ? -1 : 1;
+	}
+
+	private enum Where {
+		BRIDGE, DECK, ROOM, STAIRS, TOP, OFF
+	}
+
+	private Where where(BridgeWorld w, Vec3 p) {
+		double ax = Math.abs(rx(w, p.x)), az = Math.abs(rz(w, p.z)), y = ry(w, p.y);
+		if (ax <= BRIDGE_END + 0.5) return Where.BRIDGE;
+		if (ax > BASE_BACK + 1.5 || y < -3) return Where.OFF;
+		if (ax >= ROOM_FROM - 0.6 && ax <= ROOM_TO + 1 && az <= ROOM_HALF + 1 && y < ROOM_TOP + 0.5) return Where.ROOM;
+		if (ax >= STAIR_FROM - 0.6 && ax <= LANDING_FROM + 0.4 && az >= STAIR_IN - 0.7 && az <= STAIR_OUT + 0.7 && y > 1.3) return Where.STAIRS;
+		if (y > TOP + 0.5 && ax >= TEMPLE_FRONT - 0.5 && ax <= TEMPLE_BACK + 1 && az <= STAIR_OUT + 1) return Where.TOP;
+		return Where.DECK;
+	}
+
+	private static double flat(Vec3 a, Vec3 b) {
+		return Math.hypot(a.x - b.x, a.z - b.z);
+	}
+
+	/**
+	 * The next place to head for on the way to a target: through the door, to the end of the bridge, along
+	 * it, to the foot of the stairs, up them, round the goal.
+	 */
+	private Vec3 next(BridgeWorld w, Vec3 p, Vec3 t, int ownSide) {
+		Where at = where(w, p), to = where(w, t);
+		int sp = sideOf(rx(w, p.x)), st = sideOf(rx(w, t.x));
+		int width = w.bridgeWidth();
+		int k = Math.abs(rz(w, p.z)) > 1.5 ? (rz(w, p.z) < 0 ? -1 : 1) : stairs;
+		boolean sameBase = sp == st && at != Where.BRIDGE && to != Where.BRIDGE && to != Where.OFF;
+		boolean goingUp = sameBase && to == Where.TOP;
+		switch (at) {
+			case ROOM -> {
+				return to == Where.ROOM && sameBase ? t : world(w, new double[] {sp * (TEMPLE_FRONT - 2) + 0.5, 1, 0.5});
+			}
+			case TOP -> {
+				if (goingUp) return avoidPit(w, p, t, ownSide);
+				// Down the stairs on this side.
+				Vec3 top = world(w, stairTop(sp, k));
+				return flat(p, top) > 1.2 ? avoidPit(w, p, top, ownSide) : world(w, stairFoot(sp, k));
+			}
+			case STAIRS -> {
+				return goingUp ? world(w, stairTop(sp, k)) : world(w, stairFoot(sp, k));
+			}
+			case DECK -> {
+				double ax = Math.abs(rx(w, p.x)), az = Math.abs(rz(w, p.z));
+				// Beside or behind the temple: round to the front of it first.
+				boolean besideTemple = ax > TEMPLE_FRONT - 1 && az <= STAIR_OUT + 1.2 && !(goingUp && az >= STAIR_IN - 0.7 && ax < STAIR_FROM + 0.5);
+				if (besideTemple && !goingUp) return world(w, new double[] {sp * (TEMPLE_FRONT - 2) + 0.5, 1, k * (STAIR_OUT + 1.5) + 0.5});
+				if (goingUp) {
+					if (ax > STAIR_FROM && az > STAIR_OUT) return world(w, new double[] {sp * (TEMPLE_FRONT - 1) + 0.5, 1, k * (STAIR_OUT + 1.5) + 0.5});
+					Vec3 foot = world(w, stairFoot(sp, k));
+					return flat(p, foot) > 1.0 ? foot : world(w, stairTop(sp, k));
+				}
+				if (sameBase) return t;
+				// Off to the bridge.
+				return world(w, new double[] {sp * (BASE_FRONT + 1) + 0.5, 1, bridgeMidZ(width) + lane});
+			}
+			case BRIDGE -> {
+				if (to == Where.BRIDGE) return t;
+				return world(w, new double[] {st * (BASE_FRONT + 2) + 0.5, 1, bridgeMidZ(width) + (Math.abs(rx(w, p.x)) < BRIDGE_END - 3 ? lane : 0)});
+			}
+			default -> {
+				return t;
+			}
+		}
+	}
+
+	/** On its own temple's top: round the front of the pit rather than across it. */
+	private Vec3 avoidPit(BridgeWorld w, Vec3 p, Vec3 to, int ownSide) {
+		if (sideOf(rx(w, p.x)) != ownSide) return to;
+		double gx = w.centreX() + ownSide * GOAL_X + 0.5, gz = w.centreZ() + 0.5;
+		// Does the line from here to there pass over the pit?
+		double vx = to.x - p.x, vz = to.z - p.z, len2 = vx * vx + vz * vz;
+		if (len2 < 0.01) return to;
+		double t = Mth.clamp(((gx - p.x) * vx + (gz - p.z) * vz) / len2, 0, 1);
+		double cxp = p.x + vx * t - gx, czp = p.z + vz * t - gz;
+		if (Math.max(Math.abs(cxp), Math.abs(czp)) > GOAL_HALF + 1.3) return to;
+		// Round the front of it, on this side.
+		double side = p.z - gz >= 0 ? 1 : -1;
+		Vec3 corner = new Vec3(gx - ownSide * (GOAL_HALF + 2), p.y, gz + side * (GOAL_HALF + 2));
+		if (flat(p, corner) < 1.0) corner = new Vec3(gx - ownSide * (GOAL_HALF + 2), p.y, gz - side * (GOAL_HALF + 2));
+		return corner;
+	}
+
+	// ---------------------------------------------------------------- the game
+
 	@Override
 	public void tick() {
 		Brain b = f.bridge;
@@ -94,20 +210,20 @@ public final class BridgeGoal extends Goal {
 		BridgeWorld w = b.world;
 		if (!w.playing()) {
 			f.getNavigation().stop();
+			f.getMoveControl().setWantedPosition(f.getX(), f.getY(), f.getZ(), 0);
 			return;
 		}
+		f.getNavigation().stop();
 		int d = b.difficulty;
 		ServerLevel level = w.level();
 		if (placeCool > 0) placeCool--;
 		if (bowCool > 0) bowCool--;
 		if (wallCool > 0) wallCool--;
+		if (swing > 0) swing--;
+		if (react > 0) react--;
 		f.setShiftKeyDown(false);
 
-		// Hurt: step back and eat (from 3).
-		if (f.eating()) {
-			f.getNavigation().stop();
-			return;
-		}
+		if (f.eating()) return;
 		LivingEntity near = nearest(w.enemiesOf(b.team));
 		double nd = near == null ? 999 : f.distanceTo(near);
 		if (d >= 3 && f.getHealth() < f.getMaxHealth() * 0.4F && nd > 4) {
@@ -116,38 +232,43 @@ public final class BridgeGoal extends Goal {
 		}
 
 		if (--decide <= 0) {
-			decide = 20;
+			decide = 6 + (10 - d) * 2;
 			choose(b, near);
 		}
 
-		// Close enough to fight: fight, from the middle of the bridge so it's the other one who goes off.
-		if (near != null && nd < 4.0 + 0.06 * d && Math.abs(near.getY() - f.getY()) < 2.5) {
+		int own = side(b.team), theirs = -own;
+		Vec3 p = f.position();
+		Vec3 target = b.defending ? defendTarget(w, b) : world(w, goal(theirs));
+		Vec3 way = next(w, p, target, own);
+		heading = new Vec3(way.x - p.x, 0, way.z - p.z);
+
+		// Fight: anyone in the way or hitting it (and anyone near, when defending or from 6).
+		boolean hitBy = near != null && f.getLastHurtByMob() == near && f.tickCount - f.getLastHurtByMobTimestamp() < 40;
+		boolean inWay = near != null && inPath(near);
+		if (near != null && nd < 3.6 + 0.08 * d && Math.abs(near.getY() - f.getY()) < 2.5 && f.hasLineOfSight(near)
+				&& (b.defending || inWay || hitBy || d >= 6 && nd < 2.6)) {
 			bowDraw = -1;
 			if (f.isUsingItem()) f.stopUsingItem();
-			hold(sword());
-			f.setTarget(near);
-			duel.tick();
-			if (d >= 6) {
-				double cz = w.centreZ() + 0.5, mine = Math.abs(f.getZ() - cz), theirs = Math.abs(near.getZ() - cz);
-				if (mine > theirs - 0.3 && mine > 0.4) f.setDeltaMovement(f.getDeltaMovement().add(0, 0, Math.signum(cz - f.getZ()) * 0.025 * (d - 4) / 6.0));
-			}
+			melee(w, near, d);
 			return;
 		}
 		f.setTarget(null);
 
 		// Drawing a bow: hold still, aim, loose.
 		if (bowDraw >= 0) {
-			if (bowTarget == null || !bowTarget.isAlive()) {
+			if (bowTarget == null || !bowTarget.isAlive() || bowTarget.isSpectator()) {
 				bowDraw = -1;
 				f.stopUsingItem();
 			} else {
-				f.getNavigation().stop();
+				f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
 				f.getLookControl().setLookAt(bowTarget, 30, 30);
 				if (++bowDraw >= 22 - d) shoot(level, bowTarget, d);
 				return;
 			}
 		}
-		if (near != null && nd > 9 && nd < 32 && bowCool == 0 && d >= 2 && f.hasLineOfSight(near) && f.getRandom().nextFloat() < 0.04F + 0.012F * d) {
+		Where at = where(w, p);
+		if (near != null && nd > 9 && nd < 30 && bowCool == 0 && d >= 2 && at != Where.STAIRS && at != Where.ROOM && f.onGround() && f.hasLineOfSight(near)
+				&& f.getRandom().nextFloat() < (b.defending ? 0.05F : 0.02F) + 0.01F * d) {
 			hold(new ItemStack(Items.BOW));
 			f.startUsingItem(InteractionHand.MAIN_HAND);
 			bowTarget = near;
@@ -155,46 +276,40 @@ public final class BridgeGoal extends Goal {
 			return;
 		}
 
-		int s = side(b.team);
-		Vec3 target;
-		if (b.defending) {
-			LivingEntity threat = threat(w, b.team);
-			if (threat != null) {
-				// Between them and the goal, and a wall in their way.
-				double toGoal = Math.signum(s * GOAL_X + 0.5 + w.centreX() - threat.getX());
-				target = new Vec3(threat.getX() + toGoal * 2.5, f.getY(), threat.getZ());
-				if (d >= 4 && wallCool == 0 && threat.distanceTo(f) < 9 && f.getRandom().nextFloat() < 0.08F * (d - 3)) wall(w, threat, toGoal, d);
-			} else {
-				target = new Vec3(w.centreX() + s * (BASE_FRONT + 1) + 0.5, f.getY(), w.centreZ() + 0.5 + lane * 0.5);
-			}
-		} else {
-			// The other team's goal: once close, straight in.
-			double gx = w.centreX() - s * GOAL_X + 0.5, gz = w.centreZ() + 0.5;
-			target = new Vec3(gx, f.getY(), gz);
+		// A swing at anyone it passes.
+		if (near != null && nd < f.reach() && swing == 0 && f.hasLineOfSight(near)) {
+			f.getLookControl().setLookAt(near, 40, 40);
+			hit(level, near, d, false);
 		}
-		steer(w, b, target, d);
+		// A wall in front of an attacker on the bridge (defenders, from 4).
+		if (b.defending && d >= 4 && wallCool == 0 && near != null && nd < 8 && Math.abs(rx(w, near.getX())) <= BRIDGE_END + 2
+				&& f.getRandom().nextFloat() < 0.07F * (d - 3)) {
+			wall(w, near, own, d);
+		}
+		steer(w, b, way, target, d);
 	}
 
-	/** Attack or defend, and which way round anyone in the way. */
+	/** Attack or defend, which stairs, and which way round anyone in the way on the bridge. */
 	private void choose(Brain b, LivingEntity near) {
 		BridgeWorld w = b.world;
-		int d = b.difficulty, s = side(b.team);
+		int d = b.difficulty, own = side(b.team);
 		LivingEntity threat = threat(w, b.team);
-		double myGoal = w.centreX() + s * GOAL_X + 0.5;
+		double goalX = w.centreX() + own * GOAL_X + 0.5;
+		boolean was = b.defending;
 		if (w.teamSize() == 1) {
-			// On your own: defend when someone's nearer your goal than you are and closing in (better at it as
-			// the difficulty rises), otherwise attack.
-			boolean danger = threat != null && Math.abs(threat.getX() - myGoal) < 22 && Math.abs(threat.getX() - myGoal) < Math.abs(f.getX() - myGoal) + 4;
-			b.defending = danger && f.getRandom().nextFloat() < 0.15F + 0.085F * d;
+			// On its own: stop anyone nearer its goal than it is and coming (more often and sooner as the
+			// difficulty rises), otherwise go and score.
+			boolean danger = threat != null && Math.abs(threat.getX() - goalX) < Math.abs(f.getX() - goalX) + 8;
+			if (!danger) b.defending = false;
+			else if (!was) b.defending = f.getRandom().nextFloat() < 0.12F + 0.088F * d;
 		} else {
-			// In a team: the first always attacks, every other one defends; anyone defends when the goal's in
-			// danger and they're the nearest to it.
+			// In a team: every other one defends; the nearest to the goal defends too when it's in danger.
 			b.defending = b.index % 2 == 1;
-			if (threat != null && Math.abs(threat.getX() - myGoal) < 16 && d >= 3) {
+			if (threat != null && d >= 3 && Math.abs(threat.getX() - goalX) < 26) {
 				LivingEntity nearestAlly = null;
 				double best = 999;
 				for (LivingEntity a : w.alliesOf(b.team)) {
-					double dist = Math.abs(a.getX() - myGoal);
+					double dist = Math.abs(a.getX() - goalX);
 					if (dist < best) {
 						best = dist;
 						nearestAlly = a;
@@ -203,24 +318,60 @@ public final class BridgeGoal extends Goal {
 				if (nearestAlly == f) b.defending = true;
 			}
 		}
+		// Which stairs: from 8, the side nobody's guarding; otherwise the side it's on, or either.
+		if (!b.defending) {
+			if (d >= 8 && near != null && Math.abs(rx(w, near.getX())) > TEMPLE_FRONT - 4) stairs = rz(w, near.getZ()) > 0.5 ? -1 : 1;
+			else if (Math.abs(rx(w, f.getX())) <= BRIDGE_END && f.getRandom().nextFloat() < 0.15F) stairs = f.getRandom().nextBoolean() ? 1 : -1;
+		}
 		// Round whoever's on the bridge ahead (from 4, by bridging out to one side), or along the middle.
 		boolean blocked = false;
-		if (near != null) {
-			double ahead = (near.getX() - f.getX()) * -s;
-			blocked = ahead > 2 && ahead < 14 && Math.abs(near.getZ() - (w.centreZ() + 0.5)) < 3;
+		if (near != null && !b.defending) {
+			double ahead = (near.getX() - f.getX()) * -own;
+			blocked = ahead > 1.5 && ahead < 12 && Math.abs(rx(w, near.getX())) <= BRIDGE_END && Math.abs(near.getZ() - f.getZ()) < 2.5;
 		}
-		if (blocked && d >= 4 && !b.defending) lane = f.getRandom().nextBoolean() ? 4.5 : -4.5;
-		else if (Math.abs(lane) > 3 && f.getRandom().nextFloat() < 0.3F) lane = 0;
-		else if (Math.abs(lane) <= 3) lane = (f.getRandom().nextFloat() - 0.5) * 2.5;
+		if (blocked && d >= 4) {
+			if (Math.abs(lane) < 2) lane = f.getRandom().nextBoolean() ? 3.5 + d * 0.15 : -3.5 - d * 0.15;
+		} else if (f.getRandom().nextFloat() < 0.4F) {
+			lane = 0;
+		}
 	}
 
-	/** The enemy closest to this team's goal, if any is coming for it. */
-	private static LivingEntity threat(BridgeWorld w, int team) {
-		double goal = w.centreX() + side(team) * GOAL_X + 0.5;
+	/** Where a defender should be: on the bridge in front of an attacker, between them and the stairs, or by the goal. */
+	private Vec3 defendTarget(BridgeWorld w, Brain b) {
+		int own = side(b.team), d = b.difficulty;
+		LivingEntity threat = threat(w, b.team);
+		if (threat == null) {
+			// Nobody coming: hold the end of the bridge (good bots), or the goal.
+			return d >= 5 ? world(w, front(own, w.bridgeWidth())) : world(w, guard(own, stairs));
+		}
+		Vec3 t = threat.position();
+		Where tw = where(w, t);
+		int ts = sideOf(rx(w, t.x));
+		if (tw == Where.BRIDGE || ts != own) {
+			// Meet them on the bridge, a couple of blocks on our side of them.
+			double x = t.x + own * 2.0;
+			if (own * rx(w, x) < 2) x = w.centreX() + own * 2.0;
+			return new Vec3(x, w.y() + 1, t.z);
+		}
+		int k = rz(w, t.z) < 0 ? -1 : 1;
+		stairs = k;
+		if (tw == Where.STAIRS || tw == Where.TOP) return world(w, guard(own, k));
+		// On our deck: between them and the stairs they're making for.
+		Vec3 foot = world(w, stairFoot(own, k));
+		Vec3 dir = foot.subtract(t);
+		double len = Math.max(0.1, Math.hypot(dir.x, dir.z));
+		return new Vec3(t.x + dir.x / len * 1.8, w.y() + 1, t.z + dir.z / len * 1.8);
+	}
+
+	/** The enemy closest to this team's goal, if any is on this half. */
+	private LivingEntity threat(BridgeWorld w, int team) {
+		int own = side(team);
+		double goal = w.centreX() + own * GOAL_X + 0.5;
 		LivingEntity best = null;
-		double bestD = 30;
+		double bestD = 999;
 		for (LivingEntity e : w.enemiesOf(team)) {
-			double dist = Math.abs(e.getX() - goal);
+			if (own * rx(w, e.getX()) < -6) continue;
+			double dist = Math.abs(e.getX() - goal) + Math.abs(e.getZ() - w.centreZ()) * 0.3;
 			if (dist < bestD) {
 				bestD = dist;
 				best = e;
@@ -242,24 +393,117 @@ public final class BridgeGoal extends Goal {
 		return best;
 	}
 
+	/** Whether someone's standing in the way it's going (a few blocks ahead, near its line). */
+	private boolean inPath(LivingEntity e) {
+		double len = Math.hypot(heading.x, heading.z);
+		if (len < 0.1) return false;
+		double ux = heading.x / len, uz = heading.z / len, ex = e.getX() - f.getX(), ez = e.getZ() - f.getZ();
+		double ahead = ex * ux + ez * uz, side = Math.abs(ex * uz - ez * ux);
+		return ahead > 0.3 && ahead < 5.5 && side < 2.0;
+	}
+
+	// ---------------------------------------------------------------- fighting
+
+	/** A fight: close in (never off an edge), strafe where there's room, jump for crits, knock them off. */
+	private void melee(BridgeWorld w, LivingEntity t, int d) {
+		ServerLevel level = w.level();
+		f.setTarget(t);
+		hold(sword());
+		f.getLookControl().setLookAt(t, 40, 40);
+		float face = (float) (Mth.atan2(t.getZ() - f.getZ(), t.getX() - f.getX()) * Mth.RAD_TO_DEG) - 90;
+		double dist = f.distanceTo(t), reach = f.reach();
+		Vec3 p = f.position();
+		if (dist > reach - 0.4) {
+			Vec3 to = t.position().subtract(p);
+			double len = Math.max(0.01, Math.hypot(to.x, to.z));
+			if (safe(w, p.x + to.x / len * 0.9, p.y, p.z + to.z / len * 0.9)) {
+				f.setSprinting(d >= 3);
+				f.getMoveControl().setWantedPosition(t.getX(), p.y, t.getZ(), d >= 3 ? 1.0 : 0.85);
+			} else {
+				f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
+			}
+		} else {
+			f.setYRot(face);
+			f.yBodyRot = face;
+			// Strafe round them where there's floor both sides (from 3), keeping to the middle (from 6).
+			boolean room = safe(w, p.x + Mth.cos(face * Mth.DEG_TO_RAD) * 1.2, p.y, p.z + Mth.sin(face * Mth.DEG_TO_RAD) * 1.2)
+					&& safe(w, p.x - Mth.cos(face * Mth.DEG_TO_RAD) * 1.2, p.y, p.z - Mth.sin(face * Mth.DEG_TO_RAD) * 1.2);
+			if (d >= 3 && room) {
+				if (--strafeTicks <= 0) {
+					strafeSide = f.getRandom().nextBoolean() ? 1 : -1;
+					strafeTicks = 8 + f.getRandom().nextInt(Math.max(4, 40 - 3 * d));
+				}
+				float forward = dist > 2.8 ? 0.35F : dist < 1.8 ? -0.3F : 0;
+				f.getMoveControl().strafe(forward, strafeSide * (0.2F + 0.04F * d));
+			} else {
+				f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
+			}
+			if (d >= 6) {
+				// Edge in towards the middle of the bridge, so it's them who goes off.
+				double mz = w.centreZ() + bridgeMidZ(w.bridgeWidth());
+				if (Math.abs(rx(w, p.x)) <= BRIDGE_END + 1 && Math.abs(f.getZ() - mz) > 0.35) {
+					f.setDeltaMovement(f.getDeltaMovement().add(0, 0, Math.signum(mz - f.getZ()) * 0.02 * (d - 4) / 6.0));
+				}
+			}
+			if (d >= 4 && swing <= 4 && f.onGround() && !jumpForCrit && f.getRandom().nextFloat() < 0.05F * (d - 3)) {
+				f.getJumpControl().jump();
+				jumpForCrit = true;
+			}
+		}
+		boolean falling = !f.onGround() && f.getDeltaMovement().y < 0;
+		boolean waitForDrop = jumpForCrit && !falling && !f.onGround();
+		if (swing == 0 && dist <= reach && !waitForDrop && f.hasLineOfSight(t)) hit(level, t, d, d >= 6);
+	}
+
+	/** A swing (low levels miss now and then); a sprint hit knocks them further. */
+	private void hit(ServerLevel level, LivingEntity t, int d, boolean sprintHit) {
+		if (react > 0) return;
+		hold(sword());
+		f.swing(InteractionHand.MAIN_HAND);
+		if (f.getRandom().nextFloat() >= Math.max(0, 0.35F - 0.05F * d)) {
+			boolean hit = f.doHurtTarget(level, t);
+			if (hit && sprintHit) t.knockback(0.35 + 0.02 * d, f.getX() - t.getX(), f.getZ() - t.getZ());
+		}
+		swing = f.swingTicks() + f.getRandom().nextInt(Math.max(1, (11 - d) * 2));
+		react = Math.max(1, 10 - d);
+		jumpForCrit = false;
+	}
+
+	// ---------------------------------------------------------------- moving
+
 	private boolean solid(ServerLevel level, BlockPos pos) {
 		return !level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
 	}
 
+	/** How far down to the first floor below a spot (0: there's a floor at that level), or 99 if none near. */
+	private int drop(ServerLevel level, BlockPos floor) {
+		for (int k = 0; k <= 12; k++) if (solid(level, floor.below(k))) return k;
+		return 99;
+	}
+
+	/** Whether stepping to (x, z) keeps it on something (a drop of a block or two at most). */
+	private boolean safe(BridgeWorld w, double x, double y, double z) {
+		return drop(w.level(), BlockPos.containing(x, y - 0.5, z)) <= 2;
+	}
+
+	private boolean nearOwnGoal(BridgeWorld w, double x, double z, int s) {
+		return Math.abs(x - (w.centreX() + s * GOAL_X + 0.5)) < GOAL_HALF + 1.2 && Math.abs(z - (w.centreZ() + 0.5)) < GOAL_HALF + 1.2;
+	}
+
 	/**
-	 * Walks towards the target along a lane: bridges any gap ahead (or stops at the edge), jumps a block in
-	 * the way, breaks through placed walls, steps round the map's own.
+	 * Walks towards the next place: bridges a gap over the void (or waits at the edge), walks down steps and
+	 * drops a block or two, jumps a block in the way, breaks through placed walls.
 	 */
-	private void steer(BridgeWorld w, Brain b, Vec3 target, int d) {
+	private void steer(BridgeWorld w, Brain b, Vec3 way, Vec3 target, int d) {
 		ServerLevel level = w.level();
 		Vec3 p = f.position();
+		int own = side(b.team);
 		boolean attacking = !b.defending;
-		double toGoal = Math.hypot(target.x - p.x, target.z - p.z);
-		double tz = toGoal < 7 || b.defending ? target.z : w.centreZ() + 0.5 + lane;
-		double wx = p.x + Mth.clamp(target.x - p.x, -2.5, 2.5), wz = p.z + Mth.clamp(tz - p.z, -1.4, 1.4);
+		double wx = p.x + Mth.clamp(way.x - p.x, -2.5, 2.5), wz = p.z + Mth.clamp(way.z - p.z, -2.5, 2.5);
 		double dx = wx - p.x, dz = wz - p.z, len = Math.sqrt(dx * dx + dz * dz);
-		if (len < 0.15) {
-			f.getNavigation().stop();
+		if (len < 0.2) {
+			f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
+			f.setSprinting(false);
 			return;
 		}
 		dx /= len;
@@ -269,6 +513,7 @@ public final class BridgeGoal extends Goal {
 		// Breaking through a wall of placed blocks.
 		if (mining != null) {
 			hold(new ItemStack(Items.DIAMOND_PICKAXE));
+			f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
 			if (mineTicks % 4 == 0) f.swing(InteractionHand.MAIN_HAND);
 			if (--mineTicks <= 0) {
 				if (w.breakable(mining)) level.destroyBlock(mining, false, f);
@@ -279,18 +524,30 @@ public final class BridgeGoal extends Goal {
 
 		int groundY = Mth.floor(p.y - 0.5);
 		BlockPos ahead = BlockPos.containing(p.x + dx * 0.9, groundY, p.z + dz * 0.9);
-		boolean intoGoal = attacking && toGoal < 4.5;
+		boolean intoGoal = attacking && flat(p, world(w, goal(-own))) < GOAL_HALF + 2.5;
 		if (f.onGround() && !intoGoal && !solid(level, ahead)) {
-			// A gap: build across it (slower and with the odd slip at low levels), or wait at the edge.
-			if (f.getRandom().nextFloat() < Math.max(0, 0.05F - 0.005F * d)) {
-				f.getMoveControl().setWantedPosition(wx, p.y, wz, 1.0);
+			int down = drop(level, ahead);
+			boolean wantDown = way.y < p.y - 1.5 || target.y < p.y - 1.5;
+			boolean ownPit = nearOwnGoal(w, ahead.getX() + 0.5, ahead.getZ() + 0.5, own) && ry(w, p.y) > TOP - 1;
+			if (ownPit) {
+				// Never into its own goal: round it.
+				lane = 0;
+				f.getMoveControl().setWantedPosition(p.x - dz, p.y, p.z + dx, 0.8);
 				return;
 			}
-			f.setShiftKeyDown(true);
-			f.getNavigation().stop();
-			f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
-			if (placeCool == 0 && w.buildable(ahead) && level.getBlockState(ahead).isAir()) place(w, b, ahead);
-			return;
+			if (!(down <= 2 || wantDown && down <= 12)) {
+				// A gap over the void: build across it (slower and with the odd slip at low levels), or wait.
+				if (f.getRandom().nextFloat() < Math.max(0, 0.04F - 0.005F * d)) {
+					f.getMoveControl().setWantedPosition(wx, p.y, wz, 1.0);
+					return;
+				}
+				f.setShiftKeyDown(true);
+				f.setSprinting(false);
+				f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
+				if (placeCool == 0 && w.buildable(ahead) && level.getBlockState(ahead).isAir()) place(w, b, ahead);
+				else if (!w.buildable(ahead)) lane = 0;
+				return;
+			}
 		}
 
 		BlockPos feet = BlockPos.containing(p.x + dx * 0.8, p.y + 0.2, p.z + dz * 0.8), head = feet.above();
@@ -302,17 +559,17 @@ public final class BridgeGoal extends Goal {
 				mineTicks = Math.max(3, 13 - d);
 				return;
 			}
-			lane += f.getRandom().nextBoolean() ? 2 : -2;
-			lane = Mth.clamp(lane, -5, 5);
-		} else if (feetBlocked && f.onGround()) {
+			if (Math.abs(rx(w, p.x)) <= BRIDGE_END) lane = Mth.clamp(lane + (f.getRandom().nextBoolean() ? 2 : -2), -5, 5);
+		} else if (feetBlocked && f.onGround() && !level.getBlockState(feet).is(net.minecraft.tags.BlockTags.STAIRS)) {
 			f.getJumpControl().jump();
 		}
 
-		// Stuck (pushed against something): try another lane.
+		// Stuck (pushed against something): try another way.
 		if (f.tickCount % 20 == 0) {
 			if (p.distanceToSqr(lastPos) < 0.05) {
 				if (++stuck >= 2) {
-					lane = Mth.clamp(lane + (f.getRandom().nextBoolean() ? 2.5 : -2.5), -5, 5);
+					if (Math.abs(rx(w, p.x)) <= BRIDGE_END) lane = Mth.clamp(lane + (f.getRandom().nextBoolean() ? 2.5 : -2.5), -5, 5);
+					else stairs = -stairs;
 					if (f.onGround()) f.getJumpControl().jump();
 					stuck = 0;
 				}
@@ -322,9 +579,9 @@ public final class BridgeGoal extends Goal {
 			lastPos = p;
 		}
 		hold(sword());
-		boolean sprint = attacking && d >= 3 && Math.abs(lane) < 3;
+		boolean sprint = d >= 3 && (attacking || flat(p, target) > 6) && Math.abs(lane) < 2.5;
 		f.setSprinting(sprint);
-		f.getMoveControl().setWantedPosition(wx, p.y, wz, sprint ? 1.25 : 1.0);
+		f.getMoveControl().setWantedPosition(wx, p.y, wz, sprint ? 1.0 : 0.85);
 	}
 
 	/** Places one of its team's blocks (as fast as its difficulty allows). */
@@ -337,21 +594,21 @@ public final class BridgeGoal extends Goal {
 		placeCool = Math.max(2, 14 - (int) (1.3 * b.difficulty));
 	}
 
-	/** A wall across an attacker's path, two high, between them and the goal. */
-	private void wall(BridgeWorld w, LivingEntity threat, double toGoal, int d) {
+	/** A wall across an attacker's path on the bridge, two high, between them and its base (toward: its side). */
+	private void wall(BridgeWorld w, LivingEntity threat, double toward, int d) {
 		ServerLevel level = w.level();
-		int x = Mth.floor(threat.getX() + toGoal * 2), y = Mth.floor(threat.getY()), z0 = Mth.floor(threat.getZ());
+		int x = Mth.floor(threat.getX() + toward * 2), y = Mth.floor(threat.getY()), z0 = Mth.floor(threat.getZ());
 		int placed = 0;
 		for (int dz = -1; dz <= 1; dz++) {
 			for (int dy = 0; dy <= 1; dy++) {
 				BlockPos pos = new BlockPos(x, y + dy, z0 + dz);
-				if (level.getBlockState(pos).isAir() && w.buildable(pos) && level.getEntities(null, new net.minecraft.world.phys.AABB(pos)).isEmpty()) {
+				if (level.getBlockState(pos).isAir() && w.buildable(pos) && level.getEntities(null, new AABB(pos)).isEmpty()) {
 					place(w, f.bridge, pos);
 					placed++;
 				}
 			}
 		}
-		wallCool = placed > 0 ? 60 - 4 * d : 10;
+		wallCool = placed > 0 ? 70 - 4 * d : 10;
 	}
 
 	/** Looses an arrow, leading a moving target at higher levels. */
@@ -370,7 +627,7 @@ public final class BridgeGoal extends Goal {
 		level.playSound(null, f.getX(), f.getY(), f.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.HOSTILE, 1.0F, 1.0F / (f.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
 		f.stopUsingItem();
 		bowDraw = -1;
-		bowCool = 70;
+		bowCool = 80;
 		hold(sword());
 	}
 }

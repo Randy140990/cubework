@@ -19,3 +19,8 @@ data assets/minecraft/shaders/core/position_tex_color.vsh
 data assets/minecraft/shaders/core/position_tex_color.fsh
 data assets/minecraft/shaders/core/position_color.fsh
 data assets/minecraft/models/block/cube_column_horizontal.json
+net/minecraft/client/renderer/texture/AbstractTexture.java
+net/minecraft/client/renderer/texture/DynamicTexture.java
+grep (public|static) com/mojang/blaze3d/textures/GpuSampler.java
+grep (public|getSampler|SamplerCache) net/minecraft/client/renderer/SamplerCache.java
+grep (getSamplerCache|getSequentialBuffer|getDynamicUniforms|getModelViewMatrix) com/mojang/blaze3d/systems/RenderSystem.java

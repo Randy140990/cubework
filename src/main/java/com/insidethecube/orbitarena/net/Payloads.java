@@ -105,7 +105,8 @@ public final class Payloads {
 	 * it), the camera swooping from out in space past the crowd to where you stand.
 	 */
 	public record Cinematic(int kind, int centreX, int centreZ, int ticks, String title, String subtitle) implements CustomPacketPayload {
-		public static final int ARENA = 0, BRIDGE = 1;
+		/** The stadium, or the bridge seen coming in to blue's base or red's. */
+		public static final int ARENA = 0, BRIDGE = 1, BRIDGE_RED = 2;
 		public static final Type<Cinematic> TYPE = typeOf("cinematic");
 		public static final StreamCodec<ByteBuf, Cinematic> CODEC = StreamCodec.composite(
 				ByteBufCodecs.VAR_INT, Cinematic::kind, ByteBufCodecs.VAR_INT, Cinematic::centreX, ByteBufCodecs.VAR_INT, Cinematic::centreZ,
@@ -133,7 +134,7 @@ public final class Payloads {
 	 * Server to client: The Bridge's score (blue, your team; red), goals to win, seconds left (-1: no limit),
 	 * who's playing, and which fighter look leads red (for its face on the banner).
 	 */
-	public record BridgeScore(int blue, int red, int toWin, int secondsLeft, String blueName, String redName, int redLook) implements CustomPacketPayload {
+	public record BridgeScore(int blue, int red, int toWin, int secondsLeft, String blueName, String redName, int you, int theirLook) implements CustomPacketPayload {
 		public static final Type<BridgeScore> TYPE = typeOf("bridge_score");
 		public static final StreamCodec<ByteBuf, BridgeScore> CODEC = StreamCodec.of((buf, s) -> {
 			ByteBufCodecs.VAR_INT.encode(buf, s.blue);
@@ -142,9 +143,11 @@ public final class Payloads {
 			ByteBufCodecs.INT.encode(buf, s.secondsLeft);
 			ByteBufCodecs.STRING_UTF8.encode(buf, s.blueName);
 			ByteBufCodecs.STRING_UTF8.encode(buf, s.redName);
-			ByteBufCodecs.VAR_INT.encode(buf, s.redLook);
+			ByteBufCodecs.VAR_INT.encode(buf, s.you);
+			ByteBufCodecs.VAR_INT.encode(buf, s.theirLook);
 		}, buf -> new BridgeScore(ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
-				ByteBufCodecs.INT.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), ByteBufCodecs.VAR_INT.decode(buf)));
+				ByteBufCodecs.INT.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
+				ByteBufCodecs.VAR_INT.decode(buf)));
 
 		@Override
 		public Type<BridgeScore> type() {

@@ -39,6 +39,10 @@ public final class ArenaSky {
 	private static GpuBuffer buffer;
 	private static int indices;
 
+	/** Starts loading the sky's pictures (in the background). */
+	public static void load() {
+	}
+
 	public static boolean active() {
 		Minecraft mc = Minecraft.getInstance();
 		return mc.level != null && mc.level.dimension() == OrbitArena.ARENA;

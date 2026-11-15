@@ -13,7 +13,7 @@ import net.minecraft.resources.Identifier;
 
 /**
  * The Bridge's score, top left, as on the videos: a banner for each team with a face, the name and the
- * goals (2/5), blue (yours) over red, and the clock if there's a time limit.
+ * goals (2/5), yours over theirs, and the clock if there's a time limit.
  */
 public final class BridgeHud {
 	private BridgeHud() {}
@@ -36,8 +36,13 @@ public final class BridgeHud {
 		}
 		Font font = mc.font;
 		int x = 6, y = 6;
-		banner(g, font, x, y, 0xE01A2A6B, 0xFF4A7BFF, score.blueName(), score.blue(), score.toWin(), true, 0);
-		banner(g, font, x, y + 26, 0xE06B1A22, 0xFFFF4A5A, score.redName(), score.red(), score.toWin(), false, score.redLook());
+		// Your team's banner on top (with your face), then theirs.
+		boolean blue = score.you() == 0;
+		int blueFill = 0xE01A2A6B, blueEdge = 0xFF4A7BFF, redFill = 0xE06B1A22, redEdge = 0xFFFF4A5A;
+		banner(g, font, x, y, blue ? blueFill : redFill, blue ? blueEdge : redEdge, blue ? score.blueName() : score.redName(), blue ? score.blue() : score.red(),
+				score.toWin(), true, 0);
+		banner(g, font, x, y + 26, blue ? redFill : blueFill, blue ? redEdge : blueEdge, blue ? score.redName() : score.blueName(), blue ? score.red() : score.blue(),
+				score.toWin(), false, score.theirLook());
 		if (score.secondsLeft() >= 0) {
 			String t = score.secondsLeft() / 60 + ":" + String.format("%02d", score.secondsLeft() % 60);
 			int w = font.width(t) + 12, cx = g.guiWidth() / 2;

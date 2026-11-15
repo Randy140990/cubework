@@ -1,10 +1,12 @@
 package com.insidethecube.orbitarena.client;
 
 import com.insidethecube.orbitarena.OrbitArena;
+import com.insidethecube.orbitarena.block.ArenaBlocks;
 import com.insidethecube.orbitarena.net.Payloads;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -13,6 +15,7 @@ import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -25,13 +28,19 @@ public class OrbitArenaClient implements ClientModInitializer {
 		EntityRendererRegistry.register(OrbitArena.FIGHTER, FighterRenderer::new);
 		EntityRendererRegistry.register(OrbitArena.FAN, FanRenderer::new);
 		EntityRendererRegistry.register(OrbitArena.CRYSTAL, CrystalRenderer::new);
+		EntityRendererRegistry.register(OrbitArena.ROCK, RockRenderer::new);
+		for (net.minecraft.world.level.block.Block b : ArenaBlocks.TRANSLUCENT) BlockRenderLayerMap.putBlock(b, ChunkSectionLayer.TRANSLUCENT);
+		ArenaSky.load();
 		EntityModelLayerRegistry.registerModelLayer(FanModel.LAYER, FanModel::createLayer);
 		Emotes.register();
 
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.State.TYPE, (p, ctx) -> {
 			if (p.inArena()) {
 				Crowd.setArena(p.mode(), p.centreX(), p.centreZ());
-				if (p.mode() == Payloads.State.BRIDGE) Crystals.set(p.centreX(), p.centreZ());
+				if (p.mode() == Payloads.State.BRIDGE) {
+					Crystals.set(p.centreX(), p.centreZ());
+					Rocks.set(p.centreX(), p.centreZ());
+				}
 				else BridgeHud.clear();
 			} else {
 				ResultScreen.cancel();
@@ -57,6 +66,7 @@ public class OrbitArenaClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(Cinematic::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(Emotes::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(Crystals::tick);
+		ClientTickEvents.END_CLIENT_TICK.register(Rocks::tick);
 		Cinematic.hideHud();
 		HudElementRegistry.addLast(OrbitArena.id("bridge_score"), BridgeHud::render);
 		HudElementRegistry.addLast(OrbitArena.id("cinematic"), Cinematic::render);

@@ -48,16 +48,18 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * A game of The Bridge: you and up to four teammates (blue, west) against up to five (red, east), the rest
- * of both teams played by bots. Everyone starts in their team's cage over their base; the cages open after
- * five seconds and you cross the bridge, build round anyone in the way, knock them into space and drop into
- * their goal. A goal sends everyone back to the cages and crumbles one of the other team's pillars (its
- * crystal shatters). First to five wins; if there's a time limit, the most goals when it runs out.
+ * of both teams played by bots. Everyone starts in the room inside their temple's door, behind glass; the
+ * glass goes after five seconds and you cross the bridge, build round anyone in the way, knock them into
+ * space, climb the stairs of their temple and drop into their goal. A goal sends everyone back to their
+ * rooms and crumbles one of the other team's monoliths (its crystal shatters). First to five wins; if
+ * there's a time limit, the most goals when it runs out.
  * <p>
  * Your kit (as on the bridge servers): leather armour in your team's colour (or netherite), a sword, a bow
  * with one arrow that comes back a few seconds after you shoot it, a diamond pickaxe, two stacks of your
- * team's blocks and eight golden apples, all given again whenever you come back. You can place blocks over
- * the void and on the bridge, but not in or over a goal, a cage or the pillars, and you can only break
- * blocks someone placed. Falling into space, or going down, sends you back to your base. No fall damage.
+ * team's wool and eight golden apples, all given again whenever you come back. You can place blocks over
+ * the void, on the bridge and on the decks, but not on or round the temples or the monoliths, and you can
+ * only break blocks someone placed. Falling into space, or going down, sends you back to your room. No fall
+ * damage. Watching in spectator mode is fine: nothing counts while you spectate.
  */
 public final class BridgeMatch implements Game, BridgeWorld {
 	private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
@@ -89,23 +91,26 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		}
 
 		boolean inPlay() {
-			return respawn < 0 && e.isAlive() && !e.isRemoved();
+			return respawn < 0 && e.isAlive() && !e.isRemoved() && !e.isSpectator();
 		}
 	}
 
-	/** A pillar crumbling, a layer at a time from the top. */
+	/** A monolith crumbling, a layer at a time from the top. */
 	private static final class Crumble {
 		final int team, pillar;
-		int layer = PILLAR_TOP, wait;
+		int layer, wait;
 
 		Crumble(int team, int pillar) {
 			this.team = team;
 			this.pillar = pillar;
+			this.layer = MONOLITHS[pillar].top();
 		}
 	}
 
 	final ServerPlayer player;
 	final MatchSettings settings;
+	/** Your team (blue or red, as chosen) and theirs. */
+	final int me, them;
 	final int slot, cx, cz = Z;
 	final boolean again;
 	Phase phase = Phase.PREPARING;
@@ -121,6 +126,8 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	BridgeMatch(ServerPlayer player, MatchSettings settings, int slot, boolean again) {
 		this.player = player;
 		this.settings = settings;
+		this.me = settings.bridgeTeam() == RED ? RED : BLUE;
+		this.them = 1 - me;
 		this.slot = slot;
 		this.cx = slot * com.insidethecube.orbitarena.arena.ArenaLayout.SPACING;
 		this.again = again;
@@ -192,9 +199,14 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	}
 
 	@Override
+	public int bridgeWidth() {
+		return settings.bridgeWidth();
+	}
+
+	@Override
 	public boolean buildable(BlockPos pos) {
 		int dx = pos.getX() - cx, dy = pos.getY() - Y, dz = pos.getZ() - cz;
-		return BridgeLayout.buildable(dx, dy, dz) && mapBlock(dx, dy, dz, settings.obstacles()) == null;
+		return BridgeLayout.buildable(dx, dy, dz) && mapBlock(dx, dy, dz, settings.obstacles(), settings.bridgeWidth()) == null;
 	}
 
 	@Override
@@ -205,7 +217,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 
 	@Override
 	public BlockState blockFor(int team) {
-		return team == BLUE ? Blocks.BLUE_TERRACOTTA.defaultBlockState() : Blocks.RED_TERRACOTTA.defaultBlockState();
+		return BridgeLayout.wool(team == BLUE);
 	}
 
 	boolean involves(LivingEntity e) {
@@ -236,6 +248,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 
 	// ---------------------------------------------------------------- the game
 
+	/** In the room inside the team's temple door. */
 	private Vec3 spawn(int team) {
 		return new Vec3(cx + side(team) * SPAWN_X + 0.5, Y + 1, cz + 0.5);
 	}
@@ -253,18 +266,19 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		tickCrumbles(arena);
 		switch (phase) {
 			case PREPARING -> {
-				if (again) holdAt(arena, spawn(BLUE));
+				if (again) holdAt(arena, spawn(me));
 				Matches.Builder running = Matches.building(Matches.key(cx, Z));
 				if (running != null) {
 					player.displayClientMessage(Component.literal((BridgeBuilder.built(arena, cx) ? "Getting the bridge ready… " : "Building the bridge… ")
 							+ (int) (running.progress() * 100) + "%").withStyle(ChatFormatting.AQUA), true);
-				} else if (!repairStarted || !BridgeBuilder.built(arena, cx) || BridgeBuilder.hasObstacles(arena, cx) != settings.obstacles()) {
-					// Built afresh, or put right from the last game (blocks cleared, pillars stood back up).
+				} else if (!repairStarted || !BridgeBuilder.built(arena, cx) || BridgeBuilder.hasObstacles(arena, cx) != settings.obstacles()
+						|| BridgeBuilder.widthNow(arena, cx) != settings.bridgeWidth()) {
+					// Built afresh, or put right from the last game (blocks cleared, monoliths stood back up).
 					repairStarted = true;
-					Matches.bridgeBuilder(arena, cx, false, settings.obstacles());
+					Matches.bridgeBuilder(arena, cx, false, settings.obstacles(), settings.bridgeWidth());
 				} else if (again) {
 					player.getInventory().clearContent();
-					kit(player, BLUE);
+					kit(player, me);
 					setup(arena, false);
 				} else {
 					phase = Phase.ENTERING;
@@ -280,13 +294,13 @@ public final class BridgeMatch implements Game, BridgeWorld {
 					} catch (RuntimeException e) {
 						LOGGER.error("Orbit Arena: couldn't put {}'s things away", player.getName().getString(), e);
 					}
-					// Into blue's cage (up already, so there's a floor to land on).
+					// Into blue's room, behind the glass.
 					cages(arena, true);
-					teleport(player, arena, cageSpot(BLUE, 0, 1), yaw(BLUE));
-					kit(player, BLUE);
+					teleport(player, arena, cageSpot(me, 0, 1), yaw(me));
+					kit(player, me);
 					state(true);
 				}
-				if (ticks > 12 && player.level() != arena && ticks % 10 == 0) teleport(player, arena, cageSpot(BLUE, 0, 1), yaw(BLUE));
+				if (ticks > 12 && player.level() != arena && ticks % 10 == 0) teleport(player, arena, cageSpot(me, 0, 1), yaw(me));
 				if (ticks >= 30) {
 					if (player.level() == arena) {
 						setup(arena, settings.intro());
@@ -319,7 +333,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 			case RESULT -> {
 				if (won && ticks < Match.CELEBRATE_TICKS - 20 && ticks % 6 == 0) {
 					double x = cx + (arena.random.nextDouble() - 0.5) * 80, z = cz + (arena.random.nextBoolean() ? 1 : -1) * (6 + arena.random.nextDouble() * 10);
-					Shows.firework(arena, x, Y - 4, z, BLUE_RGB, arena.random);
+					Shows.firework(arena, x, Y - 4, z, me == BLUE ? BLUE_RGB : RED_RGB, arena.random);
 				}
 				if (ticks == (won ? Match.CELEBRATE_TICKS : 30) && !forfeit) ServerPlayNetworking.send(player, new Payloads.Result(won, endReason, summary));
 				if (ticks >= 6000 + Match.CELEBRATE_TICKS || player.level() != arena) leave();
@@ -341,11 +355,11 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	private void setup(ServerLevel arena, boolean intro) {
 		clear(arena);
 		members.clear();
-		members.add(new Member(player, BLUE, player.getName().getString()));
-		player.addTag(TEAM_TAG + "blue");
+		members.add(new Member(player, me, player.getName().getString()));
+		player.addTag(TEAM_TAG + teamName(me));
 		int n = settings.count(), d = settings.difficulty(), name = arena.random.nextInt(NAMES.length);
 		for (int team = BLUE; team <= RED; team++) {
-			for (int i = team == BLUE ? 1 : 0; i < n; i++) {
+			for (int i = team == me ? 1 : 0; i < n; i++) {
 				Fighter f = OrbitArena.FIGHTER.create(arena, EntitySpawnReason.MOB_SUMMONED);
 				if (f == null) continue;
 				String who = NAMES[name++ % NAMES.length];
@@ -370,14 +384,15 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		if (intro) {
 			phase = Phase.INTRO;
 			ticks = 0;
-			ServerPlayNetworking.send(player, new Payloads.Cinematic(Payloads.Cinematic.BRIDGE, cx, cz, Match.INTRO_TICKS, "THE BRIDGE", subtitle()));
+			ServerPlayNetworking.send(player, new Payloads.Cinematic(me == BLUE ? Payloads.Cinematic.BRIDGE : Payloads.Cinematic.BRIDGE_RED, cx, cz, Match.INTRO_TICKS,
+					"THE BRIDGE", subtitle()));
 		} else {
 			caged();
 		}
 	}
 
 	private String subtitle() {
-		return settings.count() + " v " + settings.count() + " · level " + settings.difficulty() + " · first to " + TO_WIN;
+		return (me == BLUE ? "Blue" : "Red") + " · " + settings.count() + " v " + settings.count() + " · level " + settings.difficulty() + " · first to " + TO_WIN;
 	}
 
 	private void caged() {
@@ -386,24 +401,21 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		score();
 	}
 
-	/** Where a member of a team stands in its cage. */
+	/** Where a member of a team stands in its room (n: players a team). */
 	private Vec3 cageSpot(int team, int index, int n) {
-		double off = n <= 1 ? 0 : (index - (n - 1) / 2.0) * 1.5;
-		return new Vec3(cx + side(team) * CAGE_X + 0.5, Y + CAGE_FLOOR + 1, cz + 0.5 + off);
+		return new Vec3(cx + side(team) * SPAWN_X + 0.5, Y + 1, cz + roomZ(index) + 0.5);
 	}
 
-	/** Builds both cages (or takes them away). */
+	/** Puts the glass across both temple doors (or takes it away). */
 	private void cages(ServerLevel arena, boolean up) {
 		cagesUp = up;
 		for (int s = -1; s <= 1; s += 2) {
-			for (int ax = CAGE_X - CAGE_HALF_X - 1; ax <= CAGE_X + CAGE_HALF_X + 1; ax++) {
-				for (int dz = -CAGE_HALF_Z - 1; dz <= CAGE_HALF_Z + 1; dz++) {
-					for (int dy = CAGE_FLOOR; dy <= CAGE_FLOOR + 4; dy++) {
-						BlockState b = cageBlock(s * ax, dy, dz);
-						if (b == null) continue;
-						BlockPos pos = new BlockPos(cx + s * ax, Y + dy, cz + dz);
-						arena.setBlock(pos, up ? b : Blocks.AIR.defaultBlockState(), 3);
-					}
+			for (int dz = -DOOR_HALF; dz <= DOOR_HALF; dz++) {
+				for (int dy = 1; dy <= DOOR_TOP; dy++) {
+					BlockState b = cageBlock(s * TEMPLE_FRONT, dy, dz);
+					if (b == null) continue;
+					BlockPos pos = new BlockPos(cx + s * TEMPLE_FRONT, Y + dy, cz + dz);
+					arena.setBlock(pos, up ? b : Blocks.AIR.defaultBlockState(), 3);
 				}
 			}
 		}
@@ -433,14 +445,14 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		}
 	}
 
-	/** Keeps bots still in their cages (players are kept in by the glass). */
+	/** Keeps everyone in their rooms until the glass goes (bots are held still; players by the glass). */
 	private void holdCaged() {
 		for (Member m : members) {
-			if (m.e instanceof ServerPlayer p) {
+			if (m.e instanceof ServerPlayer p && !p.isSpectator()) {
 				p.fallDistance = 0;
-				if (!cagesUp || p.getY() < Y + CAGE_FLOOR - 0.5) {
-					Vec3 at = cageSpot(m.team, 0, 1);
-					teleport(p, arena(), at, yaw(m.team));
+				Vec3 room = spawn(m.team);
+				if (!cagesUp || Math.abs(p.getX() - room.x) > 3.2 || Math.abs(p.getZ() - room.z) > 3.2 || p.getY() < Y + 0.5 || p.getY() > Y + 5) {
+					teleport(p, arena(), cageSpot(m.team, 0, 1), yaw(m.team));
 				}
 			}
 		}
@@ -473,6 +485,8 @@ public final class BridgeMatch implements Game, BridgeWorld {
 				}
 				continue;
 			}
+			// Spectating: nothing counts.
+			if (e.isSpectator()) continue;
 			double dx = e.getX() - cx, dy = e.getY() - Y, dz = e.getZ() - cz;
 			// Into the other team's goal: a goal. Into your own: back to your base.
 			if (inGoal(dx, dy, dz, -side(m.team))) {
@@ -509,7 +523,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		if (playTicks % 10 == 0) score();
 		if (settings.timeLimit() > 0 && playTicks >= settings.timeLimit() * 20) {
 			if (score[BLUE] == score[RED]) end(false, true, "Time's up, level on goals");
-			else end(score[BLUE] > score[RED], false, "Time's up");
+			else end(score[me] > score[them], false, "Time's up");
 		}
 	}
 
@@ -567,10 +581,10 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		score[m.team]++;
 		m.goals++;
 		int against = 1 - m.team;
-		crumbles.add(new Crumble(against, Math.min(PILLAR_Z.length - 1, score[m.team] - 1)));
+		crumbles.add(new Crumble(against, Math.min(MONOLITHS.length - 1, score[m.team] - 1)));
 		ServerPlayNetworking.send(player, new Payloads.Shatter(against, score[m.team] - 1));
-		boolean ours = m.team == BLUE;
-		ChatFormatting colour = ours ? ChatFormatting.BLUE : ChatFormatting.RED;
+		boolean ours = m.team == me;
+		ChatFormatting colour = m.team == BLUE ? ChatFormatting.BLUE : ChatFormatting.RED;
 		Shows.title(player, Component.literal(m.name.toUpperCase(java.util.Locale.ROOT) + " SCORED!").withStyle(colour, ChatFormatting.BOLD),
 				Component.literal("Blue " + score[BLUE] + " · Red " + score[RED]), 2, 40, 10);
 		player.sendSystemMessage(Component.literal(m.name).withStyle(colour).append(Component.literal(" scored! ").withStyle(ChatFormatting.GRAY))
@@ -579,7 +593,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		Shows.cheer(player, ours ? Payloads.Cheer.KILL : Payloads.Cheer.LOSS, ours ? 1.0F : 0.6F);
 		score();
 		if (score[m.team] >= TO_WIN) {
-			end(ours, false, ours ? "Your team crossed " + TO_WIN + " times" : "Red crossed " + TO_WIN + " times");
+			end(ours, false, ours ? "Your team crossed " + TO_WIN + " times" : (m.team == BLUE ? "Blue" : "Red") + " crossed " + TO_WIN + " times");
 			return;
 		}
 		cages(arena, true);
@@ -587,14 +601,16 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		caged();
 	}
 
-	/** One layer of each crumbling pillar every other tick, from the top, its pieces falling away into space. */
+	/** One layer of each crumbling monolith every other tick, from the top, its pieces falling away into space. */
 	private void tickCrumbles(ServerLevel arena) {
 		crumbles.removeIf(c -> {
 			if (c.wait-- > 0) return false;
 			c.wait = 1;
-			int s = side(c.team), pz = PILLAR_Z[c.pillar];
-			for (int ax = PILLAR_X; ax <= PILLAR_X + 2; ax++) {
-				for (int dz = pz - 1; dz <= pz + 1; dz++) {
+			int s = side(c.team);
+			Monolith mono = MONOLITHS[c.pillar];
+			for (int ax = mono.x() - 3; ax <= mono.x() + 3; ax++) {
+				for (int dz = mono.z() - 3; dz <= mono.z() + 3; dz++) {
+					if (monolithAt(s * ax, c.layer, dz) != c.pillar) continue;
 					BlockPos pos = new BlockPos(cx + s * ax, Y + c.layer, cz + dz);
 					BlockState state = arena.getBlockState(pos);
 					if (state.isAir()) continue;
@@ -607,7 +623,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 					}
 				}
 			}
-			return --c.layer < 1;
+			return --c.layer < mono.base();
 		});
 	}
 
@@ -635,7 +651,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	/** Your kit, given again whenever you come back. */
 	private void kit(ServerPlayer p, int team) {
 		p.getInventory().clearContent();
-		p.setGameMode(GameType.SURVIVAL);
+		if (!p.isSpectator()) p.setGameMode(GameType.SURVIVAL);
 		armour(p, team);
 		boolean netherite = settings.bridgeKit() == MatchSettings.NETHERITE;
 		p.getInventory().setItem(0, item(netherite ? Items.NETHERITE_SWORD : Items.IRON_SWORD));
@@ -644,7 +660,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		Holder<Enchantment> eff = p.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.EFFICIENCY);
 		pick.enchant(eff, 2);
 		p.getInventory().setItem(2, pick);
-		Item block = team == BLUE ? Items.BLUE_TERRACOTTA : Items.RED_TERRACOTTA;
+		Item block = BridgeLayout.wool(team == BLUE).getBlock().asItem();
 		p.getInventory().setItem(3, new ItemStack(block, 64));
 		p.getInventory().setItem(4, new ItemStack(block, 64));
 		p.getInventory().setItem(5, new ItemStack(Items.GOLDEN_APPLE, 8));
@@ -659,7 +675,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		p.getFoodData().setSaturation(10);
 		p.setRemainingFireTicks(0);
 		p.fallDistance = 0;
-		kit(p, BLUE);
+		kit(p, me);
 	}
 
 	private void teleport(ServerPlayer p, ServerLevel arena, Vec3 at, float yaw) {
@@ -669,7 +685,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	}
 
 	private void holdAt(ServerLevel arena, Vec3 at) {
-		if (player.level() != arena || player.position().distanceToSqr(at) > 0.8) teleport(player, arena, at, yaw(BLUE));
+		if (player.level() != arena || player.position().distanceToSqr(at) > 0.8) teleport(player, arena, at, yaw(me));
 		player.fallDistance = 0;
 	}
 
@@ -723,7 +739,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 			else phase = Phase.DONE;
 			return;
 		}
-		Member me = members.isEmpty() ? null : members.get(0);
+		Member mine = members.isEmpty() ? null : members.get(0);
 		Shows.title(player, Component.literal(won ? "VICTORY" : draw ? "DRAW" : forfeit ? "LEFT THE BRIDGE" : "DEFEAT")
 				.withStyle(won ? ChatFormatting.GOLD : draw ? ChatFormatting.AQUA : ChatFormatting.RED, ChatFormatting.BOLD),
 				Component.literal("Blue " + score[BLUE] + " · Red " + score[RED] + " · " + reason), 5, 70, 20);
@@ -731,8 +747,8 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		Shows.cheer(player, won ? Payloads.Cheer.WIN : Payloads.Cheer.LOSS, 1.0F);
 		player.sendSystemMessage(Component.literal("The Bridge · " + (won ? "Victory" : draw ? "Draw" : "Defeat") + " · " + subtitle())
 				.withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED));
-		summary = String.format("Goals %d to %d · Your goals %d · Knocked out %d · Lost %d · Time %s", score[BLUE], score[RED], me == null ? 0 : me.goals,
-				me == null ? 0 : me.kills, me == null ? 0 : me.deaths, Match.clock(playTicks / 20));
+		summary = String.format("Goals %d to %d · Your goals %d · Knocked out %d · Lost %d · Time %s", score[me], score[them], mine == null ? 0 : mine.goals,
+				mine == null ? 0 : mine.kills, mine == null ? 0 : mine.deaths, Match.clock(playTicks / 20));
 		player.sendSystemMessage(Component.literal(" " + summary).withStyle(ChatFormatting.GRAY));
 		score();
 		if (won && !forfeit) ServerPlayNetworking.send(player, new Payloads.Celebrate(Match.CELEBRATE_TICKS));
@@ -774,7 +790,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		for (Entity e : arena.getEntities((Entity) null, area, e -> e instanceof Fighter || e instanceof ItemEntity || e instanceof AbstractArrow || e instanceof FallingBlockEntity)) {
 			e.discard();
 		}
-		player.removeTag(TEAM_TAG + "blue");
+		player.removeTag(TEAM_TAG + teamName(me));
 		if (cagesUp) cages(arena, false);
 	}
 
@@ -805,9 +821,21 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	/** The score, the clock and who's playing, for the banners at the top of the screen. */
 	private void score() {
 		int left = settings.timeLimit() > 0 ? Math.max(0, settings.timeLimit() - playTicks / 20) : -1;
-		String red = settings.count() == 1 && members.size() > 1 ? members.get(1).name : "Red team";
-		int look = members.size() > 1 ? Math.floorMod(members.get(1).e.getUUID().hashCode(), 8) : 0;
-		String blue = settings.count() == 1 ? player.getName().getString() : player.getName().getString() + " + " + (settings.count() - 1);
-		ServerPlayNetworking.send(player, new Payloads.BridgeScore(score[BLUE], score[RED], TO_WIN, left, blue, red, look));
+		Member lead = null;
+		for (Member m : members) {
+			if (m.team == them) {
+				lead = m;
+				break;
+			}
+		}
+		String theirs = settings.count() == 1 && lead != null ? lead.name : them == BLUE ? "Blue team" : "Red team";
+		int look = lead != null && lead.e instanceof Fighter f ? f.look() : 0;
+		String yours = settings.count() == 1 ? player.getName().getString() : player.getName().getString() + " + " + (settings.count() - 1);
+		ServerPlayNetworking.send(player, new Payloads.BridgeScore(score[BLUE], score[RED], TO_WIN, left, me == BLUE ? yours : theirs, me == BLUE ? theirs : yours,
+				me, look));
+	}
+
+	private static String teamName(int team) {
+		return team == BLUE ? "blue" : "red";
 	}
 }

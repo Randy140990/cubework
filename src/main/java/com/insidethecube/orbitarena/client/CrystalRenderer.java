@@ -18,15 +18,18 @@ import net.minecraft.util.Mth;
 
 /**
  * Draws a crystal: a six-sided double point, glassy and glowing with veins of energy (green, or light red),
- * turning slowly and bobbing, with a swirl of light over it.
+ * turning slowly and bobbing, with a swirl of light over it, a beam of light down to its monolith and
+ * another up into the sky.
  */
 public class CrystalRenderer extends EntityRenderer<Crystal, CrystalRenderer.State> {
 	private static final Identifier[] TEXTURES = {OrbitArena.id("textures/entity/crystal/crystal_green.png"), OrbitArena.id("textures/entity/crystal/crystal_red.png")};
+	private static final Identifier BEAM = OrbitArena.id("textures/entity/crystal/beam.png");
+	private static final int[] TINT = {0x40FF70, 0xFF4656};
 	private static final int FULL_BRIGHT = 15728880;
 
 	public static class State extends EntityRenderState {
 		public int team;
-		public float time;
+		public float time, beamDown;
 	}
 
 	public CrystalRenderer(EntityRendererProvider.Context ctx) {
@@ -44,6 +47,7 @@ public class CrystalRenderer extends EntityRenderer<Crystal, CrystalRenderer.Sta
 		super.extractRenderState(c, s, partial);
 		s.team = c.team;
 		s.time = c.tickCount + partial + c.phase * 400;
+		s.beamDown = c.beamDown;
 	}
 
 	@Override
@@ -62,7 +66,38 @@ public class CrystalRenderer extends EntityRenderer<Crystal, CrystalRenderer.Sta
 		pose.scale(1.06F, 1.04F, 1.06F);
 		out.submitCustomGeometry(pose, RenderTypes.energySwirl(tex, scroll, scroll * 0.7F), (p, vc) -> gem(p, vc, 1.0F, 0xFF808080));
 		pose.popPose();
+		// Its beams: down to the top of its monolith, and up into the sky, fading.
+		int tint = TINT[Math.floorMod(s.team, 2)], white = 0xE8FFF0;
+		float pulse = 0.85F + 0.15F * Mth.sin(s.time * 0.12F), down = Math.max(0.5F, s.beamDown - 1.4F);
+		pose.pushPose();
+		pose.mulPose(Axis.YP.rotationDegrees(s.time * 0.4F));
+		out.submitCustomGeometry(pose, RenderTypes.entityTranslucentEmissive(BEAM), (p, vc) -> {
+			beam(p, vc, -1.4F, -1.4F - down, 0.9F, tint, (int) (170 * pulse), (int) (230 * pulse));
+			beam(p, vc, -1.4F, -1.4F - down, 0.35F, white, (int) (200 * pulse), (int) (255 * pulse));
+			beam(p, vc, 1.6F, 1.6F + 46F, 0.7F, tint, (int) (120 * pulse), 0);
+			beam(p, vc, 1.6F, 1.6F + 30F, 0.25F, white, (int) (140 * pulse), 0);
+		});
+		pose.popPose();
 		super.submit(s, pose, out, camera);
+	}
+
+	/** A beam of light from y0 to y1 (alpha a0 to a1): four planes through its middle, seen from either side. */
+	private static void beam(PoseStack.Pose p, VertexConsumer vc, float y0, float y1, float width, int rgb, int a0, int a1) {
+		int c0 = (Math.max(0, Math.min(255, a0)) << 24) | rgb, c1 = (Math.max(0, Math.min(255, a1)) << 24) | rgb;
+		float h = width / 2;
+		for (int i = 0; i < 4; i++) {
+			double a = Math.PI / 4 * i;
+			float x = (float) Math.cos(a) * h, z = (float) Math.sin(a) * h, nx = (float) -Math.sin(a), nz = (float) Math.cos(a);
+			beamQuad(p, vc, -x, y0, -z, x, y1, z, c0, c1, nx, nz);
+			beamQuad(p, vc, x, y0, z, -x, y1, -z, c0, c1, -nx, -nz);
+		}
+	}
+
+	private static void beamQuad(PoseStack.Pose p, VertexConsumer vc, float ax, float y0, float az, float bx, float y1, float bz, int c0, int c1, float nx, float nz) {
+		vc.addVertex(p, ax, y0, az).setColor(c0).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(p, nx, 0, nz);
+		vc.addVertex(p, bx, y0, bz).setColor(c0).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(p, nx, 0, nz);
+		vc.addVertex(p, bx, y1, bz).setColor(c1).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(p, nx, 0, nz);
+		vc.addVertex(p, ax, y1, az).setColor(c1).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(p, nx, 0, nz);
 	}
 
 	/**

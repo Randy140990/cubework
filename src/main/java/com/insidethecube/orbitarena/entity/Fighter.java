@@ -91,6 +91,15 @@ public class Fighter extends Zombie {
 		this.bridge = brain;
 		this.bridgeSword = sword;
 		setItemSlot(EquipmentSlot.MAINHAND, sword);
+		// About as fast as you when it sprints at 10, slower lower down.
+		AttributeInstance speed = getAttribute(Attributes.MOVEMENT_SPEED);
+		if (speed != null) speed.setBaseValue(0.30 + 0.006 * brain.difficulty);
+	}
+
+	/** On the bridge nobody gets shoved off by bumping into a bot (teammates on a narrow bridge, above all). */
+	@Override
+	public boolean isPushable() {
+		return bridge == null && super.isPushable();
 	}
 
 	public int difficulty() {

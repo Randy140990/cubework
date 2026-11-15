@@ -1,0 +1,7 @@
+{
+	"parent": "minecraft:block/cube_column_horizontal",
+	"textures": {
+		"end": "orbitarena:block/light_strip_red_end",
+		"side": "orbitarena:block/light_strip_red"
+	}
+}

@@ -28,6 +28,9 @@ public interface BridgeWorld {
 
 	List<LivingEntity> alliesOf(int team);
 
+	/** How wide the bridge is (1 to 3). */
+	int bridgeWidth();
+
 	/** Whether a block may be placed here, and whether the block here was placed (so may be broken). */
 	boolean buildable(BlockPos pos);
 

@@ -1,8 +1,10 @@
 package com.insidethecube.orbitarena;
 
+import com.insidethecube.orbitarena.block.ArenaBlocks;
 import com.insidethecube.orbitarena.entity.Crystal;
 import com.insidethecube.orbitarena.entity.Fan;
 import com.insidethecube.orbitarena.entity.Fighter;
+import com.insidethecube.orbitarena.entity.Rock;
 import com.insidethecube.orbitarena.match.Loadout;
 import com.insidethecube.orbitarena.match.Matches;
 import com.insidethecube.orbitarena.net.Payloads;
@@ -31,10 +33,12 @@ public class OrbitArena implements ModInitializer {
 	private static final ResourceKey<EntityType<?>> FIGHTER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, id("fighter"));
 	private static final ResourceKey<EntityType<?>> FAN_KEY = ResourceKey.create(Registries.ENTITY_TYPE, id("fan"));
 	private static final ResourceKey<EntityType<?>> CRYSTAL_KEY = ResourceKey.create(Registries.ENTITY_TYPE, id("crystal"));
+	private static final ResourceKey<EntityType<?>> ROCK_KEY = ResourceKey.create(Registries.ENTITY_TYPE, id("rock"));
 
 	public static EntityType<Fighter> FIGHTER;
 	public static EntityType<Fan> FAN;
 	public static EntityType<Crystal> CRYSTAL;
+	public static EntityType<Rock> ROCK;
 
 	public static Identifier id(String path) {
 		return Identifier.fromNamespaceAndPath(ID, path);
@@ -42,13 +46,17 @@ public class OrbitArena implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		ArenaBlocks.register();
 		FIGHTER = Registry.register(BuiltInRegistries.ENTITY_TYPE, FIGHTER_KEY,
 				EntityType.Builder.<Fighter>of(Fighter::new, MobCategory.MONSTER).sized(0.6F, 1.95F).eyeHeight(1.74F).clientTrackingRange(10).noLootTable().build(FIGHTER_KEY));
 		FAN = Registry.register(BuiltInRegistries.ENTITY_TYPE, FAN_KEY,
 				EntityType.Builder.<Fan>of(Fan::new, MobCategory.MISC).sized(0.6F, 1.8F).eyeHeight(1.6F).clientTrackingRange(0).noLootTable().noSave().noSummon().build(FAN_KEY));
 		CRYSTAL = Registry.register(BuiltInRegistries.ENTITY_TYPE, CRYSTAL_KEY,
 				EntityType.Builder.<Crystal>of(Crystal::new, MobCategory.MISC).sized(2.5F, 3.6F).clientTrackingRange(0).noLootTable().noSave().noSummon().build(CRYSTAL_KEY));
+		ROCK = Registry.register(BuiltInRegistries.ENTITY_TYPE, ROCK_KEY,
+				EntityType.Builder.<Rock>of(Rock::new, MobCategory.MISC).sized(1.0F, 1.0F).clientTrackingRange(0).noLootTable().noSave().noSummon().build(ROCK_KEY));
 		FabricDefaultAttributeRegistry.register(FIGHTER, Fighter.createAttributes());
+		FabricDefaultAttributeRegistry.register(ROCK, Rock.createAttributes());
 		FabricDefaultAttributeRegistry.register(CRYSTAL, Crystal.createAttributes());
 		FabricDefaultAttributeRegistry.register(FAN, Fan.createAttributes());
 		// Load the saved-things attachment before any player does.

@@ -15,100 +15,127 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 /**
- * The arena's setup screen: what to play (fighters, mob waves, a boss, or The Bridge), how well they play,
- * how many (fighters; waves; bosses; players a team on the bridge), your kit, the bridge's obstacles, a time
- * limit, how full the stands are, and whether the fly-round plays first. Start fades you in.
+ * The arena's setup screen, in two tabs that keep the same layout whatever you pick:
+ * <ul>
+ * <li>Arena: fighters, mob waves or a boss in the stadium, how well they fight, how many (waves; which
+ * boss), your kit and a time limit;</li>
+ * <li>The Bridge: teams of 1 to 5 (bots fill both), blue or red, how well the bots play, the kit, how wide
+ * the bridge is, copper obstacles and a time limit.</li>
+ * </ul>
+ * Both have the crowd and the fly-round. Start fades you in.
  */
 public class ArenaScreen extends Screen {
+	private static final int ARENA = 0, BRIDGE = 1;
+	private static int tab = ARENA;
 	private static Opponents opponents = Opponents.FIGHTERS;
-	private static int difficulty = 3, count = 1, waves = 10, bossCount = 1, teamSize = 1, timeLimit = 0, bridgeTime = 900, bridgeKit = MatchSettings.CLASSIC;
+	private static int difficulty = 3, count = 1, waves = 10, bossCount = 1, timeLimit = 0;
+	private static int bridgeDifficulty = 5, teamSize = 1, bridgeTime = 900, bridgeKit = MatchSettings.CLASSIC, bridgeWidth = 2, bridgeTeam = 0;
 	private static Kit kit = Kit.SWORD;
 	private static Boss boss = Boss.WITHER;
 	private static boolean obstacles, intro = true;
 	private static final float[] CROWDS = {0, 0.25F, 0.5F, 0.85F};
+	private static final int COL = 150, GAP = 4, ROW = 24;
 
 	private final Screen parent;
+	private int left, top, tabsY;
 
 	public ArenaScreen(Screen parent) {
 		super(Component.literal("Orbit Arena"));
 		this.parent = parent;
 	}
 
-	private int top() {
-		return this.height / 2 - (opponents == Opponents.BRIDGE || opponents == Opponents.BOSS ? 104 : 92);
-	}
-
 	@Override
 	protected void init() {
-		int w = 220, x = this.width / 2 - w / 2, y = top();
-		addRenderableWidget(CycleButton.<Opponents>builder(o -> Component.literal(switch (o) {
-					case FIGHTERS -> "Fighters (PvP)";
-					case MOBS -> "Mob waves";
-					case BOSS -> "Boss";
-					case BRIDGE -> "The Bridge";
-				}), opponents)
-				.withValues(Opponents.values())
-				.create(x, y, w, 20, Component.literal("Play"), (b, v) -> {
-					opponents = v;
-					rebuildWidgets();
-				}));
-		y += 24;
-		boolean bridge = opponents == Opponents.BRIDGE;
-		addRenderableWidget(new Slider(x, y, w, (difficulty - 1) / 9.0, v -> difficulty = 1 + (int) Math.round(v * 9),
-				() -> "Difficulty: " + difficulty + " · " + (bridge ? describeBridge(difficulty) : describe(difficulty))));
-		y += 24;
-		switch (opponents) {
-			case BOSS -> {
-				addRenderableWidget(CycleButton.<Boss>builder(b -> Component.literal(switch (b) {
-							case WITHER -> "Wither";
-							case WARDEN -> "Warden";
-							case ENDER_DRAGON -> "Ender Dragon (experimental)";
-						}), boss)
-						.withValues(Boss.values())
-						.create(x, y, w, 20, Component.literal("Boss"), (b, v) -> boss = v));
-				y += 24;
-				addRenderableWidget(new Slider(x, y, w, (bossCount - 1) / 2.0, v -> bossCount = 1 + (int) Math.round(v * 2), () -> "How many: " + bossCount));
+		int w = 2 * COL + GAP;
+		left = this.width / 2 - w / 2;
+		tabsY = Math.max(22, this.height / 2 - 108);
+		top = tabsY + 34;
+		int half = COL, right = left + COL + GAP;
+
+		addRenderableWidget(Button.builder(Component.literal("Arena"), b -> {
+			tab = ARENA;
+			rebuildWidgets();
+		}).bounds(left, tabsY, half, 20).build());
+		addRenderableWidget(Button.builder(Component.literal("The Bridge"), b -> {
+			tab = BRIDGE;
+			rebuildWidgets();
+		}).bounds(right, tabsY, half, 20).build());
+
+		int y = top;
+		if (tab == ARENA) {
+			if (opponents == Opponents.BRIDGE) opponents = Opponents.FIGHTERS;
+			addRenderableWidget(CycleButton.<Opponents>builder(o -> Component.literal(switch (o) {
+						case FIGHTERS -> "Fighters (PvP)";
+						case MOBS -> "Mob waves";
+						default -> "Boss";
+					}), opponents)
+					.withValues(Opponents.FIGHTERS, Opponents.MOBS, Opponents.BOSS)
+					.create(left, y, w, 20, Component.literal("Play"), (b, v) -> {
+						opponents = v;
+						rebuildWidgets();
+					}));
+			y += ROW;
+			addRenderableWidget(new Slider(left, y, w, (difficulty - 1) / 9.0, v -> difficulty = 1 + (int) Math.round(v * 9),
+					() -> "Difficulty: " + difficulty + " · " + describe(difficulty)));
+			y += ROW;
+			switch (opponents) {
+				case BOSS -> addRenderableWidget(new Slider(left, y, half, (bossCount - 1) / 2.0, v -> bossCount = 1 + (int) Math.round(v * 2), () -> "Bosses: " + bossCount));
+				case MOBS -> addRenderableWidget(new Slider(left, y, half, Math.sqrt((waves - 1) / 49.0), v -> waves = 1 + (int) Math.round(v * v * 49),
+						() -> "Waves: " + waves));
+				default -> addRenderableWidget(new Slider(left, y, half, Math.sqrt((count - 1) / 99.0), v -> count = 1 + (int) Math.round(v * v * 99),
+						() -> "Fighters: " + count));
 			}
-			case MOBS -> addRenderableWidget(new Slider(x, y, w, Math.sqrt((waves - 1) / 49.0), v -> waves = 1 + (int) Math.round(v * v * 49),
-					() -> "Waves: " + waves + " (one after another)"));
-			case BRIDGE -> addRenderableWidget(new Slider(x, y, w, (teamSize - 1) / 4.0, v -> teamSize = 1 + (int) Math.round(v * 4),
-					() -> "Teams: " + teamSize + " v " + teamSize + (teamSize > 1 ? " (bots with you)" : "")));
-			default -> addRenderableWidget(new Slider(x, y, w, Math.sqrt((count - 1) / 99.0), v -> count = 1 + (int) Math.round(v * v * 99),
-					() -> "How many: " + count));
-		}
-		y += 24;
-		if (bridge) {
-			addRenderableWidget(CycleButton.<Integer>builder(k -> Component.literal(k == MatchSettings.CLASSIC ? "Classic (leather, iron sword)" : "Netherite"), bridgeKit)
-					.withValues(MatchSettings.CLASSIC, MatchSettings.NETHERITE)
-					.create(x, y, w, 20, Component.literal("Kit"), (b, v) -> bridgeKit = v));
-			y += 24;
-			addRenderableWidget(CycleButton.<Boolean>builder(o -> Component.literal(o ? "Copper" : "None"), obstacles)
-					.withValues(false, true)
-					.create(x, y, w, 20, Component.literal("Obstacles"), (b, v) -> obstacles = v));
-			y += 24;
-			addRenderableWidget(CycleButton.<Integer>builder(t -> Component.literal(t == 0 ? "None" : (t / 60) + " minutes"), bridgeTime)
-					.withValues(0, 300, 600, 900)
-					.create(x, y, w, 20, Component.literal("Time limit"), (b, v) -> bridgeTime = v));
-		} else {
+			CycleButton<Boss> bossButton = CycleButton.<Boss>builder(b -> Component.literal(switch (b) {
+						case WITHER -> "Wither";
+						case WARDEN -> "Warden";
+						case ENDER_DRAGON -> "Ender Dragon";
+					}), boss)
+					.withValues(Boss.values())
+					.create(right, y, half, 20, Component.literal("Boss"), (b, v) -> boss = v);
+			bossButton.active = opponents == Opponents.BOSS;
+			addRenderableWidget(bossButton);
+			y += ROW;
 			addRenderableWidget(CycleButton.<Kit>builder(k -> Component.translatable(k.key()), kit)
 					.withValues(Kit.values())
-					.create(x, y, w, 20, Component.literal("Your kit"), (b, v) -> kit = v));
-			y += 24;
-			addRenderableWidget(CycleButton.<Integer>builder(t -> Component.literal(t == 0 ? "None" : (t / 60) + " minutes"), timeLimit)
+					.displayOnlyValue()
+					.create(left, y, half, 20, Component.literal("Kit"), (b, v) -> kit = v));
+			addRenderableWidget(CycleButton.<Integer>builder(t -> Component.literal(t == 0 ? "None" : (t / 60) + " min"), timeLimit)
 					.withValues(0, 120, 300, 600)
-					.create(x, y, w, 20, Component.literal("Time limit"), (b, v) -> timeLimit = v));
+					.create(right, y, half, 20, Component.literal("Time limit"), (b, v) -> timeLimit = v));
+		} else {
+			addRenderableWidget(new Slider(left, y, half, (teamSize - 1) / 4.0, v -> teamSize = 1 + (int) Math.round(v * 4),
+					() -> "Teams: " + teamSize + " v " + teamSize));
+			addRenderableWidget(CycleButton.<Integer>builder(t -> t == 0 ? Component.literal("Blue").withColor(0x6F8BFF) : Component.literal("Red").withColor(0xFF6B6B), bridgeTeam)
+					.withValues(0, 1)
+					.create(right, y, half, 20, Component.literal("You're on"), (b, v) -> bridgeTeam = v));
+			y += ROW;
+			addRenderableWidget(new Slider(left, y, w, (bridgeDifficulty - 1) / 9.0, v -> bridgeDifficulty = 1 + (int) Math.round(v * 9),
+					() -> "Bots: level " + bridgeDifficulty + " · " + describeBridge(bridgeDifficulty)));
+			y += ROW;
+			addRenderableWidget(CycleButton.<Integer>builder(k -> Component.literal(k == MatchSettings.CLASSIC ? "Classic" : "Netherite"), bridgeKit)
+					.withValues(MatchSettings.CLASSIC, MatchSettings.NETHERITE)
+					.create(left, y, half, 20, Component.literal("Kit"), (b, v) -> bridgeKit = v));
+			addRenderableWidget(CycleButton.<Integer>builder(n -> Component.literal(n + (n == 1 ? " block" : " blocks")), bridgeWidth)
+					.withValues(1, 2, 3)
+					.create(right, y, half, 20, Component.literal("Bridge"), (b, v) -> bridgeWidth = v));
+			y += ROW;
+			addRenderableWidget(CycleButton.<Boolean>builder(o -> Component.literal(o ? "Copper" : "None"), obstacles)
+					.withValues(false, true)
+					.create(left, y, half, 20, Component.literal("Obstacles"), (b, v) -> obstacles = v));
+			addRenderableWidget(CycleButton.<Integer>builder(t -> Component.literal(t == 0 ? "None" : (t / 60) + " min"), bridgeTime)
+					.withValues(0, 300, 600, 900)
+					.create(right, y, half, 20, Component.literal("Time limit"), (b, v) -> bridgeTime = v));
 		}
-		y += 24;
+		y += ROW;
 		addRenderableWidget(CycleButton.<Float>builder(c -> Component.literal(c == 0 ? "Empty" : c < 0.3F ? "Quiet" : c < 0.6F ? "Busy" : "Packed"), nearestCrowd())
 				.withValues(0F, 0.25F, 0.5F, 0.85F)
-				.create(x, y, w, 20, Component.literal("Crowd"), (b, v) -> Crowd.density = v));
-		y += 24;
+				.create(left, y, half, 20, Component.literal("Crowd"), (b, v) -> Crowd.density = v));
 		addRenderableWidget(CycleButton.<Boolean>builder(o -> Component.literal(o ? "On" : "Off"), intro)
 				.withValues(true, false)
-				.create(x, y, w, 20, Component.literal("Fly-round first"), (b, v) -> intro = v));
-		y += 30;
-		addRenderableWidget(Button.builder(Component.literal("Start"), b -> start()).bounds(x, y, w / 2 - 2, 20).build());
-		addRenderableWidget(Button.builder(Component.literal("Back"), b -> onClose()).bounds(x + w / 2 + 2, y, w / 2 - 2, 20).build());
+				.create(right, y, half, 20, Component.literal("Fly-round"), (b, v) -> intro = v));
+		y += ROW + 6;
+		addRenderableWidget(Button.builder(Component.literal("Start"), b -> start()).bounds(left, y, half, 20).build());
+		addRenderableWidget(Button.builder(Component.literal("Back"), b -> onClose()).bounds(right, y, half, 20).build());
 	}
 
 	private static Float nearestCrowd() {
@@ -138,7 +165,7 @@ public class ArenaScreen extends Screen {
 			case 4, 5 -> "+ bridges round you, walls";
 			case 6, 7 -> "+ knocks you off";
 			case 8, 9 -> "fast, reads attacks";
-			default -> "pro";
+			default -> "pro: attacks and defends";
 		};
 	}
 
@@ -149,21 +176,23 @@ public class ArenaScreen extends Screen {
 
 	/** The settings as last chosen (what "Go again" uses). */
 	static MatchSettings settings() {
-		int n = switch (opponents) {
+		if (tab == BRIDGE) {
+			return new MatchSettings(Opponents.BRIDGE, bridgeDifficulty, teamSize, kit, boss, bridgeTime, obstacles, intro, bridgeKit, bridgeWidth, bridgeTeam);
+		}
+		Opponents o = opponents == Opponents.BRIDGE ? Opponents.FIGHTERS : opponents;
+		int n = switch (o) {
 			case BOSS -> bossCount;
 			case MOBS -> waves;
-			case BRIDGE -> teamSize;
 			default -> count;
 		};
-		int time = opponents == Opponents.BRIDGE ? bridgeTime : timeLimit;
-		return new MatchSettings(opponents, difficulty, n, kit, boss, time, obstacles, intro, bridgeKit);
+		return new MatchSettings(o, difficulty, n, kit, boss, timeLimit, false, intro, bridgeKit, bridgeWidth, bridgeTeam);
 	}
 
 	/** The settings in a line: "10 fighters · level 10 · Netherite kit". */
 	static Component describeSettings() {
-		if (opponents == Opponents.BRIDGE) {
-			return Component.literal("The Bridge · " + teamSize + " v " + teamSize + " · level " + difficulty + " · "
-					+ (bridgeKit == MatchSettings.CLASSIC ? "Classic" : "Netherite") + " kit" + (obstacles ? " · copper obstacles" : ""));
+		if (tab == BRIDGE) {
+			return Component.literal("The Bridge · " + (bridgeTeam == 0 ? "blue" : "red") + " · " + teamSize + " v " + teamSize + " · level " + bridgeDifficulty + " · "
+					+ (bridgeKit == MatchSettings.CLASSIC ? "Classic" : "Netherite") + " kit · " + bridgeWidth + " wide" + (obstacles ? " · copper obstacles" : ""));
 		}
 		String who = switch (opponents) {
 			case FIGHTERS -> count + (count == 1 ? " fighter" : " fighters");
@@ -185,10 +214,12 @@ public class ArenaScreen extends Screen {
 	@Override
 	public void render(GuiGraphics g, int mouseX, int mouseY, float partial) {
 		super.render(g, mouseX, mouseY, partial);
-		int y = top();
-		g.drawCenteredString(this.font, this.title, this.width / 2, y - 20, 0xFFFFFFFF);
-		g.drawCenteredString(this.font, Component.literal(opponents == Opponents.BRIDGE ? "Cross the bridge and drop into their goal: first to five"
-				: "Train against fighters, mobs or bosses in a space arena"), this.width / 2, y - 10, 0xFFA0B4FF);
+		g.drawCenteredString(this.font, this.title, this.width / 2, tabsY - 14, 0xFFFFFFFF);
+		// The chosen tab: a bar of light under it.
+		int x = tab == ARENA ? left : left + COL + GAP;
+		g.fill(x + 2, tabsY + 21, x + COL - 2, tabsY + 23, tab == ARENA ? 0xFF4AC8FF : 0xFF3DFF6A);
+		g.drawCenteredString(this.font, Component.literal(tab == BRIDGE ? "Cross the bridge and drop into their goal: first to five"
+				: "Fighters, mob waves or a boss in the stadium"), this.width / 2, tabsY + 25, 0xFFA0B4FF);
 	}
 
 	/** A slider showing a value, with a function that sets it from 0 to 1. */

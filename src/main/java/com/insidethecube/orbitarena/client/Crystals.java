@@ -18,9 +18,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Blocks;
 
 /**
- * The Bridge's crystals, one over each pillar (green over blue's, light red over red's), on your screen
+ * The Bridge's crystals, one over each monolith (green over blue's, light red over red's), on your screen
  * only. Each goal against a team shatters one of its crystals (in a burst of glass and sparks) as its
- * pillar crumbles.
+ * monolith crumbles.
  */
 public final class Crystals {
 	private Crystals() {}
@@ -67,7 +67,7 @@ public final class Crystals {
 		ClientLevel level = in;
 		if (level == null) return;
 		if (effect) {
-			double x = c.getX(), y = c.getY() + 1.8, z = c.getZ();
+			double x = c.getX(), y = c.getY(), z = c.getZ();
 			BlockParticleOption glass = new BlockParticleOption(ParticleTypes.BLOCK, (c.team == BLUE ? Blocks.LIME_STAINED_GLASS : Blocks.PINK_STAINED_GLASS).defaultBlockState());
 			for (int i = 0; i < 70; i++) {
 				double vx = (Math.random() - 0.5) * 0.9, vy = Math.random() * 0.6, vz = (Math.random() - 0.5) * 0.9;
@@ -90,22 +90,25 @@ public final class Crystals {
 			return;
 		}
 		if (in == level && !CRYSTALS.isEmpty()) return;
-		if (in == level && against[0] >= PILLAR_Z.length && against[1] >= PILLAR_Z.length) return;
-		// Wait until the pillars are there (the chunks have arrived).
-		if (level.getBlockState(new BlockPos(cx - PILLAR_X - 1, Y + PILLAR_TOP - 2, cz)).isAir()
-				&& level.getBlockState(new BlockPos(cx + PILLAR_X + 1, Y + PILLAR_TOP - 2, cz)).isAir()) {
+		if (in == level && against[0] >= MONOLITHS.length && against[1] >= MONOLITHS.length) return;
+		// Wait until the monoliths are there (the chunks have arrived).
+		Monolith last = MONOLITHS[MONOLITHS.length - 1];
+		if (level.getBlockState(new BlockPos(cx - last.x(), Y + last.top() - 4, cz + last.z())).isAir()
+				&& level.getBlockState(new BlockPos(cx + last.x(), Y + last.top() - 4, cz + last.z())).isAir()) {
 			return;
 		}
 		clear();
 		in = level;
 		for (int team = BLUE; team <= RED; team++) {
-			for (int i = against[team]; i < PILLAR_Z.length; i++) {
+			for (int i = against[team]; i < MONOLITHS.length; i++) {
+				Monolith m = MONOLITHS[i];
 				Crystal c = new Crystal(OrbitArena.CRYSTAL, level);
 				c.setId(nextId--);
 				c.team = team;
 				c.pillar = i;
 				c.phase = (float) Math.random();
-				c.setPos(cx + side(team) * (PILLAR_X + 1) + 0.5, Y + CRYSTAL_Y - 1.8, cz + PILLAR_Z[i] + 0.5);
+				c.beamDown = (float) (m.crystalY() - (m.top() + 1));
+				c.setPos(cx + side(team) * m.x() + 0.5, Y + m.crystalY(), cz + m.z() + 0.5);
 				c.setOldPosAndRot();
 				level.addEntity(c);
 				CRYSTALS.add(c);

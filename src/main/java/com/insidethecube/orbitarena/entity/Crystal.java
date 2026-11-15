@@ -8,13 +8,15 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.level.Level;
 
 /**
- * One of The Bridge's crystals, floating over a pillar: a team's (green for blue, light red for red) and
- * which pillar. Like the fans, they only exist on your screen (client.Crystals adds them), turning slowly,
+ * One of The Bridge's crystals, floating over a monolith: a team's (green for blue, light red for red) and
+ * which monolith. Like the fans, they only exist on your screen (client.Crystals adds them), turning slowly,
  * until their pillar crumbles and they shatter.
  */
 public class Crystal extends Mob {
 	public int team, pillar;
 	public float phase;
+	/** How far down its beam of light reaches (to the top of its monolith). */
+	public float beamDown;
 
 	public Crystal(EntityType<? extends Mob> type, Level level) {
 		super(type, level);

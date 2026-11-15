@@ -1,0 +1,84 @@
+package com.insidethecube.orbitarena.block;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
+import com.insidethecube.orbitarena.OrbitArena;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.TransparentBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
+
+/**
+ * The arena's own blocks, made for The Bridge (and free to build with: they're in their own creative tab):
+ * <ul>
+ * <li>light strips, green and red (and white): a glowing white core with a line of colour along each edge,
+ * so a run of them laid flat reads as a band of light with a coloured line above and below, and stood up as a
+ * strip with coloured sides;</li>
+ * <li>bridge wool, blue and red: what the teams build with (soft like wool, but quick to mine with a pickaxe,
+ * as the bridge servers' clay is);</li>
+ * <li>force fields, blue and red: a glowing see-through grid, the skylight over each goal.</li>
+ * </ul>
+ */
+public final class ArenaBlocks {
+	private ArenaBlocks() {}
+
+	public static final List<Block> ALL = new ArrayList<>();
+	/** The blocks drawn see-through (the client puts them on the translucent layer). */
+	public static final List<Block> TRANSLUCENT = new ArrayList<>();
+
+	public static Block LIGHT_GREEN, LIGHT_RED, LIGHT_WHITE, WOOL_BLUE, WOOL_RED, FIELD_BLUE, FIELD_RED;
+
+	private static BlockBehaviour.Properties light(MapColor colour) {
+		return BlockBehaviour.Properties.of().mapColor(colour).strength(0.3F).sound(SoundType.GLASS).lightLevel(s -> 15).emissiveRendering((s, g, p) -> true);
+	}
+
+	public static void register() {
+		LIGHT_GREEN = block("light_strip_green", light(MapColor.COLOR_LIGHT_GREEN), RotatedPillarBlock::new);
+		LIGHT_RED = block("light_strip_red", light(MapColor.COLOR_RED), RotatedPillarBlock::new);
+		LIGHT_WHITE = block("light_strip_white", light(MapColor.SNOW), RotatedPillarBlock::new);
+		WOOL_BLUE = block("bridge_wool_blue", BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).strength(0.8F).sound(SoundType.WOOL), Block::new);
+		WOOL_RED = block("bridge_wool_red", BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(0.8F).sound(SoundType.WOOL), Block::new);
+		FIELD_BLUE = field("force_field_blue", MapColor.COLOR_BLUE);
+		FIELD_RED = field("force_field_red", MapColor.COLOR_RED);
+
+		CreativeModeTab tab = FabricItemGroup.builder()
+				.title(Component.translatable("itemGroup.orbitarena.blocks"))
+				.icon(() -> new ItemStack(LIGHT_GREEN))
+				.displayItems((ctx, entries) -> {
+					for (Block b : ALL) entries.accept(new ItemStack(b));
+				})
+				.build();
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceKey.create(Registries.CREATIVE_MODE_TAB, OrbitArena.id("blocks")), tab);
+	}
+
+	private static Block field(String name, MapColor colour) {
+		Block b = block(name, BlockBehaviour.Properties.of().mapColor(colour).strength(0.3F).sound(SoundType.GLASS).noOcclusion().lightLevel(s -> 9)
+				.emissiveRendering((s, g, p) -> true).isValidSpawn((s, g, p, t) -> false).isRedstoneConductor((s, g, p) -> false)
+				.isSuffocating((s, g, p) -> false).isViewBlocking((s, g, p) -> false), TransparentBlock::new);
+		TRANSLUCENT.add(b);
+		return b;
+	}
+
+	private static Block block(String name, BlockBehaviour.Properties props, Function<BlockBehaviour.Properties, Block> factory) {
+		ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, OrbitArena.id(name));
+		Block b = Registry.register(BuiltInRegistries.BLOCK, key, factory.apply(props.setId(key)));
+		ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, OrbitArena.id(name));
+		Registry.register(BuiltInRegistries.ITEM, itemKey, new BlockItem(b, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix()));
+		ALL.add(b);
+		return b;
+	}
+}

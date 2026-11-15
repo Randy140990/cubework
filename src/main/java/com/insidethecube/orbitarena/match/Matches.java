@@ -154,7 +154,7 @@ public final class Matches {
 							int slot = IntegerArgumentType.getInteger(c, "slot");
 							if (arena != null) {
 								builder(arena, slot * SPACING);
-								bridgeBuilder(arena, slot * SPACING, true, false);
+								bridgeBuilder(arena, slot * SPACING, true, false, 2);
 							}
 							c.getSource().sendSuccess(() -> Component.literal("Rebuilding the arena and the bridge"), false);
 							return 1;
@@ -264,8 +264,8 @@ public final class Matches {
 	}
 
 	/** Builds the bridge (full: everything; otherwise just the playing area, put right). */
-	static Builder bridgeBuilder(ServerLevel arena, int centreX, boolean full, boolean obstacles) {
-		return BUILDERS.computeIfAbsent(key(centreX, BridgeLayout.Z), k -> new BridgeBuilder(arena, centreX, full).obstacles(obstacles));
+	static Builder bridgeBuilder(ServerLevel arena, int centreX, boolean full, boolean obstacles, int width) {
+		return BUILDERS.computeIfAbsent(key(centreX, BridgeLayout.Z), k -> new BridgeBuilder(arena, centreX, full).obstacles(obstacles).width(width));
 	}
 
 	private static void tick(MinecraftServer server) {

@@ -1,0 +1,3 @@
+c net.minecraft.client.renderer.texture.DynamicTexture
+net.minecraft.client.renderer.SamplerCache
+net.minecraft.world.entity.Entity

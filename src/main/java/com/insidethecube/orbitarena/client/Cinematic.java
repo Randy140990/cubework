@@ -32,6 +32,7 @@ public final class Cinematic {
 	private static ArmorStand cam;
 	private static CameraType before;
 	private static Vec3[] path, look;
+	private static boolean faded;
 
 	public static boolean active() {
 		return active;
@@ -40,11 +41,16 @@ public final class Cinematic {
 	public static void start(Payloads.Cinematic p) {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.level == null || mc.player == null) return;
-		Vec3 c = p.kind() == Payloads.Cinematic.BRIDGE ? new Vec3(p.centreX(), BridgeLayout.Y, p.centreZ()) : new Vec3(p.centreX(), ArenaLayout.FLOOR, p.centreZ());
-		if (p.kind() == Payloads.Cinematic.BRIDGE) {
-			// From far out, round the far side, along the stands, past red's crystals, into your cage.
-			path = new Vec3[] {v(c, -170, 80, 150), v(c, 60, 50, 130), v(c, 26, 7, 9), v(c, 50, 22, -8), v(c, -36.5, 9.62, 0.5)};
-			look = new Vec3[] {v(c, 0, 0, 0), v(c, 0, 0, 0), v(c, -4, 4, 24), v(c, 41, 16, 0), v(c, 10, 7, 0.5)};
+		boolean bridge = p.kind() == Payloads.Cinematic.BRIDGE || p.kind() == Payloads.Cinematic.BRIDGE_RED;
+		Vec3 c = bridge ? new Vec3(p.centreX(), BridgeLayout.Y, p.centreZ()) : new Vec3(p.centreX(), ArenaLayout.FLOOR, p.centreZ());
+		if (bridge) {
+			// From far out, in over the other team's temple and round behind its monoliths, low over the stands
+			// along the bridge, past your temple, and round to look out over the bridge from your deck. (Coming
+			// in to red's base, the same mirrored.)
+			double m = p.kind() == Payloads.Cinematic.BRIDGE_RED ? -1 : 1;
+			path = new Vec3[] {v(c, m * 170, 75, -150), v(c, m * 92, 38, -58), v(c, m * 82, 24, 34), v(c, m * 18, 18, 30), v(c, m * -12, 7, 8),
+					v(c, m * -25, 5.5, 9.5)};
+			look = new Vec3[] {v(c, 0, 0, 0), v(c, m * 41, 12, 0), v(c, m * 41, 12, 0), v(c, m * -12, 2, 0), v(c, m * -41, 9, 0), v(c, m * 6, 2, 0)};
 		} else {
 			// From far out, round the stadium, over the crowd, down to your pedestal.
 			path = new Vec3[] {v(c, 240, 90, -170), v(c, 30, 75, -200), v(c, -95, 38, -40), v(c, -60, 14, 22), v(c, -27.5, 4.62, 0.5)};
@@ -61,6 +67,7 @@ public final class Cinematic {
 		}
 		if (!active) before = mc.options.getCameraType();
 		mc.options.setCameraType(CameraType.FIRST_PERSON);
+		faded = false;
 		place(0, true);
 		mc.setCameraEntity(cam);
 		active = true;
@@ -90,6 +97,11 @@ public final class Cinematic {
 			return;
 		}
 		float t = (mc.level.getGameTime() - start + 1) / (float) length;
+		// A quick fade to black at the end, so the cut back to you doesn't jump.
+		if (!faded && mc.level.getGameTime() - start + 1 >= length - 8) {
+			faded = true;
+			Fade.start(8, 3, 12);
+		}
 		if (t >= 1) {
 			stop();
 			return;
@@ -114,6 +126,7 @@ public final class Cinematic {
 			cam.setXRot(pitch);
 			cam.yRotO = yaw;
 			cam.xRotO = pitch;
+			head(yaw, yaw);
 			return;
 		}
 		cam.xo = cam.getX();
@@ -125,6 +138,15 @@ public final class Cinematic {
 		// Keep turning the short way round.
 		cam.setYRot(cam.yRotO + Mth.wrapDegrees(yaw - cam.yRotO));
 		cam.setXRot(pitch);
+		head(cam.yRotO, cam.getYRot());
+	}
+
+	/** The camera looks where its head points: keep the head (and body) turned with it. */
+	private static void head(float before, float now) {
+		cam.yHeadRotO = before;
+		cam.yHeadRot = now;
+		cam.yBodyRotO = before;
+		cam.yBodyRot = now;
 	}
 
 	/** A smooth curve through the points (Catmull-Rom), t from 0 to 1. */
