@@ -120,7 +120,7 @@ public final class Matches {
 				Game g = player instanceof ServerPlayer sp ? GAMES.get(sp.getUUID()) : null;
 				if (g != null && g.fighting() && g.mayPlace(at)) return InteractionResult.PASS;
 				String why = g == null ? null : g.whyNotPlace(at);
-				if (why != null) player.displayClientMessage(Component.literal(why).withStyle(ChatFormatting.GRAY), true);
+				if (g != null) player.displayClientMessage(Component.literal(why == null ? "Can't build here" : why).withStyle(ChatFormatting.GOLD), true);
 				return InteractionResult.FAIL;
 			}
 			return InteractionResult.FAIL;

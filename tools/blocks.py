@@ -26,38 +26,55 @@ def write(path, data):
 
 
 # ---------------------------------------------------------------- light strips
-# The side: a white core, the outermost line of pixels each side in the colour and the next one between.
-# Laid along x or z (lying down), those lines run along the top and bottom; stood up, down the sides.
+# Joined up like glass panes: each side of a strip knows whether another strip of its colour is there. A
+# face gets the coloured line (the outermost pixel in the colour, the next one between) only along its
+# edges where nothing joins, so the line runs round the outside of a whole run or panel of strips.
+# Which world direction each edge of each face's texture looks towards (Minecraft's own face UVs):
+EDGES = {  # face: (top, bottom, left, right)
+    "north": ("up", "down", "east", "west"),
+    "south": ("up", "down", "west", "east"),
+    "west": ("up", "down", "north", "south"),
+    "east": ("up", "down", "south", "north"),
+    "up": ("north", "south", "west", "east"),
+    "down": ("south", "north", "west", "east"),
+}
+DIRS = ["down", "east", "north", "south", "up", "west"]
 LIGHTS = {
     "green": (40, 255, 96),
     "red": (255, 40, 56),
     "white": (150, 205, 255),
 }
+import itertools, glob
 for name, c in LIGHTS.items():
-    core = mix((255, 255, 255), c, 0.07)
-    side = Image.new("RGB", (16, 16))
-    for x in range(16):
-        edge = min(x, 15 - x)
-        col = c if edge == 0 else mix(c, (255, 255, 255), 0.5) if edge == 1 else core
-        for y in range(16):
-            side.putpixel((x, y), col)
-    side.save(f"{A}/textures/block/light_strip_{name}.png")
-    end = Image.new("RGB", (16, 16))
-    for x in range(16):
-        for y in range(16):
-            edge = min(x, 15 - x, y, 15 - y)
-            end.putpixel((x, y), c if edge == 0 else mix(c, (255, 255, 255), 0.5) if edge == 1 else core)
-    end.save(f"{A}/textures/block/light_strip_{name}_end.png")
     block = f"light_strip_{name}"
-    tex = {"end": f"orbitarena:block/{block}_end", "side": f"orbitarena:block/{block}"}
-    write(f"{A}/models/block/{block}.json", {"parent": "minecraft:block/cube_column", "textures": tex})
-    write(f"{A}/models/block/{block}_horizontal.json", {"parent": "minecraft:block/cube_column_horizontal", "textures": tex})
-    write(f"{A}/blockstates/{block}.json", {"variants": {
-        "axis=x": {"model": f"orbitarena:block/{block}_horizontal", "x": 90, "y": 90},
-        "axis=y": {"model": f"orbitarena:block/{block}"},
-        "axis=z": {"model": f"orbitarena:block/{block}_horizontal", "x": 90},
-    }})
-    write(f"{A}/items/{block}.json", {"model": {"type": "minecraft:model", "model": f"orbitarena:block/{block}"}})
+    for old in glob.glob(f"{A}/textures/block/{block}*.png") + glob.glob(f"{A}/models/block/{block}*.json"):
+        os.remove(old)
+    core = mix((255, 255, 255), c, 0.07)
+    # A texture for each set of edges with a line (top 1, bottom 2, left 4, right 8).
+    for mask in range(16):
+        img = Image.new("RGB", (16, 16))
+        for x in range(16):
+            for y in range(16):
+                d = 99
+                if mask & 1: d = min(d, y)
+                if mask & 2: d = min(d, 15 - y)
+                if mask & 4: d = min(d, x)
+                if mask & 8: d = min(d, 15 - x)
+                img.putpixel((x, y), c if d == 0 else mix(c, (255, 255, 255), 0.5) if d == 1 else core)
+        img.save(f"{A}/textures/block/{block}_{mask}.png")
+    variants = {}
+    for joins in itertools.product([False, True], repeat=6):
+        j = dict(zip(DIRS, joins))
+        tex = {}
+        for face, (t, bo, l, r) in EDGES.items():
+            mask = (0 if j[t] else 1) | (0 if j[bo] else 2) | (0 if j[l] else 4) | (0 if j[r] else 8)
+            tex[face] = f"orbitarena:block/{block}_{mask}"
+        tex["particle"] = f"orbitarena:block/{block}_15"
+        key = "".join("1" if j[d] else "0" for d in DIRS)
+        write(f"{A}/models/block/{block}_{key}.json", {"parent": "minecraft:block/cube", "textures": tex})
+        variants[",".join(f"{d}={'true' if j[d] else 'false'}" for d in DIRS)] = {"model": f"orbitarena:block/{block}_{key}"}
+    write(f"{A}/blockstates/{block}.json", {"variants": variants})
+    write(f"{A}/items/{block}.json", {"model": {"type": "minecraft:model", "model": f"orbitarena:block/{block}_000000"}})
 
 # ---------------------------------------------------------------- bridge wool
 # Knitted: rows of little V stitches, each a lighter side and a darker side, with a soft fleck.
@@ -84,40 +101,38 @@ for name, c in WOOLS.items():
     write(f"{A}/items/{block}.json", {"model": {"type": "minecraft:model", "model": f"orbitarena:block/{block}"}})
 
 # ---------------------------------------------------------------- force fields
-# A soft glowing wash with faint scan lines and a shimmer, all of it tiling, so a wall of them reads as
-# one sheet (no lines round each block). Fade 0 is the full field; fades 1 to 5 each run from the one
-# below's strength at their foot to their own at their top, so a column 0, 1, ..., 5 fades out smoothly.
+# A clean glowing wash (no lines in it), with only a faint drifting shimmer, so a wall of them reads as one
+# sheet. Fade 0 is the full field; fades 1 to 12 each run from the strength at their foot to a little less at
+# their top, so a column 0 (or 1), 2, ..., 12 fades smoothly out to nothing at its top. The wall in front of
+# the stands is much fainter than the goals' fields, so you can see the crowd through it.
 import math
-FIELDS = {"blue": (70, 140, 255), "red": (255, 64, 76), "wall": (150, 215, 255)}
-FADES = 6
+FIELDS = {"blue": ((70, 140, 255), 0.42), "red": ((255, 64, 76), 0.42), "wall": ((150, 215, 255), 0.13)}
+FADES = 13
+STEPS = FADES - 1
 
 
 def strength(k):
-    return (1 - k / (FADES - 1)) ** 1.25
+    return max(0.0, 1 - k / STEPS) ** 1.3
 
 
-for name, c in FIELDS.items():
+for name, (c, base) in FIELDS.items():
     block = f"force_field_{name}"
+    for old in glob.glob(f"{A}/textures/block/{block}*.png") + glob.glob(f"{A}/models/block/{block}*.json"):
+        os.remove(old)
     variants = {}
     for k in range(FADES):
         img = Image.new("RGBA", (16, 16))
         for y in range(16):
-            # How strong the field is at this row (y 0 is the top of the block).
             up = (15 - y + 0.5) / 16
             f = strength(0) if k == 0 else strength(k - 1) + (strength(k) - strength(k - 1)) * up
             for x in range(16):
-                shimmer = 0.5 + 0.25 * math.sin((x + y * 0.5) * math.pi / 4) + 0.25 * math.sin((x * 0.5 - y) * math.pi / 8)
-                scan = 1.0 if y % 4 == 0 else 0.0
-                col = mix(c, (255, 255, 255), 0.12 + 0.3 * scan + 0.1 * shimmer)
-                alpha = (70 + 70 * scan + 26 * shimmer) * f
+                shimmer = 0.5 + 0.5 * math.sin((x + y * 0.5) * math.pi / 8) * math.sin((x * 0.5 - y) * math.pi / 8)
+                col = mix(c, (255, 255, 255), 0.18 + 0.12 * shimmer)
+                alpha = 255 * base * (0.9 + 0.1 * shimmer) * f
                 img.putpixel((x, y), col + (max(0, min(255, int(round(alpha)))),))
         img.save(f"{A}/textures/block/{block}_{k}.png")
         write(f"{A}/models/block/{block}_{k}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"orbitarena:block/{block}_{k}"}})
         variants[f"fade={k}"] = {"model": f"orbitarena:block/{block}_{k}"}
-    if os.path.exists(f"{A}/textures/block/{block}.png"):
-        os.remove(f"{A}/textures/block/{block}.png")
-    if os.path.exists(f"{A}/models/block/{block}.json"):
-        os.remove(f"{A}/models/block/{block}.json")
     write(f"{A}/blockstates/{block}.json", {"variants": variants})
     write(f"{A}/items/{block}.json", {"model": {"type": "minecraft:model", "model": f"orbitarena:block/{block}_0"}})
 

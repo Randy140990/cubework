@@ -17,6 +17,27 @@
 		},
 		"fade=5": {
 			"model": "orbitarena:block/force_field_wall_5"
+		},
+		"fade=6": {
+			"model": "orbitarena:block/force_field_wall_6"
+		},
+		"fade=7": {
+			"model": "orbitarena:block/force_field_wall_7"
+		},
+		"fade=8": {
+			"model": "orbitarena:block/force_field_wall_8"
+		},
+		"fade=9": {
+			"model": "orbitarena:block/force_field_wall_9"
+		},
+		"fade=10": {
+			"model": "orbitarena:block/force_field_wall_10"
+		},
+		"fade=11": {
+			"model": "orbitarena:block/force_field_wall_11"
+		},
+		"fade=12": {
+			"model": "orbitarena:block/force_field_wall_12"
 		}
 	}
 }

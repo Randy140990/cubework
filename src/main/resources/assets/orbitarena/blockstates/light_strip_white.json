@@ -1,16 +1,196 @@
 {
 	"variants": {
-		"axis=x": {
-			"model": "orbitarena:block/light_strip_white_horizontal",
-			"x": 90,
-			"y": 90
+		"down=false,east=false,north=false,south=false,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_000000"
 		},
-		"axis=y": {
-			"model": "orbitarena:block/light_strip_white"
+		"down=false,east=false,north=false,south=false,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_000001"
 		},
-		"axis=z": {
-			"model": "orbitarena:block/light_strip_white_horizontal",
-			"x": 90
+		"down=false,east=false,north=false,south=false,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_000010"
+		},
+		"down=false,east=false,north=false,south=false,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_000011"
+		},
+		"down=false,east=false,north=false,south=true,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_000100"
+		},
+		"down=false,east=false,north=false,south=true,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_000101"
+		},
+		"down=false,east=false,north=false,south=true,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_000110"
+		},
+		"down=false,east=false,north=false,south=true,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_000111"
+		},
+		"down=false,east=false,north=true,south=false,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_001000"
+		},
+		"down=false,east=false,north=true,south=false,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_001001"
+		},
+		"down=false,east=false,north=true,south=false,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_001010"
+		},
+		"down=false,east=false,north=true,south=false,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_001011"
+		},
+		"down=false,east=false,north=true,south=true,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_001100"
+		},
+		"down=false,east=false,north=true,south=true,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_001101"
+		},
+		"down=false,east=false,north=true,south=true,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_001110"
+		},
+		"down=false,east=false,north=true,south=true,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_001111"
+		},
+		"down=false,east=true,north=false,south=false,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_010000"
+		},
+		"down=false,east=true,north=false,south=false,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_010001"
+		},
+		"down=false,east=true,north=false,south=false,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_010010"
+		},
+		"down=false,east=true,north=false,south=false,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_010011"
+		},
+		"down=false,east=true,north=false,south=true,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_010100"
+		},
+		"down=false,east=true,north=false,south=true,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_010101"
+		},
+		"down=false,east=true,north=false,south=true,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_010110"
+		},
+		"down=false,east=true,north=false,south=true,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_010111"
+		},
+		"down=false,east=true,north=true,south=false,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_011000"
+		},
+		"down=false,east=true,north=true,south=false,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_011001"
+		},
+		"down=false,east=true,north=true,south=false,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_011010"
+		},
+		"down=false,east=true,north=true,south=false,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_011011"
+		},
+		"down=false,east=true,north=true,south=true,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_011100"
+		},
+		"down=false,east=true,north=true,south=true,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_011101"
+		},
+		"down=false,east=true,north=true,south=true,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_011110"
+		},
+		"down=false,east=true,north=true,south=true,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_011111"
+		},
+		"down=true,east=false,north=false,south=false,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_100000"
+		},
+		"down=true,east=false,north=false,south=false,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_100001"
+		},
+		"down=true,east=false,north=false,south=false,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_100010"
+		},
+		"down=true,east=false,north=false,south=false,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_100011"
+		},
+		"down=true,east=false,north=false,south=true,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_100100"
+		},
+		"down=true,east=false,north=false,south=true,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_100101"
+		},
+		"down=true,east=false,north=false,south=true,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_100110"
+		},
+		"down=true,east=false,north=false,south=true,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_100111"
+		},
+		"down=true,east=false,north=true,south=false,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_101000"
+		},
+		"down=true,east=false,north=true,south=false,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_101001"
+		},
+		"down=true,east=false,north=true,south=false,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_101010"
+		},
+		"down=true,east=false,north=true,south=false,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_101011"
+		},
+		"down=true,east=false,north=true,south=true,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_101100"
+		},
+		"down=true,east=false,north=true,south=true,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_101101"
+		},
+		"down=true,east=false,north=true,south=true,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_101110"
+		},
+		"down=true,east=false,north=true,south=true,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_101111"
+		},
+		"down=true,east=true,north=false,south=false,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_110000"
+		},
+		"down=true,east=true,north=false,south=false,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_110001"
+		},
+		"down=true,east=true,north=false,south=false,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_110010"
+		},
+		"down=true,east=true,north=false,south=false,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_110011"
+		},
+		"down=true,east=true,north=false,south=true,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_110100"
+		},
+		"down=true,east=true,north=false,south=true,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_110101"
+		},
+		"down=true,east=true,north=false,south=true,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_110110"
+		},
+		"down=true,east=true,north=false,south=true,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_110111"
+		},
+		"down=true,east=true,north=true,south=false,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_111000"
+		},
+		"down=true,east=true,north=true,south=false,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_111001"
+		},
+		"down=true,east=true,north=true,south=false,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_111010"
+		},
+		"down=true,east=true,north=true,south=false,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_111011"
+		},
+		"down=true,east=true,north=true,south=true,up=false,west=false": {
+			"model": "orbitarena:block/light_strip_white_111100"
+		},
+		"down=true,east=true,north=true,south=true,up=false,west=true": {
+			"model": "orbitarena:block/light_strip_white_111101"
+		},
+		"down=true,east=true,north=true,south=true,up=true,west=false": {
+			"model": "orbitarena:block/light_strip_white_111110"
+		},
+		"down=true,east=true,north=true,south=true,up=true,west=true": {
+			"model": "orbitarena:block/light_strip_white_111111"
 		}
 	}
 }

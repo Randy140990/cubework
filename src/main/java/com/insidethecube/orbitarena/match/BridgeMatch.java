@@ -245,15 +245,16 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	@Override
 	public String whyNotPlace(BlockPos pos) {
 		if (!playing()) return "Wait for the round to start";
-		int dx = pos.getX() - cx, dy = pos.getY() - Y, dz = pos.getZ() - cz;
-		if (mapBlock(dx, dy, dz, settings.obstacles(), settings.bridgeWidth()) != null) return null;
-		int adx = Math.abs(dx);
-		if (adx >= TEMPLE_FRONT - 3 && adx <= TEMPLE_BACK + 1 && Math.abs(dz) <= STAIR_OUT + 1 && dy >= 0) return "No building on or round the temples";
-		if (dy > 22) return "Too high to build";
-		if (dy < -14) return "Too far down to build";
+		int dx = pos.getX() - cx, dy = pos.getY() - Y, dz = pos.getZ() - cz, adx = Math.abs(dx);
+		if (BridgeLayout.inGoalField(adx, dy, dz)) return "Nothing can be built in a goal's force field";
+		if (BridgeLayout.byDoor(adx, dy, dz)) return "Keep the temple doors clear";
 		if (Math.abs(dz) > WALL_Z - 2 && adx <= WALL_END + 2) return "Too near the stands";
+		if (dy > BUILD_TOP) return "Too high to build";
+		if (dy < -14) return "Too far down to build";
+		if (monolithAt(dx, dy, dz) >= 0 || !BridgeLayout.buildable(dx, dy, dz) && adx > TEMPLE_FRONT) return "Too near a monolith";
 		return "Can't build here";
 	}
+
 
 	@Override
 	public boolean owns(BlockPos pos) {
@@ -533,6 +534,8 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		// can't be picked up, yours comes back by itself).
 		AABB area = new AABB(cx - AREA_X - 30, Y - 40, cz - AREA_Z - 30, cx + AREA_X + 30, Y + 50, cz + AREA_Z + 30);
 		for (ItemEntity i : arena.getEntitiesOfClass(ItemEntity.class, area)) i.discard();
+		// Tumbling pieces of a crumbling monolith go before they can land anywhere.
+		for (FallingBlockEntity fb : arena.getEntitiesOfClass(FallingBlockEntity.class, area, e -> e.time > 45)) fb.discard();
 		for (AbstractArrow a : arena.getEntitiesOfClass(AbstractArrow.class, area)) {
 			a.pickup = AbstractArrow.Pickup.DISALLOWED;
 			if (playTicks % 20 == 0 && (a.onGround() || a.tickCount > 200)) a.discard();
@@ -636,6 +639,8 @@ public final class BridgeMatch implements Game, BridgeWorld {
 					if (r < 0.14F) {
 						FallingBlockEntity fb = FallingBlockEntity.fall(arena, pos, state);
 						fb.dropItem = false;
+						// It never lands as a block: the stone just goes.
+						fb.disableDrop();
 						fb.setDeltaMovement(s * (0.25 + arena.random.nextDouble() * 0.3), 0.15 + arena.random.nextDouble() * 0.2, (arena.random.nextDouble() - 0.5) * 0.3);
 					} else if (r < 0.4F) {
 						arena.destroyBlock(pos, false);

@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "orbitarena:block/light_strip_white"
+		"model": "orbitarena:block/light_strip_white_000000"
 	}
 }

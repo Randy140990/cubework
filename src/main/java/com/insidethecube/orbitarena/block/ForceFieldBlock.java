@@ -12,13 +12,13 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * A force field: a glowing see-through wash that fades out upwards. FADE 0 is the full field; 1 to 5 each
- * fade a block further, so a column stepping 0, 1, 2, 3, 4, 5 fades smoothly out to nothing at its top.
+ * A force field: a glowing see-through wash that fades out upwards. FADE 0 is the full field; 1 to 12 each
+ * fade a block further, so a column stepping 1, 2, ..., 12 fades smoothly out to nothing at its top.
  * Some fields can be walked through (the boxes round the goals: you can't build into them, but you can go
  * in, and hit and shoot through them); others stop you (the wall in front of the stands).
  */
 public class ForceFieldBlock extends TransparentBlock {
-	public static final IntegerProperty FADE = IntegerProperty.create("fade", 0, 5);
+	public static final IntegerProperty FADE = IntegerProperty.create("fade", 0, 12);
 	private final boolean solid;
 
 	public ForceFieldBlock(Properties props, boolean solid) {

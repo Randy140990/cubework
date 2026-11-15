@@ -58,13 +58,14 @@ public final class BridgeGoal extends Goal {
 	}
 
 	private final Fighter f;
-	private int placeCool, bowCool = 40, bowDraw = -1, decide, wallCool, stuck, mineTicks, swing, react, strafeTicks;
+	private int placeCool, bowCool = 40, bowDraw = -1, decide, wallCool, stuck, mineTicks, swing, react, strafeTicks, wallsLeft = 2;
 	private int stairs = 1;
 	private float strafeSide = 1;
 	private boolean jumpForCrit;
 	private double lane;
 	private BlockPos mining;
 	private Vec3 lastPos = Vec3.ZERO, heading = Vec3.ZERO;
+	private double lastWayDist = 999;
 	private LivingEntity bowTarget;
 
 	BridgeGoal(Fighter f) {
@@ -285,9 +286,10 @@ public final class BridgeGoal extends Goal {
 			f.getLookControl().setLookAt(near, 40, 40);
 			hit(level, near, d, false);
 		}
-		// A wall in front of an attacker on the bridge (defenders, from 4).
-		if (b.defending && d >= 4 && wallCool == 0 && near != null && nd < 8 && Math.abs(rx(w, near.getX())) <= BRIDGE_END + 2
-				&& f.getRandom().nextFloat() < 0.07F * (d - 3)) {
+		// A wall in front of an attacker out on the bridge (defenders, from 4; a couple a life, not a fort).
+		if (at == Where.ROOM) wallsLeft = 2;
+		if (b.defending && d >= 4 && wallCool == 0 && wallsLeft > 0 && near != null && nd < 8 && Math.abs(rx(w, near.getX())) <= BRIDGE_END - 3
+				&& own * (rx(w, near.getX()) - rx(w, p.x)) < 0 && f.getRandom().nextFloat() < 0.04F * (d - 3)) {
 			wall(w, near, own, d);
 		}
 		steer(w, b, way, target, d);
@@ -340,7 +342,7 @@ public final class BridgeGoal extends Goal {
 			blocked = ahead > 1.5 && ahead < 12 && Math.abs(rx(w, near.getX())) <= BRIDGE_END && Math.abs(near.getZ() - f.getZ()) < 2.5;
 		}
 		if (blocked && d >= 4) {
-			if (Math.abs(lane) < 2) lane = f.getRandom().nextBoolean() ? 3.5 + d * 0.15 : -3.5 - d * 0.15;
+			if (Math.abs(lane) < 2) lane = f.getRandom().nextBoolean() ? 2.5 : -2.5;
 		} else if (f.getRandom().nextFloat() < 0.4F) {
 			lane = 0;
 		}
@@ -562,23 +564,44 @@ public final class BridgeGoal extends Goal {
 
 		BlockPos feet = BlockPos.containing(p.x + dx * 0.8, p.y + 0.2, p.z + dz * 0.8), head = feet.above();
 		boolean feetBlocked = solid(level, feet), headBlocked = solid(level, head);
-		if (feetBlocked && headBlocked) {
-			BlockPos breakable = w.breakable(head) ? head : w.breakable(feet) ? feet : null;
-			if (breakable != null && d >= 2) {
-				mining = breakable;
-				mineTicks = Math.max(3, 13 - d);
+		if (headBlocked) {
+			// Something placed in the way, at head height or both: break through it (it's only wool).
+			BlockPos breakable = w.breakable(head) && solid(level, head) ? head : w.breakable(feet) && feetBlocked ? feet : null;
+			if (breakable != null) {
+				mine(breakable, d);
 				return;
 			}
-			if (Math.abs(rx(w, p.x)) <= BRIDGE_END) lane = Mth.clamp(lane + (f.getRandom().nextBoolean() ? 2 : -2), -5, 5);
+			if (feetBlocked && Math.abs(rx(w, p.x)) <= BRIDGE_END) lane = Mth.clamp(lane + (f.getRandom().nextBoolean() ? 2 : -2), -3, 3);
 		} else if (feetBlocked && f.onGround() && !level.getBlockState(feet).is(net.minecraft.tags.BlockTags.STAIRS)) {
+			// A step up: jump it, first breaking anything over its head that would stop the jump.
+			BlockPos over = BlockPos.containing(p.x, p.y + 2.2, p.z), overStep = feet.above(2);
+			if (solid(level, over) && w.breakable(over)) {
+				mine(over, d);
+				return;
+			}
+			if (solid(level, overStep) && w.breakable(overStep)) {
+				mine(overStep, d);
+				return;
+			}
 			f.getJumpControl().jump();
 		}
 
-		// Stuck (pushed against something): try another way.
+		// Stuck (getting no nearer where it's going): break whatever placed blocks are round it in the way,
+		// then try another way round.
 		if (f.tickCount % 20 == 0) {
-			if (p.distanceToSqr(lastPos) < 0.05) {
-				if (++stuck >= 2) {
-					if (Math.abs(rx(w, p.x)) <= BRIDGE_END) lane = Mth.clamp(lane + (f.getRandom().nextBoolean() ? 2.5 : -2.5), -5, 5);
+			double dw = flat(p, way);
+			boolean noNearer = dw > 1.5 && dw > lastWayDist - 0.4;
+			if (noNearer || p.distanceToSqr(lastPos) < 0.05 && dw > 1.5) {
+				stuck++;
+				BlockPos clear = stuck >= 1 ? inTheWay(w, p, dx, dz) : null;
+				if (clear != null) {
+					mine(clear, d);
+					lastWayDist = 999;
+					lastPos = p;
+					return;
+				}
+				if (stuck >= 2) {
+					if (Math.abs(rx(w, p.x)) <= BRIDGE_END) lane = Mth.clamp(lane + (f.getRandom().nextBoolean() ? 2.5 : -2.5), -3, 3);
 					else stairs = -stairs;
 					if (f.onGround()) f.getJumpControl().jump();
 					stuck = 0;
@@ -586,12 +609,34 @@ public final class BridgeGoal extends Goal {
 			} else {
 				stuck = 0;
 			}
+			lastWayDist = dw;
 			lastPos = p;
 		}
 		hold(sword());
 		boolean sprint = d >= 3 && (attacking || flat(p, target) > 6) && Math.abs(lane) < 2.5;
 		f.setSprinting(sprint);
 		f.getMoveControl().setWantedPosition(wx, p.y, wz, sprint ? 1.0 : 0.85);
+	}
+
+	/** Starts breaking a placed block (quicker the better it is). */
+	private void mine(BlockPos pos, int d) {
+		mining = pos;
+		mineTicks = Math.max(3, 12 - d);
+	}
+
+	/**
+	 * A placed block round it that's in its way (ahead at its feet or head, over its head, or to either side
+	 * ahead when it's going slantwise), or null.
+	 */
+	private BlockPos inTheWay(BridgeWorld w, Vec3 p, double dx, double dz) {
+		ServerLevel level = w.level();
+		BlockPos at = BlockPos.containing(p.x, p.y + 0.2, p.z);
+		BlockPos ahead = BlockPos.containing(p.x + dx * 0.8, p.y + 0.2, p.z + dz * 0.8);
+		BlockPos ax = BlockPos.containing(p.x + Math.signum(dx) * 0.8, p.y + 0.2, p.z), az = BlockPos.containing(p.x, p.y + 0.2, p.z + Math.signum(dz) * 0.8);
+		BlockPos far = BlockPos.containing(p.x + dx * 1.6, p.y + 0.2, p.z + dz * 1.6);
+		BlockPos[] tries = {ahead.above(), ahead, at.above(2), ahead.above(2), ax.above(), ax, az.above(), az, far.above(), far};
+		for (BlockPos q : tries) if (solid(level, q) && w.breakable(q)) return q;
+		return null;
 	}
 
 	/** Places one of its team's blocks (as fast as its difficulty allows). */
@@ -608,6 +653,11 @@ public final class BridgeGoal extends Goal {
 	private void wall(BridgeWorld w, LivingEntity threat, double toward, int d) {
 		ServerLevel level = w.level();
 		int x = Mth.floor(threat.getX() + toward * 2), y = Mth.floor(threat.getY()), z0 = Mth.floor(threat.getZ());
+		// Only across the bridge itself (never a heap on a deck).
+		if (Math.abs(rx(w, x + 0.5)) > BRIDGE_END) {
+			wallCool = 10;
+			return;
+		}
 		int placed = 0;
 		for (int dz = -1; dz <= 1; dz++) {
 			for (int dy = 0; dy <= 1; dy++) {
@@ -618,7 +668,8 @@ public final class BridgeGoal extends Goal {
 				}
 			}
 		}
-		wallCool = placed > 0 ? 70 - 4 * d : 10;
+		if (placed > 0) wallsLeft--;
+		wallCool = placed > 0 ? 200 - 8 * d : 10;
 	}
 
 	/** Looses an arrow, leading a moving target at higher levels. */

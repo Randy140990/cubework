@@ -49,20 +49,23 @@ public final class ArenaSky {
 
 	private static final Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
 	private static final String DIR = "/assets/orbitarena/textures/environment/";
-	private static final int LON = 64, LAT = 32, PLON = 160, PLAT = 80, RING_SEG = 360, RING_STEPS = 48;
-	/** One full turn every 20 minutes (24,000 ticks). */
-	private static final double TURN_TICKS = 24000.0;
+	private static final int LON = 64, LAT = 32, PLON = 160, PLAT = 80, RING_SEG = 360, RING_STEPS = 80;
+	/** The stars: one full turn every 12 minutes. The planet turns once every 8. */
+	private static final double TURN_TICKS = 14400.0, SPIN_TICKS = 9600.0;
 	private static final Vector3f AXIS = new Vector3f(0.25F, 1.0F, 0.35F).normalize();
 
 	/**
-	 * Where the planet hangs: east by north-east, up over the far temple, about 28 degrees across (radius),
-	 * in sky units (the stars are 100 out). The rings' plane is HEIGHT under you, tipped ROLL degrees.
+	 * Where the planet hangs: east by north-east, up over the far temple, in sky units (the stars are 100
+	 * out). You're IN_RINGS of its radii out (in its bright B ring), the rings' plane HEIGHT under you, tipped
+	 * ROLL degrees.
 	 */
-	private static final float PLANET_AZIMUTH = 30, PLANET_ELEVATION = 17, PLANET_RADIUS_DEG = 28.4F, PLANET_DISTANCE = 50, HEIGHT = 5, ROLL = 14;
-	/** The rings from their inner edge to their outer, in the planet's radii (as Saturn's: C, B, Cassini, A, F). */
-	private static final float RING_IN = 1.24F, RING_OUT = 2.36F;
+	private static final float PLANET_AZIMUTH = 30, PLANET_ELEVATION = 17, PLANET_DISTANCE = 45, IN_RINGS = 1.78F, HEIGHT = 4, ROLL = 14;
+	/** The rings from their inner edge to their outer, in the planet's radii (as Saturn's: C, B, Cassini, A, F, then faint G and E far out). */
+	private static final float RING_IN = 1.24F, RING_OUT = 3.4F;
 	/** Pre-blurred copies of the rings for further off (where a pixel spans more of them). */
-	private static final int RING_LEVELS = 4, RING_W = 1024, RING_H = 64;
+	private static final int RING_LEVELS = 4, RING_W = 2048, RING_H = 64;
+	/** The near star: how far off it's drawn, and its stars' count, twinkling. */
+	private static final int TWINKLES = 1100;
 
 	/**
 	 * Everything is drawn with the End sky's own way of drawing (a picture, tinted and faded per corner,
@@ -70,15 +73,15 @@ public final class ArenaSky {
 	 */
 	private static final RenderPipeline SKY = RenderPipelines.END_SKY;
 
-	private static GpuBuffer sky, planet, glow;
+	private static GpuBuffer sky, planet, shade, glow, sun, twinkle;
 	private static final GpuBuffer[] ringBack = new GpuBuffer[RING_LEVELS], ringFront = new GpuBuffer[RING_LEVELS];
 	private static final int[] ringBackIndices = new int[RING_LEVELS], ringFrontIndices = new int[RING_LEVELS];
-	private static int skyIndices, planetIndices, glowIndices;
+	private static int skyIndices, planetIndices, glowIndices, sunIndices, twinkleIndices;
 	/** The pictures once made or read (stars, the planet, the rings at each level), and on the card. */
 	private static volatile NativeImage[] read;
 	private static DynamicTexture[] textures;
-	/** Plain white, for the glow (its colour and fade are in its corners). */
-	private static DynamicTexture white;
+	/** Plain white, for the glow (its colour and fade are in its corners); a soft round dot, for stars. */
+	private static DynamicTexture white, dot;
 
 	/** Starts reading and making the sky's pictures (in the background). */
 	public static void load() {
@@ -226,7 +229,9 @@ public final class ArenaSky {
 		else if (x < 2.27) o = 0.58 - 0.12 * smooth(2.03, 2.27, x) - (Math.abs(x - 2.215) < 0.007 ? 0.45 : 0);
 		else if (x < 2.322) o = 0.02;
 		else if (x < 2.338) o = 0.5;
-		else o = 0;
+		else if (x < 2.72) o = 0.02 * smooth(2.338, 2.6, x);
+		else if (x < 2.80) o = 0.24 * Math.sin((x - 2.72) / 0.08 * Math.PI);
+		else o = 0.13 * Math.sin((x - 2.8) / (RING_OUT - 2.8) * Math.PI) + 0.02;
 		// Ringlets: fine bands within.
 		o *= 0.8 + 0.2 * fbm(x * 180, 0.5, 0.5, 3, 41) + 0.1 * (fbm(x * 40, 3.5, 0.5, 2, 43) - 0.5);
 		return Math.max(0, Math.min(1, o));
@@ -242,7 +247,8 @@ public final class ArenaSky {
 		if (x < 1.53) return new double[] {168, 156, 142};
 		if (x < 1.95) return new double[] {238, 222, 188};
 		if (x < 2.03) return new double[] {150, 140, 128};
-		return new double[] {214, 204, 184};
+		if (x < 2.4) return new double[] {214, 204, 184};
+		return new double[] {196, 202, 212};
 	}
 
 	/**
@@ -365,7 +371,7 @@ public final class ArenaSky {
 		// Towards the planet: east (+x), turned north (-z) by the azimuth, raised by the elevation.
 		Vector3f dir = v(Math.cos(el) * Math.cos(az), Math.sin(el), -Math.cos(el) * Math.sin(az)).normalize();
 		Vector3f centre = new Vector3f(dir).mul(PLANET_DISTANCE);
-		float radius = (float) (PLANET_DISTANCE * Math.sin(Math.toRadians(PLANET_RADIUS_DEG)));
+		float radius = PLANET_DISTANCE / IN_RINGS;
 		Vector3f toViewer = new Vector3f(dir).negate();
 		Vector3f right = new Vector3f(dir).cross(new Vector3f(0, 1, 0)).normalize();
 		Vector3f upOnDisc = new Vector3f(right).cross(dir).normalize();
@@ -407,8 +413,12 @@ public final class ArenaSky {
 		float radius = L.radius();
 		Vector3f toViewer = new Vector3f(centre).normalize().negate();
 		int quads = PLON * PLAT;
-		try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(quads * 4 * DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize())) {
+		// Two of it: the planet itself (its bands, turning), and over it its light and shade, which don't turn
+		// (the sun, the rings' shadow, the dark side): black, as see-through as it's lit.
+		try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(quads * 4 * DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize());
+				ByteBufferBuilder shadeBytes = ByteBufferBuilder.exactlySized(quads * 4 * DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize())) {
 			BufferBuilder bb = new BufferBuilder(bytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+			BufferBuilder sb = new BufferBuilder(shadeBytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 			float[] c = {centre.x, centre.y, centre.z};
 			for (int j = 0; j < PLAT; j++) {
 				for (int i = 0; i < PLON; i++) {
@@ -429,21 +439,27 @@ public final class ArenaSky {
 						float mu = Math.max(0, n[k].dot(toViewer));
 						float limb = 0.72F + 0.28F * (float) Math.sqrt(mu);
 						float ringshine = 0.035F * (1 - Math.abs(n[k].dot(L.pole())));
-						float shade = Math.min(1, (0.006F + ringshine + 0.994F * lit) * limb);
-						int g = (int) (255 * shade);
-						bb.addVertex(p[k][0], p[k][1], p[k][2]).setUv(corners[k][0] / (float) PLON, corners[k][1] / (float) PLAT).setColor(g, g, g, 255);
+						float light = Math.min(1, (0.006F + ringshine + 0.994F * lit) * limb);
+						bb.addVertex(p[k][0], p[k][1], p[k][2]).setUv(corners[k][0] / (float) PLON, corners[k][1] / (float) PLAT).setColor(255, 255, 255, 255);
+						sb.addVertex(p[k][0], p[k][1], p[k][2]).setUv(0.5F, 0.5F).setColor(0, 0, 0, (int) (255 * (1 - light)));
 					}
 				}
 			}
 			try (MeshData mesh = bb.buildOrThrow()) {
 				planet = RenderSystem.getDevice().createBuffer(() -> "Orbit Arena planet", 40, mesh.vertexBuffer());
 			}
+			try (MeshData mesh = sb.buildOrThrow()) {
+				shade = RenderSystem.getDevice().createBuffer(() -> "Orbit Arena planet shade", 40, mesh.vertexBuffer());
+			}
 		}
 		planetIndices = quads * 6;
 
-		// A thin haze round its edge, warm, brightest on the lit side.
+		// A thin haze round its edge (where its edge is seen: nearer than its middle, and a little smaller),
+		// warm, brightest on the lit side.
 		int seg = 128;
-		float[] radii = {radius * 0.97F, radius * 0.998F, radius * 1.012F, radius * 1.07F};
+		float dist = centre.length(), rim = radius * (float) Math.sqrt(1 - radius * radius / (dist * dist));
+		Vector3f rimCentre = new Vector3f(centre).mul((dist - radius * radius / dist) / dist);
+		float[] radii = {rim * 0.975F, rim * 0.999F, rim * 1.01F, rim * 1.06F};
 		float[] alpha = {0, 0.32F, 0.2F, 0};
 		try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(seg * 3 * 4 * DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize())) {
 			BufferBuilder bb = new BufferBuilder(bytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
@@ -457,7 +473,7 @@ public final class ArenaSky {
 					for (int k = 0; k < 4; k++) {
 						Vector3f m = new Vector3f(L.right()).mul((float) Math.cos(as[k])).add(new Vector3f(L.upOnDisc()).mul((float) Math.sin(as[k])));
 						float lit = 0.05F + 0.95F * smoothf(-0.3F, 0.7F, m.dot(L.sun()));
-						Vector3f pos = new Vector3f(m).mul(radii[rs[k]]).add(centre);
+						Vector3f pos = new Vector3f(m).mul(radii[rs[k]]).add(rimCentre);
 						p[k] = new float[] {pos.x, pos.y, pos.z};
 						al[k] = (int) (255 * alpha[rs[k]] * lit);
 					}
@@ -472,6 +488,175 @@ public final class ArenaSky {
 		glowIndices = seg * 3 * 6;
 
 		buildRings(L);
+		buildSun(L);
+	}
+
+	/**
+	 * The near star: the sun that lights the planet, small and white hot, in a soft glow with four long
+	 * spikes of light (which turn slowly, as if it shimmers).
+	 */
+	private static void buildSun(Layout L) {
+		Vector3f n = new Vector3f(L.sun());
+		Vector3f u = new Vector3f(n).cross(Math.abs(n.y) < 0.9F ? new Vector3f(0, 1, 0) : new Vector3f(1, 0, 0)).normalize(), w = new Vector3f(n).cross(u).normalize();
+		float r = 92;
+		Vector3f c = new Vector3f(n).mul(r);
+		int seg = 64;
+		float[] radii = {0, 0.35F, 0.6F, 1.3F, 3.2F, 7.5F, 15};
+		float[] alpha = {1, 1, 0.85F, 0.42F, 0.16F, 0.05F, 0};
+		int[][] colour = {{255, 255, 255}, {255, 252, 240}, {255, 244, 214}, {255, 232, 190}, {255, 222, 176}, {255, 214, 168}, {255, 210, 160}};
+		int rings = radii.length - 1, spikes = 4, steps = 6;
+		try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized((seg * rings + spikes * steps) * 4 * DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize())) {
+			BufferBuilder bb = new BufferBuilder(bytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+			for (int i = 0; i < seg; i++) {
+				for (int k = 0; k < rings; k++) {
+					double a0 = Math.PI * 2 * i / seg, a1 = Math.PI * 2 * (i + 1) / seg;
+					double[] as = {a0, a1, a1, a0};
+					int[] rs = {k, k, k + 1, k + 1};
+					quad(bb, c, u, w, r, as, rs, radii, alpha, colour);
+				}
+			}
+			// The spikes: thin, fading out along their length.
+			for (int sp = 0; sp < spikes; sp++) {
+				double a = Math.PI / 2 * sp + Math.PI / 4;
+				Vector3f along = new Vector3f(u).mul((float) Math.cos(a)).add(new Vector3f(w).mul((float) Math.sin(a)));
+				Vector3f across = new Vector3f(n).cross(along).normalize();
+				for (int st = 0; st < steps; st++) {
+					float l0 = 13F * st / steps, l1 = 13F * (st + 1) / steps;
+					float w0 = 0.09F * (1 - 0.8F * st / steps), w1 = 0.09F * (1 - 0.8F * (st + 1) / steps);
+					int al0 = (int) (200 * Math.pow(1 - (double) st / steps, 2)), al1 = (int) (200 * Math.pow(1 - (double) (st + 1) / steps, 2));
+					float k = (float) Math.toRadians(1) * r;
+					Vector3f[] q = {new Vector3f(along).mul(l0 * k).add(new Vector3f(across).mul(-w0 * k)), new Vector3f(along).mul(l1 * k).add(new Vector3f(across).mul(-w1 * k)),
+							new Vector3f(along).mul(l1 * k).add(new Vector3f(across).mul(w1 * k)), new Vector3f(along).mul(l0 * k).add(new Vector3f(across).mul(w0 * k))};
+					int[] al = {al0, al1, al1, al0};
+					float[][] p = new float[4][];
+					for (int m = 0; m < 4; m++) p[m] = new float[] {c.x + q[m].x, c.y + q[m].y, c.z + q[m].z};
+					int[] order = facing(p, new float[] {0, 0, 0}, false) ? new int[] {0, 1, 2, 3} : new int[] {0, 3, 2, 1};
+					for (int m : order) bb.addVertex(p[m][0], p[m][1], p[m][2]).setUv(0.5F, 0.5F).setColor(255, 246, 228, al[m]);
+				}
+			}
+			try (MeshData mesh = bb.buildOrThrow()) {
+				sun = RenderSystem.getDevice().createBuffer(() -> "Orbit Arena sun", 40, mesh.vertexBuffer());
+			}
+		}
+		sunIndices = (seg * rings + spikes * steps) * 6;
+	}
+
+	/** One quad of a ring of a disc round c (in the plane of u and w), its corners at angles as and radii (degrees) rs. */
+	private static void quad(BufferBuilder bb, Vector3f c, Vector3f u, Vector3f w, float r, double[] as, int[] rs, float[] radii, float[] alpha, int[][] colour) {
+		float k = (float) Math.toRadians(1) * r;
+		float[][] p = new float[4][];
+		for (int m = 0; m < 4; m++) {
+			Vector3f d = new Vector3f(u).mul((float) Math.cos(as[m])).add(new Vector3f(w).mul((float) Math.sin(as[m]))).mul(radii[rs[m]] * k);
+			p[m] = new float[] {c.x + d.x, c.y + d.y, c.z + d.z};
+		}
+		int[] order = facing(p, new float[] {0, 0, 0}, false) ? new int[] {0, 1, 2, 3} : new int[] {0, 3, 2, 1};
+		for (int m : order) {
+			int[] col = colour[rs[m]];
+			bb.addVertex(p[m][0], p[m][1], p[m][2]).setUv(0.5F, 0.5F).setColor(col[0], col[1], col[2], (int) (255 * alpha[rs[m]]));
+		}
+	}
+
+	// ---------------------------------------------------------------- twinkling and shooting stars
+
+	/** Stars over the star map that twinkle: where each is, how big and bright, its colour, how it twinkles. */
+	private static float[][] twinkles;
+
+	private static void makeTwinkles() {
+		java.util.Random rnd = new java.util.Random(7071);
+		twinkles = new float[TWINKLES][];
+		for (int i = 0; i < TWINKLES; i++) {
+			double z = rnd.nextDouble() * 2 - 1, a = rnd.nextDouble() * Math.PI * 2, rr = Math.sqrt(1 - z * z);
+			boolean bright = rnd.nextDouble() < 0.06;
+			float size = bright ? 0.2F + rnd.nextFloat() * 0.1F : 0.09F + rnd.nextFloat() * 0.07F;
+			float base = bright ? 0.85F : 0.3F + rnd.nextFloat() * 0.4F;
+			double tint = rnd.nextDouble();
+			float cr = tint < 0.25 ? 0.78F : tint > 0.85 ? 1F : 0.95F, cg = tint < 0.25 ? 0.86F : tint > 0.85 ? 0.88F : 0.95F, cb = tint < 0.25 ? 1F : tint > 0.85 ? 0.7F : 0.98F;
+			twinkles[i] = new float[] {(float) (rr * Math.cos(a)), (float) z, (float) (rr * Math.sin(a)), size, base, cr, cg, cb, rnd.nextFloat() * 6.283F,
+					0.15F + rnd.nextFloat() * 0.35F, rnd.nextFloat() * 6.283F, 0.04F + rnd.nextFloat() * 0.1F};
+		}
+	}
+
+	/** Each client tick: the twinkling stars at this moment (and now and then, a shooting star). */
+	public static void tick(Minecraft mc) {
+		if (!active() || textures == null) return;
+		if (twinkles == null) makeTwinkles();
+		double t = mc.level.getGameTime();
+		int vs = DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize();
+		try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(TWINKLES * 4 * vs)) {
+			BufferBuilder bb = new BufferBuilder(bytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+			for (float[] st : twinkles) {
+				float tw = (float) ((0.62 + 0.38 * Math.sin(t * st[9] + st[8])) * (0.85 + 0.15 * Math.sin(t * st[11] * 7 + st[10])));
+				int al = (int) (255 * Math.max(0, Math.min(1, st[4] * tw)));
+				starQuad(bb, st[0], st[1], st[2], 97, st[3], (int) (255 * st[5]), (int) (255 * st[6]), (int) (255 * st[7]), al);
+			}
+			try (MeshData mesh = bb.buildOrThrow()) {
+				GpuBuffer was = twinkle;
+				twinkle = RenderSystem.getDevice().createBuffer(() -> "Orbit Arena twinkles", 40, mesh.vertexBuffer());
+				twinkleIndices = TWINKLES * 6;
+				if (was != null) was.close();
+			}
+		}
+		// A shooting star every so often (and never two at once).
+		if (shooting == null && mc.level.random.nextFloat() < 1 / 260F) {
+			java.util.Random rnd = new java.util.Random(mc.level.random.nextLong());
+			double a = rnd.nextDouble() * Math.PI * 2, el = Math.toRadians(15 + rnd.nextDouble() * 50);
+			Vector3f from = new Vector3f((float) (Math.cos(el) * Math.cos(a)), (float) Math.sin(el), (float) (Math.cos(el) * Math.sin(a)));
+			Vector3f axis = new Vector3f(from).cross(new Vector3f((float) rnd.nextGaussian(), (float) rnd.nextGaussian() - 0.6F, (float) rnd.nextGaussian())).normalize();
+			shooting = new float[] {from.x, from.y, from.z, axis.x, axis.y, axis.z, (float) t, 12 + rnd.nextInt(12), (float) Math.toRadians(14 + rnd.nextDouble() * 18)};
+		}
+	}
+
+	/** The shooting star now: where it set off, the axis it travels round, when it set off, for how long, how far. */
+	private static float[] shooting;
+
+	/** A small square facing you at direction (x, y, z), r out, size degrees across. */
+	private static void starQuad(BufferBuilder bb, float x, float y, float z, float r, float size, int cr, int cg, int cb, int al) {
+		Vector3f n = new Vector3f(x, y, z);
+		Vector3f u = new Vector3f(n).cross(Math.abs(y) < 0.9F ? new Vector3f(0, 1, 0) : new Vector3f(1, 0, 0)).normalize(), w = new Vector3f(n).cross(u).normalize();
+		float k = (float) Math.toRadians(size) * r;
+		float[][] p = new float[4][];
+		float[][] uv = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
+		float[][] off = {{-1, -1}, {1, -1}, {1, 1}, {-1, 1}};
+		for (int m = 0; m < 4; m++) {
+			p[m] = new float[] {n.x * r + (u.x * off[m][0] + w.x * off[m][1]) * k, n.y * r + (u.y * off[m][0] + w.y * off[m][1]) * k, n.z * r + (u.z * off[m][0] + w.z * off[m][1]) * k};
+		}
+		int[] order = facing(p, new float[] {0, 0, 0}, false) ? new int[] {0, 1, 2, 3} : new int[] {0, 3, 2, 1};
+		for (int m : order) bb.addVertex(p[m][0], p[m][1], p[m][2]).setUv(uv[m][0], uv[m][1]).setColor(cr, cg, cb, al);
+	}
+
+	/** Draws the shooting star where it's got to (a streak, brightest at its head, fading in and out). */
+	private static void drawShooting(Matrix4f view, GpuTextureView colour, GpuTextureView depth, double time) {
+		float[] s = shooting;
+		if (s == null) return;
+		float f = (float) ((time - s[6]) / s[7]);
+		if (f >= 1 || f < 0) {
+			shooting = null;
+			return;
+		}
+		Vector3f from = new Vector3f(s[0], s[1], s[2]), axis = new Vector3f(s[3], s[4], s[5]);
+		float fade = (float) Math.sin(Math.PI * f), head = s[8] * f, tail = Math.max(0, head - (float) Math.toRadians(7));
+		int seg = 6;
+		int vs = DefaultVertexFormat.POSITION_TEX_COLOR.getVertexSize();
+		try (ByteBufferBuilder bytes = ByteBufferBuilder.exactlySized(seg * 4 * vs)) {
+			BufferBuilder bb = new BufferBuilder(bytes, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+			for (int i = 0; i < seg; i++) {
+				float a0 = tail + (head - tail) * i / seg, a1 = tail + (head - tail) * (i + 1) / seg;
+				Vector3f p0 = new Vector3f(from).rotateAxis(a0, axis.x, axis.y, axis.z).mul(96), p1 = new Vector3f(from).rotateAxis(a1, axis.x, axis.y, axis.z).mul(96);
+				Vector3f side = new Vector3f(p1).sub(p0).cross(p0).normalize();
+				float w0 = 0.12F * (i / (float) seg), w1 = 0.12F * ((i + 1) / (float) seg);
+				int al0 = (int) (230 * fade * i / seg), al1 = (int) (230 * fade * (i + 1) / seg);
+				float[][] p = {{p0.x - side.x * w0, p0.y - side.y * w0, p0.z - side.z * w0}, {p1.x - side.x * w1, p1.y - side.y * w1, p1.z - side.z * w1},
+						{p1.x + side.x * w1, p1.y + side.y * w1, p1.z + side.z * w1}, {p0.x + side.x * w0, p0.y + side.y * w0, p0.z + side.z * w0}};
+				int[] al = {al0, al1, al1, al0};
+				int[] order = facing(p, new float[] {0, 0, 0}, false) ? new int[] {0, 1, 2, 3} : new int[] {0, 3, 2, 1};
+				for (int m : order) bb.addVertex(p[m][0], p[m][1], p[m][2]).setUv(0.5F, 0.5F).setColor(235, 242, 255, al[m]);
+			}
+			try (MeshData mesh = bb.buildOrThrow()) {
+				GpuBuffer buf = RenderSystem.getDevice().createBuffer(() -> "Orbit Arena shooting star", 40, mesh.vertexBuffer());
+				draw(SKY, buf, seg * 6, view, white, colour, depth);
+				buf.close();
+			}
+		}
 	}
 
 	/**
@@ -559,6 +744,15 @@ public final class ArenaSky {
 			white.getPixels().setPixel(0, 0, 0xFFFFFFFF);
 			white.upload();
 		}
+		NativeImage d = new NativeImage(32, 32, false);
+		for (int y = 0; y < 32; y++) {
+			for (int x = 0; x < 32; x++) {
+				double q = Math.hypot(x - 15.5, y - 15.5) / 15.5;
+				int a = clamp(255 * Math.pow(Math.max(0, 1 - q), 2.2));
+				d.setPixel(x, y, a << 24 | 0xFFFFFF);
+			}
+		}
+		dot = new Smooth(() -> "Orbit Arena star", d, AddressMode.CLAMP_TO_EDGE);
 		for (int i = 0; i < r.length; i++) {
 			if (r[i] == null) continue;
 			final String n = i == 0 ? "stars" : i == 1 ? "planet" : "rings " + (i - 2);
@@ -586,11 +780,19 @@ public final class ArenaSky {
 		Matrix4f still = new Matrix4f(RenderSystem.getModelViewMatrix());
 		Matrix4f turning = new Matrix4f(still).rotate(angle, AXIS);
 		if (stars != null) draw(SKY, sky, skyIndices, turning, stars, colour, depth);
+		if (twinkle != null) draw(SKY, twinkle, twinkleIndices, turning, dot, colour, depth);
+		drawShooting(still, colour, depth, time);
 
 		if (textures == null || textures[1] == null) return;
 		if (planet == null) buildPlanet();
+		draw(SKY, sun, sunIndices, new Matrix4f(still).rotate((float) (time / 600.0 % 1.0 * Math.PI * 2 / 4), layout().sun()), white, colour, depth);
 		for (int l = 0; l < RING_LEVELS; l++) if (ringBack[l] != null) draw(SKY, ringBack[l], ringBackIndices[l], still, textures[2 + l], colour, depth);
-		draw(SKY, planet, planetIndices, still, textures[1], colour, depth);
+		// The planet turns about its pole; its light and shade stay put.
+		Layout L = layout();
+		float spin = (float) ((time / SPIN_TICKS) % 1.0 * Math.PI * 2);
+		Matrix4f spinning = new Matrix4f(still).translate(L.centre()).rotate(spin, L.pole()).translate(new Vector3f(L.centre()).negate());
+		draw(SKY, planet, planetIndices, spinning, textures[1], colour, depth);
+		draw(SKY, shade, planetIndices, still, white, colour, depth);
 		draw(SKY, glow, glowIndices, still, white, colour, depth);
 		for (int l = 0; l < RING_LEVELS; l++) if (ringFront[l] != null) draw(SKY, ringFront[l], ringFrontIndices[l], still, textures[2 + l], colour, depth);
 	}

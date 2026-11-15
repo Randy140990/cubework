@@ -1,2 +1,2 @@
-grep renderHandsWithItems|renderItemInHand|renderHand net/minecraft/client/renderer/ItemInHandRenderer.java
-grep renderHandsWithItems|renderItemInHand|renderHand net/minecraft/client/renderer/GameRenderer.java
+grep disableDrop|cancelDrop net/minecraft/world/entity/item/FallingBlockEntity.java
+grep protected.BlockState.updateShape net/minecraft/world/level/block/state/BlockBehaviour.java

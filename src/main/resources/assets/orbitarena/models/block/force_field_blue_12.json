@@ -1,0 +1,6 @@
+{
+	"parent": "minecraft:block/cube_all",
+	"textures": {
+		"all": "orbitarena:block/force_field_blue_12"
+	}
+}

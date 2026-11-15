@@ -5,11 +5,11 @@ import static com.insidethecube.orbitarena.arena.ArenaLayout.noise;
 
 import com.insidethecube.orbitarena.block.ArenaBlocks;
 import com.insidethecube.orbitarena.block.ForceFieldBlock;
+import com.insidethecube.orbitarena.block.LightStripBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -57,7 +57,9 @@ public final class BridgeLayout {
 	/** The goal: a pit 5 by 5 in the top, centred GOAL_X out, five deep. */
 	public static final int GOAL_X = 45, GOAL_HALF = 2, GOAL_DEPTH = 5;
 	/** The force field round the goal: a box FIELD_RING out from the pit's middle, FIELD_HIGH tall over the top. */
-	public static final int FIELD_RING = 5, FIELD_HIGH = 6;
+	public static final int FIELD_RING = 5, FIELD_HIGH = 12;
+	/** Players can build up to this high (dy). */
+	public static final int BUILD_TOP = TOP + FIELD_HIGH + 6;
 	/** The room inside the temple's door, where a team waits and comes back. */
 	public static final int ROOM_FROM = 33, ROOM_TO = 37, ROOM_HALF = 2, ROOM_TOP = 4, DOOR_HALF = 1, DOOR_TOP = 3;
 	/** Where everyone stands in the room (how far out). */
@@ -112,7 +114,7 @@ public final class BridgeLayout {
 	 * A monolith: where it stands (adx out, dz across), its lowest point (dy, hanging down into space) and
 	 * its top; the crystal floats over it.
 	 */
-	public record Monolith(int x, int z, int tip, int top) {
+	public record Monolith(int x, int z, int tip, int top, int arm, int armHigh) {
 		/** Where its crystal floats (dy of the crystal's middle). */
 		public double crystalY() {
 			return top + 6.5;
@@ -131,14 +133,13 @@ public final class BridgeLayout {
 
 	/**
 	 * In a horseshoe round the goal, in the order they crumble: the two either side first, then the two
-	 * behind, the middle one (the tallest) last.
+	 * behind, the middle one (the tallest) last. Each has an arm stood against one side (which side, and how
+	 * high it goes).
 	 */
-	public static final Monolith[] MONOLITHS = {new Monolith(50, -27, -14, 30), new Monolith(50, 27, -13, 31), new Monolith(64, -17, -16, 33),
-			new Monolith(64, 17, -15, 34), new Monolith(74, 0, -17, 37)};
-	/** A monolith's half width across its broad face and half its thickness (the main slab), and how far further its lip stands out. */
-	private static final int MONO_HW = 6, MONO_HD = 2, MONO_LIP = 2;
-	/** How far out from a monolith's middle it reaches (with its lip). */
-	private static final int MONO_REACH = MONO_HW + MONO_LIP;
+	public static final Monolith[] MONOLITHS = {new Monolith(50, -27, -14, 31, 1, 13), new Monolith(50, 27, -13, 32, 1, 10), new Monolith(64, -17, -16, 34, -1, 15),
+			new Monolith(64, 17, -15, 35, 1, 12), new Monolith(74, 0, -17, 38, 1, 9)};
+	/** How far out from a monolith's middle it reaches (its bands, and its arm). */
+	private static final int MONO_REACH = 5;
 
 	/** The goal (where you score) of the base on side s: a block position (relative) in the pit. */
 	public static boolean inGoal(double dx, double dy, double dz, int s) {
@@ -234,16 +235,17 @@ public final class BridgeLayout {
 
 	/** A team side's light (green for blue's base, red for red's), standing up or lying along x or z. */
 	public static BlockState light(boolean blue, Direction.Axis axis) {
-		return (blue ? ArenaBlocks.LIGHT_GREEN : ArenaBlocks.LIGHT_RED).defaultBlockState().setValue(RotatedPillarBlock.AXIS, axis);
+		// (Which way doesn't matter: strips join up with the strips round them, see mapBlock.)
+		return (blue ? ArenaBlocks.LIGHT_GREEN : ArenaBlocks.LIGHT_RED).defaultBlockState();
 	}
 
 	public static BlockState wool(boolean blue) {
 		return b(blue ? ArenaBlocks.WOOL_BLUE : ArenaBlocks.WOOL_RED);
 	}
 
-	/** Force field: 0 full, then 1 to 5 fading out a block at a time (5 fades to nothing at its top). */
+	/** Force field: 0 full, then 1 to 12 fading out a block at a time (12 fades to nothing at its top). */
 	private static BlockState field(Block block, int fade) {
-		return block.defaultBlockState().setValue(ForceFieldBlock.FADE, Math.max(0, Math.min(5, fade)));
+		return block.defaultBlockState().setValue(ForceFieldBlock.FADE, Math.max(0, Math.min(12, fade)));
 	}
 
 	private static BlockState stairs(Block block, boolean blue) {
@@ -256,6 +258,17 @@ public final class BridgeLayout {
 	 * build). Obstacles: copper pieces on and round the bridge. Width: how wide the bridge is (1 to 3).
 	 */
 	public static BlockState mapBlock(int dx, int dy, int dz, boolean obstacles, int width) {
+		BlockState s = raw(dx, dy, dz, obstacles, width);
+		if (s == null || !(s.getBlock() instanceof LightStripBlock strip)) return s;
+		// A light strip joins up with the strips of its colour round it (so a run of them is one light).
+		for (Direction d : Direction.values()) {
+			BlockState n = raw(dx + d.getStepX(), dy + d.getStepY(), dz + d.getStepZ(), obstacles, width);
+			s = s.setValue(LightStripBlock.JOINS.get(d), n != null && n.is(strip));
+		}
+		return s;
+	}
+
+	private static BlockState raw(int dx, int dy, int dz, boolean obstacles, int width) {
 		int adx = Math.abs(dx), s = dx < 0 ? -1 : 1;
 		if (adx <= BRIDGE_END) {
 			if (dy <= 0 && dy >= -2 && dz >= bridgeLo(width) && dz <= bridgeHi(width)) return dx == 0 ? b(Blocks.LIGHT_GRAY_CONCRETE) : wool(s < 0);
@@ -347,7 +360,7 @@ public final class BridgeLayout {
 		}
 		int ring = Math.max(Math.abs(adx - GOAL_X), adz);
 		// The force field round the goal, rising from a line of light in the top and fading out upwards.
-		if (dy > TOP && dy <= TOP + FIELD_HIGH && ring == FIELD_RING) return field(blue ? ArenaBlocks.FIELD_BLUE : ArenaBlocks.FIELD_RED, dy - TOP - 1);
+		if (dy > TOP && dy <= TOP + FIELD_HIGH && ring == FIELD_RING) return field(blue ? ArenaBlocks.FIELD_BLUE : ArenaBlocks.FIELD_RED, dy - TOP);
 		if (dy == TOP && ring == FIELD_RING) return light(blue, Math.abs(adx - GOAL_X) == FIELD_RING && adz < FIELD_RING ? Direction.Axis.Z : Direction.Axis.X);
 		if (dy > TOP) return null;
 		// The goal: a glowing pit with a ring of light round its top, the team's colour round it.
@@ -401,62 +414,82 @@ public final class BridgeLayout {
 	private static final Block[] MONO_RAMP = {Blocks.CALCITE, Blocks.POLISHED_DIORITE, Blocks.SMOOTH_STONE, Blocks.DIORITE, Blocks.POLISHED_ANDESITE,
 			Blocks.ANDESITE, Blocks.STONE, Blocks.TUFF};
 
-	/** Whether (a across, o through, from the middle) is in a monolith's footprint grown by g: a rounded rectangle. */
-	private static boolean monoIn(int a, int o, int g) {
-		int ha = MONO_HW + g, ho = MONO_HD + g;
-		if (a > ha || o > ho) return false;
-		if (a == ha && o == ho) return false;
-		return g < 2 || !(a == ha && o == ho - 1 || o == ho && a == ha - 1);
+	/** Whether (a across, o through, from the middle) is in a square of half width half with its corners taken off. */
+	private static boolean monoIn(int a, int o, int half) {
+		if (half < 0 || a > half || o > half) return false;
+		if (half >= 2 && a == half && o == half) return false;
+		return !(half >= 4 && (a == half && o == half - 1 || o == half && a == half - 1));
 	}
 
 	/**
-	 * A monolith (lx, lz from its middle, dy from the bridge), built as LumenForge's Portal builder builds
-	 * its monolith slabs: a broad slab with rounded corners, its broad face to the goal, floating; its foot
-	 * rounded over; a band a block proud above the foot; a capital at the top, a band a block proud and
-	 * over it a lip two proud, in quartz; up each side a pillar, the face between them sunk, a groove where
-	 * they meet and a seam down the middle. Shaded as stone is: its own gradient from foot (darker) to top
-	 * (lighter), the sunk faces and the grooves' edges darker. A glowing socket on top, under its crystal.
+	 * A monolith (lx, lz from its middle, dy from the bridge), after the reference's: a tall column of pale
+	 * stone floating with a stepped point under it. A plinth (a band in quartz) over the point; a lower shaft
+	 * seven across with a channel up the middle of each face and light strips in it in runs of five; a collar
+	 * (another band) a little over halfway; a narrower upper shaft with one long light up its front and back; a
+	 * capital with a quartz lip, stepping in to a top with a glowing socket, under its crystal. An arm stands
+	 * against one side, with its own light and a quartz cap. Shaded as stone is: its own gradient from foot
+	 * (darker) to top (lighter), the channels and the corners darker.
 	 */
 	private static BlockState monolithBlock(Monolith m, int lx, int dy, int lz, boolean blue, int dx, int dz) {
+		int tip = m.tip(), top = m.top(), up = dy - tip, h = top - tip;
+		if (up < 0 || dy > top) return null;
 		boolean alongX = m.facesAlongX();
-		int a = Math.abs(alongX ? lz : lx), o = Math.abs(alongX ? lx : lz);
-		int tip = m.tip(), top = m.top();
-		if (dy < tip || dy > top) return null;
-		boolean main = monoIn(a, o, 0), band = monoIn(a, o, 1), lipRing = monoIn(a, o, 2);
-		if (!lipRing) return null;
-		int footBand = tip + 4, capBand = top - 5;
-		boolean isBand = band && (dy == footBand || dy == footBand + 1 || dy == capBand || dy == capBand + 1 || dy == top - 1);
-		boolean isLip = lipRing && dy == top;
-		if (!main && !isBand && !isLip) return null;
-		// Its foot rounded over (seen face on).
-		double rb = 4;
-		if (dy < tip + rb && Math.hypot(Math.max(a - (MONO_HW + 0.5 - rb), 0), tip + rb - (dy + 0.5)) > rb + (isBand ? 1 : 0)) return null;
-		double t = Math.max(0, Math.min(1, 0.55 * (dy - tip) / (double) (top - tip) + 0.45 * face(dx, dy, dz, 750)));
-		double v = 0.08 + (1 - t) * 0.62;
-		if (dy == top) {
-			if (a == 0 && o == 0) return light(blue, Direction.Axis.Y);
-			return b(Blocks.SMOOTH_QUARTZ);
+		int across = alongX ? lz : lx, out = alongX ? lx : lz;
+		int a = Math.abs(across), o = Math.abs(out);
+		int mid = tip + h * 11 / 20;
+		double t = Math.max(0, Math.min(1, 0.6 * up / (double) h + 0.4 * face(dx, dy, dz, 750)));
+		double v = 0.02 + (1 - t) * 0.5;
+		// The arm, against one side, from the plinth up.
+		int armTop = tip + 7 + m.armHigh();
+		if (across * m.arm() >= 4 && a <= 5 && o <= 1 && up >= 6 && dy <= armTop) {
+			if (dy == armTop) return b(Blocks.SMOOTH_QUARTZ);
+			boolean run = up >= 9 && dy <= armTop - 2;
+			if (run && a == 5 && o == 0) return null;
+			if (run && a == 4 && o == 0) return light(blue, Direction.Axis.Y);
+			return b(pick(MONO_RAMP, v + (a == 5 && o == 1 ? 0.08 : 0), dx, dy, dz, 755));
 		}
-		// The bands and the lip stand out in quartz; where they cross the slab itself, its own stone.
-		if (isBand && !main) return b(dy == top - 1 ? Blocks.SMOOTH_QUARTZ : Blocks.QUARTZ_BLOCK);
-		if (isBand) return b(pick(MONO_RAMP, v - 0.06, dx, dy, dz, 751));
-		// Pillars up each side (the outer two across), the face between them sunk a block, a groove where they
-		// meet, a seam down the middle of the sunk face; between the bands.
-		boolean shaft = dy > footBand + 1 && dy < capBand;
-		int front = MONO_HD - o;   // in from the broad face (0: on it)
-		if (shaft) {
-			boolean mid = a < MONO_HW - 2;
-			boolean groove = a == MONO_HW - 2 && dy > footBand + 2 && dy < capBand - 1;
-			if (mid && front < 1 || groove && front < 2) return null;
-			if (a == 0 && front < 2 && dy > footBand + 3 && dy < capBand - 2) return null;
-			double ao = 0;
-			if (mid && front == 1) ao = a >= MONO_HW - 3 || a == 1 ? 0.2 : 0.1;
-			else if (!mid && (a == MONO_HW || a == MONO_HW - 1 && groove)) ao = 0.12;
-			if (groove && front == 2) ao = 0.24;
-			return b(pick(MONO_RAMP, v + ao, dx, dy, dz, 752));
+		int half;
+		boolean band = false;
+		if (up <= 1) half = 1;
+		else if (up <= 3) half = 2;
+		else if (up <= 5) half = 3;
+		else if (up <= 7) {
+			half = 4;
+			band = true;
+		} else if (dy < mid) half = 3;
+		else if (dy <= mid + 1) {
+			half = 4;
+			band = true;
+		} else if (dy == mid + 2) half = 3;
+		else if (dy <= top - 5) half = 2;
+		else if (dy == top - 4) half = 3;
+		else if (dy == top - 3) {
+			half = 4;
+			band = true;
+		} else if (dy == top - 2) half = 3;
+		else if (dy == top - 1) half = 2;
+		else half = 1;
+		if (!monoIn(a, o, half)) return null;
+		if (dy == top) return a == 0 && o == 0 ? light(blue, Direction.Axis.Y) : b(Blocks.SMOOTH_QUARTZ);
+		// The bands: quartz round their edge, darker stone within.
+		if (band) return a == half || o == half || a + o >= 2 * half - 2 ? b(Blocks.SMOOTH_QUARTZ) : b(pick(MONO_RAMP, v + 0.15, dx, dy, dz, 751));
+		if (half == 3 && up > 7 && dy < mid) {
+			// The lower shaft: a channel up the middle of each face, with light strips in runs of five.
+			boolean span = dy >= tip + 10 && dy <= mid - 2;
+			boolean channel = a == 0 && o == 3 || o == 0 && a == 3, inner = a == 0 && o == 2 || o == 0 && a == 2;
+			if (span && channel) return null;
+			if (span && inner && Math.floorMod(dy - tip - 10, 6) != 5) return light(blue, Direction.Axis.Y);
+			boolean beside = a == 1 && o == 3 || o == 1 && a == 3;
+			return b(pick(MONO_RAMP, v + (inner ? 0.2 : beside && span ? 0.1 : 0), dx, dy, dz, 752));
 		}
-		// The rounded corners a shade darker, as worn stone is.
-		boolean corner = a == MONO_HW && o >= MONO_HD - 1 || o == MONO_HD && a >= MONO_HW - 1;
+		if (half == 2 && dy > mid + 2 && dy <= top - 5) {
+			// The upper shaft: one long light up its front and back.
+			boolean span = dy >= mid + 4 && dy <= top - 7;
+			if (span && a == 0 && o == 2) return null;
+			if (span && a == 0 && o == 1) return light(blue, Direction.Axis.Y);
+			return b(pick(MONO_RAMP, v + (span && a == 1 && o == 2 ? 0.1 : 0), dx, dy, dz, 753));
+		}
+		boolean corner = a == half && o >= half - 1 || o == half && a >= half - 1;
 		return b(pick(MONO_RAMP, v + (corner ? 0.1 : 0), dx, dy, dz, 754));
 	}
 
@@ -490,14 +523,25 @@ public final class BridgeLayout {
 	 */
 	public static boolean buildable(int dx, int dy, int dz) {
 		int adx = Math.abs(dx), adz = Math.abs(dz);
-		if (adx > AREA_X - 3 || adz > AREA_Z - 2 || dy < -14 || dy > 22) return false;
+		if (adx > AREA_X - 3 || adz > AREA_Z - 2 || dy < -14 || dy > BUILD_TOP) return false;
 		if (adx <= WALL_END + 2 && adz > WALL_Z - 2) return false;
-		if (adx >= TEMPLE_FRONT - 3 && adx <= TEMPLE_BACK + 1 && adz <= STAIR_OUT + 1 && dy >= 0) return false;
+		if (inGoalField(adx, dy, dz) || byDoor(adx, dy, dz)) return false;
 		for (Monolith m : MONOLITHS) {
 			if (Math.abs(adx - m.x()) <= MONO_REACH + 1 && Math.abs(dz - m.z()) <= MONO_REACH + 1) return false;
 		}
 		return true;
 	}
+
+	/** Inside a goal's force field (or over it): nobody builds there, so a goal can't be blocked up. */
+	public static boolean inGoalField(int adx, int dy, int dz) {
+		return Math.max(Math.abs(adx - GOAL_X), Math.abs(dz)) <= FIELD_RING && dy >= TOP - GOAL_DEPTH && dy <= BUILD_TOP;
+	}
+
+	/** In or just outside a temple's door (so nobody can shut a team in its room). */
+	public static boolean byDoor(int adx, int dy, int dz) {
+		return adx >= TEMPLE_FRONT - 2 && adx <= ROOM_TO && Math.abs(dz) <= DOOR_HALF + 1 && dy >= 1 && dy <= DOOR_TOP + 1;
+	}
+
 
 	/** The cage: glass in the team's colour across the temple's door. */
 	public static BlockState cageBlock(int dx, int dy, int dz) {
@@ -547,7 +591,7 @@ public final class BridgeLayout {
 		int back = STAND_IN + 2 * ROWS;
 		// The force field between the playing area and the stands (you can't get to the crowd; nor can you
 		// build round its ends).
-		if (adz == WALL_Z && adx <= WALL_END) return dy >= -3 && dy <= WALL_TOP ? field(ArenaBlocks.FIELD_WALL, dy - (WALL_TOP - 5)) : null;
+		if (adz == WALL_Z && adx <= WALL_END) return dy >= -3 && dy <= WALL_TOP ? field(ArenaBlocks.FIELD_WALL, dy - (WALL_TOP - 12)) : null;
 		if (adz < STAND_IN - 1 || adz > back + 4) return null;
 		// Under it all, an asteroid.
 		int floor = asteroidDepth(adx, adz);

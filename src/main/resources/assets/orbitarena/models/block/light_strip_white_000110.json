@@ -1,0 +1,12 @@
+{
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"north": "orbitarena:block/light_strip_white_14",
+		"south": "orbitarena:block/light_strip_white_14",
+		"west": "orbitarena:block/light_strip_white_6",
+		"east": "orbitarena:block/light_strip_white_10",
+		"up": "orbitarena:block/light_strip_white_13",
+		"down": "orbitarena:block/light_strip_white_14",
+		"particle": "orbitarena:block/light_strip_white_15"
+	}
+}

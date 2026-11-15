@@ -16,7 +16,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -24,9 +23,9 @@ import net.minecraft.world.level.material.MapColor;
 /**
  * The arena's own blocks, made for The Bridge (and free to build with: they're in their own creative tab):
  * <ul>
- * <li>light strips, green and red (and white): a glowing white core with a line of colour along each edge,
- * so a run of them laid flat reads as a band of light with a coloured line above and below, and stood up as a
- * strip with coloured sides;</li>
+ * <li>light strips, green and red (and white): a glowing white core edged with a line of colour, joined up
+ * with the strips beside them, so any run or panel of them reads as one light with the coloured line round its
+ * outside only;</li>
  * <li>bridge wool, blue and red: what the teams build with (soft like wool, but quick to mine with a pickaxe,
  * as the bridge servers' clay is);</li>
  * <li>force fields, blue and red: a glowing see-through wash fading out upwards, rising round each goal (you
@@ -47,9 +46,9 @@ public final class ArenaBlocks {
 	}
 
 	public static void register() {
-		LIGHT_GREEN = block("light_strip_green", light(MapColor.COLOR_LIGHT_GREEN), RotatedPillarBlock::new);
-		LIGHT_RED = block("light_strip_red", light(MapColor.COLOR_RED), RotatedPillarBlock::new);
-		LIGHT_WHITE = block("light_strip_white", light(MapColor.SNOW), RotatedPillarBlock::new);
+		LIGHT_GREEN = block("light_strip_green", light(MapColor.COLOR_LIGHT_GREEN), LightStripBlock::new);
+		LIGHT_RED = block("light_strip_red", light(MapColor.COLOR_RED), LightStripBlock::new);
+		LIGHT_WHITE = block("light_strip_white", light(MapColor.SNOW), LightStripBlock::new);
 		WOOL_BLUE = block("bridge_wool_blue", BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).strength(0.8F).sound(SoundType.WOOL), Block::new);
 		WOOL_RED = block("bridge_wool_red", BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(0.8F).sound(SoundType.WOOL), Block::new);
 		FIELD_BLUE = field("force_field_blue", MapColor.COLOR_BLUE, false);
