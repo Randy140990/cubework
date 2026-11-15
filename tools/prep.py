@@ -150,6 +150,10 @@ def main():
     remap = target["plugin"].endswith("-remap")
     build = build.replace("@MAPPINGS@", "\tmappings loom.officialMojangMappings()\n" if remap else "")
     build = build.replace("@CONTINUITY@", ("\t%s \"maven.modrinth:continuity:%s\"\n" % ("modCompileOnly" if remap else "compileOnly", continuity)) if continuity else "")
+    # FerriteCore rides inside the jar (Fabric loads the newest copy if a player has their own): it cuts
+    # the memory and start-up work of Cubework's block states. MIT licence, credited in README and notes.
+    ferrite = target.get("ferritecore")
+    build = build.replace("@FERRITECORE@", ("\tinclude \"maven.modrinth:ferrite-core:%s\"\n" % ferrite) if ferrite else "")
     build = build.replace("@MOD@", "modImplementation" if remap else "implementation")
     open(os.path.join(out, "build.gradle"), "w").write(build)
     shutil.copy(os.path.join(ROOT, "settings.gradle"), os.path.join(out, "settings.gradle"))

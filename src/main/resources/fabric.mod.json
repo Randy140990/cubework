@@ -29,6 +29,7 @@
     "cubework.continuity.mixins.json"
   ],
   "suggests": {
-    "continuity": "*"
+    "continuity": "*",
+    "modernfix": "*"
   }
 }
