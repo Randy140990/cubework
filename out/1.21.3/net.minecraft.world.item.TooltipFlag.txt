@@ -1,0 +1,8 @@
+Compiled from "TooltipFlag.java"
+public interface net.minecraft.world.item.TooltipFlag {
+  public static final net.minecraft.world.item.TooltipFlag$Default NORMAL;
+  public static final net.minecraft.world.item.TooltipFlag$Default ADVANCED;
+  public abstract boolean isAdvanced();
+  public abstract boolean isCreative();
+  static {};
+}

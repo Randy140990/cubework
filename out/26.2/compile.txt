@@ -1,0 +1,2199 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+
+> Configure project :
+Fabric Loom: 1.18.4
+
+> Task :compileJava
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/block/CwShape.java:9: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/block/CwShape.java:37: error: cannot find symbol
+	default BlockState getAppearance(BlockState state, BlockAndTintGetter renderView, BlockPos pos, Direction side, BlockState sourceState,
+	                                                   ^
+  symbol:   class BlockAndTintGetter
+  location: interface CwShape
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:25: error: cannot find symbol
+import net.minecraft.client.renderer.block.model.BlockModelDefinition;
+                                                ^
+  symbol:   class BlockModelDefinition
+  location: package net.minecraft.client.renderer.block.model
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:78: error: cannot find symbol
+	private static CompletableFuture<Map<Identifier, BlockModelDefinition>> load(PreparableReloadListener.SharedState shared, Executor executor) {
+	                                                 ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:102: error: cannot find symbol
+	private static void resolve(BlockStateResolver.Context resolver, Block block, Joining joining, BlockModelDefinition look, Identifier id) {
+	                                                                                               ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:107: error: cannot find symbol
+	static Map<BlockState, BlockStateModel.UnbakedRoot> instantiate(Block block, Joining joining, BlockModelDefinition look, String name) {
+	                                                                                              ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:17: error: package net.fabricmc.fabric.api.client.keybinding.v1 does not exist
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+                                                   ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:12: error: package net.fabricmc.fabric.api.client.rendering.v1.world does not exist
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+                                                        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:13: error: package net.fabricmc.fabric.api.client.rendering.v1.world does not exist
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+                                                        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:15: error: cannot find symbol
+import net.minecraft.client.renderer.MultiBufferSource;
+                                    ^
+  symbol:   class MultiBufferSource
+  location: package net.minecraft.client.renderer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:16: error: cannot find symbol
+import net.minecraft.client.renderer.ShapeRenderer;
+                                    ^
+  symbol:   class ShapeRenderer
+  location: package net.minecraft.client.renderer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:51: error: cannot find symbol
+	private static void render(WorldRenderContext ctx) {
+	                           ^
+  symbol:   class WorldRenderContext
+  location: class ToolRender
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:19: error: cannot find symbol
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+                                    ^
+  symbol:   class ItemBlockRenderTypes
+  location: package net.minecraft.client.renderer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:22: error: cannot find symbol
+import net.minecraft.client.renderer.block.model.TextureSlots;
+                                                ^
+  symbol:   class TextureSlots
+  location: package net.minecraft.client.renderer.block.model
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:24: error: cannot find symbol
+import net.minecraft.client.renderer.item.BlockModelWrapper;
+                                         ^
+  symbol:   class BlockModelWrapper
+  location: package net.minecraft.client.renderer.item
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:31: error: cannot find symbol
+import net.minecraft.client.resources.model.BlockModelRotation;
+                                           ^
+  symbol:   class BlockModelRotation
+  location: package net.minecraft.client.resources.model
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:26: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:27: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:30: error: cannot find symbol
+import net.minecraft.client.renderer.block.model.BlockModelDefinition;
+                                                ^
+  symbol:   class BlockModelDefinition
+  location: package net.minecraft.client.renderer.block.model
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:48: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:198: error: cannot find symbol
+	static Material material(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+	                         ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:230: error: cannot find symbol
+	private static CompletableFuture<Map<String, Map<Family, BlockModelDefinition>>> load(PreparableReloadListener.SharedState shared, Executor executor) {
+	                                                         ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:261: error: cannot find symbol
+	private static void resolve(BlockStateResolver.Context resolver, Block block, CwBlocks.Info info, Map<Family, BlockModelDefinition> families, Sprites sprites) {
+	                                                                                                              ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:421: error: cannot find symbol
+	static int hiddenFaces(BlockAndTintGetter world, BlockPos pos, BlockState state, Material m) {
+	                       ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:356: error: cannot find symbol
+		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+		                      ^
+  symbol:   class QuadEmitter
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:356: error: cannot find symbol
+		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+		                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:370: error: cannot find symbol
+		private boolean retexture(MutableQuadView q, TextureAtlasSprite[] mat, int hidden) {
+		                          ^
+  symbol:   class MutableQuadView
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:397: error: cannot find symbol
+		public Object createGeometryKey(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random) {
+		                                ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:411: error: cannot find symbol
+		public TextureAtlasSprite particleSprite(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+		                                         ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:495: error: cannot find symbol
+		private int joins(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+		                  ^
+  symbol:   class BlockAndTintGetter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:501: error: cannot find symbol
+		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+		                      ^
+  symbol:   class QuadEmitter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:501: error: cannot find symbol
+		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+		                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:525: error: cannot find symbol
+		private static void emit(QuadEmitter emitter, Models.Built b, Predicate<Direction> cullTest) {
+		                         ^
+  symbol:   class QuadEmitter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:549: error: cannot find symbol
+		public Object createGeometryKey(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random) {
+		                                ^
+  symbol:   class BlockAndTintGetter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:561: error: cannot find symbol
+		public TextureAtlasSprite particleSprite(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+		                                         ^
+  symbol:   class BlockAndTintGetter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:7: error: cannot find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:10: error: package net.minecraft.client.gui.render.state does not exist
+import net.minecraft.client.gui.render.state.GuiElementRenderState;
+                                            ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:319: error: cannot find symbol
+	void submit(GuiGraphics g) {
+	            ^
+  symbol:   class GuiGraphics
+  location: class Rings
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:326: error: cannot find symbol
+	private record Shapes(Matrix3x2f pose, float[] xy, int[] colour, int quads, ScreenRectangle bounds) implements GuiElementRenderState {
+	                                                                                                               ^
+  symbol:   class GuiElementRenderState
+  location: class Rings
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:8: error: package net.fabricmc.fabric.api.client.keybinding.v1 does not exist
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+                                                   ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:10: error: cannot find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Lettering.java:20: error: cannot find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:268: error: cannot find symbol
+	public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float delta) {
+	                             ^
+  symbol:   class GuiGraphics
+  location: class WheelScreen
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:280: error: cannot find symbol
+	public void render(GuiGraphics g, int mx, int my, float delta) {
+	                   ^
+  symbol:   class GuiGraphics
+  location: class WheelScreen
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Lettering.java:193: error: cannot find symbol
+	static void draw(GuiGraphics g, Face f, float capPx, String s, float x, float baseline, float trackPx, int colour, float scale) {
+	                 ^
+  symbol:   class GuiGraphics
+  location: class Lettering
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:8: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:14: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:37: error: cannot find symbol
+	private BlockStateModel at(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+	                           ^
+  symbol:   class BlockAndTintGetter
+  location: class JoinedModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:47: error: cannot find symbol
+	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+	                      ^
+  symbol:   class QuadEmitter
+  location: class JoinedModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:47: error: cannot find symbol
+	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+	                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class JoinedModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:52: error: cannot find symbol
+	public Object createGeometryKey(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random) {
+	                                ^
+  symbol:   class BlockAndTintGetter
+  location: class JoinedModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:5: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:9: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:20: error: cannot find symbol
+	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                            ^
+  symbol:   class MutableQuadView
+  location: class SimpleOverlayMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:20: error: cannot find symbol
+	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                                                                             ^
+  symbol:   class BlockAndTintGetter
+  location: class SimpleOverlayMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:27: error: cannot find symbol
+	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                          ^
+  symbol:   class MutableQuadView
+  location: class SimpleOverlayMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:27: error: cannot find symbol
+	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                                                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class SimpleOverlayMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:3: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:15: error: cannot find symbol
+	private static final ThreadLocal<QuadView> CURRENT = new ThreadLocal<>();
+	                                 ^
+  symbol:   class QuadView
+  location: class OverlayQuads
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:21: error: cannot find symbol
+	public static void begin(QuadView quad, BlockState state) {
+	                         ^
+  symbol:   class QuadView
+  location: class OverlayQuads
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:30: error: cannot find symbol
+	public static QuadView current() {
+	              ^
+  symbol:   class QuadView
+  location: class OverlayQuads
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:4: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:5: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:17: error: cannot find symbol
+	private static QuadEmitter cubework$followShape(QuadEmitter emitter, Direction face, float left, float bottom, float right, float top, float depth) {
+	                                                ^
+  symbol:   class QuadEmitter
+  location: class QuadUtilMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:17: error: cannot find symbol
+	private static QuadEmitter cubework$followShape(QuadEmitter emitter, Direction face, float left, float bottom, float right, float top, float depth) {
+	               ^
+  symbol:   class QuadEmitter
+  location: class QuadUtilMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:6: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:9: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:20: error: cannot find symbol
+	private boolean cubework$anyShapeFace(QuadView quad, QuadView same, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos,
+	                                      ^
+  symbol:   class QuadView
+  location: class OverlayPredicateMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:20: error: cannot find symbol
+	private boolean cubework$anyShapeFace(QuadView quad, QuadView same, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos,
+	                                                     ^
+  symbol:   class QuadView
+  location: class OverlayPredicateMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:20: error: cannot find symbol
+	private boolean cubework$anyShapeFace(QuadView quad, QuadView same, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos,
+	                                                                                               ^
+  symbol:   class BlockAndTintGetter
+  location: class OverlayPredicateMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:5: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:9: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:26: error: cannot find symbol
+	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                            ^
+  symbol:   class MutableQuadView
+  location: class OverlayProcessorMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:26: error: cannot find symbol
+	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                                                                             ^
+  symbol:   class BlockAndTintGetter
+  location: class OverlayProcessorMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:33: error: cannot find symbol
+	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                          ^
+  symbol:   class MutableQuadView
+  location: class OverlayProcessorMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:33: error: cannot find symbol
+	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                                                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class OverlayProcessorMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/block/LightFixtureBlock.java:152: error: cannot find symbol
+		DyeColor colour = dye.getDyeColor();
+		                     ^
+  symbol:   method getDyeColor()
+  location: variable dye of type DyeItem
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:67: error: cannot find symbol
+				BlockModelDefinition look = looks.get(id);
+				^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:67: error: cannot find symbol
+				BlockModelDefinition look = looks.get(id);
+				                                 ^
+  symbol:   method get(Identifier)
+  location: variable looks of type Object
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:81: error: cannot find symbol
+			List<CompletableFuture<Map.Entry<Identifier, BlockModelDefinition>>> reads = new ArrayList<>(files.size());
+			                                             ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:81: error: incompatible types: cannot infer type arguments for ArrayList<>
+			List<CompletableFuture<Map.Entry<Identifier, BlockModelDefinition>>> reads = new ArrayList<>(files.size());
+			                                                                                          ^
+    reason: inferred type does not conform to equality constraint(s)
+      inferred: Object
+      equality constraints(s): CompletableFuture<Entry<Identifier,BlockModelDefinition>>
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:87: error: package BlockModelDefinition does not exist
+						return Map.entry(id, BlockModelDefinition.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(JsonParseException::new));
+						                                         ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:95: error: cannot find symbol
+				Map<Identifier, BlockModelDefinition> out = new HashMap<>(list.size() * 2);
+				                ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:96: error: cannot find symbol
+				for (Map.Entry<Identifier, BlockModelDefinition> e : list) if (e != null) out.put(e.getKey(), e.getValue());
+				                           ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:80: error: incompatible types: inferred type does not conform to equality constraint(s)
+		return CompletableFuture.supplyAsync(() -> LISTER.listMatchingResources(resources), executor).thenCompose(files -> {
+		                                                                                                         ^
+    inferred: Object
+    equality constraints(s): Map<Identifier,BlockModelDefinition>
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:37: error: cannot find symbol
+		WHEEL = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.cubework.wheel", InputConstants.Type.KEYSYM, 71,
+		        ^
+  symbol:   variable KeyBindingHelper
+  location: class CubeworkClient
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:42: error: cannot find symbol
+				if (mc.screen == null && !WheelScreen.keyDown(WHEEL)) WheelScreen.holdOff = false;
+				      ^
+  symbol:   variable screen
+  location: variable mc of type Minecraft
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:47: error: cannot find symbol
+				if (mc.screen != null || mc.player == null) continue;
+				      ^
+  symbol:   variable screen
+  location: variable mc of type Minecraft
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:51: error: cannot find symbol
+					mc.player.displayClientMessage(Component.literal(held.isEmpty()
+					         ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type LocalPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:56: error: cannot find symbol
+				mc.setScreen(new WheelScreen(wheel, WHEEL));
+				  ^
+  symbol:   method setScreen(WheelScreen)
+  location: variable mc of type Minecraft
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:48: error: package WorldRenderEvents does not exist
+		WorldRenderEvents.AFTER_ENTITIES.register(ToolRender::render);
+		                 ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:54: error: cannot find symbol
+		MultiBufferSource buffers = ctx.consumers();
+		^
+  symbol:   class MultiBufferSource
+  location: class ToolRender
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:143: error: cannot find symbol
+		ShapeRenderer.renderShape(pose, lines, shape, at.getX() - cam.x, at.getY() - cam.y, at.getZ() - cam.z, colour, 2.0f);
+		^
+  symbol:   variable ShapeRenderer
+  location: class ToolRender
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:59: error: com.insidethecube.cubework.client.MaterialItemModel.Unbaked is not abstract and does not override abstract method bake(BakingContext,Matrix4fc) in net.minecraft.client.renderer.item.ItemModel.Unbaked
+	public record Unbaked(Map<String, Look> looks) implements ItemModel.Unbaked {
+	       ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:68: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:80: error: cannot find symbol
+					TextureSlots slots = model.getTopTextureSlots();
+					^
+  symbol:   class TextureSlots
+  location: class Unbaked
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:81: error: cannot find symbol
+					List<BakedQuad> quads = model.bakeTopGeometry(slots, baker, BlockModelRotation.IDENTITY).getAll();
+					                                                            ^
+  symbol:   variable BlockModelRotation
+  location: class Unbaked
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:82: error: cannot find symbol
+					layers.add(new Layer(quads, ModelRenderProperties.fromResolvedModel(baker, model, slots), Suppliers.memoize(() -> BlockModelWrapper.computeExtents(quads)),
+					                                                                                                                  ^
+  symbol:   variable BlockModelWrapper
+  location: class Unbaked
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:132: error: cannot find symbol
+			if (look.tint()) l.prepareTintLayers(1)[0] = GRASS;
+			                  ^
+  symbol:   method prepareTintLayers(int)
+  location: variable l of type ItemStackRenderState.LayerRenderState
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:134: error: cannot find symbol
+			l.setRenderType(type);
+			 ^
+  symbol:   method setRenderType(RenderType)
+  location: variable l of type ItemStackRenderState.LayerRenderState
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:139: error: cannot find symbol
+				l.setParticleIcon(mat[MaterialModels.SIDE]);
+				 ^
+  symbol:   method setParticleIcon(TextureAtlasSprite)
+  location: variable l of type ItemStackRenderState.LayerRenderState
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:147: error: cannot find symbol
+		if (stack.getItem() instanceof BlockItem bi && ItemBlockRenderTypes.getChunkRenderType(bi.getBlock().defaultBlockState()) == ChunkSectionLayer.TRANSLUCENT) {
+		                                               ^
+  symbol:   variable ItemBlockRenderTypes
+  location: class MaterialItemModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:150: error: cannot find symbol
+		return Sheets.cutoutBlockSheet();
+		             ^
+  symbol:   method cutoutBlockSheet()
+  location: class Sheets
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:179: error: cannot find symbol
+			int slot = sprites.slotOf(q.sprite());
+			                           ^
+  symbol:   method sprite()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:184: error: cannot find symbol
+			TextureAtlasSprite from = q.sprite(), to = mat[slot];
+			                           ^
+  symbol:   method sprite()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:192: error: cannot find symbol
+					q.shade(), q.lightEmission()));
+					            ^
+  symbol:   method lightEmission()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:192: error: cannot find symbol
+					q.shade(), q.lightEmission()));
+					 ^
+  symbol:   method shade()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:191: error: cannot find symbol
+			out.add(new BakedQuad(q.position0(), q.position1(), q.position2(), q.position3(), uv[0], uv[1], uv[2], uv[3], q.tintIndex(), q.direction(), to,
+			                                                                                                               ^
+  symbol:   method tintIndex()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:219: error: cannot find symbol
+				Map<Family, BlockModelDefinition> families = looks.get(shape.suffix);
+				            ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:219: error: cannot find symbol
+				Map<Family, BlockModelDefinition> families = looks.get(shape.suffix);
+				                                                  ^
+  symbol:   method get(String)
+  location: variable looks of type Object
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:243: error: package BlockModelDefinition does not exist
+						return new Object[] {path.substring(0, slash), family, BlockModelDefinition.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(JsonParseException::new)};
+						                                                                           ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:251: error: cannot find symbol
+				Map<String, Map<Family, BlockModelDefinition>> out = new HashMap<>();
+				                        ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:251: error: incompatible types: cannot infer type arguments for HashMap<>
+				Map<String, Map<Family, BlockModelDefinition>> out = new HashMap<>();
+				                                                                ^
+    reason: inferred type does not conform to equality constraint(s)
+      inferred: Object
+      equality constraints(s): Map<Family,BlockModelDefinition>
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:254: error: cannot find symbol
+					out.computeIfAbsent((String) e[0], k -> new EnumMap<>(Family.class)).put((Family) e[1], (BlockModelDefinition) e[2]);
+					                                                                                         ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:232: error: incompatible types: inferred type does not conform to equality constraint(s)
+		return CompletableFuture.supplyAsync(() -> LISTER.listMatchingResources(resources), executor).thenCompose(files -> {
+		                                                                                                         ^
+    inferred: Object
+    equality constraints(s): Map<String,Map<Family,BlockModelDefinition>>,U
+  where U,T are type-variables:
+    U extends Object declared in method <U>thenApply(Function<? super T,? extends U>)
+    T extends Object declared in class CompletableFuture
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:264: error: cannot find symbol
+		for (Map.Entry<Family, BlockModelDefinition> e : families.entrySet()) {
+		                       ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:338: error: MaterialModel is not abstract and does not override abstract method materialFlags() in BlockStateModel
+	private static final class MaterialModel implements BlockStateModel {
+	                     ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:403: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:407: error: cannot find symbol
+			return mat != null ? mat[SIDE] : looks[0].particleIcon();
+			                                         ^
+  symbol:   method particleIcon()
+  location: interface BlockStateModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:410: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:438: error: Retextured is not abstract and does not override abstract method materialFlags() in BlockStateModelPart
+	private record Retextured(BlockStateModelPart part, Sprites sprites, TextureAtlasSprite[] mat) implements BlockStateModelPart {
+	        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:449: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:478: error: DrawnModel is not abstract and does not override abstract method materialFlags() in BlockStateModel
+	private record DrawnModel(Block block, CwBlocks.Info info, BlockState look, Sprites sprites, Map<Drawn, Models.Built> made) implements BlockStateModel {
+	        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:553: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:560: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:568: error: DrawnPart is not abstract and does not override abstract method materialFlags() in BlockStateModelPart
+	private record DrawnPart(Models.Built built) implements BlockStateModelPart {
+	        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:581: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:327: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:337: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:342: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:347: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:267: error: method does not override or implement a method from a supertype
+	@Override
+	^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:279: error: method does not override or implement a method from a supertype
+	@Override
+	^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:668: error: cannot find symbol
+		InputConstants.Key bound = KeyBindingHelper.getBoundKeyOf(key);
+		                           ^
+  symbol:   variable KeyBindingHelper
+  location: class WheelScreen
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:675: error: cannot find symbol
+		InputConstants.Key bound = KeyBindingHelper.getBoundKeyOf(key);
+		                           ^
+  symbol:   variable KeyBindingHelper
+  location: class WheelScreen
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/ShapeSwap.java:125: error: cannot find symbol
+		player.displayClientMessage(Component.literal(text), true);
+		      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolHints.java:38: error: cannot find symbol
+		if (hint != null) mc.player.displayClientMessage(Component.literal(hint), true);
+		                           ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type LocalPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/net/Payloads.java:53: error: cannot find symbol
+		PayloadTypeRegistry.playC2S().register(PickShape.TYPE, PickShape.CODEC);
+		                   ^
+  symbol:   method playC2S()
+  location: interface PayloadTypeRegistry
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/net/Payloads.java:54: error: cannot find symbol
+		PayloadTypeRegistry.playC2S().register(ToolSetting.TYPE, ToolSetting.CODEC);
+		                   ^
+  symbol:   method playC2S()
+  location: interface PayloadTypeRegistry
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/net/Payloads.java:55: error: cannot find symbol
+		PayloadTypeRegistry.playC2S().register(ToolAction.TYPE, ToolAction.CODEC);
+		                   ^
+  symbol:   method playC2S()
+  location: interface PayloadTypeRegistry
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/ToolActions.java:34: error: cannot find symbol
+			player.displayClientMessage(Component.literal(GuideShapes.describe(ToolData.get(held)) + (n > 0 ? ": " + n + " blocks" : "")), true);
+			      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/ToolActions.java:44: error: cannot find symbol
+				player.displayClientMessage(Component.literal(n < 0 ? "Nothing to undo." : "Put back " + n + " blocks."), true);
+				      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/ToolActions.java:52: error: cannot find symbol
+				player.displayClientMessage(Component.literal("Guide cleared."), true);
+				      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/TerrainBrushItem.java:49: error: cannot find symbol
+		player.displayClientMessage(Component.literal(changed == 0 ? "Nothing to smooth here." : "Smoothed " + changed + " blocks. Undo is on the wheel."),
+		      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/BuildersGuideItem.java:46: error: cannot find symbol
+			player.displayClientMessage(Component.literal((end ? "Line end placed. " : "Guide placed (gold). ") + GuideShapes.describe(ToolData.get(stack)) + ", "
+			      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type Player
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:18: error: cannot find symbol
+		QuadView quad = OverlayQuads.current();
+		^
+  symbol:   class QuadView
+  location: class QuadUtilMixin
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+146 errors
+
+> Task :compileJava FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1794778131729.json
+
+[Incubating] Problems report is available at: file:///home/runner/work/cubework/cubework/build/v/26.2/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+> Compilation failed; see the compiler output below.
+  Note: Recompile with -Xlint:deprecation for details.
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:59: error: com.insidethecube.cubework.client.MaterialItemModel.Unbaked is not abstract and does not override abstract method bake(BakingContext,Matrix4fc) in net.minecraft.client.renderer.item.ItemModel.Unbaked
+  	public record Unbaked(Map<String, Look> looks) implements ItemModel.Unbaked {
+  	       ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:338: error: MaterialModel is not abstract and does not override abstract method materialFlags() in BlockStateModel
+  	private static final class MaterialModel implements BlockStateModel {
+  	                     ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:438: error: Retextured is not abstract and does not override abstract method materialFlags() in BlockStateModelPart
+  	private record Retextured(BlockStateModelPart part, Sprites sprites, TextureAtlasSprite[] mat) implements BlockStateModelPart {
+  	        ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:478: error: DrawnModel is not abstract and does not override abstract method materialFlags() in BlockStateModel
+  	private record DrawnModel(Block block, CwBlocks.Info info, BlockState look, Sprites sprites, Map<Drawn, Models.Built> made) implements BlockStateModel {
+  	        ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:568: error: DrawnPart is not abstract and does not override abstract method materialFlags() in BlockStateModelPart
+  	private record DrawnPart(Models.Built built) implements BlockStateModelPart {
+  	        ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:81: error: incompatible types: cannot infer type arguments for ArrayList<>
+  			List<CompletableFuture<Map.Entry<Identifier, BlockModelDefinition>>> reads = new ArrayList<>(files.size());
+  			                                                                                          ^
+      reason: inferred type does not conform to equality constraint(s)
+        inferred: Object
+        equality constraints(s): CompletableFuture<Entry<Identifier,BlockModelDefinition>>
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:80: error: incompatible types: inferred type does not conform to equality constraint(s)
+  		return CompletableFuture.supplyAsync(() -> LISTER.listMatchingResources(resources), executor).thenCompose(files -> {
+  		                                                                                                         ^
+      inferred: Object
+      equality constraints(s): Map<Identifier,BlockModelDefinition>
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:251: error: incompatible types: cannot infer type arguments for HashMap<>
+  				Map<String, Map<Family, BlockModelDefinition>> out = new HashMap<>();
+  				                                                                ^
+      reason: inferred type does not conform to equality constraint(s)
+        inferred: Object
+        equality constraints(s): Map<Family,BlockModelDefinition>
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:232: error: incompatible types: inferred type does not conform to equality constraint(s)
+  		return CompletableFuture.supplyAsync(() -> LISTER.listMatchingResources(resources), executor).thenCompose(files -> {
+  		                                                                                                         ^
+      inferred: Object
+      equality constraints(s): Map<String,Map<Family,BlockModelDefinition>>,U
+    where U,T are type-variables:
+      U extends Object declared in method <U>thenApply(Function<? super T,? extends U>)
+      T extends Object declared in class CompletableFuture
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/block/CwShape.java:9: error: cannot find symbol
+  import net.minecraft.world.level.BlockAndTintGetter;
+                                  ^
+    symbol:   class BlockAndTintGetter
+    location: package net.minecraft.world.level
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/block/CwShape.java:37: error: cannot find symbol
+  	default BlockState getAppearance(BlockState state, BlockAndTintGetter renderView, BlockPos pos, Direction side, BlockState sourceState,
+  	                                                   ^
+    symbol:   class BlockAndTintGetter
+    location: interface CwShape
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:25: error: cannot find symbol
+  import net.minecraft.client.renderer.block.model.BlockModelDefinition;
+                                                  ^
+    symbol:   class BlockModelDefinition
+    location: package net.minecraft.client.renderer.block.model
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:78: error: cannot find symbol
+  	private static CompletableFuture<Map<Identifier, BlockModelDefinition>> load(PreparableReloadListener.SharedState shared, Executor executor) {
+  	                                                 ^
+    symbol:   class BlockModelDefinition
+    location: class JoinedModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:102: error: cannot find symbol
+  	private static void resolve(BlockStateResolver.Context resolver, Block block, Joining joining, BlockModelDefinition look, Identifier id) {
+  	                                                                                               ^
+    symbol:   class BlockModelDefinition
+    location: class JoinedModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:107: error: cannot find symbol
+  	static Map<BlockState, BlockStateModel.UnbakedRoot> instantiate(Block block, Joining joining, BlockModelDefinition look, String name) {
+  	                                                                                              ^
+    symbol:   class BlockModelDefinition
+    location: class JoinedModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:15: error: cannot find symbol
+  import net.minecraft.client.renderer.MultiBufferSource;
+                                      ^
+    symbol:   class MultiBufferSource
+    location: package net.minecraft.client.renderer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:16: error: cannot find symbol
+  import net.minecraft.client.renderer.ShapeRenderer;
+                                      ^
+    symbol:   class ShapeRenderer
+    location: package net.minecraft.client.renderer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:51: error: cannot find symbol
+  	private static void render(WorldRenderContext ctx) {
+  	                           ^
+    symbol:   class WorldRenderContext
+    location: class ToolRender
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:19: error: cannot find symbol
+  import net.minecraft.client.renderer.ItemBlockRenderTypes;
+                                      ^
+    symbol:   class ItemBlockRenderTypes
+    location: package net.minecraft.client.renderer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:22: error: cannot find symbol
+  import net.minecraft.client.renderer.block.model.TextureSlots;
+                                                  ^
+    symbol:   class TextureSlots
+    location: package net.minecraft.client.renderer.block.model
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:24: error: cannot find symbol
+  import net.minecraft.client.renderer.item.BlockModelWrapper;
+                                           ^
+    symbol:   class BlockModelWrapper
+    location: package net.minecraft.client.renderer.item
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:31: error: cannot find symbol
+  import net.minecraft.client.resources.model.BlockModelRotation;
+                                             ^
+    symbol:   class BlockModelRotation
+    location: package net.minecraft.client.resources.model
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:30: error: cannot find symbol
+  import net.minecraft.client.renderer.block.model.BlockModelDefinition;
+                                                  ^
+    symbol:   class BlockModelDefinition
+    location: package net.minecraft.client.renderer.block.model
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:48: error: cannot find symbol
+  import net.minecraft.world.level.BlockAndTintGetter;
+                                  ^
+    symbol:   class BlockAndTintGetter
+    location: package net.minecraft.world.level
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:198: error: cannot find symbol
+  	static Material material(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+  	                         ^
+    symbol:   class BlockAndTintGetter
+    location: class MaterialModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:230: error: cannot find symbol
+  	private static CompletableFuture<Map<String, Map<Family, BlockModelDefinition>>> load(PreparableReloadListener.SharedState shared, Executor executor) {
+  	                                                         ^
+    symbol:   class BlockModelDefinition
+    location: class MaterialModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:261: error: cannot find symbol
+  	private static void resolve(BlockStateResolver.Context resolver, Block block, CwBlocks.Info info, Map<Family, BlockModelDefinition> families, Sprites sprites) {
+  	                                                                                                              ^
+    symbol:   class BlockModelDefinition
+    location: class MaterialModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:421: error: cannot find symbol
+  	static int hiddenFaces(BlockAndTintGetter world, BlockPos pos, BlockState state, Material m) {
+  	                       ^
+    symbol:   class BlockAndTintGetter
+    location: class MaterialModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:356: error: cannot find symbol
+  		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+  		                      ^
+    symbol:   class QuadEmitter
+    location: class MaterialModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:356: error: cannot find symbol
+  		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+  		                                           ^
+    symbol:   class BlockAndTintGetter
+    location: class MaterialModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:370: error: cannot find symbol
+  		private boolean retexture(MutableQuadView q, TextureAtlasSprite[] mat, int hidden) {
+  		                          ^
+    symbol:   class MutableQuadView
+    location: class MaterialModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:397: error: cannot find symbol
+  		public Object createGeometryKey(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random) {
+  		                                ^
+    symbol:   class BlockAndTintGetter
+    location: class MaterialModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:411: error: cannot find symbol
+  		public TextureAtlasSprite particleSprite(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+  		                                         ^
+    symbol:   class BlockAndTintGetter
+    location: class MaterialModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:495: error: cannot find symbol
+  		private int joins(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+  		                  ^
+    symbol:   class BlockAndTintGetter
+    location: class DrawnModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:501: error: cannot find symbol
+  		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+  		                      ^
+    symbol:   class QuadEmitter
+    location: class DrawnModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:501: error: cannot find symbol
+  		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+  		                                           ^
+    symbol:   class BlockAndTintGetter
+    location: class DrawnModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:525: error: cannot find symbol
+  		private static void emit(QuadEmitter emitter, Models.Built b, Predicate<Direction> cullTest) {
+  		                         ^
+    symbol:   class QuadEmitter
+    location: class DrawnModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:549: error: cannot find symbol
+  		public Object createGeometryKey(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random) {
+  		                                ^
+    symbol:   class BlockAndTintGetter
+    location: class DrawnModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:561: error: cannot find symbol
+  		public TextureAtlasSprite particleSprite(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+  		                                         ^
+    symbol:   class BlockAndTintGetter
+    location: class DrawnModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:7: error: cannot find symbol
+  import net.minecraft.client.gui.GuiGraphics;
+                                 ^
+    symbol:   class GuiGraphics
+    location: package net.minecraft.client.gui
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:319: error: cannot find symbol
+  	void submit(GuiGraphics g) {
+  	            ^
+    symbol:   class GuiGraphics
+    location: class Rings
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:326: error: cannot find symbol
+  	private record Shapes(Matrix3x2f pose, float[] xy, int[] colour, int quads, ScreenRectangle bounds) implements GuiElementRenderState {
+  	                                                                                                               ^
+    symbol:   class GuiElementRenderState
+    location: class Rings
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:10: error: cannot find symbol
+  import net.minecraft.client.gui.GuiGraphics;
+                                 ^
+    symbol:   class GuiGraphics
+    location: package net.minecraft.client.gui
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Lettering.java:20: error: cannot find symbol
+  import net.minecraft.client.gui.GuiGraphics;
+                                 ^
+    symbol:   class GuiGraphics
+    location: package net.minecraft.client.gui
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:268: error: cannot find symbol
+  	public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float delta) {
+  	                             ^
+    symbol:   class GuiGraphics
+    location: class WheelScreen
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:280: error: cannot find symbol
+  	public void render(GuiGraphics g, int mx, int my, float delta) {
+  	                   ^
+    symbol:   class GuiGraphics
+    location: class WheelScreen
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Lettering.java:193: error: cannot find symbol
+  	static void draw(GuiGraphics g, Face f, float capPx, String s, float x, float baseline, float trackPx, int colour, float scale) {
+  	                 ^
+    symbol:   class GuiGraphics
+    location: class Lettering
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:14: error: cannot find symbol
+  import net.minecraft.world.level.BlockAndTintGetter;
+                                  ^
+    symbol:   class BlockAndTintGetter
+    location: package net.minecraft.world.level
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:37: error: cannot find symbol
+  	private BlockStateModel at(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+  	                           ^
+    symbol:   class BlockAndTintGetter
+    location: class JoinedModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:47: error: cannot find symbol
+  	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+  	                      ^
+    symbol:   class QuadEmitter
+    location: class JoinedModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:47: error: cannot find symbol
+  	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+  	                                           ^
+    symbol:   class BlockAndTintGetter
+    location: class JoinedModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:52: error: cannot find symbol
+  	public Object createGeometryKey(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random) {
+  	                                ^
+    symbol:   class BlockAndTintGetter
+    location: class JoinedModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:9: error: cannot find symbol
+  import net.minecraft.world.level.BlockAndTintGetter;
+                                  ^
+    symbol:   class BlockAndTintGetter
+    location: package net.minecraft.world.level
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:20: error: cannot find symbol
+  	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+  	                            ^
+    symbol:   class MutableQuadView
+    location: class SimpleOverlayMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:20: error: cannot find symbol
+  	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+  	                                                                             ^
+    symbol:   class BlockAndTintGetter
+    location: class SimpleOverlayMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:27: error: cannot find symbol
+  	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+  	                          ^
+    symbol:   class MutableQuadView
+    location: class SimpleOverlayMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:27: error: cannot find symbol
+  	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+  	                                                                           ^
+    symbol:   class BlockAndTintGetter
+    location: class SimpleOverlayMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:15: error: cannot find symbol
+  	private static final ThreadLocal<QuadView> CURRENT = new ThreadLocal<>();
+  	                                 ^
+    symbol:   class QuadView
+    location: class OverlayQuads
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:21: error: cannot find symbol
+  	public static void begin(QuadView quad, BlockState state) {
+  	                         ^
+    symbol:   class QuadView
+    location: class OverlayQuads
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:30: error: cannot find symbol
+  	public static QuadView current() {
+  	              ^
+    symbol:   class QuadView
+    location: class OverlayQuads
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:17: error: cannot find symbol
+  	private static QuadEmitter cubework$followShape(QuadEmitter emitter, Direction face, float left, float bottom, float right, float top, float depth) {
+  	                                                ^
+    symbol:   class QuadEmitter
+    location: class QuadUtilMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:17: error: cannot find symbol
+  	private static QuadEmitter cubework$followShape(QuadEmitter emitter, Direction face, float left, float bottom, float right, float top, float depth) {
+  	               ^
+    symbol:   class QuadEmitter
+    location: class QuadUtilMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:9: error: cannot find symbol
+  import net.minecraft.world.level.BlockAndTintGetter;
+                                  ^
+    symbol:   class BlockAndTintGetter
+    location: package net.minecraft.world.level
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:20: error: cannot find symbol
+  	private boolean cubework$anyShapeFace(QuadView quad, QuadView same, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos,
+  	                                      ^
+    symbol:   class QuadView
+    location: class OverlayPredicateMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:20: error: cannot find symbol
+  	private boolean cubework$anyShapeFace(QuadView quad, QuadView same, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos,
+  	                                                     ^
+    symbol:   class QuadView
+    location: class OverlayPredicateMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:20: error: cannot find symbol
+  	private boolean cubework$anyShapeFace(QuadView quad, QuadView same, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos,
+  	                                                                                               ^
+    symbol:   class BlockAndTintGetter
+    location: class OverlayPredicateMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:9: error: cannot find symbol
+  import net.minecraft.world.level.BlockAndTintGetter;
+                                  ^
+    symbol:   class BlockAndTintGetter
+    location: package net.minecraft.world.level
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:26: error: cannot find symbol
+  	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+  	                            ^
+    symbol:   class MutableQuadView
+    location: class OverlayProcessorMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:26: error: cannot find symbol
+  	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+  	                                                                             ^
+    symbol:   class BlockAndTintGetter
+    location: class OverlayProcessorMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:33: error: cannot find symbol
+  	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+  	                          ^
+    symbol:   class MutableQuadView
+    location: class OverlayProcessorMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:33: error: cannot find symbol
+  	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+  	                                                                           ^
+    symbol:   class BlockAndTintGetter
+    location: class OverlayProcessorMixin
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:67: error: cannot find symbol
+  				BlockModelDefinition look = looks.get(id);
+  				^
+    symbol:   class BlockModelDefinition
+    location: class JoinedModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:81: error: cannot find symbol
+  			List<CompletableFuture<Map.Entry<Identifier, BlockModelDefinition>>> reads = new ArrayList<>(files.size());
+  			                                             ^
+    symbol:   class BlockModelDefinition
+    location: class JoinedModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:95: error: cannot find symbol
+  				Map<Identifier, BlockModelDefinition> out = new HashMap<>(list.size() * 2);
+  				                ^
+    symbol:   class BlockModelDefinition
+    location: class JoinedModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:96: error: cannot find symbol
+  				for (Map.Entry<Identifier, BlockModelDefinition> e : list) if (e != null) out.put(e.getKey(), e.getValue());
+  				                           ^
+    symbol:   class BlockModelDefinition
+    location: class JoinedModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:37: error: cannot find symbol
+  		WHEEL = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.cubework.wheel", InputConstants.Type.KEYSYM, 71,
+  		        ^
+    symbol:   variable KeyBindingHelper
+    location: class CubeworkClient
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:42: error: cannot find symbol
+  				if (mc.screen == null && !WheelScreen.keyDown(WHEEL)) WheelScreen.holdOff = false;
+  				      ^
+    symbol:   variable screen
+    location: variable mc of type Minecraft
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:47: error: cannot find symbol
+  				if (mc.screen != null || mc.player == null) continue;
+  				      ^
+    symbol:   variable screen
+    location: variable mc of type Minecraft
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:54: error: cannot find symbol
+  		MultiBufferSource buffers = ctx.consumers();
+  		^
+    symbol:   class MultiBufferSource
+    location: class ToolRender
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:143: error: cannot find symbol
+  		ShapeRenderer.renderShape(pose, lines, shape, at.getX() - cam.x, at.getY() - cam.y, at.getZ() - cam.z, colour, 2.0f);
+  		^
+    symbol:   variable ShapeRenderer
+    location: class ToolRender
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:80: error: cannot find symbol
+  					TextureSlots slots = model.getTopTextureSlots();
+  					^
+    symbol:   class TextureSlots
+    location: class Unbaked
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:81: error: cannot find symbol
+  					List<BakedQuad> quads = model.bakeTopGeometry(slots, baker, BlockModelRotation.IDENTITY).getAll();
+  					                                                            ^
+    symbol:   variable BlockModelRotation
+    location: class Unbaked
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:82: error: cannot find symbol
+  					layers.add(new Layer(quads, ModelRenderProperties.fromResolvedModel(baker, model, slots), Suppliers.memoize(() -> BlockModelWrapper.computeExtents(quads)),
+  					                                                                                                                  ^
+    symbol:   variable BlockModelWrapper
+    location: class Unbaked
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:147: error: cannot find symbol
+  		if (stack.getItem() instanceof BlockItem bi && ItemBlockRenderTypes.getChunkRenderType(bi.getBlock().defaultBlockState()) == ChunkSectionLayer.TRANSLUCENT) {
+  		                                               ^
+    symbol:   variable ItemBlockRenderTypes
+    location: class MaterialItemModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:219: error: cannot find symbol
+  				Map<Family, BlockModelDefinition> families = looks.get(shape.suffix);
+  				            ^
+    symbol:   class BlockModelDefinition
+    location: class MaterialModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:251: error: cannot find symbol
+  				Map<String, Map<Family, BlockModelDefinition>> out = new HashMap<>();
+  				                        ^
+    symbol:   class BlockModelDefinition
+    location: class MaterialModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:254: error: cannot find symbol
+  					out.computeIfAbsent((String) e[0], k -> new EnumMap<>(Family.class)).put((Family) e[1], (BlockModelDefinition) e[2]);
+  					                                                                                         ^
+    symbol:   class BlockModelDefinition
+    location: class MaterialModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:264: error: cannot find symbol
+  		for (Map.Entry<Family, BlockModelDefinition> e : families.entrySet()) {
+  		                       ^
+    symbol:   class BlockModelDefinition
+    location: class MaterialModels
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:668: error: cannot find symbol
+  		InputConstants.Key bound = KeyBindingHelper.getBoundKeyOf(key);
+  		                           ^
+    symbol:   variable KeyBindingHelper
+    location: class WheelScreen
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:675: error: cannot find symbol
+  		InputConstants.Key bound = KeyBindingHelper.getBoundKeyOf(key);
+  		                           ^
+    symbol:   variable KeyBindingHelper
+    location: class WheelScreen
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:18: error: cannot find symbol
+  		QuadView quad = OverlayQuads.current();
+  		^
+    symbol:   class QuadView
+    location: class QuadUtilMixin
+  Note: Some input files use or override a deprecated API.
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:68: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:403: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:410: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:449: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:553: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:560: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:581: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:327: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:337: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:342: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:347: error: method does not override or implement a method from a supertype
+  		@Override
+  		^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:267: error: method does not override or implement a method from a supertype
+  	@Override
+  	^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:279: error: method does not override or implement a method from a supertype
+  	@Override
+  	^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/block/LightFixtureBlock.java:152: error: cannot find symbol
+  		DyeColor colour = dye.getDyeColor();
+  		                     ^
+    symbol:   method getDyeColor()
+    location: variable dye of type DyeItem
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:67: error: cannot find symbol
+  				BlockModelDefinition look = looks.get(id);
+  				                                 ^
+    symbol:   method get(Identifier)
+    location: variable looks of type Object
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:51: error: cannot find symbol
+  					mc.player.displayClientMessage(Component.literal(held.isEmpty()
+  					         ^
+    symbol:   method displayClientMessage(MutableComponent,boolean)
+    location: variable player of type LocalPlayer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:56: error: cannot find symbol
+  				mc.setScreen(new WheelScreen(wheel, WHEEL));
+  				  ^
+    symbol:   method setScreen(WheelScreen)
+    location: variable mc of type Minecraft
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:132: error: cannot find symbol
+  			if (look.tint()) l.prepareTintLayers(1)[0] = GRASS;
+  			                  ^
+    symbol:   method prepareTintLayers(int)
+    location: variable l of type ItemStackRenderState.LayerRenderState
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:134: error: cannot find symbol
+  			l.setRenderType(type);
+  			 ^
+    symbol:   method setRenderType(RenderType)
+    location: variable l of type ItemStackRenderState.LayerRenderState
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:139: error: cannot find symbol
+  				l.setParticleIcon(mat[MaterialModels.SIDE]);
+  				 ^
+    symbol:   method setParticleIcon(TextureAtlasSprite)
+    location: variable l of type ItemStackRenderState.LayerRenderState
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:150: error: cannot find symbol
+  		return Sheets.cutoutBlockSheet();
+  		             ^
+    symbol:   method cutoutBlockSheet()
+    location: class Sheets
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:179: error: cannot find symbol
+  			int slot = sprites.slotOf(q.sprite());
+  			                           ^
+    symbol:   method sprite()
+    location: variable q of type BakedQuad
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:184: error: cannot find symbol
+  			TextureAtlasSprite from = q.sprite(), to = mat[slot];
+  			                           ^
+    symbol:   method sprite()
+    location: variable q of type BakedQuad
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:192: error: cannot find symbol
+  					q.shade(), q.lightEmission()));
+  					            ^
+    symbol:   method lightEmission()
+    location: variable q of type BakedQuad
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:192: error: cannot find symbol
+  					q.shade(), q.lightEmission()));
+  					 ^
+    symbol:   method shade()
+    location: variable q of type BakedQuad
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:191: error: cannot find symbol
+  			out.add(new BakedQuad(q.position0(), q.position1(), q.position2(), q.position3(), uv[0], uv[1], uv[2], uv[3], q.tintIndex(), q.direction(), to,
+  			                                                                                                               ^
+    symbol:   method tintIndex()
+    location: variable q of type BakedQuad
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:219: error: cannot find symbol
+  				Map<Family, BlockModelDefinition> families = looks.get(shape.suffix);
+  				                                                  ^
+    symbol:   method get(String)
+    location: variable looks of type Object
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:407: error: cannot find symbol
+  			return mat != null ? mat[SIDE] : looks[0].particleIcon();
+  			                                         ^
+    symbol:   method particleIcon()
+    location: interface BlockStateModel
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/ShapeSwap.java:125: error: cannot find symbol
+  		player.displayClientMessage(Component.literal(text), true);
+  		      ^
+    symbol:   method displayClientMessage(MutableComponent,boolean)
+    location: variable player of type ServerPlayer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolHints.java:38: error: cannot find symbol
+  		if (hint != null) mc.player.displayClientMessage(Component.literal(hint), true);
+  		                           ^
+    symbol:   method displayClientMessage(MutableComponent,boolean)
+    location: variable player of type LocalPlayer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/net/Payloads.java:53: error: cannot find symbol
+  		PayloadTypeRegistry.playC2S().register(PickShape.TYPE, PickShape.CODEC);
+  		                   ^
+    symbol:   method playC2S()
+    location: interface PayloadTypeRegistry
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/net/Payloads.java:54: error: cannot find symbol
+  		PayloadTypeRegistry.playC2S().register(ToolSetting.TYPE, ToolSetting.CODEC);
+  		                   ^
+    symbol:   method playC2S()
+    location: interface PayloadTypeRegistry
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/net/Payloads.java:55: error: cannot find symbol
+  		PayloadTypeRegistry.playC2S().register(ToolAction.TYPE, ToolAction.CODEC);
+  		                   ^
+    symbol:   method playC2S()
+    location: interface PayloadTypeRegistry
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/ToolActions.java:34: error: cannot find symbol
+  			player.displayClientMessage(Component.literal(GuideShapes.describe(ToolData.get(held)) + (n > 0 ? ": " + n + " blocks" : "")), true);
+  			      ^
+    symbol:   method displayClientMessage(MutableComponent,boolean)
+    location: variable player of type ServerPlayer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/ToolActions.java:44: error: cannot find symbol
+  				player.displayClientMessage(Component.literal(n < 0 ? "Nothing to undo." : "Put back " + n + " blocks."), true);
+  				      ^
+    symbol:   method displayClientMessage(MutableComponent,boolean)
+    location: variable player of type ServerPlayer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/ToolActions.java:52: error: cannot find symbol
+  				player.displayClientMessage(Component.literal("Guide cleared."), true);
+  				      ^
+    symbol:   method displayClientMessage(MutableComponent,boolean)
+    location: variable player of type ServerPlayer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/TerrainBrushItem.java:49: error: cannot find symbol
+  		player.displayClientMessage(Component.literal(changed == 0 ? "Nothing to smooth here." : "Smoothed " + changed + " blocks. Undo is on the wheel."),
+  		      ^
+    symbol:   method displayClientMessage(MutableComponent,boolean)
+    location: variable player of type ServerPlayer
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/BuildersGuideItem.java:46: error: cannot find symbol
+  			player.displayClientMessage(Component.literal((end ? "Line end placed. " : "Guide placed (gold). ") + GuideShapes.describe(ToolData.get(stack)) + ", "
+  			      ^
+    symbol:   method displayClientMessage(MutableComponent,boolean)
+    location: variable player of type Player
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:17: error: package net.fabricmc.fabric.api.client.keybinding.v1 does not exist
+  import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+                                                     ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:12: error: package net.fabricmc.fabric.api.client.rendering.v1.world does not exist
+  import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+                                                          ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:13: error: package net.fabricmc.fabric.api.client.rendering.v1.world does not exist
+  import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+                                                          ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:26: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+  import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+                                                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:27: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+  import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+                                                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:10: error: package net.minecraft.client.gui.render.state does not exist
+  import net.minecraft.client.gui.render.state.GuiElementRenderState;
+                                              ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:8: error: package net.fabricmc.fabric.api.client.keybinding.v1 does not exist
+  import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+                                                     ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:8: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+  import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+                                                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:5: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+  import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+                                                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:3: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+  import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+                                                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:4: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+  import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+                                                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:5: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+  import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+                                                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:6: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+  import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+                                                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:5: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+  import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+                                                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:87: error: package BlockModelDefinition does not exist
+  						return Map.entry(id, BlockModelDefinition.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(JsonParseException::new));
+  						                                         ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:48: error: package WorldRenderEvents does not exist
+  		WorldRenderEvents.AFTER_ENTITIES.register(ToolRender::render);
+  		                 ^
+  /home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:243: error: package BlockModelDefinition does not exist
+  						return new Object[] {path.substring(0, slash), family, BlockModelDefinition.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(JsonParseException::new)};
+  						                                                                           ^
+  146 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':compileJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:135)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:288)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:133)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.DefaultNodeExecutor.executeLocalTaskNode(DefaultNodeExecutor.java:55)
+	at org.gradle.execution.plan.DefaultNodeExecutor.execute(DefaultNodeExecutor.java:34)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:355)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:343)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:328)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:65)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: org.gradle.api.internal.tasks.compile.CompilationFailedException: Compilation failed; see the compiler output below.
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/block/CwShape.java:9: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/block/CwShape.java:37: error: cannot find symbol
+	default BlockState getAppearance(BlockState state, BlockAndTintGetter renderView, BlockPos pos, Direction side, BlockState sourceState,
+	                                                   ^
+  symbol:   class BlockAndTintGetter
+  location: interface CwShape
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:25: error: cannot find symbol
+import net.minecraft.client.renderer.block.model.BlockModelDefinition;
+                                                ^
+  symbol:   class BlockModelDefinition
+  location: package net.minecraft.client.renderer.block.model
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:78: error: cannot find symbol
+	private static CompletableFuture<Map<Identifier, BlockModelDefinition>> load(PreparableReloadListener.SharedState shared, Executor executor) {
+	                                                 ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:102: error: cannot find symbol
+	private static void resolve(BlockStateResolver.Context resolver, Block block, Joining joining, BlockModelDefinition look, Identifier id) {
+	                                                                                               ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:107: error: cannot find symbol
+	static Map<BlockState, BlockStateModel.UnbakedRoot> instantiate(Block block, Joining joining, BlockModelDefinition look, String name) {
+	                                                                                              ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:17: error: package net.fabricmc.fabric.api.client.keybinding.v1 does not exist
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+                                                   ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:12: error: package net.fabricmc.fabric.api.client.rendering.v1.world does not exist
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+                                                        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:13: error: package net.fabricmc.fabric.api.client.rendering.v1.world does not exist
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+                                                        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:15: error: cannot find symbol
+import net.minecraft.client.renderer.MultiBufferSource;
+                                    ^
+  symbol:   class MultiBufferSource
+  location: package net.minecraft.client.renderer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:16: error: cannot find symbol
+import net.minecraft.client.renderer.ShapeRenderer;
+                                    ^
+  symbol:   class ShapeRenderer
+  location: package net.minecraft.client.renderer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:51: error: cannot find symbol
+	private static void render(WorldRenderContext ctx) {
+	                           ^
+  symbol:   class WorldRenderContext
+  location: class ToolRender
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:19: error: cannot find symbol
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+                                    ^
+  symbol:   class ItemBlockRenderTypes
+  location: package net.minecraft.client.renderer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:22: error: cannot find symbol
+import net.minecraft.client.renderer.block.model.TextureSlots;
+                                                ^
+  symbol:   class TextureSlots
+  location: package net.minecraft.client.renderer.block.model
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:24: error: cannot find symbol
+import net.minecraft.client.renderer.item.BlockModelWrapper;
+                                         ^
+  symbol:   class BlockModelWrapper
+  location: package net.minecraft.client.renderer.item
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:31: error: cannot find symbol
+import net.minecraft.client.resources.model.BlockModelRotation;
+                                           ^
+  symbol:   class BlockModelRotation
+  location: package net.minecraft.client.resources.model
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:26: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:27: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:30: error: cannot find symbol
+import net.minecraft.client.renderer.block.model.BlockModelDefinition;
+                                                ^
+  symbol:   class BlockModelDefinition
+  location: package net.minecraft.client.renderer.block.model
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:48: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:198: error: cannot find symbol
+	static Material material(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+	                         ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:230: error: cannot find symbol
+	private static CompletableFuture<Map<String, Map<Family, BlockModelDefinition>>> load(PreparableReloadListener.SharedState shared, Executor executor) {
+	                                                         ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:261: error: cannot find symbol
+	private static void resolve(BlockStateResolver.Context resolver, Block block, CwBlocks.Info info, Map<Family, BlockModelDefinition> families, Sprites sprites) {
+	                                                                                                              ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:421: error: cannot find symbol
+	static int hiddenFaces(BlockAndTintGetter world, BlockPos pos, BlockState state, Material m) {
+	                       ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:356: error: cannot find symbol
+		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+		                      ^
+  symbol:   class QuadEmitter
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:356: error: cannot find symbol
+		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+		                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:370: error: cannot find symbol
+		private boolean retexture(MutableQuadView q, TextureAtlasSprite[] mat, int hidden) {
+		                          ^
+  symbol:   class MutableQuadView
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:397: error: cannot find symbol
+		public Object createGeometryKey(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random) {
+		                                ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:411: error: cannot find symbol
+		public TextureAtlasSprite particleSprite(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+		                                         ^
+  symbol:   class BlockAndTintGetter
+  location: class MaterialModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:495: error: cannot find symbol
+		private int joins(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+		                  ^
+  symbol:   class BlockAndTintGetter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:501: error: cannot find symbol
+		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+		                      ^
+  symbol:   class QuadEmitter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:501: error: cannot find symbol
+		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+		                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:525: error: cannot find symbol
+		private static void emit(QuadEmitter emitter, Models.Built b, Predicate<Direction> cullTest) {
+		                         ^
+  symbol:   class QuadEmitter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:549: error: cannot find symbol
+		public Object createGeometryKey(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random) {
+		                                ^
+  symbol:   class BlockAndTintGetter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:561: error: cannot find symbol
+		public TextureAtlasSprite particleSprite(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+		                                         ^
+  symbol:   class BlockAndTintGetter
+  location: class DrawnModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:7: error: cannot find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:10: error: package net.minecraft.client.gui.render.state does not exist
+import net.minecraft.client.gui.render.state.GuiElementRenderState;
+                                            ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:319: error: cannot find symbol
+	void submit(GuiGraphics g) {
+	            ^
+  symbol:   class GuiGraphics
+  location: class Rings
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:326: error: cannot find symbol
+	private record Shapes(Matrix3x2f pose, float[] xy, int[] colour, int quads, ScreenRectangle bounds) implements GuiElementRenderState {
+	                                                                                                               ^
+  symbol:   class GuiElementRenderState
+  location: class Rings
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:8: error: package net.fabricmc.fabric.api.client.keybinding.v1 does not exist
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+                                                   ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:10: error: cannot find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Lettering.java:20: error: cannot find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:268: error: cannot find symbol
+	public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float delta) {
+	                             ^
+  symbol:   class GuiGraphics
+  location: class WheelScreen
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:280: error: cannot find symbol
+	public void render(GuiGraphics g, int mx, int my, float delta) {
+	                   ^
+  symbol:   class GuiGraphics
+  location: class WheelScreen
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Lettering.java:193: error: cannot find symbol
+	static void draw(GuiGraphics g, Face f, float capPx, String s, float x, float baseline, float trackPx, int colour, float scale) {
+	                 ^
+  symbol:   class GuiGraphics
+  location: class Lettering
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:8: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:14: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:37: error: cannot find symbol
+	private BlockStateModel at(BlockAndTintGetter world, BlockPos pos, BlockState state) {
+	                           ^
+  symbol:   class BlockAndTintGetter
+  location: class JoinedModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:47: error: cannot find symbol
+	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+	                      ^
+  symbol:   class QuadEmitter
+  location: class JoinedModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:47: error: cannot find symbol
+	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+	                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class JoinedModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModel.java:52: error: cannot find symbol
+	public Object createGeometryKey(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random) {
+	                                ^
+  symbol:   class BlockAndTintGetter
+  location: class JoinedModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:5: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:9: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:20: error: cannot find symbol
+	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                            ^
+  symbol:   class MutableQuadView
+  location: class SimpleOverlayMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:20: error: cannot find symbol
+	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                                                                             ^
+  symbol:   class BlockAndTintGetter
+  location: class SimpleOverlayMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:27: error: cannot find symbol
+	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                          ^
+  symbol:   class MutableQuadView
+  location: class SimpleOverlayMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/SimpleOverlayMixin.java:27: error: cannot find symbol
+	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                                                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class SimpleOverlayMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:3: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:15: error: cannot find symbol
+	private static final ThreadLocal<QuadView> CURRENT = new ThreadLocal<>();
+	                                 ^
+  symbol:   class QuadView
+  location: class OverlayQuads
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:21: error: cannot find symbol
+	public static void begin(QuadView quad, BlockState state) {
+	                         ^
+  symbol:   class QuadView
+  location: class OverlayQuads
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayQuads.java:30: error: cannot find symbol
+	public static QuadView current() {
+	              ^
+  symbol:   class QuadView
+  location: class OverlayQuads
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:4: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:5: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:17: error: cannot find symbol
+	private static QuadEmitter cubework$followShape(QuadEmitter emitter, Direction face, float left, float bottom, float right, float top, float depth) {
+	                                                ^
+  symbol:   class QuadEmitter
+  location: class QuadUtilMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:17: error: cannot find symbol
+	private static QuadEmitter cubework$followShape(QuadEmitter emitter, Direction face, float left, float bottom, float right, float top, float depth) {
+	               ^
+  symbol:   class QuadEmitter
+  location: class QuadUtilMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:6: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:9: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:20: error: cannot find symbol
+	private boolean cubework$anyShapeFace(QuadView quad, QuadView same, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos,
+	                                      ^
+  symbol:   class QuadView
+  location: class OverlayPredicateMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:20: error: cannot find symbol
+	private boolean cubework$anyShapeFace(QuadView quad, QuadView same, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos,
+	                                                     ^
+  symbol:   class QuadView
+  location: class OverlayPredicateMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayPredicateMixin.java:20: error: cannot find symbol
+	private boolean cubework$anyShapeFace(QuadView quad, QuadView same, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos,
+	                                                                                               ^
+  symbol:   class BlockAndTintGetter
+  location: class OverlayPredicateMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:5: error: package net.fabricmc.fabric.api.renderer.v1.mesh does not exist
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+                                               ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:9: error: cannot find symbol
+import net.minecraft.world.level.BlockAndTintGetter;
+                                ^
+  symbol:   class BlockAndTintGetter
+  location: package net.minecraft.world.level
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:26: error: cannot find symbol
+	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                            ^
+  symbol:   class MutableQuadView
+  location: class OverlayProcessorMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:26: error: cannot find symbol
+	private void cubework$begin(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                                                                             ^
+  symbol:   class BlockAndTintGetter
+  location: class OverlayProcessorMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:33: error: cannot find symbol
+	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                          ^
+  symbol:   class MutableQuadView
+  location: class OverlayProcessorMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/OverlayProcessorMixin.java:33: error: cannot find symbol
+	private void cubework$end(MutableQuadView quad, TextureAtlasSprite sprite, BlockAndTintGetter level, BlockPos pos, BlockState appearanceState,
+	                                                                           ^
+  symbol:   class BlockAndTintGetter
+  location: class OverlayProcessorMixin
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/block/LightFixtureBlock.java:152: error: cannot find symbol
+		DyeColor colour = dye.getDyeColor();
+		                     ^
+  symbol:   method getDyeColor()
+  location: variable dye of type DyeItem
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:67: error: cannot find symbol
+				BlockModelDefinition look = looks.get(id);
+				^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:67: error: cannot find symbol
+				BlockModelDefinition look = looks.get(id);
+				                                 ^
+  symbol:   method get(Identifier)
+  location: variable looks of type Object
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:81: error: cannot find symbol
+			List<CompletableFuture<Map.Entry<Identifier, BlockModelDefinition>>> reads = new ArrayList<>(files.size());
+			                                             ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:81: error: incompatible types: cannot infer type arguments for ArrayList<>
+			List<CompletableFuture<Map.Entry<Identifier, BlockModelDefinition>>> reads = new ArrayList<>(files.size());
+			                                                                                          ^
+    reason: inferred type does not conform to equality constraint(s)
+      inferred: Object
+      equality constraints(s): CompletableFuture<Entry<Identifier,BlockModelDefinition>>
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:87: error: package BlockModelDefinition does not exist
+						return Map.entry(id, BlockModelDefinition.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(JsonParseException::new));
+						                                         ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:95: error: cannot find symbol
+				Map<Identifier, BlockModelDefinition> out = new HashMap<>(list.size() * 2);
+				                ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:96: error: cannot find symbol
+				for (Map.Entry<Identifier, BlockModelDefinition> e : list) if (e != null) out.put(e.getKey(), e.getValue());
+				                           ^
+  symbol:   class BlockModelDefinition
+  location: class JoinedModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/JoinedModels.java:80: error: incompatible types: inferred type does not conform to equality constraint(s)
+		return CompletableFuture.supplyAsync(() -> LISTER.listMatchingResources(resources), executor).thenCompose(files -> {
+		                                                                                                         ^
+    inferred: Object
+    equality constraints(s): Map<Identifier,BlockModelDefinition>
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:37: error: cannot find symbol
+		WHEEL = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.cubework.wheel", InputConstants.Type.KEYSYM, 71,
+		        ^
+  symbol:   variable KeyBindingHelper
+  location: class CubeworkClient
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:42: error: cannot find symbol
+				if (mc.screen == null && !WheelScreen.keyDown(WHEEL)) WheelScreen.holdOff = false;
+				      ^
+  symbol:   variable screen
+  location: variable mc of type Minecraft
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:47: error: cannot find symbol
+				if (mc.screen != null || mc.player == null) continue;
+				      ^
+  symbol:   variable screen
+  location: variable mc of type Minecraft
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:51: error: cannot find symbol
+					mc.player.displayClientMessage(Component.literal(held.isEmpty()
+					         ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type LocalPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/CubeworkClient.java:56: error: cannot find symbol
+				mc.setScreen(new WheelScreen(wheel, WHEEL));
+				  ^
+  symbol:   method setScreen(WheelScreen)
+  location: variable mc of type Minecraft
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:48: error: package WorldRenderEvents does not exist
+		WorldRenderEvents.AFTER_ENTITIES.register(ToolRender::render);
+		                 ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:54: error: cannot find symbol
+		MultiBufferSource buffers = ctx.consumers();
+		^
+  symbol:   class MultiBufferSource
+  location: class ToolRender
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolRender.java:143: error: cannot find symbol
+		ShapeRenderer.renderShape(pose, lines, shape, at.getX() - cam.x, at.getY() - cam.y, at.getZ() - cam.z, colour, 2.0f);
+		^
+  symbol:   variable ShapeRenderer
+  location: class ToolRender
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:59: error: com.insidethecube.cubework.client.MaterialItemModel.Unbaked is not abstract and does not override abstract method bake(BakingContext,Matrix4fc) in net.minecraft.client.renderer.item.ItemModel.Unbaked
+	public record Unbaked(Map<String, Look> looks) implements ItemModel.Unbaked {
+	       ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:68: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:80: error: cannot find symbol
+					TextureSlots slots = model.getTopTextureSlots();
+					^
+  symbol:   class TextureSlots
+  location: class Unbaked
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:81: error: cannot find symbol
+					List<BakedQuad> quads = model.bakeTopGeometry(slots, baker, BlockModelRotation.IDENTITY).getAll();
+					                                                            ^
+  symbol:   variable BlockModelRotation
+  location: class Unbaked
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:82: error: cannot find symbol
+					layers.add(new Layer(quads, ModelRenderProperties.fromResolvedModel(baker, model, slots), Suppliers.memoize(() -> BlockModelWrapper.computeExtents(quads)),
+					                                                                                                                  ^
+  symbol:   variable BlockModelWrapper
+  location: class Unbaked
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:132: error: cannot find symbol
+			if (look.tint()) l.prepareTintLayers(1)[0] = GRASS;
+			                  ^
+  symbol:   method prepareTintLayers(int)
+  location: variable l of type ItemStackRenderState.LayerRenderState
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:134: error: cannot find symbol
+			l.setRenderType(type);
+			 ^
+  symbol:   method setRenderType(RenderType)
+  location: variable l of type ItemStackRenderState.LayerRenderState
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:139: error: cannot find symbol
+				l.setParticleIcon(mat[MaterialModels.SIDE]);
+				 ^
+  symbol:   method setParticleIcon(TextureAtlasSprite)
+  location: variable l of type ItemStackRenderState.LayerRenderState
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:147: error: cannot find symbol
+		if (stack.getItem() instanceof BlockItem bi && ItemBlockRenderTypes.getChunkRenderType(bi.getBlock().defaultBlockState()) == ChunkSectionLayer.TRANSLUCENT) {
+		                                               ^
+  symbol:   variable ItemBlockRenderTypes
+  location: class MaterialItemModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialItemModel.java:150: error: cannot find symbol
+		return Sheets.cutoutBlockSheet();
+		             ^
+  symbol:   method cutoutBlockSheet()
+  location: class Sheets
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:179: error: cannot find symbol
+			int slot = sprites.slotOf(q.sprite());
+			                           ^
+  symbol:   method sprite()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:184: error: cannot find symbol
+			TextureAtlasSprite from = q.sprite(), to = mat[slot];
+			                           ^
+  symbol:   method sprite()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:192: error: cannot find symbol
+					q.shade(), q.lightEmission()));
+					            ^
+  symbol:   method lightEmission()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:192: error: cannot find symbol
+					q.shade(), q.lightEmission()));
+					 ^
+  symbol:   method shade()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:191: error: cannot find symbol
+			out.add(new BakedQuad(q.position0(), q.position1(), q.position2(), q.position3(), uv[0], uv[1], uv[2], uv[3], q.tintIndex(), q.direction(), to,
+			                                                                                                               ^
+  symbol:   method tintIndex()
+  location: variable q of type BakedQuad
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:219: error: cannot find symbol
+				Map<Family, BlockModelDefinition> families = looks.get(shape.suffix);
+				            ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:219: error: cannot find symbol
+				Map<Family, BlockModelDefinition> families = looks.get(shape.suffix);
+				                                                  ^
+  symbol:   method get(String)
+  location: variable looks of type Object
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:243: error: package BlockModelDefinition does not exist
+						return new Object[] {path.substring(0, slash), family, BlockModelDefinition.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(JsonParseException::new)};
+						                                                                           ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:251: error: cannot find symbol
+				Map<String, Map<Family, BlockModelDefinition>> out = new HashMap<>();
+				                        ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:251: error: incompatible types: cannot infer type arguments for HashMap<>
+				Map<String, Map<Family, BlockModelDefinition>> out = new HashMap<>();
+				                                                                ^
+    reason: inferred type does not conform to equality constraint(s)
+      inferred: Object
+      equality constraints(s): Map<Family,BlockModelDefinition>
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:254: error: cannot find symbol
+					out.computeIfAbsent((String) e[0], k -> new EnumMap<>(Family.class)).put((Family) e[1], (BlockModelDefinition) e[2]);
+					                                                                                         ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:232: error: incompatible types: inferred type does not conform to equality constraint(s)
+		return CompletableFuture.supplyAsync(() -> LISTER.listMatchingResources(resources), executor).thenCompose(files -> {
+		                                                                                                         ^
+    inferred: Object
+    equality constraints(s): Map<String,Map<Family,BlockModelDefinition>>,U
+  where U,T are type-variables:
+    U extends Object declared in method <U>thenApply(Function<? super T,? extends U>)
+    T extends Object declared in class CompletableFuture
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:264: error: cannot find symbol
+		for (Map.Entry<Family, BlockModelDefinition> e : families.entrySet()) {
+		                       ^
+  symbol:   class BlockModelDefinition
+  location: class MaterialModels
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:338: error: MaterialModel is not abstract and does not override abstract method materialFlags() in BlockStateModel
+	private static final class MaterialModel implements BlockStateModel {
+	                     ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:403: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:407: error: cannot find symbol
+			return mat != null ? mat[SIDE] : looks[0].particleIcon();
+			                                         ^
+  symbol:   method particleIcon()
+  location: interface BlockStateModel
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:410: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:438: error: Retextured is not abstract and does not override abstract method materialFlags() in BlockStateModelPart
+	private record Retextured(BlockStateModelPart part, Sprites sprites, TextureAtlasSprite[] mat) implements BlockStateModelPart {
+	        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:449: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:478: error: DrawnModel is not abstract and does not override abstract method materialFlags() in BlockStateModel
+	private record DrawnModel(Block block, CwBlocks.Info info, BlockState look, Sprites sprites, Map<Drawn, Models.Built> made) implements BlockStateModel {
+	        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:553: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:560: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:568: error: DrawnPart is not abstract and does not override abstract method materialFlags() in BlockStateModelPart
+	private record DrawnPart(Models.Built built) implements BlockStateModelPart {
+	        ^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/MaterialModels.java:581: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:327: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:337: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:342: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/Rings.java:347: error: method does not override or implement a method from a supertype
+		@Override
+		^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:267: error: method does not override or implement a method from a supertype
+	@Override
+	^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:279: error: method does not override or implement a method from a supertype
+	@Override
+	^
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:668: error: cannot find symbol
+		InputConstants.Key bound = KeyBindingHelper.getBoundKeyOf(key);
+		                           ^
+  symbol:   variable KeyBindingHelper
+  location: class WheelScreen
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/wheel/WheelScreen.java:675: error: cannot find symbol
+		InputConstants.Key bound = KeyBindingHelper.getBoundKeyOf(key);
+		                           ^
+  symbol:   variable KeyBindingHelper
+  location: class WheelScreen
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/ShapeSwap.java:125: error: cannot find symbol
+		player.displayClientMessage(Component.literal(text), true);
+		      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/client/ToolHints.java:38: error: cannot find symbol
+		if (hint != null) mc.player.displayClientMessage(Component.literal(hint), true);
+		                           ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type LocalPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/net/Payloads.java:53: error: cannot find symbol
+		PayloadTypeRegistry.playC2S().register(PickShape.TYPE, PickShape.CODEC);
+		                   ^
+  symbol:   method playC2S()
+  location: interface PayloadTypeRegistry
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/net/Payloads.java:54: error: cannot find symbol
+		PayloadTypeRegistry.playC2S().register(ToolSetting.TYPE, ToolSetting.CODEC);
+		                   ^
+  symbol:   method playC2S()
+  location: interface PayloadTypeRegistry
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/net/Payloads.java:55: error: cannot find symbol
+		PayloadTypeRegistry.playC2S().register(ToolAction.TYPE, ToolAction.CODEC);
+		                   ^
+  symbol:   method playC2S()
+  location: interface PayloadTypeRegistry
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/ToolActions.java:34: error: cannot find symbol
+			player.displayClientMessage(Component.literal(GuideShapes.describe(ToolData.get(held)) + (n > 0 ? ": " + n + " blocks" : "")), true);
+			      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/ToolActions.java:44: error: cannot find symbol
+				player.displayClientMessage(Component.literal(n < 0 ? "Nothing to undo." : "Put back " + n + " blocks."), true);
+				      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/ToolActions.java:52: error: cannot find symbol
+				player.displayClientMessage(Component.literal("Guide cleared."), true);
+				      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/TerrainBrushItem.java:49: error: cannot find symbol
+		player.displayClientMessage(Component.literal(changed == 0 ? "Nothing to smooth here." : "Smoothed " + changed + " blocks. Undo is on the wheel."),
+		      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type ServerPlayer
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/tool/BuildersGuideItem.java:46: error: cannot find symbol
+			player.displayClientMessage(Component.literal((end ? "Line end placed. " : "Guide placed (gold). ") + GuideShapes.describe(ToolData.get(stack)) + ", "
+			      ^
+  symbol:   method displayClientMessage(MutableComponent,boolean)
+  location: variable player of type Player
+/home/runner/work/cubework/cubework/build/v/26.2/src/main/java/com/insidethecube/cubework/compat/continuity/QuadUtilMixin.java:18: error: cannot find symbol
+		QuadView quad = OverlayQuads.current();
+		^
+  symbol:   class QuadView
+  location: class QuadUtilMixin
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+146 errors
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:88)
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:49)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.delegateAndHandleErrors(NormalizingJavaCompiler.java:98)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:38)
+	at org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:38)
+	at org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:46)
+	at org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:36)
+	at org.gradle.jvm.toolchain.internal.DefaultToolchainJavaCompiler.execute(DefaultToolchainJavaCompiler.java:57)
+	at org.gradle.api.tasks.compile.JavaCompile.lambda$createToolchainCompiler$0(JavaCompile.java:207)
+	at org.gradle.api.internal.tasks.compile.CleaningJavaCompiler.execute(CleaningJavaCompiler.java:53)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalCompilerFactory.lambda$createRebuildAllCompiler$0(IncrementalCompilerFactory.java:55)
+	at org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:70)
+	at org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:44)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:66)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$CompileOperation.call(CompileJavaBuildOperationReportingCompiler.java:78)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$CompileOperation.call(CompileJavaBuildOperationReportingCompiler.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler.execute(CompileJavaBuildOperationReportingCompiler.java:49)
+	at org.gradle.api.tasks.compile.JavaCompile.performCompilation(JavaCompile.java:225)
+	at org.gradle.api.tasks.compile.JavaCompile.performIncrementalCompilation(JavaCompile.java:166)
+	at org.gradle.api.tasks.compile.JavaCompile.compile(JavaCompile.java:151)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.doExecute(IncrementalTaskAction.java:45)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.execute(IncrementalTaskAction.java:26)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:259)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:244)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:227)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:210)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:176)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:167)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:47)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:137)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:134)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:134)
+	at org.gradle.internal.execution.steps.ExecuteStep$Mutable.execute(ExecuteStep.java:80)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:51)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:29)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:67)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:39)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:42)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:24)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:28)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:76)
+	at org.gradle.internal.Either$Right.fold(Either.java:176)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:74)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:49)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:70)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:32)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:69)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:37)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:63)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:34)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:79)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:105)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.execute(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.executeMutable(CaptureMutableStateBeforeExecutionStep.java:86)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:45)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeWithNonEmptySources(SkipEmptyMutableWorkStep.java:210)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:90)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:53)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:77)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:43)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$executeMutable$0(AssignMutableWorkspaceStep.java:34)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:305)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:30)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:21)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:56)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:38)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:68)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)
+	... 30 more
+
+
+BUILD FAILED in 34s
+1 actionable task: 1 executed
+exit=1

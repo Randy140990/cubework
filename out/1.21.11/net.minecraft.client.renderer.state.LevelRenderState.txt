@@ -1,0 +1,15 @@
+Compiled from "LevelRenderState.java"
+public class net.minecraft.client.renderer.state.LevelRenderState implements net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState {
+  public net.minecraft.client.renderer.state.CameraRenderState cameraRenderState;
+  public final java.util.List<net.minecraft.client.renderer.entity.state.EntityRenderState> entityRenderStates;
+  public final java.util.List<net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState> blockEntityRenderStates;
+  public boolean haveGlowingEntities;
+  public net.minecraft.client.renderer.state.BlockOutlineRenderState blockOutlineRenderState;
+  public final java.util.List<net.minecraft.client.renderer.state.BlockBreakingRenderState> blockBreakingRenderStates;
+  public final net.minecraft.client.renderer.state.WeatherRenderState weatherRenderState;
+  public final net.minecraft.client.renderer.state.WorldBorderRenderState worldBorderRenderState;
+  public final net.minecraft.client.renderer.state.SkyRenderState skyRenderState;
+  public long gameTime;
+  public net.minecraft.client.renderer.state.LevelRenderState();
+  public void reset();
+}

@@ -1,0 +1,7 @@
+Compiled from "GuiElementRenderState.java"
+public interface net.minecraft.client.gui.render.state.GuiElementRenderState extends net.minecraft.client.gui.render.state.ScreenArea {
+  public abstract void buildVertices(com.mojang.blaze3d.vertex.VertexConsumer, float);
+  public abstract com.mojang.blaze3d.pipeline.RenderPipeline pipeline();
+  public abstract net.minecraft.client.gui.render.TextureSetup textureSetup();
+  public abstract net.minecraft.client.gui.navigation.ScreenRectangle scissorArea();
+}

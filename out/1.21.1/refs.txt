@@ -1,0 +1,2 @@
+missing models: 0 []
+missing textures: 1 ['minecraft:block/pale_oak_planks']

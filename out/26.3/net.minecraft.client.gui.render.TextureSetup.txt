@@ -1,0 +1,28 @@
+Compiled from "TextureSetup.java"
+public final class net.minecraft.client.gui.render.TextureSetup extends java.lang.Record {
+  private final com.mojang.renderpearl.api.textures.GpuTextureView texure0;
+  private final com.mojang.renderpearl.api.textures.GpuTextureView texure1;
+  private final com.mojang.renderpearl.api.textures.GpuTextureView texure2;
+  private final com.mojang.renderpearl.api.textures.GpuSampler sampler0;
+  private final com.mojang.renderpearl.api.textures.GpuSampler sampler1;
+  private final com.mojang.renderpearl.api.textures.GpuSampler sampler2;
+  private static final net.minecraft.client.gui.render.TextureSetup NO_TEXTURE_SETUP;
+  private static int sortKeySeed;
+  public net.minecraft.client.gui.render.TextureSetup(com.mojang.renderpearl.api.textures.GpuTextureView, com.mojang.renderpearl.api.textures.GpuTextureView, com.mojang.renderpearl.api.textures.GpuTextureView, com.mojang.renderpearl.api.textures.GpuSampler, com.mojang.renderpearl.api.textures.GpuSampler, com.mojang.renderpearl.api.textures.GpuSampler);
+  public static net.minecraft.client.gui.render.TextureSetup singleTexture(com.mojang.renderpearl.api.textures.GpuTextureView, com.mojang.renderpearl.api.textures.GpuSampler);
+  public static net.minecraft.client.gui.render.TextureSetup singleTextureWithLightmap(com.mojang.renderpearl.api.textures.GpuTextureView, com.mojang.renderpearl.api.textures.GpuSampler);
+  public static net.minecraft.client.gui.render.TextureSetup doubleTexture(com.mojang.renderpearl.api.textures.GpuTextureView, com.mojang.renderpearl.api.textures.GpuSampler, com.mojang.renderpearl.api.textures.GpuTextureView, com.mojang.renderpearl.api.textures.GpuSampler);
+  public static net.minecraft.client.gui.render.TextureSetup noTexture();
+  public int getSortKey();
+  public static void updateSortKeySeed();
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public com.mojang.renderpearl.api.textures.GpuTextureView texure0();
+  public com.mojang.renderpearl.api.textures.GpuTextureView texure1();
+  public com.mojang.renderpearl.api.textures.GpuTextureView texure2();
+  public com.mojang.renderpearl.api.textures.GpuSampler sampler0();
+  public com.mojang.renderpearl.api.textures.GpuSampler sampler1();
+  public com.mojang.renderpearl.api.textures.GpuSampler sampler2();
+  static {};
+}

@@ -1,0 +1,4 @@
+Compiled from "WorldRenderEvents.java"
+public interface net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents$EndMain {
+  public abstract void endMain(net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext);
+}

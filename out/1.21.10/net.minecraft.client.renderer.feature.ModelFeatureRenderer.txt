@@ -1,0 +1,10 @@
+Compiled from "ModelFeatureRenderer.java"
+public class net.minecraft.client.renderer.feature.ModelFeatureRenderer {
+  private final com.mojang.blaze3d.vertex.PoseStack poseStack;
+  public net.minecraft.client.renderer.feature.ModelFeatureRenderer();
+  public void render(net.minecraft.client.renderer.SubmitNodeCollection, net.minecraft.client.renderer.MultiBufferSource$BufferSource, net.minecraft.client.renderer.OutlineBufferSource, net.minecraft.client.renderer.MultiBufferSource$BufferSource);
+  private void renderTranslucents(net.minecraft.client.renderer.MultiBufferSource$BufferSource, net.minecraft.client.renderer.OutlineBufferSource, java.util.List<net.minecraft.client.renderer.SubmitNodeStorage$TranslucentModelSubmit<?>>, net.minecraft.client.renderer.MultiBufferSource$BufferSource);
+  private void renderBatch(net.minecraft.client.renderer.MultiBufferSource$BufferSource, net.minecraft.client.renderer.OutlineBufferSource, java.util.Map<net.minecraft.client.renderer.RenderType, java.util.List<net.minecraft.client.renderer.SubmitNodeStorage$ModelSubmit<?>>>, net.minecraft.client.renderer.MultiBufferSource$BufferSource);
+  private <S> void renderModel(net.minecraft.client.renderer.SubmitNodeStorage$ModelSubmit<S>, net.minecraft.client.renderer.RenderType, com.mojang.blaze3d.vertex.VertexConsumer, net.minecraft.client.renderer.OutlineBufferSource, net.minecraft.client.renderer.MultiBufferSource$BufferSource);
+  private static double method_73251(net.minecraft.client.renderer.SubmitNodeStorage$TranslucentModelSubmit);
+}

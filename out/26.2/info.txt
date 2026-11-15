@@ -1,0 +1,15 @@
+jar: /home/runner/.gradle/caches/fabric-loom/26.2/minecraft-extracted_server.jar
+/home/runner/.gradle/caches/fabric-loom/1.21.11/minecraft-client.jar
+/home/runner/.gradle/caches/fabric-loom/1.21.11/minecraft-extracted_server.jar
+/home/runner/.gradle/caches/fabric-loom/1.21.11/minecraft-server.jar
+/home/runner/.gradle/caches/fabric-loom/1.21.11/minecraft-merged.jar
+/home/runner/.gradle/caches/fabric-loom/26.2/minecraft-client.jar
+/home/runner/.gradle/caches/fabric-loom/26.2/minecraft-extracted_server.jar
+/home/runner/.gradle/caches/fabric-loom/26.2/minecraft-server.jar
+/home/runner/.gradle/caches/fabric-loom/26.2/minecraft-merged.jar
+/home/runner/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged-deobf/26.2/minecraft-merged-deobf-26.2.jar
+/home/runner/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged/1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2/minecraft-merged-1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2.jar
+/home/runner/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged/1.21.11-net.fabricmc.yarn.1_21_11.1.21.11+build.6-v2/minecraft-merged-1.21.11-net.fabricmc.yarn.1_21_11.1.21.11+build.6-v2.jar
+/home/runner/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged-intermediary/1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2/minecraft-merged-intermediary-1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2.jar
+/home/runner/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged-intermediary/1.21.11-net.fabricmc.yarn.1_21_11.1.21.11+build.6-v2/minecraft-merged-intermediary-1.21.11-net.fabricmc.yarn.1_21_11.1.21.11+build.6-v2.jar
+build/v/26.2/.gradle/loom-cache/minecraftMaven/net/minecraft/minecraft-merged-201bed67e3/26.2/minecraft-merged-201bed67e3-26.2.jar

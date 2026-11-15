@@ -1,0 +1,1 @@
+1.21.1 1062 blocks; Fabric API 0.116.18+1.21.1 ; Continuity none

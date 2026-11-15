@@ -1,0 +1,4 @@
+shape blocks: 437
+shapes: 15187 names: 19473
+prepared 1.21.3 in /home/runner/work/cubework/cubework/build/v/1.21.3
+exit=0

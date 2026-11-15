@@ -1,0 +1,4 @@
+Compiled from "WorldRenderEvents.java"
+public interface net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents$AfterEntities {
+  public abstract void afterEntities(net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext);
+}

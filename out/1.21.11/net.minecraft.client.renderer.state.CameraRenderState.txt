@@ -1,0 +1,9 @@
+Compiled from "CameraRenderState.java"
+public class net.minecraft.client.renderer.state.CameraRenderState implements net.fabricmc.fabric.api.client.rendering.v1.FabricRenderState {
+  public net.minecraft.core.BlockPos blockPos;
+  public net.minecraft.world.phys.Vec3 pos;
+  public boolean initialized;
+  public net.minecraft.world.phys.Vec3 entityPos;
+  public org.joml.Quaternionf orientation;
+  public net.minecraft.client.renderer.state.CameraRenderState();
+}

@@ -1,0 +1,1079 @@
+Compiled from "StandardOverlayQuadProcessor.java"
+public class me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor extends me.pepperbell.continuity.client.processor.AbstractQuadProcessor {
+  protected java.util.Set<net.minecraft.resources.ResourceLocation> matchTilesSet;
+
+  protected java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> matchBlocksPredicate;
+
+  protected java.util.Set<net.minecraft.resources.ResourceLocation> connectTilesSet;
+
+  protected java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> connectBlocksPredicate;
+
+  protected me.pepperbell.continuity.client.processor.ConnectionPredicate connectionPredicate;
+
+  protected int tintIndex;
+
+  protected net.minecraft.world.level.block.state.BlockState tintBlock;
+
+  protected net.minecraft.client.renderer.chunk.ChunkSectionLayer layer;
+
+  protected net.fabricmc.fabric.api.util.TriState ao;
+
+  public me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor(net.minecraft.client.renderer.texture.TextureAtlasSprite[], me.pepperbell.continuity.client.processor.ProcessingPredicate, java.util.Set<net.minecraft.resources.ResourceLocation>, java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState>, java.util.Set<net.minecraft.resources.ResourceLocation>, java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState>, me.pepperbell.continuity.client.processor.ConnectionPredicate, int, net.minecraft.world.level.block.state.BlockState, net.minecraft.client.renderer.chunk.ChunkSectionLayer);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: aload_2
+         3: invokespecial #56                 // Method me/pepperbell/continuity/client/processor/AbstractQuadProcessor."<init>":([Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lme/pepperbell/continuity/client/processor/ProcessingPredicate;)V
+         6: aload_0
+         7: aload_3
+         8: putfield      #58                 // Field matchTilesSet:Ljava/util/Set;
+        11: aload_0
+        12: aload         4
+        14: putfield      #60                 // Field matchBlocksPredicate:Ljava/util/function/Predicate;
+        17: aload_0
+        18: aload         5
+        20: putfield      #62                 // Field connectTilesSet:Ljava/util/Set;
+        23: aload_0
+        24: aload         6
+        26: putfield      #64                 // Field connectBlocksPredicate:Ljava/util/function/Predicate;
+        29: aload_0
+        30: aload         7
+        32: putfield      #66                 // Field connectionPredicate:Lme/pepperbell/continuity/client/processor/ConnectionPredicate;
+        35: aload_0
+        36: iload         8
+        38: putfield      #68                 // Field tintIndex:I
+        41: aload_0
+        42: aload         9
+        44: putfield      #70                 // Field tintBlock:Lnet/minecraft/world/level/block/state/BlockState;
+        47: aload_0
+        48: aload         10
+        50: putfield      #72                 // Field layer:Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;
+        53: aload_0
+        54: aload         9
+        56: invokestatic  #78                 // Method me/pepperbell/continuity/client/util/RenderUtil.aoFromTintBlock:(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/fabricmc/fabric/api/util/TriState;
+        59: putfield      #80                 // Field ao:Lnet/fabricmc/fabric/api/util/TriState;
+        62: iconst_0
+        63: istore        11
+        65: iload         11
+        67: aload_1
+        68: arraylength
+        69: if_icmpge     97
+        72: aload_1
+        73: iload         11
+        75: aaload
+        76: astore        12
+        78: aload         12
+        80: invokestatic  #100                // Method me/pepperbell/continuity/client/util/TextureUtil.isMissingSprite:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+        83: ifeq          91
+        86: aload_1
+        87: iload         11
+        89: aconst_null
+        90: aastore
+        91: iinc          11, 1
+        94: goto          65
+        97: return
+
+  public me.pepperbell.continuity.api.client.QuadProcessor$ProcessingResult processQuadInner(net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView, net.minecraft.client.renderer.texture.TextureAtlasSprite, net.minecraft.world.level.BlockAndTintGetter, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.util.RandomSource, int, me.pepperbell.continuity.api.client.QuadProcessor$ProcessingContext);
+    Code:
+         0: aload_1
+         1: invokeinterface #122,  1          // InterfaceMethod net/fabricmc/fabric/api/renderer/v1/mesh/MutableQuadView.lightFace:()Lnet/minecraft/core/Direction;
+         6: astore        10
+         8: aload_0
+         9: aload_3
+        10: aload         4
+        12: aload         5
+        14: aload         6
+        16: aload         10
+        18: aload_2
+        19: aload         10
+        21: invokestatic  #128                // Method me/pepperbell/continuity/client/processor/DirectionMaps.getMap:(Lnet/minecraft/core/Direction;)[[Lnet/minecraft/core/Direction;
+        24: iconst_0
+        25: aaload
+        26: aload         9
+        28: invokevirtual #132                // Method getSprites:(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;[Lnet/minecraft/core/Direction;Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+        31: astore        11
+        33: aload         11
+        35: ifnull        112
+        38: aload         9
+        40: invokeinterface #136,  1          // InterfaceMethod me/pepperbell/continuity/api/client/QuadProcessor$ProcessingContext.getExtraQuadEmitter:()Lnet/fabricmc/fabric/api/renderer/v1/mesh/QuadEmitter;
+        45: astore        12
+        47: aload_0
+        48: getfield      #70                 // Field tintBlock:Lnet/minecraft/world/level/block/state/BlockState;
+        51: aload_3
+        52: aload         4
+        54: aload_0
+        55: getfield      #68                 // Field tintIndex:I
+        58: invokestatic  #140                // Method me/pepperbell/continuity/client/util/RenderUtil.getTintColor:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;I)I
+        61: istore        13
+        63: iconst_0
+        64: istore        14
+        66: iload         14
+        68: aload         11
+        70: getfield      #153                // Field me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.spriteAmount:I
+        73: if_icmpge     107
+        76: aload         12
+        78: aload         10
+        80: aload         11
+        82: getfield      #155                // Field me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+        85: iload         14
+        87: aaload
+        88: iload         13
+        90: aload_0
+        91: getfield      #72                 // Field layer:Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;
+        94: aload_0
+        95: getfield      #80                 // Field ao:Lnet/fabricmc/fabric/api/util/TriState;
+        98: invokestatic  #161                // Method me/pepperbell/continuity/client/util/QuadUtil.emitOverlayQuad:(Lnet/fabricmc/fabric/api/renderer/v1/mesh/QuadEmitter;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/chunk/ChunkSectionLayer;Lnet/fabricmc/fabric/api/util/TriState;)V
+       101: iinc          14, 1
+       104: goto          66
+       107: aload         11
+       109: invokevirtual #165                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.clear:()V
+       112: getstatic     #169                // Field me/pepperbell/continuity/api/client/QuadProcessor$ProcessingResult.NEXT_PROCESSOR:Lme/pepperbell/continuity/api/client/QuadProcessor$ProcessingResult;
+       115: areturn
+
+  protected static boolean matchesAny(java.util.Set<net.minecraft.resources.ResourceLocation>, java.util.Set<net.minecraft.client.renderer.texture.TextureAtlasSprite>);
+    Code:
+         0: aload_1
+         1: invokeinterface #188,  1          // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+         6: astore_2
+         7: aload_2
+         8: invokeinterface #194,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        13: ifeq          47
+        16: aload_2
+        17: invokeinterface #198,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        22: checkcast     #142                // class net/minecraft/client/renderer/texture/TextureAtlasSprite
+        25: astore_3
+        26: aload_0
+        27: aload_3
+        28: invokevirtual #202                // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.contents:()Lnet/minecraft/client/renderer/texture/SpriteContents;
+        31: invokevirtual #208                // Method net/minecraft/client/renderer/texture/SpriteContents.name:()Lnet/minecraft/resources/ResourceLocation;
+        34: invokeinterface #212,  2          // InterfaceMethod java/util/Set.contains:(Ljava/lang/Object;)Z
+        39: ifeq          44
+        42: iconst_1
+        43: ireturn
+        44: goto          7
+        47: iconst_0
+        48: ireturn
+
+  protected boolean appliesOverlay(net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.BlockAndTintGetter, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.Direction, net.minecraft.client.renderer.texture.TextureAtlasSprite);
+    Code:
+         0: aload_3
+         1: aload         4
+         3: aload_1
+         4: invokevirtual #224                // Method net/minecraft/world/level/block/state/BlockState.isCollisionShapeFullBlock:(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Z
+         7: ifne          12
+        10: iconst_0
+        11: ireturn
+        12: aload_0
+        13: getfield      #64                 // Field connectBlocksPredicate:Ljava/util/function/Predicate;
+        16: ifnull        34
+        19: aload_0
+        20: getfield      #64                 // Field connectBlocksPredicate:Ljava/util/function/Predicate;
+        23: aload_2
+        24: invokeinterface #227,  2          // InterfaceMethod java/util/function/Predicate.test:(Ljava/lang/Object;)Z
+        29: ifne          34
+        32: iconst_0
+        33: ireturn
+        34: aload_0
+        35: getfield      #62                 // Field connectTilesSet:Ljava/util/Set;
+        38: ifnull        59
+        41: aload_0
+        42: getfield      #62                 // Field connectTilesSet:Ljava/util/Set;
+        45: aload_2
+        46: aload         8
+        48: invokestatic  #232                // Method me/pepperbell/continuity/client/util/SpriteCalculator.getSprites:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Ljava/util/Set;
+        51: invokestatic  #234                // Method matchesAny:(Ljava/util/Set;Ljava/util/Set;)Z
+        54: ifne          59
+        57: iconst_0
+        58: ireturn
+        59: aload_0
+        60: getfield      #66                 // Field connectionPredicate:Lme/pepperbell/continuity/client/processor/ConnectionPredicate;
+        63: aload         4
+        65: aload         5
+        67: aload         6
+        69: aload         7
+        71: aload_1
+        72: aload_2
+        73: aload_3
+        74: aload         8
+        76: aload         9
+        78: invokeinterface #238,  10         // InterfaceMethod me/pepperbell/continuity/client/processor/ConnectionPredicate.shouldConnect:(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+        83: ifne          90
+        86: iconst_1
+        87: goto          91
+        90: iconst_0
+        91: ireturn
+
+  protected boolean hasSameOverlay(net.minecraft.world.level.block.state.BlockState, net.minecraft.core.Direction);
+    Code:
+         0: aload_1
+         1: ifnonnull     6
+         4: iconst_0
+         5: ireturn
+         6: aload_0
+         7: getfield      #60                 // Field matchBlocksPredicate:Ljava/util/function/Predicate;
+        10: ifnull        28
+        13: aload_0
+        14: getfield      #60                 // Field matchBlocksPredicate:Ljava/util/function/Predicate;
+        17: aload_1
+        18: invokeinterface #227,  2          // InterfaceMethod java/util/function/Predicate.test:(Ljava/lang/Object;)Z
+        23: ifne          28
+        26: iconst_0
+        27: ireturn
+        28: aload_0
+        29: getfield      #58                 // Field matchTilesSet:Ljava/util/Set;
+        32: ifnull        52
+        35: aload_0
+        36: getfield      #58                 // Field matchTilesSet:Ljava/util/Set;
+        39: aload_1
+        40: aload_2
+        41: invokestatic  #232                // Method me/pepperbell/continuity/client/util/SpriteCalculator.getSprites:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Ljava/util/Set;
+        44: invokestatic  #234                // Method matchesAny:(Ljava/util/Set;Ljava/util/Set;)Z
+        47: ifne          52
+        50: iconst_0
+        51: ireturn
+        52: iconst_1
+        53: ireturn
+
+  protected boolean appliesOverlayCorner(net.minecraft.core.Direction, net.minecraft.core.Direction, net.minecraft.core.BlockPos$MutableBlockPos, net.minecraft.world.level.BlockAndTintGetter, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.Direction, net.minecraft.client.renderer.texture.TextureAtlasSprite);
+    Code:
+         0: aload_3
+         1: aload         5
+         3: aload_1
+         4: invokevirtual #249                // Method net/minecraft/core/BlockPos$MutableBlockPos.setWithOffset:(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+         7: aload_2
+         8: invokevirtual #253                // Method net/minecraft/core/BlockPos$MutableBlockPos.move:(Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        11: pop
+        12: aload         4
+        14: aload_3
+        15: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        20: astore        10
+        22: aload         10
+        24: aload         4
+        26: aload_3
+        27: aload         8
+        29: aload         7
+        31: aload         5
+        33: invokevirtual #261                // Method net/minecraft/world/level/block/state/BlockState.getAppearance:(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        36: astore        11
+        38: aload_0
+        39: aload_3
+        40: aload         11
+        42: aload         10
+        44: aload         4
+        46: aload         5
+        48: aload         6
+        50: aload         7
+        52: aload         8
+        54: aload         9
+        56: invokevirtual #263                // Method appliesOverlay:(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+        59: ifeq          89
+        62: aload_3
+        63: aload         8
+        65: invokevirtual #253                // Method net/minecraft/core/BlockPos$MutableBlockPos.move:(Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        68: pop
+        69: aload         4
+        71: aload_3
+        72: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        77: invokevirtual #266                // Method net/minecraft/world/level/block/state/BlockState.isSolidRender:()Z
+        80: ifne          87
+        83: iconst_1
+        84: goto          88
+        87: iconst_0
+        88: ireturn
+        89: iconst_0
+        90: ireturn
+
+  protected me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector fromTwoSidesAdj(me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.Direction, net.minecraft.core.Direction, int, int, net.minecraft.core.BlockPos$MutableBlockPos, net.minecraft.world.level.BlockAndTintGetter, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.Direction, net.minecraft.client.renderer.texture.TextureAtlasSprite);
+    Code:
+         0: aload_1
+         1: aload_0
+         2: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+         5: iload         6
+         7: aaload
+         8: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+        11: aload_0
+        12: aload_2
+        13: aload         13
+        15: invokevirtual #279                // Method hasSameOverlay:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z
+        18: ifne          31
+        21: aload_0
+        22: aload_3
+        23: aload         13
+        25: invokevirtual #279                // Method hasSameOverlay:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z
+        28: ifeq          67
+        31: aload_0
+        32: aload         4
+        34: aload         5
+        36: aload         8
+        38: aload         9
+        40: aload         10
+        42: aload         11
+        44: aload         12
+        46: aload         13
+        48: aload         14
+        50: invokevirtual #281                // Method appliesOverlayCorner:(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+        53: ifeq          67
+        56: aload_1
+        57: aload_0
+        58: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+        61: iload         7
+        63: aaload
+        64: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+        67: aload_1
+        68: areturn
+
+  protected me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector fromOneSide(me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.Direction, net.minecraft.core.Direction, net.minecraft.core.Direction, int, int, int, net.minecraft.core.BlockPos$MutableBlockPos, net.minecraft.world.level.BlockAndTintGetter, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.Direction, net.minecraft.client.renderer.texture.TextureAtlasSprite);
+    Code:
+         0: aload_0
+         1: aload_3
+         2: aload         16
+         4: invokevirtual #279                // Method hasSameOverlay:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z
+         7: ifeq          19
+        10: iconst_1
+        11: istore        18
+        13: iconst_1
+        14: istore        19
+        16: goto          38
+        19: aload_0
+        20: aload_2
+        21: aload         16
+        23: invokevirtual #279                // Method hasSameOverlay:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z
+        26: istore        18
+        28: aload_0
+        29: aload         4
+        31: aload         16
+        33: invokevirtual #279                // Method hasSameOverlay:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z
+        36: istore        19
+        38: aload_1
+        39: aload_0
+        40: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+        43: iload         8
+        45: aaload
+        46: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+        49: iload         18
+        51: ifeq          90
+        54: aload_0
+        55: aload         5
+        57: aload         6
+        59: aload         11
+        61: aload         12
+        63: aload         13
+        65: aload         14
+        67: aload         15
+        69: aload         16
+        71: aload         17
+        73: invokevirtual #281                // Method appliesOverlayCorner:(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+        76: ifeq          90
+        79: aload_1
+        80: aload_0
+        81: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+        84: iload         9
+        86: aaload
+        87: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+        90: iload         19
+        92: ifeq          131
+        95: aload_0
+        96: aload         6
+        98: aload         7
+       100: aload         11
+       102: aload         12
+       104: aload         13
+       106: aload         14
+       108: aload         15
+       110: aload         16
+       112: aload         17
+       114: invokevirtual #281                // Method appliesOverlayCorner:(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+       117: ifeq          131
+       120: aload_1
+       121: aload_0
+       122: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+       125: iload         10
+       127: aaload
+       128: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+       131: aload_1
+       132: areturn
+
+  protected static me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector getCollector(me.pepperbell.continuity.api.client.ProcessingDataProvider);
+    Code:
+         0: aload_0
+         1: getstatic     #298                // Field me/pepperbell/continuity/client/processor/ProcessingDataKeys.SPRITE_COLLECTOR:Lme/pepperbell/continuity/api/client/ProcessingDataKey;
+         4: invokeinterface #304,  2          // InterfaceMethod me/pepperbell/continuity/api/client/ProcessingDataProvider.getData:(Lme/pepperbell/continuity/api/client/ProcessingDataKey;)Ljava/lang/Object;
+         9: checkcast     #9                  // class me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector
+        12: areturn
+
+  protected me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector prepareCollector(me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector, int);
+    Code:
+         0: aload_1
+         1: aload_0
+         2: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+         5: iload_2
+         6: aaload
+         7: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+        10: aload_1
+        11: areturn
+
+  protected me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector prepareCollector(me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector, int, int);
+    Code:
+         0: aload_1
+         1: aload_0
+         2: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+         5: iload_2
+         6: aaload
+         7: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+        10: aload_1
+        11: aload_0
+        12: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+        15: iload_3
+        16: aaload
+        17: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+        20: aload_1
+        21: areturn
+
+  protected me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor$SpriteCollector getSprites(net.minecraft.world.level.BlockAndTintGetter, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.Direction, net.minecraft.client.renderer.texture.TextureAtlasSprite, net.minecraft.core.Direction[], me.pepperbell.continuity.api.client.ProcessingDataProvider);
+    Code:
+         0: aload         8
+         2: getstatic     #314                // Field me/pepperbell/continuity/client/processor/ProcessingDataKeys.MUTABLE_POS:Lme/pepperbell/continuity/api/client/ProcessingDataKey;
+         5: invokeinterface #304,  2          // InterfaceMethod me/pepperbell/continuity/api/client/ProcessingDataProvider.getData:(Lme/pepperbell/continuity/api/client/ProcessingDataKey;)Ljava/lang/Object;
+        10: checkcast     #20                 // class net/minecraft/core/BlockPos$MutableBlockPos
+        13: astore        9
+        15: iconst_0
+        16: istore        10
+        18: aload         9
+        20: aload_2
+        21: aload         7
+        23: iconst_0
+        24: aaload
+        25: invokevirtual #249                // Method net/minecraft/core/BlockPos$MutableBlockPos.setWithOffset:(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        28: aload         5
+        30: invokevirtual #253                // Method net/minecraft/core/BlockPos$MutableBlockPos.move:(Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        33: pop
+        34: aload_1
+        35: aload         9
+        37: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        42: invokevirtual #266                // Method net/minecraft/world/level/block/state/BlockState.isSolidRender:()Z
+        45: ifne          115
+        48: aload         9
+        50: aload_2
+        51: aload         7
+        53: iconst_0
+        54: aaload
+        55: invokevirtual #249                // Method net/minecraft/core/BlockPos$MutableBlockPos.setWithOffset:(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+        58: pop
+        59: aload_1
+        60: aload         9
+        62: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        67: astore        12
+        69: aload         12
+        71: aload_1
+        72: aload         9
+        74: aload         5
+        76: aload         4
+        78: aload_2
+        79: invokevirtual #261                // Method net/minecraft/world/level/block/state/BlockState.getAppearance:(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+        82: astore        11
+        84: aload_0
+        85: aload         9
+        87: aload         11
+        89: aload         12
+        91: aload_1
+        92: aload_2
+        93: aload_3
+        94: aload         4
+        96: aload         5
+        98: aload         6
+       100: invokevirtual #263                // Method appliesOverlay:(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+       103: ifeq          112
+       106: iload         10
+       108: iconst_1
+       109: ior
+       110: istore        10
+       112: goto          118
+       115: aconst_null
+       116: astore        11
+       118: aload         9
+       120: aload_2
+       121: aload         7
+       123: iconst_1
+       124: aaload
+       125: invokevirtual #249                // Method net/minecraft/core/BlockPos$MutableBlockPos.setWithOffset:(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       128: aload         5
+       130: invokevirtual #253                // Method net/minecraft/core/BlockPos$MutableBlockPos.move:(Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       133: pop
+       134: aload_1
+       135: aload         9
+       137: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       142: invokevirtual #266                // Method net/minecraft/world/level/block/state/BlockState.isSolidRender:()Z
+       145: ifne          215
+       148: aload         9
+       150: aload_2
+       151: aload         7
+       153: iconst_1
+       154: aaload
+       155: invokevirtual #249                // Method net/minecraft/core/BlockPos$MutableBlockPos.setWithOffset:(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       158: pop
+       159: aload_1
+       160: aload         9
+       162: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       167: astore        13
+       169: aload         13
+       171: aload_1
+       172: aload         9
+       174: aload         5
+       176: aload         4
+       178: aload_2
+       179: invokevirtual #261                // Method net/minecraft/world/level/block/state/BlockState.getAppearance:(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       182: astore        12
+       184: aload_0
+       185: aload         9
+       187: aload         12
+       189: aload         13
+       191: aload_1
+       192: aload_2
+       193: aload_3
+       194: aload         4
+       196: aload         5
+       198: aload         6
+       200: invokevirtual #263                // Method appliesOverlay:(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+       203: ifeq          212
+       206: iload         10
+       208: iconst_2
+       209: ior
+       210: istore        10
+       212: goto          218
+       215: aconst_null
+       216: astore        12
+       218: aload         9
+       220: aload_2
+       221: aload         7
+       223: iconst_2
+       224: aaload
+       225: invokevirtual #249                // Method net/minecraft/core/BlockPos$MutableBlockPos.setWithOffset:(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       228: aload         5
+       230: invokevirtual #253                // Method net/minecraft/core/BlockPos$MutableBlockPos.move:(Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       233: pop
+       234: aload_1
+       235: aload         9
+       237: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       242: invokevirtual #266                // Method net/minecraft/world/level/block/state/BlockState.isSolidRender:()Z
+       245: ifne          315
+       248: aload         9
+       250: aload_2
+       251: aload         7
+       253: iconst_2
+       254: aaload
+       255: invokevirtual #249                // Method net/minecraft/core/BlockPos$MutableBlockPos.setWithOffset:(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       258: pop
+       259: aload_1
+       260: aload         9
+       262: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       267: astore        14
+       269: aload         14
+       271: aload_1
+       272: aload         9
+       274: aload         5
+       276: aload         4
+       278: aload_2
+       279: invokevirtual #261                // Method net/minecraft/world/level/block/state/BlockState.getAppearance:(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       282: astore        13
+       284: aload_0
+       285: aload         9
+       287: aload         13
+       289: aload         14
+       291: aload_1
+       292: aload_2
+       293: aload_3
+       294: aload         4
+       296: aload         5
+       298: aload         6
+       300: invokevirtual #263                // Method appliesOverlay:(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+       303: ifeq          312
+       306: iload         10
+       308: iconst_4
+       309: ior
+       310: istore        10
+       312: goto          318
+       315: aconst_null
+       316: astore        13
+       318: aload         9
+       320: aload_2
+       321: aload         7
+       323: iconst_3
+       324: aaload
+       325: invokevirtual #249                // Method net/minecraft/core/BlockPos$MutableBlockPos.setWithOffset:(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       328: aload         5
+       330: invokevirtual #253                // Method net/minecraft/core/BlockPos$MutableBlockPos.move:(Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       333: pop
+       334: aload_1
+       335: aload         9
+       337: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       342: invokevirtual #266                // Method net/minecraft/world/level/block/state/BlockState.isSolidRender:()Z
+       345: ifne          416
+       348: aload         9
+       350: aload_2
+       351: aload         7
+       353: iconst_3
+       354: aaload
+       355: invokevirtual #249                // Method net/minecraft/core/BlockPos$MutableBlockPos.setWithOffset:(Lnet/minecraft/core/Vec3i;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/BlockPos$MutableBlockPos;
+       358: pop
+       359: aload_1
+       360: aload         9
+       362: invokeinterface #257,  2          // InterfaceMethod net/minecraft/world/level/BlockAndTintGetter.getBlockState:(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       367: astore        15
+       369: aload         15
+       371: aload_1
+       372: aload         9
+       374: aload         5
+       376: aload         4
+       378: aload_2
+       379: invokevirtual #261                // Method net/minecraft/world/level/block/state/BlockState.getAppearance:(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+       382: astore        14
+       384: aload_0
+       385: aload         9
+       387: aload         14
+       389: aload         15
+       391: aload_1
+       392: aload_2
+       393: aload_3
+       394: aload         4
+       396: aload         5
+       398: aload         6
+       400: invokevirtual #263                // Method appliesOverlay:(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+       403: ifeq          413
+       406: iload         10
+       408: bipush        8
+       410: ior
+       411: istore        10
+       413: goto          419
+       416: aconst_null
+       417: astore        14
+       419: iload         10
+       421: tableswitch   { // 0 to 15
+                       0: 935
+                       1: 752
+                       2: 798
+                       3: 600
+                       4: 844
+                       5: 569
+                       6: 638
+                       7: 514
+                       8: 890
+                       9: 714
+                      10: 585
+                      11: 527
+                      12: 676
+                      13: 541
+                      14: 555
+                      15: 500
+                 default: 1235
+            }
+       500: aload_0
+       501: aload         8
+       503: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       506: bipush        8
+       508: invokevirtual #318                // Method prepareCollector:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;I)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       511: goto          1250
+       514: aload_0
+       515: aload         8
+       517: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       520: iconst_5
+       521: invokevirtual #318                // Method prepareCollector:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;I)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       524: goto          1250
+       527: aload_0
+       528: aload         8
+       530: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       533: bipush        6
+       535: invokevirtual #318                // Method prepareCollector:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;I)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       538: goto          1250
+       541: aload_0
+       542: aload         8
+       544: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       547: bipush        13
+       549: invokevirtual #318                // Method prepareCollector:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;I)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       552: goto          1250
+       555: aload_0
+       556: aload         8
+       558: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       561: bipush        12
+       563: invokevirtual #318                // Method prepareCollector:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;I)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       566: goto          1250
+       569: aload_0
+       570: aload         8
+       572: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       575: bipush        9
+       577: bipush        7
+       579: invokevirtual #320                // Method prepareCollector:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;II)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       582: goto          1250
+       585: aload_0
+       586: aload         8
+       588: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       591: iconst_1
+       592: bipush        15
+       594: invokevirtual #320                // Method prepareCollector:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;II)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       597: goto          1250
+       600: aload_0
+       601: aload         8
+       603: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       606: aload         13
+       608: aload         14
+       610: aload         7
+       612: iconst_2
+       613: aaload
+       614: aload         7
+       616: iconst_3
+       617: aaload
+       618: iconst_4
+       619: bipush        14
+       621: aload         9
+       623: aload_1
+       624: aload_2
+       625: aload_3
+       626: aload         4
+       628: aload         5
+       630: aload         6
+       632: invokevirtual #322                // Method fromTwoSidesAdj:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;IILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       635: goto          1250
+       638: aload_0
+       639: aload         8
+       641: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       644: aload         14
+       646: aload         11
+       648: aload         7
+       650: iconst_3
+       651: aaload
+       652: aload         7
+       654: iconst_0
+       655: aaload
+       656: iconst_3
+       657: bipush        16
+       659: aload         9
+       661: aload_1
+       662: aload_2
+       663: aload_3
+       664: aload         4
+       666: aload         5
+       668: aload         6
+       670: invokevirtual #322                // Method fromTwoSidesAdj:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;IILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       673: goto          1250
+       676: aload_0
+       677: aload         8
+       679: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       682: aload         11
+       684: aload         12
+       686: aload         7
+       688: iconst_0
+       689: aaload
+       690: aload         7
+       692: iconst_1
+       693: aaload
+       694: bipush        10
+       696: iconst_2
+       697: aload         9
+       699: aload_1
+       700: aload_2
+       701: aload_3
+       702: aload         4
+       704: aload         5
+       706: aload         6
+       708: invokevirtual #322                // Method fromTwoSidesAdj:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;IILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       711: goto          1250
+       714: aload_0
+       715: aload         8
+       717: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       720: aload         12
+       722: aload         13
+       724: aload         7
+       726: iconst_1
+       727: aaload
+       728: aload         7
+       730: iconst_2
+       731: aaload
+       732: bipush        11
+       734: iconst_0
+       735: aload         9
+       737: aload_1
+       738: aload_2
+       739: aload_3
+       740: aload         4
+       742: aload         5
+       744: aload         6
+       746: invokevirtual #322                // Method fromTwoSidesAdj:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;IILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       749: goto          1250
+       752: aload_0
+       753: aload         8
+       755: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       758: aload         12
+       760: aload         13
+       762: aload         14
+       764: aload         7
+       766: iconst_1
+       767: aaload
+       768: aload         7
+       770: iconst_2
+       771: aaload
+       772: aload         7
+       774: iconst_3
+       775: aaload
+       776: bipush        9
+       778: iconst_0
+       779: bipush        14
+       781: aload         9
+       783: aload_1
+       784: aload_2
+       785: aload_3
+       786: aload         4
+       788: aload         5
+       790: aload         6
+       792: invokevirtual #324                // Method fromOneSide:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;IIILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       795: goto          1250
+       798: aload_0
+       799: aload         8
+       801: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       804: aload         13
+       806: aload         14
+       808: aload         11
+       810: aload         7
+       812: iconst_2
+       813: aaload
+       814: aload         7
+       816: iconst_3
+       817: aaload
+       818: aload         7
+       820: iconst_0
+       821: aaload
+       822: iconst_1
+       823: bipush        14
+       825: bipush        16
+       827: aload         9
+       829: aload_1
+       830: aload_2
+       831: aload_3
+       832: aload         4
+       834: aload         5
+       836: aload         6
+       838: invokevirtual #324                // Method fromOneSide:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;IIILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       841: goto          1250
+       844: aload_0
+       845: aload         8
+       847: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       850: aload         14
+       852: aload         11
+       854: aload         12
+       856: aload         7
+       858: iconst_3
+       859: aaload
+       860: aload         7
+       862: iconst_0
+       863: aaload
+       864: aload         7
+       866: iconst_1
+       867: aaload
+       868: bipush        7
+       870: bipush        16
+       872: iconst_2
+       873: aload         9
+       875: aload_1
+       876: aload_2
+       877: aload_3
+       878: aload         4
+       880: aload         5
+       882: aload         6
+       884: invokevirtual #324                // Method fromOneSide:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;IIILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       887: goto          1250
+       890: aload_0
+       891: aload         8
+       893: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       896: aload         11
+       898: aload         12
+       900: aload         13
+       902: aload         7
+       904: iconst_0
+       905: aaload
+       906: aload         7
+       908: iconst_1
+       909: aaload
+       910: aload         7
+       912: iconst_2
+       913: aaload
+       914: bipush        15
+       916: iconst_2
+       917: iconst_0
+       918: aload         9
+       920: aload_1
+       921: aload_2
+       922: aload_3
+       923: aload         4
+       925: aload         5
+       927: aload         6
+       929: invokevirtual #324                // Method fromOneSide:(Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;IIILnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+       932: goto          1250
+       935: aload_0
+       936: aload         11
+       938: aload         5
+       940: invokevirtual #279                // Method hasSameOverlay:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z
+       943: istore        15
+       945: aload_0
+       946: aload         12
+       948: aload         5
+       950: invokevirtual #279                // Method hasSameOverlay:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z
+       953: istore        16
+       955: aload_0
+       956: aload         13
+       958: aload         5
+       960: invokevirtual #279                // Method hasSameOverlay:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z
+       963: istore        17
+       965: aload_0
+       966: aload         14
+       968: aload         5
+       970: invokevirtual #279                // Method hasSameOverlay:(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z
+       973: istore        18
+       975: iload         15
+       977: iload         16
+       979: ior
+       980: ifeq          1013
+       983: aload_0
+       984: aload         7
+       986: iconst_0
+       987: aaload
+       988: aload         7
+       990: iconst_1
+       991: aaload
+       992: aload         9
+       994: aload_1
+       995: aload_2
+       996: aload_3
+       997: aload         4
+       999: aload         5
+      1001: aload         6
+      1003: invokevirtual #281                // Method appliesOverlayCorner:(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+      1006: ifeq          1013
+      1009: iconst_1
+      1010: goto          1014
+      1013: iconst_0
+      1014: istore        19
+      1016: iload         16
+      1018: iload         17
+      1020: ior
+      1021: ifeq          1054
+      1024: aload_0
+      1025: aload         7
+      1027: iconst_1
+      1028: aaload
+      1029: aload         7
+      1031: iconst_2
+      1032: aaload
+      1033: aload         9
+      1035: aload_1
+      1036: aload_2
+      1037: aload_3
+      1038: aload         4
+      1040: aload         5
+      1042: aload         6
+      1044: invokevirtual #281                // Method appliesOverlayCorner:(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+      1047: ifeq          1054
+      1050: iconst_1
+      1051: goto          1055
+      1054: iconst_0
+      1055: istore        20
+      1057: iload         17
+      1059: iload         18
+      1061: ior
+      1062: ifeq          1095
+      1065: aload_0
+      1066: aload         7
+      1068: iconst_2
+      1069: aaload
+      1070: aload         7
+      1072: iconst_3
+      1073: aaload
+      1074: aload         9
+      1076: aload_1
+      1077: aload_2
+      1078: aload_3
+      1079: aload         4
+      1081: aload         5
+      1083: aload         6
+      1085: invokevirtual #281                // Method appliesOverlayCorner:(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+      1088: ifeq          1095
+      1091: iconst_1
+      1092: goto          1096
+      1095: iconst_0
+      1096: istore        21
+      1098: iload         18
+      1100: iload         15
+      1102: ior
+      1103: ifeq          1136
+      1106: aload_0
+      1107: aload         7
+      1109: iconst_3
+      1110: aaload
+      1111: aload         7
+      1113: iconst_0
+      1114: aaload
+      1115: aload         9
+      1117: aload_1
+      1118: aload_2
+      1119: aload_3
+      1120: aload         4
+      1122: aload         5
+      1124: aload         6
+      1126: invokevirtual #281                // Method appliesOverlayCorner:(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos$MutableBlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)Z
+      1129: ifeq          1136
+      1132: iconst_1
+      1133: goto          1137
+      1136: iconst_0
+      1137: istore        22
+      1139: iload         19
+      1141: iload         20
+      1143: ior
+      1144: iload         21
+      1146: ior
+      1147: iload         22
+      1149: ior
+      1150: ifeq          1231
+      1153: aload         8
+      1155: invokestatic  #316                // Method getCollector:(Lme/pepperbell/continuity/api/client/ProcessingDataProvider;)Lme/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector;
+      1158: astore        23
+      1160: iload         19
+      1162: ifeq          1176
+      1165: aload         23
+      1167: aload_0
+      1168: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+      1171: iconst_2
+      1172: aaload
+      1173: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+      1176: iload         20
+      1178: ifeq          1192
+      1181: aload         23
+      1183: aload_0
+      1184: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+      1187: iconst_0
+      1188: aaload
+      1189: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+      1192: iload         21
+      1194: ifeq          1209
+      1197: aload         23
+      1199: aload_0
+      1200: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+      1203: bipush        14
+      1205: aaload
+      1206: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+      1209: iload         22
+      1211: ifeq          1226
+      1214: aload         23
+      1216: aload_0
+      1217: getfield      #273                // Field sprites:[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+      1220: bipush        16
+      1222: aaload
+      1223: invokevirtual #277                // Method me/pepperbell/continuity/client/processor/overlay/StandardOverlayQuadProcessor$SpriteCollector.add:(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+      1226: aload         23
+      1228: goto          1250
+      1231: aconst_null
+      1232: goto          1250
+      1235: new           #328                // class java/lang/IllegalStateException
+      1238: dup
+      1239: iload         10
+      1241: invokedynamic #340,  0            // InvokeDynamic #0:makeConcatWithConstants:(I)Ljava/lang/String;
+      1246: invokespecial #343                // Method java/lang/IllegalStateException."<init>":(Ljava/lang/String;)V
+      1249: athrow
+      1250: areturn
+}

@@ -1,0 +1,17 @@
+Compiled from "StairsShape.java"
+public final class net.minecraft.world.level.block.state.properties.StairsShape extends java.lang.Enum<net.minecraft.world.level.block.state.properties.StairsShape> implements net.minecraft.util.StringRepresentable {
+  public static final net.minecraft.world.level.block.state.properties.StairsShape STRAIGHT;
+  public static final net.minecraft.world.level.block.state.properties.StairsShape INNER_LEFT;
+  public static final net.minecraft.world.level.block.state.properties.StairsShape INNER_RIGHT;
+  public static final net.minecraft.world.level.block.state.properties.StairsShape OUTER_LEFT;
+  public static final net.minecraft.world.level.block.state.properties.StairsShape OUTER_RIGHT;
+  private final java.lang.String name;
+  private static final net.minecraft.world.level.block.state.properties.StairsShape[] $VALUES;
+  public static net.minecraft.world.level.block.state.properties.StairsShape[] values();
+  public static net.minecraft.world.level.block.state.properties.StairsShape valueOf(java.lang.String);
+  private net.minecraft.world.level.block.state.properties.StairsShape(java.lang.String);
+  public java.lang.String toString();
+  public java.lang.String getSerializedName();
+  private static net.minecraft.world.level.block.state.properties.StairsShape[] $values();
+  static {};
+}

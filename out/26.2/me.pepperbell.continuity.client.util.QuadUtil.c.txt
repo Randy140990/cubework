@@ -1,0 +1,678 @@
+Compiled from "QuadUtil.java"
+public final class me.pepperbell.continuity.client.util.QuadUtil {
+  public me.pepperbell.continuity.client.util.QuadUtil();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+
+  public static void interpolate(net.fabricmc.fabric.api.client.renderer.v1.mesh.MutableQuadView, net.minecraft.client.renderer.texture.TextureAtlasSprite, net.minecraft.client.renderer.texture.TextureAtlasSprite);
+    Code:
+         0: aload_1
+         1: invokevirtual #7                  // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU0:()F
+         4: fstore_3
+         5: aload_1
+         6: invokevirtual #13                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV0:()F
+         9: fstore        4
+        11: aload_2
+        12: invokevirtual #7                  // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU0:()F
+        15: fstore        5
+        17: aload_2
+        18: invokevirtual #13                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV0:()F
+        21: fstore        6
+        23: aload_2
+        24: invokevirtual #16                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU1:()F
+        27: fload         5
+        29: fsub
+        30: aload_1
+        31: invokevirtual #16                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU1:()F
+        34: fload_3
+        35: fsub
+        36: fdiv
+        37: fstore        7
+        39: aload_2
+        40: invokevirtual #19                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV1:()F
+        43: fload         6
+        45: fsub
+        46: aload_1
+        47: invokevirtual #19                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV1:()F
+        50: fload         4
+        52: fsub
+        53: fdiv
+        54: fstore        8
+        56: iconst_0
+        57: istore        9
+        59: iload         9
+        61: iconst_4
+        62: if_icmpge     113
+        65: aload_0
+        66: iload         9
+        68: fload         5
+        70: aload_0
+        71: iload         9
+        73: invokeinterface #22,  2           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/MutableQuadView.u:(I)F
+        78: fload_3
+        79: fsub
+        80: fload         7
+        82: fmul
+        83: fadd
+        84: fload         6
+        86: aload_0
+        87: iload         9
+        89: invokeinterface #28,  2           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/MutableQuadView.v:(I)F
+        94: fload         4
+        96: fsub
+        97: fload         8
+        99: fmul
+       100: fadd
+       101: invokeinterface #31,  4           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/MutableQuadView.uv:(IFF)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/MutableQuadView;
+       106: pop
+       107: iinc          9, 1
+       110: goto          59
+       113: aload_0
+       114: aload_2
+       115: invokevirtual #35                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.contents:()Lnet/minecraft/client/renderer/texture/SpriteContents;
+       118: invokevirtual #39                 // Method net/minecraft/client/renderer/texture/SpriteContents.isAnimated:()Z
+       121: invokeinterface #45,  2           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/MutableQuadView.animated:(Z)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/MutableQuadView;
+       126: pop
+       127: return
+
+  public static void interpolate(net.minecraft.client.resources.model.geometry.BakedQuad, me.pepperbell.continuity.client.util.QuadUtil$PackedUvContainer, net.minecraft.client.renderer.texture.TextureAtlasSprite, net.minecraft.client.renderer.texture.TextureAtlasSprite);
+    Code:
+         0: aload_2
+         1: invokevirtual #7                  // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU0:()F
+         4: fstore        4
+         6: aload_2
+         7: invokevirtual #13                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV0:()F
+        10: fstore        5
+        12: aload_3
+        13: invokevirtual #7                  // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU0:()F
+        16: fstore        6
+        18: aload_3
+        19: invokevirtual #13                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV0:()F
+        22: fstore        7
+        24: aload_3
+        25: invokevirtual #16                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU1:()F
+        28: fload         6
+        30: fsub
+        31: aload_2
+        32: invokevirtual #16                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU1:()F
+        35: fload         4
+        37: fsub
+        38: fdiv
+        39: fstore        8
+        41: aload_3
+        42: invokevirtual #19                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV1:()F
+        45: fload         7
+        47: fsub
+        48: aload_2
+        49: invokevirtual #19                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV1:()F
+        52: fload         5
+        54: fsub
+        55: fdiv
+        56: fstore        9
+        58: iconst_0
+        59: istore        10
+        61: iload         10
+        63: iconst_4
+        64: if_icmpge     118
+        67: aload_0
+        68: iload         10
+        70: invokevirtual #49                 // Method net/minecraft/client/resources/model/geometry/BakedQuad.packedUV:(I)J
+        73: lstore        11
+        75: aload_1
+        76: iload         10
+        78: fload         6
+        80: lload         11
+        82: invokestatic  #55                 // Method net/minecraft/client/model/geom/builders/UVPair.unpackU:(J)F
+        85: fload         4
+        87: fsub
+        88: fload         8
+        90: fmul
+        91: fadd
+        92: fload         7
+        94: lload         11
+        96: invokestatic  #61                 // Method net/minecraft/client/model/geom/builders/UVPair.unpackV:(J)F
+        99: fload         5
+       101: fsub
+       102: fload         9
+       104: fmul
+       105: fadd
+       106: invokestatic  #64                 // Method net/minecraft/client/model/geom/builders/UVPair.pack:(FF)J
+       109: invokevirtual #68                 // Method me/pepperbell/continuity/client/util/QuadUtil$PackedUvContainer.packedUV:(IJ)V
+       112: iinc          10, 1
+       115: goto          61
+       118: return
+
+  public static void emitOverlayQuad(net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter, net.minecraft.core.Direction, net.minecraft.client.renderer.texture.TextureAtlasSprite, int, net.minecraft.client.renderer.chunk.ChunkSectionLayer, net.fabricmc.fabric.api.util.TriState);
+    Code:
+         0: aload_0
+         1: aload_1
+         2: fconst_0
+         3: fconst_0
+         4: fconst_1
+         5: fconst_1
+         6: fconst_0
+         7: invokeinterface #73,  7           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.square:(Lnet/minecraft/core/Direction;FFFFF)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+        12: pop
+        13: aload_0
+        14: iload_3
+        15: iload_3
+        16: iload_3
+        17: iload_3
+        18: invokeinterface #79,  5           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.color:(IIII)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+        23: pop
+        24: aload_0
+        25: iconst_0
+        26: aload_2
+        27: invokevirtual #7                  // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU0:()F
+        30: aload_2
+        31: invokevirtual #13                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV0:()F
+        34: invokeinterface #83,  4           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.uv:(IFF)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+        39: pop
+        40: aload_0
+        41: iconst_1
+        42: aload_2
+        43: invokevirtual #7                  // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU0:()F
+        46: aload_2
+        47: invokevirtual #19                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV1:()F
+        50: invokeinterface #83,  4           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.uv:(IFF)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+        55: pop
+        56: aload_0
+        57: iconst_2
+        58: aload_2
+        59: invokevirtual #16                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU1:()F
+        62: aload_2
+        63: invokevirtual #19                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV1:()F
+        66: invokeinterface #83,  4           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.uv:(IFF)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+        71: pop
+        72: aload_0
+        73: iconst_3
+        74: aload_2
+        75: invokevirtual #16                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getU1:()F
+        78: aload_2
+        79: invokevirtual #13                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.getV0:()F
+        82: invokeinterface #83,  4           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.uv:(IFF)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+        87: pop
+        88: aload_0
+        89: getstatic     #86                 // Field net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadAtlas.BLOCK:Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadAtlas;
+        92: invokeinterface #92,  2           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.atlas:(Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadAtlas;)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+        97: pop
+        98: aload_0
+        99: aload_2
+       100: invokevirtual #35                 // Method net/minecraft/client/renderer/texture/TextureAtlasSprite.contents:()Lnet/minecraft/client/renderer/texture/SpriteContents;
+       103: invokevirtual #39                 // Method net/minecraft/client/renderer/texture/SpriteContents.isAnimated:()Z
+       106: invokeinterface #96,  2           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.animated:(Z)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+       111: pop
+       112: aload_0
+       113: aload         4
+       115: invokeinterface #99,  2           // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.chunkLayer:(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+       120: pop
+       121: aload_0
+       122: aload         4
+       124: getstatic     #103                // Field net/minecraft/client/renderer/chunk/ChunkSectionLayer.TRANSLUCENT:Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;
+       127: if_acmpne     136
+       130: invokestatic  #109                // Method net/minecraft/client/renderer/Sheets.translucentBlockItemSheet:()Lnet/minecraft/client/renderer/rendertype/RenderType;
+       133: goto          139
+       136: invokestatic  #115                // Method net/minecraft/client/renderer/Sheets.cutoutBlockItemSheet:()Lnet/minecraft/client/renderer/rendertype/RenderType;
+       139: invokeinterface #118,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.itemRenderType:(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+       144: pop
+       145: aload_0
+       146: aload         5
+       148: invokeinterface #122,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.ambientOcclusion:(Lnet/fabricmc/fabric/api/util/TriState;)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+       153: pop
+       154: aload_0
+       155: invokeinterface #126,  1          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter.emit:()Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/QuadEmitter;
+       160: pop
+       161: return
+
+  public static boolean isQuadUnitSquare(net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadView);
+    Code:
+         0: getstatic     #130                // Field me/pepperbell/continuity/client/util/QuadUtil$2.$SwitchMap$net$minecraft$core$Direction$Axis:[I
+         3: aload_0
+         4: invokeinterface #136,  1          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.lightFace:()Lnet/minecraft/core/Direction;
+         9: invokevirtual #142                // Method net/minecraft/core/Direction.getAxis:()Lnet/minecraft/core/Direction$Axis;
+        12: invokevirtual #148                // Method net/minecraft/core/Direction$Axis.ordinal:()I
+        15: iaload
+        16: tableswitch   { // 1 to 3
+                       1: 44
+                       2: 51
+                       3: 58
+                 default: 65
+            }
+        44: iconst_1
+        45: istore_1
+        46: iconst_2
+        47: istore_2
+        48: goto          67
+        51: iconst_0
+        52: istore_1
+        53: iconst_2
+        54: istore_2
+        55: goto          67
+        58: iconst_1
+        59: istore_1
+        60: iconst_0
+        61: istore_2
+        62: goto          67
+        65: iconst_0
+        66: ireturn
+        67: iconst_0
+        68: istore_3
+        69: iload_3
+        70: iconst_4
+        71: if_icmpge     168
+        74: aload_0
+        75: iload_3
+        76: iload_1
+        77: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+        82: fstore        4
+        84: fload         4
+        86: ldc           #158                // float 1.0E-4f
+        88: fcmpl
+        89: ifge          100
+        92: fload         4
+        94: ldc           #159                // float -1.0E-4f
+        96: fcmpg
+        97: ifgt          118
+       100: fload         4
+       102: ldc           #160                // float 1.0001f
+       104: fcmpl
+       105: ifge          116
+       108: fload         4
+       110: ldc           #161                // float 0.9999f
+       112: fcmpg
+       113: ifgt          118
+       116: iconst_0
+       117: ireturn
+       118: aload_0
+       119: iload_3
+       120: iload_2
+       121: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+       126: fstore        5
+       128: fload         5
+       130: ldc           #158                // float 1.0E-4f
+       132: fcmpl
+       133: ifge          144
+       136: fload         5
+       138: ldc           #159                // float -1.0E-4f
+       140: fcmpg
+       141: ifgt          162
+       144: fload         5
+       146: ldc           #160                // float 1.0001f
+       148: fcmpl
+       149: ifge          160
+       152: fload         5
+       154: ldc           #161                // float 0.9999f
+       156: fcmpg
+       157: ifgt          162
+       160: iconst_0
+       161: ireturn
+       162: iinc          3, 1
+       165: goto          69
+       168: iconst_1
+       169: ireturn
+
+  public static int getTextureOrientation(net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadView);
+    Code:
+         0: aload_0
+         1: iconst_3
+         2: invokeinterface #162,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.u:(I)F
+         7: aload_0
+         8: iconst_1
+         9: invokeinterface #162,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.u:(I)F
+        14: fsub
+        15: fstore_1
+        16: aload_0
+        17: iconst_3
+        18: invokeinterface #163,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.v:(I)F
+        23: aload_0
+        24: iconst_1
+        25: invokeinterface #163,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.v:(I)F
+        30: fsub
+        31: fstore_2
+        32: aload_0
+        33: iconst_2
+        34: invokeinterface #162,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.u:(I)F
+        39: aload_0
+        40: iconst_0
+        41: invokeinterface #162,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.u:(I)F
+        46: fsub
+        47: fstore_3
+        48: aload_0
+        49: iconst_2
+        50: invokeinterface #163,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.v:(I)F
+        55: aload_0
+        56: iconst_0
+        57: invokeinterface #163,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.v:(I)F
+        62: fsub
+        63: fstore        4
+        65: fload_1
+        66: fload         4
+        68: fmul
+        69: fload_3
+        70: fload_2
+        71: fmul
+        72: fsub
+        73: fstore        5
+        75: fload         5
+        77: fconst_0
+        78: fcmpl
+        79: ifne          84
+        82: iconst_0
+        83: ireturn
+        84: fconst_1
+        85: fload         5
+        87: fdiv
+        88: fstore        6
+        90: fload_3
+        91: fneg
+        92: fload         6
+        94: fmul
+        95: fstore        7
+        97: fload_1
+        98: fload         6
+       100: fmul
+       101: fstore        8
+       103: getstatic     #164                // Field me/pepperbell/continuity/client/util/QuadUtil$2.$SwitchMap$net$minecraft$core$Direction:[I
+       106: aload_0
+       107: invokeinterface #136,  1          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.lightFace:()Lnet/minecraft/core/Direction;
+       112: invokevirtual #167                // Method net/minecraft/core/Direction.ordinal:()I
+       115: iaload
+       116: tableswitch   { // 1 to 6
+                       1: 156
+                       2: 171
+                       3: 186
+                       4: 201
+                       5: 216
+                       6: 231
+                 default: 246
+            }
+       156: iconst_0
+       157: istore        9
+       159: iconst_1
+       160: istore        10
+       162: iconst_2
+       163: istore        11
+       165: iconst_1
+       166: istore        12
+       168: goto          248
+       171: iconst_0
+       172: istore        9
+       174: iconst_1
+       175: istore        10
+       177: iconst_2
+       178: istore        11
+       180: iconst_m1
+       181: istore        12
+       183: goto          248
+       186: iconst_0
+       187: istore        9
+       189: iconst_m1
+       190: istore        10
+       192: iconst_1
+       193: istore        11
+       195: iconst_1
+       196: istore        12
+       198: goto          248
+       201: iconst_0
+       202: istore        9
+       204: iconst_1
+       205: istore        10
+       207: iconst_1
+       208: istore        11
+       210: iconst_1
+       211: istore        12
+       213: goto          248
+       216: iconst_2
+       217: istore        9
+       219: iconst_1
+       220: istore        10
+       222: iconst_1
+       223: istore        11
+       225: iconst_1
+       226: istore        12
+       228: goto          248
+       231: iconst_2
+       232: istore        9
+       234: iconst_m1
+       235: istore        10
+       237: iconst_1
+       238: istore        11
+       240: iconst_1
+       241: istore        12
+       243: goto          248
+       246: iconst_0
+       247: ireturn
+       248: aload_0
+       249: iconst_3
+       250: iload         9
+       252: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+       257: aload_0
+       258: iconst_1
+       259: iload         9
+       261: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+       266: fsub
+       267: fstore        13
+       269: aload_0
+       270: iconst_3
+       271: iload         11
+       273: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+       278: aload_0
+       279: iconst_1
+       280: iload         11
+       282: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+       287: fsub
+       288: fstore        14
+       290: aload_0
+       291: iconst_2
+       292: iload         9
+       294: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+       299: aload_0
+       300: iconst_0
+       301: iload         9
+       303: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+       308: fsub
+       309: fstore        15
+       311: aload_0
+       312: iconst_2
+       313: iload         11
+       315: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+       320: aload_0
+       321: iconst_0
+       322: iload         11
+       324: invokeinterface #154,  3          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/QuadView.posByIndex:(II)F
+       329: fsub
+       330: fstore        16
+       332: fload         13
+       334: fload         7
+       336: fmul
+       337: fload         15
+       339: fload         8
+       341: fmul
+       342: fadd
+       343: fneg
+       344: iload         10
+       346: i2f
+       347: fmul
+       348: fstore        17
+       350: fload         14
+       352: fload         7
+       354: fmul
+       355: fload         16
+       357: fload         8
+       359: fmul
+       360: fadd
+       361: fneg
+       362: iload         12
+       364: i2f
+       365: fmul
+       366: fstore        18
+       368: fload         18
+       370: invokestatic  #168                // Method java/lang/Math.abs:(F)F
+       373: fload         17
+       375: invokestatic  #168                // Method java/lang/Math.abs:(F)F
+       378: fcmpl
+       379: iflt          397
+       382: fload         18
+       384: fconst_0
+       385: fcmpl
+       386: ifle          393
+       389: iconst_0
+       390: goto          409
+       393: iconst_2
+       394: goto          409
+       397: fload         17
+       399: fconst_0
+       400: fcmpl
+       401: ifle          408
+       404: iconst_3
+       405: goto          409
+       408: iconst_1
+       409: fload         5
+       411: fconst_0
+       412: fcmpg
+       413: ifge          420
+       416: iconst_4
+       417: goto          421
+       420: iconst_0
+       421: iadd
+       422: ireturn
+
+  public static net.minecraft.client.resources.model.geometry.QuadCollection createEmissiveQuads(net.minecraft.client.resources.model.geometry.QuadCollection, net.fabricmc.fabric.api.client.renderer.v1.sprite.SpriteFinderGetter);
+    Code:
+         0: aload_0
+         1: instanceof    #174                // class net/fabricmc/fabric/api/client/renderer/v1/model/MeshQuadCollection
+         4: ifeq          44
+         7: aload_0
+         8: checkcast     #174                // class net/fabricmc/fabric/api/client/renderer/v1/model/MeshQuadCollection
+        11: astore_2
+        12: aload_1
+        13: ifnonnull     18
+        16: aconst_null
+        17: areturn
+        18: aload_2
+        19: invokevirtual #176                // Method net/fabricmc/fabric/api/client/renderer/v1/model/MeshQuadCollection.getMesh:()Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/Mesh;
+        22: aload_1
+        23: invokestatic  #180                // Method createEmissiveMesh:(Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/MeshView;Lnet/fabricmc/fabric/api/client/renderer/v1/sprite/SpriteFinderGetter;)Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/Mesh;
+        26: astore_3
+        27: aload_3
+        28: ifnull        42
+        31: new           #174                // class net/fabricmc/fabric/api/client/renderer/v1/model/MeshQuadCollection
+        34: dup
+        35: aload_3
+        36: invokespecial #186                // Method net/fabricmc/fabric/api/client/renderer/v1/model/MeshQuadCollection."<init>":(Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/Mesh;)V
+        39: goto          43
+        42: aconst_null
+        43: areturn
+        44: aconst_null
+        45: astore_2
+        46: aconst_null
+        47: astore_3
+        48: aload_0
+        49: invokevirtual #189                // Method net/minecraft/client/resources/model/geometry/QuadCollection.getAll:()Ljava/util/List;
+        52: invokeinterface #195,  1          // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+        57: astore        4
+        59: aload         4
+        61: invokeinterface #201,  1          // InterfaceMethod java/util/Iterator.hasNext:()Z
+        66: ifeq          235
+        69: aload         4
+        71: invokeinterface #206,  1          // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+        76: checkcast     #50                 // class net/minecraft/client/resources/model/geometry/BakedQuad
+        79: astore        5
+        81: aload         5
+        83: invokevirtual #210                // Method net/minecraft/client/resources/model/geometry/BakedQuad.materialInfo:()Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;
+        86: astore        6
+        88: aload         6
+        90: invokevirtual #214                // Method net/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo.sprite:()Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+        93: checkcast     #220                // class me/pepperbell/continuity/client/mixinterface/TextureAtlasSpriteExtension
+        96: invokeinterface #222,  1          // InterfaceMethod me/pepperbell/continuity/client/mixinterface/TextureAtlasSpriteExtension.continuity$getEmissiveSprite:()Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+       101: astore        7
+       103: aload         7
+       105: ifnull        232
+       108: aload_2
+       109: ifnonnull     128
+       112: new           #69                 // class me/pepperbell/continuity/client/util/QuadUtil$PackedUvContainer
+       115: dup
+       116: invokespecial #225                // Method me/pepperbell/continuity/client/util/QuadUtil$PackedUvContainer."<init>":()V
+       119: astore_3
+       120: new           #226                // class net/minecraft/client/resources/model/geometry/QuadCollection$Builder
+       123: dup
+       124: invokespecial #228                // Method net/minecraft/client/resources/model/geometry/QuadCollection$Builder."<init>":()V
+       127: astore_2
+       128: aload         5
+       130: aload_3
+       131: aload         5
+       133: invokevirtual #210                // Method net/minecraft/client/resources/model/geometry/BakedQuad.materialInfo:()Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;
+       136: invokevirtual #214                // Method net/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo.sprite:()Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+       139: aload         7
+       141: invokestatic  #229                // Method interpolate:(Lnet/minecraft/client/resources/model/geometry/BakedQuad;Lme/pepperbell/continuity/client/util/QuadUtil$PackedUvContainer;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V
+       144: new           #215                // class net/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo
+       147: dup
+       148: aload         7
+       150: aload         6
+       152: invokevirtual #233                // Method net/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo.layer:()Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;
+       155: aload         6
+       157: invokevirtual #237                // Method net/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo.itemRenderType:()Lnet/minecraft/client/renderer/rendertype/RenderType;
+       160: aload         6
+       162: invokevirtual #239                // Method net/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo.tintIndex:()I
+       165: iconst_0
+       166: bipush        15
+       168: invokespecial #242                // Method net/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo."<init>":(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;Lnet/minecraft/client/renderer/rendertype/RenderType;IZI)V
+       171: astore        8
+       173: new           #50                 // class net/minecraft/client/resources/model/geometry/BakedQuad
+       176: dup
+       177: aload         5
+       179: invokevirtual #245                // Method net/minecraft/client/resources/model/geometry/BakedQuad.position0:()Lorg/joml/Vector3fc;
+       182: aload         5
+       184: invokevirtual #249                // Method net/minecraft/client/resources/model/geometry/BakedQuad.position1:()Lorg/joml/Vector3fc;
+       187: aload         5
+       189: invokevirtual #252                // Method net/minecraft/client/resources/model/geometry/BakedQuad.position2:()Lorg/joml/Vector3fc;
+       192: aload         5
+       194: invokevirtual #255                // Method net/minecraft/client/resources/model/geometry/BakedQuad.position3:()Lorg/joml/Vector3fc;
+       197: aload_3
+       198: getfield      #258                // Field me/pepperbell/continuity/client/util/QuadUtil$PackedUvContainer.packedUV0:J
+       201: aload_3
+       202: getfield      #262                // Field me/pepperbell/continuity/client/util/QuadUtil$PackedUvContainer.packedUV1:J
+       205: aload_3
+       206: getfield      #265                // Field me/pepperbell/continuity/client/util/QuadUtil$PackedUvContainer.packedUV2:J
+       209: aload_3
+       210: getfield      #268                // Field me/pepperbell/continuity/client/util/QuadUtil$PackedUvContainer.packedUV3:J
+       213: aload         5
+       215: invokevirtual #271                // Method net/minecraft/client/resources/model/geometry/BakedQuad.direction:()Lnet/minecraft/core/Direction;
+       218: aload         8
+       220: invokespecial #274                // Method net/minecraft/client/resources/model/geometry/BakedQuad."<init>":(Lorg/joml/Vector3fc;Lorg/joml/Vector3fc;Lorg/joml/Vector3fc;Lorg/joml/Vector3fc;JJJJLnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;)V
+       223: astore        9
+       225: aload_2
+       226: aload         9
+       228: invokevirtual #277                // Method net/minecraft/client/resources/model/geometry/QuadCollection$Builder.addUnculledFace:(Lnet/minecraft/client/resources/model/geometry/BakedQuad;)Lnet/minecraft/client/resources/model/geometry/QuadCollection$Builder;
+       231: pop
+       232: goto          59
+       235: aload_2
+       236: ifnull        246
+       239: aload_2
+       240: invokevirtual #281                // Method net/minecraft/client/resources/model/geometry/QuadCollection$Builder.build:()Lnet/minecraft/client/resources/model/geometry/QuadCollection;
+       243: goto          247
+       246: aconst_null
+       247: areturn
+
+  public static net.fabricmc.fabric.api.client.renderer.v1.mesh.Mesh createEmissiveMesh(net.fabricmc.fabric.api.client.renderer.v1.mesh.MeshView, net.fabricmc.fabric.api.client.renderer.v1.sprite.SpriteFinderGetter);
+    Code:
+         0: new           #285                // class me/pepperbell/continuity/client/util/QuadUtil$1
+         3: dup
+         4: aload_1
+         5: invokespecial #287                // Method me/pepperbell/continuity/client/util/QuadUtil$1."<init>":(Lnet/fabricmc/fabric/api/client/renderer/v1/sprite/SpriteFinderGetter;)V
+         8: astore_2
+         9: aload_0
+        10: aload_2
+        11: invokeinterface #290,  2          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/MeshView.forEach:(Ljava/util/function/Consumer;)V
+        16: aload_2
+        17: getfield      #296                // Field me/pepperbell/continuity/client/util/QuadUtil$1.emissiveMeshBuilder:Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/MutableMesh;
+        20: ifnull        35
+        23: aload_2
+        24: getfield      #296                // Field me/pepperbell/continuity/client/util/QuadUtil$1.emissiveMeshBuilder:Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/MutableMesh;
+        27: invokeinterface #300,  1          // InterfaceMethod net/fabricmc/fabric/api/client/renderer/v1/mesh/MutableMesh.immutableCopy:()Lnet/fabricmc/fabric/api/client/renderer/v1/mesh/Mesh;
+        32: goto          36
+        35: aconst_null
+        36: areturn
+}
