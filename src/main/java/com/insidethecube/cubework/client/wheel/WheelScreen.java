@@ -26,7 +26,8 @@ import net.minecraft.world.item.ItemStack;
  * Tabs along the top and arrows at the sides name the pages.
  *
  * Hold the wheel's key and let go over a choice to take it, or over the middle for the full block; a quick
- * tap leaves the wheel open to click instead. Scroll steps round the ring, the left and right arrow keys
+ * tap leaves the wheel open to click instead. A click takes a choice and closes the wheel, held key or not
+ * (it stays shut until the key is let go). Scroll steps round the ring, the left and right arrow keys
  * (or the tabs and side arrows) turn the page, Enter takes the lit choice and 1 to 9 take one at once.
  */
 public final class WheelScreen extends Screen {
@@ -656,11 +657,30 @@ public final class WheelScreen extends Screen {
 		if (o != null && o.action() != null) o.action().run();
 	}
 
+	/**
+	 * Set when the wheel closes while its key is still held (a click chose, or Enter): the key's still down,
+	 * so the wheel mustn't open again until it's let go.
+	 */
+	public static boolean holdOff;
+
 	/** Whether the wheel's key is still held (a key on the keyboard; a mouse button can't be checked). */
 	private boolean held() {
 		InputConstants.Key bound = KeyBindingHelper.getBoundKeyOf(key);
 		if (bound.getType() != InputConstants.Type.KEYSYM) return true;
 		return InputConstants.isKeyDown(minecraft.getWindow(), bound.getValue());
+	}
+
+	/** Whether a key on the keyboard is down (false for a mouse button). */
+	public static boolean keyDown(KeyMapping key) {
+		InputConstants.Key bound = KeyBindingHelper.getBoundKeyOf(key);
+		if (bound.getType() != InputConstants.Type.KEYSYM) return false;
+		return InputConstants.isKeyDown(net.minecraft.client.Minecraft.getInstance().getWindow(), bound.getValue());
+	}
+
+	@Override
+	public void removed() {
+		super.removed();
+		holdOff = keyDown(key);
 	}
 
 	private void released() {

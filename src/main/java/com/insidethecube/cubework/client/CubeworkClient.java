@@ -37,6 +37,12 @@ public final class CubeworkClient implements ClientModInitializer {
 		WHEEL = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.cubework.wheel", InputConstants.Type.KEYSYM, 71,
 				KeyMapping.Category.register(com.insidethecube.cubework.Reg.id("cubework"))));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
+			// Chosen with a click while the key was still held: don't open again until it's let go.
+			if (WheelScreen.holdOff) {
+				if (mc.screen == null && !WheelScreen.keyDown(WHEEL)) WheelScreen.holdOff = false;
+				while (WHEEL.consumeClick()) {
+				}
+			}
 			while (WHEEL.consumeClick()) {
 				if (mc.screen != null || mc.player == null) continue;
 				Wheel wheel = WheelModels.forPlayer(mc);
