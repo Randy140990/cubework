@@ -22,7 +22,6 @@ public class Rock extends Mob {
 		this.setNoGravity(true);
 		this.setSilent(true);
 		this.setInvulnerable(true);
-		this.noCulling = true;
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
