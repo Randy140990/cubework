@@ -629,7 +629,8 @@ public final class BridgeGoal extends Goal {
 	private BridgePath.Habits habits(int d) {
 		if (habits == null) {
 			int kind = Math.floorMod(f.getUUID().hashCode(), 3);
-			double place = kind == 1 ? 2.0 : kind == 0 ? 3.4 : 2.6, mine = kind == 0 ? 1.4 : kind == 1 ? 4.5 : 3.5, climb = kind == 2 ? 0.6 : 1.6;
+			// A digger breaks through; a builder bridges round; a climber builds a step and goes over.
+			double place = kind == 1 ? 1.8 : kind == 0 ? 3.2 : 2.2, mine = kind == 0 ? 1.6 : kind == 1 ? 9 : 6, climb = kind == 2 ? 0.4 : 1.6;
 			habits = new BridgePath.Habits(place + (10 - d) * 0.15, mine, climb, d >= 3, d >= 5);
 		}
 		return habits;

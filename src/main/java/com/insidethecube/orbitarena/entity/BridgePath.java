@@ -53,6 +53,8 @@ final class BridgePath {
 	record Habits(double place, double mine, double climb, boolean stairs, boolean pillar) {}
 
 	private static final byte UNKNOWN = -1, PASS = 0, SOFT = 1, HARD = 2, STEP = 3;
+	/** How much it leans towards where it's going over the cheapest way (a little: much quicker to think, nearly as good). */
+	private static final double GREED = 1.6;
 	private static final Direction[] AROUND = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 
 	private final ServerLevel level;
@@ -119,7 +121,7 @@ final class BridgePath {
 	List<Step> find(BlockPos start, Vec3 aim, Predicate<BlockPos> done, Predicate<BlockPos> forbidden, Habits h, int maxNodes) {
 		PriorityQueue<Node> openSet = new PriorityQueue<>();
 		Long2ObjectOpenHashMap<Node> best = new Long2ObjectOpenHashMap<>();
-		Node first = new Node(start, 0, dist(start, aim), null, Act.WALK);
+		Node first = new Node(start, 0, GREED * dist(start, aim), null, Act.WALK);
 		openSet.add(first);
 		best.put(start.asLong(), first);
 		Node nearest = first;
@@ -145,7 +147,7 @@ final class BridgePath {
 				double g = n.g + (Double) mv[2];
 				Node was = best.get(m.asLong());
 				if (was != null && (was.closed || was.g <= g + 1e-6)) continue;
-				Node next = new Node(m, g, g + dist(m, aim), n, (Act) mv[1]);
+				Node next = new Node(m, g, g + GREED * dist(m, aim), n, (Act) mv[1]);
 				best.put(m.asLong(), next);
 				openSet.add(next);
 			}
