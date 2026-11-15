@@ -32,7 +32,8 @@ public class OrbitArenaClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(Crowd::tick);
 		HudElementRegistry.addLast(OrbitArena.id("fade"), Fade::render);
 
-		// PvP Arena on the pause menu (Leave Arena while you're in it).
+		// PvP Arena at the top right of the pause menu (Leave Arena while you're in it), clear of other mods'
+		// buttons at the top left.
 		ScreenEvents.AFTER_INIT.register((client, screen, w, h) -> {
 			if (!(screen instanceof PauseScreen)) return;
 			boolean inArena = client.level != null && client.level.dimension() == OrbitArena.ARENA;
@@ -43,7 +44,7 @@ public class OrbitArenaClient implements ClientModInitializer {
 				} else {
 					Minecraft.getInstance().setScreen(new ArenaScreen(screen));
 				}
-			}).bounds(8, 8, 98, 20).build();
+			}).bounds(w - 8 - 98, 8, 98, 20).build();
 			Screens.getButtons(screen).add(button);
 		});
 	}

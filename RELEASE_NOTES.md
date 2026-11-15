@@ -1,5 +1,10 @@
 Orbit Arena by Inside the Cube (Minecraft 1.21.11, Fabric).
 
+0.2.1: a sharper sky and the arena button out of the way.
+- The sky is now the 8K night sky (8192 by 4096, was 4096 by 2048), so stars stay sharp points instead of soft dots. Same colours and brightness as before. The jar is about 22 MB bigger and the sky takes about 128 MB more video memory.
+- PvP Arena / Leave Arena is now at the top right of the pause menu, so it isn't covered by other mods' buttons at the top left (Lightreel's record and folder buttons).
+- Checked: matches in the arena always play on Normal, even when your world is on Peaceful, so enemies stay and fight back (as 0.2.0).
+
 0.2.0: something to fight, a crowd that comes alive, and a bigger arena like the reference.
 - Enemies now appear on every difficulty: the arena always fights at Normal for its own enemies (on Peaceful the game was deleting them the moment they came out).
 - The crowd is never still: every fan keeps choosing something to do (clapping, waving, both arms up and jumping, pumping a fist, pointing at you), more and bigger as the crowd gets going, and every head follows you round the floor. Sign holders pump their signs. Now and then a Mexican wave goes round the stands. Hands go to heads when you take a big hit.
