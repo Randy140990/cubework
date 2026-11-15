@@ -19,9 +19,13 @@ import net.minecraft.world.level.block.state.BlockState;
 public interface CwShape extends FabricBlock, EntityBlock {
 	Behaviour behaviour();
 
+	/**
+	 * Only shapes made in many materials keep one: a block that's always the one thing (a round log, which
+	 * has no behaviour) has none, as it isn't one of the shape entity's blocks (placing one used to crash).
+	 */
 	@Override
 	default BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new ShapeEntity(pos, state);
+		return behaviour() == null ? null : new ShapeEntity(pos, state);
 	}
 
 	/**
