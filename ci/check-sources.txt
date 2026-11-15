@@ -1,2 +1,0 @@
-grep (public|getSampler|getRepeat|getClamp) com/mojang/blaze3d/systems/SamplerCache.java
-grep (public|getSampler|getRepeat) net/minecraft/client/renderer/SamplerCache.java

@@ -1,0 +1,10 @@
+Orbit Arena's sky
+
+stars.jpg: Deep Star Maps 2020 (starmap_2020_8k), NASA/Goddard Space Flight Center Scientific
+Visualization Studio, https://svs.gsfc.nasa.gov/4851 . Star data: ESA/Gaia/DPAC. Tone-mapped from
+the HDR original.
+
+planet_day.jpg, planet_night.jpg, planet_clouds.jpg: Earth texture maps by Solar System Scope,
+https://www.solarsystemscope.com/textures/ , licensed under Creative Commons Attribution 4.0
+(https://creativecommons.org/licenses/by/4.0/). Changes: made smaller (4096 x 2048); the night map's
+dark blue background taken out so only the lights remain.

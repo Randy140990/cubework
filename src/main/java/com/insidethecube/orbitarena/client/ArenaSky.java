@@ -27,7 +27,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.Identifier;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -42,13 +41,13 @@ import org.slf4j.Logger;
  * of the End's textured box (see mixin.SkyRendererMixin).
  * <p>
  * The pictures are big, so they're read in the background when the game starts and put on the graphics
- * card the first time the sky is drawn; until then the old panorama is drawn.
+ * card the first time the sky is drawn (until then, a second or two after the game starts, space is plain
+ * black).
  */
 public final class ArenaSky {
 	private ArenaSky() {}
 
 	private static final Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
-	private static final Identifier FALLBACK = OrbitArena.id("textures/environment/arena_sky.png");
 	private static final String DIR = "/assets/orbitarena/textures/environment/";
 	private static final int LON = 64, LAT = 32, PLON = 128, PLAT = 64;
 	/** One full turn every 20 minutes (24,000 ticks). */
@@ -100,7 +99,7 @@ public final class ArenaSky {
 						cloud = image("planet_clouds.jpg", true);
 				read = new NativeImage[] {stars, dayMap, night, cloud};
 			} catch (Throwable e) {
-				LOGGER.warn("Orbit Arena: couldn't read the sky's pictures; keeping the old sky", e);
+				LOGGER.warn("Orbit Arena: couldn't read the sky's pictures", e);
 			}
 		}, "Orbit Arena sky");
 		t.setDaemon(true);
@@ -331,13 +330,12 @@ public final class ArenaSky {
 		if (sky == null) buildSky();
 		upload();
 		DynamicTexture stars = textures == null ? null : textures[0];
-		AbstractTexture starTex = stars != null ? stars : mc.getTextureManager().getTexture(FALLBACK);
 		GpuTextureView colour = mc.getMainRenderTarget().getColorTextureView(), depth = mc.getMainRenderTarget().getDepthTextureView();
 		double time = mc.level.getGameTime() + mc.getDeltaTracker().getGameTimeDeltaPartialTick(true);
 		float angle = (float) ((time / TURN_TICKS) % 1.0 * Math.PI * 2);
 		Matrix4f still = new Matrix4f(RenderSystem.getModelViewMatrix());
 		Matrix4f turning = new Matrix4f(still).rotate(angle, AXIS);
-		draw(RenderPipelines.END_SKY, sky, skyIndices, turning, starTex, colour, depth);
+		if (stars != null) draw(RenderPipelines.END_SKY, sky, skyIndices, turning, stars, colour, depth);
 
 		if (textures == null || textures[1] == null) return;
 		if (day == null) buildPlanet();
