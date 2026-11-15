@@ -154,7 +154,7 @@ public final class Emotes {
 		}
 		if (lift > 0) {
 			float dy = -lift * k;
-			for (ModelPart part : new ModelPart[] {m.head, m.hat, m.body, ra, la, rl, ll}) part.y += dy;
+			for (ModelPart part : new ModelPart[] {m.head, m.body, ra, la, rl, ll}) part.y += dy;
 		}
 	}
 

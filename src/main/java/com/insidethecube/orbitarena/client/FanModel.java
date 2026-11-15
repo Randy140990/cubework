@@ -166,6 +166,6 @@ public class FanModel extends HumanoidModel<FanRenderState> {
 		this.leftArm.xRot = lx;
 		this.leftArm.yRot = ly;
 		this.leftArm.zRot = lz;
-		for (ModelPart p : new ModelPart[] {head, hat, body, rightArm, leftArm, rightLeg, leftLeg}) p.y += bob;
+		for (ModelPart p : new ModelPart[] {head, body, rightArm, leftArm, rightLeg, leftLeg}) p.y += bob;
 	}
 }
