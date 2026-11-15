@@ -1,5 +1,13 @@
 Cubework by Inside the Cube.
 
+0.12.0: rebuilt to start quickly (1.21.11 only, cubework-0.12.0-mc1.21.11.jar).
+- Every material's shapes used to be blocks and items of their own: about 15,300 shape blocks, which is what made the game take minutes to load. Now each shape is one block for each way of behaving (solid, glass, tinted glass, ice, packed ice, blue ice, wool, wallpaper, coal, copper, soul sand, magma, crying obsidian, glowstone, and dirt path and farmland a pixel low): 437 shape blocks in all. Each placed shape keeps its material with it, and each stack carries its material, so a red wool slab and a blue wool slab are one item in two materials.
+- Everything is still there and looks the same: every material in every shape, the same names, the same tabs, the same recipes. Each shape still sounds, mines, drops, burns, glows, shows on maps and stands up to explosions like its material (wool with shears, stone with a pickaxe, obsidian against TNT). Middle click picks the material too. Copper shapes weather, take wax and scrape with an axe as before; concrete powder shapes still set in water.
+- Your worlds convert as they load: placed shapes, shapes in chests, item frames, dropped items and shulker boxes, and players' inventories and ender chests become the new blocks and items with their materials. Make a backup first all the same.
+- Shapes drawn per material: the game keeps one look per shape for each kind of material (plain, glass, glazed terracotta, natural ground, grass, dirt path, squeezed pillars) and draws each placed shape in its own material's textures, so texture packs still carry over.
+- FerriteCore 8.2.0 still comes inside the jar (MIT licence, by malte0811).
+- What's different: shapes can't be pushed by pistons now (the game doesn't move blocks that keep data). A vanilla glass block no longer hides its face against a glass shape (the shape still hides its own against the block, and glass shapes of the same glass still hide the faces where they meet). Blueprints saved with the old ids (Axiom and the like) won't load into the new blocks. Tables are unchanged. /give and /setblock use the new ids: cubework:shape_slab_wool with [cubework:material="red_wool"].
+
 0.11.0: starts much faster (1.21.11 only, cubework-0.11.0-mc1.21.11.jar).
 - The game makes every block state of every block while it starts, and Cubework had about 1.3 million of them (vanilla has about 29,000). The pieces that join their neighbours now work out their joins from the blocks round them when they're drawn and when their hit box is asked for, instead of having a block state for every way of joining. That leaves under half as many.
   - Window frames (square, diamond and round): 12 states each instead of 192.
