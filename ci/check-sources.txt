@@ -1,0 +1,2 @@
+grep renderHandsWithItems|renderItemInHand|renderHand net/minecraft/client/renderer/ItemInHandRenderer.java
+grep renderHandsWithItems|renderItemInHand|renderHand net/minecraft/client/renderer/GameRenderer.java

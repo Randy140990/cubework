@@ -68,8 +68,7 @@ public final class Cinematic {
 		}
 		if (!active) before = mc.options.getCameraType();
 		mc.options.setCameraType(CameraType.FIRST_PERSON);
-		// No hand (or sword) in the corner while the camera flies round.
-		mc.gameRenderer.setRenderHand(false);
+		// (No hand or sword in the corner while the camera flies round: see mixin.ItemInHandRendererMixin.)
 		faded = false;
 		place(0, true);
 		mc.setCameraEntity(cam);
@@ -85,7 +84,6 @@ public final class Cinematic {
 		active = false;
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player != null) mc.setCameraEntity(mc.player);
-		mc.gameRenderer.setRenderHand(true);
 		if (before != null) mc.options.setCameraType(before);
 		before = null;
 	}

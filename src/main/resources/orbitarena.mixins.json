@@ -12,7 +12,8 @@
 	],
 	"client": [
 		"SkyRendererMixin",
-		"PlayerModelMixin"
+		"PlayerModelMixin",
+		"ItemInHandRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
