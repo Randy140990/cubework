@@ -287,18 +287,13 @@ public final class BridgeLayout {
 				return e == 2 ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.STONE);
 			}
 			default -> {
-				// The island under it: a rough bowl of rock, deepest in the middle, red streaks near the bottom.
+				// The island under it: a rough bowl of rock, deepest in the middle.
 				if (dy > 0 || e <= 2) return null;
 				int x = blue ? -adx : adx;
-				double depth = 5 + (e - 2) * 1.45 + noise(x, dz, 6, 501) * 4 - 2;
-				if (-dy > Math.min(21, depth)) return null;
-				double h = hash(x, dy, dz, 502);
-				boolean low = -dy > depth - 3;
-				if (low && h < 0.25) return h < 0.12 ? b(Blocks.GRANITE) : b(Blocks.RED_TERRACOTTA);
-				if (h < 0.18) return b(Blocks.ANDESITE);
-				if (h < 0.27) return b(Blocks.TUFF);
-				if (-dy > 12 && h < 0.4) return b(Blocks.DEEPSLATE);
-				return b(Blocks.STONE);
+				double depth = Math.min(21, 5 + (e - 2) * 1.45 + noise(x, dz, 6, 501) * 4 - 2);
+				if (-dy > depth) return null;
+				// Down through it, pale to dark grey and into red at the bottom (21 deep at the most).
+				return islandRock(x, dy, dz, Math.min(1, (-dy - 5) / 16.0));
 			}
 		}
 	}
@@ -378,7 +373,7 @@ public final class BridgeLayout {
 		if (ly < -11 || ly > h) return null;
 		if (ly < 0) {
 			double t = (-ly - 1) / 10.0, r = 4.3 * Math.pow(Math.max(0, 1 - t), 0.8) + noise(dx * 1.7 + ly, dz * 1.3, 2.2, 611) * 1.2 - 0.4;
-			return lx * lx + lz * lz <= r * r ? rock(dx, ly + m.base, dz, 0.5 + r - Math.sqrt(lx * lx + lz * lz)) : null;
+			return lx * lx + lz * lz <= r * r ? rock(dx, ly + m.base, dz, 0.5 + r - Math.sqrt(lx * lx + lz * lz), 1 - t) : null;
 		}
 		boolean wide = ax <= 3 && az <= 3 && ax + az <= 5;
 		if (ly <= 1) return wide ? (ly == 0 ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.SMOOTH_QUARTZ)) : null;
@@ -539,24 +534,68 @@ public final class BridgeLayout {
 
 	public static final int LEGACY_SPIRES = 28;
 
+	// ---------------------------------------------------------------- rock, in gradients
+
 	/**
-	 * Red layered rock for the spires and the monoliths' rocks: bands of netherrack, red and plain
-	 * terracotta and granite on the outside (depth: how far in from the surface), netherrack inside.
+	 * Rock from light to dark, as LumenForge's Island Generator paints its rock faces: a block is picked
+	 * along one of these by a smooth value (big patches, streaks running down the face, faint layers,
+	 * lighter at the top and darker underneath) with a little jitter, so the tones run into each other
+	 * instead of standing in stripes. Red for the spires and the monoliths' rocks, grey for the islands.
 	 */
-	public static BlockState rock(int x, int y, int z, double depth) {
-		if (depth > 1.6) return b(Blocks.NETHERRACK);
-		double h = hash(x, y, z, 3);
-		if (h < 0.05) return b(Blocks.POLISHED_GRANITE);
-		if (h < 0.09) return b(Blocks.NETHER_WART_BLOCK);
-		int band = Math.floorMod(y + (int) (noise(x, z, 11, 77) * 4), 7);
-		return switch (band) {
-			case 0 -> b(Blocks.RED_TERRACOTTA);
-			case 1, 4 -> b(Blocks.NETHERRACK);
-			case 2 -> b(Blocks.TERRACOTTA);
-			case 3 -> b(Blocks.GRANITE);
-			case 5 -> b(Blocks.RED_TERRACOTTA);
-			default -> b(Blocks.NETHERRACK);
-		};
+	public static final Block[] RED_RAMP = {Blocks.SMOOTH_RED_SANDSTONE, Blocks.POLISHED_GRANITE, Blocks.GRANITE, Blocks.TERRACOTTA, Blocks.ORANGE_TERRACOTTA,
+			Blocks.RED_TERRACOTTA, Blocks.RED_TERRACOTTA, Blocks.NETHERRACK, Blocks.NETHERRACK, Blocks.BROWN_TERRACOTTA, Blocks.RED_NETHER_BRICKS};
+	public static final Block[] GREY_RAMP = {Blocks.CALCITE, Blocks.DIORITE, Blocks.ANDESITE, Blocks.ANDESITE, Blocks.STONE, Blocks.STONE, Blocks.STONE, Blocks.TUFF,
+			Blocks.TUFF, Blocks.DEEPSLATE, Blocks.COBBLED_DEEPSLATE};
+
+	/** Smooth 3D value noise, 0 to 1. */
+	public static double noise3(double x, double y, double z, long salt) {
+		long x0 = (long) Math.floor(x), y0 = (long) Math.floor(y), z0 = (long) Math.floor(z);
+		double fx = x - x0, fy = y - y0, fz = z - z0;
+		fx = fx * fx * (3 - 2 * fx);
+		fy = fy * fy * (3 - 2 * fy);
+		fz = fz * fz * (3 - 2 * fz);
+		double c000 = hash(x0, y0, z0, salt), c100 = hash(x0 + 1, y0, z0, salt), c010 = hash(x0, y0 + 1, z0, salt), c110 = hash(x0 + 1, y0 + 1, z0, salt);
+		double c001 = hash(x0, y0, z0 + 1, salt), c101 = hash(x0 + 1, y0, z0 + 1, salt), c011 = hash(x0, y0 + 1, z0 + 1, salt), c111 = hash(x0 + 1, y0 + 1, z0 + 1, salt);
+		double a = c000 + (c100 - c000) * fx, b = c010 + (c110 - c010) * fx, c = c001 + (c101 - c001) * fx, d = c011 + (c111 - c011) * fx;
+		double e = a + (b - a) * fy, f = c + (d - c) * fy;
+		return e + (f - e) * fz;
+	}
+
+	/** How a rock face reads at a block, about 0 to 1: patches tens of blocks across, streaks down it. */
+	public static double face(int x, int y, int z, long salt) {
+		double p = noise3(x / 15.0, y / 10.0, z / 15.0, salt) * 0.7 + noise3(x / 5.0, y / 4.0, z / 5.0, salt + 1) * 0.3;
+		double s1 = noise((x * 0.8 + z * 0.6) / 3.4, y / 26.0 + 7.1, 1, salt + 2), s2 = noise((x * 0.6 - z * 0.8) / 3.4, y / 26.0 + 3.3, 1, salt + 3);
+		return 0.5 + (p - 0.5) * 1.7 + (Math.max(s1, s2) - 0.5) * 0.6;
+	}
+
+	/** The block v of the way along a ramp (0 light, 1 dark), jittered a little so neighbouring tones mix. */
+	public static Block pick(Block[] ramp, double v, int x, int y, int z, long salt) {
+		v += (hash(x, y, z, salt) - 0.5) * 0.12;
+		return ramp[Math.max(0, Math.min(ramp.length - 1, (int) Math.floor(v * ramp.length)))];
+	}
+
+	/**
+	 * Red rock for the spires and the monoliths' rocks. depth: how far in from the surface (inside it's
+	 * all netherrack, unseen); up: 0 at the foot to 1 at the top, light above and dark below; soft
+	 * wavering layers a few blocks apart.
+	 */
+	public static BlockState rock(int x, int y, int z, double depth, double up) {
+		if (depth > 2.2) return b(Blocks.NETHERRACK);
+		double band = Math.sin((y + noise(x, z, 9, 77) * 5) * Math.PI * 2 / 6.5) * 0.07;
+		double v = 0.06 + (1 - up) * 0.74 + (face(x, y, z, 700) - 0.5) * 0.5 + band - (depth < 0.8 ? 0.05 : 0);
+		return b(pick(RED_RAMP, v, x, y, z, 701));
+	}
+
+	/**
+	 * Under a base's deck: grey rock, pale just under the deck and darker downwards, running into red
+	 * towards the bottom (t: 0 at the top of the rock to 1 at its lowest).
+	 */
+	public static BlockState islandRock(int x, int y, int z, double t) {
+		double f = face(x, y, z, 720);
+		double red = Math.max(0, Math.min(1, (t - 0.42) / 0.45));
+		red = red * red * (3 - 2 * red) * 0.85;
+		if (hash(x, y, z, 721) < red) return b(pick(RED_RAMP, 0.32 + t * 0.5 + (f - 0.5) * 0.6, x, y, z, 722));
+		return b(pick(GREY_RAMP, 0.14 + t * 0.66 + (f - 0.5) * 0.7, x, y, z, 723));
 	}
 
 	// ---------------------------------------------------------------- the way round (for the bots)

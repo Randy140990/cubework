@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.insidethecube.orbitarena.OrbitArena;
 import com.insidethecube.orbitarena.arena.ArenaLayout;
+import com.insidethecube.orbitarena.arena.BridgeLayout;
 import com.insidethecube.orbitarena.entity.Rock;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -19,12 +20,14 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 
 /**
- * Draws an orbiting rock: a lumpy clump of blocks in red layered rock (netherrack, red and plain terracotta,
- * granite, as the spires are), tumbling slowly. Each rock's shape is made once from its seed and kept.
+ * Draws an orbiting rock: a lumpy clump of blocks in red rock, in a gradient from pale granite on top to
+ * netherrack and dark nether brick underneath (as the spires are), tumbling slowly. Each rock's shape is made once from its seed and kept.
  */
 public class RockRenderer extends EntityRenderer<Rock, RockRenderer.State> {
 	private static final Identifier TEXTURE = OrbitArena.id("textures/entity/rock/rock.png");
 	private static final Map<Long, float[]> MESHES = new HashMap<>();
+	/** The texture's tiles, light to dark: polished granite, granite, terracotta, orange and red terracotta, netherrack, brown terracotta, red nether brick. */
+	private static final int TILES = 8;
 
 	public static class State extends EntityRenderState {
 		public long seed;
@@ -97,8 +100,10 @@ public class RockRenderer extends EntityRenderer<Rock, RockRenderer.State> {
 					double rad = (size + 0.5) * lump;
 					if (x * x + y * y * 1.3 + z * z <= rad * rad) {
 						solid[x + r][y + r][z + r] = true;
-						double hh = ArenaLayout.hash(x, y, z, seed + 7);
-						tile[x + r][y + r][z + r] = hh < 0.1 ? 3 : Math.floorMod(y + (int) (seed % 5), 4) == 0 ? 1 : Math.floorMod(y + (int) (seed % 5), 4) == 2 ? 2 : 0;
+						// A gradient down the rock, light on top to dark underneath, in patches (as the spires).
+						double v = 0.08 + (1 - (y + r) / (2.0 * r)) * 0.62 + (BridgeLayout.noise3(x / 3.0, y / 3.0, z / 3.0, seed) - 0.5) * 0.55
+								+ (ArenaLayout.hash(x, y, z, seed + 7) - 0.5) * 0.12;
+						tile[x + r][y + r][z + r] = Math.max(0, Math.min(TILES - 1, (int) Math.floor(v * TILES)));
 					}
 				}
 			}
@@ -115,7 +120,7 @@ public class RockRenderer extends EntityRenderer<Rock, RockRenderer.State> {
 						if (nx >= 0 && ny >= 0 && nz >= 0 && nx < n && ny < n && nz < n && solid[nx][ny][nz]) continue;
 						int[][] face = FACES[f];
 						float bx = x - r - 0.5F + face[0][0], by = y - r - 0.5F + face[0][1], bz = z - r - 0.5F + face[0][2];
-						float u0 = tile[x][y][z] * 0.25F, u1 = u0 + 0.25F;
+						float u0 = tile[x][y][z] / (float) TILES, u1 = u0 + 1F / TILES;
 						float[][] corners = {
 								{bx, by, bz, u0, 1},
 								{bx + face[1][0], by + face[1][1], bz + face[1][2], u1, 1},

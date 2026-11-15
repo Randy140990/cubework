@@ -131,7 +131,7 @@ public final class BridgeBuilder implements Matches.Builder {
 					double d = Math.sqrt(x * x + z * z), a = Math.atan2(z, x), rad = spireRadius(s, t, a);
 					if (d < rad) {
 						int wx = s.x() + x, wy = s.y() + y, wz = s.z() + z;
-						set(wx, wy, wz, rock(cx + wx, wy, wz, rad - d));
+						set(wx, wy, wz, rock(cx + wx, wy, wz, rad - d, t));
 					}
 				}
 			}
