@@ -22,11 +22,14 @@ public class FanModel extends HumanoidModel<FanRenderState> {
 	public static final ModelLayerLocation LAYER = new ModelLayerLocation(OrbitArena.id("fan"), "main");
 	public static final int IDLE = 0, CLAP = 1, WAVE = 2, CHEER = 3, PUMP = 4, POINT = 5, HEADS = 6;
 
-	private final ModelPart sign;
+	/** Signs from this one up are the big boards (INSID3, TH3, CUB3). */
+	public static final int BIG = 6;
+	private final ModelPart sign, big;
 
 	public FanModel(ModelPart root) {
 		super(root);
 		this.sign = this.rightArm.getChild("sign");
+		this.big = this.rightArm.getChild("big_sign");
 	}
 
 	public static LayerDefinition createLayer() {
@@ -34,6 +37,8 @@ public class FanModel extends HumanoidModel<FanRenderState> {
 		PartDefinition arm = mesh.getRoot().getChild("right_arm");
 		// A board 14 x 8 pixels past the hand, reaching across to the other hand when both arms are up.
 		arm.addOrReplaceChild("sign", CubeListBuilder.create().texOffs(0, 32).addBox(-2.0F, 10.0F, -0.5F, 14.0F, 8.0F, 1.0F), PartPose.ZERO);
+		// A bigger board, 26 x 10, centred between the hands: three side by side spell the brand.
+		arm.addOrReplaceChild("big_sign", CubeListBuilder.create().texOffs(0, 48).addBox(-8.0F, 10.0F, -0.5F, 26.0F, 10.0F, 1.0F), PartPose.ZERO);
 		return LayerDefinition.create(mesh, 64, 64);
 	}
 
@@ -62,7 +67,8 @@ public class FanModel extends HumanoidModel<FanRenderState> {
 		super.setupAnim(s);
 		float t = s.time, e = Mth.clamp(s.energy, 0, 1), k = s.blend;
 		boolean holding = s.sign >= 0;
-		this.sign.visible = holding;
+		this.sign.visible = holding && s.sign < BIG;
+		this.big.visible = holding && s.sign >= BIG;
 
 		// Standing about: a little sway, arms loose.
 		this.body.yRot = Mth.sin(t * 0.05F) * 0.08F;
@@ -145,6 +151,13 @@ public class FanModel extends HumanoidModel<FanRenderState> {
 			ry = Mth.lerp(w, ry, 0);
 			ly = Mth.lerp(w, ly, 0);
 			bob = Math.min(bob, -3.0F * w);
+		}
+
+		// Looking through a spyglass: the right hand up to the eye, following the head.
+		if (s.spyglass && s.action != HEADS) {
+			rx = this.head.xRot - 1.5F;
+			ry = this.head.yRot - 0.3F;
+			rz = 0;
 		}
 
 		this.rightArm.xRot = rx;

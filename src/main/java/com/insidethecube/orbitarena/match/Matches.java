@@ -9,6 +9,8 @@ import java.util.UUID;
 
 import com.insidethecube.orbitarena.OrbitArena;
 import com.insidethecube.orbitarena.arena.ArenaBuilder;
+import com.insidethecube.orbitarena.arena.BridgeBuilder;
+import com.insidethecube.orbitarena.arena.BridgeLayout;
 import com.insidethecube.orbitarena.net.Payloads;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -23,6 +25,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -41,85 +44,102 @@ import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-/** All the matches going on, the arenas being built, and the rules of the arena dimension. */
+/** All the games going on, the arenas and bridges being built, and the rules of the arena dimension. */
 public final class Matches {
 	private Matches() {}
 
-	private static final Map<UUID, Match> MATCHES = new HashMap<>();
-	private static final Map<Integer, ArenaBuilder> BUILDERS = new HashMap<>();
+	/** Something building an arena or a bridge a slice at a time. */
+	public interface Builder {
+		/** Builds the next slice; true when it's all done. */
+		boolean tick();
+
+		/** 0 to 1. */
+		float progress();
+	}
+
+	private static final Map<UUID, Game> GAMES = new HashMap<>();
+	private static final Map<Long, Builder> BUILDERS = new HashMap<>();
+
+	public static long key(int centreX, int centreZ) {
+		return ((long) centreX << 32) | (centreZ & 0xFFFFFFFFL);
+	}
 
 	public static void register() {
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Start.TYPE, (payload, ctx) -> start(ctx.player(), payload.settings().checked()));
 		ServerPlayNetworking.registerGlobalReceiver(Payloads.Leave.TYPE, (payload, ctx) -> forfeit(ctx.player()));
+		// A celebration: everyone near sees it.
+		ServerPlayNetworking.registerGlobalReceiver(Payloads.Emote.TYPE, (payload, ctx) -> {
+			ServerPlayer p = ctx.player();
+			if (!isArena(p.level())) return;
+			for (ServerPlayer other : ((ServerLevel) p.level()).players()) {
+				if (other != p && other.distanceToSqr(p) < 160 * 160) ServerPlayNetworking.send(other, new Payloads.EmoteOf(p.getId(), payload.emote()));
+			}
+		});
 		ServerTickEvents.END_SERVER_TICK.register(Matches::tick);
 		// The arena always fights at Normal, whatever the world's difficulty (Peaceful would delete every enemy).
 		ServerWorldEvents.LOAD.register((server, world) -> {
 			if (world.dimension() == OrbitArena.ARENA && world.getLevelData() instanceof ArenaDifficulty d) d.orbitarena$markArena();
 		});
 
-		// Losing a fight in the arena isn't dying: the match ends instead.
+		// Who can hurt whom, what happens instead of dying, and what the crowd makes of it: the game decides.
 		ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> {
-			if (entity instanceof ServerPlayer p) {
-				Match m = MATCHES.get(p.getUUID());
-				if (m != null && m.inArena()) {
-					m.onPlayerDown();
-					return false;
-				}
-			}
-			return true;
+			Game g = gameOf(entity);
+			return g == null || g.allowDeath(entity, source);
 		});
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
-			// Enemies never hurt each other.
-			if (entity.getTags().contains(Match.ENEMY_TAG) && source.getEntity() != null && source.getEntity().getTags().contains(Match.ENEMY_TAG)) return false;
-			// Nothing hurts a player in the arena outside a fight (the countdown, the result).
-			if (entity instanceof ServerPlayer p && p.level().dimension() == OrbitArena.ARENA) {
-				Match m = MATCHES.get(p.getUUID());
-				return m != null && m.fighting();
-			}
-			return true;
+			Game g = gameOf(entity);
+			if (g != null) return g.allowDamage(entity, source, amount);
+			// Nothing hurts a player in the arena outside a game.
+			return !(entity instanceof ServerPlayer p && isArena(p.level()));
 		});
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, base, taken, blocked) -> {
-			if (entity instanceof ServerPlayer p) {
-				Match m = MATCHES.get(p.getUUID());
-				if (m != null && m.fighting()) m.onPlayerHurt(taken);
-			} else if (entity.getTags().contains(Match.ENEMY_TAG) && source.getEntity() instanceof ServerPlayer p) {
-				Match m = MATCHES.get(p.getUUID());
-				if (m != null && m.fighting()) m.onEnemyHurt(taken);
-			}
+			Game g = gameOf(entity);
+			if (g != null) g.afterDamage(entity, source, taken);
 		});
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
-			if (!entity.getTags().contains(Match.ENEMY_TAG)) return;
-			for (Match m : MATCHES.values()) m.onEnemyDeath(entity);
+			for (Game g : GAMES.values()) g.onDeath(entity);
 		});
 
-		// The arena itself can't be broken or built on (except in creative). Only placing things is stopped:
-		// throwing pearls and wind charges, blocking with a shield or drawing a bow while looking at the floor
-		// all still work.
-		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, be) -> !protectedFor(player));
-		AttackBlockCallback.EVENT.register((player, level, hand, pos, dir) -> protectedFor(player) ? InteractionResult.FAIL : InteractionResult.PASS);
-		UseBlockCallback.EVENT.register((player, level, hand, hit) -> protectedFor(player) && placesSomething(player.getItemInHand(hand)) ? InteractionResult.FAIL
-				: InteractionResult.PASS);
+		// The arena and the bridges can't be broken or built on, except what the bridge allows (blocks placed
+		// in a bridge game, and building near the bridge). Creative is free to build, but not mid-fight.
+		// Only placing things is stopped: pearls, wind charges, shields and bows all work while you're looking
+		// at the floor.
+		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, be) -> mayBreak(player, pos));
+		AttackBlockCallback.EVENT.register((player, level, hand, pos, dir) -> mayBreak(player, pos) ? InteractionResult.PASS : InteractionResult.FAIL);
+		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+			ItemStack stack = player.getItemInHand(hand);
+			if (!isArena(level) || !placesSomething(stack) || freeToBuild(player)) return InteractionResult.PASS;
+			if (stack.getItem() instanceof BlockItem) {
+				BlockPos at = new BlockPlaceContext(player, hand, stack, hit).getClickedPos();
+				if (level.isClientSide()) return BridgeLayout.near(at) ? InteractionResult.PASS : InteractionResult.FAIL;
+				Game g = player instanceof ServerPlayer sp ? GAMES.get(sp.getUUID()) : null;
+				return g != null && g.fighting() && g.mayPlace(at) ? InteractionResult.PASS : InteractionResult.FAIL;
+			}
+			return InteractionResult.FAIL;
+		});
 
 		// Back in after leaving mid-fight (or a crash): everything given back.
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			ServerPlayer p = handler.getPlayer();
-			if (!MATCHES.containsKey(p.getUUID()) && (Loadout.has(p) || p.level().dimension() == OrbitArena.ARENA)) {
+			if (!GAMES.containsKey(p.getUUID()) && (Loadout.has(p) || p.level().dimension() == OrbitArena.ARENA)) {
 				server.execute(() -> sendHome(p));
 			}
 		});
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-			Match m = MATCHES.remove(handler.getPlayer().getUUID());
-			if (m != null) m.abandon();
+			Game g = GAMES.remove(handler.getPlayer().getUUID());
+			if (g != null) g.abandon();
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-			for (Match m : MATCHES.values()) {
-				m.abandon();
-				Loadout.restore(m.player);
+			for (Game g : GAMES.values()) {
+				g.abandon();
+				Loadout.restore(g.player());
 			}
-			MATCHES.clear();
+			GAMES.clear();
 			BUILDERS.clear();
 		});
 
@@ -131,8 +151,12 @@ public final class Matches {
 				.then(Commands.literal("rebuild").requires(s -> s.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER))
 						.then(Commands.argument("slot", IntegerArgumentType.integer(0, 63)).executes(c -> {
 							ServerLevel arena = c.getSource().getServer().getLevel(OrbitArena.ARENA);
-							if (arena != null) builder(arena, IntegerArgumentType.getInteger(c, "slot") * SPACING);
-							c.getSource().sendSuccess(() -> Component.literal("Rebuilding the arena"), false);
+							int slot = IntegerArgumentType.getInteger(c, "slot");
+							if (arena != null) {
+								builder(arena, slot * SPACING);
+								bridgeBuilder(arena, slot * SPACING, true, false);
+							}
+							c.getSource().sendSuccess(() -> Component.literal("Rebuilding the arena and the bridge"), false);
 							return 1;
 						})))));
 	}
@@ -144,19 +168,55 @@ public final class Matches {
 				|| i instanceof BoneMealItem || i instanceof EndCrystalItem || i instanceof ArmorStandItem;
 	}
 
-	private static boolean protectedFor(Player player) {
-		return player.level().dimension() == OrbitArena.ARENA && !player.isCreative();
+	/** Really in Creative (not as mixin.PlayerMixin shows it mid-fight). */
+	static boolean realCreative(Player p) {
+		return p instanceof ServerPlayer sp ? sp.gameMode.getGameModeForPlayer() == GameType.CREATIVE : p.isCreative();
+	}
+
+	/** Creative and not in a fight: free to build and break (Axiom included). */
+	private static boolean freeToBuild(Player p) {
+		if (!realCreative(p)) return false;
+		Game g = p instanceof ServerPlayer sp ? GAMES.get(sp.getUUID()) : null;
+		return g == null || !g.fighting();
+	}
+
+	private static boolean mayBreak(Player player, BlockPos pos) {
+		if (!isArena(player.level()) || freeToBuild(player)) return true;
+		if (player.level().isClientSide()) return BridgeLayout.near(pos);
+		Game g = player instanceof ServerPlayer sp ? GAMES.get(sp.getUUID()) : null;
+		return g != null && g.fighting() && g.mayBreak(pos);
+	}
+
+	/**
+	 * Fighting in Creative (Axiom's editor): mixin.PlayerMixin shows the player as not Creative for the
+	 * fight, so everything still comes for them.
+	 */
+	public static boolean fightingInCreative(ServerPlayer p) {
+		if (GAMES.isEmpty()) return false;
+		Game g = GAMES.get(p.getUUID());
+		return g != null && g.fighting() && p.gameMode.getGameModeForPlayer() == GameType.CREATIVE;
+	}
+
+	/** The game a player, an enemy or a teammate belongs to. */
+	static Game gameOf(LivingEntity e) {
+		if (GAMES.isEmpty()) return null;
+		if (e instanceof ServerPlayer p) {
+			Game g = GAMES.get(p.getUUID());
+			if (g != null) return g;
+		}
+		if (!isArena(e.level())) return null;
+		for (Game g : GAMES.values()) if (g instanceof BridgeMatch b && b.involves(e) || g instanceof Match m && m.alive.contains(e)) return g;
+		return null;
 	}
 
 	static void start(ServerPlayer p, MatchSettings settings) {
-		Match old = MATCHES.get(p.getUUID());
+		Game old = GAMES.get(p.getUUID());
 		if (old != null) {
-			// Just finished one, still in the arena: go again straight away (putting the arena right first
-			// after a mob or boss fight).
-			if (old.phase == Match.Phase.RESULT && isArena(p.level())) {
+			// Just finished one, still in the arena: go again straight away (in the stadium or on the bridge,
+			// whichever the settings say).
+			if (old.awaitingChoice() && isArena(p.level())) {
 				old.retire();
-				if (old.settings.opponents() != MatchSettings.Opponents.FIGHTERS) builder((ServerLevel) p.level(), old.centreX);
-				MATCHES.put(p.getUUID(), new Match(p, settings, old.slot, true));
+				GAMES.put(p.getUUID(), settings.bridge() ? new BridgeMatch(p, settings, old.slot(), true) : new Match(p, settings, old.slot(), true));
 				return;
 			}
 			p.displayClientMessage(Component.literal("You're already in a match.").withStyle(ChatFormatting.RED), true);
@@ -165,28 +225,26 @@ public final class Matches {
 		if (Loadout.has(p)) sendHome(p);
 		int slot = 0;
 		while (slotTaken(slot)) slot++;
-		MATCHES.put(p.getUUID(), new Match(p, settings, slot, false));
+		GAMES.put(p.getUUID(), settings.bridge() ? new BridgeMatch(p, settings, slot, false) : new Match(p, settings, slot, false));
 	}
 
-	/** The builder at work on this arena, or null. */
-	static ArenaBuilder building(int centreX) {
-		return BUILDERS.get(centreX);
+	/** The builder at work here, or null. */
+	static Builder building(long key) {
+		return BUILDERS.get(key);
 	}
 
 	private static boolean slotTaken(int slot) {
-		for (Match m : MATCHES.values()) if (m.slot == slot) return true;
+		for (Game g : GAMES.values()) if (g.slot() == slot) return true;
 		return false;
 	}
 
 	static void forfeit(ServerPlayer p) {
-		Match m = MATCHES.get(p.getUUID());
-		if (m == null) {
+		Game g = GAMES.get(p.getUUID());
+		if (g == null) {
 			if (Loadout.has(p) || p.level().dimension() == OrbitArena.ARENA) sendHome(p);
 			return;
 		}
-		m.forfeit = true;
-		if (m.phase != Match.Phase.RESULT) m.end(false, "You left");
-		m.leave();
+		g.forfeit();
 	}
 
 	/** Gives back anything put away and sends the player home (or to their spawn if nothing was saved). */
@@ -198,26 +256,31 @@ public final class Matches {
 			var spawn = world.getRespawnData().pos();
 			p.teleportTo(world, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, java.util.Set.of(), 0, 0, true);
 		}
-		ServerPlayNetworking.send(p, new Payloads.State(false, 0, false));
+		ServerPlayNetworking.send(p, new Payloads.State(false, Payloads.State.ARENA, 0, 0, false));
 	}
 
-	static ArenaBuilder builder(ServerLevel arena, int centreX) {
-		return BUILDERS.computeIfAbsent(centreX, x -> new ArenaBuilder(arena, x));
+	static Builder builder(ServerLevel arena, int centreX) {
+		return BUILDERS.computeIfAbsent(key(centreX, 0), k -> new ArenaBuilder(arena, centreX));
+	}
+
+	/** Builds the bridge (full: everything; otherwise just the playing area, put right). */
+	static Builder bridgeBuilder(ServerLevel arena, int centreX, boolean full, boolean obstacles) {
+		return BUILDERS.computeIfAbsent(key(centreX, BridgeLayout.Z), k -> new BridgeBuilder(arena, centreX, full).obstacles(obstacles));
 	}
 
 	private static void tick(MinecraftServer server) {
-		Iterator<Map.Entry<Integer, ArenaBuilder>> b = BUILDERS.entrySet().iterator();
+		Iterator<Map.Entry<Long, Builder>> b = BUILDERS.entrySet().iterator();
 		while (b.hasNext()) if (b.next().getValue().tick()) b.remove();
-		Iterator<Match> it = MATCHES.values().iterator();
+		Iterator<Game> it = GAMES.values().iterator();
 		while (it.hasNext()) {
-			Match m = it.next();
-			if (m.player.isRemoved() && m.player.hasDisconnected()) {
-				m.abandon();
+			Game g = it.next();
+			if (g.player().isRemoved() && g.player().hasDisconnected()) {
+				g.abandon();
 				it.remove();
 				continue;
 			}
-			m.tick();
-			if (m.done()) it.remove();
+			g.tick();
+			if (g.done()) it.remove();
 		}
 	}
 
@@ -246,7 +309,7 @@ public final class Matches {
 	}
 
 	public static boolean inMatch(Player p) {
-		return MATCHES.containsKey(p.getUUID());
+		return GAMES.containsKey(p.getUUID());
 	}
 
 	static boolean isArena(Level level) {

@@ -12,7 +12,7 @@ import net.minecraft.util.Mth;
 
 /** Draws the fans: one of the fan looks, with or without a sign, a little taller or shorter. */
 public class FanRenderer extends HumanoidMobRenderer<Fan, FanRenderState, FanModel> {
-	public static final int LOOKS = 8, SIGNS = 6;
+	public static final int LOOKS = 8, SIGNS = 9;
 	private static final Identifier[][] TEXTURES = new Identifier[LOOKS][SIGNS + 1];
 
 	static {
@@ -36,6 +36,7 @@ public class FanRenderer extends HumanoidMobRenderer<Fan, FanRenderState, FanMod
 		state.look = fan.look;
 		state.sign = fan.sign;
 		state.height = fan.height;
+		state.spyglass = fan.spyglass;
 		Minecraft mc = Minecraft.getInstance();
 		float now = (mc.level == null ? 0 : mc.level.getGameTime()) + partial;
 		state.time = now + fan.phase * 997;

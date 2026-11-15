@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.insidethecube.orbitarena.ArenaSounds;
 import com.insidethecube.orbitarena.OrbitArena;
+import com.insidethecube.orbitarena.arena.BridgeLayout;
 import com.insidethecube.orbitarena.entity.Fan;
 import com.insidethecube.orbitarena.net.Payloads;
 import net.minecraft.client.Minecraft;
@@ -20,6 +21,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 /**
  * The crowd: fans in the seats of the three tiers, added on your screen only when you're in the arena. How
@@ -38,7 +42,7 @@ public final class Crowd {
 	public static float density = 0.5F;
 	private static final List<Fan> FANS = new ArrayList<>();
 	private static ClientLevel spawnedIn;
-	private static int centreX = Integer.MIN_VALUE, spawnedAt = Integer.MIN_VALUE;
+	private static int centreX = Integer.MIN_VALUE, centreZ, mode, spawnedAt = Integer.MIN_VALUE, spawnedZ, spawnedMode = -1;
 	private static float spawnedDensity;
 	private static boolean fighting;
 	/** How worked up the crowd is (0 to 1), and how much it groans. */
@@ -52,8 +56,15 @@ public final class Crowd {
 	private static long lastSmall, lastOoh;
 	private static Murmur murmur;
 
-	public static void setCentre(int x) {
+	/** Which arena you're in (the stadium or the bridge) and its centre. */
+	public static void setArena(int kind, int x, int z) {
+		mode = kind;
 		centreX = x;
+		centreZ = z;
+	}
+
+	public static boolean onBridge() {
+		return mode == com.insidethecube.orbitarena.net.Payloads.State.BRIDGE;
 	}
 
 	public static void setFighting(boolean on) {
@@ -83,7 +94,7 @@ public final class Crowd {
 			}
 			case Payloads.Cheer.WIN -> {
 				cheer = 1;
-				party = 160;
+				party = 230;
 				play(ArenaSounds.UPROAR, loud, 0);
 				play(ArenaSounds.APPLAUSE, loud * 0.8F, 30);
 			}
@@ -159,16 +170,23 @@ public final class Crowd {
 			mc.getSoundManager().play(murmur);
 		}
 		int centre = centreX != Integer.MIN_VALUE ? centreX : Math.round((float) mc.player.getX() / SPACING) * SPACING;
-		boolean stale = spawnedIn != level || spawnedAt != centre || spawnedDensity != density;
+		boolean stale = spawnedIn != level || spawnedAt != centre || spawnedZ != centreZ || spawnedMode != mode || spawnedDensity != density;
 		// Wait until the stands are there (the chunks have arrived).
-		if (stale && level.getBlockState(new BlockPos(centre + (int) seatRadius(0, 4), FLOOR + seatY(0, 4) - 1, 0)).isAir()) return;
+		BlockPos check = onBridge() ? new BlockPos(centre, BridgeLayout.Y + BridgeLayout.rowTop(2), centreZ + (int) BridgeLayout.rowZ(2))
+				: new BlockPos(centre + (int) seatRadius(0, 4), FLOOR + seatY(0, 4) - 1, 0);
+		if (stale && level.getBlockState(check).isAir()) return;
 		if (stale) {
 			for (Fan f : FANS) level.removeEntity(f.getId(), Entity.RemovalReason.DISCARDED);
 			FANS.clear();
 			spawnedIn = level;
 			spawnedAt = centre;
+			spawnedZ = centreZ;
+			spawnedMode = mode;
 			spawnedDensity = density;
-			if (density > 0) seat(level, centre);
+			if (density > 0) {
+				if (onBridge()) seatBridge(level, centre, centreZ);
+				else seat(level, centre);
+			}
 		}
 	}
 
@@ -185,28 +203,71 @@ public final class Crowd {
 					boolean tunnel = false;
 					for (double t : TUNNELS) if (tier == 0 && row < 3 && Math.toRadians(angleDiff(a, t)) * r < 3.6) tunnel = true;
 					if (tunnel) continue;
+					// Facing you as you start (east, row 4 of the first tier): three side by side spelling the brand.
+					int brand = tier == 0 && row == 4 ? s == seats - 1 ? 0 : s == 0 ? 1 : s == 1 ? 2 : -1 : -1;
 					double h = hash(s, row, tier, 99);
-					if (h > density) continue;
-					double rad = Math.toRadians(a + (hash(s, row, tier, 98) - 0.5) * 0.4);
+					if (h > density && brand < 0) continue;
+					double rad = Math.toRadians(a + (brand >= 0 ? 0 : (hash(s, row, tier, 98) - 0.5) * 0.4));
 					double x = centre + Math.cos(rad) * r, z = Math.sin(rad) * r;
-					Fan fan = new Fan(OrbitArena.FAN, level);
-					fan.setId(nextId--);
-					fan.setPos(x, y, z);
-					float yaw = (float) Math.toDegrees(Math.atan2(-z, centre - x)) - 90;
-					fan.setYRot(yaw);
-					fan.yBodyRot = yaw;
-					fan.yHeadRot = yaw;
-					fan.yRotO = yaw;
-					fan.yBodyRotO = yaw;
-					fan.yHeadRotO = yaw;
-					fan.setOldPosAndRot();
-					fan.look = (int) (hash(s, row, tier, 96) * FanRenderer.LOOKS);
-					fan.sign = hash(s, row, tier, 95) < 0.07 ? (int) (hash(s, row, tier, 94) * FanRenderer.SIGNS) : -1;
-					fan.phase = (float) hash(s, row, tier, 93);
-					fan.height = 0.86F + (float) hash(s, row, tier, 92) * 0.16F;
+					Fan fan = add(level, x, y, z, centre, 0, hash(s, row, tier, 96), hash(s, row, tier, 95), hash(s, row, tier, 94), hash(s, row, tier, 93),
+							hash(s, row, tier, 92), brand);
 					fan.seatAngle = (float) Math.toDegrees(rad);
-					level.addEntity(fan);
-					FANS.add(fan);
+				}
+			}
+		}
+	}
+
+	/**
+	 * A fan at (x, y, z) facing (fx, fz): its look, sign (about one in eleven holds one, GG most often), a
+	 * spyglass now and then, its beat and height, from its seat's random numbers. Brand: 0, 1, 2 for the
+	 * three boards that spell INSID3 TH3 CUB3, or -1.
+	 */
+	private static Fan add(ClientLevel level, double x, double y, double z, double fx, double fz, double look, double signRoll, double signPick, double phase,
+			double height, int brand) {
+		Fan fan = new Fan(OrbitArena.FAN, level);
+		fan.setId(nextId--);
+		fan.setPos(x, y, z);
+		float yaw = (float) Math.toDegrees(Math.atan2(fz - z, fx - x)) - 90;
+		fan.setYRot(yaw);
+		fan.yBodyRot = yaw;
+		fan.yHeadRot = yaw;
+		fan.yRotO = yaw;
+		fan.yBodyRotO = yaw;
+		fan.yHeadRotO = yaw;
+		fan.setOldPosAndRot();
+		fan.look = (int) (look * FanRenderer.LOOKS);
+		if (brand >= 0) fan.sign = FanModel.BIG + brand;
+		else if (signRoll < 0.09) fan.sign = signPick < 0.4 ? 2 : (int) ((signPick - 0.4) / 0.6 * FanModel.BIG);
+		else fan.sign = -1;
+		if (fan.sign < 0 && signRoll > 0.985) {
+			fan.spyglass = true;
+			fan.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.SPYGLASS));
+		}
+		fan.phase = (float) phase;
+		fan.height = 0.86F + (float) height * 0.16F;
+		level.addEntity(fan);
+		FANS.add(fan);
+		return fan;
+	}
+
+	/** The bridge's two grandstands, facing the bridge; a brand trio in the middle of each. */
+	private static void seatBridge(ClientLevel level, int centre, int cz) {
+		for (int side = -1; side <= 1; side += 2) {
+			for (int row = 0; row < BridgeLayout.ROWS; row++) {
+				double z = cz + 0.5 + side * BridgeLayout.rowZ(row);
+				double y = BridgeLayout.Y + BridgeLayout.rowTop(row) + 1;
+				int seats = (int) ((2 * BridgeLayout.STAND_HALF_X) / 1.35);
+				for (int s = 0; s <= seats; s++) {
+					double x = centre - BridgeLayout.STAND_HALF_X + 0.5 + s * 1.35;
+					// Read from the bridge: on the north stand (facing south) left is east, on the south stand west.
+					int mid = seats / 2, brand = row == 2 && Math.abs(s - mid) <= 1 ? side < 0 ? s - mid + 1 : 1 - (s - mid) : -1;
+					long seed = s * 31L + side;
+					if (hash(seed, row, 7, 99) > density && brand < 0) continue;
+					if (brand < 0 && Math.floorMod(s, 8) == 0) continue;
+					Fan fan = add(level, x + (brand >= 0 ? 0 : (hash(seed, row, 7, 98) - 0.5) * 0.3), y, z, x, cz + 0.5, hash(seed, row, 7, 96),
+							hash(seed, row, 7, 95), hash(seed, row, 7, 94), hash(seed, row, 7, 93), hash(seed, row, 7, 92), brand);
+					// The Mexican wave runs along each stand and back down the other.
+					fan.seatAngle = (float) ((x - centre + BridgeLayout.STAND_HALF_X) * 4 + (side > 0 ? 180 : 0));
 				}
 			}
 		}

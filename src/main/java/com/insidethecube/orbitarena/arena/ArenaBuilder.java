@@ -17,9 +17,9 @@ import net.minecraft.world.level.block.state.BlockState;
  * floating rocks. Everything is worked out from ArenaLayout, so building again repairs the arena exactly;
  * an arena of an older design is cleared as it's rebuilt.
  */
-public final class ArenaBuilder {
+public final class ArenaBuilder implements com.insidethecube.orbitarena.match.Matches.Builder {
 	/** Bump when the arena's design changes, so existing arenas are rebuilt. */
-	public static final int VERSION = 3;
+	public static final int VERSION = 4;
 	/** The marker under the centre that says which version an arena is. */
 	private static final BlockState MARKER = Blocks.REINFORCED_DEEPSLATE.defaultBlockState();
 
@@ -56,11 +56,13 @@ public final class ArenaBuilder {
 	}
 
 	/** 0 to 1. */
+	@Override
 	public float progress() {
 		return (next + rockNext * 600f) / (columns.size() + rocks * 600f);
 	}
 
 	/** Builds the next slice; true when it's all done. */
+	@Override
 	public boolean tick() {
 		long start = System.nanoTime();
 		while (next < columns.size() && System.nanoTime() - start < BUDGET) {
@@ -104,8 +106,12 @@ public final class ArenaBuilder {
 		// The underside of the asteroid, three blocks thick, under everything.
 		double outer = rockOuter(a);
 		if (r < outer) {
-			int bottom = f + rockBottom(x, z);
-			fill(x, z, bottom, bottom + 2, rock(x, bottom, z));
+			// Deep enough to meet its neighbours' underside, so there are no gaps to see through.
+			int bottom = f + rockBottom(x, z), top = bottom + 2;
+			for (int[] n : new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+				if (radius(x + n[0] + 0.5, z + n[1] + 0.5) < rockOuter(angle(x + n[0] + 0.5, z + n[1] + 0.5))) top = Math.max(top, f + rockBottom(x + n[0], z + n[1]) + 1);
+			}
+			fill(x, z, bottom, top, rock(x, bottom, z));
 		}
 		if (r < WALL_OUT) fill(x, z, f - 2, f - 1, b(Blocks.DEEPSLATE));
 		int tier = tierAt(r);
@@ -256,19 +262,32 @@ public final class ArenaBuilder {
 		}
 	}
 
-	/** Tunnels at floor level through the wall and the first rows, framed in orange. */
+	/**
+	 * Tunnels at floor level through the wall and the first rows: framed in orange, walled and roofed all
+	 * the way along, lit down the middle of the ceiling, and closed at the end by a dark gate edged with
+	 * light (so there's no seeing out into the hollow under the stands).
+	 */
 	private void tunnels(int x, int z, double r, double a) {
 		int f = FLOOR;
-		if (r < WALL_IN - 0.5 || r >= 56.5) return;
+		if (r < WALL_IN - 0.5 || r >= 57.5) return;
 		for (double t : TUNNELS) {
 			double arc = Math.toRadians(angleDiff(a, t)) * r;
 			if (arc < 2.6) {
+				if (r >= 56.5) {
+					// Behind the gate: solid.
+					fill(x, z, f, f + 5, b(Blocks.POLISHED_BLACKSTONE));
+					continue;
+				}
 				clear(x, z, f + 1, f + 4);
 				set(x, f, z, b(Blocks.GRAY_CONCRETE));
-				if (r >= 55.5) fill(x, z, f + 1, f + 4, b(Blocks.BLACK_CONCRETE));
-				else set(x, f + 5, z, b(Blocks.ORANGE_CONCRETE));
-			} else if (arc < 3.6 && r < WALL_OUT + 0.5) {
-				fill(x, z, f + 1, f + 5, b(Blocks.ORANGE_CONCRETE));
+				boolean lit = arc < 0.7 && Math.floorMod((int) Math.floor(r), 3) == 0;
+				set(x, f + 5, z, lit ? b(Blocks.SEA_LANTERN) : b(Blocks.ORANGE_CONCRETE));
+				if (r >= 55.5) {
+					// The gate: dark, edged with light.
+					for (int y = f + 1; y <= f + 4; y++) set(x, y, z, arc >= 1.7 || y == f + 4 ? b(Blocks.SEA_LANTERN) : b(Blocks.POLISHED_BLACKSTONE));
+				}
+			} else if (arc < 3.6) {
+				fill(x, z, f, f + 5, b(Blocks.ORANGE_CONCRETE));
 			}
 		}
 	}

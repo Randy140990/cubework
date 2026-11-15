@@ -12,16 +12,13 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.BossEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -33,22 +30,26 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * One player's match: getting the arena ready, the fade in, "3, 2, 1, Fight!", the fight (enemies
- * topped up in waves until all are beaten), the result, and then the player's choice: go again (straight
- * back onto the pedestal, the arena put right first if a mob or boss fight damaged it), change the
- * settings and go again, or fade back home with everything returned.
+ * One player's match in the stadium: getting the arena ready, the fade in, the fly-round (if it's on),
+ * "3, 2, 1, Fight!", the fight (fighters and bosses topped up until all are beaten; mobs in waves, the next
+ * coming in as the last few of one are left), the result, and then the player's choice: go again (straight
+ * back onto the pedestal, the arena put right first if a mob or boss fight damaged it), change the settings,
+ * or fade back home with everything returned. A win is celebrated for ten seconds first: the crowd goes
+ * wild, fireworks go up, and you see yourself celebrate.
  * <p>
- * The player always fights in Survival, whatever their game mode was (and if anything switches it during
- * the fight, it's switched back), and is only let go once they're really standing in the arena.
+ * The fight starts in Survival. Switching to Creative (Axiom's editor) is allowed: you can still be hurt,
+ * and everything still comes for you (see mixin.PlayerMixin).
  */
-public final class Match {
+public final class Match implements Game {
 	private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
 
 	enum Phase {
-		PREPARING, ENTERING, COUNTDOWN, FIGHT, RESULT, LEAVING, DONE
+		PREPARING, ENTERING, INTRO, COUNTDOWN, FIGHT, RESULT, LEAVING, DONE
 	}
 
 	public static final String ENEMY_TAG = "orbitarena_enemy";
+	/** How long the fly-round lasts, and how long a win is celebrated before the choice comes up (ticks). */
+	static final int INTRO_TICKS = 200, CELEBRATE_TICKS = 200;
 
 	final ServerPlayer player;
 	final MatchSettings settings;
@@ -59,9 +60,12 @@ public final class Match {
 	int ticks, fightTicks;
 	final List<LivingEntity> alive = new ArrayList<>();
 	int spawned, kills;
+	/** Mob waves: the wave on now (from 1), and how many of it are still to come out. */
+	int wave, waveLeft;
 	float dealt, taken;
 	boolean won, forfeit;
 	String endReason = "";
+	private String summary = "";
 	private final ServerBossEvent bar = new ServerBossEvent(Component.literal("Orbit Arena"), BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.PROGRESS);
 
 	Match(ServerPlayer player, MatchSettings settings, int slot, boolean again) {
@@ -70,6 +74,21 @@ public final class Match {
 		this.slot = slot;
 		this.centreX = slot * SPACING;
 		this.again = again;
+	}
+
+	@Override
+	public ServerPlayer player() {
+		return player;
+	}
+
+	@Override
+	public MatchSettings settings() {
+		return settings;
+	}
+
+	@Override
+	public int slot() {
+		return slot;
 	}
 
 	ServerLevel arena() {
@@ -84,16 +103,34 @@ public final class Match {
 		return new AABB(centreX - WALL_OUT, FLOOR - 4, -WALL_OUT, centreX + WALL_OUT, FLOOR + CEILING + 30, WALL_OUT);
 	}
 
+	boolean mobs() {
+		return settings.opponents() == MatchSettings.Opponents.MOBS;
+	}
+
+	/** How many there are to beat in all (for mob waves, every wave's). */
+	int total() {
+		if (!mobs()) return settings.count();
+		int n = 0;
+		for (int w = 1; w <= settings.count(); w++) n += waveSize(w);
+		return n;
+	}
+
+	/** Each wave a little bigger than the last, and bigger at higher levels. */
+	int waveSize(int w) {
+		return Math.min(30, 3 + w + settings.difficulty() / 3);
+	}
+
 	int maxAlive() {
 		int d = settings.difficulty();
 		return switch (settings.opponents()) {
 			case FIGHTERS -> Math.min(settings.count(), Math.min(30, 4 + 2 * d));
-			case MOBS -> Math.min(settings.count(), Math.min(40, 4 + 3 * d));
-			case BOSS -> settings.count();
+			case MOBS -> Math.min(40, 4 + 3 * d);
+			default -> settings.count();
 		};
 	}
 
-	void tick() {
+	@Override
+	public void tick() {
 		ticks++;
 		ServerLevel arena = arena();
 		if (arena == null) return;
@@ -103,7 +140,7 @@ public final class Match {
 				if (again) hold(arena);
 				// Wait until the arena is built and nothing is building or repairing it (stepping in while it's
 				// being rebuilt could leave you with no floor).
-				ArenaBuilder running = Matches.building(centreX);
+				Matches.Builder running = Matches.building(Matches.key(centreX, 0));
 				if (running != null) {
 					player.displayClientMessage(Component.literal((again ? "Putting the arena right… " : "Building the arena… ") + (int) (running.progress() * 100) + "%")
 							.withStyle(ChatFormatting.AQUA), true);
@@ -112,7 +149,7 @@ public final class Match {
 				} else if (again) {
 					player.getInventory().clearContent();
 					arm(arena);
-					countdown();
+					ready(false);
 				} else {
 					enter();
 				}
@@ -131,7 +168,7 @@ public final class Match {
 				if (ticks > 12 && player.level() != arena && ticks % 10 == 0) teleportIn(arena);
 				if (ticks >= 30) {
 					if (player.level() == arena) {
-						countdown();
+						ready(settings.intro());
 					} else if (ticks > 400) {
 						LOGGER.warn("Orbit Arena: couldn't get {} into the arena", player.getName().getString());
 						player.displayClientMessage(Component.literal("Couldn't get you into the arena. Try again.").withStyle(ChatFormatting.RED), false);
@@ -140,18 +177,21 @@ public final class Match {
 					}
 				}
 			}
+			case INTRO -> {
+				hold(arena);
+				if (ticks >= INTRO_TICKS) countdown();
+			}
 			case COUNTDOWN -> {
-				keepSurvival();
 				hold(arena);
 				if (ticks == 1 || ticks == 21 || ticks == 41) {
 					int n = 3 - (ticks - 1) / 20;
-					title(Component.literal(String.valueOf(n)).withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD), Component.literal(subtitle()), 0, 20, 2);
-					sound(SoundEvents.NOTE_BLOCK_PLING.value(), 0.6F + 0.2F * (3 - n));
+					Shows.title(player, Component.literal(String.valueOf(n)).withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD), Component.literal(subtitle()), 0, 20, 2);
+					Shows.sound(player, SoundEvents.NOTE_BLOCK_PLING.value(), 1.0F, 0.6F + 0.2F * (3 - n));
 				}
 				if (ticks >= 60) {
-					title(Component.literal("FIGHT!").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), Component.empty(), 0, 20, 10);
-					sound(SoundEvents.PLAYER_LEVELUP, 1.4F);
-					cheer(Payloads.Cheer.FIGHT, 1.0F);
+					Shows.title(player, Component.literal("FIGHT!").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), Component.empty(), 0, 20, 10);
+					Shows.sound(player, SoundEvents.PLAYER_LEVELUP, 1.0F, 1.4F);
+					Shows.cheer(player, Payloads.Cheer.FIGHT, 1.0F);
 					freezeEnemies(false);
 					phase = Phase.FIGHT;
 					ticks = 0;
@@ -159,21 +199,26 @@ public final class Match {
 				}
 			}
 			case FIGHT -> {
-				keepSurvival();
 				// Somehow out of the arena (another mod's teleport, a command): that ends it.
 				if (player.level() != arena) {
 					forfeit = true;
 					end(false, "You left the arena");
 					leave();
 				} else {
+					creativeFair();
 					fight(arena);
 				}
 			}
 			case RESULT -> {
-				// The player picks: go again, change the settings, or leave (see Matches.start). If they don't
-				// within five minutes, or they've gone, home they go.
-				keepSurvival();
-				if (ticks >= 6000 || player.level() != arena) leave();
+				// A win: ten seconds of fireworks and cheering, then the choice. The player picks: go again, change
+				// the settings, or leave (see Matches.start). If they don't within five minutes, or they've gone,
+				// home they go.
+				if (won && ticks < CELEBRATE_TICKS - 20 && ticks % 7 == 0) {
+					double a = arena.random.nextDouble() * Math.PI * 2, r = 20 + arena.random.nextDouble() * 26;
+					Shows.firework(arena, centreX + Math.cos(a) * r, FLOOR + 2, Math.sin(a) * r, -1, arena.random);
+				}
+				if (ticks == (won ? CELEBRATE_TICKS : 30) && !forfeit) ServerPlayNetworking.send(player, new Payloads.Result(won, endReason, summary));
+				if (ticks >= 6000 + CELEBRATE_TICKS || player.level() != arena) leave();
 			}
 			case LEAVING -> {
 				if (ticks == 12) {
@@ -193,11 +238,21 @@ public final class Match {
 		}
 	}
 
+	/**
+	 * In Creative mid-fight (Axiom's editor, say), the fight stays fair: Creative would make you unhurtable
+	 * and invisible to everything, so you're made hurtable again (and mixin.PlayerMixin keeps you visible).
+	 */
+	private void creativeFair() {
+		if (player.gameMode.getGameModeForPlayer() == GameType.CREATIVE && player.getAbilities().invulnerable) {
+			player.getAbilities().invulnerable = false;
+		}
+	}
+
 	private String subtitle() {
 		String who = switch (settings.opponents()) {
 			case FIGHTERS -> settings.count() + (settings.count() == 1 ? " fighter" : " fighters");
-			case MOBS -> settings.count() + " mobs";
-			case BOSS -> settings.count() + " × " + bossName();
+			case MOBS -> settings.count() + (settings.count() == 1 ? " wave" : " waves") + " of mobs";
+			default -> settings.count() + " × " + bossName();
 		};
 		return who + " · level " + settings.difficulty();
 	}
@@ -234,17 +289,24 @@ public final class Match {
 		player.fallDistance = 0;
 	}
 
+	/** The first enemies out (held still), the bar up, then the fly-round or straight to the countdown. */
+	private void ready(boolean intro) {
+		if (mobs()) startWave(1, false);
+		spawnUpTo(Math.min(maxAlive(), total()));
+		freezeEnemies(true);
+		bar.addPlayer(player);
+		if (intro) {
+			phase = Phase.INTRO;
+			ticks = 0;
+			ServerPlayNetworking.send(player, new Payloads.Cinematic(Payloads.Cinematic.ARENA, centreX, 0, INTRO_TICKS, "ORBIT ARENA", subtitle()));
+		} else {
+			countdown();
+		}
+	}
+
 	private void countdown() {
 		phase = Phase.COUNTDOWN;
 		ticks = 0;
-		spawnUpTo(Math.min(maxAlive(), settings.count()));
-		freezeEnemies(true);
-		bar.addPlayer(player);
-	}
-
-	/** Fights are in Survival: if anything switches the player out of it, they're switched back. */
-	private void keepSurvival() {
-		if (player.gameMode.getGameModeForPlayer() != GameType.SURVIVAL) player.setGameMode(GameType.SURVIVAL);
 	}
 
 	private void enter() {
@@ -254,11 +316,28 @@ public final class Match {
 		player.level().playSound(null, player.blockPosition(), SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS, 0.25F, 1.6F);
 	}
 
+	private void startWave(int n, boolean announce) {
+		wave = n;
+		waveLeft = waveSize(n);
+		if (announce) {
+			Shows.title(player, Component.literal("WAVE " + n).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD),
+					Component.literal(n == settings.count() ? "The last one" : "of " + settings.count()), 0, 30, 10);
+			Shows.sound(player, SoundEvents.RAID_HORN.value(), 0.6F, 1.2F);
+			Shows.cheer(player, Payloads.Cheer.KILL, 0.8F);
+		}
+	}
+
 	private void fight(ServerLevel arena) {
 		fightTicks++;
 		alive.removeIf(e -> !e.isAlive() || e.isRemoved());
-		// Top up the enemies as they fall, until all of them have come.
-		if (alive.size() < maxAlive() && spawned < settings.count() && fightTicks % 10 == 0) spawnUpTo(Math.min(maxAlive(), alive.size() + 2));
+		if (mobs()) {
+			// Waves without a break: the next comes out while the last few of this one are still fighting.
+			if (waveLeft == 0 && alive.size() <= 2 && wave < settings.count()) startWave(wave + 1, true);
+			if (waveLeft > 0 && alive.size() < maxAlive() && fightTicks % 8 == 0) spawnUpTo(Math.min(maxAlive(), alive.size() + 2));
+		} else if (alive.size() < maxAlive() && spawned < total() && fightTicks % 10 == 0) {
+			// Top up the enemies as they fall, until all of them have come.
+			spawnUpTo(Math.min(maxAlive(), alive.size() + 2));
+		}
 		for (LivingEntity e : alive) {
 			if (e instanceof Warden w) w.increaseAngerAt(player, 150, false);
 			else if (e instanceof Mob m && !(e instanceof EnderDragon) && m.getTarget() != player) m.setTarget(player);
@@ -266,13 +345,13 @@ public final class Match {
 		}
 		Matches.keepInside(player, centreX);
 		if (fightTicks % 20 == 0) com.insidethecube.orbitarena.entity.Fighter.clearDrops(arena, box());
-		int left = settings.count() - kills;
-		float progress = settings.count() == 0 ? 0 : left / (float) settings.count();
-		bar.setProgress(Math.max(0, Math.min(1, progress)));
+		int total = total(), left = total - kills;
+		bar.setProgress(Math.max(0, Math.min(1, total == 0 ? 0 : left / (float) total)));
 		String time = clock(fightTicks / 20);
 		if (settings.timeLimit() > 0) time = clock(Math.max(0, settings.timeLimit() - fightTicks / 20)) + " left";
-		bar.setName(Component.literal(left + " to beat · " + time));
-		if (kills >= settings.count()) end(true, "All beaten");
+		if (mobs()) bar.setName(Component.literal("Wave " + wave + " of " + settings.count() + " · " + (alive.size() + waveLeft) + " to beat · " + time));
+		else bar.setName(Component.literal(left + " to beat · " + time));
+		if (kills >= total) end(true, mobs() ? "Every wave beaten" : "All beaten");
 		else if (settings.timeLimit() > 0 && fightTicks >= settings.timeLimit() * 20) end(false, "Time's up");
 	}
 
@@ -281,10 +360,14 @@ public final class Match {
 	}
 
 	private void spawnUpTo(int target) {
-		while (alive.size() < target && spawned < settings.count()) {
+		while (alive.size() < target && spawned < total() && (!mobs() || waveLeft > 0)) {
 			LivingEntity e = Spawns.spawn(this, arena(), spawned);
 			spawned++;
-			if (e == null) continue;
+			if (mobs()) waveLeft--;
+			if (e == null) {
+				kills++;
+				continue;
+			}
 			e.addTag(ENEMY_TAG);
 			alive.add(e);
 		}
@@ -294,7 +377,7 @@ public final class Match {
 		for (LivingEntity e : alive) if (e instanceof Mob m) m.setNoAi(frozen);
 	}
 
-	/** Holds the player on the pedestal (during the countdown, and while the arena's put right to go again). */
+	/** Holds the player on the pedestal (during the fly-round and countdown, and while the arena's put right). */
 	private void hold(ServerLevel arena) {
 		Vec3 s = start();
 		if (player.level() != arena) teleportIn(arena);
@@ -302,28 +385,62 @@ public final class Match {
 		player.fallDistance = 0;
 	}
 
-	void onEnemyHurt(float amount) {
-		dealt += amount;
-		cheer(Payloads.Cheer.HIT, Math.min(1, amount / 8));
+	// ---------------------------------------------------------------- who hurts whom
+
+	@Override
+	public boolean allowDamage(LivingEntity victim, DamageSource source, float amount) {
+		// Enemies never hurt each other.
+		if (victim.getTags().contains(ENEMY_TAG) && source.getEntity() != null && source.getEntity().getTags().contains(ENEMY_TAG)) return false;
+		// Nothing hurts the player outside a fight (the fly-round, the countdown, the result).
+		if (victim == player) return fighting();
+		return true;
 	}
 
-	void onEnemyDeath(LivingEntity e) {
-		if (!alive.remove(e)) return;
-		kills++;
-		cheer(Payloads.Cheer.KILL, kills >= settings.count() ? 1 : 0.7F);
+	@Override
+	public void afterDamage(LivingEntity victim, DamageSource source, float amount) {
+		if (!fighting()) return;
+		if (victim == player) {
+			taken += amount;
+			if (amount >= 4) Shows.cheer(player, Payloads.Cheer.HURT, Math.min(1, amount / 10));
+		} else if (victim.getTags().contains(ENEMY_TAG) && source.getEntity() == player) {
+			dealt += amount;
+			Shows.cheer(player, Payloads.Cheer.HIT, Math.min(1, amount / 8));
+		}
 	}
 
-	void onPlayerHurt(float amount) {
-		taken += amount;
-		if (amount >= 4) cheer(Payloads.Cheer.HURT, Math.min(1, amount / 10));
-	}
-
-	/** The player would have died: it's a loss instead. */
-	void onPlayerDown() {
+	@Override
+	public boolean allowDeath(LivingEntity victim, DamageSource source) {
+		if (victim != player || !inArena()) return true;
+		// The player would have died: it's a loss instead.
 		player.setHealth(player.getMaxHealth());
 		player.removeAllEffects();
 		end(false, "You were beaten");
+		return false;
 	}
+
+	@Override
+	public void onDeath(LivingEntity e) {
+		if (!alive.remove(e)) return;
+		kills++;
+		Shows.cheer(player, Payloads.Cheer.KILL, kills >= total() ? 1 : 0.7F);
+	}
+
+	@Override
+	public boolean mayBreak(BlockPos pos) {
+		return false;
+	}
+
+	@Override
+	public boolean mayPlace(BlockPos pos) {
+		return false;
+	}
+
+	@Override
+	public boolean owns(BlockPos pos) {
+		return Math.abs(pos.getX() - centreX) < SIZE + 120 && Math.abs(pos.getZ()) < SIZE + 120;
+	}
+
+	// ---------------------------------------------------------------- the end
 
 	void end(boolean won, String reason) {
 		if (phase.ordinal() >= Phase.RESULT.ordinal()) return;
@@ -340,36 +457,48 @@ public final class Match {
 			return;
 		}
 		int secs = fightTicks / 20;
-		title(Component.literal(won ? "VICTORY" : forfeit ? "LEFT THE ARENA" : "DEFEAT").withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED, ChatFormatting.BOLD),
+		Shows.title(player, Component.literal(won ? "VICTORY" : forfeit ? "LEFT THE ARENA" : "DEFEAT").withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED, ChatFormatting.BOLD),
 				Component.literal(reason + " · " + clock(secs)), 5, 70, 20);
-		sound(won ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.BEACON_DEACTIVATE, 1.0F);
-		cheer(won ? Payloads.Cheer.WIN : Payloads.Cheer.LOSS, 1.0F);
+		Shows.sound(player, won ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.BEACON_DEACTIVATE, 1.0F, 1.0F);
+		Shows.cheer(player, won ? Payloads.Cheer.WIN : Payloads.Cheer.LOSS, 1.0F);
 		player.sendSystemMessage(Component.literal("Orbit Arena · " + (won ? "Victory" : "Defeat") + " · " + subtitle()).withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED));
-		String summary = String.format("Time %s · Beaten %d of %d · Damage dealt %.0f · Damage taken %.0f", clock(secs), kills, settings.count(), dealt, taken);
+		String what = mobs() ? String.format("Waves %d of %d · Beaten %d", Math.max(0, won ? wave : wave - 1), settings.count(), kills)
+				: String.format("Beaten %d of %d", kills, total());
+		summary = String.format("Time %s · %s · Damage dealt %.0f · Damage taken %.0f", clock(secs), what, dealt, taken);
 		player.sendSystemMessage(Component.literal(" " + summary).withStyle(ChatFormatting.GRAY));
 		state(true);
-		// Go again, change the settings, or leave: the player's choice (not when they chose to leave).
-		if (!forfeit) ServerPlayNetworking.send(player, new Payloads.Result(won, reason, summary));
+		// A win is celebrated: you see yourself cheer (third person) while the fireworks go up.
+		if (won && !forfeit) ServerPlayNetworking.send(player, new Payloads.Celebrate(CELEBRATE_TICKS));
 	}
 
-	/** Making way for another go: the enemies cleared, this match's bar gone. */
-	void retire() {
+	@Override
+	public void retire() {
 		ServerLevel arena = arena();
 		if (arena != null) clearArena(arena);
 		bar.removeAllPlayers();
 		phase = Phase.DONE;
+		// Mob and boss fights can damage the arena: put it right before the next go.
+		if (arena != null && settings.opponents() != MatchSettings.Opponents.FIGHTERS) Matches.builder(arena, centreX);
+	}
+
+	@Override
+	public void forfeit() {
+		forfeit = true;
+		if (phase != Phase.RESULT) end(false, "You left");
+		leave();
 	}
 
 	/** Fade out and go home (from the result, or straight away when leaving). */
-	void leave() {
+	@Override
+	public void leave() {
 		if (phase == Phase.LEAVING || phase == Phase.DONE) return;
 		phase = Phase.LEAVING;
 		ticks = 0;
 		ServerPlayNetworking.send(player, new Payloads.Fade(12, 6, 20));
 	}
 
-	/** When the player has gone (logged off): tidy up; their things come back when they're next in. */
-	void abandon() {
+	@Override
+	public void abandon() {
 		ServerLevel arena = arena();
 		if (arena != null) clearArena(arena);
 		bar.removeAllPlayers();
@@ -381,33 +510,27 @@ public final class Match {
 		alive.clear();
 	}
 
-	boolean done() {
+	@Override
+	public boolean done() {
 		return phase == Phase.DONE;
 	}
 
-	boolean fighting() {
+	@Override
+	public boolean fighting() {
 		return phase == Phase.FIGHT;
 	}
 
-	boolean inArena() {
-		return phase.ordinal() >= Phase.COUNTDOWN.ordinal() || (phase == Phase.ENTERING && ticks >= 12) || (again && phase == Phase.PREPARING);
+	@Override
+	public boolean awaitingChoice() {
+		return phase == Phase.RESULT;
+	}
+
+	@Override
+	public boolean inArena() {
+		return phase.ordinal() >= Phase.INTRO.ordinal() || (phase == Phase.ENTERING && ticks >= 12) || (again && phase == Phase.PREPARING);
 	}
 
 	private void state(boolean in) {
-		ServerPlayNetworking.send(player, new Payloads.State(in, centreX, phase == Phase.FIGHT || phase == Phase.COUNTDOWN));
-	}
-
-	private void cheer(int kind, float strength) {
-		ServerPlayNetworking.send(player, new Payloads.Cheer(kind, strength));
-	}
-
-	private void title(Component title, Component sub, int in, int stay, int out) {
-		player.connection.send(new ClientboundSetTitlesAnimationPacket(in, stay, out));
-		player.connection.send(new ClientboundSetSubtitleTextPacket(sub));
-		player.connection.send(new ClientboundSetTitleTextPacket(title));
-	}
-
-	private void sound(SoundEvent sound, float pitch) {
-		player.level().playSound(null, BlockPos.containing(player.position()), sound, SoundSource.PLAYERS, 1.0F, pitch);
+		ServerPlayNetworking.send(player, new Payloads.State(in, Payloads.State.ARENA, centreX, 0, phase == Phase.FIGHT || phase == Phase.COUNTDOWN));
 	}
 }

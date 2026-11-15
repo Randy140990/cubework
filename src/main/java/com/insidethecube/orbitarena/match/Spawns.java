@@ -64,7 +64,7 @@ final class Spawns {
 		Mob mob = switch (m.settings.opponents()) {
 			case FIGHTERS -> fighter(level, d, rnd);
 			case MOBS -> mob(level, d, rnd);
-			case BOSS -> boss(level, m, rnd);
+			default -> boss(level, m, rnd);
 		};
 		if (mob == null) return null;
 		if (mob instanceof EnderDragon || mob instanceof WitherBoss) y = FLOOR + 14;

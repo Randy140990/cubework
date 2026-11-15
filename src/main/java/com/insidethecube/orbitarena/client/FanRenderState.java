@@ -13,4 +13,6 @@ public class FanRenderState extends HumanoidRenderState {
 	public float blend;
 	/** How lively the crowd is, how much it groans, and how high the wave lifts this fan (0 to 1). */
 	public float energy, groan, wave;
+	/** Watching the fight through a spyglass. */
+	public boolean spyglass;
 }

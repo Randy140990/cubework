@@ -1,6 +1,7 @@
 """Draws Orbit Arena's entity textures (64 x 64, the humanoid layout with mirrored left limbs).
 
-Fans: 8 original space-crowd looks (astronauts, a robot, critters, supporters) x 7 (no sign, and 6 signs).
+Fans: 8 original space-crowd looks (astronauts, a robot, critters, supporters) x 10 (no sign, 6 signs, and the three
+big boards that spell INSID3 TH3 CUB3 when three fans hold them side by side).
 Fighters: 8 masked arena fighters. Run from the project root: python3 tools/textures.py
 """
 import os
@@ -28,6 +29,7 @@ BODY = box_faces(16, 16, 8, 12, 4)
 ARM = box_faces(40, 16, 4, 12, 4)
 LEG = box_faces(0, 16, 4, 12, 4)
 SIGN = box_faces(0, 32, 14, 8, 1)
+BIG = box_faces(0, 48, 26, 10, 1)
 
 
 class Skin:
@@ -73,19 +75,24 @@ def shade(c, k):
 FONT = {
     "G": ["111", "100", "101", "101", "111"], "O": ["111", "101", "101", "101", "111"], "!": ["010", "010", "010", "000", "010"],
     "W": ["101", "101", "101", "111", "101"], "I": ["111", "010", "010", "010", "111"], "N": ["101", "111", "111", "111", "101"],
+    "S": ["111", "100", "111", "001", "111"], "D": ["110", "101", "101", "101", "110"], "3": ["111", "001", "111", "001", "111"],
+    "T": ["111", "010", "010", "010", "010"], "H": ["101", "101", "111", "101", "101"], "C": ["111", "100", "100", "100", "111"],
+    "U": ["101", "101", "101", "101", "111"], "B": ["110", "101", "110", "101", "110"],
 }
 HEART = ["0101000", "1111100", "1111100", "0111000", "0010000"]
 STAR = ["0010000", "1111100", "0111000", "0101000", "1000100"]
 SIGNS = [("GO!", (255, 255, 255)), ("WOW", (255, 230, 80)), ("GG!", (120, 255, 200)), ("WIN", (255, 140, 60)), (HEART, (255, 70, 110)),
          (STAR, (255, 220, 60))]
+# The brand, across three big boards held side by side.
+BRAND = [("INSID3", (255, 150, 40)), ("TH3", (255, 255, 255)), ("CUB3", (255, 150, 40))]
 
 
-def draw_sign(s, sign, board):
+def draw_sign(s, sign, board, faces=SIGN):
     """The board, with the text on its back face turned half round (it's raised overhead, so it reads from the front)."""
-    s.part(SIGN, board, 0.03)
+    s.part(faces, board, 0.03)
     text, colour = sign
     glyph = text if isinstance(text, list) else None
-    x0, y0, x1, y1 = SIGN["back"]
+    x0, y0, x1, y1 = faces["back"]
     w, h = x1 - x0, y1 - y0
     pixels = []
     if glyph:
@@ -242,10 +249,12 @@ def fighter(look):
 def main():
     boards = [(232, 200, 140), (250, 250, 250), (60, 60, 70), (40, 80, 160), (160, 40, 60), (40, 130, 90)]
     for look in range(8):
-        for sign in range(7):
+        for sign in range(10):
             s = fan(look)
-            if sign > 0:
+            if 0 < sign <= len(SIGNS):
                 draw_sign(s, SIGNS[sign - 1], boards[(look + sign) % len(boards)])
+            elif sign > len(SIGNS):
+                draw_sign(s, BRAND[sign - len(SIGNS) - 1], (28, 30, 40), BIG)
             s.save(os.path.join(ROOT, "fan", "fan_%d_%d.png" % (look, sign)))
         fighter(look).save(os.path.join(ROOT, "fighter", "fighter_%d.png" % look))
 

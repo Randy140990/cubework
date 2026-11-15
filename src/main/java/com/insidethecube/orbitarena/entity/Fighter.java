@@ -58,6 +58,9 @@ public class Fighter extends Zombie {
 	private ItemStack beforeEating = ItemStack.EMPTY;
 	/** A look (0 to 7) for the texture. */
 	private int look;
+	/** On the bridge: its part in its team's game (null in the stadium), and its sword between blocks and bows. */
+	public BridgeGoal.Brain bridge;
+	ItemStack bridgeSword = ItemStack.EMPTY;
 
 	public Fighter(EntityType<? extends Zombie> type, Level level) {
 		super(type, level);
@@ -82,6 +85,14 @@ public class Fighter extends Zombie {
 		if (speed != null) speed.setBaseValue(0.22 + 0.012 * this.difficulty);
 	}
 
+	/** Sets it up to play The Bridge for a team. */
+	public void setupBridge(BridgeGoal.Brain brain, ItemStack sword, int apples, int look) {
+		setup(brain.difficulty, apples, ItemStack.EMPTY, look);
+		this.bridge = brain;
+		this.bridgeSword = sword;
+		setItemSlot(EquipmentSlot.MAINHAND, sword);
+	}
+
 	public int difficulty() {
 		return difficulty;
 	}
@@ -92,6 +103,7 @@ public class Fighter extends Zombie {
 
 	@Override
 	protected void registerGoals() {
+		this.goalSelector.addGoal(0, new BridgeGoal(this));
 		this.goalSelector.addGoal(1, new DuelGoal(this));
 	}
 
@@ -246,7 +258,7 @@ public class Fighter extends Zombie {
 		@Override
 		public boolean canUse() {
 			LivingEntity t = f.getTarget();
-			return t != null && t.isAlive();
+			return t != null && t.isAlive() && f.bridge == null;
 		}
 
 		@Override

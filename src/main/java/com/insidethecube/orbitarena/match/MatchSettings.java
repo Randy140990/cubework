@@ -6,36 +6,61 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 
 /**
- * What a match is: who you fight, how well they fight (1 to 10), how many of them, your kit, and the time
- * limit in seconds (0: none).
+ * What a match is: who you fight, how well they fight (1 to 10), how many (fighters or bosses; waves of
+ * mobs; players a team on the bridge), your kit, the time limit in seconds (0: none), and for the bridge
+ * its kit (0 classic, 1 netherite) and whether there are obstacles. Intro: the fly-round before it starts.
  */
-public record MatchSettings(Opponents opponents, int difficulty, int count, Kit kit, Boss boss, int timeLimit) {
+public record MatchSettings(Opponents opponents, int difficulty, int count, Kit kit, Boss boss, int timeLimit, boolean obstacles, boolean intro,
+		int bridgeKit) {
 	public enum Opponents {
 		/** Armoured fighters that fight like players. */
 		FIGHTERS,
 		/** Waves of hostile mobs. */
 		MOBS,
 		/** A boss (or a few). */
-		BOSS
+		BOSS,
+		/** The Bridge: two teams, two goals, first to five. */
+		BRIDGE
 	}
 
 	public enum Boss {
 		WITHER, WARDEN, ENDER_DRAGON
 	}
 
-	public static final StreamCodec<ByteBuf, MatchSettings> STREAM_CODEC = StreamCodec.composite(
-			ByteBufCodecs.VAR_INT, s -> s.opponents.ordinal(),
-			ByteBufCodecs.VAR_INT, MatchSettings::difficulty,
-			ByteBufCodecs.VAR_INT, MatchSettings::count,
-			ByteBufCodecs.VAR_INT, s -> s.kit.ordinal(),
-			ByteBufCodecs.VAR_INT, s -> s.boss.ordinal(),
-			ByteBufCodecs.VAR_INT, MatchSettings::timeLimit,
-			(o, d, c, k, b, t) -> new MatchSettings(Opponents.values()[Mth.clamp(o, 0, Opponents.values().length - 1)], d, c,
-					Kit.values()[Mth.clamp(k, 0, Kit.values().length - 1)], Boss.values()[Mth.clamp(b, 0, Boss.values().length - 1)], t));
+	public static final int CLASSIC = 0, NETHERITE = 1;
+
+	public static final StreamCodec<ByteBuf, MatchSettings> STREAM_CODEC = StreamCodec.of((buf, s) -> {
+		ByteBufCodecs.VAR_INT.encode(buf, s.opponents.ordinal());
+		ByteBufCodecs.VAR_INT.encode(buf, s.difficulty);
+		ByteBufCodecs.VAR_INT.encode(buf, s.count);
+		ByteBufCodecs.VAR_INT.encode(buf, s.kit.ordinal());
+		ByteBufCodecs.VAR_INT.encode(buf, s.boss.ordinal());
+		ByteBufCodecs.VAR_INT.encode(buf, s.timeLimit);
+		ByteBufCodecs.BOOL.encode(buf, s.obstacles);
+		ByteBufCodecs.BOOL.encode(buf, s.intro);
+		ByteBufCodecs.VAR_INT.encode(buf, s.bridgeKit);
+	}, buf -> {
+		int o = ByteBufCodecs.VAR_INT.decode(buf), d = ByteBufCodecs.VAR_INT.decode(buf), c = ByteBufCodecs.VAR_INT.decode(buf);
+		int k = ByteBufCodecs.VAR_INT.decode(buf), b = ByteBufCodecs.VAR_INT.decode(buf), t = ByteBufCodecs.VAR_INT.decode(buf);
+		boolean obstacles = ByteBufCodecs.BOOL.decode(buf), intro = ByteBufCodecs.BOOL.decode(buf);
+		int bk = ByteBufCodecs.VAR_INT.decode(buf);
+		return new MatchSettings(Opponents.values()[Mth.clamp(o, 0, Opponents.values().length - 1)], d, c, Kit.values()[Mth.clamp(k, 0, Kit.values().length - 1)],
+				Boss.values()[Mth.clamp(b, 0, Boss.values().length - 1)], t, obstacles, intro, bk);
+	});
 
 	/** Within the limits (a modified client can send anything). */
 	public MatchSettings checked() {
-		int max = opponents == Opponents.BOSS ? 3 : 100;
-		return new MatchSettings(opponents, Mth.clamp(difficulty, 1, 10), Mth.clamp(count, 1, max), kit, boss, Mth.clamp(timeLimit, 0, 3600));
+		int max = switch (opponents) {
+			case BOSS -> 3;
+			case MOBS -> 50;
+			case BRIDGE -> 5;
+			default -> 100;
+		};
+		return new MatchSettings(opponents, Mth.clamp(difficulty, 1, 10), Mth.clamp(count, 1, max), kit, boss, Mth.clamp(timeLimit, 0, 3600), obstacles, intro,
+				Mth.clamp(bridgeKit, 0, 1));
+	}
+
+	public boolean bridge() {
+		return opponents == Opponents.BRIDGE;
 	}
 }

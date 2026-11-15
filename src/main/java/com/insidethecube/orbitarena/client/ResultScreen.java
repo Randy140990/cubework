@@ -25,10 +25,10 @@ public class ResultScreen extends Screen {
 		this.result = result;
 	}
 
-	/** The server says the match is over: show this in two seconds. */
+	/** The server says the match is over (after any celebrating): show this in a moment. */
 	static void show(Payloads.Result result) {
 		pending = result;
-		delay = 40;
+		delay = 10;
 	}
 
 	/** Left the arena: nothing to show. */

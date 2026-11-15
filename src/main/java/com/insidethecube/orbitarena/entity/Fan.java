@@ -18,6 +18,8 @@ public class Fan extends Mob {
 	public float phase, height = 1;
 	/** Where its seat is round the stadium, in degrees (for the Mexican wave). */
 	public float seatAngle;
+	/** Watching through a spyglass (it holds one). */
+	public boolean spyglass;
 
 	public Fan(EntityType<? extends Mob> type, Level level) {
 		super(type, level);

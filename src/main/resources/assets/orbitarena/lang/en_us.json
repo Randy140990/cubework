@@ -16,5 +16,8 @@
 	"subtitles.orbitarena.crowd.applause": "Crowd applauds",
 	"subtitles.orbitarena.crowd.applause_light": "Crowd claps",
 	"subtitles.orbitarena.crowd.ooh": "Crowd gasps",
-	"subtitles.orbitarena.crowd.aww": "Crowd groans"
+	"subtitles.orbitarena.crowd.aww": "Crowd groans",
+	"entity.orbitarena.crystal": "Bridge Crystal",
+	"key.orbitarena.celebrate": "Celebrate",
+	"key.category.orbitarena.orbitarena": "Orbit Arena"
 }
