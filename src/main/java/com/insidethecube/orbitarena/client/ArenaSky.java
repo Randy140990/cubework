@@ -288,8 +288,8 @@ public final class ArenaSky {
 
 	// ---------------------------------------------------------------- drawing
 
-	/** The pictures onto the card, once they've been read. */
-	private static void upload() {
+	/** The pictures onto the card, once they've been read (each tick until then; never mid-frame). */
+	public static void upload(Minecraft mc) {
 		NativeImage[] r = read;
 		if (r == null || textures != null) return;
 		textures = new DynamicTexture[r.length];
@@ -318,7 +318,6 @@ public final class ArenaSky {
 	public static void render() {
 		Minecraft mc = Minecraft.getInstance();
 		if (sky == null) buildSky();
-		upload();
 		DynamicTexture stars = textures == null ? null : textures[0];
 		GpuTextureView colour = mc.getMainRenderTarget().getColorTextureView(), depth = mc.getMainRenderTarget().getDepthTextureView();
 		double time = mc.level.getGameTime() + mc.getDeltaTracker().getGameTimeDeltaPartialTick(true);

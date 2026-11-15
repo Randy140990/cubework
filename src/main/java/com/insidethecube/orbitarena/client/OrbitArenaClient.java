@@ -67,6 +67,7 @@ public class OrbitArenaClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(Emotes::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(Crystals::tick);
 		ClientTickEvents.END_CLIENT_TICK.register(Rocks::tick);
+		ClientTickEvents.END_CLIENT_TICK.register(ArenaSky::upload);
 		Cinematic.hideHud();
 		HudElementRegistry.addLast(OrbitArena.id("bridge_score"), BridgeHud::render);
 		HudElementRegistry.addLast(OrbitArena.id("cinematic"), Cinematic::render);
