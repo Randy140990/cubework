@@ -1,0 +1,15 @@
+net/minecraft/client/renderer/item/BlockModelWrapper.java
+net/minecraft/world/level/block/entity/BlockEntity.java
+grep getSoundType|playStepSound|playMuffledStepSound|playCombinationStepSounds|walkingStepSound net/minecraft/world/entity/Entity.java
+grep getSoundType|playBlockFallSound net/minecraft/world/entity/LivingEntity.java
+grep getSoundType|getPlaceSound net/minecraft/world/item/BlockItem.java
+grep getSoundType net/minecraft/client/multiplayer/MultiPlayerGameMode.java
+grep getSoundType|case 2001 net/minecraft/client/renderer/LevelEventHandler.java
+grep getDestroyProgress|getMapColor|requiresCorrectToolForDrops|getSoundType net/minecraft/world/level/block/state/BlockBehaviour.java
+grep getBlockExplosionResistance|getExplosionResistance net/minecraft/world/level/ExplosionDamageCalculator.java
+grep public static List<ItemStack> getDrops|dropResources|getDrops\( net/minecraft/world/level/block/Block.java
+grep public static SerializableChunkData parse|block_entities|"sections"|block_states|palette net/minecraft/world/level/chunk/storage/SerializableChunkData.java
+grep public .*load|Optional<|CompoundTag net/minecraft/world/level/storage/PlayerDataStorage.java
+grep ID_MAPPER|bootstrap net/minecraft/client/renderer/item/ItemModels.java
+grep getAtlas|getTextureAtlas|atlasManager|getSprite net/minecraft/client/Minecraft.java
+net/minecraft/client/resources/model/AtlasManager.java
