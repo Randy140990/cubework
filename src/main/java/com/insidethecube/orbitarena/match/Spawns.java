@@ -55,6 +55,8 @@ final class Spawns {
 		} else {
 			// Round the far side of the floor, clear of the dais and its ring of light.
 			double a = Math.toRadians(-70 + rnd.nextDouble() * 140), r = 16 + rnd.nextDouble() * 28;
+			// Not inside the far pedestal.
+			if (Math.abs(Math.cos(a) * r - PEDESTAL_X) < 4.5 && Math.abs(Math.sin(a) * r) < 4.5) r += 9;
 			x = m.centreX + Math.cos(a) * r;
 			z = Math.sin(a) * r;
 		}
