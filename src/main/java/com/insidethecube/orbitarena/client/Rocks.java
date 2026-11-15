@@ -58,9 +58,9 @@ public final class Rocks {
 			in = level;
 			for (int i = 0; i < COUNT; i++) {
 				boolean above = i % 2 == 0;
-				double radius = 50 + h(i, 1) * 17, height = above ? 36 + h(i, 2) * 20 : -32 - h(i, 2) * 24;
+				double radius = 84 + h(i, 1) * 22, height = above ? 40 + h(i, 2) * 22 : -38 - h(i, 2) * 26;
 				// Nearer rocks go round quicker (one turn every three to seven minutes).
-				double period = 3600 + (radius - 50) * 170 + h(i, 3) * 1800;
+				double period = 4200 + (radius - 84) * 170 + h(i, 3) * 1800;
 				ORBITS.add(new Orbit(radius, height, period, h(i, 4) * Math.PI * 2, h(i, 5) * 3, (h(i, 6) - 0.5) * 0.2));
 				Rock r = new Rock(OrbitArena.ROCK, level);
 				r.setId(nextId--);

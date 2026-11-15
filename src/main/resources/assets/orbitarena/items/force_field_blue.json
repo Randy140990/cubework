@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "orbitarena:block/force_field_blue"
+		"model": "orbitarena:block/force_field_blue_0"
 	}
 }

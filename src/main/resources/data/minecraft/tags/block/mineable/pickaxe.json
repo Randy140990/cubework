@@ -5,8 +5,6 @@
 		"orbitarena:bridge_wool_red",
 		"orbitarena:light_strip_green",
 		"orbitarena:light_strip_red",
-		"orbitarena:light_strip_white",
-		"orbitarena:force_field_blue",
-		"orbitarena:force_field_red"
+		"orbitarena:light_strip_white"
 	]
 }

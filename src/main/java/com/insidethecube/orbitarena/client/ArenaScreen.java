@@ -65,7 +65,7 @@ public class ArenaScreen extends Screen {
 		if (tab == ARENA) {
 			if (opponents == Opponents.BRIDGE) opponents = Opponents.FIGHTERS;
 			addRenderableWidget(CycleButton.<Opponents>builder(o -> Component.literal(switch (o) {
-						case FIGHTERS -> "Fighters (PvP)";
+						case FIGHTERS -> "Fighters";
 						case MOBS -> "Mob waves";
 						default -> "Boss";
 					}), opponents)

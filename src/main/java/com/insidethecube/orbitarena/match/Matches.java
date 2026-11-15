@@ -118,7 +118,10 @@ public final class Matches {
 				BlockPos at = new BlockPlaceContext(player, hand, stack, hit).getClickedPos();
 				if (level.isClientSide()) return BridgeLayout.near(at) ? InteractionResult.PASS : InteractionResult.FAIL;
 				Game g = player instanceof ServerPlayer sp ? GAMES.get(sp.getUUID()) : null;
-				return g != null && g.fighting() && g.mayPlace(at) ? InteractionResult.PASS : InteractionResult.FAIL;
+				if (g != null && g.fighting() && g.mayPlace(at)) return InteractionResult.PASS;
+				String why = g == null ? null : g.whyNotPlace(at);
+				if (why != null) player.displayClientMessage(Component.literal(why).withStyle(ChatFormatting.GRAY), true);
+				return InteractionResult.FAIL;
 			}
 			return InteractionResult.FAIL;
 		});

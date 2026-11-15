@@ -18,16 +18,16 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public final class BridgeBuilder implements Matches.Builder {
 	/** Bump when the bridge's design changes, so existing bridges are rebuilt. */
-	public static final int VERSION = 3;
+	public static final int VERSION = 4;
 	private static final BlockState MARKER = Blocks.REINFORCED_DEEPSLATE.defaultBlockState();
 	private static final long BUDGET = 25_000_000L;
 
 	private final ServerLevel level;
 	private final int cx, cz;
-	private final boolean full, legacy;
+	private final boolean full, legacy, previous;
 	private boolean obstacles;
 	private int width = 2;
-	private int column, legacySpire, standColumn, spire;
+	private int column, legacySpire, previousSpire, standColumn, spire;
 	private final int areaColumns, standColumns;
 
 	public BridgeBuilder(ServerLevel level, int centreX, boolean full) {
@@ -37,13 +37,19 @@ public final class BridgeBuilder implements Matches.Builder {
 		this.full = full || !built(level, centreX);
 		// The first bridges (before the temples) had their spires elsewhere: clear those away.
 		this.legacy = this.full && level.getBlockState(new BlockPos(centreX, Y - 21, Z)).is(MARKER.getBlock());
+		// The last version's spires stood closer in: clear any that have moved.
+		this.previous = this.full && level.getBlockState(new BlockPos(centreX, Y - 40 - (VERSION - 1), Z)).is(MARKER.getBlock());
 		this.areaColumns = (2 * AREA_X + 1) * (2 * AREA_Z + 1);
-		this.standColumns = this.full ? (2 * STAND_HALF_X + 3) * (2 * (ROWS * 2 + 4)) : 0;
+		this.standColumns = this.full ? STAND_X_SPAN * 2 * STAND_Z_SPAN : 0;
 		if (!this.full) this.spire = SPIRES;
 		if (!this.legacy) this.legacySpire = LEGACY_SPIRES;
+		if (!this.previous) this.previousSpire = SPIRES;
 	}
 
 	/** The obstacles (copper on the bridge) in or out, and how wide the bridge is: set before the area is built. */
+	/** The stands outside the playing area: how far along and across (each side) the stand pass goes. */
+	private static final int STAND_X_SPAN = 2 * (STAND_HALF_X + 4) + 1, STAND_Z_SPAN = STAND_BACK - AREA_Z;
+
 	public BridgeBuilder obstacles(boolean on) {
 		this.obstacles = on;
 		return this;
@@ -73,8 +79,8 @@ public final class BridgeBuilder implements Matches.Builder {
 
 	@Override
 	public float progress() {
-		float total = areaColumns + LEGACY_SPIRES * 200f + standColumns + SPIRES * 300f;
-		return (column + legacySpire * 200f + standColumn + spire * 300f) / total;
+		float total = areaColumns + LEGACY_SPIRES * 200f + SPIRES * 200f + standColumns + SPIRES * 300f;
+		return (column + legacySpire * 200f + previousSpire * 200f + standColumn + spire * 300f) / total;
 	}
 
 	private void set(int dx, int dy, int dz, BlockState state) {
@@ -87,8 +93,14 @@ public final class BridgeBuilder implements Matches.Builder {
 		long start = System.nanoTime();
 		BlockState air = Blocks.AIR.defaultBlockState();
 		// The first bridges' spires away first (some stood where the monoliths are now).
-		while (legacySpire < LEGACY_SPIRES && System.nanoTime() - start < BUDGET) clearLegacySpire(legacySpire++);
+		while (legacySpire < LEGACY_SPIRES && System.nanoTime() - start < BUDGET) clearSpire(BridgeLayout.legacySpire(legacySpire++));
 		if (legacySpire < LEGACY_SPIRES) return false;
+		while (previousSpire < SPIRES && System.nanoTime() - start < BUDGET) {
+			Spire was = BridgeLayout.previousSpire(previousSpire), now = BridgeLayout.spire(previousSpire);
+			previousSpire++;
+			if (was.z() != now.z()) clearSpire(was);
+		}
+		if (previousSpire < SPIRES) return false;
 		while (column < areaColumns && System.nanoTime() - start < BUDGET) {
 			int dx = column / (2 * AREA_Z + 1) - AREA_X, dz = column % (2 * AREA_Z + 1) - AREA_Z;
 			for (int dy = AREA_BOTTOM; dy <= AREA_TOP; dy++) {
@@ -100,11 +112,11 @@ public final class BridgeBuilder implements Matches.Builder {
 		}
 		if (column < areaColumns) return false;
 		while (standColumn < standColumns && System.nanoTime() - start < BUDGET) {
-			int across = 2 * (ROWS * 2 + 4);
-			int dx = standColumn / across - (STAND_HALF_X + 1), k = standColumn % across;
-			int dz = k < across / 2 ? STAND_IN - 1 + k : -(STAND_IN - 1 + k - across / 2);
-			for (int dy = -8; dy <= rowTop(ROWS - 1) + 8; dy++) {
-				// (Air where there's no stand: the first, smaller stands are cleared away.)
+			// Beyond the playing area (which has the stands' fronts in it): the rest of the stands and their asteroids.
+			int dx = standColumn / (2 * STAND_Z_SPAN) - (STAND_HALF_X + 4), k = standColumn % (2 * STAND_Z_SPAN);
+			int dz = k < STAND_Z_SPAN ? AREA_Z + 1 + k : -(AREA_Z + 1 + k - STAND_Z_SPAN);
+			for (int dy = AREA_BOTTOM - 4; dy <= AREA_TOP; dy++) {
+				// (Air where there's no stand: the last ones, nearer in, are cleared away.)
 				BlockState s = standBlock(dx, dy, dz);
 				set(dx, dy, dz, s == null ? air : s);
 			}
@@ -138,9 +150,8 @@ public final class BridgeBuilder implements Matches.Builder {
 		}
 	}
 
-	/** Takes away one of the first bridges' spires (exactly where it was built). */
-	private void clearLegacySpire(int i) {
-		Spire s = BridgeLayout.legacySpire(i);
+	/** Takes away a spire an earlier version built (exactly where it was). */
+	private void clearSpire(Spire s) {
 		int r = (int) Math.ceil(s.radius() * 1.3);
 		BlockState air = Blocks.AIR.defaultBlockState();
 		for (int y = 0; y < s.height(); y++) {

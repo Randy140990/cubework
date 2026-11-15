@@ -84,32 +84,46 @@ for name, c in WOOLS.items():
     write(f"{A}/items/{block}.json", {"model": {"type": "minecraft:model", "model": f"orbitarena:block/{block}"}})
 
 # ---------------------------------------------------------------- force fields
-# A glowing grid: bright lines round each block (so a sheet of them is a grid) and a fainter one across
-# the middle, over a faint wash of the colour.
-FIELDS = {"blue": (80, 140, 255), "red": (255, 70, 80)}
+# A soft glowing wash with faint scan lines and a shimmer, all of it tiling, so a wall of them reads as
+# one sheet (no lines round each block). Fade 0 is the full field; fades 1 to 5 each run from the one
+# below's strength at their foot to their own at their top, so a column 0, 1, ..., 5 fades out smoothly.
+import math
+FIELDS = {"blue": (70, 140, 255), "red": (255, 64, 76), "wall": (150, 215, 255)}
+FADES = 6
+
+
+def strength(k):
+    return (1 - k / (FADES - 1)) ** 1.25
+
+
 for name, c in FIELDS.items():
-    img = Image.new("RGBA", (16, 16))
-    for y in range(16):
-        for x in range(16):
-            edge = min(x, 15 - x, y, 15 - y)
-            if edge == 0:
-                px = mix(c, (255, 255, 255), 0.55) + (235,)
-            elif edge == 1:
-                px = mix(c, (255, 255, 255), 0.2) + (120,)
-            elif x in (7, 8) or y in (7, 8):
-                px = mix(c, (255, 255, 255), 0.3) + (95,)
-            else:
-                px = c + (42,)
-            img.putpixel((x, y), px)
-    img.save(f"{A}/textures/block/force_field_{name}.png")
     block = f"force_field_{name}"
-    write(f"{A}/models/block/{block}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"orbitarena:block/{block}"}})
-    write(f"{A}/blockstates/{block}.json", {"variants": {"": {"model": f"orbitarena:block/{block}"}}})
-    write(f"{A}/items/{block}.json", {"model": {"type": "minecraft:model", "model": f"orbitarena:block/{block}"}})
+    variants = {}
+    for k in range(FADES):
+        img = Image.new("RGBA", (16, 16))
+        for y in range(16):
+            # How strong the field is at this row (y 0 is the top of the block).
+            up = (15 - y + 0.5) / 16
+            f = strength(0) if k == 0 else strength(k - 1) + (strength(k) - strength(k - 1)) * up
+            for x in range(16):
+                shimmer = 0.5 + 0.25 * math.sin((x + y * 0.5) * math.pi / 4) + 0.25 * math.sin((x * 0.5 - y) * math.pi / 8)
+                scan = 1.0 if y % 4 == 0 else 0.0
+                col = mix(c, (255, 255, 255), 0.12 + 0.3 * scan + 0.1 * shimmer)
+                alpha = (70 + 70 * scan + 26 * shimmer) * f
+                img.putpixel((x, y), col + (max(0, min(255, int(round(alpha)))),))
+        img.save(f"{A}/textures/block/{block}_{k}.png")
+        write(f"{A}/models/block/{block}_{k}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"orbitarena:block/{block}_{k}"}})
+        variants[f"fade={k}"] = {"model": f"orbitarena:block/{block}_{k}"}
+    if os.path.exists(f"{A}/textures/block/{block}.png"):
+        os.remove(f"{A}/textures/block/{block}.png")
+    if os.path.exists(f"{A}/models/block/{block}.json"):
+        os.remove(f"{A}/models/block/{block}.json")
+    write(f"{A}/blockstates/{block}.json", {"variants": variants})
+    write(f"{A}/items/{block}.json", {"model": {"type": "minecraft:model", "model": f"orbitarena:block/{block}_0"}})
 
 write(ROOT + "/data/minecraft/tags/block/mineable/pickaxe.json", {"replace": False, "values": [
     "orbitarena:bridge_wool_blue", "orbitarena:bridge_wool_red", "orbitarena:light_strip_green", "orbitarena:light_strip_red",
-    "orbitarena:light_strip_white", "orbitarena:force_field_blue", "orbitarena:force_field_red"]})
+    "orbitarena:light_strip_white"]})
 
 # The names.
 lang_path = A + "/lang/en_us.json"
@@ -122,6 +136,7 @@ lang.update({
     "block.orbitarena.bridge_wool_red": "Red Bridge Wool",
     "block.orbitarena.force_field_blue": "Blue Force Field",
     "block.orbitarena.force_field_red": "Red Force Field",
+    "block.orbitarena.force_field_wall": "Wall Force Field",
     "itemGroup.orbitarena.blocks": "Orbit Arena",
     "entity.orbitarena.rock": "Orbiting Rock",
 })

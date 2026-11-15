@@ -4,27 +4,30 @@ import static com.insidethecube.orbitarena.arena.ArenaLayout.hash;
 import static com.insidethecube.orbitarena.arena.ArenaLayout.noise;
 
 import com.insidethecube.orbitarena.block.ArenaBlocks;
+import com.insidethecube.orbitarena.block.ForceFieldBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
-import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.SlabType;
 
 /**
  * The Bridge's map, shared by the builder, the game, the bots and the crowd: two bases floating in space,
  * joined by a bridge 1 to 3 blocks wide, blue to the west and red to the east.
  * <p>
  * Each base is an island with a deck edged in layers (a quartz lip, a band of light set back under it, a
- * lower lip, then a second band), and on it a temple: you come out of its door (where your team waits
- * behind glass before each round), and stairs up both sides take you to the top, where the goal is, a
- * glowing pit under a roof on four columns with a force-field skylight. Behind the temple five monoliths
- * float in a horseshoe, each with a crystal over it; one crumbles each time that team is scored on. The
- * blue base's lights are green, the red base's red. Grandstands run along both sides of the bridge, and red
- * rock spires float all round at different heights.
+ * lower lip, then a second band), and on it a temple in two tiers, each edged the same way. You come out of
+ * its door (where your team waits behind glass before each round), and ten steps up each side take you to
+ * the top, where the goal is: a glowing pit inside a box of force field that rises from a line of light
+ * round it and fades out upwards (walk through it; you can't build into it). Round the back of each base
+ * five monoliths float in a horseshoe, built as LumenForge's Portal builder builds its monolith slabs
+ * (broad, rounded at the corners and the foot, a band above the foot, a capital with a quartz lip, pillars
+ * up each side with the face between them sunk, shaded from foot to top), a crystal over each; one
+ * crumbles each time that team is scored on. The blue base's lights are green, the red base's red.
+ * Grandstands run along both sides of the bridge on jagged red asteroids, behind a wall of force field;
+ * red rock spires float all round.
  * <p>
  * Positions are relative to the map's centre: dx along the bridge (east is +), dy from the bridge's top,
  * dz across. "adx" is how far out from the middle (|dx|): both bases are the same, mirrored.
@@ -40,31 +43,39 @@ public final class BridgeLayout {
 	/** The bridge runs between the bases, |dx| up to BRIDGE_END, three blocks deep. */
 	public static final int BRIDGE_END = 20;
 	/** Each base's deck: a landing |dz| up to LANDING_HALF from BASE_FRONT, then the main deck to BASE_BACK. */
-	public static final int BASE_FRONT = 21, LANDING_HALF = 6, DECK_FROM = 25, BASE_BACK = 52, BASE_HALF = 13;
-	/** The temple: its base from TEMPLE_FRONT to TEMPLE_BACK, |dz| up to TEMPLE_HALF, its top at dy = TOP. */
-	public static final int TEMPLE_FRONT = 32, TEMPLE_BACK = 47, TEMPLE_HALF = 8, TOP = 7;
-	/** The stairs up each side: |dz| from STAIR_IN to STAIR_OUT, one step up a block from STAIR_FROM out. */
-	public static final int STAIR_FROM = 33, STAIR_IN = 9, STAIR_OUT = 11;
+	public static final int BASE_FRONT = 21, LANDING_HALF = 6, DECK_FROM = 25, BASE_BACK = 58, BASE_HALF = 14;
+	/**
+	 * The temple: a lower tier from TEMPLE_FRONT to TEMPLE_BACK up to dy = TIER, an upper tier UPPER_IN in
+	 * from its front and back up to dy = TOP, both |dz| up to TEMPLE_HALF (and out to STAIR_OUT where the
+	 * stairs come out at the top).
+	 */
+	public static final int TEMPLE_FRONT = 32, TEMPLE_BACK = 52, TEMPLE_HALF = 9, TIER = 5, UPPER_IN = 2, TOP = 10;
+	/** The stairs up each side: |dz| from STAIR_IN to STAIR_OUT, one step up a block from STAIR_FROM out (ten steps). */
+	public static final int STAIR_FROM = 33, STAIR_IN = 10, STAIR_OUT = 12;
 	/** Where the stairs come out at the top (the landings either side, from here back). */
-	public static final int LANDING_FROM = 40;
-	/** The goal: a pit 5 by 5 in the top, centred GOAL_X out, five deep, under the roof. */
-	public static final int GOAL_X = 41, GOAL_HALF = 2, GOAL_DEPTH = 5;
+	public static final int LANDING_FROM = STAIR_FROM + TOP;
+	/** The goal: a pit 5 by 5 in the top, centred GOAL_X out, five deep. */
+	public static final int GOAL_X = 45, GOAL_HALF = 2, GOAL_DEPTH = 5;
+	/** The force field round the goal: a box FIELD_RING out from the pit's middle, FIELD_HIGH tall over the top. */
+	public static final int FIELD_RING = 5, FIELD_HIGH = 6;
 	/** The room inside the temple's door, where a team waits and comes back. */
 	public static final int ROOM_FROM = 33, ROOM_TO = 37, ROOM_HALF = 2, ROOM_TOP = 4, DOOR_HALF = 1, DOOR_TOP = 3;
 	/** Where everyone stands in the room (how far out). */
 	public static final int SPAWN_X = 35;
-	/** The roof over the goal: from PAV_FROM to TEMPLE_BACK, |dz| up to PAV_HALF, at dy = ROOF. */
-	public static final int PAV_FROM = 35, PAV_HALF = 6, ROOF = 14;
 	/** Below this (dy) you've fallen into space. */
-	public static final int VOID = -28;
+	public static final int VOID = -32;
 
 	/** The playing area: put right exactly between matches (anything not the map's is cleared). */
-	public static final int AREA_X = 66, AREA_Z = 25, AREA_BOTTOM = -24, AREA_TOP = 34;
+	public static final int AREA_X = 78, AREA_Z = 31, AREA_BOTTOM = -27, AREA_TOP = 42;
 
 	/** The grandstands along both sides of the bridge: rows two deep and one up, from STAND_IN out, ROWS of them. */
-	public static final int STAND_IN = 17, ROWS = 10, STAND_HALF_X = 26;
+	public static final int STAND_IN = 22, ROWS = 10, STAND_HALF_X = 26;
+	/** The force field between the playing area and the stands (|dz|), and how high it goes. */
+	public static final int WALL_Z = STAND_IN - 2, WALL_END = STAND_HALF_X + 3, WALL_TOP = 24;
+	/** How far back the stands' asteroids reach (|dz|), for building and clearing them. */
+	public static final int STAND_BACK = STAND_IN + 2 * ROWS + 4;
 	/** Spires and rocks are built out to this far. */
-	public static final int SIZE = 230;
+	public static final int SIZE = 240;
 
 	/** Team colours (blue: the player's team, west; red: east). */
 	public static final int BLUE = 0, RED = 1;
@@ -97,48 +108,49 @@ public final class BridgeLayout {
 
 	// ---------------------------------------------------------------- the monoliths
 
-	/** A monolith: where it stands (adx out, dz across), its foot (dy) and how tall; the crystal floats over it. */
-	public record Monolith(int x, int z, int base, int height) {
-		public int top() {
-			return base + height;
-		}
-
+	/**
+	 * A monolith: where it stands (adx out, dz across), its lowest point (dy, hanging down into space) and
+	 * its top; the crystal floats over it.
+	 */
+	public record Monolith(int x, int z, int tip, int top) {
 		/** Where its crystal floats (dy of the crystal's middle). */
 		public double crystalY() {
-			return top() + 6.5;
+			return top + 6.5;
 		}
 
-		/** Which way its strips of light face: along x (true), or across. */
+		/** Which way its broad face (with the seam of light) faces: along x (true), or across. */
 		public boolean facesAlongX() {
 			return Math.abs(GOAL_X - x) >= Math.abs(z);
 		}
-	}
 
-	/** In the order they crumble: the two ends of the horseshoe first, the middle one last. */
-	private static final double[] MONO_ANGLES = {-84, 84, -42, 42, 0};
-	private static final int[] MONO_BASES = {-2, 1, 2, -1, 0}, MONO_HEIGHTS = {20, 22, 23, 21, 25};
-	public static final Monolith[] MONOLITHS = new Monolith[MONO_ANGLES.length];
-
-	static {
-		for (int i = 0; i < MONOLITHS.length; i++) {
-			double a = Math.toRadians(MONO_ANGLES[i]);
-			MONOLITHS[i] = new Monolith((int) Math.round(GOAL_X + 20 * Math.cos(a)), (int) Math.round(20 * Math.sin(a)), MONO_BASES[i], MONO_HEIGHTS[i]);
+		/** Its lowest and highest blocks, for crumbling it. */
+		public int base() {
+			return tip;
 		}
 	}
+
+	/**
+	 * In a horseshoe round the goal, in the order they crumble: the two either side first, then the two
+	 * behind, the middle one (the tallest) last.
+	 */
+	public static final Monolith[] MONOLITHS = {new Monolith(50, -27, -14, 30), new Monolith(50, 27, -13, 31), new Monolith(64, -17, -16, 33),
+			new Monolith(64, 17, -15, 34), new Monolith(74, 0, -17, 37)};
+	/** A monolith's half width across its broad face and half its thickness (the main slab), and how far further its lip stands out. */
+	private static final int MONO_HW = 6, MONO_HD = 2, MONO_LIP = 2;
+	/** How far out from a monolith's middle it reaches (with its lip). */
+	private static final int MONO_REACH = MONO_HW + MONO_LIP;
 
 	/** The goal (where you score) of the base on side s: a block position (relative) in the pit. */
 	public static boolean inGoal(double dx, double dy, double dz, int s) {
 		return Math.abs(dx - (s * GOAL_X + 0.5)) < GOAL_HALF + 0.75 && Math.abs(dz - 0.5) < GOAL_HALF + 0.75 && dy < TOP + 0.6 && dy > TOP - GOAL_DEPTH - 1;
 	}
 
-	// ---------------------------------------------------------------- the deck's outline
+	// ---------------------------------------------------------------- outlines
 
-	/** How far a deck column is from the deck's edge (0 on the edge), -1 off the deck; and which way its edge runs. */
-	private static final int[][] INSET = new int[AREA_X + 2][2 * AREA_Z + 3];
-	private static final boolean[][] EDGE_ALONG_X = new boolean[AREA_X + 2][2 * AREA_Z + 3];
-	/** The same for the temple's base (so its top can be edged the same way). */
-	private static final int[][] TEMPLE_INSET = new int[AREA_X + 2][2 * AREA_Z + 3];
-	private static final boolean[][] TEMPLE_ALONG_X = new boolean[AREA_X + 2][2 * AREA_Z + 3];
+	/** How far a column is from the edge of a shape (0 on the edge), -1 off it; and which way its edge runs. */
+	private static final int W = AREA_X + 2, D = 2 * AREA_Z + 3;
+	private static final int[][] DECK_IN = new int[W][D], LOW_IN = new int[W][D], HIGH_IN = new int[W][D];
+	private static final boolean[][] DECK_X = new boolean[W][D], LOW_X = new boolean[W][D], HIGH_X = new boolean[W][D];
 
 	/** How wide the deck is this far out (|dz| up to it), or -1 off the deck. */
 	public static int deckHalf(int adx) {
@@ -152,10 +164,15 @@ public final class BridgeLayout {
 		return Math.abs(dz) <= deckHalf(adx);
 	}
 
-	/** The temple's solid base: the main block and the landings at the top of the stairs. */
-	public static boolean inTemple(int adx, int dz) {
+	/** The temple's lower tier, and its upper (in from the front and back), each with the landings at the top of the stairs. */
+	public static boolean lowTier(int adx, int dz) {
 		int adz = Math.abs(dz);
 		return adx >= TEMPLE_FRONT && adx <= TEMPLE_BACK && (adz <= TEMPLE_HALF || adx >= LANDING_FROM && adz <= STAIR_OUT);
+	}
+
+	public static boolean highTier(int adx, int dz) {
+		int adz = Math.abs(dz);
+		return adx >= TEMPLE_FRONT + UPPER_IN && adx <= TEMPLE_BACK - UPPER_IN && (adz <= TEMPLE_HALF || adx >= LANDING_FROM && adz <= STAIR_OUT);
 	}
 
 	private interface Shape {
@@ -163,7 +180,8 @@ public final class BridgeLayout {
 	}
 
 	private static void distances(int[][] out, boolean[][] alongX, Shape shape, Shape alsoInside) {
-		for (int adx = 0; adx <= AREA_X + 1; adx++) {
+		Shape inside = (a, z) -> shape.in(a, z) || alsoInside.in(a, z);
+		for (int adx = 0; adx < W; adx++) {
 			for (int dz = -AREA_Z - 1; dz <= AREA_Z + 1; dz++) {
 				int ix = adx, iz = dz + AREA_Z + 1;
 				if (!shape.in(adx, dz)) {
@@ -171,40 +189,41 @@ public final class BridgeLayout {
 					continue;
 				}
 				int found = 14;
-				boolean along = true;
 				search:
 				for (int k = 1; k <= 14; k++) {
 					for (int ox = -k; ox <= k; ox++) {
 						for (int oz = -k; oz <= k; oz++) {
-							if (Math.max(Math.abs(ox), Math.abs(oz)) != k) continue;
-							int nx = adx + ox, nz = dz + oz;
-							if (!shape.in(nx, nz) && !alsoInside.in(nx, nz)) {
+							if (Math.max(Math.abs(ox), Math.abs(oz)) == k && !inside.in(adx + ox, dz + oz)) {
 								found = k - 1;
-								along = Math.abs(oz) >= Math.abs(ox);
 								break search;
 							}
 						}
 					}
 				}
 				out[ix][iz] = found;
-				alongX[ix][iz] = along;
+				// Which way the edge runs: along x where the outside is across (in z), else across. (Lights laid
+				// along the edge, so a run of them reads as one band, the coloured lines along its top and bottom.)
+				int k = found + 1;
+				boolean outZ = !inside.in(adx, dz + k) || !inside.in(adx, dz - k), outX = !inside.in(adx + k, dz) || !inside.in(adx - k, dz);
+				alongX[ix][iz] = outZ || !outX;
 			}
 		}
 	}
 
 	static {
 		// The bridge counts as deck where it joins (so the deck isn't edged across the end of the bridge).
-		distances(INSET, EDGE_ALONG_X, BridgeLayout::onDeck, (adx, dz) -> adx >= BRIDGE_END - 2 && adx <= BRIDGE_END && Math.abs(dz) <= 1);
-		distances(TEMPLE_INSET, TEMPLE_ALONG_X, BridgeLayout::inTemple, (adx, dz) -> false);
+		distances(DECK_IN, DECK_X, BridgeLayout::onDeck, (adx, dz) -> adx >= BRIDGE_END - 3 && adx <= BRIDGE_END && Math.abs(dz) <= 2);
+		distances(LOW_IN, LOW_X, BridgeLayout::lowTier, (adx, dz) -> false);
+		distances(HIGH_IN, HIGH_X, BridgeLayout::highTier, (adx, dz) -> false);
 	}
 
 	private static int inset(int[][] table, int adx, int dz) {
-		if (adx < 0 || adx > AREA_X + 1 || dz < -AREA_Z - 1 || dz > AREA_Z + 1) return -1;
+		if (adx < 0 || adx >= W || dz < -AREA_Z - 1 || dz > AREA_Z + 1) return -1;
 		return table[adx][dz + AREA_Z + 1];
 	}
 
-	private static boolean alongX(boolean[][] table, int adx, int dz) {
-		return table[Math.min(adx, AREA_X + 1)][Math.max(0, Math.min(2 * AREA_Z + 2, dz + AREA_Z + 1))];
+	private static Direction.Axis axis(boolean[][] table, int adx, int dz) {
+		return table[Math.min(adx, W - 1)][Math.max(0, Math.min(D - 1, dz + AREA_Z + 1))] ? Direction.Axis.X : Direction.Axis.Z;
 	}
 
 	// ---------------------------------------------------------------- blocks
@@ -220,6 +239,11 @@ public final class BridgeLayout {
 
 	public static BlockState wool(boolean blue) {
 		return b(blue ? ArenaBlocks.WOOL_BLUE : ArenaBlocks.WOOL_RED);
+	}
+
+	/** Force field: 0 full, then 1 to 5 fading out a block at a time (5 fades to nothing at its top). */
+	private static BlockState field(Block block, int fade) {
+		return block.defaultBlockState().setValue(ForceFieldBlock.FADE, Math.max(0, Math.min(5, fade)));
 	}
 
 	private static BlockState stairs(Block block, boolean blue) {
@@ -239,9 +263,9 @@ public final class BridgeLayout {
 		}
 		boolean blue = s < 0;
 		for (Monolith m : MONOLITHS) {
-			int lx = adx - m.x, lz = dz - m.z;
-			if (Math.abs(lx) <= 5 && Math.abs(lz) <= 5) {
-				BlockState mb = monolithBlock(m, lx, dy - m.base, lz, blue, dx, dz);
+			int lx = adx - m.x(), lz = dz - m.z();
+			if (Math.abs(lx) <= MONO_REACH && Math.abs(lz) <= MONO_REACH && dy >= m.tip() && dy <= m.top()) {
+				BlockState mb = monolithBlock(m, lx, dy, lz, blue, dx, dz);
 				if (mb != null) return mb;
 			}
 		}
@@ -251,9 +275,11 @@ public final class BridgeLayout {
 
 	/** The deck and the island under it. */
 	private static BlockState deck(int adx, int dy, int dz, boolean blue) {
-		int e = inset(INSET, adx, dz);
+		int e = inset(DECK_IN, adx, dz);
 		if (e < 0) return null;
-		Direction.Axis axis = alongX(EDGE_ALONG_X, adx, dz) ? Direction.Axis.X : Direction.Axis.Z;
+		Direction.Axis axis = axis(DECK_X, adx, dz);
+		// Where the bridge comes in, a plain abutment under its end (the bands either side stop at it).
+		if (adx <= BASE_FRONT + 1 && Math.abs(dz) <= 2 && dy < 0 && dy >= -3) return dy == -3 ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.SMOOTH_STONE);
 		switch (dy) {
 			case 0 -> {
 				if (e == 0) return b(Blocks.SMOOTH_QUARTZ);
@@ -290,15 +316,26 @@ public final class BridgeLayout {
 				// The island under it: a rough bowl of rock, deepest in the middle.
 				if (dy > 0 || e <= 2) return null;
 				int x = blue ? -adx : adx;
-				double depth = Math.min(21, 5 + (e - 2) * 1.45 + noise(x, dz, 6, 501) * 4 - 2);
+				double depth = Math.min(22, 5 + (e - 2) * 1.45 + noise(x, dz, 6, 501) * 4 - 2);
 				if (-dy > depth) return null;
-				// Down through it, pale to dark grey and into red at the bottom (21 deep at the most).
-				return islandRock(x, dy, dz, Math.min(1, (-dy - 5) / 16.0));
+				// Down through it, pale to dark grey and into red at the bottom.
+				return islandRock(x, dy, dz, Math.min(1, (-dy - 5) / 17.0));
 			}
 		}
 	}
 
-	/** The temple on the deck: the stairs, its base with the room and the goal, the roof over the goal. */
+	/**
+	 * A tier's edge, from its top (dy = top) down: a quartz lip, a band of light set back under it, a lower
+	 * lip; then its walls (e: how far in from the edge; null for air).
+	 */
+	private static BlockState tierEdge(int e, int dy, int top, boolean blue, Direction.Axis axis) {
+		if (dy == top) return e == 0 ? b(Blocks.SMOOTH_QUARTZ) : null;
+		if (dy == top - 1) return e == 0 ? b(Blocks.AIR) : e == 1 ? light(blue, axis) : null;
+		if (dy == top - 2) return e == 0 ? b(Blocks.POLISHED_ANDESITE) : null;
+		return null;
+	}
+
+	/** The temple on the deck: the stairs, its two tiers with the room and the goal, the force field over the goal. */
 	private static BlockState temple(int adx, int dy, int dz, boolean blue) {
 		int adz = Math.abs(dz);
 		// The stairs up both sides, filled in underneath.
@@ -308,88 +345,119 @@ public final class BridgeLayout {
 			if (dy == k + 1) return stairs(adz == STAIR_OUT ? Blocks.POLISHED_ANDESITE_STAIRS : Blocks.SMOOTH_QUARTZ_STAIRS, blue);
 			return null;
 		}
-		if (dy <= TOP && inTemple(adx, dz)) {
-			int ep = inset(TEMPLE_INSET, adx, dz);
-			Direction.Axis axis = alongX(TEMPLE_ALONG_X, adx, dz) ? Direction.Axis.X : Direction.Axis.Z;
-			// The room inside the door, lit along its ceiling, and the door.
-			if (adx >= ROOM_FROM && adx <= ROOM_TO && adz <= ROOM_HALF && dy <= ROOM_TOP) return null;
-			if (adx >= ROOM_FROM && adx <= ROOM_TO && dz == 0 && dy == ROOM_TOP + 1) return light(blue, Direction.Axis.X);
-			if (adx == TEMPLE_FRONT && adz <= DOOR_HALF && dy <= DOOR_TOP) return null;
-			if (adx == TEMPLE_FRONT && adz == DOOR_HALF + 1 && dy <= DOOR_TOP + 1) return b(Blocks.SMOOTH_QUARTZ);
-			if (adx == TEMPLE_FRONT && adz <= DOOR_HALF && dy == DOOR_TOP + 1) return b(Blocks.SMOOTH_QUARTZ);
-			// The goal: a glowing pit with a ring of light round its top, the team's colour round it.
-			int ring = Math.max(Math.abs(adx - GOAL_X), adz);
-			if (ring <= GOAL_HALF) {
-				if (dy > TOP - GOAL_DEPTH) return null;
-				if (dy == TOP - GOAL_DEPTH) return b(ArenaBlocks.LIGHT_WHITE);
-			}
-			if (ring == GOAL_HALF + 1 && dy >= TOP - GOAL_DEPTH && dy < TOP) {
-				return dy == TOP - 1 ? light(blue, Math.abs(adx - GOAL_X) == GOAL_HALF + 1 ? Direction.Axis.Z : Direction.Axis.X) : b(Blocks.WHITE_CONCRETE);
-			}
+		int ring = Math.max(Math.abs(adx - GOAL_X), adz);
+		// The force field round the goal, rising from a line of light in the top and fading out upwards.
+		if (dy > TOP && dy <= TOP + FIELD_HIGH && ring == FIELD_RING) return field(blue ? ArenaBlocks.FIELD_BLUE : ArenaBlocks.FIELD_RED, dy - TOP - 1);
+		if (dy == TOP && ring == FIELD_RING) return light(blue, Math.abs(adx - GOAL_X) == FIELD_RING && adz < FIELD_RING ? Direction.Axis.Z : Direction.Axis.X);
+		if (dy > TOP) return null;
+		// The goal: a glowing pit with a ring of light round its top, the team's colour round it.
+		if (ring <= GOAL_HALF && dy >= TOP - GOAL_DEPTH) return dy == TOP - GOAL_DEPTH ? b(ArenaBlocks.LIGHT_WHITE) : null;
+		if (ring == GOAL_HALF + 1 && dy >= TOP - GOAL_DEPTH && dy < TOP) {
+			return dy == TOP - 1 ? light(blue, Math.abs(adx - GOAL_X) == GOAL_HALF + 1 ? Direction.Axis.Z : Direction.Axis.X) : b(Blocks.WHITE_CONCRETE);
+		}
+		boolean high = highTier(adx, dz), low = lowTier(adx, dz);
+		if (dy > TIER) {
+			// The upper tier.
+			if (!high) return null;
+			int e = inset(HIGH_IN, adx, dz);
+			BlockState edge = tierEdge(e, dy, TOP, blue, axis(HIGH_X, adx, dz));
+			if (edge != null) return edge.isAir() ? null : edge;
 			if (dy == TOP) {
 				if (ring == GOAL_HALF + 1) return wool(blue);
 				if (ring == GOAL_HALF + 2) return b(Blocks.SMOOTH_QUARTZ);
-				if (ep == 0) return b(Blocks.SMOOTH_QUARTZ);
 				if (Math.floorMod(adx, 4) == 0 || Math.floorMod(dz, 4) == 0) return b(Blocks.POLISHED_ANDESITE);
 				return b(Blocks.SMOOTH_STONE);
 			}
-			// Its sides: a quartz lip at the top, a band of light set back under it, a lower lip, then walls
-			// with strips of light either side of the door.
-			if (ep == 0) {
-				if (dy == TOP - 1) return null;
-				if (dy == TOP - 2) return b(Blocks.POLISHED_ANDESITE);
-				if (adx == TEMPLE_FRONT && adz == 5) return light(blue, Direction.Axis.Y);
-				return dy == 1 ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.SMOOTH_STONE);
+			if (e == 0) {
+				// Its walls, with strips of light up the front either side.
+				if (adx == TEMPLE_FRONT + UPPER_IN && adz == 5) return light(blue, Direction.Axis.Y);
+				return dy == TIER + 1 ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.SMOOTH_STONE);
 			}
-			if (ep == 1 && dy == TOP - 1) return light(blue, axis);
 			return b(Blocks.STONE);
 		}
-		// The roof over the goal, on four columns, with the force field over the pit.
-		if (dy > TOP && dy <= ROOF + 1 && adx >= PAV_FROM && adx <= TEMPLE_BACK && adz <= PAV_HALF) {
-			boolean rim = adx == PAV_FROM || adx == TEMPLE_BACK || adz == PAV_HALF;
-			if (dy < ROOF) {
-				boolean column = (adx <= PAV_FROM + 1 || adx >= TEMPLE_BACK - 1) && adz >= PAV_HALF - 1;
-				if (!column) return null;
-				boolean inner = (adx == PAV_FROM + 1 || adx == TEMPLE_BACK - 1) && adz == PAV_HALF - 1;
-				if (inner && dy > TOP + 1 && dy < ROOF - 1) return light(blue, Direction.Axis.Y);
-				return b(Blocks.QUARTZ_PILLAR);
-			}
-			if (dy == ROOF) {
-				if (Math.abs(adx - GOAL_X) <= 3 && adz <= 3) return b(blue ? ArenaBlocks.FIELD_BLUE : ArenaBlocks.FIELD_RED);
-				if (adz == 4 && Math.abs(adx - GOAL_X) <= 4) return light(blue, Direction.Axis.X);
-				return rim ? b(Blocks.SMOOTH_QUARTZ) : b(Blocks.SMOOTH_STONE);
-			}
-			return rim ? Blocks.SMOOTH_QUARTZ_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM) : null;
+		// The lower tier.
+		if (!low) return null;
+		int e = inset(LOW_IN, adx, dz);
+		// The room inside the door, lit along its ceiling, and the door.
+		if (adx >= ROOM_FROM && adx <= ROOM_TO && adz <= ROOM_HALF && dy <= ROOM_TOP) return null;
+		if (adx > ROOM_FROM && adx <= ROOM_TO && dz == 0 && dy == ROOM_TOP + 1) return light(blue, Direction.Axis.X);
+		if (adx == TEMPLE_FRONT && adz <= DOOR_HALF && dy <= DOOR_TOP) return null;
+		if (adx == TEMPLE_FRONT && adz == DOOR_HALF + 1 && dy <= DOOR_TOP + 1) return b(Blocks.SMOOTH_QUARTZ);
+		if (adx == TEMPLE_FRONT && adz <= DOOR_HALF && dy == DOOR_TOP + 1) return b(Blocks.SMOOTH_QUARTZ);
+		// Where the upper tier stands on it, its own; elsewhere its edge.
+		if (!(high && dy == TIER)) {
+			BlockState edge = tierEdge(e, dy, TIER, blue, axis(LOW_X, adx, dz));
+			if (edge != null) return edge.isAir() ? null : edge;
 		}
-		return null;
+		if (e == 0) {
+			if (adx == TEMPLE_FRONT && adz == 6) return light(blue, Direction.Axis.Y);
+			return dy == 1 ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.SMOOTH_STONE);
+		}
+		if (dy == TIER && !high) return b(Blocks.SMOOTH_STONE);
+		return b(Blocks.STONE);
+	}
+
+	/** Light grey stone from light to dark, for the monoliths (LumenForge's pale look). */
+	private static final Block[] MONO_RAMP = {Blocks.CALCITE, Blocks.POLISHED_DIORITE, Blocks.SMOOTH_STONE, Blocks.DIORITE, Blocks.POLISHED_ANDESITE,
+			Blocks.ANDESITE, Blocks.STONE, Blocks.TUFF};
+
+	/** Whether (a across, o through, from the middle) is in a monolith's footprint grown by g: a rounded rectangle. */
+	private static boolean monoIn(int a, int o, int g) {
+		int ha = MONO_HW + g, ho = MONO_HD + g;
+		if (a > ha || o > ho) return false;
+		if (a == ha && o == ho) return false;
+		return g < 2 || !(a == ha && o == ho - 1 || o == ho && a == ha - 1);
 	}
 
 	/**
-	 * A monolith (lx, ly, lz from its foot): a rock floating under it, a plinth, a chamfered shaft with strips
-	 * of light up two faces, a capital and a glowing socket on top, under its crystal.
+	 * A monolith (lx, lz from its middle, dy from the bridge), built as LumenForge's Portal builder builds
+	 * its monolith slabs: a broad slab with rounded corners, its broad face to the goal, floating; its foot
+	 * rounded over; a band a block proud above the foot; a capital at the top, a band a block proud and
+	 * over it a lip two proud, in quartz; up each side a pillar, the face between them sunk, a groove where
+	 * they meet and a seam down the middle. Shaded as stone is: its own gradient from foot (darker) to top
+	 * (lighter), the sunk faces and the grooves' edges darker. A glowing socket on top, under its crystal.
 	 */
-	private static BlockState monolithBlock(Monolith m, int lx, int ly, int lz, boolean blue, int dx, int dz) {
-		int ax = Math.abs(lx), az = Math.abs(lz), h = m.height();
-		if (ly < -11 || ly > h) return null;
-		if (ly < 0) {
-			double t = (-ly - 1) / 10.0, r = 4.3 * Math.pow(Math.max(0, 1 - t), 0.8) + noise(dx * 1.7 + ly, dz * 1.3, 2.2, 611) * 1.2 - 0.4;
-			return lx * lx + lz * lz <= r * r ? rock(dx, ly + m.base, dz, 0.5 + r - Math.sqrt(lx * lx + lz * lz), 1 - t) : null;
-		}
-		boolean wide = ax <= 3 && az <= 3 && ax + az <= 5;
-		if (ly <= 1) return wide ? (ly == 0 ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.SMOOTH_QUARTZ)) : null;
-		if (ly >= h - 2 && ly < h) return wide ? (ly == h - 2 ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.SMOOTH_QUARTZ)) : null;
-		if (ly == h) {
-			if (lx == 0 && lz == 0) return light(blue, Direction.Axis.Y);
-			return ax <= 1 && az <= 1 ? b(Blocks.SMOOTH_QUARTZ) : null;
-		}
-		if (ax > 2 || az > 2 || ax + az > 3) return null;
+	private static BlockState monolithBlock(Monolith m, int lx, int dy, int lz, boolean blue, int dx, int dz) {
 		boolean alongX = m.facesAlongX();
-		int across = alongX ? az : ax, out = alongX ? ax : az;
-		if (out == 2 && across == 0 && ly >= 4 && ly <= h - 5) return light(blue, Direction.Axis.Y);
-		if (out == 2 && across == 1) return b(Blocks.SMOOTH_QUARTZ);
-		if (ly == 2 || ly == h - 4) return b(Blocks.POLISHED_ANDESITE);
-		if (ax + az == 3) return b(Blocks.SMOOTH_QUARTZ);
-		return b(Blocks.SMOOTH_STONE);
+		int a = Math.abs(alongX ? lz : lx), o = Math.abs(alongX ? lx : lz);
+		int tip = m.tip(), top = m.top();
+		if (dy < tip || dy > top) return null;
+		boolean main = monoIn(a, o, 0), band = monoIn(a, o, 1), lipRing = monoIn(a, o, 2);
+		if (!lipRing) return null;
+		int footBand = tip + 4, capBand = top - 5;
+		boolean isBand = band && (dy == footBand || dy == footBand + 1 || dy == capBand || dy == capBand + 1 || dy == top - 1);
+		boolean isLip = lipRing && dy == top;
+		if (!main && !isBand && !isLip) return null;
+		// Its foot rounded over (seen face on).
+		double rb = 4;
+		if (dy < tip + rb && Math.hypot(Math.max(a - (MONO_HW + 0.5 - rb), 0), tip + rb - (dy + 0.5)) > rb + (isBand ? 1 : 0)) return null;
+		double t = Math.max(0, Math.min(1, 0.55 * (dy - tip) / (double) (top - tip) + 0.45 * face(dx, dy, dz, 750)));
+		double v = 0.08 + (1 - t) * 0.62;
+		if (dy == top) {
+			if (a == 0 && o == 0) return light(blue, Direction.Axis.Y);
+			return b(Blocks.SMOOTH_QUARTZ);
+		}
+		// The bands and the lip stand out in quartz; where they cross the slab itself, its own stone.
+		if (isBand && !main) return b(dy == top - 1 ? Blocks.SMOOTH_QUARTZ : Blocks.QUARTZ_BLOCK);
+		if (isBand) return b(pick(MONO_RAMP, v - 0.06, dx, dy, dz, 751));
+		// Pillars up each side (the outer two across), the face between them sunk a block, a groove where they
+		// meet, a seam down the middle of the sunk face; between the bands.
+		boolean shaft = dy > footBand + 1 && dy < capBand;
+		int front = MONO_HD - o;   // in from the broad face (0: on it)
+		if (shaft) {
+			boolean mid = a < MONO_HW - 2;
+			boolean groove = a == MONO_HW - 2 && dy > footBand + 2 && dy < capBand - 1;
+			if (mid && front < 1 || groove && front < 2) return null;
+			if (a == 0 && front < 2 && dy > footBand + 3 && dy < capBand - 2) return null;
+			double ao = 0;
+			if (mid && front == 1) ao = a >= MONO_HW - 3 || a == 1 ? 0.2 : 0.1;
+			else if (!mid && (a == MONO_HW || a == MONO_HW - 1 && groove)) ao = 0.12;
+			if (groove && front == 2) ao = 0.24;
+			return b(pick(MONO_RAMP, v + ao, dx, dy, dz, 752));
+		}
+		// The rounded corners a shade darker, as worn stone is.
+		boolean corner = a == MONO_HW && o >= MONO_HD - 1 || o == MONO_HD && a >= MONO_HW - 1;
+		return b(pick(MONO_RAMP, v + (corner ? 0.1 : 0), dx, dy, dz, 754));
 	}
 
 	/** Which monolith (0 to 4) a relative block position belongs to, or -1. */
@@ -397,7 +465,8 @@ public final class BridgeLayout {
 		int adx = Math.abs(dx);
 		for (int i = 0; i < MONOLITHS.length; i++) {
 			Monolith m = MONOLITHS[i];
-			if (Math.abs(adx - m.x) <= 3 && Math.abs(dz - m.z) <= 3 && dy >= m.base && dy <= m.top()) return i;
+			int lx = adx - m.x(), lz = dz - m.z();
+			if (Math.abs(lx) <= MONO_REACH && Math.abs(lz) <= MONO_REACH && monolithBlock(m, lx, dy, lz, false, dx, dz) != null) return i;
 		}
 		return -1;
 	}
@@ -417,16 +486,15 @@ public final class BridgeLayout {
 
 	/**
 	 * Whether players may build here (relative): over the void round the bridge and the bases, and on the
-	 * decks, but not on or round the temples (the stairs, the goals, the doors) or the monoliths.
+	 * decks, but not on or round the temples (the stairs, the goals, the doors), the monoliths or the stands.
 	 */
 	public static boolean buildable(int dx, int dy, int dz) {
 		int adx = Math.abs(dx), adz = Math.abs(dz);
-		if (adx > AREA_X - 3 || adz > AREA_Z - 2 || dy < -14 || dy > 20) return false;
-		if (adx <= STAND_HALF_X + 1 && adz > STAND_IN - 3) return false;
+		if (adx > AREA_X - 3 || adz > AREA_Z - 2 || dy < -14 || dy > 22) return false;
+		if (adx <= WALL_END + 2 && adz > WALL_Z - 2) return false;
 		if (adx >= TEMPLE_FRONT - 3 && adx <= TEMPLE_BACK + 1 && adz <= STAIR_OUT + 1 && dy >= 0) return false;
 		for (Monolith m : MONOLITHS) {
-			int lx = adx - m.x, lz = dz - m.z;
-			if (lx * lx + lz * lz <= 25) return false;
+			if (Math.abs(adx - m.x()) <= MONO_REACH + 1 && Math.abs(dz - m.z()) <= MONO_REACH + 1) return false;
 		}
 		return true;
 	}
@@ -460,38 +528,58 @@ public final class BridgeLayout {
 		return STAND_IN + 2 * row + 1;
 	}
 
-	/** The stands' block at a relative position, or null (for both sides; dz's sign picks the side). */
+	/** How deep the asteroid under a stand reaches at a column (dy, below 0), or 0 off it. */
+	private static int asteroidDepth(int adx, int adz) {
+		double cz = STAND_IN + ROWS, rz = ROWS + 4, rx = STAND_HALF_X + 4;
+		double e = (adx / rx) * (adx / rx) + ((adz - cz) / rz) * ((adz - cz) / rz);
+		if (e >= 1) return 0;
+		double jag = (noise(adx, adz, 4, 811) - 0.5) * 7 + (hash(adx >> 1, 0, adz >> 1, 812) - 0.5) * 3;
+		return (int) Math.round(-(3 + 19 * Math.pow(1 - e, 0.65) + jag));
+	}
+
+	/**
+	 * The stands' block at a relative position, or null (for both sides; dz's sign picks the side): rows of
+	 * seats on a jagged asteroid of red rock, and a wall of force field in front, fading out upwards.
+	 */
 	public static BlockState standBlock(int dx, int dy, int dz) {
 		int adx = Math.abs(dx), adz = Math.abs(dz);
-		if (adz < STAND_IN - 1 || adz > STAND_IN + 2 * ROWS + 2 || adx > STAND_HALF_X + 1) return null;
+		if (adx > STAND_HALF_X + 4) return null;
 		int back = STAND_IN + 2 * ROWS;
+		// The force field between the playing area and the stands (you can't get to the crowd; nor can you
+		// build round its ends).
+		if (adz == WALL_Z && adx <= WALL_END) return dy >= -3 && dy <= WALL_TOP ? field(ArenaBlocks.FIELD_WALL, dy - (WALL_TOP - 5)) : null;
+		if (adz < STAND_IN - 1 || adz > back + 4) return null;
+		// Under it all, an asteroid.
+		int floor = asteroidDepth(adx, adz);
+		int bottom = adx > STAND_HALF_X + 1 ? -3 : adz >= back ? -2 : adx == STAND_HALF_X + 1 ? -2 : adz == STAND_IN - 1 ? -1 : rowTop(Math.max(0, (adz - STAND_IN) / 2)) - 3;
+		if (floor < 0 && dy < bottom && dy >= floor) {
+			double up = 1 - (double) (bottom - dy) / Math.max(1, bottom - floor);
+			return rock(dx, dy, dz, 0.5, up);
+		}
+		if (adz > back + 2 || adx > STAND_HALF_X + 1) return null;
 		// The ends and the back wall.
 		if (adz >= back) {
 			if (adx > STAND_HALF_X) return null;
 			if (dy == rowTop(ROWS - 1) + 7) return b(Blocks.SEA_LANTERN);
 			if (dy == rowTop(ROWS - 1) + 5) return b(Blocks.ORANGE_CONCRETE);
-			if (dy >= -6 && dy <= rowTop(ROWS - 1) + 7) return b(Blocks.LIGHT_GRAY_CONCRETE);
+			if (dy >= -2 && dy <= rowTop(ROWS - 1) + 7) return b(Blocks.LIGHT_GRAY_CONCRETE);
 			return null;
 		}
 		if (adx == STAND_HALF_X + 1) {
 			int top = adz < STAND_IN ? -1 : rowTop((adz - STAND_IN) / 2) + 2;
-			if (dy >= -6 && dy <= top) return dy == top ? b(Blocks.SEA_LANTERN) : b(Blocks.LIGHT_GRAY_CONCRETE);
+			if (dy >= -2 && dy <= top) return dy == top ? b(Blocks.SEA_LANTERN) : b(Blocks.LIGHT_GRAY_CONCRETE);
 			return null;
 		}
 		// The front rail: lit at the foot.
 		if (adz == STAND_IN - 1) {
 			if (dy == -1) return b(Blocks.SEA_LANTERN);
 			if (dy == 0) return b(Blocks.POLISHED_DEEPSLATE);
-			if (dy >= -6 && dy < -1) return b(Blocks.LIGHT_GRAY_CONCRETE);
 			return null;
 		}
 		int row = (adz - STAND_IN) / 2, top = rowTop(row);
 		boolean front = (adz - STAND_IN) % 2 == 0;
 		if (dy == top) return Math.floorMod(dx, 8) == 0 ? b(Blocks.SMOOTH_STONE) : front ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.ANDESITE);
 		if (dy < top && dy >= top - 3) return b(Blocks.STONE_BRICKS);
-		// Under the stands: beams down to the frame.
-		if (dy == -6) return b(Blocks.LIGHT_GRAY_CONCRETE);
-		if (dy < top - 3 && dy > -6 && Math.floorMod(dx, 6) == 0) return b(Blocks.LIGHT_GRAY_CONCRETE);
 		return null;
 	}
 
@@ -503,10 +591,19 @@ public final class BridgeLayout {
 	public static final int SPIRES = 34;
 
 	public static Spire spire(int i) {
+		return spire(i, 64, 100);
+	}
+
+	/** The spires as the last version of the map had them (closer in), so a rebuild can clear any that have moved. */
+	public static Spire previousSpire(int i) {
+		return spire(i, 45, 80);
+	}
+
+	private static Spire spire(int i, int clearZ, int clearX) {
 		// Round the map at all heights, clear of the playing area and the stands.
 		double a = (i + hash(i, 0, 0, 70) * 0.7) / SPIRES * Math.PI * 2, dist = 82 + hash(i, 1, 0, 71) * 95;
 		int x = (int) (Math.cos(a) * dist * 1.2), z = (int) (Math.sin(a) * dist);
-		if (Math.abs(z) < 45 && Math.abs(x) < 80) z += z < 0 ? -45 : 45;
+		if (Math.abs(z) < clearZ && Math.abs(x) < clearX) z += z < 0 ? -clearZ : clearZ;
 		double size = hash(i, 5, 0, 75);
 		int height = 14 + (int) (size * size * 58);
 		int y = -55 + (int) (hash(i, 3, 0, 73) * 70) - height / 3;

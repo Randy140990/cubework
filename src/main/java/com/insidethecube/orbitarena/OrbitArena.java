@@ -20,7 +20,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 
 /**
- * Orbit Arena: a space PvP training arena. Press PvP Arena on the pause menu, pick what you play (fighters,
+ * Orbit Arena: a space combat training arena. Press Orbit Arena on the pause menu, pick what you play (fighters,
  * mob waves, a boss, or The Bridge with teams of up to five), a difficulty from 1 to 10, how many and your
  * kit, and you're taken to an arena in space with a packed crowd. Your own things are put away and given
  * back after.

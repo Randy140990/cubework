@@ -3,6 +3,7 @@ package com.insidethecube.orbitarena.entity;
 import static com.insidethecube.orbitarena.arena.BridgeLayout.*;
 
 import java.util.EnumSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
@@ -171,8 +172,11 @@ public final class BridgeGoal extends Goal {
 					return flat(p, foot) > 1.0 ? foot : world(w, stairTop(sp, k));
 				}
 				if (sameBase) return t;
-				// Off to the bridge.
-				return world(w, new double[] {sp * (BASE_FRONT + 1) + 0.5, 1, bridgeMidZ(width) + lane});
+				// Off to the bridge: to the front of the deck, then out along it (the far end of it, so it keeps
+				// going; on the bridge it heads on from there).
+				double mid = bridgeMidZ(width) + lane;
+				if (ax < BASE_FRONT + 3.5 && Math.abs(rz(w, p.z) - mid) < 1.6) return world(w, new double[] {-sp * (BASE_FRONT + 2) + 0.5, 1, mid});
+				return world(w, new double[] {sp * (BASE_FRONT + 1) + 0.5, 1, mid});
 			}
 			case BRIDGE -> {
 				if (to == Where.BRIDGE) return t;
@@ -303,19 +307,25 @@ public final class BridgeGoal extends Goal {
 			if (!danger) b.defending = false;
 			else if (!was) b.defending = f.getRandom().nextFloat() < 0.12F + 0.088F * d;
 		} else {
-			// In a team: every other one defends; the nearest to the goal defends too when it's in danger.
-			b.defending = b.index % 2 == 1;
-			if (threat != null && d >= 3 && Math.abs(threat.getX() - goalX) < 26) {
-				LivingEntity nearestAlly = null;
-				double best = 999;
-				for (LivingEntity a : w.alliesOf(b.team)) {
-					double dist = Math.abs(a.getX() - goalX);
-					if (dist < best) {
-						best = dist;
-						nearestAlly = a;
-					}
-				}
-				if (nearestAlly == f) b.defending = true;
+			// In a team, everyone goes to score while nobody's coming (but for a keeper, in big teams of good
+			// bots). When they come, as many bots as there are attackers on our half go back to stop them, the
+			// nearest to our goal first, always leaving one to keep attacking where there are two or more; any
+			// already on their base, about to score, keeps going.
+			List<Fighter> bots = new ArrayList<>();
+			for (LivingEntity a : w.alliesOf(b.team)) if (a instanceof Fighter fa && fa.bridge != null) bots.add(fa);
+			int coming = 0;
+			for (LivingEntity e : w.enemiesOf(b.team)) if (own * rx(w, e.getX()) > -6) coming++;
+			if (coming == 0) {
+				b.defending = bots.size() >= 3 && d >= 7 && b.index == 1;
+			} else {
+				int want = Math.min(coming, Math.max(1, bots.size() - 1));
+				bots.removeIf(a -> a != f && -own * rx(w, a.getX()) > BASE_FRONT);
+				bots.sort((x1, x2) -> Double.compare(Math.abs(x1.getX() - goalX), Math.abs(x2.getX() - goalX)));
+				int rank = bots.indexOf(f);
+				boolean onTheirBase = -own * rx(w, f.getX()) > BASE_FRONT;
+				boolean should = !onTheirBase && rank >= 0 && rank < want;
+				// Low levels are slow to see it.
+				b.defending = should && (was || d >= 3 || f.getRandom().nextFloat() < 0.3F + 0.15F * d);
 			}
 		}
 		// Which stairs: from 8, the side nobody's guarding; otherwise the side it's on, or either.

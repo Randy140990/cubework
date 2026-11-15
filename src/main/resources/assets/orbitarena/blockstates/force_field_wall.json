@@ -1,0 +1,22 @@
+{
+	"variants": {
+		"fade=0": {
+			"model": "orbitarena:block/force_field_wall_0"
+		},
+		"fade=1": {
+			"model": "orbitarena:block/force_field_wall_1"
+		},
+		"fade=2": {
+			"model": "orbitarena:block/force_field_wall_2"
+		},
+		"fade=3": {
+			"model": "orbitarena:block/force_field_wall_3"
+		},
+		"fade=4": {
+			"model": "orbitarena:block/force_field_wall_4"
+		},
+		"fade=5": {
+			"model": "orbitarena:block/force_field_wall_5"
+		}
+	}
+}

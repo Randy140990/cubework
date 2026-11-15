@@ -28,5 +28,6 @@
 	"block.orbitarena.force_field_blue": "Blue Force Field",
 	"block.orbitarena.force_field_red": "Red Force Field",
 	"itemGroup.orbitarena.blocks": "Orbit Arena",
-	"entity.orbitarena.rock": "Orbiting Rock"
+	"entity.orbitarena.rock": "Orbiting Rock",
+	"block.orbitarena.force_field_wall": "Wall Force Field"
 }

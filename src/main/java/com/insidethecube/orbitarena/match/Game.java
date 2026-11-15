@@ -55,6 +55,11 @@ interface Game {
 
 	boolean mayPlace(BlockPos pos);
 
+	/** Why a block can't go here, said to the player (or null to say nothing). */
+	default String whyNotPlace(BlockPos pos) {
+		return null;
+	}
+
 	/** Whether this game owns this position (it's in its arena or on its bridge). */
 	boolean owns(BlockPos pos);
 }

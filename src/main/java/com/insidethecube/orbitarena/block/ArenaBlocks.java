@@ -18,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 
@@ -30,7 +29,8 @@ import net.minecraft.world.level.material.MapColor;
  * strip with coloured sides;</li>
  * <li>bridge wool, blue and red: what the teams build with (soft like wool, but quick to mine with a pickaxe,
  * as the bridge servers' clay is);</li>
- * <li>force fields, blue and red: a glowing see-through grid, the skylight over each goal.</li>
+ * <li>force fields, blue and red: a glowing see-through wash fading out upwards, rising round each goal (you
+ * can walk through, but not build into it); and a pale one, the wall in front of the stands, that stops you.</li>
  * </ul>
  */
 public final class ArenaBlocks {
@@ -40,7 +40,7 @@ public final class ArenaBlocks {
 	/** The blocks drawn see-through (the client puts them on the translucent layer). */
 	public static final List<Block> TRANSLUCENT = new ArrayList<>();
 
-	public static Block LIGHT_GREEN, LIGHT_RED, LIGHT_WHITE, WOOL_BLUE, WOOL_RED, FIELD_BLUE, FIELD_RED;
+	public static Block LIGHT_GREEN, LIGHT_RED, LIGHT_WHITE, WOOL_BLUE, WOOL_RED, FIELD_BLUE, FIELD_RED, FIELD_WALL;
 
 	private static BlockBehaviour.Properties light(MapColor colour) {
 		return BlockBehaviour.Properties.of().mapColor(colour).strength(0.3F).sound(SoundType.GLASS).lightLevel(s -> 15).emissiveRendering((s, g, p) -> true);
@@ -52,8 +52,9 @@ public final class ArenaBlocks {
 		LIGHT_WHITE = block("light_strip_white", light(MapColor.SNOW), RotatedPillarBlock::new);
 		WOOL_BLUE = block("bridge_wool_blue", BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).strength(0.8F).sound(SoundType.WOOL), Block::new);
 		WOOL_RED = block("bridge_wool_red", BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(0.8F).sound(SoundType.WOOL), Block::new);
-		FIELD_BLUE = field("force_field_blue", MapColor.COLOR_BLUE);
-		FIELD_RED = field("force_field_red", MapColor.COLOR_RED);
+		FIELD_BLUE = field("force_field_blue", MapColor.COLOR_BLUE, false);
+		FIELD_RED = field("force_field_red", MapColor.COLOR_RED, false);
+		FIELD_WALL = field("force_field_wall", MapColor.COLOR_LIGHT_BLUE, true);
 
 		CreativeModeTab tab = FabricItemGroup.builder()
 				.title(Component.translatable("itemGroup.orbitarena.blocks"))
@@ -65,10 +66,11 @@ public final class ArenaBlocks {
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceKey.create(Registries.CREATIVE_MODE_TAB, OrbitArena.id("blocks")), tab);
 	}
 
-	private static Block field(String name, MapColor colour) {
-		Block b = block(name, BlockBehaviour.Properties.of().mapColor(colour).strength(0.3F).sound(SoundType.GLASS).noOcclusion().lightLevel(s -> 9)
-				.emissiveRendering((s, g, p) -> true).isValidSpawn((s, g, p, t) -> false).isRedstoneConductor((s, g, p) -> false)
-				.isSuffocating((s, g, p) -> false).isViewBlocking((s, g, p) -> false), TransparentBlock::new);
+	private static Block field(String name, MapColor colour, boolean solid) {
+		// Unbreakable (but for creative), as the map is.
+		Block b = block(name, BlockBehaviour.Properties.of().mapColor(colour).strength(-1.0F, 3600000.0F).sound(SoundType.GLASS).noOcclusion()
+				.lightLevel(s -> 7).emissiveRendering((s, g, p) -> true).isValidSpawn((s, g, p, t) -> false).isRedstoneConductor((s, g, p) -> false)
+				.isSuffocating((s, g, p) -> false).isViewBlocking((s, g, p) -> false), p -> new ForceFieldBlock(p, solid));
 		TRANSLUCENT.add(b);
 		return b;
 	}
