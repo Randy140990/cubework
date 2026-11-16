@@ -1,0 +1,7 @@
+67:	private boolean cancelDrop = false;
+183:						if (!this.cancelDrop) {
+267:				this.cancelDrop = true;
+288:		valueOutput.putBoolean("CancelDrop", this.cancelDrop);
+301:		this.cancelDrop = valueInput.getBooleanOr("CancelDrop", false);
+310:	public void disableDrop() {
+311:		this.cancelDrop = true;
