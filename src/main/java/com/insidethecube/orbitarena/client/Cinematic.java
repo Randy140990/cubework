@@ -48,7 +48,12 @@ public final class Cinematic {
 			// monoliths, back along over the crowd, down the bridge to your temple and round to look out over
 			// the bridge from your deck. (Coming in to red's base, the same mirrored.)
 			double m = p.kind() == Payloads.Cinematic.BRIDGE_RED ? -1 : 1, g = BridgeLayout.GOAL_X;
-			path = new Vec3[] {v(c, m * -30, 78, -215), v(c, m * 38, 50, -112), v(c, m * 108, 30, -30), v(c, m * 98, 22, 40), v(c, m * 24, 20, 35),
+			if (Crowd.ring()) {
+				// With the ring stadium round it all: down over the ring, in over the other team's monoliths,
+				// low along inside the crowd and down the bridge.
+				path = new Vec3[] {v(c, m * -30, 82, -230), v(c, m * 60, 52, -118), v(c, m * 112, 40, -18), v(c, m * 72, 30, 30), v(c, m * 26, 16, 32),
+						v(c, m * -12, 9, 7), v(c, m * -26, 5.5, 9.5)};
+			} else path = new Vec3[] {v(c, m * -30, 78, -215), v(c, m * 38, 50, -112), v(c, m * 108, 30, -30), v(c, m * 98, 22, 40), v(c, m * 24, 20, 35),
 					v(c, m * -12, 9, 7), v(c, m * -26, 5.5, 9.5)};
 			look = new Vec3[] {v(c, 0, 4, 0), v(c, m * 40, 10, 0), v(c, m * g, 14, 0), v(c, m * g, 12, 0), v(c, 0, 2, 0), v(c, m * -g, 12, 0),
 					v(c, m * 6, 2, 0)};

@@ -99,5 +99,18 @@
         "stream": false
       }
     ]
+  },
+  "crowd.boo": {
+    "subtitle": "subtitles.orbitarena.crowd.boo",
+    "sounds": [
+      {
+        "name": "orbitarena:crowd/boo_1",
+        "stream": false
+      },
+      {
+        "name": "orbitarena:crowd/boo_2",
+        "stream": false
+      }
+    ]
   }
 }

@@ -78,19 +78,27 @@ FONT = {
     "S": ["111", "100", "111", "001", "111"], "D": ["110", "101", "101", "101", "110"], "3": ["111", "001", "111", "001", "111"],
     "T": ["111", "010", "010", "010", "010"], "H": ["101", "101", "111", "101", "101"], "C": ["111", "100", "100", "100", "111"],
     "U": ["101", "101", "101", "101", "111"], "B": ["110", "101", "110", "101", "110"],
+    "E": ["111", "100", "111", "100", "111"], "L": ["100", "100", "100", "100", "111"], "R": ["110", "101", "110", "101", "101"],
+    "M": ["101", "111", "111", "101", "101"], "A": ["010", "101", "111", "101", "101"], "1": ["010", "110", "010", "010", "111"],
+    "0": ["111", "101", "101", "101", "111"],
 }
 HEART = ["0101000", "1111100", "1111100", "0111000", "0010000"]
 STAR = ["0010000", "1111100", "0111000", "0101000", "1000100"]
-SIGNS = [("GO!", (255, 255, 255)), ("WOW", (255, 230, 80)), ("GG!", (120, 255, 200)), ("WIN", (255, 140, 60)), (HEART, (255, 70, 110)),
-         (STAR, (255, 220, 60))]
-# The brand, across three big boards held side by side.
-BRAND = [("INSID3", (255, 150, 40)), ("TH3", (255, 255, 255)), ("CUB3", (255, 150, 40))]
+BLUE_BOARD, RED_BOARD = (40, 80, 200), (200, 40, 50)
+# Small boards (text, its colour, and a board colour of its own, or None for the fan's). The last two are the
+# teams' (GO! on blue, GO! on red).
+SIGNS = [("GO!", (255, 255, 255), None), ("WOW", (255, 230, 80), None), ("GG!", (120, 255, 200), None), ("WIN", (255, 140, 60), None),
+         (HEART, (255, 70, 110), None), (STAR, (255, 220, 60), None), ("BOO", (255, 90, 90), (40, 40, 48)), ("OMG", (255, 230, 80), None),
+         ("LOL", (120, 220, 255), None), ("10!", (255, 255, 255), None), ("GO!", (255, 255, 255), BLUE_BOARD), ("GO!", (255, 255, 255), RED_BOARD)]
+# Big boards: the brand across three held side by side, then the teams' and a goal's.
+BIG_SIGNS = [("INSID3", (255, 150, 40), (28, 30, 40)), ("TH3", (255, 255, 255), (28, 30, 40)), ("CUB3", (255, 150, 40), (28, 30, 40)),
+             ("BLUE!", (255, 255, 255), BLUE_BOARD), ("RED!", (255, 255, 255), RED_BOARD), ("GOAL!", (255, 220, 60), (28, 30, 40))]
 
 
 def draw_sign(s, sign, board, faces=SIGN):
     """The board, with the text on its back face turned half round (it's raised overhead, so it reads from the front)."""
     s.part(faces, board, 0.03)
-    text, colour = sign
+    text, colour = sign[0], sign[1]
     glyph = text if isinstance(text, list) else None
     x0, y0, x1, y1 = faces["back"]
     w, h = x1 - x0, y1 - y0
@@ -177,10 +185,11 @@ def fan(look):
         s.px(x0 + 3, y0 + 6, shade(skin, 0.5))
         s.px(x0 + 4, y0 + 6, shade(skin, 0.5))
     else:
-        # Supporters: a hoodie with a star, a "10" shirt, a striped scarf.
+        # Supporters: a hoodie with a star, a "10" shirt, a striped scarf; and (8 to 11) the teams' shirts,
+        # blue and red, each with a scarf in the team's colours.
         tones = [(240, 200, 170), (198, 140, 100), (140, 95, 65), (95, 65, 45)]
         tone = tones[look % 4]
-        shirt = {4: (30, 170, 160), 5: (210, 40, 50), 6: (250, 205, 40)}[look]
+        shirt = {4: (30, 170, 160), 5: (210, 40, 50), 6: (250, 205, 40), 8: (40, 80, 210), 9: (30, 60, 170), 10: (205, 40, 50), 11: (170, 30, 40)}[look]
         hair = [(60, 40, 25), (25, 20, 20), (200, 150, 70)][look % 3]
         s.part(HEAD, tone)
         s.part(ARM, shirt)
@@ -199,6 +208,13 @@ def fan(look):
         if look == 4:
             for (sx, sy) in [(4, 2), (3, 3), (4, 3), (5, 3), (2, 4), (3, 4), (4, 4), (5, 4), (6, 4), (3, 5), (5, 5)]:
                 s.px(bx + sx - 1, by + sy, (255, 230, 90))
+        elif look >= 8:
+            # A team shirt: a white stripe across it, a scarf in the team's colours round the neck.
+            team = (40, 80, 210) if look < 10 else (205, 40, 50)
+            s.band(BODY, [5], (245, 245, 245))
+            s.band(BODY, [0, 1], (245, 245, 245))
+            for x in range(BODY["front"][0], BODY["front"][2], 2):
+                s.px(x, BODY["front"][1], team)
         elif look == 5:
             for (sx, sy) in [(1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (3, 2), (4, 2), (5, 2), (3, 3), (5, 3), (3, 4), (5, 4), (3, 5), (5, 5), (3, 6), (4, 6), (5, 6)]:
                 s.px(bx + sx, by + sy, (255, 255, 255))
@@ -248,15 +264,21 @@ def fighter(look):
 
 def main():
     boards = [(232, 200, 140), (250, 250, 250), (60, 60, 70), (40, 80, 160), (160, 40, 60), (40, 130, 90)]
-    for look in range(8):
-        for sign in range(10):
+    import glob
+    for old in glob.glob(os.path.join(ROOT, "fan", "fan_*.png")):
+        os.remove(old)
+    for look in range(12):
+        for sign in range(1 + len(SIGNS) + len(BIG_SIGNS)):
             s = fan(look)
             if 0 < sign <= len(SIGNS):
-                draw_sign(s, SIGNS[sign - 1], boards[(look + sign) % len(boards)])
+                sg = SIGNS[sign - 1]
+                draw_sign(s, sg, sg[2] or boards[(look + sign) % len(boards)])
             elif sign > len(SIGNS):
-                draw_sign(s, BRAND[sign - len(SIGNS) - 1], (28, 30, 40), BIG)
+                sg = BIG_SIGNS[sign - len(SIGNS) - 1]
+                draw_sign(s, sg, sg[2], BIG)
             s.save(os.path.join(ROOT, "fan", "fan_%d_%d.png" % (look, sign)))
-        fighter(look).save(os.path.join(ROOT, "fighter", "fighter_%d.png" % look))
+        if look < 8:
+            fighter(look).save(os.path.join(ROOT, "fighter", "fighter_%d.png" % look))
 
 
 if __name__ == "__main__":

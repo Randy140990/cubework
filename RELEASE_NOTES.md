@@ -1,5 +1,12 @@
 Orbit Arena by Inside the Cube (Minecraft 1.21.11, Fabric).
 
+0.4.3: a ring stadium, and a crowd that takes sides.
+- The Bridge has a new choice on its setup tab, Stands: along the bridge (as before), or a ring round it all. The ring is a stadium round the whole map like a planet's rings round it: straight along both sides of the bridge and round in a half circle past each base's monoliths, a lower tier of ten rows rising from its glowing inner edge, a concourse, and an upper tier of eight more, with a thick tapering band of pale stone under it, banded like a planet's rings, and a wall of force field round inside it. The fly-round has its own path for it. Changing between the two rebuilds the stands (and moves the red rock spires that would be in the ring's way).
+- The crowd is livelier, in the stadium and on the bridge: fans sit and watch when it's calm and get to their feet for anything big; they chat to the fan beside them, eat (cookies, bread, apples, chicken, melon, pie, potatoes, honey, berries, carrots), stretch, clap, wave, cheer, jump up and down, pump their fists, point, and now and then floss or dab; flags get waved; more signs (BOO, OMG, LOL, 10!).
+- On the bridge the fans take sides: mostly blue's at blue's end and red's at red's, half of them in their team's shirt, with GO! signs, BLUE! and RED! boards and flags in their team's colours. When a team scores its fans go wild (cheering, jumping, flossing, dabbing, flags and signs up) and the other side's fans boo (hands cupped, arms jabbing, heads shaking), hold their heads or cover their faces. A win does the same, bigger. You hear the cheers and the boos.
+- In the stadium the crowd boos when you lose, as well as the "aww".
+- Bridge bots restock from the chests from level 2 (and a little sooner, under 16 blocks).
+
 0.4.2: blocks by the round, restock chests, bots that never stand still.
 - Blocks are the round's, not a life's: you get two stacks a round with bots at level 1 to 5, one stack at 6 to 10 (bots too). Falling off doesn't give you more; a new round does.
 - Under each half of the bridge, eight blocks down (well above where you'd fall to your death), a double chest with two stacks of blocks, filled again every round. Bridge down to it to restock (the other side's colour turns into yours as you take it).

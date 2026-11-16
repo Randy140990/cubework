@@ -29,7 +29,7 @@ public class ArenaScreen extends Screen {
 	private static int tab = ARENA;
 	private static Opponents opponents = Opponents.FIGHTERS;
 	private static int difficulty = 3, count = 1, waves = 10, bossCount = 1, timeLimit = 0;
-	private static int bridgeDifficulty = 5, teamSize = 1, bridgeTime = 900, bridgeKit = MatchSettings.CLASSIC, bridgeWidth = 2, bridgeTeam = 0;
+	private static int bridgeDifficulty = 5, teamSize = 1, bridgeTime = 900, bridgeKit = MatchSettings.CLASSIC, bridgeWidth = 2, bridgeTeam = 0, bridgeStands = MatchSettings.SIDES;
 	private static Kit kit = Kit.SWORD;
 	private static Boss boss = Boss.WITHER;
 	private static boolean obstacles, intro = true;
@@ -125,6 +125,10 @@ public class ArenaScreen extends Screen {
 			addRenderableWidget(CycleButton.<Integer>builder(t -> Component.literal(t == 0 ? "None" : (t / 60) + " min"), bridgeTime)
 					.withValues(0, 300, 600, 900)
 					.create(right, y, half, 20, Component.literal("Time limit"), (b, v) -> bridgeTime = v));
+			y += ROW;
+			addRenderableWidget(CycleButton.<Integer>builder(t -> Component.literal(t == MatchSettings.RING ? "A ring round it all, two tiers" : "Along the bridge"), bridgeStands)
+					.withValues(MatchSettings.SIDES, MatchSettings.RING)
+					.create(left, y, w, 20, Component.literal("Stands"), (b, v) -> bridgeStands = v));
 		}
 		y += ROW;
 		addRenderableWidget(CycleButton.<Float>builder(c -> Component.literal(c == 0 ? "Empty" : c < 0.3F ? "Quiet" : c < 0.6F ? "Busy" : "Packed"), nearestCrowd())
@@ -177,7 +181,7 @@ public class ArenaScreen extends Screen {
 	/** The settings as last chosen (what "Go again" uses). */
 	static MatchSettings settings() {
 		if (tab == BRIDGE) {
-			return new MatchSettings(Opponents.BRIDGE, bridgeDifficulty, teamSize, kit, boss, bridgeTime, obstacles, intro, bridgeKit, bridgeWidth, bridgeTeam);
+			return new MatchSettings(Opponents.BRIDGE, bridgeDifficulty, teamSize, kit, boss, bridgeTime, obstacles, intro, bridgeKit, bridgeWidth, bridgeTeam, bridgeStands);
 		}
 		Opponents o = opponents == Opponents.BRIDGE ? Opponents.FIGHTERS : opponents;
 		int n = switch (o) {
@@ -185,14 +189,14 @@ public class ArenaScreen extends Screen {
 			case MOBS -> waves;
 			default -> count;
 		};
-		return new MatchSettings(o, difficulty, n, kit, boss, timeLimit, false, intro, bridgeKit, bridgeWidth, bridgeTeam);
+		return new MatchSettings(o, difficulty, n, kit, boss, timeLimit, false, intro, bridgeKit, bridgeWidth, bridgeTeam, bridgeStands);
 	}
 
 	/** The settings in a line: "10 fighters · level 10 · Netherite kit". */
 	static Component describeSettings() {
 		if (tab == BRIDGE) {
 			return Component.literal("The Bridge · " + (bridgeTeam == 0 ? "blue" : "red") + " · " + teamSize + " v " + teamSize + " · level " + bridgeDifficulty + " · "
-					+ (bridgeKit == MatchSettings.CLASSIC ? "Classic" : "Netherite") + " kit · " + bridgeWidth + " wide" + (obstacles ? " · copper obstacles" : ""));
+					+ (bridgeKit == MatchSettings.CLASSIC ? "Classic" : "Netherite") + " kit · " + bridgeWidth + " wide" + (obstacles ? " · copper obstacles" : "") + (bridgeStands == MatchSettings.RING ? " · ring stadium" : ""));
 		}
 		String who = switch (opponents) {
 			case FIGHTERS -> count + (count == 1 ? " fighter" : " fighters");

@@ -270,7 +270,11 @@ public final class Matches {
 
 	/** Builds the bridge (full: everything; otherwise just the playing area, put right). */
 	static Builder bridgeBuilder(ServerLevel arena, int centreX, boolean full, boolean obstacles, int width) {
-		return BUILDERS.computeIfAbsent(key(centreX, BridgeLayout.Z), k -> new BridgeBuilder(arena, centreX, full).obstacles(obstacles).width(width));
+		return bridgeBuilder(arena, centreX, full, obstacles, width, false);
+	}
+
+	static Builder bridgeBuilder(ServerLevel arena, int centreX, boolean full, boolean obstacles, int width, boolean ring) {
+		return BUILDERS.computeIfAbsent(key(centreX, BridgeLayout.Z), k -> new BridgeBuilder(arena, centreX, full, ring).obstacles(obstacles).width(width));
 	}
 
 	private static void tick(MinecraftServer server) {

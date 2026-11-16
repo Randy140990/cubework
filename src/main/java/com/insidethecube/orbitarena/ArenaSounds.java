@@ -18,6 +18,7 @@ public final class ArenaSounds {
 	public static final SoundEvent APPLAUSE_LIGHT = register("crowd.applause_light");
 	public static final SoundEvent OOH = register("crowd.ooh");
 	public static final SoundEvent AWW = register("crowd.aww");
+	public static final SoundEvent BOO = register("crowd.boo");
 
 	private static SoundEvent register(String name) {
 		Identifier id = OrbitArena.id(name);

@@ -37,7 +37,7 @@ public class OrbitArenaClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(Payloads.State.TYPE, (p, ctx) -> {
 			if (p.inArena()) {
 				Crowd.setArena(p.mode(), p.centreX(), p.centreZ());
-				if (p.mode() == Payloads.State.BRIDGE) {
+				if (p.mode() != Payloads.State.ARENA) {
 					Crystals.set(p.centreX(), p.centreZ());
 					Rocks.set(p.centreX(), p.centreZ());
 				}

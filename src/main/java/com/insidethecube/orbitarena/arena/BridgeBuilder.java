@@ -24,31 +24,44 @@ public final class BridgeBuilder implements Matches.Builder {
 
 	private final ServerLevel level;
 	private final int cx, cz;
-	private final boolean full, legacy, previous;
+	private final boolean full, legacy, previous, ring;
 	private boolean obstacles;
 	private int width = 2;
-	private int column, legacySpire, previousSpire, standColumn, spire;
+	private int column, legacySpire, previousSpire, ringSpire, standColumn, spire;
 	private final int areaColumns, standColumns;
 
 	public BridgeBuilder(ServerLevel level, int centreX, boolean full) {
+		this(level, centreX, full, false);
+	}
+
+	/** Ring: the crowd in a stadium ring round the whole map (or false: in stands along the bridge). */
+	public BridgeBuilder(ServerLevel level, int centreX, boolean full, boolean ring) {
 		this.level = level;
 		this.cx = centreX;
 		this.cz = Z;
-		this.full = full || !built(level, centreX);
+		this.ring = ring;
+		this.full = full || !built(level, centreX, ring);
 		// The first bridges (before the temples) had their spires elsewhere: clear those away.
 		this.legacy = this.full && level.getBlockState(new BlockPos(centreX, Y - 21, Z)).is(MARKER.getBlock());
 		// The last version's spires stood closer in: clear any that have moved.
 		this.previous = this.full && level.getBlockState(new BlockPos(centreX, Y - 40 - (VERSION - 1), Z)).is(MARKER.getBlock());
 		this.areaColumns = (2 * AREA_X + 1) * (2 * AREA_Z + 1);
-		this.standColumns = this.full ? STAND_X_SPAN * 2 * STAND_Z_SPAN : 0;
+		this.standColumns = this.full ? STAND_X_SPAN * STAND_Z_SPAN : 0;
 		if (!this.full) this.spire = SPIRES;
+		if (!this.full || !ring) this.ringSpire = SPIRES;
 		if (!this.legacy) this.legacySpire = LEGACY_SPIRES;
 		if (!this.previous) this.previousSpire = SPIRES;
 	}
 
 	/** The obstacles (copper on the bridge) in or out, and how wide the bridge is: set before the area is built. */
-	/** The stands outside the playing area: how far along and across (each side) the stand pass goes. */
-	private static final int STAND_X_SPAN = 2 * (STAND_HALF_X + 4) + 1, STAND_Z_SPAN = STAND_BACK - AREA_Z;
+	/**
+	 * The stands outside the playing area: the pass goes over everywhere either kind of stands could be (the
+	 * ones along the bridge, or the ring round it all), so changing from one to the other clears the other.
+	 */
+	private static final int STAND_X_HALF = RING_L + RING_BACK + 2, STAND_Z_HALF = RING_BACK + 2, STAND_X_SPAN = 2 * STAND_X_HALF + 1,
+			STAND_Z_SPAN = 2 * STAND_Z_HALF + 1;
+	/** Where the ring is marked as built (and the stands are the ring). */
+	private static final int RING_MARK = 50;
 
 	public BridgeBuilder obstacles(boolean on) {
 		this.obstacles = on;
@@ -65,6 +78,11 @@ public final class BridgeBuilder implements Matches.Builder {
 		return level.getBlockState(new BlockPos(centreX, Y - 40 - VERSION, Z)).is(MARKER.getBlock());
 	}
 
+	/** Whether it's built with these stands (the ring, or along the bridge). */
+	public static boolean built(ServerLevel level, int centreX, boolean ring) {
+		return built(level, centreX) && level.getBlockState(new BlockPos(centreX, Y - RING_MARK, Z)).is(MARKER.getBlock()) == ring;
+	}
+
 	/** Whether the obstacles are there now. */
 	public static boolean hasObstacles(ServerLevel level, int centreX) {
 		return level.getBlockState(new BlockPos(centreX + 7, Y + 1, Z)).is(Blocks.WAXED_WEATHERED_COPPER);
@@ -79,8 +97,8 @@ public final class BridgeBuilder implements Matches.Builder {
 
 	@Override
 	public float progress() {
-		float total = areaColumns + LEGACY_SPIRES * 200f + SPIRES * 200f + standColumns + SPIRES * 300f;
-		return (column + legacySpire * 200f + previousSpire * 200f + standColumn + spire * 300f) / total;
+		float total = areaColumns + LEGACY_SPIRES * 200f + SPIRES * 400f + standColumns * 0.4f + SPIRES * 300f;
+		return (column + legacySpire * 200f + previousSpire * 200f + ringSpire * 200f + standColumn * 0.4f + spire * 300f) / total;
 	}
 
 	private void set(int dx, int dy, int dz, BlockState state) {
@@ -101,40 +119,61 @@ public final class BridgeBuilder implements Matches.Builder {
 			if (was.z() != now.z()) clearSpire(was);
 		}
 		if (previousSpire < SPIRES) return false;
+		// With the ring, the spires that would stand in it go first.
+		while (ringSpire < SPIRES && System.nanoTime() - start < BUDGET) {
+			Spire s = BridgeLayout.spire(ringSpire++);
+			if (spireHitsRing(s)) clearSpire(s);
+		}
+		if (ringSpire < SPIRES) return false;
 		while (column < areaColumns && System.nanoTime() - start < BUDGET) {
 			int dx = column / (2 * AREA_Z + 1) - AREA_X, dz = column % (2 * AREA_Z + 1) - AREA_Z;
 			for (int dy = AREA_BOTTOM; dy <= AREA_TOP; dy++) {
 				BlockState s = mapBlock(dx, dy, dz, obstacles, width);
-				if (s == null) s = standBlock(dx, dy, dz);
+				if (s == null) s = stands(dx, dy, dz);
 				set(dx, dy, dz, s == null ? air : s);
 			}
 			column++;
 		}
 		if (column < areaColumns) return false;
 		while (standColumn < standColumns && System.nanoTime() - start < BUDGET) {
-			// Beyond the playing area (which has the stands' fronts in it): the rest of the stands and their asteroids.
-			int dx = standColumn / (2 * STAND_Z_SPAN) - (STAND_HALF_X + 4), k = standColumn % (2 * STAND_Z_SPAN);
-			int dz = k < STAND_Z_SPAN ? AREA_Z + 1 + k : -(AREA_Z + 1 + k - STAND_Z_SPAN);
+			// Beyond the playing area (which has the stands' fronts in it): the rest of the stands, wherever
+			// either kind could be (air where these stands aren't: the other kind, or the last ones, cleared).
+			int dx = standColumn / STAND_Z_SPAN - STAND_X_HALF, dz = standColumn % STAND_Z_SPAN - STAND_Z_HALF;
+			standColumn++;
+			int adx = Math.abs(dx), adz = Math.abs(dz);
+			if (adx <= AREA_X && adz <= AREA_Z) continue;
+			double rd = ringDist(dx + 0.5, dz + 0.5);
+			boolean sides = adx <= STAND_HALF_X + 4 && adz <= STAND_BACK, inRing = rd >= RING_WALL - 1.5 && rd < RING_BACK + 2.5;
+			if (!sides && !inRing) continue;
 			for (int dy = AREA_BOTTOM - 4; dy <= AREA_TOP; dy++) {
-				// (Air where there's no stand: the last ones, nearer in, are cleared away.)
-				BlockState s = standBlock(dx, dy, dz);
+				BlockState s = stands(dx, dy, dz);
 				set(dx, dy, dz, s == null ? air : s);
 			}
-			standColumn++;
 		}
 		if (standColumn < standColumns) return false;
-		if (spire < SPIRES && System.nanoTime() - start < BUDGET) buildSpire(spire++);
+		while (spire < SPIRES && System.nanoTime() - start < BUDGET) {
+			Spire s = BridgeLayout.spire(spire++);
+			if (!ring || !spireHitsRing(s)) {
+				buildSpire(s);
+				break;
+			}
+		}
 		boolean done = spire >= SPIRES;
 		if (done && full) {
 			for (int v = 1; v < VERSION; v++) set(0, -40 - v, 0, air);
 			set(0, -40 - VERSION, 0, MARKER);
+			set(0, -RING_MARK, 0, ring ? MARKER : air);
 		}
 		return done;
 	}
 
+	/** The stands' block here: the ring's, or the ones along the bridge. */
+	private BlockState stands(int dx, int dy, int dz) {
+		return ring ? ringBlock(dx, dy, dz) : standBlock(dx, dy, dz);
+	}
+
 	/** A rock spire: a lumpy spindle of layered red rock, standing on end. */
-	private void buildSpire(int i) {
-		Spire s = BridgeLayout.spire(i);
+	private void buildSpire(Spire s) {
 		int r = (int) Math.ceil(s.radius() * 1.3);
 		for (int y = 0; y < s.height(); y++) {
 			double t = (y + 0.5) / s.height();

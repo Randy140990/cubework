@@ -673,13 +673,13 @@ public final class BridgeGoal extends Goal {
 		}
 		int own = side(b.team), theirs = -own;
 		Vec3 goalAt = world(w, goal(theirs));
-		// Running low on blocks (from 4): down to its restock chest under its half of the bridge, if there's
+		// Running low on blocks (from 2): down to a restock chest under the bridge, if there's
 		// anything in it and nobody's about to score.
 		// (Whichever chest is nearer and has blocks in it: what colour they are makes no odds to a bot.)
 		int ct = w.chestBlocks(b.team) == 0 || w.chestBlocks(1 - b.team) > 0 && p.distanceToSqr(Vec3.atCenterOf(w.chest(1 - b.team))) < p.distanceToSqr(Vec3.atCenterOf(w.chest(b.team)))
 				? 1 - b.team : b.team;
 		BlockPos chest = w.chest(ct);
-		if (!restocking && blocks < 10 && d >= 4 && w.chestBlocks(ct) > 0 && (!b.defending || nearestThreatFar(w, b))) restocking = true;
+		if (!restocking && blocks < 16 && d >= 2 && w.chestBlocks(ct) > 0 && (!b.defending || nearestThreatFar(w, b))) restocking = true;
 		if (restocking && (blocks >= w.blocksPerRound() / 2 || w.chestBlocks(ct) == 0 || b.defending && !nearestThreatFar(w, b))) restocking = false;
 		if (restocking && p.distanceToSqr(chest.getX() + 1.0, chest.getY() + 0.5, chest.getZ() + 0.5) < 9) {
 			// At the chest: open it, take what it needs.

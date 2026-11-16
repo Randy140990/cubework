@@ -45,7 +45,7 @@ public final class Payloads {
 	 * z; the floor is at ArenaLayout.FLOOR), and whether a match is on.
 	 */
 	public record State(boolean inArena, int mode, int centreX, int centreZ, boolean fighting) implements CustomPacketPayload {
-		public static final int ARENA = 0, BRIDGE = 1;
+		public static final int ARENA = 0, BRIDGE = 1, BRIDGE_RING = 2;
 		public static final Type<State> TYPE = typeOf("state");
 		public static final StreamCodec<ByteBuf, State> CODEC = StreamCodec.composite(
 				ByteBufCodecs.BOOL, State::inArena, ByteBufCodecs.VAR_INT, State::mode, ByteBufCodecs.VAR_INT, State::centreX, ByteBufCodecs.VAR_INT,
@@ -62,7 +62,8 @@ public final class Payloads {
 	 * a glancing hit is small, a heavy one big).
 	 */
 	public record Cheer(int kind, float strength) implements CustomPacketPayload {
-		public static final int HIT = 0, KILL = 1, FIGHT = 2, WIN = 3, LOSS = 4, HURT = 5;
+		/** GOAL: a team scored (strength: which, 0 blue, 1 red); END: a team won (strength: which, or 2 for a draw). */
+		public static final int HIT = 0, KILL = 1, FIGHT = 2, WIN = 3, LOSS = 4, HURT = 5, GOAL = 6, END = 7;
 		public static final Type<Cheer> TYPE = typeOf("cheer");
 		public static final StreamCodec<ByteBuf, Cheer> CODEC = StreamCodec.composite(
 				ByteBufCodecs.VAR_INT, Cheer::kind, ByteBufCodecs.FLOAT, Cheer::strength, Cheer::new);

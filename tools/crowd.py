@@ -150,6 +150,10 @@ def crowd_shouts(mix, count, t0, spread, dur_range, kind="cheer", loud=1.0):
         elif kind == "aww":
             v0, v1 = ("ah", "uh")
             start, peak, end = base * 1.7, base * 1.75, base * 1.05
+        elif kind == "boo":
+            # A long low "boo", sagging at the end.
+            v0, v1 = ("oo", "oo") if rng.random() < 0.8 else ("oh", "oo")
+            start, peak, end = base * 1.15, base * rng.uniform(1.2, 1.35), base * rng.uniform(0.85, 1.0)
         else:  # roar: open throats, held
             v0, v1 = ("ah", "ah") if rng.random() < 0.6 else ("eh", "ah")
             start, peak, end = base * 1.6, base * rng.uniform(2.1, 2.7), base * 1.9
@@ -299,8 +303,21 @@ def make_reaction(out, name, kind, count, length):
     write(os.path.join(out, name + ".ogg"), finish(reverb(mix, 2.4, 0.45), 0.8))
 
 
+def make_boo(out, name, count, length):
+    """The crowd booing: waves of long low boos, a few starting late, over a low roar."""
+    mix = render(length)
+    crowd_shouts(mix, count, 0.0, 0.5, (1.4, 2.6), "boo")
+    crowd_shouts(mix, count // 2, 1.2, 0.8, (1.2, 2.2), "boo", 0.8)
+    roar_bed(mix, 0.0, length * 0.8, 0.22, 0.3, length * 0.4)
+    write(os.path.join(out, name + ".ogg"), finish(reverb(mix, 2.4, 0.45), 0.8))
+
+
 def main():
     out = os.path.join(sys.argv[1], "crowd")
+    if len(sys.argv) > 2 and sys.argv[2] == "boo":
+        for i in (1, 2):
+            make_boo(out, "boo_%d" % i, 140, 4.0)
+        return
     make_murmur(out)
     for i in (1, 2, 3):
         make_cheer(out, "cheer_small_%d" % i, 60, 2.0, (0.35, 0.8), 0.25)
@@ -312,6 +329,8 @@ def main():
     for i in (1, 2):
         make_reaction(out, "ooh_%d" % i, "ooh", 120, 2.2)
     make_reaction(out, "aww", "aww", 150, 3.0)
+    for i in (1, 2):
+        make_boo(out, "boo_%d" % i, 140, 4.0)
 
 
 if __name__ == "__main__":

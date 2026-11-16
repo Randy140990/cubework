@@ -12,7 +12,8 @@ import net.minecraft.util.Mth;
 
 /** Draws the fans: one of the fan looks, with or without a sign, a little taller or shorter. */
 public class FanRenderer extends HumanoidMobRenderer<Fan, FanRenderState, FanModel> {
-	public static final int LOOKS = 8, SIGNS = 9;
+	/** Eight looks, then two in blue's shirts and two in red's (8 to 11); twelve small signs and six big boards. */
+	public static final int LOOKS = 12, SIGNS = 18;
 	private static final Identifier[][] TEXTURES = new Identifier[LOOKS][SIGNS + 1];
 
 	static {
@@ -42,13 +43,18 @@ public class FanRenderer extends HumanoidMobRenderer<Fan, FanRenderState, FanMod
 		state.time = now + fan.phase * 997;
 		state.energy = Crowd.energy();
 		state.groan = Crowd.groan();
+		// How its own side's doing: scored (cheer) or scored on (boo); a fan on neither side cheers anything.
+		float cheer = Crowd.cheeringFor(fan.team), boo = Crowd.booingFor(fan.team);
+		state.boo = boo;
+		state.sitBase = fan.sits && state.energy < 0.55F && cheer < 0.3F && boo < 0.3F && Crowd.cheering() < 0.4F;
 		// What it's doing: a new choice every 2.5 to 4.5 seconds, its own beat, livelier as the crowd is.
 		float slotLength = 50 + fan.phase * 40;
 		float at = (now + fan.phase * 1234) / slotLength;
 		long slot = (long) Math.floor(at);
 		float local = at - slot;
 		long seed = (long) (fan.phase * 1_000_003);
-		state.action = FanModel.choose(ArenaLayout.hash(seed, slot, fan.sign, 7), state.energy, Crowd.cheering(), state.groan, fan.sign >= 0);
+		state.action = FanModel.choose(ArenaLayout.hash(seed, slot, fan.sign, 7), ArenaLayout.hash(seed, slot, fan.look, 8), state.energy, cheer, boo, state.groan,
+				fan.sign >= 0, fan.snack, fan.flag, fan.sits);
 		float edge = Math.min(local, 1 - local) / 0.15F;
 		state.blend = edge >= 1 ? 1 : edge * edge * (3 - 2 * edge);
 		// The Mexican wave lifts the fans it's passing.

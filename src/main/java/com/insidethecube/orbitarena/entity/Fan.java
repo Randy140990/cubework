@@ -20,6 +20,10 @@ public class Fan extends Mob {
 	public float seatAngle;
 	/** Watching through a spyglass (it holds one). */
 	public boolean spyglass;
+	/** Whose side it's on on the bridge (0 blue, 1 red), or -1 (on yours, in the stadium; neither, on the bridge). */
+	public int team = -1;
+	/** Has a snack (it's holding one, and eats it now and then); has a flag to wave; likes to sit when it's calm. */
+	public boolean snack, flag, sits;
 
 	public Fan(EntityType<? extends Mob> type, Level level) {
 		super(type, level);

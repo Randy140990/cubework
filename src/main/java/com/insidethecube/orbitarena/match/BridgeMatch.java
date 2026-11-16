@@ -213,7 +213,12 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	@Override
 	public boolean buildable(BlockPos pos) {
 		int dx = pos.getX() - cx, dy = pos.getY() - Y, dz = pos.getZ() - cz;
-		return BridgeLayout.buildable(dx, dy, dz) && mapBlock(dx, dy, dz, settings.obstacles(), settings.bridgeWidth()) == null;
+		return BridgeLayout.buildable(dx, dy, dz, ring()) && mapBlock(dx, dy, dz, settings.obstacles(), settings.bridgeWidth()) == null;
+	}
+
+	/** Whether the crowd's in the ring stadium round it all (or in the stands along the bridge). */
+	private boolean ring() {
+		return settings.bridgeStands() == MatchSettings.RING;
 	}
 
 	/** Blocks a round: two stacks with bots at 1 to 5, one stack at 6 to 10 (bots and players alike). */
@@ -323,7 +328,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		int dx = pos.getX() - cx, dy = pos.getY() - Y, dz = pos.getZ() - cz, adx = Math.abs(dx);
 		if (BridgeLayout.inGoalField(adx, dy, dz)) return "Nothing can be built in a goal's force field";
 		if (BridgeLayout.byDoor(adx, dy, dz)) return "Keep the temple doors clear";
-		if (Math.abs(dz) > WALL_Z - 2 && adx <= WALL_END + 2) return "Too near the stands";
+		if (ring() ? ringDist(dx + 0.5, dz + 0.5) > RING_WALL - 3 : Math.abs(dz) > WALL_Z - 2 && adx <= WALL_END + 2) return "Too near the stands";
 		if (dy > BUILD_TOP) return "Too high to build";
 		if (dy < -14) return "Too far down to build";
 		if (monolithAt(dx, dy, dz) >= 0 || !BridgeLayout.buildable(dx, dy, dz) && adx > TEMPLE_FRONT) return "Too near a monolith";
@@ -361,11 +366,11 @@ public final class BridgeMatch implements Game, BridgeWorld {
 				if (running != null) {
 					player.displayClientMessage(Component.literal((BridgeBuilder.built(arena, cx) ? "Getting the bridge ready… " : "Building the bridge… ")
 							+ (int) (running.progress() * 100) + "%").withStyle(ChatFormatting.AQUA), true);
-				} else if (!repairStarted || !BridgeBuilder.built(arena, cx) || BridgeBuilder.hasObstacles(arena, cx) != settings.obstacles()
+				} else if (!repairStarted || !BridgeBuilder.built(arena, cx, ring()) || BridgeBuilder.hasObstacles(arena, cx) != settings.obstacles()
 						|| BridgeBuilder.widthNow(arena, cx) != settings.bridgeWidth()) {
 					// Built afresh, or put right from the last game (blocks cleared, monoliths stood back up).
 					repairStarted = true;
-					Matches.bridgeBuilder(arena, cx, false, settings.obstacles(), settings.bridgeWidth());
+					Matches.bridgeBuilder(arena, cx, false, settings.obstacles(), settings.bridgeWidth(), ring());
 				} else if (again) {
 					player.getInventory().clearContent();
 					kit(player, me);
@@ -698,7 +703,8 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		player.sendSystemMessage(Component.literal(m.name).withStyle(colour).append(Component.literal(" scored! ").withStyle(ChatFormatting.GRAY))
 				.append(Component.literal("Blue " + score[BLUE] + " · Red " + score[RED]).withStyle(ChatFormatting.WHITE)));
 		Shows.sound(player, ours ? SoundEvents.PLAYER_LEVELUP : SoundEvents.BEACON_DEACTIVATE, 1.0F, ours ? 1.0F : 0.8F);
-		Shows.cheer(player, ours ? Payloads.Cheer.KILL : Payloads.Cheer.LOSS, ours ? 1.0F : 0.6F);
+		// The crowd: the scorers' fans go wild, the other side's boo.
+		Shows.cheer(player, Payloads.Cheer.GOAL, m.team);
 		score();
 		if (score[m.team] >= TO_WIN) {
 			end(ours, false, ours ? "Your team crossed " + TO_WIN + " times" : (m.team == BLUE ? "Blue" : "Red") + " crossed " + TO_WIN + " times");
@@ -872,7 +878,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 				.withStyle(won ? ChatFormatting.GOLD : draw ? ChatFormatting.AQUA : ChatFormatting.RED, ChatFormatting.BOLD),
 				Component.literal("Blue " + score[BLUE] + " · Red " + score[RED] + " · " + reason), 5, 70, 20);
 		Shows.sound(player, won ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.BEACON_DEACTIVATE, 1.0F, 1.0F);
-		Shows.cheer(player, won ? Payloads.Cheer.WIN : Payloads.Cheer.LOSS, 1.0F);
+		Shows.cheer(player, Payloads.Cheer.END, draw ? 2 : won ? me : them);
 		player.sendSystemMessage(Component.literal("The Bridge · " + (won ? "Victory" : draw ? "Draw" : "Defeat") + " · " + subtitle())
 				.withStyle(won ? ChatFormatting.GOLD : ChatFormatting.RED));
 		summary = String.format("Goals %d to %d · Your goals %d · Knocked out %d · Lost %d · Time %s", score[me], score[them], mine == null ? 0 : mine.goals,
@@ -943,7 +949,8 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	}
 
 	private void state(boolean in) {
-		ServerPlayNetworking.send(player, new Payloads.State(in, Payloads.State.BRIDGE, cx, cz, phase == Phase.PLAY || phase == Phase.CAGED));
+		ServerPlayNetworking.send(player, new Payloads.State(in, ring() ? Payloads.State.BRIDGE_RING : Payloads.State.BRIDGE, cx, cz,
+				phase == Phase.PLAY || phase == Phase.CAGED));
 	}
 
 	/** The score, the clock and who's playing, for the banners at the top of the screen. */

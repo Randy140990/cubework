@@ -534,9 +534,15 @@ public final class BridgeLayout {
 	 * decks, but not on or round the temples (the stairs, the goals, the doors), the monoliths or the stands.
 	 */
 	public static boolean buildable(int dx, int dy, int dz) {
+		return buildable(dx, dy, dz, false);
+	}
+
+	/** As buildable, with the ring stadium (ring) or the stands along the bridge. */
+	public static boolean buildable(int dx, int dy, int dz, boolean ring) {
+		if (ring && ringDist(dx + 0.5, dz + 0.5) > RING_WALL - 3) return false;
 		int adx = Math.abs(dx), adz = Math.abs(dz);
 		if (adx > AREA_X - 3 || adz > AREA_Z - 2 || dy < -14 || dy > BUILD_TOP) return false;
-		if (adx <= WALL_END + 2 && adz > WALL_Z - 2) return false;
+		if (!ring && adx <= WALL_END + 2 && adz > WALL_Z - 2) return false;
 		if (inGoalField(adx, dy, dz) || byDoor(adx, dy, dz)) return false;
 		for (Monolith m : MONOLITHS) {
 			if (Math.abs(adx - m.x()) <= MONO_REACH + 1 && Math.abs(dz - m.z()) <= MONO_REACH + 1) return false;
@@ -597,6 +603,93 @@ public final class BridgeLayout {
 		if (e >= 1) return 0;
 		double jag = (noise(adx, adz, 4, 811) - 0.5) * 7 + (hash(adx >> 1, 0, adz >> 1, 812) - 0.5) * 3;
 		return (int) Math.round(-(3 + 19 * Math.pow(1 - e, 0.65) + jag));
+	}
+
+	// ---------------------------------------------------------------- the ring stadium
+
+	/**
+	 * The other way to seat the crowd: a stadium in a ring round the whole map, like a planet's rings round
+	 * it. It isn't a circle: it runs straight along both sides of the bridge (RING_L either side of the
+	 * middle) and round in a half circle past each base's monoliths. A lower tier of ten rows rises from its
+	 * glowing inner edge, a concourse, then an upper tier of eight more; under it all a thick tapering band of
+	 * pale stone, banded like a planet's rings. A wall of force field runs round inside it.
+	 */
+	public static final int RING_L = 40, RING_IN = 46, RING_ROWS = 10, RING_CONCOURSE = 66, RING_UP_IN = 69, RING_UP_ROWS = 8, RING_BACK = 85,
+			RING_WALL = RING_IN - 2, RING_TOP = 26;
+
+	/** How far a column is from the ring's middle line (the straight along the bridge, or the ends' centres). */
+	public static double ringDist(double dx, double dz) {
+		double ax = Math.abs(dx);
+		return ax <= RING_L ? Math.abs(dz) : Math.hypot(ax - RING_L, dz);
+	}
+
+	/** The top of a row of the ring's seats (dy), and how far out its middle is: lower rows 0 to 9, upper 10 to 17. */
+	public static int ringRowTop(int row) {
+		return row < RING_ROWS ? -1 + row : 12 + (row - RING_ROWS);
+	}
+
+	public static double ringRowDist(int row) {
+		return row < RING_ROWS ? RING_IN + 2 * row + 1 : RING_UP_IN + 2 * (row - RING_ROWS) + 1;
+	}
+
+	public static int ringRows() {
+		return RING_ROWS + RING_UP_ROWS;
+	}
+
+	/** The underside of the ring at d out: down from its inner edge, deepest under the concourse, up to its back. */
+	private static int ringUnder(double d) {
+		return d < RING_CONCOURSE ? (int) Math.floor(-6 - (d - RING_IN) * 0.22) : (int) Math.floor(-10.4 + (d - RING_CONCOURSE) * 0.48);
+	}
+
+	/** Pale stone in bands round the ring, like a planet's rings, seen from under it. */
+	private static final Block[] RING_BANDS = {Blocks.CALCITE, Blocks.SMOOTH_STONE, Blocks.POLISHED_DIORITE, Blocks.WHITE_CONCRETE, Blocks.LIGHT_GRAY_CONCRETE,
+			Blocks.SMOOTH_STONE, Blocks.CALCITE, Blocks.POLISHED_ANDESITE};
+
+	/** The ring stadium's block at a relative position, or null. */
+	public static BlockState ringBlock(int dx, int dy, int dz) {
+		double d = ringDist(dx + 0.5, dz + 0.5);
+		if (d < RING_WALL - 0.5 || d >= RING_BACK + 2 || dy > RING_TOP + 1 || dy < -14) return null;
+		// The force field round inside it (you can't get to the crowd), fading out upwards.
+		if (d < RING_WALL + 0.5) return dy >= -6 && dy <= WALL_TOP ? field(ArenaBlocks.FIELD_WALL, dy - (WALL_TOP - 12)) : null;
+		if (d < RING_IN - 1) return null;
+		int under = ringUnder(d);
+		if (dy < under) return null;
+		int band = (int) Math.floor(d / 2.5);
+		BlockState fill = b(RING_BANDS[Math.floorMod(band, RING_BANDS.length)]);
+		// The inner edge: a lip of quartz over a ring of light all the way round (the stadium's glow).
+		if (d < RING_IN) {
+			if (dy == 0) return b(Blocks.SMOOTH_QUARTZ);
+			if (dy == -2 || dy == -3) return b(ArenaBlocks.LIGHT_WHITE);
+			if (dy > 0) return null;
+			return fill;
+		}
+		// The back wall: up to the top, an orange band and a line of light along it.
+		if (d >= RING_BACK) {
+			if (dy == RING_TOP) return b(Blocks.SEA_LANTERN);
+			if (dy == RING_TOP - 2) return b(Blocks.ORANGE_CONCRETE);
+			return dy < RING_TOP ? b(Blocks.LIGHT_GRAY_CONCRETE) : null;
+		}
+		// The concourse between the tiers: a walkway, lit along its edge.
+		if (d >= RING_CONCOURSE && d < RING_UP_IN) {
+			if (dy == 9) return d < RING_CONCOURSE + 1 ? b(Blocks.SEA_LANTERN) : b(Blocks.POLISHED_ANDESITE);
+			if (dy == 10 && d < RING_CONCOURSE + 1) return b(Blocks.POLISHED_DEEPSLATE);
+			return dy < 9 ? fill : null;
+		}
+		boolean upper = d >= RING_UP_IN;
+		int row = upper ? RING_ROWS + (int) ((d - RING_UP_IN) / 2) : (int) ((d - RING_IN) / 2);
+		int top = ringRowTop(row);
+		if (dy > top) return null;
+		if (dy == top) {
+			boolean front = (int) Math.floor(d - (upper ? RING_UP_IN : RING_IN)) % 2 == 0;
+			return Math.floorMod(dx + dz, 9) == 0 ? b(Blocks.SMOOTH_STONE) : front ? b(Blocks.POLISHED_ANDESITE) : b(Blocks.ANDESITE);
+		}
+		if (dy >= top - 2) return b(Blocks.STONE_BRICKS);
+		return fill;
+	}
+
+	/** Whether a spire would stand in (or too near) the ring stadium. */
+	public static boolean spireHitsRing(Spire sp) {
+		return ringDist(sp.x(), sp.z()) - sp.radius() * 1.4 - 3 < RING_BACK + 10;
 	}
 
 	/**

@@ -24,6 +24,11 @@ public final class BridgeHud {
 		score = s;
 	}
 
+	/** Your team on the bridge (0 blue, 1 red), or -1 if there's no score yet. */
+	public static int you() {
+		return score == null ? -1 : score.you();
+	}
+
 	public static void clear() {
 		score = null;
 	}
