@@ -114,6 +114,8 @@ public final class Matches {
 		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
 			ItemStack stack = player.getItemInHand(hand);
 			if (!isArena(level) || !placesSomething(stack) || freeToBuild(player)) return InteractionResult.PASS;
+			// Opening a chest (the restock chests under the bridge) with blocks in hand: let it open.
+			if (!player.isSecondaryUseActive() && level.getBlockState(hit.getBlockPos()).getBlock() instanceof net.minecraft.world.level.block.ChestBlock) return InteractionResult.PASS;
 			if (stack.getItem() instanceof BlockItem) {
 				BlockPos at = new BlockPlaceContext(player, hand, stack, hit).getClickedPos();
 				if (level.isClientSide()) return BridgeLayout.near(at) ? InteractionResult.PASS : InteractionResult.FAIL;

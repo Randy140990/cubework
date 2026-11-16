@@ -38,4 +38,17 @@ public interface BridgeWorld {
 
 	/** The block a team builds with. */
 	BlockState blockFor(int team);
+
+	/** How many blocks everyone gets each round; which round it is (so a bot knows when to count afresh). */
+	int blocksPerRound();
+
+	int round();
+
+	/** A team's restock chest (where it stands), and taking up to max blocks out of it (how many it got). */
+	BlockPos chest(int team);
+
+	int takeBlocks(int team, int max);
+
+	/** How many blocks are left in a team's restock chest. */
+	int chestBlocks(int team);
 }

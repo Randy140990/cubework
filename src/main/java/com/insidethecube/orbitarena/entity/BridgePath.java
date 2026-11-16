@@ -39,6 +39,8 @@ final class BridgePath {
 		DROP,
 		/** Place a block to walk on, over a gap, then walk out onto it. */
 		BRIDGE,
+		/** Place a block a step down, over a gap, then step down onto it (bridging down). */
+		DESCEND,
 		/** Place a block in front as a step, then climb onto it. */
 		STAIR,
 		/** Jump and place a block under itself (straight up). */
@@ -50,7 +52,7 @@ final class BridgePath {
 	record Step(BlockPos at, Act act) {}
 
 	/** A bot's habits: what each way of getting past something costs it (higher: less keen), and what it can do. */
-	record Habits(double place, double mine, double climb, boolean stairs, boolean pillar) {}
+	record Habits(double place, double mine, double climb, boolean stairs, boolean pillar, boolean build) {}
 
 	private static final byte UNKNOWN = -1, PASS = 0, SOFT = 1, HARD = 2, STEP = 3;
 	/** How much it leans towards where it's going over the cheapest way (a little: much quicker to think, nearly as good). */
@@ -186,10 +188,12 @@ final class BridgePath {
 							break;
 						}
 					}
-					if (w.buildable(mFloor)) out.add(new Object[] {m, Act.BRIDGE, h.place()});
+					if (h.build() && w.buildable(mFloor)) out.add(new Object[] {m, Act.BRIDGE, h.place()});
+					// Or a step down, built under where it'll land (to get down to somewhere below).
+					if (h.build() && open(mFloor) && w.buildable(m.below(2))) out.add(new Object[] {mFloor, Act.DESCEND, h.place() + 0.6});
 				}
 				// A step built in front, to climb onto (on firm ground, with room over it).
-				if (h.stairs() && headroom && solid(mFloor) && w.buildable(m) && open(m.above(2))) out.add(new Object[] {m.above(), Act.STAIR, h.place() + h.climb()});
+				if (h.build() && h.stairs() && headroom && solid(mFloor) && w.buildable(m) && open(m.above(2))) out.add(new Object[] {m.above(), Act.STAIR, h.place() + h.climb()});
 			} else {
 				// Up onto whatever's in front (a block, or a stair), with room to stand there and to jump.
 				if (kf != PASS && kh == PASS && open(m.above(2)) && headroom) out.add(new Object[] {mHead, Act.UP, kf == STEP ? 1.2 : 1.0 + h.climb()});
@@ -199,7 +203,7 @@ final class BridgePath {
 			}
 		}
 		// Straight up: jump and place a block underneath.
-		if (h.pillar() && headroom && w.buildable(p)) out.add(new Object[] {p.above(), Act.PILLAR, h.place() + h.climb() + 0.5});
+		if (h.build() && h.pillar() && headroom && w.buildable(p)) out.add(new Object[] {p.above(), Act.PILLAR, h.place() + h.climb() + 0.5});
 	}
 
 	/** Whether a step can still be made as planned (nothing new in the way it can't deal with). */
@@ -209,7 +213,7 @@ final class BridgePath {
 		return switch (s.act()) {
 			case WALK, DROP -> open(at) && open(at.above());
 			case UP -> open(at) && open(at.above()) && solid(at.below());
-			case BRIDGE -> open(at) && open(at.above()) && (solid(at.below()) || w.buildable(at.below()));
+			case BRIDGE, DESCEND -> open(at) && open(at.above()) && (solid(at.below()) || w.buildable(at.below()));
 			case STAIR, PILLAR -> open(at) && open(at.above()) && (solid(at.below()) || w.buildable(at.below()));
 			case MINE -> kind(at) != HARD && kind(at.above()) != HARD && kind(at) != STEP;
 		};

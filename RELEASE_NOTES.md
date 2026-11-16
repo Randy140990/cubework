@@ -1,5 +1,12 @@
 Orbit Arena by Inside the Cube (Minecraft 1.21.11, Fabric).
 
+0.4.2: blocks by the round, restock chests, bots that never stand still.
+- Blocks are the round's, not a life's: you get two stacks a round with bots at level 1 to 5, one stack at 6 to 10 (bots too). Falling off doesn't give you more; a new round does.
+- Under each half of the bridge, eight blocks down (well above where you'd fall to your death), a double chest with two stacks of blocks, filled again every round. Bridge down to it to restock (the other side's colour turns into yours as you take it).
+- Bots count their blocks too. Running low (from level 4), they bridge down a staircase to the nearer chest, take what they need and climb back up, unless someone's about to score. With none left they only walk, drop and dig.
+- Bots can now bridge down as well as across, up and over.
+- Bots never stand still: if one hasn't got anywhere in three seconds it thinks again with anything allowed (digging, building, climbing all cheap) until it's moving.
+
 0.4.1: bots that get there whatever's in the way.
 - The Bridge's bots plan their way as a player would. Where something's in the way they weigh breaking through it, bridging out round it over the void, building a step and climbing over it, or pillaring straight up (and dropping down the other side, as there's no fall damage), and do whichever suits them: some are diggers, some builders, some climbers, so a team doesn't all do the same. They think again the moment their way is blocked or they're knocked off it. Attackers plan straight into your goal once they're near it, up the stairs or up the temple's side; defenders get to wherever they need to be to stop you, through or round anything. From 3 they build steps up; from 5 they pillar.
 

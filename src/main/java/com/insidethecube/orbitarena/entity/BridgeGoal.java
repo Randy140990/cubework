@@ -72,6 +72,13 @@ public final class BridgeGoal extends Goal {
 	private int pathAt, planCool, pathStall;
 	private BlockPos pathAim;
 	private BridgePath.Habits habits;
+	/** Its blocks this round (as many as anyone gets), and which round it last counted them for. */
+	private int blocks, blocksRound = -1;
+	/** Off to its restock chest. */
+	private boolean restocking;
+	/** A watch on whether it's getting anywhere: where it was, how long it's been there, how long it'll try anything. */
+	private Vec3 watchAt = Vec3.ZERO;
+	private int watchTicks, desperate;
 
 	BridgeGoal(Fighter f) {
 		this.f = f;
@@ -631,8 +638,12 @@ public final class BridgeGoal extends Goal {
 			int kind = Math.floorMod(f.getUUID().hashCode(), 3);
 			// A digger breaks through; a builder bridges round; a climber builds a step and goes over.
 			double place = kind == 1 ? 1.8 : kind == 0 ? 3.2 : 2.2, mine = kind == 0 ? 1.6 : kind == 1 ? 9 : 6, climb = kind == 2 ? 0.4 : 1.6;
-			habits = new BridgePath.Habits(place + (10 - d) * 0.15, mine, climb, d >= 3, d >= 5);
+			habits = new BridgePath.Habits(place + (10 - d) * 0.15, mine, climb, d >= 3, d >= 5, true);
 		}
+		// Stuck a while: anything goes (dig, build, climb, all cheap) until it's moving again.
+		if (desperate > 0) return new BridgePath.Habits(1.2, 1.0, 0.5, d >= 2 && blocks > 0, d >= 2 && blocks > 0, blocks > 0);
+		// With no blocks left it can only walk, drop and dig.
+		if (blocks <= 0 && habits.build()) return new BridgePath.Habits(habits.place(), habits.mine(), habits.climb(), false, false, false);
 		return habits;
 	}
 
@@ -644,6 +655,11 @@ public final class BridgeGoal extends Goal {
 	private void travel(BridgeWorld w, Brain b, Vec3 way, Vec3 target, int d) {
 		ServerLevel level = w.level();
 		Vec3 p = f.position();
+		if (blocksRound != w.round()) {
+			blocksRound = w.round();
+			blocks = w.blocksPerRound();
+			restocking = false;
+		}
 		if (mining != null) {
 			hold(new ItemStack(Items.DIAMOND_PICKAXE));
 			f.getMoveControl().setWantedPosition(p.x, p.y, p.z, 0);
@@ -657,11 +673,42 @@ public final class BridgeGoal extends Goal {
 		}
 		int own = side(b.team), theirs = -own;
 		Vec3 goalAt = world(w, goal(theirs));
+		// Running low on blocks (from 4): down to its restock chest under its half of the bridge, if there's
+		// anything in it and nobody's about to score.
+		// (Whichever chest is nearer and has blocks in it: what colour they are makes no odds to a bot.)
+		int ct = w.chestBlocks(b.team) == 0 || w.chestBlocks(1 - b.team) > 0 && p.distanceToSqr(Vec3.atCenterOf(w.chest(1 - b.team))) < p.distanceToSqr(Vec3.atCenterOf(w.chest(b.team)))
+				? 1 - b.team : b.team;
+		BlockPos chest = w.chest(ct);
+		if (!restocking && blocks < 10 && d >= 4 && w.chestBlocks(ct) > 0 && (!b.defending || nearestThreatFar(w, b))) restocking = true;
+		if (restocking && (blocks >= w.blocksPerRound() / 2 || w.chestBlocks(ct) == 0 || b.defending && !nearestThreatFar(w, b))) restocking = false;
+		if (restocking && p.distanceToSqr(chest.getX() + 1.0, chest.getY() + 0.5, chest.getZ() + 0.5) < 9) {
+			// At the chest: open it, take what it needs.
+			f.getLookControl().setLookAt(chest.getX() + 1.0, chest.getY() + 0.5, chest.getZ() + 0.5);
+			f.swing(InteractionHand.MAIN_HAND);
+			level.playSound(null, chest, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.5F, 1.0F);
+			blocks += w.takeBlocks(ct, w.blocksPerRound() - blocks);
+			restocking = false;
+			path = null;
+			return;
+		}
 		// Near their goal, straight for it; otherwise to the route's next point (or where it's defending).
-		boolean forGoal = !b.defending && flat(p, goalAt) < 36;
-		Vec3 aim = forGoal ? new Vec3(goalAt.x, w.y() + TOP - 2, goalAt.z) : b.defending ? target : way;
+		boolean forGoal = !restocking && !b.defending && flat(p, goalAt) < 36;
+		Vec3 aim = restocking ? new Vec3(chest.getX() + 1.0, chest.getY() + 1, chest.getZ() + 0.5) : forGoal ? new Vec3(goalAt.x, w.y() + TOP - 2, goalAt.z)
+				: b.defending ? target : way;
 		BlockPos aimBlock = BlockPos.containing(aim);
-		BlockPos feet = BlockPos.containing(p.x, p.y + 0.2, p.z);
+		BlockPos feet = BlockPos.containing(p.x, p.y + 0.6, p.z);
+		// Not getting anywhere (three seconds in the same spot, with somewhere to be): think again, anything goes.
+		if (desperate > 0) desperate--;
+		if (f.tickCount % 20 == 0) {
+			if (p.distanceToSqr(watchAt) < 0.5 && p.distanceTo(aim) > 2.5) watchTicks += 20;
+			else watchTicks = 0;
+			watchAt = p;
+			if (watchTicks >= 60) {
+				watchTicks = 0;
+				desperate = 140;
+				path = null;
+			}
+		}
 		boolean lost = path != null && pathAt < path.size() && (flatTo(p, path.get(pathAt).at()) > 3.2 || Math.abs(p.y - path.get(pathAt).at().getY()) > 3);
 		boolean rethink = path == null || pathAt >= path.size() || --planCool <= 0 || lost || pathAim == null || pathAim.distSqr(aimBlock) > 6;
 		// (It thinks again with its feet on something: not halfway through a jump or a drop.)
@@ -671,6 +718,13 @@ public final class BridgeGoal extends Goal {
 			return;
 		}
 		follow(w, b, p, d);
+	}
+
+	/** Whether nobody on the other team is close to scoring (none on its own half, past the middle of the bridge). */
+	private boolean nearestThreatFar(BridgeWorld w, Brain b) {
+		int own = side(b.team);
+		for (LivingEntity e : w.enemiesOf(b.team)) if (own * rx(w, e.getX()) > 4) return false;
+		return true;
 	}
 
 	private double flatTo(Vec3 p, BlockPos at) {
@@ -685,6 +739,8 @@ public final class BridgeGoal extends Goal {
 		java.util.function.Predicate<BlockPos> done;
 		if (forGoal) {
 			done = q -> Math.max(Math.abs(q.getX() - cx - theirs * GOAL_X), Math.abs(q.getZ() - cz)) <= GOAL_HALF && q.getY() - y0 <= TOP;
+		} else if (restocking) {
+			done = q -> Math.abs(q.getX() + 0.5 - aim.x) < 2.2 && Math.abs(q.getZ() + 0.5 - aim.z) < 2.2 && Math.abs(q.getY() - aim.y) <= 2;
 		} else {
 			done = q -> Math.abs(q.getX() + 0.5 - aim.x) < 1.2 && Math.abs(q.getZ() + 0.5 - aim.z) < 1.2 && Math.abs(q.getY() - aim.y) <= 1.5;
 		}
@@ -738,9 +794,13 @@ public final class BridgeGoal extends Goal {
 					}
 				}
 			}
-			case BRIDGE -> {
+			case BRIDGE, DESCEND -> {
 				BlockPos floor = at.below();
 				if (!solid(level, floor)) {
+					if (blocks <= 0) {
+						path = null;
+						return;
+					}
 					// At the edge, crouched, placing the next block out (low levels now and then just step off).
 					f.setShiftKeyDown(true);
 					f.setSprinting(false);
@@ -762,6 +822,10 @@ public final class BridgeGoal extends Goal {
 			case STAIR -> {
 				BlockPos step = at.below();
 				if (!solid(level, step)) {
+					if (blocks <= 0) {
+						path = null;
+						return;
+					}
 					f.setSprinting(false);
 					f.getLookControl().setLookAt(step.getX() + 0.5, step.getY() + 0.5, step.getZ() + 0.5);
 					if (!level.getEntities(f, new AABB(step)).isEmpty()) {
@@ -777,6 +841,10 @@ public final class BridgeGoal extends Goal {
 			case PILLAR -> {
 				BlockPos under = at.below();
 				if (!solid(level, under)) {
+					if (blocks <= 0) {
+						path = null;
+						return;
+					}
 					f.setSprinting(false);
 					f.getMoveControl().setWantedPosition(under.getX() + 0.5, p.y, under.getZ() + 0.5, 0.5);
 					f.getLookControl().setLookAt(under.getX() + 0.5, under.getY(), under.getZ() + 0.5);
@@ -826,6 +894,8 @@ public final class BridgeGoal extends Goal {
 
 	/** Places one of its team's blocks (as fast as its difficulty allows). */
 	private void place(BridgeWorld w, Brain b, BlockPos pos) {
+		if (blocks <= 0) return;
+		blocks--;
 		BlockState state = w.blockFor(b.team);
 		hold(new ItemStack(state.getBlock().asItem()));
 		w.level().setBlock(pos, state, 3);

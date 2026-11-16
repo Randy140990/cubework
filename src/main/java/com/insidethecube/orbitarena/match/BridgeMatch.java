@@ -45,6 +45,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -56,13 +58,17 @@ import net.minecraft.world.phys.Vec3;
  * there's a time limit, the most goals when it runs out.
  * <p>
  * Your kit (as on the bridge servers): leather armour in your team's colour (or netherite), a sword, a bow
- * with one arrow that comes back a few seconds after you shoot it, a diamond pickaxe, two stacks of your
- * team's wool and eight golden apples, all given again whenever you come back. You can place blocks over
- * the void, on the bridge and on the decks, but not on or round the temples or the monoliths, and you can
- * only break blocks someone placed. Falling into space, or going down, sends you back to your room. No fall
+ * with one arrow that comes back a few seconds after you shoot it, a diamond pickaxe, your team's wool and
+ * eight golden apples, all given again whenever you come back. The blocks are a round's: two stacks with
+ * bots at 1 to 5, one at 6 to 10, kept as they are when you come back mid-round; a restock chest under each
+ * half of the bridge has two more stacks each round. You can place blocks over the void, on the bridge, the
+ * decks and the temples, but not in a goal's force field, a temple's doorway, or by the monoliths or the
+ * stands, and you can only break blocks someone placed. Falling into space, or going down, sends you back to your room. No fall
  * damage. Watching in spectator mode is fine: nothing counts while you spectate.
  */
 public final class BridgeMatch implements Game, BridgeWorld {
+	/** Which round it is (counting from the first). */
+	private int round;
 	private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
 
 	enum Phase {
@@ -208,6 +214,75 @@ public final class BridgeMatch implements Game, BridgeWorld {
 	public boolean buildable(BlockPos pos) {
 		int dx = pos.getX() - cx, dy = pos.getY() - Y, dz = pos.getZ() - cz;
 		return BridgeLayout.buildable(dx, dy, dz) && mapBlock(dx, dy, dz, settings.obstacles(), settings.bridgeWidth()) == null;
+	}
+
+	/** Blocks a round: two stacks with bots at 1 to 5, one stack at 6 to 10 (bots and players alike). */
+	@Override
+	public int blocksPerRound() {
+		return settings.difficulty() >= 6 ? 64 : 128;
+	}
+
+	@Override
+	public int round() {
+		return round;
+	}
+
+	@Override
+	public BlockPos chest(int team) {
+		return new BlockPos(cx + BridgeLayout.chestXs(team)[0], Y + CHEST_DOWN, cz);
+	}
+
+	/** Both halves of a team's restock chest (null where it isn't there). */
+	private Container[] chests(int team) {
+		ServerLevel arena = arena();
+		Container[] out = new Container[2];
+		if (arena == null) return out;
+		int[] xs = BridgeLayout.chestXs(team);
+		for (int i = 0; i < 2; i++) {
+			if (arena.getBlockEntity(new BlockPos(cx + xs[i], Y + CHEST_DOWN, cz)) instanceof Container c) out[i] = c;
+		}
+		return out;
+	}
+
+	@Override
+	public int chestBlocks(int team) {
+		int n = 0;
+		for (Container c : chests(team)) {
+			if (c == null) continue;
+			for (int i = 0; i < c.getContainerSize(); i++) if (c.getItem(i).getItem() instanceof BlockItem) n += c.getItem(i).getCount();
+		}
+		return n;
+	}
+
+	@Override
+	public int takeBlocks(int team, int max) {
+		int got = 0;
+		for (Container c : chests(team)) {
+			if (c == null) continue;
+			for (int i = 0; i < c.getContainerSize() && got < max; i++) {
+				ItemStack st = c.getItem(i);
+				if (!(st.getItem() instanceof BlockItem)) continue;
+				int n = Math.min(max - got, st.getCount());
+				st.shrink(n);
+				got += n;
+				c.setChanged();
+			}
+		}
+		return got;
+	}
+
+	/** Both restock chests filled for the round: two stacks each (of that side's colour; anyone's turns into theirs). */
+	private void fillChests() {
+		for (int team = 0; team < 2; team++) {
+			Item block = BridgeLayout.wool(team == BLUE).getBlock().asItem();
+			Container[] cs = chests(team);
+			for (Container c : cs) {
+				if (c == null) continue;
+				c.clearContent();
+				c.setItem(13, new ItemStack(block, 64));
+				c.setChanged();
+			}
+		}
 	}
 
 	@Override
@@ -436,8 +511,10 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		}
 	}
 
-	/** Everyone back into their cage, healed, kit given again. */
+	/** Everyone back into their cage, healed, kit given again (a new round: blocks counted afresh, chests filled). */
 	private void toCages(ServerLevel arena) {
+		round++;
+		fillChests();
 		int[] count = new int[2];
 		for (Member m : members) {
 			int i = count[m.team]++;
@@ -445,7 +522,7 @@ public final class BridgeMatch implements Game, BridgeWorld {
 			Vec3 at = cageSpot(m.team, i, settings.count());
 			if (m.e instanceof ServerPlayer p) {
 				teleport(p, arena, at, yaw(m.team));
-				refresh(p);
+				refresh(p, blocksPerRound());
 			} else {
 				m.e.snapTo(at.x, at.y, at.z, yaw(m.team), 0);
 				m.e.setDeltaMovement(Vec3.ZERO);
@@ -530,6 +607,15 @@ public final class BridgeMatch implements Game, BridgeWorld {
 				if (p.gameMode.getGameModeForPlayer() == GameType.CREATIVE && p.getAbilities().invulnerable) p.getAbilities().invulnerable = false;
 			}
 		}
+		// Blocks of the other team's colour (from their chest) turn into yours.
+		for (Member m : members) {
+			if (!(m.e instanceof ServerPlayer pl)) continue;
+			Item mine = BridgeLayout.wool(m.team == BLUE).getBlock().asItem(), theirs = BridgeLayout.wool(m.team != BLUE).getBlock().asItem();
+			for (int i = 0; i < pl.getInventory().getContainerSize(); i++) {
+				ItemStack st = pl.getInventory().getItem(i);
+				if (st.is(theirs)) pl.getInventory().setItem(i, new ItemStack(mine, st.getCount()));
+			}
+		}
 		// Nothing to pick up: you only ever have your kit (blocks you break drop nothing you can take; arrows
 		// can't be picked up, yours comes back by itself).
 		AABB area = new AABB(cx - AREA_X - 30, Y - 40, cz - AREA_Z - 30, cx + AREA_X + 30, Y + 50, cz + AREA_Z + 30);
@@ -581,8 +667,10 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		m.respawn = -1;
 		Vec3 at = spawn(m.team);
 		if (m.e instanceof ServerPlayer p) {
+			// Back mid-round: the same blocks it had (blocks are a round's, not a life's).
+			int blocks = blocksHeld(p);
 			teleport(p, arena, at, yaw(m.team));
-			refresh(p);
+			refresh(p, blocks);
 		} else {
 			m.e.snapTo(at.x, at.y, at.z, yaw(m.team), 0);
 			m.e.setDeltaMovement(Vec3.ZERO);
@@ -674,8 +762,22 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		e.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
 	}
 
-	/** Your kit, given again whenever you come back. */
+	/** Your kit, given again whenever you come back (with a round's blocks). */
 	private void kit(ServerPlayer p, int team) {
+		kit(p, team, blocksPerRound());
+	}
+
+	/** How many blocks a player has on them. */
+	private static int blocksHeld(ServerPlayer p) {
+		int n = 0;
+		for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+			ItemStack st = p.getInventory().getItem(i);
+			if (st.getItem() instanceof BlockItem) n += st.getCount();
+		}
+		return n;
+	}
+
+	private void kit(ServerPlayer p, int team, int blocks) {
 		p.getInventory().clearContent();
 		if (!p.isSpectator()) p.setGameMode(GameType.SURVIVAL);
 		armour(p, team);
@@ -687,21 +789,21 @@ public final class BridgeMatch implements Game, BridgeWorld {
 		pick.enchant(eff, 2);
 		p.getInventory().setItem(2, pick);
 		Item block = BridgeLayout.wool(team == BLUE).getBlock().asItem();
-		p.getInventory().setItem(3, new ItemStack(block, 64));
-		p.getInventory().setItem(4, new ItemStack(block, 64));
+		if (blocks > 0) p.getInventory().setItem(3, new ItemStack(block, Math.min(64, blocks)));
+		if (blocks > 64) p.getInventory().setItem(4, new ItemStack(block, Math.min(64, blocks - 64)));
 		p.getInventory().setItem(5, new ItemStack(Items.GOLDEN_APPLE, 8));
 		p.getInventory().setItem(8, new ItemStack(Items.ARROW));
 		p.getInventory().setSelectedSlot(0);
 	}
 
-	private void refresh(ServerPlayer p) {
+	private void refresh(ServerPlayer p, int blocks) {
 		p.setHealth(p.getMaxHealth());
 		p.removeAllEffects();
 		p.getFoodData().setFoodLevel(20);
 		p.getFoodData().setSaturation(10);
 		p.setRemainingFireTicks(0);
 		p.fallDistance = 0;
-		kit(p, me);
+		kit(p, me, blocks);
 	}
 
 	private void teleport(ServerPlayer p, ServerLevel arena, Vec3 at, float yaw) {

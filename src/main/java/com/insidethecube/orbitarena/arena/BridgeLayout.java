@@ -10,6 +10,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -42,6 +44,11 @@ public final class BridgeLayout {
 
 	/** The bridge runs between the bases, |dx| up to BRIDGE_END, three blocks deep. */
 	public static final int BRIDGE_END = 20;
+	/**
+	 * Under each half of the bridge, CHEST_DOWN below it, a double chest with blocks in it, filled again each
+	 * round (|dx| CHEST_X and one further out): to restock, bridge down to it.
+	 */
+	public static final int CHEST_X = 9, CHEST_DOWN = -8;
 	/** Each base's deck: a landing |dz| up to LANDING_HALF from BASE_FRONT, then the main deck to BASE_BACK. */
 	public static final int BASE_FRONT = 21, LANDING_HALF = 6, DECK_FROM = 25, BASE_BACK = 58, BASE_HALF = 14;
 	/**
@@ -272,6 +279,11 @@ public final class BridgeLayout {
 		int adx = Math.abs(dx), s = dx < 0 ? -1 : 1;
 		if (adx <= BRIDGE_END) {
 			if (dy <= 0 && dy >= -2 && dz >= bridgeLo(width) && dz <= bridgeHi(width)) return dx == 0 ? b(Blocks.LIGHT_GRAY_CONCRETE) : wool(s < 0);
+			if (dy == CHEST_DOWN && dz == 0 && (adx == CHEST_X || adx == CHEST_X + 1)) {
+				// Facing south: its west half is the right-hand one.
+				boolean west = dx == -(CHEST_X + 1) || dx == CHEST_X;
+				return Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH).setValue(ChestBlock.TYPE, west ? ChestType.RIGHT : ChestType.LEFT);
+			}
 			return obstacles ? obstacle(adx, dy, dz, width) : null;
 		}
 		boolean blue = s < 0;
@@ -542,6 +554,12 @@ public final class BridgeLayout {
 		return adx >= TEMPLE_FRONT - 2 && adx <= ROOM_TO && Math.abs(dz) <= DOOR_HALF + 1 && dy >= 1 && dy <= DOOR_TOP + 1;
 	}
 
+
+	/** A team's restock chest's two halves (relative x of each; dz 0, dy CHEST_DOWN): under its half of the bridge. */
+	public static int[] chestXs(int team) {
+		int s = side(team);
+		return new int[] {s * CHEST_X, s * (CHEST_X + 1)};
+	}
 
 	/** The cage: glass in the team's colour across the temple's door. */
 	public static BlockState cageBlock(int dx, int dy, int dz) {
