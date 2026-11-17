@@ -33,6 +33,8 @@ public class DialogueScreen extends GameScreen {
 		if (tr != null) box.speaker = tr.title();
 		String cry = extra.getStringOr("cry", "");
 		if (!cry.isEmpty()) Sounds.cry(cry, 1F);
+		// The camera closes in on the two of you, and the black bars come in, as in a cutscene.
+		Adventure.focus(npc);
 	}
 
 	private boolean asks() {
@@ -83,6 +85,7 @@ public class DialogueScreen extends GameScreen {
 		t.putBoolean("yes", yes);
 		if (trainer != null) t.putString("trainer", trainer);
 		ClientPlayNetworking.send(new Net.Act("dialogue_done", t));
+		Adventure.focus(-1);
 		if (minecraft != null && minecraft.screen == this) minecraft.setScreen(null);
 	}
 
@@ -93,6 +96,7 @@ public class DialogueScreen extends GameScreen {
 
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
+		if (npc >= 0) Ui.cinema(g, width, height, Math.min(1, (ticks + partial) / 6F));
 		int h = boxHeight(), m = 6 * s;
 		box.render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, yesNo == null);
 		if (yesNo != null) {

@@ -23,6 +23,7 @@ public class RetromonClient implements ClientModInitializer {
 		EntityRendererRegistry.register(Retromon.WORLD_MON, WorldMonRenderer::new);
 		Adventure.register();
 		Hud.register();
+		Colours.register();
 		ClientPlayNetworking.registerGlobalReceiver(Net.Push.TYPE, (payload, ctx) -> ClientState.receive(payload.kind(), payload.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 			Sounds.tick();

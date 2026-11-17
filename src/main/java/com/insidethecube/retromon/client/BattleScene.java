@@ -1,46 +1,62 @@
 package com.insidethecube.retromon.client;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.insidethecube.retromon.Retromon;
+import com.insidethecube.retromon.engine.Move;
+import com.insidethecube.retromon.engine.Type;
 import com.insidethecube.retromon.game.MonDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Mth;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * A battle on the spot: your Pokémon and the other one stand on the ground where you are, yours near and to
- * the left, theirs further off and to the right (as the games lay it out), seen from just behind you. The way
- * it faces is the most open way round you; tall grass, flowers and the like are flattened while you battle
- * (only on your screen) and come back after. Also the Poké Ball's throw, and the evolution showcase.
+ * The battle's stage: a set piece built for the fight, as the games had their battle backgrounds. It's put up
+ * in the sky over where you are (on your screen only) and taken down after: a route's grass field ringed with
+ * trees, a forest clearing, a cave's rock bowl, the water's edge, a gym floor or a town square, by where you
+ * are. It's always bright day there. Your Pokémon stands near and to the left, theirs further off to the
+ * right, seen from behind yours. Also the Poké Balls (thrown, shaking, sending out), the moves' effects, the
+ * screen shaking on a hit, and the evolution and Pokédex showcase.
  */
 public final class BattleScene {
 	private BattleScene() {}
 
 	private static boolean active, revealed;
-	private static Vec3 cam = Vec3.ZERO;
+	private static Vec3 cam = Vec3.ZERO, camTarget = Vec3.ZERO;
 	private static float camYaw, camPitch;
-	private static MonDisplay mine, theirs, ball;
+	private static MonDisplay mine, theirs, ball, sendBall;
+	private static int sendSide = -1;
 	private static int hiddenNpc = -1;
-	private static Vec3 origin = Vec3.ZERO, fwd = new Vec3(0, 0, 1), right = new Vec3(-1, 0, 0), enemyAt = Vec3.ZERO, mineAt = Vec3.ZERO;
+	private static Vec3 centre = Vec3.ZERO, enemyAt = Vec3.ZERO, mineAt = Vec3.ZERO;
 	private static int nextId = -77000;
 	private static ClientLevel level;
-	/** Plants flattened for the battle, to put back after. */
-	private static final Map<BlockPos, BlockState> CLEARED = new LinkedHashMap<>();
+	private static String kind = "route";
+	private static int shake;
+	private static final Random RNG = new Random();
+	/** What was there before the stage went up, to put back after. */
+	private static final Map<BlockPos, BlockState> BEFORE = new LinkedHashMap<>();
 
 	/** Whether the battle camera is on (from the middle of the wipe into the battle to the end). */
 	public static boolean active() {
 		return active && revealed;
+	}
+
+	/** Whether a stage is up (it's day there whatever the time). */
+	public static boolean staged() {
+		return active;
 	}
 
 	public static void reveal() {
@@ -48,7 +64,7 @@ public final class BattleScene {
 	}
 
 	public static float fov() {
-		return 55F;
+		return 52F;
 	}
 
 	public static boolean hides(Entity e) {
@@ -60,110 +76,393 @@ public final class BattleScene {
 		return side == 0 ? mine : theirs;
 	}
 
-	/** Sets out the field: npc is the trainer you're battling (or -1), enemies the Pokémon you'll face. */
-	public static void start(int npc, List<String> enemies) {
+	public static Vec3 spot(int side) {
+		return side == 0 ? mineAt : enemyAt;
+	}
+
+	/** Sets out the stage: npc is the trainer you're battling (or -1), enemies the Pokémon you'll face, arena the kind of place. */
+	public static void start(int npc, List<String> enemies, String arena) {
 		end();
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null || mc.level == null) return;
 		level = mc.level;
 		hiddenNpc = npc;
-		origin = mc.player.position();
-		float prefer = mc.player.getYRot();
-		Entity trainer = npc >= 0 ? level.getEntity(npc) : null;
-		if (trainer != null) {
-			Vec3 d = trainer.position().subtract(origin);
-			prefer = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
-		}
-		// Room for the tallest of them (Onix needs the field set further back).
+		kind = arena == null ? "route" : arena;
 		float h = 1;
 		for (String sp : enemies) {
 			BedrockModel.Def def = BedrockModel.def(sp);
 			if (def != null) h = Math.max(h, def.height);
 		}
-		double far = 7.0 + Math.max(0, h - 1.5) * 1.4;
-		float yaw = openest(prefer, far);
-		double r = Math.toRadians(yaw);
-		fwd = new Vec3(-Math.sin(r), 0, Math.cos(r));
-		right = new Vec3(-Math.cos(r), 0, -Math.sin(r));
-		mineAt = at(2.6, -1.0);
-		enemyAt = at(far, 1.5);
-		clearPlants(far);
+		build(mc.player.blockPosition());
+		double far = 6.0 + Math.max(0, h - 1.5) * 1.3;
+		mineAt = centre.add(-1.3, 0, 2.6);
+		enemyAt = centre.add(1.4, 0, 2.6 - far);
+		if (kind.equals("water")) enemyAt = new Vec3(enemyAt.x, centre.y - 0.1, enemyAt.z);
 		mine = spawn(mineAt, face(mineAt, enemyAt));
 		theirs = spawn(enemyAt, face(enemyAt, mineAt));
-		// Just behind and above where you stand (you step out of the picture), looking between the two.
-		cam = origin.subtract(fwd.scale(1.2)).add(right.scale(-0.4)).add(0, 1.9 + Math.max(0, h - 2) * 0.35, 0);
-		Vec3 look = mineAt.lerp(enemyAt, 0.58).add(0, 0.45 + h * 0.2, 0);
-		Vec3 d = look.subtract(cam);
-		camYaw = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
-		camPitch = (float) Math.toDegrees(Math.atan2(-d.y, Math.sqrt(d.x * d.x + d.z * d.z)));
+		// Behind your Pokémon and a little above, looking across to theirs (the newer games' view).
+		cam = centre.add(0.3, 2.3 + Math.max(0, h - 2) * 0.35, 8.2 + Math.max(0, h - 2) * 0.8);
+		aim(mineAt.lerp(enemyAt, 0.6).add(0, 0.55 + h * 0.18, 0));
 		active = true;
 		revealed = false;
 	}
 
-	/** One Pokémon in front of you (the evolution scene). */
+	/** One Pokémon in front of you on a stage (evolving): builds a stage if there isn't one. */
 	public static void showcase(String species) {
-		end();
-		Minecraft mc = Minecraft.getInstance();
-		if (mc.player == null || mc.level == null) return;
-		level = mc.level;
-		origin = mc.player.position();
-		float yaw = openest(mc.player.getYRot(), 4);
-		double r = Math.toRadians(yaw);
-		fwd = new Vec3(-Math.sin(r), 0, Math.cos(r));
-		right = new Vec3(-Math.cos(r), 0, -Math.sin(r));
-		enemyAt = at(3.2, 0);
-		clearPlants(4);
-		theirs = spawn(enemyAt, face(enemyAt, origin));
+		if (!active) {
+			Minecraft mc = Minecraft.getInstance();
+			if (mc.player == null || mc.level == null) return;
+			end();
+			level = mc.level;
+			kind = "route";
+			build(mc.player.blockPosition());
+			active = true;
+		}
+		spotlight(species);
+		revealed = true;
+	}
+
+	/** The Pokémon caught (or evolving) stands in the middle, close to you, turning slowly. */
+	public static void spotlight(String species) {
+		if (level == null) return;
+		for (MonDisplay d : new MonDisplay[] {mine, ball, sendBall}) if (d != null) level.removeEntity(d.getId(), Entity.RemovalReason.DISCARDED);
+		mine = ball = sendBall = null;
+		Vec3 at = centre.add(0, 0, -0.5);
+		if (theirs == null) theirs = spawn(at, 0);
+		theirs.snapTo(at.x, at.y, at.z, 0, 0);
+		theirs.facing = 0;
 		theirs.species = species;
 		theirs.size = theirs.sizeOld = 0;
 		theirs.sizeTarget = 1;
+		enemyAt = at;
 		BedrockModel.Def def = BedrockModel.def(species);
 		float h = def == null ? 1 : def.height;
-		cam = origin.subtract(fwd.scale(0.6)).add(0, 1.2 + h * 0.3, 0);
-		Vec3 d = enemyAt.add(0, h * 0.45, 0).subtract(cam);
-		camYaw = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
-		camPitch = (float) Math.toDegrees(Math.atan2(-d.y, Math.sqrt(d.x * d.x + d.z * d.z)));
-		active = revealed = true;
+		cam = at.add(0, 0.9 + h * 0.45, 2.6 + h * 1.1);
+		aim(at.add(0, h * 0.5, 0));
 	}
 
-	// ---------- the Poké Ball ----------
+	private static void aim(Vec3 look) {
+		camTarget = look;
+		Vec3 d = look.subtract(cam);
+		camYaw = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
+		camPitch = (float) Math.toDegrees(Math.atan2(-d.y, Math.sqrt(d.x * d.x + d.z * d.z)));
+	}
 
-	/** Throws a ball at their Pokémon (texture: which ball). */
+	// ---------- the Poké Balls ----------
+
+	/** Throws a ball at their Pokémon (item: which ball). */
 	public static void throwBall(String item) {
 		if (!active || level == null) return;
 		if (ball != null) level.removeEntity(ball.getId(), Entity.RemovalReason.DISCARDED);
-		Vec3 from = cam.add(fwd.scale(1.0)).add(0, -0.6, 0);
-		ball = spawn(from, 0);
-		ball.species = "poke_ball";
-		ball.texture = Retromon.ID + ":textures/pokemon/ball_" + (item == null || item.isEmpty() ? "poke_ball" : item) + ".png";
-		ball.size = ball.sizeOld = ball.sizeTarget = 1;
+		ball = ballAt(cam.add(-0.4, -0.7, -0.8), item);
 		BedrockModel.Def def = BedrockModel.def(theirs == null ? "pidgey" : theirs.species);
 		double top = def == null ? 0.8 : Math.min(2.5, def.height * 0.6);
 		ball.fly(enemyAt.x, enemyAt.y + top, enemyAt.z, 1.4, 14);
+		Sounds.ball();
+	}
+
+	private static MonDisplay ballAt(Vec3 p, String item) {
+		MonDisplay b = spawn(p, 0);
+		b.species = "poke_ball";
+		b.texture = Retromon.ID + ":textures/pokemon/ball_" + (item == null || item.isEmpty() ? "poke_ball" : item) + ".png";
+		b.size = b.sizeOld = b.sizeTarget = 1;
+		return b;
 	}
 
 	/** The ball drops to the ground in front of where their Pokémon was. */
 	public static void dropBall() {
 		if (ball != null) ball.fly(enemyAt.x, enemyAt.y, enemyAt.z, 0.25, 8);
+		burst(enemyAt.add(0, 0.6, 0), ParticleTypes.POOF, 10, 0.25);
 	}
 
 	public static void shakeBall() {
 		if (ball != null) ball.wobble = 12;
 	}
 
-	/** The ball bursts open (it broke free) or stays shut (caught: it stays until the end). */
+	/** The ball bursts open (it broke free). */
 	public static void burstBall() {
 		if (ball != null && level != null) {
+			burst(ball.position().add(0, 0.3, 0), ParticleTypes.POOF, 12, 0.3);
 			level.removeEntity(ball.getId(), Entity.RemovalReason.DISCARDED);
 			ball = null;
 		}
 	}
 
-	// ---------- setting out the field ----------
+	/** Caught: little stars over the shut ball. */
+	public static void caughtStars() {
+		if (ball != null) burst(ball.position().add(0, 0.5, 0), ParticleTypes.HAPPY_VILLAGER, 14, 0.4);
+	}
 
-	private static Vec3 at(double ahead, double side) {
-		Vec3 p = origin.add(fwd.scale(ahead)).add(right.scale(side));
-		return new Vec3(p.x, ground(p.x, origin.y, p.z), p.z);
+	/** A Pokémon sent out: a ball arcs to its spot and pops (the Pokémon appears as it does). */
+	public static void sendOut(int side) {
+		if (!active || level == null) return;
+		if (sendBall != null) level.removeEntity(sendBall.getId(), Entity.RemovalReason.DISCARDED);
+		Vec3 to = spot(side);
+		Vec3 from = side == 0 ? cam.add(0.6, -0.8, -0.6) : to.add(0.8, 1.6, -3.5);
+		sendBall = ballAt(from, "poke_ball");
+		sendBall.fly(to.x, to.y + 0.2, to.z, 1.1, 9);
+		sendSide = side;
+		Sounds.ball();
+	}
+
+	// ---------- the moves' effects ----------
+
+	private record Fx(Vec3 from, Vec3 to, ParticleOptions particle, int life, boolean beam, int[] age) {}
+
+	private static final List<Fx> FX = new ArrayList<>();
+
+	/** A move's effect, by its type: a stream from the attacker for special moves, a burst on the target for physical ones. */
+	public static void move(int side, String moveId) {
+		if (!active() || moveId == null) return;
+		Move m = Move.find(moveId);
+		if (m == null) return;
+		Vec3 me = spot(side).add(0, 0.6, 0), them = spot(1 - side).add(0, 0.6, 0);
+		ParticleOptions p = particle(m.type());
+		if (m.power() <= 0) {
+			// Status moves: on itself (raising its stats) or on the other one.
+			boolean self = m.effect().contains("UP") || m.effect().contains("HEAL") || m.effect().contains("REFLECT") || m.effect().contains("LIGHT_SCREEN")
+					|| m.effect().contains("SUBSTITUTE") || m.effect().contains("FOCUS") || m.effect().contains("REST") || m.effect().contains("PROTECT");
+			FX.add(new Fx(self ? me : them, self ? me : them, self ? ParticleTypes.HAPPY_VILLAGER : p, 14, false, new int[1]));
+			Sounds.sfx("shrink", self ? 1.2F : 0.9F, 0.6F);
+			return;
+		}
+		boolean special = switch (m.type()) {
+			case FIRE, WATER, GRASS, ELECTRIC, PSYCHIC, ICE, DRAGON, DARK -> true;
+			default -> false;
+		};
+		if (special) FX.add(new Fx(me, them, p, 12, true, new int[1]));
+		else FX.add(new Fx(them, them, p, 8, false, new int[1]));
+		Sounds.sfx(sound(m), 1F, 0.7F);
+	}
+
+	private static String sound(Move m) {
+		return switch (m.type()) {
+			case FIRE -> "ember";
+			case WATER -> "water";
+			case GRASS -> "vine";
+			case ELECTRIC -> "thunder";
+			case PSYCHIC -> "psybeam";
+			case ICE -> "ice";
+			case FLYING -> "gust";
+			case POISON, BUG -> "peck";
+			case FIGHTING, ROCK, GROUND, STEEL -> "pound";
+			default -> "tackle";
+		};
+	}
+
+	private static ParticleOptions particle(Type t) {
+		return switch (t) {
+			case FIRE -> ParticleTypes.FLAME;
+			case WATER -> ParticleTypes.SPLASH;
+			case GRASS -> ParticleTypes.CHERRY_LEAVES;
+			case ELECTRIC -> ParticleTypes.ELECTRIC_SPARK;
+			case PSYCHIC -> ParticleTypes.WITCH;
+			case ICE -> ParticleTypes.SNOWFLAKE;
+			case DRAGON -> ParticleTypes.REVERSE_PORTAL;
+			case DARK -> ParticleTypes.SQUID_INK;
+			case GHOST -> ParticleTypes.SOUL;
+			case POISON -> ParticleTypes.WITCH;
+			case FLYING -> ParticleTypes.SMALL_GUST;
+			case FIGHTING -> ParticleTypes.ENCHANTED_HIT;
+			case GROUND -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState());
+			case ROCK -> new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
+			case BUG -> ParticleTypes.SPORE_BLOSSOM_AIR;
+			case STEEL -> ParticleTypes.WAX_OFF;
+			default -> ParticleTypes.CRIT;
+		};
+	}
+
+	/** A hit: the screen shakes (harder when it's super effective). */
+	public static void hit(int side, int effect) {
+		shake = effect > 0 ? 12 : 7;
+		burst(spot(side).add(0, 0.7, 0), ParticleTypes.CRIT, effect > 0 ? 18 : 8, 0.35);
+	}
+
+	/** Fainting: it sinks as it goes. */
+	public static void faint(int side) {
+		MonDisplay d = display(side);
+		if (d == null) return;
+		Vec3 p = spot(side);
+		d.fly(p.x, p.y - 0.7, p.z, 0, 16);
+		d.sizeTarget = 0;
+		Sounds.faint();
+	}
+
+	private static void burst(Vec3 at, ParticleOptions p, int n, double spread) {
+		if (level == null) return;
+		for (int i = 0; i < n; i++) {
+			level.addParticle(p, at.x + (RNG.nextDouble() - 0.5) * spread * 2, at.y + (RNG.nextDouble() - 0.5) * spread * 2,
+					at.z + (RNG.nextDouble() - 0.5) * spread * 2, (RNG.nextDouble() - 0.5) * 0.1, RNG.nextDouble() * 0.08, (RNG.nextDouble() - 0.5) * 0.1);
+		}
+	}
+
+	// ---------- building the stage ----------
+
+	/** Where the stage goes: over you, clear of the highest ground around, and below the top of the world. */
+	private static void build(BlockPos you) {
+		BEFORE.clear();
+		int top = you.getY();
+		for (int dx = -16; dx <= 16; dx += 4) {
+			for (int dz = -16; dz <= 16; dz += 4) top = Math.max(top, level.getHeight(Heightmap.Types.WORLD_SURFACE, you.getX() + dx, you.getZ() + dz));
+		}
+		int y = Math.min(level.getMaxY() - 20, top + 26);
+		int cx = you.getX(), cz = you.getZ();
+		centre = new Vec3(cx + 0.5, y + 1, cz + 0.5);
+		RNG.setSeed(cx * 31L + cz);
+		int r = 14;
+		for (int dx = -r - 3; dx <= r + 3; dx++) {
+			for (int dz = -r - 3; dz <= r + 3; dz++) {
+				double d = Math.sqrt(dx * dx + dz * dz);
+				if (d > r + 0.5) continue;
+				floor(cx + dx, y, cz + dz, dx, dz, d);
+			}
+		}
+		switch (kind) {
+			case "forest" -> {
+				ring(cx, y, cz, 10.5, 15, 9, true);
+				ring(cx, y, cz, 13.5, 18, 11, true);
+				plants(cx, y, cz, 6, 12, 0.35, Blocks.FERN.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(), Blocks.BROWN_MUSHROOM.defaultBlockState());
+			}
+			case "cave" -> rocks(cx, y, cz);
+			case "gym" -> gym(cx, y, cz);
+			case "water" -> {
+				ring(cx, y, cz, 12.5, 9, 7, false);
+				plants(cx, y, cz, 4, 9, 0.2, Blocks.SHORT_GRASS.defaultBlockState(), Blocks.SUGAR_CANE.defaultBlockState(), Blocks.LILY_PAD.defaultBlockState());
+			}
+			case "town" -> {
+				ring(cx, y, cz, 12.5, 8, 7, false);
+				plants(cx, y, cz, 7, 11, 0.25, Blocks.POPPY.defaultBlockState(), Blocks.DANDELION.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState());
+				for (int i = 0; i < 6; i++) {
+					double a = Math.toRadians(i * 60 + 30);
+					int lx = cx + (int) Math.round(Math.sin(a) * 9.5), lz = cz + (int) Math.round(Math.cos(a) * 9.5);
+					if (lz - cz > 5) continue;
+					set(lx, y + 1, lz, Blocks.OAK_FENCE.defaultBlockState());
+					set(lx, y + 2, lz, Blocks.OAK_FENCE.defaultBlockState());
+					set(lx, y + 3, lz, Blocks.LANTERN.defaultBlockState());
+				}
+			}
+			default -> {
+				ring(cx, y, cz, 11.5, 12, 8, false);
+				ring(cx, y, cz, 14.5, 14, 10, false);
+				plants(cx, y, cz, 6.5, 11, 0.45, Blocks.TALL_GRASS.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(), Blocks.DANDELION.defaultBlockState(),
+						Blocks.POPPY.defaultBlockState(), Blocks.AZURE_BLUET.defaultBlockState());
+			}
+		}
+	}
+
+	private static void floor(int x, int y, int z, int dx, int dz, double d) {
+		BlockState top;
+		switch (kind) {
+			case "cave" -> top = RNG.nextInt(5) == 0 ? Blocks.GRAVEL.defaultBlockState() : RNG.nextInt(4) == 0 ? Blocks.ANDESITE.defaultBlockState() : Blocks.STONE.defaultBlockState();
+			case "gym" -> {
+				boolean line = Math.abs(d - 7) < 0.5 || Math.abs(dz) == 0 && d < 7;
+				top = line ? Blocks.WHITE_CONCRETE.defaultBlockState() : d < 7 ? (dz > 0 ? Blocks.LIGHT_BLUE_TERRACOTTA : Blocks.RED_TERRACOTTA).defaultBlockState()
+						: Blocks.POLISHED_ANDESITE.defaultBlockState();
+			}
+			case "water" -> top = dz < -1 ? Blocks.WATER.defaultBlockState() : dz < 1 ? Blocks.SAND.defaultBlockState() : Blocks.GRASS_BLOCK.defaultBlockState();
+			case "forest" -> top = RNG.nextInt(6) == 0 ? Blocks.PODZOL.defaultBlockState() : RNG.nextInt(8) == 0 ? Blocks.MOSS_BLOCK.defaultBlockState()
+					: Blocks.GRASS_BLOCK.defaultBlockState();
+			case "town" -> top = Math.abs(dx) <= 1 || Math.abs(dz) <= 1 ? Blocks.DIRT_PATH.defaultBlockState() : Blocks.GRASS_BLOCK.defaultBlockState();
+			default -> top = Blocks.GRASS_BLOCK.defaultBlockState();
+		}
+		set(x, y, z, top);
+		set(x, y - 1, z, top.is(Blocks.WATER) ? Blocks.SAND.defaultBlockState() : Blocks.DIRT.defaultBlockState());
+		set(x, y - 2, z, Blocks.STONE.defaultBlockState());
+	}
+
+	/** A ring of trees at a radius (n of them, height h), leaving the space behind the camera open. */
+	private static void ring(int cx, int y, int cz, double radius, int n, int h, boolean mixed) {
+		for (int i = 0; i < n; i++) {
+			double a = Math.toRadians(i * 360.0 / n + RNG.nextInt(10));
+			int tx = cx + (int) Math.round(Math.sin(a) * radius), tz = cz + (int) Math.round(Math.cos(a) * radius);
+			if (tz - cz > 6 && Math.abs(tx - cx) < 7) continue;
+			int kindOf = mixed ? RNG.nextInt(3) : 0;
+			BlockState log = kindOf == 1 ? Blocks.SPRUCE_LOG.defaultBlockState() : kindOf == 2 ? Blocks.BIRCH_LOG.defaultBlockState() : Blocks.OAK_LOG.defaultBlockState();
+			BlockState leaves = (kindOf == 1 ? Blocks.SPRUCE_LEAVES : kindOf == 2 ? Blocks.BIRCH_LEAVES : Blocks.OAK_LEAVES).defaultBlockState()
+					.setValue(LeavesBlock.PERSISTENT, true);
+			tree(tx, y + 1, tz, h - 2 + RNG.nextInt(4), log, leaves);
+		}
+	}
+
+	private static void tree(int x, int y, int z, int h, BlockState log, BlockState leaves) {
+		for (int i = 0; i < h; i++) set(x, y + i, z, log);
+		int top = y + h;
+		for (int dx = -3; dx <= 3; dx++) {
+			for (int dy = -3; dy <= 2; dy++) {
+				for (int dz = -3; dz <= 3; dz++) {
+					double d = Math.sqrt(dx * dx + dy * dy * 1.4 + dz * dz);
+					if (d > 3.1 || (dx == 0 && dz == 0 && dy < 1)) continue;
+					BlockPos p = new BlockPos(x + dx, top + dy, z + dz);
+					if (level.getBlockState(p).isAir()) set(p.getX(), p.getY(), p.getZ(), leaves);
+				}
+			}
+		}
+	}
+
+	/** Grass and flowers between two radii (none in the middle where they battle), with a chance per spot. */
+	private static void plants(int cx, int y, int cz, double from, double to, double chance, BlockState... kinds) {
+		for (int dx = (int) -to; dx <= to; dx++) {
+			for (int dz = (int) -to; dz <= to; dz++) {
+				double d = Math.sqrt(dx * dx + dz * dz);
+				if (d < from || d > to || RNG.nextDouble() > chance) continue;
+				BlockPos at = new BlockPos(cx + dx, y + 1, cz + dz);
+				if (!level.getBlockState(at).isAir()) continue;
+				BlockState below = level.getBlockState(at.below());
+				BlockState p = kinds[RNG.nextInt(kinds.length)];
+				if (p.is(Blocks.LILY_PAD)) {
+					if (below.is(Blocks.WATER)) set(at.getX(), at.getY(), at.getZ(), p);
+					continue;
+				}
+				if (below.is(Blocks.WATER)) continue;
+				if (p.is(Blocks.TALL_GRASS)) {
+					set(at.getX(), at.getY(), at.getZ(), p);
+					set(at.getX(), at.getY() + 1, at.getZ(), p.setValue(net.minecraft.world.level.block.DoublePlantBlock.HALF,
+							net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+				} else if (p.is(Blocks.SUGAR_CANE)) {
+					if (!below.is(Blocks.SAND) && !below.is(Blocks.GRASS_BLOCK)) continue;
+					set(at.getX(), at.getY(), at.getZ(), p);
+					set(at.getX(), at.getY() + 1, at.getZ(), p);
+				} else {
+					set(at.getX(), at.getY(), at.getZ(), p);
+				}
+			}
+		}
+	}
+
+	/** A cave: a bowl of rock walls of uneven height around a stone floor, with a few boulders. */
+	private static void rocks(int cx, int y, int cz) {
+		BlockState[] stone = {Blocks.STONE.defaultBlockState(), Blocks.ANDESITE.defaultBlockState(), Blocks.TUFF.defaultBlockState(),
+				Blocks.COBBLESTONE.defaultBlockState()};
+		for (int dx = -16; dx <= 16; dx++) {
+			for (int dz = -16; dz <= 16; dz++) {
+				double d = Math.sqrt(dx * dx + dz * dz);
+				if (d < 10.5 || d > 14.5) continue;
+				if (dz > 6 && Math.abs(dx) < 8) continue;
+				int h = 4 + (int) (Math.abs(Math.sin(dx * 0.7) + Math.cos(dz * 0.6)) * 3) + RNG.nextInt(3);
+				for (int i = 1; i <= h; i++) set(cx + dx, y + i, cz + dz, stone[RNG.nextInt(stone.length)]);
+			}
+		}
+		for (int i = 0; i < 6; i++) {
+			int bx = cx + RNG.nextInt(17) - 8, bz = cz + RNG.nextInt(9) - 9;
+			if (Math.abs(bx - cx) < 3) continue;
+			set(bx, y + 1, bz, stone[RNG.nextInt(stone.length)]);
+		}
+	}
+
+	/** A gym: the battle floor in red and blue, and pillars with lights round the back. */
+	private static void gym(int cx, int y, int cz) {
+		for (int i = 0; i < 9; i++) {
+			double a = Math.toRadians(100 + i * 20);
+			int px = cx + (int) Math.round(Math.sin(a) * 12), pz = cz + (int) Math.round(Math.cos(a) * 12);
+			for (int k = 1; k <= 6; k++) set(px, y + k, pz, Blocks.QUARTZ_PILLAR.defaultBlockState());
+			set(px, y + 7, pz, Blocks.SEA_LANTERN.defaultBlockState());
+		}
+	}
+
+	private static void set(int x, int y, int z, BlockState s) {
+		BlockPos p = new BlockPos(x, y, z);
+		if (!BEFORE.containsKey(p)) BEFORE.put(p, level.getBlockState(p));
+		level.setBlock(p, s, 2 | 16, 0);
 	}
 
 	private static float face(Vec3 from, Vec3 to) {
@@ -181,109 +480,64 @@ public final class BattleScene {
 		return d;
 	}
 
-	/** Plants on the field and between you and it (grass, flowers, ferns, bushes, crops), cleared on your screen. */
-	private static void clearPlants(double far) {
-		CLEARED.clear();
-		for (double a = -1.5; a <= far + 1.5; a += 0.5) {
-			for (double side = -2.5; side <= 3.0; side += 0.5) {
-				Vec3 p = origin.add(fwd.scale(a)).add(right.scale(side));
-				for (int dy = -1; dy <= 2; dy++) {
-					BlockPos at = BlockPos.containing(p.x, origin.y + dy, p.z);
-					if (CLEARED.containsKey(at)) continue;
-					BlockState st = level.getBlockState(at);
-					if (plant(st)) {
-						CLEARED.put(at.immutable(), st);
-						level.setBlock(at, Blocks.AIR.defaultBlockState(), 2 | 16, 0);
-					}
-				}
-			}
-		}
-	}
-
-	private static boolean plant(BlockState s) {
-		return s.is(Blocks.SHORT_GRASS) || s.is(Blocks.TALL_GRASS) || s.is(Blocks.FERN) || s.is(Blocks.LARGE_FERN) || s.is(BlockTags.FLOWERS)
-				|| s.is(Blocks.DEAD_BUSH) || s.is(Blocks.SWEET_BERRY_BUSH) || s.is(BlockTags.CROPS) || s.is(Blocks.SUGAR_CANE) || s.is(Blocks.BUSH)
-				|| s.is(Blocks.SHORT_DRY_GRASS) || s.is(Blocks.TALL_DRY_GRASS) || s.is(Blocks.FIREFLY_BUSH) || s.is(BlockTags.SAPLINGS);
-	}
-
-	private static void restorePlants() {
-		if (level == null) return;
-		for (Map.Entry<BlockPos, BlockState> e : CLEARED.entrySet()) {
-			if (level.getBlockState(e.getKey()).isAir()) level.setBlock(e.getKey(), e.getValue(), 2 | 16, 0);
-		}
-		CLEARED.clear();
-	}
-
 	public static void end() {
 		if (level != null) {
-			for (MonDisplay d : new MonDisplay[] {mine, theirs, ball}) if (d != null) level.removeEntity(d.getId(), Entity.RemovalReason.DISCARDED);
-			restorePlants();
+			for (MonDisplay d : new MonDisplay[] {mine, theirs, ball, sendBall}) if (d != null) level.removeEntity(d.getId(), Entity.RemovalReason.DISCARDED);
+			List<Map.Entry<BlockPos, BlockState>> back = new ArrayList<>(BEFORE.entrySet());
+			for (int i = back.size() - 1; i >= 0; i--) level.setBlock(back.get(i).getKey(), back.get(i).getValue(), 2 | 16, 0);
 		}
-		mine = theirs = ball = null;
+		BEFORE.clear();
+		FX.clear();
+		mine = theirs = ball = sendBall = null;
 		hiddenNpc = -1;
 		active = revealed = false;
 		level = null;
+		shake = 0;
 	}
 
-	/** If the world changed under a battle (left the game), forget it. */
 	public static void tick(Minecraft mc) {
+		// If the world changed under a battle (left the game), forget it.
 		if (active && mc.level != level) {
 			level = null;
-			mine = theirs = ball = null;
-			CLEARED.clear();
+			mine = theirs = ball = sendBall = null;
+			BEFORE.clear();
+			FX.clear();
 			active = revealed = false;
+			return;
+		}
+		if (!active || level == null) return;
+		if (shake > 0) shake--;
+		if (sendBall != null && !sendBall.flying()) {
+			burst(sendBall.position().add(0, 0.4, 0), ParticleTypes.POOF, 12, 0.3);
+			Sounds.poof();
+			level.removeEntity(sendBall.getId(), Entity.RemovalReason.DISCARDED);
+			sendBall = null;
+		}
+		for (int i = FX.size() - 1; i >= 0; i--) {
+			Fx f = FX.get(i);
+			int age = ++f.age()[0];
+			if (f.beam()) {
+				// The stream travels from the attacker to the target, then bursts there.
+				double t = Math.min(1, age / (double) f.life());
+				Vec3 at = f.from().lerp(f.to(), t);
+				for (int k = 0; k < 4; k++) {
+					level.addParticle(f.particle(), at.x + (RNG.nextDouble() - 0.5) * 0.3, at.y + (RNG.nextDouble() - 0.5) * 0.3, at.z + (RNG.nextDouble() - 0.5) * 0.3, 0, 0.01, 0);
+				}
+				if (age == f.life()) burst(f.to(), f.particle(), 16, 0.4);
+			} else if (age % 2 == 0) {
+				burst(f.to(), f.particle(), 6, 0.45);
+			}
+			if (age >= f.life()) FX.remove(i);
 		}
 	}
 
 	public static double[] cameraPose(float partial) {
-		return new double[] {cam.x, cam.y, cam.z, camYaw, camPitch};
-	}
-
-	// ---------- the lie of the land ----------
-
-	private static boolean solid(BlockPos p) {
-		BlockState s = level.getBlockState(p);
-		return !s.getCollisionShape(level, p).isEmpty();
-	}
-
-	/** The top of the ground near this height (within a few blocks), so they stand on it, not in it. */
-	private static double ground(double x, double y, double z) {
-		BlockPos base = BlockPos.containing(x, y, z);
-		for (int dy = 3; dy >= -4; dy--) {
-			BlockPos p = base.offset(0, dy, 0);
-			if (solid(p) && !solid(p.above()) && !solid(p.above(2))) {
-				VoxelShape shape = level.getBlockState(p).getCollisionShape(level, p);
-				return p.getY() + shape.max(Direction.Axis.Y);
-			}
+		double sx = 0, sy = 0;
+		if (shake > 0) {
+			double k = shake * 0.012;
+			sx = (RNG.nextDouble() - 0.5) * k;
+			sy = (RNG.nextDouble() - 0.5) * k;
 		}
-		return y;
-	}
-
-	/** Of the eight ways round, the most open one out to the far Pokémon, the way you face first. */
-	private static float openest(float prefer, double far) {
-		float best = Math.round(prefer / 45F) * 45F;
-		int bestScore = Integer.MIN_VALUE;
-		for (int i = 0; i < 8; i++) {
-			float yaw = Math.round(prefer / 45F) * 45F + (i % 2 == 0 ? 1 : -1) * ((i + 1) / 2) * 45F;
-			double r = Math.toRadians(yaw);
-			double fx = -Math.sin(r), fz = Math.cos(r), rx = -Math.cos(r), rz = -Math.sin(r);
-			int score = 0;
-			for (double a = -1.5; a <= far + 1; a += 0.5) {
-				for (double side : new double[] {-1.0, 0, 1.5}) {
-					double x = origin.x + fx * a + rx * side, z = origin.z + fz * a + rz * side;
-					BlockPos feet = BlockPos.containing(x, origin.y + 0.3, z);
-					if (!solid(feet) && !solid(feet.above())) score++;
-					else score -= 2;
-					double gy = ground(x, origin.y, z);
-					if (Math.abs(gy - origin.y) > 2.5) score--;
-				}
-			}
-			score = score * 4 - i;
-			if (score > bestScore) {
-				bestScore = score;
-				best = yaw;
-			}
-		}
-		return Mth.wrapDegrees(best);
+		return new double[] {cam.x + sx, cam.y + sy, cam.z, camYaw, camPitch};
 	}
 }

@@ -41,6 +41,14 @@ public final class Adventure {
 	private static CameraType before;
 	private static Vec3 follow;
 	private static double smoothY = Double.NaN;
+	/** Who you're talking to (the camera closes in on the two of you), or -1; and how far in it's come (0 to 1). */
+	private static int focusId = -1;
+	private static double focusIn;
+
+	public static void focus(int entityId) {
+		focusId = entityId;
+	}
+
 	/** The camera as last set (x, y, z, yaw, pitch), for putting things on screen over the world. */
 	public static double[] lastPose;
 
@@ -87,7 +95,7 @@ public final class Adventure {
 		if (frozen > 0) frozen--;
 		distance += (distanceTarget - distance) * 0.2;
 		while (SPEED.consumeClick()) {
-			speed = speed >= 3 ? 1 : speed + 1;
+			speed = speed >= 4 ? 1 : speed + 1;
 			CompoundTag t = new CompoundTag();
 			t.putInt("times", speed);
 			ClientPlayNetworking.send(new Net.Act("speed", t));
@@ -110,9 +118,17 @@ public final class Adventure {
 		if (Double.isNaN(smoothY) || Math.abs(smoothY - p.y) > 6) smoothY = p.y;
 		smoothY += (p.y - smoothY) * 0.08;
 		follow = new Vec3(p.x, smoothY + 0.9, p.z);
-		double yaw = Math.toRadians(YAW), pitch = Math.toRadians(PITCH);
+		// Talking to someone: ease in towards the middle of the two of you, closer and a little lower.
+		Entity other = focusId >= 0 && e.level() != null ? e.level().getEntity(focusId) : null;
+		focusIn += ((other != null ? 1 : 0) - focusIn) * 0.12;
+		Vec3 centre = follow;
+		if (other != null) centre = follow.lerp(other.getPosition(partial).add(0, 0.9, 0), 0.5);
+		else focusId = -1;
+		Vec3 target = follow.lerp(centre, focusIn);
+		double dist = distance + (13 - distance) * focusIn, pitchDeg = PITCH - 12 * focusIn;
+		double yaw = Math.toRadians(YAW), pitch = Math.toRadians(pitchDeg);
 		double lx = -Math.sin(yaw) * Math.cos(pitch), ly = -Math.sin(pitch), lz = Math.cos(yaw) * Math.cos(pitch);
-		return lastPose = new double[] {follow.x - lx * distance, follow.y - ly * distance, follow.z - lz * distance, YAW, PITCH};
+		return lastPose = new double[] {target.x - lx * dist, target.y - ly * dist, target.z - lz * dist, YAW, (float) pitchDeg};
 	}
 
 	/** A: talk to whoever's in front of you (or close by), person or Pokémon. */

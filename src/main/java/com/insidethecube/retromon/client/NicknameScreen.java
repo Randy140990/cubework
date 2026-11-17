@@ -6,7 +6,6 @@ import com.insidethecube.retromon.engine.Species;
 import com.insidethecube.retromon.game.Net;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -17,9 +16,11 @@ public class NicknameScreen extends GameScreen {
 	private final String where, species;
 	private final int index;
 	private Choice yesNo = new Choice(List.of("YES", "NO"));
-	private EditBox field;
+	/** The name as you type it (our own entry box, drawn in the game's style). */
+	private final StringBuilder name = new StringBuilder();
 	private boolean naming, sent;
 	private final TextBox box;
+	private static final int MAX = 10;
 
 	public NicknameScreen(CompoundTag t) {
 		super("Nickname");
@@ -30,25 +31,24 @@ public class NicknameScreen extends GameScreen {
 		box = TextBox.still("Give a nickname to " + (sp == null ? "it" : sp.name()) + "?");
 	}
 
-	@Override
-	protected void init() {
-		super.init();
-		int w = Math.min(width - 40 * s, 160 * s);
-		field = new EditBox(font, (width - w) / 2, height / 2 - 10, w, 20, Component.literal("Nickname"));
-		field.setMaxLength(10);
-		field.visible = naming;
-		addRenderableWidget(field);
-		if (naming) setFocused(field);
-	}
-
 	private void answer(boolean yes) {
+		Sounds.press();
 		if (!yes) {
 			done("");
 			return;
 		}
 		naming = true;
-		field.visible = true;
-		setFocused(field);
+	}
+
+	@Override
+	public boolean charTyped(net.minecraft.client.input.CharacterEvent e) {
+		if (!naming) return false;
+		String c = e.codepointAsString();
+		if (name.length() < MAX && c.length() == 1 && (Character.isLetterOrDigit(c.charAt(0)) || " .'-♂♀".indexOf(c.charAt(0)) >= 0)) {
+			name.append(Character.toUpperCase(c.charAt(0)));
+			Sounds.press();
+		}
+		return true;
 	}
 
 	private void done(String name) {
@@ -66,14 +66,12 @@ public class NicknameScreen extends GameScreen {
 	protected boolean key(KeyEvent e) {
 		if (naming) {
 			if (e.key() == GLFW.GLFW_KEY_ENTER || e.key() == GLFW.GLFW_KEY_KP_ENTER) {
-				done(field.getValue());
-				return true;
+				Sounds.press();
+				done(name.toString().trim());
+			} else if (e.key() == GLFW.GLFW_KEY_BACKSPACE && name.length() > 0) {
+				name.setLength(name.length() - 1);
 			}
-			if (e.key() == GLFW.GLFW_KEY_ESCAPE) {
-				done("");
-				return true;
-			}
-			return false;
+			return true;
 		}
 		if (yesNo.key(e)) return true;
 		if (Ui.isA(e)) answer(yesNo.at == 0);
@@ -95,12 +93,19 @@ public class NicknameScreen extends GameScreen {
 			choice(g, yesNo, width - w - m, height - h - m - yesNo.height(s) - 4 * s, w, i -> answer(i == 0));
 			return;
 		}
-		int pw = Math.min(width - 20 * s, 200 * s), ph = 60 * s, px = (width - pw) / 2, py = height / 2 - 34 * s;
-		Ui.panel(g, px, py, pw, ph, s);
-		Ui.centred(g, font, "NICKNAME?", width / 2, py + 6 * s, Ui.MUTED, s, true);
-		Ui.centred(g, font, "Enter to keep it, Esc for none", width / 2, py + ph - 12 * s, Ui.DIM, s, true);
-		int bw = 40 * s, bx = px + pw - bw - 8 * s, by = py + ph - 26 * s;
-		Ui.button(g, font, bx, by, bw, 12 * s, "OK", Ui.GREEN, over(bx, by, bw, 12 * s), s);
-		hit(bx, by, bw, 12 * s, () -> done(field.getValue()));
+		int pw = Math.min(width - 20 * s, 210 * s), ph = 74 * s, px = (width - pw) / 2, py = height / 2 - 44 * s;
+		Ui.round(g, px, py, pw, ph, 0xF0141B2E, 3 * s);
+		Species sp = Species.ALL.get(species);
+		Ui.heading(g, font, "NICKNAME FOR " + (sp == null ? "IT" : sp.name()), px + 12 * s, py + 9 * s, Ui.TEXT, s);
+		// The entry: a cream field with the name and a blinking cursor, then the slots left.
+		int fx = px + 12 * s, fy = py + 24 * s, fw = pw - 24 * s, fh = 20 * s;
+		Ui.round(g, fx, fy, fw, fh, Ui.CREAM, 2 * s);
+		String shown = name + ((ticks / 10) % 2 == 0 && name.length() < MAX ? "_" : "");
+		Ui.draw(g, font, Ui.bold(shown), fx + 8 * s, fy + 6 * s, Ui.CREAM_INK, s, false);
+		Ui.draw(g, font, Ui.ui((MAX - name.length()) + " left"), fx + fw - 8 * s - Ui.width(font, (MAX - name.length()) + " left", s), fy + 6 * s, 0xFF7A849E, s, false);
+		Ui.text(g, font, "Enter: done.  Empty: no name.", px + 12 * s, py + 50 * s, Ui.DIM, s);
+		int bw = 46 * s, bx = px + pw - bw - 12 * s, by = py + ph - 18 * s + 2 * s;
+		Ui.button(g, font, bx, by - 4 * s, bw, 14 * s, "OK", Ui.GREEN, over(bx, by - 4 * s, bw, 14 * s), s);
+		hit(bx, by - 4 * s, bw, 14 * s, () -> done(name.toString().trim()));
 	}
 }

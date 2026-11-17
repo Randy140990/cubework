@@ -1,9 +1,0 @@
-grep (DayTime|TimeOfDay|timeOfDay|getSunAngle|getGameTime|ClockManager|clock) net/minecraft/world/level/Level.java
-grep (DayTime|TimeOfDay|timeOfDay|ClientLevelData|clock|Clock) net/minecraft/client/multiplayer/ClientLevel.java
-grep (handleSetTime|DayTime|setTime) net/minecraft/client/multiplayer/ClientPacketListener.java
-grep (DayTime|TimeOfDay|timeOfDay) net/minecraft/client/renderer/LevelRenderer.java
-grep (DayTime|TimeOfDay|timeOfDay|getSunAngle) net/minecraft/client/renderer/SkyRenderer.java
-grep (enum|SLIM|WIDE) net/minecraft/world/entity/player/PlayerModelType.java
-grep (ResourceTexture\(|public) net/minecraft/core/ClientAsset.java
-grep (DayTime|dayTime) net/minecraft/world/level/storage/LevelData.java
-grep (DayTime|dayTime) net/minecraft/world/level/storage/WritableLevelData.java

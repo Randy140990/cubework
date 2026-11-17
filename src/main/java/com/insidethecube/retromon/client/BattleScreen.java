@@ -21,24 +21,32 @@ import net.minecraft.nbt.Tag;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * A battle, over the Pokémon standing in the world: their box top left, yours (with its EXP bar) at the
- * right, the message panel, and four big buttons: FIGHT, BAG, POKéMON, RUN. The game on the server decides
- * each turn; this plays back what happened (the lines, the HP running down, lunges, flickers, faints, the
- * Poké Ball thrown and shaking, EXP filling) and then asks what you'll do next. Keys or mouse.
+ * A battle on its stage: their card top right, yours (with its EXP bar) bottom left, the message bar along
+ * the bottom, and the commands stacked on the right as the newer games have them: FIGHT, POKéMON, BAG, RUN.
+ * The game on the server decides each turn; this plays back what happened (the lines, the HP running down,
+ * each move's effect, hits shaking the screen, faints, Poké Balls sent out, thrown and shaking, EXP filling)
+ * and then asks what you'll do next. A first catch shows its Pokédex entry. Keys or mouse; Esc is Minecraft's menu.
  */
 public class BattleScreen extends GameScreen {
 	/** What's on show for one side (it changes as the turn plays back, not all at once). */
 	private static final class Side {
 		String species = "", name = "", status = "", gender = "";
-		int level, max = 1, hpTarget, index;
+		int level, max = 1, hpTarget, index = -1;
 		float hp, exp, expTarget;
 		boolean shown;
 	}
 
 	private record Step(int kind, int side, String text, int a, int b) {}
 
-	private static final int SHAKE = -1, POP = -2, END = -3, NOTICE_DONE = -4, INTO_BALL = -5;
-	private static final int WIPE = 20;
+	private static final int SHAKE = -1, POP = -2, END = -3, NOTICE_DONE = -4, INTO_BALL = -5, GROW = -6, DEX = -7;
+	/** The way in: three white flashes, then the bars sweep shut and open on the stage. */
+	private static final int WIPE = 34;
+	/** The battle that's on (it carries on behind Minecraft's menu). */
+	public static BattleScreen current;
+	/** The commands as they're shown, top to bottom, and what each one is (0 FIGHT, 1 BAG, 2 POKéMON, 3 RUN). */
+	private static final int[] ORDER = {0, 2, 1, 3};
+	private boolean newCatch;
+	private String caughtSpecies;
 
 	private enum Mode {
 		PLAY, MAIN, FIGHT, PARTY, BAG, BAG_TARGET, WAIT
@@ -63,8 +71,11 @@ public class BattleScreen extends GameScreen {
 
 	public BattleScreen(CompoundTag start) {
 		super("Battle");
+		current = this;
 		Music.play(start.getStringOr("music", "wild_battle"));
 		feed(start);
+		for (Mon m : theirs) caughtSpecies = m.species.id();
+		newCatch = caughtSpecies != null && !ClientState.data.caught.contains(caughtSpecies);
 	}
 
 	/** A turn from the game: what happened, and where things stand. */
@@ -98,8 +109,8 @@ public class BattleScreen extends GameScreen {
 		super.tick();
 		if (wipe > 0) {
 			wipe--;
-			if (wipe == WIPE / 2) BattleScene.reveal();
-			if (wipe > WIPE / 2) return;
+			if (wipe == WIPE / 3) BattleScene.reveal();
+			if (wipe > WIPE / 3) return;
 		}
 		if (mode == Mode.WAIT) waited++;
 		boolean moving = false;
@@ -158,9 +169,29 @@ public class BattleScreen extends GameScreen {
 			}
 			case POP -> {
 				BattleScene.burstBall();
+				Sounds.poof();
 				if (BattleScene.display(1) != null) BattleScene.display(1).sizeTarget = 1;
 				Sounds.cry(sides[1].species, 1F);
 				wait = 12;
+				return;
+			}
+			case GROW -> {
+				if (d != null) d.sizeTarget = 1;
+				Sounds.cry(side(e.side()).species, 1F);
+				side(e.side()).shown = true;
+				wait = 14;
+				return;
+			}
+			case DEX -> {
+				// A first catch: its Pokédex entry, on the stage, then on to the end.
+				if (minecraft != null && caughtSpecies != null) {
+					BattleScene.spotlight(caughtSpecies);
+					minecraft.setScreen(new DexScreen(caughtSpecies, () -> {
+						current = this;
+						minecraft.setScreen(this);
+					}));
+				}
+				wait = 4;
 				return;
 			}
 			case END -> {
@@ -184,20 +215,24 @@ public class BattleScreen extends GameScreen {
 				sd.max = Math.max(1, e.b());
 			}
 			case ATTACK -> {
-				if (d != null) d.lunge = MonDisplay.LUNGE;
-				Sounds.attack();
-				wait = 10;
+				Move mv = e.text() == null ? null : Move.find(e.text());
+				if (d != null && (mv == null || mv.power() > 0)) d.lunge = MonDisplay.LUNGE;
+				if (mv == null) Sounds.attack();
+				BattleScene.move(e.side(), e.text());
+				wait = mv != null && mv.power() > 0 ? 14 : 12;
 			}
 			case HIT -> {
+				int effect = effectAhead();
 				if (d != null) d.flash = 14;
-				Sounds.hit();
+				Sounds.hit(effect);
+				BattleScene.hit(e.side(), effect);
 				wait = 14;
 			}
 			case FAINT -> {
-				if (d != null) d.sizeTarget = 0;
+				BattleScene.faint(e.side());
 				Sounds.cry(side(e.side()).species, 0.7F);
 				side(e.side()).shown = false;
-				wait = 24;
+				wait = 26;
 			}
 			case SEND_OUT -> {
 				List<Mon> list = e.side() == 0 ? mine : theirs;
@@ -214,21 +249,29 @@ public class BattleScreen extends GameScreen {
 				}
 				sd.index = e.a();
 				sd.hp = sd.hpTarget = e.b();
-				sd.shown = true;
 				if (d != null) {
 					d.species = sd.species;
 					d.size = d.sizeOld = 0;
-					d.sizeTarget = 1;
+					d.sizeTarget = 0;
 				}
-				Sounds.cry(sd.species, 1F);
-				wait = 18;
+				// Yours (and a trainer's) come out of a ball; a wild one is just there.
+				if (e.side() == 0 || !kind.equals("WILD")) {
+					BattleScene.sendOut(e.side());
+					sd.shown = false;
+					queue.addFirst(new Step(GROW, e.side(), null, 0, 0));
+					wait = 9;
+				} else {
+					sd.shown = true;
+					if (d != null) d.sizeTarget = 1;
+					Sounds.cry(sd.species, 1F);
+					wait = 18;
+				}
 			}
 			case RECALL -> {
 				if (d != null) d.sizeTarget = 0;
 				wait = 14;
 			}
 			case BALL -> {
-				Sounds.ball();
 				BattleScene.throwBall(lastBall);
 				wait = 14;
 				Step next = queue.peek();
@@ -239,6 +282,7 @@ public class BattleScreen extends GameScreen {
 			}
 			case CAUGHT -> {
 				Sounds.caught();
+				BattleScene.caughtStars();
 				sides[1].shown = false;
 				wait = 40;
 			}
@@ -268,6 +312,18 @@ public class BattleScreen extends GameScreen {
 		}
 	}
 
+	/** Whether the hit coming up is super effective (1), not very effective (-1) or neither (0): its line follows it. */
+	private int effectAhead() {
+		int n = 0;
+		for (Step st : queue) {
+			if (++n > 4) break;
+			if (st.text() == null) continue;
+			if (st.text().contains("super effective")) return 1;
+			if (st.text().contains("not very effective")) return -1;
+		}
+		return 0;
+	}
+
 	private void say(String text) {
 		message = text == null ? "" : text;
 		typed = 0;
@@ -280,6 +336,10 @@ public class BattleScreen extends GameScreen {
 			if (!afterQueued) {
 				afterQueued = true;
 				if (result.equals("WIN")) Music.play(kind.equals("WILD") ? "defeated_wild_mon" : boss ? "defeated_gym_leader" : "defeated_trainer");
+				if (result.equals("CAUGHT") && newCatch) {
+					queue.add(new Step(Event.Kind.TEXT.ordinal(), -1, "New POKéDEX data will be added for " + sides[1].name + "!", 0, 0));
+					queue.add(new Step(DEX, -1, null, 0, 0));
+				}
 				for (String l : after) queue.add(new Step(Event.Kind.TEXT.ordinal(), -1, l, 0, 0));
 				queue.add(new Step(END, -1, null, 0, 0));
 			}
@@ -309,6 +369,7 @@ public class BattleScreen extends GameScreen {
 	}
 
 	private void close() {
+		current = null;
 		BattleScene.end();
 		Music.resumePlace();
 		if (minecraft != null && minecraft.screen == this) minecraft.setScreen(null);
@@ -445,9 +506,9 @@ public class BattleScreen extends GameScreen {
 
 	@Override
 	protected boolean key(KeyEvent e) {
-		if (wipe > WIPE / 2) return true;
-		// If the game ever stops answering, Escape gets you out.
-		if (mode == Mode.WAIT && waited > 100 && e.key() == GLFW.GLFW_KEY_ESCAPE) {
+		if (wipe > WIPE / 3) return true;
+		// If the game ever stops answering, Delete gets you out.
+		if (mode == Mode.WAIT && waited > 100 && e.key() == GLFW.GLFW_KEY_DELETE) {
 			ClientPlayNetworking.send(new Net.Act("battle_quit", new CompoundTag()));
 			close();
 			return true;
@@ -457,17 +518,24 @@ public class BattleScreen extends GameScreen {
 				if (message != null && Ui.isA(e)) advance();
 			}
 			case MAIN -> {
-				if (Ui.isLeft(e) || Ui.isRight(e)) mainAt ^= 1;
-				else if (Ui.isUp(e) || Ui.isDown(e)) mainAt ^= 2;
-				else if (Ui.isA(e)) pickMain(mainAt);
+				int row = row(mainAt);
+				if (Ui.isUp(e) || Ui.isLeft(e)) mainAt = ORDER[Math.floorMod(row - 1, 4)];
+				else if (Ui.isDown(e) || Ui.isRight(e)) mainAt = ORDER[Math.floorMod(row + 1, 4)];
+				else if (Ui.isA(e)) {
+					Sounds.press();
+					pickMain(mainAt);
+				}
 			}
 			case FIGHT -> {
 				Mon m = me();
 				int n = m == null ? 0 : m.moves.size();
 				if (n == 0 || Ui.isB(e)) mode = Mode.MAIN;
-				else if (Ui.isLeft(e) || Ui.isRight(e)) fightAt = Math.min(n - 1, fightAt ^ 1);
-				else if (Ui.isUp(e) || Ui.isDown(e)) fightAt = Math.min(n - 1, fightAt ^ 2);
-				else if (Ui.isA(e)) pickMove(fightAt);
+				else if (Ui.isUp(e) || Ui.isLeft(e)) fightAt = Math.floorMod(fightAt - 1, n);
+				else if (Ui.isDown(e) || Ui.isRight(e)) fightAt = Math.floorMod(fightAt + 1, n);
+				else if (Ui.isA(e)) {
+					Sounds.press();
+					pickMove(fightAt);
+				}
 			}
 			case PARTY, BAG_TARGET -> {
 				int n = mine.size();
@@ -489,8 +557,14 @@ public class BattleScreen extends GameScreen {
 		return true;
 	}
 
+	private static int row(int command) {
+		for (int i = 0; i < 4; i++) if (ORDER[i] == command) return i;
+		return 0;
+	}
+
 	private void advance() {
 		if (message == null) return;
+		Sounds.press();
 		if (typed < message.length()) typed = message.length();
 		else message = null;
 	}
@@ -517,108 +591,152 @@ public class BattleScreen extends GameScreen {
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
 		if (wipe > 0) {
-			// Into the battle: bars close in from top and bottom, then open on the field.
-			float t = (WIPE - wipe + partial) / (WIPE / 2F);
-			float cover = t <= 1 ? t : Math.max(0, 2 - t);
+			// Into the battle: three white flashes, then bars sweep shut from top and bottom and open on the stage.
+			float t = WIPE - wipe + partial;
+			if (t < 12) {
+				if (((int) t / 2) % 2 == 0) g.fill(0, 0, width, height, 0xCCFFFFFF);
+				return;
+			}
+			float u = (t - 12) / ((WIPE - 12) / 2F);
+			float cover = u <= 1 ? u : Math.max(0, 2 - u);
 			int bar = (int) (height / 2F * Math.min(1, cover));
 			g.fill(0, 0, width, bar, 0xFF000000);
 			g.fill(0, height - bar, width, height, 0xFF000000);
-			if (wipe > WIPE / 2) return;
+			if (wipe > WIPE / 3) return;
 		}
-		int m = 6 * s, bh = Math.max(boxHeight(), 42 * s);
+		Ui.cinema(g, width, height, 0.55F);
+		int m = 8 * s, bh = 34 * s;
 		Side them = sides[1], me = sides[0];
-		if (them.shown) {
-			int w = 150 * s, h = 32 * s, x = m, y = m;
-			Ui.tagged(g, x, y, w, h, s, Ui.RED);
-			Ui.text(g, font, them.name + " " + them.gender, x + 9 * s, y + 6 * s, Ui.TEXT, s);
-			Ui.right(g, font, "Lv" + them.level, x + w - 8 * s, y + 6 * s, Ui.GOLD, s);
-			if (!them.status.isEmpty()) Ui.chip(g, font, them.status, x + w - 8 * s - Ui.width(font, "Lv" + them.level, s) - Ui.width(font, them.status, s) - 12 * s,
-					y + 5 * s, Ui.statusColor(them.status), s);
-			Ui.hp(g, font, x + 9 * s, y + 18 * s, w - 18 * s, them.hp, them.max, s);
-		}
-		if (me.shown) {
-			int w = 160 * s, h = 44 * s, x = width - w - m, y = height - bh - h - 2 * m;
-			Ui.tagged(g, x, y, w, h, s, Ui.BLUE);
-			Ui.text(g, font, me.name + " " + me.gender, x + 9 * s, y + 6 * s, Ui.TEXT, s);
-			Ui.right(g, font, "Lv" + me.level, x + w - 8 * s, y + 6 * s, Ui.GOLD, s);
-			if (!me.status.isEmpty()) Ui.chip(g, font, me.status, x + w - 8 * s - Ui.width(font, "Lv" + me.level, s) - Ui.width(font, me.status, s) - 12 * s,
-					y + 5 * s, Ui.statusColor(me.status), s);
-			Ui.hp(g, font, x + 9 * s, y + 18 * s, w - 18 * s, me.hp, me.max, s);
-			Ui.right(g, font, Math.round(me.hp) + "/" + me.max, x + w - 8 * s, y + 26 * s, Ui.TEXT, s);
-			Species sp = Species.ALL.get(me.species);
-			if (sp != null) {
-				int now = sp.growth().expAt(me.level), next = me.level >= 100 ? now + 1 : sp.growth().expAt(me.level + 1);
-				float frac = (me.exp - now) / Math.max(1F, next - now);
-				Ui.plain(g, font, "EXP", x + 9 * s, y + 35 * s, Ui.CYAN, s);
-				Ui.bar(g, x + 9 * s + Ui.width(font, "EXP", s) + 3 * s, y + 36 * s, w - 26 * s - Ui.width(font, "EXP", s), 4 * s, frac, Ui.CYAN, s);
-			}
-		}
+		if (them.shown) foeCard(g, them, width - m - 156 * s, m + height / 14);
+		if (me.shown) myCard(g, me, m, height - m - bh - 50 * s);
 		int by = height - bh - m;
 		switch (mode) {
 			case MAIN -> drawMain(g, m, by, bh);
 			case FIGHT -> drawFight(g, m, by, bh);
 			case PARTY, BAG_TARGET -> drawParty(g, m, by, bh);
 			case BAG -> drawBag(g, m, by, bh);
-			default -> messagePanel(g, m, by, width - 2 * m, bh, message == null ? "" : message.substring(0, Math.min(typed, message.length())));
+			default -> messageBar(g, m, by, width - 2 * m, bh, message == null ? "" : message.substring(0, Math.min(typed, message.length())), true);
 		}
 	}
 
-	private void messagePanel(GuiGraphics g, int x, int y, int w, int h, String text) {
-		Ui.panel(g, x, y, w, h, s);
-		List<String> lines = Ui.wrap(font, text, (w - 20 * s) / s);
-		for (int i = 0; i < Math.min(2, lines.size()); i++) Ui.text(g, font, lines.get(i), x + 10 * s, y + 9 * s + i * 11 * s, Ui.TEXT, s);
+	private void foeCard(GuiGraphics g, Side them, int x, int y) {
+		int w = 156 * s, h = 30 * s;
+		Ui.round(g, x, y, w, h, 0xE6141B2E, 2 * s);
+		Ui.round(g, x, y, 4 * s, h, Ui.RED, s);
+		Ui.heading(g, font, them.name, x + 10 * s, y + 5 * s, Ui.TEXT, s);
+		Ui.text(g, font, them.gender, x + 12 * s + Ui.boldWidth(font, them.name, s), y + 5 * s, them.gender.contains("♀") ? 0xFFFF8FB3 : 0xFF8FC8FF, s);
+		Ui.right(g, font, "Lv. " + them.level, x + w - 8 * s, y + 5 * s, Ui.CREAM, s);
+		if (!them.status.isEmpty()) Ui.chip(g, font, them.status, x + w - 14 * s - Ui.width(font, "Lv. " + them.level, s) - Ui.width(font, them.status, s),
+				y + 4 * s, Ui.statusColor(them.status), s);
+		float frac = them.hp / Math.max(1F, them.max);
+		Ui.bar(g, x + 10 * s, y + 18 * s, w - 18 * s, 6 * s, frac, Ui.hpColor(frac), s);
+	}
+
+	private void myCard(GuiGraphics g, Side me, int x, int y) {
+		int w = 170 * s, h = 44 * s;
+		Ui.round(g, x, y, w, h, 0xE6141B2E, 2 * s);
+		Ui.round(g, x, y, 4 * s, h, Ui.BLUE, s);
+		Ui.heading(g, font, me.name, x + 10 * s, y + 5 * s, Ui.TEXT, s);
+		Ui.text(g, font, me.gender, x + 12 * s + Ui.boldWidth(font, me.name, s), y + 5 * s, me.gender.contains("♀") ? 0xFFFF8FB3 : 0xFF8FC8FF, s);
+		Ui.right(g, font, "Lv. " + me.level, x + w - 8 * s, y + 5 * s, Ui.CREAM, s);
+		if (!me.status.isEmpty()) Ui.chip(g, font, me.status, x + w - 14 * s - Ui.width(font, "Lv. " + me.level, s) - Ui.width(font, me.status, s),
+				y + 4 * s, Ui.statusColor(me.status), s);
+		float frac = me.hp / Math.max(1F, me.max);
+		Ui.bar(g, x + 10 * s, y + 18 * s, w - 18 * s, 6 * s, frac, Ui.hpColor(frac), s);
+		Ui.right(g, font, Math.round(me.hp) + " / " + me.max, x + w - 8 * s, y + 26 * s, Ui.TEXT, s);
+		Species sp = Species.ALL.get(me.species);
+		if (sp != null) {
+			int now = sp.growth().expAt(me.level), next = me.level >= 100 ? now + 1 : sp.growth().expAt(me.level + 1);
+			float ef = Math.max(0, Math.min(1, (me.exp - now) / Math.max(1F, next - now)));
+			Ui.plain(g, font, "EXP", x + 10 * s, y + 34 * s, Ui.CYAN, s);
+			int ex = x + 12 * s + Ui.width(font, "EXP", s);
+			Ui.bar(g, ex, y + 35 * s, x + w - 8 * s - ex, 4 * s, ef, Ui.CYAN, s);
+		}
+	}
+
+	/** The message bar along the bottom (the line typing out, the arrow when it's done). */
+	private void messageBar(GuiGraphics g, int x, int y, int w, int h, String text, boolean arrow) {
+		Ui.round(g, x, y, w, h, 0xEE101726, 2 * s);
+		g.fill(x + 3 * s, y + s, x + w - 3 * s, y + 2 * s, 0x22FFFFFF);
+		List<String> lines = Ui.wrap(font, text, (w - 24 * s) / s);
+		for (int i = 0; i < Math.min(2, lines.size()); i++) Ui.text(g, font, lines.get(i), x + 12 * s, y + 7 * s + i * 12 * s, Ui.TEXT, s);
+		if (arrow && message != null && typed >= message.length() && (ticks / 8) % 2 == 0) Ui.text(g, font, "▼", x + w - 14 * s, y + h - 13 * s, Ui.CREAM, s);
 	}
 
 	private void drawMain(GuiGraphics g, int m, int by, int bh) {
 		Mon mon = me();
-		int cw = Math.min(170 * s, width / 2), mw = width - 2 * m - cw - 4 * s;
-		messagePanel(g, m, by, mw, bh, "What will " + (mon == null ? "you" : mon.name()) + " do?");
-		String[] items = {"FIGHT", "BAG", "POKéMON", "RUN"};
+		int cw = 104 * s, ph = 17 * s, gap = 3 * s;
+		messageBar(g, m, by, width - 2 * m - cw - 6 * s, bh, "What will " + (mon == null ? "you" : mon.name()) + " do?", false);
+		String[] names = {"FIGHT", "BAG", "POKéMON", "RUN"};
 		int[] colors = {Ui.RED, Ui.AMBER, Ui.GREEN, Ui.BLUE};
-		int bw = (cw - 2 * s) / 2, bhh = (bh - 2 * s) / 2, x0 = width - m - cw;
-		for (int i = 0; i < 4; i++) {
-			int bx = x0 + (i % 2) * (bw + 2 * s), byy = by + (i / 2) * (bhh + 2 * s);
-			int idx = i;
-			if (over(bx, byy, bw, bhh)) mainAt = i;
-			boolean dim = i == 3 && !kind.equals("WILD");
-			Ui.button(g, font, bx, byy, bw, bhh, items[i], dim ? 0xFF5A6070 : colors[i], i == mainAt, s);
-			hit(bx, byy, bw, bhh, () -> pickMain(idx));
+		int x = width - m - cw, y0 = by + bh - 4 * ph - 3 * gap;
+		for (int r = 0; r < 4; r++) {
+			int i = ORDER[r];
+			int y = y0 + r * (ph + gap);
+			if (over(x, y, cw, ph)) mainAt = i;
+			boolean on = i == mainAt, dim = i == 3 && !kind.equals("WILD");
+			int col = dim ? 0xFF5A6070 : colors[i];
+			Ui.round(g, x, y, cw, ph, on ? Ui.CREAM : 0xE6141B2E, 2 * s);
+			Ui.round(g, x + 2 * s, y + 2 * s, ph - 4 * s, ph - 4 * s, col, 2 * s);
+			Ui.draw(g, font, Ui.bold(names[i]), x + ph + 4 * s, y + (ph - 8 * s) / 2, on ? Ui.CREAM_INK : Ui.TEXT, s, !on);
+			if (on) Ui.text(g, font, Ui.CURSOR, x - 9 * s, y + (ph - 8 * s) / 2, Ui.CREAM, s);
+			hit(x, y, cw, ph, () -> pickMain(i));
 		}
 	}
 
 	private void drawFight(GuiGraphics g, int m, int by, int bh) {
 		Mon mon = me();
 		if (mon == null) return;
-		int bw = (width - 2 * m - 50 * s) / 2, bhh = (bh - 2 * s) / 2;
+		int cw = 176 * s, ph = 19 * s, gap = 3 * s, n = mon.moves.size();
+		int x = width - m - cw, y0 = by + bh - 4 * ph - 3 * gap;
 		for (int i = 0; i < 4; i++) {
-			int bx = m + (i % 2) * (bw + 2 * s), byy = by + (i / 2) * (bhh + 2 * s);
-			if (i >= mon.moves.size()) {
-				Ui.round(g, bx, byy, bw, bhh, 0x80141B2E, s);
-				Ui.centred(g, font, "-", bx + bw / 2, byy + (bhh - 8 * s) / 2, Ui.DIM, s, true);
+			int y = y0 + i * (ph + gap);
+			if (i >= n) {
+				Ui.round(g, x, y, cw, ph, 0x80141B2E, 2 * s);
+				Ui.centred(g, font, "-", x + cw / 2, y + (ph - 8 * s) / 2, Ui.DIM, s, false);
 				continue;
 			}
 			Move mv = Move.get(mon.moves.get(i));
 			int idx = i;
-			if (over(bx, byy, bw, bhh)) fightAt = i;
+			if (over(x, y, cw, ph)) fightAt = i;
 			boolean on = i == fightAt;
-			int col = Ui.typeColor(mv.type());
-			Ui.round(g, bx, byy, bw, bhh, on ? 0xFFFFFFFF : Ui.darker(col, 0.5F), s);
-			Ui.round(g, bx + s, byy + s, bw - 2 * s, bhh - 2 * s, on ? col : Ui.darker(col, 0.75F), s);
-			Ui.text(g, font, mv.name(), bx + 7 * s, byy + 4 * s, Ui.TEXT, s);
-			int pp = mon.pp.get(i);
-			Ui.plain(g, font, mv.type().label.toUpperCase(), bx + 7 * s, byy + bhh - 11 * s, 0xDDFFFFFF, s);
-			Ui.right(g, font, "PP " + pp + "/" + mv.pp(), bx + bw - 7 * s, byy + bhh - 11 * s, pp == 0 ? Ui.HP_RED : Ui.TEXT, s);
-			hit(bx, byy, bw, bhh, () -> pickMove(idx));
+			int col = Ui.typeColor(mv.type()), pp = mon.pp.get(i);
+			Ui.round(g, x, y, cw, ph, on ? Ui.CREAM : 0xE6141B2E, 2 * s);
+			// The type's colour as a tab with its name, then the move, then its PP.
+			int tw = 44 * s;
+			Ui.round(g, x + 2 * s, y + 2 * s, tw, ph - 4 * s, col, 2 * s);
+			Ui.centred(g, font, mv.type().label.toUpperCase(), x + 2 * s + tw / 2, y + (ph - 8 * s) / 2, 0xFFFFFFFF, s, true);
+			Ui.draw(g, font, Ui.bold(mv.name()), x + tw + 8 * s, y + (ph - 8 * s) / 2, on ? Ui.CREAM_INK : Ui.TEXT, s, !on);
+			String ppText = pp + "/" + mv.pp();
+			Ui.draw(g, font, Ui.ui(ppText), x + cw - 8 * s - Ui.width(font, ppText, s), y + (ph - 8 * s) / 2,
+					pp == 0 ? Ui.HP_RED : on ? Ui.CREAM_INK : Ui.MUTED, s, false);
+			if (on) Ui.text(g, font, Ui.CURSOR, x - 9 * s, y + (ph - 8 * s) / 2, Ui.CREAM, s);
+			hit(x, y, cw, ph, () -> pickMove(idx));
 		}
-		int back = 46 * s, bx = width - m - back;
-		Ui.button(g, font, bx, by, back, bh, "BACK", 0xFF5A6070, over(bx, by, back, bh), s);
-		hit(bx, by, back, bh, () -> mode = Mode.MAIN);
+		// What the picked move is, in the bar on the left.
+		int lw = width - 2 * m - cw - 6 * s;
+		Move sel = fightAt < n ? Move.get(mon.moves.get(fightAt)) : null;
+		Ui.round(g, m, by, lw, bh, 0xEE101726, 2 * s);
+		if (sel != null) {
+			String type = sel.type().label.toUpperCase();
+			Ui.chip(g, font, type, m + 10 * s, by + 6 * s, Ui.typeColor(sel.type()), s);
+			String cat = sel.power() <= 0 ? "STATUS" : switch (sel.type()) {
+				case FIRE, WATER, GRASS, ELECTRIC, PSYCHIC, ICE, DRAGON, DARK -> "SPECIAL";
+				default -> "PHYSICAL";
+			};
+			Ui.chip(g, font, cat, m + 20 * s + Ui.width(font, type, s), by + 6 * s, 0xFF4A5578, s);
+			String stats = "POWER " + (sel.power() <= 1 ? "-" : sel.power()) + "    ACCURACY " + (sel.accuracy() <= 0 ? "-" : sel.accuracy());
+			Ui.text(g, font, stats, m + 10 * s, by + 20 * s, Ui.MUTED, s);
+		}
+		int back = 40 * s, bx = m + lw - back - 4 * s;
+		Ui.button(g, font, bx, by + 4 * s, back, 14 * s, "BACK", 0xFF5A6070, over(bx, by + 4 * s, back, 14 * s), s);
+		hit(bx, by + 4 * s, back, 14 * s, () -> mode = Mode.MAIN);
 	}
 
 	private void drawParty(GuiGraphics g, int m, int by, int bh) {
 		int cols = width > 300 * s ? 2 : 1, gap = 4 * s;
 		int cw = Math.min(170 * s, (width - 2 * m - gap * (cols - 1)) / cols), ch = 42 * s;
-		int total = cols * cw + gap * (cols - 1), x0 = (width - total) / 2, y0 = m;
+		int total = cols * cw + gap * (cols - 1), x0 = (width - total) / 2, y0 = m + height / 12;
 		for (int i = 0; i < mine.size(); i++) {
 			int x = x0 + (i % cols) * (cw + gap), y = y0 + (i / cols) * (ch + gap);
 			int idx = i;
@@ -627,9 +745,9 @@ public class BattleScreen extends GameScreen {
 			hit(x, y, cw, ch, () -> pickParty(idx));
 		}
 		String prompt = mode == Mode.BAG_TARGET ? "Use it on which POKéMON?" : forced ? "Bring out which POKéMON?" : "Choose a POKéMON.";
-		messagePanel(g, m, by, width - 2 * m - (forced ? 0 : 50 * s), bh, prompt);
+		messageBar(g, m, by, width - 2 * m - (forced ? 0 : 50 * s), bh, prompt, false);
 		if (!forced) {
-			int back = 46 * s, bx = width - m - back;
+			int back = 44 * s, bx = width - m - back;
 			Ui.button(g, font, bx, by, back, bh, "BACK", 0xFF5A6070, over(bx, by, back, bh), s);
 			hit(bx, by, back, bh, this::back);
 		}
@@ -637,21 +755,24 @@ public class BattleScreen extends GameScreen {
 
 	private void drawBag(GuiGraphics g, int m, int by, int bh) {
 		List<String> l = battleItems();
-		int w = Math.min(width - 2 * m, 200 * s), row = 14 * s, h = (l.size() + 1) * row + 10 * s, x = width - w - m, y = Math.max(m, by - h - 4 * s);
-		Ui.tagged(g, x, y, w, h, s, Ui.AMBER);
+		int w = Math.min(width - 2 * m, 190 * s), row = 16 * s, h = (l.size() + 1) * row + 8 * s, x = width - w - m, y = Math.max(m, by - h - 4 * s);
+		Ui.round(g, x, y, w, h, 0xE6141B2E, 2 * s);
 		for (int i = 0; i <= l.size(); i++) {
-			int ty = y + 6 * s + i * row;
+			int ty = y + 4 * s + i * row;
 			int idx = i;
-			if (over(x, ty - 2 * s, w, row)) bagAt = i;
-			if (i == bagAt) Ui.round(g, x + 4 * s, ty - 2 * s, w - 8 * s, row - s, 0x33F0B43C, s);
-			if (i == l.size()) Ui.text(g, font, "CANCEL", x + 12 * s, ty + s, Ui.MUTED, s);
+			if (over(x, ty, w, row)) bagAt = i;
+			boolean on = i == bagAt;
+			Ui.pill(g, x + 3 * s, ty, w - 6 * s, row - 2 * s, on, s);
+			int tc = on ? Ui.CREAM_INK : Ui.TEXT;
+			if (i == l.size()) Ui.draw(g, font, Ui.bold("CANCEL"), x + 12 * s, ty + 4 * s, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
 			else {
 				Item it = Item.find(l.get(i));
-				Ui.text(g, font, it.name(), x + 12 * s, ty + s, Ui.TEXT, s);
-				Ui.right(g, font, "x" + ClientState.data.count(it.id()), x + w - 10 * s, ty + s, Ui.MUTED, s);
+				String count = "x" + ClientState.data.count(it.id());
+				Ui.draw(g, font, Ui.bold(it.name()), x + 12 * s, ty + 4 * s, tc, s, false);
+				Ui.draw(g, font, Ui.ui(count), x + w - 12 * s - Ui.width(font, count, s), ty + 4 * s, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
 			}
-			hit(x, ty - 2 * s, w, row, () -> pickItem(idx));
+			hit(x, ty, w, row, () -> pickItem(idx));
 		}
-		messagePanel(g, m, by, width - 2 * m, bh, l.isEmpty() ? "There's nothing you can use in battle." : "Use which item?");
+		messageBar(g, m, by, width - 2 * m, bh, l.isEmpty() ? "There's nothing you can use in battle." : "Use which item?", false);
 	}
 }

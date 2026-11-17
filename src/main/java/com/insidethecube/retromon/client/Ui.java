@@ -7,12 +7,16 @@ import com.insidethecube.retromon.engine.Type;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
+import net.minecraft.network.chat.Style;
+import com.insidethecube.retromon.Retromon;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * The look of Retromon's screens: deep navy glass panels with soft rounded corners, white text, colour for
- * what you can press (FIGHT red, BAG amber, POKéMON green, RUN blue), type colours on moves, smooth HP and
- * EXP bars. Everything's drawn at a whole-number size so the pixel font stays crisp.
+ * The look of Retromon's screens: deep navy glass panels with soft rounded corners, clean white text (Poppins,
+ * a rounded modern font, as the newer games use), cream highlights for what's picked, colour for what you can
+ * press (FIGHT red, BAG amber, POKéMON green, RUN blue), type colours on moves, smooth HP and EXP bars.
  */
 public final class Ui {
 	private Ui() {}
@@ -22,6 +26,8 @@ public final class Ui {
 	public static final int RED = 0xFFE5525C, AMBER = 0xFFF0B43C, GREEN = 0xFF41BF84, BLUE = 0xFF4A8FE0, GOLD = 0xFFFFD45A, CYAN = 0xFF47C6F2;
 	public static final int HP_GREEN = 0xFF4CD27E, HP_YELLOW = 0xFFF2C744, HP_RED = 0xFFEF4F4F, TRACK = 0xFF0B1020;
 	public static final String CURSOR = "▶";
+	/** The cream of a picked row or button (the newer games' highlight), and the dark text on it. */
+	public static final int CREAM = 0xFFFFF4D8, CREAM_INK = 0xFF26304A;
 
 	/** How big to draw: 1 on a small window or a big GUI scale, 2 or more when there's room. */
 	public static int scale(int screenHeight) {
@@ -53,10 +59,31 @@ public final class Ui {
 
 	/** A button: its colour (brighter when picked or under the mouse), its label centred. */
 	public static void button(GuiGraphics g, Font f, int x, int y, int w, int h, String label, int color, boolean on, int s) {
-		round(g, x, y, w, h, on ? 0xFFFFFFFF : darker(color, 0.55F), s);
+		round(g, x, y, w, h, on ? CREAM : darker(color, 0.55F), s);
 		round(g, x + s, y + s, w - 2 * s, h - 2 * s, on ? color : darker(color, 0.8F), s);
 		g.fill(x + 3 * s, y + 2 * s, x + w - 3 * s, y + 3 * s, 0x33FFFFFF);
-		centred(g, f, label, x + w / 2, y + (h - 8 * s) / 2, TEXT, s, true);
+		int lw = boldWidth(f, label, s);
+		draw(g, f, bold(label), x + (w - lw) / 2, y + (h - 8 * s) / 2, TEXT, s, true);
+	}
+
+	/** A pill: a rounded row that's cream when picked (dark text) and glass when not, as the newer games' lists. */
+	public static void pill(GuiGraphics g, int x, int y, int w, int h, boolean on, int s) {
+		round(g, x, y, w, h, on ? CREAM : 0xB0141B2E, s);
+		if (!on) g.fill(x + 2 * s, y, x + w - 2 * s, y + Math.max(1, s / 2), 0x26FFFFFF);
+	}
+
+	/** Black bars at the top and bottom of the screen (a cinema frame), fading into the picture. t: 0 to 1. */
+	public static void cinema(GuiGraphics g, int width, int height, float t) {
+		int bar = Math.round(height * 0.11F * Math.max(0, Math.min(1, t)));
+		if (bar <= 0) return;
+		g.fill(0, 0, width, bar, 0xFF000000);
+		g.fill(0, height - bar, width, height, 0xFF000000);
+		int fade = Math.max(1, bar / 2);
+		for (int i = 0; i < fade; i++) {
+			int a = (int) (200 * (1 - i / (float) fade));
+			g.fill(0, bar + i, width, bar + i + 1, a << 24);
+			g.fill(0, height - bar - i - 1, width, height - bar - i, a << 24);
+		}
 	}
 
 	public static int darker(int argb, float k) {
@@ -68,28 +95,50 @@ public final class Ui {
 		return ((int) (Math.max(0, Math.min(1, a)) * (argb >>> 24)) << 24) | (argb & 0xFFFFFF);
 	}
 
+	private static final Style FONT = Style.EMPTY.withFont(new FontDescription.Resource(Retromon.id("ui")));
+	private static final Style BOLD = Style.EMPTY.withFont(new FontDescription.Resource(Retromon.id("ui_bold")));
+
+	/** Text in the interface font. */
+	public static Component ui(String text) {
+		return Component.literal(text).withStyle(FONT);
+	}
+
+	/** Text in the bold interface font (titles, names, buttons). */
+	public static Component bold(String text) {
+		return Component.literal(text).withStyle(BOLD);
+	}
+
 	public static void text(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {
-		shadowed(g, f, text, x, y, color, s);
+		draw(g, f, ui(text), x, y, color, s, true);
 	}
 
 	public static void plain(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {
-		g.pose().pushMatrix();
-		g.pose().translate(x, y);
-		g.pose().scale(s, s);
-		g.drawString(f, text, 0, 0, color, false);
-		g.pose().popMatrix();
+		draw(g, f, ui(text), x, y, color, s, false);
 	}
 
 	public static void shadowed(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {
+		draw(g, f, ui(text), x, y, color, s, true);
+	}
+
+	/** Bold text (a title or a name), with a soft shadow. */
+	public static void heading(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {
+		draw(g, f, bold(text), x, y, color, s, true);
+	}
+
+	public static void draw(GuiGraphics g, Font f, Component c, int x, int y, int color, int s, boolean shadow) {
 		g.pose().pushMatrix();
 		g.pose().translate(x, y);
 		g.pose().scale(s, s);
-		g.drawString(f, text, 0, 0, color, true);
+		g.drawString(f, c, 0, 0, color, shadow);
 		g.pose().popMatrix();
 	}
 
 	public static int width(Font f, String text, int s) {
-		return f.width(text) * s;
+		return f.width(ui(text)) * s;
+	}
+
+	public static int boldWidth(Font f, String text, int s) {
+		return f.width(bold(text)) * s;
 	}
 
 	public static void centred(GuiGraphics g, Font f, String text, int cx, int y, int color, int s, boolean shadow) {
@@ -109,7 +158,7 @@ public final class Ui {
 			StringBuilder line = new StringBuilder();
 			for (String word : para.split(" ")) {
 				String next = line.isEmpty() ? word : line + " " + word;
-				if (f.width(next) > width && !line.isEmpty()) {
+				if (f.width(ui(next)) > width && !line.isEmpty()) {
 					out.add(line.toString());
 					line = new StringBuilder(word);
 				} else {
@@ -199,7 +248,7 @@ public final class Ui {
 
 	public static boolean isB(KeyEvent e) {
 		int k = e.key();
-		return k == GLFW.GLFW_KEY_BACKSPACE || k == GLFW.GLFW_KEY_ESCAPE || k == GLFW.GLFW_KEY_X || k == GLFW.GLFW_KEY_Q;
+		return k == GLFW.GLFW_KEY_BACKSPACE || k == GLFW.GLFW_KEY_X || k == GLFW.GLFW_KEY_Q;
 	}
 
 	public static boolean isUp(KeyEvent e) {

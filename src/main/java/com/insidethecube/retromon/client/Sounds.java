@@ -95,17 +95,37 @@ public final class Sounds {
 		tune(SoundEvents.NOTE_BLOCK_BELL, 3, 13, 13, 13, 17, -1, 15, 15, 15, 18, -1, 17, 20, 25);
 	}
 
+	/** One of the games' little sounds (sounds/sfx): the A press, bumps, balls, hits and so on. */
+	public static void sfx(String id) {
+		sfx(id, 1F, 0.8F);
+	}
+
+	public static void sfx(String id, float pitch, float volume) {
+		if (id == null || id.isEmpty()) return;
+		Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(Retromon.id("sfx." + id), SoundSource.UI, volume, pitch,
+				RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true));
+	}
+
+	/** The A press (the games' click as the text moves on or a choice is made). */
+	public static void press() {
+		sfx("press", 1F, 0.55F);
+	}
+
 	public static void select() {
-		play(SoundEvents.NOTE_BLOCK_HAT, pitch(18), 0.5F);
+		press();
 	}
 
 	public static void attack() {
-		play(SoundEvents.NOTE_BLOCK_SNARE, pitch(8), 0.7F);
+		sfx("tackle", 1F, 0.6F);
 	}
 
 	public static void hit() {
-		play(SoundEvents.NOTE_BLOCK_BASEDRUM, pitch(4), 0.9F);
-		play(SoundEvents.NOTE_BLOCK_SNARE, pitch(2), 0.6F);
+		sfx("damage");
+	}
+
+	/** A hit by how well it went: super effective, not very effective, or plain. */
+	public static void hit(int effect) {
+		sfx(effect > 0 ? "super" : effect < 0 ? "weak" : "damage");
 	}
 
 	public static void stat(boolean up) {
@@ -113,14 +133,22 @@ public final class Sounds {
 	}
 
 	public static void shake() {
-		play(SoundEvents.NOTE_BLOCK_HAT, pitch(6), 0.8F);
+		sfx("tink");
 	}
 
 	public static void ball() {
-		tune(SoundEvents.NOTE_BLOCK_XYLOPHONE, 2, 18, 13, 6);
+		sfx("ball_toss");
+	}
+
+	public static void poof() {
+		sfx("ball_poof");
 	}
 
 	public static void run() {
-		tune(SoundEvents.NOTE_BLOCK_HAT, 2, 10, 13, 16, 20);
+		sfx("run");
+	}
+
+	public static void faint() {
+		sfx("faint_fall");
 	}
 }

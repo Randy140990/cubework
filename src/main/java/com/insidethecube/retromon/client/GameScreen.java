@@ -103,8 +103,17 @@ public abstract class GameScreen extends Screen {
 	protected void back() {
 	}
 
+	/** A screen put aside for Minecraft's own menu (Esc), to come back to when that closes. */
+	public static GameScreen resume;
+
 	@Override
 	public boolean keyPressed(KeyEvent e) {
+		// Esc opens Minecraft's menu, as anywhere in the game; closing it brings this screen back.
+		if (e.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE && minecraft != null && minecraft.level != null) {
+			resume = this;
+			minecraft.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
+			return true;
+		}
 		if (key(e)) return true;
 		return super.keyPressed(e);
 	}
@@ -214,6 +223,7 @@ public abstract class GameScreen extends Screen {
 		/** A press of A: finishes typing the page, or turns it. Returns true when there's nothing left to show. */
 		public boolean press() {
 			if (laidOut < 0) return false;
+			Sounds.press();
 			if (!typedOut()) {
 				typed = length();
 				return false;
@@ -225,9 +235,9 @@ public abstract class GameScreen extends Screen {
 
 		public void render(GuiGraphics g, Font f, int x, int y, int w, int h, int s, int ticks, boolean arrow) {
 			if (speaker != null && !speaker.isEmpty()) {
-				int tw = Ui.width(f, speaker, s) + 12 * s;
-				Ui.round(g, x + 6 * s, y - 9 * s, tw, 11 * s, Ui.EDGE_LIGHT, s);
-				Ui.text(g, f, speaker, x + 12 * s, y - 7 * s, Ui.TEXT, s);
+				int tw = Ui.boldWidth(f, speaker, s) + 14 * s;
+				Ui.round(g, x + 8 * s, y - 10 * s, tw, 12 * s, Ui.CREAM, s);
+				Ui.draw(g, f, Ui.bold(speaker), x + 15 * s, y - 8 * s, Ui.CREAM_INK, s, false);
 			}
 			Ui.panel(g, x, y, w, h, s);
 			layout(f, (w - 20 * s) / s);

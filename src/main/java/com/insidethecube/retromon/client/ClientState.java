@@ -34,6 +34,8 @@ public final class ClientState {
 	public static String placeName = "";
 	public static int placeTicks = -1;
 	private static final Deque<Supplier<Screen>> QUEUE = new ArrayDeque<>();
+	/** Your name, your rival's and boy or girl from the new-game intro, sent once the world's loaded. */
+	public static CompoundTag pendingProfile;
 
 	public static void receive(String kind, CompoundTag t) {
 		Minecraft mc = Minecraft.getInstance();
@@ -41,9 +43,19 @@ public final class ClientState {
 			case "mode" -> {
 				boolean save = t.getBooleanOr("save", false);
 				Adventure.setOn(t.getBooleanOr("on", false), save);
-				if (save) Shaders.enter();
+				if (save) {
+					Shaders.enter();
+					// The brighter greens are worked into the map as it's drawn: draw it again.
+					if (mc.levelRenderer != null) mc.levelRenderer.allChanged();
+				}
 			}
-			case "sync" -> data = PlayerData.load(t);
+			case "sync" -> {
+				data = PlayerData.load(t);
+				if (pendingProfile != null) {
+					ClientPlayNetworking.send(new Net.Act("profile", pendingProfile));
+					pendingProfile = null;
+				}
+			}
 			case "intro" -> {
 				introPending = true;
 				introDelay = 30;
@@ -82,12 +94,13 @@ public final class ClientState {
 			case "battle_start" -> {
 				List<String> enemies = new ArrayList<>();
 				for (Tag e : t.getListOrEmpty("theirs")) if (e instanceof CompoundTag c) enemies.add(c.getStringOr("sp", "pidgey"));
-				BattleScene.start(t.getStringOr("kind", "WILD").equals("TRAINER") ? battleNpc : -1, enemies);
+				BattleScene.start(t.getStringOr("kind", "WILD").equals("TRAINER") ? battleNpc : -1, enemies, t.getStringOr("arena", "route"));
 				battleNpc = -1;
+				GameScreen.resume = null;
 				mc.setScreen(new BattleScreen(t));
 			}
 			case "battle_turn" -> {
-				if (mc.screen instanceof BattleScreen b) b.feed(t);
+				if (BattleScreen.current != null) BattleScreen.current.feed(t);
 			}
 			case "nickname" -> QUEUE.add(() -> new NicknameScreen(t));
 			case "evolve" -> QUEUE.add(() -> new EvolutionScreen(t));
@@ -96,6 +109,7 @@ public final class ClientState {
 				switch (t.getStringOr("sound", "")) {
 					case "heal" -> Sounds.heal();
 					case "caught" -> Sounds.caught();
+					case "item" -> Music.jingle("get_item");
 					default -> {
 					}
 				}
@@ -120,6 +134,15 @@ public final class ClientState {
 			QUEUE.clear();
 			return;
 		}
+		// Back from Minecraft's menu (Esc) to the screen that was up: a battle, a conversation, the menu.
+		if (mc.screen == null && GameScreen.resume != null) {
+			GameScreen r = GameScreen.resume;
+			GameScreen.resume = null;
+			if (!(r instanceof BattleScreen) || BattleScreen.current == r) {
+				mc.setScreen(r);
+				return;
+			}
+		}
 		if (mc.screen == null && !QUEUE.isEmpty()) {
 			mc.setScreen(QUEUE.poll().get());
 			return;
@@ -138,5 +161,7 @@ public final class ClientState {
 		placeName = "";
 		placeTicks = -1;
 		QUEUE.clear();
+		GameScreen.resume = null;
+		BattleScreen.current = null;
 	}
 }
