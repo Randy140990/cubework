@@ -50,8 +50,8 @@ public final class BattleScene {
 		return side == 0 ? mine : theirs;
 	}
 
-	/** Sets out the field: npc is the trainer you're battling (or -1), enemy the first Pokémon you'll face. */
-	public static void start(int npc, String enemy) {
+	/** Sets out the field: npc is the trainer you're battling (or -1), enemies the Pokémon you'll face. */
+	public static void start(int npc, java.util.List<String> enemies) {
 		end();
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null || mc.level == null) return;
@@ -64,8 +64,12 @@ public final class BattleScene {
 			Vec3 d = trainer.position().subtract(origin);
 			prefer = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
 		}
-		BedrockModel.Def def = BedrockModel.def(enemy);
-		float h = def == null ? 1 : def.height;
+		// Room for the tallest of them (Onix needs the field set further back).
+		float h = 1;
+		for (String sp : enemies) {
+			BedrockModel.Def def = BedrockModel.def(sp);
+			if (def != null) h = Math.max(h, def.height);
+		}
 		double far = 7.5 + Math.max(0, h - 1.5) * 1.4;
 		float yaw = openest(prefer, far);
 		double r = Math.toRadians(yaw);

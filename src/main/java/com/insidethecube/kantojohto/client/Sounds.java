@@ -51,7 +51,7 @@ public final class Sounds {
 	}
 
 	public static void play(Holder<SoundEvent> sound, float pitch, float volume) {
-		Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound, pitch, volume));
+		Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound.value(), pitch, volume));
 	}
 
 	public static void cry(String species, float pitch) {

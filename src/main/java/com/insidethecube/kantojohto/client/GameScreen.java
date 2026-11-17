@@ -81,6 +81,13 @@ public abstract class GameScreen extends Screen {
 			laidOut = -1;
 		}
 
+		/** Shown all at once (a prompt that sits there while you choose). */
+		public static TextBox still(String line) {
+			TextBox b = new TextBox(List.of(line));
+			b.typed = 1 << 20;
+			return b;
+		}
+
 		public boolean empty() {
 			return messages.isEmpty();
 		}
@@ -116,7 +123,7 @@ public abstract class GameScreen extends Screen {
 
 		/** Whether it's showing its last page, all typed out. */
 		public boolean atEnd() {
-			return page >= pages.size() - 1 && typedOut();
+			return laidOut >= 0 && !pages.isEmpty() && page >= pages.size() - 1 && typedOut();
 		}
 
 		public boolean finished() {

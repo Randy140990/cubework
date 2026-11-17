@@ -163,8 +163,7 @@ public class MenuScreen extends GameScreen {
 				}
 				if (view == View.BAG || (view == View.MESSAGE && afterMessage == View.BAG)) renderBag(g, d);
 				if (view == View.SAVE) {
-					TextBox ask = new TextBox(List.of("Would you like to save the game?"));
-					ask.press();
+					TextBox ask = TextBox.still("Would you like to save the game?");
 					ask.render(g, font, 0, height - h, width, h, s, ticks, false);
 					yesNo.render(g, font, width - yesNo.width(font, s) - 2 * s, height - h - yesNo.height(s), s);
 				}
@@ -172,8 +171,7 @@ public class MenuScreen extends GameScreen {
 			}
 			case PARTY, POTION_ON -> {
 				renderParty(g, d, true);
-				TextBox hint = new TextBox(List.of(view == View.PARTY ? "Choose a POKéMON." : "Use on which POKéMON?"));
-				hint.press();
+				TextBox hint = TextBox.still(view == View.PARTY ? "Choose a POKéMON." : "Use on which POKéMON?");
 				hint.render(g, font, 0, height - h, width, h, s, ticks, false);
 			}
 			case SUMMARY -> renderSummary(g, d);

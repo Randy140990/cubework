@@ -51,11 +51,9 @@ public final class ClientState {
 			}
 			case "mart" -> mc.setScreen(new MartScreen());
 			case "battle_start" -> {
-				String enemy = "pidgey";
-				ListTag theirs = t.getListOrEmpty("theirs");
-				int at = t.getIntOr("enemy", 0);
-				if (at < theirs.size() && theirs.get(at) instanceof CompoundTag c) enemy = c.getStringOr("sp", "pidgey");
-				BattleScene.start(t.getStringOr("kind", "WILD").equals("TRAINER") ? battleNpc : -1, enemy);
+				List<String> enemies = new ArrayList<>();
+				for (Tag e : t.getListOrEmpty("theirs")) if (e instanceof CompoundTag c) enemies.add(c.getStringOr("sp", "pidgey"));
+				BattleScene.start(t.getStringOr("kind", "WILD").equals("TRAINER") ? battleNpc : -1, enemies);
 				battleNpc = -1;
 				mc.setScreen(new BattleScreen(t));
 			}
