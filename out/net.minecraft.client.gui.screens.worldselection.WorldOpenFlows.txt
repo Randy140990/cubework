@@ -1,0 +1,46 @@
+Compiled from "WorldOpenFlows.java"
+public class net.minecraft.client.gui.screens.worldselection.WorldOpenFlows {
+  private static final org.slf4j.Logger LOGGER;
+  private static final java.util.UUID WORLD_PACK_ID;
+  private final net.minecraft.client.Minecraft minecraft;
+  private final net.minecraft.world.level.storage.LevelStorageSource levelSource;
+  public net.minecraft.client.gui.screens.worldselection.WorldOpenFlows(net.minecraft.client.Minecraft, net.minecraft.world.level.storage.LevelStorageSource);
+  public void createFreshLevel(java.lang.String, net.minecraft.world.level.LevelSettings, net.minecraft.world.level.levelgen.WorldOptions, java.util.function.Function<net.minecraft.core.HolderLookup$Provider, net.minecraft.world.level.levelgen.WorldDimensions>, net.minecraft.client.gui.screens.Screen);
+  private net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess createWorldAccess(java.lang.String);
+  public void createLevelFromExistingSettings(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, net.minecraft.server.ReloadableServerResources, net.minecraft.core.LayeredRegistryAccess<net.minecraft.server.RegistryLayer>, net.minecraft.world.level.storage.WorldData);
+  public net.minecraft.server.WorldStem loadWorldStem(com.mojang.serialization.Dynamic<?>, boolean, net.minecraft.server.packs.repository.PackRepository) throws java.lang.Exception;
+  public com.mojang.datafixers.util.Pair<net.minecraft.world.level.LevelSettings, net.minecraft.client.gui.screens.worldselection.WorldCreationContext> recreateWorldData(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess) throws java.lang.Exception;
+  private <D, R> R loadWorldDataBlocking(net.minecraft.server.WorldLoader$PackConfig, net.minecraft.server.WorldLoader$WorldDataSupplier<D>, net.minecraft.server.WorldLoader$ResultFactory<D, R>) throws java.lang.Exception;
+  private void askForBackup(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, boolean, java.lang.Runnable, java.lang.Runnable);
+  public static void confirmWorldCreation(net.minecraft.client.Minecraft, net.minecraft.client.gui.screens.worldselection.CreateWorldScreen, com.mojang.serialization.Lifecycle, java.lang.Runnable, boolean);
+  public void openWorld(java.lang.String, java.lang.Runnable);
+  private void openWorldLoadLevelData(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, java.lang.Runnable);
+  private void openWorldCheckVersionCompatibility(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, net.minecraft.world.level.storage.LevelSummary, com.mojang.serialization.Dynamic<?>, java.lang.Runnable);
+  private void openWorldLoadLevelStem(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, com.mojang.serialization.Dynamic<?>, boolean, java.lang.Runnable);
+  private void openWorldCheckWorldStemCompatibility(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, net.minecraft.server.WorldStem, net.minecraft.server.packs.repository.PackRepository, java.lang.Runnable);
+  private void openWorldLoadBundledResourcePack(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, net.minecraft.server.WorldStem, net.minecraft.server.packs.repository.PackRepository, java.lang.Runnable);
+  private void openWorldCheckDiskSpace(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, net.minecraft.server.WorldStem, net.minecraft.client.resources.server.DownloadedPackSource, net.minecraft.server.packs.repository.PackRepository, java.lang.Runnable);
+  private void openWorldDoLoad(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, net.minecraft.server.WorldStem, net.minecraft.server.packs.repository.PackRepository);
+  private java.util.concurrent.CompletableFuture<java.lang.Void> loadBundledResourcePack(net.minecraft.client.resources.server.DownloadedPackSource, net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess);
+  private java.util.concurrent.CompletableFuture<java.lang.Boolean> promptBundledPackLoadFailure();
+  private void method_57774(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, net.minecraft.server.WorldStem, net.minecraft.server.packs.repository.PackRepository, net.minecraft.client.resources.server.DownloadedPackSource, java.lang.Runnable, boolean);
+  private java.lang.Void method_57785(java.lang.Throwable);
+  private void method_57777(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, net.minecraft.server.WorldStem, net.minecraft.client.resources.server.DownloadedPackSource, net.minecraft.server.packs.repository.PackRepository, java.lang.Runnable, java.lang.Boolean);
+  private java.util.concurrent.CompletionStage method_57789(java.lang.Throwable);
+  private static java.lang.Boolean method_57786(java.lang.Void);
+  private static void method_57772(net.minecraft.server.WorldStem, net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, java.lang.Runnable);
+  private void method_57790(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, net.minecraft.server.WorldStem, net.minecraft.server.packs.repository.PackRepository, java.lang.Runnable);
+  private void method_57778(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, com.mojang.serialization.Dynamic, java.lang.Runnable);
+  private static void method_57788(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, java.lang.Runnable);
+  private void method_57779(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, com.mojang.serialization.Dynamic, java.lang.Runnable, boolean, boolean);
+  private static void method_57791(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, java.lang.Runnable);
+  private void method_57783(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, java.lang.Runnable, boolean);
+  private static void method_41893(java.lang.Runnable, net.minecraft.client.Minecraft, net.minecraft.client.gui.screens.worldselection.CreateWorldScreen, boolean);
+  private static void method_54617(net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess, java.lang.Runnable, boolean, boolean);
+  private static com.mojang.datafixers.util.Pair method_45695(net.minecraft.server.packs.resources.CloseableResourceManager, net.minecraft.server.ReloadableServerResources, net.minecraft.core.LayeredRegistryAccess, net.minecraft.client.gui.screens.worldselection.WorldOpenFlows$1Data);
+  private static net.minecraft.server.WorldLoader$DataLoadOutput method_54609(com.mojang.serialization.Dynamic, net.minecraft.server.WorldLoader$DataLoadContext);
+  private static net.minecraft.server.WorldLoader$DataLoadOutput method_54622(com.mojang.serialization.Dynamic, net.minecraft.server.WorldLoader$DataLoadContext);
+  private void method_54621();
+  private static net.minecraft.server.WorldLoader$DataLoadOutput method_45698(java.util.function.Function, net.minecraft.world.level.LevelSettings, net.minecraft.world.level.levelgen.WorldOptions, net.minecraft.server.WorldLoader$DataLoadContext);
+  static {};
+}

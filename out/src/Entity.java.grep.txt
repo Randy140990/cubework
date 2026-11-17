@@ -1,0 +1,8 @@
+377:	public void setId(int i) {
+1649:	public void absSnapTo(double d, double e, double f, float g, float h) {
+1661:	public void absSnapTo(double d, double e, double f) {
+1670:	public void snapTo(Vec3 vec3) {
+1674:	public void snapTo(double d, double e, double f) {
+1678:	public void snapTo(BlockPos blockPos, float f, float g) {
+1682:	public void snapTo(Vec3 vec3, float f, float g) {
+1686:	public void snapTo(double d, double e, double f, float g, float h) {

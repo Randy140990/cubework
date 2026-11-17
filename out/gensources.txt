@@ -1,0 +1,20 @@
+
+> Configure project :
+Fabric Loom: 1.18.4
+Failed to find class (com/mojang/blaze3d/pipeline/RenderPipeline$Builder) to add injected interfaces from mod(s) (fabric-rendering-v1)
+Failed to find class (com/mojang/blaze3d/pipeline/RenderPipeline$Snippet) to add injected interfaces from mod(s) (fabric-rendering-v1)
+Failed to find class (net/minecraft/server/packs/resources/Resource) to add injected interfaces from mod(s) (fabric-resource-loader-v1)
+Failed to find class (com/mojang/blaze3d/pipeline/RenderPipeline) to add injected interfaces from mod(s) (fabric-rendering-v1)
+
+> Task :validateAccessWidener UP-TO-DATE
+
+> Task :genSourcesWithVineflower
+Decompile cache stats: 0 hits, 6622 misses
+
+> Task :genSources
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1794947281225.json
+
+BUILD SUCCESSFUL in 3m 15s
+2 actionable tasks: 1 executed, 1 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.7.1/userguide/configuration_cache_enabling.html
+sources: .gradle/loom-cache/minecraftMaven/net/minecraft/minecraft-merged-560387b4cf/1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2/minecraft-merged-560387b4cf-1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2-sources.jar

@@ -1,0 +1,1 @@
+645:	public abstract LevelData.RespawnData getRespawnData();

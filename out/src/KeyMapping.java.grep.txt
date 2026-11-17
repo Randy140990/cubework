@@ -1,0 +1,17 @@
+86:			keyMapping.registerMapping(keyMapping.key);
+105:		this.registerMapping(this.key);
+167:	public boolean matches(KeyEvent keyEvent) {
+173:	public boolean matchesMouse(MouseButtonEvent mouseButtonEvent) {
+193:	private void registerMapping(InputConstants.Key key) {
+204:		public static final KeyMapping.Category MOVEMENT = register("movement");
+205:		public static final KeyMapping.Category MISC = register("misc");
+206:		public static final KeyMapping.Category MULTIPLAYER = register("multiplayer");
+207:		public static final KeyMapping.Category GAMEPLAY = register("gameplay");
+208:		public static final KeyMapping.Category INVENTORY = register("inventory");
+209:		public static final KeyMapping.Category CREATIVE = register("creative");
+210:		public static final KeyMapping.Category SPECTATOR = register("spectator");
+211:		public static final KeyMapping.Category DEBUG = register("debug");
+213:		private static KeyMapping.Category register(String string) {
+214:			return register(Identifier.withDefaultNamespace(string));
+217:		public static KeyMapping.Category register(Identifier identifier) {
+220:				throw new IllegalArgumentException(String.format(Locale.ROOT, "Category '%s' is already registered.", identifier));

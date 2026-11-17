@@ -1,0 +1,45 @@
+Compiled from "Tag.java"
+public interface net.minecraft.nbt.Tag {
+  public static final int OBJECT_HEADER;
+  public static final int ARRAY_HEADER;
+  public static final int OBJECT_REFERENCE;
+  public static final int STRING_SIZE;
+  public static final byte TAG_END;
+  public static final byte TAG_BYTE;
+  public static final byte TAG_SHORT;
+  public static final byte TAG_INT;
+  public static final byte TAG_LONG;
+  public static final byte TAG_FLOAT;
+  public static final byte TAG_DOUBLE;
+  public static final byte TAG_BYTE_ARRAY;
+  public static final byte TAG_STRING;
+  public static final byte TAG_LIST;
+  public static final byte TAG_COMPOUND;
+  public static final byte TAG_INT_ARRAY;
+  public static final byte TAG_LONG_ARRAY;
+  public static final int MAX_DEPTH;
+  public abstract void write(java.io.DataOutput) throws java.io.IOException;
+  public abstract java.lang.String toString();
+  public abstract byte getId();
+  public abstract net.minecraft.nbt.TagType<?> getType();
+  public abstract net.minecraft.nbt.Tag copy();
+  public abstract int sizeInBytes();
+  public abstract void accept(net.minecraft.nbt.TagVisitor);
+  public abstract net.minecraft.nbt.StreamTagVisitor$ValueResult accept(net.minecraft.nbt.StreamTagVisitor);
+  public default void acceptAsRoot(net.minecraft.nbt.StreamTagVisitor);
+  public default java.util.Optional<java.lang.String> asString();
+  public default java.util.Optional<java.lang.Number> asNumber();
+  public default java.util.Optional<java.lang.Byte> asByte();
+  public default java.util.Optional<java.lang.Short> asShort();
+  public default java.util.Optional<java.lang.Integer> asInt();
+  public default java.util.Optional<java.lang.Long> asLong();
+  public default java.util.Optional<java.lang.Float> asFloat();
+  public default java.util.Optional<java.lang.Double> asDouble();
+  public default java.util.Optional<java.lang.Boolean> asBoolean();
+  public default java.util.Optional<byte[]> asByteArray();
+  public default java.util.Optional<int[]> asIntArray();
+  public default java.util.Optional<long[]> asLongArray();
+  public default java.util.Optional<net.minecraft.nbt.CompoundTag> asCompound();
+  public default java.util.Optional<net.minecraft.nbt.ListTag> asList();
+  private static java.lang.Boolean method_68661(java.lang.Byte);
+}

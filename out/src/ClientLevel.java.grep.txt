@@ -1,0 +1,2 @@
+414:	public void addEntity(Entity entity) {
+419:	public void removeEntity(int i, Entity.RemovalReason removalReason) {

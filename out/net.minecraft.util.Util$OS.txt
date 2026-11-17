@@ -1,0 +1,21 @@
+Compiled from "Util.java"
+public class net.minecraft.util.Util$OS extends java.lang.Enum<net.minecraft.util.Util$OS> {
+  public static final net.minecraft.util.Util$OS LINUX;
+  public static final net.minecraft.util.Util$OS SOLARIS;
+  public static final net.minecraft.util.Util$OS WINDOWS;
+  public static final net.minecraft.util.Util$OS OSX;
+  public static final net.minecraft.util.Util$OS UNKNOWN;
+  private final java.lang.String telemetryName;
+  private static final net.minecraft.util.Util$OS[] $VALUES;
+  public static net.minecraft.util.Util$OS[] values();
+  public static net.minecraft.util.Util$OS valueOf(java.lang.String);
+  net.minecraft.util.Util$OS(java.lang.String);
+  public void openUri(java.net.URI);
+  public void openFile(java.io.File);
+  public void openPath(java.nio.file.Path);
+  protected java.lang.String[] getOpenUriArguments(java.net.URI);
+  public void openUri(java.lang.String);
+  public java.lang.String telemetryName();
+  private static net.minecraft.util.Util$OS[] $values();
+  static {};
+}

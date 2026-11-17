@@ -1,0 +1,24 @@
+315:	public void setWeatherParameters(int i, int j, boolean bl, boolean bl2) {
+350:		int i = this.getGameRules().get(GameRules.PLAYERS_SLEEPING_PERCENTAGE);
+352:			if (this.getGameRules().get(GameRules.ADVANCE_TIME)) {
+358:			if (this.getGameRules().get(GameRules.ADVANCE_WEATHER) && this.isRaining()) {
+464:			if (this.getGameRules().get(GameRules.ADVANCE_TIME)) {
+545:				boolean bl2 = this.getGameRules().get(GameRules.SPAWN_MOBS)
+580:			int i = this.getGameRules().get(GameRules.MAX_SNOW_ACCUMULATION_HEIGHT);
+642:		return this.getGameRules().get(GameRules.PLAYERS_SLEEPING_PERCENTAGE) <= 100;
+648:				int i = this.getGameRules().get(GameRules.PLAYERS_SLEEPING_PERCENTAGE);
+700:			if (this.getGameRules().get(GameRules.ADVANCE_WEATHER)) {
+1056:		if (this.getGameRules().get(GameRules.GLOBAL_SOUND_EVENTS)) {
+1193:			case MOB -> this.getGameRules().get(GameRules.MOB_GRIEFING) ? this.getDestroyType(GameRules.MOB_EXPLOSION_DROP_DECAY) : Explosion.BlockInteraction.KEEP;
+1211:		return this.getGameRules().get(gameRule) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
+1420:	public LevelData.RespawnData getRespawnData() {
+1421:		return this.getServer().getRespawnData();
+1701:			&& this.getGameRules().get(GameRules.SPAWN_MOBS)
+1702:			&& this.getGameRules().get(GameRules.SPAWN_MONSTERS);
+1741:		int i = this.getGameRules().get(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER);
+1772:	public GameRules getGameRules() {
+1773:		return this.serverLevelData.getGameRules();
+1799:		return level.dimension() == Level.NETHER ? this.getGameRules().get(GameRules.ALLOW_ENTERING_NETHER_USING_PORTALS) : true;
+1803:		return this.getGameRules().get(GameRules.PVP);
+1807:		return this.getGameRules().get(GameRules.COMMAND_BLOCKS_WORK);
+1811:		return this.getGameRules().get(GameRules.SPAWNER_BLOCKS_WORK);
