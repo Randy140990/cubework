@@ -1,0 +1,93 @@
+name: Compile check
+
+# Development aid: compiles a work-in-progress branch (check/...) and saves the compiler's output and the
+# signatures of the classes in ci/check-classes.txt to the 'ci-check' branch. It never fails the run, and
+# it doesn't publish anything or start the game.
+on:
+  push:
+    branches: ["check/**"]
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Compile
+        shell: bash
+        run: |
+          set +e +o pipefail
+          chmod +x gradlew
+          mkdir -p out
+          ./gradlew compileJava --stacktrace > out/compile.txt 2>&1; echo "exit=$?" >> out/compile.txt
+          tail -30 out/compile.txt
+          # When it compiles, the jar too (for testing before there's a release).
+          if grep -q "exit=0" out/compile.txt; then
+            ./gradlew build -x test > out/build.txt 2>&1; echo "exit=$?" >> out/build.txt
+            cp $(ls build/libs/*.jar | grep -v -- '-sources.jar') out/ 2>/dev/null || true
+          fi
+          ./gradlew printClasspath > /dev/null 2>&1
+          CP=$(cat classpath.txt 2>/dev/null)
+          echo "$CP" | tr ':' '\n' > out/classpath.txt
+          # Entries whose names match ci/check-find.txt (one pattern a line), in the game and in Fabric API.
+          if [ -s ci/check-find.txt ]; then
+            while read -r pat; do
+              [ -z "$pat" ] && continue
+              for F in $(echo "$CP" | tr ':' '\n'); do
+                unzip -l "$F" 2>/dev/null | grep -i -E "$pat" | awk '{print $4}' | sed "s|^|$(basename $F): |" >> out/found.txt || true
+              done
+            done < ci/check-find.txt
+          fi
+          # Signatures of the classes in ci/check-classes.txt ("c some.Class" adds the bytecode).
+          if [ -s ci/check-classes.txt ]; then
+            while read -r cls; do
+              [ -z "$cls" ] && continue
+              case "$cls" in
+                "c "*) c="${cls#c }"; javap -c -p -cp "$CP" "$c" > "out/$c.c.txt" 2>&1 || true ;;
+                *) javap -p -cp "$CP" "$cls" > "out/$cls.txt" 2>&1 || true ;;
+              esac
+            done < ci/check-classes.txt
+          fi
+          # Vanilla sources (Loom's decompiler, Mojang names) for the paths in ci/check-sources.txt (one a
+          # line: a class path, or "grep PATTERN path" for the matching lines only), and data files.
+          if [ -s ci/check-sources.txt ]; then
+            ./gradlew genSources > out/gensources.txt 2>&1
+            SJAR=$(find ~/.gradle .gradle -name "minecraft-merged*sources.jar" 2>/dev/null | head -n 1)
+            echo "sources: $SJAR" >> out/gensources.txt
+            mkdir -p out/src
+            while read -r line; do
+              [ -z "$line" ] && continue
+              case "$line" in
+                "grep "*) rest="${line#grep }"; pat="${rest%% *}"; f="${rest#* }"
+                  unzip -p "$SJAR" "$f" 2>/dev/null | grep -n -E "$pat" > "out/src/$(basename $f).grep.txt" ;;
+                "data "*) f="${line#data }"
+                  for J in $(find ~/.gradle .gradle -name "*.jar" 2>/dev/null | grep -i -E "minecraft|server|client" | grep -v sources); do
+                    unzip -p "$J" "$f" > "out/src/$(basename $f)" 2>/dev/null && [ -s "out/src/$(basename $f)" ] && break
+                  done ;;
+                *) unzip -p "$SJAR" "$line" > "out/src/$(basename $line)" 2>/dev/null ;;
+              esac
+            done < ci/check-sources.txt
+          fi
+          exit 0
+      - name: Save
+        continue-on-error: true
+        shell: bash
+        run: |
+          BR=ci-check-routeone
+          
+          git config user.name "routeone-ci"
+          git config user.email "routeone-ci@users.noreply.github.com"
+          cp -r out /tmp/out
+          git checkout --orphan ci-check-tmp
+          git rm -rf --cached . > /dev/null 2>&1 || true
+          rm -rf out && cp -r /tmp/out out
+          git add -f out
+          git commit -m "Compile check for ${GITHUB_SHA}" > /dev/null
+          git push -f origin HEAD:$BR

@@ -1,0 +1,8 @@
+grep (detached|void.setup|setPosition|setRotation|getMaxZoom|move\(|protected|public) net/minecraft/client/Camera.java
+grep (moveVector|keyPresses|tick|Input\(|public|private) net/minecraft/client/player/KeyboardInput.java
+grep (turnPlayer|onScroll|grabMouse|releaseMouse|isMouseGrabbed|handleAccumulatedMovement) net/minecraft/client/MouseHandler.java
+grep (public|openWorld|createFreshLevel|checkForBackupAndLoad|loadLevel) net/minecraft/client/gui/screens/worldselection/WorldOpenFlows.java
+grep (addRenderableWidget|Button.builder|createNormalMenuOptions|init\(\)|private|protected) net/minecraft/client/gui/screens/TitleScreen.java
+grep (public.void.blit|drawCenteredString|public.void.drawString|public.void.fill\(|pose\(\)|public.int.guiWidth) net/minecraft/client/gui/GuiGraphics.java
+grep (doWeatherCycle|doFireTick|ADVANCE_WEATHER|SPREAD|FIRE|WEATHER|public.static.final) net/minecraft/world/level/gamerules/GameRules.java
+grep (public|LevelStorageAccess.createAccess|validateAndCreateAccess|getBaseDir|getLevelPath) net/minecraft/world/level/storage/LevelStorageSource.java

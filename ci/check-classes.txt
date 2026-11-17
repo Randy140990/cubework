@@ -1,0 +1,17 @@
+net.minecraft.client.Camera
+net.minecraft.client.player.KeyboardInput
+net.minecraft.client.player.ClientInput
+net.minecraft.client.MouseHandler
+net.minecraft.client.gui.screens.TitleScreen
+net.minecraft.client.gui.screens.worldselection.WorldOpenFlows
+net.minecraft.world.level.storage.LevelStorageSource
+net.minecraft.world.entity.player.Input
+net.minecraft.client.CameraType
+net.minecraft.client.Options
+net.minecraft.client.gui.Gui
+net.minecraft.client.renderer.GameRenderer
+net.minecraft.client.player.LocalPlayer
+net.minecraft.client.gui.GuiGraphics
+net.minecraft.client.gui.screens.Screen
+net.minecraft.client.KeyMapping
+net.minecraft.world.level.GameRules
