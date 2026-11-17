@@ -1,11 +1,3 @@
-grep (SHORT_DRY_GRASS|TALL_DRY_GRASS|FIREFLY_BUSH|Block.BUSH|SHORT_GRASS|TALL_GRASS) net/minecraft/world/level/block/Blocks.java
-grep (FLOWERS|CROPS|SAPLINGS) net/minecraft/tags/BlockTags.java
-grep (public) net/minecraft/client/sounds/MusicManager.java
-grep (setTickRate|tickRateManager) net/minecraft/server/MinecraftServer.java
-grep (setTickRate|public) net/minecraft/server/ServerTickRateManager.java
-grep (public.EditBox|setMaxLength|setValue|getValue|setFocused) net/minecraft/client/gui/components/EditBox.java
-grep (shift|record) net/minecraft/world/entity/player/Input.java
-grep (openPath|openFile|openUri|getPlatform) net/minecraft/util/Util.java
-grep (getCompoundOrEmpty|getStringOr|getIntOr|getListOrEmpty) net/minecraft/nbt/CompoundTag.java
-grep (void.bobView|void.bobHurt|getFov) net/minecraft/client/renderer/GameRenderer.java
-grep (isInWater|isUnderWater) net/minecraft/world/entity/Entity.java
+grep (UI|MUSIC|MASTER) net/minecraft/sounds/SoundSource.java
+grep (pauseAllExcept|soundManager.pause|soundManager.resume) net/minecraft/client/Minecraft.java
+grep (public.*getSoundEvent|public.void.play|public.boolean.isActive) net/minecraft/client/sounds/SoundManager.java

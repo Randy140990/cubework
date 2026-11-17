@@ -502,7 +502,7 @@ def write_ogg(samples, path):
         w.setsampwidth(2)
         w.setframerate(RATE)
         w.writeframes((samples * 32000).astype(np.int16).tobytes())
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", tmp, "-c:a", "libvorbis", "-q:a", "1", path], check=True)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", tmp, "-ar", "44100", "-c:a", "libvorbis", "-q:a", "1", path], check=True)
     os.remove(tmp)
 
 

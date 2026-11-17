@@ -1,9 +1,15 @@
 package com.insidethecube.retromon.client;
 
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import com.insidethecube.retromon.Retromon;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -14,8 +20,9 @@ import net.minecraft.util.RandomSource;
 /**
  * The game's music (Yellow's soundtrack, rendered from the game's own code): each place's tune, the battle
  * themes and victory fanfares, and the short jingles (healing, a catch, a level up), which pause the music
- * and then let it carry on. A song with an intro plays the intro once and then loops the rest. It plays on
- * Minecraft's music volume, and Minecraft's own music keeps quiet meanwhile.
+ * and then let it carry on. A song with an intro plays the intro once and then loops the rest. It has its own
+ * volume (OPTION in the START menu), so it plays even with Minecraft's music slider at 0, and Minecraft's own
+ * music keeps quiet meanwhile.
  */
 public final class Music {
 	private Music() {}
@@ -26,10 +33,69 @@ public final class Music {
 	private static String jingle;
 	private static SoundInstance jinglePlaying;
 	private static final Map<String, Boolean> HAS_INTRO = new HashMap<>();
+	/** Retromon's music volume, 0 to 4 (OFF, LOW, MID, HIGH, MAX); saved in config/retromon-client.properties. */
+	private static int level = -1;
+	private static String logged;
+
+	/**
+	 * The sound channel the music plays on: Minecraft's "UI" channel where the game has one (it isn't paused
+	 * with the game and players rarely turn it down), otherwise the master channel.
+	 */
+	private static final SoundSource SOURCE = source();
+
+	private static SoundSource source() {
+		try {
+			return SoundSource.valueOf("UI");
+		} catch (IllegalArgumentException e) {
+			return SoundSource.MASTER;
+		}
+	}
+
+	private static Path configFile() {
+		return FabricLoader.getInstance().getConfigDir().resolve("retromon-client.properties");
+	}
+
+	public static int level() {
+		if (level < 0) {
+			level = 4;
+			try (Reader r = Files.newBufferedReader(configFile())) {
+				Properties p = new Properties();
+				p.load(r);
+				level = Math.max(0, Math.min(4, Integer.parseInt(p.getProperty("music", "4").trim())));
+			} catch (Exception ignored) {
+				// No settings yet: full volume.
+			}
+		}
+		return level;
+	}
+
+	/** Sets the music volume (0 to 4), saves it and carries on the song at the new volume. */
+	public static void setLevel(int value) {
+		level = Math.max(0, Math.min(4, value));
+		try {
+			Files.createDirectories(configFile().getParent());
+			try (Writer w = Files.newBufferedWriter(configFile())) {
+				Properties p = new Properties();
+				p.setProperty("music", Integer.toString(level));
+				p.store(w, "Retromon client settings");
+			}
+		} catch (Exception e) {
+			Retromon.LOG.warn("Couldn't save the music volume: {}", e.toString());
+		}
+		String song = current;
+		stopSound();
+		current = null;
+		if (song != null && jingle == null) play(song);
+		else current = song;
+	}
+
+	private static float volume() {
+		return level() / 4F;
+	}
 
 	/** Whether Retromon's music is playing (Minecraft's own music stays quiet then). */
 	public static boolean active() {
-		return current != null || jingle != null;
+		return level() > 0 && (current != null || jingle != null);
 	}
 
 	private static boolean exists(String id) {
@@ -38,19 +104,26 @@ public final class Music {
 	}
 
 	private static SoundInstance sound(String id, boolean loop) {
-		return new SimpleSoundInstance(Retromon.id("music." + id), SoundSource.MUSIC, 1.0F, 1.0F, RandomSource.create(), loop, 0,
+		return new SimpleSoundInstance(Retromon.id("music." + id), SOURCE, volume(), 1.0F, RandomSource.create(), loop, 0,
 				SoundInstance.Attenuation.NONE, 0, 0, 0, true);
 	}
 
 	/** Plays a song (from its intro, if it has one), replacing what's playing. */
 	public static void play(String id) {
 		if (id == null || id.isEmpty() || !exists(id)) {
+			if (id != null && !id.isEmpty()) Retromon.LOG.warn("Retromon music: no file for {}", id);
 			stop();
 			return;
 		}
 		if (id.equals(current) && playing != null) return;
 		stopSound();
 		current = id;
+		if (level() == 0) return;
+		if (!id.equals(logged)) {
+			logged = id;
+			boolean known = Minecraft.getInstance().getSoundManager().getSoundEvent(Retromon.id("music." + id)) != null;
+			Retromon.LOG.info("Retromon music: {} on {} at {}%{}", id, SOURCE, level() * 25, known ? "" : " (sound event missing!)");
+		}
 		inIntro = exists(id + "_intro");
 		looping = !inIntro;
 		playing = sound(inIntro ? id + "_intro" : id, !inIntro);
@@ -60,7 +133,7 @@ public final class Music {
 
 	/** A song played once through (a jingle that pauses the music). */
 	public static void jingle(String id) {
-		if (!exists(id)) return;
+		if (!exists(id) || level() == 0) return;
 		Minecraft mc = Minecraft.getInstance();
 		if (jinglePlaying != null) mc.getSoundManager().stop(jinglePlaying);
 		if (playing != null) mc.getSoundManager().stop(playing);
@@ -123,14 +196,14 @@ public final class Music {
 			}
 			return;
 		}
-		if (current == null || playing == null) return;
+		if (current == null || playing == null || level() == 0) return;
 		if (inIntro && !mc.getSoundManager().isActive(playing)) {
 			inIntro = false;
 			looping = true;
 			playing = sound(current, true);
 			mc.getSoundManager().play(playing);
-		} else if (looping && !mc.getSoundManager().isActive(playing) && mc.options.getSoundSourceVolume(SoundSource.MUSIC) > 0) {
-			// Stopped by something else (the volume slider): start again.
+		} else if (looping && !mc.getSoundManager().isActive(playing)) {
+			// Stopped by something else (loading a world stops every sound): start again.
 			playing = sound(current, true);
 			mc.getSoundManager().play(playing);
 		}

@@ -23,6 +23,8 @@ public class MenuScreen extends GameScreen {
 		MENU, PARTY, PARTY_ACTION, SUMMARY, BAG, BAG_ACTION, USE_ON, CARD, SAVE, OPTION, MESSAGE
 	}
 
+	/** Which OPTION row the keys change: 0 text speed, 1 music. */
+	private int optionRow;
 	private static final String[] ITEMS = {"POKéMON", "BAG", "CARD", "SAVE", "OPTION", "EXIT"};
 	private static final int[] COLORS = {Ui.GREEN, Ui.AMBER, Ui.BLUE, Ui.CYAN, 0xFF8C93A8, Ui.RED};
 	private static final String[] POCKETS = {"ITEMS", "BALLS", "KEY ITEMS"};
@@ -232,8 +234,12 @@ public class MenuScreen extends GameScreen {
 				else if (Ui.isA(e)) save();
 			}
 			case OPTION -> {
-				if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isA(e)) setSpeed(Math.floorMod(d.textSpeed + (Ui.isLeft(e) ? -1 : 1), 3));
-				else if (Ui.isB(e)) view = View.MENU;
+				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = 1 - optionRow;
+				else if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isA(e)) {
+					int step = Ui.isLeft(e) ? -1 : 1;
+					if (optionRow == 0) setSpeed(Math.floorMod(d.textSpeed + step, 3));
+					else Music.setLevel(Math.floorMod(Music.level() + step, 5));
+				} else if (Ui.isB(e)) view = View.MENU;
 			}
 			case MESSAGE -> {
 				if ((Ui.isA(e) || Ui.isB(e)) && message.press()) view = afterMessage;
@@ -488,20 +494,35 @@ public class MenuScreen extends GameScreen {
 	}
 
 	private void drawOptions(GuiGraphics g, PlayerData d) {
-		int m = 6 * s, w = Math.min(width - 120 * s, 230 * s), h = 76 * s, x = m, y = m;
+		int m = 6 * s, w = Math.min(width - 120 * s, 230 * s), h = 112 * s, x = m, y = m;
 		Ui.panel(g, x, y, w, h, s);
 		int l = x + 12 * s;
-		Ui.text(g, font, "TEXT SPEED", l, y + 10 * s, Ui.MUTED, s);
+		Ui.text(g, font, "TEXT SPEED", l, y + 10 * s, optionRow == 0 ? Ui.TEXT : Ui.MUTED, s);
 		String[] speeds = {"SLOW", "MID", "FAST"};
 		int bw = (w - 30 * s) / 3;
 		for (int i = 0; i < 3; i++) {
 			int bx = l + i * (bw + 3 * s), by = y + 22 * s;
 			int idx = i;
 			Ui.button(g, font, bx, by, bw, 16 * s, speeds[i], Ui.BLUE, d.textSpeed == i, s);
-			hit(bx, by, bw, 16 * s, () -> setSpeed(idx));
+			hit(bx, by, bw, 16 * s, () -> {
+				optionRow = 0;
+				setSpeed(idx);
+			});
 		}
-		Ui.text(g, font, "Mouse wheel: zoom.  R: game speed.", l, y + 46 * s, Ui.DIM, s);
-		Ui.text(g, font, "Shift: run.  Music: Minecraft's music volume.", l, y + 58 * s, Ui.DIM, s);
+		Ui.text(g, font, "MUSIC", l, y + 46 * s, optionRow == 1 ? Ui.TEXT : Ui.MUTED, s);
+		String[] levels = {"OFF", "LOW", "MID", "HIGH", "MAX"};
+		int mw = (w - 36 * s) / 5;
+		for (int i = 0; i < 5; i++) {
+			int bx = l + i * (mw + 3 * s), by = y + 58 * s;
+			int idx = i;
+			Ui.button(g, font, bx, by, mw, 16 * s, levels[i], Ui.BLUE, Music.level() == i, s);
+			hit(bx, by, mw, 16 * s, () -> {
+				optionRow = 1;
+				Music.setLevel(idx);
+			});
+		}
+		Ui.text(g, font, "Mouse wheel: zoom.  R: game speed.", l, y + 82 * s, Ui.DIM, s);
+		Ui.text(g, font, "Shift: run.  Up and down: pick a row.", l, y + 94 * s, Ui.DIM, s);
 	}
 
 	@SuppressWarnings("unused")
