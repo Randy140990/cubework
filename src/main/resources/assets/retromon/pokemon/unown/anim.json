@@ -1,0 +1,1 @@
+{"format_version":"1.8.0","animations":{"animation.unown.ground_idle":{"animation_length":4,"bones":{"body":{"position":["math.sin(q.anim_time*90*1-90)*0.8","1.2+math.sin(q.anim_time*90*2+135)*0.35","math.sin(q.anim_time*90*2+90)*0.25"],"rotation":["1+math.sin(q.anim_time*90*2)*1.5",0,"math.sin(q.anim_time*90*1)*4"]}},"loop":true}}}

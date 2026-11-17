@@ -1,5 +1,11 @@
-grep (getGameRules|setWeatherParameters|getRespawnData) net/minecraft/server/level/ServerLevel.java
-grep (getGameRules|getRespawnData|setWeatherParameters) net/minecraft/world/level/Level.java
-grep (public.void.addEntity|public.void.removeEntity) net/minecraft/client/multiplayer/ClientLevel.java
-grep (public.final.void.snapTo|public.void.snapTo|public.void.setId|public.void.moveTo|public.void.absSnapTo) net/minecraft/world/entity/Entity.java
-grep (public.boolean.matches|public.static.Category|register) net/minecraft/client/KeyMapping.java
+grep (SHORT_DRY_GRASS|TALL_DRY_GRASS|FIREFLY_BUSH|Block.BUSH|SHORT_GRASS|TALL_GRASS) net/minecraft/world/level/block/Blocks.java
+grep (FLOWERS|CROPS|SAPLINGS) net/minecraft/tags/BlockTags.java
+grep (public) net/minecraft/client/sounds/MusicManager.java
+grep (setTickRate|tickRateManager) net/minecraft/server/MinecraftServer.java
+grep (setTickRate|public) net/minecraft/server/ServerTickRateManager.java
+grep (public.EditBox|setMaxLength|setValue|getValue|setFocused) net/minecraft/client/gui/components/EditBox.java
+grep (shift|record) net/minecraft/world/entity/player/Input.java
+grep (openPath|openFile|openUri|getPlatform) net/minecraft/util/Util.java
+grep (getCompoundOrEmpty|getStringOr|getIntOr|getListOrEmpty) net/minecraft/nbt/CompoundTag.java
+grep (void.bobView|void.bobHurt|getFov) net/minecraft/client/renderer/GameRenderer.java
+grep (isInWater|isUnderWater) net/minecraft/world/entity/Entity.java

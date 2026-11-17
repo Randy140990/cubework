@@ -1,0 +1,39 @@
+# id	species	level	place	kind	note
+snorlax_route_12	snorlax	30	route_12	static	Asleep on the road (wake it with the POKé FLUTE in Yellow)
+snorlax_route_16	snorlax	30	route_16	static	Asleep on the road
+articuno	articuno	50	seafoam_islands_b4f	static	Deep in the Seafoam Islands
+zapdos	zapdos	50	power_plant	static	In the Power Plant
+moltres	moltres	50	victory_road_2f	static	On Victory Road
+mewtwo	mewtwo	70	cerulean_cave_b1f	static	Deep in Cerulean Cave
+electrode_power_plant_1	electrode	43	power_plant	static	Posing as an item ball
+electrode_power_plant_2	electrode	43	power_plant	static	Posing as an item ball
+bulbasaur_gift	bulbasaur	10	cerulean_city	gift	Given by the girl in the house by the Gym (Yellow)
+charmander_gift	charmander	10	route_24	gift	Given by the trainer at the end of Nugget Bridge (Yellow)
+squirtle_gift	squirtle	10	vermilion_city	gift	Given by Officer Jenny (Yellow)
+eevee_gift	eevee	25	celadon_city	gift	In the Celadon Mansion's back room
+lapras_gift	lapras	15	saffron_city	gift	From a Silph Co. employee
+hitmonlee_gift	hitmonlee	30	saffron_city	gift	Fighting Dojo prize (one or the other)
+hitmonchan_gift	hitmonchan	30	saffron_city	gift	Fighting Dojo prize (one or the other)
+magikarp_gift	magikarp	5	route_4	gift	Sold for ¥500 at Mt. Moon's Pokémon Centre
+omanyte_gift	omanyte	30	cinnabar_island	gift	Revived from the Helix Fossil
+kabuto_gift	kabuto	30	cinnabar_island	gift	Revived from the Dome Fossil
+aerodactyl_gift	aerodactyl	30	cinnabar_island	gift	Revived from the Old Amber
+porygon_gift	porygon	18	celadon_city	gift	Game Corner prize
+mr_mime_trade	mr_mime	14	route_2	trade	In-game trade (stands in for the trade)
+jynx_trade	jynx	22	cerulean_city	trade	In-game trade
+farfetch_d_trade	farfetch_d	12	vermilion_city	trade	In-game trade
+lickitung_trade	lickitung	15	route_18	trade	In-game trade
+mew	mew	5	-	event	Event only: place it anywhere you like
+lugia	lugia	40	whirl_island_lugia_chamber	static	Silver's mascot, in the Whirl Islands
+ho_oh	ho_oh	40	tin_tower_roof	static	On top of Tin Tower (Rainbow Wing)
+sudowoodo	sudowoodo	20	route_36	static	The odd tree on Route 36 (SquirtBottle)
+red_gyarados	gyarados	30	lake_of_rage	static	The Red Gyarados in the Lake of Rage
+snorlax_vermilion	snorlax	50	vermilion_city	static	Asleep by Diglett's Cave (Gold and Silver)
+raikou	raikou	40	burned_tower_b1f	roaming	Flees the Burned Tower, then roams Johto
+entei	entei	40	burned_tower_b1f	roaming	Flees the Burned Tower, then roams Johto
+suicune	suicune	40	burned_tower_b1f	roaming	Flees the Burned Tower, then roams Johto
+lapras_union_cave	lapras	20	union_cave_b2f	static	Fridays only, in Union Cave
+electrode_rocket_1	electrode	23	team_rocket_base_b2f	static	Powering the Rocket base generator
+electrode_rocket_2	electrode	23	team_rocket_base_b2f	static	Powering the Rocket base generator
+electrode_rocket_3	electrode	23	team_rocket_base_b2f	static	Powering the Rocket base generator
+togepi_egg	togepi	5	violet_city	gift	The egg from Prof. Elm's aide

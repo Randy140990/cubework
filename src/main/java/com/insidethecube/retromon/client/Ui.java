@@ -1,0 +1,220 @@
+package com.insidethecube.retromon.client;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.insidethecube.retromon.engine.Type;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.KeyEvent;
+import org.lwjgl.glfw.GLFW;
+
+/**
+ * The look of Retromon's screens: deep navy glass panels with soft rounded corners, white text, colour for
+ * what you can press (FIGHT red, BAG amber, POKéMON green, RUN blue), type colours on moves, smooth HP and
+ * EXP bars. Everything's drawn at a whole-number size so the pixel font stays crisp.
+ */
+public final class Ui {
+	private Ui() {}
+
+	public static final int PANEL = 0xEC141B2E, PANEL_SOFT = 0xD0141B2E, EDGE = 0xFF33416A, EDGE_LIGHT = 0xFF5A6DA3, SHINE = 0x22FFFFFF;
+	public static final int TEXT = 0xFFF4F6FF, MUTED = 0xFFA9B4D4, DIM = 0xFF6B7697, INK = 0xFF1A1F30;
+	public static final int RED = 0xFFE5525C, AMBER = 0xFFF0B43C, GREEN = 0xFF41BF84, BLUE = 0xFF4A8FE0, GOLD = 0xFFFFD45A, CYAN = 0xFF47C6F2;
+	public static final int HP_GREEN = 0xFF4CD27E, HP_YELLOW = 0xFFF2C744, HP_RED = 0xFFEF4F4F, TRACK = 0xFF0B1020;
+	public static final String CURSOR = "▶";
+
+	/** How big to draw: 1 on a small window or a big GUI scale, 2 or more when there's room. */
+	public static int scale(int screenHeight) {
+		return Math.max(1, Math.min(3, screenHeight / 190));
+	}
+
+	/** A rounded rectangle (corners cut one or two pixels in), in one colour. */
+	public static void round(GuiGraphics g, int x, int y, int w, int h, int color, int s) {
+		int r = Math.max(1, s);
+		g.fill(x + 2 * r, y, x + w - 2 * r, y + h, color);
+		g.fill(x + r, y + r, x + 2 * r, y + h - r, color);
+		g.fill(x + w - 2 * r, y + r, x + w - r, y + h - r, color);
+		g.fill(x, y + 2 * r, x + r, y + h - 2 * r, color);
+		g.fill(x + w - r, y + 2 * r, x + w, y + h - 2 * r, color);
+	}
+
+	/** A panel: an edge, the glass, and a faint sheen across the top. */
+	public static void panel(GuiGraphics g, int x, int y, int w, int h, int s) {
+		round(g, x, y, w, h, EDGE, s);
+		round(g, x + s, y + s, w - 2 * s, h - 2 * s, PANEL, s);
+		g.fill(x + 3 * s, y + 2 * s, x + w - 3 * s, y + 3 * s, SHINE);
+	}
+
+	/** A panel with a coloured strip down its left side (for menus and boxes that belong to something). */
+	public static void tagged(GuiGraphics g, int x, int y, int w, int h, int s, int accent) {
+		panel(g, x, y, w, h, s);
+		g.fill(x + s, y + 3 * s, x + 3 * s, y + h - 3 * s, accent);
+	}
+
+	/** A button: its colour (brighter when picked or under the mouse), its label centred. */
+	public static void button(GuiGraphics g, Font f, int x, int y, int w, int h, String label, int color, boolean on, int s) {
+		round(g, x, y, w, h, on ? 0xFFFFFFFF : darker(color, 0.55F), s);
+		round(g, x + s, y + s, w - 2 * s, h - 2 * s, on ? color : darker(color, 0.8F), s);
+		g.fill(x + 3 * s, y + 2 * s, x + w - 3 * s, y + 3 * s, 0x33FFFFFF);
+		centred(g, f, label, x + w / 2, y + (h - 8 * s) / 2, TEXT, s, true);
+	}
+
+	public static int darker(int argb, float k) {
+		int a = argb >>> 24, r = (argb >> 16) & 255, gr = (argb >> 8) & 255, b = argb & 255;
+		return (a << 24) | ((int) (r * k) << 16) | ((int) (gr * k) << 8) | (int) (b * k);
+	}
+
+	public static int alpha(int argb, float a) {
+		return ((int) (Math.max(0, Math.min(1, a)) * (argb >>> 24)) << 24) | (argb & 0xFFFFFF);
+	}
+
+	public static void text(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {
+		shadowed(g, f, text, x, y, color, s);
+	}
+
+	public static void plain(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {
+		g.pose().pushMatrix();
+		g.pose().translate(x, y);
+		g.pose().scale(s, s);
+		g.drawString(f, text, 0, 0, color, false);
+		g.pose().popMatrix();
+	}
+
+	public static void shadowed(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {
+		g.pose().pushMatrix();
+		g.pose().translate(x, y);
+		g.pose().scale(s, s);
+		g.drawString(f, text, 0, 0, color, true);
+		g.pose().popMatrix();
+	}
+
+	public static int width(Font f, String text, int s) {
+		return f.width(text) * s;
+	}
+
+	public static void centred(GuiGraphics g, Font f, String text, int cx, int y, int color, int s, boolean shadow) {
+		int x = cx - width(f, text, s) / 2;
+		if (shadow) shadowed(g, f, text, x, y, color, s);
+		else plain(g, f, text, x, y, color, s);
+	}
+
+	public static void right(GuiGraphics g, Font f, String text, int rx, int y, int color, int s) {
+		shadowed(g, f, text, rx - width(f, text, s), y, color, s);
+	}
+
+	/** Splits text into lines that fit a width (in unscaled font pixels). */
+	public static List<String> wrap(Font f, String text, int width) {
+		List<String> out = new ArrayList<>();
+		for (String para : text.split("\n")) {
+			StringBuilder line = new StringBuilder();
+			for (String word : para.split(" ")) {
+				String next = line.isEmpty() ? word : line + " " + word;
+				if (f.width(next) > width && !line.isEmpty()) {
+					out.add(line.toString());
+					line = new StringBuilder(word);
+				} else {
+					line = new StringBuilder(next);
+				}
+			}
+			out.add(line.toString());
+		}
+		return out;
+	}
+
+	public static int hpColor(float frac) {
+		return frac > 0.5F ? HP_GREEN : frac > 0.2F ? HP_YELLOW : HP_RED;
+	}
+
+	/** A rounded bar: a dark track and the part filled. */
+	public static void bar(GuiGraphics g, int x, int y, int w, int h, float frac, int color, int s) {
+		round(g, x, y, w, h, 0xFF05080F, Math.max(1, s / 2));
+		g.fill(x + s / 2 + 1, y + 1, x + w - s / 2 - 1, y + h - 1, TRACK);
+		int fw = Math.round((w - 2) * Math.max(0, Math.min(1, frac)));
+		if (frac > 0 && fw < 1) fw = 1;
+		if (fw > 0) {
+			g.fill(x + 1, y + 1, x + 1 + fw, y + h - 1, color);
+			g.fill(x + 1, y + 1, x + 1 + fw, y + 1 + Math.max(1, (h - 2) / 3), 0x40FFFFFF);
+		}
+	}
+
+	/** An HP bar with its label. */
+	public static void hp(GuiGraphics g, Font f, int x, int y, int w, float hp, int max, int s) {
+		plain(g, f, "HP", x, y, GOLD, s);
+		int bx = x + width(f, "HP", s) + 3 * s;
+		float frac = max <= 0 ? 0 : hp / max;
+		bar(g, bx, y + s, w - (bx - x), 5 * s, frac, hpColor(frac), s);
+	}
+
+	/** The colour of a type (as the later games colour their move buttons). */
+	public static int typeColor(Type t) {
+		if (t == null) return 0xFF8A8FA3;
+		return switch (t) {
+			case NORMAL -> 0xFF9DA0AA;
+			case FIRE -> 0xFFF08436;
+			case WATER -> 0xFF4D90D5;
+			case ELECTRIC -> 0xFFE9C72E;
+			case GRASS -> 0xFF5DB850;
+			case ICE -> 0xFF6FCFD0;
+			case FIGHTING -> 0xFFCE4069;
+			case POISON -> 0xFFAB6AC8;
+			case GROUND -> 0xFFD97746;
+			case FLYING -> 0xFF8FA8DD;
+			case PSYCHIC -> 0xFFF66F71;
+			case BUG -> 0xFF90C12C;
+			case ROCK -> 0xFFC5B78C;
+			case GHOST -> 0xFF5269AC;
+			case DRAGON -> 0xFF0A6DC4;
+			case DARK -> 0xFF5A5366;
+			case STEEL -> 0xFF5A8EA1;
+			case CURSE -> 0xFF68A090;
+		};
+	}
+
+	/** A small rounded tag (a type, a status). */
+	public static int chip(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {
+		int w = width(f, text, s) + 6 * s;
+		round(g, x, y, w, 10 * s, color, s);
+		plain(g, f, text, x + 3 * s, y + s, 0xFFFFFFFF, s);
+		return w;
+	}
+
+	public static int statusColor(String tag) {
+		return switch (tag) {
+			case "PSN" -> 0xFFA25BC7;
+			case "BRN" -> 0xFFEF7A3C;
+			case "FRZ" -> 0xFF5FC9D6;
+			case "PAR" -> 0xFFD9B32E;
+			case "SLP" -> 0xFF8C93A8;
+			case "FNT" -> 0xFFB53A3A;
+			default -> 0xFF8C93A8;
+		};
+	}
+
+	// ---------- keys (every screen also works with the keyboard, like the games) ----------
+
+	public static boolean isA(KeyEvent e) {
+		int k = e.key();
+		return k == GLFW.GLFW_KEY_SPACE || k == GLFW.GLFW_KEY_ENTER || k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_Z || k == GLFW.GLFW_KEY_E;
+	}
+
+	public static boolean isB(KeyEvent e) {
+		int k = e.key();
+		return k == GLFW.GLFW_KEY_BACKSPACE || k == GLFW.GLFW_KEY_ESCAPE || k == GLFW.GLFW_KEY_X || k == GLFW.GLFW_KEY_Q;
+	}
+
+	public static boolean isUp(KeyEvent e) {
+		return e.key() == GLFW.GLFW_KEY_UP || e.key() == GLFW.GLFW_KEY_W;
+	}
+
+	public static boolean isDown(KeyEvent e) {
+		return e.key() == GLFW.GLFW_KEY_DOWN || e.key() == GLFW.GLFW_KEY_S;
+	}
+
+	public static boolean isLeft(KeyEvent e) {
+		return e.key() == GLFW.GLFW_KEY_LEFT || e.key() == GLFW.GLFW_KEY_A;
+	}
+
+	public static boolean isRight(KeyEvent e) {
+		return e.key() == GLFW.GLFW_KEY_RIGHT || e.key() == GLFW.GLFW_KEY_D;
+	}
+}

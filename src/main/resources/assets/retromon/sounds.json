@@ -1,0 +1,2784 @@
+{
+ "cry.bulbasaur": {
+  "sounds": [
+   {
+    "name": "retromon:cry/bulbasaur",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ivysaur": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ivysaur",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.venusaur": {
+  "sounds": [
+   {
+    "name": "retromon:cry/venusaur",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.charmander": {
+  "sounds": [
+   {
+    "name": "retromon:cry/charmander",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.charmeleon": {
+  "sounds": [
+   {
+    "name": "retromon:cry/charmeleon",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.charizard": {
+  "sounds": [
+   {
+    "name": "retromon:cry/charizard",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.squirtle": {
+  "sounds": [
+   {
+    "name": "retromon:cry/squirtle",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.wartortle": {
+  "sounds": [
+   {
+    "name": "retromon:cry/wartortle",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.blastoise": {
+  "sounds": [
+   {
+    "name": "retromon:cry/blastoise",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.caterpie": {
+  "sounds": [
+   {
+    "name": "retromon:cry/caterpie",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.metapod": {
+  "sounds": [
+   {
+    "name": "retromon:cry/metapod",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.butterfree": {
+  "sounds": [
+   {
+    "name": "retromon:cry/butterfree",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.weedle": {
+  "sounds": [
+   {
+    "name": "retromon:cry/weedle",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.kakuna": {
+  "sounds": [
+   {
+    "name": "retromon:cry/kakuna",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.beedrill": {
+  "sounds": [
+   {
+    "name": "retromon:cry/beedrill",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.pidgey": {
+  "sounds": [
+   {
+    "name": "retromon:cry/pidgey",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.pidgeotto": {
+  "sounds": [
+   {
+    "name": "retromon:cry/pidgeotto",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.pidgeot": {
+  "sounds": [
+   {
+    "name": "retromon:cry/pidgeot",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.rattata": {
+  "sounds": [
+   {
+    "name": "retromon:cry/rattata",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.raticate": {
+  "sounds": [
+   {
+    "name": "retromon:cry/raticate",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.spearow": {
+  "sounds": [
+   {
+    "name": "retromon:cry/spearow",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.fearow": {
+  "sounds": [
+   {
+    "name": "retromon:cry/fearow",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ekans": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ekans",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.arbok": {
+  "sounds": [
+   {
+    "name": "retromon:cry/arbok",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.pikachu": {
+  "sounds": [
+   {
+    "name": "retromon:cry/pikachu",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.raichu": {
+  "sounds": [
+   {
+    "name": "retromon:cry/raichu",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.sandshrew": {
+  "sounds": [
+   {
+    "name": "retromon:cry/sandshrew",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.sandslash": {
+  "sounds": [
+   {
+    "name": "retromon:cry/sandslash",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.nidoran_f": {
+  "sounds": [
+   {
+    "name": "retromon:cry/nidoran_f",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.nidorina": {
+  "sounds": [
+   {
+    "name": "retromon:cry/nidorina",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.nidoqueen": {
+  "sounds": [
+   {
+    "name": "retromon:cry/nidoqueen",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.nidoran_m": {
+  "sounds": [
+   {
+    "name": "retromon:cry/nidoran_m",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.nidorino": {
+  "sounds": [
+   {
+    "name": "retromon:cry/nidorino",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.nidoking": {
+  "sounds": [
+   {
+    "name": "retromon:cry/nidoking",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.clefairy": {
+  "sounds": [
+   {
+    "name": "retromon:cry/clefairy",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.clefable": {
+  "sounds": [
+   {
+    "name": "retromon:cry/clefable",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.vulpix": {
+  "sounds": [
+   {
+    "name": "retromon:cry/vulpix",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ninetales": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ninetales",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.jigglypuff": {
+  "sounds": [
+   {
+    "name": "retromon:cry/jigglypuff",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.wigglytuff": {
+  "sounds": [
+   {
+    "name": "retromon:cry/wigglytuff",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.zubat": {
+  "sounds": [
+   {
+    "name": "retromon:cry/zubat",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.golbat": {
+  "sounds": [
+   {
+    "name": "retromon:cry/golbat",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.oddish": {
+  "sounds": [
+   {
+    "name": "retromon:cry/oddish",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.gloom": {
+  "sounds": [
+   {
+    "name": "retromon:cry/gloom",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.vileplume": {
+  "sounds": [
+   {
+    "name": "retromon:cry/vileplume",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.paras": {
+  "sounds": [
+   {
+    "name": "retromon:cry/paras",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.parasect": {
+  "sounds": [
+   {
+    "name": "retromon:cry/parasect",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.venonat": {
+  "sounds": [
+   {
+    "name": "retromon:cry/venonat",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.venomoth": {
+  "sounds": [
+   {
+    "name": "retromon:cry/venomoth",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.diglett": {
+  "sounds": [
+   {
+    "name": "retromon:cry/diglett",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.dugtrio": {
+  "sounds": [
+   {
+    "name": "retromon:cry/dugtrio",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.meowth": {
+  "sounds": [
+   {
+    "name": "retromon:cry/meowth",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.persian": {
+  "sounds": [
+   {
+    "name": "retromon:cry/persian",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.psyduck": {
+  "sounds": [
+   {
+    "name": "retromon:cry/psyduck",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.golduck": {
+  "sounds": [
+   {
+    "name": "retromon:cry/golduck",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.mankey": {
+  "sounds": [
+   {
+    "name": "retromon:cry/mankey",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.primeape": {
+  "sounds": [
+   {
+    "name": "retromon:cry/primeape",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.growlithe": {
+  "sounds": [
+   {
+    "name": "retromon:cry/growlithe",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.arcanine": {
+  "sounds": [
+   {
+    "name": "retromon:cry/arcanine",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.poliwag": {
+  "sounds": [
+   {
+    "name": "retromon:cry/poliwag",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.poliwhirl": {
+  "sounds": [
+   {
+    "name": "retromon:cry/poliwhirl",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.poliwrath": {
+  "sounds": [
+   {
+    "name": "retromon:cry/poliwrath",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.abra": {
+  "sounds": [
+   {
+    "name": "retromon:cry/abra",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.kadabra": {
+  "sounds": [
+   {
+    "name": "retromon:cry/kadabra",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.alakazam": {
+  "sounds": [
+   {
+    "name": "retromon:cry/alakazam",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.machop": {
+  "sounds": [
+   {
+    "name": "retromon:cry/machop",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.machoke": {
+  "sounds": [
+   {
+    "name": "retromon:cry/machoke",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.machamp": {
+  "sounds": [
+   {
+    "name": "retromon:cry/machamp",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.bellsprout": {
+  "sounds": [
+   {
+    "name": "retromon:cry/bellsprout",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.weepinbell": {
+  "sounds": [
+   {
+    "name": "retromon:cry/weepinbell",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.victreebel": {
+  "sounds": [
+   {
+    "name": "retromon:cry/victreebel",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.tentacool": {
+  "sounds": [
+   {
+    "name": "retromon:cry/tentacool",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.tentacruel": {
+  "sounds": [
+   {
+    "name": "retromon:cry/tentacruel",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.geodude": {
+  "sounds": [
+   {
+    "name": "retromon:cry/geodude",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.graveler": {
+  "sounds": [
+   {
+    "name": "retromon:cry/graveler",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.golem": {
+  "sounds": [
+   {
+    "name": "retromon:cry/golem",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ponyta": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ponyta",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.rapidash": {
+  "sounds": [
+   {
+    "name": "retromon:cry/rapidash",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.slowpoke": {
+  "sounds": [
+   {
+    "name": "retromon:cry/slowpoke",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.slowbro": {
+  "sounds": [
+   {
+    "name": "retromon:cry/slowbro",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.magnemite": {
+  "sounds": [
+   {
+    "name": "retromon:cry/magnemite",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.magneton": {
+  "sounds": [
+   {
+    "name": "retromon:cry/magneton",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.farfetch_d": {
+  "sounds": [
+   {
+    "name": "retromon:cry/farfetch_d",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.doduo": {
+  "sounds": [
+   {
+    "name": "retromon:cry/doduo",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.dodrio": {
+  "sounds": [
+   {
+    "name": "retromon:cry/dodrio",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.seel": {
+  "sounds": [
+   {
+    "name": "retromon:cry/seel",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.dewgong": {
+  "sounds": [
+   {
+    "name": "retromon:cry/dewgong",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.grimer": {
+  "sounds": [
+   {
+    "name": "retromon:cry/grimer",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.muk": {
+  "sounds": [
+   {
+    "name": "retromon:cry/muk",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.shellder": {
+  "sounds": [
+   {
+    "name": "retromon:cry/shellder",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.cloyster": {
+  "sounds": [
+   {
+    "name": "retromon:cry/cloyster",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.gastly": {
+  "sounds": [
+   {
+    "name": "retromon:cry/gastly",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.haunter": {
+  "sounds": [
+   {
+    "name": "retromon:cry/haunter",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.gengar": {
+  "sounds": [
+   {
+    "name": "retromon:cry/gengar",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.onix": {
+  "sounds": [
+   {
+    "name": "retromon:cry/onix",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.drowzee": {
+  "sounds": [
+   {
+    "name": "retromon:cry/drowzee",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.hypno": {
+  "sounds": [
+   {
+    "name": "retromon:cry/hypno",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.krabby": {
+  "sounds": [
+   {
+    "name": "retromon:cry/krabby",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.kingler": {
+  "sounds": [
+   {
+    "name": "retromon:cry/kingler",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.voltorb": {
+  "sounds": [
+   {
+    "name": "retromon:cry/voltorb",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.electrode": {
+  "sounds": [
+   {
+    "name": "retromon:cry/electrode",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.exeggcute": {
+  "sounds": [
+   {
+    "name": "retromon:cry/exeggcute",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.exeggutor": {
+  "sounds": [
+   {
+    "name": "retromon:cry/exeggutor",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.cubone": {
+  "sounds": [
+   {
+    "name": "retromon:cry/cubone",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.marowak": {
+  "sounds": [
+   {
+    "name": "retromon:cry/marowak",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.hitmonlee": {
+  "sounds": [
+   {
+    "name": "retromon:cry/hitmonlee",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.hitmonchan": {
+  "sounds": [
+   {
+    "name": "retromon:cry/hitmonchan",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.lickitung": {
+  "sounds": [
+   {
+    "name": "retromon:cry/lickitung",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.koffing": {
+  "sounds": [
+   {
+    "name": "retromon:cry/koffing",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.weezing": {
+  "sounds": [
+   {
+    "name": "retromon:cry/weezing",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.rhyhorn": {
+  "sounds": [
+   {
+    "name": "retromon:cry/rhyhorn",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.rhydon": {
+  "sounds": [
+   {
+    "name": "retromon:cry/rhydon",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.chansey": {
+  "sounds": [
+   {
+    "name": "retromon:cry/chansey",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.tangela": {
+  "sounds": [
+   {
+    "name": "retromon:cry/tangela",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.kangaskhan": {
+  "sounds": [
+   {
+    "name": "retromon:cry/kangaskhan",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.horsea": {
+  "sounds": [
+   {
+    "name": "retromon:cry/horsea",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.seadra": {
+  "sounds": [
+   {
+    "name": "retromon:cry/seadra",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.goldeen": {
+  "sounds": [
+   {
+    "name": "retromon:cry/goldeen",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.seaking": {
+  "sounds": [
+   {
+    "name": "retromon:cry/seaking",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.staryu": {
+  "sounds": [
+   {
+    "name": "retromon:cry/staryu",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.starmie": {
+  "sounds": [
+   {
+    "name": "retromon:cry/starmie",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.mr_mime": {
+  "sounds": [
+   {
+    "name": "retromon:cry/mr_mime",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.scyther": {
+  "sounds": [
+   {
+    "name": "retromon:cry/scyther",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.jynx": {
+  "sounds": [
+   {
+    "name": "retromon:cry/jynx",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.electabuzz": {
+  "sounds": [
+   {
+    "name": "retromon:cry/electabuzz",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.magmar": {
+  "sounds": [
+   {
+    "name": "retromon:cry/magmar",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.pinsir": {
+  "sounds": [
+   {
+    "name": "retromon:cry/pinsir",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.tauros": {
+  "sounds": [
+   {
+    "name": "retromon:cry/tauros",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.magikarp": {
+  "sounds": [
+   {
+    "name": "retromon:cry/magikarp",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.gyarados": {
+  "sounds": [
+   {
+    "name": "retromon:cry/gyarados",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.lapras": {
+  "sounds": [
+   {
+    "name": "retromon:cry/lapras",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ditto": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ditto",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.eevee": {
+  "sounds": [
+   {
+    "name": "retromon:cry/eevee",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.vaporeon": {
+  "sounds": [
+   {
+    "name": "retromon:cry/vaporeon",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.jolteon": {
+  "sounds": [
+   {
+    "name": "retromon:cry/jolteon",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.flareon": {
+  "sounds": [
+   {
+    "name": "retromon:cry/flareon",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.porygon": {
+  "sounds": [
+   {
+    "name": "retromon:cry/porygon",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.omanyte": {
+  "sounds": [
+   {
+    "name": "retromon:cry/omanyte",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.omastar": {
+  "sounds": [
+   {
+    "name": "retromon:cry/omastar",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.kabuto": {
+  "sounds": [
+   {
+    "name": "retromon:cry/kabuto",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.kabutops": {
+  "sounds": [
+   {
+    "name": "retromon:cry/kabutops",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.aerodactyl": {
+  "sounds": [
+   {
+    "name": "retromon:cry/aerodactyl",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.snorlax": {
+  "sounds": [
+   {
+    "name": "retromon:cry/snorlax",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.articuno": {
+  "sounds": [
+   {
+    "name": "retromon:cry/articuno",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.zapdos": {
+  "sounds": [
+   {
+    "name": "retromon:cry/zapdos",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.moltres": {
+  "sounds": [
+   {
+    "name": "retromon:cry/moltres",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.dratini": {
+  "sounds": [
+   {
+    "name": "retromon:cry/dratini",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.dragonair": {
+  "sounds": [
+   {
+    "name": "retromon:cry/dragonair",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.dragonite": {
+  "sounds": [
+   {
+    "name": "retromon:cry/dragonite",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.mewtwo": {
+  "sounds": [
+   {
+    "name": "retromon:cry/mewtwo",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.mew": {
+  "sounds": [
+   {
+    "name": "retromon:cry/mew",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.chikorita": {
+  "sounds": [
+   {
+    "name": "retromon:cry/chikorita",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.bayleef": {
+  "sounds": [
+   {
+    "name": "retromon:cry/bayleef",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.meganium": {
+  "sounds": [
+   {
+    "name": "retromon:cry/meganium",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.cyndaquil": {
+  "sounds": [
+   {
+    "name": "retromon:cry/cyndaquil",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.quilava": {
+  "sounds": [
+   {
+    "name": "retromon:cry/quilava",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.typhlosion": {
+  "sounds": [
+   {
+    "name": "retromon:cry/typhlosion",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.totodile": {
+  "sounds": [
+   {
+    "name": "retromon:cry/totodile",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.croconaw": {
+  "sounds": [
+   {
+    "name": "retromon:cry/croconaw",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.feraligatr": {
+  "sounds": [
+   {
+    "name": "retromon:cry/feraligatr",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.sentret": {
+  "sounds": [
+   {
+    "name": "retromon:cry/sentret",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.furret": {
+  "sounds": [
+   {
+    "name": "retromon:cry/furret",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.hoothoot": {
+  "sounds": [
+   {
+    "name": "retromon:cry/hoothoot",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.noctowl": {
+  "sounds": [
+   {
+    "name": "retromon:cry/noctowl",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ledyba": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ledyba",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ledian": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ledian",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.spinarak": {
+  "sounds": [
+   {
+    "name": "retromon:cry/spinarak",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ariados": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ariados",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.crobat": {
+  "sounds": [
+   {
+    "name": "retromon:cry/crobat",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.chinchou": {
+  "sounds": [
+   {
+    "name": "retromon:cry/chinchou",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.lanturn": {
+  "sounds": [
+   {
+    "name": "retromon:cry/lanturn",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.pichu": {
+  "sounds": [
+   {
+    "name": "retromon:cry/pichu",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.cleffa": {
+  "sounds": [
+   {
+    "name": "retromon:cry/cleffa",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.igglybuff": {
+  "sounds": [
+   {
+    "name": "retromon:cry/igglybuff",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.togepi": {
+  "sounds": [
+   {
+    "name": "retromon:cry/togepi",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.togetic": {
+  "sounds": [
+   {
+    "name": "retromon:cry/togetic",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.natu": {
+  "sounds": [
+   {
+    "name": "retromon:cry/natu",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.xatu": {
+  "sounds": [
+   {
+    "name": "retromon:cry/xatu",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.mareep": {
+  "sounds": [
+   {
+    "name": "retromon:cry/mareep",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.flaaffy": {
+  "sounds": [
+   {
+    "name": "retromon:cry/flaaffy",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ampharos": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ampharos",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.bellossom": {
+  "sounds": [
+   {
+    "name": "retromon:cry/bellossom",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.marill": {
+  "sounds": [
+   {
+    "name": "retromon:cry/marill",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.azumarill": {
+  "sounds": [
+   {
+    "name": "retromon:cry/azumarill",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.sudowoodo": {
+  "sounds": [
+   {
+    "name": "retromon:cry/sudowoodo",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.politoed": {
+  "sounds": [
+   {
+    "name": "retromon:cry/politoed",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.hoppip": {
+  "sounds": [
+   {
+    "name": "retromon:cry/hoppip",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.skiploom": {
+  "sounds": [
+   {
+    "name": "retromon:cry/skiploom",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.jumpluff": {
+  "sounds": [
+   {
+    "name": "retromon:cry/jumpluff",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.aipom": {
+  "sounds": [
+   {
+    "name": "retromon:cry/aipom",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.sunkern": {
+  "sounds": [
+   {
+    "name": "retromon:cry/sunkern",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.sunflora": {
+  "sounds": [
+   {
+    "name": "retromon:cry/sunflora",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.yanma": {
+  "sounds": [
+   {
+    "name": "retromon:cry/yanma",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.wooper": {
+  "sounds": [
+   {
+    "name": "retromon:cry/wooper",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.quagsire": {
+  "sounds": [
+   {
+    "name": "retromon:cry/quagsire",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.espeon": {
+  "sounds": [
+   {
+    "name": "retromon:cry/espeon",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.umbreon": {
+  "sounds": [
+   {
+    "name": "retromon:cry/umbreon",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.murkrow": {
+  "sounds": [
+   {
+    "name": "retromon:cry/murkrow",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.slowking": {
+  "sounds": [
+   {
+    "name": "retromon:cry/slowking",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.misdreavus": {
+  "sounds": [
+   {
+    "name": "retromon:cry/misdreavus",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.unown": {
+  "sounds": [
+   {
+    "name": "retromon:cry/unown",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.wobbuffet": {
+  "sounds": [
+   {
+    "name": "retromon:cry/wobbuffet",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.girafarig": {
+  "sounds": [
+   {
+    "name": "retromon:cry/girafarig",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.pineco": {
+  "sounds": [
+   {
+    "name": "retromon:cry/pineco",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.forretress": {
+  "sounds": [
+   {
+    "name": "retromon:cry/forretress",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.dunsparce": {
+  "sounds": [
+   {
+    "name": "retromon:cry/dunsparce",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.gligar": {
+  "sounds": [
+   {
+    "name": "retromon:cry/gligar",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.steelix": {
+  "sounds": [
+   {
+    "name": "retromon:cry/steelix",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.snubbull": {
+  "sounds": [
+   {
+    "name": "retromon:cry/snubbull",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.granbull": {
+  "sounds": [
+   {
+    "name": "retromon:cry/granbull",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.qwilfish": {
+  "sounds": [
+   {
+    "name": "retromon:cry/qwilfish",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.scizor": {
+  "sounds": [
+   {
+    "name": "retromon:cry/scizor",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.shuckle": {
+  "sounds": [
+   {
+    "name": "retromon:cry/shuckle",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.heracross": {
+  "sounds": [
+   {
+    "name": "retromon:cry/heracross",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.sneasel": {
+  "sounds": [
+   {
+    "name": "retromon:cry/sneasel",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.teddiursa": {
+  "sounds": [
+   {
+    "name": "retromon:cry/teddiursa",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ursaring": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ursaring",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.slugma": {
+  "sounds": [
+   {
+    "name": "retromon:cry/slugma",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.magcargo": {
+  "sounds": [
+   {
+    "name": "retromon:cry/magcargo",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.swinub": {
+  "sounds": [
+   {
+    "name": "retromon:cry/swinub",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.piloswine": {
+  "sounds": [
+   {
+    "name": "retromon:cry/piloswine",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.corsola": {
+  "sounds": [
+   {
+    "name": "retromon:cry/corsola",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.remoraid": {
+  "sounds": [
+   {
+    "name": "retromon:cry/remoraid",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.octillery": {
+  "sounds": [
+   {
+    "name": "retromon:cry/octillery",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.delibird": {
+  "sounds": [
+   {
+    "name": "retromon:cry/delibird",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.mantine": {
+  "sounds": [
+   {
+    "name": "retromon:cry/mantine",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.skarmory": {
+  "sounds": [
+   {
+    "name": "retromon:cry/skarmory",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.houndour": {
+  "sounds": [
+   {
+    "name": "retromon:cry/houndour",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.houndoom": {
+  "sounds": [
+   {
+    "name": "retromon:cry/houndoom",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.kingdra": {
+  "sounds": [
+   {
+    "name": "retromon:cry/kingdra",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.phanpy": {
+  "sounds": [
+   {
+    "name": "retromon:cry/phanpy",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.donphan": {
+  "sounds": [
+   {
+    "name": "retromon:cry/donphan",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.porygon2": {
+  "sounds": [
+   {
+    "name": "retromon:cry/porygon2",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.stantler": {
+  "sounds": [
+   {
+    "name": "retromon:cry/stantler",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.smeargle": {
+  "sounds": [
+   {
+    "name": "retromon:cry/smeargle",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.tyrogue": {
+  "sounds": [
+   {
+    "name": "retromon:cry/tyrogue",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.hitmontop": {
+  "sounds": [
+   {
+    "name": "retromon:cry/hitmontop",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.smoochum": {
+  "sounds": [
+   {
+    "name": "retromon:cry/smoochum",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.elekid": {
+  "sounds": [
+   {
+    "name": "retromon:cry/elekid",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.magby": {
+  "sounds": [
+   {
+    "name": "retromon:cry/magby",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.miltank": {
+  "sounds": [
+   {
+    "name": "retromon:cry/miltank",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.blissey": {
+  "sounds": [
+   {
+    "name": "retromon:cry/blissey",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.raikou": {
+  "sounds": [
+   {
+    "name": "retromon:cry/raikou",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.entei": {
+  "sounds": [
+   {
+    "name": "retromon:cry/entei",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.suicune": {
+  "sounds": [
+   {
+    "name": "retromon:cry/suicune",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.larvitar": {
+  "sounds": [
+   {
+    "name": "retromon:cry/larvitar",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.pupitar": {
+  "sounds": [
+   {
+    "name": "retromon:cry/pupitar",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.tyranitar": {
+  "sounds": [
+   {
+    "name": "retromon:cry/tyranitar",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.lugia": {
+  "sounds": [
+   {
+    "name": "retromon:cry/lugia",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.ho_oh": {
+  "sounds": [
+   {
+    "name": "retromon:cry/ho_oh",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.celebi": {
+  "sounds": [
+   {
+    "name": "retromon:cry/celebi",
+    "volume": 0.8
+   }
+  ]
+ },
+ "music.bike_riding": {
+  "sounds": [
+   {
+    "name": "retromon:music/bike_riding",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.caught_mon": {
+  "sounds": [
+   {
+    "name": "retromon:music/caught_mon",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.celadon": {
+  "sounds": [
+   {
+    "name": "retromon:music/celadon",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.celadon_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/celadon_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.cinnabar": {
+  "sounds": [
+   {
+    "name": "retromon:music/cinnabar",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.cinnabar_mansion": {
+  "sounds": [
+   {
+    "name": "retromon:music/cinnabar_mansion",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.cinnabar_mansion_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/cinnabar_mansion_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.cities1": {
+  "sounds": [
+   {
+    "name": "retromon:music/cities1",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.cities2": {
+  "sounds": [
+   {
+    "name": "retromon:music/cities2",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.cities2_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/cities2_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.credits": {
+  "sounds": [
+   {
+    "name": "retromon:music/credits",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.defeated_gym_leader": {
+  "sounds": [
+   {
+    "name": "retromon:music/defeated_gym_leader",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.defeated_gym_leader_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/defeated_gym_leader_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.defeated_trainer": {
+  "sounds": [
+   {
+    "name": "retromon:music/defeated_trainer",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.defeated_trainer_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/defeated_trainer_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.defeated_wild_mon": {
+  "sounds": [
+   {
+    "name": "retromon:music/defeated_wild_mon",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.defeated_wild_mon_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/defeated_wild_mon_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.dungeon1": {
+  "sounds": [
+   {
+    "name": "retromon:music/dungeon1",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.dungeon1_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/dungeon1_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.dungeon2": {
+  "sounds": [
+   {
+    "name": "retromon:music/dungeon2",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.dungeon3": {
+  "sounds": [
+   {
+    "name": "retromon:music/dungeon3",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.final_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/final_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.final_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/final_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.game_corner": {
+  "sounds": [
+   {
+    "name": "retromon:music/game_corner",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.game_corner_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/game_corner_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.get_item": {
+  "sounds": [
+   {
+    "name": "retromon:music/get_item",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.get_item2": {
+  "sounds": [
+   {
+    "name": "retromon:music/get_item2",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.get_key_item": {
+  "sounds": [
+   {
+    "name": "retromon:music/get_key_item",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.gym": {
+  "sounds": [
+   {
+    "name": "retromon:music/gym",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.gym_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/gym_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.gym_leader_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/gym_leader_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.gym_leader_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/gym_leader_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.hall_of_fame": {
+  "sounds": [
+   {
+    "name": "retromon:music/hall_of_fame",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.hall_of_fame_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/hall_of_fame_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.indigo_plateau": {
+  "sounds": [
+   {
+    "name": "retromon:music/indigo_plateau",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.indigo_plateau_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/indigo_plateau_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.jigglypuff_song": {
+  "sounds": [
+   {
+    "name": "retromon:music/jigglypuff_song",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.lavender": {
+  "sounds": [
+   {
+    "name": "retromon:music/lavender",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.lavender_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/lavender_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.level_up": {
+  "sounds": [
+   {
+    "name": "retromon:music/level_up",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_evil_trainer": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_evil_trainer",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_evil_trainer_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_evil_trainer_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_female_trainer": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_female_trainer",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_female_trainer_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_female_trainer_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_jessie_james": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_jessie_james",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_jessie_james_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_jessie_james_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_male_trainer": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_male_trainer",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_male_trainer_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_male_trainer_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_prof_oak": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_prof_oak",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_prof_oak_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_prof_oak_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_rival": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_rival",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.meet_rival_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/meet_rival_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.museum_guy": {
+  "sounds": [
+   {
+    "name": "retromon:music/museum_guy",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.museum_guy_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/museum_guy_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.oaks_lab": {
+  "sounds": [
+   {
+    "name": "retromon:music/oaks_lab",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.oaks_lab_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/oaks_lab_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.pallet_town": {
+  "sounds": [
+   {
+    "name": "retromon:music/pallet_town",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.pkmn_healed": {
+  "sounds": [
+   {
+    "name": "retromon:music/pkmn_healed",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.pokecenter": {
+  "sounds": [
+   {
+    "name": "retromon:music/pokecenter",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.pokemon_tower": {
+  "sounds": [
+   {
+    "name": "retromon:music/pokemon_tower",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.pokemon_tower_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/pokemon_tower_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.routes1": {
+  "sounds": [
+   {
+    "name": "retromon:music/routes1",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.routes2": {
+  "sounds": [
+   {
+    "name": "retromon:music/routes2",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.routes3": {
+  "sounds": [
+   {
+    "name": "retromon:music/routes3",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.routes3_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/routes3_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.routes4": {
+  "sounds": [
+   {
+    "name": "retromon:music/routes4",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.routes4_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/routes4_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.safari_zone": {
+  "sounds": [
+   {
+    "name": "retromon:music/safari_zone",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.safari_zone_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/safari_zone_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.silph_co": {
+  "sounds": [
+   {
+    "name": "retromon:music/silph_co",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.silph_co_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/silph_co_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.ss_anne": {
+  "sounds": [
+   {
+    "name": "retromon:music/ss_anne",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.surfing": {
+  "sounds": [
+   {
+    "name": "retromon:music/surfing",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.surfing_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/surfing_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.surfing_pikachu": {
+  "sounds": [
+   {
+    "name": "retromon:music/surfing_pikachu",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.surfing_pikachu_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/surfing_pikachu_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.title_screen": {
+  "sounds": [
+   {
+    "name": "retromon:music/title_screen",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.title_screen_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/title_screen_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.trainer_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/trainer_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.trainer_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/trainer_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.vermilion": {
+  "sounds": [
+   {
+    "name": "retromon:music/vermilion",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.wild_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/wild_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.wild_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/wild_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.yellow_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/yellow_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.yellow_unused_song": {
+  "sounds": [
+   {
+    "name": "retromon:music/yellow_unused_song",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.yellow_unused_song_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/yellow_unused_song_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ }
+}

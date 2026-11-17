@@ -1,8 +1,0 @@
-{
- "scale": 0.85,
- "idle": "animation.bulbasaur.battle_idle",
- "ground": "animation.bulbasaur.ground_idle",
- "texture": "kantojohto:textures/pokemon/bulbasaur.png",
- "layers": [],
- "height": 0.8
-}

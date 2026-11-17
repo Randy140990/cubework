@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "kantojohto",
+	"id": "retromon",
 	"version": "${version}",
-	"name": "Route One",
-	"description": "Kanto and Johto, played the way the originals were: a 2.5D adventure on Insid3 Th3 Cub3's map. Working name.",
+	"name": "Retromon",
+	"description": "The original games' mechanics, region by region, as a 2.5D adventure on Insid3 Th3 Cub3's maps. Kanto and Johto first.",
 	"authors": [
 		"Insid3 Th3 Cub3"
 	],
@@ -11,13 +11,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.insidethecube.kantojohto.RouteOne"
+			"com.insidethecube.retromon.Retromon"
 		],
 		"client": [
-			"com.insidethecube.kantojohto.client.RouteOneClient"
+			"com.insidethecube.retromon.client.RetromonClient"
 		]
 	},
-	"accessWidener": "kantojohto.accesswidener",
+	"accessWidener": "retromon.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.16.0",
 		"minecraft": "~1.21.11",
@@ -25,6 +25,6 @@
 		"fabric-api": "*"
 	},
 	"mixins": [
-		"kantojohto.mixins.json"
+		"retromon.mixins.json"
 	]
 }

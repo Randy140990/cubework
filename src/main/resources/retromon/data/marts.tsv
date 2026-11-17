@@ -1,0 +1,11 @@
+# mart	place	items
+viridian_city	viridian_city	poke_ball,potion,antidote,parlyz_heal,burn_heal
+pewter_city	pewter_city	poke_ball,potion,escape_rope,antidote,burn_heal,awakening,parlyz_heal
+cerulean_city	cerulean_city	poke_ball,potion,escape_rope,repel,antidote,burn_heal,awakening,parlyz_heal
+vermilion_city	vermilion_city	poke_ball,super_potion,ice_heal,awakening,parlyz_heal,repel
+lavender_town	lavender_town	great_ball,super_potion,revive,escape_rope,super_repel,antidote,burn_heal,ice_heal,parlyz_heal
+celadon_city_4f	celadon_city	poke_doll,fire_stone,thunderstone,water_stone,leaf_stone
+fuchsia_city	fuchsia_city	ultra_ball,great_ball,hyper_potion,revive,full_heal,super_repel
+cinnabar_island	cinnabar_island	ultra_ball,great_ball,hyper_potion,max_repel,escape_rope,full_heal,revive
+saffron_city	saffron_city	great_ball,hyper_potion,max_repel,escape_rope,full_heal,revive
+indigo_plateau	indigo_plateau	ultra_ball,great_ball,full_restore,max_potion,full_heal,revive,max_repel

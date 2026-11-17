@@ -17,9 +17,9 @@ dependencies {
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/kantojohto.accesswidener")
+	accessWidenerPath = file("src/main/resources/retromon.accesswidener")
 	mods {
-		"kantojohto" {
+		"retromon" {
 			sourceSet sourceSets.main
 		}
 	}

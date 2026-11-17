@@ -1,0 +1,169 @@
+# id	region	name	music	wild
+pallet_town	kanto	PALLET TOWN	pallet_town	-
+viridian_city	kanto	VIRIDIAN CITY	cities1	-
+pewter_city	kanto	PEWTER CITY	cities1	-
+cerulean_city	kanto	CERULEAN CITY	cities2	-
+lavender_town	kanto	LAVENDER TOWN	lavender	-
+vermilion_city	kanto	VERMILION CITY	vermilion	-
+celadon_city	kanto	CELADON CITY	celadon	-
+fuchsia_city	kanto	FUCHSIA CITY	cities2	-
+cinnabar_island	kanto	CINNABAR ISLAND	cinnabar	-
+indigo_plateau	kanto	INDIGO PLATEAU	indigo_plateau	-
+saffron_city	kanto	SAFFRON CITY	cities1	-
+route_1	kanto	ROUTE 1	routes1	route_1
+route_2	kanto	ROUTE 2	routes1	route_2
+route_3	kanto	ROUTE 3	routes3	route_3
+route_4	kanto	ROUTE 4	routes3	route_4
+route_5	kanto	ROUTE 5	routes3	route_5
+route_6	kanto	ROUTE 6	routes3	route_6
+route_7	kanto	ROUTE 7	routes3	route_7
+route_8	kanto	ROUTE 8	routes3	route_8
+route_9	kanto	ROUTE 9	routes3	route_9
+route_10	kanto	ROUTE 10	routes3	route_10
+route_11	kanto	ROUTE 11	routes4	route_11
+route_12	kanto	ROUTE 12	routes4	route_12
+route_13	kanto	ROUTE 13	routes4	route_13
+route_14	kanto	ROUTE 14	routes4	route_14
+route_15	kanto	ROUTE 15	routes4	route_15
+route_16	kanto	ROUTE 16	routes3	route_16
+route_17	kanto	ROUTE 17	routes3	route_17
+route_18	kanto	ROUTE 18	routes3	route_18
+route_19	kanto	SEA ROUTE 19	routes3	route_19
+route_20	kanto	SEA ROUTE 20	routes3	route_20
+route_21	kanto	SEA ROUTE 21	routes3	route_21
+route_22	kanto	ROUTE 22	routes3	route_22
+route_23	kanto	ROUTE 23	indigo_plateau	route_23
+route_24	kanto	ROUTE 24	routes2	route_24
+route_25	kanto	ROUTE 25	routes2	route_25
+viridian_forest	kanto	VIRIDIAN FOREST	dungeon2	viridian_forest
+mt_moon_1f	kanto	MT.MOON	dungeon3	mt_moon_1f
+mt_moon_b1f	kanto	MT.MOON	dungeon3	mt_moon_b1f
+mt_moon_b2f	kanto	MT.MOON	dungeon3	mt_moon_b2f
+rock_tunnel_1f	kanto	ROCK TUNNEL	dungeon3	rock_tunnel_1f
+power_plant	kanto	POWER PLANT	dungeon1	power_plant
+victory_road_1f	kanto	VICTORY ROAD	dungeon3	victory_road_1f
+pokemon_tower_1f	kanto	POKéMON TOWER	pokemon_tower	pokemon_tower_1f
+pokemon_tower_2f	kanto	POKéMON TOWER	pokemon_tower	pokemon_tower_2f
+pokemon_tower_3f	kanto	POKéMON TOWER	pokemon_tower	pokemon_tower_3f
+pokemon_tower_4f	kanto	POKéMON TOWER	pokemon_tower	pokemon_tower_4f
+pokemon_tower_5f	kanto	POKéMON TOWER	pokemon_tower	pokemon_tower_5f
+pokemon_tower_6f	kanto	POKéMON TOWER	pokemon_tower	pokemon_tower_6f
+pokemon_tower_7f	kanto	POKéMON TOWER	pokemon_tower	pokemon_tower_7f
+seafoam_islands_b1f	kanto	SEAFOAM ISLANDS	dungeon2	seafoam_islands_b1f
+seafoam_islands_b2f	kanto	SEAFOAM ISLANDS	dungeon2	seafoam_islands_b2f
+seafoam_islands_b3f	kanto	SEAFOAM ISLANDS	dungeon2	seafoam_islands_b3f
+seafoam_islands_b4f	kanto	SEAFOAM ISLANDS	dungeon2	seafoam_islands_b4f
+pokemon_mansion_1f	kanto	POKéMON MANSION	cinnabar_mansion	pokemon_mansion_1f
+seafoam_islands_1f	kanto	SEAFOAM ISLANDS	dungeon2	seafoam_islands_1f
+victory_road_2f	kanto	VICTORY ROAD	dungeon3	victory_road_2f
+digletts_cave	kanto	DIGLETT's CAVE	dungeon2	digletts_cave
+victory_road_3f	kanto	VICTORY ROAD	dungeon3	victory_road_3f
+pokemon_mansion_2f	kanto	POKéMON MANSION	cinnabar_mansion	pokemon_mansion_2f
+pokemon_mansion_3f	kanto	POKéMON MANSION	cinnabar_mansion	pokemon_mansion_3f
+pokemon_mansion_b1f	kanto	POKéMON MANSION	cinnabar_mansion	pokemon_mansion_b1f
+safari_zone_east	kanto	SAFARI ZONE	safari_zone	safari_zone_east
+safari_zone_north	kanto	SAFARI ZONE	safari_zone	safari_zone_north
+safari_zone_west	kanto	SAFARI ZONE	safari_zone	safari_zone_west
+safari_zone_center	kanto	SAFARI ZONE	safari_zone	safari_zone_center
+cerulean_cave_2f	kanto	CERULEAN CAVE	dungeon1	cerulean_cave_2f
+cerulean_cave_b1f	kanto	CERULEAN CAVE	dungeon1	cerulean_cave_b1f
+cerulean_cave_1f	kanto	CERULEAN CAVE	dungeon1	cerulean_cave_1f
+rock_tunnel_b1f	kanto	ROCK TUNNEL	dungeon3	rock_tunnel_b1f
+route_38	johto	ROUTE 38	route_37	route_38
+route_39	johto	ROUTE 39	route_37	route_39
+olivine_city	johto	OLIVINE CITY	violet_city	olivine_city
+route_42	johto	ROUTE 42	lake_of_rage	route_42
+route_44	johto	ROUTE 44	lake_of_rage	route_44
+mahogany_town	johto	MAHOGANY TOWN	cherrygrove_city	mahogany_town
+sprout_tower_1f	johto	SPROUT TOWER	sprout_tower	sprout_tower_1f
+sprout_tower_2f	johto	SPROUT TOWER	sprout_tower	sprout_tower_2f
+sprout_tower_3f	johto	SPROUT TOWER	sprout_tower	sprout_tower_3f
+tin_tower_1f	johto	TIN TOWER	tin_tower	tin_tower_1f
+tin_tower_2f	johto	TIN TOWER	tin_tower	tin_tower_2f
+tin_tower_3f	johto	TIN TOWER	tin_tower	tin_tower_3f
+tin_tower_4f	johto	TIN TOWER	tin_tower	tin_tower_4f
+tin_tower_5f	johto	TIN TOWER	tin_tower	tin_tower_5f
+tin_tower_6f	johto	TIN TOWER	tin_tower	tin_tower_6f
+tin_tower_7f	johto	TIN TOWER	tin_tower	tin_tower_7f
+tin_tower_8f	johto	TIN TOWER	tin_tower	tin_tower_8f
+tin_tower_9f	johto	TIN TOWER	tin_tower	tin_tower_9f
+burned_tower_1f	johto	BURNED TOWER	burned_tower	burned_tower_1f
+burned_tower_b1f	johto	BURNED TOWER	burned_tower	burned_tower_b1f
+national_park	johto	NATIONAL PARK	national_park	national_park
+national_park_bug_contest	johto	NATIONAL PARK	bug_catching_contest	national_park_bug_contest
+ruins_of_alph_outside	johto	RUINS OF ALPH	union_cave	ruins_of_alph_outside
+ruins_of_alph_ho_oh_chamber	johto	RUINS OF ALPH	union_cave	ruins_of_alph_ho_oh_chamber
+ruins_of_alph_kabuto_chamber	johto	RUINS OF ALPH	union_cave	ruins_of_alph_kabuto_chamber
+ruins_of_alph_omanyte_chamber	johto	RUINS OF ALPH	union_cave	ruins_of_alph_omanyte_chamber
+ruins_of_alph_aerodactyl_chamber	johto	RUINS OF ALPH	union_cave	ruins_of_alph_aerodactyl_chamber
+ruins_of_alph_inner_chamber	johto	RUINS OF ALPH	ruins_of_alph_interior	ruins_of_alph_inner_chamber
+union_cave_1f	johto	UNION CAVE	union_cave	union_cave_1f
+union_cave_b1f	johto	UNION CAVE	union_cave	union_cave_b1f
+union_cave_b2f	johto	UNION CAVE	union_cave	union_cave_b2f
+slowpoke_well_b1f	johto	SLOWPOKE WELL	dark_cave	slowpoke_well_b1f
+slowpoke_well_b2f	johto	SLOWPOKE WELL	dark_cave	slowpoke_well_b2f
+olivine_lighthouse_1f	johto	LIGHTHOUSE	lighthouse	olivine_lighthouse_1f
+olivine_lighthouse_2f	johto	LIGHTHOUSE	lighthouse	olivine_lighthouse_2f
+olivine_lighthouse_3f	johto	LIGHTHOUSE	lighthouse	olivine_lighthouse_3f
+olivine_lighthouse_4f	johto	LIGHTHOUSE	lighthouse	olivine_lighthouse_4f
+olivine_lighthouse_5f	johto	LIGHTHOUSE	lighthouse	olivine_lighthouse_5f
+olivine_lighthouse_6f	johto	LIGHTHOUSE	violet_city	olivine_lighthouse_6f
+team_rocket_base_b1f	johto	MAHOGANY TOWN	rocket_hideout	team_rocket_base_b1f
+team_rocket_base_b2f	johto	MAHOGANY TOWN	rocket_hideout	team_rocket_base_b2f
+team_rocket_base_b3f	johto	MAHOGANY TOWN	rocket_hideout	team_rocket_base_b3f
+ilex_forest	johto	ILEX FOREST	union_cave	ilex_forest
+goldenrod_underground	johto	GOLDENROD CITY	union_cave	goldenrod_underground
+goldenrod_underground_switch_room_entrances	johto	GOLDENROD CITY	union_cave	goldenrod_underground_switch_room_entrances
+goldenrod_dept_store_b1f	johto	GOLDENROD CITY	goldenrod_city	goldenrod_dept_store_b1f
+goldenrod_underground_warehouse	johto	GOLDENROD CITY	union_cave	goldenrod_underground_warehouse
+mount_mortar_1f_outside	johto	MT.MORTAR	union_cave	mount_mortar_1f_outside
+mount_mortar_1f_inside	johto	MT.MORTAR	union_cave	mount_mortar_1f_inside
+mount_mortar_2f_inside	johto	MT.MORTAR	union_cave	mount_mortar_2f_inside
+mount_mortar_b1f	johto	MT.MORTAR	union_cave	mount_mortar_b1f
+ice_path_1f	johto	ICE PATH	dark_cave	ice_path_1f
+ice_path_b1f	johto	ICE PATH	dark_cave	ice_path_b1f
+ice_path_b2f_mahogany_side	johto	ICE PATH	dark_cave	ice_path_b2f_mahogany_side
+ice_path_b2f_blackthorn_side	johto	ICE PATH	dark_cave	ice_path_b2f_blackthorn_side
+ice_path_b3f	johto	ICE PATH	dark_cave	ice_path_b3f
+whirl_island_nw	johto	WHIRL ISLANDS	union_cave	whirl_island_nw
+whirl_island_ne	johto	WHIRL ISLANDS	union_cave	whirl_island_ne
+whirl_island_sw	johto	WHIRL ISLANDS	union_cave	whirl_island_sw
+whirl_island_cave	johto	WHIRL ISLANDS	union_cave	whirl_island_cave
+whirl_island_se	johto	WHIRL ISLANDS	union_cave	whirl_island_se
+whirl_island_b1f	johto	WHIRL ISLANDS	union_cave	whirl_island_b1f
+whirl_island_b2f	johto	WHIRL ISLANDS	union_cave	whirl_island_b2f
+whirl_island_lugia_chamber	johto	WHIRL ISLANDS	union_cave	whirl_island_lugia_chamber
+silver_cave_room_1	johto	SILVER CAVE	lighthouse	silver_cave_room_1
+silver_cave_room_2	johto	SILVER CAVE	lighthouse	silver_cave_room_2
+silver_cave_room_3	johto	SILVER CAVE	lighthouse	silver_cave_room_3
+silver_cave_item_rooms	johto	SILVER CAVE	lighthouse	silver_cave_item_rooms
+dark_cave_violet_entrance	johto	DARK CAVE	dark_cave	dark_cave_violet_entrance
+dark_cave_blackthorn_entrance	johto	DARK CAVE	dark_cave	dark_cave_blackthorn_entrance
+dragons_den_1f	johto	DRAGON'S DEN	dragons_den	dragons_den_1f
+dragons_den_b1f	johto	DRAGON'S DEN	dragons_den	dragons_den_b1f
+ecruteak_city	johto	ECRUTEAK CITY	ecruteak_city	ecruteak_city
+route_45	johto	ROUTE 45	route_36	route_45
+route_46	johto	ROUTE 46	route_36	route_46
+blackthorn_city	johto	BLACKTHORN CITY	azalea_town	blackthorn_city
+route_33	johto	ROUTE 33	route_30	route_33
+azalea_town	johto	AZALEA TOWN	azalea_town	azalea_town
+route_43	johto	ROUTE 43	lake_of_rage	route_43
+lake_of_rage	johto	LAKE OF RAGE	lake_of_rage	lake_of_rage
+route_32	johto	ROUTE 32	route_30	route_32
+route_35	johto	ROUTE 35	route_36	route_35
+route_36	johto	ROUTE 36	route_36	route_36
+route_37	johto	ROUTE 37	route_36	route_37
+violet_city	johto	VIOLET CITY	violet_city	violet_city
+route_34	johto	ROUTE 34	route_36	route_34
+goldenrod_city	johto	GOLDENROD CITY	goldenrod_city	goldenrod_city
+olivine_port	johto	OLIVINE CITY	violet_city	olivine_port
+tin_tower_roof	johto	TIN TOWER	tin_tower	tin_tower_roof
+silver_cave_outside	johto	SILVER CAVE	indigo_plateau	silver_cave_outside
+route_40	johto	ROUTE 40	route_36	route_40
+route_41	johto	ROUTE 41	route_36	route_41
+cianwood_city	johto	CIANWOOD CITY	ecruteak_city	cianwood_city
+route_29	johto	ROUTE 29	route_29	route_29
+new_bark_town	johto	NEW BARK TOWN	new_bark_town	new_bark_town
+route_30	johto	ROUTE 30	route_30	route_30
+route_31	johto	ROUTE 31	route_30	route_31
+cherrygrove_city	johto	CHERRYGROVE CITY	cherrygrove_city	cherrygrove_city

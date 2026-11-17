@@ -1,0 +1,330 @@
+# key	place	title	sprite	facing	sight	money	party species:level	badge	before	defeat	after	x	y
+agathas_room_0	agathas_room	ELITE FOUR AGATHA	agatha	down	0	99	gengar:56,golbat:56,haunter:55,arbok:58,gengar:60	-	-	...	...	5	2
+brunos_room_0	brunos_room	ELITE FOUR BRUNO	bruno	down	0	99	onix:53,hitmonchan:55,hitmonlee:55,onix:56,machamp:58	-	-	...	...	5	2
+celadon_gym_0	celadon_gym	LEADER ERIKA	leader_erika	down	0	99	tangela:30,weepinbell:32,gloom:32	RAINBOWBADGE	Hello. Lovely weather isn't it? It's so pleasant. | ...Oh dear... I must have dozed off. Welcome. | My name is ERIKA. I am the LEADER of CELADON GYM. | I teach the art of flower arranging. My POKéMON are of the grass-type. | Oh, I'm sorry, I had no idea that you wished to challenge me. | Very well, but I shall not lose.	Oh! I concede defeat. | You are remarkably strong. | I must confer you the RAINBOWBADGE.	You are cataloging POKéMON? I must say I'm impressed. | I would never collect POKéMON if they were unattractive.	4	3
+celadon_gym_1	celadon_gym	LASS	cooltrainer_f	right	2	15	bellsprout:23,weepinbell:23	-	I was getting bored.	My makeup!	Grass-type POKéMON are tough against the water-type! | They also have an edge on rock and ground POKéMON!	2	11
+celadon_gym_2	celadon_gym	BEAUTY	beauty	left	4	70	oddish:21,bellsprout:21,oddish:21,bellsprout:21	-	Aren't you the peeping Tom?	I'm in shock!	Oh, you weren't peeping? We get a lot of gawkers!	7	10
+celadon_gym_3	celadon_gym	JR.TRAINER♀	cooltrainer_f	down	4	20	bulbasaur:24,ivysaur:24	-	Look at my grass POKéMON! | They're so easy to raise!	No!	We only use grass-type POKéMON at our GYM! | We also use them for making flower arrangements!	9	5
+celadon_gym_4	celadon_gym	BEAUTY	beauty	down	2	70	bellsprout:24,bellsprout:24	-	Don't bring any bugs or fire POKéMON in here!	Oh! You!	Our LEADER, ERIKA, might be quiet, but she's also very skilled!	1	5
+celadon_gym_5	celadon_gym	LASS	cooltrainer_f	down	2	15	oddish:23,gloom:23	-	Pleased to meet you. My hobby is POKéMON training.	Oh! Splendid!	I have a blind date coming up. I have to learn to be polite.	6	3
+celadon_gym_6	celadon_gym	BEAUTY	beauty	down	3	70	exeggcute:26	-	Welcome to CELADON GYM! | You better not underestimate girl power!	Oh! Beaten!	I didn't bring my best POKéMON! | Wait 'til next time!	3	3
+celadon_gym_7	celadon_gym	COOLTRAINER♀	cooltrainer_f	down	3	35	weepinbell:24,gloom:24,ivysaur:24	-	-	-	-	5	3
+cerulean_city_0	cerulean_city	ROCKET	rocket	none	3	30	machop:17,drowzee:17	-	-	-	-	30	8
+cerulean_gym_0	cerulean_gym	LEADER MISTY	leader_misty	down	0	99	staryu:18,starmie:21	CASCADEBADGE	Hi, you're a new face! | What's your policy on POKéMON? What is your approach? | My policy is an all-out offensive with water-type POKéMON! | MISTY, the world-famous beauty, is your host! | Are you ready, sweetie?	I can't believe I lost! | All right! | You can have the CASCADEBADGE to show you beat me!	The CASCADEBADGE makes all POKéMON up to L30 obey! | That includes even outsiders! | There's more, you can now use CUT anytime! | You can CUT down small bushes to open new paths! | You can also have my favorite TM!	4	2
+cerulean_gym_1	cerulean_gym	JR.TRAINER♀	cooltrainer_f	right	3	20	goldeen:19	-	Splash! | I'm first up! Let's do it!	That can't be!	MISTY is going to keep improving! | She won't lose to someone like you!	2	3
+cerulean_gym_2	cerulean_gym	SWIMMER	swimmer	left	3	5	horsea:16,shellder:16	-	-	-	-	8	7
+cinnabar_gym_0	cinnabar_gym	LEADER BLAINE	leader_blaine	down	0	99	ninetales:48,rapidash:50,arcanine:54	VOLCANOBADGE	Hah! | I am BLAINE! I am the LEADER of CINNABAR GYM! | My fiery POKéMON will incinerate all challengers! | Hah! You better have BURN HEAL!	I have burnt out! | You have earned the VOLCANOBADGE!	FIRE BLAST is the ultimate fire technique! | Don't waste it on water POKéMON!	3	3
+cinnabar_gym_1	cinnabar_gym	SUPER NERD	super_nerd	down	3	25	vulpix:36,vulpix:36,ninetales:36	-	-	-	-	17	2
+cinnabar_gym_2	cinnabar_gym	BURGLAR	super_nerd	down	3	90	growlithe:36,vulpix:36,ninetales:36	-	-	-	-	17	8
+cinnabar_gym_3	cinnabar_gym	SUPER NERD	super_nerd	down	3	25	ponyta:34,charmander:34,vulpix:34,growlithe:34	-	-	-	-	11	4
+cinnabar_gym_4	cinnabar_gym	BURGLAR	super_nerd	down	3	90	ponyta:41	-	-	-	-	11	8
+cinnabar_gym_5	cinnabar_gym	SUPER NERD	super_nerd	down	3	25	rapidash:41	-	-	-	-	11	14
+cinnabar_gym_6	cinnabar_gym	BURGLAR	super_nerd	down	3	90	vulpix:37,growlithe:37	-	-	-	-	3	14
+cinnabar_gym_7	cinnabar_gym	SUPER NERD	super_nerd	down	3	25	growlithe:37,vulpix:37	-	-	-	-	3	8
+fighting_dojo_0	fighting_dojo	BLACKBELT	hiker	down	4	25	hitmonlee:37,hitmonchan:37	-	Hoargh! Take your shoes off!	I give up!	You wait 'til you see our Master! | I'm a small fry compared to him!	5	3
+fighting_dojo_1	fighting_dojo	BLACKBELT	hiker	right	4	25	mankey:31,mankey:31,primeape:31	-	I hear you're good! Show me!	Judge! 1 point!	Our Master is a pro fighter!	3	4
+fighting_dojo_2	fighting_dojo	BLACKBELT	hiker	right	3	25	machop:32,machoke:32	-	Nothing tough frightens me! | I break boulders for training!	Yow! Stubbed fingers!	The only thing that frightens us is psychic power!	3	6
+fighting_dojo_3	fighting_dojo	BLACKBELT	hiker	left	3	25	primeape:36	-	Hoohah! | You're trespassing in our FIGHTING DOJO!	Oof! I give up!	The prime fighters across the land train here.	5	5
+fighting_dojo_4	fighting_dojo	BLACKBELT	hiker	left	3	25	machop:31,mankey:31,primeape:31	-	-	-	-	5	7
+fuchsia_gym_0	fuchsia_gym	LEADER KOGA	leader_koga	down	0	99	venonat:44,venonat:46,venonat:48,venomoth:50	SOULBADGE	KOGA: Fwahahaha! | A mere child like you dares to challenge me? | Very well, I shall show you true terror as a ninja master! | You shall feel the despair of poison and sleep techniques!	Humph! You have proven your worth! | Here! Take the SOULBADGE!	When afflicted by TOXIC, POKéMON suffer more and more as battle progresses! | It will surely terrorize foes!	4	10
+fuchsia_gym_1	fuchsia_gym	JUGGLER	rocker	down	2	35	hypno:38	-	I wanted to become a ninja, so I joined this GYM!	I'm done for!	I will keep on training under KOGA, my ninja master!	8	13
+fuchsia_gym_2	fuchsia_gym	JUGGLER	rocker	right	4	35	drowzee:31,drowzee:31,kadabra:31,drowzee:31	-	Let's see you beat my special techniques!	You had me fooled!	I like poison and sleep techniques, as they linger after battle!	7	8
+fuchsia_gym_3	fuchsia_gym	JUGGLER	rocker	down	2	35	drowzee:34,kadabra:34	-	Stop right there! | Our invisible walls have you frustrated?	Whoa! He's got it!	You impressed me! Here's a hint! | Look very closely for gaps in the invisible walls!	1	12
+fuchsia_gym_4	fuchsia_gym	TAMER	rocker	up	2	40	sandslash:34,arbok:34	-	I also study the way of the ninja with master KOGA! | Ninja have a long history of using animals!	Awoo!	I still have much to learn!	3	5
+fuchsia_gym_5	fuchsia_gym	TAMER	rocker	down	2	40	arbok:33,sandslash:33,arbok:33	-	Master KOGA comes from a long line of ninjas! | What did you descend from?	Dropped my balls!	Where there is light, there is shadow! | Light and shadow! Which do you choose?	8	2
+fuchsia_gym_6	fuchsia_gym	JUGGLER	rocker	left	3	35	drowzee:34,hypno:34	-	-	-	-	2	7
+game_corner_0	game_corner	ROCKET	rocket	up	3	30	raticate:20,zubat:20	-	-	-	-	9	5
+lances_room_0	lances_room	ELITE FOUR LANCE	lance	down	0	99	gyarados:58,dragonair:56,dragonair:56,aerodactyl:60,dragonite:62	-	-	That's it! | I hate to admit it, but you are a POKéMON master!	...	6	1
+loreleis_room_0	loreleis_room	ELITE FOUR LORELEI	lorelei	down	0	99	dewgong:54,cloyster:53,slowbro:54,jynx:56,lapras:56	-	-	How dare you!	...	5	2
+mt_moon_1f_0	mt_moon_1f	HIKER	hiker	down	2	35	geodude:10,geodude:10,onix:10	-	WHOA! You shocked me! Oh, you're just a kid!	Wow! Shocked again!	Kids like you shouldn't be here!	5	6
+mt_moon_1f_1	mt_moon_1f	YOUNGSTER	youngster	right	3	15	rattata:10,rattata:10,zubat:10	-	Did you come to explore too?	Losing stinks!	I came down here to show off to girls.	12	16
+mt_moon_1f_2	mt_moon_1f	LASS	cooltrainer_f	down	3	15	oddish:11,bellsprout:11	-	Wow! It's way bigger in here than I thought!	Oh! I lost it!	How do you get out of here?	30	4
+mt_moon_1f_3	mt_moon_1f	SUPER NERD	super_nerd	up	3	25	magnemite:11,voltorb:11	-	What! Don't sneak up on me!	My POKéMON won't do!	I have to find stronger POKéMON.	24	31
+mt_moon_1f_4	mt_moon_1f	LASS	cooltrainer_f	down	3	15	clefairy:14	-	What? I'm waiting for my friends to find me here.	I lost?	I heard there are some very rare fossils here.	16	23
+mt_moon_1f_5	mt_moon_1f	BUG CATCHER	youngster	down	3	10	weedle:11,kakuna:11	-	Suspicious men are in the cave. What about you?	You got me!	I saw them! I'm sure they're from TEAM ROCKET!	7	22
+mt_moon_1f_6	mt_moon_1f	BUG CATCHER	youngster	right	3	10	caterpie:10,metapod:10,caterpie:10	-	Go through this cave to get to CERULEAN CITY!	I lost.	ZUBAT is tough! But, it can be useful if you catch one.	30	27
+mt_moon_b2f_0	mt_moon_b2f	SUPER NERD	super_nerd	right	4	25	grimer:12,voltorb:12,koffing:12	-	We, TEAM ROCKET, are POKéMON gangsters!	I blew it!	Darn it all! My associates won't stand for this!	12	8
+mt_moon_b2f_1	mt_moon_b2f	ROCKET	rocket	down	4	30	sandshrew:11,rattata:11,zubat:11	-	We're pulling a big job here! Get lost, kid!	So, you are good.	If you find a fossil, give it to me and scram!	15	22
+mt_moon_b2f_2	mt_moon_b2f	ROCKET	rocket	up	4	30	zubat:12,ekans:12	-	Little kids should leave grown-ups alone!	I'm steamed!	POKéMON lived here long before people came.	29	11
+mt_moon_b2f_3	mt_moon_b2f	ROCKET	rocket	left	3	30	rattata:13,zubat:13	-	-	-	-	29	17
+oaks_lab_0	oaks_lab	RIVAL1	blue	none	3	35	eevee:5	-	-	-	-	4	3
+pewter_gym_0	pewter_gym	LEADER BROCK	leader_brock	down	0	99	geodude:10,onix:12	BOULDERBADGE	I'm BROCK! I'm PEWTER's GYM LEADER! | I believe in rock hard defense and determination! | That's why my POKéMON are all the rock-type! | Do you still want to challenge me? Fine then! Show me your best!	I took you for granted. | As proof of your victory, here's the BOULDERBADGE! | {player} received the BOULDERBADGE!	There are all kinds of trainers in the world! | Some raise POKéMON for fights. Some see them as pets. | I'm in training to become a POKéMON breeder. | If you take your POKéMON training seriously, go visit the GYM in CERULEAN and test your abilities!	4	1
+pewter_gym_1	pewter_gym	JR.TRAINER♂	cooltrainer_m	right	3	20	diglett:9,sandshrew:9	-	-	-	-	3	6
+pokemon_mansion_1f_0	pokemon_mansion_1f	SCIENTIST	scientist	left	3	50	electrode:29,weezing:29	-	Who are you? There shouldn't be anyone here.	Ouch!	A key? I don't know what you're talking about.	17	17
+pokemon_mansion_2f_0	pokemon_mansion_2f	BURGLAR	super_nerd	left_right	0	90	charmander:34,charmeleon:34	-	I can't get out! This old place is one big puzzle!	Oh no! My bag of loot!	Switches open and close alternating sets of doors!	3	17
+pokemon_mansion_3f_0	pokemon_mansion_3f	BURGLAR	super_nerd	left_right	0	90	ninetales:38	-	This place is like, huge!	Ayah!	I wonder where my partner went.	5	11
+pokemon_mansion_3f_1	pokemon_mansion_3f	SCIENTIST	scientist	left	2	50	magnemite:33,magneton:33,voltorb:33	-	My mentor once lived here.	Whew! Overwhelming!	So, you're stuck? Try jumping off over there!	20	11
+pokemon_mansion_b1f_0	pokemon_mansion_b1f	BURGLAR	super_nerd	none	0	90	growlithe:34,ponyta:34	-	Uh-oh. Where am I now?	Awooh!	You can find stuff lying around.	16	23
+pokemon_mansion_b1f_1	pokemon_mansion_b1f	SCIENTIST	scientist	down	3	50	magnemite:34,electrode:34	-	This place is ideal for a lab.	What was that for?	I like it here! It's conducive to my studies!	27	11
+pokemon_tower_3f_0	pokemon_tower_3f	CHANNELER	channeler	left	2	30	gastly:23	-	Urrg...Awaa... Huhu...graa..	Hwa! I'm saved!	The GHOSTs can be identified by the SILPH SCOPE.	12	3
+pokemon_tower_3f_1	pokemon_tower_3f	CHANNELER	channeler	down	3	30	gastly:24	-	Kekeke.... Kwaaah!	Hmm? What am I doing?	Sorry! I was possessed!	9	8
+pokemon_tower_3f_2	pokemon_tower_3f	CHANNELER	channeler	down	2	30	gastly:22	-	Be gone! Evil spirit!	Whew! The spirit left!	My friends were possessed too!	10	13
+pokemon_tower_4f_0	pokemon_tower_4f	CHANNELER	channeler	right	2	30	gastly:24	-	GHOST! No! Kwaaah!	Where is the GHOST?	I must have been dreaming...	5	10
+pokemon_tower_4f_1	pokemon_tower_4f	CHANNELER	channeler	down	2	30	gastly:23,gastly:23	-	Be cursed with me! Kwaaah!	What!	We can't crack the identity of the GHOSTs.	15	7
+pokemon_tower_4f_2	pokemon_tower_4f	CHANNELER	channeler	left	2	30	gastly:22	-	Huhuhu... Beat me not!	Huh? Who? What?	May the departed souls of POKéMON rest in peace...	14	12
+pokemon_tower_5f_0	pokemon_tower_5f	CHANNELER	channeler	left	2	30	haunter:23	-	Give...me... your...soul...	Gasp!	I was under possession!	17	7
+pokemon_tower_5f_1	pokemon_tower_5f	CHANNELER	channeler	left	3	30	gastly:22	-	You...shall... join...us...	What a nightmare!	I was possessed!	14	3
+pokemon_tower_5f_2	pokemon_tower_5f	CHANNELER	channeler	right	2	30	gastly:24	-	Zombies!	Ha?	I regained my senses!	6	10
+pokemon_tower_5f_3	pokemon_tower_5f	CHANNELER	channeler	right	2	30	haunter:22	-	Urgah... Urff....	Whoo!	I fell to evil spirits despite my training!	9	16
+pokemon_tower_6f_0	pokemon_tower_6f	CHANNELER	channeler	right	3	30	gastly:22,gastly:22,gastly:22	-	Give...me... blood...	Groan!	I feel anemic and weak...	12	10
+pokemon_tower_6f_1	pokemon_tower_6f	CHANNELER	channeler	down	3	30	gastly:24	-	Urff... Kwaah!	Some-thing fell out!	Hair didn't fall out! It was an evil spirit!	9	5
+pokemon_tower_6f_2	pokemon_tower_6f	CHANNELER	channeler	left	2	30	gastly:24	-	Ke..ke...ke... ke..ke...ke!!	Keee!	What's going on here?	16	5
+rock_tunnel_1f_0	rock_tunnel_1f	HIKER	hiker	down	4	35	geodude:19,machop:19,geodude:19,geodude:19	-	This tunnel goes a long way, kid!	Doh! You win!	Watch for ONIX! It can put the squeeze on you!	7	5
+rock_tunnel_1f_1	rock_tunnel_1f	HIKER	hiker	down	4	35	onix:20,onix:20,geodude:20	-	Hmm. Maybe I'm lost in here...	Ease up! What am I doing? Which way is out?	That sleeping POKéMON on ROUTE 12 forced me to take this detour.	5	16
+rock_tunnel_1f_2	rock_tunnel_1f	HIKER	hiker	left	3	35	geodude:21,graveler:21	-	Outsiders like you need to show me some respect!	I give!	You're talented enough to hike!	17	15
+rock_tunnel_1f_3	rock_tunnel_1f	POKéMANIAC	super_nerd	left	3	50	cubone:23,slowpoke:23	-	POKéMON fight! Ready, go!	Game over!	Oh well, I'll get a ZUBAT as I go!	23	8
+rock_tunnel_1f_4	rock_tunnel_1f	JR.TRAINER♀	cooltrainer_f	left	4	20	bellsprout:22,clefairy:22	-	Eek! Don't try anything funny in the dark!	It was too dark!	I saw a MACHOP in this tunnel!	37	21
+rock_tunnel_1f_5	rock_tunnel_1f	JR.TRAINER♀	cooltrainer_f	down	4	20	meowth:20,oddish:20,pidgey:20	-	I came this far for POKéMON!	I'm out of POKéMON!	You looked cute and harmless!	22	24
+rock_tunnel_1f_6	rock_tunnel_1f	JR.TRAINER♀	cooltrainer_f	right	4	20	pidgey:19,rattata:19,rattata:19,bellsprout:19	-	You have POKéMON! Let's start!	You play hard!	Whew! I'm all sweaty now!	32	24
+rock_tunnel_b1f_0	rock_tunnel_b1f	JR.TRAINER♀	cooltrainer_f	down	4	20	jigglypuff:21,pidgey:21,meowth:21	-	Hikers leave twigs as trail markers.	Ohhh! I did my best!	I want to go home!	11	13
+rock_tunnel_b1f_1	rock_tunnel_b1f	HIKER	hiker	down	3	35	geodude:21,geodude:21,graveler:21	-	Hahaha! Can you beat my power?	Oops! Out-muscled!	I go for power because I hate thinking!	6	10
+rock_tunnel_b1f_2	rock_tunnel_b1f	POKéMANIAC	super_nerd	down	3	50	slowpoke:20,slowpoke:20,slowpoke:20	-	You have a POKéDEX? I want one too!	Shoot! I'm so jealous!	When you finish your POKéDEX, can I have it?	3	5
+rock_tunnel_b1f_3	rock_tunnel_b1f	POKéMANIAC	super_nerd	right	4	50	charmander:22,cubone:22	-	Do you know about costume players?	Well, that's that.	Costume players dress up as POKéMON for fun.	20	21
+rock_tunnel_b1f_4	rock_tunnel_b1f	HIKER	hiker	down	3	35	geodude:25	-	My POKéMON techniques will leave you crying!	I give! You're a better technician!	In mountains, you'll often find rock-type POKéMON.	30	10
+rock_tunnel_b1f_5	rock_tunnel_b1f	JR.TRAINER♀	cooltrainer_f	right	4	20	oddish:22,bulbasaur:22	-	I don't often come here, but I will fight you.	Oh! I lost!	I like tiny POKéMON, big ones are too scary!	14	28
+rock_tunnel_b1f_6	rock_tunnel_b1f	HIKER	hiker	right	3	35	machop:20,onix:20	-	Hit me with your best shot!	Fired away!	I'll raise my POKéMON to beat yours, kid!	33	5
+rock_tunnel_b1f_7	rock_tunnel_b1f	POKéMANIAC	super_nerd	down	3	50	slowpoke:25	-	I draw POKéMON when I'm home.	Whew! I'm exhausted!	I'm an artist, not a fighter.	26	30
+rocket_hideout_b1f_0	rocket_hideout_b1f	ROCKET	rocket	left	3	30	drowzee:21,machop:21	-	Who are you? How did you get here?	Oww! Beaten!	Are you dissing TEAM ROCKET?	26	8
+rocket_hideout_b1f_1	rocket_hideout_b1f	ROCKET	rocket	right	2	30	raticate:21,raticate:21	-	You broke into our operation?	Burnt!	You're not going to get away with this, brat!	12	6
+rocket_hideout_b1f_2	rocket_hideout_b1f	ROCKET	rocket	down	2	30	grimer:20,koffing:20,koffing:20	-	Intruder alert!	I can't do it!	SILPH SCOPE? I don't know where it is!	18	17
+rocket_hideout_b1f_3	rocket_hideout_b1f	ROCKET	rocket	right	3	30	rattata:19,raticate:19,raticate:19,rattata:19	-	Why did you come here?	This won't do!	OK, I'll talk! Take the elevator to see my BOSS!	15	25
+rocket_hideout_b1f_4	rocket_hideout_b1f	ROCKET	rocket	left	3	30	grimer:22,koffing:22	-	Are you lost, you little rat?	Why...?	Uh-oh, that fight opened the door!	28	18
+rocket_hideout_b2f_0	rocket_hideout_b2f	ROCKET	rocket	down	4	30	zubat:17,koffing:17,grimer:17,zubat:17,raticate:17	-	BOSS said you can see GHOSTs with the SILPH SCOPE!	I surrender!	The TEAM ROCKET HQ has 4 basement floors. Can you reach the BOSS?	20	12
+rocket_hideout_b3f_0	rocket_hideout_b3f	ROCKET	rocket	right	2	30	rattata:20,raticate:20,drowzee:20	-	Stop meddling in TEAM ROCKET's affairs!	Oof! Taken down!	SILPH SCOPE? The machine the BOSS stole. It's here somewhere.	10	22
+rocket_hideout_b3f_1	rocket_hideout_b3f	ROCKET	rocket	up	4	30	machop:21,machop:21	-	We got word from upstairs that you were coming!	What? I lost? No!	Go ahead and go! But, you need the LIFT KEY to run the elevator!	26	12
+rocket_hideout_b4f_0	rocket_hideout_b4f	ROCKET BOSS GIOVANNI	leader_giovanni	down	0	99	onix:25,rhyhorn:24,persian:29	-	I see that you raise POKéMON with utmost care. | A child like you would never understand what I hope to achieve. | I shall step aside this time! | I hope we meet again...	No!	...	25	3
+rocket_hideout_b4f_1	rocket_hideout_b4f	ROCKET	rocket	down	3	30	koffing:21,zubat:21	-	-	-	-	11	2
+route_10_0	route_10	POKéMANIAC	super_nerd	left	4	50	rhyhorn:30,lickitung:30	-	Wow, are you a POKéMANIAC too? Want to see my collection?	Humph. I'm not angry!	I have more rare POKéMON at home!	10	44
+route_10_1	route_10	HIKER	hiker	up	3	35	geodude:21,onix:21	-	Ha-hahah-ah-ha!	Ha-haha! Not laughing! Ha-hay fever! Haha-ha-choo!	Haha-ha-choo! Ha-choo! Snort! Snivel!	3	57
+route_10_2	route_10	POKéMANIAC	super_nerd	left	4	50	cubone:20,slowpoke:20	-	Hi, kid, want to see my POKéMON?	Oh no! My POKéMON!	I don't like you for beating me!	14	64
+route_10_3	route_10	JR.TRAINER♀	cooltrainer_f	left	3	20	jigglypuff:20,clefairy:20	-	I've been to a POKéMON GYM a few times. But, I lost each time.	Ohh! Blew it again!	I noticed some POKéMANIACs prowling around.	7	25
+route_10_4	route_10	HIKER	hiker	down	2	35	onix:19,graveler:19	-	Ah! This mountain air is delicious!	That cleared my head!	I feel bloated on mountain air!	3	61
+route_10_5	route_10	JR.TRAINER♀	cooltrainer_f	down	2	20	pidgey:21,pidgeotto:21	-	I'm feeling a bit faint from this tough hike.	I'm not up to it!	The POKéMON here are so chunky! There should be a pink one with a floral pattern!	7	54
+route_11_0	route_11	GAMBLER	gambler	down	3	70	poliwag:18,horsea:18	-	Win, lose or draw!	Atcha! Didn't go my way!	POKéMON is life! And to live is to gamble!	10	14
+route_11_1	route_11	GAMBLER	gambler	down	2	70	bellsprout:18,oddish:18	-	Competition! I can't get enough!	I had a chance!	You can't be a coward in the world of POKéMON!	26	9
+route_11_2	route_11	YOUNGSTER	youngster	left	3	15	ekans:21	-	Let's go, but don't cheat!	Huh? That's not right!	I did my best! I have no regrets!	13	5
+route_11_3	route_11	ENGINEER	super_nerd	down	3	50	magnemite:21	-	Careful! I'm laying down some cables!	That was electric!	Spread the word to save energy!	36	11
+route_11_4	route_11	YOUNGSTER	youngster	up	4	15	sandshrew:19,zubat:19	-	I just became a trainer! But, I think I can win!	My POKéMON couldn't!	What do you want? Leave me alone!	22	4
+route_11_5	route_11	GAMBLER	gambler	down	3	70	voltorb:18,magnemite:18	-	Fwahaha! I have never lost!	My first loss!	Luck of the draw! Just luck!	45	7
+route_11_6	route_11	GAMBLER	gambler	up	3	70	growlithe:18,vulpix:18	-	I have never won before...	I saw this coming...	It's just luck. Luck of the draw.	33	3
+route_11_7	route_11	YOUNGSTER	youngster	right	4	15	rattata:17,rattata:17,raticate:17	-	I'm the best in my class!	Darn! I need to make my POKéMON stronger!	There's a fat POKéMON that comes down from the mountains. | It's strong if you can get it.	43	5
+route_11_8	route_11	ENGINEER	super_nerd	left	3	50	magnemite:18,magnemite:18,magneton:18	-	Watch out for live wires!	Whoa! You spark plug!	Well, better get back to work.	45	16
+route_11_9	route_11	YOUNGSTER	youngster	up	4	15	nidoran_m:18,nidorino:18	-	My POKéMON should be ready by now!	Too much, too young!	I better go find stronger ones!	22	12
+route_12_0	route_12	FISHERMAN	fisher	left	4	35	goldeen:22,poliwag:22,goldeen:22	-	Yeah! I got a bite, here!	Tch! Just a small fry!	Hang on! My line's snagged!	14	31
+route_12_1	route_12	FISHERMAN	fisher	up	4	35	tentacool:24,goldeen:24	-	Be patient! Fishing is a waiting game!	That one got away!	With a better ROD, I could catch better POKéMON!	5	39
+route_12_2	route_12	JR.TRAINER♂	cooltrainer_m	left	4	20	nidoran_m:29,nidorino:29	-	Have you found a MOON STONE?	Oww!	I could have made my POKéMON evolve with MOON STONE!	11	92
+route_12_3	route_12	ROCKER	super_nerd	up	4	25	voltorb:29,electrode:29	-	Electricity is my specialty!	Unplugged!	Water conducts electricity, so you should zap sea POKéMON!	14	76
+route_12_4	route_12	FISHERMAN	fisher	left	4	35	goldeen:27	-	The FISHING FOOL vs. POKéMON KID!	Too much!	You beat me at POKéMON, but I'm good at fishing!	12	40
+route_12_5	route_12	FISHERMAN	fisher	right	4	35	poliwag:21,shellder:21,goldeen:21,horsea:21	-	I'd rather be working!	It's not easy...	It's all right. Losing doesn't bug me anymore.	9	52
+route_12_6	route_12	FISHERMAN	fisher	down	1	35	magikarp:24,magikarp:24	-	You never know what you could catch!	Lost it!	I catch MAGIKARP all the time, but they're so weak!	6	87
+route_13_0	route_13	BIRD KEEPER	cooltrainer_m	right	2	25	pidgey:29,pidgeotto:29	-	My bird POKéMON want to scrap!	My bird combo lost?	My POKéMON look happy even though they lost.	49	10
+route_13_1	route_13	JR.TRAINER♀	cooltrainer_f	down	2	20	pidgey:24,meowth:24,rattata:24,pidgey:24,meowth:24	-	I'm told I'm good for a kid!	Ohh! I lost!	I want to become a good trainer. I'll train hard.	48	10
+route_13_2	route_13	JR.TRAINER♀	cooltrainer_f	down	2	20	poliwag:30,poliwag:30	-	Wow! Your BADGEs are too cool!	Not enough!	You got those BADGEs from GYM LEADERs. I know!	27	9
+route_13_3	route_13	JR.TRAINER♀	cooltrainer_f	left	2	20	pidgey:27,meowth:27,pidgey:27,pidgeotto:27	-	My cute POKéMON wish to make your acquaintance.	Wow! You totally won!	You have to make POKéMON fight to toughen them up!	23	10
+route_13_4	route_13	JR.TRAINER♀	cooltrainer_f	down	4	20	goldeen:28,poliwag:28,horsea:28	-	I found CARBOS in a cave once.	Just messed up!	CARBOS boosted the SPEED of my POKéMON.	50	5
+route_13_5	route_13	BIRD KEEPER	cooltrainer_m	right	2	25	spearow:25,pidgey:25,pidgey:25,spearow:25,spearow:25	-	The wind's blowing my way!	The wind turned!	I'm beat. I guess I'll FLY home.	12	4
+route_13_6	route_13	BEAUTY	beauty	down	4	70	rattata:27,vulpix:27,rattata:27	-	Sure, I'll play with you!	Oh! You little brute!	I wonder which is stronger, male or female POKéMON?	33	6
+route_13_7	route_13	BEAUTY	beauty	down	2	70	clefairy:29,meowth:29	-	Do you want to POKéMON with me?	It's over already?	I don't know anything about POKéMON. I just like cool ones!	32	6
+route_13_8	route_13	BIKER	biker	up	2	20	koffing:28,koffing:28,koffing:28	-	What're you lookin' at?	Dang! Stripped gears!	Get lost!	10	7
+route_13_9	route_13	BIRD KEEPER	cooltrainer_m	up	4	25	pidgey:26,pidgeotto:26,spearow:26,fearow:26	-	I always go with bird POKéMON!	Out of power!	I wish I could fly like PIDGEY and PIDGEOTTO...	7	13
+route_14_0	route_14	BIRD KEEPER	cooltrainer_m	down	2	25	pidgey:28,doduo:28,pidgeotto:28	-	You need to use TMs to teach good moves to POKéMON!	Not good enough!	You have some HMs, right? POKéMON can't ever forget those moves.	4	4
+route_14_1	route_14	BIRD KEEPER	cooltrainer_m	down	2	25	pidgey:26,spearow:26,pidgey:26,fearow:26	-	My bird POKéMON should be ready for battle.	Not ready yet!	They need to learn better moves.	15	6
+route_14_2	route_14	BIRD KEEPER	cooltrainer_m	down	4	25	pidgeotto:29,fearow:29	-	TMs are on sale in CELADON! But, only a few people have HMs!	Aww, bummer!	Teach POKéMON moves of the same element type for more power.	12	11
+route_14_3	route_14	BIRD KEEPER	cooltrainer_m	up	3	25	spearow:28,doduo:28,fearow:28	-	Have you taught your bird POKéMON how to FLY?	Shot down in flames!	Bird POKéMON are my true love!	14	15
+route_14_4	route_14	BIRD KEEPER	cooltrainer_m	left	3	25	farfetchd:33	-	Have you heard of the legendary POKéMON?	Why? Why'd I lose?	The 3 legendary POKéMON are all birds of prey.	15	31
+route_14_5	route_14	BIRD KEEPER	cooltrainer_m	up	4	25	spearow:29,fearow:29	-	I'm not into it, but OK! Let's go!	I knew it!	Winning, losing, it doesn't matter in the long run!	6	49
+route_14_6	route_14	BIKER	biker	down	4	20	koffing:26,koffing:26,grimer:26,koffing:26	-	C'mon, c'mon. Let's go, let's go, let's go!	Arrg! Lost! Get lost!	What, what, what? What do you want?	5	39
+route_14_7	route_14	BIKER	biker	right	4	20	grimer:28,grimer:28,koffing:28	-	Perfect! I need to burn some time!	What? You!?	Raising POKéMON is a drag, man.	4	30
+route_14_8	route_14	BIKER	biker	left	3	20	koffing:29,muk:29	-	We ride out here because there's more room!	Wipe out!	It's cool you made your POKéMON so strong! | Might is right! And you know it!	15	30
+route_14_9	route_14	BIKER	biker	right	4	20	koffing:29,grimer:29	-	POKéMON fight? Cool! Rumble!	Blown away!	You know who'd win, you and me one on one!	4	31
+route_15_0	route_15	JR.TRAINER♀	cooltrainer_f	down	2	20	gloom:28,oddish:28,oddish:28	-	Let me try out the POKéMON I just got in a trade!	Not good enough!	You can't change the nickname of any POKéMON you get in a trade. | Only the Original Trainer can.	41	11
+route_15_1	route_15	JR.TRAINER♀	cooltrainer_f	left	3	20	pidgey:29,pidgeotto:29	-	You look gentle, so I think I can beat you!	No, wrong!	I'm afraid of BIKERs, they look so ugly and mean!	53	10
+route_15_2	route_15	BIRD KEEPER	cooltrainer_m	up	3	25	pidgeotto:26,farfetchd:26,doduo:26,pidgey:26	-	When I whistle, I can summon bird POKéMON!	Ow! That's tragic!	Maybe I'm not cut out for battles.	31	13
+route_15_3	route_15	BIRD KEEPER	cooltrainer_m	up	3	25	dodrio:28,doduo:28,doduo:28	-	Hmm? My birds are shivering! You're good, aren't you?	Just as I thought!	Did you know moves like EARTHQUAKE don't have any effect on birds?	35	13
+route_15_4	route_15	BEAUTY	beauty	down	2	70	pidgeotto:29,wigglytuff:29	-	Oh, you're a little cutie!	You looked so cute too!	I forgive you! I can take it!	53	11
+route_15_5	route_15	BEAUTY	beauty	right	3	70	bulbasaur:29,ivysaur:29	-	I raise POKéMON because I live alone!	I didn't ask for this!	I just like going home to be with my POKéMON!	41	10
+route_15_6	route_15	BIKER	biker	down	3	20	koffing:25,koffing:25,weezing:25,koffing:25,grimer:25	-	Hey kid! C'mon! I just got these!	Why not?	You only live once, so I live as an outlaw! TEAM ROCKET RULES!	48	10
+route_15_7	route_15	BIKER	biker	down	3	20	koffing:28,grimer:28,weezing:28	-	Fork over all your cash when you lose to me, kid!	That can't be true!	I was just joking about the money!	46	10
+route_15_8	route_15	JR.TRAINER♀	cooltrainer_f	right	3	20	clefairy:33	-	What's cool? Trading POKéMON!	I said trade!	I trade POKéMON with my friends!	37	5
+route_15_9	route_15	JR.TRAINER♀	cooltrainer_f	up	3	20	bellsprout:29,oddish:29,tangela:29	-	Want to play with my POKéMON?	I was too impatient!	I'll go train with weaker people.	18	13
+route_16_0	route_16	BIKER	biker	left	3	20	grimer:29,koffing:29	-	What do you want?	Don't you dare laugh!	We like just hanging here, what's it to you?	17	12
+route_16_1	route_16	CUE BALL	biker	right	2	25	machop:28,mankey:28,machop:28	-	Nice BIKE! Hand it over!	Knock-out!	Forget it, who needs your BIKE!	14	13
+route_16_2	route_16	CUE BALL	biker	up	2	25	mankey:29,machop:29	-	Come out and play, little mouse!	You little rat!	I hate losing! Get away from me!	11	12
+route_16_3	route_16	BIKER	biker	left	2	20	weezing:33	-	Hey, you just bumped me!	Kaboom!	You can also get to FUCHSIA from VERMILION using a coastal road.	9	11
+route_16_4	route_16	CUE BALL	biker	right	2	25	machop:33	-	I'm feeling hungry and mean!	Bad, bad, bad!	I like my POKéMON ferocious! They tear up enemies!	6	10
+route_16_5	route_16	BIKER	biker	right	4	20	grimer:26,grimer:26,grimer:26,grimer:26	-	Sure, I'll go!	Don't make me mad!	I like harassing people with my vicious POKéMON!	3	12
+route_17_0	route_17	CUE BALL	biker	left	3	25	mankey:29,primeape:29	-	There's no money in fighting kids!	Burned out!	Good stuff is lying around on CYCLING ROAD!	12	19
+route_17_1	route_17	CUE BALL	biker	right	4	25	machop:29,machoke:29	-	What do you want, kiddo?	Whoo!	I could belly-bump you outta here!	11	16
+route_17_2	route_17	BIKER	biker	up	4	20	weezing:28,koffing:28,weezing:28	-	You heading to FUCHSIA?	Crash and burn!	I love racing downhill!	4	18
+route_17_3	route_17	BIKER	biker	left	4	20	muk:33	-	We're BIKERs! Highway stars!	Smoked!	Are you looking for adventure?	7	32
+route_17_4	route_17	BIKER	biker	right	3	20	voltorb:29,voltorb:29	-	Let VOLTORB electrify you!	Grounded out!	I got my VOLTORB at the abandoned POWER PLANT.	14	34
+route_17_5	route_17	CUE BALL	biker	left	2	25	machoke:33	-	My POKéMON won't evolve! Why?	Why, you!	Maybe some POKéMON need element STONEs to evolve.	17	58
+route_17_6	route_17	CUE BALL	biker	right	4	25	mankey:26,mankey:26,machoke:26,machop:26	-	I need a little exercise!	Whew! Good workout!	I'm sure I lost weight there!	2	68
+route_17_7	route_17	CUE BALL	biker	right	2	25	primeape:29,machoke:29	-	Be a rebel!	Aaaargh!	Be ready to fight for your beliefs!	14	98
+route_17_8	route_17	BIKER	biker	left	3	20	weezing:29,muk:29	-	Nice BIKE! How's it handle?	Shoot!	The slope makes it hard to steer!	5	98
+route_17_9	route_17	BIKER	biker	down	4	20	koffing:25,weezing:25,koffing:25,koffing:25,weezing:25	-	Get lost, kid! I'm bushed!	Are you satisfied?	I need to catch a few Zs!	10	118
+route_18_0	route_18	BIRD KEEPER	cooltrainer_m	right	3	25	spearow:29,fearow:29	-	I always check every grassy area for new POKéMON.	Tch!	I wish I had a BIKE!	36	11
+route_18_1	route_18	BIRD KEEPER	cooltrainer_m	left	3	25	dodrio:34	-	Kurukkoo! How do you like my bird call?	I had to bug you!	I also collect sea POKéMON on weekends!	40	15
+route_18_2	route_18	BIRD KEEPER	cooltrainer_m	left	4	25	spearow:26,spearow:26,fearow:26,spearow:26	-	This is my turf! Get out of here!	Darn!	This is my fave POKéMON hunting area!	42	13
+route_19_0	route_19	SWIMMER	cooltrainer_m	right	4	5	tentacool:30,shellder:30	-	Have to warm up before my swim!	All warmed up!	Thanks, kid! I'm ready for a swim!	9	7
+route_19_1	route_19	SWIMMER	cooltrainer_m	left	4	5	goldeen:29,horsea:29,staryu:29	-	Wait! You'll have a heart attack!	Ooh! That's chilly!	Watch out for TENTACOOL!	12	9
+route_19_2	route_19	SWIMMER	swimmer	left	3	5	poliwag:30,poliwhirl:30	-	I love swimming! What about you?	Belly flop!	I can beat POKéMON at swimming!	13	25
+route_19_3	route_19	SWIMMER	swimmer	right	4	5	horsea:27,tentacool:27,tentacool:27,goldeen:27	-	What's beyond the horizon?	Glub!	I see a couple of islands!	4	27
+route_19_4	route_19	SWIMMER	swimmer	up	4	5	goldeen:29,shellder:29,seaking:29	-	I tried diving for POKéMON, but it was a no go!	Help!	You have to fish for sea POKéMON!	16	31
+route_19_5	route_19	SWIMMER	swimmer	down	4	5	horsea:30,horsea:30	-	I look at the sea to forget!	Ooh! Traumatic!	I'm looking at the sea to forget!	9	13
+route_19_6	route_19	BEAUTY	swimmer	left	3	70	poliwag:27,goldeen:27,seaking:27,goldeen:27,poliwag:27	-	Oh, I just love your ride! Can I have it if I win?	Oh! I lost!	It's still a long way to go to SEAFOAM ISLANDS.	8	43
+route_19_7	route_19	BEAUTY	swimmer	right	4	70	goldeen:30,seaking:30	-	Swimming's great! Sunburns aren't!	Shocker!	My boy friend wanted to swim to SEAFOAM ISLANDS.	11	43
+route_19_8	route_19	SWIMMER	swimmer	up	4	5	tentacool:27,tentacool:27,staryu:27,horsea:27,tentacruel:27	-	These waters are treacherous!	Ooh! Dangerous!	I got a cramp! Glub, glub...	9	42
+route_19_9	route_19	BEAUTY	swimmer	down	4	70	staryu:29,staryu:29,staryu:29	-	I swam here, but I'm tired.	I'm exhausted...	LAPRAS is so big, it must keep you dry on water.	10	44
+route_20_0	route_20	SWIMMER	swimmer	up	4	5	shellder:31,cloyster:31	-	The water is shallow here.	Splash!	I wish I could ride my POKéMON.	87	8
+route_20_1	route_20	BEAUTY	swimmer	up	4	70	seadra:30,horsea:30,seadra:30	-	SEAFOAM is a quiet getaway!	Quit it!	There's a huge cavern underneath this island.	68	11
+route_20_2	route_20	BEAUTY	swimmer	down	2	70	seaking:35	-	I love floating with the fishes!	Yowch!	Want to float with me?	45	10
+route_20_3	route_20	JR.TRAINER♀	swimmer	right	4	20	tentacool:30,horsea:30,seel:30	-	Are you on vacation too?	No mercy at all!	SEAFOAM used to be one island!	55	14
+route_20_4	route_20	SWIMMER	swimmer	down	3	5	staryu:35	-	Check out my buff physique!	Wimpy!	I should've been buffing up my POKéMON, not me!	38	13
+route_20_5	route_20	SWIMMER	swimmer	up	4	5	horsea:28,horsea:28,seadra:28,horsea:28	-	Why are you riding a POKéMON? Can't you swim?	Ouch! Torpedoed!	Riding a POKéMON sure looks fun!	87	13
+route_20_6	route_20	BIRD KEEPER	cooltrainer_m	up	2	25	fearow:30,fearow:30,pidgeotto:30	-	I rode my bird POKéMON here!	Oh no!	My birds can't FLY me back!	34	9
+route_20_7	route_20	BEAUTY	swimmer	up	4	70	shellder:30,shellder:30,cloyster:30	-	My boy friend gave me big pearls!	Don't touch my pearls!	Will my pearls grow bigger inside CLOYSTER?	25	7
+route_20_8	route_20	JR.TRAINER♀	swimmer	down	3	20	goldeen:31,seaking:31	-	I swam here from CINNABAR ISLAND!	I'm so disappointed!	POKéMON have taken over an abandoned mansion on CINNABAR!	24	12
+route_20_9	route_20	BEAUTY	swimmer	up	4	70	poliwag:31,seaking:31	-	CINNABAR, in the west, has a LAB for POKéMON.	Wait!	CINNABAR is a volcanic island!	15	8
+route_21_0	route_21	FISHERMAN	fisher	left	0	35	seaking:28,goldeen:28,seaking:28,seaking:28	-	You want to know if the fish are biting?	Dang!	I can't catch anything good!	4	24
+route_21_1	route_21	FISHERMAN	fisher	down	0	35	magikarp:27,magikarp:27,magikarp:27,magikarp:27,magikarp:27,magikarp:27	-	I got a big haul! Wanna go for it?	Darn MAGIKARP!	I seem to only catch MAGIKARP!	6	25
+route_21_2	route_21	SWIMMER	swimmer	up	4	5	seadra:33,tentacruel:33	-	The sea cleanses my body and soul!	Ayah!	I like the mountains too!	10	31
+route_21_3	route_21	CUE BALL	swimmer	right	4	25	tentacool:31,tentacool:31,tentacruel:31	-	What's wrong with me swimming?	Cheap shot!	I look like what? A studded inner tube? Get lost!	12	30
+route_21_4	route_21	SWIMMER	swimmer	down	4	5	starmie:37	-	I caught all my POKéMON at sea!	Diver!! Down!!	Where'd you catch your POKéMON?	16	63
+route_21_5	route_21	SWIMMER	swimmer	right	4	5	staryu:33,wartortle:33	-	Right now, I'm in a triathlon meet!	Pant... pant...pant...	I'm beat! But, I still have the bike race and marathon left!	5	71
+route_21_6	route_21	SWIMMER	swimmer	left	3	5	poliwhirl:32,tentacool:32,seadra:32	-	Ahh! Feel the sun and the wind!	Yow! I lost!	I'm sunburnt to a crisp!	15	71
+route_21_7	route_21	FISHERMAN	fisher	left	0	35	shellder:31,cloyster:31	-	Hey, don't scare away the fish!	Sorry! I didn't mean it!	I was just angry that I couldn't catch anything.	14	56
+route_21_8	route_21	FISHERMAN	fisher	right	0	35	seaking:33,goldeen:33	-	Keep me company 'til I get a hit!	That burned some time.	Oh wait! I got a bite! Yeah!	17	57
+route_24_0	route_24	ROCKET	cooltrainer_m	left	4	30	ekans:15,zubat:15	-	I saw your feat from the grass!	I thought not!	I hid because the people on the bridge scared me!	11	15
+route_24_1	route_24	JR.TRAINER♂	cooltrainer_m	up	1	20	rattata:14,ekans:14	-	OK! I'm No. 5! I'll stomp you!	Whoa! Too much!	I did my best, I have no regrets!	5	20
+route_24_2	route_24	JR.TRAINER♂	cooltrainer_m	left	1	20	mankey:18	-	I'm No. 4! Getting tired?	I lost too!	I did my best, so I've no regrets!	11	19
+route_24_3	route_24	LASS	cooltrainer_f	right	1	15	pidgey:16,nidoran_f:16	-	Here's No. 3! I won't be easy!	Ow! Stomped flat!	I did my best, I have no regrets!	10	22
+route_24_4	route_24	YOUNGSTER	youngster	left	1	15	rattata:14,ekans:14,zubat:14	-	I'm second! Now it's serious!	How could I lose?	I did my best, I have no regrets!	11	25
+route_24_5	route_24	LASS	cooltrainer_f	right	1	15	pidgey:14,nidoran_f:14	-	This is NUGGET BRIDGE! Beat us 5 trainers and win a fabulous prize! | Think you got what it takes?	Whoo! Good stuff!	I did my best, I have no regrets!	10	28
+route_24_6	route_24	BUG CATCHER	youngster	left	3	10	caterpie:14,weedle:14	-	-	-	-	11	31
+route_25_0	route_25	YOUNGSTER	youngster	down	2	15	rattata:15,spearow:15	-	Local trainers come here to practice!	You're decent.	All POKéMON have weaknesses. It's best to raise different kinds.	14	2
+route_25_1	route_25	YOUNGSTER	youngster	up	3	15	slowpoke:17	-	Dad took me to a great party on S.S.ANNE at VERMILION CITY!	I'm not mad!	On S.S.ANNE, I saw trainers from around the world.	18	5
+route_25_2	route_25	JR.TRAINER♂	cooltrainer_m	down	3	20	rattata:14,ekans:14	-	I'm a cool guy. I've got a girl friend!	Aww, darn...	Oh well. My girl will cheer me up.	24	4
+route_25_3	route_25	LASS	cooltrainer_f	right	2	15	nidoran_m:15,nidoran_f:15	-	Hi! My boy friend is cool!	I'm in a slump!	I wish my guy was as good as you!	18	8
+route_25_4	route_25	YOUNGSTER	youngster	left	4	15	ekans:14,sandshrew:14	-	I knew I had to fight you!	I knew I'd lose too!	If your POKéMON gets confused or falls asleep, switch it!	32	3
+route_25_5	route_25	LASS	cooltrainer_f	down	4	15	oddish:13,pidgey:13,oddish:13	-	My friend has a cute POKéMON. I'm so jealous!	I'm not so jealous!	You came from MT. MOON? May I have a CLEFAIRY?	37	4
+route_25_6	route_25	HIKER	hiker	right	3	35	machop:15,geodude:15	-	I just got down from MT.MOON, but I'm ready!	You worked hard!	Drat! A ZUBAT bit me back in there.	8	4
+route_25_7	route_25	HIKER	hiker	up	2	35	geodude:13,geodude:13,machop:13,geodude:13	-	I'm off to see a POKéMON collector at the cape!	You got me.	The collector has many rare kinds of POKéMON.	23	9
+route_25_8	route_25	HIKER	hiker	right	2	35	onix:17	-	You're going to see BILL? First, let's fight!	You're something.	The trail below is a shortcut to CERULEAN CITY.	13	7
+route_3_0	route_3	BUG CATCHER	youngster	right	2	10	caterpie:10,weedle:10,caterpie:10	-	Hey! I met you in VIRIDIAN FOREST!	You beat me again!	There are other kinds of POKéMON than those found in the forest!	10	6
+route_3_1	route_3	YOUNGSTER	youngster	down	3	15	rattata:11,ekans:11	-	Hi! I like shorts! They're comfy and easy to wear!	I don't believe it!	Are you storing your POKéMON on PC? Each BOX can hold 20 POKéMON!	14	4
+route_3_2	route_3	LASS	cooltrainer_f	left	2	15	pidgey:9,pidgey:9	-	You looked at me, didn't you?	You're mean!	Quit staring if you don't want to fight!	16	9
+route_3_3	route_3	BUG CATCHER	youngster	down	1	10	weedle:9,kakuna:9,caterpie:9,metapod:9	-	Are you a trainer? Let's fight!	If I had new POKéMON, I would've won!	If a POKéMON BOX on the PC gets full, just switch to another BOX!	19	5
+route_3_4	route_3	LASS	cooltrainer_f	left	4	15	rattata:10,nidoran_m:10	-	That look you gave me, it's so intriguing!	Be nice!	Avoid fights by not letting people see you!	23	4
+route_3_5	route_3	YOUNGSTER	youngster	left	3	15	spearow:14	-	Hey! You're not wearing shorts!	Lost! Lost! Lost!	I always wear shorts, even in winter!	22	9
+route_3_6	route_3	BUG CATCHER	youngster	right	3	10	caterpie:11,metapod:11	-	You can fight my new POKéMON!	Done like dinner!	Trained POKéMON are stronger than the wild ones!	24	6
+route_3_7	route_3	LASS	cooltrainer_f	up	2	15	jigglypuff:14	-	Eek! Did you touch me?	That's it?	ROUTE 4 is at the foot of MT.MOON.	33	10
+route_4_0	route_4	LASS	cooltrainer_f	right	3	15	paras:31,paras:31,parasect:31	-	I came to get my mushroom POKéMON!	Oh! My cute mushroom POKéMON!	There might not be any more mushrooms here. | I think I got them all.	63	3
+route_6_0	route_6	JR.TRAINER♂	cooltrainer_m	right	0	20	weepinbell:16	-	I'm doing this out of love. Leave me alone!	No, this can't be...	My love will leave me in disgust.	10	21
+route_6_1	route_6	JR.TRAINER♀	cooltrainer_f	left	0	20	cubone:20	-	I'm training for my love. Don't bother me!	My textbook never...	Now I understand, POKéMON isn't about calculated numbers.	11	21
+route_6_2	route_6	BUG CATCHER	youngster	right	4	10	weedle:16,caterpie:16,weedle:16	-	There aren't many bugs out here.	No! You're kidding!	I like bugs, so I'm going back to VIRIDIAN FOREST.	0	15
+route_6_3	route_6	JR.TRAINER♂	cooltrainer_m	left	3	20	spearow:16,raticate:16	-	Huh? You want to talk to me?	I didn't start it!	I should carry more POKéMON with me for safety.	11	31
+route_6_4	route_6	JR.TRAINER♀	cooltrainer_f	left	3	20	pidgey:16,pidgey:16,pidgey:16	-	Me? Well, OK. I'll play!	Just didn't work!	I want to get stronger! What's your secret?	11	30
+route_6_5	route_6	BUG CATCHER	youngster	left	3	10	butterfree:20	-	I've never seen you around! Are you good?	You are too good!	Are my POKéMON weak? Or, am I just bad?	19	26
+route_8_0	route_8	SUPER NERD	super_nerd	right	4	25	voltorb:20,koffing:20,voltorb:20,magnemite:20	-	You look good at POKéMON, but how's your chem?	Ow! Meltdown!	I am better at school than this!	8	5
+route_8_1	route_8	GAMBLER	gambler	up	4	70	poliwag:22,poliwag:22,poliwhirl:22	-	All right! Let's roll the dice!	Drat! Came up short!	Lady Luck's not with me today!	13	9
+route_8_2	route_8	SUPER NERD	super_nerd	up	4	25	grimer:22,muk:22,grimer:22	-	You need strategy to win at this!	It's not logical!	Go with GRIMER first...and... ...and...then...	42	6
+route_8_3	route_8	LASS	cooltrainer_f	left	2	15	nidoran_f:23,nidorina:23	-	I like NIDORAN, so I collect them!	Why? Why??	When POKéMON grow up they get ugly! They shouldn't evolve!	26	3
+route_8_4	route_8	SUPER NERD	super_nerd	right	3	25	koffing:26	-	School is fun, but so are POKéMON.	I'll stay with school.	We're stuck here because of the gates at SAFFRON.	26	4
+route_8_5	route_8	LASS	cooltrainer_f	left	3	15	meowth:24,meowth:24,meowth:24	-	MEOWTH is so cute, meow, meow, meow!	Meow!	I think PIDGEY and RATTATA are cute too!	26	5
+route_8_6	route_8	LASS	cooltrainer_f	right	2	15	pidgey:19,rattata:19,nidoran_f:19,meowth:19,nidoran_m:19	-	We must look silly standing here like this!	Look what you did!	SAFFRON's gate-keeper won't let us through. He's so mean!	26	6
+route_8_7	route_8	GAMBLER	gambler	down	2	70	growlithe:24,vulpix:24	-	I'm a rambling, gambling dude!	Missed the big score!	Gambling and POKéMON are like eating peanuts! Just can't stop!	46	13
+route_8_8	route_8	LASS	cooltrainer_f	left	4	15	clefairy:22,clefairy:22	-	What's a cute, round and fluffy POKéMON?	Stop! | Don't be so mean to my CLEFAIRY!	I heard that CLEFAIRY evolves when it's exposed to a MOON STONE.	51	12
+route_9_0	route_9	JR.TRAINER♀	cooltrainer_f	left	3	20	oddish:18,bellsprout:18,oddish:18,bellsprout:18	-	You have POKéMON with you! You're mine!	You deceived me!	You need light to get through that dark tunnel ahead.	13	10
+route_9_1	route_9	YOUNGSTER	cooltrainer_m	left	2	15	sandshrew:24	-	I aim to be the ultimate trainer!	My SANDSHREW lost?	I'll restart my 100-win streak with SANDSHREW.	24	7
+route_9_2	route_9	JR.TRAINER♂	cooltrainer_m	right	4	20	rattata:19,diglett:19,ekans:19,sandshrew:19	-	I'm taking ROCK TUNNEL to go to LAVENDER...	Can't measure up!	Are you off to ROCK TUNNEL too?	31	7
+route_9_3	route_9	JR.TRAINER♀	cooltrainer_f	right	2	20	meowth:23	-	Don't you dare condescend me!	No! You're too much!	You're obviously talented! Good luck to you!	48	8
+route_9_4	route_9	HIKER	hiker	left	2	35	machop:20,onix:20	-	Bwahaha! Great! I was bored, eh!	Keep it coming, eh! | Oh wait. I'm out of POKéMON!	You sure had guts standing up to me there, eh?	16	15
+route_9_5	route_9	HIKER	hiker	left	3	35	geodude:20,machop:20,geodude:20	-	Hahaha! Aren't you a little toughie!	What's that?	Hahaha! Kids should be tough!	43	3
+route_9_6	route_9	BUG CATCHER	youngster	down	4	10	beedrill:19,beedrill:19	-	I got up early every day to raise my POKéMON from cocoons!	WHAT? | What a total waste of time!	I have to collect more than bugs to get stronger...	22	2
+route_9_7	route_9	HIKER	hiker	right	2	35	geodude:21,onix:21	-	Hahahaha! Come on, dude!	Hahahaha! You beat me fair!	Hahahaha! Us hearty guys always laugh!	45	15
+route_9_8	route_9	BUG CATCHER	youngster	right	2	10	caterpie:20,weedle:20,venonat:20	-	Go, my super bug POKéMON!	My bugs...	If you don't like bug POKéMON, you bug me!	40	8
+ss_anne_1f_rooms_0	ss_anne_1f_rooms	GENTLEMAN	gentleman	left	2	70	growlithe:18,growlithe:18	-	I travel alone on my journeys! | My POKéMON are my only friends!	My, my friends...	You should be nice to friends!	2	3
+ss_anne_1f_rooms_1	ss_anne_1f_rooms	GENTLEMAN	gentleman	up	3	70	nidoran_m:19,nidoran_f:19	-	You pup! How dare you barge in!	Humph! You rude child!	I wish to be left alone! Get out!	11	4
+ss_anne_1f_rooms_2	ss_anne_1f_rooms	YOUNGSTER	youngster	up	2	15	nidoran_m:21	-	I love POKéMON! Do you?	Wow! You're great!	Let me be your friend, OK? | Then we can trade POKéMON!	11	14
+ss_anne_1f_rooms_3	ss_anne_1f_rooms	LASS	cooltrainer_f	left	2	15	pidgey:18,nidoran_f:18	-	I collected these POKéMON from all around the world!	Oh no! I went around the world for these!	You hurt my poor worldly POKéMON! | I demand that you heal them at a POKéMON CENTER!	13	11
+ss_anne_2f_0	ss_anne_2f	RIVAL1	blue	down	3	35	eevee:5	-	-	-	-	36	4
+ss_anne_2f_rooms_0	ss_anne_2f_rooms	GENTLEMAN	gentleman	right	2	70	voltorb:22,magnemite:22	-	Competing against the young keeps me youthful.	Good fight! Ah, I feel young again!	15 years ago, I would have won!	10	2
+ss_anne_2f_rooms_1	ss_anne_2f_rooms	FISHERMAN	fisher	left	3	35	goldeen:17,tentacool:17,goldeen:17	-	Check out what I fished up!	I'm all out!	Party? | The cruise ship's party should be over by now.	13	4
+ss_anne_2f_rooms_2	ss_anne_2f_rooms	GENTLEMAN	gentleman	right	3	70	growlithe:17,ponyta:17	-	Which do you like, a strong or a rare POKéMON?	I must salute you!	I prefer strong and rare POKéMON.	0	14
+ss_anne_2f_rooms_3	ss_anne_2f_rooms	LASS	cooltrainer_f	down	2	15	jigglypuff:20	-	I never saw you at the party.	Take it easy!	Oh, I adore your strong POKéMON!	2	11
+ss_anne_b1f_rooms_0	ss_anne_b1f_rooms	SAILOR	sailor	down	2	30	shellder:21	-	You know what they say about sailors and fighting!	Right! Good fight, mate!	Haha! Want to be a sailor, mate?	0	13
+ss_anne_b1f_rooms_1	ss_anne_b1f_rooms	SAILOR	sailor	down	3	30	horsea:17,shellder:17,tentacool:17	-	My sailor's pride is at stake!	Your spirit sank me!	Did you see the FISHING GURU in VERMILION CITY?	2	11
+ss_anne_b1f_rooms_2	ss_anne_b1f_rooms	SAILOR	sailor	left	2	30	tentacool:18,staryu:18	-	Us sailors have POKéMON too!	OK, you're not bad.	We caught all our POKéMON while out at sea!	12	3
+ss_anne_b1f_rooms_3	ss_anne_b1f_rooms	SAILOR	sailor	down	2	30	horsea:17,horsea:17,horsea:17	-	I like feisty kids like you!	Argh! Lost it!	Sea POKéMON live in deep water. You'll need a ROD!	22	2
+ss_anne_b1f_rooms_4	ss_anne_b1f_rooms	SAILOR	sailor	right	2	30	machop:20	-	Matey, you're walking the plank if you lose!	Argh! Beaten by a kid!	Jellyfish some-times drift into the ship.	0	2
+ss_anne_b1f_rooms_5	ss_anne_b1f_rooms	FISHERMAN	fisher	right	3	35	tentacool:17,staryu:17,shellder:17	-	Hello stranger! Stop and chat! | All my POKéMON are from the sea!	Darn! I let that one get away!	I was going to make you my assistant too!	0	4
+ss_anne_bow_0	ss_anne_bow	SAILOR	sailor	down	3	30	machop:18,shellder:18	-	Hey matey! | Let's do a little jig!	You're impressive!	How many kinds of POKéMON do you think there are?	4	4
+ss_anne_bow_1	ss_anne_bow	SAILOR	sailor	up	3	30	machop:17,tentacool:17	-	Ahoy there! Are you seasick?	I was just careless!	My Pa said there are 100 kinds of POKéMON. I think there are more.	10	8
+saffron_gym_0	saffron_gym	LEADER SABRINA	leader_sabrina	down	0	99	abra:50,kadabra:50,alakazam:50	MARSHBADGE	I had a vision of your arrival! | I have had psychic powers since I was a child. | I first learned to bend spoons with my mind. | I dislike fight-ing, but if you wish, I will show you my powers!	I'm shocked! But, a loss is a loss. | I admit I didn't work hard enough to win! | You earned the MARSHBADGE!	Everyone has psychic power! People just don't realize it!	9	8
+saffron_gym_1	saffron_gym	CHANNELER	channeler	down	3	30	gastly:34,haunter:34	-	Does our unseen power scare you?	I never foresaw this!	Psychic POKéMON fear only bugs!	10	1
+saffron_gym_2	saffron_gym	PSYCHIC	youngster	down	3	10	kadabra:31,slowpoke:31,mr_mime:31,kadabra:31	-	POKéMON take on the appearance of their trainers. | Your POKéMON must be tough, then!	I knew it!	I must teach better techniques to my POKéMON!	17	1
+saffron_gym_3	saffron_gym	CHANNELER	channeler	down	3	30	haunter:38	-	You know that power alone isn't enough!	I don't believe this!	SABRINA just wiped out the KARATE MASTER next door!	3	7
+saffron_gym_4	saffron_gym	PSYCHIC	youngster	down	3	10	mr_mime:34,kadabra:34	-	You and I, our POKéMON shall fight!	I lost after all!	I knew that this was going to take place.	17	7
+saffron_gym_5	saffron_gym	CHANNELER	channeler	down	3	30	gastly:33,gastly:33,haunter:33	-	SABRINA is young, but she's also our LEADER! | You won't reach her easily!	I lost my concentration!	There used to be 2 POKéMON GYMs in SAFFRON. | The FIGHTING DOJO next door lost its GYM status when we went and creamed them!	3	13
+saffron_gym_6	saffron_gym	PSYCHIC	youngster	down	3	10	slowpoke:33,slowpoke:33,slowbro:33	-	SAFFRON POKéMON GYM is famous for its psychics! | You want to see SABRINA! I can tell!	Arrrgh!	That's right! I used telepathy to read your mind!	17	13
+saffron_gym_7	saffron_gym	PSYCHIC	youngster	down	3	10	slowbro:38	-	-	-	-	3	1
+silph_co_10f_0	silph_co_10f	ROCKET	rocket	right	3	30	machoke:33	-	Welcome to the 10F! So good of you to join me!	I'm stunned!	Nice try, but the boardroom is up one more floor!	1	9
+silph_co_10f_1	silph_co_10f	SCIENTIST	scientist	left	4	50	magnemite:29,koffing:29	-	Enough of your silly games!	No continues left!	Are you satisfied with beating me? Then go on home!	10	2
+silph_co_11f_0	silph_co_11f	ROCKET BOSS GIOVANNI	leader_giovanni	down	0	99	nidorino:37,persian:35,rhyhorn:37,nidoqueen:41	-	Ah, {player}! So we meet again! | The PRESIDENT and I are discussing a vital business proposition. | Keep your nose out of grown-up matters... | or, experience a world of pain!	Gaah! Demolished!	...	6	9
+silph_co_11f_1	silph_co_11f	ROCKET	rocket	up	3	30	rattata:25,rattata:25,zubat:25,rattata:25,ekans:25	-	-	-	-	15	9
+silph_co_2f_0	silph_co_2f	SCIENTIST	scientist	down	3	50	grimer:26,weezing:26,koffing:26,weezing:26	-	Help! I'm a SILPH employee.	How did you know I was a ROCKET?	I work for both SILPH and TEAM ROCKET!	5	12
+silph_co_2f_1	silph_co_2f	SCIENTIST	scientist	left	4	50	magnemite:28,voltorb:28,magneton:28	-	It's off limits here! Go home!	You're good.	Can you solve the maze in here?	24	13
+silph_co_2f_2	silph_co_2f	ROCKET	rocket	up	3	30	cubone:29,zubat:29	-	No kids are allowed in here!	Tough!	Diamond-shaped tiles are teleport blocks! | They're hi-tech transporters!	16	11
+silph_co_2f_3	silph_co_2f	ROCKET	rocket	up	3	30	golbat:25,zubat:25,zubat:25,raticate:25,zubat:25	-	Hey kid! What are you doing here?	I goofed!	SILPH CO. will be merged with TEAM ROCKET!	24	7
+silph_co_3f_0	silph_co_3f	ROCKET	rocket	left	2	30	raticate:28,hypno:28,raticate:28	-	Quit messing with us, kid!	I give up!	A hint? You can open doors with a CARD KEY!	20	7
+silph_co_3f_1	silph_co_3f	SCIENTIST	scientist	down	3	50	electrode:29,weezing:29	-	I support TEAM ROCKET more than I support SILPH!	You really got me!	Humph... | TEAM ROCKET said that if I helped them, they'd let me study POKéMON!	7	9
+silph_co_4f_0	silph_co_4f	ROCKET	rocket	right	4	30	machop:29,drowzee:29	-	TEAM ROCKET has taken command of SILPH CO.!	Arrgh!	Fwahahaha! My BOSS has been after this place!	9	14
+silph_co_4f_1	silph_co_4f	SCIENTIST	scientist	left	3	50	electrode:33	-	My POKéMON are my loyal soldiers!	Darn! You weak POKéMON!	The doors are electronically locked! A CARD KEY opens them!	14	6
+silph_co_4f_2	silph_co_4f	ROCKET	rocket	up	4	30	ekans:28,zubat:28,cubone:28	-	Intruder spotted!	Who are you?	I better tell the BOSS on 11F!	26	10
+silph_co_5f_0	silph_co_5f	ROCKET	rocket	right	1	30	arbok:33	-	I heard a kid was wandering around.	Boom!	It's not smart to pick a fight with TEAM ROCKET!	8	16
+silph_co_5f_1	silph_co_5f	SCIENTIST	scientist	right	2	50	magneton:26,koffing:26,weezing:26,magnemite:26	-	We study POKé BALL technology on this floor!	Dang! Blast it!	We worked on the ultimate POKé BALL which would catch anything!	8	3
+silph_co_5f_2	silph_co_5f	JUGGLER	rocker	up	4	35	kadabra:29,mr_mime:29	-	Whaaat? There shouldn't be any children here!	Oh goodness!	You're only on 5F. It's a long way to my BOSS!	18	10
+silph_co_5f_3	silph_co_5f	ROCKET	rocket	up	3	30	hypno:33	-	Show TEAM ROCKET a little respect!	Cough... Cough...	Which reminds me. | KOFFING evolves into WEEZING!	28	4
+silph_co_6f_0	silph_co_6f	ROCKET	rocket	right	2	30	machop:29,machoke:29	-	I am one of the 4 ROCKET BROTHERS!	Flame out!	No matter! My brothers will avenge me!	17	3
+silph_co_6f_1	silph_co_6f	SCIENTIST	scientist	down	3	50	voltorb:25,koffing:25,magneton:25,magnemite:25,koffing:25	-	That rotten PRESIDENT! | He shouldn't have sent me to the TIKSI BRANCH!	Shoot!	TIKSI BRANCH? It's in Russian no man's land!	7	8
+silph_co_6f_2	silph_co_6f	ROCKET	rocket	left	2	30	zubat:28,zubat:28,golbat:28	-	You dare betray TEAM ROCKET?	You traitor!	If you stand for justice, you betray evil!	14	15
+silph_co_7f_0	silph_co_7f	ROCKET	rocket	down	2	30	raticate:26,arbok:26,koffing:26,golbat:26	-	Aha! I smell a little rat!	Lights out!	You won't find my BOSS by just scurrying around!	13	1
+silph_co_7f_1	silph_co_7f	SCIENTIST	scientist	down	3	50	electrode:29,muk:29	-	Heheh! | You mistook me for a SILPH worker?	I'm done!	Despite your age, you are a skilled trainer!	2	13
+silph_co_7f_2	silph_co_7f	ROCKET	rocket	left	3	30	cubone:29,cubone:29	-	I am one of the 4 ROCKET BROTHERS!	Aack! Brothers, I lost!	Doesn't matter. My brothers will repay the favor!	20	2
+silph_co_7f_3	silph_co_7f	ROCKET	rocket	right	4	30	sandshrew:29,sandslash:29	-	A child intruder? That must be you!	Fine! I lost!	Go on home before my BOSS gets ticked off!	19	14
+silph_co_8f_0	silph_co_8f	ROCKET	rocket	left	4	30	raticate:26,zubat:26,golbat:26,rattata:26	-	That's as far as you'll go!	Not enough grit!	If you don't turn back, I'll call for backup!	19	2
+silph_co_8f_1	silph_co_8f	SCIENTIST	scientist	down	4	50	grimer:29,electrode:29	-	You're causing us problems!	Huh? I lost?	So, what do you think of SILPH BUILDING's maze?	10	2
+silph_co_8f_2	silph_co_8f	ROCKET	rocket	right	4	30	weezing:28,golbat:28,koffing:28	-	I am one of the 4 ROCKET BROTHERS!	Whoo! Oh brothers!	I'll leave you up to my brothers!	12	15
+silph_co_9f_0	silph_co_9f	ROCKET	rocket	up	4	30	drowzee:28,grimer:28,machop:28	-	Your POKéMON seem to adore you, kid!	Ghaaah!	If I had started as a trainer at your age...	2	4
+silph_co_9f_1	silph_co_9f	SCIENTIST	scientist	down	2	50	voltorb:28,koffing:28,magneton:28	-	Your POKéMON have weak points! I can nail them!	You hammered me!	Exploiting weak spots does work! Think about element types!	21	13
+silph_co_9f_2	silph_co_9f	ROCKET	rocket	up	4	30	golbat:28,drowzee:28,hypno:28	-	I am one of the 4 ROCKET BROTHERS!	Warg! Brothers, I lost!	My brothers will avenge me!	13	16
+vermilion_gym_0	vermilion_gym	LEADER LT.SURGE	leader_lt_surge	down	0	99	raichu:28	THUNDERBADGE	Ten-hut! Welcome to VERMILION GYM! | Will you look at that, a pint-size challenger! | Hahaha! You've got big and brassy nerves to take me on with your puny power! | A POKéMON battle is war! I'll show you, civilian! | I'll shock you into surrender!	Stop! You're very good!	...	5	1
+vermilion_gym_1	vermilion_gym	GENTLEMAN	gentleman	left	2	70	voltorb:22,magnemite:22	-	I'm a lightweight, but I'm good with electricity!	Fried!	OK, I'll talk! | LT.SURGE said he hid door switches inside something!	9	6
+vermilion_gym_2	vermilion_gym	ROCKER	super_nerd	left	3	25	voltorb:20,voltorb:20,voltorb:20	-	This is no place for kids!	Wow! Surprised me!	LT.SURGE set up double locks! Here's a hint! | When you open the 1st lock, the 2nd lock is right next to it!	3	8
+vermilion_gym_3	vermilion_gym	SAILOR	sailor	right	3	30	magnemite:24	-	-	-	-	0	10
+victory_road_1f_0	victory_road_1f	COOLTRAINER♀	cooltrainer_f	right	2	35	persian:44,ninetales:44	-	I wonder if you are good enough for me!	I lost out!	I never wanted to lose to anybody!	7	5
+victory_road_1f_1	victory_road_1f	COOLTRAINER♂	cooltrainer_m	down	2	35	ivysaur:42,wartortle:42,charmeleon:42,charizard:42	-	I can see you're good! Let me see exactly how good!	I had a chance...	I concede, you're better than me!	3	2
+victory_road_2f_0	victory_road_2f	BLACKBELT	hiker	left	4	25	machoke:43,machop:43,machoke:43	-	VICTORY ROAD is the final test for trainers!	Aiyah!	If you get stuck, try moving some boulders around!	12	9
+victory_road_2f_1	victory_road_2f	JUGGLER	super_nerd	left	3	35	drowzee:41,hypno:41,kadabra:41,kadabra:41	-	Ah, so you wish to challenge the ELITE FOUR?	You got me!	{rival} also came through here!	21	13
+victory_road_2f_2	victory_road_2f	TAMER	cooltrainer_m	down	3	40	persian:44,golduck:44	-	Come on! I'll whip you!	I got whipped!	You earned the right to be on VICTORY ROAD!	19	8
+victory_road_2f_3	victory_road_2f	POKéMANIAC	super_nerd	down	1	50	charmeleon:40,lapras:40,lickitung:40	-	If you can get through here, you can go meet the ELITE FOUR!	No! Unbelievable!	I can beat you when it comes to knowledge about POKéMON!	4	2
+victory_road_2f_4	victory_road_2f	JUGGLER	super_nerd	left	3	35	mr_mime:48	-	Is VICTORY ROAD too tough?	Well done!	Many trainers give up the challenge here.	26	3
+victory_road_3f_0	victory_road_3f	COOLTRAINER♂	cooltrainer_m	left	1	35	exeggutor:43,cloyster:43,arcanine:43	-	I heard rumors of a child prodigy!	The rumors were true!	You beat GIOVANNI of TEAM ROCKET?	28	5
+victory_road_3f_1	victory_road_3f	COOLTRAINER♀	cooltrainer_f	right	4	35	bellsprout:43,weepinbell:43,victreebel:43	-	I'll show you just how good you are!	I'm furious!	You showed me just how good I was!	7	13
+victory_road_3f_2	victory_road_3f	COOLTRAINER♂	cooltrainer_m	left	4	35	kingler:43,tentacruel:43,blastoise:43	-	Only the chosen can pass here!	I don't believe it!	All trainers here are headed to the POKéMON LEAGUE! Be careful!	6	14
+victory_road_3f_3	victory_road_3f	COOLTRAINER♀	cooltrainer_f	right	4	35	parasect:43,dewgong:43,chansey:43	-	Trainers live to seek stronger opponents!	Oh! So strong!	By fighting tough battles, you get stronger!	13	3
+viridian_forest_0	viridian_forest	BUG CATCHER	youngster	left	4	10	caterpie:7,caterpie:7	-	Hey! You have POKéMON! Come on! Let's battle 'em!	No! CATERPIE can't cut it!	Ssh! You'll scare the bugs away!	30	33
+viridian_forest_1	viridian_forest	BUG CATCHER	youngster	left	4	10	metapod:6,caterpie:6,metapod:6	-	Yo! You can't jam out if you're a POKéMON trainer!	Huh? I ran out of POKéMON!	Darn! I'm going to catch some stronger ones!	30	19
+viridian_forest_2	viridian_forest	BUG CATCHER	youngster	left	1	10	caterpie:10	-	Hey, wait up! What's the hurry?	I give! You're good at this!	Sometimes, you can find stuff on the ground! | I'm looking for the stuff I dropped!	2	18
+viridian_forest_3	viridian_forest	LASS	cooltrainer_f	none	0	15	nidoran_f:6,nidoran_m:6	-	Hi, do you have a PIKACHU?	Oh no, really?	I looked forever, but I never found a PIKACHU here!	2	41
+viridian_forest_4	viridian_forest	BUG CATCHER	youngster	right	4	10	caterpie:8,metapod:8	-	I'm gonna be the best. You just can't beat me!	After all I did...	A METAPOD is cool because its attack is its defense!	13	17
+viridian_gym_0	viridian_gym	LEADER GIOVANNI	leader_giovanni	down	0	99	dugtrio:50,persian:53,nidoqueen:53,nidoking:55,rhydon:55	EARTHBADGE	Fwahahaha! This is my hideout! | I planned to resurrect TEAM ROCKET here! | But, you have caught me again! So be it! This time, I'm not holding back! | Once more, you shall face GIOVANNI, the greatest trainer!	Ha! That was a truly intense fight! You have won! As proof, here is the EARTHBADGE!	Having lost, I cannot face my underlings! TEAM ROCKET is finished forever! | I will dedicate my life to the study of POKéMON! | Let us meet again someday! Farewell!	2	1
+viridian_gym_1	viridian_gym	COOLTRAINER♂	cooltrainer_m	down	4	35	sandslash:39,dugtrio:39	-	Rrrroar! I'm working myself into a rage!	Wargh!	I'm still not worthy!	12	7
+viridian_gym_2	viridian_gym	BLACKBELT	hiker	up	4	25	machop:40,machoke:40	-	POKéMON and I, we make wonderful music together!	You are in perfect harmony!	Do you know the identity of our GYM LEADER?	11	11
+viridian_gym_3	viridian_gym	TAMER	rocker	down	2	40	rhyhorn:43	-	Karate is the ultimate form of martial arts!	Atcho!	If my POKéMON were as good at Karate as I...	10	7
+viridian_gym_4	viridian_gym	BLACKBELT	hiker	left	3	25	machoke:43	-	The truly talented win with style!	I lost my grip!	The LEADER will scold me!	3	7
+viridian_gym_5	viridian_gym	COOLTRAINER♂	cooltrainer_m	right	4	35	rhyhorn:43	-	I'm the KARATE KING! Your fate rests with me!	Ayah!	POKéMON LEAGUE? You? Don't get cocky!	13	5
+viridian_gym_6	viridian_gym	BLACKBELT	hiker	down	3	25	machoke:38,machop:38,machoke:38	-	Your POKéMON will cower at the crack of my whip!	Yowch! Whiplash!	Wait! I was just careless!	10	1
+viridian_gym_7	viridian_gym	TAMER	rocker	right	4	40	arbok:39,tauros:39	-	VIRIDIAN GYM was closed for a long time, but now our LEADER is back!	I was beaten?	You can go on to POKéMON LEAGUE only by defeating our GYM LEADER!	2	16
+viridian_gym_8	viridian_gym	COOLTRAINER♂	cooltrainer_m	down	3	35	nidorino:39,nidoking:39	-	-	-	-	6	5

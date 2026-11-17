@@ -1,8 +1,0 @@
-{
- "scale": 1,
- "idle": "animation.onix.battle_idle",
- "ground": "animation.onix.boulder_rotation",
- "texture": "kantojohto:textures/pokemon/onix.png",
- "layers": [],
- "height": 4
-}

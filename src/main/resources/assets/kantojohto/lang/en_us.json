@@ -1,8 +1,0 @@
-{
-	"key.category.kantojohto.route_one": "Route One",
-	"key.kantojohto.start": "Start (menu)",
-	"key.kantojohto.toggle": "Adventure camera (outside a Route One save)",
-	"key.kantojohto.direction": "Camera: north up or diagonal",
-	"entity.kantojohto.npc": "Person",
-	"entity.kantojohto.mon_display": "Pokémon"
-}

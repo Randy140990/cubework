@@ -1,0 +1,1 @@
+{"scale":0.4,"idle":"animation.pichu.battle_idle","ground":"animation.pichu.ground_idle","texture":"retromon:textures/pokemon/pichu.png","layers":[{"frames":["retromon:textures/pokemon/pichu_layer0_0.png"],"fps":0,"emissive":true,"translucent":false}],"height":0.9,"standIn":null}

@@ -4,7 +4,7 @@ import os, random
 from PIL import Image, ImageFilter
 
 HERE = os.path.dirname(__file__)
-OUT = os.path.join(HERE, "..", "src", "main", "resources", "assets", "kantojohto", "textures", "gui", "intro.png")
+OUT = os.path.join(HERE, "..", "src", "main", "resources", "assets", "retromon", "textures", "gui", "intro.png")
 W, H = 480, 270
 src = Image.open(os.path.join(HERE, "art", "charizard-pixelized.jpg")).convert("RGB")
 src = src.resize((round(src.width * 472 / src.height), 472), Image.LANCZOS)

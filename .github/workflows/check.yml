@@ -80,10 +80,10 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          BR=ci-check-routeone
+          BR=ci-check-retromon
           
-          git config user.name "routeone-ci"
-          git config user.email "routeone-ci@users.noreply.github.com"
+          git config user.name "retromon-ci"
+          git config user.email "retromon-ci@users.noreply.github.com"
           cp -r out /tmp/out
           git checkout --orphan ci-check-tmp
           git rm -rf --cached . > /dev/null 2>&1 || true

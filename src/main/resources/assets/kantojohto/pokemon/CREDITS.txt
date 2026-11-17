@@ -1,4 +1,0 @@
-Pokemon models, animations, textures and cries: by the Cobblemon team (https://cobblemon.com),
-licensed under Creative Commons Attribution-NonCommercial 3.0 (see LICENSE-cobblemon-models.txt).
-Changes: renamed and repacked for Route One; the models, animations and textures are otherwise unchanged.
-Route One is free and non-commercial.

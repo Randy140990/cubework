@@ -1,0 +1,345 @@
+# key	place	sprite	facing	movement	lines	x	y
+bike_shop_p0	bike_shop	bike_shop_clerk	none	stay	How do you like your new BICYCLE? | You can take it on CYCLING ROAD and in caves!	6	2
+bike_shop_p1	bike_shop	middle_aged_woman	up_down	walk	A plain city BIKE is good enough for me! | You can't put a shopping basket on an MTB!	5	6
+bike_shop_p2	bike_shop	youngster	up	stay	These BIKEs are cool, but they're way expensive!	1	3
+bills_house_p0	bills_house	super_nerd	none	stay	BILL: Look, bud, just check out some of my rare POKéMON on my PC!	6	5
+celadon_chief_house_p0	celadon_chief_house	gramps	down	stay	Hehehe! The slots just reel in the dough, big time!	4	2
+celadon_chief_house_p1	celadon_chief_house	rocket	any_dir	walk	CHIEF! | We just shipped 2000 POKéMON as slot prizes!	1	4
+celadon_chief_house_p2	celadon_chief_house	sailor	left	stay	Don't touch the poster at the GAME CORNER! | There's no secret switch behind it!	5	6
+celadon_city_p0	celadon_city	little_girl	any_dir	walk	I got my KOFFING from my friend! | We get along now, because I was very nice to it!	8	17
+celadon_city_p1	celadon_city	gramps	up	stay	Heheh! This GYM is great! It's full of women!	11	28
+celadon_city_p2	celadon_city	girl	up_down	walk	The GAME CORNER is bad for our city's image!	14	19
+celadon_city_p3	celadon_city	gramps	down	stay	Moan! I blew it all at the slots! | I knew I should have cashed in my coins for prizes!	25	22
+celadon_city_p4	celadon_city	gramps	down	stay	Hello, there! | I've seen you, but I never had a chance to talk! | Here's a gift for dropping by!	22	16
+celadon_city_p5	celadon_city	fisher	left	stay	This is my trusted pal, POLIWRATH! | It evolved from POLIWHIRL when I used WATER STONE!	32	12
+celadon_city_p6	celadon_city	monster	right	stay	POLIWRATH: Ribi ribit!	30	12
+celadon_city_p7	celadon_city	rocket	left_right	walk	What are you staring at?	32	29
+celadon_city_p8	celadon_city	rocket	left_right	walk	Keep out of TEAM ROCKET's way!	42	14
+celadon_diner_p0	celadon_diner	cook	left_right	walk	Hi! | We're taking a break now.	8	5
+celadon_diner_p1	celadon_diner	middle_aged_woman	none	stay	My POKéMON are weak, so I often have to go to the DRUG STORE.	7	2
+celadon_diner_p2	celadon_diner	middle_aged_man	down	stay	Psst! There's a basement under the GAME CORNER.	1	4
+celadon_diner_p3	celadon_diner	fisher	right	stay	Munch... | The man at that table lost it all at the slots.	5	3
+celadon_hotel_p0	celadon_hotel	granny	down	stay	POKéMON? No, this is a hotel for people. | We're full up.	3	1
+celadon_hotel_p1	celadon_hotel	beauty	none	stay	I'm on vacation with my brother and boy friend. | CELADON is such a pretty city!	2	4
+celadon_hotel_p2	celadon_hotel	super_nerd	left_right	walk	Why did she bring her brother?	8	4
+celadon_mansion_1f_p0	celadon_mansion_1f	monster	right	stay	MEOWTH: Meow!	0	5
+celadon_mansion_1f_p1	celadon_mansion_1f	fairy	left_right	walk	CLEFAIRY: Pi pippippi!	1	8
+celadon_mansion_1f_p2	celadon_mansion_1f	monster	up_down	walk	NIDORAN: Kya kyaoo!	4	4
+celadon_mansion_3f_p0	celadon_mansion_3f	bike_shop_clerk	up	stay	Me? I'm the programmer! | What a surprise! I never expected anyone to fill a POKéDEX.	0	4
+celadon_mansion_3f_p1	celadon_mansion_3f	clerk	up	stay	I'm the graphic artist! I drew you!	3	4
+celadon_mansion_3f_p2	celadon_mansion_3f	super_nerd	up	stay	I wrote the story! Isn't ERIKA cute? | I like MISTY a lot too! | Oh, and SABRINA, I like her!	0	7
+celadon_mansion_3f_p3	celadon_mansion_3f	silph_worker_m	none	stay	Is that right? | I'm the game designer! | Filling up your POKéDEX is tough, but don't quit! | When you finish, come tell me!	2	3
+celadon_mansion_roof_house_p0	celadon_mansion_roof_house	hiker	down	stay	I know everything about the world of POKéMON in your GAME BOY! | Get together with your friends and trade POKéMON!	2	2
+celadon_mart_1f_p0	celadon_mart_1f	link_receptionist	down	stay	Hello! Welcome to CELADON DEPT. STORE. | The board on the right describes the store layout.	8	3
+celadon_mart_2f_p0	celadon_mart_2f	middle_aged_man	none	stay	SUPER REPEL keeps weak POKéMON at bay... | Hmm, it's a more powerful REPEL!	19	5
+celadon_mart_2f_p1	celadon_mart_2f	girl	up_down	walk	For long outings, you should buy REVIVE.	14	4
+celadon_mart_3f_p0	celadon_mart_3f	gameboy_kid	right	stay	Captured POKéMON are registered with an ID No. and OT, the name of the Original Trainer that caught it!	11	6
+celadon_mart_3f_p1	celadon_mart_3f	gameboy_kid	down	stay	All right! | My buddy's going to trade me his KANGASKHAN for my GRAVELER!	7	2
+celadon_mart_3f_p2	celadon_mart_3f	gameboy_kid	down	stay	Come on GRAVELER! | I love GRAVELER! I collect them! | Huh? | GRAVELER turned into a different POKéMON!	8	2
+celadon_mart_3f_p3	celadon_mart_3f	little_boy	up	stay	You can identify POKéMON you got in trades by their ID Numbers!	2	5
+celadon_mart_4f_p0	celadon_mart_4f	super_nerd	left_right	walk	I'm getting a gift for COPYCAT in CERULEAN CITY. | It's got to be a POKé DOLL. They are trendy!	15	5
+celadon_mart_4f_p1	celadon_mart_4f	youngster	left_right	walk	I heard something useful. | You can run from wild POKéMON by distracting them with a POKé DOLL!	5	2
+celadon_mart_5f_p0	celadon_mart_5f	gentleman	up_down	walk	POKéMON ability enhancers can be bought only here. | Use CALCIUM to increase SPECIAL abilities. | Use CARBOS to increase SPEED.	14	5
+celadon_mart_5f_p1	celadon_mart_5f	sailor	none	stay	I'm here for POKéMON ability enhancers. | PROTEIN increases ATTACK power. | IRON increases DEFENSE!	2	6
+celadon_mart_roof_p0	celadon_mart_roof	super_nerd	left	stay	My sister is a trainer, believe it or not. | But, she's so immature, she drives me nuts!	10	4
+celadon_mart_roof_p1	celadon_mart_roof	little_girl	any_dir	walk	I'm thirsty! I want something to drink!	5	5
+celadon_pokecenter_p0	celadon_pokecenter	gentleman	down	stay	POKé FLUTE awakens POKéMON with a sound that only they can hear!	7	3
+celadon_pokecenter_p1	celadon_pokecenter	beauty	any_dir	walk	I rode uphill on CYCLING ROAD from FUCHSIA!	10	5
+cerulean_badge_house_p0	cerulean_badge_house	middle_aged_man	right	stay	POKéMON BADGEs are owned only by skilled trainers. | I see you have at least one. | Those BADGEs have amazing secrets!	5	3
+cerulean_city_p0	cerulean_city	blue	down	stay	{rival}: Hey, guess what? | I went to BILL's and got him to show me his rare POKéMON! | That added a lot of pages to my POKéDEX! | After all, BILL's world famous as a POKéMANIAC! | He invented the POKéMON Storage System on PC! | Since you're using his system, go thank him! | Well, I better get rolling! Smell ya later!	20	2
+cerulean_city_p1	cerulean_city	cooltrainer_m	down	stay	You're a trainer too? Collecting, fighting, it's a tough life.	31	20
+cerulean_city_p2	cerulean_city	super_nerd	up_down	walk	That bush in front of the shop is in the way. | There might be a way around.	15	18
+cerulean_city_p3	cerulean_city	super_nerd	left_right	walk	You're making an encyclopedia on POKéMON? That sounds amusing.	9	21
+cerulean_city_p4	cerulean_city	officer_jenny	down	stay	These poor people here were robbed. | We're positive that TEAM ROCKET is behind this terrible deed. | Even our POLICE FORCE has trouble with the ROCKETs!	28	12
+cerulean_city_p5	cerulean_city	cooltrainer_f	left	stay	OK! ELECTRODE! Use SONICBOOM! Please ELECTRODE, pay attention!	29	26
+cerulean_city_p6	cerulean_city	cooltrainer_f	left_right	walk	I want a bright red BICYCLE! | I'll keep it at home, so it won't get dirty!	9	27
+cerulean_city_p7	cerulean_city	super_nerd	down	stay	This is CERULEAN CAVE! Horribly strong POKéMON live in there! | The POKéMON LEAGUE champion is the only person who is allowed in!	4	12
+cerulean_city_p8	cerulean_city	officer_jenny	down	stay	These poor people here were robbed. | We're positive that TEAM ROCKET is behind this terrible deed. | Even our POLICE FORCE has trouble with the ROCKETs!	27	12
+cerulean_gym_p0	cerulean_gym	gym_guide	down	stay	Yo! Champ in making! | Here's my advice! | The LEADER, MISTY, is a pro who uses water POKéMON! | You can drain all their water with plant POKéMON! | Or, zap them with electricity!	7	10
+cerulean_mart_p0	cerulean_mart	cooltrainer_m	up_down	walk	Use REPEL to keep bugs and weak POKéMON away. | Put your strongest POKéMON at the top of the list for best results!	3	4
+cerulean_mart_p1	cerulean_mart	cooltrainer_f	left_right	walk	Have you seen any RARE CANDY? | It's supposed to make POKéMON go up one level!	6	2
+cerulean_melanies_house_p0	cerulean_melanies_house	girl	down	stay	I take care of injured POKéMON. | I nursed this BULBASAUR back to health. | It needs a good trainer to take care of it now.	3	1
+cerulean_melanies_house_p1	cerulean_melanies_house	bulbasaur	down	stay	BULBASAUR: Bubba! Zoar!	4	1
+cerulean_melanies_house_p2	cerulean_melanies_house	oddish	none	stay	ODDISH: Orddissh!	1	4
+cerulean_melanies_house_p3	cerulean_melanies_house	sandshrew	left	stay	SANDSHREW: Pikii!	5	3
+cerulean_pokecenter_p0	cerulean_pokecenter	super_nerd	any_dir	walk	That BILL! | I heard that he'll do whatever it takes to get rare POKéMON!	10	5
+cerulean_pokecenter_p1	cerulean_pokecenter	gentleman	up	stay	Have you heard about BILL? | Everyone calls him a POKéMANIAC! | I think people are just jealous of BILL, though. | Who wouldn't want to boast about their POKéMON?	4	3
+cerulean_trashed_house_p0	cerulean_trashed_house	fishing_guru	down	stay	Those miserable ROCKETs! | Look what they did here! | They stole a TM for teaching POKéMON how to DIG holes! | That cost me a bundle, it did!	2	1
+cerulean_trashed_house_p1	cerulean_trashed_house	girl	left_right	walk	TEAM ROCKET must be trying to DIG their way into no good!	5	6
+champions_room_p0	champions_room	blue	down	stay	Why? Why did I lose? | I never made any mistakes raising my POKéMON... | Darn it! You're the new POKéMON LEAGUE champion! | Although I don't like to admit it.	4	2
+champions_room_p1	champions_room	oak	up	stay	OAK: {player}!	3	7
+cinnabar_island_p0	cinnabar_island	girl	left_right	walk	CINNABAR GYM's BLAINE is an odd man who has lived here for decades.	12	5
+cinnabar_island_p1	cinnabar_island	gambler	none	stay	Scientists conduct experiments in the burned-out building.	14	6
+cinnabar_lab_p0	cinnabar_lab	fishing_guru	none	stay	We study POKéMON extensively here. | People often bring us rare POKéMON for examination.	1	3
+cinnabar_lab_fossil_room_p0	cinnabar_lab_fossil_room	scientist	left_right	walk	Hiya! | I am important doctor! | I study here rare POKéMON fossils! | You! Have you a fossil for me?	5	2
+cinnabar_lab_metronome_room_p0	cinnabar_lab_metronome_room	scientist	down	stay	Tch-tch-tch! I made a cool TM! | It can cause all kinds of fun!	7	2
+cinnabar_lab_metronome_room_p1	cinnabar_lab_metronome_room	scientist	left_right	walk	EEVEE can evolve into 1 of 3 kinds of POKéMON.	2	3
+cinnabar_lab_trade_room_p0	cinnabar_lab_trade_room	super_nerd	down	stay	I found this very strange fossil in MT.MOON! | I think it's a rare, prehistoric POKéMON!	3	2
+cinnabar_mart_p0	cinnabar_mart	silph_worker_f	none	stay	Don't they have X ATTACK? It's good for battles!	6	2
+cinnabar_mart_p1	cinnabar_mart	scientist	none	stay	It never hurts to have extra items!	3	4
+cinnabar_pokecenter_p0	cinnabar_pokecenter	cooltrainer_f	any_dir	walk	You can cancel evolution. | When a POKéMON is evolving, you can stop it and leave it the way it is.	9	4
+cinnabar_pokecenter_p1	cinnabar_pokecenter	gentleman	none	stay	Do you have any friends? | POKéMON you get in trades grow very quickly. | I think it's worth a try!	2	6
+colosseum_p0	colosseum	red	any_dir	stay	!	2	2
+copycats_house_1f_p0	copycats_house_1f	middle_aged_woman	down	stay	My daughter is so self-centered. She only has a few friends.	2	2
+copycats_house_1f_p1	copycats_house_1f	middle_aged_man	left	stay	My daughter likes to mimic people. | Her mimicry has earned her the nickname COPYCAT around here!	5	4
+copycats_house_1f_p2	copycats_house_1f	chansey	none	stay	CHANSEY: Chaaan sey!	1	4
+copycats_house_2f_p0	copycats_house_2f	brunette_girl	any_dir	walk	{player}: Hi! Do you like POKéMON? | {player}: Uh no, I just asked you. | {player}: Huh? You're strange! | COPYCAT: Hmm? Quit mimicking? | But, that's my favorite hobby!	4	3
+copycats_house_2f_p1	copycats_house_2f	bird	left_right	walk	DODUO: Giiih! | MIRROR MIRROR ON THE WALL, WHO IS THE FAIREST ONE OF ALL?	4	6
+copycats_house_2f_p2	copycats_house_2f	monster	down	stay	This is a rare POKéMON! Huh? It's only a doll!	5	1
+copycats_house_2f_p3	copycats_house_2f	bird	down	stay	This is a rare POKéMON! Huh? It's only a doll!	2	0
+copycats_house_2f_p4	copycats_house_2f	fairy	right	stay	This is a rare POKéMON! Huh? It's only a doll!	1	6
+daycare_p0	daycare	gentleman	right	stay	I run a DAYCARE. Would you like me to raise one of your POKéMON?	2	3
+digletts_cave_route_11_p0	digletts_cave_route_11	gambler	none	stay	What a surprise! DIGLETTs dug this long tunnel! | It goes right to VIRIDIAN CITY!	2	3
+digletts_cave_route_2_p0	digletts_cave_route_2	fishing_guru	none	stay	I went to ROCK TUNNEL, but it's dark and scary. | If a POKéMON's FLASH could light it up...	3	3
+fuchsia_bills_grandpas_house_p0	fuchsia_bills_grandpas_house	middle_aged_woman	right	stay	SAFARI ZONE's WARDEN is old, but still active! | All his teeth are false, though.	2	3
+fuchsia_bills_grandpas_house_p1	fuchsia_bills_grandpas_house	gambler	up	stay	Hmm? You've met BILL? | He's my grandson! | He always liked collecting things even as a child!	7	2
+fuchsia_bills_grandpas_house_p2	fuchsia_bills_grandpas_house	youngster	none	stay	BILL files his own POKéMON data on his PC! | Did he show you?	5	5
+fuchsia_city_p0	fuchsia_city	youngster	left_right	walk	Did you try the SAFARI GAME? Some POKéMON can only be caught there.	10	12
+fuchsia_city_p1	fuchsia_city	gambler	left_right	walk	SAFARI ZONE has a zoo in front of the entrance. | Out back is the SAFARI GAME for catching POKéMON.	28	17
+fuchsia_city_p2	fuchsia_city	fisher	down	stay	ERIK: Where's SARA? I said I'd meet her here.	30	14
+fuchsia_city_p3	fuchsia_city	youngster	up	stay	That item ball in there is really a POKéMON.	24	8
+fuchsia_city_p4	fuchsia_city	chansey	down	stay	!	31	5
+fuchsia_city_p5	fuchsia_city	monster	left_right	walk	!	12	6
+fuchsia_city_p6	fuchsia_city	monster	left_right	walk	!	30	12
+fuchsia_city_p7	fuchsia_city	seel	any_dir	walk	!	8	17
+fuchsia_good_rod_house_p0	fuchsia_good_rod_house	fishing_guru	right	stay	I'm the FISHING GURU's older brother! | I simply Looove fishing! | Do you like to fish?	5	3
+fuchsia_gym_p0	fuchsia_gym	gym_guide	down	stay	Yo! Champ in making! | FUCHSIA GYM is riddled with invisible walls! | KOGA might appear close, but he's blocked off! | You have to find gaps in the walls to reach him!	7	15
+fuchsia_mart_p0	fuchsia_mart	middle_aged_man	none	stay	Do you have a SAFARI ZONE flag? | What about cards or calendars?	4	2
+fuchsia_mart_p1	fuchsia_mart	cooltrainer_f	up_down	walk	Did you try X SPEED? It speeds up a POKéMON in battle!	6	5
+fuchsia_meeting_room_p0	fuchsia_meeting_room	safari_zone_worker	down	stay	We nicknamed the WARDEN SLOWPOKE. | He and SLOWPOKE both look vacant!	4	1
+fuchsia_meeting_room_p1	fuchsia_meeting_room	safari_zone_worker	up	stay	SLOWPOKE is very knowledgeable about POKéMON! | He even has some fossils of rare, extinct POKéMON!	0	2
+fuchsia_meeting_room_p2	fuchsia_meeting_room	safari_zone_worker	down	stay	SLOWPOKE came in, but I couldn't understand him. | I think he's got a speech problem!	10	1
+fuchsia_pokecenter_p0	fuchsia_pokecenter	rocker	up	stay	You can't win with just one strong POKéMON. | It's tough, but you have to raise them evenly.	4	3
+fuchsia_pokecenter_p1	fuchsia_pokecenter	cooltrainer_f	left_right	walk	There's a narrow trail west of VIRIDIAN CITY. | It goes to POKéMON LEAGUE HQ. The HQ governs all trainers.	6	5
+game_corner_p0	game_corner	beauty	down	stay	Welcome! | You can exchange your coins for fabulous prizes next door.	2	6
+game_corner_p1	game_corner	clerk	down	stay	Welcome to ROCKET GAME CORNER! | Do you need some game coins? | It's ¥1000 for 50 coins. Would you like some?	5	6
+game_corner_p2	game_corner	middle_aged_man	left	stay	Keep this quiet. | It's rumored that this place is run by TEAM ROCKET.	2	10
+game_corner_p3	game_corner	beauty	left	stay	I think these machines have different odds.	2	13
+game_corner_p4	game_corner	fishing_guru	right	stay	Oops! Forgot the COIN CASE!	5	11
+game_corner_p5	game_corner	middle_aged_woman	left	stay	I'm having a wonderful time!	8	11
+game_corner_p6	game_corner	gym_guide	left	stay	Hey! | You have better things to do, champ in making! | CELADON GYM's LEADER is ERIKA! She uses grass-type POKéMON! | She might appear docile, but don't be fooled!	8	14
+game_corner_p7	game_corner	gambler	right	stay	Games are scary! It's so easy to get hooked!	11	15
+game_corner_p8	game_corner	middle_aged_man	left	stay	Oops! Forgot the COIN CASE!	14	11
+game_corner_p9	game_corner	fishing_guru	right	stay	Oops! Forgot the COIN CASE!	17	13
+game_corner_prize_room_p0	game_corner_prize_room	balding_guy	none	stay	I sure do fancy that PORYGON! | But, it's hard to win at slots!	1	4
+game_corner_prize_room_p1	game_corner_prize_room	gambler	left_right	walk	I had a major haul today!	7	3
+hall_of_fame_p0	hall_of_fame	oak	down	stay	OAK: Er-hem! Congratulations, {player}! | This floor is the POKéMON HALL OF FAME! | POKéMON LEAGUE champions are honored for their exploits here! | Their POKéMON are also recorded in the HALL OF FAME! | {player}! You have endeavored hard to become the new LEAGUE champion! | Congratulations, {player}, you and your POKéMON are HALL OF FAMERs!	5	2
+indigo_plateau_lobby_p0	indigo_plateau_lobby	gym_guide	right	stay	Yo! Champ in making! | At POKéMON LEAGUE, you have to face the ELITE FOUR in succession. | If you lose, you have to start all over again! This is it! Go for it!	4	9
+indigo_plateau_lobby_p1	indigo_plateau_lobby	cooltrainer_f	down	stay	From here on, you face the ELITE FOUR one by one! | If you win, a door opens to the next trainer! Good luck!	5	1
+lavender_cubone_house_p0	lavender_cubone_house	monster	up	stay	CUBONE: Kyarugoo!	3	5
+lavender_cubone_house_p1	lavender_cubone_house	brunette_girl	right	stay	I hate those horrible ROCKETs! | That poor CUBONE's mother... | It was killed trying to escape from TEAM ROCKET!	2	4
+lavender_mart_p0	lavender_mart	balding_guy	none	stay	I'm searching for items that raise the abilities of POKéMON during a single battle. | X ATTACK, X DEFEND, X SPEED and X SPECIAL are what I'm after. | Do you know where I can get them?	3	4
+lavender_mart_p1	lavender_mart	cooltrainer_m	none	stay	You know REVIVE? It revives any fainted POKéMON!	7	2
+lavender_pokecenter_p0	lavender_pokecenter	gentleman	none	stay	TEAM ROCKET will do anything for the sake of gold!	5	3
+lavender_pokecenter_p1	lavender_pokecenter	little_girl	left_right	walk	I saw CUBONE's mother die trying to escape from TEAM ROCKET!	10	5
+lavender_town_p0	lavender_town	little_girl	any_dir	walk	Do you believe in GHOSTs?	15	9
+lavender_town_p1	lavender_town	cooltrainer_m	none	stay	This town is known as the grave site of POKéMON. | Memorial services are held in POKéMON TOWER.	9	10
+lavender_town_p2	lavender_town	super_nerd	left_right	walk	GHOSTs appeared in POKéMON TOWER. | I think they're the spirits of POKéMON that the ROCKETs killed.	8	7
+mr_fujis_house_p0	mr_fujis_house	super_nerd	none	stay	That's odd, MR.FUJI isn't here. Where'd he go?	3	5
+mr_fujis_house_p1	mr_fujis_house	little_girl	down	stay	This is really MR.FUJI's house. | He's really kind! | He looks after abandoned and orphaned POKéMON!	6	3
+mr_fujis_house_p2	mr_fujis_house	monster	up	stay	PSYDUCK: Gwappa!	6	4
+mr_fujis_house_p3	mr_fujis_house	monster	none	stay	NIDORINO: Gaoo!	1	3
+mr_fujis_house_p4	mr_fujis_house	mr_fuji	none	stay	MR.FUJI: {player}. | Your POKéDEX quest may fail without love for your POKéMON. | I think this may help your quest.	3	1
+mr_psychics_house_p0	mr_psychics_house	fishing_guru	left	stay	...Wait! Don't say a word! | You wanted this!	5	3
+mt_moon_pokecenter_p0	mt_moon_pokecenter	youngster	up	stay	I've 6 POKé BALLs set in my belt. | At most, you can carry 6 POKéMON.	4	3
+mt_moon_pokecenter_p1	mt_moon_pokecenter	gentleman	up	stay	TEAM ROCKET attacks CERULEAN citizens... | TEAM ROCKET is always in the news!	7	3
+museum_1f_p0	museum_1f	gambler	none	stay	That is one magnificent fossil!	1	4
+museum_1f_p1	museum_1f	scientist	none	stay	We are proud of 2 fossils of very rare, prehistoric POKéMON!	17	4
+museum_1f_p2	museum_1f	old_amber	none	stay	The AMBER is clear and gold!	16	2
+museum_2f_p0	museum_2f	youngster	left_right	walk	MOON STONE? | What's so special about it?	1	7
+museum_2f_p1	museum_2f	gramps	down	stay	July 20, 1969! | The 1st lunar landing! | I bought a color TV to watch it!	0	5
+museum_2f_p2	museum_2f	scientist	down	stay	We have a space exhibit now.	7	5
+museum_2f_p3	museum_2f	brunette_girl	none	stay	I want a PIKACHU! It's so cute! | I asked my Daddy to catch me one!	11	5
+museum_2f_p4	museum_2f	hiker	down	stay	Yeah, a PIKACHU soon, I promise!	12	5
+name_raters_house_p0	name_raters_house	silph_president	left	stay	Hello, hello! I am the official NAME RATER! | Want me to rate the nicknames of your POKéMON?	5	3
+oaks_lab_p0	oaks_lab	oak	down	stay	OAK: Go ahead, it's yours!	5	2
+oaks_lab_p1	oaks_lab	oak	up	stay	?	5	10
+oaks_lab_p2	oaks_lab	girl	up_down	walk	PROF.OAK is the authority on POKéMON! | Many POKéMON trainers hold him in high regard!	1	9
+oaks_lab_p3	oaks_lab	scientist	none	stay	I study POKéMON as PROF.OAK's AIDE.	2	10
+oaks_lab_p4	oaks_lab	scientist	none	stay	I study POKéMON as PROF.OAK's AIDE.	8	10
+pallet_town_p0	pallet_town	oak	none	stay	OAK: Hey! Wait! Don't go out!	10	4
+pallet_town_p1	pallet_town	girl	any_dir	walk	I'm raising POKéMON too! | When they get strong, they can protect me!	3	8
+pallet_town_p2	pallet_town	fisher	any_dir	walk	Technology is incredible! | You can now store and recall items and POKéMON as data via PC!	11	14
+pewter_city_p0	pewter_city	cooltrainer_f	none	stay	It's rumored that CLEFAIRYs came from the moon! | They appeared after MOON STONE fell on MT.MOON.	8	15
+pewter_city_p1	pewter_city	cooltrainer_m	none	stay	There aren't many serious POKéMON trainers here! | They're all like BUG CATCHERs, but PEWTER GYM's BROCK is totally into it!	17	25
+pewter_city_p2	pewter_city	super_nerd	none	stay	Did you check out the MUSEUM?	27	17
+pewter_city_p3	pewter_city	super_nerd	left_right	walk	Psssst! Do you know what I'm doing?	26	25
+pewter_city_p4	pewter_city	youngster	down	stay	You're a trainer right? BROCK's looking for new challengers! Follow me!	35	16
+pewter_gym_p0	pewter_gym	gym_guide	down	stay	Hiya! I can tell you have what it takes to become a POKéMON champ! | I'm no trainer, but I can tell you how to win! | Let me take you to the top!	7	10
+pewter_mart_p0	pewter_mart	youngster	up_down	walk	A shady old man got me to buy this really weird fish POKéMON! | It's totally weak and it cost ¥500!	3	3
+pewter_mart_p1	pewter_mart	super_nerd	none	stay	Good things can happen if you raise POKéMON diligently, even the weak ones!	5	5
+pewter_nidoran_house_p0	pewter_nidoran_house	monster	left	stay	NIDORAN: Bowbow!	4	5
+pewter_nidoran_house_p1	pewter_nidoran_house	little_boy	right	stay	NIDORAN sit!	3	5
+pewter_nidoran_house_p2	pewter_nidoran_house	middle_aged_man	none	stay	Our POKéMON's an outsider, so it's hard to handle. | An outsider is a POKéMON that you get in a trade. | It grows fast, but it may ignore an unskilled trainer in battle! | If only we had some BADGEs...	1	2
+pewter_pokecenter_p0	pewter_pokecenter	gentleman	left	stay	What!? | TEAM ROCKET is at MT.MOON? Huh? I'm on the phone! | Scram!	11	7
+pewter_pokecenter_p1	pewter_pokecenter	jigglypuff	down	stay	JIGGLYPUFF: Puu pupuu!	1	3
+pewter_speech_house_p0	pewter_speech_house	gambler	right	stay	POKéMON learn new techniques as they grow! | But, some moves must be taught by the trainer!	2	3
+pewter_speech_house_p1	pewter_speech_house	youngster	none	stay	POKéMON become easier to catch when they are hurt or asleep! | But, it's not a sure thing!	4	5
+pokemon_fan_club_p0	pokemon_fan_club	fisher	left	stay	Won't you admire my CLEFAIRY's adorable tail?	6	3
+pokemon_fan_club_p1	pokemon_fan_club	girl	right	stay	I just love my SEEL! | It squeals when I hug it!	1	3
+pokemon_fan_club_p2	pokemon_fan_club	clefairy	left	stay	CLEFAIRY: Pippii!	6	4
+pokemon_fan_club_p3	pokemon_fan_club	seel	right	stay	SEEL: Kyuoo!	1	4
+pokemon_fan_club_p4	pokemon_fan_club	gentleman	down	stay	I chair the POKéMON Fan Club! | I have more than 100 POKéMON. I love them all! | I'm very fussy when it comes to POKéMON! | So... | Did you come to hear me brag about my POKéMON?	3	1
+pokemon_fan_club_p5	pokemon_fan_club	link_receptionist	down	stay	Our CHAIRMAN is very vocal about POKéMON.	5	1
+pokemon_tower_1f_p0	pokemon_tower_1f	link_receptionist	up	stay	POKéMON TOWER was erected in the memory of POKéMON that had died.	15	13
+pokemon_tower_1f_p1	pokemon_tower_1f	middle_aged_woman	none	stay	Did you come to pay respects? Bless you!	6	8
+pokemon_tower_1f_p2	pokemon_tower_1f	balding_guy	none	stay	I came to pray for my CLEFAIRY. | Sniff! I can't stop crying...	8	12
+pokemon_tower_1f_p3	pokemon_tower_1f	girl	none	stay	My GROWLITHE... Why did you die?	13	7
+pokemon_tower_1f_p4	pokemon_tower_1f	channeler	left	stay	I am a CHANNELER! There are spirits up to mischief!	17	7
+pokemon_tower_2f_p0	pokemon_tower_2f	blue	none	stay	{rival}: Hey, {player}! What brings you here? Your POKéMON don't look dead! | I can at least make them faint! Let's go, pal!	14	5
+pokemon_tower_2f_p1	pokemon_tower_2f	channeler	right	stay	Even we could not identify the wayward GHOSTs! | A SILPH SCOPE might be able to unmask them.	3	7
+pokemon_tower_5f_p0	pokemon_tower_5f	channeler	none	stay	Come, child! I sealed this space with white magic! | You can rest here!	12	8
+pokemon_tower_7f_p0	pokemon_tower_7f	mr_fuji	down	stay	MR.FUJI: Heh? You came to save me? | Thank you. But, I came here of my own free will. | I came to calm the soul of CUBONE's mother. | I think MAROWAK's spirit has gone to the afterlife. | I must thank you for your kind concern! | Follow me to my home, POKéMON HOUSE at the foot of this tower.	10	3
+rock_tunnel_pokecenter_p0	rock_tunnel_pokecenter	gentleman	down	stay	The element types of POKéMON make them stronger than some types and weaker than others!	7	3
+rock_tunnel_pokecenter_p1	rock_tunnel_pokecenter	fisher	none	stay	I sold a useless NUGGET for ¥5000!	2	5
+route_1_p0	route_1	youngster	left_right	walk	See those ledges along the road? | It's a bit scary, but you can jump from them. | You can get back to PALLET TOWN quicker that way.	15	13
+route_11_gate_1f_p0	route_11_gate_1f	guard	none	stay	When you catch lots of POKéMON, isn't it hard to think up names? | In LAVENDER TOWN, there's a man who rates POKéMON nicknames. | He'll help you rename them too!	4	1
+route_11_gate_2f_p0	route_11_gate_2f	scientist	none	stay	There are items on the ground that can't be seen. | ITEMFINDER will detect an item close to you. | It can't pinpoint it, so you have to look yourself!	2	6
+route_12_gate_1f_p0	route_12_gate_1f	guard	none	stay	There's a lookout spot upstairs.	1	3
+route_12_gate_2f_p0	route_12_gate_2f	brunette_girl	up_down	walk	My POKéMON's ashes are stored in POKéMON TOWER. | You can have this TM. I don't need it anymore...	3	4
+route_12_super_rod_house_p0	route_12_super_rod_house	fishing_guru	right	stay	I'm the FISHING GURU's brother! | I simply Looove fishing! | Do you like to fish?	2	4
+route_15_gate_1f_p0	route_15_gate_1f	guard	none	stay	Are you working on a POKéDEX? | PROF.OAK's AIDE came by here.	4	1
+route_15_gate_2f_p0	route_15_gate_2f	scientist	down	stay	EXP.ALL gives EXP points to all the POKéMON with you, even if they don't fight. | It does, however, reduce the amount of EXP for each POKéMON. | If you don't need it, you should store it via PC.	4	2
+route_16_fly_house_p0	route_16_fly_house	brunette_girl	right	stay	Oh, you found my secret retreat! | Please don't tell anyone I'm here. I'll make it up to you with this!	2	3
+route_16_fly_house_p1	route_16_fly_house	bird	any_dir	walk	FEAROW: Kyueen!	6	4
+route_16_gate_1f_p0	route_16_gate_1f	guard	down	stay	No pedestrians are allowed on CYCLING ROAD!	4	5
+route_16_gate_1f_p1	route_16_gate_1f	gambler	none	stay	How'd you get in? Good effort!	4	3
+route_16_gate_2f_p0	route_16_gate_2f	little_boy	none	stay	I'm going for a ride with my girl friend!	4	2
+route_16_gate_2f_p1	route_16_gate_2f	little_girl	left_right	walk	We're going riding together!	2	5
+route_18_gate_1f_p0	route_18_gate_1f	guard	down	stay	You need a BICYCLE for CYCLING ROAD!	4	1
+route_22_gate_p0	route_22_gate	guard	left	stay	Only truly skilled trainers are allowed through. | You don't have the BOULDERBADGE yet!	6	2
+route_24_p0	route_24	cooltrainer_m	down	stay	I'm not good at raising POKéMON. | I should release my CHARMANDER because I haven't raised it well... | If you promise me you'll care for it, it's yours.	6	5
+route_2_gate_p0	route_2_gate	scientist	left	stay	The HM FLASH lights even the darkest dungeons.	1	4
+route_2_gate_p1	route_2_gate	youngster	left_right	walk	Once a POKéMON learns FLASH, you can get through ROCK TUNNEL.	5	4
+route_2_trade_house_p0	route_2_trade_house	scientist	right	stay	A fainted POKéMON can't fight. But, it can still use moves like CUT!	2	4
+route_3_p0	route_3	super_nerd	none	stay	Whew... I better take a rest... Groan... | That tunnel from CERULEAN takes a lot out of you!	57	11
+route_4_p0	route_4	cooltrainer_f	any_dir	walk	Ouch! I tripped over a rocky POKéMON, GEODUDE!	9	8
+route_5_gate_p0	route_5_gate	guard	right	stay	I'm on guard duty. Gee, I'm thirsty, though! | Oh, wait there, the road's closed.	1	3
+ss_anne_1f_p0	ss_anne_1f	waiter	left_right	walk	Bonjour! I am le waiter on this ship! | I will be happy to serve you any-thing you please! | Ah! Le strong silent type!	12	6
+ss_anne_1f_p1	ss_anne_1f	sailor	none	stay	The passengers are restless! | You might be challenged by the more bored ones!	27	5
+ss_anne_1f_rooms_p0	ss_anne_1f_rooms	girl	up_down	walk	Waiter, I would like a cherry pie please!	22	3
+ss_anne_1f_rooms_p1	ss_anne_1f_rooms	middle_aged_man	none	stay	A cruise is so elegant yet cozy!	0	14
+ss_anne_1f_rooms_p2	ss_anne_1f_rooms	little_girl	down	stay	I always travel with WIGGLYTUFF!	2	11
+ss_anne_1f_rooms_p3	ss_anne_1f_rooms	jigglypuff	down	stay	WIGGLYTUFF: Puup pupuu!	3	11
+ss_anne_1f_rooms_p4	ss_anne_1f_rooms	girl	right	stay	We are cruising around the world.	10	13
+ss_anne_1f_rooms_p5	ss_anne_1f_rooms	gentleman	left_right	walk	Ssh! I'm a GLOBAL POLICE agent! | I'm on the trail of TEAM ROCKET!	21	13
+ss_anne_2f_p0	ss_anne_2f	waiter	up_down	walk	This ship, she is a luxury liner for trainers! | At every port, we hold parties with invited trainers!	3	7
+ss_anne_2f_rooms_p0	ss_anne_2f_rooms	gentleman	down	stay	In all my travels, I've never seen any POKéMON sleep like this one! | It was something like this!	1	2
+ss_anne_2f_rooms_p1	ss_anne_2f_rooms	gentleman	down	stay	Ah yes, I have seen some POKéMON ferry people across the water!	21	2
+ss_anne_2f_rooms_p2	ss_anne_2f_rooms	gramps	down	stay	POKéMON can CUT down small bushes.	22	1
+ss_anne_2f_rooms_p3	ss_anne_2f_rooms	gentleman	down	stay	Have you gone to the SAFARI ZONE in FUCHSIA CITY? | It had many rare kinds of POKéMON!!	12	12
+ss_anne_2f_rooms_p4	ss_anne_2f_rooms	little_boy	none	stay	Me and my Daddy think the SAFARI ZONE is awesome!	11	14
+ss_anne_2f_rooms_p5	ss_anne_2f_rooms	brunette_girl	left	stay	The CAPTAIN looked really sick and pale!	22	12
+ss_anne_2f_rooms_p6	ss_anne_2f_rooms	beauty	right	stay	I hear many people get seasick!	20	12
+ss_anne_3f_p0	ss_anne_3f	sailor	left_right	walk	Our CAPTAIN is a sword master! | He even teaches CUT to POKéMON!	9	3
+ss_anne_b1f_rooms_p0	ss_anne_b1f_rooms	super_nerd	right	stay	My buddy, MACHOKE, is super strong! | He has enough STRENGTH to move big rocks!	10	13
+ss_anne_b1f_rooms_p1	ss_anne_b1f_rooms	monster	none	stay	MACHOKE: Gwoh! Goggoh!	11	12
+ss_anne_bow_p0	ss_anne_bow	super_nerd	up	stay	The party's over. The ship will be departing soon.	5	2
+ss_anne_bow_p1	ss_anne_bow	sailor	none	stay	Scrubbing decks is hard work!	4	9
+ss_anne_bow_p2	ss_anne_bow	cooltrainer_m	none	stay	Urf. I feel ill. | I stepped out to get some air.	7	11
+ss_anne_captains_room_p0	ss_anne_captains_room	captain	up	stay	CAPTAIN: Ooargh... I feel hideous... Urrp! Seasick... | {player} rubbed the CAPTAIN's back! | Rub-rub... Rub-rub...	4	2
+ss_anne_kitchen_p0	ss_anne_kitchen	cook	up_down	walk	You, mon petit! We're busy here! Out of the way!	1	8
+ss_anne_kitchen_p1	ss_anne_kitchen	cook	up_down	walk	I saw an odd ball in the trash.	5	8
+ss_anne_kitchen_p2	ss_anne_kitchen	cook	up_down	walk	I'm so busy I'm getting dizzy!	9	7
+ss_anne_kitchen_p3	ss_anne_kitchen	cook	none	stay	Hum-de-hum-de-ho... | I peel spuds every day! Hum-hum...	13	6
+ss_anne_kitchen_p4	ss_anne_kitchen	cook	none	stay	Did you hear about SNORLAX? | All it does is eat and sleep!	13	8
+ss_anne_kitchen_p5	ss_anne_kitchen	cook	none	stay	Snivel...Sniff... | I only get to peel onions... Snivel...	13	10
+ss_anne_kitchen_p6	ss_anne_kitchen	cook	up	stay	Er-hem! Indeed I am le CHEF! | Le main course is	11	13
+safari_zone_center_rest_house_p0	safari_zone_center_rest_house	girl	down	stay	SARA: Where did my boy friend, ERIK, go?	3	2
+safari_zone_center_rest_house_p1	safari_zone_center_rest_house	scientist	up_down	walk	I'm catching POKéMON to take home as gifts!	1	4
+safari_zone_east_rest_house_p0	safari_zone_east_rest_house	scientist	up_down	walk	How many did you catch? I'm bushed from the work!	1	3
+safari_zone_east_rest_house_p1	safari_zone_east_rest_house	rocker	none	stay	I caught a CHANSEY! | That makes this all worthwhile!	4	2
+safari_zone_east_rest_house_p2	safari_zone_east_rest_house	silph_worker_m	none	stay	Whew! I'm tired from all the fun!	5	2
+safari_zone_gate_p0	safari_zone_gate	safari_zone_worker	left	stay	Welcome to the SAFARI ZONE!	6	2
+safari_zone_north_rest_house_p0	safari_zone_north_rest_house	scientist	left_right	walk	You can keep any item you find on the ground here. | But, you'll run out of time if you try for all of them at once!	6	3
+safari_zone_north_rest_house_p1	safari_zone_north_rest_house	safari_zone_worker	none	stay	Go to the deepest part of the SAFARI ZONE. You will win a prize!	3	4
+safari_zone_north_rest_house_p2	safari_zone_north_rest_house	gentleman	up_down	walk	My EEVEE evolved into FLAREON! | But, a friend's EEVEE turned into a VAPOREON! I wonder why?	1	5
+safari_zone_secret_house_p0	safari_zone_secret_house	fishing_guru	down	stay	Ah! Finally! | You're the first person to reach the SECRET HOUSE! | I was getting worried that no one would win our campaign prize. | Congratulations! You have won!	3	3
+safari_zone_west_rest_house_p0	safari_zone_west_rest_house	scientist	any_dir	walk	Tossing ROCKs at POKéMON might make them run, but they'll be easier to catch.	4	4
+safari_zone_west_rest_house_p1	safari_zone_west_rest_house	cooltrainer_m	right	stay	Using BAIT will make POKéMON easier to catch.	0	2
+safari_zone_west_rest_house_p2	safari_zone_west_rest_house	silph_worker_f	down	stay	I hiked a lot, but I didn't see any POKéMON I wanted.	6	2
+saffron_city_p0	saffron_city	rocket	none	stay	What do you want? Get lost!	7	6
+saffron_city_p1	saffron_city	rocket	left_right	walk	BOSS said he'll take this town!	20	8
+saffron_city_p2	saffron_city	rocket	none	stay	Get out of the way!	34	4
+saffron_city_p3	saffron_city	rocket	none	stay	SAFFRON belongs to TEAM ROCKET!	13	12
+saffron_city_p4	saffron_city	rocket	left_right	walk	Being evil makes me feel so alive!	11	25
+saffron_city_p5	saffron_city	rocket	left_right	walk	Ow! Watch where you're walking!	32	13
+saffron_city_p6	saffron_city	rocket	left_right	walk	With SILPH under control, we can exploit POKéMON around the world!	18	30
+saffron_city_p7	saffron_city	scientist	any_dir	walk	You beat TEAM ROCKET all alone? That's amazing!	8	14
+saffron_city_p8	saffron_city	silph_worker_m	none	stay	Yeah! TEAM ROCKET is gone! It's safe to go out again!	23	23
+saffron_city_p9	saffron_city	silph_worker_f	left_right	walk	People should be flocking back to SAFFRON now.	17	30
+saffron_city_p10	saffron_city	gentleman	down	stay	I flew here on my PIDGEOT when I read about SILPH. | It's already over? I missed the media action.	30	12
+saffron_city_p11	saffron_city	bird	down	stay	PIDGEOT: Bi bibii!	31	12
+saffron_city_p12	saffron_city	rocker	up	stay	I saw ROCKET BOSS escaping SILPH's building.	18	8
+saffron_city_p13	saffron_city	rocket	down	stay	I'm a security guard. | Suspicious kids I don't allow in!	18	22
+saffron_gym_p0	saffron_gym	gym_guide	down	stay	Yo! Champ in making! | SABRINA's POKéMON use psychic power instead of force! | Fighting POKéMON are weak against psychic POKéMON! | They get creamed before they can even aim a punch!	10	15
+saffron_mart_p0	saffron_mart	super_nerd	none	stay	MAX REPEL lasts longer than SUPER REPEL for keeping weaker POKéMON away!	4	2
+saffron_mart_p1	saffron_mart	cooltrainer_f	any_dir	walk	REVIVE is costly, but it revives fainted POKéMON!	6	5
+saffron_pidgey_house_p0	saffron_pidgey_house	brunette_girl	right	stay	Thank you for writing. I hope to see you soon! | Hey! Don't look at my letter!	2	3
+saffron_pidgey_house_p1	saffron_pidgey_house	bird	up_down	walk	PIDGEY: Kurukkoo!	0	4
+saffron_pidgey_house_p2	saffron_pidgey_house	youngster	down	stay	The COPYCAT is cute! I'm getting her a POKé DOLL!	4	1
+saffron_pokecenter_p0	saffron_pokecenter	beauty	none	stay	POKéMON growth rates differ from specie to specie.	5	5
+saffron_pokecenter_p1	saffron_pokecenter	gentleman	down	stay	SILPH CO. is very famous. That's why it attracted TEAM ROCKET!	8	3
+silph_co_10f_p0	silph_co_10f	silph_worker_f	any_dir	walk	Waaaaa! I'm scared!	9	15
+silph_co_11f_p0	silph_co_11f	silph_president	down	stay	PRESIDENT: Thank you for saving SILPH! | I will never forget you saved us in our moment of peril! | I have to thank you in some way! | Because I am rich, I can give you anything! | Here, maybe this will do!	7	5
+silph_co_11f_p1	silph_co_11f	beauty	down	stay	SECRETARY: Thank you for rescuing all of us! | We admire your courage.	10	5
+silph_co_11f_p2	silph_co_11f	james	up	stay	Hold it right there, brat!	2	8
+silph_co_11f_p3	silph_co_11f	jessie	up	stay	Hold it right there, brat!	3	8
+silph_co_1f_p0	silph_co_1f	link_receptionist	down	stay	Welcome! | The PRESIDENT is in the boardroom on 11F!	4	2
+silph_co_2f_p0	silph_co_2f	silph_worker_f	up	stay	{player} got ... !	10	1
+silph_co_3f_p0	silph_co_3f	silph_worker_m	none	stay	I work for SILPH. What should I do?	24	8
+silph_co_4f_p0	silph_co_4f	silph_worker_m	none	stay	Sssh! Can't you see I'm hiding?	6	2
+silph_co_5f_p0	silph_co_5f	silph_worker_m	none	stay	TEAM ROCKET is in an uproar over some intruder. That's you right?	13	9
+silph_co_6f_p0	silph_co_6f	silph_worker_m	none	stay	The ROCKETs came and took over the building!	10	6
+silph_co_6f_p1	silph_co_6f	silph_worker_m	none	stay	Oh dear, oh dear. Help me please!	20	6
+silph_co_6f_p2	silph_co_6f	silph_worker_f	down	stay	Look at him! He's such a coward!	21	6
+silph_co_6f_p3	silph_co_6f	silph_worker_f	right	stay	TEAM ROCKET is trying to conquer the world with POKéMON!	11	10
+silph_co_6f_p4	silph_co_6f	silph_worker_m	up	stay	They must have targeted SILPH for our POKéMON products.	18	13
+silph_co_7f_p0	silph_co_7f	silph_worker_m	none	stay	Oh! Hi! You're not a ROCKET! You came to save us? Why, thank you! | I want you to have this POKéMON for saving us.	1	5
+silph_co_7f_p1	silph_co_7f	silph_worker_m	up	stay	TEAM ROCKET was after the MASTER BALL which will catch any POKéMON!	13	13
+silph_co_7f_p2	silph_co_7f	silph_worker_m	none	stay	It would be bad if TEAM ROCKET took over SILPH or our POKéMON!	7	10
+silph_co_7f_p3	silph_co_7f	silph_worker_f	none	stay	You! It's really dangerous here! You came to save me? You can't!	10	8
+silph_co_7f_p4	silph_co_7f	blue	up	stay	{rival}: What kept you {player}?	3	7
+silph_co_8f_p0	silph_co_8f	silph_worker_m	none	stay	I wonder if SILPH is finished...	4	2
+summer_beach_house_p0	summer_beach_house	fishing_guru	down	stay	Whoa! | Your PIKACHU knows how to SURF! So, I'm not alone... | Great! You earned the right to SURF with the DUDE! | Give it a go?	2	3
+summer_beach_house_p1	summer_beach_house	pikachu	1	walk	PIKACHU: Pikaa	5	3
+trade_center_p0	trade_center	red	any_dir	stay	!	2	2
+underground_path_route_6_p0	underground_path_route_6	girl	none	stay	People often lose things in that UNDERGROUND PATH.	2	3
+underground_path_route_7_p0	underground_path_route_7	middle_aged_man	none	stay	I heard a sleepy POKéMON appeared near CELADON CITY.	2	4
+underground_path_route_7_copy_p0	underground_path_route_7_copy	girl	none	stay	I want to shop at the dept. store in CELADON but... | There are so many rough looking people there.	3	2
+underground_path_route_7_copy_p1	underground_path_route_7_copy	middle_aged_man	none	stay	You're here to shop in CELADON? | Just step outside and head west!	2	4
+underground_path_route_8_p0	underground_path_route_8	girl	none	stay	The dept. store in CELADON has a great selection!	3	4
+vermilion_city_p0	vermilion_city	cooltrainer_f	left_right	walk	We're careful about pollution! | We've heard GRIMER multiplies in toxic sludge!	19	7
+vermilion_city_p1	vermilion_city	gambler	none	stay	Did you see S.S. ANNE moored in the harbor?	14	6
+vermilion_city_p2	vermilion_city	sailor	up	stay	Welcome to S.S. ANNE!	19	30
+vermilion_city_p3	vermilion_city	gambler	none	stay	I'm putting up a building on this plot of land. | My POKéMON is tamping the land.	30	7
+vermilion_city_p4	vermilion_city	monster	up_down	walk	MACHOP: Guoh! Gogogoh!	29	9
+vermilion_city_p5	vermilion_city	sailor	left_right	walk	S.S.ANNE is a famous luxury cruise ship. | We visit VERMILION once a year.	25	27
+vermilion_gym_p0	vermilion_gym	gym_guide	down	stay	Yo! Champ in making! | LT.SURGE has a nickname. People refer to him as the Lightning American! | He's an expert on electric POKéMON! | Birds and water POKéMON are at risk! Beware of paralysis too! | LT.SURGE is very cautious! | You'll have to break a code to get to him!	4	14
+vermilion_mart_p0	vermilion_mart	cooltrainer_m	none	stay	There are evil people who will use POKéMON for criminal acts. | TEAM ROCKET traffics in rare POKéMON. | They also abandon POKéMON that they consider not to be popular or useful.	5	6
+vermilion_mart_p1	vermilion_mart	cooltrainer_f	left_right	walk	I think POKéMON can be good or evil. It depends on the trainer.	3	3
+vermilion_old_rod_house_p0	vermilion_old_rod_house	fishing_guru	right	stay	I'm the FISHING GURU! | I simply Looove fishing! | Do you like to fish?	2	4
+vermilion_pidgey_house_p0	vermilion_pidgey_house	youngster	left	stay	I'm getting my PIDGEY to fly a letter to SAFFRON in the north!	5	3
+vermilion_pidgey_house_p1	vermilion_pidgey_house	bird	left_right	walk	PIDGEY: Kurukkoo!	3	5
+vermilion_pokecenter_p0	vermilion_pokecenter	fishing_guru	none	stay	Even if they are the same level, POKéMON can have very different abilities. | A POKéMON raised by a trainer is stronger than one in the wild.	10	5
+vermilion_pokecenter_p1	vermilion_pokecenter	sailor	none	stay	My POKéMON was poisoned! It fainted while we were walking!	5	4
+viridian_city_p0	viridian_city	youngster	any_dir	walk	Those POKé BALLs at your waist! You have POKéMON! | It's great that you can carry and use POKéMON any-time, anywhere!	13	20
+viridian_city_p1	viridian_city	gambler	none	stay	Ahh, I've had my coffee now and I feel great! | Sure, you can go through! | I'm sorry I was so rude to you! | I see you're using a POKéDEX. | I'll show you how to catch POKéMON as my apology.	18	9
+viridian_forest_p0	viridian_forest	youngster	none	stay	I came here with some friends! | They're out for POKéMON fights!	16	43
+viridian_forest_p1	viridian_forest	youngster	none	stay	I ran out of POKé BALLs to catch POKéMON with! | You should carry extras!	27	40
+viridian_forest_north_gate_p0	viridian_forest_north_gate	super_nerd	none	stay	Many POKéMON live only in forests and caves. | You need to look everywhere to get different kinds!	3	2
+viridian_forest_north_gate_p1	viridian_forest_north_gate	gramps	none	stay	Have you noticed the bushes on the roadside? | They can be cut down by a special POKéMON move.	2	5
+viridian_forest_south_gate_p0	viridian_forest_south_gate	girl	left	stay	Are you going to VIRIDIAN FOREST? Be careful, it's a natural maze!	8	4
+viridian_forest_south_gate_p1	viridian_forest_south_gate	little_girl	up_down	walk	You have to roam far to get new kinds of POKéMON. | Look for other types outside of VIRIDIAN FOREST.	2	4
+viridian_gym_p0	viridian_gym	gym_guide	down	stay	Yo! Champ in making! | Even I don't know VIRIDIAN LEADER's identity! | This will be the toughest of all the GYM LEADERs! | I heard that the trainers here like ground-type POKéMON!	16	15
+viridian_mart_p0	viridian_mart	youngster	up_down	walk	This shop sells a lot of PARLYZ HEALs.	5	5
+viridian_mart_p1	viridian_mart	cooltrainer_m	none	stay	The shop finally has some POTIONs in stock.	3	3
+viridian_nickname_house_p0	viridian_nickname_house	balding_guy	none	stay	Coming up with nicknames is fun, but hard. | Simple names are the easiest to remember.	5	3
+viridian_nickname_house_p1	viridian_nickname_house	little_girl	up_down	walk	My Daddy loves POKéMON too.	1	4
+viridian_nickname_house_p2	viridian_nickname_house	bird	left_right	walk	SPEARY: Tetweet!	5	5
+viridian_pokecenter_p0	viridian_pokecenter	gentleman	up_down	walk	You can use that PC in the corner. | The receptionist told me. So kind!	10	5
+viridian_pokecenter_p1	viridian_pokecenter	cooltrainer_m	up	stay	There's a POKéMON CENTER in every town ahead. | They don't charge any money either!	4	3
+viridian_school_house_p0	viridian_school_house	brunette_girl	up	stay	Whew! I'm trying to memorize all my notes.	3	5
+viridian_school_house_p1	viridian_school_house	cooltrainer_f	down	stay	Okay! | Be sure to read the blackboard carefully!	4	1
+viridian_school_house_p2	viridian_school_house	little_girl	up	stay	Sis says POKéMON will become tame if you treat them nicely.	4	5
+wardens_house_p0	wardens_house	warden	none	stay	WARDEN: Hif fuff hefifoo! | Ha lof ha feef ee hafahi ho. Heff hee fwee!	2	3
