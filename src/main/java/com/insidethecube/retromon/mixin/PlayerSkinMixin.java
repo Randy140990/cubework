@@ -19,7 +19,7 @@ public abstract class PlayerSkinMixin {
 	@org.spongepowered.asm.mixin.Unique
 	private static PlayerSkin retromon$boy, retromon$girl;
 
-	@Inject(method = "getSkin", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getSkin", at = @At("HEAD"), cancellable = true, require = 0)
 	private void retromon$hero(CallbackInfoReturnable<PlayerSkin> cir) {
 		if (!Adventure.inSave || (Object) this != Minecraft.getInstance().player) return;
 		boolean girl = "girl".equals(ClientState.data.gender);

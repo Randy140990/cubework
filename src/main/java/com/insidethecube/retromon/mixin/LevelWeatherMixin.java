@@ -11,12 +11,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /** And clear skies there (no rain or storm on the stage). */
 @Mixin(Level.class)
 public abstract class LevelWeatherMixin {
-	@Inject(method = "getRainLevel", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getRainLevel", at = @At("HEAD"), cancellable = true, require = 0)
 	private void retromon$noRain(float partial, CallbackInfoReturnable<Float> cir) {
 		if ((Object) this instanceof ClientLevel && BattleScene.staged()) cir.setReturnValue(0F);
 	}
 
-	@Inject(method = "getThunderLevel", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getThunderLevel", at = @At("HEAD"), cancellable = true, require = 0)
 	private void retromon$noThunder(float partial, CallbackInfoReturnable<Float> cir) {
 		if ((Object) this instanceof ClientLevel && BattleScene.staged()) cir.setReturnValue(0F);
 	}

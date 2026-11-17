@@ -225,7 +225,9 @@ public final class Game {
 		BlockState b = level.getBlockState(below);
 		if (!level.getFluidState(below).isEmpty() || b.is(net.minecraft.tags.BlockTags.LEAVES) || b.is(net.minecraft.tags.BlockTags.FENCES)
 				|| b.is(net.minecraft.tags.BlockTags.WALLS) || b.is(net.minecraft.tags.BlockTags.FENCE_GATES)) return false;
-		return b.isFaceSturdy(level, below, net.minecraft.core.Direction.UP);
+		if (!b.isFaceSturdy(level, below, net.minecraft.core.Direction.UP)) return false;
+		// Not a roof: real ground has more under it (a roof has the room beneath it).
+		return !level.getBlockState(at.below(2)).isAir() && !level.getBlockState(at.below(3)).isAir() && level.canSeeSky(at);
 	}
 
 	/**
