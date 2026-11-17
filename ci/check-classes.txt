@@ -1,0 +1,7 @@
+net.fabricmc.fabric.api.resource.ResourceManagerHelper
+net.fabricmc.fabric.api.resource.ResourcePackActivationType
+net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents$Before
+net.fabricmc.fabric.api.event.player.AttackBlockCallback
+net.fabricmc.fabric.api.event.player.UseBlockCallback
+net.minecraft.client.input.CharacterEvent
+net.minecraft.world.entity.player.PlayerSkin
