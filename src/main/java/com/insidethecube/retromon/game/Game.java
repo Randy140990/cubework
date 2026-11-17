@@ -180,10 +180,18 @@ public final class Game {
 		Net.send(p, "sync", data(p).save());
 	}
 
-	/** The game's speed: 1, 2 or 3 times (everything, as an emulator's fast-forward does). */
+	/** The game's speed: 1 to 4 times (everything, as an emulator's fast-forward does). */
 	public static void setSpeed(int times) {
 		if (server == null) return;
-		server.tickRateManager().setTickRate(20F * Math.max(1, Math.min(3, times)));
+		server.tickRateManager().setTickRate(20F * Math.max(1, Math.min(4, times)));
+	}
+
+	/** Map editing (`/retromon build on`): off, nobody can break or change the map in a Retromon save. */
+	public static boolean build;
+
+	/** Whether this player is kept from breaking or changing anything (a Retromon save, not in build mode). */
+	public static boolean locked(net.minecraft.world.entity.player.Player p) {
+		return ourSave && !build && p instanceof ServerPlayer;
 	}
 
 	/** Pallet Town, outside your house. */
@@ -191,7 +199,7 @@ public final class Game {
 
 	private static void toStart(ServerPlayer p) {
 		ServerLevel level = (ServerLevel) p.level();
-		BlockPos at = standable(level, START_X, START_Z, START_Y);
+		BlockPos at = spot(level, START_X, START_Z, 6);
 		p.teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
 	}
 
@@ -210,6 +218,36 @@ public final class Game {
 		return level.getBlockState(at).getCollisionShape(level, at).isEmpty();
 	}
 
+	/** Good ground to stand on: dry, open above, and on a solid top (not water, a fence, a wall or a tree). */
+	private static boolean goodGround(ServerLevel level, BlockPos at) {
+		if (!free(level, at) || !free(level, at.above()) || !level.getFluidState(at).isEmpty() || !level.getFluidState(at.above()).isEmpty()) return false;
+		BlockPos below = at.below();
+		BlockState b = level.getBlockState(below);
+		if (!level.getFluidState(below).isEmpty() || b.is(net.minecraft.tags.BlockTags.LEAVES) || b.is(net.minecraft.tags.BlockTags.FENCES)
+				|| b.is(net.minecraft.tags.BlockTags.WALLS) || b.is(net.minecraft.tags.BlockTags.FENCE_GATES)) return false;
+		return b.isFaceSturdy(level, below, net.minecraft.core.Direction.UP);
+	}
+
+	/**
+	 * The nearest good spot to stand around x, z (on the ground, not a roof or a treetop), searching outwards
+	 * up to `radius` blocks. The ground height comes from the map itself.
+	 */
+	public static BlockPos spot(ServerLevel level, int x, int z, int radius) {
+		for (int r = 0; r <= radius; r++) {
+			for (int dx = -r; dx <= r; dx++) {
+				for (int dz = -r; dz <= r; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
+					int top = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x + dx, z + dz);
+					for (int y = top; y >= top - 6; y--) {
+						BlockPos at = new BlockPos(x + dx, y, z + dz);
+						if (goodGround(level, at)) return at;
+					}
+				}
+			}
+		}
+		return standable(level, x, z, START_Y);
+	}
+
 	// ---------- places (zones on the map) ----------
 
 	/** A part of the map that's a place in the games: a box from x1, z1 to x2, z2 (top to bottom of the world). */
@@ -222,9 +260,9 @@ public final class Game {
 	private static final List<Zone> zones = new ArrayList<>();
 	private static final Map<UUID, int[]> CORNER1 = new HashMap<>(), CORNER2 = new HashMap<>();
 
-	/** Pallet Town, Route 1 and Viridian City on Insid3 Th3 Cub3's Kanto map, to begin with. */
-	private static final Zone[] DEFAULT_ZONES = {new Zone("pallet_town", -830, 666, -752, 720), new Zone("route_1", -830, 586, -752, 665),
-			new Zone("viridian_city", -860, 470, -720, 585)};
+	/** Pallet Town to Route 2 on Insid3 Th3 Cub3's Kanto map, to begin with (mark the rest with /retromon zone). */
+	private static final Zone[] DEFAULT_ZONES = {new Zone("pallet_town", -845, 655, -745, 735), new Zone("route_1", -845, 590, -745, 654),
+			new Zone("viridian_city", -830, 495, -745, 589), new Zone("route_22", -900, 495, -831, 565), new Zone("route_2", -830, 340, -745, 494)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -293,6 +331,8 @@ public final class Game {
 			COOLDOWN.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			BUSY.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			if (s.getTickCount() % 10 == 0) enter(p, placeAt(p.getX(), p.getZ()));
+			// Kept in Adventure mode (so nothing on the map can be broken, Axiom included) unless map editing is on.
+			if (!build && s.getTickCount() % 20 == 0 && p.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) p.setGameMode(GameType.ADVENTURE);
 			if (Battles.in(p) || BUSY.containsKey(id)) {
 				LAST.put(id, p.blockPosition());
 				continue;
@@ -319,8 +359,16 @@ public final class Game {
 		return false;
 	}
 
+	/** Blocks walked since the last step (the map is at 4 blocks to the games' step), and steps of peace after a battle. */
+	private static final Map<UUID, Integer> WALKED = new HashMap<>(), GRACE = new HashMap<>();
+	public static final int BLOCKS_PER_GAME_STEP = 4;
+
 	/** A step: friendship, REPEL, and in the grass (or a cave) a wild Pokémon may jump out, as often as in the games. */
 	private static void step(ServerPlayer p, BlockPos pos) {
+		int walked = WALKED.merge(p.getUUID(), 1, Integer::sum);
+		if (walked < BLOCKS_PER_GAME_STEP) return;
+		WALKED.put(p.getUUID(), 0);
+		if (GRACE.computeIfPresent(p.getUUID(), (k, v) -> v > 1 ? v - 1 : null) != null) return;
 		PlayerData d = data(p);
 		for (Mon m : d.party) {
 			if (++m.steps >= 512) {
@@ -348,6 +396,7 @@ public final class Game {
 
 	public static void afterBattle(ServerPlayer p) {
 		COOLDOWN.put(p.getUUID(), 60);
+		GRACE.put(p.getUUID(), 4);
 	}
 
 	public static void blackout(ServerPlayer p) {
@@ -424,14 +473,36 @@ public final class Game {
 	// ---------- talking ----------
 
 	private static String player(ServerPlayer p) {
-		return p.getGameProfile().name().toUpperCase();
+		String n = data(p).name;
+		return n.isEmpty() ? p.getGameProfile().name().toUpperCase() : n;
+	}
+
+	private static String rival(ServerPlayer p) {
+		String n = data(p).rival;
+		return n.isEmpty() ? "BLUE" : n;
 	}
 
 	/** The games' lines with your name (and your rival's) put in. */
 	static List<String> fill(ServerPlayer p, List<String> lines) {
 		List<String> out = new ArrayList<>();
-		for (String l : lines) out.add(l.replace("{player}", player(p)).replace("{rival}", "BLUE"));
+		for (String l : lines) out.add(l.replace("{player}", player(p)).replace("{rival}", rival(p)));
 		return out;
+	}
+
+	/** From the new-game intro: name, rival and boy or girl (only before the adventure starts, or to fill in a blank). */
+	public static void profile(ServerPlayer p, CompoundTag t) {
+		PlayerData d = data(p);
+		String name = clean(t.getStringOr("name", "")), rival = clean(t.getStringOr("rival", ""));
+		if (!name.isEmpty() && (!d.started || d.name.isEmpty())) d.name = name;
+		if (!rival.isEmpty() && (!d.started || d.rival.isEmpty())) d.rival = rival;
+		String g = t.getStringOr("gender", "");
+		if (g.equals("boy") || g.equals("girl")) d.gender = g;
+		sync(p);
+	}
+
+	private static String clean(String s) {
+		s = s.replaceAll("[^A-Za-z0-9 .'-]", "").trim().toUpperCase();
+		return s.length() > 10 ? s.substring(0, 10) : s;
 	}
 
 	public static void talk(ServerPlayer p, int entityId) {
@@ -478,6 +549,26 @@ public final class Game {
 		}
 	}
 
+	/** An item ball: the item goes in your bag (once), and the ball's gone. */
+	private static void pickUp(ServerPlayer p, WorldMon w, String key) {
+		PlayerData d = data(p);
+		Trainers.FieldItem fi = Trainers.FIELD_ITEMS.get(key);
+		if (fi == null || d.statics.contains("item:" + key)) {
+			w.discard();
+			return;
+		}
+		d.statics.add("item:" + key);
+		Item it = Item.find(fi.item());
+		String name = it != null ? it.name() : fi.item().replace("tm_", "TM ").replace('_', ' ').toUpperCase();
+		if (it != null) d.give(fi.item(), 1);
+		w.discard();
+		sync(p);
+		CompoundTag s = new CompoundTag();
+		s.putString("sound", "item");
+		Net.send(p, "sound", s);
+		message(p, List.of(player(p) + " found " + name + "!"));
+	}
+
 	private static void talkMon(ServerPlayer p, WorldMon w) {
 		PlayerData d = data(p);
 		String key = w.key();
@@ -485,6 +576,10 @@ public final class Game {
 		String name = sp == null ? "POKéMON" : sp.name();
 		CompoundTag t = new CompoundTag();
 		t.putString("cry", w.species());
+		if (key.startsWith("item:")) {
+			pickUp(p, w, key.substring(5));
+			return;
+		}
 		if (key.startsWith("pet:")) {
 			Trainers.Person person = Trainers.PEOPLE.get(key.substring(4));
 			dialogue(p, null, "talk", person == null ? List.of(name + ": ...") : fill(p, person.lines()), t, w.getId());
@@ -791,10 +886,9 @@ public final class Game {
 
 	// ---------- people and Pokémon in the world ----------
 
-	/** The first people on the Kanto map: the Viridian nurse and clerk, a practice trainer on Route 1, Brock by Oak's lab, two Pallet folk. */
+	/** The first people on the Kanto map: the Viridian nurse and clerk (until the interiors), and a practice trainer on Route 1. */
 	private static final Object[][] DEFAULTS = {{"nurse", Npc.NURSE, "", -785, 561, 0F}, {"clerk", Npc.CLERK, "viridian_city", -766, 549, 0F},
-			{"joey", Npc.TRAINER, "youngster_joey", -790, 600, 0F}, {"brock", Npc.LEADER, "pewter_gym_0", -798, 706, 90F},
-			{"pallet_girl", Npc.PERSON, "pallet_town_p1", -797, 688, 0F}, {"pallet_fisher", Npc.PERSON, "pallet_town_p2", -782, 682, 90F}};
+			{"joey", Npc.TRAINER, "youngster_joey", -790, 600, 0F}};
 
 	/** Puts the first people in place once their part of the map is loaded (each only once per save). */
 	private static void placeTouchPoints(MinecraftServer s) {
@@ -804,12 +898,21 @@ public final class Game {
 		for (JsonElement e : placed) done.add(e.getAsString());
 		ServerLevel level = s.overworld();
 		boolean changed = false;
+		// Each marked place gets the games' people, trainers and item balls once its ground is loaded.
+		for (Zone z : List.copyOf(zones)) {
+			if (done.contains("place:" + z.place())) continue;
+			if (!level.hasChunkAt(new BlockPos(z.x1(), START_Y, z.z1())) || !level.hasChunkAt(new BlockPos(z.x2(), START_Y, z.z2()))) continue;
+			populate(level, z.place(), false);
+			placed.add("place:" + z.place());
+			done.add("place:" + z.place());
+			changed = true;
+		}
 		for (Object[] d : DEFAULTS) {
 			String key = (String) d[0];
 			if (done.contains(key)) continue;
 			int x = (Integer) d[3], z = (Integer) d[4];
 			if (!level.hasChunkAt(new BlockPos(x, START_Y, z))) continue;
-			BlockPos at = standable(level, x, z, START_Y);
+			BlockPos at = spot(level, x, z, 6);
 			place(level, (Integer) d[1], (String) d[2], at.getX() + 0.5, at.getY(), at.getZ() + 0.5, (Float) d[5]);
 			placed.add(key);
 			changed = true;
@@ -818,6 +921,74 @@ public final class Game {
 			marker.add("placedKeys", placed);
 			saveMarker();
 		}
+	}
+
+	/**
+	 * Puts a place's people, trainers and item balls where the games had them: each one's spot on the games'
+	 * map is laid over the place's marked box (so mark the box to the place's edges), then moved to the nearest
+	 * good ground. Anyone already there stays (or, with redo, is put back where the games had them).
+	 */
+	public static int populate(ServerLevel level, String place, boolean redo) {
+		Zone z = null;
+		for (Zone x : zones) if (x.place().equals(place)) {
+			z = x;
+			break;
+		}
+		int[] size = Places.size(place);
+		if (z == null || size == null) return -1;
+		net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(z.x1(), level.getMinY(), z.z1(), z.x2() + 1, level.getMaxY(), z.z2() + 1);
+		java.util.Set<String> present = new java.util.HashSet<>();
+		for (Npc n : level.getEntitiesOfClass(Npc.class, box)) {
+			if (redo && Trainers.POS.containsKey(n.key())) n.discard();
+			else present.add(n.key());
+		}
+		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box)) {
+			if (redo && (w.key().startsWith("pet:") || w.key().startsWith("item:"))) w.discard();
+			else present.add(w.key());
+		}
+		int count = 0;
+		for (Trainers.Trainer t : Trainers.in(place)) {
+			BlockPos at = gameSpot(level, z, size, Trainers.POS.get(t.key()));
+			if (at == null || present.contains(t.key())) continue;
+			place(level, t.leader() ? Npc.LEADER : Npc.TRAINER, t.key(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yawOf(t.facing(), 0F));
+			count++;
+		}
+		for (Trainers.Person ps : Trainers.peopleIn(place)) {
+			BlockPos at = gameSpot(level, z, size, Trainers.POS.get(ps.key()));
+			if (at == null) continue;
+			String sp = ps.species();
+			if (sp != null) {
+				if (present.contains("pet:" + ps.key())) continue;
+				placeMon(level, sp, "pet:" + ps.key(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yawOf(ps.facing(), 0F));
+			} else {
+				if (present.contains(ps.key())) continue;
+				place(level, Npc.PERSON, ps.key(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yawOf(ps.facing(), 0F));
+			}
+			count++;
+		}
+		for (Trainers.FieldItem fi : Trainers.itemsIn(place)) {
+			if (present.contains("item:" + fi.key()) || takenByAnyone("item:" + fi.key())) continue;
+			BlockPos at = gameSpot(level, z, size, new int[] {fi.x(), fi.y()});
+			if (at == null) continue;
+			placeMon(level, "poke_ball", "item:" + fi.key(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
+			count++;
+		}
+		return count;
+	}
+
+	private static boolean takenByAnyone(String key) {
+		if (server == null) return false;
+		for (ServerPlayer p : server.getPlayerList().getPlayers()) if (data(p).statics.contains(key)) return true;
+		return false;
+	}
+
+	/** A spot on the games' map (x, y in steps) laid over a marked place, moved to good ground nearby. */
+	private static BlockPos gameSpot(ServerLevel level, Zone z, int[] size, int[] xy) {
+		if (xy == null || xy[0] < 0 || xy[1] < 0) return null;
+		double fx = (xy[0] + 0.5) / size[0], fz = (xy[1] + 0.5) / size[1];
+		int x = z.x1() + (int) Math.floor(fx * (z.x2() - z.x1() + 1)), zz = z.z1() + (int) Math.floor(fz * (z.z2() - z.z1() + 1));
+		if (!level.hasChunkAt(new BlockPos(x, START_Y, zz))) return null;
+		return spot(level, x, zz, 8);
 	}
 
 	/** The way the games had someone facing, as a yaw (north up): down is south. */

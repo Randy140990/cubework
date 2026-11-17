@@ -34,7 +34,25 @@ public final class Battles {
 	}
 
 	private static String name(ServerPlayer p) {
-		return p.getGameProfile().name().toUpperCase();
+		String n = Game.data(p).name;
+		return n.isEmpty() ? p.getGameProfile().name().toUpperCase() : n;
+	}
+
+	/** Which set piece the battle is fought on: a route's field, a forest, a cave, the water's edge, a gym or a town square. */
+	private static String arena(ServerPlayer p, Session s) {
+		String place = Game.data(p).place;
+		if (s.trainer != null && s.trainer.boss() && !s.trainer.title().contains("ROCKET")) return "gym";
+		if (place.contains("gym") || place.contains("plateau") || place.contains("room") || place.contains("lance") || place.contains("champion")) return "gym";
+		if (place.contains("forest") || place.contains("ilex") || place.contains("park")) return "forest";
+		for (String k : new String[] {"cave", "mt_moon", "tunnel", "seafoam", "victory_road", "rock", "mortar", "ice_path", "whirl", "ruins", "dragons_den",
+				"silver_cave", "dark_cave", "union", "slowpoke", "diglett", "hideout", "mansion", "tower", "power_plant", "well"}) {
+			if (place.contains(k)) return "cave";
+		}
+		net.minecraft.core.BlockPos at = p.blockPosition();
+		for (int dx = -3; dx <= 3; dx++) for (int dz = -3; dz <= 3; dz++)
+			if (!p.level().getFluidState(at.offset(dx, -1, dz)).isEmpty() || !p.level().getFluidState(at.offset(dx, 0, dz)).isEmpty()) return "water";
+		if (place.contains("city") || place.contains("town") || place.contains("island")) return "town";
+		return "route";
 	}
 
 	/** A wild battle (staticKey: the one-off encounter it is, or null). */
@@ -70,6 +88,7 @@ public final class Battles {
 		List<Event> ev = s.battle.start();
 		CompoundTag t = turn(s, ev);
 		t.putString("music", music);
+		t.putString("arena", arena(p, s));
 		Net.send(p, "battle_start", t);
 	}
 

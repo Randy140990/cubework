@@ -35,6 +35,8 @@ public class PlayerData {
 	public String place = "";
 	/** Text speed: 0 slow, 1 mid, 2 fast. */
 	public int textSpeed = 2;
+	/** From the new-game intro: your name, your rival's and whether you're a boy or a girl. */
+	public String name = "", rival = "", gender = "boy";
 
 	public boolean anyHealthy() {
 		for (Mon m : party) if (!m.fainted()) return true;
@@ -103,6 +105,9 @@ public class PlayerData {
 		t.putInt("repel", repel);
 		t.putString("place", place);
 		t.putInt("textSpeed", textSpeed);
+		t.putString("name", name);
+		t.putString("rival", rival);
+		t.putString("gender", gender);
 		return t;
 	}
 
@@ -134,6 +139,9 @@ public class PlayerData {
 		d.repel = t.getIntOr("repel", 0);
 		d.place = t.getStringOr("place", "");
 		d.textSpeed = t.getIntOr("textSpeed", 2);
+		d.name = t.getStringOr("name", "");
+		d.rival = t.getStringOr("rival", "");
+		d.gender = t.getStringOr("gender", "boy");
 		return d;
 	}
 }

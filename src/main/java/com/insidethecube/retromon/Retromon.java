@@ -75,6 +75,10 @@ public class Retromon implements ModInitializer {
 		ServerTickEvents.END_SERVER_TICK.register(Game::tick);
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> Game.join(handler.player));
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> Game.leave(handler.player));
+		// Nothing on the map can be broken in a Retromon save (whatever the game mode), unless map editing is on.
+		net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, be) -> !Game.locked(player));
+		net.fabricmc.fabric.api.event.player.AttackBlockCallback.EVENT.register((player, world, hand, pos, dir) ->
+				Game.locked(player) ? net.minecraft.world.InteractionResult.FAIL : net.minecraft.world.InteractionResult.PASS);
 		commands();
 	}
 
@@ -102,9 +106,21 @@ public class Retromon implements ModInitializer {
 				if (Game.adventure(p) && p.level().getServer().isSingleplayer()) Game.setSpeed(t.getIntOr("times", 1));
 			}
 			case "save" -> Game.save(p);
+			case "profile" -> Game.profile(p, t);
 			default -> {
 			}
 		}
+	}
+
+	private static int populate(CommandContext<CommandSourceStack> c, boolean redo) {
+		String place = StringArgumentType.getString(c, "place");
+		int n = Game.populate(c.getSource().getLevel(), place, redo);
+		if (n < 0) {
+			c.getSource().sendFailure(Component.literal("Mark " + place + " first (/retromon zone), and it has to be one of the games' Kanto maps"));
+			return 0;
+		}
+		c.getSource().sendSuccess(() -> Component.literal(n + " people and items placed in " + place + (redo ? " (everyone put back where the games had them)" : "")), false);
+		return 1;
 	}
 
 	private static float facingFrom(ServerPlayer p) {
@@ -218,7 +234,9 @@ public class Retromon implements ModInitializer {
 								c.getSource().sendFailure(Component.literal("Mark both corners first (/retromon zone corner1, corner2)"));
 								return 0;
 							}
-							c.getSource().sendSuccess(() -> Component.literal("That area is now " + Places.get(place).name()), false);
+							int n = Game.populate((ServerLevel) p.level(), place, false);
+							c.getSource().sendSuccess(() -> Component.literal("That area is now " + Places.get(place).name()
+									+ (n > 0 ? ", with " + n + " people and items from the games" : "")), false);
 							return 1;
 						})))
 						.then(Commands.literal("clear").then(Commands.argument("place", StringArgumentType.word()).suggests((c, b) -> {
@@ -329,6 +347,19 @@ public class Retromon implements ModInitializer {
 					ServerPlayer p = c.getSource().getPlayerOrException();
 					Game.data(p).money = IntegerArgumentType.getInteger(c, "amount");
 					Game.sync(p);
+					return 1;
+				})))
+				.then(Commands.literal("populate").then(Commands.argument("place", StringArgumentType.word()).suggests((c, b) -> {
+					for (Game.Zone z : Game.zones()) b.suggest(z.place());
+					return b.buildFuture();
+				}).executes(c -> populate(c, false)).then(Commands.literal("redo").executes(c -> populate(c, true)))))
+				.then(Commands.literal("build").then(Commands.literal("on").executes(c -> {
+					Game.build = true;
+					c.getSource().sendSuccess(() -> Component.literal("Map editing on: game modes and breaking blocks are allowed until /retromon build off"), false);
+					return 1;
+				})).then(Commands.literal("off").executes(c -> {
+					Game.build = false;
+					c.getSource().sendSuccess(() -> Component.literal("Map editing off: the map is locked again"), false);
 					return 1;
 				})))
 				.then(Commands.literal("heal").executes(c -> {

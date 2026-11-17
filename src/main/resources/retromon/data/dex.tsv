@@ -1,0 +1,252 @@
+# dex	category	height	weight_lbs	text
+1	SEED	2'04"	15.0	The seed on its back is filled with nutrients. The seed grows steadily larger as its body grows.
+2	SEED	3'03"	29.0	Exposure to sunlight adds to its strength. Sunlight also makes the bud on its back grow larger.
+3	SEED	6'07"	221.0	By spreading the broad petals of its flower and catching the sun's rays, it fills its body with power.
+4	LIZARD	2'00"	19.0	The flame on its tail shows the strength of its life force. If it is weak, the flame also burns weakly.
+5	FLAME	3'07"	42.0	It is very hotheaded by nature, so it constantly seeks opponents. It calms down only when it wins.
+6	FLAME	5'07"	200.0	If CHARIZARD becomes furious, the flame at the tip of its tail flares up in a whitishblue color.
+7	TINYTURTLE	1'08"	20.0	The shell is soft when it is born. It soon becomes so resilient, prodding fingers will bounce off it.
+8	TURTLE	3'03"	50.0	It is recognized as a symbol of longevity. If its shell has algae on it, that WARTORTLE is very old.
+9	SHELLFISH	5'03"	189.0	It deliberately makes itself heavy so it can withstand the recoil of the water jets it fires.
+10	WORM	1'00"	6.0	For protection, it releases a horrible stench from the antenna on its head to drive away enemies.
+11	COCOON	2'04"	22.0	Inside the shell, it is soft and weak as it prepares to evolve. It stays motionless in the shell.
+12	BUTTERFLY	3'07"	71.0	It collects honey every day. It rubs honey onto the hairs on its legs to carry it back to its nest.
+13	HAIRY BUG	1'00"	7.0	Its poison stinger is very powerful. Its bright-colored body is intended to warn off its enemies.
+14	COCOON	2'00"	22.0	Although it is a cocoon, it can move a little. It can extend its poison barb if it is attacked.
+15	POISON BEE	3'03"	65.0	It can take down any opponent with its powerful poison stingers. It sometimes attacks in swarms.
+16	TINY BIRD	1'00"	4.0	It usually hides in tall grass. Because it dislikes fighting, it protects itself by kicking up sand.
+17	BIRD	3'07"	66.0	It has outstanding vision. However high it flies, it is able to distinguish the movements of its prey.
+18	BIRD	4'11"	87.0	Its well-developed chest muscles make it strong enough to whip up a gusty windstorm with just a few flaps.
+19	RAT	1'00"	8.0	It eats anything. Wherever food is available, it will settle down and produce offspring continuously.
+20	RAT	2'04"	41.0	Gnaws on anything with its tough fangs. It can even topple concrete buildings by gnawing on them.
+21	TINY BIRD	1'00"	4.0	It flaps its short wings to flush out insects from tall grass. It then plucks them with its stubby beak.
+22	BEAK	3'11"	84.0	It shoots itself suddenly high into the sky, then plummets down in one fell swoop to strike its prey.
+23	SNAKE	6'07"	15.0	It can freely detach its jaw to swallow large prey whole. It can become too heavy to move, however.
+24	COBRA	11'06"	143.0	Transfixing prey with the face-like pattern on its belly, it binds and poisons the frightened victim.
+25	MOUSE	1'04"	13.0	This intelligent POKéMON roasts hard BERRIES with electricity to make them tender enough to eat.
+26	MOUSE	2'07"	66.0	When its electricity builds, its muscles are stimulated, and it becomes more aggressive than usual.
+27	MOUSE	2'00"	26.0	If it fell from a great height, this POKéMON could save itself by rolling into a ball and bouncing.
+28	MOUSE	3'03"	65.0	In an attempt to hide itself, it will run around at top speed to kick up a blinding dust storm.
+29	POISON PIN	1'04"	15.0	The poison hidden in its small horn is extremely potent. Even a tiny scratch can have fatal results.
+30	POISON PIN	2'07"	44.0	When feeding its young, it first chews and tenderizes the food, then spits it out for the offspring.
+31	DRILL	4'03"	132.0	Its body is covered with needlelike scales. It never shows signs of shrinking from any attack.
+32	POISON PIN	1'08"	20.0	It is small, but its horn is filled with poison. It charges then stabs with the horn to inject poison.
+33	POISON PIN	2'11"	43.0	It raises its big ears to check its surroundings. If it senses anything, it attacks immediately.
+34	DRILL	4'07"	137.0	It swings its big tail around during battle. If its foe flinches, it will charge with its sturdy body.
+35	FAIRY	2'00"	17.0	The moonlight that it stores in the wings on its back apparently gives it the ability to float in midair.
+36	FAIRY	4'03"	88.0	With its acute hearing, it can pick up sounds from far away. It usually hides in quiet places.
+37	FOX	2'00"	22.0	As it develops, its single white tail gains color and splits into six. It is quite warm and cuddly.
+38	FOX	3'07"	44.0	Some legends claim that each of its nine tails has its own unique type of special mystical power.
+39	BALLOON	1'08"	12.0	If it inflates to SING a lullaby, it can perform longer and cause sure drowsiness in its audience.
+40	BALLOON	3'03"	26.0	Their fur feels so good that if two of them snuggle together, they won't want to be separated.
+41	BAT	2'07"	17.0	While flying, it constantly emits ultrasonic waves from its mouth to check its surroundings.
+42	BAT	5'03"	121.0	However hard its victim's hide may be, it punctures with sharp fangs and gorges itself with blood.
+43	WEED	1'08"	12.0	Awakened by moonlight, it roams actively at night. In the day, it stays quietly underground.
+44	WEED	2'07"	19.0	What appears to be drool is actually sweet honey. It is very sticky and clings stubbornly if touched.
+45	FLOWER	3'11"	41.0	It has the world's largest petals. With every step, the petals shake out heavy clouds of toxic pollen.
+46	MUSHROOM	1'00"	12.0	It is doused with mushroom spores when it is born. As its body grows, mushrooms sprout from its back.
+47	MUSHROOM	3'03"	65.0	It stays mostly in dark, damp places, the preference not of the bug, but of the big mushrooms on its back.
+48	INSECT	3'03"	66.0	Its eyes also function as radar units. It catches and eats small bugs that hide in darkness.
+49	POISONMOTH	4'11"	28.0	When it attacks, it flaps its large wings violently to scatter its poisonous powder all around.
+50	MOLE	0'08"	2.0	Its skin is very thin. If it is exposed to light, its blood heats up, causing it to grow weak.
+51	MOLE	2'04"	73.0	Its three heads bob separately up and down to loosen the soil nearby, making it easier for it to burrow.
+52	SCRATCHCAT	1'04"	9.0	It is fascinated by round objects. It can't stop playing with them until it tires and falls asleep.
+53	CLASSY CAT	3'03"	71.0	Many adore it for its sophisticated air. However, it will lash out and scratch for little reason.
+54	DUCK	2'07"	43.0	It has mystical powers but doesn't recall that it has used them. That is why it always looks puzzled.
+55	DUCK	5'07"	169.0	When it swims at full speed using its long, webbed limbs, its forehead somehow begins to glow.
+56	PIG MONKEY	1'08"	62.0	It is extremely ill-tempered. Groups of them will attack any handy target for no reason.
+57	PIG MONKEY	3'03"	71.0	If approached while asleep, it may awaken and angrily give chase in a groggy state of semi-sleep.
+58	PUPPY	2'04"	42.0	It has a brave and trustworthy nature. It fearlessly stands up to bigger and stronger foes.
+59	LEGENDARY	6'03"	342.0	This legendary Chinese POKEMON is considered magnificent. Many people are enchanted by its grand mane.
+60	TADPOLE	2'00"	27.0	Because it is inept at walking on its newly grown legs, it always swims around in water.
+61	TADPOLE	3'03"	44.0	The swirl on its belly subtly undulates. Staring at it may gradually cause drowsiness.
+62	TADPOLE	4'03"	119.0	This strong and skilled swimmer is even capable of crossing the Pacific Ocean just by kicking.
+63	PSI	2'11"	43.0	It senses impending attacks and TELEPORTS away to safety before the actual attacks can strike.
+64	PSI	4'03"	125.0	It possesses strong spiritual power. The more danger it faces, the stronger its psychic power.
+65	PSI	4'11"	106.0	Closing both its eyes heightens all its other senses. This enables it to use its abilities to their extremes.
+66	SUPERPOWER	2'07"	43.0	Always brimming with power, it passes time by lifting boulders. Doing so makes it even stronger.
+67	SUPERPOWER	4'11"	155.0	It always goes at its full power, but this very tough and durable POKéMON never gets tired.
+68	SUPERPOWER	5'03"	287.0	It quickly swings its four arms to rock its opponents with ceaseless punches and chops from all angles.
+69	FLOWER	2'04"	9.0	Even though its body is extremely skinny, it is blindingly fast when catching its prey.
+70	FLYCATCHER	3'03"	14.0	Even though it is filled with ACID, it does not melt because it also oozes a neutralizing fluid.
+71	FLYCATCHER	5'07"	34.0	ACID that has dissolved many prey becomes sweeter, making it even more effective at attracting prey.
+72	JELLYFISH	2'11"	100.0	When the tide goes out, dehydrated TENTACOOL remains can be found washed up on the shore.
+73	JELLYFISH	5'03"	121.0	Its 80 tentacles absorb water and stretch almost endlessly to CONSTRICT its prey and enemies.
+74	ROCK	1'04"	44.0	Most people may not notice, but a closer look should reveal that there are many GEODUDE around.
+75	ROCK	3'03"	232.0	With a free and uncaring nature, it doesn't mind if pieces break off while it rolls down mountains.
+76	MEGATON	4'07"	662.0	It sheds its skin once a year. The discarded shell immediately hardens and crumbles away.
+77	FIRE HORSE	3'03"	66.0	It is a weak runner immediately after birth. It gradually becomes faster by chasing after its parents.
+78	FIRE HORSE	5'07"	209.0	At full gallop, its four hooves barely touch the ground because it moves so incredibly fast.
+79	DOPEY	3'11"	79.0	It lazes vacantly near water. If something bites its tail, it won't even notice for a whole day.
+80	HERMITCRAB	5'03"	173.0	If the tail-biting SHELLDER is thrown off in a harsh battle, it reverts to being an ordinary SLOWPOKE.
+81	MAGNET	1'00"	13.0	It is attracted by electromagnetic waves. It may approach trainers if they are using their POKéGEAR.
+82	MAGNET	3'03"	132.0	Three MAGNEMITE are linked by a strong magnetic force. Earaches will occur if you get too close.
+83	WILD DUCK	2'07"	33.0	If anyone tries to disturb where the essential plant sticks grow, it uses its own stick to thwart them.
+84	TWIN BIRD	4'07"	86.0	By alternately raising and lowering its two heads, it balances itself to be more stable while running.
+85	TRIPLEBIRD	5'11"	188.0	It collects data and plans three times as wisely, but it may think too much and become immobilized.
+86	SEA LION	3'07"	198.0	Although it can't walk well on land, it is a graceful swimmer. It especially loves being in frigid seas.
+87	SEA LION	5'07"	265.0	Its streamlined body has little drag in water. The colder the temperature, the friskier it gets.
+88	SLUDGE	2'11"	66.0	As it moves, it loses bits of its body from which new GRIMER emerge. This worsens the stench around it.
+89	SLUDGE	3'11"	66.0	They love to gather in smelly areas where sludge accumulates, making the stench around them worse.
+90	BIVALVE	1'00"	9.0	It swims facing backward by opening and closing its two-piece shell. It is surprisingly fast.
+91	BIVALVE	4'11"	292.0	Once it slams its shell shut, it is impossible to open, even by those with superior strength.
+92	GAS	4'03"	0.2	With its gas-like body, it can sneak into any place it desires. However, it can be blown away by wind.
+93	GAS	5'03"	0.2	In total darkness, where nothing is visible, HAUNTER lurks, silently stalking its next victim.
+94	SHADOW	4'11"	89.0	It steals heat from its surroundings. If you feel a sudden chill, it is certain that a GENGAR appeared.
+95	ROCK SNAKE	28'10"	463.0	It twists and squirms through the ground. The thunderous roar of its tunneling echoes a long way.
+96	HYPNOSIS	3'03"	71.0	If you think that you had a good dream, but you can't remember it, a DROWZEE has probably eaten it.
+97	HYPNOSIS	5'03"	167.0	When it is very hungry, it puts humans it meets to sleep, then it feasts on their dreams.
+98	RIVER CRAB	1'04"	14.0	If it senses danger approaching, it cloaks itself with bubbles from its mouth so it will look bigger.
+99	PINCER	4'03"	132.0	It can hardly lift its massive, overgrown pincer. The pincer's size makes it difficult to aim properly.
+100	BALL	1'08"	23.0	It rolls to move. If the ground is uneven, a sudden jolt from hitting a bump can cause it to explode.
+101	BALL	3'11"	147.0	It is dangerous. If it has too much electricity and has nothing to do, it amuses itself by exploding.
+102	EGG	1'04"	6.0	The shell is very durable. Even if it cracks, it can survive without spilling the contents.
+103	COCONUT	6'07"	265.0	Its three heads think independently. However, they are friendly and never appear to squabble.
+104	LONELY	1'04"	14.0	If it is sad or lonely, the skull it wears shakes, and emits a plaintive and mournful sound.
+105	BONEKEEPER	3'03"	99.0	It has been seen pounding boulders with the bone it carries in order to tap out messages to others.
+106	KICKING	4'11"	110.0	This amazing POKéMON has an awesome sense of balance. It can kick in succession from any position.
+107	PUNCHING	4'07"	111.0	Its punches slice the air. However, it seems to need a short break after fighting for three minutes.
+108	LICKING	3'11"	144.0	Its tongue has well-developed nerves that run to the very tip, so it can be deftly manipulated.
+109	POISON GAS	2'00"	2.0	Its thin, filmy body is filled with gases that cause constant sniffles, coughs and teary eyes.
+110	POISON GAS	3'11"	21.0	If one of the twin KOFFING inflates, the other one deflates. It constantly mixes its poisonous gases.
+111	SPIKES	3'03"	254.0	It is inept at turning because of its four short legs. It can only charge and run in one direction.
+112	DRILL	6'03"	265.0	Its rugged hide protects it from even the heat of lava. However, the hide also makes it insensitive.
+113	EGG	3'07"	76.0	It walks carefully to prevent its egg from breaking. However, it is extremely fast at running away.
+114	VINE	3'03"	77.0	The vines that cloak its entire body are always jiggling. They effectively unnerve its foes.
+115	PARENT	7'03"	176.0	If it is safe, the young gets out of the belly pouch to play. The adult keeps a close eye on the youngster.
+116	DRAGON	1'04"	18.0	If attacked by a larger enemy, it quickly swims to safety by adeptly controlling its dorsal fin.
+117	DRAGON	3'11"	55.0	An examination of its cells revealed the presence of a gene not found in HORSEA. It became a hot topic.
+118	GOLDFISH	2'00"	33.0	Its dorsal, pectoral and tail fins wave elegantly in water. That is why it is known as the water dancer.
+119	GOLDFISH	4'03"	86.0	During spawning season, SEAKING gather from all over, coloring the rivers a brilliant red.
+120	STARSHAPE	2'07"	76.0	At night, the center of its body slowly flickers with the same rhythm as a human heartbeat.
+121	MYSTERIOUS	3'07"	176.0	The center section of its body is called the core. It glows in a different color each time it is seen.
+122	BARRIER	4'03"	120.0	A skilled mime from birth, it gains the ability to create invisible objects as it matures.
+123	MANTIS	4'11"	123.0	It slashes through grass with its sharp scythes, moving too fast for the human eye to track.
+124	HUMANSHAPE	4'07"	90.0	It rocks its body rhythmically. It appears to alter the rhythm depending on how it is feeling.
+125	ELECTRIC	3'07"	66.0	Electricity runs across the surface of its body. In darkness, its entire body glows a whitish-blue.
+126	SPITFIRE	4'03"	98.0	It dislikes cold places, so it blows scorching flames to make the environment suitable for itself.
+127	STAGBEETLE	4'11"	121.0	With its horns, it digs burrows to sleep in at night. In the morning, damp soil clings to its body.
+128	WILD BULL	4'07"	195.0	They fight each other by locking horns. The herd's protector takes pride in its battle-scarred horns.
+129	FISH	2'11"	22.0	An underpowered, pathetic POKéMON. It may jump high on rare occasions, but never more than seven feet.
+130	ATROCIOUS	21'04"	518.0	They say that during past wars, GYARADOS would appear and leave blazing ruins in its wake.
+131	TRANSPORT	8'02"	485.0	They have gentle hearts. Because they rarely fight, many have been caught. Their number has dwindled.
+132	TRANSFORM	1'00"	9.0	It can transform into anything. When it sleeps, it changes into a stone to avoid being attacked.
+133	EVOLUTION	1'00"	14.0	It has the ability to alter the composition of its body to suit its surrounding environment.
+134	BUBBLE JET	3'03"	64.0	When VAPOREON's fins begin to vibrate, it is a sign that rain will come within a few hours.
+135	LIGHTNING	2'07"	54.0	It concentrates the weak electric charges emitted by its cells and launches wicked lightning bolts.
+136	FLAME	2'11"	55.0	It stores some of the air it inhales in its internal flame pouch, which heats it to over 3,000 degrees.
+137	VIRTUAL	2'07"	80.0	It is a manmade POKéMON. Since it doesn't breathe, people are eager to try it in any environment.
+138	SPIRAL	1'04"	17.0	Revived from an ancient fossil, this POKéMON uses air stored in its shell to sink and rise in water.
+139	SPIRAL	3'03"	77.0	Apparently, it cracked SHELLDER's shell with its sharp fangs and sucked out the insides.
+140	SHELLFISH	1'08"	25.0	On rare occasions, some have been found as fossils which they became while hiding on the ocean floor.
+141	SHELLFISH	4'03"	89.0	In the water, it tucks in its limbs to become more compact, then it wiggles its shell to swim fast.
+142	FOSSIL	5'11"	130.0	A vicious POKéMON from the distant past, it appears to have flown by spreading its wings and gliding.
+143	SLEEPING	6'11"	1014.0	What sounds like its cry may actually be its snores or the rumblings of its hungry belly.
+144	FREEZE	5'07"	122.0	The magnificent, seemingly translucent wings of this legendary bird POKéMON are said to be made of ice.
+145	ELECTRIC	5'03"	116.0	This legendary bird POKéMON causes savage thunderstorms by flapping its glittering wings.
+146	FLAME	6'07"	132.0	This legendary POKéMON scatters embers with every flap of its wings. It is a thrilling sight to behold.
+147	DRAGON	5'11"	7.0	It is born large to start with. It repeatedly sheds its skin as it steadily grows longer.
+148	DRAGON	13'01"	36.0	They say that if it emits an aura from its whole body, the weather will begin to change instantly.
+149	DRAGON	7'03"	463.0	It is said that this POKéMON constantly flies over the immense seas and rescues drowning people.
+150	GENETIC	6'07"	269.0	Because its battle abilities were raised to the ultimate level, it thinks only of defeating its foes.
+151	NEW SPECIE	1'04"	9.0	Apparently, it appears only to those people who are pure of heart and have a strong desire to see it.
+152	LEAF	2'11"	14.0	A sweet aroma gently wafts from the leaf on its head. It is docile and loves to soak up the sun's rays.
+153	LEAF	3'11"	35.0	The scent of spices comes from around its neck. Somehow, sniffing it makes you want to fight.
+154	HERB	5'11"	222.0	The aroma that rises from its petals contains a substance that calms aggressive feelings.
+155	FIRE MOUSE	1'08"	17.0	It is timid, and always curls itself up in a ball. If attacked, it flares up its back for protection.
+156	VOLCANO	2'11"	42.0	Be careful if it turns its back during battle. It means that it will attack with the fire on its back.
+157	VOLCANO	5'07"	175.0	If its rage peaks, it becomes so hot that anything that touches it will instantly go up in flames.
+158	BIG JAW	2'00"	21.0	Its well-developed jaws are powerful and capable of crushing anything. Even its trainer must be careful.
+159	BIG JAW	3'07"	55.0	If it loses a fang, a new one grows back in its place. There are always 48 fangs lining its mouth.
+160	BIG JAW	7'07"	196.0	When it bites with its massive and powerful jaws, it shakes its head and savagely tears its victim up.
+161	SCOUT	2'07"	13.0	A very cautious POKéMON, it raises itself up using its tail to get a better view of its surroundings.
+162	LONG BODY	5'11"	72.0	It makes a nest to suit its long and skinny body. The nest is impossible for other POKéMON to enter.
+163	OWL	2'04"	47.0	It always stands on one foot. It changes feet so fast, the movement can rarely be seen.
+164	OWL	5'03"	90.0	Its eyes are specially adapted. They concentrate even faint light and enable it to see in the dark.
+165	FIVE STAR	3'03"	24.0	It is very timid. It will be afraid to move if it is alone. But it will be active if it is in a group.
+166	FIVE STAR	4'07"	78.0	When the stars flicker in the night sky, it flutters about, scattering a glowing powder.
+167	STRINGSPIT	1'08"	19.0	It lies still in the same pose for days in its web, waiting for its unsuspecting prey to wander close.
+168	LONG LEG	3'07"	74.0	It spins string not only from its rear but also from its mouth. It is hard to tell which end is which.
+169	BAT	5'11"	165.0	It flies so silently through the dark on its four wings that it may not be noticed even when nearby.
+170	ANGLER	1'08"	26.0	It shoots positive and negative electricity between the tips of its two antennae and zaps its enemies.
+171	LIGHT	3'11"	50.0	The light it emits is so bright that it can illuminate the sea's surface from a depth of over three miles.
+172	TINY MOUSE	1'00"	4.0	It is not yet skilled at storing electricity. It may send out a jolt if amused or startled.
+173	STARSHAPE	1'00"	7.0	Because of its unusual, star-like silhouette, people believe that it came here on a meteor.
+174	BALLOON	1'00"	2.0	It has a very soft body. If it starts to roll, it will bounce all over and be impossible to stop.
+175	SPIKE BALL	1'00"	3.0	The shell seems to be filled with joy. It is said that it will share good luck when treated kindly.
+176	HAPPINESS	2'00"	7.0	They say that it will appear before kindhearted, caring people and shower them with happiness.
+177	LITTLEBIRD	0'08"	4.0	Because its wings aren't yet fully grown, it has to hop to get around. It is always staring at something.
+178	MYSTIC	4'11"	33.0	They say that it stays still and quiet because it is seeing both the past and future at the same time.
+179	WOOL	2'00"	17.0	If static electricity builds in its body, its fleece doubles in volume. Touching it will shock you.
+180	WOOL	2'07"	29.0	As a result of storing too much electricity, it developed patches where even downy wool won't grow.
+181	LIGHT	4'07"	136.0	The tail's tip shines brightly and can be seen from far away. It acts as a beacon for lost people.
+182	FLOWER	1'04"	13.0	BELLOSSOM gather at times and appear to dance. They say that the dance is a ritual to summon the sun.
+183	AQUAMOUSE	1'04"	19.0	The tip of its tail, which contains oil that is lighter than water, lets it swim without drowning.
+184	AQUARABBIT	2'07"	63.0	By keeping still and listening intently, it can tell what is in even wild, fastmoving rivers.
+185	IMITATION	3'11"	84.0	Although it always pretends to be a tree, its composition appears to be closer to a rock than a plant.
+186	FROG	3'07"	75.0	If POLIWAG and POLIWHIRL hear its echoing cry, they respond by gathering from far and wide.
+187	COTTONWEED	1'04"	1.0	To keep from being blown away by the wind, they gather in clusters. They do enjoy gentle breezes, though.
+188	COTTONWEED	2'00"	2.0	The bloom on top of its head opens and closes as the temperature fluctuates up and down.
+189	COTTONWEED	2'07"	7.0	Once it catches the wind, it deftly controls its cotton-puff spores to float, even around the world.
+190	LONG TAIL	2'07"	25.0	Its tail is so powerful that it can use it to grab a tree branch and hold itself up in the air.
+191	SEED	1'00"	4.0	It may drop out of the sky suddenly. If attacked by a SPEAROW, it will violently shake its leaves.
+192	SUN	2'07"	19.0	It converts sunlight into energy. In the darkness after sunset, it closes its petals and becomes still.
+193	CLEAR WING	3'11"	84.0	If it flaps its wings really fast, it can generate shock waves that will shatter windows in the area.
+194	WATER FISH	1'04"	19.0	This POKéMON lives in cold water. It will leave the water to search for food when it gets cold outside.
+195	WATER FISH	4'07"	165.0	This carefree POKéMON has an easy-going nature. While swimming, it always bumps into boat hulls.
+196	SUN	2'11"	58.0	It uses the fine hair that covers its body to sense air currents and predict its enemy's actions.
+197	MOONLIGHT	3'03"	60.0	When agitated, this POKéMON protects itself by spraying poisonous sweat from its pores.
+198	DARKNESS	1'08"	5.0	Feared and loathed by many, it is believed to bring misfortune to all those who see it at night.
+199	ROYAL	6'07"	175.0	It has incredible intellect and intuition. Whatever the situation, it remains calm and collected.
+200	SCREECH	2'04"	2.0	It likes playing mischievous tricks such as screaming and wailing to startle people at night.
+201	SYMBOL	1'08"	11.0	Their shapes look like hieroglyphs on ancient tablets. It is said that the two are somehow related.
+202	PATIENT	4'03"	63.0	It hates light and shock. If attacked, it inflates its body to pump up its counterstrike.
+203	LONG NECK	4'11"	91.0	Its tail has a small brain of its own. Beware! If you get close, it may react to your scent and bite.
+204	BAGWORM	2'00"	16.0	It likes to make its shell thicker by adding layers of tree bark. The additional weight doesn't bother it.
+205	BAGWORM	3'11"	277.0	Its entire body is shielded by a steel-hard shell. What lurks inside the armor is a total mystery.
+206	LAND SNAKE	4'11"	31.0	When spotted, this POKéMON escapes backward by furiously boring into the ground with its tail.
+207	FLYSCORPIO	3'07"	143.0	It flies straight at its target's face then clamps down on the startled victim to inject poison.
+208	IRON SNAKE	30'02"	882.0	Its body has been compressed deep under the ground. As a result, it is even harder than a diamond.
+209	FAIRY	2'00"	17.0	Although it looks frightening, it is actually kind and affectionate. It is very popular among women.
+210	FAIRY	4'07"	107.0	It is actually timid and easily spooked. If attacked, it flails about to fend off its attacker.
+211	BALLOON	1'08"	9.0	To fire its poison spikes, it must inflate its body by drinking over 2.6 gallons of water all at once.
+212	SCISSORS	5'11"	260.0	It swings its eyepatterned pincers up to scare its foes. This makes it look like it has three heads.
+213	MOLD	2'00"	45.0	The BERRIES it stores in its vase-like shell decompose and become a gooey liquid.
+214	SINGLEHORN	4'11"	119.0	This powerful POKéMON thrusts its prized horn under its enemies' bellies then lifts and throws them.
+215	SHARP CLAW	2'11"	62.0	Its paws conceal sharp claws. If attacked, it suddenly extends the claws and startles its enemy.
+216	LITTLEBEAR	2'00"	19.0	If it finds honey, its crescent mark glows. It always licks its paws because they are soaked with honey.
+217	HIBERNANT	5'11"	277.0	Although it is a good climber, it prefers to snap trees with its forelegs and eat fallen BERRIES.
+218	LAVA	2'04"	77.0	It never sleeps. It has to keep moving because if it stopped, its magma body would cool and harden.
+219	LAVA	2'07"	121.0	The shell on its back is just skin that has cooled and hardened. It breaks easily with a slight touch.
+220	PIG	1'04"	14.0	It rubs its snout on the ground to find and dig up food. It sometimes discovers hot springs.
+221	SWINE	3'07"	123.0	Because the long hair all over its body obscures its sight, it just keeps charging repeatedly.
+222	CORAL	2'00"	11.0	It continuously sheds and grows. The tip of its head is prized as a treasure for its beauty.
+223	JET	2'00"	26.0	It has superb accuracy. The water it shoots out can strike even moving prey from more than 300 feet.
+224	JET	2'11"	63.0	It traps enemies with its suctioncupped tentacles then smashes them with its rock-hard head.
+225	DELIVERY	2'11"	35.0	It carries food all day long. There are tales about lost people who were saved by the food it had.
+226	KITE	6'11"	485.0	As it majestically swims, it doesn't care if REMORAID attach to it for scavenging its leftovers.
+227	ARMOR BIRD	5'07"	111.0	Its sturdy wings look heavy, but they are actually hollow and light, allowing it to fly freely in the sky.
+228	DARK	2'00"	24.0	It uses different kinds of cries for communicating with others of its kind and for pursuing its prey.
+229	DARK	4'07"	77.0	If you are burned by the flames it shoots from its mouth, the pain will never go away.
+230	DRAGON	5'11"	335.0	It is said that it usually hides in underwater caves. It can create whirlpools by yawning.
+231	LONG NOSE	1'08"	74.0	It swings its long snout around playfully, but because it is so strong, that can be dangerous.
+232	ARMOR	3'07"	265.0	It has sharp, hard tusks and a rugged hide. Its TACKLE is strong enough to knock down a house.
+233	VIRTUAL	2'00"	72.0	This upgraded version of PORYGON is designed for space exploration. It can't fly, though.
+234	BIG HORN	4'07"	157.0	The curved antlers subtly change the flow of air to create a strange space where reality is distorted.
+235	PAINTER	3'11"	128.0	A special fluid oozes from the tip of its tail. It paints the fluid everywhere to mark its territory.
+236	SCUFFLE	2'04"	46.0	It is always bursting with energy. To make itself stronger, it keeps on fighting even if it loses.
+237	HANDSTAND	4'07"	106.0	If you become enchanted by its smooth, elegant, dance-like kicks, you may get drilled hard.
+238	KISS	1'04"	13.0	Its lips are the most sensitive parts on its body. It always uses its lips first to examine things.
+239	ELECTRIC	2'00"	52.0	It rotates its arms to generate electricity, but it tires easily, so it charges up only a little bit.
+240	LIVE COAL	2'04"	47.0	Each and every time it inhales and exhales, hot embers dribble out of its mouth and nostrils.
+241	MILK COW	3'11"	166.0	Its milk is packed with nutrition, making it the ultimate beverage for the sick or weary.
+242	HAPPINESS	4'11"	103.0	Anyone who takes even one bite of BLISSEY's egg becomes unfailingly caring and pleasant to everyone.
+243	THUNDER	6'03"	392.0	The rain clouds it carries let it fire thunderbolts at will. They say that it descended with lightning.
+244	VOLCANO	6'11"	437.0	Volcanoes erupt when it barks. Unable to restrain its extreme power, it races headlong around the land.
+245	AURORA	6'07"	412.0	Said to be the reincarnation of north winds, it can instantly purify filthy, murky water.
+246	ROCK SKIN	2'00"	159.0	It feeds on soil. After it has eaten a large mountain, it will fall asleep so it can grow.
+247	HARD SHELL	3'11"	335.0	Its shell is as hard as sheet rock, and it is also very strong. Its THRASHING can topple a mountain.
+248	ARMOR	6'07"	445.0	Its body can't be harmed by any sort of attack, so it is very eager to make challenges against enemies.
+249	DIVING	17'01"	476.0	It is said that it quietly spends its time deep at the bottom of the sea because its powers are too strong.
+250	RAINBOW	12'06"	439.0	Legends claim this POKéMON flies the world's skies continuously on its magnificent sevencolored wings.
+251	TIMETRAVEL	2'00"	11.0	This POKéMON wanders across time. Grass and trees flourish in the forests in which it has appeared.

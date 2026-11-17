@@ -636,7 +636,7 @@ public class Battle {
 		f.chargeSlot = -1;
 		f.invulnerable = null;
 		if (wasHidden) out.add(Event.sendOut(s, s == 0 ? active : enemy, att.hp));
-		out.add(Event.of(Event.Kind.ATTACK, s));
+		out.add(new Event(Event.Kind.ATTACK, s, m.id(), 0, 0));
 		boolean targetsFoe = targetsFoe(m);
 		// Protect, Fly and Dig.
 		if (targetsFoe && g.protecting) {

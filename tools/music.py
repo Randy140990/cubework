@@ -263,6 +263,18 @@ def step(c, tempo, pitches, drums, frame, first_loop_hits):
                 else:
                     c.loops[c.pc] = n + 1
                     c.pc = target
+        elif op == "square_note":
+            # A sound effect's note: length in frames, volume, fade, and the Game Boy's raw frequency.
+            c.wait = num(a[0]) + 1
+            c.volume, c.fade = num(a[1]), num(a[2]) & 15 if num(a[2]) >= 0 else (8 | (-num(a[2]) & 7))
+            start_freq(c, pitches, num(a[3]) & 0x7FF)
+            return
+        elif op == "noise_note":
+            c.wait = num(a[0]) + 1
+            c.drum = [(num(a[0]), num(a[1]), num(a[2]), num(a[3]))]
+            c.drum_wait = 0
+            c.on = True
+            return
         elif op in ("note", "rest", "drum_note"):
             if op == "drum_note":
                 length = num(a[1])
@@ -292,6 +304,10 @@ def start_note(c, pitches, pitch):
     f = frequency(pitches, pitch, c.octave)
     if c.perfect:
         f += 1
+    start_freq(c, pitches, f)
+
+
+def start_freq(c, pitches, f):
     c.base_freq = f
     c.freq = f
     c.on = c.volume > 0 or c.index == 3 and c.volume > 0
@@ -471,7 +487,15 @@ def song_files(folder):
             songs[m.group(1)] = chans
     # A few jingles that play like music (levelling up, a catch, an item).
     jingles = {"Level_Up": "level_up", "Caught_Mon": "caught_mon", "Get_Item1_1": "get_item", "Get_Key_Item_1": "get_key_item", "Dex_Page_Added": "dex_page_added",
-               "Get_Item2_1": "get_item2"}
+               "Get_Item2_1": "get_item2",
+               # The little sounds: menus, text, bumps, and a battle's balls, hits and faints.
+               "Press_AB_1": "sfx_press", "Start_Menu_1": "sfx_menu", "Collision_1": "sfx_bump", "Save_1": "sfx_save", "Swap_1": "sfx_swap",
+               "Tink_1": "sfx_tink", "Go_Inside_1": "sfx_door", "Ball_Toss": "sfx_ball_toss", "Ball_Poof": "sfx_ball_poof", "Faint_Fall": "sfx_faint_fall",
+               "Faint_Thud": "sfx_faint_thud", "Run": "sfx_run", "Damage": "sfx_damage", "Super_Effective": "sfx_super", "Not_Very_Effective": "sfx_weak",
+               "Pound": "sfx_pound", "Peck": "sfx_peck", "Vine_Whip": "sfx_vine", "Psybeam": "sfx_psybeam", "Psychic_M": "sfx_psychic",
+               "Trainer_Appeared": "sfx_trainer", "Heal_HP_2": "sfx_heal_hp", "Purchase_3": "sfx_purchase", "Denied_3": "sfx_denied",
+               "Switch_3": "sfx_switch", "Ledge_3": "sfx_ledge", "Battle_0C": "sfx_tackle", "Battle_13": "sfx_gust", "Battle_2C": "sfx_ember",
+               "Battle_29": "sfx_water", "Battle_31": "sfx_thunder", "Battle_24": "sfx_ice", "Shrink_3": "sfx_shrink"}
     for hf in sorted(os.listdir(os.path.join(folder, "audio/headers"))):
         if not hf.startswith("sfxheaders"):
             continue

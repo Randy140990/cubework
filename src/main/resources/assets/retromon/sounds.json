@@ -2780,5 +2780,278 @@
     "volume": 0.7
    }
   ]
+ },
+ "sfx.ball_poof": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_ball_poof",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.ball_toss": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_ball_toss",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.bump": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_bump",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.damage": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_damage",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.denied": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_denied",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.door": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_door",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.ember": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_ember",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.faint_fall": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_faint_fall",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.faint_thud": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_faint_thud",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.gust": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_gust",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.heal_hp": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_heal_hp",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.ice": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_ice",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.ledge": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_ledge",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.menu": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_menu",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.peck": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_peck",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.pound": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_pound",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.press": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_press",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.psybeam": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_psybeam",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.psychic": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_psychic",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.purchase": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_purchase",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.run": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_run",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.save": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_save",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.shrink": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_shrink",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.super": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_super",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.swap": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_swap",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.switch": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_switch",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.tackle": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_tackle",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.thunder": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_thunder",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.tink": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_tink",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.trainer": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_trainer",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.vine": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_vine",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.water": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_water",
+    "volume": 0.8
+   }
+  ]
+ },
+ "sfx.weak": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_weak",
+    "volume": 0.8
+   }
+  ]
+ },
+ "music.dex_page_added": {
+  "sounds": [
+   {
+    "name": "retromon:music/dex_page_added",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
  }
 }

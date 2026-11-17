@@ -18,6 +18,12 @@ public final class Places {
 
 	public static final Map<String, Place> ALL = new LinkedHashMap<>();
 	public static final Map<String, Mart> MARTS = new LinkedHashMap<>();
+	/** Each Kanto map's size in steps (width, height), for laying the games' people out on a marked place. */
+	public static final Map<String, int[]> SIZES = new LinkedHashMap<>();
+
+	public static int[] size(String place) {
+		return SIZES.get(place);
+	}
 
 	public static Place get(String id) {
 		return id == null ? null : ALL.get(id);
@@ -32,6 +38,7 @@ public final class Places {
 	}
 
 	static {
+		for (String[] r : Species.table("sizes.tsv")) SIZES.put(r[0], new int[] {Integer.parseInt(r[1]), Integer.parseInt(r[2])});
 		for (String[] r : Species.table("places.tsv")) {
 			// Johto's maps reuse some Kanto ids (its Kanto half): the first (Yellow's) wins.
 			ALL.putIfAbsent(r[0], new Place(r[0], r[1], r[2], r[3], r[4]));

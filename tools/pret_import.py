@@ -562,7 +562,7 @@ def kanto_people():
     classes = trainer_classes()
     texts = text_blocks(YELLOW)
     places_set = KANTO_PLACES
-    trainers, people = [], []
+    trainers, people, balls = [], [], []
     objdir = os.path.join(YELLOW, "data/maps/objects")
     for f in sorted(os.listdir(objdir)):
         mapname = f[:-4]
@@ -576,6 +576,7 @@ def kanto_people():
         headers = re.findall(r"trainer (EVENT_\w+),\s*(\d+),\s*(\w+),\s*(\w+),\s*(\w+)", sc)
         n_trainer = 0
         n_person = 0
+        n_ball = 0
         for om in re.finditer(r"object_event\s+(\d+),\s*(\d+),\s*(SPRITE_\w+),\s*(\w+),\s*(\w+),\s*(TEXT_\w+)(?:,\s*(\w+)(?:,\s*(\d+))?)?", obj):
             x, y, sprite, move, facing, tconst, opp, idx = om.groups()
             sprite = sprite.replace("SPRITE_", "").lower()
@@ -619,6 +620,9 @@ def kanto_people():
                     title = info["name"]
                 trainers.append((key, place, title, sprite, facing.lower(), sight, info["money"], ",".join(f"{sp}:{lv}" for lv, sp in party), badge,
                                  " | ".join(before) or "-", " | ".join(defeat) or "-", " | ".join(after) or "-", x, y))
+            elif sprite == "poke_ball" and opp and not opp.isdigit():
+                balls.append((f"{place}_i{n_ball}", place, opp.lower(), x, y))
+                n_ball += 1
             elif not opp or not opp.isdigit():
                 lines = resolve(label, scripts, texts) if label else []
                 if not lines or sprite in ("poke_ball", "boulder", "fossil", "paper", "clipboard", "snorlax", "pokedex", "lying_old_man_unused_1"):
@@ -626,7 +630,31 @@ def kanto_people():
                 key = f"{place}_p{n_person}"
                 n_person += 1
                 people.append((key, place, sprite, facing.lower(), move.lower(), " | ".join(lines), x, y))
-    return trainers, people
+    return trainers, people, balls
+
+
+def dex_entries():
+    """Gold's Pokédex entries, in dex order: category, height, weight and the entry's text."""
+    base = os.path.join(GOLD, "data/pokemon")
+    files = dict(re.findall(r"(\w+)PokedexEntry::\s+INCLUDE \"([^\"]+)\"", read(os.path.join(base, "dex_entries_gold.asm"))))
+    order = re.findall(r"dw (\w+)PokedexEntry", read(os.path.join(base, "dex_entry_pointers.asm")))
+    out = []
+    for i, lab in enumerate(order):
+        src = read(os.path.join(GOLD, files[lab]))
+        cat = re.search(r'db "([^"@]*)@?" ; species name', src).group(1)
+        h, w = map(int, re.search(r"dw (\d+), (\d+) ; height, weight", src).groups())
+        lines = re.findall(r'(?:db|next|page)\s+"([^"]*)"', src.split("height, weight", 1)[1])
+        text = clean(" ".join(l.replace("@", "") for l in lines)).replace("- ", "")
+        out.append((i + 1, cat, f"{h // 100}'{h % 100:02d}\"", f"{w / 10:.1f}", text))
+    return out
+
+
+def map_sizes():
+    """Each Kanto map's size in steps (the games give it in 2x2-step blocks)."""
+    out = []
+    for c, w, h in re.findall(r"map_const (\w+),\s*(\d+),\s*(\d+)", read(os.path.join(YELLOW, "constants/map_constants.asm"))):
+        out.append((ident(c), int(w) * 2, int(h) * 2))
+    return out
 
 
 # ---------- write ----------
@@ -676,7 +704,10 @@ def main():
     wrows, kanto_species = wild()
     write_tsv("wild.tsv", ["place", "method", "time", "rate_per_256", "slots species:level:weight"],
               [(p, k, t, r, ",".join(f"{sp}:{lv}:{w}" for sp, lv, w in sl)) for p, k, t, r, sl in wrows])
-    tr, pe = kanto_people()
+    tr, pe, balls = kanto_people()
+    write_tsv("field_items.tsv", ["key", "place", "item", "x", "y"], balls)
+    write_tsv("sizes.tsv", ["place", "width_steps", "height_steps"], map_sizes())
+    write_tsv("dex.tsv", ["dex", "category", "height", "weight_lbs", "text"], dex_entries())
     write_tsv("trainers.tsv", ["key", "place", "title", "sprite", "facing", "sight", "money", "party species:level", "badge", "before", "defeat", "after", "x", "y"], tr)
     write_tsv("people.tsv", ["key", "place", "sprite", "facing", "movement", "lines", "x", "y"], pe)
     print(len(tr), "trainers,", len(pe), "people")

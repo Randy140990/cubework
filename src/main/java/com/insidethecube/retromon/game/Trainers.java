@@ -54,6 +54,29 @@ public final class Trainers {
 	public static final Map<String, Trainer> ALL = new LinkedHashMap<>();
 	public static final Map<String, Person> PEOPLE = new LinkedHashMap<>();
 	public static final Map<String, Static> STATICS = new LinkedHashMap<>();
+	/** Where each trainer and person stood in the games: their map's x, y in steps. */
+	public static final Map<String, int[]> POS = new LinkedHashMap<>();
+
+	/** An item lying in a Poké Ball on the map (the games' item balls). */
+	public record FieldItem(String key, String place, String item, int x, int y) {}
+
+	public static final Map<String, FieldItem> FIELD_ITEMS = new LinkedHashMap<>();
+
+	public static List<Person> peopleIn(String place) {
+		return PEOPLE.values().stream().filter(p -> p.place().equals(place)).toList();
+	}
+
+	public static List<FieldItem> itemsIn(String place) {
+		return FIELD_ITEMS.values().stream().filter(i -> i.place().equals(place)).toList();
+	}
+
+	private static int num(String[] r, int i) {
+		try {
+			return i < r.length ? Integer.parseInt(r[i].trim()) : -1;
+		} catch (NumberFormatException e) {
+			return -1;
+		}
+	}
 
 	private static List<String> lines(String s) {
 		if (s == null || s.equals("-") || s.isEmpty()) return List.of();
@@ -76,8 +99,17 @@ public final class Trainers {
 			if (team.isEmpty()) continue;
 			ALL.put(r[0], new Trainer(r[0], r[1], r[2], r[3], r[4], Integer.parseInt(r[5]), Integer.parseInt(r[6]), List.copyOf(team),
 					r[8].equals("-") ? null : r[8], lines(r[9]), lines(r[10]), lines(r[11])));
+			POS.put(r[0], new int[] {num(r, 12), num(r, 13)});
 		}
-		for (String[] r : Species.table("people.tsv")) PEOPLE.put(r[0], new Person(r[0], r[1], r[2], r[3], r[4], lines(r[5])));
+		for (String[] r : Species.table("people.tsv")) {
+			PEOPLE.put(r[0], new Person(r[0], r[1], r[2], r[3], r[4], lines(r[5])));
+			POS.put(r[0], new int[] {num(r, 6), num(r, 7)});
+		}
+		for (String[] r : Species.table("field_items.tsv")) {
+			// The Power Plant's "items" that are really VOLTORB and ELECTRODE stay as they are in the statics.
+			if (Species.ALL.containsKey(r[2])) continue;
+			FIELD_ITEMS.put(r[0], new FieldItem(r[0], r[1], r[2], num(r, 3), num(r, 4)));
+		}
 		for (String[] r : Species.table("statics.tsv")) {
 			if (Species.ALL.containsKey(r[1])) STATICS.put(r[0], new Static(r[0], r[1], Integer.parseInt(r[2]), r[3], r[4], r[5]));
 		}

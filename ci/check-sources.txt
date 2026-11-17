@@ -1,14 +1,9 @@
-grep (setTimeFromServer|setDayTime|tickTime|getDayTime|class.ClientLevelData) net/minecraft/client/multiplayer/ClientLevel.java
-grep (record.PlayerSkin|public.static|PlayerSkin.insecure|PlayerSkin\() net/minecraft/world/entity/player/PlayerSkin.java
-grep (getSkin|PlayerSkin) net/minecraft/client/player/AbstractClientPlayer.java
-grep (interface|record) net/minecraft/core/ClientAsset.java
-grep (public.static.void.renderEntityInInventory) net/minecraft/client/gui/screens/inventory/InventoryScreen.java
-grep (default.int.getMaxY|default.int.getMinY|int.getHeight\() net/minecraft/world/level/LevelHeightAccessor.java
-grep (GUST|CHERRY_LEAVES|ELECTRIC_SPARK|SNOWFLAKE|SOUL_FIRE_FLAME|DRAGON_BREATH|SQUID_INK|ENCHANTED_HIT|WITCH|SPLASH|BUBBLE.=|CLOUD|POOF|HAPPY_VILLAGER|FLAME.=|CRIT.=|NOTE|END_ROD|DUST_PLUME|SCULK_SOUL|SPORE_BLOSSOM_AIR|TOTEM|EXPLOSION.=|SMOKE.=|LARGE_SMOKE|HEART|GLOW.=|FIREWORK|TRIAL_SPAWNER_DETECTED|INFESTED|WHITE_SMOKE|SNEEZE|WAX_ON|ELECTRIC|SONIC_BOOM) net/minecraft/core/particles/ParticleTypes.java
-grep (public.void.addParticle|public.void.addAlwaysVisibleParticle) net/minecraft/client/multiplayer/ClientLevel.java
-grep (pauseAllExcept|case.*PAUSE|PauseScreen\() net/minecraft/client/Minecraft.java
-grep (public.PauseScreen) net/minecraft/client/gui/screens/PauseScreen.java
-grep (public.int.getHeight|Heightmap.Types) net/minecraft/world/level/Level.java
-grep (public.boolean.charTyped|public.boolean.keyPressed|public.boolean.mouseClicked) net/minecraft/client/gui/screens/Screen.java
-grep (record.CharacterEvent|codepoint|public) net/minecraft/client/input/CharacterEvent.java
-data version.json
+grep (DayTime|TimeOfDay|timeOfDay|getSunAngle|getGameTime|ClockManager|clock) net/minecraft/world/level/Level.java
+grep (DayTime|TimeOfDay|timeOfDay|ClientLevelData|clock|Clock) net/minecraft/client/multiplayer/ClientLevel.java
+grep (handleSetTime|DayTime|setTime) net/minecraft/client/multiplayer/ClientPacketListener.java
+grep (DayTime|TimeOfDay|timeOfDay) net/minecraft/client/renderer/LevelRenderer.java
+grep (DayTime|TimeOfDay|timeOfDay|getSunAngle) net/minecraft/client/renderer/SkyRenderer.java
+grep (enum|SLIM|WIDE) net/minecraft/world/entity/player/PlayerModelType.java
+grep (ResourceTexture\(|public) net/minecraft/core/ClientAsset.java
+grep (DayTime|dayTime) net/minecraft/world/level/storage/LevelData.java
+grep (DayTime|dayTime) net/minecraft/world/level/storage/WritableLevelData.java
