@@ -1,0 +1,8 @@
+{
+ "scale": 1,
+ "idle": "animation.geodude.battle_idle",
+ "ground": "animation.geodude.ground_idle",
+ "texture": "kantojohto:textures/pokemon/geodude.png",
+ "layers": [],
+ "height": 0.5
+}

@@ -1,0 +1,58 @@
+{
+ "cry.bulbasaur": {
+  "sounds": [
+   {
+    "name": "kantojohto:cry/bulbasaur",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.charmander": {
+  "sounds": [
+   {
+    "name": "kantojohto:cry/charmander",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.squirtle": {
+  "sounds": [
+   {
+    "name": "kantojohto:cry/squirtle",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.pidgey": {
+  "sounds": [
+   {
+    "name": "kantojohto:cry/pidgey",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.rattata": {
+  "sounds": [
+   {
+    "name": "kantojohto:cry/rattata",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.geodude": {
+  "sounds": [
+   {
+    "name": "kantojohto:cry/geodude",
+    "volume": 0.8
+   }
+  ]
+ },
+ "cry.onix": {
+  "sounds": [
+   {
+    "name": "kantojohto:cry/onix",
+    "volume": 0.8
+   }
+  ]
+ }
+}

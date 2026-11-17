@@ -1,0 +1,8 @@
+{
+ "scale": 0.7,
+ "idle": "animation.pidgey.ground_idle",
+ "ground": "animation.pidgey.ground_idle",
+ "texture": "kantojohto:textures/pokemon/pidgey.png",
+ "layers": [],
+ "height": 0.7
+}

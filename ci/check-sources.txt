@@ -1,10 +1,5 @@
-grep (COMPOUND_TAG|TRUSTED_COMPOUND|STRING_UTF8|public.static.final.StreamCodec<ByteBuf,.(Integer|Boolean|Float|String)>) net/minecraft/network/codec/ByteBufCodecs.java
-grep (public|<T>) net/minecraft/world/level/gamerules/GameRules.java
-grep (setGameMode|public.boolean.setGameMode|gameMode\.) net/minecraft/server/level/ServerPlayer.java
-grep (public.static.RenderType.entityCutout|public.static.RenderType.eyes|public.static.RenderType.entityTranslucent|public.static.RenderType.entitySolid) net/minecraft/client/renderer/rendertype/RenderTypes.java
-grep (STEP_HEIGHT|MOVEMENT_SPEED) net/minecraft/world/entity/ai/attributes/Attributes.java
-grep (public.void.render|public.void.translateAndRotate|xScale|resetPose|getInitialPose|public.float.xRot|public.void.setPos|visible|skipDraw|getAllParts|getChild) net/minecraft/client/model/geom/ModelPart.java
-grep (public.static.SimpleSoundInstance.forUI) net/minecraft/client/resources/sounds/SimpleSoundInstance.java
-grep (NOTE_BLOCK_BELL|NOTE_BLOCK_CHIME|NOTE_BLOCK_HARP|EXPERIENCE_ORB_PICKUP|PLAYER_LEVELUP|PLAYER_HURT\b|GENERIC_HURT) net/minecraft/sounds/SoundEvents.java
-grep (public.static.final.ModelLayerLocation.PLAYER\b|PLAYER_SLIM|ZOMBIE\b) net/minecraft/client/model/geom/ModelLayers.java
-grep (public|createMesh) net/minecraft/client/model/HumanoidModel.java
+grep (getGameRules|setWeatherParameters|getRespawnData) net/minecraft/server/level/ServerLevel.java
+grep (getGameRules|getRespawnData|setWeatherParameters) net/minecraft/world/level/Level.java
+grep (public.void.addEntity|public.void.removeEntity) net/minecraft/client/multiplayer/ClientLevel.java
+grep (public.final.void.snapTo|public.void.snapTo|public.void.setId|public.void.moveTo|public.void.absSnapTo) net/minecraft/world/entity/Entity.java
+grep (public.boolean.matches|public.static.Category|register) net/minecraft/client/KeyMapping.java

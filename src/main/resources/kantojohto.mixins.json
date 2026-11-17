@@ -4,7 +4,12 @@
 	"package": "com.insidethecube.kantojohto.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [],
-	"client": [],
+	"client": [
+		"CameraMixin",
+		"KeyboardInputMixin",
+		"MouseHandlerMixin",
+		"GameRendererMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}

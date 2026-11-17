@@ -1,0 +1,20 @@
+{
+ "scale": 0.625,
+ "idle": "animation.charmander.battle_idle",
+ "ground": "animation.charmander.ground_idle",
+ "texture": "kantojohto:textures/pokemon/charmander.png",
+ "layers": [
+  {
+   "frames": [
+    "kantojohto:textures/pokemon/charmander_layer0_0.png",
+    "kantojohto:textures/pokemon/charmander_layer0_1.png",
+    "kantojohto:textures/pokemon/charmander_layer0_2.png",
+    "kantojohto:textures/pokemon/charmander_layer0_3.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "height": 1.3
+}

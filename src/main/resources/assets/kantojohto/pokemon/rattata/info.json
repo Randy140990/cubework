@@ -1,0 +1,8 @@
+{
+ "scale": 0.8,
+ "idle": "animation.rattata.ground_idle",
+ "ground": "animation.rattata.ground_idle",
+ "texture": "kantojohto:textures/pokemon/rattata.png",
+ "layers": [],
+ "height": 0.5
+}

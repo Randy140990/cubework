@@ -1,0 +1,8 @@
+{
+ "scale": 0.7,
+ "idle": "animation.squirtle.ground_idle",
+ "ground": null,
+ "texture": "kantojohto:textures/pokemon/squirtle.png",
+ "layers": [],
+ "height": 1.2
+}
