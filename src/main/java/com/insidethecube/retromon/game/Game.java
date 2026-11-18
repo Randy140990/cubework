@@ -189,23 +189,67 @@ public final class Game {
 		BlockPos feet = p.blockPosition();
 		// (Grass counts in the north half of town only: a tuft by a house down south isn't the way out.)
 		boolean inGrass = p.getZ() < (town.z1() + town.z2()) / 2.0 && (grass(level.getBlockState(feet)) || grass(level.getBlockState(feet.above())));
-		boolean leaving = inTown ? p.getZ() < town.z1() + 7 || inGrass : placeAt(p.getX(), p.getZ()) != null;
+		boolean leaving = outOfTown(level, town, p.getX(), p.getY(), p.getZ());
 		if (inTown && !leaving) {
 			// Where to put you back: only good ground (not the top of a fence, not in the grass).
 			if (p.onGround() && p.getZ() > town.z1() + 10 && goodGround(level, feet)) SAFE.put(p.getUUID(), feet);
 			return;
 		}
 		if (!leaving) return;
-		BlockPos back = SAFE.get(p.getUUID());
-		if (back == null) {
-			int x = Math.max(town.x1() + 4, Math.min(town.x2() - 4, p.getBlockX()));
-			back = spot(level, x, town.z1() + 14, 8);
+		// You stop where you are: back only the step you've just taken, to the last place you stood in town.
+		Vec3 last = lastWhere(p, v -> town.contains(v.x, v.z) && !outOfTown(level, town, v.x, v.y, v.z));
+		if (last != null) stopAt(p, last);
+		else {
+			BlockPos back = SAFE.get(p.getUUID());
+			if (back == null) {
+				int x = Math.max(town.x1() + 4, Math.min(town.x2() - 4, p.getBlockX()));
+				back = spot(level, x, town.z1() + 14, 8);
+			}
+			stopAt(p, new Vec3(back.getX() + 0.5, back.getY(), back.getZ() + 0.5));
 		}
-		p.teleportTo(back.getX() + 0.5, back.getY(), back.getZ() + 0.5);
 		BUSY.put(p.getUUID(), 200);
 		CompoundTag t = new CompoundTag();
 		t.putBoolean("stop", true);
 		Net.send(p, "intro", t);
+	}
+
+	/** Whether a spot's out of Pallet Town for Oak: the tree line at its north edge, the north half's tall grass, or another place. */
+	private static boolean outOfTown(ServerLevel level, Zone town, double x, double y, double z) {
+		if (!town.contains(x, z)) return placeAt(x, z) != null;
+		BlockPos feet = BlockPos.containing(x, y, z);
+		boolean inGrass = z < (town.z1() + town.z2()) / 2.0 && (grass(level.getBlockState(feet)) || grass(level.getBlockState(feet.above())));
+		return z < town.z1() + 7 || inGrass;
+	}
+
+	/** Where each player has stood lately, newest first (to stop them where they are, not throw them back). */
+	private static final Map<UUID, java.util.ArrayDeque<Vec3>> RECENT = new HashMap<>();
+
+	private static void recent(ServerPlayer p) {
+		if (!p.onGround()) return;
+		java.util.ArrayDeque<Vec3> r = RECENT.computeIfAbsent(p.getUUID(), k -> new java.util.ArrayDeque<>());
+		Vec3 here = p.position();
+		if (!r.isEmpty()) {
+			double d = r.peekFirst().distanceToSqr(here);
+			if (d < 0.04) return;
+			if (d > 64) r.clear();
+		}
+		r.addFirst(here);
+		while (r.size() > 40) r.removeLast();
+	}
+
+	/** The last place you stood that passes the test, or null. */
+	private static Vec3 lastWhere(ServerPlayer p, java.util.function.Predicate<Vec3> ok) {
+		java.util.ArrayDeque<Vec3> r = RECENT.get(p.getUUID());
+		if (r != null) for (Vec3 v : r) if (ok.test(v)) return v;
+		return null;
+	}
+
+	/** Stopped where you are: put just there, with nothing carrying you on. */
+	private static void stopAt(ServerPlayer p, Vec3 at) {
+		p.setDeltaMovement(Vec3.ZERO);
+		p.teleportTo(at.x, at.y, at.z);
+		java.util.ArrayDeque<Vec3> r = RECENT.get(p.getUUID());
+		if (r != null) r.clear();
 	}
 
 	/** Oak takes you to his lab: you're put outside its door (until it has an inside), facing it. */
@@ -315,7 +359,13 @@ public final class Game {
 		if (d.party.isEmpty() || d.beaten.contains("rival_lab")) return;
 		Trainers.Trainer t = rivalLab(p);
 		ServerLevel level = (ServerLevel) p.level();
-		Npc n = rivalNpc(p, "rival_lab", spot(level, p.getBlockX() + 5, p.getBlockZ() + 1, 4));
+		// He comes from the side of you away from Oak, so he never walks through him.
+		Vec3 from = new Vec3(5, 0, 1);
+		for (Npc oak : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(14), o -> o.key().equals(OAK_KEY))) {
+			Vec3 away = p.position().subtract(oak.position()).multiply(1, 0, 1);
+			if (away.lengthSqr() > 0.01) from = away.normalize().scale(5);
+		}
+		Npc n = rivalNpc(p, "rival_lab", spot(level, (int) Math.floor(p.getX() + from.x), (int) Math.floor(p.getZ() + from.z), 3));
 		if (n == null) talkBattle(p, null, t);
 		else walkUp(p, n, t, "meet_rival", null);
 	}
@@ -325,6 +375,14 @@ public final class Game {
 	/** Each player's rival when he's about (in the lab, on Route 22, at Oak's), and ticks left as he heads off. */
 	private static final Map<UUID, Npc> RIVALS = new HashMap<>();
 	private static final Map<UUID, Integer> RIVAL_LEAVING = new HashMap<>();
+	private static final int LEAVE_TICKS = 230;
+	/** Who's still looking at their battle's last words (till the battle screen closes, or 30 s). */
+	private static final Map<UUID, Integer> AFTER_BATTLE = new HashMap<>();
+
+	/** The battle screen's closed: the world goes on (your rival can head off). */
+	public static void battleClosed(ServerPlayer p) {
+		AFTER_BATTLE.remove(p.getUUID());
+	}
 
 	/** Whether a rival in the world is one the game's using (else he's left over in a save, and goes). */
 	static boolean rivalKnown(Npc n) {
@@ -359,7 +417,7 @@ public final class Game {
 				RIVAL_LEAVING.remove(id);
 				continue;
 			}
-			if (engaged(p) || WALKS.containsKey(id)) continue;
+			if (engaged(p) || WALKS.containsKey(id) || AFTER_BATTLE.containsKey(id)) continue;
 			PlayerData d = data(p);
 			boolean done = switch (n.key()) {
 				case "rival_lab" -> d.beaten.contains("rival_lab");
@@ -367,14 +425,19 @@ public final class Game {
 				default -> d.hasDex();
 			};
 			if (!done) continue;
+			// He stands and looks at you a moment, then walks off, and is gone once he's out of the way.
 			Integer left = RIVAL_LEAVING.get(id);
 			if (left == null) {
+				n.getNavigation().stop();
+				n.setFacing(n.yawTo(p));
+				RIVAL_LEAVING.put(id, LEAVE_TICKS);
+			} else if (left == LEAVE_TICKS - 30) {
 				Vec3 away = n.position().subtract(p.position()).multiply(1, 0, 1);
 				away = away.lengthSqr() < 0.01 ? new Vec3(-1, 0, 0) : away.normalize();
-				Vec3 to = n.position().add(away.scale(18));
-				n.getNavigation().moveTo(to.x, n.getY(), to.z, 1.1);
-				RIVAL_LEAVING.put(id, 90);
-			} else if (left <= 0 || n.distanceTo(p) > 16) {
+				Vec3 to = n.position().add(away.scale(24));
+				n.getNavigation().moveTo(to.x, n.getY(), to.z, 0.9);
+				RIVAL_LEAVING.put(id, left - 1);
+			} else if (left <= 0 || (left < LEAVE_TICKS - 30 && n.distanceTo(p) > 22)) {
 				n.discard();
 				RIVALS.remove(id);
 				RIVAL_LEAVING.remove(id);
@@ -392,6 +455,8 @@ public final class Game {
 		Battles.drop(p);
 		LAST.remove(p.getUUID());
 		BUSY.remove(p.getUUID());
+		RECENT.remove(p.getUUID());
+		AFTER_BATTLE.remove(p.getUUID());
 		setSpeed(1);
 	}
 
@@ -679,7 +744,9 @@ public final class Game {
 			if (p.getHealth() < p.getMaxHealth()) p.setHealth(p.getMaxHealth());
 			COOLDOWN.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			BUSY.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
-			if (s.getTickCount() % 10 == 0) enter(p, placeAt(p.getX(), p.getZ()));
+			AFTER_BATTLE.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
+			recent(p);
+			if (s.getTickCount() % 2 == 0) enter(p, placeAt(p.getX(), p.getZ()));
 			if (!data(p).started && !BUSY.containsKey(id)) oakStops(p);
 			if (s.getTickCount() % 5 == 0) story(p);
 			if (s.getTickCount() % 40 == 0) moonlight(p);
@@ -871,6 +938,19 @@ public final class Game {
 			return;
 		}
 		Vec3 target = alongTrail(trail, here, FOLLOW_GAP);
+		if (target.distanceTo(here) < FOLLOW_GAP - 0.25) {
+			// You've not walked far enough for it to follow your path (it's just come out, or you've just got
+			// here): it stands a step and a half off you, where it is if it's that far off already, else behind you.
+			Vec3 off = w != null ? w.position().subtract(here).multiply(1, 0, 1) : Vec3.ZERO;
+			if (off.lengthSqr() < 0.25) {
+				double yaw = Math.toRadians(p.getYRot());
+				off = new Vec3(Math.sin(yaw), 0, -Math.cos(yaw));
+			}
+			double far = Math.max(FOLLOW_GAP - 0.25, Math.min(FOLLOW_GAP, off.length()));
+			Vec3 at = here.add(off.normalize().scale(far));
+			BlockPos b = BlockPos.containing(at.x, here.y + 0.1, at.z);
+			if (level.getBlockState(b).getCollisionShape(level, b).isEmpty()) target = new Vec3(at.x, here.y, at.z);
+		}
 		if (w == null) {
 			FOLLOWERS.remove(uid);
 			w = placeMon(level, lead.species.id(), "follow:" + uid, target.x, target.y, target.z, p.getYRot());
@@ -1059,6 +1139,7 @@ public final class Game {
 	public static void afterBattle(ServerPlayer p) {
 		COOLDOWN.put(p.getUUID(), 60);
 		GRACE.put(p.getUUID(), 4);
+		AFTER_BATTLE.put(p.getUUID(), 600);
 	}
 
 	public static void blackout(ServerPlayer p) {
@@ -1208,17 +1289,25 @@ public final class Game {
 		if (!ourSave || !d.started || d.hasDex() || !"viridian_city".equals(d.place)) return false;
 		if (!place.matches("route_2(_.*)?") && !place.startsWith("viridian_forest") && !place.startsWith("pewter") && !place.startsWith("diglett")) return false;
 		ServerLevel level = (ServerLevel) p.level();
-		BlockPos back = VIRIDIAN_SAFE.get(p.getUUID());
-		if (back == null) {
-			Vec3 c = centreOf("viridian_city", level);
-			if (c == null) return false;
-			back = BlockPos.containing(c);
+		// You stop where you are: back only the step you've just taken out of Viridian.
+		Vec3 last = lastWhere(p, v -> "viridian_city".equals(placeAt(v.x, v.z)));
+		if (last != null) stopAt(p, last);
+		else {
+			BlockPos back = VIRIDIAN_SAFE.get(p.getUUID());
+			if (back == null) {
+				Vec3 c = centreOf("viridian_city", level);
+				if (c == null) return false;
+				back = BlockPos.containing(c);
+			}
+			stopAt(p, new Vec3(back.getX() + 0.5, back.getY(), back.getZ() + 0.5));
 		}
-		p.teleportTo(back.getX() + 0.5, back.getY(), back.getZ() + 0.5);
 		Npc man = null;
-		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(64), n -> n.key().equals(OLD_MAN))) man = n;
+		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(64), n -> n.key().equals(OLD_MAN)))
+			if (man == null || n.distanceTo(p) < man.distanceTo(p)) man = n;
 		if (man != null) man.talker = p;
-		dialogue(p, man, "talk", OLD_MAN_GRUMPY);
+		// The camera turns to him only if he's by you (he's across the road north); else it stays on you.
+		boolean near = man != null && man.distanceTo(p) < 12;
+		dialogue(p, man, "talk", OLD_MAN_GRUMPY, new CompoundTag(), near ? man.getId() : -1);
 		return true;
 	}
 

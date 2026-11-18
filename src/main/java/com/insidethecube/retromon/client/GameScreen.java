@@ -144,7 +144,7 @@ public abstract class GameScreen extends Screen {
 	protected void choice(GuiGraphics g, Choice c, int x, int y, int w, IntConsumer pick) {
 		// A soft glass card with a row of pills; the picked one cream with dark text (the newer games' lists).
 		int h = c.height(s);
-		Ui.round(g, x, y, w, h, 0xE6141B2E, 3 * s);
+		Ui.round(g, x, y, w, h, 0xE6123C38, 3 * s);
 		for (int i = 0; i < c.options.size(); i++) {
 			int ty = y + 6 * s + i * 13 * s;
 			int row = i;
@@ -255,7 +255,8 @@ public abstract class GameScreen extends Screen {
 			Ui.round(g, x + 2 * s, y + 2 * s, w - 4 * s, h - 4 * s, 0xFFFFF9EC, 3 * s);
 			if (speaker != null && !speaker.isEmpty()) {
 				int tw = Ui.boldWidth(f, speaker, s) + 16 * s;
-				Ui.round(g, x + 10 * s, y - 7 * s, tw, 13 * s, 0xFF26304A, 3 * s);
+				Ui.rr(g, x + 9 * s, y - 8 * s, tw + 2 * s, 15 * s, 7.5F * s, Ui.EDGE);
+				Ui.rr(g, x + 10 * s, y - 7 * s, tw, 13 * s, 6.5F * s, 0xFF123C38);
 				Ui.draw(g, f, Ui.bold(speaker), x + 18 * s, y - 4 * s, 0xFFFFFFFF, s, false);
 			}
 			layout(f, (w - 20 * s) / s);
@@ -267,7 +268,7 @@ public abstract class GameScreen extends Screen {
 			String b = left > 0 ? p[1].substring(0, Math.min(p[1].length(), left)) : "";
 			Ui.plain(g, f, a, x + 14 * s, y + 10 * s, Ui.CREAM_INK, s);
 			Ui.plain(g, f, b, x + 14 * s, y + 10 * s + 12 * s, Ui.CREAM_INK, s);
-			if (arrow && typedOut()) Ui.plain(g, f, "▼", x + w - 16 * s, y + h - 14 * s + ((ticks / 6) % 2) * s, 0xFFE5525C, s);
+			if (arrow && typedOut()) Ui.triangle(g, x + w - 14 * s, y + h - 11 * s + ((ticks / 6) % 2) * s, 8 * s, 2, 0xFFE5525C);
 		}
 	}
 

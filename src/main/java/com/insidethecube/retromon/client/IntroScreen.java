@@ -44,12 +44,12 @@ public class IntroScreen extends GameScreen {
 	}
 
 	private final Screen parent;
-	/** The opening (a shooting star across the night, as the handheld games' logo had) plays once each time the game's started. */
+	/** The opening (INSID3 TH3 CUB3 presents, fading in and out) plays once each time the game's started. */
 	private static boolean opened;
 	private volatile Step step = opened ? Step.TITLE : Step.OPENING;
 	/** Ticks into the opening, and since the title came up (its white flash, Charizard's roar). */
 	private int openTicks, titleTicks = 99;
-	private static final int OPEN_END = 84;
+	private static final int OPEN_END = 70;
 	private Choice menu;
 	/** The three save slots (Retromon, Retromon 2, Retromon 3): what's in each, read when the menu opens. */
 	private SlotInfo[] slotCards = new SlotInfo[SLOTS];
@@ -120,7 +120,6 @@ public class IntroScreen extends GameScreen {
 		super.tick();
 		if (step == Step.OPENING) {
 			openTicks++;
-			if (openTicks == 8) Sounds.sfx("star", 1F, 0.9F);
 			if (openTicks >= OPEN_END) toTitle();
 		}
 		if (titleTicks < 99) titleTicks++;
@@ -423,11 +422,17 @@ public class IntroScreen extends GameScreen {
 			case SLOTS -> {
 				if (confirm != null) {
 					if (confirm.key(e)) return true;
-					if (Ui.isB(e)) confirm = null;
-					else if (Ui.isA(e)) confirmed(confirm.at == 0);
+					if (Ui.isB(e)) {
+						confirm = null;
+						deleting = false;
+					} else if (Ui.isA(e)) confirmed(confirm.at == 0);
 					return true;
 				}
 				int n = SLOTS + 1;
+				if (e.key() == GLFW.GLFW_KEY_DELETE || e.key() == GLFW.GLFW_KEY_X) {
+					askDelete(slotAt);
+					return true;
+				}
 				if (Ui.isUp(e) || Ui.isLeft(e)) slotAt = Math.floorMod(slotAt - 1, n);
 				else if (Ui.isDown(e) || Ui.isRight(e)) slotAt = Math.floorMod(slotAt + 1, n);
 				else if (Ui.isB(e)) step = Step.MENU;
@@ -496,13 +501,37 @@ public class IntroScreen extends GameScreen {
 		confirm.at = 1;
 	}
 
+	/** Asked before a slot's game is deleted (moved aside to retromon-old-saves). */
+	private boolean deleting;
+
+	private void askDelete(int i) {
+		if (i < 0 || i >= SLOTS || slotCards[i] == null || slotCards[i].empty() || replacing) return;
+		Sounds.press();
+		slotAt = i;
+		deleting = true;
+		confirm = new Choice(List.of("YES, DELETE IT", "NO"));
+		confirm.at = 1;
+	}
+
 	private void confirmed(boolean yes) {
 		Sounds.press();
 		if (!yes) {
 			confirm = null;
+			deleting = false;
 			return;
 		}
 		confirm = null;
+		if (deleting) {
+			deleting = false;
+			SlotInfo c = slotCards[slotAt];
+			try {
+				if (c != null && c.folder() != null) moveAside(c.folder());
+			} catch (IOException e) {
+				Retromon.LOG.warn("Couldn't move slot {} aside", slotAt + 1, e);
+			}
+			readSlots();
+			return;
+		}
 		targetSlot = slotAt;
 		replaceTarget = true;
 		startOak();
@@ -786,11 +815,6 @@ public class IntroScreen extends GameScreen {
 			int big = Math.max(2, s * 3);
 			int tw = Ui.boldWidth(font, "RETROMON", big);
 			Ui.draw(g, font, Ui.bold("RETROMON"), (width - tw) / 2, height / 7, Ui.GOLD, big, true);
-			// The name's mark: a little twinkling star over the last O (as Pokémon has its accent).
-			int ox = (width - tw) / 2 + Ui.boldWidth(font, "RETROM", big) + Ui.boldWidth(font, "O", big) / 2;
-			float tw2 = 0.8F + 0.2F * (float) Math.sin((ticks + partial) * 0.25);
-			int ss = Math.round(9 * big * tw2);
-			Ui.icon(g, "emote/star", ox - ss / 2, height / 7 - ss + big, ss, 0xFFFFFFFF);
 			Ui.centred(g, font, "KANTO & JOHTO", width / 2, height / 7 + 12 * big, 0xFFE8ECFF, s, true);
 		}
 		int m = 8 * s;
@@ -833,72 +857,17 @@ public class IntroScreen extends GameScreen {
 		if (titleTicks < 14) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, 1 - (titleTicks + partial) / 14F));
 	}
 
-	/**
-	 * The opening: the night sky, stars twinkling; a shooting star streaks across with a trail of sparkles and
-	 * lands with a burst; INSID3 TH3 CUB3 fades in where it fell (as the handheld games' logo had its star);
-	 * then a white flash into the title. Any key or a click skips it.
-	 */
+	/** The opening: INSID3 TH3 CUB3 presents, fading in on the dark and out again, then a white flash into the title. */
 	private void drawOpening(GuiGraphics g, float t) {
 		g.fill(0, 0, width, height, 0xFF04050C);
-		java.util.Random r = new java.util.Random(11);
-		int px = Math.max(1, s);
-		for (int i = 0; i < 90; i++) {
-			int x = r.nextInt(Math.max(1, width)), y = r.nextInt(Math.max(1, height * 3 / 4));
-			float tw = 0.35F + 0.65F * (0.5F + 0.5F * (float) Math.sin(t * (0.08 + r.nextFloat() * 0.12) + r.nextFloat() * 6.3));
-			float in = Math.min(1, t / 14F);
-			g.fill(x, y, x + px, y + px, Ui.alpha(0xFFE8ECFF, tw * in * (0.4F + r.nextFloat() * 0.6F)));
-		}
-		// The star: across from the top right, slowing as it comes down.
-		float x0 = width * 1.05F, y0 = height * 0.12F, x1 = width * 0.5F, y1 = height * 0.52F;
-		float start = 8, land = 36;
-		float p = Math.max(0, Math.min(1, (t - start) / (land - start)));
-		float e = 1 - (1 - p) * (1 - p) * (1 - p);
-		if (t >= start) {
-			float hx = x0 + (x1 - x0) * e, hy = y0 + (y1 - y0) * e;
-			if (p < 1) {
-				// The trail: pixel squares behind it, smaller and fainter, with sparkles dropping off.
-				for (int k = 14; k >= 1; k--) {
-					float pk = Math.max(0, e - k * 0.028F);
-					float tx = x0 + (x1 - x0) * pk, ty = y0 + (y1 - y0) * pk;
-					int sz = Math.max(px, (int) ((15 - k) * 0.55F * px));
-					g.fill((int) tx - sz / 2, (int) ty - sz / 2, (int) tx + (sz + 1) / 2, (int) ty + (sz + 1) / 2,
-							Ui.alpha(k % 3 == 0 ? 0xFFFFE27A : 0xFFFFFFFF, (15 - k) / 15F * 0.85F));
-				}
-				java.util.Random sp = new java.util.Random((long) (t * 3));
-				for (int k = 0; k < 6; k++) {
-					float b = Math.max(0, e - sp.nextFloat() * 0.35F);
-					float sx = x0 + (x1 - x0) * b + (sp.nextFloat() - 0.5F) * 10 * px, sy = y0 + (y1 - y0) * b + sp.nextFloat() * 14 * px;
-					g.fill((int) sx, (int) sy, (int) sx + px, (int) sy + px, Ui.alpha(0xFFFFF4C0, 0.8F));
-				}
-				int hs = 5 * px;
-				Ui.glow(g, (int) hx, (int) hy, 14 * px, 14 * px, 0x18FFF0B0);
-				g.fill((int) hx - hs / 2, (int) hy - hs / 2, (int) hx + hs / 2 + 1, (int) hy + hs / 2 + 1, 0xFFFFFFFF);
-			} else {
-				// Landed: a burst of sparkles, and the star twinkling where it fell.
-				float since = t - land;
-				for (int k = 0; k < 16; k++) {
-					double a = Math.PI * 2 * k / 16;
-					float d = Math.min(1, since / 10F) * (22 + (k % 3) * 8) * px;
-					float fade = Math.max(0, 1 - since / 18F);
-					int sx = (int) (x1 + Math.cos(a) * d), sy = (int) (y1 + Math.sin(a) * d);
-					g.fill(sx, sy, sx + px * 2, sy + px * 2, Ui.alpha(k % 2 == 0 ? 0xFFFFE27A : 0xFFFFFFFF, fade));
-				}
-				float tw = 0.8F + 0.2F * (float) Math.sin(t * 0.35);
-				int ss = Math.round(14 * px * tw);
-				Ui.icon(g, "emote/star", (int) x1 - ss / 2, (int) y1 - ss / 2, ss, 0xFFFFFFFF);
-			}
-		}
-		// The maker's name under where it fell.
-		if (t > land + 2) {
-			float a = Math.min(1, (t - land - 2) / 12F);
-			int big = Math.max(2, s * 2);
-			String name = "INSID3 TH3 CUB3";
-			int nw = Ui.boldWidth(font, name, big);
-			Ui.draw(g, font, Ui.bold(name), (width - nw) / 2, (int) (y1 + 14 * px), Ui.alpha(0xFFFFFFFF, a), big, true);
-			Ui.centred(g, font, "presents", width / 2, (int) (y1 + 14 * px) + 12 * big, Ui.alpha(0xFFB8C0E0, a), s, true);
-		}
+		float a = Math.min(1, Math.max(0, (t - 6) / 14F)) * Math.min(1, Math.max(0, (OPEN_END - 14 - t) / 12F));
+		int big = Math.max(2, s * 2);
+		String name = "INSID3 TH3 CUB3";
+		int nw = Ui.boldWidth(font, name, big), y = height / 2 - 10 * s;
+		Ui.draw(g, font, Ui.bold(name), (width - nw) / 2, y, Ui.alpha(0xFFFFFFFF, a), big, true);
+		Ui.centred(g, font, "presents", width / 2, y + 12 * big, Ui.alpha(0xFFB8C0E0, a), s, true);
 		// Into white for the title.
-		if (t > OPEN_END - 12) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, Math.min(1, (t - (OPEN_END - 12)) / 12F)));
+		if (t > OPEN_END - 8) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, Math.min(1, (t - (OPEN_END - 8)) / 8F)));
 	}
 
 	/** A soft shadow on the ground under someone's feet. */
@@ -917,7 +886,6 @@ public class IntroScreen extends GameScreen {
 		int cx = width - 2 * 8 * s - tall / 3 - 6 * s, feet = boxTop + 2 * s;
 		Ui.glow(g, cx, feet - tall / 2, tall * 2 / 5, tall / 2, 0x0AFFF4D8);
 		shadow(g, cx, feet, tall);
-		boolean speaking = talk != null && !talk.typedOut();
 		Identifier who = switch (scene) {
 			case "hero" -> hero();
 			case "rival" -> RIVAL;
@@ -926,7 +894,8 @@ public class IntroScreen extends GameScreen {
 		// They look out at you (turned a little towards the text, the head straight on).
 		Figures.Batch b = Figures.batch(0, 0, width, height);
 		Figures.Fig f = b.person(who, cx, feet, tall).facing(-22).pitch(-2).look(22, 3).at(secs);
-		if (scene.equals("oak")) f.talk(speaking ? 1 : 0.25F);
+		// Oak talks with his hands the whole time (the same pace whether a line's typing or not).
+		if (scene.equals("oak")) f.talk(0.85F);
 		else if (scene.equals("hero")) {
 			// You, saying hello: a different greeting every couple of seconds.
 			int[] hi = {Figures.WAVE, Figures.WAVE_BOTH, Figures.CHEER, Figures.TADA};
@@ -957,9 +926,9 @@ public class IntroScreen extends GameScreen {
 			int idx = i;
 			boolean on = genderAt == i;
 			// The card: glass, its colour along the top, warmer and lit when it's the one.
-			Ui.round(g, x - s, top - s, cw + 2 * s, ch + 2 * s, on ? 0xFFFFFFFF : 0x40FFFFFF, 4 * s);
-			g.fillGradient(x, top, x + cw, top + ch, on ? Ui.darker(col[i], 0.55F) | 0xFF000000 : 0xF0141B2E, on ? 0xF0101626 : 0xF00D1222);
-			Ui.round(g, x, top, cw, 5 * s, col[i], 2 * s);
+			Ui.rr(g, x - s, top - s, cw + 2 * s, ch + 2 * s, 9 * s, on ? 0xFFFFFFFF : 0x40FFFFFF);
+			Ui.rrv(g, x, top, cw, ch, 8 * s, on ? Ui.darker(col[i], 0.55F) | 0xFF000000 : 0xF0123C38, on ? 0xF00E302D : 0xF00A2422);
+			Ui.rr(g, x + 6 * s, top + 3 * s, cw - 12 * s, 3 * s, 1.5F * s, col[i]);
 			int cx = x + cw / 2, feet = top + 12 * s + tall;
 			if (on) Ui.glow(g, cx, feet - tall / 2, cw / 2, tall / 2, 0x0EFFFFFF);
 			shadow(g, cx, feet, tall);
@@ -996,7 +965,7 @@ public class IntroScreen extends GameScreen {
 		int cw = Math.min(170 * s, width / 2 - 20 * s), cx = width / 2 + 10 * s;
 		int listH = names.height(s);
 		int ch = 26 * s + listH + (typing ? 30 * s : 0), cy = height / 2 - ch / 2;
-		Ui.round(g, cx, cy, cw, ch, 0xF0141B2E, 4 * s);
+		Ui.panel(g, cx, cy, cw, ch, s);
 		Ui.heading(g, font, namingRival ? "YOUR RIVAL'S NAME" : "YOUR NAME", cx + 10 * s, cy + 8 * s, Ui.TEXT, s);
 		choice(g, names, cx + 4 * s, cy + 20 * s, cw - 8 * s, this::pickName);
 		if (typing) {
@@ -1010,7 +979,8 @@ public class IntroScreen extends GameScreen {
 
 	/**
 	 * The three slots as cards side by side: a picture of where you were, your name and where, your badges, your
-	 * POKéDEX and time played, your party, and when you last played. An empty slot invites a new game. BACK below.
+	 * POKéDEX and time played, your party, and when you last played. An empty slot invites a new game; a full one
+	 * can be deleted (DELETE, or the Delete key). BACK below.
 	 */
 	private void drawSlots(GuiGraphics g) {
 		int m = 8 * s, gap = 8 * s;
@@ -1026,21 +996,35 @@ public class IntroScreen extends GameScreen {
 			boolean on = slotAt == k;
 			int y = top - (on ? 3 * s : 0);
 			SlotInfo c = slotCards[k];
-			Ui.round(g, x - s, y - s, cw + 2 * s, ch + 2 * s, on ? 0xFFFFFFFF : 0x40FFFFFF, 4 * s);
-			g.fillGradient(x, y, x + cw, y + ch, 0xF41A2440, 0xF40E1424);
-			// The picture (or, empty, a dim field with a plus).
+			// A rounded card: a rim all the way round (white when it's the one), the battle screen's teal glass.
+			float r = 9 * s;
+			Ui.rr(g, x + s, y + 3 * s, cw, ch, r, 0x60000000);
+			Ui.rr(g, x - 1.5F * s, y - 1.5F * s, cw + 3 * s, ch + 3 * s, r + 1.5F * s, on ? 0xFFFFFFFF : 0xFF4FB896);
+			Ui.rr(g, x, y, cw, ch, r, 0xF8123C38);
+			// The picture (or, empty, a dim field with a plus), set in with rounded corners.
+			int px = x + 4 * s, py = y + 4 * s, pw2 = cw - 8 * s, ph2 = picH - 4 * s;
 			if (c != null && c.picture() != null) {
 				int pw = c.picW(), ph = c.picH();
 				// Fills the frame, cut to fit.
-				float k1 = Math.max(cw / (float) pw, picH / (float) ph);
-				int sw = Math.round(cw / k1), sh = Math.round(picH / k1);
-				g.blit(RenderPipelines.GUI_TEXTURED, c.picture(), x, y, (pw - sw) / 2F, (ph - sh) / 2F, cw, picH, sw, sh, pw, ph);
+				float k1 = Math.max(pw2 / (float) pw, ph2 / (float) ph);
+				int sw = Math.round(pw2 / k1), sh = Math.round(ph2 / k1);
+				g.blit(RenderPipelines.GUI_TEXTURED, c.picture(), px, py, (pw - sw) / 2F, (ph - sh) / 2F, pw2, ph2, sw, sh, pw, ph);
 			} else {
-				g.fillGradient(x, y, x + cw, y + picH, 0xFF2A4A3A, 0xFF16261E);
-				if (c == null || c.empty()) Ui.centred(g, font, "+", x + cw / 2, y + picH / 2 - 8 * s, 0x90FFFFFF, Math.max(2, s * 2), true);
+				Ui.rr(g, px, py, pw2, ph2, r - 4 * s, 0xFF1E4A40);
+				if (c == null || c.empty()) Ui.centred(g, font, "+", x + cw / 2, py + ph2 / 2 - 8 * s, 0x90FFFFFF, Math.max(2, s * 2), true);
 			}
-			Ui.round(g, x + 4 * s, y + 4 * s, Ui.boldWidth(font, "SLOT " + (k + 1), s) + 8 * s, 11 * s, 0xC0101626, 2 * s);
-			Ui.draw(g, font, Ui.bold("SLOT " + (k + 1)), x + 8 * s, y + 6 * s, 0xFFFFFFFF, s, false);
+			corners(g, px, py, pw2, ph2, r - 4 * s, 0xFF123C38);
+			int tagW = Ui.boldWidth(font, "SLOT " + (k + 1), s) + 12 * s;
+			Ui.rr(g, px + 4 * s, py + 4 * s, tagW, 12 * s, 6 * s, 0xD0101626);
+			Ui.draw(g, font, Ui.bold("SLOT " + (k + 1)), px + 10 * s, py + 6 * s, 0xFFFFFFFF, s, false);
+			// A filled slot can be cleared: DELETE in its corner.
+			if (c != null && !c.empty() && !replacing) {
+				int dw = Ui.boldWidth(font, "DELETE", s) + 12 * s, dx = px + pw2 - dw - 4 * s, dy = py + 4 * s;
+				boolean overDel = confirm == null && over(dx, dy, dw, 12 * s);
+				Ui.rr(g, dx, dy, dw, 12 * s, 6 * s, overDel ? 0xFFE5525C : 0xB0101626);
+				Ui.draw(g, font, Ui.bold("DELETE"), dx + 6 * s, dy + 2 * s, 0xFFFFFFFF, s, false);
+				if (confirm == null) hit(dx, dy, dw, 12 * s, () -> askDelete(idx));
+			}
 			int ty = y + picH + 6 * s, tx = x + 7 * s;
 			if (c == null || c.empty()) {
 				Ui.heading(g, font, "EMPTY", tx, ty, Ui.TEXT, s);
@@ -1084,17 +1068,46 @@ public class IntroScreen extends GameScreen {
 				byy + 22 * s, Ui.DIM, s, true);
 		if (confirm != null) {
 			SlotInfo c = slotCards[slotAt];
-			List<String> lines = List.of("Start over in SLOT " + (slotAt + 1) + "?", c.str("name", "This") + "'s game (" + c.str("place", "KANTO") + ") is moved",
-					"to retromon-old-saves, and a new game begins.");
+			List<String> lines = deleting
+					? List.of("Delete SLOT " + (slotAt + 1) + "?", c.str("name", "This") + "'s game (" + c.str("place", "KANTO") + ") is moved",
+							"to retromon-old-saves (the last three are kept there).")
+					: List.of("Start over in SLOT " + (slotAt + 1) + "?", c.str("name", "This") + "'s game (" + c.str("place", "KANTO") + ") is moved",
+							"to retromon-old-saves, and a new game begins.");
 			int w = 0;
 			for (String l : lines) w = Math.max(w, Ui.width(font, l, s));
 			w += 24 * s;
 			int cwid = confirm.width(font, s), h = lines.size() * 11 * s + 16 * s, px = (width - w) / 2, py = height / 2 - h / 2 - 20 * s;
 			g.fill(0, 0, width, height, 0x90000000);
-			Ui.round(g, px, py, w, h, 0xF0141B2E, 3 * s);
+			Ui.panel(g, px, py, w, h, s);
 			for (int i = 0; i < lines.size(); i++) Ui.text(g, font, lines.get(i), px + 12 * s, py + 8 * s + i * 11 * s, Ui.TEXT, s);
 			choice(g, confirm, (width - cwid) / 2, py + h + 6 * s, cwid, i -> confirmed(i == 0));
 		}
+	}
+
+	/** Rounds a picture's top corners: the card's colour over what sticks out past a radius r. */
+	private void corners(GuiGraphics g, int x, int y, int w, int h, float r, int color) {
+		if (r <= 1) return;
+		float k = (float) Math.max(1, Minecraft.getInstance().getWindow().getGuiScale());
+		int R = Math.round(r * k), X = Math.round(x * k), Y = Math.round(y * k), W = Math.round(w * k);
+		int a = color >>> 24, rgb = color & 0xFFFFFF;
+		g.pose().pushMatrix();
+		g.pose().scale(1 / k, 1 / k);
+		for (int j = 0; j < R; j++) {
+			float dy = R - j - 0.5F;
+			float in = R - (float) Math.sqrt(Math.max(0, R * R - dy * dy));
+			int full = (int) Math.floor(in);
+			float part = in - full;
+			if (full > 0) {
+				g.fill(X, Y + j, X + full, Y + j + 1, color);
+				g.fill(X + W - full, Y + j, X + W, Y + j + 1, color);
+			}
+			if (part > 0) {
+				int c = ((int) (a * part) << 24) | rgb;
+				g.fill(X + full, Y + j, X + full + 1, Y + j + 1, c);
+				g.fill(X + W - full - 1, Y + j, X + W - full, Y + j + 1, c);
+			}
+		}
+		g.pose().popMatrix();
 	}
 
 	private void panel(GuiGraphics g, List<String> lines) {
@@ -1106,7 +1119,7 @@ public class IntroScreen extends GameScreen {
 		for (String l : lines) w = Math.max(w, Ui.width(font, l, s));
 		w += 24 * s;
 		int h = lines.size() * 11 * s + 14 * s + (back ? 12 * s : 0), x = (width - w) / 2, y = height * 4 / 5 - h / 2;
-		Ui.round(g, x, y, w, h, 0xF0141B2E, 3 * s);
+		Ui.panel(g, x, y, w, h, s);
 		for (int i = 0; i < lines.size(); i++) Ui.text(g, font, lines.get(i), x + 12 * s, y + 8 * s + i * 11 * s, Ui.TEXT, s);
 		if (back) Ui.text(g, font, "A: back", x + 12 * s, y + h - 16 * s, Ui.DIM, s);
 	}

@@ -1,5 +1,5 @@
 Pokemon and Poke Ball models, animations, textures and cries: by the Cobblemon team (https://cobblemon.com),
 licensed under Creative Commons Attribution-NonCommercial 3.0 (see LICENSE-cobblemon-models.txt).
-Changes: trimmed to the idle animations, renamed and repacked for Retromon; the models, animations and textures
+Changes: trimmed to the animations Retromon uses (standing, walking, flying, battle and cries), renamed and repacked for Retromon; the models, animations and textures
 are otherwise unchanged. Raikou, Entei, Suicune and Celebi use stand-in models until Cobblemon has them.
 Retromon is free and non-commercial.

@@ -12,7 +12,7 @@ import net.minecraft.nbt.CompoundTag;
  * The wardrobe: you on the left (turning to follow the mouse), and your look on the right, row by row: skin,
  * hair and its colour, hat (the cap in a Pokémon's pattern, worn forwards or backwards) and its colour, top,
  * bottoms, shoes, and your bag (a backpack or a satchel) and its colour. Up and down pick a row, left and right
- * change it, and it shows on you straight away. DONE keeps it (in your save); B puts back what you had.
+ * change it, and it shows on you straight away. DONE or B keeps it (in your save); UNDO puts back what you had.
  */
 public class ClothesScreen extends GameScreen {
 	/** One a part of Outfit.PARTS, in its order. */
@@ -39,6 +39,18 @@ public class ClothesScreen extends GameScreen {
 	private void change(int r, int d) {
 		String part = Outfit.PARTS[r];
 		outfit.v.put(part, Math.floorMod(outfit.get(part) + d, Outfit.options(part)));
+		// Picking the cap's style or which way it's on puts the cap on.
+		if (part.equals("capp") || part.equals("capb")) outfit.v.put("hat", java.util.Arrays.asList(Outfit.HATS).indexOf("cap"));
+		preview = outfit.write();
+		Sounds.press();
+	}
+
+	/** UNDO: back to what you had when you came in (you're still choosing). */
+	private void undo() {
+		boolean girl = "girl".equals(ClientState.data.gender);
+		Outfit was = Outfit.parse(before, girl);
+		outfit.v.clear();
+		outfit.v.putAll(was.v);
 		preview = outfit.write();
 		Sounds.press();
 	}
@@ -53,12 +65,10 @@ public class ClothesScreen extends GameScreen {
 		if (minecraft != null) minecraft.setScreen(parent);
 	}
 
+	/** B (or Esc) keeps what you're wearing, as the newer games' wardrobes do. */
 	@Override
 	protected void back() {
-		Sounds.press();
-		preview = null;
-		ClientState.data.outfit = before;
-		if (minecraft != null) minecraft.setScreen(parent);
+		done();
 	}
 
 	@Override
@@ -78,7 +88,7 @@ public class ClothesScreen extends GameScreen {
 	protected void draw(GuiGraphics g, float partial) {
 		// The world behind, frosted.
 		if (minecraft != null && minecraft.options.getMenuBackgroundBlurriness() > 0) g.blurBeforeThisStratum();
-		g.fill(0, 0, width, height, 0x990D1222);
+		g.fill(0, 0, width, height, 0x990A1C20);
 		if (minecraft != null) {
 			mouseX = (float) (minecraft.mouseHandler.xpos() * width / Math.max(1, minecraft.getWindow().getScreenWidth()));
 			mouseY = (float) (minecraft.mouseHandler.ypos() * height / Math.max(1, minecraft.getWindow().getScreenHeight()));
@@ -86,7 +96,7 @@ public class ClothesScreen extends GameScreen {
 		int m = 8 * s;
 		// You, on a soft spotlight.
 		int pw = Math.min(width / 2 - m, 150 * s), ph = height - 2 * m;
-		Ui.round(g, m, m, pw, ph, 0xE6141B2E, 3 * s);
+		Ui.panel(g, m, m, pw, ph, s);
 		Ui.round(g, m + pw / 2 - 40 * s, m + ph - 34 * s, 80 * s, 14 * s, 0x40FFF4D8, 7 * s);
 		if (minecraft != null && minecraft.player != null) {
 			InventoryScreen.renderEntityInInventoryFollowsMouse(g, m + 6 * s, m + 6 * s, m + pw - 6 * s, m + ph - 20 * s, (int) (ph * 0.36F), 0.0625F,
@@ -114,9 +124,9 @@ public class ClothesScreen extends GameScreen {
 				int col = 0xFF000000 | Outfit.COLOURS[Math.floorMod(val, Outfit.COLOURS.length)];
 				Ui.round(g, vx + 12 * s, ty - s, 9 * s, 9 * s, col, 2 * s);
 			}
-			Ui.draw(g, font, Ui.ui("◀"), vx, ty, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
+			Ui.triangle(g, vx + 4 * s, ty + 4 * s, 7 * s, 3, on ? Ui.CREAM_INK : Ui.MUTED);
 			Ui.draw(g, font, Ui.bold(label), vx + 26 * s, ty, on ? Ui.CREAM_INK : idle ? Ui.DIM : Ui.TEXT, s, false);
-			Ui.draw(g, font, Ui.ui("▶"), x + w - 10 * s, ty, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
+			Ui.triangle(g, x + w - 8 * s, ty + 4 * s, 7 * s, 1, on ? Ui.CREAM_INK : Ui.MUTED);
 			int rr = r;
 			hit(vx - 2 * s, y, 12 * s, rh, () -> change(rr, -1));
 			hit(vx + 12 * s, y, w - (vx - x) - 12 * s, rh, () -> change(rr, 1));
@@ -125,8 +135,8 @@ public class ClothesScreen extends GameScreen {
 		boolean onDone = row == ROW_NAMES.length;
 		Ui.button(g, font, x, by, bw, 16 * s, "DONE", Ui.GREEN, onDone || over(x, by, bw, 16 * s), s);
 		hit(x, by, bw, 16 * s, this::done);
-		Ui.button(g, font, x + bw + 4 * s, by, bw, 16 * s, "CANCEL", 0xFF5A6070, over(x + bw + 4 * s, by, bw, 16 * s), s);
-		hit(x + bw + 4 * s, by, bw, 16 * s, this::back);
-		Ui.text(g, font, "Up/down: pick   Left/right: change", x, by + 22 * s, Ui.DIM, s);
+		Ui.button(g, font, x + bw + 4 * s, by, bw, 16 * s, "UNDO", 0xFF5A6070, over(x + bw + 4 * s, by, bw, 16 * s), s);
+		hit(x + bw + 4 * s, by, bw, 16 * s, this::undo);
+		Ui.text(g, font, "Up/down: pick   Left/right: change   B: done", x, by + 22 * s, Ui.DIM, s);
 	}
 }

@@ -21,7 +21,8 @@ import org.lwjgl.glfw.GLFW;
 public final class Ui {
 	private Ui() {}
 
-	public static final int PANEL = 0xEC141B2E, PANEL_SOFT = 0xD0141B2E, EDGE = 0xFF33416A, EDGE_LIGHT = 0xFF5A6DA3, SHINE = 0x22FFFFFF;
+	/** The battle screen's look, everywhere: deep teal glass with a mint rim. */
+	public static final int PANEL = 0xF0123C38, PANEL_SOFT = 0xD0123C38, EDGE = 0xFF4FB896, EDGE_LIGHT = 0xFF8FF5C0, SHINE = 0x22FFFFFF;
 	public static final int TEXT = 0xFFF4F6FF, MUTED = 0xFFA9B4D4, DIM = 0xFF6B7697, INK = 0xFF1A1F30;
 	public static final int RED = 0xFFE5525C, AMBER = 0xFFF0B43C, GREEN = 0xFF41BF84, BLUE = 0xFF4A8FE0, GOLD = 0xFFFFD45A, CYAN = 0xFF47C6F2;
 	public static final int HP_GREEN = 0xFF4CD27E, HP_YELLOW = 0xFFF2C744, HP_RED = 0xFFEF4F4F, TRACK = 0xFF0B1020;
@@ -34,42 +35,215 @@ public final class Ui {
 		return Math.max(1, Math.min(3, screenHeight / 190));
 	}
 
-	/** A rounded rectangle (corners cut one or two pixels in), in one colour. */
+	/** A rounded rectangle in one colour: corners rounded by about one and a half times s (smooth, see rr). */
 	public static void round(GuiGraphics g, int x, int y, int w, int h, int color, int s) {
-		int r = Math.max(1, s);
-		g.fill(x + 2 * r, y, x + w - 2 * r, y + h, color);
-		g.fill(x + r, y + r, x + 2 * r, y + h - r, color);
-		g.fill(x + w - 2 * r, y + r, x + w - r, y + h - r, color);
-		g.fill(x, y + 2 * r, x + r, y + h - 2 * r, color);
-		g.fill(x + w - r, y + 2 * r, x + w, y + h - 2 * r, color);
+		rr(g, x, y, w, h, Math.max(1, s) * 1.6F, color);
 	}
 
-	/** A panel: an edge, the glass, and a faint sheen across the top. */
+	/** How many screen pixels a GUI pixel is (the GUI scale). */
+	private static float gs() {
+		return (float) Math.max(1, net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScale());
+	}
+
+	/**
+	 * A rectangle with round corners (radius r), drawn at the screen's own resolution with soft, anti-aliased
+	 * edges (not stepped in GUI pixels): the newer games' smooth panels, buttons and pills. x, y, w, h and r are in
+	 * GUI pixels.
+	 */
+	public static void rr(GuiGraphics g, float x, float y, float w, float h, float r, int color) {
+		rrv(g, x, y, w, h, r, color, color);
+	}
+
+	/** A colour part way from one to another (each channel, alpha too). */
+	public static int mix(int a, int b, float t) {
+		t = Math.max(0, Math.min(1, t));
+		int out = 0;
+		for (int sh = 0; sh <= 24; sh += 8) {
+			int ca = (a >>> sh) & 0xFF, cb = (b >>> sh) & 0xFF;
+			out |= Math.round(ca + (cb - ca) * t) << sh;
+		}
+		return out;
+	}
+
+	/** A rounded rectangle as rr, shaded from one colour at the top to another at the bottom. */
+	public static void rrv(GuiGraphics g, float x, float y, float w, float h, float r, int top, int bottom) {
+		if (w <= 0 || h <= 0 || ((top >>> 24) == 0 && (bottom >>> 24) == 0)) return;
+		float k = gs();
+		int X = Math.round(x * k), Y = Math.round(y * k), W = Math.round((x + w) * k) - X, H = Math.round((y + h) * k) - Y;
+		if (W <= 0 || H <= 0) return;
+		float R = Math.max(0, Math.min(r * k, Math.min(W, H) / 2F));
+		boolean flat = top == bottom;
+		g.pose().pushMatrix();
+		g.pose().scale(1 / k, 1 / k);
+		int ri = (int) Math.ceil(R);
+		// The middle band, whole.
+		if (H - 2 * ri > 0) {
+			if (flat) g.fill(X, Y + ri, X + W, Y + H - ri, top);
+			else g.fillGradient(X, Y + ri, X + W, Y + H - ri, mix(top, bottom, (ri + 0.5F) / H), mix(top, bottom, (H - ri - 0.5F) / H));
+		}
+		for (int j = 0; j < ri && j < H; j++) {
+			// Distance of this row's middle from the corners' centres (above it); below them it's a whole row.
+			float dy = R - j - 0.5F;
+			float inner = dy > 0 && dy < R - 0.5F ? (float) Math.sqrt(Math.max(0, (R - 0.5F) * (R - 0.5F) - dy * dy)) : 0;
+			float outer = dy > 0 ? (float) Math.sqrt(Math.max(0, (R + 0.5F) * (R + 0.5F) - dy * dy)) : R;
+			int solidIn = dy > 0 ? (int) Math.ceil(R - inner) : 0;
+			int edgeOut = (int) Math.floor(R - outer);
+			for (int pass = 0; pass < 2; pass++) {
+				int yy = pass == 0 ? Y + j : Y + H - 1 - j;
+				if (pass == 1 && yy <= Y + j) break;
+				int color = flat ? top : mix(top, bottom, (yy - Y + 0.5F) / H);
+				int a = color >>> 24, rgb = color & 0xFFFFFF;
+				if (W - 2 * solidIn > 0) g.fill(X + solidIn, yy, X + W - solidIn, yy + 1, color);
+				// The pixels along the curve, as much of each as the shape covers.
+				for (int i = Math.max(0, edgeOut); i < solidIn && i < (W + 1) / 2; i++) {
+					float cx = i + 0.5F - R;
+					float d = (float) Math.sqrt(cx * cx + dy * dy);
+					float cov = Math.max(0, Math.min(1, R + 0.5F - d));
+					if (cov <= 0) continue;
+					int c = ((int) (a * cov) << 24) | rgb;
+					g.fill(X + i, yy, X + i + 1, yy + 1, c);
+					if (W - 1 - i != i) g.fill(X + W - 1 - i, yy, X + W - i, yy + 1, c);
+				}
+			}
+		}
+		g.pose().popMatrix();
+	}
+
+	/** A rounded ring (an outline): radius r, t thick, smooth like rr. */
+	public static void ring(GuiGraphics g, float x, float y, float w, float h, float r, float t, int color) {
+		if (w <= 0 || h <= 0 || t <= 0) return;
+		float k = gs();
+		float X = x * k, Y = y * k, W = w * k, H = h * k, R = Math.min(r * k, Math.min(W, H) / 2), T = t * k;
+		float iX = X + T, iY = Y + T, iW = W - 2 * T, iH = H - 2 * T, iR = Math.max(0, R - T);
+		g.pose().pushMatrix();
+		g.pose().scale(1 / k, 1 / k);
+		for (int row = (int) Math.floor(Y); row < (int) Math.ceil(Y + H); row++) {
+			float cy = row + 0.5F;
+			float[] o = extent(X, Y, W, H, R, cy);
+			if (o == null) continue;
+			float[] in = iW > 0 && iH > 0 ? extent(iX, iY, iW, iH, iR, cy) : null;
+			if (in == null) span(g, row, o[0], o[1], color);
+			else {
+				span(g, row, o[0], in[0], color);
+				span(g, row, in[1], o[1], color);
+			}
+		}
+		g.pose().popMatrix();
+	}
+
+	/** Where a rounded rectangle runs across one row (its left and right), or null if the row's outside it. */
+	private static float[] extent(float X, float Y, float W, float H, float R, float cy) {
+		if (cy < Y || cy > Y + H) return null;
+		float dy = 0;
+		if (cy < Y + R) dy = Y + R - cy;
+		else if (cy > Y + H - R) dy = cy - (Y + H - R);
+		float in = dy > 0 ? R - (float) Math.sqrt(Math.max(0, R * R - dy * dy)) : 0;
+		return new float[] {X + in, X + W - in};
+	}
+
+	/** One row's run from a to b (screen pixels), its ends as much as they're covered. */
+	private static void span(GuiGraphics g, int row, float a, float b, int color) {
+		if (b <= a) return;
+		int al = color >>> 24, rgb = color & 0xFFFFFF;
+		int ia = (int) Math.ceil(a), ib = (int) Math.floor(b);
+		if (ib < ia) {
+			g.fill(ib, row, ib + 1, row + 1, ((int) (al * (b - a)) << 24) | rgb);
+			return;
+		}
+		if (ib > ia) g.fill(ia, row, ib, row + 1, color);
+		float fl = ia - a, fr = b - ib;
+		if (fl > 0) g.fill(ia - 1, row, ia, row + 1, ((int) (al * fl) << 24) | rgb);
+		if (fr > 0) g.fill(ib, row, ib + 1, row + 1, ((int) (al * fr) << 24) | rgb);
+	}
+
+	/**
+	 * A small solid triangle pointing a way (0 up, 1 right, 2 down, 3 left), centred on (cx, cy), size across in GUI
+	 * pixels, drawn smooth at the screen's resolution (the font's arrows look odd, so they're drawn instead).
+	 */
+	public static void triangle(GuiGraphics g, float cx, float cy, float size, int dir, int color) {
+		float k = gs();
+		float S = size * k, CX = cx * k, CY = cy * k;
+		int a = color >>> 24, rgb = color & 0xFFFFFF;
+		g.pose().pushMatrix();
+		g.pose().translate(cx, cy);
+		g.pose().rotate((float) (Math.PI / 2 * dir));
+		g.pose().scale(1 / k, 1 / k);
+		// Pointing up: rows from the tip down, each as wide as the triangle is there, soft at the ends.
+		float hgt = S * 0.86F;
+		for (int j = 0; j < (int) Math.ceil(hgt); j++) {
+			float half = (j + 0.5F) / hgt * S / 2;
+			float top = -hgt / 2 + j;
+			int x0 = (int) Math.ceil(-half), x1 = (int) Math.floor(half);
+			int yy = Math.round(top);
+			if (x1 > x0) g.fill(x0, yy, x1, yy + 1, color);
+			float f = x0 + half;
+			if (f > 0) {
+				int c = ((int) (a * Math.min(1, f)) << 24) | rgb;
+				g.fill(x0 - 1, yy, x0, yy + 1, c);
+				g.fill(x1, yy, x1 + 1, yy + 1, c);
+			}
+		}
+		g.pose().popMatrix();
+	}
+
+	/** A filled ellipse centred on (cx, cy), radii rx and ry (GUI pixels), with soft edges. */
+	public static void ellipse(GuiGraphics g, float cx, float cy, float rx, float ry, int color) {
+		if (rx <= 0 || ry <= 0) return;
+		if (Math.abs(rx - ry) < 0.01F) {
+			rr(g, cx - rx, cy - ry, 2 * rx, 2 * ry, rx, color);
+			return;
+		}
+		float k = gs();
+		float RX = rx * k, RY = ry * k, CX = cx * k, CY = cy * k;
+		int a = color >>> 24, rgb = color & 0xFFFFFF;
+		g.pose().pushMatrix();
+		g.pose().scale(1 / k, 1 / k);
+		for (int j = (int) Math.floor(CY - RY); j < (int) Math.ceil(CY + RY); j++) {
+			float v = (j + 0.5F - CY) / RY;
+			if (Math.abs(v) >= 1) continue;
+			float half = RX * (float) Math.sqrt(1 - v * v);
+			int x0 = (int) Math.ceil(CX - half), x1 = (int) Math.floor(CX + half);
+			if (x1 > x0) g.fill(x0, j, x1, j + 1, color);
+			float fl = x0 - (CX - half), fr = (CX + half) - x1;
+			if (fl > 0) g.fill(x0 - 1, j, x0, j + 1, ((int) (a * fl) << 24) | rgb);
+			if (fr > 0) g.fill(x1, j, x1 + 1, j + 1, ((int) (a * fr) << 24) | rgb);
+		}
+		g.pose().popMatrix();
+	}
+
+	/** A panel, as the battle screen's: a soft shadow, a mint rim, deep teal glass, a faint sheen across the top. */
 	public static void panel(GuiGraphics g, int x, int y, int w, int h, int s) {
-		round(g, x, y, w, h, EDGE, s);
-		round(g, x + s, y + s, w - 2 * s, h - 2 * s, PANEL, s);
-		g.fill(x + 3 * s, y + 2 * s, x + w - 3 * s, y + 3 * s, SHINE);
+		float r = 5 * s;
+		rr(g, x + s * 0.6F, y + s * 1.4F, w, h, r, 0x50000000);
+		rr(g, x, y, w, h, r, EDGE_LIGHT);
+		rr(g, x + s, y + s, w - 2 * s, h - 2 * s, r - s, 0xFF123C38);
+		rrv(g, x + s, y + s, w - 2 * s, h / 2F - s, r - s, 0x221D5A52, 0x000B2A2C);
+		rr(g, x + 4 * s, y + 2 * s, w - 8 * s, Math.max(1, s * 0.6F), 1, SHINE);
 	}
 
 	/** A panel with a coloured strip down its left side (for menus and boxes that belong to something). */
 	public static void tagged(GuiGraphics g, int x, int y, int w, int h, int s, int accent) {
 		panel(g, x, y, w, h, s);
-		g.fill(x + s, y + 3 * s, x + 3 * s, y + h - 3 * s, accent);
+		rr(g, x + 1.5F * s, y + 4 * s, 2 * s, h - 8 * s, s, accent);
 	}
 
 	/** A button: its colour (brighter when picked or under the mouse), its label centred. */
 	public static void button(GuiGraphics g, Font f, int x, int y, int w, int h, String label, int color, boolean on, int s) {
-		round(g, x, y, w, h, on ? CREAM : darker(color, 0.55F), s);
-		round(g, x + s, y + s, w - 2 * s, h - 2 * s, on ? color : darker(color, 0.8F), s);
-		g.fill(x + 3 * s, y + 2 * s, x + w - 3 * s, y + 3 * s, 0x33FFFFFF);
+		float r = Math.min(h / 2F, 6 * s);
+		rr(g, x + s * 0.5F, y + s * 1.2F, w, h, r, 0x50000000);
+		rr(g, x, y, w, h, r, on ? 0xFFFFFFFF : darker(color, 0.55F));
+		rr(g, x + s, y + s, w - 2 * s, h - 2 * s, r - s, on ? color : darker(color, 0.8F));
+		rr(g, x + 3 * s, y + 1.6F * s, w - 6 * s, Math.max(1, (h - 2 * s) * 0.4F), r - 2 * s, 0x26FFFFFF);
 		int lw = boldWidth(f, label, s);
 		draw(g, f, bold(label), x + (w - lw) / 2, y + (h - 8 * s) / 2, TEXT, s, true);
 	}
 
 	/** A pill: a rounded row that's cream when picked (dark text) and glass when not, as the newer games' lists. */
 	public static void pill(GuiGraphics g, int x, int y, int w, int h, boolean on, int s) {
-		round(g, x, y, w, h, on ? CREAM : 0xB0141B2E, s);
-		if (!on) g.fill(x + 2 * s, y, x + w - 2 * s, y + Math.max(1, s / 2), 0x26FFFFFF);
+		float r = Math.min(h / 2F, 5 * s);
+		if (on) rr(g, x - s * 0.5F, y - s * 0.5F, w + s, h + s, r + s * 0.5F, 0xFFFFFFFF);
+		rr(g, x, y, w, h, r, on ? CREAM : 0xB0123C38);
+		if (!on) rr(g, x + 3 * s, y + s * 0.5F, w - 6 * s, Math.max(1, s * 0.5F), 1, 0x26FFFFFF);
 	}
 
 	/**
@@ -280,13 +454,14 @@ public final class Ui {
 
 	/** A rounded bar: a dark track and the part filled. */
 	public static void bar(GuiGraphics g, int x, int y, int w, int h, float frac, int color, int s) {
-		round(g, x, y, w, h, 0xFF05080F, Math.max(1, s / 2));
-		g.fill(x + s / 2 + 1, y + 1, x + w - s / 2 - 1, y + h - 1, TRACK);
-		int fw = Math.round((w - 2) * Math.max(0, Math.min(1, frac)));
-		if (frac > 0 && fw < 1) fw = 1;
+		// A rounded track with a white rim (as the battle's HP bars), the colour inside it lit along its top.
+		rr(g, x - s * 0.6F, y - s * 0.6F, w + s * 1.2F, h + s * 1.2F, (h + s * 1.2F) / 2, 0xD0EFFFF6);
+		rr(g, x, y, w, h, h / 2F, TRACK);
+		float fw = w * Math.max(0, Math.min(1, frac));
+		if (frac > 0 && fw < h) fw = Math.min(w, Math.max(fw, h * 0.6F));
 		if (fw > 0) {
-			g.fill(x + 1, y + 1, x + 1 + fw, y + h - 1, color);
-			g.fill(x + 1, y + 1, x + 1 + fw, y + 1 + Math.max(1, (h - 2) / 3), 0x40FFFFFF);
+			rr(g, x, y, fw, h, h / 2F, color);
+			rr(g, x + h / 4F, y + h * 0.12F, Math.max(0, fw - h / 2F), Math.max(1, h * 0.3F), h * 0.15F, 0x40FFFFFF);
 		}
 	}
 
@@ -325,9 +500,10 @@ public final class Ui {
 
 	/** A small rounded tag (a type, a status). */
 	public static int chip(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {
-		int w = width(f, text, s) + 6 * s;
-		round(g, x, y, w, 10 * s, color, s);
-		plain(g, f, text, x + 3 * s, y + s, 0xFFFFFFFF, s);
+		int w = width(f, text, s) + 8 * s;
+		rr(g, x, y, w, 10 * s, 5 * s, color);
+		rr(g, x + 2 * s, y + s * 0.6F, w - 4 * s, 3 * s, 1.5F * s, 0x2AFFFFFF);
+		plain(g, f, text, x + 4 * s, y + s, 0xFFFFFFFF, s);
 		return w;
 	}
 

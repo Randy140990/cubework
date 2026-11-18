@@ -212,6 +212,11 @@ public class MenuScreen extends DeviceScreen {
 		view = View.BAG;
 	}
 
+	@Override
+	protected String backLabel() {
+		return view == View.MENU ? "CLOSE" : "BACK";
+	}
+
 	// ---------- keys ----------
 
 	@Override
@@ -551,7 +556,7 @@ public class MenuScreen extends DeviceScreen {
 			Ui.text(g, font, mv.name(), mxp + 4 * s, my, Ui.TEXT, s);
 			Ui.right(g, font, mon.pp.get(i) + "/" + mv.pp(), mxp + mw - 4 * s, my, Ui.TEXT, s);
 		}
-		Ui.text(g, font, "◀ ▶  other POKéMON", l, y + h - 14 * s, Ui.DIM, s);
+		Ui.text(g, font, "Left/right: other POKéMON", l, y + h - 14 * s, Ui.DIM, s);
 	}
 
 	/** Your bag's colour (from your clothes), or yellow. */
@@ -649,7 +654,7 @@ public class MenuScreen extends DeviceScreen {
 		if (bagAt < bagTop) bagTop = bagAt;
 		if (bagAt >= bagTop + rows) bagTop = bagAt - rows + 1;
 		bagTop = Math.max(0, Math.min(bagTop, Math.max(0, n - rows)));
-		Ui.round(g, lx, ly, lw, rows * row + 8 * s, 0xE6141B2E, 3 * s);
+		Ui.round(g, lx, ly, lw, rows * row + 8 * s, 0xE6123C38, 3 * s);
 		for (int k = 0; k < rows && bagTop + k < n; k++) {
 			int i = bagTop + k, ty = ly + 4 * s + k * row;
 			int idx = i;
@@ -666,8 +671,8 @@ public class MenuScreen extends DeviceScreen {
 			}
 			if (view == View.BAG) hit(lx, ty, lw, row, () -> pickBag(idx));
 		}
-		if (bagTop > 0) Ui.centred(g, font, "▲", lx + lw / 2, ly - 2 * s, Ui.MUTED, s, false);
-		if (bagTop + rows < n) Ui.centred(g, font, "▼", lx + lw / 2, ly + rows * row + 5 * s, Ui.MUTED, s, false);
+		if (bagTop > 0) Ui.triangle(g, lx + lw / 2F, ly - 3 * s, 6 * s, 0, Ui.MUTED);
+		if (bagTop + rows < n) Ui.triangle(g, lx + lw / 2F, ly + rows * row + 11 * s, 6 * s, 2, Ui.MUTED);
 		if (l.isEmpty()) Ui.text(g, font, "Nothing in this pocket yet.", lx + 8 * s, ly + row + 8 * s, Ui.DIM, s);
 		// What the item does.
 		int dy = height - m - descH;
@@ -686,15 +691,8 @@ public class MenuScreen extends DeviceScreen {
 
 	/** A picked pocket: a white line round it. */
 	private void outline(GuiGraphics g, int x, int y, int w, int h, int r) {
-		int t = Math.max(1, s);
-		g.fill(x + r, y - t, x + w - r, y, 0xFFFFFFFF);
-		g.fill(x + r, y + h, x + w - r, y + h + t, 0xFFFFFFFF);
-		g.fill(x - t, y + r, x, y + h - r, 0xFFFFFFFF);
-		g.fill(x + w, y + r, x + w + t, y + h - r, 0xFFFFFFFF);
-		g.fill(x + r / 3, y + r / 3 - t, x + r, y + r / 3, 0xFFFFFFFF);
-		g.fill(x + w - r, y + r / 3 - t, x + w - r / 3, y + r / 3, 0xFFFFFFFF);
-		g.fill(x + r / 3, y + h - r / 3, x + r, y + h - r / 3 + t, 0xFFFFFFFF);
-		g.fill(x + w - r, y + h - r / 3, x + w - r / 3, y + h - r / 3 + t, 0xFFFFFFFF);
+		float t = Math.max(1, s) * 1.2F;
+		Ui.ring(g, x - t, y - t, w + 2 * t, h + 2 * t, r + t, t, 0xFFFFFFFF);
 	}
 
 	/** Your trainer card: your face (from your look), name, money, the Pokédex, time played and the badges. */

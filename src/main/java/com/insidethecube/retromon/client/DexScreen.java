@@ -97,8 +97,8 @@ public class DexScreen extends GameScreen {
 		int m = 10 * s, x = m, y = m + Math.round((1 - in) * 12 * s), w = width - 2 * m, h = height - 2 * m;
 		Ui.round(g, x + 2 * s, y + 3 * s, w, h, 0x60000000, 6 * s);
 		Ui.round(g, x, y, w, h, 0xFF7E1820, 6 * s);
-		g.fillGradient(x + s, y + s, x + w - s, y + h - s, 0xFFE0404A, 0xFFB02630);
-		g.fill(x + 6 * s, y + 2 * s, x + w - 6 * s, y + 3 * s, 0x50FFFFFF);
+		Ui.rrv(g, x + s, y + s, w - 2 * s, h - 2 * s, 8.6F * s, 0xFFE0404A, 0xFFB02630);
+		Ui.rr(g, x + 9 * s, y + 2 * s, w - 18 * s, s, s / 2F, 0x50FFFFFF);
 		int lens = 16 * s, lx = x + 10 * s, ly = y + 6 * s;
 		Ui.round(g, lx - 2 * s, ly - 2 * s, lens + 4 * s, lens + 4 * s, 0xFFF4F6FF, lens / 2);
 		Ui.round(g, lx, ly, lens, lens, 0xFF2A7FE0, lens / 2 - s);
@@ -112,7 +112,7 @@ public class DexScreen extends GameScreen {
 		// The screen.
 		int sx = x + 10 * s, sy = y + 28 * s, sw = w - 20 * s, sh = h - 38 * s;
 		Ui.round(g, sx - 2 * s, sy - 2 * s, sw + 4 * s, sh + 4 * s, 0xFF3A0C10, 3 * s);
-		g.fillGradient(sx, sy, sx + sw, sy + sh, 0xFFEAF6F2, 0xFFC4DED6);
+		Ui.rrv(g, sx, sy, sw, sh, 3.4F * s, 0xFFEAF6F2, 0xFFC4DED6);
 		for (int gx = sx + 12 * s; gx < sx + sw; gx += 12 * s) g.fill(gx, sy, gx + 1, sy + sh, 0x14205050);
 		for (int gy = sy + 12 * s; gy < sy + sh; gy += 12 * s) g.fill(sx, gy, sx + sw, gy + 1, 0x14205050);
 		// Left: the Pokémon on a turntable, turning slowly.
@@ -160,7 +160,7 @@ public class DexScreen extends GameScreen {
 			Ui.round(g, rx, ry, rw, 14 * s, Ui.alpha(0xFF2A9A5A, k), 3 * s);
 			Ui.draw(g, font, Ui.bold(reg), rx + 6 * s, ry + 3 * s, Ui.alpha(0xFFFFFFFF, k), s, false);
 		}
-		if (ticks > 10 && (ticks / 10) % 2 == 0) Ui.draw(g, font, Ui.ui("▼"), x + w - 16 * s, y + h - 12 * s, 0xFFFFFFFF, s, false);
+		if (ticks > 10 && (ticks / 10) % 2 == 0) Ui.triangle(g, x + w - 12 * s, y + h - 8 * s, 7 * s, 2, 0xFFFFFFFF);
 		// In from white, out to white.
 		float white = t < FADE ? 1 - t / FADE : 0;
 		if (closing >= 0) white = Math.min(1, (closing + partial) / FADE);

@@ -53,7 +53,16 @@ public abstract class DeviceScreen extends GameScreen {
 				s = s0;
 			}
 		}
-		Device.front(g, f, W, H, ticks, partial, font);
+		int[] b = Device.front(g, f, W, H, ticks, partial, font, backLabel(), backOver);
+		backOver = b != null && over(b[0], b[1], b[2], b[3]);
+		if (b != null) hit(b[0], b[1], b[2], b[3], this::back);
+	}
+
+	private boolean backOver;
+
+	/** The status bar's BACK button: what it says (null for none). */
+	protected String backLabel() {
+		return "BACK";
 	}
 
 	@Override

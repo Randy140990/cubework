@@ -117,7 +117,7 @@ public class PokedexScreen extends DeviceScreen {
 	@Override
 	protected void drawScreen(GuiGraphics g, float partial) {
 		PlayerData d = ClientState.data;
-		g.fill(0, 0, width, height, 0xF00D1222);
+		g.fill(0, 0, width, height, 0x400A1C20);
 		int m = 8 * s;
 		// The header: the title, the two lists, and how many you've seen and own.
 		Ui.round(g, m, m, width - 2 * m, 22 * s, 0xFFE5525C, 3 * s);
@@ -147,7 +147,7 @@ public class PokedexScreen extends DeviceScreen {
 		if (at < top) top = at;
 		if (at >= top + rows) top = at - rows + 1;
 		top = Math.max(0, Math.min(top, count() - rows));
-		Ui.round(g, m, ly, lw, rows * row + 6 * s, 0xE6141B2E, 3 * s);
+		Ui.panel(g, m, ly, lw, rows * row + 6 * s, s);
 		for (int r = 0; r < rows && top + r < count(); r++) {
 			int n = top + r + 1, y = ly + 3 * s + r * row;
 			Species sp = byDex(n);

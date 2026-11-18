@@ -153,17 +153,18 @@ public final class Hud {
 			x -= lw;
 			Ui.text(g, mc.font, keys[i][1], x, y + 3 * s, 0xE0E8ECFF, s);
 			x -= kw + 3 * s;
-			Ui.round(g, x, y, kw, 13 * s, 0xC8141B2E, 2 * s);
-			Ui.round(g, x, y + 11 * s, kw, 2 * s, 0x60000000, s);
+			Ui.rr(g, x + 0.5F * s, y + s, kw, 13 * s, 6.5F * s, 0x50000000);
+			Ui.rr(g, x, y, kw, 13 * s, 6.5F * s, 0xD8123C38);
 			Ui.draw(g, mc.font, Ui.bold(keys[i][0]), x + 4 * s, y + 3 * s, Ui.GOLD, s, false);
 			x -= gap;
 		}
 		// The time, with a sun or a moon.
 		int cw = Ui.width(mc.font, clock, s) + 22 * s;
 		x -= cw;
-		Ui.round(g, x, y, cw, 13 * s, 0xC8141B2E, 2 * s);
-		Ui.round(g, x + 4 * s, y + 3 * s, 7 * s, 7 * s, night ? 0xFFE8ECFF : 0xFFFFC94A, 3 * s);
-		if (night) Ui.round(g, x + 6 * s, y + 2 * s, 6 * s, 6 * s, 0xFF141B2E, 3 * s);
+		Ui.rr(g, x + 0.5F * s, y + s, cw, 13 * s, 6.5F * s, 0x50000000);
+		Ui.rr(g, x, y, cw, 13 * s, 6.5F * s, 0xD8123C38);
+		Ui.rr(g, x + 4 * s, y + 3 * s, 7 * s, 7 * s, 3.5F * s, night ? 0xFFE8ECFF : 0xFFFFC94A);
+		if (night) Ui.rr(g, x + 6 * s, y + 2 * s, 6 * s, 6 * s, 3 * s, 0xFF123C38);
 		Ui.text(g, mc.font, clock, x + 15 * s, y + 3 * s, Ui.TEXT, s);
 	}
 
@@ -188,7 +189,7 @@ public final class Hud {
 		int s = Ui.scale(g.guiHeight());
 		String t = "\u25B6\u25B6 x" + Adventure.speed;
 		int w = Ui.width(mc.font, t, s) + 12 * s;
-		Ui.round(g, g.guiWidth() - w - 6 * s, 6 * s, w, 14 * s, 0xC0141B2E, s);
+		Ui.rr(g, g.guiWidth() - w - 6 * s, 6 * s, w, 14 * s, 7 * s, 0xD8123C38);
 		Ui.text(g, mc.font, t, g.guiWidth() - w, 9 * s, Ui.GOLD, s);
 	}
 

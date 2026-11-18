@@ -94,7 +94,7 @@ public class NicknameScreen extends GameScreen {
 			return;
 		}
 		int pw = Math.min(width - 20 * s, 210 * s), ph = 74 * s, px = (width - pw) / 2, py = height / 2 - 44 * s;
-		Ui.round(g, px, py, pw, ph, 0xF0141B2E, 3 * s);
+		Ui.round(g, px, py, pw, ph, 0xF0123C38, 3 * s);
 		Species sp = Species.ALL.get(species);
 		Ui.heading(g, font, "NICKNAME FOR " + (sp == null ? "IT" : sp.name()), px + 12 * s, py + 9 * s, Ui.TEXT, s);
 		// The entry: a cream field with the name and a blinking cursor, then the slots left.

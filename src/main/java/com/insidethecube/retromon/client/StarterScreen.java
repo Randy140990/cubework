@@ -179,8 +179,8 @@ public class StarterScreen extends GameScreen {
 				int idx = i;
 				boolean on = i == at;
 				int lift = on ? 4 * s : 0;
-				Ui.round(g, x - s, y - s - lift, cw + 2 * s, ch + 2 * s, on ? 0xFFFFFFFF : 0x38FFFFFF, 4 * s);
-				g.fillGradient(x, y - lift, x + cw, y + ch - lift, on ? Ui.darker(COLORS[i], 0.62F) | 0xFF000000 : 0xF0182036, on ? 0xF0121A2C : 0xF00D1222);
+				Ui.rr(g, x - s, y - s - lift, cw + 2 * s, ch + 2 * s, 9 * s, on ? 0xFFFFFFFF : 0x38FFFFFF);
+				Ui.rrv(g, x, y - lift, cw, ch, 8 * s, on ? Ui.darker(COLORS[i], 0.62F) | 0xFF000000 : 0xF0154440, on ? 0xF0103430 : 0xF00A2422);
 				// A round pad for it to stand on, in its colour.
 				int cx = x + cw / 2, feet = y - lift + 14 * s + tall;
 				Ui.glow(g, cx, feet - tall / 2, cw / 2, tall / 2 + 4 * s, on ? 0x10FFFFFF : 0x06FFFFFF);

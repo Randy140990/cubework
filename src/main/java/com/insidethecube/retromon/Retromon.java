@@ -93,6 +93,7 @@ public class Retromon implements ModInitializer {
 				Battles.drop(p);
 				Game.afterBattle(p);
 			}
+			case "battle_closed" -> Game.battleClosed(p);
 			case "buy" -> Game.buy(p, t);
 			case "sell" -> Game.sell(p, t);
 			case "use" -> Game.use(p, t);

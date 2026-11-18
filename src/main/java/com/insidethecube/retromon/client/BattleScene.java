@@ -218,7 +218,7 @@ public final class BattleScene {
 		if (ball != null) level.removeEntity(ball.getId(), Entity.RemovalReason.DISCARDED);
 		// From your hand (you throw it), or from in front of the camera if you're not on the stage.
 		ball = ballAt(hand(hero, cam.add(-0.4, -0.7, -0.8)), item);
-		if (hero != null) hero.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+		if (hero != null) hero.throwing = com.insidethecube.retromon.game.Npc.THROW;
 		BedrockModel.Def def = BedrockModel.def(theirs == null ? "pidgey" : theirs.species);
 		double top = def == null ? 0.8 : Math.min(2.5, def.height * 0.6);
 		ball.fly(enemyAt.x, enemyAt.y + top, enemyAt.z, 1.4, 14);
@@ -308,7 +308,7 @@ public final class BattleScene {
 		Vec3 to = spot(side);
 		com.insidethecube.retromon.game.Npc who = side == 0 ? hero : foe;
 		Vec3 from = hand(who, side == 0 ? cam.add(0.6, -0.8, -0.6) : to.add(0.8, 1.6, -3.5));
-		if (who != null) who.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+		if (who != null) who.throwing = com.insidethecube.retromon.game.Npc.THROW;
 		sendBall = ballAt(from, "poke_ball");
 		sendBall.fly(to.x, to.y + 0.2, to.z, 1.1, 9);
 		sendSide = side;
@@ -580,8 +580,11 @@ public final class BattleScene {
 			d.act("cry");
 		}
 		if (hero != null) {
-			hero.cheer = 40;
-			hero.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+			// A different celebration each time: arms up and hopping, the floss, a fist pump, a wave.
+			hero.cheer = com.insidethecube.retromon.game.Npc.CHEER;
+			int was = hero.dance;
+			hero.dance = (int) (Math.random() * 4);
+			if (hero.dance == was) hero.dance = (hero.dance + 1) % 4;
 		}
 		Vec3 at = spot(0).add(0, 0.3 + height(0) * 0.5, 0);
 		sphere(at, ParticleTypes.HAPPY_VILLAGER, 14, 0.2);
@@ -922,7 +925,6 @@ public final class BattleScene {
 				l.then().run();
 			}
 		}
-		if (hero != null && hero.cheer > 0 && hero.cheer == 20) hero.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
 		if (shake > 0) shake--;
 		if (flashTicks > 0) flashTicks--;
 		if (shotTicks > 0) shotTicks--;

@@ -27,10 +27,125 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		String sprite = "youngster";
 		/** Hopping for joy (you, on the battle stage, after a win). */
 		float hop;
+		/** How far through a Poké Ball throw (0 for none). */
+		float throwK;
+		/** Celebrating a win: how (-1 for not), and ticks in. */
+		int dance = -1;
+		float danceT;
+	}
+
+	/** The figure: the usual walk and stand, with a proper overarm throw and your celebrations on top. */
+	static class Figure extends HumanoidModel<State> {
+		Figure(net.minecraft.client.model.geom.ModelPart root) {
+			super(root);
+		}
+
+		@Override
+		public void setupAnim(State s) {
+			super.setupAnim(s);
+			if (s.throwK > 0) throwing(s.throwK);
+			switch (s.dance) {
+				case 0 -> armsUp(s.danceT);
+				case 1 -> floss(s.danceT);
+				case 2 -> pump(s.danceT);
+				case 3 -> wave(s.danceT);
+				default -> {
+				}
+			}
+		}
+
+		private static float ease(float u) {
+			u = Math.max(0, Math.min(1, u));
+			return u * u * (3 - 2 * u);
+		}
+
+		/** Turned at the waist (the arms going round with it). */
+		private void twist(float yaw) {
+			body.yRot = yaw;
+			rightArm.z = net.minecraft.util.Mth.sin(yaw) * 5;
+			rightArm.x = -net.minecraft.util.Mth.cos(yaw) * 5;
+			leftArm.z = -net.minecraft.util.Mth.sin(yaw) * 5;
+			leftArm.x = net.minecraft.util.Mth.cos(yaw) * 5;
+			rightArm.yRot = yaw;
+			leftArm.yRot = yaw;
+		}
+
+		/** Overarm: the arm back over the shoulder, then over and through, then back down to the side. */
+		private void throwing(float k) {
+			float arm, turn;
+			if (k < 0.25F) {
+				float u = ease(k / 0.25F);
+				arm = -3.0F * u;
+				turn = 0.3F * u;
+			} else if (k < 0.45F) {
+				float u = (k - 0.25F) / 0.2F;
+				arm = -3.0F + 2.4F * u;
+				turn = 0.3F - 0.55F * u;
+			} else {
+				float u = ease((k - 0.45F) / 0.55F);
+				arm = -0.6F * (1 - u);
+				turn = -0.25F * (1 - u);
+			}
+			twist(turn);
+			rightArm.xRot = arm;
+			rightArm.zRot = 0.08F;
+			leftArm.xRot = -0.6F * (float) Math.sin(Math.min(1, k) * Math.PI);
+			leftArm.zRot = -0.1F;
+		}
+
+		private static float phase(float t, float perSecond) {
+			return t / 20F * (float) Math.PI * 2 * perSecond;
+		}
+
+		/** Both arms up, hopping. */
+		private void armsUp(float t) {
+			float sway = 0.12F * net.minecraft.util.Mth.sin(phase(t, 2.2F));
+			rightArm.xRot = -2.8F;
+			leftArm.xRot = -2.8F;
+			rightArm.zRot = 0.3F + sway;
+			leftArm.zRot = -0.3F + sway;
+			rightArm.yRot = leftArm.yRot = 0;
+			head.xRot = -0.25F;
+		}
+
+		/** The floss: both arms straight and swinging side to side, one in front and one behind, the hips the other way. */
+		private void floss(float t) {
+			float ph = phase(t, 1.8F);
+			float side = net.minecraft.util.Mth.sin(ph), front = net.minecraft.util.Mth.cos(ph);
+			rightArm.xRot = -0.3F * front;
+			leftArm.xRot = 0.3F * front;
+			rightArm.yRot = leftArm.yRot = 0;
+			rightArm.zRot = 0.6F * side + 0.1F;
+			leftArm.zRot = 0.6F * side - 0.1F;
+			rightLeg.zRot = -0.16F * side;
+			leftLeg.zRot = -0.16F * side;
+			body.zRot = -0.06F * side;
+			head.zRot = 0.08F * side;
+		}
+
+		/** A fist pump: the right fist punching the air, the other hand at the hip. */
+		private void pump(float t) {
+			float up = Math.abs(net.minecraft.util.Mth.sin(phase(t, 1.6F)));
+			rightArm.xRot = -2.4F - 0.55F * up;
+			rightArm.yRot = 0;
+			rightArm.zRot = -0.1F;
+			leftArm.xRot = -0.25F;
+			leftArm.yRot = 0;
+			leftArm.zRot = -0.65F;
+			head.xRot = -0.2F * up;
+		}
+
+		/** A wave: the right arm up, the hand going side to side. */
+		private void wave(float t) {
+			rightArm.xRot = -2.75F;
+			rightArm.yRot = 0;
+			rightArm.zRot = 0.1F + 0.35F * net.minecraft.util.Mth.sin(phase(t, 1.5F));
+			head.zRot = 0.06F * net.minecraft.util.Mth.sin(phase(t, 0.75F));
+		}
 	}
 
 	public NpcRenderer(EntityRendererProvider.Context ctx) {
-		super(ctx, new HumanoidModel<>(ctx.bakeLayer(ModelLayers.PLAYER)), 0.5F);
+		super(ctx, new Figure(ctx.bakeLayer(ModelLayers.PLAYER)), 0.5F);
 		// Your cap and bag, when it's you on the battle stage.
 		addLayer(new GearLayer<>(this));
 	}
@@ -64,7 +179,12 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 	public void extractRenderState(Npc npc, State s, float partial) {
 		super.extractRenderState(npc, s, partial);
 		s.sprite = sprite(npc);
-		s.hop = npc.cheer > 0 ? 0.45F * Math.abs(net.minecraft.util.Mth.sin((40 - npc.cheer + partial) / 20F * (float) Math.PI * 2)) : 0;
+		float in = Npc.CHEER - npc.cheer + partial;
+		s.dance = npc.cheer > 0 ? npc.dance : -1;
+		s.danceT = in;
+		// Hopping with the arms up and with the fist pump.
+		s.hop = npc.cheer > 0 && (npc.dance == 0 || npc.dance == 2) ? 0.4F * Math.abs(net.minecraft.util.Mth.sin(in / 20F * (float) Math.PI * 2)) : 0;
+		s.throwK = npc.throwing > 0 ? 1 - Math.max(0, npc.throwing - partial) / Npc.THROW : 0;
 	}
 
 	static String sprite(Npc npc) {

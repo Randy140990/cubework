@@ -30,8 +30,11 @@ public class Npc extends PathfinderMob {
 	private static final EntityDataAccessor<Float> FACING = SynchedEntityData.defineId(Npc.class, EntityDataSerializers.FLOAT);
 	/** Walking up to someone they've spotted (server only): ticks left, or 0. */
 	public int approaching;
-	/** On the battle stage (your screen only): cheering a win, ticks left (hops for joy). */
-	public int cheer;
+	/** On the battle stage (your screen only): cheering a win, ticks left, and how (see NpcRenderer.Figure). */
+	public int cheer, dance;
+	/** On the battle stage (your screen only): throwing a Poké Ball, ticks left. */
+	public int throwing;
+	public static final int CHEER = 52, THROW = 12;
 
 	public Npc(EntityType<? extends PathfinderMob> type, Level level) {
 		super(type, level);
@@ -114,7 +117,10 @@ public class Npc extends PathfinderMob {
 	public void tick() {
 		super.tick();
 		if (!level().isClientSide()) serverTick();
-		else if (cheer > 0) cheer--;
+		else {
+			if (cheer > 0) cheer--;
+			if (throwing > 0) throwing--;
+		}
 		// FACING is the way they face right now (walking, too), so everyone sees them turn as they go.
 		face(facing());
 	}

@@ -191,7 +191,7 @@ public final class Device {
 		return new Frame(x, y, w, h, ix, iy, iw, ih, bar, bez, k, s);
 	}
 
-	private static final int RED = 0xFFDA3A33, RED_DARK = 0xFF9C1F1C, RED_LIGHT = 0xFFF0675A, INK = 0xFF0E1424;
+	private static final int RED = 0xFFDA3A33, RED_DARK = 0xFF9C1F1C, RED_LIGHT = 0xFFF0675A, INK = 0xFF0A1C20;
 
 	/** Behind what's on its screen: the world frosted and dimmed, the device's body, the dark of its screen. */
 	public static void back(GuiGraphics g, Frame f, int W, int H, int ticks, float partial) {
@@ -217,7 +217,9 @@ public final class Device {
 		// It folds in the middle: the right half opened out a little away from the light, and the hinge down the
 		// middle, its knuckles standing proud of the top and bottom edges.
 		int cx = x + w / 2;
-		half(g, x, y, w, h - Math.max(3, h / 60), r, cx, 0x1C000000);
+		g.enableScissor(cx, y - 1, x + w + 1, y + h + 1);
+		Ui.rr(g, x, y, w, h - Math.max(3, h / 60), r, 0x1C000000);
+		g.disableScissor();
 		int hw = Math.max(5, f.bez()), ky = Math.max(2, f.bez() / 3);
 		rounded(g, cx - hw / 2 + 1, y - ky + 2, hw, h + 2 * ky - 2, hw / 2, 0x50000000);
 		rounded(g, cx - hw / 2, y - ky, hw, h + 2 * ky - 2, hw / 2, RED_DARK);
@@ -245,18 +247,32 @@ public final class Device {
 		int ir = Math.max(3, r / 2);
 		rounded(g, f.ix() - 2, f.iy() - 2, f.iw() + 4, f.ih() + 4, ir + 1, 0xFF3A0E0E);
 		rounded(g, f.ix(), f.iy(), f.iw(), f.ih(), ir, INK);
-		g.fillGradient(f.ix(), f.iy() + f.bar(), f.ix() + f.iw(), f.iy() + f.ih() - ir, 0xFF15203A, 0xFF0C1222);
+		g.fillGradient(f.ix(), f.iy() + f.bar(), f.ix() + f.iw(), f.iy() + f.ih() - ir, 0xFF143A38, 0xFF0A1C20);
 	}
 
-	/** Over its screen: the status bar (the time, where you are, your money) and your hands holding it. */
-	public static void front(GuiGraphics g, Frame f, int W, int H, int ticks, float partial, Font font) {
-		if (f.y() >= H) return;
+	/**
+	 * Over its screen: the status bar (BACK, the time, where you are, your money) and the crease. Returns where the
+	 * BACK button is (x, y, w, h), or null.
+	 */
+	public static int[] front(GuiGraphics g, Frame f, int W, int H, int ticks, float partial, Font font, String back, boolean backOver) {
+		if (f.y() >= H) return null;
 		Minecraft mc = Minecraft.getInstance();
 		int s = Math.max(1, f.bar() / 11);
 		int bx = f.ix(), by = f.iy(), bw = f.iw(), bh = f.bar();
-		g.fill(bx + 3, by, bx + bw - 3, by + bh, 0xFF0A0F1C);
+		g.fill(bx + 3, by, bx + bw - 3, by + bh, 0xFF071517);
 		g.fill(bx + 3, by + bh - 1, bx + bw - 3, by + bh, 0x40FFFFFF);
 		int ty = by + (bh - 8 * s) / 2 + s / 2;
+		// BACK (or CLOSE), first along the bar: a pill with an arrow, cream under the mouse.
+		int[] backAt = null;
+		if (back != null) {
+			int pw = Ui.boldWidth(font, back, s) + 20 * s, ph = bh - 3 * s, px = bx + 5 * s, py = by + (bh - ph) / 2;
+			Ui.rr(g, px, py, pw, ph, ph / 2F, backOver ? Ui.CREAM : 0xFF1E4A45);
+			Ui.triangle(g, px + 7 * s, py + ph / 2F, 6 * s, 3, backOver ? Ui.CREAM_INK : 0xFF8FF5C0);
+			Ui.draw(g, font, Ui.bold(back), px + 13 * s, py + (ph - 8 * s) / 2, backOver ? Ui.CREAM_INK : Ui.TEXT, s, false);
+			backAt = new int[] {px, py, pw, ph};
+			bx += pw + 6 * s;
+			bw -= pw + 6 * s;
+		}
 		if (mc.level != null) {
 			long tod = Math.floorMod(mc.level.getDayTime(), 24000L);
 			int hour = (int) ((tod / 1000 + 6) % 24), minute = (int) ((tod % 1000) * 60 / 1000);
@@ -267,7 +283,7 @@ public final class Device {
 			Ui.draw(g, font, Ui.bold(clock), bx + 12 + cs, ty, Ui.TEXT, s, false);
 		}
 		String place = ClientState.placeName.isEmpty() ? "" : ClientState.placeName;
-		if (!place.isEmpty()) Ui.centred(g, font, place, bx + bw / 2, ty, Ui.MUTED, s, false);
+		if (!place.isEmpty()) Ui.centred(g, font, place, f.ix() + f.iw() / 2, ty, Ui.MUTED, s, false);
 		String cash = Ui.money(ClientState.data.money);
 		Ui.right(g, font, cash, bx + bw - 10, ty, Ui.GOLD, s);
 		// The crease where it folds, across the screen and all that's on it; the halves lit a little differently.
@@ -279,6 +295,7 @@ public final class Device {
 			g.fill(cx + i, f.iy(), cx + i + 1, f.iy() + f.ih(), Ui.alpha(0xFF000000, 0.34F * a * a));
 		}
 		g.fill(cx + 1, f.iy(), cx + 2, f.iy() + f.ih(), 0x18FFFFFF);
+		return backAt;
 	}
 
 	/** One half of a rounded shape (from x = from to its right edge), in a colour. */
@@ -337,24 +354,13 @@ public final class Device {
 		return (int) Math.round(r - Math.sqrt(Math.max(0, r * r - dy * dy)));
 	}
 
-	/** A rectangle with properly rounded corners (radius r). */
+	/** A rectangle with properly rounded corners (radius r), smooth. */
 	public static void rounded(GuiGraphics g, int x, int y, int w, int h, int r, int color) {
-		r = Math.max(0, Math.min(r, Math.min(w, h) / 2));
-		for (int i = 0; i < r; i++) {
-			int in = inset(r, i);
-			g.fill(x + in, y + i, x + w - in, y + i + 1, color);
-			g.fill(x + in, y + h - i - 1, x + w - in, y + h - i, color);
-		}
-		g.fill(x, y + r, x + w, y + h - r, color);
+		Ui.rr(g, x, y, w, h, r, color);
 	}
 
-	/** A filled ellipse centred on (cx, cy). */
+	/** A filled ellipse centred on (cx, cy), smooth. */
 	public static void disc(GuiGraphics g, int cx, int cy, int rx, int ry, int color) {
-		if (rx <= 0 || ry <= 0) return;
-		for (int i = -ry; i < ry; i++) {
-			double v = (i + 0.5) / ry;
-			int half = (int) Math.round(rx * Math.sqrt(Math.max(0, 1 - v * v)));
-			if (half > 0) g.fill(cx - half, cy + i, cx + half, cy + i + 1, color);
-		}
+		Ui.ellipse(g, cx, cy, rx, ry, color);
 	}
 }

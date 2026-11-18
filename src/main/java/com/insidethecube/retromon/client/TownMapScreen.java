@@ -339,7 +339,7 @@ public class TownMapScreen extends DeviceScreen {
 			int tw = Ui.boldWidth(font, label, s) + 16 * s;
 			boolean on = t.equals(tab);
 			Ui.round(g, x + s, m + 2 * s, tw, 14 * s, 0x50000000, 4 * s);
-			Ui.round(g, x, m, tw, 14 * s, on ? Ui.CREAM : 0xD0141B2E, 4 * s);
+			Ui.round(g, x, m, tw, 14 * s, on ? Ui.CREAM : 0xD0123C38, 4 * s);
 			Ui.draw(g, font, Ui.bold(label), x + 8 * s, m + 3 * s, on ? Ui.CREAM_INK : Ui.TEXT, s, false);
 			hit(x, m, tw, 14 * s, () -> {
 				tab = t;
@@ -353,7 +353,7 @@ public class TownMapScreen extends DeviceScreen {
 		if (highlightTitle != null) {
 			String h = "Where " + highlightTitle + " lives";
 			int hw = Ui.width(font, h, s) + 12 * s;
-			Ui.round(g, x + 4 * s, m, hw, 14 * s, 0xD0141B2E, 4 * s);
+			Ui.round(g, x + 4 * s, m, hw, 14 * s, 0xD0123C38, 4 * s);
 			Ui.text(g, font, h, x + 10 * s, m + 3 * s, 0xFFFFD34A, s);
 		}
 	}
@@ -418,7 +418,7 @@ public class TownMapScreen extends DeviceScreen {
 			boolean been = ClientState.data.visited.contains(zn.place());
 			boolean sel = zn.place().equals(picked);
 			Ui.round(g, bx + s, by + 2 * s, lw, lh, 0x50000000, 4 * s);
-			Ui.round(g, bx, by, lw, lh, sel ? Ui.CREAM : town ? (been ? 0xF0E5525C : 0xE0485068) : 0xD0141B2E, 4 * s);
+			Ui.round(g, bx, by, lw, lh, sel ? Ui.CREAM : town ? (been ? 0xF0E5525C : 0xE0485068) : 0xD0123C38, 4 * s);
 			int ink = sel ? Ui.CREAM_INK : 0xFFFFFFFF;
 			if (town) Ui.draw(g, font, Ui.bold(name), bx + 6 * s, by + 3 * s, ink, s, false);
 			else Ui.plain(g, font, name, bx + 6 * s, by + 3 * s, sel ? Ui.CREAM_INK : Ui.TEXT, s);
@@ -475,7 +475,7 @@ public class TownMapScreen extends DeviceScreen {
 	private void drawCompass(GuiGraphics g, double z) {
 		int r = 9 * s, cxp = width - r - 8 * s, cyp = 8 * s + r + 18 * s;
 		Device.disc(g, cxp, cyp + s, r, r, 0x50000000);
-		Device.disc(g, cxp, cyp, r, r, 0xF0141B2E);
+		Device.disc(g, cxp, cyp, r, r, 0xF0123C38);
 		for (int i = 0; i < r - 2 * s; i++) g.fill(cxp - Math.max(1, (r - 2 * s - i) / 3), cyp - i, cxp + Math.max(1, (r - 2 * s - i) / 3), cyp - i + 1, 0xFFE5525C);
 		Ui.centred(g, font, "N", cxp, cyp - r - 10 * s, 0xFFFFFFFF, s, true);
 		// The scale: a bar for a round distance.
@@ -492,7 +492,7 @@ public class TownMapScreen extends DeviceScreen {
 		Ui.right(g, font, len + " m", bx + bw, by - 12 * s, 0xFFFFFFFF, s);
 		// The zoom, with + and - to click.
 		int zx = width - 18 * s, zy = cyp + r + 12 * s, zh = Math.max(30 * s, height - zy - 46 * s);
-		Ui.round(g, zx, zy, 12 * s, zh, 0xD0141B2E, 4 * s);
+		Ui.round(g, zx, zy, 12 * s, zh, 0xD0123C38, 4 * s);
 		double f = (Math.log(z) - Math.log(fit())) / Math.max(0.01, Math.log(MAX_ZOOM) - Math.log(fit()));
 		int ky = zy + zh - 14 * s - (int) ((zh - 28 * s) * Math.max(0, Math.min(1, f)));
 		Ui.round(g, zx + 2 * s, ky + 4 * s, 8 * s, 6 * s, Ui.CREAM, 2 * s);
@@ -611,7 +611,7 @@ public class TownMapScreen extends DeviceScreen {
 		}
 		// The panel: the picked place.
 		int px = width - m - panelW, py = m + 22 * s, ph = 92 * s;
-		Ui.round(g, px, py, panelW, ph, 0xF0141B2E, 3 * s);
+		Ui.round(g, px, py, panelW, ph, 0xF0123C38, 3 * s);
 		Point sel = points.get(at);
 		if (sel != null) {
 			List<String> nm = Ui.wrap(font, sel.name(), (panelW - 16 * s) / s);
