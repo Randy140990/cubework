@@ -136,18 +136,17 @@ public abstract class GameScreen extends Screen {
 
 	/** A list to pick from, drawn as a panel with the cursor (and clickable): YES/NO, items, the menu. */
 	protected void choice(GuiGraphics g, Choice c, int x, int y, int w, IntConsumer pick) {
+		// A soft glass card with a row of pills; the picked one cream with dark text (the newer games' lists).
 		int h = c.height(s);
-		Ui.panel(g, x, y, w, h, s);
+		Ui.round(g, x, y, w, h, 0xE6141B2E, 3 * s);
 		for (int i = 0; i < c.options.size(); i++) {
 			int ty = y + 6 * s + i * 13 * s;
 			int row = i;
 			boolean hover = over(x, ty - 2 * s, w, 13 * s);
 			if (hover) c.at = i;
-			if (i == c.at) {
-				Ui.round(g, x + 3 * s, ty - 2 * s, w - 6 * s, 12 * s, 0x334A8FE0, s);
-				Ui.text(g, font, Ui.CURSOR, x + 6 * s, ty, Ui.GOLD, s);
-			}
-			Ui.text(g, font, c.options.get(i), x + 16 * s, ty, i == c.at ? Ui.TEXT : Ui.MUTED, s);
+			boolean on = i == c.at;
+			Ui.pill(g, x + 3 * s, ty - 2 * s, w - 6 * s, 12 * s, on, s);
+			Ui.draw(g, font, Ui.bold(c.options.get(i)), x + 10 * s, ty, on ? Ui.CREAM_INK : Ui.TEXT, s, false);
 			hit(x, ty - 2 * s, w, 13 * s, () -> pick.accept(row));
 		}
 	}
@@ -234,12 +233,16 @@ public abstract class GameScreen extends Screen {
 		}
 
 		public void render(GuiGraphics g, Font f, int x, int y, int w, int h, int s, int ticks, boolean arrow) {
+			// The speech panel as the newer games have it: warm cream, rounded, dark text, a soft shadow below,
+			// and the speaker's name on a dark tab.
+			Ui.round(g, x + s, y + 2 * s, w, h, 0x40000000, 4 * s);
+			Ui.round(g, x, y, w, h, 0xF8FBF5E6, 4 * s);
+			Ui.round(g, x + 2 * s, y + 2 * s, w - 4 * s, h - 4 * s, 0xFFFFF9EC, 3 * s);
 			if (speaker != null && !speaker.isEmpty()) {
-				int tw = Ui.boldWidth(f, speaker, s) + 14 * s;
-				Ui.round(g, x + 8 * s, y - 10 * s, tw, 12 * s, Ui.CREAM, s);
-				Ui.draw(g, f, Ui.bold(speaker), x + 15 * s, y - 8 * s, Ui.CREAM_INK, s, false);
+				int tw = Ui.boldWidth(f, speaker, s) + 16 * s;
+				Ui.round(g, x + 10 * s, y - 7 * s, tw, 13 * s, 0xFF26304A, 3 * s);
+				Ui.draw(g, f, Ui.bold(speaker), x + 18 * s, y - 4 * s, 0xFFFFFFFF, s, false);
 			}
-			Ui.panel(g, x, y, w, h, s);
 			layout(f, (w - 20 * s) / s);
 			if (page >= pages.size()) return;
 			String[] p = pages.get(page);
@@ -247,9 +250,9 @@ public abstract class GameScreen extends Screen {
 			String a = p[0].substring(0, Math.min(p[0].length(), Math.max(0, left)));
 			left -= p[0].length();
 			String b = left > 0 ? p[1].substring(0, Math.min(p[1].length(), left)) : "";
-			Ui.text(g, f, a, x + 10 * s, y + 8 * s, Ui.TEXT, s);
-			Ui.text(g, f, b, x + 10 * s, y + 8 * s + 11 * s, Ui.TEXT, s);
-			if (arrow && typedOut() && (ticks / 8) % 2 == 0) Ui.text(g, f, "▼", x + w - 14 * s, y + h - 13 * s, Ui.GOLD, s);
+			Ui.plain(g, f, a, x + 14 * s, y + 10 * s, Ui.CREAM_INK, s);
+			Ui.plain(g, f, b, x + 14 * s, y + 10 * s + 12 * s, Ui.CREAM_INK, s);
+			if (arrow && typedOut()) Ui.plain(g, f, "▼", x + w - 16 * s, y + h - 14 * s + ((ticks / 6) % 2) * s, 0xFFE5525C, s);
 		}
 	}
 

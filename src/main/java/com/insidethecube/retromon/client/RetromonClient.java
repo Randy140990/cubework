@@ -30,6 +30,7 @@ public class RetromonClient implements ClientModInitializer {
 						net.fabricmc.fabric.api.resource.ResourcePackActivationType.NORMAL));
 		ClientPlayNetworking.registerGlobalReceiver(Net.Push.TYPE, (payload, ctx) -> ClientState.receive(payload.kind(), payload.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
+			IntroScreen.tickPending();
 			Sounds.tick();
 			Music.tick(mc);
 			Adventure.tick(mc);

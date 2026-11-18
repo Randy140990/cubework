@@ -63,6 +63,25 @@ public class IntroScreen extends GameScreen {
 	private final StringBuilder typed = new StringBuilder();
 	private String playerName = "", rivalName = "";
 	private String slotName;
+	/** Who's on screen while Oak talks: oak, hero (you) or rival. */
+	private String scene = "oak";
+	/**
+	 * A save to open once this tick is over: opening a world from inside a screen's tick trips Fabric's screen
+	 * events (the screen changes under them), so it waits for the end of the tick.
+	 */
+	private static String pendingLoad;
+	private static Screen pendingParent;
+
+	/** Called at the end of each client tick: opens the save that's waiting, if there is one. */
+	public static void tickPending() {
+		if (pendingLoad == null) return;
+		String folder = pendingLoad;
+		Screen parent = pendingParent;
+		pendingLoad = null;
+		pendingParent = null;
+		Minecraft mc = Minecraft.getInstance();
+		mc.createWorldOpenFlows().openWorld(folder, () -> mc.setScreen(new IntroScreen(parent)));
+	}
 
 	public IntroScreen(Screen parent) {
 		super("Retromon");
@@ -157,6 +176,11 @@ public class IntroScreen extends GameScreen {
 	// ---------- Professor Oak's welcome ----------
 
 	private void say(List<String> lines, Runnable then) {
+		say(lines, "oak", then);
+	}
+
+	private void say(List<String> lines, String who, Runnable then) {
+		scene = who;
 		talk = new TextBox(lines);
 		talk.speaker = "PROF. OAK";
 		afterTalk = then;
@@ -203,12 +227,12 @@ public class IntroScreen extends GameScreen {
 		if (name.isEmpty()) return;
 		if (!namingRival) {
 			playerName = name;
-			say(List.of("Right! So your name is " + name + "!", "This is my grandson. He's been your rival since you were a baby.",
-					"...Erm, what is his name again?"), () -> startNaming(true));
+			say(List.of("Right! So your name is " + name + "!"), "hero", () -> say(List.of("This is my grandson. He's been your rival since you were a baby.",
+					"...Erm, what is his name again?"), "rival", () -> startNaming(true)));
 		} else {
 			rivalName = name;
-			say(List.of("That's right! I remember now! His name is " + name + "!", playerName + "!", "Your very own POKéMON legend is about to unfold!",
-					"A world of dreams and adventures with POKéMON awaits! Let's go!"), this::newGame);
+			say(List.of("That's right! I remember now! His name is " + name + "!"), "rival", () -> say(List.of(playerName + "!",
+					"Your very own POKéMON legend is about to unfold!", "A world of dreams and adventures with POKéMON awaits! Let's go!"), "hero", this::newGame));
 		}
 	}
 
@@ -331,8 +355,8 @@ public class IntroScreen extends GameScreen {
 	}
 
 	private void load(String folder) {
-		Minecraft mc = Minecraft.getInstance();
-		mc.createWorldOpenFlows().openWorld(folder, () -> mc.setScreen(new IntroScreen(parent)));
+		pendingLoad = folder;
+		pendingParent = parent;
 	}
 
 	/** The Kanto map: inside the Kanto map mod (Retromon's second jar), or a world or zip in .minecraft/retromon (for map makers). */
@@ -497,18 +521,24 @@ public class IntroScreen extends GameScreen {
 
 	// ---------- drawing ----------
 
+	private static final Identifier OAK = Retromon.id("textures/entity/npc/oak.png");
+	private static final Identifier RIVAL = Retromon.id("textures/entity/npc/blue.png");
+
+	private Identifier hero() {
+		return Retromon.id("textures/entity/player/" + (girl ? "girl" : "boy") + ".png");
+	}
+
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
 		g.fill(0, 0, width, height, 0xFF0A0E24);
-		// The picture, filling the screen, crisp (dimmed while Oak talks).
+		// The picture, filling the screen, crisp (dimmed once Oak's talking).
 		float k = Math.max(width / (float) ART_W, height / (float) ART_H);
 		int w = Math.round(ART_W * k), h = Math.round(ART_H * k);
 		g.blit(RenderPipelines.GUI_TEXTURED, ART, (width - w) / 2, (height - h) / 2, 0, 0, w, h, ART_W, ART_H, ART_W, ART_H);
-		boolean oak = step == Step.TALK || step == Step.GENDER || step == Step.NAME || step == Step.COPYING;
-		if (oak) {
-			g.fill(0, 0, width, height, 0xC00A0E24);
+		boolean story = step == Step.TALK || step == Step.GENDER || step == Step.NAME || step == Step.COPYING;
+		if (story) {
+			g.fill(0, 0, width, height, 0xD00A0E24);
 			Ui.cinema(g, width, height, 1);
-			drawOak(g);
 		} else {
 			int big = Math.max(2, s * 3);
 			int tw = Ui.boldWidth(font, "RETROMON", big);
@@ -529,25 +559,44 @@ public class IntroScreen extends GameScreen {
 				choice(g, menu, (width - mw) / 2, height * 3 / 5, mw, this::menuPick);
 			}
 			case SLOTS -> drawSlots(g);
-			case TALK -> talk.render(g, font, m, height - boxHeight() - m - height / 10, width - 2 * m, boxHeight(), s, ticks, true);
+			case TALK -> {
+				drawSpeaker(g, partial);
+				int bh = boxHeight();
+				talk.render(g, font, m * 2, height - bh - height / 9, width - 4 * m, bh, s, ticks, true);
+			}
 			case GENDER -> drawGender(g);
 			case NAME -> drawNames(g);
-			case COPYING -> panel(g, List.of(progress));
+			case COPYING -> {
+				figure(g, hero(), width / 2, height / 7, (int) (height * 0.5F), true, partial);
+				panel(g, List.of(progress));
+			}
 			case FAILED -> panel(g, Ui.wrap(font, "The new game couldn't be made: " + failure, 240), true);
 		}
-		if (!oak) Ui.centred(g, font, "A fan game by Insid3 Th3 Cub3.  Pokemon models from Cobblemon (CC BY-NC 3.0).", width / 2, height - 12, 0xFF9098C0, 1, true);
+		if (!story) Ui.centred(g, font, "A fan game by Insid3 Th3 Cub3.  Pokemon models from Cobblemon (CC BY-NC 3.0).", width / 2, height - 12, 0xFF9098C0, 1, true);
 	}
 
-	/** The professor, as a nameplate under a soft spotlight (his part of the scene). */
-	private void drawOak(GuiGraphics g) {
-		int cx = width / 2, cy = height / 3, r = 46 * s;
-		for (int i = r; i > 0; i -= Math.max(1, s)) {
-			int a = (int) (60 * (1 - i / (float) r));
-			g.fill(cx - i, cy - i / 2, cx + i, cy + i / 2, a << 24 | 0xFFF4D8);
+	/** A figure centred on cx with its top at y, about tall pixels high: the professor to the waist, people in full. */
+	private void figure(GuiGraphics g, Identifier tex, int cx, int y, int tall, boolean full, float partial) {
+		int px = Math.max(1, tall / (full ? 32 : 20));
+		int bob = (int) Math.round(Math.sin((ticks + partial) * 0.12) * px * 0.25);
+		// A soft light behind them.
+		int r = 16 * px;
+		for (int i = 0; i < 6; i++) {
+			int rr = r - i * r / 7;
+			Ui.round(g, cx - rr, y + tall / 2 - rr * 3 / 4, 2 * rr, rr * 3 / 2, 0x0CFFF4D8, rr / 2);
 		}
-		int pw = Ui.boldWidth(font, "PROF. OAK", s * 2);
-		Ui.draw(g, font, Ui.bold("PROF. OAK"), cx - pw / 2, cy - 8 * s, Ui.CREAM, s * 2, true);
-		Ui.centred(g, font, "POKéMON RESEARCHER  ·  PALLET TOWN", cx, cy + 12 * s, 0xFFB8C0E0, s, true);
+		SkinFigure.draw(g, tex, cx - 8 * px, y, px, full, bob);
+		if (full) SkinFigure.shadow(g, cx, y + 32 * px, 14 * px, Math.max(1, px / 2));
+	}
+
+	/** Whoever's in the scene as Oak talks: Oak himself, you, or your rival. */
+	private void drawSpeaker(GuiGraphics g, float partial) {
+		int top = height / 9 + 6 * s, tall = height - top - boxHeight() - height / 9 - 10 * s;
+		switch (scene) {
+			case "hero" -> figure(g, hero(), width / 2, top, tall, true, partial);
+			case "rival" -> figure(g, RIVAL, width / 2, top, tall, true, partial);
+			default -> figure(g, OAK, width / 2, top, tall, false, partial);
+		}
 	}
 
 	private void drawSlots(GuiGraphics g) {
@@ -573,40 +622,45 @@ public class IntroScreen extends GameScreen {
 	}
 
 	private void drawGender(GuiGraphics g) {
-		int cw = 90 * s, ch = 110 * s, gap = 14 * s, x0 = (width - 2 * cw - gap) / 2, y = height / 2 - ch / 2 + 10 * s;
+		int top = height / 9 + 22 * s, ch = height - top - height / 9 - 12 * s, cw = Math.min(ch * 2 / 3, width / 3), gap = 16 * s;
+		int x0 = (width - 2 * cw - gap) / 2;
+		Ui.centred(g, font, "Are you a boy? Or are you a girl?", width / 2, top - 14 * s, Ui.TEXT, s, true);
 		String[] label = {"BOY", "GIRL"};
 		int[] col = {0xFF4A8FE0, 0xFFE5525C};
 		for (int i = 0; i < 2; i++) {
 			int x = x0 + i * (cw + gap);
 			int idx = i;
-			if (over(x, y, cw, ch)) genderAt = i;
+			if (over(x, top, cw, ch)) genderAt = i;
 			boolean on = genderAt == i;
-			Ui.round(g, x, y, cw, ch, on ? Ui.CREAM : 0xE6141B2E, 3 * s);
-			// A simple figure: head, body, legs, in the card's colour.
-			int fx = x + cw / 2, fy = y + 16 * s;
-			Ui.round(g, fx - 9 * s, fy, 18 * s, 18 * s, on ? 0xFFF1C9A5 : 0xFFB89A80, 4 * s);
-			Ui.round(g, fx - 12 * s, fy - 3 * s, 24 * s, 8 * s, col[i], 2 * s);
-			Ui.round(g, fx - 13 * s, fy + 20 * s, 26 * s, 30 * s, col[i], 3 * s);
-			Ui.round(g, fx - 10 * s, fy + 51 * s, 8 * s, 18 * s, on ? 0xFF2C3550 : 0xFF3A4260, s);
-			Ui.round(g, fx + 2 * s, fy + 51 * s, 8 * s, 18 * s, on ? 0xFF2C3550 : 0xFF3A4260, s);
+			Ui.round(g, x, top, cw, ch, on ? Ui.CREAM : 0xE6141B2E, 4 * s);
+			Ui.round(g, x, top, cw, 5 * s, col[i], 2 * s);
+			Identifier tex = Retromon.id("textures/entity/player/" + (i == 1 ? "girl" : "boy") + ".png");
+			int tall = ch - 34 * s, px = Math.max(1, tall / 32);
+			SkinFigure.draw(g, tex, x + cw / 2 - 8 * px, top + 10 * s, px, true, 0);
+			SkinFigure.shadow(g, x + cw / 2, top + 10 * s + 32 * px, 14 * px, Math.max(1, px / 2));
 			int lw = Ui.boldWidth(font, label[i], s);
-			Ui.draw(g, font, Ui.bold(label[i]), fx - lw / 2, y + ch - 16 * s, on ? Ui.CREAM_INK : Ui.TEXT, s, !on);
-			hit(x, y, cw, ch, () -> pickGender(idx));
+			Ui.draw(g, font, Ui.bold(label[i]), x + (cw - lw) / 2, top + ch - 16 * s, on ? Ui.CREAM_INK : Ui.TEXT, s, !on);
+			hit(x, top, cw, ch, () -> pickGender(idx));
 		}
-		Ui.centred(g, font, "Are you a boy? Or are you a girl?", width / 2, y - 18 * s, Ui.TEXT, s, true);
 	}
 
 	private void drawNames(GuiGraphics g) {
-		int w = 150 * s, x = width / 2 - w - 6 * s, y = height / 2 - 30 * s;
-		String q = namingRival ? "His name?" : "Your name?";
-		Ui.centred(g, font, q, width / 2, y - 18 * s, Ui.TEXT, s, true);
-		choice(g, names, x, y, w, this::pickName);
-		// The typed name, in a cream field (when NEW NAME's picked).
-		int fx = width / 2 + 6 * s, fw = 150 * s, fh = 22 * s;
-		Ui.round(g, fx, y, fw, fh, typing ? Ui.CREAM : 0x80141B2E, 2 * s);
-		String shown = typing ? typed + ((ticks / 10) % 2 == 0 && typed.length() < 10 ? "_" : "") : "NEW NAME: type it";
-		Ui.draw(g, font, Ui.bold(shown), fx + 8 * s, y + 7 * s, typing ? Ui.CREAM_INK : Ui.MUTED, s, false);
-		if (typing) Ui.text(g, font, "Enter: done.  Backspace: delete.", fx, y + fh + 5 * s, Ui.DIM, s);
+		// Who's being named stands on the left; the names on a card on the right.
+		int top = height / 9 + 8 * s, tall = height - top - height / 9 - 10 * s;
+		figure(g, namingRival ? RIVAL : hero(), width / 3, top, tall, true, 0);
+		int cw = Math.min(170 * s, width / 2 - 20 * s), cx = width / 2 + 10 * s;
+		int listH = names.height(s);
+		int ch = 26 * s + listH + (typing ? 30 * s : 0), cy = height / 2 - ch / 2;
+		Ui.round(g, cx, cy, cw, ch, 0xF0141B2E, 4 * s);
+		Ui.heading(g, font, namingRival ? "YOUR RIVAL'S NAME" : "YOUR NAME", cx + 10 * s, cy + 8 * s, Ui.TEXT, s);
+		choice(g, names, cx + 4 * s, cy + 20 * s, cw - 8 * s, this::pickName);
+		if (typing) {
+			int fy = cy + 22 * s + listH, fw = cw - 20 * s;
+			Ui.round(g, cx + 10 * s, fy, fw, 18 * s, Ui.CREAM, 3 * s);
+			String shown = typed + ((ticks / 10) % 2 == 0 && typed.length() < 10 ? "_" : "");
+			Ui.draw(g, font, Ui.bold(shown.isEmpty() ? "_" : shown), cx + 18 * s, fy + 5 * s, Ui.CREAM_INK, s, false);
+			Ui.draw(g, font, Ui.ui("Enter"), cx + 10 * s + fw - 8 * s - Ui.width(font, "Enter", s), fy + 5 * s, 0xFF8A93AA, s, false);
+		}
 	}
 
 	private void panel(GuiGraphics g, List<String> lines) {
@@ -617,7 +671,7 @@ public class IntroScreen extends GameScreen {
 		int w = 0;
 		for (String l : lines) w = Math.max(w, Ui.width(font, l, s));
 		w += 24 * s;
-		int h = lines.size() * 11 * s + 14 * s + (back ? 12 * s : 0), x = (width - w) / 2, y = height * 3 / 5 - h / 2;
+		int h = lines.size() * 11 * s + 14 * s + (back ? 12 * s : 0), x = (width - w) / 2, y = height * 4 / 5 - h / 2;
 		Ui.round(g, x, y, w, h, 0xF0141B2E, 3 * s);
 		for (int i = 0; i < lines.size(); i++) Ui.text(g, font, lines.get(i), x + 12 * s, y + 8 * s + i * 11 * s, Ui.TEXT, s);
 		if (back) Ui.text(g, font, "A: back", x + 12 * s, y + h - 16 * s, Ui.DIM, s);
