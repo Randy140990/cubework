@@ -1,3 +1,0 @@
-net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback$RegistrationHelper
-net.minecraft.world.entity.player.PlayerSkin
-net.minecraft.client.renderer.texture.TextureManager

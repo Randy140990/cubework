@@ -270,11 +270,11 @@ public final class Device {
 		} catch (Exception e) {
 			return;
 		}
-		float gy = f.y() + f.h() * 0.62F;
+		// Holding it low on each side; the forearms long enough to run off the bottom of the screen.
+		float gy = f.y() + f.h() * 0.78F;
 		double ang = Math.atan2(0.42, 1);
-		// Long enough to run off the bottom of the screen.
 		float reach = (float) ((H - gy + 24) / Math.cos(ang));
-		int p = Math.max(Math.max(3, Math.round(f.h() * 0.03F)), (int) Math.ceil(reach / 12F));
+		int p = Math.max(Math.max(3, Math.round(f.h() * 0.032F)), (int) Math.ceil(reach / 12F));
 		arm(g, skin, true, f.x() + f.bez() * 0.35F, gy, (float) ang, p, f);
 		arm(g, skin, false, f.x() + f.w() - f.bez() * 0.35F, gy, (float) -ang, p, f);
 	}
@@ -288,18 +288,20 @@ public final class Device {
 		g.pose().translate(gx, gy);
 		g.pose().rotate(angle);
 		g.pose().scale(1, -1);
-		// The arm's outer side (darker, as it turns away from the light), then its front; the sleeve over both.
-		int sx = left ? -w / 2 - side : w / 2;
+		// Beside the device (overlapping its edge by a pixel of the skin): the arm's outer side, darker as it turns
+		// away from the light, then its front; the sleeve over both.
+		int fx = left ? -w + p : -p;
+		int sx = left ? fx - side : fx + w;
 		g.blit(RenderPipelines.GUI_TEXTURED, skin, sx, -L, su, sv, side, L, 4, 12, 64, 64, 0xFF9AA0A8);
-		g.blit(RenderPipelines.GUI_TEXTURED, skin, -w / 2, -L, fu, fv, w, L, 4, 12, 64, 64, 0xFFFFFFFF);
+		g.blit(RenderPipelines.GUI_TEXTURED, skin, fx, -L, fu, fv, w, L, 4, 12, 64, 64, 0xFFFFFFFF);
 		g.blit(RenderPipelines.GUI_TEXTURED, skin, sx, -L, lsu, lsv, side, L, 4, 12, 64, 64, 0xFF9AA0A8);
-		g.blit(RenderPipelines.GUI_TEXTURED, skin, -w / 2, -L, lu, lv, w, L, 4, 12, 64, 64, 0xFFFFFFFF);
+		g.blit(RenderPipelines.GUI_TEXTURED, skin, fx, -L, lu, lv, w, L, 4, 12, 64, 64, 0xFFFFFFFF);
 		// A soft shade where the hand meets the device.
-		g.fill(-w / 2, -p, w / 2, 0, 0x22000000);
+		g.fill(fx, -p, fx + w, 0, 0x22000000);
 		g.pose().popMatrix();
 		// The thumb, over the front of the device (the hand's own colour).
 		g.pose().pushMatrix();
-		float tx = gx + (left ? 1 : -1) * p * 1.1F, ty = gy - p * 0.9F;
+		float tx = gx + (left ? 1 : -1) * p * 0.9F, ty = gy - p * 0.9F;
 		g.pose().translate(tx, ty);
 		g.pose().rotate(left ? 0.5F : -0.5F);
 		int tw = Math.max(2, Math.round(p * 1.3F)), th = Math.max(3, Math.round(p * 2.1F));

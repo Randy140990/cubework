@@ -84,6 +84,8 @@ public final class Game {
 		Flags.solidSigns = ourSave;
 		STREET.clear();
 		heldTime = -1;
+		frozenWorld = false;
+		DEVICES.clear();
 		zones.clear();
 		if (!ourSave) return;
 		try {
@@ -968,11 +970,24 @@ public final class Game {
 
 	/** The time when a battle began: the world's clock stands still until it's over (so day doesn't turn to night mid-fight). */
 	private static long heldTime = -1;
+	/** The world's held still (a Pokédex is out). */
+	private static boolean frozenWorld;
 
 	private static void holdTime(MinecraftServer s) {
 		if (!ourSave) return;
-		boolean fighting = false;
-		for (ServerPlayer p : s.getPlayerList().getPlayers()) if (adventure(p) && (Battles.in(p) || DEVICES.contains(p.getUUID()))) fighting = true;
+		boolean fighting = false, device = false;
+		for (ServerPlayer p : s.getPlayerList().getPlayers()) {
+			if (!adventure(p)) continue;
+			if (Battles.in(p)) fighting = true;
+			if (DEVICES.contains(p.getUUID())) device = true;
+		}
+		// With your Pokédex out (playing alone), the whole world waits: people and Pokémon stand still too.
+		boolean freeze = device && s.isSingleplayer();
+		if (freeze != frozenWorld) {
+			frozenWorld = freeze;
+			s.tickRateManager().setFrozen(freeze);
+		}
+		fighting |= device;
 		ServerLevel level = s.overworld();
 		if (fighting == heldTime >= 0) return;
 		// The clock stops (the game rule, so your screen's clock stops too, with no jumps back) and starts again after.
