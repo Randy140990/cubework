@@ -257,8 +257,8 @@ public final class BedrockModel {
 			return;
 		}
 		parts.put(name, part);
-		// Cobblemon's extra faces for when Ditto turns into it.
-		if (name.contains("ditto")) part.visible = false;
+		// Cobblemon's extra faces for when Ditto turns into it (but Ditto's own body is called "ditto": that stays).
+		if (name.contains("ditto") && !def.species.equals("ditto")) part.visible = false;
 		for (JsonObject child : children.getOrDefault(name, List.of())) collect(part, child, children);
 	}
 

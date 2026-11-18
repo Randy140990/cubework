@@ -131,7 +131,7 @@ def model_quads(geo, anim=None, hidden=()):
 
     def build(b, parent_m, parent_pivot):
         # Parts hidden in its pose (Pidgey's open wings) and Ditto's faces are left out, with all they carry.
-        if b["name"] in hidden or "ditto" in b["name"]:
+        if b["name"] in hidden or ("ditto" in b["name"] and not g["description"].get("identifier", "").endswith("ditto")):
             return
         pv, rot = vec(b, "pivot"), vec(b, "rotation")
         r = (-math.radians(rot[0]), -math.radians(rot[1]), math.radians(rot[2]))
