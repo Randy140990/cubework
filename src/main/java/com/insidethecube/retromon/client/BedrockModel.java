@@ -219,10 +219,12 @@ public final class BedrockModel {
 				addBox(cubes, c, pv);
 			}
 		}
+		// Bedrock's turns go the other way round from Minecraft's (in x, y and z alike, while its moves are mirrored in x and y):
+		// read the other way, Pikachu stood on its hind legs covering its eyes, Onix on its head, Pidgey a box. All 251 checked.
 		PartPose pose = parentPivot == null
-				? PartPose.offsetAndRotation(-pv[0], 24 - pv[1], pv[2], -rad(rot[0]), -rad(rot[1]), rad(rot[2]))
-				: PartPose.offsetAndRotation(-(pv[0] - parentPivot[0]), -(pv[1] - parentPivot[1]), pv[2] - parentPivot[2], -rad(rot[0]), -rad(rot[1]),
-						rad(rot[2]));
+				? PartPose.offsetAndRotation(-pv[0], 24 - pv[1], pv[2], rad(rot[0]), rad(rot[1]), -rad(rot[2]))
+				: PartPose.offsetAndRotation(-(pv[0] - parentPivot[0]), -(pv[1] - parentPivot[1]), pv[2] - parentPivot[2], rad(rot[0]), rad(rot[1]),
+						-rad(rot[2]));
 		PartDefinition def = parentDef.addOrReplaceChild(name, cubes, pose);
 		for (int i = 0; i < turned.size(); i++) {
 			JsonObject c = turned.get(i);
@@ -230,7 +232,7 @@ public final class BedrockModel {
 			CubeListBuilder one = CubeListBuilder.create();
 			addBox(one, c, cp);
 			def.addOrReplaceChild(name + "_r" + i, one,
-					PartPose.offsetAndRotation(-(cp[0] - pv[0]), -(cp[1] - pv[1]), cp[2] - pv[2], -rad(r[0]), -rad(r[1]), rad(r[2])));
+					PartPose.offsetAndRotation(-(cp[0] - pv[0]), -(cp[1] - pv[1]), cp[2] - pv[2], rad(r[0]), rad(r[1]), -rad(r[2])));
 		}
 		for (JsonObject child : children.getOrDefault(name, List.of())) build(def, child, pv, children);
 	}
@@ -300,9 +302,9 @@ public final class BedrockModel {
 			}
 			if (t.has("rotation") && t.get("rotation").isJsonArray()) {
 				JsonArray v = t.getAsJsonArray("rotation");
-				p.xRot += (float) -Math.toRadians(v.get(0).getAsFloat());
-				p.yRot += (float) -Math.toRadians(v.get(1).getAsFloat());
-				p.zRot += (float) Math.toRadians(v.get(2).getAsFloat());
+				p.xRot += (float) Math.toRadians(v.get(0).getAsFloat());
+				p.yRot += (float) Math.toRadians(v.get(1).getAsFloat());
+				p.zRot += (float) -Math.toRadians(v.get(2).getAsFloat());
 			}
 		}
 		apply(pd != null ? pd.anim() : def.idle, seconds, true);
@@ -327,9 +329,9 @@ public final class BedrockModel {
 			tr.eval(t, v);
 			switch (tr.kind) {
 				case Track.ROTATION -> {
-					p.xRot += (float) -Math.toRadians(v[0]);
-					p.yRot += (float) -Math.toRadians(v[1]);
-					p.zRot += (float) Math.toRadians(v[2]);
+					p.xRot += (float) Math.toRadians(v[0]);
+					p.yRot += (float) Math.toRadians(v[1]);
+					p.zRot += (float) -Math.toRadians(v[2]);
 				}
 				case Track.POSITION -> {
 					p.x += (float) -v[0];

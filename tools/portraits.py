@@ -134,20 +134,21 @@ def model_quads(geo, anim=None, hidden=()):
         if b["name"] in hidden or ("ditto" in b["name"] and not g["description"].get("identifier", "").endswith("ditto")):
             return
         pv, rot = vec(b, "pivot"), vec(b, "rotation")
-        r = (-math.radians(rot[0]), -math.radians(rot[1]), math.radians(rot[2]))
+        # Bedrock turns the other way round from Minecraft's in all three (see BedrockModel.java); moves are mirrored in x and y.
+        r = (math.radians(rot[0]), math.radians(rot[1]), -math.radians(rot[2]))
         if parent_pivot is None:
             off = (-pv[0], 24 - pv[1], pv[2])
         else:
             off = (-(pv[0] - parent_pivot[0]), -(pv[1] - parent_pivot[1]), pv[2] - parent_pivot[2])
         ar, ap, sc = anim.get(b["name"], ([0, 0, 0], [0, 0, 0], [1, 1, 1]))
-        r = (r[0] - math.radians(ar[0]), r[1] - math.radians(ar[1]), r[2] + math.radians(ar[2]))
+        r = (r[0] + math.radians(ar[0]), r[1] + math.radians(ar[1]), r[2] - math.radians(ar[2]))
         off = (off[0] - ap[0], off[1] - ap[1], off[2] + ap[2])
         m = parent_m @ pose(off, r) @ np.diag([sc[0], sc[1], sc[2], 1.0])
         for c in b.get("cubes", []):
             cr = vec(c, "rotation")
             if any(cr):
                 cp = vec(c, "pivot") if c.get("pivot") else pv
-                cm = m @ pose((-(cp[0] - pv[0]), -(cp[1] - pv[1]), cp[2] - pv[2]), (-math.radians(cr[0]), -math.radians(cr[1]), math.radians(cr[2])))
+                cm = m @ pose((-(cp[0] - pv[0]), -(cp[1] - pv[1]), cp[2] - pv[2]), (math.radians(cr[0]), math.radians(cr[1]), -math.radians(cr[2])))
                 piv = cp
             else:
                 cm, piv = m, pv

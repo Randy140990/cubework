@@ -100,30 +100,48 @@ def main(jar):
         idle_parts, ground_parts, actions, moving = None, None, {}, {}
         if poser:
             pj = json.loads(z.read(poser[0]))
-            for pose in pj.get("poses", {}).values():
+            poses = pj.get("poses", {})
+
+            def anim_of(pose):
                 for a in pose.get("animations", []):
                     m = re.match(r"q\.bedrock\('([a-z0-9_]+)', '([a-z0-9_]+)'\)", a) if isinstance(a, str) else None
-                    if not m:
-                        continue
-                    if pose.get("isBattle") and not idle:
-                        idle = (m.group(1), m.group(2))
-                        idle_parts = pose.get("transformedParts", [])
-                    if "STAND" in pose.get("poseTypes", []) and not pose.get("isBattle") and not pose.get("isTouchingWater") and not ground:
-                        ground = (m.group(1), m.group(2))
-                        ground_parts = pose.get("transformedParts", [])
+                    if m:
+                        return (m.group(1), m.group(2))
+                return None
+
+            def odd(name, pair):
+                # Poses that aren't how it stands or walks: asleep, ridden, jumping, in water, running.
+                words = ("sleep", "ride", "jump", "swim", "water", "surface", "run", "sprint", "shoulder", "fly", "hover", "air")
+                return any(w in name.lower() or w in pair[1] for w in words)
+
+            def pick(cands, prefer):
+                cands = [(n, p, anim_of(p)) for n, p in cands]
+                cands = [c for c in cands if c[2]]
+                for want in prefer:
+                    for n, p, pair in cands:
+                        if want(n, p, pair):
+                            return n, p, pair
+                return None
+
+            # In battle: the battle pose it stands in (not the one it sleeps in).
+            battle = [(n, p) for n, p in poses.items() if p.get("isBattle") and "SLEEP" not in p.get("poseTypes", [])]
+            got = pick(battle, [lambda n, p, a: "STAND" in p.get("poseTypes", []) and not odd(n, a), lambda n, p, a: not odd(n, a), lambda n, p, a: True])
+            if got:
+                idle, idle_parts = got[2], got[1].get("transformedParts", [])
+            # On the ground: its standing pose (the one used for its portrait), not a ridden jump or a swim.
+            ground_c = [(n, p) for n, p in poses.items() if not p.get("isBattle") and not p.get("isTouchingWater") and "STAND" in p.get("poseTypes", [])]
+            got = pick(ground_c, [lambda n, p, a: any(t in p.get("poseTypes", []) for t in ("PORTRAIT", "PROFILE", "NONE")) and not odd(n, a),
+                                  lambda n, p, a: not odd(n, a), lambda n, p, a: True])
+            if got:
+                ground, ground_parts = got[2], got[1].get("transformedParts", [])
             # How it walks, flies and hovers (for Pokémon out in the world), each with its parts (Pidgey's wings open to fly).
-            for pose in pj.get("poses", {}).values():
-                types = pose.get("poseTypes", [])
-                if pose.get("isBattle") or pose.get("isTouchingWater"):
-                    continue
-                for kind, want in (("walk", "WALK"), ("fly", "FLY"), ("hover", "HOVER")):
-                    if want not in types or kind in moving:
-                        continue
-                    for a in pose.get("animations", []):
-                        m = re.match(r"q\.bedrock\('([a-z0-9_]+)', '([a-z0-9_]+)'\)", a) if isinstance(a, str) else None
-                        if m:
-                            moving[kind] = ((m.group(1), m.group(2)), pose.get("transformedParts", []))
-                            break
+            for kind, want in (("walk", "WALK"), ("fly", "FLY"), ("hover", "HOVER")):
+                c = [(n, p) for n, p in poses.items() if not p.get("isBattle") and not p.get("isTouchingWater") and want in p.get("poseTypes", [])]
+                calm = ("ride", "jump", "run", "sprint", "sleep")
+                got = pick(c, [lambda n, p, a: kind in n.lower() and not any(w in n.lower() or w in a[1] for w in calm),
+                               lambda n, p, a: not any(w in n.lower() or w in a[1] for w in calm), lambda n, p, a: True])
+                if got:
+                    moving[kind] = (got[2], got[1].get("transformedParts", []))
             for name, a in pj.get("animations", {}).items():
                 m = re.match(r"q\.bedrock_stateful\('([a-z0-9_]+)', '([a-z0-9_]+)'\)", a) if isinstance(a, str) else None
                 if m and name in ("cry", "recoil", "faint", "physical", "special", "status"):
