@@ -1,0 +1,28 @@
+{
+ "idle": "animation.quailet.ground_idle",
+ "ground": "animation.quailet.ground_idle",
+ "actions": {
+  "cry": "animation.quailet.cry",
+  "recoil": "animation.quailet.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.quailet.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.quailet.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.quailet.air_hover",
+   "parts": []
+  }
+ },
+ "scale": 0.618,
+ "height": 0.906,
+ "texture": "retromon:textures/mons/pidgey.png",
+ "layers": [],
+ "name": "QUAILET",
+ "parts": []
+}

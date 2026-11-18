@@ -360,15 +360,13 @@ public final class Ui {
 	/** A Pokémon's portrait (drawn from its model), as a square of the given size. */
 	public static void portrait(GuiGraphics g, String species, int x, int y, int size) {
 		if (species == null || species.isEmpty()) return;
-		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, Retromon.id("textures/gui/mon/" + species + ".png"), x, y, 0, 0, size, size, 128, 128,
-				128, 128);
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, Look.portrait(species), x, y, 0, 0, size, size, 128, 128, 128, 128);
 	}
 
 	/** A portrait as a dark silhouette (seen but not caught, in the Pokédex). */
 	public static void silhouette(GuiGraphics g, String species, int x, int y, int size) {
 		if (species == null || species.isEmpty()) return;
-		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, Retromon.id("textures/gui/mon/" + species + ".png"), x, y, 0, 0, size, size, 128, 128,
-				128, 128, 0xFF1A2038);
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, Look.portrait(species), x, y, 0, 0, size, size, 128, 128, 128, 128, 0xFF1A2038);
 	}
 
 	/** Money as the games show it: ₽3,000. */
@@ -378,12 +376,12 @@ public final class Ui {
 
 	/** Text in the interface font. */
 	public static Component ui(String text) {
-		return Component.literal(text).withStyle(FONT);
+		return Component.literal(Look.text(text)).withStyle(FONT);
 	}
 
 	/** Text in the bold interface font (titles, names, buttons). */
 	public static Component bold(String text) {
-		return Component.literal(text).withStyle(BOLD);
+		return Component.literal(Look.text(text)).withStyle(BOLD);
 	}
 
 	public static void text(GuiGraphics g, Font f, String text, int x, int y, int color, int s) {

@@ -1,0 +1,20 @@
+{
+ "idle": "animation.jerbit.ground_idle",
+ "ground": "animation.jerbit.ground_idle",
+ "actions": {
+  "cry": "animation.jerbit.cry",
+  "recoil": "animation.jerbit.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.jerbit.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 0.552,
+ "height": 0.906,
+ "texture": "retromon:textures/mons/rattata.png",
+ "layers": [],
+ "name": "JERBIT",
+ "parts": []
+}

@@ -43,6 +43,7 @@ public final class Settings {
 	}
 
 	public static void set(String key, int value) {
+		if (key.equals("look")) look = value;
 		props().setProperty(key, Integer.toString(value));
 		try {
 			Files.createDirectories(file().getParent());
@@ -52,6 +53,14 @@ public final class Settings {
 		} catch (Exception e) {
 			Retromon.LOG.warn("Couldn't save the settings: {}", e.toString());
 		}
+	}
+
+	private static int look = -1;
+
+	/** POKéMON LOOK: Cobblemon's models (0, the default) or Retromon's own creatures where there's one (1). */
+	public static int look() {
+		if (look < 0) look = get("look", 0, 0, 1);
+		return look;
 	}
 
 	/** The Pokédex reads entries aloud (1) or not (0). */

@@ -1,0 +1,20 @@
+{
+ "idle": "animation.fernadillo.battle_idle",
+ "ground": "animation.fernadillo.ground_idle",
+ "actions": {
+  "cry": "animation.fernadillo.cry",
+  "recoil": "animation.fernadillo.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.fernadillo.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 0.96,
+ "height": 0.75,
+ "texture": "retromon:textures/mons/bulbasaur.png",
+ "layers": [],
+ "name": "FERNADILLO",
+ "parts": []
+}

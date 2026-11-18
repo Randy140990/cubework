@@ -26,7 +26,7 @@ public class MenuScreen extends DeviceScreen {
 		MENU, PARTY, PARTY_ACTION, SUMMARY, BAG, BAG_ACTION, USE_ON, CARD, SAVE, WAIT, OPTION, MESSAGE
 	}
 
-	/** Which OPTION row the keys change: 0 text speed, 1 music, 2 the Pokédex voice, 3 nights, 4 wild Pokémon, 5 walking with you. */
+	/** Which OPTION row the keys change: 0 text speed, 1 music, 2 the Pokédex voice, 3 nights, 4 wild Pokémon, 5 walking with you, 6 the POKéMON LOOK. */
 	private int optionRow;
 	private static final String[] ITEMS = {"POKéDEX", "POKéMON", "BAG", "MAP", "CLOTHES", "CARD", "WAIT", "SAVE", "OPTION", "EXIT"};
 	/** Each app's picture (textures/gui/icon). */
@@ -283,7 +283,7 @@ public class MenuScreen extends DeviceScreen {
 				else if (Ui.isA(e)) save();
 			}
 			case OPTION -> {
-				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = Math.floorMod(optionRow + (Ui.isUp(e) ? -1 : 1), 6);
+				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = Math.floorMod(optionRow + (Ui.isUp(e) ? -1 : 1), 7);
 				else if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isA(e)) {
 					int step = Ui.isLeft(e) ? -1 : 1;
 					switch (optionRow) {
@@ -298,10 +298,11 @@ public class MenuScreen extends DeviceScreen {
 							Settings.set("seen", Settings.seen() ? 0 : 1);
 							Settings.sendPrefs();
 						}
-						default -> {
+						case 5 -> {
 							Settings.set("follow", Settings.follower() ? 0 : 1);
 							Settings.sendPrefs();
 						}
+						default -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
 					}
 					Sounds.press();
 				} else if (Ui.isB(e)) view = View.MENU;
@@ -743,7 +744,7 @@ public class MenuScreen extends DeviceScreen {
 	private void drawOptions(GuiGraphics g, PlayerData d) {
 		int m = 8 * s, x = m, y = m, w = width - 2 * m;
 		Ui.draw(g, font, Ui.bold("OPTION"), x, y, Ui.TEXT, s, true);
-		int rh = Math.max(20 * s, Math.min(26 * s, (height - y - 30 * s) / 6)), y0 = y + 14 * s;
+		int rh = Math.max(18 * s, Math.min(26 * s, (height - y - 30 * s) / 7)), y0 = y + 14 * s;
 		optionRow(g, d, x, y0, w, 0, "TEXT SPEED", new String[] {"SLOW", "MID", "FAST"}, d.textSpeed, i -> setSpeed(i));
 		optionRow(g, d, x, y0 + rh, w, 1, "MUSIC", new String[] {"OFF", "LOW", "MID", "HIGH", "MAX"}, Music.level(), Music::setLevel);
 		optionRow(g, d, x, y0 + 2 * rh, w, 2, "POKéDEX VOICE", new String[] {"OFF", "ON"}, Settings.voice() ? 1 : 0, i -> Settings.set("voice", i));
@@ -759,6 +760,7 @@ public class MenuScreen extends DeviceScreen {
 			Settings.set("follow", i);
 			Settings.sendPrefs();
 		});
+		optionRow(g, d, x, y0 + 6 * rh, w, 6, "POKéMON LOOK", new String[] {"COBBLEMON", "RETROMON"}, Settings.look(), i -> Settings.set("look", i));
 		Ui.text(g, font, "Mouse wheel: zoom.  TAB: game speed.  Shift: run.", x, height - 10 * s, Ui.DIM, s);
 	}
 

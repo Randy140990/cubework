@@ -122,20 +122,24 @@ public final class BedrockModel {
 
 	private static final Map<String, Optional<Def>> DEFS = new HashMap<>();
 
+	/** A species' model in the POKéMON LOOK chosen: Retromon's own creature where there's one, else Cobblemon's. */
 	public static Def def(String species) {
-		return DEFS.computeIfAbsent(species, BedrockModel::load).orElse(null);
+		boolean ours = Look.ours();
+		return DEFS.computeIfAbsent((ours ? "r:" : "c:") + species, k -> load(species, ours)).orElse(null);
 	}
 
 	public static void clearCache() {
 		DEFS.clear();
 	}
 
-	private static Optional<Def> load(String species) {
+	private static Optional<Def> load(String species, boolean ours) {
 		try {
-			JsonObject geo = json("pokemon/" + species + "/model.geo.json");
-			JsonObject info = json("pokemon/" + species + "/info.json");
+			String folder = "pokemon/";
+			if (ours && Minecraft.getInstance().getResourceManager().getResource(Retromon.id("mons/" + species + "/model.geo.json")).isPresent()) folder = "mons/";
+			JsonObject geo = json(folder + species + "/model.geo.json");
+			JsonObject info = json(folder + species + "/info.json");
 			if (geo == null) return Optional.empty();
-			JsonObject anims = json("pokemon/" + species + "/anim.json");
+			JsonObject anims = json(folder + species + "/anim.json");
 			return Optional.of(new Def(species, geo, info == null ? new JsonObject() : info, anims));
 		} catch (RuntimeException e) {
 			Retromon.LOG.warn("Couldn't read the model for {}", species, e);

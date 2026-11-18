@@ -1,0 +1,32 @@
+{
+ "idle": "animation.cinderkid.battle_idle",
+ "ground": "animation.cinderkid.ground_idle",
+ "actions": {
+  "cry": "animation.cinderkid.cry",
+  "recoil": "animation.cinderkid.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.cinderkid.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 0.779,
+ "height": 1.219,
+ "texture": "retromon:textures/mons/charmander.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/charmander_glow_0.png",
+    "retromon:textures/mons/charmander_glow_1.png",
+    "retromon:textures/mons/charmander_glow_2.png",
+    "retromon:textures/mons/charmander_glow_3.png"
+   ],
+   "fps": 8,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "CINDERKID",
+ "parts": []
+}

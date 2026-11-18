@@ -44,7 +44,7 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 	@Override
 	public void extractRenderState(MonDisplay e, State s, float partial) {
 		super.extractRenderState(e, s, partial);
-		if (!(e.model instanceof BedrockModel m) || !m.def.species.equals(e.species)) {
+		if (!(e.model instanceof BedrockModel m) || m.def != BedrockModel.def(e.species)) {
 			e.model = BedrockModel.create(e.species);
 		}
 		s.model = e.model instanceof BedrockModel m ? m : null;

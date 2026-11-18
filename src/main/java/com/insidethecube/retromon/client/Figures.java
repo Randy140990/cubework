@@ -405,7 +405,7 @@ public final class Figures {
 		}
 
 		private void drawMon(Fig f, PoseStack pose) {
-			BedrockModel m = mons.computeIfAbsent(f.species, BedrockModel::create);
+			BedrockModel m = mons.computeIfAbsent((Look.ours() ? "r:" : "c:") + f.species, k -> BedrockModel.create(f.species));
 			if (m == null) return;
 			float h = Math.max(0.3F, m.def.height);
 			float k = f.tall / h;

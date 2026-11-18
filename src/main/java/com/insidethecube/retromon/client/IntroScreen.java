@@ -1049,7 +1049,7 @@ public class IntroScreen extends GameScreen {
 				if (c.info().has("party") && c.info().get("party").isJsonArray()) {
 					for (com.google.gson.JsonElement e : c.info().getAsJsonArray("party")) {
 						if (pi >= 6) break;
-						Ui.pic(g, Retromon.id("textures/gui/mon/" + e.getAsString() + ".png"), tx + pi * ps, ty + 46 * s, ps, ps, 128, 128, 0xFFFFFFFF);
+						Ui.pic(g, Look.portrait(e.getAsString()), tx + pi * ps, ty + 46 * s, ps, ps, 128, 128, 0xFFFFFFFF);
 						pi++;
 					}
 				}

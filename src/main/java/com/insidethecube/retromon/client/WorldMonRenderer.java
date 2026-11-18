@@ -38,7 +38,8 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 	@Override
 	public void extractRenderState(WorldMon e, State s, float partial) {
 		super.extractRenderState(e, s, partial);
-		if (!(e.model instanceof BedrockModel m) || !m.def.species.equals(e.species())) e.model = BedrockModel.create(e.species());
+		// (Made again when POKéMON LOOK changes: its model is the look's.)
+		if (!(e.model instanceof BedrockModel m) || m.def != BedrockModel.def(e.species())) e.model = BedrockModel.create(e.species());
 		s.model = e.model instanceof BedrockModel m ? m : null;
 		s.yaw = e.facing();
 		s.pose = null;

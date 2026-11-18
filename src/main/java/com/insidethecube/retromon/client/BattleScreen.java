@@ -406,7 +406,8 @@ public class BattleScreen extends GameScreen {
 	}
 
 	private void say(String text) {
-		message = text == null ? "" : text;
+		// (Our creatures' names in place before it's typed out, so the old name never shows part way.)
+		message = text == null ? "" : Look.text(text);
 		typed = 0;
 		hold = 0;
 	}

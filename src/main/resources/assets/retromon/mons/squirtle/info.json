@@ -1,0 +1,20 @@
+{
+ "idle": "animation.tidapir.ground_idle",
+ "ground": "animation.tidapir.ground_idle",
+ "actions": {
+  "cry": "animation.tidapir.cry",
+  "recoil": "animation.tidapir.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.tidapir.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 0.985,
+ "height": 0.812,
+ "texture": "retromon:textures/mons/squirtle.png",
+ "layers": [],
+ "name": "TIDAPIR",
+ "parts": []
+}

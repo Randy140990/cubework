@@ -202,7 +202,7 @@ public abstract class GameScreen extends Screen {
 			pages = new ArrayList<>();
 			owners.clear();
 			for (int mi = 0; mi < messages.size(); mi++) {
-				List<String> lines = Ui.wrap(f, messages.get(mi), width);
+				List<String> lines = Ui.wrap(f, Look.text(messages.get(mi)), width);
 				for (int i = 0; i < lines.size(); i += 2) {
 					pages.add(new String[] {lines.get(i), i + 1 < lines.size() ? lines.get(i + 1) : ""});
 					owners.add(mi);
