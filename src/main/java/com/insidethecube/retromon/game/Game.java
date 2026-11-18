@@ -228,6 +228,7 @@ public final class Game {
 		if (town == null || size == null) return null;
 		BlockPos guess = gameSpot(level, town, size, new int[] {12, 11});
 		if (guess == null) return null;
+		for (int dx = -12; dx <= 12; dx += 12) for (int dz = -12; dz <= 12; dz += 12) if (!level.hasChunkAt(guess.offset(dx, 0, dz))) return null;
 		int street = streetY(level, town);
 		BlockPos best = null;
 		double bestD = 1e9;
@@ -526,19 +527,23 @@ public final class Game {
 	 * Someone standing where they shouldn't from an older placing (the nurse on the Pokémon Center's arch, a man
 	 * in a pond): moved to good ground nearby, which becomes their spot. Checked once each time they're loaded.
 	 */
-	static void settle(Npc n) {
-		if (!ourSave || n.role() == Npc.LEADER || n.key().startsWith("rival") || !(n.level() instanceof ServerLevel level)) return;
+	static boolean settle(Npc n) {
+		if (!ourSave || n.role() == Npc.LEADER || n.key().startsWith("rival") || !(n.level() instanceof ServerLevel level)) return true;
 		BlockPos at = n.blockPosition();
 		Zone zone = zoneAt(at.getX(), at.getZ());
-		if (zone == null) return;
+		if (zone == null) return true;
+		// Not till the place is loaded round them (so nothing's loaded just for this); tried again next tick.
+		for (int dx = -9; dx <= 9; dx += 9) for (int dz = -9; dz <= 9; dz += 9) if (!level.hasChunkAt(at.offset(dx, 0, dz))) return false;
+		if (!level.hasChunkAt(new BlockPos(zone.x1(), at.getY(), zone.z1())) || !level.hasChunkAt(new BlockPos(zone.x2(), at.getY(), zone.z2()))) return false;
 		String pl = zone.place();
 		boolean town = pl.endsWith("_city") || pl.endsWith("_town");
-		if (!town && !pl.startsWith("route_")) return;
+		if (!town && !pl.startsWith("route_")) return true;
 		boolean wet = n.isInWater() || !level.getFluidState(at).isEmpty() || !level.getFluidState(at.below()).isEmpty();
 		boolean high = (town || n.role() == Npc.NURSE || n.role() == Npc.CLERK) && at.getY() > streetY(level, zone) + 1;
-		if (!wet && !high) return;
+		if (!wet && !high) return true;
 		BlockPos to = spot(level, at.getX(), at.getZ(), 8);
 		if (!to.equals(at)) n.rehome(to);
+		return true;
 	}
 
 	private static BlockPos spotAny(ServerLevel level, int x, int z, int radius) {

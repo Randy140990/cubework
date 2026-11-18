@@ -125,10 +125,7 @@ public class Npc extends PathfinderMob {
 			discard();
 			return;
 		}
-		if (!settled) {
-			settled = true;
-			Game.settle(this);
-		}
+		if (!settled) settled = Game.settle(this);
 		if (home == null) {
 			home = blockPosition();
 			homeFacing = facing();
