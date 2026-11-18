@@ -197,6 +197,11 @@ public final class Ui {
 				128, 128, 0xFF1A2038);
 	}
 
+	/** Money as the games show it: ₽3,000. */
+	public static String money(int n) {
+		return com.insidethecube.retromon.engine.Battle.money(n);
+	}
+
 	/** Text in the interface font. */
 	public static Component ui(String text) {
 		return Component.literal(text).withStyle(FONT);

@@ -85,6 +85,8 @@ public final class Battles {
 
 	private static void begin(ServerPlayer p, Session s, String music) {
 		ON.put(p.getUUID(), s);
+		s.battle.purse = Game.data(p).money;
+		s.battle.lenient = s.trainer != null && (s.trainer.key().equals("rival_lab") || s.trainer.key().equals("rival_22"));
 		List<Event> ev = s.battle.start();
 		CompoundTag t = turn(s, ev);
 		t.putString("music", music);
@@ -132,7 +134,7 @@ public final class Battles {
 		List<String> after = new ArrayList<>();
 		switch (b.result) {
 			case WIN -> {
-				d.money += b.prize;
+				d.money = Math.min(999999, d.money + b.prize);
 				if (s.trainer != null && s.trainer.key().startsWith("rival_")) {
 					d.beaten.add(s.trainer.key());
 					// The first one, in the lab: Oak sees to your Pokémon after.
@@ -175,7 +177,7 @@ public final class Battles {
 					after.addAll(Game.fill(p, List.of("{rival}: Yeah! Am I great or what?", "{rival}: Okay! I'll make my POKéMON fight to toughen it up!",
 							"{player}! Gramps! Smell ya later!", "OAK: Your POKéMON look tired. Here, let me heal them for you.")));
 				} else {
-					d.money /= 2;
+					d.money = Math.max(0, d.money - b.lost);
 					d.healAll();
 					Game.blackout(p);
 				}

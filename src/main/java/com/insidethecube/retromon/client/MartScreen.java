@@ -175,7 +175,7 @@ public class MartScreen extends GameScreen {
 		int m = 6 * s, h = boxHeight();
 		box.render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, step == Step.BYE);
 		// Money, top right.
-		String money = "¥" + d.money;
+		String money = Ui.money(d.money);
 		int mw = Math.max(Ui.width(font, money, s), Ui.width(font, "MONEY", s)) + 20 * s;
 		Ui.tagged(g, width - mw - m, m, mw, 26 * s, s, Ui.GOLD);
 		Ui.text(g, font, "MONEY", width - mw - m + 8 * s, m + 4 * s, Ui.MUTED, s);
@@ -201,7 +201,7 @@ public class MartScreen extends GameScreen {
 			} else {
 				Item it = Item.find(l.get(i));
 				Ui.text(g, font, it == null ? l.get(i) : it.name(), lx + 12 * s, ty + s, Ui.TEXT, s);
-				Ui.right(g, font, "¥" + price(l.get(i)), lx + lw - 46 * s, ty + s, Ui.GOLD, s);
+				Ui.right(g, font, Ui.money(price(l.get(i))), lx + lw - 46 * s, ty + s, Ui.GOLD, s);
 				Ui.right(g, font, "x" + d.count(l.get(i)), lx + lw - 10 * s, ty + s, Ui.MUTED, s);
 			}
 			if (step != Step.HOW_MANY) hit(lx, ty - 2 * s, lw, row, () -> pick(idx));
@@ -210,7 +210,7 @@ public class MartScreen extends GameScreen {
 			int qw = 120 * s, qh = 46 * s, qx = width - qw - m, qy = height - h - m - qh - 6 * s;
 			Ui.panel(g, qx, qy, qw, qh, s);
 			Ui.text(g, font, "x" + count, qx + 10 * s, qy + 8 * s, Ui.TEXT, s);
-			Ui.right(g, font, "¥" + price(picked) * count, qx + qw - 10 * s, qy + 8 * s, Ui.GOLD, s);
+			Ui.right(g, font, Ui.money(price(picked) * count), qx + qw - 10 * s, qy + 8 * s, Ui.GOLD, s);
 			int bw = 22 * s, by = qy + 22 * s;
 			Ui.button(g, font, qx + 8 * s, by, bw, 16 * s, "-", Ui.BLUE, over(qx + 8 * s, by, bw, 16 * s), s);
 			hit(qx + 8 * s, by, bw, 16 * s, () -> count = Math.max(1, count - 1));

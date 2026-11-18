@@ -426,6 +426,15 @@ public class MenuScreen extends GameScreen {
 			Ui.text(g, font, ITEMS[i], x + 14 * s, ry + 5 * s, on ? Ui.TEXT : Ui.MUTED, s);
 			if (view == View.MENU) hit(x, ry, w, row, () -> pickMenu(idx));
 		}
+		// Your money, just under the menu.
+		int my = y + h + 4 * s, mh = 18 * s;
+		Ui.panel(g, x, my, w, mh, s);
+		int cs = 8 * s, cx = x + 6 * s, cy = my + 5 * s;
+		Ui.round(g, cx, cy, cs, cs, 0xFFE0A526, 4 * s);
+		Ui.round(g, cx + s, cy + s, cs - 2 * s, cs - 2 * s, 0xFFFFD45A, 4 * s);
+		String cash = Ui.money(ClientState.data.money);
+		if (18 * s + Ui.width(font, "MONEY", s) + 6 * s + Ui.width(font, cash, s) + 7 * s <= w) Ui.text(g, font, "MONEY", x + 18 * s, my + 5 * s, Ui.MUTED, s);
+		Ui.right(g, font, cash, x + w - 7 * s, my + 5 * s, Ui.GOLD, s);
 	}
 
 	/** One Pokémon as a card: name, level, HP bar and numbers, status and types. */
@@ -553,7 +562,7 @@ public class MenuScreen extends GameScreen {
 		Ui.right(g, font, name(), x + w - 12 * s, ty, Ui.TEXT, s);
 		ty += 12 * s;
 		Ui.text(g, font, "MONEY", l, ty, Ui.MUTED, s);
-		Ui.right(g, font, "¥" + d.money, x + w - 12 * s, ty, Ui.GOLD, s);
+		Ui.right(g, font, Ui.money(d.money), x + w - 12 * s, ty, Ui.GOLD, s);
 		ty += 12 * s;
 		Ui.text(g, font, "POKéDEX", l, ty, Ui.MUTED, s);
 		Ui.right(g, font, "SEEN " + d.seen.size() + "   OWN " + d.caught.size(), x + w - 12 * s, ty, Ui.TEXT, s);

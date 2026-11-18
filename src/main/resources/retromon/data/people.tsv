@@ -112,7 +112,7 @@ fuchsia_meeting_room_p2	fuchsia_meeting_room	safari_zone_worker	down	stay	SLOWPO
 fuchsia_pokecenter_p0	fuchsia_pokecenter	rocker	up	stay	You can't win with just one strong POKéMON. | It's tough, but you have to raise them evenly.	4	3
 fuchsia_pokecenter_p1	fuchsia_pokecenter	cooltrainer_f	left_right	walk	There's a narrow trail west of VIRIDIAN CITY. | It goes to POKéMON LEAGUE HQ. The HQ governs all trainers.	6	5
 game_corner_p0	game_corner	beauty	down	stay	Welcome! | You can exchange your coins for fabulous prizes next door.	2	6
-game_corner_p1	game_corner	clerk	down	stay	Welcome to ROCKET GAME CORNER! | Do you need some game coins? | It's ¥1000 for 50 coins. Would you like some?	5	6
+game_corner_p1	game_corner	clerk	down	stay	Welcome to ROCKET GAME CORNER! | Do you need some game coins? | It's ₽1000 for 50 coins. Would you like some?	5	6
 game_corner_p2	game_corner	middle_aged_man	left	stay	Keep this quiet. | It's rumored that this place is run by TEAM ROCKET.	2	10
 game_corner_p3	game_corner	beauty	left	stay	I think these machines have different odds.	2	13
 game_corner_p4	game_corner	fishing_guru	right	stay	Oops! Forgot the COIN CASE!	5	11
@@ -166,7 +166,7 @@ pewter_city_p2	pewter_city	super_nerd	none	stay	Did you check out the MUSEUM?	27
 pewter_city_p3	pewter_city	super_nerd	left_right	walk	Psssst! Do you know what I'm doing?	26	25
 pewter_city_p4	pewter_city	youngster	down	stay	You're a trainer right? BROCK's looking for new challengers! Follow me!	35	16
 pewter_gym_p0	pewter_gym	gym_guide	down	stay	Hiya! I can tell you have what it takes to become a POKéMON champ! | I'm no trainer, but I can tell you how to win! | Let me take you to the top!	7	10
-pewter_mart_p0	pewter_mart	youngster	up_down	walk	A shady old man got me to buy this really weird fish POKéMON! | It's totally weak and it cost ¥500!	3	3
+pewter_mart_p0	pewter_mart	youngster	up_down	walk	A shady old man got me to buy this really weird fish POKéMON! | It's totally weak and it cost ₽500!	3	3
 pewter_mart_p1	pewter_mart	super_nerd	none	stay	Good things can happen if you raise POKéMON diligently, even the weak ones!	5	5
 pewter_nidoran_house_p0	pewter_nidoran_house	monster	left	stay	NIDORAN: Bowbow!	4	5
 pewter_nidoran_house_p1	pewter_nidoran_house	little_boy	right	stay	NIDORAN sit!	3	5
@@ -191,7 +191,7 @@ pokemon_tower_2f_p1	pokemon_tower_2f	channeler	right	stay	Even we could not iden
 pokemon_tower_5f_p0	pokemon_tower_5f	channeler	none	stay	Come, child! I sealed this space with white magic! | You can rest here!	12	8
 pokemon_tower_7f_p0	pokemon_tower_7f	mr_fuji	down	stay	MR.FUJI: Heh? You came to save me? | Thank you. But, I came here of my own free will. | I came to calm the soul of CUBONE's mother. | I think MAROWAK's spirit has gone to the afterlife. | I must thank you for your kind concern! | Follow me to my home, POKéMON HOUSE at the foot of this tower.	10	3
 rock_tunnel_pokecenter_p0	rock_tunnel_pokecenter	gentleman	down	stay	The element types of POKéMON make them stronger than some types and weaker than others!	7	3
-rock_tunnel_pokecenter_p1	rock_tunnel_pokecenter	fisher	none	stay	I sold a useless NUGGET for ¥5000!	2	5
+rock_tunnel_pokecenter_p1	rock_tunnel_pokecenter	fisher	none	stay	I sold a useless NUGGET for ₽5000!	2	5
 route_1_p0	route_1	youngster	left_right	walk	See those ledges along the road? | It's a bit scary, but you can jump from them. | You can get back to PALLET TOWN quicker that way.	15	13
 route_11_gate_1f_p0	route_11_gate_1f	guard	none	stay	When you catch lots of POKéMON, isn't it hard to think up names? | In LAVENDER TOWN, there's a man who rates POKéMON nicknames. | He'll help you rename them too!	4	1
 route_11_gate_2f_p0	route_11_gate_2f	scientist	none	stay	There are items on the ground that can't be seen. | ITEMFINDER will detect an item close to you. | It can't pinpoint it, so you have to look yourself!	2	6

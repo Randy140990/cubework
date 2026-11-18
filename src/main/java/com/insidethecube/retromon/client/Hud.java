@@ -9,7 +9,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-/** Over the world in the adventure: no hotbar, hearts or crosshair, and the "!" over a trainer who's spotted you. */
+/** Over the world in the adventure: no hotbar, hearts or crosshair, the "!" over a trainer who's spotted you, and your money as it changes. */
 public final class Hud {
 	private Hud() {}
 
@@ -28,6 +28,7 @@ public final class Hud {
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("fade"), Hud::fade);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("place"), Hud::place);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("speed"), Hud::speed);
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("money"), Hud::money);
 	}
 
 	// ---------- the cinema frame (talking to someone, or a trainer walking up to you), fading in and out ----------
@@ -57,6 +58,57 @@ public final class Hud {
 				atDark = null;
 			}
 		}
+		moneyTick(mc);
+	}
+
+	// ---------- your money, sliding in at the top right when it changes (after a battle, say) ----------
+
+	private static int moneySeen, moneyFrom, moneyTo, moneyTicks = -1, moneyQuiet;
+	private static final int MONEY_SHOW = 110;
+
+	private static void moneyTick(Minecraft mc) {
+		int cash = ClientState.data.money;
+		if (!Adventure.active() || mc.level == null) {
+			// Loading a game: what it has comes in quietly.
+			moneyTicks = -1;
+			moneyQuiet = 40;
+			return;
+		}
+		if (moneyQuiet > 0) {
+			moneyQuiet--;
+			moneySeen = cash;
+			return;
+		}
+		if (mc.screen instanceof MartScreen) moneySeen = cash;
+		if (cash != moneySeen) {
+			if (moneyTicks < 0) moneyFrom = moneySeen;
+			moneyTo = cash;
+			moneySeen = cash;
+			moneyTicks = 0;
+		}
+		// It waits for you to be back out in the world (a battle's prize shows once the battle's over).
+		if (moneyTicks >= 0 && mc.screen == null && !BattleScene.active() && ++moneyTicks > MONEY_SHOW) moneyTicks = -1;
+	}
+
+	private static void money(GuiGraphics g, DeltaTracker delta) {
+		Minecraft mc = Minecraft.getInstance();
+		if (!Adventure.active() || BattleScene.active() || moneyTicks < 0 || mc.screen != null || mc.options.hideGui) return;
+		int s = Ui.scale(g.guiHeight());
+		float t = moneyTicks + delta.getGameTimeDeltaPartialTick(true);
+		float k = Math.max(0, Math.min(1, Math.min(t / 8F, (MONEY_SHOW - t) / 10F)));
+		k = 1 - (1 - k) * (1 - k);
+		float c = Math.max(0, Math.min(1, (t - 8) / 24F));
+		int shown = Math.round(moneyFrom + (moneyTo - moneyFrom) * (1 - (1 - c) * (1 - c)));
+		int d = moneyTo - moneyFrom;
+		String total = Ui.money(shown), change = (d >= 0 ? "+" : "-") + Ui.money(Math.abs(d));
+		int w = Math.max(Ui.width(mc.font, Ui.money(Math.max(moneyFrom, moneyTo)), s), Ui.width(mc.font, change, s)) + 34 * s, h = 30 * s;
+		int x = g.guiWidth() - 6 * s - w + Math.round((w + 6 * s) * (1 - k)), y = Adventure.speed > 1 ? 24 * s : 6 * s;
+		Ui.tagged(g, x, y, w, h, s, Ui.GOLD);
+		int cs = 9 * s, cx = x + 10 * s, cy = y + 5 * s;
+		Ui.round(g, cx, cy, cs, cs, 0xFFE0A526, 4 * s);
+		Ui.round(g, cx + s, cy + s, cs - 2 * s, cs - 2 * s, 0xFFFFD45A, 4 * s);
+		Ui.text(g, mc.font, total, cx + cs + 4 * s, y + 6 * s, Ui.TEXT, s);
+		Ui.text(g, mc.font, change, cx + cs + 4 * s, y + 17 * s, d >= 0 ? 0xFF7CF0A8 : 0xFFFF8A8A, s);
 	}
 
 	private static void cinema(GuiGraphics g, DeltaTracker delta) {

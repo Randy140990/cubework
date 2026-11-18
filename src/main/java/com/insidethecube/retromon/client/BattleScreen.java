@@ -80,6 +80,9 @@ public class BattleScreen extends GameScreen {
 	private int mainAt, fightAt, partyAt, bagAt;
 	private String bagItem, lastBall = "poke_ball";
 	private int wipe = WIPE;
+	/** Your money, shown at the top left once it changes (prize money, Pay Day, blacking out): from, to, and ticks since. */
+	private int moneyFrom, moneyTo, moneyAt = -1;
+	private static final int MONEY_COUNT = 24;
 
 	public BattleScreen(CompoundTag start) {
 		super("Battle");
@@ -130,6 +133,7 @@ public class BattleScreen extends GameScreen {
 
 	private void step() {
 		onStage++;
+		if (moneyAt >= 0) moneyAt++;
 		if (fromDex > 0) fromDex--;
 		if (toDex >= 0) {
 			wait = Math.max(wait, 2);
@@ -375,6 +379,14 @@ public class BattleScreen extends GameScreen {
 				Sounds.stat(e.a() > 0);
 				BattleScene.stat(e.side() == 1 ? 1 : 0, e.a() > 0);
 				wait = 8;
+			}
+			case MONEY -> {
+				// Counting on from what it showed last (a prize, then Pay Day's coins on top).
+				moneyFrom = moneyAt >= 0 ? moneyTo : e.b() - e.a();
+				moneyTo = e.b();
+				moneyAt = 0;
+				if (e.a() > 0) Sounds.sfx("purchase");
+				wait = 4;
 			}
 			default -> {
 			}
@@ -761,6 +773,7 @@ public class BattleScreen extends GameScreen {
 		int by = height - bh - m;
 		if (them.shown) foeCard(g, them, width - m - PLATE_W * s, m + 12 * s + height / 14);
 		if (me.shown) myCard(g, me, m, by - 48 * s);
+		if (moneyAt >= 0) moneyChip(g, m, m + 12 * s + height / 14, partial);
 		switch (mode) {
 			case MAIN -> drawMain(g, m, by, bh);
 			case FIGHT -> drawFight(g, m, by, bh);
@@ -897,6 +910,33 @@ public class BattleScreen extends GameScreen {
 				g.fill(ex, ey, ex + Math.round(ew * ef), ey + 2 * s, 0xFF5AD2FF);
 			}
 		}
+	}
+
+	/**
+	 * Your money, sliding in at the top left when it changes: the total counting up (or down) to what you have now,
+	 * with the change beneath it in green (or red).
+	 */
+	private void moneyChip(GuiGraphics g, int x0, int y, float partial) {
+		float t = moneyAt + partial, in = Math.min(1, t / 6F), k = 1 - (1 - in) * (1 - in);
+		float c = Math.min(1, t / MONEY_COUNT);
+		int shown = Math.round(moneyFrom + (moneyTo - moneyFrom) * (1 - (1 - c) * (1 - c)));
+		int delta = moneyTo - moneyFrom;
+		String total = Ui.money(shown), change = (delta >= 0 ? "+" : "-") + Ui.money(Math.abs(delta));
+		int w = Math.max(Ui.boldWidth(font, total, s), Ui.width(font, "MONEY", s) + Ui.width(font, change, s) + 8 * s) + 22 * s, h = 30 * s;
+		int x = (int) (x0 - (w + x0) * (1 - k));
+		Ui.round(g, x + s, y + 2 * s, w, h, 0x50000000, 3 * s);
+		Ui.round(g, x, y, w, h, 0xFFFFD45A, 3 * s);
+		Ui.round(g, x + s, y + s, w - 2 * s, h - 2 * s, 0xF0123C38, 3 * s);
+		g.fill(x + 4 * s, y + 2 * s, x + w - 4 * s, y + 3 * s, 0x26FFFFFF);
+		// A gold coin with the ₽ on it.
+		int cx = x + 6 * s, cy = y + 6 * s, cs = 9 * s;
+		Ui.round(g, cx, cy, cs, cs, 0xFFE0A526, 4 * s);
+		Ui.round(g, cx + s, cy + s, cs - 2 * s, cs - 2 * s, 0xFFFFD45A, 4 * s);
+		Ui.text(g, font, "₽", cx + 2 * s, cy + s, 0xFF8A5A10, s);
+		Ui.draw(g, font, Ui.bold(total), x + 18 * s, y + 6 * s, 0xFFFFFFFF, s, true);
+		Ui.text(g, font, "MONEY", x + 6 * s, y + 18 * s, 0xFF8FE6FF, s);
+		float lift = Math.max(0, 1 - t / 10F) * 4 * s;
+		Ui.right(g, font, change, x + w - 7 * s, y + 18 * s + Math.round(lift), delta >= 0 ? 0xFF7CF0A8 : 0xFFFF8A8A, s);
 	}
 
 	/** The party's six Poké Balls in a row: one for each Pokémon (grey if it's fainted), empty slots after. */

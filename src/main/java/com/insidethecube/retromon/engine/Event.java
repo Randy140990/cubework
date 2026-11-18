@@ -2,12 +2,14 @@ package com.insidethecube.retromon.engine;
 
 /**
  * Something that happens in a battle, in order, for the screen to play back: a line of text, a change of
- * HP, an attack, a hit, a faint, a Pokémon sent out, a Poké Ball's shakes, EXP and level-ups.
+ * HP, an attack, a hit, a faint, a Pokémon sent out, a Poké Ball's shakes, EXP, level-ups and money.
  * side: 0 is you, 1 the other side.
  */
 public record Event(Kind kind, int side, String text, int a, int b) {
 	public enum Kind {
-		TEXT, HP, ATTACK, HIT, FAINT, SEND_OUT, RECALL, BALL, CAUGHT, ESCAPE, EXP, LEVEL, STATUS, STAT
+		TEXT, HP, ATTACK, HIT, FAINT, SEND_OUT, RECALL, BALL, CAUGHT, ESCAPE, EXP, LEVEL, STATUS, STAT,
+		/** Your money changing (a: by how much, b: what you have after). */
+		MONEY
 	}
 
 	public static Event text(String t) {

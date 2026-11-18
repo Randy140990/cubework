@@ -99,6 +99,10 @@ public class Battle {
 	public Result result = Result.NONE;
 	/** Money won (when you beat a trainer, and from Pay Day), and the Pokémon you caught. */
 	public int prize, payDay;
+	/** The money you came in with, and what you lose if you black out (half, as in the games). */
+	public int purse, lost;
+	/** A battle you can lose without blacking out (your rival's first two): no money lost either. */
+	public boolean lenient;
 	public Mon caught;
 	/** Your Pokémon that went up a level (they may evolve after the battle), and moves waiting for room. */
 	public final Set<Integer> levelled = new LinkedHashSet<>();
@@ -123,6 +127,11 @@ public class Battle {
 		this.kind = kind;
 		this.trainer = trainer;
 		this.prizeBase = prizeBase;
+	}
+
+	/** Money as the games show it: ₽3,000. */
+	public static String money(int n) {
+		return String.format(java.util.Locale.ROOT, "\u20BD%,d", n);
 	}
 
 	public Mon me() {
@@ -1499,12 +1508,20 @@ public class Battle {
 				}
 			}
 			if (next < 0) {
+				// The trainer pays for their last Pokémon's level; Pay Day's coins are picked up after.
 				if (kind == Kind.TRAINER) {
 					out.add(Event.text(playerName + " defeated " + trainer + "!"));
 					prize = prizeBase * them().level;
+					if (prize > 0) {
+						out.add(new Event(Event.Kind.MONEY, 0, null, prize, purse + prize));
+						out.add(Event.text(playerName + " got " + money(prize) + " for winning!"));
+					}
 				}
-				prize += payDay;
-				if (prize > 0) out.add(Event.text(playerName + " got ¥" + prize + " for winning!"));
+				if (payDay > 0) {
+					prize += payDay;
+					out.add(new Event(Event.Kind.MONEY, 0, null, payDay, purse + prize));
+					out.add(Event.text(playerName + " picked up " + money(payDay) + "!"));
+				}
 				end(Result.WIN, out);
 				return;
 			}
@@ -1518,7 +1535,15 @@ public class Battle {
 			field[0].clear();
 			if (firstHealthy(mine) < 0) {
 				out.add(Event.text(playerName + " is out of usable POKéMON!"));
-				out.add(Event.text(playerName + " blacked out!"));
+				if (!lenient) {
+					lost = purse / 2;
+					if (lost > 0) {
+						out.add(new Event(Event.Kind.MONEY, 0, null, -lost, purse - lost));
+						out.add(Event.text(kind == Kind.TRAINER ? playerName + " paid " + money(lost) + " to the winner."
+								: playerName + " panicked and dropped " + money(lost) + "..."));
+					}
+					out.add(Event.text(playerName + " blacked out!"));
+				}
 				end(Result.LOSS, out);
 			} else {
 				state = State.SWITCH;
