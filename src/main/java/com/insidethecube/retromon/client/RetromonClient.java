@@ -24,6 +24,10 @@ public class RetromonClient implements ClientModInitializer {
 		Adventure.register();
 		Hud.register();
 		Colours.register();
+		// The Retromon Look pack (Pokémon-style grass, leaves, flowers, paths): in Resource Packs, off until you switch it on.
+		net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(Retromon.ID).ifPresent(c -> net.fabricmc.fabric.api.resource.ResourceManagerHelper
+				.registerBuiltinResourcePack(Retromon.id("retromon_look"), c, Component.literal("Retromon Look"),
+						net.fabricmc.fabric.api.resource.ResourcePackActivationType.NORMAL));
 		ClientPlayNetworking.registerGlobalReceiver(Net.Push.TYPE, (payload, ctx) -> ClientState.receive(payload.kind(), payload.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 			Sounds.tick();

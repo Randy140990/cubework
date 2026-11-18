@@ -25,9 +25,9 @@ public class MenuScreen extends GameScreen {
 
 	/** Which OPTION row the keys change: 0 text speed, 1 music. */
 	private int optionRow;
-	private static final String[] ITEMS = {"POKéMON", "BAG", "CARD", "SAVE", "OPTION", "EXIT"};
-	private static final int[] COLORS = {Ui.GREEN, Ui.AMBER, Ui.BLUE, Ui.CYAN, 0xFF8C93A8, Ui.RED};
-	private static final String[] POCKETS = {"ITEMS", "BALLS", "KEY ITEMS"};
+	private static final String[] ITEMS = {"POKéDEX", "POKéMON", "BAG", "MAP", "CLOTHES", "CARD", "SAVE", "OPTION", "EXIT"};
+	private static final int[] COLORS = {0xFFE5525C, Ui.GREEN, Ui.AMBER, 0xFF4CB8A0, 0xFFB07CE0, Ui.BLUE, Ui.CYAN, 0xFF8C93A8, Ui.RED};
+	private static final String[] POCKETS = {"ITEMS", "BALLS", "KEY ITEMS", "TM & HM"};
 
 	private View view = View.MENU, afterMessage = View.MENU;
 	private int menuAt, partyAt, swapFrom = -1, pocket, bagAt, actionAt;
@@ -39,6 +39,7 @@ public class MenuScreen extends GameScreen {
 	}
 
 	private static String name() {
+		if (!ClientState.data.name.isEmpty()) return ClientState.data.name;
 		Minecraft mc = Minecraft.getInstance();
 		return mc.player == null ? "YOU" : mc.player.getGameProfile().name().toUpperCase();
 	}
@@ -67,7 +68,7 @@ public class MenuScreen extends GameScreen {
 		for (String id : ClientState.data.items.keySet()) {
 			Item it = Item.find(id);
 			if (it == null) continue;
-			int p = it.keyItem() ? 2 : it.ball() ? 1 : 0;
+			int p = it.teaches() ? 3 : it.keyItem() ? 2 : it.ball() ? 1 : 0;
 			if (p == pocket) out.add(id);
 		}
 		return out;
@@ -78,8 +79,18 @@ public class MenuScreen extends GameScreen {
 	private void pickMenu(int i) {
 		PlayerData d = ClientState.data;
 		menuAt = i;
-		switch (i) {
-			case 0 -> {
+		Sounds.press();
+		switch (ITEMS[i]) {
+			case "POKéDEX" -> {
+				if (minecraft != null) minecraft.setScreen(new PokedexScreen(this));
+			}
+			case "MAP" -> {
+				if (minecraft != null) minecraft.setScreen(new TownMapScreen(this));
+			}
+			case "CLOTHES" -> {
+				if (minecraft != null) minecraft.setScreen(new ClothesScreen(this));
+			}
+			case "POKéMON" -> {
 				if (d.party.isEmpty()) say(View.MENU, "You don't have any POKéMON yet.");
 				else {
 					partyAt = 0;
@@ -87,16 +98,16 @@ public class MenuScreen extends GameScreen {
 					view = View.PARTY;
 				}
 			}
-			case 1 -> {
+			case "BAG" -> {
 				bagAt = 0;
 				view = View.BAG;
 			}
-			case 2 -> view = View.CARD;
-			case 3 -> {
+			case "CARD" -> view = View.CARD;
+			case "SAVE" -> {
 				yesNo = new Choice(List.of("YES", "NO"));
 				view = View.SAVE;
 			}
-			case 4 -> view = View.OPTION;
+			case "OPTION" -> view = View.OPTION;
 			default -> onClose();
 		}
 	}
@@ -213,7 +224,7 @@ public class MenuScreen extends GameScreen {
 			case BAG -> {
 				int n = pocketItems().size() + 1;
 				if (Ui.isLeft(e) || Ui.isRight(e)) {
-					pocket = Math.floorMod(pocket + (Ui.isLeft(e) ? -1 : 1), 3);
+					pocket = Math.floorMod(pocket + (Ui.isLeft(e) ? -1 : 1), POCKETS.length);
 					bagAt = 0;
 				} else if (Ui.isUp(e)) bagAt = Math.floorMod(bagAt - 1, n);
 				else if (Ui.isDown(e)) bagAt = Math.floorMod(bagAt + 1, n);
@@ -362,6 +373,12 @@ public class MenuScreen extends GameScreen {
 		Ui.round(g, x, y, w, h, on ? Ui.EDGE_LIGHT : Ui.EDGE, s);
 		Ui.round(g, x + s, y + s, w - 2 * s, h - 2 * s, mon.fainted() ? 0xEC2A1A22 : on ? 0xEC22305A : Ui.PANEL, s);
 		if (marked) Ui.round(g, x + s, y + s, w - 2 * s, h - 2 * s, 0x40F0B43C, s);
+		// Its picture on the left, then its details.
+		int ph = h - 6 * s;
+		Ui.round(g, x + 3 * s, y + 3 * s, ph, ph, on ? 0x40FFF4D8 : 0x30FFFFFF, 2 * s);
+		Ui.portrait(g, mon.species.id(), x + 3 * s, y + 3 * s, ph);
+		x += ph + 2 * s;
+		w -= ph + 2 * s;
 		Ui.text(g, font, mon.name() + " " + mon.genderMark(), x + 7 * s, y + 6 * s, Ui.TEXT, s);
 		Ui.right(g, font, "Lv" + mon.level, x + w - 7 * s, y + 6 * s, Ui.GOLD, s);
 		Ui.hp(g, font, x + 7 * s, y + 17 * s, w - 60 * s, mon.hp, mon.maxHp(), s);
@@ -436,11 +453,11 @@ public class MenuScreen extends GameScreen {
 	private void drawBag(GuiGraphics g, PlayerData d) {
 		int m = 6 * s, w = Math.min(width - 2 * m, 240 * s), x = m, y = m;
 		// Pockets as tabs.
-		int tw = (w - 2 * s * 2) / 3;
-		for (int i = 0; i < 3; i++) {
+		int n = POCKETS.length, tw = (w - 2 * s * (n - 1)) / n;
+		for (int i = 0; i < n; i++) {
 			int tx = x + i * (tw + 2 * s);
 			int idx = i;
-			Ui.button(g, font, tx, y, tw, 16 * s, POCKETS[i], i == 0 ? Ui.AMBER : i == 1 ? Ui.RED : Ui.BLUE, i == pocket, s);
+			Ui.button(g, font, tx, y, tw, 16 * s, POCKETS[i], i == 0 ? Ui.AMBER : i == 1 ? Ui.RED : i == 2 ? Ui.BLUE : 0xFF9A6CD8, i == pocket, s);
 			if (view == View.BAG) hit(tx, y, tw, 16 * s, () -> {
 				pocket = idx;
 				bagAt = 0;

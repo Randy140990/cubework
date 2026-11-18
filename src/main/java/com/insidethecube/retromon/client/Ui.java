@@ -98,6 +98,20 @@ public final class Ui {
 	private static final Style FONT = Style.EMPTY.withFont(new FontDescription.Resource(Retromon.id("ui")));
 	private static final Style BOLD = Style.EMPTY.withFont(new FontDescription.Resource(Retromon.id("ui_bold")));
 
+	/** A Pokémon's portrait (drawn from its model), as a square of the given size. */
+	public static void portrait(GuiGraphics g, String species, int x, int y, int size) {
+		if (species == null || species.isEmpty()) return;
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, Retromon.id("textures/gui/mon/" + species + ".png"), x, y, 0, 0, size, size, 128, 128,
+				128, 128);
+	}
+
+	/** A portrait as a dark silhouette (seen but not caught, in the Pokédex). */
+	public static void silhouette(GuiGraphics g, String species, int x, int y, int size) {
+		if (species == null || species.isEmpty()) return;
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, Retromon.id("textures/gui/mon/" + species + ".png"), x, y, 0, 0, size, size, 128, 128,
+				128, 128, 0xFF1A2038);
+	}
+
 	/** Text in the interface font. */
 	public static Component ui(String text) {
 		return Component.literal(text).withStyle(FONT);

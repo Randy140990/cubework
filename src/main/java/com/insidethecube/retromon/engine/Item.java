@@ -125,7 +125,7 @@ public record Item(String id, String name, int price, String pocket) {
 
 	/** Whether it's used on one of your Pokémon (out of battle). */
 	public boolean onPokemon() {
-		return heal() > 0 || cures() != null || revives() > 0 || evolves() || id.equals("rare_candy") || vitamin() >= 0 || id.startsWith("ether")
+		return teaches() || heal() > 0 || cures() != null || revives() > 0 || evolves() || id.equals("rare_candy") || vitamin() >= 0 || id.startsWith("ether")
 				|| id.startsWith("max_ether") || id.startsWith("elixer") || id.equals("max_elixer") || id.equals("pp_up") || id.equals("bitter_berry");
 	}
 
@@ -192,10 +192,32 @@ public record Item(String id, String name, int price, String pocket) {
 		return null;
 	}
 
+	/** Whether this is a TM or HM (it teaches a move: tm_<move>, hm_<move>). */
+	public boolean teaches() {
+		return pocket.equals("tm");
+	}
+
+	/** The move a TM or HM teaches. */
+	public String move() {
+		return teaches() ? id.substring(3) : null;
+	}
+
+	public boolean hm() {
+		return id.startsWith("hm_");
+	}
+
 	static {
 		for (String[] r : Species.table("items.tsv")) {
 			Item it = new Item(r[0], r[1], Integer.parseInt(r[2]), r[3]);
 			ALL.put(it.id, it);
+		}
+		// The TMs and HMs of both generations: one per move (named by it), in their own pocket.
+		for (String[] r : Species.table("tms.tsv")) {
+			Move mv = Move.find(r[2]);
+			if (mv == null) continue;
+			boolean hm = r[1].equals("hm");
+			String num = !r[4].equals("-") ? r[4] : r[3];
+			ALL.put(r[0], new Item(r[0], num + " " + mv.name(), hm ? 0 : 3000, "tm"));
 		}
 	}
 }

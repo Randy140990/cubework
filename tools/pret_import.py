@@ -12,6 +12,7 @@ loads (src/main/resources/retromon/data):
 
 Usage: pret_import.py <pret folder with pokered, pokeyellow, pokegold>
 """
+import glob
 import os, re, sys
 
 PRET = sys.argv[1] if len(sys.argv) > 1 else "/home/claude/pret"
@@ -649,6 +650,106 @@ def dex_entries():
     return out
 
 
+CRYSTAL = os.path.join(os.path.dirname(YELLOW), "pokecrystal")
+
+
+def tm_list():
+    """The TMs and HMs of Gen 1 (Yellow) and Gen 2 (Gold): one item per move, with its number in each."""
+    items = {}
+    for gen, root in (("1", YELLOW), ("2", GOLD)):
+        src = read(os.path.join(root, "constants/item_constants.asm"))
+        n = h = 0
+        for kind, mv in re.findall(r"^\s*add_(tm|hm)\s+(\w+)", src, re.M):
+            if kind == "tm":
+                n += 1
+                num = f"TM{n:02d}"
+            else:
+                h += 1
+                num = f"HM{h:02d}"
+            key = f"{kind}_{ident(mv)}"
+            row = items.setdefault(key, [key, kind, ident(mv), "-", "-"])
+            row[3 if gen == "1" else 4] = num
+    return list(items.values())
+
+
+def tmhm_gen1():
+    """What each of the 151 can learn from Gen 1's TMs and HMs (added to Gen 2's lists)."""
+    out = []
+    for f in sorted(glob.glob(os.path.join(YELLOW, "data/pokemon/base_stats/*.asm"))):
+        src = read(f)
+        dex = re.search(r"db DEX_(\w+)", src)
+        body = re.search(r"tmhm(.*?); end", src, re.S)
+        if not dex or not body:
+            continue
+        moves = [ident(m) for m in re.findall(r"[A-Z][A-Z0-9_]+", body.group(1))]
+        out.append((ident(dex.group(1)), ",".join(moves)))
+    return out
+
+
+def camel_to_place(root):
+    """MapName (as in the scripts and attributes) -> our place id, through the map constants."""
+    out = {}
+    for c in re.findall(r"map_const (\w+),", read(os.path.join(root, "constants/map_constants.asm"))):
+        out[c.replace("_", "").lower()] = ident(c)
+    return out
+
+
+def gifts():
+    """The TMs and HMs people give in Kanto: the gym leaders' TMs and the HMs (by the place they're given in)."""
+    names = camel_to_place(YELLOW)
+    out = []
+    for f in sorted(glob.glob(os.path.join(YELLOW, "scripts/*.asm"))):
+        place = names.get(os.path.splitext(os.path.basename(f))[0].lower())
+        if not place:
+            continue
+        for kind, mv in re.findall(r"(?:lb bc|ld a),\s*(TM|HM)_(\w+)", read(f)):
+            out.append((place, f"{kind.lower()}_{ident(mv)}"))
+    return sorted(set(out))
+
+
+def town_map():
+    """The Pokégear's town maps (Crystal): each landmark's spot and name, which landmark each place is in, and the routes between them."""
+    consts = re.findall(r"const (LANDMARK_\w+)", read(os.path.join(CRYSTAL, "constants/landmark_constants.asm")))
+    kanto_from = consts.index("LANDMARK_PALLET_TOWN")
+    src = read(os.path.join(CRYSTAL, "data/maps/landmarks.asm"))
+    marks = re.findall(r"landmark\s+(-?\d+),\s*(-?\d+),\s*(\w+)", src)
+    names = {k: v.replace("¯", " ").replace("<BSP>", " ").replace("@", "") for k, v in re.findall(r"(\w+):\s+db \"([^\"]*)\"", src)}
+    points = {}
+    for i, (x, y, label) in enumerate(marks):
+        if i == 0 or i >= len(consts):
+            continue
+        key = consts[i][len("LANDMARK_"):].lower()
+        name = names.get(label, key.upper().replace("_", " "))
+        kind = "route" if "ROUTE" in name else "town" if any(w in name for w in ("CITY", "TOWN", "ISLAND", "PLATEAU")) else "spot"
+        points[key] = (key, "kanto" if i >= kanto_from else "johto", int(x), int(y), kind, name.strip())
+    places = camel_to_place(CRYSTAL)
+    of = {}
+    for m, lm in re.findall(r"map (\w+), \w+, \w+, LANDMARK_(\w+)", read(os.path.join(CRYSTAL, "data/maps/maps.asm"))):
+        pid = places.get(m.lower())
+        if pid:
+            of[pid] = lm.lower()
+    edges = set()
+    cur = None
+    for line in read(os.path.join(CRYSTAL, "data/maps/attributes.asm")).splitlines():
+        a = re.match(r"\s*map_attributes (\w+),", line)
+        if a:
+            cur = places.get(a.group(1).lower())
+            continue
+        c = re.match(r"\s*connection \w+, (\w+),", line)
+        if c and cur:
+            other = places.get(c.group(1).lower())
+            la, lb = of.get(cur), of.get(other)
+            if la and lb and la != lb:
+                edges.add(tuple(sorted((la, lb))))
+    return list(points.values()), of, sorted(edges)
+
+
+
+def table_rows(name):
+    path = os.path.join(OUT, name)
+    return [l.rstrip("\n").split("\t") for l in open(path, encoding="utf-8") if not l.startswith("#") and l.strip()]
+
+
 def map_sizes():
     """Each Kanto map's size in steps (the games give it in 2x2-step blocks)."""
     out = []
@@ -707,6 +808,35 @@ def main():
     tr, pe, balls = kanto_people()
     write_tsv("field_items.tsv", ["key", "place", "item", "x", "y"], balls)
     write_tsv("sizes.tsv", ["place", "width_steps", "height_steps"], map_sizes())
+    write_tsv("tms.tsv", ["id", "kind", "move", "gen1_number", "gen2_number"], tm_list())
+    write_tsv("tmhm1.tsv", ["species", "moves"], tmhm_gen1())
+    write_tsv("gifts.tsv", ["place", "item"], gifts())
+    pts, of, edges = town_map()
+    write_tsv("map_points.tsv", ["landmark", "region", "x", "y", "kind", "name"], pts)
+    # Our places (Yellow's Kanto names, Crystal's Johto) to landmarks; Gen 1's own places fall back to their town.
+    fallback = {"pokemon_tower": "lavender_town", "safari_zone": "fuchsia_city", "cerulean_cave": "cerulean_city", "pokemon_mansion": "cinnabar_island",
+                "silph_co": "saffron_city", "rocket_hideout": "celadon_city", "ss_anne": "vermilion_city", "seafoam": "seafoam_islands",
+                "mt_moon": "mt_moon", "rock_tunnel": "rock_tunnel", "victory_road": "victory_road", "digletts_cave": "digletts_cave",
+                "power_plant": "power_plant", "indigo_plateau": "indigo_plateau", "viridian_forest": "route_2", "underground": "saffron_city",
+                "pokemon_fan_club": "vermilion_city", "game_corner": "celadon_city", "bike_shop": "cerulean_city", "museum": "pewter_city"}
+    rows = []
+    for r in table_rows("places.tsv"):
+        pid = r[0]
+        lm = of.get(pid)
+        if not lm:
+            for k, v in fallback.items():
+                if pid.startswith(k) or k in pid:
+                    lm = v
+                    break
+        if not lm:
+            for k in sorted((p[0] for p in pts), key=len, reverse=True):
+                if pid.startswith(k):
+                    lm = k
+                    break
+        if lm:
+            rows.append((pid, lm))
+    write_tsv("place_landmarks.tsv", ["place", "landmark"], rows)
+    write_tsv("map_edges.tsv", ["a", "b"], edges)
     write_tsv("dex.tsv", ["dex", "category", "height", "weight_lbs", "text"], dex_entries())
     write_tsv("trainers.tsv", ["key", "place", "title", "sprite", "facing", "sight", "money", "party species:level", "badge", "before", "defeat", "after", "x", "y"], tr)
     write_tsv("people.tsv", ["key", "place", "sprite", "facing", "movement", "lines", "x", "y"], pe)

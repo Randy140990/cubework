@@ -107,6 +107,8 @@ public class Retromon implements ModInitializer {
 			}
 			case "save" -> Game.save(p);
 			case "profile" -> Game.profile(p, t);
+			case "fly" -> Game.fly(p, t);
+			case "outfit" -> Game.outfit(p, t);
 			default -> {
 			}
 		}
@@ -360,6 +362,17 @@ public class Retromon implements ModInitializer {
 				})).then(Commands.literal("off").executes(c -> {
 					Game.build = false;
 					c.getSource().sendSuccess(() -> Component.literal("Map editing off: the map is locked again"), false);
+					return 1;
+				})))
+				.then(Commands.literal("badge").then(Commands.argument("badge", StringArgumentType.word()).executes(c -> {
+					ServerPlayer p = c.getSource().getPlayerOrException();
+					String b = StringArgumentType.getString(c, "badge").toUpperCase();
+					PlayerData d = Game.data(p);
+					if (b.equals("ALL")) {
+						for (Trainers.Trainer t : Trainers.ALL.values()) if (t.badge() != null) d.badges.add(t.badge());
+					} else d.badges.add(b.endsWith("BADGE") ? b : b + "BADGE");
+					Game.sync(p);
+					c.getSource().sendSuccess(() -> Component.literal("Badges: " + String.join(", ", d.badges)), false);
 					return 1;
 				})))
 				.then(Commands.literal("heal").executes(c -> {

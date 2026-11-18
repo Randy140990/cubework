@@ -37,6 +37,10 @@ public class PlayerData {
 	public int textSpeed = 2;
 	/** From the new-game intro: your name, your rival's and whether you're a boy or a girl. */
 	public String name = "", rival = "", gender = "boy";
+	/** Your clothes (from CLOTHES in the menu), as the wardrobe writes them; empty for the hero's own. */
+	public String outfit = "";
+	/** The places you've been (for the Town Map, and where you can fly). */
+	public final Set<String> visited = new LinkedHashSet<>();
 
 	public boolean anyHealthy() {
 		for (Mon m : party) if (!m.fainted()) return true;
@@ -108,6 +112,8 @@ public class PlayerData {
 		t.putString("name", name);
 		t.putString("rival", rival);
 		t.putString("gender", gender);
+		t.putString("outfit", outfit);
+		t.putString("visited", join(visited));
 		return t;
 	}
 
@@ -142,6 +148,8 @@ public class PlayerData {
 		d.name = t.getStringOr("name", "");
 		d.rival = t.getStringOr("rival", "");
 		d.gender = t.getStringOr("gender", "boy");
+		d.outfit = t.getStringOr("outfit", "");
+		split(t.getStringOr("visited", ""), d.visited);
 		return d;
 	}
 }

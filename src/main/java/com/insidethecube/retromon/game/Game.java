@@ -313,6 +313,7 @@ public final class Game {
 		PlayerData d = data(p);
 		if (place == null || place.equals(d.place)) return;
 		d.place = place;
+		if (d.visited.add(place)) sync(p);
 		Places.Place pl = Places.get(place);
 		CompoundTag t = new CompoundTag();
 		t.putString("id", place);
@@ -528,7 +529,13 @@ public final class Game {
 			}
 			case Npc.PERSON -> {
 				Trainers.Person person = Trainers.PEOPLE.get(n.key());
-				dialogue(p, n, "talk", person == null ? List.of("...") : fill(p, person.lines()));
+				List<String> lines = new ArrayList<>(person == null ? List.of("...") : fill(p, person.lines()));
+				// Someone with a TM or HM to give (the HM houses, the TM gifts): it's yours.
+				if (person != null && !person.place().endsWith("_gym")) {
+					String got = giveGift(p, person.place());
+					if (got != null) lines.add(got);
+				}
+				dialogue(p, n, "talk", lines);
 			}
 			case Npc.TRAINER, Npc.LEADER -> {
 				Trainers.Trainer t = Trainers.get(n.key());
@@ -752,6 +759,89 @@ public final class Game {
 	}
 
 	/** A move a party Pokémon can learn now: straight in if there's room, otherwise you choose. */
+	/**
+	 * A TM or HM: "Booted up a TM! It contained <move>! Teach <move> to <Pokémon>?" If it can learn it, it does
+	 * (or you pick a move to forget); a TM's used up, an HM isn't.
+	 */
+	private static void teach(ServerPlayer p, Item it, int index) {
+		PlayerData d = data(p);
+		Mon m = d.party.get(index);
+		Move mv = Move.find(it.move());
+		if (mv == null) return;
+		List<String> lines = new ArrayList<>();
+		lines.add("Booted up " + (it.hm() ? "an HM" : "a TM") + "! It contained " + mv.name() + "!");
+		if (!m.species.canLearnByMachine(mv.id())) {
+			lines.add(m.name() + " is not compatible with " + mv.name() + ". It can't learn " + mv.name() + ".");
+			message(p, lines);
+			return;
+		}
+		if (m.moves.contains(mv.id())) {
+			lines.add(m.name() + " already knows " + mv.name() + "!");
+			message(p, lines);
+			return;
+		}
+		if (!it.hm()) d.take(it.id());
+		message(p, lines);
+		offerMove(p, index, mv.id());
+	}
+
+	/** Fly: off to a town you've been to, if one of yours knows FLY and you have the THUNDERBADGE (as in the games). */
+	public static void fly(ServerPlayer p, CompoundTag t) {
+		PlayerData d = data(p);
+		String place = t.getStringOr("place", "");
+		if (Battles.in(p) || !d.visited.contains(place)) return;
+		boolean knows = d.party.stream().anyMatch(m -> m.moves.contains("fly") && !m.fainted());
+		if (!knows || !d.badges.contains("THUNDERBADGE")) {
+			message(p, List.of(!knows ? "None of your POKéMON knows FLY." : "You need the THUNDERBADGE to use FLY outside of battle."));
+			return;
+		}
+		Zone z = null;
+		for (Zone x : zones) if (x.place().equals(place)) z = x;
+		if (z == null) {
+			message(p, List.of("There's nowhere to land there yet."));
+			return;
+		}
+		ServerLevel level = (ServerLevel) p.level();
+		BlockPos at = spot(level, (z.x1() + z.x2()) / 2, (z.z1() + z.z2()) / 2, 16);
+		p.teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+		enter(p, place);
+	}
+
+	/** Your clothes, from the wardrobe. */
+	public static void outfit(ServerPlayer p, CompoundTag t) {
+		PlayerData d = data(p);
+		String o = t.getStringOr("outfit", "");
+		if (o.length() > 200) return;
+		d.outfit = o;
+		sync(p);
+	}
+
+	/** The TMs and HMs people give, by place (the gym leaders' after their badge, the others when you talk to them). */
+	private static java.util.Map<String, List<String>> gifts;
+
+	public static List<String> giftsIn(String place) {
+		if (gifts == null) {
+			java.util.Map<String, List<String>> m = new java.util.HashMap<>();
+			for (String[] r : Species.table("gifts.tsv")) m.computeIfAbsent(r[0], k -> new ArrayList<>()).add(r[1]);
+			gifts = m;
+		}
+		return gifts.getOrDefault(place, List.of());
+	}
+
+	/** Gives the next gift from this place you haven't had yet: the line to say, or null. */
+	public static String giveGift(ServerPlayer p, String place) {
+		PlayerData d = data(p);
+		for (String g : giftsIn(place)) {
+			if (!d.statics.add("gift:" + place + ":" + g)) continue;
+			Item it = Item.find(g);
+			if (it == null) continue;
+			d.give(g, 1);
+			sync(p);
+			return player(p) + " received " + it.name() + "!";
+		}
+		return null;
+	}
+
 	public static void offerMove(ServerPlayer p, int index, String move) {
 		PlayerData d = data(p);
 		if (index < 0 || index >= d.party.size() || Move.find(move) == null) return;
@@ -816,6 +906,8 @@ public final class Game {
 			d.take(it.id());
 			blackout(p);
 			message(p, List.of(player(p) + " used an ESCAPE ROPE!"));
+		} else if (it.teaches() && i >= 0 && i < d.party.size()) {
+			teach(p, it, i);
 		} else if (i >= 0 && i < d.party.size()) {
 			Mon m = d.party.get(i);
 			if (it.evolves()) {

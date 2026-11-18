@@ -1,0 +1,96 @@
+# landmark	region	x	y	kind	name
+new_bark_town	johto	140	100	town	NEW BARK TOWN
+route_29	johto	128	100	route	ROUTE 29
+cherrygrove_city	johto	100	100	town	CHERRYGROVE CITY
+route_30	johto	100	80	route	ROUTE 30
+route_31	johto	96	60	route	ROUTE 31
+violet_city	johto	84	60	town	VIOLET CITY
+sprout_tower	johto	85	58	spot	SPROUT TOWER
+route_32	johto	84	92	route	ROUTE 32
+ruins_of_alph	johto	76	76	spot	RUINS OF ALPH
+union_cave	johto	84	124	spot	UNION CAVE
+route_33	johto	82	124	route	ROUTE 33
+azalea_town	johto	68	124	town	AZALEA TOWN
+slowpoke_well	johto	70	122	spot	SLOWPOKE WELL
+ilex_forest	johto	52	120	spot	ILEX FOREST
+route_34	johto	52	112	route	ROUTE 34
+goldenrod_city	johto	52	92	town	GOLDENROD CITY
+radio_tower	johto	50	92	spot	RADIO TOWER
+route_35	johto	52	76	route	ROUTE 35
+national_park	johto	52	60	spot	NATIONAL PARK
+route_36	johto	64	60	route	ROUTE 36
+route_37	johto	68	52	route	ROUTE 37
+ecruteak_city	johto	68	44	town	ECRUTEAK CITY
+tin_tower	johto	70	42	spot	TIN TOWER
+burned_tower	johto	66	42	spot	BURNED TOWER
+route_38	johto	52	44	route	ROUTE 38
+route_39	johto	36	48	route	ROUTE 39
+olivine_city	johto	36	60	town	OLIVINE CITY
+lighthouse	johto	38	62	spot	LIGHTHOUSE
+battle_tower	johto	28	56	spot	BATTLE TOWER
+route_40	johto	28	64	route	ROUTE 40
+whirl_islands	johto	28	92	town	WHIRL ISLANDS
+route_41	johto	28	100	route	ROUTE 41
+cianwood_city	johto	20	100	town	CIANWOOD CITY
+route_42	johto	92	44	route	ROUTE 42
+mt_mortar	johto	84	44	spot	MT.MORTAR
+mahogany_town	johto	108	44	town	MAHOGANY TOWN
+route_43	johto	108	36	route	ROUTE 43
+lake_of_rage	johto	108	28	spot	LAKE OF RAGE
+route_44	johto	120	44	route	ROUTE 44
+ice_path	johto	130	38	spot	ICE PATH
+blackthorn_city	johto	132	44	town	BLACKTHORN CITY
+dragons_den	johto	132	36	spot	DRAGON'S DEN
+route_45	johto	132	64	route	ROUTE 45
+dark_cave	johto	112	72	spot	DARK CAVE
+route_46	johto	124	88	route	ROUTE 46
+silver_cave	johto	148	68	spot	SILVER CAVE
+pallet_town	kanto	52	108	town	PALLET TOWN
+route_1	kanto	52	92	route	ROUTE 1
+viridian_city	kanto	52	76	town	VIRIDIAN CITY
+route_2	kanto	52	64	route	ROUTE 2
+pewter_city	kanto	52	52	town	PEWTER CITY
+route_3	kanto	64	52	route	ROUTE 3
+mt_moon	kanto	76	52	spot	MT.MOON
+route_4	kanto	88	52	route	ROUTE 4
+cerulean_city	kanto	100	52	town	CERULEAN CITY
+route_24	kanto	100	44	route	ROUTE 24
+route_25	kanto	108	36	route	ROUTE 25
+route_5	kanto	100	60	route	ROUTE 5
+underground_path	kanto	108	76	spot	UNDERGROUND
+route_6	kanto	100	76	route	ROUTE 6
+vermilion_city	kanto	100	84	town	VERMILION CITY
+digletts_cave	kanto	88	60	spot	DIGLETT'S CAVE
+route_7	kanto	88	68	route	ROUTE 7
+route_8	kanto	116	68	route	ROUTE 8
+route_9	kanto	116	52	route	ROUTE 9
+rock_tunnel	kanto	132	52	spot	ROCK TUNNEL
+route_10	kanto	132	56	route	ROUTE 10
+power_plant	kanto	132	60	spot	POWER PLANT
+lavender_town	kanto	132	68	town	LAVENDER TOWN
+lav_radio_tower	kanto	140	68	spot	LAV RADIO TOWER
+celadon_city	kanto	76	68	town	CELADON CITY
+saffron_city	kanto	100	68	town	SAFFRON CITY
+route_11	kanto	116	84	route	ROUTE 11
+route_12	kanto	132	80	route	ROUTE 12
+route_13	kanto	124	100	route	ROUTE 13
+route_14	kanto	116	112	route	ROUTE 14
+route_15	kanto	104	116	route	ROUTE 15
+route_16	kanto	68	68	route	ROUTE 16
+route_17	kanto	68	92	route	ROUTE 17
+route_18	kanto	80	116	route	ROUTE 18
+fuchsia_city	kanto	92	116	town	FUCHSIA CITY
+route_19	kanto	92	128	route	ROUTE 19
+route_20	kanto	76	132	route	ROUTE 20
+seafoam_islands	kanto	68	132	town	SEAFOAM ISLANDS
+cinnabar_island	kanto	52	132	town	CINNABAR ISLAND
+route_21	kanto	52	120	route	ROUTE 21
+route_22	kanto	36	68	route	ROUTE 22
+victory_road	kanto	28	52	spot	VICTORY ROAD
+route_23	kanto	28	44	route	ROUTE 23
+indigo_plateau	kanto	28	36	town	INDIGO PLATEAU
+route_26	kanto	28	92	route	ROUTE 26
+route_27	kanto	20	100	route	ROUTE 27
+tohjo_falls	kanto	12	100	spot	TOHJO FALLS
+route_28	kanto	20	68	route	ROUTE 28
+fast_ship	kanto	140	116	spot	FAST SHIP

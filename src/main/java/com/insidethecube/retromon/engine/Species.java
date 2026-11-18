@@ -93,6 +93,19 @@ public record Species(String id, String name, int dex, Type type1, Type type2, i
 		return BY_DEX.get(dex);
 	}
 
+	private static java.util.Map<String, Set<String>> tmhm1;
+
+	/** Whether a TM or HM of this move can be taught to it (Gold/Silver's lists, plus Yellow's for the first 151). */
+	public boolean canLearnByMachine(String move) {
+		if (tmhm.contains(move)) return true;
+		if (tmhm1 == null) {
+			java.util.Map<String, Set<String>> m = new java.util.HashMap<>();
+			for (String[] r : table("tmhm1.tsv")) m.put(r[0], new java.util.HashSet<>(java.util.Arrays.asList(r.length > 1 ? r[1].split(",") : new String[0])));
+			tmhm1 = m;
+		}
+		return tmhm1.getOrDefault(id, Set.of()).contains(move);
+	}
+
 	public static List<String[]> table(String name) {
 		List<String[]> rows = new ArrayList<>();
 		try (InputStream in = Species.class.getResourceAsStream("/retromon/data/" + name)) {

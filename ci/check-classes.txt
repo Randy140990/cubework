@@ -1,2 +1,1 @@
-net.fabricmc.fabric.api.resource.ResourceManagerHelper
-net.fabricmc.fabric.api.resource.ResourcePackActivationType
+net.minecraft.client.gui.screens.inventory.InventoryScreen

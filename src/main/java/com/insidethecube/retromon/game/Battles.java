@@ -140,6 +140,8 @@ public final class Battles {
 						after.addAll(said);
 						if (d.badges.add(s.trainer.badge()) && after.stream().noneMatch(l -> l.contains("received the " + s.trainer.badge())))
 							after.add(name(p) + " received the " + s.trainer.badge() + "!");
+						String tm = Game.giveGift(p, s.trainer.place());
+						if (tm != null) after.add(tm);
 					}
 				}
 				if (s.staticKey != null) staticDone(p, s.staticKey);

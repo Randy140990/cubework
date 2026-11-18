@@ -23,6 +23,14 @@ public abstract class PlayerSkinMixin {
 	private void retromon$hero(CallbackInfoReturnable<PlayerSkin> cir) {
 		if (!Adventure.inSave || (Object) this != Minecraft.getInstance().player) return;
 		boolean girl = "girl".equals(ClientState.data.gender);
+		// Clothes from the wardrobe (or being tried on): the skin made from them.
+		String outfit = com.insidethecube.retromon.client.ClothesScreen.preview != null ? com.insidethecube.retromon.client.ClothesScreen.preview
+				: ClientState.data.outfit;
+		if (outfit != null && !outfit.isEmpty() && com.insidethecube.retromon.client.Outfit.ensure(outfit, girl)) {
+			cir.setReturnValue(PlayerSkin.insecure(new ClientAsset.ResourceTexture(com.insidethecube.retromon.client.Outfit.HERO,
+					com.insidethecube.retromon.client.Outfit.HERO), null, null, PlayerModelType.WIDE));
+			return;
+		}
 		if (retromon$boy == null) {
 			retromon$boy = PlayerSkin.insecure(new ClientAsset.ResourceTexture(Retromon.id("entity/player/boy")), null, null, PlayerModelType.WIDE);
 			retromon$girl = PlayerSkin.insecure(new ClientAsset.ResourceTexture(Retromon.id("entity/player/girl")), null, null, PlayerModelType.WIDE);
