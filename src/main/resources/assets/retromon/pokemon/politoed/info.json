@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.politoed.ground_idle","ground":"animation.politoed.ground_idle","texture":"retromon:textures/pokemon/politoed.png","layers":[],"height":1.35,"standIn":null,"parts":[],"actions":{}}
+{"scale":1.0,"idle":"animation.politoed.ground_idle","ground":"animation.politoed.ground_idle","texture":"retromon:textures/pokemon/politoed.png","layers":[],"height":1.35,"standIn":null,"parts":[],"actions":{},"poses":{"walk":{"anim":"animation.politoed.ground_idle","parts":[]}}}

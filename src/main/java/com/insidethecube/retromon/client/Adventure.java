@@ -204,14 +204,16 @@ public final class Adventure {
 						if (!b.isEmpty()) break;
 					}
 					if (!b.isEmpty()) lines.add(b.toString());
-				} else if (net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath().endsWith("shelf")) {
-					String place = ClientState.placeName.isEmpty() ? "" : ClientState.placeName;
-					if (place.isEmpty()) continue;
-					lines.add(place);
-					String sub = SIGNS.get(place.toUpperCase());
-					if (sub != null) lines.set(0, place + ": " + sub);
-				} else continue;
-				if (lines.isEmpty()) return;
+				} else if (!net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath().endsWith("shelf")) continue;
+				if (lines.isEmpty()) {
+					// A shelf standing in for a sign (or a blank sign): the game reads out the games' own sign for that spot.
+					Sounds.press();
+					CompoundTag t = new CompoundTag();
+					t.putInt("x", at.getX());
+					t.putInt("z", at.getZ());
+					ClientPlayNetworking.send(new Net.Act("read", t));
+					return;
+				}
 				Sounds.press();
 				mc.setScreen(new DialogueScreen(lines, "sign", -1, new CompoundTag()));
 				return;

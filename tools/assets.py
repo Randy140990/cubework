@@ -97,7 +97,7 @@ def main(jar):
         idle, ground = None, None
         # How the parts stand in that pose (Pidgey's open wings hidden, its closed ones shown), and its one-off
         # animations (a cry, flinching, attacking, fainting).
-        idle_parts, ground_parts, actions = None, None, {}
+        idle_parts, ground_parts, actions, moving = None, None, {}, {}
         if poser:
             pj = json.loads(z.read(poser[0]))
             for pose in pj.get("poses", {}).values():
@@ -111,6 +111,19 @@ def main(jar):
                     if "STAND" in pose.get("poseTypes", []) and not pose.get("isBattle") and not pose.get("isTouchingWater") and not ground:
                         ground = (m.group(1), m.group(2))
                         ground_parts = pose.get("transformedParts", [])
+            # How it walks, flies and hovers (for Pokémon out in the world), each with its parts (Pidgey's wings open to fly).
+            for pose in pj.get("poses", {}).values():
+                types = pose.get("poseTypes", [])
+                if pose.get("isBattle") or pose.get("isTouchingWater"):
+                    continue
+                for kind, want in (("walk", "WALK"), ("fly", "FLY"), ("hover", "HOVER")):
+                    if want not in types or kind in moving:
+                        continue
+                    for a in pose.get("animations", []):
+                        m = re.match(r"q\.bedrock\('([a-z0-9_]+)', '([a-z0-9_]+)'\)", a) if isinstance(a, str) else None
+                        if m:
+                            moving[kind] = ((m.group(1), m.group(2)), pose.get("transformedParts", []))
+                            break
             for name, a in pj.get("animations", {}).items():
                 m = re.match(r"q\.bedrock_stateful\('([a-z0-9_]+)', '([a-z0-9_]+)'\)", a) if isinstance(a, str) else None
                 if m and name in ("cry", "recoil", "faint", "physical", "special", "status"):
@@ -130,7 +143,24 @@ def main(jar):
         if not idle_k:
             idle_k = ground_k or next((k for k in all_anims if k.endswith(".ground_idle")), None) or next((k for k in all_anims if "idle" in k), None)
         action_k = {n: key(pair) for n, pair in actions.items() if key(pair)}
-        keep = {k: all_anims[k] for k in (idle_k, ground_k, *action_k.values()) if k}
+        def parts_of(lst):
+            out = []
+            for t in lst or []:
+                entry = {"part": t.get("part")}
+                vis = t.get("isVisible", t.get("visible"))
+                if vis is not None:
+                    entry["visible"] = bool(vis)
+                for k2 in ("position", "rotation"):
+                    if k2 in t:
+                        entry[k2] = t[k2]
+                if entry["part"] and len(entry) > 1:
+                    out.append(entry)
+            return out
+        poses_k = {}
+        for kind, (pair, plist) in moving.items():
+            if key(pair):
+                poses_k[kind] = {"anim": key(pair), "parts": parts_of(plist)}
+        keep = {k: all_anims[k] for k in (idle_k, ground_k, *action_k.values(), *(v["anim"] for v in poses_k.values())) if k}
         open(os.path.join(d, "anim.json"), "wb").write(compact({"format_version": "1.8.0", "animations": keep}))
         layers = []
         for i, layer in enumerate(var.get("layers", [])):
@@ -162,7 +192,7 @@ def main(jar):
                 parts.append(entry)
         info = {"scale": species.get("baseScale", 1.0) * scale_mul, "idle": idle_k, "ground": ground_k, "texture": f"retromon:textures/pokemon/{sid}.png",
                 "layers": layers, "height": species.get("hitbox", {}).get("height", 1.0) * scale_mul, "standIn": src_id if src_id != sid else None,
-                "parts": parts, "actions": action_k}
+                "parts": parts, "actions": action_k, "poses": poses_k}
         open(os.path.join(d, "info.json"), "wb").write(compact(info))
         cry = f"assets/cobblemon/sounds/pokemon/{cn}/{cn}_cry.ogg"
         if cry in nameset:

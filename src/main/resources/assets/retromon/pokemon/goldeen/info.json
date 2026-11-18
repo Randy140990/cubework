@@ -1,1 +1,1 @@
-{"scale":0.6,"idle":"animation.goldeen.ground_battle_idle","ground":"animation.goldeen.ground_idle","texture":"retromon:textures/pokemon/goldeen.png","layers":[],"height":0.8,"standIn":null,"parts":[],"actions":{"cry":"animation.goldeen.cry"}}
+{"scale":0.6,"idle":"animation.goldeen.ground_battle_idle","ground":"animation.goldeen.ground_idle","texture":"retromon:textures/pokemon/goldeen.png","layers":[],"height":0.8,"standIn":null,"parts":[],"actions":{"cry":"animation.goldeen.cry"},"poses":{"walk":{"anim":"animation.goldeen.ground_walk","parts":[]}}}

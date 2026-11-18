@@ -1,1 +1,1 @@
-{"scale":1.05,"idle":"animation.feraligatr.battle_idle","ground":"animation.feraligatr.ground_idle","texture":"retromon:textures/pokemon/feraligatr.png","layers":[],"height":2.1,"standIn":null,"parts":[],"actions":{"cry":"animation.feraligatr.cry"}}
+{"scale":1.05,"idle":"animation.feraligatr.battle_idle","ground":"animation.feraligatr.ground_idle","texture":"retromon:textures/pokemon/feraligatr.png","layers":[],"height":2.1,"standIn":null,"parts":[],"actions":{"cry":"animation.feraligatr.cry"},"poses":{"walk":{"anim":"animation.feraligatr.ground_walk","parts":[]}}}

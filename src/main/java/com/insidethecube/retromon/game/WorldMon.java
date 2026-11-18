@@ -22,8 +22,12 @@ public class WorldMon extends PathfinderMob {
 	private static final EntityDataAccessor<String> SPECIES = SynchedEntityData.defineId(WorldMon.class, EntityDataSerializers.STRING);
 	private static final EntityDataAccessor<String> KEY = SynchedEntityData.defineId(WorldMon.class, EntityDataSerializers.STRING);
 	private static final EntityDataAccessor<Float> FACING = SynchedEntityData.defineId(WorldMon.class, EntityDataSerializers.FLOAT);
-	/** Its model on your screen (a client object). */
+	private static final EntityDataAccessor<Boolean> AIRBORNE = SynchedEntityData.defineId(WorldMon.class, EntityDataSerializers.BOOLEAN);
+	/** Its model on your screen (a client object), and how high it's flying there (eased). */
 	public Object model;
+	public float liftNow, liftOld;
+	/** Server: when a wild one appeared (ticks), and where it's headed next. */
+	public int born, nextMove;
 
 	public WorldMon(EntityType<? extends PathfinderMob> type, Level level) {
 		super(type, level);
@@ -41,6 +45,32 @@ public class WorldMon extends PathfinderMob {
 		b.define(SPECIES, "pidgey");
 		b.define(KEY, "");
 		b.define(FACING, 0F);
+		b.define(AIRBORNE, false);
+	}
+
+	/** Out in the grass (a wild one you can see) or walking with you (your Pokémon): these move about. */
+	public boolean roams() {
+		String k = key();
+		return k.startsWith("wild:") || k.startsWith("follow:");
+	}
+
+	public boolean wild() {
+		return key().startsWith("wild:");
+	}
+
+	/** In the air (a bird flying over the grass). */
+	public boolean airborne() {
+		return entityData.get(AIRBORNE);
+	}
+
+	public void setAirborne(boolean on) {
+		entityData.set(AIRBORNE, on);
+	}
+
+	/** How fast it moves when it does (wild ones amble, yours keeps up with you). */
+	public void setSpeed(double speed) {
+		var a = getAttribute(Attributes.MOVEMENT_SPEED);
+		if (a != null) a.setBaseValue(speed);
 	}
 
 	public String species() {
@@ -74,6 +104,11 @@ public class WorldMon extends PathfinderMob {
 	@Override
 	public void tick() {
 		super.tick();
+		if (roams()) {
+			// One the game doesn't know any more (left over in a save): gone.
+			if (!level().isClientSide() && !Game.roamerKnown(this)) discard();
+			return;
+		}
 		setYRot(facing());
 		yBodyRot = facing();
 		yHeadRot = facing();

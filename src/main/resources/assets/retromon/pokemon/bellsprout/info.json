@@ -1,1 +1,1 @@
-{"scale":0.65,"idle":"animation.bellsprout.battle_idle","ground":"animation.bellsprout.ground_idle","texture":"retromon:textures/pokemon/bellsprout.png","layers":[],"height":1.0,"standIn":null,"parts":[],"actions":{"cry":"animation.bellsprout.cry"}}
+{"scale":0.65,"idle":"animation.bellsprout.battle_idle","ground":"animation.bellsprout.ground_idle","texture":"retromon:textures/pokemon/bellsprout.png","layers":[],"height":1.0,"standIn":null,"parts":[],"actions":{"cry":"animation.bellsprout.cry"},"poses":{"walk":{"anim":"animation.bellsprout.ground_walk","parts":[]}}}

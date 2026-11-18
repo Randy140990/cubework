@@ -1,1 +1,1 @@
-{"scale":0.8,"idle":"animation.shellder.battle_idle","ground":null,"texture":"retromon:textures/pokemon/shellder.png","layers":[],"height":0.5,"standIn":null,"parts":[],"actions":{"cry":"animation.shellder.cry","recoil":"animation.shellder.recoil"}}
+{"scale":0.8,"idle":"animation.shellder.battle_idle","ground":null,"texture":"retromon:textures/pokemon/shellder.png","layers":[],"height":0.5,"standIn":null,"parts":[],"actions":{"cry":"animation.shellder.cry","recoil":"animation.shellder.recoil"},"poses":{"walk":{"anim":"animation.shellder.ground_walk","parts":[]}}}

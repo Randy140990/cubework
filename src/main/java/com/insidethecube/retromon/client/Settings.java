@@ -59,6 +59,25 @@ public final class Settings {
 		return get("voice", 1, 0, 1) == 1;
 	}
 
+	/** Wild Pokémon: seen in the grass, walked into (1, the default, as Let's Go), or the classic hidden ones (0). */
+	public static boolean seen() {
+		return get("seen", 1, 0, 1) == 1;
+	}
+
+	/** One of your Pokémon walks with you (1, the default) or not (0). */
+	public static boolean follower() {
+		return get("follow", 1, 0, 1) == 1;
+	}
+
+	/** Tells the server how you like things (it does the nights, the wild Pokémon and your follower). */
+	public static void sendPrefs() {
+		net.minecraft.nbt.CompoundTag t = new net.minecraft.nbt.CompoundTag();
+		t.putInt("nights", nights());
+		t.putBoolean("seen", seen());
+		t.putBoolean("follow", follower());
+		net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.insidethecube.retromon.game.Net.Act("prefs", t));
+	}
+
 	/** Nights: 0 dark (as Minecraft), 1 soft (the default: a blue, moonlit night you can see in), 2 bright. */
 	public static int nights() {
 		return get("nights", 1, 0, 2);

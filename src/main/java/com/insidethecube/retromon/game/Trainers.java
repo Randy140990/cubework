@@ -53,6 +53,26 @@ public final class Trainers {
 
 	public static final Map<String, Trainer> ALL = new LinkedHashMap<>();
 	public static final Map<String, Person> PEOPLE = new LinkedHashMap<>();
+
+	/** A sign on the games' maps: where it stands (in steps) and what it says. */
+	public record Sign(String key, String place, int x, int y, List<String> lines) {}
+
+	private static List<Sign> signs;
+
+	public static List<Sign> signsIn(String place) {
+		if (signs == null) {
+			signs = new java.util.ArrayList<>();
+			for (String[] r : Species.table("signs.tsv")) {
+				if (r.length < 5 || r[0].startsWith("#")) continue;
+				try {
+					signs.add(new Sign(r[0], r[1], Integer.parseInt(r[2].trim()), Integer.parseInt(r[3].trim()), lines(r[4])));
+				} catch (NumberFormatException ignored) {
+					// A header or a stray line.
+				}
+			}
+		}
+		return signs.stream().filter(sg -> sg.place().equals(place)).toList();
+	}
 	public static final Map<String, Static> STATICS = new LinkedHashMap<>();
 	/** Where each trainer and person stood in the games: their map's x, y in steps. */
 	public static final Map<String, int[]> POS = new LinkedHashMap<>();

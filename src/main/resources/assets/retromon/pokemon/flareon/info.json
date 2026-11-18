@@ -1,1 +1,1 @@
-{"scale":0.8,"idle":"animation.flareon.ground_idle","ground":"animation.flareon.ground_idle","texture":"retromon:textures/pokemon/flareon.png","layers":[],"height":1.15,"standIn":null,"parts":[],"actions":{"cry":"animation.flareon.cry"}}
+{"scale":0.8,"idle":"animation.flareon.ground_idle","ground":"animation.flareon.ground_idle","texture":"retromon:textures/pokemon/flareon.png","layers":[],"height":1.15,"standIn":null,"parts":[],"actions":{"cry":"animation.flareon.cry"},"poses":{"walk":{"anim":"animation.flareon.ground_idle","parts":[]}}}

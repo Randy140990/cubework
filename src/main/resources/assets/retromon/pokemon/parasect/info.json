@@ -1,1 +1,1 @@
-{"scale":0.8,"idle":"animation.parasect.ride_jump","ground":"animation.parasect.ride_jump","texture":"retromon:textures/pokemon/parasect.png","layers":[],"height":1.3,"standIn":null,"parts":[],"actions":{"cry":"animation.parasect.cry"}}
+{"scale":0.8,"idle":"animation.parasect.ride_jump","ground":"animation.parasect.ride_jump","texture":"retromon:textures/pokemon/parasect.png","layers":[],"height":1.3,"standIn":null,"parts":[],"actions":{"cry":"animation.parasect.cry"},"poses":{"walk":{"anim":"animation.parasect.ride_jump","parts":[]}}}

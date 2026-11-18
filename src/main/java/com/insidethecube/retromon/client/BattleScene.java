@@ -501,6 +501,22 @@ public final class BattleScene {
 		ring(spot(side).add(0, 0.1, 0), dust(pendingFlash, 1.4F), 16, 0.28);
 	}
 
+	/** Your Pokémon celebrating a win: the camera comes round in front of it as it hops for joy. */
+	private static int cheerTicks, cheerMax = 1;
+
+	public static void cheer() {
+		if (!active) return;
+		cheerTicks = cheerMax = 52;
+		MonDisplay d = display(0);
+		if (d != null) {
+			d.cheer = MonDisplay.CHEER;
+			d.act("cry");
+		}
+		Vec3 at = spot(0).add(0, 0.3 + height(0) * 0.5, 0);
+		sphere(at, ParticleTypes.HAPPY_VILLAGER, 14, 0.2);
+		FX.add(new Fx(SPIRAL, spot(0), spot(0), ParticleTypes.NOTE, dust(0xFFE070, 1.4F), 30, 4, new int[1], 3));
+	}
+
 	/** A stat raised or lowered: arrows over it (the screen draws them), and sparkles. */
 	public static void stat(int side, boolean up) {
 		if (!active) return;
@@ -755,6 +771,7 @@ public final class BattleScene {
 		FX.clear();
 		IMPACTS.clear();
 		ARROWS.clear();
+		cheerTicks = 0;
 		shotTicks = flashTicks = 0;
 		boltIn = -1;
 		mine = theirs = ball = sendBall = null;
@@ -851,6 +868,7 @@ public final class BattleScene {
 			}
 			if (age >= f.life()) FX.remove(i);
 		}
+		if (cheerTicks > 0) cheerTicks--;
 		for (int i = IMPACTS.size() - 1; i >= 0; i--) if (++IMPACTS.get(i).age > IMPACTS.get(i).life) IMPACTS.remove(i);
 		for (int i = ARROWS.size() - 1; i >= 0; i--) if (++ARROWS.get(i).age > Arrows.LIFE) ARROWS.remove(i);
 	}
@@ -863,7 +881,23 @@ public final class BattleScene {
 			sy = (RNG.nextDouble() - 0.5) * k;
 		}
 		double x = cam.x, y = cam.y, z = cam.z, yaw = camYaw, pitch = camPitch;
-		if (shotTicks > 0 && shotSide >= 0) {
+		if (cheerTicks > 0) {
+			// In front of yours, a little to the side, looking back at it.
+			float t = 1 - (cheerTicks - partial) / cheerMax;
+			double w = t < 0.2 ? t / 0.2 : t > 0.82 ? (1 - t) / 0.18 : 1;
+			w = w * w * (3 - 2 * w);
+			Vec3 me = spot(0), toFoe = spot(1).subtract(me);
+			toFoe = new Vec3(toFoe.x, 0, toFoe.z).normalize();
+			double h = height(0);
+			Vec3 front = me.add(toFoe.scale(2.6 + h * 0.9)).add(-toFoe.z * 1.1, 0.9 + h * 0.4, toFoe.x * 1.1);
+			Vec3 look = me.add(0, 0.25 + h * 0.5, 0);
+			x += (front.x - x) * w;
+			y += (front.y - y) * w;
+			z += (front.z - z) * w;
+			Vec3 at = camTarget.lerp(look, w).subtract(x, y, z);
+			yaw = Math.toDegrees(Math.atan2(-at.x, at.z));
+			pitch = Math.toDegrees(Math.atan2(-at.y, Math.sqrt(at.x * at.x + at.z * at.z)));
+		} else if (shotTicks > 0 && shotSide >= 0) {
 			// A gentle push in towards the one attacking, the view leaning its way; then back.
 			float t = 1 - (shotTicks - partial) / shotMax;
 			double w = Math.sin(Math.PI * Math.max(0, Math.min(1, t)));

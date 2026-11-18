@@ -1,1 +1,1 @@
-{"scale":1.1,"idle":"animation.mareep.ground_idle","ground":null,"texture":"retromon:textures/pokemon/mareep.png","layers":[{"frames":["retromon:textures/pokemon/mareep_layer0_0.png"],"fps":0,"emissive":true,"translucent":false}],"height":0.9,"standIn":null,"parts":[],"actions":{}}
+{"scale":1.1,"idle":"animation.mareep.ground_idle","ground":null,"texture":"retromon:textures/pokemon/mareep.png","layers":[{"frames":["retromon:textures/pokemon/mareep_layer0_0.png"],"fps":0,"emissive":true,"translucent":false}],"height":0.9,"standIn":null,"parts":[],"actions":{},"poses":{}}

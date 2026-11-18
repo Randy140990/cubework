@@ -35,6 +35,8 @@ public class PlayerData {
 	public String place = "";
 	/** Text speed: 0 slow, 1 mid, 2 fast. */
 	public int textSpeed = 2;
+	/** Which of your party walks with you (its place in the party). */
+	public int follow;
 	/** From the new-game intro: your name, your rival's and whether you're a boy or a girl. */
 	public String name = "", rival = "", gender = "boy";
 	/** Your clothes (from CLOTHES in the menu), as the wardrobe writes them; empty for the hero's own. */
@@ -109,6 +111,7 @@ public class PlayerData {
 		t.putInt("repel", repel);
 		t.putString("place", place);
 		t.putInt("textSpeed", textSpeed);
+		t.putInt("follow", follow);
 		t.putString("name", name);
 		t.putString("rival", rival);
 		t.putString("gender", gender);
@@ -145,6 +148,7 @@ public class PlayerData {
 		d.repel = t.getIntOr("repel", 0);
 		d.place = t.getStringOr("place", "");
 		d.textSpeed = t.getIntOr("textSpeed", 2);
+		d.follow = t.getIntOr("follow", 0);
 		d.name = t.getStringOr("name", "");
 		d.rival = t.getStringOr("rival", "");
 		d.gender = t.getStringOr("gender", "boy");

@@ -1,1 +1,1 @@
-{"scale":0.8,"idle":"animation.dugtrio.battle_idle","ground":"animation.dugtrio.ground_idle","texture":"retromon:textures/pokemon/dugtrio.png","layers":[],"height":1.1,"standIn":null,"parts":[],"actions":{"cry":"animation.dugtrio.cry"}}
+{"scale":0.8,"idle":"animation.dugtrio.battle_idle","ground":"animation.dugtrio.ground_idle","texture":"retromon:textures/pokemon/dugtrio.png","layers":[],"height":1.1,"standIn":null,"parts":[],"actions":{"cry":"animation.dugtrio.cry"},"poses":{"walk":{"anim":"animation.dugtrio.ground_walk","parts":[]}}}

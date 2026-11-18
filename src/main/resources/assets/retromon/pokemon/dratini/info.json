@@ -1,1 +1,1 @@
-{"scale":0.6,"idle":"animation.dratini.ground_idle","ground":"animation.dratini.ground_idle","texture":"retromon:textures/pokemon/dratini.png","layers":[],"height":1.8,"standIn":null,"parts":[],"actions":{"cry":"animation.dratini.cry"}}
+{"scale":0.6,"idle":"animation.dratini.ground_idle","ground":"animation.dratini.ground_idle","texture":"retromon:textures/pokemon/dratini.png","layers":[],"height":1.8,"standIn":null,"parts":[],"actions":{"cry":"animation.dratini.cry"},"poses":{"walk":{"anim":"animation.dratini.ground_walk","parts":[]}}}

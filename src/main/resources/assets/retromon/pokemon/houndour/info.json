@@ -1,1 +1,1 @@
-{"scale":0.7,"idle":"animation.houndour.ground_idle","ground":"animation.houndour.ground_idle","texture":"retromon:textures/pokemon/houndour.png","layers":[],"height":1.2,"standIn":null,"parts":[],"actions":{"cry":"animation.houndour.cry"}}
+{"scale":0.7,"idle":"animation.houndour.ground_idle","ground":"animation.houndour.ground_idle","texture":"retromon:textures/pokemon/houndour.png","layers":[],"height":1.2,"standIn":null,"parts":[],"actions":{"cry":"animation.houndour.cry"},"poses":{"walk":{"anim":"animation.houndour.ground_idle","parts":[]}}}

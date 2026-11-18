@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.omastar.battle_idle","ground":"animation.omastar.ground_idle","texture":"retromon:textures/pokemon/omastar.png","layers":[],"height":0.7,"standIn":null,"parts":[],"actions":{"cry":"animation.omastar.cry"}}
+{"scale":1.0,"idle":"animation.omastar.battle_idle","ground":"animation.omastar.ground_idle","texture":"retromon:textures/pokemon/omastar.png","layers":[],"height":0.7,"standIn":null,"parts":[],"actions":{"cry":"animation.omastar.cry"},"poses":{"walk":{"anim":"animation.omastar.ground_walk","parts":[]}}}

@@ -43,6 +43,8 @@ public final class BedrockModel {
 		final Map<String, Anim> actions = new HashMap<>();
 		/** How its parts stand in its pose: shown or hidden (Pidgey's open wings are hidden while it stands), moved, turned. */
 		final List<JsonObject> poseParts = new ArrayList<>();
+		/** Its other poses out in the world (walk, fly, hover): each an animation and how its parts stand. */
+		final Map<String, PoseDef> poses = new HashMap<>();
 
 		Def(String species, JsonObject geo, JsonObject info, JsonObject anims) {
 			this.species = species;
@@ -79,6 +81,21 @@ public final class BedrockModel {
 			if (info.has("parts") && info.get("parts").isJsonArray()) {
 				for (JsonElement e : info.getAsJsonArray("parts")) if (e.isJsonObject()) poseParts.add(e.getAsJsonObject());
 			}
+			if (info.has("poses") && info.get("poses").isJsonObject()) {
+				for (Map.Entry<String, JsonElement> e : info.getAsJsonObject("poses").entrySet()) {
+					JsonObject o = e.getValue().getAsJsonObject();
+					String anim = o.has("anim") ? o.get("anim").getAsString() : "";
+					if (!all.has(anim)) continue;
+					List<JsonObject> parts = new ArrayList<>();
+					if (o.has("parts")) for (JsonElement pe : o.getAsJsonArray("parts")) if (pe.isJsonObject()) parts.add(pe.getAsJsonObject());
+					poses.put(e.getKey(), new PoseDef(Anim.read(all.getAsJsonObject(anim)), parts));
+				}
+			}
+		}
+
+		/** Whether it has a pose by this name (walk, fly, hover). */
+		public boolean hasPose(String name) {
+			return poses.containsKey(name);
 		}
 
 		/** Whether it has a one-off animation by this name. */
@@ -92,6 +109,9 @@ public final class BedrockModel {
 			return a == null ? 0 : a.length;
 		}
 	}
+
+	/** A pose: its looping animation and how its parts stand. */
+	record PoseDef(Anim anim, List<JsonObject> parts) {}
 
 	/** A glowing layer drawn over the model (Charmander's flame), cycling through its frames. */
 	public record Layer(List<Identifier> frames, float fps) {
@@ -252,9 +272,24 @@ public final class BedrockModel {
 	 * seconds in (if it has that one and it hasn't finished).
 	 */
 	public void pose(double seconds, String action, double actionSeconds) {
+		pose(seconds, null, action, actionSeconds);
+	}
+
+	/**
+	 * Poses it in one of its poses out in the world (walk, fly, hover; null for its idle), with a one-off
+	 * animation over it. The pose decides which parts show (Pidgey's wings open to fly, folded to walk).
+	 */
+	public void pose(double seconds, String poseName, String action, double actionSeconds) {
 		for (ModelPart p : parts.values()) p.resetPose();
+		PoseDef pd = poseName == null ? null : def.poses.get(poseName);
+		visibility(def.poseParts);
+		List<JsonObject> standing = def.poseParts;
+		if (pd != null) {
+			visibility(pd.parts());
+			standing = pd.parts();
+		}
 		// Its pose's own moves and turns (from Cobblemon's poser).
-		for (JsonObject t : def.poseParts) {
+		for (JsonObject t : standing) {
 			ModelPart p = parts.get(t.has("part") ? t.get("part").getAsString() : "");
 			if (p == null) continue;
 			if (t.has("position") && t.get("position").isJsonArray()) {
@@ -270,9 +305,16 @@ public final class BedrockModel {
 				p.zRot += (float) Math.toRadians(v.get(2).getAsFloat());
 			}
 		}
-		apply(def.idle, seconds, true);
+		apply(pd != null ? pd.anim() : def.idle, seconds, true);
 		Anim one = action == null ? null : def.actions.get(action);
 		if (one != null && actionSeconds >= 0 && actionSeconds <= one.length) apply(one, actionSeconds, false);
+	}
+
+	private void visibility(List<JsonObject> list) {
+		for (JsonObject t : list) {
+			ModelPart p = parts.get(t.has("part") ? t.get("part").getAsString() : "");
+			if (p != null && t.has("visible")) p.visible = t.get("visible").getAsBoolean();
+		}
 	}
 
 	private void apply(Anim a, double seconds, boolean loop) {

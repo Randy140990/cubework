@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.magikarp.ground_idle","ground":"animation.magikarp.ground_idle","texture":"retromon:textures/pokemon/magikarp.png","layers":[],"height":0.8,"standIn":null,"parts":[],"actions":{"cry":"animation.magikarp.cry"}}
+{"scale":1.0,"idle":"animation.magikarp.ground_idle","ground":"animation.magikarp.ground_idle","texture":"retromon:textures/pokemon/magikarp.png","layers":[],"height":0.8,"standIn":null,"parts":[],"actions":{"cry":"animation.magikarp.cry"},"poses":{"walk":{"anim":"animation.magikarp.ground_walk","parts":[]}}}

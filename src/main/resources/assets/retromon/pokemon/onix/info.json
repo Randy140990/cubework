@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.onix.battle_idle","ground":"animation.onix.boulder_rotation","texture":"retromon:textures/pokemon/onix.png","layers":[],"height":4.0,"standIn":null,"parts":[],"actions":{"cry":"animation.onix.cry"}}
+{"scale":1.0,"idle":"animation.onix.battle_idle","ground":"animation.onix.boulder_rotation","texture":"retromon:textures/pokemon/onix.png","layers":[],"height":4.0,"standIn":null,"parts":[],"actions":{"cry":"animation.onix.cry"},"poses":{"walk":{"anim":"animation.onix.ground_walk","parts":[]}}}

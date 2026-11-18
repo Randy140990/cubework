@@ -1,5 +1,6 @@
 package com.insidethecube.retromon.game;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -17,7 +18,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 /**
  * A person in the world you can talk to: a Pokémon Centre nurse, a Mart clerk, a trainer, a gym leader or one
  * of the townsfolk.
- * They stand facing one way (trainers watch along it), never come to harm and never wander off.
+ * Trainers stand facing one way (watching along it); townsfolk who walk about in the games stroll a few steps
+ * round their spot, and the rest look about now and then. They never come to harm and never wander off.
  */
 public class Npc extends PathfinderMob {
 	public static final int NURSE = 0, CLERK = 1, TRAINER = 2, LEADER = 3, PERSON = 4;
@@ -78,10 +80,45 @@ public class Npc extends PathfinderMob {
 		yHeadRot = yaw;
 	}
 
+	/** Townsfolk who walk about in the games do here too, a few steps round where they stand; others look about. */
+	private BlockPos home;
+	private int nextWander;
+	private boolean looked, walking;
+	private Trainers.Person person;
+
 	@Override
 	public void tick() {
 		super.tick();
-		if (approaching <= 0 && getNavigation().isDone()) face(facing());
+		if (!level().isClientSide() && role() == PERSON && approaching <= 0) wander();
+		if (approaching <= 0 && getNavigation().isDone()) {
+			if (walking) {
+				// Arrived: keeps facing the way it walked.
+				walking = false;
+				entityData.set(FACING, getYRot());
+			}
+			face(facing());
+		}
+	}
+
+	private void wander() {
+		if (!looked) {
+			person = Trainers.PEOPLE.get(key());
+			looked = true;
+		}
+		if (person == null) return;
+		if (home == null) home = blockPosition();
+		if (tickCount < nextWander) return;
+		nextWander = tickCount + 70 + random.nextInt(130);
+		String facing = person.facing();
+		if (person.movement().equals("walk")) {
+			boolean upDown = facing.equals("up_down"), leftRight = facing.equals("left_right");
+			int dx = upDown ? 0 : random.nextInt(7) - 3, dz = leftRight ? 0 : random.nextInt(7) - 3;
+			if (dx == 0 && dz == 0) return;
+			walking = getNavigation().moveTo(home.getX() + dx + 0.5, home.getY(), home.getZ() + dz + 0.5, 0.55);
+		} else if (facing.equals("any_dir") || facing.equals("none")) {
+			// Stands still, but looks about now and then.
+			if (random.nextInt(3) == 0) setFacing(random.nextInt(4) * 90F);
+		}
 	}
 
 	@Override

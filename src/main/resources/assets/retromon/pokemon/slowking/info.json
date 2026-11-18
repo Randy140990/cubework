@@ -1,1 +1,1 @@
-{"scale":1.2,"idle":"animation.slowking.battle_idle","ground":"animation.slowking.ground_idle","texture":"retromon:textures/pokemon/slowking.png","layers":[],"height":1.6,"standIn":null,"parts":[],"actions":{"cry":"animation.slowking.cry"}}
+{"scale":1.2,"idle":"animation.slowking.battle_idle","ground":"animation.slowking.ground_idle","texture":"retromon:textures/pokemon/slowking.png","layers":[],"height":1.6,"standIn":null,"parts":[],"actions":{"cry":"animation.slowking.cry"},"poses":{"walk":{"anim":"animation.slowking.ground_walk","parts":[]}}}

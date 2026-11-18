@@ -1,1 +1,1 @@
-{"scale":0.8,"idle":"animation.vaporeon.ground_idle","ground":"animation.vaporeon.ground_idle","texture":"retromon:textures/pokemon/vaporeon.png","layers":[],"height":1.15,"standIn":null,"parts":[],"actions":{"cry":"animation.vaporeon.cry"}}
+{"scale":0.8,"idle":"animation.vaporeon.ground_idle","ground":"animation.vaporeon.ground_idle","texture":"retromon:textures/pokemon/vaporeon.png","layers":[],"height":1.15,"standIn":null,"parts":[],"actions":{"cry":"animation.vaporeon.cry"},"poses":{"walk":{"anim":"animation.vaporeon.ground_idle","parts":[]}}}

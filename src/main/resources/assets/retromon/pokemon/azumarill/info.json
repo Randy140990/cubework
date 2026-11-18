@@ -1,1 +1,1 @@
-{"scale":0.9,"idle":"animation.azumarill.ground_idle","ground":"animation.azumarill.ground_idle","texture":"retromon:textures/pokemon/azumarill.png","layers":[],"height":1.2,"standIn":null,"parts":[],"actions":{}}
+{"scale":0.9,"idle":"animation.azumarill.ground_idle","ground":"animation.azumarill.ground_idle","texture":"retromon:textures/pokemon/azumarill.png","layers":[],"height":1.2,"standIn":null,"parts":[],"actions":{},"poses":{"walk":{"anim":"animation.azumarill.ground_idle","parts":[]}}}

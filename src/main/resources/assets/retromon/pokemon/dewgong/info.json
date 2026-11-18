@@ -1,1 +1,1 @@
-{"scale":0.7,"idle":"animation.dewgong.ground_idle","ground":"animation.dewgong.ground_idle","texture":"retromon:textures/pokemon/dewgong.png","layers":[],"height":2.0,"standIn":null,"parts":[],"actions":{"cry":"animation.dewgong.cry"}}
+{"scale":0.7,"idle":"animation.dewgong.ground_idle","ground":"animation.dewgong.ground_idle","texture":"retromon:textures/pokemon/dewgong.png","layers":[],"height":2.0,"standIn":null,"parts":[],"actions":{"cry":"animation.dewgong.cry"},"poses":{"walk":{"anim":"animation.dewgong.ground_walk","parts":[]}}}

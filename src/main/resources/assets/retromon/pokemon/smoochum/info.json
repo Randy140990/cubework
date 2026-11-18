@@ -1,1 +1,1 @@
-{"scale":0.55,"idle":"animation.smoochum.ground_idle","ground":"animation.smoochum.ground_idle","texture":"retromon:textures/pokemon/smoochum.png","layers":[],"height":1.2,"standIn":null,"parts":[],"actions":{}}
+{"scale":0.55,"idle":"animation.smoochum.ground_idle","ground":"animation.smoochum.ground_idle","texture":"retromon:textures/pokemon/smoochum.png","layers":[],"height":1.2,"standIn":null,"parts":[],"actions":{},"poses":{"walk":{"anim":"animation.smoochum.ground_idle","parts":[]}}}

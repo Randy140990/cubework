@@ -40,7 +40,7 @@ public class BattleScreen extends GameScreen {
 	private record Step(int kind, int side, String text, int a, int b) {}
 
 	private static final int SHAKE = -1, POP = -2, END = -3, NOTICE_DONE = -4, INTO_BALL = -5, GROW = -6, DEX = -7, ABSORB = -8, CLOSE_BALL = -9,
-			DROP = -10;
+			DROP = -10, CHEER = -11;
 	/** The way in (as Let's Go): two quick flashes, a slanted sweep of white from left to right, then the white fades on the stage. */
 	private static final int WIPE = 36;
 	/** The wipe's ticks left when the stage goes up behind the white. */
@@ -196,6 +196,12 @@ public class BattleScreen extends GameScreen {
 			case CLOSE_BALL -> {
 				BattleScene.closeBall();
 				wait = 6;
+				return;
+			}
+			case CHEER -> {
+				BattleScene.cheer();
+				Sounds.cry(sides[0].species, 1.05F);
+				wait = 50;
 				return;
 			}
 			case DROP -> {
@@ -394,7 +400,11 @@ public class BattleScreen extends GameScreen {
 		if (result != null) {
 			if (!afterQueued) {
 				afterQueued = true;
-				if (result.equals("WIN")) Music.play(kind.equals("WILD") ? "defeated_wild_mon" : boss ? "defeated_gym_leader" : "defeated_trainer");
+				if (result.equals("WIN")) {
+					Music.play(kind.equals("WILD") ? "defeated_wild_mon" : boss ? "defeated_gym_leader" : "defeated_trainer");
+					// Yours celebrates: the camera comes round in front of it as it hops for joy.
+					if (sides[0].shown) queue.add(new Step(CHEER, 0, null, 0, 0));
+				}
 				if (result.equals("CAUGHT") && newCatch) {
 					queue.add(new Step(Event.Kind.TEXT.ordinal(), -1, "New POKéDEX data will be added for " + sides[1].name + "!", 0, 0));
 					queue.add(new Step(DEX, -1, null, 0, 0));

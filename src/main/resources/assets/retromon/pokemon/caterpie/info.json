@@ -1,1 +1,1 @@
-{"scale":0.5,"idle":"animation.caterpie.ground_idle","ground":"animation.caterpie.ground_idle","texture":"retromon:textures/pokemon/caterpie.png","layers":[],"height":0.6,"standIn":null,"parts":[],"actions":{"cry":"animation.caterpie.cry"}}
+{"scale":0.5,"idle":"animation.caterpie.ground_idle","ground":"animation.caterpie.ground_idle","texture":"retromon:textures/pokemon/caterpie.png","layers":[],"height":0.6,"standIn":null,"parts":[],"actions":{"cry":"animation.caterpie.cry"},"poses":{"walk":{"anim":"animation.caterpie.ground_walk","parts":[]}}}

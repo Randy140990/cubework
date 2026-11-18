@@ -13,11 +13,9 @@ public final class Night {
 	/** The strength the server's unseen night vision has (a potion's is 0 or 1). */
 	public static final int AMPLIFIER = 7;
 
-	/** Tells the server how you like nights (it gives the unseen night vision only if not DARK). */
+	/** Tells the server how you like nights (and the rest of your settings). */
 	public static void send() {
-		net.minecraft.nbt.CompoundTag t = new net.minecraft.nbt.CompoundTag();
-		t.putInt("nights", Settings.nights());
-		net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.insidethecube.retromon.game.Net.Act("nights", t));
+		Settings.sendPrefs();
 	}
 
 	/** How far it's night (0 by day, 1 at full night), from the time of day. */

@@ -1,1 +1,1 @@
-{"scale":0.55,"idle":"animation.horsea.ground_idle","ground":"animation.horsea.ground_idle","texture":"retromon:textures/pokemon/horsea.png","layers":[],"height":1.1,"standIn":null,"parts":[],"actions":{"cry":"animation.horsea.cry"}}
+{"scale":0.55,"idle":"animation.horsea.ground_idle","ground":"animation.horsea.ground_idle","texture":"retromon:textures/pokemon/horsea.png","layers":[],"height":1.1,"standIn":null,"parts":[],"actions":{"cry":"animation.horsea.cry"},"poses":{"walk":{"anim":"animation.horsea.ground_walk","parts":[]}}}

@@ -29,6 +29,9 @@ public class MonDisplay extends Entity {
 	public int actionAge;
 	/** Tinted red (drawn into a ball as light) for so many ticks, or 0. */
 	public int red;
+	/** Celebrating a win: ticks left (hops, a twirl). */
+	public int cheer;
+	public static final int CHEER = 44;
 	/** A Poké Ball's texture (which ball it is), or null for a Pokémon. */
 	public String texture;
 	/** Ticks left of a wobble (a ball shaking on the ground). */
@@ -63,6 +66,7 @@ public class MonDisplay extends Entity {
 		if (lunge > 0) lunge--;
 		if (flash > 0) flash--;
 		if (red > 0) red--;
+		if (cheer > 0) cheer--;
 		if (action != null && ++actionAge > 100) action = null;
 	}
 

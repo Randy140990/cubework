@@ -1,0 +1,195 @@
+# key	place	x	y	lines
+celadon_city_s0	celadon_city	27	15	TRAINER TIPS | X ACCURACY boosts the accuracy of techniques! | DIRE HIT jacks up the likelihood of critical hits! | Get your items at CELADON DEPT. STORE!
+celadon_city_s1	celadon_city	19	15	CELADON CITY The City of Rainbow Dreams
+celadon_city_s2	celadon_city	42	9	Heal Your POKéMON! POKéMON CENTER
+celadon_city_s3	celadon_city	13	29	CELADON CITY POKéMON GYM LEADER: ERIKA | The Nature-Loving Princess!
+celadon_city_s4	celadon_city	21	9	CELADON MANSION
+celadon_city_s5	celadon_city	12	13	Find what you need at CELADON DEPT. STORE!
+celadon_city_s6	celadon_city	39	21	TRAINER TIPS | GUARD SPEC. protects POKéMON against SPECIAL attacks such as fire and water! | Get your items at CELADON DEPT. STORE!
+celadon_city_s7	celadon_city	33	21	Coins exchanged for prizes! PRIZE EXCHANGE
+celadon_city_s8	celadon_city	27	21	ROCKET GAME CORNER The playground for grownups!
+celadon_mansion_1f_s0	celadon_mansion_1f	4	9	CELADON MANSION Manager's Suite
+celadon_mansion_2f_s0	celadon_mansion_2f	4	9	GAME FREAK Meeting Room
+celadon_mansion_3f_s0	celadon_mansion_3f	1	3	It's the game program! Messing with it could bug out the game!
+celadon_mansion_3f_s1	celadon_mansion_3f	4	3	Someone's playing a game instead of working!
+celadon_mansion_3f_s2	celadon_mansion_3f	1	6	It's the script! Better not look at the ending!
+celadon_mansion_3f_s3	celadon_mansion_3f	4	9	GAME FREAK Development Room
+celadon_mansion_roof_s0	celadon_mansion_roof	3	7	I KNOW EVERYTHING!
+celadon_mart_1f_s0	celadon_mart_1f	11	4	1F: SERVICE COUNTER | 2F: TRAINER'S MARKET | 3F: TV GAME SHOP | 4F: WISEMAN GIFTS | 5F: DRUG STORE | ROOFTOP SQUARE: VENDING MACHINES
+celadon_mart_1f_s1	celadon_mart_1f	14	1	1F: SERVICE COUNTER
+celadon_mart_2f_s0	celadon_mart_2f	14	1	Top Grade Items for Trainers! | 2F: TRAINER'S MARKET
+celadon_mart_3f_s0	celadon_mart_3f	2	4	It's an SNES!
+celadon_mart_3f_s1	celadon_mart_3f	3	4	An RPG! There's no time for that!
+celadon_mart_3f_s2	celadon_mart_3f	5	4	It's an SNES!
+celadon_mart_3f_s3	celadon_mart_3f	6	4	A sports game! Dad'll like that!
+celadon_mart_3f_s4	celadon_mart_3f	2	6	It's an SNES!
+celadon_mart_3f_s5	celadon_mart_3f	3	6	A puzzle game! Looks addictive!
+celadon_mart_3f_s6	celadon_mart_3f	5	6	It's an SNES!
+celadon_mart_3f_s7	celadon_mart_3f	6	6	A fighting game! Looks tough!
+celadon_mart_3f_s8	celadon_mart_3f	14	1	3F: TV GAME SHOP
+celadon_mart_3f_s9	celadon_mart_3f	4	1	Red and Blue! Both are POKéMON!
+celadon_mart_3f_s10	celadon_mart_3f	6	1	Red and Blue! Both are POKéMON!
+celadon_mart_3f_s11	celadon_mart_3f	10	1	Red and Blue! Both are POKéMON!
+celadon_mart_4f_s0	celadon_mart_4f	14	1	Express yourself with gifts! | 4F: WISEMAN GIFTS | Evolution Special! Element STONEs on sale now!
+celadon_mart_5f_s0	celadon_mart_5f	14	1	5F: DRUG STORE
+celadon_mart_roof_s0	celadon_mart_roof	13	2	ROOFTOP SQUARE: VENDING MACHINES
+cerulean_city_s0	cerulean_city	23	19	CERULEAN CITY A Mysterious, Blue Aura Surrounds It
+cerulean_city_s1	cerulean_city	17	29	TRAINER TIPS | Pressing B Button during evolution cancels the whole process.
+cerulean_city_s2	cerulean_city	26	25	All your item needs fulfilled! POKéMON MART
+cerulean_city_s3	cerulean_city	20	17	Heal Your POKéMON! POKéMON CENTER
+cerulean_city_s4	cerulean_city	11	25	Grass and caves handled easily! BIKE SHOP
+cerulean_city_s5	cerulean_city	27	21	CERULEAN CITY POKéMON GYM LEADER: MISTY | The Tomboyish Mermaid!
+cerulean_trashed_house_s0	cerulean_trashed_house	3	0	TEAM ROCKET left a way out!
+cinnabar_island_s0	cinnabar_island	9	5	CINNABAR ISLAND The Fiery Town of Burning Desire
+cinnabar_island_s1	cinnabar_island	16	11	All your item needs fulfilled! POKéMON MART
+cinnabar_island_s2	cinnabar_island	12	11	Heal Your POKéMON! POKéMON CENTER
+cinnabar_island_s3	cinnabar_island	9	11	POKéMON LAB
+cinnabar_island_s4	cinnabar_island	13	3	CINNABAR ISLAND POKéMON GYM LEADER: BLAINE | The Hot-Headed Quiz Master!
+cinnabar_lab_s0	cinnabar_lab	3	2	A photo of the LAB's founder, DR.FUJI!
+cinnabar_lab_s1	cinnabar_lab	9	4	POKéMON LAB Meeting Room
+cinnabar_lab_s2	cinnabar_lab	13	4	POKéMON LAB R-and-D Room
+cinnabar_lab_s3	cinnabar_lab	17	4	POKéMON LAB Testing Room
+cinnabar_lab_metronome_room_s0	cinnabar_lab_metronome_room	0	4	There's an e-mail message! | ... | The 3 legendary bird POKéMON are ARTICUNO, ZAPDOS and MOLTRES. | Their whereabouts are unknown. | We plan to explore the cavern close to CERULEAN. | From: POKéMON RESEARCH TEAM | ...
+cinnabar_lab_metronome_room_s1	cinnabar_lab_metronome_room	1	4	There's an e-mail message! | ... | The 3 legendary bird POKéMON are ARTICUNO, ZAPDOS and MOLTRES. | Their whereabouts are unknown. | We plan to explore the cavern close to CERULEAN. | From: POKéMON RESEARCH TEAM | ...
+cinnabar_lab_metronome_room_s2	cinnabar_lab_metronome_room	2	1	An amber pipe!
+copycats_house_2f_s0	copycats_house_2f	3	5	A game with MARIO wearing a bucket on his head!
+copycats_house_2f_s1	copycats_house_2f	0	1	... | My Secrets! | Skill: Mimicry! Hobby: Collecting dolls! Favorite POKéMON: CLEFAIRY!
+fuchsia_city_s0	fuchsia_city	15	23	FUCHSIA CITY Behold! It's Passion Pink!
+fuchsia_city_s1	fuchsia_city	25	15	FUCHSIA CITY Behold! It's Passion Pink!
+fuchsia_city_s2	fuchsia_city	17	5	SAFARI GAME POKéMON-U-CATCH!
+fuchsia_city_s3	fuchsia_city	6	13	All your item needs fulfilled! POKéMON MART
+fuchsia_city_s4	fuchsia_city	20	27	Heal Your POKéMON! POKéMON CENTER
+fuchsia_city_s5	fuchsia_city	27	29	SAFARI ZONE WARDEN's HOME
+fuchsia_city_s6	fuchsia_city	21	15	POKéMON PARADISE SAFARI ZONE
+fuchsia_city_s7	fuchsia_city	5	29	FUCHSIA CITY POKéMON GYM LEADER: KOGA | The Poisonous Ninja Master!
+fuchsia_city_s8	fuchsia_city	33	7	Name: CHANSEY | Catching one is all up to chance.
+fuchsia_city_s9	fuchsia_city	27	7	Name: VOLTORB | The very image of a POKé BALL.
+fuchsia_city_s10	fuchsia_city	13	7	Name: KANGASKHAN | A maternal POKéMON that raises its young in a pouch on its belly.
+fuchsia_city_s11	fuchsia_city	31	13	Name: SLOWPOKE | Friendly and very slow moving.
+fuchsia_city_s12	fuchsia_city	13	15	Name: LAPRAS | A.K.A. the king of the seas.
+fuchsia_city_s13	fuchsia_city	7	7	Name: OMANYTE | A POKéMON that was resurrected from a fossil.
+game_corner_s0	game_corner	9	4	Hey! | A switch behind the poster!? Let's push it!
+lavender_town_s0	lavender_town	11	9	LAVENDER TOWN The Noble Purple Town
+lavender_town_s1	lavender_town	9	3	New SILPH SCOPE! | Make the Invisible Plain to See! | SILPH CO.
+lavender_town_s2	lavender_town	16	13	All your item needs fulfilled! POKéMON MART
+lavender_town_s3	lavender_town	4	5	Heal Your POKéMON! POKéMON CENTER
+lavender_town_s4	lavender_town	5	9	LAVENDER VOLUNTEER POKéMON HOUSE
+lavender_town_s5	lavender_town	17	7	May the Souls of POKéMON Rest Easy POKéMON TOWER
+mt_moon_1f_s0	mt_moon_1f	15	23	Beware! ZUBAT is a bloodsucker!
+museum_2f_s0	museum_2f	11	2	SPACE SHUTTLE COLUMBIA
+museum_2f_s1	museum_2f	2	5	Meteorite that fell on MT.MOON. (MOON STONE?)
+pallet_town_s0	pallet_town	13	13	OAK POKéMON RESEARCH LAB
+pallet_town_s1	pallet_town	7	9	PALLET TOWN Shades of your journey await!
+pallet_town_s2	pallet_town	3	5	{player}'s house
+pallet_town_s3	pallet_town	11	5	{rival}'s house
+pewter_city_s0	pewter_city	19	29	TRAINER TIPS | Any POKéMON that takes part in battle, however short, earns EXP!
+pewter_city_s1	pewter_city	33	19	NOTICE! | Thieves have been stealing POKéMON fossils at MT. MOON! Please call PEWTER POLICE with any info!
+pewter_city_s2	pewter_city	24	17	All your item needs fulfilled! POKéMON MART
+pewter_city_s3	pewter_city	14	25	Heal Your POKéMON! POKéMON CENTER
+pewter_city_s4	pewter_city	15	9	PEWTER MUSEUM OF SCIENCE
+pewter_city_s5	pewter_city	11	17	PEWTER CITY POKéMON GYM LEADER: BROCK | The Rock Solid POKéMON Trainer!
+pewter_city_s6	pewter_city	25	23	PEWTER CITY A Stone Gray City
+rock_tunnel_1f_s0	rock_tunnel_1f	11	29	ROCK TUNNEL CERULEAN CITY - LAVENDER TOWN
+rocket_hideout_elevator_s0	rocket_hideout_elevator	1	1	It appears to need a key.
+route_1_s0	route_1	9	27	ROUTE 1 PALLET TOWN - VIRIDIAN CITY
+route_10_s0	route_10	7	19	ROCK TUNNEL
+route_10_s1	route_10	12	19	Heal Your POKéMON! POKéMON CENTER
+route_10_s2	route_10	9	55	ROCK TUNNEL
+route_10_s3	route_10	5	41	POWER PLANT
+route_11_s0	route_11	1	5	DIGLETT's CAVE
+route_11_gate_2f_s0	route_11_gate_2f	1	2	Looked into the binoculars. | A big POKéMON is asleep on a road!
+route_11_gate_2f_s1	route_11_gate_2f	6	2	Looked into the binoculars. | The only way to get from CERULEAN CITY to LAVENDER is by way of the ROCK TUNNEL.
+route_12_s0	route_12	13	13	ROUTE 12 North to LAVENDER
+route_12_s1	route_12	11	63	SPORT FISHING AREA
+route_12_gate_2f_s0	route_12_gate_2f	1	2	Looked into the binoculars. | A man fishing!
+route_12_gate_2f_s1	route_12_gate_2f	6	2	Looked into the binoculars. | It's POKéMON TOWER!
+route_13_s0	route_13	15	13	TRAINER TIPS | Look to the left of that post!
+route_13_s1	route_13	33	5	TRAINER TIPS | Use SELECT to switch items in the ITEM window!
+route_13_s2	route_13	31	11	ROUTE 13 North to SILENCE BRIDGE
+route_14_s0	route_14	17	13	ROUTE 14 West to FUCHSIA CITY
+route_15_s0	route_15	39	9	ROUTE 15 West to FUCHSIA CITY
+route_15_gate_2f_s0	route_15_gate_2f	6	2	Looked into the binoculars. | It looks like a small island!
+route_16_s0	route_16	27	11	Enjoy the slope! CYCLING ROAD
+route_16_s1	route_16	5	17	ROUTE 16 CELADON CITY - FUCHSIA CITY
+route_16_gate_2f_s0	route_16_gate_2f	1	2	Looked into the binoculars. | It's CELADON DEPT. STORE!
+route_16_gate_2f_s1	route_16_gate_2f	6	2	Looked into the binoculars. | There's a long path over water!
+route_17_s0	route_17	9	51	It's a notice! | Watch out for discarded items!
+route_17_s1	route_17	9	63	TRAINER TIPS | All POKéMON are unique. | Even POKéMON of the same type and level grow at different rates.
+route_17_s2	route_17	9	75	TRAINER TIPS | Press the A or B Button to stay in place while on a slope.
+route_17_s3	route_17	9	87	ROUTE 17 CELADON CITY - FUCHSIA CITY
+route_17_s4	route_17	9	111	It's a notice! | Don't throw the game, throw POKé BALLs instead!
+route_17_s5	route_17	9	141	CYCLING ROAD Slope ends here!
+route_18_s0	route_18	43	7	ROUTE 18 CELADON CITY - FUCHSIA CITY
+route_18_s1	route_18	33	5	CYCLING ROAD No pedestrians permitted!
+route_18_gate_2f_s0	route_18_gate_2f	1	2	Looked into the binoculars. | PALLET TOWN is in the west!
+route_18_gate_2f_s1	route_18_gate_2f	6	2	Looked into the binoculars. | There are people swimming!
+route_19_s0	route_19	11	11	SEA ROUTE 19 FUCHSIA CITY - SEAFOAM ISLANDS
+route_2_s0	route_2	5	65	ROUTE 2 VIRIDIAN CITY - PEWTER CITY
+route_2_s1	route_2	11	11	DIGLETT's CAVE
+route_20_s0	route_20	51	7	SEAFOAM ISLANDS
+route_20_s1	route_20	57	11	SEAFOAM ISLANDS
+route_22_s0	route_22	7	11	POKéMON LEAGUE Front Gate
+route_23_s0	route_23	3	33	VICTORY ROAD GATE - POKéMON LEAGUE
+route_25_s0	route_25	43	3	SEA COTTAGE BILL lives here!
+route_3_s0	route_3	59	9	ROUTE 3 MT.MOON AHEAD
+route_4_s0	route_4	12	5	Heal Your POKéMON! POKéMON CENTER
+route_4_s1	route_4	17	7	MT.MOON Tunnel Entrance
+route_4_s2	route_4	27	7	ROUTE 4 MT.MOON - CERULEAN CITY
+route_5_s0	route_5	17	29	UNDERGROUND PATH CERULEAN CITY - VERMILION CITY
+route_6_s0	route_6	19	15	UNDERGROUND PATH CERULEAN CITY - VERMILION CITY
+route_7_s0	route_7	3	13	UNDERGROUND PATH CELADON CITY - LAVENDER TOWN
+route_8_s0	route_8	17	3	UNDERGROUND PATH CELADON CITY - LAVENDER TOWN
+route_9_s0	route_9	25	7	ROUTE 9 CERULEAN CITY-ROCK TUNNEL
+ss_anne_captains_room_s0	ss_anne_captains_room	4	1	Yuck! Shouldn't have looked!
+ss_anne_captains_room_s1	ss_anne_captains_room	1	2	How to Conquer Seasickness... The CAPTAIN's reading this!
+safari_zone_center_s0	safari_zone_center	18	20	REST HOUSE
+safari_zone_center_s1	safari_zone_center	14	22	TRAINER TIPS | Press the START Button to check remaining time!
+safari_zone_east_s0	safari_zone_east	26	10	REST HOUSE
+safari_zone_east_s1	safari_zone_east	6	4	TRAINER TIPS | The remaining time declines only while you walk!
+safari_zone_east_s2	safari_zone_east	5	23	CENTER AREA NORTH: AREA 2
+safari_zone_north_s0	safari_zone_north	36	4	REST HOUSE
+safari_zone_north_s1	safari_zone_north	4	25	TRAINER TIPS | The SECRET HOUSE is still ahead!
+safari_zone_north_s2	safari_zone_north	13	31	AREA 2
+safari_zone_north_s3	safari_zone_north	19	33	TRAINER TIPS | POKéMON hide in tall grass! | Zigzag through grassy areas to flush them out.
+safari_zone_north_s4	safari_zone_north	26	28	TRAINER TIPS | Win a free HM for finding the SECRET HOUSE!
+safari_zone_west_s0	safari_zone_west	12	12	REST HOUSE
+safari_zone_west_s1	safari_zone_west	17	3	REQUEST NOTICE | Please find the SAFARI WARDEN's lost GOLD TEETH. They're around here somewhere. | Reward offered! Contact: WARDEN
+safari_zone_west_s2	safari_zone_west	26	4	TRAINER TIPS | Zone Exploration Campaign! | The Search for the SECRET HOUSE!
+safari_zone_west_s3	safari_zone_west	24	22	AREA 3 EAST: CENTER AREA
+saffron_city_s0	saffron_city	17	5	SAFFRON CITY Shining, Golden Land of Commerce
+saffron_city_s1	saffron_city	27	5	FIGHTING DOJO
+saffron_city_s2	saffron_city	35	5	SAFFRON CITY POKéMON GYM LEADER: SABRINA | The Master of Psychic POKéMON!
+saffron_city_s3	saffron_city	26	11	All your item needs fulfilled! POKéMON MART
+saffron_city_s4	saffron_city	39	19	TRAINER TIPS | FULL HEAL cures all ailments like sleep and burns. | It costs a bit more, but it's more convenient.
+saffron_city_s5	saffron_city	5	21	TRAINER TIPS | New GREAT BALL offers improved capture rates. | Try it on those hard-to-catch POKéMON.
+saffron_city_s6	saffron_city	15	21	SILPH CO. OFFICE BUILDING
+saffron_city_s7	saffron_city	10	29	Heal Your POKéMON! POKéMON CENTER
+saffron_city_s8	saffron_city	27	29	MR.PSYCHIC's HOUSE
+saffron_city_s9	saffron_city	1	19	SILPH's latest product! | Release to be determined...
+seafoam_islands_b4f_s0	seafoam_islands_b4f	9	15	Boulders might change the flow of water!
+seafoam_islands_b4f_s1	seafoam_islands_b4f	23	1	DANGER Fast current!
+summer_beach_house_s0	summer_beach_house	3	0	SURFIN' DUDE's scribbles... | When I shoot the tube, the tunes hit the groove!
+summer_beach_house_s1	summer_beach_house	7	0	SURFING TIP 1! | After flips, line the board up with a wave for a cool effect!
+summer_beach_house_s2	summer_beach_house	11	0	SURFING TIP 2! | Pulling flips in a jump is totally rad!
+summer_beach_house_s3	summer_beach_house	13	1	It's some sort of a machine...
+vermilion_city_s0	vermilion_city	27	3	VERMILION CITY The Port of Exquisite Sunsets
+vermilion_city_s1	vermilion_city	37	13	NOTICE! | ROUTE 12 may be blocked off by a sleeping POKéMON. | Detour through ROCK TUNNEL to LAVENDER TOWN. | VERMILION POLICE
+vermilion_city_s2	vermilion_city	24	13	All your item needs fulfilled! POKéMON MART
+vermilion_city_s3	vermilion_city	12	3	Heal Your POKéMON! POKéMON CENTER
+vermilion_city_s4	vermilion_city	7	13	POKéMON FAN CLUB All POKéMON fans welcome!
+vermilion_city_s5	vermilion_city	7	19	VERMILION CITY POKéMON GYM LEADER: LT.SURGE | The Lightning American!
+vermilion_city_s6	vermilion_city	29	15	VERMILION HARBOR
+viridian_city_s0	viridian_city	17	17	VIRIDIAN CITY The Eternally Green Paradise
+viridian_city_s1	viridian_city	19	1	TRAINER TIPS | Catch POKéMON and expand your collection! | The more you have, the easier it is to fight!
+viridian_city_s2	viridian_city	21	29	TRAINER TIPS | The battle moves of POKéMON are limited by their POWER POINTs, PP. | To replenish PP, rest your tired POKéMON at a POKéMON CENTER!
+viridian_city_s3	viridian_city	30	19	All your item needs fulfilled! POKéMON MART
+viridian_city_s4	viridian_city	24	25	Heal Your POKéMON! POKéMON CENTER
+viridian_city_s5	viridian_city	27	7	VIRIDIAN CITY POKéMON GYM
+viridian_forest_s0	viridian_forest	24	40	TRAINER TIPS | If you want to avoid battles, stay away from grassy areas!
+viridian_forest_s1	viridian_forest	16	32	For poison, use ANTIDOTE! Get it at POKéMON MARTs!
+viridian_forest_s2	viridian_forest	26	17	TRAINER TIPS | Contact PROF.OAK via PC to get your POKéDEX evaluated!
+viridian_forest_s3	viridian_forest	4	24	TRAINER TIPS | No stealing of POKéMON from other trainers! Catch only wild POKéMON!
+viridian_forest_s4	viridian_forest	18	45	TRAINER TIPS | Weaken POKéMON before attempting capture! | When healthy, they may escape!
+viridian_forest_s5	viridian_forest	2	1	LEAVING VIRIDIAN FOREST PEWTER CITY AHEAD
+wardens_house_s0	wardens_house	4	3	POKéMON photos and fossils.
+wardens_house_s1	wardens_house	5	3	POKéMON photos and fossils.

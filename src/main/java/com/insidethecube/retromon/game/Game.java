@@ -471,6 +471,8 @@ public final class Game {
 			if (s.getTickCount() % 10 == 0) enter(p, placeAt(p.getX(), p.getZ()));
 			if (s.getTickCount() % 5 == 0 && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
 			if (s.getTickCount() % 40 == 0) moonlight(p);
+			if (s.getTickCount() % 5 == 0) follower(p);
+			if (s.getTickCount() % 10 == 0) roamers(p);
 			// Kept in Adventure mode (so nothing on the map can be broken, Axiom included) unless map editing is on.
 			if (!build && s.getTickCount() % 20 == 0 && p.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) p.setGameMode(GameType.ADVENTURE);
 			if (Battles.in(p) || BUSY.containsKey(id)) {
@@ -480,6 +482,7 @@ public final class Game {
 			BlockPos pos = p.blockPosition();
 			BlockPos last = LAST.put(id, pos);
 			if (last != null && (last.getX() != pos.getX() || last.getZ() != pos.getZ())) step(p, pos);
+			if (touchWild(p)) continue;
 			if (s.getTickCount() % 4 == 0) watch(p);
 		}
 		approach(s);
@@ -492,7 +495,207 @@ public final class Game {
 
 	public static void nights(ServerPlayer p, CompoundTag t) {
 		NIGHTS.put(p.getUUID(), Math.max(0, Math.min(2, t.getIntOr("nights", 1))));
+		if (t.contains("seen")) SEEN.put(p.getUUID(), t.getBooleanOr("seen", true));
+		if (t.contains("follow")) FOLLOW_ON.put(p.getUUID(), t.getBooleanOr("follow", true));
 		moonlight(p);
+	}
+
+	// ---------- wild Pokémon you can see (as Let's Go), and yours walking with you ----------
+
+	/** The wild Pokémon out in the grass: each one's entity → the Pokémon it is (species, level, moves). */
+	private static final Map<Integer, Mon> WILD_MONS = new HashMap<>();
+	/** Each player's Pokémon walking with them (its entity). */
+	private static final Map<UUID, Integer> FOLLOWERS = new HashMap<>();
+	/** Seen in the grass (the default) or the classic hidden ones; and whether one walks with you. */
+	private static final Map<UUID, Boolean> SEEN = new HashMap<>(), FOLLOW_ON = new HashMap<>();
+	/** Up to this many out at once, appearing this near you, gone when this far. */
+	private static final int SEEN_MAX = 4, SEEN_NEAR = 10, SEEN_GONE = 22;
+
+	public static boolean seenMode(ServerPlayer p) {
+		return SEEN.getOrDefault(p.getUUID(), true);
+	}
+
+	/** Whether a roaming one (wild or following) is still the game's (else it's a leftover and goes). */
+	public static boolean roamerKnown(WorldMon w) {
+		if (w.wild()) return WILD_MONS.containsKey(w.getId());
+		return FOLLOWERS.containsValue(w.getId());
+	}
+
+	/** Grass to stand in near a height (or, in a cave, any good ground), or null. */
+	private static BlockPos grassAt(ServerLevel level, int x, int z, int nearY, boolean anywhere) {
+		for (int y = nearY + 4; y >= nearY - 4; y--) {
+			BlockPos at = new BlockPos(x, y, z);
+			if (anywhere ? goodGround(level, at) : grass(level.getBlockState(at)) && level.getBlockState(at.below()).isFaceSturdy(level, at.below(),
+					net.minecraft.core.Direction.UP)) return at;
+		}
+		return null;
+	}
+
+	private static boolean flier(String species) {
+		Species sp = Species.ALL.get(species);
+		return sp != null && (sp.type1() == com.insidethecube.retromon.engine.Type.FLYING || sp.type2() == com.insidethecube.retromon.engine.Type.FLYING);
+	}
+
+	/** The wild ones near you: new ones appear in the grass (from the place's own wild list), old ones wander or go. */
+	private static void roamers(ServerPlayer p) {
+		ServerLevel level = (ServerLevel) p.level();
+		PlayerData d = data(p);
+		String tag = "wild:" + p.getUUID();
+		int now = level.getServer().getTickCount();
+		List<WorldMon> out = level.getEntitiesOfClass(WorldMon.class, p.getBoundingBox().inflate(48), w -> tag.equals(w.key()));
+		boolean grassy = d.place != null && !d.place.isEmpty() && !anywhere(d.place);
+		for (WorldMon w : out) {
+			double dist = w.distanceTo(p);
+			if (dist > SEEN_GONE || now - w.born > 20 * 75 && dist > 9 || !seenMode(p)) {
+				vanish(level, w);
+				continue;
+			}
+			if (now >= w.nextMove) {
+				w.nextMove = now + 40 + RNG.nextInt(90);
+				boolean air = flier(w.species()) && RNG.nextInt(3) == 0 ? !w.airborne() : w.airborne();
+				w.setAirborne(air);
+				for (int tries = 0; tries < 6; tries++) {
+					int x = w.getBlockX() + RNG.nextInt(11) - 5, z = w.getBlockZ() + RNG.nextInt(11) - 5;
+					BlockPos to = grassAt(level, x, z, w.getBlockY(), !grassy);
+					if (to == null) continue;
+					w.getNavigation().moveTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5, air ? 1.4 : 1.0);
+					break;
+				}
+			}
+		}
+		if (!seenMode(p) || !d.started || !d.anyHealthy() || d.place == null || d.place.isEmpty() || out.size() >= SEEN_MAX || Battles.in(p)) return;
+		if (RNG.nextInt(100) >= 40) return;
+		Wild.Table table = Wild.get(d.place, "grass", Wild.timeOfDay(level.getDayTime()));
+		if (table == null || table.ratePer256() <= 0 || !Wild.has(d.place)) return;
+		for (int tries = 0; tries < 14; tries++) {
+			double a = RNG.nextDouble() * Math.PI * 2, r = 5 + RNG.nextDouble() * (SEEN_NEAR - 5);
+			int x = (int) Math.floor(p.getX() + Math.cos(a) * r), z = (int) Math.floor(p.getZ() + Math.sin(a) * r);
+			BlockPos at = grassAt(level, x, z, p.getBlockY(), !grassy);
+			if (at == null) continue;
+			Mon foe = table.roll(RNG);
+			// A REPEL keeps away ones weaker than your lead.
+			Mon lead = null;
+			for (Mon m : d.party) if (!m.fainted()) {
+				lead = m;
+				break;
+			}
+			if (d.repel > 0 && lead != null && foe.level < lead.level) return;
+			WorldMon w = placeMon(level, foe.species.id(), tag, at.getX() + 0.5, at.getY(), at.getZ() + 0.5, RNG.nextFloat() * 360F);
+			if (w == null) return;
+			w.born = now;
+			w.nextMove = now + 10 + RNG.nextInt(30);
+			w.setSpeed(0.2 + RNG.nextDouble() * 0.06);
+			if (flier(foe.species.id()) && RNG.nextBoolean()) w.setAirborne(true);
+			WILD_MONS.put(w.getId(), foe);
+			// It rustles out of the grass.
+			level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,
+					Blocks.SHORT_GRASS.defaultBlockState()), at.getX() + 0.5, at.getY() + 0.4, at.getZ() + 0.5, 14, 0.35, 0.25, 0.35, 0.05);
+			return;
+		}
+	}
+
+	private static void vanish(ServerLevel level, WorldMon w) {
+		WILD_MONS.remove(w.getId());
+		level.sendParticles(net.minecraft.core.particles.ParticleTypes.POOF, w.getX(), w.getY() + 0.4, w.getZ(), 5, 0.2, 0.2, 0.2, 0.01);
+		w.discard();
+	}
+
+	/** Walking into a wild one you can see: the battle with exactly that one. */
+	private static boolean touchWild(ServerPlayer p) {
+		if (COOLDOWN.containsKey(p.getUUID()) || !data(p).anyHealthy()) return false;
+		String tag = "wild:" + p.getUUID();
+		ServerLevel level = (ServerLevel) p.level();
+		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, p.getBoundingBox().inflate(0.9, 1.5, 0.9), w -> tag.equals(w.key()))) {
+			Mon foe = WILD_MONS.remove(w.getId());
+			w.discard();
+			if (foe == null) continue;
+			Battles.wild(p, foe, null);
+			return true;
+		}
+		return false;
+	}
+
+	/** Which of your party walks with you: the one you chose (FOLLOW), or else your first that can. */
+	private static Mon followMon(PlayerData d) {
+		if (d.follow >= 0 && d.follow < d.party.size() && !d.party.get(d.follow).fainted()) return d.party.get(d.follow);
+		for (Mon m : d.party) if (!m.fainted()) return m;
+		return null;
+	}
+
+	private static Vec3 behind(ServerPlayer p, double by) {
+		Vec3 look = Vec3.directionFromRotation(0, p.getYRot());
+		return p.position().subtract(look.x * by, 0, look.z * by);
+	}
+
+	/** Your Pokémon walking with you (as in Yellow, and the newer games): it keeps a step behind, and catches up if it falls back. */
+	private static void follower(ServerPlayer p) {
+		ServerLevel level = (ServerLevel) p.level();
+		PlayerData d = data(p);
+		Integer id = FOLLOWERS.get(p.getUUID());
+		WorldMon w = id != null && level.getEntity(id) instanceof WorldMon wm && wm.isAlive() ? wm : null;
+		Mon lead = followMon(d);
+		boolean want = d.started && lead != null && !Battles.in(p) && FOLLOW_ON.getOrDefault(p.getUUID(), true);
+		if (!want) {
+			if (w != null) w.discard();
+			FOLLOWERS.remove(p.getUUID());
+			return;
+		}
+		if (w == null) {
+			Vec3 b = behind(p, 1.6);
+			FOLLOWERS.remove(p.getUUID());
+			w = placeMon(level, lead.species.id(), "follow:" + p.getUUID(), b.x, p.getY(), b.z, p.getYRot());
+			if (w == null) return;
+			w.setSpeed(0.32);
+			FOLLOWERS.put(p.getUUID(), w.getId());
+			return;
+		}
+		if (!w.species().equals(lead.species.id())) w.setSpecies(lead.species.id());
+		double dist = w.distanceTo(p);
+		if (dist > 14 || Math.abs(w.getY() - p.getY()) > 5) {
+			Vec3 b = behind(p, 1.5);
+			w.getNavigation().stop();
+			w.teleportTo(b.x, p.getY(), b.z);
+		} else if (dist > 2.3) {
+			Vec3 b = behind(p, 1.4);
+			w.getNavigation().moveTo(b.x, p.getY(), b.z, dist > 6 ? 2.0 : dist > 3.5 ? 1.5 : 1.15);
+		} else if (dist < 1.5) {
+			w.getNavigation().stop();
+		}
+	}
+
+	/** A: reading a sign (or a shelf standing in for one): the words of the games' sign nearest that spot. */
+	public static void read(ServerPlayer p, CompoundTag t) {
+		int bx = t.getIntOr("x", p.getBlockX()), bz = t.getIntOr("z", p.getBlockZ());
+		String place = placeAt(bx + 0.5, bz + 0.5);
+		if (place == null) return;
+		Zone z = null;
+		for (Zone zz : zones) if (zz.place().equals(place) && zz.contains(bx + 0.5, bz + 0.5)) z = zz;
+		int[] size = Places.size(place);
+		Trainers.Sign best = null;
+		double bestD = 14 * 14;
+		if (z != null && size != null) {
+			for (Trainers.Sign sg : Trainers.signsIn(place)) {
+				double fx = (sg.x() + 0.5) / size[0], fz = (sg.y() + 0.5) / size[1];
+				double wx = z.x1() + fx * (z.x2() - z.x1() + 1), wz = z.z1() + fz * (z.z2() - z.z1() + 1);
+				double dd = (wx - bx) * (wx - bx) + (wz - bz) * (wz - bz);
+				if (dd < bestD) {
+					bestD = dd;
+					best = sg;
+				}
+			}
+		}
+		Places.Place pl = Places.get(place);
+		List<String> lines = best != null ? fill(p, best.lines()) : List.of(pl == null ? place.toUpperCase().replace('_', ' ') : pl.name());
+		dialogue(p, null, "talk", lines);
+	}
+
+	/** FOLLOW from the party: that one walks with you now. */
+	public static void follow(ServerPlayer p, CompoundTag t) {
+		PlayerData d = data(p);
+		int i = t.getIntOr("i", 0);
+		if (i < 0 || i >= d.party.size()) return;
+		d.follow = i;
+		sync(p);
 	}
 
 	/** At night, an unseen night vision (no icon, no swirls) so the screen can lift the dark to a moonlit blue. */
@@ -564,6 +767,8 @@ public final class Game {
 		}
 		if (d.repel > 0 && --d.repel == 0) message(p, List.of("REPEL's effect wore off."));
 		if (!d.started || !d.anyHealthy() || COOLDOWN.containsKey(p.getUUID()) || d.place.isEmpty()) return;
+		// Seen in the grass (as Let's Go): you meet them by walking into them, not at random.
+		if (seenMode(p)) return;
 		boolean inGrass = grass(p.level().getBlockState(pos)) || grass(p.level().getBlockState(pos.above()));
 		if (!inGrass && !anywhere(d.place)) return;
 		Wild.Table table = Wild.get(d.place, "grass", Wild.timeOfDay(p.level().getDayTime()));
@@ -701,6 +906,7 @@ public final class Game {
 		}
 		if (!(e instanceof Npc n)) return;
 		PlayerData d = data(p);
+		n.getNavigation().stop();
 		n.getLookControl().setLookAt(p);
 		switch (n.role()) {
 			case Npc.NURSE -> dialogue(p, n, "heal", List.of("Welcome to our POKéMON CENTER!", "We heal your POKéMON back to perfect health!",
@@ -775,6 +981,16 @@ public final class Game {
 			pickUp(p, w, key.substring(5));
 			return;
 		}
+		if (key.startsWith("follow:")) {
+			Mon m = followMon(d);
+			String who = m == null ? name : m.name();
+			String line = m == null ? who + " is looking at you." : m.hp * 4 < m.maxHp() ? who + " is tired. It needs a rest at a POKéMON CENTER."
+					: m.friendship >= 220 ? who + " is overjoyed to be walking with you!" : m.friendship >= 150 ? who + " is happy and bounces along!"
+							: m.friendship >= 90 ? who + " is enjoying the walk." : who + " is looking at you, a little unsure.";
+			dialogue(p, null, "talk", List.of(line), t, w.getId());
+			return;
+		}
+		if (key.startsWith("wild:")) return;
 		if (key.startsWith("pet:")) {
 			Trainers.Person person = Trainers.PEOPLE.get(key.substring(4));
 			dialogue(p, null, "talk", person == null ? List.of(name + ": ...") : fill(p, person.lines()), t, w.getId());

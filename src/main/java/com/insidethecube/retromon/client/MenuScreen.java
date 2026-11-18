@@ -23,7 +23,7 @@ public class MenuScreen extends GameScreen {
 		MENU, PARTY, PARTY_ACTION, SUMMARY, BAG, BAG_ACTION, USE_ON, CARD, SAVE, WAIT, OPTION, MESSAGE
 	}
 
-	/** Which OPTION row the keys change: 0 text speed, 1 music, 2 the Pokédex voice, 3 nights. */
+	/** Which OPTION row the keys change: 0 text speed, 1 music, 2 the Pokédex voice, 3 nights, 4 wild Pokémon, 5 walking with you. */
 	private int optionRow;
 	private static final String[] ITEMS = {"POKéDEX", "POKéMON", "BAG", "MAP", "CLOTHES", "CARD", "WAIT", "SAVE", "OPTION", "EXIT"};
 	private static final int[] COLORS = {0xFFE5525C, Ui.GREEN, Ui.AMBER, 0xFF4CB8A0, 0xFFB07CE0, Ui.BLUE, Ui.CYAN, 0xFF8C93A8, Ui.RED};
@@ -145,6 +145,16 @@ public class MenuScreen extends GameScreen {
 				swapFrom = partyAt;
 				view = View.PARTY;
 			}
+			case 2 -> {
+				// This one walks with you now.
+				CompoundTag t = new CompoundTag();
+				t.putInt("i", partyAt);
+				ClientPlayNetworking.send(new Net.Act("follow", t));
+				ClientState.data.follow = partyAt;
+				Mon m = partyAt < ClientState.data.party.size() ? ClientState.data.party.get(partyAt) : null;
+				if (m != null) Sounds.cry(m.species.id(), 1F);
+				say(View.PARTY, (m == null ? "It" : m.name()) + " will walk with you.");
+			}
 			default -> view = View.PARTY;
 		}
 	}
@@ -215,8 +225,8 @@ public class MenuScreen extends GameScreen {
 				} else if (Ui.isB(e)) back();
 			}
 			case PARTY_ACTION -> {
-				if (Ui.isUp(e)) actionAt = Math.floorMod(actionAt - 1, 3);
-				else if (Ui.isDown(e)) actionAt = Math.floorMod(actionAt + 1, 3);
+				if (Ui.isUp(e)) actionAt = Math.floorMod(actionAt - 1, 4);
+				else if (Ui.isDown(e)) actionAt = Math.floorMod(actionAt + 1, 4);
 				else if (Ui.isA(e)) partyAction(actionAt);
 				else if (Ui.isB(e)) view = View.PARTY;
 			}
@@ -254,16 +264,24 @@ public class MenuScreen extends GameScreen {
 				else if (Ui.isA(e)) save();
 			}
 			case OPTION -> {
-				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = Math.floorMod(optionRow + (Ui.isUp(e) ? -1 : 1), 4);
+				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = Math.floorMod(optionRow + (Ui.isUp(e) ? -1 : 1), 6);
 				else if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isA(e)) {
 					int step = Ui.isLeft(e) ? -1 : 1;
 					switch (optionRow) {
 						case 0 -> setSpeed(Math.floorMod(d.textSpeed + step, 3));
 						case 1 -> Music.setLevel(Math.floorMod(Music.level() + step, 5));
 						case 2 -> Settings.set("voice", Settings.voice() ? 0 : 1);
-						default -> {
+						case 3 -> {
 							Settings.set("nights", Math.floorMod(Settings.nights() + step, 3));
 							Night.send();
+						}
+						case 4 -> {
+							Settings.set("seen", Settings.seen() ? 0 : 1);
+							Settings.sendPrefs();
+						}
+						default -> {
+							Settings.set("follow", Settings.follower() ? 0 : 1);
+							Settings.sendPrefs();
 						}
 					}
 					Sounds.press();
@@ -346,7 +364,7 @@ public class MenuScreen extends GameScreen {
 				String hint = view == View.USE_ON ? "Use on which POKéMON?" : swapFrom >= 0 ? "Move to where?" : "Choose a POKéMON.";
 				TextBox.still(hint).render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, false);
 				if (view == View.PARTY_ACTION) {
-					Choice c = new Choice(List.of("SUMMARY", "SWITCH", "CANCEL"));
+					Choice c = new Choice(List.of("SUMMARY", "SWITCH", "FOLLOW ME", "CANCEL"));
 					c.at = actionAt;
 					int w = c.width(font, s);
 					choice(g, c, width - w - m, height - h - m - c.height(s) - 4 * s, w, this::partyAction);
@@ -548,7 +566,7 @@ public class MenuScreen extends GameScreen {
 	}
 
 	private void drawOptions(GuiGraphics g, PlayerData d) {
-		int m = 6 * s, w = Math.min(width - 120 * s, 240 * s), h = 172 * s, x = m, y = m;
+		int m = 6 * s, w = Math.min(width - 120 * s, 240 * s), h = Math.min(height - 2 * m, 236 * s), x = m, y = m;
 		Ui.panel(g, x, y, w, h, s);
 		int l = x + 12 * s;
 		optionRow(g, d, l, y + 10 * s, w, 0, "TEXT SPEED", new String[] {"SLOW", "MID", "FAST"}, d.textSpeed, i -> setSpeed(i));
@@ -558,7 +576,15 @@ public class MenuScreen extends GameScreen {
 			Settings.set("nights", i);
 			Night.send();
 		});
-		Ui.text(g, font, "Mouse wheel: zoom.  R: game speed.  Shift: run.", l, y + h - 14 * s, Ui.DIM, s);
+		optionRow(g, d, l, y + 154 * s, w, 4, "WILD POKéMON", new String[] {"HIDDEN", "SEEN"}, Settings.seen() ? 1 : 0, i -> {
+			Settings.set("seen", i);
+			Settings.sendPrefs();
+		});
+		optionRow(g, d, l, y + 190 * s, w, 5, "WALK WITH YOU", new String[] {"OFF", "ON"}, Settings.follower() ? 1 : 0, i -> {
+			Settings.set("follow", i);
+			Settings.sendPrefs();
+		});
+		Ui.text(g, font, "Mouse wheel: zoom.  R: game speed.  Shift: run.", l, y + h - 12 * s, Ui.DIM, s);
 	}
 
 	private void optionRow(GuiGraphics g, PlayerData d, int l, int y, int w, int row, String label, String[] values, int now,
