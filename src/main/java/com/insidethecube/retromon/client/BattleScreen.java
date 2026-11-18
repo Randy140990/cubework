@@ -40,7 +40,12 @@ public class BattleScreen extends GameScreen {
 
 	private static final int SHAKE = -1, POP = -2, END = -3, NOTICE_DONE = -4, INTO_BALL = -5, GROW = -6, DEX = -7;
 	/** The way in: three white flashes, then the bars sweep shut and open on the stage. */
-	private static final int WIPE = 34;
+	private static final int WIPE = 40;
+	/** The wipe's last ticks: the stage is up behind the white, and the white fades away. */
+	private static final int REVEAL = 14;
+	/** Aiming a Poké Ball: which ball, and how long the ring's been closing. */
+	private String aimBall;
+	private int aimTicks;
 	/** The battle that's on (it carries on behind Minecraft's menu). */
 	public static BattleScreen current;
 	/** The commands as they're shown, top to bottom, and what each one is (0 FIGHT, 1 BAG, 2 POKéMON, 3 RUN). */
@@ -49,7 +54,7 @@ public class BattleScreen extends GameScreen {
 	private String caughtSpecies;
 
 	private enum Mode {
-		PLAY, MAIN, FIGHT, PARTY, BAG, BAG_TARGET, WAIT
+		PLAY, MAIN, FIGHT, PARTY, BAG, BAG_TARGET, WAIT, AIM
 	}
 
 	private final Side[] sides = {new Side(), new Side()};
@@ -109,8 +114,8 @@ public class BattleScreen extends GameScreen {
 		super.tick();
 		if (wipe > 0) {
 			wipe--;
-			if (wipe == WIPE / 3) BattleScene.reveal();
-			if (wipe > WIPE / 3) return;
+			if (wipe == REVEAL) BattleScene.reveal();
+			if (wipe > REVEAL) return;
 		}
 		if (mode == Mode.WAIT) waited++;
 		boolean moving = false;
@@ -219,7 +224,10 @@ public class BattleScreen extends GameScreen {
 				if (d != null && (mv == null || mv.power() > 0)) d.lunge = MonDisplay.LUNGE;
 				if (mv == null) Sounds.attack();
 				BattleScene.move(e.side(), e.text());
-				wait = mv != null && mv.power() > 0 ? 14 : 12;
+				wait = mv == null ? 12 : mv.power() <= 0 ? 14 : switch (mv.type()) {
+					case FIRE, WATER, GRASS, ELECTRIC, PSYCHIC, ICE, DRAGON, DARK -> 22;
+					default -> 18;
+				};
 			}
 			case HIT -> {
 				int effect = effectAhead();
@@ -470,9 +478,10 @@ public class BattleScreen extends GameScreen {
 				notice("The trainer blocked the BALL! Don't be a thief!", Mode.BAG);
 				return;
 			}
-			lastBall = it.id();
-			ClientState.data.take(it.id());
-			send("BALL", 0, it.id());
+			// Aim first: the ring round the wild Pokémon, coloured by how likely it is to stay caught.
+			aimBall = it.id();
+			aimTicks = 0;
+			mode = Mode.AIM;
 			return;
 		}
 		if (it.revives() > 0) {
@@ -506,7 +515,7 @@ public class BattleScreen extends GameScreen {
 
 	@Override
 	protected boolean key(KeyEvent e) {
-		if (wipe > WIPE / 3) return true;
+		if (wipe > REVEAL) return true;
 		// If the game ever stops answering, Delete gets you out.
 		if (mode == Mode.WAIT && waited > 100 && e.key() == GLFW.GLFW_KEY_DELETE) {
 			ClientPlayNetworking.send(new Net.Act("battle_quit", new CompoundTag()));
@@ -546,6 +555,10 @@ public class BattleScreen extends GameScreen {
 				else if (Ui.isLeft(e) || Ui.isRight(e)) partyAt = Math.floorMod(partyAt + (Ui.isLeft(e) ? -1 : 1), n);
 				else if (Ui.isA(e)) pickParty(partyAt);
 			}
+			case AIM -> {
+				if (Ui.isA(e)) throwBall();
+				else if (Ui.isB(e)) mode = Mode.BAG;
+			}
 			case BAG -> {
 				int n = battleItems().size() + 1;
 				if (Ui.isB(e)) mode = Mode.MAIN;
@@ -572,6 +585,29 @@ public class BattleScreen extends GameScreen {
 	@Override
 	protected void clickAnywhere() {
 		if (mode == Mode.PLAY || mode == Mode.WAIT) advance();
+		else if (mode == Mode.AIM) throwBall();
+	}
+
+	private void throwBall() {
+		if (aimBall == null) return;
+		Sounds.press();
+		lastBall = aimBall;
+		ClientState.data.take(aimBall);
+		send("BALL", 0, aimBall);
+		aimBall = null;
+	}
+
+	/** The chance of a catch with this ball now (Gold and Silver's sums), for the ring's colour. */
+	private float catchChance() {
+		Species sp = Species.ALL.get(sides[1].species);
+		if (sp == null) return 0.5F;
+		Item ball = Item.find(aimBall);
+		float bonus = ball == null ? 1F : (float) Math.max(1, ball.catchBonus());
+		if (aimBall != null && aimBall.equals("master_ball")) return 1;
+		float max = Math.max(1, sides[1].max), hp = Math.max(1, sides[1].hp);
+		float a = Math.max(1, (3 * max - 2 * hp) * sp.catchRate() * bonus / (3 * max));
+		if (!sides[1].status.isEmpty()) a += sides[1].status.equals("SLP") || sides[1].status.equals("FRZ") ? 10 : 5;
+		return Math.min(1, (a + 1) / 256F);
 	}
 
 	@Override
@@ -581,7 +617,7 @@ public class BattleScreen extends GameScreen {
 			case PARTY -> {
 				if (!forced) mode = Mode.MAIN;
 			}
-			case BAG_TARGET -> mode = Mode.BAG;
+			case BAG_TARGET, AIM -> mode = Mode.BAG;
 			default -> clickAnywhere();
 		}
 	}
@@ -591,20 +627,33 @@ public class BattleScreen extends GameScreen {
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
 		if (wipe > 0) {
-			// Into the battle: three white flashes, then bars sweep shut from top and bottom and open on the stage.
+			// Into the battle (as Let's Go): streaks swoosh across from left to right, the screen washes white,
+			// and the white fades away on the stage.
 			float t = WIPE - wipe + partial;
-			if (t < 12) {
-				if (((int) t / 2) % 2 == 0) g.fill(0, 0, width, height, 0xCCFFFFFF);
-				return;
+			float swoosh = WIPE - REVEAL - 8;
+			for (int i = 0; i < 16; i++) {
+				int bandH = height / 16, y = i * bandH;
+				float start = (i * 7 % 16) * 0.55F;
+				float k = (t - start) / Math.max(1, swoosh - start);
+				if (k <= 0) continue;
+				int lead = (int) (width * Math.min(1.4F, k * 1.4F));
+				int tail = Math.max(0, lead - width / 2 - (int) (width * 0.6F * Math.min(1, k)));
+				int col = i % 3 == 0 ? 0xB8DFFFD0 : i % 3 == 1 ? 0xC8FFFFFF : 0xA8C8F0FF;
+				g.fill(Math.min(width, tail), y, Math.min(width, lead), y + bandH, col);
+				g.fill(Math.min(width, lead - 6 * s), y + bandH / 3, Math.min(width, lead + 12 * s), y + bandH * 2 / 3, 0xF0FFFFFF);
 			}
-			float u = (t - 12) / ((WIPE - 12) / 2F);
-			float cover = u <= 1 ? u : Math.max(0, 2 - u);
-			int bar = (int) (height / 2F * Math.min(1, cover));
-			g.fill(0, 0, width, bar, 0xFF000000);
-			g.fill(0, height - bar, width, height, 0xFF000000);
-			if (wipe > WIPE / 3) return;
+			if (t >= swoosh) {
+				float white = t < WIPE - REVEAL ? Math.min(1, (t - swoosh) / 8F) : Math.max(0, 1 - (t - (WIPE - REVEAL)) / REVEAL);
+				g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, white));
+			}
+			if (wipe > REVEAL) return;
 		}
 		Ui.cinema(g, width, height, 0.55F);
+		// A hit's colour flashing over the stage (yellow for a Thunderbolt, orange for fire...).
+		if (BattleScene.flashTicks > 0) {
+			float k = Math.max(0, (BattleScene.flashTicks - partial) / BattleScene.flashMax);
+			g.fill(0, 0, width, height, Ui.alpha(0xFF000000 | BattleScene.flashColor, 0.45F * k));
+		}
 		int m = 8 * s, bh = 34 * s;
 		Side them = sides[1], me = sides[0];
 		if (them.shown) foeCard(g, them, width - m - 156 * s, m + height / 14);
@@ -615,6 +664,7 @@ public class BattleScreen extends GameScreen {
 			case FIGHT -> drawFight(g, m, by, bh);
 			case PARTY, BAG_TARGET -> drawParty(g, m, by, bh);
 			case BAG -> drawBag(g, m, by, bh);
+			case AIM -> drawAim(g, m, by, bh, partial);
 			default -> messageBar(g, m, by, width - 2 * m, bh, message == null ? "" : message.substring(0, Math.min(typed, message.length())), true);
 		}
 	}
@@ -751,6 +801,35 @@ public class BattleScreen extends GameScreen {
 			Ui.button(g, font, bx, by, back, bh, "BACK", 0xFF5A6070, over(bx, by, back, bh), s);
 			hit(bx, by, back, bh, this::back);
 		}
+	}
+
+	/** A ring of thick dots (the GUI has no circles). */
+	private void ring(GuiGraphics g, int cx, int cy, int r, int thick, int color) {
+		int n = Math.max(24, r / Math.max(1, s));
+		for (int i = 0; i < n; i++) {
+			double a = Math.PI * 2 * i / n;
+			int x = cx + (int) Math.round(Math.cos(a) * r), y = cy + (int) Math.round(Math.sin(a) * r);
+			g.fill(x - thick / 2, y - thick / 2, x + (thick + 1) / 2, y + (thick + 1) / 2, color);
+		}
+	}
+
+	/** Aiming: a white ring round the wild Pokémon and a coloured one closing inside it (green easy, red hard). */
+	private void drawAim(GuiGraphics g, int m, int by, int bh, float partial) {
+		var at = BattleScene.enemySpot().add(0, BattleScene.enemyHeight() * 0.5, 0);
+		int[] c = BattleScene.project(at, width, height);
+		if (c != null) {
+			int[] top = BattleScene.project(at.add(0, BattleScene.enemyHeight() * 0.6, 0), width, height);
+			int r = top == null ? 30 * s : Math.max(18 * s, Math.abs(c[1] - top[1]) + 10 * s);
+			float chance = catchChance();
+			int col = chance >= 0.5F ? 0xFF5CD65C : chance >= 0.25F ? 0xFFF2C12E : chance >= 0.1F ? 0xFFF07D2A : 0xFFE5525C;
+			float phase = ((ticks + partial) % 40) / 40F;
+			int inner = (int) (r * (1 - 0.7F * phase));
+			ring(g, c[0], c[1], r, 2 * s, 0xE6FFFFFF);
+			ring(g, c[0], c[1], inner, 3 * s, col);
+			Ui.centred(g, font, chance >= 0.5F ? "Easy" : chance >= 0.25F ? "Fair" : chance >= 0.1F ? "Hard" : "Very hard", c[0], c[1] + r + 6 * s, col, s, true);
+		}
+		Item it = Item.find(aimBall);
+		messageBar(g, m, by, width - 2 * m, bh, "Throw the " + (it == null ? "BALL" : it.name()) + "!   A or click: throw.   B: back.", false);
 	}
 
 	private void drawBag(GuiGraphics g, int m, int by, int bh) {

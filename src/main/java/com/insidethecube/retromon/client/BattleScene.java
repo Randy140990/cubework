@@ -207,22 +207,84 @@ public final class BattleScene {
 
 	// ---------- the moves' effects ----------
 
-	private record Fx(Vec3 from, Vec3 to, ParticleOptions particle, int life, boolean beam, int[] age) {}
+	private record Fx(Vec3 from, Vec3 to, ParticleOptions particle, int life, boolean beam, int[] age, int density) {}
 
 	private static final List<Fx> FX = new ArrayList<>();
+	/** A flash of the move's colour over the screen (the battle screen draws it): colour, ticks left, length. */
+	public static int flashColor, flashTicks, flashMax = 1;
+	/** The camera's move for an attack: behind the attacker looking at the target, then back. */
+	private static int shotSide = -1, shotTicks, shotMax = 1;
+	/** A lightning bolt to come down on a target (Thunderbolt, Thunder): ticks to wait, and where. */
+	private static int boltIn = -1;
+	private static Vec3 boltAt = Vec3.ZERO;
 
-	/** A move's effect, by its type: a stream from the attacker for special moves, a burst on the target for physical ones. */
+	/** The colour of each type, for the flash on a hit. */
+	public static int typeColor(Type t) {
+		return switch (t) {
+			case FIRE -> 0xFF8A2A;
+			case WATER -> 0x3C8CFF;
+			case GRASS -> 0x5CD65C;
+			case ELECTRIC -> 0xFFE23A;
+			case PSYCHIC -> 0xFF6FB7;
+			case ICE -> 0xA8F0FF;
+			case DRAGON -> 0x7A5CFF;
+			case DARK -> 0x1A1420;
+			case GHOST -> 0x7A4CC8;
+			case POISON -> 0xB04CD8;
+			case FIGHTING -> 0xE0502A;
+			case GROUND -> 0xC8A050;
+			case ROCK -> 0xB8A070;
+			case BUG -> 0xA8D030;
+			case FLYING -> 0xB8D8FF;
+			case STEEL -> 0xC8D0E0;
+			default -> 0xFFFFFF;
+		};
+	}
+
+	/** Where a point in the world falls on the screen (width x height), or null if it's behind the camera. */
+	public static int[] project(Vec3 p, int width, int height) {
+		double[] pose = cameraPose(0);
+		double yaw = Math.toRadians(pose[3]), pitch = Math.toRadians(pose[4]);
+		double fx = -Math.sin(yaw) * Math.cos(pitch), fy = -Math.sin(pitch), fz = Math.cos(yaw) * Math.cos(pitch);
+		double rx = -Math.cos(yaw), rz = -Math.sin(yaw);
+		// up = right x forward
+		double ux = 0 * fz - rz * fy, uy = rz * fx - rx * fz, uz = rx * fy - 0 * fx;
+		double dx = p.x - pose[0], dy = p.y - pose[1], dz = p.z - pose[2];
+		double x = dx * rx + dz * rz, y = dx * ux + dy * uy + dz * uz, z = dx * fx + dy * fy + dz * fz;
+		if (z <= 0.1) return null;
+		double t = Math.tan(Math.toRadians(fov()) / 2);
+		return new int[] {(int) (width / 2.0 + x / z / t * height / 2.0), (int) (height / 2.0 - y / z / t * height / 2.0)};
+	}
+
+	/** How tall their Pokémon stands (for the catch ring). */
+	public static float enemyHeight() {
+		BedrockModel.Def def = BedrockModel.def(theirs == null ? "pidgey" : theirs.species);
+		return def == null ? 1 : def.height;
+	}
+
+	public static Vec3 enemySpot() {
+		return enemyAt;
+	}
+
+	/**
+	 * A move's effect: the camera moves behind the attacker to watch it go, the move's colour flashes as it
+	 * lands, and its particles by type: a stream for special moves, a burst for physical ones, sparkles for
+	 * stat moves. The big ones have their own: a real bolt of lightning for Thunderbolt and Thunder, beams for
+	 * the beam moves, the ground shaking for Earthquake, a fire storm, a wave, an explosion.
+	 */
 	public static void move(int side, String moveId) {
 		if (!active() || moveId == null) return;
 		Move m = Move.find(moveId);
 		if (m == null) return;
 		Vec3 me = spot(side).add(0, 0.6, 0), them = spot(1 - side).add(0, 0.6, 0);
 		ParticleOptions p = particle(m.type());
+		int density = 3 + Math.max(0, m.power()) / 25;
 		if (m.power() <= 0) {
 			// Status moves: on itself (raising its stats) or on the other one.
 			boolean self = m.effect().contains("UP") || m.effect().contains("HEAL") || m.effect().contains("REFLECT") || m.effect().contains("LIGHT_SCREEN")
 					|| m.effect().contains("SUBSTITUTE") || m.effect().contains("FOCUS") || m.effect().contains("REST") || m.effect().contains("PROTECT");
-			FX.add(new Fx(self ? me : them, self ? me : them, self ? ParticleTypes.HAPPY_VILLAGER : p, 14, false, new int[1]));
+			FX.add(new Fx(self ? me : them, self ? me : them, self ? ParticleTypes.HAPPY_VILLAGER : p, 14, false, new int[1], 4));
+			shot(side, 12);
 			Sounds.sfx("shrink", self ? 1.2F : 0.9F, 0.6F);
 			return;
 		}
@@ -230,9 +292,51 @@ public final class BattleScene {
 			case FIRE, WATER, GRASS, ELECTRIC, PSYCHIC, ICE, DRAGON, DARK -> true;
 			default -> false;
 		};
-		if (special) FX.add(new Fx(me, them, p, 12, true, new int[1]));
-		else FX.add(new Fx(them, them, p, 8, false, new int[1]));
+		String id = m.id();
+		shot(side, special ? 24 : 18);
+		if (id.equals("thunderbolt") || id.equals("thunder") || id.equals("zap_cannon")) {
+			boltIn = 10;
+			boltAt = spot(1 - side);
+			FX.add(new Fx(them, them, ParticleTypes.ELECTRIC_SPARK, 20, false, new int[1], 10));
+		} else if (id.contains("beam") || id.equals("solarbeam") || id.equals("dragonbreath") || id.equals("aurora_beam")) {
+			FX.add(new Fx(me, them, ParticleTypes.END_ROD, 14, true, new int[1], 6));
+			FX.add(new Fx(me, them, p, 14, true, new int[1], density + 4));
+		} else if (id.equals("earthquake") || id.equals("magnitude") || id.equals("fissure")) {
+			shake = 26;
+			FX.add(new Fx(them, them, new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState()), 20, false, new int[1], 14));
+			FX.add(new Fx(me, me, new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState()), 20, false, new int[1], 8));
+		} else if (id.equals("explosion") || id.equals("selfdestruct")) {
+			shake = 24;
+			burst(me, ParticleTypes.EXPLOSION_EMITTER, 1, 0.1);
+			flash(0xFFFFFF, 14);
+		} else if (id.equals("flamethrower") || id.equals("fire_blast") || id.equals("fire_spin") || id.equals("sacred_fire")) {
+			FX.add(new Fx(me, them, ParticleTypes.FLAME, 14, true, new int[1], 12));
+			FX.add(new Fx(them, them, ParticleTypes.LAVA, 18, false, new int[1], 6));
+		} else if (id.equals("surf") || id.equals("hydro_pump") || id.equals("whirlpool") || id.equals("bubblebeam")) {
+			FX.add(new Fx(me, them, ParticleTypes.SPLASH, 14, true, new int[1], 14));
+			FX.add(new Fx(them, them, ParticleTypes.FALLING_WATER, 18, false, new int[1], 10));
+		} else if (id.equals("blizzard") || id.equals("gust") || id.equals("twister") || id.equals("razor_wind") || id.equals("whirlwind")) {
+			FX.add(new Fx(them, them, m.type() == Type.ICE ? ParticleTypes.SNOWFLAKE : ParticleTypes.GUST, 20, false, new int[1], 8));
+		} else if (special) {
+			FX.add(new Fx(me, them, p, 12, true, new int[1], density));
+		} else {
+			FX.add(new Fx(them, them, p, 8, false, new int[1], density));
+		}
+		pendingFlash = typeColor(m.type());
 		Sounds.sfx(sound(m), 1F, 0.7F);
+	}
+
+	/** The colour to flash when the hit lands (set by the move, used by hit()). */
+	private static int pendingFlash = 0xFFFFFF;
+
+	public static void flash(int rgb, int ticks) {
+		flashColor = rgb;
+		flashTicks = flashMax = ticks;
+	}
+
+	private static void shot(int side, int ticks) {
+		shotSide = side;
+		shotTicks = shotMax = ticks;
 	}
 
 	private static String sound(Move m) {
@@ -274,7 +378,8 @@ public final class BattleScene {
 
 	/** A hit: the screen shakes (harder when it's super effective). */
 	public static void hit(int side, int effect) {
-		shake = effect > 0 ? 12 : 7;
+		shake = Math.max(shake, effect > 0 ? 12 : 7);
+		flash(pendingFlash, effect > 0 ? 12 : 8);
 		burst(spot(side).add(0, 0.7, 0), ParticleTypes.CRIT, effect > 0 ? 18 : 8, 0.35);
 	}
 
@@ -488,6 +593,8 @@ public final class BattleScene {
 		}
 		BEFORE.clear();
 		FX.clear();
+		shotTicks = flashTicks = 0;
+		boltIn = -1;
 		mine = theirs = ball = sendBall = null;
 		hiddenNpc = -1;
 		active = revealed = false;
@@ -507,6 +614,20 @@ public final class BattleScene {
 		}
 		if (!active || level == null) return;
 		if (shake > 0) shake--;
+		if (flashTicks > 0) flashTicks--;
+		if (shotTicks > 0) shotTicks--;
+		if (boltIn >= 0 && boltIn-- == 0) {
+			// A real bolt of lightning on the target (just on your screen): its flash, its thunder.
+			net.minecraft.world.entity.LightningBolt bolt = net.minecraft.world.entity.EntityType.LIGHTNING_BOLT.create(level,
+					net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
+			if (bolt != null) {
+				bolt.setVisualOnly(true);
+				bolt.setId(nextId--);
+				bolt.snapTo(boltAt.x, boltAt.y, boltAt.z, 0, 0);
+				level.addEntity(bolt);
+			}
+			flash(0xFFE23A, 10);
+		}
 		if (sendBall != null && !sendBall.flying()) {
 			burst(sendBall.position().add(0, 0.4, 0), ParticleTypes.POOF, 12, 0.3);
 			Sounds.poof();
@@ -520,12 +641,12 @@ public final class BattleScene {
 				// The stream travels from the attacker to the target, then bursts there.
 				double t = Math.min(1, age / (double) f.life());
 				Vec3 at = f.from().lerp(f.to(), t);
-				for (int k = 0; k < 4; k++) {
+				for (int k = 0; k < f.density(); k++) {
 					level.addParticle(f.particle(), at.x + (RNG.nextDouble() - 0.5) * 0.3, at.y + (RNG.nextDouble() - 0.5) * 0.3, at.z + (RNG.nextDouble() - 0.5) * 0.3, 0, 0.01, 0);
 				}
 				if (age == f.life()) burst(f.to(), f.particle(), 16, 0.4);
 			} else if (age % 2 == 0) {
-				burst(f.to(), f.particle(), 6, 0.45);
+				burst(f.to(), f.particle(), f.density(), 0.45);
 			}
 			if (age >= f.life()) FX.remove(i);
 		}
@@ -538,6 +659,25 @@ public final class BattleScene {
 			sx = (RNG.nextDouble() - 0.5) * k;
 			sy = (RNG.nextDouble() - 0.5) * k;
 		}
-		return new double[] {cam.x + sx, cam.y + sy, cam.z, camYaw, camPitch};
+		double x = cam.x, y = cam.y, z = cam.z, yaw = camYaw, pitch = camPitch;
+		if (shotTicks > 0 && shotSide >= 0) {
+			// Behind the attacker and a little to the side, watching its move go across; in and out smoothly.
+			float t = 1 - (shotTicks - partial) / shotMax;
+			double w = Math.sin(Math.PI * Math.max(0, Math.min(1, t)));
+			w = w * w * 0.85;
+			Vec3 a = spot(shotSide), b = spot(1 - shotSide);
+			Vec3 dir = new Vec3(b.x - a.x, 0, b.z - a.z).normalize();
+			Vec3 side = new Vec3(-dir.z, 0, dir.x);
+			Vec3 at = a.subtract(dir.scale(3.0)).add(side.scale(1.1)).add(0, 1.6, 0);
+			Vec3 look = b.add(0, 0.7, 0).subtract(at);
+			double sYaw = Math.toDegrees(Math.atan2(-look.x, look.z)), sPitch = Math.toDegrees(Math.atan2(-look.y, Math.sqrt(look.x * look.x + look.z * look.z)));
+			double dy = ((sYaw - yaw) % 360 + 540) % 360 - 180;
+			x += (at.x - x) * w;
+			y += (at.y - y) * w;
+			z += (at.z - z) * w;
+			yaw += dy * w;
+			pitch += (sPitch - pitch) * w;
+		}
+		return new double[] {x + sx, y + sy, z, yaw, pitch};
 	}
 }
