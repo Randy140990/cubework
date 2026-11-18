@@ -1,1 +1,0 @@
-grep (takeAutoScreenshot|hasWorldScreenshot|Screenshot\.) net/minecraft/client/renderer/GameRenderer.java

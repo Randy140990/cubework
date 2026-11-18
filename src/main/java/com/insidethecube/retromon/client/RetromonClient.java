@@ -43,8 +43,10 @@ public class RetromonClient implements ClientModInitializer {
 				BattleScene.tickDisplays();
 			}
 			Hud.tick(mc);
+			SlotSnapshot.tick(mc);
 		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> {
+			SlotSnapshot.leaving(mc);
 			Adventure.setOn(false, false);
 			ClientState.reset();
 			BattleScene.end();

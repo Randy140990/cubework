@@ -314,6 +314,8 @@ public class MenuScreen extends GameScreen {
 
 	private void save() {
 		ClientPlayNetworking.send(new Net.Act("save", new CompoundTag()));
+		// The save slot's picture and details (where you are, badges, time) are brought up to date too.
+		SlotSnapshot.soon();
 		Sounds.jingle("get_key_item");
 		say(View.MENU, name() + " saved the game.");
 	}

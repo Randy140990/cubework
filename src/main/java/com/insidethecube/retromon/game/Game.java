@@ -643,6 +643,7 @@ public final class Game {
 			if (!adventure(p)) continue;
 			UUID id = p.getUUID();
 			p.getFoodData().setFoodLevel(20);
+			data(p).played += 1.0 / Math.max(1F, s.tickRateManager().tickrate());
 			if (p.getHealth() < p.getMaxHealth()) p.setHealth(p.getMaxHealth());
 			COOLDOWN.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			BUSY.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);

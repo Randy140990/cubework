@@ -51,7 +51,15 @@ public class IntroScreen extends GameScreen {
 	private int openTicks, titleTicks = 99;
 	private static final int OPEN_END = 84;
 	private Choice menu;
-	private List<Path> slots = new ArrayList<>();
+	/** The three save slots (Retromon, Retromon 2, Retromon 3): what's in each, read when the menu opens. */
+	private SlotInfo[] slotCards = new SlotInfo[SLOTS];
+	/** CONTINUE (pick a game, or an empty slot for a new one) or REPLACE (all three full: which to start over in). */
+	private boolean replacing;
+	/** The slot a new game goes in (-1: the first empty one), and whether what's there is moved aside first. */
+	private int targetSlot = -1;
+	private boolean replaceTarget;
+	/** Asking before a slot's game is replaced. */
+	private Choice confirm;
 	private int slotAt;
 	private volatile String progress = "";
 	private volatile String failure = "";
@@ -125,6 +133,94 @@ public class IntroScreen extends GameScreen {
 
 	// ---------- the menu and the save slots ----------
 
+	/** Up to three games: a NEW GAME with all three full asks which one to start over in. */
+	public static final int SLOTS = 3;
+
+	/** A slot's save folder name: Retromon, Retromon 2, Retromon 3 (the names new games have always had). */
+	static String slotFolder(int k) {
+		return k == 0 ? Game.SAVE_NAME : Game.SAVE_NAME + " " + (k + 1);
+	}
+
+	/** What a slot holds: its folder (null when empty), its details (SlotSnapshot writes them), its picture. */
+	private record SlotInfo(Path folder, com.google.gson.JsonObject info, Identifier picture, int picW, int picH, String when) {
+		boolean empty() {
+			return folder == null;
+		}
+
+		String str(String k, String or) {
+			return info.has(k) && info.get(k).isJsonPrimitive() ? info.get(k).getAsString() : or;
+		}
+
+		int num(String k) {
+			try {
+				return info.has(k) ? info.get(k).getAsInt() : 0;
+			} catch (RuntimeException e) {
+				return 0;
+			}
+		}
+	}
+
+	private void readSlots() {
+		Path saves = root().resolve("saves");
+		for (int k = 0; k < SLOTS; k++) {
+			Path f = saves.resolve(slotFolder(k));
+			if (!Files.exists(f.resolve("level.dat")) || !Files.exists(f.resolve(Game.MARKER))) {
+				slotCards[k] = new SlotInfo(null, new com.google.gson.JsonObject(), null, 0, 0, "");
+				continue;
+			}
+			com.google.gson.JsonObject info = new com.google.gson.JsonObject();
+			try {
+				Path j = f.resolve(SlotSnapshot.INFO);
+				if (Files.exists(j)) info = com.google.gson.JsonParser.parseString(Files.readString(j, StandardCharsets.UTF_8)).getAsJsonObject();
+			} catch (Exception e) {
+				Retromon.LOG.warn("Couldn't read slot {}'s details", k + 1, e);
+			}
+			if (!info.has("name")) {
+				// An older save: at least the trainer's name from its marker.
+				try {
+					java.util.regex.Matcher m = PLAYER.matcher(Files.readString(f.resolve(Game.MARKER), StandardCharsets.UTF_8));
+					if (m.find()) info.addProperty("name", m.group(1));
+				} catch (IOException ignored) {
+					// No name, then.
+				}
+			}
+			String when = "";
+			try {
+				when = java.time.format.DateTimeFormatter.ofPattern("d MMM, HH:mm").format(
+						java.time.LocalDateTime.ofInstant(Files.getLastModifiedTime(f.resolve("level.dat")).toInstant(), java.time.ZoneId.systemDefault()));
+			} catch (IOException ignored) {
+				// No date, then.
+			}
+			Identifier pic = null;
+			int pw = 0, ph = 0;
+			for (String name : new String[] {SlotSnapshot.PICTURE, "icon.png"}) {
+				Path img = f.resolve(name);
+				if (!Files.exists(img)) continue;
+				try (InputStream in = Files.newInputStream(img)) {
+					com.mojang.blaze3d.platform.NativeImage n = com.mojang.blaze3d.platform.NativeImage.read(in);
+					pw = n.getWidth();
+					ph = n.getHeight();
+					pic = Retromon.id("dynamic/slot" + k);
+					Minecraft.getInstance().getTextureManager().register(pic, new net.minecraft.client.renderer.texture.DynamicTexture(() -> "Retromon slot", n));
+					break;
+				} catch (Exception e) {
+					Retromon.LOG.warn("Couldn't read slot {}'s picture", k + 1, e);
+				}
+			}
+			slotCards[k] = new SlotInfo(f, info, pic, pw, ph, when);
+		}
+	}
+
+	private boolean anySlot() {
+		for (SlotInfo c : slotCards) if (c != null && !c.empty()) return true;
+		return false;
+	}
+
+	private int firstEmpty() {
+		for (int k = 0; k < SLOTS; k++) if (slotCards[k] == null || slotCards[k].empty()) return k;
+		return -1;
+	}
+
 	/** Your Retromon saves (worlds with Retromon's marker), the last played first. */
 	private static List<Path> findSlots() {
 		List<Path> out = new ArrayList<>();
@@ -174,9 +270,9 @@ public class IntroScreen extends GameScreen {
 	}
 
 	private void openMenu() {
-		slots = findSlots();
+		readSlots();
 		List<String> options = new ArrayList<>();
-		if (!slots.isEmpty()) options.add("CONTINUE");
+		if (anySlot()) options.add("CONTINUE");
 		options.add("NEW GAME");
 		options.add("OPTIONS");
 		options.add("MINECRAFT");
@@ -190,10 +286,29 @@ public class IntroScreen extends GameScreen {
 		Sounds.press();
 		switch (menu.selected()) {
 			case "CONTINUE" -> {
+				replacing = false;
+				confirm = null;
 				slotAt = 0;
+				for (int k = 0; k < SLOTS; k++) if (!slotCards[k].empty()) {
+					slotAt = k;
+					break;
+				}
 				step = Step.SLOTS;
 			}
-			case "NEW GAME" -> startOak();
+			case "NEW GAME" -> {
+				int free = firstEmpty();
+				if (free >= 0) {
+					targetSlot = free;
+					replaceTarget = false;
+					startOak();
+				} else {
+					// All three full: which one to start over in.
+					replacing = true;
+					confirm = null;
+					slotAt = 0;
+					step = Step.SLOTS;
+				}
+			}
 			case "OPTIONS" -> {
 				if (minecraft != null) minecraft.setScreen(new net.minecraft.client.gui.screens.options.OptionsScreen(this, minecraft.options));
 			}
@@ -306,9 +421,15 @@ public class IntroScreen extends GameScreen {
 				else if (Ui.isA(e)) menuPick(menu.at);
 			}
 			case SLOTS -> {
-				int n = slots.size() + 1;
-				if (Ui.isUp(e)) slotAt = Math.floorMod(slotAt - 1, n);
-				else if (Ui.isDown(e)) slotAt = Math.floorMod(slotAt + 1, n);
+				if (confirm != null) {
+					if (confirm.key(e)) return true;
+					if (Ui.isB(e)) confirm = null;
+					else if (Ui.isA(e)) confirmed(confirm.at == 0);
+					return true;
+				}
+				int n = SLOTS + 1;
+				if (Ui.isUp(e) || Ui.isLeft(e)) slotAt = Math.floorMod(slotAt - 1, n);
+				else if (Ui.isDown(e) || Ui.isRight(e)) slotAt = Math.floorMod(slotAt + 1, n);
 				else if (Ui.isB(e)) step = Step.MENU;
 				else if (Ui.isA(e)) pickSlot(slotAt);
 			}
@@ -349,13 +470,69 @@ public class IntroScreen extends GameScreen {
 		} else named(names.selected());
 	}
 
+	/**
+	 * A slot picked: CONTINUE plays its game (an empty one starts a new game there); after NEW GAME with all three
+	 * full, it asks before starting over in it.
+	 */
 	private void pickSlot(int i) {
 		Sounds.press();
-		if (i >= slots.size()) {
+		if (i >= SLOTS) {
 			step = Step.MENU;
 			return;
 		}
-		load(slots.get(i).getFileName().toString());
+		SlotInfo c = slotCards[i];
+		if (!replacing && !c.empty()) {
+			load(c.folder().getFileName().toString());
+			return;
+		}
+		if (c.empty()) {
+			targetSlot = i;
+			replaceTarget = false;
+			startOak();
+			return;
+		}
+		slotAt = i;
+		confirm = new Choice(List.of("YES, START OVER", "NO"));
+		confirm.at = 1;
+	}
+
+	private void confirmed(boolean yes) {
+		Sounds.press();
+		if (!yes) {
+			confirm = null;
+			return;
+		}
+		confirm = null;
+		targetSlot = slotAt;
+		replaceTarget = true;
+		startOak();
+	}
+
+	/** The game in a slot, moved aside into .minecraft/retromon-old-saves (the newest three are kept there). */
+	private static void moveAside(Path folder) throws IOException {
+		// Beside the map folder, not in it (the map folder is searched for a map when the map mod isn't there).
+		Path old = root().resolve("retromon-old-saves");
+		Files.createDirectories(old);
+		String stamp = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HHmmss").format(java.time.LocalDateTime.now());
+		Files.move(folder, old.resolve(folder.getFileName() + " " + stamp));
+		List<Path> kept = new ArrayList<>();
+		try (Stream<Path> st = Files.list(old)) {
+			st.filter(Files::isDirectory).forEach(kept::add);
+		}
+		kept.sort(Comparator.comparing((Path p) -> {
+			try {
+				return Files.getLastModifiedTime(p).toMillis();
+			} catch (IOException e) {
+				return 0L;
+			}
+		}).reversed());
+		for (int i = 3; i < kept.size(); i++) deleteFolder(kept.get(i));
+	}
+
+	private static void deleteFolder(Path dir) throws IOException {
+		try (Stream<Path> st = Files.walk(dir)) {
+			for (Path p : st.sorted(Comparator.reverseOrder()).toList()) Files.deleteIfExists(p);
+		}
 	}
 
 	@Override
@@ -441,7 +618,10 @@ public class IntroScreen extends GameScreen {
 	private void newGame() {
 		Path map = bundledMap();
 		if (map == null) return;
-		slotName = freeSlot();
+		int k = targetSlot >= 0 ? targetSlot : firstEmpty();
+		slotName = k >= 0 ? slotFolder(k) : freeSlot();
+		boolean aside = replaceTarget;
+		replaceTarget = false;
 		CompoundTag profile = new CompoundTag();
 		profile.putString("name", playerName);
 		profile.putString("rival", rivalName);
@@ -453,6 +633,11 @@ public class IntroScreen extends GameScreen {
 			Path tmp = null;
 			try {
 				Path to = root().resolve("saves").resolve(slotName);
+				// Starting over in a full slot: its old game is moved aside first (kept in old-saves).
+				if (aside && Files.exists(to)) {
+					progress = "Moving the old game aside...";
+					moveAside(to);
+				}
 				Files.createDirectories(to);
 				if (Files.isDirectory(map)) copyFolder(map, to);
 				else {
@@ -823,25 +1008,92 @@ public class IntroScreen extends GameScreen {
 		}
 	}
 
+	/**
+	 * The three slots as cards side by side: a picture of where you were, your name and where, your badges, your
+	 * POKéDEX and time played, your party, and when you last played. An empty slot invites a new game. BACK below.
+	 */
 	private void drawSlots(GuiGraphics g) {
-		int m = 8 * s, w = Math.min(width - 2 * m, 250 * s), row = 26 * s;
-		int n = Math.min(slots.size(), 6);
-		int h = (n + 1) * row + 26 * s, x = (width - w) / 2, y = Math.max(m, height * 2 / 5 - 20 * s);
-		Ui.round(g, x, y, w, h, 0xF0141B2E, 3 * s);
-		Ui.heading(g, font, "CONTINUE", x + 12 * s, y + 9 * s, Ui.TEXT, s);
-		for (int i = 0; i <= n; i++) {
-			int ty = y + 24 * s + i * row;
-			int idx = i < n ? i : slots.size();
-			if (over(x, ty, w, row - 3 * s)) slotAt = idx;
-			boolean on = slotAt == idx;
-			Ui.pill(g, x + 6 * s, ty, w - 12 * s, row - 4 * s, on, s);
-			int ink = on ? Ui.CREAM_INK : Ui.TEXT;
-			if (i < n) {
-				Path p = slots.get(i);
-				Ui.draw(g, font, Ui.bold(p.getFileName().toString()), x + 14 * s, ty + 4 * s, ink, s, false);
-				Ui.draw(g, font, Ui.ui(slotInfo(p)), x + 14 * s, ty + 13 * s, on ? 0xFF5A6480 : Ui.MUTED, s, false);
-			} else Ui.draw(g, font, Ui.bold("BACK"), x + 14 * s, ty + 7 * s, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
-			hit(x, ty, w, row - 3 * s, () -> pickSlot(idx));
+		int m = 8 * s, gap = 8 * s;
+		int cw = Math.min(170 * s, (width - 2 * m - 2 * gap) / 3), x0 = (width - 3 * cw - 2 * gap) / 2;
+		int picH = cw * 9 / 16, ch = picH + 92 * s;
+		int top = Math.max(m + 22 * s, (height - ch) / 2 - 10 * s);
+		String title = replacing ? "ALL THREE SLOTS ARE FULL" : "CONTINUE";
+		Ui.heading(g, font, title, (width - Ui.boldWidth(font, title, s)) / 2, top - 20 * s, Ui.GOLD, s);
+		if (replacing) Ui.centred(g, font, "Choose a game to start over in.", width / 2, top - 9 * s, Ui.MUTED, s, true);
+		for (int k = 0; k < SLOTS; k++) {
+			int x = x0 + k * (cw + gap), idx = k;
+			if (confirm == null && over(x, top, cw, ch)) slotAt = k;
+			boolean on = slotAt == k;
+			int y = top - (on ? 3 * s : 0);
+			SlotInfo c = slotCards[k];
+			Ui.round(g, x - s, y - s, cw + 2 * s, ch + 2 * s, on ? 0xFFFFFFFF : 0x40FFFFFF, 4 * s);
+			g.fillGradient(x, y, x + cw, y + ch, 0xF41A2440, 0xF40E1424);
+			// The picture (or, empty, a dim field with a plus).
+			if (c != null && c.picture() != null) {
+				int pw = c.picW(), ph = c.picH();
+				// Fills the frame, cut to fit.
+				float k1 = Math.max(cw / (float) pw, picH / (float) ph);
+				int sw = Math.round(cw / k1), sh = Math.round(picH / k1);
+				g.blit(RenderPipelines.GUI_TEXTURED, c.picture(), x, y, (pw - sw) / 2F, (ph - sh) / 2F, cw, picH, sw, sh, pw, ph);
+			} else {
+				g.fillGradient(x, y, x + cw, y + picH, 0xFF2A4A3A, 0xFF16261E);
+				if (c == null || c.empty()) Ui.centred(g, font, "+", x + cw / 2, y + picH / 2 - 8 * s, 0x90FFFFFF, Math.max(2, s * 2), true);
+			}
+			Ui.round(g, x + 4 * s, y + 4 * s, Ui.boldWidth(font, "SLOT " + (k + 1), s) + 8 * s, 11 * s, 0xC0101626, 2 * s);
+			Ui.draw(g, font, Ui.bold("SLOT " + (k + 1)), x + 8 * s, y + 6 * s, 0xFFFFFFFF, s, false);
+			int ty = y + picH + 6 * s, tx = x + 7 * s;
+			if (c == null || c.empty()) {
+				Ui.heading(g, font, "EMPTY", tx, ty, Ui.TEXT, s);
+				Ui.text(g, font, replacing ? "" : "Start a new game here.", tx, ty + 12 * s, Ui.MUTED, s);
+			} else {
+				String who = c.str("name", "TRAINER");
+				Ui.heading(g, font, who, tx, ty, "girl".equals(c.str("gender", "")) ? 0xFFFF9FC0 : 0xFF9FD0FF, s);
+				Ui.text(g, font, c.str("place", "KANTO"), tx, ty + 11 * s, Ui.TEXT, s);
+				// Badges: eight, filled for each one won.
+				int badges = c.num("badges"), bs = 7 * s;
+				for (int b = 0; b < 8; b++) {
+					int bx = tx + b * (bs + 2 * s), by = ty + 24 * s;
+					Ui.round(g, bx, by, bs, bs, b < badges ? 0xFFF2C744 : 0x40FFFFFF, Math.max(1, s));
+				}
+				String dex = c.info().has("dex") && c.info().get("dex").getAsBoolean() ? "POKéDEX " + c.num("caught") : "NO POKéDEX YET";
+				Ui.text(g, font, dex, tx, ty + 35 * s, Ui.MUTED, s);
+				int secs = c.num("played");
+				String time = secs / 3600 + ":" + String.format("%02d", secs / 60 % 60);
+				Ui.right(g, font, time, x + cw - 7 * s, ty + 35 * s, Ui.TEXT, s);
+				// The party.
+				int ps = Math.min(16 * s, (cw - 14 * s) / 6), pi = 0;
+				if (c.info().has("party") && c.info().get("party").isJsonArray()) {
+					for (com.google.gson.JsonElement e : c.info().getAsJsonArray("party")) {
+						if (pi >= 6) break;
+						Ui.pic(g, Retromon.id("textures/gui/mon/" + e.getAsString() + ".png"), tx + pi * ps, ty + 46 * s, ps, ps, 128, 128, 0xFFFFFFFF);
+						pi++;
+					}
+				}
+				Ui.text(g, font, c.when(), tx, ty + 46 * s + ps + 3 * s, Ui.DIM, s);
+			}
+			if (confirm == null) hit(x, top, cw, ch, () -> pickSlot(idx));
+		}
+		// BACK.
+		int bw = 60 * s, bx = (width - bw) / 2, byy = top + ch + 10 * s;
+		boolean onBack = slotAt == SLOTS || confirm == null && over(bx, byy, bw, 16 * s);
+		if (confirm == null && over(bx, byy, bw, 16 * s)) slotAt = SLOTS;
+		Ui.pill(g, bx, byy, bw, 16 * s, onBack, s);
+		Ui.centred(g, font, "BACK", bx + bw / 2, byy + 4 * s, onBack ? Ui.CREAM_INK : Ui.MUTED, s, false);
+		if (confirm == null) hit(bx, byy, bw, 16 * s, () -> pickSlot(SLOTS));
+		if (replacing) Ui.centred(g, font, "The game you replace is moved to .minecraft/retromon-old-saves (the last three are kept there).", width / 2,
+				byy + 22 * s, Ui.DIM, s, true);
+		if (confirm != null) {
+			SlotInfo c = slotCards[slotAt];
+			List<String> lines = List.of("Start over in SLOT " + (slotAt + 1) + "?", c.str("name", "This") + "'s game (" + c.str("place", "KANTO") + ") is moved",
+					"to retromon-old-saves, and a new game begins.");
+			int w = 0;
+			for (String l : lines) w = Math.max(w, Ui.width(font, l, s));
+			w += 24 * s;
+			int cwid = confirm.width(font, s), h = lines.size() * 11 * s + 16 * s, px = (width - w) / 2, py = height / 2 - h / 2 - 20 * s;
+			g.fill(0, 0, width, height, 0x90000000);
+			Ui.round(g, px, py, w, h, 0xF0141B2E, 3 * s);
+			for (int i = 0; i < lines.size(); i++) Ui.text(g, font, lines.get(i), px + 12 * s, py + 8 * s + i * 11 * s, Ui.TEXT, s);
+			choice(g, confirm, (width - cwid) / 2, py + h + 6 * s, cwid, i -> confirmed(i == 0));
 		}
 	}
 

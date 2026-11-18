@@ -46,6 +46,9 @@ public class PlayerData {
 	/** How far the story's come: "parcel" (carrying OAK's PARCEL), "pokedex" (Oak gave you the POKéDEX). */
 	public final Set<String> story = new LinkedHashSet<>();
 
+	/** Time played, in real seconds (the game's speed doesn't count). */
+	public double played;
+
 	public boolean hasDex() {
 		return story.contains("pokedex");
 	}
@@ -124,6 +127,7 @@ public class PlayerData {
 		t.putString("outfit", outfit);
 		t.putString("visited", join(visited));
 		t.putString("story", join(story));
+		t.putDouble("played", played);
 		return t;
 	}
 
@@ -160,6 +164,7 @@ public class PlayerData {
 		d.rival = t.getStringOr("rival", "");
 		d.gender = t.getStringOr("gender", "boy");
 		d.outfit = t.getStringOr("outfit", "");
+		d.played = t.getDoubleOr("played", 0);
 		if (t.contains("story")) split(t.getStringOr("story", ""), d.story);
 		// A save from before the errand (0.8 and older): you already had the POKéDEX.
 		else if (d.started) d.story.add("pokedex");
