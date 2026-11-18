@@ -531,7 +531,10 @@ public final class Game {
 				Trainers.Person person = Trainers.PEOPLE.get(n.key());
 				List<String> lines = new ArrayList<>(person == null ? List.of("...") : fill(p, person.lines()));
 				// Someone with a TM or HM to give (the HM houses, the TM gifts): it's yours.
-				if (person != null && !person.place().endsWith("_gym")) {
+				String pl = person == null ? "" : person.place();
+				boolean outdoors = pl.endsWith("_city") || pl.endsWith("_town") || pl.startsWith("route_") && !pl.contains("gate") && !pl.contains("house")
+						|| pl.endsWith("_island");
+				if (person != null && !pl.endsWith("_gym") && !outdoors) {
 					String got = giveGift(p, person.place());
 					if (got != null) lines.add(got);
 				}
