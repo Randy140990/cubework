@@ -324,7 +324,7 @@ vermilion_pidgey_house_p1	vermilion_pidgey_house	bird	left_right	walk	PIDGEY: Ku
 vermilion_pokecenter_p0	vermilion_pokecenter	fishing_guru	none	stay	Even if they are the same level, POKéMON can have very different abilities. | A POKéMON raised by a trainer is stronger than one in the wild.	10	5
 vermilion_pokecenter_p1	vermilion_pokecenter	sailor	none	stay	My POKéMON was poisoned! It fainted while we were walking!	5	4
 viridian_city_p0	viridian_city	youngster	any_dir	walk	Those POKé BALLs at your waist! You have POKéMON! | It's great that you can carry and use POKéMON any-time, anywhere!	13	20
-viridian_city_p1	viridian_city	gambler	none	stay	Ahh, I've had my coffee now and I feel great! | Sure, you can go through! | I'm sorry I was so rude to you! | I see you're using a POKéDEX. | I'll show you how to catch POKéMON as my apology.	18	9
+viridian_city_p1	viridian_city	gambler	none	stay	Ahh, I've had my coffee now and I feel great! | Sure, you can go through! | I'm sorry I was so rude to you! | I see you're using a POKéDEX. | I'll show you how to catch POKéMON as my apology. | First, you need to weaken the target POKéMON. | Then throw a POKé BALL!	18	9
 viridian_forest_p0	viridian_forest	youngster	none	stay	I came here with some friends! | They're out for POKéMON fights!	16	43
 viridian_forest_p1	viridian_forest	youngster	none	stay	I ran out of POKé BALLs to catch POKéMON with! | You should carry extras!	27	40
 viridian_forest_north_gate_p0	viridian_forest_north_gate	super_nerd	none	stay	Many POKéMON live only in forests and caves. | You need to look everywhere to get different kinds!	3	2

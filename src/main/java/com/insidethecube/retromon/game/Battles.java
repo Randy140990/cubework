@@ -133,9 +133,10 @@ public final class Battles {
 		switch (b.result) {
 			case WIN -> {
 				d.money += b.prize;
-				if (s.trainer != null && s.trainer.key().equals("rival_lab")) {
-					d.beaten.add("rival_lab");
-					d.healAll();
+				if (s.trainer != null && s.trainer.key().startsWith("rival_")) {
+					d.beaten.add(s.trainer.key());
+					// The first one, in the lab: Oak sees to your Pokémon after.
+					if (s.trainer.key().equals("rival_lab")) d.healAll();
 					after.addAll(Game.fill(p, s.trainer.defeat()));
 					after.addAll(Game.fill(p, s.trainer.after()));
 				} else if (s.trainer != null) {
@@ -161,7 +162,13 @@ public final class Battles {
 				out.putInt("nicknameIndex", toBox ? d.box.size() - 1 : d.party.size() - 1);
 			}
 			case LOSS -> {
-				if (s.trainer != null && s.trainer.key().equals("rival_lab")) {
+				if (s.trainer != null && s.trainer.key().equals("rival_22")) {
+					// Route 22, the first time: no harm done if you lose (as in the games), he goes on his way.
+					d.beaten.add("rival_22");
+					d.healAll();
+					after.addAll(Game.fill(p, List.of("{rival}: What? Why do I have 2 POKéMON? You should catch some more too!",
+							"{rival}: I heard POKéMON LEAGUE has many tough trainers! You should quit dawdling and get a move on!")));
+				} else if (s.trainer != null && s.trainer.key().equals("rival_lab")) {
 					// The first battle with your rival: no harm done if you lose (Oak sees to your Pokémon).
 					d.beaten.add("rival_lab");
 					d.healAll();

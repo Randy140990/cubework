@@ -36,6 +36,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gamerules.GameRules;
@@ -180,17 +181,23 @@ public final class Game {
 		Zone town = town();
 		if (town == null) return;
 		boolean inTown = town.contains(p.getX(), p.getZ());
-		// The tree line: the last few blocks of town at its north edge, where the path to Route 1 starts.
-		boolean leaving = inTown ? p.getZ() < town.z1() + 7 : placeAt(p.getX(), p.getZ()) != null;
+		ServerLevel level = (ServerLevel) p.level();
+		// The tree line (the last few blocks of town at its north edge, where the path to Route 1 starts), or the
+		// first step into tall grass, wherever it is: he stops you there and then.
+		BlockPos feet = p.blockPosition();
+		// (Grass counts in the north half of town only: a tuft by a house down south isn't the way out.)
+		boolean inGrass = p.getZ() < (town.z1() + town.z2()) / 2.0 && (grass(level.getBlockState(feet)) || grass(level.getBlockState(feet.above())));
+		boolean leaving = inTown ? p.getZ() < town.z1() + 7 || inGrass : placeAt(p.getX(), p.getZ()) != null;
 		if (inTown && !leaving) {
-			if (p.onGround() && p.getZ() > town.z1() + 12) SAFE.put(p.getUUID(), p.blockPosition());
+			// Where to put you back: only good ground (not the top of a fence, not in the grass).
+			if (p.onGround() && p.getZ() > town.z1() + 10 && goodGround(level, feet)) SAFE.put(p.getUUID(), feet);
 			return;
 		}
 		if (!leaving) return;
 		BlockPos back = SAFE.get(p.getUUID());
 		if (back == null) {
 			int x = Math.max(town.x1() + 4, Math.min(town.x2() - 4, p.getBlockX()));
-			back = spot((ServerLevel) p.level(), x, town.z1() + 14, 8);
+			back = spot(level, x, town.z1() + 14, 8);
 		}
 		p.teleportTo(back.getX() + 0.5, back.getY(), back.getZ() + 0.5);
 		BUSY.put(p.getUUID(), 200);
@@ -199,20 +206,64 @@ public final class Game {
 		Net.send(p, "intro", t);
 	}
 
-	/** Oak takes you to his lab: you're put at its door (until it has an inside). */
+	/** Oak takes you to his lab: you're put outside its door (until it has an inside), facing it. */
 	public static void toLab(ServerPlayer p) {
-		Zone town = town();
-		if (town == null || data(p).started) return;
-		int[] size = Places.size("pallet_town");
-		BlockPos door = size == null ? null : gameSpot((ServerLevel) p.level(), town, size, new int[] {12, 12});
+		if (town() == null || data(p).started) return;
+		BlockPos[] door = labDoor((ServerLevel) p.level());
 		if (door == null) return;
-		p.teleportTo((ServerLevel) p.level(), door.getX() + 0.5, door.getY(), door.getZ() + 0.5, java.util.Set.of(), 180F, 0F, true);
+		BlockPos at = door[1];
+		float yaw = (float) Math.toDegrees(Math.atan2(-(door[0].getX() - at.getX()), door[0].getZ() - at.getZ()));
+		p.teleportTo((ServerLevel) p.level(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, java.util.Set.of(), yaw, 0F, true);
 		BUSY.put(p.getUUID(), 200);
 	}
 
-	/** Your rival's first Pokémon: the one strong against yours (as in Red and Blue). */
-	private static Trainers.Trainer rivalLab(ServerPlayer p) {
+	/**
+	 * Oak's lab's door: the door block nearest where the games had it (their Pallet Town, laid over the marked
+	 * town), and good ground just outside it. Without a door there, the games' spot itself (on good ground).
+	 * Returns {door, outside}, or null.
+	 */
+	private static BlockPos[] labDoor(ServerLevel level) {
+		Zone town = town();
+		int[] size = Places.size("pallet_town");
+		if (town == null || size == null) return null;
+		BlockPos guess = gameSpot(level, town, size, new int[] {12, 11});
+		if (guess == null) return null;
+		int street = streetY(level, town);
+		BlockPos best = null;
+		double bestD = 1e9;
+		for (int dx = -12; dx <= 12; dx++) {
+			for (int dz = -12; dz <= 12; dz++) {
+				for (int y = street - 2; y <= street + 3; y++) {
+					BlockPos at = new BlockPos(guess.getX() + dx, y, guess.getZ() + dz);
+					BlockState b = level.getBlockState(at);
+					if (!(b.getBlock() instanceof net.minecraft.world.level.block.DoorBlock)
+							|| b.getValue(net.minecraft.world.level.block.DoorBlock.HALF) != net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER)
+						continue;
+					double d = dx * dx + dz * dz;
+					if (d < bestD) {
+						bestD = d;
+						best = at;
+					}
+				}
+			}
+		}
+		if (best != null) {
+			// Outside: the side of the door with open sky.
+			for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.Plane.HORIZONTAL) {
+				for (int k = 1; k <= 2; k++) {
+					BlockPos o = best.relative(dir, k);
+					for (int y = -1; y <= 1; y++) if (goodGround(level, o.above(y))) return new BlockPos[] {best, o.above(y)};
+				}
+			}
+		}
+		BlockPos at = spot(level, guess.getX(), guess.getZ() + 1, 8);
+		return new BlockPos[] {at.north(2), at};
+	}
+
+	/** Your rival's first Pokémon: the one strong against yours (as in Red and Blue), kept from then on. */
+	private static String rivalStarter(ServerPlayer p) {
 		PlayerData d = data(p);
+		for (String k : d.story) if (k.startsWith("rival:")) return k.substring(6);
 		String mine = d.party.isEmpty() ? "charmander" : d.party.get(0).species.id();
 		String sp = switch (mine) {
 			case "bulbasaur" -> "charmander";
@@ -220,20 +271,112 @@ public final class Game {
 			case "pikachu" -> "eevee";
 			default -> "squirtle";
 		};
+		if (!d.party.isEmpty()) d.story.add("rival:" + sp);
+		return sp;
+	}
+
+	private static Trainers.Trainer rivalLab(ServerPlayer p) {
+		String sp = rivalStarter(p);
+		String name = Species.get(sp).name();
 		return new Trainers.Trainer("rival_lab", "pallet_town", rival(p), "blue", "none", 0, 35, List.of(new Trainers.Member(sp, 5)), null,
-				List.of(), List.of("WHAT? Unbelievable! I picked the wrong POKéMON!"),
+				List.of("{rival}: Heh, I don't need to be greedy like you!", "{rival}: I'll take this one, then!", "{rival} received a " + name + "!",
+						"{rival}: Wait, {player}! Let's check out our POKéMON!", "Come on, I'll take you on!"),
+				List.of("WHAT? Unbelievable! I picked the wrong POKéMON!"),
 				List.of("{rival}: Okay! I'll make my POKéMON fight to toughen it up!", "{player}! Gramps! Smell ya later!"));
 	}
 
-	/** After your first Pokémon gets its name: your rival takes his, and wants to battle (as in the games). */
+	/** Route 22, after the POKéDEX: your rival on his way to the League (Red and Blue's first Route 22 battle). */
+	private static Trainers.Trainer rival22(ServerPlayer p) {
+		String sp = rivalStarter(p);
+		return new Trainers.Trainer("rival_22", "route_22", rival(p), "blue", "none", 0, 35,
+				List.of(new Trainers.Member("pidgey", 9), new Trainers.Member(sp, 8)), null,
+				List.of("{rival}: Hey! {player}!", "You're going to POKéMON LEAGUE?", "Forget it! You probably don't have any BADGEs!",
+						"The guard won't let you through!", "By the way, did your POKéMON get any stronger?"),
+				List.of("Awww! You just lucked out!"),
+				List.of("{rival}: I heard POKéMON LEAGUE has many tough trainers!", "I have to figure out how to get past them!",
+						"You should quit dawdling and get a move on!"));
+	}
+
+	/** A trainer by key: the games' trainers, or your rival (made up for you, with his Pokémon). */
+	static Trainers.Trainer trainerFor(ServerPlayer p, String key) {
+		return switch (key) {
+			case "rival_lab" -> rivalLab(p);
+			case "rival_22" -> rival22(p);
+			default -> Trainers.get(key);
+		};
+	}
+
+	/** After your first Pokémon gets its name: your rival turns up, takes his, and walks over to battle you. */
 	private static void rivalChallenge(ServerPlayer p) {
 		PlayerData d = data(p);
 		if (d.party.isEmpty() || d.beaten.contains("rival_lab")) return;
 		Trainers.Trainer t = rivalLab(p);
-		String sp = Species.get(t.team().get(0).species()).name();
-		dialogue(p, null, "rival", fill(p, List.of("{rival}: Heh, I don't need to be greedy like you!", "Go ahead and choose, {player}!",
-				"{rival}: I'll take this one, then!", "{rival} received a " + sp + "!", "{rival}: Wait, {player}! Let's check out our POKéMON!",
-				"Come on, I'll take you on!")));
+		ServerLevel level = (ServerLevel) p.level();
+		Npc n = rivalNpc(p, "rival_lab", spot(level, p.getBlockX() + 5, p.getBlockZ() + 1, 4));
+		if (n == null) talkBattle(p, null, t);
+		else walkUp(p, n, t, "meet_rival", null);
+	}
+
+	// ---------- your rival in person ----------
+
+	/** Each player's rival when he's about (in the lab, on Route 22, at Oak's), and ticks left as he heads off. */
+	private static final Map<UUID, Npc> RIVALS = new HashMap<>();
+	private static final Map<UUID, Integer> RIVAL_LEAVING = new HashMap<>();
+
+	/** Whether a rival in the world is one the game's using (else he's left over in a save, and goes). */
+	static boolean rivalKnown(Npc n) {
+		return RIVALS.containsValue(n);
+	}
+
+	private static Npc rivalNpc(ServerPlayer p, String key, BlockPos at) {
+		dropRival(p);
+		Npc n = place((ServerLevel) p.level(), Npc.TRAINER, key, at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
+		if (n == null) return null;
+		n.setCustomName(net.minecraft.network.chat.Component.literal(rival(p)));
+		n.setFacing(n.yawTo(p));
+		RIVALS.put(p.getUUID(), n);
+		return n;
+	}
+
+	private static void dropRival(ServerPlayer p) {
+		Npc old = RIVALS.remove(p.getUUID());
+		if (old != null && !old.isRemoved()) old.discard();
+		RIVAL_LEAVING.remove(p.getUUID());
+	}
+
+	/** Once you're done with him (the battle, the visit to Oak's), your rival heads off and is gone. */
+	private static void rivalsLeave(MinecraftServer s) {
+		for (Map.Entry<UUID, Npc> e : List.copyOf(RIVALS.entrySet())) {
+			UUID id = e.getKey();
+			Npc n = e.getValue();
+			ServerPlayer p = s.getPlayerList().getPlayer(id);
+			if (p == null || n.isRemoved()) {
+				if (n != null && !n.isRemoved()) n.discard();
+				RIVALS.remove(id);
+				RIVAL_LEAVING.remove(id);
+				continue;
+			}
+			if (engaged(p) || WALKS.containsKey(id)) continue;
+			PlayerData d = data(p);
+			boolean done = switch (n.key()) {
+				case "rival_lab" -> d.beaten.contains("rival_lab");
+				case "rival_22" -> d.beaten.contains("rival_22");
+				default -> d.hasDex();
+			};
+			if (!done) continue;
+			Integer left = RIVAL_LEAVING.get(id);
+			if (left == null) {
+				Vec3 away = n.position().subtract(p.position()).multiply(1, 0, 1);
+				away = away.lengthSqr() < 0.01 ? new Vec3(-1, 0, 0) : away.normalize();
+				Vec3 to = n.position().add(away.scale(18));
+				n.getNavigation().moveTo(to.x, n.getY(), to.z, 1.1);
+				RIVAL_LEAVING.put(id, 90);
+			} else if (left <= 0 || n.distanceTo(p) > 16) {
+				n.discard();
+				RIVALS.remove(id);
+				RIVAL_LEAVING.remove(id);
+			} else RIVAL_LEAVING.put(id, left - 1);
+		}
 	}
 
 	public static Trainers.Trainer rivalTrainer(ServerPlayer p) {
@@ -353,20 +496,49 @@ public final class Game {
 		});
 	}
 
-	/** The nearest good ground within two blocks of a height (searching outwards), or null. */
+	/**
+	 * The nearest good ground near a height (searching outwards): first anywhere within a block of it (the
+	 * street), and only then two blocks up or down (so it's the pavement in front of an arch, not its top).
+	 */
 	private static BlockPos spotNear(ServerLevel level, int x, int z, int radius, int y0) {
-		for (int r = 0; r <= radius; r++) {
-			for (int dx = -r; dx <= r; dx++) {
-				for (int dz = -r; dz <= r; dz++) {
-					if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
-					for (int y = y0 + 2; y >= y0 - 2; y--) {
-						BlockPos at = new BlockPos(x + dx, y, z + dz);
-						if (goodGround(level, at)) return at;
+		for (int[] heights : new int[][] {{0, 1, -1}, {2, -2}}) {
+			for (int r = 0; r <= radius; r++) {
+				for (int dx = -r; dx <= r; dx++) {
+					for (int dz = -r; dz <= r; dz++) {
+						if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
+						for (int dy : heights) {
+							BlockPos at = new BlockPos(x + dx, y0 + dy, z + dz);
+							if (goodGround(level, at)) return at;
+						}
 					}
 				}
 			}
 		}
 		return null;
+	}
+
+	private static Zone zoneAt(int x, int z) {
+		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i);
+		return null;
+	}
+
+	/**
+	 * Someone standing where they shouldn't from an older placing (the nurse on the Pokémon Center's arch, a man
+	 * in a pond): moved to good ground nearby, which becomes their spot. Checked once each time they're loaded.
+	 */
+	static void settle(Npc n) {
+		if (!ourSave || n.role() == Npc.LEADER || n.key().startsWith("rival") || !(n.level() instanceof ServerLevel level)) return;
+		BlockPos at = n.blockPosition();
+		Zone zone = zoneAt(at.getX(), at.getZ());
+		if (zone == null) return;
+		String pl = zone.place();
+		boolean town = pl.endsWith("_city") || pl.endsWith("_town");
+		if (!town && !pl.startsWith("route_")) return;
+		boolean wet = n.isInWater() || !level.getFluidState(at).isEmpty() || !level.getFluidState(at.below()).isEmpty();
+		boolean high = (town || n.role() == Npc.NURSE || n.role() == Npc.CLERK) && at.getY() > streetY(level, zone) + 1;
+		if (!wet && !high) return;
+		BlockPos to = spot(level, at.getX(), at.getZ(), 8);
+		if (!to.equals(at)) n.rehome(to);
 	}
 
 	private static BlockPos spotAny(ServerLevel level, int x, int z, int radius) {
@@ -447,6 +619,7 @@ public final class Game {
 	private static void enter(ServerPlayer p, String place) {
 		PlayerData d = data(p);
 		if (place == null || place.equals(d.place)) return;
+		if (oldManStops(p, place)) return;
 		d.place = place;
 		if (d.visited.add(place)) sync(p);
 		Places.Place pl = Places.get(place);
@@ -469,9 +642,10 @@ public final class Game {
 			COOLDOWN.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			BUSY.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			if (s.getTickCount() % 10 == 0) enter(p, placeAt(p.getX(), p.getZ()));
-			if (s.getTickCount() % 5 == 0 && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
+			if (!data(p).started && !BUSY.containsKey(id)) oakStops(p);
+			if (s.getTickCount() % 5 == 0) story(p);
 			if (s.getTickCount() % 40 == 0) moonlight(p);
-			if (s.getTickCount() % 5 == 0) follower(p);
+			follower(p);
 			if (s.getTickCount() % 10 == 0) roamers(p);
 			// Kept in Adventure mode (so nothing on the map can be broken, Axiom included) unless map editing is on.
 			if (!build && s.getTickCount() % 20 == 0 && p.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) p.setGameMode(GameType.ADVENTURE);
@@ -486,6 +660,7 @@ public final class Game {
 			if (s.getTickCount() % 4 == 0) watch(p);
 		}
 		approach(s);
+		rivalsLeave(s);
 		if (s.getTickCount() % 40 == 0) placeTouchPoints(s);
 		holdTime(s);
 	}
@@ -585,7 +760,7 @@ public final class Game {
 			w.born = now;
 			w.nextMove = now + 10 + RNG.nextInt(30);
 			w.setSpeed(0.2 + RNG.nextDouble() * 0.06);
-			if (flier(foe.species.id()) && RNG.nextBoolean()) w.setAirborne(true);
+			if (flier(foe.species.id()) && RNG.nextInt(10) < 7) w.setAirborne(true);
 			WILD_MONS.put(w.getId(), foe);
 			// It rustles out of the grass.
 			level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,
@@ -605,7 +780,7 @@ public final class Game {
 		if (COOLDOWN.containsKey(p.getUUID()) || !data(p).anyHealthy()) return false;
 		String tag = "wild:" + p.getUUID();
 		ServerLevel level = (ServerLevel) p.level();
-		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, p.getBoundingBox().inflate(0.9, 1.5, 0.9), w -> tag.equals(w.key()))) {
+		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, p.getBoundingBox().inflate(0.9, 1.5, 0.9), w -> tag.equals(w.key()) && !w.airborne())) {
 			Mon foe = WILD_MONS.remove(w.getId());
 			w.discard();
 			if (foe == null) continue;
@@ -627,40 +802,86 @@ public final class Game {
 		return p.position().subtract(look.x * by, 0, look.z * by);
 	}
 
-	/** Your Pokémon walking with you (as in Yellow, and the newer games): it keeps a step behind, and catches up if it falls back. */
+	/** Where each player has walked lately (newest first, a point every fifth of a block): the path yours follows. */
+	private static final Map<UUID, java.util.ArrayDeque<Vec3>> TRAIL = new HashMap<>();
+	/** How far back along your path your Pokémon walks. */
+	private static final double FOLLOW_GAP = 1.7;
+
+	/**
+	 * Your Pokémon walking with you (as in Yellow, and the newer games): it walks the path you walked, a step and a
+	 * half behind, every tick, so it turns your corners with you and never wanders off the path; it eases to a
+	 * stop when you stop, looks up at you, and appears behind you if it's left far behind.
+	 */
 	private static void follower(ServerPlayer p) {
 		ServerLevel level = (ServerLevel) p.level();
 		PlayerData d = data(p);
-		Integer id = FOLLOWERS.get(p.getUUID());
+		UUID uid = p.getUUID();
+		Integer id = FOLLOWERS.get(uid);
 		WorldMon w = id != null && level.getEntity(id) instanceof WorldMon wm && wm.isAlive() ? wm : null;
 		Mon lead = followMon(d);
-		boolean want = d.started && lead != null && !Battles.in(p) && FOLLOW_ON.getOrDefault(p.getUUID(), true);
+		boolean want = d.started && lead != null && !Battles.in(p) && FOLLOW_ON.getOrDefault(uid, true);
+		java.util.ArrayDeque<Vec3> trail = TRAIL.computeIfAbsent(uid, k -> new java.util.ArrayDeque<>());
+		Vec3 here = p.position();
+		if (trail.isEmpty() || trail.peekFirst().distanceToSqr(here) > 0.04) {
+			if (!trail.isEmpty() && trail.peekFirst().distanceToSqr(here) > 36) trail.clear();
+			trail.addFirst(here);
+			while (trail.size() > 60) trail.removeLast();
+		}
 		if (!want) {
 			if (w != null) w.discard();
-			FOLLOWERS.remove(p.getUUID());
+			FOLLOWERS.remove(uid);
 			return;
 		}
+		Vec3 target = alongTrail(trail, here, FOLLOW_GAP);
 		if (w == null) {
-			Vec3 b = behind(p, 1.6);
-			FOLLOWERS.remove(p.getUUID());
-			w = placeMon(level, lead.species.id(), "follow:" + p.getUUID(), b.x, p.getY(), b.z, p.getYRot());
+			FOLLOWERS.remove(uid);
+			w = placeMon(level, lead.species.id(), "follow:" + uid, target.x, target.y, target.z, p.getYRot());
 			if (w == null) return;
-			w.setSpeed(0.32);
-			FOLLOWERS.put(p.getUUID(), w.getId());
+			w.setNoGravity(true);
+			w.setNoAi(true);
+			FOLLOWERS.put(uid, w.getId());
 			return;
 		}
 		if (!w.species().equals(lead.species.id())) w.setSpecies(lead.species.id());
-		double dist = w.distanceTo(p);
-		if (dist > 14 || Math.abs(w.getY() - p.getY()) > 5) {
-			Vec3 b = behind(p, 1.5);
-			w.getNavigation().stop();
-			w.teleportTo(b.x, p.getY(), b.z);
-		} else if (dist > 2.3) {
-			Vec3 b = behind(p, 1.4);
-			w.getNavigation().moveTo(b.x, p.getY(), b.z, dist > 6 ? 2.0 : dist > 3.5 ? 1.5 : 1.15);
-		} else if (dist < 1.5) {
-			w.getNavigation().stop();
+		w.setDeltaMovement(Vec3.ZERO);
+		Vec3 at = w.position();
+		double dist = at.distanceTo(target);
+		if (dist > 12 || w.distanceTo(p) > 14) {
+			w.setPos(target.x, target.y, target.z);
+			return;
 		}
+		if (dist > 0.03) {
+			// Eases along: quick when it's fallen behind, gentle as it closes in.
+			double step = Math.min(dist, Math.max(0.05, dist * 0.32));
+			Vec3 to = at.add(target.subtract(at).scale(step / dist));
+			w.setPos(to.x, to.y, to.z);
+			if (dist > 0.12) {
+				float yaw = (float) Math.toDegrees(Math.atan2(-(target.x - at.x), target.z - at.z));
+				float turned = w.getYRot() + net.minecraft.util.Mth.wrapDegrees(yaw - w.getYRot()) * 0.35F;
+				w.setYRot(turned);
+				w.setYHeadRot(turned);
+				w.yBodyRot = turned;
+			}
+		} else if (w.tickCount % 20 == 0) {
+			// Stopped: it looks up at you.
+			float yaw = (float) Math.toDegrees(Math.atan2(-(p.getX() - at.x), p.getZ() - at.z));
+			w.setYRot(yaw);
+			w.setYHeadRot(yaw);
+			w.yBodyRot = yaw;
+		}
+	}
+
+	/** The point so far back along the path you've walked (or as far back as it goes). */
+	private static Vec3 alongTrail(java.util.ArrayDeque<Vec3> trail, Vec3 from, double back) {
+		Vec3 prev = from;
+		double left = back;
+		for (Vec3 pt : trail) {
+			double seg = prev.distanceTo(pt);
+			if (seg >= left && seg > 1e-6) return prev.add(pt.subtract(prev).scale(left / seg));
+			left -= seg;
+			prev = pt;
+		}
+		return prev;
 	}
 
 	/** A: reading a sign (or a shelf standing in for one): the words of the games' sign nearest that spot. */
@@ -713,15 +934,14 @@ public final class Game {
 	private static long heldTime = -1;
 
 	private static void holdTime(MinecraftServer s) {
+		if (!ourSave) return;
 		boolean fighting = false;
 		for (ServerPlayer p : s.getPlayerList().getPlayers()) if (adventure(p) && Battles.in(p)) fighting = true;
 		ServerLevel level = s.overworld();
-		if (!fighting) {
-			heldTime = -1;
-			return;
-		}
-		if (heldTime < 0) heldTime = level.getDayTime();
-		else if (level.getDayTime() != heldTime) level.setDayTime(heldTime);
+		if (fighting == heldTime >= 0) return;
+		// The clock stops (the game rule, so your screen's clock stops too, with no jumps back) and starts again after.
+		heldTime = fighting ? level.getDayTime() : -1;
+		level.getGameRules().set(GameRules.ADVANCE_TIME, !fighting, s);
 	}
 
 	/** WAIT from the menu: on to the morning (0), midday (1), evening (2) or night (3). */
@@ -796,40 +1016,222 @@ public final class Game {
 		else toStart(p);
 	}
 
+	// ---------- the story: Oak's Parcel (Red and Blue's first errand) ----------
+	//
+	// After your first battle, Oak's back at his lab's door. In Viridian, the Mart's clerk calls you over: Oak's
+	// order came in. The Mart won't sell you anything till it's delivered, and the old man lying across the road
+	// north won't let you by. Take it to Oak: your rival turns up, and Oak gives you each a POKéDEX, and you five
+	// POKé BALLs. Then the old man's had his coffee, the Mart's open, and your rival's waiting on Route 22.
+
+	static final String OAK_KEY = "oaks_lab_p0", OLD_MAN = "viridian_city_p1";
+	private static final List<String> OLD_MAN_GRUMPY = List.of("You can't go through here!", "This is private property!",
+			"GIRL: Oh Grandpa! Don't be so mean! He hasn't had his coffee yet.");
+	/** Where each player last stood on good ground in Viridian (to put them back from the old man). */
+	private static final Map<UUID, BlockPos> VIRIDIAN_SAFE = new HashMap<>();
+
+	private static boolean viridianMart(Npc n) {
+		return n.role() == Npc.CLERK && n.key().contains("viridian");
+	}
+
+	/** Each 5 ticks: the clerk calling you over, Oak at his door, your rival on Route 22. */
+	private static void story(ServerPlayer p) {
+		PlayerData d = data(p);
+		if (!d.started || !ourSave) return;
+		ServerLevel level = (ServerLevel) p.level();
+		oakAtLab(level);
+		if (engaged(p) || WALKS.containsKey(p.getUUID()) || Battles.in(p)) return;
+		if ("viridian_city".equals(d.place) && p.onGround() && goodGround(level, p.blockPosition())) VIRIDIAN_SAFE.put(p.getUUID(), p.blockPosition());
+		// "Hey! You came from PALLET TOWN?"
+		if (!d.hasDex() && !d.story.contains("parcel")) {
+			for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(9), Game::viridianMart)) {
+				if (n.distanceTo(p) > 9 || !n.hasLineOfSight(p)) continue;
+				walkUp(p, n, null, "", () -> giveParcel(p, n));
+				return;
+			}
+		}
+		// Your rival, from the League's way, once you have the POKéDEX.
+		if (d.hasDex() && d.anyHealthy() && !d.beaten.contains("rival_22") && "route_22".equals(d.place) && !RIVALS.containsKey(p.getUUID())) {
+			Npc n = rivalNpc(p, "rival_22", spot(level, p.getBlockX() - 9, p.getBlockZ(), 5));
+			if (n != null) walkUp(p, n, rival22(p), "meet_rival", null);
+		}
+	}
+
+	private static void giveParcel(ServerPlayer p, Npc n) {
+		PlayerData d = data(p);
+		if (d.story.contains("parcel") || d.hasDex()) return;
+		d.story.add("parcel");
+		d.give("oaks_parcel", 1);
+		sync(p);
+		if (n != null) n.talker = p;
+		dialogue(p, n, "talk", fill(p, List.of("Hey! You came from PALLET TOWN?", "You know PROF.OAK, right?", "His order came in. Will you take it to him?",
+				"{player} got OAK's PARCEL!", "Okay! Say hi to PROF.OAK for me!")), cues(3, "get_key_item"));
+	}
+
+	/** Lines a dialogue plays a jingle on (line index, then the jingle). */
+	private static CompoundTag cues(Object... at) {
+		CompoundTag t = new CompoundTag();
+		ListTag l = new ListTag();
+		for (int i = 0; i + 1 < at.length; i += 2) l.add(StringTag.valueOf(at[i] + ":" + at[i + 1]));
+		t.put("cues", l);
+		return t;
+	}
+
+	/** Oak, back at his lab's door once you've your first Pokémon (once per save). */
+	private static void oakAtLab(ServerLevel level) {
+		if (!ourSave) return;
+		JsonArray placed = marker.has("placedKeys") ? marker.getAsJsonArray("placedKeys") : new JsonArray();
+		for (JsonElement e : placed) if (e.getAsString().equals("oak:lab")) return;
+		BlockPos[] door = labDoor(level);
+		if (door == null || !level.hasChunkAt(door[1])) return;
+		// Beside the way in, looking out.
+		BlockPos out = door[1];
+		int sx = Integer.signum(out.getX() - door[0].getX()), sz = Integer.signum(out.getZ() - door[0].getZ());
+		BlockPos at = spot(level, out.getX() + sz * 2, out.getZ() + sx * 2, 3);
+		Npc oak = place(level, Npc.PERSON, OAK_KEY, at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
+		if (oak != null) {
+			oak.setCustomName(net.minecraft.network.chat.Component.literal("PROF.OAK"));
+			oak.setFacing((float) Math.toDegrees(Math.atan2(-(out.getX() + sx * 3 - at.getX()), out.getZ() + sz * 3 - at.getZ())));
+		}
+		placed.add("oak:lab");
+		marker.add("placedKeys", placed);
+		saveMarker();
+	}
+
+	private static final int[] RATING_AT = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 999};
+	private static final String[] RATINGS = {"You still have lots to do. Look for POKéMON in grassy areas!",
+			"You're on the right track! Get a FLASH HM from my AIDE!", "You still need more POKéMON! Try to catch other species!",
+			"Good, you're trying hard! Get an ITEMFINDER from my AIDE!", "Looking good! Go find my AIDE when you get 50!",
+			"You finally got at least 50 species! Be sure to get EXP.ALL from my AIDE!", "Oh! This is getting even better!",
+			"Very good! Go fish for some marine POKéMON!", "Wonderful! Do you like to collect things?", "I'm impressed! It must have been difficult to do!",
+			"You finally got at least 100 species! I can't believe how good you are!", "You even have the evolved forms of POKéMON! Super!",
+			"Excellent! Trade with friends to get some more!", "Outstanding! You've become a real pro at this!",
+			"I have nothing left to say! You're the authority now!", "Your POKéDEX is fully complete! Congratulations!"};
+
+	private static void oakTalk(ServerPlayer p, Npc n) {
+		PlayerData d = data(p);
+		if (d.story.contains("parcel") && !d.hasDex()) {
+			deliverParcel(p, n);
+			return;
+		}
+		if (!d.hasDex()) {
+			dialogue(p, n, "talk", fill(p, List.of("OAK: If a wild POKéMON appears, your POKéMON can fight against it!", "Afterward, go on to the next town.",
+					"VIRIDIAN CITY is just north, past ROUTE 1.")));
+			return;
+		}
+		int own = d.caught.size(), r = 0;
+		while (r < RATING_AT.length - 1 && own >= RATING_AT[r]) r++;
+		dialogue(p, n, "talk", fill(p, List.of("OAK: Good to see you! How is your POKéDEX coming? Here, let me take a look!",
+				"POKéDEX completion is: " + d.seen.size() + " POKéMON seen, " + own + " POKéMON owned.", "PROF.OAK's Rating: " + RATINGS[r])));
+	}
+
+	/** The parcel to Oak: your rival turns up, and you each get a POKéDEX; you get five POKé BALLs. */
+	private static void deliverParcel(ServerPlayer p, Npc n) {
+		PlayerData d = data(p);
+		d.take("oaks_parcel");
+		d.story.remove("parcel");
+		d.story.add("pokedex");
+		d.give("poke_ball", 5);
+		sync(p);
+		ServerLevel level = (ServerLevel) p.level();
+		Npc rv = rivalNpc(p, "rival_visit", spot(level, p.getBlockX() + 2, p.getBlockZ() + 2, 3));
+		if (rv != null) rv.talker = p;
+		List<String> lines = List.of("OAK: Oh, {player}! How is my old POKéMON?", "Well, it seems to like you a lot.",
+				"You must be talented as a POKéMON trainer!", "What? You have something for me?", "{player} delivered OAK's PARCEL.",
+				"Ah! This is the custom POKé BALL I ordered! Thanks, {player}!", "{rival}: Gramps! I almost forgot! What did you call me for?",
+				"OAK: Oh right! I have a request of you two.", "On the desk there is my invention, POKéDEX!",
+				"It automatically records data on POKéMON you've seen or caught! It's a hi-tech encyclopedia!",
+				"OAK: {player} and {rival}! Take these with you!", "{player} got POKéDEX from OAK!",
+				"To make a complete guide on all the POKéMON in the world... That was my dream!", "But, I'm too old! I can't do it!",
+				"So, I want you two to fulfill my dream for me!", "Get moving, you two! This is a great undertaking in POKéMON history!",
+				"{rival}: Alright Gramps! Leave it all to me!", "{player}, I hate to say it, but I don't need you!",
+				"I know! I'll borrow a TOWN MAP from my sis! I'll tell her not to lend you one, {player}! Hahaha!",
+				"OAK: You can't get detailed data on POKéMON by just seeing them.", "You must catch them! Use these to capture wild POKéMON.",
+				"{player} got 5 POKé BALLs!", "When a wild POKéMON appears, it's fair game. Throw a POKé BALL at it and try to catch it!",
+				"This won't always work, though. A healthy POKéMON could escape. You have to be lucky!");
+		dialogue(p, n, "talk", fill(p, lines), cues(4, "get_key_item", 11, "get_key_item", 21, "get_item"));
+	}
+
+	/** North of Viridian before the POKéDEX: the old man won't let you by, and you're put back. */
+	private static boolean oldManStops(ServerPlayer p, String place) {
+		PlayerData d = data(p);
+		if (!ourSave || !d.started || d.hasDex() || !"viridian_city".equals(d.place)) return false;
+		if (!place.matches("route_2(_.*)?") && !place.startsWith("viridian_forest") && !place.startsWith("pewter") && !place.startsWith("diglett")) return false;
+		ServerLevel level = (ServerLevel) p.level();
+		BlockPos back = VIRIDIAN_SAFE.get(p.getUUID());
+		if (back == null) {
+			Vec3 c = centreOf("viridian_city", level);
+			if (c == null) return false;
+			back = BlockPos.containing(c);
+		}
+		p.teleportTo(back.getX() + 0.5, back.getY(), back.getZ() + 0.5);
+		Npc man = null;
+		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(64), n -> n.key().equals(OLD_MAN))) man = n;
+		if (man != null) man.talker = p;
+		dialogue(p, man, "talk", OLD_MAN_GRUMPY);
+		return true;
+	}
+
 	// ---------- trainers who spot you ----------
 
-	private record Walk(Npc npc, ServerPlayer player, Trainers.Trainer trainer) {}
+	/** Someone walking up to you: a trainer (then the battle), or anyone with something to say (then that). */
+	private record Walk(Npc npc, ServerPlayer player, Trainers.Trainer trainer, Runnable then) {}
+
+	/** The "!" over them, the music, the black bars, and they come to you. */
+	private static void walkUp(ServerPlayer p, Npc n, Trainers.Trainer t, String music, Runnable then) {
+		CompoundTag e = new CompoundTag();
+		e.putInt("npc", n.getId());
+		e.putString("music", music == null ? "" : music);
+		Net.send(p, "exclaim", e);
+		n.getNavigation().stop();
+		n.setFacing(n.yawTo(p));
+		n.approaching = 160;
+		BUSY.put(p.getUUID(), 400);
+		WALKS.put(p.getUUID(), new Walk(n, p, t, then));
+	}
 
 	private static final Map<UUID, Walk> WALKS = new HashMap<>();
 
-	/** Any trainer who hasn't battled you yet and sees you along their line walks up to you. */
+	/** Talking to someone or in a battle: people you're with stay put and face you until it's over. */
+	static boolean engaged(ServerPlayer p) {
+		return BUSY.containsKey(p.getUUID()) || Battles.in(p);
+	}
+
+	/**
+	 * Any trainer who hasn't battled you yet and sees you walks up to you: you're spotted if you're ahead of them
+	 * (within about 70 degrees of the way they're facing as they pace) and within their reach, 5 to 10 blocks
+	 * (further for the ones who watched further in the games), or right beside them whichever way they face,
+	 * with nothing in between.
+	 */
 	private static void watch(ServerPlayer p) {
 		PlayerData d = data(p);
 		if (!d.started || !d.anyHealthy() || WALKS.containsKey(p.getUUID())) return;
 		ServerLevel level = (ServerLevel) p.level();
-		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(24))) {
-			if (n.role() != Npc.TRAINER && n.role() != Npc.LEADER) continue;
+		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(11))) {
+			if (n.role() != Npc.TRAINER && n.role() != Npc.LEADER || n.approaching > 0 || n.talker != null) continue;
 			Trainers.Trainer t = Trainers.get(n.key());
-			if (t == null || t.sight() <= 0 || d.beaten.contains(t.key())) continue;
-			double yaw = Math.toRadians(n.facing());
-			double fx = -Math.sin(yaw), fz = Math.cos(yaw);
-			double dx = p.getX() - n.getX(), dz = p.getZ() - n.getZ(), dy = p.getY() - n.getY();
-			double along = dx * fx + dz * fz, across = Math.abs(dx * fz - dz * fx);
-			if (along < 0.5 || along > t.sight() * BLOCKS_PER_STEP + 0.5 || across > 1.2 || Math.abs(dy) > 2) continue;
-			if (!n.hasLineOfSight(p)) continue;
-			CompoundTag e = new CompoundTag();
-			e.putInt("npc", n.getId());
-			e.putString("music", spottedMusic(t));
-			Net.send(p, "exclaim", e);
-			n.approaching = 120;
-			BUSY.put(p.getUUID(), 400);
-			WALKS.put(p.getUUID(), new Walk(n, p, t));
+			if (t == null || t.sight() <= 0 || d.beaten.contains(t.key()) || !spots(n, p, t)) continue;
+			walkUp(p, n, t, spottedMusic(t), null);
 			return;
 		}
 	}
 
+	/** Whether a trainer sees you (see watch). */
+	static boolean spots(Npc n, ServerPlayer p, Trainers.Trainer t) {
+		double dx = p.getX() - n.getX(), dz = p.getZ() - n.getZ(), dy = p.getY() - n.getY();
+		if (Math.abs(dy) > 2.5) return false;
+		double dist = Math.sqrt(dx * dx + dz * dz), reach = Math.max(5, Math.min(10, 3 + t.sight() * 1.5));
+		if (dist > reach) return false;
+		if (dist > 2.2) {
+			double yaw = Math.toRadians(n.facing());
+			double ahead = (dx * -Math.sin(yaw) + dz * Math.cos(yaw)) / dist;
+			if (ahead < 0.34) return false;
+		}
+		return n.hasLineOfSight(p);
+	}
+
 	/** The "eyes meet" tune: the girls', the boys' or Team Rocket's. */
 	static String spottedMusic(Trainers.Trainer t) {
+		if (t.key().startsWith("rival")) return "meet_rival";
 		String s = t.sprite();
 		if (s.contains("rocket") || s.contains("giovanni") || s.contains("jessie") || s.contains("james")) return "meet_evil_trainer";
 		if (s.endsWith("_f") || s.contains("girl") || s.contains("lass") || s.contains("beauty") || s.contains("woman") || s.contains("channeler")
@@ -845,18 +1247,22 @@ public final class Game {
 			if (n.isRemoved() || p.isRemoved() || p.hasDisconnected()) return true;
 			n.approaching--;
 			double dist = n.distanceTo(p);
-			if (n.approaching > 100) {
+			// The "!" (a second), then they come over: round whatever's in the way, not just in a line.
+			if (n.approaching > 140) {
 				n.getNavigation().stop();
+				n.setFacing(n.yawTo(p));
 				return false;
 			}
-			if (dist > 1.8 && n.approaching > 0) {
-				n.getNavigation().moveTo(p, 1.0);
+			if (dist > 1.9 && n.approaching > 0) {
+				if (n.approaching % 5 == 0 || n.getNavigation().isDone()) n.getNavigation().moveTo(p, 0.95);
 				return false;
 			}
 			n.getNavigation().stop();
 			n.approaching = 0;
-			n.getLookControl().setLookAt(p);
-			talkBattle(p, n, w.trainer());
+			n.talker = p;
+			BUSY.remove(p.getUUID());
+			if (w.then() != null) w.then().run();
+			else if (w.trainer() != null) talkBattle(p, n, w.trainer());
 			return true;
 		});
 	}
@@ -907,16 +1313,30 @@ public final class Game {
 		if (!(e instanceof Npc n)) return;
 		PlayerData d = data(p);
 		n.getNavigation().stop();
-		n.getLookControl().setLookAt(p);
+		n.talker = p;
 		switch (n.role()) {
 			case Npc.NURSE -> dialogue(p, n, "heal", List.of("Welcome to our POKéMON CENTER!", "We heal your POKéMON back to perfect health!",
 					"Shall we heal your POKéMON?"));
 			case Npc.CLERK -> {
+				// Viridian's Mart before the errand: OAK's PARCEL, and no shopping until it's delivered.
+				if (viridianMart(n) && d.started && !d.hasDex()) {
+					if (d.story.contains("parcel")) dialogue(p, n, "talk", List.of("Okay! Say hi to PROF.OAK for me!"));
+					else giveParcel(p, n);
+					return;
+				}
 				CompoundTag t = new CompoundTag();
 				t.putString("mart", n.key().isEmpty() ? d.place : n.key());
 				dialogue(p, n, "mart", List.of("Hi there! May I help you?"), t);
 			}
 			case Npc.PERSON -> {
+				if (n.key().equals(OAK_KEY)) {
+					oakTalk(p, n);
+					return;
+				}
+				if (n.key().equals(OLD_MAN) && !d.hasDex()) {
+					dialogue(p, n, "talk", OLD_MAN_GRUMPY);
+					return;
+				}
 				Trainers.Person person = Trainers.PEOPLE.get(n.key());
 				List<String> lines = new ArrayList<>(person == null ? List.of("...") : fill(p, person.lines()));
 				// Someone with a TM or HM to give (the HM houses, the TM gifts): it's yours.
@@ -1075,7 +1495,7 @@ public final class Game {
 				if (!d.beaten.contains("rival_lab") && !d.party.isEmpty()) Battles.trainer(p, rivalLab(p));
 			}
 			case "battle" -> {
-				Trainers.Trainer tr = Trainers.get(t.getStringOr("trainer", ""));
+				Trainers.Trainer tr = trainerFor(p, t.getStringOr("trainer", ""));
 				if (tr != null && !d.beaten.contains(tr.key()) && d.anyHealthy()) Battles.trainer(p, tr);
 			}
 			case "static" -> {
@@ -1358,7 +1778,7 @@ public final class Game {
 		if (!sp.equals("bulbasaur") && !sp.equals("charmander") && !sp.equals("squirtle") && !sp.equals("pikachu")) return;
 		d.add(new Mon(Species.get(sp), 5, RNG));
 		d.started = true;
-		d.give("poke_ball", 5);
+		// No POKé BALLs yet: Oak gives you some with the POKéDEX (after his parcel).
 		d.give("potion", 3);
 		d.money = 3000;
 		sync(p);
@@ -1394,8 +1814,8 @@ public final class Game {
 	 */
 	public static int lightUp(ServerLevel level, Zone z) {
 		int street = streetY(level, z), placed = 0;
-		BlockState light12 = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 12);
-		BlockState light9 = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 9);
+		// Soft: one ring of faint light round each lamp (brighter rings showed as squares of light on the ground).
+		BlockState soft = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 7);
 		java.util.Set<Long> done = new java.util.HashSet<>();
 		for (int x = z.x1(); x <= z.x2(); x++) {
 			for (int zz = z.z1(); zz <= z.z2(); zz++) {
@@ -1403,23 +1823,81 @@ public final class Game {
 					BlockPos at = new BlockPos(x, y, zz);
 					BlockState b = level.getBlockState(at);
 					if (b.getLightEmission() < 12 || b.is(Blocks.LIGHT) || !level.getFluidState(at).isEmpty() || b.is(Blocks.FIRE) || b.is(Blocks.LAVA)) continue;
-					for (int ring = 0; ring < 2; ring++) {
-						int r = ring == 0 ? 5 : 9;
-						for (int i = 0; i < 8; i++) {
-							double a = Math.PI * 2 * i / 8 + ring * Math.PI / 8;
-							int lx = x + (int) Math.round(Math.cos(a) * r), lz = zz + (int) Math.round(Math.sin(a) * r);
-							if (!done.add(BlockPos.asLong(lx, 0, lz))) continue;
-							int top = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, lx, lz);
-							BlockPos to = new BlockPos(lx, top, lz);
-							if (Math.abs(top - street) > 4 || !level.getBlockState(to).isAir()) continue;
-							level.setBlock(to, ring == 0 ? light12 : light9, 2);
-							placed++;
-						}
+					for (int i = 0; i < 6; i++) {
+						double a = Math.PI * 2 * i / 6;
+						int lx = x + (int) Math.round(Math.cos(a) * 5), lz = zz + (int) Math.round(Math.sin(a) * 5);
+						if (!done.add(BlockPos.asLong(lx, 0, lz))) continue;
+						int top = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, lx, lz);
+						BlockPos to = new BlockPos(lx, top, lz);
+						if (Math.abs(top - street) > 4 || !level.getBlockState(to).isAir()) continue;
+						level.setBlock(to, soft, 2);
+						placed++;
 					}
 				}
 			}
 		}
 		return placed;
+	}
+
+	/**
+	 * The games' signs in a place, where the map hasn't got one: two shelves stacked (the look of the signs on the
+	 * map), or a sign if shelves aren't in this version, at the sign's spot on the games' map (on good ground near
+	 * it), facing the camera. Not where there's already a sign or a shelf within six blocks. Read with SPACE.
+	 */
+	private static int plantSigns(ServerLevel level, Zone z) {
+		String pl = z.place();
+		if (!pl.endsWith("_city") && !pl.endsWith("_town") && !pl.startsWith("route_") && !pl.endsWith("_island")) return 0;
+		int[] size = Places.size(pl);
+		if (size == null) return 0;
+		Block shelf = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(net.minecraft.resources.Identifier.withDefaultNamespace("oak_shelf"))
+				.orElse(null);
+		int street = streetY(level, z), planted = 0;
+		for (Trainers.Sign sg : Trainers.signsIn(pl)) {
+			double fx = (sg.x() + 0.5) / size[0], fz = (sg.y() + 0.5) / size[1];
+			int wx = z.x1() + (int) Math.floor(fx * (z.x2() - z.x1() + 1)), wz = z.z1() + (int) Math.floor(fz * (z.z2() - z.z1() + 1));
+			if (!z.contains(wx + 0.5, wz + 0.5) || !level.hasChunkAt(new BlockPos(wx, street, wz)) || signNear(level, wx, street, wz, 6)) continue;
+			BlockPos at = spotNear(level, wx, wz, 4, street);
+			if (at == null) continue;
+			if (shelf != null) {
+				BlockState st = shelf.defaultBlockState().trySetValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING,
+						net.minecraft.core.Direction.SOUTH);
+				if (!level.getBlockState(at.above()).isAir()) continue;
+				level.setBlock(at, st, 3);
+				level.setBlock(at.above(), st, 3);
+			} else level.setBlock(at, Blocks.OAK_SIGN.defaultBlockState(), 3);
+			planted++;
+		}
+		return planted;
+	}
+
+	private static boolean signNear(ServerLevel level, int x, int y, int z, int r) {
+		for (int dx = -r; dx <= r; dx++) {
+			for (int dz = -r; dz <= r; dz++) {
+				for (int dy = -3; dy <= 4; dy++) {
+					BlockState b = level.getBlockState(new BlockPos(x + dx, y + dy, z + dz));
+					if (b.getBlock() instanceof net.minecraft.world.level.block.SignBlock
+							|| net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(b.getBlock()).getPath().endsWith("shelf")) return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/** Takes away the brighter light rings 0.7 and 0.8 put round lamps (levels 12 and 9, just above the ground). */
+	private static void unlight(ServerLevel level, Zone z) {
+		int street = streetY(level, z);
+		for (int x = z.x1(); x <= z.x2(); x++) {
+			for (int zz = z.z1(); zz <= z.z2(); zz++) {
+				int top = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, x, zz);
+				for (int y = Math.max(street - 4, top - 1); y <= Math.min(street + 5, top + 1); y++) {
+					BlockPos at = new BlockPos(x, y, zz);
+					BlockState b = level.getBlockState(at);
+					if (!b.is(Blocks.LIGHT)) continue;
+					int lv = b.getValue(net.minecraft.world.level.block.LightBlock.LEVEL);
+					if (lv == 12 || lv == 9) level.setBlock(at, Blocks.AIR.defaultBlockState(), 2);
+				}
+			}
+		}
 	}
 
 	/** The first people on the Kanto map: the Viridian nurse and clerk (until the interiors), and a practice trainer on Route 1. */
@@ -1436,13 +1914,29 @@ public final class Game {
 		boolean changed = false;
 		// Each marked place gets the games' people, trainers and item balls once its ground is loaded.
 		for (Zone z : List.copyOf(zones)) {
-			if (done.contains("place:" + z.place())) continue;
-			if (!level.hasChunkAt(new BlockPos(z.x1(), START_Y, z.z1())) || !level.hasChunkAt(new BlockPos(z.x2(), START_Y, z.z2()))) continue;
-			populate(level, z.place(), false);
-			lightUp(level, z);
-			placed.add("place:" + z.place());
-			done.add("place:" + z.place());
-			changed = true;
+			boolean loaded = level.hasChunkAt(new BlockPos(z.x1(), START_Y, z.z1())) && level.hasChunkAt(new BlockPos(z.x2(), START_Y, z.z2()));
+			if (!loaded) continue;
+			if (!done.contains("place:" + z.place())) {
+				populate(level, z.place(), false);
+				placed.add("place:" + z.place());
+				done.add("place:" + z.place());
+				changed = true;
+			}
+			// Lamps' light, the softer way (taking away 0.7's brighter rings where they were put).
+			if (!done.contains("light2:" + z.place() + z.x1() + "," + z.z1())) {
+				unlight(level, z);
+				lightUp(level, z);
+				placed.add("light2:" + z.place() + z.x1() + "," + z.z1());
+				done.add("light2:" + z.place() + z.x1() + "," + z.z1());
+				changed = true;
+			}
+			// The games' signs, where the map doesn't have one.
+			if (!done.contains("signs:" + z.place() + z.x1() + "," + z.z1())) {
+				plantSigns(level, z);
+				placed.add("signs:" + z.place() + z.x1() + "," + z.z1());
+				done.add("signs:" + z.place() + z.x1() + "," + z.z1());
+				changed = true;
+			}
 		}
 		for (Object[] d : DEFAULTS) {
 			String key = (String) d[0];

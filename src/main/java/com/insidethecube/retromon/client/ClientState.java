@@ -73,7 +73,7 @@ public final class ClientState {
 				for (Tag e : l) e.asString().ifPresent(lines::add);
 				String mode = t.getStringOr("mode", "talk");
 				int npc = t.getIntOr("npc", -1);
-				if (mode.equals("battle")) battleNpc = npc;
+				if (mode.equals("battle") || mode.equals("rival")) battleNpc = npc;
 				Adventure.frozen = 0;
 				exclaimTicks = 0;
 				// A message while the menu's open (an item's effect) shows in the menu.
@@ -91,6 +91,15 @@ public final class ClientState {
 				exclaimTicks = 40;
 				Adventure.frozen = 200;
 				Sounds.spotted(t.getStringOr("music", ""));
+				// The camera frames the two of you (black bars in), and you turn to face them.
+				Adventure.focus(exclaimNpc);
+				net.minecraft.world.entity.Entity who = mc.level == null ? null : mc.level.getEntity(exclaimNpc);
+				if (who != null && mc.player != null) {
+					float yaw = (float) Math.toDegrees(Math.atan2(-(who.getX() - mc.player.getX()), who.getZ() - mc.player.getZ()));
+					mc.player.setYRot(yaw);
+					mc.player.setYHeadRot(yaw);
+					mc.player.yBodyRot = yaw;
+				}
 			}
 			case "mart" -> show(() -> new MartScreen(t.getStringOr("mart", "")));
 			case "battle_start" -> {
@@ -112,6 +121,7 @@ public final class ClientState {
 					case "heal" -> Sounds.heal();
 					case "caught" -> Sounds.caught();
 					case "item" -> Music.jingle("get_item");
+					case "key" -> Music.jingle("get_key_item");
 					default -> {
 					}
 				}

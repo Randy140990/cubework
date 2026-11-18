@@ -90,8 +90,10 @@ public final class Sounds {
 		Music.jingle("pkmn_healed");
 	}
 
+	/** Someone's spotted you: their "eyes meet" tune (or, for someone who just wants a word, the "!" alone). */
 	public static void spotted(String music) {
-		Music.play(music == null || music.isEmpty() ? "meet_male_trainer" : music);
+		if (music == null || music.isEmpty()) sfx("tink", 1.4F, 0.8F);
+		else Music.play(music);
 	}
 
 	public static void caught() {

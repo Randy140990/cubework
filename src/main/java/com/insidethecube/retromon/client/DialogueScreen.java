@@ -20,6 +20,9 @@ public class DialogueScreen extends GameScreen {
 	private final int npc;
 	private Choice yesNo;
 	private boolean sent;
+	/** Jingles on lines ("got OAK's PARCEL!"): line index to jingle, and the last line one played for. */
+	private final java.util.Map<Integer, String> cues = new java.util.HashMap<>();
+	private int cued = -1;
 
 	public DialogueScreen(List<String> lines, String mode, int npc, CompoundTag extra) {
 		super("Dialogue");
@@ -31,6 +34,16 @@ public class DialogueScreen extends GameScreen {
 		this.trainer = t.isEmpty() ? null : t;
 		Trainers.Trainer tr = Trainers.get(trainer);
 		if (tr != null) box.speaker = tr.title();
+		for (net.minecraft.nbt.Tag c : extra.getListOrEmpty("cues")) c.asString().ifPresent(v -> {
+			int at = v.indexOf(':');
+			if (at > 0) {
+				try {
+					cues.put(Integer.parseInt(v.substring(0, at)), v.substring(at + 1));
+				} catch (NumberFormatException ignored) {
+					// Not a cue.
+				}
+			}
+		});
 		String cry = extra.getStringOr("cry", "");
 		if (!cry.isEmpty()) Sounds.cry(cry, 1F);
 		// The camera closes in on the two of you, and the black bars come in, as in a cutscene.
@@ -45,6 +58,12 @@ public class DialogueScreen extends GameScreen {
 	public void tick() {
 		super.tick();
 		box.tick();
+		int line = box.message();
+		if (line >= 0 && line != cued) {
+			cued = line;
+			String j = cues.get(line);
+			if (j != null) Music.jingle(j);
+		}
 		if (asks() && yesNo == null && box.atEnd()) yesNo = new Choice(List.of("YES", "NO"));
 	}
 

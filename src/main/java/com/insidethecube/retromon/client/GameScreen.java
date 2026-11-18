@@ -114,6 +114,10 @@ public abstract class GameScreen extends Screen {
 			minecraft.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
 			return true;
 		}
+		if (Adventure.SPEED != null && Adventure.SPEED.matches(e) && minecraft != null && minecraft.level != null) {
+			Adventure.cycleSpeed();
+			return true;
+		}
 		if (key(e)) return true;
 		return super.keyPressed(e);
 	}
@@ -155,6 +159,8 @@ public abstract class GameScreen extends Screen {
 	public static final class TextBox {
 		private final List<String> messages = new ArrayList<>();
 		private List<String[]> pages = new ArrayList<>();
+		/** Which message each page comes from. */
+		private final List<Integer> owners = new ArrayList<>();
 		private int page, typed, laidOut = -1;
 		/** Who's speaking (shown on a tab above the box), or null. */
 		public String speaker;
@@ -192,10 +198,12 @@ public abstract class GameScreen extends Screen {
 			laidOut = width;
 			int keepPage = page;
 			pages = new ArrayList<>();
-			for (String m : messages) {
-				List<String> lines = Ui.wrap(f, m, width);
+			owners.clear();
+			for (int mi = 0; mi < messages.size(); mi++) {
+				List<String> lines = Ui.wrap(f, messages.get(mi), width);
 				for (int i = 0; i < lines.size(); i += 2) {
 					pages.add(new String[] {lines.get(i), i + 1 < lines.size() ? lines.get(i + 1) : ""});
+					owners.add(mi);
 				}
 			}
 			page = Math.min(keepPage, Math.max(0, pages.size()));
@@ -209,6 +217,11 @@ public abstract class GameScreen extends Screen {
 
 		public void tick() {
 			if (typed < length()) typed = Math.min(length(), typed + textSpeed());
+		}
+
+		/** The message (line given) showing now, or -1 before it's laid out. */
+		public int message() {
+			return laidOut < 0 || page >= owners.size() ? -1 : owners.get(page);
 		}
 
 		public boolean typedOut() {

@@ -40,11 +40,16 @@ public class IntroScreen extends GameScreen {
 	private static final int ART_W = 480, ART_H = 270;
 
 	private enum Step {
-		TITLE, MENU, SLOTS, TALK, GENDER, NAME, COPYING, FAILED
+		OPENING, TITLE, MENU, SLOTS, TALK, GENDER, NAME, COPYING, FAILED
 	}
 
 	private final Screen parent;
-	private volatile Step step = Step.TITLE;
+	/** The opening (a shooting star across the night, as the handheld games' logo had) plays once each time the game's started. */
+	private static boolean opened;
+	private volatile Step step = opened ? Step.TITLE : Step.OPENING;
+	/** Ticks into the opening, and since the title came up (its white flash, Charizard's roar). */
+	private int openTicks, titleTicks = 99;
+	private static final int OPEN_END = 84;
 	private Choice menu;
 	private List<Path> slots = new ArrayList<>();
 	private int slotAt;
@@ -99,12 +104,18 @@ public class IntroScreen extends GameScreen {
 	@Override
 	protected void init() {
 		super.init();
-		if (ticks == 0) Music.play("title_screen");
+		if (ticks == 0 && step != Step.OPENING) Music.play("title_screen");
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
+		if (step == Step.OPENING) {
+			openTicks++;
+			if (openTicks == 8) Sounds.sfx("star", 1F, 0.9F);
+			if (openTicks >= OPEN_END) toTitle();
+		}
+		if (titleTicks < 99) titleTicks++;
 		if (talk != null) talk.tick();
 		if (copied) {
 			copied = false;
@@ -152,6 +163,15 @@ public class IntroScreen extends GameScreen {
 
 	/** Showing Minecraft's own title screen (chosen from MINECRAFT); otherwise Retromon's is the start. */
 	public static boolean minecraftTitle;
+
+	/** From the opening to the title: a white flash, Charizard's roar, and the title music. */
+	private void toTitle() {
+		opened = true;
+		step = Step.TITLE;
+		titleTicks = 0;
+		Sounds.cry("charizard", 1F);
+		Music.play("title_screen");
+	}
 
 	private void openMenu() {
 		slots = findSlots();
@@ -271,9 +291,12 @@ public class IntroScreen extends GameScreen {
 	@Override
 	protected boolean key(KeyEvent e) {
 		switch (step) {
+			case OPENING -> toTitle();
 			case TITLE -> {
 				if (Ui.isA(e)) {
+					// START: Charizard roars, as the title's Pokémon did.
 					Sounds.press();
+					Sounds.cry("charizard", 1F);
 					openMenu();
 				} else if (Ui.isB(e)) onClose();
 			}
@@ -337,7 +360,11 @@ public class IntroScreen extends GameScreen {
 
 	@Override
 	protected void clickAnywhere() {
-		if (step == Step.TITLE) openMenu();
+		if (step == Step.OPENING) toTitle();
+		else if (step == Step.TITLE) {
+			Sounds.cry("charizard", 1F);
+			openMenu();
+		}
 		else if (step == Step.TALK && talk.press()) afterTalk.run();
 		else if (step == Step.FAILED) step = Step.MENU;
 	}
@@ -555,6 +582,10 @@ public class IntroScreen extends GameScreen {
 
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
+		if (step == Step.OPENING) {
+			drawOpening(g, openTicks + partial);
+			return;
+		}
 		g.fill(0, 0, width, height, 0xFF0A0E24);
 		// The picture, filling the screen, crisp (dimmed once Oak's talking).
 		float k = Math.max(width / (float) ART_W, height / (float) ART_H);
@@ -603,13 +634,86 @@ public class IntroScreen extends GameScreen {
 				int tall = (int) (height * 0.42F), feet = height / 9 + 14 * s + tall;
 				Figures.Batch b = Figures.batch(0, 0, width, height);
 				shadow(g, width / 2, feet, tall);
-				b.person(hero(), width / 2F, feet, tall).emote(Figures.WAVE, secs).at(secs).facing(8).pitch(-3);
+				// Off you go: waving goodbye, a cheer, a ta-da, by turns.
+				int[] bye = {Figures.WAVE_BOTH, Figures.CHEER, Figures.WAVE, Figures.TADA};
+				int at = (int) (secs / 2.2F) % bye.length;
+				b.person(hero(), width / 2F, feet, tall).emote(bye[at], secs - (int) (secs / 2.2F) * 2.2F).at(secs).facing(8).pitch(-3);
 				b.draw(g);
 				panel(g, List.of(progress));
 			}
 			case FAILED -> panel(g, Ui.wrap(font, "The new game couldn't be made: " + failure, 240), true);
 		}
 		if (!story) Ui.centred(g, font, "A fan game by Insid3 Th3 Cub3.  Pokemon models from Cobblemon (CC BY-NC 3.0).", width / 2, height - 12, 0xFF9098C0, 1, true);
+		// Into the title from the opening: a white flash, fading.
+		if (titleTicks < 14) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, 1 - (titleTicks + partial) / 14F));
+	}
+
+	/**
+	 * The opening: the night sky, stars twinkling; a shooting star streaks across with a trail of sparkles and
+	 * lands with a burst; INSID3 TH3 CUB3 fades in where it fell (as the handheld games' logo had its star);
+	 * then a white flash into the title. Any key or a click skips it.
+	 */
+	private void drawOpening(GuiGraphics g, float t) {
+		g.fill(0, 0, width, height, 0xFF04050C);
+		java.util.Random r = new java.util.Random(11);
+		int px = Math.max(1, s);
+		for (int i = 0; i < 90; i++) {
+			int x = r.nextInt(Math.max(1, width)), y = r.nextInt(Math.max(1, height * 3 / 4));
+			float tw = 0.35F + 0.65F * (0.5F + 0.5F * (float) Math.sin(t * (0.08 + r.nextFloat() * 0.12) + r.nextFloat() * 6.3));
+			float in = Math.min(1, t / 14F);
+			g.fill(x, y, x + px, y + px, Ui.alpha(0xFFE8ECFF, tw * in * (0.4F + r.nextFloat() * 0.6F)));
+		}
+		// The star: across from the top right, slowing as it comes down.
+		float x0 = width * 1.05F, y0 = height * 0.12F, x1 = width * 0.5F, y1 = height * 0.52F;
+		float start = 8, land = 36;
+		float p = Math.max(0, Math.min(1, (t - start) / (land - start)));
+		float e = 1 - (1 - p) * (1 - p) * (1 - p);
+		if (t >= start) {
+			float hx = x0 + (x1 - x0) * e, hy = y0 + (y1 - y0) * e;
+			if (p < 1) {
+				// The trail: pixel squares behind it, smaller and fainter, with sparkles dropping off.
+				for (int k = 14; k >= 1; k--) {
+					float pk = Math.max(0, e - k * 0.028F);
+					float tx = x0 + (x1 - x0) * pk, ty = y0 + (y1 - y0) * pk;
+					int sz = Math.max(px, (int) ((15 - k) * 0.55F * px));
+					g.fill((int) tx - sz / 2, (int) ty - sz / 2, (int) tx + (sz + 1) / 2, (int) ty + (sz + 1) / 2,
+							Ui.alpha(k % 3 == 0 ? 0xFFFFE27A : 0xFFFFFFFF, (15 - k) / 15F * 0.85F));
+				}
+				java.util.Random sp = new java.util.Random((long) (t * 3));
+				for (int k = 0; k < 6; k++) {
+					float b = Math.max(0, e - sp.nextFloat() * 0.35F);
+					float sx = x0 + (x1 - x0) * b + (sp.nextFloat() - 0.5F) * 10 * px, sy = y0 + (y1 - y0) * b + sp.nextFloat() * 14 * px;
+					g.fill((int) sx, (int) sy, (int) sx + px, (int) sy + px, Ui.alpha(0xFFFFF4C0, 0.8F));
+				}
+				int hs = 5 * px;
+				Ui.glow(g, (int) hx, (int) hy, 14 * px, 14 * px, 0x18FFF0B0);
+				g.fill((int) hx - hs / 2, (int) hy - hs / 2, (int) hx + hs / 2 + 1, (int) hy + hs / 2 + 1, 0xFFFFFFFF);
+			} else {
+				// Landed: a burst of sparkles, and the star twinkling where it fell.
+				float since = t - land;
+				for (int k = 0; k < 16; k++) {
+					double a = Math.PI * 2 * k / 16;
+					float d = Math.min(1, since / 10F) * (22 + (k % 3) * 8) * px;
+					float fade = Math.max(0, 1 - since / 18F);
+					int sx = (int) (x1 + Math.cos(a) * d), sy = (int) (y1 + Math.sin(a) * d);
+					g.fill(sx, sy, sx + px * 2, sy + px * 2, Ui.alpha(k % 2 == 0 ? 0xFFFFE27A : 0xFFFFFFFF, fade));
+				}
+				float tw = 0.8F + 0.2F * (float) Math.sin(t * 0.35);
+				int ss = Math.round(14 * px * tw);
+				Ui.icon(g, "emote/star", (int) x1 - ss / 2, (int) y1 - ss / 2, ss, 0xFFFFFFFF);
+			}
+		}
+		// The maker's name under where it fell.
+		if (t > land + 2) {
+			float a = Math.min(1, (t - land - 2) / 12F);
+			int big = Math.max(2, s * 2);
+			String name = "INSID3 TH3 CUB3";
+			int nw = Ui.boldWidth(font, name, big);
+			Ui.draw(g, font, Ui.bold(name), (width - nw) / 2, (int) (y1 + 14 * px), Ui.alpha(0xFFFFFFFF, a), big, true);
+			Ui.centred(g, font, "presents", width / 2, (int) (y1 + 14 * px) + 12 * big, Ui.alpha(0xFFB8C0E0, a), s, true);
+		}
+		// Into white for the title.
+		if (t > OPEN_END - 12) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, Math.min(1, (t - (OPEN_END - 12)) / 12F)));
 	}
 
 	/** A soft shadow on the ground under someone's feet. */
@@ -634,15 +738,16 @@ public class IntroScreen extends GameScreen {
 			case "rival" -> RIVAL;
 			default -> OAK;
 		};
-		// The head follows the pointer: across, and up and down.
-		int headY = feet - tall * 7 / 8;
-		float look = mx < 0 ? 0 : Math.max(-28, Math.min(28, (mx - cx) / (float) Math.max(1, width) * 70));
-		float down = my < 0 ? 0 : Math.max(-22, Math.min(32, (my - headY) / (float) Math.max(1, height) * 80));
+		// They look out at you (turned a little towards the text, the head straight on).
 		Figures.Batch b = Figures.batch(0, 0, width, height);
-		Figures.Fig f = b.person(who, cx, feet, tall).facing(-22).pitch(-2).look(look + 22, down).at(secs);
+		Figures.Fig f = b.person(who, cx, feet, tall).facing(-22).pitch(-2).look(22, 3).at(secs);
 		if (scene.equals("oak")) f.talk(speaking ? 1 : 0.25F);
-		else if (scene.equals("hero")) f.wave(talk != null && talk.atEnd() ? 0 : 1).facing(-10);
-		else f.talk(0.2F);
+		else if (scene.equals("hero")) {
+			// You, saying hello: a different greeting every couple of seconds.
+			int[] hi = {Figures.WAVE, Figures.WAVE_BOTH, Figures.CHEER, Figures.TADA};
+			int at = (int) (secs / 2.2F) % hi.length;
+			f.emote(hi[at], secs - (int) (secs / 2.2F) * 2.2F).facing(-10);
+		} else f.talk(0.2F);
 		b.draw(g);
 	}
 
@@ -656,7 +761,7 @@ public class IntroScreen extends GameScreen {
 		if (genderAt != lastGender) {
 			lastGender = genderAt;
 			genderSince = ticks;
-			genderEmote = (genderEmote + 1 + (int) (Math.random() * (Figures.EMOTES - 2))) % (Figures.EMOTES - 1);
+			genderEmote = (genderEmote + 1 + (int) (Math.random() * (Figures.HAPPY.length - 1))) % Figures.HAPPY.length;
 			Sounds.select();
 		}
 		float since = ticks - genderSince + partial;
@@ -676,8 +781,9 @@ public class IntroScreen extends GameScreen {
 			Identifier tex = Retromon.id("textures/entity/player/" + (i == 1 ? "girl" : "boy") + ".png");
 			Figures.Fig f = b.person(tex, cx, feet, tall).at(secs + i * 1.3F).pitch(-2);
 			if (on) {
-				// The one you point at turns to you and does something: waves, cheers, jumps for joy, points, twirls.
-				f.emote(genderEmote, since / 20F).facing(0).look(0, mx < 0 ? 0 : Math.max(-15, Math.min(20, (my - (feet - tall)) / (float) height * 50)));
+				// The one you point at turns to you and does something: waves (one hand or both), cheers, jumps for
+				// joy, points, twirls, claps, or flings its arms out (ta-da!).
+				f.emote(Figures.HAPPY[genderEmote], since / 20F).facing(0).look(0, 2);
 			} else f.facing(i == 0 ? 18 : -18);
 			int lw = Ui.boldWidth(font, label[i], s);
 			Ui.draw(g, font, Ui.bold(label[i]), x + (cw - lw) / 2, top + ch - 18 * s, 0xFFFFFFFF, s, true);
@@ -686,8 +792,8 @@ public class IntroScreen extends GameScreen {
 		b.draw(g);
 		// A bubble over the one you point at, to go with what they're doing.
 		int cx = x0 + genderAt * (cw + gap) + cw / 2;
-		String[] bubbles = {"happy", "star", "heart", "exclaim", "note", "happy"};
-		int lift = (int) (Figures.emoteHop(genderEmote, since / 20F) * tall);
+		String[] bubbles = {"happy", "star", "heart", "exclaim", "note", "happy", "star", "heart"};
+		int lift = (int) (Figures.emoteHop(Figures.HAPPY[genderEmote], since / 20F) * tall);
 		Ui.bubble(g, bubbles[genderEmote % bubbles.length], cx + tall / 5, top + 12 * s - lift, s, Math.min(1, Math.max(0, since - 3) / 6F));
 	}
 
@@ -700,7 +806,7 @@ public class IntroScreen extends GameScreen {
 		Figures.Batch b = Figures.batch(0, 0, width, height);
 		Figures.Fig who = b.person(namingRival ? RIVAL : hero(), fx, feet, tall).facing(20).pitch(-2).at(secs);
 		if (typing) who.emote(Figures.THINK, secs);
-		else who.look(mx < 0 ? 0 : Math.max(-20, Math.min(25, (mx - fx) / (float) width * 60)), mx < 0 ? 0 : Math.max(-15, Math.min(25, (my - top) / (float) height * 50)));
+		else who.look(0, 3);
 		b.draw(g);
 		int cw = Math.min(170 * s, width / 2 - 20 * s), cx = width / 2 + 10 * s;
 		int listH = names.height(s);

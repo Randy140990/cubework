@@ -46,12 +46,13 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		if (e.roams() && s.model != null) {
 			// Out in the grass or walking with you: walks when it moves, and a bird takes to the air.
 			double moved = Math.hypot(e.getX() - e.xo, e.getZ() - e.zo);
-			boolean moving = moved > 0.01;
+			boolean moving = moved > 0.015;
 			s.yaw = Mth.rotLerp(partial, e.yBodyRotO, e.yBodyRot);
-			float target = e.airborne() ? 1.6F + (float) Math.sin((e.tickCount + partial) * 0.12F) * 0.25F : 0;
+			// Wild birds fly well above the grass (you walk under them; they come down to land now and then).
+			float target = e.airborne() ? (e.wild() ? 4.2F : 1.6F) + (float) Math.sin((e.tickCount + partial) * 0.12F) * (e.wild() ? 0.45F : 0.25F) : 0;
 			if (e.tickCount != lastTick(e)) {
 				e.liftOld = e.liftNow;
-				e.liftNow += (target - e.liftNow) * 0.12F;
+				e.liftNow += (target - e.liftNow) * 0.08F;
 			}
 			s.lift = Mth.lerp(partial, e.liftOld, e.liftNow);
 			BedrockModel m = s.model;

@@ -1,7 +1,7 @@
 {
 	"key.category.retromon.retromon": "Retromon",
 	"key.retromon.start": "Start (menu)",
-	"key.retromon.speed": "Game speed (1x, 2x, 3x)",
+	"key.retromon.fast": "Game speed (1x to 4x)",
 	"key.retromon.toggle": "Adventure camera (outside a Retromon save)",
 	"entity.retromon.npc": "Person",
 	"entity.retromon.mon_display": "Pokémon",

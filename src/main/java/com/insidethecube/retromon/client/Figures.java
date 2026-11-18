@@ -130,7 +130,9 @@ public final class Figures {
 	}
 
 	/** People's gestures. */
-	public static final int WAVE = 0, CHEER = 1, JUMP = 2, POINT = 3, SPIN = 4, THINK = 5, EMOTES = 6;
+	public static final int WAVE = 0, CHEER = 1, JUMP = 2, POINT = 3, SPIN = 4, THINK = 5, CLAP = 6, TADA = 7, WAVE_BOTH = 8, EMOTES = 9;
+	/** The cheerful ones (for someone you point at, or saying hello). */
+	public static final int[] HAPPY = {WAVE, CHEER, JUMP, POINT, SPIN, CLAP, TADA, WAVE_BOTH};
 
 	/** How high a gesture lifts them (screen pixels per block of height), for the ones with a jump. */
 	public static float emoteHop(int kind, float secs) {
@@ -138,6 +140,7 @@ public final class Figures {
 			case JUMP -> secs < 0.9F ? (float) Math.abs(Math.sin(secs / 0.45F * Math.PI)) * 0.22F : 0;
 			case CHEER -> secs < 1.2F ? (float) Math.abs(Math.sin(secs / 0.3F * Math.PI)) * 0.06F : 0;
 			case SPIN -> secs < 0.6F ? (float) Math.sin(secs / 0.6F * Math.PI) * 0.18F : 0;
+			case TADA -> secs < 0.4F ? (float) Math.sin(secs / 0.4F * Math.PI) * 0.08F : 0;
 			default -> 0;
 		};
 	}
@@ -264,9 +267,22 @@ public final class Figures {
 			m.head.yRot = (float) Math.toRadians(-f.look);
 			m.head.xRot += (float) Math.toRadians(f.lookDown);
 			if (f.talk > 0) {
-				// A hand out as they speak, and a nod.
-				m.rightArm.xRot = f.talk * (-0.75F - (float) Math.sin(t * 4.5) * 0.18F);
-				m.rightArm.zRot += f.talk * 0.12F;
+				// Talking with their hands, as people do: a hand out, both opened wide, the other hand, a hand to the
+				// chin, easing from one to the next; and a nod as they go.
+				float cyc = t / 2.6F, into = cyc - (float) Math.floor(cyc);
+				int a = Math.floorMod((int) Math.floor(cyc), 4);
+				float w = Math.min(1, into / 0.3F);
+				w = w * w * (3 - 2 * w);
+				float[] from = talkPose(Math.floorMod(a - 1, 4), t), to = talkPose(a, t);
+				float[] p = new float[7];
+				for (int i = 0; i < 7; i++) p[i] = f.talk * (from[i] + (to[i] - from[i]) * w);
+				m.rightArm.xRot += p[0];
+				m.rightArm.yRot += p[1];
+				m.rightArm.zRot += p[2];
+				m.leftArm.xRot += p[3];
+				m.leftArm.yRot += p[4];
+				m.leftArm.zRot += p[5];
+				m.head.zRot += p[6];
 				m.head.xRot += f.talk * (float) Math.sin(t * 5.2) * 0.07F;
 			}
 			if (f.wave > 0) {
@@ -298,6 +314,17 @@ public final class Figures {
 			pose.translate(0F, -1.5F, 0F);
 			m.renderToBuffer(pose, bufferSource.getBuffer(m.renderType(f.skin)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 			bufferSource.endBatch();
+		}
+
+		/** The arms (right x, y, z; left x, y, z) and head tilt of each way of talking with the hands. */
+		private static float[] talkPose(int i, float t) {
+			float s = (float) Math.sin(t * 4.5), c = (float) Math.sin(t * 4 + 1);
+			return switch (i) {
+				case 0 -> new float[] {-0.75F - s * 0.18F, 0, 0.12F, 0, 0, 0, 0};
+				case 1 -> new float[] {-0.62F - s * 0.1F, 0.3F, 0.5F, -0.62F - c * 0.1F, -0.3F, -0.5F, 0};
+				case 2 -> new float[] {0, 0, 0, -0.8F - c * 0.18F, 0, -0.12F, -0.05F};
+				default -> new float[] {-1.85F, 0.55F, 0, -0.45F, -0.55F, 0, 0.12F};
+			};
 		}
 
 		/** A gesture on the model: arms (and head) for each kind. */
@@ -338,6 +365,29 @@ public final class Figures {
 				case SPIN -> {
 					m.rightArm.zRot = 1.3F;
 					m.leftArm.zRot = -1.3F;
+				}
+				case CLAP -> {
+					// Both hands out in front, clapping.
+					float c = (float) Math.abs(Math.sin(t * 9));
+					m.rightArm.xRot = m.leftArm.xRot = -1.15F;
+					m.rightArm.yRot = -0.32F - c * 0.22F;
+					m.leftArm.yRot = 0.32F + c * 0.22F;
+					m.head.xRot -= 0.1F;
+				}
+				case TADA -> {
+					// Arms flung out wide (ta-da!), with a bounce.
+					float w = Math.min(1, t / 0.15F), b = (float) Math.sin(t * 6) * 0.08F;
+					m.rightArm.zRot = w * (1.85F + b);
+					m.leftArm.zRot = -w * (1.85F + b);
+					m.rightArm.xRot = m.leftArm.xRot = -0.25F * w;
+					m.head.xRot -= 0.15F * w;
+				}
+				case WAVE_BOTH -> {
+					// Both arms up, waving side to side.
+					m.rightArm.zRot = 2.45F + sw * 0.35F;
+					m.leftArm.zRot = -2.45F + sw * 0.35F;
+					m.rightArm.xRot = m.leftArm.xRot = -0.12F;
+					m.head.zRot = (float) Math.sin(t * 5.5) * 0.07F;
 				}
 				case THINK -> {
 					// A hand to the chin, head tipped.

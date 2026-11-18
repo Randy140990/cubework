@@ -231,6 +231,10 @@ def boy():
     # A cap: red crown, a white front panel with a little ball mark, a dark brim (outer layer).
     RED, WHITE, BRIM = C("d23a3a"), C("f4f4f2"), C("23252b")
     s.fill("hat", "top", RED, grain=0.08)
+    # The crown on the head itself too, so the cap shows even with the skin's hat layer switched off.
+    s.fill("head", "top", mul(RED, 0.95), grain=0.08)
+    for f in ("right", "left", "back"):
+        s.fill("head", f, mul(RED, 0.85), 0, 0, 8, 1, grain=0.08)
     for f in ("right", "left", "back"):
         s.fill("hat", f, mul(RED, 0.9 if f != "back" else 0.82), 0, 0, 8, 2, grain=0.08)
     s.fill("hat", "front", WHITE, 0, 0, 8, 2, grain=0.04)
@@ -307,6 +311,7 @@ def girl():
     # A white sun hat with a red band (outer layer), long hair under it.
     HAT, BAND = C("f6f6f2"), C("d83a4a")
     s.fill("hat", "top", HAT, grain=0.05)
+    s.fill("head", "top", mul(HAT, 0.95), grain=0.05)
     for f in SIDES:
         s.fill("hat", f, mul(HAT, {"front": 1.0, "right": 0.92, "left": 0.92, "back": 0.86}[f]), 0, 0, 8, 1, grain=0.05)
         s.fill("hat", f, BAND if f != "back" else mul(BAND, 0.85), 0, 1, 8, 2)

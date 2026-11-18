@@ -30,7 +30,7 @@ public final class Hud {
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("speed"), Hud::speed);
 	}
 
-	// ---------- the cinema frame (talking to someone), fading in and out ----------
+	// ---------- the cinema frame (talking to someone, or a trainer walking up to you), fading in and out ----------
 
 	private static float cine, cineOld;
 	/** A fade to black and back (waiting until morning): ticks left, and what to do at the darkest. */
@@ -46,7 +46,8 @@ public final class Hud {
 	public static void tick(Minecraft mc) {
 		cineOld = cine;
 		boolean want = Adventure.active() && !BattleScene.active()
-				&& (mc.screen instanceof DialogueScreen || mc.screen instanceof StarterScreen || mc.screen instanceof NicknameScreen && cine > 0);
+				&& (mc.screen instanceof DialogueScreen || mc.screen instanceof StarterScreen || mc.screen instanceof NicknameScreen && cine > 0
+						|| mc.screen == null && Adventure.frozen > 0);
 		cine += ((want ? 1 : 0) - cine) * (want ? 0.14F : 0.2F);
 		if (Math.abs(cine - (want ? 1 : 0)) < 0.01F) cine = want ? 1 : 0;
 		if (fade > 0) {
@@ -78,7 +79,12 @@ public final class Hud {
 
 	// ---------- the buttons and the time, small at the bottom right ----------
 
-	/** What's what: SPACE to talk, ENTER for the menu, R for speed, and the time of day with the sun or the moon. */
+	/** A key as it's bound now (SPACE, ENTER, TAB), so the hints follow your controls. */
+	private static String key(net.minecraft.client.KeyMapping k) {
+		return k == null ? "?" : k.getTranslatedKeyMessage().getString().toUpperCase(java.util.Locale.ROOT);
+	}
+
+	/** What's what: SPACE to talk, ENTER for the menu, TAB for speed, and the time of day with the sun or the moon. */
 	private static void hints(GuiGraphics g, DeltaTracker delta) {
 		Minecraft mc = Minecraft.getInstance();
 		if (!Adventure.active() || BattleScene.active() || mc.screen != null || mc.level == null || mc.options.hideGui) return;
@@ -87,7 +93,7 @@ public final class Hud {
 		int hour = (int) ((t / 1000 + 6) % 24), minute = (int) ((t % 1000) * 60 / 1000);
 		boolean night = Night.nightness() > 0.5F;
 		String clock = String.format("%d:%02d %s", hour % 12 == 0 ? 12 : hour % 12, minute, hour < 12 ? "AM" : "PM");
-		String[][] keys = {{"SPACE", "Talk"}, {"ENTER", "Menu"}, {"R", "Speed"}};
+		String[][] keys = {{key(mc.options.keyJump), "Talk"}, {key(Adventure.START), "Menu"}, {key(Adventure.SPEED), "Speed"}};
 		int pad = 5 * s, gap = 8 * s, x = w - pad, y = h - pad - 14 * s;
 		// The keys, right to left.
 		for (int i = keys.length - 1; i >= 0; i--) {

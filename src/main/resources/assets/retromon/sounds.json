@@ -5061,5 +5061,13 @@
     "volume": 0.9
    }
   ]
+ },
+ "sfx.star": {
+  "sounds": [
+   {
+    "name": "retromon:sfx/sfx_star",
+    "volume": 0.8
+   }
+  ]
  }
 }

@@ -124,6 +124,11 @@ public class BattleScreen extends GameScreen {
 			if (wipe == REVEAL) BattleScene.reveal();
 			if (wipe > REVEAL) return;
 		}
+		// Sped up (TAB), the battle plays that much faster too: its steps, text, bars and waits.
+		for (int i = 0, n = Math.max(1, Adventure.speed); i < n && minecraft != null && minecraft.screen == this; i++) step();
+	}
+
+	private void step() {
 		onStage++;
 		if (fromDex > 0) fromDex--;
 		if (toDex >= 0) {
@@ -284,11 +289,10 @@ public class BattleScreen extends GameScreen {
 				wait = 14;
 			}
 			case FAINT -> {
-				if (d != null) d.act("faint");
 				BattleScene.faint(e.side());
 				Sounds.cry(side(e.side()).species, 0.7F);
 				side(e.side()).shown = false;
-				wait = 26;
+				wait = 34;
 			}
 			case SEND_OUT -> {
 				List<Mon> list = e.side() == 0 ? mine : theirs;

@@ -43,6 +43,12 @@ public class PlayerData {
 	public String outfit = "";
 	/** The places you've been (for the Town Map, and where you can fly). */
 	public final Set<String> visited = new LinkedHashSet<>();
+	/** How far the story's come: "parcel" (carrying OAK's PARCEL), "pokedex" (Oak gave you the POKéDEX). */
+	public final Set<String> story = new LinkedHashSet<>();
+
+	public boolean hasDex() {
+		return story.contains("pokedex");
+	}
 
 	public boolean anyHealthy() {
 		for (Mon m : party) if (!m.fainted()) return true;
@@ -117,6 +123,7 @@ public class PlayerData {
 		t.putString("gender", gender);
 		t.putString("outfit", outfit);
 		t.putString("visited", join(visited));
+		t.putString("story", join(story));
 		return t;
 	}
 
@@ -153,6 +160,9 @@ public class PlayerData {
 		d.rival = t.getStringOr("rival", "");
 		d.gender = t.getStringOr("gender", "boy");
 		d.outfit = t.getStringOr("outfit", "");
+		if (t.contains("story")) split(t.getStringOr("story", ""), d.story);
+		// A save from before the errand (0.8 and older): you already had the POKéDEX.
+		else if (d.started) d.story.add("pokedex");
 		split(t.getStringOr("visited", ""), d.visited);
 		return d;
 	}

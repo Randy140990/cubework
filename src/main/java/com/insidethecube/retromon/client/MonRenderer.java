@@ -20,7 +20,7 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 
 	public static class State extends EntityRenderState {
 		BedrockModel model;
-		float yaw, size, lunge, lift, wobble, actionSecs, spin;
+		float yaw, size, lunge, lift, wobble, actionSecs, spin, keel;
 		boolean hidden, red;
 		String action;
 		Identifier texture;
@@ -71,6 +71,14 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 			if (p < 0.8F) s.lift = 0.55F * Math.abs(Mth.sin((float) Math.PI * p / 0.4F));
 			if (p < 0.4F) s.spin = p / 0.4F * 360F;
 		} else s.spin = 0;
+		s.keel = 0;
+		if (e.faint > 0) {
+			// Fainting: sags, then keels over onto its side and settles a little lower.
+			float p = Math.min(1, (MonDisplay.FAINT - e.faint + partial) / MonDisplay.FAINT);
+			float k = ease(Math.max(0, p - 0.12F) / 0.38F);
+			s.keel = 82F * k;
+			s.lift = -0.12F * k + (p < 0.12F ? -0.05F * Mth.sin((float) Math.PI * p / 0.12F) : 0);
+		}
 		s.hidden = e.flash > 0 && (e.flash / 2) % 2 == 0;
 		s.action = e.action;
 		s.actionSecs = (e.actionAge + partial) / 20F;
@@ -94,6 +102,7 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 		pose.translate(-Math.sin(yaw) * s.lunge, s.lift, Math.cos(yaw) * s.lunge);
 		pose.mulPose(Axis.YP.rotationDegrees(180F - s.yaw - s.spin));
 		if (s.wobble != 0) pose.mulPose(Axis.ZP.rotationDegrees(s.wobble));
+		if (s.keel != 0) pose.mulPose(Axis.ZP.rotationDegrees(s.keel));
 		pose.scale(-1F, -1F, 1F);
 		pose.scale(scale, scale, scale);
 		pose.translate(0F, -1.501F, 0F);

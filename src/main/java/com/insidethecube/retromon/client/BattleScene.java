@@ -64,6 +64,7 @@ public final class BattleScene {
 	public static long heldDay = -1;
 
 	public static void reveal() {
+		if (active && !built) setUp();
 		revealed = true;
 	}
 
@@ -84,7 +85,20 @@ public final class BattleScene {
 		return side == 0 ? mineAt : enemyAt;
 	}
 
-	/** Sets out the stage: npc is the trainer you're battling (or -1), enemies the Pokémon you'll face, arena the kind of place. */
+	/** Where the stage goes up, how tall their tallest is, and who's battling you (their key and role), until it's built. */
+	private static BlockPos stageAt = BlockPos.ZERO;
+	private static float stageH = 1;
+	private static String foeKey;
+	private static int foeRole = com.insidethecube.retromon.game.Npc.TRAINER;
+	private static boolean built;
+	/** You, standing behind yours; their trainer behind theirs (on the stage only). */
+	private static com.insidethecube.retromon.game.Npc hero, foe;
+
+	/**
+	 * A battle's starting: npc is the trainer you're battling (or -1), enemies the Pokémon you'll face, arena the
+	 * kind of place. The stage itself goes up under the white of the wipe (reveal), so nothing shows (or casts a
+	 * shader's shadow) before it covers the screen.
+	 */
 	public static void start(int npc, List<String> enemies, String arena) {
 		end();
 		Minecraft mc = Minecraft.getInstance();
@@ -98,7 +112,21 @@ public final class BattleScene {
 			BedrockModel.Def def = BedrockModel.def(sp);
 			if (def != null) h = Math.max(h, def.height);
 		}
-		build(mc.player.blockPosition());
+		stageH = h;
+		stageAt = mc.player.blockPosition();
+		Entity t = npc >= 0 ? mc.level.getEntity(npc) : null;
+		foeKey = t instanceof com.insidethecube.retromon.game.Npc n ? n.key() : null;
+		foeRole = t instanceof com.insidethecube.retromon.game.Npc n ? n.role() : com.insidethecube.retromon.game.Npc.TRAINER;
+		built = false;
+		active = true;
+		revealed = false;
+	}
+
+	/** Puts up the stage, the two Pokémon (not out yet), you and their trainer, and the camera. */
+	private static void setUp() {
+		built = true;
+		float h = stageH;
+		build(stageAt);
 		double far = 6.0 + Math.max(0, h - 1.5) * 1.3;
 		mineAt = centre.add(-0.5, 0, 2.4);
 		enemyAt = centre.add(1.9, 0, 2.4 - far);
@@ -109,8 +137,30 @@ public final class BattleScene {
 		// left of the middle, clear of your card, theirs further off to the right.
 		cam = centre.add(0.0, 1.9 + Math.max(0, h - 2) * 0.4, 7.4 + Math.max(0, h - 2) * 0.9);
 		aim(mineAt.lerp(enemyAt, 0.5).add(0, 0.8 + Math.max(0, h - 1) * 0.15, 0));
-		active = true;
-		revealed = false;
+		// You stand behind yours, off to the left (the newer games' view); their trainer behind theirs.
+		Vec3 heroAt = mineAt.add(-1.5, 0, 1.3);
+		hero = person("hero", com.insidethecube.retromon.game.Npc.PERSON, heroAt, face(heroAt, enemyAt));
+		if (foeKey != null && !foeKey.isEmpty()) {
+			Vec3 foeAt = enemyAt.add(1.5, 0, -1.7 - Math.max(0, h - 1.5) * 0.4);
+			foe = person(foeKey, foeRole, foeAt, face(foeAt, mineAt));
+		}
+	}
+
+	private static com.insidethecube.retromon.game.Npc person(String key, int role, Vec3 at, float yaw) {
+		com.insidethecube.retromon.game.Npc n = new com.insidethecube.retromon.game.Npc(Retromon.NPC, level);
+		n.setId(nextId--);
+		n.setRole(role);
+		n.setKey(key);
+		n.snapTo(at.x, at.y, at.z, yaw, 0);
+		n.setFacing(yaw);
+		level.addEntity(n);
+		return n;
+	}
+
+	/** Where the one who sent a side's Pokémon out stands (you, or their trainer), or null for a wild one. */
+	private static Vec3 trainerOf(int side) {
+		com.insidethecube.retromon.game.Npc n = side == 0 ? hero : foe;
+		return n == null ? null : n.position().add(0, 1.1, 0);
 	}
 
 	/** One Pokémon in front of you on a stage (evolving): builds a stage if there isn't one. */
@@ -122,6 +172,7 @@ public final class BattleScene {
 			level = mc.level;
 			kind = "route";
 			build(mc.player.blockPosition());
+			built = true;
 			active = true;
 		}
 		spotlight(species);
@@ -160,11 +211,20 @@ public final class BattleScene {
 	public static void throwBall(String item) {
 		if (!active || level == null) return;
 		if (ball != null) level.removeEntity(ball.getId(), Entity.RemovalReason.DISCARDED);
-		ball = ballAt(cam.add(-0.4, -0.7, -0.8), item);
+		// From your hand (you throw it), or from in front of the camera if you're not on the stage.
+		ball = ballAt(hand(hero, cam.add(-0.4, -0.7, -0.8)), item);
+		if (hero != null) hero.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
 		BedrockModel.Def def = BedrockModel.def(theirs == null ? "pidgey" : theirs.species);
 		double top = def == null ? 0.8 : Math.min(2.5, def.height * 0.6);
 		ball.fly(enemyAt.x, enemyAt.y + top, enemyAt.z, 1.4, 14);
 		Sounds.ball();
+	}
+
+	/** A trainer's throwing hand (on the stage), or the given spot without one. */
+	private static Vec3 hand(com.insidethecube.retromon.game.Npc n, Vec3 otherwise) {
+		if (n == null) return otherwise;
+		double yaw = Math.toRadians(n.getYRot());
+		return n.position().add(-Math.cos(yaw) * 0.4 - Math.sin(yaw) * 0.3, 1.45, -Math.sin(yaw) * 0.4 + Math.cos(yaw) * 0.3);
 	}
 
 	private static MonDisplay ballAt(Vec3 p, String item) {
@@ -241,7 +301,9 @@ public final class BattleScene {
 		if (!active || level == null) return;
 		if (sendBall != null) level.removeEntity(sendBall.getId(), Entity.RemovalReason.DISCARDED);
 		Vec3 to = spot(side);
-		Vec3 from = side == 0 ? cam.add(0.6, -0.8, -0.6) : to.add(0.8, 1.6, -3.5);
+		com.insidethecube.retromon.game.Npc who = side == 0 ? hero : foe;
+		Vec3 from = hand(who, side == 0 ? cam.add(0.6, -0.8, -0.6) : to.add(0.8, 1.6, -3.5));
+		if (who != null) who.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
 		sendBall = ballAt(from, "poke_ball");
 		sendBall.fly(to.x, to.y + 0.2, to.z, 1.1, 9);
 		sendSide = side;
@@ -512,6 +574,10 @@ public final class BattleScene {
 			d.cheer = MonDisplay.CHEER;
 			d.act("cry");
 		}
+		if (hero != null) {
+			hero.cheer = 40;
+			hero.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+		}
 		Vec3 at = spot(0).add(0, 0.3 + height(0) * 0.5, 0);
 		sphere(at, ParticleTypes.HAPPY_VILLAGER, 14, 0.2);
 		FX.add(new Fx(SPIRAL, spot(0), spot(0), ParticleTypes.NOTE, dust(0xFFE070, 1.4F), 30, 4, new int[1], 3));
@@ -525,15 +591,40 @@ public final class BattleScene {
 		FX.add(new Fx(SPIRAL, at, at, up ? ParticleTypes.END_ROD : ParticleTypes.SQUID_INK, dust(up ? 0xFF7A3A : 0x4A8FE0, 1.4F), 16, 0, new int[1], 3));
 	}
 
-	/** Fainting: it sinks as it goes. */
+	/**
+	 * Fainting: it sags and keels over (its own faint animation, where its model has one), then its trainer calls
+	 * it back as red light (a wild one fades away where it lies).
+	 */
 	public static void faint(int side) {
 		MonDisplay d = display(side);
 		if (d == null) return;
-		Vec3 p = spot(side);
-		d.fly(p.x, p.y - 0.7, p.z, 0, 16);
-		d.sizeTarget = 0;
-		ring(p.add(0, 0.1, 0), ParticleTypes.POOF, 14, 0.15);
+		d.faint = MonDisplay.FAINT;
+		d.act("faint");
 		Sounds.faint();
+		later(18, () -> {
+			Vec3 p = spot(side).add(0, 0.2 + height(side) * 0.3, 0);
+			Vec3 back = trainerOf(side);
+			d.red = 14;
+			d.sizeTarget = 0;
+			if (back != null) {
+				FX.add(new Fx(BEAM, p, back, dust(0xFF3A3A, 1.1F), dust(0xFFFFFF, 0.8F), 9, 3, new int[1], 3));
+				Sounds.ball();
+			} else burst(p, dust(0xFFFFFF, 0.9F), 12, 0.35);
+		});
+	}
+
+	/** Things to do a little later (after so many ticks). */
+	private record Later(int[] ticks, Runnable then) {}
+
+	private static final List<Later> LATER = new ArrayList<>();
+
+	private static void later(int ticks, Runnable then) {
+		LATER.add(new Later(new int[] {ticks}, then));
+	}
+
+	/** One more tick for the Pokémon and balls on the stage (the game sped up: the battle keeps pace). */
+	public static void tickDisplays() {
+		for (MonDisplay d : new MonDisplay[] {mine, theirs, ball, sendBall}) if (d != null) d.tick();
 	}
 
 	private static void burst(Vec3 at, ParticleOptions p, int n, double spread) {
@@ -764,6 +855,7 @@ public final class BattleScene {
 	public static void end() {
 		if (level != null) {
 			for (MonDisplay d : new MonDisplay[] {mine, theirs, ball, sendBall}) if (d != null) level.removeEntity(d.getId(), Entity.RemovalReason.DISCARDED);
+			for (Entity n : new Entity[] {hero, foe}) if (n != null) level.removeEntity(n.getId(), Entity.RemovalReason.DISCARDED);
 			List<Map.Entry<BlockPos, BlockState>> back = new ArrayList<>(BEFORE.entrySet());
 			for (int i = back.size() - 1; i >= 0; i--) level.setBlock(back.get(i).getKey(), back.get(i).getValue(), 2 | 16, 0);
 		}
@@ -772,6 +864,9 @@ public final class BattleScene {
 		IMPACTS.clear();
 		ARROWS.clear();
 		cheerTicks = 0;
+		LATER.clear();
+		hero = foe = null;
+		built = false;
 		shotTicks = flashTicks = 0;
 		boltIn = -1;
 		mine = theirs = ball = sendBall = null;
@@ -792,6 +887,14 @@ public final class BattleScene {
 			return;
 		}
 		if (!active || level == null) return;
+		for (int i = LATER.size() - 1; i >= 0; i--) {
+			Later l = LATER.get(i);
+			if (--l.ticks()[0] <= 0) {
+				LATER.remove(i);
+				l.then().run();
+			}
+		}
+		if (hero != null && hero.cheer > 0 && hero.cheer == 20) hero.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
 		if (shake > 0) shake--;
 		if (flashTicks > 0) flashTicks--;
 		if (shotTicks > 0) shotTicks--;

@@ -15,6 +15,7 @@
     "ClientLevelDataMixin",
     "LevelWeatherMixin",
     "PlayerSkinMixin",
+    "AvatarLayersMixin",
     "NightVisionMixin",
     "OutlineMixin",
     "OutlineColourMixin",

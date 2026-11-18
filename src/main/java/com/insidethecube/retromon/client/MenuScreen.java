@@ -26,7 +26,8 @@ public class MenuScreen extends GameScreen {
 	/** Which OPTION row the keys change: 0 text speed, 1 music, 2 the Pokédex voice, 3 nights, 4 wild Pokémon, 5 walking with you. */
 	private int optionRow;
 	private static final String[] ITEMS = {"POKéDEX", "POKéMON", "BAG", "MAP", "CLOTHES", "CARD", "WAIT", "SAVE", "OPTION", "EXIT"};
-	private static final int[] COLORS = {0xFFE5525C, Ui.GREEN, Ui.AMBER, 0xFF4CB8A0, 0xFFB07CE0, Ui.BLUE, Ui.CYAN, 0xFF8C93A8, Ui.RED};
+	/** One per menu item (WAIT's was missing, which made opening the menu crash). */
+	private static final int[] COLORS = {0xFFE5525C, Ui.GREEN, Ui.AMBER, 0xFF4CB8A0, 0xFFB07CE0, Ui.BLUE, 0xFF7C8CF0, Ui.CYAN, 0xFF8C93A8, Ui.RED};
 	private static final String[] POCKETS = {"ITEMS", "BALLS", "KEY ITEMS", "TM & HM"};
 
 	private View view = View.MENU, afterMessage = View.MENU;
@@ -82,7 +83,9 @@ public class MenuScreen extends GameScreen {
 		Sounds.press();
 		switch (ITEMS[i]) {
 			case "POKéDEX" -> {
-				if (minecraft != null) minecraft.setScreen(new PokedexScreen(this));
+				// Oak gives you it, once you've taken him his parcel.
+				if (!d.hasDex()) say(View.MENU, "You don't have a POKéDEX yet.");
+				else if (minecraft != null) minecraft.setScreen(new PokedexScreen(this));
 			}
 			case "MAP" -> {
 				if (minecraft != null) minecraft.setScreen(new TownMapScreen(this));

@@ -25,10 +25,25 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 
 	public static class State extends HumanoidRenderState {
 		String sprite = "youngster";
+		/** Hopping for joy (you, on the battle stage, after a win). */
+		float hop;
 	}
 
 	public NpcRenderer(EntityRendererProvider.Context ctx) {
 		super(ctx, new HumanoidModel<>(ctx.bakeLayer(ModelLayers.PLAYER)), 0.5F);
+	}
+
+	@Override
+	public net.minecraft.world.phys.Vec3 getRenderOffset(State s) {
+		return super.getRenderOffset(s).add(0, s.hop, 0);
+	}
+
+	/** You as you look in the world: your clothes if you've chosen some, else the boy or the girl. */
+	static Identifier hero() {
+		boolean girl = "girl".equals(ClientState.data.gender);
+		String outfit = ClientState.data.outfit;
+		if (outfit != null && !outfit.isEmpty() && Outfit.ensure(outfit, girl)) return Outfit.HERO;
+		return Retromon.id(girl ? "textures/entity/player/girl.png" : "textures/entity/player/boy.png");
 	}
 
 	@Override
@@ -47,9 +62,14 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 	public void extractRenderState(Npc npc, State s, float partial) {
 		super.extractRenderState(npc, s, partial);
 		s.sprite = sprite(npc);
+		s.hop = npc.cheer > 0 ? 0.45F * Math.abs(net.minecraft.util.Mth.sin((40 - npc.cheer + partial) / 20F * (float) Math.PI * 2)) : 0;
 	}
 
 	static String sprite(Npc npc) {
+		String key = npc.key();
+		// Your rival (wherever he turns up), and you yourself (on the battle stage).
+		if (key.startsWith("rival")) return "blue";
+		if (key.equals("hero")) return "hero";
 		return switch (npc.role()) {
 			case Npc.NURSE -> "nurse";
 			case Npc.CLERK -> "clerk";
@@ -66,6 +86,7 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 
 	@Override
 	public Identifier getTextureLocation(State s) {
+		if (s.sprite.equals("hero")) return hero();
 		return SKINS.computeIfAbsent(s.sprite, k -> {
 			Identifier id = Retromon.id("textures/entity/npc/" + k + ".png");
 			return Minecraft.getInstance().getResourceManager().getResource(id).isPresent() ? id : FALLBACK;

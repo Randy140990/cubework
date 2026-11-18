@@ -31,7 +31,7 @@ public final class Adventure {
 	public static boolean inSave;
 	/** How far back the camera sits (blocks), and where it's easing to. Close to the games' view, a little room either way. */
 	public static double distance = 30, distanceTarget = 30;
-	public static final double PITCH = 55, FOV = 34, NEAR = 24, FAR = 40;
+	public static final double PITCH = 52, FOV = 34, NEAR = 24, FAR = 40;
 	/** The camera always looks north, as the games do. */
 	public static final float YAW = 180F;
 	/** Held still (a trainer has spotted you, or a text box is up). */
@@ -56,7 +56,8 @@ public final class Adventure {
 
 	public static void register() {
 		START = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.retromon.start", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_ENTER, CATEGORY));
-		SPEED = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.retromon.speed", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, CATEGORY));
+		// TAB, not R: shader packs reload on R. (A new name, so the old R setting isn't carried over.)
+		SPEED = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.retromon.fast", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, CATEGORY));
 		TOGGLE = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.retromon.toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F7, CATEGORY));
 	}
 
@@ -94,19 +95,22 @@ public final class Adventure {
 		}
 		if (!active()) return;
 		if (mc.options.getCameraType() != CameraType.THIRD_PERSON_BACK) mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
-		if (frozen > 0) frozen--;
+		if (frozen > 0 && --frozen == 0 && mc.screen == null) focus(-1);
 		distance += (distanceTarget - distance) * 0.2;
-		while (SPEED.consumeClick()) {
-			speed = speed >= 4 ? 1 : speed + 1;
-			CompoundTag t = new CompoundTag();
-			t.putInt("times", speed);
-			ClientPlayNetworking.send(new Net.Act("speed", t));
-		}
+		while (SPEED.consumeClick()) cycleSpeed();
 		hidden = !BattleScene.active() && behind(mc);
 		if (mc.screen == null) {
 			while (mc.options.keyJump.consumeClick()) talk(mc);
 			while (START.consumeClick()) mc.setScreen(new MenuScreen());
 		}
+	}
+
+	/** The game's speed: 1x, 2x, 3x, 4x and round again (the world, and battles with it). */
+	public static void cycleSpeed() {
+		speed = speed >= 4 ? 1 : speed + 1;
+		CompoundTag t = new CompoundTag();
+		t.putInt("times", speed);
+		ClientPlayNetworking.send(new Net.Act("speed", t));
 	}
 
 	public static void zoom(double scroll) {
@@ -128,10 +132,38 @@ public final class Adventure {
 		if (other != null) centre = follow.lerp(other.getPosition(partial).add(0, 0.9, 0), 0.5);
 		else focusId = -1;
 		Vec3 target = follow.lerp(centre, focusIn);
-		double dist = distance + (13 - distance) * focusIn, pitchDeg = PITCH - 12 * focusIn;
+		// Closing in only as far as the view stays clear: if the closer, lower camera would be inside a roof
+		// or a wall behind them, it stays up and back (no clipping into buildings).
+		if (focusIn > 0.01 && e.level() != null) {
+			double[] full = camAt(target, 13, PITCH - 12);
+			var hit = e.level().clip(new net.minecraft.world.level.ClipContext(target, new Vec3(full[0], full[1], full[2]),
+					net.minecraft.world.level.ClipContext.Block.VISUAL, net.minecraft.world.level.ClipContext.Fluid.NONE, e));
+			boolean clear = hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS;
+			focusRoom += ((clear ? 1 : 0) - focusRoom) * 0.1;
+		} else focusRoom = 1;
+		double k = focusIn * focusRoom;
+		double dist = distance + (13 - distance) * k, pitchDeg = PITCH - 12 * k;
+		double[] at = camAt(target, dist, pitchDeg);
+		// Even so, never inside something: pulled in in front of whatever's in the way.
+		if (focusIn > 0.01 && e.level() != null) {
+			Vec3 c = new Vec3(at[0], at[1], at[2]);
+			var hit = e.level().clip(new net.minecraft.world.level.ClipContext(target, c, net.minecraft.world.level.ClipContext.Block.VISUAL,
+					net.minecraft.world.level.ClipContext.Fluid.NONE, e));
+			if (hit.getType() != net.minecraft.world.phys.HitResult.Type.MISS && focusRoom < 0.5) {
+				double d = Math.max(4, hit.getLocation().distanceTo(target) - 0.6);
+				if (d < dist) at = camAt(target, dist + (d - dist) * focusIn, pitchDeg);
+			}
+		}
+		return lastPose = new double[] {at[0], at[1], at[2], YAW, (float) pitchDeg};
+	}
+
+	/** How far the talking camera has room to close in (0 to 1). */
+	private static double focusRoom = 1;
+
+	private static double[] camAt(Vec3 target, double dist, double pitchDeg) {
 		double yaw = Math.toRadians(YAW), pitch = Math.toRadians(pitchDeg);
 		double lx = -Math.sin(yaw) * Math.cos(pitch), ly = -Math.sin(pitch), lz = Math.cos(yaw) * Math.cos(pitch);
-		return lastPose = new double[] {target.x - lx * dist, target.y - ly * dist, target.z - lz * dist, YAW, (float) pitchDeg};
+		return new double[] {target.x - lx * dist, target.y - ly * dist, target.z - lz * dist};
 	}
 
 	/** A: talk to whoever's in front of you (or close by), person or Pokémon. */

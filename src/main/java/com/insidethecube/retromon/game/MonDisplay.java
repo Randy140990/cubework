@@ -29,6 +29,9 @@ public class MonDisplay extends Entity {
 	public int actionAge;
 	/** Tinted red (drawn into a ball as light) for so many ticks, or 0. */
 	public int red;
+	/** Fainting: ticks left (it sags, keels over and sinks a little), from FAINT. */
+	public int faint;
+	public static final int FAINT = 34;
 	/** Celebrating a win: ticks left (hops, a twirl). */
 	public int cheer;
 	public static final int CHEER = 44;
@@ -67,6 +70,7 @@ public class MonDisplay extends Entity {
 		if (flash > 0) flash--;
 		if (red > 0) red--;
 		if (cheer > 0) cheer--;
+		if (faint > 0) faint--;
 		if (action != null && ++actionAge > 100) action = null;
 	}
 

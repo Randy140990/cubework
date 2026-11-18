@@ -100,9 +100,9 @@ public class StarterScreen extends GameScreen {
 		atSince = ticks;
 		step = Step.AFTER;
 		String mon = Species.get(IDS[at]).name();
-		box.set(List.of(name + " received " + mon + "!", "Here are some POKé BALLS and POTIONS to start you off.",
-				"Wild POKéMON live in the tall grass. ROUTE 1 is just north of here.",
-				"Heal at the POKéMON CENTER in VIRIDIAN CITY, and shop at the MART.", "Press ENTER for your menu. Good luck, " + name + "!"));
+		box.set(List.of(name + " received " + mon + "!", "Here are some POTIONS to start you off.",
+				"If a wild POKéMON appears, your POKéMON can fight against it!",
+				"ROUTE 1 is just north of here. Afterward, go on to the next town, VIRIDIAN CITY.", "Press ENTER for your menu. Good luck, " + name + "!"));
 	}
 
 	private void advance() {
