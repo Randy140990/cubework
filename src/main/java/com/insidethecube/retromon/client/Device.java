@@ -203,6 +203,8 @@ public final class Device {
 		Ui.vignette(g, W, H, 0x05070F, 0.55F * k);
 		if (f.y() >= H) return;
 		int x = f.x(), y = f.y(), w = f.w(), h = f.h(), r = Math.max(6, h / 11);
+		// Your hands first: they hold it from behind.
+		hands(g, f, H);
 		// A soft shadow, the body (a darker lip along the bottom), lit along the top.
 		disc(g, x + w / 2, y + h + h / 10, w / 2, h / 14, 0x30000000);
 		rounded(g, x + 2, y + 5, w, h, r, 0x50000000);
@@ -212,7 +214,18 @@ public final class Device {
 			int in = inset(r, i);
 			g.fill(x + in, y + i, x + w - in, y + i + 1, Ui.alpha(0xFFFFFFFF, 0.22F * (1 - i / (float) r)));
 		}
-		g.fill(x + r, y + h / 2, x + w - r, y + h / 2 + Math.max(1, h / 160), 0x33000000);
+		// It folds in the middle: the right half opened out a little away from the light, and the hinge down the
+		// middle, its knuckles standing proud of the top and bottom edges.
+		int cx = x + w / 2;
+		half(g, x, y, w, h - Math.max(3, h / 60), r, cx, 0x1C000000);
+		int hw = Math.max(5, f.bez()), ky = Math.max(2, f.bez() / 3);
+		rounded(g, cx - hw / 2 + 1, y - ky + 2, hw, h + 2 * ky - 2, hw / 2, 0x50000000);
+		rounded(g, cx - hw / 2, y - ky, hw, h + 2 * ky - 2, hw / 2, RED_DARK);
+		g.fill(cx - hw / 2 + 1, y - ky + 2, cx + hw / 2 - 1, y + h + ky - 4, 0xFFC22C27);
+		g.fill(cx - hw / 2 + 1, y - ky + 2, cx - hw / 2 + 2, y + h + ky - 4, 0x40FFFFFF);
+		g.fill(cx - 1, y - ky + 2, cx, y + h + ky - 4, 0x60FFFFFF);
+		g.fill(cx + hw / 2 - 2, y - ky + 2, cx + hw / 2 - 1, y + h + ky - 4, 0x50000000);
+		for (int yy : new int[] {y - ky + 2 + hw / 2, y + h / 2, y + h + ky - 4 - hw / 2}) g.fill(cx - hw / 2 + 1, yy, cx + hw / 2 - 1, yy + 1, 0x30000000);
 		// The lens, top left (white ring, blue glass, a glint), and three lights beside it.
 		int lr = Math.max(5, (int) (f.bez() * 1.25F)), lx = x + r + lr / 2, ly = y + Math.max(2, f.bez() / 3);
 		disc(g, lx, ly + 1, lr + 2, lr + 2, 0x55000000);
@@ -257,10 +270,27 @@ public final class Device {
 		if (!place.isEmpty()) Ui.centred(g, font, place, bx + bw / 2, ty, Ui.MUTED, s, false);
 		String cash = Ui.money(ClientState.data.money);
 		Ui.right(g, font, cash, bx + bw - 10, ty, Ui.GOLD, s);
-		hands(g, f, H);
+		// The crease where it folds, across the screen and all that's on it; the halves lit a little differently.
+		int cx = f.ix() + f.iw() / 2, cw = Math.max(3, f.iw() / 30);
+		g.fill(f.ix() + 2, f.iy(), cx, f.iy() + f.ih(), 0x07FFFFFF);
+		g.fill(cx, f.iy(), f.ix() + f.iw() - 2, f.iy() + f.ih(), 0x10000000);
+		for (int i = -cw; i < cw; i++) {
+			float a = 1 - Math.abs(i + 0.5F) / cw;
+			g.fill(cx + i, f.iy(), cx + i + 1, f.iy() + f.ih(), Ui.alpha(0xFF000000, 0.34F * a * a));
+		}
+		g.fill(cx + 1, f.iy(), cx + 2, f.iy() + f.ih(), 0x18FFFFFF);
 	}
 
-	/** Your forearms coming up from the bottom of the screen, a hand at each side of it, thumbs over the front. */
+	/** One half of a rounded shape (from x = from to its right edge), in a colour. */
+	private static void half(GuiGraphics g, int x, int y, int w, int h, int r, int from, int color) {
+		for (int i = 0; i < h; i++) {
+			int in = i < r ? inset(r, i) : i >= h - r ? inset(r, h - 1 - i) : 0;
+			int a = Math.max(from, x + in), b = x + w - in;
+			if (b > a) g.fill(a, y + i, b, y + i + 1, color);
+		}
+	}
+
+	/** Your forearms coming up from the bottom of the screen, a hand at each side holding it from behind. */
 	private static void hands(GuiGraphics g, Frame f, int H) {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null) return;
@@ -288,25 +318,14 @@ public final class Device {
 		g.pose().translate(gx, gy);
 		g.pose().rotate(angle);
 		g.pose().scale(1, -1);
-		// Beside the device (overlapping its edge by a pixel of the skin): the arm's outer side, darker as it turns
-		// away from the light, then its front; the sleeve over both.
-		int fx = left ? -w + p : -p;
+		// Beside the device, the hand going round behind its edge: the arm's outer side, darker as it turns away
+		// from the light, then its front; the sleeve over both.
+		int fx = left ? -w + 2 * p : -2 * p;
 		int sx = left ? fx - side : fx + w;
 		g.blit(RenderPipelines.GUI_TEXTURED, skin, sx, -L, su, sv, side, L, 4, 12, 64, 64, 0xFF9AA0A8);
 		g.blit(RenderPipelines.GUI_TEXTURED, skin, fx, -L, fu, fv, w, L, 4, 12, 64, 64, 0xFFFFFFFF);
 		g.blit(RenderPipelines.GUI_TEXTURED, skin, sx, -L, lsu, lsv, side, L, 4, 12, 64, 64, 0xFF9AA0A8);
 		g.blit(RenderPipelines.GUI_TEXTURED, skin, fx, -L, lu, lv, w, L, 4, 12, 64, 64, 0xFFFFFFFF);
-		// A soft shade where the hand meets the device.
-		g.fill(fx, -p, fx + w, 0, 0x22000000);
-		g.pose().popMatrix();
-		// The thumb, over the front of the device (the hand's own colour).
-		g.pose().pushMatrix();
-		float tx = gx + (left ? 1 : -1) * p * 0.9F, ty = gy - p * 0.9F;
-		g.pose().translate(tx, ty);
-		g.pose().rotate(left ? 0.5F : -0.5F);
-		int tw = Math.max(2, Math.round(p * 1.3F)), th = Math.max(3, Math.round(p * 2.1F));
-		g.fill(-tw / 2 + 1, -th / 2 + 2, tw / 2 + 1, th / 2 + 2, 0x40000000);
-		g.blit(RenderPipelines.GUI_TEXTURED, skin, -tw / 2, -th / 2, fu + 1, fv + 10, tw, th, 2, 2, 64, 64, 0xFFFFFFFF);
 		g.pose().popMatrix();
 	}
 
