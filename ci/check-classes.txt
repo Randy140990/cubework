@@ -1,0 +1,4 @@
+net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
+net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry$Factory
+net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry$Context
+net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
