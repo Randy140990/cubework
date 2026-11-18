@@ -1,6 +1,0 @@
-grep (void.update|hasEffect|NIGHT_VISION|getNightVisionScale) net/minecraft/client/renderer/LightTexture.java
-grep (getNightVisionScale) net/minecraft/client/renderer/GameRenderer.java
-grep (shouldEntityAppearGlowing) net/minecraft/client/Minecraft.java
-grep (public.int.getTeamColor) net/minecraft/world/entity/Entity.java
-grep (VoxelShape.getCollisionShape) net/minecraft/world/level/block/state/BlockBehaviour.java
-grep (outlineColor|shouldEntityAppearGlowing|getTeamColor) net/minecraft/client/renderer/entity/EntityRenderer.java
