@@ -1,0 +1,8 @@
+grep (submitSkinRenderState|submitEntityRenderState|public.void.fillGradient) net/minecraft/client/gui/GuiGraphics.java
+net/minecraft/client/gui/components/PlayerSkinWidget.java
+net/minecraft/client/gui/render/pip/GuiSkinRenderer.java
+net/minecraft/client/gui/render/state/pip/GuiSkinRenderState.java
+grep (class|public.PlayerModel|ModelPart.(leftArm|rightArm|head)|public.static) net/minecraft/client/model/player/PlayerModel.java
+grep (class|public.PlayerModel|leftArm|rightArm|public.static) net/minecraft/client/model/PlayerModel.java
+grep (PLAYER.=|PLAYER_SLIM) net/minecraft/client/model/geom/ModelLayers.java
+grep (getEntityModels|EntityModelSet) net/minecraft/client/Minecraft.java
