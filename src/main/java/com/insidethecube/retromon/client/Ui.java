@@ -126,6 +126,11 @@ public final class Ui {
 		g.pose().popMatrix();
 	}
 
+	/** A whole picture (texW by texH) drawn into a box, tinted with a colour (0xFFFFFFFF for none). */
+	public static void pic(GuiGraphics g, net.minecraft.resources.Identifier id, int x, int y, int w, int h, int texW, int texH, int color) {
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, id, x, y, 0, 0, w, h, texW, texH, texW, texH, color);
+	}
+
 	/** A white picture (an icon) tinted with a colour. */
 	public static void icon(GuiGraphics g, String name, int x, int y, int size, int color) {
 		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, Retromon.id("textures/gui/" + name + ".png"), x, y, 0, 0, size, size, 32, 32, 32, 32,

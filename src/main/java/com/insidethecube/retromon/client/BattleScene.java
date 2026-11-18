@@ -128,20 +128,21 @@ public final class BattleScene {
 		float h = stageH;
 		build(stageAt);
 		double far = 6.0 + Math.max(0, h - 1.5) * 1.3;
-		mineAt = centre.add(-0.5, 0, 2.4);
-		enemyAt = centre.add(1.9, 0, 2.4 - far);
+		mineAt = centre.add(-0.6, 0, 2.2);
+		enemyAt = centre.add(1.8, 0, 2.2 - far);
 		if (kind.equals("water")) enemyAt = new Vec3(enemyAt.x, centre.y - 0.1, enemyAt.z);
 		mine = spawn(mineAt, face(mineAt, enemyAt));
 		theirs = spawn(enemyAt, face(enemyAt, mineAt));
 		// Behind your Pokémon and a little above, looking across to theirs (the newer games' view): yours low and
 		// left of the middle, clear of your card, theirs further off to the right.
-		cam = centre.add(0.0, 1.9 + Math.max(0, h - 2) * 0.4, 7.4 + Math.max(0, h - 2) * 0.9);
+		cam = centre.add(-1.4, 2.2 + Math.max(0, h - 2) * 0.4, 9.8 + Math.max(0, h - 2) * 0.9);
 		aim(mineAt.lerp(enemyAt, 0.5).add(0, 0.8 + Math.max(0, h - 1) * 0.15, 0));
+		introTicks = INTRO;
 		// You stand behind yours, off to the left (the newer games' view); their trainer behind theirs.
-		Vec3 heroAt = mineAt.add(-1.5, 0, 1.3);
+		Vec3 heroAt = mineAt.add(-2.0, 0, 1.5);
 		hero = person("hero", com.insidethecube.retromon.game.Npc.PERSON, heroAt, face(heroAt, enemyAt));
 		if (foeKey != null && !foeKey.isEmpty()) {
-			Vec3 foeAt = enemyAt.add(1.5, 0, -1.7 - Math.max(0, h - 1.5) * 0.4);
+			Vec3 foeAt = enemyAt.add(2.1, 0, -1.8 - Math.max(0, h - 1.5) * 0.4);
 			foe = person(foeKey, foeRole, foeAt, face(foeAt, mineAt));
 		}
 	}
@@ -197,6 +198,10 @@ public final class BattleScene {
 		cam = at.add(0, 0.9 + h * 0.45, 2.6 + h * 1.1);
 		aim(at.add(0, h * 0.5, 0));
 	}
+
+	/** The camera's opening sweep: ticks left (from their side, round to behind you). */
+	private static int introTicks;
+	private static final int INTRO = 64;
 
 	private static void aim(Vec3 look) {
 		camTarget = look;
@@ -667,7 +672,7 @@ public final class BattleScene {
 		int cx = you.getX(), cz = you.getZ();
 		centre = new Vec3(cx + 0.5, y + 1, cz + 0.5);
 		RNG.setSeed(cx * 31L + cz);
-		int r = 14;
+		int r = 19;
 		for (int dx = -r - 3; dx <= r + 3; dx++) {
 			for (int dz = -r - 3; dz <= r + 3; dz++) {
 				double d = Math.sqrt(dx * dx + dz * dz);
@@ -677,18 +682,22 @@ public final class BattleScene {
 		}
 		switch (kind) {
 			case "forest" -> {
-				ring(cx, y, cz, 10.5, 15, 9, true);
-				ring(cx, y, cz, 13.5, 18, 11, true);
-				plants(cx, y, cz, 6, 12, 0.35, Blocks.FERN.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(), Blocks.BROWN_MUSHROOM.defaultBlockState());
+				hedges(cx, y, cz, 8.6, 10.0, true);
+				ring(cx, y, cz, 10.5, 17, 9, true);
+				ring(cx, y, cz, 13.5, 22, 11, true);
+				ring(cx, y, cz, 16.8, 28, 13, true);
+				plants(cx, y, cz, 6, 9.5, 0.4, Blocks.FERN.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(), Blocks.BROWN_MUSHROOM.defaultBlockState());
 			}
 			case "cave" -> rocks(cx, y, cz);
 			case "gym" -> gym(cx, y, cz);
 			case "water" -> {
 				ring(cx, y, cz, 12.5, 9, 7, false);
+				ring(cx, y, cz, 16.5, 22, 11, false);
 				plants(cx, y, cz, 4, 9, 0.2, Blocks.SHORT_GRASS.defaultBlockState(), Blocks.SUGAR_CANE.defaultBlockState(), Blocks.LILY_PAD.defaultBlockState());
 			}
 			case "town" -> {
 				ring(cx, y, cz, 12.5, 8, 7, false);
+				ring(cx, y, cz, 16.5, 24, 11, false);
 				plants(cx, y, cz, 7, 11, 0.25, Blocks.POPPY.defaultBlockState(), Blocks.DANDELION.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState());
 				for (int i = 0; i < 6; i++) {
 					double a = Math.toRadians(i * 60 + 30);
@@ -700,10 +709,14 @@ public final class BattleScene {
 				}
 			}
 			default -> {
-				ring(cx, y, cz, 11.5, 12, 8, false);
-				ring(cx, y, cz, 14.5, 14, 10, false);
-				plants(cx, y, cz, 6.5, 11, 0.45, Blocks.TALL_GRASS.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(), Blocks.DANDELION.defaultBlockState(),
-						Blocks.POPPY.defaultBlockState(), Blocks.AZURE_BLUET.defaultBlockState());
+				// Let's Go's fields: open grass in the middle, long grass and hedges at its edge, then a deep wall of
+				// round trees all the way round (no sky or edge showing between them).
+				hedges(cx, y, cz, 8.8, 10.2, false);
+				ring(cx, y, cz, 10.8, 16, 7, false);
+				ring(cx, y, cz, 13.6, 22, 10, false);
+				ring(cx, y, cz, 16.8, 28, 12, false);
+				plants(cx, y, cz, 6.2, 9.6, 0.5, Blocks.TALL_GRASS.defaultBlockState(), Blocks.TALL_GRASS.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(),
+						Blocks.DANDELION.defaultBlockState(), Blocks.POPPY.defaultBlockState(), Blocks.AZURE_BLUET.defaultBlockState());
 			}
 		}
 		lights(cx, y, cz);
@@ -745,12 +758,26 @@ public final class BattleScene {
 		for (int i = 0; i < n; i++) {
 			double a = Math.toRadians(i * 360.0 / n + RNG.nextInt(10));
 			int tx = cx + (int) Math.round(Math.sin(a) * radius), tz = cz + (int) Math.round(Math.cos(a) * radius);
-			if (tz - cz > 4 && Math.abs(tx - cx) < 9) continue;
+			if (tz - cz > 2 && Math.abs(tx - cx) < 10) continue;
 			int kindOf = mixed ? RNG.nextInt(3) : 0;
 			BlockState log = kindOf == 1 ? Blocks.SPRUCE_LOG.defaultBlockState() : kindOf == 2 ? Blocks.BIRCH_LOG.defaultBlockState() : Blocks.OAK_LOG.defaultBlockState();
 			BlockState leaves = (kindOf == 1 ? Blocks.SPRUCE_LEAVES : kindOf == 2 ? Blocks.BIRCH_LEAVES : Blocks.OAK_LEAVES).defaultBlockState()
 					.setValue(LeavesBlock.PERSISTENT, true);
 			tree(tx, y + 1, tz, h - 2 + RNG.nextInt(4), log, leaves);
+		}
+	}
+
+	/** Low hedges (leaves a block or two high) round the field's edge, between two radii, clear of the camera. */
+	private static void hedges(int cx, int y, int cz, double from, double to, boolean mixed) {
+		for (int dx = (int) -to; dx <= to; dx++) {
+			for (int dz = (int) -to; dz <= to; dz++) {
+				double d = Math.sqrt(dx * dx + dz * dz);
+				if (d < from || d > to || dz > 1 && Math.abs(dx) < 10 || RNG.nextInt(10) < 3) continue;
+				BlockState leaves = (mixed && RNG.nextInt(3) == 0 ? Blocks.SPRUCE_LEAVES : Blocks.OAK_LEAVES).defaultBlockState()
+						.setValue(LeavesBlock.PERSISTENT, true);
+				set(cx + dx, y + 1, cz + dz, leaves);
+				if (RNG.nextInt(3) > 0) set(cx + dx, y + 2, cz + dz, leaves);
+			}
 		}
 	}
 
@@ -864,6 +891,7 @@ public final class BattleScene {
 		IMPACTS.clear();
 		ARROWS.clear();
 		cheerTicks = 0;
+		introTicks = 0;
 		LATER.clear();
 		hero = foe = null;
 		built = false;
@@ -972,6 +1000,7 @@ public final class BattleScene {
 			if (age >= f.life()) FX.remove(i);
 		}
 		if (cheerTicks > 0) cheerTicks--;
+		if (introTicks > 0) introTicks--;
 		for (int i = IMPACTS.size() - 1; i >= 0; i--) if (++IMPACTS.get(i).age > IMPACTS.get(i).life) IMPACTS.remove(i);
 		for (int i = ARROWS.size() - 1; i >= 0; i--) if (++ARROWS.get(i).age > Arrows.LIFE) ARROWS.remove(i);
 	}
@@ -984,7 +1013,21 @@ public final class BattleScene {
 			sy = (RNG.nextDouble() - 0.5) * k;
 		}
 		double x = cam.x, y = cam.y, z = cam.z, yaw = camYaw, pitch = camPitch;
-		if (cheerTicks > 0) {
+		if (introTicks > 0) {
+			// The opening: low on their side, looking at them (and their trainer), then round and back to you.
+			float t = 1 - (introTicks - partial) / INTRO;
+			double w = Math.min(1, Math.max(0, (t - 0.15) / 0.85));
+			w = w * w * (3 - 2 * w);
+			Vec3 them = foe != null ? enemyAt.lerp(foe.position(), 0.35) : enemyAt;
+			Vec3 from = enemyAt.add(-3.6, 1.4 + height(1) * 0.3, 4.6);
+			Vec3 lookFrom = them.add(0, 0.6 + height(1) * 0.35, 0);
+			x = from.x + (x - from.x) * w;
+			y = from.y + (y - from.y) * w;
+			z = from.z + (z - from.z) * w;
+			Vec3 at = lookFrom.lerp(camTarget, w).subtract(x, y, z);
+			yaw = Math.toDegrees(Math.atan2(-at.x, at.z));
+			pitch = Math.toDegrees(Math.atan2(-at.y, Math.sqrt(at.x * at.x + at.z * at.z)));
+		} else if (cheerTicks > 0) {
 			// In front of yours, a little to the side, looking back at it.
 			float t = 1 - (cheerTicks - partial) / cheerMax;
 			double w = t < 0.2 ? t / 0.2 : t > 0.82 ? (1 - t) / 0.18 : 1;
@@ -1006,11 +1049,11 @@ public final class BattleScene {
 			double w = Math.sin(Math.PI * Math.max(0, Math.min(1, t)));
 			w = w * w;
 			Vec3 focus = spot(shotSide).add(0, 0.25 + height(shotSide) * 0.45, 0);
-			double push = shotSide == 0 ? 0.16 : 0.1;
+			double push = shotSide == 0 ? 0.42 : 0.36;
 			x += (focus.x - x) * push * w;
 			y += (focus.y - y) * push * 0.5 * w;
 			z += (focus.z - z) * push * w;
-			Vec3 look = camTarget.lerp(focus, 0.28 * w).subtract(x, y, z);
+			Vec3 look = camTarget.lerp(focus, 0.55 * w).subtract(x, y, z);
 			yaw = Math.toDegrees(Math.atan2(-look.x, look.z));
 			pitch = Math.toDegrees(Math.atan2(-look.y, Math.sqrt(look.x * look.x + look.z * look.z)));
 		}
