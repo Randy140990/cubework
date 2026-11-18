@@ -75,6 +75,22 @@ jobs:
               esac
             done < ci/check-sources.txt
           fi
+          # Vanilla client assets matching the patterns in ci/check-assets.txt (one a line, e.g.
+          # "assets/minecraft/textures/block/"), zipped into out/assets.zip.
+          if [ -s ci/check-assets.txt ]; then
+            CJ=$(find ~/.gradle .gradle -name "*.jar" 2>/dev/null | grep -i -E "minecraft-(client|merged)|client-.*\.jar|minecraft.*client" | grep -v sources | head -n 1)
+            for J in $(find ~/.gradle .gradle -name "*.jar" 2>/dev/null | grep -i minecraft | grep -v sources); do
+              if unzip -l "$J" 2>/dev/null | grep -q "assets/minecraft/textures/block/stone.png"; then CJ="$J"; break; fi
+            done
+            echo "client: $CJ" > out/assets.txt
+            mkdir -p /tmp/assets && cd /tmp/assets
+            while read -r pat; do
+              [ -z "$pat" ] && continue
+              unzip -o -q "$CJ" "${pat}*" >> "$GITHUB_WORKSPACE/out/assets.txt" 2>&1 || true
+            done < "$GITHUB_WORKSPACE/ci/check-assets.txt"
+            zip -q -r "$GITHUB_WORKSPACE/out/assets.zip" . || true
+            cd "$GITHUB_WORKSPACE"
+          fi
           exit 0
       - name: Save
         continue-on-error: true

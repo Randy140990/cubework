@@ -1,0 +1,6 @@
+net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback
+net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
+net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents
+net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents$Load
+net.minecraft.client.renderer.texture.NativeImage
+com.mojang.blaze3d.platform.NativeImage

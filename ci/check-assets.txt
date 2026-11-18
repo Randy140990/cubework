@@ -1,0 +1,4 @@
+assets/minecraft/textures/block/
+assets/minecraft/models/block/
+assets/minecraft/blockstates/
+assets/minecraft/textures/colormap/
