@@ -1,6 +1,2 @@
-net.minecraft.network.chat.FontDescription
-net.minecraft.network.chat.FontDescription$Resource
-net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
-net.minecraft.client.color.block.BlockColor
-net.minecraft.client.renderer.BiomeColors
-net.minecraft.world.level.FoliageColor
+net.fabricmc.fabric.api.resource.ResourceManagerHelper
+net.fabricmc.fabric.api.resource.ResourcePackActivationType

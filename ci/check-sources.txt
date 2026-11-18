@@ -1,0 +1,5 @@
+grep (public.NativeImage\(|public.void.setPixel|public.int.getPixel|public.static.NativeImage.read|public.void.close) com/mojang/blaze3d/platform/NativeImage.java
+grep (public.DynamicTexture|public.void.upload|public.NativeImage.getPixels) net/minecraft/client/renderer/texture/DynamicTexture.java
+grep (public.void.register|public.AbstractTexture.getTexture|public.void.release) net/minecraft/client/renderer/texture/TextureManager.java
+grep (public.static.void.renderEntityInInventory) net/minecraft/client/gui/screens/inventory/InventoryScreen.java
+data version.json
