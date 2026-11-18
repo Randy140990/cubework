@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.piloswine.ground_idle","ground":"animation.piloswine.ride_jump","texture":"retromon:textures/pokemon/piloswine.png","layers":[],"height":1.2,"standIn":null}
+{"scale":1.0,"idle":"animation.piloswine.ground_idle","ground":"animation.piloswine.ride_jump","texture":"retromon:textures/pokemon/piloswine.png","layers":[],"height":1.2,"standIn":null,"parts":[],"actions":{"cry":"animation.piloswine.cry","recoil":"animation.piloswine.recoil"}}

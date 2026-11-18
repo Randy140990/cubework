@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.slowpoke.ground_idle","ground":"animation.slowpoke.ground_idle","texture":"retromon:textures/pokemon/slowpoke.png","layers":[],"height":0.7,"standIn":null}
+{"scale":1.0,"idle":"animation.slowpoke.ground_idle","ground":"animation.slowpoke.ground_idle","texture":"retromon:textures/pokemon/slowpoke.png","layers":[],"height":0.7,"standIn":null,"parts":[],"actions":{"cry":"animation.slowpoke.cry"}}

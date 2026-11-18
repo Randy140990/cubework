@@ -1,1 +1,1 @@
-{"scale":0.55,"idle":"animation.bellossom.battle_idle","ground":"animation.bellossom.ground_idle","texture":"retromon:textures/pokemon/celebi.png","layers":[],"height":1.1,"standIn":"bellossom"}
+{"scale":0.55,"idle":"animation.bellossom.battle_idle","ground":"animation.bellossom.ground_idle","texture":"retromon:textures/pokemon/celebi.png","layers":[],"height":1.1,"standIn":"bellossom","parts":[],"actions":{"cry":"animation.bellossom.cry","recoil":"animation.bellossom.recoil"}}

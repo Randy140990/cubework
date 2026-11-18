@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.gyarados.air_battle_idle","ground":"animation.gyarados.ride_ground_jump","texture":"retromon:textures/pokemon/gyarados.png","layers":[],"height":3.3,"standIn":null}
+{"scale":1.0,"idle":"animation.gyarados.air_battle_idle","ground":"animation.gyarados.ride_ground_jump","texture":"retromon:textures/pokemon/gyarados.png","layers":[],"height":3.3,"standIn":null,"parts":[],"actions":{"cry":"animation.gyarados.cry","recoil":"animation.gyarados.recoil"}}

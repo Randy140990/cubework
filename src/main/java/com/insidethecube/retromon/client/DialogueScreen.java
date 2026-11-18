@@ -96,9 +96,11 @@ public class DialogueScreen extends GameScreen {
 
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
-		if (npc >= 0) Ui.cinema(g, width, height, Math.min(1, (ticks + partial) / 6F));
+		// (The cinema frame fades in and out round this, from the HUD.) The box rises into place.
 		int h = boxHeight(), m = 6 * s;
-		box.render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, yesNo == null);
+		float in = Math.min(1, (ticks + partial) / 5F);
+		int rise = Math.round((1 - in * in * (3 - 2 * in)) * (h + m) * 0.6F);
+		box.render(g, font, m, height - h - m + rise, width - 2 * m, h, s, ticks, yesNo == null);
 		if (yesNo != null) {
 			int w = yesNo.width(font, s);
 			choice(g, yesNo, width - w - m, height - h - m - yesNo.height(s) - 4 * s, w, i -> done(i == 0));

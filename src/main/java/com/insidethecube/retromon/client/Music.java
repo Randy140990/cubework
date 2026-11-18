@@ -1,15 +1,9 @@
 package com.insidethecube.retromon.client;
 
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import com.insidethecube.retromon.Retromon;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -51,37 +45,15 @@ public final class Music {
 		}
 	}
 
-	private static Path configFile() {
-		return FabricLoader.getInstance().getConfigDir().resolve("retromon-client.properties");
-	}
-
 	public static int level() {
-		if (level < 0) {
-			level = 4;
-			try (Reader r = Files.newBufferedReader(configFile())) {
-				Properties p = new Properties();
-				p.load(r);
-				level = Math.max(0, Math.min(4, Integer.parseInt(p.getProperty("music", "4").trim())));
-			} catch (Exception ignored) {
-				// No settings yet: full volume.
-			}
-		}
+		if (level < 0) level = Settings.get("music", 4, 0, 4);
 		return level;
 	}
 
 	/** Sets the music volume (0 to 4), saves it and carries on the song at the new volume. */
 	public static void setLevel(int value) {
 		level = Math.max(0, Math.min(4, value));
-		try {
-			Files.createDirectories(configFile().getParent());
-			try (Writer w = Files.newBufferedWriter(configFile())) {
-				Properties p = new Properties();
-				p.setProperty("music", Integer.toString(level));
-				p.store(w, "Retromon client settings");
-			}
-		} catch (Exception e) {
-			Retromon.LOG.warn("Couldn't save the music volume: {}", e.toString());
-		}
+		Settings.set("music", level);
 		String song = current;
 		stopSound();
 		current = null;

@@ -42,9 +42,33 @@ public class DexScreen extends GameScreen {
 		return entries;
 	}
 
+	/** Closing: ticks into the fade to white (-1 while open). */
+	private int closing = -1;
+	private static final int FADE = 8;
+
 	private void done() {
+		if (closing >= 0) return;
 		Sounds.press();
-		then.run();
+		Sounds.stopVoice();
+		closing = 0;
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+		// Its cry, then the Pokédex reads its entry (as on TV).
+		if (ticks == 12 && sp != null) Sounds.cry(sp.id(), 1F);
+		if (ticks == 30 && sp != null) Sounds.dexVoice(sp.id());
+		if (closing >= 0 && ++closing >= FADE) {
+			closing = -1;
+			then.run();
+		}
+	}
+
+	@Override
+	public void removed() {
+		Sounds.stopVoice();
+		super.removed();
 	}
 
 	@Override
@@ -70,7 +94,7 @@ public class DexScreen extends GameScreen {
 		g.fill(0, 0, width, height, Ui.alpha(0xF00A0E1C, in));
 		if (sp == null) return;
 		// The Pokédex itself: a red case, the lens and lights along the top, the screen inside.
-		int m = 10 * s, x = m, y = m + Math.round((1 - in) * 30 * s), w = width - 2 * m, h = height - 2 * m;
+		int m = 10 * s, x = m, y = m + Math.round((1 - in) * 12 * s), w = width - 2 * m, h = height - 2 * m;
 		Ui.round(g, x + 2 * s, y + 3 * s, w, h, 0x60000000, 6 * s);
 		Ui.round(g, x, y, w, h, 0xFF7E1820, 6 * s);
 		g.fillGradient(x + s, y + s, x + w - s, y + h - s, 0xFFE0404A, 0xFFB02630);
@@ -98,7 +122,7 @@ public class DexScreen extends GameScreen {
 		Ui.round(g, cx - lw * 3 / 10, feet - 4 * s, lw * 3 / 5, 8 * s, 0xFFB8D4CC, 4 * s);
 		Figures.Batch b = Figures.batch(sx, sy, sx + sw, sy + sh);
 		float hop = t < 16 ? (float) Math.abs(Math.sin(t / 8F * Math.PI)) * 8 * s : 0;
-		b.mon(sp.id(), cx, feet, tall).at(secs).pitch(8).spin(-25 + (float) Math.sin(secs * 0.6) * 35).hop(hop);
+		b.mon(sp.id(), cx, feet, tall).at(secs).pitch(8).spin(-25 + (float) Math.sin(secs * 0.6) * 35).hop(hop).action("cry", secs - 0.4F);
 		b.draw(g);
 		Ui.draw(g, font, Ui.bold("No. " + String.format("%03d", sp.dex())), sx + 8 * s, sy + 7 * s, 0xFF3A4A60, s, false);
 		// A scan line down the screen as the entry comes in.
@@ -137,5 +161,9 @@ public class DexScreen extends GameScreen {
 			Ui.draw(g, font, Ui.bold(reg), rx + 6 * s, ry + 3 * s, Ui.alpha(0xFFFFFFFF, k), s, false);
 		}
 		if (ticks > 10 && (ticks / 10) % 2 == 0) Ui.draw(g, font, Ui.ui("▼"), x + w - 16 * s, y + h - 12 * s, 0xFFFFFFFF, s, false);
+		// In from white, out to white.
+		float white = t < FADE ? 1 - t / FADE : 0;
+		if (closing >= 0) white = Math.min(1, (closing + partial) / FADE);
+		if (white > 0) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, white));
 	}
 }

@@ -1,1 +1,1 @@
-{"scale":0.875,"idle":"animation.ledian.battle_idle","ground":"animation.ledian.ground_idle","texture":"retromon:textures/pokemon/ledian.png","layers":[],"height":1.4,"standIn":null}
+{"scale":0.875,"idle":"animation.ledian.battle_idle","ground":"animation.ledian.ground_idle","texture":"retromon:textures/pokemon/ledian.png","layers":[],"height":1.4,"standIn":null,"parts":[],"actions":{"cry":"animation.ledian.cry"}}

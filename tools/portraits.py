@@ -113,8 +113,9 @@ def idle_pose(folder, info):
     return out
 
 
-def model_quads(geo, anim=None):
+def model_quads(geo, anim=None, hidden=()):
     anim = anim or {}
+    hidden = set(hidden)
     g = geo["minecraft:geometry"][0]
     tex_w = g["description"].get("texture_width", 64)
     tex_h = g["description"].get("texture_height", 64)
@@ -129,6 +130,9 @@ def model_quads(geo, anim=None):
     quads = []
 
     def build(b, parent_m, parent_pivot):
+        # Parts hidden in its pose (Pidgey's open wings) and Ditto's faces are left out, with all they carry.
+        if b["name"] in hidden or "ditto" in b["name"]:
+            return
         pv, rot = vec(b, "pivot"), vec(b, "rotation")
         r = (-math.radians(rot[0]), -math.radians(rot[1]), math.radians(rot[2]))
         if parent_pivot is None:
@@ -174,7 +178,8 @@ def render(species):
     tex_id = info.get("texture") or f"retromon:textures/pokemon/{species}.png"
     ns, path = tex_id.split(":", 1)
     tex = np.array(Image.open(os.path.join(ROOT, "..", ns, path)).convert("RGBA")).astype(np.float32)
-    quads, tw, th = model_quads(geo, idle_pose(folder, info))
+    hidden = [t["part"] for t in info.get("parts", []) if t.get("visible") is False]
+    quads, tw, th = model_quads(geo, idle_pose(folder, info), hidden)
     if not quads:
         return None
     th_img, tw_img = tex.shape[0], tex.shape[1]

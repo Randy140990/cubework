@@ -20,18 +20,18 @@ import net.minecraft.nbt.CompoundTag;
 /** The START menu: your Pokémon (and their summaries), the bag, your trainer card, saving and options. */
 public class MenuScreen extends GameScreen {
 	private enum View {
-		MENU, PARTY, PARTY_ACTION, SUMMARY, BAG, BAG_ACTION, USE_ON, CARD, SAVE, OPTION, MESSAGE
+		MENU, PARTY, PARTY_ACTION, SUMMARY, BAG, BAG_ACTION, USE_ON, CARD, SAVE, WAIT, OPTION, MESSAGE
 	}
 
-	/** Which OPTION row the keys change: 0 text speed, 1 music. */
+	/** Which OPTION row the keys change: 0 text speed, 1 music, 2 the Pokédex voice, 3 nights. */
 	private int optionRow;
-	private static final String[] ITEMS = {"POKéDEX", "POKéMON", "BAG", "MAP", "CLOTHES", "CARD", "SAVE", "OPTION", "EXIT"};
+	private static final String[] ITEMS = {"POKéDEX", "POKéMON", "BAG", "MAP", "CLOTHES", "CARD", "WAIT", "SAVE", "OPTION", "EXIT"};
 	private static final int[] COLORS = {0xFFE5525C, Ui.GREEN, Ui.AMBER, 0xFF4CB8A0, 0xFFB07CE0, Ui.BLUE, Ui.CYAN, 0xFF8C93A8, Ui.RED};
 	private static final String[] POCKETS = {"ITEMS", "BALLS", "KEY ITEMS", "TM & HM"};
 
 	private View view = View.MENU, afterMessage = View.MENU;
 	private int menuAt, partyAt, swapFrom = -1, pocket, bagAt, actionAt;
-	private Choice yesNo;
+	private Choice yesNo, waitChoice;
 	private TextBox message;
 
 	public MenuScreen() {
@@ -108,6 +108,10 @@ public class MenuScreen extends GameScreen {
 				view = View.SAVE;
 			}
 			case "OPTION" -> view = View.OPTION;
+			case "WAIT" -> {
+				waitChoice = new Choice(List.of("MORNING", "MIDDAY", "EVENING", "NIGHT", "CANCEL"));
+				view = View.WAIT;
+			}
 			default -> onClose();
 		}
 	}
@@ -239,17 +243,27 @@ public class MenuScreen extends GameScreen {
 			case CARD -> {
 				if (Ui.isA(e) || Ui.isB(e)) view = View.MENU;
 			}
+			case WAIT -> {
+				if (waitChoice.key(e)) return true;
+				if (Ui.isB(e)) view = View.MENU;
+				else if (Ui.isA(e)) waitUntil(waitChoice.at);
+			}
 			case SAVE -> {
 				if (yesNo.key(e)) return true;
 				if (Ui.isB(e) || (Ui.isA(e) && yesNo.at == 1)) view = View.MENU;
 				else if (Ui.isA(e)) save();
 			}
 			case OPTION -> {
-				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = 1 - optionRow;
+				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = Math.floorMod(optionRow + (Ui.isUp(e) ? -1 : 1), 4);
 				else if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isA(e)) {
 					int step = Ui.isLeft(e) ? -1 : 1;
-					if (optionRow == 0) setSpeed(Math.floorMod(d.textSpeed + step, 3));
-					else Music.setLevel(Math.floorMod(Music.level() + step, 5));
+					switch (optionRow) {
+						case 0 -> setSpeed(Math.floorMod(d.textSpeed + step, 3));
+						case 1 -> Music.setLevel(Math.floorMod(Music.level() + step, 5));
+						case 2 -> Settings.set("voice", Settings.voice() ? 0 : 1);
+						default -> Settings.set("nights", Math.floorMod(Settings.nights() + step, 3));
+					}
+					Sounds.press();
 				} else if (Ui.isB(e)) view = View.MENU;
 			}
 			case MESSAGE -> {
@@ -257,6 +271,21 @@ public class MenuScreen extends GameScreen {
 			}
 		}
 		return true;
+	}
+
+	/** WAIT: rest until a time of day (the screen fades to black while time passes). */
+	private void waitUntil(int which) {
+		if (which >= 4) {
+			view = View.MENU;
+			return;
+		}
+		Sounds.press();
+		onClose();
+		Hud.fadeThrough(() -> {
+			CompoundTag t = new CompoundTag();
+			t.putInt("until", which);
+			ClientPlayNetworking.send(new Net.Act("wait", t));
+		});
 	}
 
 	private void save() {
@@ -304,7 +333,7 @@ public class MenuScreen extends GameScreen {
 		PlayerData d = ClientState.data;
 		int m = 6 * s, h = boxHeight();
 		switch (view) {
-			case MENU, SAVE, OPTION, CARD -> drawMenu(g);
+			case MENU, SAVE, WAIT, OPTION, CARD -> drawMenu(g);
 			default -> {
 			}
 		}
@@ -342,6 +371,11 @@ public class MenuScreen extends GameScreen {
 				});
 			}
 			case OPTION -> drawOptions(g, d);
+			case WAIT -> {
+				TextBox.still("Wait until when?").render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, false);
+				int w = waitChoice.width(font, s);
+				choice(g, waitChoice, width - w - m, height - h - m - waitChoice.height(s) - 4 * s, w, this::waitUntil);
+			}
 			case MESSAGE -> {
 				if (afterMessage == View.BAG) drawBag(g, d);
 				else if (afterMessage == View.PARTY) drawParty(g, d);
@@ -511,35 +545,30 @@ public class MenuScreen extends GameScreen {
 	}
 
 	private void drawOptions(GuiGraphics g, PlayerData d) {
-		int m = 6 * s, w = Math.min(width - 120 * s, 230 * s), h = 112 * s, x = m, y = m;
+		int m = 6 * s, w = Math.min(width - 120 * s, 240 * s), h = 172 * s, x = m, y = m;
 		Ui.panel(g, x, y, w, h, s);
 		int l = x + 12 * s;
-		Ui.text(g, font, "TEXT SPEED", l, y + 10 * s, optionRow == 0 ? Ui.TEXT : Ui.MUTED, s);
-		String[] speeds = {"SLOW", "MID", "FAST"};
-		int bw = (w - 30 * s) / 3;
-		for (int i = 0; i < 3; i++) {
-			int bx = l + i * (bw + 3 * s), by = y + 22 * s;
+		optionRow(g, d, l, y + 10 * s, w, 0, "TEXT SPEED", new String[] {"SLOW", "MID", "FAST"}, d.textSpeed, i -> setSpeed(i));
+		optionRow(g, d, l, y + 46 * s, w, 1, "MUSIC", new String[] {"OFF", "LOW", "MID", "HIGH", "MAX"}, Music.level(), Music::setLevel);
+		optionRow(g, d, l, y + 82 * s, w, 2, "POKéDEX VOICE", new String[] {"OFF", "ON"}, Settings.voice() ? 1 : 0, i -> Settings.set("voice", i));
+		optionRow(g, d, l, y + 118 * s, w, 3, "NIGHTS", new String[] {"DARK", "SOFT", "BRIGHT"}, Settings.nights(), i -> Settings.set("nights", i));
+		Ui.text(g, font, "Mouse wheel: zoom.  R: game speed.  Shift: run.", l, y + h - 14 * s, Ui.DIM, s);
+	}
+
+	private void optionRow(GuiGraphics g, PlayerData d, int l, int y, int w, int row, String label, String[] values, int now,
+			java.util.function.IntConsumer pick) {
+		Ui.text(g, font, label, l, y, optionRow == row ? Ui.TEXT : Ui.MUTED, s);
+		int n = values.length, bw = (w - 24 * s - (n - 1) * 3 * s) / n;
+		for (int i = 0; i < n; i++) {
+			int bx = l + i * (bw + 3 * s), by = y + 12 * s;
 			int idx = i;
-			Ui.button(g, font, bx, by, bw, 16 * s, speeds[i], Ui.BLUE, d.textSpeed == i, s);
+			Ui.button(g, font, bx, by, bw, 16 * s, values[i], Ui.BLUE, now == i, s);
 			hit(bx, by, bw, 16 * s, () -> {
-				optionRow = 0;
-				setSpeed(idx);
+				optionRow = row;
+				pick.accept(idx);
+				Sounds.press();
 			});
 		}
-		Ui.text(g, font, "MUSIC", l, y + 46 * s, optionRow == 1 ? Ui.TEXT : Ui.MUTED, s);
-		String[] levels = {"OFF", "LOW", "MID", "HIGH", "MAX"};
-		int mw = (w - 36 * s) / 5;
-		for (int i = 0; i < 5; i++) {
-			int bx = l + i * (mw + 3 * s), by = y + 58 * s;
-			int idx = i;
-			Ui.button(g, font, bx, by, mw, 16 * s, levels[i], Ui.BLUE, Music.level() == i, s);
-			hit(bx, by, mw, 16 * s, () -> {
-				optionRow = 1;
-				Music.setLevel(idx);
-			});
-		}
-		Ui.text(g, font, "Mouse wheel: zoom.  R: game speed.", l, y + 82 * s, Ui.DIM, s);
-		Ui.text(g, font, "Shift: run.  Up and down: pick a row.", l, y + 94 * s, Ui.DIM, s);
 	}
 
 	@SuppressWarnings("unused")

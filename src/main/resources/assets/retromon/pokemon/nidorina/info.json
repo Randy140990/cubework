@@ -1,1 +1,1 @@
-{"scale":0.9,"idle":"animation.nidorina.battle_idle","ground":"animation.nidorina.ground_idle","texture":"retromon:textures/pokemon/nidorina.png","layers":[],"height":0.8,"standIn":null}
+{"scale":0.9,"idle":"animation.nidorina.battle_idle","ground":"animation.nidorina.ground_idle","texture":"retromon:textures/pokemon/nidorina.png","layers":[],"height":0.8,"standIn":null,"parts":[],"actions":{"cry":"animation.nidorina.cry","recoil":"animation.nidorina.recoil"}}

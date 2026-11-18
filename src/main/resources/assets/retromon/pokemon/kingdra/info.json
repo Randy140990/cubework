@@ -1,1 +1,1 @@
-{"scale":0.9,"idle":"animation.kingdra.water_idle","ground":"animation.kingdra.water_idle","texture":"retromon:textures/pokemon/kingdra.png","layers":[],"height":3.0,"standIn":null}
+{"scale":0.9,"idle":"animation.kingdra.water_idle","ground":"animation.kingdra.water_idle","texture":"retromon:textures/pokemon/kingdra.png","layers":[],"height":3.0,"standIn":null,"parts":[],"actions":{"cry":"animation.kingdra.cry"}}

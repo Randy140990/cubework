@@ -1,1 +1,1 @@
-{"scale":0.7,"idle":"animation.hoothoot.ground_idle","ground":null,"texture":"retromon:textures/pokemon/hoothoot.png","layers":[{"frames":["retromon:textures/pokemon/hoothoot_layer0_0.png"],"fps":0,"emissive":"true","translucent":false}],"height":1.0,"standIn":null}
+{"scale":0.7,"idle":"animation.hoothoot.ground_idle","ground":null,"texture":"retromon:textures/pokemon/hoothoot.png","layers":[{"frames":["retromon:textures/pokemon/hoothoot_layer0_0.png"],"fps":0,"emissive":"true","translucent":false}],"height":1.0,"standIn":null,"parts":[],"actions":{}}

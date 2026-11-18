@@ -72,7 +72,8 @@ public class PokedexScreen extends GameScreen {
 			national = !national;
 			at = Math.min(at, count() - 1);
 			Sounds.press();
-		} else if (Ui.isA(e)) showArea();
+		} else if (e.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_V) listen();
+		else if (Ui.isA(e)) showArea();
 		else if (Ui.isB(e)) back();
 		return true;
 	}
@@ -81,6 +82,21 @@ public class PokedexScreen extends GameScreen {
 	public boolean mouseScrolled(double x, double y, double dx, double dy) {
 		move(dy > 0 ? -3 : 3);
 		return true;
+	}
+
+	/** V: the Pokédex reads the entry aloud (for one you've caught). */
+	private void listen() {
+		Species sp = byDex(at + 1);
+		if (sp != null && ClientState.data.caught.contains(sp.id())) {
+			Settings.set("voice", 1);
+			Sounds.dexVoice(sp.id());
+		}
+	}
+
+	@Override
+	public void removed() {
+		Sounds.stopVoice();
+		super.removed();
 	}
 
 	@Override
@@ -204,6 +220,11 @@ public class PokedexScreen extends GameScreen {
 			List<String> wl = Ui.wrap(font, where, (w - 16 * s) / s);
 			int maxLines = Math.max(1, (y + h - ty - 24 * s) / (11 * s));
 			for (int i = 0; i < wl.size() && i < maxLines; i++) Ui.draw(g, font, Ui.ui(wl.get(i)), x + 8 * s, ty + 12 * s + i * 11 * s, Ui.CREAM_INK, s, false);
+			if (got) {
+				int lw2 = 60 * s, lx = x + w - lw2 - 8 * s - (names.isEmpty() ? 0 : 64 * s), ly2 = y + h - 20 * s;
+				Ui.button(g, font, lx, ly2, lw2, 14 * s, "LISTEN (V)", 0xFFE5525C, over(lx, ly2, lw2, 14 * s), s);
+				hit(lx, ly2, lw2, 14 * s, this::listen);
+			}
 			if (!names.isEmpty()) {
 				int bw = 60 * s, bx = x + w - bw - 8 * s, by = y + h - 20 * s;
 				Ui.button(g, font, bx, by, bw, 14 * s, "ON MAP", 0xFF4CB8A0, over(bx, by, bw, 14 * s), s);

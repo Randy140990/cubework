@@ -1,1 +1,1 @@
-{"scale":1.1,"idle":"animation.arcanine.sleep","ground":"animation.arcanine.ride_jump","texture":"retromon:textures/pokemon/arcanine.png","layers":[],"height":1.7,"standIn":null}
+{"scale":1.1,"idle":"animation.arcanine.sleep","ground":"animation.arcanine.ride_jump","texture":"retromon:textures/pokemon/arcanine.png","layers":[],"height":1.7,"standIn":null,"parts":[],"actions":{"cry":"animation.arcanine.cry","recoil":"animation.arcanine.recoil"}}

@@ -1,1 +1,1 @@
-{"scale":0.9,"idle":"animation.magnemite.air_idle","ground":"animation.magnemite.air_idle","texture":"retromon:textures/pokemon/magnemite.png","layers":[],"height":0.6,"standIn":null}
+{"scale":0.9,"idle":"animation.magnemite.air_idle","ground":"animation.magnemite.air_idle","texture":"retromon:textures/pokemon/magnemite.png","layers":[],"height":0.6,"standIn":null,"parts":[],"actions":{"cry":"animation.magnemite.cry"}}

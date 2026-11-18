@@ -1,1 +1,1 @@
-{"scale":1.2800000000000002,"idle":"animation.jolteon.ground_idle","ground":"animation.jolteon.ground_idle","texture":"retromon:textures/pokemon/raikou.png","layers":[],"height":1.8399999999999999,"standIn":"jolteon"}
+{"scale":1.2800000000000002,"idle":"animation.jolteon.ground_idle","ground":"animation.jolteon.ground_idle","texture":"retromon:textures/pokemon/raikou.png","layers":[],"height":1.8399999999999999,"standIn":"jolteon","parts":[],"actions":{"cry":"animation.jolteon.cry"}}

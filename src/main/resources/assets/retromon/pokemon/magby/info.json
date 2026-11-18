@@ -1,1 +1,1 @@
-{"scale":0.7,"idle":"animation.magby.battle_idle","ground":"animation.magby.ground_idle","texture":"retromon:textures/pokemon/magby.png","layers":[],"height":1.2,"standIn":null}
+{"scale":0.7,"idle":"animation.magby.battle_idle","ground":"animation.magby.ground_idle","texture":"retromon:textures/pokemon/magby.png","layers":[],"height":1.2,"standIn":null,"parts":[],"actions":{"cry":"animation.magby.cry","recoil":"animation.magby.recoil"}}

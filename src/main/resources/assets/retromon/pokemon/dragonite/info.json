@@ -1,1 +1,1 @@
-{"scale":0.9,"idle":"animation.dragonite.battle_idle","ground":null,"texture":"retromon:textures/pokemon/dragonite.png","layers":[],"height":3.2,"standIn":null}
+{"scale":0.9,"idle":"animation.dragonite.battle_idle","ground":null,"texture":"retromon:textures/pokemon/dragonite.png","layers":[],"height":3.2,"standIn":null,"parts":[],"actions":{"cry":"animation.dragonite.cry"}}

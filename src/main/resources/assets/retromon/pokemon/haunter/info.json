@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.haunter.ground_idle","ground":"animation.haunter.ground_idle","texture":"retromon:textures/pokemon/haunter.png","layers":[],"height":1.2,"standIn":null}
+{"scale":1.0,"idle":"animation.haunter.ground_idle","ground":"animation.haunter.ground_idle","texture":"retromon:textures/pokemon/haunter.png","layers":[],"height":1.2,"standIn":null,"parts":[],"actions":{"cry":"animation.haunter.cry"}}

@@ -55,10 +55,13 @@ public final class BattleScene {
 		return active && revealed;
 	}
 
-	/** Whether a stage is up (it's day there whatever the time). */
+	/** Whether a stage is up. */
 	public static boolean staged() {
 		return active;
 	}
+
+	/** The world's time of day when the battle began: it holds there on your screen until it's over (the server holds it too). */
+	public static long heldDay = -1;
 
 	public static void reveal() {
 		revealed = true;
@@ -87,6 +90,7 @@ public final class BattleScene {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null || mc.level == null) return;
 		level = mc.level;
+		heldDay = mc.level.getDayTime();
 		hiddenNpc = npc;
 		kind = arena == null ? "route" : arena;
 		float h = 1;
@@ -171,9 +175,46 @@ public final class BattleScene {
 		return b;
 	}
 
+	/** The ball bounces up off their Pokémon and hangs there, opening. */
+	public static void ballUp() {
+		if (ball == null) return;
+		Vec3 p = ball.position();
+		ball.fly(p.x, p.y + 0.9, p.z + 0.5, 0.35, 7);
+		Sounds.sfx("tink", 1.4F, 0.6F);
+	}
+
+	/** It's drawn into the open ball as red light: tinted red, shrinking as it streams up into it. */
+	public static void absorb() {
+		if (ball == null || theirs == null) return;
+		Vec3 b = ball.position();
+		Vec3 mid = enemyAt.add(0, 0.25 + height(1) * 0.45, 0);
+		theirs.red = 40;
+		theirs.fly(b.x, b.y - 0.35, b.z, 0, 12);
+		theirs.sizeTarget = 0;
+		FX.add(new Fx(BEAM, mid, b, dust(0xFF3A3A, 2.0F), dust(0xFFE0E0, 1.3F), 12, 0, new int[1], 7));
+		sphere(b, ParticleTypes.END_ROD, 12, 0.14);
+		Sounds.sfx("shrink", 1.5F, 0.8F);
+	}
+
+	/** The ball snaps shut on it. */
+	public static void closeBall() {
+		if (ball == null) return;
+		sphere(ball.position(), ParticleTypes.CRIT, 10, 0.2);
+		Sounds.sfx("tink", 1.1F, 0.8F);
+	}
+
+	/** It broke free: back at its spot, red light fading. */
+	public static void release() {
+		if (theirs == null) return;
+		theirs.setPos(enemyAt.x, enemyAt.y, enemyAt.z);
+		theirs.fly(enemyAt.x, enemyAt.y, enemyAt.z, 0, 1);
+		theirs.red = 6;
+		theirs.sizeTarget = 1;
+	}
+
 	/** The ball drops to the ground in front of where their Pokémon was. */
 	public static void dropBall() {
-		if (ball != null) ball.fly(enemyAt.x, enemyAt.y, enemyAt.z, 0.25, 8);
+		if (ball != null) ball.fly(enemyAt.x, enemyAt.y, enemyAt.z + 0.5, 0.25, 8);
 		burst(enemyAt.add(0, 0.6, 0), ParticleTypes.POOF, 10, 0.25);
 	}
 
@@ -558,6 +599,18 @@ public final class BattleScene {
 						Blocks.POPPY.defaultBlockState(), Blocks.AZURE_BLUET.defaultBlockState());
 			}
 		}
+		lights(cx, y, cz);
+	}
+
+	/** Unseen lights over the stage, so a battle at night is moonlit and clear rather than dark. */
+	private static void lights(int cx, int y, int cz) {
+		BlockState light = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 13);
+		for (int i = 0; i < 6; i++) {
+			double a = Math.toRadians(i * 60);
+			int lx = cx + (int) Math.round(Math.sin(a) * 5), lz = cz + (int) Math.round(Math.cos(a) * 5) - 1;
+			set(lx, y + 4, lz, light);
+		}
+		set(cx, y + 5, cz, light);
 	}
 
 	private static void floor(int x, int y, int z, int dx, int dz, double d) {

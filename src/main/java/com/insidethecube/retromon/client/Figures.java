@@ -37,7 +37,13 @@ public final class Figures {
 		final Identifier skin;
 		final String species;
 		final float cx, feet, tall;
-		float facing, pitch, wave, talk, hop, spin, look, nod, seconds, squash = 1;
+		float facing, pitch, wave, talk, hop, spin, look, lookDown, nod, seconds, squash = 1;
+		/** A gesture (people): one of the EMOTES, and how far into it (seconds). */
+		int emote = -1;
+		float emoteSecs;
+		/** A one-off animation (Pokémon): cry, recoil..., and how far into it (seconds). */
+		String action;
+		float actionSecs;
 
 		Fig(Identifier skin, String species, float cx, float feet, float tall) {
 			this.skin = skin;
@@ -89,6 +95,27 @@ public final class Figures {
 			return this;
 		}
 
+		/** The head turned to look, across (positive to the screen's right) and down (positive down), in degrees. */
+		public Fig look(float across, float down) {
+			look = across;
+			lookDown = down;
+			return this;
+		}
+
+		/** A gesture: one of WAVE, CHEER, JUMP, POINT, SPIN, THINK, and how far into it (seconds). */
+		public Fig emote(int kind, float secs) {
+			emote = kind;
+			emoteSecs = secs;
+			return this;
+		}
+
+		/** A Pokémon's one-off animation (its cry, a flinch), secs in. */
+		public Fig action(String name, float secs) {
+			action = name;
+			actionSecs = secs;
+			return this;
+		}
+
 		/** Squashed (below 1) or stretched (above 1) up and down, for a landing or a spring. */
 		public Fig squash(float k) {
 			squash = k;
@@ -100,6 +127,19 @@ public final class Figures {
 			seconds = secs;
 			return this;
 		}
+	}
+
+	/** People's gestures. */
+	public static final int WAVE = 0, CHEER = 1, JUMP = 2, POINT = 3, SPIN = 4, THINK = 5, EMOTES = 6;
+
+	/** How high a gesture lifts them (screen pixels per block of height), for the ones with a jump. */
+	public static float emoteHop(int kind, float secs) {
+		return switch (kind) {
+			case JUMP -> secs < 0.9F ? (float) Math.abs(Math.sin(secs / 0.45F * Math.PI)) * 0.22F : 0;
+			case CHEER -> secs < 1.2F ? (float) Math.abs(Math.sin(secs / 0.3F * Math.PI)) * 0.06F : 0;
+			case SPIN -> secs < 0.6F ? (float) Math.sin(secs / 0.6F * Math.PI) * 0.18F : 0;
+			default -> 0;
+		};
 	}
 
 	/** The figures for one frame over an area of the screen. */
@@ -222,6 +262,7 @@ public final class Figures {
 			m.leftArm.zRot = -0.06F - sway;
 			m.head.xRot = (float) Math.sin(t * 1.1) * 0.03F;
 			m.head.yRot = (float) Math.toRadians(-f.look);
+			m.head.xRot += (float) Math.toRadians(f.lookDown);
 			if (f.talk > 0) {
 				// A hand out as they speak, and a nod.
 				m.rightArm.xRot = f.talk * (-0.75F - (float) Math.sin(t * 4.5) * 0.18F);
@@ -235,6 +276,7 @@ public final class Figures {
 				m.rightArm.xRot = (1 - w) * m.rightArm.xRot + w * -0.15F;
 				m.head.zRot = w * (float) Math.sin(t * 5.5) * 0.06F;
 			}
+			if (f.emote >= 0) gesture(m, f.emote, f.emoteSecs);
 			if (!nested) {
 				copy(m.head, m.hat);
 				copy(m.body, m.jacket);
@@ -245,6 +287,9 @@ public final class Figures {
 			}
 			// The model is two blocks from the top of its head to its feet.
 			float k = f.tall / 2F;
+			float turn = f.emote == SPIN && f.emoteSecs < 0.6F ? f.emoteSecs / 0.6F * 360F : 0;
+			if (f.emote >= 0) pose.translate(0, -emoteHop(f.emote, f.emoteSecs) * f.tall, 0);
+			if (turn != 0) pose.mulPose(Axis.YP.rotationDegrees(-turn));
 			pose.translate(0, -f.tall / 2F, 0);
 			pose.mulPose(Axis.XP.rotationDegrees(f.pitch));
 			pose.translate(0, f.tall / 2F, 0);
@@ -253,6 +298,60 @@ public final class Figures {
 			pose.translate(0F, -1.5F, 0F);
 			m.renderToBuffer(pose, bufferSource.getBuffer(m.renderType(f.skin)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 			bufferSource.endBatch();
+		}
+
+		/** A gesture on the model: arms (and head) for each kind. */
+		private static void gesture(PlayerModel m, int kind, float t) {
+			float sw = (float) Math.sin(t * 11);
+			switch (kind) {
+				case WAVE -> {
+					float w = Math.min(1, t / 0.2F);
+					m.rightArm.zRot = (1 - w) * m.rightArm.zRot + w * (2.55F + sw * 0.38F);
+					m.rightArm.xRot = w * -0.15F;
+					m.head.zRot = w * (float) Math.sin(t * 5.5) * 0.06F;
+				}
+				case CHEER -> {
+					// Both arms up, pumping.
+					float pump = (float) Math.abs(Math.sin(t / 0.3F * Math.PI));
+					m.rightArm.zRot = 2.6F + pump * 0.25F;
+					m.leftArm.zRot = -2.6F - pump * 0.25F;
+					m.rightArm.xRot = m.leftArm.xRot = -0.1F;
+					m.head.xRot -= 0.25F;
+				}
+				case JUMP -> {
+					// A jump for joy: arms flung out and up, legs tucking a little at the top.
+					float up = (float) Math.abs(Math.sin(t / 0.45F * Math.PI));
+					m.rightArm.zRot = 0.5F + up * 1.6F;
+					m.leftArm.zRot = -0.5F - up * 1.6F;
+					m.rightLeg.xRot = -up * 0.35F;
+					m.leftLeg.xRot = up * 0.2F;
+					m.head.xRot -= up * 0.2F;
+				}
+				case POINT -> {
+					// Points out at you, then a little fist pump.
+					float w = Math.min(1, t / 0.18F);
+					m.rightArm.xRot = w * -1.45F;
+					m.rightArm.yRot = w * 0.25F;
+					m.leftArm.xRot = w * (-0.9F + (float) Math.abs(Math.sin(t * 7)) * -0.6F);
+					m.leftArm.zRot = -0.2F;
+				}
+				case SPIN -> {
+					m.rightArm.zRot = 1.3F;
+					m.leftArm.zRot = -1.3F;
+				}
+				case THINK -> {
+					// A hand to the chin, head tipped.
+					float w = Math.min(1, t / 0.25F);
+					m.rightArm.xRot = w * -2.0F;
+					m.rightArm.yRot = w * 0.55F;
+					m.leftArm.xRot = w * -0.6F;
+					m.leftArm.yRot = w * -0.7F;
+					m.head.zRot = w * 0.18F;
+					m.head.xRot += w * 0.12F;
+				}
+				default -> {
+				}
+			}
 		}
 
 		private void drawMon(Fig f, PoseStack pose) {
@@ -266,7 +365,7 @@ public final class Figures {
 			pose.mulPose(Axis.YP.rotationDegrees(-(f.facing + f.spin)));
 			pose.scale(k * m.def.scale, k * m.def.scale, k * m.def.scale);
 			pose.translate(0F, -1.501F, 0F);
-			m.pose(f.seconds);
+			m.pose(f.seconds, f.action, f.actionSecs);
 			m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityCutoutNoCull(m.def.texture)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 			for (BedrockModel.Layer l : m.def.layers) {
 				m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityTranslucentEmissive(l.frame(f.seconds))), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);

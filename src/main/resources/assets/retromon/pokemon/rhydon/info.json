@@ -1,1 +1,1 @@
-{"scale":1.1,"idle":"animation.rhydon.battle_idle","ground":"animation.rhydon.ride_jump","texture":"retromon:textures/pokemon/rhydon.png","layers":[],"height":2.0,"standIn":null}
+{"scale":1.1,"idle":"animation.rhydon.battle_idle","ground":"animation.rhydon.ride_jump","texture":"retromon:textures/pokemon/rhydon.png","layers":[],"height":2.0,"standIn":null,"parts":[],"actions":{"cry":"animation.rhydon.cry","recoil":"animation.rhydon.recoil"}}

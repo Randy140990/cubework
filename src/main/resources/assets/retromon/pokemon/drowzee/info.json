@@ -1,1 +1,1 @@
-{"scale":0.85,"idle":"animation.drowzee.battle_idle","ground":"animation.drowzee.ground_idle","texture":"retromon:textures/pokemon/drowzee.png","layers":[],"height":1.35,"standIn":null}
+{"scale":0.85,"idle":"animation.drowzee.battle_idle","ground":"animation.drowzee.ground_idle","texture":"retromon:textures/pokemon/drowzee.png","layers":[],"height":1.35,"standIn":null,"parts":[],"actions":{"cry":"animation.drowzee.cry","recoil":"animation.drowzee.recoil"}}

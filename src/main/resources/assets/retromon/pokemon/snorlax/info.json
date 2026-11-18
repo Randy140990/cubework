@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.snorlax.battle_idle","ground":"animation.snorlax.ground_idle","texture":"retromon:textures/pokemon/snorlax.png","layers":[],"height":3.35,"standIn":null}
+{"scale":1.0,"idle":"animation.snorlax.battle_idle","ground":"animation.snorlax.ground_idle","texture":"retromon:textures/pokemon/snorlax.png","layers":[],"height":3.35,"standIn":null,"parts":[{"part":"coolhat","visible":false}],"actions":{"cry":"animation.snorlax.cry"}}

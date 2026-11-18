@@ -20,8 +20,9 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 
 	public static class State extends EntityRenderState {
 		BedrockModel model;
-		float yaw, size, lunge, lift, wobble;
-		boolean hidden;
+		float yaw, size, lunge, lift, wobble, actionSecs;
+		boolean hidden, red;
+		String action;
 		Identifier texture;
 	}
 
@@ -65,6 +66,9 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 			}
 		}
 		s.hidden = e.flash > 0 && (e.flash / 2) % 2 == 0;
+		s.action = e.action;
+		s.actionSecs = (e.actionAge + partial) / 20F;
+		s.red = e.red > 0;
 		s.texture = e.texture == null ? null : Identifier.parse(e.texture);
 		s.wobble = e.wobble > 0 ? Mth.sin((12 - e.wobble + partial) / 12F * (float) Math.PI * 2) * 25F : 0;
 	}
@@ -87,10 +91,12 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 		pose.scale(-1F, -1F, 1F);
 		pose.scale(scale, scale, scale);
 		pose.translate(0F, -1.501F, 0F);
-		m.pose(s.ageInTicks / 20.0);
+		m.pose(s.ageInTicks / 20.0, s.action, s.actionSecs);
 		// Lit at least a little, so battles at night can still be seen.
 		int light = Math.max(s.lightCoords & 0xFFFF, 11 << 4) | (s.lightCoords & 0xFFFF0000);
-		out.submitModelPart(m.root, pose, RenderTypes.entityCutoutNoCull(s.texture != null ? s.texture : m.def.texture), light, OverlayTexture.NO_OVERLAY, null);
+		// Red light as it's drawn into a ball.
+		int overlay = s.red ? OverlayTexture.pack(0, 3) : OverlayTexture.NO_OVERLAY;
+		out.submitModelPart(m.root, pose, RenderTypes.entityCutoutNoCull(s.texture != null ? s.texture : m.def.texture), s.red ? FULL_BRIGHT : light, overlay, null);
 		for (BedrockModel.Layer l : m.def.layers) {
 			out.submitModelPart(m.root, pose, RenderTypes.entityTranslucentEmissive(l.frame(s.ageInTicks / 20F)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY, null);
 		}

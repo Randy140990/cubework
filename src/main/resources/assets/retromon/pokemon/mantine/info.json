@@ -1,1 +1,1 @@
-{"scale":1.1,"idle":"animation.mantine.ground_idle","ground":"animation.mantine.ground_idle","texture":"retromon:textures/pokemon/mantine.png","layers":[],"height":0.9,"standIn":null}
+{"scale":1.1,"idle":"animation.mantine.ground_idle","ground":"animation.mantine.ground_idle","texture":"retromon:textures/pokemon/mantine.png","layers":[],"height":0.9,"standIn":null,"parts":[],"actions":{"cry":"animation.mantine.cry"}}

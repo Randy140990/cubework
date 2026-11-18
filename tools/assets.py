@@ -2,7 +2,8 @@
 """
 Copies the Pokémon models, animations, textures and cries Retromon uses out of a Cobblemon jar, for all 251
 Pokémon of Kanto and Johto, plus the Poké Ball model and its textures, into
-src/main/resources/assets/retromon. Only the idle animations are kept, and the JSON is written compactly.
+src/main/resources/assets/retromon. The idle animations are kept with how the parts stand in that pose (shown, hidden,
+moved), and the one-off animations (cry, recoil, faint, physical, special, status); the JSON is written compactly.
 
 Cobblemon's models and textures are licensed CC BY-NC 3.0 by the Cobblemon team: the licence goes with them
 (pokemon/LICENSE-cobblemon-models.txt) and CREDITS.txt says what was changed (only trimmed, renamed and
@@ -94,6 +95,9 @@ def main(jar):
             open(os.path.join(tdir, f"{sid}.png"), "wb").write(z.read(tex))
         # Which animation it idles with in battle (and on the ground), from its poser.
         idle, ground = None, None
+        # How the parts stand in that pose (Pidgey's open wings hidden, its closed ones shown), and its one-off
+        # animations (a cry, flinching, attacking, fainting).
+        idle_parts, ground_parts, actions = None, None, {}
         if poser:
             pj = json.loads(z.read(poser[0]))
             for pose in pj.get("poses", {}).values():
@@ -103,8 +107,14 @@ def main(jar):
                         continue
                     if pose.get("isBattle") and not idle:
                         idle = (m.group(1), m.group(2))
+                        idle_parts = pose.get("transformedParts", [])
                     if "STAND" in pose.get("poseTypes", []) and not pose.get("isBattle") and not pose.get("isTouchingWater") and not ground:
                         ground = (m.group(1), m.group(2))
+                        ground_parts = pose.get("transformedParts", [])
+            for name, a in pj.get("animations", {}).items():
+                m = re.match(r"q\.bedrock_stateful\('([a-z0-9_]+)', '([a-z0-9_]+)'\)", a) if isinstance(a, str) else None
+                if m and name in ("cry", "recoil", "faint", "physical", "special", "status"):
+                    actions[name] = (m.group(1), m.group(2))
         all_anims = {}
         for a in anims:
             try:
@@ -119,7 +129,8 @@ def main(jar):
         idle_k, ground_k = key(idle), key(ground)
         if not idle_k:
             idle_k = ground_k or next((k for k in all_anims if k.endswith(".ground_idle")), None) or next((k for k in all_anims if "idle" in k), None)
-        keep = {k: all_anims[k] for k in (idle_k, ground_k) if k}
+        action_k = {n: key(pair) for n, pair in actions.items() if key(pair)}
+        keep = {k: all_anims[k] for k in (idle_k, ground_k, *action_k.values()) if k}
         open(os.path.join(d, "anim.json"), "wb").write(compact({"format_version": "1.8.0", "animations": keep}))
         layers = []
         for i, layer in enumerate(var.get("layers", [])):
@@ -138,8 +149,20 @@ def main(jar):
             if out_frames:
                 layers.append({"frames": out_frames, "fps": t.get("fps", 0) if isinstance(t, dict) else 0, "emissive": layer.get("emissive", False),
                                "translucent": layer.get("translucent", False)})
+        parts = []
+        for t in (idle_parts if idle_parts is not None else ground_parts) or []:
+            entry = {"part": t.get("part")}
+            vis = t.get("isVisible", t.get("visible"))
+            if vis is not None:
+                entry["visible"] = bool(vis)
+            for k in ("position", "rotation"):
+                if k in t:
+                    entry[k] = t[k]
+            if entry["part"] and len(entry) > 1:
+                parts.append(entry)
         info = {"scale": species.get("baseScale", 1.0) * scale_mul, "idle": idle_k, "ground": ground_k, "texture": f"retromon:textures/pokemon/{sid}.png",
-                "layers": layers, "height": species.get("hitbox", {}).get("height", 1.0) * scale_mul, "standIn": src_id if src_id != sid else None}
+                "layers": layers, "height": species.get("hitbox", {}).get("height", 1.0) * scale_mul, "standIn": src_id if src_id != sid else None,
+                "parts": parts, "actions": action_k}
         open(os.path.join(d, "info.json"), "wb").write(compact(info))
         cry = f"assets/cobblemon/sounds/pokemon/{cn}/{cn}_cry.ogg"
         if cry in nameset:

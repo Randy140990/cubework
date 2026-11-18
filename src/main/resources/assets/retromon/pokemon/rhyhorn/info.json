@@ -1,1 +1,1 @@
-{"scale":1.0,"idle":"animation.rhyhorn.battle_idle","ground":"animation.rhyhorn.ride_jump","texture":"retromon:textures/pokemon/rhyhorn.png","layers":[],"height":1.4,"standIn":null}
+{"scale":1.0,"idle":"animation.rhyhorn.battle_idle","ground":"animation.rhyhorn.ride_jump","texture":"retromon:textures/pokemon/rhyhorn.png","layers":[],"height":1.4,"standIn":null,"parts":[],"actions":{"cry":"animation.rhyhorn.cry","recoil":"animation.rhyhorn.recoil"}}

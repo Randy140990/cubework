@@ -3,7 +3,9 @@
   "minVersion": "0.8",
   "package": "com.insidethecube.retromon.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "SignCollisionMixin"
+  ],
   "client": [
     "CameraMixin",
     "KeyboardInputMixin",
@@ -12,7 +14,11 @@
     "MusicManagerMixin",
     "ClientLevelDataMixin",
     "LevelWeatherMixin",
-    "PlayerSkinMixin"
+    "PlayerSkinMixin",
+    "NightVisionMixin",
+    "LightTextureMixin",
+    "OutlineMixin",
+    "OutlineColourMixin"
   ],
   "injectors": {
     "defaultRequire": 1

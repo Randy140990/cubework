@@ -3053,5 +3053,2013 @@
     "volume": 0.7
    }
   ]
+ },
+ "dex.charmander": {
+  "sounds": [
+   {
+    "name": "retromon:dex/charmander",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.pidgey": {
+  "sounds": [
+   {
+    "name": "retromon:dex/pidgey",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.bulbasaur": {
+  "sounds": [
+   {
+    "name": "retromon:dex/bulbasaur",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ivysaur": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ivysaur",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.venusaur": {
+  "sounds": [
+   {
+    "name": "retromon:dex/venusaur",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.charmeleon": {
+  "sounds": [
+   {
+    "name": "retromon:dex/charmeleon",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.charizard": {
+  "sounds": [
+   {
+    "name": "retromon:dex/charizard",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.squirtle": {
+  "sounds": [
+   {
+    "name": "retromon:dex/squirtle",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.wartortle": {
+  "sounds": [
+   {
+    "name": "retromon:dex/wartortle",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.blastoise": {
+  "sounds": [
+   {
+    "name": "retromon:dex/blastoise",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.caterpie": {
+  "sounds": [
+   {
+    "name": "retromon:dex/caterpie",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.metapod": {
+  "sounds": [
+   {
+    "name": "retromon:dex/metapod",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.butterfree": {
+  "sounds": [
+   {
+    "name": "retromon:dex/butterfree",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.weedle": {
+  "sounds": [
+   {
+    "name": "retromon:dex/weedle",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.kakuna": {
+  "sounds": [
+   {
+    "name": "retromon:dex/kakuna",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.beedrill": {
+  "sounds": [
+   {
+    "name": "retromon:dex/beedrill",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.pidgeotto": {
+  "sounds": [
+   {
+    "name": "retromon:dex/pidgeotto",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.pidgeot": {
+  "sounds": [
+   {
+    "name": "retromon:dex/pidgeot",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.rattata": {
+  "sounds": [
+   {
+    "name": "retromon:dex/rattata",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.raticate": {
+  "sounds": [
+   {
+    "name": "retromon:dex/raticate",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.spearow": {
+  "sounds": [
+   {
+    "name": "retromon:dex/spearow",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.fearow": {
+  "sounds": [
+   {
+    "name": "retromon:dex/fearow",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ekans": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ekans",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.arbok": {
+  "sounds": [
+   {
+    "name": "retromon:dex/arbok",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.pikachu": {
+  "sounds": [
+   {
+    "name": "retromon:dex/pikachu",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.raichu": {
+  "sounds": [
+   {
+    "name": "retromon:dex/raichu",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.sandshrew": {
+  "sounds": [
+   {
+    "name": "retromon:dex/sandshrew",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.sandslash": {
+  "sounds": [
+   {
+    "name": "retromon:dex/sandslash",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.nidoran_f": {
+  "sounds": [
+   {
+    "name": "retromon:dex/nidoran_f",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.nidorina": {
+  "sounds": [
+   {
+    "name": "retromon:dex/nidorina",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.nidoqueen": {
+  "sounds": [
+   {
+    "name": "retromon:dex/nidoqueen",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.nidoran_m": {
+  "sounds": [
+   {
+    "name": "retromon:dex/nidoran_m",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.nidorino": {
+  "sounds": [
+   {
+    "name": "retromon:dex/nidorino",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.nidoking": {
+  "sounds": [
+   {
+    "name": "retromon:dex/nidoking",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.clefairy": {
+  "sounds": [
+   {
+    "name": "retromon:dex/clefairy",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.clefable": {
+  "sounds": [
+   {
+    "name": "retromon:dex/clefable",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.vulpix": {
+  "sounds": [
+   {
+    "name": "retromon:dex/vulpix",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ninetales": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ninetales",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.jigglypuff": {
+  "sounds": [
+   {
+    "name": "retromon:dex/jigglypuff",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.wigglytuff": {
+  "sounds": [
+   {
+    "name": "retromon:dex/wigglytuff",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.zubat": {
+  "sounds": [
+   {
+    "name": "retromon:dex/zubat",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.golbat": {
+  "sounds": [
+   {
+    "name": "retromon:dex/golbat",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.oddish": {
+  "sounds": [
+   {
+    "name": "retromon:dex/oddish",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.gloom": {
+  "sounds": [
+   {
+    "name": "retromon:dex/gloom",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.vileplume": {
+  "sounds": [
+   {
+    "name": "retromon:dex/vileplume",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.paras": {
+  "sounds": [
+   {
+    "name": "retromon:dex/paras",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.parasect": {
+  "sounds": [
+   {
+    "name": "retromon:dex/parasect",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.venonat": {
+  "sounds": [
+   {
+    "name": "retromon:dex/venonat",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.venomoth": {
+  "sounds": [
+   {
+    "name": "retromon:dex/venomoth",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.diglett": {
+  "sounds": [
+   {
+    "name": "retromon:dex/diglett",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.dugtrio": {
+  "sounds": [
+   {
+    "name": "retromon:dex/dugtrio",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.meowth": {
+  "sounds": [
+   {
+    "name": "retromon:dex/meowth",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.persian": {
+  "sounds": [
+   {
+    "name": "retromon:dex/persian",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.psyduck": {
+  "sounds": [
+   {
+    "name": "retromon:dex/psyduck",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.golduck": {
+  "sounds": [
+   {
+    "name": "retromon:dex/golduck",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.mankey": {
+  "sounds": [
+   {
+    "name": "retromon:dex/mankey",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.primeape": {
+  "sounds": [
+   {
+    "name": "retromon:dex/primeape",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.growlithe": {
+  "sounds": [
+   {
+    "name": "retromon:dex/growlithe",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.arcanine": {
+  "sounds": [
+   {
+    "name": "retromon:dex/arcanine",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.poliwag": {
+  "sounds": [
+   {
+    "name": "retromon:dex/poliwag",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.poliwhirl": {
+  "sounds": [
+   {
+    "name": "retromon:dex/poliwhirl",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.poliwrath": {
+  "sounds": [
+   {
+    "name": "retromon:dex/poliwrath",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.abra": {
+  "sounds": [
+   {
+    "name": "retromon:dex/abra",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.kadabra": {
+  "sounds": [
+   {
+    "name": "retromon:dex/kadabra",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.alakazam": {
+  "sounds": [
+   {
+    "name": "retromon:dex/alakazam",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.machop": {
+  "sounds": [
+   {
+    "name": "retromon:dex/machop",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.machoke": {
+  "sounds": [
+   {
+    "name": "retromon:dex/machoke",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.machamp": {
+  "sounds": [
+   {
+    "name": "retromon:dex/machamp",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.bellsprout": {
+  "sounds": [
+   {
+    "name": "retromon:dex/bellsprout",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.weepinbell": {
+  "sounds": [
+   {
+    "name": "retromon:dex/weepinbell",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.victreebel": {
+  "sounds": [
+   {
+    "name": "retromon:dex/victreebel",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.tentacool": {
+  "sounds": [
+   {
+    "name": "retromon:dex/tentacool",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.tentacruel": {
+  "sounds": [
+   {
+    "name": "retromon:dex/tentacruel",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.geodude": {
+  "sounds": [
+   {
+    "name": "retromon:dex/geodude",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.graveler": {
+  "sounds": [
+   {
+    "name": "retromon:dex/graveler",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.golem": {
+  "sounds": [
+   {
+    "name": "retromon:dex/golem",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ponyta": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ponyta",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.rapidash": {
+  "sounds": [
+   {
+    "name": "retromon:dex/rapidash",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.slowpoke": {
+  "sounds": [
+   {
+    "name": "retromon:dex/slowpoke",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.slowbro": {
+  "sounds": [
+   {
+    "name": "retromon:dex/slowbro",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.magnemite": {
+  "sounds": [
+   {
+    "name": "retromon:dex/magnemite",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.magneton": {
+  "sounds": [
+   {
+    "name": "retromon:dex/magneton",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.farfetch_d": {
+  "sounds": [
+   {
+    "name": "retromon:dex/farfetch_d",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.doduo": {
+  "sounds": [
+   {
+    "name": "retromon:dex/doduo",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.dodrio": {
+  "sounds": [
+   {
+    "name": "retromon:dex/dodrio",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.seel": {
+  "sounds": [
+   {
+    "name": "retromon:dex/seel",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.dewgong": {
+  "sounds": [
+   {
+    "name": "retromon:dex/dewgong",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.grimer": {
+  "sounds": [
+   {
+    "name": "retromon:dex/grimer",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.muk": {
+  "sounds": [
+   {
+    "name": "retromon:dex/muk",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.shellder": {
+  "sounds": [
+   {
+    "name": "retromon:dex/shellder",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.cloyster": {
+  "sounds": [
+   {
+    "name": "retromon:dex/cloyster",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.gastly": {
+  "sounds": [
+   {
+    "name": "retromon:dex/gastly",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.haunter": {
+  "sounds": [
+   {
+    "name": "retromon:dex/haunter",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.gengar": {
+  "sounds": [
+   {
+    "name": "retromon:dex/gengar",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.onix": {
+  "sounds": [
+   {
+    "name": "retromon:dex/onix",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.drowzee": {
+  "sounds": [
+   {
+    "name": "retromon:dex/drowzee",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.hypno": {
+  "sounds": [
+   {
+    "name": "retromon:dex/hypno",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.krabby": {
+  "sounds": [
+   {
+    "name": "retromon:dex/krabby",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.kingler": {
+  "sounds": [
+   {
+    "name": "retromon:dex/kingler",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.voltorb": {
+  "sounds": [
+   {
+    "name": "retromon:dex/voltorb",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.electrode": {
+  "sounds": [
+   {
+    "name": "retromon:dex/electrode",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.exeggcute": {
+  "sounds": [
+   {
+    "name": "retromon:dex/exeggcute",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.exeggutor": {
+  "sounds": [
+   {
+    "name": "retromon:dex/exeggutor",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.cubone": {
+  "sounds": [
+   {
+    "name": "retromon:dex/cubone",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.marowak": {
+  "sounds": [
+   {
+    "name": "retromon:dex/marowak",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.hitmonlee": {
+  "sounds": [
+   {
+    "name": "retromon:dex/hitmonlee",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.hitmonchan": {
+  "sounds": [
+   {
+    "name": "retromon:dex/hitmonchan",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.lickitung": {
+  "sounds": [
+   {
+    "name": "retromon:dex/lickitung",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.koffing": {
+  "sounds": [
+   {
+    "name": "retromon:dex/koffing",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.weezing": {
+  "sounds": [
+   {
+    "name": "retromon:dex/weezing",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.rhyhorn": {
+  "sounds": [
+   {
+    "name": "retromon:dex/rhyhorn",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.rhydon": {
+  "sounds": [
+   {
+    "name": "retromon:dex/rhydon",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.chansey": {
+  "sounds": [
+   {
+    "name": "retromon:dex/chansey",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.tangela": {
+  "sounds": [
+   {
+    "name": "retromon:dex/tangela",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.kangaskhan": {
+  "sounds": [
+   {
+    "name": "retromon:dex/kangaskhan",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.horsea": {
+  "sounds": [
+   {
+    "name": "retromon:dex/horsea",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.seadra": {
+  "sounds": [
+   {
+    "name": "retromon:dex/seadra",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.goldeen": {
+  "sounds": [
+   {
+    "name": "retromon:dex/goldeen",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.seaking": {
+  "sounds": [
+   {
+    "name": "retromon:dex/seaking",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.staryu": {
+  "sounds": [
+   {
+    "name": "retromon:dex/staryu",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.starmie": {
+  "sounds": [
+   {
+    "name": "retromon:dex/starmie",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.mr_mime": {
+  "sounds": [
+   {
+    "name": "retromon:dex/mr_mime",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.scyther": {
+  "sounds": [
+   {
+    "name": "retromon:dex/scyther",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.jynx": {
+  "sounds": [
+   {
+    "name": "retromon:dex/jynx",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.electabuzz": {
+  "sounds": [
+   {
+    "name": "retromon:dex/electabuzz",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.magmar": {
+  "sounds": [
+   {
+    "name": "retromon:dex/magmar",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.pinsir": {
+  "sounds": [
+   {
+    "name": "retromon:dex/pinsir",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.tauros": {
+  "sounds": [
+   {
+    "name": "retromon:dex/tauros",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.magikarp": {
+  "sounds": [
+   {
+    "name": "retromon:dex/magikarp",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.gyarados": {
+  "sounds": [
+   {
+    "name": "retromon:dex/gyarados",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.lapras": {
+  "sounds": [
+   {
+    "name": "retromon:dex/lapras",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ditto": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ditto",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.eevee": {
+  "sounds": [
+   {
+    "name": "retromon:dex/eevee",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.vaporeon": {
+  "sounds": [
+   {
+    "name": "retromon:dex/vaporeon",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.jolteon": {
+  "sounds": [
+   {
+    "name": "retromon:dex/jolteon",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.flareon": {
+  "sounds": [
+   {
+    "name": "retromon:dex/flareon",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.porygon": {
+  "sounds": [
+   {
+    "name": "retromon:dex/porygon",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.omanyte": {
+  "sounds": [
+   {
+    "name": "retromon:dex/omanyte",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.omastar": {
+  "sounds": [
+   {
+    "name": "retromon:dex/omastar",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.kabuto": {
+  "sounds": [
+   {
+    "name": "retromon:dex/kabuto",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.kabutops": {
+  "sounds": [
+   {
+    "name": "retromon:dex/kabutops",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.aerodactyl": {
+  "sounds": [
+   {
+    "name": "retromon:dex/aerodactyl",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.snorlax": {
+  "sounds": [
+   {
+    "name": "retromon:dex/snorlax",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.articuno": {
+  "sounds": [
+   {
+    "name": "retromon:dex/articuno",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.zapdos": {
+  "sounds": [
+   {
+    "name": "retromon:dex/zapdos",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.moltres": {
+  "sounds": [
+   {
+    "name": "retromon:dex/moltres",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.dratini": {
+  "sounds": [
+   {
+    "name": "retromon:dex/dratini",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.dragonair": {
+  "sounds": [
+   {
+    "name": "retromon:dex/dragonair",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.dragonite": {
+  "sounds": [
+   {
+    "name": "retromon:dex/dragonite",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.mewtwo": {
+  "sounds": [
+   {
+    "name": "retromon:dex/mewtwo",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.mew": {
+  "sounds": [
+   {
+    "name": "retromon:dex/mew",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.chikorita": {
+  "sounds": [
+   {
+    "name": "retromon:dex/chikorita",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.bayleef": {
+  "sounds": [
+   {
+    "name": "retromon:dex/bayleef",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.meganium": {
+  "sounds": [
+   {
+    "name": "retromon:dex/meganium",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.cyndaquil": {
+  "sounds": [
+   {
+    "name": "retromon:dex/cyndaquil",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.quilava": {
+  "sounds": [
+   {
+    "name": "retromon:dex/quilava",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.typhlosion": {
+  "sounds": [
+   {
+    "name": "retromon:dex/typhlosion",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.totodile": {
+  "sounds": [
+   {
+    "name": "retromon:dex/totodile",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.croconaw": {
+  "sounds": [
+   {
+    "name": "retromon:dex/croconaw",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.feraligatr": {
+  "sounds": [
+   {
+    "name": "retromon:dex/feraligatr",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.sentret": {
+  "sounds": [
+   {
+    "name": "retromon:dex/sentret",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.furret": {
+  "sounds": [
+   {
+    "name": "retromon:dex/furret",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.hoothoot": {
+  "sounds": [
+   {
+    "name": "retromon:dex/hoothoot",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.noctowl": {
+  "sounds": [
+   {
+    "name": "retromon:dex/noctowl",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ledyba": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ledyba",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ledian": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ledian",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.spinarak": {
+  "sounds": [
+   {
+    "name": "retromon:dex/spinarak",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ariados": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ariados",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.crobat": {
+  "sounds": [
+   {
+    "name": "retromon:dex/crobat",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.chinchou": {
+  "sounds": [
+   {
+    "name": "retromon:dex/chinchou",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.lanturn": {
+  "sounds": [
+   {
+    "name": "retromon:dex/lanturn",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.pichu": {
+  "sounds": [
+   {
+    "name": "retromon:dex/pichu",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.cleffa": {
+  "sounds": [
+   {
+    "name": "retromon:dex/cleffa",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.igglybuff": {
+  "sounds": [
+   {
+    "name": "retromon:dex/igglybuff",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.togepi": {
+  "sounds": [
+   {
+    "name": "retromon:dex/togepi",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.togetic": {
+  "sounds": [
+   {
+    "name": "retromon:dex/togetic",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.natu": {
+  "sounds": [
+   {
+    "name": "retromon:dex/natu",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.xatu": {
+  "sounds": [
+   {
+    "name": "retromon:dex/xatu",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.mareep": {
+  "sounds": [
+   {
+    "name": "retromon:dex/mareep",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.flaaffy": {
+  "sounds": [
+   {
+    "name": "retromon:dex/flaaffy",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ampharos": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ampharos",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.bellossom": {
+  "sounds": [
+   {
+    "name": "retromon:dex/bellossom",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.marill": {
+  "sounds": [
+   {
+    "name": "retromon:dex/marill",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.azumarill": {
+  "sounds": [
+   {
+    "name": "retromon:dex/azumarill",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.sudowoodo": {
+  "sounds": [
+   {
+    "name": "retromon:dex/sudowoodo",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.politoed": {
+  "sounds": [
+   {
+    "name": "retromon:dex/politoed",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.hoppip": {
+  "sounds": [
+   {
+    "name": "retromon:dex/hoppip",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.skiploom": {
+  "sounds": [
+   {
+    "name": "retromon:dex/skiploom",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.jumpluff": {
+  "sounds": [
+   {
+    "name": "retromon:dex/jumpluff",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.aipom": {
+  "sounds": [
+   {
+    "name": "retromon:dex/aipom",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.sunkern": {
+  "sounds": [
+   {
+    "name": "retromon:dex/sunkern",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.sunflora": {
+  "sounds": [
+   {
+    "name": "retromon:dex/sunflora",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.yanma": {
+  "sounds": [
+   {
+    "name": "retromon:dex/yanma",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.wooper": {
+  "sounds": [
+   {
+    "name": "retromon:dex/wooper",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.quagsire": {
+  "sounds": [
+   {
+    "name": "retromon:dex/quagsire",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.espeon": {
+  "sounds": [
+   {
+    "name": "retromon:dex/espeon",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.umbreon": {
+  "sounds": [
+   {
+    "name": "retromon:dex/umbreon",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.murkrow": {
+  "sounds": [
+   {
+    "name": "retromon:dex/murkrow",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.slowking": {
+  "sounds": [
+   {
+    "name": "retromon:dex/slowking",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.misdreavus": {
+  "sounds": [
+   {
+    "name": "retromon:dex/misdreavus",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.unown": {
+  "sounds": [
+   {
+    "name": "retromon:dex/unown",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.wobbuffet": {
+  "sounds": [
+   {
+    "name": "retromon:dex/wobbuffet",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.girafarig": {
+  "sounds": [
+   {
+    "name": "retromon:dex/girafarig",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.pineco": {
+  "sounds": [
+   {
+    "name": "retromon:dex/pineco",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.forretress": {
+  "sounds": [
+   {
+    "name": "retromon:dex/forretress",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.dunsparce": {
+  "sounds": [
+   {
+    "name": "retromon:dex/dunsparce",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.gligar": {
+  "sounds": [
+   {
+    "name": "retromon:dex/gligar",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.steelix": {
+  "sounds": [
+   {
+    "name": "retromon:dex/steelix",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.snubbull": {
+  "sounds": [
+   {
+    "name": "retromon:dex/snubbull",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.granbull": {
+  "sounds": [
+   {
+    "name": "retromon:dex/granbull",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.qwilfish": {
+  "sounds": [
+   {
+    "name": "retromon:dex/qwilfish",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.scizor": {
+  "sounds": [
+   {
+    "name": "retromon:dex/scizor",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.shuckle": {
+  "sounds": [
+   {
+    "name": "retromon:dex/shuckle",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.heracross": {
+  "sounds": [
+   {
+    "name": "retromon:dex/heracross",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.sneasel": {
+  "sounds": [
+   {
+    "name": "retromon:dex/sneasel",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.teddiursa": {
+  "sounds": [
+   {
+    "name": "retromon:dex/teddiursa",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ursaring": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ursaring",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.slugma": {
+  "sounds": [
+   {
+    "name": "retromon:dex/slugma",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.magcargo": {
+  "sounds": [
+   {
+    "name": "retromon:dex/magcargo",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.swinub": {
+  "sounds": [
+   {
+    "name": "retromon:dex/swinub",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.piloswine": {
+  "sounds": [
+   {
+    "name": "retromon:dex/piloswine",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.corsola": {
+  "sounds": [
+   {
+    "name": "retromon:dex/corsola",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.remoraid": {
+  "sounds": [
+   {
+    "name": "retromon:dex/remoraid",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.octillery": {
+  "sounds": [
+   {
+    "name": "retromon:dex/octillery",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.delibird": {
+  "sounds": [
+   {
+    "name": "retromon:dex/delibird",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.mantine": {
+  "sounds": [
+   {
+    "name": "retromon:dex/mantine",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.skarmory": {
+  "sounds": [
+   {
+    "name": "retromon:dex/skarmory",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.houndour": {
+  "sounds": [
+   {
+    "name": "retromon:dex/houndour",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.houndoom": {
+  "sounds": [
+   {
+    "name": "retromon:dex/houndoom",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.kingdra": {
+  "sounds": [
+   {
+    "name": "retromon:dex/kingdra",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.phanpy": {
+  "sounds": [
+   {
+    "name": "retromon:dex/phanpy",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.donphan": {
+  "sounds": [
+   {
+    "name": "retromon:dex/donphan",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.porygon2": {
+  "sounds": [
+   {
+    "name": "retromon:dex/porygon2",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.stantler": {
+  "sounds": [
+   {
+    "name": "retromon:dex/stantler",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.smeargle": {
+  "sounds": [
+   {
+    "name": "retromon:dex/smeargle",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.tyrogue": {
+  "sounds": [
+   {
+    "name": "retromon:dex/tyrogue",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.hitmontop": {
+  "sounds": [
+   {
+    "name": "retromon:dex/hitmontop",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.smoochum": {
+  "sounds": [
+   {
+    "name": "retromon:dex/smoochum",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.elekid": {
+  "sounds": [
+   {
+    "name": "retromon:dex/elekid",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.magby": {
+  "sounds": [
+   {
+    "name": "retromon:dex/magby",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.miltank": {
+  "sounds": [
+   {
+    "name": "retromon:dex/miltank",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.blissey": {
+  "sounds": [
+   {
+    "name": "retromon:dex/blissey",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.raikou": {
+  "sounds": [
+   {
+    "name": "retromon:dex/raikou",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.entei": {
+  "sounds": [
+   {
+    "name": "retromon:dex/entei",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.suicune": {
+  "sounds": [
+   {
+    "name": "retromon:dex/suicune",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.larvitar": {
+  "sounds": [
+   {
+    "name": "retromon:dex/larvitar",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.pupitar": {
+  "sounds": [
+   {
+    "name": "retromon:dex/pupitar",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.tyranitar": {
+  "sounds": [
+   {
+    "name": "retromon:dex/tyranitar",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.lugia": {
+  "sounds": [
+   {
+    "name": "retromon:dex/lugia",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.ho_oh": {
+  "sounds": [
+   {
+    "name": "retromon:dex/ho_oh",
+    "volume": 0.9
+   }
+  ]
+ },
+ "dex.celebi": {
+  "sounds": [
+   {
+    "name": "retromon:dex/celebi",
+    "volume": 0.9
+   }
+  ]
  }
 }

@@ -1,1 +1,1 @@
-{"scale":0.65,"idle":"animation.typhlosion.ground_idle","ground":null,"texture":"retromon:textures/pokemon/typhlosion.png","layers":[{"frames":["retromon:textures/pokemon/typhlosion_layer0_0.png"],"fps":0,"emissive":true,"translucent":true}],"height":2.65,"standIn":null}
+{"scale":0.65,"idle":"animation.typhlosion.ground_idle","ground":null,"texture":"retromon:textures/pokemon/typhlosion.png","layers":[{"frames":["retromon:textures/pokemon/typhlosion_layer0_0.png"],"fps":0,"emissive":true,"translucent":true}],"height":2.65,"standIn":null,"parts":[],"actions":{}}

@@ -133,7 +133,12 @@ public final class Battles {
 		switch (b.result) {
 			case WIN -> {
 				d.money += b.prize;
-				if (s.trainer != null) {
+				if (s.trainer != null && s.trainer.key().equals("rival_lab")) {
+					d.beaten.add("rival_lab");
+					d.healAll();
+					after.addAll(Game.fill(p, s.trainer.defeat()));
+					after.addAll(Game.fill(p, s.trainer.after()));
+				} else if (s.trainer != null) {
 					d.beaten.add(s.trainer.key());
 					List<String> said = Game.fill(p, s.trainer.leader() ? s.trainer.defeat() : s.trainer.after());
 					if (s.trainer.leader()) {
@@ -156,9 +161,17 @@ public final class Battles {
 				out.putInt("nicknameIndex", toBox ? d.box.size() - 1 : d.party.size() - 1);
 			}
 			case LOSS -> {
-				d.money /= 2;
-				d.healAll();
-				Game.blackout(p);
+				if (s.trainer != null && s.trainer.key().equals("rival_lab")) {
+					// The first battle with your rival: no harm done if you lose (Oak sees to your Pokémon).
+					d.beaten.add("rival_lab");
+					d.healAll();
+					after.addAll(Game.fill(p, List.of("{rival}: Yeah! Am I great or what?", "{rival}: Okay! I'll make my POKéMON fight to toughen it up!",
+							"{player}! Gramps! Smell ya later!", "OAK: Your POKéMON look tired. Here, let me heal them for you.")));
+				} else {
+					d.money /= 2;
+					d.healAll();
+					Game.blackout(p);
+				}
 			}
 			default -> {
 			}

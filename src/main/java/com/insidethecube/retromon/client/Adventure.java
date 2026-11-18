@@ -51,6 +51,8 @@ public final class Adventure {
 
 	/** The camera as last set (x, y, z, yaw, pitch), for putting things on screen over the world. */
 	public static double[] lastPose;
+	/** Something's between the camera and you (your outline shows through it). */
+	public static boolean hidden;
 
 	public static void register() {
 		START = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.retromon.start", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_ENTER, CATEGORY));
@@ -100,6 +102,7 @@ public final class Adventure {
 			t.putInt("times", speed);
 			ClientPlayNetworking.send(new Net.Act("speed", t));
 		}
+		hidden = !BattleScene.active() && behind(mc);
 		if (mc.screen == null) {
 			while (mc.options.keyJump.consumeClick()) talk(mc);
 			while (START.consumeClick()) mc.setScreen(new MenuScreen());
@@ -149,10 +152,71 @@ public final class Adventure {
 				best = e;
 			}
 		}
-		if (best == null) return;
+		if (best == null) {
+			readSign(mc);
+			return;
+		}
 		CompoundTag t = new CompoundTag();
 		t.putInt("npc", best.getId());
 		ClientPlayNetworking.send(new Net.Act("talk", t));
+	}
+
+	/** Whether a block stands between the camera and you (checked at your middle and your head). */
+	private static boolean behind(Minecraft mc) {
+		double[] cam = lastPose;
+		if (cam == null || mc.level == null) return false;
+		Vec3 from = new Vec3(cam[0], cam[1], cam[2]);
+		for (double up : new double[] {0.9, 1.6}) {
+			Vec3 to = mc.player.position().add(0, up, 0);
+			var hit = mc.level.clip(new net.minecraft.world.level.ClipContext(from, to, net.minecraft.world.level.ClipContext.Block.VISUAL,
+					net.minecraft.world.level.ClipContext.Fluid.NONE, mc.player));
+			if (hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS || hit.getLocation().distanceToSqr(to) < 0.6) return false;
+		}
+		return true;
+	}
+
+	/** The signs of the games' towns and routes (read from a shelf standing in for a sign). */
+	private static final java.util.Map<String, String> SIGNS = java.util.Map.ofEntries(java.util.Map.entry("PALLET TOWN", "Shades of your journey await!"),
+			java.util.Map.entry("ROUTE 1", "PALLET TOWN - VIRIDIAN CITY"), java.util.Map.entry("VIRIDIAN CITY", "The Eternally Green Paradise"),
+			java.util.Map.entry("ROUTE 22", "POKéMON LEAGUE Front Gate"), java.util.Map.entry("ROUTE 2", "VIRIDIAN CITY - PEWTER CITY"),
+			java.util.Map.entry("PEWTER CITY", "A Stone Gray City"), java.util.Map.entry("CERULEAN CITY", "A Mysterious, Blue Aura Surrounds It"),
+			java.util.Map.entry("VERMILION CITY", "The Port of Exquisite Sunsets"), java.util.Map.entry("LAVENDER TOWN", "The Noble Purple Town"),
+			java.util.Map.entry("CELADON CITY", "The City of Rainbow Dreams"), java.util.Map.entry("FUCHSIA CITY", "Behold! It's Passion Pink!"),
+			java.util.Map.entry("SAFFRON CITY", "Shining, Golden Land of Commerce"), java.util.Map.entry("CINNABAR ISLAND", "The Fiery Town of Burning Desire"),
+			java.util.Map.entry("INDIGO PLATEAU", "The Ultimate Goal of Trainers!"));
+
+	/** A: read the sign in front of you (its words), or a shelf standing in for one (the place's sign). */
+	private static void readSign(Minecraft mc) {
+		Vec3 look = Vec3.directionFromRotation(0, mc.player.getYRot());
+		for (double d = 0.5; d <= 2.1; d += 0.4) {
+			for (int dy = 0; dy <= 1; dy++) {
+				net.minecraft.core.BlockPos at = net.minecraft.core.BlockPos.containing(mc.player.getX() + look.x * d, mc.player.getY() + dy + 0.2,
+						mc.player.getZ() + look.z * d);
+				var state = mc.level.getBlockState(at);
+				java.util.List<String> lines = new java.util.ArrayList<>();
+				if (mc.level.getBlockEntity(at) instanceof net.minecraft.world.level.block.entity.SignBlockEntity sign) {
+					StringBuilder b = new StringBuilder();
+					for (var text : new net.minecraft.world.level.block.entity.SignText[] {sign.getFrontText(), sign.getBackText()}) {
+						for (int i = 0; i < 4; i++) {
+							String l = text.getMessage(i, false).getString().strip();
+							if (!l.isEmpty()) b.append(b.isEmpty() ? "" : " ").append(l);
+						}
+						if (!b.isEmpty()) break;
+					}
+					if (!b.isEmpty()) lines.add(b.toString());
+				} else if (net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath().endsWith("shelf")) {
+					String place = ClientState.placeName.isEmpty() ? "" : ClientState.placeName;
+					if (place.isEmpty()) continue;
+					lines.add(place);
+					String sub = SIGNS.get(place.toUpperCase());
+					if (sub != null) lines.set(0, place + ": " + sub);
+				} else continue;
+				if (lines.isEmpty()) return;
+				Sounds.press();
+				mc.setScreen(new DialogueScreen(lines, "sign", -1, new CompoundTag()));
+				return;
+			}
+		}
 	}
 
 	/** Which way to walk for the keys held: screen up is north. Returns the yaw, or NaN. */

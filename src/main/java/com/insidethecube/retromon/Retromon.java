@@ -109,6 +109,8 @@ public class Retromon implements ModInitializer {
 			case "profile" -> Game.profile(p, t);
 			case "fly" -> Game.fly(p, t);
 			case "outfit" -> Game.outfit(p, t);
+			case "lab" -> Game.toLab(p);
+			case "wait" -> Game.waitUntil(p, t);
 			default -> {
 			}
 		}

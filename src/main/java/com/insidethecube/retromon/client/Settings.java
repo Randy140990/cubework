@@ -1,0 +1,66 @@
+package com.insidethecube.retromon.client;
+
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Properties;
+
+import com.insidethecube.retromon.Retromon;
+import net.fabricmc.loader.api.FabricLoader;
+
+/**
+ * Your own settings for Retromon on this computer (config/retromon-client.properties): the music volume, whether
+ * the Pokédex reads its entries aloud, and how bright nights are.
+ */
+public final class Settings {
+	private Settings() {}
+
+	private static Properties props;
+
+	private static Path file() {
+		return FabricLoader.getInstance().getConfigDir().resolve("retromon-client.properties");
+	}
+
+	private static Properties props() {
+		if (props == null) {
+			props = new Properties();
+			try (Reader r = Files.newBufferedReader(file())) {
+				props.load(r);
+			} catch (Exception ignored) {
+				// No settings yet: the defaults.
+			}
+		}
+		return props;
+	}
+
+	public static int get(String key, int fallback, int min, int max) {
+		try {
+			return Math.max(min, Math.min(max, Integer.parseInt(props().getProperty(key, Integer.toString(fallback)).trim())));
+		} catch (NumberFormatException e) {
+			return fallback;
+		}
+	}
+
+	public static void set(String key, int value) {
+		props().setProperty(key, Integer.toString(value));
+		try {
+			Files.createDirectories(file().getParent());
+			try (Writer w = Files.newBufferedWriter(file())) {
+				props().store(w, "Retromon client settings");
+			}
+		} catch (Exception e) {
+			Retromon.LOG.warn("Couldn't save the settings: {}", e.toString());
+		}
+	}
+
+	/** The Pokédex reads entries aloud (1) or not (0). */
+	public static boolean voice() {
+		return get("voice", 1, 0, 1) == 1;
+	}
+
+	/** Nights: 0 dark (as Minecraft), 1 soft (the default: a blue, moonlit night you can see in), 2 bright. */
+	public static int nights() {
+		return get("nights", 1, 0, 2);
+	}
+}

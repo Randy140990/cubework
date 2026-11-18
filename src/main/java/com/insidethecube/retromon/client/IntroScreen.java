@@ -528,7 +528,7 @@ public class IntroScreen extends GameScreen {
 	private static final Identifier OAK = Retromon.id("textures/entity/npc/oak.png");
 	private static final Identifier RIVAL = Retromon.id("textures/entity/npc/blue.png");
 	/** When the picked card last changed (for the wave and the bubble popping up). */
-	private int genderSince, lastGender = -1;
+	private int genderSince, lastGender = -1, genderEmote;
 
 	private Identifier hero() {
 		return Retromon.id("textures/entity/player/" + (girl ? "girl" : "boy") + ".png");
@@ -551,6 +551,11 @@ public class IntroScreen extends GameScreen {
 			int big = Math.max(2, s * 3);
 			int tw = Ui.boldWidth(font, "RETROMON", big);
 			Ui.draw(g, font, Ui.bold("RETROMON"), (width - tw) / 2, height / 7, Ui.GOLD, big, true);
+			// The name's mark: a little twinkling star over the last O (as Pokémon has its accent).
+			int ox = (width - tw) / 2 + Ui.boldWidth(font, "RETROM", big) + Ui.boldWidth(font, "O", big) / 2;
+			float tw2 = 0.8F + 0.2F * (float) Math.sin((ticks + partial) * 0.25);
+			int ss = Math.round(9 * big * tw2);
+			Ui.icon(g, "emote/star", ox - ss / 2, height / 7 - ss + big, ss, 0xFFFFFFFF);
 			Ui.centred(g, font, "KANTO & JOHTO", width / 2, height / 7 + 12 * big, 0xFFE8ECFF, s, true);
 		}
 		int m = 8 * s;
@@ -579,7 +584,7 @@ public class IntroScreen extends GameScreen {
 				int tall = (int) (height * 0.42F), feet = height / 9 + 14 * s + tall;
 				Figures.Batch b = Figures.batch(0, 0, width, height);
 				shadow(g, width / 2, feet, tall);
-				b.person(hero(), width / 2F, feet, tall).wave(1).at(secs).facing(8).pitch(-3);
+				b.person(hero(), width / 2F, feet, tall).emote(Figures.WAVE, secs).at(secs).facing(8).pitch(-3);
 				b.draw(g);
 				panel(g, List.of(progress));
 			}
@@ -610,9 +615,12 @@ public class IntroScreen extends GameScreen {
 			case "rival" -> RIVAL;
 			default -> OAK;
 		};
-		float look = mx < 0 ? 0 : Math.max(-25, Math.min(25, (mx - cx) / (float) Math.max(1, width) * 60));
+		// The head follows the pointer: across, and up and down.
+		int headY = feet - tall * 7 / 8;
+		float look = mx < 0 ? 0 : Math.max(-28, Math.min(28, (mx - cx) / (float) Math.max(1, width) * 70));
+		float down = my < 0 ? 0 : Math.max(-22, Math.min(32, (my - headY) / (float) Math.max(1, height) * 80));
 		Figures.Batch b = Figures.batch(0, 0, width, height);
-		Figures.Fig f = b.person(who, cx, feet, tall).facing(-22).pitch(-2).look(look).at(secs);
+		Figures.Fig f = b.person(who, cx, feet, tall).facing(-22).pitch(-2).look(look + 22, down).at(secs);
 		if (scene.equals("oak")) f.talk(speaking ? 1 : 0.25F);
 		else if (scene.equals("hero")) f.wave(talk != null && talk.atEnd() ? 0 : 1).facing(-10);
 		else f.talk(0.2F);
@@ -629,6 +637,7 @@ public class IntroScreen extends GameScreen {
 		if (genderAt != lastGender) {
 			lastGender = genderAt;
 			genderSince = ticks;
+			genderEmote = (genderEmote + 1 + (int) (Math.random() * (Figures.EMOTES - 2))) % (Figures.EMOTES - 1);
 			Sounds.select();
 		}
 		float since = ticks - genderSince + partial;
@@ -648,18 +657,19 @@ public class IntroScreen extends GameScreen {
 			Identifier tex = Retromon.id("textures/entity/player/" + (i == 1 ? "girl" : "boy") + ".png");
 			Figures.Fig f = b.person(tex, cx, feet, tall).at(secs + i * 1.3F).pitch(-2);
 			if (on) {
-				// The one you point at turns to you and waves (with a little hop as they start).
-				float hop = since < 8 ? (float) Math.sin(since / 8F * Math.PI) * 6 * s : 0;
-				f.wave(Math.min(1, since / 4F)).facing(0).hop(hop);
+				// The one you point at turns to you and does something: waves, cheers, jumps for joy, points, twirls.
+				f.emote(genderEmote, since / 20F).facing(0).look(0, mx < 0 ? 0 : Math.max(-15, Math.min(20, (my - (feet - tall)) / (float) height * 50)));
 			} else f.facing(i == 0 ? 18 : -18);
 			int lw = Ui.boldWidth(font, label[i], s);
 			Ui.draw(g, font, Ui.bold(label[i]), x + (cw - lw) / 2, top + ch - 18 * s, 0xFFFFFFFF, s, true);
 			hit(x, top, cw, ch, () -> pickGender(idx));
 		}
 		b.draw(g);
-		// A happy face over the one you point at.
+		// A bubble over the one you point at, to go with what they're doing.
 		int cx = x0 + genderAt * (cw + gap) + cw / 2;
-		Ui.bubble(g, genderAt == 0 ? "happy" : "heart", cx + tall / 5, top + 12 * s, s, Math.min(1, Math.max(0, since - 3) / 6F));
+		String[] bubbles = {"happy", "star", "heart", "exclaim", "note", "happy"};
+		int lift = (int) (Figures.emoteHop(genderEmote, since / 20F) * tall);
+		Ui.bubble(g, bubbles[genderEmote % bubbles.length], cx + tall / 5, top + 12 * s - lift, s, Math.min(1, Math.max(0, since - 3) / 6F));
 	}
 
 	private void drawNames(GuiGraphics g, float secs) {
@@ -669,7 +679,9 @@ public class IntroScreen extends GameScreen {
 		Ui.glow(g, fx, feet - tall / 2, tall * 2 / 5, tall / 2, 0x0AFFF4D8);
 		shadow(g, fx, feet, tall);
 		Figures.Batch b = Figures.batch(0, 0, width, height);
-		b.person(namingRival ? RIVAL : hero(), fx, feet, tall).facing(20).pitch(-2).at(secs).talk(typing ? 0.3F : 0);
+		Figures.Fig who = b.person(namingRival ? RIVAL : hero(), fx, feet, tall).facing(20).pitch(-2).at(secs);
+		if (typing) who.emote(Figures.THINK, secs);
+		else who.look(mx < 0 ? 0 : Math.max(-20, Math.min(25, (mx - fx) / (float) width * 60)), mx < 0 ? 0 : Math.max(-15, Math.min(25, (my - top) / (float) height * 50)));
 		b.draw(g);
 		int cw = Math.min(170 * s, width / 2 - 20 * s), cx = width / 2 + 10 * s;
 		int listH = names.height(s);

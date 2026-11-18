@@ -1,1 +1,1 @@
-{"scale":0.5,"idle":"animation.cyndaquil.ground_idle","ground":null,"texture":"retromon:textures/pokemon/cyndaquil.png","layers":[{"frames":["retromon:textures/pokemon/cyndaquil_layer0_0.png"],"fps":0,"emissive":true,"translucent":true}],"height":1.15,"standIn":null}
+{"scale":0.5,"idle":"animation.cyndaquil.ground_idle","ground":null,"texture":"retromon:textures/pokemon/cyndaquil.png","layers":[{"frames":["retromon:textures/pokemon/cyndaquil_layer0_0.png"],"fps":0,"emissive":true,"translucent":true}],"height":1.15,"standIn":null,"parts":[],"actions":{}}

@@ -24,10 +24,14 @@ public class StarterScreen extends GameScreen {
 	private static final Identifier OAK = Retromon.id("textures/entity/npc/oak.png");
 
 	private enum Step {
-		WELCOME, CHOOSE, CONFIRM, AFTER
+		STOP, WELCOME, CHOOSE, CONFIRM, AFTER
 	}
 
 	private Step step = Step.WELCOME;
+	/** Going to the lab: ticks into the fade to black and back (-1 when not). */
+	private int toLab = -1;
+	private static final int LAB_FADE = 24;
+	private List<String> labLines = List.of();
 	private final TextBox box;
 	private int at = 1, lastAt = -1, atSince;
 	private Choice yesNo;
@@ -39,12 +43,15 @@ public class StarterScreen extends GameScreen {
 		Minecraft mc = Minecraft.getInstance();
 		String n = ClientState.data.name;
 		name = n != null && !n.isEmpty() ? n : mc.player == null ? "YOU" : mc.player.getGameProfile().name().toUpperCase();
+		if (stopped) {
+			step = Step.STOP;
+			labLines = List.of("Here, " + name + "! There are 3 POKéMON here! Haha!",
+					"They are inside the POKé BALLS. When I was young, I was a serious POKéMON trainer!",
+					"In my old age, I have only 3 left, but you can have one! Choose!");
+		}
 		box = new TextBox(stopped
 				? List.of("Hey! Wait! Don't go out!", "It's unsafe! Wild POKéMON live in tall grass!",
-						"You need your own POKéMON for your protection. I know! Here, come with me!",
-						"Here, " + name + "! There are 3 POKéMON here! Haha!",
-						"They are inside the POKé BALLS. When I was young, I was a serious POKéMON trainer!",
-						"In my old age, I have only 3 left, but you can have one! Choose!")
+						"You need your own POKéMON for your protection. I know! Here, come with me!")
 				: List.of("Hello there! Welcome to the world of POKéMON!", "My name is OAK! People call me the POKéMON PROF!",
 						name + "! Your very own POKéMON legend is about to unfold!", "But first, you'll need a POKéMON of your own. Choose one!"));
 		box.speaker = "PROF. OAK";
@@ -59,6 +66,16 @@ public class StarterScreen extends GameScreen {
 	public void tick() {
 		super.tick();
 		box.tick();
+		if (toLab >= 0) {
+			toLab++;
+			// At the darkest, you're at the lab's door and Oak goes on.
+			if (toLab == LAB_FADE / 2) {
+				ClientPlayNetworking.send(new Net.Act("lab", new CompoundTag()));
+				step = Step.WELCOME;
+				box.set(labLines);
+			}
+			if (toLab >= LAB_FADE) toLab = -1;
+		}
 	}
 
 	private void choose(int i) {
@@ -89,7 +106,11 @@ public class StarterScreen extends GameScreen {
 	}
 
 	private void advance() {
-		if (step == Step.WELCOME && box.press()) {
+		if (toLab >= 0) return;
+		if (step == Step.STOP && box.press()) {
+			toLab = 0;
+			Sounds.sfx("run");
+		} else if (step == Step.WELCOME && box.press()) {
 			step = Step.CHOOSE;
 			lastAt = -1;
 			box.set(List.of("Which POKéMON will you choose?"));
@@ -102,7 +123,7 @@ public class StarterScreen extends GameScreen {
 	@Override
 	protected boolean key(KeyEvent e) {
 		switch (step) {
-			case WELCOME, AFTER -> {
+			case STOP, WELCOME, AFTER -> {
 				if (Ui.isA(e) || Ui.isB(e)) advance();
 			}
 			case CHOOSE -> {
@@ -137,8 +158,8 @@ public class StarterScreen extends GameScreen {
 	protected void draw(GuiGraphics g, float partial) {
 		int h = boxHeight(), m = 6 * s, boxTop = height - h - m - height / 14;
 		float secs = (ticks + partial) / 20F;
-		g.fillGradient(0, 0, width, height, 0x700A0E24, 0xC00A0E24);
-		Ui.cinema(g, width, height, Math.min(1, (ticks + partial) / 10F));
+		if (step == Step.STOP) g.fillGradient(0, height / 2, width, height, 0x000A0E24, 0x900A0E24);
+		else g.fillGradient(0, 0, width, height, 0x700A0E24, 0xC00A0E24);
 		Figures.Batch b = Figures.batch(0, 0, width, height);
 		boolean choosing = step == Step.CHOOSE || step == Step.CONFIRM;
 		if (choosing) {
@@ -166,6 +187,7 @@ public class StarterScreen extends GameScreen {
 				Ui.round(g, cx - cw * 3 / 8, feet - 5 * s, cw * 3 / 4, 10 * s, Ui.alpha(COLORS[i], on ? 0.75F : 0.4F), 4 * s);
 				Ui.round(g, cx - cw * 3 / 10, feet - 3 * s, cw * 3 / 5, 6 * s, Ui.alpha(0xFFFFFFFF, on ? 0.35F : 0.15F), 3 * s);
 				Figures.Fig f = b.mon(IDS[i], cx, feet, tall).at(secs + i * 0.7F).pitch(10).facing(i == 0 ? 14 : i == 2 ? -14 : 0);
+				if (on && step == Step.CHOOSE) f.action("cry", since / 20F);
 				if (on && step == Step.CHOOSE) {
 					// Hops twice, twirling on the first, and lands with a squash.
 					if (since < 22) {
@@ -193,12 +215,17 @@ public class StarterScreen extends GameScreen {
 				int mt = tall * 2 / 5, mxp = width / 2;
 				Ui.round(g, mxp - mt / 2, boxTop - 3 * s, mt, 6 * s, 0x50000000, 3 * s);
 				float hop = since < 30 ? (float) Math.abs(Math.sin(since / 10F * Math.PI)) * 10 * s : 0;
-				b.mon(IDS[at], mxp, boxTop + s, mt).at(secs).pitch(6).facing(10).hop(hop);
+				b.mon(IDS[at], mxp, boxTop + s, mt).at(secs).pitch(6).facing(10).hop(hop).action("cry", since / 20F);
 				b.draw(g);
 				Ui.bubble(g, "star", mxp + mt / 3, boxTop - mt - (int) hop, s, Math.min(1, since / 6F));
 			} else b.draw(g);
 		}
-		box.render(g, font, m * 2, boxTop, width - 4 * m, h, s, ticks, step == Step.WELCOME || step == Step.AFTER);
+		box.render(g, font, m * 2, boxTop, width - 4 * m, h, s, ticks, step == Step.STOP || step == Step.WELCOME || step == Step.AFTER);
+		if (toLab >= 0) {
+			float t = (toLab + partial) / LAB_FADE;
+			float a = Math.min(1, (t < 0.5F ? t : 1 - t) * 2.6F);
+			g.fill(0, 0, width, height, Ui.alpha(0xFF05070F, a));
+		}
 		if (step == Step.CONFIRM) {
 			int w = yesNo.width(font, s);
 			choice(g, yesNo, width - w - m * 2, boxTop - yesNo.height(s) - 4 * s, w, i -> confirm(i == 0));

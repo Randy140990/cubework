@@ -1,1 +1,1 @@
-{"scale":1.1,"idle":"animation.swinub.battle_idle","ground":"animation.swinub.ground_idle","texture":"retromon:textures/pokemon/swinub.png","layers":[],"height":0.4,"standIn":null}
+{"scale":1.1,"idle":"animation.swinub.battle_idle","ground":"animation.swinub.ground_idle","texture":"retromon:textures/pokemon/swinub.png","layers":[],"height":0.4,"standIn":null,"parts":[],"actions":{"cry":"animation.swinub.cry","recoil":"animation.swinub.recoil"}}

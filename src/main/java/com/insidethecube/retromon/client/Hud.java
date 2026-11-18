@@ -22,9 +22,91 @@ public final class Hud {
 				if (!Adventure.active()) old.render(g, delta);
 			});
 		}
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("cinema"), Hud::cinema);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("exclaim"), Hud::exclaim);
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("hints"), Hud::hints);
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("fade"), Hud::fade);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("place"), Hud::place);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("speed"), Hud::speed);
+	}
+
+	// ---------- the cinema frame (talking to someone), fading in and out ----------
+
+	private static float cine, cineOld;
+	/** A fade to black and back (waiting until morning): ticks left, and what to do at the darkest. */
+	private static int fade;
+	private static final int FADE = 36;
+	private static Runnable atDark;
+
+	public static void fadeThrough(Runnable then) {
+		fade = FADE;
+		atDark = then;
+	}
+
+	public static void tick(Minecraft mc) {
+		cineOld = cine;
+		boolean want = Adventure.active() && !BattleScene.active()
+				&& (mc.screen instanceof DialogueScreen || mc.screen instanceof StarterScreen || mc.screen instanceof NicknameScreen && cine > 0);
+		cine += ((want ? 1 : 0) - cine) * (want ? 0.14F : 0.2F);
+		if (Math.abs(cine - (want ? 1 : 0)) < 0.01F) cine = want ? 1 : 0;
+		if (fade > 0) {
+			fade--;
+			if (fade == FADE / 2 && atDark != null) {
+				atDark.run();
+				atDark = null;
+			}
+		}
+	}
+
+	private static void cinema(GuiGraphics g, DeltaTracker delta) {
+		float k = cineOld + (cine - cineOld) * delta.getGameTimeDeltaPartialTick(true);
+		if (k > 0.005F) Ui.cinema(g, g.guiWidth(), g.guiHeight(), k);
+	}
+
+	private static void fade(GuiGraphics g, DeltaTracker delta) {
+		if (fade <= 0) return;
+		float t = FADE - fade + delta.getGameTimeDeltaPartialTick(true);
+		float half = FADE / 2F, a = t < half ? t / half : 1 - (t - half) / half;
+		a = Math.max(0, Math.min(1, a * 1.25F));
+		g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF05070F, a));
+		if (a > 0.85F) {
+			Minecraft mc = Minecraft.getInstance();
+			int s = Ui.scale(g.guiHeight());
+			Ui.centred(g, mc.font, "Time passes...", g.guiWidth() / 2, g.guiHeight() / 2 - 4 * s, Ui.alpha(0xFFE8ECFF, (a - 0.85F) / 0.15F), s, false);
+		}
+	}
+
+	// ---------- the buttons and the time, small at the bottom right ----------
+
+	/** What's what: SPACE to talk, ENTER for the menu, R for speed, and the time of day with the sun or the moon. */
+	private static void hints(GuiGraphics g, DeltaTracker delta) {
+		Minecraft mc = Minecraft.getInstance();
+		if (!Adventure.active() || BattleScene.active() || mc.screen != null || mc.level == null || mc.options.hideGui) return;
+		int s = Ui.scale(g.guiHeight()), w = g.guiWidth(), h = g.guiHeight();
+		long t = Math.floorMod(mc.level.getDayTime(), 24000L);
+		int hour = (int) ((t / 1000 + 6) % 24), minute = (int) ((t % 1000) * 60 / 1000);
+		boolean night = Night.nightness() > 0.5F;
+		String clock = String.format("%d:%02d %s", hour % 12 == 0 ? 12 : hour % 12, minute, hour < 12 ? "AM" : "PM");
+		String[][] keys = {{"SPACE", "Talk"}, {"ENTER", "Menu"}, {"R", "Speed"}};
+		int pad = 5 * s, gap = 8 * s, x = w - pad, y = h - pad - 14 * s;
+		// The keys, right to left.
+		for (int i = keys.length - 1; i >= 0; i--) {
+			int lw = Ui.width(mc.font, keys[i][1], s), kw = Ui.boldWidth(mc.font, keys[i][0], s) + 8 * s;
+			x -= lw;
+			Ui.text(g, mc.font, keys[i][1], x, y + 3 * s, 0xE0E8ECFF, s);
+			x -= kw + 3 * s;
+			Ui.round(g, x, y, kw, 13 * s, 0xC8141B2E, 2 * s);
+			Ui.round(g, x, y + 11 * s, kw, 2 * s, 0x60000000, s);
+			Ui.draw(g, mc.font, Ui.bold(keys[i][0]), x + 4 * s, y + 3 * s, Ui.GOLD, s, false);
+			x -= gap;
+		}
+		// The time, with a sun or a moon.
+		int cw = Ui.width(mc.font, clock, s) + 22 * s;
+		x -= cw;
+		Ui.round(g, x, y, cw, 13 * s, 0xC8141B2E, 2 * s);
+		Ui.round(g, x + 4 * s, y + 3 * s, 7 * s, 7 * s, night ? 0xFFE8ECFF : 0xFFFFC94A, 3 * s);
+		if (night) Ui.round(g, x + 6 * s, y + 2 * s, 6 * s, 6 * s, 0xFF141B2E, 3 * s);
+		Ui.text(g, mc.font, clock, x + 15 * s, y + 3 * s, Ui.TEXT, s);
 	}
 
 	/** The place's name, sliding in at the top left as you arrive (as the later games do), then away. */

@@ -1,1 +1,1 @@
-{"scale":0.9,"idle":"animation.skarmory.battle_idle","ground":"animation.skarmory.ride_jump","texture":"retromon:textures/pokemon/skarmory.png","layers":[],"height":1.8,"standIn":null}
+{"scale":0.9,"idle":"animation.skarmory.battle_idle","ground":"animation.skarmory.ride_jump","texture":"retromon:textures/pokemon/skarmory.png","layers":[],"height":1.8,"standIn":null,"parts":[],"actions":{"cry":"animation.skarmory.cry","recoil":"animation.skarmory.recoil"}}

@@ -24,6 +24,11 @@ public class MonDisplay extends Entity {
 	public static final int LUNGE = 14;
 	/** The lunge: a dash in with a hop (a move that hits), or a hop where it stands (a move from afar). */
 	public boolean dash = true;
+	/** A one-off animation playing (cry, recoil, faint...) and ticks into it, or null. */
+	public String action;
+	public int actionAge;
+	/** Tinted red (drawn into a ball as light) for so many ticks, or 0. */
+	public int red;
 	/** A Poké Ball's texture (which ball it is), or null for a Pokémon. */
 	public String texture;
 	/** Ticks left of a wobble (a ball shaking on the ground). */
@@ -57,6 +62,14 @@ public class MonDisplay extends Entity {
 		if (Math.abs(sizeTarget - size) < 0.01F) size = sizeTarget;
 		if (lunge > 0) lunge--;
 		if (flash > 0) flash--;
+		if (red > 0) red--;
+		if (action != null && ++actionAge > 100) action = null;
+	}
+
+	/** Plays one of its one-off animations from the start (if its model has it). */
+	public void act(String name) {
+		action = name;
+		actionAge = 0;
 	}
 
 	/** Throws it (a ball) from where it is to there, in an arc this high, over so many ticks. */

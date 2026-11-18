@@ -1,1 +1,1 @@
-{"scale":0.8,"idle":"animation.jolteon.ground_idle","ground":"animation.jolteon.ground_idle","texture":"retromon:textures/pokemon/jolteon.png","layers":[],"height":1.15,"standIn":null}
+{"scale":0.8,"idle":"animation.jolteon.ground_idle","ground":"animation.jolteon.ground_idle","texture":"retromon:textures/pokemon/jolteon.png","layers":[],"height":1.15,"standIn":null,"parts":[],"actions":{"cry":"animation.jolteon.cry"}}

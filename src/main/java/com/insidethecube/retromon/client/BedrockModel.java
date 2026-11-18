@@ -39,6 +39,10 @@ public final class BedrockModel {
 		public final Identifier texture;
 		public final List<Layer> layers = new ArrayList<>();
 		final Anim idle;
+		/** One-off animations by name (cry, recoil, faint...), as Cobblemon plays them over the idle. */
+		final Map<String, Anim> actions = new HashMap<>();
+		/** How its parts stand in its pose: shown or hidden (Pidgey's open wings are hidden while it stands), moved, turned. */
+		final List<JsonObject> poseParts = new ArrayList<>();
 
 		Def(String species, JsonObject geo, JsonObject info, JsonObject anims) {
 			this.species = species;
@@ -66,6 +70,26 @@ public final class BedrockModel {
 				if (all.has(name)) a = Anim.read(all.getAsJsonObject(name));
 			}
 			idle = a;
+			if (info.has("actions") && info.get("actions").isJsonObject()) {
+				for (Map.Entry<String, JsonElement> e : info.getAsJsonObject("actions").entrySet()) {
+					String name = e.getValue().getAsString();
+					if (all.has(name)) actions.put(e.getKey(), Anim.read(all.getAsJsonObject(name)));
+				}
+			}
+			if (info.has("parts") && info.get("parts").isJsonArray()) {
+				for (JsonElement e : info.getAsJsonArray("parts")) if (e.isJsonObject()) poseParts.add(e.getAsJsonObject());
+			}
+		}
+
+		/** Whether it has a one-off animation by this name. */
+		public boolean has(String action) {
+			return actions.containsKey(action);
+		}
+
+		/** How long a one-off animation lasts (seconds), or 0. */
+		public double length(String action) {
+			Anim a = actions.get(action);
+			return a == null ? 0 : a.length;
 		}
 	}
 
@@ -134,6 +158,10 @@ public final class BedrockModel {
 		for (JsonObject b : roots) build(mesh.getRoot(), b, null, children);
 		this.root = LayerDefinition.create(mesh, def.texW, def.texH).bakeRoot();
 		for (JsonObject b : roots) collect(root, b, children);
+		for (JsonObject t : def.poseParts) {
+			ModelPart p = parts.get(t.has("part") ? t.get("part").getAsString() : "");
+			if (p != null && t.has("visible")) p.visible = t.get("visible").getAsBoolean();
+		}
 	}
 
 	public static BedrockModel create(String species) {
@@ -216,10 +244,40 @@ public final class BedrockModel {
 
 	/** Poses it for this moment of its idle animation. */
 	public void pose(double seconds) {
+		pose(seconds, null, 0);
+	}
+
+	/**
+	 * Poses it for this moment of its idle, with a one-off animation (cry, recoil...) played over it, action
+	 * seconds in (if it has that one and it hasn't finished).
+	 */
+	public void pose(double seconds, String action, double actionSeconds) {
 		for (ModelPart p : parts.values()) p.resetPose();
-		Anim a = def.idle;
+		// Its pose's own moves and turns (from Cobblemon's poser).
+		for (JsonObject t : def.poseParts) {
+			ModelPart p = parts.get(t.has("part") ? t.get("part").getAsString() : "");
+			if (p == null) continue;
+			if (t.has("position") && t.get("position").isJsonArray()) {
+				JsonArray v = t.getAsJsonArray("position");
+				p.x += -v.get(0).getAsFloat();
+				p.y += -v.get(1).getAsFloat();
+				p.z += v.get(2).getAsFloat();
+			}
+			if (t.has("rotation") && t.get("rotation").isJsonArray()) {
+				JsonArray v = t.getAsJsonArray("rotation");
+				p.xRot += (float) -Math.toRadians(v.get(0).getAsFloat());
+				p.yRot += (float) -Math.toRadians(v.get(1).getAsFloat());
+				p.zRot += (float) Math.toRadians(v.get(2).getAsFloat());
+			}
+		}
+		apply(def.idle, seconds, true);
+		Anim one = action == null ? null : def.actions.get(action);
+		if (one != null && actionSeconds >= 0 && actionSeconds <= one.length) apply(one, actionSeconds, false);
+	}
+
+	private void apply(Anim a, double seconds, boolean loop) {
 		if (a == null) return;
-		double t = a.length > 0 ? (a.loop ? seconds % a.length : Math.min(seconds, a.length)) : seconds;
+		double t = a.length > 0 ? (loop && a.loop ? seconds % a.length : Math.min(seconds, a.length)) : seconds;
 		double[] v = new double[3];
 		for (Track tr : a.tracks) {
 			ModelPart p = parts.get(tr.bone);

@@ -1,1 +1,1 @@
-{"scale":0.8,"idle":"animation.grimer.battle_idle","ground":"animation.grimer.ground_idle","texture":"retromon:textures/pokemon/grimer.png","layers":[],"height":1.25,"standIn":null}
+{"scale":0.8,"idle":"animation.grimer.battle_idle","ground":"animation.grimer.ground_idle","texture":"retromon:textures/pokemon/grimer.png","layers":[],"height":1.25,"standIn":null,"parts":[],"actions":{"cry":"animation.grimer.cry","recoil":"animation.grimer.recoil"}}

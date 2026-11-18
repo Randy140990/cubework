@@ -54,6 +54,22 @@ public final class Sounds {
 		Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound.value(), pitch, volume));
 	}
 
+	private static SoundInstance voice;
+
+	/** The Pokédex reads a Pokémon's entry aloud (if that's on in OPTION). */
+	public static void dexVoice(String species) {
+		stopVoice();
+		if (species == null || species.isEmpty() || !Settings.voice()) return;
+		voice = new SimpleSoundInstance(Retromon.id("dex." + species), SoundSource.NEUTRAL, 1F, 1F, RandomSource.create(), false, 0,
+				SoundInstance.Attenuation.NONE, 0, 0, 0, true);
+		Minecraft.getInstance().getSoundManager().play(voice);
+	}
+
+	public static void stopVoice() {
+		if (voice != null) Minecraft.getInstance().getSoundManager().stop(voice);
+		voice = null;
+	}
+
 	public static void cry(String species, float pitch) {
 		if (species == null || species.isEmpty()) return;
 		Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(Retromon.id("cry." + species), SoundSource.NEUTRAL, 0.9F, pitch,

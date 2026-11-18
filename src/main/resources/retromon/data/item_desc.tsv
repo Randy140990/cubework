@@ -1,0 +1,166 @@
+# id	text
+master_ball	The best BALL. It never misses.
+ultra_ball	A BALL with a high rate of success.
+brightpowder	Lowers the foe's accuracy. (HOLD)
+great_ball	A BALL with a decent success rate.
+poke_ball	An item for catching POKéMON.
+bicycle	A collapsible bike for fast movement.
+moon_stone	Evolves certain kinds of POKéMON.
+antidote	Cures poisoned POKéMON.
+burn_heal	Heals burned POKéMON.
+ice_heal	Defrosts frozen POKéMON.
+awakening	Awakens sleeping POKéMON.
+parlyz_heal	Heals paralyzed POKéMON.
+full_restore	Fully restores HP & status.
+max_potion	Fully restores POKéMON HP.
+hyper_potion	Restores POKéMON HP by 200.
+super_potion	Restores POKéMON HP by 50.
+potion	Restores POKéMON HP by 20.
+escape_rope	Use for escaping from caves, etc.
+repel	Repels weak POKéMON for 100 steps.
+max_elixer	Fully restores the PP of one POKéMON.
+fire_stone	Evolves certain kinds of POKéMON.
+thunderstone	Evolves certain kinds of POKéMON.
+water_stone	Evolves certain kinds of POKéMON.
+hp_up	Raises the HP of one POKéMON.
+protein	Raises ATTACK of one POKéMON.
+iron	Raises DEFENSE of one POKéMON.
+carbos	Raises SPEED of one POKéMON.
+lucky_punch	Ups critical hit ratio of CHANSEY.
+calcium	Ups SPECIAL stats of one POKéMON.
+rare_candy	Raises level of a POKéMON by one.
+x_accuracy	Raises accuracy. (1 BTL)
+leaf_stone	Evolves certain kinds of POKéMON.
+metal_powder	Raises DEFENSE of DITTO. (HOLD)
+nugget	Made of pure gold. Sell high.
+poke_doll	Use to escape from a wild POKéMON.
+full_heal	Eliminates all status problems.
+revive	Restores a fainted POKéMON to 1/2 HP.
+max_revive	Fully restores a fainted POKéMON.
+guard_spec	Prevents stats reduction. (1 BTL)
+super_repel	Repels weak POKéMON for 200 steps.
+max_repel	Repels weak POKéMON for 250 steps.
+dire_hit	Ups critical hit ratio. (1 BTL)
+fresh_water	Restores POKéMON HP by 50.
+soda_pop	Restores POKéMON HP by 60.
+lemonade	Restores POKéMON HP by 80.
+x_attack	Raises ATTACK. (1 BTL)
+x_defend	Raises DEFENSE. (1 BTL)
+x_speed	Raises SPEED. (1 BTL)
+x_special	Raises SPECIAL ATTACK. (1 BTL)
+coin_case	Holds up to 9,999 game coins.
+itemfinder	Checks for unseen items in the area.
+exp_share	Shares battle EXP. Points. (HOLD)
+old_rod	Use by water to fish for POKéMON.
+good_rod	A good ROD for catching POKéMON.
+silver_leaf	A strange, silvercolored leaf.
+super_rod	The best ROD for catching POKéMON.
+pp_up	Raises max PP of a selected move.
+ether	Restores PP of one move by 10.
+max_ether	Fully restores PP of one move.
+elixer	Restores PP of all moves by 10.
+red_scale	A scale from the red GYARADOS.
+secretpotion	Fully heals any POKéMON.
+s_s_ticket	A ticket for the S.S.AQUA.
+mystery_egg	An EGG obtained from MR.POKéMON.
+clear_bell	Makes a gentle ringing.
+silver_wing	A strange, silvercolored feather.
+moomoo_milk	Restores POKéMON HP by 100.
+quick_claw	Raises 1st strike ratio. (HOLD)
+psncureberry	A self-cure for poison. (HOLD)
+gold_leaf	A strange, goldcolored leaf.
+soft_sand	Powers up groundtype moves. (HOLD)
+sharp_beak	Powers up flyingtype moves. (HOLD)
+przcureberry	A self-cure for paralysis. (HOLD)
+burnt_berry	A self-cure for freezing. (HOLD)
+ice_berry	A self-heal for a burn. (HOLD)
+poison_barb	Powers up poisontype moves. (HOLD)
+kings_rock	May make the foe flinch. (HOLD)
+bitter_berry	A self-cure for confusion. (HOLD)
+mint_berry	A self-awakening for sleep. (HOLD)
+red_apricorn	A red APRICORN.
+tinymushroom	An ordinary mushroom. Sell low.
+big_mushroom	A rare mushroom. Sell high.
+silverpowder	Powers up bug-type moves. (HOLD)
+blu_apricorn	A blue APRICORN.
+amulet_coin	Doubles monetary earnings. (HOLD)
+ylw_apricorn	A yellow APRICORN.
+grn_apricorn	A green APRICORN.
+cleanse_tag	Helps repel wild POKéMON. (HOLD)
+mystic_water	Powers up watertype moves. (HOLD)
+twistedspoon	Powers up psychictype moves. (HOLD)
+wht_apricorn	A white APRICORN.
+blackbelt_i	Boosts fightingtype moves. (HOLD)
+blk_apricorn	A black APRICORN.
+pnk_apricorn	A pink APRICORN.
+blackglasses	Powers up darktype moves. (HOLD)
+slowpoketail	Very tasty. Sell high.
+pink_bow	Powers up normaltype moves. (HOLD)
+stick	An ordinary stick. Sell low.
+smoke_ball	Escape from wild POKéMON. (HOLD)
+nevermeltice	Powers up ice-type moves. (HOLD)
+magnet	Boosts electrictype moves. (HOLD)
+miracleberry	Cures all status problems. (HOLD)
+pearl	A beautiful pearl. Sell low.
+big_pearl	A big, beautiful pearl. Sell high.
+everstone	Stops evolution. (HOLD)
+spell_tag	Powers up ghosttype moves. (HOLD)
+ragecandybar	Restores POKéMON HP by 20.
+gs_ball	The mysterious BALL.
+blue_card	Card to save points.
+miracle_seed	Powers up grasstype moves. (HOLD)
+thick_club	A bone of some sort. Sell low.
+focus_band	May prevent fainting. (HOLD)
+energypowder	Restores POKéMON HP by 50. Bitter.
+energy_root	Restores POKéMON HP by 200. Bitter.
+heal_powder	Cures all status problems. Bitter.
+revival_herb	Revives fainted POKéMON. Bitter.
+hard_stone	Powers up rocktype moves. (HOLD)
+lucky_egg	Earns extra EXP. points. (HOLD)
+card_key	Opens shutters in the RADIO TOWER.
+machine_part	A machine part for the POWER PLANT.
+egg_ticket	May use at Goldenrod trade corner.
+lost_item	The POKé DOLL lost by the COPYCAT.
+stardust	Pretty, red sand. Sell high.
+star_piece	A hunk of red gem. Sell very high.
+basement_key	Opens doors.
+pass	A ticket for the MAGNET TRAIN.
+charcoal	Powers up firetype moves. (HOLD)
+berry_juice	Restores POKéMON HP by 20.
+scope_lens	Raises critical hit ratio. (HOLD)
+metal_coat	Powers up steeltype moves. (HOLD)
+dragon_fang	Powers up dragontype moves. (HOLD)
+leftovers	Restores HP during battle. (HOLD)
+mysteryberry	A self-restore for PP. (HOLD)
+dragon_scale	A rare dragon-type item.
+berserk_gene	Boosts ATTACK but causes confusion.
+sacred_ash	Fully revives all fainted POKéMON.
+heavy_ball	A BALL for catching heavy POKéMON.
+flower_mail	Flower-print MAIL. (HOLD)
+level_ball	A BALL for lowerlevel POKéMON.
+lure_ball	A BALL for POKéMON hooked by a ROD.
+fast_ball	A BALL for catching fast POKéMON.
+light_ball	An odd, electrical orb. (HOLD)
+friend_ball	A BALL that makes POKéMON friendly.
+moon_ball	A BALL for MOON STONE evolvers.
+love_ball	For catching the opposite gender.
+normal_box	Open it and see what's inside.
+gorgeous_box	Open it and see what's inside.
+sun_stone	Evolves certain kinds of POKéMON.
+polkadot_bow	Powers up normaltype moves. (HOLD)
+up_grade	A mysterious box made by SILPH CO.
+berry	A self-restore item. (10HP, HOLD)
+gold_berry	A self-restore item. (30HP, HOLD)
+squirtbottle	A bottle used for watering plants.
+park_ball	The Bug-Catching Contest BALL.
+rainbow_wing	A mystical feather of rainbow colors.
+brick_piece	A rare chunk of tile.
+surf_mail	LAPRAS-print MAIL. (HOLD)
+litebluemail	DRATINI-print MAIL. (HOLD)
+portraitmail	MAIL featuring the holder's likeness.
+lovely_mail	Heart-print MAIL. (HOLD)
+eon_mail	EEVEE-print MAIL. (HOLD)
+morph_mail	DITTO-print MAIL. (HOLD)
+bluesky_mail	Sky-print MAIL. (HOLD)
+music_mail	NATU-print MAIL. (HOLD)
+mirage_mail	MEW-print MAIL. (HOLD)
