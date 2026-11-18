@@ -24,7 +24,7 @@ public final class ClientState {
 
 	public static PlayerData data = new PlayerData();
 	/** The professor's welcome is waiting for the world to be on screen. */
-	private static boolean introPending;
+	private static boolean introPending, introStopped;
 	private static int introDelay;
 	/** The trainer who's just spotted you, and how long the "!" stays up. */
 	public static int exclaimNpc = -1, exclaimTicks;
@@ -58,7 +58,8 @@ public final class ClientState {
 			}
 			case "intro" -> {
 				introPending = true;
-				introDelay = 30;
+				introStopped = t.getBooleanOr("stop", false);
+				introDelay = introStopped ? 4 : 30;
 			}
 			case "place" -> {
 				placeName = t.getStringOr("name", "");
@@ -149,7 +150,7 @@ public final class ClientState {
 		}
 		if (introPending && mc.screen == null && --introDelay <= 0) {
 			introPending = false;
-			mc.setScreen(new StarterScreen());
+			mc.setScreen(new StarterScreen(introStopped));
 		}
 	}
 

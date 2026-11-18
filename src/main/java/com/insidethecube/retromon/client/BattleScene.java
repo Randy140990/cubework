@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.Entity;
@@ -95,14 +96,15 @@ public final class BattleScene {
 		}
 		build(mc.player.blockPosition());
 		double far = 6.0 + Math.max(0, h - 1.5) * 1.3;
-		mineAt = centre.add(-1.3, 0, 2.6);
-		enemyAt = centre.add(1.4, 0, 2.6 - far);
+		mineAt = centre.add(-0.5, 0, 2.4);
+		enemyAt = centre.add(1.9, 0, 2.4 - far);
 		if (kind.equals("water")) enemyAt = new Vec3(enemyAt.x, centre.y - 0.1, enemyAt.z);
 		mine = spawn(mineAt, face(mineAt, enemyAt));
 		theirs = spawn(enemyAt, face(enemyAt, mineAt));
-		// Behind your Pokémon and a little above, looking across to theirs (the newer games' view).
-		cam = centre.add(0.3, 2.3 + Math.max(0, h - 2) * 0.35, 8.2 + Math.max(0, h - 2) * 0.8);
-		aim(mineAt.lerp(enemyAt, 0.6).add(0, 0.55 + h * 0.18, 0));
+		// Behind your Pokémon and a little above, looking across to theirs (the newer games' view): yours low and
+		// left of the middle, clear of your card, theirs further off to the right.
+		cam = centre.add(0.0, 1.9 + Math.max(0, h - 2) * 0.4, 7.4 + Math.max(0, h - 2) * 0.9);
+		aim(mineAt.lerp(enemyAt, 0.5).add(0, 0.8 + Math.max(0, h - 1) * 0.15, 0));
 		active = true;
 		revealed = false;
 	}
@@ -207,16 +209,50 @@ public final class BattleScene {
 
 	// ---------- the moves' effects ----------
 
-	private record Fx(Vec3 from, Vec3 to, ParticleOptions particle, int life, boolean beam, int[] age, int density) {}
+	/** Kinds of effect: a stream from one to the other, bursts on the target, a gathering on the attacker, a ring on the ground. */
+	private static final int BEAM = 0, BURST = 1, CHARGE = 2, RING = 3, SPIRAL = 4;
+
+	private record Fx(int kind, Vec3 from, Vec3 to, ParticleOptions particle, ParticleOptions trail, int life, int delay, int[] age, int density) {}
 
 	private static final List<Fx> FX = new ArrayList<>();
-	/** A flash of the move's colour over the screen (the battle screen draws it): colour, ticks left, length. */
+	/** A flash of the move's colour round the screen's edges (the battle screen draws it): colour, ticks left, length. */
 	public static int flashColor, flashTicks, flashMax = 1;
-	/** The camera's move for an attack: behind the attacker looking at the target, then back. */
+	/** The camera's move for an attack: a push in towards the attacker, and back. */
 	private static int shotSide = -1, shotTicks, shotMax = 1;
 	/** A lightning bolt to come down on a target (Thunderbolt, Thunder): ticks to wait, and where. */
 	private static int boltIn = -1;
 	private static Vec3 boltAt = Vec3.ZERO;
+
+	/** A hit's burst drawn on the screen over the one hit (a star of light in the move's colour). */
+	public static final class Impact {
+		public final int side, color;
+		public final boolean big;
+		public int age;
+		public final int life;
+
+		Impact(int side, int color, boolean big, int life) {
+			this.side = side;
+			this.color = color;
+			this.big = big;
+			this.life = life;
+		}
+	}
+
+	/** Arrows rising (a stat up) or falling (down) over a Pokémon, drawn on the screen. */
+	public static final class Arrows {
+		public final int side;
+		public final boolean up;
+		public int age;
+		public static final int LIFE = 26;
+
+		Arrows(int side, boolean up) {
+			this.side = side;
+			this.up = up;
+		}
+	}
+
+	public static final List<Impact> IMPACTS = new ArrayList<>();
+	public static final List<Arrows> ARROWS = new ArrayList<>();
 
 	/** The colour of each type, for the flash on a hit. */
 	public static int typeColor(Type t) {
@@ -228,7 +264,7 @@ public final class BattleScene {
 			case PSYCHIC -> 0xFF6FB7;
 			case ICE -> 0xA8F0FF;
 			case DRAGON -> 0x7A5CFF;
-			case DARK -> 0x1A1420;
+			case DARK -> 0x3A2A50;
 			case GHOST -> 0x7A4CC8;
 			case POISON -> 0xB04CD8;
 			case FIGHTING -> 0xE0502A;
@@ -262,67 +298,104 @@ public final class BattleScene {
 		return def == null ? 1 : def.height;
 	}
 
+	/** How tall a side's Pokémon stands. */
+	public static float height(int side) {
+		MonDisplay d = display(side);
+		BedrockModel.Def def = d == null ? null : BedrockModel.def(d.species);
+		return def == null ? 1 : Math.min(3.5F, def.height);
+	}
+
 	public static Vec3 enemySpot() {
 		return enemyAt;
 	}
 
+	private static ParticleOptions dust(int rgb, float size) {
+		return new DustParticleOptions(rgb & 0xFFFFFF, size);
+	}
+
+	/** Moves that hit from afar (the attacker rears back rather than dashing in). */
+	private static final java.util.Set<String> RANGED = java.util.Set.of("swift", "sonicboom", "dragon_rage", "razor_wind", "gust", "twister", "earthquake",
+			"magnitude", "fissure", "rock_slide", "rock_throw", "pin_missile", "spike_cannon", "egg_bomb", "barrage", "bonemerang", "poison_sting", "twineedle",
+			"acid", "smog", "sludge", "sludge_bomb", "razor_leaf", "explosion", "selfdestruct", "night_shade", "psywave", "seismic_toss", "sand_attack",
+			"string_shot", "spore", "sleep_powder", "stun_spore", "poisonpowder", "present");
+	/** Moves of the special types that still hit up close (punches, bites, a waterfall). */
+	private static final java.util.Set<String> CLOSE = java.util.Set.of("fire_punch", "ice_punch", "thunderpunch", "bite", "crunch", "flame_wheel", "waterfall",
+			"crabhammer", "clamp", "vine_whip", "faint_attack", "thief", "pursuit", "outrage");
+
+	/** Whether a move hits up close (the attacker dashes in) or from afar. */
+	public static boolean contact(Move m) {
+		if (m == null || m.power() <= 0) return false;
+		if (CLOSE.contains(m.id())) return true;
+		if (m.id().contains("beam") || RANGED.contains(m.id())) return false;
+		return !m.type().special();
+	}
+
 	/**
-	 * A move's effect: the camera moves behind the attacker to watch it go, the move's colour flashes as it
-	 * lands, and its particles by type: a stream for special moves, a burst for physical ones, sparkles for
-	 * stat moves. The big ones have their own: a real bolt of lightning for Thunderbolt and Thunder, beams for
-	 * the beam moves, the ground shaking for Earthquake, a fire storm, a wave, an explosion.
+	 * A move's effect: the attacker hops in (or rears back for a move from afar), the camera pushes in a little,
+	 * and the move's particles by type: special moves gather on the attacker and stream across in their colour,
+	 * bursting on the target; hits up close slash or thump; stat moves spiral up. The big ones have their own:
+	 * a real bolt of lightning for Thunderbolt and Thunder, beams, the ground shaking for Earthquake, a fire
+	 * storm, a wave, an explosion.
 	 */
 	public static void move(int side, String moveId) {
 		if (!active() || moveId == null) return;
 		Move m = Move.find(moveId);
 		if (m == null) return;
-		Vec3 me = spot(side).add(0, 0.6, 0), them = spot(1 - side).add(0, 0.6, 0);
+		Vec3 me = spot(side).add(0, 0.25 + height(side) * 0.4, 0), them = spot(1 - side).add(0, 0.25 + height(1 - side) * 0.4, 0);
 		ParticleOptions p = particle(m.type());
+		int rgb = typeColor(m.type());
+		ParticleOptions tint = dust(rgb, 1.8F);
 		int density = 3 + Math.max(0, m.power()) / 25;
+		pendingFlash = rgb;
 		if (m.power() <= 0) {
 			// Status moves: on itself (raising its stats) or on the other one.
 			boolean self = m.effect().contains("UP") || m.effect().contains("HEAL") || m.effect().contains("REFLECT") || m.effect().contains("LIGHT_SCREEN")
 					|| m.effect().contains("SUBSTITUTE") || m.effect().contains("FOCUS") || m.effect().contains("REST") || m.effect().contains("PROTECT");
-			FX.add(new Fx(self ? me : them, self ? me : them, self ? ParticleTypes.HAPPY_VILLAGER : p, 14, false, new int[1], 4));
-			shot(side, 12);
+			Vec3 at = self ? spot(side) : spot(1 - side);
+			FX.add(new Fx(SPIRAL, at, at, self ? ParticleTypes.END_ROD : p, tint, 18, 0, new int[1], 3));
+			shot(side, 14);
 			Sounds.sfx("shrink", self ? 1.2F : 0.9F, 0.6F);
 			return;
 		}
-		boolean special = switch (m.type()) {
-			case FIRE, WATER, GRASS, ELECTRIC, PSYCHIC, ICE, DRAGON, DARK -> true;
-			default -> false;
-		};
+		boolean close = contact(m);
 		String id = m.id();
-		shot(side, special ? 24 : 18);
-		if (id.equals("thunderbolt") || id.equals("thunder") || id.equals("zap_cannon")) {
-			boltIn = 10;
+		shot(side, close ? 16 : 24);
+		if (!close) FX.add(new Fx(CHARGE, me, me, ParticleTypes.END_ROD, tint, 7, 0, new int[1], 4));
+		int after = close ? 5 : 7;
+		if (id.equals("thunderbolt") || id.equals("thunder") || id.equals("zap_cannon") || id.equals("thundershock") || id.equals("thunderpunch")) {
+			boltIn = after + 3;
 			boltAt = spot(1 - side);
-			FX.add(new Fx(them, them, ParticleTypes.ELECTRIC_SPARK, 20, false, new int[1], 10));
-		} else if (id.contains("beam") || id.equals("solarbeam") || id.equals("dragonbreath") || id.equals("aurora_beam")) {
-			FX.add(new Fx(me, them, ParticleTypes.END_ROD, 14, true, new int[1], 6));
-			FX.add(new Fx(me, them, p, 14, true, new int[1], density + 4));
+			FX.add(new Fx(BURST, them, them, ParticleTypes.ELECTRIC_SPARK, tint, 18, after, new int[1], 10));
+		} else if (id.contains("beam") || id.equals("solarbeam") || id.equals("dragonbreath") || id.equals("psybeam")) {
+			FX.add(new Fx(BEAM, me, them, ParticleTypes.END_ROD, tint, 12, after, new int[1], 8));
+			FX.add(new Fx(BEAM, me, them, p, dust(0xFFFFFF, 1.2F), 12, after + 2, new int[1], density + 3));
 		} else if (id.equals("earthquake") || id.equals("magnitude") || id.equals("fissure")) {
-			shake = 26;
-			FX.add(new Fx(them, them, new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState()), 20, false, new int[1], 14));
-			FX.add(new Fx(me, me, new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState()), 20, false, new int[1], 8));
+			shake = 28;
+			FX.add(new Fx(RING, spot(1 - side), spot(1 - side), new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DIRT.defaultBlockState()), tint, 20, 2, new int[1],
+					16));
+			FX.add(new Fx(RING, spot(side), spot(side), ParticleTypes.DUST_PLUME, tint, 16, 0, new int[1], 10));
 		} else if (id.equals("explosion") || id.equals("selfdestruct")) {
-			shake = 24;
+			shake = 26;
 			burst(me, ParticleTypes.EXPLOSION_EMITTER, 1, 0.1);
-			flash(0xFFFFFF, 14);
-		} else if (id.equals("flamethrower") || id.equals("fire_blast") || id.equals("fire_spin") || id.equals("sacred_fire")) {
-			FX.add(new Fx(me, them, ParticleTypes.FLAME, 14, true, new int[1], 12));
-			FX.add(new Fx(them, them, ParticleTypes.LAVA, 18, false, new int[1], 6));
-		} else if (id.equals("surf") || id.equals("hydro_pump") || id.equals("whirlpool") || id.equals("bubblebeam")) {
-			FX.add(new Fx(me, them, ParticleTypes.SPLASH, 14, true, new int[1], 14));
-			FX.add(new Fx(them, them, ParticleTypes.FALLING_WATER, 18, false, new int[1], 10));
-		} else if (id.equals("blizzard") || id.equals("gust") || id.equals("twister") || id.equals("razor_wind") || id.equals("whirlwind")) {
-			FX.add(new Fx(them, them, m.type() == Type.ICE ? ParticleTypes.SNOWFLAKE : ParticleTypes.GUST, 20, false, new int[1], 8));
-		} else if (special) {
-			FX.add(new Fx(me, them, p, 12, true, new int[1], density));
+			flash(0xFFFFFF, 16);
+		} else if (id.equals("flamethrower") || id.equals("fire_blast") || id.equals("fire_spin") || id.equals("sacred_fire") || id.equals("ember")) {
+			FX.add(new Fx(BEAM, me, them, ParticleTypes.FLAME, dust(0xFF6A1A, 2.2F), 12, after, new int[1], id.equals("ember") ? 6 : 14));
+			FX.add(new Fx(BURST, them, them, ParticleTypes.LAVA, dust(0xFFB040, 2F), 16, after + 10, new int[1], 6));
+		} else if (id.equals("surf") || id.equals("hydro_pump") || id.equals("whirlpool") || id.equals("bubblebeam") || id.equals("water_gun") || id.equals("bubble")) {
+			FX.add(new Fx(BEAM, me, them, id.startsWith("bubble") ? ParticleTypes.BUBBLE_POP : ParticleTypes.SPLASH, dust(0x5AA8FF, 2F), 12, after, new int[1], 14));
+			FX.add(new Fx(BURST, them, them, ParticleTypes.FALLING_WATER, dust(0x9AD0FF, 1.6F), 16, after + 10, new int[1], 10));
+		} else if (id.equals("blizzard") || id.equals("gust") || id.equals("twister") || id.equals("razor_wind") || id.equals("whirlwind") || id.equals("ice_beam")
+				|| id.equals("powder_snow")) {
+			FX.add(new Fx(SPIRAL, spot(1 - side), spot(1 - side), m.type() == Type.ICE ? ParticleTypes.SNOWFLAKE : ParticleTypes.GUST, tint, 20, after, new int[1], 6));
+		} else if (close) {
+			// Up close: a slash for claws and blades, a thump for the rest, as it lands its hop.
+			boolean slash = id.contains("scratch") || id.contains("slash") || id.equals("cut") || id.contains("fury") || id.contains("claw") || id.equals("vicegrip")
+					|| id.equals("guillotine") || id.equals("karate_chop") || id.equals("wing_attack") || id.equals("peck") || id.equals("drill_peck");
+			FX.add(new Fx(BURST, them, them, slash ? ParticleTypes.SWEEP_ATTACK : ParticleTypes.POOF, tint, 4, after, new int[1], slash ? 2 : 6));
+			if (m.type() != Type.NORMAL) FX.add(new Fx(BURST, them, them, p, tint, 8, after, new int[1], density));
 		} else {
-			FX.add(new Fx(them, them, p, 8, false, new int[1], density));
+			FX.add(new Fx(BEAM, me, them, p, tint, 12, after, new int[1], density + 3));
 		}
-		pendingFlash = typeColor(m.type());
 		Sounds.sfx(sound(m), 1F, 0.7F);
 	}
 
@@ -376,11 +449,23 @@ public final class BattleScene {
 		};
 	}
 
-	/** A hit: the screen shakes (harder when it's super effective). */
+	/** A hit: the screen shakes (harder when it's super effective), the move's colour glows round the edges, a star of light bursts on it. */
 	public static void hit(int side, int effect) {
-		shake = Math.max(shake, effect > 0 ? 12 : 7);
-		flash(pendingFlash, effect > 0 ? 12 : 8);
-		burst(spot(side).add(0, 0.7, 0), ParticleTypes.CRIT, effect > 0 ? 18 : 8, 0.35);
+		shake = Math.max(shake, effect > 0 ? 14 : 8);
+		flash(pendingFlash, effect > 0 ? 16 : 10);
+		IMPACTS.add(new Impact(side, pendingFlash, effect > 0, effect > 0 ? 12 : 9));
+		Vec3 at = spot(side).add(0, 0.25 + height(side) * 0.4, 0);
+		sphere(at, ParticleTypes.CRIT, effect > 0 ? 22 : 12, 0.45);
+		sphere(at, dust(pendingFlash, 1.6F), effect > 0 ? 18 : 10, 0.3);
+		ring(spot(side).add(0, 0.1, 0), dust(pendingFlash, 1.4F), 16, 0.28);
+	}
+
+	/** A stat raised or lowered: arrows over it (the screen draws them), and sparkles. */
+	public static void stat(int side, boolean up) {
+		if (!active) return;
+		ARROWS.add(new Arrows(side, up));
+		Vec3 at = spot(side);
+		FX.add(new Fx(SPIRAL, at, at, up ? ParticleTypes.END_ROD : ParticleTypes.SQUID_INK, dust(up ? 0xFF7A3A : 0x4A8FE0, 1.4F), 16, 0, new int[1], 3));
 	}
 
 	/** Fainting: it sinks as it goes. */
@@ -390,6 +475,7 @@ public final class BattleScene {
 		Vec3 p = spot(side);
 		d.fly(p.x, p.y - 0.7, p.z, 0, 16);
 		d.sizeTarget = 0;
+		ring(p.add(0, 0.1, 0), ParticleTypes.POOF, 14, 0.15);
 		Sounds.faint();
 	}
 
@@ -398,6 +484,25 @@ public final class BattleScene {
 		for (int i = 0; i < n; i++) {
 			level.addParticle(p, at.x + (RNG.nextDouble() - 0.5) * spread * 2, at.y + (RNG.nextDouble() - 0.5) * spread * 2,
 					at.z + (RNG.nextDouble() - 0.5) * spread * 2, (RNG.nextDouble() - 0.5) * 0.1, RNG.nextDouble() * 0.08, (RNG.nextDouble() - 0.5) * 0.1);
+		}
+	}
+
+	/** Particles flying out in all directions from a point. */
+	private static void sphere(Vec3 at, ParticleOptions p, int n, double speed) {
+		if (level == null) return;
+		for (int i = 0; i < n; i++) {
+			double u = RNG.nextDouble() * 2 - 1, a = RNG.nextDouble() * Math.PI * 2, r = Math.sqrt(1 - u * u);
+			double vx = r * Math.cos(a), vy = u, vz = r * Math.sin(a);
+			level.addParticle(p, at.x + vx * 0.15, at.y + vy * 0.15, at.z + vz * 0.15, vx * speed, vy * speed, vz * speed);
+		}
+	}
+
+	/** Particles flying out flat along the ground in a ring. */
+	private static void ring(Vec3 at, ParticleOptions p, int n, double speed) {
+		if (level == null) return;
+		for (int i = 0; i < n; i++) {
+			double a = Math.PI * 2 * i / n;
+			level.addParticle(p, at.x + Math.cos(a) * 0.3, at.y, at.z + Math.sin(a) * 0.3, Math.cos(a) * speed, 0.01, Math.sin(a) * speed);
 		}
 	}
 
@@ -480,7 +585,7 @@ public final class BattleScene {
 		for (int i = 0; i < n; i++) {
 			double a = Math.toRadians(i * 360.0 / n + RNG.nextInt(10));
 			int tx = cx + (int) Math.round(Math.sin(a) * radius), tz = cz + (int) Math.round(Math.cos(a) * radius);
-			if (tz - cz > 6 && Math.abs(tx - cx) < 7) continue;
+			if (tz - cz > 4 && Math.abs(tx - cx) < 9) continue;
 			int kindOf = mixed ? RNG.nextInt(3) : 0;
 			BlockState log = kindOf == 1 ? Blocks.SPRUCE_LOG.defaultBlockState() : kindOf == 2 ? Blocks.BIRCH_LOG.defaultBlockState() : Blocks.OAK_LOG.defaultBlockState();
 			BlockState leaves = (kindOf == 1 ? Blocks.SPRUCE_LEAVES : kindOf == 2 ? Blocks.BIRCH_LEAVES : Blocks.OAK_LEAVES).defaultBlockState()
@@ -510,6 +615,8 @@ public final class BattleScene {
 			for (int dz = (int) -to; dz <= to; dz++) {
 				double d = Math.sqrt(dx * dx + dz * dz);
 				if (d < from || d > to || RNG.nextDouble() > chance) continue;
+				// Nothing between the camera and the Pokémon.
+				if (dz > 0 && Math.abs(dx) < 9) continue;
 				BlockPos at = new BlockPos(cx + dx, y + 1, cz + dz);
 				if (!level.getBlockState(at).isAir()) continue;
 				BlockState below = level.getBlockState(at.below());
@@ -542,7 +649,7 @@ public final class BattleScene {
 			for (int dz = -16; dz <= 16; dz++) {
 				double d = Math.sqrt(dx * dx + dz * dz);
 				if (d < 10.5 || d > 14.5) continue;
-				if (dz > 6 && Math.abs(dx) < 8) continue;
+				if (dz > 4 && Math.abs(dx) < 9) continue;
 				int h = 4 + (int) (Math.abs(Math.sin(dx * 0.7) + Math.cos(dz * 0.6)) * 3) + RNG.nextInt(3);
 				for (int i = 1; i <= h; i++) set(cx + dx, y + i, cz + dz, stone[RNG.nextInt(stone.length)]);
 			}
@@ -593,6 +700,8 @@ public final class BattleScene {
 		}
 		BEFORE.clear();
 		FX.clear();
+		IMPACTS.clear();
+		ARROWS.clear();
 		shotTicks = flashTicks = 0;
 		boltIn = -1;
 		mine = theirs = ball = sendBall = null;
@@ -636,20 +745,61 @@ public final class BattleScene {
 		}
 		for (int i = FX.size() - 1; i >= 0; i--) {
 			Fx f = FX.get(i);
-			int age = ++f.age()[0];
-			if (f.beam()) {
-				// The stream travels from the attacker to the target, then bursts there.
-				double t = Math.min(1, age / (double) f.life());
-				Vec3 at = f.from().lerp(f.to(), t);
-				for (int k = 0; k < f.density(); k++) {
-					level.addParticle(f.particle(), at.x + (RNG.nextDouble() - 0.5) * 0.3, at.y + (RNG.nextDouble() - 0.5) * 0.3, at.z + (RNG.nextDouble() - 0.5) * 0.3, 0, 0.01, 0);
+			int age = ++f.age()[0] - f.delay();
+			if (age <= 0) continue;
+			switch (f.kind()) {
+				case BEAM -> {
+					// The stream travels from the attacker to the target in a trail of its colour, then bursts there.
+					double t = Math.min(1, age / (double) f.life());
+					Vec3 d = f.to().subtract(f.from());
+					for (int k = 0; k < f.density(); k++) {
+						double tt = Math.max(0, t - RNG.nextDouble() * 0.12);
+						Vec3 at = f.from().lerp(f.to(), tt);
+						double j = 0.12 + 0.1 * Math.sin(age * 0.9 + k);
+						level.addParticle(f.particle(), at.x + (RNG.nextDouble() - 0.5) * j, at.y + (RNG.nextDouble() - 0.5) * j, at.z + (RNG.nextDouble() - 0.5) * j,
+								d.x * 0.02, d.y * 0.02 + 0.005, d.z * 0.02);
+					}
+					Vec3 head = f.from().lerp(f.to(), t);
+					for (int k = 0; k < 3; k++) level.addParticle(f.trail(), head.x + (RNG.nextDouble() - 0.5) * 0.2, head.y + (RNG.nextDouble() - 0.5) * 0.2,
+							head.z + (RNG.nextDouble() - 0.5) * 0.2, 0, 0, 0);
+					if (age == f.life()) {
+						sphere(f.to(), f.particle(), 18, 0.25);
+						sphere(f.to(), f.trail(), 14, 0.2);
+					}
 				}
-				if (age == f.life()) burst(f.to(), f.particle(), 16, 0.4);
-			} else if (age % 2 == 0) {
-				burst(f.to(), f.particle(), f.density(), 0.45);
+				case CHARGE -> {
+					// Light gathering on the attacker before the move goes.
+					for (int k = 0; k < f.density(); k++) {
+						double a = RNG.nextDouble() * Math.PI * 2, u = RNG.nextDouble() * 2 - 1, r = Math.sqrt(1 - u * u);
+						Vec3 off = new Vec3(r * Math.cos(a), u, r * Math.sin(a)).scale(0.9);
+						Vec3 at = f.to().add(off);
+						level.addParticle(k % 2 == 0 ? f.particle() : f.trail(), at.x, at.y, at.z, -off.x * 0.12, -off.y * 0.12, -off.z * 0.12);
+					}
+				}
+				case RING -> {
+					if (age % 3 == 1) ring(f.to(), f.particle(), f.density(), 0.18 + age * 0.01);
+					if (age % 4 == 1) ring(f.to().add(0, 0.2, 0), f.trail(), 12, 0.22);
+				}
+				case SPIRAL -> {
+					// Rising round it in a spiral (a stat move, a whirlwind).
+					for (int k = 0; k < f.density(); k++) {
+						double a = age * 0.55 + k * Math.PI * 2 / f.density();
+						double y = (age / (double) f.life()) * 1.8;
+						Vec3 at = f.to().add(Math.cos(a) * 0.7, y, Math.sin(a) * 0.7);
+						level.addParticle(k % 2 == 0 ? f.particle() : f.trail(), at.x, at.y, at.z, 0, 0.02, 0);
+					}
+				}
+				default -> {
+					if (age % 2 == 1) {
+						burst(f.to(), f.particle(), f.density(), 0.45);
+						burst(f.to(), f.trail(), Math.max(2, f.density() / 2), 0.4);
+					}
+				}
 			}
 			if (age >= f.life()) FX.remove(i);
 		}
+		for (int i = IMPACTS.size() - 1; i >= 0; i--) if (++IMPACTS.get(i).age > IMPACTS.get(i).life) IMPACTS.remove(i);
+		for (int i = ARROWS.size() - 1; i >= 0; i--) if (++ARROWS.get(i).age > Arrows.LIFE) ARROWS.remove(i);
 	}
 
 	public static double[] cameraPose(float partial) {
@@ -661,22 +811,18 @@ public final class BattleScene {
 		}
 		double x = cam.x, y = cam.y, z = cam.z, yaw = camYaw, pitch = camPitch;
 		if (shotTicks > 0 && shotSide >= 0) {
-			// Behind the attacker and a little to the side, watching its move go across; in and out smoothly.
+			// A gentle push in towards the one attacking, the view leaning its way; then back.
 			float t = 1 - (shotTicks - partial) / shotMax;
 			double w = Math.sin(Math.PI * Math.max(0, Math.min(1, t)));
-			w = w * w * 0.85;
-			Vec3 a = spot(shotSide), b = spot(1 - shotSide);
-			Vec3 dir = new Vec3(b.x - a.x, 0, b.z - a.z).normalize();
-			Vec3 side = new Vec3(-dir.z, 0, dir.x);
-			Vec3 at = a.subtract(dir.scale(3.0)).add(side.scale(1.1)).add(0, 1.6, 0);
-			Vec3 look = b.add(0, 0.7, 0).subtract(at);
-			double sYaw = Math.toDegrees(Math.atan2(-look.x, look.z)), sPitch = Math.toDegrees(Math.atan2(-look.y, Math.sqrt(look.x * look.x + look.z * look.z)));
-			double dy = ((sYaw - yaw) % 360 + 540) % 360 - 180;
-			x += (at.x - x) * w;
-			y += (at.y - y) * w;
-			z += (at.z - z) * w;
-			yaw += dy * w;
-			pitch += (sPitch - pitch) * w;
+			w = w * w;
+			Vec3 focus = spot(shotSide).add(0, 0.25 + height(shotSide) * 0.45, 0);
+			double push = shotSide == 0 ? 0.16 : 0.1;
+			x += (focus.x - x) * push * w;
+			y += (focus.y - y) * push * 0.5 * w;
+			z += (focus.z - z) * push * w;
+			Vec3 look = camTarget.lerp(focus, 0.28 * w).subtract(x, y, z);
+			yaw = Math.toDegrees(Math.atan2(-look.x, look.z));
+			pitch = Math.toDegrees(Math.atan2(-look.y, Math.sqrt(look.x * look.x + look.z * look.z)));
 		}
 		return new double[] {x + sx, y + sy, z, yaw, pitch};
 	}

@@ -1,7 +1,0 @@
-grep (guiRenderState|nextStratum|submitPicturesInPicture|public.Matrix3x2fStack.pose|scissorStack) net/minecraft/client/gui/GuiGraphics.java
-grep (public.void|public.static|ELEMENT_SORT|Comparator|up\(\)) net/minecraft/client/gui/render/state/GuiRenderState.java
-grep (renderToBuffer|public.final.RenderType.renderType|public.ModelPart.root) net/minecraft/client/model/Model.java
-grep (public.DustParticleOptions) net/minecraft/core/particles/DustParticleOptions.java
-grep (SWEEP_ATTACK|DUST_PLUME|FIREWORK|FLASH|SONIC_BOOM|GLOW.=|WHITE_ASH|TRIAL_SPAWNER_DETECTED_PLAYER|BUBBLE_POP|INSTANT_EFFECT|HEART|NOTE) net/minecraft/core/particles/ParticleTypes.java
-grep (ENTITY_IN_UI|PLAYER_SKIN|ITEMS_FLAT|LEVEL|enum.Entry) com/mojang/blaze3d/platform/Lighting.java
-grep (public.static.RenderType.(entityCutoutNoCull|entityTranslucent|entityTranslucentEmissive|entityCutout)) net/minecraft/client/renderer/rendertype/RenderTypes.java

@@ -154,7 +154,31 @@ public final class Game {
 		setSpeed(1);
 		sync(p);
 		data(p).place = "";
-		if (!data(p).started) Net.send(p, "intro", new CompoundTag());
+		// Without a Pokémon: Oak stops you as you head out of Pallet Town (below); on a map without Pallet Town
+		// marked, his welcome comes straight away.
+		if (!data(p).started && town() == null) Net.send(p, "intro", new CompoundTag());
+	}
+
+	private static Zone town() {
+		for (Zone z : zones) if (z.place().equals("pallet_town")) return z;
+		return null;
+	}
+
+	/**
+	 * Before you have a Pokémon, Oak stops you leaving Pallet Town for the next place (as the games did at the
+	 * tall grass): you're put back a few steps inside the town, and he takes you to choose one.
+	 */
+	private static void oakStops(ServerPlayer p) {
+		Zone town = town();
+		if (town == null || town.contains(p.getX(), p.getZ()) || placeAt(p.getX(), p.getZ()) == null) return;
+		int x = Math.max(town.x1() + 4, Math.min(town.x2() - 4, p.getBlockX()));
+		int z = Math.max(town.z1() + 4, Math.min(town.z2() - 4, p.getBlockZ()));
+		BlockPos to = standable((ServerLevel) p.level(), x, z, p.getBlockY());
+		p.teleportTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5);
+		BUSY.put(p.getUUID(), 100);
+		CompoundTag t = new CompoundTag();
+		t.putBoolean("stop", true);
+		Net.send(p, "intro", t);
 	}
 
 	public static void leave(ServerPlayer p) {
@@ -334,6 +358,7 @@ public final class Game {
 			COOLDOWN.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			BUSY.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			if (s.getTickCount() % 10 == 0) enter(p, placeAt(p.getX(), p.getZ()));
+			if (s.getTickCount() % 5 == 0 && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
 			// Kept in Adventure mode (so nothing on the map can be broken, Axiom included) unless map editing is on.
 			if (!build && s.getTickCount() % 20 == 0 && p.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) p.setGameMode(GameType.ADVENTURE);
 			if (Battles.in(p) || BUSY.containsKey(id)) {

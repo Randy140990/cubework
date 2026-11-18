@@ -21,7 +21,9 @@ public class MonDisplay extends Entity {
 	public float size = 1, sizeTarget = 1, sizeOld = 1;
 	/** Ticks left of a lunge (attacking) and of flashing (hit). */
 	public int lunge, flash;
-	public static final int LUNGE = 10;
+	public static final int LUNGE = 14;
+	/** The lunge: a dash in with a hop (a move that hits), or a hop where it stands (a move from afar). */
+	public boolean dash = true;
 	/** A Poké Ball's texture (which ball it is), or null for a Pokémon. */
 	public String texture;
 	/** Ticks left of a wobble (a ball shaking on the ground). */

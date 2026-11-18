@@ -20,7 +20,7 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 
 	public static class State extends EntityRenderState {
 		BedrockModel model;
-		float yaw, size, lunge, wobble;
+		float yaw, size, lunge, lift, wobble;
 		boolean hidden;
 		Identifier texture;
 	}
@@ -49,10 +49,29 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 		s.model = e.model instanceof BedrockModel m ? m : null;
 		s.yaw = e.facing;
 		s.size = Mth.lerp(partial, e.sizeOld, e.size);
-		s.lunge = e.lunge > 0 ? Mth.sin((float) Math.PI * (MonDisplay.LUNGE - e.lunge + partial) / MonDisplay.LUNGE) : 0;
+		s.lunge = s.lift = 0;
+		if (e.lunge > 0) {
+			float p = Math.min(1, (MonDisplay.LUNGE - e.lunge + partial) / MonDisplay.LUNGE);
+			if (e.dash) {
+				// Draws back, springs in with a hop, lands, then trots back to its place.
+				if (p < 0.18F) s.lunge = -0.3F * ease(p / 0.18F);
+				else if (p < 0.48F) s.lunge = -0.3F + 1.75F * ease((p - 0.18F) / 0.3F);
+				else s.lunge = 1.45F * (1 - ease((p - 0.48F) / 0.52F));
+				if (p > 0.16F && p < 0.56F) s.lift = 0.6F * Mth.sin((float) Math.PI * (p - 0.16F) / 0.4F);
+			} else {
+				// Rears back and hops where it stands as it lets the move go.
+				s.lunge = -0.22F * Mth.sin((float) Math.PI * p);
+				s.lift = 0.45F * Math.abs(Mth.sin((float) Math.PI * 2 * p)) * (1 - p * 0.4F);
+			}
+		}
 		s.hidden = e.flash > 0 && (e.flash / 2) % 2 == 0;
 		s.texture = e.texture == null ? null : Identifier.parse(e.texture);
 		s.wobble = e.wobble > 0 ? Mth.sin((12 - e.wobble + partial) / 12F * (float) Math.PI * 2) * 25F : 0;
+	}
+
+	private static float ease(float t) {
+		t = Math.max(0, Math.min(1, t));
+		return t * t * (3 - 2 * t);
 	}
 
 	@Override
@@ -62,7 +81,7 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 		float scale = m.def.scale * s.size;
 		pose.pushPose();
 		double yaw = Math.toRadians(s.yaw);
-		pose.translate(-Math.sin(yaw) * s.lunge * 0.7, 0, Math.cos(yaw) * s.lunge * 0.7);
+		pose.translate(-Math.sin(yaw) * s.lunge, s.lift, Math.cos(yaw) * s.lunge);
 		pose.mulPose(Axis.YP.rotationDegrees(180F - s.yaw));
 		if (s.wobble != 0) pose.mulPose(Axis.ZP.rotationDegrees(s.wobble));
 		pose.scale(-1F, -1F, 1F);

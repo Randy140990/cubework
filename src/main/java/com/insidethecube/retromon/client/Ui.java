@@ -72,18 +72,98 @@ public final class Ui {
 		if (!on) g.fill(x + 2 * s, y, x + w - 2 * s, y + Math.max(1, s / 2), 0x26FFFFFF);
 	}
 
-	/** Black bars at the top and bottom of the screen (a cinema frame), fading into the picture. t: 0 to 1. */
+	/**
+	 * The cinema frame: the top and bottom of the screen darkening smoothly into the picture (no hard bars). t (0 to
+	 * 1) is how far it has faded in: the whole frame fades in together, by its opacity.
+	 */
 	public static void cinema(GuiGraphics g, int width, int height, float t) {
-		int bar = Math.round(height * 0.11F * Math.max(0, Math.min(1, t)));
-		if (bar <= 0) return;
-		g.fill(0, 0, width, bar, 0xFF000000);
-		g.fill(0, height - bar, width, height, 0xFF000000);
-		int fade = Math.max(1, bar / 2);
-		for (int i = 0; i < fade; i++) {
-			int a = (int) (200 * (1 - i / (float) fade));
-			g.fill(0, bar + i, width, bar + i + 1, a << 24);
-			g.fill(0, height - bar - i - 1, width, height - bar - i, a << 24);
+		t = Math.max(0, Math.min(1, t));
+		if (t <= 0) return;
+		// Ease in, so it arrives softly.
+		float k = t * t * (3 - 2 * t);
+		int deep = Math.round(height * 0.075F), soft = Math.round(height * 0.12F);
+		int a = (int) (0xE6 * k), mid = (int) (0x9C * k);
+		g.fillGradient(0, 0, width, deep, a << 24, mid << 24);
+		g.fillGradient(0, deep, width, deep + soft, mid << 24, 0);
+		g.fillGradient(0, height - deep - soft, width, height - deep, 0, mid << 24);
+		g.fillGradient(0, height - deep, width, height, mid << 24, a << 24);
+	}
+
+	/** A glow of colour around the edges of the screen (a hit's colour), strength 0 to 1. */
+	public static void vignette(GuiGraphics g, int width, int height, int rgb, float strength) {
+		if (strength <= 0) return;
+		int a = (int) (Math.min(1, strength) * 0xB0);
+		int c = (a << 24) | (rgb & 0xFFFFFF), clear = rgb & 0xFFFFFF;
+		int e = Math.round(height * 0.22F);
+		g.fillGradient(0, 0, width, e, c, clear);
+		g.fillGradient(0, height - e, width, height, clear, c);
+		// Sides: thin vertical strips stepping down in strength (the GUI only fades top to bottom).
+		int side = Math.round(width * 0.12F), steps = 12;
+		for (int i = 0; i < steps; i++) {
+			int x0 = side * i / steps, x1 = side * (i + 1) / steps;
+			int ai = (int) (a * (1 - (i + 0.5F) / steps) * 0.85F);
+			int col = (ai << 24) | (rgb & 0xFFFFFF);
+			g.fill(x0, 0, x1, height, col);
+			g.fill(width - x1, 0, width - x0, height, col);
 		}
+	}
+
+	/**
+	 * A slanted bar (the newer games' buttons): a parallelogram leaning forward by lean pixels, filled top to
+	 * bottom from one colour to another, with an outline if edge isn't 0.
+	 */
+	public static void slab(GuiGraphics g, int x, int y, int w, int h, int top, int bottom, int lean, int edge, int edgeW) {
+		g.pose().pushMatrix();
+		g.pose().translate(x + lean / 2F, y + h / 2F);
+		g.pose().mul(new org.joml.Matrix3x2f(1, 0, -lean / (float) Math.max(1, h), 1, 0, 0));
+		int hh = h / 2;
+		if (edge != 0 && edgeW > 0) {
+			g.fill(-edgeW, -hh - edgeW, w + edgeW, h - hh + edgeW, edge);
+		}
+		g.fillGradient(0, -hh, w, h - hh, top, bottom);
+		// A sheen along the top.
+		g.fill(1, -hh, w - 1, -hh + Math.max(1, h / 10), 0x38FFFFFF);
+		g.pose().popMatrix();
+	}
+
+	/** A white picture (an icon) tinted with a colour. */
+	public static void icon(GuiGraphics g, String name, int x, int y, int size, int color) {
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, Retromon.id("textures/gui/" + name + ".png"), x, y, 0, 0, size, size, 32, 32, 32, 32,
+				color);
+	}
+
+	/**
+	 * A speech bubble with an emote in it (heart, star, exclaim, note, happy), its tail pointing down at (cx,
+	 * bottom). pop (0 to 1) is how far it has popped up.
+	 */
+	public static void bubble(GuiGraphics g, String emote, int cx, int bottom, int s, float pop) {
+		if (pop <= 0) return;
+		float k = pop < 1 ? (float) (1 + Math.sin(pop * Math.PI) * 0.25) * pop : 1;
+		int size = Math.round(22 * s * k), half = size / 2;
+		int top = bottom - size - Math.round(5 * s * k);
+		round(g, cx - half - s, top - s, size + 2 * s, size + 2 * s, 0x50000000, 3 * s);
+		round(g, cx - half, top, size, size, 0xFFFFFFFF, 3 * s);
+		// The tail.
+		for (int i = 0; i < 5 * s * k; i++) {
+			int w = Math.max(0, Math.round(4 * s * k) - i);
+			g.fill(cx - w, top + size + i, cx + w, top + size + i + 1, 0xFFFFFFFF);
+		}
+		int in = Math.round(size * 0.72F);
+		icon(g, "emote/" + emote, cx - in / 2, top + (size - in) / 2, in, 0xFFFFFFFF);
+	}
+
+	/** A soft round glow (a light behind something), built up from see-through rounded boxes. */
+	public static void glow(GuiGraphics g, int cx, int cy, int rx, int ry, int color) {
+		for (int i = 0; i < 7; i++) {
+			int x = rx - i * rx / 8, y = ry - i * ry / 8;
+			round(g, cx - x, cy - y, 2 * x, 2 * y, color, Math.max(1, Math.min(x, y) / 3));
+		}
+	}
+
+	/** A colour mixed towards white by k (0 to 1). */
+	public static int lighter(int argb, float k) {
+		int a = argb >>> 24, r = (argb >> 16) & 255, gr = (argb >> 8) & 255, b = argb & 255;
+		return (a << 24) | ((int) (r + (255 - r) * k) << 16) | ((int) (gr + (255 - gr) * k) << 8) | (int) (b + (255 - b) * k);
 	}
 
 	public static int darker(int argb, float k) {
