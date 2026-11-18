@@ -111,6 +111,7 @@ public class Retromon implements ModInitializer {
 			case "outfit" -> Game.outfit(p, t);
 			case "lab" -> Game.toLab(p);
 			case "wait" -> Game.waitUntil(p, t);
+			case "nights" -> Game.nights(p, t);
 			default -> {
 			}
 		}

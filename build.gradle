@@ -25,6 +25,11 @@ loom {
 	}
 }
 
+// The jar: Retromon-0.7.1-for-MC1.21.11.jar
+remapJar {
+	archiveFileName = "Retromon-${project.mod_version}-for-MC${project.minecraft_version}.jar"
+}
+
 processResources {
 	def version = project.version
 	inputs.property "version", version

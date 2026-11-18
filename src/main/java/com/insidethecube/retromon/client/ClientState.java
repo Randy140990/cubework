@@ -44,6 +44,7 @@ public final class ClientState {
 				boolean save = t.getBooleanOr("save", false);
 				Adventure.setOn(t.getBooleanOr("on", false), save);
 				if (save) {
+					Night.send();
 					Shaders.enter();
 					// The brighter greens are worked into the map as it's drawn: draw it again.
 					if (mc.levelRenderer != null) mc.levelRenderer.allChanged();

@@ -50,7 +50,10 @@ public class RetromonClient implements ClientModInitializer {
 		// Retromon on the title screen, top left (clear of the menu and other mods' buttons).
 		ScreenEvents.AFTER_INIT.register((client, screen, w, h) -> {
 			if (!(screen instanceof TitleScreen)) return;
-			Button button = Button.builder(Component.literal("Retromon"), b -> Minecraft.getInstance().setScreen(new IntroScreen(screen))).bounds(8, 8, 98, 20)
+			Button button = Button.builder(Component.literal("Retromon"), b -> {
+				IntroScreen.minecraftTitle = false;
+				Minecraft.getInstance().setScreen(new IntroScreen(screen));
+			}).bounds(8, 8, 98, 20)
 					.build();
 			Screens.getButtons(screen).add(button);
 		});

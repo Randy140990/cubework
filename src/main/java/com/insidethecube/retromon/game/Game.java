@@ -470,6 +470,7 @@ public final class Game {
 			BUSY.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			if (s.getTickCount() % 10 == 0) enter(p, placeAt(p.getX(), p.getZ()));
 			if (s.getTickCount() % 5 == 0 && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
+			if (s.getTickCount() % 40 == 0) moonlight(p);
 			// Kept in Adventure mode (so nothing on the map can be broken, Axiom included) unless map editing is on.
 			if (!build && s.getTickCount() % 20 == 0 && p.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) p.setGameMode(GameType.ADVENTURE);
 			if (Battles.in(p) || BUSY.containsKey(id)) {
@@ -484,6 +485,25 @@ public final class Game {
 		approach(s);
 		if (s.getTickCount() % 40 == 0) placeTouchPoints(s);
 		holdTime(s);
+	}
+
+	/** Each player's NIGHTS setting (0 dark, 1 soft, 2 bright), sent from their OPTION. */
+	private static final Map<UUID, Integer> NIGHTS = new HashMap<>();
+
+	public static void nights(ServerPlayer p, CompoundTag t) {
+		NIGHTS.put(p.getUUID(), Math.max(0, Math.min(2, t.getIntOr("nights", 1))));
+		moonlight(p);
+	}
+
+	/** At night, an unseen night vision (no icon, no swirls) so the screen can lift the dark to a moonlit blue. */
+	private static void moonlight(ServerPlayer p) {
+		long t = Math.floorMod(p.level().getDayTime(), 24000L);
+		boolean night = t >= 12300 && t < 23700 && NIGHTS.getOrDefault(p.getUUID(), 1) > 0;
+		var nv = p.getEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+		boolean ours = nv != null && nv.getAmplifier() == 7;
+		if (night && (nv == null || ours && nv.getDuration() < 400)) {
+			p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 900, 7, true, false, false));
+		} else if (!night && ours) p.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
 	}
 
 	/** The time when a battle began: the world's clock stands still until it's over (so day doesn't turn to night mid-fight). */

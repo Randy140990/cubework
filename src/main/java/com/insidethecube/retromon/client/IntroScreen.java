@@ -150,12 +150,17 @@ public class IntroScreen extends GameScreen {
 		}
 	}
 
+	/** Showing Minecraft's own title screen (chosen from MINECRAFT); otherwise Retromon's is the start. */
+	public static boolean minecraftTitle;
+
 	private void openMenu() {
 		slots = findSlots();
 		List<String> options = new ArrayList<>();
 		if (!slots.isEmpty()) options.add("CONTINUE");
 		options.add("NEW GAME");
-		options.add("BACK");
+		options.add("OPTIONS");
+		options.add("MINECRAFT");
+		options.add("QUIT");
 		menu = new Choice(options);
 		step = Step.MENU;
 	}
@@ -169,6 +174,18 @@ public class IntroScreen extends GameScreen {
 				step = Step.SLOTS;
 			}
 			case "NEW GAME" -> startOak();
+			case "OPTIONS" -> {
+				if (minecraft != null) minecraft.setScreen(new net.minecraft.client.gui.screens.options.OptionsScreen(this, minecraft.options));
+			}
+			case "MINECRAFT" -> {
+				// The usual title screen (other worlds, servers, mods); its Retromon button comes back here.
+				minecraftTitle = true;
+				if (minecraft != null) minecraft.setScreen(parent instanceof net.minecraft.client.gui.screens.TitleScreen ? parent
+						: new net.minecraft.client.gui.screens.TitleScreen());
+			}
+			case "QUIT" -> {
+				if (minecraft != null) minecraft.stop();
+			}
 			default -> onClose();
 		}
 	}
@@ -328,7 +345,9 @@ public class IntroScreen extends GameScreen {
 	@Override
 	protected void back() {
 		switch (step) {
-			case TITLE -> onClose();
+			case TITLE -> {
+				// Retromon is the start: there's nowhere to go back to.
+			}
 			case MENU -> step = Step.TITLE;
 			case SLOTS, FAILED -> step = Step.MENU;
 			case TALK -> clickAnywhere();

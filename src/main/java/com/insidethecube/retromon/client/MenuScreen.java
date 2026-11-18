@@ -261,7 +261,10 @@ public class MenuScreen extends GameScreen {
 						case 0 -> setSpeed(Math.floorMod(d.textSpeed + step, 3));
 						case 1 -> Music.setLevel(Math.floorMod(Music.level() + step, 5));
 						case 2 -> Settings.set("voice", Settings.voice() ? 0 : 1);
-						default -> Settings.set("nights", Math.floorMod(Settings.nights() + step, 3));
+						default -> {
+							Settings.set("nights", Math.floorMod(Settings.nights() + step, 3));
+							Night.send();
+						}
 					}
 					Sounds.press();
 				} else if (Ui.isB(e)) view = View.MENU;
@@ -551,7 +554,10 @@ public class MenuScreen extends GameScreen {
 		optionRow(g, d, l, y + 10 * s, w, 0, "TEXT SPEED", new String[] {"SLOW", "MID", "FAST"}, d.textSpeed, i -> setSpeed(i));
 		optionRow(g, d, l, y + 46 * s, w, 1, "MUSIC", new String[] {"OFF", "LOW", "MID", "HIGH", "MAX"}, Music.level(), Music::setLevel);
 		optionRow(g, d, l, y + 82 * s, w, 2, "POKéDEX VOICE", new String[] {"OFF", "ON"}, Settings.voice() ? 1 : 0, i -> Settings.set("voice", i));
-		optionRow(g, d, l, y + 118 * s, w, 3, "NIGHTS", new String[] {"DARK", "SOFT", "BRIGHT"}, Settings.nights(), i -> Settings.set("nights", i));
+		optionRow(g, d, l, y + 118 * s, w, 3, "NIGHTS", new String[] {"DARK", "SOFT", "BRIGHT"}, Settings.nights(), i -> {
+			Settings.set("nights", i);
+			Night.send();
+		});
 		Ui.text(g, font, "Mouse wheel: zoom.  R: game speed.  Shift: run.", l, y + h - 14 * s, Ui.DIM, s);
 	}
 

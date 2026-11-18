@@ -16,9 +16,9 @@
     "LevelWeatherMixin",
     "PlayerSkinMixin",
     "NightVisionMixin",
-    "LightTextureMixin",
     "OutlineMixin",
-    "OutlineColourMixin"
+    "OutlineColourMixin",
+    "TitleMixin"
   ],
   "injectors": {
     "defaultRequire": 1
