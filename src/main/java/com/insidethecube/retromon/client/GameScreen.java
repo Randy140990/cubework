@@ -20,6 +20,8 @@ public abstract class GameScreen extends Screen {
 	protected int s = 1;
 	protected int ticks;
 	protected int mx = -1, my = -1;
+	/** Where what's drawn now sits on the screen (a device's screen draws its insides from its own corner). */
+	protected int ox, oy;
 
 	private record Hit(int x, int y, int w, int h, Runnable click) {}
 
@@ -68,7 +70,7 @@ public abstract class GameScreen extends Screen {
 
 	/** Something clickable, drawn this frame. */
 	protected void hit(int x, int y, int w, int h, Runnable click) {
-		hits.add(new Hit(x, y, w, h, click));
+		hits.add(new Hit(x + ox, y + oy, w, h, click));
 	}
 
 	protected boolean over(int x, int y, int w, int h) {

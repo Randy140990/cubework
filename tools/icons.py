@@ -100,4 +100,81 @@ im, d = canvas()  # RUN: a double arrow
 for ox in (0, 10):
     d.polygon(pts([(4 + ox, 5), (14 + ox, 16), (4 + ox, 27), (9 + ox, 27), (19 + ox, 16), (9 + ox, 5)]), fill=W)
 save(im, 'icon', 'run.png')
+
+# ---- the START menu's apps (white, on coloured rounds) ----
+T = (0, 0, 0, 0)
+im, d = canvas()  # POKéDEX: the device, its lens and a screen
+d.rounded_rectangle(pts([(5, 4), (27, 28)]), radius=4 * K, fill=W)
+d.rounded_rectangle(pts([(9, 13), (23, 24)]), radius=2 * K, fill=T)
+d.ellipse(pts([(8, 6.5), (13, 11.5)]), fill=T)
+d.ellipse(pts([(9.5, 8), (11.5, 10)]), fill=W)
+d.ellipse(pts([(16, 8), (18, 10)]), fill=T)
+d.ellipse(pts([(20, 8), (22, 10)]), fill=T)
+save(im, 'icon', 'dex.png')
+
+im, d = canvas()  # BAG: a backpack with a flap and two straps
+d.rounded_rectangle(pts([(6, 7), (26, 29)]), radius=5 * K, fill=W)
+d.arc(pts([(11, 1.5), (21, 11)]), 180, 360, fill=W, width=3 * K)
+d.rounded_rectangle(pts([(6, 7), (26, 16)]), radius=5 * K, fill=T)
+d.rounded_rectangle(pts([(7.5, 8.5), (24.5, 15)]), radius=4 * K, fill=W)
+d.rectangle(pts([(6, 16), (26, 17.6)]), fill=T)
+d.rounded_rectangle(pts([(10, 20), (22, 26)]), radius=2 * K, fill=T)
+d.rounded_rectangle(pts([(11.5, 21.5), (20.5, 24.5)]), radius=1 * K, fill=W)
+save(im, 'icon', 'backpack.png')
+
+im, d = canvas()  # MAP: a folded map with a pin
+d.polygon(pts([(3, 7), (11, 4), (21, 7), (29, 4), (29, 25), (21, 28), (11, 25), (3, 28)]), fill=W)
+d.line(pts([(11, 4), (11, 25)]), fill=T, width=int(1.5 * K))
+d.line(pts([(21, 7), (21, 28)]), fill=T, width=int(1.5 * K))
+d.ellipse(pts([(13, 9), (19, 15)]), fill=T)
+d.polygon(pts([(13.3, 13.5), (18.7, 13.5), (16, 20)]), fill=T)
+save(im, 'icon', 'map.png')
+
+im, d = canvas()  # CLOTHES: a cap
+d.chord(pts([(6, 6), (26, 26)]), 180, 360, fill=W)
+d.rounded_rectangle(pts([(4, 15), (30, 19)]), radius=2 * K, fill=W)
+d.ellipse(pts([(14.5, 4.5), (17.5, 7.5)]), fill=W)
+d.line(pts([(16, 8), (16, 15)]), fill=T, width=int(1.2 * K))
+save(im, 'icon', 'cap.png')
+
+im, d = canvas()  # CARD: an ID card
+d.rounded_rectangle(pts([(3, 7), (29, 25)]), radius=3 * K, fill=W)
+d.ellipse(pts([(6.5, 11), (13.5, 18)]), fill=T)
+d.chord(pts([(5.5, 17), (14.5, 26)]), 180, 360, fill=T)
+for y in (12, 16, 20):
+    d.rounded_rectangle(pts([(16.5, y - 0.9), (26, y + 0.9)]), radius=1 * K, fill=T)
+save(im, 'icon', 'card.png')
+
+im, d = canvas()  # WAIT: a clock
+d.ellipse(pts([(3, 3), (29, 29)]), fill=W)
+d.ellipse(pts([(6, 6), (26, 26)]), fill=T)
+d.line(pts([(16, 16), (16, 9)]), fill=W, width=int(2.4 * K))
+d.line(pts([(16, 16), (21, 19)]), fill=W, width=int(2.4 * K))
+d.ellipse(pts([(14.5, 14.5), (17.5, 17.5)]), fill=W)
+save(im, 'icon', 'clock.png')
+
+im, d = canvas()  # SAVE: a notebook with a ribbon
+d.rounded_rectangle(pts([(6, 3), (26, 29)]), radius=3 * K, fill=W)
+d.rectangle(pts([(9, 3), (10.5, 29)]), fill=T)
+d.polygon(pts([(18, 3), (23, 3), (23, 13), (20.5, 10.5), (18, 13)]), fill=T)
+save(im, 'icon', 'save.png')
+
+im, d = canvas()  # OPTION: a cog
+cog = []
+for i in range(48):
+    a = math.pi * 2 * i / 48
+    r = 13.5 if (i // 3) % 2 == 0 else 10.5
+    cog.append((16 + math.cos(a) * r, 16 + math.sin(a) * r))
+d.polygon(pts(cog), fill=W)
+d.ellipse(pts([(11.5, 11.5), (20.5, 20.5)]), fill=T)
+save(im, 'icon', 'cog.png')
+
+im, d = canvas()  # EXIT: a cross
+d.line(pts([(8, 8), (24, 24)]), fill=W, width=int(4 * K))
+d.line(pts([(24, 8), (8, 24)]), fill=W, width=int(4 * K))
+save(im, 'icon', 'close.png')
+
+im, d = canvas()  # the map's "you are here": an arrow
+d.polygon(pts([(16, 2), (28, 28), (16, 21), (4, 28)]), fill=W)
+save(im, 'icon', 'arrow.png')
 print('icons written')

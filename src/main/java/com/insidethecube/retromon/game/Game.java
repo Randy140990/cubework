@@ -386,6 +386,7 @@ public final class Game {
 
 
 	public static void leave(ServerPlayer p) {
+		DEVICES.remove(p.getUUID());
 		Battles.drop(p);
 		LAST.remove(p.getUUID());
 		BUSY.remove(p.getUUID());
@@ -405,7 +406,34 @@ public final class Game {
 	}
 
 	public static void sync(ServerPlayer p) {
-		Net.send(p, "sync", data(p).save());
+		CompoundTag t = data(p).save();
+		// The marked places too, for the Town Map.
+		net.minecraft.nbt.ListTag zs = new net.minecraft.nbt.ListTag();
+		for (Zone z : zones) {
+			CompoundTag o = new CompoundTag();
+			o.putString("place", z.place());
+			o.putInt("x1", z.x1());
+			o.putInt("z1", z.z1());
+			o.putInt("x2", z.x2());
+			o.putInt("z2", z.z2());
+			zs.add(o);
+		}
+		t.put("zones", zs);
+		Net.send(p, "sync", t);
+	}
+
+	/** Everyone's map brought up to date (a place has been marked or cleared). */
+	private static void syncAll() {
+		if (server == null) return;
+		for (ServerPlayer q : server.getPlayerList().getPlayers()) if (adventure(q)) sync(q);
+	}
+
+	/** Who has their Pokédex out (the clock stands still while it is, as in a battle). */
+	private static final java.util.Set<UUID> DEVICES = new java.util.HashSet<>();
+
+	public static void device(ServerPlayer p, boolean on) {
+		if (on && adventure(p)) DEVICES.add(p.getUUID());
+		else DEVICES.remove(p.getUUID());
 	}
 
 	/** The game's speed: 1 to 4 times (everything, as an emulator's fast-forward does). */
@@ -611,6 +639,7 @@ public final class Game {
 		if (a == null || b == null) return false;
 		zones.add(new Zone(place, Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), Math.max(a[1], b[1])));
 		saveMarker();
+		syncAll();
 		return true;
 	}
 
@@ -618,6 +647,7 @@ public final class Game {
 		int before = zones.size();
 		zones.removeIf(z -> z.place().equals(place));
 		saveMarker();
+		syncAll();
 		return before - zones.size();
 	}
 
@@ -942,7 +972,7 @@ public final class Game {
 	private static void holdTime(MinecraftServer s) {
 		if (!ourSave) return;
 		boolean fighting = false;
-		for (ServerPlayer p : s.getPlayerList().getPlayers()) if (adventure(p) && Battles.in(p)) fighting = true;
+		for (ServerPlayer p : s.getPlayerList().getPlayers()) if (adventure(p) && (Battles.in(p) || DEVICES.contains(p.getUUID()))) fighting = true;
 		ServerLevel level = s.overworld();
 		if (fighting == heldTime >= 0) return;
 		// The clock stops (the game rule, so your screen's clock stops too, with no jumps back) and starts again after.

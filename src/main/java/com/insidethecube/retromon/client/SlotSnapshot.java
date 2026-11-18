@@ -102,7 +102,7 @@ public final class SlotSnapshot {
 	 * The middle of the screen (clear of the corners, where the place name and the keys are), cut to 16:9 and made
 	 * small, each pixel the average of the block it stands for.
 	 */
-	private static NativeImage shrink(NativeImage in) {
+	static NativeImage shrink(NativeImage in) {
 		int sw = in.getWidth(), sh = in.getHeight();
 		int cw = Math.min(sw * 3 / 4, sh * 3 / 4 * 16 / 9), ch = cw * 9 / 16;
 		int x0 = (sw - cw) / 2, y0 = (sh - ch) / 2;

@@ -42,11 +42,21 @@ public class RetromonClient implements ClientModInitializer {
 				BattleScene.tick(mc);
 				BattleScene.tickDisplays();
 			}
+			Device.tick(mc);
 			Hud.tick(mc);
 			SlotSnapshot.tick(mc);
+			Postcards.tick(mc);
+			TownMap.tick(mc);
+		});
+		// The Town Map keeps up with the world: chunks coming in are looked at for what's changed.
+		net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_LOAD.register((level, chunk) -> TownMap.chunkLoaded(chunk));
+		// Your cap, bag and Pokédex on your figure.
+		net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback.EVENT.register((type, renderer, helper, ctx) -> {
+			if (renderer instanceof net.minecraft.client.renderer.entity.player.AvatarRenderer<?> avatar) helper.register(new GearLayer<>(avatar));
 		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> {
 			SlotSnapshot.leaving(mc);
+			TownMap.leaving();
 			Adventure.setOn(false, false);
 			ClientState.reset();
 			BattleScene.end();

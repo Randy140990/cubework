@@ -16,6 +16,7 @@
     "LevelWeatherMixin",
     "PlayerSkinMixin",
     "AvatarLayersMixin",
+    "PlayerModelMixin",
     "NightVisionMixin",
     "OutlineMixin",
     "OutlineColourMixin",

@@ -34,6 +34,10 @@ public final class ClientState {
 	public static String placeName = "";
 	public static int placeTicks = -1;
 	private static final Deque<Supplier<Screen>> QUEUE = new ArrayDeque<>();
+	/** The places marked on the map (towns, routes): where each is, for the Town Map. */
+	public record Zone(String place, int x1, int z1, int x2, int z2) {}
+
+	public static java.util.List<Zone> zones = java.util.List.of();
 	/** Your name, your rival's and boy or girl from the new-game intro, sent once the world's loaded. */
 	public static CompoundTag pendingProfile;
 
@@ -52,6 +56,14 @@ public final class ClientState {
 			}
 			case "sync" -> {
 				data = PlayerData.load(t);
+				if (t.contains("zones")) {
+					java.util.List<Zone> zs = new java.util.ArrayList<>();
+					for (Tag e : t.getListOrEmpty("zones")) {
+						if (!(e instanceof CompoundTag z)) continue;
+						zs.add(new Zone(z.getStringOr("place", ""), z.getIntOr("x1", 0), z.getIntOr("z1", 0), z.getIntOr("x2", 0), z.getIntOr("z2", 0)));
+					}
+					zones = java.util.List.copyOf(zs);
+				}
 				if (pendingProfile != null) {
 					ClientPlayNetworking.send(new Net.Act("profile", pendingProfile));
 					pendingProfile = null;
@@ -65,6 +77,7 @@ public final class ClientState {
 			case "place" -> {
 				placeName = t.getStringOr("name", "");
 				placeTicks = 0;
+				Postcards.entered(t.getStringOr("id", ""));
 				Music.setPlace(t.getStringOr("music", ""));
 			}
 			case "dialogue" -> {
@@ -175,5 +188,8 @@ public final class ClientState {
 		QUEUE.clear();
 		GameScreen.resume = null;
 		BattleScreen.current = null;
+		zones = java.util.List.of();
+		Device.reset();
+		Postcards.reset();
 	}
 }

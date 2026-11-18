@@ -22,13 +22,20 @@ public final class Outfit {
 	public static final String[] HATS = {"none", "cap", "beanie", "sunhat"};
 	public static final String[] TOPS = {"jacket", "tee", "hoodie", "vest"};
 	public static final String[] BOTTOMS = {"jeans", "shorts", "skirt"};
+	/** The cap's patterns (textures/gear/cap_*.png): PLAIN takes your hat colour. */
+	public static final String[] CAPS = {"pokeball", "pikachu", "bulbasaur", "charmander", "squirtle", "eevee", "gengar", "snorlax", "greatball", "ultraball",
+			"plain"};
+	public static final String[] CAP_NAMES = {"POKé BALL", "PIKACHU", "BULBASAUR", "CHARMANDER", "SQUIRTLE", "EEVEE", "GENGAR", "SNORLAX", "GREAT BALL",
+			"ULTRA BALL", "PLAIN"};
+	public static final String[] CAP_WAYS = {"FORWARDS", "BACKWARDS"};
+	public static final String[] BAGS = {"backpack", "satchel", "none"};
 	public static final String[] COLOUR_NAMES = {"RED", "BLUE", "GREEN", "YELLOW", "BLACK", "WHITE", "PINK", "ORANGE", "PURPLE", "BROWN", "TEAL", "GREY", "NAVY",
 			"CREAM"};
 	public static final int[] COLOURS = {0xD8343C, 0x3A6FD0, 0x3FA34D, 0xF2C12E, 0x2A2A30, 0xF2F2F2, 0xF08FB6, 0xF07D2A, 0x8A52C8, 0x7A5030, 0x2AA5A0, 0x8C8F99,
 			0x283A6E, 0xF0E2BE};
 
 	/** What's being picked: the parts in order, and their values (style or colour index). */
-	public static final String[] PARTS = {"skin", "hair", "hairc", "hat", "hatc", "top", "topc", "bot", "botc", "shoec"};
+	public static final String[] PARTS = {"skin", "hair", "hairc", "hat", "capp", "capb", "hatc", "top", "topc", "bot", "botc", "shoec", "bag", "bagc"};
 	public final Map<String, Integer> v = new LinkedHashMap<>();
 
 	public static Outfit defaults(boolean girl) {
@@ -43,6 +50,10 @@ public final class Outfit {
 		o.v.put("bot", girl ? 2 : 0);
 		o.v.put("botc", girl ? 0 : 12);
 		o.v.put("shoec", girl ? 6 : 0);
+		o.v.put("capp", girl ? 1 : 0);
+		o.v.put("capb", 0);
+		o.v.put("bag", girl ? 1 : 0);
+		o.v.put("bagc", 3);
 		return o;
 	}
 
@@ -79,6 +90,9 @@ public final class Outfit {
 			case "hat" -> HATS.length;
 			case "top" -> TOPS.length;
 			case "bot" -> BOTTOMS.length;
+			case "capp" -> CAPS.length;
+			case "capb" -> CAP_WAYS.length;
+			case "bag" -> BAGS.length;
 			default -> COLOURS.length;
 		};
 	}
@@ -90,6 +104,9 @@ public final class Outfit {
 			case "hat" -> HATS[i].toUpperCase();
 			case "top" -> TOPS[i].toUpperCase();
 			case "bot" -> BOTTOMS[i].toUpperCase();
+			case "capp" -> CAP_NAMES[i];
+			case "capb" -> CAP_WAYS[i];
+			case "bag" -> BAGS[i].toUpperCase();
 			default -> COLOUR_NAMES[i];
 		};
 	}
@@ -125,22 +142,27 @@ public final class Outfit {
 		layer(out, "top_" + top, colour("topc"));
 		if (top.equals("jacket")) layer(out, "top_jacket_trim", -1);
 		layer(out, "hair_" + HAIRS[Math.floorMod(get("hair"), HAIRS.length)], colour("hairc"));
+		// The cap is a model of its own (GearLayer); the beanie and the sun hat are on the skin.
 		String hat = HATS[Math.floorMod(get("hat"), HATS.length)];
-		if (!hat.equals("none")) layer(out, "hat_" + hat, colour("hatc"));
+		if (!hat.equals("none") && !hat.equals("cap")) layer(out, "hat_" + hat, colour("hatc"));
 		return out;
 	}
 
-	private int colour(String part) {
+	int colour(String part) {
 		return COLOURS[Math.floorMod(get(part), COLOURS.length)];
 	}
 
 	/** One wardrobe layer stacked on (tinted with rgb, or in its own colours for -1). */
-	private static void layer(NativeImage out, String name, int rgb) throws Exception {
-		Identifier id = Retromon.id("textures/outfit/" + name + ".png");
+	static void layer(NativeImage out, String name, int rgb) throws Exception {
+		layer(out, Retromon.id("textures/outfit/" + name + ".png"), rgb);
+	}
+
+	/** Any picture stacked on, tinted (the bag's, from textures/gear, too). Both are 64 wide; as tall as out. */
+	static void layer(NativeImage out, Identifier id, int rgb) throws Exception {
 		try (InputStream in = Minecraft.getInstance().getResourceManager().open(id); NativeImage img = NativeImage.read(in)) {
 			int tr = rgb < 0 ? 255 : (rgb >> 16) & 255, tg = rgb < 0 ? 255 : (rgb >> 8) & 255, tb = rgb < 0 ? 255 : rgb & 255;
-			for (int y = 0; y < 64; y++) {
-				for (int x = 0; x < 64; x++) {
+			for (int y = 0; y < Math.min(out.getHeight(), img.getHeight()); y++) {
+				for (int x = 0; x < Math.min(out.getWidth(), img.getWidth()); x++) {
 					int c = img.getPixel(x, y);
 					int a = (c >>> 24) & 255;
 					if (a == 0) continue;

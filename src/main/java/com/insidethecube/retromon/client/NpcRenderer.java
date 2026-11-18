@@ -31,6 +31,8 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 
 	public NpcRenderer(EntityRendererProvider.Context ctx) {
 		super(ctx, new HumanoidModel<>(ctx.bakeLayer(ModelLayers.PLAYER)), 0.5F);
+		// Your cap and bag, when it's you on the battle stage.
+		addLayer(new GearLayer<>(this));
 	}
 
 	@Override
@@ -43,7 +45,7 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		boolean girl = "girl".equals(ClientState.data.gender);
 		String outfit = ClientState.data.outfit;
 		if (outfit != null && !outfit.isEmpty() && Outfit.ensure(outfit, girl)) return Outfit.HERO;
-		return Retromon.id(girl ? "textures/entity/player/girl.png" : "textures/entity/player/boy.png");
+		return Retromon.id(girl ? "textures/entity/player/girl_bare.png" : "textures/entity/player/boy_bare.png");
 	}
 
 	@Override

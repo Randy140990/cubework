@@ -28,7 +28,7 @@ public abstract class KeyboardInputMixin extends ClientInput {
 		if (!Adventure.active()) return;
 		LocalPlayer player = Minecraft.getInstance().player;
 		Input k = this.keyPresses;
-		if (player == null || Adventure.frozen > 0) {
+		if (player == null || Adventure.frozen > 0 || com.insidethecube.retromon.client.Device.busy()) {
 			this.keyPresses = Input.EMPTY;
 			this.moveVector = Vec2.ZERO;
 			return;

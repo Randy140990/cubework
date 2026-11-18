@@ -222,14 +222,17 @@ def oak():
 
 # ---------- the boy ----------
 
-def boy():
+def boy(bare=False):
     s = Skin(2)
     SKIN, HAIR, BROW = C("f0c39e"), C("2b2422"), C("2b2422")
     head_skin(s, SKIN)
     hair_cap(s, HAIR, depth_front=2, depth_side=3, depth_back=6)
     face_features(s, C("2f5fa8"), SKIN, BROW, mouth=C("b56a58"))
-    # A cap: red crown, a white front panel with a little ball mark, a dark brim (outer layer).
+    # A cap: red crown, a white front panel with a little ball mark, a dark brim (outer layer). The bare skin
+    # (worn in game, where the cap is a 3D model of its own) has none: hair on top instead.
     RED, WHITE, BRIM = C("d23a3a"), C("f4f4f2"), C("23252b")
+    if bare:
+        return boy_rest(s, SKIN, HAIR, bare)
     s.fill("hat", "top", RED, grain=0.08)
     # The crown on the head itself too, so the cap shows even with the skin's hat layer switched off.
     s.fill("head", "top", mul(RED, 0.95), grain=0.08)
@@ -247,14 +250,17 @@ def boy():
         s.set("hat", "front", x, 2, mul(BRIM, 1.3))
     # Dark hair spiking out under the cap at the sides and the back.
     spikes(s, HAIR, [0] * 8, [3, 3, 4, 4, 5, 4, 4, 3], [3, 4, 5, 6, 6, 5, 4, 3], seed=5, top=False)
-    for f in ("right", "left", "back"):
-        for x in range(8):
-            for y in range(2):
-                pass
     for f in ("right", "left"):
         s.fill("hat", f, mul(RED, 0.9), 0, 0, 8, 2, grain=0.08)
     s.fill("hat", "back", mul(RED, 0.82), 0, 0, 8, 2, grain=0.08)
     s.fill("hat", "back", C("e8e8e6"), 3, 2, 5, 3)
+    return boy_rest(s, SKIN, HAIR, bare)
+
+
+def boy_rest(s, SKIN, HAIR, bare):
+    if bare:
+        # Spiky hair all over, the way it is under the cap.
+        spikes(s, HAIR, [1, 2, 1, 2, 2, 1, 2, 1], [3, 3, 4, 4, 5, 4, 4, 3], [3, 4, 5, 6, 6, 5, 4, 3], seed=5, top=True)
     # A black tee under a short-sleeved jacket: navy with white panels and a teal trim.
     TEE, JACKET, PANEL, TRIM = C("1e1f24"), C("27407a"), C("eef0f2"), C("2bb3a3")
     s.box("body", TEE)
@@ -269,14 +275,15 @@ def boy():
         s.fill("jacket", f, mul(PANEL, 0.92), 0, 0, 4, 5)
     s.fill("jacket", "back", mul(PANEL, 0.86), 0, 0, 8, 3)
     s.ring("jacket", 11, 12, mul(JACKET, 0.8))
-    # Backpack straps over the shoulders, and the pack itself on the back (yellow).
+    # Backpack straps over the shoulders, and the pack itself on the back (yellow): not on the bare skin.
     STRAP, PACK = C("3a2c22"), C("f2c230")
-    for y in range(0, 8):
-        s.set("jacket", "front", 1, y, STRAP)
-        s.set("jacket", "front", 6, y, STRAP)
-    s.fill("jacket", "back", PACK, 1, 2, 7, 10, grain=0.08)
-    s.fill("jacket", "back", mul(PACK, 0.8), 1, 6, 7, 7)
-    s.set("jacket", "back", 4, 4, C("3a2c22"))
+    if not bare:
+        for y in range(0, 8):
+            s.set("jacket", "front", 1, y, STRAP)
+            s.set("jacket", "front", 6, y, STRAP)
+        s.fill("jacket", "back", PACK, 1, 2, 7, 10, grain=0.08)
+        s.fill("jacket", "back", mul(PACK, 0.8), 1, 6, 7, 7)
+        s.set("jacket", "back", 4, 4, C("3a2c22"))
     # Arms: the jacket's short sleeves (white with a teal cuff), bare forearms, a green wristband.
     for arm, sl in (("rarm", "rsleeve"), ("larm", "lsleeve")):
         s.box(arm, SKIN, grain=0.03)
@@ -296,13 +303,13 @@ def boy():
     for leg in ("rleg", "lleg"):
         s.set(leg, "front", 1, 9, C("f2f2f2"))
         s.set(leg, "front", 2, 9, C("f2f2f2"))
-    s.save(os.path.join(ROOT, "player", "boy.png"))
+    s.save(os.path.join(ROOT, "player", "boy_bare.png" if bare else "boy.png"))
     return s
 
 
 # ---------- the girl ----------
 
-def girl():
+def girl(bare=False):
     s = Skin(3)
     SKIN, HAIR, BROW = C("f3c9a8"), C("7a4a2a"), C("5a3420")
     head_skin(s, SKIN)
@@ -330,8 +337,9 @@ def girl():
     s.box("body", TOP)
     s.fill("body", "front", COLLAR, 2, 0, 6, 1)
     s.fill("body", "front", mul(TOP, 0.85), 3, 1, 5, 2)
-    for i in range(8):
-        s.set("body", "front", 7 - i, i + 1, C("f2c230"))
+    if not bare:
+        for i in range(8):
+            s.set("body", "front", 7 - i, i + 1, C("f2c230"))
     s.fill("jacket", "back", mul(HAIR, 0.84), 1, 0, 7, 6, grain=0.1)
     for x in (1, 3, 5):
         s.set("jacket", "back", x, 6, mul(HAIR, 0.8))
@@ -355,7 +363,7 @@ def girl():
         s.ring(leg, 0, 2, SKIRT)
         s.ring(leg, 5, 10, C("f4f4f2"))
     shoes(s, C("d83a4a"), C("f2f2f2"), 2)
-    s.save(os.path.join(ROOT, "player", "girl.png"))
+    s.save(os.path.join(ROOT, "player", "girl_bare.png" if bare else "girl.png"))
     return s
 
 
@@ -434,4 +442,4 @@ def preview(skins):
 
 
 if __name__ == "__main__":
-    print(preview([oak(), boy(), girl(), rival()]))
+    print(preview([oak(), boy(), girl(), rival(), boy(True), girl(True)]))

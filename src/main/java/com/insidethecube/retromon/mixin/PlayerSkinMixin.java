@@ -32,8 +32,9 @@ public abstract class PlayerSkinMixin {
 			return;
 		}
 		if (retromon$boy == null) {
-			retromon$boy = PlayerSkin.insecure(new ClientAsset.ResourceTexture(Retromon.id("entity/player/boy")), null, null, PlayerModelType.WIDE);
-			retromon$girl = PlayerSkin.insecure(new ClientAsset.ResourceTexture(Retromon.id("entity/player/girl")), null, null, PlayerModelType.WIDE);
+			// Without the cap and bag painted on: they're models of their own (GearLayer).
+			retromon$boy = PlayerSkin.insecure(new ClientAsset.ResourceTexture(Retromon.id("entity/player/boy_bare")), null, null, PlayerModelType.WIDE);
+			retromon$girl = PlayerSkin.insecure(new ClientAsset.ResourceTexture(Retromon.id("entity/player/girl_bare")), null, null, PlayerModelType.WIDE);
 		}
 		cir.setReturnValue(girl ? retromon$girl : retromon$boy);
 	}

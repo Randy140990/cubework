@@ -99,9 +99,15 @@ public final class Adventure {
 		distance += (distanceTarget - distance) * 0.2;
 		while (SPEED.consumeClick()) cycleSpeed();
 		hidden = !BattleScene.active() && behind(mc);
-		if (mc.screen == null) {
+		if (mc.screen == null && !Device.busy()) {
 			while (mc.options.keyJump.consumeClick()) talk(mc);
-			while (START.consumeClick()) mc.setScreen(new MenuScreen());
+			// START: you take your Pokédex out, and the menu comes up on it.
+			while (START.consumeClick()) Device.open(MenuScreen::new);
+		} else if (mc.screen == null) {
+			while (mc.options.keyJump.consumeClick()) {
+			}
+			while (START.consumeClick()) {
+			}
 		}
 	}
 

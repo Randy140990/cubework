@@ -139,7 +139,7 @@ public final class Hud {
 	/** What's what: SPACE to talk, ENTER for the menu, TAB for speed, and the time of day with the sun or the moon. */
 	private static void hints(GuiGraphics g, DeltaTracker delta) {
 		Minecraft mc = Minecraft.getInstance();
-		if (!Adventure.active() || BattleScene.active() || mc.screen != null || mc.level == null || mc.options.hideGui) return;
+		if (!Adventure.active() || BattleScene.active() || mc.screen != null || mc.level == null || mc.options.hideGui || Device.busy()) return;
 		int s = Ui.scale(g.guiHeight()), w = g.guiWidth(), h = g.guiHeight();
 		long t = Math.floorMod(mc.level.getDayTime(), 24000L);
 		int hour = (int) ((t / 1000 + 6) % 24), minute = (int) ((t % 1000) * 60 / 1000);

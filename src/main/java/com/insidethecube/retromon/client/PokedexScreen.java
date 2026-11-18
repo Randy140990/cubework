@@ -21,7 +21,7 @@ import net.minecraft.client.input.KeyEvent;
  * height and weight and the entry for the ones you've caught, and for any you've seen, where to find them
  * (which can be shown on the Town Map).
  */
-public class PokedexScreen extends GameScreen {
+public class PokedexScreen extends DeviceScreen {
 	private final Screen parent;
 	private boolean national;
 	private int at, top;
@@ -102,7 +102,7 @@ public class PokedexScreen extends GameScreen {
 	@Override
 	protected void back() {
 		Sounds.press();
-		if (minecraft != null) minecraft.setScreen(parent);
+		to(parent);
 	}
 
 	private void showArea() {
@@ -111,11 +111,11 @@ public class PokedexScreen extends GameScreen {
 		Sounds.press();
 		TownMapScreen map = new TownMapScreen(this);
 		map.highlight(sp.name(), areas(sp.id()));
-		minecraft.setScreen(map);
+		to(map);
 	}
 
 	@Override
-	protected void draw(GuiGraphics g, float partial) {
+	protected void drawScreen(GuiGraphics g, float partial) {
 		PlayerData d = ClientState.data;
 		g.fill(0, 0, width, height, 0xF00D1222);
 		int m = 8 * s;

@@ -10,12 +10,14 @@ import net.minecraft.nbt.CompoundTag;
 
 /**
  * The wardrobe: you on the left (turning to follow the mouse), and your look on the right, row by row: skin,
- * hair and its colour, hat and its colour, top, bottoms and shoes. Up and down pick a row, left and right
+ * hair and its colour, hat (the cap in a Pokémon's pattern, worn forwards or backwards) and its colour, top,
+ * bottoms, shoes, and your bag (a backpack or a satchel) and its colour. Up and down pick a row, left and right
  * change it, and it shows on you straight away. DONE keeps it (in your save); B puts back what you had.
  */
 public class ClothesScreen extends GameScreen {
-	private static final String[] ROW_NAMES = {"SKIN", "HAIR", "HAIR COLOUR", "HAT", "HAT COLOUR", "TOP", "TOP COLOUR", "BOTTOMS", "BOTTOMS COLOUR",
-			"SHOES"};
+	/** One a part of Outfit.PARTS, in its order. */
+	private static final String[] ROW_NAMES = {"SKIN", "HAIR", "HAIR COLOUR", "HAT", "CAP STYLE", "CAP", "HAT COLOUR", "TOP", "TOP COLOUR", "BOTTOMS",
+			"BOTTOMS COLOUR", "SHOES", "BAG", "BAG COLOUR"};
 	/** While you choose, the skin shows this (null: what's saved). */
 	public static String preview;
 
@@ -74,7 +76,9 @@ public class ClothesScreen extends GameScreen {
 
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
-		g.fill(0, 0, width, height, 0xC00D1222);
+		// The world behind, frosted.
+		if (minecraft != null && minecraft.options.getMenuBackgroundBlurriness() > 0) g.blurBeforeThisStratum();
+		g.fill(0, 0, width, height, 0x990D1222);
 		if (minecraft != null) {
 			mouseX = (float) (minecraft.mouseHandler.xpos() * width / Math.max(1, minecraft.getWindow().getScreenWidth()));
 			mouseY = (float) (minecraft.mouseHandler.ypos() * height / Math.max(1, minecraft.getWindow().getScreenHeight()));
@@ -90,29 +94,34 @@ public class ClothesScreen extends GameScreen {
 		}
 		Ui.heading(g, font, "CLOTHES", m + 10 * s, m + 8 * s, Ui.TEXT, s);
 		// The rows.
-		int x = m + pw + 8 * s, w = width - x - m, rh = 15 * s, y0 = m;
+		int x = m + pw + 8 * s, w = width - x - m, y0 = m;
+		int pitch = Math.max(11 * s, Math.min(17 * s, (height - 2 * m - 40 * s) / ROW_NAMES.length)), rh = pitch - 2 * s;
+		boolean cap = Outfit.HATS[Math.floorMod(outfit.get("hat"), Outfit.HATS.length)].equals("cap");
 		for (int r = 0; r < ROW_NAMES.length; r++) {
-			int y = y0 + r * (rh + 2 * s);
+			int y = y0 + r * pitch;
 			boolean on = r == row;
 			if (over(x, y, w, rh)) row = r;
 			Ui.pill(g, x, y, w, rh, on, s);
-			Ui.draw(g, font, Ui.bold(ROW_NAMES[r]), x + 8 * s, y + 4 * s, on ? Ui.CREAM_INK : Ui.TEXT, s, false);
 			String part = Outfit.PARTS[r];
+			// The cap's own rows only matter with the cap on.
+			boolean idle = !cap && (part.equals("capp") || part.equals("capb"));
+			int ty = y + Math.max(s, (rh - 8 * s) / 2);
+			Ui.draw(g, font, Ui.bold(ROW_NAMES[r]), x + 8 * s, ty, on ? Ui.CREAM_INK : idle ? Ui.DIM : Ui.TEXT, s, false);
 			int val = outfit.get(part);
 			String label = Outfit.label(part, Math.floorMod(val, Outfit.options(part)));
 			int vx = x + w - 92 * s;
 			if (!part.equals("skin") && (part.endsWith("c") || part.equals("shoec"))) {
 				int col = 0xFF000000 | Outfit.COLOURS[Math.floorMod(val, Outfit.COLOURS.length)];
-				Ui.round(g, vx + 12 * s, y + 3 * s, 9 * s, 9 * s, col, 2 * s);
+				Ui.round(g, vx + 12 * s, ty - s, 9 * s, 9 * s, col, 2 * s);
 			}
-			Ui.draw(g, font, Ui.ui("◀"), vx, y + 4 * s, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
-			Ui.draw(g, font, Ui.bold(label), vx + 26 * s, y + 4 * s, on ? Ui.CREAM_INK : Ui.TEXT, s, false);
-			Ui.draw(g, font, Ui.ui("▶"), x + w - 10 * s, y + 4 * s, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
+			Ui.draw(g, font, Ui.ui("◀"), vx, ty, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
+			Ui.draw(g, font, Ui.bold(label), vx + 26 * s, ty, on ? Ui.CREAM_INK : idle ? Ui.DIM : Ui.TEXT, s, false);
+			Ui.draw(g, font, Ui.ui("▶"), x + w - 10 * s, ty, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
 			int rr = r;
 			hit(vx - 2 * s, y, 12 * s, rh, () -> change(rr, -1));
 			hit(vx + 12 * s, y, w - (vx - x) - 12 * s, rh, () -> change(rr, 1));
 		}
-		int by = y0 + ROW_NAMES.length * (rh + 2 * s) + 4 * s, bw = (w - 4 * s) / 2;
+		int by = y0 + ROW_NAMES.length * pitch + 4 * s, bw = (w - 4 * s) / 2;
 		boolean onDone = row == ROW_NAMES.length;
 		Ui.button(g, font, x, by, bw, 16 * s, "DONE", Ui.GREEN, onDone || over(x, by, bw, 16 * s), s);
 		hit(x, by, bw, 16 * s, this::done);
