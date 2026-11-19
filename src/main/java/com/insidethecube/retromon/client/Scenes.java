@@ -72,7 +72,8 @@ public final class Scenes {
 		float[] p = cam.at(x, y, z);
 		float ppb = cam.perBlock(p[2]) * V.k;
 		float facing = (float) Math.toDegrees(yaw - Math.PI) - cam.towards(x, z);
-		Figures.Fig f = skin != null ? b.person(skin, V.x(p[0]), V.y(p[1]), 1.8F * ppb) : b.mon(species, V.x(p[0]), V.y(p[1]), 1).perBlock(ppb);
+		float sx = V.x(p[0]) + V.bx, sy = V.y(p[1]) + V.by;
+		Figures.Fig f = skin != null ? b.person(skin, sx, sy, 1.8F * ppb) : b.mon(species, sx, sy, 1).perBlock(ppb);
 		return f.facing(wrap(facing)).pitch(cam.pitch()).depth((9 - p[2]) * 24).at(secs);
 	}
 
@@ -135,7 +136,7 @@ public final class Scenes {
 		Cam cam = new Cam().look(cx, 2.35, 6.6, cx, 0.62, 0.3);
 		disc(g, cam, 0, 0, 0, 4.2, 0x8CDFF6F4);
 		disc(g, cam, 0, 0.005, 0, 2.0, 0x73FFFFFF);
-		Figures.Batch b = Figures.batch(0, 0, V.gw, V.gh);
+		Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
 		blob(g, cam, 0, 0, 0.45, 200);
 		Figures.Fig oak = place(b, cam, OAK, null, 0, 0, 0, Math.PI, secs);
 		if (talking) oak.talk(0.85F);
@@ -199,7 +200,7 @@ public final class Scenes {
 		V.rr(g, c[0] - rx, cy, rx * 2, drop, 0, 0xFFA9DCCB);
 		V.ellipse(g, c[0], cy, rx * 0.95F, ry * 0.95F, 0xFFBFEFE0);
 		V.ellipse(g, c[0], cy, rx * 0.85F, ry * 0.85F, 0xFFE9FFF6);
-		Figures.Batch b = Figures.batch(0, 0, V.gw, V.gh);
+		Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
 		double turn = turning ? Math.sin(secs * 0.55) * 0.9 : 0;
 		Figures.Fig f = place(b, cam, you, null, 0, 0, 0, Math.PI + turn, secs);
 		if (wave > 0) f.wave(wave);
@@ -222,7 +223,7 @@ public final class Scenes {
 		V.rr(g, c[0] - rx * 1.1F, cy, rx * 2.2F, drop, 0, 0xFFA9DCCB);
 		V.ellipse(g, c[0], cy, rx * 1.1F, ry * 1.1F, 0xFFBFEFE0);
 		V.ellipse(g, c[0], cy, rx * 0.93F, ry * 0.93F, 0xFFE9FFF6);
-		Figures.Batch b = Figures.batch(0, 0, V.gw, V.gh);
+		Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
 		place(b, cam, null, species, 0, 0, 0, Math.PI + Math.sin(secs * 0.45) * 0.7, secs);
 		b.draw(g);
 	}

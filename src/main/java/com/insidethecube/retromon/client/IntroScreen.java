@@ -379,6 +379,11 @@ public class IntroScreen extends GameScreen {
 	private void startNaming(boolean rival) {
 		namingRival = rival;
 		entry = null;
+		// Oak's question stays up while you pick his grandson's name.
+		if (rival) {
+			talk = TextBox.still("Now, what was his name again...?");
+			talk.speaker = "PROF. OAK";
+		}
 		List<String> opts = new ArrayList<>();
 		opts.add("NEW NAME");
 		if (rival) opts.addAll(List.of("BLUE", "GARY", "JOHN"));

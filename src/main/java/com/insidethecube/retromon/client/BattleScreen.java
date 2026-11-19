@@ -779,6 +779,8 @@ public class BattleScreen extends GameScreen {
 		if (them.shown && plates) plate(g, them, false);
 		if (me.shown && plates) plate(g, me, true);
 		if (moneyAt >= 0) moneyChip(g, m, m + 13 * s, partial);
+		if (message != null && message.endsWith(" wants to battle!") && !kind.equals("WILD")) drawChallenge(g, message.substring(0, message.length() - 17), partial);
+		else challengeAt = -1;
 		switch (mode) {
 			case MAIN -> drawMain(g, m, by, bh);
 			case FIGHT -> drawFight(g, m, by, bh);
@@ -791,6 +793,46 @@ public class BattleScreen extends GameScreen {
 			float a = toDex >= 0 ? Math.min(1, (toDex + partial) / DEX_FADE) : Math.max(0, (fromDex - partial) / DEX_FADE);
 			g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, a));
 		}
+	}
+
+	/** When the challenge card came in (ticks), or -1. */
+	private int challengeAt = -1;
+
+	/**
+	 * "BLUE wants to battle!", as the UI Viewer has it: speed lines streaming across, and the trainer's card sliding
+	 * in from the right, a red band leaning forward with gold edges, TRAINER and their name on it.
+	 */
+	private void drawChallenge(GuiGraphics g, String who, float partial) {
+		if (challengeAt < 0) challengeAt = ticks;
+		float t = (ticks - challengeAt + partial) / 20F;
+		// The speed lines: pale slanted streaks sliding right.
+		float shift = (t / 0.5F % 1) * 400;
+		for (float x = -400 + shift - V.ox / V.k; x < V.W + V.ox / V.k + 400; x += 400) {
+			for (int k2 = 0; k2 < 13; k2++) {
+				float lx = x + k2 * 30;
+				g.pose().pushMatrix();
+				g.pose().translate(V.x(lx), V.y(0));
+				g.pose().mul(new org.joml.Matrix3x2f(1, 0, -0.2126F, 1, 0, 0));
+				g.fill(0, 0, Math.max(1, Math.round(V.s(4))), Math.round(V.s(V.H)), 0x47FFFFFF);
+				g.pose().popMatrix();
+			}
+		}
+		float in = Math.min(1, t / 0.5F), e = 1 - (1 - in) * (1 - in) * (1 - in), x = 1280 - 640 * e, y = 180, w = 640 + V.ox / V.k + 60, h = 52 * 1.15F + 13 * 1.3F + 44 + 8;
+		g.pose().pushMatrix();
+		g.pose().translate(V.x(x), V.y(y));
+		g.pose().mul(new org.joml.Matrix3x2f(1, 0, -0.2126F, 1, 0, 0));
+		float k = V.k;
+		// The band: clear at its left end, red by a quarter of the way.
+		int steps = 32;
+		for (int i = 0; i < steps; i++) {
+			float t0 = i / (float) steps, a = Math.min(1, t0 / 0.25F) * 0.95F;
+			g.fill(Math.round(w * k * t0), 0, Math.round(w * k * (i + 1) / steps), Math.round(h * k), Ui.alpha(0xFFE5525C, a));
+		}
+		g.fill(0, 0, Math.round(w * k), Math.round(4 * k), V.GOLD);
+		g.fill(0, Math.round((h - 4) * k), Math.round(w * k), Math.round(h * k), V.GOLD);
+		g.pose().popMatrix();
+		V.label(g, "Trainer", x + 160, y + 26, 0xFFFFE6C0);
+		V.text(g, who, x + 160 - 6, y + 26 + 20, 52, V.TEXT, true);
 	}
 
 	/** Where a side's Pokémon is on the screen (the middle of it), or null. */

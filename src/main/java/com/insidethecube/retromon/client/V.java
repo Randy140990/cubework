@@ -25,6 +25,12 @@ public final class V {
 	public static float k = 1, ox, oy;
 	/** The window in GUI pixels. */
 	public static int gw, gh;
+	/**
+	 * Where the area being drawn in sits on the screen (GUI pixels): 0, 0 for a whole-window screen; the device's
+	 * screen's corner when drawing on it (whose drawing is moved there). Pictures drawn apart from the rest (the 3D
+	 * figures) need it.
+	 */
+	public static int bx, by;
 
 	// The viewer's colours.
 	public static final int PANEL = 0xFF123C38, PANEL_HI = 0xFF1D5A52, EDGE = 0xFF4FB896, EDGE_LIGHT = 0xFF8FF5C0, TEXT = 0xFFF4F6FF, MUTED = 0xFFA9D4C6,
