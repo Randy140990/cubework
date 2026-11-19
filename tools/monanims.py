@@ -4,7 +4,27 @@ standing idle, its livelier battle stance, walking, calling out and getting hit 
 that fly). Parts a creature hasn't got are left out, and each creature can add its own (a flame's flicker, a plume).
 """
 
-from monlib import Anims, wave, bounce, keys, track, merge, only, eyelids, pulse
+from monlib import Anims, wave, bounce, keys, track, merge, only, eyelids, pulse, squeeze
+
+
+def _hit(R, k, body_back=4.0, lift=1.2, rear=14, roll=8, head=(22, -14)):
+    """Getting hit, on any body: knocked back and up, a flinch with the head snapping down and aside, a shake to settle,
+    and the eyes squeezed shut. R is its length; k how big (less for heavy ones)."""
+    a, b, c, d = R * 0.1, R * 0.3, R * 0.5, R * 0.7
+    hx, hz = head
+    return {
+        "body": track(position=keys({0: [0, 0, 0], a: [0, lift * k, body_back * k], b: [-0.8 * k, -0.4 * k, body_back * 0.75 * k],
+                                     c: [0.6 * k, 0, body_back * 0.35 * k], d: [-0.3 * k, 0, body_back * 0.12 * k], R: [0, 0, 0]}),
+                      rotation=keys({0: [0, 0, 0], a: [-rear, 0, roll], b: [rear * 0.35, 0, -roll * 0.6], c: [-rear * 0.2, 0, roll * 0.35],
+                                     d: [rear * 0.07, 0, -roll * 0.12], R: [0, 0, 0]})),
+        "neck": track(rotation=keys({0: [0, 0, 0], a: [-12, 0, 0], b: [10, 0, 0], c: [-4, 0, 0], R: [0, 0, 0]})),
+        "head": track(rotation=keys({0: [0, 0, 0], a: [hx, 0, hz], b: [-hx * 0.45, 14, -hz * 0.6], c: [hx * 0.28, -8, hz * 0.3],
+                                     d: [-hx * 0.1, 3, 0], R: [0, 0, 0]})),
+        "jaw": track(rotation=keys({0: [0, 0, 0], a: [16, 0, 0], b: [10, 0, 0], c: [0, 0, 0], R: [0, 0, 0]})),
+        "ear_right": track(rotation=keys({0: [0, 0, 0], a: [40, 0, -25], c: [18, 0, -10], R: [0, 0, 0]})),
+        "ear_left": track(rotation=keys({0: [0, 0, 0], a: [40, 0, 25], c: [18, 0, 10], R: [0, 0, 0]})),
+        "tail": track(rotation=keys({0: [0, 0, 0], a: [28, 0, 0], c: [10, 0, 0], R: [0, 0, 0]})),
+        **squeeze(R)}
 
 
 def _extra(extras, name):
@@ -60,13 +80,12 @@ def four_legs(sid, m, walk=0.8, stride=30, k=1.0, slow=1.0, extras=None, idle="b
         "leg_front_right": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-14, 0, 0], C * 0.65: [-14, 0, 0], C: [0, 0, 0]})),
         "leg_front_left": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-14, 0, 0], C * 0.65: [-14, 0, 0], C: [0, 0, 0]})),
     }, _extra(extras, "cry"))), loop=False)
-    R = 0.5 * slow
-    recoil = A.add("recoil", R, only(m, merge({
-        "body": track(rotation=keys({0: [0, 0, 0], R * 0.2: [-9, 0, 5], R: [0, 0, 0]}), position=keys({0: [0, 0, 0], R * 0.2: [0, 0, 1.2 * k], R: [0, 0, 0]})),
-        "head": track(rotation=keys({0: [0, 0, 0], R * 0.2: [16, 0, 0], R: [0, 0, 0]})),
-        "ear_right": track(rotation=keys({0: [0, 0, 0], R * 0.2: [25, 0, 0], R: [0, 0, 0]})),
-        "ear_left": track(rotation=keys({0: [0, 0, 0], R * 0.2: [25, 0, 0], R: [0, 0, 0]})),
-    }, _extra(extras, "recoil"))), loop=False)
+    R = 0.75 * slow
+    legs = {"leg_front_right": track(rotation=keys({0: [0, 0, 0], R * 0.1: [-20, 0, 0], R * 0.3: [8, 0, 0], R * 0.6: [0, 0, 0]})),
+            "leg_front_left": track(rotation=keys({0: [0, 0, 0], R * 0.1: [-20, 0, 0], R * 0.3: [8, 0, 0], R * 0.6: [0, 0, 0]})),
+            "leg_back_right": track(rotation=keys({0: [0, 0, 0], R * 0.1: [14, 0, 0], R * 0.3: [-6, 0, 0], R * 0.6: [0, 0, 0]})),
+            "leg_back_left": track(rotation=keys({0: [0, 0, 0], R * 0.1: [14, 0, 0], R * 0.3: [-6, 0, 0], R * 0.6: [0, 0, 0]}))}
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k), legs, _extra(extras, "recoil"))), loop=False)
     info = {"idle": battle if idle == "battle" else ground, "ground": ground, "actions": {"cry": cry, "recoil": recoil},
             "poses": {"walk": {"anim": walk_id, "parts": []}}}
     if fly:
@@ -134,12 +153,14 @@ def bird(sid, m, walk=0.5, stride=40, k=1.0, slow=1.0, extras=None, flap=0.36):
         "body": track(position=keys({0: [0, 0, 0], C * 0.2: [0, 1 * k, 0], C * 0.6: [0, 1 * k, 0], C: [0, 0, 0]})),
         "tail": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-20, 0, 0], C * 0.6: [-20, 0, 0], C: [0, 0, 0]})),
     }, _extra(extras, "cry"))), loop=False)
-    R = 0.5 * slow
-    recoil = A.add("recoil", R, only(m, merge({
-        "body": track(rotation=keys({0: [0, 0, 0], R * 0.2: [-14, 0, 0], R: [0, 0, 0]}), position=keys({0: [0, 0, 0], R * 0.2: [0, 0.6 * k, 1.2 * k], R: [0, 0, 0]})),
-        "wing_right": track(rotation=keys({0: [0, 0, 0], R * 0.2: [0, 0, 40], R: [0, 0, 0]})),
-        "wing_left": track(rotation=keys({0: [0, 0, 0], R * 0.2: [0, 0, -40], R: [0, 0, 0]})),
-    }, _extra(extras, "recoil"))), loop=False)
+    R = 0.7 * slow
+    ruffle = {"wing_right": track(rotation=keys({0: [0, 0, 0], R * 0.1: [0, 0, 55], R * 0.3: [0, 0, 18], R * 0.45: [0, 0, 32], R: [0, 0, 0]})),
+              "wing_left": track(rotation=keys({0: [0, 0, 0], R * 0.1: [0, 0, -55], R * 0.3: [0, 0, -18], R * 0.45: [0, 0, -32], R: [0, 0, 0]})),
+              "tail": track(rotation=keys({0: [0, 0, 0], R * 0.1: [-25, 0, 0], R * 0.5: [-8, 0, 0], R: [0, 0, 0]})),
+              "beak_lower": track(rotation=keys({0: [0, 0, 0], R * 0.1: [22, 0, 0], R * 0.45: [0, 0, 0]})),
+              "plume": track(rotation=keys({0: [0, 0, 0], R * 0.1: [30, 0, 0], R * 0.35: [-12, 0, 0], R * 0.6: [5, 0, 0], R: [0, 0, 0]}))}
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k, body_back=3.5, rear=16, roll=6, head=(20, -12)), ruffle, _extra(extras, "recoil"))),
+                   loop=False)
     info = {"idle": ground, "ground": ground, "actions": {"cry": cry, "recoil": recoil},
             "poses": {"walk": {"anim": walk_id, "parts": []}, "fly": {"anim": fly, "parts": []}, "hover": {"anim": hover, "parts": []}}}
     return A, info
@@ -183,11 +204,13 @@ def hopper(sid, m, hop=0.45, height=2.0, k=1.0, extras=None):
         "arm_right": track(rotation=keys({0: [0, 0, 0], 0.2: [-40, 0, 0], 0.7: [-40, 0, 0], 1.0: [0, 0, 0]})),
         "arm_left": track(rotation=keys({0: [0, 0, 0], 0.2: [-40, 0, 0], 0.7: [-40, 0, 0], 1.0: [0, 0, 0]})),
     }, _extra(extras, "cry"))), loop=False)
-    recoil = A.add("recoil", 0.5, only(m, merge({
-        "body": track(rotation=keys({0: [0, 0, 0], 0.1: [-12, 0, 0], 0.5: [0, 0, 0]}), position=keys({0: [0, 0, 0], 0.1: [0, 0.4 * k, 1.2 * k], 0.5: [0, 0, 0]})),
-        "ear_right": track(rotation=keys({0: [0, 0, 0], 0.1: [30, 0, 0], 0.5: [0, 0, 0]})),
-        "ear_left": track(rotation=keys({0: [0, 0, 0], 0.1: [30, 0, 0], 0.5: [0, 0, 0]})),
-    }, _extra(extras, "recoil"))), loop=False)
+    R = 0.7
+    flail = {"arm_right": track(rotation=keys({0: [0, 0, 0], R * 0.1: [-35, 0, 20], R * 0.4: [-10, 0, 5], R: [0, 0, 0]})),
+             "arm_left": track(rotation=keys({0: [0, 0, 0], R * 0.1: [-35, 0, -20], R * 0.4: [-10, 0, -5], R: [0, 0, 0]})),
+             "ear_right": track(rotation=keys({0: [0, 0, 0], R * 0.1: [50, 0, -20], R * 0.5: [20, 0, -8], R: [0, 0, 0]})),
+             "ear_left": track(rotation=keys({0: [0, 0, 0], R * 0.1: [50, 0, 20], R * 0.5: [20, 0, 8], R: [0, 0, 0]}))}
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k, body_back=3.5, lift=1.8, rear=18, roll=8, head=(18, -12)), flail,
+                                              _extra(extras, "recoil"))), loop=False)
     info = {"idle": battle if (extras or {}).get("battle_idle") else ground, "ground": ground, "actions": {"cry": cry, "recoil": recoil},
             "poses": {"walk": {"anim": walk, "parts": []}}}
     return A, info

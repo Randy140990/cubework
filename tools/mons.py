@@ -95,6 +95,57 @@ def muzzle_patch(colour, zf, top, half, edge=None):
     return f
 
 
+def tuck(length, down=24, back=2.0):
+    """An armadillo pulling its head in under its shell while it's hit, then peeking back out."""
+    L = length
+    return {"head": track(rotation=keys({0: [0, 0, 0], L * 0.1: [down, 0, 0], L * 0.55: [down, 0, 0], L * 0.8: [0, 0, 0]}),
+                          position=keys({0: [0, 0, 0], L * 0.1: [0, -back * 0.5, back], L * 0.55: [0, -back * 0.5, back], L * 0.8: [0, 0, 0]}))}
+
+
+def goat_nose(nose, nostril, lip, front_z, top_y, mouth_y, nost_dx, tooth=None, tooth_z=None, line_to=None, top=None):
+    """A goat's muzzle: a soft leather nose pad across its top with a nostril each side (seen from the front and from
+    above), a split lip down the middle where there's a middle column, the mouth's line along the bottom and back along
+    each side, and (tooth) a tooth showing at the side of the mouth. All by where the texel is (z front_z the muzzle's
+    front, top_y its top, mouth_y its bottom), so it works across several boxes."""
+    def at_nostril(x):
+        return abs(abs(x) - nost_dx) < 0.3
+
+    def f(at):
+        if at.face == "front" and at.z <= front_z + 0.02:
+            if at.y >= top_y - 1:
+                return mix(nostril, nose, 0.15) if at_nostril(at.x) else rgb(nose)
+            if at.y >= top_y - 2 and at_nostril(at.x):
+                return mix(nose, nostril, 0.35)
+            if at.y < mouth_y + 1:
+                return rgb(lip) if 0.12 < at.lx < 0.88 else None
+            if abs(at.x) < 0.3:
+                return mix(nose, lip, 0.45)
+            return None
+        if at.face == "top" and at.z < front_z + 1.02:
+            return mix(nostril, nose, 0.3) if at_nostril(at.x) else rgb(nose)
+        if at.face == "top" and top is not None:
+            return rgb(top)
+        if at.face in ("nx", "px") and mouth_y <= at.y < mouth_y + 1:
+            if tooth is not None and abs(at.z - tooth_z) < 0.5:
+                return rgb(tooth)
+            if at.z < (line_to if line_to is not None else front_z + 99):
+                return rgb(lip)
+        return None
+    return f
+
+
+def jaw_teeth(inside, teeth, front_z, under=None):
+    """A lower jaw: its little front teeth along the front of its top, the inside of the mouth behind them (both seen
+    when it opens), its underside a shade darker."""
+    def f(at):
+        if at.face == "top":
+            return rgb(teeth) if at.z < front_z + 1.02 else rgb(inside)
+        if under is not None and at.face == "bottom":
+            return rgb(under)
+        return None
+    return f
+
+
 def hidden(bone):
     """Tracks keeping a part tucked away (shrunk to nothing) while it isn't wanted: an effect shown only when calling."""
     return {bone: track(scale=[0.001, 0.001, 0.001])}
@@ -213,7 +264,7 @@ def fernadillo():
     m.bone("jaw", "head", [0, 3.5, -11], [Cube([-1.5, 2.25, -13], [3, 1, 3], jaw_m)])
     m.pair("ear_right", "head", [-3.5, 8.5, -8], [Cube([-4.5, 8.5, -8.5], [2, 3, 1], ear)], rotation=[0, 0, -20])
     m.eyes("head", 4, 5, -11.5, h=3, corner=(1, 2), half=4, iris="#7A4A22", pupil="#1A100A", skin=c["skin"], iris_light="#D0923A",
-           grid=["LLL", "WPI", "JJE"])
+           grid=["LLL", "WPI", ".JJ"])
     leafy = leaf_spray(c["leaf_l"], c["leaf_d"], c["vein"])
     m.bone("burst", "shell", [0, 12, 0], [Cube([-1.5, 12, 0], [3, 0, 6], leafy, [-35, a, 0], [0, 12, 0]) for a in (0, 60, 120, 180, 240, 300)])
     for end, z in (("front", -3.5), ("back", 3.5)):
@@ -226,8 +277,7 @@ def fernadillo():
     A, info = four_legs("fernadillo", m, walk=0.8, stride=30, extras={
         "idle": {"shell": track(rotation=[wave(2, 1.2), 0, 0]), "crest": track(rotation=[wave(1, 4), 0, 0])},
         "battle": {"shell": track(rotation=[wave(1, 2), 0, 0]), "crest": track(rotation=[wave(0.5, 6), 0, 0])},
-        "recoil": {"head": track(rotation=keys({0: [0, 0, 0], 0.1: [24, 0, 0], 0.5: [0, 0, 0]}),
-                                 position=keys({0: [0, 0, 0], 0.1: [0, -1, 1.5], 0.5: [0, 0, 0]}))},
+        "recoil": tuck(0.75, 24, 2.0),
         "all": hidden("burst"),
         "cry": merge({"shell": track(scale=keys({0: [1, 1, 1], 0.25: [1.06, 1.1, 1.06], 0.75: [1.06, 1.1, 1.06], 1.2: [1, 1, 1]}))}, burst("burst", 1.2))})
     write("bulbasaur", "FERNADILLO", m, A, info, 0.72)
@@ -275,8 +325,8 @@ def brambadillo():
     m.bone("crest", "head", [0, 13, -12], [Cube([-2.5, 13, -12], [5, 0, 7], fern, [-20, 0, 0], [0, 13, -12])])
     m.bone("jaw", "head", [0, 5, -15], [Cube([-2, 3.5, -17.5], [4, 1, 4], jaw_m)])
     m.pair("ear_right", "head", [-4.5, 12, -10], [Cube([-5.5, 12, -10.5], [2, 3, 1], ear)], rotation=[10, 0, -28])
-    m.eyes("head", x_inner=1.25, y=8.5, z=-15, w=3, h=3, iris="#7A40A0", pupil="#160A18", skin=SKIN, iris_light="#C08CE0")
-    m.brows("head", [Cube([-4.75, 11.6, -15.4], [4, 1, 1], brow, [0, 0, 14], [-0.75, 12.1, -15])])
+    m.eyes("head", x_inner=1.5, y=9, z=-15, w=3, h=2, iris="#7A40A0", pupil="#160A18", skin=SKIN, iris_light="#C08CE0", grid=["DLL", "JPW"])
+    m.brows("head", [Cube([-4.75, 10.9, -15.4], [4, 1, 1], brow, [0, 0, 14], [-0.75, 11.4, -15])])
     leafy = leaf_spray(LEAF_L, LEAF_D, VEIN)
     m.bone("burst", "shell", [0, 16, 0], [Cube([-2, 16, 0], [4, 0, 7], leafy, [-35, a, 0], [0, 16, 0]) for a in (0, 60, 120, 180, 240, 300)])
     for end, z in (("front", -4.5), ("back", 4.5)):
@@ -290,6 +340,7 @@ def brambadillo():
         "idle": {"shell": track(rotation=[wave(2, 1), 0, 0]), "crest": track(rotation=[wave(2, 5), 0, 0])},
         "battle": {"crest": track(rotation=[wave(0.5, 8), 0, 0])},
         "walk": {"crest": track(rotation=[wave(0.45, 6), 0, 0])},
+        "recoil": tuck(0.75 * 1.0, 22, 2.5),
         "all": hidden("burst"),
         "cry": merge({"crest": track(rotation=keys({0: [0, 0, 0], 0.25: [-25, 0, 0], 0.9: [-25, 0, 0], 1.2: [0, 0, 0]})),
                       "shell": track(scale=keys({0: [1, 1, 1], 0.25: [1.05, 1.08, 1.05], 0.75: [1.05, 1.08, 1.05], 1.2: [1, 1, 1]}))}, burst("burst", 1.2, 5))})
@@ -355,9 +406,9 @@ def grovadon():
     m.bone("jaw", "head", [0, 9, -24], [Cube([-3.5, 6.5, -28], [7, 2, 7], jaw_m)])
     m.bone("beard", "jaw", [0, 6.5, -24], [Cube([-3, 3, -27], [6, 4, 4], beard), Cube([-2, 1.5, -26.5], [4, 2, 3], beard)])
     m.pair("ear_right", "head", [-6, 18, -16], [Cube([-7.5, 18, -16.5], [3, 4, 1], ear)], rotation=[15, 0, -35])
-    m.eyes("head", x_inner=2, y=13, z=-24, w=4, h=4, iris="#8A5A22", pupil="#160E08", skin=SKIN, iris_light="#E0B058")
+    m.eyes("head", x_inner=2.5, y=14.5, z=-24, w=3, h=2, iris="#8A5A22", pupil="#160E08", skin=SKIN, iris_light="#E0B058", grid=["DLL", "JPW"])
     mossy_brow = Mat(MOSS, lambda a: mix("#4E7A34", "#8CBA5C", a.ly + cell(a.x, a.y, a.z, 1) * 0.3), noise=0.03, edge=0)
-    m.brows("head", [Cube([-7.5, 17.25, -24.6], [6, 2, 1], mossy_brow, [0, 0, 10], [-1.5, 18.25, -24])])
+    m.brows("head", [Cube([-7.5, 16.4, -24.6], [6, 2, 1], mossy_brow, [0, 0, 10], [-1.5, 17.4, -24])])
     leafy = leaf_spray(LEAF_L, LEAF_D, VEIN)
     m.bone("burst", "shell", [0, 30, 0], [Cube([-3, 30, 0], [6, 0, 10], leafy, [-35, a, 0], [0, 30, 0]) for a in (0, 45, 90, 135, 180, 225, 270, 315)])
     for end, z in (("front", -8), ("back", 8)):
@@ -374,6 +425,7 @@ def grovadon():
                  "beard": track(rotation=[wave(2.8, 4), 0, 0])},
         "battle": {"ferns": track(rotation=[wave(1.4, 5), 0, 0]), "beard": track(rotation=[wave(1.4, 6), 0, 0])},
         "walk": {"ferns": track(rotation=[wave(0.6, 5), 0, wave(1.2, 4)]), "beard": track(rotation=[wave(0.6, 8), 0, 0])},
+        "recoil": tuck(0.75 * 1.4, 18, 3.0),
         # A stamp and a roar: the front up, then down hard.
         "all": hidden("burst"),
         "cry": {**burst("burst", 1.68, 8, 120),
@@ -404,20 +456,30 @@ def goat_legs(m, xs, zs, top, knee, hoof_h, w, mat, shin, hoof, cuff=None, paren
     for end, z in (("front", zs[0]), ("back", zs[1])):
         x = xs[0] if end == "front" else xs[1]
         m.pair(f"leg_{end}_right", parent, [-x, top, z], [Cube([-x - w / 2, knee, z - w / 2], [w, top - knee + 1, w], mat)])
-        cubes = [Cube([-x - w / 2, hoof_h, z - w / 2], [w, knee - hoof_h, w], shin), Cube([-x - w / 2 - 0.5, 0, z - w / 2 - 0.5], [w + 1, hoof_h, w + 1], hoof)]
+        H, x0, z0 = w + 1, -x - w / 2 - 0.5, z - w / 2 - 0.5
+        tw = H // 2 if H % 2 == 0 else (H - 1) // 2
+        th = max(1, round(hoof_h) - 1)
+        # A cloven hoof: its heel, two toes in front with the cleft between them, and a dewclaw behind.
+        cubes = [Cube([-x - w / 2, hoof_h, z - w / 2], [w, knee - hoof_h, w], shin), Cube([x0, 0, z0 + 1], [H, hoof_h, H - 1], hoof),
+                 Cube([x0, 0, z0], [tw, th, 1], hoof), Cube([x0 + H - tw, 0, z0], [tw, th, 1], hoof),
+                 Cube([x0 + (H - 1) / 2, hoof_h, z0 + H], [1, 1, 1], hoof)]
         if cuff is not None:
             cubes.append(Cube([-x - w / 2 - 0.5, hoof_h, z - w / 2 - 0.5], [w + 1, 1, w + 1], cuff))
         m.pair(f"shin_{end}_right", f"leg_{end}_right", [-x, knee, z], cubes)
 
 
 def hoof_mat(dark="#241C20"):
+    """Hard dark hoof, a sheen down its front, the cleft dark, smouldering along its bottom edge."""
     def f(at):
-        if at.face == "bottom" or (at.face != "top" and at.row == at.fh - 1):
+        if at.face == "bottom" or (at.face != "top" and at.row == at.fh - 1 and at.fh > 1):
             return rgb("#FF7A2A")
-        if at.face == "front" and at.col == at.fw // 2:
-            return rgb("#120E10")
-        return rgb(dark)
-    return Mat(dark, f, glow=lambda a: rgb("#FF8A2A") if a.face == "bottom" or (a.face != "top" and a.row == a.fh - 1) else None, noise=0.02)
+        if at.face == "front" and at.fw >= 3 and at.col == at.fw // 2 and at.fw % 2 == 0:
+            return rgb("#0E0A0C")
+        if at.face == "top":
+            return mix(dark, "#4A3E44", 0.35)
+        return mix(dark, "#5A4C54", 0.3 * (1 - at.ly)) if at.face == "front" else rgb(dark)
+    return Mat(dark, f, glow=lambda a: rgb("#FF8A2A") if a.face == "bottom" or (a.face != "top" and a.row == a.fh - 1 and a.fh > 1) else None,
+               noise=0.02)
 
 
 def horn_mat(lo, hi, ridges=False):
@@ -450,8 +512,8 @@ def cinderkid():
     wool = Mat(WOOL, wool_paint(WOOL, WOOL_L, WOOL_D, belly="#5E555A", below=8.5), noise=0.02)
     tuft = Mat(WOOL_L, wool_paint(WOOL_L, "#857980", WOOL), noise=0.02, edge=0)
     bib = Mat(CREAM, lambda a: rgb("#D9C8AE") if hash01("b", a.col, a.row, a.face) > 0.7 else None, noise=0.02)
-    muzzle = Mat(CREAM, nostrils("#3A2C2C", "#F6EAD6"), smile("#5A3A34"), noise=0.02)
-    jaw = Mat("#E0D0B6", open_mouth("#B8505A"), noise=0.02)
+    muzzle = Mat(CREAM, goat_nose("#B89A92", "#3A2A2A", "#5A3A34", -13.5, 17, 14, 1.5, line_to=-12.5, top="#F6EAD6"), noise=0.02)
+    jaw = Mat("#E0D0B6", jaw_teeth("#B8505A", "#FFFBF0", -13.25), noise=0.02)
     ear = Mat(WOOL, lambda a: rgb("#E8662C") if a.face == "bottom" else None, glow=lambda a: rgb("#B83A18") if a.face == "bottom" else None, noise=0.02)
     leg = Mat(WOOL, lambda a: mix(WOOL, WOOL_D, 1 - a.ly) if a.face != "top" else None, noise=0.02)
 
@@ -465,7 +527,7 @@ def cinderkid():
     m.bone("fringe", "head", [0, 20.5, -9.5], flame([0, 20.5, -9.5], 4, 6))
     horn(m, "horn", "head", [-2.5, 20.5, -8.5], [(1, 3), (1, 2), (1, 2)], [[-30, 0, -14], [-25, 0, 0], [-30, 0, 0]])
     m.pair("ear_right", "head", [-4, 18.5, -9], [Cube([-7, 18, -9.75], [3, 1, 2], ear)], rotation=[0, -15, 42])
-    m.eyes("head", x_inner=1, y=16.5, z=-11.5, w=3, h=3, iris="#E88A20", pupil="#1A0A06", skin=WOOL, iris_light="#FFD060", grid=["LIL", "WPI", "LJL"])
+    m.eyes("head", x_inner=1.5, y=16.5, z=-11.5, w=2, h=3, iris="#E88A20", pupil="#1A0A06", skin=WOOL, iris_light="#FFD060", grid=["LL", "WP", "JI"])
     m.brows("head", [Cube([-4, 19.6, -11.9], [3, 1, 1], tuft, [0, 0, 12], [-1, 20.1, -11.5])])
     goat_legs(m, (2.25, 2.25), (-3.5, 3.5), 9, 5, 2, 2, leg, leg, hoof_mat(), cuff=tuft)
     m.bone("tail", "body", [0, 12.5, 5.5], [Cube([-1, 12, 5], [2, 2, 2], wool)], rotation=[-40, 0, 0])
@@ -490,8 +552,9 @@ def emberam():
     wool = Mat(WOOL, wool_paint(WOOL, WOOL_L, WOOL_D, belly="#544A50", below=13), noise=0.02)
     tuft = Mat(WOOL_L, wool_paint(WOOL_L, "#7A6E74", WOOL), noise=0.02, edge=0)
     bib = Mat(CREAM, lambda a: rgb("#CDB99C") if hash01("b", a.col, a.row, a.face) > 0.7 else None, noise=0.02)
-    muzzle = Mat(CREAM, nostrils("#3A2C2C", "#F2E4CE"), smile("#4A2E2A", grin=False), noise=0.02)
-    jaw = Mat("#D8C6AA", open_mouth("#B04850"), noise=0.02)
+    muzzle = Mat(CREAM, goat_nose("#8E7A74", "#2A1E1E", "#4A2E2A", -17.5, 24, 20, 1, tooth="#FFF8EA", tooth_z=-16, line_to=-15,
+                                   top="#F2E4CE"), noise=0.02)
+    jaw = Mat("#D8C6AA", jaw_teeth("#B04850", "#FFF8EA", -17.25), noise=0.02)
     ear = Mat(WOOL, lambda a: rgb("#E8662C") if a.face == "bottom" else None, glow=lambda a: rgb("#B83A18") if a.face == "bottom" else None, noise=0.02)
 
     def lava(at):
@@ -515,8 +578,8 @@ def emberam():
     horn(m, "horn", "head", [-3, 27, -11], [(2, 3), (2, 3), (1, 3), (1, 2), (1, 2)],
          [[-45, 0, -20], [-45, 0, 0], [-45, 0, 0], [-40, 0, 0], [-35, 0, 0]], lo=0.1, hi=0.95)
     m.pair("ear_right", "head", [-4.5, 24.5, -12], [Cube([-8, 24, -12.75], [4, 1, 2], ear)], rotation=[0, -15, 40])
-    m.eyes("head", x_inner=1, y=24, z=-15, w=3, h=3, iris="#E07818", pupil="#1A0A06", skin=WOOL, iris_light="#FFC850", grid=["WIL", "PPI", "JJL"])
-    m.brows("head", [Cube([-4.25, 27.1, -15.4], [3, 1, 1], tuft, [0, 0, 16], [-1.25, 27.6, -15])])
+    m.eyes("head", x_inner=1.25, y=24.5, z=-15, w=3, h=2, iris="#E07818", pupil="#1A0A06", skin=WOOL, iris_light="#FFC850", grid=["DLL", "JPW"])
+    m.brows("head", [Cube([-4.5, 26.4, -15.4], [3, 1, 1], tuft, [0, 0, 16], [-1.5, 26.9, -15])])
     goat_legs(m, (3, 3), (-5, 5), 13, 7, 2.5, 3, leg, leg, hoof_mat(), cuff=tuft)
     m.bone("tail", "body", [0, 18, 7.5], [Cube([-1, 17, 7], [2, 3, 2], wool)], rotation=[-45, 0, 0])
     m.bone("tail2", "tail", [0, 19.5, 8], flame([0, 19.5, 8], 6, 9))
@@ -540,10 +603,9 @@ def pyribex():
     wool = Mat(WOOL, wool_paint(WOOL, WOOL_L, WOOL_D, belly="#4A4046", below=21), noise=0.02)
     tuft = Mat(WOOL_L, wool_paint(WOOL_L, "#75676D", WOOL), noise=0.02, edge=0)
     bib = Mat(CREAM, lambda a: rgb("#C8B394") if cell(a.x, a.y, a.z, 1) > 0.65 else None, noise=0.02)
-    muzzle = Mat(CREAM, lambda a: rgb("#3A2C2C") if a.face == "front" and a.row == 1 and a.col in (0, a.fw - 1) else
-                 (rgb("#F0E2CA") if a.face == "top" else None), smile("#3A2424", grin=False), noise=0.02)
-    jaw = Mat("#D2BFA2", open_mouth("#A84048"), noise=0.02)
-    fang = Mat("#FFF8EA", lambda a: rgb("#E0D6C4") if a.face == "bottom" else None, noise=0.01, edge=0)
+    muzzle = Mat(CREAM, goat_nose("#6E5E5A", "#1E1416", "#3A2424", -26, 40, 36, 1, tooth="#FFF8EA", tooth_z=-24.5, line_to=-22,
+                                   top="#F0E2CA"), noise=0.02)
+    jaw = Mat("#D2BFA2", jaw_teeth("#A84048", "#FFF8EA", -25.5), noise=0.02)
     ear = Mat(WOOL, lambda a: rgb("#E8662C") if a.face == "bottom" else None, glow=lambda a: rgb("#B83A18") if a.face == "bottom" else None, noise=0.02)
 
     def lava(at):
@@ -577,16 +639,14 @@ def pyribex():
     m.bone("neck", "body", [0, 29, -11], blob([-3.5, 27, -16], [7, 10, 7], wool), rotation=[-20, 0, 0])
     m.bone("mane", "neck", [0, 34, -12], flame([0, 36, -11], 7, 11) + flame([0, 33, -7.5], 7, 10) + flame([0, 31, -4], 6, 8))
     m.bone("head", "neck", [0, 36, -14], face_blob([-6, 35, -22], [12, 11, 9], wool) +
-           blob([-3.5, 35, -26], [7, 6, 5], muzzle) + [Cube([-1.5, 31, -22.5], [3, 5, 2], bib), Cube([-1, 29, -22], [2, 2, 1], bib),
-                                                       Cube([-2.75, 34, -25.75], [1, 1, 1], fang), Cube([1.75, 34, -25.75], [1, 1, 1], fang)])
+           blob([-3.5, 35, -26], [7, 6, 5], muzzle) + [Cube([-1.5, 31, -22.5], [3, 5, 2], bib), Cube([-1, 29, -22], [2, 2, 1], bib)])
     m.bone("jaw", "head", [0, 36, -22], [Cube([-3, 33.5, -25.5], [6, 2, 4], jaw)])
     m.bone("fringe", "head", [0, 45.5, -18.5], flame([0, 45.5, -18.5], 7, 9))
     horn(m, "horn", "head", [-3.5, 45, -16], [(3, 5), (3, 5), (2, 5), (2, 4), (2, 4), (1, 3)],
          [[-35, 0, -16], [-25, 0, -4], [-22, 0, 0], [-20, 0, 0], [-18, 0, 0], [-15, 0, 0]], lo=0.05, hi=1.0, ridges=True)
     m.pair("ear_right", "head", [-6, 41, -18], [Cube([-11, 40.5, -19], [5, 2, 3], ear)], rotation=[0, -15, 35])
-    m.eyes("head", x_inner=1.25, y=40.5, z=-22, w=4, h=4, iris="#F07818", pupil="#160806", skin=WOOL, iris_light="#FFD050",
-           grid=["IJJI", "WPPP", "IPPI", "JIIJ"])
-    m.brows("head", [Cube([-5.75, 44.75, -22.5], [5, 1, 1], tuft, [0, 0, 16], [-1.25, 45.25, -22])])
+    m.eyes("head", x_inner=1.75, y=42, z=-22, w=3, h=2, iris="#F07818", pupil="#160806", skin=WOOL, iris_light="#FFD050", grid=["DLL", "JPW"])
+    m.brows("head", [Cube([-5.75, 43.9, -22.5], [5, 1, 1], tuft, [0, 0, 16], [-1.25, 44.4, -22])])
     # Wings, folded at rest along its sides: the coverts on an arm along the shoulder, the ember feathers hanging from it.
     efea = Mat("#C9361A", feather_plane("#2A1A18", "#C9361A", "#FFB44A", edge="#FFE08A"), noise=0.015, edge=0,
                glow=lambda a: ember_ramp(0.5 + 0.5 * (1 - a.ly)) if a.ly < 0.4 else None)
@@ -594,7 +654,7 @@ def pyribex():
                 arm, efea, efea)
     goat_legs(m, (4.5, 4.5), (-8, 8), 22, 11, 3, 4, leg, leg, hoof_mat(), cuff=tuft)
     m.bone("tail", "body", [0, 29, 12], [Cube([-1.5, 28, 11.5], [3, 4, 3], wool)], rotation=[-40, 0, 0])
-    m.bone("tail2", "tail", [0, 31.5, 13], flame([0, 31.5, 13], 8, 13))
+    m.bone("tail2", "tail", [0, 31.5, 13], flame([0, 31, 13.5], 12, 19, planes=4))
     flick = {"fringe": track(scale=[1, wave(0.5, 0.12, 0, 1), 1]), "mane": track(scale=[1, wave(0.4, 0.1, 30, 1), wave(0.6, 0.06, 0, 1)]),
              "tail2": track(scale=[wave(0.4, 0.08, 0, 1), wave(0.3, 0.16, 0, 1), 1])}
     fold = {}
@@ -679,7 +739,7 @@ def tidapir():
     m.bone("spray", "trunk3", [0, 6, -16], jet([0, 6, -16], 10, 6))
     m.pair("ear_right", "head", [-2.5, 12, -8], [Cube([-4, 11.5, -8.5], [2, 2, 1], ear)], rotation=[0, 0, -20])
     m.eyes("head", 3.5, 8.5, -11, h=3, corner=(1, 2), half=3.5, iris="#1E5A8A", pupil="#0A1426", skin=BLUE, iris_light="#8AE4F4",
-           grid=["LLL", "WPI", "JJE"])
+           grid=["LLL", "WPI", ".JJ"])
     for end, z in (("front", -3.75), ("back", 3.75)):
         m.pair(f"leg_{end}_right", "body", [-2.5, 4, z], [Cube([-4, 0, z - 1.5], [3, 4, 3], leg)] + tapir_toes(-4, z - 1.5, 2, 3, toe))
     m.bone("tail", "body", [0, 9, 6], [Cube([-0.5, 8, 6], [1, 2, 2], fin), Cube([-1.5, 8.5, 7.5], [3, 1, 1], fin)], rotation=[-20, 0, 0])
@@ -726,7 +786,7 @@ def surfapir():
     m.bone("spray", "trunk3", [0, 9, -22], jet([0, 9, -22], 13, 8))
     m.pair("ear_right", "head", [-4, 15.5, -10.5], [Cube([-7, 15, -11], [3, 3, 0], fin), Cube([-5.5, 15, -11.5], [1, 2, 1], fin)], rotation=[0, 20, -30])
     m.eyes("head", 4.5, 11.5, -14.5, h=3, corner=(1, 2), half=4.5, iris="#1E5A8A", pupil="#081226", skin=BLUE, iris_light="#8AE4F4",
-           grid=["LLL", "WPI", "JJE"])
+           grid=["DLL", "WPI", ".JJ"])
     for end, z in (("front", -5), ("back", 5)):
         m.pair(f"leg_{end}_right", "body", [-3.25, 6, z], [Cube([-5, 0, z - 2], [3.5, 6, 4], leg)] + tapir_toes(-5, z - 2, 3, 3.5, toe))
     m.bone("tail", "body", [0, 12, 8], [Cube([-0.5, 11, 8], [1, 2, 3], fin)], rotation=[-15, 0, 0])
@@ -786,8 +846,8 @@ def tsunapir():
     m.bone("trunk3", "trunk2", [0, 18.5, -35], [Cube([-2.5, 14, -38], [5, 5, 3], trunk), Cube([-3.5, 13, -40], [7, 7, 2], spout)], rotation=[20, 0, 0])
     m.bone("spray", "trunk3", [0, 16.5, -40], jet([0, 16.5, -40], 20, 12))
     m.pair("ear_right", "head", [-7, 26, -19], [Cube([-13, 25, -20], [6, 5, 0], fin), Cube([-10, 25, -20.5], [2, 3, 1], fin)], rotation=[0, 20, -25])
-    m.eyes("head", x_inner=4, y=21, z=-26, w=4, h=4, iris="#1A4E80", pupil="#060E1C", skin=BLUE, iris_light="#8AE4F4")
-    m.brows("head", [Cube([-8.5, 25.4, -26.6], [6, 1, 1], Mat(BLUE_D, noise=0.02, edge=0), [0, 0, 12], [-3, 25.9, -26])])
+    m.eyes("head", x_inner=3.5, y=22.5, z=-26, w=3, h=2, iris="#1A4E80", pupil="#060E1C", skin=BLUE, iris_light="#8AE4F4", grid=["DLL", "PIE"])
+    m.brows("head", [Cube([-8.5, 24.4, -26.6], [6, 1, 1], Mat(BLUE_D, noise=0.02, edge=0), [0, 0, 12], [-3, 24.9, -26])])
     for end, z in (("front", -9), ("back", 9)):
         m.pair(f"leg_{end}_right", "body", [-6.5, 12, z], blob([-10.5, 0, z - 4], [8, 12, 8], leg) + tapir_toes(-10.5, z - 4, 3, 8, toe))
     m.bone("tail", "body", [0, 20, 15], [Cube([-1.5, 18, 15], [3, 4, 5], fin)], rotation=[-15, 0, 0])
@@ -919,7 +979,7 @@ def quailet():
     m.bone("beak_lower", "head", [0, 9, -5], [Cube([-0.5, 8.4, -5.75], [1, 1, 1], Mat("#4A4650", noise=0.01, edge=0))])
     m.bone("plume", "head", [0, 12.5, -3], [Cube([-0.5, 12.5, -3.5], [1, 2, 1], plume)], rotation=[-10, 0, 0])
     m.bone("plume_tip", "plume", [0, 14.5, -3], [Cube([-0.5, 13.5, -5], [1, 2, 2], plume)], rotation=[35, 0, 0])
-    m.eyes("head", 3, 8.5, -5, h=3, corner=(1, 2), half=3, iris="#6A3A1A", pupil="#0C0A10", skin=LIL_D, iris_light="#D89A4A", grid=["LLL", "WPI", "JJE"])
+    m.eyes("head", 3, 8.5, -5, h=3, corner=(1, 2), half=3, iris="#6A3A1A", pupil="#0C0A10", skin=LIL_D, iris_light="#D89A4A", grid=["LLL", "WPI", ".JJ"])
     sec = Mat(LIL, feather_plane(LIL, LIL_D, PLUME, bars=LIL_L), noise=0.015, edge=0)
     pri = Mat(LIL_D, feather_plane(LIL_D, "#4A4066", PLUME, edge=CREAM), noise=0.015, edge=0)
     folded_wing(m, 3.5, 7.5, -3.5, 6, 3, 1, [(0, 2, 3), (1.5, 2, 3), (3, 2, 3)], [(0, 2, 4), (1.5, 2, 4)], fea, sec, pri)
@@ -970,7 +1030,7 @@ def plumquail():
     m.bone("plume_tip", "plume", [0, 24, -6], [Cube([-2, 23, -8], [1, 2, 2], plume, [0, 0, 10], [-1.5, 24, -6]),
                                                Cube([1, 23, -8], [1, 2, 2], plume, [0, 0, -10], [1.5, 24, -6])], rotation=[35, 0, 0])
     m.eyes("head", 3.5, 16.5, -8.5, h=3, corner=(1, 2), half=3.5, iris="#6A3A1A", pupil="#0C0A10", skin=LIL_D, iris_light="#E0A24A",
-           grid=["LLL", "WPI", "JJE"])
+           grid=["DLL", "WPI", ".JJ"])
     sec = Mat(LIL, feather_plane(LIL, LIL_D, PLUME, bars=LIL_L), noise=0.015, edge=0)
     pri = Mat(LIL_D, feather_plane(LIL_D, "#433A60", PLUME, edge=CREAM), noise=0.015, edge=0)
     folded_wing(m, 4.5, 12, -5, 9, 4, 1, [(0, 2, 4), (1.5, 2, 4), (3, 2, 4), (4.5, 2, 4)], [(0, 2, 6), (1.5, 2, 6), (3, 2, 5)], fea, sec, pri)
@@ -1044,7 +1104,7 @@ def regalquail():
     m.bone("plume_tip", "plume", [0, 39.5, -9], [Cube([-1, 38.5, -12], [2, 3, 3], plume), Cube([-4, 37.5, -11], [1, 2, 2], plume, [0, 0, 20], [-2, 38.5, -9]),
                                                   Cube([3, 37.5, -11], [1, 2, 2], plume, [0, 0, -20], [2, 38.5, -9])], rotation=[30, 0, 0])
     m.eyes("head", 4.5, 29, -12.5, h=3, corner=(1, 3), half=4.5, iris="#7A4A1A", pupil="#0C0A10", skin=LIL_D, iris_light="#F0C050",
-           grid=["LLLL", "WPPI", "JJIE"])
+           grid=["DLLL", "WPPI", ".JIE"])
     sec = Mat(LIL, feather_plane(LIL, LIL_D, GOLD, bars=LIL_L), noise=0.015, edge=0)
     pri = Mat(LIL_D, feather_plane(LIL_D, LIL, GOLD, edge="#FFE08A"), noise=0.015, edge=0)
     folded_wing(m, 7, 20, -8, 15, 6, 2, [(0, 3, 6), (2.5, 3, 6), (5, 3, 6), (7.5, 3, 6), (10, 3, 6)], [(0, 3, 9), (2.5, 3, 9), (5, 3, 8), (7.5, 3, 7)],
@@ -1143,7 +1203,7 @@ def jerboa(sid, name, stands, big=False):
     m.bone("jaw", "head", S([0, 7.5, -7.5]), [Cube(S([-1, 6.4, -8.75]), [2 * s, 1, 1.5 * s], snout)])
     m.pair("whiskers_right", "head", S([-1.5, 8, -8.5]), [Cube(S([-4.5, 8, -9]), [3 * s, 0, 2], whisk)], rotation=[0, -15, 0])
     m.eyes("head", 3 * s, 8.5 * s, -7.5 * s, h=3, corner=(1, 2 if not big else 3), half=3 * s, iris="#3A2A20", pupil="#080606", skin=SAND,
-           iris_light="#9A7A5A", grid=["LLL", "WPP", "PPJ"] if not big else ["LLLL", "WPPP", "PPPJ"])
+           iris_light="#9A7A5A", grid=["LLL", "WPP", ".PJ"] if not big else ["LLLL", "WPPP", ".PPJ"])
     ear_rot = [8, 0, -14] if not big else [35, 0, -20]
     m.pair("ear_right", "head", S([-1.75, 12, -5]), [Cube(S([-3.25, 12, -5.5]), [3 * s, 6 * s, 1], ear)], rotation=ear_rot)
     m.pair("arm_right", "body", S([-2, 6.5, -3.5]), [Cube(S([-2.5, 4.5, -4.25]), [1, 2 * s, 1], paw)], rotation=[-25, 0, 0])

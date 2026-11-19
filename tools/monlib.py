@@ -184,7 +184,7 @@ class Model:
         self.bone(left, pl, [-pivot[0], pivot[1], pivot[2]], [mirror_cube(c) for c in cubes], rot_l)
 
     def eyes(self, head, x_inner, y, z, w=2, h=3, iris="#3A2A20", pupil="#120D0A", skin="#888888", lash="#1A1414", shine="#FFFFFF",
-             iris_light=None, white=None, lid_line=None, side=False, corner=None, grid=None, half=None):
+             iris_light=None, white=None, lid_line=None, side=False, corner=None, grid=None, half=None, squint=True):
         """Eyes, each with an eyelid that drops shut for a blink (the lid's height, its scale in y, goes from 0 to 1).
         Front (the default): on the face at z, the right eye's inner edge x_inner from the middle.
         side=True: on the sides of the head, x_inner being the head's half-width and z where the eye starts at the front.
@@ -193,14 +193,20 @@ class Model:
         if corner:
             wf, ws = corner
             hw = half if half is not None else x_inner
-            em_f = eye_mat(wf + ws, h, iris, pupil, lash, shine, iris_light, white, grid=grid, part=(0, wf), face="front")
-            em_s = eye_mat(wf + ws, h, iris, pupil, lash, shine, iris_light, white, grid=grid, part=(wf, ws), face="side")
+            em_f = eye_mat(wf + ws, h, iris, pupil, lash, shine, iris_light, white, grid=grid, part=(0, wf), face="front", skin=skin)
+            em_s = eye_mat(wf + ws, h, iris, pupil, lash, shine, iris_light, white, grid=grid, part=(wf, ws), face="side", skin=skin)
             lm = Mat(skin, lambda a: CLEAR if not outward(a) else (rgb(lid_line or lash) if a.row == a.fh - 1 else None), noise=0.01, shade=0.2, edge=0)
             self.pair("eye_right", head, [-hw, y + h, z], [Cube([-hw, y, z - 0.01], [wf, h, 0], em_f), Cube([-hw - 0.01, y, z], [0, h, ws], em_s)])
             self.pair("eyelid_right", "eye_right", [-hw, y + h, z], [Cube([-hw - 0.02, y, z - 0.03], [wf + 0.04, h, 0], lm),
                                                                      Cube([-hw - 0.03, y, z - 0.02], [0, h, ws + 0.02], lm)])
+            if squint:
+                sg = squint_grid(wf + ws, h)
+                sq_f = eye_mat(wf + ws, h, iris, pupil, lash, shine, grid=sg, part=(0, wf), face="front", skin=skin)
+                sq_s = eye_mat(wf + ws, h, iris, pupil, lash, shine, grid=sg, part=(wf, ws), face="side", skin=skin)
+                self.pair("squint_right", "eye_right", [-hw, y + h / 2, z], [Cube([-hw - 0.02, y, z - 0.05], [wf, h, 0], sq_f),
+                                                                           Cube([-hw - 0.05, y, z - 0.02], [0, h, ws], sq_s)])
             return
-        em = eye_mat(w, h, iris, pupil, lash, shine, iris_light, white, side=side, grid=grid)
+        em = eye_mat(w, h, iris, pupil, lash, shine, iris_light, white, side=side, grid=grid, skin=skin)
         lid_face = ("nx", "px") if side else ("front",)
         lm = Mat(skin, lambda a: CLEAR if not outward(a) else (rgb(lid_line or lash) if a.face in lid_face and a.row == a.fh - 1 else None),
                  noise=0.01, shade=0.2, edge=0)
@@ -212,6 +218,9 @@ class Model:
         xr = -(x_inner + w)
         self.pair("eye_right", head, [xr + w / 2, y + h, z], [Cube([xr, y, z - 0.01], [w, h, 0], em)])
         self.pair("eyelid_right", "eye_right", [xr + w / 2, y + h, z], [Cube([xr, y, z - 0.03], [w, h, 0], lm)])
+        if squint:
+            sq = eye_mat(w, h, iris, pupil, lash, shine, grid=squint_grid(w, h), skin=skin)
+            self.pair("squint_right", "eye_right", [xr + w / 2, y + h / 2, z], [Cube([xr, y, z - 0.05], [w, h, 0], sq)])
 
     def brows(self, head, cubes):
         """Brows over the eyes (cubes for the right one; the left is mirrored)."""
@@ -249,14 +258,29 @@ def outward(at):
     return True
 
 
-def eye_mat(w, h, iris, pupil, lash, shine, iris_light=None, white=None, side=False, grid=None, part=None, face=None):
+def squint_grid(n, h):
+    """A shut eye squeezed tight, n texels across (inner side first) and h high: skin, with a dark line like a ">" whose
+    point is at the inner corner and whose arms open towards the outer side."""
+    rows = [["S"] * n for _ in range(h)]
+    mid = (h - 1) / 2
+    for k in range(n):
+        off = (k / max(1, n - 1)) * (h - 1) / 2
+        for r in {int(math.floor(mid - off + 0.5)), int(math.floor(mid + off + 0.5))}:
+            rows[max(0, min(h - 1, r))][k] = "L"
+    return ["".join(r) for r in rows]
+
+
+def eye_mat(w, h, iris, pupil, lash, shine, iris_light=None, white=None, side=False, grid=None, part=None, face=None, skin=None):
     """An eye's drawing on its flat part. part=(first column, columns) for an eye in two parts round a corner (the face
     part's columns run inner to outer; the side part's carry on from front to back)."""
     I, P, L, S = rgb(iris), rgb(pupil), rgb(lash), rgb(shine)
     J = rgb(iris_light) if iris_light else mix(I, "#FFFFFF", 0.35)
     E = rgb(white) if white else rgb("#F4F1EA")
     grid = grid or EYES.get((w, h))
-    table = {"L": L, "W": S, "w": mix(S, I, 0.35), "P": P, "I": I, "J": J, "E": E, "K": mix(I, P, 0.5)}
+    SK = rgb(skin) if skin else I
+    # S skin (to shape the eye's outline), D the skin's shadow (a lid's crease), . nothing (the face behind shows).
+    table = {"L": L, "W": S, "w": mix(S, I, 0.35), "P": P, "I": I, "J": J, "E": E, "K": mix(I, P, 0.5), "S": SK, "D": mix(SK, L, 0.4),
+             ".": CLEAR}
 
     def f(at):
         if not outward(at):
@@ -559,7 +583,16 @@ def only(m, d):
 
 
 def eyelids(at):
-    return {"eyelid_right": track(scale=[1, blink(at), 1]), "eyelid_left": track(scale=[1, blink(at), 1])}
+    """The eyelids' blink, and the squeezed-shut eyes kept away (they only show when hit)."""
+    return {"eyelid_right": track(scale=[1, blink(at), 1]), "eyelid_left": track(scale=[1, blink(at), 1]),
+            "squint_right": track(scale=[0.001, 0.001, 0.001]), "squint_left": track(scale=[0.001, 0.001, 0.001])}
+
+
+def squeeze(length, shut=0.04, open_at=0.55):
+    """Eyes squeezed shut while hit: the squint parts brought back (from nothing) for a moment."""
+    L = length
+    k = keys({0: [1, 1, 1], L * shut: [1000, 1000, 1000], L * open_at: [1000, 1000, 1000], L * (open_at + 0.07): [1, 1, 1]})
+    return {"squint_right": track(scale=k), "squint_left": track(scale=dict(k))}
 
 
 def pulse(period, amp):
