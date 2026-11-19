@@ -1,3 +1,8 @@
-grep startWaitingForNewLevel|LevelLoadingScreen|ReceivingLevelScreen|handleRespawn|levelLoadTracker|LevelLoadTracker net/minecraft/client/multiplayer/ClientPacketListener.java
-net/minecraft/client/gui/screens/LevelLoadingScreen.java
-grep class|LevelLoadTracker|isLevelReady|ready|close net/minecraft/client/multiplayer/LevelLoadTracker.java
+net/minecraft/client/model/geom/ModelPart.java
+grep blur|renderBackground|renderBlurredBackground|renderMenuBackground net/minecraft/client/gui/screens/Screen.java
+grep keyPress|public void|private void|screen != null|InputConstants net/minecraft/client/KeyboardHandler.java
+grep keyInventory|keyDrop|keySwapOffhand|keyChat|keyCommand|keyTogglePerspective|keyPickItem|keySocialInteractions|keyAdvancements|keyHotbarSlots|handleKeybinds|keyScreenshot|keyUse|keyAttack|keyFullscreen|keySmoothCamera|keySpectatorOutlines|keyQuickActions net/minecraft/client/Minecraft.java
+grep public net/minecraft/client/KeyMapping.java
+grep public|static net/minecraft/client/renderer/texture/OverlayTexture.java
+grep submitCustomGeometry|interface|void submit net/minecraft/client/renderer/SubmitNodeCollector.java
+grep record|fixedTime|hasSkyLight|ambientLight|monsterSettings|cardinalLight|effectsLocation|DimensionType\( net/minecraft/world/level/dimension/DimensionType.java
