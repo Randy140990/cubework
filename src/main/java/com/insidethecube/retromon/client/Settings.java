@@ -63,6 +63,16 @@ public final class Settings {
 		return look;
 	}
 
+	/** SOUND: how loud cries and menu sounds are, from OFF (0) to MAX (4, the default). */
+	public static int sound() {
+		return get("sound", 4, 0, 4);
+	}
+
+	/** BATTLE EFFECTS: moves play their animations in battle (1, the default) or not (0). */
+	public static boolean effects() {
+		return get("effects", 1, 0, 1) == 1;
+	}
+
 	/** The Pokédex reads entries aloud (1) or not (0). */
 	public static boolean voice() {
 		return get("voice", 1, 0, 1) == 1;

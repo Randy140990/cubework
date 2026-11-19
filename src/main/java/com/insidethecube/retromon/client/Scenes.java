@@ -246,6 +246,48 @@ public final class Scenes {
 		}
 	}
 
+	/** A round stand at (x, 0, 0): its side a band, its top a pale disc (radius in blocks). */
+	private static void standAt(GuiGraphics g, Cam cam, double x, double radius) {
+		float[] c = cam.at(x, 0, 0), e = cam.at(x + radius, 0, 0), lo = cam.at(x, -0.16, 0), n = cam.at(x, 0, -radius), s = cam.at(x, 0, radius);
+		float rx = Math.abs(e[0] - c[0]), ry = Math.abs(s[1] - n[1]) / 2, cy = (s[1] + n[1]) / 2, drop = lo[1] - c[1];
+		V.ellipse(g, c[0], cy + drop + 6, rx * 1.08F, ry * 1.08F, 0x30000000);
+		V.ellipse(g, c[0], cy + drop, rx * 1.08F, ry * 1.08F, 0xFF9FD6C4);
+		V.rr(g, c[0] - rx * 1.08F, cy, rx * 2.16F, drop, 0, 0xFFA9DCCB);
+		V.ellipse(g, c[0], cy, rx * 1.08F, ry * 1.08F, 0xFFBFEFE0);
+		V.ellipse(g, c[0], cy, rx * 0.95F, ry * 0.95F, 0xFFE9FFF6);
+	}
+
+	/**
+	 * A trade, as the viewer's: yours on a stand at the left, theirs at the right, facing each other. swap (0 to 1,
+	 * or below 0 before it starts): they go into their balls, which cross over in arcs, and come out the other side.
+	 */
+	public static void trade(GuiGraphics g, float secs, String yours, String theirs, float swap) {
+		Cam cam = new Cam().look(0, 2.2, 7.6, 0, 0.8, 0);
+		standAt(g, cam, -2.2, 1.2);
+		standAt(g, cam, 2.2, 1.2);
+		boolean crossed = swap > 0.85F, mons = swap < 0.15F || crossed;
+		if (mons) {
+			Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
+			place(b, cam, null, crossed ? theirs : yours, -2.2, 0, 0, Math.PI * 0.82, secs);
+			place(b, cam, null, crossed ? yours : theirs, 2.2, 0, 0, -Math.PI * 0.82, secs + 0.5F);
+			b.draw(g);
+		} else {
+			float m = Math.max(0, Math.min(1, (swap - 0.15F) / 0.7F));
+			ball(g, cam, -2.2 + 4.4 * m, 0.8 + Math.sin(m * Math.PI) * 1.6, 0, 0xFFE5525C);
+			ball(g, cam, 2.2 - 4.4 * m, 0.8 + Math.sin(m * Math.PI) * 1.2, 0.3, 0xFF4A8FE0);
+		}
+	}
+
+	/** A ball in the air (0.22 blocks round), lit from above. */
+	private static void ball(GuiGraphics g, Cam cam, double x, double y, double z, int colour) {
+		float[] p = cam.at(x, y, z), q = cam.at(x + 0.22, y, z);
+		float r = Math.max(3, Math.abs(q[0] - p[0]));
+		blob(g, cam, x, z, 0.22, 140);
+		V.ellipse(g, p[0], p[1], r, r, Ui.mix(colour, 0xFF000000, 0.25F));
+		V.ellipse(g, p[0], p[1] - r * 0.06F, r * 0.92F, r * 0.92F, colour);
+		V.ellipse(g, p[0] - r * 0.3F, p[1] - r * 0.35F, r * 0.28F, r * 0.22F, 0x8CFFFFFF);
+	}
+
 	/** The picture of you as you look now (your outfit's skin, made if need be). */
 	public static Identifier you(String outfit, boolean girl) {
 		return Outfit.ensure(outfit, girl) ? Outfit.HERO : Retromon.id("textures/entity/player/" + (girl ? "girl" : "boy") + ".png");

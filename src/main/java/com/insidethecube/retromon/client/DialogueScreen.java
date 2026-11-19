@@ -77,7 +77,7 @@ public class DialogueScreen extends GameScreen {
 	}
 
 	private boolean asks() {
-		return mode.equals("heal") || mode.equals("gift");
+		return mode.equals("heal") || mode.equals("gift") || mode.equals("trade");
 	}
 
 	@Override

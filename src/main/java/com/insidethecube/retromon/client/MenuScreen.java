@@ -291,28 +291,10 @@ public class MenuScreen extends DeviceScreen {
 				else if (Ui.isA(e)) save();
 			}
 			case OPTION -> {
-				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = Math.floorMod(optionRow + (Ui.isUp(e) ? -1 : 1), 7);
+				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = Math.floorMod(optionRow + (Ui.isUp(e) ? -1 : 1), OPTION_LABELS.length);
 				else if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isA(e)) {
-					int step = Ui.isLeft(e) ? -1 : 1;
-					switch (optionRow) {
-						case 0 -> setSpeed(Math.floorMod(d.textSpeed + step, 3));
-						case 1 -> Music.setLevel(Math.floorMod(Music.level() + step, 5));
-						case 2 -> Settings.set("voice", Settings.voice() ? 0 : 1);
-						case 3 -> {
-							Settings.set("nights", Math.floorMod(Settings.nights() + step, 3));
-							Night.send();
-						}
-						case 4 -> {
-							Settings.set("seen", Settings.seen() ? 0 : 1);
-							Settings.sendPrefs();
-						}
-						case 5 -> {
-							Settings.set("follow", Settings.follower() ? 0 : 1);
-							Settings.sendPrefs();
-						}
-						default -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
-					}
-					Sounds.press();
+					if (optionRow == OPTION_LABELS.length - 1 && !Ui.isA(e)) return true;
+					changeOption(optionRow, Ui.isLeft(e) ? -1 : 1);
 				} else if (Ui.isB(e)) view = View.MENU;
 			}
 			case MESSAGE -> {
@@ -858,37 +840,47 @@ public class MenuScreen extends DeviceScreen {
 	}
 
 	/** What each option does (the viewer's top panel). */
-	private static final String[] OPTION_LINES = {"How quickly words appear in text boxes.", "How loud the music plays.",
+	/** OPTION's rows (the UI Viewer's, with ours for your partner and the look), what each does, and their values. */
+	private static final String[] OPTION_LABELS = {"TEXT SPEED", "MUSIC", "SOUND", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "BATTLE EFFECTS", "WALK WITH YOU",
+			"POKéMON LOOK", "CONTROLS"};
+	private static final String[] OPTION_LINES = {"How quickly words appear in text boxes.", "How loud the music plays.", "How loud cries and menu sounds are.",
 			"Whether the POKéDEX reads its entries out loud.", "How dark nights get outside.", "Whether wild POKéMON show in the grass, or jump out at you.",
-			"Whether your partner walks with you.", "COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures."};
+			"Whether moves play their animations in battle.", "Whether your partner walks with you.",
+			"COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures.", "See every key: what it does in game, and what's turned off."};
+	private static final String[][] OPTION_VALUES = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"},
+			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"OFF", "ON"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {}};
 
 	/**
 	 * OPTION, as the UI Viewer's: what the row does in a panel at the top, then the rows (the one you're on cream),
-	 * each with its value between arrows; left and right (or a click) change it.
+	 * each with its value between arrows; left and right (or a click) change it. CONTROLS opens the key map.
 	 */
 	private void drawOptions(GuiGraphics g, PlayerData d) {
 		Scenes.backdrop(g, "sky");
+		int n = OPTION_LABELS.length;
+		optionRow = Math.max(0, Math.min(n - 1, optionRow));
 		V.panel(g, 170, 40, 940, 96);
-		List<String> dl = V.wrap(OPTION_LINES[Math.max(0, Math.min(6, optionRow))], 880, 22, true);
+		List<String> dl = V.wrap(OPTION_LINES[optionRow], 880, 22, true);
 		for (int i = 0; i < Math.min(2, dl.size()); i++) V.text(g, dl.get(i), 200, 62 + i * 30, 22, V.TEXT, true);
-		V.panel(g, 170, 160, 940, 7 * 59 + 36 - 8);
-		String[] labels = {"TEXT SPEED", "MUSIC", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "WALK WITH YOU", "POKéMON LOOK"};
-		String[][] values = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"}, {"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"},
-				{"OFF", "ON"}, {"COBBLEMON", "RETROMON"}};
-		int[] now = {d.textSpeed, Music.level(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0, Settings.follower() ? 1 : 0, Settings.look()};
-		for (int r = 0; r < 7; r++) {
-			float ry = 160 + 18 + r * 59, rx = 188, rw = 904;
-			if (vover(rx, ry, rw, 51)) optionRow = r;
+		float rh = 51;
+		V.panel(g, 170, 160, 940, n * rh + 36);
+		int[] now = {d.textSpeed, Music.level(), Settings.sound(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0, Settings.effects() ? 1 : 0,
+				Settings.follower() ? 1 : 0, Settings.look(), 0};
+		for (int r = 0; r < n; r++) {
+			float ry = 160 + 18 + r * rh, rx = 188, rw = 904;
+			if (vover(rx, ry, rw, rh)) optionRow = r;
 			boolean on = r == optionRow;
-			V.item(g, labels[r], null, rx, ry, rw, 51, on, false, 21);
+			V.item(g, OPTION_LABELS[r], null, rx, ry, rw, rh, on, false, 21);
 			int c = on ? V.INK : V.TEXT;
-			String v = values[r][Math.max(0, Math.min(values[r].length - 1, now[r]))];
-			float vx = rx + rw - 22 - 130;
-			V.tri(g, vx - 14, ry + 25.5F, 12, 2, Ui.alpha(c, 0.6F));
-			V.centred(g, v, vx + 65, ry + 13, 21, c, true);
-			V.tri(g, vx + 130 + 14, ry + 25.5F, 12, 0, Ui.alpha(c, 0.6F));
+			if (OPTION_VALUES[r].length == 0) V.tri(g, rx + rw - 22 - 6, ry + rh / 2, 12, 0, Ui.alpha(c, 0.6F));
+			else {
+				String v = OPTION_VALUES[r][Math.max(0, Math.min(OPTION_VALUES[r].length - 1, now[r]))];
+				float vx = rx + rw - 22 - 130;
+				V.tri(g, vx - 14, ry + rh / 2, 12, 2, Ui.alpha(c, 0.6F));
+				V.centred(g, v, vx + 65, ry + (rh - 21 * 1.15F) / 2, 21, c, true);
+				V.tri(g, vx + 130 + 14, ry + rh / 2, 12, 0, Ui.alpha(c, 0.6F));
+			}
 			int row = r;
-			vhit(rx, ry, rw, 51, () -> {
+			vhit(rx, ry, rw, rh, () -> {
 				optionRow = row;
 				changeOption(row, 1);
 			});
@@ -896,26 +888,33 @@ public class MenuScreen extends DeviceScreen {
 		V.hints(g, "A", "Change", "B", "Back");
 	}
 
-	/** Changes an option by a step (left -1, right or A +1). */
+	/** Changes an option by a step (left -1, right or A +1); CONTROLS opens the key map. */
 	private void changeOption(int row, int step) {
 		PlayerData d = ClientState.data;
 		switch (row) {
 			case 0 -> setSpeed(Math.floorMod(d.textSpeed + step, 3));
 			case 1 -> Music.setLevel(Math.floorMod(Music.level() + step, 5));
-			case 2 -> Settings.set("voice", Settings.voice() ? 0 : 1);
-			case 3 -> {
+			case 2 -> Settings.set("sound", Math.floorMod(Settings.sound() + step, 5));
+			case 3 -> Settings.set("voice", Settings.voice() ? 0 : 1);
+			case 4 -> {
 				Settings.set("nights", Math.floorMod(Settings.nights() + step, 3));
 				Night.send();
 			}
-			case 4 -> {
+			case 5 -> {
 				Settings.set("seen", Settings.seen() ? 0 : 1);
 				Settings.sendPrefs();
 			}
-			case 5 -> {
+			case 6 -> Settings.set("effects", Settings.effects() ? 0 : 1);
+			case 7 -> {
 				Settings.set("follow", Settings.follower() ? 0 : 1);
 				Settings.sendPrefs();
 			}
-			default -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
+			case 8 -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
+			default -> {
+				Sounds.press();
+				if (minecraft != null) minecraft.setScreen(new KeyMapScreen(this));
+				return;
+			}
 		}
 		Sounds.press();
 	}

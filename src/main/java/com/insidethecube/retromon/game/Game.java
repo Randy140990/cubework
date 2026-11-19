@@ -1590,6 +1590,28 @@ public final class Game {
 		message(p, List.of(player(p) + " found " + name + "!"));
 	}
 
+	/** The in-game trades: what each trader wants for theirs (as Red and Blue have them). */
+	private static final Map<String, String> TRADE_WANTS = Map.of("mr_mime_trade", "abra", "jynx_trade", "poliwhirl", "farfetch_d_trade", "spearow",
+			"lickitung_trade", "slowbro");
+
+	/** A trade agreed on the trade screen: yours (party slot i, the species they want) goes, theirs comes. */
+	public static void tradeDone(ServerPlayer p, CompoundTag t) {
+		PlayerData d = data(p);
+		String key = t.getStringOr("static", "");
+		Trainers.Static st = Trainers.STATICS.get(key);
+		int i = t.getIntOr("i", -1);
+		String want = TRADE_WANTS.get(key);
+		if (st == null || want == null || d.statics.contains(key) || i < 0 || i >= d.party.size() || !d.party.get(i).species.id().equals(want)) return;
+		Mon got = new Mon(Species.get(st.species()), st.level(), RNG);
+		d.party.set(i, got);
+		d.seen.add(got.species.id());
+		d.caught.add(got.species.id());
+		d.statics.add(key);
+		Entity e = p.level().getEntity(t.getIntOr("npc", -1));
+		if (e instanceof WorldMon w) w.discard();
+		sync(p);
+	}
+
 	private static void talkMon(ServerPlayer p, WorldMon w) {
 		PlayerData d = data(p);
 		String key = w.key();
@@ -1622,7 +1644,12 @@ public final class Game {
 			return;
 		}
 		t.putString("static", key);
-		if (st.kind().equals("gift") || st.kind().equals("trade")) {
+		Species want = Species.ALL.get(TRADE_WANTS.getOrDefault(key, ""));
+		if (st.kind().equals("trade") && want != null) {
+			// An in-game trade (the viewer's "Trading"): what they're after, for theirs.
+			t.putString("want", want.id());
+			dialogue(p, null, "trade", List.of("TRADER: I'm looking for a " + want.name() + ". Will you trade one for my " + name + "?"), t, w.getId());
+		} else if (st.kind().equals("gift") || st.kind().equals("trade")) {
 			dialogue(p, null, "gift", List.of(st.note() + ".", "Do you want " + name + "?"), t, w.getId());
 		} else if (!d.started || !d.anyHealthy()) {
 			dialogue(p, null, "talk", List.of("A wild " + name + "!", "You'd better have a POKéMON that can battle first."), t, w.getId());
@@ -1704,6 +1731,34 @@ public final class Game {
 				Trainers.Static st = Trainers.STATICS.get(t.getStringOr("static", ""));
 				if (st == null || d.statics.contains(st.id()) || !d.anyHealthy()) return;
 				Battles.wild(p, new Mon(Species.get(st.species()), st.level(), RNG), st.id());
+			}
+			case "trade" -> {
+				Trainers.Static st = Trainers.STATICS.get(t.getStringOr("static", ""));
+				Species want = Species.ALL.get(t.getStringOr("want", ""));
+				if (st == null || want == null || d.statics.contains(st.id())) return;
+				int npcId = t.getIntOr("npc", -1);
+				if (!yes) {
+					dialogue(p, null, "talk", List.of("TRADER: Aww. If you change your mind, I'll be here."), new CompoundTag(), npcId);
+					return;
+				}
+				int idx = -1;
+				for (int i = 0; i < d.party.size(); i++) if (d.party.get(i).species.id().equals(want.id()) && idx < 0) idx = i;
+				if (idx < 0) {
+					dialogue(p, null, "talk", List.of("TRADER: What? That's not a " + want.name() + ". If you get one, come back here!"), new CompoundTag(), npcId);
+					return;
+				}
+				Mon mine = d.party.get(idx);
+				CompoundTag o = new CompoundTag();
+				o.putString("static", st.id());
+				o.putInt("npc", npcId);
+				o.putInt("i", idx);
+				o.putString("send", want.id());
+				o.putString("sendName", mine.name());
+				o.putInt("sendLv", mine.level);
+				o.putString("get", st.species());
+				o.putInt("getLv", st.level());
+				o.putString("player", player(p));
+				Net.send(p, "trade", o);
 			}
 			case "gift" -> {
 				Trainers.Static st = Trainers.STATICS.get(t.getStringOr("static", ""));

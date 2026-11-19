@@ -132,6 +132,7 @@ public final class ClientState {
 			case "nickname" -> QUEUE.add(() -> new NicknameScreen(t));
 			case "evolve" -> QUEUE.add(() -> new EvolutionScreen(t));
 			case "learn" -> QUEUE.add(() -> new LearnScreen(t));
+			case "trade" -> QUEUE.add(() -> new TradeScreen(t));
 			case "sound" -> {
 				switch (t.getStringOr("sound", "")) {
 					case "heal" -> Sounds.heal();

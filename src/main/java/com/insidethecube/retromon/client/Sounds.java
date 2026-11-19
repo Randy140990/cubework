@@ -51,7 +51,9 @@ public final class Sounds {
 	}
 
 	public static void play(Holder<SoundEvent> sound, float pitch, float volume) {
-		Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound.value(), pitch, volume));
+		float k = Settings.sound() / 4F;
+		if (k <= 0) return;
+		Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound.value(), pitch, volume * k));
 	}
 
 	private static SoundInstance voice;
@@ -72,7 +74,8 @@ public final class Sounds {
 
 	public static void cry(String species, float pitch) {
 		if (species == null || species.isEmpty()) return;
-		Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(Retromon.id("cry." + species), SoundSource.NEUTRAL, 0.9F, pitch,
+		if (Settings.sound() <= 0) return;
+		Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(Retromon.id("cry." + species), SoundSource.NEUTRAL, 0.9F * Settings.sound() / 4F, pitch,
 				RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true));
 	}
 
@@ -120,7 +123,8 @@ public final class Sounds {
 
 	public static void sfx(String id, float pitch, float volume) {
 		if (id == null || id.isEmpty()) return;
-		Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(Retromon.id("sfx." + id), SoundSource.UI, volume, pitch,
+		if (Settings.sound() <= 0) return;
+		Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(Retromon.id("sfx." + id), SoundSource.UI, volume * Settings.sound() / 4F, pitch,
 				RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true));
 	}
 

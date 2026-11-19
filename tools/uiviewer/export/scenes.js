@@ -19,6 +19,8 @@ const BG = {
   dex: 'linear-gradient(160deg,#5AC8E8,#2E8FC0 55%,#1E5F96)',
   evolve: 'radial-gradient(circle at 50% 45%, #FFFFFF 0%, #C9F2FF 25%, #6FB8E8 55%, #2E5F96 100%)',
   gift: 'radial-gradient(ellipse at 50% 40%, #FFFFFF 0%, #FFF4D8 35%, #F6C46B 70%, #D9733A 100%)',
+  trade: 'radial-gradient(ellipse at 50% 40%, #FFFFFF 0%, #E3F2FF 35%, #9CC2F2 70%, #4A6FC0 100%)',
+  keymap: 'linear-gradient(160deg,#1D5A52,#123C38 60%,#0A2422)',
 };
 const TITLE_DAY = `<div style="position:absolute;inset:0;background:linear-gradient(180deg,#5FB0E8 0%,#9ED6F5 50%,#D6F0FB 64%,#9ED68A 64.2%,#6DB85B 100%)"></div><div style="position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 0%, rgba(255,255,255,.12) 0 5deg, transparent 5deg 15deg)"></div>`;
 const TITLE_NIGHT = `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%, #2A3F7A 0%, #142454 45%, #070D26 100%)"></div><div style="position:absolute;inset:0;background:radial-gradient(circle at 12% 18%,#fff 0 1.5px,transparent 2.5px),radial-gradient(circle at 78% 12%,#fff 0 2px,transparent 3px),radial-gradient(circle at 64% 34%,#cfe 0 1.5px,transparent 2.5px),radial-gradient(circle at 30% 42%,#fff 0 1px,transparent 2px),radial-gradient(circle at 88% 46%,#fff 0 1.5px,transparent 2.5px);background-size:320px 260px"></div><div style="position:absolute;right:120px;top:70px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#FFF8DC,#E8DDB0);box-shadow:0 0 40px rgba(255,248,220,.5)"></div>`;

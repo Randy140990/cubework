@@ -40,7 +40,7 @@ public class IntroScreen extends GameScreen {
 	private static final int ART_W = 480, ART_H = 270;
 
 	private enum Step {
-		OPENING, TITLE, MENU, SLOTS, TALK, MAKER, NAME, COPYING, FAILED
+		OPENING, TITLE, MENU, SLOTS, KEYS, TALK, MAKER, NAME, COPYING, FAILED
 	}
 
 	private final Screen parent;
@@ -307,7 +307,7 @@ public class IntroScreen extends GameScreen {
 				if (free >= 0) {
 					targetSlot = free;
 					replaceTarget = false;
-					startOak();
+					showKeys();
 				} else {
 					// All three full: which one to start over in.
 					replacing = true;
@@ -435,6 +435,11 @@ public class IntroScreen extends GameScreen {
 				if (Ui.isB(e)) step = Step.TITLE;
 				else if (Ui.isA(e)) menuPick(menu.at);
 			}
+			case KEYS -> {
+				if (keysChoice.key(e)) return true;
+				if (Ui.isB(e)) keysPick(2);
+				else if (Ui.isA(e)) keysPick(keysChoice.at);
+			}
 			case SLOTS -> {
 				if (confirm != null) {
 					if (confirm.key(e)) return true;
@@ -499,7 +504,7 @@ public class IntroScreen extends GameScreen {
 		if (c.empty()) {
 			targetSlot = i;
 			replaceTarget = false;
-			startOak();
+			showKeys();
 			return;
 		}
 		slotAt = i;
@@ -540,7 +545,47 @@ public class IntroScreen extends GameScreen {
 		}
 		targetSlot = slotAt;
 		replaceTarget = true;
-		startOak();
+		showKeys();
+	}
+
+	// ---------- the keys (the viewer's "Keys check", before the first game) ----------
+
+	private Choice keysChoice;
+
+	private void showKeys() {
+		keysChoice = new Choice(List.of("Use these keys", "Show the key map", "Back"));
+		step = Step.KEYS;
+	}
+
+	private void keysPick(int i) {
+		Sounds.press();
+		if (i == 0) startOak();
+		else if (i == 1) {
+			if (minecraft != null) minecraft.setScreen(new KeyMapScreen(this));
+		} else step = Step.MENU;
+	}
+
+	/** "These are your keys": walking, talking, the menu, speeding up and going back, then go on or see them all. */
+	private void drawKeys(GuiGraphics g) {
+		Scenes.backdrop(g, "sky");
+		V.panel(g, 180, 110, 640, 420);
+		V.text(g, "These are your keys", 220, 144, 36, V.TEXT, true);
+		String[][] rows = {{"W A S D", "Walk"}, {"SPACE", "Talk, look, choose"}, {"ENTER", "Open the menu"}, {"TAB", "Speed up"}, {"Q X", "Back"}};
+		int[] widths = {0, 120, 80, 64, 0};
+		float y = 144 + 36 + 20 + 20;
+		for (int r = 0; r < rows.length; r++) {
+			float x = 220;
+			if (widths[r] > 0) {
+				float w = widths[r];
+				V.rr(g, x, y + 2, w, 28, 9, 0x40000000);
+				V.rr(g, x, y, w, 28, 9, V.CREAM);
+				V.centred(g, rows[r][0], x + w / 2, y + (28 - 14 * 1.1F) / 2, 14, V.INK, true);
+				x += w;
+			} else for (String k : rows[r][0].split(" ")) x += V.key(g, k, x, y, 28) + 6;
+			V.text(g, rows[r][1], 220 + 200, y + 1, 22, V.TEXT, true);
+			y += 28 + 14 + 12;
+		}
+		vchoice(g, keysChoice, 860, 300, 300, this::keysPick);
 	}
 
 	/** The game in a slot, moved aside into .minecraft/retromon-old-saves (the newest three are kept there). */
@@ -588,7 +633,7 @@ public class IntroScreen extends GameScreen {
 				// Retromon is the start: there's nowhere to go back to.
 			}
 			case MENU -> step = Step.TITLE;
-			case SLOTS, FAILED -> step = Step.MENU;
+			case SLOTS, FAILED, KEYS -> step = Step.MENU;
 			case TALK -> clickAnywhere();
 			default -> {
 			}
@@ -815,6 +860,7 @@ public class IntroScreen extends GameScreen {
 		switch (step) {
 			case TITLE, MENU -> drawTitle(g, secs);
 			case SLOTS -> drawSlots(g, secs);
+			case KEYS -> drawKeys(g);
 			case TALK -> {
 				String mode = scene.equals("rival") ? "rival" : scene.equals("hero") ? "you" : "intro";
 				// "Some people keep them as friends": the little yellow one jumps up onto his shoulder.

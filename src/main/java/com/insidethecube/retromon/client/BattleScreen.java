@@ -284,9 +284,11 @@ public class BattleScreen extends GameScreen {
 					if (mv != null && mv.power() <= 0) d.act("cry");
 				}
 				if (mv == null) Sounds.attack();
-				BattleScene.move(e.side(), e.text());
+				// (BATTLE EFFECTS off in OPTION: no move animations.)
+				boolean fx = Settings.effects();
+				if (fx) BattleScene.move(e.side(), e.text());
 				// The hit lands as it arrives (up close), or as the move reaches the target (from afar).
-				wait = mv == null ? 8 : mv.power() <= 0 ? 16 : close ? 8 : 19;
+				wait = mv == null || !fx ? 8 : mv.power() <= 0 ? 16 : close ? 8 : 19;
 			}
 			case HIT -> {
 				int effect = effectAhead();
@@ -295,7 +297,7 @@ public class BattleScreen extends GameScreen {
 					d.act("recoil");
 				}
 				Sounds.hit(effect);
-				BattleScene.hit(e.side(), effect);
+				if (Settings.effects()) BattleScene.hit(e.side(), effect);
 				wait = 14;
 			}
 			case FAINT -> {

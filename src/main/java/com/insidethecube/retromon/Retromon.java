@@ -108,6 +108,7 @@ public class Retromon implements ModInitializer {
 			case "nickname" -> Game.nickname(p, t);
 			case "evolve" -> Game.evolve(p, t);
 			case "learn" -> Game.learn(p, t);
+			case "trade_done" -> Game.tradeDone(p, t);
 			case "order" -> Game.order(p, t);
 			case "options" -> Game.options(p, t);
 			case "speed" -> {
