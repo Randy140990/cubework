@@ -23,6 +23,8 @@ public class RetromonClient implements ClientModInitializer {
 		EntityRendererRegistry.register(Retromon.WORLD_MON, WorldMonRenderer::new);
 		Adventure.register();
 		Hud.register();
+		// The insides of buildings: cut-out (glass, leaves and the clock face show what's behind them).
+		net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(Retromon.PROP, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
 		Colours.register();
 		// 3D figures on screens (Oak, you, the starters, the Pokédex), drawn without a world.
 		net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(ctx -> new Figures.Renderer(ctx.vertexConsumers()));

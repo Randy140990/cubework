@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pale","pale":"retromon:block/interior/pale"},"elements":[{"from":[0.0,16,12.8],"to":[11.2,16,16.0],"faces":{"down":{"uv":[0.0,0.0,5.6,1.6],"texture":"#pale"}}}]}

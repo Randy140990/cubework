@@ -87,21 +87,21 @@ function labShelf(room, X, Z, f, w = 2, h = 3.2, o = {}) {
 // The ball incubator: a round machine (eight-sided, as a Minecraft build would round it): a white base, balls on its rim,
 // a glass tank of warm water with more balls inside, and a red top.
 function incubator(room, x, z) {
-  const g = new THREE.Group(); g.position.set(x, 0, z);
-  const cyl = (r, y0, y1, mat, seg = 8) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, y1 - y0, seg, 1), matFor(mat)); m.position.y = (y0 + y1) / 2; m.rotation.y = Math.PI / 8; m.castShadow = mat !== "tankGlass"; m.receiveShadow = true; g.add(m); return m; };
-  cyl(1.08, 0, 0.82, "paint"); cyl(1.12, 0.82, 0.94, "redPlastic"); cyl(1.06, 0.94, 1.0, "paint");
-  cyl(0.62, 1.0, 1.12, "greyPlastic");
-  const ball = (bx, by, bz, s = 0.3) => { const m = new THREE.Mesh(new THREE.BoxGeometry(s, s, s), matFor("ball")); m.position.set(bx, by + s / 2, bz); m.castShadow = true; g.add(m); };
+  // Round as a Minecraft build rounds things: each disc is two crossed slabs (a blocky circle), so it's all boxes.
+  const G = room.geo;
+  const disc = (r, y0, y1, mat) => { const k = 0.62 * r; G.box(x - r, y0, z - k, x + r, y1, z + k, mat); G.box(x - k, y0, z - r, x + k, y1, z + r, mat); };
+  disc(1.08, 0, 0.82, "paint"); disc(1.12, 0.82, 0.94, "redPlastic"); disc(1.06, 0.94, 1.0, "paint");
+  disc(0.62, 1.0, 1.12, "greyPlastic");
+  const ball = (bx, by, bz, s = 0.3) => G.box(x + bx - s / 2, by, z + bz - s / 2, x + bx + s / 2, by + s, z + bz + s / 2, { all: "ball", top: "ball" });
   for (const [bx, bz] of [[-0.25, -0.15], [0.22, -0.2], [0.0, 0.2], [-0.3, 0.25], [0.3, 0.18]]) ball(bx, 1.12, bz, 0.26);
-  for (let i = 0; i < 4; i++) { const a = Math.PI * 0.6 + i * 0.42; ball(Math.cos(a) * 0.86, 1.0, Math.sin(a) * 0.86 * -1 + 0.0, 0.24); }
-  cyl(0.8, 1.0, 2.35, "tankGlass");
-  cyl(0.86, 2.35, 2.62, "redPlastic"); cyl(0.55, 2.62, 2.86, "paint"); cyl(0.3, 2.86, 3.0, "redPlastic");
-  room.group.add(g);
+  for (const [bx, bz] of [[-0.86, 0.3], [-0.55, 0.78], [0.55, 0.78], [0.86, 0.3]]) ball(bx, 1.0, bz, 0.24);
+  disc(0.8, 1.0, 2.35, "tankGlass");
+  disc(0.86, 2.35, 2.62, "redPlastic"); disc(0.55, 2.62, 2.86, "paint"); disc(0.3, 2.86, 3.0, "redPlastic");
   // Pipes back to the wall.
-  room.geo.box(0.0, 2.0, z - 0.1, x - 0.6, 2.2, z + 0.1, "steel"); room.geo.box(0.0, 0.3, z + 0.35, x - 0.9, 0.5, z + 0.55, "steel");
+  G.box(0.0, 2.0, z - 0.1, x - 0.6, 2.2, z + 0.1, "steel"); G.box(0.0, 0.3, z + 0.35, x - 0.9, 0.5, z + 0.55, "steel");
   room.solid(x - 1.12, z - 1.12, x + 1.12, z + 1.12);
   room.act([x - 1.2, z - 1.2, x + 1.2, z + 1.4], { label: "Look", lines: ["An incubator. Balls rest in its warm water, waiting for new trainers.", "There are more on the rim, ready to hand out."] });
-  room.item("Ball incubator", "A round machine: white base, balls on its rim, a glass tank with more inside, a red top.");
+  room.item("Ball incubator", "A round machine (a blocky circle, as Minecraft builds round things): white base, balls on its rim, a glass tank with more inside, a red top.");
 }
 // A whiteboard on its own stand, on little wheels.
 function boardStand(room, x0, z, w, f = "s", lines, mat = "boardLab") {

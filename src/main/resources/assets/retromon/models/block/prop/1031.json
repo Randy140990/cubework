@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/mc_dark_oak","mc_dark_oak":"retromon:block/interior/mc_dark_oak"},"elements":[{"from":[14.88,0.0,16],"to":[16.0,3.84,16],"faces":{"north":{"uv":[0.0,12.16,1.12,16.0],"texture":"#mc_dark_oak"}}}]}

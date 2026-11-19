@@ -62,6 +62,13 @@ public class StarterScreen extends GameScreen {
 		this(false);
 	}
 
+	/** Talking to Oak in his lab before you've a Pokémon: the three balls, straight away. */
+	public static StarterScreen inLab() {
+		StarterScreen s = new StarterScreen(false);
+		s.box.set(List.of("Ah, " + s.name + "! There are 3 POKéMON here! Haha!", "They are inside the POKé BALLS. You can have one! Choose!"));
+		return s;
+	}
+
 	@Override
 	public void tick() {
 		super.tick();

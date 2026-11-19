@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/silver","silver":"retromon:block/interior/silver"},"elements":[{"from":[0.0,3.2,16],"to":[6.4,4.8,16],"faces":{"north":{"uv":[9.6,11.2,16.0,12.8],"texture":"#silver"}}}]}

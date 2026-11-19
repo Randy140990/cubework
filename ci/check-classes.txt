@@ -1,0 +1,3 @@
+net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap
+net.minecraft.client.renderer.chunk.ChunkSectionLayer
+net.minecraft.world.level.block.state.BlockBehaviour$Properties

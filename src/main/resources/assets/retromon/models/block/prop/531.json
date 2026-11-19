@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/bag","bag":"retromon:block/interior/bag","sq_light":"retromon:block/interior/sq_light"},"elements":[{"from":[0.0,0,0.0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[0.0,0.0,8.0,8.0],"texture":"#sq_light"}}},{"from":[0,0.0,5.6],"to":[0,8.8,13.6],"faces":{"east":{"uv":[2.4,7.2,10.4,16.0],"texture":"#bag"}}}]}

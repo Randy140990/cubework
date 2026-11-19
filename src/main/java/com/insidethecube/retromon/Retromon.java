@@ -49,6 +49,9 @@ public class Retromon implements ModInitializer {
 	public static EntityType<Npc> NPC;
 	public static EntityType<MonDisplay> MON_DISPLAY;
 	public static EntityType<WorldMon> WORLD_MON;
+	public static final ResourceKey<net.minecraft.world.level.block.Block> PROP_KEY = ResourceKey.create(Registries.BLOCK, id("prop"));
+	/** The insides of buildings, block by block (see Interiors). */
+	public static net.minecraft.world.level.block.Block PROP;
 
 	public static Identifier id(String path) {
 		return Identifier.fromNamespaceAndPath(ID, path);
@@ -63,6 +66,10 @@ public class Retromon implements ModInitializer {
 						.build(MON_KEY));
 		WORLD_MON = Registry.register(BuiltInRegistries.ENTITY_TYPE, WORLD_MON_KEY,
 				EntityType.Builder.<WorldMon>of(WorldMon::new, MobCategory.MISC).sized(1.0F, 1.2F).clientTrackingRange(10).noLootTable().build(WORLD_MON_KEY));
+		PROP = Registry.register(BuiltInRegistries.BLOCK, PROP_KEY, new com.insidethecube.retromon.game.Prop(
+				net.minecraft.world.level.block.state.BlockBehaviour.Properties.of().setId(PROP_KEY).noOcclusion().strength(-1F, 3600000F).noLootTable()
+						.isViewBlocking((st, g, pos) -> false).isSuffocating((st, g, pos) -> false)
+						.pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK).sound(net.minecraft.world.level.block.SoundType.WOOD)));
 		FabricDefaultAttributeRegistry.register(NPC, Npc.createAttributes());
 		FabricDefaultAttributeRegistry.register(WORLD_MON, WorldMon.createAttributes());
 		// Read the games' data now, so a mistake in it shows at once.

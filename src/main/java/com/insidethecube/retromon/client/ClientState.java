@@ -24,7 +24,7 @@ public final class ClientState {
 
 	public static PlayerData data = new PlayerData();
 	/** The professor's welcome is waiting for the world to be on screen. */
-	private static boolean introPending, introStopped;
+	private static boolean introPending, introStopped, introLab;
 	private static int introDelay;
 	/** The trainer who's just spotted you, and how long the "!" stays up. */
 	public static int exclaimNpc = -1, exclaimTicks;
@@ -69,9 +69,12 @@ public final class ClientState {
 					pendingProfile = null;
 				}
 			}
+			// Through a door, down the stairs: the screen goes black and comes back (the server moves you at the darkest).
+			case "fade" -> Hud.fadeThrough(null);
 			case "intro" -> {
 				introPending = true;
 				introStopped = t.getBooleanOr("stop", false);
+				introLab = t.getBooleanOr("lab", false);
 				introDelay = introStopped ? 4 : 30;
 			}
 			case "place" -> {
@@ -174,7 +177,7 @@ public final class ClientState {
 		}
 		if (introPending && mc.screen == null && --introDelay <= 0) {
 			introPending = false;
-			mc.setScreen(new StarterScreen(introStopped));
+			mc.setScreen(introLab ? StarterScreen.inLab() : new StarterScreen(introStopped));
 		}
 	}
 

@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/steel","steel":"retromon:block/interior/steel"},"elements":[{"from":[9.6,16,6.4],"to":[11.52,16,8.32],"faces":{"down":{"uv":[9.6,7.68,11.52,9.6],"texture":"#steel"}}}]}

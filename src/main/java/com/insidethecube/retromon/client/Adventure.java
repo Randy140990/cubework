@@ -131,6 +131,9 @@ public final class Adventure {
 		if (Double.isNaN(smoothY) || Math.abs(smoothY - p.y) > 6) smoothY = p.y;
 		smoothY += (p.y - smoothY) * 0.08;
 		follow = new Vec3(p.x, smoothY + 0.9, p.z);
+		// Inside a building the camera holds still on the whole room (as the Interior Viewer shows it), not on you.
+		com.insidethecube.retromon.game.Interiors.Room room = com.insidethecube.retromon.game.Interiors.roomOf(e);
+		if (room != null) follow = new Vec3(room.cx(), room.oy() + 0.9, room.cz());
 		// Talking to someone: ease in towards the middle of the two of you, closer and a little lower.
 		Entity other = focusId >= 0 && e.level() != null ? e.level().getEntity(focusId) : null;
 		focusIn += ((other != null ? 1 : 0) - focusIn) * 0.12;
@@ -148,7 +151,8 @@ public final class Adventure {
 			focusRoom += ((clear ? 1 : 0) - focusRoom) * 0.1;
 		} else focusRoom = 1;
 		double k = focusIn * focusRoom;
-		double dist = distance + (13 - distance) * k, pitchDeg = PITCH - 12 * k;
+		double far = room != null ? room.camDist() : distance;
+		double dist = far + (13 - far) * k, pitchDeg = PITCH - 12 * k;
 		double[] at = camAt(target, dist, pitchDeg);
 		// Even so, never inside something: pulled in in front of whatever's in the way.
 		if (focusIn > 0.01 && e.level() != null) {
@@ -191,6 +195,12 @@ public final class Adventure {
 			}
 		}
 		if (best == null) {
+			// Inside, the thing in front of you (the TV, a shelf, the fridge) says what it is.
+			java.util.List<String> lines = com.insidethecube.retromon.game.Interiors.lookAt(mc.player);
+			if (lines != null) {
+				mc.setScreen(new DialogueScreen(lines, "sign", -1, new CompoundTag()));
+				return;
+			}
 			readSign(mc);
 			return;
 		}

@@ -252,9 +252,15 @@ public final class Game {
 		if (r != null) r.clear();
 	}
 
-	/** Oak takes you to his lab: you're put outside its door (until it has an inside), facing it. */
+	/** Oak takes you to his lab: inside it, in front of him and the table of balls. */
 	public static void toLab(ServerPlayer p) {
-		if (town() == null || data(p).started) return;
+		if (data(p).started) return;
+		Interiors.Room lab = Interiors.ROOMS.get("lab");
+		if (lab != null && Interiors.go(p, lab, 9.6, 6.3, 180F, false)) {
+			BUSY.put(p.getUUID(), 200);
+			return;
+		}
+		if (town() == null) return;
 		BlockPos[] door = labDoor((ServerLevel) p.level());
 		if (door == null) return;
 		BlockPos at = door[1];
@@ -521,6 +527,8 @@ public final class Game {
 	public static final int START_X = -806, START_Y = 18, START_Z = 700;
 
 	private static void toStart(ServerPlayer p) {
+		// Your room, upstairs at home (an inside of its own; your world's outside is outside its door).
+		if (Interiors.start(p)) return;
 		ServerLevel level = (ServerLevel) p.level();
 		BlockPos at = spot(level, START_X, START_Z, 6);
 		p.teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
@@ -558,6 +566,7 @@ public final class Game {
 	 * up to `radius` blocks. The ground height comes from the map itself.
 	 */
 	public static BlockPos spot(ServerLevel level, int x, int z, int radius) {
+		if (level.dimension() == Interiors.LEVEL) return Interiors.spot(level, x, z, radius);
 		Zone zone = null;
 		for (int i = zones.size() - 1; i >= 0 && zone == null; i--) if (zones.get(i).contains(x, z)) zone = zones.get(i);
 		if (zone != null) {
@@ -746,15 +755,18 @@ public final class Game {
 			BUSY.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			AFTER_BATTLE.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			recent(p);
-			if (s.getTickCount() % 2 == 0) enter(p, placeAt(p.getX(), p.getZ()));
-			if (!data(p).started && !BUSY.containsKey(id)) oakStops(p);
+			Interiors.tick(p);
+			// Inside a building, the outside's checks (its places, Oak at the town's edge, grass, trainers' sight) don't apply.
+			boolean inside = Interiors.in(p);
+			if (!inside && s.getTickCount() % 2 == 0) enter(p, placeAt(p.getX(), p.getZ()));
+			if (!inside && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
 			if (s.getTickCount() % 5 == 0) story(p);
 			if (s.getTickCount() % 40 == 0) moonlight(p);
 			follower(p);
 			if (s.getTickCount() % 10 == 0) roamers(p);
 			// Kept in Adventure mode (so nothing on the map can be broken, Axiom included) unless map editing is on.
 			if (!build && s.getTickCount() % 20 == 0 && p.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) p.setGameMode(GameType.ADVENTURE);
-			if (Battles.in(p) || BUSY.containsKey(id)) {
+			if (Battles.in(p) || BUSY.containsKey(id) || inside) {
 				LAST.put(id, p.blockPosition());
 				continue;
 			}
@@ -1210,7 +1222,8 @@ public final class Game {
 
 	/** Oak, back at his lab's door once you've your first Pokémon (once per save). */
 	private static void oakAtLab(ServerLevel level) {
-		if (!ourSave) return;
+		// He's inside his lab now (Interiors), not out at the door.
+		if (!ourSave || !Interiors.ROOMS.isEmpty()) return;
 		JsonArray placed = marker.has("placedKeys") ? marker.getAsJsonArray("placedKeys") : new JsonArray();
 		for (JsonElement e : placed) if (e.getAsString().equals("oak:lab")) return;
 		BlockPos[] door = labDoor(level);
@@ -1241,6 +1254,13 @@ public final class Game {
 
 	private static void oakTalk(ServerPlayer p, Npc n) {
 		PlayerData d = data(p);
+		if (!d.started) {
+			CompoundTag t = new CompoundTag();
+			t.putBoolean("stop", false);
+			t.putBoolean("lab", true);
+			Net.send(p, "intro", t);
+			return;
+		}
 		if (d.story.contains("parcel") && !d.hasDex()) {
 			deliverParcel(p, n);
 			return;

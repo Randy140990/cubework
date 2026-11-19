@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/honey","honey":"retromon:block/interior/honey"},"elements":[{"from":[1.6,16,0.0],"to":[16.0,16,3.2],"faces":{"down":{"uv":[8.8,6.4,16.0,8.0],"texture":"#honey"}}},{"from":[1.6,16,3.2],"to":[16.0,16,16.0],"faces":{"down":{"uv":[8.8,0.0,16.0,6.4],"texture":"#honey"}}}]}

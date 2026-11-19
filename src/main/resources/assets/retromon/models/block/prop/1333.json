@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/red_plastic","red_plastic":"retromon:block/interior/red_plastic"},"elements":[{"from":[0.0,0,5.024],"to":[1.6,0,10.976],"faces":{"up":{"uv":[0.0,5.024,1.6,10.976],"texture":"#red_plastic"}}}]}

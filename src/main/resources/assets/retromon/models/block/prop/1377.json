@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/shelf_white","shelf_white":"retromon:block/interior/shelf_white"},"elements":[{"from":[0.0,16,9.6],"to":[7.68,16,16.0],"faces":{"down":{"uv":[0.0,0.0,7.68,6.4],"texture":"#shelf_white"}}},{"from":[7.68,16,9.6],"to":[16.0,16,16.0],"faces":{"down":{"uv":[7.68,0.0,16.0,6.4],"texture":"#shelf_white"}}}]}

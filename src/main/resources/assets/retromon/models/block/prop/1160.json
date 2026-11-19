@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pot","pot":"retromon:block/interior/pot"},"elements":[{"from":[0.0,16,9.024],"to":[5.376,16,16.0],"faces":{"down":{"uv":[0.0,0.0,5.376,6.976],"texture":"#pot"}}}]}
