@@ -1,0 +1,72 @@
+{
+ "idle": "animation.achebill.battle_idle",
+ "ground": "animation.achebill.ground_idle",
+ "actions": {
+  "cry": "animation.achebill.cry",
+  "recoil": "animation.achebill.recoil",
+  "attack": "animation.achebill.attack",
+  "critical": "animation.achebill.critical",
+  "special": "animation.achebill.special",
+  "recall": "animation.achebill.recall",
+  "sendout": "animation.achebill.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.achebill.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.achebill.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.achebill.faint",
+   "parts": []
+  }
+ },
+ "move": "CONFUSION",
+ "attack_move": "SCRATCH",
+ "scale": 0.817,
+ "height": 1.163,
+ "texture": "retromon:textures/mons/psyduck.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/psyduck_glow_0.png",
+    "retromon:textures/mons/psyduck_glow_1.png",
+    "retromon:textures/mons/psyduck_glow_2.png",
+    "retromon:textures/mons/psyduck_glow_3.png",
+    "retromon:textures/mons/psyduck_glow_4.png",
+    "retromon:textures/mons/psyduck_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "ACHEBILL",
+ "anchors": {
+  "mouth": [
+   0,
+   10.5,
+   -9.0
+  ],
+  "back": [
+   0,
+   19.6,
+   -0.2
+  ],
+  "body": [
+   0,
+   6.0,
+   -0.2
+  ],
+  "size": [
+   11.8,
+   18.6,
+   18.4
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.kindlepup.battle_idle",
+ "ground": "animation.kindlepup.ground_idle",
+ "actions": {
+  "cry": "animation.kindlepup.cry",
+  "recoil": "animation.kindlepup.recoil",
+  "attack": "animation.kindlepup.attack",
+  "critical": "animation.kindlepup.critical",
+  "special": "animation.kindlepup.special",
+  "recall": "animation.kindlepup.recall",
+  "sendout": "animation.kindlepup.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.kindlepup.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.kindlepup.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.kindlepup.faint",
+   "parts": []
+  }
+ },
+ "move": "EMBER",
+ "attack_move": "BITE",
+ "scale": 0.917,
+ "height": 1.2,
+ "texture": "retromon:textures/mons/growlithe.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/growlithe_glow_0.png",
+    "retromon:textures/mons/growlithe_glow_1.png",
+    "retromon:textures/mons/growlithe_glow_2.png",
+    "retromon:textures/mons/growlithe_glow_3.png",
+    "retromon:textures/mons/growlithe_glow_4.png",
+    "retromon:textures/mons/growlithe_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "KINDLEPUP",
+ "anchors": {
+  "mouth": [
+   0,
+   9.6,
+   -13.5
+  ],
+  "back": [
+   0,
+   14.7,
+   0.0
+  ],
+  "body": [
+   0,
+   7.5,
+   0.0
+  ],
+  "size": [
+   8.72,
+   19.2,
+   29.4
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

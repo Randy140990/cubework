@@ -1,0 +1,72 @@
+{
+ "idle": "animation.frillfrog.battle_idle",
+ "ground": "animation.frillfrog.ground_idle",
+ "actions": {
+  "cry": "animation.frillfrog.cry",
+  "recoil": "animation.frillfrog.recoil",
+  "attack": "animation.frillfrog.attack",
+  "critical": "animation.frillfrog.critical",
+  "special": "animation.frillfrog.special",
+  "recall": "animation.frillfrog.recall",
+  "sendout": "animation.frillfrog.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.frillfrog.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.frillfrog.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.frillfrog.faint",
+   "parts": []
+  }
+ },
+ "move": "WATER GUN",
+ "attack_move": "DOUBLESLAP",
+ "scale": 0.973,
+ "height": 1.131,
+ "texture": "retromon:textures/mons/poliwhirl.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/poliwhirl_glow_0.png",
+    "retromon:textures/mons/poliwhirl_glow_1.png",
+    "retromon:textures/mons/poliwhirl_glow_2.png",
+    "retromon:textures/mons/poliwhirl_glow_3.png",
+    "retromon:textures/mons/poliwhirl_glow_4.png",
+    "retromon:textures/mons/poliwhirl_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "FRILLFROG",
+ "anchors": {
+  "mouth": [
+   0,
+   13.3,
+   -4.5
+  ],
+  "back": [
+   0,
+   19.1,
+   -0.2
+  ],
+  "body": [
+   0,
+   8.5,
+   -0.2
+  ],
+  "size": [
+   13.4,
+   18.1,
+   9.6
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

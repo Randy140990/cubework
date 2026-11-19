@@ -1,0 +1,72 @@
+{
+ "idle": "animation.brawlape.battle_idle",
+ "ground": "animation.brawlape.ground_idle",
+ "actions": {
+  "cry": "animation.brawlape.cry",
+  "recoil": "animation.brawlape.recoil",
+  "attack": "animation.brawlape.attack",
+  "critical": "animation.brawlape.critical",
+  "special": "animation.brawlape.special",
+  "recall": "animation.brawlape.recall",
+  "sendout": "animation.brawlape.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.brawlape.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.brawlape.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.brawlape.faint",
+   "parts": []
+  }
+ },
+ "move": "SEISMIC TOSS",
+ "attack_move": "KARATE CHOP",
+ "scale": 0.987,
+ "height": 1.823,
+ "texture": "retromon:textures/mons/machoke.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/machoke_glow_0.png",
+    "retromon:textures/mons/machoke_glow_1.png",
+    "retromon:textures/mons/machoke_glow_2.png",
+    "retromon:textures/mons/machoke_glow_3.png",
+    "retromon:textures/mons/machoke_glow_4.png",
+    "retromon:textures/mons/machoke_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BRAWLAPE",
+ "anchors": {
+  "mouth": [
+   0,
+   19.04,
+   -8.06
+  ],
+  "back": [
+   0,
+   30.16,
+   0.04
+  ],
+  "body": [
+   0,
+   13.3,
+   0.04
+  ],
+  "size": [
+   20.04,
+   29.16,
+   12.24
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

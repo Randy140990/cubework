@@ -1,0 +1,72 @@
+{
+ "idle": "animation.pyrewolf.battle_idle",
+ "ground": "animation.pyrewolf.ground_idle",
+ "actions": {
+  "cry": "animation.pyrewolf.cry",
+  "recoil": "animation.pyrewolf.recoil",
+  "attack": "animation.pyrewolf.attack",
+  "critical": "animation.pyrewolf.critical",
+  "special": "animation.pyrewolf.special",
+  "recall": "animation.pyrewolf.recall",
+  "sendout": "animation.pyrewolf.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.pyrewolf.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.pyrewolf.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.pyrewolf.faint",
+   "parts": []
+  }
+ },
+ "move": "FLAME WHEEL",
+ "attack_move": "EXTREMESPEED",
+ "scale": 1.016,
+ "height": 2.166,
+ "texture": "retromon:textures/mons/arcanine.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/arcanine_glow_0.png",
+    "retromon:textures/mons/arcanine_glow_1.png",
+    "retromon:textures/mons/arcanine_glow_2.png",
+    "retromon:textures/mons/arcanine_glow_3.png",
+    "retromon:textures/mons/arcanine_glow_4.png",
+    "retromon:textures/mons/arcanine_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PYREWOLF",
+ "anchors": {
+  "mouth": [
+   0,
+   21.08,
+   -21.43
+  ],
+  "back": [
+   0,
+   29.25,
+   0.25
+  ],
+  "body": [
+   0,
+   18.86,
+   0.25
+  ],
+  "size": [
+   12.4,
+   34.66,
+   50.83
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

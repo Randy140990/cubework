@@ -19,7 +19,9 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Lance wasps", ["weedle", "kakuna", "beedrill"]), ("Vipers", ["ekans", "arbok"]), ("Pangolins", ["sandshrew", "sandslash"]),
             ("Moon rabbits", ["clefairy", "clefable"]), ("Fire fennecs", ["vulpix", "ninetales"]), ("Singing chinchillas", ["jigglypuff", "wigglytuff"]),
             ("Bats", ["zubat", "golbat"]), ("Tubers", ["oddish", "gloom", "vileplume"]), ("Mushroom crabs", ["paras", "parasect"]),
-            ("Gnats", ["venonat", "venomoth"]), ("Star-nosed moles", ["diglett", "dugtrio"]), ("Lynxes", ["meowth", "persian"])]
+            ("Gnats", ["venonat", "venomoth"]), ("Star-nosed moles", ["diglett", "dugtrio"]), ("Lynxes", ["meowth", "persian"]),
+            ("Platypuses", ["psyduck", "golduck"]), ("Maned wolves", ["growlithe", "arcanine"]), ("Frogs", ["poliwag", "poliwhirl", "poliwrath"]),
+            ("Tarsiers", ["abra", "kadabra", "alakazam"]), ("Gorillas", ["machop", "machoke", "machamp"])]
 KEEP = ("idle", "ground")
 
 

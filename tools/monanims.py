@@ -474,3 +474,49 @@ def burrower(sid, m, bodies=("body",), k=1.0, slow=1.0, extras=None):
     info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
     battle_set(A, m, info, "legs4", k, slow, extras)
     return A, info
+
+
+def biped(sid, m, walk=0.7, stride=28, k=1.0, slow=1.0, extras=None, guard=40):
+    """A creature that stands and walks upright: hips, knees and ankles bending as it steps, its arms swinging from the
+    shoulder and bending at the elbow, a fighting guard in battle (arms raised, knees bent), arms flung up to call."""
+    extras = with_move(m, extras)
+    A = Anims(sid)
+    P = 3.0 * slow
+    lr = lambda name, rot: {name + "_right": track(rotation=rot(1)), name + "_left": track(rotation=rot(-1))}
+    ground = A.add("ground_idle", P, only(m, merge({
+        "body": track(position=[0, wave(P / 2, 0.15 * k), 0], scale=pulse(P / 2, 0.012)),
+        "head": track(rotation=[wave(P, 3, 90), wave(P, 12), wave(P, 2, 45)]),
+        "jaw": track(rotation=keys({0: [0, 0, 0], 2.0 * slow: [0, 0, 0], 2.2 * slow: [6, 0, 0], 2.5 * slow: [0, 0, 0], P: [0, 0, 0]})),
+        "ear_right": track(rotation=[0, 0, wave(P / 2, 4)]), "ear_left": track(rotation=[0, 0, wave(P / 2, -4)]),
+    }, lr("arm", lambda d: [wave(P, 3, 90 if d > 0 else 270), 0, d * 4]), lr("forearm", lambda d: [wave(P, 3, 0, -8), 0, 0]),
+        tail_chain(P / 2, 8, 3), eyelids(P * 0.7), _extra(extras, "idle"))))
+    B = 1.2 * slow
+    battle = A.add("battle_idle", B, only(m, merge({
+        "body": track(position=[0, bounce(B / 2, 0.35 * k, 0, -0.4 * k), 0], rotation=[wave(B, 2, 0, 4), wave(B, 4), 0]),
+        "head": track(rotation=[wave(B / 2, 2, 0, -4), wave(B, 5), 0]),
+    }, lr("arm", lambda d: [wave(B / 2, 4, 0 if d > 0 else 180, -guard), 0, d * 10]), lr("forearm", lambda d: [wave(B / 2, 5, 40, -guard * 1.3), 0, 0]),
+        lr("leg", lambda d: [-12, 0, d * 4]), lr("shin", lambda d: [18, 0, 0]), lr("foot", lambda d: [-6, 0, 0]),
+        tail_chain(B / 2, 10, 4), eyelids(B * 0.7), _extra(extras, "battle"))))
+    W = walk
+    walk_id = A.add("ground_walk", W, only(m, merge({
+        "body": track(position=[0, bounce(W / 2, 0.45 * k), 0], rotation=[4, wave(W, 4), wave(W, 3)]),
+        "head": track(rotation=[wave(W / 2, 2), wave(W, -3), 0]),
+        "leg_right": track(rotation=[wave(W, stride), 0, 0]), "leg_left": track(rotation=[wave(W, -stride), 0, 0]),
+        "shin_right": track(rotation=[bounce(W, 34, 0), 0, 0]), "shin_left": track(rotation=[bounce(W, 34, 90), 0, 0]),
+        "foot_right": track(rotation=[wave(W, -10, 60), 0, 0]), "foot_left": track(rotation=[wave(W, 10, 60), 0, 0]),
+        "arm_right": track(rotation=[wave(W, -stride * 0.7), 0, 4]), "arm_left": track(rotation=[wave(W, stride * 0.7), 0, -4]),
+        "forearm_right": track(rotation=[wave(W, -10, 30, -14), 0, 0]), "forearm_left": track(rotation=[wave(W, 10, 30, -14), 0, 0]),
+    }, tail_chain(W, 12, 4), eyelids(W * 0.6), _extra(extras, "walk"))))
+    C = 1.2 * slow
+    up = lambda a: keys({0: [0, 0, 0], C * 0.2: a, C * 0.7: a, C: [0, 0, 0]})
+    cry = A.add("cry", C, only(m, merge({
+        "body": track(rotation=up([-8, 0, 0]), position=keys({0: [0, 0, 0], C * 0.2: [0, 1 * k, 0], C * 0.7: [0, 1 * k, 0], C: [0, 0, 0]})),
+        "head": track(rotation=up([-20, 0, 0])), "jaw": track(rotation=up([40, 0, 0])),
+        "arm_right": track(rotation=up([-130, 0, 25])), "arm_left": track(rotation=up([-130, 0, -25])),
+        "forearm_right": track(rotation=up([-20, 0, 0])), "forearm_left": track(rotation=up([-20, 0, 0])),
+    }, _extra(extras, "cry"))), loop=False)
+    R = 0.75 * slow
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k), _extra(extras, "recoil"))), loop=False)
+    info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
+    battle_set(A, m, info, "hopper", k, slow, extras)
+    return A, info

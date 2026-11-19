@@ -1,0 +1,72 @@
+{
+ "idle": "animation.quadrilla.battle_idle",
+ "ground": "animation.quadrilla.ground_idle",
+ "actions": {
+  "cry": "animation.quadrilla.cry",
+  "recoil": "animation.quadrilla.recoil",
+  "attack": "animation.quadrilla.attack",
+  "critical": "animation.quadrilla.critical",
+  "special": "animation.quadrilla.special",
+  "recall": "animation.quadrilla.recall",
+  "sendout": "animation.quadrilla.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.quadrilla.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.quadrilla.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.quadrilla.faint",
+   "parts": []
+  }
+ },
+ "move": "SUBMISSION",
+ "attack_move": "CROSS CHOP",
+ "scale": 0.985,
+ "height": 2.234,
+ "texture": "retromon:textures/mons/machamp.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/machamp_glow_0.png",
+    "retromon:textures/mons/machamp_glow_1.png",
+    "retromon:textures/mons/machamp_glow_2.png",
+    "retromon:textures/mons/machamp_glow_3.png",
+    "retromon:textures/mons/machamp_glow_4.png",
+    "retromon:textures/mons/machamp_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "QUADRILLA",
+ "anchors": {
+  "mouth": [
+   0,
+   21.86,
+   -9.18
+  ],
+  "back": [
+   0,
+   36.74,
+   -0.12
+  ],
+  "body": [
+   0,
+   15.4,
+   -0.12
+  ],
+  "size": [
+   23.12,
+   35.74,
+   13.72
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}
