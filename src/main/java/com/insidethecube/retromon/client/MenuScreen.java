@@ -465,7 +465,8 @@ public class MenuScreen extends DeviceScreen {
 	 */
 	private void drawMenu(GuiGraphics g) {
 		PlayerData d = ClientState.data;
-		Scenes.backdrop(g, "night");
+		// Over the frosted world (the viewer's), no backdrop of its own.
+		V.centred(g, "M E N U", 640, 30 + 2, 30, 0x66000000, true);
 		V.centred(g, "M E N U", 640, 30, 30, V.TEXT, true);
 		for (int i = 0; i < ITEMS.length; i++) {
 			float tx = 110 + (i % 5) * 220, ty = 130 + (i / 5) * 230;

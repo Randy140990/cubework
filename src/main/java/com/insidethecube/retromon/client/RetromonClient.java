@@ -56,6 +56,8 @@ public class RetromonClient implements ClientModInitializer {
 		net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback.EVENT.register((type, renderer, helper, ctx) -> {
 			if (renderer instanceof net.minecraft.client.renderer.entity.player.AvatarRenderer<?> avatar) helper.register(new GearLayer<>(avatar));
 		});
+		// Into the world: it fades in from black (the loading screen's black), not all at once.
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, mc) -> Hud.arrive());
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> {
 			SlotSnapshot.leaving(mc);
 			TownMap.leaving();

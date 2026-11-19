@@ -177,8 +177,9 @@ public final class Maker {
 
 	// ---------- drawing (the viewer's layout, in canvas pixels) ----------
 
-	private static final float X = 24, Y = 20, PW = 870, PAD_X = 14, PAD_Y = 12, GAP = 10, COL = (PW - 2 * PAD_X - GAP) / 2;
-	private static final float LABEL_W = 70, ROW_PAD_X = 8, ROW_PAD_Y = 4, CARD_PAD = 8, TITLE_H = 24, SW = 30, SW_GAP = 7, CHIP = 14, CHIP_H = 26;
+	private static final float X = 24, Y = 20, PW = 870, PAD_X = 16, PAD_Y = 14, GAP = 12, COL = (PW - 2 * PAD_X - GAP) / 2;
+	/** The labels' column is wide enough for COLOUR with its arrow (it ran into the swatches). */
+	private static final float LABEL_W = 84, ROW_PAD_X = 10, ROW_PAD_Y = 6, CARD_PAD = 10, TITLE_H = 26, SW = 30, SW_GAP = 8, CHIP = 14, CHIP_H = 26;
 
 	/** The options' lines: where each sits (x, y from the options' top left), and how tall they come to. */
 	private static float[][] flow(Row r, float width) {
@@ -263,7 +264,7 @@ public final class Maker {
 			int col = c < split ? 0 : 1;
 			float cx = X + PAD_X + col * (COL + GAP), y = cy[col];
 			V.rr(g, cx, y, COL, cardH[c], 18, 0x29000000);
-			V.text(g, spaced(groups.get(c)), cx + CARD_PAD + 12, y + CARD_PAD + 2, 17, V.EDGE_LIGHT, true);
+			V.tracked(g, groups.get(c), cx + CARD_PAD + 12, y + CARD_PAD + 2, 17, V.EDGE_LIGHT, 2);
 			float ry = y + CARD_PAD + TITLE_H;
 			for (int i : members.get(c)) {
 				Row r = rows.get(i);

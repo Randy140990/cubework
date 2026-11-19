@@ -44,9 +44,9 @@ public class IntroScreen extends GameScreen {
 	}
 
 	private final Screen parent;
-	/** The opening (INSID3 TH3 CUB3 presents, fading in and out) plays once each time the game's started. */
+	/** The opening (INSID3 TH3 CUB3 presents, fading in and out) plays each time the title comes up: at the start and after you quit a game. */
 	private static boolean opened;
-	private volatile Step step = opened ? Step.TITLE : Step.OPENING;
+	private volatile Step step = Step.OPENING;
 	/** Ticks into the opening, and since the title came up (its white flash, Charizard's roar). */
 	private int openTicks, titleTicks = 99;
 	private static final int OPEN_END = 70;
@@ -78,6 +78,9 @@ public class IntroScreen extends GameScreen {
 	/** When the little yellow one jumped for Oak's shoulder (ticks), or -1; when you waved goodbye, or -1. */
 	private int hopAt = -1, waveAt = -1;
 	private String playerName = "", rivalName = "";
+	/** Fading to black before the game loads (ticks), and when the loading screen came up (it fades in from black). */
+	private int fadeOutAt = -1, loadingAt = -1;
+	private static final int FADE_OUT = 12;
 	private String slotName;
 	/** Who's on screen while Oak talks: oak, hero (you) or rival. */
 	private String scene = "oak";
@@ -122,14 +125,21 @@ public class IntroScreen extends GameScreen {
 	public void tick() {
 		super.tick();
 		if (step == Step.OPENING) {
-			openTicks++;
+			// Not while Minecraft's own loading screen is still over it.
+			if (minecraft == null || minecraft.getOverlay() == null) openTicks++;
 			if (openTicks >= OPEN_END) toTitle();
 		}
 		if (titleTicks < 99) titleTicks++;
 		if (talk != null) talk.tick();
 		// "Off you go, then!": you wave, then the game loads.
 		if (waveAt >= 0 && ticks - waveAt > 18 && step == Step.TALK) {
+			// Then everything fades to black, and the game loads behind it.
 			waveAt = -1;
+			fadeOutAt = ticks;
+		}
+		if (fadeOutAt >= 0 && ticks - fadeOutAt >= FADE_OUT) {
+			fadeOutAt = -1;
+			loadingAt = ticks;
 			newGame();
 		}
 		if (copied) {
@@ -869,6 +879,7 @@ public class IntroScreen extends GameScreen {
 				float wave = waveAt < 0 ? 0 : Math.min(1, (ticks - waveAt + partial) / 6F);
 				Scenes.prof(g, secs, mode, waveAt < 0, wave, mode.equals("intro") ? hop : -1, you());
 				talk.renderV(g, font, 140, 26, 1000, ticks, partial, waveAt < 0);
+				if (fadeOutAt >= 0) g.fill(0, 0, width, height, Ui.alpha(0xFF000000, Math.min(1, (ticks - fadeOutAt + partial) / FADE_OUT)));
 			}
 			case MAKER -> {
 				Scenes.backdrop(g, "maker");
@@ -933,6 +944,8 @@ public class IntroScreen extends GameScreen {
 	}
 
 	/** Your saves as cards (the viewer's): who, where, how far; pick one to carry on, an empty one for a new game. */
+	private final List<Runnable> deletes = new ArrayList<>();
+
 	private void drawSlots(GuiGraphics g, float secs) {
 		Scenes.backdrop(g, "sky");
 		Scenes.stand(g, secs, you(), -1.6, 0, true);
@@ -987,7 +1000,8 @@ public class IntroScreen extends GameScreen {
 					if (overDel) V.pill(g, dx, dy, dw, 24, V.RED);
 					V.ring(g, dx, dy, dw, 24, 12, 2, 0xB3E5525C);
 					V.text(g, "DELETE", dx + 12, dy + 5, 13, overDel ? 0xFFFFFFFF : 0xFFFFB3B8, true);
-					if (confirm == null) vhit(dx, dy, dw, 24, () -> askDelete(idx));
+					// (Its click is added after the card's, so it wins over loading the game.)
+					if (confirm == null) deletes.add(() -> vhit(dx, dy, dw, 24, () -> askDelete(idx)));
 				}
 			} else {
 				float tw = V.width("SLOT " + (k + 1), 14, true) + 24;
@@ -997,6 +1011,8 @@ public class IntroScreen extends GameScreen {
 				V.right(g, "Empty", x + w - 24, y + 30, 17, V.MUTED, true);
 			}
 			if (confirm == null) vhit(x, y, w, h, () -> pickSlot(idx));
+			for (Runnable r : deletes) r.run();
+			deletes.clear();
 			y += h + 18;
 		}
 		V.hints(g, "A", "Choose", "B", "Back");
@@ -1032,6 +1048,12 @@ public class IntroScreen extends GameScreen {
 
 	/** While the world's made and loads: a ball spinning, where you're going, how far along, and a tip. */
 	private void drawLoading(GuiGraphics g, float secs) {
+		drawLoadingPage(g, secs);
+		float t = loadingAt < 0 ? 99 : ticks - loadingAt;
+		if (t < 10) g.fill(0, 0, width, height, Ui.alpha(0xFF000000, 1 - t / 10F));
+	}
+
+	private void drawLoadingPage(GuiGraphics g, float secs) {
 		Scenes.backdrop(g, "night");
 		float cx = 640, cy = 317;
 		g.pose().pushMatrix();

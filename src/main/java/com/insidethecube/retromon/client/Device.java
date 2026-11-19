@@ -23,7 +23,7 @@ public final class Device {
 	private Device() {}
 
 	/** How long (ticks): taking it out, it coming up the screen, going down, and putting it away. */
-	static final int TAKE = 12, RISE = 11, DROP = 8, PUT = 10;
+	static final int TAKE = 8, RISE = 11, DROP = 2, PUT = 8;
 
 	private enum Phase {
 		NONE, TAKING, OPEN, DROPPING, PUTTING

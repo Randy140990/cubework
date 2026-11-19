@@ -158,11 +158,12 @@ public final class Scenes {
 			double px = x, py = 0, pz = z, yaw = Math.PI + turn + Math.sin(secs * 0.4 + x) * 0.15;
 			String pose = null;
 			if (sid.equals("cubone")) {
-				// Wandering round in a slow loop, facing the way it goes.
-				double a = secs * 0.45;
-				px = -1.25 + Math.cos(a) * 0.95;
-				pz = 0.85 + Math.sin(a) * 0.45;
-				yaw = Math.atan2(Math.sin(a) * 0.95, -Math.cos(a) * 0.45) + Math.PI;
+				// Round the professor in a wide loop, clear of the others, facing the way it walks (it walked backwards
+				// before: its turn was half a turn out).
+				double a = secs * 0.35;
+				px = Math.cos(a) * 2.55;
+				pz = 0.35 + Math.sin(a) * 2.25;
+				yaw = Math.atan2(Math.sin(a) * 2.55, -Math.cos(a) * 2.25);
 				pose = "walk";
 			} else if (sid.equals("pikachu") && hopSecs >= 0) {
 				// Up onto his shoulder in a little arc, then riding there.

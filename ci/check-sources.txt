@@ -1,8 +1,5 @@
-net/minecraft/client/model/geom/ModelPart.java
-grep blur|renderBackground|renderBlurredBackground|renderMenuBackground net/minecraft/client/gui/screens/Screen.java
-grep keyPress|public void|private void|screen != null|InputConstants net/minecraft/client/KeyboardHandler.java
-grep keyInventory|keyDrop|keySwapOffhand|keyChat|keyCommand|keyTogglePerspective|keyPickItem|keySocialInteractions|keyAdvancements|keyHotbarSlots|handleKeybinds|keyScreenshot|keyUse|keyAttack|keyFullscreen|keySmoothCamera|keySpectatorOutlines|keyQuickActions net/minecraft/client/Minecraft.java
-grep public net/minecraft/client/KeyMapping.java
-grep public|static net/minecraft/client/renderer/texture/OverlayTexture.java
-grep submitCustomGeometry|interface|void submit net/minecraft/client/renderer/SubmitNodeCollector.java
-grep record|fixedTime|hasSkyLight|ambientLight|monsterSettings|cardinalLight|effectsLocation|DimensionType\( net/minecraft/world/level/dimension/DimensionType.java
+net/minecraft/world/level/dimension/DimensionType.java
+data data/minecraft/dimension_type/overworld.json
+grep keyPress net/minecraft/client/KeyboardHandler.java
+grep submitCustomGeometry net/minecraft/client/renderer/SubmitNodeCollector.java
+grep interface net/minecraft/client/renderer/SubmitNodeCollector.java

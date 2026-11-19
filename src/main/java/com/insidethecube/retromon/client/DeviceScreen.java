@@ -3,71 +3,32 @@ package com.insidethecube.retromon.client;
 import net.minecraft.client.gui.GuiGraphics;
 
 /**
- * A screen shown on your Pokédex (the START menu, the Pokédex itself, the Town Map): the device held up in
- * your hands over the frosted world, with this drawn on its screen. Its insides draw from the screen's own
- * top-left corner, width and height being the screen's (below the status bar).
+ * A page of the START menu (the menu itself, the Pokédex, the Town Map...), as the UI Viewer shows them: over the
+ * whole window, the world frosted behind it. (It used to show on a Pokédex held up in your hands.)
  */
 public abstract class DeviceScreen extends GameScreen {
-	/** Where the device's screen was last drawn (for the mouse: wheel and drag). */
+	/** Where the page is (the whole window), for the mouse: wheel and drag. */
 	protected int screenX, screenY, screenW, screenH;
 
 	protected DeviceScreen(String title) {
 		super(title);
 	}
 
-	/** What's on the device's screen. */
+	/** The page. */
 	protected abstract void drawScreen(GuiGraphics g, float partial);
 
 	@Override
 	protected final void draw(GuiGraphics g, float partial) {
-		int W = width, H = height, mx0 = mx, my0 = my, s0 = s;
-		Device.Frame f = Device.frame(W, H, partial);
-		Device.back(g, f, W, H, ticks, partial);
-		int cx = f.ix(), cy = f.iy() + f.bar(), cw = f.iw(), ch = f.ih() - f.bar();
-		screenX = cx;
-		screenY = cy;
-		screenW = cw;
-		screenH = ch;
-		if (cy < H) {
-			g.enableScissor(cx, cy, cx + cw, cy + ch);
-			g.pose().pushMatrix();
-			g.pose().translate(cx, cy);
-			width = cw;
-			height = ch;
-			ox = cx;
-			oy = cy;
-			mx = mx0 - cx;
-			my = my0 - cy;
-			s = Device.scale(ch);
-			// The UI Viewer's canvas fits the device's screen.
-			V.fit(cw, ch);
-			V.bx = cx;
-			V.by = cy;
-			try {
-				drawScreen(g, partial);
-			} finally {
-				V.fit(W, H);
-				V.bx = 0;
-				V.by = 0;
-				g.pose().popMatrix();
-				g.disableScissor();
-				width = W;
-				height = H;
-				ox = 0;
-				oy = 0;
-				mx = mx0;
-				my = my0;
-				s = s0;
-			}
-		}
-		int[] b = Device.front(g, f, W, H, ticks, partial, font, backLabel(), backOver);
-		backOver = b != null && over(b[0], b[1], b[2], b[3]);
-		if (b != null) hit(b[0], b[1], b[2], b[3], this::back);
+		net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+		if (mc.options.getMenuBackgroundBlurriness() > 0) g.blurBeforeThisStratum();
+		g.fill(0, 0, width, height, 0x330A1C20);
+		screenX = 0;
+		screenY = 0;
+		screenW = width;
+		screenH = height;
+		drawScreen(g, partial);
 	}
 
-	private boolean backOver;
-
-	/** The status bar's BACK button: what it says (null for none). */
 	protected String backLabel() {
 		return "BACK";
 	}

@@ -67,46 +67,74 @@ public final class Ui {
 
 	/** A rounded rectangle as rr, shaded from one colour at the top to another at the bottom. */
 	public static void rrv(GuiGraphics g, float x, float y, float w, float h, float r, int top, int bottom) {
+		rrv(g, x, y, w, h, r, top, bottom, 1F);
+	}
+
+	/** White anti-aliased discs (textures/gui/shape/disc_R.png, R the radius in pixels): corners, circles and ellipses. */
+	private static final int[] DISCS = {4, 6, 9, 14, 20, 30, 46, 68, 103, 154, 231, 346, 519};
+	private static final net.minecraft.resources.Identifier[] DISC_IDS = new net.minecraft.resources.Identifier[DISCS.length];
+
+	/** The disc to draw radius R (screen pixels) from: the smallest at least as big (scaled down at most by a half). */
+	private static int disc(float R) {
+		for (int i = 0; i < DISCS.length; i++) if (DISCS[i] >= R) return i;
+		return DISCS.length - 1;
+	}
+
+	private static net.minecraft.resources.Identifier discId(int i) {
+		if (DISC_IDS[i] == null) DISC_IDS[i] = com.insidethecube.retromon.Retromon.id("textures/gui/shape/disc_" + DISCS[i] + ".png");
+		return DISC_IDS[i];
+	}
+
+	/** A quarter of a disc (corner 0 top left, 1 top right, 2 bottom left, 3 bottom right) into an R by R box. */
+	private static void quarter(GuiGraphics g, int x, int y, int R, int corner, int color) {
+		if (R <= 0 || (color >>> 24) == 0) return;
+		int i = disc(R), D = DISCS[i];
+		g.pose().pushMatrix();
+		g.pose().translate(x, y);
+		g.pose().scale(R / (float) D, R / (float) D);
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, discId(i), 0, 0, (corner & 1) * D, (corner >> 1) * D, D, D, 2 * D, 2 * D, color);
+		g.pose().popMatrix();
+	}
+
+	/**
+	 * A rounded rectangle shaded from top (at its top) to bottom (stop of the way down, flat after that). Drawn as
+	 * a few plain bands and four textured corners (a handful of quads, not one per pixel), at the screen's own
+	 * resolution, its curved edges anti-aliased. Nothing is drawn twice, so see-through colours stay even.
+	 */
+	public static void rrv(GuiGraphics g, float x, float y, float w, float h, float r, int top, int bottom, float stop) {
 		if (w <= 0 || h <= 0 || ((top >>> 24) == 0 && (bottom >>> 24) == 0)) return;
 		float k = gs();
 		int X = Math.round(x * k), Y = Math.round(y * k), W = Math.round((x + w) * k) - X, H = Math.round((y + h) * k) - Y;
 		if (W <= 0 || H <= 0) return;
-		float R = Math.max(0, Math.min(r * k, Math.min(W, H) / 2F));
-		boolean flat = top == bottom;
+		int R = (int) Math.max(0, Math.min(Math.round(r * k), Math.min(W, H) / 2));
 		g.pose().pushMatrix();
 		g.pose().scale(1 / k, 1 / k);
-		int ri = (int) Math.ceil(R);
-		// The middle band, whole.
-		if (H - 2 * ri > 0) {
-			if (flat) g.fill(X, Y + ri, X + W, Y + H - ri, top);
-			else g.fillGradient(X, Y + ri, X + W, Y + H - ri, mix(top, bottom, (ri + 0.5F) / H), mix(top, bottom, (H - ri - 0.5F) / H));
-		}
-		for (int j = 0; j < ri && j < H; j++) {
-			// Distance of this row's middle from the corners' centres (above it); below them it's a whole row.
-			float dy = R - j - 0.5F;
-			float inner = dy > 0 && dy < R - 0.5F ? (float) Math.sqrt(Math.max(0, (R - 0.5F) * (R - 0.5F) - dy * dy)) : 0;
-			float outer = dy > 0 ? (float) Math.sqrt(Math.max(0, (R + 0.5F) * (R + 0.5F) - dy * dy)) : R;
-			int solidIn = dy > 0 ? (int) Math.ceil(R - inner) : 0;
-			int edgeOut = (int) Math.floor(R - outer);
-			for (int pass = 0; pass < 2; pass++) {
-				int yy = pass == 0 ? Y + j : Y + H - 1 - j;
-				if (pass == 1 && yy <= Y + j) break;
-				int color = flat ? top : mix(top, bottom, (yy - Y + 0.5F) / H);
-				int a = color >>> 24, rgb = color & 0xFFFFFF;
-				if (W - 2 * solidIn > 0) g.fill(X + solidIn, yy, X + W - solidIn, yy + 1, color);
-				// The pixels along the curve, as much of each as the shape covers.
-				for (int i = Math.max(0, edgeOut); i < solidIn && i < (W + 1) / 2; i++) {
-					float cx = i + 0.5F - R;
-					float d = (float) Math.sqrt(cx * cx + dy * dy);
-					float cov = Math.max(0, Math.min(1, R + 0.5F - d));
-					if (cov <= 0) continue;
-					int c = ((int) (a * cov) << 24) | rgb;
-					g.fill(X + i, yy, X + i + 1, yy + 1, c);
-					if (W - 1 - i != i) g.fill(X + W - 1 - i, yy, X + W - i, yy + 1, c);
-				}
-			}
-		}
+		float st = Math.max(0.001F, stop);
+		java.util.function.IntUnaryOperator at = yy -> top == bottom ? top : mix(top, bottom, (yy - Y) / (H * st));
+		// The bands: across the top and bottom between the corners, and the whole width between them.
+		bands(g, X + R, Y, X + W - R, Y + R, Y, H, st, top, bottom);
+		bands(g, X, Y + R, X + W, Y + H - R, Y, H, st, top, bottom);
+		bands(g, X + R, Y + H - R, X + W - R, Y + H, Y, H, st, top, bottom);
+		quarter(g, X, Y, R, 0, at.applyAsInt(Y + R / 2));
+		quarter(g, X + W - R, Y, R, 1, at.applyAsInt(Y + R / 2));
+		quarter(g, X, Y + H - R, R, 2, at.applyAsInt(Y + H - R / 2));
+		quarter(g, X + W - R, Y + H - R, R, 3, at.applyAsInt(Y + H - R / 2));
 		g.pose().popMatrix();
+	}
+
+	/** A box from x0, y0 to x1, y1 (screen pixels) in its shading: top to bottom over stop of H from Y, then flat. */
+	private static void bands(GuiGraphics g, int x0, int y0, int x1, int y1, int Y, int H, float stop, int top, int bottom) {
+		if (x1 <= x0 || y1 <= y0) return;
+		if (top == bottom) {
+			g.fill(x0, y0, x1, y1, top);
+			return;
+		}
+		int ys = Y + Math.round(H * stop);
+		if (y0 < ys) {
+			int e = Math.min(y1, ys);
+			g.fillGradient(x0, y0, x1, e, mix(top, bottom, (y0 - Y) / (H * stop)), mix(top, bottom, (e - Y) / (H * stop)));
+		}
+		if (y1 > ys) g.fill(x0, Math.max(y0, ys), x1, y1, bottom);
 	}
 
 	/** A rounded ring (an outline): radius r, t thick, smooth like rr. */
@@ -117,7 +145,15 @@ public final class Ui {
 		float iX = X + T, iY = Y + T, iW = W - 2 * T, iH = H - 2 * T, iR = Math.max(0, R - T);
 		g.pose().pushMatrix();
 		g.pose().scale(1 / k, 1 / k);
+		int midA = (int) Math.ceil(Y + Math.max(R, T)), midB = (int) Math.floor(Y + H - Math.max(R, T));
 		for (int row = (int) Math.floor(Y); row < (int) Math.ceil(Y + H); row++) {
+			if (row >= midA && row < midB) {
+				// The straight sides: one block each (not a row at a time).
+				block(g, midA, midB, X, X + T, color);
+				block(g, midA, midB, X + W - T, X + W, color);
+				row = midB - 1;
+				continue;
+			}
 			float cy = row + 0.5F;
 			float[] o = extent(X, Y, W, H, R, cy);
 			if (o == null) continue;
@@ -139,6 +175,21 @@ public final class Ui {
 		else if (cy > Y + H - R) dy = cy - (Y + H - R);
 		float in = dy > 0 ? R - (float) Math.sqrt(Math.max(0, R * R - dy * dy)) : 0;
 		return new float[] {X + in, X + W - in};
+	}
+
+	/** Rows r0 to r1 from a to b (screen pixels), its ends as much as they're covered. */
+	private static void block(GuiGraphics g, int r0, int r1, float a, float b, int color) {
+		if (b <= a || r1 <= r0) return;
+		int al = color >>> 24, rgb = color & 0xFFFFFF;
+		int ia = (int) Math.ceil(a), ib = (int) Math.floor(b);
+		if (ib < ia) {
+			g.fill(ib, r0, ib + 1, r1, ((int) (al * (b - a)) << 24) | rgb);
+			return;
+		}
+		if (ib > ia) g.fill(ia, r0, ib, r1, color);
+		float fl = ia - a, fr = b - ib;
+		if (fl > 0) g.fill(ia - 1, r0, ia, r1, ((int) (al * fl) << 24) | rgb);
+		if (fr > 0) g.fill(ib, r0, ib + 1, r1, ((int) (al * fr) << 24) | rgb);
 	}
 
 	/** One row's run from a to b (screen pixels), its ends as much as they're covered. */
@@ -186,28 +237,17 @@ public final class Ui {
 		g.pose().popMatrix();
 	}
 
-	/** A filled ellipse centred on (cx, cy), radii rx and ry (GUI pixels), with soft edges. */
+	/** A filled ellipse centred on (cx, cy), radii rx and ry (GUI pixels), with soft edges: one textured disc. */
 	public static void ellipse(GuiGraphics g, float cx, float cy, float rx, float ry, int color) {
-		if (rx <= 0 || ry <= 0) return;
-		if (Math.abs(rx - ry) < 0.01F) {
-			rr(g, cx - rx, cy - ry, 2 * rx, 2 * ry, rx, color);
-			return;
-		}
+		if (rx <= 0 || ry <= 0 || (color >>> 24) == 0) return;
 		float k = gs();
-		float RX = rx * k, RY = ry * k, CX = cx * k, CY = cy * k;
-		int a = color >>> 24, rgb = color & 0xFFFFFF;
+		float RX = rx * k, RY = ry * k;
+		int i = disc((float) Math.sqrt(RX * RY)), D = DISCS[i];
 		g.pose().pushMatrix();
 		g.pose().scale(1 / k, 1 / k);
-		for (int j = (int) Math.floor(CY - RY); j < (int) Math.ceil(CY + RY); j++) {
-			float v = (j + 0.5F - CY) / RY;
-			if (Math.abs(v) >= 1) continue;
-			float half = RX * (float) Math.sqrt(1 - v * v);
-			int x0 = (int) Math.ceil(CX - half), x1 = (int) Math.floor(CX + half);
-			if (x1 > x0) g.fill(x0, j, x1, j + 1, color);
-			float fl = x0 - (CX - half), fr = (CX + half) - x1;
-			if (fl > 0) g.fill(x0 - 1, j, x0, j + 1, ((int) (a * fl) << 24) | rgb);
-			if (fr > 0) g.fill(x1, j, x1 + 1, j + 1, ((int) (a * fr) << 24) | rgb);
-		}
+		g.pose().translate(cx * k - RX, cy * k - RY);
+		g.pose().scale(RX / D, RY / D);
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, discId(i), 0, 0, 0, 0, 2 * D, 2 * D, 2 * D, 2 * D, color);
 		g.pose().popMatrix();
 	}
 

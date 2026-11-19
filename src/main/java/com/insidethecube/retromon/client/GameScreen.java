@@ -60,8 +60,11 @@ public abstract class GameScreen extends Screen {
 		mx = mouseX;
 		my = mouseY;
 		hits.clear();
+		V.HINTS.clear();
 		V.fit(width, height);
 		draw(g, partial);
+		// The key hints work as buttons too (SPACE, ESC, TAB...).
+		for (V.Hint h : List.copyOf(V.HINTS)) vhit(h.x(), h.y(), h.w(), h.h(), () -> pressHint(h.key()));
 		// Widgets (the nickname box).
 		super.render(g, mouseX, mouseY, partial);
 	}
@@ -106,6 +109,19 @@ public abstract class GameScreen extends Screen {
 		}
 		clickAnywhere();
 		return true;
+	}
+
+	/** A key hint clicked: as if its key were pressed (B goes back). */
+	protected void pressHint(String key) {
+		int code = switch (key) {
+			case "A" -> org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+			case "TAB" -> org.lwjgl.glfw.GLFW.GLFW_KEY_TAB;
+			case "ENTER" -> org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
+			case "B", "ESC" -> -1;
+			default -> key.length() == 1 ? org.lwjgl.glfw.GLFW.GLFW_KEY_A + (Character.toUpperCase(key.charAt(0)) - 'A') : -2;
+		};
+		if (code == -1) back();
+		else if (code >= 0) keyPressed(new KeyEvent(code, 0, 0));
 	}
 
 	/** A click on nothing in particular: moves the text on, by default. */

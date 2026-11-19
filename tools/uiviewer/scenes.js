@@ -117,8 +117,9 @@ const SCENES = {
         const [x, z, turn, fly] = r.home;
         if (r.sid === "cubone") {
           // Wandering round in a slow loop, facing the way it goes.
-          const a = t * 0.45, wx = -1.25 + Math.cos(a) * 0.95, wz = 0.85 + Math.sin(a) * 0.45;
-          placeMon(r, wx, wz, Math.atan2(Math.sin(a) * 0.95, -Math.cos(a) * 0.45) + Math.PI); r.base = "walk";
+          // Round the professor in a wide loop, clear of the others, facing the way it walks.
+          const a = t * 0.35, wx = Math.cos(a) * 2.55, wz = 0.35 + Math.sin(a) * 2.25;
+          placeMon(r, wx, wz, Math.atan2(Math.sin(a) * 2.55, -Math.cos(a) * 2.25)); r.base = "walk";
         } else if (r.sid === "pikachu" && S.hopT != null) {
           // Up onto his shoulder in a little arc, then riding there.
           S.hopT = Math.min(1, S.hopT + dt / 0.75); const k = S.hopT, e = k * k * (3 - 2 * k);

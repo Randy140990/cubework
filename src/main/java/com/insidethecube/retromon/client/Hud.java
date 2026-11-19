@@ -48,6 +48,13 @@ public final class Hud {
 	/** What to do once it's faded back (WAIT: "It's morning now."). */
 	private static Runnable afterFade;
 
+	/** Arriving in the world: black, fading out as it comes in (ticks left). */
+	private static int arrive;
+
+	public static void arrive() {
+		arrive = 34;
+	}
+
 	public static void fadeThrough(Runnable then) {
 		fadeThrough(then, "Time passes...");
 	}
@@ -83,6 +90,7 @@ public final class Hud {
 				r.run();
 			}
 		}
+		if (arrive > 0 && mc.level != null && mc.screen == null || arrive > 0 && mc.screen instanceof DialogueScreen) arrive--;
 		moneyTick(mc);
 		if (badgeShown >= 0 && mc.screen == null) badgeTicks++;
 	}
@@ -178,6 +186,7 @@ public final class Hud {
 	}
 
 	private static void fade(GuiGraphics g, DeltaTracker delta) {
+		if (arrive > 0) g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF000000, Math.min(1, (arrive - delta.getGameTimeDeltaPartialTick(true)) / 20F)));
 		if (fade <= 0) return;
 		float t = fadeLen - fade + delta.getGameTimeDeltaPartialTick(true);
 		if (fadeWords.isEmpty()) {
@@ -217,6 +226,7 @@ public final class Hud {
 		boolean night = Night.nightness() > 0.5F;
 		String clock = String.format("%d:%02d %s", hour % 12 == 0 ? 12 : hour % 12, minute, hour < 12 ? "AM" : "PM");
 		V.hints(g, key(mc.options.keyJump), "Talk", key(Adventure.START), "Menu", key(Adventure.SPEED), "Speed x" + Adventure.speed);
+		V.HINTS.clear();
 		// The time, at the bottom left, with a sun or a moon.
 		float cw = V.width(clock, 17, true) + 44;
 		V.panel(g, 22, V.H - 14 - 36, cw, 36, 18, true);

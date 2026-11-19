@@ -107,10 +107,9 @@ public final class V {
 		float e = 2.5F;
 		if (soft) rr(g, x + e, y + e, w - 2 * e, h - 2 * e, r - e, 0xD1123C38);
 		else {
-			// rgba(29,90,82,.95) to rgba(18,60,56,.95) by 55%, then flat.
-			float mid = (h - 2 * e) * 0.55F;
-			rr(g, x + e, y + e, w - 2 * e, h - 2 * e, r - e, 0xF2123C38);
-			rrv(g, x + e, y + e, w - 2 * e, mid, Math.min(r - e, mid / 2), 0xF21D5A52, 0xF2123C38);
+			// rgba(29,90,82,.95) to rgba(18,60,56,.95) by 55%, then flat: in one pass (laying the shading over a flat
+			// panel drew the glass twice above the 55% line, which showed as a line across).
+			Ui.rrv(g, x(x + e), y(y + e), s(w - 2 * e), s(h - 2 * e), s(r - e), 0xF21D5A52, 0xF2123C38, 0.55F);
 		}
 		ring(g, x + e, y + e, w - 2 * e, h - 2 * e, r - e, 1.5F, 0x2E8FF5C0);
 	}
@@ -256,8 +255,33 @@ public final class V {
 	}
 
 	/** A small capital label (the viewer's g-label: 13px, spaced, muted). */
+	/** Words with their letters spaced apart (letter-spacing, in canvas pixels). */
+	public static void tracked(GuiGraphics g, String text, float x, float y, float size, int color, float spacing) {
+		String t = Look.text(text);
+		float cx = x;
+		for (int i = 0; i < t.length(); i++) {
+			String ch = t.substring(i, i + 1);
+			draw(g, comp(ch, true), cx, y, size, color, false);
+			cx += width(ch, size, true) + spacing;
+		}
+	}
+
+	public static float trackedWidth(String text, float size, float spacing) {
+		String t = Look.text(text);
+		float w = 0;
+		for (int i = 0; i < t.length(); i++) w += width(t.substring(i, i + 1), size, true) + spacing;
+		return Math.max(0, w - spacing);
+	}
+
+	/** A label (the viewer's g-label): 13px capitals, 1.4px apart. */
 	public static void label(GuiGraphics g, String text, float x, float y, int color) {
-		text(g, spaced(text.toUpperCase()), x, y, 13, color, true);
+		String t = Look.text(text.toUpperCase());
+		float cx = x;
+		for (int i = 0; i < t.length(); i++) {
+			String ch = t.substring(i, i + 1);
+			draw(g, comp(ch, true), cx, y, 13, color, false);
+			cx += width(ch, 13, true) + 1.4F;
+		}
 	}
 
 	public static void label(GuiGraphics g, String text, float x, float y) {
@@ -265,7 +289,10 @@ public final class V {
 	}
 
 	public static float labelWidth(String text) {
-		return width(spaced(text.toUpperCase()), 13, true);
+		String t = Look.text(text.toUpperCase());
+		float w = 0;
+		for (int i = 0; i < t.length(); i++) w += width(t.substring(i, i + 1), 13, true) + 1.4F;
+		return Math.max(0, w - 1.4F);
 	}
 
 	/** Letter spacing, roughly: a hair space between letters. */
@@ -345,17 +372,26 @@ public final class V {
 		return w;
 	}
 
-	/** The keys along the bottom right (the viewer's g-hints): A shown as SPACE and B as ESC, as on a keyboard. */
+	/** A key hint drawn this frame (its box on the canvas and its key), so it can be clicked like a button. */
+	public record Hint(float x, float y, float w, float h, String key) {}
+
+	public static final List<Hint> HINTS = new java.util.ArrayList<>();
+
+	/**
+	 * The keys along the bottom right (the viewer's g-hints): A shown as SPACE and B as ESC, as on a keyboard. Each
+	 * is also a button: clicking it does what the key does.
+	 */
 	public static void hints(GuiGraphics g, String... pairs) {
 		float x = W - 22, y = H - 14 - 28;
 		for (int i = pairs.length - 2; i >= 0; i -= 2) {
 			String kk = keyName(pairs[i]), l = pairs[i + 1];
-			float lw = width(l, 17, true);
+			float lw = width(l, 17, true), right = x;
 			x -= lw;
 			text(g, l, x, y + 5, 17, TEXT, true, true);
 			float kw = Math.max(28, width(kk, 14, true) + 14);
 			x -= 7 + kw;
 			key(g, kk, x, y, 28);
+			HINTS.add(new Hint(x - 6, y - 6, right - x + 12, 40, pairs[i]));
 			x -= 18;
 		}
 	}
