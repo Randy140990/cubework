@@ -40,7 +40,15 @@ def model(folder):
     import numpy as np
     ns, path = info["texture"].split(":", 1)
     im = Image.open(os.path.join(ROOT, "..", ns, path)).convert("RGBA")
-    texels = int((np.array(im)[..., 3] > 0).sum())
+    # Texels painted: on the texture, or (for parts that only show glowing, such as flames) on a glowing layer.
+    painted = np.array(im)[..., 3] > 0
+    for layer in info.get("layers", []):
+        for f in layer["frames"][:1]:
+            lns, lpath = f.split(":", 1)
+            g_im = Image.open(os.path.join(ROOT, "..", lns, lpath)).convert("RGBA")
+            if g_im.size == im.size:
+                painted |= np.array(g_im)[..., 3] > 0
+    texels = int(painted.sum())
     return {"geo": g, "anims": anims, "info": {k: info.get(k) for k in ("scale", "idle", "ground", "parts", "poses", "actions", "name")},
             "texture": data_uri(info["texture"]), "layers": layers,
             "detail": {"cubes": cubes, "bones": len(g["bones"]), "texture": f"{im.size[0]}×{im.size[1]}", "texels": texels, "animations": len(anims)}}

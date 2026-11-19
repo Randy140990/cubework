@@ -66,7 +66,7 @@ class Mat:
     edge: how much darker the texels round each face's edge are (an outline, as hand-painted models have).
     """
 
-    def __init__(self, base, *layers, glow=None, shade=1.0, noise=0.03, flat=False, edge=0.07):
+    def __init__(self, base, *layers, glow=None, shade=1.0, noise=0.03, flat=False, edge=0.07, frames=False):
         self.base = rgb(base)
         self.layers = layers
         self.glow = glow
@@ -74,6 +74,9 @@ class Mat:
         self.noise = noise
         self.flat = flat
         self.edge = edge
+        # frames: glow is called with the frame too, glow(at, frame), and gives (colour, alpha) or None: something
+        # whose shape changes from frame to frame (a flame's tongues), drawn only in the glowing layer.
+        self.frames = frames
 
     def colour(self, at):
         c = self.base
@@ -111,12 +114,15 @@ class At:
 
 
 class Cube:
-    def __init__(self, origin, size, mat, rotation=None, pivot=None):
+    def __init__(self, origin, size, mat, rotation=None, pivot=None, seams=()):
         self.origin = [float(v) for v in origin]
         self.size = [int(round(v)) for v in size]
         self.mat = mat
         self.rotation = rotation
         self.pivot = pivot
+        # Edges that join on to another box of the same part, so they get no outline: (face, "r0" first row, "rl"
+        # last row, "c0" first column or "cl" last column).
+        self.seams = set(seams)
         self.uv = None
 
 
@@ -129,7 +135,7 @@ def mirror_cube(c):
     o, s = c.origin, c.size
     piv = None if c.pivot is None else [-c.pivot[0], c.pivot[1], c.pivot[2]]
     rot = None if c.rotation is None else [c.rotation[0], -c.rotation[1], -c.rotation[2]]
-    return Cube([-(o[0] + s[0]), o[1], o[2]], s, c.mat, rot, piv)
+    return Cube([-(o[0] + s[0]), o[1], o[2]], s, c.mat, rot, piv, c.seams)
 
 
 def blob(origin, size, mat, b=1, flat_bottom=False):
@@ -143,6 +149,17 @@ def blob(origin, size, mat, b=1, flat_bottom=False):
     return [Cube([x, y + yb, z + b], [w, h - b - yb, d - 2 * b], mat),
             Cube([x + b, y, z + b], [w - 2 * b, h, d - 2 * b], mat),
             Cube([x + b, y + yb, z], [w - 2 * b, h - b - yb, d], mat)]
+
+
+def face_blob(origin, size, mat, b=1):
+    """A head that's rounded at the top and back but has a flat face the full width across (for eyes on the front)."""
+    x, y, z = origin
+    w, h, d = [int(round(v)) for v in size]
+    # Three boxes that don't overlap (where two faces lie in the same place, they fight over which is drawn): the
+    # face and its sides, a band over the top, and a band round the back. The joins between them get no outline.
+    return [Cube([x, y, z], [w, h - b, d - b], mat, seams={("front", "r0"), ("top", "r0"), ("bottom", "r0")}),
+            Cube([x + b, y + h - b, z], [w - 2 * b, b, d - b], mat),
+            Cube([x + b, y, z + d - b], [w - 2 * b, h - b, b], mat, seams={("top", "rl"), ("bottom", "rl")})]
 
 
 class Model:
@@ -167,14 +184,26 @@ class Model:
         self.bone(left, pl, [-pivot[0], pivot[1], pivot[2]], [mirror_cube(c) for c in cubes], rot_l)
 
     def eyes(self, head, x_inner, y, z, w=2, h=3, iris="#3A2A20", pupil="#120D0A", skin="#888888", lash="#1A1414", shine="#FFFFFF",
-             iris_light=None, white=None, lid_line=None, side=False):
+             iris_light=None, white=None, lid_line=None, side=False, corner=None, grid=None, half=None):
         """Eyes, each with an eyelid that drops shut for a blink (the lid's height, its scale in y, goes from 0 to 1).
-        On the face: the right eye at -x, its inner edge x_inner from the middle, on the face at z.
-        side=True: on the sides of the head instead (as a bird's, a goat's or a tapir's), x_inner then being the head's
-        half-width and z where the eye begins at the front."""
-        em = eye_mat(w, h, iris, pupil, lash, shine, iris_light, white, side)
+        Front (the default): on the face at z, the right eye's inner edge x_inner from the middle.
+        side=True: on the sides of the head, x_inner being the head's half-width and z where the eye starts at the front.
+        corner=(wf, ws): round the corner of a flat face: wf columns on the face (at its outer edge, half being the head's
+        half-width), ws on the side; z is the face. grid: the eye's own drawing (rows of letters, inner side first)."""
+        if corner:
+            wf, ws = corner
+            hw = half if half is not None else x_inner
+            em_f = eye_mat(wf + ws, h, iris, pupil, lash, shine, iris_light, white, grid=grid, part=(0, wf), face="front")
+            em_s = eye_mat(wf + ws, h, iris, pupil, lash, shine, iris_light, white, grid=grid, part=(wf, ws), face="side")
+            lm = Mat(skin, lambda a: CLEAR if not outward(a) else (rgb(lid_line or lash) if a.row == a.fh - 1 else None), noise=0.01, shade=0.2, edge=0)
+            self.pair("eye_right", head, [-hw, y + h, z], [Cube([-hw, y, z - 0.01], [wf, h, 0], em_f), Cube([-hw - 0.01, y, z], [0, h, ws], em_s)])
+            self.pair("eyelid_right", "eye_right", [-hw, y + h, z], [Cube([-hw - 0.02, y, z - 0.03], [wf + 0.04, h, 0], lm),
+                                                                     Cube([-hw - 0.03, y, z - 0.02], [0, h, ws + 0.02], lm)])
+            return
+        em = eye_mat(w, h, iris, pupil, lash, shine, iris_light, white, side=side, grid=grid)
         lid_face = ("nx", "px") if side else ("front",)
-        lm = Mat(skin, lambda a: rgb(lid_line or lash) if a.face in lid_face and a.row == a.fh - 1 else None, noise=0.01, shade=0.2, edge=0)
+        lm = Mat(skin, lambda a: CLEAR if not outward(a) else (rgb(lid_line or lash) if a.face in lid_face and a.row == a.fh - 1 else None),
+                 noise=0.01, shade=0.2, edge=0)
         if side:
             xs = -x_inner
             self.pair("eye_right", head, [xs, y + h, z + w / 2], [Cube([xs - 0.01, y, z], [0, h, w], em)])
@@ -184,6 +213,10 @@ class Model:
         self.pair("eye_right", head, [xr + w / 2, y + h, z], [Cube([xr, y, z - 0.01], [w, h, 0], em)])
         self.pair("eyelid_right", "eye_right", [xr + w / 2, y + h, z], [Cube([xr, y, z - 0.03], [w, h, 0], lm)])
 
+    def brows(self, head, cubes):
+        """Brows over the eyes (cubes for the right one; the left is mirrored)."""
+        self.bone("brows", head, [0, 0, 0], list(cubes) + [mirror_cube(c) for c in cubes])
+
     def cubes(self):
         return [c for b in self.bones for c in b.cubes]
 
@@ -192,26 +225,60 @@ class Model:
 # L lash (the dark line along the top), W highlight, w a second small highlight, P pupil, I iris, J the iris's lit lower part,
 # E the white of the eye.
 EYES = {
-    (2, 2): ["WP", "PJ"],
-    (2, 3): ["WP", "PP", "JJ"],
-    (3, 3): ["WPP", "PPP", "JJw"],
-    (3, 4): ["WWP", "WPP", "PPP", "JJw"],
-    (4, 4): ["WWPP", "WPPP", "PPPP", "IJJw"],
-    (4, 5): ["LLLL", "WWPP", "WPPP", "PPPI", "IJJw"],
-    (5, 5): ["LLLLL", "EWWPP", "EWPPP", "EPPPI", "EIJJw"],
+    (2, 2): ["WP", "PI"],
+    (2, 3): ["LL", "WP", "PJ"],
+    (3, 2): ["WPI", "PJE"],
+    (3, 3): ["LLL", "WPI", "EJJ"],
+    (3, 4): ["LLL", "WPI", "PPI", "EJJ"],
+    (4, 3): ["LLLL", "EWPI", "EJJE"],
+    (4, 4): ["LLLL", "EWPI", "EPPI", "EEJE"],
+    (5, 4): ["LLLLL", "EWPPI", "EPPPI", "EEJJE"],
+    (5, 5): ["LLLLL", "EWWPI", "EWPPI", "EPPPJ", "EEJJE"],
 }
 
 
-def eye_mat(w, h, iris, pupil, lash, shine, iris_light=None, white=None, side=False):
+def outward(at):
+    """Whether this texel is on the face of a flat part (no depth, or no width) that looks out from the head, not the
+    face behind it. Both faces of a flat part sit in the same place, so the one behind is left clear: otherwise the
+    two fight over which is drawn."""
+    s = at.cube.size
+    if s[2] == 0:
+        return at.face == "front"
+    if s[0] == 0:
+        return at.face == ("nx" if at.cube.origin[0] < 0 else "px")
+    return True
+
+
+def eye_mat(w, h, iris, pupil, lash, shine, iris_light=None, white=None, side=False, grid=None, part=None, face=None):
+    """An eye's drawing on its flat part. part=(first column, columns) for an eye in two parts round a corner (the face
+    part's columns run inner to outer; the side part's carry on from front to back)."""
     I, P, L, S = rgb(iris), rgb(pupil), rgb(lash), rgb(shine)
     J = rgb(iris_light) if iris_light else mix(I, "#FFFFFF", 0.35)
     E = rgb(white) if white else rgb("#F4F1EA")
-    grid = EYES.get((w, h))
-    table = {"L": L, "W": S, "w": mix(S, I, 0.35), "P": P, "I": I, "J": J, "E": E}
+    grid = grid or EYES.get((w, h))
+    table = {"L": L, "W": S, "w": mix(S, I, 0.35), "P": P, "I": I, "J": J, "E": E, "K": mix(I, P, 0.5)}
 
     def f(at):
-        if side:
-            # On the side of the head: the highlight towards the front (the right eye's face is nx, column 0 at the front).
+        if not outward(at):
+            return CLEAR
+        if part is not None:
+            c0, n = part
+            if face == "front":
+                if at.face != "front":
+                    return None
+                right = at.cube.origin[0] < 0
+                # The right eye's face part: its inner side is towards +x (column 0 of the face is +x).
+                k = (n - 1 - at.col) if right else at.col
+                k = n - 1 - k
+            else:
+                if at.face == "nx":
+                    k = at.col
+                elif at.face == "px":
+                    k = at.fw - 1 - at.col
+                else:
+                    return None
+            k += c0
+        elif side:
             if at.face == "nx":
                 k = at.col
             elif at.face == "px":
@@ -221,9 +288,9 @@ def eye_mat(w, h, iris, pupil, lash, shine, iris_light=None, white=None, side=Fa
         else:
             if at.face != "front":
                 return None
-            inner_right = at.cube.origin[0] + w / 2 < 0  # the right eye: its inner side is towards +x, column 0 on the face
+            inner_right = at.cube.origin[0] + w / 2 < 0
             k = at.col if inner_right else (w - 1 - at.col)
-        if grid is None:
+        if grid is None or at.row >= len(grid) or k >= len(grid[at.row]):
             return I
         return table[grid[at.row][k]]
 
@@ -266,10 +333,12 @@ def shade_for(at, c):
         k = 0.78
     else:
         k = 0.9 + 0.14 * at.ly
-        if at.row == 0 and at.fh > 2:
+        if at.row == 0 and at.fh > 2 and (at.face, "r0") not in c.seams:
             k *= 1.05
     if m.edge and at.edge and at.fw > 2 and at.fh > 2:
-        k *= 1 - m.edge
+        on = [e for e, hit in (("r0", at.row == 0), ("rl", at.row == at.fh - 1), ("c0", at.col == 0), ("cl", at.col == at.fw - 1)) if hit]
+        if not all((at.face, e) in c.seams for e in on):
+            k *= 1 - m.edge
     return 1 + (k - 1) * m.shade
 
 
@@ -301,7 +370,10 @@ def pack(cubes):
     return W, Hp
 
 
-def paint(cubes, tex_w, tex_h, frames=4):
+FRAMES = 6
+
+
+def paint(cubes, tex_w, tex_h, frames=FRAMES):
     """The texture, and the glowing layer's frames (or None)."""
     img = np.zeros((tex_h, tex_w, 4), np.uint8)
     glows = [np.zeros((tex_h, tex_w, 4), np.uint8) for _ in range(frames)]
@@ -312,6 +384,16 @@ def paint(cubes, tex_w, tex_h, frames=4):
                 for col in range(fw):
                     x, y, z = texel_point(c, face, col, row)
                     at = At(x, y, z, face, c, col, row, fw, fh)
+                    if c.mat.frames:
+                        for fi in range(frames):
+                            g = c.mat.glow(at, fi)
+                            if g is None:
+                                continue
+                            any_glow = True
+                            col_rgb, alpha = g
+                            glows[fi][v + row, u + col, :3] = np.clip(rgb(col_rgb), 0, 255).astype(np.uint8)
+                            glows[fi][v + row, u + col, 3] = int(max(0, min(255, alpha)))
+                        continue
                     base = c.mat.colour(at)
                     if base is None:
                         continue
@@ -329,6 +411,94 @@ def paint(cubes, tex_w, tex_h, frames=4):
                                 glows[fi][v + row, u + col, :3] = np.clip(g * (0.9 + 0.1 * flick), 0, 255).astype(np.uint8)
                                 glows[fi][v + row, u + col, 3] = int(255 * min(1, 0.55 + 0.45 * flick))
     return img, (glows if any_glow else None)
+
+
+def flame_shape(at, fi, frames=FRAMES, heat=1.0):
+    """A flame on a flat part, frame by frame: tongues that lick up and sway, white-hot in the core, yellow, then orange,
+    red at the edges and the tips. Gives (colour, alpha) or None (no flame there)."""
+    c = at.cube
+    if c.size[2] == 0:
+        u = at.lx
+    elif c.size[0] == 0:
+        u = at.lz
+    else:
+        return None
+    v = at.ly
+    ph = fi / frames * 2 * math.pi
+    seed = (c.origin[0] * 1.7 + c.origin[2] * 2.3) % 6.28
+    centre = 0.5 + 0.07 * math.sin(ph + v * 4.0 + seed)
+    hw = 0.5 * (1 - v ** 1.25) * (1 + 0.14 * math.sin(ph * 2 + v * 9 + seed))
+    if v > 0.45:
+        # Tongues: the top splits into licks that rise and fall from frame to frame.
+        lick = abs(math.sin((u - centre) * math.pi * 2.6 + ph + seed))
+        hw *= 0.55 + 0.45 * lick
+        if v > 0.82 and lick < 0.55:
+            return None
+    d = abs(u - centre)
+    if d > hw or hw <= 0.01:
+        return None
+    k = d / hw
+    t = (1 - v * 0.85) * (1 - k * 0.7) * heat
+    col = ramp(["#7A140C", "#D2301A", "#F26A1E", "#FFA436", "#FFD95A", "#FFF7D0"], t)
+    alpha = 255 if k < 0.6 else 255 - (k - 0.6) * 260
+    return col, alpha
+
+
+def flame_mat(heat=1.0):
+    """A see-through flat part that only shows its flame, glowing, in the glowing layer."""
+    return Mat("#FF8A2A", lambda a: CLEAR, glow=lambda a, fi: flame_shape(a, fi, heat=heat), frames=True, noise=0, edge=0)
+
+
+def flame(origin, w, h, mat=None, planes=3, heat=1.0):
+    """A flame standing up from origin (its base's middle): crossed flat parts (three, at 60 degrees to each other, so it
+    looks full from every side), w wide and h tall."""
+    mat = mat or flame_mat(heat)
+    x, y, z = origin
+    out = []
+    for i in range(planes):
+        out.append(Cube([x - w / 2, y, z], [w, h, 0], mat, [0, i * 180 / planes, 0], [x, y, z]))
+    return out
+
+
+def water_shape(at, fi, frames=FRAMES):
+    """A jet of water on a flat part lying along z (its trunk end at the part's back, +z), frame by frame: a cone that
+    widens away from the trunk, white at its heart and pale blue at its edges, its streaks flowing outward and
+    breaking into drops towards the end. Gives (colour, alpha) or None."""
+    c = at.cube
+    if c.size[1] == 0:
+        u = at.lx
+    elif c.size[0] == 0:
+        u = at.ly
+    else:
+        return None
+    t = 1 - at.lz  # 0 at the trunk, 1 at the far end
+    hw = 0.14 + 0.36 * t ** 0.8
+    d = abs(u - 0.5)
+    if d > hw:
+        return None
+    k = d / hw
+    lane = round(u * 9)
+    flow = (t * 2.2 - fi / frames + hash01("lane", lane) * 0.7) % 1.0
+    if t > 0.3 and flow < 0.12 + 0.3 * t * k:
+        return None
+    if t > 0.72 and hash01("drop", lane, round(t * 12), fi) < (t - 0.72) * 2.4:
+        return None
+    col = mix("#FFFFFF", "#6FCFF2", min(1.0, k * 0.9 + t * 0.35))
+    alpha = (235 if k < 0.45 else 235 - (k - 0.45) * 220) * (1 - max(0.0, t - 0.8) * 2.5)
+    return col, max(60, alpha)
+
+
+def water_mat():
+    """A see-through flat part that only shows its water, in the glowing layer (so it looks wet and bright)."""
+    return Mat("#BDEBFA", lambda a: CLEAR, glow=lambda a, fi: water_shape(a, fi), frames=True, noise=0, edge=0)
+
+
+def jet(tip, length, w, planes=3):
+    """A jet of water shooting out from tip (a trunk's end) towards -z: crossed flat parts round its line, so it looks
+    full from every side, length long and w across at its widest."""
+    x, y, z = tip
+    mat = water_mat()
+    return [Cube([x - w / 2, y, z - length], [w, 0, length], mat, [0, 0, i * 180 / planes], [x, y, z]) for i in range(planes)]
 
 
 # ---------- animations (Molang) ----------
@@ -416,7 +586,7 @@ def write(sid, name, model, anims, info, stands):
         for i, gimg in enumerate(glows):
             Image.fromarray(gimg, "RGBA").save(os.path.join(OUT_TEX, f"{sid}_glow_{i}.png"))
             frames.append(f"retromon:textures/mons/{sid}_glow_{i}.png")
-        layers.append({"frames": frames, "fps": 8, "emissive": True, "translucent": True})
+        layers.append({"frames": frames, "fps": 10, "emissive": True, "translucent": True})
     top = 0.0
     out_bones = []
     for b in model.bones:

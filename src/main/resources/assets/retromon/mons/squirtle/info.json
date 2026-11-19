@@ -14,7 +14,21 @@
  "scale": 0.795,
  "height": 0.906,
  "texture": "retromon:textures/mons/squirtle.png",
- "layers": [],
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/squirtle_glow_0.png",
+    "retromon:textures/mons/squirtle_glow_1.png",
+    "retromon:textures/mons/squirtle_glow_2.png",
+    "retromon:textures/mons/squirtle_glow_3.png",
+    "retromon:textures/mons/squirtle_glow_4.png",
+    "retromon:textures/mons/squirtle_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
  "name": "TIDAPIR",
  "parts": []
 }

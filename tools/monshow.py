@@ -85,11 +85,13 @@ class Creature:
         tex_id = tex_override or self.info.get("texture")
         ns, path = tex_id.split(":", 1)
         self.tex = np.array(Image.open(os.path.join(ROOT, "..", ns, path)).convert("RGBA")).astype(np.float32)
-        self.glow = []
+        self.glow = []  # each glow layer's frames, with its frames per second
         for layer in self.info.get("layers", []):
-            for fr in layer["frames"][:1]:
+            frames = []
+            for fr in layer["frames"]:
                 ns, path = fr.split(":", 1)
-                self.glow.append(np.array(Image.open(os.path.join(ROOT, "..", ns, path)).convert("RGBA")).astype(np.float32))
+                frames.append(np.array(Image.open(os.path.join(ROOT, "..", ns, path)).convert("RGBA")).astype(np.float32))
+            self.glow.append((frames, layer.get("fps", 10)))
         self.name = self.info.get("name", sid.upper())
 
     def anim_for(self, pose):
@@ -125,7 +127,7 @@ def render(cr, t, size, pose="idle", action=None, action_t=0.0, yaw=-30, pitch=1
     depth = np.full((N, N), -1e9, np.float32)
     light = np.array([-0.5, -0.7, 0.55])
     light /= np.linalg.norm(light)
-    texes = [(cr.tex, False)] + [(g, True) for g in cr.glow]
+    texes = [(cr.tex, False)] + [(fr[int(t * fps) % len(fr)], True) for fr, fps in cr.glow]
     for P, uvs in proj:
         S = np.empty((4, 3))
         S[:, 0] = (P[:, 0] - cx) * scale + N / 2
@@ -178,11 +180,18 @@ def render(cr, t, size, pose="idle", action=None, action_t=0.0, yaw=-30, pitch=1
                     c2[:, 3] = 255
                     sub_i[ok] = c2
                 else:
+                    # Glow over the part, or on its own where the part is clear (a flame): see-through at its edges,
+                    # solid enough to hide what's behind it at its heart.
                     ok = inside & (col[..., 3] > 10) & (z >= sub_d - 1e-4)
                     if not ok.any():
                         continue
                     al = col[ok][:, 3:4] / 255.0
-                    sub_i[ok, :3] = sub_i[ok, :3] * (1 - al * 0.85) + col[ok][:, :3] * al * 0.85 + col[ok][:, :3] * al * 0.25
+                    empty = sub_i[ok, 3:4] < 1
+                    lit = sub_i[ok, :3] * (1 - al * 0.85) + col[ok][:, :3] * al * 0.85 + col[ok][:, :3] * al * 0.25
+                    sub_i[ok, :3] = np.where(empty, np.minimum(255, col[ok][:, :3] * 1.1), lit)
+                    sub_i[ok, 3] = np.maximum(sub_i[ok, 3], al[:, 0] * 255)
+                    solid = ok & (col[..., 3] > 140)
+                    sub_d[solid] = np.maximum(sub_d[solid], z[solid])
     out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGBA").resize((size, size), Image.Resampling.LANCZOS)
     return out, frame
 
