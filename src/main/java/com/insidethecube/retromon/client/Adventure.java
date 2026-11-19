@@ -130,7 +130,8 @@ public final class Adventure {
 		// Across the ground it follows you exactly; up and down (steps, slabs) it eases, so it doesn't bob.
 		if (Double.isNaN(smoothY) || Math.abs(smoothY - p.y) > 6) smoothY = p.y;
 		smoothY += (p.y - smoothY) * 0.08;
-		follow = new Vec3(p.x, smoothY + 0.9, p.z);
+		Vec3 you = new Vec3(p.x, smoothY + 0.9, p.z);
+		follow = you;
 		// Inside a building the camera holds still on the whole room (as the Interior Viewer shows it), not on you.
 		com.insidethecube.retromon.game.Interiors.Room room = com.insidethecube.retromon.game.Interiors.roomOf(e);
 		if (room != null) follow = new Vec3(room.cx(), room.oy() + 0.9, room.cz());
@@ -138,7 +139,7 @@ public final class Adventure {
 		Entity other = focusId >= 0 && e.level() != null ? e.level().getEntity(focusId) : null;
 		focusIn += ((other != null ? 1 : 0) - focusIn) * 0.12;
 		Vec3 centre = follow;
-		if (other != null) centre = follow.lerp(other.getPosition(partial).add(0, 0.9, 0), 0.5);
+		if (other != null) centre = you.lerp(other.getPosition(partial).add(0, 0.9, 0), 0.5);
 		else focusId = -1;
 		Vec3 target = follow.lerp(centre, focusIn);
 		// Closing in only as far as the view stays clear: if the closer, lower camera would be inside a roof

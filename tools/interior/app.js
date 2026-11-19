@@ -4,7 +4,8 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x000000);
-const camera = new THREE.PerspectiveCamera(32, 16 / 10, 0.1, 400);
+// The game's own camera (Adventure.java): field of view 34, looking down at 52 degrees, north up.
+const camera = new THREE.PerspectiveCamera(34, 16 / 10, 0.1, 400);
 const hemi = new THREE.HemisphereLight(0xfff6e8, 0x8a7f74, 0.62); scene.add(hemi);
 const ambient = new THREE.AmbientLight(0xffffff, 0.12); scene.add(ambient);
 const sun = new THREE.DirectionalLight(0xffffff, 0.6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
@@ -83,11 +84,33 @@ function prepareRoom(r) {
 }
 
 // ---------- the camera: always facing north, looking down; the whole room, or following you ----------
-const PITCH = 55 * D2R;
-const cam = { mode: "room", tx: 8, tz: 7, ty: 0, dist: 30, fit: null };
-const scratch = new THREE.PerspectiveCamera(32, 1.6, 0.1, 400), ndc = new THREE.Vector3();
-function placeCam(c, tx, ty, tz, d) { c.position.set(tx, ty + Math.sin(PITCH) * d, tz + Math.cos(PITCH) * d); c.lookAt(tx, ty, tz); c.updateMatrixWorld(true); }
+const PITCH = 52 * D2R, TALK_PITCH = 40 * D2R;
+const cam = { mode: "room", tx: 8, tz: 7, ty: 0, dist: 30, fit: null, pitch: PITCH };
+const scratch = new THREE.PerspectiveCamera(34, 1.6, 0.1, 400), ndc = new THREE.Vector3();
+function placeCam(c, tx, ty, tz, d, pitch = PITCH) { c.position.set(tx, ty + Math.sin(pitch) * d, tz + Math.cos(pitch) * d); c.lookAt(tx, ty, tz); c.updateMatrixWorld(true); }
+// As the mod frames a room (tools/interior/export/tomod.py, fit_camera): every corner inside 90% of a 16:9 screen.
+function fitGame(r) {
+  const t = Math.tan(17 * D2R), aspect = 16 / 9, p = PITCH;
+  const corners = []; for (const x of [-0.4, r.W + 0.4]) for (const y of [0, r.H]) for (const z of [-0.4, r.D + 0.3]) corners.push([x, y, z]);
+  const fits = (tz, dist) => {
+    const cx = r.W / 2, cy = 0.9, cam = [cx, cy + Math.sin(p) * dist, tz + Math.cos(p) * dist], fwd = [0, -Math.sin(p), -Math.cos(p)], up = [0, Math.cos(p), -Math.sin(p)];
+    for (const [x, y, z] of corners) {
+      const d = [x - cam[0], y - cam[1], z - cam[2]], depth = d[1] * fwd[1] + d[2] * fwd[2];
+      const sx = d[0] / (depth * t * aspect), sy = (d[1] * up[1] + d[2] * up[2]) / (depth * t);
+      if (Math.abs(sx) > 0.9 || Math.abs(sy) > 0.9) return false;
+    }
+    return true;
+  };
+  let best = null;
+  for (let i = 0; i <= 40; i++) {
+    const tz = r.D * (0.3 + 0.5 * i / 40); let a = 8, b = 80;
+    for (let k = 0; k < 40; k++) { const m = (a + b) / 2; if (fits(tz, m)) b = m; else a = m; }
+    if (!best || b < best.d) best = { tz, d: b };
+  }
+  return best;
+}
 function fitRoom(r) {
+  if (!r.outside) return fitGame(r);
   const H = r.outside ? 5.5 : r.H, pts = [[0, 0, 0], [r.W, 0, 0], [0, 0, r.D], [r.W, 0, r.D], [0, H, 0], [r.W, H, 0], [0, r.outside ? 0 : H, r.D], [r.W, r.outside ? 0 : H, r.D]].map(p => V(...p));
   scratch.aspect = camera.aspect; scratch.updateProjectionMatrix();
   const fits = (tz, d) => { placeCam(scratch, r.W / 2, 0, tz, d); for (const p of pts) { ndc.copy(p).project(scratch); if (Math.abs(ndc.x) > 0.95 || ndc.y > 0.86 || ndc.y < -0.94 || ndc.z > 1) return false; } return true; };
@@ -98,10 +121,13 @@ function fitRoom(r) {
   }
   return best;
 }
+// Talking to someone: as in the mod, the camera eases in on the two of you, 13 blocks back and 40 degrees down.
+let focus = null;
 function camGoal() {
-  if (cam.mode === "room" && cam.fit) return { x: room.W / 2, y: 0, z: cam.fit.tz, d: cam.fit.d };
+  if (focus) return { x: (me.x + focus.x) / 2, y: 0.9, z: (me.z + focus.z) / 2, d: 13, p: TALK_PITCH };
+  if (cam.mode === "room" && cam.fit) return { x: room.W / 2, y: room.outside ? 0 : 0.9, z: cam.fit.tz, d: cam.fit.d, p: PITCH };
   const d = room.outside ? 15 : 11.5, m = room.outside ? 6 : 4;
-  return { x: Math.max(Math.min(m, room.W / 2), Math.min(room.W - Math.min(m, room.W / 2), me.x)), y: me.y * 0.6, z: Math.max(2, Math.min(room.D - 2.5, me.z - 0.6)), d };
+  return { x: Math.max(Math.min(m, room.W / 2), Math.min(room.W - Math.min(m, room.W / 2), me.x)), y: me.y * 0.6, z: Math.max(2, Math.min(room.D - 2.5, me.z - 0.6)), d, p: PITCH };
 }
 
 // ---------- going places ----------
@@ -124,7 +150,7 @@ function switchRoom(id, spawn) {
   $("#placeName").textContent = room.name; $("#placeFloor").textContent = room.floor;
   closeTalk(); renderPanel();
 }
-function snapCam() { const g = camGoal(); cam.tx = g.x; cam.ty = g.y; cam.tz = g.z; cam.dist = g.d; placeCam(camera, cam.tx, cam.ty, cam.tz, cam.dist); }
+function snapCam() { const g = camGoal(); cam.tx = g.x; cam.ty = g.y; cam.tz = g.z; cam.dist = g.d; cam.pitch = g.p; placeCam(camera, cam.tx, cam.ty, cam.tz, cam.dist, cam.pitch); }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function tween(ms, fn) { return new Promise(res => { const t0 = performance.now(); const step = now => { const k = Math.min(1, (now - t0) / ms); fn(k); if (k < 1) requestAnimationFrame(step); else res(); }; requestAnimationFrame(step); }); }
 const fadeEl = $("#fade"), irisEl = $("#iris");
@@ -187,9 +213,9 @@ async function doAct(a) {
   busy = true;
   if (a.npc) {
     const n = a.npc, lines = n.talk(fol.size);
-    n.talking = true;
+    n.talking = true; focus = { x: n.x, z: n.z };
     await say(lines.map(l => ({ who: n.name, text: l.text })));
-    n.talking = false;
+    n.talking = false; focus = null;
   } else if (a.follower) {
     const nm = nameOf(fol.sid), big = fol.size.h > 3.4, tiny = fol.size.h < 0.6;
     const line = big ? `${nm.toUpperCase()} is squeezed in, but it looks happy to be here.` : tiny ? `${nm.toUpperCase()} looks up at you and wiggles.` : `${nm.toUpperCase()} is happy to be following you around.`;
@@ -386,8 +412,11 @@ function tickFrame(now) {
     if (room.bag) { room.bag.t += dt; room.bag.swing *= Math.exp(-dt * 1.4); room.bag.grp.rotation.x = -Math.sin(room.bag.t * 5.2) * 0.42 * room.bag.swing; }
     for (const n of room.npcs) { if (!n.fig) continue; const want = n.talking ? Math.atan2(-(me.x - n.x), -(me.z - n.z)) - n.yaw : 0; let d = Math.atan2(Math.sin(want), Math.cos(want)); d = Math.max(-1.1, Math.min(1.1, d)); n.headYaw = (n.headYaw || 0) + (d - (n.headYaw || 0)) * Math.min(1, dt * 6); poseFigure(n.fig, { seated: n.seated, headYaw: n.headYaw, talk: n.talking }); }
     const g = camGoal(), k = Math.min(1, dt * 5);
-    cam.tx += (g.x - cam.tx) * k; cam.ty += (g.y - cam.ty) * k; cam.tz += (g.z - cam.tz) * k; cam.dist += (g.d - cam.dist) * k;
-    placeCam(camera, cam.tx, cam.ty, cam.tz, cam.dist);
+    const kk = focus || cam.pitch !== PITCH ? Math.min(1, dt * 3) : k;
+    cam.tx += (g.x - cam.tx) * kk; cam.ty += (g.y - cam.ty) * kk; cam.tz += (g.z - cam.tz) * kk; cam.dist += (g.d - cam.dist) * kk; cam.pitch += (g.p - cam.pitch) * kk;
+    if (Math.abs(cam.pitch - g.p) < 1e-4) cam.pitch = g.p;
+    placeCam(camera, cam.tx, cam.ty, cam.tz, cam.dist, cam.pitch);
+    viewerEl.classList.toggle("cine", !!talk);
     updateTags();
   }
   renderer.render(scene, camera);
@@ -428,7 +457,7 @@ function renderPanel() {
   const size = room.outside ? `${room.W} by ${room.D} blocks` : `${room.W} by ${room.D} blocks`;
   const facts = [["Floor", size], room.outside ? ["Houses", "8 by 6 outside"] : ["Walls", `${room.H} blocks high`]];
   if (room.outsideSize) facts.push(["From outside", room.outsideSize + " blocks"]);
-  facts.push(["Camera", cam.mode === "room" ? "Facing north, whole room" : "Facing north, following"]);
+  facts.push(["Camera", cam.mode === "room" ? "The game's: north up, 52° down, held on the room" : "Close up, following you"]);
   let follower = `<p class="note">No follower. Pick any creature above.</p>`;
   if (d && fol.size) {
     const h = fol.size.h, ride = canRide();

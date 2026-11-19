@@ -46,12 +46,13 @@ function playOnce(st, key) { const an = animFor(st.m, key); if (an) { st.once = 
 function tickMon(st, dt) {
   if (!st) return;
   st.t += dt;
-  const mv = st.base === "walk" ? moveAnim(st.m) : null;
+  const mv = st.base === "walk" ? moveAnim(st.m) : st.base === "fly" ? flyAnim(st.m) : null;
   const base = mv ? mv.an : st.base === "ground" ? groundIdle(st.m) : (animFor(st.m, "idle") || groundIdle(st.m));
   let list = [[base, st.t]];
   if (st.once) { st.ot += dt; if (st.ot > (st.once.len || 1) + 0.05) { st.once = null; } else list = [[st.once, st.ot]]; }
   setParts(st.m, mv ? mv.key : null); pose(st.m, list);
 }
+function flyAnim(model) { const p = model.info.poses || {}; for (const k of ["fly", "hover", "walk"]) if (p[k] && model.anims[p[k].anim]) return { an: model.anims[p[k].anim], key: k }; return null; }
 function disc(r, color, y = 0.01, op = 1) { const m = new THREE.Mesh(new THREE.CircleGeometry(r, 48), new THREE.MeshLambertMaterial({ color, transparent: op < 1, opacity: op })); m.rotation.x = -Math.PI / 2; m.position.y = y; m.receiveShadow = true; return m; }
 function blob(r) { const m = new THREE.Mesh(new THREE.PlaneGeometry(r, r), matFor("shadowBlob")); m.rotation.x = -Math.PI / 2; m.position.y = 0.02; m.renderOrder = 3; return m; }
 function figureOf(look) { const f = makeFigure(look); poseFigure(f, {}); return f; }
@@ -95,8 +96,9 @@ const SCENES = {
     const SPOTS = [["pikachu", -0.85, 0.95, 0.35], ["cubone", -1.8, 0.35, 0.55], ["oddish", 0.55, 1.35, -0.1], ["clefairy", -1.3, 1.55, 0.2], ["pidgey", -1.45, -0.55, 0.4, 1.55]];
     SPOTS.forEach(([sid, x, z, turn, fly]) => mon(sid).then(st => { st.base = "ground"; st.home = [x, z, turn, fly || 0]; group.add(st.m.holder); S.runners.push(st); placeMon(st, x, z, Math.PI + turn, fly || 0); }));
     S.nextCry = 2;
+    S.hop = () => { if (S.hopT == null) { S.hopT = 0; const r = S.runners.find(q => q.sid === "pikachu"); if (r) playOnce(r, "cry"); } };
     S.enter = o => {
-      S.mode = o.mode || "intro";
+      S.mode = o.mode || "intro"; S.hopT = null;
       rival.root.visible = S.mode === "rival";
       const k = JSON.stringify(G.look);
       if (S.mode === "you") { if (k !== lookKey || !you) { if (you) group.remove(you.root); you = figureOf(G.look); you.root.position.set(1.45, 0, 0.45); you.root.rotation.y = Math.PI - 0.25; group.add(you.root); lookKey = k; } you.root.visible = true; }
@@ -111,17 +113,42 @@ const SCENES = {
       if (you && you.root.visible) poseFigure(you, { wave: S.youWave || 0 });
       S.nextCry -= dt;
       if (S.nextCry < 0 && S.runners.length) { const r = S.runners[Math.floor(Math.random() * S.runners.length)]; playOnce(r, "cry"); S.nextCry = 2.5 + Math.random() * 2.5; }
-      for (const r of S.runners) { const [x, z, turn, fly] = r.home; placeMon(r, x, z, Math.PI + turn + Math.sin(t * 0.4 + x) * 0.15, fly ? fly + Math.sin(t * 2.2) * 0.12 : 0); if (fly) r.base = "walk"; tickMon(r, dt); }
+      for (const r of S.runners) {
+        const [x, z, turn, fly] = r.home;
+        if (r.sid === "cubone") {
+          // Wandering round in a slow loop, facing the way it goes.
+          const a = t * 0.45, wx = -1.25 + Math.cos(a) * 0.95, wz = 0.85 + Math.sin(a) * 0.45;
+          placeMon(r, wx, wz, Math.atan2(Math.sin(a) * 0.95, -Math.cos(a) * 0.45) + Math.PI); r.base = "walk";
+        } else if (r.sid === "pikachu" && S.hopT != null) {
+          // Up onto his shoulder in a little arc, then riding there.
+          S.hopT = Math.min(1, S.hopT + dt / 0.75); const k = S.hopT, e = k * k * (3 - 2 * k);
+          const hx = x + (0.3 - x) * e, hz = z + (0.02 - z) * e, hy = 1.4 * e + Math.sin(Math.PI * k) * 0.9;
+          placeMon(r, hx, hz, Math.PI + turn * (1 - e) + Math.sin(t * 0.5) * 0.1 * e, hy); r.base = k < 1 ? "walk" : "ground";
+        } else { placeMon(r, x, z, Math.PI + turn + Math.sin(t * 0.4 + x) * 0.15, fly ? fly + Math.sin(t * 2.2) * 0.12 : 0); if (fly) r.base = "fly"; }
+        tickMon(r, dt);
+      }
     };
     return S;
   },
   // The title: a few of our creatures, drawn as pixel art (the scene is rendered small and blown up).
   title() {
-    const group = new THREE.Group(), S = { group, mons: [] };
-    const hill = new THREE.Mesh(new THREE.CylinderGeometry(3.0, 3.4, 0.6, 40), new THREE.MeshLambertMaterial({ color: 0x7CC46A })); hill.position.y = -0.3; hill.receiveShadow = true; group.add(hill);
-    [["charmander", -1.35, 0.1, 0.45], ["pikachu", 0, 0.9, 0.0], ["bulbasaur", 1.35, 0.1, -0.45], ["squirtle", 0.1, -1.0, -0.1]].forEach(([sid, x, z, turn]) => mon(sid).then(st => { st.base = "ground"; group.add(st.m.holder); placeMon(st, x, z, Math.PI + turn); S.mons.push(st); }));
-    S.enter = () => { lightFor(0, 0, 6, 14); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); look3(0, 1.55, 5.6, 0, 0.95, 0); };
-    S.tick = (dt, t) => { for (const m of S.mons) tickMon(m, dt); };
+    const group = new THREE.Group(), S = { group, mons: [], clouds: [] }, night = LOOK === "theirs";
+    const box = (w, h, d, c, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: c })); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; group.add(m); return m; };
+    if (night) {
+      // The old title: Charizard, alone, against the night sky.
+      mon("charizard").then(st => { st.base = "ground"; group.add(st.m.holder); placeMon(st, 0, 0, Math.PI - 0.3, -0.2); S.mons.push(st); });
+      S.enter = () => { lightFor(-2, 3, 4, 10); hemi3.color.set(0x9fb6ff); hemi3.groundColor.set(0x1a2244); look3(0, 1.4, 6.2, 0, 1.0, 0); };
+    } else {
+      // A blocky hill, a few trees and clouds, and our creatures on top.
+      box(7.2, 0.6, 3.6, 0x6DB85B, 0, -0.3, 0); box(5.0, 0.6, 2.6, 0x7CC46A, 0, -0.02, -0.1); box(7.4, 0.12, 3.8, 0x8A6A44, 0, -0.66, 0);
+      for (const [x, z, s] of [[-3.0, -1.4, 1.0], [3.1, -1.2, 1.15], [-3.6, 0.6, 0.85], [3.7, 0.4, 0.9]]) {
+        box(0.3 * s, 1.2 * s, 0.3 * s, 0x7A5030, x, 0.6 * s - 0.3, z); box(1.3 * s, 1.0 * s, 1.3 * s, 0x3F8E3E, x, 1.4 * s - 0.3, z); box(0.8 * s, 0.6 * s, 0.8 * s, 0x4FA04C, x, 2.05 * s - 0.3, z);
+      }
+      for (const [x, y, z, w] of [[-3.2, 3.6, -6, 2.2], [1.8, 4.2, -7, 3.0], [4.6, 3.3, -5.5, 1.6], [-0.8, 4.6, -8, 1.8]]) { const c = box(w, 0.5, 0.9, 0xFFFFFF, x, y, z); box(w * 0.55, 0.35, 0.8, 0xFFFFFF, x + w * 0.1, y + 0.4, z); S.clouds.push(c); }
+      [["charmander", -1.35, 0.1, 0.45], ["pikachu", 0, 0.75, 0.0], ["bulbasaur", 1.35, 0.1, -0.45], ["squirtle", 0.1, -0.85, -0.1]].forEach(([sid, x, z, turn]) => mon(sid).then(st => { st.base = "ground"; group.add(st.m.holder); placeMon(st, x, z, Math.PI + turn, 0.28); S.mons.push(st); }));
+      S.enter = () => { lightFor(0, 0, 6, 14); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); look3(0, 1.55, 5.9, 0, 1.0, 0); };
+    }
+    S.tick = (dt, t) => { for (const m of S.mons) tickMon(m, dt); S.clouds.forEach((c, i) => { c.position.x += dt * 0.12 * (1 + i * 0.3); if (c.position.x > 7) c.position.x = -7; }); };
     return S;
   },
   // Everyone of a kind, side by side on a stage: the one you pick steps forward and waves, with their partner behind.

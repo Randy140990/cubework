@@ -37,6 +37,10 @@ const extras = new THREE.Group(); extras.visible = false; scene.add(extras);
 let youFig = null;
 
 // ---------- who's who ----------
+// The story's named roles wear looks we designed ourselves (tools/skins2.py).
+const OWN_LOOK = new Set(["oak", "blue", "red", "nurse", "officer_jenny", "jessie", "james", "giovanni", "rocket", "rocket_f", "rocket_scientist", "leader_brock", "leader_misty",
+  "leader_lt_surge", "leader_erika", "leader_koga", "leader_sabrina", "leader_blaine", "leader_giovanni", "lorelei", "bruno", "agatha", "lance", "bill", "mr_fuji", "copycat",
+  "mr_psychic", "fan_club_chairman", "name_rater", "day_care_man", "old_man", "fishing_guru", "silph_president", "captain", "warden", "museum_guide"]);
 const ALL = PEOPLE.map((p, i) => ({ id: "P-" + String(i + 1).padStart(3, "0"), group: p[0], kind: p[1], spec: p[2], name: p[3], who: p[4], where: p[5], team: p[6] }));
 const GROUP_NAME = Object.fromEntries(GROUPS.map(g => [g[0], g[1]]));
 const specOf = s => typeof s === "string" ? { skin: s } : { outfit: OUTFIT.defaults(s.outfit === "girl") };
@@ -67,9 +71,10 @@ const title = s => String(s).replace(/_/g, " ").toLowerCase().replace(/(^|\s)\w/
 function renderPanel(p) {
   const team = p.team.map(sid => { const n = NAMES[sid]; return n ? `<span>${esc(n[0])} <small>for ${esc(n[1])}</small></span>` : `<span>${esc(title(sid))} <small>(not built yet)</small></span>`; }).join("");
   $("#panel").innerHTML = `
-    <div class="chips"><span class="chip">${p.id}</span><span class="chip ${p.kind === "U" ? "u" : ""}">${p.kind === "U" ? "Unique" : "Generic"}</span><span class="chip">${esc(GROUP_NAME[p.group])}</span></div>
+    <div class="chips"><span class="chip">${p.id}</span><span class="chip ${p.kind === "U" ? "u" : ""}">${p.kind === "U" ? "Unique" : "Generic"}</span><span class="chip">${esc(GROUP_NAME[p.group])}</span>${OWN_LOOK.has(p.spec) ? `<span class="chip">Our own look</span>` : ""}</div>
     <h2>${esc(p.name)}</h2>
     <div>${esc(p.who)}</div>
+    ${OWN_LOOK.has(p.spec) ? `<div class="note">A look of our own for this role, not the games' or the show's design. The name and lines stay as the games' for now.</div>` : ""}
     <div><div class="label">Where you meet them</div><div style="font-weight:700">${esc(p.where)}</div></div>
     ${p.team.length ? `<div><div class="label">Their team (from the old games)</div><div class="team" style="margin-top:6px">${team}</div></div>` : ""}
     <div><div class="label">Skin</div><div class="skinwrap" style="margin-top:6px"><canvas class="skin" id="skinCv" width="64" height="64" aria-label="The skin, flat"></canvas>

@@ -36,12 +36,18 @@ screen("splash", "Start", "Opening", {
 });
 screen("title", "Start", "Title screen", {
   scene: "title", pixel: 5,
-  what: "The title: RETROMON in one word, and a few of our own creatures drawn as pixel art, as the old title had its pixel Charizard. With the look set to Cobblemon (the switch under the screen), it reads POKéMON and the creatures are Cobblemon's.",
-  tags: ["New look"], mod: "IntroScreen shows RETROMON and PRESS START over the world.",
+  what: "The title. RETROMON look: the word built of little blocks, as Minecraft's own title is, over a blocky hill with clouds and trees and a few of our creatures, all drawn as pixel art. COBBLEMON look: the old title, the pixel Charizard against the night sky, reading POKéMON.",
+  tags: ["New look"], mod: "IntroScreen: the pixel Charizard against the night sky, RETROMON, PRESS START.",
   make() {
-    backdrop("linear-gradient(180deg,#7EC6EC 0%,#BFE6F7 52%,#E8F7FB 62%,#9ED68A 63%,#7CC46A 100%)");
-    add(h("div", "", `<div style="position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 0%, rgba(255,255,255,.16) 0 5deg, transparent 5deg 15deg)"></div>`));
-    box(0, 70, 1280, null, "", `<div style="text-align:center"><span class="g-title" style="display:inline-block;font-size:140px;line-height:1;letter-spacing:6px;color:#FFD45A;-webkit-text-stroke:7px #26304A;paint-order:stroke fill;text-shadow:0 10px 0 rgba(0,0,0,.25)">${LOOK === "theirs" ? "POKéMON" : "RETROMON"}</span></div>`);
+    const night = LOOK === "theirs";
+    if (night) {
+      backdrop("radial-gradient(ellipse at 50% 30%, #2A3F7A 0%, #142454 45%, #070D26 100%)");
+      add(h("div", "", `<div style="position:absolute;inset:0;background:radial-gradient(circle at 12% 18%,#fff 0 1.5px,transparent 2.5px),radial-gradient(circle at 78% 12%,#fff 0 2px,transparent 3px),radial-gradient(circle at 64% 34%,#cfe 0 1.5px,transparent 2.5px),radial-gradient(circle at 30% 42%,#fff 0 1px,transparent 2px),radial-gradient(circle at 88% 46%,#fff 0 1.5px,transparent 2.5px);background-size:320px 260px"></div><div style="position:absolute;right:120px;top:70px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#FFF8DC,#E8DDB0);box-shadow:0 0 40px rgba(255,248,220,.5)"></div>`));
+    } else {
+      backdrop("linear-gradient(180deg,#5FB0E8 0%,#9ED6F5 50%,#D6F0FB 64%,#9ED68A 64.2%,#6DB85B 100%)");
+      add(h("div", "", `<div style="position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 0%, rgba(255,255,255,.12) 0 5deg, transparent 5deg 15deg)"></div>`));
+    }
+    box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="${night ? "POKéMON" : "RETROMON"}" src="${wordmark(night ? "POKéMON" : "RETROMON", night ? { top: [255, 236, 120], bottom: [240, 170, 40], side: [40, 60, 140], line: [12, 18, 48] } : {})}" style="max-width:1080px;image-rendering:pixelated;filter:drop-shadow(0 10px 0 rgba(0,0,0,.18))"></div>`);
     box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#FFF4D8;color:#26304A;font-size:30px;letter-spacing:6px;box-shadow:0 6px 0 rgba(0,0,0,.18)">PRESS START</span></div>`);
     box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:#123C38;opacity:.8">INSID3 TH3 CUB3</div>`);
     box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:#123C38;opacity:.8">Version 0.21</div>`);
@@ -152,7 +158,7 @@ screen("keys", "Start", "Keys check", {
 // ===================== A new game =====================
 screen("prof", "A new game", "The professor", {
   scene: "prof", sceneOpts: () => ({ mode: "intro" }),
-  what: "The professor welcomes you, with Retromon creatures running round him in the light.",
+  what: "The professor welcomes you, with our creatures about him: one wanders round, the bird hovers flapping, and when he says some keep them as friends, the little yellow one jumps up onto his shoulder.",
   tags: ["Retromon creatures"], mod: "IntroScreen: Prof. Oak talks the whole time he's speaking.",
   try: ["A to go on."],
   make() {
@@ -163,7 +169,7 @@ screen("prof", "A new game", "The professor", {
     C.say([
       { who: "PROF. OAK", text: "Ah, there you are! Welcome. I'm OAK. Most people round here call me the POKéMON PROF." },
       { who: "PROF. OAK", text: "This world is full of creatures we call **POKéMON**. You'll find them in the grass, the sea, the caves, even in town." },
-      { who: "PROF. OAK", text: "Some people keep them as friends. Some raise them for battles. Me? I study them." },
+      { who: "PROF. OAK", text: "Some people keep them as friends. Some raise them for battles. Me? I study them.", on: () => S.hop && S.hop() },
       { who: "PROF. OAK", text: "But that's enough about me. First, tell me a little about yourself." },
     ]).then(() => { S.talking = false; if (C.alive()) go("creator"); });
     return { key: k => C.key(k) };

@@ -44,6 +44,10 @@ h1 span { color: var(--accent) }
 .viewer { position: relative; background: #000; border-radius: 18px; overflow: hidden; aspect-ratio: 16 / 10; min-height: 320px; max-width: 100%; box-shadow: var(--shadow); outline: none;
   user-select: none; -webkit-user-select: none; touch-action: none }
 @media (max-width: 640px) { .viewer { aspect-ratio: 4 / 5 } }
+/* The cutscene bars, as in the mod while someone's talking. */
+.cinebar { position: absolute; left: 0; right: 0; height: 0; background: #000; pointer-events: none; transition: height .45s ease; z-index: 2 }
+.cinebar.t { top: 0 } .cinebar.b { bottom: 0 }
+.viewer.cine .cinebar { height: 9% }
 .viewer canvas { display: block; width: 100%; height: 100%; touch-action: none }
 .place { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; border-radius: 999px;
   background: var(--g-panel-soft); border: 1.5px solid var(--g-edge); color: var(--g-text); font-family: Fredoka, system-ui, sans-serif; font-weight: 600; font-size: 15px;
@@ -117,7 +121,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 86
 <div class="wrap">
   <header>
     <h1>Retromon <span>Interior Viewer</span></h1>
-    <p class="lede">Walk the insides of Retromon's buildings with the camera the game uses: fixed, facing north, the near wall left off. Walls, floors and carpets are our own textures drawn at Minecraft's 16 pixels to a block, so what you see here is what goes in the game; you move as the game moves you (0.6 wide, 4.3 blocks a second, 5.6 running, steps up to 0.6) and A picks who to talk to the way the mod does. Pick any creature to follow you at its true size. Small ones can ride on your shoulder.</p>
+    <p class="lede">Walk the insides of Retromon's buildings with the camera the game uses inside (north up, 52° down, field of view 34, held on the whole room; it closes in with the black bars when someone talks), the near wall left off. Walls, floors and carpets are our own textures drawn at Minecraft's 16 pixels to a block, so what you see here is what goes in the game; you move as the game moves you (0.6 wide, 4.3 blocks a second, 5.6 running, steps up to 0.6) and A picks who to talk to the way the mod does. Pick any creature to follow you at its true size. Small ones can ride on your shoulder.</p>
   </header>
   <div class="top">
     <label class="pick"><span>Place</span><select id="roomPick" aria-label="Place"></select></label>
@@ -125,12 +129,12 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 86
     <div class="seg" id="meSeg" role="group" aria-label="You"><button data-v="ghost" aria-pressed="true">Ghost</button><button data-v="boy" aria-pressed="false">You (boy)</button><button data-v="girl" aria-pressed="false">You (girl)</button></div>
     <div class="seg" id="rideSeg" role="group" aria-label="Where it goes"><button data-v="walk" aria-pressed="true">Walks behind</button><button data-v="shoulder" aria-pressed="false" title="For creatures 1 block tall or less">On your shoulder</button></div>
     <div class="seg" id="lookSeg" role="group" aria-label="Look"><button data-v="ours" aria-pressed="true">Retromon</button><button data-v="theirs" aria-pressed="false">Cobblemon</button></div>
-    <div class="seg" id="camSeg" role="group" aria-label="Camera"><button data-v="room" aria-pressed="true">Whole room</button><button data-v="close" aria-pressed="false">Follow</button></div>
+    <div class="seg" id="camSeg" role="group" aria-label="Camera"><button data-v="room" aria-pressed="true">Game camera</button><button data-v="close" aria-pressed="false">Close up</button></div>
   </div>
   <div class="main">
     <div class="stick">
       <div class="viewer" id="viewer" tabindex="0" aria-label="The room. Use W A S D or the arrow keys to walk, E to look or talk.">
-        <canvas id="c"></canvas>
+        <div class="cinebar t"></div><div class="cinebar b"></div><canvas id="c"></canvas>
         <div id="tags"></div>
         <div class="place" id="place"><i></i><span id="placeName"></span><small id="placeFloor"></small></div>
         <div class="keys" id="keys"><span class="key"><b>WASD</b>Walk</span><span class="key"><b>Shift</b>Run</span><span class="key"><b>E</b>Look, talk</span></div>

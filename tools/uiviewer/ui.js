@@ -79,6 +79,40 @@ function portrait(sid) {
 // An <img> that fills in when the picture's ready.
 function pic(sid, size, extra = "") { const id = "p" + Math.random().toString(36).slice(2); portrait(sid).then(u => { const e = document.getElementById(id); if (e) e.src = u; }); return `<img id="${id}" alt="" style="width:${size}px;height:${size}px;image-rendering:auto;${extra}" src="${PORTRAIT[LOOK + ":" + sid] || "data:image/gif;base64,R0lGODlhAQABAAAAACw="}">`; }
 
+// ---------- the title's wordmark: letters built of little blocks, as Minecraft's own title is ----------
+const WM_GLYPHS = {
+  R: ["11111.", "11..11", "11..11", "11111.", "11.11.", "11..11", "11..11"], E: ["111111", "11....", "11....", "11111.", "11....", "11....", "111111"],
+  T: ["111111", "..11..", "..11..", "..11..", "..11..", "..11..", "..11.."], O: [".1111.", "11..11", "11..11", "11..11", "11..11", "11..11", ".1111."],
+  M: ["11...11", "111.111", "1111111", "11.1.11", "11...11", "11...11", "11...11"], N: ["11...11", "111..11", "1111.11", "11.1111", "11..111", "11...11", "11...11"],
+  P: ["11111.", "11..11", "11..11", "11111.", "11....", "11....", "11...."], K: ["11..11", "11.11.", "1111..", "111...", "1111..", "11.11.", "11..11"],
+  "é": ["....11.", "...11..", "111111", "11....", "11111.", "11....", "111111"],
+};
+function wordmark(text, o = {}) {
+  const u = o.unit || 14, depth = o.depth || 4, gap = 1, rows = 7, top = o.top || [255, 238, 150], bot = o.bottom || [242, 140, 30];
+  const side = o.side || [120, 58, 18], line = o.line || [36, 18, 8];
+  const glyphs = [...text].map(c => WM_GLYPHS[c] || WM_GLYPHS[c.toUpperCase()] || ["."]);
+  const cols = glyphs.reduce((a, g) => a + Math.max(...g.map(r => r.length)) + gap, -gap);
+  const pad = u, W = cols * u + depth * 3 + pad * 2, H = rows * u + depth * 3 + pad * 2 + u;
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H; const x = cv.getContext("2d");
+  const cells = []; let cx = 0;
+  for (const g of glyphs) { const gw = Math.max(...g.map(r => r.length)); g.forEach((r, ry) => [...r].forEach((ch, rx) => { if (ch === "1") cells.push([cx + rx, ry]); })); cx += gw + gap; }
+  const rgb = (c, k = 0) => `rgb(${c.map(v => Math.max(0, Math.min(255, Math.round(v * (1 + k))))).join(",")})`;
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  const X = c => pad + c * u, Y = r => pad + u + r * u;
+  // The dark outline, then the sides (stacked down and right), then the lit fronts of the blocks.
+  x.fillStyle = rgb(line); for (const [c, r] of cells) x.fillRect(X(c) - 3, Y(r) - 3, u + 6 + depth * 3, u + 6 + depth * 3);
+  for (let d = depth; d >= 1; d--) for (const [c, r] of cells) { x.fillStyle = rgb(side, -0.12 * (d / depth)); x.fillRect(X(c) + d * 3, Y(r) + d * 3, u, u); }
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (const [c, r] of cells) {
+    const base = mix(top, bot, r / (rows - 1)), px = X(c), py = Y(r), q = Math.max(2, Math.round(u / 7));
+    x.fillStyle = rgb(base); x.fillRect(px, py, u, u);
+    for (let i = 0; i < 3; i++) { x.fillStyle = rgb(base, (rnd() - 0.5) * 0.18); x.fillRect(px + Math.floor(rnd() * (u / q)) * q, py + Math.floor(rnd() * (u / q)) * q, q, q); }
+    x.fillStyle = rgb(base, 0.18); x.fillRect(px, py, u, q); x.fillRect(px, py, q, u);
+    x.fillStyle = rgb(base, -0.2); x.fillRect(px, py + u - q, u, q); x.fillRect(px + u - q, py, q, u);
+  }
+  return cv.toDataURL();
+}
+
 // ---------- icons: drawn here, simple round shapes in the same palette ----------
 const ICON = {
   dex: `<svg viewBox="0 0 64 64"><rect x="10" y="6" width="44" height="52" rx="10" fill="#E5525C"/><rect x="16" y="14" width="32" height="20" rx="5" fill="#BFEAF5"/><circle cx="22" cy="45" r="5" fill="#FFD45A"/><rect x="32" y="42" width="14" height="5" rx="2.5" fill="#123C38"/><circle cx="18" cy="10" r="2" fill="#fff"/></svg>`,
@@ -136,6 +170,7 @@ function textBox(lines, o = {}) {
   let res; const done = new Promise(r => res = r);
   function show() {
     const L = lines[i]; who.hidden = !L.who; who.textContent = L.who || ""; full = L.text; shown = 0; t0 = performance.now(); more.hidden = true;
+    if (L.on) L.on();
     if (choice) { choice.el.remove(); choice = null; }
     tick();
   }

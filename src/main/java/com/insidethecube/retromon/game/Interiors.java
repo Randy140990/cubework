@@ -340,6 +340,11 @@ public final class Interiors {
 			Room r = roomAt(p.getX());
 			if (r == null) return;
 			double lx = p.getX() - r.ox(), ly = p.getY() - r.oy(), lz = p.getZ() - r.oz();
+			// Fallen out of a room somehow (under a floor): back to where you come in.
+			if (ly < -3 && r.warps().stream().noneMatch(w -> w.kind().equals("down"))) {
+				go(p, r, r.ex(), r.ez(), r.eyaw(), false);
+				return;
+			}
 			for (Warp w : r.warps()) {
 				switch (w.kind()) {
 					case "mat" -> {
@@ -385,7 +390,7 @@ public final class Interiors {
 				y = b.getY();
 			}
 			// Up against the door's outside (south) face, heading in.
-			if (p.getX() > x0 - 0.2 && p.getX() < x1 + 0.2 && p.getZ() > zf - 0.1 && p.getZ() < zf + 0.55 && Math.abs(p.getY() - y) < 1.2
+			if (p.getX() > x0 - 0.2 && p.getX() < x1 + 0.2 && p.getZ() > zf - 1.0 && p.getZ() < zf + 0.55 && Math.abs(p.getY() - y) < 1.2
 					&& (dz < -0.01 || facingNorth)) {
 				Room r = ROOMS.get(d.room());
 				if (r != null) go(p, r, r.ex(), r.ez(), r.eyaw(), true);
