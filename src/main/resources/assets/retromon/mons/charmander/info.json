@@ -3,14 +3,28 @@
  "ground": "animation.cinderkid.ground_idle",
  "actions": {
   "cry": "animation.cinderkid.cry",
-  "recoil": "animation.cinderkid.recoil"
+  "recoil": "animation.cinderkid.recoil",
+  "attack": "animation.cinderkid.attack",
+  "critical": "animation.cinderkid.critical",
+  "special": "animation.cinderkid.special",
+  "recall": "animation.cinderkid.recall",
+  "sendout": "animation.cinderkid.sendout"
  },
  "poses": {
   "walk": {
    "anim": "animation.cinderkid.ground_walk",
    "parts": []
+  },
+  "confused": {
+   "anim": "animation.cinderkid.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.cinderkid.faint",
+   "parts": []
   }
  },
+ "move": "EMBER",
  "scale": 0.582,
  "height": 1.719,
  "texture": "retromon:textures/mons/charmander.png",

@@ -5,6 +5,7 @@ that fly). Parts a creature hasn't got are left out, and each creature can add i
 """
 
 from monlib import Anims, wave, bounce, keys, track, merge, only, eyelids, pulse, squeeze
+from monbattle import battle as battle_set
 
 
 def _hit(R, k, body_back=4.0, lift=1.2, rear=14, roll=8, head=(22, -14)):
@@ -27,6 +28,17 @@ def _hit(R, k, body_back=4.0, lift=1.2, rear=14, roll=8, head=(22, -14)):
         **squeeze(R)}
 
 
+def with_move(m, extras):
+    """The creature's own extras, with its signature move's (its effect's parts kept away, and their flight)."""
+    mv = getattr(m, "move_extras", None)
+    if not mv:
+        return extras
+    out = dict(extras or {})
+    for key, tracks in mv.items():
+        out[key] = merge(out.get(key), tracks)
+    return out
+
+
 def _extra(extras, name):
     e = extras or {}
     return merge(e.get("all"), e.get(name))
@@ -34,6 +46,7 @@ def _extra(extras, name):
 
 def four_legs(sid, m, walk=0.8, stride=30, k=1.0, slow=1.0, extras=None, idle="battle", fly=None):
     """A four-legged creature. k: how big its bobs are (less for heavy ones); slow: how much slower everything is."""
+    extras = with_move(m, extras)
     A = Anims(sid)
     L = ("leg_front_right", "leg_back_left"), ("leg_front_left", "leg_back_right")
     P = 4 * slow
@@ -74,7 +87,7 @@ def four_legs(sid, m, walk=0.8, stride=30, k=1.0, slow=1.0, extras=None, idle="b
                       rotation=keys({0: [0, 0, 0], C * 0.2: [-8, 0, 0], C * 0.65: [-8, 0, 0], C: [0, 0, 0]})),
         "neck": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-12, 0, 0], C * 0.65: [-12, 0, 0], C: [0, 0, 0]})),
         "head": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-22, 0, 0], C * 0.4: [-16, 0, 0], C * 0.6: [-22, 0, 0], C: [0, 0, 0]})),
-        "jaw": track(rotation=keys({0: [0, 0, 0], C * 0.2: [28, 0, 0], C * 0.4: [18, 0, 0], C * 0.6: [28, 0, 0], C * 0.8: [0, 0, 0]})),
+        "jaw": track(rotation=keys({0: [0, 0, 0], C * 0.2: [42, 0, 0], C * 0.4: [30, 0, 0], C * 0.6: [42, 0, 0], C * 0.8: [0, 0, 0]})),
         "ear_right": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-18, 0, -14], C * 0.8: [-18, 0, -14], C: [0, 0, 0]})),
         "ear_left": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-18, 0, 14], C * 0.8: [-18, 0, 14], C: [0, 0, 0]})),
         "leg_front_right": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-14, 0, 0], C * 0.65: [-14, 0, 0], C: [0, 0, 0]})),
@@ -89,8 +102,9 @@ def four_legs(sid, m, walk=0.8, stride=30, k=1.0, slow=1.0, extras=None, idle="b
     info = {"idle": battle if idle == "battle" else ground, "ground": ground, "actions": {"cry": cry, "recoil": recoil},
             "poses": {"walk": {"anim": walk_id, "parts": []}}}
     if fly:
-        info["poses"]["fly"] = {"anim": A.add("air_fly", fly["period"], only(m, merge(fly["fly"], eyelids(fly["period"] * 0.5)))), "parts": []}
-        info["poses"]["hover"] = {"anim": A.add("air_hover", fly["hover_period"], only(m, merge(fly["hover"], eyelids(fly["hover_period"] * 0.5)))), "parts": []}
+        info["poses"]["fly"] = {"anim": A.add("air_fly", fly["period"], only(m, merge(fly["fly"], eyelids(fly["period"] * 0.5), _extra(extras, "fly")))), "parts": []}
+        info["poses"]["hover"] = {"anim": A.add("air_hover", fly["hover_period"], only(m, merge(fly["hover"], eyelids(fly["hover_period"] * 0.5), _extra(extras, "hover")))), "parts": []}
+    battle_set(A, m, info, "legs4", k, slow, extras)
     return A, info
 
 
@@ -104,6 +118,7 @@ def wings(flap, amp, rest, period, phase=0.0):
 
 def bird(sid, m, walk=0.5, stride=40, k=1.0, slow=1.0, extras=None, flap=0.36):
     """A bird: pecks and looks about, walks with its head bobbing, flies and hovers."""
+    extras = with_move(m, extras)
     A = Anims(sid)
     P = 4 * slow
     peck = keys({0: [0, 0, 0], 2.2 * slow: [0, 0, 0], 2.35 * slow: [0, 25, 0], 2.9 * slow: [0, 25, 0], 3.05 * slow: [0, -20, 0], 3.6 * slow: [0, -20, 0],
@@ -163,11 +178,13 @@ def bird(sid, m, walk=0.5, stride=40, k=1.0, slow=1.0, extras=None, flap=0.36):
                    loop=False)
     info = {"idle": ground, "ground": ground, "actions": {"cry": cry, "recoil": recoil},
             "poses": {"walk": {"anim": walk_id, "parts": []}, "fly": {"anim": fly, "parts": []}, "hover": {"anim": hover, "parts": []}}}
+    battle_set(A, m, info, "bird", k, slow, extras)
     return A, info
 
 
 def hopper(sid, m, hop=0.45, height=2.0, k=1.0, extras=None):
     """A creature that hops on long back feet (a jerboa): stands up tall, sniffs, hops along."""
+    extras = with_move(m, extras)
     A = Anims(sid)
     ground = A.add("ground_idle", 4.0, only(m, merge({
         "body": track(position=[0, wave(2, 0.14 * k), 0], scale=[1, wave(1, 0.025, 0, 1), 1]),
@@ -198,7 +215,7 @@ def hopper(sid, m, hop=0.45, height=2.0, k=1.0, extras=None):
         "body": track(rotation=keys({0: [0, 0, 0], 0.2: [-22, 0, 0], 0.7: [-22, 0, 0], 1.0: [0, 0, 0]}),
                       position=keys({0: [0, 0, 0], 0.2: [0, 1.4 * k, 0], 0.7: [0, 1.4 * k, 0], 1.0: [0, 0, 0]})),
         "head": track(rotation=keys({0: [0, 0, 0], 0.2: [-10, 0, 0], 0.4: [-4, 0, 0], 0.6: [-10, 0, 0], 1.0: [0, 0, 0]})),
-        "jaw": track(rotation=keys({0: [0, 0, 0], 0.2: [25, 0, 0], 0.4: [10, 0, 0], 0.6: [25, 0, 0], 0.8: [0, 0, 0]})),
+        "jaw": track(rotation=keys({0: [0, 0, 0], 0.2: [38, 0, 0], 0.4: [22, 0, 0], 0.6: [38, 0, 0], 0.8: [0, 0, 0]})),
         "ear_right": track(rotation=keys({0: [0, 0, 0], 0.2: [-12, 0, 10], 0.8: [-12, 0, 10], 1.0: [0, 0, 0]})),
         "ear_left": track(rotation=keys({0: [0, 0, 0], 0.2: [-12, 0, -10], 0.8: [-12, 0, -10], 1.0: [0, 0, 0]})),
         "arm_right": track(rotation=keys({0: [0, 0, 0], 0.2: [-40, 0, 0], 0.7: [-40, 0, 0], 1.0: [0, 0, 0]})),
@@ -213,4 +230,5 @@ def hopper(sid, m, hop=0.45, height=2.0, k=1.0, extras=None):
                                               _extra(extras, "recoil"))), loop=False)
     info = {"idle": battle if (extras or {}).get("battle_idle") else ground, "ground": ground, "actions": {"cry": cry, "recoil": recoil},
             "poses": {"walk": {"anim": walk, "parts": []}}}
+    battle_set(A, m, info, "hopper", k, 1.0, extras)
     return A, info

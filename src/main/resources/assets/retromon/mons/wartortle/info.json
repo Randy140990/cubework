@@ -3,14 +3,28 @@
  "ground": "animation.surfapir.ground_idle",
  "actions": {
   "cry": "animation.surfapir.cry",
-  "recoil": "animation.surfapir.recoil"
+  "recoil": "animation.surfapir.recoil",
+  "attack": "animation.surfapir.attack",
+  "critical": "animation.surfapir.critical",
+  "special": "animation.surfapir.special",
+  "recall": "animation.surfapir.recall",
+  "sendout": "animation.surfapir.sendout"
  },
  "poses": {
   "walk": {
    "anim": "animation.surfapir.ground_walk",
    "parts": []
+  },
+  "confused": {
+   "anim": "animation.surfapir.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.surfapir.faint",
+   "parts": []
   }
  },
+ "move": "WATER GUN",
  "scale": 0.8,
  "height": 1.25,
  "texture": "retromon:textures/mons/wartortle.png",

@@ -1,0 +1,56 @@
+{
+ "idle": "animation.shriket.ground_idle",
+ "ground": "animation.shriket.ground_idle",
+ "actions": {
+  "cry": "animation.shriket.cry",
+  "recoil": "animation.shriket.recoil",
+  "attack": "animation.shriket.attack",
+  "critical": "animation.shriket.critical",
+  "special": "animation.shriket.special",
+  "recall": "animation.shriket.recall",
+  "sendout": "animation.shriket.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.shriket.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.shriket.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.shriket.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.shriket.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.shriket.faint",
+   "parts": []
+  }
+ },
+ "move": "FURY ATTACK",
+ "scale": 0.648,
+ "height": 1.019,
+ "texture": "retromon:textures/mons/spearow.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/spearow_glow_0.png",
+    "retromon:textures/mons/spearow_glow_1.png",
+    "retromon:textures/mons/spearow_glow_2.png",
+    "retromon:textures/mons/spearow_glow_3.png",
+    "retromon:textures/mons/spearow_glow_4.png",
+    "retromon:textures/mons/spearow_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SHRIKET",
+ "parts": []
+}

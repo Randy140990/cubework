@@ -3,18 +3,46 @@
  "ground": "animation.grovadon.ground_idle",
  "actions": {
   "cry": "animation.grovadon.cry",
-  "recoil": "animation.grovadon.recoil"
+  "recoil": "animation.grovadon.recoil",
+  "attack": "animation.grovadon.attack",
+  "critical": "animation.grovadon.critical",
+  "special": "animation.grovadon.special",
+  "recall": "animation.grovadon.recall",
+  "sendout": "animation.grovadon.sendout"
  },
  "poses": {
   "walk": {
    "anim": "animation.grovadon.ground_walk",
    "parts": []
+  },
+  "confused": {
+   "anim": "animation.grovadon.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.grovadon.faint",
+   "parts": []
   }
  },
+ "move": "RAZOR LEAF",
  "scale": 1.138,
  "height": 2.312,
  "texture": "retromon:textures/mons/venusaur.png",
- "layers": [],
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/venusaur_glow_0.png",
+    "retromon:textures/mons/venusaur_glow_1.png",
+    "retromon:textures/mons/venusaur_glow_2.png",
+    "retromon:textures/mons/venusaur_glow_3.png",
+    "retromon:textures/mons/venusaur_glow_4.png",
+    "retromon:textures/mons/venusaur_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
  "name": "GROVADON",
  "parts": []
 }

@@ -3,7 +3,12 @@
  "ground": "animation.pyribex.ground_idle",
  "actions": {
   "cry": "animation.pyribex.cry",
-  "recoil": "animation.pyribex.recoil"
+  "recoil": "animation.pyribex.recoil",
+  "attack": "animation.pyribex.attack",
+  "critical": "animation.pyribex.critical",
+  "special": "animation.pyribex.special",
+  "recall": "animation.pyribex.recall",
+  "sendout": "animation.pyribex.sendout"
  },
  "poses": {
   "walk": {
@@ -17,8 +22,17 @@
   "hover": {
    "anim": "animation.pyribex.air_hover",
    "parts": []
+  },
+  "confused": {
+   "anim": "animation.pyribex.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.pyribex.faint",
+   "parts": []
   }
  },
+ "move": "FLAMETHROWER",
  "scale": 0.935,
  "height": 4.438,
  "texture": "retromon:textures/mons/charizard.png",

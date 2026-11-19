@@ -3,14 +3,28 @@
  "ground": "animation.tidapir.ground_idle",
  "actions": {
   "cry": "animation.tidapir.cry",
-  "recoil": "animation.tidapir.recoil"
+  "recoil": "animation.tidapir.recoil",
+  "attack": "animation.tidapir.attack",
+  "critical": "animation.tidapir.critical",
+  "special": "animation.tidapir.special",
+  "recall": "animation.tidapir.recall",
+  "sendout": "animation.tidapir.sendout"
  },
  "poses": {
   "walk": {
    "anim": "animation.tidapir.ground_walk",
    "parts": []
+  },
+  "confused": {
+   "anim": "animation.tidapir.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.tidapir.faint",
+   "parts": []
   }
  },
+ "move": "WATER GUN",
  "scale": 0.795,
  "height": 0.906,
  "texture": "retromon:textures/mons/squirtle.png",

@@ -3,18 +3,46 @@
  "ground": "animation.jerbolt.ground_idle",
  "actions": {
   "cry": "animation.jerbolt.cry",
-  "recoil": "animation.jerbolt.recoil"
+  "recoil": "animation.jerbolt.recoil",
+  "attack": "animation.jerbolt.attack",
+  "critical": "animation.jerbolt.critical",
+  "special": "animation.jerbolt.special",
+  "recall": "animation.jerbolt.recall",
+  "sendout": "animation.jerbolt.sendout"
  },
  "poses": {
   "walk": {
    "anim": "animation.jerbolt.ground_walk",
    "parts": []
+  },
+  "confused": {
+   "anim": "animation.jerbolt.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.jerbolt.faint",
+   "parts": []
   }
  },
+ "move": "HYPER FANG",
  "scale": 0.727,
  "height": 1.65,
  "texture": "retromon:textures/mons/raticate.png",
- "layers": [],
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/raticate_glow_0.png",
+    "retromon:textures/mons/raticate_glow_1.png",
+    "retromon:textures/mons/raticate_glow_2.png",
+    "retromon:textures/mons/raticate_glow_3.png",
+    "retromon:textures/mons/raticate_glow_4.png",
+    "retromon:textures/mons/raticate_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
  "name": "JERBOLT",
  "parts": []
 }

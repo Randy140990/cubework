@@ -114,7 +114,7 @@ class At:
 
 
 class Cube:
-    def __init__(self, origin, size, mat, rotation=None, pivot=None, seams=()):
+    def __init__(self, origin, size, mat, rotation=None, pivot=None, seams=(), effect=False):
         self.origin = [float(v) for v in origin]
         self.size = [int(round(v)) for v in size]
         self.mat = mat
@@ -123,6 +123,8 @@ class Cube:
         # Edges that join on to another box of the same part, so they get no outline: (face, "r0" first row, "rl"
         # last row, "c0" first column or "cl" last column).
         self.seams = set(seams)
+        # An effect (smoke, stars, a move's leaves): not part of the creature's body, so it doesn't count to its height.
+        self.effect = effect
         self.uv = None
 
 
@@ -135,7 +137,7 @@ def mirror_cube(c):
     o, s = c.origin, c.size
     piv = None if c.pivot is None else [-c.pivot[0], c.pivot[1], c.pivot[2]]
     rot = None if c.rotation is None else [c.rotation[0], -c.rotation[1], -c.rotation[2]]
-    return Cube([-(o[0] + s[0]), o[1], o[2]], s, c.mat, rot, piv, c.seams)
+    return Cube([-(o[0] + s[0]), o[1], o[2]], s, c.mat, rot, piv, c.seams, c.effect)
 
 
 def blob(origin, size, mat, b=1, flat_bottom=False):
@@ -200,11 +202,12 @@ class Model:
             self.pair("eyelid_right", "eye_right", [-hw, y + h, z], [Cube([-hw - 0.02, y, z - 0.03], [wf + 0.04, h, 0], lm),
                                                                      Cube([-hw - 0.03, y, z - 0.02], [0, h, ws + 0.02], lm)])
             if squint:
-                sg = squint_grid(wf + ws, h)
-                sq_f = eye_mat(wf + ws, h, iris, pupil, lash, shine, grid=sg, part=(0, wf), face="front", skin=skin)
-                sq_s = eye_mat(wf + ws, h, iris, pupil, lash, shine, grid=sg, part=(wf, ws), face="side", skin=skin)
-                self.pair("squint_right", "eye_right", [-hw, y + h / 2, z], [Cube([-hw - 0.02, y, z - 0.05], [wf, h, 0], sq_f),
-                                                                           Cube([-hw - 0.05, y, z - 0.02], [0, h, ws], sq_s)])
+                for name, gridf, off in COVERS:
+                    g = gridf(wf + ws, h)
+                    c_f = eye_mat(wf + ws, h, iris, pupil, lash, shine, grid=g, part=(0, wf), face="front", skin=skin)
+                    c_s = eye_mat(wf + ws, h, iris, pupil, lash, shine, grid=g, part=(wf, ws), face="side", skin=skin)
+                    self.pair(name + "_right", "eye_right", [-hw, y + h / 2, z], [Cube([-hw - 0.02, y, z - off], [wf, h, 0], c_f),
+                                                                                Cube([-hw - off, y, z - 0.02], [0, h, ws], c_s)])
             return
         em = eye_mat(w, h, iris, pupil, lash, shine, iris_light, white, side=side, grid=grid, skin=skin)
         lid_face = ("nx", "px") if side else ("front",)
@@ -219,8 +222,32 @@ class Model:
         self.pair("eye_right", head, [xr + w / 2, y + h, z], [Cube([xr, y, z - 0.01], [w, h, 0], em)])
         self.pair("eyelid_right", "eye_right", [xr + w / 2, y + h, z], [Cube([xr, y, z - 0.03], [w, h, 0], lm)])
         if squint:
-            sq = eye_mat(w, h, iris, pupil, lash, shine, grid=squint_grid(w, h), skin=skin)
-            self.pair("squint_right", "eye_right", [xr + w / 2, y + h / 2, z], [Cube([xr, y, z - 0.05], [w, h, 0], sq)])
+            for name, gridf, off in COVERS:
+                # Dazed and fainted eyes need room for their mark: at least three across and three high, centred on the eye.
+                cw, ch = (w, h) if name == "squint" else (max(3, w), max(3, h))
+                cx0, cy0 = xr - (cw - w) / 2, y - (ch - h) / 2
+                cm = eye_mat(cw, ch, iris, pupil, lash, shine, grid=gridf(cw, ch), skin=skin)
+                self.pair(name + "_right", "eye_right", [xr + w / 2, y + h / 2, z], [Cube([cx0, cy0, z - off], [cw, ch, 0], cm)])
+
+    def battle_fx(self, head, top, cz, mouth, front, size=1.0):
+        """The battle effects every creature has: stars that circle above its head when it's confused (top: the head's
+        top, cz: its middle front to back), and a burst where a critical hit lands (in front of its mouth)."""
+        st = star_mat()
+        n = max(5, round(5 * size)) // 2 * 2 + 1
+        r, py = 4.5 * size, top + 2.5 * size
+        stars = []
+        for i in range(3):
+            a = i * 120
+            px, pz = r * math.sin(math.radians(a)), cz + r * math.cos(math.radians(a))
+            for extra in (0, 90):
+                stars.append(Cube([px - n / 2, py - n / 2, pz], [n, n, 0], st, [0, a + extra, 0], [px, py, pz], effect=True))
+        self.bone("fx_stars", head, [0, py, cz], stars)
+        bm = burst_mat()
+        m = max(8, round(12 * size))
+        bz = front - 4 * size
+        self.bone("fx_impact", "root" if "root" in self.names else None, [0, mouth, bz],
+                  [Cube([-m / 2, mouth - m / 2, bz], [m, m, 0], bm, effect=True),
+                   Cube([-m / 2, mouth - m / 2, bz], [m, m, 0], bm, [0, 90, 0], [0, mouth, bz], effect=True)])
 
     def brows(self, head, cubes):
         """Brows over the eyes (cubes for the right one; the left is mirrored)."""
@@ -268,6 +295,28 @@ def squint_grid(n, h):
         for r in {int(math.floor(mid - off + 0.5)), int(math.floor(mid + off + 0.5))}:
             rows[max(0, min(h - 1, r))][k] = "L"
     return ["".join(r) for r in rows]
+
+
+def ring_grid(n, h):
+    """Dazed eyes: a dark ring (an "o") where they're big enough, a wavy line where they're small."""
+    if n < 3 or h < 3:
+        return ["".join("L" if (r + k) % 2 == 0 else "S" for k in range(n)) for r in range(h)]
+    return ["".join("L" if r in (0, h - 1) or k in (0, n - 1) else "S" for k in range(n)) for r in range(h)]
+
+
+def cross_grid(n, h):
+    """Fainted eyes: an "x"."""
+    rows = [["S"] * n for _ in range(h)]
+    for r in range(h):
+        f = r / max(1, h - 1)
+        for k in {int(math.floor(f * (n - 1) + 0.5)), int(math.floor((1 - f) * (n - 1) + 0.5))}:
+            rows[r][k] = "L"
+    return ["".join(r) for r in rows]
+
+
+# The overlays an eye can have, each kept away until wanted: squeezed shut (hit), dazed (confused), fainted. Each sits a
+# hair further out than the last so none fights another.
+COVERS = (("squint", squint_grid, 0.05), ("dizzy", ring_grid, 0.06), ("faint", cross_grid, 0.07))
 
 
 def eye_mat(w, h, iris, pupil, lash, shine, iris_light=None, white=None, side=False, grid=None, part=None, face=None, skin=None):
@@ -438,8 +487,9 @@ def paint(cubes, tex_w, tex_h, frames=FRAMES):
 
 
 def flame_shape(at, fi, frames=FRAMES, heat=1.0):
-    """A flame on a flat part, frame by frame: tongues that lick up and sway, white-hot in the core, yellow, then orange,
-    red at the edges and the tips. Gives (colour, alpha) or None (no flame there)."""
+    """A flame on a flat part, frame by frame, drawn as crisp pixel art: a tight teardrop, narrow at its base, swelling
+    a little, then drawn up into two or three licking tongues. Solid bands of colour: a pale white-yellow heart, yellow,
+    orange, and a red-orange rim, with no soft fading or dark edges. Gives (colour, alpha) or None (no flame there)."""
     c = at.cube
     if c.size[2] == 0:
         u = at.lx
@@ -450,22 +500,143 @@ def flame_shape(at, fi, frames=FRAMES, heat=1.0):
     v = at.ly
     ph = fi / frames * 2 * math.pi
     seed = (c.origin[0] * 1.7 + c.origin[2] * 2.3) % 6.28
-    centre = 0.5 + 0.07 * math.sin(ph + v * 4.0 + seed)
-    hw = 0.5 * (1 - v ** 1.25) * (1 + 0.14 * math.sin(ph * 2 + v * 9 + seed))
+    centre = 0.5 + 0.08 * math.sin(ph + v * 3.0 + seed) * v
+    widest = 0.28
+    if v < widest:
+        hw = 0.3 + 0.2 * math.sin(v / widest * math.pi / 2)
+    else:
+        hw = 0.5 * (1 - ((v - widest) / (1 - widest)) ** 0.9)
     if v > 0.45:
-        # Tongues: the top splits into licks that rise and fall from frame to frame.
-        lick = abs(math.sin((u - centre) * math.pi * 2.6 + ph + seed))
+        # Tongues: the upper flame splits into licks that rise and fall from frame to frame.
+        lick = abs(math.sin((u - centre) * math.pi * 2.0 + ph + seed))
         hw *= 0.55 + 0.45 * lick
-        if v > 0.82 and lick < 0.55:
+        if v > 0.72 and lick < 0.45 + (v - 0.72):
             return None
     d = abs(u - centre)
-    if d > hw or hw <= 0.01:
+    if d > hw or hw <= 0.04:
         return None
     k = d / hw
-    t = (1 - v * 0.85) * (1 - k * 0.7) * heat
-    col = ramp(["#7A140C", "#D2301A", "#F26A1E", "#FFA436", "#FFD95A", "#FFF7D0"], t)
-    alpha = 255 if k < 0.6 else 255 - (k - 0.6) * 260
-    return col, alpha
+    heat_v = (1 - k) * 0.75 + (1 - v) * 0.55 * heat
+    if heat_v > 0.98:
+        return rgb("#FFF8D2"), 255
+    if heat_v > 0.72:
+        return rgb("#FFD640"), 255
+    if heat_v > 0.45:
+        return rgb("#FF9A24"), 255
+    return rgb("#F2581E"), 235
+
+
+def smoke_shape(at, fi, frames=FRAMES):
+    """Smoke on a flat part, frame by frame: soft grey puffs drifting up off a flame, widening and thinning as they rise."""
+    c = at.cube
+    if c.size[2] == 0:
+        u = at.lx
+    elif c.size[0] == 0:
+        u = at.lz
+    else:
+        return None
+    v = at.ly
+    seed = (c.origin[0] * 1.3 + c.origin[2] * 1.9) % 6.28
+    p = (v * 2.5 - fi / frames) % 1.0
+    puff = 1 - abs(p - 0.5) * 2
+    cx = 0.5 + 0.18 * math.sin(v * 5 + seed + fi / frames * 2 * math.pi) * v
+    r = (0.14 + 0.3 * v) * (0.55 + 0.45 * puff)
+    d = abs(u - cx)
+    if d > r or puff < 0.25:
+        return None
+    alpha = 80 * (1 - v) * (1 - d / r) * puff
+    if alpha < 18:
+        return None
+    return mix("#5E5654", "#B4ACA8", v), alpha
+
+
+STAR = ["..Y..", ".YYY.", "YYWYY", ".YYY.", ".Y.Y."]
+
+
+def star_shape(at, fi):
+    """A little five-pointed star, bright yellow with a pale heart, twinkling from frame to frame."""
+    col, row = int(at.lx * 5 - 1e-9), int((1 - at.ly) * 5 - 1e-9)
+    ch = STAR[max(0, min(4, row))][max(0, min(4, col))]
+    if ch == ".":
+        return None
+    if ch == "W":
+        return rgb("#FFFBE0"), 255
+    return rgb("#FFD83A"), 255
+
+
+def star_mat():
+    return Mat("#FFD83A", lambda a: CLEAR, glow=lambda a, fi: star_shape(a, fi), frames=True, noise=0, edge=0)
+
+
+def burst_shape(at, fi):
+    """A critical hit's impact: a jagged burst of eight spikes round a white-hot heart."""
+    dx, dy = at.lx - 0.5, at.ly - 0.5
+    r = math.hypot(dx, dy)
+    th = math.atan2(dy, dx)
+    R = 0.16 + 0.34 * abs(math.cos(4 * th + fi * 0.4)) ** 2.5
+    if r > R:
+        return None
+    k = r / R
+    if k < 0.4:
+        return rgb("#FFFFFF"), 255
+    if k < 0.72:
+        return rgb("#FFE45A"), 255
+    return rgb("#FF9A30"), 235
+
+
+def burst_mat():
+    return Mat("#FFE45A", lambda a: CLEAR, glow=lambda a, fi: burst_shape(a, fi), frames=True, noise=0, edge=0)
+
+
+def wind_shape(at, fi):
+    """A gust: a ring of wind broken into three sweeping arcs, white at its heart, pale blue at its edges, turning."""
+    dx, dy = at.lx - 0.5, at.ly - 0.5
+    r = math.hypot(dx, dy)
+    if not 0.22 < r < 0.48:
+        return None
+    th = (math.atan2(dy, dx) + fi * 0.5) % (2 * math.pi / 3)
+    if th > 1.6:
+        return None
+    k = abs(r - 0.35) / 0.13
+    return mix("#FFFFFF", "#A8DAF6", k), 230 - 120 * k
+
+
+def wind_mat():
+    return Mat("#E8F6FF", lambda a: CLEAR, glow=lambda a, fi: wind_shape(a, fi), frames=True, noise=0, edge=0)
+
+
+def fang_shape(at, down):
+    """A pair of great fangs, pointing down (the upper pair) or up (the lower), glinting white."""
+    u, v = at.lx, at.ly
+    for c in (0.3, 0.7):
+        hw = 0.17 * (v if down else 1 - v) + 0.02
+        if abs(u - c) < hw:
+            return (mix("#FFFFFF", "#CFE6FF", abs(u - c) / hw), 255)
+    return None
+
+
+def fang_mat(down):
+    return Mat("#FFFFFF", lambda a: CLEAR, glow=lambda a, fi: fang_shape(a, down), frames=True, noise=0, edge=0)
+
+
+def blade_mat(light, dark, rib):
+    """A single leaf blade, sharp at both ends, a pale rib down its middle."""
+    def f(at):
+        c = at.cube
+        u = at.lx if c.size[1] == 0 else at.ly
+        t = at.lz
+        hw = 0.5 * math.sin(math.pi * min(1.0, max(0.0, t))) ** 0.8
+        d = abs(u - 0.5)
+        if d > hw:
+            return CLEAR
+        if d < 0.1:
+            return rgb(rib)
+        return mix(light, dark, d / max(0.01, hw))
+    return Mat(light, f, noise=0.02, edge=0)
+
+
+def smoke_mat():
+    return Mat("#8A8280", lambda a: CLEAR, glow=lambda a, fi: smoke_shape(a, fi), frames=True, noise=0, edge=0)
 
 
 def flame_mat(heat=1.0):
@@ -473,14 +644,19 @@ def flame_mat(heat=1.0):
     return Mat("#FF8A2A", lambda a: CLEAR, glow=lambda a, fi: flame_shape(a, fi, heat=heat), frames=True, noise=0, edge=0)
 
 
-def flame(origin, w, h, mat=None, planes=3, heat=1.0):
-    """A flame standing up from origin (its base's middle): crossed flat parts (three, at 60 degrees to each other, so it
-    looks full from every side), w wide and h tall."""
+def flame(origin, w, h, mat=None, planes=2, heat=1.0, smoke=False):
+    """A flame standing up from origin (its base's middle): crossed flat parts (two, square to each other, so it looks
+    full from every side), w wide and h tall. smoke: a wisp of smoke rising off its top."""
     mat = mat or flame_mat(heat)
     x, y, z = origin
     out = []
     for i in range(planes):
         out.append(Cube([x - w / 2, y, z], [w, h, 0], mat, [0, i * 180 / planes, 0], [x, y, z]))
+    if smoke:
+        sm = smoke_mat()
+        sw, sh, sy = max(3, round(w * 0.55)), max(5, round(h * 0.6)), y + h * 0.8
+        for i in range(2):
+            out.append(Cube([x - sw / 2, sy, z], [sw, sh, 0], sm, [0, 45 + i * 90, 0], [x, sy, z], effect=True))
     return out
 
 
@@ -582,10 +758,19 @@ def only(m, d):
     return {k: v for k, v in d.items() if k in m.names}
 
 
+HIDE = [0.001, 0.001, 0.001]
+FX = ("squint_right", "squint_left", "dizzy_right", "dizzy_left", "faint_right", "faint_left", "fx_stars", "fx_impact")
+
+
+def away(*bones):
+    """Tracks keeping these parts tucked away (shrunk to nothing)."""
+    return {b: track(scale=list(HIDE)) for b in bones}
+
+
 def eyelids(at):
-    """The eyelids' blink, and the squeezed-shut eyes kept away (they only show when hit)."""
-    return {"eyelid_right": track(scale=[1, blink(at), 1]), "eyelid_left": track(scale=[1, blink(at), 1]),
-            "squint_right": track(scale=[0.001, 0.001, 0.001]), "squint_left": track(scale=[0.001, 0.001, 0.001])}
+    """The eyelids' blink, with the battle overlays (squeezed, dazed and fainted eyes, the stars, the impact) kept away:
+    they only show when wanted."""
+    return {"eyelid_right": track(scale=[1, blink(at), 1]), "eyelid_left": track(scale=[1, blink(at), 1]), **away(*FX)}
 
 
 def squeeze(length, shut=0.04, open_at=0.55):
@@ -635,7 +820,8 @@ def write(sid, name, model, anims, info, stands):
                 co["rotation"] = c.rotation
                 co["pivot"] = c.pivot or b.pivot
             cs.append(co)
-            top = max(top, c.origin[1] + c.size[1])
+            if not c.effect:
+                top = max(top, c.origin[1] + c.size[1])
         if cs:
             o["cubes"] = cs
         out_bones.append(o)

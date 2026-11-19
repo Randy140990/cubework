@@ -3,14 +3,28 @@
  "ground": "animation.tsunapir.ground_idle",
  "actions": {
   "cry": "animation.tsunapir.cry",
-  "recoil": "animation.tsunapir.recoil"
+  "recoil": "animation.tsunapir.recoil",
+  "attack": "animation.tsunapir.attack",
+  "critical": "animation.tsunapir.critical",
+  "special": "animation.tsunapir.special",
+  "recall": "animation.tsunapir.recall",
+  "sendout": "animation.tsunapir.sendout"
  },
  "poses": {
   "walk": {
    "anim": "animation.tsunapir.ground_walk",
    "parts": []
+  },
+  "confused": {
+   "anim": "animation.tsunapir.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.tsunapir.faint",
+   "parts": []
   }
  },
+ "move": "HYDRO PUMP",
  "scale": 1.305,
  "height": 2.375,
  "texture": "retromon:textures/mons/blastoise.png",

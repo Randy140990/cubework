@@ -3,14 +3,28 @@
  "ground": "animation.emberam.ground_idle",
  "actions": {
   "cry": "animation.emberam.cry",
-  "recoil": "animation.emberam.recoil"
+  "recoil": "animation.emberam.recoil",
+  "attack": "animation.emberam.attack",
+  "critical": "animation.emberam.critical",
+  "special": "animation.emberam.special",
+  "recall": "animation.emberam.recall",
+  "sendout": "animation.emberam.sendout"
  },
  "poses": {
   "walk": {
    "anim": "animation.emberam.ground_walk",
    "parts": []
+  },
+  "confused": {
+   "anim": "animation.emberam.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.emberam.faint",
+   "parts": []
   }
  },
+ "move": "EMBER",
  "scale": 0.616,
  "height": 2.5,
  "texture": "retromon:textures/mons/charmeleon.png",

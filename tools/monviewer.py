@@ -13,7 +13,9 @@ DATA = os.path.join(HERE, "..", "src", "main", "resources", "retromon", "data")
 
 FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember goats", ["charmander", "charmeleon", "charizard"]),
             ("Sea tapirs", ["squirtle", "wartortle", "blastoise"]), ("Quails", ["pidgey", "pidgeotto", "pidgeot"]),
-            ("Jerboas", ["rattata", "raticate"])]
+            ("Jerboas", ["rattata", "raticate"]), ("Quill porcupines ♀", ["nidoran_f", "nidorina", "nidoqueen"]),
+            ("Quill porcupines ♂", ["nidoran_m", "nidorino", "nidoking"]), ("Mongooses", ["mankey", "primeape"]), ("Shrikes", ["spearow", "fearow"]),
+            ("Gliders", ["pichu", "pikachu", "raichu"])]
 KEEP = ("idle", "ground")
 
 
@@ -49,7 +51,7 @@ def model(folder):
             if g_im.size == im.size:
                 painted |= np.array(g_im)[..., 3] > 0
     texels = int(painted.sum())
-    return {"geo": g, "anims": anims, "info": {k: info.get(k) for k in ("scale", "idle", "ground", "parts", "poses", "actions", "name")},
+    return {"geo": g, "anims": anims, "info": {k: info.get(k) for k in ("scale", "idle", "ground", "parts", "poses", "actions", "name", "move")},
             "texture": data_uri(info["texture"]), "layers": layers,
             "detail": {"cubes": cubes, "bones": len(g["bones"]), "texture": f"{im.size[0]}×{im.size[1]}", "texels": texels, "animations": len(anims)}}
 
@@ -65,7 +67,11 @@ def species_rows():
         if evo and evo != "-":
             parts = evo.split(";")[0].split(":")
             if parts[0] == "level":
-                nxt = {"level": int(parts[1]), "into": parts[2]}
+                nxt = {"how": f"Level {int(parts[1])}", "level": int(parts[1]), "into": parts[2]}
+            elif parts[0] == "item":
+                nxt = {"how": parts[1].replace("_", " ").title(), "into": parts[2]}
+            elif parts[0] == "happiness":
+                nxt = {"how": "Friendship", "into": parts[2]}
         out[f[1]] = {"dex": int(f[0]), "name": f[2], "types": [t for t in (f[3], f[4]) if t and t != "-"],
                      "stats": {"HP": int(f[5]), "Attack": int(f[6]), "Defense": int(f[7]), "Sp. Atk": int(f[9]), "Sp. Def": int(f[10]), "Speed": int(f[8])},
                      "catch": int(f[11]), "exp": int(f[12]), "growth": f[13].replace("_", " ").title(), "evolves": nxt}

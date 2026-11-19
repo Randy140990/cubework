@@ -1,0 +1,48 @@
+{
+ "idle": "animation.zipsy.battle_idle",
+ "ground": "animation.zipsy.ground_idle",
+ "actions": {
+  "cry": "animation.zipsy.cry",
+  "recoil": "animation.zipsy.recoil",
+  "attack": "animation.zipsy.attack",
+  "critical": "animation.zipsy.critical",
+  "special": "animation.zipsy.special",
+  "recall": "animation.zipsy.recall",
+  "sendout": "animation.zipsy.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.zipsy.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.zipsy.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.zipsy.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDERSHOCK",
+ "scale": 0.782,
+ "height": 0.767,
+ "texture": "retromon:textures/mons/pichu.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/pichu_glow_0.png",
+    "retromon:textures/mons/pichu_glow_1.png",
+    "retromon:textures/mons/pichu_glow_2.png",
+    "retromon:textures/mons/pichu_glow_3.png",
+    "retromon:textures/mons/pichu_glow_4.png",
+    "retromon:textures/mons/pichu_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "ZIPSY",
+ "parts": []
+}

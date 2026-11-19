@@ -3,18 +3,46 @@
  "ground": "animation.fernadillo.ground_idle",
  "actions": {
   "cry": "animation.fernadillo.cry",
-  "recoil": "animation.fernadillo.recoil"
+  "recoil": "animation.fernadillo.recoil",
+  "attack": "animation.fernadillo.attack",
+  "critical": "animation.fernadillo.critical",
+  "special": "animation.fernadillo.special",
+  "recall": "animation.fernadillo.recall",
+  "sendout": "animation.fernadillo.sendout"
  },
  "poses": {
   "walk": {
    "anim": "animation.fernadillo.ground_walk",
    "parts": []
+  },
+  "confused": {
+   "anim": "animation.fernadillo.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.fernadillo.faint",
+   "parts": []
   }
  },
+ "move": "RAZOR LEAF",
  "scale": 0.795,
  "height": 0.906,
  "texture": "retromon:textures/mons/bulbasaur.png",
- "layers": [],
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/bulbasaur_glow_0.png",
+    "retromon:textures/mons/bulbasaur_glow_1.png",
+    "retromon:textures/mons/bulbasaur_glow_2.png",
+    "retromon:textures/mons/bulbasaur_glow_3.png",
+    "retromon:textures/mons/bulbasaur_glow_4.png",
+    "retromon:textures/mons/bulbasaur_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
  "name": "FERNADILLO",
  "parts": []
 }

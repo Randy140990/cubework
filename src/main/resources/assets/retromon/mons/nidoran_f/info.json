@@ -1,0 +1,48 @@
+{
+ "idle": "animation.nidoranf.battle_idle",
+ "ground": "animation.nidoranf.ground_idle",
+ "actions": {
+  "cry": "animation.nidoranf.cry",
+  "recoil": "animation.nidoranf.recoil",
+  "attack": "animation.nidoranf.attack",
+  "critical": "animation.nidoranf.critical",
+  "special": "animation.nidoranf.special",
+  "recall": "animation.nidoranf.recall",
+  "sendout": "animation.nidoranf.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.nidoranf.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.nidoranf.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.nidoranf.faint",
+   "parts": []
+  }
+ },
+ "move": "POISON STING",
+ "scale": 1.055,
+ "height": 0.55,
+ "texture": "retromon:textures/mons/nidoran_f.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/nidoran_f_glow_0.png",
+    "retromon:textures/mons/nidoran_f_glow_1.png",
+    "retromon:textures/mons/nidoran_f_glow_2.png",
+    "retromon:textures/mons/nidoran_f_glow_3.png",
+    "retromon:textures/mons/nidoran_f_glow_4.png",
+    "retromon:textures/mons/nidoran_f_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "QUILLETTE",
+ "parts": []
+}

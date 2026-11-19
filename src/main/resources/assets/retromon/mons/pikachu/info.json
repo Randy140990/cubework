@@ -1,0 +1,48 @@
+{
+ "idle": "animation.zapglider.battle_idle",
+ "ground": "animation.zapglider.ground_idle",
+ "actions": {
+  "cry": "animation.zapglider.cry",
+  "recoil": "animation.zapglider.recoil",
+  "attack": "animation.zapglider.attack",
+  "critical": "animation.zapglider.critical",
+  "special": "animation.zapglider.special",
+  "recall": "animation.zapglider.recall",
+  "sendout": "animation.zapglider.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.zapglider.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.zapglider.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.zapglider.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDERSHOCK",
+ "scale": 0.818,
+ "height": 0.954,
+ "texture": "retromon:textures/mons/pikachu.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/pikachu_glow_0.png",
+    "retromon:textures/mons/pikachu_glow_1.png",
+    "retromon:textures/mons/pikachu_glow_2.png",
+    "retromon:textures/mons/pikachu_glow_3.png",
+    "retromon:textures/mons/pikachu_glow_4.png",
+    "retromon:textures/mons/pikachu_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "ZAPGLIDER",
+ "parts": []
+}

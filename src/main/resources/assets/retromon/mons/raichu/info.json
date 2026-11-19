@@ -1,0 +1,48 @@
+{
+ "idle": "animation.stormglider.battle_idle",
+ "ground": "animation.stormglider.ground_idle",
+ "actions": {
+  "cry": "animation.stormglider.cry",
+  "recoil": "animation.stormglider.recoil",
+  "attack": "animation.stormglider.attack",
+  "critical": "animation.stormglider.critical",
+  "special": "animation.stormglider.special",
+  "recall": "animation.stormglider.recall",
+  "sendout": "animation.stormglider.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.stormglider.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.stormglider.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.stormglider.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDERBOLT",
+ "scale": 1.099,
+ "height": 1.456,
+ "texture": "retromon:textures/mons/raichu.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/raichu_glow_0.png",
+    "retromon:textures/mons/raichu_glow_1.png",
+    "retromon:textures/mons/raichu_glow_2.png",
+    "retromon:textures/mons/raichu_glow_3.png",
+    "retromon:textures/mons/raichu_glow_4.png",
+    "retromon:textures/mons/raichu_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "STORMGLIDER",
+ "parts": []
+}

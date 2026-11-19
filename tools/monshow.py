@@ -17,7 +17,8 @@ ROOT = portraits.ROOT
 MONS = os.path.join(ROOT, "mons")
 ORDER = ["bulbasaur", "charmander", "squirtle", "pidgey", "rattata"]
 ALL = ["bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon", "charizard", "squirtle", "wartortle", "blastoise", "pidgey", "pidgeotto", "pidgeot",
-       "rattata", "raticate"]
+       "rattata", "raticate", "nidoran_f", "nidorina", "nidoqueen", "nidoran_m", "nidorino", "nidoking", "mankey", "primeape", "spearow", "fearow",
+       "pichu", "pikachu", "raichu"]
 TYPES = {"bulbasaur": ("GRASS", "#4FA64A"), "charmander": ("FIRE", "#E8662C"), "squirtle": ("WATER", "#2F74BA"), "pidgey": ("NORMAL · FLYING", "#8C80A8"),
          "rattata": ("NORMAL", "#B7864A")}
 FONT = "/usr/share/fonts/truetype/google-fonts/Poppins-Bold.ttf"
@@ -62,7 +63,8 @@ def pose_at(anims, names_times):
         if not a:
             continue
         L = a.get("animation_length", 0)
-        tt = (t % L) if (a.get("loop") and L) else min(t, L) if L else t
+        loops = a.get("loop") in (True, "true")  # "hold_on_last_frame" plays once and stays
+        tt = (t % L) if (loops and L) else min(t, L) if L else t
         for bone, chans in a.get("bones", {}).items():
             r0, p0, s0 = out.get(bone, ([0, 0, 0], [0, 0, 0], [1, 1, 1]))
             r = channel(chans["rotation"], tt, [0, 0, 0]) if "rotation" in chans else [0, 0, 0]
