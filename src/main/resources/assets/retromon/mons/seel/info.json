@@ -26,7 +26,7 @@
  },
  "move": "AURORA BEAM",
  "attack_move": "HEADBUTT",
- "scale": 1.631,
+ "scale": 1.387,
  "height": 0.613,
  "texture": "retromon:textures/mons/seel.png",
  "layers": [

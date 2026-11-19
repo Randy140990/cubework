@@ -26,7 +26,7 @@
  },
  "move": "CONFUSE RAY",
  "attack_move": "LICK",
- "scale": 0.945,
+ "scale": 1.04,
  "height": 1.587,
  "texture": "retromon:textures/mons/haunter.png",
  "layers": [

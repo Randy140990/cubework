@@ -1,0 +1,72 @@
+{
+ "idle": "animation.kickaroo.battle_idle",
+ "ground": "animation.kickaroo.ground_idle",
+ "actions": {
+  "cry": "animation.kickaroo.cry",
+  "recoil": "animation.kickaroo.recoil",
+  "attack": "animation.kickaroo.attack",
+  "critical": "animation.kickaroo.critical",
+  "special": "animation.kickaroo.special",
+  "recall": "animation.kickaroo.recall",
+  "sendout": "animation.kickaroo.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.kickaroo.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.kickaroo.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.kickaroo.faint",
+   "parts": []
+  }
+ },
+ "move": "HI JUMP KICK",
+ "attack_move": "DOUBLE KICK",
+ "scale": 0.901,
+ "height": 1.887,
+ "texture": "retromon:textures/mons/hitmonlee.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/hitmonlee_glow_0.png",
+    "retromon:textures/mons/hitmonlee_glow_1.png",
+    "retromon:textures/mons/hitmonlee_glow_2.png",
+    "retromon:textures/mons/hitmonlee_glow_3.png",
+    "retromon:textures/mons/hitmonlee_glow_4.png",
+    "retromon:textures/mons/hitmonlee_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "KICKAROO",
+ "anchors": {
+  "mouth": [
+   0,
+   21.0,
+   -7.4
+  ],
+  "back": [
+   0,
+   31.2,
+   -0.2
+  ],
+  "body": [
+   0,
+   14.0,
+   -0.2
+  ],
+  "size": [
+   9.6,
+   30.2,
+   21.1
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

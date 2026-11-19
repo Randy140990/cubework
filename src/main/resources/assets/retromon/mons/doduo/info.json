@@ -34,7 +34,7 @@
  },
  "move": "FURY ATTACK",
  "attack_move": "PECK",
- "scale": 0.863,
+ "scale": 1.18,
  "height": 1.738,
  "texture": "retromon:textures/mons/doduo.png",
  "layers": [

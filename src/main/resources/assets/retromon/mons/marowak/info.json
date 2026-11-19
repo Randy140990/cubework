@@ -1,0 +1,72 @@
+{
+ "idle": "animation.bonejackal.battle_idle",
+ "ground": "animation.bonejackal.ground_idle",
+ "actions": {
+  "cry": "animation.bonejackal.cry",
+  "recoil": "animation.bonejackal.recoil",
+  "attack": "animation.bonejackal.attack",
+  "critical": "animation.bonejackal.critical",
+  "special": "animation.bonejackal.special",
+  "recall": "animation.bonejackal.recall",
+  "sendout": "animation.bonejackal.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.bonejackal.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.bonejackal.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.bonejackal.faint",
+   "parts": []
+  }
+ },
+ "move": "BONE RUSH",
+ "attack_move": "BONEMERANG",
+ "scale": 0.683,
+ "height": 1.978,
+ "texture": "retromon:textures/mons/marowak.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/marowak_glow_0.png",
+    "retromon:textures/mons/marowak_glow_1.png",
+    "retromon:textures/mons/marowak_glow_2.png",
+    "retromon:textures/mons/marowak_glow_3.png",
+    "retromon:textures/mons/marowak_glow_4.png",
+    "retromon:textures/mons/marowak_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BONEJACKAL",
+ "anchors": {
+  "mouth": [
+   0,
+   17.98,
+   -9.63
+  ],
+  "back": [
+   0,
+   32.65,
+   -0.06
+  ],
+  "body": [
+   0,
+   12.52,
+   -0.06
+  ],
+  "size": [
+   17.5,
+   31.65,
+   26.77
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

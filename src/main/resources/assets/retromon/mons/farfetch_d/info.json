@@ -34,7 +34,7 @@
  },
  "move": "SLASH",
  "attack_move": "FURY ATTACK",
- "scale": 0.754,
+ "scale": 0.932,
  "height": 1.127,
  "texture": "retromon:textures/mons/farfetch_d.png",
  "layers": [

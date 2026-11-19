@@ -1,0 +1,72 @@
+{
+ "idle": "animation.podlings.ground_idle",
+ "ground": "animation.podlings.ground_idle",
+ "actions": {
+  "cry": "animation.podlings.cry",
+  "recoil": "animation.podlings.recoil",
+  "attack": "animation.podlings.attack",
+  "critical": "animation.podlings.critical",
+  "special": "animation.podlings.special",
+  "recall": "animation.podlings.recall",
+  "sendout": "animation.podlings.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.podlings.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.podlings.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.podlings.faint",
+   "parts": []
+  }
+ },
+ "move": "HYPNOSIS",
+ "attack_move": "BARRAGE",
+ "scale": 0.621,
+ "height": 0.725,
+ "texture": "retromon:textures/mons/exeggcute.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/exeggcute_glow_0.png",
+    "retromon:textures/mons/exeggcute_glow_1.png",
+    "retromon:textures/mons/exeggcute_glow_2.png",
+    "retromon:textures/mons/exeggcute_glow_3.png",
+    "retromon:textures/mons/exeggcute_glow_4.png",
+    "retromon:textures/mons/exeggcute_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PODLINGS",
+ "anchors": {
+  "mouth": [
+   0,
+   6.2,
+   -3.9
+  ],
+  "back": [
+   0,
+   12.6,
+   0.0
+  ],
+  "body": [
+   0,
+   0.5,
+   0.0
+  ],
+  "size": [
+   13.0,
+   11.6,
+   12.6
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.basalwyrm.battle_idle",
+ "ground": "animation.basalwyrm.ground_idle",
+ "actions": {
+  "cry": "animation.basalwyrm.cry",
+  "recoil": "animation.basalwyrm.recoil",
+  "attack": "animation.basalwyrm.attack",
+  "critical": "animation.basalwyrm.critical",
+  "special": "animation.basalwyrm.special",
+  "recall": "animation.basalwyrm.recall",
+  "sendout": "animation.basalwyrm.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.basalwyrm.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.basalwyrm.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.basalwyrm.faint",
+   "parts": []
+  }
+ },
+ "move": "ROCK THROW",
+ "attack_move": "SLAM",
+ "scale": 2.556,
+ "height": 0.9,
+ "texture": "retromon:textures/mons/onix.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/onix_glow_0.png",
+    "retromon:textures/mons/onix_glow_1.png",
+    "retromon:textures/mons/onix_glow_2.png",
+    "retromon:textures/mons/onix_glow_3.png",
+    "retromon:textures/mons/onix_glow_4.png",
+    "retromon:textures/mons/onix_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BASALWYRM",
+ "anchors": {
+  "mouth": [
+   0,
+   3.2,
+   -38.9
+  ],
+  "back": [
+   0,
+   10.8,
+   -2.0
+  ],
+  "body": [
+   0,
+   5.79,
+   -2.0
+  ],
+  "size": [
+   14.4,
+   14.4,
+   107.6
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

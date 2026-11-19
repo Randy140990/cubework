@@ -26,7 +26,7 @@
  },
  "move": "AURORA BEAM",
  "attack_move": "SPIKE CANNON",
- "scale": 1.778,
+ "scale": 1.556,
  "height": 0.9,
  "texture": "retromon:textures/mons/cloyster.png",
  "layers": [

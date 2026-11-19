@@ -34,7 +34,7 @@
  },
  "move": "TRI ATTACK",
  "attack_move": "DRILL PECK",
- "scale": 0.811,
+ "scale": 1.365,
  "height": 2.344,
  "texture": "retromon:textures/mons/dodrio.png",
  "layers": [

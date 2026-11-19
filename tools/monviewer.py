@@ -25,7 +25,10 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Flytraps", ["bellsprout", "weepinbell", "victreebel"]), ("Sail jellies", ["tentacool", "tentacruel"]), ("Geodes", ["geodude", "graveler", "golem"]),
             ("Fire deer", ["ponyta", "rapidash"]), ("Salamanders", ["slowpoke", "slowbro"]),
             ("Bolt nuts", ["magnemite", "magneton"]), ("Kingfisher", ["farfetch_d"]), ("Cassowaries", ["doduo", "dodrio"]), ("Ice seals", ["seel", "dewgong"]),
-            ("Bog slimes", ["grimer", "muk"]), ("Shells", ["shellder", "cloyster"]), ("Shadow lanterns", ["gastly", "haunter", "gengar"])]
+            ("Bog slimes", ["grimer", "muk"]), ("Shells", ["shellder", "cloyster"]), ("Shadow lanterns", ["gastly", "haunter", "gengar"]),
+            ("Basalt wyrm", ["onix"]), ("Koalas", ["drowzee", "hypno"]), ("Fiddler crabs", ["krabby", "kingler"]), ("Bulbs", ["voltorb", "electrode"]),
+            ("Acorns", ["exeggcute", "exeggutor"]), ("Skull jackals", ["cubone", "marowak"]), ("Kangaroo", ["hitmonlee"]), ("Mantis shrimp", ["hitmonchan"]),
+            ("Chameleon", ["lickitung"])]
 KEEP = ("idle", "ground")
 
 

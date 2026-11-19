@@ -1,0 +1,72 @@
+{
+ "idle": "animation.oaktrio.battle_idle",
+ "ground": "animation.oaktrio.ground_idle",
+ "actions": {
+  "cry": "animation.oaktrio.cry",
+  "recoil": "animation.oaktrio.recoil",
+  "attack": "animation.oaktrio.attack",
+  "critical": "animation.oaktrio.critical",
+  "special": "animation.oaktrio.special",
+  "recall": "animation.oaktrio.recall",
+  "sendout": "animation.oaktrio.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.oaktrio.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.oaktrio.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.oaktrio.faint",
+   "parts": []
+  }
+ },
+ "move": "EGG BOMB",
+ "attack_move": "STOMP",
+ "scale": 1.578,
+ "height": 2.155,
+ "texture": "retromon:textures/mons/exeggutor.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/exeggutor_glow_0.png",
+    "retromon:textures/mons/exeggutor_glow_1.png",
+    "retromon:textures/mons/exeggutor_glow_2.png",
+    "retromon:textures/mons/exeggutor_glow_3.png",
+    "retromon:textures/mons/exeggutor_glow_4.png",
+    "retromon:textures/mons/exeggutor_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "OAKTRIO",
+ "anchors": {
+  "mouth": [
+   0,
+   26.4,
+   -7.36
+  ],
+  "back": [
+   0,
+   35.48,
+   4.0
+  ],
+  "body": [
+   0,
+   18.25,
+   4.0
+  ],
+  "size": [
+   24.0,
+   34.48,
+   22.45
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

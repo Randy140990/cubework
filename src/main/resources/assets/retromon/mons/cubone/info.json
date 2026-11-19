@@ -1,0 +1,72 @@
+{
+ "idle": "animation.skullkit.battle_idle",
+ "ground": "animation.skullkit.ground_idle",
+ "actions": {
+  "cry": "animation.skullkit.cry",
+  "recoil": "animation.skullkit.recoil",
+  "attack": "animation.skullkit.attack",
+  "critical": "animation.skullkit.critical",
+  "special": "animation.skullkit.special",
+  "recall": "animation.skullkit.recall",
+  "sendout": "animation.skullkit.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.skullkit.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.skullkit.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.skullkit.faint",
+   "parts": []
+  }
+ },
+ "move": "BONEMERANG",
+ "attack_move": "BONE CLUB",
+ "scale": 0.606,
+ "height": 1.156,
+ "texture": "retromon:textures/mons/cubone.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/cubone_glow_0.png",
+    "retromon:textures/mons/cubone_glow_1.png",
+    "retromon:textures/mons/cubone_glow_2.png",
+    "retromon:textures/mons/cubone_glow_3.png",
+    "retromon:textures/mons/cubone_glow_4.png",
+    "retromon:textures/mons/cubone_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SKULLKIT",
+ "anchors": {
+  "mouth": [
+   0,
+   8.9,
+   -6.8
+  ],
+  "back": [
+   0,
+   19.5,
+   -0.3
+  ],
+  "body": [
+   0,
+   6.0,
+   -0.3
+  ],
+  "size": [
+   10.8,
+   18.5,
+   15.7
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

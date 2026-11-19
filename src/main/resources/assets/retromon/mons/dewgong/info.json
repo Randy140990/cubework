@@ -26,7 +26,7 @@
  },
  "move": "ICE BEAM",
  "attack_move": "TAKE DOWN",
- "scale": 2.217,
+ "scale": 1.724,
  "height": 0.812,
  "texture": "retromon:textures/mons/dewgong.png",
  "layers": [

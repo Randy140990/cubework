@@ -1,0 +1,72 @@
+{
+ "idle": "animation.hypnala.battle_idle",
+ "ground": "animation.hypnala.ground_idle",
+ "actions": {
+  "cry": "animation.hypnala.cry",
+  "recoil": "animation.hypnala.recoil",
+  "attack": "animation.hypnala.attack",
+  "critical": "animation.hypnala.critical",
+  "special": "animation.hypnala.special",
+  "recall": "animation.hypnala.recall",
+  "sendout": "animation.hypnala.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.hypnala.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.hypnala.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.hypnala.faint",
+   "parts": []
+  }
+ },
+ "move": "PSYCHIC",
+ "attack_move": "HEADBUTT",
+ "scale": 1.01,
+ "height": 1.931,
+ "texture": "retromon:textures/mons/hypno.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/hypno_glow_0.png",
+    "retromon:textures/mons/hypno_glow_1.png",
+    "retromon:textures/mons/hypno_glow_2.png",
+    "retromon:textures/mons/hypno_glow_3.png",
+    "retromon:textures/mons/hypno_glow_4.png",
+    "retromon:textures/mons/hypno_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "HYPNALA",
+ "anchors": {
+  "mouth": [
+   0,
+   19.29,
+   -8.62
+  ],
+  "back": [
+   0,
+   31.89,
+   -0.36
+  ],
+  "body": [
+   0,
+   12.3,
+   -0.36
+  ],
+  "size": [
+   24.94,
+   30.89,
+   13.04
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

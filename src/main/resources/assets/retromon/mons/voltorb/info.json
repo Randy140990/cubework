@@ -1,0 +1,72 @@
+{
+ "idle": "animation.bulblet.ground_idle",
+ "ground": "animation.bulblet.ground_idle",
+ "actions": {
+  "cry": "animation.bulblet.cry",
+  "recoil": "animation.bulblet.recoil",
+  "attack": "animation.bulblet.attack",
+  "critical": "animation.bulblet.critical",
+  "special": "animation.bulblet.special",
+  "recall": "animation.bulblet.recall",
+  "sendout": "animation.bulblet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.bulblet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.bulblet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.bulblet.faint",
+   "parts": []
+  }
+ },
+ "move": "SONICBOOM",
+ "attack_move": "TACKLE",
+ "scale": 0.904,
+ "height": 0.719,
+ "texture": "retromon:textures/mons/voltorb.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/voltorb_glow_0.png",
+    "retromon:textures/mons/voltorb_glow_1.png",
+    "retromon:textures/mons/voltorb_glow_2.png",
+    "retromon:textures/mons/voltorb_glow_3.png",
+    "retromon:textures/mons/voltorb_glow_4.png",
+    "retromon:textures/mons/voltorb_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BULBLET",
+ "anchors": {
+  "mouth": [
+   0,
+   6.0,
+   -5.1
+  ],
+  "back": [
+   0,
+   12.5,
+   0.0
+  ],
+  "body": [
+   0,
+   5.75,
+   0.0
+  ],
+  "size": [
+   9.0,
+   11.5,
+   9.3
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

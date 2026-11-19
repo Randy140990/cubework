@@ -1,0 +1,72 @@
+{
+ "idle": "animation.lashleon.battle_idle",
+ "ground": "animation.lashleon.ground_idle",
+ "actions": {
+  "cry": "animation.lashleon.cry",
+  "recoil": "animation.lashleon.recoil",
+  "attack": "animation.lashleon.attack",
+  "critical": "animation.lashleon.critical",
+  "special": "animation.lashleon.special",
+  "recall": "animation.lashleon.recall",
+  "sendout": "animation.lashleon.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.lashleon.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.lashleon.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.lashleon.faint",
+   "parts": []
+  }
+ },
+ "move": "WRAP",
+ "attack_move": "LICK",
+ "scale": 1.327,
+ "height": 1.13,
+ "texture": "retromon:textures/mons/lickitung.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/lickitung_glow_0.png",
+    "retromon:textures/mons/lickitung_glow_1.png",
+    "retromon:textures/mons/lickitung_glow_2.png",
+    "retromon:textures/mons/lickitung_glow_3.png",
+    "retromon:textures/mons/lickitung_glow_4.png",
+    "retromon:textures/mons/lickitung_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LASHLEON",
+ "anchors": {
+  "mouth": [
+   0,
+   11.18,
+   -13.5
+  ],
+  "back": [
+   0,
+   17.82,
+   0.0
+  ],
+  "body": [
+   0,
+   11.66,
+   0.0
+  ],
+  "size": [
+   9.45,
+   18.08,
+   45.6
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}
