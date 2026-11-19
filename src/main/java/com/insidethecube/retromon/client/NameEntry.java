@@ -115,8 +115,9 @@ public final class NameEntry {
 			boolean on = i == sel;
 			int bg = i == KEYS.length + 1 ? (on ? V.GREEN : 0x4041BF84) : on ? V.CREAM : 0x12FFFFFF;
 			V.rr(g, kx, ky, kw, 50, 14, bg);
-			String t = i < KEYS.length ? (KEYS[i].equals(" ") ? "␣" : KEYS[i]) : i == KEYS.length ? "DELETE" : "OK";
-			float size = i < KEYS.length ? 26 : 18;
+			boolean space = i < KEYS.length && KEYS[i].equals(" ");
+			String t = i < KEYS.length ? (space ? "SPACE" : KEYS[i]) : i == KEYS.length ? "DELETE" : "OK";
+			float size = i < KEYS.length && !space ? 26 : space ? 13 : 18;
 			V.centred(g, t, kx + kw / 2, ky + (50 - size * 1.15F) / 2, size, i == KEYS.length + 1 ? 0xFFFFFFFF : on ? V.INK : V.TEXT, true);
 			int ii = i;
 			hits.add(kx, ky, kw, 50, () -> {

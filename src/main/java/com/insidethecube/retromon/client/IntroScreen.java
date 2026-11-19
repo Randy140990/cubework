@@ -821,7 +821,7 @@ public class IntroScreen extends GameScreen {
 				if (mode.equals("intro") && hopAt < 0 && talk.message() == 2) hopAt = ticks;
 				float hop = hopAt < 0 ? -1 : (ticks - hopAt + partial) / 20F;
 				float wave = waveAt < 0 ? 0 : Math.min(1, (ticks - waveAt + partial) / 6F);
-				Scenes.prof(g, secs, mode, waveAt < 0 && !talk.typedOut() || waveAt < 0 && mode.equals("intro"), wave, mode.equals("intro") ? hop : 1.5F, you());
+				Scenes.prof(g, secs, mode, waveAt < 0, wave, mode.equals("intro") ? hop : -1, you());
 				talk.renderV(g, font, 140, 26, 1000, ticks, partial, waveAt < 0);
 			}
 			case MAKER -> {
@@ -971,7 +971,7 @@ public class IntroScreen extends GameScreen {
 	/** Your name (you on your stand, the ready names, or the letters), or your rival's (beside Oak, his line kept up). */
 	private void drawNames(GuiGraphics g, float secs, float partial) {
 		if (namingRival) {
-			Scenes.prof(g, secs, "rival", false, 0, 1.5F, you());
+			Scenes.prof(g, secs, "rival", false, 0, -1, you());
 			if (entry == null && talk != null) talk.renderV(g, font, 140, 26, 1000, ticks, partial, false);
 			if (entry == null) vchoice(g, names, 980, 140, 250, this::pickName);
 		} else {
