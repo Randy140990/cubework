@@ -1,0 +1,72 @@
+{
+ "idle": "animation.frondrake.battle_idle",
+ "ground": "animation.frondrake.ground_idle",
+ "actions": {
+  "cry": "animation.frondrake.cry",
+  "recoil": "animation.frondrake.recoil",
+  "attack": "animation.frondrake.attack",
+  "critical": "animation.frondrake.critical",
+  "special": "animation.frondrake.special",
+  "recall": "animation.frondrake.recall",
+  "sendout": "animation.frondrake.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.frondrake.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.frondrake.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.frondrake.faint",
+   "parts": []
+  }
+ },
+ "move": "TWISTER",
+ "attack_move": "WATER GUN",
+ "scale": 0.588,
+ "height": 2.16,
+ "texture": "retromon:textures/mons/seadra.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/seadra_glow_0.png",
+    "retromon:textures/mons/seadra_glow_1.png",
+    "retromon:textures/mons/seadra_glow_2.png",
+    "retromon:textures/mons/seadra_glow_3.png",
+    "retromon:textures/mons/seadra_glow_4.png",
+    "retromon:textures/mons/seadra_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "FRONDRAKE",
+ "anchors": {
+  "mouth": [
+   0,
+   23.36,
+   -12.66
+  ],
+  "back": [
+   0,
+   35.56,
+   1.86
+  ],
+  "body": [
+   0,
+   18.6,
+   1.86
+  ],
+  "size": [
+   9.76,
+   34.56,
+   20.04
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

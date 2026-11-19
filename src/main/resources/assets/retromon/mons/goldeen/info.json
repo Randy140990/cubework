@@ -1,0 +1,72 @@
+{
+ "idle": "animation.flaretail.battle_idle",
+ "ground": "animation.flaretail.ground_idle",
+ "actions": {
+  "cry": "animation.flaretail.cry",
+  "recoil": "animation.flaretail.recoil",
+  "attack": "animation.flaretail.attack",
+  "critical": "animation.flaretail.critical",
+  "special": "animation.flaretail.special",
+  "recall": "animation.flaretail.recall",
+  "sendout": "animation.flaretail.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.flaretail.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.flaretail.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.flaretail.faint",
+   "parts": []
+  }
+ },
+ "move": "HORN ATTACK",
+ "attack_move": "PECK",
+ "scale": 0.8,
+ "height": 0.775,
+ "texture": "retromon:textures/mons/goldeen.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/goldeen_glow_0.png",
+    "retromon:textures/mons/goldeen_glow_1.png",
+    "retromon:textures/mons/goldeen_glow_2.png",
+    "retromon:textures/mons/goldeen_glow_3.png",
+    "retromon:textures/mons/goldeen_glow_4.png",
+    "retromon:textures/mons/goldeen_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "FLARETAIL",
+ "anchors": {
+  "mouth": [
+   0,
+   5.2,
+   -7.9
+  ],
+  "back": [
+   0,
+   13.4,
+   0.5
+  ],
+  "body": [
+   0,
+   6.0,
+   0.5
+  ],
+  "size": [
+   4.3,
+   12.4,
+   22.9
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

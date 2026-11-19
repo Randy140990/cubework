@@ -1,0 +1,72 @@
+{
+ "idle": "animation.puffspore.battle_idle",
+ "ground": "animation.puffspore.ground_idle",
+ "actions": {
+  "cry": "animation.puffspore.cry",
+  "recoil": "animation.puffspore.recoil",
+  "attack": "animation.puffspore.attack",
+  "critical": "animation.puffspore.critical",
+  "special": "animation.puffspore.special",
+  "recall": "animation.puffspore.recall",
+  "sendout": "animation.puffspore.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.puffspore.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.puffspore.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.puffspore.faint",
+   "parts": []
+  }
+ },
+ "move": "SMOG",
+ "attack_move": "TACKLE",
+ "scale": 0.987,
+ "height": 0.963,
+ "texture": "retromon:textures/mons/koffing.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/koffing_glow_0.png",
+    "retromon:textures/mons/koffing_glow_1.png",
+    "retromon:textures/mons/koffing_glow_2.png",
+    "retromon:textures/mons/koffing_glow_3.png",
+    "retromon:textures/mons/koffing_glow_4.png",
+    "retromon:textures/mons/koffing_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PUFFSPORE",
+ "anchors": {
+  "mouth": [
+   0,
+   7.6,
+   -5.0
+  ],
+  "back": [
+   0,
+   14.5,
+   0.0
+  ],
+  "body": [
+   0,
+   9.0,
+   0.0
+  ],
+  "size": [
+   10.56,
+   13.5,
+   10.38
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

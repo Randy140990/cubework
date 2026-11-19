@@ -1,0 +1,72 @@
+{
+ "idle": "animation.driftleaf.battle_idle",
+ "ground": "animation.driftleaf.ground_idle",
+ "actions": {
+  "cry": "animation.driftleaf.cry",
+  "recoil": "animation.driftleaf.recoil",
+  "attack": "animation.driftleaf.attack",
+  "critical": "animation.driftleaf.critical",
+  "special": "animation.driftleaf.special",
+  "recall": "animation.driftleaf.recall",
+  "sendout": "animation.driftleaf.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.driftleaf.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.driftleaf.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.driftleaf.faint",
+   "parts": []
+  }
+ },
+ "move": "SMOKESCREEN",
+ "attack_move": "BUBBLE",
+ "scale": 0.466,
+ "height": 1.288,
+ "texture": "retromon:textures/mons/horsea.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/horsea_glow_0.png",
+    "retromon:textures/mons/horsea_glow_1.png",
+    "retromon:textures/mons/horsea_glow_2.png",
+    "retromon:textures/mons/horsea_glow_3.png",
+    "retromon:textures/mons/horsea_glow_4.png",
+    "retromon:textures/mons/horsea_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "DRIFTLEAF",
+ "anchors": {
+  "mouth": [
+   0,
+   14.6,
+   -8.1
+  ],
+  "back": [
+   0,
+   21.6,
+   -0.3
+  ],
+  "body": [
+   0,
+   11.0,
+   -0.3
+  ],
+  "size": [
+   5.6,
+   20.6,
+   9.8
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

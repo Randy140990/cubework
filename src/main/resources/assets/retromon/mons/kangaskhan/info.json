@@ -1,0 +1,72 @@
+{
+ "idle": "animation.antmatron.battle_idle",
+ "ground": "animation.antmatron.ground_idle",
+ "actions": {
+  "cry": "animation.antmatron.cry",
+  "recoil": "animation.antmatron.recoil",
+  "attack": "animation.antmatron.attack",
+  "critical": "animation.antmatron.critical",
+  "special": "animation.antmatron.special",
+  "recall": "animation.antmatron.recall",
+  "sendout": "animation.antmatron.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.antmatron.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.antmatron.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.antmatron.faint",
+   "parts": []
+  }
+ },
+ "move": "DIZZY PUNCH",
+ "attack_move": "MEGA PUNCH",
+ "scale": 2.5,
+ "height": 1.2,
+ "texture": "retromon:textures/mons/kangaskhan.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/kangaskhan_glow_0.png",
+    "retromon:textures/mons/kangaskhan_glow_1.png",
+    "retromon:textures/mons/kangaskhan_glow_2.png",
+    "retromon:textures/mons/kangaskhan_glow_3.png",
+    "retromon:textures/mons/kangaskhan_glow_4.png",
+    "retromon:textures/mons/kangaskhan_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "ANTMATRON",
+ "anchors": {
+  "mouth": [
+   0,
+   11.2,
+   -20.5
+  ],
+  "back": [
+   0,
+   20.2,
+   0.5
+  ],
+  "body": [
+   0,
+   11.0,
+   0.5
+  ],
+  "size": [
+   10.1,
+   19.2,
+   36.0
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

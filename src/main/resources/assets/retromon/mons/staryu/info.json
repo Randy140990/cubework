@@ -1,0 +1,72 @@
+{
+ "idle": "animation.urchlet.ground_idle",
+ "ground": "animation.urchlet.ground_idle",
+ "actions": {
+  "cry": "animation.urchlet.cry",
+  "recoil": "animation.urchlet.recoil",
+  "attack": "animation.urchlet.attack",
+  "critical": "animation.urchlet.critical",
+  "special": "animation.urchlet.special",
+  "recall": "animation.urchlet.recall",
+  "sendout": "animation.urchlet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.urchlet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.urchlet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.urchlet.faint",
+   "parts": []
+  }
+ },
+ "move": "SWIFT",
+ "attack_move": "TACKLE",
+ "scale": 1.106,
+ "height": 0.642,
+ "texture": "retromon:textures/mons/staryu.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/staryu_glow_0.png",
+    "retromon:textures/mons/staryu_glow_1.png",
+    "retromon:textures/mons/staryu_glow_2.png",
+    "retromon:textures/mons/staryu_glow_3.png",
+    "retromon:textures/mons/staryu_glow_4.png",
+    "retromon:textures/mons/staryu_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "URCHLET",
+ "anchors": {
+  "mouth": [
+   0,
+   5.0,
+   -4.9
+  ],
+  "back": [
+   0,
+   11.26,
+   1.88
+  ],
+  "body": [
+   0,
+   6.09,
+   1.88
+  ],
+  "size": [
+   9.61,
+   10.26,
+   12.16
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

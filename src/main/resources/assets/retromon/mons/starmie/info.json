@@ -1,0 +1,72 @@
+{
+ "idle": "animation.prismurchin.ground_idle",
+ "ground": "animation.prismurchin.ground_idle",
+ "actions": {
+  "cry": "animation.prismurchin.cry",
+  "recoil": "animation.prismurchin.recoil",
+  "attack": "animation.prismurchin.attack",
+  "critical": "animation.prismurchin.critical",
+  "special": "animation.prismurchin.special",
+  "recall": "animation.prismurchin.recall",
+  "sendout": "animation.prismurchin.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.prismurchin.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.prismurchin.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.prismurchin.faint",
+   "parts": []
+  }
+ },
+ "move": "BUBBLEBEAM",
+ "attack_move": "SWIFT",
+ "scale": 1.066,
+ "height": 0.938,
+ "texture": "retromon:textures/mons/starmie.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/starmie_glow_0.png",
+    "retromon:textures/mons/starmie_glow_1.png",
+    "retromon:textures/mons/starmie_glow_2.png",
+    "retromon:textures/mons/starmie_glow_3.png",
+    "retromon:textures/mons/starmie_glow_4.png",
+    "retromon:textures/mons/starmie_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PRISMURCHIN",
+ "anchors": {
+  "mouth": [
+   0,
+   7.5,
+   -7.1
+  ],
+  "back": [
+   0,
+   16.0,
+   4.32
+  ],
+  "body": [
+   0,
+   8.94,
+   4.32
+  ],
+  "size": [
+   13.42,
+   15.0,
+   21.24
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

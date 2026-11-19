@@ -1,0 +1,72 @@
+{
+ "idle": "animation.lancetail.battle_idle",
+ "ground": "animation.lancetail.ground_idle",
+ "actions": {
+  "cry": "animation.lancetail.cry",
+  "recoil": "animation.lancetail.recoil",
+  "attack": "animation.lancetail.attack",
+  "critical": "animation.lancetail.critical",
+  "special": "animation.lancetail.special",
+  "recall": "animation.lancetail.recall",
+  "sendout": "animation.lancetail.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.lancetail.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.lancetail.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.lancetail.faint",
+   "parts": []
+  }
+ },
+ "move": "WATERFALL",
+ "attack_move": "HORN DRILL",
+ "scale": 0.963,
+ "height": 1.215,
+ "texture": "retromon:textures/mons/seaking.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/seaking_glow_0.png",
+    "retromon:textures/mons/seaking_glow_1.png",
+    "retromon:textures/mons/seaking_glow_2.png",
+    "retromon:textures/mons/seaking_glow_3.png",
+    "retromon:textures/mons/seaking_glow_4.png",
+    "retromon:textures/mons/seaking_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LANCETAIL",
+ "anchors": {
+  "mouth": [
+   0,
+   8.32,
+   -12.34
+  ],
+  "back": [
+   0,
+   20.44,
+   0.7
+  ],
+  "body": [
+   0,
+   9.4,
+   0.7
+  ],
+  "size": [
+   6.72,
+   19.44,
+   45.78
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}
