@@ -28,6 +28,7 @@ public final class Hud {
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("fade"), Hud::fade);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("place"), Hud::place);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("speed"), Hud::speed);
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("badge"), Hud::badgeNotice);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("money"), Hud::money);
 	}
 
@@ -66,6 +67,39 @@ public final class Hud {
 			}
 		}
 		moneyTick(mc);
+		if (badgeShown >= 0 && mc.screen == null) badgeTicks++;
+	}
+
+	// ---------- a badge won: the UI Viewer's notice ----------
+
+	private static int badgeShown = -1, badgeTicks;
+	private static final String[] BADGE_NAMES = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
+
+	/** Shows the notice for badge b (0 to 7) once you're back out in the world. */
+	public static void badge(int b) {
+		badgeShown = b;
+		badgeTicks = 0;
+	}
+
+	/** The badge, its name, and the eight slots with the ones you have lit, sliding in at the top right for a few seconds. */
+	private static void badgeNotice(GuiGraphics g, DeltaTracker delta) {
+		Minecraft mc = Minecraft.getInstance();
+		if (badgeShown < 0 || !Adventure.active() || mc.screen != null) return;
+		if (badgeTicks > 90) {
+			badgeShown = -1;
+			return;
+		}
+		V.fit(g.guiWidth(), g.guiHeight());
+		float t = badgeTicks + delta.getGameTimeDeltaPartialTick(true), in = Math.min(1, t / 9F), out = t > 76 ? Math.min(1, (t - 76) / 10F) : 0;
+		float a = in * (1 - out), x = 870 + (1 - in) * 40, y = 96;
+		if (a < 0.02F) return;
+		V.panel(g, x, y, 386, 98, 22, false);
+		V.icon(g, "badge_" + badgeShown, x + 12, y + 20, 58);
+		V.label(g, "Badge", x + 84, y + 14);
+		V.text(g, BADGE_NAMES[badgeShown], x + 84, y + 32, 21, V.TEXT, true);
+		java.util.Set<String> have = ClientState.data.badges;
+		for (int j = 0; j < 8; j++)
+			V.icon(g, "badge_" + j, x + 84 + j * 27, y + 64, 22, have.contains(BADGE_NAMES[j]) || j == badgeShown ? 0xFFFFFFFF : 0x8055595E);
 	}
 
 	// ---------- your money, sliding in at the top right when it changes (after a battle, say) ----------

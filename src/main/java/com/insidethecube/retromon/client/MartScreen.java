@@ -172,53 +172,62 @@ public class MartScreen extends GameScreen {
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
 		PlayerData d = ClientState.data;
-		int m = 6 * s, h = boxHeight();
-		box.render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, step == Step.BYE);
-		// Money, top right.
+		// The UI Viewer's shop: the clerk's words in the text box, your money at the top left, the list at the top right
+		// with prices, how many you have of the one you're on, and how many to buy in its own panel.
+		if (!box.empty()) {
+			box.speaker = "CLERK";
+			box.renderV(g, font, 140, 26, 1000, ticks, partial, step == Step.BYE);
+		}
 		String money = Ui.money(d.money);
-		int mw = Math.max(Ui.width(font, money, s), Ui.width(font, "MONEY", s)) + 20 * s;
-		Ui.tagged(g, width - mw - m, m, mw, 26 * s, s, Ui.GOLD);
-		Ui.text(g, font, "MONEY", width - mw - m + 8 * s, m + 4 * s, Ui.MUTED, s);
-		Ui.right(g, font, money, width - m - 8 * s, m + 14 * s, Ui.TEXT, s);
+		float mw = Math.max(V.width(money, 26, true), V.labelWidth("Money")) + 44;
+		V.panel(g, 30, 30, mw, 80, 22, false);
+		V.label(g, "Money", 52, 46);
+		V.text(g, money, 52, 66, 26, V.TEXT, true);
 		if (step == Step.BYE) return;
 		if (step == Step.MENU) {
-			int w = menu.width(font, s);
-			choice(g, menu, m, m, w, this::menuPick);
+			vchoice(g, menu, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(menu.options.size()), 300, this::menuPick);
 			return;
 		}
-		// The list: what's for sale (or what you have), the price and how many you've got.
 		List<String> l = list();
-		int lw = Math.min(width - 2 * m, 220 * s), row = 14 * s, lh = (l.size() + 1) * row + 10 * s, lx = m, ly = m;
-		Ui.tagged(g, lx, ly, lw, lh, s, from == Step.SELL ? Ui.GREEN : Ui.BLUE);
-		for (int i = 0; i <= l.size(); i++) {
-			int ty = ly + 6 * s + i * row;
-			int idx = i;
+		float lx = 760, ly = 30, lw = 480;
+		int rows = Math.min(l.size() + 1, 9);
+		V.panel(g, lx, ly, lw, V.choiceHeight(rows));
+		int top = Math.max(0, Math.min(at - rows + 1, l.size() + 1 - rows));
+		for (int k = 0; k < rows; k++) {
+			int i = top + k, idx = i;
+			float ty = ly + 12 + k * 54;
 			boolean on = i == at && step != Step.HOW_MANY || (step == Step.HOW_MANY && i < l.size() && l.get(i).equals(picked));
-			if (over(lx, ty - 2 * s, lw, row) && step != Step.HOW_MANY) at = i;
-			if (on) Ui.round(g, lx + 4 * s, ty - 2 * s, lw - 8 * s, row - s, 0x334A8FE0, s);
-			if (i == l.size()) {
-				Ui.text(g, font, "CANCEL", lx + 12 * s, ty + s, Ui.MUTED, s);
-			} else {
+			if (vover(lx + 12, ty, lw - 24, 46) && step != Step.HOW_MANY) at = i;
+			if (i == l.size()) V.item(g, "CANCEL", null, lx + 12, ty, lw - 24, 46, on, false, 21);
+			else {
 				Item it = Item.find(l.get(i));
-				Ui.text(g, font, it == null ? l.get(i) : it.name(), lx + 12 * s, ty + s, Ui.TEXT, s);
-				Ui.right(g, font, Ui.money(price(l.get(i))), lx + lw - 46 * s, ty + s, Ui.GOLD, s);
-				Ui.right(g, font, "x" + d.count(l.get(i)), lx + lw - 10 * s, ty + s, Ui.MUTED, s);
+				V.item(g, it == null ? l.get(i) : it.name(), Ui.money(price(l.get(i))), lx + 12, ty, lw - 24, 46, on, false, 21);
 			}
-			if (step != Step.HOW_MANY) hit(lx, ty - 2 * s, lw, row, () -> pick(idx));
+			if (step != Step.HOW_MANY) vhit(lx + 12, ty, lw - 24, 46, () -> pick(idx));
+		}
+		// How many of it you have.
+		if (at < l.size()) {
+			V.panel(g, 30, 600, 300, 52, 24, true);
+			V.label(g, "In your bag", 52, 619);
+			V.text(g, String.valueOf(d.count(l.get(at))), 52 + V.labelWidth("In your bag") + 16, 613, 22, V.TEXT, true);
 		}
 		if (step == Step.HOW_MANY) {
-			int qw = 120 * s, qh = 46 * s, qx = width - qw - m, qy = height - h - m - qh - 6 * s;
-			Ui.panel(g, qx, qy, qw, qh, s);
-			Ui.text(g, font, "x" + count, qx + 10 * s, qy + 8 * s, Ui.TEXT, s);
-			Ui.right(g, font, Ui.money(price(picked) * count), qx + qw - 10 * s, qy + 8 * s, Ui.GOLD, s);
-			int bw = 22 * s, by = qy + 22 * s;
-			Ui.button(g, font, qx + 8 * s, by, bw, 16 * s, "-", Ui.BLUE, over(qx + 8 * s, by, bw, 16 * s), s);
-			hit(qx + 8 * s, by, bw, 16 * s, () -> count = Math.max(1, count - 1));
-			Ui.button(g, font, qx + 12 * s + bw, by, bw, 16 * s, "+", Ui.BLUE, over(qx + 12 * s + bw, by, bw, 16 * s), s);
-			hit(qx + 12 * s + bw, by, bw, 16 * s, () -> count = Math.min(maxCount(), count + 1));
-			int ow = qw - 2 * bw - 28 * s;
-			Ui.button(g, font, qx + qw - ow - 8 * s, by, ow, 16 * s, "OK", Ui.GREEN, over(qx + qw - ow - 8 * s, by, ow, 16 * s), s);
-			hit(qx + qw - ow - 8 * s, by, ow, 16 * s, this::confirm);
+			float qx = 440, qy = 300, qw = 300, qh = 128;
+			V.panel(g, qx, qy, qw, qh);
+			V.label(g, "How many?", qx + 22, qy + 18);
+			V.text(g, "x" + String.format("%02d", count), qx + 22, qy + 40, 38, V.TEXT, true);
+			V.right(g, Ui.money(price(picked) * count), qx + qw - 22, qy + 48, 26, V.TEXT, true);
+			float bw = 54;
+			for (int b = 0; b < 3; b++) {
+				String t = b == 0 ? "-" : b == 1 ? "+" : "OK";
+				float bx = qx + 22 + b * (bw + 10), by = qy + 88;
+				boolean over = vover(bx, by, b == 2 ? qw - 44 - 2 * (bw + 10) : bw, 30);
+				float w = b == 2 ? qw - 44 - 2 * (bw + 10) : bw;
+				V.pill(g, bx, by, w, 30, b == 2 ? (over ? V.GREEN : 0xCC41BF84) : over ? V.CREAM : 0x33FFF4D8);
+				V.centred(g, t, bx + w / 2, by + 6, 17, b == 2 ? 0xFFFFFFFF : over ? V.INK : V.TEXT, true);
+				Runnable act = b == 0 ? () -> count = Math.max(1, count - 1) : b == 1 ? () -> count = Math.min(maxCount(), count + 1) : this::confirm;
+				vhit(bx, by, w, 30, act);
+			}
 		}
 	}
 }

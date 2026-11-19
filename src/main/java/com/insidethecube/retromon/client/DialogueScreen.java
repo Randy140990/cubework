@@ -24,6 +24,12 @@ public class DialogueScreen extends GameScreen {
 	private final java.util.Map<Integer, String> cues = new java.util.HashMap<>();
 	private int cued = -1;
 
+	/** The lines as they're said (the speakers taken off). */
+	private final java.util.List<String> said;
+	/** When the line showing came up (ticks), for the cards that pop up with it. */
+	private int lineAt;
+	private static final String[] BADGES = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
+
 	/** A line that starts with who's speaking: "OAK: ..." (capitals, before a colon). */
 	private static final java.util.regex.Pattern SPEAKER = java.util.regex.Pattern.compile("^([A-Z][A-Z .'é&]{1,20}): (.+)$");
 
@@ -40,6 +46,7 @@ public class DialogueScreen extends GameScreen {
 			} else said.add(l);
 		}
 		this.box = new TextBox(said);
+		this.said = said;
 		if (who != null) box.speaker = who;
 		this.mode = mode;
 		this.npc = npc;
@@ -75,6 +82,7 @@ public class DialogueScreen extends GameScreen {
 		int line = box.message();
 		if (line >= 0 && line != cued) {
 			cued = line;
+			lineAt = ticks;
 			String j = cues.get(line);
 			if (j != null) Music.jingle(j);
 		}
@@ -118,6 +126,11 @@ public class DialogueScreen extends GameScreen {
 		t.putBoolean("yes", yes);
 		if (trainer != null) t.putString("trainer", trainer);
 		ClientPlayNetworking.send(new Net.Act("dialogue_done", t));
+		// A badge won: its notice on the HUD, where it sits among the eight.
+		for (String l : said) {
+			int b = badgeIn(l);
+			if (b >= 0 && (l.contains("received") || l.contains("got"))) Hud.badge(b);
+		}
 		Adventure.focus(-1);
 		if (minecraft != null && minecraft.screen == this) minecraft.setScreen(null);
 	}
@@ -138,9 +151,58 @@ public class DialogueScreen extends GameScreen {
 		g.pose().translate(0, V.s(rise));
 		box.renderV(g, font, 140, 26, 1000, ticks, partial, yesNo == null);
 		g.pose().popMatrix();
+		// Getting something: the UI Viewer's card held up over the world (a badge spins in instead).
+		int line = box.message();
+		if (line >= 0 && line < said.size()) {
+			String l = said.get(line);
+			int b = badgeIn(l);
+			float t = (ticks - lineAt + partial) / 20F;
+			if (b >= 0 && (l.contains("received") || l.contains("got"))) badgeCard(g, b, t);
+			else if (cues.containsKey(line) || l.matches(".*\\b(got|received|obtained|found)\\b.*!.*")) itemCard(g, l, t);
+		}
 		if (yesNo != null) {
 			float w = 300;
 			vchoice(g, yesNo, V.W - 140 - w, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), w, i -> done(i == 0));
 		}
+	}
+
+	private static int badgeIn(String line) {
+		String u = line.toUpperCase();
+		for (int i = 0; i < BADGES.length; i++) if (u.contains(BADGES[i])) return i;
+		return -1;
+	}
+
+	/** The picture for something you've got: a ball, medicine, a disc for a TM, the map, a key for the rest. */
+	private static String itemPicture(String line) {
+		String u = line.toUpperCase();
+		if (u.contains("BALL")) return "icon_ball";
+		if (u.contains("POTION") || u.contains("HEAL") || u.contains("ANTIDOTE") || u.contains("REVIVE")) return "icon_potion";
+		if (u.contains(" TM") || u.contains(" HM")) return "icon_disc";
+		if (u.contains("MAP")) return "icon_map";
+		if (u.contains("POKéDEX") || u.contains("POKEDEX")) return "icon_dex";
+		return "icon_key";
+	}
+
+	/** The item held up in a card (the viewer's): a soft glow bobbing behind it, a couple of notes. */
+	private void itemCard(GuiGraphics g, String line, float t) {
+		float pop = Math.min(1, t / 0.4F), k = pop < 1 ? (float) (0.85 + 0.15 * Math.sin(pop * Math.PI / 2) + Math.sin(pop * Math.PI) * 0.08) : 1;
+		float w = 300 * k, x = 640 - w / 2, y = 120 + (300 - w) / 2;
+		V.panel(g, x, y, w, w);
+		float bob = (float) Math.sin(t * Math.PI / 0.8) * 2;
+		V.glow(g, 640, 270 + bob, 126 * k, 126 * k, 0x2EFFF4D8);
+		V.icon(g, itemPicture(line), 640 - 75 * k, 270 - 75 * k, 150 * k);
+		V.text(g, "♫", x + 18, y + 14, 30, V.GOLD, true);
+		V.text(g, "♪", x + w - 22 - 16, y + 40, 24, V.EDGE_LIGHT, true);
+	}
+
+	/** A badge won (the viewer's): a burst of light, the badge spinning in and shining. */
+	private void badgeCard(GuiGraphics g, int b, float t) {
+		g.fill(0, 0, width, height, 0x59061A1E);
+		V.glow(g, 640, 220, 190, 190, 0x26FFF4D8);
+		V.glow(g, 640, 220, 120, 120, 0x40FFF4D8);
+		float in = Math.min(1, t / 1.1F), e = 1 - (1 - in) * (1 - in) * (1 - in);
+		float spin = (float) Math.cos((1 - e) * Math.PI * 3), sc = 0.2F + 0.8F * e + (in < 1 ? (float) Math.sin(in * Math.PI) * 0.08F : 0);
+		float size = 240 * sc, w = Math.max(4, size * Math.abs(spin));
+		V.img(g, V.tex("badge_" + b), 640 - w / 2, 220 - size / 2, w, size, 128, 128, 0xFFFFFFFF);
 	}
 }
