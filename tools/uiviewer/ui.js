@@ -29,7 +29,11 @@ const PARTY = [["pikachu", 24, ["THUNDERSHOCK", "QUICK ATTACK", "THUNDER WAVE", 
   ["pidgeotto", 21, ["GUST", "QUICK ATTACK", "SAND-ATTACK", "WHIRLWIND"], 1, ""], ["sandshrew", 18, ["SCRATCH", "SAND-ATTACK", "SLASH", "DEFENSE CURL"], 0.35, "PSN"],
   ["cubone", 17, ["BONE CLUB", "GROWL", "LEER", "HEADBUTT"], 1, ""], ["clefairy", 16, ["POUND", "SING", "DOUBLESLAP", "MINIMIZE"], 0, "FNT"]];
 function sp(sid) { return DATA.species[sid]; }
-function ourName(sid) { const d = sp(sid); return d ? (d.ours.info.name || sid.toUpperCase()) : sid.toUpperCase(); }
+// Which look the creatures wear: ours (Retromon) or theirs (Cobblemon), as the mod's Look toggle swaps them.
+let LOOK = "ours";
+try { if (localStorage.getItem("rm-ui-look") === "theirs") LOOK = "theirs"; } catch (e) {}
+function lookEntry(sid) { return sp(sid)[LOOK] || sp(sid).ours; }
+function ourName(sid) { const d = sp(sid); return d ? (LOOK === "theirs" ? d.pname.toUpperCase() : (d.ours.info.name || sid.toUpperCase())) : sid.toUpperCase(); }
 function statsAt(sid, lv) {
   const b = sp(sid).stats.stats, o = {};
   for (const [k, v] of Object.entries(b)) o[k] = k === "HP" ? Math.floor((2 * v + 15) * lv / 100) + lv + 10 : Math.floor((2 * v + 15) * lv / 100) + 5;
@@ -57,22 +61,23 @@ function money(n) { return "&#8381;" + n.toLocaleString("en-GB"); }
 const PORTRAIT = {}, portraitWaits = {};
 let pR = null, pScene = null, pCam = null;
 function portrait(sid) {
-  if (PORTRAIT[sid]) return Promise.resolve(PORTRAIT[sid]);
-  if (portraitWaits[sid]) return portraitWaits[sid];
-  return portraitWaits[sid] = loadSpecies(sid).then(() => {
+  const key = LOOK + ":" + sid;
+  if (PORTRAIT[key]) return Promise.resolve(PORTRAIT[key]);
+  if (portraitWaits[key]) return portraitWaits[key];
+  return portraitWaits[key] = loadSpecies(sid).then(() => {
     if (!pR) { const c = document.createElement("canvas"); c.width = c.height = 192; pR = new THREE.WebGLRenderer({ canvas: c, antialias: true, alpha: true, preserveDrawingBuffer: true }); pR.setClearColor(0, 0);
       pScene = new THREE.Scene(); pScene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 0.85)); const l = new THREE.DirectionalLight(0xffffff, 0.6); l.position.set(-3, 5, 4); pScene.add(l); pCam = new THREE.PerspectiveCamera(30, 1, 0.01, 200); }
-    const m = buildModel(sp(sid).ours), sz = sizeOf(m);
+    const m = buildModel(lookEntry(sid)), sz = sizeOf(m);
     return new Promise(res => { let n = 0; const wait = () => { const im = m.mat.map && m.mat.map.image; if ((im && im.complete !== false && im.width) || n++ > 60) res(m); else setTimeout(wait, 50); }; wait(); });
   }).then(m => {
     pose(m, [[groundIdle(m), 0.3]]); m.holder.rotation.y = Math.PI * 0.82; m.holder.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(m.holder), c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3()), R = Math.max(size.x, size.y, size.z) * 0.62;
     pScene.add(m.holder); pCam.position.set(c.x + R * 0.35, c.y + R * 0.55, c.z + R / Math.tan(15 * D2R) * 0.92); pCam.lookAt(c); pR.render(pScene, pCam); pScene.remove(m.holder);
-    return PORTRAIT[sid] = pR.domElement.toDataURL();
+    return PORTRAIT[key] = pR.domElement.toDataURL();
   });
 }
 // An <img> that fills in when the picture's ready.
-function pic(sid, size, extra = "") { const id = "p" + Math.random().toString(36).slice(2); portrait(sid).then(u => { const e = document.getElementById(id); if (e) e.src = u; }); return `<img id="${id}" alt="" style="width:${size}px;height:${size}px;image-rendering:auto;${extra}" src="${PORTRAIT[sid] || "data:image/gif;base64,R0lGODlhAQABAAAAACw="}">`; }
+function pic(sid, size, extra = "") { const id = "p" + Math.random().toString(36).slice(2); portrait(sid).then(u => { const e = document.getElementById(id); if (e) e.src = u; }); return `<img id="${id}" alt="" style="width:${size}px;height:${size}px;image-rendering:auto;${extra}" src="${PORTRAIT[LOOK + ":" + sid] || "data:image/gif;base64,R0lGODlhAQABAAAAACw="}">`; }
 
 // ---------- icons: drawn here, simple round shapes in the same palette ----------
 const ICON = {
@@ -98,13 +103,13 @@ const ITEM_ICON = n => /BALL/.test(n) ? ICON.ball : /POTION|HEAL|ANTIDOTE|AWAKEN
 const SCREENS = [], BY = {};
 const SKYFOR = { battle: "linear-gradient(180deg,#7EC6EC 0%,#BFE6F7 55%,#E8F7FB 70%)", town: "#0A1715", counter: "#0A1715" };
 function screen(id, group, name, o) { const s = Object.assign({ id, group, name, scene: "none" }, o); SCREENS.push(s); BY[id] = s; }
-let cur = null, curDef = null, timers = [];
+let cur = null, curDef = null, timers = [], curId = null, curArg;
 function later(ms, fn) { const t = setTimeout(fn, ms); timers.push(t); return t; }
 function clearTimers() { for (const t of timers) { clearTimeout(t); clearInterval(t); } timers = []; }
 function go(id, arg) {
   if (cur && cur.leave) cur.leave();
   clearTimers(); uiRoot.innerHTML = ""; backdrop(null);
-  curDef = BY[id];
+  curDef = BY[id]; curId = id; curArg = arg;
   if (SKYFOR[curDef.scene]) backdrop(SKYFOR[curDef.scene]);
   setScene(curDef.scene, curDef.sceneOpts && curDef.sceneOpts(arg));
   setPixel(curDef.pixel || 0);

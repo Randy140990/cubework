@@ -17,6 +17,15 @@ function setScene(name, opts) {
   scNow = SC[name]; scNow.group.visible = true;
   if (scNow.enter) scNow.enter(opts || {});
 }
+// Swap every creature's look: drop the built scenes (they're made again with the other models) and show the screen again.
+function setLook(v) {
+  if (v === LOOK) return;
+  LOOK = v; try { localStorage.setItem("rm-ui-look", v); } catch (e) {}
+  for (const k in SC) { scene3.remove(SC[k].group); delete SC[k]; }
+  scNow = null; renderLook();
+  if (curId) go(curId, curArg);
+}
+function renderLook() { document.querySelectorAll("#lookSeg [data-look]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.look === LOOK))); }
 function setPixel(n) { const dpr = Math.min(2, window.devicePixelRatio || 1); renderer.setPixelRatio(n ? 1 / n : dpr); $("#c").style.imageRendering = n ? "pixelated" : "auto"; resize3(); }
 function resize3() { const w = stageEl.clientWidth, hh = stageEl.clientHeight; if (!w || !hh) return; renderer.setSize(w, hh, false); cam3.aspect = w / hh; cam3.updateProjectionMatrix(); }
 new ResizeObserver(resize3).observe(stageEl);
@@ -24,7 +33,7 @@ new ResizeObserver(resize3).observe(stageEl);
 // ---------- creatures in scenes ----------
 async function mon(sid) {
   await loadSpecies(sid);
-  const m = buildModel(sp(sid).ours); m.size = sizeOf(m);
+  const m = buildModel(lookEntry(sid)); m.size = sizeOf(m);
   m.holder.traverse(o => { if (o.isMesh) o.castShadow = true; });
   return { m, sid, base: "idle", t: Math.random() * 3, once: null, ot: 0, x: 0, z: 0, y: 0, yaw: 0 };
 }

@@ -36,12 +36,12 @@ screen("splash", "Start", "Opening", {
 });
 screen("title", "Start", "Title screen", {
   scene: "title", pixel: 5,
-  what: "The title: RETROMON in one word, and a few of our own creatures drawn as pixel art, as the old title had its pixel Charizard.",
+  what: "The title: RETROMON in one word, and a few of our own creatures drawn as pixel art, as the old title had its pixel Charizard. With the look set to Cobblemon (the switch under the screen), it reads POKéMON and the creatures are Cobblemon's.",
   tags: ["New look"], mod: "IntroScreen shows RETROMON and PRESS START over the world.",
   make() {
     backdrop("linear-gradient(180deg,#7EC6EC 0%,#BFE6F7 52%,#E8F7FB 62%,#9ED68A 63%,#7CC46A 100%)");
     add(h("div", "", `<div style="position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 0%, rgba(255,255,255,.16) 0 5deg, transparent 5deg 15deg)"></div>`));
-    box(0, 70, 1280, null, "", `<div style="text-align:center"><span class="g-title" style="display:inline-block;font-size:140px;line-height:1;letter-spacing:6px;color:#FFD45A;-webkit-text-stroke:7px #26304A;paint-order:stroke fill;text-shadow:0 10px 0 rgba(0,0,0,.25)">RETROMON</span></div>`);
+    box(0, 70, 1280, null, "", `<div style="text-align:center"><span class="g-title" style="display:inline-block;font-size:140px;line-height:1;letter-spacing:6px;color:#FFD45A;-webkit-text-stroke:7px #26304A;paint-order:stroke fill;text-shadow:0 10px 0 rgba(0,0,0,.25)">${LOOK === "theirs" ? "POKéMON" : "RETROMON"}</span></div>`);
     box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#FFF4D8;color:#26304A;font-size:30px;letter-spacing:6px;box-shadow:0 6px 0 rgba(0,0,0,.18)">PRESS START</span></div>`);
     box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:#123C38;opacity:.8">INSID3 TH3 CUB3</div>`);
     box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:#123C38;opacity:.8">Version 0.21</div>`);

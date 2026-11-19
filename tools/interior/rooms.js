@@ -98,7 +98,7 @@ function incubator(room, x, z) {
   cyl(0.86, 2.35, 2.62, "redPlastic"); cyl(0.55, 2.62, 2.86, "paint"); cyl(0.3, 2.86, 3.0, "redPlastic");
   room.group.add(g);
   // Pipes back to the wall.
-  room.geo.box(x - 0.55, 2.0, 0.0, x - 0.35, 2.2, z - 0.6, "steel"); room.geo.box(x + 0.35, 0.3, 0.0, x + 0.55, 0.5, z - 0.9, "steel");
+  room.geo.box(0.0, 2.0, z - 0.1, x - 0.6, 2.2, z + 0.1, "steel"); room.geo.box(0.0, 0.3, z + 0.35, x - 0.9, 0.5, z + 0.55, "steel");
   room.solid(x - 1.12, z - 1.12, x + 1.12, z + 1.12);
   room.act([x - 1.2, z - 1.2, x + 1.2, z + 1.4], { label: "Look", lines: ["An incubator. Balls rest in its warm water, waiting for new trainers.", "There are more on the rim, ready to hand out."] });
   room.item("Ball incubator", "A round machine: white base, balls on its rim, a glass tank with more inside, a red top.");
@@ -130,7 +130,7 @@ function bunting(room, x0, x1, y) { room.geo.box(x0, y, 0.04, x1, y + 0.45, 0.05
 const BUILD = {
   house1() {
     const R = new Room("house1", { name: "Your house", floor: "Downstairs", paper: "paperMum", outsideSize: "8 by 6" });
-    shell(R, { paper: "mcCream", floor: "mcOak", zones: [[0, 0, 8, 6, "mcQuartzCheck"]], door: DOOR, skirt: "mcStripped" });
+    shell(R, { paper: "mcCream", floor: "sqHoney", zones: [[0, 0, 8, 6, "mcQuartzCheck"]], door: DOOR, skirt: "mcStripped" });
     kitchen(R, 0.2, "s");
     clock(R, 6.85, 2.55);
     tvSet(R, 7.75, 0, "s", R.screen("tvFilm", 40, 24, drawFilm, 0.9), { w: 3.2, speakers: true,
@@ -167,7 +167,7 @@ const BUILD = {
 
   house2() {
     const R = new Room("house2", { name: "Your room", floor: "Upstairs", paper: "paperRoom" });
-    shell(R, { paper: "mcSky", floor: "mcBirch", floorRects: [[0, 0, 12, 14], [12, 2, 16, 14]], skirt: "mcStripped" });
+    shell(R, { paper: "mcSky", floor: "sqLight", floorRects: [[0, 0, 12, 14], [12, 2, 16, 14]], skirt: "mcStripped" });
     stairsDown(R, 12, 0, 2, { to: "house1", spawn: STAIRS_FOOT, paper: "mcSky" });
     deskPC(R, 0.4, 0, "s", R.screen("pcScreen", 32, 24, drawPC, 1), { pc: true });
     officeChair(R, 1.55, 1.6, "n");
@@ -191,7 +191,7 @@ const BUILD = {
 
   rival1() {
     const R = new Room("rival1", { name: "Rival's house", floor: "Downstairs", paper: "paperRival", outsideSize: "8 by 6" });
-    shell(R, { paper: "mcSage", floor: "mcPale", zones: [[0, 0, 6, 6, "mcBlueCheck"]], door: DOOR, skirt: "mcStripped" });
+    shell(R, { paper: "mcSage", floor: "sqPale", zones: [[0, 0, 6, 6, "mcBlueCheck"]], door: DOOR, skirt: "mcStripped" });
     const F = R.F(0.2, 0, "s");
     counterUnit(R, F, 0, 1, "cupboardWhite", "counter", "paint"); counterUnit(R, F, 1, 1, "cupboardWhite", "sink", "paint");
     counterUnit(R, F, 2, 1, "oven", "hob", "paint"); counterUnit(R, F, 3, 1, "cupboardWhite", "counter", "paint");
@@ -225,7 +225,7 @@ const BUILD = {
 
   rival2() {
     const R = new Room("rival2", { name: "Rival's room", floor: "Upstairs", paper: "paperRivalRoom" });
-    shell(R, { paper: "mcNavy", floor: "mcSpruce", floorRects: [[0, 0, 12, 14], [12, 2, 16, 14]], skirt: "mcDarkOak" });
+    shell(R, { paper: "mcNavy", floor: "sqDark", floorRects: [[0, 0, 12, 14], [12, 2, 16, 14]], skirt: "mcDarkOak" });
     stairsDown(R, 12, 0, 2, { to: "rival1", spawn: STAIRS_FOOT, paper: "mcNavy" });
     deskPC(R, 0.4, 0, "s", R.screen("pcLocked", 40, 24, drawLocked, 1), { top: "walnut", lines: ["His PC's locked. The password hint just says: ME."] });
     officeChair(R, 1.55, 1.6, "n", "redFabric");
@@ -264,14 +264,17 @@ const BUILD = {
       R.act([0.3, 0, 2.3, 1.8], { label: "Use", lines: ["The professor's PC. Notes on every creature he's met, and a lot of unread email."] });
       R.item("Teal desk run", "Teal cupboards and drawers, white tops, the PC and a microscope."); }
     officeChair(R, 1.4, 1.75, "n", "blueFabric");
-    incubator(R, 4.6, 1.45);
-    labMachine(R, 6.6, 3, R.screen("labScreen", 44, 22, drawLab, 0.95), { name: "The professor's machine", lines: ["Numbers scroll by. A creature's heartbeat, its height and its weight.", "It's reading something new."] });
+    incubator(R, 1.8, 4.5);
+    labMachine(R, 3.9, 3, R.screen("labScreen", 44, 22, drawLab, 0.95), { name: "The professor's machine", lines: ["Numbers scroll by. A creature's heartbeat, its height and its weight.", "It's reading something new."] });
+    windowN(R, 7.5, 1.7, 2.2, 1.5, { lines: ["Out of the window: Pallet Town, and the sea past the houses."] });
     whiteboard(R, 10.2, 1.4, 3.4, 1.9, "boardMap", ["A map of Kanto, the towns marked in red.", "Underneath, in the professor's writing: THREE NEW TRAINERS, THREE NEW PARTNERS."]);
     healer(R, 14.6, 3);
     ballTable(R, 11.6, 4.3, 14.8, 5.6);
     // Two rows of white shelves, back to back across the room, as in the games.
     for (const X of [0.4, 2.4, 4.4]) labShelf(R, X, 9.6, "s", 2, 3.2, { lines: ["Books on creatures: their habits, their homes, how they change as they grow.", "It's all a bit much to take in."] });
     for (const X of [11.6, 13.6, 15.6]) labShelf(R, X, 9.6, "s", 2, 3.2, { rows: ["binders", "booksFull", "storeBoxes", "booksFull"], lines: ["Research papers. One of them is called ON THE KEEPING OF SMALL CREATURES IN BALLS."] });
+    // A second row on the right, below the first, with aides either side.
+    for (const X of [11.6, 13.6, 15.6]) labShelf(R, X, 14.2, "s", 2, 3.2, { rows: ["booksFull", "storeBoxes", "booksFull", "binders"], lines: ["Field notes, filed by route: ROUTE 1, ROUTE 2, VIRIDIAN FOREST..."] });
     // The aide's corner, bottom left: a desk against the west wall, his chair, and a board on a stand behind him.
     deskPC(R, 0, 15.3, "e", R.screen("pcAide", 40, 26, drawLab, 0.9), { top: "lab", lines: ["The aide's PC: a spreadsheet of heights and weights, half filled in."] });
     officeChair(R, 1.6, 14.15, "w", "blueFabric");
@@ -286,12 +289,16 @@ const BUILD = {
       ] });
     R.npcs.push({ name: "Blue", x: 13.2, z: 6.7, yaw: FACE.n, look: { skin: "blue" },
       talk: () => [{ text: "Gramps said I could pick first. Well, after you. He made me promise." }, { text: "Hurry up, will you? I've got places to be." }] });
-    R.npcs.push({ name: "Aide", x: 8.1, z: 1.9, yaw: FACE.n, look: { skin: "scientist" },
+    R.npcs.push({ name: "Aide", x: 5.4, z: 1.9, yaw: FACE.n, look: { skin: "scientist" },
       talk: () => [{ text: "I'm the professor's aide. These readings won't record themselves!" }] });
     R.npcs.push({ name: "Aide", x: 1.6, z: 14.15, yaw: FACE.w, seated: true, look: { skin: "scientist" },
       talk: () => [{ text: "The professor's writing a book. Every creature in the region, one page each." }, { text: "He's only up to the second page." }] });
-    R.npcs.push({ name: "Aide", x: 15.0, z: 12.6, yaw: FACE.w, look: { skin: "scientist_f" },
+    R.npcs.push({ name: "Aide", x: 15.4, z: 12.5, yaw: FACE.n, look: { skin: "scientist_f" },
       talk: () => [{ text: "Have you got a partner yet? The professor gives every new trainer one of their own." }, { text: "Look after it, and it'll look after you." }] });
+    R.npcs.push({ name: "Aide", x: 12.3, z: 12.5, yaw: FACE.n, look: { skin: "scientist" },
+      talk: () => [{ text: "Every book on this shelf, I've read twice. The professor's read them three times." }] });
+    R.npcs.push({ name: "Aide", x: 14.6, z: 16.4, yaw: FACE.n, look: { skin: "scientist_f" },
+      talk: () => [{ text: "I'm filing the notes from ROUTE 1. Bird POKéMON, mostly. And a lot of RATTATA." }] });
     R.spawn = LAB_IN;
     return R;
   },

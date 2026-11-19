@@ -1,5 +1,6 @@
 // ---------- materials: each a pixel texture, laid at 16 pixels to a block (or stretched over one face: "fit") ----------
 const MATDEF = {
+  sqHoney: { tex: "sqHoney", per: 2 }, sqLight: { tex: "sqLight", per: 2 }, sqPale: { tex: "sqPale", per: 2 }, sqDark: { tex: "sqDark", per: 2 },
   mcOak: { tex: "mcOak", per: 1 }, mcSpruce: { tex: "mcSpruce", per: 1 }, mcBirch: { tex: "mcBirch", per: 1 }, mcPale: { tex: "mcPale", per: 1 }, mcDarkOak: { tex: "mcDarkOak", per: 1 }, mcAcacia: { tex: "mcAcacia", per: 1 },
   mcCream: { tex: "mcCream", per: 1 }, mcSky: { tex: "mcSky", per: 1 }, mcSage: { tex: "mcSage", per: 1 }, mcNavy: { tex: "mcNavy", per: 1 }, mcStripped: { tex: "mcStripped", per: 1 },
   mcQuartzCheck: { tex: "mcQuartzCheck", per: 2 }, mcLabTile: { tex: "mcLabTile", per: 2 }, mcLabWall: { tex: "mcLabWall", per: 1 }, mcCyan: { tex: "mcCyan", per: 1 },

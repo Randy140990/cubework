@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Paints Retromon's first people as 64x64 player skins: the nurse, the Mart clerk, a youngster and a gym leader."""
+"""Paints Retromon's people as 64x64 player skins (textures/entity/npc). Writes the ones not there yet;
+--all repaints everyone."""
 import os
 from PIL import Image
 
@@ -112,7 +113,35 @@ def person(skin_c, hair, style, top, legs, legstyle="pants", shoes=S(40, 35, 35)
             if legstyle == "dress":
                 box(p, 16, 16, 8, 12, 4, top)
         for e in extras:
-            if e == "glasses":
+            if isinstance(e, tuple):
+                n, c = e[0], e[1]
+                if n == "headband": band(p, 0, 0, 8, 8, 8, 1, 2, c)
+                elif n == "badge": front(p, 16, 16, 8, 12, 4, 1, 2, 3, 4, c)
+                elif n == "collar": front(p, 16, 16, 8, 12, 4, 2, 0, 6, 1, c)
+                elif n == "overalls":
+                    front(p, 16, 16, 8, 12, 4, 2, 4, 6, 12, c); front(p, 16, 16, 8, 12, 4, 2, 0, 3, 4, c); front(p, 16, 16, 8, 12, 4, 5, 0, 6, 4, c)
+                    band(p, 16, 16, 8, 12, 4, 7, 12, c)
+                elif n == "gloves": band(p, 40, 16, 4, 12, 4, 9, 12, c); band(p, 32, 48, 4, 12, 4, 9, 12, c)
+                elif n == "stripe": band(p, 16, 16, 8, 12, 4, e[2], e[2] + 1, c); band(p, 40, 16, 4, 12, 4, e[2], e[2] + 1, c); band(p, 32, 48, 4, 12, 4, e[2], e[2] + 1, c)
+                elif n == "sash":
+                    for i in range(8): front(p, 16, 16, 8, 12, 4, i, i, i + 1, i + 2, c)
+                elif n == "tie": front(p, 16, 16, 8, 12, 4, 3, 0, 5, 7, c)
+                elif n == "cape": rect(p, 32, 20, 40, 32, c)
+                elif n == "belt": band(p, 16, 16, 8, 12, 4, 10, 12, c)
+                elif n == "socks": band(p, 0, 16, 4, 12, 4, 7, 10, c); band(p, 16, 48, 4, 12, 4, 7, 10, c)
+                elif n == "bag": rect(p, 32, 21, 40, 30, c)
+                elif n == "scarf": band(p, 16, 16, 8, 12, 4, 0, 2, c)
+                elif n == "apron": front(p, 16, 16, 8, 12, 4, 1, 4, 7, 12, c)
+                elif n == "trim": front(p, 16, 16, 8, 12, 4, 3, 0, 5, 12, c)
+                elif n == "hem": band(p, 16, 16, 8, 12, 4, 11, 12, c)
+                continue
+            if e == "freckles":
+                p[10, 13] = p[13, 13] = tuple(max(0, v - 45) for v in skin_c[:3]) + (255,)
+            elif e == "blush":
+                p[9, 13] = p[14, 13] = S(240, 140, 150)
+            elif e == "lipstick":
+                p[11, 14] = p[12, 14] = S(200, 60, 80)
+            elif e == "glasses":
                 for x in (9, 10, 13, 14): p[x, 12] = S(30, 30, 40)
                 p[11, 11] = p[12, 11] = S(30, 30, 40)
             elif e == "shades":
@@ -212,6 +241,99 @@ PEOPLE = {
     "leader_giovanni": person(FAIR, BLACK, "short", S(200, 110, 50), S(40, 30, 30)),
 }
 
+MED, DEEP = S(214, 158, 114), S(120, 78, 52)
+AUBURN, GINGER, PINK_H, NAVY_H, TEAL_H, WHITE_H = S(140, 60, 30), S(220, 120, 50), S(240, 130, 170), S(40, 50, 100), S(40, 140, 140), S(235, 235, 235)
+W, NAVY, KHAKI, DENIM, BLK = S(245, 245, 245), S(40, 50, 90), S(170, 150, 100), S(60, 90, 150), S(30, 30, 35)
+MORE = {
+    # Unique people still to make (story and town).
+    "mum": person(FAIR2, BROWN, "bun", S(240, 150, 120), S(70, 90, 140), "skirt", extras=(("apron", S(250, 240, 220)), "blush")),
+    "daisy": person(FAIR, BROWN, "long", S(120, 180, 110), S(245, 235, 210), "skirt", shoes=S(120, 80, 50), extras=("blush",)),
+    "bill": person(FAIR, BROWN, "short", S(70, 130, 200), S(60, 60, 80), extras=(("collar", W),)),
+    "copycat": person(FAIR, BROWN, "pigtails", S(220, 60, 60), S(60, 60, 90), "skirt", extras=("blush",)),
+    "mr_psychic": person(FAIR, GREY, "bald", S(120, 70, 150), S(120, 70, 150), extras=(("sash", S(230, 190, 80)),)),
+    "fan_club_chairman": person(FAIR2, GREY, "short", S(150, 100, 60), S(150, 100, 60), extras=("moustache", ("tie", S(200, 40, 50)))),
+    "name_rater": person(FAIR, WHITE_H, "short", S(90, 90, 120), S(60, 60, 80), extras=("glasses", ("tie", S(60, 120, 200)))),
+    "day_care_man": person(TAN, GREY, "short", S(110, 150, 90), S(120, 90, 60), hat=S(200, 170, 110), extras=("moustache",)),
+    "old_man": person(FAIR2, GREY, "bald", S(170, 140, 100), S(110, 90, 70), extras=("beard",)),
+    "museum_guide": person(FAIR, BLACK, "short", NAVY, NAVY, hat=NAVY, extras=(("badge", S(230, 190, 80)),)),
+    "nurse_m": person(FAIR, PINK_H, "short", S(248, 176, 200), W, shoes=W, hat=W, extras=(("apron", W),)),
+    "officer_m": person(MED, BLACK, "short", S(40, 60, 140), S(40, 60, 140), hat=S(40, 60, 140), extras=(("badge", S(230, 190, 80)), ("belt", BLK))),
+    "rocket_f": person(FAIR, S(160, 60, 160), "long", BLK, BLK, "skirt", shoes=BLK, hat=BLK, extras=("letter",)),
+    "rocket_scientist": person(FAIR, BLACK, "short", BLK, BLK, extras=("coat", "glasses", "letter")),
+    "clerk_f": person(MED, BLACK, "ponytail", S(60, 110, 210), S(40, 50, 90), "skirt", extras=(("apron", W), ("stripe", S(40, 80, 180), 4))),
+    "game_corner_clerk": person(FAIR, BROWN, "short", W, BLK, extras=("vest", ("tie", S(200, 40, 50)))),
+    # Trainers still to make (generic classes).
+    "lass": person(FAIR, BLACK, "long", S(230, 120, 160), S(60, 60, 110), "skirt", extras=("blush",)),
+    "bug_catcher": person(FAIR, BROWN, "short", S(240, 240, 200), S(110, 140, 70), "shorts", hat=S(120, 160, 70), extras=(("socks", W),)),
+    "camper": person(TAN, BROWN, "short", S(220, 140, 60), KHAKI, "shorts", hat=S(60, 110, 60), extras=(("bag", S(110, 80, 50)),)),
+    "picnicker": person(FAIR, GINGER, "pigtails", S(120, 190, 120), DENIM, "shorts", hat=S(250, 220, 120)),
+    "engineer": person(MED, BROWN, "short", S(240, 170, 50), DENIM, hat=S(250, 210, 40), extras=(("overalls", DENIM),)),
+    "swimmer_f": person(FAIR2, BLACK, "ponytail", S(60, 160, 220), FAIR2, "shorts", shoes=FAIR2, extras=("shirtless", ("overalls", S(60, 160, 220)))),
+    "cue_ball": person(TAN, BLACK, "bald", BLK, S(60, 60, 70), extras=("shades", ("belt", S(200, 40, 50)))),
+    "psychic_m": person(FAIR, BLACK, "short", S(90, 60, 140), S(60, 40, 90), extras=(("sash", S(230, 190, 80)),)),
+    "psychic_f": person(FAIR, S(110, 70, 170), "long", S(150, 60, 140), S(60, 40, 90), "skirt"),
+    "juggler": person(FAIR, GINGER, "short", S(200, 60, 60), S(60, 60, 160), extras=(("stripe", S(240, 200, 60), 3), ("stripe", S(240, 200, 60), 7))),
+    "tamer": person(TAN, BLACK, "short", S(160, 60, 40), KHAKI, hat=S(150, 110, 60), extras=("moustache", ("belt", S(90, 60, 40)))),
+    "bird_keeper": person(FAIR, BROWN, "short", S(230, 210, 120), S(90, 110, 70), hat=S(90, 140, 70), extras=(("bag", S(110, 80, 50)),)),
+    "black_belt": person(TAN, BLACK, "short", W, W, extras=(("belt", BLK), ("headband", W))),
+    "burglar": person(FAIR, BLACK, "short", S(60, 60, 70), S(40, 40, 50), extras=("shades", ("stripe", W, 3), ("stripe", W, 6))),
+    "pokemaniac": person(FAIR, BLACK, "short", S(90, 160, 80), S(110, 90, 60), extras=("glasses", ("bag", S(60, 100, 160)))),
+    "crush_girl": person(MED, BLACK, "ponytail", S(220, 60, 60), S(40, 40, 60), "shorts", extras=(("headband", S(220, 60, 60)), ("gloves", W))),
+    "tuber_m": person(FAIR, BROWN, "short", FAIR, S(60, 140, 220), "shorts", shoes=FAIR, extras=("shirtless", "freckles")),
+    "tuber_f": person(FAIR, GINGER, "pigtails", S(250, 140, 170), S(250, 140, 170), "shorts", shoes=FAIR),
+    "twins": person(FAIR, BROWN, "pigtails", S(250, 200, 80), S(200, 60, 80), "skirt", extras=("blush",)),
+    "ruin_maniac": person(TAN, BROWN, "short", KHAKI, KHAKI, hat=KHAKI, extras=("beard", ("bag", S(110, 80, 50)))),
+    "lady": person(FAIR, BLOND, "long", S(240, 200, 220), S(240, 200, 220), "dress", extras=("lipstick",)),
+    "painter": person(FAIR, AUBURN, "bun", W, S(80, 80, 120), "skirt", hat=S(200, 60, 60), extras=(("apron", S(240, 200, 120)),)),
+    "aroma_lady": person(MED, S(130, 80, 40), "long", S(170, 210, 140), S(120, 170, 110), "dress", extras=("blush",)),
+    "breeder_m": person(TAN, BROWN, "short", S(240, 230, 200), S(110, 140, 90), extras=(("apron", S(120, 170, 110)),)),
+    "breeder_f": person(FAIR, BROWN, "ponytail", S(240, 230, 200), S(110, 140, 90), "skirt", extras=(("apron", S(240, 160, 170)),)),
+    "ranger_m": person(MED, BROWN, "short", S(80, 130, 80), KHAKI, hat=S(80, 130, 80), extras=(("bag", S(110, 80, 50)),)),
+    "ranger_f": person(FAIR, AUBURN, "ponytail", S(80, 130, 80), KHAKI, "shorts", hat=S(80, 130, 80)),
+    "rich_boy": person(FAIR, BLOND, "short", S(60, 60, 120), S(60, 60, 120), "shorts", extras=(("collar", W), ("tie", S(200, 40, 50)), ("socks", W))),
+    "hiker_f": person(TAN, BROWN, "ponytail", S(200, 90, 60), KHAKI, "shorts", hat=S(160, 110, 60), extras=(("bag", S(110, 80, 50)),)),
+    "fisher_f": person(FAIR, BLACK, "ponytail", S(240, 230, 120), DENIM, hat=S(240, 230, 120)),
+    # People in town (generic), with all skin tones.
+    "teen_boy": person(MED, BLACK, "spiky", S(60, 140, 200), DENIM),
+    "teen_girl": person(DEEP, BLACK, "ponytail", S(240, 200, 60), DENIM, "shorts"),
+    "businessman": person(FAIR, BROWN, "short", S(60, 60, 70), S(60, 60, 70), extras=(("collar", W), ("tie", S(40, 80, 160)))),
+    "office_worker": person(DARK, BLACK, "bun", S(80, 80, 100), S(80, 80, 100), "skirt", extras=(("collar", W),)),
+    "farmer": person(TAN, BROWN, "short", S(200, 80, 60), DENIM, hat=S(230, 200, 120), extras=(("overalls", DENIM),)),
+    "farmer_f": person(MED, AUBURN, "pigtails", S(240, 230, 200), DENIM, hat=S(230, 200, 120), extras=(("overalls", DENIM), "freckles")),
+    "gardener": person(DEEP, GREY, "short", S(110, 150, 90), S(90, 80, 60), hat=S(230, 200, 120), extras=(("gloves", S(110, 150, 90)),)),
+    "student_m": person(FAIR, BLACK, "short", NAVY, S(60, 60, 70), extras=(("collar", W), ("tie", S(200, 40, 50)), ("bag", S(60, 60, 70)))),
+    "student_f": person(MED, BROWN, "long", NAVY, S(60, 60, 110), "skirt", extras=(("collar", W), ("socks", W))),
+    "jogger": person(DARK, BLACK, "short", S(240, 90, 60), S(50, 50, 60), "shorts", extras=(("headband", W), ("socks", W))),
+    "jogger_f": person(FAIR, BLOND, "ponytail", S(80, 200, 160), S(50, 50, 60), "shorts", extras=(("headband", S(240, 90, 120)),)),
+    "tourist": person(FAIR, GINGER, "short", S(240, 140, 60), KHAKI, "shorts", hat=S(250, 230, 160), extras=(("bag", S(60, 60, 70)),)),
+    "musician": person(MED, BLACK, "long", S(110, 40, 60), BLK, extras=("shades",)),
+    "dancer": person(DEEP, BLACK, "bun", S(240, 120, 180), S(240, 120, 180), "dress"),
+    "delivery": person(FAIR, BROWN, "short", S(200, 140, 60), S(110, 80, 50), hat=S(200, 140, 60), extras=(("bag", S(110, 80, 50)),)),
+    "builder": person(TAN, BROWN, "short", S(240, 140, 40), DENIM, hat=S(250, 210, 40), extras=(("stripe", S(220, 220, 220), 6), ("gloves", S(200, 160, 60)))),
+    "doctor": person(DARK, BLACK, "short", S(90, 160, 200), S(60, 60, 80), extras=("coat", "glasses")),
+    "doctor_f": person(FAIR, AUBURN, "bun", S(90, 160, 200), S(60, 60, 80), "skirt", extras=("coat",)),
+    "librarian": person(FAIR, GREY, "bun", S(140, 110, 160), S(90, 70, 110), "skirt", extras=("glasses",)),
+    "teacher": person(MED, BROWN, "short", S(170, 130, 90), S(80, 70, 60), extras=("glasses", ("tie", S(60, 120, 80)))),
+    "postman": person(FAIR, BLACK, "short", S(200, 50, 50), NAVY, hat=S(200, 50, 50), extras=(("bag", S(110, 80, 50)),)),
+    "baker": person(FAIR2, BLOND, "short", W, S(110, 90, 70), hat=W, extras=(("apron", W),)),
+    "shopkeeper": person(DEEP, BLACK, "short", S(80, 150, 120), S(80, 70, 60), extras=(("apron", S(240, 230, 200)),)),
+    "shopkeeper_f": person(FAIR, BROWN, "bun", S(220, 140, 160), S(80, 70, 60), "skirt", extras=(("apron", S(240, 230, 200)),)),
+    "young_mum": person(MED, BROWN, "ponytail", S(170, 200, 230), DENIM, "skirt"),
+    "young_dad": person(FAIR, BROWN, "short", S(110, 150, 110), DENIM, extras=("beard",)),
+    "backpacker": person(TAN, BLOND, "long", S(200, 90, 60), KHAKI, "shorts", extras=(("bag", S(60, 110, 60)),)),
+    "skater": person(FAIR, BROWN, "short", S(40, 40, 50), DENIM, hat=S(200, 60, 60)),
+    "lifeguard": person(MED, BLOND, "short", S(220, 50, 50), S(220, 50, 50), "shorts", shoes=MED, extras=("shades",)),
+    "photographer": person(FAIR, BLACK, "short", S(110, 100, 80), S(60, 60, 70), hat=S(60, 60, 70), extras=(("bag", BLK),)),
+    "reporter": person(DARK, BLACK, "long", S(200, 60, 60), S(60, 60, 70), "skirt", extras=("lipstick",)),
+    "waitress": person(FAIR, AUBURN, "ponytail", BLK, BLK, "skirt", extras=(("apron", W), ("collar", W))),
+    "cook_f": person(MED, BLACK, "bun", W, S(60, 60, 70), "skirt", hat=W, extras=(("apron", W),)),
+    "fisherman_old": person(FAIR2, WHITE_H, "short", S(240, 220, 60), S(240, 220, 60), hat=S(240, 220, 60), extras=("beard",)),
+    "sailor_f": person(FAIR, BLACK, "ponytail", W, NAVY, "skirt", hat=W, extras=(("collar", NAVY),)),
+    "grandad": person(DEEP, WHITE_H, "short", S(140, 120, 90), S(90, 80, 70), extras=("glasses", "moustache")),
+    "nan": person(MED, WHITE_H, "bun", S(160, 90, 130), S(90, 70, 110), "dress", extras=("glasses",)),
+    "boy": person(DARK, BLACK, "short", S(60, 160, 90), DENIM, "shorts"),
+    "toddler_girl": person(FAIR, BLOND, "pigtails", S(250, 170, 200), S(250, 170, 200), "dress"),
+}
 SKINS = {
     "nurse": skin(FAIR, S(240, 130, 170), S(248, 176, 200), S(248, 176, 200), FAIR, FAIR, S(245, 245, 245), nurse_extra),
     "clerk": skin(FAIR, S(110, 70, 40), S(60, 110, 210), S(60, 110, 210), FAIR, S(40, 50, 90), S(30, 30, 35), clerk_extra),
@@ -219,7 +341,12 @@ SKINS = {
     "leader": skin(TAN, S(100, 66, 34), S(220, 120, 50), S(220, 120, 50), TAN, S(110, 80, 50), S(50, 40, 35), leader_extra),
 }
 SKINS.update(PEOPLE)
+SKINS.update(MORE)
 os.makedirs(OUT, exist_ok=True)
+import sys
+everyone = "--all" in sys.argv
 for name, im in SKINS.items():
-    im.save(os.path.join(OUT, name + ".png"))
+    f = os.path.join(OUT, name + ".png")
+    if os.path.exists(f) and not everyone: continue
+    im.save(f)
     print(name)

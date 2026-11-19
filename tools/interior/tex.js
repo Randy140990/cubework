@@ -99,10 +99,30 @@ function mcPlanks(P, r, base) {
     }
   }
 }
+// Our own floor for the houses: wood in squares, as the newer games' houses have it. Each block is one square tile of four
+// boards, the grain turning a quarter between neighbours, with a thin dark seam round each square.
+function woodSquares(P, r, base) {
+  const lt = shadec(base, 0.12), dk = shadec(base, -0.16), seam = shadec(base, -0.4);
+  for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) {
+    const across = (tx + ty) % 2 === 0;
+    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+      const u = across ? x : y, v = across ? y : x, board = v >> 2, tone = [0.03, -0.03, 0.02, -0.04][board];
+      let c = shadec(base, tone + (r() - 0.5) * 0.04);
+      if (((u * 5 + board * 7) % 13) === 0) c = mixc(c, dk, 0.4);
+      if ((v & 3) === 0) c = mixc(c, lt, 0.3);
+      if ((v & 3) === 3) c = mixc(c, dk, 0.45);
+      if (x === 0 || y === 0) c = mixc(c, seam, 0.75);
+      if (x === 15 || y === 15) c = mixc(c, lt, 0.25);
+      P.set(tx * 16 + x, ty * 16 + y, c);
+    }
+  }
+}
 function mcStone(P, r, base, n = 0.07, spots = 0) { P.fill(base, n, r); for (let i = 0; i < spots; i++) { const x = r() * 16, y = r() * 16; P.set(x, y, shadec(base, (r() - 0.5) * 0.4)); P.set(x + 1, y, shadec(base, (r() - 0.5) * 0.25)); } }
 function mcWool(P, r, base) { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(base, (((x >> 1) + (y >> 1)) % 2 ? 0.035 : -0.035) + (r() - 0.5) * 0.06)); for (let i = 0; i < 10; i++) P.set(r() * 16, r() * 16, shadec(base, 0.1)); }
 function mcCheck(P, r, a, b) { for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = (tx + ty) % 2 ? b : a; mcStone({ fill: (col, n, rr) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(tx * 16 + x, ty * 16 + y, shadec(col, (rr() - 0.5) * n)); }, set: (x, y, col) => P.set(tx * 16 + (x | 0) % 16, ty * 16 + (y | 0) % 16, col) }, r, c, 0.05, 6); } }
 const TEXDEF = {
+  sqHoney: [32, 32, (P, r) => woodSquares(P, r, hx("#C9A06A"))], sqLight: [32, 32, (P, r) => woodSquares(P, r, hx("#D9B983"))],
+  sqPale: [32, 32, (P, r) => woodSquares(P, r, hx("#E2D0B0"))], sqDark: [32, 32, (P, r) => woodSquares(P, r, hx("#94704A"))],
   mcOak: [16, 16, (P, r) => mcPlanks(P, r, hx("#B8945F"))], mcSpruce: [16, 16, (P, r) => mcPlanks(P, r, hx("#7A5A38"))], mcBirch: [16, 16, (P, r) => mcPlanks(P, r, hx("#D9C48C"))],
   mcPale: [16, 16, (P, r) => mcPlanks(P, r, hx("#E6DAD2"))], mcDarkOak: [16, 16, (P, r) => mcPlanks(P, r, hx("#4E3622"))], mcAcacia: [16, 16, (P, r) => mcPlanks(P, r, hx("#B4623A"))],
   mcCream: [16, 16, (P, r) => mcStone(P, r, hx("#EFE6D2"), 0.05, 5)], mcSky: [16, 16, (P, r) => mcStone(P, r, hx("#CFE2EE"), 0.05, 5)], mcSage: [16, 16, (P, r) => mcStone(P, r, hx("#DDE3D2"), 0.05, 5)],
