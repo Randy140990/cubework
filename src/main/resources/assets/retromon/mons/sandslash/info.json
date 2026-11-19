@@ -1,0 +1,72 @@
+{
+ "idle": "animation.spirepang.battle_idle",
+ "ground": "animation.spirepang.ground_idle",
+ "actions": {
+  "cry": "animation.spirepang.cry",
+  "recoil": "animation.spirepang.recoil",
+  "attack": "animation.spirepang.attack",
+  "critical": "animation.spirepang.critical",
+  "special": "animation.spirepang.special",
+  "recall": "animation.spirepang.recall",
+  "sendout": "animation.spirepang.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.spirepang.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.spirepang.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.spirepang.faint",
+   "parts": []
+  }
+ },
+ "move": "SANDSTORM",
+ "attack_move": "FURY SWIPES",
+ "scale": 1.285,
+ "height": 0.856,
+ "texture": "retromon:textures/mons/sandslash.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/sandslash_glow_0.png",
+    "retromon:textures/mons/sandslash_glow_1.png",
+    "retromon:textures/mons/sandslash_glow_2.png",
+    "retromon:textures/mons/sandslash_glow_3.png",
+    "retromon:textures/mons/sandslash_glow_4.png",
+    "retromon:textures/mons/sandslash_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SPIREPANG",
+ "anchors": {
+  "mouth": [
+   0,
+   7.02,
+   -16.7
+  ],
+  "back": [
+   0,
+   14.69,
+   1.2
+  ],
+  "body": [
+   0,
+   8.87,
+   1.2
+  ],
+  "size": [
+   15.22,
+   13.69,
+   45.5
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

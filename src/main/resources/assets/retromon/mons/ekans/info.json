@@ -1,0 +1,72 @@
+{
+ "idle": "animation.coilet.battle_idle",
+ "ground": "animation.coilet.ground_idle",
+ "actions": {
+  "cry": "animation.coilet.cry",
+  "recoil": "animation.coilet.recoil",
+  "attack": "animation.coilet.attack",
+  "critical": "animation.coilet.critical",
+  "special": "animation.coilet.special",
+  "recall": "animation.coilet.recall",
+  "sendout": "animation.coilet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.coilet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.coilet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.coilet.faint",
+   "parts": []
+  }
+ },
+ "move": "ACID",
+ "attack_move": "WRAP",
+ "scale": 1.901,
+ "height": 0.263,
+ "texture": "retromon:textures/mons/ekans.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/ekans_glow_0.png",
+    "retromon:textures/mons/ekans_glow_1.png",
+    "retromon:textures/mons/ekans_glow_2.png",
+    "retromon:textures/mons/ekans_glow_3.png",
+    "retromon:textures/mons/ekans_glow_4.png",
+    "retromon:textures/mons/ekans_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "COILET",
+ "anchors": {
+  "mouth": [
+   0,
+   1.0,
+   -15.1
+  ],
+  "back": [
+   0,
+   4.3,
+   0.0
+  ],
+  "body": [
+   0,
+   1.5,
+   0.0
+  ],
+  "size": [
+   4.14,
+   4.2,
+   45.2
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

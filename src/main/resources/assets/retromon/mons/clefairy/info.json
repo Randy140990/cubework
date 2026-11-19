@@ -1,0 +1,72 @@
+{
+ "idle": "animation.lunabun.ground_idle",
+ "ground": "animation.lunabun.ground_idle",
+ "actions": {
+  "cry": "animation.lunabun.cry",
+  "recoil": "animation.lunabun.recoil",
+  "attack": "animation.lunabun.attack",
+  "critical": "animation.lunabun.critical",
+  "special": "animation.lunabun.special",
+  "recall": "animation.lunabun.recall",
+  "sendout": "animation.lunabun.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.lunabun.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.lunabun.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.lunabun.faint",
+   "parts": []
+  }
+ },
+ "move": "SING",
+ "attack_move": "POUND",
+ "scale": 0.49,
+ "height": 1.531,
+ "texture": "retromon:textures/mons/clefairy.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/clefairy_glow_0.png",
+    "retromon:textures/mons/clefairy_glow_1.png",
+    "retromon:textures/mons/clefairy_glow_2.png",
+    "retromon:textures/mons/clefairy_glow_3.png",
+    "retromon:textures/mons/clefairy_glow_4.png",
+    "retromon:textures/mons/clefairy_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LUNABUN",
+ "anchors": {
+  "mouth": [
+   0,
+   10.4,
+   -6.7
+  ],
+  "back": [
+   0,
+   25.5,
+   -0.2
+  ],
+  "body": [
+   0,
+   6.5,
+   -0.2
+  ],
+  "size": [
+   11.0,
+   24.5,
+   12.3
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

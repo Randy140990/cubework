@@ -1,0 +1,72 @@
+{
+ "idle": "animation.solfennec.battle_idle",
+ "ground": "animation.solfennec.ground_idle",
+ "actions": {
+  "cry": "animation.solfennec.cry",
+  "recoil": "animation.solfennec.recoil",
+  "attack": "animation.solfennec.attack",
+  "critical": "animation.solfennec.critical",
+  "special": "animation.solfennec.special",
+  "recall": "animation.solfennec.recall",
+  "sendout": "animation.solfennec.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.solfennec.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.solfennec.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.solfennec.faint",
+   "parts": []
+  }
+ },
+ "move": "FIRE SPIN",
+ "attack_move": "QUICK ATTACK",
+ "scale": 0.603,
+ "height": 2.32,
+ "texture": "retromon:textures/mons/ninetales.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/ninetales_glow_0.png",
+    "retromon:textures/mons/ninetales_glow_1.png",
+    "retromon:textures/mons/ninetales_glow_2.png",
+    "retromon:textures/mons/ninetales_glow_3.png",
+    "retromon:textures/mons/ninetales_glow_4.png",
+    "retromon:textures/mons/ninetales_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SOLFENNEC",
+ "anchors": {
+  "mouth": [
+   0,
+   19.36,
+   -20.66
+  ],
+  "back": [
+   0,
+   23.0,
+   -0.32
+  ],
+  "body": [
+   0,
+   16.0,
+   -0.32
+  ],
+  "size": [
+   13.44,
+   37.12,
+   51.42
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

@@ -16,7 +16,8 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Jerboas", ["rattata", "raticate"]), ("Quill porcupines ♀", ["nidoran_f", "nidorina", "nidoqueen"]),
             ("Quill porcupines ♂", ["nidoran_m", "nidorino", "nidoking"]), ("Mongooses", ["mankey", "primeape"]), ("Shrikes", ["spearow", "fearow"]),
             ("Gliders", ["pichu", "pikachu", "raichu"]), ("Leaf grubs", ["caterpie", "metapod", "butterfree"]),
-            ("Lance wasps", ["weedle", "kakuna", "beedrill"])]
+            ("Lance wasps", ["weedle", "kakuna", "beedrill"]), ("Vipers", ["ekans", "arbok"]), ("Pangolins", ["sandshrew", "sandslash"]),
+            ("Moon rabbits", ["clefairy", "clefable"]), ("Fire fennecs", ["vulpix", "ninetales"]), ("Singing chinchillas", ["jigglypuff", "wigglytuff"])]
 KEEP = ("idle", "ground")
 
 

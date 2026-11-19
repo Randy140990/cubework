@@ -1,0 +1,72 @@
+{
+ "idle": "animation.lunahare.ground_idle",
+ "ground": "animation.lunahare.ground_idle",
+ "actions": {
+  "cry": "animation.lunahare.cry",
+  "recoil": "animation.lunahare.recoil",
+  "attack": "animation.lunahare.attack",
+  "critical": "animation.lunahare.critical",
+  "special": "animation.lunahare.special",
+  "recall": "animation.lunahare.recall",
+  "sendout": "animation.lunahare.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.lunahare.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.lunahare.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.lunahare.faint",
+   "parts": []
+  }
+ },
+ "move": "MOONLIGHT",
+ "attack_move": "DOUBLESLAP",
+ "scale": 0.547,
+ "height": 2.558,
+ "texture": "retromon:textures/mons/clefable.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/clefable_glow_0.png",
+    "retromon:textures/mons/clefable_glow_1.png",
+    "retromon:textures/mons/clefable_glow_2.png",
+    "retromon:textures/mons/clefable_glow_3.png",
+    "retromon:textures/mons/clefable_glow_4.png",
+    "retromon:textures/mons/clefable_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LUNAHARE",
+ "anchors": {
+  "mouth": [
+   0,
+   16.53,
+   -9.49
+  ],
+  "back": [
+   0,
+   41.92,
+   -0.14
+  ],
+  "body": [
+   0,
+   10.56,
+   -0.14
+  ],
+  "size": [
+   15.95,
+   40.92,
+   22.27
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

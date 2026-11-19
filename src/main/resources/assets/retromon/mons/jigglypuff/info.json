@@ -1,0 +1,72 @@
+{
+ "idle": "animation.puffchin.ground_idle",
+ "ground": "animation.puffchin.ground_idle",
+ "actions": {
+  "cry": "animation.puffchin.cry",
+  "recoil": "animation.puffchin.recoil",
+  "attack": "animation.puffchin.attack",
+  "critical": "animation.puffchin.critical",
+  "special": "animation.puffchin.special",
+  "recall": "animation.puffchin.recall",
+  "sendout": "animation.puffchin.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.puffchin.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.puffchin.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.puffchin.faint",
+   "parts": []
+  }
+ },
+ "move": "SING",
+ "attack_move": "POUND",
+ "scale": 0.746,
+ "height": 0.938,
+ "texture": "retromon:textures/mons/jigglypuff.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/jigglypuff_glow_0.png",
+    "retromon:textures/mons/jigglypuff_glow_1.png",
+    "retromon:textures/mons/jigglypuff_glow_2.png",
+    "retromon:textures/mons/jigglypuff_glow_3.png",
+    "retromon:textures/mons/jigglypuff_glow_4.png",
+    "retromon:textures/mons/jigglypuff_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PUFFCHIN",
+ "anchors": {
+  "mouth": [
+   0,
+   6.4,
+   -5.3
+  ],
+  "back": [
+   0,
+   16.0,
+   0.0
+  ],
+  "body": [
+   0,
+   3.7,
+   0.0
+  ],
+  "size": [
+   11.2,
+   15.0,
+   14.8
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.choruschin.ground_idle",
+ "ground": "animation.choruschin.ground_idle",
+ "actions": {
+  "cry": "animation.choruschin.cry",
+  "recoil": "animation.choruschin.recoil",
+  "attack": "animation.choruschin.attack",
+  "critical": "animation.choruschin.critical",
+  "special": "animation.choruschin.special",
+  "recall": "animation.choruschin.recall",
+  "sendout": "animation.choruschin.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.choruschin.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.choruschin.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.choruschin.faint",
+   "parts": []
+  }
+ },
+ "move": "SING",
+ "attack_move": "DOUBLESLAP",
+ "scale": 0.873,
+ "height": 1.718,
+ "texture": "retromon:textures/mons/wigglytuff.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/wigglytuff_glow_0.png",
+    "retromon:textures/mons/wigglytuff_glow_1.png",
+    "retromon:textures/mons/wigglytuff_glow_2.png",
+    "retromon:textures/mons/wigglytuff_glow_3.png",
+    "retromon:textures/mons/wigglytuff_glow_4.png",
+    "retromon:textures/mons/wigglytuff_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "CHORUSCHIN",
+ "anchors": {
+  "mouth": [
+   0,
+   15.98,
+   -8.66
+  ],
+  "back": [
+   0,
+   28.48,
+   -0.4
+  ],
+  "body": [
+   0,
+   9.56,
+   -0.4
+  ],
+  "size": [
+   17.68,
+   27.48,
+   24.97
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

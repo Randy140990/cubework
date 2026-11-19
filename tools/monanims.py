@@ -378,3 +378,39 @@ def insect(sid, m, flap=0.16, amp=45, k=1.0, slow=1.0, extras=None, abdomen=("ab
             "poses": {"walk": {"anim": walk_id, "parts": []}, "fly": {"anim": fly, "parts": []}}}
     battle_set(A, m, info, "bird", k, slow, extras)
     return A, info
+
+
+def serpent(sid, m, segs, necks=("neck", "neck2"), k=1.0, slow=1.0, extras=None):
+    """A snake: its body a chain of segments lying in curves along the ground (segs, from behind the neck to the tail
+    tip), its front reared up on neck joints holding the head. It sways and flicks its tongue at rest, slithers in a wave
+    running down its length, and rears higher to hiss with its jaws wide (a hood or frill flaring if it has one)."""
+    extras = with_move(m, extras)
+    A = Anims(sid)
+    flick = lambda L, at: track(scale=keys({0: [1, 1, 0.05], at: [1, 1, 0.05], at + 0.08: [1, 1, 1], at + 0.22: [1, 1, 1], at + 0.3: [1, 1, 0.05], L: [1, 1, 0.05]}))
+    P = 3.0 * slow
+    ground = A.add("ground_idle", P, only(m, merge({
+        "head": track(rotation=[wave(P, 4, 90), wave(P, 10), 0]),
+        "tongue": flick(P, 1.1 * slow), "hood": track(scale=[wave(P, 0.04, 0, 1), 1, 1]),
+    }, chain(list(necks), P, 3, 8, 60), chain(segs, P, 0, 4, 40), eyelids(P * 0.7), _extra(extras, "idle"))))
+    B = 1.6 * slow
+    battle = A.add("battle_idle", B, only(m, merge({
+        "head": track(rotation=[wave(B / 2, 4, 0, 0), wave(B, 8), 0]),
+        "tongue": flick(B, 0.5 * slow), "hood": track(scale=[wave(B / 2, 0.06, 0, 1.06), 1, 1]),
+    }, chain(list(necks), B / 2, 5, 6, 60), chain(segs, B / 2, 0, 5, 50), eyelids(B * 0.7), _extra(extras, "battle"))))
+    W = 1.0 * slow
+    walk_id = A.add("ground_walk", W, only(m, merge({
+        "head": track(rotation=[0, wave(W, -6, 90), 0]), "tongue": flick(W, 0.3),
+    }, chain(list(necks), W, 2, 8, 70), chain(segs, W, 0, 16, 65, grow=0.1), eyelids(W * 0.6), _extra(extras, "walk"))))
+    C = 1.3 * slow
+    up = lambda a: keys({0: [0, 0, 0], C * 0.2: [a, 0, 0], C * 0.7: [a, 0, 0], C: [0, 0, 0]})
+    cry = A.add("cry", C, only(m, merge({
+        necks[0]: track(rotation=up(-16)), necks[-1]: track(rotation=up(-10)), "head": track(rotation=up(-14)),
+        "jaw": track(rotation=keys({0: [0, 0, 0], C * 0.2: [48, 0, 0], C * 0.7: [48, 0, 0], C * 0.85: [0, 0, 0]})),
+        "tongue": track(scale=keys({0: [1, 1, 0.05], C * 0.2: [1, 1, 1.3], C * 0.7: [1, 1, 1.3], C * 0.8: [1, 1, 0.05]})),
+        "hood": track(scale=keys({0: [1, 1, 1], C * 0.2: [1.35, 1.15, 1], C * 0.7: [1.35, 1.15, 1], C: [1, 1, 1]})),
+    }, _extra(extras, "cry"))), loop=False)
+    R = 0.75 * slow
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k, lift=0.6), _extra(extras, "recoil"))), loop=False)
+    info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
+    battle_set(A, m, info, "legs4", k, slow, extras)
+    return A, info

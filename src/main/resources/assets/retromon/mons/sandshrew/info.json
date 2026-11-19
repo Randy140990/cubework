@@ -1,0 +1,72 @@
+{
+ "idle": "animation.pangrit.battle_idle",
+ "ground": "animation.pangrit.ground_idle",
+ "actions": {
+  "cry": "animation.pangrit.cry",
+  "recoil": "animation.pangrit.recoil",
+  "attack": "animation.pangrit.attack",
+  "critical": "animation.pangrit.critical",
+  "special": "animation.pangrit.special",
+  "recall": "animation.pangrit.recall",
+  "sendout": "animation.pangrit.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.pangrit.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.pangrit.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.pangrit.faint",
+   "parts": []
+  }
+ },
+ "move": "SAND-ATTACK",
+ "attack_move": "SCRATCH",
+ "scale": 1.25,
+ "height": 0.6,
+ "texture": "retromon:textures/mons/sandshrew.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/sandshrew_glow_0.png",
+    "retromon:textures/mons/sandshrew_glow_1.png",
+    "retromon:textures/mons/sandshrew_glow_2.png",
+    "retromon:textures/mons/sandshrew_glow_3.png",
+    "retromon:textures/mons/sandshrew_glow_4.png",
+    "retromon:textures/mons/sandshrew_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PANGRIT",
+ "anchors": {
+  "mouth": [
+   0,
+   5.2,
+   -12.5
+  ],
+  "back": [
+   0,
+   10.6,
+   0.5
+  ],
+  "body": [
+   0,
+   6.03,
+   0.5
+  ],
+  "size": [
+   11.3,
+   9.6,
+   34.0
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}
