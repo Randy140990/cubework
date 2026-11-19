@@ -938,7 +938,7 @@ def stage_of(sid):
             if line.startswith("#") or not line.strip():
                 continue
             f = line.rstrip("\n").split("\t")
-            for e in (f[15].split(";") if f[15] and f[15] != "-" else []):
+            for e in (f[15].replace("|", ";").split(";") if f[15] and f[15] != "-" else []):
                 p = e.split(":")
                 if len(p) >= 3:
                     into.setdefault(f[1], set()).add(p[-1])

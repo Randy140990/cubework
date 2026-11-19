@@ -70,7 +70,7 @@ def species_rows():
         evo = f[15]
         nxt = None
         if evo and evo != "-":
-            parts = evo.split(";")[0].split(":")
+            parts = evo.split(";")[0].split("|")[0].split(":")
             if parts[0] == "level":
                 nxt = {"how": f"Level {int(parts[1])}", "level": int(parts[1]), "into": parts[2]}
             elif parts[0] == "item":
