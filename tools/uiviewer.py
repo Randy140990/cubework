@@ -33,7 +33,7 @@ def skindata():
             out[grp][n] = "data:image/png;base64," + base64.b64encode(open(f, "rb").read()).decode()
     return out
 
-MAP_BOX = (-1250, 100, -46, 1000)   # Kanto, in blocks (x0, z0, x1, z1)
+MAP_BOX = (-1250, 120, -46, 1000)   # Kanto, in blocks (x0, z0, x1, z1); the top stops short of the island to the north
 
 def mapdata():
     """The real Town Map of Kanto (baked from the world, as TownMap draws it) and its places, for the Town Map screen."""

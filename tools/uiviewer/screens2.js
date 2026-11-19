@@ -63,6 +63,41 @@ screen("itemget", "In the world", "Getting an item", {
     return { key: k => C.key(k) };
   }
 });
+screen("badgeget", "In the world", "Getting a badge", {
+  scene: "town", sceneOpts: () => ({}),
+  what: "Winning a badge: the badge spins in over a burst of light, the leader's words, then it flies up into a notice on the HUD that shows where it sits among the eight. Every badge is our own design.",
+  tags: ["New: badges of our own", "New: the badge notice"],
+  try: ["Left and right to see each badge.", "A to move the words on."],
+  make(arg) {
+    const C = ctl(); let i = (arg && arg.badge) || 0, run = 0;
+    const gym = i => Object.entries(GYMS).find(([, g]) => g[2] === i);
+    const show = () => {
+      const me = ++run; uiRoot.querySelectorAll(".bg-get").forEach(e => e.remove());
+      const [town, [lead]] = gym(i), [name, col] = BADGES[i];
+      const dim = box(0, 0, 1280, 720, "bg-get", ""); dim.style.background = "radial-gradient(circle at 50% 42%, rgba(255,244,216,.0) 0, rgba(10,24,30,.55) 60%)"; dim.style.animation = "gfade .4s";
+      const big = box(490, 70, 300, 300, "bg-get", `<style>@keyframes bgspin{0%{transform:scale(.2) rotateY(540deg);opacity:0}70%{transform:scale(1.08) rotateY(-12deg);opacity:1}100%{transform:scale(1) rotateY(0)}}
+        @keyframes bgrays{to{transform:rotate(360deg)}}@keyframes bgshine{0%,60%{transform:translateX(-140%) skewX(-20deg)}100%{transform:translateX(160%) skewX(-20deg)}}
+        @keyframes bgfly{to{left:1018px;top:100px;width:56px;height:56px;opacity:.0}}@keyframes bgtoast{from{opacity:0;transform:translateX(40px)}}</style>
+        <div style="position:absolute;inset:-120px;border-radius:50%;background:repeating-conic-gradient(${col}55 0 10deg,transparent 10deg 20deg);animation:bgrays 14s linear infinite;-webkit-mask:radial-gradient(circle,#000 30%,transparent 68%);mask:radial-gradient(circle,#000 30%,transparent 68%)"></div>
+        <div style="position:absolute;inset:-30px;border-radius:50%;background:radial-gradient(circle,rgba(255,244,216,.9),rgba(255,244,216,0) 65%)"></div>
+        <div style="position:absolute;inset:30px;perspective:600px"><div style="width:100%;height:100%;animation:bgspin 1.1s cubic-bezier(.2,.8,.3,1) both;filter:drop-shadow(0 14px 18px rgba(0,0,0,.35));position:relative;overflow:hidden;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)">${badgeSvg(i)}
+        <div style="position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:bgshine 2.6s 1s ease-in-out infinite"></div></div></div>`);
+      C.say([{ text: `**${G.name}** received the **${name}** from **${lead}**!` }, { text: `It's pinned to your **TRAINER CARD** now. That's **${i + 1} of 8**.` }]).then(() => {
+        if (!C.alive() || me !== run) return;
+        big.style.animation = "bgfly .7s ease-in forwards"; later(700, () => big.remove()); dim.style.transition = "opacity .5s"; dim.style.opacity = 0;
+        // The notice on the HUD: the badge, its name, and the eight slots with this one lit.
+        const t = box(870, 96, 386, null, "g-panel bg-get", `<div style="display:flex;align-items:center;gap:14px;padding:12px 18px 12px 12px;animation:bgtoast .45s ease-out">
+          <span style="width:58px;height:58px;flex:none">${badgeSvg(i)}</span><span style="display:grid;gap:6px"><span class="g-label">Badge</span><span style="font-size:21px;font-weight:900">${esc(name)}</span>
+          <span style="display:flex;gap:5px">${BADGES.map((b, j) => `<span style="width:22px;height:22px;${j <= i ? "" : "filter:grayscale(1) brightness(.55);opacity:.5"}">${badgeSvg(j)}</span>`).join("")}</span></span></div>`);
+        t.style.borderRadius = "22px";
+        later(3800, () => { t.style.transition = "opacity .5s"; t.style.opacity = 0; });
+      });
+    };
+    show();
+    hints([["A", "Next"], ["◀▶", "Other badges"]]);
+    return { key: k => { if (k === "left" || k === "right") { go("badgeget", { badge: (i + (k === "right" ? 1 : 7)) % 8 }); return true; } return C.key(k); } };
+  }
+});
 const MENU = [["POKéDEX", "dex", "dex", "Every POKéMON you've seen and caught."], ["POKéMON", "ball", "party", "Your team: check them, switch them, pick who follows you."], ["BAG", "bag", "bag", "Your items, in four pockets."],
   ["MAP", "map", "map", "The TOWN MAP: where you are, and where everywhere else is."], ["CLOTHES", "cap", "clothes", "Change what you're wearing."], ["CARD", "card", "card", "Your TRAINER CARD and badges."],
   ["WAIT", "clock", "wait", "Let time pass, to morning, midday, evening or night."], ["SAVE", "save", "save", "Save your game."], ["OPTION", "cog", "options", "Text speed, music, nights and more."], ["EXIT", "close", "hud", "Close the menu."]];
@@ -270,7 +305,7 @@ screen("map", "Menus", "Town Map", {
     const M = box(20, 20, VW, VH, "g-panel", ""); M.style.overflow = "hidden"; M.style.padding = "0"; M.style.cursor = "grab";
     const cv = document.createElement("canvas"); cv.width = VW * 2; cv.height = VH * 2; Object.assign(cv.style, { width: VW + "px", height: VH + "px", display: "block" }); M.appendChild(cv);
     const ctx = cv.getContext("2d");
-    const info = box(940, 20, 320, 626, "g-panel", ""); info.style.padding = "22px 24px"; info.style.overflow = "hidden";
+    const info = box(940, 20, 320, 626, "g-panel", ""); info.style.padding = "22px 24px"; info.style.overflow = "hidden"; info.style.display = "flex"; info.style.flexDirection = "column";
     const zoom = () => ZOOMS[zi];
     const toScreen = (x, z) => [(x - cx) * zoom() + VW / 2, (z - cz) * zoom() + VH / 2];
     const clampC = () => { const hw = VW / 2 / zoom(), hh = VH / 2 / zoom();
@@ -313,15 +348,18 @@ screen("map", "Menus", "Town Map", {
     };
     const drawInfo = () => {
       const p = P[sel], been = BEEN.includes(p.key), here = TOWN_HERE[p.name] || p.here || [];
-      const wild = p.wild.slice(0, 12);
+      const wild = p.wild.slice(0, GYMS[p.name] ? 4 : 12);
       info.innerHTML = `<div class="g-label">${p.key === "pallet_town" ? "You are here" : KIND[p.kind] || "Place"}</div>
         <div class="g-title" style="font-size:${p.name.length > 14 ? 27 : 32}px;line-height:1.1;margin:6px 0 10px">${esc(p.name)}</div>
         ${p.tag ? `<div style="font-size:18px;font-weight:800;line-height:1.45;color:#E8F4EF;font-style:italic">"${esc(p.tag)}"</div>` : ""}
-        ${here.length ? `<div class="g-label" style="margin-top:16px">Here</div><div style="display:grid;gap:5px;margin-top:6px">${here.map(x => `<div style="display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900"><span style="width:9px;height:9px;border-radius:3px;background:#8FF5C0"></span>${esc(x)}</div>`).join("")}</div>` : ""}
+        ${here.length ? `<div class="g-label" style="margin-top:16px">Here</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px">${here.map(x => `<span style="display:inline-flex;align-items:center;gap:7px;font-size:14.5px;font-weight:900;padding:4px 11px;border-radius:999px;background:rgba(0,0,0,.18)"><span style="width:8px;height:8px;border-radius:3px;background:#8FF5C0"></span>${esc(x)}</span>`).join("")}</div>` : ""}
+        ${GYMS[p.name] ? (([lead, type, b, lv]) => `<div class="g-label" style="margin-top:16px">Gym</div><div style="display:grid;grid-template-columns:58px 1fr;gap:4px 12px;align-items:center;margin-top:8px;padding:10px 12px;border-radius:16px;background:rgba(0,0,0,.18)">
+          <span style="grid-row:span 3;width:58px;height:58px">${badgeSvg(b)}</span><span style="font-size:19px;font-weight:900">${esc(lead)}</span>
+          <span style="font-size:14px;font-weight:900;color:#A9D4C6">${esc(type)} type · ${esc(BADGES[b][0])}</span><span style="font-size:14px;font-weight:800;color:#E8F4EF">Team from level ${esc(lv)}</span></div>`)(GYMS[p.name]) : ""}
         ${wild.length ? `<div class="g-label" style="margin-top:16px">Wild POKéMON</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">${wild.map(sid => DATA.species[sid]
           ? `<div title="${esc(DATA.species[sid].pname)}" style="aspect-ratio:1;border-radius:12px;background:rgba(0,0,0,.18);display:grid;place-items:center">${pic(sid, 56)}</div>`
           : `<div title="${esc(sid)}" style="aspect-ratio:1;border-radius:12px;background:rgba(0,0,0,.18);display:grid;place-items:center;font-size:26px;font-weight:900;color:#5E8E82">?</div>`).join("")}</div>` : ""}
-        <div style="position:absolute;left:24px;right:24px;bottom:22px;display:grid;gap:8px">
+        <div style="margin-top:auto;padding-top:12px;display:grid;gap:8px">
           ${p.kind === "town" ? (been ? `<div class="g-chip on" style="justify-content:center;font-size:17px;padding:8px">A: FLY HERE</div>` : `<div class="g-chip" style="justify-content:center;font-size:15px;padding:8px;opacity:.7">Not been here yet</div>`) : ""}
           <div style="font-size:12.5px;font-weight:800;color:#A9D4C6;line-height:1.35">${p.zone ? `Zone in the mod: ${p.zone[0]}, ${p.zone[1]} to ${p.zone[2]}, ${p.zone[3]}` : `About ${p.x}, ${p.z} on your map`}</div></div>`;
     };
@@ -351,7 +389,36 @@ screen("map", "Menus", "Town Map", {
     };
   }
 });
-const BADGES = [["BOULDERBADGE", "#A8A29A"], ["CASCADEBADGE", "#4D90D5"], ["THUNDERBADGE", "#E9C72E"], ["RAINBOWBADGE", "#5DB850"], ["SOULBADGE", "#E07AA8"], ["MARSHBADGE", "#E9B43C"], ["VOLCANOBADGE", "#E5525C"], ["EARTHBADGE", "#7CC46A"]];
+// Our own badges: every one a six-sided enamel pin with a silver rim, its town's colour and its own mark in cream.
+const BADGES = [["BOULDERBADGE", "#8E8A84"], ["CASCADEBADGE", "#3F86D0"], ["THUNDERBADGE", "#E2B320"], ["RAINBOWBADGE", "#4FA84A"], ["SOULBADGE", "#B0509A"], ["MARSHBADGE", "#D6962A"], ["VOLCANOBADGE", "#D8443C"], ["EARTHBADGE", "#5E8A3A"]];
+const BADGE_MARK = [
+  // a block: a cube seen from the corner
+  `<path d="M32 17l12 6v13l-12 6-12-6V23z" fill="#FFF4D8"/><path d="M32 29l12-6v13l-12 6z" fill="#D9CDB0"/><path d="M32 29L20 23v13l12 6z" fill="#EFE3C6"/><path d="M26 32l3 2" stroke="#8E8A84" stroke-width="1.6"/>`,
+  // three waves
+  `<path d="M18 24q3.5-4 7 0t7 0 7 0 7 0M18 32q3.5-4 7 0t7 0 7 0 7 0M18 40q3.5-4 7 0t7 0 7 0 7 0" fill="none" stroke="#FFF4D8" stroke-width="3.4" stroke-linecap="round"/>`,
+  // a bolt
+  `<path d="M35 14L22 34h9l-3 16 14-22h-9z" fill="#FFF4D8"/>`,
+  // a bow over a sprout
+  `<path d="M18 36a14 14 0 0 1 28 0" fill="none" stroke="#FFF4D8" stroke-width="3"/><path d="M23 36a9 9 0 0 1 18 0" fill="none" stroke="#FFD45A" stroke-width="2.4"/><path d="M32 48V38" stroke="#FFF4D8" stroke-width="2.6"/><path d="M32 41q-6-1-7-6 6 0 7 6zM32 41q6-1 7-6-6 0-7 6z" fill="#FFF4D8"/>`,
+  // a crescent and a star
+  `<path d="M36 16a16 16 0 1 0 0 32 13 13 0 1 1 0-32z" fill="#FFF4D8"/><path d="M41 27l1.6 3.4 3.7.4-2.8 2.5.8 3.7-3.3-1.9-3.3 1.9.8-3.7-2.8-2.5 3.7-.4z" fill="#FFF4D8"/>`,
+  // an eye in a diamond
+  `<path d="M32 15l15 17-15 17-15-17z" fill="none" stroke="#FFF4D8" stroke-width="3"/><path d="M22 32q10-9 20 0-10 9-20 0z" fill="#FFF4D8"/><circle cx="32" cy="32" r="3.6" fill="#D6962A"/>`,
+  // a peak with a flame
+  `<path d="M16 46l11-15 4 4 5-8 12 19z" fill="#FFF4D8"/><path d="M33 26q-5-5 0-12 1 5 4 6 1 4-4 6z" fill="#FFD45A"/>`,
+  // a world with a mountain on it
+  `<circle cx="32" cy="32" r="14" fill="none" stroke="#FFF4D8" stroke-width="3"/><path d="M19 36l7-8 4 4 5-7 10 11q-2 6-13 9-10-2-13-9z" fill="#FFF4D8"/>`];
+function badgeSvg(i) {
+  const [, c] = BADGES[i];
+  return `<svg viewBox="0 0 64 64" style="display:block;width:100%;height:100%"><defs><linearGradient id="bg${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity="1"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>
+    <linearGradient id="br${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#B8C4CC"/><stop offset="1" stop-color="#6E7A84"/></linearGradient></defs>
+    <path d="M32 3l25 14.5v29L32 61 7 46.5v-29z" fill="url(#br${i})"/><path d="M32 8l20.7 12v24L32 56 11.3 44V20z" fill="${c}"/><path d="M32 8l20.7 12v24L32 56 11.3 44V20z" fill="url(#bg${i})"/>
+    <path d="M32 8l20.7 12v4L32 12 11.3 24v-4z" fill="#fff" opacity=".28"/>${BADGE_MARK[i]}</svg>`;
+}
+// The gyms, for the Town Map's city panels: leader, type, badge (index into BADGES), and their team's levels.
+const GYMS = { "PEWTER CITY": ["BROCK", "ROCK", 0, "12 to 14"], "CERULEAN CITY": ["MISTY", "WATER", 1, "18 to 21"], "VERMILION CITY": ["LT. SURGE", "ELECTRIC", 2, "18 to 24"],
+  "CELADON CITY": ["ERIKA", "GRASS", 3, "24 to 29"], "FUCHSIA CITY": ["KOGA", "POISON", 4, "37 to 43"], "SAFFRON CITY": ["SABRINA", "PSYCHIC", 5, "37 to 43"],
+  "CINNABAR ISLAND": ["BLAINE", "FIRE", 6, "40 to 47"], "VIRIDIAN CITY": ["GIOVANNI", "GROUND", 7, "42 to 50"] };
 screen("card", "Menus", "Trainer card", {
   scene: "creator", sceneOpts: () => ({ side: 2.1 }),
   what: "Your TRAINER CARD: you as you look, your name and ID, money, POKéDEX, time, and the eight badges.",
@@ -362,13 +429,13 @@ screen("card", "Menus", "Trainer card", {
       <div style="display:grid;grid-template-columns:200px 1fr;gap:12px 20px;font-size:23px;font-weight:900">
       <span class="g-label">Name</span><span>${esc(G.name)}</span><span class="g-label">ID No.</span><span>${G.id}</span><span class="g-label">Money</span><span>${money(G.money)}</span>
       <span class="g-label">Pokédex</span><span>${G.caught}</span><span class="g-label">Play time</span><span>${G.time}</span><span class="g-label">Started</span><span>${G.started}</span></div>
-      <div class="g-label" style="margin-top:6px">Badges</div><div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px">${BADGES.map(([n, c], i) => `<div title="${n}" style="aspect-ratio:1;border-radius:18px;background:rgba(0,0,0,.2);display:grid;place-items:center;${i < G.badges ? "" : "filter:grayscale(1) brightness(.5);opacity:.55"}"><span style="width:60px;height:60px">${ICON.badge(c)}</span></div>`).join("")}</div></div>`);
+      <div class="g-label" style="margin-top:6px">Badges</div><div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px">${BADGES.map(([n, c], i) => `<div title="${n}" style="aspect-ratio:1;border-radius:18px;background:rgba(0,0,0,.2);display:grid;place-items:center;${i < G.badges ? "" : "filter:grayscale(1) brightness(.5);opacity:.55"}"><span style="width:66px;height:66px">${badgeSvg(i)}</span></div>`).join("")}</div></div>`);
     hints([["B", "Back"]]);
     return { key: k => { if (k === "b") go("menu", { sel: 5 }); return true; } };
   }
 });
 screen("clothes", "Menus", "Clothes", {
-  scene: "creator", sceneOpts: () => ({ side: -1.15 }),
+  scene: "creator", sceneOpts: () => ({ side: -1.95 }),
   what: "Change what you wear, as the mod's CLOTHES does: hat (cap, beanie, sun hat), cap pattern and which way round, top, bottoms, shoes and bag, each in one of 14 colours. B keeps what you chose, UNDO puts back what you came in with.",
   mod: "ClothesScreen: CAP STYLE, BACKWARDS, colours; B keeps, UNDO restores.",
   make() {

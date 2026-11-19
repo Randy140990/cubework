@@ -49,8 +49,8 @@ screen("title", "Start", "Title screen", {
     }
     box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="${night ? "POKéMON" : "RETROMON"}" src="${wordmark(night ? "POKéMON" : "RETROMON", night ? { top: [255, 236, 120], bottom: [240, 170, 40], side: [40, 60, 140], line: [12, 18, 48] } : {})}" style="max-width:1080px;image-rendering:pixelated;filter:drop-shadow(0 10px 0 rgba(0,0,0,.18))"></div>`);
     box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#FFF4D8;color:#26304A;font-size:30px;letter-spacing:6px;box-shadow:0 6px 0 rgba(0,0,0,.18)">PRESS START</span></div>`);
-    box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:#123C38;opacity:.8">INSID3 TH3 CUB3</div>`);
-    box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:#123C38;opacity:.8">Version 0.21</div>`);
+    box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">INSID3 TH3 CUB3</div>`);
+    box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">Version 0.22</div>`);
     return { key: k => { if (k === "a") go("language"); return true; } };
   }
 });
@@ -181,8 +181,8 @@ function makerRows(tab) {
   const ch = (label, key, names, off) => ({ label, key, chips: names.map((n, i) => [i, title(n)]), off, get: () => O()[key], set: v => O()[key] = v });
   if (tab === "you") return [
     { label: "BODY", chips: [[0, "Boy"], [1, "Girl"]], get: () => O().girl ? 1 : 0, set: v => { const keep = { skin: O().skin, eyes: O().eyes }; G.outfit = Object.assign(OUTFIT.defaults(!!v), keep); } },
-    Object.assign(sw("SKIN", "skin", OUTFIT.SKIN_RGB.concat(OUTFIT.SKIN_RGB_NEW)), { newFrom: 4 }),
-    ch("HAIR", "hair", OUTFIT.HAIRS), sw("HAIR COLOUR", "hairc", OUTFIT.COLOURS), Object.assign(sw("EYES", "eyes", OUTFIT.EYE_RGB), { newFrom: 0 }),
+    Object.assign(sw("SKIN", "skin", OUTFIT.SKIN_RGB.concat(OUTFIT.SKIN_RGB_NEW)), { newFrom: 4 }), Object.assign(sw("EYES", "eyes", OUTFIT.EYE_RGB), { newFrom: 0 }),
+    ch("HAIR", "hair", OUTFIT.HAIRS), sw("HAIR COLOUR", "hairc", OUTFIT.COLOURS),
   ];
   return [ch("HAT", "hat", OUTFIT.HATS), ch("CAP", "capp", OUTFIT.CAP_NAMES, () => O().hat !== 1), ch("CAP WAY", "capb", ["Forwards", "Backwards"], () => O().hat !== 1), sw("HAT COLOUR", "hatc", OUTFIT.COLOURS),
     ch("TOP", "top", OUTFIT.TOPS), sw("TOP COLOUR", "topc", OUTFIT.COLOURS), ch("BOTTOMS", "bot", OUTFIT.BOTTOMS), sw("BOTTOMS COLOUR", "botc", OUTFIT.COLOURS),
@@ -190,19 +190,26 @@ function makerRows(tab) {
 }
 function maker(C, tabs, o) {
   let tab = 0, sel = 0, rows = makerRows(tabs[0]);
-  const P = box(30, 24, 700, null, "g-panel", ""); P.style.padding = "10px 14px";
+  const P = box(24, 20, 870, null, "g-panel", ""); P.style.padding = "12px 14px"; P.style.maxHeight = "650px"; P.style.overflow = "auto";
   const opts = r => r.swatches ? r.swatches.map((c, i) => [i, c]) : r.chips;
   const idxOf = r => Math.max(0, opts(r).findIndex(([v]) => v === r.get()));
   const draw = () => {
     rows = makerRows(tabs[tab]);
     const tabBar = tabs.length > 1 ? `<div style="display:flex;gap:8px;margin:2px 0 8px 10px">${tabs.map((t, i) => `<span class="g-chip${i === tab ? " on" : ""}" data-t="${i}" style="font-size:14px;padding:3px 14px">${t === "you" ? "YOU" : "CLOTHES"}</span>`).join("")}<span style="margin-left:auto;font-size:12px;font-weight:900;color:#A9D4C6;align-self:center">TAB switches</span></div>` : "";
-    P.innerHTML = tabBar + rows.map((r, i) => { const dim = r.off && r.off();
-      return `<div style="display:grid;grid-template-columns:140px 1fr;align-items:center;gap:10px;padding:4px 10px;border-radius:14px;${dim ? "opacity:.4;" : ""}${i === sel ? "background:rgba(255,244,216,.12);box-shadow:inset 0 0 0 2px rgba(255,244,216,.5)" : ""}">
-      <span class="g-label" style="font-size:12px;${i === sel ? "color:#FFF4D8" : ""}">${r.label}</span>
-      <span style="display:flex;flex-wrap:wrap;gap:${r.swatches ? 6 : 6}px;align-items:center">${opts(r).map(([v, l], j) => r.swatches
-        ? `<span class="g-swatch${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="position:relative;width:28px;height:28px;border-width:2.5px;border-radius:7px;background:${l}">${r.newFrom != null && j >= r.newFrom ? `<i style="position:absolute;right:-4px;top:-4px;width:9px;height:9px;border-radius:50%;background:#FFD45A;box-shadow:0 0 0 2px #123C38"></i>` : ""}</span>`
-        : `<span class="g-chip${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="font-size:13.5px;padding:2px 10px">${esc(l)}</span>`).join("")}</span></div>`; }).join("") +
-      `<div style="display:flex;gap:12px;margin-top:6px;padding:0 10px;align-items:center"><span class="g-item${sel === rows.length ? " on" : ""}" data-done="1">${esc(o.done || "DONE")}</span><span class="g-item${sel === rows.length + 1 ? " on" : ""}" data-rand="1">MIX IT UP</span>
+    // Rows go in cards by what they're for (hat, top, bottoms...), with room to breathe: big swatches and chips.
+    const GROUP = { "BODY": "YOU", "SKIN": "YOU", "EYES": "YOU", "HAIR": "HAIR", "HAIR COLOUR": "HAIR", "HAT": "HAT", "CAP": "HAT", "CAP WAY": "HAT", "HAT COLOUR": "HAT",
+      "TOP": "TOP", "TOP COLOUR": "TOP", "BOTTOMS": "BOTTOMS", "BOTTOMS COLOUR": "BOTTOMS", "SHOES": "SHOES", "BAG": "BAG", "BAG COLOUR": "BAG" };
+    const short = (r, g) => r.label === g ? (g === "SHOES" ? "COLOUR" : "STYLE") : r.label.startsWith(g + " ") ? r.label.slice(g.length + 1) : r.label;
+    const rowHtml = (r, i, g) => { const dim = r.off && r.off(), on = i === sel;
+      return `<div style="display:grid;grid-template-columns:70px 1fr;align-items:center;gap:8px;padding:4px 8px;border-radius:14px;transition:background .15s;${dim ? "opacity:.4;" : ""}${on ? "background:rgba(255,244,216,.13);box-shadow:inset 0 0 0 2px rgba(255,244,216,.55)" : ""}">
+      <span class="g-label" style="font-size:12.5px;${on ? "color:#FFF4D8" : ""}">${on ? "&#9656; " : ""}${short(r, g)}</span>
+      <span style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">${opts(r).map(([v, l], j) => r.swatches
+        ? `<span class="g-swatch${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="position:relative;width:30px;height:30px;border-width:3px;border-radius:9px;background:linear-gradient(160deg,rgba(255,255,255,.28),rgba(0,0,0,.12)),${l}">${r.newFrom != null && j >= r.newFrom ? `<i style="position:absolute;right:-4px;top:-4px;width:10px;height:10px;border-radius:50%;background:#FFD45A;box-shadow:0 0 0 2px #123C38"></i>` : ""}</span>`
+        : `<span class="g-chip${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="font-size:14px;padding:3px 11px">${esc(l)}</span>`).join("")}</span></div>`; };
+    const groups = []; rows.forEach((r, i) => { const g = GROUP[r.label] || r.label; let G2 = groups[groups.length - 1]; if (!G2 || G2.g !== g) groups.push(G2 = { g, rows: [] }); G2.rows.push([r, i]); });
+    P.innerHTML = tabBar + `<div style="columns:2;column-gap:10px">${groups.map(G2 => `<div style="border-radius:18px;background:rgba(0,0,0,.16);padding:8px 6px 8px 6px;display:grid;gap:2px;break-inside:avoid;margin-bottom:10px">
+      <div class="g-title" style="font-size:17px;letter-spacing:2px;padding:2px 12px 2px;color:#8FF5C0">${G2.g}</div>${G2.rows.map(([r, i]) => rowHtml(r, i, G2.g)).join("")}</div>`).join("")}</div>` +
+      `<div style="display:flex;gap:12px;margin-top:0;padding:0 10px;align-items:center"><span class="g-item${sel === rows.length ? " on" : ""}" data-done="1">${esc(o.done || "DONE")}</span><span class="g-item${sel === rows.length + 1 ? " on" : ""}" data-rand="1">MIX IT UP</span>
         ${tabs[tab] === "you" ? `<span style="margin-left:auto;font-size:12.5px;font-weight:800;color:#CFEDE3"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#FFD45A;margin-right:5px"></i>New: four more skin tones, eye colour</span>` : ""}</div>`;
     P.querySelectorAll("[data-r]").forEach(e => e.onclick = () => { const r = rows[+e.dataset.r]; sel = +e.dataset.r; r.set(opts(r)[+e.dataset.j][0]); changed(); });
     P.querySelectorAll("[data-t]").forEach(e => e.onclick = () => { tab = +e.dataset.t; sel = 0; draw(); });
@@ -225,7 +232,7 @@ function maker(C, tabs, o) {
   return w;
 }
 screen("creator", "A new game", "Character maker", {
-  scene: "creator", sceneOpts: () => ({ side: -1.15 }),
+  scene: "creator", sceneOpts: () => ({ side: -1.95 }),
   what: "Make yourself on Minecraft's player model, its corners just softened: boy or girl, skin tone, hair and its colour, eyes, then your clothes. It's the mod's own wardrobe (the same layers and colours CLOTHES uses), with four more skin tones and eye colour added.",
   tags: ["The mod's wardrobe", "New: 4 skin tones, eye colour"], mod: "Outfit: FAIR, LIGHT, TAN, DEEP skin; 6 hair styles; cap, beanie or sun hat; jacket, tee, hoodie or vest; jeans, shorts or skirt; shoes; backpack or satchel; 14 colours.",
   try: ["Up and down between rows, left and right to change, A on DONE.", "MIX IT UP picks at random."],

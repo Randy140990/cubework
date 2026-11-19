@@ -46,18 +46,18 @@ function playOnce(st, key) { const an = animFor(st.m, key); if (an) { st.once = 
 function tickMon(st, dt) {
   if (!st) return;
   st.t += dt;
-  const mv = st.base === "walk" ? moveAnim(st.m) : st.base === "fly" ? flyAnim(st.m) : null;
+  const mv = st.base === "walk" ? moveAnim(st.m) : st.base === "fly" ? flyAnim(st.m) : st.base === "hover" ? flyAnim(st.m, ["hover", "fly", "walk"]) : null;
   const base = mv ? mv.an : st.base === "ground" ? groundIdle(st.m) : (animFor(st.m, "idle") || groundIdle(st.m));
   let list = [[base, st.t]];
   if (st.once) { st.ot += dt; if (st.ot > (st.once.len || 1) + 0.05) { st.once = null; } else list = [[st.once, st.ot]]; }
   setParts(st.m, mv ? mv.key : null); pose(st.m, list);
 }
-function flyAnim(model) { const p = model.info.poses || {}; for (const k of ["fly", "hover", "walk"]) if (p[k] && model.anims[p[k].anim]) return { an: model.anims[p[k].anim], key: k }; return null; }
+function flyAnim(model, order = ["fly", "hover", "walk"]) { const p = model.info.poses || {}; for (const k of order) if (p[k] && model.anims[p[k].anim]) return { an: model.anims[p[k].anim], key: k }; return null; }
 function disc(r, color, y = 0.01, op = 1) { const m = new THREE.Mesh(new THREE.CircleGeometry(r, 48), new THREE.MeshLambertMaterial({ color, transparent: op < 1, opacity: op })); m.rotation.x = -Math.PI / 2; m.position.y = y; m.receiveShadow = true; return m; }
 function blob(r) { const m = new THREE.Mesh(new THREE.PlaneGeometry(r, r), matFor("shadowBlob")); m.rotation.x = -Math.PI / 2; m.position.y = 0.02; m.renderOrder = 3; return m; }
 function figureOf(look) { const f = makeFigure(look); poseFigure(f, {}); return f; }
 
-const PROF_LOOK = { skin: "oak" }, RIVAL_LOOK = { skin: "blue" }, NURSE_LOOK = { skin: "nurse" }, CLERK_LOOK = { skin: "clerk" }, BUGBOY_LOOK = { skin: "youngster" }, MUM_LOOK = { skin: "middle_aged_woman" };
+const PROF_LOOK = { skin: "oak" }, RIVAL_LOOK = { skin: "blue" }, NURSE_LOOK = { skin: "nurse" }, CLERK_LOOK = { skin: "clerk" }, BUGBOY_LOOK = { skin: "youngster" }, MUM_LOOK = { skin: "mum" };
 
 const SCENES = {
   // Pallet Town, from the Interior Viewer: you outside your door, your partner beside you.
@@ -136,19 +136,21 @@ const SCENES = {
     const box = (w, h, d, c, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: c })); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; group.add(m); return m; };
     if (night) {
       // The old title: Charizard, alone, against the night sky.
-      mon("charizard").then(st => { st.base = "ground"; group.add(st.m.holder); placeMon(st, 0, 0, Math.PI - 0.3, -0.2); S.mons.push(st); });
-      S.enter = () => { lightFor(-2, 3, 4, 10); hemi3.color.set(0x9fb6ff); hemi3.groundColor.set(0x1a2244); look3(0, 1.4, 6.2, 0, 1.0, 0); };
+      // Flying, a little turned, filling the space under the word (as the old title has it), not crowding it.
+      mon("charizard").then(st => { const k = 2.2 / Math.max(0.5, st.m.size.h); st.m.holder.scale.multiplyScalar(k); st.m.size = { ...st.m.size, h: st.m.size.h * k, w: st.m.size.w * k, l: st.m.size.l * k, cx: st.m.size.cx * k, cz: st.m.size.cz * k };
+        st.base = "hover"; st.fly = true; group.add(st.m.holder); placeMon(st, 0.15, 0, Math.PI - 0.45, -0.55); S.mons.push(st); S.zard = st; });
+      S.enter = () => { lightFor(-2, 3, 4, 10); hemi3.color.set(0x9fb6ff); hemi3.groundColor.set(0x1a2244); look3(0, 1.45, 8.2, 0, 1.15, 0); };
     } else {
       // A blocky hill, a few trees and clouds, and our creatures on top.
       box(7.2, 0.6, 3.6, 0x6DB85B, 0, -0.3, 0); box(5.0, 0.6, 2.6, 0x7CC46A, 0, -0.02, -0.1); box(7.4, 0.12, 3.8, 0x8A6A44, 0, -0.66, 0);
       for (const [x, z, s] of [[-3.0, -1.4, 1.0], [3.1, -1.2, 1.15], [-3.6, 0.6, 0.85], [3.7, 0.4, 0.9]]) {
         box(0.3 * s, 1.2 * s, 0.3 * s, 0x7A5030, x, 0.6 * s - 0.3, z); box(1.3 * s, 1.0 * s, 1.3 * s, 0x3F8E3E, x, 1.4 * s - 0.3, z); box(0.8 * s, 0.6 * s, 0.8 * s, 0x4FA04C, x, 2.05 * s - 0.3, z);
       }
-      for (const [x, y, z, w] of [[-3.2, 3.6, -6, 2.2], [1.8, 4.2, -7, 3.0], [4.6, 3.3, -5.5, 1.6], [-0.8, 4.6, -8, 1.8]]) { const c = box(w, 0.5, 0.9, 0xFFFFFF, x, y, z); box(w * 0.55, 0.35, 0.8, 0xFFFFFF, x + w * 0.1, y + 0.4, z); S.clouds.push(c); }
+      for (const [x, y, z, w] of [[-3.2, 3.6, -6, 2.2], [1.8, 4.2, -7, 3.0], [4.6, 3.3, -5.5, 1.6], [-0.8, 4.6, -8, 1.8]]) { const c = box(w, 0.5, 0.9, 0xFFFFFF, x, y, z), top = box(w * 0.55, 0.35, 0.8, 0xFFFFFF, 0, 0, 0); group.remove(top); c.add(top); top.position.set(w * 0.1, 0.4, 0); S.clouds.push(c); }
       [["charmander", -1.35, 0.1, 0.45], ["pikachu", 0, 0.75, 0.0], ["bulbasaur", 1.35, 0.1, -0.45], ["squirtle", 0.1, -0.85, -0.1]].forEach(([sid, x, z, turn]) => mon(sid).then(st => { st.base = "ground"; group.add(st.m.holder); placeMon(st, x, z, Math.PI + turn, 0.28); S.mons.push(st); }));
       S.enter = () => { lightFor(0, 0, 6, 14); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); look3(0, 1.55, 5.9, 0, 1.0, 0); };
     }
-    S.tick = (dt, t) => { for (const m of S.mons) tickMon(m, dt); S.clouds.forEach((c, i) => { c.position.x += dt * 0.12 * (1 + i * 0.3); if (c.position.x > 7) c.position.x = -7; }); };
+    S.tick = (dt, t) => { for (const m of S.mons) tickMon(m, dt); if (S.zard) S.zard.m.holder.position.y = -0.55 + Math.sin(t * 1.6) * 0.12; S.clouds.forEach((c, i) => { c.position.x += dt * 0.12 * (1 + i * 0.3); if (c.position.x > 7) c.position.x = -7; }); };
     return S;
   },
   // Everyone of a kind, side by side on a stage: the one you pick steps forward and waves, with their partner behind.
@@ -258,7 +260,9 @@ const SCENES = {
         if (th.t < 0.7) { const k = th.t / 0.7; ball.position.lerpVectors(th.from, th.to, k); ball.position.y += Math.sin(k * Math.PI) * 2.2; ball.rotation.x += dt * 16; }
         else if (!th.landed) { th.landed = true; ball.position.copy(th.to); ball.rotation.set(0, 0, 0); if (th.onLand) th.onLand(); }
       }
-      if (S.shakeT != null) { S.shakeT += dt; const k = S.shakeT; ball.rotation.z = Math.sin(k * 14) * 0.45 * Math.max(0, Math.sin(k * Math.PI / 0.9)) * (k % 1.1 < 0.9 ? 1 : 0); ball.position.y = Math.max(0.22, ball.position.y - dt * 3); }
+      // Three wobbles, a beat apart: the ball tips side to side and rocks on the ground, then settles.
+      if (S.shakeT != null) { S.shakeT += dt; const k = S.shakeT, n = Math.floor(k / 1.1), ph = k % 1.1, on = n < 3 && ph < 0.75, env = on ? Math.sin(ph * Math.PI / 0.75) : 0;
+        ball.rotation.z = Math.sin(ph * 16) * 0.55 * env; ball.position.x = 0 + Math.sin(ph * 16) * 0.08 * env; ball.position.y = Math.max(0.22, ball.position.y - dt * 3); }
     };
     return S;
   },

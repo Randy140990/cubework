@@ -130,14 +130,32 @@ function eff(mt, sid) { let m = 1; for (const t of sp(sid).stats.types) m *= (CH
 function drain(p, to, pl, ms = 700) { return new Promise(r => { const from = p.hp, t0 = performance.now(); const f = () => { const k = Math.min(1, (performance.now() - t0) / ms); p.hp = from + (to - from) * k; pl.draw(); if (k < 1) requestAnimationFrame(f); else r(); }; f(); }); }
 function flash(col) { const f = add(h("div", "", "")); Object.assign(f.style, { position: "absolute", inset: "0", background: col, opacity: ".0", transition: "opacity .12s" }); requestAnimationFrame(() => { f.style.opacity = ".45"; }); later(160, () => f.style.opacity = "0"); later(400, () => f.remove()); }
 function statArrow(x, y, up) { const e = box(x, y, 200, 120, "", `<div style="font-size:64px;font-weight:900;color:${up ? "#FF8A5C" : "#6FC3FF"};text-shadow:0 0 18px currentColor;animation:${up ? "aup" : "adn"} 1s ease both">${up ? "&#9650;&#9650;" : "&#9660;&#9660;"}</div><style>@keyframes adn{from{transform:translateY(-30px);opacity:0}40%{opacity:1}to{transform:translateY(30px);opacity:0}}@keyframes aup{from{transform:translateY(30px);opacity:0}40%{opacity:1}to{transform:translateY(-30px);opacity:0}}</style>`); later(1100, () => e.remove()); }
+// The four commands: a stack of wide buttons bottom right, each in its colour with a sheen, its own picture, and an arrow
+// that points at the one you're on. The question sits above them, clear of everything.
+const CMD_ICON = {
+  FIGHT: `<svg viewBox="0 0 64 64"><path d="M32 6l6 14 15-4-8 13 12 9-15 3 1 15-11-9-11 9 1-15-15-3 12-9-8-13 15 4z" fill="#FFF4D8"/><path d="M32 20l3 8 8-2-4 7 6 5-8 1v8l-5-5-5 5v-8l-8-1 6-5-4-7 8 2z" fill="#FFD45A"/></svg>`,
+  "POKéMON": `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#FFF4D8"/><path d="M8 32a24 24 0 0 1 48 0z" fill="#E5525C"/><rect x="8" y="29.5" width="48" height="5" fill="#26304A"/><circle cx="32" cy="32" r="8.5" fill="#26304A"/><circle cx="32" cy="32" r="5" fill="#FFF4D8"/></svg>`,
+  BAG: `<svg viewBox="0 0 64 64"><path d="M22 18q0-10 10-10t10 10" fill="none" stroke="#FFF4D8" stroke-width="5"/><rect x="10" y="18" width="44" height="38" rx="10" fill="#FFF4D8"/><rect x="10" y="30" width="44" height="6" fill="#E0B868"/><rect x="27" y="27" width="10" height="12" rx="3" fill="#8A5A2A"/></svg>`,
+  RUN: `<svg viewBox="0 0 64 64"><path d="M10 24h24V12l22 20-22 20V40H10z" fill="#FFF4D8"/><path d="M6 24h3v16H6zM0 26h3v12H0z" fill="#FFF4D8" opacity=".6"/></svg>`,
+};
 function commandButtons(onPick, o = {}) {
-  const B = [["FIGHT", "#E5525C", 930, 600, 82], ["POKéMON", "#41BF84", 1078, 626, 62], ["BAG", "#F0B43C", 1204, 626, 58], ["RUN", "#4A8FE0", 1204, 508, 44]];
+  const B = [["FIGHT", "#E5525C", 404, 80], ["POKéMON", "#36B07A", 494, 62], ["BAG", "#E9A830", 566, 62], ["RUN", "#4A8FE0", 638, 62]];
+  const X = 948, W = 300;
   let sel = 0;
-  const els = B.map(([n, c, x, y, r], i) => { const e = box(x - r, y - r, 2 * r, 2 * r, "", `<div style="width:100%;height:100%;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%, ${c}, ${darkerHex(c, 0.35)});border:4px solid rgba(255,255,255,.85);box-shadow:0 8px 20px rgba(0,0,0,.35);font-family:Fredoka;font-weight:700;font-size:${n.length > 5 ? 17 : r > 60 ? 26 : r > 50 ? 19 : 16}px;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.4);transition:transform .15s">${n}</div>`); e.style.cursor = "pointer"; e.onclick = () => { sel = i; paint(); onPick(i); }; e.onmouseenter = () => { sel = i; paint(); }; return e; });
-  const pill = box(540, 600, 330, null, "g-panel soft", `<div style="padding:12px 20px;font-size:21px;font-weight:900;text-align:center">What will <span style="color:#FFD45A">${esc(o.who)}</span> do?</div>`); pill.style.borderRadius = "999px";
-  const paint = () => els.forEach((e, i) => { e.firstChild.style.transform = i === sel ? "scale(1.12)" : "scale(1)"; e.firstChild.style.borderColor = i === sel ? "#FFF4D8" : "rgba(255,255,255,.85)"; e.firstChild.style.boxShadow = i === sel ? "0 0 0 6px rgba(255,244,216,.45),0 8px 20px rgba(0,0,0,.35)" : "0 8px 20px rgba(0,0,0,.35)"; });
+  const els = B.map(([n, c, y, hh], i) => { const big = i === 0;
+    const e = box(X, y, W, hh, "", `<div style="position:relative;width:100%;height:100%;border-radius:${hh / 2}px;overflow:hidden;display:flex;align-items:center;gap:14px;padding:0 22px 0 ${big ? 12 : 10}px;
+      background:linear-gradient(180deg, ${lighterHex(c, 0.18)} 0%, ${c} 48%, ${darkerHex(c, 0.22)} 100%);border:3px solid rgba(255,255,255,.9);box-shadow:0 6px 0 ${darkerHex(c, 0.45)},0 12px 22px rgba(0,0,0,.3);transition:transform .15s, box-shadow .15s">
+      <span style="position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0))"></span>
+      <span style="position:absolute;right:-30px;top:-40px;width:${hh * 2}px;height:${hh * 2}px;border-radius:50%;background:rgba(255,255,255,.08)"></span>
+      <span style="position:relative;width:${big ? 56 : 44}px;height:${big ? 56 : 44}px;flex:none;border-radius:50%;background:${darkerHex(c, 0.3)};display:grid;place-items:center;box-shadow:inset 0 3px 6px rgba(0,0,0,.25)"><span style="width:${big ? 40 : 30}px;height:${big ? 40 : 30}px">${CMD_ICON[n]}</span></span>
+      <span style="position:relative;font-family:Fredoka,Nunito,sans-serif;font-weight:700;font-size:${big ? 32 : 24}px;letter-spacing:1.5px;color:#fff;text-shadow:0 2px 0 ${darkerHex(c, 0.45)}">${n}</span></div>`);
+    e.style.cursor = "pointer"; e.onclick = () => { sel = i; paint(); onPick(i); }; e.onmouseenter = () => { sel = i; paint(); }; return e; });
+  const arrow = box(X - 46, 0, 36, 36, "", `<style>@keyframes cmdbob{50%{transform:translateX(-7px)}}</style><svg viewBox="0 0 36 36" style="animation:cmdbob .7s ease-in-out infinite;filter:drop-shadow(0 3px 0 rgba(0,0,0,.3))"><path d="M6 4l26 14L6 32l6-14z" fill="#FFF4D8" stroke="#26304A" stroke-width="3" stroke-linejoin="round"/></svg>`);
+  const pill = box(null, 330, null, null, "g-panel soft", `<div style="padding:11px 22px;font-size:19px;font-weight:900;white-space:nowrap">What will <span style="color:#FFD45A">${esc(o.who)}</span> do?</div>`); pill.style.borderRadius = "999px"; pill.style.left = "auto"; pill.style.right = (1280 - X - W) + "px";
+  const paint = () => { els.forEach((e, i) => { const d = e.firstChild, on = i === sel; d.style.transform = on ? "translateX(-14px) scale(1.03)" : "none"; d.style.borderColor = on ? "#FFF4D8" : "rgba(255,255,255,.75)"; d.style.filter = on ? "none" : "saturate(.8) brightness(.92)"; });
+    const [, , y, hh] = B[sel]; arrow.style.top = (y + hh / 2 - 18) + "px"; arrow.style.left = (X - 54) + "px"; };
   paint();
-  return { key(k) { const map = { left: [1, 0, 0, 2][sel], right: [1, 2, 2, 2][sel], up: [0, 0, 3, 3][sel], down: [0, 1, 2, 2][sel] }; if (k in map) { sel = map[k]; paint(); return true; } if (k === "a") { onPick(sel); return true; } return false; }, remove() { els.forEach(e => e.remove()); pill.remove(); } };
+  return { key(k) { if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : 3)) % 4; paint(); return true; } if (k === "left" || k === "right") return true; if (k === "a") { onPick(sel); return true; } return false; }, remove() { els.forEach(e => e.remove()); pill.remove(); arrow.remove(); } };
 }
 function movePanel(p, foeSid, onPick, onBack) {
   let sel = 0;
@@ -222,9 +240,9 @@ screen("battle", "Battle", "Battle: commands and moves", {
 });
 screen("catch", "Battle", "Catching", {
   scene: "battle", sceneOpts: () => ({ ours: "pikachu", foe: "pidgey", trainer: false }),
-  what: "A wild POKéMON: throw a ball from the BAG (the list opens bottom right, where the buttons were). A ring closes in round it, with 'Press A to throw!' in the middle; press A when it's small for Nice!, Great! or Excellent! Then the ball shakes, and Gotcha!",
+  what: "A wild POKéMON: throw a ball from the BAG (the list opens bottom right, where the buttons were). A ring closes in round it; press SPACE (or click) when it's small for Nice!, Great! or Excellent! Then the ball wobbles three times on the ground, and Gotcha!",
   tags: ["New: throw timing and call-outs"], mod: "BattleScreen's BAG, POKé BALLS.",
-  try: ["BAG, POKé BALLS, POKé BALL, then press A as the ring shrinks."],
+  try: ["BAG, POKé BALLS, POKé BALL, then press SPACE (or click) as the ring shrinks."],
   make() {
     const C = ctl(), S = SC.battle, foeN = ourName("pidgey"); C.sayAt = { x: 520, w: 724 };
     const ours = Object.assign({}, G.party[0]), foe = { sid: "pidgey", lv: 4, gender: "F", status: "" }; foe.maxhp = statsAt("pidgey", 4).HP; foe.hp = Math.round(foe.maxhp * 0.4);
@@ -241,12 +259,13 @@ screen("catch", "Battle", "Catching", {
         // The ring: smaller is better.
         const p = V(0, 0.4, 0).project(cam3), cx = (p.x + 1) / 2 * 1280, cy = (1 - p.y) / 2 * 720;
         const ring = box(cx - 150, cy - 150, 300, 300, "", `<svg viewBox="0 0 300 300" width="300" height="300"><circle cx="150" cy="150" r="60" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="6"/><circle id="rg" cx="150" cy="150" r="140" fill="none" stroke="#8FF5C0" stroke-width="8"/></svg>`);
-        const tip = box(440, Math.min(560, cy + 170), 400, null, "g-panel g-pop", `<div style="padding:12px 18px;text-align:center;font-size:22px;font-weight:900">Press <span class="g-key round">A</span> to throw!</div>`); tip.style.borderRadius = "999px";
+        const tip = box(400, Math.max(96, cy - 230), 480, null, "g-panel g-pop", `<div style="padding:12px 18px;text-align:center;font-size:22px;font-weight:900">Press <span class="g-key">SPACE</span> or click to throw!</div>`); tip.style.borderRadius = "999px";
+        const hit = box(0, 0, 1280, 720, "", ""); hit.style.cursor = "crosshair";
         let r = 140, dir = -1, live = true;
         const spin = () => { if (!live || !C.alive()) return; r += dir * 2.4; if (r < 40) dir = 1; if (r > 140) dir = -1; const e = $("#rg"); if (e) { e.setAttribute("r", r); e.setAttribute("stroke", r < 70 ? "#FFD45A" : r < 100 ? "#8FF5C0" : "#fff"); } requestAnimationFrame(spin); };
         spin();
-        await new Promise(res => { const w = { key(k) { if (k === "a") { C.pop(w); res(); } return true; } }; C.push(w); });
-        live = false; ring.remove(); tip.remove();
+        await new Promise(res => { const w = { key(k) { if (k === "a") { C.pop(w); res(); } return true; } }; C.push(w); hit.onclick = e => { e.stopPropagation(); C.pop(w); res(); }; });
+        live = false; ring.remove(); tip.remove(); hit.remove();
         const call = r < 62 ? "Excellent!" : r < 90 ? "Great!" : r < 120 ? "Nice!" : null;
         await C.say([{ text: `**${G.name}** threw a **${j ? "GREAT BALL" : "POKé BALL"}**!` }], { keep: true });
         S.point = 1;
@@ -255,9 +274,11 @@ screen("catch", "Battle", "Catching", {
         if (call) { const c = add(h("div", "g-callout", call)); c.style.left = cx + "px"; c.style.top = (cy - 80) + "px"; later(1400, () => c.remove()); }
         await new Promise(res => { const t0 = performance.now(); const f = () => { S.foeHidden = Math.min(1, (performance.now() - t0) / 350); if (S.foeHidden < 1) requestAnimationFrame(f); else res(); }; f(); });
         uiRoot.querySelectorAll(".g-text").forEach(x => x.remove());
+        // The ball shakes three times on its own, a dot for each, then clicks shut.
         S.shakeT = 0;
-        await C.say([{ text: "..." }, { text: "... ..." }, { text: "... ... ..." }], {});
-        S.shakeT = null;
+        const dots = box(cx - 80, Math.max(90, cy - 150), 160, null, "g-panel g-pop", `<div id="shk" style="padding:10px 0;text-align:center;font-size:34px;font-weight:900;letter-spacing:10px;color:#FFD45A">&middot;</div>`); dots.style.borderRadius = "999px";
+        for (let n = 1; n <= 3; n++) { await C.wait(1100); const e = $("#shk"); if (e) e.innerHTML = "&middot;".repeat(Math.min(3, n + 1)); }
+        dots.remove(); S.shakeT = null;
         const st = box(cx - 120, cy - 160, 240, 120, "g-pop", `<div style="font-size:60px;text-align:center;color:#FFD45A;text-shadow:0 0 20px #FFD45A">&#10022; &#10022; &#10022;</div>`);
         const cg = add(h("div", "g-callout", "Gotcha!")); cg.style.left = "640px"; cg.style.top = "150px";
         await C.say([{ text: `Gotcha! **${foeN}** was caught!` }]); st.remove();

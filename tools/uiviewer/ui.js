@@ -153,7 +153,9 @@ function go(id, arg) {
 }
 function step(d) { const i = SCREENS.indexOf(curDef); go(SCREENS[(i + d + SCREENS.length) % SCREENS.length].id); }
 function hints(list, o = {}) {
-  const e = h("div", "g-hints", list.map(([k, l]) => `<span><span class="g-key${k.length === 1 ? " round" : ""}">${esc(k)}</span>${esc(l)}</span>`).join(""));
+  // A and B are the keyboard's SPACE and ESC (the letter A on a keyboard is "left"), so say so.
+  const KB = { A: "SPACE", B: "ESC" };
+  const e = h("div", "g-hints", list.map(([k, l]) => { k = KB[k] || k; return `<span><span class="g-key${k.length === 1 ? " round" : ""}">${esc(k)}</span>${esc(l)}</span>`; }).join(""));
   if (o.left) { e.style.right = "auto"; e.style.left = "22px"; }
   return add(e);
 }

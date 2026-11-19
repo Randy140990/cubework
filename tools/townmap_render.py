@@ -88,6 +88,16 @@ def render(box=None, scale=1):
     edge = np.zeros((GH, GW), bool)
     for yy in Yn: edge |= (Y - yy) >= 2
     o[(K == BUILT) & edge] *= 0.7
+    # Cliffs: ground at the foot of a drop of 2 or more, and its rim, in earth browns (as the old maps draw ledges), not grass green.
+    up = np.full((GH, GW), -64, np.int32)
+    for s in (1, 2):
+        for dx, dz in ((s, 0), (-s, 0), (0, s), (0, -s)): up = np.maximum(up, sh(Y, dx, dz, -64))
+    low = np.full((GH, GW), 999, np.int32)
+    for yy in Yn: low = np.minimum(low, np.where(yy == -64, 999, yy))
+    foot = (K == GROUND) & (up - Y >= 2); rim = (K == GROUND) & (Y - low >= 2) & ~foot
+    tone = np.clip(1 + 0.05 * (Y - hNW), 0.8, 1.15)[:, :, None]
+    o[foot] = (np.array([176, 128, 84], np.float32) * tone)[foot]
+    o[rim] = o[rim] * 0.35 + (np.array([196, 150, 100], np.float32) * tone)[rim] * 0.65
     o[K == NOTHING] = [0x34, 0x8C, 0xCE]
     img = np.clip(o, 0, 255).astype(np.uint8)
     img = img[z0 - gz0:z1 - gz0, x0 - gx0:x1 - gx0]
