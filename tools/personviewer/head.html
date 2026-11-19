@@ -87,13 +87,13 @@ input[type=search] { width: 220px }
   </div>
   <div class="main">
     <div>
-      <div class="viewer" id="viewer" tabindex="0" aria-label="The person, turning. Drag to turn them, the arrow keys for the next or previous person.">
+      <div class="viewer" id="viewer" tabindex="0" aria-label="The person, turning. Drag left and right to turn them, up and down to look from above or below; the arrow keys for the next or previous person.">
         <canvas id="c"></canvas>
         <div class="badge" id="badge"></div>
       </div>
       <div class="controls">
         <div class="seg" id="poseSeg" role="group" aria-label="Pose"><button data-v="stand" aria-pressed="true">Stand</button><button data-v="walk" aria-pressed="false">Walk</button><button data-v="wave" aria-pressed="false">Wave</button><button data-v="talk" aria-pressed="false">Talk</button><button data-v="cheer" aria-pressed="false">Cheer</button><button data-v="sit" aria-pressed="false">Sit</button></div>
-        <div class="seg" id="viewSeg" role="group" aria-label="View"><button data-v="turn" aria-pressed="true">Turning</button><button data-v="front" aria-pressed="false">Front</button><button data-v="side" aria-pressed="false">Side</button><button data-v="back" aria-pressed="false">Back</button></div>
+        <div class="seg" id="viewSeg" role="group" aria-label="View"><button data-v="turn" aria-pressed="true">Turning</button><button data-v="front" aria-pressed="false">Front</button><button data-v="side" aria-pressed="false">Side</button><button data-v="back" aria-pressed="false">Back</button><button data-v="above" aria-pressed="false">From above</button><button data-v="top" aria-pressed="false">Top</button></div>
         <div class="seg" id="sizeSeg" role="group" aria-label="Size check"><button data-v="off" aria-pressed="true">On their own</button><button data-v="on" aria-pressed="false">Beside you and a block</button></div>
       </div>
     </div>

@@ -42,7 +42,8 @@ const GROUP_NAME = Object.fromEntries(GROUPS.map(g => [g[0], g[1]]));
 const specOf = s => typeof s === "string" ? { skin: s } : { outfit: OUTFIT.defaults(s.outfit === "girl") };
 const skinFile = s => typeof s === "string" ? "textures/entity/npc/" + s + ".png" : "Made from your clothes (Outfit), as the mod makes it";
 let filter = { q: "", group: "all", kind: "all" }, list = ALL.slice(), cur = 0, fig = null;
-const st = { pose: "stand", view: "turn", yaw: Math.PI - 0.5, drag: null, auto: true, phase: 0 };
+const PITCH0 = 0.19;   // the usual eye line: a little above them
+const st = { pose: "stand", view: "turn", yaw: Math.PI - 0.5, pitch: PITCH0, pitchGoal: PITCH0, drag: null, auto: true, phase: 0 };
 
 function visible() {
   const q = filter.q.trim().toLowerCase();
@@ -121,14 +122,24 @@ $("#find").addEventListener("input", e => { filter.q = e.target.value; refilter(
 for (const b of $("#kindSeg").querySelectorAll("button")) b.onclick = () => { filter.kind = b.dataset.v; setSeg($("#kindSeg"), filter.kind); refilter(true); };
 for (const b of $("#poseSeg").querySelectorAll("button")) b.onclick = () => { st.pose = b.dataset.v; setSeg($("#poseSeg"), st.pose); };
 // People face -z at no turn, so their front is half a turn round to the camera.
-const VIEWS = { front: Math.PI, side: Math.PI / 2, back: 0 };
-for (const b of $("#viewSeg").querySelectorAll("button")) b.onclick = () => { st.view = b.dataset.v; setSeg($("#viewSeg"), st.view); st.auto = st.view === "turn"; };
+const VIEWS = { front: Math.PI, side: Math.PI / 2, back: 0, above: Math.PI - 0.6, top: Math.PI };
+// How far up the camera looks from: level views keep the usual eye line, From above is three-quarters down, Top is straight down on their head.
+const PITCHES = { front: PITCH0, side: PITCH0, back: PITCH0, above: 0.85, top: 1.5 };
+for (const b of $("#viewSeg").querySelectorAll("button")) b.onclick = () => {
+  st.view = b.dataset.v; setSeg($("#viewSeg"), st.view); st.auto = st.view === "turn";
+  if (PITCHES[st.view] != null) st.pitchGoal = PITCHES[st.view]; else if (st.pitchGoal > 1.2) st.pitchGoal = PITCH0;
+};
 for (const b of $("#sizeSeg").querySelectorAll("button")) b.onclick = () => {
   setSeg($("#sizeSeg"), b.dataset.v); extras.visible = b.dataset.v === "on";
   if (extras.visible && !youFig) { youFig = makeFigure({ outfit: OUTFIT.defaults(false) }); youFig.root.position.set(-1.35, 0, 0.1); youFig.root.rotation.y = Math.PI - 0.35; youFig.root.traverse(o => { if (o.isMesh) o.castShadow = true; }); extras.add(youFig.root); }
 };
-viewerEl.addEventListener("pointerdown", e => { st.drag = { x: e.clientX, yaw: st.yaw }; viewerEl.setPointerCapture(e.pointerId); viewerEl.style.cursor = "grabbing"; viewerEl.focus({ preventScroll: true }); });
-viewerEl.addEventListener("pointermove", e => { if (!st.drag) return; st.yaw = st.drag.yaw + (e.clientX - st.drag.x) * 0.012; st.auto = false; st.view = "free"; setSeg($("#viewSeg"), ""); });
+viewerEl.addEventListener("pointerdown", e => { st.drag = { x: e.clientX, y: e.clientY, yaw: st.yaw, pitch: st.pitchGoal }; viewerEl.setPointerCapture(e.pointerId); viewerEl.style.cursor = "grabbing"; viewerEl.focus({ preventScroll: true }); });
+viewerEl.addEventListener("pointermove", e => {
+  if (!st.drag) return;
+  st.yaw = st.drag.yaw + (e.clientX - st.drag.x) * 0.012;
+  st.pitchGoal = st.pitch = Math.max(-0.35, Math.min(1.5, st.drag.pitch + (e.clientY - st.drag.y) * 0.008));
+  st.auto = false; st.view = "free"; setSeg($("#viewSeg"), "");
+});
 const endDrag = () => { st.drag = null; viewerEl.style.cursor = "grab"; };
 viewerEl.addEventListener("pointerup", endDrag); viewerEl.addEventListener("pointercancel", endDrag);
 window.addEventListener("keydown", e => {
@@ -154,8 +165,9 @@ function tick(now) {
   }
   if (youFig) poseFigure(youFig, {});
   const w = viewerEl.clientWidth, h = viewerEl.clientHeight, wide = extras.visible;
-  const dist = (wide ? 7.4 : 5.6) * (w / h < 1 ? 1.45 : 1);
-  camera.position.set(0, 1.35 + dist * 0.12, dist); camera.lookAt(0, wide ? 0.85 : 0.92, 0);
+  st.pitch += (st.pitchGoal - st.pitch) * Math.min(1, dt * 8);
+  const dist = (wide ? 7.4 : 5.6) * (w / h < 1 ? 1.45 : 1) * (st.pitch > 1.2 ? 0.62 : 1), ty = wide ? 0.85 : 0.92 + Math.max(0, st.pitch - 0.3) * 0.5;
+  camera.position.set(0, ty + Math.sin(st.pitch) * dist, Math.cos(st.pitch) * dist); camera.lookAt(0, ty, 0);
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
