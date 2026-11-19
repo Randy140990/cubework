@@ -31,7 +31,7 @@ def main():
     page, out = sys.argv[1], sys.argv[2]
     d = os.path.join(HERE, "interior")
     head = open(os.path.join(d, "head.html")).read()
-    js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "rooms.js", "app.js"))
+    js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "figure.js", "creature.js", "rooms.js", "app.js"))
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
             + "const DATA = " + data + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
