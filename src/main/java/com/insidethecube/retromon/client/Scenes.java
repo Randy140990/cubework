@@ -206,6 +206,27 @@ public final class Scenes {
 		b.draw(g);
 	}
 
+	/**
+	 * One creature on a round stand, turning gently (the summary, the Pokédex): the viewer's camera at side so it
+	 * stands off to one side, framed by its size.
+	 */
+	public static void model(GuiGraphics g, float secs, String species, double side) {
+		BedrockModel.Def def = BedrockModel.def(species);
+		double h = Math.max(0.6, def == null ? 1 : def.height), l = Math.max(0.6, h), d = Math.max(Math.max(h * 3.1, l * 2.3), 3.8);
+		Cam cam = new Cam().look(side, h * 0.62 + d * 0.16, d, side, h * 0.5, 0);
+		double sc = Math.max(0.5, Math.min(3, l * 0.55));
+		float[] c = cam.at(0, 0, 0), e = cam.at(1.4 * sc, 0, 0), lo = cam.at(0, -0.16, 0), n = cam.at(0, 0, -1.4 * sc), s = cam.at(0, 0, 1.4 * sc);
+		float rx = Math.abs(e[0] - c[0]), ry = Math.abs(s[1] - n[1]) / 2, cy = (s[1] + n[1]) / 2, drop = lo[1] - c[1];
+		V.ellipse(g, c[0], cy + drop + 6, rx * 1.1F, ry * 1.1F, 0x30000000);
+		V.ellipse(g, c[0], cy + drop, rx * 1.1F, ry * 1.1F, 0xFF9FD6C4);
+		V.rr(g, c[0] - rx * 1.1F, cy, rx * 2.2F, drop, 0, 0xFFA9DCCB);
+		V.ellipse(g, c[0], cy, rx * 1.1F, ry * 1.1F, 0xFFBFEFE0);
+		V.ellipse(g, c[0], cy, rx * 0.93F, ry * 0.93F, 0xFFE9FFF6);
+		Figures.Batch b = Figures.batch(0, 0, V.gw, V.gh);
+		place(b, cam, null, species, 0, 0, 0, Math.PI + Math.sin(secs * 0.45) * 0.7, secs);
+		b.draw(g);
+	}
+
 	/** The picture of you as you look now (your outfit's skin, made if need be). */
 	public static Identifier you(String outfit, boolean girl) {
 		return Outfit.ensure(outfit, girl) ? Outfit.HERO : Retromon.id("textures/entity/player/" + (girl ? "girl" : "boy") + ".png");

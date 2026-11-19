@@ -20,7 +20,8 @@
     "NightVisionMixin",
     "OutlineMixin",
     "OutlineColourMixin",
-    "TitleMixin"
+    "TitleMixin",
+    "LoadingScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

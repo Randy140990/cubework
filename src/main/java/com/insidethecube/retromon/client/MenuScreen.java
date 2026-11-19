@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.nbt.CompoundTag;
 
@@ -248,13 +249,16 @@ public class MenuScreen extends DeviceScreen {
 				else if (Ui.isB(e)) view = View.PARTY;
 			}
 			case SUMMARY -> {
-				if (Ui.isLeft(e) || Ui.isUp(e)) partyAt = Math.floorMod(partyAt - 1, d.party.size());
-				else if (Ui.isRight(e) || Ui.isDown(e)) partyAt = Math.floorMod(partyAt + 1, d.party.size());
-				else if (Ui.isA(e) || Ui.isB(e)) view = View.PARTY;
+				// As the viewer: TAB or left and right for the page, up and down for the next of your team.
+				if (e.key() == GLFW.GLFW_KEY_TAB || Ui.isRight(e)) summaryPage = (summaryPage + 1) % 3;
+				else if (Ui.isLeft(e)) summaryPage = (summaryPage + 2) % 3;
+				else if (Ui.isUp(e)) partyAt = Math.floorMod(partyAt - 1, d.party.size());
+				else if (Ui.isDown(e)) partyAt = Math.floorMod(partyAt + 1, d.party.size());
+				else if (Ui.isB(e)) view = View.PARTY;
 			}
 			case BAG -> {
 				int n = pocketItems().size() + 1;
-				if (Ui.isLeft(e) || Ui.isRight(e)) {
+				if (Ui.isLeft(e) || Ui.isRight(e) || e.key() == GLFW.GLFW_KEY_TAB) {
 					pocket = Math.floorMod(pocket + (Ui.isLeft(e) ? -1 : 1), POCKETS.length);
 					bagAt = 0;
 					bagTop = 0;
@@ -378,12 +382,17 @@ public class MenuScreen extends DeviceScreen {
 		switch (view) {
 			case PARTY, PARTY_ACTION, USE_ON -> {
 				drawParty(g, d);
-				String hint = view == View.USE_ON ? "Use on which POKéMON?" : swapFrom >= 0 ? "Move to where?" : "Choose a POKéMON.";
-				TextBox.still(hint).renderV(g, font, 140, 26, 1000, ticks, partial, false);
+				// Moving one, or using an item: a word at the top right (the cards fill the rest).
+				if (view == View.USE_ON || swapFrom >= 0) {
+					String hint = view == View.USE_ON ? "Use on which POKéMON?" : "Move to where?";
+					float hw = V.width(hint, 19, true) + 44;
+					V.panel(g, V.W - 30 - hw, 30, hw, 46, 23, true);
+					V.text(g, hint, V.W - 30 - hw + 22, 41, 19, V.TEXT, true);
+				}
 				if (view == View.PARTY_ACTION) {
 					Choice c = new Choice(List.of("SUMMARY", "SWITCH", "FOLLOW ME", "CANCEL"));
 					c.at = actionAt;
-					vchoice(g, c, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(c.options.size()), 300, this::partyAction);
+					vchoice(g, c, 950, V.H - 30 - V.choiceHeight(4), 290, this::partyAction);
 					actionAt = c.at;
 				}
 			}
@@ -485,64 +494,147 @@ public class MenuScreen extends DeviceScreen {
 		if (mon.species.type2() != null) Ui.chip(g, font, mon.species.type2().label.toUpperCase(), cx, cy, Ui.typeColor(mon.species.type2()), s);
 	}
 
+	/**
+	 * Your team as the UI Viewer has it: six cards, three across, each with a picture of the POKéMON, its name,
+	 * level, types, status, HP; the one you're on cream and glowing; FOLLOWING YOU on your partner.
+	 */
 	private void drawParty(GuiGraphics g, PlayerData d) {
-		int m = 6 * s, cols = width > 300 * s ? 2 : 1, gap = 4 * s;
-		int cw = Math.min(170 * s, (width - 2 * m - gap * (cols - 1)) / cols), ch = 42 * s;
-		int total = cols * cw + gap * (cols - 1), x0 = (width - total) / 2, y0 = m;
+		Scenes.backdrop(g, "party");
+		V.header(g, "icon_ball", "POKéMON", null);
+		float cw = (1220 - 2 * 22) / 3F, ch = 262;
 		for (int i = 0; i < d.party.size(); i++) {
-			int x = x0 + (i % cols) * (cw + gap), y = y0 + (i / cols) * (ch + gap);
+			Mon mon = d.party.get(i);
+			float x = 30 + (i % 3) * (cw + 22), y = 100 + (i / 3) * (ch + 22);
 			int idx = i;
-			if (over(x, y, cw, ch) && (view == View.PARTY || view == View.USE_ON)) partyAt = i;
-			card(g, font, d.party.get(i), x, y, cw, ch, i == partyAt, i == swapFrom, s);
-			if (view == View.PARTY) hit(x, y, cw, ch, () -> pickParty(idx));
-			if (view == View.USE_ON) hit(x, y, cw, ch, () -> use(pocketItems().get(Math.min(bagAt, pocketItems().size() - 1)), idx));
+			if (vover(x, y, cw, ch) && (view == View.PARTY || view == View.USE_ON)) partyAt = i;
+			boolean on = i == partyAt, fnt = mon.fainted();
+			if (on) {
+				V.rr(g, x - 4, y - 4, cw + 8, ch + 8, 30, 0x66FFF4D8);
+				V.shadow(g, x, y, cw, ch, 26, 1.2F);
+				V.rr(g, x, y, cw, ch, 26, 0xFFFFFFFF);
+				V.rrv(g, x + 2.5F, y + 2.5F, cw - 5, ch - 5, 23.5F, 0xFFFFF8E6, 0xFFFFF0CC);
+			} else V.panel(g, x, y, cw, ch, 26, false);
+			if (i == swapFrom) V.ring(g, x, y, cw, ch, 26, 4, V.GOLD);
+			int ink = on ? V.INK : V.TEXT;
+			V.glow(g, x + 10 + 78, y + 8 + 97, 70, 70, on ? 0x3AFFD45A : 0x228FF5C0);
+			V.img(g, Look.portrait(mon.species.id()), x + 10, y + 8, 156, 156, 128, 128, fnt ? 0x99FFFFFF : 0xFFFFFFFF);
+			float tx = x + 18 + 160, ty = y + 18;
+			V.text(g, mon.name(), tx, ty, 25, ink, true);
+			String gm = mon.genderMark();
+			if (gm != null && !gm.isEmpty()) V.text(g, gm, tx + V.width(mon.name(), 25, true) + 6, ty + 4, 20, gm.contains("\u2640") ? 0xFFFF8FB1 : 0xFF7FB8FF, true);
+			V.text(g, "Lv. " + mon.level, tx, ty + 38, 20, ink, true);
+			float cx = tx;
+			cx += V.type(g, mon.species.type1().label, Ui.typeColor(mon.species.type1()), cx, ty + 70, 0, 13.5F) + 6;
+			if (mon.species.type2() != null) V.type(g, mon.species.type2().label, Ui.typeColor(mon.species.type2()), cx, ty + 70, 0, 13.5F);
+			float sx = tx;
+			String st = fnt ? "FNT" : mon.status.tag;
+			if (!st.isEmpty()) {
+				float sw = V.width(st, 13, true) + 16;
+				V.rr(g, sx, ty + 104, sw, 22, 7, Ui.statusColor(st));
+				V.text(g, st, sx + 8, ty + 107, 13, 0xFFFFFFFF, true);
+				sx += sw + 6;
+			}
+			if (i == d.follow) {
+				float fw = V.width("FOLLOWING YOU", 12, true) + 20;
+				V.pill(g, sx, ty + 105, fw, 21, on ? V.INK : V.EDGE_LIGHT);
+				V.text(g, "FOLLOWING YOU", sx + 10, ty + 109, 12, on ? V.CREAM : 0xFF123C38, true);
+			}
+			float frac = mon.hp / (float) Math.max(1, mon.maxHp()), hy = y + ch - 18 - 24;
+			V.text(g, "HP", x + 20, hy + 4, 14, on ? 0xFFB8860B : V.GOLD, true);
+			String hpT = mon.hp + "/" + mon.maxHp();
+			float hw = V.width(hpT, 19, true);
+			V.bar(g, x + 20 + 34, hy + 5, cw - 40 - 34 - hw - 12, 14, frac, V.hpColour(frac));
+			V.right(g, hpT, x + cw - 20, hy, 19, ink, true);
+			if (view == View.PARTY) vhit(x, y, cw, ch, () -> pickParty(idx));
+			if (view == View.USE_ON) vhit(x, y, cw, ch, () -> use(pocketItems().get(Math.min(bagAt, pocketItems().size() - 1)), idx));
 		}
+		V.hints(g, "A", "Choose", "B", "Back");
 	}
 
+	/** The summary's page: INFO, STATS or MOVES. */
+	private int summaryPage;
+
+	@Override
+	protected boolean wantsTab() {
+		return view == View.SUMMARY || view == View.BAG;
+	}
+
+	/**
+	 * One of your team in full, as the UI Viewer's summary: it in 3D on a stand at the right; on the left its name,
+	 * level and three pages: INFO (number, types, trainer, EXP), STATS (as bars) and MOVES (with types and PP).
+	 */
 	private void drawSummary(GuiGraphics g, PlayerData d) {
 		if (d.party.isEmpty()) return;
 		Mon mon = d.party.get(Math.min(partyAt, d.party.size() - 1));
-		int m = 6 * s, w = Math.min(width - 2 * m, 300 * s), h = Math.min(height - 2 * m, 190 * s), x = (width - w) / 2, y = (height - h) / 2;
-		Ui.panel(g, x, y, w, h, s);
-		hit(x, y, w, h, () -> view = View.PARTY);
 		Species sp = mon.species;
-		int l = x + 10 * s, ty = y + 10 * s;
-		Ui.text(g, font, mon.name() + " " + mon.genderMark(), l, ty, Ui.TEXT, s);
-		Ui.right(g, font, "Lv" + mon.level + "   No." + String.format("%03d", sp.dex()), x + w - 10 * s, ty, Ui.GOLD, s);
-		ty += 13 * s;
-		int cx = l;
-		cx += Ui.chip(g, font, sp.type1().label.toUpperCase(), cx, ty, Ui.typeColor(sp.type1()), s) + 3 * s;
-		if (sp.type2() != null) cx += Ui.chip(g, font, sp.type2().label.toUpperCase(), cx, ty, Ui.typeColor(sp.type2()), s) + 3 * s;
+		Scenes.backdrop(g, "summary");
+		Scenes.model(g, (ticks) / 20F, sp.id(), -1.05);
+		float x = 28, y = 28, w = 640, h = 660, px = x + 28;
+		V.panel(g, x, y, w, h);
+		float ty = y + 24;
+		V.text(g, mon.name(), px, ty, 36, V.TEXT, true);
+		float nx = px + V.width(mon.name(), 36, true) + 12;
+		String gm = mon.genderMark();
+		if (gm != null && !gm.isEmpty()) {
+			V.text(g, gm, nx, ty + 10, 22, gm.contains("\u2640") ? 0xFFFF8FB1 : 0xFF7FB8FF, true);
+			nx += V.width(gm, 22, true) + 10;
+		}
 		String st = mon.fainted() ? "FNT" : mon.status.tag;
-		if (!st.isEmpty()) Ui.chip(g, font, st, cx, ty, Ui.statusColor(st), s);
-		if (mon.nickname != null) Ui.right(g, font, sp.name(), x + w - 10 * s, ty + s, Ui.MUTED, s);
-		ty += 15 * s;
-		int half = (w - 30 * s) / 2;
-		Ui.hp(g, font, l, ty, half, mon.hp, mon.maxHp(), s);
-		Ui.text(g, font, mon.hp + "/" + mon.maxHp(), l + half + 6 * s, ty, Ui.MUTED, s);
-		ty += 11 * s;
-		int now = sp.growth().expAt(mon.level), next = mon.level >= 100 ? now : sp.growth().expAt(mon.level + 1);
-		Ui.plain(g, font, "EXP", l, ty, Ui.CYAN, s);
-		Ui.bar(g, l + Ui.width(font, "EXP", s) + 3 * s, ty + s, half - Ui.width(font, "EXP", s) - 3 * s, 4 * s,
-				next <= now ? 1 : (mon.exp - now) / (float) (next - now), Ui.CYAN, s);
-		Ui.text(g, font, (next - mon.exp) + " to Lv" + Math.min(100, mon.level + 1), l + half + 6 * s, ty, Ui.MUTED, s);
-		ty += 14 * s;
-		// Stats on the left, moves on the right.
-		String[] names = {"ATTACK", "DEFENSE", "SPCL.ATK", "SPCL.DEF", "SPEED"};
-		int[] stats = {mon.attack(), mon.defense(), mon.spAttack(), mon.spDefense(), mon.speed()};
-		for (int i = 0; i < 5; i++) {
-			Ui.text(g, font, names[i], l, ty + i * 11 * s, Ui.MUTED, s);
-			Ui.right(g, font, String.valueOf(stats[i]), l + half - 4 * s, ty + i * 11 * s, Ui.TEXT, s);
+		if (!st.isEmpty()) {
+			float sw = V.width(st, 13, true) + 16;
+			V.rr(g, nx, ty + 12, sw, 22, 7, Ui.statusColor(st));
+			V.text(g, st, nx + 8, ty + 15, 13, 0xFFFFFFFF, true);
 		}
-		int mxp = l + half + 6 * s, mw = w - (mxp - x) - 10 * s;
-		for (int i = 0; i < mon.moves.size(); i++) {
-			Move mv = Move.get(mon.moves.get(i));
-			int my = ty + i * 14 * s;
-			Ui.round(g, mxp, my - 2 * s, mw, 12 * s, Ui.alpha(Ui.typeColor(mv.type()), 0.55F), s);
-			Ui.text(g, font, mv.name(), mxp + 4 * s, my, Ui.TEXT, s);
-			Ui.right(g, font, mon.pp.get(i) + "/" + mv.pp(), mxp + mw - 4 * s, my, Ui.TEXT, s);
+		V.right(g, "Lv. " + mon.level, x + w - 28, ty + 8, 24, V.TEXT, true);
+		float cx = px, cy = ty + 50 + 14;
+		String[] tabs = {"INFO", "STATS", "MOVES"};
+		for (int t = 0; t < 3; t++) {
+			int tt = t;
+			float tw = V.chip(g, tabs[t], cx, cy, 15, t == summaryPage, false);
+			vhit(cx, cy, tw, 26, () -> summaryPage = tt);
+			cx += tw + 8;
 		}
-		Ui.text(g, font, "Left/right: other POKéMON", l, y + h - 14 * s, Ui.DIM, s);
+		float by = cy + 26 + 18;
+		if (summaryPage == 0) {
+			String[][] rows = {{"No.", String.format("%03d", sp.dex())}, {"Types", ""}, {"Trainer", name()}, {"Item", "None"}};
+			for (int r = 0; r < rows.length; r++) {
+				float ry = by + r * 40;
+				V.label(g, rows[r][0], px, ry + 7);
+				if (r == 1) {
+					float tx = px + 140;
+					tx += V.type(g, sp.type1().label, Ui.typeColor(sp.type1()), tx, ry + 2, 92, 13.5F) + 8;
+					if (sp.type2() != null) V.type(g, sp.type2().label, Ui.typeColor(sp.type2()), tx, ry + 2, 92, 13.5F);
+				} else V.text(g, rows[r][1], px + 140, ry, 21, V.TEXT, true);
+			}
+			int now = sp.growth().expAt(mon.level), next = mon.level >= 100 ? now : sp.growth().expAt(mon.level + 1);
+			float ey = by + rows.length * 40 + 16;
+			V.label(g, "EXP to Lv. " + Math.min(100, mon.level + 1) + "  (" + Math.max(0, next - mon.exp) + " more)", px, ey);
+			V.pill(g, px, ey + 22, w - 56, 7, 0xFF0B2A2C);
+			float ef = next <= now ? 1 : (mon.exp - now) / (float) (next - now);
+			if (ef > 0) V.pill(g, px, ey + 22, Math.max(7, (w - 56) * ef), 7, 0xFF6FC3FF);
+		} else if (summaryPage == 1) {
+			String[] names = {"HP", "ATTACK", "DEFENSE", "SPCL.ATK", "SPCL.DEF", "SPEED"};
+			int[] stats = {mon.maxHp(), mon.attack(), mon.defense(), mon.spAttack(), mon.spDefense(), mon.speed()};
+			for (int i = 0; i < 6; i++) {
+				float ry = by + i * 40;
+				V.label(g, names[i], px, ry + 6);
+				V.right(g, i == 0 ? mon.hp + "/" + stats[0] : String.valueOf(stats[i]), px + 150 + 70, ry, 19, V.TEXT, true);
+				float f = Math.min(1, stats[i] / (mon.level * 2.6F + 30));
+				V.pill(g, px + 150 + 82, ry + 3, w - 56 - 232, 16, 0xFF0B2A2C);
+				if (f > 0) V.rrv(g, px + 150 + 84, ry + 5, Math.max(12, (w - 56 - 236) * f), 12, 6, 0xFF4FB896, 0xFF8FF5C0);
+			}
+		} else {
+			for (int i = 0; i < mon.moves.size(); i++) {
+				Move mv = Move.get(mon.moves.get(i));
+				float ry = by + i * 62;
+				V.panel(g, px, ry, w - 56, 52, 18, true);
+				float tw = V.type(g, mv.type().label, Ui.typeColor(mv.type()), px + 16, ry + 13, 92, 13.5F);
+				V.text(g, mv.name(), px + 16 + tw + 14, ry + 13, 21, V.TEXT, true);
+				V.right(g, "PP " + mon.pp.get(i) + "/" + mv.pp(), px + w - 56 - 16, ry + 15, 18, V.TEXT, true);
+			}
+		}
+		vhit(x, y + h - 60, w, 60, () -> view = View.PARTY);
+		V.hints(g, "TAB", "Page", "B", "Back");
 	}
 
 	/** Your bag's colour (from your clothes), or yellow. */
@@ -557,35 +649,78 @@ public class MenuScreen extends DeviceScreen {
 	 * one on the right, with what the item under the cursor does.
 	 */
 	private void drawBag(GuiGraphics g, PlayerData d) {
-		int m = 8 * s;
-		int bw = Math.min(width * 2 / 5, 130 * s), bh = Math.min(height - 2 * m - 12 * s, bw * 6 / 5);
-		int bx = m + 4 * s, by = m + (height - 2 * m - bh) / 2;
-		int col = bagColour(), dark = Ui.darker(col, 0.72F), light = Ui.lighter(col, 0.22F);
-		int r = Math.max(4, bw / 7);
-		// The straps peeking up behind, the body, the lid with its buckles, the side pocket and the front pocket.
-		Device.rounded(g, bx + bw / 4, by - 6 * s, bw / 2, 16 * s, 6 * s, Ui.darker(col, 0.5F));
-		Device.rounded(g, bx + bw / 4 + 3 * s, by - 3 * s, bw / 2 - 6 * s, 10 * s, 4 * s, 0xFF0F1626);
-		Device.rounded(g, bx + 3 * s, by + 5 * s, bw, bh, r, 0x50000000);
-		int[][] pockets = new int[4][];
-		// ITEMS: the main body.
-		pockets[0] = new int[] {bx, by, bw, bh};
-		// KEY ITEMS: the lid.
-		int lidH = bh * 30 / 100;
-		pockets[2] = new int[] {bx + 2 * s, by, bw - 4 * s, lidH};
-		// BALLS: the front pocket.
-		int fpW = bw * 62 / 100, fpH = bh * 30 / 100;
-		pockets[1] = new int[] {bx + (bw - fpW) / 2, by + bh - fpH - 8 * s, fpW, fpH};
-		// TMs and HMs: the side pocket (right).
-		int spW = Math.max(10 * s, bw / 6), spH = bh * 36 / 100;
-		pockets[3] = new int[] {bx + bw - spW / 2, by + bh / 2 - spH / 4, spW, spH};
-		for (int i = 0; i < 4; i++) {
-			int[] pk = pockets[i];
+		Scenes.backdrop(g, "bag");
+		V.header(g, "icon_bag", "BAG", null);
+		bagPicture(g, 48, 96);
+		// The pockets' names under the bag.
+		float tw = 0;
+		for (String p : POCKETS) tw += V.chipWidth(p, 13) + 6;
+		float cx = 48 + 200 - (tw - 6) / 2;
+		for (int i = 0; i < POCKETS.length; i++) {
 			int idx = i;
-			if (over(pk[0], pk[1], pk[2], pk[3]) && view == View.BAG) {
-				// (the smaller pockets win over the body they sit on)
-				if (i != 0 || !overAny(pockets)) pocket = i;
+			float w = V.chip(g, POCKETS[i], cx, 96 + 500, 13, i == pocket, false);
+			if (view == View.BAG) vhit(cx, 596, w, 24, () -> {
+				pocket = idx;
+				bagAt = 0;
+				bagTop = 0;
+			});
+			cx += w + 6;
+		}
+		// What's in the picked pocket, with how many.
+		List<String> l = pocketItems();
+		float lx = 480, ly = 110, lw = 740, lh = 440;
+		V.panel(g, lx, ly, lw, lh);
+		int rows = 7, n = l.size() + 1;
+		if (bagAt < bagTop) bagTop = bagAt;
+		if (bagAt >= bagTop + rows) bagTop = bagAt - rows + 1;
+		bagTop = Math.max(0, Math.min(bagTop, Math.max(0, n - rows)));
+		for (int k = 0; k < rows && bagTop + k < n; k++) {
+			int i = bagTop + k, idx = i;
+			float ty = ly + 14 + k * 54;
+			if (vover(lx + 14, ty, lw - 28, 46) && view == View.BAG) bagAt = i;
+			boolean on = i == bagAt;
+			if (i == l.size()) V.item(g, "CLOSE BAG", null, lx + 14, ty, lw - 28, 46, on, !on, 21);
+			else {
+				Item it = Item.find(l.get(i));
+				V.item(g, "      " + it.name(), "x" + d.count(it.id()), lx + 14, ty, lw - 28, 46, on, false, 21);
+				V.icon(g, itemIcon(it), lx + 14 + 40, ty + 6, 34);
 			}
-			if (view == View.BAG) hit(pk[0], pk[1], pk[2], pk[3], () -> {
+			if (view == View.BAG) vhit(lx + 14, ty, lw - 28, 46, () -> pickBag(idx));
+		}
+		if (bagTop > 0) V.tri(g, lx + lw / 2, ly + 6, 14, 3, V.MUTED);
+		if (bagTop + rows < n) V.tri(g, lx + lw / 2, ly + lh - 6, 14, 1, V.MUTED);
+		if (l.isEmpty()) V.text(g, "Empty", lx + 34, ly + 14 + 54 + 12, 21, V.MUTED, true);
+		// What it does.
+		V.panel(g, 480, 570, 740, 110, 24, true);
+		String desc = bagAt < l.size() ? BattleScreen.describe(l.get(bagAt)) : "Put the bag away.";
+		List<String> dl = V.wrap(desc, 740 - 52, 21, true);
+		for (int i = 0; i < Math.min(2, dl.size()); i++) V.text(g, dl.get(i), 506, 570 + 20 + i * 30, 21, V.TEXT, true);
+		V.hints(g, "A", "Choose", "B", "Back", "TAB", "Pocket");
+	}
+
+	/** An item's picture in the bag (the viewer's): balls, medicine, discs for TMs, the map, else a key. */
+	private static String itemIcon(Item it) {
+		String n = it.name().toUpperCase();
+		if (n.contains("BALL")) return "icon_ball";
+		if (n.contains("POTION") || n.contains("HEAL") || n.contains("ANTIDOTE") || n.contains("AWAKENING") || n.contains("REVIVE")) return "icon_potion";
+		if (n.startsWith("TM") || n.startsWith("HM")) return "icon_disc";
+		if (n.contains("MAP")) return "icon_map";
+		if (n.contains("ROPE") || n.contains("REPEL")) return "icon_bag";
+		return "icon_key";
+	}
+
+	/**
+	 * Your backpack (the viewer's picture), in its colour: its body (ITEMS), front pocket (BALLS), lid (KEY ITEMS)
+	 * and side pocket (TM & HM); the picked one lifted with a cream outline. Clicking a pocket picks it.
+	 */
+	private void bagPicture(GuiGraphics g, float ox, float oy) {
+		int col = bagColour(), dk = Ui.darker(col, 0.78F), dd = Ui.darker(col, 0.62F), lt = Ui.lighter(col, 0.18F);
+		float k = 1;
+		// The pockets' boxes (in the picture's 400 by 500), by pocket: ITEMS, BALLS, KEY ITEMS, TM & HM.
+		float[][] box = {{60, 70, 280, 390}, {100, 262, 200, 160}, {60, 64, 280, 142}, {318, 230, 62, 170}};
+		for (int i = 3; i >= 0; i--) {
+			int idx = i;
+			if (view == View.BAG) vhit(ox + box[i][0], oy + box[i][1], box[i][2], box[i][3], () -> {
 				if (pocket != idx) {
 					pocket = idx;
 					bagAt = 0;
@@ -593,80 +728,44 @@ public class MenuScreen extends DeviceScreen {
 				}
 			});
 		}
-		// The body.
-		Device.rounded(g, bx, by, bw, bh, r, dark);
-		Device.rounded(g, bx, by, bw, bh - 3 * s, r, col);
-		g.fill(bx + r, by + lidH + 2 * s, bx + bw - r, by + lidH + 3 * s, Ui.alpha(0xFF000000, 0.2F));
-		if (pocket == 0) outline(g, bx, by, bw, bh, r);
-		// The lid, with two buckles and a Poké Ball badge.
-		int[] lid = pockets[2];
-		Device.rounded(g, lid[0], lid[1], lid[2], lid[3], r, light);
-		g.fill(lid[0] + r, lid[1] + 2 * s, lid[0] + lid[2] - r, lid[1] + 3 * s, 0x33FFFFFF);
-		for (int k = 0; k < 2; k++) {
-			int sx = lid[0] + lid[2] * (k == 0 ? 1 : 3) / 4 - 3 * s;
-			g.fill(sx, lid[1] + lid[3] - 8 * s, sx + 6 * s, lid[1] + lid[3] + 6 * s, Ui.darker(col, 0.55F));
-			Ui.round(g, sx - s, lid[1] + lid[3] - 2 * s, 8 * s, 6 * s, 0xFFE2C46A, s);
-		}
-		int bc = lid[0] + lid[2] / 2, bcy = lid[1] + lid[3] / 2;
-		Device.disc(g, bc, bcy, 6 * s, 6 * s, 0xFF2A2A2E);
-		Device.disc(g, bc, bcy, 5 * s, 5 * s, 0xFFF4F4F0);
-		for (int yy = -5 * s; yy < 0; yy++) {
-			double v = (yy + 0.5) / (5.0 * s);
-			int half = (int) Math.round(5 * s * Math.sqrt(Math.max(0, 1 - v * v)));
-			g.fill(bc - half, bcy + yy, bc + half, bcy + yy + 1, 0xFFE2423C);
-		}
-		g.fill(bc - 5 * s, bcy - Math.max(1, s / 2), bc + 5 * s, bcy + Math.max(1, s / 2), 0xFF2A2A2E);
-		Device.disc(g, bc, bcy, 2 * s, 2 * s, 0xFFFFFFFF);
-		if (pocket == 2) outline(g, lid[0], lid[1], lid[2], lid[3], r);
-		// The side pocket.
-		int[] sp = pockets[3];
-		Device.rounded(g, sp[0], sp[1], sp[2], sp[3], 3 * s, dark);
-		Device.rounded(g, sp[0] + s, sp[1] + s, sp[2] - 2 * s, sp[3] / 3, 2 * s, Ui.darker(col, 0.62F));
-		if (pocket == 3) outline(g, sp[0], sp[1], sp[2], sp[3], 3 * s);
-		// The front pocket, with its zip.
-		int[] fp = pockets[1];
-		Device.rounded(g, fp[0], fp[1] + 2 * s, fp[2], fp[3], 4 * s, Ui.darker(col, 0.8F));
-		Device.rounded(g, fp[0], fp[1], fp[2], fp[3], 4 * s, light);
-		g.fill(fp[0] + 4 * s, fp[1] + 4 * s, fp[0] + fp[2] - 4 * s, fp[1] + 5 * s, 0xFF4A4A50);
-		Ui.round(g, fp[0] + fp[2] - 10 * s, fp[1] + 3 * s, 4 * s, 5 * s, 0xFFD0D0D4, s);
-		if (pocket == 1) outline(g, fp[0], fp[1], fp[2], fp[3], 4 * s);
-		// The picked pocket's name, under the bag.
-		Ui.centred(g, font, POCKETS[pocket], bx + bw / 2, by + bh + 4 * s, Ui.GOLD, s, true);
-		// What's in it, on the right.
-		List<String> l = pocketItems();
-		int lx = bx + bw + 16 * s, lw = width - lx - m, row = 14 * s, descH = 30 * s;
-		int ly = m, rows = Math.max(2, (height - ly - m - descH - 12 * s) / row);
-		int n = l.size() + 1;
-		if (bagAt < bagTop) bagTop = bagAt;
-		if (bagAt >= bagTop + rows) bagTop = bagAt - rows + 1;
-		bagTop = Math.max(0, Math.min(bagTop, Math.max(0, n - rows)));
-		Ui.round(g, lx, ly, lw, rows * row + 8 * s, 0xE6123C38, 3 * s);
-		for (int k = 0; k < rows && bagTop + k < n; k++) {
-			int i = bagTop + k, ty = ly + 4 * s + k * row;
-			int idx = i;
-			if (over(lx, ty, lw, row) && view == View.BAG) bagAt = i;
-			Ui.pill(g, lx + 3 * s, ty, lw - 6 * s, row - 2 * s, i == bagAt, s);
-			int ink = i == bagAt ? Ui.CREAM_INK : Ui.TEXT;
-			if (i == l.size()) Ui.draw(g, font, Ui.bold("CLOSE BAG"), lx + 10 * s, ty + 3 * s, i == bagAt ? Ui.CREAM_INK : Ui.MUTED, s, false);
-			else {
-				Item it = Item.find(l.get(i));
-				BattleScreen.itemIcon(g, it, lx + 6 * s, ty + s, 10 * s, s);
-				Ui.draw(g, font, Ui.bold(it.name()), lx + 20 * s, ty + 3 * s, ink, s, false);
-				Ui.draw(g, font, Ui.ui("x" + d.count(it.id())), lx + lw - 10 * s - Ui.width(font, "x" + d.count(it.id()), s), ty + 3 * s,
-						i == bagAt ? Ui.CREAM_INK : Ui.MUTED, s, false);
-			}
-			if (view == View.BAG) hit(lx, ty, lw, row, () -> pickBag(idx));
-		}
-		if (bagTop > 0) Ui.triangle(g, lx + lw / 2F, ly - 3 * s, 6 * s, 0, Ui.MUTED);
-		if (bagTop + rows < n) Ui.triangle(g, lx + lw / 2F, ly + rows * row + 11 * s, 6 * s, 2, Ui.MUTED);
-		if (l.isEmpty()) Ui.text(g, font, "Nothing in this pocket yet.", lx + 8 * s, ly + row + 8 * s, Ui.DIM, s);
-		// What the item does.
-		int dy = height - m - descH;
-		Ui.round(g, lx, dy, lw, descH, 0xF0FBF5E6, 3 * s);
-		String desc = bagAt < l.size() ? BattleScreen.describe(l.get(bagAt)) : "Put the bag away.";
-		List<String> dl = Ui.wrap(font, desc, (lw - 14 * s) / s);
-		for (int i = 0; i < Math.min(2, dl.size()); i++) Ui.plain(g, font, dl.get(i), lx + 7 * s, dy + 6 * s + i * 11 * s, Ui.CREAM_INK, s);
-		Ui.text(g, font, "Left/right: pocket   A: use   B: back", m, height - 9 * s, Ui.DIM, s);
+		java.util.function.IntFunction<Float> lift = p -> p == pocket ? -6F : 0F;
+		// The strap loop and the shoulder straps.
+		V.ring(g, ox + 150 - 7, oy + 18 - 7, 114, 70, 25, 14, dd);
+		V.rr(g, ox + 64, oy + 96, 44, 300, 10, dk);
+		V.rr(g, ox + 292, oy + 96, 44, 300, 10, dk);
+		// The body (ITEMS).
+		float by = oy + lift.apply(0);
+		pocketShape(g, ox + 60, by + 70, 280, 390, 30, col, pocket == 0, dd);
+		for (int yy = 8; yy < 382; yy += 16) for (int xx = 8 + (yy / 16) % 2 * 8; xx < 272; xx += 16)
+			V.rr(g, ox + 60 + xx, by + 70 + yy, 5, 5, 0, Ui.alpha(lt, 0.22F));
+		V.ring(g, ox + 76, by + 86, 248, 358, 22, 2.5F, Ui.alpha(dd, 0.6F));
+		V.rr(g, ox + 60, by + 430, 280, 30, 14, Ui.alpha(dd, 0.55F));
+		// The side pocket (TM & HM), a disc peeking out.
+		float sy = oy + lift.apply(3);
+		pocketShape(g, ox + 318, sy + 230, 62, 170, 14, dk, pocket == 3, dd);
+		V.rr(g, ox + 326, sy + 210, 46, 34, 8, 0xFF5A8EA1);
+		V.rr(g, ox + 349 - 12, sy + 227 - 12, 24, 24, 12, 0xFF9FD3E2);
+		V.rr(g, ox + 349 - 4, sy + 227 - 4, 8, 8, 4, 0xFF123C38);
+		V.rr(g, ox + 324, sy + 300, 50, 6, 3, dd);
+		// The front pocket (BALLS), its zip and a ball on it.
+		float fy = oy + lift.apply(1);
+		pocketShape(g, ox + 100, fy + 262, 200, 160, 26, lt, pocket == 1, dd);
+		V.rr(g, ox + 118, fy + 297.5F, 164, 5, 2.5F, dd);
+		V.rr(g, ox + 190, fy + 292, 20, 16, 4, 0xFFF4F6F5);
+		V.icon(g, "icon_ball", ox + 200 - 32, fy + 362 - 32, 64);
+		// The lid (KEY ITEMS) with its buckle.
+		float ly = oy + lift.apply(2);
+		pocketShape(g, ox + 60, ly + 64, 280, 142, 44, dk, pocket == 2, dd);
+		V.rr(g, ox + 176, ly + 176, 48, 46, 9, 0xFFB8860B);
+		V.rr(g, ox + 179, ly + 179, 42, 40, 7, V.GOLD);
+		V.rr(g, ox + 190, ly + 190, 20, 18, 4, 0xFFB8860B);
+	}
+
+	/** One part of the bag: filled, outlined (cream and glowing when it's the pocket picked). */
+	private void pocketShape(GuiGraphics g, float x, float y, float w, float h, float r, int fill, boolean on, int edge) {
+		if (on) V.rr(g, x - 8, y - 8, w + 16, h + 16, r + 8, 0x66FFF4D8);
+		V.rr(g, x, y, w, h, r, fill);
+		V.ring(g, x, y, w, h, r, on ? 6 : 3, on ? V.CREAM : edge);
 	}
 
 	/** Whether the mouse is over one of the bag's small pockets (they sit on its body). */
@@ -717,45 +816,67 @@ public class MenuScreen extends DeviceScreen {
 		V.hints(g, "B", "Back");
 	}
 
-	private void drawOptions(GuiGraphics g, PlayerData d) {
-		int m = 8 * s, x = m, y = m, w = width - 2 * m;
-		Ui.draw(g, font, Ui.bold("OPTION"), x, y, Ui.TEXT, s, true);
-		int rh = Math.max(18 * s, Math.min(26 * s, (height - y - 30 * s) / 7)), y0 = y + 14 * s;
-		optionRow(g, d, x, y0, w, 0, "TEXT SPEED", new String[] {"SLOW", "MID", "FAST"}, d.textSpeed, i -> setSpeed(i));
-		optionRow(g, d, x, y0 + rh, w, 1, "MUSIC", new String[] {"OFF", "LOW", "MID", "HIGH", "MAX"}, Music.level(), Music::setLevel);
-		optionRow(g, d, x, y0 + 2 * rh, w, 2, "POKéDEX VOICE", new String[] {"OFF", "ON"}, Settings.voice() ? 1 : 0, i -> Settings.set("voice", i));
-		optionRow(g, d, x, y0 + 3 * rh, w, 3, "NIGHTS", new String[] {"DARK", "SOFT", "BRIGHT"}, Settings.nights(), i -> {
-			Settings.set("nights", i);
-			Night.send();
-		});
-		optionRow(g, d, x, y0 + 4 * rh, w, 4, "WILD POKéMON", new String[] {"HIDDEN", "SEEN"}, Settings.seen() ? 1 : 0, i -> {
-			Settings.set("seen", i);
-			Settings.sendPrefs();
-		});
-		optionRow(g, d, x, y0 + 5 * rh, w, 5, "WALK WITH YOU", new String[] {"OFF", "ON"}, Settings.follower() ? 1 : 0, i -> {
-			Settings.set("follow", i);
-			Settings.sendPrefs();
-		});
-		optionRow(g, d, x, y0 + 6 * rh, w, 6, "POKéMON LOOK", new String[] {"COBBLEMON", "RETROMON"}, Settings.look(), i -> Settings.set("look", i));
-		Ui.text(g, font, "Mouse wheel: zoom.  TAB: game speed.  Shift: run.", x, height - 10 * s, Ui.DIM, s);
-	}
+	/** What each option does (the viewer's top panel). */
+	private static final String[] OPTION_LINES = {"How quickly words appear in text boxes.", "How loud the music plays.",
+			"Whether the POKéDEX reads its entries out loud.", "How dark nights get outside.", "Whether wild POKéMON show in the grass, or jump out at you.",
+			"Whether your partner walks with you.", "COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures."};
 
-	private void optionRow(GuiGraphics g, PlayerData d, int l, int y, int w, int row, String label, String[] values, int now,
-			java.util.function.IntConsumer pick) {
-		boolean on = optionRow == row;
-		if (on) Ui.round(g, l - 3 * s, y - 3 * s, w + 6 * s, 20 * s, 0x33F0B43C, 3 * s);
-		Ui.draw(g, font, Ui.bold(label), l + 2 * s, y + 3 * s, on ? Ui.TEXT : Ui.MUTED, s, false);
-		int bx0 = l + Math.min(w / 3, 96 * s), n = values.length, bw = (l + w - bx0 - (n - 1) * 3 * s) / n;
-		for (int i = 0; i < n; i++) {
-			int bx = bx0 + i * (bw + 3 * s);
-			int idx = i;
-			Ui.button(g, font, bx, y, bw, 14 * s, values[i], Ui.BLUE, now == i, s);
-			hit(bx, y, bw, 14 * s, () -> {
+	/**
+	 * OPTION, as the UI Viewer's: what the row does in a panel at the top, then the rows (the one you're on cream),
+	 * each with its value between arrows; left and right (or a click) change it.
+	 */
+	private void drawOptions(GuiGraphics g, PlayerData d) {
+		Scenes.backdrop(g, "sky");
+		V.panel(g, 170, 40, 940, 96);
+		List<String> dl = V.wrap(OPTION_LINES[Math.max(0, Math.min(6, optionRow))], 880, 22, true);
+		for (int i = 0; i < Math.min(2, dl.size()); i++) V.text(g, dl.get(i), 200, 62 + i * 30, 22, V.TEXT, true);
+		V.panel(g, 170, 160, 940, 7 * 59 + 36 - 8);
+		String[] labels = {"TEXT SPEED", "MUSIC", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "WALK WITH YOU", "POKéMON LOOK"};
+		String[][] values = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"}, {"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"},
+				{"OFF", "ON"}, {"COBBLEMON", "RETROMON"}};
+		int[] now = {d.textSpeed, Music.level(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0, Settings.follower() ? 1 : 0, Settings.look()};
+		for (int r = 0; r < 7; r++) {
+			float ry = 160 + 18 + r * 59, rx = 188, rw = 904;
+			if (vover(rx, ry, rw, 51)) optionRow = r;
+			boolean on = r == optionRow;
+			V.item(g, labels[r], null, rx, ry, rw, 51, on, false, 21);
+			int c = on ? V.INK : V.TEXT;
+			String v = values[r][Math.max(0, Math.min(values[r].length - 1, now[r]))];
+			float vx = rx + rw - 22 - 130;
+			V.tri(g, vx - 14, ry + 25.5F, 12, 2, Ui.alpha(c, 0.6F));
+			V.centred(g, v, vx + 65, ry + 13, 21, c, true);
+			V.tri(g, vx + 130 + 14, ry + 25.5F, 12, 0, Ui.alpha(c, 0.6F));
+			int row = r;
+			vhit(rx, ry, rw, 51, () -> {
 				optionRow = row;
-				pick.accept(idx);
-				Sounds.press();
+				changeOption(row, 1);
 			});
 		}
+		V.hints(g, "A", "Change", "B", "Back");
+	}
+
+	/** Changes an option by a step (left -1, right or A +1). */
+	private void changeOption(int row, int step) {
+		PlayerData d = ClientState.data;
+		switch (row) {
+			case 0 -> setSpeed(Math.floorMod(d.textSpeed + step, 3));
+			case 1 -> Music.setLevel(Math.floorMod(Music.level() + step, 5));
+			case 2 -> Settings.set("voice", Settings.voice() ? 0 : 1);
+			case 3 -> {
+				Settings.set("nights", Math.floorMod(Settings.nights() + step, 3));
+				Night.send();
+			}
+			case 4 -> {
+				Settings.set("seen", Settings.seen() ? 0 : 1);
+				Settings.sendPrefs();
+			}
+			case 5 -> {
+				Settings.set("follow", Settings.follower() ? 0 : 1);
+				Settings.sendPrefs();
+			}
+			default -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
+		}
+		Sounds.press();
 	}
 
 	@SuppressWarnings("unused")

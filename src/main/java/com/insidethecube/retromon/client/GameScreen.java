@@ -127,6 +127,7 @@ public abstract class GameScreen extends Screen {
 			minecraft.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
 			return true;
 		}
+		if (e.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_TAB && wantsTab() && key(e)) return true;
 		if (Adventure.SPEED != null && Adventure.SPEED.matches(e) && minecraft != null && minecraft.level != null) {
 			Adventure.cycleSpeed();
 			return true;
@@ -137,6 +138,11 @@ public abstract class GameScreen extends Screen {
 
 	/** A key: true if the screen used it. */
 	protected abstract boolean key(KeyEvent e);
+
+	/** Whether TAB is this screen's own (pages, pockets) rather than the game's speed. */
+	protected boolean wantsTab() {
+		return false;
+	}
 
 	protected int boxHeight() {
 		return 10 * s * 2 + 16 * s;
