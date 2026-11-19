@@ -26,8 +26,8 @@
  },
  "move": "HARDEN",
  "attack_move": "POISON STING",
- "scale": 0.631,
- "height": 1.188,
+ "scale": 0.816,
+ "height": 1.225,
  "texture": "retromon:textures/mons/kakuna.png",
  "layers": [
   {
@@ -48,23 +48,23 @@
  "anchors": {
   "mouth": [
    0,
-   12.5,
-   -3.8
+   13.0,
+   -4.8
   ],
   "back": [
    0,
-   20.0,
-   0.25
+   20.6,
+   1.55
   ],
   "body": [
    0,
-   6.0,
-   0.25
+   5.75,
+   1.55
   ],
   "size": [
-   9.4,
-   19.0,
-   8.0
+   10.4,
+   19.6,
+   11.5
   ]
  },
  "stage": 2,

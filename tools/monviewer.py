@@ -23,7 +23,9 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Platypuses", ["psyduck", "golduck"]), ("Maned wolves", ["growlithe", "arcanine"]), ("Frogs", ["poliwag", "poliwhirl", "poliwrath"]),
             ("Tarsiers", ["abra", "kadabra", "alakazam"]), ("Gorillas", ["machop", "machoke", "machamp"]),
             ("Flytraps", ["bellsprout", "weepinbell", "victreebel"]), ("Sail jellies", ["tentacool", "tentacruel"]), ("Geodes", ["geodude", "graveler", "golem"]),
-            ("Fire deer", ["ponyta", "rapidash"]), ("Salamanders", ["slowpoke", "slowbro"])]
+            ("Fire deer", ["ponyta", "rapidash"]), ("Salamanders", ["slowpoke", "slowbro"]),
+            ("Bolt nuts", ["magnemite", "magneton"]), ("Kingfisher", ["farfetch_d"]), ("Cassowaries", ["doduo", "dodrio"]), ("Ice seals", ["seel", "dewgong"]),
+            ("Bog slimes", ["grimer", "muk"]), ("Shells", ["shellder", "cloyster"]), ("Shadow lanterns", ["gastly", "haunter", "gengar"])]
 KEEP = ("idle", "ground")
 
 
@@ -127,20 +129,22 @@ def effect(folder):
     info = json.load(open(os.path.join(folder, "info.json")))
     geo = json.load(open(os.path.join(folder, "model.geo.json")))["minecraft:geometry"][0]
     anims = json.load(open(os.path.join(folder, "anim.json")))["animations"]
-    return {"geo": geo, "anims": anims, "info": {"scale": 1, **{k: info.get(k) for k in ("release", "hit", "hold", "length", "aura", "body")}},
+    return {"geo": geo, "anims": anims, "info": {"scale": 1, **{k: info.get(k) for k in ("release", "hit", "hold", "length", "aura", "body", "status", "label", "loop")}},
             "texture": data_uri(info["texture"]), "layers": [{"frames": [data_uri(f) for f in l["frames"]], "fps": l.get("fps", 10)} for l in info.get("layers", [])]}
 
 
 def write_moves(path):
     """The move effects, in a file of their own beside the page (fetched when first wanted)."""
     base = os.path.join(ROOT, "moves")
-    out = {"effects": {}, "auras": {}}
+    out = {"effects": {}, "auras": {}, "statuses": {}}
     for d in sorted(os.listdir(base)):
         f = os.path.join(base, d)
         if not os.path.isdir(f):
             continue
         if d.startswith("aura_"):
             out["auras"][d[5:].upper()] = effect(f)
+        elif d.startswith("status_"):
+            out["statuses"][d[7:]] = effect(f)
         else:
             out["effects"][d] = effect(f)
     json.dump(out, open(path, "w"), separators=(",", ":"))
@@ -152,12 +156,20 @@ def main(out_path):
     # In Pokedex order (a line goes where its first Kanto member does: the gliders with Pikachu).
     FAMILIES.sort(key=lambda f: min((rows[s]["dex"] for s in f[1] if rows[s]["dex"] <= 151), default=rows[f[1][0]]["dex"]))
     data = {"families": [], "species": {}}
+    # Each creature's models (both looks) go in a file of their own beside the page, fetched when it's first picked;
+    # the page itself carries only what the lists and panels need.
+    mons_dir = os.path.join(os.path.dirname(os.path.abspath(out_path)), "mons")
+    os.makedirs(mons_dir, exist_ok=True)
+    heavy = ("geo", "anims", "texture", "layers")
     for fam, members in FAMILIES:
         data["families"].append({"name": fam, "members": members})
         for sid in members:
             ours = model(os.path.join(ROOT, "mons", sid))
             theirs = model(os.path.join(ROOT, "pokemon", sid))
-            data["species"][sid] = {"stats": rows[sid], "ours": ours, "theirs": theirs}
+            json.dump({"ours": {k: ours[k] for k in heavy}, "theirs": {k: theirs[k] for k in heavy}}, open(os.path.join(mons_dir, sid + ".json"), "w"),
+                      separators=(",", ":"))
+            light = lambda d: {k: v for k, v in d.items() if k not in heavy}
+            data["species"][sid] = {"stats": rows[sid], "ours": light(ours), "theirs": light(theirs)}
     for sid, d in data["species"].items():
         ev = d["stats"]["evolves"]
         if ev:

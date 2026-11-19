@@ -1,0 +1,72 @@
+{
+ "idle": "animation.boltnut.battle_idle",
+ "ground": "animation.boltnut.ground_idle",
+ "actions": {
+  "cry": "animation.boltnut.cry",
+  "recoil": "animation.boltnut.recoil",
+  "attack": "animation.boltnut.attack",
+  "critical": "animation.boltnut.critical",
+  "special": "animation.boltnut.special",
+  "recall": "animation.boltnut.recall",
+  "sendout": "animation.boltnut.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.boltnut.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.boltnut.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.boltnut.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDERSHOCK",
+ "attack_move": "TACKLE",
+ "scale": 0.882,
+ "height": 0.85,
+ "texture": "retromon:textures/mons/magnemite.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/magnemite_glow_0.png",
+    "retromon:textures/mons/magnemite_glow_1.png",
+    "retromon:textures/mons/magnemite_glow_2.png",
+    "retromon:textures/mons/magnemite_glow_3.png",
+    "retromon:textures/mons/magnemite_glow_4.png",
+    "retromon:textures/mons/magnemite_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BOLTNUT",
+ "anchors": {
+  "mouth": [
+   0,
+   3.8,
+   -2.75
+  ],
+  "back": [
+   0,
+   14.6,
+   0.0
+  ],
+  "body": [
+   0,
+   9.0,
+   0.0
+  ],
+  "size": [
+   14.4,
+   13.6,
+   4.3
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

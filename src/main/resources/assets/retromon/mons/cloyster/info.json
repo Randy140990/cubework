@@ -1,0 +1,72 @@
+{
+ "idle": "animation.thornyster.ground_idle",
+ "ground": "animation.thornyster.ground_idle",
+ "actions": {
+  "cry": "animation.thornyster.cry",
+  "recoil": "animation.thornyster.recoil",
+  "attack": "animation.thornyster.attack",
+  "critical": "animation.thornyster.critical",
+  "special": "animation.thornyster.special",
+  "recall": "animation.thornyster.recall",
+  "sendout": "animation.thornyster.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.thornyster.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.thornyster.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.thornyster.faint",
+   "parts": []
+  }
+ },
+ "move": "AURORA BEAM",
+ "attack_move": "SPIKE CANNON",
+ "scale": 1.778,
+ "height": 0.9,
+ "texture": "retromon:textures/mons/cloyster.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/cloyster_glow_0.png",
+    "retromon:textures/mons/cloyster_glow_1.png",
+    "retromon:textures/mons/cloyster_glow_2.png",
+    "retromon:textures/mons/cloyster_glow_3.png",
+    "retromon:textures/mons/cloyster_glow_4.png",
+    "retromon:textures/mons/cloyster_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "THORNYSTER",
+ "anchors": {
+  "mouth": [
+   0,
+   4.5,
+   -9.5
+  ],
+  "back": [
+   0,
+   15.4,
+   0.4
+  ],
+  "body": [
+   0,
+   2.95,
+   0.4
+  ],
+  "size": [
+   17.38,
+   14.4,
+   21.42
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

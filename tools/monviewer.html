@@ -58,6 +58,11 @@ h1 span { color: var(--accent) }
 .seg button { border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; font-weight: 700; border-radius: 999px; padding: 5px 11px; cursor: pointer }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink) }
 .seg button:disabled { opacity: .35; cursor: default }
+.statuspick { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 4px 3px 12px;
+  pointer-events: auto; box-shadow: var(--shadow); font-size: 13px; font-weight: 700; color: var(--muted) }
+.statuspick select { font: inherit; font-weight: 700; color: var(--ink); background: transparent; border: 0; border-radius: 999px; padding: 5px 8px; cursor: pointer }
+.statuspick select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.statuspick.on { background: var(--accent); color: var(--accent-ink) } .statuspick.on select { color: var(--accent-ink) }
 .seg .sep { width: 1px; background: var(--line); margin: 4px 3px }
 .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; border-radius: inherit }
 .toast { position: absolute; top: 58px; left: 50%; transform: translateX(-50%); background: var(--surface); color: var(--ink); border: 1px solid var(--line);
@@ -130,7 +135,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 80
         </div>
         <div class="hint" id="hint">Grid squares are 1 block.</div>
         <div class="flash" id="flash"></div><div class="toast" id="toast"></div>
-        <div class="bar-bottom"><div class="seg" id="poses" role="group" aria-label="Pose"></div><div class="seg" id="anims" role="group" aria-label="Action"></div></div>
+        <div class="bar-bottom"><div class="seg" id="poses" role="group" aria-label="Pose"></div><div class="seg" id="anims" role="group" aria-label="Action"></div><label class="statuspick" id="statusWrap"><span>Status</span><select id="status" aria-label="Status"></select></label></div>
       </div>
     </div>
     <aside class="panel" id="panel" aria-live="polite"></aside>
@@ -357,7 +362,7 @@ const player = (() => {
 
 // ---------- state ----------
 const state = { fam: 0, sid: DATA.families[0].members[0], show: "both", anim: "idle", act: null, spin: false, player: true,
-  mode: "creatures", move: "pound", performer: "ghost", stg: 1, all: false };
+  mode: "creatures", move: "pound", performer: "ghost", stg: 1, all: false, status: "", since: 0 };
 const cache = {};
 let cur = null, t0 = performance.now(), ta = performance.now();
 function build(sid) {
@@ -386,7 +391,29 @@ function sizeOf(model) {
   const s = new THREE.Vector3(); box.getSize(s);
   return { h: box.max.y, l: s.z, w: s.x, box };
 }
+// Each creature's models are fetched from their own file the first time it's wanted.
+const speciesLoading = {};
+function loadSpecies(sid) {
+  const d = DATA.species[sid];
+  if (d.ours.geo) return Promise.resolve();
+  if (!speciesLoading[sid]) speciesLoading[sid] = fetch(`mons/${sid}.json`).then(r => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+    .then(j => { Object.assign(d.ours, j.ours); Object.assign(d.theirs, j.theirs); })
+    .catch(e => { delete speciesLoading[sid]; throw e; });
+  return speciesLoading[sid];
+}
+function prefetchNext() {
+  const L = CREATURE_ORDER, i = L.indexOf(state.sid);
+  for (const k of [1, -1]) loadSpecies(L[((i + k) % L.length + L.length) % L.length]).catch(() => {});
+}
 function place() {
+  const sid = state.sid;
+  if (DATA.species[sid].ours.geo) { placeNow(); prefetchNext(); return; }
+  stopPlay();
+  $("#hint").textContent = "Loading " + title(DATA.species[sid].ours.info.name) + "\u2026";
+  loadSpecies(sid).then(() => { if (state.sid === sid && state.mode === "creatures") { placeNow(); prefetchNext(); } })
+    .catch(() => { if (state.sid === sid) $("#hint").textContent = "This creature didn't load. Reload the page to try again."; });
+}
+function placeNow() {
   stopPlay();
   if (typeof carReset === "function" && state.mode === "creatures") carReset();
   for (const k of Object.keys(cache)) { stage.remove(cache[k].theirs.holder); stage.remove(cache[k].ours.holder); }
@@ -424,7 +451,7 @@ function setAnims() {
   const move = (cur.ours.info.move || "Special").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
   const poses = [["idle", "Idle"], ["walk", "Walk"], ["fly", "Fly"], ["hover", "Hover"], ["confused", "Confused"], ["faint", "Faint"]];
   const atk = (cur.ours.info.attack_move || "Attack").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-  const acts = [["cry", "Call"], ["recoil", "Hit"], ["attack", atk], ["special", move], ["critical", "Critical"], ["recall", "Recall"]];
+  const acts = [["cry", "Call"], ["recoil", "Hit"], ["attack", atk], ["special", move], ["selfhit", "Hurt itself"], ["critical", "Critical"], ["recall", "Recall"]];
   const pe = $("#poses"), ae = $("#anims"); pe.innerHTML = ""; ae.innerHTML = "";
   for (const [k, label] of poses) {
     const has = !!(animFor(cur.ours, k) || animFor(cur.theirs, k));
@@ -436,12 +463,17 @@ function setAnims() {
     pe.appendChild(b);
   }
   for (const [k, label] of acts) {
-    const has = !!(animFor(cur.ours, k) || animFor(cur.theirs, k));
+    const has = k === "selfhit" ? !!animFor(cur.ours, "attack") : !!(animFor(cur.ours, k) || animFor(cur.theirs, k));
     if (!has) continue;
     const b = document.createElement("button");
     b.textContent = label; b.dataset.v = k;
     b.setAttribute("aria-pressed", String(state.act === k));
-    b.onclick = () => { state.act = k; ta = performance.now(); setAnims(); if (k === "attack" || k === "special") startCreatureMove(k); else stopPlay(); };
+    b.onclick = () => {
+      state.act = k; ta = performance.now();
+      // Hurting itself is what a confused creature does: so it's confused while it does.
+      if (k === "selfhit") setStatus("confusion"); else setAnims();
+      if (k === "attack" || k === "special") startCreatureMove(k); else stopPlay();
+    };
     ae.appendChild(b);
   }
   if (!animFor(cur.ours, state.anim) && !animFor(cur.theirs, state.anim)) state.anim = "idle";
@@ -664,6 +696,14 @@ function startCreatureMove(k) {
 let moveCur = null;
 function perfStage(perf) { return state.performer === "ghost" ? state.stg : (perf.info.stage || 2); }
 function placeMoves() {
+  const need = [GHOST].concat(state.performer !== "ghost" ? [state.performer] : []);
+  if (need.every(s => DATA.species[s].ours.geo)) { placeMovesNow(); return; }
+  carReset();
+  $("#panel").innerHTML = `<p class="note">Loading\u2026</p>`;
+  Promise.all(need.map(loadSpecies)).then(() => { if (state.mode === "moves") placeMovesNow(); })
+    .catch(() => { $("#panel").innerHTML = `<p class="note">This creature didn't load. Reload the page to try again.</p>`; });
+}
+function placeMovesNow() {
   carReset();
   if (!MOVES) { $("#panel").innerHTML = `<p class="note">Loading the move effects…</p>`; return; }
   for (const k of Object.keys(cache)) { stage.remove(cache[k].theirs.holder); stage.remove(cache[k].ours.holder); }
@@ -844,6 +884,83 @@ function resize() {
   camera.aspect = r.width / Math.max(1, r.height); camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(viewerEl);
+// ---------- statuses: asleep, poisoned, burned, frozen... shown on both looks, with their own effect over each ----------
+const STATUS_LIST = [["", "None"], ["sleep", "Asleep"], ["poison", "Poisoned"], ["toxic", "Badly poisoned"], ["burn", "Burned"], ["freeze", "Frozen"],
+  ["paralysis", "Paralysed"], ["confusion", "Confused"], ["attract", "Infatuated"], ["seeded", "Leech Seed"], ["curse", "Cursed"],
+  ["nightmare", "Nightmare"], ["bound", "Trapped"]];
+// How each changes the body: how fast it moves (0: not at all), eyes shut, a glow pulsing over it, a colour wash, jolts.
+const STATUS_BODY = {
+  sleep: { speed: 0.45, shut: true }, nightmare: { speed: 0.5, shut: true, glow: [0.16, 0.06, 0.22], pulse: 2.2 },
+  poison: { glow: [0.28, 0.06, 0.34], pulse: 3.2 }, toxic: { glow: [0.36, 0.04, 0.4], pulse: 5 },
+  burn: { glow: [0.4, 0.1, 0.02], pulse: 9, flicker: true }, freeze: { speed: 0, color: [0.72, 0.86, 1.0], glow: [0.06, 0.14, 0.24] },
+  paralysis: { speed: 0.6, jolt: true, glow: [0.34, 0.3, 0.02], pulse: 0 }, confusion: { pose: "confused" },
+  attract: { glow: [0.26, 0.06, 0.14], pulse: 2.6 }, seeded: { glow: [0.06, 0.22, 0.04], pulse: 2.4 }, curse: { glow: [0.18, 0.06, 0.26], pulse: 1.6 },
+  bound: { speed: 0.5 } };
+const statusBuilt = { ours: {}, theirs: {} };
+const statusOn = new Set();
+function statusFx(who, key) {
+  if (!MOVES || MOVES.failed || !MOVES.statuses || !MOVES.statuses[key]) return null;
+  return statusBuilt[who][key] || (statusBuilt[who][key] = buildModel(MOVES.statuses[key]));
+}
+function hideStatusFx() { for (const m of statusOn) m.holder.visible = false; }
+function renderStatus() {
+  const sel = $("#status");
+  if (!sel.options.length) {
+    for (const [k, label] of STATUS_LIST) { const o = document.createElement("option"); o.value = k; o.textContent = label; sel.appendChild(o); }
+    sel.onchange = () => setStatus(sel.value);
+  }
+  sel.value = state.status;
+  $("#statusWrap").classList.toggle("on", !!state.status);
+}
+function setStatus(k) {
+  state.status = k; state.since = performance.now();
+  if (state.act === "selfhit" && k !== "confusion") state.act = null;
+  renderStatus(); setAnims();
+  if (k && !MOVES) loadMoves();
+}
+// A creature's status this frame: its eyes, glow and jolts, and its status's effect placed over it, sized to it.
+function applyStatus(who, model, now, selfAt) {
+  const key = state.status, S = STATUS_BODY[key] || {}, t = now / 1000;
+  if (S.shut) for (const b of model.bones) if (/^eyelid/.test(b.name)) b.group.scale.set(1, 1, 1);
+  if (S.color) model.mat.color.setRGB(...S.color);
+  if (S.glow) {
+    let k = S.pulse ? 0.55 + 0.45 * Math.sin(t * S.pulse) : 1;
+    if (S.flicker) k *= 0.75 + 0.25 * Math.sin(t * 23) * Math.sin(t * 7);
+    if (S.jolt) k = (t % 1.4) < 0.22 ? 1 : 0.15;
+    model.mat.emissive.setRGB(S.glow[0] * k, S.glow[1] * k, S.glow[2] * k);
+  }
+  model.holder.rotation.z = S.jolt && (t % 1.4) < 0.22 ? Math.sin(t * 95) * 0.05 : 0;
+  const sz = cur.sizes && cur.sizes[who];
+  const place1 = (fx, tt) => {
+    // (Not until its pictures have loaded, so it never shows as blank squares.)
+    if (!fx || !sz || !fx.glowLayers.every(g => g.maps.every(m => m.image && m.image.width))) return;
+    // (The box was measured with the creature at the middle of the stage, unturned.)
+    const c = new THREE.Vector3(); sz.box.getCenter(c);
+    c.applyAxisAngle(new THREE.Vector3(0, 1, 0), model.holder.rotation.y).add(model.holder.position);
+    const f = Math.min(3, Math.max(0.5, Math.max(sz.w, sz.h, sz.l) * 0.9)), u = 16 / f;
+    fx.holder.position.copy(c); fx.holder.rotation.y = model.holder.rotation.y; fx.holder.scale.setScalar(f / 16);
+    const set = (n, v) => { const b = fx.byName[n]; if (b) b.base = v; };
+    set("s1_top", [0, sz.h / 2 * u + 1.5, -sz.l / 2 * u * 0.5]); set("s1_mid", [0, 0, 0]); set("s1_ground", [0, -sz.h / 2 * u, 0]);
+    const an = Object.values(fx.anims)[0];
+    pose(fx, [[an, tt]]);
+    const ib = fx.byName["s1_icebox"];
+    if (ib && ib.group.scale.x > 0.01) ib.group.scale.set(sz.w * u / 16 * 1.12, sz.h * u / 16 * 1.06, sz.l * u / 16 * 1.12);
+    for (const g of fx.glowLayers) g.m.map = g.maps[Math.floor(tt * g.fps) % g.maps.length];
+    if (!fx.holder.parent) stage.add(fx.holder);
+    fx.holder.visible = model.holder.visible !== false && (state.show === "both" || state.show === who);
+    statusOn.add(fx);
+  };
+  const fxS = key && !(key === "confusion" && who === "ours" && animFor(model, "confused")) ? statusFx(who, key) : null;
+  place1(fxS, (now - state.since) / 1000);
+  if (selfAt != null && selfAt >= 0) { const h = statusFx(who, "selfhit"); if (h && selfAt <= 0.9) place1(h, selfAt); }
+}
+function statusTime(t) {
+  const S = STATUS_BODY[state.status];
+  if (!S || S.speed == null) return t;
+  if (S.speed === 0) return Math.max(0, (state.since - t0) / 1000);
+  return t * S.speed;
+}
+
 function frame(now) {
   // (A frame's time can come a moment before a click's: never let it go below 0.)
   const t = Math.max(0, (now - t0) / 1000);
@@ -851,6 +968,7 @@ function frame(now) {
   let flash = 0, toast = "";
   for (const b of Object.values(balls)) { b.g.visible = false; b.beam.visible = false; }
   carTick(now);
+  hideStatusFx();
   if (state.mode === "moves") frameMoves(now);
   else if (cur) {
     updatePlay(now);
@@ -861,11 +979,19 @@ function frame(now) {
     if (recall && tA > END) { state.act = null; state.anim = "idle"; t0 = now; setAnims(); }
     for (const [who, model] of [["theirs", cur.theirs], ["ours", cur.ours]]) {
       const out = recall && tA >= R5;
-      const key = out ? "idle" : state.anim;
+      const sp = (STATUS_BODY[state.status] || {}).pose;
+      const key = out ? "idle" : (sp && state.anim === "idle" && animFor(model, sp) ? sp : state.anim);
       const baseAnim = animFor(model, key) || animFor(model, "idle");
       setParts(model, key === "idle" ? null : key);
-      const list = [[baseAnim, out ? tA - R5 : t]];
-      if (state.act && !recall) {
+      const list = [[baseAnim, out ? tA - R5 : statusTime(t)]];
+      let selfAt = null;
+      if (state.act === "selfhit" && who === "ours") {
+        // Hurting itself in its confusion: it winds up and strikes, then reels from its own blow.
+        const atk = animFor(model, "attack"), rec = animFor(model, "recoil");
+        const la = atk ? atk.len : 0.6, lr = rec ? rec.len : 0.6, cyc = tA % (la + lr + 0.9);
+        if (cyc < la) { if (atk) list.push([atk, cyc]); } else if (cyc < la + lr) { if (rec) list.push([rec, cyc - la]); }
+        selfAt = cyc - la * 0.92;
+      } else if (state.act && !recall) {
         const act = animFor(model, state.act);
         if (act) {
           // A move's body motion follows the move being played (holding while a long move pours out); others loop.
@@ -889,6 +1015,7 @@ function frame(now) {
       model.holder.scale.setScalar(((model.info.scale || 1) / 16) * k);
       model.mat.color.setRGB(1, 1 - 0.65 * red, 1 - 0.68 * red);
       model.mat.emissive.setRGB(white * 0.9, white * 0.9, white * 0.9);
+      if (!recall) applyStatus(who, model, now, selfAt); else model.holder.rotation.z = 0;
       const B = balls[who];
       if (recall && tA < R7 && model.holder.parent) {
         const p = new THREE.Vector3(); model.holder.getWorldPosition(p); stage.worldToLocal(p); p.y = 0;
@@ -927,6 +1054,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 renderPickers();
+renderStatus();
 resize();
 place();
 requestAnimationFrame(frame);

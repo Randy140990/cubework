@@ -1,0 +1,72 @@
+{
+ "idle": "animation.glaciseal.battle_idle",
+ "ground": "animation.glaciseal.ground_idle",
+ "actions": {
+  "cry": "animation.glaciseal.cry",
+  "recoil": "animation.glaciseal.recoil",
+  "attack": "animation.glaciseal.attack",
+  "critical": "animation.glaciseal.critical",
+  "special": "animation.glaciseal.special",
+  "recall": "animation.glaciseal.recall",
+  "sendout": "animation.glaciseal.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.glaciseal.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.glaciseal.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.glaciseal.faint",
+   "parts": []
+  }
+ },
+ "move": "ICE BEAM",
+ "attack_move": "TAKE DOWN",
+ "scale": 2.217,
+ "height": 0.812,
+ "texture": "retromon:textures/mons/dewgong.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/dewgong_glow_0.png",
+    "retromon:textures/mons/dewgong_glow_1.png",
+    "retromon:textures/mons/dewgong_glow_2.png",
+    "retromon:textures/mons/dewgong_glow_3.png",
+    "retromon:textures/mons/dewgong_glow_4.png",
+    "retromon:textures/mons/dewgong_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "GLACISEAL",
+ "anchors": {
+  "mouth": [
+   0,
+   7.2,
+   -19.1
+  ],
+  "back": [
+   0,
+   11.6,
+   1.5
+  ],
+  "body": [
+   0,
+   5.68,
+   1.5
+  ],
+  "size": [
+   19.2,
+   13.0,
+   50.25
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

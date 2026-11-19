@@ -31,6 +31,20 @@
       "1 + math.sin(q.anim_time * 1440 + 0) * 0.12"
      ]
     },
+    "whiskers_right": {
+     "rotation": [
+      0,
+      "math.sin(q.anim_time * 1440 + 0) * 6",
+      0
+     ]
+    },
+    "whiskers_left": {
+     "rotation": [
+      0,
+      "math.sin(q.anim_time * 1440 + 0) * -6",
+      0
+     ]
+    },
     "ear_right": {
      "rotation": [
       "math.sin(q.anim_time * 180 + 0) * 4",

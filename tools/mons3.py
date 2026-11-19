@@ -10,10 +10,11 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-from monlib import CLEAR, Cube, Mat, Model, blob, face_blob, hash01, mix, rgb, track, wave, keys, write  # noqa: E402
-from monanims import crawler, cocoon, insect, serpent, four_legs, hopper, flyer, burrower, biped, floater  # noqa: E402
+from monlib import CLEAR, Cube, Mat, Model, blob, face_blob, hash01, mix, ramp, rgb, track, wave, keys, write, underside  # noqa: E402
+from monanims import crawler, cocoon, insect, serpent, four_legs, hopper, flyer, burrower, biped, floater, ooze, bird  # noqa: E402
 from mons import leaf_mat, sharp_claw_mat, fx_for, open_mouth, stout_legs, whisker_mat, dragon_wing, membrane_mat, shag_mat  # noqa: E402
-from monlib import flame  # noqa: E402
+from monlib import flame, flame_shape, eye_mat, mirror_cube, bounce  # noqa: E402
+from mons import feather_plane, jointed_wing  # noqa: E402
 from mons2 import fur, brush, n  # noqa: E402
 
 
@@ -180,28 +181,29 @@ def leafgrub():
 
 
 def huskalis():
-    """A jade chrysalis standing up like a curled bud, wrapped round the back in a big dried leaf held on with silk; gold
-    seams between its plates, and sleepy eyes peering out from under heavy lids."""
+    """A jade chrysalis, hard as armour, standing tall and curving forward like a crescent: broad in the middle, its top
+    drawn forward into a hooked point, plates edged in gold, a silk thread holding it up from the back, and sleepy eyes
+    under heavy lids."""
     m = Model()
     J, JL, JD, SEAM = "#5FB56A", "#B8EAB0", "#2E7040", "#D8B04A"
     shell = Mat(J, shell_paint(J, JL, JD, SEAM), noise=0.015)
-    dried = leaf_mat("#C8A25A", "#7A5A2A", "#E8D08A", "y")
     silk = Mat("#F4F2EC", lambda a: CLEAR if a.col % 2 else None, noise=0.0, edge=0, flat=True)
     m.bone("root", None, [0, 0, 0])
-    m.bone("body", "root", [0, 0, 0], blob([-3, 0, -2.6], [6, 3, 5.2], shell) + blob([-3.8, 3, -3.1], [7.6, 5, 6.2], shell) +
-           blob([-3.6, 8, -3.3], [7.2, 4, 6.2], shell))
-    m.bone("head", "body", [0, 12, 0], blob([-3.1, 12, -3.5], [6.2, 3, 5.8], shell) +
-           [Cube([-2.2, 15, -2.9], [4.4, 2, 4.6], shell), Cube([-1.2, 16.6, -2.6], [2.4, 1.6, 3], shell, [-14, 0, 0], [0, 16.6, -1])])
-    m.eyes("head", x_inner=0.8, y=12.6, z=-3.5, w=3, h=2, iris="#2A5A2A", pupil="#0A1A0A", skin=J, iris_light="#7ACB6A", grid=["LLL", "IPW"])
-    m.bone("wrap", "body", [0, 2, 3], [Cube([-4.5, 1.5, 3.3], [9, 15, 0], dried),
-                                      Cube([-4.4, 2.5, -2.5], [0, 11, 6], dried, [0, -8, 0], [-4.4, 2.5, 3]),
-                                      Cube([4.4, 2.5, -2.5], [0, 11, 6], dried, [0, 8, 0], [4.4, 2.5, 3])])
-    m.bone("silk", "head", [0, 17, -1], [Cube([-0.5, 17.5, -1.5], [0, 5, 1], silk, [0, 0, 10], [0, 17.5, -1]),
-                                        Cube([0.5, 17.5, -1.2], [0, 6, 1], silk, [0, 0, -8], [0, 17.5, -1])])
-    fx_for(m, 0.8)
+    # From the bottom up: a rounded foot, the swelling middle, the shoulders leaning back a little.
+    m.bone("body", "root", [0, 0, 0], blob([-3, 0, -2.6], [6, 3, 5.4], shell) + blob([-4.4, 3, -3.4], [8.8, 4, 7.2], shell, b=2) +
+           blob([-4.6, 7, -3.2], [9.2, 4, 7.4], shell, b=2) + blob([-4.2, 11, -2.6], [8.4, 3, 6.8], shell))
+    # The head: the face leaning forward, then the hooked crown curving over it to a point.
+    m.bone("head", "body", [0, 14, 0], blob([-3.8, 14, -3.8], [7.6, 3.4, 6.6], shell) +
+           [Cube([-3, 17.2, -3.4], [6, 2, 5.6], shell), Cube([-2, 18.8, -3.6], [4, 2, 4.4], shell, [-18, 0, 0], [0, 18.8, -1]),
+            Cube([-1.2, 20.2, -4.6], [2.4, 1.6, 3], shell, [-38, 0, 0], [0, 20.2, -2]), Cube([-0.6, 20.6, -6.4], [1.2, 1.2, 2], shell, [-55, 0, 0], [0, 20.6, -4.4])])
+    m.eyes("head", x_inner=0.6, y=14.8, z=-3.8, w=2, h=2, iris="#2A6A2A", pupil="#0A1A0A", skin=J, iris_light="#7ACB6A", grid=["LL", "IP"])
+    m.brows("head", [Cube([-2.9, 16.7, -4.1], [2.6, 1, 0.6], Mat(JD, noise=0.01, edge=0), [0, 0, 10], [-0.6, 17.1, -4])])
+    m.bone("silk", "head", [0, 20, 1.5], [Cube([-0.5, 20.5, 1.5], [0, 7, 1], silk, [0, 0, 8], [0, 20.5, 1.5]),
+                                         Cube([0.5, 20.5, 1.8], [0, 8, 1], silk, [0, 0, -6], [0, 20.5, 1.5])])
+    fx_for(m, 0.9)
     moves(m, "TACKLE", "HARDEN")
-    A, info = cocoon("huskalis", m, k=0.8, extras={"idle": {"silk": track(rotation=[wave(2, 4), 0, wave(3, 5)])}})
-    write("metapod", "HUSKALIS", m, A, info, 0.72)
+    A, info = cocoon("huskalis", m, k=0.9, extras={"idle": {"silk": track(rotation=[wave(2, 4), 0, wave(3, 5)])}})
+    write("metapod", "HUSKALIS", m, A, info, 1.05)
 
 
 def veilmoth():
@@ -240,8 +242,8 @@ def veilmoth():
     m.bone("abdomen3", "abdomen2", [0, 10.6, 9.8], [Cube([-1.5, 9.2, 9.7], [3, 3, 3], stripe)], rotation=[-8, 0, 0])
     legs_pair(m, "leg_1_right", "body", 2.2, 9.5, -1.5, 5, legm, claw, ang=-10)
     legs_pair(m, "leg_2_right", "body", 2.2, 9.5, 1.5, 5.5, legm, claw, ang=10)
-    m.pair("wing_right", "body", [-3, 14.2, -1], [Cube([-20, 14.2, -4.5], [17, 0, 13], fore)], rotation=[0, 0, 38])
-    m.pair("hindwing_right", "body", [-3, 13.4, 2], [Cube([-15, 13.4, 1], [12, 0, 10], hind)], rotation=[0, 0, 26])
+    m.pair("wing_right", "body", [-3, 14.2, -1.5], [Cube([-20, 14.2, -7.5], [17, 0, 11], fore, [0, -12, 0], [-3, 14.2, -1.5])], rotation=[0, 0, 40])
+    m.pair("hindwing_right", "body", [-3, 12.6, 2.5], [Cube([-15, 12.6, 2.2], [12, 0, 9.5], hind, [0, 14, 0], [-3, 12.6, 2.5])], rotation=[0, 0, 18])
     fx_for(m, 0.9)
     moves(m, "GUST", "CONFUSION")
     A, info = insect("veilmoth", m, flap=0.55, amp=48, k=0.9, legs=("leg_1_right", "leg_1_left", "leg_2_right", "leg_2_left"))
@@ -297,31 +299,35 @@ def stinglet():
 
 
 def barbcase():
-    """A hard golden cocoon like a lantern, banded with dark armour plates, short spikes along its ridges, its little
-    arms folded tight, and narrow eyes glaring out under hard brows."""
+    """A hard golden cocoon hanging like a lantern: a rounded hood over its face, dark armour bands round it, sharp
+    pointed barbs along its ridges, two little arms folded tight, and narrow eyes glaring out under hard brows."""
     m = Model()
     GO, GOL, GOD, PLATE = "#E8B030", "#FFDC70", "#9A6A14", "#5E3E14"
     shell = Mat(GO, shell_paint(GO, GOL, GOD, PLATE), noise=0.015)
     plate = Mat(PLATE, shell_paint(PLATE, "#8A6430", "#3A2408", "#2A1A06", facets=False), noise=0.015)
-    spike = Mat("#3A2610", lambda a: rgb("#E8D8B0") if a.ly > 0.65 else None, noise=0.01, edge=0)
+    barb = taper_mat("#3A2610", "#F0E4C0")
     brow = Mat(PLATE, noise=0.01, edge=0)
     m.bone("root", None, [0, 0, 0])
-    body = blob([-3, 0, -2.6], [6, 3, 5.2], shell) + blob([-4, 3, -3.2], [8, 3, 6.4], plate) + blob([-3.8, 6, -3.1], [7.6, 3, 6.2], shell) + \
-        blob([-3.6, 9, -3], [7.2, 2.5, 6], plate)
-    for y in (4.5, 10):
+    body = blob([-2.6, 0, -2.4], [5.2, 2.5, 4.8], shell) + blob([-4, 2.5, -3.4], [8, 3, 6.8], plate) + blob([-4.6, 5.5, -3.6], [9.2, 4, 7.4], shell, b=2) + \
+        blob([-4.4, 9.5, -3.4], [8.8, 2.5, 7], plate)
+    # Barbs: sharp points sticking out along the bands, sideways and back.
+    for y in (4, 10.5):
         for sx in (-1, 1):
-            body.append(Cube([sx * 4.2 - 0.5, y, -0.5], [1, 2.2, 1], spike, [0, 0, 55 * sx], [sx * 4.2, y, 0]))
-        body.append(Cube([-0.5, y - 0.2, 3.2], [1, 2.2, 1], spike, [60, 0, 0], [0, y, 3.4]))
-    body += [Cube([-3.9, 5.2, -3.7], [1.6, 2.4, 1.4], shell, [0, 0, -12], [-3.2, 6.4, -3]), Cube([2.3, 5.2, -3.7], [1.6, 2.4, 1.4], shell, [0, 0, 12], [3.2, 6.4, -3])]
+            body += spike(sx * 4.2, y, 0, 3.5, [0, -sx * 90, 0], barb, 2.2)
+            body += spike(sx * 3.2, y, 2.4, 3, [0, -sx * 40, 0], barb, 2)
+        body += spike(0, y, 3.2, 3.5, [0, 0, 0], barb, 2.2)
+    body += [Cube([-4.6, 6.2, -4.1], [1.8, 2.6, 1.4], shell, [0, 0, -12], [-3.6, 7.6, -3.4]), Cube([2.8, 6.2, -4.1], [1.8, 2.6, 1.4], shell, [0, 0, 12], [3.6, 7.6, -3.4])]
     m.bone("body", "root", [0, 0, 0], body)
-    m.bone("head", "body", [0, 11.5, 0], blob([-3.2, 11.5, -3.3], [6.4, 3.5, 5.8], shell) +
-           [Cube([-2.4, 15, -2.6], [4.8, 2, 4.4], plate), Cube([-0.6, 17, -1], [1.2, 2.4, 1.2], spike, [-15, 0, 0], [0, 17, -0.4])])
-    m.eyes("head", x_inner=0.6, y=12.6, z=-3.3, w=3, h=2, iris="#E8E040", pupil="#2A1A04", skin=GO, iris_light="#FFF8A0", grid=["LLL", "IPW"])
-    m.brows("head", [Cube([-3.6, 14.6, -3.8], [3.4, 1, 1], brow, [0, 0, 18], [-0.6, 15.1, -3.4])])
-    fx_for(m, 0.8)
+    # The hood: a rounded dome over the face, its rim jutting out over the eyes, a barb on top.
+    hd = blob([-3.8, 12, -3.4], [7.6, 3.4, 6.6], shell) + blob([-4, 15.2, -3.6], [8, 2.6, 7], plate) + [Cube([-2.6, 17.6, -2.4], [5.2, 1.6, 4.8], plate)]
+    hd += spike(0, 19, -0.4, 3, [-80, 0, 0], barb, 1.4) + [Cube([-3.6, 15.2, -4.3], [7.2, 1, 1.2], plate)]
+    m.bone("head", "body", [0, 12, 0], hd)
+    m.eyes("head", x_inner=0.5, y=13.4, z=-3.4, w=2, h=1, iris="#E8E040", pupil="#2A1A04", skin=GO, iris_light="#FFF8A0", grid=["IP"])
+    m.brows("head", [Cube([-3.0, 14.4, -3.9], [2.8, 1, 1], brow, [0, 0, 16], [-0.5, 14.9, -3.6])])
+    fx_for(m, 0.9)
     moves(m, "POISON STING", "HARDEN")
-    A, info = cocoon("barbcase", m, k=0.8)
-    write("kakuna", "BARBCASE", m, A, info, 0.75)
+    A, info = cocoon("barbcase", m, k=0.9)
+    write("kakuna", "BARBCASE", m, A, info, 1.0)
 
 
 def lancewasp():
@@ -469,19 +475,47 @@ def glow_patch(colour, shape="crescent"):
     return Mat(colour, lambda a: rgb(colour) if inside(a) else CLEAR, glow=lambda a: rgb(colour) if inside(a) else None, noise=0, edge=0, flat=True)
 
 
-def snake_paint(base, light, dark, belly, chevron, below):
-    """A snake's scales: a pale belly, the back marked with a chain of chevrons, sides shading down."""
-    B, Lt, Dk, Be, Ch = rgb(base), rgb(light), rgb(dark), rgb(belly), rgb(chevron)
+def snake_paint(base, light, dark, belly, mark, below, kind="chevron", mark_edge=None):
+    """A snake's skin: small overlapping scales in staggered rows all over (each catching the light along its front
+    edge, shadowed at its back), broad pale plates across the belly, and down the back a pattern: chevrons, or a chain
+    of diamonds edged in dark."""
+    B, Lt, Dk, Be, Mk = rgb(base), rgb(light), rgb(dark), rgb(belly), rgb(mark)
+    Me = rgb(mark_edge) if mark_edge else Dk
+
+    def scaled(at, c):
+        if at.face in ("top", "bottom"):
+            u, v = at.z, at.x
+        elif at.face in ("nx", "px"):
+            u, v = at.z, at.y
+        else:
+            u, v = at.x, at.y
+        rv = v * 1.3
+        r = math.floor(rv)
+        fu = (u * 1.3 + (r % 2) * 0.5) % 1.0
+        fv = rv % 1.0
+        if fu > 0.8 or fv < 0.16:
+            return c * 0.78
+        if fu < 0.3:
+            return mix(c, Lt, 0.2)
+        return c
 
     def f(at):
         if at.face == "bottom" or at.y < below:
-            return Be
-        if at.face == "top":
-            zz = (at.z % 4.0) / 4.0
-            if abs(at.x) < 0.45 + 0.9 * abs(zz - 0.5) * 2 and abs(at.x) > 0.9 * abs(zz - 0.5) * 2 - 0.4:
-                return Ch
-            return mix(B, Lt, 0.3)
-        return mix(Dk, B, 0.4 + 0.6 * at.ly)
+            return Be * (0.8 if (at.z * 1.5) % 1.0 < 0.2 else 1.0)
+        if at.face == "top" or (at.side and at.ly > 0.7):
+            zz = at.z
+            if kind == "chevron":
+                q = (zz % 3.2) / 3.2
+                d = abs(abs(at.x) - (q - 0.2) * 2.2)
+                if d < 0.42:
+                    return scaled(at, Mk)
+            else:
+                q = ((zz % 4.4) / 4.4 - 0.5) * 4.4
+                r = abs(at.x) * 1.15 + abs(q) * 0.7
+                if r < 1.05:
+                    return scaled(at, Mk if r < 0.75 else Me)
+            return scaled(at, mix(B, Lt, 0.25))
+        return scaled(at, mix(Dk, B, 0.35 + 0.65 * at.ly))
     return f
 
 
@@ -515,63 +549,81 @@ def frill_mat(web, rib, edge, spot):
 # ======================================================================================================
 
 def viper(sid, name, stands, big):
-    """A viper lying in curves, its front reared up. The small one slim and lilac with copper chevrons and a little copper
-    spade at its tail; grown, long and deep violet with gold chevrons, a heavy brow, long fangs, and a great ribbed frill
-    of teal and gold round its neck that flares when it hisses."""
+    """A viper. The small one slim and lilac with copper chevrons down its back, a broad viper's head with brow ridges
+    and slit-pupilled eyes, a forked tongue, and a little copper spade at the end of its tail; it lies coiled, its head
+    raised, and rattles the tip of its tail. Grown, long and deep violet with a chain of gold diamonds down its back, a
+    heavy brow, long fangs, and a great ribbed frill of teal and gold round its neck that flares when it hisses. Both
+    are covered in fine scales, with broad plates down the belly, and slither in waves running down their length."""
     m = Model()
-    s = 1.0 if not big else 1.7
+    s = 1.0 if not big else 1.45
     S = lambda v: [x * s for x in v]
     if not big:
-        BASE, LT, DK, BELLY, CHEV = "#9A7AC0", "#C8B0E4", "#5E4A80", "#F0E0B0", "#C87A3A"
+        BASE, LT, DK, BELLY, MARK, MEDGE = "#9A7AC0", "#C8B0E4", "#5E4A80", "#F0E0B0", "#C87A3A", None
     else:
-        BASE, LT, DK, BELLY, CHEV = "#5A3A7A", "#8A6AAA", "#2E1E44", "#F0DCA0", "#E0A030"
-    skin = Mat(BASE, snake_paint(BASE, LT, DK, BELLY, CHEV, 0.6 * s), noise=0.02)
-    headm = Mat(BASE, lambda a: rgb(BELLY) if a.face == "bottom" else (mix(BASE, LT, 0.35) if a.face == "top" else None), noise=0.02)
+        BASE, LT, DK, BELLY, MARK, MEDGE = "#5A3A7A", "#8A6AAA", "#2E1E44", "#F0DCA0", "#E8B030", "#1A1024"
+    skin = Mat(BASE, snake_paint(BASE, LT, DK, BELLY, MARK, 0.5 * s, "chevron" if not big else "diamond", MEDGE), noise=0.015)
+    headp = snake_paint(BASE, LT, DK, BELLY, MARK, 0.4 * s, "none")
+    headm = Mat(BASE, lambda a: rgb(BELLY) if a.face == "bottom" else headp(a), noise=0.015)
+    ridge = Mat(DK, lambda a: mix(DK, BASE, 0.5) if a.face == "top" else None, noise=0.01, edge=0)
     jaw_m = Mat(BELLY, open_mouth("#8A2A3A", "#D8C090"), noise=0.02)
     fang = Mat("#FFFFF4", noise=0.0, edge=0)
     tongue = Mat("#D8304A", lambda a: CLEAR if (a.lz < 0.3 and abs(a.lx - 0.5) < 0.2) else None, noise=0, edge=0, flat=True)
-    spade = Mat(CHEV, lambda a: CLEAR if abs(a.lx - 0.5) > 0.5 * (1 - abs(a.lz - 0.5) * 2) + 0.05 else None, noise=0.01, edge=0, flat=True)
+    spade = Mat(MARK, lambda a: CLEAR if abs(a.lx - 0.5) > 0.5 * (1 - abs(a.lz - 0.5) * 2) + 0.05 else None, noise=0.01, edge=0, flat=True)
+    nost = Mat("#140C18", noise=0, edge=0)
     m.bone("root", None, [0, 0, 0])
-    m.bone("body", "root", S([0, 1.5, -2]), [Cube(S([-1.6, 0, -2]), [round(3.2 * s), round(3 * s), round(4 * s)], skin)])
-    segs, prev, z = [], "body", 2.0
-    rests = (38, -52, -48, 42, 46, -36, -30) if big else (35, -50, -45, 40, 45, -35)
-    for i, r in enumerate(rests):
-        w, h = max(1.2, 3.0 - i * 0.28) * s, max(1.2, 2.8 - i * 0.24) * s
+    m.bone("body", "root", S([0, 1.4, -1]), [Cube(S([-1.6, 0, -2.4]), [n(3.2 * s), n(2.8 * s), n(4.2 * s)], skin)])
+    # The body: many short segments tapering to the tail, lying straight at rest (its curves come from how it moves).
+    nseg = 10 if not big else 12
+    segs, prev, z = [], "body", 1.6
+    L = 2.6
+    for i in range(nseg):
+        t = i / (nseg - 1)
+        w, h = (3.0 - 2.0 * t ** 1.3) * s, (2.7 - 1.7 * t ** 1.3) * s
         nm = f"seg{i + 1}"
-        cubes = [Cube([-w / 2, 0, z * s], [w, h, 4 * s], skin)]
-        if i == len(rests) - 1:
-            cubes.append(Cube([-1.5 * s, 0.4 * s, (z + 3.6) * s], [3 * s, 0, 3 * s], spade))
-        m.bone(nm, prev, [0, 1.4 * s, z * s], cubes, rotation=[0, r, 0])
+        cubes = [Cube([-w / 2, 0, (z - 0.2) * s], [n(w), n(h), n((L + 0.4) * s)], skin)]
+        if i == nseg - 1:
+            cubes.append(Cube([-1.5 * s, 0.3 * s, (z + L) * s], [n(3 * s), 0, n(3 * s)], spade if not big else Mat(DK, lambda a: CLEAR if abs(a.lx - 0.5) > 0.5 * (1 - a.lz) else None, noise=0, edge=0, flat=True)))
+        m.bone(nm, prev, [0, 1.2 * s, z * s], cubes)
         segs.append(nm)
-        prev, z = nm, z + 4
-    r1, r2 = (-55, -22) if not big else (-70, -16)
-    m.bone("neck", "body", S([0, 1.5, -2]), [Cube(S([-1.4, 0.2, -6]), [round(2.8 * s), round(2.8 * s), round(4.2 * s)], skin)], rotation=[r1, 0, 0])
-    m.bone("neck2", "neck", S([0, 1.6, -6]), [Cube(S([-1.3, 0.3, -9.6]), [round(2.6 * s), round(2.6 * s), round(3.8 * s)], skin)], rotation=[r2, 0, 0])
-    m.bone("head", "neck2", S([0, 1.8, -9.5]), face_blob(S([-2, 0.6, -14]), S([4, 3, 4.6]), headm), rotation=[-(r1 + r2) - 5, 0, 0])
-    hd = m.bones[-1]
-    hd.cubes += [Cube(S([-1.1, 0.5, -14.6]), [max(1, round(0.8 * s)), max(1, round(1.2 * s)), 1], fang), Cube(S([0.3, 0.5, -14.6]), [max(1, round(0.8 * s)), max(1, round(1.2 * s)), 1], fang)]
+        prev, z = nm, z + L
+    r1, r2 = (-55, -22) if not big else (-68, -18)
+    m.bone("neck", "body", S([0, 1.4, -2.4]), [Cube(S([-1.4, 0.2, -6.4]), [n(2.8 * s), n(2.8 * s), n(4.4 * s)], skin)], rotation=[r1, 0, 0])
+    m.bone("neck2", "neck", S([0, 1.6, -6.2]), [Cube(S([-1.3, 0.3, -9.8]), [n(2.6 * s), n(2.6 * s), n(3.9 * s)], skin)], rotation=[r2, 0, 0])
+    # A viper's head: broad at the back over the jaws, narrowing to a blunt snout, a ridge over each eye.
+    hz = -9.6
+    m.bone("head", "neck2", S([0, 1.8, hz]), face_blob(S([-2.3, 0.6, hz - 3.6]), S([4.6, 2.8, 3.8]), headm) +
+           [Cube(S([-1.6, 0.6, hz - 5.4]), [n(3.2 * s), n(2.2 * s), n(1.9 * s)], headm),
+            Cube(S([-2.5, 3.2, hz - 3.4]), [n(1.6 * s), 1, n(2.6 * s)], ridge, [0, 0, 10], S([-1, 3.4, hz - 2])),
+            Cube(S([0.9, 3.2, hz - 3.4]), [n(1.6 * s), 1, n(2.6 * s)], ridge, [0, 0, -10], S([1, 3.4, hz - 2])),
+            Cube(S([-1.0, 2.2, hz - 5.45]), [1, 1, 0], nost), Cube(S([0.4, 2.2, hz - 5.45]), [1, 1, 0], nost)],
+           rotation=[-(r1 + r2) - 5, 0, 0])
+    hd = bone_of(m, "head")
+    hd.cubes += [Cube(S([-1.1, 0.0, hz - 5.2]), [1, n(1.4 * s), 1], fang), Cube(S([0.3, 0.0, hz - 5.2]), [1, n(1.4 * s), 1], fang)]
+    m.bone("jaw", "head", S([0, 0.9, hz - 1.5]), [Cube(S([-1.9, 0.0, hz - 5.2]), [n(3.8 * s), 1, n(4 * s)], jaw_m)])
+    m.bone("tongue", "jaw", S([0, 0.8, hz - 5]), [Cube(S([-0.5, 0.8, hz - 8]), [n(s), 0, n(3 * s)], tongue)])
+    m.eyes("head", 2.3 * s, 2.0 * s, (hz - 3.6) * s, h=2, corner=(1, 1), half=2.3 * s, iris="#F0C030" if not big else "#E84030", pupil="#140C04",
+           skin=BASE, iris_light="#FFE890", grid=["DLLD", "JIPI", "IIPJ", "SIIS"])
     if big:
-        hd.cubes += [Cube(S([-2.3, 3.3, -13.6]), [round(1.8 * s), 1, round(2.4 * s)], Mat(DK, noise=0.01, edge=0), [0, 0, 14], S([-0.6, 3.6, -12.4])),
-                     Cube(S([0.5, 3.3, -13.6]), [round(1.8 * s), 1, round(2.4 * s)], Mat(DK, noise=0.01, edge=0), [0, 0, -14], S([0.6, 3.6, -12.4]))]
-    m.bone("jaw", "head", S([0, 1.0, -11]), [Cube(S([-1.6, 0.1, -13.8]), [round(3.2 * s), 1, round(3.4 * s)], jaw_m)])
-    m.bone("tongue", "jaw", S([0, 0.9, -13.6]), [Cube(S([-0.5, 0.9, -16.6]), [max(1, round(s)), 0, round(3 * s)], tongue)])
-    m.eyes("head", 2 * s, 2.2 * s, -14 * s, h=2, corner=(1, 1), half=2 * s, iris="#F0C030" if not big else "#E84030", pupil="#140C04",
-           skin=BASE, iris_light="#FFE890", grid=["WP", "IP"])
-    if big:
-        # The frill lies along the reared neck, behind it, so it fans out round the head seen from the front.
-        m.bone("hood", "neck2", S([0, 3.0, -6]), [Cube(S([-7, 3.0, -11.3]), [24, 0, 9], frill_mat("#2AA89A", "#E0B040", "#1A2A40", "#F0D070"))])
+        m.bone("hood", "neck2", S([0, 3.0, -6.4]), [Cube(S([-6, 3.0, -11.6]), [n(12 * s), 0, n(7.5 * s)], frill_mat("#2AA89A", "#E0B040", "#1A2A40", "#F0D070"))])
     fx_for(m, 0.7 * s)
     moves(m, "WRAP" if not big else "BITE", "ACID" if not big else "GLARE")
-    A, info = serpent(name.lower(), m, segs, k=0.6 * s)
+    if not big:
+        # Coiled at rest: each joint curling the same way, the tail tip rattling.
+        coil = [30, 34, 36, 36, 36, 36, 34, 30, 20, 10]
+        rattle = {segs[-1]: track(rotation=[0, wave(0.12, 14), 0]), segs[-2]: track(rotation=[0, wave(0.12, 6, 40), 0])}
+    else:
+        coil = [22, 22, 18, -22, -26, -26, -20, 22, 24, 20, -14, -10]
+        rattle = {}
+    A, info = serpent(name.lower(), m, segs, k=0.6 * s, coil=coil, extras={"idle": rattle, "battle": rattle})
     write(sid, name, m, A, info, stands)
 
 
 def coilet():
-    viper("ekans", "COILET", 0.5, False)
+    viper("ekans", "COILET", 0.55, False)
 
 
 def frillasp():
-    viper("arbok", "FRILLASP", 1.5, True)
+    viper("arbok", "FRILLASP", 1.15, True)
 
 
 # ======================================================================================================
@@ -708,8 +760,9 @@ def lunahare():
 
 def fennec(sid, name, stands, big):
     """A desert fox of embers: warm cream-orange fur, a pale muzzle and chest, a black nose, huge ears with a glowing ember
-    rim round each inner ear, an ember mark on its brow, and a bushy tail in joints ending in a flame. Grown, tall and
-    golden, slender-legged, a ruff of flame-tipped fur at its neck, a long plumed tail with a great flame at its tip."""
+    rim round each inner ear, an ember mark on its brow, big glossy eyes, and a bushy tail in joints ending in a flame.
+    Grown, tall and golden, slender-legged, a ruff of flame-tipped fur at its neck, and five long plumed tails fanned out
+    behind it like the rays of the sun, each in joints and each tipped with flame."""
     m = Model()
     s = 1.0 if not big else 1.6
     S = lambda v: [x * s for x in v]
@@ -725,32 +778,56 @@ def fennec(sid, name, stands, big):
     legm = Mat(FUR, lambda a: mix(FUR_D, FUR, 0.5 + 0.5 * a.ly), noise=0.02)
     claw = Mat("#3A2A20", noise=0.0, edge=0)
     tailm = Mat(FUR, fur(FUR, FUR_L, FUR_D), noise=0.03)
+    tipm = Mat(BELLY, fur(BELLY, "#FFFFFF", FUR_L), noise=0.03)
     m.bone("root", None, [0, 0, 0])
     top = 5 if not big else 7.5
     m.bone("body", "root", S([0, top + 2.5, 0]), blob(S([-3, top, -5]), S([6, 5, 10]), furm) +
-           [Cube(S([-2.4, top + 0.4, -5.4]), [round(4.8 * s), round(4 * s), 1], Mat(BELLY, noise=0.02))])
+           [Cube(S([-2.4, top + 0.4, -5.4]), [n(4.8 * s), n(4 * s), 1], Mat(BELLY, noise=0.02))])
     hy = top + 4
     m.bone("neck", "body", S([0, hy, -4.5]), blob(S([-2.2, hy - 1.5, -6.5]), S([4.4, 4, 3.5]), furm), rotation=[-12, 0, 0])
     m.bone("head", "neck", S([0, hy + 1.5, -6]), face_blob(S([-3, hy, -10.5]), S([6, 4.6, 5]), face) +
-           [Cube(S([-1.4, hy, -12.6]), [round(2.8 * s), round(2.2 * s), round(2.2 * s)], muzzle)], rotation=[12, 0, 0])
-    m.bone("jaw", "head", S([0, hy + 0.6, -9.5]), [Cube(S([-1.2, hy - 0.4, -12.2]), [round(2.4 * s), 1, round(2.6 * s)], jaw_m)])
-    m.eyes("head", x_inner=0.9 * s, y=(hy + 2.2) * s, z=-10.5 * s, w=2 if not big else 3, h=2,
-           iris="#C86A1A" if not big else "#C8301A", pupil="#1A0A04", skin=FUR, iris_light="#FFB050", grid=["IW", "PI"] if not big else ["DLL", "WPI"])
-    m.bone("mark", "head", S([0, hy + 4, -10.52]), [Cube(S([-0.8, hy + 3.2, -10.53]), [round(1.6 * s), round(1.8 * s), 0], glow_patch("#FF9A3A", "flame"))])
-    m.pair("ear_right", "head", S([-1.8, hy + 4.4, -8]), [Cube(S([-4.2, hy + 4.2, -8]), [round(4.4 * s), round(7.5 * s), 0], ear)], rotation=[-6, 10, -16])
+           [Cube(S([-1.4, hy, -12.6]), [n(2.8 * s), n(2.2 * s), n(2.2 * s)], muzzle)], rotation=[12, 0, 0])
+    m.bone("jaw", "head", S([0, hy + 0.6, -9.5]), [Cube(S([-1.2, hy - 0.4, -12.2]), [n(2.4 * s), 1, n(2.6 * s)], jaw_m)])
+    # Big glossy eyes: a dark lash line over them, a bright catch-light, the iris paler below the pupil.
+    m.eyes("head", x_inner=0.7 * s, y=(hy + 1.6) * s, z=-10.5 * s, w=2, h=3, iris="#B85A14" if not big else "#C8301A", pupil="#1A0A04", skin=FUR,
+           iris_light="#FFB050" if not big else "#FF7A4A", grid=["LL", "PW", "JI"])
+    m.bone("mark", "head", S([0, hy + 4, -10.52]), [Cube(S([-0.8, hy + 3.4, -10.53]), [n(1.6 * s), n(1.4 * s), 0], glow_patch("#FF9A3A", "flame"))])
+    m.pair("ear_right", "head", S([-1.8, hy + 4.4, -8]), [Cube(S([-4.2, hy + 4.2, -8]), [n(4.4 * s), n(7.5 * s), 0], ear)], rotation=[-6, 10, -16])
     stout_legs(m, 2.0 * s, (-3.6 * s, 3.6 * s), round(top * s), round(2 * s), legm, claw, 2, sharp=True, claw_len=1)
-    n_seg = 4 if not big else 5
-    segs = [((3.2 - i * 0.3) * s, (3.2 - i * 0.3) * s, 3 * s) for i in range(n_seg)]
-    names, zt = tail_bones(m, "body", (top + 3.4) * s, 4.6 * s, segs, tailm, (12, 6, -2, -8, -8)[:n_seg])
-    tip = next(b for b in m.bones if b.name == names[-1])
-    tip.cubes += flame([0, tip.pivot[1] + 0.5 * s, zt - 1.2 * s], round(4.5 * s), round(7 * s), smoke=big)
-    if big:
-        neck = next(b for b in m.bones if b.name == "neck")
+    if not big:
+        segs = [((3.2 - i * 0.3) * s, (3.2 - i * 0.3) * s, 3 * s) for i in range(4)]
+        names, zt = tail_bones(m, "body", (top + 3.4) * s, 4.6 * s, segs, tailm, (12, 6, -2, -8))
+        tip = bone_of(m, names[-1])
+        tip.cubes += flame([0, tip.pivot[1] + 0.5 * s, zt - 1.2 * s], round(4.5 * s), round(7 * s))
+        tails = []
+    else:
+        neck = bone_of(m, "neck")
         for i, a in enumerate((-60, -25, 25, 60)):
             neck.cubes += flame([math.sin(math.radians(a)) * 2.6 * s, (hy + 1.6) * s, (-5 + math.cos(math.radians(a)) * 0.8) * s], round(2.6 * s), round(4 * s))
+        # Five tails fanned out like the sun's rays: the middle one up the back, two either side spread wide.
+        tails = []
+        y0, z0 = (top + 3.6) * s, 4.4 * s
+        for j, (yaw, lift) in enumerate(((0, 22), (-30, 14), (30, 14), (-58, 4), (58, 4))):
+            prev, z = "body", z0
+            names = []
+            for i in range(4):
+                w = (2.6 - i * 0.35) * s
+                nm = f"tail_{j}_{i}"
+                cubes = [Cube([-w / 2, y0 - w / 2, z - 0.3], [n(w), n(w), n(2.8 * s + 0.3)], tailm if i < 3 else tipm)]
+                rot = [lift if i == 0 else (6 if i == 1 else -6), yaw if i == 0 else 0, 0]
+                m.bone(nm, prev, [0, y0, z], cubes, rotation=rot)
+                names.append(nm)
+                prev, z = nm, z + 2.8 * s
+            bone_of(m, names[-1]).cubes += flame([0, y0 + 0.4 * s, z - 0.8 * s], round(3.4 * s), round(5.6 * s))
+            tails.append(names)
     fx_for(m, 0.8 * s)
     moves(m, "QUICK ATTACK", "EMBER" if not big else "FIRE SPIN")
-    A, info = four_legs(name.lower(), m, walk=0.55 if not big else 0.7, stride=32, k=0.7 * s)
+    sway = {}
+    for j, names in enumerate(tails):
+        for i, nm in enumerate(names):
+            sway[nm] = track(rotation=[wave(2.2, 4 + i * 2, i * 50 + j * 40), wave(1.6, 6 + i * 3, i * 45 + j * 70), 0])
+    A, info = four_legs(name.lower(), m, walk=0.55 if not big else 0.7, stride=32, k=0.7 * s,
+                        extras={"idle": sway, "battle": sway, "walk": sway} if tails else None)
     write(sid, name, m, A, info, stands)
 
 
@@ -767,49 +844,59 @@ def solfennec():
 # ======================================================================================================
 
 def chinchilla(sid, name, stands, big):
-    """A singing chinchilla: a round ball of the softest pale pink-cream fur, big round ears, a curl of a forelock,
-    round blue eyes, tiny hands and feet, and a little curled tail. It puffs itself up to sing. Grown, it's pear-shaped
-    and lush, a thick ruff at its throat, long soft ears drooping down its back, longer feet."""
+    """A singing chinchilla: a round ball of the softest silvery pink fur, enormous round ears pink inside, long
+    whiskers, big glossy dark eyes, a curl of a forelock, tiny hands held to its chest, and a great bushy tail curled
+    up its back. It puffs itself up to sing. Grown, pear-shaped and lush, a thick ruff at its throat, long soft ears
+    drooping down its back, longer feet, and a still bigger plume of a tail."""
     m = Model()
     s = 1.0 if not big else 1.7
     S = lambda v: [x * s for x in v]
-    FUR, FUR_L, FUR_D, BELLY = "#F4D8E0", "#FFF0F4", "#D0A8B8", "#FFF8F4"
+    FUR, FUR_L, FUR_D, BELLY = "#E8CCD8", "#FFF0F6", "#A88A9C", "#FFF6F2"
     furm = Mat(FUR, fur(FUR, FUR_L, FUR_D, belly=BELLY, below=2.5 * s, speck=0.6), noise=0.03)
-    ear = ear_mat(FUR, "#F8B8C8", "round")
-    longear = ear_mat(FUR, "#F8B8C8", "rabbit")
+    ear = ear_mat(FUR, "#F8A8C0", "round")
+    longear = ear_mat(FUR, "#F8A8C0", "rabbit")
     jaw_m = Mat(BELLY, open_mouth("#C84A6A", "#F0D0D8"), noise=0.02)
-    nose = Mat("#E8889A", noise=0.0, edge=0)
+    nose = Mat("#E8789A", noise=0.0, edge=0)
     paw = Mat(BELLY, lambda a: rgb("#F2B8C8") if a.face == "bottom" else None, noise=0.02)
     claw = Mat("#B08898", noise=0.0, edge=0)
+    plume = Mat(FUR_L, brush(FUR, FUR_L, FUR_D, tip="#FFFFFF", tip_from=0.75), noise=0.0, edge=0)
     m.bone("root", None, [0, 0, 0])
     if not big:
-        m.bone("body", "root", S([0, 4, 0]), blob(S([-4.5, 1.2, -4]), S([9, 5, 8]), furm))
-        m.bone("head", "body", S([0, 6, 0]), blob(S([-4.5, 5.8, -4.5]), S([9, 4.6, 9]), furm) +
-               [Cube(S([-0.6, 7.4, -4.8]), [max(1, round(1.2 * s)), 1, 1], nose)])
-        hy, hz, eh = 7.8, -4.5, 5
+        m.bone("body", "root", S([0, 4, 0]), blob(S([-4.5, 1.2, -4]), S([9, 5, 8]), furm, b=2) + [Cube(S([-3, 1.6, -4.3]), [n(6 * s), n(4 * s), 1], Mat(BELLY, noise=0.03))])
+        m.bone("head", "body", S([0, 6, 0]), blob(S([-4.5, 5.8, -4.5]), S([9, 5, 9]), furm, b=2) +
+               [Cube(S([-0.6, 7.4, -4.8]), [n(1.2 * s), 1, 1], nose)])
+        hy, hz, eh = 7.8, -4.5, 7
     else:
-        m.bone("body", "root", S([0, 5, 0]), blob(S([-5, 1.5, -4.5]), S([10, 7, 9]), furm))
-        m.bone("head", "body", S([0, 9, -0.5]), blob(S([-4, 8.4, -4.5]), S([8, 5.6, 8]), furm) +
-               [Cube(S([-0.6, 10.4, -4.8]), [max(1, round(1.2 * s)), 1, 1], nose)])
-        m.bones[next(i for i, b in enumerate(m.bones) if b.name == "body")].cubes += [
-            Cube(S([-4.6, 7.4, -4.8]), [round(9.2 * s), round(2.4 * s), round(2 * s)], Mat(FUR_L, noise=0.04, edge=0))]
+        m.bone("body", "root", S([0, 5, 0]), blob(S([-5, 1.5, -4.5]), S([10, 7, 9]), furm, b=2) + [Cube(S([-3.4, 2, -4.8]), [n(6.8 * s), n(5 * s), 1], Mat(BELLY, noise=0.03))])
+        m.bone("head", "body", S([0, 9, -0.5]), blob(S([-4, 8.4, -4.5]), S([8, 5.6, 8]), furm, b=2) +
+               [Cube(S([-0.6, 10.4, -4.8]), [n(1.2 * s), 1, 1], nose)])
+        bone_of(m, "body").cubes += [Cube(S([-4.6, 7.4, -4.8]), [n(9.2 * s), n(2.4 * s), n(2 * s)], Mat(FUR_L, noise=0.04, edge=0))]
         hy, hz, eh = 10.8, -4.5, 10
-    m.bone("jaw", "head", S([0, hy - 1.4, hz + 1]), [Cube(S([-1, hy - 1.9, hz - 0.4]), [round(2 * s), 1, round(1.6 * s)], jaw_m)])
+    m.bone("jaw", "head", S([0, hy - 1.4, hz + 1]), [Cube(S([-1, hy - 1.9, hz - 0.4]), [n(2 * s), 1, n(1.6 * s)], jaw_m)])
     m.bone("snout", "head", S([0, hy - 0.4, hz]), [])
-    m.eyes("head", x_inner=1.0 * s, y=hy * s, z=hz * s, w=3, h=2, iris="#3A7AC8", pupil="#0A1424", skin=FUR, iris_light="#8AC0F0", grid=["WPI", "PJE"])
-    m.bone("curl", "head", S([0, hy + 2.6, hz + 1]), [Cube(S([-1, hy + 2.4, hz + 0.2]), [round(2 * s), round(2 * s), round(2 * s)], furm),
-                                                     Cube(S([-0.6, hy + 3.6, hz - 0.8]), [round(1.6 * s), round(1.6 * s), round(1.6 * s)], furm, [-30, 0, 0], S([0, hy + 4, hz])),
+    m.pair("whiskers_right", "head", S([-1.2, hy - 0.6, hz]), [Cube(S([-6.6, hy - 0.6, hz - 1.2]), [n(5.4 * s), 0, n(2.4 * s)], whisker_mat("#F8F0F4"))])
+    m.eyes("head", x_inner=1.0 * s, y=hy * s, z=hz * s, w=2, h=2, iris="#2A1A24", pupil="#0A0608", skin=FUR, iris_light="#6A4A5A", grid=["PW", "KP"])
+    m.bone("curl", "head", S([0, hy + 2.6, hz + 1]), [Cube(S([-1, hy + 2.4, hz + 0.2]), [n(2 * s), n(2 * s), n(2 * s)], furm),
+                                                     Cube(S([-0.6, hy + 3.6, hz - 0.8]), [n(1.6 * s), n(1.6 * s), n(1.6 * s)], furm, [-30, 0, 0], S([0, hy + 4, hz])),
                                                      Cube(S([-0.4, hy + 3.4, hz - 1.6]), [1, 1, 1], furm)])
     if not big:
-        m.pair("ear_right", "head", S([-3, hy + 2.6, -1]), [Cube(S([-5.6, hy + 2.2, -1]), [round(5 * s), round(eh * s), 0], ear)], rotation=[-5, 15, -20])
+        m.pair("ear_right", "head", S([-3, hy + 2.6, -1]), [Cube(S([-7.4, hy + 1.8, -1]), [n(7 * s), n(eh * s), 0], ear)], rotation=[-5, 15, -22])
     else:
-        m.pair("ear_right", "head", S([-3, hy + 2.6, 0]), [Cube(S([-4.6, hy + 2.6 - eh, 0]), [round(3.6 * s), round(eh * s), 0], longear)],
+        m.pair("ear_right", "head", S([-3, hy + 2.6, 0]), [Cube(S([-4.6, hy + 2.6 - eh, 0]), [n(3.6 * s), n(eh * s), 0], longear)],
                rotation=[30, 20, -18])
-    m.pair("arm_right", "body", S([-4.2, 4.6, -2.5]), [Cube(S([-5.2, 2.6, -3]), [round(1.6 * s), round(2.4 * s), round(1.6 * s)], furm)])
-    m.pair("leg_right", "body", S([-2.4, 2, 0]), [Cube(S([-3.4, 0.8, -1]), [round(2 * s), round(1.6 * s), round(2 * s)], furm)])
-    m.pair("foot_right", "leg_right", S([-2.4, 0.8, 0]), [Cube(S([-3.5, 0, -2.6 if big else -2]), [round(2.2 * s), 1, round((3.6 if big else 2.6) * s)], paw)] +
+    m.pair("arm_right", "body", S([-3.6, 4.6, -3]), [Cube(S([-4.4, 2.8, -4.2]), [n(1.6 * s), n(2.2 * s), n(1.6 * s)], furm),
+                                                    Cube(S([-4.2, 2.6, -4.6]), [n(1.4 * s), 1, n(1.2 * s)], paw)], rotation=[-30, 0, -20])
+    m.pair("leg_right", "body", S([-2.4, 2, 0]), [Cube(S([-3.4, 0.8, -1]), [n(2 * s), n(1.6 * s), n(2 * s)], furm)])
+    m.pair("foot_right", "leg_right", S([-2.4, 0.8, 0]), [Cube(S([-3.5, 0, -2.6 if big else -2]), [n(2.2 * s), 1, n((3.6 if big else 2.6) * s)], paw)] +
            [Cube(S([-3.4 + i * 0.8, 0, -2.6 - (0.8 if big else 0)]), [1, 1, 1], claw) for i in range(2)])
-    names, zt = tail_bones(m, "body", 3 * s, 3.8 * s, [(2 * s, 2 * s, 1.6 * s), (1.6 * s, 1.6 * s, 1.6 * s), (1.2 * s, 1.2 * s, 1.4 * s)], furm, (50, 40, 40))
+    # The bushy tail: a plume of long fur in three joints, curled up the back.
+    pl = (5 if not big else 6) * s
+    names, zt = tail_bones(m, "body", 3 * s, 3.8 * s, [(1.6 * s, 1.6 * s, 2 * s), (1.4 * s, 1.4 * s, 2 * s), (1.2 * s, 1.2 * s, 2 * s)], furm, (55, 40, 40))
+    for i, nm in enumerate(names):
+        b = bone_of(m, nm)
+        y, z = b.pivot[1], b.pivot[2]
+        w = n(pl * (0.8 + i * 0.25))
+        b.cubes += [Cube([-w / 2, y, z - 0.5], [w, 0, n(2.6 * s)], plume), Cube([0, y - w / 2, z - 0.5], [0, w, n(2.6 * s)], plume)]
     fx_for(m, 0.8 * s)
     moves(m, "POUND" if not big else "DOUBLESLAP", "SING")
     A, info = hopper(name.lower(), m, hop=0.42, height=1.6 * s, k=0.7 * s, extras={
@@ -864,11 +951,12 @@ def bat(sid, name, stands, big):
     m.eyes("head", x_inner=0.7 * s, y=11.3 * s, z=-6 * s, w=2, h=2, iris="#1A1420" if not big else "#E0303A", pupil="#06040A", skin=FUR,
            iris_light="#FF8080", grid=["PW", "PP"] if not big else ["IW", "PI"])
     m.pair("ear_right", "head", S([-1.4, 13.4, -4]), [Cube(S([-3.4, 13.2, -4]), [round(3.6 * s), round(5.5 * s), 0], ear)], rotation=[-5, 10, -12])
-    dragon_wing(m, 2.4 * s, 11.6 * s, -2 * s, 6 * s, (3 * s, 4 * s, 1.5 * s, 7.5 * s), bonem, mems, thick=1 if not big else 1.5, claw=claw)
+    dragon_wing(m, 2.4 * s, 11.6 * s, -2 * s, 6 * s, (3 * s, 4 * s, 1.5 * s, 7.5 * s), bonem, mems, thick=1 if not big else 1.5, claw=claw,
+                under="#B89AD8" if not big else "#A85A78")
     legs_pair(m, "leg_right", "body", 1.2 * s, 7.8 * s, 1.5 * s, round(2 * s), bonem, claw)
     fx_for(m, 0.7 * s)
     moves(m, "LEECH LIFE" if not big else "WING ATTACK", "SUPERSONIC" if not big else "CONFUSE RAY")
-    A, info = flyer(name.lower(), m, flap=0.3 if not big else 0.42, amp=48, rest=12, k=0.7 * s, legs=("leg_right", "leg_left"))
+    A, info = flyer(name.lower(), m, flap=0.36 if not big else 0.62, amp=32, rest=66 if not big else 70, k=0.7 * s, legs=("leg_right", "leg_left"))
     write(sid, name, m, A, info, stands)
 
 
@@ -905,49 +993,58 @@ def petal_mat(base, light, vein, spot=None):
 
 
 def tuber(sid, name, stands, stage):
-    """A walking tuber: a round indigo root with a face, waddling on little root feet. The first wears a crown of five
-    broad leaves; the next a drooping, half-open bud of dark petals dripping glowing nectar, its eyes sleepy; the last a
-    great five-petalled flower spread over its head, violet with orange veins and pale spots round a dark central pit."""
+    """A walking tuber: a round indigo root with a face, walking on two short root legs. The first wears a crown of five
+    broad leaves; the next a drooping, half-open bud of dark petals dripping glowing nectar, its eyes sleepy, little
+    leafy arms at its sides; the last a great five-petalled flower spread over its head, violet with orange veins and pale
+    spots round a dark central pit, and leafy arms it holds out."""
     m = Model()
-    s = (1.0, 1.15, 1.35)[stage]
+    s = (1.0, 1.35, 1.55)[stage]
     S = lambda v: [x * s for x in v]
     TB, TBL, TBD = "#5A6AC8", "#8A9AE8", "#2E3A8A"
-    body = Mat(TB, lambda a: mix(TBD, TB, 0.4 + 0.6 * a.ly) if a.face != "top" else mix(TB, TBL, 0.5), noise=0.025)
+    body = Mat(TB, fur(TB, TBL, TBD, speck=0.3), noise=0.02)
     jaw_m = Mat(TBD, open_mouth("#6A2A4A", TB), noise=0.02)
-    root = Mat("#C8B890", lambda a: rgb("#8A7A5A") if a.face == "bottom" else None, noise=0.02, edge=0)
+    rootm = Mat("#C8B890", lambda a: rgb("#8A7A5A") if a.face == "bottom" else (rgb("#A8987A") if a.row % 2 else None), noise=0.02)
+    toe = Mat("#8A7A5A", noise=0, edge=0)
     m.bone("root", None, [0, 0, 0])
-    m.bone("body", "root", S([0, 4.5, 0]), blob(S([-4, 1.4, -4]), S([8, 7, 8]), body, b=2))
-    m.bone("head", "body", S([0, 8, 0]), [Cube(S([-2, 8.2, -2]), [round(4 * s), round(1.5 * s), round(4 * s)], Mat("#3E8A3A", noise=0.02))])
-    hd = m.bones[-1]
+    hip = 3
+    m.bone("body", "root", S([0, hip + 3, 0]), blob(S([-4, hip - 0.6, -4]), S([8, 7, 8]), body, b=2))
+    m.bone("head", "body", S([0, hip + 6.5, 0]), [Cube(S([-2, hip + 6.2, -2]), [n(4 * s), n(1.5 * s), n(4 * s)], Mat("#3E8A3A", noise=0.02))])
+    hd = bone_of(m, "head")
+    ty = hip + 7.4
     if stage == 0:
         lf = leaf_mat("#7AD060", "#2E7A30", "#C8F0A0", "z")
         for a in (0, 72, 144, 216, 288):
-            hd.cubes.append(Cube(S([-2.5, 9.4, 0]), [round(5 * s), 0, round(10 * s)], lf, [52, a, 0], S([0, 9.4, 0])))
+            hd.cubes.append(Cube(S([-2.5, ty, 0]), [n(5 * s), 0, n(10 * s)], lf, [52, a, 0], S([0, ty, 0])))
     elif stage == 1:
         pm = petal_mat("#A8382A", "#E87A4A", "#6A1A14")
         for a in (0, 72, 144, 216, 288):
-            hd.cubes.append(Cube(S([-2.5, 9.4, 0]), [round(5 * s), 0, round(7 * s)], pm, [68, a, 0], S([0, 9.4, 0])))
-            hd.cubes.append(Cube(S([-2, 9.6, 0]), [round(4 * s), 0, round(5 * s)], leaf_mat("#5AA848", "#2A6A2A", "#A8E080", "z"), [10, a + 36, 0], S([0, 9.4, 0])))
+            hd.cubes.append(Cube(S([-2.5, ty, 0]), [n(5 * s), 0, n(7 * s)], pm, [68, a, 0], S([0, ty, 0])))
+            hd.cubes.append(Cube(S([-2, ty + 0.2, 0]), [n(4 * s), 0, n(5 * s)], leaf_mat("#5AA848", "#2A6A2A", "#A8E080", "z"), [10, a + 36, 0], S([0, ty, 0])))
         drop = Mat("#E8FF8A", lambda a: CLEAR if (a.lx - 0.5) ** 2 + (a.ly - 0.45) ** 2 > 0.2 else None,
                    glow=lambda a: rgb("#E8FF8A") if (a.lx - 0.5) ** 2 + (a.ly - 0.45) ** 2 < 0.2 else None, noise=0, edge=0, flat=True)
-        # A drop of glowing nectar hanging from the tip of the bud.
-        m.bone("drip", "head", S([0, 16, 0]), [Cube(S([-0.8, 15.6, 0]), [round(1.6 * s), round(2.2 * s), 0], drop),
-                                               Cube(S([0, 15.6, -0.8]), [0, round(2.2 * s), round(1.6 * s)], drop)])
+        m.bone("drip", "head", S([0, ty + 6.2, 0]), [Cube(S([-0.8, ty + 5.8, 0]), [n(1.6 * s), n(2.2 * s), 0], drop),
+                                                     Cube(S([0, ty + 5.8, -0.8]), [0, n(2.2 * s), n(1.6 * s)], drop)])
     else:
         pm = petal_mat("#8A3AC8", "#E8B8FF", "#F08A2A", spot="#F4E0FF")
         for a in (0, 72, 144, 216, 288):
-            hd.cubes.append(Cube(S([-6, 10, 1.5]), [round(12 * s), 0, round(13 * s)], pm, [-8, a, 0], S([0, 10, 0])))
-        hd.cubes += [Cube(S([-2.4, 9.8, -2.4]), [round(4.8 * s), round(1.6 * s), round(4.8 * s)], Mat("#2A1A2E", noise=0.02)),
-                     Cube(S([-1.6, 11.2, -1.6]), [round(3.2 * s), 1, round(3.2 * s)], Mat("#F0A040", noise=0.02, edge=0))]
-    m.bone("jaw", "head", S([0, 4.4, -3.5]), [Cube(S([-1.2, 3.8, -4.1]), [round(2.4 * s), 1, round(1.4 * s)], jaw_m)])
-    m.bone("snout", "head", S([0, 5.5, -4]), [])
-    m.eyes("head", x_inner=0.9 * s, y=5.6 * s, z=-4 * s, w=2, h=2, iris="#C83A3A" if stage < 2 else "#E8A030", pupil="#1A0606", skin=TB,
-           grid=["PW", "PP"] if stage == 0 else (["LL", "PW"] if stage == 1 else ["IW", "PI"]))
-    m.pair("leg_right", "body", S([-2, 1.6, 0]), [Cube(S([-3, 0.9, -1]), [round(2 * s), round(1.2 * s), round(2 * s)], root)])
-    m.pair("foot_right", "leg_right", S([-2, 0.6, 0]), [Cube(S([-3.2, 0, -1.6]), [round(2.4 * s), 1, round(2.6 * s)], root)])
+            hd.cubes.append(Cube(S([-6, ty + 0.6, 1.5]), [n(12 * s), 0, n(13 * s)], pm, [-8, a, 0], S([0, ty + 0.6, 0])))
+        hd.cubes += [Cube(S([-2.4, ty + 0.4, -2.4]), [n(4.8 * s), n(1.6 * s), n(4.8 * s)], Mat("#2A1A2E", noise=0.02)),
+                     Cube(S([-1.6, ty + 1.8, -1.6]), [n(3.2 * s), 1, n(3.2 * s)], Mat("#F0A040", noise=0.02, edge=0))]
+    m.bone("jaw", "body", S([0, hip + 1.2, -3.6]), [Cube(S([-1.2, hip + 0.6, -4.2]), [n(2.4 * s), 1, n(1.4 * s)], jaw_m)])
+    m.bone("face", "body", S([0, hip + 3, -4]), [])
+    # Eyes: tall glossy ovals, set well apart, a catch-light in each.
+    m.eyes("body", x_inner=1.0 * s, y=(hip + 2.0) * s, z=-4 * s, w=2, h=3, iris="#E04A4A" if stage < 2 else "#E8A030", pupil="#1A0606", skin=TB,
+           iris_light="#FF9A8A", grid=["PW", "PP", "KI"] if stage == 0 else (["LL", "PW", "KI"] if stage == 1 else ["LL", "PW", "II"]))
+    if stage:
+        lf2 = leaf_mat("#6AC050", "#2A6A2A", "#B8E890", base_end=1)
+        m.pair("arm_right", "body", S([-3.8, hip + 3.6, -0.5]), [Cube(S([-4.8, hip + 1.6, -1]), [n(1.4 * s), n(2.4 * s), n(1.4 * s)], body)],
+               rotation=[0, 0, 24])
+        m.pair("forearm_right", "arm_right", S([-4.2, hip + 1.8, -0.5]), [Cube(S([-6, hip - 2.4, -0.5]), [n(3.2 * s), n(4.4 * s), 0], lf2)], rotation=[-10, 0, 10])
+    upright_legs(m, 2.0 * s, hip * s, 0.2 * s, n(2 * s), rootm, rootm, n(3 * s), toe_m=toe, ntoes=3, thigh_w=n(2.4 * s))
     fx_for(m, 0.8 * s)
     moves(m, ("ABSORB", "ACID", "ACID")[stage], ("POISONPOWDER", "SLEEP POWDER", "PETAL DANCE")[stage])
-    A, info = hopper(name.lower(), m, hop=0.4, height=1.0 * s, k=0.6 * s, extras={"drip": {} if stage != 1 else {}})
+    A, info = biped(name.lower(), m, walk=0.5 + 0.08 * stage, stride=34, k=0.6 * s, guard=10 if stage else 0,
+                    extras={"idle": {"head": track(rotation=[wave(2.4, 4), wave(3.2, 6), wave(2.4, 4, 90)])}})
     write(sid, name, m, A, info, stands)
 
 
@@ -956,11 +1053,11 @@ def tuberlet():
 
 
 def droopbud():
-    tuber("gloom", "DROOPBUD", 1.0, 1)
+    tuber("gloom", "DROOPBUD", 1.25, 1)
 
 
 def rafflora():
-    tuber("vileplume", "RAFFLORA", 1.35, 2)
+    tuber("vileplume", "RAFFLORA", 1.6, 2)
 
 
 # ======================================================================================================
@@ -991,8 +1088,8 @@ def crab(sid, name, stands, big):
     m.bone("jaw", "head", S([0, 2.6, -4]), [Cube(S([-1, 2.0, -4.8]), [round(2 * s), 1, 1], jaw_m)])
     stalk = Mat(CRD, noise=0.0, edge=0)
     m.pair("antenna_right", "head", S([-1.2, 4.8, -4]), [Cube(S([-1.6, 4.8, -4.4]), [1, round(1.8 * s), 1], stalk)], rotation=[-15, 0, -10])
-    m.eyes("head", x_inner=0.6 * s, y=3.4 * s, z=-4.4 * s, w=2, h=2, iris="#0A0A0A" if not big else "#E8F4E0", pupil="#000000" if not big else "#A8C8A0",
-           skin=CR, grid=["PW", "PP"] if not big else ["WI", "II"])
+    m.eyes("head", x_inner=0.6 * s, y=3.4 * s, z=-4.4 * s, w=2, h=2, iris="#F4F0E8" if not big else "#E8F4E0", pupil="#C8C0B8" if not big else "#A8C8A0",
+           skin=CR, grid=["WI", "II"])
     m.pair("arm_right", "body", S([-2.6, 3.4, -3]), [Cube(S([-4.4, 2.8, -4.6]), [round(1.6 * s), round(1.4 * s), round(2.2 * s)], shell),
                                                     Cube(S([-4.8, 2.2, -7.2]), [round(2.2 * s), round(1.6 * s), round(2.8 * s)], shell),
                                                     Cube(S([-4.6, 3.8, -7.0]), [round(1.6 * s), 1, round(2.4 * s)], shell, [-14, 0, 0], S([-4, 3.8, -4.8]))],
@@ -1006,8 +1103,17 @@ def crab(sid, name, stands, big):
         m.bone("shell", "body", S([0, 5, 1]), blob(S([-4.5, 5, -3]), S([9, 2, 9]), cap, b=2) + blob(S([-3.6, 7, -2.1]), S([7.2, 1.6, 7.2]), cap) +
                [Cube(S([-2.4, 8.6, -0.9]), [round(4.8 * s), 1, round(4.8 * s)], cap), Cube(S([-1.2, 4.6, 0.3]), [round(2.4 * s), 1, round(2.4 * s)], Mat("#F0E4C8", noise=0.02))])
     else:
-        bracket = Mat("#C8903A", lambda a: rgb("#F4E0B0") if a.face != "bottom" and (a.cube.origin[1] + a.cube.size[1]) - a.y < 0.6 else
-                      (rgb("#E8D8B8") if a.face == "bottom" else mix("#8A5A1E", "#C8903A", a.ly)), noise=0.025)
+        def bracket_p(a):
+            # A shelf of bracket fungus: velvety growth bands round from its root (dark) to its pale rim, pores beneath.
+            if a.face == "bottom":
+                return rgb("#E8D8B8") if hash01("pore", round(a.x * 2), round(a.z * 2)) > 0.18 else rgb("#B8A07A")
+            c = a.cube
+            if a.face != "top" and (c.origin[1] + c.size[1]) - a.y < 0.5:
+                return rgb("#F8E8C0")
+            r = math.hypot(a.x / s, (a.z / s) - 1) if a.face == "top" else (c.origin[1] + c.size[1] - a.y) / s * 2
+            band = ramp(["#5A3A14", "#8A5A1E", "#C8903A", "#E0B060", "#B87A2A", "#F0D8A0"], (r * 0.22) % 1.0)
+            return mix(band, "#000000", 0.12 * hash01("vel", round(a.x * 2), round(a.y * 2), round(a.z * 2)))
+        bracket = Mat("#C8903A", bracket_p, noise=0.02)
         m.bone("shell", "body", S([0, 5, 1]), blob(S([-6, 5, -3.5]), S([12, 2, 10]), bracket) + blob(S([-5, 7, -2.5]), S([10, 2, 8]), bracket) +
                blob(S([-3.5, 9, -1.5]), S([7, 2, 6]), bracket) + [Cube(S([-1, 11, 0]), [round(2 * s), round(1.2 * s), round(2 * s)], bracket)])
     fx_for(m, 0.6 * s)
@@ -1100,55 +1206,70 @@ def toxilace():
 # ======================================================================================================
 
 def star_nose():
-    """A star nose on a flat part facing forward: pink fleshy rays round a small middle."""
+    """A star nose on a flat part facing forward: twenty-two pink fleshy rays round a small middle."""
     def inside(at):
         x, y = at.lx - 0.5, at.ly - 0.5
         r, th = math.hypot(x, y) * 2, math.atan2(y, x)
-        R = 0.35 + 0.6 * abs(math.cos(th * 5.5)) ** 2
+        R = 0.42 + 0.56 * abs(math.cos(th * 5.5)) ** 1.5
         return r < R
-    return Mat("#F08AA8", lambda a: (rgb("#FFC8D8") if math.hypot(a.lx - 0.5, a.ly - 0.5) < 0.18 else None) if inside(a) else CLEAR,
+    return Mat("#F07A9A", lambda a: (rgb("#FFD0DC") if math.hypot(a.lx - 0.5, a.ly - 0.5) < 0.16 else
+                                     (rgb("#C84A6A") if math.hypot(a.lx - 0.5, a.ly - 0.5) > 0.4 else None)) if inside(a) else CLEAR,
                noise=0.01, edge=0, flat=True)
 
 
 def mole(m, suffix, x, z, s, velvet, face, nose, claw_m, paw, main):
+    """A star-nosed mole poking up out of the mound: its velvet body, a round head, the big pink star of a nose on the
+    end of a short snout, tiny eyes, and its great pink shovel paws turned out over the mound's rim, long claws on each."""
     b, h = "body" + suffix, "head" + suffix
-    m.bone(b, "mound", [x, 3 * s, z], blob([x - 2.4 * s, 1.5 * s, z - 2.4 * s], [round(4.8 * s), round(6 * s), round(4.8 * s)], velvet))
-    m.bone(h, b, [x, 6.5 * s, z - 1 * s], face_blob([x - 2.3 * s, 5.2 * s, z - 3.2 * s], [round(4.6 * s), round(3.4 * s), round(2 * s)], face) +
-           [Cube([x - 1.6 * s, 5.6 * s, z - 3.3 * s], [round(3.2 * s), round(3.2 * s), 0], nose)])
+    m.bone(b, "mound", [x, 3 * s, z], blob([x - 2.6 * s, 1.5 * s, z - 2.6 * s], [n(5.2 * s), n(6.5 * s), n(5.2 * s)], velvet, b=2))
+    m.bone(h, b, [x, 7 * s, z - 1 * s], face_blob([x - 2.5 * s, 5.4 * s, z - 3.4 * s], [n(5 * s), n(3.6 * s), n(2.4 * s)], face) +
+           [Cube([x - 1.2 * s, 5.8 * s, z - 4.6 * s], [n(2.4 * s), n(2 * s), n(1.4 * s)], face),
+            Cube([x - 2.4 * s, 4.6 * s, z - 4.68 * s], [n(4.8 * s), n(4.8 * s), 0], nose)])
     if not main:
-        m.bones[-1].cubes += [Cube([x - 1.6 * s, 7.6 * s, z - 3.25 * s], [1, 1, 0], Mat("#0A0A0A", noise=0, edge=0)),
-                              Cube([x + 0.6 * s, 7.6 * s, z - 3.25 * s], [1, 1, 0], Mat("#0A0A0A", noise=0, edge=0))]
+        bone_of(m, h).cubes += [Cube([x - 1.8 * s, 8.0 * s, z - 3.45 * s], [1, 1, 0], Mat("#0A0A0A", noise=0, edge=0)),
+                                Cube([x + 0.8 * s, 8.0 * s, z - 3.45 * s], [1, 1, 0], Mat("#0A0A0A", noise=0, edge=0))]
+    bb = bone_of(m, b)
     for sx in (-1, 1):
-        m.bones[next(i for i, bb in enumerate(m.bones) if bb.name == b)].cubes += [
-            Cube([x + sx * 2.6 * s - 1, 2 * s, z - 2.8 * s], [2, 1.2, 2], paw)] + [
-            Cube([x + sx * 2.6 * s - 1 + i * 0.7, 2 * s, z - 3.4 * s], [0, 1.4, 1.6], claw_m) for i in range(3)]
+        px = x + sx * 3.0 * s
+        bb.cubes += [Cube([px - 1.5 * s, 2.2 * s, z - 3.6 * s], [n(3 * s), n(1.2 * s), n(2.6 * s)], paw, [0, sx * -20, sx * 30], [px, 2.6 * s, z - 2.4 * s])]
+        bb.cubes += [Cube([px - 1.3 * s + i * 0.9 * s, 2.0 * s, z - 5.6 * s], [0, n(1.6 * s), n(2.2 * s)], claw_m, [0, sx * -20, 0], [px, 2.6 * s, z - 2.4 * s])
+                     for i in range(3)]
 
 
 def burrow(sid, name, stands, trio):
-    """A star-nosed mole poking up out of its mound: dark velvet fur, a pink star of a nose, tiny eyes, broad pink
-    digging paws with long claws at the mound's edge. Three of them together in one big mound when grown."""
+    """A star-nosed mole poking up out of a lumpy mound of earth: dark brown velvet fur with a soft sheen, a big pink star
+    of a nose, tiny eyes, broad pink shovel paws with long pale claws turned out over the mound's rim, pebbles and tufts
+    of grass in the soil. Three of them together in one big mound when grown."""
     m = Model()
     s = 1.0 if not trio else 1.15
-    velvet = Mat("#4A4450", lambda a: mix("#2A2630", "#6A6474", a.ly) if a.face != "top" else rgb("#6A6474"), noise=0.03)
-    face = Mat("#4A4450", noise=0.03)
-    dirt = Mat("#8A6238", lambda a: rgb("#B08A5A") if a.face == "top" and hash01("dt", int(a.x), int(a.z)) < 0.3 else
-               (rgb("#5A3E22") if hash01("dp", int(a.x * 2), int(a.y * 2), int(a.z * 2)) < 0.15 else None), noise=0.04)
-    paw = Mat("#F2A8B8", noise=0.02, edge=0)
+    V, V_L, V_D = "#4A3E3A", "#7A6A62", "#241C1A"
+    velvet = Mat(V, fur(V, V_L, V_D, speck=0.25), noise=0.02)
+    face = Mat(V, fur(V, V_L, V_D, speck=0.1), noise=0.02)
+    soil = Mat("#8A6238", lambda a: rgb("#A88458") if a.face == "top" and hash01("dt", round(a.x * 2), round(a.z * 2)) < 0.25 else
+               (rgb("#5A3E22") if hash01("dp", round(a.x * 2), round(a.y * 2), round(a.z * 2)) < 0.14 else
+                (rgb("#B8B0A0") if hash01("pb", round(a.x), round(a.y), round(a.z)) < 0.04 else None)), noise=0.04)
+    grass = leaf_mat("#7AC050", "#3A7A28", "#B8E890")
+    paw = Mat("#F2A0B4", lambda a: rgb("#E07A94") if a.face == "bottom" else None, noise=0.02, edge=0)
     claw_m = sharp_claw_mat("#E8E0D0", "#FFFFFF")
     m.bone("root", None, [0, 0, 0])
-    w = 10 if not trio else 17
-    m.bone("mound", "root", [0, 0, 0], blob([-w / 2, 0, -w / 2 + 1], [w, 3, w - 2], dirt, b=2) +
-           [Cube([-w / 2 + 1, 2.5, -w / 2 + 2], [w - 2, 1.2, w - 4], dirt)])
+    w = 12 if not trio else 19
+    mound = blob([-w / 2, 0, -w / 2 + 1], [w, 2.5, w - 2], soil, b=2) + blob([-w / 2 + 1.5, 2, -w / 2 + 2.5], [w - 3, 1.6, w - 5], soil) + \
+        [Cube([-w / 2 + 2.5, 3.4, -w / 2 + 3.5], [w - 5, 0.8, w - 7], soil)]
+    for i in range(5 if not trio else 8):
+        a = i * 2.4 + 0.6
+        gx, gz = math.cos(a) * (w / 2 - 1.2), math.sin(a) * (w / 2 - 2) + 1
+        mound += [Cube([gx - 1, 1.5, gz], [2, 3, 0], grass), Cube([gx, 1.5, gz - 1], [0, 3, 2], grass)]
+    m.bone("mound", "root", [0, 0, 0], mound)
     if not trio:
         mole(m, "", 0, 0, s, velvet, face, star_nose(), claw_m, paw, True)
         bodies = ("body",)
     else:
         mole(m, "", 0, -1.5, s, velvet, face, star_nose(), claw_m, paw, True)
-        mole(m, "2", -4.6, 1.8, s * 0.9, velvet, face, star_nose(), claw_m, paw, False)
-        mole(m, "3", 4.6, 1.8, s * 0.9, velvet, face, star_nose(), claw_m, paw, False)
+        mole(m, "2", -5.4, 2.0, s * 0.88, velvet, face, star_nose(), claw_m, paw, False)
+        mole(m, "3", 5.4, 2.0, s * 0.88, velvet, face, star_nose(), claw_m, paw, False)
         bodies = ("body", "body2", "body3")
-    m.bone("jaw", "head", [0, 5.6 * s, -2.8 * s], [Cube([-1 * s, 5.0 * s, -3.4 * s], [round(2 * s), 1, 1], Mat("#2A2630", noise=0.01))])
-    m.eyes("head", x_inner=0.9 * s, y=7.6 * s, z=(-3.2 - (1.5 if trio else 0)) * s, w=1, h=1, iris="#0A0A0A", pupil="#000000", skin="#4A4450",
+    m.bone("jaw", "head", [0, 5.8 * s, -3.4 * s], [Cube([-1 * s, 5.0 * s, -4.4 * s], [n(2 * s), 1, 1], Mat("#2A2020", noise=0.01))])
+    m.eyes("head", x_inner=1.0 * s, y=8.0 * s, z=(-3.4 - (1.5 if trio else 0)) * s, w=1, h=1, iris="#0A0A0A", pupil="#000000", skin=V,
            grid=["P"], squint=False)
     fx_for(m, 0.6 * s)
     moves(m, "SCRATCH" if not trio else "SLASH", "MAGNITUDE" if not trio else "EARTHQUAKE")
@@ -2316,12 +2437,639 @@ def shellmander():
     salamander("slowbro", "SHELLMANDER", 1.6, True)
 
 
+def single_eye(m, bone, x0, y, z, w, h, iris, pupil, skin, grid, iris_light=None):
+    """One eye in the middle of a face (with its lid, so it blinks like a pair does)."""
+    em = eye_mat(w, h, iris, pupil, "#1A1414", "#FFFFFF", iris_light=iris_light, grid=grid, skin=skin)
+    m.bone("eye_right", bone, [x0 + w / 2, y + h, z], [Cube([x0, y, z - 0.01], [w, h, 0], em)])
+    lm = Mat(skin, noise=0.01, shade=0.2, edge=0)
+    m.bone("eyelid_right", "eye_right", [x0 + w / 2, y + h, z], [Cube([x0 - 0.02, y, z - 0.03], [w + 0.04, h, 0], lm)])
+
+
+def ghost_flame_mat():
+    """A ghost's flame: a flame's shape, burning blue and violet."""
+    def g(at, fi):
+        r = flame_shape(at, fi)
+        if r is None:
+            return None
+        c, a = r
+        return rgb([c[2], c[1] * 0.85, c[0]]), a
+    return Mat("#5A6AFF", lambda a: CLEAR, glow=g, frames=True, noise=0, edge=0)
+
+
+def bird_legs(m, x, hip, z, thigh, shank, w, thighm, legm, talon, toe_len=3, dagger=False):
+    """A bird's leg in joints: the feathered thigh to the knee, the bare scaly shank from there (bending back at the
+    ankle as it steps), and the foot: three toes splayed forward and one back, each with a hooked claw; (dagger) a long
+    straight claw on the inner toe."""
+    knee = hip - thigh
+    m.pair("leg_right", "body", [-x, hip, z], [Cube([-x - (w + 1) / 2, knee - 0.3, z - (w + 1) / 2], [n(w + 1), n(thigh + 0.6), n(w + 1)], thighm)])
+    sw = max(1, n(w * 0.6))
+    m.pair("shin_right", "leg_right", [-x, knee, z], [Cube([-x - sw / 2, 0.8, z - sw / 2], [sw, n(knee - 0.6), sw], legm)])
+    toes = []
+    for a in (-30, 0, 30):
+        sa, ca = math.sin(math.radians(a)), math.cos(math.radians(a))
+        tx, tz = -x + toe_len * sa, z - toe_len * ca
+        toes += [Cube([-x - 0.5, 0, z - toe_len], [1, 1, n(toe_len)], legm, [0, a, 0], [-x, 0.5, z]),
+                 Cube([tx - 0.5, 0, tz - 1.5], [1, 1, 2], talon, [30, a, 0], [tx, 1, tz])]
+    toes.append(Cube([-x - 0.5, 0, z], [1, 1, n(toe_len * 0.5)], legm))
+    if dagger:
+        a = -30
+        sa, ca = math.sin(math.radians(a)), math.cos(math.radians(a))
+        tx, tz = -x + toe_len * sa, z - toe_len * ca
+        toes.append(Cube([tx, 0, tz - 3.5], [0, 2, 3.5], sharp_claw_mat(), [0, a, 0], [tx, 0.5, tz]))
+    m.pair("foot_right", "shin_right", [-x, 1, z], toes)
+
+
+# ======================================================================================================
+# The bolt nuts: BOLTNUT > BOLTRIO (in place of Magnemite, Magneton)
+# ======================================================================================================
+
+
+def steel_mat(base, light, dark, rivet=None):
+    """Brushed steel: streaks of light along it, darker at the bottom, (rivet) rivets at the corners."""
+    B, Lt, Dk = rgb(base), rgb(light), rgb(dark)
+
+    def f(at):
+        k = 0.45 + 0.55 * at.ly if at.face not in ("top", "bottom") else (1.0 if at.face == "top" else 0.3)
+        c = mix(Dk, B, k)
+        if hash01("brush", round(at.y * 2), round((at.x + at.z) * 0.5)) < 0.18:
+            c = mix(c, Lt, 0.35)
+        if rivet and at.face in ("front", "back") and min(at.lx, 1 - at.lx) < 0.16 and min(at.ly, 1 - at.ly) < 0.16:
+            return rgb(rivet)
+        return c
+    return f
+
+
+def nut(m, bone, parent, cx, cy, cz, s, steel, ring, coil_m, tip_r, tip_b, eye_bone_name=None, main=True):
+    """One bolt nut: a six-sided steel nut facing forward, its hole the socket of one big eye, copper coils for ears
+    with a red and a blue tip crackling between them, a bolt through it."""
+    cubes = [Cube([cx - 4 * s, cy - 2.3 * s, cz - 2 * s], [n(8 * s), n(4.6 * s), n(4 * s)], steel, [0, 0, a], [cx, cy, cz]) for a in (0, 60, 120)]
+    cubes += [Cube([cx - 2.4 * s, cy - 2.4 * s, cz - 2.25 * s], [n(4.8 * s), n(4.8 * s), 0], ring)]
+    m.bone(bone, parent, [cx, cy, cz], cubes)
+    return bone
+
+
+def bolt_nut(sid, name, stands, trio):
+    """A living bolt nut that floats: a six-sided nut of brushed steel facing forward, one big eye looking out of its
+    hole, copper coil ears with a red tip and a blue tip crackling between them, a bolt through it with a screw thread
+    below and a hex head on top. Three together, linked by copper rods and arcs of light, when grown."""
+    m = Model()
+    s = 1.0
+    STEEL, STEEL_L, STEEL_D = "#9AA6B4", "#DDE6EE", "#5A6674"
+    steel = Mat(STEEL, steel_mat(STEEL, STEEL_L, STEEL_D), noise=0.02)
+    ring = Mat("#2A3038", lambda a: rgb("#14181E") if math.hypot(a.lx - 0.5, a.ly - 0.5) < 0.42 else CLEAR, noise=0, edge=0, flat=True)
+    coil = Mat("#C8743A", lambda a: rgb("#8A4A20") if a.row % 2 else rgb("#E8A060"), noise=0.01)
+    thread = Mat("#8A96A4", lambda a: rgb("#5A6674") if int(a.y * 2) % 2 else None, noise=0.01)
+    red = Mat("#E8402A", glow=lambda a: rgb("#FF6A4A"), noise=0, edge=0)
+    blue = Mat("#3A6AE8", glow=lambda a: rgb("#6A9AFF"), noise=0, edge=0)
+    arc = Mat("#FFF27A", lambda a: CLEAR, glow=lambda a: rgb("#FFF8A0") if abs(a.ly - 0.5 - 0.3 * math.sin(a.lx * 9)) < 0.18 else None, noise=0, edge=0, flat=True)
+    m.bone("root", None, [0, 0, 0])
+    y0 = 9
+    m.bone("body", "root", [0, y0, 0], [Cube([-1, y0 - 1, -1], [2, 2, 2], steel)])
+    units = [("head", 0.0, y0 + (4.5 if trio else 0), 0.0)] + ([("nut2_right", -5.0, y0 - 3, 0.5)] if trio else [])
+    for nm, cx, cy, cz in units:
+        par = "body"
+        nut(m, nm, par, cx, cy, cz, s, steel, ring, coil, red, blue)
+        b = bone_of(m, nm)
+        # The bolt: a hex head on top, a screw thread out the bottom.
+        b.cubes += [Cube([cx - 1.2, cy + 3.6, cz - 1.2], [3, 1.4, 3], steel), Cube([cx - 0.6, cy + 2.2, cz - 0.6], [1, 1.6, 1], thread),
+                    Cube([cx - 0.8, cy - 6.2, cz - 0.8], [2, 4, 2], thread)]
+        # Coil ears, crackling between their tips.
+        b.cubes += [Cube([cx - 6.4, cy - 1, cz - 1], [2.6, 2, 2], coil), Cube([cx - 7.2, cy - 1.2, cz - 1.2], [1, 2.4, 2.4], red),
+                    Cube([cx + 3.8, cy - 1, cz - 1], [2.6, 2, 2], coil), Cube([cx + 6.2, cy - 1.2, cz - 1.2], [1, 2.4, 2.4], blue)]
+    if trio:
+        b = bone_of(m, "nut2_right")
+        m.bone("nut2_left", "body", [5.0, y0 - 3, 0.5], [mirror_cube(c) for c in b.cubes])
+        # Copper rods between them, and arcs crackling along them.
+        rod = Mat("#B8642A", lambda a: rgb("#E8A060") if a.face == "top" else None, noise=0.01)
+        bone_of(m, "body").cubes += [Cube([-0.5, y0 - 2, 0], [1, 1, 1], rod)]
+        for sx in (-1, 1):
+            bone_of(m, "body").cubes += [Cube([sx * 2.5 - 0.5, y0 - 1.5, -0.5], [1, 6, 1], rod, [0, 0, sx * 40], [sx * 2.5, y0 + 1.5, 0]),
+                                          Cube([sx * 2.5 - 1.5, y0 - 1.5, -2.6], [3, 6, 0], arc, [0, 0, sx * 40], [sx * 2.5, y0 + 1.5, -2.6])]
+        bone_of(m, "body").cubes += [Cube([-4, y0 - 4, -0.5], [8, 1, 1], rod), Cube([-4, y0 - 5, -2.4], [8, 2.4, 0], arc)]
+        single_eye(m, "head", -1.5, y0 + 4.5 - 1.5, -2.27, 3, 3, "#E83A3A", "#1A0606", "#2A3038", None, "#FF8A6A")
+        for side, cx in (("2", -5.0), ("3", 5.0)):
+            em = eye_mat(3, 3, "#E83A3A", "#1A0606", "#1A1414", "#FFFFFF", iris_light="#FF8A6A", skin="#2A3038")
+            bone_of(m, "nut2_right" if cx < 0 else "nut2_left").cubes.append(Cube([cx - 1.5, y0 - 4.5, 0.5 - 2.27], [3, 3, 0], em))
+    else:
+        single_eye(m, "head", -1.5, y0 - 1.5, -2.27, 3, 3, "#3A3A44", "#0A0A10", "#2A3038", None, "#8A8A9A")
+    fx_for(m, 0.8 if not trio else 1.1)
+    moves(m, "TACKLE" if not trio else "SONICBOOM", "THUNDERSHOCK" if not trio else "ZAP CANNON")
+    ex = {"idle": {"head": track(rotation=[0, 0, wave(3, 14)])}, "battle": {"head": track(rotation=[0, 0, wave(1.2, 18)])}}
+    if trio:
+        for nm, ph in (("nut2_right", 120), ("nut2_left", 240)):
+            ex["idle"][nm] = track(rotation=[0, 0, wave(3, 14, ph)], position=[0, wave(2.4, 0.5, ph), 0])
+            ex["battle"][nm] = track(rotation=[0, 0, wave(1.2, 18, ph)], position=[0, wave(1.2, 0.6, ph), 0])
+    A, info = floater(name.lower(), m, k=0.7 if not trio else 1.0, bob=0.8, extras=ex)
+    write(sid, name, m, A, info, stands)
+
+
+def boltnut():
+    bolt_nut("magnemite", "BOLTNUT", 0.75, False)
+
+
+def boltrio():
+    bolt_nut("magneton", "BOLTRIO", 1.25, True)
+
+
+# ======================================================================================================
+# REEDFISHER (in place of Farfetch'd)
+# ======================================================================================================
+
+
+def reedfisher():
+    """A kingfisher that carries a bulrush like a sword: a big head with a long dagger of a beak, a shaggy crest at the
+    back of its head, teal-blue back and wings spotted with pale blue, a rust-orange breast, a white throat, short red
+    legs, a short tail, and a tall bulrush (a brown velvet head on a green stem) held under one wing."""
+    m = Model()
+    s = 1.3
+    S = lambda v: [x * s for x in v]
+    BACK, BACK_L, BACK_D, BREAST, THROAT = "#2A86B8", "#62C0E8", "#174E78", "#E8832A", "#FFF6E8"
+
+    def body_p(at):
+        if at.face == "front" or (at.face in ("nx", "px", "bottom") and at.y < 5.4 * s):
+            return mix(BREAST, "#F0A050", 0.4 * hash01("br", round(at.x * 2), round(at.y * 2)))
+        c = fur(BACK, BACK_L, BACK_D)(at)
+        if hash01("spot", round(at.x), round(at.y), round(at.z)) < 0.08:
+            return mix(c, "#A8E8FF", 0.7)
+        return c
+
+    def head_p(at):
+        if at.face in ("front", "nx", "px") and at.y < 8.4 * s:
+            return rgb(THROAT)
+        if at.face in ("nx", "px") and abs(at.y - 9.2 * s) < 0.5 * s:
+            return rgb("#E8832A")
+        c = fur(BACK, BACK_L, BACK_D)(at)
+        return mix(c, "#A8E8FF", 0.6) if hash01("hs", round(at.x * 2), round(at.z * 2)) < 0.12 and at.face == "top" else c
+    body = Mat(BACK, body_p, noise=0.02)
+    head = Mat(BACK, head_p, noise=0.02)
+    beak = Mat("#1E1C20", lambda a: rgb("#3A363C") if a.face == "top" else None, noise=0.01, edge=0)
+    crest = Mat(BACK, feather_plane(BACK_D, BACK, BACK_L, edge="#A8E8FF"), noise=0.015, edge=0)
+    sec = Mat(BACK, feather_plane(BACK_D, BACK, BACK_L, edge="#A8E8FF", spot="#A8E8FF"), noise=0.015, edge=0)
+    pri = Mat(BACK_D, feather_plane("#123A5A", BACK_D, BACK, edge="#62C0E8"), noise=0.015, edge=0)
+    cov = Mat(BACK, lambda a: mix(BACK, BACK_L, a.ly), noise=0.02)
+    tfea = Mat(BACK_D, feather_plane(BACK_D, BACK, "#123A5A", edge=BACK_L), noise=0.015, edge=0)
+    legm = Mat("#D84A3A", lambda a: rgb("#A83020") if a.face == "bottom" else None, noise=0.02, edge=0)
+    m.bone("root", None, [0, 0, 0])
+    m.bone("body", "root", S([0, 5, 0]), blob(S([-2.8, 3, -3.5]), S([5.6, 5, 7.5]), body, b=1))
+    m.bone("head", "body", S([0, 8, -2.8]), face_blob(S([-2.6, 7.4, -6]), S([5.2, 4, 4.6]), head))
+    m.bone("beak", "head", S([0, 9, -6]), [Cube(S([-0.6, 8.4, -10.5]), [n(1.2 * s), n(1.2 * s), n(4.5 * s)], beak)])
+    m.bone("beak_lower", "head", S([0, 8.4, -6]), [Cube(S([-0.5, 7.9, -9.6]), [n(s), 1, n(3.6 * s)], beak)])
+    m.bone("plume", "head", S([0, 11, -2.6]), [Cube([0, 10.8 * s, (-3.2 + i * 1.1) * s], [0, n(3 * s), n(2.6 * s)], crest, [-50 - i * 10, 0, 0],
+                                                     [0, 10.8 * s, (-3.2 + i * 1.1) * s]) for i in range(4)])
+    m.eyes("head", 2.6 * s, 8.8 * s, -6 * s, h=2, corner=(1, 2), half=2.6 * s, iris="#1A1014", pupil="#06040A", skin=BACK, iris_light="#5A4A50",
+           grid=["DLL", "PPW"])
+    jointed_wing(m, 2.8 * s, 7.8 * s, -3 * s, n(6.4 * s), (2.4 * s, 2.4 * s, 2 * s, 3.4 * s), sec, sec, pri, arm=cov)
+    m.bone("tail", "body", S([0, 5, 4]), [Cube([-0.75 * s, 5 * s, 3.8 * s], [n(1.5 * s), 0, n(3.4 * s)], tfea, [0, ry, 0], [0, 5 * s, 3.8 * s]) for ry in (-20, -7, 7, 20)],
+           rotation=[-12, 0, 0])
+    bird_legs(m, 1.3 * s, 3.2 * s, 0.3 * s, 1.2 * s, 2 * s, 1, body, legm, Mat("#2A1E1E", noise=0, edge=0), toe_len=2)
+    # The bulrush, tucked under the right wing like a sword at its side.
+    stem = Mat("#5A9A3A", lambda a: rgb("#3A6A28") if a.col % 2 else None, noise=0.01, edge=0)
+    velvet = Mat("#7A4A2A", fur("#7A4A2A", "#A06A40", "#4A2A18", speck=0.4), noise=0.03)
+    bone_of(m, "wing_right").cubes += [Cube(S([-3.6, 2, -9]), [1, 1, n(17 * s)], stem, [-38, 0, 0], S([-3.4, 7, -1])),
+                                       Cube(S([-4.1, 1.5, -10.5]), [n(2 * s), n(2 * s), n(5 * s)], velvet, [-38, 0, 0], S([-3.4, 7, -1]))]
+    fx_for(m, s)
+    moves(m, "FURY ATTACK", "SLASH")
+    A, info = bird("reedfisher", m, walk=0.45, stride=34, k=s, flap=0.4,
+                   extras={"walk": {"shin_right": track(rotation=[bounce(0.45, 24), 0, 0]), "shin_left": track(rotation=[bounce(0.45, 24, 90), 0, 0])}})
+    write("farfetch_d", "REEDFISHER", m, A, info, 0.85)
+
+
+# ======================================================================================================
+# The cassowaries: TWINCASK > TRICASK (in place of Doduo, Dodrio)
+# ======================================================================================================
+
+
+def cassowary(sid, name, stands, heads):
+    """A cassowary with more than one head: a round body of long shaggy black plumes hanging like hair, long strong
+    scaly legs on three toes with a dagger of a claw on each inner toe, and on blue necks hung with red wattles, heads
+    each crowned with a tall horn casque. Two heads when young; three when grown, the middle one tallest."""
+    m = Model()
+    s = 1.0 if heads == 2 else 1.25
+    S = lambda v: [x * s for x in v]
+    PL, PL_L, PL_D = "#24222A", "#4A4654", "#121016"
+    plumes = shag_mat(PL_L, "#5A5664", PL_D)
+    body = Mat(PL, fur(PL, PL_L, PL_D, speck=0.5), noise=0.03)
+    neckm = Mat("#3A8AD8", lambda a: mix("#2A5AB8", "#5AB8F0", a.ly), noise=0.02)
+    head = Mat("#3A8AD8", lambda a: rgb("#2A2A34") if a.face == "top" else None, noise=0.02)
+    casque = Mat("#A87A4A", lambda a: mix("#6A4A28", "#D8A870", a.ly), noise=0.02)
+    beak = Mat("#2A2630", lambda a: rgb("#4A4450") if a.face == "top" else None, noise=0.01, edge=0)
+    wattle = Mat("#D8302A", lambda a: rgb("#A81E1A") if a.ly < 0.3 else None, noise=0.02)
+    legm = Mat("#6A7A8A", lambda a: mix("#4A5462", "#8A96A4", a.ly) if a.row % 2 else None, noise=0.02)
+    talon = Mat("#2A2420", noise=0, edge=0)
+    m.bone("root", None, [0, 0, 0])
+    by = 10
+    m.bone("body", "root", S([0, by + 3, 0]), blob(S([-4.2, by, -5]), S([8.4, 7, 10]), body, b=2) +
+           [Cube(S([sx * 4.3, by - 3, -4]), [0, n(6 * s), n(9 * s)], plumes) for sx in (-1, 1)] + [Cube(S([-4, by - 3, 5.1]), [n(8 * s), n(6 * s), 0], plumes)])
+    # The necks: from the front of the body, each with its own head.
+    spots = [(0, "head", "neck", 0, 9, -14)] if heads == 1 else []
+    if heads == 2:
+        spots = [(-1.8, "head", "neck", 12, 8, -10), (1.8, "head2", "neck2", -12, 8, -10)]
+    elif heads == 3:
+        spots = [(0, "head", "neck", 0, 10, -6), (-2.4, "head2", "neck2", 22, 8, -14), (2.4, "head3", "neck3", -22, 8, -14)]
+    for x, hn, nn, yaw, L, tilt in spots:
+        m.bone(nn, "body", S([x, by + 5, -4]), [Cube(S([x - 0.9, by + 5, -4.9]), [n(1.8 * s), n(L * s), n(1.8 * s)], neckm),
+                                                Cube(S([x - 0.9, by + 5.5, -5.4]), [n(1.8 * s), n(2 * s), 0], wattle)], rotation=[tilt, yaw, 0])
+        ty = by + 5 + L
+        m.bone(hn, nn, S([x, ty, -4]), face_blob(S([x - 1.5, ty - 0.5, -6.6]), S([3, 2.6, 3.6]), head) +
+               [Cube(S([x - 0.6, ty + 1.8, -6]), [n(1.2 * s), n(3 * s), n(3 * s)], casque),
+                Cube(S([x - 0.8, ty, -9.4]), [n(1.6 * s), 1, n(2.8 * s)], beak)], rotation=[-tilt, 0, 0])
+        bone_of(m, hn).cubes += [Cube(S([x - 0.8, ty - 0.8, -6.6]), [n(1.6 * s), 1, n(1.6 * s)], wattle)]
+        em = eye_mat(1, 1, "#C8501A", "#100804", "#1A1414", "#FFFFFF", grid=["I"], skin="#3A8AD8")
+        bone_of(m, hn).cubes += [Cube(S([x - 1.52, ty + 0.8, -6.2]), [0, 1, 1], em), Cube(S([x + 1.52, ty + 0.8, -6.2]), [0, 1, 1], em)]
+    # Little wings of bare quills.
+    quill = Mat("#1A1820", lambda a: rgb("#3A3644") if a.ly > 0.6 else None, noise=0, edge=0)
+    m.pair("wing_right", "body", S([-4.3, by + 4.5, -1]), [Cube(S([-4.4, by + 1.5 - i * 0.6, -1 + i]), [1, n(3 * s), 1], quill, [-20 - i * 10, 0, 0], S([-4.4, by + 4.5, -1]))
+                                                           for i in range(3)])
+    bird_legs(m, 2.2 * s, (by + 1) * s, 0.5 * s, 4 * s, 7 * s, 2, body, legm, talon, toe_len=3, dagger=True)
+    fx_for(m, s)
+    moves(m, "PECK" if heads == 2 else "DRILL PECK", "FURY ATTACK" if heads == 2 else "TRI ATTACK")
+    W = 0.5 if heads == 2 else 0.6
+    ex = {"idle": {}, "walk": {"shin_right": track(rotation=[bounce(W, 30), 0, 0]), "shin_left": track(rotation=[bounce(W, 30, 90), 0, 0])}, "battle": {}}
+    for i, (_, hn, nn, *_r) in enumerate(spots[1:], start=1):
+        ex["idle"][hn] = track(rotation=[wave(2.2, 8, i * 100), wave(3, 18, i * 140), 0])
+        ex["idle"][nn] = track(rotation=[wave(2.6, 5, i * 70), 0, 0])
+        ex["walk"][hn] = track(position=[0, 0, wave(W / 2, 0.5, i * 90)])
+    A, info = bird(name.lower(), m, walk=W, stride=34, k=s, flap=0.3, extras=ex)
+    write(sid, name, m, A, info, stands)
+
+
+def twincask():
+    cassowary("doduo", "TWINCASK", 1.5, 2)
+
+
+def tricask():
+    cassowary("dodrio", "TRICASK", 1.9, 3)
+
+
+# ======================================================================================================
+# The ice seals: FROSTPUP > GLACISEAL (in place of Seel, Dewgong)
+# ======================================================================================================
+
+
+def seal(sid, name, stands, big):
+    """A seal. The pup is a fluffy ball of cream-white fur with huge dark eyes, a small black nose, long frosty whiskers,
+    flippers, and a glowing pale-blue snowflake on its brow. Grown, a long sleek silver-blue seal with a frosty mane of
+    icicle spines down its back, two long tusks of ice, heavy brows, and a long tail in joints ending in broad flukes."""
+    m = Model()
+    s = 1.0 if not big else 1.5
+    S = lambda v: [x * s for x in v]
+    if not big:
+        F, F_L, F_D, BELLY = "#F2EEE6", "#FFFFFF", "#C8C8D0", "#FFFFFF"
+    else:
+        F, F_L, F_D, BELLY = "#B8CCE0", "#E8F4FF", "#7A90AC", "#E8F0F8"
+    furm = Mat(F, fur(F, F_L, F_D, belly=BELLY, below=1.4 * s, speck=0.6), noise=0.03)
+    face = Mat(F, lambda a: rgb(BELLY) if a.face == "bottom" else None, noise=0.03)
+    nose = Mat("#1A1A20", noise=0, edge=0)
+    jaw_m = Mat(BELLY, open_mouth("#C85A6A", "#E8D8D8"), noise=0.02)
+    flip = Mat(F_D, lambda a: rgb(mix(F_D, "#000000", 0.2)) if a.face == "bottom" else None, noise=0.02)
+    fluke = Mat(F_D, lambda a: CLEAR if abs(a.lx - 0.5) > 0.5 * (0.4 + 0.6 * a.lz) or (a.lz > 0.85 and abs(a.lx - 0.5) < 0.12) else None, noise=0.01, edge=0, flat=True)
+    ice = taper_mat("#A8E0F8", "#FFFFFF")
+    m.bone("root", None, [0, 0, 0])
+    if not big:
+        m.bone("body", "root", [0, 4, 0], blob([-4, 0.5, -5], [8, 6.5, 11], furm, b=2))
+        m.bone("head", "body", [0, 6, -4.5], face_blob([-3.6, 3, -9.6], [7.2, 6, 5.4], face) + [Cube([-0.7, 5, -9.9], [1.4, 1, 1], nose)])
+        m.bone("jaw", "head", [0, 4.2, -8], [Cube([-1.2, 3.4, -9.8], [2.4, 1, 2], jaw_m)])
+        m.bone("snout", "head", [0, 5, -9.6], [])
+        m.eyes("head", x_inner=1.0, y=5.8, z=-9.6, w=2, h=2, iris="#141018", pupil="#06040A", skin=F, iris_light="#4A4050",
+               grid=["PPPW", "PPWP", "PPPP", "KPPK"])
+        m.pair("whiskers_right", "head", [-1.2, 5.2, -9.6], [Cube([-5.6, 5.2, -10.6], [4.4, 0, 2], whisker_mat("#E8F4FF"))])
+        m.bone("mark", "head", [0, 8.4, -9.62], [Cube([-1, 7.8, -9.63], [2, 2, 0], glow_patch("#A8E8FF", "diamond"))])
+        m.pair("leg_front_right", "body", [-3.6, 2.5, -2.5], [Cube([-6, 0, -3.5], [3, 1, 3], flip, [0, 0, -20], [-3.6, 1, -2.5])])
+        names, zt = tail_bones(m, "body", 2.5, 5.5, [(5, 3, 2.5), (3.5, 2, 2)], furm, (0, 6))
+        bone_of(m, names[-1]).cubes.append(Cube([-3, 1.6, zt - 0.5], [6, 0, 4], fluke))
+        moves(m, "HEADBUTT", "AURORA BEAM")
+        k = 0.7
+    else:
+        m.bone("body", "root", S([0, 4, 0]), blob(S([-3.6, 0.5, -6]), S([7.2, 6, 13]), furm, b=2))
+        bd = bone_of(m, "body")
+        for i in range(6):
+            z = (-5 + i * 2.2) * s
+            bd.cubes += spike(0, 6.4 * s, z, (3.5 - abs(i - 2) * 0.4) * s, [48, 0, 0], ice, 2)
+        m.bone("neck", "body", S([0, 5, -5]), blob(S([-2.8, 2.5, -8]), S([5.6, 5, 4]), furm), rotation=[-16, 0, 0])
+        m.bone("head", "neck", S([0, 6.5, -7.5]), face_blob(S([-3, 4, -12]), S([6, 4.6, 5]), face) + [Cube(S([-0.7, 5.6, -12.3]), [n(1.4 * s), 1, 1], nose),
+                                                                                                    Cube(S([-3.2, 8, -12.4]), [n(6.4 * s), 1, n(1.4 * s)], Mat(F_D, noise=0.02, edge=0))],
+               rotation=[16, 0, 0])
+        hd = bone_of(m, "head")
+        hd.cubes += spike(-1.2 * s, 4.4 * s, -11.8 * s, 4 * s, [-100, 0, 0], ice, 1.6) + spike(1.2 * s, 4.4 * s, -11.8 * s, 4 * s, [-100, 0, 0], ice, 1.6)
+        m.bone("jaw", "head", S([0, 4.8, -10]), [Cube(S([-1.6, 3.8, -12]), [n(3.2 * s), 1, n(2.4 * s)], jaw_m)])
+        m.eyes("head", x_inner=0.9 * s, y=6.4 * s, z=-12 * s, w=2, h=2, iris="#1A2440", pupil="#06040A", skin=F, iris_light="#6A8AC8",
+               grid=["LLLL", "PPWW", "PPPW", "KPPK"])
+        m.pair("whiskers_right", "head", S([-1.2, 5.6, -12]), [Cube(S([-6, 5.6, -13]), [n(4.6 * s), 0, n(2 * s)], whisker_mat("#E8F4FF"))])
+        m.pair("leg_front_right", "body", S([-3.2, 2.5, -3]), [Cube(S([-6.4, 0, -4]), [n(3.4 * s), 1, n(3.4 * s)], flip, [0, 0, -18], S([-3.2, 1, -3]))])
+        names, zt = tail_bones(m, "body", 2.6 * s, 6.5 * s, [(5 * s, 3 * s, 3 * s), (3.6 * s, 2.4 * s, 3 * s), (2.4 * s, 1.6 * s, 3 * s)], furm, (0, 6, 8))
+        bone_of(m, names[-1]).cubes.append(Cube([-3.6 * s, 2.2 * s, zt - 0.5], [n(7.2 * s), 0, n(5 * s)], fluke))
+        moves(m, "TAKE DOWN", "ICE BEAM")
+        k = 1.0
+    fx_for(m, 0.8 * s)
+    A, info = four_legs(name.lower(), m, walk=0.9, stride=28, k=k, slow=1.3, extras={"walk": {"body": track(position=[0, bounce(0.9, 0.8 * s), 0], rotation=[wave(0.9, 5), 0, 0]),
+                                                                                         "tail": track(rotation=[wave(0.9, 12, 90), 0, 0])}})
+    write(sid, name, m, A, info, stands)
+
+
+def frostpup():
+    seal("seel", "FROSTPUP", 1.0, False)
+
+
+def glaciseal():
+    seal("dewgong", "GLACISEAL", 1.8, True)
+
+
+# ======================================================================================================
+# The bog slimes: BOGBLOB > MIREMASS (in place of Grimer, Muk)
+# ======================================================================================================
+
+
+def ooze_mat(base, light, dark, bubble):
+    """Glossy swamp ooze: dark in its folds, a wet shine along the top, little pale bubbles in it."""
+    B, Lt, Dk, Bu = rgb(base), rgb(light), rgb(dark), rgb(bubble)
+
+    def f(at):
+        c = mix(Dk, B, 0.4 + 0.6 * at.ly) if at.face != "top" else mix(B, Lt, 0.4)
+        h = hash01("bub", round(at.x * 2), round(at.y * 2), round(at.z * 2))
+        if h < 0.05:
+            return Bu
+        if h < 0.09:
+            return mix(c, Lt, 0.5)
+        if at.face != "bottom" and hash01("sheen", round(at.x), round(at.z)) < 0.15 and at.ly > 0.7:
+            return mix(c, "#FFFFFF", 0.3)
+        return c
+    return f
+
+
+def bog_slime(sid, name, stands, big):
+    """A slime of the bog: a heap of glossy green-brown ooze sagging over a puddle of itself, bubbles in it, a lily pad
+    with a little flower stuck on top, small pale eyes, a drooling grin, and two drippy arms. Grown, a great mound of
+    murk with a broken branch, reeds and lily pads caught in it, a wide toothy maw, long dripping arms, and moss."""
+    m = Model()
+    s = 1.0 if not big else 1.6
+    S = lambda v: [x * s for x in v]
+    O, O_L, O_D, BUB = ("#5A7A3A", "#8AAE5A", "#2E4420", "#C8E8A0") if not big else ("#4A5A3A", "#7A8A5A", "#22281A", "#B8D090")
+    ooze_m = Mat(O, ooze_mat(O, O_L, O_D, BUB), noise=0.02)
+    jaw_m = Mat(O_D, open_mouth("#3A1A1A", O_D), noise=0.02)
+    tooth = Mat("#E8E0C0", noise=0, edge=0)
+    pad = Mat("#4A9A3A", lambda a: CLEAR if math.hypot(a.lx - 0.5, a.lz - 0.5) > 0.5 or (abs(a.lx - 0.5) < 0.06 and a.lz < 0.5) else
+              (rgb("#7AC860") if math.hypot(a.lx - 0.5, a.lz - 0.5) < 0.2 else None), noise=0.01, edge=0, flat=True)
+    flower = Mat("#F8C8E0", lambda a: rgb("#FFF0A0") if a.face == "top" and abs(a.lx - 0.5) < 0.3 else None, noise=0, edge=0)
+    m.bone("root", None, [0, 0, 0])
+    m.bone("puddle", "root", [0, 0, 0], blob(S([-6.5, 0, -6]), S([13, 1.5, 12]), ooze_m))
+    m.bone("body", "root", S([0, 2, 0]), blob(S([-4.8, 1, -4.4]), S([9.6, 6, 8.8]), ooze_m, b=2) + blob(S([-3.6, 6.5, -3.4]), S([7.2, 3, 6.6]), ooze_m) +
+           [Cube(S([x - 0.5, 1, z]), [1, n(1.6 * s), 1], ooze_m) for x, z in ((-4.4, -2), (4.2, 1), (-1.6, -4.5), (2.4, -4.4))])
+    top = 9.4
+    m.bone("head", "body", S([0, 7, -1]), [Cube(S([-3.2, 6.2, -3.6]), [n(6.4 * s), n(2 * s), 1], ooze_m)])
+    m.eyes("head", x_inner=0.8 * s, y=7.0 * s, z=-3.6 * s, w=2, h=2, iris="#F0F4D8" if not big else "#E8D860", pupil="#1A1A10", skin=O,
+           grid=["SWWS", "WWWW", "WWPW", "SWWS"] if not big else ["DDDD", "JIIJ", "IIPI", "SIIS"])
+    jw = 4 if not big else 6
+    m.bone("jaw", "body", S([0, 5, -4]), [Cube(S([-jw / 2, 4.2, -4.7]), [n(jw * s), n(1.4 * s), n(2 * s)], jaw_m)] +
+           ([Cube(S([-jw / 2 + 0.4 + i * 1.1, 5.2, -4.8]), [1, n(1.2 * s), 1], tooth) for i in range(5)] if big else []))
+    upright_arms(m, 4.6 * s, 6 * s, -0.5 * s, 3 * s, 3 * s, n(1.8 * s), ooze_m, ooze_m, hw=n(2.4 * s), hh=n(1.6 * s), fingers=3, finger_len=n(1.4 * s),
+                 rest=(10, 0, 40), fore_rest=(-20, 0, -10))
+    hd = bone_of(m, "body")
+    if not big:
+        hd.cubes += [Cube(S([-2, top, -2]), [n(4.4 * s), 0, n(4.4 * s)], pad, [6, 20, 0], S([0, top, 0])),
+                     Cube(S([0.4, top, -0.2]), [1, 1, 1], flower), Cube(S([0.2, top + 0.6, -0.4]), [1, 1, 1], Mat("#FFFFFF", noise=0, edge=0))]
+    else:
+        wood = Mat("#6A4A2A", lambda a: rgb("#C8A070") if a.face in ("front", "back") and min(a.lx, 1 - a.lx, a.ly, 1 - a.ly) > 0.2 else
+                   (rgb("#4A3018") if a.row % 2 else None), noise=0.02)
+        reed = leaf_mat("#8AB050", "#4A7028", "#C8E090")
+        hd.cubes += [Cube(S([-6, 4.5, -1]), [n(5 * s), n(1.8 * s), n(1.8 * s)], wood, [0, 25, -15], S([-3, 5.4, 0])),
+                     Cube(S([-2.4, top - 0.2, -2.2]), [n(4.6 * s), 0, n(4.6 * s)], pad, [4, -30, 0], S([0, top, 0])),
+                     Cube(S([3, 6, 0]), [n(3.6 * s), 0, n(3.6 * s)], pad, [0, 40, 60], S([4, 6.5, 1]))]
+        for x, z, a in ((-2, 1.5, -10), (2.4, 2, 12), (0.4, 2.8, 4)):
+            hd.cubes += [Cube(S([x - 0.8, top - 1, z]), [n(1.6 * s), n(6 * s), 0], reed, [a, 0, a * 0.5], S([x, top - 1, z]))]
+    fx_for(m, 0.8 * s)
+    moves(m, "POUND" if not big else "SLUDGE", "SLUDGE" if not big else "SLUDGE BOMB")
+    A, info = ooze(name.lower(), m, k=0.8 * s, slow=1.0 if not big else 1.2)
+    write(sid, name, m, A, info, stands)
+
+
+def bogblob():
+    bog_slime("grimer", "BOGBLOB", 0.9, False)
+
+
+def miremass():
+    bog_slime("muk", "MIREMASS", 1.5, True)
+
+
+# ======================================================================================================
+# The shells: GLINTSHELL > THORNYSTER (in place of Shellder, Cloyster)
+# ======================================================================================================
+
+
+def ribbed(base, light, dark, rib_n=9):
+    """A shell's valve: ribs fanning out from its hinge at the back, lighter along each rib, growth lines across them."""
+    B, Lt, Dk = rgb(base), rgb(light), rgb(dark)
+
+    def f(at):
+        if at.face == "bottom":
+            return mix(Dk, B, 0.5)
+        x, z = at.x, at.z - at.cube.origin[2] - at.cube.size[2]
+        ang = math.atan2(x, -z)
+        rib = abs(((ang / math.pi * rib_n) % 1.0) - 0.5) * 2
+        r = math.hypot(x, z)
+        c = mix(Dk, Lt, 0.35 + 0.65 * (1 - rib))
+        if abs((r % 1.6) - 0.8) < 0.1:
+            c = mix(c, Dk, 0.35)
+        return c
+    return f
+
+
+def shell_creature(sid, name, stands, big):
+    """A shell that hops on its hinge. The first is a pink-and-cream scallop of two ribbed valves, a frilled orange mantle
+    between them with a row of tiny glowing blue eyes all along its edge, and two big white eyes peering out. Grown, a
+    thorny oyster: a heavy violet-red shell bristling all over with long pale spines, gaping open on a frosted pearl of a
+    face with two eyes in it."""
+    m = Model()
+    s = 1.0 if not big else 1.5
+    S = lambda v: [x * s for x in v]
+    if not big:
+        SH, SH_L, SH_D = "#E89AA8", "#FFE8E0", "#B05A6A"
+    else:
+        SH, SH_L, SH_D = "#9A3A5A", "#D888A0", "#5A1A30"
+    valve = Mat(SH, ribbed(SH, SH_L, SH_D), noise=0.015)
+    mantle = Mat("#F0904A", lambda a: rgb("#FFB878") if a.row % 2 else None, noise=0.02, edge=0)
+    dot = Mat("#3AA8FF", glow=lambda a: rgb("#8AE0FF"), noise=0, edge=0)
+    spine = taper_mat(SH_D, "#FFF0F4")
+    m.bone("root", None, [0, 0, 0])
+    w, d, hl = (9, 8, 3) if not big else (11, 10, 5)
+    m.bone("body", "root", S([0, 2, 3]), blob(S([-w / 2, 0, -d / 2 - 1]), S([w, 3, d]), valve, b=1) +
+           [Cube(S([-w / 2 + 0.5, 2.6, -d / 2 - 1.4]), [n((w - 1) * s), n(1.2 * s), n((d - 1) * s)], mantle)])
+    # The top valve is the head: hinged at the back, opening up.
+    m.bone("head", "body", S([0, 3, 2.6]), blob(S([-w / 2, 3, -d / 2 - 1]), S([w, hl, d]), valve, b=1) +
+           [Cube(S([-1.5, 3.4, 3]), [n(3 * s), n(1.4 * s), n(1.6 * s)], valve), Cube(S([-w / 2, 3, 2.4]), [n(2 * s), n(1.4 * s), n(1.2 * s)], valve)],
+           rotation=[-14 if not big else -20, 0, 0])
+    m.bone("jaw", "head", S([0, 3, -d / 2 - 1]), [])
+    bd = bone_of(m, "body")
+    if not big:
+        for i in range(8):
+            x = (-w / 2 + 1 + i * (w - 2) / 7) * s
+            bd.cubes.append(Cube([x - 0.4, 3.6 * s, (-d / 2 - 1.5) * s], [1, 1, 0], dot))
+        m.bone("face", "body", S([0, 3, -4]), [])
+        m.eyes("body", x_inner=0.6 * s, y=3.0 * s, z=(-d / 2 - 1.45) * s, w=2, h=2, iris="#F4F0E8", pupil="#1A1A20", skin="#F0904A",
+               grid=["SWWS", "WWWW", "WPPW", "SWWS"])
+        moves(m, "CLAMP", "AURORA BEAM")
+    else:
+        hd = bone_of(m, "head")
+        for i in range(14):
+            a = i * 2.4
+            r = 0.6 + (i % 3) * 0.12
+            x, z = math.sin(a) * w / 2 * r, math.cos(a) * d / 2 * r - 1
+            L = (4 + (i % 4)) * s
+            hd.cubes += spike(x * s, (3 + hl) * s - 0.5, z * s, L, [40 + (i % 3) * 12, -math.degrees(math.atan2(x, z)), 0], spine, 2)
+        for i in range(8):
+            a = i * 0.8 - 2.8
+            bd.cubes += spike(math.sin(a) * w / 2 * s, 1.2 * s, (math.cos(a) * d / 2 - 1) * s, 3.5 * s, [8, -math.degrees(a), 0], spine, 2)
+        pearl = Mat("#E8F4FF", lambda a: mix("#B8D8F0", "#FFFFFF", a.ly), glow=lambda a: rgb("#D8F0FF") if a.ly > 0.75 else None, noise=0.02)
+        m.bone("pearl", "body", S([0, 4.5, -2]), blob(S([-2.8, 2.8, -5]), S([5.6, 5, 5]), pearl) +
+               [Cube(S([-0.6, 7.6, -3.6]), [n(1.2 * s), n(2.2 * s), n(1.2 * s)], pearl, [-20, 0, 0], S([0, 7.6, -3]))])
+        m.eyes("pearl", x_inner=0.4 * s, y=4.6 * s, z=-5 * s, w=2, h=2, iris="#2A3A5A", pupil="#0A0A14", skin="#E8F4FF", iris_light="#8AA8D8",
+               grid=["LLLL", "IIPW", "IPPI", "SIIS"])
+        moves(m, "SPIKE CANNON", "AURORA BEAM")
+    fx_for(m, 0.8 * s)
+    A, info = hopper(name.lower(), m, hop=0.5, height=1.4 * s, k=0.7 * s,
+                     extras={"idle": {"head": track(rotation=[wave(2.4, 5, 0, -3), 0, 0])},
+                             "walk": {"head": track(rotation=[wave(0.5, 14, 180, -6), 0, 0])},
+                             "cry": {"head": track(rotation=keys({0: [0, 0, 0], 0.2: [-25, 0, 0], 0.7: [-25, 0, 0], 1.0: [0, 0, 0]}))}})
+    write(sid, name, m, A, info, stands)
+
+
+def glintshell():
+    shell_creature("shellder", "GLINTSHELL", 0.65, False)
+
+
+def thornyster():
+    shell_creature("cloyster", "THORNYSTER", 1.6, True)
+
+
+# ======================================================================================================
+# The shadow lanterns: WISPLET > SHADEWICK > GLOOMWARDEN (in place of Gastly, Haunter, Gengar)
+# ======================================================================================================
+
+
+def smoke_mat(base, light, dark):
+    """Living shadow: deep violet-black, wisps of paler smoke curling over it."""
+    B, Lt, Dk = rgb(base), rgb(light), rgb(dark)
+
+    def f(at):
+        w = math.sin(at.x * 1.3 + at.y * 0.9) + math.sin(at.z * 1.1 - at.y * 1.4)
+        c = mix(Dk, B, 0.4 + 0.6 * at.ly) if at.face != "top" else mix(B, Lt, 0.25)
+        if abs(w) < 0.22:
+            c = mix(c, Lt, 0.35)
+        return c
+    return f
+
+
+def shadow(sid, name, stands, stage):
+    """A shadow that carries a ghostly flame. The first is a ball of violet-black shadow, a ring of smoke drifting round it,
+    glowing slanted eyes and a wide grin, a blue wick of flame burning on its crown. The second is a hooded shade with
+    no body below its smoky tail, the wick flame on the tip of its hood, and two clawed hands floating free at its sides.
+    The last is broad and stout, a lantern in its chest with the blue flame behind the bars, a ridge of smoke spines
+    down its back, a huge grin, short clawed legs and arms, and the flame on its crown."""
+    m = Model()
+    SM, SM_L, SM_D = "#3E2E58", "#7A62A0", "#1C1428"
+    shade = Mat(SM, smoke_mat(SM, SM_L, SM_D), noise=0.02)
+    jaw_m = Mat(SM_D, open_mouth("#E8E0F8", "#140C1C"), noise=0.01)
+    tooth = Mat("#F4F0FF", noise=0, edge=0)
+    gf = ghost_flame_mat()
+    claw = Mat("#E8E0F0", noise=0, edge=0)
+    smoke = Mat("#8A72B8", lambda a: CLEAR if abs(a.ly - 0.5 - 0.25 * math.sin(a.lx * 12)) > 0.22 else None,
+                glow=lambda a: rgb("#9A88D8") if abs(a.ly - 0.5 - 0.25 * math.sin(a.lx * 12)) < 0.1 else None, noise=0, edge=0, flat=True)
+    m.bone("root", None, [0, 0, 0])
+    eye_grid = ["DD....", "JJJ..."]
+    if stage == 0:
+        y0 = 8
+        m.bone("body", "root", [0, y0, 0], blob([-4.5, y0 - 4.5, -4.5], [9, 9, 9], shade, b=2))
+        m.bone("head", "body", [0, y0, -4.5], [Cube([-3.5, y0 - 2.5, -4.6], [7, 5, 0], Mat(SM, lambda a: CLEAR, noise=0, edge=0, flat=True))])
+        m.bone("jaw", "body", [0, y0 - 1.6, -4.5], [Cube([-2.8, y0 - 2.6, -4.7], [5.6, 1.2, 1.2], jaw_m)] + [Cube([-2.6 + i * 1.1, y0 - 1.8, -4.8], [1, 1, 0], tooth) for i in range(5)])
+        m.bone("ring", "body", [0, y0, 0], [Cube([-7, y0 - 1, -7], [14, 0, 14], Mat("#8A72B8", lambda a: CLEAR if abs(math.hypot(a.lx - 0.5, a.lz - 0.5) - 0.42) > 0.06 else None,
+                                                                                      glow=lambda a: rgb("#A890E8") if abs(math.hypot(a.lx - 0.5, a.lz - 0.5) - 0.42) < 0.04 else None,
+                                                                                      noise=0, edge=0, flat=True))], rotation=[12, 0, 8])
+        bone_of(m, "body").cubes += flame([0, y0 + 4.2, 0], 4, 6, mat=gf)
+        eyes_at, ew = (y0 + 0.4, -4.5), 2
+        moves(m, "LICK", "NIGHT SHADE")
+    elif stage == 1:
+        y0 = 11
+        m.bone("body", "root", [0, y0, 0], blob([-4.5, y0 - 3, -4], [9, 7, 8], shade, b=2) + [Cube([-3.5, y0 + 3.5, -3], [7, 2.5, 6], shade),
+                                                                                              Cube([-2, y0 + 5.6, -2], [4, 2, 4], shade, [-12, 0, 0], [0, y0 + 5.6, 0]),
+                                                                                              Cube([-0.8, y0 + 7.2, -1], [1.6, 1.6, 2], shade, [-24, 0, 0], [0, y0 + 7.2, 0])])
+        bone_of(m, "body").cubes += flame([0, y0 + 8.4, -1.4], 3.6, 5.6, mat=gf)
+        m.bone("head", "body", [0, y0, -4], [Cube([-3.5, y0 - 1.5, -4.1], [7, 4, 0], Mat(SM, lambda a: CLEAR, noise=0, edge=0, flat=True))])
+        m.bone("jaw", "body", [0, y0 - 1.4, -4], [Cube([-3.2, y0 - 2.6, -4.3], [6.4, 1.4, 1.2], jaw_m)] + [Cube([-3 + i * 1.2, y0 - 1.6, -4.4], [1, 1, 0], tooth) for i in range(6)])
+        names, zt = tail_bones(m, "body", y0 - 3, 0, [(6, 3, 0.1), (4.5, 2.5, 0.1), (3, 2, 0.1)], shade, (0, 0, 0))
+        for i, nm in enumerate(names):
+            b = bone_of(m, nm)
+            b.cubes = [Cube([-(3 - i) - 0.5, y0 - 3 - 2.5 * (i + 1), -2 + i * 0.8], [n((6 - i * 1.5)), n(2.6), n(4 - i)], shade)]
+            b.pivot = [0, y0 - 3 - 2.5 * i, -1 + i * 0.8]
+        # Floating hands: no arms, just the hands drifting at its sides, three long claws on each.
+        m.pair("arm_right", "body", [-7.5, y0 + 1, -2], [])
+        m.pair("forearm_right", "arm_right", [-7.5, y0 + 1, -2], [Cube([-9, y0 - 1, -3.2], [3, 3, 2.4], shade)] +
+               [Cube([-9 + i, y0 - 3, -3.6], [1, 2.4, 1], claw, [-20, 0, 0], [-9 + i, y0 - 1, -3]) for i in range(3)] +
+               [Cube([-6.6, y0, -3], [1.4, 1, 1.4], shade)])
+        eyes_at, ew = (y0 + 0.8, -4), 2
+        moves(m, "LICK", "CONFUSE RAY")
+    else:
+        hip = 4
+        m.bone("body", "root", [0, hip + 6, 0], blob([-6.5, hip - 0.5, -5], [13, 12, 10], shade, b=2) + blob([-5.5, hip + 11, -4], [11, 2, 8], shade))
+        bd = bone_of(m, "body")
+        for i in range(5):
+            bd.cubes += spike(0, hip + 12.5 - i * 1.4, 3 + i * 0.8, 4 - abs(i - 1) * 0.5, [-40 + i * 18, 0, 0], taper_mat(SM, "#B8A0E8"), 2.4)
+        # The lantern in its chest: the blue flame behind dark bars.
+        bars = Mat("#14101C", lambda a: CLEAR if (a.col % 3 != 0 and min(a.ly, 1 - a.ly) > 0.15) else None, noise=0, edge=0, flat=True)
+        bd.cubes += [Cube([-2.6, hip + 1.6, -5.25], [5.2, 5, 0], Mat("#2A2A6A", glow=lambda a: rgb("#6A9AFF") if math.hypot(a.lx - 0.5, a.ly - 0.45) < 0.32 else None,
+                                                                    noise=0, edge=0, flat=True)),
+                     Cube([-2.8, hip + 1.4, -5.4], [5.6, 5.4, 0], bars)]
+        bd.cubes += flame([0, hip + 1.6, -5.3], 3.2, 4.4, mat=gf, planes=1)
+        bd.cubes += flame([0, hip + 13, -1], 4, 6.5, mat=gf)
+        m.bone("head", "body", [0, hip + 9, -5], [Cube([-5, hip + 7.5, -5.1], [10, 4, 0], Mat(SM, lambda a: CLEAR, noise=0, edge=0, flat=True))])
+        m.bone("jaw", "body", [0, hip + 8.2, -5], [Cube([-4.6, hip + 7.2, -5.3], [9.2, 1.6, 1.4], jaw_m)] +
+               [Cube([-4.4 + i * 1.1, hip + 8.2, -5.4], [1, 1, 0], tooth) for i in range(9)])
+        upright_arms(m, 6.8, hip + 9, -1, 3, 3, 3, shade, shade, hw=3.5, hh=2, claws=3, rest=(-14, 0, 26), fore_rest=(-30, 0, 0))
+        upright_legs(m, 3.4, hip, 0, 3, shade, shade, 4, ntoes=3, sharp=True, thigh_w=4)
+        eyes_at, ew = (hip + 9.6, -5), 3
+        moves(m, "NIGHT SHADE", "SHADOW BALL")
+    # Glowing slanted eyes on the dark: no whites, just light.
+    def eye_glow(a, fi):
+        # A slanted eye of light: its inner corner lower than its outer, a brighter middle.
+        inner = (a.lx - 0.5) * (1 if a.x < 0 else -1)
+        if a.ly < 0.3 - inner * 0.7 or a.ly > 0.95:
+            return None
+        return (rgb("#FFFFFF") if abs(a.ly - 0.6) < 0.18 and abs(a.lx - 0.5) < 0.3 else rgb("#B8F4FF")), 255
+    eg = Mat("#C8F0FF", lambda a: CLEAR, glow=eye_glow, frames=True, noise=0, edge=0)
+    hd = bone_of(m, "head")
+    ey, ez = eyes_at
+    hd.cubes += [Cube([-0.6 - ew - 0.4, ey, ez - 0.12], [ew + 0.4, 1.6 + 0.4 * stage, 0], eg), Cube([0.6, ey, ez - 0.12], [ew + 0.4, 1.6 + 0.4 * stage, 0], eg)]
+    m.bone("eyelid_right", "head", [0, ey, ez], [])
+    fx_for(m, (0.8, 1.0, 1.2)[stage])
+    if stage == 0:
+        A, info = floater(name.lower(), m, k=0.7, bob=1.0, extras={"idle": {"ring": track(rotation=[12, "q.anim_time * 90", 8])},
+                                                                   "battle": {"ring": track(rotation=[12, "q.anim_time * 160", 8])}})
+    elif stage == 1:
+        A, info = floater(name.lower(), m, k=0.9, bob=1.2, tentacles=[["tail", "tail2", "tail3"]],
+                          extras={"idle": {"forearm_right": track(position=[0, wave(2.4, 0.8, 0), wave(2.4, 0.6, 90)]),
+                                           "forearm_left": track(position=[0, wave(2.4, 0.8, 120), wave(2.4, 0.6, 210)])}})
+    else:
+        A, info = biped(name.lower(), m, walk=0.62, stride=22, k=1.1, slow=1.1, guard=40)
+    write(sid, name, m, A, info, stands)
+
+
+def wisplet():
+    shadow("gastly", "WISPLET", 1.0, 0)
+
+
+def shadewick():
+    shadow("haunter", "SHADEWICK", 1.5, 1)
+
+
+def gloomwarden():
+    shadow("gengar", "GLOOMWARDEN", 1.95, 2)
+
+
 ALL3 = (leafgrub, huskalis, veilmoth, stinglet, barbcase, lancewasp, coilet, frillasp, pangrit, spirepang, lunabun, lunahare,
         fennember, solfennec, puffchin, choruschin,
         duskbat, nightmaw, tuberlet, droopbud, rafflora, shroomshell, funguard, fuzzgnat, toxilace, starsnout, triosnout, lynxkit, sabrelynx,
         achebill, tidebill, kindlepup, pyrewolf, droptad, frillfrog, brawltoad, slumbersier, mindsier, sagesier, knucklet, brawlape,
         quadrilla, snapsprout, snapbulb, gulptrap, driftsail, stormsail, geodink, geobrute, geotitan, emberfawn, blazehart, slowmander,
-        shellmander)
+        shellmander, boltnut, boltrio, reedfisher, twincask, tricask, frostpup, glaciseal, bogblob, miremass, glintshell, thornyster,
+        wisplet, shadewick, gloomwarden)
 
 
 def main(names):

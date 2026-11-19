@@ -1,0 +1,72 @@
+{
+ "idle": "animation.wisplet.battle_idle",
+ "ground": "animation.wisplet.ground_idle",
+ "actions": {
+  "cry": "animation.wisplet.cry",
+  "recoil": "animation.wisplet.recoil",
+  "attack": "animation.wisplet.attack",
+  "critical": "animation.wisplet.critical",
+  "special": "animation.wisplet.special",
+  "recall": "animation.wisplet.recall",
+  "sendout": "animation.wisplet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.wisplet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.wisplet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.wisplet.faint",
+   "parts": []
+  }
+ },
+ "move": "NIGHT SHADE",
+ "attack_move": "LICK",
+ "scale": 0.88,
+ "height": 1.137,
+ "texture": "retromon:textures/mons/gastly.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/gastly_glow_0.png",
+    "retromon:textures/mons/gastly_glow_1.png",
+    "retromon:textures/mons/gastly_glow_2.png",
+    "retromon:textures/mons/gastly_glow_3.png",
+    "retromon:textures/mons/gastly_glow_4.png",
+    "retromon:textures/mons/gastly_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "WISPLET",
+ "anchors": {
+  "mouth": [
+   0,
+   6.4,
+   -5.12
+  ],
+  "back": [
+   0,
+   13.5,
+   0.0
+  ],
+  "body": [
+   0,
+   10.85,
+   0.0
+  ],
+  "size": [
+   14.0,
+   12.5,
+   14.0
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

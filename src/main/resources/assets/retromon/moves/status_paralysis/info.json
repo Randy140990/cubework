@@ -1,0 +1,24 @@
+{
+ "status": "paralysis",
+ "label": "Paralysed",
+ "length": {
+  "1": 2.4
+ },
+ "loop": true,
+ "texture": "retromon:textures/moves/status_paralysis.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/moves/status_paralysis_glow_0.png",
+    "retromon:textures/moves/status_paralysis_glow_1.png",
+    "retromon:textures/moves/status_paralysis_glow_2.png",
+    "retromon:textures/moves/status_paralysis_glow_3.png",
+    "retromon:textures/moves/status_paralysis_glow_4.png",
+    "retromon:textures/moves/status_paralysis_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ]
+}

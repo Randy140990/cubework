@@ -111,12 +111,16 @@ def wings(flap, amp, rest, period, phase=0.0, span=1.0, unfold=0.0):
     sit folded (neat at the sides, huge spread in flight). unfold: how far the elbow opens from its folded rest."""
     sc = [span, span, span] if span != 1.0 else None
     out = {}
-    parts = (("wing", 0, amp, 0, rest), ("wing_mid", -unfold, amp * 0.35, flap, 0), ("wing_tip", 0, amp * 0.35, 0, 0),
-             ("wing_fan", 0, amp * 0.3, flap * 0.5, 0), ("wing_fan2", 0, amp * 0.3, 0, 0))
-    for i, (name, x, z_amp, y_amp, base) in enumerate(parts):
-        ph = phase + i * 35
+    # Each joint lags well behind the one before (55 degrees of the beat), and bends further, so the beat visibly rolls
+    # out from shoulder to fingertips; spread wings also flex at the elbow and wrist on the upstroke, folding in a
+    # little as they rise and opening out again for the downstroke.
+    parts = (("wing", 0, amp, 0, rest, 0), ("wing_mid", -unfold, amp * 0.45, flap, 0, 14), ("wing_tip", 0, amp * 0.45, 0, 0, 9),
+             ("wing_fan", 0, amp * 0.4, flap * 0.5, 0, 5), ("wing_fan2", 0, amp * 0.4, 0, 0, 0))
+    for i, (name, x, z_amp, y_amp, base, flex) in enumerate(parts):
+        ph = phase + i * 55
         for side, sgn in (("right", 1), ("left", -1)):
-            rot = [x, wave(period, sgn * y_amp, ph + 5) if y_amp else 0, wave(period, sgn * z_amp, ph, sgn * base)]
+            rx = wave(period, flex, ph + 90, x) if (flex and unfold) else x
+            rot = [rx, wave(period, sgn * y_amp, ph + 5) if y_amp else 0, wave(period, sgn * z_amp, ph, sgn * base)]
             out[f"{name}_{side}"] = track(rotation=rot, scale=sc if name == "wing" else None)
     return out
 
@@ -380,27 +384,47 @@ def insect(sid, m, flap=0.16, amp=45, k=1.0, slow=1.0, extras=None, abdomen=("ab
     return A, info
 
 
-def serpent(sid, m, segs, necks=("neck", "neck2"), k=1.0, slow=1.0, extras=None):
-    """A snake: its body a chain of segments lying in curves along the ground (segs, from behind the neck to the tail
-    tip), its front reared up on neck joints holding the head. It sways and flicks its tongue at rest, slithers in a wave
-    running down its length, and rears higher to hiss with its jaws wide (a hood or frill flaring if it has one)."""
+def slither(segs, period, amp, lag=50.0, grow=0.06, coil=None, body_amp=None):
+    """Tracks for a snake's body to slither: a wave runs back down its length, each segment's heading following the one
+    in front of it a beat later (lag degrees), so the body draws an S that travels back along it while the head goes
+    straight on. Each joint turns by the difference between its heading and the one before. coil: resting turns added
+    to each joint (curled up, or lying in curves)."""
+    out = {}
+    heads = [amp * (0.55 if body_amp is None else body_amp)] + [amp * (1 + i * grow) for i in range(len(segs))]
+    out["body"] = track(rotation=[0, wave(period, heads[0], 0), 0])
+    for i, nm in enumerate(segs):
+        a1, a0 = heads[i + 1], heads[i]
+        e = f"{wave(period, a1, -(i + 1) * lag)} - {wave(period, a0, -i * lag)}"
+        if coil:
+            e = f"{coil[i]} + {e}"
+        out[nm] = track(rotation=[0, e, 0])
+    return out
+
+
+def serpent(sid, m, segs, necks=("neck", "neck2"), k=1.0, slow=1.0, extras=None, coil=None):
+    """A snake: its body a chain of segments behind its reared-up front (segs, from behind the neck to the tail tip),
+    the neck joints holding the head. At rest it lies curled (coil: each joint's resting turn), swaying a little and
+    flicking its tongue; it slithers with a wave running back down its length, the S of its body travelling along it
+    while its head stays steady and looks ahead; it rears higher to hiss with its jaws wide (a frill flaring)."""
     extras = with_move(m, extras)
     A = Anims(sid)
     flick = lambda L, at: track(scale=keys({0: [1, 1, 0.05], at: [1, 1, 0.05], at + 0.08: [1, 1, 1], at + 0.22: [1, 1, 1], at + 0.3: [1, 1, 0.05], L: [1, 1, 0.05]}))
+    steady = lambda P, amp: {necks[0]: track(rotation=[0, wave(P, -amp * 0.5, 0), 0]), necks[-1]: track(rotation=[0, wave(P, -amp * 0.3, 0), 0])}
     P = 3.0 * slow
-    ground = A.add("ground_idle", P, only(m, merge({
+    ground = A.add("ground_idle", P, only(m, merge(slither(segs, P * 2, 4, 40, coil=coil), {
         "head": track(rotation=[wave(P, 4, 90), wave(P, 10), 0]),
         "tongue": flick(P, 1.1 * slow), "hood": track(scale=[wave(P, 0.04, 0, 1), 1, 1]),
-    }, chain(list(necks), P, 3, 8, 60), chain(segs, P, 0, 4, 40), eyelids(P * 0.7), _extra(extras, "idle"))))
+    }, chain(list(necks), P, 3, 8, 60), eyelids(P * 0.7), _extra(extras, "idle"))))
     B = 1.6 * slow
-    battle = A.add("battle_idle", B, only(m, merge({
+    battle = A.add("battle_idle", B, only(m, merge(slither(segs, B, 5, 45, coil=coil), {
         "head": track(rotation=[wave(B / 2, 4, 0, 0), wave(B, 8), 0]),
         "tongue": flick(B, 0.5 * slow), "hood": track(scale=[wave(B / 2, 0.06, 0, 1.06), 1, 1]),
-    }, chain(list(necks), B / 2, 5, 6, 60), chain(segs, B / 2, 0, 5, 50), eyelids(B * 0.7), _extra(extras, "battle"))))
-    W = 1.0 * slow
-    walk_id = A.add("ground_walk", W, only(m, merge({
-        "head": track(rotation=[0, wave(W, -6, 90), 0]), "tongue": flick(W, 0.3),
-    }, chain(list(necks), W, 2, 8, 70), chain(segs, W, 0, 16, 65, grow=0.1), eyelids(W * 0.6), _extra(extras, "walk"))))
+    }, chain(list(necks), B / 2, 5, 6, 60), eyelids(B * 0.7), _extra(extras, "battle"))))
+    W = 1.1 * slow
+    sl = slither(segs, W, 30, 52)
+    walk_id = A.add("ground_walk", W, only(m, merge(sl, steady(W, 30 * 0.55), {
+        "head": track(rotation=[0, wave(W, -4, 90), 0]), "tongue": flick(W, 0.3),
+    }, eyelids(W * 0.6), _extra(extras, "walk"))))
     C = 1.3 * slow
     up = lambda a: keys({0: [0, 0, 0], C * 0.2: [a, 0, 0], C * 0.7: [a, 0, 0], C: [0, 0, 0]})
     cry = A.add("cry", C, only(m, merge({
@@ -563,6 +587,42 @@ def floater(sid, m, tentacles=(), k=1.0, slow=1.0, extras=None, bob=1.0, pulse_b
                                         flare, _extra(extras, "cry"))), loop=False)
     R = 0.75 * slow
     recoil = A.add("recoil", R, only(m, merge(_hit(R, k), tents(R, 24, 10), _extra(extras, "recoil"))), loop=False)
+    info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
+    battle_set(A, m, info, "hopper", k, slow, extras)
+    return A, info
+
+
+def ooze(sid, m, k=1.0, slow=1.0, extras=None):
+    """A creature of ooze (a slime): it sags and swells as it breathes, its drippy arms swaying; it lurches along by
+    surging forward and slumping, rears up tall to call, and splats flat when hit."""
+    extras = with_move(m, extras)
+    A = Anims(sid)
+    sq = lambda P, a, ph=0: track(scale=[wave(P, a, ph, 1), wave(P, -a * 1.4, ph, 1), wave(P, a, ph, 1)])
+    arms = lambda P, a, base=0: {"arm_right": track(rotation=[wave(P, a, 0, base), 0, wave(P, a * 0.5, 60, 6)]),
+                                 "arm_left": track(rotation=[wave(P, a, 50, base), 0, wave(P, -a * 0.5, 110, -6)]),
+                                 "forearm_right": track(rotation=[wave(P, a * 0.8, 40, -6), 0, 0]),
+                                 "forearm_left": track(rotation=[wave(P, a * 0.8, 90, -6), 0, 0])}
+    P = 3.0 * slow
+    ground = A.add("ground_idle", P, only(m, merge({"body": sq(P, 0.04), "head": track(rotation=[wave(P, 3, 90), wave(P * 2, 8), 0]),
+                                                    "puddle": sq(P, -0.03, 90), "jaw": track(rotation=[wave(P, 4, 0, 4), 0, 0])},
+                                                   arms(P, 8), eyelids(P * 0.7), _extra(extras, "idle"))))
+    B = 1.4 * slow
+    battle = A.add("battle_idle", B, only(m, merge({"body": sq(B, 0.06), "puddle": sq(B, -0.04, 90)}, arms(B, 10, -30), eyelids(B * 0.7),
+                                                   _extra(extras, "battle"))))
+    W = 1.1 * slow
+    walk_id = A.add("ground_walk", W, only(m, merge({"body": track(scale=[wave(W, 0.05, 0, 1), wave(W, -0.08, 0, 1), wave(W, 0.1, 90, 1)],
+                                                                   rotation=[wave(W, 6, 90, 4), 0, 0], position=[0, 0, wave(W, -0.6 * k, 90)]),
+                                                     "puddle": track(scale=[1, 1, wave(W, 0.12, 0, 1)])},
+                                                    arms(W, 16, -10), eyelids(W * 0.7), _extra(extras, "walk"))))
+    C = 1.3 * slow
+    up = lambda a: keys({0: [0, 0, 0], C * 0.25: a, C * 0.7: a, C: [0, 0, 0]})
+    cry = A.add("cry", C, only(m, merge({"body": track(scale=keys({0: [1, 1, 1], C * 0.25: [0.9, 1.25, 0.9], C * 0.7: [0.9, 1.25, 0.9], C: [1, 1, 1]})),
+                                         "jaw": track(rotation=up([40, 0, 0])), "head": track(rotation=up([-12, 0, 0])),
+                                         "arm_right": track(rotation=up([-120, 0, 30])), "arm_left": track(rotation=up([-120, 0, -30]))},
+                                        _extra(extras, "cry"))), loop=False)
+    R = 0.8 * slow
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k), {"body": track(scale=keys({0: [1, 1, 1], R * 0.15: [1.25, 0.7, 1.25], R * 0.5: [0.95, 1.08, 0.95], R: [1, 1, 1]}))},
+                                              _extra(extras, "recoil"))), loop=False)
     info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
     battle_set(A, m, info, "hopper", k, slow, extras)
     return A, info

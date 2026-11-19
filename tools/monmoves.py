@@ -1826,6 +1826,155 @@ def aura_fx(typ):
     return fx, {f"animation.move.{fx.id}.loop": anim}
 
 
+# ---------- statuses: what shows on a creature while it's asleep, poisoned, burned, frozen... ----------
+
+def sh_ice(u, v, fi):
+    """A face of ice: see-through pale blue, a frosted rim, streaks of light across it."""
+    e = min(u, 1 - u, v, 1 - v)
+    if e < .06:
+        return "W", 200
+    if abs((u + v * 0.6) % 0.5 - 0.25) < .025 or abs((u * 0.7 - v + 2) % 0.7 - 0.35) < .018:
+        return "W", 150
+    return ("C", 95) if e > .2 else ("M", 120)
+
+
+STATUSES = [  # key, the name shown, what it looks like
+    ("sleep", "Asleep"), ("poison", "Poisoned"), ("toxic", "Badly poisoned"), ("burn", "Burned"), ("freeze", "Frozen"),
+    ("paralysis", "Paralysed"), ("confusion", "Confused"), ("attract", "Infatuated"), ("seeded", "Leech Seed"),
+    ("curse", "Cursed"), ("nightmare", "Nightmare"), ("bound", "Trapped"), ("selfhit", "Hurt itself"),
+]
+
+
+def status_fx(key):
+    """A status's effect, looping, round a body 16 units across (the player scales it to the creature), from three points
+    the player moves to fit it: s1_top (over its head), s1_mid (the middle of its body) and s1_ground (under it); a
+    frozen creature's ice (s1_icebox) is sized to it as well."""
+    fx = FX(f"status_{key}")
+    top = fx.group(1, "top", "root", (0, 10, -3))
+    mid = fx.group(1, "mid", "root", (0, 0, 0))
+    gnd = fx.group(1, "ground", "root", (0, -8, 0))
+    L = 2.4
+    Q = 3.0
+    small = set()
+
+    def sp(slot, mat, w, h, at, off=(0, 0, 0), **kw):
+        # Drawn Q times as big as it shows, so it's painted in enough texels to come out round.
+        b = fx.spr(1, slot, mat, w * Q, h * Q, at, off, **kw)
+        small.add(b)
+        return b
+
+    def show(b, t0, t1, k0=1.0, k1=None):
+        q = 1 / Q if b in small else 1.0
+        fx.show(1, b, t0, t1, k0 * q, (k0 if k1 is None else k1) * q)
+
+    def drift(b, t0, t1, rise, k0=0.8, k1=1.2, dx=0.0):
+        show(b, t0, t1, k0, k1)
+        fx.pos(1, b, {t0: [0, 0, 0], t1: [dx, rise, 0]})
+
+    if key in ("sleep", "nightmare"):
+        g, W, H = glyph_shape("Z")
+        pal_ = "SLEEP" if key == "sleep" else "DARK"
+        for i, t0 in enumerate((0.0, 0.8, 1.6)):
+            b = sp(f"z{i}", G(g, pal_), W * 0.6, H * 0.6, top, (2 + i * 1.5, i * 1.2, 0))
+            drift(b, t0, min(L, t0 + 1.5), 7, 0.6, 1.25, 3)
+        if key == "nightmare":
+            for i in range(3):
+                b = sp(f"cl{i}", G(sh_puff, "DARK"), 9, 7, top, ((i - 1) * 5, 5 + (i % 2), 0))
+                show(b, 0, L, 1.0)
+                fx.pos(1, b, {0: [0, 0, 0], L / 2: [0.8 * (1 - i), 0.6, 0], L: [0, 0, 0]})
+            for i in range(4):
+                b = sp(f"w{i}", G(sh_wisp, "GHOST"), 4, 8, mid, (math.sin(i * 1.7) * 7, -2, math.cos(i * 1.7) * 7), kind="vert", planes=1, rot=[0, i * 90, 0])
+                drift(b, i * 0.5, i * 0.5 + 1.3, 6, 0.8, 1.0)
+    elif key in ("poison", "toxic"):
+        nb = 7 if key == "poison" else 12
+        for i in range(nb):
+            a = i * 2.4
+            t0 = (i * L / nb) % L
+            b = sp(f"b{i}", G(sh_bubble, "POISON" if key == "poison" or i % 2 else "DARK"), 3.5, 3.5, mid,
+                       (math.sin(a) * 6, -4 + (i % 3) * 2, math.cos(a) * 6))
+            drift(b, t0, min(L, t0 + 1.1), 8, 0.6, 1.1)
+    elif key == "burn":
+        for i, (x, y, z) in enumerate(((-5, 0, -2), (4, 2, 1), (0, 4, 4), (-2, -3, 5), (5, -2, -4))):
+            b = sp(f"f{i}", G(sh_flame, "FIRE", seed=i * 0.9), 4.5, 7, mid, (x, y, z), kind="vert")
+            t0 = i * 0.45
+            show(b, t0, min(L, t0 + 1.2), 0.7, 1.0)
+        for i in range(6):
+            b = sp(f"e{i}", G(sh_spark, "FIRE"), 2, 2, mid, (math.sin(i * 2.1) * 5, 3, math.cos(i * 2.1) * 5))
+            drift(b, i * 0.38, i * 0.38 + 0.9, 7, 1.0, 0.5)
+    elif key == "freeze":
+        b = fx.spr(1, "icebox", G(sh_ice, "ICE", "flat"), 16, 16, mid, (0, 0, 0), kind="box")
+        show(b, 0, L, 1.0)
+        for i in range(6):
+            b = sp(f"fl{i}", G(sh_flake, "ICE"), 3, 3, mid, (math.sin(i * 1.9) * 8.5, -3 + (i % 3) * 4, math.cos(i * 1.9) * 8.5))
+            show(b, i * 0.4, i * 0.4 + 0.7, 0.4, 1.0)
+    elif key == "paralysis":
+        for i in range(8):
+            a = i * 2.6
+            b = sp(f"s{i}", G(sh_bolt, "ELECTRIC", "vert", seed=i), 3, 6, mid, (math.sin(a) * 7, -3 + (i % 4) * 2.5, math.cos(a) * 7), kind="vert",
+                       rot=[0, i * 47, (i % 2) * 40 - 20])
+            t0 = (i * 0.29) % L
+            show(b, t0, t0 + 0.16, 1.0)
+        for i in range(4):
+            b = sp(f"k{i}", G(sh_spark, "ELECTRIC"), 3, 3, mid, (math.sin(i * 1.6) * 6, 2, math.cos(i * 1.6) * 6))
+            show(b, i * 0.6 + 0.1, i * 0.6 + 0.3, 1.0)
+    elif key == "confusion":
+        ring = fx.group(1, "ring", top, (0, 0, 0))
+        for i in range(3):
+            a = i * 2 * math.pi / 3
+            b = sp(f"st{i}", G(sh_spark, "STAR"), 3.5, 3.5, ring, (math.sin(a) * 4.5, 0, math.cos(a) * 4.5))
+            show(b, 0, L, 1.0)
+        fx.rot(1, ring, {0: [0, 0, 0], L / 2: [0, 180, 0], L: [0, 360, 0]})
+    elif key == "attract":
+        g, W, H = glyph_shape("HEART")
+        for i, t0 in enumerate((0.0, 0.6, 1.2, 1.8)):
+            b = sp(f"h{i}", G(g, "HEART"), W * 0.45, H * 0.45, top, ((i % 2) * 5 - 2.5, 0, 0))
+            drift(b, t0, min(L, t0 + 1.2), 6, 0.5, 1.0, (i % 2) * 2 - 1)
+    elif key == "seeded":
+        for i in range(4):
+            a = i * math.pi / 2
+            b = sp(f"v{i}", G(sh_vine, "GRASS", "long"), 2, 10, gnd, (math.sin(a) * 6, 1, math.cos(a) * 6), kind="long", rot=[-60, i * 90, 0])
+            show(b, 0, L, 1.0)
+        for i in range(6):
+            b = sp(f"d{i}", G(sh_spark, "HEAL"), 2.5, 2.5, mid, (math.sin(i * 2.2) * 5, 0, math.cos(i * 2.2) * 5))
+            show(b, i * 0.38, i * 0.38 + 0.9, 1.0, 0.4)
+            fx.pos(1, b, {i * 0.38: [0, 0, 0], i * 0.38 + 0.9: [0, 8, 6]})
+    elif key == "curse":
+        g, W, H = glyph_shape("NAIL")
+        b = sp("nail", G(g, "GHOST"), W * 0.8, H * 0.8, top, (0, 3, 0))
+        show(b, 0, L, 1.0)
+        fx.pos(1, b, {0: [0, 0, 0], L / 2: [0, -1.2, 0], L: [0, 0, 0]})
+        for i in range(5):
+            b = sp(f"w{i}", G(sh_wisp, "GHOST"), 4, 9, mid, (math.sin(i * 1.3) * 7, -3, math.cos(i * 1.3) * 7), kind="vert", planes=1, rot=[0, i * 72, 0])
+            drift(b, i * 0.45, i * 0.45 + 1.4, 7, 0.8, 1.0)
+    elif key == "bound":
+        for i, y in enumerate((-4, 0, 4)):
+            b = fx.spr(1, f"r{i}", G(sh_ring, "NORMAL", "flat", r0=.84, w=.13, dash=0), 19 - abs(y) * 0.6, 19 - abs(y) * 0.6, mid, (0, y, 0), kind="flat")
+            show(b, 0, L, 1.0)
+            fx.rot(1, b, {0: [0, 0, 0], L: [0, 120 * (1 if i % 2 else -1), 0]})
+            fx.key(1, b, "scale", {0: [1, 1, 1], L / 2: [0.92, 1, 0.92], L: [1, 1, 1]})
+    elif key == "selfhit":
+        L = 0.9
+        b = sp("pow", G(sh_pow, "NORMAL"), 12, 12, mid, (0, 1, -4))
+        show(b, 0, 0.35, 0.6, 1.2)
+        for i in range(3):
+            a = i * 2 * math.pi / 3
+            b = sp(f"st{i}", G(sh_spark, "STAR"), 3, 3, top, (math.sin(a) * 4, 0, math.cos(a) * 4))
+            show(b, 0.1, 0.85, 1.0)
+            fx.pos(1, b, {0.1: [0, 0, 0], 0.85: [math.sin(a + 2) * 3, 2, math.cos(a + 2) * 3]})
+    anims, lens = fx.anims()
+    a = anims[f"animation.move.{fx.id}.stage1"]
+    a["loop"] = key != "selfhit"
+    a["animation_length"] = L
+    return fx, {f"animation.move.{fx.id}.loop": a}, L
+
+
+def build_statuses():
+    for key, label in STATUSES:
+        fx, anims, L = status_fx(key)
+        write_fx(fx, anims, {"status": key, "label": label, "length": {1: L}, "loop": key != "selfhit"})
+        print("status", key, len(fx.m.bones), "bones")
+
+
 # ---------- writing ----------
 
 def textures(fx):
@@ -1947,4 +2096,9 @@ def build(only=None):
 
 
 if __name__ == "__main__":
-    build(set(sys.argv[1:]) or None)
+    if sys.argv[1:] == ["statuses"]:
+        build_statuses()
+    else:
+        build(set(sys.argv[1:]) or None)
+        if len(sys.argv) == 1:
+            build_statuses()

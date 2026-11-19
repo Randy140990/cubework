@@ -1,0 +1,24 @@
+{
+ "status": "selfhit",
+ "label": "Hurt itself",
+ "length": {
+  "1": 0.9
+ },
+ "loop": false,
+ "texture": "retromon:textures/moves/status_selfhit.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/moves/status_selfhit_glow_0.png",
+    "retromon:textures/moves/status_selfhit_glow_1.png",
+    "retromon:textures/moves/status_selfhit_glow_2.png",
+    "retromon:textures/moves/status_selfhit_glow_3.png",
+    "retromon:textures/moves/status_selfhit_glow_4.png",
+    "retromon:textures/moves/status_selfhit_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ]
+}

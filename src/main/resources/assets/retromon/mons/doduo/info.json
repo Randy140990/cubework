@@ -1,0 +1,80 @@
+{
+ "idle": "animation.twincask.ground_idle",
+ "ground": "animation.twincask.ground_idle",
+ "actions": {
+  "cry": "animation.twincask.cry",
+  "recoil": "animation.twincask.recoil",
+  "attack": "animation.twincask.attack",
+  "critical": "animation.twincask.critical",
+  "special": "animation.twincask.special",
+  "recall": "animation.twincask.recall",
+  "sendout": "animation.twincask.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.twincask.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.twincask.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.twincask.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.twincask.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.twincask.faint",
+   "parts": []
+  }
+ },
+ "move": "FURY ATTACK",
+ "attack_move": "PECK",
+ "scale": 0.863,
+ "height": 1.738,
+ "texture": "retromon:textures/mons/doduo.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/doduo_glow_0.png",
+    "retromon:textures/mons/doduo_glow_1.png",
+    "retromon:textures/mons/doduo_glow_2.png",
+    "retromon:textures/mons/doduo_glow_3.png",
+    "retromon:textures/mons/doduo_glow_4.png",
+    "retromon:textures/mons/doduo_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TWINCASK",
+ "anchors": {
+  "mouth": [
+   0,
+   23.2,
+   -9.9
+  ],
+  "back": [
+   0,
+   28.8,
+   0.05
+  ],
+  "body": [
+   0,
+   12.0,
+   0.05
+  ],
+  "size": [
+   8.8,
+   27.8,
+   14.5
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

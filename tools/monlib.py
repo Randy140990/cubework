@@ -77,6 +77,9 @@ class Mat:
         # frames: glow is called with the frame too, glow(at, frame), and gives (colour, alpha) or None: something
         # whose shape changes from frame to frame (a flame's tongues), drawn only in the glowing layer.
         self.frames = frames
+        # under: (colour, amount) for a flat part (a wing's membrane, its feathers) whose underside is another colour:
+        # the face towards the body's middle (a wing's inner face, underneath it when spread), or the bottom face.
+        self.under = None
 
     def colour(self, at):
         c = self.base
@@ -87,22 +90,34 @@ class Mat:
             if isinstance(r, str) and r == CLEAR:
                 return None
             c = rgb(r)
+        if self.under is not None and (at.face == "bottom" or (at.face == "px" and at.x < 0) or (at.face == "nx" and at.x > 0)):
+            c = mix(c, self.under[0], self.under[1])
         return c
+
+
+def underside(mat, colour, amount=0.55):
+    """The same paint, its underside (see Mat.under) washed towards another colour, as a wing's underside is."""
+    import copy
+    m = copy.copy(mat)
+    m.under = (rgb(colour), amount)
+    return m
 
 
 class At:
     """Where a texel is: its point (x, y, z), the face, the cube, its spot on the cube (lx, ly, lz from 0 to 1), and its
     column and row on the face (fw by fh)."""
 
-    __slots__ = ("x", "y", "z", "face", "cube", "lx", "ly", "lz", "col", "row", "fw", "fh")
+    __slots__ = ("x", "y", "z", "face", "cube", "lx", "ly", "lz", "col", "row", "fw", "fh", "sc", "sr", "d")
 
-    def __init__(self, x, y, z, face, cube, col, row, fw, fh):
+    def __init__(self, x, y, z, face, cube, col, row, fw, fh, sc=None, sr=None, d=1):
         self.x, self.y, self.z, self.face, self.cube = x, y, z, face, cube
         o, s = cube.origin, cube.size
         self.lx = (x - o[0]) / s[0] if s[0] else 0.5
         self.ly = (y - o[1]) / s[1] if s[1] else 0.5
         self.lz = (z - o[2]) / s[2] if s[2] else 0.5
         self.col, self.row, self.fw, self.fh = col, row, fw, fh
+        # The fine texel within the face (painted d by d to each unit of the model): its column and row.
+        self.sc, self.sr, self.d = (col if sc is None else sc), (row if sr is None else sr), d
 
     @property
     def side(self):
@@ -111,6 +126,11 @@ class At:
     @property
     def edge(self):
         return self.col == 0 or self.row == 0 or self.col == self.fw - 1 or self.row == self.fh - 1
+
+    @property
+    def fine_edge(self):
+        """On the face's outermost ring of fine texels (a thin outline)."""
+        return self.sc == 0 or self.sr == 0 or self.sc == self.fw * self.d - 1 or self.sr == self.fh * self.d - 1
 
 
 class Cube:
@@ -327,41 +347,50 @@ def eye_mat(w, h, iris, pupil, lash, shine, iris_light=None, white=None, side=Fa
     table = {"L": L, "W": S, "w": mix(S, I, 0.35), "P": P, "I": I, "J": J, "E": E, "K": mix(I, P, 0.5), "S": SK, "D": mix(SK, L, 0.4),
              ".": CLEAR}
 
+    # A grid of twice as many rows as the eye is high is drawn in fine texels (two to each of the eye's units, across
+    # and down), for eyes drawn in more detail: slit pupils, catch-lights, lashes.
+    q = 2 if grid is not None and len(grid) == 2 * h else 1
+
     def f(at):
         if not outward(at):
             return CLEAR
+        if q > 1 and at.d >= q:
+            col, row, fw = at.sc * q // at.d, at.sr * q // at.d, at.fw * q
+        else:
+            col, row, fw = at.col, at.row, at.fw
+        W_ = w * q
         if part is not None:
-            c0, n = part
+            c0, n = part[0] * q, part[1] * q
             if face == "front":
                 if at.face != "front":
                     return None
                 right = at.cube.origin[0] < 0
                 # The right eye's face part: its inner side is towards +x (column 0 of the face is +x).
-                k = (n - 1 - at.col) if right else at.col
+                k = (n - 1 - col) if right else col
                 k = n - 1 - k
             else:
                 if at.face == "nx":
-                    k = at.col
+                    k = col
                 elif at.face == "px":
-                    k = at.fw - 1 - at.col
+                    k = fw - 1 - col
                 else:
                     return None
             k += c0
         elif side:
             if at.face == "nx":
-                k = at.col
+                k = col
             elif at.face == "px":
-                k = w - 1 - at.col
+                k = W_ - 1 - col
             else:
                 return None
         else:
             if at.face != "front":
                 return None
             inner_right = at.cube.origin[0] + w / 2 < 0
-            k = at.col if inner_right else (w - 1 - at.col)
-        if grid is None or at.row >= len(grid) or k >= len(grid[at.row]):
+            k = col if inner_right else (W_ - 1 - col)
+        if grid is None or row >= len(grid) or k >= len(grid[row]):
             return I
-        return table[grid[at.row][k]]
+        return table[grid[row][k]]
 
     return Mat(iris, f, noise=0.0, shade=0.1, edge=0)
 
@@ -375,21 +404,25 @@ def face_rect(c):
             ("nx", u + d + w, v + d, d, h), ("back", u + 2 * d + w, v + d, w, h)]
 
 
-def texel_point(c, face, col, row):
+def texel_point(c, face, col, row, cf=None, rf=None):
+    """The point a texel paints. cf, rf: its middle across and down the face, in model units (for fine texels);
+    otherwise the middle of texel col, row."""
     x0, y0, z0 = c.origin
     w, h, d = c.size
     x1, y1, z1 = x0 + w, y0 + h, z0 + d
+    a = col + .5 if cf is None else cf
+    b = row + .5 if rf is None else rf
     if face == "top":
-        return x1 - (col + .5), y1, z1 - (row + .5)
+        return x1 - a, y1, z1 - b
     if face == "bottom":
-        return x1 - (col + .5), y0, z1 - (row + .5)
+        return x1 - a, y0, z1 - b
     if face == "px":
-        return x1, y1 - (row + .5), z1 - (col + .5)
+        return x1, y1 - b, z1 - a
     if face == "front":
-        return x1 - (col + .5), y1 - (row + .5), z0
+        return x1 - a, y1 - b, z0
     if face == "nx":
-        return x0, y1 - (row + .5), z0 + (col + .5)
-    return x0 + (col + .5), y1 - (row + .5), z1
+        return x0, y1 - b, z0 + a
+    return x0 + a, y1 - b, z1
 
 
 def shade_for(at, c):
@@ -402,10 +435,11 @@ def shade_for(at, c):
         k = 0.78
     else:
         k = 0.9 + 0.14 * at.ly
-        if at.row == 0 and at.fh > 2 and (at.face, "r0") not in c.seams:
+        if at.sr < at.d and at.fh > 2 and (at.face, "r0") not in c.seams:
             k *= 1.05
-    if m.edge and at.edge and at.fw > 2 and at.fh > 2:
-        on = [e for e, hit in (("r0", at.row == 0), ("rl", at.row == at.fh - 1), ("c0", at.col == 0), ("cl", at.col == at.fw - 1)) if hit]
+    if m.edge and at.fine_edge and at.fw > 2 and at.fh > 2:
+        D = at.d
+        on = [e for e, hit in (("r0", at.sr == 0), ("rl", at.sr == at.fh * D - 1), ("c0", at.sc == 0), ("cl", at.sc == at.fw * D - 1)) if hit]
         if not all((at.face, e) in c.seams for e in on):
             k *= 1 - m.edge
     return 1 + (k - 1) * m.shade
@@ -442,17 +476,25 @@ def pack(cubes):
 FRAMES = 6
 
 
-def paint(cubes, tex_w, tex_h, frames=FRAMES):
-    """The texture, and the glowing layer's frames (or None)."""
-    img = np.zeros((tex_h, tex_w, 4), np.uint8)
-    glows = [np.zeros((tex_h, tex_w, 4), np.uint8) for _ in range(frames)]
+DETAIL = 2  # fine texels painted to each unit of a creature's model, across and down (the UVs stay in model units)
+
+
+def paint(cubes, tex_w, tex_h, frames=FRAMES, detail=1):
+    """The texture, and the glowing layer's frames (or None). detail: fine texels to each unit of the model, across and
+    down: the picture is that many times bigger, while the model's UVs (and its declared texture size) stay the same,
+    so every face is painted in finer texels."""
+    D = detail
+    img = np.zeros((tex_h * D, tex_w * D, 4), np.uint8)
+    glows = [np.zeros((tex_h * D, tex_w * D, 4), np.uint8) for _ in range(frames)]
     any_glow = False
     for ci, c in enumerate(cubes):
-        for face, u, v, fw, fh in face_rect(c):
-            for row in range(fh):
-                for col in range(fw):
-                    x, y, z = texel_point(c, face, col, row)
-                    at = At(x, y, z, face, c, col, row, fw, fh)
+        for face, u0, v0, fw, fh in face_rect(c):
+            for srow in range(fh * D):
+                for scol in range(fw * D):
+                    col, row = scol // D, srow // D
+                    x, y, z = texel_point(c, face, col, row, (scol + .5) / D, (srow + .5) / D)
+                    at = At(x, y, z, face, c, col, row, fw, fh, scol, srow, D)
+                    u, v = u0 * D + scol - col, v0 * D + srow - row
                     if c.mat.frames:
                         for fi in range(frames):
                             g = c.mat.glow(at, fi)
@@ -467,7 +509,7 @@ def paint(cubes, tex_w, tex_h, frames=FRAMES):
                     if base is None:
                         continue
                     k = shade_for(at, c)
-                    n = (hash01(ci, face, col, row) * 2 - 1) * c.mat.noise * 255
+                    n = (hash01(ci, face, scol, srow) * 2 - 1) * c.mat.noise * 255
                     img[v + row, u + col, :3] = np.clip(base * k + n, 0, 255).astype(np.uint8)
                     img[v + row, u + col, 3] = 255
                     if c.mat.glow is not None:
@@ -476,7 +518,7 @@ def paint(cubes, tex_w, tex_h, frames=FRAMES):
                             any_glow = True
                             g = rgb(g)
                             for fi in range(frames):
-                                flick = 0.78 + 0.22 * math.sin(fi / frames * 2 * math.pi + hash01(ci, col, row) * 6.3)
+                                flick = 0.78 + 0.22 * math.sin(fi / frames * 2 * math.pi + hash01(ci, scol, srow) * 6.3)
                                 glows[fi][v + row, u + col, :3] = np.clip(g * (0.9 + 0.1 * flick), 0, 255).astype(np.uint8)
                                 glows[fi][v + row, u + col, 3] = int(255 * min(1, 0.55 + 0.45 * flick))
     return img, (glows if any_glow else None)
@@ -957,7 +999,7 @@ def write(sid, name, model, anims, info, stands):
     drop_move_fx(model, anims)
     cubes = model.cubes()
     tw, th = pack(cubes)
-    img, glows = paint(cubes, tw, th)
+    img, glows = paint(cubes, tw, th, detail=getattr(model, "detail", DETAIL))
     os.makedirs(os.path.join(OUT_MODELS, sid), exist_ok=True)
     os.makedirs(OUT_TEX, exist_ok=True)
     Image.fromarray(img, "RGBA").save(os.path.join(OUT_TEX, sid + ".png"))

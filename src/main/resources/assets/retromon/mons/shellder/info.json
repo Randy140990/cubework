@@ -1,0 +1,72 @@
+{
+ "idle": "animation.glintshell.ground_idle",
+ "ground": "animation.glintshell.ground_idle",
+ "actions": {
+  "cry": "animation.glintshell.cry",
+  "recoil": "animation.glintshell.recoil",
+  "attack": "animation.glintshell.attack",
+  "critical": "animation.glintshell.critical",
+  "special": "animation.glintshell.special",
+  "recall": "animation.glintshell.recall",
+  "sendout": "animation.glintshell.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.glintshell.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.glintshell.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.glintshell.faint",
+   "parts": []
+  }
+ },
+ "move": "AURORA BEAM",
+ "attack_move": "CLAMP",
+ "scale": 1.733,
+ "height": 0.375,
+ "texture": "retromon:textures/mons/shellder.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/shellder_glow_0.png",
+    "retromon:textures/mons/shellder_glow_1.png",
+    "retromon:textures/mons/shellder_glow_2.png",
+    "retromon:textures/mons/shellder_glow_3.png",
+    "retromon:textures/mons/shellder_glow_4.png",
+    "retromon:textures/mons/shellder_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "GLINTSHELL",
+ "anchors": {
+  "mouth": [
+   0,
+   3.0,
+   -5.5
+  ],
+  "back": [
+   0,
+   7.0,
+   -1.25
+  ],
+  "body": [
+   0,
+   2.3,
+   -1.25
+  ],
+  "size": [
+   9.0,
+   6.0,
+   10.52
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

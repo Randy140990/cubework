@@ -1,0 +1,24 @@
+{
+ "status": "burn",
+ "label": "Burned",
+ "length": {
+  "1": 2.4
+ },
+ "loop": true,
+ "texture": "retromon:textures/moves/status_burn.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/moves/status_burn_glow_0.png",
+    "retromon:textures/moves/status_burn_glow_1.png",
+    "retromon:textures/moves/status_burn_glow_2.png",
+    "retromon:textures/moves/status_burn_glow_3.png",
+    "retromon:textures/moves/status_burn_glow_4.png",
+    "retromon:textures/moves/status_burn_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ]
+}

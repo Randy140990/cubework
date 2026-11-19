@@ -1,5 +1,5 @@
 {
- "idle": "animation.rafflora.ground_idle",
+ "idle": "animation.rafflora.battle_idle",
  "ground": "animation.rafflora.ground_idle",
  "actions": {
   "cry": "animation.rafflora.cry",
@@ -26,8 +26,8 @@
  },
  "move": "PETAL DANCE",
  "attack_move": "ACID",
- "scale": 1.341,
- "height": 1.007,
+ "scale": 1.286,
+ "height": 1.244,
  "texture": "retromon:textures/mons/vileplume.png",
  "layers": [
   {
@@ -48,23 +48,23 @@
  "anchors": {
   "mouth": [
    0,
-   5.94,
-   -3.74
+   6.51,
+   -4.22
   ],
   "back": [
    0,
-   17.12,
-   0.1
+   20.91,
+   -0.2
   ],
   "body": [
    0,
-   6.39,
-   0.1
+   9.22,
+   -0.2
   ],
   "size": [
-   16.0,
-   16.12,
-   25.56
+   19.0,
+   19.91,
+   28.84
   ]
  },
  "stage": 3,

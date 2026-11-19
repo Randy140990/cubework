@@ -33,12 +33,15 @@ def fur(base, light, dark, belly=None, below=None, speck=0.35):
     def f(at):
         if belly is not None and (at.face == "bottom" or (below is not None and at.y < below and at.face != "top")):
             return rgb(belly)
+        # Fine hairs: each fine texel a shade lighter or darker than the next, so a coat of one colour has depth.
+        hair = hash01("hair", round(at.x * 2), round(at.y * 2), round(at.z * 2)) - 0.5
         if at.face == "top":
-            return mix(base, light, 0.55 + 0.25 * cell(at.x, at.y, at.z, 1.3))
-        c = mix(dark, base, 0.45 + 0.55 * at.ly)
-        if cell(at.x * 1.1, at.y, at.z * 1.1, 1.0) > 1 - speck * 0.3:
-            c = mix(c, light, 0.35)
-        return c
+            c = mix(base, light, 0.55 + 0.25 * cell(at.x, at.y, at.z, 1.3))
+        else:
+            c = mix(dark, base, 0.45 + 0.55 * at.ly)
+            if cell(at.x * 1.1, at.y, at.z * 1.1, 1.0) > 1 - speck * 0.3:
+                c = mix(c, light, 0.35)
+        return mix(c, light if hair > 0 else dark, abs(hair) * 0.22)
     return f
 
 
@@ -508,7 +511,7 @@ def shrike(sid, name, stands, stage):
                             rotation=keys({0: [0, 0, 0], q(.3): [-6, 0, 0], q(.55): [12, 0, 0], St: [0, 0, 0]}))}
         m.move_name, m.move_extras = "DRILL PECK", {"all": away("fx_drill"), "special": sp}
     attack_move(m, "PECK", 1.0 + 0.15 * stage, s, "bird")
-    A, info = bird(name.lower(), m, walk=0.5 + 0.1 * stage, stride=36 - 6 * stage, k=s, slow=1.0 + 0.15 * stage, flap=0.34 + 0.12 * stage)
+    A, info = bird(name.lower(), m, walk=0.5 + 0.1 * stage, stride=36 - 6 * stage, k=s, slow=1.0 + 0.15 * stage, flap=0.42 + 0.4 * stage)
     done(sid, name, m, A, info, stands)
 
 

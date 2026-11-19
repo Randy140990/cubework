@@ -1,0 +1,72 @@
+{
+ "idle": "animation.bogblob.battle_idle",
+ "ground": "animation.bogblob.ground_idle",
+ "actions": {
+  "cry": "animation.bogblob.cry",
+  "recoil": "animation.bogblob.recoil",
+  "attack": "animation.bogblob.attack",
+  "critical": "animation.bogblob.critical",
+  "special": "animation.bogblob.special",
+  "recall": "animation.bogblob.recall",
+  "sendout": "animation.bogblob.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.bogblob.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.bogblob.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.bogblob.faint",
+   "parts": []
+  }
+ },
+ "move": "SLUDGE",
+ "attack_move": "POUND",
+ "scale": 1.308,
+ "height": 0.688,
+ "texture": "retromon:textures/mons/grimer.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/grimer_glow_0.png",
+    "retromon:textures/mons/grimer_glow_1.png",
+    "retromon:textures/mons/grimer_glow_2.png",
+    "retromon:textures/mons/grimer_glow_3.png",
+    "retromon:textures/mons/grimer_glow_4.png",
+    "retromon:textures/mons/grimer_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BOGBLOB",
+ "anchors": {
+  "mouth": [
+   0,
+   5.0,
+   -4.1
+  ],
+  "back": [
+   0,
+   12.0,
+   0.05
+  ],
+  "body": [
+   0,
+   6.0,
+   0.05
+  ],
+  "size": [
+   13.0,
+   11.0,
+   12.0
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

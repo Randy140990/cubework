@@ -26,8 +26,8 @@
  },
  "move": "EARTHQUAKE",
  "attack_move": "SLASH",
- "scale": 1.304,
- "height": 0.652,
+ "scale": 1.204,
+ "height": 0.706,
  "texture": "retromon:textures/mons/dugtrio.png",
  "layers": [
   {
@@ -48,23 +48,23 @@
  "anchors": {
   "mouth": [
    0,
-   6.44,
-   -5.79
+   6.67,
+   -7.38
   ],
   "back": [
    0,
-   11.44,
-   -1.83
+   12.29,
+   -3.21
   ],
   "body": [
    0,
    5.22,
-   -1.83
+   -3.21
   ],
   "size": [
-   17.0,
-   10.44,
-   15.0
+   19.87,
+   11.29,
+   17.99
   ]
  },
  "stage": 3,

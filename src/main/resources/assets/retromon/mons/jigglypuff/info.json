@@ -26,8 +26,8 @@
  },
  "move": "SING",
  "attack_move": "POUND",
- "scale": 0.746,
- "height": 0.938,
+ "scale": 0.674,
+ "height": 1.038,
  "texture": "retromon:textures/mons/jigglypuff.png",
  "layers": [
   {
@@ -53,18 +53,18 @@
   ],
   "back": [
    0,
-   16.0,
-   0.0
+   17.6,
+   -0.15
   ],
   "body": [
    0,
    3.7,
-   0.0
+   -0.15
   ],
   "size": [
-   11.2,
-   15.0,
-   14.8
+   14.8,
+   16.6,
+   16.4
   ]
  },
  "stage": 2,

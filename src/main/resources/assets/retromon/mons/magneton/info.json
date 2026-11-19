@@ -1,0 +1,72 @@
+{
+ "idle": "animation.boltrio.battle_idle",
+ "ground": "animation.boltrio.ground_idle",
+ "actions": {
+  "cry": "animation.boltrio.cry",
+  "recoil": "animation.boltrio.recoil",
+  "attack": "animation.boltrio.attack",
+  "critical": "animation.boltrio.critical",
+  "special": "animation.boltrio.special",
+  "recall": "animation.boltrio.recall",
+  "sendout": "animation.boltrio.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.boltrio.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.boltrio.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.boltrio.faint",
+   "parts": []
+  }
+ },
+ "move": "ZAP CANNON",
+ "attack_move": "SONICBOOM",
+ "scale": 1.105,
+ "height": 1.131,
+ "texture": "retromon:textures/mons/magneton.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/magneton_glow_0.png",
+    "retromon:textures/mons/magneton_glow_1.png",
+    "retromon:textures/mons/magneton_glow_2.png",
+    "retromon:textures/mons/magneton_glow_3.png",
+    "retromon:textures/mons/magneton_glow_4.png",
+    "retromon:textures/mons/magneton_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BOLTRIO",
+ "anchors": {
+  "mouth": [
+   0,
+   8.3,
+   -2.75
+  ],
+  "back": [
+   0,
+   19.1,
+   -0.8
+  ],
+  "body": [
+   0,
+   8.75,
+   -0.8
+  ],
+  "size": [
+   24.4,
+   18.1,
+   5.1
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}
