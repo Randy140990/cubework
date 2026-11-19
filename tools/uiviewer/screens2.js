@@ -113,7 +113,7 @@ screen("dex", "Menus", "Pokédex", {
     const draw = () => {
       if (sel < top) top = sel; if (sel > top + 8) top = sel - 8;
       L.innerHTML = DEXLIST.slice(top, top + 9).map((x, j) => { const i = top + j, seen = SEEN.has(x.sid), got = CAUGHT.has(x.sid);
-        return `<div class="g-item${i === sel ? " on" : ""}" style="min-height:54px"><span style="width:62px;opacity:.75;font-variant-numeric:tabular-nums">${String(x.n).padStart(3, "0")}</span><span style="width:22px;height:22px;display:inline-block">${got ? ICON.ball : ""}</span><span style="${seen ? "" : "opacity:.45"}">${seen ? esc(ourName(x.sid)) : "?????"}</span></div>`; }).join("");
+        return `<div class="g-item${i === sel ? " on" : ""}" style="min-height:54px;padding-top:2px;padding-bottom:2px"><span style="width:58px;opacity:.75;font-variant-numeric:tabular-nums">${String(x.n).padStart(3, "0")}</span><span style="width:48px;height:48px;display:inline-grid;place-items:center">${seen ? pic(x.sid, 48, got ? "" : "filter:brightness(0) opacity(.45)") : ""}</span><span style="${seen ? "" : "opacity:.45"}">${seen ? esc(ourName(x.sid)) : "?????"}</span><span class="r" style="width:22px;height:22px">${got ? ICON.ball : ""}</span></div>`; }).join("");
       const x = DEXLIST[sel], seen = SEEN.has(x.sid);
       info.innerHTML = seen ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="g-title" style="font-size:26px">${esc(ourName(x.sid))}</span>${x.d.stats.types.map(typeChip).join("")}</div><div style="font-size:15px;font-weight:800;color:#A9D4C6">Stands in for #${String(x.n).padStart(3, "0")} ${esc(x.d.pname)}</div>` : `<span class="g-title" style="font-size:26px">?????</span>`;
       SC.model.hide = !seen; if (seen) SC.model.show(x.sid);
@@ -143,29 +143,34 @@ screen("dexentry", "Menus", "Pokédex entry", {
     return { key: k => { if (k === "b") { go("dex", { sid }); return true; } return true; } };
   }
 });
-function monCard(p, on, w = 560) {
-  const f = p.hp / p.maxhp;
-  return `<div class="g-panel" style="position:relative;width:${w}px;padding:14px 20px 14px 92px;border-radius:22px;${on ? "background:linear-gradient(180deg,#FFF8E6,#FFF0CC);color:#26304A;border-color:#fff;box-shadow:0 0 0 4px rgba(255,244,216,.4),0 14px 30px rgba(0,0,0,.35)" : ""}${p.status === "FNT" ? ";filter:saturate(.4)" : ""}">
-    <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:62px;height:62px;border-radius:50%;background:${TYPECOL(sp(p.sid).stats.types[0])};display:grid;place-items:center;font-family:Fredoka;font-weight:700;font-size:26px;color:#fff;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2)">${esc(ourName(p.sid)[0])}</div>
-    <div style="display:flex;align-items:center;gap:10px"><span class="g-title" style="font-size:25px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-weight:900;font-size:19px">Lv. ${p.lv}</span></div>
-    <div style="display:flex;align-items:center;gap:12px;margin-top:6px"><span style="font-weight:900;font-size:14px;letter-spacing:1px;opacity:.75">HP</span>${hpBar(f, w - 260)}<span style="font-weight:900;font-size:18px;font-variant-numeric:tabular-nums">${p.hp}/${p.maxhp}</span></div></div>`;
+function monCard(p, on, i) {
+  const f = p.hp / p.maxhp, d = sp(p.sid);
+  return `<div class="g-panel" style="position:relative;height:262px;padding:14px 18px;border-radius:26px;${on ? "background:linear-gradient(180deg,#FFF8E6,#FFF0CC);color:#26304A;border-color:#fff;box-shadow:0 0 0 4px rgba(255,244,216,.4),0 14px 30px rgba(0,0,0,.35)" : ""}${p.status === "FNT" ? ";filter:saturate(.35)" : ""}">
+    <div style="position:absolute;left:10px;top:8px;width:156px;height:156px;border-radius:26px;background:radial-gradient(circle at 50% 62%, ${on ? "rgba(255,212,90,.45)" : "rgba(143,245,192,.22)"}, transparent 68%)">${pic(p.sid, 156)}</div>
+    <div style="margin-left:160px;display:grid;gap:8px;padding-top:4px">
+      <div style="display:flex;align-items:center;gap:6px"><span class="g-title" style="font-size:25px;line-height:1.1">${esc(ourName(p.sid))}</span>${gender(p.gender)}</div>
+      <div style="font-weight:900;font-size:20px">Lv. ${p.lv}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${d.stats.types.map(t => typeChip(t).replace("min-width:92px", "")).join("")}</div>
+      <div>${statusChip(p.status)}${i === 0 ? `<span style="display:inline-block;margin-left:${p.status ? 6 : 0}px;padding:2px 10px;border-radius:999px;background:${on ? "#26304A" : "#8FF5C0"};color:${on ? "#FFF4D8" : "#123C38"};font-weight:900;font-size:12px;letter-spacing:.8px">FOLLOWING YOU</span>` : ""}</div></div>
+    <div style="position:absolute;left:20px;right:20px;bottom:18px;display:flex;align-items:center;gap:10px"><span style="font-weight:900;font-size:14px;letter-spacing:1px;color:${on ? "#B8860B" : "#FFD45A"}">HP</span>
+      <div class="g-hp" style="flex:1"><i style="width:${Math.max(0, f) * 100}%;background:${hpCol(f)}"></i></div><span style="font-weight:900;font-size:19px;font-variant-numeric:tabular-nums">${p.hp}/${p.maxhp}</span></div></div>`;
 }
 screen("party", "Menus", "Your team", {
-  what: "Your six as cards: name, level, HP and any status. A on one for SUMMARY, SWITCH, FOLLOW ME.",
+  what: "Your six as cards, three across: a picture of each, name, level, types, HP and any status, and which one is following you. A on one for SUMMARY, SWITCH, FOLLOW ME.",
   mod: "MenuScreen's POKéMON, with SUMMARY, SWITCH, FOLLOW ME and CANCEL.",
   make() {
     backdrop("linear-gradient(160deg,#9EE3C9,#4FA88E 60%,#2B6E61)"); const C = ctl();
     header(ICON.ball, "POKéMON");
     let sel = 0;
-    const grid = box(60, 110, 1160, 520, "", "");
-    const draw = () => { grid.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px 30px">${G.party.map((p, i) => monCard(p, i === sel)).join("")}</div>`; [...grid.firstChild.children].forEach((c, i) => c.onclick = () => { sel = i; draw(); menu(); }); };
+    const grid = box(30, 100, 1220, 560, "", "");
+    const draw = () => { grid.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px 22px">${G.party.map((p, i) => monCard(p, i === sel, i)).join("")}</div>`; [...grid.firstChild.children].forEach((c, i) => c.onclick = () => { sel = i; draw(); menu(); }); };
     const menu = async () => {
-      const i = await C.choose(["SUMMARY", "SWITCH", "FOLLOW ME", "CANCEL"], { x: 930, y: 380, w: 290 });
+      const i = await C.choose(["SUMMARY", "SWITCH", "FOLLOW ME", "CANCEL"], { x: 950, y: null, bottom: 30, w: 290 });
       if (i === 0) go("summary", { i: sel });
       else if (i === 2) { const tb = C.say([{ text: `**${ourName(G.party[sel].sid)}** will follow you now.` }]); }
     };
     draw(); hints([["A", "Choose"], ["B", "Back"]]);
-    const nav = { key(k) { if (k === "a") { menu(); return true; } if (k === "b") { go("menu", { sel: 1 }); return true; } const n = sel; sel = gridMove(sel, 6, 2, k); if (n !== sel) draw(); return true; } };
+    const nav = { key(k) { if (k === "a") { menu(); return true; } if (k === "b") { go("menu", { sel: 1 }); return true; } const n = sel; sel = gridMove(sel, 6, 3, k); if (n !== sel) draw(); return true; } };
     C.push(nav);
     return { key: k => C.key(k) };
   }
@@ -204,16 +209,28 @@ screen("bag", "Menus", "Bag", {
     backdrop("linear-gradient(160deg,#FFE7B8,#F6C46B 55%,#D99A3A)"); const C = ctl();
     const pockets = Object.keys(G.bag); let pk = 0, sel = 0;
     header(ICON.bag, "BAG");
-    const bag = box(60, 130, 380, 470, "", ""); const L = box(480, 110, 740, 440, "g-panel", ""); L.style.padding = "14px";
+    const bag = box(48, 96, 400, 540, "", ""); const L = box(480, 110, 740, 440, "g-panel", ""); L.style.padding = "14px";
     const desc = box(480, 570, 740, 110, "g-panel soft", ""); desc.style.padding = "18px 26px"; desc.style.fontSize = "21px"; desc.style.fontWeight = "800";
+    add(h("div", "", pic(G.party[0].sid, 680, "position:absolute;right:-90px;bottom:-120px;opacity:.09;filter:saturate(.6)"))).style.cssText = "position:absolute;inset:0;pointer-events:none;overflow:hidden";
+    uiRoot.insertBefore(uiRoot.lastChild, uiRoot.firstChild);
     const draw = () => {
-      const col = G.look.bag || "#E9B43C", dk = darkerHex(col, 0.25), parts = { "ITEMS": "body", "BALLS": "front", "KEY ITEMS": "lid", "TM & HM": "side" }, on = parts[pockets[pk]];
-      const glow = p => p === on ? `stroke="#FFF4D8" stroke-width="7"` : `stroke="${dk}" stroke-width="3"`;
-      bag.innerHTML = `<svg viewBox="0 0 380 470" width="380" height="470"><path d="M120 90 a70 60 0 0 1 140 0" fill="none" stroke="${dk}" stroke-width="18"/>
-        <rect x="60" y="80" width="260" height="360" rx="70" fill="${col}" ${glow("body")}/><path d="M70 160 Q190 80 310 160 L310 120 Q190 40 70 120 Z" fill="${dk}" ${glow("lid")}/>
-        <rect x="105" y="250" width="170" height="140" rx="40" fill="${darkerHex(col, 0.12)}" ${glow("front")}/><rect x="300" y="200" width="60" height="170" rx="26" fill="${darkerHex(col, 0.18)}" ${glow("side")}/>
-        <rect x="175" y="240" width="30" height="40" rx="10" fill="#26304A"/></svg>
-        <div style="position:absolute;left:0;right:0;top:450px;display:flex;justify-content:center;gap:8px">${pockets.map((p, i) => `<span class="g-chip${i === pk ? " on" : ""}" style="font-size:14px;padding:4px 10px">${esc(p)}</span>`).join("")}</div>`;
+      const col = hex(colourOf(G.outfit.bagc)), dk = darkerHex(col, 0.22), dd = darkerHex(col, 0.38), lt = lighterHex(col, 0.18), on = { "ITEMS": "body", "BALLS": "front", "KEY ITEMS": "lid", "TM & HM": "side" }[pockets[pk]];
+      const hl = p => p === on ? `stroke="#FFF4D8" stroke-width="6" filter="url(#gl)"` : `stroke="${dd}" stroke-width="3"`;
+      const lift = p => p === on ? `transform="translate(0,-6)"` : "";
+      bag.innerHTML = `<svg viewBox="0 0 400 500" width="400" height="500"><defs><filter id="gl" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#FFF4D8" flood-opacity=".9"/></filter>
+          <pattern id="weave" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${col}"/><rect width="4" height="4" fill="${lt}" opacity=".25"/><rect x="4" y="4" width="4" height="4" fill="${dk}" opacity=".18"/></pattern></defs>
+        <rect x="150" y="18" width="100" height="56" rx="18" fill="none" stroke="${dd}" stroke-width="14"/>
+        <rect x="64" y="96" width="44" height="300" rx="10" fill="${dk}"/><rect x="292" y="96" width="44" height="300" rx="10" fill="${dk}"/>
+        <g ${lift("body")}><rect x="60" y="70" width="280" height="390" rx="30" fill="url(#weave)" ${hl("body")}/>
+          <rect x="76" y="86" width="248" height="358" rx="22" fill="none" stroke="${dd}" stroke-width="2.5" stroke-dasharray="8 7" opacity=".7"/><rect x="60" y="430" width="280" height="30" rx="14" fill="${dd}" opacity=".55"/></g>
+        <g ${lift("side")}><rect x="318" y="230" width="62" height="170" rx="14" fill="${dk}" ${hl("side")}/><rect x="326" y="210" width="46" height="34" rx="8" fill="#5A8EA1"/><circle cx="349" cy="227" r="12" fill="#9FD3E2"/><circle cx="349" cy="227" r="4" fill="#123C38"/>
+          <rect x="324" y="300" width="50" height="6" rx="3" fill="${dd}"/></g>
+        <g ${lift("front")}><rect x="100" y="262" width="200" height="160" rx="26" fill="${lt}" ${hl("front")}/><path d="M118 300 H282" stroke="${dd}" stroke-width="5" stroke-linecap="round"/><rect x="190" y="292" width="20" height="16" rx="4" fill="#F4F6F5" stroke="${dd}" stroke-width="2"/>
+          <g transform="translate(200 362)"><circle r="28" fill="#F4F6F5"/><path d="M-28 0 a28 28 0 0 1 56 0z" fill="#E5525C"/><rect x="-28" y="-3" width="56" height="6" fill="#26304A"/><circle r="9" fill="#26304A"/><circle r="5" fill="#fff"/></g></g>
+        <g ${lift("lid")}><path d="M60 140 V108 Q60 66 104 64 H296 Q340 66 340 108 V140 Q340 200 290 206 H110 Q60 200 60 140Z" fill="${dk}" ${hl("lid")}/>
+          <path d="M80 120 Q200 96 320 120" stroke="${lt}" stroke-width="3" fill="none" opacity=".5"/><rect x="176" y="176" width="48" height="46" rx="9" fill="#FFD45A" stroke="#B8860B" stroke-width="3"/><rect x="190" y="190" width="20" height="18" rx="4" fill="#B8860B"/></g>
+      </svg>
+      <div style="position:absolute;left:0;right:0;top:500px;display:flex;justify-content:center;gap:6px">${pockets.map((p, i) => `<span class="g-chip${i === pk ? " on" : ""}" style="font-size:13px;padding:3px 10px">${esc(p)}</span>`).join("")}</div>`;
       const items = G.bag[pockets[pk]];
       L.innerHTML = items.map(([n, c], i) => `<div class="g-item${i === sel ? " on" : ""}"><span style="width:34px;height:34px">${ITEM_ICON(n)}</span><span>${esc(n)}</span><span class="r">x${c}</span></div>`).join("") || `<div style="padding:20px;font-size:21px;font-weight:800;color:#A9D4C6">Empty</div>`;
       desc.innerHTML = items[sel] ? esc(items[sel][2]) : "";
@@ -230,40 +247,108 @@ screen("bag", "Menus", "Bag", {
     return { key: k => C.key(k) };
   }
 });
-const TOWNS = [["PALLET TOWN", 210, 520, "A quiet start to a long road. Your home, and PROF. OAK's lab.", ["PROF. OAK's LAB", "Your house", "Rival's house"]],
-  ["VIRIDIAN CITY", 210, 400, "The city of green, where the grass is always fresh.", ["POKéMON CENTER", "POKé MART", "GYM"]], ["PEWTER CITY", 210, 170, "A stone-grey city between the rough mountains.", ["POKéMON CENTER", "POKé MART", "GYM", "MUSEUM"]],
-  ["CERULEAN CITY", 610, 150, "A blue city by the water, and its cave of mysteries.", ["POKéMON CENTER", "POKé MART", "GYM", "BIKE SHOP"]], ["SAFFRON CITY", 610, 300, "The golden city of business, right in the middle of Kanto.", ["POKéMON CENTER", "POKé MART", "GYM", "SILPH CO."]],
-  ["VERMILION CITY", 610, 460, "The port city, where the ships come in at sunset.", ["POKéMON CENTER", "POKé MART", "GYM", "FAN CLUB"]], ["LAVENDER TOWN", 860, 300, "A quiet town of purple light and old stories.", ["POKéMON CENTER", "POKé MART", "TOWER"]],
-  ["CELADON CITY", 420, 300, "The city of rainbows, with its great department store.", ["POKéMON CENTER", "DEPT. STORE", "GYM", "GAME CORNER"]], ["FUCHSIA CITY", 520, 600, "A pink city by the safari, full of rare POKéMON.", ["POKéMON CENTER", "POKé MART", "GYM", "SAFARI ZONE"]],
-  ["CINNABAR ISLAND", 210, 640, "A hot island with a volcano and a lab.", ["POKéMON CENTER", "POKé MART", "GYM", "LAB"]], ["INDIGO PLATEAU", 80, 120, "Where the best trainers in Kanto go to face the ELITE FOUR.", ["POKéMON CENTER", "POKéMON LEAGUE"]]];
+// The town's buildings, for the panel (the places file only has the outside of a town).
+const TOWN_HERE = { "PALLET TOWN": ["PROF. OAK's LAB", "Your house", "Rival's house"], "VIRIDIAN CITY": ["POKéMON CENTER", "POKé MART", "GYM"],
+  "PEWTER CITY": ["POKéMON CENTER", "POKé MART", "GYM", "MUSEUM"], "CERULEAN CITY": ["POKéMON CENTER", "POKé MART", "GYM", "BIKE SHOP"],
+  "SAFFRON CITY": ["POKéMON CENTER", "POKé MART", "GYM", "SILPH CO."], "VERMILION CITY": ["POKéMON CENTER", "POKé MART", "GYM", "FAN CLUB"],
+  "LAVENDER TOWN": ["POKéMON CENTER", "POKé MART", "TOWER"], "CELADON CITY": ["POKéMON CENTER", "DEPT. STORE", "GYM", "GAME CORNER"],
+  "FUCHSIA CITY": ["POKéMON CENTER", "POKé MART", "GYM", "SAFARI ZONE"], "CINNABAR ISLAND": ["POKéMON CENTER", "POKé MART", "GYM", "LAB"],
+  "INDIGO PLATEAU": ["POKéMON CENTER", "POKéMON LEAGUE"] };
+const BEEN = ["pallet_town", "route_1", "viridian_city", "route_22", "route_2", "pewter_city"];
+let MAPIMG = null;
+function mapImage() { if (!MAPIMG) { MAPIMG = new Image(); MAPIMG.src = MAPDATA.img; } return MAPIMG; }
 screen("map", "Menus", "Town Map", {
-  what: "Kanto, drawn our own way: towns and routes, where you are, and what's in the town you point at.",
-  mod: "TownMapScreen: zoom with E and Q, C to centre on you, Tab for the next town.",
-  try: ["Arrows to move between towns."],
+  what: "The real Town Map: Kanto as it is in your world, drawn from above in soft colours from the blocks themselves. Every town and route is marked; point at one to see what's there.",
+  mod: "TownMapScreen and TownMap: the same baked map (townmap/r.*.bin), the same colours and shading. Q and E zoom, C comes back to you, a town you've been to can be flown to. In game the places come from the zones you mark.",
+  try: ["Arrows to move between places.", "+ and - (or the mouse wheel) to zoom, drag to look around.", "C to come back to you. A on a town you've been to: FLY HERE."],
   make() {
-    backdrop("linear-gradient(180deg,#5BA3D9,#3F86C2)");
-    let sel = 0;
-    const roads = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [4, 6], [4, 7], [1, 7], [5, 8], [8, 9], [0, 9], [3, 6], [6, 8], [1, 10]];
-    const M = box(20, 20, 900, 680, "", "");
-    const info = box(940, 40, 320, 640, "g-panel", ""); info.style.padding = "22px 24px";
-    const draw = () => {
-      M.innerHTML = `<svg viewBox="0 0 900 680" width="900" height="680"><defs><pattern id="wv" width="40" height="20" patternUnits="userSpaceOnUse"><path d="M0 10 q10 -6 20 0 t20 0" stroke="rgba(255,255,255,.25)" fill="none" stroke-width="2"/></pattern></defs>
-        <rect width="900" height="680" fill="url(#wv)"/>
-        <path d="M60 60 L760 70 Q900 120 880 300 L860 420 Q820 560 660 640 L360 650 Q260 560 160 600 L60 560 Q20 300 60 60Z" fill="#7CC46A" stroke="#F4F0E6" stroke-width="6"/>
-        <path d="M120 120 L330 120 L330 260 L180 260Z" fill="#9C8A6A" opacity=".55"/><path d="M700 120 L820 160 L800 260 L690 240Z" fill="#5E9C4E" opacity=".6"/><circle cx="470" cy="480" r="60" fill="#4E9A48" opacity=".5"/>
-        <path d="M170 610 L250 610 L250 670 L170 670Z" fill="#7CC46A" stroke="#F4F0E6" stroke-width="5"/>
-        ${roads.map(([a, b]) => `<line x1="${TOWNS[a][1]}" y1="${TOWNS[a][2]}" x2="${TOWNS[b][1]}" y2="${TOWNS[b][2]}" stroke="#F6E7B8" stroke-width="12" stroke-linecap="round"/>`).join("")}
-        ${TOWNS.map(([n, x, y], i) => `<g data-i="${i}" style="cursor:pointer"><rect x="${x - 17}" y="${y - 17}" width="34" height="34" rx="9" fill="${i === sel ? "#FFF4D8" : "#E5525C"}" stroke="#fff" stroke-width="4"/>${i === 0 ? `<circle cx="${x}" cy="${y - 38}" r="11" fill="#FFD45A" stroke="#26304A" stroke-width="3"/>` : ""}</g>`).join("")}
-        <circle cx="${TOWNS[sel][1]}" cy="${TOWNS[sel][2]}" r="30" fill="none" stroke="#FFF4D8" stroke-width="5" stroke-dasharray="8 6"><animateTransform attributeName="transform" type="rotate" from="0 ${TOWNS[sel][1]} ${TOWNS[sel][2]}" to="360 ${TOWNS[sel][1]} ${TOWNS[sel][2]}" dur="6s" repeatCount="indefinite"/></circle></svg>`;
-      const [n, , , d, places] = TOWNS[sel];
-      info.innerHTML = `<div class="g-label">${sel === 0 ? "You are here" : "Town"}</div><div class="g-title" style="font-size:32px;line-height:1.1;margin:6px 0 12px">${esc(n)}</div><div style="font-size:19px;font-weight:800;line-height:1.5;color:#E8F4EF">${esc(d)}</div>
-        <div class="g-label" style="margin-top:20px">Here</div><div style="display:grid;gap:6px;margin-top:8px">${places.map(p => `<div style="display:flex;align-items:center;gap:10px;font-size:18px;font-weight:900"><span style="width:10px;height:10px;border-radius:3px;background:#8FF5C0"></span>${esc(p)}</div>`).join("")}</div>`;
-      M.querySelectorAll("[data-i]").forEach(e => e.onclick = () => { sel = +e.dataset.i; draw(); });
+    backdrop("#348CCE");
+    const P = MAPDATA.points, [bx0, bz0] = MAPDATA.box, MW = MAPDATA.w, MH = MAPDATA.h, VW = 900, VH = 680;
+    const FIT = Math.min(VW / MW, VH / MH), ZOOMS = [FIT, 1.5, 3, 6];
+    let zi = 0, cx = bx0 + MW / 2, cz = bz0 + MH / 2, tx = cx, tz = cz, sel = 0, t0 = performance.now(), alive = true;
+    const YOU = { x: -797, z: 702, yaw: 0 };
+    const M = box(20, 20, VW, VH, "g-panel", ""); M.style.overflow = "hidden"; M.style.padding = "0"; M.style.cursor = "grab";
+    const cv = document.createElement("canvas"); cv.width = VW * 2; cv.height = VH * 2; Object.assign(cv.style, { width: VW + "px", height: VH + "px", display: "block" }); M.appendChild(cv);
+    const ctx = cv.getContext("2d");
+    const info = box(940, 20, 320, 626, "g-panel", ""); info.style.padding = "22px 24px"; info.style.overflow = "hidden";
+    const zoom = () => ZOOMS[zi];
+    const toScreen = (x, z) => [(x - cx) * zoom() + VW / 2, (z - cz) * zoom() + VH / 2];
+    const clampC = () => { const hw = VW / 2 / zoom(), hh = VH / 2 / zoom();
+      tx = MW * zoom() <= VW ? bx0 + MW / 2 : Math.max(bx0 + hw, Math.min(bx0 + MW - hw, tx)); tz = MH * zoom() <= VH ? bz0 + MH / 2 : Math.max(bz0 + hh, Math.min(bz0 + MH - hh, tz)); };
+    const follow = () => { const p = P[sel], [sx, sy] = toScreen(p.x, p.z); if (zi > 0 && (sx < 120 || sx > VW - 120 || sy < 90 || sy > VH - 90)) { tx = p.x; tz = p.z; clampC(); } };
+    const KIND = { town: "Town", route: "Route", spot: "Place" };
+    const rr = (x, y, w, hh, r) => { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + hh, r); ctx.arcTo(x + w, y + hh, x, y + hh, r); ctx.arcTo(x, y + hh, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); };
+    const label = (text, x, y, big) => {
+      ctx.font = `900 ${big ? 13 : 11}px Nunito, system-ui, sans-serif`; const w = ctx.measureText(text).width + 14, hh = big ? 22 : 18;
+      rr(x - w / 2, y, w, hh, hh / 2); ctx.fillStyle = "rgba(18,60,56,.88)"; ctx.fill(); ctx.strokeStyle = "#4FB896"; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = "#FFF4D8"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, x, y + hh / 2 + 0.5);
     };
-    const near = k => { const [, x, y] = TOWNS[sel], dir = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] }[k]; let best = sel, bd = 1e9;
-      TOWNS.forEach(([, tx, ty], i) => { if (i === sel) return; const dx = tx - x, dy = ty - y, along = dx * dir[0] + dy * dir[1]; if (along <= 0) return; const d = along + Math.abs(dx * dir[1] - dy * dir[0]) * 2; if (d < bd) { bd = d; best = i; } }); return best; };
-    draw(); hints([["E", "Zoom in"], ["Q", "Zoom out"], ["C", "You"], ["B", "Back"]]);
-    return { key: k => { if (k === "b") { go("menu", { sel: 3 }); return true; } if (k === "tab") { sel = (sel + 1) % TOWNS.length; draw(); return true; } if (["left", "right", "up", "down"].includes(k)) { sel = near(k); draw(); return true; } return true; } };
+    const paint = now => {
+      if (!alive) return;
+      cx += (tx - cx) * 0.2; cz += (tz - cz) * 0.2;
+      ctx.setTransform(2, 0, 0, 2, 0, 0); ctx.fillStyle = "#348CCE"; ctx.fillRect(0, 0, VW, VH);
+      const img = mapImage(), z = zoom();
+      if (img.complete) { ctx.imageSmoothingEnabled = z < 1; const [ox, oy] = toScreen(bx0, bz0); ctx.drawImage(img, ox, oy, MW * z, MH * z); }
+      // The zones the mod knows, faintly, once you're in close.
+      if (zi >= 1) for (const p of P) if (p.zone) { const [a, b] = toScreen(p.zone[0], p.zone[1]), [c, d] = toScreen(p.zone[2], p.zone[3]); ctx.strokeStyle = "rgba(255,244,216,.55)"; ctx.setLineDash([6, 5]); ctx.lineWidth = 1.5; ctx.strokeRect(a, b, c - a, d - b); ctx.setLineDash([]); }
+      const pulse = (Math.sin((now - t0) / 260) + 1) / 2;
+      P.forEach((p, i) => {
+        const [sx, sy] = toScreen(p.x, p.z); if (sx < -40 || sy < -40 || sx > VW + 40 || sy > VH + 40) return;
+        const on = i === sel, been = BEEN.includes(p.key);
+        if (p.kind === "town") { const r = zi >= 2 ? 9 : 7; rr(sx - r, sy - r, r * 2, r * 2, 4); ctx.fillStyle = on ? "#FFD45A" : been ? "#E5525C" : "#B9C4C0"; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#FFFFFF"; ctx.stroke(); }
+        else if (p.kind === "spot") { ctx.save(); ctx.translate(sx, sy); ctx.rotate(Math.PI / 4); ctx.fillStyle = on ? "#FFD45A" : "#8FF5C0"; ctx.fillRect(-5, -5, 10, 10); ctx.strokeStyle = "#123C38"; ctx.lineWidth = 2; ctx.strokeRect(-5, -5, 10, 10); ctx.restore(); }
+        else { ctx.beginPath(); ctx.arc(sx, sy, on ? 6 : 4, 0, 7); ctx.fillStyle = on ? "#FFD45A" : "#FFF4D8"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#123C38"; ctx.stroke(); }
+        if (on) { ctx.beginPath(); ctx.arc(sx, sy, 15 + pulse * 5, 0, 7); ctx.strokeStyle = `rgba(255,212,90,${0.9 - pulse * 0.5})`; ctx.lineWidth = 3; ctx.stroke(); }
+        if (p.kind === "town" || on || zi >= 2) label(p.name, sx, sy + (p.kind === "town" ? 12 : 9), p.kind === "town");
+      });
+      // You: the arrow, the way you face.
+      const [yx, yy] = toScreen(YOU.x, YOU.z);
+      ctx.save(); ctx.translate(yx, yy); ctx.rotate(YOU.yaw); ctx.beginPath(); ctx.moveTo(0, -11); ctx.lineTo(8, 8); ctx.lineTo(0, 4); ctx.lineTo(-8, 8); ctx.closePath();
+      ctx.fillStyle = "#FFD45A"; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#26304A"; ctx.stroke(); ctx.restore();
+      // Scale bar.
+      const blocks = zi === 0 ? 200 : zi === 1 ? 100 : zi === 2 ? 50 : 20, bw = blocks * z;
+      ctx.fillStyle = "rgba(18,60,56,.8)"; rr(14, VH - 40, bw + 90, 26, 13); ctx.fill(); ctx.fillStyle = "#FFF4D8"; ctx.fillRect(26, VH - 28, bw, 4);
+      ctx.font = "900 12px Nunito, system-ui, sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(blocks + " blocks", 34 + bw, VH - 26);
+      requestAnimationFrame(paint);
+    };
+    const drawInfo = () => {
+      const p = P[sel], been = BEEN.includes(p.key), here = TOWN_HERE[p.name] || p.here || [];
+      const wild = p.wild.slice(0, 12);
+      info.innerHTML = `<div class="g-label">${p.key === "pallet_town" ? "You are here" : KIND[p.kind] || "Place"}</div>
+        <div class="g-title" style="font-size:${p.name.length > 14 ? 27 : 32}px;line-height:1.1;margin:6px 0 10px">${esc(p.name)}</div>
+        ${p.tag ? `<div style="font-size:18px;font-weight:800;line-height:1.45;color:#E8F4EF;font-style:italic">"${esc(p.tag)}"</div>` : ""}
+        ${here.length ? `<div class="g-label" style="margin-top:16px">Here</div><div style="display:grid;gap:5px;margin-top:6px">${here.map(x => `<div style="display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900"><span style="width:9px;height:9px;border-radius:3px;background:#8FF5C0"></span>${esc(x)}</div>`).join("")}</div>` : ""}
+        ${wild.length ? `<div class="g-label" style="margin-top:16px">Wild POKéMON</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">${wild.map(sid => DATA.species[sid]
+          ? `<div title="${esc(DATA.species[sid].pname)}" style="aspect-ratio:1;border-radius:12px;background:rgba(0,0,0,.18);display:grid;place-items:center">${pic(sid, 56)}</div>`
+          : `<div title="${esc(sid)}" style="aspect-ratio:1;border-radius:12px;background:rgba(0,0,0,.18);display:grid;place-items:center;font-size:26px;font-weight:900;color:#5E8E82">?</div>`).join("")}</div>` : ""}
+        <div style="position:absolute;left:24px;right:24px;bottom:22px;display:grid;gap:8px">
+          ${p.kind === "town" ? (been ? `<div class="g-chip on" style="justify-content:center;font-size:17px;padding:8px">A: FLY HERE</div>` : `<div class="g-chip" style="justify-content:center;font-size:15px;padding:8px;opacity:.7">Not been here yet</div>`) : ""}
+          <div style="font-size:12.5px;font-weight:800;color:#A9D4C6;line-height:1.35">${p.zone ? `Zone in the mod: ${p.zone[0]}, ${p.zone[1]} to ${p.zone[2]}, ${p.zone[3]}` : `About ${p.x}, ${p.z} on your map`}</div></div>`;
+    };
+    const near = k => { const p = P[sel], dir = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] }[k]; let best = sel, bd = 1e9;
+      P.forEach((q, i) => { if (i === sel) return; const dx = q.x - p.x, dz = q.z - p.z, along = dx * dir[0] + dz * dir[1]; if (along <= 4) return; const d = along + Math.abs(dx * dir[1] - dz * dir[0]) * 2.2; if (d < bd) { bd = d; best = i; } }); return best; };
+    const setZoom = (n, ax, az) => { n = Math.max(0, Math.min(ZOOMS.length - 1, n)); if (n === zi) return; zi = n; if (ax != null) { tx = ax; tz = az; } else { tx = P[sel].x; tz = P[sel].z; } clampC(); cx = tx; cz = tz; };
+    const pick = i => { sel = i; drawInfo(); follow(); };
+    // Mouse: drag to look around, wheel to zoom, click a place to point at it.
+    let drag = null;
+    M.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, tx, tz, moved: false }; M.setPointerCapture(e.pointerId); M.style.cursor = "grabbing"; });
+    M.addEventListener("pointermove", e => { if (!drag) return; const k = uiScale(), dx = (e.clientX - drag.x) / k, dy = (e.clientY - drag.y) / k; if (Math.hypot(dx, dy) > 4) drag.moved = true; tx = drag.tx - dx / zoom(); tz = drag.tz - dy / zoom(); clampC(); cx = tx; cz = tz; });
+    M.addEventListener("pointerup", e => { M.style.cursor = "grab"; const d = drag; drag = null; if (!d || d.moved) return;
+      const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k; let best = -1, bd = 22;
+      P.forEach((p, i) => { const [sx, sy] = toScreen(p.x, p.z), dd = Math.hypot(sx - mx, sy - my); if (dd < bd) { bd = dd; best = i; } }); if (best >= 0) pick(best); });
+    M.addEventListener("wheel", e => { e.preventDefault(); const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k;
+      const wx = cx + (mx - VW / 2) / zoom(), wz = cz + (my - VH / 2) / zoom(); setZoom(zi + (e.deltaY < 0 ? 1 : -1), wx, wz); }, { passive: false });
+    pick(0); requestAnimationFrame(paint);
+    hints([["+", "Zoom in"], ["-", "Zoom out"], ["C", "You"], ["B", "Back"]]);
+    return {
+      raw(e) { if (e.code === "Equal" || e.code === "NumpadAdd") { setZoom(zi + 1); return true; } if (e.code === "Minus" || e.code === "NumpadSubtract") { setZoom(zi - 1); return true; }
+        if (e.code === "KeyC") { pick(0); setZoom(Math.max(zi, 2), YOU.x, YOU.z); return true; } return false; },
+      key: k => { if (k === "b") { alive = false; go("menu", { sel: 3 }); return true; }
+        if (k === "tab") { let i = sel; do { i = (i + 1) % P.length; } while (P[i].kind !== "town"); pick(i); return true; }
+        if (k === "a") { const p = P[sel]; if (p.kind === "town" && BEEN.includes(p.key)) { alive = false; G.place = p.name; go("hud"); } return true; }
+        if (["left", "right", "up", "down"].includes(k)) { pick(near(k)); return true; } return true; },
+      leave() { alive = false; }
+    };
   }
 });
 const BADGES = [["BOULDERBADGE", "#A8A29A"], ["CASCADEBADGE", "#4D90D5"], ["THUNDERBADGE", "#E9C72E"], ["RAINBOWBADGE", "#5DB850"], ["SOULBADGE", "#E07AA8"], ["MARSHBADGE", "#E9B43C"], ["VOLCANOBADGE", "#E5525C"], ["EARTHBADGE", "#7CC46A"]];
@@ -284,12 +369,12 @@ screen("card", "Menus", "Trainer card", {
 });
 screen("clothes", "Menus", "Clothes", {
   scene: "creator", sceneOpts: () => ({ side: -1.15 }),
-  what: "Change what you wear: cap, top, bottoms, shoes and bag. B keeps what you chose, UNDO puts back what you came in with.",
+  what: "Change what you wear, as the mod's CLOTHES does: hat (cap, beanie, sun hat), cap pattern and which way round, top, bottoms, shoes and bag, each in one of 14 colours. B keeps what you chose, UNDO puts back what you came in with.",
   mod: "ClothesScreen: CAP STYLE, BACKWARDS, colours; B keeps, UNDO restores.",
   make() {
     backdrop("radial-gradient(ellipse at 70% 45%, #FFFFFF 0%, #FFF0E0 35%, #F6C99A 70%, #D98A52 100%)");
-    const C = ctl(), before = JSON.stringify(G.look);
-    maker(C, makerRows(false), { done: "UNDO", onDone: () => { G.look = JSON.parse(before); SC.creator.refresh(); go("clothes"); }, onBack: () => go("menu", { sel: 4 }) });
+    const C = ctl(), before = JSON.stringify(G.outfit);
+    maker(C, ["clothes"], { done: "UNDO", onDone: () => { G.outfit = JSON.parse(before); SC.creator.refresh(); go("clothes"); }, onBack: () => go("menu", { sel: 4 }) });
     hints([["A", "Choose"], ["B", "Keep and close"]]);
     return { key: k => C.key(k) };
   }

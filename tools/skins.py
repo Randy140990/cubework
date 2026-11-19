@@ -156,6 +156,7 @@ PEOPLE = {
     "oak": person(FAIR, GREY, "short", S(170, 80, 60), S(120, 90, 60), extras=("coat",)),
     "cooltrainer_f": person(FAIR, S(200, 110, 60), "ponytail", S(40, 120, 130), S(30, 30, 40), "skirt"),
     "cooltrainer_m": person(FAIR, S(60, 140, 70), "spiky", S(40, 120, 130), S(30, 30, 40)),
+    "scientist_f": person(FAIR, S(70, 50, 40), "ponytail", S(90, 150, 170), S(60, 60, 72), "skirt", shoes=S(60, 60, 72), extras=("coat", "glasses")),
     "super_nerd": person(FAIR, BLACK, "short", S(235, 235, 235), S(120, 90, 60), extras=("glasses",)),
     "rocket": person(FAIR, BLACK, "short", S(30, 30, 35), S(30, 30, 35), hat=S(30, 30, 35), extras=("letter",)),
     "scientist": person(FAIR, GREY, "short", S(90, 90, 110), S(70, 70, 80), extras=("coat", "glasses")),

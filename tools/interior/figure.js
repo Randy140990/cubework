@@ -1,117 +1,186 @@
-// ---------- people: rounded blocks rather than square ones, at a player's proportions (32 pixels to 1.8 blocks) ----------
+// ---------- people: Minecraft's player model wearing the mod's own skins, its corners only just softened ----------
+// The skins are the mod's (textures/entity/npc, textures/entity/player, and your clothes made from textures/outfit
+// as Outfit.compose makes them); the cap and the bag are the mod's GearLayer models. 32 pixels to 1.8 blocks.
 const PXK = 1.8 / 32;
-function roundedBox(w, h, d, r) {
-  const sx = Math.max(3, Math.round(w / (r * 0.5))), sy = Math.max(3, Math.round(h / (r * 0.5))), sz = Math.max(3, Math.round(d / (r * 0.5)));
-  const g = new THREE.BoxGeometry(w, h, d, sx, sy, sz), p = g.attributes.position, nrm = g.attributes.normal;
-  const hw = w / 2 - r, hh = h / 2 - r, hd = d / 2 - r, v = new THREE.Vector3(), c = new THREE.Vector3(), n = new THREE.Vector3();
-  for (let i = 0; i < p.count; i++) {
-    v.fromBufferAttribute(p, i);
-    c.set(Math.max(-hw, Math.min(hw, v.x)), Math.max(-hh, Math.min(hh, v.y)), Math.max(-hd, Math.min(hd, v.z)));
-    n.subVectors(v, c); if (n.lengthSq() < 1e-12) n.fromBufferAttribute(nrm, i); n.normalize();
-    v.copy(c).addScaledVector(n, r); p.setXYZ(i, v.x, v.y, v.z); nrm.setXYZ(i, n.x, n.y, n.z);
+const SKIN_IMG = {};
+const skinsReady = (typeof SKINDATA === "undefined" ? Promise.resolve() : Promise.all(Object.entries(SKINDATA).flatMap(([grp, m]) => Object.entries(m).map(([n, uri]) => new Promise(res => {
+  const im = new Image(); im.onload = () => { SKIN_IMG[grp + "/" + n] = im; res(); }; im.onerror = () => res(); im.src = uri;
+})))));
+const OUTFIT = {
+  SKINS: ["FAIR", "LIGHT", "TAN", "DEEP"], SKIN_RGB: [0xF2CBAE, 0xE6B48E, 0xC08A60, 0x86563A],
+  // Proposed: four more skin tones in between and either side, for everyone to see themselves.
+  SKINS_NEW: ["PALE", "MEDIUM", "BROWN", "DARK"], SKIN_RGB_NEW: [0xF8DCC8, 0xD69E72, 0xA2683F, 0x5C3824],
+  HAIRS: ["short", "spiky", "long", "ponytail", "pigtails", "bun"], HATS: ["none", "cap", "beanie", "sunhat"], TOPS: ["jacket", "tee", "hoodie", "vest"],
+  BOTTOMS: ["jeans", "shorts", "skirt"], CAPS: ["pokeball", "greatball", "ultraball", "plain"], CAP_NAMES: ["POKé BALL", "GREAT BALL", "ULTRA BALL", "PLAIN"],
+  BAGS: ["backpack", "satchel", "none"],
+  COLOUR_NAMES: ["RED", "BLUE", "GREEN", "YELLOW", "BLACK", "WHITE", "PINK", "ORANGE", "PURPLE", "BROWN", "TEAL", "GREY", "NAVY", "CREAM"],
+  COLOURS: [0xD8343C, 0x3A6FD0, 0x3FA34D, 0xF2C12E, 0x2A2A30, 0xF2F2F2, 0xF08FB6, 0xF07D2A, 0x8A52C8, 0x7A5030, 0x2AA5A0, 0x8C8F99, 0x283A6E, 0xF0E2BE],
+  EYES: ["NAVY", "BROWN", "HAZEL", "GREEN", "BLUE", "GREY", "AMBER", "VIOLET"], EYE_RGB: [0x2D3250, 0x5A3A22, 0x7A6A34, 0x3A7A44, 0x3A6FD0, 0x6E7A88, 0xB87A22, 0x6A4AA8],
+  defaults(girl) {
+    return { girl: !!girl, skin: 0, hair: girl ? 4 : 0, hairc: girl ? 9 : 4, hat: girl ? 3 : 1, hatc: girl ? 5 : 0, top: girl ? 1 : 0, topc: girl ? 10 : 0,
+      bot: girl ? 2 : 0, botc: girl ? 0 : 12, shoec: girl ? 6 : 0, capp: 0, capb: 0, bag: girl ? 1 : 0, bagc: 3, eyes: 0 };
+  },
+};
+function skinRGB(i) { const all = OUTFIT.SKIN_RGB.concat(OUTFIT.SKIN_RGB_NEW); return all[((i % all.length) + all.length) % all.length]; }
+const colourOf = i => OUTFIT.COLOURS[((i % 14) + 14) % 14];
+// One layer stacked on, tinted (-1 for its own colours): as Outfit.layer does it, pixel for pixel.
+function stack(out, img, rgb) {
+  if (!img) return;
+  const c = document.createElement("canvas"); c.width = img.width; c.height = img.height; const x = c.getContext("2d"); x.drawImage(img, 0, 0);
+  const src = x.getImageData(0, 0, c.width, c.height).data, dst = out.data, W = out.width;
+  const tr = rgb < 0 ? 255 : (rgb >> 16) & 255, tg = rgb < 0 ? 255 : (rgb >> 8) & 255, tb = rgb < 0 ? 255 : rgb & 255;
+  for (let y = 0; y < Math.min(out.height, c.height); y++) for (let xx = 0; xx < Math.min(W, c.width); xx++) {
+    const i = (y * c.width + xx) * 4, o = (y * W + xx) * 4, a = src[i + 3];
+    if (!a) continue;
+    const r = src[i] * tr / 255, g = src[i + 1] * tg / 255, b = src[i + 2] * tb / 255;
+    if (a >= 250) { dst[o] = r; dst[o + 1] = g; dst[o + 2] = b; dst[o + 3] = 255; continue; }
+    const oa = dst[o + 3], na = a + oa * (255 - a) / 255;
+    dst[o] = (r * a + dst[o] * (255 - a)) / 255; dst[o + 1] = (g * a + dst[o + 1] * (255 - a)) / 255; dst[o + 2] = (b * a + dst[o + 2] * (255 - a)) / 255; dst[o + 3] = na;
   }
+}
+// Your skin from your clothes, as Outfit.compose makes it; your eyes recoloured where the face layer has its irises.
+function composeOutfit(o) {
+  const cv = document.createElement("canvas"); cv.width = 64; cv.height = 64; const ctx = cv.getContext("2d"), out = ctx.getImageData(0, 0, 64, 64);
+  const L = n => SKIN_IMG["outfit/" + n];
+  stack(out, L("body"), skinRGB(o.skin)); stack(out, L("face"), -1);
+  const eye = OUTFIT.EYE_RGB[((o.eyes || 0) % 8 + 8) % 8], hairc = colourOf(o.hairc);
+  for (let i = 0; i < out.data.length; i += 4) {
+    const r = out.data[i], g = out.data[i + 1], b = out.data[i + 2];
+    if (r === 45 && g === 50 && b === 80) { out.data[i] = eye >> 16 & 255; out.data[i + 1] = eye >> 8 & 255; out.data[i + 2] = eye & 255; }
+    else if (r === 70 && g === 50 && b === 40) { out.data[i] = (hairc >> 16 & 255) * 0.62; out.data[i + 1] = (hairc >> 8 & 255) * 0.62; out.data[i + 2] = (hairc & 255) * 0.62; }
+  }
+  stack(out, L("bottom_" + OUTFIT.BOTTOMS[o.bot % 3]), colourOf(o.botc)); stack(out, L("shoes"), colourOf(o.shoec));
+  const top = OUTFIT.TOPS[o.top % 4]; stack(out, L("top_" + top), colourOf(o.topc)); if (top === "jacket") stack(out, L("top_jacket_trim"), -1);
+  stack(out, L("hair_" + OUTFIT.HAIRS[o.hair % 6]), colourOf(o.hairc));
+  const hat = OUTFIT.HATS[o.hat % 4]; if (hat !== "none" && hat !== "cap") stack(out, L("hat_" + hat), colourOf(o.hatc));
+  ctx.putImageData(out, 0, 0); return cv;
+}
+function gearCanvas(base, detail, rgb) {
+  const cv = document.createElement("canvas"); cv.width = 64; cv.height = 32; const ctx = cv.getContext("2d"), out = ctx.getImageData(0, 0, 64, 32);
+  stack(out, SKIN_IMG["gear/" + base], rgb); if (detail) stack(out, SKIN_IMG["gear/" + detail], -1); ctx.putImageData(out, 0, 0); return cv;
+}
+function texOf(canvas) { const t = new THREE.CanvasTexture(canvas); t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; t.generateMipmaps = false; return t; }
+function canvasOfImg(img) { const c = document.createElement("canvas"); c.width = img.width; c.height = img.height; c.getContext("2d").drawImage(img, 0, 0); return c; }
+
+// A box part in the skin's layout (w, h, d pixels; uv at its corner in a texW by texH picture), its edges rounded by r.
+const lamCache = {};
+function lam(c) { return lamCache[c] || (lamCache[c] = new THREE.MeshLambertMaterial({ color: new THREE.Color(c) })); }
+function mcBox(w, h, d, uvx, uvy, r, texW = 64, texH = 64, inflate = 0, dims) {
+  const [tw, th, td] = dims || [w, h, d];
+  const W = w + 2 * inflate, H = h + 2 * inflate, D = d + 2 * inflate, hw = W / 2, hh = H / 2, hd = D / 2;
+  r = Math.min(r, hw * 0.45, hh * 0.45, hd * 0.45);
+  const g = new THREE.BoxGeometry(W, H, D, 3, 3, 3), P = g.attributes.position, UV = g.attributes.uv, N = g.attributes.normal, idx = g.index;
+  const rem = (v, half) => (Math.abs(v) > 1e-6 && Math.abs(Math.abs(v) - half) > 1e-6) ? Math.sign(v) * (half - r) : v;
+  for (let i = 0; i < P.count; i++) P.setXYZ(i, rem(P.getX(i), hw), rem(P.getY(i), hh), rem(P.getZ(i), hd));
+  const R = { px: [uvx, uvy + td, td, th], nz: [uvx + td, uvy + td, tw, th], nx: [uvx + td + tw, uvy + td, td, th], pz: [uvx + 2 * td + tw, uvy + td, tw, th],
+    py: [uvx + td, uvy, tw, td], ny: [uvx + td + tw, uvy, tw, td] };
+  const faces = ["px", "nx", "py", "ny", "pz", "nz"];
+  g.groups.forEach((grp, fi) => {
+    const f = faces[fi], [rx, ry, rw, rh] = R[f];
+    for (let k = grp.start; k < grp.start + grp.count; k++) {
+      const v = idx.getX(k), x = P.getX(v), y = P.getY(v), z = P.getZ(v);
+      let u, vr;
+      if (f === "px") { u = (hd - z) / D; vr = (hh - y) / H; } else if (f === "nx") { u = (z + hd) / D; vr = (hh - y) / H; }
+      else if (f === "pz") { u = (x + hw) / W; vr = (hh - y) / H; } else if (f === "nz") { u = (hw - x) / W; vr = (hh - y) / H; }
+      else if (f === "py") { u = (hw - x) / W; vr = (z + hd) / D; } else { u = (hw - x) / W; vr = (z + hd) / D; }
+      u = Math.min(1, Math.max(0, u)); vr = Math.min(1, Math.max(0, vr));
+      UV.setXY(v, (rx + u * rw * 0.999 + 0.0005) / texW, 1 - (ry + vr * rh * 0.999 + 0.0005) / texH);
+    }
+  });
+  const v3 = new THREE.Vector3(), c = new THREE.Vector3(), n = new THREE.Vector3(), iw = hw - r, ih = hh - r, id = hd - r;
+  for (let i = 0; i < P.count; i++) {
+    v3.fromBufferAttribute(P, i); c.set(Math.max(-iw, Math.min(iw, v3.x)), Math.max(-ih, Math.min(ih, v3.y)), Math.max(-id, Math.min(id, v3.z)));
+    n.subVectors(v3, c); if (n.lengthSq() < 1e-12) n.fromBufferAttribute(N, i); n.normalize();
+    v3.copy(c).addScaledVector(n, r); P.setXYZ(i, v3.x, v3.y, v3.z); N.setXYZ(i, n.x, n.y, n.z);
+  }
+  g.scale(PXK, PXK, PXK);
   return g;
 }
 const ghostMat = new THREE.MeshLambertMaterial({ color: 0xA6EBCF, emissive: 0x12382E, transparent: true, opacity: 0.62, depthWrite: false });
 const ghostEye = new THREE.MeshBasicMaterial({ color: 0x163A33, transparent: true, opacity: 0.85 });
-const lamCache = {};
-function lam(c) { return lamCache[c] || (lamCache[c] = new THREE.MeshLambertMaterial({ color: new THREE.Color(c) })); }
-function darkerHex(c, k) { const v = mixc(hx(c), [0, 0, 0], k); return "#" + v.map(x => Math.round(x).toString(16).padStart(2, "0")).join(""); }
-const LOOK_DEFAULT = { body: "boy", skin: "#E9B48C", hair: "#4A3020", hairStyle: "short", eyes: "#3B2A1C", brows: "fine", cap: null,
-  top: "#D9524E", legs: "#3F5F9E", shoes: "#2B2522", skirt: false, bag: null, coat: null };
-// look: null for the see-through ghost, or { body, skin, hair, hairStyle, eyes, brows, cap, top, legs, shoes, skirt, bag, coat }.
-function makeFigure(look) {
-  const ghost = !look, k = PXK;
-  const L = ghost ? null : Object.assign({}, LOOK_DEFAULT, look.shirt ? { top: look.shirt } : {}, look);
-  const girl = L && L.body === "girl";
-  const mat = c => ghost ? ghostMat : lam(c);
-  const part = (w, h, d, r, m, x, y, z, parent, rot) => {
-    const b = new THREE.Mesh(roundedBox(w * k, h * k, d * k, Math.min(r, w / 2 - 0.01, h / 2 - 0.01, d / 2 - 0.01) * k), m);
-    b.position.set(x * k, y * k, z * k); if (rot) b.rotation.set(rot[0] || 0, rot[1] || 0, rot[2] || 0);
-    b.castShadow = !ghost; parent.add(b); return b;
+// spec: null for the see-through ghost; { skin: "oak" } for one of the mod's people; { player: "boy" } for the boy
+// or the girl as they come; { outfit: {...} } for you in your clothes (with the cap and bag as the mod adds them).
+function makeFigure(spec) {
+  const ghost = !spec, k = PXK, R = 0.45;
+  let canvas = null, outfit = null;
+  if (!ghost) {
+    if (spec.outfit) { outfit = spec.outfit; canvas = composeOutfit(outfit); }
+    else { const im = SKIN_IMG[(spec.player ? "player/" : "npc/") + (spec.player || spec.skin)] || SKIN_IMG["npc/youngster"]; canvas = im ? canvasOfImg(im) : null; }
+  }
+  const tex = canvas ? texOf(canvas) : null;
+  const base = ghost ? ghostMat : new THREE.MeshLambertMaterial({ map: tex });
+  const over = ghost ? null : new THREE.MeshLambertMaterial({ map: tex, transparent: true, alphaTest: 0.1, depthWrite: true, side: THREE.DoubleSide });
+  const part = (parent, w, h, d, uvx, uvy, ox, oy, oz, ovx, ovy, inf = 0.5) => {
+    const m = new THREE.Mesh(mcBox(w, h, d, uvx, uvy, R), base); m.position.set(ox * k, oy * k, oz * k); m.castShadow = !ghost; parent.add(m);
+    if (over && ovx != null) { const o = new THREE.Mesh(mcBox(w, h, d, ovx, ovy, R, 64, 64, inf), over); o.position.copy(m.position); o.castShadow = true; parent.add(o); }
+    return m;
   };
   const root = new THREE.Group(), hips = new THREE.Group(); hips.position.y = 12 * k; root.add(hips);
-  const tw = girl ? 7 : 8, aw = girl ? 3 : 4, ax = girl ? 5 : 6;
-  part(tw, 12, 4, 1.2, mat(L ? L.top : 0), 0, 6, 0, hips);
-  if (L && L.coat) { part(tw + 0.8, 11, 4.8, 1.2, lam(L.coat), 0, 6.2, 0.15, hips); part(tw - 3.2, 9, 0.4, 0.15, lam(L.top), 0, 7.4, -2.45, hips); }
-  if (L && L.bag) { part(6, 7, 2.6, 1.0, lam(L.bag), 0, 6.5, 3.2, hips); part(1, 9, 0.6, 0.3, lam(darkerHex(L.bag, 0.3)), -2.2, 6.5, -2.2, hips); part(1, 9, 0.6, 0.3, lam(darkerHex(L.bag, 0.3)), 2.2, 6.5, -2.2, hips); }
-  if (L && L.skirt) part(tw + 1.4, 4.6, 5.4, 1.4, lam(L.legs), 0, -1.6, 0, hips);
+  part(hips, 8, 12, 4, 16, 16, 0, 6, 0, 16, 32, 0.25);
   const head = new THREE.Group(); head.position.y = 12 * k; hips.add(head);
-  part(8, 8, 8, 1.6, mat(L ? L.skin : 0), 0, 4, 0, head);
-  if (ghost) { part(1.2, 1.6, 0.5, 0.25, ghostEye, -1.7, 3.6, -4.05, head); part(1.2, 1.6, 0.5, 0.25, ghostEye, 1.7, 3.6, -4.05, head); }
-  else {
-    // Eyes: white, the iris in its own colour, a glint. A mouth, and brows in the hair's colour, a shade darker.
-    for (const s of [-1, 1]) {
-      part(1.5, 1.9, 0.5, 0.3, lam("#FFFFFF"), 1.8 * s, 3.4, -4.02, head);
-      part(1.0, 1.4, 0.5, 0.28, lam(L.eyes), 1.65 * s, 3.3, -4.12, head);
-      const g = part(0.45, 0.45, 0.3, 0.1, new THREE.MeshBasicMaterial({ color: 0xffffff }), 1.45 * s + 0.15, 3.75, -4.3, head);
-      g.castShadow = false;
-    }
-    part(1.8, 0.45, 0.4, 0.15, lam(darkerHex(L.skin, 0.32)), 0, 1.6, -4.02, head);
-    const bc = lam(darkerHex(L.hair, 0.3)), br = L.brows;
-    for (const s of [-1, 1]) {
-      if (br === "fine") part(1.8, 0.38, 0.4, 0.15, bc, 1.75 * s, 5.0, -4.05, head);
-      else if (br === "thick") part(2.1, 0.75, 0.5, 0.25, bc, 1.75 * s, 5.05, -4.05, head);
-      else if (br === "arched") part(1.9, 0.45, 0.45, 0.18, bc, 1.75 * s, 5.05, -4.05, head, [0, 0, -0.22 * s]);
-      else if (br === "straight") part(2.2, 0.5, 0.45, 0.18, bc, 1.7 * s, 4.95, -4.05, head);
-      else if (br === "bushy") part(2.3, 0.95, 0.6, 0.35, bc, 1.75 * s, 5.05, -4.06, head);
-    }
-    const hm = lam(L.hair), st = L.hairStyle;
-    if (st === "buzz") { part(8.4, 1.4, 8.4, 0.6, hm, 0, 7.6, 0, head); part(8.4, 4.5, 1.0, 0.4, hm, 0, 5.6, 3.8, head); }
-    else {
-      if (!L.cap) part(8.8, 3.2, 8.8, 1.5, hm, 0, 7.2, 0.1, head);
-      part(8.8, 6, 2.2, 1.0, hm, 0, 4.5, 3.5, head);
-      for (const s of [-1, 1]) part(1.0, 3.2, 6, 0.45, hm, 4.3 * s, 5.4, 0.9, head);
-      if (st === "swept") { part(6.2, 2.4, 1.3, 0.6, hm, -1.3, 6.0, -4.15, head, [0, 0, 0.28]); part(3, 1.6, 1.2, 0.5, hm, 2.6, 6.6, -4.1, head); }
-      else if (!L.cap || st === "long") part(8.8, 2.0, 1.2, 0.5, hm, 0, 6.2, -4.1, head);
-      if (st === "spiky" && !L.cap) for (const [x, z, rz, rx] of [[-2.5, -1.5, 0.4, -0.3], [0, -2, 0, -0.4], [2.5, -1.5, -0.4, -0.3], [-1.5, 1.5, 0.3, 0.3], [1.5, 1.5, -0.3, 0.3]]) part(2.2, 2.8, 2.2, 0.6, hm, x, 9.0, z, head, [rx, 0, rz]);
-      if (st === "long") { part(8.8, 9.5, 2.4, 1.0, hm, 0, 2.2, 3.6, head); for (const s of [-1, 1]) part(1.3, 7.5, 2.6, 0.6, hm, 4.35 * s, 2.6, -1.2, head); }
-      if (st === "bob") { part(8.8, 6.6, 2.6, 1.0, hm, 0, 3.4, 3.6, head); for (const s of [-1, 1]) part(1.5, 6.2, 7.2, 0.7, hm, 4.4 * s, 3.5, 0.2, head); }
-      if (st === "pony") { part(1.8, 1.8, 1.8, 0.6, lam(L.top), 0, 5.6, 4.9, head); part(2.8, 7.5, 2.8, 1.2, hm, 0, 1.7, 5.6, head, [0.22, 0, 0]); }
-      if (st === "bun") { part(4.2, 4.2, 4.2, 1.8, hm, 0, 8.9, 2.4, head); part(4.6, 0.8, 4.6, 0.35, lam(L.top), 0, 7.4, 2.4, head); }
-    }
-    if (L.cap) {
-      const cm = lam(L.cap);
-      part(9.0, 3.6, 9.0, 1.8, cm, 0, 7.6, 0.15, head); part(8.4, 0.7, 4.4, 0.35, cm, 0, 6.3, -5.7, head);
-      part(2.4, 2.4, 0.35, 0.5, lam("#FFFFFF"), 0, 7.7, -4.6, head); part(1.2, 1.2, 0.4, 0.3, lam(darkerHex(L.cap, 0.2)), 0, 7.7, -4.72, head);
-    }
-  }
-  const limb = (x, y, parent, upper, lower, uMat, lMat, w, foot) => {
+  part(head, 8, 8, 8, 0, 0, 0, 4, 0, 32, 0, 0.5);
+  if (ghost) { const e = (x) => { const m = new THREE.Mesh(new THREE.BoxGeometry(1.2 * k, 1.6 * k, 0.4 * k), ghostEye); m.position.set(x * k, 3.6 * k, -4.05 * k); head.add(m); }; e(-1.7); e(1.7); }
+  const limb = (x, y, parent, uvx, uvy, ovx, ovy) => {
     const j = new THREE.Group(); j.position.set(x * k, y * k, 0); parent.add(j);
-    part(w, upper, 4, 1.0, uMat, 0, -upper / 2, 0, j);
-    const knee = new THREE.Group(); knee.position.y = -upper * k; j.add(knee);
-    if (foot) { part(w, lower - 2, 4, 1.0, lMat, 0, -(lower - 2) / 2, 0, knee); part(w + 0.5, 2.3, 5.2, 0.9, foot, 0, -lower + 1.15, -0.5, knee); }
-    else part(w, lower, 4, 1.0, lMat, 0, -lower / 2, 0, knee);
+    const knee = new THREE.Group(); j.add(knee);
+    part(knee, 4, 12, 4, uvx, uvy, 0, y === 0 ? -6 : -4, 0, ovx, ovy, 0.25);
     return { j, knee };
   };
-  const top = mat(L ? L.top : 0), skin = mat(L ? L.skin : 0), sleeve = L && L.coat ? lam(L.coat) : top;
-  const armL = limb(-ax, 11.5, hips, 6, 6, sleeve, L && L.coat ? sleeve : skin, aw), armR = limb(ax, 11.5, hips, 6, 6, sleeve, L && L.coat ? sleeve : skin, aw);
-  const legM = L && L.skirt ? skin : mat(L ? L.legs : 0), shoe = ghost ? null : lam(L.shoes);
-  const legL = limb(-2, 0, hips, 6, 6, legM, legM, 4, shoe), legR = limb(2, 0, hips, 6, 6, legM, legM, 4, shoe);
+  // The character's right is +x here (they face -z): the right arm and leg are the skin's first arm and leg.
+  const armR = limb(6, 10, hips, 40, 16, 40, 32), armL = limb(-6, 10, hips, 32, 48, 48, 48);
+  const legR = limb(2, 0, hips, 0, 16, 0, 32), legL = limb(-2, 0, hips, 16, 48, 0, 48);
+  const F = { root, hips, head, armL, armR, legL, legR, phase: 0 };
+  if (outfit) addGear(F, outfit);
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.9), matFor("shadowBlob")); shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.025; shadow.renderOrder = 3; root.add(shadow);
-  return { root, hips, head, armL, armR, legL, legR, shadow, phase: 0 };
+  F.shadow = shadow;
+  return F;
+}
+// The cap and the bag, as GearLayer draws them (Minecraft's y runs down there and its x the other way: turned round here).
+function addGear(F, o) {
+  const k = PXK, R = 0.3;
+  if (OUTFIT.HATS[o.hat % 4] === "cap") {
+    const pat = OUTFIT.CAPS[(o.capp || 0) % OUTFIT.CAPS.length], tint = pat === "plain" ? colourOf(o.hatc) : -1;
+    const mat = new THREE.MeshLambertMaterial({ map: texOf(gearCanvas("cap_" + pat, null, tint)), alphaTest: 0.1, side: THREE.DoubleSide });
+    const cap = new THREE.Group(); F.head.add(cap); if (o.capb === 1) cap.rotation.y = Math.PI;
+    const add = (w, h, d, u, v, x, y, z, inf = 0, parent = cap) => { const m = new THREE.Mesh(mcBox(w, h, d, u, v, R, 64, 32, inf), mat); m.position.set(x * k, y * k, z * k); m.castShadow = true; parent.add(m); return m; };
+    add(9, 4, 9, 0, 0, 0, 6.5, 0, 0.12); add(7, 1, 7, 36, 0, 0, 8.95, 0); add(1, 1, 1, 28, 14, 0, 9.7, 0, -0.1);
+    const brim = new THREE.Group(); brim.position.set(0, 4.9 * k, -4.6 * k); brim.rotation.x = -0.14; cap.add(brim); add(9, 1, 5, 0, 14, 0, 0, -2.5, 0, brim);
+  }
+  const bag = OUTFIT.BAGS[(o.bag || 0) % 3];
+  if (bag !== "none") {
+    const mat = new THREE.MeshLambertMaterial({ map: texOf(gearCanvas("bag_base", "bag_detail", colourOf(o.bagc))), alphaTest: 0.1 });
+    const B = (w, h, d, u, v, x0, y0, z0, inf = 0) => { const m = new THREE.Mesh(mcBox(w, h, d, u, v, R, 64, 32, inf), mat); m.position.set(-(x0 + w / 2) * k, (12 - (y0 + h / 2)) * k, (z0 + d / 2) * k); m.castShadow = true; F.hips.add(m); return m; };
+    if (bag === "backpack") {
+      B(7, 9, 4, 0, 0, -3.5, 0.6, 2.2); B(7, 4, 1, 0, 13, -3.5, 0.3, 6.0, 0.08); B(1, 4, 3, 22, 0, 3.5, 5, 2.7); B(1, 4, 3, 22, 0, -4.5, 5, 2.7); B(5, 3, 1, 16, 13, -2.5, 5.6, 6.05);
+      B(1, 1, 5, 36, 0, 2.2, -0.45, -2.6); B(1, 1, 5, 36, 0, -3.2, -0.45, -2.6); B(1, 8, 1, 32, 0, 2.2, 0, -2.6); B(1, 8, 1, 32, 0, -3.2, 0, -2.6);
+    } else {
+      B(5, 5, 2, 0, 20, 0.6, 7.6, 2.15); B(1, 1, 5, 36, 0, -3.7, -0.45, -2.6);
+      const s = (len, z, rz) => { const m = new THREE.Mesh(mcBox(1, len, 1, 48, 0, R, 64, 32), mat); const g = new THREE.Group(); g.position.set(3.2 * k, 11.8 * k, z * k); g.rotation.z = -rz; m.position.y = -len / 2 * k; g.add(m); F.hips.add(g); };
+      s(14, -2.35, 0.62); s(12, 2.35, 0.5);
+    }
+  }
 }
 function poseFigure(f, o) {
-  // o: { walk (0..1.3), seated, headYaw, talk, wave (0..1), point (0..1), cheer (0..1) }
-  const s = Math.sin(f.phase), a = 0.62 * (o.walk || 0);
+  // Minecraft's own swing: arms and legs straight, swinging from the shoulder and hip. o: { walk, seated, headYaw, talk, wave, point, cheer, nod }.
+  const s = Math.sin(f.phase), a = 0.75 * Math.min(1.2, o.walk || 0);
+  f.armL.j.rotation.set(0, 0, 0); f.armR.j.rotation.set(0, 0, 0); f.legL.j.rotation.set(0, 0, 0); f.legR.j.rotation.set(0, 0, 0);
   if (o.seated) {
-    f.hips.position.y = 0.56; f.hips.position.z = 0.08;
-    f.legL.j.rotation.x = f.legR.j.rotation.x = Math.PI / 2; f.legL.knee.rotation.x = f.legR.knee.rotation.x = -Math.PI / 2 + 0.15;
-    f.armL.j.rotation.x = f.armR.j.rotation.x = 0.55; f.armL.knee.rotation.x = f.armR.knee.rotation.x = 0.35;
+    f.hips.position.y = 0.56; f.hips.position.z = 0.04;
+    f.legL.j.rotation.x = f.legR.j.rotation.x = Math.PI / 2 - 0.08; f.legL.j.rotation.y = 0.08; f.legR.j.rotation.y = -0.08;
+    f.armL.j.rotation.x = f.armR.j.rotation.x = 0.5;
     f.shadow.visible = false;
   } else {
-    f.hips.position.y = 12 * PXK + Math.abs(Math.cos(f.phase)) * 0.035 * Math.min(1, o.walk || 0); f.hips.position.z = 0;
+    f.hips.position.y = 12 * PXK; f.hips.position.z = 0;
     f.legL.j.rotation.x = s * a; f.legR.j.rotation.x = -s * a;
-    f.legL.knee.rotation.x = -Math.max(0, -Math.sin(f.phase + 0.9)) * a * 1.3; f.legR.knee.rotation.x = -Math.max(0, Math.sin(f.phase + 0.9)) * a * 1.3;
-    f.armL.j.rotation.x = -s * a * 0.8; f.armR.j.rotation.x = s * a * 0.8;
-    f.armL.knee.rotation.x = f.armR.knee.rotation.x = 0.25 + a * 0.3;
-    f.armL.j.rotation.z = -0.06; f.armR.j.rotation.z = 0.06;
+    f.armL.j.rotation.x = -s * a * 0.85; f.armR.j.rotation.x = s * a * 0.85;
+    const t0 = performance.now() / 1000;
+    f.armL.j.rotation.z = -0.04 - Math.sin(t0 * 1.3) * 0.02; f.armR.j.rotation.z = 0.04 + Math.sin(t0 * 1.3) * 0.02;
     f.shadow.visible = true;
   }
   const t = performance.now() / 1000;
-  if (o.wave) { f.armR.j.rotation.z = 0.06 + 2.5 * o.wave; f.armR.j.rotation.x = 0; f.armR.knee.rotation.z = 0; f.armR.knee.rotation.x = 0.2 + Math.sin(t * 9) * 0.5 * o.wave; }
-  if (o.point) { f.armR.j.rotation.x = 1.45 * o.point; f.armR.knee.rotation.x = 0.1; }
-  if (o.cheer) { f.armL.j.rotation.z = -2.6 * o.cheer; f.armR.j.rotation.z = 2.6 * o.cheer; f.armL.j.rotation.x = f.armR.j.rotation.x = 0; f.hips.position.y += Math.abs(Math.sin(t * 7)) * 0.12 * o.cheer; }
+  if (o.wave) { f.armR.j.rotation.z = 2.7 * o.wave + Math.sin(t * 9) * 0.25 * o.wave; f.armR.j.rotation.x = 0; }
+  if (o.point) { f.armR.j.rotation.x = 1.5 * o.point; f.armR.j.rotation.z = 0.1; }
+  if (o.cheer) { f.armL.j.rotation.z = -2.7 * o.cheer; f.armR.j.rotation.z = 2.7 * o.cheer; f.armL.j.rotation.x = f.armR.j.rotation.x = 0; f.hips.position.y += Math.abs(Math.sin(t * 7)) * 0.12 * o.cheer; }
   f.head.rotation.y = o.headYaw || 0;
   f.head.rotation.x = o.talk ? Math.sin(performance.now() / 120) * 0.05 : (o.nod || 0);
 }

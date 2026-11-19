@@ -1,0 +1,47 @@
+# Where Kanto's places are on Insid3 Th3 Cub3's map (block x, z: the middle of each), for the UI Viewer's Town Map.
+# Read off the baked Town Map by eye, except the five the mod already knows (Game.DEFAULT_ZONES), which carry their zone.
+# In game, the places come from the zones you mark (/retromon zone); this is only for the viewer.
+# key	x	z	zone (x1,z1,x2,z2)
+pallet_town	-795	695	-845,655,-745,735
+route_1	-795	622	-845,590,-745,654
+viridian_city	-787	542	-830,495,-745,589
+route_22	-866	530	-900,495,-831,565
+route_2	-787	417	-830,340,-745,494
+pewter_city	-790	295
+route_3	-700	303
+mt_moon	-612	270
+route_4	-480	262
+cerulean_city	-345	258
+route_24	-352	180
+route_25	-262	150
+route_9	-230	262
+route_10	-128	262
+rock_tunnel	-130	305
+route_5	-357	330
+saffron_city	-350	422
+route_7	-430	424
+celadon_city	-512	422
+route_16	-620	418
+route_8	-230	420
+lavender_town	-126	425
+route_6	-355	505
+vermilion_city	-355	580
+route_11	-230	585
+route_12	-124	560
+route_13	-195	710
+route_14	-270	745
+route_15	-360	785
+fuchsia_city	-500	785
+route_18	-590	782
+route_17	-640	590
+route_19	-500	870
+route_20	-575	920
+seafoam_islands	-630	925
+cinnabar_island	-825	912
+route_21	-795	805
+route_23	-910	440
+victory_road	-910	300
+indigo_plateau	-910	170
+route_26	-985	640
+route_27	-1120	683
+route_28	-1080	527

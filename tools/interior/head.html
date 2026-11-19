@@ -117,11 +117,12 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 86
 <div class="wrap">
   <header>
     <h1>Retromon <span>Interior Viewer</span></h1>
-    <p class="lede">Walk the insides of Retromon's buildings with the camera the game uses: fixed, facing north, the near wall left off. Pick any creature to follow you at its true size. Small ones can ride on your shoulder.</p>
+    <p class="lede">Walk the insides of Retromon's buildings with the camera the game uses: fixed, facing north, the near wall left off. Walls, floors and carpets are drawn as Minecraft blocks, a block to a tile; you move as the game moves you (0.6 wide, 4.3 blocks a second, 5.6 running, steps up to 0.6) and A picks who to talk to the way the mod does. Pick any creature to follow you at its true size. Small ones can ride on your shoulder.</p>
   </header>
   <div class="top">
     <label class="pick"><span>Place</span><select id="roomPick" aria-label="Place"></select></label>
     <label class="pick"><span>Follower</span><select id="followPick" aria-label="Follower"></select></label>
+    <div class="seg" id="meSeg" role="group" aria-label="You"><button data-v="ghost" aria-pressed="true">Ghost</button><button data-v="boy" aria-pressed="false">You (boy)</button><button data-v="girl" aria-pressed="false">You (girl)</button></div>
     <div class="seg" id="rideSeg" role="group" aria-label="Where it goes"><button data-v="walk" aria-pressed="true">Walks behind</button><button data-v="shoulder" aria-pressed="false" title="For creatures 1 block tall or less">On your shoulder</button></div>
     <div class="seg" id="lookSeg" role="group" aria-label="Look"><button data-v="ours" aria-pressed="true">Retromon</button><button data-v="theirs" aria-pressed="false">Cobblemon</button></div>
     <div class="seg" id="camSeg" role="group" aria-label="Camera"><button data-v="room" aria-pressed="true">Whole room</button><button data-v="close" aria-pressed="false">Follow</button></div>

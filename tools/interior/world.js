@@ -1,5 +1,12 @@
 // ---------- materials: each a pixel texture, laid at 16 pixels to a block (or stretched over one face: "fit") ----------
 const MATDEF = {
+  mcOak: { tex: "mcOak", per: 1 }, mcSpruce: { tex: "mcSpruce", per: 1 }, mcBirch: { tex: "mcBirch", per: 1 }, mcPale: { tex: "mcPale", per: 1 }, mcDarkOak: { tex: "mcDarkOak", per: 1 }, mcAcacia: { tex: "mcAcacia", per: 1 },
+  mcCream: { tex: "mcCream", per: 1 }, mcSky: { tex: "mcSky", per: 1 }, mcSage: { tex: "mcSage", per: 1 }, mcNavy: { tex: "mcNavy", per: 1 }, mcStripped: { tex: "mcStripped", per: 1 },
+  mcQuartzCheck: { tex: "mcQuartzCheck", per: 2 }, mcLabTile: { tex: "mcLabTile", per: 2 }, mcLabWall: { tex: "mcLabWall", per: 1 }, mcCyan: { tex: "mcCyan", per: 1 },
+  booksFull: { tex: "booksFull", per: [2, 0.5] }, binders: { tex: "binders", per: [2, 0.5] }, storeBoxes: { tex: "storeBoxes", per: [2, 0.5] }, shelfWhite: { tex: "shelfWhite", per: 1 },
+  cupboardTeal: { tex: "cupboardTeal", fit: true }, tealPaint: { tex: "tealPaint", per: 1 }, tankGlass: { tex: "tankGlass", fit: true, alpha: 0.38, double: true }, redPlastic: { tex: "redPlastic", per: 1 },
+  boardMap: { tex: "boardMap", fit: true }, boardLab: { tex: "boardLab", fit: true },
+  labPanel: { tex: "labPanel", per: 1 }, vent: { tex: "vent", per: 1 }, lab: { tex: "lab", per: 1 }, mcBlueCheck: { tex: "mcBlueCheck", per: 2 },
   oak: { tex: "oak", per: 2 }, oakFloor: { tex: "oakFloor", per: 2 }, honeyFloor: { tex: "honeyFloor", per: 2 }, paleFloor: { tex: "paleFloor", per: 2 }, walnutFloor: { tex: "walnutFloor", per: 2 }, walnut: { tex: "walnut", per: 2 }, honey: { tex: "honey", per: 2 }, pale: { tex: "pale", per: 2 }, tread: { tex: "tread", per: 1 },
   checker: { tex: "checker", per: 1 }, tileWhite: { tex: "tileWhite", per: 1 }, tileBlue: { tex: "tileBlue", per: 1 }, splash: { tex: "splash", per: 1 },
   paperMum: { tex: "paperMum", per: 1 }, paperRoom: { tex: "paperRoom", per: 1 }, paperRival: { tex: "paperRival", per: 1 }, paperRivalRoom: { tex: "paperRivalRoom", per: 1 },
@@ -318,7 +325,20 @@ function sofa(room, X, Z, f, w = 3, o = {}) {
   room.act(F.rect(0, 0, w, 1.4), { label: "Sit", lines: o.lines || ["A comfy sofa. The cushions still have the shape of Mum's afternoon nap."] });
   room.item("Sofa", "Teal fabric, three seat cushions, two throw pillows, walnut feet.");
 }
-function rug(room, x0, z0, x1, z1, mat) { room.geo.box(x0, 0, z0, x1, 0.025, z1, { top: mat, all: "cap", bottom: null }); room.item("Rug", "A patterned rug laid on the floor."); }
+// A rug as Minecraft builders lay one: carpet a block at a time (1 pixel thick), each in its own wool colour.
+const RUGS = {
+  mum: (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#B8343A" : (i === 1 || j === 1 || i === w - 2 || j === d - 2) ? "#EFE2C4" : ((i + j) % 2 ? "#E99A2E" : "#B8343A"),
+  room: (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#F2F2F2" : ((i * 3 + j * 5) % 7 === 0 ? "#F2C12E" : "#3A6FD0"),
+  rival: (i, j, w, d) => (j === 0 || j === d - 1) ? "#C9343A" : ((i + j) % 2 ? "#2A2A30" : "#F2F2F2"),
+};
+function wool(c) { const k = "wool" + c.slice(1); if (!MATDEF[k]) { TEXDEF[k] = [16, 16, (P, r) => mcWool(P, r, hx(c))]; MATDEF[k] = { tex: k, per: 1 }; } return k; }
+function rug(room, x0, z0, x1, z1, mat) {
+  const pat = RUGS[{ rugMum: "mum", rugRoom: "room", rugRival: "rival" }[mat] || mat];
+  x0 = Math.round(x0); z0 = Math.round(z0); x1 = Math.round(x1); z1 = Math.round(z1);
+  const w = x1 - x0, d = z1 - z0;
+  for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) room.geo.box(x0 + i, 0, z0 + j, x0 + i + 1, 1 / 16, z0 + j + 1, { top: wool(pat(i, j, w, d)), all: wool(pat(i, j, w, d)), bottom: null });
+  room.item("Carpet", "Wool carpet, a block at a time, as it would be laid in Minecraft.");
+}
 function tvSet(room, X, Z, f, screenKey, o = {}) {
   const F = room.F(X, Z, f), w = o.w || 2.8;
   F.box(0, 0, 0, w, 0.62, 0.8, { all: "walnut", front: null, bottom: null });
@@ -570,7 +590,7 @@ function house(room, x0, z0, o) {
   room.act([x0 + w - 1.15, mz, x0 + w - 0.55, mz + 0.5], { label: "Look", lines: [o.mail] });
   room.item(o.name, "8 by 6 blocks outside (16 by 14 inside), siding walls, tiled gable roof, chimney, window box, a door that opens as you walk up.");
 }
-function lab(room, x0, z0) {
+function lab(room, x0, z0, o = {}) {
   const G = room.geo, w = 12, d = 7, h = 4.4;
   G.box(x0, 0, z0, x0 + w, h, z0 + d, { all: "labWall", top: "roofGrey", bottom: null });
   G.box(x0 - 0.25, h, z0 - 0.25, x0 + w + 0.25, h + 0.4, z0 + d + 0.25, { all: "fence", top: "roofGrey" });
@@ -584,8 +604,8 @@ function lab(room, x0, z0) {
   textBoard("signLab", "PROF. LAB", 44, "#26304A", "#E9EDEC");
   G.box(dx - 0.6, 3.15, z0 + d, dx + dw + 0.6, 3.85, z0 + d + 0.06, { s: "signLab", all: "fence" });
   room.solid(x0, z0, x0 + w, z0 + d + 0.1);
-  room.act([dx, z0 + d, dx + dw, z0 + d + 0.6], { label: "Open", lines: ["The lab door is shut. Its inside comes after the houses."] });
-  room.item("The professor's lab", "12 by 7 blocks, white panels, a roof vent and a dish; its inside is next.");
+  if (o.to) room.warps.push({ test: (p, input) => input.up && p.z < z0 + d + 0.62 && p.x > dx + 0.1 && p.x < dx + dw - 0.1, to: o.to, spawn: o.spawn, fx: "iris" });
+  room.item("The professor's lab", "12 by 7 blocks outside, white panels, a roof vent and a dish. Walk into its door to go in.");
 }
 function tree(room, x, z, s = 1) {
   const G = room.geo;

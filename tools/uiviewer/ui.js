@@ -2,6 +2,7 @@
 const stageEl = $("#stage"), uiRoot = $("#ui"), bgEl = $("#bg");
 function fitUI() { const w = stageEl.clientWidth || 1280; uiRoot.style.transform = `scale(${w / 1280})`; }
 new ResizeObserver(fitUI).observe(stageEl);
+function uiScale() { return (stageEl.clientWidth || 1280) / 1280; }
 function h(tag, cls, html, style) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; if (style) Object.assign(e.style, style); return e; }
 function box(x, y, w, hh, cls = "g-panel", html = "") { const e = h("div", cls, html); Object.assign(e.style, { left: x + "px", top: y + "px" }); if (w != null) e.style.width = w + "px"; if (hh != null) e.style.height = hh + "px"; e.style.position = "absolute"; uiRoot.appendChild(e); return e; }
 function add(e) { uiRoot.appendChild(e); return e; }
@@ -14,7 +15,7 @@ function title(s) { return String(s).toLowerCase().replace(/(^|[\s-])\w/g, c => 
 // ---------- what you've got: one save, carried from screen to screen ----------
 const G = {
   lang: "English", name: "RED", rival: "BLUE", money: 3150, badges: 2, seen: 34, caught: 12, time: "12:34", started: "19/11/2026", id: "40217",
-  look: { body: "boy", skin: "#E9B48C", hair: "#3B2618", hairStyle: "spiky", eyes: "#3B2A1C", brows: "fine", cap: "#D9524E", top: "#3F7FD0", legs: "#2F3F66", shoes: "#2B2522", bag: "#E9B43C", skirt: false },
+  outfit: Object.assign(OUTFIT.defaults(false), { capp: 0, topc: 1, hairc: 9 }),
   opts: { textSpeed: 1, music: 3, sound: 3, voice: 1, nights: 1, wild: 1, effects: 0, style: 0 },
   party: [], place: "PALLET TOWN",
   bag: {
@@ -34,6 +35,8 @@ function statsAt(sid, lv) {
   for (const [k, v] of Object.entries(b)) o[k] = k === "HP" ? Math.floor((2 * v + 15) * lv / 100) + lv + 10 : Math.floor((2 * v + 15) * lv / 100) + 5;
   return o;
 }
+Object.defineProperty(G, "look", { get: () => ({ outfit: G.outfit }) });
+const hex = n => "#" + (n >>> 0).toString(16).padStart(6, "0").slice(-6);
 for (const [sid, lv, moves, hp, status] of PARTY) {
   const st = statsAt(sid, lv);
   G.party.push({ sid, lv, moves, maxhp: st.HP, hp: Math.round(st.HP * hp), status, stats: st, exp: 0.3 + (lv % 5) / 10, gender: sid === "clefairy" ? "F" : (lv % 2 ? "M" : "F") });
@@ -46,7 +49,30 @@ function statusChip(s) { return s ? `<span class="g-status" style="background:${
 function hpCol(f) { return f > 0.5 ? "var(--hp-green)" : f > 0.2 ? "var(--hp-yellow)" : "var(--hp-red)"; }
 function hpBar(f, w) { return `<div class="g-hp" style="width:${w}px"><i style="width:${Math.max(0, f) * 100}%;background:${hpCol(f)}"></i></div>`; }
 function gender(g) { return g === "F" ? `<span style="color:#FF8FB1">&#9792;</span>` : g === "M" ? `<span style="color:#7FB8FF">&#9794;</span>` : ""; }
+function darkerHex(c, k) { const v = mixc(hx(c), [0, 0, 0], k); return "#" + v.map(x => Math.round(x).toString(16).padStart(2, "0")).join(""); }
+function lighterHex(c, k) { const v = mixc(hx(c), [255, 255, 255], k); return "#" + v.map(x => Math.round(x).toString(16).padStart(2, "0")).join(""); }
 function money(n) { return "&#8381;" + n.toLocaleString("en-GB"); }
+
+// ---------- little pictures of our creatures, for lists: each drawn once from its model, three-quarters on ----------
+const PORTRAIT = {}, portraitWaits = {};
+let pR = null, pScene = null, pCam = null;
+function portrait(sid) {
+  if (PORTRAIT[sid]) return Promise.resolve(PORTRAIT[sid]);
+  if (portraitWaits[sid]) return portraitWaits[sid];
+  return portraitWaits[sid] = loadSpecies(sid).then(() => {
+    if (!pR) { const c = document.createElement("canvas"); c.width = c.height = 192; pR = new THREE.WebGLRenderer({ canvas: c, antialias: true, alpha: true, preserveDrawingBuffer: true }); pR.setClearColor(0, 0);
+      pScene = new THREE.Scene(); pScene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 0.85)); const l = new THREE.DirectionalLight(0xffffff, 0.6); l.position.set(-3, 5, 4); pScene.add(l); pCam = new THREE.PerspectiveCamera(30, 1, 0.01, 200); }
+    const m = buildModel(sp(sid).ours), sz = sizeOf(m);
+    return new Promise(res => { let n = 0; const wait = () => { const im = m.mat.map && m.mat.map.image; if ((im && im.complete !== false && im.width) || n++ > 60) res(m); else setTimeout(wait, 50); }; wait(); });
+  }).then(m => {
+    pose(m, [[groundIdle(m), 0.3]]); m.holder.rotation.y = Math.PI * 0.82; m.holder.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(m.holder), c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3()), R = Math.max(size.x, size.y, size.z) * 0.62;
+    pScene.add(m.holder); pCam.position.set(c.x + R * 0.35, c.y + R * 0.55, c.z + R / Math.tan(15 * D2R) * 0.92); pCam.lookAt(c); pR.render(pScene, pCam); pScene.remove(m.holder);
+    return PORTRAIT[sid] = pR.domElement.toDataURL();
+  });
+}
+// An <img> that fills in when the picture's ready.
+function pic(sid, size, extra = "") { const id = "p" + Math.random().toString(36).slice(2); portrait(sid).then(u => { const e = document.getElementById(id); if (e) e.src = u; }); return `<img id="${id}" alt="" style="width:${size}px;height:${size}px;image-rendering:auto;${extra}" src="${PORTRAIT[sid] || "data:image/gif;base64,R0lGODlhAQABAAAAACw="}">`; }
 
 // ---------- icons: drawn here, simple round shapes in the same palette ----------
 const ICON = {
@@ -80,7 +106,8 @@ function go(id, arg) {
   clearTimers(); uiRoot.innerHTML = ""; backdrop(null);
   curDef = BY[id];
   if (SKYFOR[curDef.scene]) backdrop(SKYFOR[curDef.scene]);
-  setScene(curDef.scene, curDef.sceneOpts && curDef.sceneOpts());
+  setScene(curDef.scene, curDef.sceneOpts && curDef.sceneOpts(arg));
+  setPixel(curDef.pixel || 0);
   cur = curDef.make(arg) || {};
   renderFlows(); renderNotes();
   try { history.replaceState(null, "", "#" + id); } catch (e) {}

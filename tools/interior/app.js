@@ -47,8 +47,17 @@ function nameOf(sid) { const d = DATA.species[sid]; return d ? title(d.ours.info
 function title(s) { return String(s).toLowerCase().replace(/(^|[\s-])\w/g, c => c.toUpperCase()); }
 
 // ---------- you ----------
-const me = { x: 4, z: 9, y: 0, yaw: Math.PI, fig: makeFigure(null), walk: 0 };
-actors.add(me.fig.root);
+const me = { x: 4, z: 9, y: 0, yaw: Math.PI, fig: null, walk: 0, as: "ghost" };
+// The ghost, or you as the mod dresses you (Outfit.defaults: the boy, or the girl).
+const ME_LOOK = { ghost: null, boy: { outfit: OUTFIT.defaults(false) }, girl: { outfit: OUTFIT.defaults(true) } };
+function setMe(as) {
+  if (me.fig) actors.remove(me.fig.root);
+  me.as = as; me.fig = makeFigure(ME_LOOK[as]);
+  actors.add(me.fig.root); me.fig.root.position.set(me.x, me.y, me.z); me.fig.root.rotation.y = me.yaw;
+  try { localStorage.setItem("rm-interior-me", as); } catch (e) {}
+}
+
+function renderMe() { const el = $("#meSeg"); if (el) setSeg(el, me.as); }
 
 // ---------- places ----------
 const built = {};
@@ -229,27 +238,44 @@ for (const b of viewerEl.querySelectorAll("[data-k]")) {
 }
 
 // ---------- moving about ----------
-const R_ME = 0.28;
+// You, as in the game: a player is 0.6 wide (0.3 either side of the middle) and steps up 0.6 at most.
+const R_ME = 0.3, STEP_UP = 0.6;
 function blocked(x, z) { for (const s of room.solids) if (x + R_ME > s[0] && x - R_ME < s[2] && z + R_ME > s[1] && z - R_ME < s[3]) return true; return false; }
 function moveMe(dx, dz) {
   // One axis at a time, so you slide along walls and furniture; a step too high (the side of the stairs) stops you.
   const tryMove = (nx, nz) => {
     if (blocked(nx, nz)) return false;
-    const g = room.groundAt(nx, nz); if (Math.abs(g - me.y) > 0.8) return false;
+    const g = room.groundAt(nx, nz); if (Math.abs(g - me.y) > STEP_UP) return false;
     me.x = nx; me.z = nz; return true;
   };
   const a = tryMove(me.x + dx, me.z), b = tryMove(me.x, me.z + dz);
   return a || b;
 }
+// As the mod's A button (Adventure.talk): the person or creature within 3.5 blocks that scores best on
+// distance less facing x 1.5; if there's none, whatever stands 0.5 to 2.1 blocks straight ahead (as a sign is read).
 function probe() {
-  const px = me.x - Math.sin(me.yaw) * 0.78, pz = me.z - Math.cos(me.yaw) * 0.78;
-  if (fol.model && fol.ride === "walk") { const r = Math.max(0.45, Math.max(fol.size.l, fol.size.w) * 0.5); if (Math.hypot(px - fol.x, pz - fol.z) < r + 0.2) return { label: "Talk", follower: true, at: [fol.x, fol.y + fol.size.h + 0.3, fol.z] }; }
-  let best = null, bd = 1e9;
-  for (const a of room.acts) {
-    const [x0, z0, x1, z1] = a.rect, e = 0.18;
-    if (px > x0 - e && px < x1 + e && pz > z0 - e && pz < z1 + e) { const d = Math.hypot((x0 + x1) / 2 - px, (z0 + z1) / 2 - pz); if (d < bd) { bd = d; best = a; } }
+  const lx = -Math.sin(me.yaw), lz = -Math.cos(me.yaw);
+  let best = null, bs = 1e9;
+  const consider = (x, z, a) => {
+    const tx = x - me.x, tz = z - me.z, d = Math.hypot(tx, tz);
+    if (d > 3.5) return;
+    const face = d > 1e-4 ? (tx * lx + tz * lz) / d : 1, sc = d - face * 1.5;
+    if (sc < bs) { bs = sc; best = a; }
+  };
+  if (fol.model && fol.ride === "walk") consider(fol.x, fol.z, { label: "Talk", follower: true, at: [fol.x, fol.y + fol.size.h + 0.3, fol.z] });
+  for (const a of room.acts) if (a.npc) consider(a.npc.x, a.npc.z, a);
+  if (best) return best;
+  for (let d = 0.5; d <= 2.1 + 1e-6; d += 0.4) {
+    const px = me.x + lx * d, pz = me.z + lz * d;
+    let hit = null, hd = 1e9;
+    for (const a of room.acts) {
+      if (a.npc) continue;
+      const [x0, z0, x1, z1] = a.rect;
+      if (px > x0 && px < x1 && pz > z0 && pz < z1) { const c = Math.hypot((x0 + x1) / 2 - px, (z0 + z1) / 2 - pz); if (c < hd) { hd = c; hit = a; } }
+    }
+    if (hit) return hit;
   }
-  return best;
+  return null;
 }
 function updateMe(dt) {
   let dx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0), dz = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
@@ -391,6 +417,7 @@ function renderPickers() {
   fp.value = fol.want || "";
   fp.onchange = () => { fp.blur(); viewerEl.focus({ preventScroll: true }); viewerActive = true; setFollower(fp.value); };
   for (const b of $("#rideSeg").querySelectorAll("button")) b.onclick = () => { if (!b.disabled) setRide(b.dataset.v); };
+  for (const b of $("#meSeg").querySelectorAll("button")) b.onclick = () => { setMe(b.dataset.v); renderMe(); };
   for (const b of $("#lookSeg").querySelectorAll("button")) b.onclick = () => { fol.look = b.dataset.v; setSeg($("#lookSeg"), fol.look); if (fol.want) setFollower(fol.want); };
   for (const b of $("#camSeg").querySelectorAll("button")) b.onclick = () => { cam.mode = b.dataset.v; setSeg($("#camSeg"), cam.mode); };
 }
@@ -430,6 +457,4 @@ function renderPanel() {
 // ---------- start ----------
 renderPickers();
 resize();
-switchRoom("house2");
-setFollower(fol.want);
-requestAnimationFrame(tickFrame);
+skinsReady.then(() => { let as = "ghost"; try { as = localStorage.getItem("rm-interior-me") || "ghost"; } catch (e) {} setMe(ME_LOOK[as] !== undefined ? as : "ghost"); renderMe(); switchRoom("house2"); setFollower(fol.want); requestAnimationFrame(tickFrame); });

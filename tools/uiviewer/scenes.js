@@ -17,6 +17,7 @@ function setScene(name, opts) {
   scNow = SC[name]; scNow.group.visible = true;
   if (scNow.enter) scNow.enter(opts || {});
 }
+function setPixel(n) { const dpr = Math.min(2, window.devicePixelRatio || 1); renderer.setPixelRatio(n ? 1 / n : dpr); $("#c").style.imageRendering = n ? "pixelated" : "auto"; resize3(); }
 function resize3() { const w = stageEl.clientWidth, hh = stageEl.clientHeight; if (!w || !hh) return; renderer.setSize(w, hh, false); cam3.aspect = w / hh; cam3.updateProjectionMatrix(); }
 new ResizeObserver(resize3).observe(stageEl);
 
@@ -46,12 +47,7 @@ function disc(r, color, y = 0.01, op = 1) { const m = new THREE.Mesh(new THREE.C
 function blob(r) { const m = new THREE.Mesh(new THREE.PlaneGeometry(r, r), matFor("shadowBlob")); m.rotation.x = -Math.PI / 2; m.position.y = 0.02; m.renderOrder = 3; return m; }
 function figureOf(look) { const f = makeFigure(look); poseFigure(f, {}); return f; }
 
-const PROF_LOOK = { body: "boy", skin: "#EBC3A0", hair: "#C9CED6", hairStyle: "swept", eyes: "#3B2A1C", brows: "thick", top: "#B8433F", coat: "#F4F6F5", legs: "#6B5A4A", shoes: "#3B2A1C" };
-const RIVAL_LOOK = { body: "boy", skin: "#F0C29C", hair: "#8A5A32", hairStyle: "spiky", eyes: "#2F2A3A", brows: "arched", top: "#6E59B8", legs: "#2B2522", shoes: "#5A3D27" };
-const NURSE_LOOK = { body: "girl", skin: "#F3CDB0", hair: "#F08AA8", hairStyle: "bun", eyes: "#4C86C8", brows: "fine", top: "#F4F6F5", legs: "#F08AA8", shoes: "#F4F6F5", skirt: true };
-const CLERK_LOOK = { body: "boy", skin: "#C98B62", hair: "#2B2522", hairStyle: "short", eyes: "#2B2522", brows: "straight", top: "#4A8FE0", coat: "#3F9C8A", legs: "#2F3F66", shoes: "#2B2522" };
-const BUGBOY_LOOK = { body: "boy", skin: "#E9B48C", hair: "#5A3D27", hairStyle: "short", eyes: "#2B2522", brows: "fine", cap: "#F2C744", top: "#F4F6F5", legs: "#5DAE52", shoes: "#3B2A1C", bag: "#5DAE52" };
-const MUM_LOOK = { body: "girl", skin: "#E9B48C", hair: "#7A4A2E", hairStyle: "long", eyes: "#3B2A1C", brows: "fine", top: "#E77D6E", legs: "#4C6FA8", shoes: "#5A3D27" };
+const PROF_LOOK = { skin: "oak" }, RIVAL_LOOK = { skin: "blue" }, NURSE_LOOK = { skin: "nurse" }, CLERK_LOOK = { skin: "clerk" }, BUGBOY_LOOK = { skin: "youngster" }, MUM_LOOK = { skin: "middle_aged_woman" };
 
 const SCENES = {
   // Pallet Town, from the Interior Viewer: you outside your door, your partner beside you.
@@ -84,33 +80,64 @@ const SCENES = {
     const group = new THREE.Group(), S = { group, runners: [] };
     group.add(disc(4.2, 0xDFF6F4, 0.0, 0.55)); group.add(disc(2.0, 0xFFFFFF, 0.005, 0.45));
     const prof = figureOf(PROF_LOOK); prof.root.position.set(0, 0, 0); prof.root.rotation.y = Math.PI; group.add(prof.root); S.prof = prof;
-    const rival = figureOf(RIVAL_LOOK); rival.root.position.set(1.6, 0, 0.3); rival.root.rotation.y = Math.PI - 0.25; group.add(rival.root); S.rival = rival;
+    const rival = figureOf(RIVAL_LOOK); rival.root.position.set(1.45, 0, 0.45); rival.root.rotation.y = Math.PI - 0.25; group.add(rival.root); S.rival = rival;
     let you = null, lookKey = "";
-    const ring = ["pikachu", "cubone", "oddish", "clefairy"];
-    ring.forEach((sid, i) => mon(sid).then(st => { st.base = "walk"; st.a = i / ring.length * Math.PI * 2; group.add(st.m.holder); S.runners.push(st); }));
-    mon("pidgey").then(st => { st.base = "walk"; st.a = 0; st.fly = true; group.add(st.m.holder); S.runners.push(st); });
+    // Our creatures beside him: standing about, now and then one calling out.
+    const SPOTS = [["pikachu", -0.85, 0.95, 0.35], ["cubone", -1.8, 0.35, 0.55], ["oddish", 0.55, 1.35, -0.1], ["clefairy", -1.3, 1.55, 0.2], ["pidgey", -1.45, -0.55, 0.4, 1.55]];
+    SPOTS.forEach(([sid, x, z, turn, fly]) => mon(sid).then(st => { st.base = "ground"; st.home = [x, z, turn, fly || 0]; group.add(st.m.holder); S.runners.push(st); placeMon(st, x, z, Math.PI + turn, fly || 0); }));
+    S.nextCry = 2;
     S.enter = o => {
       S.mode = o.mode || "intro";
       rival.root.visible = S.mode === "rival";
       const k = JSON.stringify(G.look);
-      if (S.mode === "you") { if (k !== lookKey || !you) { if (you) group.remove(you.root); you = figureOf(G.look); you.root.position.set(1.6, 0, 0.3); you.root.rotation.y = Math.PI - 0.25; group.add(you.root); lookKey = k; } you.root.visible = true; }
+      if (S.mode === "you") { if (k !== lookKey || !you) { if (you) group.remove(you.root); you = figureOf(G.look); you.root.position.set(1.45, 0, 0.45); you.root.rotation.y = Math.PI - 0.25; group.add(you.root); lookKey = k; } you.root.visible = true; }
       else if (you) you.root.visible = false;
-      for (const r of S.runners) r.m.holder.visible = S.mode === "intro";
       lightFor(0, 0, 8, 14); hemi3.color.set(0xf2fbff); hemi3.groundColor.set(0x9fb8c0);
-      const x = S.mode === "intro" ? 0 : 0.8;
-      look3(x, 1.75, 6.4, x, 1.05, 0);
+      const x = S.mode === "intro" ? -0.3 : 0.2;
+      look3(x, 2.35, 6.6, x, 0.62, 0.3);
     };
     S.tick = (dt, t) => {
       poseFigure(prof, { talk: S.talking, point: S.point || 0, wave: S.wave || 0 });
       if (rival.root.visible) poseFigure(rival, { headYaw: Math.sin(t * 0.7) * 0.2 });
       if (you && you.root.visible) poseFigure(you, { wave: S.youWave || 0 });
-      for (const r of S.runners) {
-        r.a += dt * (r.fly ? 0.55 : 0.42);
-        const R0 = r.fly ? 2.4 : 2.9, x = Math.sin(r.a) * R0, z = Math.cos(r.a) * R0 * 0.62 + 0.2;
-        const yaw = Math.atan2(-Math.cos(r.a) * R0, Math.sin(r.a) * R0 * 0.62);
-        placeMon(r, x, z, yaw, r.fly ? 1.4 + Math.sin(t * 2) * 0.15 : 0); r.m.holder.visible = S.mode === "intro";
-        tickMon(r, dt);
+      S.nextCry -= dt;
+      if (S.nextCry < 0 && S.runners.length) { const r = S.runners[Math.floor(Math.random() * S.runners.length)]; playOnce(r, "cry"); S.nextCry = 2.5 + Math.random() * 2.5; }
+      for (const r of S.runners) { const [x, z, turn, fly] = r.home; placeMon(r, x, z, Math.PI + turn + Math.sin(t * 0.4 + x) * 0.15, fly ? fly + Math.sin(t * 2.2) * 0.12 : 0); if (fly) r.base = "walk"; tickMon(r, dt); }
+    };
+    return S;
+  },
+  // The title: a few of our creatures, drawn as pixel art (the scene is rendered small and blown up).
+  title() {
+    const group = new THREE.Group(), S = { group, mons: [] };
+    const hill = new THREE.Mesh(new THREE.CylinderGeometry(3.0, 3.4, 0.6, 40), new THREE.MeshLambertMaterial({ color: 0x7CC46A })); hill.position.y = -0.3; hill.receiveShadow = true; group.add(hill);
+    [["charmander", -1.35, 0.1, 0.45], ["pikachu", 0, 0.9, 0.0], ["bulbasaur", 1.35, 0.1, -0.45], ["squirtle", 0.1, -1.0, -0.1]].forEach(([sid, x, z, turn]) => mon(sid).then(st => { st.base = "ground"; group.add(st.m.holder); placeMon(st, x, z, Math.PI + turn); S.mons.push(st); }));
+    S.enter = () => { lightFor(0, 0, 6, 14); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); look3(0, 1.55, 5.6, 0, 0.95, 0); };
+    S.tick = (dt, t) => { for (const m of S.mons) tickMon(m, dt); };
+    return S;
+  },
+  // Everyone of a kind, side by side on a stage: the one you pick steps forward and waves, with their partner behind.
+  cast() {
+    const group = new THREE.Group(), S = { group, figs: [], key: "" };
+    const floor = new THREE.Mesh(new THREE.CylinderGeometry(9, 9.3, 0.2, 64), new THREE.MeshLambertMaterial({ color: 0xBFEFE0 })); floor.position.y = -0.1; floor.receiveShadow = true; group.add(floor);
+    S.show = (list, sel) => {
+      const key = list.map(c => c.creature || c.spec.skin || c.spec.player || JSON.stringify(c.spec.outfit)).join(",");
+      if (key !== S.key) {
+        for (const f of S.figs) group.remove(f.root); S.figs = [];
+        const n = list.length, gap = 1.3;
+        list.forEach((c, i) => { let f; if (c.creature) { f = { root: new THREE.Group(), creature: true }; mon(c.creature).then(st => { st.base = "ground"; f.st = st; f.root.add(st.m.holder); placeMon(st, 0, 0, 0); }); } else f = makeFigure(c.spec); f.root.position.set((i - (n - 1) / 2) * gap, 0, 0); f.root.rotation.y = Math.PI; group.add(f.root); f.x = f.root.position.x; f.z = 0; S.figs.push(f); });
+        S.key = key; const W = (n - 1) * gap + 1.2, d = Math.max(5.2, W / (2 * Math.tan(17 * D2R) * cam3.aspect) * 1.12);
+        look3(0, 2.1 + d * 0.06, d, 0, 0.75, 0);
       }
+      S.sel = sel; const c = list[sel];
+      if (S.ace) { group.remove(S.ace.m.holder); S.ace = null; }
+      S.aceWant = c && c.ace;
+      if (c && c.ace) mon(c.ace).then(st => { if (S.aceWant !== c.ace) return; if (S.ace) group.remove(S.ace.m.holder); st.base = "ground"; S.ace = st; group.add(st.m.holder); const f = S.figs[sel];
+        const big = st.m.size.h > 2.2 ? 2.2 / st.m.size.h : 1; if (big < 1) { st.m.holder.scale.multiplyScalar(big); st.m.size = { ...st.m.size, h: st.m.size.h * big, w: st.m.size.w * big, l: st.m.size.l * big, cx: st.m.size.cx * big, cz: st.m.size.cz * big }; } S.aceScale = big; placeMon(st, f.x + 0.75 + st.m.size.w * 0.4, -0.4 - st.m.size.l * 0.3, Math.PI - 0.3); });
+    };
+    S.enter = () => { lightFor(0, 0, 9, 14); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); S.key = ""; };
+    S.tick = (dt, t) => {
+      S.figs.forEach((f, i) => { const on = i === S.sel; f.z += ((on ? 0.9 : 0) - f.z) * Math.min(1, dt * 6); f.root.position.z = f.z; if (f.creature) { if (f.st) tickMon(f.st, dt); } else poseFigure(f, { wave: on ? 0.8 : 0, headYaw: on ? 0 : Math.sin(t * 0.6 + i) * 0.25 }); });
+      if (S.ace) tickMon(S.ace, dt);
     };
     return S;
   },

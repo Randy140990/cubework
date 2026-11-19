@@ -35,17 +35,16 @@ screen("splash", "Start", "Opening", {
   }
 });
 screen("title", "Start", "Title screen", {
-  scene: "model", sceneOpts: () => ({ sid: "pikachu", ox: -1.6, stand: false, zoom: 1.15 }),
-  what: "The title: Retromon's own logo, a creature turning beside it, and PRESS START.",
+  scene: "title", pixel: 5,
+  what: "The title: RETROMON in one word, and a few of our own creatures drawn as pixel art, as the old title had its pixel Charizard.",
   tags: ["New look"], mod: "IntroScreen shows RETROMON and PRESS START over the world.",
   make() {
-    backdrop(SKY);
-    add(h("div", "", `<div style="position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 72% 46%, rgba(255,255,255,.18) 0 6deg, transparent 6deg 18deg)"></div>`));
-    box(70, 150, 660, null, "", `<div class="g-title" style="font-size:132px;line-height:.95;letter-spacing:4px;color:#FFD45A;-webkit-text-stroke:6px #26304A;paint-order:stroke fill;text-shadow:0 10px 0 rgba(0,0,0,.25);transform:rotate(-4deg)">RETRO<br>MON</div>
-      <div style="display:inline-block;margin:18px 0 0 40px;padding:6px 26px;border-radius:999px;background:#E5525C;color:#fff;font-family:Fredoka;font-weight:600;font-size:34px;letter-spacing:10px;box-shadow:0 6px 0 #9E3433">KANTO</div>`);
-    box(0, 600, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#FFF4D8;color:#26304A;font-size:30px;letter-spacing:6px;box-shadow:0 6px 0 rgba(0,0,0,.18)">PRESS START</span></div>`);
-    box(28, 676, 400, null, "", `<div style="font-weight:800;font-size:15px;color:#123C38;opacity:.8">INSID3 TH3 CUB3</div>`);
-    box(1080, 676, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:#123C38;opacity:.8">Version 0.21</div>`);
+    backdrop("linear-gradient(180deg,#7EC6EC 0%,#BFE6F7 52%,#E8F7FB 62%,#9ED68A 63%,#7CC46A 100%)");
+    add(h("div", "", `<div style="position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 0%, rgba(255,255,255,.16) 0 5deg, transparent 5deg 15deg)"></div>`));
+    box(0, 70, 1280, null, "", `<div style="text-align:center"><span class="g-title" style="display:inline-block;font-size:140px;line-height:1;letter-spacing:6px;color:#FFD45A;-webkit-text-stroke:7px #26304A;paint-order:stroke fill;text-shadow:0 10px 0 rgba(0,0,0,.25)">RETROMON</span></div>`);
+    box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#FFF4D8;color:#26304A;font-size:30px;letter-spacing:6px;box-shadow:0 6px 0 rgba(0,0,0,.18)">PRESS START</span></div>`);
+    box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:#123C38;opacity:.8">INSID3 TH3 CUB3</div>`);
+    box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:#123C38;opacity:.8">Version 0.21</div>`);
     return { key: k => { if (k === "a") go("language"); return true; } };
   }
 });
@@ -79,7 +78,7 @@ screen("saves", "Start", "Continue or new game", {
         <div class="g-panel" style="position:relative;margin-bottom:18px;padding:18px 22px;display:grid;grid-template-columns:150px 1fr;gap:20px;${i === sel ? "border-color:#FFF4D8;box-shadow:0 0 0 4px rgba(255,244,216,.4),0 14px 36px rgba(0,0,0,.4)" : ""}">
           <div style="border-radius:16px;background:linear-gradient(180deg,#9ED8F2,#BFEFE0 55%,#6DB257 56%,#5FA24C);position:relative;overflow:hidden">
             <div style="position:absolute;left:18px;bottom:22px;width:56px;height:40px;background:#F2E8D2;border-radius:4px"></div><div style="position:absolute;left:12px;bottom:58px;width:68px;height:22px;background:#C9493F;border-radius:6px 6px 0 0"></div>
-            <div style="position:absolute;right:18px;bottom:16px;width:22px;height:44px;border-radius:10px;background:${G.look.top}"></div><div style="position:absolute;right:20px;bottom:58px;width:18px;height:18px;border-radius:6px;background:${G.look.skin}"></div></div>
+            <div style="position:absolute;right:18px;bottom:16px;width:22px;height:44px;border-radius:4px;background:${hex(colourOf(G.outfit.topc))}"></div><div style="position:absolute;right:20px;bottom:58px;width:18px;height:18px;border-radius:3px;background:${hex(skinRGB(G.outfit.skin))}"></div></div>
           <div style="display:grid;gap:6px"><div style="display:flex;align-items:center;gap:12px"><span style="padding:2px 12px;border-radius:999px;background:#FFF4D8;color:#26304A;font-weight:900;font-size:14px;letter-spacing:1px">SLOT ${i + 1}</span><span class="g-title" style="font-size:30px">${esc(G.name)}</span></div>
             <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 18px;font-size:19px;font-weight:800"><span class="g-label">Place</span><span>${esc(G.place)}</span><span class="g-label">Pokédex</span><span>${G.caught}</span><span class="g-label">Badges</span><span>${G.badges}</span><span class="g-label">Play time</span><span>${G.time}</span></div></div>
           <span style="position:absolute;right:16px;top:14px;padding:2px 12px;border-radius:999px;border:2px solid rgba(229,82,92,.7);color:#FFB3B8;font-weight:900;font-size:13px">DELETE</span></div>` : `
@@ -170,57 +169,49 @@ screen("prof", "A new game", "The professor", {
     return { key: k => C.key(k) };
   }
 });
-const SKINS = ["#F6D7C3", "#EBC3A0", "#E0AC86", "#C98B62", "#A86F4C", "#8A5638", "#6A3F28", "#4A2B1C"];
-const HAIRS = ["#1E1A18", "#3B2618", "#6B4426", "#8E3B22", "#C8622E", "#E3B65C", "#EDE2C4", "#A8ACB4", "#3F6FB0", "#E07AA8"];
-const EYES = ["#3B2A1C", "#6B4426", "#8A7A3C", "#3E8A4E", "#3F7FD0", "#7A8A99", "#C98B22", "#7A5AB8"];
-const CLOTH = ["#D9524E", "#E9B43C", "#5DAE52", "#3F7FD0", "#6E59B8", "#E07AA8", "#2B2522", "#F4F6F5", "#2F3F66", "#8E5B36"];
-const STYLES = [["short", "Short"], ["spiky", "Spiky"], ["swept", "Swept"], ["long", "Long"], ["bob", "Bob"], ["pony", "Ponytail"], ["bun", "Bun"], ["buzz", "Buzz"]];
-const BROWS = [["fine", "Fine"], ["thick", "Thick"], ["arched", "Arched"], ["straight", "Straight"], ["bushy", "Bushy"], ["none", "None"]];
-// Rows of the character maker, shared with CLOTHES.
-function makerRows(full) {
-  const R = [];
-  if (full) {
-    R.push({ label: "BODY", chips: [["boy", "Boy"], ["girl", "Girl"]], get: () => G.look.body, set: v => { G.look.body = v; } });
-    R.push({ label: "SKIN", swatches: SKINS, get: () => G.look.skin, set: v => G.look.skin = v });
-    R.push({ label: "HAIR", chips: STYLES, get: () => G.look.hairStyle, set: v => G.look.hairStyle = v });
-    R.push({ label: "HAIR COLOUR", swatches: HAIRS, get: () => G.look.hair, set: v => G.look.hair = v });
-    R.push({ label: "EYES", swatches: EYES, get: () => G.look.eyes, set: v => G.look.eyes = v });
-    R.push({ label: "BROWS", chips: BROWS, get: () => G.look.brows, set: v => G.look.brows = v });
-  }
-  R.push({ label: "CAP", swatches: [null].concat(CLOTH), get: () => G.look.cap, set: v => G.look.cap = v });
-  R.push({ label: "TOP", swatches: CLOTH, get: () => G.look.top, set: v => G.look.top = v });
-  R.push({ label: "BOTTOMS", swatches: CLOTH, get: () => G.look.legs, set: v => G.look.legs = v, extra: { label: "Skirt", get: () => G.look.skirt, set: v => G.look.skirt = v } });
-  R.push({ label: "SHOES", swatches: CLOTH, get: () => G.look.shoes, set: v => G.look.shoes = v });
-  R.push({ label: "BAG", swatches: [null].concat(CLOTH), get: () => G.look.bag, set: v => G.look.bag = v });
-  return R;
+// The maker's rows: what the mod's CLOTHES already has (Outfit), and what's new here (more skin tones, eye colour).
+function makerRows(tab) {
+  const O = () => G.outfit, sw = (label, key, list, isNew) => ({ label, key, swatches: list.map(hex), isNew, get: () => O()[key], set: v => O()[key] = v });
+  const ch = (label, key, names, off) => ({ label, key, chips: names.map((n, i) => [i, title(n)]), off, get: () => O()[key], set: v => O()[key] = v });
+  if (tab === "you") return [
+    { label: "BODY", chips: [[0, "Boy"], [1, "Girl"]], get: () => O().girl ? 1 : 0, set: v => { const keep = { skin: O().skin, eyes: O().eyes }; G.outfit = Object.assign(OUTFIT.defaults(!!v), keep); } },
+    Object.assign(sw("SKIN", "skin", OUTFIT.SKIN_RGB.concat(OUTFIT.SKIN_RGB_NEW)), { newFrom: 4 }),
+    ch("HAIR", "hair", OUTFIT.HAIRS), sw("HAIR COLOUR", "hairc", OUTFIT.COLOURS), Object.assign(sw("EYES", "eyes", OUTFIT.EYE_RGB), { newFrom: 0 }),
+  ];
+  return [ch("HAT", "hat", OUTFIT.HATS), ch("CAP", "capp", OUTFIT.CAP_NAMES, () => O().hat !== 1), ch("CAP WAY", "capb", ["Forwards", "Backwards"], () => O().hat !== 1), sw("HAT COLOUR", "hatc", OUTFIT.COLOURS),
+    ch("TOP", "top", OUTFIT.TOPS), sw("TOP COLOUR", "topc", OUTFIT.COLOURS), ch("BOTTOMS", "bot", OUTFIT.BOTTOMS), sw("BOTTOMS COLOUR", "botc", OUTFIT.COLOURS),
+    sw("SHOES", "shoec", OUTFIT.COLOURS), ch("BAG", "bag", OUTFIT.BAGS), sw("BAG COLOUR", "bagc", OUTFIT.COLOURS)];
 }
-function maker(C, rows, o) {
-  let sel = 0;
+function maker(C, tabs, o) {
+  let tab = 0, sel = 0, rows = makerRows(tabs[0]);
   const P = box(30, 24, 700, null, "g-panel", ""); P.style.padding = "10px 14px";
-  const opts = r => r.swatches ? r.swatches.map(v => [v, v]) : r.chips;
+  const opts = r => r.swatches ? r.swatches.map((c, i) => [i, c]) : r.chips;
   const idxOf = r => Math.max(0, opts(r).findIndex(([v]) => v === r.get()));
   const draw = () => {
-    P.innerHTML = rows.map((r, i) => `<div style="display:grid;grid-template-columns:132px 1fr;align-items:center;gap:10px;padding:4px 10px;border-radius:16px;${i === sel ? "background:rgba(255,244,216,.12);box-shadow:inset 0 0 0 2px rgba(255,244,216,.5)" : ""}">
+    rows = makerRows(tabs[tab]);
+    const tabBar = tabs.length > 1 ? `<div style="display:flex;gap:8px;margin:2px 0 8px 10px">${tabs.map((t, i) => `<span class="g-chip${i === tab ? " on" : ""}" data-t="${i}" style="font-size:14px;padding:3px 14px">${t === "you" ? "YOU" : "CLOTHES"}</span>`).join("")}<span style="margin-left:auto;font-size:12px;font-weight:900;color:#A9D4C6;align-self:center">TAB switches</span></div>` : "";
+    P.innerHTML = tabBar + rows.map((r, i) => { const dim = r.off && r.off();
+      return `<div style="display:grid;grid-template-columns:140px 1fr;align-items:center;gap:10px;padding:4px 10px;border-radius:14px;${dim ? "opacity:.4;" : ""}${i === sel ? "background:rgba(255,244,216,.12);box-shadow:inset 0 0 0 2px rgba(255,244,216,.5)" : ""}">
       <span class="g-label" style="font-size:12px;${i === sel ? "color:#FFF4D8" : ""}">${r.label}</span>
-      <span style="display:flex;flex-wrap:wrap;gap:${r.swatches ? 8 : 6}px;align-items:center">${opts(r).map(([v, l], j) => r.swatches
-        ? `<span class="g-swatch${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="width:31px;height:31px;border-width:2.5px;background:${v || "repeating-linear-gradient(45deg,#3a5a55 0 5px,#2a4743 5px 10px)"}"></span>`
-        : `<span class="g-chip${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="font-size:13.5px;padding:2px 9px">${esc(l)}</span>`).join("")}
-        ${r.extra ? `<span class="g-chip${r.extra.get() ? " on" : ""}" data-x="${i}" style="font-size:13.5px;padding:2px 9px;margin-left:4px">${esc(r.extra.label)}</span>` : ""}</span></div>`).join("") +
-      `<div style="display:flex;gap:12px;margin-top:6px;padding:0 10px"><span class="g-item${sel === rows.length ? " on" : ""}" data-done="1">${esc(o.done || "DONE")}</span><span class="g-item${sel === rows.length + 1 ? " on" : ""}" data-rand="1">MIX IT UP</span></div>`;
+      <span style="display:flex;flex-wrap:wrap;gap:${r.swatches ? 6 : 6}px;align-items:center">${opts(r).map(([v, l], j) => r.swatches
+        ? `<span class="g-swatch${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="position:relative;width:28px;height:28px;border-width:2.5px;border-radius:7px;background:${l}">${r.newFrom != null && j >= r.newFrom ? `<i style="position:absolute;right:-4px;top:-4px;width:9px;height:9px;border-radius:50%;background:#FFD45A;box-shadow:0 0 0 2px #123C38"></i>` : ""}</span>`
+        : `<span class="g-chip${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="font-size:13.5px;padding:2px 10px">${esc(l)}</span>`).join("")}</span></div>`; }).join("") +
+      `<div style="display:flex;gap:12px;margin-top:6px;padding:0 10px;align-items:center"><span class="g-item${sel === rows.length ? " on" : ""}" data-done="1">${esc(o.done || "DONE")}</span><span class="g-item${sel === rows.length + 1 ? " on" : ""}" data-rand="1">MIX IT UP</span>
+        ${tabs[tab] === "you" ? `<span style="margin-left:auto;font-size:12.5px;font-weight:800;color:#CFEDE3"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#FFD45A;margin-right:5px"></i>New: four more skin tones, eye colour</span>` : ""}</div>`;
     P.querySelectorAll("[data-r]").forEach(e => e.onclick = () => { const r = rows[+e.dataset.r]; sel = +e.dataset.r; r.set(opts(r)[+e.dataset.j][0]); changed(); });
-    P.querySelectorAll("[data-x]").forEach(e => e.onclick = () => { const r = rows[+e.dataset.x]; r.extra.set(!r.extra.get()); changed(); });
-    P.querySelector("[data-done]").onclick = () => o.onDone(); P.querySelector("[data-rand]").onclick = () => { mix(); };
+    P.querySelectorAll("[data-t]").forEach(e => e.onclick = () => { tab = +e.dataset.t; sel = 0; draw(); });
+    P.querySelector("[data-done]").onclick = () => o.onDone(); P.querySelector("[data-rand]").onclick = () => mix();
   };
   const changed = () => { draw(); if (SC.creator) SC.creator.refresh(); };
-  const mix = () => { for (const r of rows) { const os = opts(r); r.set(os[Math.floor(Math.random() * os.length)][0]); } changed(); };
+  const mix = () => { for (const t of tabs) for (const r of makerRows(t)) { if (r.label === "BODY") continue; const os = opts(r); r.set(os[Math.floor(Math.random() * os.length)][0]); } changed(); };
   draw();
   const w = { key(k) {
     const n = rows.length + 2;
+    if (k === "tab" && tabs.length > 1) { tab = (tab + 1) % tabs.length; sel = 0; draw(); return true; }
     if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : n - 1)) % n; draw(); return true; }
     if (sel >= rows.length) { if (k === "a") { if (sel === rows.length) o.onDone(); else mix(); return true; } if (k === "left" || k === "right") { sel = sel === rows.length ? rows.length + 1 : rows.length; draw(); return true; } }
     const r = rows[sel];
     if (r && (k === "left" || k === "right")) { const os = opts(r); r.set(os[(idxOf(r) + (k === "right" ? 1 : os.length - 1)) % os.length][0]); changed(); return true; }
-    if (r && k === "a" && r.extra) { r.extra.set(!r.extra.get()); changed(); return true; }
     if (k === "b" && o.onBack) { o.onBack(); return true; }
     return false;
   } };
@@ -229,14 +220,14 @@ function maker(C, rows, o) {
 }
 screen("creator", "A new game", "Character maker", {
   scene: "creator", sceneOpts: () => ({ side: -1.15 }),
-  what: "Make yourself: boy or girl, skin tone, hair style and colour, eyes, brows, then clothes. Every part is a rounded block, as Shards of Arcadia's maker lets you choose hair and brows.",
-  tags: ["New", "Rounded figure"], mod: "Today: the boy or girl and a few clothes (CLOTHES on the menu).",
+  what: "Make yourself on Minecraft's player model, its corners just softened: boy or girl, skin tone, hair and its colour, eyes, then your clothes. It's the mod's own wardrobe (the same layers and colours CLOTHES uses), with four more skin tones and eye colour added.",
+  tags: ["The mod's wardrobe", "New: 4 skin tones, eye colour"], mod: "Outfit: FAIR, LIGHT, TAN, DEEP skin; 6 hair styles; cap, beanie or sun hat; jacket, tee, hoodie or vest; jeans, shorts or skirt; shoes; backpack or satchel; 14 colours.",
   try: ["Up and down between rows, left and right to change, A on DONE.", "MIX IT UP picks at random."],
   make() {
     backdrop("radial-gradient(ellipse at 70% 45%, #FFFFFF 0%, #DFF6EE 35%, #9EDCC9 70%, #4FA88E 100%)");
     const C = ctl();
     box(760, 640, 480, null, "", `<div class="g-title" style="text-align:center;font-size:24px;color:#123C38">What do you look like?</div>`);
-    maker(C, makerRows(true), { done: "THAT'S ME", onDone: () => go("name", { who: "you" }), onBack: () => go("prof") });
+    maker(C, ["you", "clothes"], { done: "THAT'S ME", onDone: () => go("name", { who: "you" }), onBack: () => go("prof") });
     hints([["A", "Choose"], ["B", "Back"]]);
     return { key: k => C.key(k) };
   }
@@ -272,7 +263,7 @@ screen("name", "A new game", "Your name", {
   try: ["Type on your keyboard (Shift for W, A, S, D, E, Q, X and Z), or move round the letters and press A.", "OK when you're done."],
   make(arg) {
     backdrop("radial-gradient(ellipse at 50% 45%, #FFFFFF 0%, #DFF6EE 35%, #9EDCC9 70%, #4FA88E 100%)");
-    const C = ctl(), girl = G.look.body === "girl";
+    const C = ctl(), girl = !!G.outfit.girl;
     const presets = girl ? ["LEAF", "LYRA", "KRIS"] : ["RED", "KRIS", "ETHAN"];
     C.choose(["NEW NAME"].concat(presets), { x: 980, y: 190, w: 250, back: false }).then(i => {
       if (i > 0) { G.name = presets[i - 1]; go("rival"); return; }

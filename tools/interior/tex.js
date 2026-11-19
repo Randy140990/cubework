@@ -84,7 +84,40 @@ function leaves(P, r, base, lt, dk, hole = 0.16) {
   for (let i = 0; i < P.w * P.h / 40; i++) { const x = (r() * P.w) | 0, y = (r() * P.h) | 0; P.set(x, y, shadec(lt, 0.2)); P.set(x + 1, y, lt); P.set(x, y + 1, dk); }
 }
 
+// Minecraft-style blocks: 16 pixels to a block, four boards to a plank, soft grain; colours as the world's blocks.
+function mcPlanks(P, r, base) {
+  const lt = shadec(base, 0.16), dk = shadec(base, -0.2), gap = shadec(base, -0.42);
+  for (let row = 0; row < 4; row++) {
+    const y0 = row * 4, seam = [3, 11, 7, 14][row], tone = [0.02, -0.04, 0.03, -0.02][row];
+    for (let y = y0; y < y0 + 4; y++) for (let x = 0; x < 16; x++) {
+      let c = shadec(base, tone + (r() - 0.5) * 0.05);
+      if (((x * 7 + row * 5 + y * 3) % 11) === 0 && y !== y0 + 3) c = mixc(c, dk, 0.35);
+      if (y === y0) c = mixc(c, lt, 0.35);
+      if (y === y0 + 3) c = mixc(c, gap, 0.55);
+      if (x === seam) c = mixc(c, gap, 0.7);
+      P.set(x, y, c);
+    }
+  }
+}
+function mcStone(P, r, base, n = 0.07, spots = 0) { P.fill(base, n, r); for (let i = 0; i < spots; i++) { const x = r() * 16, y = r() * 16; P.set(x, y, shadec(base, (r() - 0.5) * 0.4)); P.set(x + 1, y, shadec(base, (r() - 0.5) * 0.25)); } }
+function mcWool(P, r, base) { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(base, (((x >> 1) + (y >> 1)) % 2 ? 0.035 : -0.035) + (r() - 0.5) * 0.06)); for (let i = 0; i < 10; i++) P.set(r() * 16, r() * 16, shadec(base, 0.1)); }
+function mcCheck(P, r, a, b) { for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = (tx + ty) % 2 ? b : a; mcStone({ fill: (col, n, rr) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(tx * 16 + x, ty * 16 + y, shadec(col, (rr() - 0.5) * n)); }, set: (x, y, col) => P.set(tx * 16 + (x | 0) % 16, ty * 16 + (y | 0) % 16, col) }, r, c, 0.05, 6); } }
 const TEXDEF = {
+  mcOak: [16, 16, (P, r) => mcPlanks(P, r, hx("#B8945F"))], mcSpruce: [16, 16, (P, r) => mcPlanks(P, r, hx("#7A5A38"))], mcBirch: [16, 16, (P, r) => mcPlanks(P, r, hx("#D9C48C"))],
+  mcPale: [16, 16, (P, r) => mcPlanks(P, r, hx("#E6DAD2"))], mcDarkOak: [16, 16, (P, r) => mcPlanks(P, r, hx("#4E3622"))], mcAcacia: [16, 16, (P, r) => mcPlanks(P, r, hx("#B4623A"))],
+  mcCream: [16, 16, (P, r) => mcStone(P, r, hx("#EFE6D2"), 0.05, 5)], mcSky: [16, 16, (P, r) => mcStone(P, r, hx("#CFE2EE"), 0.05, 5)], mcSage: [16, 16, (P, r) => mcStone(P, r, hx("#DDE3D2"), 0.05, 5)],
+  mcNavy: [16, 16, (P, r) => mcStone(P, r, hx("#33506F"), 0.06, 6)],
+  mcQuartzCheck: [32, 32, (P, r) => mcCheck(P, r, hx("#EEEAE2"), hx("#BFD8CC"))], mcBlueCheck: [32, 32, (P, r) => mcCheck(P, r, hx("#EEF2F4"), hx("#9CC4E0"))],
+  mcStripped: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#C9A877"), (x % 5 === 0 ? -0.08 : 0) + (r() - 0.5) * 0.05)); }],
+  mcLabTile: [32, 32, (P, r) => mcCheck(P, r, hx("#EEF0EF"), hx("#DCE2E1"))],
+  mcLabWall: [16, 16, (P, r) => mcStone(P, r, hx("#F2F4F3"), 0.035, 3)],
+  mcCyan: [16, 16, (P, r) => mcStone(P, r, hx("#6FA9B0"), 0.05, 4)],
+  labPanel: [16, 16, (P, r) => { P.fill(hx("#D9DEDD"), 0.03, r); P.rect(0, 0, 16, 1, hx("#F4F6F5")); P.rect(0, 15, 16, 1, hx("#A9B2B0")); P.rect(2, 3, 5, 4, hx("#2B3A44")); P.rect(3, 4, 3, 2, hx("#58D3A0"));
+    P.rect(9, 3, 2, 2, hx("#E5525C")); P.rect(12, 3, 2, 2, hx("#F2C12E")); P.rect(9, 6, 2, 2, hx("#5AA9E6")); P.rect(12, 6, 2, 2, hx("#58D3A0"));
+    for (let i = 0; i < 6; i++) P.rect(2 + i * 2, 10, 1, 3, hx("#7E8886")); P.rect(2, 13, 12, 1, hx("#7E8886")); }],
+  vent: [16, 16, (P, r) => { P.fill(hx("#B9C1BF"), 0.03, r); for (let y = 2; y < 16; y += 3) P.rect(1, y, 14, 1, hx("#7E8886")); }],
+  mcGlass: [16, 16, (P, r) => { P.fill(hx("#DDEFF5"), 0.02, r); P.rect(0, 0, 16, 1, hx("#FFFFFF")); P.rect(0, 15, 16, 1, hx("#BFD6DD")); P.rect(0, 0, 1, 16, hx("#FFFFFF")); P.rect(15, 0, 1, 16, hx("#BFD6DD")); P.line(3, 6, 6, 3, hx("#FFFFFF")); P.line(3, 9, 9, 3, hx("#FFFFFF")); }],
+
   oak: [32, 32, (P, r) => planks(P, r, C.oak, C.oakL, C.oakD, C.gap, 4, 16)],
   walnut: [32, 32, (P, r) => planks(P, r, C.walnut, C.walnutL, C.walnutD, hx("#3E2614"), 4, 16)],
   honey: [32, 32, (P, r) => planks(P, r, hx("#D8A866"), hx("#EDC88B"), hx("#B07E45"), hx("#7A5129"), 4, 32)],
@@ -199,6 +232,51 @@ const TEXDEF = {
       if (h > 5) P.set(x, 8 - h + 2, shadec(c, 0.45));
       x += w;
     }
+  }],
+  // The lab's shelves, packed: books shoulder to shoulder, rows of binders, and white storage boxes.
+  booksFull: [32, 8, (P, r) => {
+    let x = 0;
+    while (x < 32) {
+      const w = 1 + ((r() * 3) | 0), h = 6 + ((r() * 3) | 0), c = BOOKS[(r() * BOOKS.length) | 0];
+      for (let i = 0; i < w && x + i < 32; i++) for (let j = 8 - Math.min(8, h); j < 8; j++) P.set(x + i, j, shadec(c, (i === 0 ? 0.14 : i === w - 1 ? -0.16 : 0) + (j === 8 - h ? 0.18 : 0)));
+      if (h > 6) P.set(x, 8 - h + 2, shadec(c, 0.45));
+      x += w;
+    }
+  }],
+  binders: [32, 8, (P, r) => {
+    const cols = ["#3A6FD0", "#E5525C", "#F2C12E", "#58A64A", "#7A4FB8", "#2FA3B0"];
+    for (let b = 0; b < 8; b++) { const c = hx(cols[(b + ((r() * 2) | 0)) % cols.length]);
+      for (let i = 0; i < 4; i++) for (let j = 0; j < 8; j++) P.set(b * 4 + i, j, shadec(c, (i === 0 ? 0.14 : i === 3 ? -0.2 : 0)));
+      P.rect(b * 4 + 1, 2, 2, 2, hx("#F4F6F5")); P.set(b * 4 + 1, 6, shadec(c, -0.35)); P.set(b * 4 + 2, 6, shadec(c, -0.35)); }
+  }],
+  storeBoxes: [32, 8, (P, r) => {
+    for (let b = 0; b < 4; b++) { const c = hx(b % 2 ? "#E9E4D8" : "#F4F6F5");
+      for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) P.set(b * 8 + i, j, shadec(c, (i === 0 ? 0.08 : i === 7 ? -0.18 : 0) + (j === 0 ? 0.08 : 0) + (r() - 0.5) * 0.03));
+      P.rect(b * 8 + 2, 3, 4, 2, hx(["#9CC4E0", "#F2C12E", "#E99A2E", "#8FD3A8"][b])); P.rect(b * 8 + 3, 6, 2, 1, shadec(c, -0.3)); }
+  }],
+  shelfWhite: [16, 16, (P, r) => { P.fill(hx("#F4F5F3"), 0.025, r); P.rect(0, 0, 16, 1, hx("#FFFFFF")); P.rect(0, 15, 16, 1, hx("#D9DDDA")); }],
+  cupboardTeal: [16, 16, (P, r) => {
+    const c = hx("#3FA7A9");
+    P.bevel(0, 0, 16, 4, c, 0.14, 0.02, r); P.rect(6, 1, 4, 1, C.steelD); P.rect(6, 2, 4, 1, C.steel);
+    P.bevel(0, 4, 16, 12, c, 0.14, 0.02, r); P.bevel(2, 6, 12, 8, shadec(c, -0.05), 0.08, 0, r); P.rect(12, 8, 1, 3, C.steelD); P.rect(11, 8, 1, 3, C.steel);
+  }],
+  tealPaint: [16, 16, (P, r) => P.fill(hx("#3FA7A9"), 0.03, r)],
+  tankGlass: [16, 16, (P, r) => { P.fill(hx("#BFEFF2"), 0.02, r); P.rect(2, 0, 1, 16, hx("#FFFFFF")); P.rect(4, 0, 1, 16, hx("#E6FBFC")); }],
+  redPlastic: [16, 16, (P, r) => { P.fill(hx("#E5525C"), 0.03, r); P.rect(0, 0, 16, 2, hx("#F07C84")); }],
+  boardLab: [40, 26, (P, r) => {
+    P.fill(hx("#F7F8F6")); P.text("NOTES", 2, 2, hx("#3A6FD0"));
+    for (let i = 0; i < 3; i++) { P.rect(2, 9 + i * 5, 2, 2, hx("#E5525C")); P.rect(6, 9 + i * 5, 14 - i * 3, 1, hx("#26304A")); P.rect(6, 11 + i * 5, 9, 1, hx("#7E8886")); }
+    P.ring(31, 14, 6, hx("#58A64A"));
+    P.rect(29, 12, 1, 1, hx("#26304A")); P.rect(33, 12, 1, 1, hx("#26304A")); P.rect(30, 16, 3, 1, hx("#26304A"));
+  }],
+  boardMap: [48, 28, (P, r) => {
+    P.fill(hx("#F7F8F6")); P.rect(0, 0, 48, 1, hx("#DDE1DE"));
+    const land = hx("#8FD3A8"), sea = hx("#9CC4E0");
+    P.rect(4, 4, 26, 18, sea); P.rect(6, 6, 6, 12, land); P.rect(12, 6, 14, 5, land); P.rect(20, 11, 6, 9, land); P.rect(12, 13, 6, 5, land);
+    for (const [x, y] of [[8, 16], [8, 9], [15, 8], [23, 8], [23, 15], [15, 15]]) P.rect(x, y, 2, 2, hx("#E5525C"));
+    P.text("KANTO", 5, 23, hx("#26304A"));
+    for (let i = 0; i < 4; i++) { P.rect(33, 5 + i * 5, 12, 1, hx("#3A6FD0")); P.rect(33, 7 + i * 5, 8, 1, hx("#7E8886")); }
+    P.rect(34, 24, 6, 2, hx("#E5525C"));
   }],
   cupboard: [16, 16, (P, r) => {
     const c = hx("#7CC4AE");
@@ -422,6 +500,14 @@ function drawPC(P, f) {
   P.text("ITEMS", 5, 8, hx("#26304A")); P.text("POTION", 5, 14, hx("#26304A"));
   if (f % 8 < 4) P.rect(29, 14, 1, 5, hx("#26304A"));
   P.rect(0, P.h - 4, P.w, 4, hx("#1E4F86")); P.rect(1, P.h - 3, 5, 2, hx("#5DAE52"));
+}
+// The professor's machine: a heartbeat line running, a creature's outline and its numbers.
+function drawLab(P, f) {
+  P.fill(hx("#163A3F"));
+  for (let x = 0; x < P.w; x++) { const k = (x + f) % 24, y = 6 + (k === 8 ? -4 : k === 9 ? 3 : k === 10 ? -1 : 0); P.set(x, y, hx("#58D3A0")); }
+  P.rect(0, 11, P.w, 1, hx("#24575D"));
+  P.text("DATA", 2, 14, hx("#BFF5DC")); P.rect(22, 14, 2 + (f % 6) * 2, 4, hx("#F2C12E"));
+  if (f % 6 < 3) P.rect(P.w - 4, 2, 2, 2, hx("#E5525C"));
 }
 function drawLocked(P, f) {
   P.fill(hx("#23262B"));

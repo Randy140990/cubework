@@ -210,8 +210,8 @@ screen("battle", "Battle", "Battle: commands and moves", {
       const cb = commandButtons(async i => {
         C.pop(cb); cb.remove();
         if (i === 0) { const mp = movePanel(ours, foe.sid, j => { C.pop(mp); mp.remove(); turn(j); }, () => { C.pop(mp); mp.remove(); commands(); }); C.push(mp); }
-        else if (i === 1) { const j = await C.choose(G.party.map(p => ({ label: ourName(p.sid), right: `Lv. ${p.lv}`, off: p.status === "FNT" })).concat(["CANCEL"]), { x: 820, y: 150, w: 420 }); if (j > 0 && j < 6 && G.party[j].status !== "FNT") await C.say([{ text: `Come back, **${ourName(ours.sid)}**!` }, { text: "(In game, the other one goes out here.)" }]); commands(); }
-        else if (i === 2) { const j = await C.choose([{ label: "POKé BALLS", right: "2 kinds" }, { label: "MEDICINE", right: "4 kinds" }, "CANCEL"], { x: 820, y: 280, w: 420 }); if (j === 0) await C.say([{ text: "The trainer blocked the ball! Don't be a thief!" }]); else if (j === 1) { await C.say([{ text: `**${G.name}** used a **POTION**.` }]); await drain(ours, Math.min(ours.maxhp, ours.hp + 20), P1); await C.say([{ text: `**${ourName(ours.sid)}**'s HP was restored.` }]); } commands(); }
+        else if (i === 1) { const j = await C.choose(G.party.map(p => ({ label: `${pic(p.sid, 36, "vertical-align:middle;margin:-6px 8px -6px -8px")}${esc(ourName(p.sid))}`, right: `Lv. ${p.lv}`, off: p.status === "FNT" })).concat(["CANCEL"]), { x: 800, y: null, bottom: 24, w: 450 }); if (j > 0 && j < 6 && G.party[j].status !== "FNT") await C.say([{ text: `Come back, **${ourName(ours.sid)}**!` }, { text: "(In game, the other one goes out here.)" }]); commands(); }
+        else if (i === 2) { const j = await C.choose([{ label: "POKé BALLS", right: "2 kinds" }, { label: "MEDICINE", right: "4 kinds" }, "CANCEL"], { x: 800, y: null, bottom: 24, w: 450 }); if (j === 0) await C.say([{ text: "The trainer blocked the ball! Don't be a thief!" }]); else if (j === 1) { await C.say([{ text: `**${G.name}** used a **POTION**.` }]); await drain(ours, Math.min(ours.maxhp, ours.hp + 20), P1); await C.say([{ text: `**${ourName(ours.sid)}**'s HP was restored.` }]); } commands(); }
         else { await C.say([{ text: "No! There's no running from a trainer battle!" }]); commands(); }
       }, { who: ourName(ours.sid) });
       C.push(cb);
@@ -222,7 +222,7 @@ screen("battle", "Battle", "Battle: commands and moves", {
 });
 screen("catch", "Battle", "Catching", {
   scene: "battle", sceneOpts: () => ({ ours: "pikachu", foe: "pidgey", trainer: false }),
-  what: "A wild POKéMON: throw a ball from the BAG. A ring closes in round it; press A when it's small for Nice!, Great! or Excellent! Then the ball shakes, and Gotcha!",
+  what: "A wild POKéMON: throw a ball from the BAG (the list opens bottom right, where the buttons were). A ring closes in round it, with 'Press A to throw!' in the middle; press A when it's small for Nice!, Great! or Excellent! Then the ball shakes, and Gotcha!",
   tags: ["New: throw timing and call-outs"], mod: "BattleScreen's BAG, POKé BALLS.",
   try: ["BAG, POKé BALLS, POKé BALL, then press A as the ring shrinks."],
   make() {
@@ -236,12 +236,12 @@ screen("catch", "Battle", "Catching", {
         const pick = await new Promise(res => { const cb = commandButtons(i => { C.pop(cb); cb.remove(); res(i); }, { who: ourName(ours.sid) }); C.push(cb); });
         if (pick === 3) { await C.say([{ text: "Got away safely!" }]); if (C.alive()) go("hud"); return; }
         if (pick !== 2) { await C.say([{ text: "Try the BAG this time: it's for catching." }]); continue; }
-        const j = await C.choose([{ label: "POKé BALL", right: "x" + bagCount("POKé BALL") }, { label: "GREAT BALL", right: "x" + bagCount("GREAT BALL") }, "CANCEL"], { x: 820, y: 260, w: 420 });
+        const j = await C.choose([{ label: "POKé BALL", right: "x" + bagCount("POKé BALL") }, { label: "GREAT BALL", right: "x" + bagCount("GREAT BALL") }, "CANCEL"], { x: 800, y: null, bottom: 24, w: 450 });
         if (j < 0 || j === 2) continue;
         // The ring: smaller is better.
         const p = V(0, 0.4, 0).project(cam3), cx = (p.x + 1) / 2 * 1280, cy = (1 - p.y) / 2 * 720;
         const ring = box(cx - 150, cy - 150, 300, 300, "", `<svg viewBox="0 0 300 300" width="300" height="300"><circle cx="150" cy="150" r="60" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="6"/><circle id="rg" cx="150" cy="150" r="140" fill="none" stroke="#8FF5C0" stroke-width="8"/></svg>`);
-        const tip = box(440, 120, 400, null, "g-panel soft", `<div style="padding:10px 18px;text-align:center;font-size:20px;font-weight:900">Press <span class="g-key round">A</span> to throw!</div>`); tip.style.borderRadius = "999px";
+        const tip = box(440, Math.min(560, cy + 170), 400, null, "g-panel g-pop", `<div style="padding:12px 18px;text-align:center;font-size:22px;font-weight:900">Press <span class="g-key round">A</span> to throw!</div>`); tip.style.borderRadius = "999px";
         let r = 140, dir = -1, live = true;
         const spin = () => { if (!live || !C.alive()) return; r += dir * 2.4; if (r < 40) dir = 1; if (r > 140) dir = -1; const e = $("#rg"); if (e) { e.setAttribute("r", r); e.setAttribute("stroke", r < 70 ? "#FFD45A" : r < 100 ? "#8FF5C0" : "#fff"); } requestAnimationFrame(spin); };
         spin();
@@ -308,7 +308,7 @@ screen("evolve", "Battle", "Evolving", {
     (async () => {
       await C.say([{ text: `What? **${a}** is evolving!` }]);
       S.turn = false; S.glowOn = 1;
-      const tip = box(440, 40, 400, null, "g-panel soft", `<div style="padding:10px 18px;text-align:center;font-size:18px;font-weight:900">Press <span class="g-key round">B</span> to stop it</div>`); tip.style.borderRadius = "999px";
+      const tip = box(440, 300, 400, null, "g-panel g-pop", `<div style="padding:12px 18px;text-align:center;font-size:20px;font-weight:900">Press <span class="g-key round">B</span> to stop it</div>`); tip.style.borderRadius = "999px";
       const stop = { key(k) { if (k === "b") stopped = true; return true; } }; C.push(stop);
       await C.wait(1200); S.hide = true; await C.wait(900);
       C.pop(stop); tip.remove();
