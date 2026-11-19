@@ -257,7 +257,7 @@ def porcupine(sid, name, stands, stage, male):
     tl = 4.5 if stage == 2 else 2.5
     tq = [quill_cubes(dx, 5 * s, (4.3 + tl * 0.6) * s, n(2.8 * s), [25, dx * 10, 0]) for dx in ((-s, 0, s) if stage < 2 else (-1.5 * s, -0.5 * s, 0.5 * s, 1.5 * s))]
     m.bone("tail", "body", S([0, 4.5, 4.5]), [Cube(S([-1.5, 3.5, 4.3]), [n(3 * s), n(2 * s), n(tl * s)], body)] + [c for q in tq for c in q], rotation=[-10, 0, 0])
-    stout_legs(m, 2.4 * s, (-2.8 * s, 2.8 * s), round(3 * s), max(2, round(2.2 * s)), legm, claw, 3, claw_len=2)
+    stout_legs(m, 2.4 * s, (-2.8 * s, 2.8 * s), round(3 * s), max(2, round(2.2 * s)), legm, claw, 3, claw_len=2, sharp=True)
 
     # POISON STING: barbed quills shot from its back, their tips glowing with venom.
     fx_for(m, s)
@@ -374,7 +374,7 @@ def mongoose(sid, name, stands, stage):
     bw, bl = n(5 * s), n(7 * s)
     m.bone("tail3", "tail2", S([0, 6.75, 12.5]), [Cube([-bw / 2, 6.75 * s, 12.3 * s], [bw, 0, bl], tuft, [0, 0, a], [0, 6.75 * s, 12.3 * s])
                                                   for a in (0, 45, 90, 135)], rotation=[8, 0, 0])
-    stout_legs(m, 1.9 * s, (-4 * s, 4 * s), round(4.5 * s), max(2, round(1.8 * s)), legm, claw, 4,
+    stout_legs(m, 1.9 * s, (-4 * s, 4 * s), round(4.5 * s), max(2, round(1.8 * s)), legm, claw, 4, sharp=True, claw_len=2 if stage == 2 else 1,
                extra=(lambda z: [Cube([-1.9 * s - 2, 2.6 * s, z - 1], [1, 2, 2], Mat(MANE, noise=0.02, edge=0))]) if stage == 1 else None)
 
     # KARATE CHOP: it rears up and chops down with a forepaw, a bright slash sweeping down in front of it.
@@ -519,7 +519,7 @@ def shriket():
 
 
 def galeshrike():
-    shrike("fearow", "GALESHRIKE", 2.35, 1)
+    shrike("fearow", "GALESHRIKE", 2.7, 1)
 
 
 # ---------- the gliders (Pichu, Pikachu, Raichu) ----------

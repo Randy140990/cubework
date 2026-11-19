@@ -51,7 +51,8 @@ def model(folder):
             if g_im.size == im.size:
                 painted |= np.array(g_im)[..., 3] > 0
     texels = int(painted.sum())
-    return {"geo": g, "anims": anims, "info": {k: info.get(k) for k in ("scale", "idle", "ground", "parts", "poses", "actions", "name", "move", "attack_move")},
+    return {"geo": g, "anims": anims, "info": {k: info.get(k) for k in ("scale", "idle", "ground", "parts", "poses", "actions", "name", "move", "attack_move",
+                                                                         "anchors", "stage")},
             "texture": data_uri(info["texture"]), "layers": layers,
             "detail": {"cubes": cubes, "bones": len(g["bones"]), "texture": f"{im.size[0]}×{im.size[1]}", "texels": texels, "animations": len(anims)}}
 
@@ -78,6 +79,66 @@ def species_rows():
     return out
 
 
+def move_rows(rows, ours):
+    """Every move, with what it does, its TM or HM, and the Retromon creatures that learn it by level."""
+    sys.path.insert(0, HERE)
+    import movetext
+    index = json.load(open(os.path.join(ROOT, "moves", "index.json")))
+    tm = {}
+    for line in open(os.path.join(DATA, "tms.tsv"), encoding="utf-8"):
+        if line.startswith("#") or not line.strip():
+            continue
+        f = line.rstrip("\n").split("\t")
+        tm[f[2]] = {"gs": None if f[4] == "-" else f[4], "rb": None if f[3] == "-" else f[3]}
+    learn = {}
+    for line in open(os.path.join(DATA, "species.tsv"), encoding="utf-8"):
+        if line.startswith("#") or not line.strip():
+            continue
+        f = line.rstrip("\n").split("\t")
+        if f[1] not in ours:
+            continue
+        for e in f[16].split(","):
+            if ":" in e:
+                lv, mv = e.split(":")
+                learn.setdefault(mv, {}).setdefault(f[1], int(lv))
+    out = []
+    for line in open(os.path.join(DATA, "moves.tsv"), encoding="utf-8"):
+        if line.startswith("#") or not line.strip():
+            continue
+        f = line.rstrip("\n").split("\t")
+        mid = f[0]
+        ix = index[mid]
+        out.append({"id": mid, "n": ix["n"], "name": ix["name"], "type": ix["type"], "category": ix["category"], "power": int(f[3]),
+                     "accuracy": int(f[5]), "pp": int(f[6]), "desc": movetext.describe(f[1], f[2], int(f[7]), int(f[3]), f[9] == "1"),
+                     "tm": tm.get(mid), "learners": [[sid, lv] for sid, lv in sorted(learn.get(mid, {}).items(), key=lambda x: x[1])],
+                     "body": ix["body"], "hit": ix.get("hit"), "hold": ix.get("hold", 0), "length": ix.get("length"), "aura": ix.get("aura")})
+    return out
+
+
+def effect(folder):
+    info = json.load(open(os.path.join(folder, "info.json")))
+    geo = json.load(open(os.path.join(folder, "model.geo.json")))["minecraft:geometry"][0]
+    anims = json.load(open(os.path.join(folder, "anim.json")))["animations"]
+    return {"geo": geo, "anims": anims, "info": {"scale": 1, **{k: info.get(k) for k in ("release", "hit", "hold", "length", "aura", "body")}},
+            "texture": data_uri(info["texture"]), "layers": [{"frames": [data_uri(f) for f in l["frames"]], "fps": l.get("fps", 10)} for l in info.get("layers", [])]}
+
+
+def write_moves(path):
+    """The move effects, in a file of their own beside the page (fetched when first wanted)."""
+    base = os.path.join(ROOT, "moves")
+    out = {"effects": {}, "auras": {}}
+    for d in sorted(os.listdir(base)):
+        f = os.path.join(base, d)
+        if not os.path.isdir(f):
+            continue
+        if d.startswith("aura_"):
+            out["auras"][d[5:].upper()] = effect(f)
+        else:
+            out["effects"][d] = effect(f)
+    json.dump(out, open(path, "w"), separators=(",", ":"))
+    print(path, os.path.getsize(path) // 1024, "KB")
+
+
 def main(out_path):
     rows = species_rows()
     data = {"families": [], "species": {}}
@@ -92,6 +153,9 @@ def main(out_path):
         if ev:
             ev["oursName"] = data["species"].get(ev["into"], {}).get("ours", {}).get("info", {}).get("name")
             ev["theirsName"] = rows[ev["into"]]["name"]
+    ours = {sid for _, members in FAMILIES for sid in members}
+    data["moves"] = move_rows(rows, ours)
+    write_moves(os.path.join(os.path.dirname(os.path.abspath(out_path)), "moves.json"))
     page = open(os.path.join(HERE, "monviewer.html")).read()
     page = page.replace("/*DATA*/null", json.dumps(data, separators=(",", ":")))
     open(out_path, "w").write(page)

@@ -1,0 +1,4520 @@
+{
+ "pound": {
+  "n": 1,
+  "name": "POUND",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 35,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "karate_chop": {
+  "n": 2,
+  "name": "KARATE CHOP",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 50,
+  "accuracy": 100,
+  "pp": 25,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "doubleslap": {
+  "n": 3,
+  "name": "DOUBLESLAP",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 15,
+  "accuracy": 85,
+  "pp": 10,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.74,
+   "2": 0.9,
+   "3": 1.06
+  }
+ },
+ "comet_punch": {
+  "n": 4,
+  "name": "COMET PUNCH",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 18,
+  "accuracy": 85,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.74,
+   "2": 0.9,
+   "3": 1.22
+  }
+ },
+ "mega_punch": {
+  "n": 5,
+  "name": "MEGA PUNCH",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 85,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "pay_day": {
+  "n": 6,
+  "name": "PAY DAY",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.2,
+   "2": 1.4,
+   "3": 1.6
+  }
+ },
+ "fire_punch": {
+  "n": 7,
+  "name": "FIRE PUNCH",
+  "type": "FIRE",
+  "category": "Special",
+  "power": 75,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": "FIRE",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.89,
+   "2": 0.89,
+   "3": 0.89
+  }
+ },
+ "ice_punch": {
+  "n": 8,
+  "name": "ICE PUNCH",
+  "type": "ICE",
+  "category": "Special",
+  "power": 75,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": "ICE",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.76,
+   "2": 0.76,
+   "3": 0.76
+  }
+ },
+ "thunderpunch": {
+  "n": 9,
+  "name": "THUNDERPUNCH",
+  "type": "ELECTRIC",
+  "category": "Special",
+  "power": 75,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": "ELECTRIC",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.64,
+   "2": 0.64,
+   "3": 0.64
+  }
+ },
+ "scratch": {
+  "n": 10,
+  "name": "SCRATCH",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 35,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "vicegrip": {
+  "n": 11,
+  "name": "VICEGRIP",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 55,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.6,
+   "2": 0.6,
+   "3": 0.6
+  }
+ },
+ "guillotine": {
+  "n": 12,
+  "name": "GUILLOTINE",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 0,
+  "accuracy": 30,
+  "pp": 5,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.71,
+   "2": 0.71,
+   "3": 0.71
+  }
+ },
+ "razor_wind": {
+  "n": 13,
+  "name": "RAZOR WIND",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 75,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": 1.22,
+  "hold": 0.0,
+  "length": {
+   "1": 1.6,
+   "2": 1.7,
+   "3": 1.8
+  }
+ },
+ "swords_dance": {
+  "n": 14,
+  "name": "SWORDS DANCE",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.86,
+   "2": 1.86,
+   "3": 1.86
+  }
+ },
+ "cut": {
+  "n": 15,
+  "name": "CUT",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 50,
+  "accuracy": 95,
+  "pp": 30,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "gust": {
+  "n": 16,
+  "name": "GUST",
+  "type": "FLYING",
+  "category": "Physical",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 35,
+  "body": "special",
+  "aura": null,
+  "hit": 0.8,
+  "hold": 0.0,
+  "length": {
+   "1": 1.0,
+   "2": 1.14,
+   "3": 1.28
+  }
+ },
+ "wing_attack": {
+  "n": 17,
+  "name": "WING ATTACK",
+  "type": "FLYING",
+  "category": "Physical",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 35,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.7,
+   "2": 0.7,
+   "3": 0.7
+  }
+ },
+ "whirlwind": {
+  "n": 18,
+  "name": "WHIRLWIND",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.06,
+   "2": 1.16,
+   "3": 1.26
+  }
+ },
+ "fly": {
+  "n": 19,
+  "name": "FLY",
+  "type": "FLYING",
+  "category": "Physical",
+  "power": 70,
+  "accuracy": 95,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "bind": {
+  "n": 20,
+  "name": "BIND",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 15,
+  "accuracy": 75,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.6,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "slam": {
+  "n": 21,
+  "name": "SLAM",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 75,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "vine_whip": {
+  "n": 22,
+  "name": "VINE WHIP",
+  "type": "GRASS",
+  "category": "Special",
+  "power": 35,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "attack",
+  "aura": "GRASS",
+  "hit": 0.42,
+  "hold": 0.0,
+  "length": {
+   "1": 0.76,
+   "2": 0.76,
+   "3": 0.76
+  }
+ },
+ "stomp": {
+  "n": 23,
+  "name": "STOMP",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "double_kick": {
+  "n": 24,
+  "name": "DOUBLE KICK",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 30,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.74,
+   "2": 0.74,
+   "3": 0.74
+  }
+ },
+ "mega_kick": {
+  "n": 25,
+  "name": "MEGA KICK",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 120,
+  "accuracy": 75,
+  "pp": 5,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "jump_kick": {
+  "n": 26,
+  "name": "JUMP KICK",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 70,
+  "accuracy": 95,
+  "pp": 25,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "rolling_kick": {
+  "n": 27,
+  "name": "ROLLING KICK",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 60,
+  "accuracy": 85,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "sand_attack": {
+  "n": 28,
+  "name": "SAND-ATTACK",
+  "type": "GROUND",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.76,
+   "2": 1.76,
+   "3": 1.8
+  }
+ },
+ "headbutt": {
+  "n": 29,
+  "name": "HEADBUTT",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "horn_attack": {
+  "n": 30,
+  "name": "HORN ATTACK",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 25,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "fury_attack": {
+  "n": 31,
+  "name": "FURY ATTACK",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 15,
+  "accuracy": 85,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.7,
+   "2": 0.82,
+   "3": 1.06
+  }
+ },
+ "horn_drill": {
+  "n": 32,
+  "name": "HORN DRILL",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 30,
+  "pp": 5,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.91,
+   "2": 0.91,
+   "3": 0.91
+  }
+ },
+ "tackle": {
+  "n": 33,
+  "name": "TACKLE",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 35,
+  "accuracy": 95,
+  "pp": 35,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "body_slam": {
+  "n": 34,
+  "name": "BODY SLAM",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 85,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "wrap": {
+  "n": 35,
+  "name": "WRAP",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 15,
+  "accuracy": 85,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.6,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "take_down": {
+  "n": 36,
+  "name": "TAKE DOWN",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 90,
+  "accuracy": 85,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "thrash": {
+  "n": 37,
+  "name": "THRASH",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "double_edge": {
+  "n": 38,
+  "name": "DOUBLE-EDGE",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 120,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "tail_whip": {
+  "n": 39,
+  "name": "TAIL WHIP",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "poison_sting": {
+  "n": 40,
+  "name": "POISON STING",
+  "type": "POISON",
+  "category": "Physical",
+  "power": 15,
+  "accuracy": 100,
+  "pp": 35,
+  "body": "special",
+  "aura": null,
+  "hit": 0.86,
+  "hold": 0.0,
+  "length": {
+   "1": 1.34,
+   "2": 1.49,
+   "3": 1.59
+  }
+ },
+ "twineedle": {
+  "n": 41,
+  "name": "TWINEEDLE",
+  "type": "BUG",
+  "category": "Physical",
+  "power": 25,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.12,
+   "2": 1.12,
+   "3": 1.12
+  }
+ },
+ "pin_missile": {
+  "n": 42,
+  "name": "PIN MISSILE",
+  "type": "BUG",
+  "category": "Physical",
+  "power": 14,
+  "accuracy": 85,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.2,
+   "2": 1.3,
+   "3": 1.4
+  }
+ },
+ "leer": {
+  "n": 43,
+  "name": "LEER",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "bite": {
+  "n": 44,
+  "name": "BITE",
+  "type": "DARK",
+  "category": "Special",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 25,
+  "body": "attack",
+  "aura": "DARK",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.6,
+   "2": 0.6,
+   "3": 0.6
+  }
+ },
+ "growl": {
+  "n": 45,
+  "name": "GROWL",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.71,
+   "2": 1.71,
+   "3": 1.71
+  }
+ },
+ "roar": {
+  "n": 46,
+  "name": "ROAR",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.3,
+   "2": 1.43,
+   "3": 1.56
+  }
+ },
+ "sing": {
+  "n": 47,
+  "name": "SING",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 55,
+  "pp": 15,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.56,
+   "2": 1.56,
+   "3": 1.58
+  }
+ },
+ "supersonic": {
+  "n": 48,
+  "name": "SUPERSONIC",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 55,
+  "pp": 20,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.17,
+   "2": 1.3,
+   "3": 1.43
+  }
+ },
+ "sonicboom": {
+  "n": 49,
+  "name": "SONICBOOM",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 20,
+  "accuracy": 90,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": 0.65,
+  "hold": 0.0,
+  "length": {
+   "1": 0.93,
+   "2": 0.93,
+   "3": 0.93
+  }
+ },
+ "disable": {
+  "n": 50,
+  "name": "DISABLE",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 55,
+  "pp": 20,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "acid": {
+  "n": 51,
+  "name": "ACID",
+  "type": "POISON",
+  "category": "Physical",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.1,
+   "2": 1.2,
+   "3": 1.3
+  }
+ },
+ "ember": {
+  "n": 52,
+  "name": "EMBER",
+  "type": "FIRE",
+  "category": "Special",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 25,
+  "body": "special",
+  "aura": "FIRE",
+  "hit": 0.66,
+  "hold": 0.0,
+  "length": {
+   "1": 1.04,
+   "2": 1.14,
+   "3": 1.24
+  }
+ },
+ "flamethrower": {
+  "n": 53,
+  "name": "FLAMETHROWER",
+  "type": "FIRE",
+  "category": "Special",
+  "power": 95,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": "FIRE",
+  "hit": 0.42,
+  "hold": 1.4,
+  "length": {
+   "1": 2.55,
+   "2": 2.55,
+   "3": 2.55
+  }
+ },
+ "mist": {
+  "n": 54,
+  "name": "MIST",
+  "type": "ICE",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.43,
+   "2": 1.43,
+   "3": 1.43
+  }
+ },
+ "water_gun": {
+  "n": 55,
+  "name": "WATER GUN",
+  "type": "WATER",
+  "category": "Special",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 25,
+  "body": "special",
+  "aura": "WATER",
+  "hit": 0.42,
+  "hold": 0.2,
+  "length": {
+   "1": 1.37,
+   "2": 1.37,
+   "3": 1.37
+  }
+ },
+ "hydro_pump": {
+  "n": 56,
+  "name": "HYDRO PUMP",
+  "type": "WATER",
+  "category": "Special",
+  "power": 120,
+  "accuracy": 80,
+  "pp": 5,
+  "body": "special",
+  "aura": "WATER",
+  "hit": 0.42,
+  "hold": 1.0,
+  "length": {
+   "1": 2.03,
+   "2": 2.03,
+   "3": 2.03
+  }
+ },
+ "surf": {
+  "n": 57,
+  "name": "SURF",
+  "type": "WATER",
+  "category": "Special",
+  "power": 95,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": "WATER",
+  "hit": 0.9,
+  "hold": 0.3,
+  "length": {
+   "1": 1.56,
+   "2": 1.56,
+   "3": 1.56
+  }
+ },
+ "ice_beam": {
+  "n": 58,
+  "name": "ICE BEAM",
+  "type": "ICE",
+  "category": "Special",
+  "power": 95,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": "ICE",
+  "hit": 0.42,
+  "hold": 0.4,
+  "length": {
+   "1": 1.54,
+   "2": 1.54,
+   "3": 1.54
+  }
+ },
+ "blizzard": {
+  "n": 59,
+  "name": "BLIZZARD",
+  "type": "ICE",
+  "category": "Special",
+  "power": 120,
+  "accuracy": 70,
+  "pp": 5,
+  "body": "special",
+  "aura": "ICE",
+  "hit": 0.65,
+  "hold": 0.0,
+  "length": {
+   "1": 1.77,
+   "2": 1.77,
+   "3": 1.77
+  }
+ },
+ "psybeam": {
+  "n": 60,
+  "name": "PSYBEAM",
+  "type": "PSYCHIC",
+  "category": "Special",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": "PSYCHIC",
+  "hit": 0.75,
+  "hold": 0.0,
+  "length": {
+   "1": 1.31,
+   "2": 1.31,
+   "3": 1.31
+  }
+ },
+ "bubblebeam": {
+  "n": 61,
+  "name": "BUBBLEBEAM",
+  "type": "WATER",
+  "category": "Special",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": "WATER",
+  "hit": 0.8,
+  "hold": 0.0,
+  "length": {
+   "1": 1.61,
+   "2": 1.79,
+   "3": 1.97
+  }
+ },
+ "aurora_beam": {
+  "n": 62,
+  "name": "AURORA BEAM",
+  "type": "ICE",
+  "category": "Special",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": "ICE",
+  "hit": 0.42,
+  "hold": 0.4,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "hyper_beam": {
+  "n": 63,
+  "name": "HYPER BEAM",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 150,
+  "accuracy": 90,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": 0.97,
+  "hold": 0.5,
+  "length": {
+   "1": 2.01,
+   "2": 2.01,
+   "3": 2.01
+  }
+ },
+ "peck": {
+  "n": 64,
+  "name": "PECK",
+  "type": "FLYING",
+  "category": "Physical",
+  "power": 35,
+  "accuracy": 100,
+  "pp": 35,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "drill_peck": {
+  "n": 65,
+  "name": "DRILL PECK",
+  "type": "FLYING",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.7,
+   "2": 0.7,
+   "3": 0.7
+  }
+ },
+ "submission": {
+  "n": 66,
+  "name": "SUBMISSION",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 80,
+  "pp": 25,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.06,
+   "2": 1.06,
+   "3": 1.26
+  }
+ },
+ "low_kick": {
+  "n": 67,
+  "name": "LOW KICK",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 50,
+  "accuracy": 90,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "counter": {
+  "n": 68,
+  "name": "COUNTER",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "seismic_toss": {
+  "n": 69,
+  "name": "SEISMIC TOSS",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "strength": {
+  "n": 70,
+  "name": "STRENGTH",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "absorb": {
+  "n": 71,
+  "name": "ABSORB",
+  "type": "GRASS",
+  "category": "Special",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": "GRASS",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.95,
+   "2": 2.02,
+   "3": 2.09
+  }
+ },
+ "mega_drain": {
+  "n": 72,
+  "name": "MEGA DRAIN",
+  "type": "GRASS",
+  "category": "Special",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": "GRASS",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 2.02,
+   "2": 2.16,
+   "3": 2.23
+  }
+ },
+ "leech_seed": {
+  "n": 73,
+  "name": "LEECH SEED",
+  "type": "GRASS",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 90,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 2.55,
+   "2": 2.62,
+   "3": 2.69
+  }
+ },
+ "growth": {
+  "n": 74,
+  "name": "GROWTH",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.45,
+   "2": 1.45,
+   "3": 1.45
+  }
+ },
+ "razor_leaf": {
+  "n": 75,
+  "name": "RAZOR LEAF",
+  "type": "GRASS",
+  "category": "Special",
+  "power": 55,
+  "accuracy": 95,
+  "pp": 25,
+  "body": "special",
+  "aura": "GRASS",
+  "hit": 0.84,
+  "hold": 0.0,
+  "length": {
+   "1": 1.24,
+   "2": 1.48,
+   "3": 1.66
+  }
+ },
+ "solarbeam": {
+  "n": 76,
+  "name": "SOLARBEAM",
+  "type": "GRASS",
+  "category": "Special",
+  "power": 120,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": "GRASS",
+  "hit": 1.12,
+  "hold": 0.4,
+  "length": {
+   "1": 2.06,
+   "2": 2.06,
+   "3": 2.06
+  }
+ },
+ "poisonpowder": {
+  "n": 77,
+  "name": "POISONPOWDER",
+  "type": "POISON",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 75,
+  "pp": 35,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.72,
+   "2": 1.79,
+   "3": 1.86
+  }
+ },
+ "stun_spore": {
+  "n": 78,
+  "name": "STUN SPORE",
+  "type": "GRASS",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 75,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.72,
+   "2": 1.79,
+   "3": 1.86
+  }
+ },
+ "sleep_powder": {
+  "n": 79,
+  "name": "SLEEP POWDER",
+  "type": "GRASS",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 75,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.72,
+   "2": 1.79,
+   "3": 1.86
+  }
+ },
+ "petal_dance": {
+  "n": 80,
+  "name": "PETAL DANCE",
+  "type": "GRASS",
+  "category": "Special",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": "GRASS",
+  "hit": 1.25,
+  "hold": 0.0,
+  "length": {
+   "1": 1.64,
+   "2": 1.74,
+   "3": 1.84
+  }
+ },
+ "string_shot": {
+  "n": 81,
+  "name": "STRING SHOT",
+  "type": "BUG",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 95,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.1,
+  "length": {
+   "1": 1.76,
+   "2": 1.76,
+   "3": 1.76
+  }
+ },
+ "dragon_rage": {
+  "n": 82,
+  "name": "DRAGON RAGE",
+  "type": "DRAGON",
+  "category": "Special",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": "DRAGON",
+  "hit": 0.8,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "fire_spin": {
+  "n": 83,
+  "name": "FIRE SPIN",
+  "type": "FIRE",
+  "category": "Special",
+  "power": 15,
+  "accuracy": 70,
+  "pp": 15,
+  "body": "special",
+  "aura": "FIRE",
+  "hit": 0.65,
+  "hold": 0.0,
+  "length": {
+   "1": 1.81,
+   "2": 1.81,
+   "3": 1.81
+  }
+ },
+ "thundershock": {
+  "n": 84,
+  "name": "THUNDERSHOCK",
+  "type": "ELECTRIC",
+  "category": "Special",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": "ELECTRIC",
+  "hit": 0.42,
+  "hold": 0.05,
+  "length": {
+   "1": 0.92,
+   "2": 0.92,
+   "3": 0.92
+  }
+ },
+ "thunderbolt": {
+  "n": 85,
+  "name": "THUNDERBOLT",
+  "type": "ELECTRIC",
+  "category": "Special",
+  "power": 95,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": "ELECTRIC",
+  "hit": 0.42,
+  "hold": 0.3,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "thunder_wave": {
+  "n": 86,
+  "name": "THUNDER WAVE",
+  "type": "ELECTRIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.21,
+   "2": 1.21,
+   "3": 1.21
+  }
+ },
+ "thunder": {
+  "n": 87,
+  "name": "THUNDER",
+  "type": "ELECTRIC",
+  "category": "Special",
+  "power": 120,
+  "accuracy": 70,
+  "pp": 10,
+  "body": "special",
+  "aura": "ELECTRIC",
+  "hit": 0.55,
+  "hold": 0.0,
+  "length": {
+   "1": 0.96,
+   "2": 0.96,
+   "3": 0.96
+  }
+ },
+ "rock_throw": {
+  "n": 88,
+  "name": "ROCK THROW",
+  "type": "ROCK",
+  "category": "Physical",
+  "power": 50,
+  "accuracy": 90,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": 0.75,
+  "hold": 0.0,
+  "length": {
+   "1": 1.03,
+   "2": 1.15,
+   "3": 1.27
+  }
+ },
+ "earthquake": {
+  "n": 89,
+  "name": "EARTHQUAKE",
+  "type": "GROUND",
+  "category": "Physical",
+  "power": 100,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": 0.4,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "fissure": {
+  "n": 90,
+  "name": "FISSURE",
+  "type": "GROUND",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 30,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": 0.4,
+  "hold": 0.0,
+  "length": {
+   "1": 1.56,
+   "2": 1.56,
+   "3": 1.56
+  }
+ },
+ "dig": {
+  "n": 91,
+  "name": "DIG",
+  "type": "GROUND",
+  "category": "Physical",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.1,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "toxic": {
+  "n": 92,
+  "name": "TOXIC",
+  "type": "POISON",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 85,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.73,
+   "2": 1.89,
+   "3": 2.05
+  }
+ },
+ "confusion": {
+  "n": 93,
+  "name": "CONFUSION",
+  "type": "PSYCHIC",
+  "category": "Special",
+  "power": 50,
+  "accuracy": 100,
+  "pp": 25,
+  "body": "special",
+  "aura": "PSYCHIC",
+  "hit": 0.45,
+  "hold": 0.0,
+  "length": {
+   "1": 1.11,
+   "2": 1.11,
+   "3": 1.11
+  }
+ },
+ "psychic_m": {
+  "n": 94,
+  "name": "PSYCHIC",
+  "type": "PSYCHIC",
+  "category": "Special",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": "PSYCHIC",
+  "hit": 0.45,
+  "hold": 0.0,
+  "length": {
+   "1": 1.31,
+   "2": 1.31,
+   "3": 1.31
+  }
+ },
+ "hypnosis": {
+  "n": 95,
+  "name": "HYPNOSIS",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 60,
+  "pp": 20,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "meditate": {
+  "n": 96,
+  "name": "MEDITATE",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.56,
+   "2": 1.56,
+   "3": 1.56
+  }
+ },
+ "agility": {
+  "n": 97,
+  "name": "AGILITY",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "quick_attack": {
+  "n": 98,
+  "name": "QUICK ATTACK",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "rage": {
+  "n": 99,
+  "name": "RAGE",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "teleport": {
+  "n": 100,
+  "name": "TELEPORT",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.55,
+   "2": 1.55,
+   "3": 1.55
+  }
+ },
+ "night_shade": {
+  "n": 101,
+  "name": "NIGHT SHADE",
+  "type": "GHOST",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": 0.42,
+  "hold": 0.3,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "mimic": {
+  "n": 102,
+  "name": "MIMIC",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.61,
+   "2": 1.61,
+   "3": 1.61
+  }
+ },
+ "screech": {
+  "n": 103,
+  "name": "SCREECH",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 85,
+  "pp": 40,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.71,
+   "2": 1.71,
+   "3": 1.71
+  }
+ },
+ "double_team": {
+  "n": 104,
+  "name": "DOUBLE TEAM",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "recover": {
+  "n": 105,
+  "name": "RECOVER",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.59,
+   "2": 1.59,
+   "3": 1.59
+  }
+ },
+ "harden": {
+  "n": 106,
+  "name": "HARDEN",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "minimize": {
+  "n": 107,
+  "name": "MINIMIZE",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "smokescreen": {
+  "n": 108,
+  "name": "SMOKESCREEN",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.76,
+   "2": 1.79,
+   "3": 1.86
+  }
+ },
+ "confuse_ray": {
+  "n": 109,
+  "name": "CONFUSE RAY",
+  "type": "GHOST",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "withdraw": {
+  "n": 110,
+  "name": "WITHDRAW",
+  "type": "WATER",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "defense_curl": {
+  "n": 111,
+  "name": "DEFENSE CURL",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "barrier": {
+  "n": 112,
+  "name": "BARRIER",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "light_screen": {
+  "n": 113,
+  "name": "LIGHT SCREEN",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "haze": {
+  "n": 114,
+  "name": "HAZE",
+  "type": "ICE",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "reflect": {
+  "n": 115,
+  "name": "REFLECT",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "focus_energy": {
+  "n": 116,
+  "name": "FOCUS ENERGY",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": "NORMAL",
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.49,
+   "2": 1.49,
+   "3": 1.49
+  }
+ },
+ "bide": {
+  "n": 117,
+  "name": "BIDE",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.7,
+  "hold": 0.0,
+  "length": {
+   "1": 1.06,
+   "2": 1.06,
+   "3": 1.06
+  }
+ },
+ "metronome": {
+  "n": 118,
+  "name": "METRONOME",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.61,
+   "2": 1.61,
+   "3": 1.61
+  }
+ },
+ "mirror_move": {
+  "n": 119,
+  "name": "MIRROR MOVE",
+  "type": "FLYING",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.25,
+   "2": 1.25,
+   "3": 1.25
+  }
+ },
+ "selfdestruct": {
+  "n": 120,
+  "name": "SELFDESTRUCT",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 200,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.06,
+   "2": 1.06,
+   "3": 1.06
+  }
+ },
+ "egg_bomb": {
+  "n": 121,
+  "name": "EGG BOMB",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 100,
+  "accuracy": 75,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": 0.8,
+  "hold": 0.0,
+  "length": {
+   "1": 1.18,
+   "2": 1.18,
+   "3": 1.18
+  }
+ },
+ "lick": {
+  "n": 122,
+  "name": "LICK",
+  "type": "GHOST",
+  "category": "Physical",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.42,
+  "hold": 0.0,
+  "length": {
+   "1": 0.76,
+   "2": 0.76,
+   "3": 0.76
+  }
+ },
+ "smog": {
+  "n": 123,
+  "name": "SMOG",
+  "type": "POISON",
+  "category": "Physical",
+  "power": 20,
+  "accuracy": 70,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": 0.75,
+  "hold": 0.0,
+  "length": {
+   "1": 1.72,
+   "2": 1.79,
+   "3": 1.86
+  }
+ },
+ "sludge": {
+  "n": 124,
+  "name": "SLUDGE",
+  "type": "POISON",
+  "category": "Physical",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.23,
+   "2": 1.23,
+   "3": 1.33
+  }
+ },
+ "bone_club": {
+  "n": 125,
+  "name": "BONE CLUB",
+  "type": "GROUND",
+  "category": "Physical",
+  "power": 65,
+  "accuracy": 85,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "fire_blast": {
+  "n": 126,
+  "name": "FIRE BLAST",
+  "type": "FIRE",
+  "category": "Special",
+  "power": 120,
+  "accuracy": 85,
+  "pp": 5,
+  "body": "special",
+  "aura": "FIRE",
+  "hit": 0.7,
+  "hold": 0.0,
+  "length": {
+   "1": 1.56,
+   "2": 1.56,
+   "3": 1.56
+  }
+ },
+ "waterfall": {
+  "n": 127,
+  "name": "WATERFALL",
+  "type": "WATER",
+  "category": "Special",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": "WATER",
+  "hit": 0.17,
+  "hold": 0.0,
+  "length": {
+   "1": 0.81,
+   "2": 0.81,
+   "3": 0.81
+  }
+ },
+ "clamp": {
+  "n": 128,
+  "name": "CLAMP",
+  "type": "WATER",
+  "category": "Special",
+  "power": 35,
+  "accuracy": 75,
+  "pp": 10,
+  "body": "attack",
+  "aura": "WATER",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.81,
+   "2": 0.81,
+   "3": 0.81
+  }
+ },
+ "swift": {
+  "n": 129,
+  "name": "SWIFT",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": 0.75,
+  "hold": 0.0,
+  "length": {
+   "1": 1.17,
+   "2": 1.31,
+   "3": 1.38
+  }
+ },
+ "skull_bash": {
+  "n": 130,
+  "name": "SKULL BASH",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 100,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": "NORMAL",
+  "hit": 0.6,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "spike_cannon": {
+  "n": 131,
+  "name": "SPIKE CANNON",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.1,
+   "2": 1.2,
+   "3": 1.4
+  }
+ },
+ "constrict": {
+  "n": 132,
+  "name": "CONSTRICT",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 10,
+  "accuracy": 100,
+  "pp": 35,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.6,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "amnesia": {
+  "n": 133,
+  "name": "AMNESIA",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.56,
+   "2": 1.56,
+   "3": 1.56
+  }
+ },
+ "kinesis": {
+  "n": 134,
+  "name": "KINESIS",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 80,
+  "pp": 15,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "softboiled": {
+  "n": 135,
+  "name": "SOFTBOILED",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.89,
+   "2": 1.89,
+   "3": 1.89
+  }
+ },
+ "hi_jump_kick": {
+  "n": 136,
+  "name": "HI JUMP KICK",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 85,
+  "accuracy": 90,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "glare": {
+  "n": 137,
+  "name": "GLARE",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 75,
+  "pp": 30,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "dream_eater": {
+  "n": 138,
+  "name": "DREAM EATER",
+  "type": "PSYCHIC",
+  "category": "Special",
+  "power": 100,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": "PSYCHIC",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 2.02,
+   "2": 2.16,
+   "3": 2.3
+  }
+ },
+ "poison_gas": {
+  "n": 139,
+  "name": "POISON GAS",
+  "type": "POISON",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 55,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.72,
+   "2": 1.79,
+   "3": 1.86
+  }
+ },
+ "barrage": {
+  "n": 140,
+  "name": "BARRAGE",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 15,
+  "accuracy": 85,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.12,
+   "2": 1.24,
+   "3": 1.48
+  }
+ },
+ "leech_life": {
+  "n": 141,
+  "name": "LEECH LIFE",
+  "type": "BUG",
+  "category": "Physical",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.95,
+   "2": 2.02,
+   "3": 2.09
+  }
+ },
+ "lovely_kiss": {
+  "n": 142,
+  "name": "LOVELY KISS",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 75,
+  "pp": 10,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "sky_attack": {
+  "n": 143,
+  "name": "SKY ATTACK",
+  "type": "FLYING",
+  "category": "Physical",
+  "power": 140,
+  "accuracy": 90,
+  "pp": 5,
+  "body": "attack",
+  "aura": "FLYING",
+  "hit": 0.8,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "transform": {
+  "n": 144,
+  "name": "TRANSFORM",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.65,
+   "2": 1.65,
+   "3": 1.65
+  }
+ },
+ "bubble": {
+  "n": 145,
+  "name": "BUBBLE",
+  "type": "WATER",
+  "category": "Special",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": "WATER",
+  "hit": 1.0,
+  "hold": 0.0,
+  "length": {
+   "1": 1.79,
+   "2": 1.93,
+   "3": 2.07
+  }
+ },
+ "dizzy_punch": {
+  "n": 146,
+  "name": "DIZZY PUNCH",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "spore": {
+  "n": 147,
+  "name": "SPORE",
+  "type": "GRASS",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.72,
+   "2": 1.79,
+   "3": 1.86
+  }
+ },
+ "flash": {
+  "n": 148,
+  "name": "FLASH",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 70,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "psywave": {
+  "n": 149,
+  "name": "PSYWAVE",
+  "type": "PSYCHIC",
+  "category": "Special",
+  "power": 1,
+  "accuracy": 80,
+  "pp": 15,
+  "body": "special",
+  "aura": "PSYCHIC",
+  "hit": 0.8,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.36
+  }
+ },
+ "splash": {
+  "n": 150,
+  "name": "SPLASH",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "acid_armor": {
+  "n": 151,
+  "name": "ACID ARMOR",
+  "type": "POISON",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "crabhammer": {
+  "n": 152,
+  "name": "CRABHAMMER",
+  "type": "WATER",
+  "category": "Special",
+  "power": 90,
+  "accuracy": 85,
+  "pp": 10,
+  "body": "attack",
+  "aura": "WATER",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.81,
+   "2": 0.81,
+   "3": 0.81
+  }
+ },
+ "explosion": {
+  "n": 153,
+  "name": "EXPLOSION",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 250,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.2,
+   "3": 1.34
+  }
+ },
+ "fury_swipes": {
+  "n": 154,
+  "name": "FURY SWIPES",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 18,
+  "accuracy": 80,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.71,
+   "2": 0.84,
+   "3": 1.1
+  }
+ },
+ "bonemerang": {
+  "n": 155,
+  "name": "BONEMERANG",
+  "type": "GROUND",
+  "category": "Physical",
+  "power": 50,
+  "accuracy": 90,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": 0.7,
+  "hold": 0.0,
+  "length": {
+   "1": 1.41,
+   "2": 1.41,
+   "3": 1.41
+  }
+ },
+ "rest": {
+  "n": 156,
+  "name": "REST",
+  "type": "PSYCHIC",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.85,
+   "2": 1.85,
+   "3": 1.85
+  }
+ },
+ "rock_slide": {
+  "n": 157,
+  "name": "ROCK SLIDE",
+  "type": "ROCK",
+  "category": "Physical",
+  "power": 75,
+  "accuracy": 90,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": 0.45,
+  "hold": 0.0,
+  "length": {
+   "1": 1.49,
+   "2": 1.69,
+   "3": 1.89
+  }
+ },
+ "hyper_fang": {
+  "n": 158,
+  "name": "HYPER FANG",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 90,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.6,
+   "2": 0.6,
+   "3": 0.6
+  }
+ },
+ "sharpen": {
+  "n": 159,
+  "name": "SHARPEN",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "conversion": {
+  "n": 160,
+  "name": "CONVERSION",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.43,
+   "2": 1.43,
+   "3": 1.43
+  }
+ },
+ "tri_attack": {
+  "n": 161,
+  "name": "TRI ATTACK",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": 0.8,
+  "hold": 0.0,
+  "length": {
+   "1": 1.39,
+   "2": 1.39,
+   "3": 1.39
+  }
+ },
+ "super_fang": {
+  "n": 162,
+  "name": "SUPER FANG",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 90,
+  "pp": 10,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.71,
+   "2": 0.71,
+   "3": 0.71
+  }
+ },
+ "slash": {
+  "n": 163,
+  "name": "SLASH",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "substitute": {
+  "n": 164,
+  "name": "SUBSTITUTE",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "struggle": {
+  "n": 165,
+  "name": "STRUGGLE",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 50,
+  "accuracy": 100,
+  "pp": 1,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "sketch": {
+  "n": 166,
+  "name": "SKETCH",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 1,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.95,
+   "2": 1.95,
+   "3": 1.95
+  }
+ },
+ "triple_kick": {
+  "n": 167,
+  "name": "TRIPLE KICK",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 10,
+  "accuracy": 90,
+  "pp": 10,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.9,
+   "2": 0.9,
+   "3": 0.9
+  }
+ },
+ "thief": {
+  "n": 168,
+  "name": "THIEF",
+  "type": "DARK",
+  "category": "Special",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "attack",
+  "aura": "DARK",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.88,
+   "2": 0.88,
+   "3": 0.88
+  }
+ },
+ "spider_web": {
+  "n": 169,
+  "name": "SPIDER WEB",
+  "type": "BUG",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.51,
+   "2": 1.51,
+   "3": 1.51
+  }
+ },
+ "mind_reader": {
+  "n": 170,
+  "name": "MIND READER",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "nightmare": {
+  "n": 171,
+  "name": "NIGHTMARE",
+  "type": "GHOST",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.41,
+   "2": 1.51,
+   "3": 1.61
+  }
+ },
+ "flame_wheel": {
+  "n": 172,
+  "name": "FLAME WHEEL",
+  "type": "FIRE",
+  "category": "Special",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 25,
+  "body": "attack",
+  "aura": "FIRE",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.19,
+   "2": 1.19,
+   "3": 1.19
+  }
+ },
+ "snore": {
+  "n": 173,
+  "name": "SNORE",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": 0.95,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.27,
+   "3": 1.27
+  }
+ },
+ "curse": {
+  "n": 174,
+  "name": "CURSE",
+  "type": "CURSE",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "flail": {
+  "n": 175,
+  "name": "FLAIL",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.84,
+   "2": 0.84,
+   "3": 0.97
+  }
+ },
+ "conversion2": {
+  "n": 176,
+  "name": "CONVERSION2",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.43,
+   "2": 1.43,
+   "3": 1.43
+  }
+ },
+ "aeroblast": {
+  "n": 177,
+  "name": "AEROBLAST",
+  "type": "FLYING",
+  "category": "Physical",
+  "power": 100,
+  "accuracy": 95,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": 0.42,
+  "hold": 0.3,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "cotton_spore": {
+  "n": 178,
+  "name": "COTTON SPORE",
+  "type": "GRASS",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 85,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.76,
+   "2": 1.79,
+   "3": 1.86
+  }
+ },
+ "reversal": {
+  "n": 179,
+  "name": "REVERSAL",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.81,
+   "2": 0.81,
+   "3": 0.96
+  }
+ },
+ "spite": {
+  "n": 180,
+  "name": "SPITE",
+  "type": "GHOST",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.31,
+   "2": 1.41,
+   "3": 1.51
+  }
+ },
+ "powder_snow": {
+  "n": 181,
+  "name": "POWDER SNOW",
+  "type": "ICE",
+  "category": "Special",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 25,
+  "body": "special",
+  "aura": "ICE",
+  "hit": 0.8,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.28
+  }
+ },
+ "protect": {
+  "n": 182,
+  "name": "PROTECT",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "mach_punch": {
+  "n": 183,
+  "name": "MACH PUNCH",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "scary_face": {
+  "n": 184,
+  "name": "SCARY FACE",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 90,
+  "pp": 10,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.56,
+   "2": 1.56,
+   "3": 1.56
+  }
+ },
+ "faint_attack": {
+  "n": 185,
+  "name": "FAINT ATTACK",
+  "type": "DARK",
+  "category": "Special",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": "DARK",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.81,
+   "2": 0.81,
+   "3": 0.81
+  }
+ },
+ "sweet_kiss": {
+  "n": 186,
+  "name": "SWEET KISS",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 75,
+  "pp": 10,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.41,
+   "2": 1.41,
+   "3": 1.41
+  }
+ },
+ "belly_drum": {
+  "n": 187,
+  "name": "BELLY DRUM",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "sludge_bomb": {
+  "n": 188,
+  "name": "SLUDGE BOMB",
+  "type": "POISON",
+  "category": "Physical",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.62,
+   "2": 1.7,
+   "3": 1.78
+  }
+ },
+ "mud_slap": {
+  "n": 189,
+  "name": "MUD-SLAP",
+  "type": "GROUND",
+  "category": "Physical",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.08,
+   "2": 1.16,
+   "3": 1.24
+  }
+ },
+ "octazooka": {
+  "n": 190,
+  "name": "OCTAZOOKA",
+  "type": "WATER",
+  "category": "Special",
+  "power": 65,
+  "accuracy": 85,
+  "pp": 10,
+  "body": "special",
+  "aura": "WATER",
+  "hit": 0.7,
+  "hold": 0.0,
+  "length": {
+   "1": 1.85,
+   "2": 1.85,
+   "3": 1.92
+  }
+ },
+ "spikes": {
+  "n": 191,
+  "name": "SPIKES",
+  "type": "GROUND",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "zap_cannon": {
+  "n": 192,
+  "name": "ZAP CANNON",
+  "type": "ELECTRIC",
+  "category": "Special",
+  "power": 100,
+  "accuracy": 50,
+  "pp": 5,
+  "body": "special",
+  "aura": "ELECTRIC",
+  "hit": 1.1,
+  "hold": 0.0,
+  "length": {
+   "1": 1.61,
+   "2": 1.61,
+   "3": 1.61
+  }
+ },
+ "foresight": {
+  "n": 193,
+  "name": "FORESIGHT",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "destiny_bond": {
+  "n": 194,
+  "name": "DESTINY BOND",
+  "type": "GHOST",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.46,
+   "3": 1.56
+  }
+ },
+ "perish_song": {
+  "n": 195,
+  "name": "PERISH SONG",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.45,
+   "2": 1.58,
+   "3": 1.71
+  }
+ },
+ "icy_wind": {
+  "n": 196,
+  "name": "ICY WIND",
+  "type": "ICE",
+  "category": "Special",
+  "power": 55,
+  "accuracy": 95,
+  "pp": 15,
+  "body": "special",
+  "aura": "ICE",
+  "hit": 0.8,
+  "hold": 0.0,
+  "length": {
+   "1": 1.04,
+   "2": 1.1,
+   "3": 1.16
+  }
+ },
+ "detect": {
+  "n": 197,
+  "name": "DETECT",
+  "type": "FIGHTING",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "bone_rush": {
+  "n": 198,
+  "name": "BONE RUSH",
+  "type": "GROUND",
+  "category": "Physical",
+  "power": 25,
+  "accuracy": 80,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": 0.7,
+  "hold": 0.0,
+  "length": {
+   "1": 1.12,
+   "2": 1.26,
+   "3": 1.54
+  }
+ },
+ "lock_on": {
+  "n": 199,
+  "name": "LOCK-ON",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "outrage": {
+  "n": 200,
+  "name": "OUTRAGE",
+  "type": "DRAGON",
+  "category": "Special",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": "DRAGON",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "sandstorm": {
+  "n": 201,
+  "name": "SANDSTORM",
+  "type": "ROCK",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "giga_drain": {
+  "n": 202,
+  "name": "GIGA DRAIN",
+  "type": "GRASS",
+  "category": "Special",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "special",
+  "aura": "GRASS",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 2.16,
+   "2": 2.3,
+   "3": 2.44
+  }
+ },
+ "endure": {
+  "n": 203,
+  "name": "ENDURE",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "charm": {
+  "n": 204,
+  "name": "CHARM",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "rollout": {
+  "n": 205,
+  "name": "ROLLOUT",
+  "type": "ROCK",
+  "category": "Physical",
+  "power": 30,
+  "accuracy": 90,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "false_swipe": {
+  "n": 206,
+  "name": "FALSE SWIPE",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "swagger": {
+  "n": 207,
+  "name": "SWAGGER",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 90,
+  "pp": 15,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "milk_drink": {
+  "n": 208,
+  "name": "MILK DRINK",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.59,
+   "2": 1.59,
+   "3": 1.59
+  }
+ },
+ "spark": {
+  "n": 209,
+  "name": "SPARK",
+  "type": "ELECTRIC",
+  "category": "Special",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": "ELECTRIC",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "fury_cutter": {
+  "n": 210,
+  "name": "FURY CUTTER",
+  "type": "BUG",
+  "category": "Physical",
+  "power": 10,
+  "accuracy": 95,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.72,
+   "3": 0.86
+  }
+ },
+ "steel_wing": {
+  "n": 211,
+  "name": "STEEL WING",
+  "type": "STEEL",
+  "category": "Physical",
+  "power": 70,
+  "accuracy": 90,
+  "pp": 25,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.78,
+   "2": 0.78,
+   "3": 0.78
+  }
+ },
+ "mean_look": {
+  "n": 212,
+  "name": "MEAN LOOK",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "attract": {
+  "n": 213,
+  "name": "ATTRACT",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.51,
+   "2": 1.51,
+   "3": 1.51
+  }
+ },
+ "sleep_talk": {
+  "n": 214,
+  "name": "SLEEP TALK",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "heal_bell": {
+  "n": 215,
+  "name": "HEAL BELL",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "return": {
+  "n": 216,
+  "name": "RETURN",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.06,
+   "2": 1.06,
+   "3": 1.06
+  }
+ },
+ "present": {
+  "n": 217,
+  "name": "PRESENT",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 90,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": 0.85,
+  "hold": 0.0,
+  "length": {
+   "1": 1.13,
+   "2": 1.13,
+   "3": 1.13
+  }
+ },
+ "frustration": {
+  "n": 218,
+  "name": "FRUSTRATION",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "safeguard": {
+  "n": 219,
+  "name": "SAFEGUARD",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 25,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.36,
+   "2": 1.36,
+   "3": 1.36
+  }
+ },
+ "pain_split": {
+  "n": 220,
+  "name": "PAIN SPLIT",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 0.96,
+   "2": 0.96,
+   "3": 0.96
+  }
+ },
+ "sacred_fire": {
+  "n": 221,
+  "name": "SACRED FIRE",
+  "type": "FIRE",
+  "category": "Special",
+  "power": 100,
+  "accuracy": 95,
+  "pp": 5,
+  "body": "special",
+  "aura": "FIRE",
+  "hit": 0.75,
+  "hold": 0.0,
+  "length": {
+   "1": 1.71,
+   "2": 1.71,
+   "3": 1.71
+  }
+ },
+ "magnitude": {
+  "n": 222,
+  "name": "MAGNITUDE",
+  "type": "GROUND",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 30,
+  "body": "special",
+  "aura": null,
+  "hit": 0.4,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "dynamicpunch": {
+  "n": 223,
+  "name": "DYNAMICPUNCH",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 100,
+  "accuracy": 50,
+  "pp": 5,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "megahorn": {
+  "n": 224,
+  "name": "MEGAHORN",
+  "type": "BUG",
+  "category": "Physical",
+  "power": 120,
+  "accuracy": 85,
+  "pp": 10,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "dragonbreath": {
+  "n": 225,
+  "name": "DRAGONBREATH",
+  "type": "DRAGON",
+  "category": "Special",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": "DRAGON",
+  "hit": 0.42,
+  "hold": 0.3,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "baton_pass": {
+  "n": 226,
+  "name": "BATON PASS",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.65,
+   "2": 1.65,
+   "3": 1.65
+  }
+ },
+ "encore": {
+  "n": 227,
+  "name": "ENCORE",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "cry",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.51,
+   "2": 1.51,
+   "3": 1.51
+  }
+ },
+ "pursuit": {
+  "n": 228,
+  "name": "PURSUIT",
+  "type": "DARK",
+  "category": "Special",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "attack",
+  "aura": "DARK",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.58,
+   "2": 0.58,
+   "3": 0.58
+  }
+ },
+ "rapid_spin": {
+  "n": 229,
+  "name": "RAPID SPIN",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 40,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "sweet_scent": {
+  "n": 230,
+  "name": "SWEET SCENT",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.76,
+   "2": 1.76,
+   "3": 1.76
+  }
+ },
+ "iron_tail": {
+  "n": 231,
+  "name": "IRON TAIL",
+  "type": "STEEL",
+  "category": "Physical",
+  "power": 100,
+  "accuracy": 75,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "metal_claw": {
+  "n": 232,
+  "name": "METAL CLAW",
+  "type": "STEEL",
+  "category": "Physical",
+  "power": 50,
+  "accuracy": 95,
+  "pp": 35,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.66,
+   "2": 0.66,
+   "3": 0.66
+  }
+ },
+ "vital_throw": {
+  "n": 233,
+  "name": "VITAL THROW",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 1.16,
+   "2": 1.16,
+   "3": 1.16
+  }
+ },
+ "morning_sun": {
+  "n": 234,
+  "name": "MORNING SUN",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.75,
+   "2": 1.75,
+   "3": 1.75
+  }
+ },
+ "synthesis": {
+  "n": 235,
+  "name": "SYNTHESIS",
+  "type": "GRASS",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.75,
+   "2": 1.75,
+   "3": 1.75
+  }
+ },
+ "moonlight": {
+  "n": 236,
+  "name": "MOONLIGHT",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.75,
+   "2": 1.75,
+   "3": 1.75
+  }
+ },
+ "hidden_power": {
+  "n": 237,
+  "name": "HIDDEN POWER",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": 1.25,
+  "hold": 0.0,
+  "length": {
+   "1": 1.54,
+   "2": 1.59,
+   "3": 1.64
+  }
+ },
+ "cross_chop": {
+  "n": 238,
+  "name": "CROSS CHOP",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 100,
+  "accuracy": 80,
+  "pp": 5,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.7,
+   "2": 0.7,
+   "3": 0.7
+  }
+ },
+ "twister": {
+  "n": 239,
+  "name": "TWISTER",
+  "type": "DRAGON",
+  "category": "Special",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": "DRAGON",
+  "hit": 0.85,
+  "hold": 0.0,
+  "length": {
+   "1": 1.41,
+   "2": 1.41,
+   "3": 1.41
+  }
+ },
+ "rain_dance": {
+  "n": 240,
+  "name": "RAIN DANCE",
+  "type": "WATER",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 90,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "sunny_day": {
+  "n": 241,
+  "name": "SUNNY DAY",
+  "type": "FIRE",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 90,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.66,
+   "2": 1.66,
+   "3": 1.66
+  }
+ },
+ "crunch": {
+  "n": 242,
+  "name": "CRUNCH",
+  "type": "DARK",
+  "category": "Special",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": "DARK",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.64,
+   "2": 0.64,
+   "3": 0.64
+  }
+ },
+ "mirror_coat": {
+  "n": 243,
+  "name": "MIRROR COAT",
+  "type": "PSYCHIC",
+  "category": "Special",
+  "power": 1,
+  "accuracy": 100,
+  "pp": 20,
+  "body": "special",
+  "aura": "PSYCHIC",
+  "hit": 0.72,
+  "hold": 0.0,
+  "length": {
+   "1": 1.26,
+   "2": 1.26,
+   "3": 1.26
+  }
+ },
+ "psych_up": {
+  "n": 244,
+  "name": "PSYCH UP",
+  "type": "NORMAL",
+  "category": "Status",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "special",
+  "aura": null,
+  "hit": null,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.46,
+   "3": 1.46
+  }
+ },
+ "extremespeed": {
+  "n": 245,
+  "name": "EXTREMESPEED",
+  "type": "NORMAL",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.85,
+   "2": 0.85,
+   "3": 0.85
+  }
+ },
+ "ancientpower": {
+  "n": 246,
+  "name": "ANCIENTPOWER",
+  "type": "ROCK",
+  "category": "Physical",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 5,
+  "body": "special",
+  "aura": null,
+  "hit": 1.2,
+  "hold": 0.0,
+  "length": {
+   "1": 1.46,
+   "2": 1.52,
+   "3": 1.58
+  }
+ },
+ "shadow_ball": {
+  "n": 247,
+  "name": "SHADOW BALL",
+  "type": "GHOST",
+  "category": "Physical",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "special",
+  "aura": null,
+  "hit": 0.85,
+  "hold": 0.0,
+  "length": {
+   "1": 1.13,
+   "2": 1.13,
+   "3": 1.13
+  }
+ },
+ "future_sight": {
+  "n": 248,
+  "name": "FUTURE SIGHT",
+  "type": "PSYCHIC",
+  "category": "Special",
+  "power": 80,
+  "accuracy": 90,
+  "pp": 15,
+  "body": "special",
+  "aura": "PSYCHIC",
+  "hit": 1.45,
+  "hold": 0.4,
+  "length": {
+   "1": 1.83,
+   "2": 1.83,
+   "3": 1.83
+  }
+ },
+ "rock_smash": {
+  "n": 249,
+  "name": "ROCK SMASH",
+  "type": "FIGHTING",
+  "category": "Physical",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 15,
+  "body": "attack",
+  "aura": null,
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.86,
+   "2": 0.86,
+   "3": 0.86
+  }
+ },
+ "whirlpool": {
+  "n": 250,
+  "name": "WHIRLPOOL",
+  "type": "WATER",
+  "category": "Special",
+  "power": 15,
+  "accuracy": 70,
+  "pp": 15,
+  "body": "special",
+  "aura": "WATER",
+  "hit": 0.45,
+  "hold": 0.0,
+  "length": {
+   "1": 1.51,
+   "2": 1.51,
+   "3": 1.51
+  }
+ },
+ "beat_up": {
+  "n": 251,
+  "name": "BEAT UP",
+  "type": "DARK",
+  "category": "Special",
+  "power": 10,
+  "accuracy": 100,
+  "pp": 10,
+  "body": "attack",
+  "aura": "DARK",
+  "hit": 0.3,
+  "hold": 0.0,
+  "length": {
+   "1": 0.7,
+   "2": 0.94,
+   "3": 1.18
+  }
+ }
+}

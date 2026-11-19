@@ -388,6 +388,80 @@ def leaf_band(leaf, leaf_l, leaf_d, vein, thorn=None, moss=None):
     return f
 
 
+def broad_leaf(light, dark, rib, along="y", base_end=0, tip=None):
+    """A broad leaf on a flat part (as on the Cobblemon armadillo's cousins, but our own): pointed at its tip, widest a
+    third of the way up, a pale midrib with veins slanting out from it, darker towards its edges. along: the axis from
+    its base to its tip (base_end 1 if the base is at the high end); tip: a colour its point runs into."""
+    L, Dk, R = rgb(light), rgb(dark), rgb(rib)
+
+    def f(at):
+        c = at.cube
+        if along == "y":
+            t = at.ly if base_end == 0 else 1 - at.ly
+            s = (at.lx - .5) * 2 if c.size[0] else (at.lz - .5) * 2
+        elif along == "z":
+            t = at.lz if base_end == 0 else 1 - at.lz
+            s = (at.lx - .5) * 2 if c.size[0] else (at.ly - .5) * 2
+        else:
+            t = at.lx if base_end == 0 else 1 - at.lx
+            s = (at.lz - .5) * 2 if c.size[2] else (at.ly - .5) * 2
+        half = math.sin(math.pi * min(1.0, t * 0.82 + 0.08)) ** 0.7 * (1 - t * 0.3)
+        if t > 0.97 or abs(s) > half:
+            return CLEAR
+        if abs(s) < 0.14:
+            return R
+        if tip is not None and t > 0.72:
+            return mix(light, tip, min(1.0, (t - 0.72) / 0.2))
+        if ((t * 5 - abs(s) * 1.1) % 1.0) < 0.14:
+            return mix(rib, light, 0.45)
+        return mix(L, Dk, min(1.0, abs(s) / max(0.05, half)) * 0.75)
+    return f
+
+
+def leaf_mat(light, dark, rib, along="y", base_end=0, tip=None):
+    return Mat(light, broad_leaf(light, dark, rib, along, base_end, tip), noise=0.02, edge=0)
+
+
+def whisker_mat(colour):
+    """Whiskers on a flat part lying out from a cheek: three fine lines fanning a little, the rest see-through."""
+    def f(at):
+        for i, z in enumerate((0.2, 0.5, 0.8)):
+            if abs(at.lz - (z + (at.lx - 0.5) * 0.25 * (i - 1))) < 0.12:
+                return rgb(colour)
+        return CLEAR
+    return Mat(colour, f, noise=0.0, edge=0, flat=True)
+
+
+def shag_mat(base, light, dark):
+    """A shaggy coat on a flat part hanging down (its top is its root): strands side by side in shades of the coat,
+    ending raggedly at different lengths, as a mammoth's coat does."""
+    B, Lt, Dk = rgb(base), rgb(light), rgb(dark)
+
+    def f(at):
+        t = 1 - at.ly
+        h = hash01("shag", at.col, at.cube.origin[0], at.cube.origin[2])
+        if t > 0.62 + 0.36 * h:
+            return CLEAR
+        k = hash01("shade", at.col // 1, at.cube.origin[2])
+        col = mix(Dk, Lt, 0.25 + 0.6 * k)
+        return mix(col, Dk, t * 0.5) if t > 0.4 else mix(col, B, 0.3)
+    return Mat(base, f, noise=0.03, edge=0, flat=True)
+
+
+def shingle_leaves(m, bone, xs, y, z, w, l, mat, tilt=16):
+    """A row of leaves lying over a band of armour like shingles, each pointing back with its tip lifting a little."""
+    b = next(x for x in m.bones if x.name == bone)
+    for x in xs:
+        b.cubes.append(Cube([x - w / 2, y, z], [w, 0, l], mat, [tilt, 0, 0], [x, y, z]))
+
+
+def side_leaves(m, bone, x, y, z, h, l, mat, lean=14):
+    """Leaves hanging down the armour's sides (each a flat part, its base at the top), leaning out a little."""
+    b = next(xx for xx in m.bones if xx.name == bone)
+    for sx in (-1, 1):
+        b.cubes.append(Cube([sx * x, y - h, z], [0, h, l], mat, [0, 0, lean * sx], [sx * x, y, z + l / 2]))
+
+
 def armadillo_belly(skin, cream, below):
     def f(at):
         if at.face == "bottom" or at.y < below:
@@ -413,6 +487,10 @@ def fernadillo():
     leg = Mat(c["skin"], lambda a: rgb(c["skin_d"]) if a.face == "bottom" or a.ly < 0.25 else None)
     claw = Mat(c["claw"], noise=0.01, edge=0)
     fern = Mat(c["leaf"], frond(c["leaf_l"], c["leaf_d"], c["vein"], "z", 0, 4), noise=0.02, edge=0)
+    flat_leaf = leaf_mat(c["leaf_l"], c["leaf_d"], c["vein"], "z")
+    hang_leaf = leaf_mat(c["leaf_l"], c["leaf_d"], c["vein"], "y", 1)
+    sprig = leaf_mat("#8ED466", "#3E8A3A", "#D2F0A8", "y")
+    whisk = whisker_mat("#6A4A36")
 
     m.bone("root", None, [0, 0, 0])
     m.bone("body", "root", [0, 6, 0], blob([-4.5, 2, -6], [9, 7, 12], skin))
@@ -421,16 +499,21 @@ def fernadillo():
     for i, (z, y0, top) in enumerate(bands):
         h = int(round(top - y0 + 1))
         m.bones[-1].cubes += blob([-5.5, y0 - 1, z], [11, h, 3], leaf)
-        # Leaf tips hanging over the band's lower edge at each side.
-        m.bones[-1].cubes += [Cube([-6, y0 - 2, z + 1], [1, 2, 1], tip), Cube([5, y0 - 2, z + 1], [1, 2, 1], tip)]
+        # Flat leaves over each band like shingles, and hanging down its sides.
+        shingle_leaves(m, "shell", (-3.4, 0, 3.4), y0 - 1 + h + 0.05, z - 0.4, 3, 4, flat_leaf)
+        side_leaves(m, "shell", 5.65, y0 + 1.8, z - 0.8, 5, 4, hang_leaf)
     m.bones[-1].cubes.append(Cube([-4.5, 4.5, 6.75], [9, 4, 1], leaf))
-    m.bone("crest", "shell", [0, 12, 0], [Cube([-1, 12, -4], [2, 2, 2], sprout, [-20, 0, 0], [0, 12, -3]),
-                                          Cube([-1, 12.5, -1.25], [2, 2, 2], sprout, [-10, 0, 0], [0, 12.5, -0.25]),
-                                          Cube([-1, 12, 1.5], [2, 2, 2], sprout, [10, 0, 0], [0, 12, 2.5])])
+    # A sprig of three leaves standing up from its ridge (in place of the old blocks).
+    sprig_leaves = []
+    for (z0, h, rx, rz) in ((-4, 6, -18, 0), (-1.5, 7, -6, -28), (-1.5, 7, -6, 28), (1.2, 5, 12, 0)):
+        # Each leaf crossed (two flat parts square to each other) so it looks full from every side.
+        sprig_leaves += [Cube([0, 12.2, z0], [0, h, 4], sprig, [rx, 0, rz], [0, 12.2, z0 + 2]),
+                         Cube([-2, 12.2, z0 + 2], [4, h, 0], sprig, [rx, 0, rz], [0, 12.2, z0 + 2])]
+    m.bone("crest", "shell", [0, 12, 0], sprig_leaves)
     m.bone("head", "body", [0, 6.5, -6], face_blob([-4, 3, -11.5], [8, 6, 6], face))
     m.bones[-1].cubes += [Cube([-2, 3, -13.5], [4, 3, 2], muzzle), Cube([-1, 5.25, -14.25], [2, 1, 1], nose),
                           Cube([-4, 8.5, -11], [8, 1, 5], leaf), Cube([-1.5, 8.5, -12], [3, 1, 1], tip),
-                          Cube([-4.75, 3.25, -11], [1, 2, 3], cheek), Cube([3.75, 3.25, -11], [1, 2, 3], cheek)]
+                          Cube([-7.5, 4.2, -12.5], [3.5, 0, 3], whisk), Cube([4, 4.2, -12.5], [3.5, 0, 3], whisk)]
     m.bone("jaw", "head", [0, 3.5, -8.5], [Cube([-1.5, 2.25, -13], [3, 1, 5], jaw_m)])
     m.pair("ear_right", "head", [-3.5, 8.5, -8], [Cube([-4.5, 8.5, -8.5], [2, 3, 1], ear)], rotation=[0, 0, -20])
     m.eyes("head", 4, 5, -11.5, h=3, corner=(1, 2), half=4, iris="#7A4A22", pupil="#1A100A", skin=c["skin"], iris_light="#D0923A",
@@ -473,6 +556,10 @@ def brambadillo():
     claw = Mat("#6E3A8E", lambda a: rgb("#B07AD0") if a.face == "top" else None, noise=0.01, edge=0)
     fern = Mat(LEAF, frond(LEAF_L, LEAF_D, VEIN, "z", 0, 5), noise=0.02, edge=0)
     brow = Mat(SKIN_D, noise=0.02, edge=0)
+    flat_leaf = leaf_mat(LEAF_L, LEAF_D, VEIN, "z")
+    hang_leaf = leaf_mat(LEAF_L, LEAF_D, VEIN, "y", 1)
+    thorn_leaf = leaf_mat(LEAF_L, LEAF_D, VEIN, "y", 0, tip=THORN)
+    whisk = whisker_mat("#5A3A2A")
 
     m.bone("root", None, [0, 0, 0])
     m.bone("body", "root", [0, 9, 0], blob([-6, 3.5, -8], [12, 9, 16], skin))
@@ -483,16 +570,18 @@ def brambadillo():
     for z, top in zip(zs, tops):
         y0 = 7
         sh.cubes += blob([-7.5, y0, z], [15, int(top - y0), 4], leaf)
-        sh.cubes += [Cube([-8, y0 - 1.5, z + 1], [1, 3, 2], tip), Cube([7, y0 - 1.5, z + 1], [1, 3, 2], tip)]
-        # Thorns along the band's ridge, leaning back.
-        for x in (-4.5, -0.5, 3.5):
-            sh.cubes.append(Cube([x, top, z + 1], [1, 2, 1], thorn, [-25, 0, 0], [x + 0.5, top, z + 1.5]))
+        shingle_leaves(m, "shell", (-4.8, -1.6, 1.6, 4.8), top + 0.05, z - 0.6, 3, 5, flat_leaf)
+        side_leaves(m, "shell", 7.65, y0 + 2.5, z - 0.5, 6, 5, hang_leaf)
+        # Leaves along the band's ridge, standing up and leaning back, their points turned violet.
+        for x in (-4, 0, 4):
+            sh.cubes += [Cube([x, top, z + 0.3], [0, 5, 4], thorn_leaf, [-25, 0, 0], [x, top, z + 2.3]),
+                         Cube([x - 2, top, z + 2.3], [4, 5, 0], thorn_leaf, [-25, 0, 0], [x, top, z + 2.3])]
     sh.cubes.append(Cube([-6, 6, 8.5], [12, 6, 1], leaf))
     m.bone("head", "body", [0, 9, -8], face_blob([-5, 4.5, -15], [10, 8, 8], face))
     hd = m.bones[-1]
     hd.cubes += blob([-2.5, 4.5, -18], [5, 4, 4], muzzle)
     hd.cubes += [Cube([-1.5, 7.75, -18.75], [3, 1, 1], nose), Cube([-5, 12, -14.5], [10, 1, 6], leaf),
-                 Cube([-7, 6, -13], [2, 1, 1], thorn, [0, 0, -15], [-5, 6.5, -12.5]), Cube([5, 6, -13], [2, 1, 1], thorn, [0, 0, 15], [5, 6.5, -12.5])]
+                 Cube([-9, 6, -16], [4, 0, 3.5], whisk), Cube([5, 6, -16], [4, 0, 3.5], whisk)]
     m.bone("crest", "head", [0, 13, -12], [Cube([-2.5, 13, -12], [5, 0, 7], fern, [-20, 0, 0], [0, 13, -12])])
     m.bone("jaw", "head", [0, 5, -12], [Cube([-2, 3.5, -17.5], [4, 1, 6], jaw_m)])
     m.pair("ear_right", "head", [-4.5, 12, -10], [Cube([-5.5, 12, -10.5], [2, 3, 1], ear)], rotation=[10, 0, -28])
@@ -541,7 +630,9 @@ def grovadon():
     cap = Mat("#8B4FB3", lambda a: rgb("#F2EAF8") if (a.face == "top" or a.side) and cell(a.x, a.y, a.z, 1) > 0.72 else (rgb("#6A3790") if a.face == "bottom" else None),
               noise=0.02, edge=0.05)
     fern = Mat(LEAF, frond(LEAF_L, LEAF_D, VEIN, "y", 0, 6), noise=0.02, edge=0)
-    beard = Mat(MOSS, lambda a: mix("#4E7A34", "#8CBA5C", a.ly + cell(a.x, a.y, a.z, 1) * 0.3), noise=0.03, edge=0)
+    beard = shag_mat(MOSS, "#9CC86A", "#3E6A2C")
+    shag = shag_mat(MOSS, "#A2CC70", "#3A6228")
+    big_leaf = leaf_mat("#6FB45A", "#24602C", "#B8E08C", "z")
     brow = Mat(SKIN_D, noise=0.02, edge=0)
 
     m.bone("root", None, [0, 0, 0])
@@ -553,7 +644,9 @@ def grovadon():
     for z, top in zip(zs, tops):
         y0 = 12
         sh.cubes += blob([-12.5, y0, z], [25, int(top - y0), 6], leaf, b=2)
-        sh.cubes += [Cube([-13.5, y0 - 3, z + 2], [1, 4, 2], tip), Cube([12.5, y0 - 3, z + 2], [1, 4, 2], tip)]
+        # A shaggy coat hanging down its sides, like a mammoth's (flat strands, in place of the old blocks).
+        for sx in (-1, 1):
+            sh.cubes.append(Cube([sx * 12.7, y0 - 7, z - 0.5], [0, 10, 7], shag, [0, 0, 8 * sx], [sx * 12.7, y0 + 3, z + 3]))
         sh.cubes.append(Cube([-1, top, z + 2], [2, 3, 2], thorn, [-25, 0, 0], [0, top, z + 3]))
     sh.cubes += blob([-10, 10, 15], [20, 11, 2], leaf)
     # Moss lumps over the top of the armour.
@@ -565,6 +658,9 @@ def grovadon():
     fb = m.bones[-1]
     for i, (x, z, ry, rz) in enumerate([(-6, -6, 20, -18), (6, -3, -30, 16), (-3, 5, 60, -10), (7, 8, -60, 20), (0, -11, 5, 4)]):
         fb.cubes.append(Cube([x - 2.5, 28, z], [5, 9, 0], fern, [rz * 0.4, ry, rz], [x, 28, z]))
+    # Great broad leaves fanning out over the grove from its middle, drooping at their tips.
+    for a in (20, 75, 130, 200, 255, 310):
+        fb.cubes.append(Cube([-4.5, 31, 0], [9, 0, 18], big_leaf, [12, a, 0], [0, 31, 0]))
     m.bone("toadstools", "shell", [0, 29, 0])
     tb = m.bones[-1]
     for x, z, h, r in [(-8, 1, 4, 3), (8, -10, 3, 2), (2, 9, 5, 3), (-1, -4, 3, 2)]:
@@ -576,14 +672,15 @@ def grovadon():
     hd.cubes += blob([-4, 8, -29], [8, 6, 6], muzzle)
     hd.cubes += [Cube([-2.5, 13, -29.75], [5, 1, 1], nose), Cube([-8, 18, -23.5], [16, 2, 9], leaf), Cube([-7, 19.5, -22], [14, 1, 6], moss)]
     m.bone("jaw", "head", [0, 9, -19.5], [Cube([-3.5, 6.5, -28], [7, 2, 9], jaw_m)])
-    m.bone("beard", "jaw", [0, 6.5, -24], [Cube([-3, 3, -27], [6, 4, 4], beard), Cube([-2, 1.5, -26.5], [4, 2, 3], beard)])
+    m.bone("beard", "jaw", [0, 6.5, -24], [Cube([-3.5, 1, -27.2], [7, 6, 0], beard), Cube([0, 1, -27], [0, 6, 5], beard),
+                                           Cube([-3, 1.5, -25], [6, 5, 0], beard)])
     m.pair("ear_right", "head", [-6, 18, -16], [Cube([-7.5, 18, -16.5], [3, 4, 1], ear)], rotation=[15, 0, -35])
     m.eyes("head", x_inner=2.5, y=14.5, z=-24, w=3, h=2, iris="#8A5A22", pupil="#160E08", skin=SKIN, iris_light="#E0B058", grid=["DLL", "JPW"])
     mossy_brow = Mat(MOSS, lambda a: mix("#4E7A34", "#8CBA5C", a.ly + cell(a.x, a.y, a.z, 1) * 0.3), noise=0.03, edge=0)
     m.brows("head", [Cube([-7.5, 16.4, -24.6], [6, 2, 1], mossy_brow, [0, 0, 10], [-1.5, 17.4, -24])])
     leafy = leaf_spray(LEAF_L, LEAF_D, VEIN)
     m.bone("burst", "shell", [0, 30, 0], [Cube([-3, 30, 0], [6, 0, 10], leafy, [-35, a, 0], [0, 30, 0]) for a in (0, 45, 90, 135, 180, 225, 270, 315)])
-    stout_legs(m, 7.5, (-8, 8), 11, 7, leg, claw, 3, extra=lambda z: [Cube([-11.5, 9, z - 3], [2, 2, 6], moss)])
+    stout_legs(m, 7.5, (-8, 8), 11, 7, leg, claw, 3, extra=lambda z: [Cube([-11.4, 4, z - 3.5], [0, 7, 7], shag, [0, 0, -6], [-11.4, 11, z])])
     m.bone("tail", "body", [0, 12, 13], [Cube([-2.5, 9.5, 13], [5, 5, 6], skin)], rotation=[14, 0, 0])
     m.bone("tail2", "tail", [0, 12, 19], [Cube([-1.5, 10.5, 18.5], [3, 3, 5], skin), Cube([-2, 13, 19], [4, 1, 4], moss)], rotation=[10, 0, 0])
     m.bone("tail3", "tail2", [0, 12, 23], [Cube([-4, 12, 22.5], [8, 0, 10], Mat(LEAF, frond(LEAF_L, LEAF_D, VEIN, "z", 0, 6), noise=0.02, edge=0))],
@@ -836,22 +933,27 @@ def pyribex():
     # Wings, folded at rest along its sides: the coverts on an arm along the shoulder, the ember feathers hanging from it.
     efea = Mat("#C9361A", feather_plane("#2A1A18", "#C9361A", "#FFB44A", edge="#FFE08A"), noise=0.015, edge=0,
                glow=lambda a: ember_ramp(0.5 + 0.5 * (1 - a.ly)) if a.ly < 0.4 else None)
-    folded_wing(m, 7, 33, -8, 18, 4, 2, [(0, 3, 10), (3, 3, 10), (6, 3, 10), (9, 3, 10), (12, 3, 10)], [(0, 3, 15), (3, 3, 14), (6, 3, 13), (9, 3, 12)],
-                arm, efea, efea)
+    # Big wings: the feathers reach well down its sides towards the ground.
+    folded_wing(m, 7, 33, -9, 22, 4, 2, [(0, 3, 14), (3, 3, 14), (6, 3, 14), (9, 3, 13), (12, 3, 13), (15, 3, 12)],
+                [(0, 3, 20), (3, 3, 19), (6, 3, 18), (9, 3, 17), (12, 3, 15)], arm, efea, efea)
     goat_legs(m, (4.5, 4.5), (-8, 8), 22, 11, 3, 4, leg, leg, hoof_mat(), cuff=tuft)
-    m.bone("tail", "body", [0, 29, 12], [Cube([-1.5, 28, 11.5], [3, 4, 3], wool)], rotation=[-40, 0, 0])
-    m.bone("tail2", "tail", [0, 31.5, 13], flame([0, 30.5, 13.5], 10, 18, smoke=True), rotation=[40, 0, 0])
+    # A long tail in three joints (to sway and curl as it moves), drooping and then rising, the flame at its tip.
+    m.bone("tail", "body", [0, 28, 11], [Cube([-2, 26, 11], [4, 4, 8], leg)], rotation=[-15, 0, 0])
+    m.bone("tail2", "tail", [0, 28, 19], [Cube([-1.5, 26.5, 18.5], [3, 3, 8], leg)], rotation=[10, 0, 0])
+    m.bone("tail3", "tail2", [0, 28, 26], [Cube([-1, 27, 25.5], [2, 2, 7], leg)], rotation=[25, 0, 0])
+    m.bone("tail4", "tail3", [0, 29, 32], flame([0, 28.5, 32], 10, 18, smoke=True), rotation=[-20, 0, 0])
     flick = {"fringe": track(scale=[1, wave(0.5, 0.12, 0, 1), 1]), "mane": track(scale=[1, wave(0.4, 0.1, 30, 1), wave(0.6, 0.06, 0, 1)]),
-             "tail2": track(scale=[wave(0.4, 0.08, 0, 1), wave(0.3, 0.16, 0, 1), 1])}
-    fold = {}
+             "tail4": track(scale=[wave(0.4, 0.08, 0, 1), wave(0.3, 0.16, 0, 1), 1])}
+    fold = {"tail": track(rotation=[wave(2.6, 4, 0, -15), wave(2.6, 9), 0]), "tail2": track(rotation=[wave(2.6, 5, 50, 10), wave(2.6, 12, 50), 0]),
+            "tail3": track(rotation=[wave(2.6, 6, 100, 25), wave(2.6, 14, 100), 0])}
     fly = {"period": 0.7, "hover_period": 0.9,
            "fly": merge(flick, {"body": track(rotation=[12, 0, 0], position=[0, wave(0.7, 1.5, 90), 0]),
                                 "leg_front_right": track(rotation=[-50, 0, 0]), "leg_front_left": track(rotation=[-50, 0, 0]),
                                 "leg_back_right": track(rotation=[55, 0, 0]), "leg_back_left": track(rotation=[55, 0, 0]),
-                                "neck": track(rotation=[10, 0, 0]), "head": track(rotation=[-6, 0, 0])}, wings(10, 40, 85, 0.7)),
+                                "neck": track(rotation=[10, 0, 0]), "head": track(rotation=[-6, 0, 0])}, wings(10, 40, 85, 0.7, span=1.45)),
            "hover": merge(flick, {"body": track(rotation=[-8, 0, 0], position=[0, wave(0.9, 2, 90), 0]),
                                   "leg_front_right": track(rotation=[-25, 0, 0]), "leg_front_left": track(rotation=[-20, 0, 0]),
-                                  "leg_back_right": track(rotation=[20, 0, 0]), "leg_back_left": track(rotation=[20, 0, 0])}, wings(14, 35, 80, 0.9))}
+                                  "leg_back_right": track(rotation=[20, 0, 0]), "leg_back_left": track(rotation=[20, 0, 0])}, wings(14, 35, 80, 0.9, span=1.35))}
     embers(m, 2.0, 1.8, n=6, name="FLAMETHROWER")
     attack_move(m, "SCRATCH", 1.25, 1.8)
     A, info = four_legs("pyribex", m, walk=1.0, stride=24, k=2.0, slow=1.25, fly=fly, extras={
@@ -896,7 +998,22 @@ def tapir_paint(blue, blue_l, blue_d, foam, belly, waves, belly_below, head=Fals
     return f
 
 
-def stout_legs(m, cx, zs, top, w, leg, toe, ntoes, extra=None, foot=None, claw_len=1):
+def sharp_claw_mat(dark="#2A2024", tip="#B8AAA0"):
+    """A claw on a flat part standing along z (its root at the back): thick at the root, tapering to a sharp point that
+    hooks down, dark at the root and pale at the point."""
+    D, T = rgb(dark), rgb(tip)
+
+    def f(at):
+        u, v = 1 - at.lz, at.ly
+        top = 1 - 0.35 * u - 0.45 * u * u
+        bot = 0.05 + 0.25 * u ** 1.6
+        if v > top or v < bot or u > 0.97:
+            return CLEAR
+        return mix(D, T, min(1.0, u * 1.2))
+    return Mat(dark, f, noise=0.0, edge=0, flat=True)
+
+
+def stout_legs(m, cx, zs, top, w, leg, toe, ntoes, extra=None, foot=None, claw_len=1, sharp=False):
     """Four sturdy jointed legs: a thick upper leg, a knee cap (front) or a hock jutting back (back) at the joint, a
     slimmer lower leg that bends there, and a broad foot with its toes or claws along the front."""
     body = next(b for b in m.bones if b.name == "body")
@@ -915,7 +1032,44 @@ def stout_legs(m, cx, zs, top, w, leg, toe, ntoes, extra=None, foot=None, claw_l
         m.pair(f"leg_{end}_right", "body", [-cx, top, z], upper + [joint] + (extra(z) if extra else []))
         lower = [Cube([-cx - wl / 2, fh, z - wl / 2], [wl, knee - fh + 1, wl], leg), Cube([x0, 0, z0 - 1], [w, fh, w + 1], foot)]
         toes = [Cube([x0 + (i + 0.5) * w / ntoes - tw / 2, 0, z0 - 1 - claw_len], [tw, 1 if tw == 1 else fh, claw_len], toe) for i in range(ntoes)]
+        if sharp:
+            # Sharp hooked claws: a knuckle, then a talon curving down to a point.
+            sc = sharp_claw_mat()
+            L = claw_len + 1.5
+            toes = []
+            for i in range(ntoes):
+                xc = x0 + (i + 0.5) * w / ntoes
+                toes += [Cube([xc - tw / 2, 0, z0 - 2], [tw, 1, 1], toe), Cube([xc, 0, z0 - 2 - L], [0, 2, L], sc)]
         m.pair(f"shin_{end}_right", f"leg_{end}_right", [-cx, knee, z], lower + toes)
+
+
+_fins = {}
+
+
+def spiky_fin(base, light, spines):
+    """A dorsal fin on a flat part standing along the back: a sail rising to its middle, its top edge drawn out into
+    sharp spines, a pale rib up each spine, deep at its root and pale at its edge."""
+    k = (base, light, spines)
+    if k in _fins:
+        return _fins[k]
+    B, Lt = rgb(base), rgb(light)
+
+    def f(at):
+        u, v = at.lz, at.ly
+        crest = math.sin(math.pi * u) ** 0.7
+        tri = 1 - abs(((u * spines) % 1.0) - 0.5) * 2
+        top = crest * (0.55 + 0.45 * tri ** 1.5)
+        if v > top or crest < 0.08:
+            return CLEAR
+        rib = abs(((u * spines) % 1.0) - 0.5) < 0.09
+        col = mix(B, Lt, min(1.0, v / max(0.05, top)) * 0.85)
+        if rib:
+            col = mix(col, "#FFFFFF", 0.35)
+        if top - v < 0.08:
+            col = mix(col, Lt, 0.6)
+        return col
+    _fins[k] = Mat(base, f, noise=0.015, edge=0, flat=True)
+    return _fins[k]
 
 
 def tapir_toes(x, z, n, w, mat):
@@ -938,7 +1092,7 @@ def tidapir():
 
     m.bone("root", None, [0, 0, 0])
     m.bone("body", "root", [0, 7, 0], blob([-4, 3.5, -6], [8, 7, 12], body))
-    m.bone("back_fin", "body", [0, 10.5, 0], [Cube([-0.5, 10.5, -4], [1, 1, 8], fin), Cube([-0.5, 11.5, -2.5], [1, 1, 5], fin), Cube([-0.5, 12.5, -1], [1, 1, 2], fin)])
+    m.bone("back_fin", "body", [0, 10.5, 0], [Cube([-0.5, 10.5, -4], [1, 1, 8], fin), Cube([0, 11.5, -4.5], [0, 4, 9], spiky_fin(AQUA, FOAM, 3))])
     m.bone("head", "body", [0, 9, -6], face_blob([-3.5, 6.5, -11], [7, 6, 5], head) +
            [Cube([-0.5, 12.5, -10], [1, 1, 3], fin), Cube([-0.5, 13.5, -9], [1, 1, 1], fin), Cube([-4.25, 6.75, -10.5], [1, 2, 2], cheek),
             Cube([3.25, 6.75, -10.5], [1, 2, 2], cheek)])
@@ -986,8 +1140,7 @@ def surfapir():
 
     m.bone("root", None, [0, 0, 0])
     m.bone("body", "root", [0, 10, 0], blob([-5, 5, -8], [10, 9, 16], body))
-    m.bone("back_fin", "body", [0, 14, 0], [Cube([-0.5, 14, -6], [1, 1, 12], fin), Cube([-0.5, 15, -4.5], [1, 2, 9], fin), Cube([-0.5, 17, -3], [1, 2, 6], fin),
-                                             Cube([-0.5, 19, -1.5], [1, 1, 3], fin)])
+    m.bone("back_fin", "body", [0, 14, 0], [Cube([-0.5, 14, -6], [1, 1, 12], fin), Cube([0, 15, -6.5], [0, 7, 13], spiky_fin(AQUA, FOAM, 5))])
     m.bone("head", "body", [0, 12, -8], face_blob([-4.5, 9, -14.5], [9, 7, 7], head) +
            [Cube([-5.25, 9.5, -13.5], [1, 3, 3], cheek), Cube([4.25, 9.5, -13.5], [1, 3, 3], cheek)])
     m.bone("foam", "head", [0, 16, -12], [Cube([-2, 16, -13], [4, 2, 4], foam), Cube([-1.5, 18, -14.5], [3, 1, 3], foam), Cube([-1, 17, -15.5], [2, 1, 1], foam)])
@@ -1049,11 +1202,10 @@ def tsunapir():
                      Cube([x + 0.5, 27.5 + h - 3, z - 0.5], [2, 2, 1], coral, [0, 0, r], [x, 27.5, z])]
     for x, z in [(-4, -4), (4, 0), (-1, 6), (6, -11), (-7, -1), (1, -8)]:
         ar.cubes.append(Cube([x - 1, 27.5, z - 1], [2, 1, 2], barn))
-    m.bone("back_fin", "armour", [0, 28, 0], [Cube([-0.5, 28, -9], [1, 2, 18], fin), Cube([-0.5, 30, -7], [1, 3, 13], fin), Cube([-0.5, 33, -4], [1, 3, 8], fin),
-                                               Cube([-0.5, 36, -2], [1, 2, 4], fin)])
+    m.bone("back_fin", "armour", [0, 28, 0], [Cube([-0.5, 28, -9], [1, 2, 18], fin), Cube([0, 30, -9.5], [0, 11, 19], spiky_fin(AQUA, FOAM, 7))])
     m.bone("head", "body", [0, 22, -15], face_blob([-8, 16, -26], [16, 12, 12], head, b=2))
     m.bone("foam", "head", [0, 16, -22], [Cube([-4, 12, -26], [8, 5, 5], foam), Cube([-3, 10, -25.5], [6, 2, 4], foam), Cube([-2, 8.5, -25], [4, 2, 3], foam)])
-    m.bone("crest", "head", [0, 28, -20], [Cube([-0.5, 28, -24], [1, 2, 8], fin), Cube([-0.5, 30, -22], [1, 2, 5], fin)])
+    m.bone("crest", "head", [0, 28, -20], [Cube([-0.5, 28, -24], [1, 2, 8], fin), Cube([0, 30, -24.5], [0, 5, 9], spiky_fin(AQUA, FOAM, 4))])
     m.bone("jaw", "head", [0, 17, -20.5], [Cube([-3, 15, -27], [6, 2, 7], jaw)])
     m.bone("trunk", "head", [0, 21, -26], [Cube([-3.5, 16.5, -31], [7, 7, 5], trunk)])
     m.bone("trunk2", "trunk", [0, 20, -31], [Cube([-3, 15.5, -35], [6, 6, 4], trunk)], rotation=[15, 0, 0])

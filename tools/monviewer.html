@@ -9,6 +9,7 @@
   --accent: #178A69; --accent-soft: #D9F1E8; --accent-ink: #FFFFFF; --stage: #DCEDE6; --grid: #B9D3CA; --grid-major: #93B8AB;
   --bar: #2E9E7B; --bar-track: #E3EFEA; --theirs: #6A7D9A; --ours: #178A69; --shadow: 0 1px 2px rgba(16,48,43,.06), 0 8px 24px rgba(16,48,43,.06);
   --t-grass: #4E9F45; --t-poison: #8E54B8; --t-fire: #E0602A; --t-flying: #7A88D8; --t-water: #3479C9; --t-normal: #938C74; --t-ground: #B88E4A; --t-fighting: #B84A3A; --t-electric: #D8A818;
+  --t-ice: #3FA6B8; --t-psychic: #D9507E; --t-bug: #869A1E; --t-rock: #A08A3A; --t-ghost: #6A5AA8; --t-dragon: #5D4DD8; --t-dark: #5B4A40; --t-steel: #7A8CA0; --t-curse: #4E8070;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0A1715; --surface: #10221F; --surface-2: #0D1C1A; --ink: #E2F3ED; --muted: #8FB2AA; --line: #1E3A35;
@@ -21,13 +22,23 @@
   --bar: #4FB896; --bar-track: #18302B; --theirs: #9AAAC4; --ours: #5FD0A8; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
   color-scheme: dark }
 * { box-sizing: border-box }
+[hidden] { display: none !important }
 body { background: var(--bg); color: var(--ink); font-family: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 15px; line-height: 1.5 }
 .wrap { max-width: 1240px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
 header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 14px }
 h1 { font-family: Fredoka, "Nunito Sans", system-ui, sans-serif; font-weight: 600; font-size: clamp(24px, 3.4vw, 34px); letter-spacing: .2px; margin: 0; text-wrap: balance }
 h1 span { color: var(--accent) }
 .lede { color: var(--muted); margin: 0; max-width: 62ch }
-.families { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 10px }
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0 10px }
+.pick { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: var(--muted); min-width: 0; max-width: 100% }
+.pick select { font: inherit; font-size: 15px; font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  padding: 7px 14px; min-width: 0; max-width: 100%; cursor: pointer }
+.pick select:focus-visible, .seg button:focus-visible, .stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.moverow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px }
+.cat { font-size: 11.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted) }
+.learn { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none }
+.learn li { background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 600 }
+.learn li small { color: var(--muted); font-weight: 600 }
 .fam { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 14px; font: inherit; font-weight: 600; cursor: pointer }
 .fam[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
 .stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin-bottom: 14px }
@@ -87,8 +98,18 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 80
     <h1>Retromon <span>Creature Viewer</span></h1>
     <p class="lede">Retromon's own creatures beside the Cobblemon models they stand in for, at their in-game sizes, animated as the mod plays them. Drag to turn, scroll or pinch to zoom.</p>
   </header>
-  <div class="families" id="families" role="group" aria-label="Family"></div>
-  <div class="stages" id="stages" role="group" aria-label="Stage"></div>
+  <div class="top">
+    <div class="seg" id="mode" role="group" aria-label="View"><button data-v="creatures" aria-pressed="true">Creatures</button><button data-v="moves" aria-pressed="false">Moves</button></div>
+    <label class="pick" id="pickWrap"><span>Creature</span><select id="pick" aria-label="Creature"></select></label>
+  </div>
+  <div class="moverow" id="moverow" hidden>
+    <label class="pick"><span>Move</span><select id="movePick" aria-label="Move"></select></label>
+    <div class="seg" role="group" aria-label="Step through"><button id="prev">Previous</button><button id="replay">Replay</button><button id="next">Next</button></div>
+    <div class="seg" role="group" aria-label="Play all"><button id="all" aria-pressed="false">Play all in turn</button></div>
+    <label class="pick"><span>Performed by</span><select id="performer" aria-label="Performed by"></select></label>
+    <div class="seg" id="stageSeg" role="group" aria-label="Evolution stage"><button data-v="1">Stage 1</button><button data-v="2">Stage 2</button><button data-v="3">Stage 3</button></div>
+  </div>
+  <div class="stages" id="stages" role="group" aria-label="Evolution line"></div>
   <div class="main">
     <div>
       <div class="viewer" id="viewer">
@@ -330,7 +351,8 @@ const player = (() => {
 })();
 
 // ---------- state ----------
-const state = { fam: 0, sid: DATA.families[0].members[0], show: "both", anim: "idle", act: null, spin: false, player: true };
+const state = { fam: 0, sid: DATA.families[0].members[0], show: "both", anim: "idle", act: null, spin: false, player: true,
+  mode: "creatures", move: "pound", performer: "ghost", stg: 1, all: false };
 const cache = {};
 let cur = null, t0 = performance.now(), ta = performance.now();
 function build(sid) {
@@ -360,8 +382,12 @@ function sizeOf(model) {
   return { h: box.max.y, l: s.z, w: s.x, box };
 }
 function place() {
+  stopPlay();
   for (const k of Object.keys(cache)) { stage.remove(cache[k].theirs.holder); stage.remove(cache[k].ours.holder); }
+  if (ghosts) { stage.remove(ghosts.perf.holder); stage.remove(ghosts.tgt.holder); }
   const pair = build(state.sid);
+  pair.theirs.holder.rotation.y = 0; pair.ours.holder.rotation.y = 0;
+  if (state.act === "attack" || state.act === "special") state.act = null;
   const a = sizeOf(pair.theirs), b = sizeOf(pair.ours);
   pair.sizes = { theirs: a, ours: b };
   const gap = 0.6, half = Math.max(a.w, a.l, b.w, b.l) / 2;
@@ -400,7 +426,7 @@ function setAnims() {
     const b = document.createElement("button");
     b.textContent = label; b.dataset.v = k;
     b.setAttribute("aria-pressed", String(state.anim === k && !state.act));
-    b.onclick = () => { state.anim = k; state.act = null; t0 = performance.now(); setAnims(); };
+    b.onclick = () => { state.anim = k; state.act = null; stopPlay(); t0 = performance.now(); setAnims(); };
     pe.appendChild(b);
   }
   for (const [k, label] of acts) {
@@ -409,7 +435,7 @@ function setAnims() {
     const b = document.createElement("button");
     b.textContent = label; b.dataset.v = k;
     b.setAttribute("aria-pressed", String(state.act === k));
-    b.onclick = () => { state.act = k; ta = performance.now(); setAnims(); };
+    b.onclick = () => { state.act = k; ta = performance.now(); setAnims(); if (k === "attack" || k === "special") startCreatureMove(k); else stopPlay(); };
     ae.appendChild(b);
   }
   if (!animFor(cur.ours, state.anim) && !animFor(cur.theirs, state.anim)) state.anim = "idle";
@@ -449,7 +475,8 @@ const lerp3 = (a, b, f) => a.clone().lerp(b, f);
 
 // ---------- the side panel ----------
 const TYPE = { GRASS: "--t-grass", POISON: "--t-poison", FIRE: "--t-fire", FLYING: "--t-flying", WATER: "--t-water", NORMAL: "--t-normal",
-  GROUND: "--t-ground", FIGHTING: "--t-fighting", ELECTRIC: "--t-electric" };
+  GROUND: "--t-ground", FIGHTING: "--t-fighting", ELECTRIC: "--t-electric", ICE: "--t-ice", PSYCHIC: "--t-psychic", BUG: "--t-bug", ROCK: "--t-rock",
+  GHOST: "--t-ghost", DRAGON: "--t-dragon", DARK: "--t-dark", STEEL: "--t-steel", CURSE: "--t-curse" };
 function title(s) { return s.charAt(0) + s.slice(1).toLowerCase(); }
 function fmt(n) { return n.toFixed(2); }
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
@@ -481,14 +508,22 @@ function renderPanel() {
 }
 
 // ---------- pickers ----------
+function famOf(sid) { return Math.max(0, DATA.families.findIndex(f => f.members.includes(sid))); }
 function renderPickers() {
-  const fe = $("#families"); fe.innerHTML = "";
-  DATA.families.forEach((f, i) => {
-    const b = document.createElement("button"); b.className = "fam"; b.textContent = f.name;
-    b.setAttribute("aria-pressed", String(i === state.fam));
-    b.onclick = () => { state.fam = i; state.sid = f.members[0]; renderPickers(); place(); };
-    fe.appendChild(b);
-  });
+  // One pick list (the original's name, then ours); picking one shows its evolution line underneath.
+  const sel = $("#pick");
+  if (!sel.options.length) {
+    for (const f of DATA.families) {
+      const og = document.createElement("optgroup"); og.label = f.name;
+      for (const sid of f.members) {
+        const d = DATA.species[sid], o = document.createElement("option");
+        o.value = sid; o.textContent = `${title(d.stats.name)} · ${title(d.ours.info.name)}`; og.appendChild(o);
+      }
+      sel.appendChild(og);
+    }
+    sel.onchange = () => { state.sid = sel.value; state.fam = famOf(sel.value); renderPickers(); place(); };
+  }
+  sel.value = state.sid;
   const se = $("#stages"); se.innerHTML = "";
   DATA.families[state.fam].members.forEach(sid => {
     const d = DATA.species[sid];
@@ -507,12 +542,246 @@ for (const b of document.querySelectorAll("#opts button")) b.onclick = () => {
   if (b.dataset.v === "player") place();
 };
 
+// ---------- moves: one effect per move, played from whoever uses it ----------
+const D_REACH = 56;   // from the user's mouth to where a move lands (3.5 blocks), as the effects are made
+const CAMEL = { THUNDERPUNCH: "ThunderPunch", THUNDERSHOCK: "ThunderShock", DYNAMICPUNCH: "DynamicPunch", SOLARBEAM: "SolarBeam", BUBBLEBEAM: "BubbleBeam",
+  DOUBLESLAP: "DoubleSlap", SONICBOOM: "SonicBoom", POISONPOWDER: "PoisonPowder", VICEGRIP: "ViceGrip", ANCIENTPOWER: "AncientPower",
+  DRAGONBREATH: "DragonBreath", EXTREMESPEED: "ExtremeSpeed", SELFDESTRUCT: "Selfdestruct", SOFTBOILED: "Softboiled" };
+function moveName(n) { return CAMEL[n] || n.toLowerCase().replace(/(^|[\s-])\w/g, c => c.toUpperCase()); }
+const TYPE_ORDER = ["NORMAL", "FIRE", "WATER", "ELECTRIC", "GRASS", "ICE", "FIGHTING", "POISON", "GROUND", "FLYING", "PSYCHIC", "BUG", "ROCK", "GHOST", "DRAGON", "DARK", "STEEL", "CURSE"];
+const MOVE_BY_ID = {}, MOVE_BY_NAME = {};
+for (const m of DATA.moves) { MOVE_BY_ID[m.id] = m; MOVE_BY_NAME[m.name] = m; }
+const MOVE_ORDER = TYPE_ORDER.flatMap(t => DATA.moves.filter(m => m.type === t).map(m => m.id));
+let MOVES = null, movesLoading = null;
+function loadMoves() {
+  if (!movesLoading) movesLoading = fetch("moves.json").then(r => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+    .then(j => (MOVES = j)).catch(() => (MOVES = { failed: true }));
+  return movesLoading;
+}
+const fxBuilt = {}, auraBuilt = {};
+function fxFor(id) {
+  if (!MOVES || MOVES.failed || !MOVES.effects[id]) return null;
+  return fxBuilt[id] || (fxBuilt[id] = buildModel(MOVES.effects[id]));
+}
+function auraFor(type) {
+  if (!MOVES || MOVES.failed || !MOVES.auras[type]) return null;
+  return auraBuilt[type] || (auraBuilt[type] = buildModel(MOVES.auras[type]));
+}
+// The ghosts: a Retromon creature's shape, see-through, standing in for whoever uses a move, and for its target.
+const ghostMat = new THREE.MeshLambertMaterial({ color: 0x9CC2B7, transparent: true, opacity: 0.55 });
+function ghostify(model) {
+  model.holder.traverse(o => { if (!o.isMesh) return; if (o.material === model.mat) o.material = ghostMat; else o.visible = false; });
+  return model;
+}
+const GHOST = "ivysaur";
+let ghosts = null;
+function ghostPair() {
+  return ghosts || (ghosts = { perf: ghostify(buildModel(DATA.species[GHOST].ours)), tgt: ghostify(buildModel(DATA.species[GHOST].ours)) });
+}
+// Where a point on a creature (in its own units) sits on the stage.
+function onStage(model, p) {
+  const s = (model.info.scale || 1) / 16, th = model.holder.rotation.y, c = Math.cos(th), n = Math.sin(th);
+  const x = p[0] * s, y = p[1] * s, z = p[2] * s;
+  return new THREE.Vector3(model.holder.position.x + x * c + z * n, model.holder.position.y + y, model.holder.position.z - x * n + z * c);
+}
+let play = null;
+function stopPlay() {
+  if (play) { if (play.fx) stage.remove(play.fx.holder); if (play.aura) stage.remove(play.aura.holder); }
+  play = null;
+}
+// Plays a move: the user's body (its attack, its special or its call) and the move's effect, timed so the effect leaves
+// as the body lets go; the body holds still while a long move (Flamethrower, Hydro Pump) pours out; the user's type
+// glows round it for special moves; the target flinches as the move lands.
+function startPlay(user, id, stg, target, bodyKey) {
+  stopPlay();
+  const mv = MOVE_BY_ID[id]; if (!mv) return;
+  const fx = fxFor(id), A = user.info.anchors;
+  const act = animFor(user, bodyKey || mv.body) || animFor(user, "special") || null;
+  const Rb = act ? act.len * ((bodyKey || mv.body) === "cry" ? 0.35 : 0.45) : 0.3;
+  const rel = fx ? (fx.info.release ?? 0.3) : 0.3;
+  const eo = Rb - rel, bo = Math.max(0, -eo);
+  const an = fx ? fx.anims[`animation.move.${id}.stage${stg}`] : null;
+  play = { user, target, id, mv, fx, an, stg, act, Rb, rel, bo, eoAbs: bo + eo, hold: mv.hold || 0, t0: performance.now(),
+           aura: mv.aura && fx ? auraFor(mv.aura) : null, tb: -1, tf: -1, tr: -1 };
+  if (fx && A) {
+    const s = user.info.scale || 1, m = A.mouth;
+    const rel3 = p => [(p[0] - m[0]) * s, (p[1] - m[1]) * s, (p[2] - m[2]) * s];
+    const set = (name, v) => { const b = fx.byName[name]; if (b) b.base = v; };
+    set("at_back", rel3(A.back)); set("at_body", rel3(A.body));
+    set("at_ground", [0, -m[1] * s, (A.body[2] - m[2]) * s]);
+    set("at_tground", [0, -m[1] * s, -D_REACH]);
+    fx.holder.position.copy(onStage(user, m)); fx.holder.rotation.y = user.holder.rotation.y;
+    fx.holder.visible = false; stage.add(fx.holder);
+  }
+  if (play.aura && A) {
+    const s = user.info.scale || 1, sz = A.size;
+    play.aura.holder.position.copy(onStage(user, A.body)); play.aura.holder.rotation.y = user.holder.rotation.y;
+    play.aura.holder.scale.set(sz[0] * s / 18 / 16 * 1.2, Math.max(0.6, sz[1] * s / 15) / 16, Math.min(sz[2], sz[0] * 1.6) * s / 18 / 16);
+    play.aura.holder.visible = false; stage.add(play.aura.holder);
+  }
+  play.end = Math.max(play.eoAbs + (an ? an.len : 1), bo + (act ? act.len : 0) + play.hold) + 0.15;
+}
+function updatePlay(now) {
+  if (!play) return;
+  let t = (now - play.t0) / 1000;
+  if (t > play.end + 0.9) {
+    // A pause, then again (or on to the next move).
+    if (state.mode === "moves" && state.all) { nextMove(1); return; }
+    play.t0 = now; t = 0;
+  }
+  const P = play, hz = P.Rb + 0.08, tb0 = t - P.bo;
+  P.tb = tb0 < hz ? tb0 : tb0 < hz + P.hold ? hz : tb0 - P.hold;
+  P.tf = t - P.eoAbs;
+  P.tr = P.mv.hit != null ? P.tf - P.mv.hit : -1;
+  if (P.fx && P.an) {
+    const vis = P.tf >= 0 && P.tf <= P.an.len;
+    P.fx.holder.visible = vis;
+    if (vis) { pose(P.fx, [[P.an, P.tf]]); for (const g of P.fx.glowLayers) g.m.map = g.maps[Math.floor(P.tf * g.fps) % g.maps.length]; }
+  }
+  if (P.aura) {
+    const on = P.tf >= P.rel - 0.3 && P.tf <= P.rel + P.hold + 0.75;
+    P.aura.holder.visible = on;
+    if (on) { pose(P.aura, [[Object.values(P.aura.anims)[0], t]]); for (const g of P.aura.glowLayers) g.m.map = g.maps[Math.floor(t * g.fps) % g.maps.length]; }
+  }
+}
+function startCreatureMove(k) {
+  const model = cur.ours, mv = MOVE_BY_NAME[k === "attack" ? model.info.attack_move : model.info.move];
+  stopPlay();
+  if (!mv) return;
+  loadMoves().then(() => {
+    if (state.mode !== "creatures" || state.act !== k || cur.ours !== model) return;
+    startPlay(model, mv.id, model.info.stage || 2, null, k);
+    if (play) play.t0 = ta;
+  });
+}
+
+// The Moves page: the ghost (or a creature) on the left using the move on a ghost target on the right.
+let moveCur = null;
+function perfStage(perf) { return state.performer === "ghost" ? state.stg : (perf.info.stage || 2); }
+function placeMoves() {
+  if (!MOVES) { $("#panel").innerHTML = `<p class="note">Loading the move effects…</p>`; return; }
+  for (const k of Object.keys(cache)) { stage.remove(cache[k].theirs.holder); stage.remove(cache[k].ours.holder); }
+  const g = ghostPair();
+  stage.remove(g.perf.holder); stage.remove(g.tgt.holder);
+  const perf = state.performer === "ghost" ? g.perf : build(state.performer).ours, tgt = g.tgt;
+  setParts(perf, null); setParts(tgt, null);
+  perf.holder.scale.setScalar((perf.info.scale || 1) / 16); perf.mat.color.setRGB(1, 1, 1); perf.mat.emissive.setRGB(0, 0, 0);
+  perf.holder.rotation.y = Math.PI / 2; tgt.holder.rotation.y = -Math.PI / 2;
+  const mz = -perf.info.anchors.mouth[2] * (perf.info.scale || 1) / 16, tz = -tgt.info.anchors.mouth[2] * (tgt.info.scale || 1) / 16;
+  const gap = mz + D_REACH / 16 + tz;
+  perf.holder.position.set(gap / 2, 0, 0); tgt.holder.position.set(-gap / 2, 0, 0);
+  stage.add(perf.holder); stage.add(tgt.holder);
+  player.visible = false;
+  const a = sizeOf(perf), b = sizeOf(tgt);
+  const H = Math.max(a.h, b.h, 1.2) + 0.4, W = gap + (a.l + b.l) / 2 + 0.8;
+  const fov = camera.fov * D2R, aspect = Math.max(0.6, camera.aspect);
+  const dist = Math.max((H * 1.5) / (2 * Math.tan(fov / 2)), (W * 1.12) / (2 * Math.tan(fov / 2) * aspect), 2.5);
+  controls.target.set(0, H * 0.36, 0);
+  camera.position.set(dist * 0.18, H * 0.36 + dist * 0.32, dist * 0.93);
+  controls.update();
+  moveCur = { perf, tgt };
+  if (MOVES.failed) {
+    $("#panel").innerHTML = `<p class="note">The move effects didn't load. Reload the page to try again.</p>`;
+    return;
+  }
+  startPlay(perf, state.move, perfStage(perf), tgt);
+  renderMoveRow(); renderMovePanel();
+}
+function nextMove(d) {
+  const i = MOVE_ORDER.indexOf(state.move), n = MOVE_ORDER.length;
+  state.move = MOVE_ORDER[((i + d) % n + n) % n];
+  placeMoves();
+}
+function powerText(m) { return m.category === "Status" ? "—" : m.power === 0 ? "One hit" : m.power === 1 ? "Varies" : String(m.power); }
+function renderMoveRow() {
+  const sel = $("#movePick");
+  if (!sel.options.length) {
+    for (const t of TYPE_ORDER) {
+      const og = document.createElement("optgroup"); og.label = t === "CURSE" ? "???" : title(t);
+      for (const m of DATA.moves.filter(x => x.type === t)) {
+        const o = document.createElement("option"); o.value = m.id; o.textContent = `${String(m.n).padStart(3, "0")} ${moveName(m.name)}`; og.appendChild(o);
+      }
+      sel.appendChild(og);
+    }
+    sel.onchange = () => { state.move = sel.value; placeMoves(); };
+    const ps = $("#performer");
+    const og0 = document.createElement("option"); og0.value = "ghost"; og0.textContent = "Ghost (any creature)"; ps.appendChild(og0);
+    for (const f of DATA.families) {
+      const og = document.createElement("optgroup"); og.label = f.name;
+      for (const sid of f.members) {
+        const d = DATA.species[sid], o = document.createElement("option");
+        o.value = sid; o.textContent = `${title(d.ours.info.name)} (${title(d.stats.name)})`; og.appendChild(o);
+      }
+      ps.appendChild(og);
+    }
+    ps.onchange = () => { state.performer = ps.value; placeMoves(); };
+  }
+  sel.value = state.move; $("#performer").value = state.performer;
+  const perf = moveCur && moveCur.perf, stg = perf ? perfStage(perf) : state.stg;
+  for (const b of document.querySelectorAll("#stageSeg button")) {
+    b.setAttribute("aria-pressed", String(+b.dataset.v === stg));
+    b.disabled = state.performer !== "ghost";
+  }
+  $("#all").setAttribute("aria-pressed", String(state.all));
+}
+function renderMovePanel() {
+  const m = MOVE_BY_ID[state.move], perf = moveCur && moveCur.perf;
+  const tm = m.tm ? [m.tm.gs && `${m.tm.gs} in Gold & Silver`, m.tm.rb && `${m.tm.rb} in Red & Blue`].filter(Boolean).join(", ") : "Neither";
+  const learners = m.learners.map(([sid, lv]) => `<li>${esc(title(DATA.species[sid].ours.info.name))} <small>Lv ${lv}</small></li>`).join("");
+  const stg = perf ? perfStage(perf) : state.stg;
+  const who = state.performer === "ghost" ? "the ghost" : title(DATA.species[state.performer].ours.info.name);
+  $("#panel").innerHTML = `
+    <div class="title"><div class="big">${esc(moveName(m.name))}</div><div class="sub">Move No. ${String(m.n).padStart(3, "0")}, used by ${esc(who)} at stage ${stg}</div></div>
+    <div class="types"><span class="type" style="background:var(${TYPE[m.type] || "--t-normal"})">${m.type === "CURSE" ? "???" : esc(m.type)}</span><span class="cat">${esc(m.category)}</span></div>
+    <p class="note" style="color:var(--ink);font-size:14.5px">${esc(m.desc)}</p>
+    <div class="facts">
+      <div class="fact"><small>Power</small><b>${powerText(m)}</b></div><div class="fact"><small>Accuracy</small><b>${m.accuracy}%</b></div>
+      <div class="fact"><small>PP</small><b>${m.pp}</b></div><div class="fact"><small>TM or HM</small><b>${esc(tm)}</b></div>
+    </div>
+    <div><h2>Our creatures that learn it by level</h2>${learners ? `<ul class="learn">${learners}</ul>` : `<p class="note">None of our 27 so far.</p>`}</div>
+    <p class="note">Moves grow as creatures evolve: pick a stage with the ghost, or pick a creature to see it at its own stage.${m.aura ? " Special moves wrap the user in a glow of its type." : ""}</p>`;
+}
+function frameMoves(now) {
+  const m = moveCur; if (!m) return;
+  updatePlay(now);
+  const t = (now - t0) / 1000;
+  const lp = [[animFor(m.perf, "idle"), t]];
+  if (play && play.act && play.tb >= 0 && play.tb <= play.act.len) lp.push([play.act, play.tb]);
+  pose(m.perf, lp);
+  const lt = [[animFor(m.tgt, "idle"), t]], rec = animFor(m.tgt, "recoil");
+  if (play && rec && play.tr >= 0 && play.tr <= rec.len) lt.push([rec, play.tr]);
+  pose(m.tgt, lt);
+  for (const g of m.perf.glowLayers) g.m.map = g.maps[Math.floor(t * g.fps) % g.maps.length] || g.maps[0];
+  labels.innerHTML = "";
+  if (state.performer === "ghost") label(m.perf, "Ghost", "Any creature");
+  else label(m.perf, "ours", DATA.species[state.performer].ours.info.name);
+  label(m.tgt, "Target", "Ghost");
+}
+function setMode(mode) {
+  state.mode = mode;
+  for (const b of document.querySelectorAll("#mode button")) b.setAttribute("aria-pressed", String(b.dataset.v === mode));
+  const moves = mode === "moves";
+  $("#pickWrap").hidden = moves; $("#stages").hidden = moves; $("#moverow").hidden = !moves;
+  $("#show").hidden = moves; $("#opts").hidden = moves; $(".bar-bottom").hidden = moves;
+  $("#hint").textContent = moves ? "Grid squares are 1 block. The ghost stands in for any Retromon creature: pick one under Performed by." : "Grid squares are 1 block.";
+  stopPlay(); labels.innerHTML = "";
+  if (moves) { placeMoves(); loadMoves().then(() => { if (state.mode === "moves") placeMoves(); }); }
+  else { state.act = null; place(); }
+}
+for (const b of document.querySelectorAll("#mode button")) b.onclick = () => setMode(b.dataset.v);
+$("#prev").onclick = () => nextMove(-1);
+$("#next").onclick = () => nextMove(1);
+$("#replay").onclick = () => { if (play) play.t0 = performance.now(); };
+$("#all").onclick = () => { state.all = !state.all; renderMoveRow(); };
+for (const b of document.querySelectorAll("#stageSeg button")) b.onclick = () => { state.stg = +b.dataset.v; placeMoves(); };
+
 // ---------- labels under each model ----------
 const labels = $("#labels");
 function label(model, who, name, sub) {
   let el = model._label;
   if (!el) { el = model._label = document.createElement("div"); el.className = "label"; }
-  el.innerHTML = `<span class="who ${who}">${who === "ours" ? "Retromon" : "Cobblemon"}</span><span class="nm">${esc(name)}</span>`;
+  const tag = who === "ours" ? "Retromon" : who === "theirs" ? "Cobblemon" : who;
+  el.innerHTML = `<span class="who ${who === "ours" ? "ours" : "theirs"}">${esc(tag)}</span><span class="nm">${esc(name)}</span>`;
   if (el.parentNode !== labels) labels.appendChild(el);
   const p = new THREE.Vector3(); model.holder.getWorldPosition(p);
   p.y = -0.05; p.project(camera);
@@ -534,7 +803,9 @@ function frame(now) {
   const tA = Math.max(0, (now - ta) / 1000);
   let flash = 0, toast = "";
   for (const b of Object.values(balls)) { b.g.visible = false; b.beam.visible = false; }
-  if (cur) {
+  if (state.mode === "moves") frameMoves(now);
+  else if (cur) {
+    updatePlay(now);
     // Recall and send out, as in a battle: a red beam from the ball in the player's hand draws it back in (tinted red,
     // shrinking); the ball is thrown in an arc, bounces, pops open with a white flash, and out it comes, glowing white.
     const recall = state.act === "recall";
@@ -549,8 +820,10 @@ function frame(now) {
       if (state.act && !recall) {
         const act = animFor(model, state.act);
         if (act) {
-          const at = tA % ((act.len || 1) + 0.9);
-          list.push([act, at]);
+          // A move's body motion follows the move being played (holding while a long move pours out); others loop.
+          const mine = play && play.user === model;
+          const at = mine ? play.tb : tA % ((act.len || 1) + 0.9);
+          if (!mine || (at >= 0 && at <= act.len)) list.push([act, at]);
           if (state.act === "critical" && who === "ours") {
             const f = at / (act.len || 1);
             if (f > 0.44 && f < 0.6) flash = Math.max(flash, 0.55 * (1 - (f - 0.44) / 0.16));

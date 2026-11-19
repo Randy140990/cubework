@@ -26,8 +26,8 @@
  },
  "move": "WATER GUN",
  "attack_move": "TACKLE",
- "scale": 0.8,
- "height": 1.25,
+ "scale": 0.727,
+ "height": 1.375,
  "texture": "retromon:textures/mons/wartortle.png",
  "layers": [
   {
@@ -45,5 +45,28 @@
   }
  ],
  "name": "SURFAPIR",
+ "anchors": {
+  "mouth": [
+   0,
+   10.0,
+   -15.0
+  ],
+  "back": [
+   0,
+   23.0,
+   0.0
+  ],
+  "body": [
+   0,
+   9.5,
+   0.0
+  ],
+  "size": [
+   14.0,
+   22.0,
+   35.5
+  ]
+ },
+ "stage": 2,
  "parts": []
 }

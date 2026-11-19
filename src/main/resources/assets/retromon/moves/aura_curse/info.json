@@ -1,0 +1,23 @@
+{
+ "aura": "CURSE",
+ "length": {
+  "1": 2.0
+ },
+ "loop": true,
+ "texture": "retromon:textures/moves/aura_curse.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/moves/aura_curse_glow_0.png",
+    "retromon:textures/moves/aura_curse_glow_1.png",
+    "retromon:textures/moves/aura_curse_glow_2.png",
+    "retromon:textures/moves/aura_curse_glow_3.png",
+    "retromon:textures/moves/aura_curse_glow_4.png",
+    "retromon:textures/moves/aura_curse_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ]
+}

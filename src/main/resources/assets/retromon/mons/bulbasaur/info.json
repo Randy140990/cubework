@@ -26,8 +26,8 @@
  },
  "move": "RAZOR LEAF",
  "attack_move": "TACKLE",
- "scale": 0.795,
- "height": 0.906,
+ "scale": 0.6,
+ "height": 1.2,
  "texture": "retromon:textures/mons/bulbasaur.png",
  "layers": [
   {
@@ -45,5 +45,28 @@
   }
  ],
  "name": "FERNADILLO",
+ "anchors": {
+  "mouth": [
+   0,
+   3.5,
+   -14.75
+  ],
+  "back": [
+   0,
+   20.2,
+   0.0
+  ],
+  "body": [
+   0,
+   5.5,
+   0.0
+  ],
+  "size": [
+   15.5,
+   19.2,
+   29.25
+  ]
+ },
+ "stage": 1,
  "parts": []
 }

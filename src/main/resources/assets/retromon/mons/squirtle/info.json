@@ -26,8 +26,8 @@
  },
  "move": "WATER GUN",
  "attack_move": "TACKLE",
- "scale": 0.795,
- "height": 0.906,
+ "scale": 0.743,
+ "height": 0.969,
  "texture": "retromon:textures/mons/squirtle.png",
  "layers": [
   {
@@ -45,5 +45,28 @@
   }
  ],
  "name": "TIDAPIR",
+ "anchors": {
+  "mouth": [
+   0,
+   7.0,
+   -11.5
+  ],
+  "back": [
+   0,
+   16.5,
+   0.0
+  ],
+  "body": [
+   0,
+   7.0,
+   0.0
+  ],
+  "size": [
+   10.1,
+   15.5,
+   24.5
+  ]
+ },
+ "stage": 1,
  "parts": []
 }

@@ -1,0 +1,69 @@
+{
+ "move": "FLAME WHEEL",
+ "type": "FIRE",
+ "category": "Special",
+ "body": "attack",
+ "release": 0.3,
+ "hit": 0.3,
+ "hold": 0.0,
+ "length": {
+  "1": 1.19,
+  "2": 1.19,
+  "3": 1.19
+ },
+ "aura": "FIRE",
+ "anchors": {
+  "at_back": [
+   0,
+   6,
+   12
+  ],
+  "at_body": [
+   0,
+   -3,
+   12
+  ],
+  "at_ground": [
+   0,
+   -10,
+   4
+  ],
+  "at_target": [
+   0,
+   0,
+   -56.0
+  ],
+  "at_tground": [
+   0,
+   -10,
+   -56.0
+  ],
+  "at_sky": [
+   0,
+   38,
+   -56.0
+  ],
+  "at_mid": [
+   0,
+   4,
+   -28.0
+  ]
+ },
+ "reach": 56.0,
+ "texture": "retromon:textures/moves/flame_wheel.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/moves/flame_wheel_glow_0.png",
+    "retromon:textures/moves/flame_wheel_glow_1.png",
+    "retromon:textures/moves/flame_wheel_glow_2.png",
+    "retromon:textures/moves/flame_wheel_glow_3.png",
+    "retromon:textures/moves/flame_wheel_glow_4.png",
+    "retromon:textures/moves/flame_wheel_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ]
+}

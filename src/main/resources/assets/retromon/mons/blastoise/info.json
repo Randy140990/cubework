@@ -26,8 +26,8 @@
  },
  "move": "HYDRO PUMP",
  "attack_move": "TACKLE",
- "scale": 1.305,
- "height": 2.375,
+ "scale": 1.21,
+ "height": 2.562,
  "texture": "retromon:textures/mons/blastoise.png",
  "layers": [
   {
@@ -45,5 +45,28 @@
   }
  ],
  "name": "TSUNAPIR",
+ "anchors": {
+  "mouth": [
+   0,
+   17.0,
+   -26.5
+  ],
+  "back": [
+   0,
+   42.0,
+   0.0
+  ],
+  "body": [
+   0,
+   17.5,
+   0.0
+  ],
+  "size": [
+   26.0,
+   41.0,
+   64.5
+  ]
+ },
+ "stage": 3,
  "parts": []
 }

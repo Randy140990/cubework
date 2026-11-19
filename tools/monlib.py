@@ -878,10 +878,83 @@ def place_stars(model, stands, anims=None):
             an["bones"]["fx_stars"]["scale"] = [round(f, 4)] * 3
 
 
+KEEP_FX = ("fx_stars", "fx_impact")
+
+
+def drop_move_fx(model, anims):
+    """Moves' effects come from the move library now (tools/monmoves.py: one effect per move, whoever uses it), so the
+    effects a creature was built with are taken out, with their tracks. Its own motions (the wind-up, the lunge, the
+    trunk aiming) stay. The confused stars and the critical-hit burst are the creature's and stay too."""
+    drop = {b.name for b in model.bones if b.name.startswith("fx_") and b.name not in KEEP_FX}
+    grew = True
+    while grew:
+        more = {b.name for b in model.bones if b.parent in drop} - drop
+        grew = bool(more)
+        drop |= more
+    model.bones = [b for b in model.bones if b.name not in drop]
+    for name, an in anims.all.items():
+        bones = an.get("bones", {})
+        for b in [b for b in bones if b in drop]:
+            del bones[b]
+        if name.endswith(".special"):
+            bones.pop("spray", None)
+
+
+def anchors(model):
+    """Where a move's effect comes from on this creature, in its own units: its mouth (the front of its head, at the
+    jaw), the top of its back, the middle of its body, and its size (width, height, length)."""
+    solid = [c for c in model.cubes() if not c.effect and not c.mat.frames]
+    x0 = min(c.origin[0] for c in solid); x1 = max(c.origin[0] + c.size[0] for c in solid)
+    y1 = max(c.origin[1] + c.size[1] for c in solid)
+    z0 = min(c.origin[2] for c in solid); z1 = max(c.origin[2] + c.size[2] for c in solid)
+    by = {b.name: b for b in model.bones}
+    head = by.get("head")
+    hc = [c for c in head.cubes if not c.effect and not c.rotation] if head else []
+    jaw = by.get("jaw") or by.get("beak_lower")
+    beak = by.get("beak")
+    front = min(c.origin[2] for c in (beak.cubes if beak and beak.cubes else hc)) if hc else z0
+    mouth_y = jaw.pivot[1] if jaw else (min(c.origin[1] for c in hc) + 1 if hc else y1 * 0.6)
+    body = by.get("body")
+    bc = [c for c in body.cubes if not c.effect] if body else solid
+    bz = (min(c.origin[2] for c in bc) + max(c.origin[2] + c.size[2] for c in bc)) / 2
+    btop = max(c.origin[1] + c.size[1] for c in model.cubes() if not c.effect and not c.mat.frames and bz - 8 < c.origin[2] + c.size[2] / 2 < bz + 8)
+    bmid = (min(c.origin[1] for c in bc) + max(c.origin[1] + c.size[1] for c in bc)) / 2
+    r = lambda v: [round(a, 2) for a in v]
+    return {"mouth": r([0, mouth_y, front - 0.5]), "back": r([0, btop + 1, bz]), "body": r([0, bmid, bz]),
+            "size": r([x1 - x0, y1, z1 - z0])}
+
+
+_stages = None
+
+
+def stage_of(sid):
+    """How far along its line a species is, for moves that grow as creatures evolve: 1 for the first (or a baby), 3 for
+    the last of a line, 2 between (and for a species that doesn't evolve)."""
+    global _stages
+    if _stages is None:
+        data = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources", "retromon", "data", "species.tsv")
+        into, frm = {}, {}
+        for line in open(data, encoding="utf-8"):
+            if line.startswith("#") or not line.strip():
+                continue
+            f = line.rstrip("\n").split("\t")
+            for e in (f[15].split(";") if f[15] and f[15] != "-" else []):
+                p = e.split(":")
+                if len(p) >= 3:
+                    into.setdefault(f[1], set()).add(p[-1])
+                    frm[p[-1]] = f[1]
+        _stages = {}
+        for s in set(into) | set(frm):
+            has_before, has_after = s in frm, s in into
+            _stages[s] = 2 if (has_before and has_after) or not (has_before or has_after) else (3 if has_before else 1)
+    return _stages.get(sid, 2)
+
+
 def write(sid, name, model, anims, info, stands):
     """Writes a creature: model, animations, info and textures. stands sets its size in the world: the height, in blocks, its
     cubes would reach unturned (set so it comes out about as big overall as the Cobblemon model it stands in for)."""
     place_stars(model, stands, anims)
+    drop_move_fx(model, anims)
     cubes = model.cubes()
     tw, th = pack(cubes)
     img, glows = paint(cubes, tw, th)
@@ -931,6 +1004,8 @@ def write(sid, name, model, anims, info, stands):
     info["texture"] = f"retromon:textures/mons/{sid}.png"
     info["layers"] = layers
     info["name"] = name
+    info["anchors"] = anchors(model)
+    info["stage"] = stage_of(sid)
     info.setdefault("parts", [])
     json.dump(info, open(os.path.join(OUT_MODELS, sid, "info.json"), "w"), indent=1)
     used = int((img[..., 3] > 0).sum())

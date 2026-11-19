@@ -106,10 +106,12 @@ def four_legs(sid, m, walk=0.8, stride=30, k=1.0, slow=1.0, extras=None, idle="b
     return A, info
 
 
-def wings(flap, amp, rest, period, phase=0.0):
+def wings(flap, amp, rest, period, phase=0.0, span=1.0):
     """The wings' tracks for a flap: up and down about rest (degrees), amp each way. The right wing lifts with a
-    positive turn about z (Bedrock's turns), the left with a negative one."""
-    return {"wing_right": track(rotation=[0, 0, wave(period, amp, phase, rest)]), "wing_left": track(rotation=[0, 0, wave(period, -amp, phase, -rest)]),
+    positive turn about z (Bedrock's turns), the left with a negative one. span: how much bigger the wings open out
+    than they sit folded (a bird's wings are neat at its sides, and huge spread in flight)."""
+    sc = [span, span, span] if span != 1.0 else None
+    return {"wing_right": track(rotation=[0, 0, wave(period, amp, phase, rest)], scale=sc), "wing_left": track(rotation=[0, 0, wave(period, -amp, phase, -rest)], scale=sc),
             "wing_mid_right": track(rotation=[0, wave(period, flap, phase + 40), 0]), "wing_mid_left": track(rotation=[0, wave(period, -flap, phase + 40), 0]),
             "wing_tip_right": track(rotation=[0, 0, wave(period, amp * 0.4, phase + 70)]), "wing_tip_left": track(rotation=[0, 0, wave(period, -amp * 0.4, phase + 70)])}
 
@@ -147,14 +149,14 @@ def bird(sid, m, walk=0.5, stride=40, k=1.0, slow=1.0, extras=None, flap=0.36):
         "head": track(rotation=[-12, 0, 0]), "neck": track(rotation=[-8, 0, 0]),
         "plume": track(rotation=[24, 0, 0]),
         "tail": track(rotation=[wave(F, 6, 0, 10), 0, 0]),
-    }, wings(18, 52, 70, F), eyelids(F * 0.5), _extra(extras, "fly"))))
+    }, wings(18, 52, 70, F, span=1.9), eyelids(F * 0.5), _extra(extras, "fly"))))
     H = flap * 1.5
     hover = A.add("air_hover", H, only(m, merge({
         "body": track(position=[0, wave(H, 0.8 * k, 90), 0], rotation=[-6, 0, 0]),
         "leg_right": track(rotation=[25, 0, 0]), "leg_left": track(rotation=[25, 0, 0]),
         "plume": track(rotation=[wave(H, 10), 0, 0]),
         "tail": track(rotation=[wave(H, 8, 0, 18), 0, 0]),
-    }, wings(24, 42, 65, H), eyelids(H * 0.5), _extra(extras, "hover"))))
+    }, wings(24, 42, 65, H, span=1.75), eyelids(H * 0.5), _extra(extras, "hover"))))
     C = 1.0 * slow
     cry = A.add("cry", C, only(m, merge({
         "neck": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-14, 0, 0], C * 0.6: [-14, 0, 0], C: [0, 0, 0]})),
