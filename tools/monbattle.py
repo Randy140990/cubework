@@ -45,6 +45,7 @@ def attack(T, k, a, kind):
             t[leg] = track(rotation=keys({0: [0, 0, 0], p(.3): [-8, 0, 0], p(.45): [22 * a, 0, 0], T: [0, 0, 0]}))
     elif kind == "bird":
         t.update(keys_lr("wing", {0: [0, 0, 0], p(.3): [0, 0, 25], p(.45): [0, 0, 60], p(.7): [0, 0, 10], T: [0, 0, 0]}))
+        t.update(keys_lr("wing_mid", {0: [0, 0, 0], p(.3): [-40, 0, 0], p(.45): [-65, 0, 0], p(.7): [-10, 0, 0], T: [0, 0, 0]}))
         t.update(keys_lr("leg", {0: [0, 0, 0], p(.3): [-10, 0, 0], p(.45): [25, 0, 0], T: [0, 0, 0]}))
     else:
         t.update(keys_lr("arm", {0: [0, 0, 0], p(.3): [20, 0, 0], p(.45): [-60, 0, 15], p(.6): [-20, 0, 0], T: [0, 0, 0]}))
@@ -76,6 +77,7 @@ def special(S, k, kind):
             flap[q(f)] = [0, 0, 80 if i % 2 == 0 else -5]
         flap.update({q(.85): [0, 0, 30], S: [0, 0, 0]})
         t.update(keys_lr("wing", flap))
+        t.update(keys_lr("wing_mid", {0: [0, 0, 0], q(.3): [-50, 0, 0], q(.4): [-70, 0, 0], q(.85): [-70, 0, 0], S: [0, 0, 0]}))
     else:
         t.update(keys_lr("arm", {0: [0, 0, 0], q(.3): [10, 0, 0], q(.45): [-50, 0, 20], q(.85): [-40, 0, 15], S: [0, 0, 0]}))
     return t

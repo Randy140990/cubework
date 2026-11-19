@@ -1,0 +1,72 @@
+{
+ "idle": "animation.huskalis.battle_idle",
+ "ground": "animation.huskalis.ground_idle",
+ "actions": {
+  "cry": "animation.huskalis.cry",
+  "recoil": "animation.huskalis.recoil",
+  "attack": "animation.huskalis.attack",
+  "critical": "animation.huskalis.critical",
+  "special": "animation.huskalis.special",
+  "recall": "animation.huskalis.recall",
+  "sendout": "animation.huskalis.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.huskalis.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.huskalis.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.huskalis.faint",
+   "parts": []
+  }
+ },
+ "move": "HARDEN",
+ "attack_move": "TACKLE",
+ "scale": 0.49,
+ "height": 1.469,
+ "texture": "retromon:textures/mons/metapod.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/metapod_glow_0.png",
+    "retromon:textures/mons/metapod_glow_1.png",
+    "retromon:textures/mons/metapod_glow_2.png",
+    "retromon:textures/mons/metapod_glow_3.png",
+    "retromon:textures/mons/metapod_glow_4.png",
+    "retromon:textures/mons/metapod_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "HUSKALIS",
+ "anchors": {
+  "mouth": [
+   0,
+   13.0,
+   -4.0
+  ],
+  "back": [
+   0,
+   24.5,
+   -0.2
+  ],
+  "body": [
+   0,
+   6.0,
+   -0.2
+  ],
+  "size": [
+   9.0,
+   23.5,
+   7.07
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

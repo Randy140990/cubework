@@ -54,23 +54,20 @@ def four_legs(sid, m, walk=0.8, stride=30, k=1.0, slow=1.0, extras=None, idle="b
         "head": track(rotation=[wave(P, 3, 90), wave(P, 9), wave(P, 2, 45)]),
         "jaw": track(rotation=keys({0: [0, 0, 0], 2.4 * slow: [0, 0, 0], 2.6 * slow: [6, 0, 0], 2.9 * slow: [0, 0, 0], P: [0, 0, 0]})),
         "ear_right": track(rotation=[0, wave(P / 2, 5), wave(P / 4, 4)]), "ear_left": track(rotation=[0, wave(P / 2, -5, 60), wave(P / 4, -4, 30)]),
-        "tail": track(rotation=[wave(P / 2, 4), wave(P / 2, 10), 0]), "tail2": track(rotation=[wave(P / 2, 6, 60), wave(P / 2, 6, 40), 0]),
-        "tail3": track(rotation=[wave(P / 2, 6, 120), 0, 0]),
-    }, eyelids(P * 0.78), _extra(extras, "idle"))))
+    }, tail_chain(P / 2, 8, 4), eyelids(P * 0.78), _extra(extras, "idle"))))
     B = 2 * slow
     battle = A.add("battle_idle", B, only(m, merge({
         "body": track(position=[0, bounce(B / 2, 0.45 * k), 0], rotation=[wave(B / 2, 1.2), 0, 0]),
         "neck": track(rotation=[wave(B / 2, 3, 0, 4), 0, 0]),
         "head": track(rotation=[wave(B / 2, 3, 90, -3), wave(B, 5), 0]),
         "ear_right": track(rotation=[wave(B / 2, 3), 0, wave(B / 4, 5)]), "ear_left": track(rotation=[wave(B / 2, 3), 0, wave(B / 4, -5)]),
-        "tail": track(rotation=[wave(B / 2, 6), wave(B / 4, 14), 0]), "tail2": track(rotation=[0, wave(B / 4, 10, 60), 0]),
         "leg_front_right": track(rotation=[wave(B / 2, 3, 0, -5), 0, 0]), "leg_front_left": track(rotation=[wave(B / 2, 3, 0, 5), 0, 0]),
-    }, eyelids(B * 0.7), _extra(extras, "battle"))))
+    }, tail_chain(B / 2, 11, 5), eyelids(B * 0.7), _extra(extras, "battle"))))
     W = walk
     tracks = {"body": track(position=[0, bounce(W / 2, 0.5 * k), 0], rotation=[0, 0, wave(W, 2.5)]),
               "neck": track(rotation=[wave(W / 2, 3), 0, 0]),
               "head": track(rotation=[wave(W / 2, 2.5, 90), wave(W, -3), 0]),
-              "tail": track(rotation=[wave(W / 2, 6), wave(W, 16), 0]), "tail2": track(rotation=[wave(W / 2, 6, 60), wave(W, 10, 60), 0]),
+              **tail_chain(W, 13, 5),
               "ear_right": track(rotation=[wave(W / 2, 6), 0, 0]), "ear_left": track(rotation=[wave(W / 2, 6), 0, 0])}
     for leg in L[0]:
         tracks[leg] = track(rotation=[wave(W, stride), 0, 0])
@@ -106,14 +103,33 @@ def four_legs(sid, m, walk=0.8, stride=30, k=1.0, slow=1.0, extras=None, idle="b
     return A, info
 
 
-def wings(flap, amp, rest, period, phase=0.0, span=1.0):
-    """The wings' tracks for a flap: up and down about rest (degrees), amp each way. The right wing lifts with a
-    positive turn about z (Bedrock's turns), the left with a negative one. span: how much bigger the wings open out
-    than they sit folded (a bird's wings are neat at its sides, and huge spread in flight)."""
+def wings(flap, amp, rest, period, phase=0.0, span=1.0, unfold=0.0):
+    """The wings' tracks for a flap, like an arm from shoulder to fingertips: the shoulder (wing) lifts and beats about
+    rest (degrees), amp each way, and each joint after it (the elbow, the wrist, the two fans of flight feathers) bends
+    a beat behind the one before, so the beat runs out along the wing in a wave. The right wing lifts with a positive
+    turn about z (Bedrock's turns), the left with a negative one. span: how much bigger the wings open out than they
+    sit folded (neat at the sides, huge spread in flight). unfold: how far the elbow opens from its folded rest."""
     sc = [span, span, span] if span != 1.0 else None
-    return {"wing_right": track(rotation=[0, 0, wave(period, amp, phase, rest)], scale=sc), "wing_left": track(rotation=[0, 0, wave(period, -amp, phase, -rest)], scale=sc),
-            "wing_mid_right": track(rotation=[0, wave(period, flap, phase + 40), 0]), "wing_mid_left": track(rotation=[0, wave(period, -flap, phase + 40), 0]),
-            "wing_tip_right": track(rotation=[0, 0, wave(period, amp * 0.4, phase + 70)]), "wing_tip_left": track(rotation=[0, 0, wave(period, -amp * 0.4, phase + 70)])}
+    out = {}
+    parts = (("wing", 0, amp, 0, rest), ("wing_mid", -unfold, amp * 0.35, flap, 0), ("wing_tip", 0, amp * 0.35, 0, 0),
+             ("wing_fan", 0, amp * 0.3, flap * 0.5, 0), ("wing_fan2", 0, amp * 0.3, 0, 0))
+    for i, (name, x, z_amp, y_amp, base) in enumerate(parts):
+        ph = phase + i * 35
+        for side, sgn in (("right", 1), ("left", -1)):
+            rot = [x, wave(period, sgn * y_amp, ph + 5) if y_amp else 0, wave(period, sgn * z_amp, ph, sgn * base)]
+            out[f"{name}_{side}"] = track(rotation=rot, scale=sc if name == "wing" else None)
+    return out
+
+
+def tail_chain(period, yaw, pitch=0.0, n=6, lag=45):
+    """A tail's joints swaying one after another, each a beat behind and a little further than the one before, so a
+    long tail ripples along its length (tail, tail2... for those it has)."""
+    out = {}
+    for i in range(n):
+        name = "tail" if i == 0 else f"tail{i + 1}"
+        k = 1 + i * 0.25
+        out[name] = track(rotation=[wave(period, pitch * k, i * lag) if pitch else 0, wave(period, yaw * k, i * lag) if yaw else 0, 0])
+    return out
 
 
 def bird(sid, m, walk=0.5, stride=40, k=1.0, slow=1.0, extras=None, flap=0.36):
@@ -149,14 +165,14 @@ def bird(sid, m, walk=0.5, stride=40, k=1.0, slow=1.0, extras=None, flap=0.36):
         "head": track(rotation=[-12, 0, 0]), "neck": track(rotation=[-8, 0, 0]),
         "plume": track(rotation=[24, 0, 0]),
         "tail": track(rotation=[wave(F, 6, 0, 10), 0, 0]),
-    }, wings(18, 52, 70, F, span=1.9), eyelids(F * 0.5), _extra(extras, "fly"))))
+    }, wings(18, 52, 70, F, span=1.9, unfold=75), eyelids(F * 0.5), _extra(extras, "fly"))))
     H = flap * 1.5
     hover = A.add("air_hover", H, only(m, merge({
         "body": track(position=[0, wave(H, 0.8 * k, 90), 0], rotation=[-6, 0, 0]),
         "leg_right": track(rotation=[25, 0, 0]), "leg_left": track(rotation=[25, 0, 0]),
         "plume": track(rotation=[wave(H, 10), 0, 0]),
         "tail": track(rotation=[wave(H, 8, 0, 18), 0, 0]),
-    }, wings(24, 42, 65, H, span=1.75), eyelids(H * 0.5), _extra(extras, "hover"))))
+    }, wings(24, 42, 65, H, span=1.75, unfold=75), eyelids(H * 0.5), _extra(extras, "hover"))))
     C = 1.0 * slow
     cry = A.add("cry", C, only(m, merge({
         "neck": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-14, 0, 0], C * 0.6: [-14, 0, 0], C: [0, 0, 0]})),
@@ -164,6 +180,9 @@ def bird(sid, m, walk=0.5, stride=40, k=1.0, slow=1.0, extras=None, flap=0.36):
         "beak_lower": track(rotation=keys({0: [0, 0, 0], C * 0.2: [30, 0, 0], C * 0.4: [12, 0, 0], C * 0.6: [30, 0, 0], C * 0.8: [0, 0, 0]})),
         "plume": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-25, 0, 0], C * 0.6: [12, 0, 0], C: [0, 0, 0]})),
         "wing_right": track(rotation=keys({0: [0, 0, 0], C * 0.2: [0, 0, 55], C * 0.4: [0, 0, 35], C * 0.6: [0, 0, 55], C: [0, 0, 0]})),
+        # The wings opened out as it calls (the elbows unfold).
+        "wing_mid_right": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-60, 0, 0], C * 0.6: [-60, 0, 0], C: [0, 0, 0]})),
+        "wing_mid_left": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-60, 0, 0], C * 0.6: [-60, 0, 0], C: [0, 0, 0]})),
         "wing_left": track(rotation=keys({0: [0, 0, 0], C * 0.2: [0, 0, -55], C * 0.4: [0, 0, -35], C * 0.6: [0, 0, -55], C: [0, 0, 0]})),
         "body": track(position=keys({0: [0, 0, 0], C * 0.2: [0, 1 * k, 0], C * 0.6: [0, 1 * k, 0], C: [0, 0, 0]})),
         "tail": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-20, 0, 0], C * 0.6: [-20, 0, 0], C: [0, 0, 0]})),
@@ -192,7 +211,7 @@ def hopper(sid, m, hop=0.45, height=2.0, k=1.0, extras=None):
         "snout": track(scale=[1, 1, wave(0.25, 0.12, 0, 1)]),
         "whiskers_right": track(rotation=[0, wave(0.25, 6), 0]), "whiskers_left": track(rotation=[0, wave(0.25, -6), 0]),
         "ear_right": track(rotation=[wave(2, 4), wave(1, 10), 0]), "ear_left": track(rotation=[wave(2, 4, 50), wave(1, -10, 50), 0]),
-        "tail": track(rotation=[0, wave(2, 10), 0]), "tail2": track(rotation=[wave(2, 6, 90), wave(2, 6), 0]), "tail3": track(rotation=[wave(2, 8, 150), 0, 0]),
+        **tail_chain(2, 9, 5),
         "arm_right": track(rotation=[wave(1, 6), 0, 0]), "arm_left": track(rotation=[wave(1, 6, 40), 0, 0]),
     }, eyelids(2.2), _extra(extras, "idle"))))
     walk = A.add("ground_walk", hop, only(m, merge({
@@ -200,7 +219,7 @@ def hopper(sid, m, hop=0.45, height=2.0, k=1.0, extras=None):
         "body": track(position=[0, bounce(hop, height * k), 0], rotation=[wave(hop, 8, 90), 0, 0]),
         "leg_right": track(rotation=[wave(hop, 30, 180), 0, 0]), "leg_left": track(rotation=[wave(hop, 30, 180), 0, 0]),
         "foot_right": track(rotation=[wave(hop, -20, 180), 0, 0]), "foot_left": track(rotation=[wave(hop, -20, 180), 0, 0]),
-        "tail": track(rotation=[wave(hop, 12), 0, 0]), "tail2": track(rotation=[wave(hop, 10, 60), 0, 0]), "tail3": track(rotation=[wave(hop, 10, 120), 0, 0]),
+        **tail_chain(hop, 4, 10),
         "ear_right": track(rotation=[wave(hop, 10, 30), 0, 0]), "ear_left": track(rotation=[wave(hop, 10, 30), 0, 0]),
         "arm_right": track(rotation=[-20, 0, 0]), "arm_left": track(rotation=[-20, 0, 0]),
     }, eyelids(hop * 0.6), _extra(extras, "walk"))))
@@ -231,4 +250,131 @@ def hopper(sid, m, hop=0.45, height=2.0, k=1.0, extras=None):
     info = {"idle": battle if (extras or {}).get("battle_idle") else ground, "ground": ground, "actions": {"cry": cry, "recoil": recoil},
             "poses": {"walk": {"anim": walk, "parts": []}}}
     battle_set(A, m, info, "hopper", k, 1.0, extras)
+    return A, info
+
+
+# ---------- more body plans: crawlers, cocoons, flying insects ----------
+
+def chain(names, period, pitch=0.0, yaw=0.0, lag=50, grow=0.0, lift=0.0):
+    """A chain of joints (a larva's segments, an abdomen) each moving a beat behind the one before."""
+    out = {}
+    for i, nm in enumerate(names):
+        k = 1 + i * grow
+        out[nm] = track(rotation=[wave(period, pitch * k, i * lag) if pitch else 0, wave(period, yaw * k, i * lag) if yaw else 0, 0],
+                        position=[0, wave(period, lift, i * lag), 0] if lift else None)
+    return out
+
+
+def _antennae(period, amp, spread=0.0):
+    return {"antenna_right": track(rotation=[wave(period, amp), 0, wave(period / 2, amp * 0.7, 0, spread)]),
+            "antenna_left": track(rotation=[wave(period, amp, 40), 0, wave(period / 2, -amp * 0.7, 30, -spread)])}
+
+
+def crawler(sid, m, segs, walk=0.9, k=1.0, slow=1.0, extras=None):
+    """A crawling larva: its body a chain of segments behind its head (segs, front to back), rippling front to back as
+    it crawls; it sways and twitches its antennae at rest and rears up to call."""
+    extras = with_move(m, extras)
+    A = Anims(sid)
+    P = 3.2 * slow
+    ground = A.add("ground_idle", P, only(m, merge({
+        "body": track(position=[0, wave(P, 0.15 * k), 0]),
+        "head": track(rotation=[wave(P, 4, 90), wave(P, 10), wave(P, 3, 45)]),
+        "jaw": track(rotation=keys({0: [0, 0, 0], 2.0 * slow: [0, 0, 0], 2.2 * slow: [8, 0, 0], 2.5 * slow: [0, 0, 0], P: [0, 0, 0]})),
+    }, _antennae(P / 2, 8), chain(segs, P / 2, 0, 5, 40), eyelids(P * 0.7), _extra(extras, "idle"))))
+    B = 1.6 * slow
+    battle = A.add("battle_idle", B, only(m, merge({
+        "body": track(position=[0, bounce(B / 2, 0.3 * k), 0], rotation=[wave(B / 2, 2, 0, -3), 0, 0]),
+        "head": track(rotation=[wave(B / 2, 5, 0, -6), wave(B, 6), 0]),
+    }, _antennae(B / 2, 10), chain(segs, B / 2, 4, 3, 50), eyelids(B * 0.7), _extra(extras, "battle"))))
+    W = walk
+    walk_id = A.add("ground_walk", W, only(m, merge({
+        "body": track(position=[0, bounce(W, 0.35 * k), wave(W, 0.6 * k)]),
+        "head": track(rotation=[wave(W, 6), wave(W, 4), 0]),
+    }, _antennae(W, 8), chain(segs, W, 10, 2, 60, lift=0.45 * k), eyelids(W * 0.6), _extra(extras, "walk"))))
+    C = 1.2 * slow
+    up = lambda a: keys({0: [0, 0, 0], C * 0.2: [a, 0, 0], C * 0.65: [a, 0, 0], C: [0, 0, 0]})
+    cry = A.add("cry", C, only(m, merge({
+        "body": track(rotation=up(-14), position=keys({0: [0, 0, 0], C * 0.2: [0, 1.0 * k, 0], C * 0.65: [0, 1.0 * k, 0], C: [0, 0, 0]})),
+        "head": track(rotation=up(-24)), segs[0]: track(rotation=up(12)),
+        "jaw": track(rotation=keys({0: [0, 0, 0], C * 0.2: [38, 0, 0], C * 0.4: [26, 0, 0], C * 0.6: [38, 0, 0], C * 0.8: [0, 0, 0]})),
+        "antenna_right": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-20, 0, -22], C * 0.8: [-20, 0, -22], C: [0, 0, 0]})),
+        "antenna_left": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-20, 0, 22], C * 0.8: [-20, 0, 22], C: [0, 0, 0]})),
+    }, _extra(extras, "cry"))), loop=False)
+    R = 0.75 * slow
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k), _extra(extras, "recoil"))), loop=False)
+    info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
+    battle_set(A, m, info, "legs4", k, slow, extras)
+    return A, info
+
+
+def cocoon(sid, m, k=1.0, slow=1.0, extras=None):
+    """A creature shut in its hard cocoon: it can barely move. It sways a little, shudders, and shuffles along in small
+    hops."""
+    extras = with_move(m, extras)
+    A = Anims(sid)
+    P = 4.0 * slow
+    ground = A.add("ground_idle", P, only(m, merge({
+        "body": track(rotation=[wave(P, 1.5, 90), 0, wave(P, 2)], position=[0, wave(P / 2, 0.08 * k), 0]),
+        "head": track(rotation=[wave(P, 2), wave(P, 4), 0]),
+    }, eyelids(P * 0.6), _extra(extras, "idle"))))
+    B = 2.0 * slow
+    battle = A.add("battle_idle", B, only(m, merge({
+        "body": track(rotation=[wave(B / 2, 2), 0, wave(B, 3)], position=[0, bounce(B / 2, 0.15 * k), 0]),
+    }, eyelids(B * 0.7), _extra(extras, "battle"))))
+    W = 0.7 * slow
+    walk_id = A.add("ground_walk", W, only(m, merge({
+        "body": track(position=[0, bounce(W, 1.0 * k), 0], rotation=[wave(W, 4), 0, wave(W * 2, 3)]),
+    }, eyelids(W), _extra(extras, "walk"))))
+    C = 1.1 * slow
+    cry = A.add("cry", C, only(m, merge({
+        "body": track(rotation=keys({0: [0, 0, 0], C * 0.1: [0, 0, 6], C * 0.2: [0, 0, -6], C * 0.3: [0, 0, 6], C * 0.4: [0, 0, -6], C * 0.5: [0, 0, 4],
+                                     C * 0.6: [0, 0, -3], C: [0, 0, 0]}),
+                      scale=keys({0: [1, 1, 1], C * 0.15: [1.05, 1.08, 1.05], C * 0.6: [1.05, 1.08, 1.05], C: [1, 1, 1]})),
+    }, _extra(extras, "cry"))), loop=False)
+    R = 0.75 * slow
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k * 0.5, lift=0.4, rear=6), _extra(extras, "recoil"))), loop=False)
+    info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
+    battle_set(A, m, info, "legs4", k, slow, extras)
+    return A, info
+
+
+def insect(sid, m, flap=0.16, amp=45, k=1.0, slow=1.0, extras=None, abdomen=("abdomen", "abdomen2", "abdomen3"), legs=()):
+    """A flying insect, always on the wing: its wings beating (the hind pair a beat behind the fore), its body bobbing
+    as it hovers, its abdomen swinging, its legs hanging. flap: one wingbeat (a moth's slow, a wasp's a blur)."""
+    extras = with_move(m, extras)
+    A = Anims(sid)
+
+    def beat(f, a, rest=18):
+        return {"wing_right": track(rotation=[0, wave(f, a * 0.2), wave(f, a, 0, rest)]), "wing_left": track(rotation=[0, wave(f, -a * 0.2), wave(f, -a, 0, -rest)]),
+                "hindwing_right": track(rotation=[0, wave(f, a * 0.15, 60), wave(f, a * 0.8, 60, rest * 0.6)]),
+                "hindwing_left": track(rotation=[0, wave(f, -a * 0.15, 60), wave(f, -a * 0.8, 60, -rest * 0.6)])}
+    dangle = {lg: track(rotation=[wave(1.4 * slow, 8, i * 40), 0, 0]) for i, lg in enumerate(legs)}
+    P = 2.0 * slow
+    base = {"body": track(position=[0, wave(P, 1.2 * k), 0], rotation=[wave(P, 3, 60), 0, wave(P * 2, 2)]),
+            "head": track(rotation=[wave(P, 4, 90), wave(P * 2, 8), 0])}
+    ground = A.add("ground_idle", P, only(m, merge(base, beat(flap, amp), _antennae(P / 2, 8), chain(abdomen, P, 5, 0, 50), dangle,
+                                                   eyelids(P * 0.7), _extra(extras, "idle"))))
+    B = 1.0 * slow
+    battle = A.add("battle_idle", B, only(m, merge({"body": track(position=[0, wave(B, 1.5 * k), 0], rotation=[wave(B, 4, 60, -4), 0, 0]),
+                                                    "head": track(rotation=[wave(B, 4, 0, -4), wave(B * 2, 6), 0])},
+                                                   beat(flap, amp * 1.1), _antennae(B / 2, 10), chain(abdomen, B, 7, 0, 50), dangle,
+                                                   eyelids(B * 0.7), _extra(extras, "battle"))))
+    W = 1.0 * slow
+    walk_id = A.add("ground_walk", W, only(m, merge({"body": track(position=[0, wave(W, 1.4 * k), 0], rotation=[12, 0, wave(W, 3)])},
+                                                    beat(flap * 0.9, amp * 1.1), _antennae(W / 2, 6), chain(abdomen, W, 6, 0, 50), dangle,
+                                                    eyelids(W * 0.6), _extra(extras, "walk"))))
+    fly = A.add("air_fly", W, only(m, merge({"body": track(position=[0, wave(W, 1.8 * k), 0], rotation=[18, 0, wave(W, 4)])},
+                                            beat(flap * 0.85, amp * 1.2), chain(abdomen, W, 6, 0, 50), dangle, eyelids(W * 0.5), _extra(extras, "fly"))))
+    C = 1.2 * slow
+    cry = A.add("cry", C, only(m, merge({
+        "body": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-14, 0, 0], C * 0.65: [-14, 0, 0], C: [0, 0, 0]}),
+                      position=keys({0: [0, 0, 0], C * 0.2: [0, 2 * k, 0], C * 0.65: [0, 2 * k, 0], C: [0, 0, 0]})),
+        "head": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-18, 0, 0], C * 0.65: [-18, 0, 0], C: [0, 0, 0]})),
+        "jaw": track(rotation=keys({0: [0, 0, 0], C * 0.2: [34, 0, 0], C * 0.6: [34, 0, 0], C * 0.8: [0, 0, 0]})),
+    }, beat(flap * 0.7, amp * 1.4, 30), _extra(extras, "cry"))), loop=False)
+    R = 0.75 * slow
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k), beat(flap, amp), _extra(extras, "recoil"))), loop=False)
+    info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil},
+            "poses": {"walk": {"anim": walk_id, "parts": []}, "fly": {"anim": fly, "parts": []}}}
+    battle_set(A, m, info, "bird", k, slow, extras)
     return A, info

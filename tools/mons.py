@@ -933,9 +933,13 @@ def pyribex():
     # Wings, folded at rest along its sides: the coverts on an arm along the shoulder, the ember feathers hanging from it.
     efea = Mat("#C9361A", feather_plane("#2A1A18", "#C9361A", "#FFB44A", edge="#FFE08A"), noise=0.015, edge=0,
                glow=lambda a: ember_ramp(0.5 + 0.5 * (1 - a.ly)) if a.ly < 0.4 else None)
-    # Big wings: the feathers reach well down its sides towards the ground.
-    folded_wing(m, 7, 33, -9, 22, 4, 2, [(0, 3, 14), (3, 3, 14), (6, 3, 14), (9, 3, 13), (12, 3, 13), (15, 3, 12)],
-                [(0, 3, 20), (3, 3, 19), (6, 3, 18), (9, 3, 17), (12, 3, 15)], arm, efea, efea)
+    # Dragon wings: a horned arm with a claw at the wrist, finger spines fanning back, and a dark, torn membrane between
+    # them (ragged edges, a few holes burnt through, their edges glowing like embers). Big: folded, they lie back along
+    # its flanks; spread, they reach far out.
+    spine = Mat("#2A2226", lambda a: mix("#2A2226", "#8A6A5A", a.ly * 0.5) if a.ly > 0.2 else rgb("#FF8A2A"),
+                glow=lambda a: rgb("#FF8A2A") if a.ly < 0.12 else None, noise=0.02, edge=0)
+    mems = [membrane_mat("#3A2228", "#C9361A", "#6A3A34", glow="#FF7A2A", seed=i * 1.7) for i in range(5)]
+    dragon_wing(m, 7, 33, -9, 16, (7, 8, 3, 13), spine, mems, thick=2, claw=Mat("#E8DCC8", lambda a: rgb("#FFF4E0") if a.ly < 0.4 else None, noise=0.01, edge=0))
     goat_legs(m, (4.5, 4.5), (-8, 8), 22, 11, 3, 4, leg, leg, hoof_mat(), cuff=tuft)
     # A long tail in three joints (to sway and curl as it moves), drooping and then rising, the flame at its tip.
     m.bone("tail", "body", [0, 28, 11], [Cube([-2, 26, 11], [4, 4, 8], leg)], rotation=[-15, 0, 0])
@@ -944,16 +948,15 @@ def pyribex():
     m.bone("tail4", "tail3", [0, 29, 32], flame([0, 28.5, 32], 10, 18, smoke=True), rotation=[-20, 0, 0])
     flick = {"fringe": track(scale=[1, wave(0.5, 0.12, 0, 1), 1]), "mane": track(scale=[1, wave(0.4, 0.1, 30, 1), wave(0.6, 0.06, 0, 1)]),
              "tail4": track(scale=[wave(0.4, 0.08, 0, 1), wave(0.3, 0.16, 0, 1), 1])}
-    fold = {"tail": track(rotation=[wave(2.6, 4, 0, -15), wave(2.6, 9), 0]), "tail2": track(rotation=[wave(2.6, 5, 50, 10), wave(2.6, 12, 50), 0]),
-            "tail3": track(rotation=[wave(2.6, 6, 100, 25), wave(2.6, 14, 100), 0])}
+    fold = {}
     fly = {"period": 0.7, "hover_period": 0.9,
            "fly": merge(flick, {"body": track(rotation=[12, 0, 0], position=[0, wave(0.7, 1.5, 90), 0]),
                                 "leg_front_right": track(rotation=[-50, 0, 0]), "leg_front_left": track(rotation=[-50, 0, 0]),
                                 "leg_back_right": track(rotation=[55, 0, 0]), "leg_back_left": track(rotation=[55, 0, 0]),
-                                "neck": track(rotation=[10, 0, 0]), "head": track(rotation=[-6, 0, 0])}, wings(10, 40, 85, 0.7, span=1.45)),
+                                "neck": track(rotation=[10, 0, 0]), "head": track(rotation=[-6, 0, 0])}, wings(10, 40, 85, 0.7, span=1.45, unfold=75)),
            "hover": merge(flick, {"body": track(rotation=[-8, 0, 0], position=[0, wave(0.9, 2, 90), 0]),
                                   "leg_front_right": track(rotation=[-25, 0, 0]), "leg_front_left": track(rotation=[-20, 0, 0]),
-                                  "leg_back_right": track(rotation=[20, 0, 0]), "leg_back_left": track(rotation=[20, 0, 0])}, wings(14, 35, 80, 0.9, span=1.35))}
+                                  "leg_back_right": track(rotation=[20, 0, 0]), "leg_back_left": track(rotation=[20, 0, 0])}, wings(14, 35, 80, 0.9, span=1.35, unfold=75))}
     embers(m, 2.0, 1.8, n=6, name="FLAMETHROWER")
     attack_move(m, "SCRATCH", 1.25, 1.8)
     A, info = four_legs("pyribex", m, walk=1.0, stride=24, k=2.0, slow=1.25, fly=fly, extras={
@@ -1318,6 +1321,106 @@ def folded_wing(m, x, y_top, z0, length, cov_h, thick, secondaries, primaries, c
            [Cube([xs - 0.03 * (i + 3), yb - h + 1, zt + zo], [0, h, w], pri, [-12 - 4 * i, 0, 0], [xs, yb, zt + zo]) for i, (zo, w, h) in enumerate(primaries)])
 
 
+def jointed_wing(m, x, y_top, z0, chord, spans, cov, sec, pri, parent="body", arm=None, thick=1.0, fold=75, gap=0.04):
+    """A bird's wing in five parts, each on its own joint, as an arm is from shoulder to fingertips: the shoulder (wing:
+    an arm down its front edge, the coverts behind), the elbow (wing_mid: the forearm and a row of secondaries), the
+    wrist (wing_tip: the hand and the inner primaries), and two fans of long flight feathers (wing_fan, then wing_fan2 at
+    the very tip). Folded at rest, the coverts hang over the shoulder and the rest lies back along the flank (wing_mid
+    turned back by fold degrees); in flight it unfolds and beats in a wave, each joint a moment behind the one before.
+    x: the shoulder's distance out; y_top: its height; z0: the wing's front edge; chord: front to back; spans: how far
+    the shoulder, elbow, wrist and fan parts each reach down the wing (out along it, when spread)."""
+    s1, s2, s3, s4 = spans
+    arm = arm or cov
+    xs = -x - thick / 2
+    y1, y2, y3 = y_top - s1, y_top - s1 - s2, y_top - s1 - s2 - s3
+    zf = z0 + 0.5
+    at = max(1, round(thick))
+    m.pair("wing_right", parent, [xs, y_top, zf],
+           [Cube([xs - thick / 2, y1, z0], [at, s1 + 0.5, at], arm), Cube([xs, y1 - 0.5, z0 + 0.5], [0, s1 + 1, chord], cov)])
+    nsec = max(2, round(chord / 2.5))
+    w = chord / nsec
+    m.pair("wing_mid_right", "wing_right", [xs, y1, zf],
+           [Cube([xs - thick / 2, y2, z0], [at, s2 + 0.5, at], arm)] +
+           [Cube([xs - gap * (i + 1), y2 - 1, z0 + 0.5 + i * w], [0, s2 + 1.5, w + 0.6], sec) for i in range(nsec)], rotation=[fold, 0, 0])
+    nin = max(2, round(chord * 0.75 / 2.5))
+    w2 = chord * 0.75 / nin
+    m.pair("wing_tip_right", "wing_mid_right", [xs, y2, zf],
+           [Cube([xs - thick / 2, y3, z0], [at, s3 + 0.5, at], arm)] +
+           [Cube([xs - gap * (i + 4), y3 - 1, z0 + 0.3 + i * w2], [0, s3 + 1.5, w2 + 0.5], pri, [-6 - 4 * i, 0, 0], [xs, y2, z0 + i * w2])
+            for i in range(nin)])
+    fw = max(2, round(chord / 5))
+    m.pair("wing_fan_right", "wing_tip_right", [xs, y3, zf],
+           [Cube([xs - gap * (i + 8), y3 - s4, z0 + 0.4 + i * fw * 0.8], [0, s4 + 1, fw], pri, [-8 - 7 * i, 0, 0], [xs, y3, z0 + 0.4 + i * fw * 0.8])
+            for i in range(3)])
+    m.pair("wing_fan2_right", "wing_fan_right", [xs, y3, zf - 0.5],
+           [Cube([xs - gap * (i + 12), y3 - s4 * 1.15, z0 - 0.2 + i * fw * 0.7], [0, s4 * 1.15 + 1, fw], pri, [2 - 6 * i, 0, 0],
+                 [xs, y3, z0 - 0.2 + i * fw * 0.7]) for i in range(2)])
+
+
+def membrane_mat(base, edge, vein, glow=None, seed=0):
+    """A dragon's wing membrane on a flat part hanging from its top: dark and leathery, veins running down it, its
+    trailing edge ragged between scallops, a few small holes torn through it (their edges burnt bright)."""
+    B, E, V = rgb(base), rgb(edge), rgb(vein)
+
+    def shape(at):
+        u, v = at.lz, 1 - at.ly
+        rag = 0.86 + 0.08 * math.sin(v * 17 + seed) + 0.04 * math.sin(v * 41 + seed * 2)
+        if u > rag:
+            return "out", 0
+        hole = hash01("hole", seed, int(at.ly * at.fh / 2), int(at.lz * at.fw / 2))
+        if hole < 0.05 and 0.15 < u < 0.8 and 0.1 < v < 0.9:
+            return "hole", 0
+        if hole < 0.09 and 0.15 < u < 0.8 and 0.1 < v < 0.9:
+            return "rim", 0
+        return "in", rag - u
+
+    def f(at):
+        k, d = shape(at)
+        if k in ("out", "hole"):
+            return CLEAR
+        if k == "rim" or d < 0.06:
+            return E
+        col = mix(B, E, max(0.0, 0.35 - d) * 1.2)
+        if abs(((at.lz * 3.2) % 1.0) - 0.5) < 0.07:
+            col = mix(col, V, 0.6)
+        return col
+
+    def g(at):
+        if glow is None:
+            return None
+        k, d = shape(at)
+        return rgb(glow) if k == "rim" or (k == "in" and d < 0.06) else None
+    return Mat(base, f, glow=g if glow else None, noise=0.02, edge=0, flat=True)
+
+
+def dragon_wing(m, x, y_top, z0, chord, spans, bone, membranes, parent="body", thick=2.0, fold=75, claw=None):
+    """A dragon's wing on the same five joints as a bird's, so it beats the same way: an arm (shoulder, elbow, wrist)
+    down its front edge with a hooked claw at the wrist, then long finger spines fanning back from the wrist, with a
+    thin, torn membrane stretched between the arm and each spine (holes and a ragged edge, like an old dragon's)."""
+    s1, s2, s3, s4 = spans
+    xs = -x - thick / 2
+    y1, y2, y3 = y_top - s1, y_top - s1 - s2, y_top - s1 - s2 - s3
+    zf = z0 + 1
+    at = max(1, round(thick))
+    mb = membranes
+    m.pair("wing_right", parent, [xs, y_top, zf],
+           [Cube([xs - thick / 2, y1, z0], [at, s1 + 0.5, at], bone), Cube([xs, y1, z0 + at], [0, s1 + 0.5, chord * 0.7], mb[0])])
+    m.pair("wing_mid_right", "wing_right", [xs, y1, zf],
+           [Cube([xs - thick / 2 + 0.25, y2, z0 + 0.25], [at - 0.5 if at > 1 else 1, s2 + 0.5, at - 0.5 if at > 1 else 1], bone),
+            Cube([xs - 0.04, y2, z0 + at - 0.5], [0, s2 + 0.5, chord * 0.85], mb[1])], rotation=[fold, 0, 0])
+    m.pair("wing_tip_right", "wing_mid_right", [xs, y2, zf],
+           [Cube([xs - 0.5, y3, z0 + 0.5], [1, s3 + 0.5, 1], bone), Cube([xs - 0.08, y3, z0 + 1], [0, s3 + 0.5, chord], mb[2])] +
+           ([Cube([xs - 0.5, y3 - 0.5, z0 - 1.5], [1, 1, 2], claw or bone, [-30, 0, 0], [xs, y3, z0 - 0.5])] if claw is not False else []))
+    # The fingers: spines fanning back from the wrist, the membrane between them.
+    fan = []
+    for i, ang in enumerate((-15, -40, -62)):
+        L = s4 * (1.0, 1.1, 0.95)[i]
+        fan.append(Cube([xs - 0.5, y3 - L, z0 + 0.5], [1, L, 1], bone, [ang, 0, 0], [xs, y3, z0 + 1]))
+        fan.append(Cube([xs - 0.1 - 0.03 * i, y3 - L, z0 + 1], [0, L, chord * 0.55], mb[3 + (i % 2)], [ang, 0, 0], [xs, y3, z0 + 1]))
+    m.pair("wing_fan_right", "wing_tip_right", [xs, y3, zf], fan[:4])
+    m.pair("wing_fan2_right", "wing_fan_right", [xs, y3, zf], fan[4:])
+
+
 def trousers(base, light, dark):
     """Feathers down a bird's thigh: rows of small overlapping scallops, darker underneath, ragged at the bottom."""
     def f(at):
@@ -1387,7 +1490,7 @@ def quailet():
     m.eyes("head", 3, 8.5, -5, h=3, corner=(1, 2), half=3, iris="#6A3A1A", pupil="#0C0A10", skin=LIL_D, iris_light="#D89A4A", grid=["LLL", "WPI", ".JJ"])
     sec = Mat(LIL, feather_plane(LIL, LIL_D, PLUME, bars=LIL_L), noise=0.015, edge=0)
     pri = Mat(LIL_D, feather_plane(LIL_D, "#4A4066", PLUME, edge=CREAM), noise=0.015, edge=0)
-    folded_wing(m, 3.5, 7.5, -3.5, 6, 3, 1, [(0, 2, 3), (1.5, 2, 3), (3, 2, 3)], [(0, 2, 4), (1.5, 2, 4)], fea, sec, pri)
+    jointed_wing(m, 3.5, 7.5, -3.5, 6, (2.5, 2.5, 2, 3), sec, sec, pri, arm=fea)
     tfea = Mat(LIL_D, feather_plane(LIL_D, "#4A4066", PLUME, bars=LIL), noise=0.015, edge=0)
     m.bone("tail", "body", [0, 5, 4], [Cube([-0.75, 5, 3.5], [1.5, 0, 4], tfea, [0, ry, 0], [0, 5, 3.5]) for ry in (-36, -18, 0, 18, 36)] +
            [Cube([-1.5, 4.5, 3], [3, 1, 2], tail)], rotation=[-25, 0, 0])
@@ -1441,7 +1544,7 @@ def plumquail():
            grid=["DLL", "WPI", ".JJ"])
     sec = Mat(LIL, feather_plane(LIL, LIL_D, PLUME, bars=LIL_L), noise=0.015, edge=0)
     pri = Mat(LIL_D, feather_plane(LIL_D, "#433A60", PLUME, edge=CREAM), noise=0.015, edge=0)
-    folded_wing(m, 4.5, 12, -5, 9, 4, 1, [(0, 2, 4), (1.5, 2, 4), (3, 2, 4), (4.5, 2, 4)], [(0, 2, 6), (1.5, 2, 6), (3, 2, 5)], fea, sec, pri)
+    jointed_wing(m, 4.5, 12, -5, 9, (3.5, 3.5, 3, 4.5), sec, sec, pri, arm=fea)
     tfea = Mat(LIL_D, feather_plane(LIL_D, LIL, PLUME, bars=LIL_L), noise=0.015, edge=0)
     m.bone("tail", "body", [0, 9, 5], [Cube([-1, 9, 4.5], [2, 0, 8 if ry == 0 else 7], tfea, [0, ry, 0], [0, 9, 4.5]) for ry in (-30, -20, -10, 0, 10, 20, 30)] +
            [Cube([-2, 8.5, 4], [4, 1, 3], tail)], rotation=[-15, 0, 0])
@@ -1518,8 +1621,7 @@ def regalquail():
            grid=["DLLL", "WPPI", ".JIE"])
     sec = Mat(LIL, feather_plane(LIL, LIL_D, GOLD, bars=LIL_L), noise=0.015, edge=0)
     pri = Mat(LIL_D, feather_plane(LIL_D, LIL, GOLD, edge="#FFE08A"), noise=0.015, edge=0)
-    folded_wing(m, 7, 20, -8, 15, 6, 2, [(0, 3, 6), (2.5, 3, 6), (5, 3, 6), (7.5, 3, 6), (10, 3, 6)], [(0, 3, 9), (2.5, 3, 9), (5, 3, 8), (7.5, 3, 7)],
-                fea, sec, pri)
+    jointed_wing(m, 7, 20, -8, 15, (5, 5, 4.5, 7), sec, sec, pri, arm=fea, thick=2)
     covm = Mat(LIL, feather_plane(LIL, LIL_D, GOLD, bars=LIL_L), noise=0.015, edge=0)
     m.bone("tail", "body", [0, 18, 6], [Cube([-3, 15, 5], [6, 4, 5], body)] +
            [Cube([-1.25, 18, 6], [2.5, 0, 9], covm, [0, ry, 0], [0, 18, 6]) for ry in (-40, -20, 0, 20, 40)], rotation=[-20, 0, 0])

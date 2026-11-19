@@ -1,0 +1,72 @@
+{
+ "idle": "animation.leafgrub.battle_idle",
+ "ground": "animation.leafgrub.ground_idle",
+ "actions": {
+  "cry": "animation.leafgrub.cry",
+  "recoil": "animation.leafgrub.recoil",
+  "attack": "animation.leafgrub.attack",
+  "critical": "animation.leafgrub.critical",
+  "special": "animation.leafgrub.special",
+  "recall": "animation.leafgrub.recall",
+  "sendout": "animation.leafgrub.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.leafgrub.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.leafgrub.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.leafgrub.faint",
+   "parts": []
+  }
+ },
+ "move": "STRING SHOT",
+ "attack_move": "TACKLE",
+ "scale": 0.579,
+ "height": 0.725,
+ "texture": "retromon:textures/mons/caterpie.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/caterpie_glow_0.png",
+    "retromon:textures/mons/caterpie_glow_1.png",
+    "retromon:textures/mons/caterpie_glow_2.png",
+    "retromon:textures/mons/caterpie_glow_3.png",
+    "retromon:textures/mons/caterpie_glow_4.png",
+    "retromon:textures/mons/caterpie_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LEAFGRUB",
+ "anchors": {
+  "mouth": [
+   0,
+   2.2,
+   -10.5
+  ],
+  "back": [
+   0,
+   12.6,
+   -3.25
+  ],
+  "body": [
+   0,
+   2.7,
+   -3.25
+  ],
+  "size": [
+   7.2,
+   11.6,
+   26.1
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

@@ -1,0 +1,76 @@
+{
+ "idle": "animation.lancewasp.battle_idle",
+ "ground": "animation.lancewasp.ground_idle",
+ "actions": {
+  "cry": "animation.lancewasp.cry",
+  "recoil": "animation.lancewasp.recoil",
+  "attack": "animation.lancewasp.attack",
+  "critical": "animation.lancewasp.critical",
+  "special": "animation.lancewasp.special",
+  "recall": "animation.lancewasp.recall",
+  "sendout": "animation.lancewasp.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.lancewasp.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.lancewasp.air_fly",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.lancewasp.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.lancewasp.faint",
+   "parts": []
+  }
+ },
+ "move": "TWINEEDLE",
+ "attack_move": "FURY ATTACK",
+ "scale": 1.123,
+ "height": 1.425,
+ "texture": "retromon:textures/mons/beedrill.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/beedrill_glow_0.png",
+    "retromon:textures/mons/beedrill_glow_1.png",
+    "retromon:textures/mons/beedrill_glow_2.png",
+    "retromon:textures/mons/beedrill_glow_3.png",
+    "retromon:textures/mons/beedrill_glow_4.png",
+    "retromon:textures/mons/beedrill_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LANCEWASP",
+ "anchors": {
+  "mouth": [
+   0,
+   15.4,
+   -8.1
+  ],
+  "back": [
+   0,
+   23.4,
+   0.0
+  ],
+  "body": [
+   0,
+   16.0,
+   0.0
+  ],
+  "size": [
+   36.0,
+   22.8,
+   28.4
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

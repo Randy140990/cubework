@@ -77,14 +77,14 @@
     "tail": {
      "rotation": [
       "math.sin(q.anim_time * 180 + 0) * 4",
-      "math.sin(q.anim_time * 180 + 0) * 10",
+      "math.sin(q.anim_time * 180 + 0) * 8",
       0
      ]
     },
     "tail2": {
      "rotation": [
-      "math.sin(q.anim_time * 180 + 60) * 6",
-      "math.sin(q.anim_time * 180 + 40) * 6",
+      "math.sin(q.anim_time * 180 + 45) * 5",
+      "math.sin(q.anim_time * 180 + 45) * 10",
       0
      ],
      "scale": [
@@ -216,25 +216,6 @@
       "math.sin(q.anim_time * 720 + 0) * -5"
      ]
     },
-    "tail": {
-     "rotation": [
-      "math.sin(q.anim_time * 360 + 0) * 6",
-      "math.sin(q.anim_time * 720 + 0) * 14",
-      0
-     ]
-    },
-    "tail2": {
-     "rotation": [
-      0,
-      "math.sin(q.anim_time * 720 + 60) * 10",
-      0
-     ],
-     "scale": [
-      "1 + math.sin(q.anim_time * 900 + 0) * 0.08",
-      "1 + math.sin(q.anim_time * 1200 + 0) * 0.16",
-      1
-     ]
-    },
     "leg_front_right": {
      "rotation": [
       "-5 + math.sin(q.anim_time * 360 + 0) * 3",
@@ -247,6 +228,25 @@
       "5 + math.sin(q.anim_time * 360 + 0) * 3",
       0,
       0
+     ]
+    },
+    "tail": {
+     "rotation": [
+      "math.sin(q.anim_time * 360 + 0) * 5",
+      "math.sin(q.anim_time * 360 + 0) * 11",
+      0
+     ]
+    },
+    "tail2": {
+     "rotation": [
+      "math.sin(q.anim_time * 360 + 45) * 6.25",
+      "math.sin(q.anim_time * 360 + 45) * 13.75",
+      0
+     ],
+     "scale": [
+      "1 + math.sin(q.anim_time * 900 + 0) * 0.08",
+      "1 + math.sin(q.anim_time * 1200 + 0) * 0.16",
+      1
      ]
     },
     "eyelid_right": {
@@ -360,15 +360,15 @@
     },
     "tail": {
      "rotation": [
-      "math.sin(q.anim_time * 1028.571 + 0) * 6",
-      "math.sin(q.anim_time * 514.286 + 0) * 16",
+      "math.sin(q.anim_time * 514.286 + 0) * 5",
+      "math.sin(q.anim_time * 514.286 + 0) * 13",
       0
      ]
     },
     "tail2": {
      "rotation": [
-      "math.sin(q.anim_time * 1028.571 + 60) * 6",
-      "math.sin(q.anim_time * 514.286 + 60) * 10",
+      "math.sin(q.anim_time * 514.286 + 45) * 6.25",
+      "math.sin(q.anim_time * 514.286 + 45) * 16.25",
       0
      ],
      "scale": [

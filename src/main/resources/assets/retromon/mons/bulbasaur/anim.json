@@ -70,21 +70,21 @@
     "tail": {
      "rotation": [
       "math.sin(q.anim_time * 180 + 0) * 4",
-      "math.sin(q.anim_time * 180 + 0) * 10",
+      "math.sin(q.anim_time * 180 + 0) * 8",
       0
      ]
     },
     "tail2": {
      "rotation": [
-      "math.sin(q.anim_time * 180 + 60) * 6",
-      "math.sin(q.anim_time * 180 + 40) * 6",
+      "math.sin(q.anim_time * 180 + 45) * 5",
+      "math.sin(q.anim_time * 180 + 45) * 10",
       0
      ]
     },
     "tail3": {
      "rotation": [
-      "math.sin(q.anim_time * 180 + 120) * 6",
-      0,
+      "math.sin(q.anim_time * 180 + 90) * 6",
+      "math.sin(q.anim_time * 180 + 90) * 12",
       0
      ]
     },
@@ -218,20 +218,6 @@
       "math.sin(q.anim_time * 720 + 0) * -5"
      ]
     },
-    "tail": {
-     "rotation": [
-      "math.sin(q.anim_time * 360 + 0) * 6",
-      "math.sin(q.anim_time * 720 + 0) * 14",
-      0
-     ]
-    },
-    "tail2": {
-     "rotation": [
-      0,
-      "math.sin(q.anim_time * 720 + 60) * 10",
-      0
-     ]
-    },
     "leg_front_right": {
      "rotation": [
       "-5 + math.sin(q.anim_time * 360 + 0) * 3",
@@ -243,6 +229,27 @@
      "rotation": [
       "5 + math.sin(q.anim_time * 360 + 0) * 3",
       0,
+      0
+     ]
+    },
+    "tail": {
+     "rotation": [
+      "math.sin(q.anim_time * 360 + 0) * 5",
+      "math.sin(q.anim_time * 360 + 0) * 11",
+      0
+     ]
+    },
+    "tail2": {
+     "rotation": [
+      "math.sin(q.anim_time * 360 + 45) * 6.25",
+      "math.sin(q.anim_time * 360 + 45) * 13.75",
+      0
+     ]
+    },
+    "tail3": {
+     "rotation": [
+      "math.sin(q.anim_time * 360 + 90) * 7.5",
+      "math.sin(q.anim_time * 360 + 90) * 16.5",
       0
      ]
     },
@@ -364,15 +371,22 @@
     },
     "tail": {
      "rotation": [
-      "math.sin(q.anim_time * 900 + 0) * 6",
-      "math.sin(q.anim_time * 450 + 0) * 16",
+      "math.sin(q.anim_time * 450 + 0) * 5",
+      "math.sin(q.anim_time * 450 + 0) * 13",
       0
      ]
     },
     "tail2": {
      "rotation": [
-      "math.sin(q.anim_time * 900 + 60) * 6",
-      "math.sin(q.anim_time * 450 + 60) * 10",
+      "math.sin(q.anim_time * 450 + 45) * 6.25",
+      "math.sin(q.anim_time * 450 + 45) * 16.25",
+      0
+     ]
+    },
+    "tail3": {
+     "rotation": [
+      "math.sin(q.anim_time * 450 + 90) * 7.5",
+      "math.sin(q.anim_time * 450 + 90) * 19.5",
       0
      ]
     },

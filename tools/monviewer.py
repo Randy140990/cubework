@@ -15,7 +15,8 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Sea tapirs", ["squirtle", "wartortle", "blastoise"]), ("Quails", ["pidgey", "pidgeotto", "pidgeot"]),
             ("Jerboas", ["rattata", "raticate"]), ("Quill porcupines ♀", ["nidoran_f", "nidorina", "nidoqueen"]),
             ("Quill porcupines ♂", ["nidoran_m", "nidorino", "nidoking"]), ("Mongooses", ["mankey", "primeape"]), ("Shrikes", ["spearow", "fearow"]),
-            ("Gliders", ["pichu", "pikachu", "raichu"])]
+            ("Gliders", ["pichu", "pikachu", "raichu"]), ("Leaf grubs", ["caterpie", "metapod", "butterfree"]),
+            ("Lance wasps", ["weedle", "kakuna", "beedrill"])]
 KEEP = ("idle", "ground")
 
 
@@ -141,6 +142,8 @@ def write_moves(path):
 
 def main(out_path):
     rows = species_rows()
+    # In Pokedex order (a line goes where its first Kanto member does: the gliders with Pikachu).
+    FAMILIES.sort(key=lambda f: min((rows[s]["dex"] for s in f[1] if rows[s]["dex"] <= 151), default=rows[f[1][0]]["dex"]))
     data = {"families": [], "species": {}}
     for fam, members in FAMILIES:
         data["families"].append({"name": fam, "members": members})

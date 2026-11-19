@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from monlib import (CLEAR, Cube, Mat, Model, OUT_MODELS, FRAMES, blob, cell, face_blob, hash01, mix, ramp, rgb, track, wave, keys,  # noqa: E402
                     merge, away, write, wind_mat, burst_mat)
 from monanims import four_legs, bird  # noqa: E402
-from mons import (stout_legs, fx_for, fly_out, talon_mat, trousers, quail_feet, folded_wing, feather_plane,  # noqa: E402
+from mons import (stout_legs, fx_for, fly_out, talon_mat, trousers, quail_feet, folded_wing, jointed_wing, feather_plane,  # noqa: E402
                   jaw_teeth, attack_move)
 
 
@@ -464,9 +464,7 @@ def shrike(sid, name, stands, stage):
     m.eyes("head", 2.25 * s, (8.3 + hy) * s, (-6 + hz) * s, h=3 if stage == 0 else 3, corner=(1, 2) if stage == 0 else (1, 3), half=2.25 * s,
            iris="#B8401E", pupil="#100808", skin=MASK, iris_light="#F09040", grid=["DLL", "WPI", ".JJ"] if stage == 0 else ["SDLL", "LPPW", ".JJI"])
     nsec, npri = (3, 2) if stage == 0 else (5, 4)
-    folded_wing(m, 3 * s, 7.6 * s, -3.4 * s, n(6.5 * s), n(2.5 * s), 1,
-                [(i * 1.2 * s, n(2 * s), n(3 * s)) for i in range(nsec)],
-                [(i * 1.1 * s, n(2 * s), n((4.5 + 0.5 * i) * s)) for i in range(npri)], cov, sec, pri)
+    jointed_wing(m, 3 * s, 7.6 * s, -3.4 * s, n(6.5 * s), (2.5 * s, 2.5 * s, 2 * s, 3.5 * s), sec, sec, pri, arm=cov, thick=1 if stage == 0 else 1.5)
     if stage == 1:
         # A breast of scalloped feathers.
         breast = Mat(BREAST, lambda a: mix(BREAST, "#D8C8AE", 0.5) if (a.col + 2 * a.row) % 4 == 0 else None, noise=0.02, edge=0)
@@ -607,8 +605,9 @@ def glider(sid, name, stands, stage):
             Cube([ex, ey, ez + 0.06], [ewn, ehn, 0], Mat(FUR, ear_back, noise=0.015, edge=0))],
            rotation=[-8, -15, -25 if stage < 2 else -12])
     if stage < 2:
-        m.eyes("head", x_inner=0.45 * s, y=5.4 * s * (1.04 if stage == 0 else 1.0), z=-7.5 * s, w=2 if stage == 1 else 3, h=3, iris="#2A1A12",
-               pupil="#0A0604", skin=FUR, iris_light="#6A4A30", grid=["LL", "PW", "PP"] if stage == 1 else ["SLS", "PPW", "SPS"])
+        # Small button eyes on the baby (dark, with a glint), the same shape a little bigger when it grows.
+        m.eyes("head", x_inner=0.45 * s if stage == 1 else 0.9, y=5.4 * s * (1.04 if stage == 0 else 1.0), z=-7.5 * s, w=2, h=3 if stage == 1 else 2,
+               iris="#2A1A12", pupil="#0A0604", skin=FUR, iris_light="#6A4A30", grid=["LL", "PW", "PP"] if stage == 1 else ["PW", "PP"])
     else:
         m.eyes("head", x_inner=0.5 * s, y=5.6 * s, z=-7.5 * s, w=3, h=2, iris="#2A1A12", pupil="#0A0604", skin=FUR, iris_light="#7A5030",
                grid=["DLL", "PPW"])

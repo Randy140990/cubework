@@ -18,7 +18,7 @@ MONS = os.path.join(ROOT, "mons")
 ORDER = ["bulbasaur", "charmander", "squirtle", "pidgey", "rattata"]
 ALL = ["bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon", "charizard", "squirtle", "wartortle", "blastoise", "pidgey", "pidgeotto", "pidgeot",
        "rattata", "raticate", "nidoran_f", "nidorina", "nidoqueen", "nidoran_m", "nidorino", "nidoking", "mankey", "primeape", "spearow", "fearow",
-       "pichu", "pikachu", "raichu"]
+       "pichu", "pikachu", "raichu", "caterpie", "metapod", "butterfree", "weedle", "kakuna", "beedrill"]
 TYPES = {"bulbasaur": ("GRASS", "#4FA64A"), "charmander": ("FIRE", "#E8662C"), "squirtle": ("WATER", "#2F74BA"), "pidgey": ("NORMAL · FLYING", "#8C80A8"),
          "rattata": ("NORMAL", "#B7864A")}
 FONT = "/usr/share/fonts/truetype/google-fonts/Poppins-Bold.ttf"
