@@ -34,6 +34,7 @@ h1 span { color: var(--accent) }
 .pick select { font: inherit; font-size: 15px; font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
   padding: 7px 14px; min-width: 0; max-width: 100%; cursor: pointer }
 .pick select:focus-visible, .seg button:focus-visible, .stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.carinfo { color: var(--muted); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 9ch }
 .moverow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px }
 .cat { font-size: 11.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted) }
 .learn { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none }
@@ -101,11 +102,15 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 80
   <div class="top">
     <div class="seg" id="mode" role="group" aria-label="View"><button data-v="creatures" aria-pressed="true">Creatures</button><button data-v="moves" aria-pressed="false">Moves</button></div>
     <label class="pick" id="pickWrap"><span>Creature</span><select id="pick" aria-label="Creature"></select></label>
+    <div class="seg" id="car" role="group" aria-label="Go through them all">
+      <button id="prev" title="Previous (left arrow)">&#9664; Previous</button><button id="play" aria-pressed="false" title="Play all, or pause (space)">Play all</button><button id="next" title="Next (right arrow)">Next &#9654;</button>
+    </div>
+    <label class="pick"><span>Hold</span><select id="hold" aria-label="Seconds on each"><option value="5">5 s</option><option value="10" selected>10 s</option><option value="15">15 s</option><option value="20">20 s</option></select></label>
+    <span class="carinfo" id="carinfo"></span>
   </div>
   <div class="moverow" id="moverow" hidden>
     <label class="pick"><span>Move</span><select id="movePick" aria-label="Move"></select></label>
-    <div class="seg" role="group" aria-label="Step through"><button id="prev">Previous</button><button id="replay">Replay</button><button id="next">Next</button></div>
-    <div class="seg" role="group" aria-label="Play all"><button id="all" aria-pressed="false">Play all in turn</button></div>
+    <div class="seg" role="group" aria-label="Replay"><button id="replay">Replay</button></div>
     <label class="pick"><span>Performed by</span><select id="performer" aria-label="Performed by"></select></label>
     <div class="seg" id="stageSeg" role="group" aria-label="Evolution stage"><button data-v="1">Stage 1</button><button data-v="2">Stage 2</button><button data-v="3">Stage 3</button></div>
   </div>
@@ -383,6 +388,7 @@ function sizeOf(model) {
 }
 function place() {
   stopPlay();
+  if (typeof carReset === "function" && state.mode === "creatures") carReset();
   for (const k of Object.keys(cache)) { stage.remove(cache[k].theirs.holder); stage.remove(cache[k].ours.holder); }
   if (ghosts) { stage.remove(ghosts.perf.holder); stage.remove(ghosts.tgt.holder); }
   const pair = build(state.sid);
@@ -626,7 +632,6 @@ function updatePlay(now) {
   let t = (now - play.t0) / 1000;
   if (t > play.end + 0.9) {
     // A pause, then again (or on to the next move).
-    if (state.mode === "moves" && state.all) { nextMove(1); return; }
     play.t0 = now; t = 0;
   }
   const P = play, hz = P.Rb + 0.08, tb0 = t - P.bo;
@@ -659,6 +664,7 @@ function startCreatureMove(k) {
 let moveCur = null;
 function perfStage(perf) { return state.performer === "ghost" ? state.stg : (perf.info.stage || 2); }
 function placeMoves() {
+  carReset();
   if (!MOVES) { $("#panel").innerHTML = `<p class="note">Loading the move effects…</p>`; return; }
   for (const k of Object.keys(cache)) { stage.remove(cache[k].theirs.holder); stage.remove(cache[k].ours.holder); }
   const g = ghostPair();
@@ -722,7 +728,6 @@ function renderMoveRow() {
     b.setAttribute("aria-pressed", String(+b.dataset.v === stg));
     b.disabled = state.performer !== "ghost";
   }
-  $("#all").setAttribute("aria-pressed", String(state.all));
 }
 function renderMovePanel() {
   const m = MOVE_BY_ID[state.move], perf = moveCur && moveCur.perf;
@@ -769,10 +774,52 @@ function setMode(mode) {
   else { state.act = null; place(); }
 }
 for (const b of document.querySelectorAll("#mode button")) b.onclick = () => setMode(b.dataset.v);
-$("#prev").onclick = () => nextMove(-1);
-$("#next").onclick = () => nextMove(1);
 $("#replay").onclick = () => { if (play) play.t0 = performance.now(); };
-$("#all").onclick = () => { state.all = !state.all; renderMoveRow(); };
+
+// ---------- going through them all: each creature (or move) held a while, then the next ----------
+const CREATURE_ORDER = DATA.families.flatMap(f => f.members);
+const car = { on: false, paused: false, hold: 10, start: performance.now(), left: 10, shown: null };
+function carItems() { return state.mode === "moves" ? MOVE_ORDER : CREATURE_ORDER; }
+function carGo(d) {
+  if (state.mode === "moves") { nextMove(d); return; }
+  const L = CREATURE_ORDER, i = L.indexOf(state.sid);
+  state.sid = L[((i + d) % L.length + L.length) % L.length]; state.fam = famOf(state.sid);
+  renderPickers(); place();
+}
+function carReset() { car.start = performance.now(); car.left = car.hold; car.shown = null; renderCar(); }
+function renderCar() {
+  const L = carItems(), i = L.indexOf(state.mode === "moves" ? state.move : state.sid);
+  const b = $("#play");
+  b.textContent = !car.on ? "Play all" : car.paused ? "Resume" : "Pause";
+  b.setAttribute("aria-pressed", String(car.on && !car.paused));
+  const left = car.on && !car.paused ? Math.max(0, Math.ceil(car.hold - (performance.now() - car.start) / 1000)) : null;
+  $("#carinfo").textContent = `${i + 1} of ${L.length}` + (left !== null ? ` \u00B7 next in ${left} s` : car.on ? " \u00B7 paused" : "");
+}
+function carTick(now) {
+  if (!car.on || car.paused) return;
+  const left = car.hold - (now - car.start) / 1000;
+  if (left <= 0) { carGo(1); return; }
+  const sec = Math.ceil(left);
+  if (sec !== car.shown) { car.shown = sec; renderCar(); }
+}
+function togglePlay() {
+  const now = performance.now();
+  if (!car.on) { car.on = true; car.paused = false; car.start = now; }
+  else if (!car.paused) { car.paused = true; car.left = Math.max(0, car.hold - (now - car.start) / 1000); }
+  else { car.paused = false; car.start = now - (car.hold - car.left) * 1000; }
+  car.shown = null; renderCar();
+}
+$("#play").onclick = togglePlay;
+$("#prev").onclick = () => carGo(-1);
+$("#next").onclick = () => carGo(1);
+$("#hold").onchange = () => { car.hold = +$("#hold").value; carReset(); };
+document.addEventListener("keydown", e => {
+  const t = e.target;
+  if (t && t.closest && t.closest("select, input, textarea")) return;
+  if (e.key === "ArrowRight") { carGo(1); e.preventDefault(); }
+  else if (e.key === "ArrowLeft") { carGo(-1); e.preventDefault(); }
+  else if (e.key === " " && !(t && t.closest && t.closest("button"))) { togglePlay(); e.preventDefault(); }
+});
 for (const b of document.querySelectorAll("#stageSeg button")) b.onclick = () => { state.stg = +b.dataset.v; placeMoves(); };
 
 // ---------- labels under each model ----------
@@ -803,6 +850,7 @@ function frame(now) {
   const tA = Math.max(0, (now - ta) / 1000);
   let flash = 0, toast = "";
   for (const b of Object.values(balls)) { b.g.visible = false; b.beam.visible = false; }
+  carTick(now);
   if (state.mode === "moves") frameMoves(now);
   else if (cur) {
     updatePlay(now);
