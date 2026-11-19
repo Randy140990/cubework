@@ -875,10 +875,10 @@ public class BattleScreen extends GameScreen {
 	 * the name, male or female, any status, and the level; the HP bar (and for yours the numbers and the EXP); the
 	 * party's balls above it.
 	 */
-	private void plate(GuiGraphics g, Side sd, boolean mine) {
-		float x = mine ? 36 : 820, y = mine ? 560 : 36, w = mine ? 470 : 420, h = mine ? 118 : 92, px = x + 22;
+	private void plate(GuiGraphics g, Side sd, boolean ours) {
+		float x = ours ? 36 : 820, y = ours ? 560 : 36, w = ours ? 470 : 420, h = ours ? 118 : 92, px = x + 22;
 		V.panel(g, x, y, w, h, 22, false);
-		float ty = y + (mine ? 14 : 12);
+		float ty = y + (ours ? 14 : 12);
 		V.text(g, sd.name, px, ty, 27, V.TEXT, true);
 		float nx = px + V.width(sd.name, 27, true) + 10;
 		if (!sd.gender.isEmpty()) {
@@ -894,9 +894,9 @@ public class BattleScreen extends GameScreen {
 		V.right(g, "Lv. " + sd.level, x + w - 22, ty + 5, 21, V.TEXT, true);
 		float hy = ty + 34 + 8, frac = Math.max(0, Math.min(1, sd.hp / Math.max(1F, sd.max)));
 		V.text(g, "HP", px, hy + 2, 14, V.GOLD, true);
-		float bw = mine ? 260 : 320;
+		float bw = ours ? 260 : 320;
 		V.bar(g, px + 32, hy + 3, bw, 14, frac, V.hpColour(frac));
-		if (mine) {
+		if (ours) {
 			V.text(g, Math.round(sd.hp) + "/" + sd.max, px + 32 + bw + 12, hy - 1, 20, V.TEXT, true);
 			Species sp = Species.ALL.get(sd.species);
 			float ef = 0;
@@ -910,10 +910,10 @@ public class BattleScreen extends GameScreen {
 			if (ef > 0) V.pill(g, px + 42, ey + 1, Math.max(7, (w - 44 - 42) * ef), 7, 0xFF6FC3FF);
 		}
 		// The party's balls above the plate: one for each (grey if it's fainted).
-		List<Mon> party = mine ? mine : theirs;
-		if (!mine && kind.equals("WILD")) return;
+		List<Mon> party = ours ? mine : theirs;
+		if (!ours && kind.equals("WILD")) return;
 		for (int i = 0; i < party.size() && i < 6; i++) {
-			float bx = mine ? x + 18 + i * 26 : x + w - 18 - 22 - i * 26;
+			float bx = ours ? x + 18 + i * 26 : x + w - 18 - 22 - i * 26;
 			V.icon(g, "icon_ball", bx, y - 30, 22, party.get(i).fainted() ? 0x73808890 : 0xFFFFFFFF);
 		}
 	}

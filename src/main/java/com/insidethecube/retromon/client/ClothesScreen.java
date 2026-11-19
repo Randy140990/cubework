@@ -71,72 +71,30 @@ public class ClothesScreen extends GameScreen {
 		done();
 	}
 
-	@Override
-	protected boolean key(KeyEvent e) {
-		int n = ROW_NAMES.length + 1;
-		if (Ui.isUp(e)) row = Math.floorMod(row - 1, n);
-		else if (Ui.isDown(e)) row = Math.floorMod(row + 1, n);
-		else if (row < ROW_NAMES.length && (Ui.isLeft(e) || Ui.isRight(e))) change(row, Ui.isLeft(e) ? -1 : 1);
-		else if (Ui.isA(e)) {
-			if (row == ROW_NAMES.length) done();
-			else change(row, 1);
-		} else if (Ui.isB(e)) back();
-		return true;
+	/** The UI Viewer's maker, with the clothes alone: UNDO puts back what you came in with. */
+	private Maker maker;
+
+	private Maker maker() {
+		if (maker == null) {
+			boolean girl = "girl".equals(ClientState.data.gender);
+			maker = new Maker(outfit, girl, new String[] {"clothes"}, "UNDO", this::undo, this::back, () -> preview = maker.outfit.write());
+		}
+		return maker;
 	}
 
 	@Override
+	protected boolean key(KeyEvent e) {
+		maker().key(e);
+		return true;
+	}
+
+	/** You on a stand at the right, turning gently; the maker's cards of clothes on the left (as the viewer has it). */
+	@Override
 	protected void draw(GuiGraphics g, float partial) {
-		// The world behind, frosted.
-		if (minecraft != null && minecraft.options.getMenuBackgroundBlurriness() > 0) g.blurBeforeThisStratum();
-		g.fill(0, 0, width, height, 0x990A1C20);
-		if (minecraft != null) {
-			mouseX = (float) (minecraft.mouseHandler.xpos() * width / Math.max(1, minecraft.getWindow().getScreenWidth()));
-			mouseY = (float) (minecraft.mouseHandler.ypos() * height / Math.max(1, minecraft.getWindow().getScreenHeight()));
-		}
-		int m = 8 * s;
-		// You, on a soft spotlight.
-		int pw = Math.min(width / 2 - m, 150 * s), ph = height - 2 * m;
-		Ui.panel(g, m, m, pw, ph, s);
-		Ui.round(g, m + pw / 2 - 40 * s, m + ph - 34 * s, 80 * s, 14 * s, 0x40FFF4D8, 7 * s);
-		if (minecraft != null && minecraft.player != null) {
-			InventoryScreen.renderEntityInInventoryFollowsMouse(g, m + 6 * s, m + 6 * s, m + pw - 6 * s, m + ph - 20 * s, (int) (ph * 0.36F), 0.0625F,
-					mouseX, mouseY, minecraft.player);
-		}
-		Ui.heading(g, font, "CLOTHES", m + 10 * s, m + 8 * s, Ui.TEXT, s);
-		// The rows.
-		int x = m + pw + 8 * s, w = width - x - m, y0 = m;
-		int pitch = Math.max(11 * s, Math.min(17 * s, (height - 2 * m - 40 * s) / ROW_NAMES.length)), rh = pitch - 2 * s;
-		boolean cap = Outfit.HATS[Math.floorMod(outfit.get("hat"), Outfit.HATS.length)].equals("cap");
-		for (int r = 0; r < ROW_NAMES.length; r++) {
-			int y = y0 + r * pitch;
-			boolean on = r == row;
-			if (over(x, y, w, rh)) row = r;
-			Ui.pill(g, x, y, w, rh, on, s);
-			String part = Outfit.PARTS[r];
-			// The cap's own rows only matter with the cap on.
-			boolean idle = !cap && (part.equals("capp") || part.equals("capb"));
-			int ty = y + Math.max(s, (rh - 8 * s) / 2);
-			Ui.draw(g, font, Ui.bold(ROW_NAMES[r]), x + 8 * s, ty, on ? Ui.CREAM_INK : idle ? Ui.DIM : Ui.TEXT, s, false);
-			int val = outfit.get(part);
-			String label = Outfit.label(part, Math.floorMod(val, Outfit.options(part)));
-			int vx = x + w - 92 * s;
-			if (!part.equals("skin") && (part.endsWith("c") || part.equals("shoec"))) {
-				int col = 0xFF000000 | Outfit.COLOURS[Math.floorMod(val, Outfit.COLOURS.length)];
-				Ui.round(g, vx + 12 * s, ty - s, 9 * s, 9 * s, col, 2 * s);
-			}
-			Ui.triangle(g, vx + 4 * s, ty + 4 * s, 7 * s, 3, on ? Ui.CREAM_INK : Ui.MUTED);
-			Ui.draw(g, font, Ui.bold(label), vx + 26 * s, ty, on ? Ui.CREAM_INK : idle ? Ui.DIM : Ui.TEXT, s, false);
-			Ui.triangle(g, x + w - 8 * s, ty + 4 * s, 7 * s, 1, on ? Ui.CREAM_INK : Ui.MUTED);
-			int rr = r;
-			hit(vx - 2 * s, y, 12 * s, rh, () -> change(rr, -1));
-			hit(vx + 12 * s, y, w - (vx - x) - 12 * s, rh, () -> change(rr, 1));
-		}
-		int by = y0 + ROW_NAMES.length * pitch + 4 * s, bw = (w - 4 * s) / 2;
-		boolean onDone = row == ROW_NAMES.length;
-		Ui.button(g, font, x, by, bw, 16 * s, "DONE", Ui.GREEN, onDone || over(x, by, bw, 16 * s), s);
-		hit(x, by, bw, 16 * s, this::done);
-		Ui.button(g, font, x + bw + 4 * s, by, bw, 16 * s, "UNDO", 0xFF5A6070, over(x + bw + 4 * s, by, bw, 16 * s), s);
-		hit(x + bw + 4 * s, by, bw, 16 * s, this::undo);
-		Ui.text(g, font, "Up/down: pick   Left/right: change   B: done", x, by + 22 * s, Ui.DIM, s);
+		Scenes.backdrop(g, "clothes");
+		boolean girl = "girl".equals(ClientState.data.gender);
+		Scenes.stand(g, (ticks + partial) / 20F, Scenes.you(preview == null ? outfit.write() : preview, girl), -1.95, 0, true);
+		maker().draw(g, this::vhit, (ticks + partial) / 20F);
+		V.hints(g, "A", "Choose", "B", "Keep and close");
 	}
 }

@@ -265,6 +265,11 @@ public final class TownMap {
 		for (int z = Math.max(0, z0); z < Math.min(R, z1); z++) {
 			for (int x = Math.max(0, x0); x < Math.min(R, x1); x++) {
 				int i = z * R + x, wx = bx + x, wz = bz + z;
+				// The little island off the north coast (north of Cerulean's cape) stays off the map, as asked.
+				if (wx >= -675 && wx <= -515 && wz >= 35 && wz <= 119) {
+					out[i] = SEA;
+					continue;
+				}
 				byte k = r.kinds[r.id[i]];
 				int c = r.colours[r.id[i]];
 				int h = r.y[i];
@@ -340,6 +345,27 @@ public final class TownMap {
 						or *= 0.7F;
 						og *= 0.7F;
 						ob *= 0.7F;
+					}
+				} else if (k == GROUND) {
+					// Cliffs in earth browns (as the old maps draw ledges), not grass green: the ground at the foot of a
+					// drop of 2 or more, and its rim.
+					int up = -64, low = 999;
+					for (int d = 1; d <= 2; d++) {
+						up = Math.max(up, Math.max(Math.max(heightAt(wx + d, wz), heightAt(wx - d, wz)), Math.max(heightAt(wx, wz + d), heightAt(wx, wz - d))));
+					}
+					for (int[] o : new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+						int hh = heightAt(wx + o[0], wz + o[1]);
+						if (hh > -64) low = Math.min(low, hh);
+					}
+					float tone = clamp(1 + 0.05F * (h - heightAt(wx - 1, wz - 1)), 0.8F, 1.15F);
+					if (up - h >= 2) {
+						or = 176 * tone;
+						og = 128 * tone;
+						ob = 84 * tone;
+					} else if (h - low >= 2) {
+						or = or * 0.35F + 196 * tone * 0.65F;
+						og = og * 0.35F + 150 * tone * 0.65F;
+						ob = ob * 0.35F + 100 * tone * 0.65F;
 					}
 				}
 				out[i] = 0xFF000000 | (int) clamp(or, 0, 255) << 16 | (int) clamp(og, 0, 255) << 8 | (int) clamp(ob, 0, 255);

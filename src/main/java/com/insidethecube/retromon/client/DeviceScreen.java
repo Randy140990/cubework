@@ -39,9 +39,12 @@ public abstract class DeviceScreen extends GameScreen {
 			mx = mx0 - cx;
 			my = my0 - cy;
 			s = Device.scale(ch);
+			// The UI Viewer's canvas fits the device's screen.
+			V.fit(cw, ch);
 			try {
 				drawScreen(g, partial);
 			} finally {
+				V.fit(W, H);
 				g.pose().popMatrix();
 				g.disableScissor();
 				width = W;

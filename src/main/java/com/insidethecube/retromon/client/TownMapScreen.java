@@ -502,35 +502,102 @@ public class TownMapScreen extends DeviceScreen {
 		hit(zx, zy + zh - 12 * s, 12 * s, 12 * s, () -> zoomBy(1 / 1.5, mapW / 2.0, mapH / 2.0));
 	}
 
-	/** The picked place: its picture, its name, and FLY HERE for a town you've been to. */
+	/** The gyms (the UI Viewer's city panels): leader, type, badge number and their team's levels, by town. */
+	private static final java.util.Map<String, String[]> GYMS = java.util.Map.of("pewter_city", new String[] {"BROCK", "ROCK", "0", "12 to 14"}, "cerulean_city",
+			new String[] {"MISTY", "WATER", "1", "18 to 21"}, "vermilion_city", new String[] {"LT. SURGE", "ELECTRIC", "2", "18 to 24"}, "celadon_city",
+			new String[] {"ERIKA", "GRASS", "3", "24 to 29"}, "fuchsia_city", new String[] {"KOGA", "POISON", "4", "37 to 43"}, "saffron_city",
+			new String[] {"SABRINA", "PSYCHIC", "5", "37 to 43"}, "cinnabar_island", new String[] {"BLAINE", "FIRE", "6", "40 to 47"}, "viridian_city",
+			new String[] {"GIOVANNI", "GROUND", "7", "42 to 50"});
+	private static final String[] BADGE_NAMES = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
+	private static java.util.Map<String, List<String>> wild;
+
+	/** The wild POKéMON of a place (each once, in the order of the table). */
+	private static List<String> wildIn(String place) {
+		if (wild == null) {
+			java.util.Map<String, List<String>> m = new java.util.HashMap<>();
+			for (String[] r : com.insidethecube.retromon.engine.Species.table("wild.tsv")) {
+				if (r.length < 5 || r[0].startsWith("#")) continue;
+				List<String> l = m.computeIfAbsent(r[0], k -> new java.util.ArrayList<>());
+				for (String slot : r[4].split(",")) {
+					String sp = slot.split(":")[0].trim();
+					if (!sp.isEmpty() && !l.contains(sp)) l.add(sp);
+				}
+			}
+			wild = m;
+		}
+		return wild.getOrDefault(place, List.of());
+	}
+
+	/**
+	 * The picked place, as the UI Viewer's panel down the right: what kind of place, its name and the line from its
+	 * sign, its picture if you've been, its gym (leader, type, badge, levels), the wild POKéMON there, and FLY HERE
+	 * for a town you've been to.
+	 */
 	private void drawCard(GuiGraphics g) {
 		if (picked == null) return;
 		Places.Place pl = Places.get(picked);
 		String name = pl == null ? picked.toUpperCase().replace('_', ' ') : pl.name();
 		Point pt = points.get(placeToPoint.getOrDefault(picked, ""));
-		boolean town = pt != null && pt.kind().equals("town"), been = ClientState.data.visited.contains(picked);
-		int cw = Math.min(150 * s, width / 2), pich = cw * 9 / 16, ch = pich + 52 * s;
-		int x = 6 * s, y = height - ch - 16 * s;
-		Device.rounded(g, x + 2 * s, y + 3 * s, cw, ch, 6 * s, 0x50000000);
-		Device.rounded(g, x, y, cw, ch, 6 * s, 0xF8FBF5E6);
-		Identifier pic = Postcards.picture(picked);
-		int px = x + 4 * s, py = y + 4 * s, pw = cw - 8 * s;
-		if (pic != null) g.blit(RenderPipelines.GUI_TEXTURED, pic, px, py, 0, 0, pw, pich - 4 * s, 384, 216, 384, 216);
-		else {
-			g.fill(px, py, px + pw, py + pich - 4 * s, 0xFF2A3350);
-			Ui.centred(g, font, been ? "No picture yet" : "Not been here yet", px + pw / 2, py + (pich - 4 * s) / 2 - 4 * s, Ui.MUTED, s, false);
+		boolean town = pt != null && pt.kind().equals("town"), been = ClientState.data.visited.contains(picked), here = picked.equals(ClientState.data.place);
+		float x = 940, y = 20, w = 320, h = 626, px = x + 24;
+		V.panel(g, x, y, w, h);
+		vhit(x, y, w, h, () -> {
+		});
+		V.label(g, here ? "You are here" : town ? "Town" : pt != null && pt.kind().equals("route") ? "Route" : "Place", px, y + 22);
+		V.text(g, name, px, y + 42, name.length() > 14 ? 27 : 32, V.TEXT, true);
+		float cy = y + 42 + 44;
+		String line = Adventure.signLine(name);
+		if (!line.isEmpty()) {
+			for (String l : V.wrap("\"" + line + "\"", w - 48, 18, true)) {
+				V.text(g, l, px, cy, 18, 0xFFE8F4EF, true);
+				cy += 26;
+			}
+			cy += 6;
 		}
-		int ty = y + pich + 2 * s;
-		Ui.draw(g, font, Ui.bold(name), x + 8 * s, ty, Ui.CREAM_INK, s, false);
-		Ui.draw(g, font, Ui.ui((town ? "Town" : pt != null && pt.kind().equals("route") ? "Route" : "Place") + (been ? "  ·  Visited" : "")), x + 8 * s,
-				ty + 11 * s, 0xFF7A849E, s, false);
-		if (picked.equals(ClientState.data.place)) Ui.draw(g, font, Ui.ui("You are here."), x + 8 * s, ty + 22 * s, 0xFFE5394A, s, false);
+		Identifier pic = Postcards.picture(picked);
+		if (pic != null) {
+			float pw = w - 48, ph = pw * 9 / 16;
+			V.rr(g, px - 2, cy - 2, pw + 4, ph + 4, 14, 0x33000000);
+			V.img(g, pic, px, cy, pw, ph, 384, 216, 0xFFFFFFFF);
+			cy += ph + 14;
+		}
+		String[] gym = GYMS.get(picked);
+		if (gym != null) {
+			V.label(g, "Gym", px, cy);
+			cy += 22;
+			V.rr(g, px, cy, w - 48, 86, 16, 0x2E000000);
+			int b = Integer.parseInt(gym[2]);
+			V.icon(g, "badge_" + b, px + 12, cy + 14, 58);
+			V.text(g, gym[0], px + 82, cy + 10, 19, V.TEXT, true);
+			V.text(g, gym[1] + " type · " + BADGE_NAMES[b], px + 82, cy + 38, 13, V.MUTED, true);
+			V.text(g, "Team from level " + gym[3], px + 82, cy + 58, 13, 0xFFE8F4EF, true);
+			cy += 86 + 16;
+		}
+		List<String> wl = wildIn(picked);
+		if (!wl.isEmpty()) {
+			V.label(g, "Wild POKéMON", px, cy);
+			cy += 22;
+			int per = 4, max = gym != null ? 4 : 8;
+			float cell = (w - 48 - 3 * 6) / per;
+			for (int i = 0; i < Math.min(max, wl.size()); i++) {
+				float cx = px + (i % per) * (cell + 6), cyy = cy + (i / per) * (cell + 6);
+				V.rr(g, cx, cyy, cell, cell, 12, 0x2E000000);
+				V.img(g, Look.portrait(wl.get(i)), cx + 6, cyy + 6, cell - 12, cell - 12, 128, 128, 0xFFFFFFFF);
+			}
+		}
+		// FLY HERE (a town you've been to), or not been yet.
+		float by = y + h - 22 - 46;
 		if (town) {
 			boolean ok = flyable(picked) && canFly();
-			int bw = 62 * s, bx = x + cw - bw - 6 * s, by = y + ch - 18 * s;
-			Ui.button(g, font, bx, by, bw, 13 * s, "FLY HERE", ok ? 0xFF4A8FE0 : 0xFF8A90A0, ok && over(bx, by, bw, 13 * s), s);
-			String place = picked;
-			if (ok) hit(bx, by, bw, 13 * s, () -> flyTo(place));
+			if (been && ok) {
+				V.pill(g, px, by, w - 48, 46, V.CREAM);
+				V.centred(g, "A: FLY HERE", x + w / 2, by + 13, 17, V.INK, true);
+				String place = picked;
+				vhit(px, by, w - 48, 46, () -> flyTo(place));
+			} else {
+				V.ring(g, px, by, w - 48, 46, 23, 2, 0x598FF5C0);
+				V.centred(g, been ? "Can't fly from here" : "Not been here yet", x + w / 2, by + 14, 15, Ui.alpha(V.TEXT, 0.7F), true);
+			}
 		}
 	}
 

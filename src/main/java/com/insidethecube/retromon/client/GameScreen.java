@@ -76,7 +76,7 @@ public abstract class GameScreen extends Screen {
 
 	/** Something clickable on the viewer's canvas (V): its box in canvas pixels. */
 	protected void vhit(float x, float y, float w, float h, Runnable click) {
-		hit(Math.round(V.x(x)) - ox, Math.round(V.y(y)) - oy, Math.round(V.s(w)), Math.round(V.s(h)), click);
+		hit(Math.round(V.x(x)), Math.round(V.y(y)), Math.round(V.s(w)), Math.round(V.s(h)), click);
 	}
 
 	/** Whether the mouse is over a box on the viewer's canvas. */

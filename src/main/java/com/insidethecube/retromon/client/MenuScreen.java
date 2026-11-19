@@ -379,12 +379,11 @@ public class MenuScreen extends DeviceScreen {
 			case PARTY, PARTY_ACTION, USE_ON -> {
 				drawParty(g, d);
 				String hint = view == View.USE_ON ? "Use on which POKéMON?" : swapFrom >= 0 ? "Move to where?" : "Choose a POKéMON.";
-				TextBox.still(hint).render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, false);
+				TextBox.still(hint).renderV(g, font, 140, 26, 1000, ticks, partial, false);
 				if (view == View.PARTY_ACTION) {
 					Choice c = new Choice(List.of("SUMMARY", "SWITCH", "FOLLOW ME", "CANCEL"));
 					c.at = actionAt;
-					int w = c.width(font, s);
-					choice(g, c, width - w - m, height - h - m - c.height(s) - 4 * s, w, this::partyAction);
+					vchoice(g, c, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(c.options.size()), 300, this::partyAction);
 					actionAt = c.at;
 				}
 			}
@@ -394,88 +393,74 @@ public class MenuScreen extends DeviceScreen {
 				if (view == View.BAG_ACTION) {
 					Choice c = new Choice(List.of("USE", "CANCEL"));
 					c.at = actionAt;
-					int w = c.width(font, s);
-					choice(g, c, width - w - m, height - h - m - c.height(s) - 4 * s, w, this::bagAction);
+					vchoice(g, c, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(c.options.size()), 300, this::bagAction);
 					actionAt = c.at;
 				}
 			}
 			case CARD -> drawCard(g, d);
 			case SAVE -> {
-				TextBox.still("Would you like to save the game?").render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, false);
-				int w = yesNo.width(font, s);
-				choice(g, yesNo, width - w - m, height - h - m - yesNo.height(s) - 4 * s, w, i -> {
+				TextBox.still("Would you like to save the game?").renderV(g, font, 140, 26, 1000, ticks, partial, false);
+				vchoice(g, yesNo, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), 300, i -> {
 					if (i == 0) save();
 					else view = View.MENU;
 				});
 			}
 			case OPTION -> drawOptions(g, d);
 			case WAIT -> {
-				TextBox.still("Wait until when?").render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, false);
-				int w = waitChoice.width(font, s);
-				choice(g, waitChoice, width - w - m, height - h - m - waitChoice.height(s) - 4 * s, w, this::waitUntil);
+				TextBox.still("Wait until when?").renderV(g, font, 140, 26, 1000, ticks, partial, false);
+				vchoice(g, waitChoice, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(waitChoice.options.size()), 300, this::waitUntil);
 			}
 			case MESSAGE -> {
 				if (afterMessage == View.BAG) drawBag(g, d);
 				else if (afterMessage == View.PARTY) drawParty(g, d);
 				else drawMenu(g);
-				message.render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, true);
+				message.renderV(g, font, 140, 26, 1000, ticks, partial, true);
 			}
 			default -> {
 			}
 		}
 	}
 
+	/** What each tile does, in a line (the UI Viewer's words). */
+	private static final String[] LINES = {"Every POKéMON you've seen and caught.", "Your team: check them, switch them, pick who follows you.", "Your items, in four pockets.",
+			"The TOWN MAP: where you are, and where everywhere else is.", "Change what you're wearing.", "Your TRAINER CARD and badges.",
+			"Let time pass, to morning, midday, evening or night.", "Save your game.", "Text speed, music, nights and more.", "Close the menu."};
+	private static final String[] TILE_ICONS = {"icon_dex", "icon_ball", "icon_bag", "icon_map", "icon_cap", "icon_card", "icon_clock", "icon_save", "icon_cog", "icon_close"};
+
 	/**
-	 * The home screen: a greeting, the apps as round buttons (the picked one grows, with a white ring), and your
-	 * party along the bottom with their HP.
+	 * The menu, as the UI Viewer's: MENU at the top, the ten big round tiles in two rows of five (our own symbols on
+	 * teal; the one you're on cream, lifted and glowing), what it does in a panel underneath.
 	 */
 	private void drawMenu(GuiGraphics g) {
 		PlayerData d = ClientState.data;
-		int m = 8 * s;
-		Ui.draw(g, font, Ui.bold("Hello, " + name() + "!"), m + 2 * s, m, Ui.TEXT, s, true);
-		Ui.right(g, font, "BADGES " + d.badges.size() + (d.hasDex() ? "   POKéDEX " + d.caught.size() : ""), width - m - 2 * s, m, Ui.MUTED, s);
-		int rows = (ITEMS.length + COLS - 1) / COLS;
-		int partyH = d.party.isEmpty() ? 0 : 30 * s;
-		int top = m + 16 * s, avail = height - top - partyH - 14 * s;
-		int cell = Math.min((width - 2 * m) / COLS, Math.max(30 * s, avail / rows));
-		int dia = Math.min(cell - 18 * s, 44 * s);
-		int gridW = cell * COLS, x0 = (width - gridW) / 2, y0 = top + Math.max(0, (avail - rows * cell) / 2);
+		Scenes.backdrop(g, "night");
+		V.centred(g, "M E N U", 640, 30, 30, V.TEXT, true);
 		for (int i = 0; i < ITEMS.length; i++) {
-			int cx = x0 + (i % COLS) * cell + cell / 2, cy = y0 + (i / COLS) * cell + dia / 2 + 2 * s;
-			int idx = i;
-			boolean hover = over(cx - cell / 2, cy - dia / 2 - 2 * s, cell, cell);
-			if (hover && view == View.MENU) menuAt = i;
-			boolean on = i == menuAt && view == View.MENU;
+			float tx = 110 + (i % 5) * 220, ty = 130 + (i / 5) * 230;
 			boolean off = ITEMS[i].equals("POKéDEX") && !d.hasDex() || ITEMS[i].equals("POKéMON") && d.party.isEmpty();
-			int r = dia / 2 + (on ? 2 * s : 0);
-			int col = off ? 0xFF4A5068 : COLORS[i];
-			Device.disc(g, cx, cy + 2 * s, r, r, 0x50000000);
-			if (on) Device.disc(g, cx, cy, r + 2 * s, r + 2 * s, 0xFFFFFFFF);
-			Device.disc(g, cx, cy, r, r, col);
-			Device.disc(g, cx, cy - r / 3, r * 3 / 4, r / 2, Ui.alpha(0xFFFFFFFF, 0.16F));
-			int ic = r + r / 4;
-			Ui.icon(g, "icon/" + ICONS[i], cx - ic / 2, cy - ic / 2, ic, off ? 0xFF9AA0B4 : 0xFFFFFFFF);
-			int ly = cy + r + 4 * s;
+			if (view == View.MENU && vover(tx + 10, ty, 160, 180)) menuAt = i;
+			boolean on = i == menuAt && view == View.MENU;
+			float lift = on ? -8 : 0, sc = on ? 1.08F : 1, ds = 120 * sc, dx = tx + 30 - (ds - 120) / 2, dy = ty + lift - (ds - 120) / 2;
 			if (on) {
-				int lw = Ui.boldWidth(font, ITEMS[i], s) + 10 * s;
-				Ui.round(g, cx - lw / 2, ly - 2 * s, lw, 12 * s, Ui.CREAM, 3 * s);
-				Ui.draw(g, font, Ui.bold(ITEMS[i]), cx - lw / 2 + 5 * s, ly, Ui.CREAM_INK, s, false);
-			} else Ui.centred(g, font, ITEMS[i], cx, ly, off ? Ui.DIM : Ui.TEXT, s, true);
-			if (view == View.MENU) hit(cx - cell / 2, cy - dia / 2 - 2 * s, cell, cell, () -> pickMenu(idx));
-		}
-		// Your party, along the bottom.
-		if (!d.party.isEmpty()) {
-			int n = d.party.size(), pw = Math.min(54 * s, (width - 2 * m) / 6), px0 = (width - n * pw) / 2, py = height - partyH - 10 * s;
-			for (int i = 0; i < n; i++) {
-				Mon mon = d.party.get(i);
-				int px = px0 + i * pw;
-				Ui.round(g, px + 2 * s, py, pw - 4 * s, partyH - 2 * s, mon.fainted() ? 0x802A1A22 : 0x80243050, 3 * s);
-				Ui.portrait(g, mon.species.id(), px + 3 * s, py + s, 18 * s);
-				Ui.draw(g, font, Ui.ui("Lv" + mon.level), px + 22 * s, py + 4 * s, Ui.GOLD, s, false);
-				Ui.bar(g, px + 5 * s, py + partyH - 9 * s, pw - 14 * s, 3 * s, mon.hp / (float) Math.max(1, mon.maxHp()), Ui.hpColor(mon.hp / (float) Math.max(1, mon.maxHp())), s);
+				V.rr(g, dx - 5, dy - 5, ds + 10, ds + 10, 34 * sc + 5, 0x59FFF4D8);
+				V.shadow(g, dx, dy, ds, ds, 34 * sc, 1.4F);
+				V.rr(g, dx, dy, ds, ds, 34 * sc, 0xFFFFFFFF);
+				V.rr(g, dx + 3, dy + 3, ds - 6, ds - 6, 34 * sc - 3, V.CREAM);
+			} else {
+				V.shadow(g, dx, dy, ds, ds, 34, 0.8F);
+				V.rr(g, dx, dy, ds, ds, 34, V.EDGE);
+				V.rrv(g, dx + 3, dy + 3, ds - 6, ds - 6, 31, 0xF51D5A52, 0xF5123C38);
 			}
+			float is = 66 * sc;
+			V.icon(g, TILE_ICONS[i], dx + (ds - is) / 2, dy + (ds - is) / 2, is, off ? 0x80FFFFFF : 0xFFFFFFFF);
+			V.centred(g, ITEMS[i], tx + 90, ty + 120 + 8 + 2 + lift, 19, 0x80000000, true);
+			V.centred(g, ITEMS[i], tx + 90, ty + 120 + 8 + lift, 19, on ? V.CREAM : off ? V.DIM : V.TEXT, true);
+			int idx = i;
+			if (view == View.MENU) vhit(tx + 10, ty, 160, 180, () -> pickMenu(idx));
 		}
-		Ui.text(g, font, "Arrows: choose   A: open   B: put it away", m, height - 10 * s, Ui.DIM, s);
+		V.panel(g, 240, 600, 800, 58, 24, true);
+		V.centred(g, LINES[Math.max(0, Math.min(LINES.length - 1, menuAt))], 640, 615, 21, V.TEXT, true);
+		V.hints(g, "A", "Open", "B", "Close");
 	}
 
 	/** One Pokémon as a card: name, level, HP bar and numbers, status and types. */
@@ -697,48 +682,39 @@ public class MenuScreen extends DeviceScreen {
 	}
 
 	/** Your trainer card: your face (from your look), name, money, the Pokédex, time played and the badges. */
+	/**
+	 * Your TRAINER CARD, as the UI Viewer's: you on a stand at the left, the card at the right with your name, ID,
+	 * money, POKéDEX, play time, and the eight badges (our own designs; dark until you've won each).
+	 */
 	private void drawCard(GuiGraphics g, PlayerData d) {
-		int m = 8 * s, w = Math.min(width - 2 * m, 280 * s), h = Math.min(height - 2 * m, 150 * s), x = (width - w) / 2, y = (height - h) / 2;
+		Scenes.backdrop(g, "card");
+		float secs = (ticks) / 20F;
 		boolean girl = "girl".equals(d.gender);
-		int accent = girl ? 0xFFE86A9A : 0xFF4A8FE0;
-		Device.rounded(g, x + 2 * s, y + 4 * s, w, h, 8 * s, 0x50000000);
-		Device.rounded(g, x, y, w, h, 8 * s, 0xFFF6F1E4);
-		Device.rounded(g, x, y, w, 22 * s, 8 * s, accent);
-		g.fill(x, y + 14 * s, x + w, y + 22 * s, accent);
-		hit(x, y, w, h, () -> view = View.MENU);
-		Ui.draw(g, font, Ui.bold("TRAINER CARD"), x + 10 * s, y + 7 * s, 0xFFFFFFFF, s, true);
-		Ui.right(g, font, "IDNo. " + String.format("%05d", Math.abs(name().hashCode()) % 100000), x + w - 10 * s, y + 7 * s, 0xFFFFFFFF, s);
-		// Your face, from your look's head (the front of the head and the hat layer over it).
-		int ps = 46 * s, px = x + w - ps - 12 * s, py = y + 30 * s;
-		Device.rounded(g, px - 3 * s, py - 3 * s, ps + 6 * s, ps + 6 * s, 5 * s, 0xFFE4DCCB);
-		if (minecraft != null && minecraft.player != null) {
-			try {
-				net.minecraft.resources.Identifier skin = minecraft.player.getSkin().body().texturePath();
-				g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, skin, px, py, 8, 8, ps, ps, 8, 8, 64, 64);
-				g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, skin, px, py, 40, 8, ps, ps, 8, 8, 64, 64);
-			} catch (Exception ignored) {
-				// No skin to show.
-			}
-		}
-		int l = x + 12 * s, ty = y + 30 * s, vx = px - 12 * s;
-		String[][] rows = {{"NAME", name()}, {"MONEY", Ui.money(d.money)}, {"POKéDEX", d.hasDex() ? "SEEN " + d.seen.size() + "  OWN " + d.caught.size() : "-"},
-				{"TIME", String.format("%d:%02d", (int) d.played / 3600, (int) d.played / 60 % 60)}};
+		Scenes.stand(g, secs, Scenes.you(d.outfit, girl), 2.1, 0, true);
+		float x = 470, y = 60, w = 770, h = 600;
+		V.panel(g, x, y, w, h);
+		vhit(x, y, w, h, () -> view = View.MENU);
+		V.icon(g, "icon_card", x + 34, y + 28, 46);
+		V.text(g, "TRAINER CARD", x + 34 + 46 + 14, y + 34, 34, V.TEXT, true);
+		String[][] rows = {{"Name", name()}, {"ID No.", String.format("%05d", Math.abs(name().hashCode()) % 100000)}, {"Money", Ui.money(d.money)},
+				{"Pokédex", d.hasDex() ? String.valueOf(d.caught.size()) : "-"}, {"Play time", String.format("%d:%02d", (int) d.played / 3600, (int) d.played / 60 % 60)}};
+		float ry = y + 28 + 46 + 16;
 		for (String[] r : rows) {
-			Ui.draw(g, font, Ui.bold(r[0]), l, ty, 0xFF7A849E, s, false);
-			Ui.draw(g, font, Ui.ui(r[1]), vx - Ui.width(font, r[1], s), ty, Ui.CREAM_INK, s, false);
-			g.fill(l, ty + 10 * s, vx, ty + 10 * s + 1, 0x22000000);
-			ty += 13 * s;
+			V.label(g, r[0], x + 34, ry + 7);
+			V.text(g, r[1], x + 34 + 220, ry, 23, V.TEXT, true);
+			ry += 23 * 1.3F + 12;
 		}
-		ty += 4 * s;
+		ry += 6;
+		V.label(g, "Badges", x + 34, ry);
 		String[] badges = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
-		int[] colors = {0xFF9A9A9A, 0xFF4FA6E8, 0xFFF0A63C, 0xFF7CCB5C, 0xFFD95A9E, 0xFFE8C340, 0xFFE8553C, 0xFF6BBF59};
-		int bwd = Math.min(16 * s, (w - 24 * s) / 8), bty = Math.min(ty, y + h - bwd - 8 * s);
+		float bw = (w - 68 - 7 * 10) / 8, by = ry + 26;
 		for (int i = 0; i < 8; i++) {
 			boolean got = d.badges.contains(badges[i]);
-			int bx = l + i * (bwd + 3 * s);
-			Device.disc(g, bx + bwd / 2, bty + bwd / 2, bwd / 2, bwd / 2, got ? colors[i] : 0xFFD8D0BE);
-			if (got) Device.disc(g, bx + bwd / 2 - bwd / 6, bty + bwd / 3, bwd / 6, bwd / 8, 0x88FFFFFF);
+			float bx = x + 34 + i * (bw + 10);
+			V.rr(g, bx, by, bw, bw, 18, 0x33000000);
+			V.icon(g, "badge_" + i, bx + (bw - 66) / 2, by + (bw - 66) / 2, 66, got ? 0xFFFFFFFF : 0x8C55595E);
 		}
+		V.hints(g, "B", "Back");
 	}
 
 	private void drawOptions(GuiGraphics g, PlayerData d) {
