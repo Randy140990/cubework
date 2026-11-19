@@ -310,7 +310,8 @@ public class BattleScreen extends GameScreen {
 				BattleScene.faint(e.side());
 				Sounds.cry(side(e.side()).species, 0.7F);
 				side(e.side()).shown = false;
-				wait = 34;
+				// It falls and lies there, then its trainer calls it back with a ball.
+				wait = 66;
 			}
 			case SEND_OUT -> {
 				List<Mon> list = e.side() == 0 ? mine : theirs;
@@ -351,7 +352,7 @@ public class BattleScreen extends GameScreen {
 			case RECALL -> {
 				// Called back: red light streams from it into the ball in its trainer's hand (the Creature Viewer's recall).
 				BattleScene.recall(e.side());
-				wait = 18;
+				wait = 30;
 			}
 			case BALL -> {
 				BattleScene.throwBall(lastBall);
@@ -1131,8 +1132,8 @@ public class BattleScreen extends GameScreen {
 			V.rr(g, x, y + 6, W, hh, hh / 2, Ui.darker(c, 0.55F));
 			V.rr(g, x, y + 12, W, hh, hh / 2, 0x30000000);
 			V.rr(g, x, y, W, hh, hh / 2, on ? V.CREAM : 0xE6FFFFFF);
-			V.rrv(g, x + 3, y + 3, W - 6, (hh - 6) * 0.48F + 1, (hh - 6) / 2, Ui.lighter(c, 0.18F), c);
-			V.rrv(g, x + 3, y + 3 + (hh - 6) * 0.48F, W - 6, (hh - 6) * 0.52F, (hh - 6) / 2, c, Ui.darker(c, 0.78F));
+			// The button's face in one piece (as two halves, each rounded, it showed notches at both ends).
+			V.rrStops(g, x + 3, y + 3, W - 6, hh - 6, (hh - 6) / 2, new float[] {0, 0.48F, 1}, new int[] {Ui.lighter(c, 0.18F), c, Ui.darker(c, 0.78F)});
 			V.rrv(g, x + 10, y + 4, W - 20, (hh - 6) * 0.42F, (hh - 6) * 0.21F, 0x59FFFFFF, 0x00FFFFFF);
 			float ir = big ? 56 : 44, ix = x + (big ? 12 : 10);
 			V.rr(g, ix, y + (hh - ir) / 2, ir, ir, ir / 2, Ui.darker(c, 0.7F));

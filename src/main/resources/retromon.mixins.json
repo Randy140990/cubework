@@ -21,7 +21,10 @@
     "OutlineMixin",
     "OutlineColourMixin",
     "TitleMixin",
-    "LoadingScreenMixin"
+    "LoadingScreenMixin",
+    "ModelPartAccessor",
+    "CubeAccessor",
+    "KeyboardHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

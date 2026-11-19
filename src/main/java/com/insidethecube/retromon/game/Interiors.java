@@ -285,10 +285,12 @@ public final class Interiors {
 		if (level == null || r == null) return false;
 		COOL.put(p.getUUID(), FADE_TICKS + 20);
 		Runnable move = () -> {
-			if (p.level() != level) Game.leavingLevel(p);
+			boolean fromOutside = p.level() != level;
+			if (fromOutside) Game.leavingLevel(p);
 			p.teleportTo(level, r.ox() + x, r.oy(), r.oz() + z, java.util.Set.of(), yaw, 30F, true);
 			p.setDeltaMovement(Vec3.ZERO);
 			LAST.remove(p.getUUID());
+			Game.roomEntered(p, r, fromOutside);
 		};
 		if (!fade) {
 			move.run();
@@ -312,6 +314,7 @@ public final class Interiors {
 			p.teleportTo(world, d.x(), d.y(), d.z(), java.util.Set.of(), 0F, 30F, true);
 			p.setDeltaMovement(Vec3.ZERO);
 			LAST.remove(p.getUUID());
+			Game.roomLeft(p);
 		});
 	}
 
@@ -430,7 +433,7 @@ public final class Interiors {
 	}
 
 	/** Something in a room you're facing: what it says, and how far ahead it is. */
-	public record Ahead(List<String> lines, double distance) {
+	public record Ahead(List<String> lines, double distance, Vec3 at) {
 	}
 
 	/** The thing straight ahead of you in a room (0.5 to 2.1 blocks on), or null. */
@@ -451,7 +454,8 @@ public final class Interiors {
 					}
 				}
 			}
-			if (best != null && !best.lines().isEmpty()) return new Ahead(best.lines(), d);
+			if (best != null && !best.lines().isEmpty())
+				return new Ahead(best.lines(), d, new Vec3(r.ox() + (best.x0() + best.x1()) / 2, r.oy() + 1.6, r.oz() + (best.z0() + best.z1()) / 2));
 		}
 		return null;
 	}

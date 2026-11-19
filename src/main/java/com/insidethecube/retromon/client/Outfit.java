@@ -124,8 +124,20 @@ public final class Outfit {
 	private static String built;
 
 	/** The skin for this outfit, made (or remade) if it's changed. Returns false if it couldn't be made. */
+	private static boolean builtGirl;
+
+	/** The outfit the hero skin was made from (for the cap and bag on figures), and whether it's the girl. */
+	public static String heroOutfit() {
+		return built == null ? "" : built;
+	}
+
+	public static boolean heroGirl() {
+		return builtGirl;
+	}
+
 	public static boolean ensure(String outfit, boolean girl) {
-		if (outfit.equals(built)) return true;
+		if (outfit.equals(built) && girl == builtGirl) return true;
+		builtGirl = girl;
 		try {
 			NativeImage img = parse(outfit, girl).compose();
 			Minecraft.getInstance().getTextureManager().register(HERO, new DynamicTexture(() -> "Retromon hero", img));

@@ -57,9 +57,16 @@ public final class Settings {
 
 	private static int look = -1;
 
-	/** POKéMON LOOK: Cobblemon's models (0, the default) or Retromon's own creatures where there's one (1). */
+	/** POKéMON LOOK: Cobblemon's models (0) or Retromon's own creatures where there's one (1, the default). */
 	public static int look() {
-		if (look < 0) look = get("look", 0, 0, 1);
+		if (look < 0) {
+			// Retromon's own creatures are the default now: switched over once, even if an older version saved COBBLEMON.
+			if (get("look_ours_default", 0, 0, 1) == 0) {
+				set("look", 1);
+				set("look_ours_default", 1);
+			}
+			look = get("look", 1, 0, 1);
+		}
 		return look;
 	}
 
@@ -76,6 +83,11 @@ public final class Settings {
 	/** BATTLE STYLE: SWITCH (0, the default) asks whether you'll change POKéMON when a trainer's about to send out their next; SET (1) doesn't. */
 	public static boolean switchStyle() {
 		return get("style", 0, 0, 1) == 0;
+	}
+
+	/** SHADERS: Tempered Light on (1, the default) or off (0: Minecraft's own light, much quicker). */
+	public static boolean shaders() {
+		return get("shaders", 1, 0, 1) == 1;
 	}
 
 	/** The Pokédex reads entries aloud (1) or not (0). */

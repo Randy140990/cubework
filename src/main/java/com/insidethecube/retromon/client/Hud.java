@@ -206,6 +206,27 @@ public final class Hud {
 		}
 	}
 
+	// ---------- the prompt over what you can talk to ----------
+
+	/**
+	 * Over whoever (or whatever) SPACE would talk to or look at: the Interior Viewer's prompt, a small pill with the
+	 * key and the word (Talk, Look), bobbing gently.
+	 */
+	private static void prompt(GuiGraphics g, Minecraft mc, DeltaTracker delta) {
+		Adventure.Prompt pr = Adventure.prompt();
+		if (pr == null) return;
+		float[] at = Adventure.project(pr.at(), g.guiWidth(), g.guiHeight());
+		if (at == null) return;
+		float cx = V.vx(at[0]), cy = V.vy(at[1]) - 6 + (float) Math.sin((mc.level.getGameTime() + delta.getGameTimeDeltaPartialTick(true)) / 6.0) * 2;
+		String k = key(mc.options.keyJump), word = pr.word();
+		float kw = Math.max(28, V.width(k, 14, true) + 14), ww = V.width(word, 17, true), w = 5 + kw + 8 + ww + 14, h = 38, x = cx - w / 2, y = cy - h;
+		V.shadow(g, x, y, w, h, h / 2, 0.8F);
+		V.pill(g, x, y, w, h, V.EDGE_LIGHT);
+		V.pill(g, x + 1.5F, y + 1.5F, w - 3, h - 3, 0xF2123C38);
+		V.key(g, k, x + 5, y + 5, 28);
+		V.text(g, word, x + 5 + kw + 8, y + 10, 17, V.TEXT, true);
+	}
+
 	// ---------- the buttons and the time, small at the bottom right ----------
 
 	/** A key as it's bound now (SPACE, ENTER, TAB), so the hints follow your controls. */
@@ -227,6 +248,7 @@ public final class Hud {
 		String clock = String.format("%d:%02d %s", hour % 12 == 0 ? 12 : hour % 12, minute, hour < 12 ? "AM" : "PM");
 		V.hints(g, key(mc.options.keyJump), "Talk", key(Adventure.START), "Menu", key(Adventure.SPEED), "Speed x" + Adventure.speed);
 		V.HINTS.clear();
+		prompt(g, mc, delta);
 		// The time, at the bottom left, with a sun or a moon.
 		float cw = V.width(clock, 17, true) + 44;
 		V.panel(g, 22, V.H - 14 - 36, cw, 36, 18, true);

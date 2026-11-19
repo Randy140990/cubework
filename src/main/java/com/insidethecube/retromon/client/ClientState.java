@@ -77,6 +77,16 @@ public final class ClientState {
 				introLab = t.getBooleanOr("lab", false);
 				introDelay = introStopped ? 4 : 30;
 			}
+			case "room" -> {
+				// A building's room (or back outside): its music; its name in the banner, coming in from outside.
+				String name = t.getStringOr("name", "");
+				if (!name.isEmpty()) {
+					placeName = name;
+					placeTicks = 0;
+				}
+				String music = t.getStringOr("music", "");
+				if (!music.isEmpty()) Music.setPlace(music);
+			}
 			case "place" -> {
 				placeName = t.getStringOr("name", "");
 				placeTicks = 0;

@@ -600,8 +600,9 @@ public final class BattleScene {
 	}
 
 	/**
-	 * Fainting: it sags and keels over (its own faint animation, where its model has one), then its trainer calls
-	 * it back as red light (a wild one fades away where it lies).
+	 * Fainting: it sags and keels over (its own faint animation, where its model has one) and lies there a moment;
+	 * then its trainer throws a ball beside it, the ball opens, red light draws it in, and the ball comes back to
+	 * the trainer's hand (a wild one fades away where it lies).
 	 */
 	public static void faint(int side) {
 		MonDisplay d = display(side);
@@ -609,31 +610,57 @@ public final class BattleScene {
 		d.faint = MonDisplay.FAINT;
 		d.act("faint");
 		Sounds.faint();
-		later(18, () -> {
-			Vec3 p = spot(side).add(0, 0.2 + height(side) * 0.3, 0);
-			Vec3 back = trainerOf(side);
-			d.red = 14;
-			d.sizeTarget = 0;
-			if (back != null) {
-				FX.add(new Fx(BEAM, p, back, dust(0xFF3A3A, 1.1F), dust(0xFFFFFF, 0.8F), 9, 3, new int[1], 3));
-				Sounds.ball();
-			} else burst(p, dust(0xFFFFFF, 0.9F), 12, 0.35);
+		later(30, () -> {
+			if (trainerOf(side) != null) recallWithBall(side);
+			else {
+				Vec3 p = spot(side).add(0, 0.2 + height(side) * 0.3, 0);
+				d.sizeTarget = 0;
+				burst(p, dust(0xFFFFFF, 0.9F), 12, 0.35);
+			}
 		});
 	}
 
 	/**
-	 * Called back (switching): as the Creature Viewer's recall, it's tinted red and shrinks as red light streams from it
-	 * into the ball in its trainer's hand.
+	 * Called back (switching): as the Creature Viewer's recall: its trainer throws a ball beside it, the ball pops
+	 * open, red light streams from it into the ball as it shrinks, tinted red, and the ball arcs back to the hand.
 	 */
 	public static void recall(int side) {
+		if (display(side) == null) return;
+		recallWithBall(side);
+	}
+
+	/** A ball thrown to call a Pokémon back (one at a time). */
+	private static MonDisplay recallBall;
+
+	private static void recallWithBall(int side) {
 		MonDisplay d = display(side);
-		if (d == null) return;
-		Vec3 p = spot(side).add(0, 0.2 + height(side) * 0.3, 0);
-		Vec3 back = trainerOf(side);
-		d.red = 16;
-		d.sizeTarget = 0;
-		if (back != null) FX.add(new Fx(BEAM, p, back, dust(0xFF3A3A, 1.1F), dust(0xFFFFFF, 0.8F), 9, 0, new int[1], 3));
+		if (d == null || level == null) return;
+		Vec3 at = spot(side), back = trainerOf(side);
+		com.insidethecube.retromon.game.Npc who = side == 0 ? hero : foe;
+		Vec3 from = hand(who, back == null ? at.add(0, 1.4, 2) : back);
+		Vec3 toward = from.subtract(at).multiply(1, 0, 1);
+		Vec3 land = at.add(toward.lengthSqr() < 1e-4 ? Vec3.ZERO : toward.normalize().scale(1.1)).add(0, 0.13, 0);
+		if (recallBall != null) level.removeEntity(recallBall.getId(), Entity.RemovalReason.DISCARDED);
+		MonDisplay b = recallBall = ballAt(from, "poke_ball");
+		b.fly(land.x, land.y, land.z, 0.9, 8);
+		if (who != null) who.throwing = com.insidethecube.retromon.game.Npc.THROW;
 		Sounds.ball();
+		later(10, () -> {
+			// It opens: the red light, and in it goes.
+			Vec3 p = at.add(0, 0.2 + height(side) * 0.35, 0);
+			d.red = 16;
+			d.sizeTarget = 0;
+			FX.add(new Fx(BEAM, p, b.position().add(0, 0.2, 0), dust(0xFF3A30, 1.1F), dust(0xFFFFFF, 0.8F), 9, 0, new int[1], 3));
+			flash(0xFF3A30, 5);
+			Sounds.sfx("tink", 0.8F, 0.6F);
+		});
+		later(24, () -> b.fly(from.x, from.y, from.z, 0.7, 8));
+		later(33, () -> {
+			if (level != null && recallBall == b) {
+				level.removeEntity(b.getId(), Entity.RemovalReason.DISCARDED);
+				recallBall = null;
+			}
+		});
 	}
 
 	/** Things to do a little later (after so many ticks). */
@@ -647,7 +674,7 @@ public final class BattleScene {
 
 	/** One more tick for the Pokémon and balls on the stage (the game sped up: the battle keeps pace). */
 	public static void tickDisplays() {
-		for (MonDisplay d : new MonDisplay[] {mine, theirs, ball, sendBall}) if (d != null) d.tick();
+		for (MonDisplay d : new MonDisplay[] {mine, theirs, ball, sendBall, recallBall}) if (d != null) d.tick();
 	}
 
 	private static void burst(Vec3 at, ParticleOptions p, int n, double spread) {
@@ -899,7 +926,7 @@ public final class BattleScene {
 
 	public static void end() {
 		if (level != null) {
-			for (MonDisplay d : new MonDisplay[] {mine, theirs, ball, sendBall}) if (d != null) level.removeEntity(d.getId(), Entity.RemovalReason.DISCARDED);
+			for (MonDisplay d : new MonDisplay[] {mine, theirs, ball, sendBall, recallBall}) if (d != null) level.removeEntity(d.getId(), Entity.RemovalReason.DISCARDED);
 			for (Entity n : new Entity[] {hero, foe}) if (n != null) level.removeEntity(n.getId(), Entity.RemovalReason.DISCARDED);
 			List<Map.Entry<BlockPos, BlockState>> back = new ArrayList<>(BEFORE.entrySet());
 			for (int i = back.size() - 1; i >= 0; i--) level.setBlock(back.get(i).getKey(), back.get(i).getValue(), 2 | 16, 0);
@@ -915,7 +942,7 @@ public final class BattleScene {
 		built = false;
 		shotTicks = flashTicks = 0;
 		boltIn = -1;
-		mine = theirs = ball = sendBall = null;
+		mine = theirs = ball = sendBall = recallBall = null;
 		hiddenNpc = -1;
 		active = revealed = false;
 		level = null;
@@ -926,7 +953,7 @@ public final class BattleScene {
 		// If the world changed under a battle (left the game), forget it.
 		if (active && mc.level != level) {
 			level = null;
-			mine = theirs = ball = sendBall = null;
+			mine = theirs = ball = sendBall = recallBall = null;
 			BEFORE.clear();
 			FX.clear();
 			active = revealed = false;

@@ -260,6 +260,7 @@ public final class Figures {
 		private PlayerModel person() {
 			if (person == null) {
 				person = new PlayerModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER), false);
+				Soft.apply(person.root(), true, Soft.PEOPLE);
 				try {
 					nested = person.rightArm.getChild("right_sleeve") == person.rightSleeve;
 				} catch (RuntimeException e) {
@@ -337,6 +338,8 @@ public final class Figures {
 			pose.scale(k, k, k);
 			pose.translate(0F, -1.5F, 0F);
 			m.renderToBuffer(pose, bufferSource.getBuffer(m.renderType(f.skin)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+			// You (in your clothes): your cap and bag too, as in the world.
+			if (Outfit.HERO.equals(f.skin)) GearLayer.drawOn(m, pose, bufferSource, Outfit.heroOutfit(), Outfit.heroGirl(), FULL_BRIGHT);
 			bufferSource.endBatch();
 		}
 

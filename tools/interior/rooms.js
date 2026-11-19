@@ -66,7 +66,7 @@ function labMachine(room, X, w, screenKey, o = {}) {
 function ballTable(room, x0, z0, x1, z1) {
   table(room, x0, z0, x1, z1, { top: "lab", leg: "steel", h: 0.95, name: "The table of balls", note: "A white-topped steel table with three balls in a row." });
   const n = 3, s = 0.36, y = 0.95, cz = (z0 + z1) / 2;
-  for (let i = 0; i < n; i++) { const cx = x0 + (x1 - x0) * (i + 1) / (n + 1); room.geo.box(cx - s / 2, y, cz - s / 2, cx + s / 2, y + s, cz + s / 2, { all: "ball", top: "ball" }); }
+  for (let i = 0; i < n; i++) { const cx = x0 + (x1 - x0) * (i + 1) / (n + 1); room.geo.box(cx - s / 2, y, cz - s / 2, cx + s / 2, y + s, cz + s / 2, { all: "ball", top: "ballTop" }); }
   room.act([x0, z0 - 0.3, x1, z1 + 0.3], { label: "Look", lines: ["Three balls, each with a creature inside.", "The professor will let you choose one when he's ready."] });
 }
 // White, modern shelves, packed full: books, binders and boxes, row on row.
@@ -89,10 +89,11 @@ function labShelf(room, X, Z, f, w = 2, h = 3.2, o = {}) {
 function incubator(room, x, z) {
   // Round as a Minecraft build rounds things: each disc is two crossed slabs (a blocky circle), so it's all boxes.
   const G = room.geo;
-  const disc = (r, y0, y1, mat) => { const k = 0.62 * r; G.box(x - r, y0, z - k, x + r, y1, z + k, mat); G.box(x - k, y0, z - r, x + k, y1, z + r, mat); };
+  // (The second slab sits a hair inside the first's top and bottom, so their faces never lie in one plane and flicker.)
+  const disc = (r, y0, y1, mat) => { const k = 0.62 * r, e = Math.min(0.01, (y1 - y0) / 4); G.box(x - r, y0, z - k, x + r, y1, z + k, mat); G.box(x - k, y0 + e, z - r, x + k, y1 - e, z + r, mat); };
   disc(1.08, 0, 0.82, "paint"); disc(1.12, 0.82, 0.94, "redPlastic"); disc(1.06, 0.94, 1.0, "paint");
   disc(0.62, 1.0, 1.12, "greyPlastic");
-  const ball = (bx, by, bz, s = 0.3) => G.box(x + bx - s / 2, by, z + bz - s / 2, x + bx + s / 2, by + s, z + bz + s / 2, { all: "ball", top: "ball" });
+  const ball = (bx, by, bz, s = 0.3) => G.box(x + bx - s / 2, by, z + bz - s / 2, x + bx + s / 2, by + s, z + bz + s / 2, { all: "ball", top: "ballTop" });
   for (const [bx, bz] of [[-0.25, -0.15], [0.22, -0.2], [0.0, 0.2], [-0.3, 0.25], [0.3, 0.18]]) ball(bx, 1.12, bz, 0.26);
   for (const [bx, bz] of [[-0.86, 0.3], [-0.55, 0.78], [0.55, 0.78], [0.86, 0.3]]) ball(bx, 1.0, bz, 0.24);
   disc(0.8, 1.0, 2.35, "tankGlass");
@@ -118,7 +119,7 @@ function healer(room, X, w) {
   const F = room.F(X, 0, "s");
   F.box(0, 0, 0, w, 1.1, 1.0, { all: "cupboardWhite", top: "lab", back: null, bottom: null });
   F.box(0.2, 1.1, 0.15, w - 0.2, 1.2, 0.85, "greyPlastic");
-  for (let i = 0; i < 6; i++) { const lx = 0.45 + (i % 3) * ((w - 0.9) / 2), lz = 0.35 + Math.floor(i / 3) * 0.3; F.box(lx - 0.1, 1.2, lz - 0.1, lx + 0.1, 1.38, lz + 0.1, { all: "ball", top: "ball" }); }
+  for (let i = 0; i < 6; i++) { const lx = 0.45 + (i % 3) * ((w - 0.9) / 2), lz = 0.35 + Math.floor(i / 3) * 0.3; F.box(lx - 0.1, 1.2, lz - 0.1, lx + 0.1, 1.38, lz + 0.1, { all: "ball", top: "ballTop" }); }
   F.box(0, 1.1, 0, w, 2.4, 0.15, { front: "labPanel", all: "greyPlastic" });
   F.solid(0, 0, w, 1.0);
   room.act(F.rect(0, 0.5, w, 1.5), { label: "Look", lines: ["A machine for resting creatures, six slots on its top.", "It's warm. Someone was using it this morning."] });

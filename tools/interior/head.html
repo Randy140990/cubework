@@ -59,7 +59,7 @@ h1 span { color: var(--accent) }
 .key b { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 6px; background: var(--g-cream); color: var(--g-cream-ink); font-size: 11px }
 .prompt { position: absolute; transform: translate(-50%, -100%); pointer-events: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px 4px 4px; border-radius: 999px;
   background: var(--g-panel); border: 1.5px solid var(--g-edge-light); color: var(--g-text); font-weight: 800; font-size: 12.5px; white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,.35) }
-.prompt b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--g-cream); color: var(--g-cream-ink); font-size: 11px }
+.prompt b { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--g-cream); color: var(--g-cream-ink); font-size: 11px }
 .tag { position: absolute; transform: translate(-50%, -100%); pointer-events: none; font-family: Fredoka, system-ui, sans-serif; font-weight: 600; font-size: 13px; color: #fff;
   padding: 1px 9px; border-radius: 999px; background: rgba(0,0,0,.42); white-space: nowrap }
 
@@ -137,8 +137,8 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 86
         <div class="cinebar t"></div><div class="cinebar b"></div><canvas id="c"></canvas>
         <div id="tags"></div>
         <div class="place" id="place"><i></i><span id="placeName"></span><small id="placeFloor"></small></div>
-        <div class="keys" id="keys"><span class="key"><b>WASD</b>Walk</span><span class="key"><b>Shift</b>Run</span><span class="key"><b>E</b>Look, talk</span></div>
-        <div class="prompt" id="prompt" hidden><b>E</b><span id="promptText">Look</span></div>
+        <div class="keys" id="keys"><span class="key"><b>WASD</b>Walk</span><span class="key"><b>Shift</b>Run</span><span class="key"><b>SPACE</b>Look, talk</span></div>
+        <div class="prompt" id="prompt" hidden><b>SPACE</b><span id="promptText">Look</span></div>
         <div class="textbox" id="textbox" hidden><span class="who" id="who" hidden></span><span id="text"></span><span class="more" id="more" hidden></span></div>
         <div class="choices" id="choices" hidden role="listbox"></div>
         <div class="fade" id="fade"></div>

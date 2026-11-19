@@ -445,6 +445,8 @@ const TEXDEF = {
   }],
   bag: [16, 16, (P, r) => { P.fill(hx("#C9524E"), 0.08, r); P.rect(0, 4, 16, 1, hx("#F2C744")); P.rect(0, 11, 16, 1, hx("#F2C744")); }],
   ball: [16, 16, (P, r) => { P.rect(0, 0, 16, 8, hx("#E5525C")); P.rect(0, 8, 16, 8, hx("#F4F6F5")); P.rect(0, 7, 16, 2, C.black); P.rect(6, 6, 4, 4, C.black); P.rect(7, 7, 2, 2, hx("#FFFFFF")); P.set(3, 2, hx("#FF9AA0")); }],
+  // A ball seen from above: the red top, darker at its rim (its black band shows on the sides), and a shine.
+  ballTop: [16, 16, (P, r) => { P.rect(0, 0, 16, 16, hx("#1E1E24")); P.rect(1, 1, 14, 14, hx("#C23E48")); P.rect(2, 2, 12, 12, hx("#E5525C")); P.rect(4, 3, 3, 2, hx("#FF9AA0")); P.set(4, 5, hx("#FF9AA0")); }],
   flower: [16, 16, (P, r) => {
     for (const [cx, cy, c] of [[3, 5, C.red], [11, 3, C.yellow], [7, 9, hx("#F4F6F5")], [13, 10, C.pink]]) {
       P.line(cx, cy + 2, cx + ((cx % 3) - 1), 15, C.greenD); P.set(cx + 1, cy + 5, C.green); P.set(cx - 1, cy + 6, C.green);

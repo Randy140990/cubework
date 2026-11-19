@@ -59,6 +59,8 @@ public class DialogueScreen extends GameScreen {
 		this.trainer = t.isEmpty() ? null : t;
 		Trainers.Trainer tr = Trainers.get(trainer);
 		if (tr != null && box.speaker == null) box.speaker = tr.title();
+		String whoTag = extra.getStringOr("who", "");
+		if (box.speaker == null && !whoTag.isEmpty()) box.speaker = whoTag;
 		for (net.minecraft.nbt.Tag c : extra.getListOrEmpty("cues")) c.asString().ifPresent(v -> {
 			int at = v.indexOf(':');
 			if (at > 0) {

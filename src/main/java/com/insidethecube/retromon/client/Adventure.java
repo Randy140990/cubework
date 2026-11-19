@@ -99,6 +99,7 @@ public final class Adventure {
 		distance += (distanceTarget - distance) * 0.2;
 		while (SPEED.consumeClick()) cycleSpeed();
 		hidden = !BattleScene.active() && behind(mc);
+		updatePrompt(mc);
 		if (mc.screen == null && !Device.busy()) {
 			while (mc.options.keyJump.consumeClick()) talk(mc);
 			// START: you take your Pokédex out, and the menu comes up on it.
@@ -109,6 +110,25 @@ public final class Adventure {
 			while (START.consumeClick()) {
 			}
 		}
+	}
+
+	/**
+	 * Whether a key is kept from Minecraft and other mods: out in the world in the Retromon game, everything but
+	 * the game's own keys (walking, running, SPACE, START, SPEED, the Retromon switch) and Esc, F1, F2 and F11.
+	 * With one of our screens open, keys go to it as ever.
+	 */
+	public static boolean blocks(net.minecraft.client.input.KeyEvent e) {
+		Minecraft mc = Minecraft.getInstance();
+		if (!active() || mc.player == null) return false;
+		if (mc.screen != null) return false;
+		int k = e.key();
+		if (k == GLFW.GLFW_KEY_ESCAPE || k == GLFW.GLFW_KEY_F1 || k == GLFW.GLFW_KEY_F2 || k == GLFW.GLFW_KEY_F11) return false;
+		var o = mc.options;
+		for (KeyMapping m : new KeyMapping[] {o.keyUp, o.keyDown, o.keyLeft, o.keyRight, o.keyJump, o.keyShift, o.keySprint, START, SPEED, TOGGLE, o.keyScreenshot,
+				o.keyFullscreen})
+			if (m != null && m.matches(e)) return false;
+		// The arrow keys walk too.
+		return k != GLFW.GLFW_KEY_UP && k != GLFW.GLFW_KEY_DOWN && k != GLFW.GLFW_KEY_LEFT && k != GLFW.GLFW_KEY_RIGHT;
 	}
 
 	/** The game's speed: 1x, 2x, 3x, 4x and round again (the world, and battles with it). */
@@ -137,7 +157,12 @@ public final class Adventure {
 		if (room != null) follow = new Vec3(room.cx(), room.oy() + 0.9, room.cz());
 		// Talking to someone: ease in towards the middle of the two of you, closer and a little lower.
 		Entity other = focusId >= 0 && e.level() != null ? e.level().getEntity(focusId) : null;
-		focusIn += ((other != null ? 1 : 0) - focusIn) * 0.12;
+		// Eased by time, not by frames (at a high frame rate it snapped in and out).
+		long now = System.nanoTime();
+		double dt = lastFrame == 0 ? 0.016 : Math.max(0, Math.min(0.1, (now - lastFrame) / 1e9));
+		lastFrame = now;
+		double ease = 1 - Math.exp(-dt * 3.2), easeRoom = 1 - Math.exp(-dt * 2.4);
+		focusIn += ((other != null ? 1 : 0) - focusIn) * ease;
 		Vec3 centre = follow;
 		if (other != null) centre = you.lerp(other.getPosition(partial).add(0, 0.9, 0), 0.5);
 		else focusId = -1;
@@ -149,7 +174,7 @@ public final class Adventure {
 			var hit = e.level().clip(new net.minecraft.world.level.ClipContext(target, new Vec3(full[0], full[1], full[2]),
 					net.minecraft.world.level.ClipContext.Block.VISUAL, net.minecraft.world.level.ClipContext.Fluid.NONE, e));
 			boolean clear = hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS;
-			focusRoom += ((clear ? 1 : 0) - focusRoom) * 0.1;
+			focusRoom += ((clear ? 1 : 0) - focusRoom) * easeRoom;
 		} else focusRoom = 1;
 		double k = focusIn * focusRoom;
 		double far = room != null ? room.camDist() : distance;
@@ -170,6 +195,71 @@ public final class Adventure {
 
 	/** How far the talking camera has room to close in (0 to 1). */
 	private static double focusRoom = 1;
+	private static long lastFrame;
+
+	// ---------- what SPACE would talk to (the prompt over it) ----------
+
+	/** What SPACE talks to or looks at now: where to show the prompt (over it), and the word for it. */
+	public record Prompt(Vec3 at, String word) {}
+
+	private static Prompt prompt;
+
+	public static Prompt prompt() {
+		return prompt;
+	}
+
+	/** Who you'd talk to: the nearest you're facing (or right by you), person or Pokémon; and how far. */
+	private static Entity talkTarget(Minecraft mc, double[] dist) {
+		Entity best = null;
+		double bestScore = 1e9;
+		Vec3 me = mc.player.position();
+		Vec3 look = Vec3.directionFromRotation(0, mc.player.getYRot());
+		dist[0] = 1e9;
+		for (Entity e : mc.level.entitiesForRendering()) {
+			if (!(e instanceof Npc) && !(e instanceof WorldMon) || e.isInvisible()) continue;
+			Vec3 to = e.position().subtract(me).multiply(1, 0, 1);
+			double d = to.length();
+			if (d > 3.5) continue;
+			double facing = d < 1e-3 ? 1 : to.normalize().dot(look);
+			if (facing < 0.35 && d > 1.1) continue;
+			double score = d - facing * 1.5 + (e instanceof WorldMon ? 0.8 : 0);
+			if (score < bestScore) {
+				bestScore = score;
+				best = e;
+				dist[0] = d;
+			}
+		}
+		return best;
+	}
+
+	/** Works out the prompt (each tick): someone to talk to, or the thing in front of you inside. */
+	private static void updatePrompt(Minecraft mc) {
+		prompt = null;
+		if (mc.player == null || mc.level == null || mc.screen != null || Device.busy() || frozen > 0 || BattleScene.active()) return;
+		double[] d = new double[1];
+		Entity best = talkTarget(mc, d);
+		com.insidethecube.retromon.game.Interiors.Ahead ahead = com.insidethecube.retromon.game.Interiors.ahead(mc.player);
+		if (ahead != null && ahead.at() != null && (best == null || d[0] > ahead.distance() + 0.35)) {
+			prompt = new Prompt(ahead.at(), "Look");
+			return;
+		}
+		if (best != null) prompt = new Prompt(best.position().add(0, best.getBbHeight() + 0.35, 0), "Talk");
+	}
+
+	/** Where a point in the world falls on the screen (GUI pixels, w by h), or null behind the camera. */
+	public static float[] project(Vec3 p, int w, int h) {
+		double[] pose = lastPose;
+		if (pose == null) return null;
+		double yaw = Math.toRadians(pose[3]), pitch = Math.toRadians(pose[4]);
+		double fx = -Math.sin(yaw) * Math.cos(pitch), fy = -Math.sin(pitch), fz = Math.cos(yaw) * Math.cos(pitch);
+		double rx = -Math.cos(yaw), rz = -Math.sin(yaw);
+		double ux = -rz * fy, uy = rz * fx - rx * fz, uz = rx * fy;
+		double dx = p.x - pose[0], dy = p.y - pose[1], dz = p.z - pose[2];
+		double x = dx * rx + dz * rz, y = dx * ux + dy * uy + dz * uz, z = dx * fx + dy * fy + dz * fz;
+		if (z <= 0.1) return null;
+		double t = Math.tan(Math.toRadians(FOV) / 2);
+		return new float[] {(float) (w / 2.0 + x / z / t * h / 2.0), (float) (h / 2.0 - y / z / t * h / 2.0)};
+	}
 
 	private static double[] camAt(Vec3 target, double dist, double pitchDeg) {
 		double yaw = Math.toRadians(YAW), pitch = Math.toRadians(pitchDeg);
@@ -179,26 +269,9 @@ public final class Adventure {
 
 	/** A: talk to whoever's in front of you (or close by), person or Pokémon. */
 	private static void talk(Minecraft mc) {
-		Entity best = null;
-		double bestScore = 1e9;
-		Vec3 me = mc.player.position();
-		Vec3 look = Vec3.directionFromRotation(0, mc.player.getYRot());
-		double bestDist = 1e9;
-		for (Entity e : mc.level.entitiesForRendering()) {
-			if (!(e instanceof Npc) && !(e instanceof WorldMon)) continue;
-			Vec3 to = e.position().subtract(me).multiply(1, 0, 1);
-			double d = to.length();
-			if (d > 3.5) continue;
-			double facing = d < 1e-3 ? 1 : to.normalize().dot(look);
-			// Someone you're facing (or right up against you); not whoever happens to be behind you.
-			if (facing < 0.35 && d > 1.1) continue;
-			double score = d - facing * 1.5 + (e instanceof WorldMon ? 0.8 : 0);
-			if (score < bestScore) {
-				bestScore = score;
-				best = e;
-				bestDist = d;
-			}
-		}
+		double[] dd = new double[1];
+		Entity best = talkTarget(mc, dd);
+		double bestDist = dd[0];
 		// Inside, the thing in front of you (the TV, a shelf, the fridge) says what it is, unless someone's nearer
 		// in front of it.
 		com.insidethecube.retromon.game.Interiors.Ahead ahead = com.insidethecube.retromon.game.Interiors.ahead(mc.player);

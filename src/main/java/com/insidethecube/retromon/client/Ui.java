@@ -122,6 +122,50 @@ public final class Ui {
 		g.pose().popMatrix();
 	}
 
+	/**
+	 * A rounded rectangle shaded through several colours, top to bottom: cols[i] at the fraction at[i] of its height
+	 * (at rising from 0 to 1). One shape, so a button lit at the top and shaded at the bottom has no seam.
+	 */
+	public static void rrStops(GuiGraphics g, float x, float y, float w, float h, float r, float[] at, int[] cols) {
+		if (w <= 0 || h <= 0) return;
+		float k = gs();
+		int X = Math.round(x * k), Y = Math.round(y * k), W = Math.round((x + w) * k) - X, H = Math.round((y + h) * k) - Y;
+		if (W <= 0 || H <= 0) return;
+		int R = (int) Math.max(0, Math.min(Math.round(r * k), Math.min(W, H) / 2));
+		java.util.function.IntUnaryOperator col = yy -> {
+			float t = (yy - Y) / (float) H;
+			if (t <= at[0]) return cols[0];
+			for (int i = 1; i < at.length; i++) if (t <= at[i]) return mix(cols[i - 1], cols[i], (t - at[i - 1]) / Math.max(1e-4F, at[i] - at[i - 1]));
+			return cols[cols.length - 1];
+		};
+		g.pose().pushMatrix();
+		g.pose().scale(1 / k, 1 / k);
+		stops(g, X + R, Y, X + W - R, Y + R, Y, H, at, col);
+		stops(g, X, Y + R, X + W, Y + H - R, Y, H, at, col);
+		stops(g, X + R, Y + H - R, X + W - R, Y + H, Y, H, at, col);
+		quarter(g, X, Y, R, 0, col.applyAsInt(Y + R / 2));
+		quarter(g, X + W - R, Y, R, 1, col.applyAsInt(Y + R / 2));
+		quarter(g, X, Y + H - R, R, 2, col.applyAsInt(Y + H - R / 2));
+		quarter(g, X + W - R, Y + H - R, R, 3, col.applyAsInt(Y + H - R / 2));
+		g.pose().popMatrix();
+	}
+
+	/** A box shaded by col, in gradients between the stops. */
+	private static void stops(GuiGraphics g, int x0, int y0, int x1, int y1, int Y, int H, float[] at, java.util.function.IntUnaryOperator col) {
+		if (x1 <= x0 || y1 <= y0) return;
+		java.util.List<Integer> ys = new java.util.ArrayList<>();
+		ys.add(y0);
+		for (float a : at) {
+			int yy = Y + Math.round(H * a);
+			if (yy > y0 && yy < y1) ys.add(yy);
+		}
+		ys.add(y1);
+		for (int i = 0; i + 1 < ys.size(); i++) {
+			int a = ys.get(i), b = ys.get(i + 1);
+			if (b > a) g.fillGradient(x0, a, x1, b, col.applyAsInt(a), col.applyAsInt(b));
+		}
+	}
+
 	/** A box from x0, y0 to x1, y1 (screen pixels) in its shading: top to bottom over stop of H from Y, then flat. */
 	private static void bands(GuiGraphics g, int x0, int y0, int x1, int y1, int Y, int H, float stop, int top, int bottom) {
 		if (x1 <= x0 || y1 <= y0) return;

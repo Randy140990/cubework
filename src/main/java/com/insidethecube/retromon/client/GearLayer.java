@@ -111,6 +111,7 @@ public class GearLayer<S extends HumanoidRenderState, M extends HumanoidModel<S>
 		m.getRoot().addOrReplaceChild("dex", CubeListBuilder.create().texOffs(0, 0).addBox(-3, -0.5F, -2, 6, 1, 4),
 				PartPose.offsetAndRotation(-1, 10.6F, -0.5F, 0, (float) (Math.PI / 2), (float) (Math.PI / 2)));
 		deviceHand = bake(m, 32, 16);
+		for (ModelPart p : new ModelPart[] {cap, ears, spikes, bulb, flame, backpack, satchel}) if (p != null) Soft.apply(p, true, Soft.GEAR);
 	}
 
 	/** Whose gear this is: you (in the world or the wardrobe's mirror), or you on the battle stage. Null for anyone else. */
@@ -174,6 +175,46 @@ public class GearLayer<S extends HumanoidRenderState, M extends HumanoidModel<S>
 				boolean both = p[1] > 0.6F;
 				(both ? model.body : model.rightArm).translateAndRotate(pose);
 				out.submitModelPart(both ? deviceHeld : deviceHand, pose, RenderTypes.entityCutoutNoCull(DEVICE), light, overlay, null, false, false, -1, null, 0);
+				pose.popPose();
+			}
+		}
+	}
+
+	/**
+	 * The cap and bag on a figure drawn outside the world (the maker, the professor's scene, your trainer card): on
+	 * a model already posed, straight into a buffer.
+	 */
+	public static void drawOn(HumanoidModel<?> model, PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, String worn, boolean girl, int light) {
+		build();
+		Outfit o = worn == null || worn.isEmpty() ? Outfit.defaults(girl) : Outfit.parse(worn, girl);
+		int overlay = OverlayTexture.NO_OVERLAY;
+		if (Outfit.HATS[Math.floorMod(o.get("hat"), Outfit.HATS.length)].equals("cap")) {
+			String pattern = Outfit.CAPS[Math.floorMod(o.get("capp"), Outfit.CAPS.length)];
+			var type = RenderTypes.entityCutoutNoCull(Retromon.id("textures/gear/cap_" + pattern + ".png"));
+			int tint = pattern.equals("plain") ? 0xFF000000 | o.colour("hatc") : -1;
+			pose.pushPose();
+			model.root().translateAndRotate(pose);
+			model.getHead().translateAndRotate(pose);
+			if (o.get("capb") == 1) pose.mulPose(Axis.YP.rotation((float) Math.PI));
+			cap.render(pose, buffers.getBuffer(type), light, overlay, tint);
+			ModelPart extra = switch (pattern) {
+				case "pikachu", "eevee" -> ears;
+				case "gengar" -> spikes;
+				case "bulbasaur" -> bulb;
+				case "charmander" -> flame;
+				default -> null;
+			};
+			if (extra != null) extra.render(pose, buffers.getBuffer(type), light, overlay, -1);
+			pose.popPose();
+		}
+		String bag = Outfit.BAGS[Math.floorMod(o.get("bag"), Outfit.BAGS.length)];
+		if (!bag.equals("none")) {
+			Identifier tex = bagTexture(o.colour("bagc"));
+			if (tex != null) {
+				pose.pushPose();
+				model.root().translateAndRotate(pose);
+				model.body.translateAndRotate(pose);
+				(bag.equals("satchel") ? satchel : backpack).render(pose, buffers.getBuffer(RenderTypes.entityCutoutNoCull(tex)), light, overlay, -1);
 				pose.popPose();
 			}
 		}

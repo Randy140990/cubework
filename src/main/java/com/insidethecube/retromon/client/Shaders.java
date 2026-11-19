@@ -33,9 +33,46 @@ public final class Shaders {
 		Class.forName("net.irisshaders.iris.Iris").getMethod("reload").invoke(null);
 	}
 
-	/** Entering a Retromon save: Tempered Light on (if Iris is here and it isn't already). */
+	/**
+	 * OPTION's SHADERS, switched now: on (Tempered Light) or off (Minecraft's own light, much quicker). Your own
+	 * setting comes back when you leave the game, as ever.
+	 */
+	public static void set(boolean on) {
+		if (!FabricLoader.getInstance().isModLoaded("iris")) return;
+		try {
+			Object cfg = config();
+			if (!switched) {
+				@SuppressWarnings("unchecked")
+				Optional<String> current = (Optional<String>) cfg.getClass().getMethod("getShaderPackName").invoke(cfg);
+				previousPack = current.orElse(null);
+				previousEnabled = (Boolean) cfg.getClass().getMethod("areShadersEnabled").invoke(cfg);
+			}
+			if (on) {
+				Path pack = Minecraft.getInstance().gameDirectory.toPath().resolve("shaderpacks").resolve(PACK);
+				if (!Files.exists(pack)) {
+					Files.createDirectories(pack.getParent());
+					try (InputStream in = Shaders.class.getResourceAsStream("/retromon/shaders/" + PACK)) {
+						if (in != null) Files.copy(in, pack, StandardCopyOption.REPLACE_EXISTING);
+					}
+				}
+				cfg.getClass().getMethod("setShaderPackName", String.class).invoke(cfg, PACK);
+			}
+			cfg.getClass().getMethod("setShadersEnabled", boolean.class).invoke(cfg, on);
+			cfg.getClass().getMethod("save").invoke(cfg);
+			reload();
+			switched = true;
+		} catch (Throwable t) {
+			Retromon.LOG.warn("Couldn't switch the shaders {}: {}", on ? "on" : "off", t.toString());
+		}
+	}
+
+	/** Entering a Retromon save: Tempered Light on (if Iris is here and it isn't already), or off if OPTION says so. */
 	public static void enter() {
 		if (switched || !FabricLoader.getInstance().isModLoaded("iris")) return;
+		if (!Settings.shaders()) {
+			set(false);
+			return;
+		}
 		try {
 			Path dir = Minecraft.getInstance().gameDirectory.toPath().resolve("shaderpacks");
 			Files.createDirectories(dir);

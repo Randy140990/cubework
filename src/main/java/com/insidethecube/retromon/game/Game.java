@@ -745,6 +745,28 @@ public final class Game {
 		return before - zones.size();
 	}
 
+	/**
+	 * Into a building's room: its own music (Oak's lab has the lab's; homes, their town's), and from outside, its
+	 * name in the place banner (PROF. OAK's LAB, YOUR HOUSE, BLUE's HOUSE).
+	 */
+	public static void roomEntered(ServerPlayer p, Interiors.Room r, boolean banner) {
+		Places.Place pl = Places.get(r.place());
+		CompoundTag t = new CompoundTag();
+		String name = fill(p, List.of(r.name().replace("Rival's", "{rival}'s"))).get(0).toUpperCase();
+		t.putString("name", banner ? name : "");
+		t.putString("music", r.name().toLowerCase().contains("lab") ? "oaks_lab" : pl == null ? "" : pl.music());
+		Net.send(p, "room", t);
+	}
+
+	/** Back outside: the place's own music again. */
+	public static void roomLeft(ServerPlayer p) {
+		Places.Place pl = Places.get(data(p).place);
+		CompoundTag t = new CompoundTag();
+		t.putString("name", "");
+		t.putString("music", pl == null ? "" : pl.music());
+		Net.send(p, "room", t);
+	}
+
 	private static void enter(ServerPlayer p, String place) {
 		PlayerData d = data(p);
 		if (place == null || place.equals(d.place)) return;
@@ -1674,6 +1696,8 @@ public final class Game {
 	}
 
 	private static void dialogue(ServerPlayer p, Npc n, String mode, List<String> lines, CompoundTag t, int entityId) {
+		// Who's talking, for the tab over the text box (MUM, DAISY...): the name over their head.
+		if (n != null && n.hasCustomName() && !t.contains("who")) t.putString("who", n.getCustomName().getString().toUpperCase());
 		t.putInt("npc", entityId);
 		t.putString("mode", mode);
 		ListTag l = new ListTag();
@@ -2127,6 +2151,98 @@ public final class Game {
 		return planted;
 	}
 
+	/**
+	 * Takes away the shelf signs plantSigns put down: for each of the games' signs, the spots are tried in the same
+	 * order it tried them; the first is where it put its two shelves (facing south, air above), if it put any. Only
+	 * where those two are the only shelves near the sign (so your own are never touched). What's taken away is
+	 * listed in the world's folder (retromon_removed_signs.txt).
+	 */
+	private static int unplantSigns(MinecraftServer server, ServerLevel level, Zone z) {
+		String pl = z.place();
+		int[] size = Places.size(pl);
+		Block shelf = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(net.minecraft.resources.Identifier.withDefaultNamespace("oak_shelf"))
+				.orElse(null);
+		if (size == null || shelf == null) return 0;
+		int street = streetY(level, z), removed = 0;
+		StringBuilder log = new StringBuilder();
+		for (Trainers.Sign sg : Trainers.signsIn(pl)) {
+			double fx = (sg.x() + 0.5) / size[0], fz = (sg.y() + 0.5) / size[1];
+			int wx = z.x1() + (int) Math.floor(fx * (z.x2() - z.x1() + 1)), wz = z.z1() + (int) Math.floor(fz * (z.z2() - z.z1() + 1));
+			if (!z.contains(wx + 0.5, wz + 0.5) || !level.hasChunkAt(new BlockPos(wx, street, wz))) continue;
+			BlockPos found = null;
+			search:
+			for (int[] heights : new int[][] {{0, 1, -1}, {2, -2}}) {
+				for (int r = 0; r <= 4; r++) {
+					for (int dx = -r; dx <= r; dx++) {
+						for (int dz = -r; dz <= r; dz++) {
+							if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
+							for (int dy : heights) {
+								BlockPos at = new BlockPos(wx + dx, street + dy, wz + dz);
+								if (ourShelves(level, at, shelf)) {
+									found = at;
+									break search;
+								}
+								if (goodGround(level, at)) break search;
+							}
+						}
+					}
+				}
+			}
+			if (found == null || shelvesNear(level, wx, street, wz, 6) != 2) continue;
+			level.setBlock(found.above(), Blocks.AIR.defaultBlockState(), 3);
+			level.setBlock(found, Blocks.AIR.defaultBlockState(), 3);
+			log.append(pl).append(' ').append(found.getX()).append(' ').append(found.getY()).append(' ').append(found.getZ()).append('\n');
+			removed++;
+		}
+		if (removed > 0) {
+			try {
+				Path f = server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("retromon_removed_signs.txt");
+				Files.writeString(f, log.toString(), StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
+			} catch (IOException e) {
+				Retromon.LOG.warn("Couldn't note the removed signs", e);
+			}
+			Retromon.LOG.info("Retromon: took away {} shelf signs in {}", removed, pl);
+		}
+		return removed;
+	}
+
+	/** Two shelves stacked, both facing south, with air above: the way plantSigns put them. */
+	private static boolean ourShelves(ServerLevel level, BlockPos at, Block shelf) {
+		BlockState a = level.getBlockState(at), b = level.getBlockState(at.above());
+		return a.is(shelf) && b.is(shelf) && facesSouth(a) && facesSouth(b) && level.getBlockState(at.above(2)).isAir();
+	}
+
+	private static boolean facesSouth(BlockState st) {
+		return st.getOptionalValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING).orElse(null) == net.minecraft.core.Direction.SOUTH;
+	}
+
+	/** How many shelves there are within r of a spot. */
+	private static int shelvesNear(ServerLevel level, int x, int y, int z, int r) {
+		int n = 0;
+		for (int dx = -r; dx <= r; dx++)
+			for (int dz = -r; dz <= r; dz++)
+				for (int dy = -3; dy <= 4; dy++) {
+					BlockState b = level.getBlockState(new BlockPos(x + dx, y + dy, z + dz));
+					if (net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(b.getBlock()).getPath().endsWith("shelf")) n++;
+				}
+		return n;
+	}
+
+	/** Takes away the faint light rings lightUp put round lamps (level 7, at the ground). */
+	private static void unlightRings(ServerLevel level, Zone z) {
+		int street = streetY(level, z);
+		for (int x = z.x1(); x <= z.x2(); x++) {
+			for (int zz = z.z1(); zz <= z.z2(); zz++) {
+				int top = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, x, zz);
+				for (int y = Math.max(street - 4, top - 1); y <= Math.min(street + 5, top + 1); y++) {
+					BlockPos at = new BlockPos(x, y, zz);
+					BlockState b = level.getBlockState(at);
+					if (b.is(Blocks.LIGHT) && b.getValue(net.minecraft.world.level.block.LightBlock.LEVEL) == 7) level.setBlock(at, Blocks.AIR.defaultBlockState(), 2);
+				}
+			}
+		}
+	}
+
 	private static boolean signNear(ServerLevel level, int x, int y, int z, int r) {
 		for (int dx = -r; dx <= r; dx++) {
 			for (int dz = -r; dz <= r; dz++) {
@@ -2179,19 +2295,19 @@ public final class Game {
 				done.add("place:" + z.place());
 				changed = true;
 			}
-			// Lamps' light, the softer way (taking away 0.7's brighter rings where they were put).
-			if (!done.contains("light2:" + z.place() + z.x1() + "," + z.z1())) {
+			// Nothing of ours on the map: the lamp light rings and the shelf signs earlier versions put down are
+			// taken away again (once per place), and none are put down any more.
+			if (!done.contains("unlight7:" + z.place() + z.x1() + "," + z.z1())) {
 				unlight(level, z);
-				lightUp(level, z);
-				placed.add("light2:" + z.place() + z.x1() + "," + z.z1());
-				done.add("light2:" + z.place() + z.x1() + "," + z.z1());
+				unlightRings(level, z);
+				placed.add("unlight7:" + z.place() + z.x1() + "," + z.z1());
+				done.add("unlight7:" + z.place() + z.x1() + "," + z.z1());
 				changed = true;
 			}
-			// The games' signs, where the map doesn't have one.
-			if (!done.contains("signs:" + z.place() + z.x1() + "," + z.z1())) {
-				plantSigns(level, z);
-				placed.add("signs:" + z.place() + z.x1() + "," + z.z1());
-				done.add("signs:" + z.place() + z.x1() + "," + z.z1());
+			if (done.contains("signs:" + z.place() + z.x1() + "," + z.z1()) && !done.contains("unsigns:" + z.place() + z.x1() + "," + z.z1())) {
+				unplantSigns(s, level, z);
+				placed.add("unsigns:" + z.place() + z.x1() + "," + z.z1());
+				done.add("unsigns:" + z.place() + z.x1() + "," + z.z1());
 				changed = true;
 			}
 		}

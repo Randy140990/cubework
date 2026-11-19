@@ -27,7 +27,7 @@ const MATDEF = {
   doorExt: { tex: "doorExt", fit: true }, doorLab: { tex: "doorLab", fit: true }, painting: { tex: "painting", fit: true }, paintingHills: { tex: "paintingHills", fit: true },
   poster: { tex: "poster", fit: true }, posterRival: { tex: "posterRival", fit: true }, posterDragon: { tex: "posterDragon", fit: true }, clock: { tex: "clock", fit: true, cut: true },
   photos: { tex: "photos", fit: true }, map: { tex: "map", fit: true }, sign: { tex: "sign", fit: true }, dartboard: { tex: "dartboard", fit: true, cut: true }, bag: { tex: "bag", per: 1 },
-  ball: { tex: "ball", fit: true }, flowerTop: { tex: "flowerTop", per: 1 }, flower: { tex: "flower", fit: true, cut: true, double: true }, tallGrass: { tex: "tallGrass", fit: true, cut: true, double: true },
+  ball: { tex: "ball", fit: true }, ballTop: { tex: "ballTop", fit: true }, flowerTop: { tex: "flowerTop", per: 1 }, flower: { tex: "flower", fit: true, cut: true, double: true }, tallGrass: { tex: "tallGrass", fit: true, cut: true, double: true },
   mailbox: { tex: "mailbox", fit: true }, keyboard: { tex: "keyboard", fit: true }, console: { tex: "console", fit: true }, bunting: { tex: "bunting", fit: true, cut: true, double: true },
   trophyPlate: { tex: "trophyPlate", fit: true },
   aoN: { tex: "aoN", fit: true, overlay: true }, aoW: { tex: "aoW", fit: true, overlay: true }, aoE: { tex: "aoE", fit: true, overlay: true },

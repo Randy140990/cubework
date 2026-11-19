@@ -18,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerModelMixin {
 	@Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"), require = 0)
 	private void retromon$device(AvatarRenderState state, CallbackInfo ci) {
+		// In a Retromon save players' corners are just softened, as the Person Viewer draws everyone.
+		com.insidethecube.retromon.client.Soft.apply(((PlayerModel) (Object) this).root(), Adventure.inSave, com.insidethecube.retromon.client.Soft.PEOPLE);
 		Minecraft mc = Minecraft.getInstance();
 		if (!Adventure.active() || mc.player == null || state.id != mc.player.getId()) return;
 		float[] p = Device.pose(mc.getDeltaTracker().getGameTimeDeltaPartialTick(true));

@@ -79,6 +79,10 @@ public final class V {
 		Ui.rrv(g, x(x), y(y), s(w), s(h), s(r), top, bottom);
 	}
 
+	public static void rrStops(GuiGraphics g, float x, float y, float w, float h, float r, float[] at, int[] cols) {
+		Ui.rrStops(g, x(x), y(y), s(w), s(h), s(r), at, cols);
+	}
+
 	public static void ring(GuiGraphics g, float x, float y, float w, float h, float r, float t, int c) {
 		Ui.ring(g, x(x), y(y), s(w), s(h), s(r), s(t), c);
 	}

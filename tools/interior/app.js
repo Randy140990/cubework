@@ -476,7 +476,7 @@ function renderPanel() {
     <div><h2>Controls</h2><div class="ctrls">
       <kbd>W A S D</kbd><span>Walk (or the arrow keys)</span>
       <kbd>Shift</kbd><span>Run</span>
-      <kbd>E</kbd><span>Look, talk, or go on (or Space, Enter)</span>
+      <kbd>Space</kbd><span>Look, talk, or go on (or Enter; E in menus)</span>
       <kbd>Stairs</kbd><span>Walk up or down them to change floor</span>
       <kbd>Door mat</kbd><span>Walk off it, south, to go out: a fade to black</span>
       <kbd>Doors</kbd><span>Outside, walk into one: it opens, then the circle closes in</span>

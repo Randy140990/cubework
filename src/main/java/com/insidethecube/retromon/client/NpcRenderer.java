@@ -38,6 +38,8 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 	static class Figure extends HumanoidModel<State> {
 		Figure(net.minecraft.client.model.geom.ModelPart root) {
 			super(root);
+			// Corners just softened, as the Person Viewer draws everyone.
+			Soft.apply(root, true, Soft.PEOPLE);
 		}
 
 		@Override
