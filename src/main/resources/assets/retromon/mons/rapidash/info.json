@@ -1,0 +1,72 @@
+{
+ "idle": "animation.blazehart.battle_idle",
+ "ground": "animation.blazehart.ground_idle",
+ "actions": {
+  "cry": "animation.blazehart.cry",
+  "recoil": "animation.blazehart.recoil",
+  "attack": "animation.blazehart.attack",
+  "critical": "animation.blazehart.critical",
+  "special": "animation.blazehart.special",
+  "recall": "animation.blazehart.recall",
+  "sendout": "animation.blazehart.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.blazehart.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.blazehart.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.blazehart.faint",
+   "parts": []
+  }
+ },
+ "move": "FIRE SPIN",
+ "attack_move": "FURY ATTACK",
+ "scale": 0.736,
+ "height": 2.717,
+ "texture": "retromon:textures/mons/rapidash.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/rapidash_glow_0.png",
+    "retromon:textures/mons/rapidash_glow_1.png",
+    "retromon:textures/mons/rapidash_glow_2.png",
+    "retromon:textures/mons/rapidash_glow_3.png",
+    "retromon:textures/mons/rapidash_glow_4.png",
+    "retromon:textures/mons/rapidash_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BLAZEHART",
+ "anchors": {
+  "mouth": [
+   0,
+   23.52,
+   -16.46
+  ],
+  "back": [
+   0,
+   28.1,
+   0.0
+  ],
+  "body": [
+   0,
+   16.1,
+   0.0
+  ],
+  "size": [
+   15.68,
+   40.24,
+   29.86
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

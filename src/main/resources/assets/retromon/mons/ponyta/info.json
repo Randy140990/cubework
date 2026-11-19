@@ -1,0 +1,72 @@
+{
+ "idle": "animation.emberfawn.battle_idle",
+ "ground": "animation.emberfawn.ground_idle",
+ "actions": {
+  "cry": "animation.emberfawn.cry",
+  "recoil": "animation.emberfawn.recoil",
+  "attack": "animation.emberfawn.attack",
+  "critical": "animation.emberfawn.critical",
+  "special": "animation.emberfawn.special",
+  "recall": "animation.emberfawn.recall",
+  "sendout": "animation.emberfawn.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.emberfawn.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.emberfawn.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.emberfawn.faint",
+   "parts": []
+  }
+ },
+ "move": "EMBER",
+ "attack_move": "STOMP",
+ "scale": 1.01,
+ "height": 1.188,
+ "texture": "retromon:textures/mons/ponyta.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/ponyta_glow_0.png",
+    "retromon:textures/mons/ponyta_glow_1.png",
+    "retromon:textures/mons/ponyta_glow_2.png",
+    "retromon:textures/mons/ponyta_glow_3.png",
+    "retromon:textures/mons/ponyta_glow_4.png",
+    "retromon:textures/mons/ponyta_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "EMBERFAWN",
+ "anchors": {
+  "mouth": [
+   0,
+   14.8,
+   -11.9
+  ],
+  "back": [
+   0,
+   20.0,
+   0.0
+  ],
+  "body": [
+   0,
+   9.5,
+   0.0
+  ],
+  "size": [
+   11.2,
+   19.0,
+   19.5
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

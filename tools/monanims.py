@@ -520,3 +520,49 @@ def biped(sid, m, walk=0.7, stride=28, k=1.0, slow=1.0, extras=None, guard=40):
     info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
     battle_set(A, m, info, "hopper", k, slow, extras)
     return A, info
+
+
+def floater(sid, m, tentacles=(), k=1.0, slow=1.0, extras=None, bob=1.0, pulse_bell=0.0):
+    """A creature that floats (a jellyfish, a hovering stone): it bobs and drifts, its tentacles (each a list of joint
+    names, root first) rippling below it a beat apart; its arms, if it has them, drifting at its sides. It tips forward
+    to move, rises and flares out to call. pulse_bell: how much its bell (body) swells and narrows as it swims."""
+    extras = with_move(m, extras)
+    A = Anims(sid)
+
+    def tents(period, amp, yaw):
+        out = {}
+        for j, names in enumerate(tentacles):
+            out.update(chain(names, period, pitch=amp, yaw=yaw, lag=55, grow=0.35))
+            for i, nm in enumerate(names):
+                out[nm] = track(rotation=[wave(period, amp * (1 + i * 0.35), i * 55 + j * 47), wave(period * 1.5, yaw * (1 + i * 0.3), i * 50 + j * 83), 0])
+        return out
+    sw = (lambda P: track(position=[0, wave(P, bob * k, 90), 0], rotation=[wave(P, 3), wave(P * 2, 6), wave(P * 1.3, 3)],
+                          scale=[wave(P, pulse_bell, 0, 1), wave(P, -pulse_bell, 0, 1), wave(P, pulse_bell, 0, 1)] if pulse_bell else None))
+    arms = lambda P, a, base=0: {"arm_right": track(rotation=[wave(P, a, 0, base), 0, wave(P, a * 0.6, 90, 10)]),
+                                 "arm_left": track(rotation=[wave(P, a, 40, base), 0, wave(P, -a * 0.6, 130, -10)]),
+                                 "forearm_right": track(rotation=[wave(P, a * 0.6, 60, -10), 0, 0]), "forearm_left": track(rotation=[wave(P, a * 0.6, 100, -10), 0, 0])}
+    P = 2.4 * slow
+    ground = A.add("ground_idle", P, only(m, merge({"body": sw(P), "head": track(rotation=[wave(P, 3, 90), wave(P * 2, 8), 0])},
+                                                    arms(P, 6), tents(P, 10, 6), eyelids(P * 0.7), _extra(extras, "idle"))))
+    B = 1.4 * slow
+    battle = A.add("battle_idle", B, only(m, merge({"body": sw(B)}, arms(B, 10, -30), tents(B, 14, 8), eyelids(B * 0.7), _extra(extras, "battle"))))
+    W = 1.2 * slow
+    walk_id = A.add("ground_walk", W, only(m, merge({"body": track(position=[0, wave(W, bob * 0.8 * k, 90), 0], rotation=[12, 0, wave(W, 3)],
+                                                             scale=[wave(W, pulse_bell, 0, 1), wave(W, -pulse_bell, 0, 1), wave(W, pulse_bell, 0, 1)] if pulse_bell else None)},
+                                                     arms(W, 12, 20), tents(W, 22, 4), eyelids(W * 0.7), _extra(extras, "walk"))))
+    C = 1.3 * slow
+    up = lambda a: keys({0: [0, 0, 0], C * 0.2: a, C * 0.7: a, C: [0, 0, 0]})
+    flare = {}
+    for names in tentacles:
+        for i, nm in enumerate(names):
+            flare[nm] = track(rotation=up([-30 if i == 0 else -10, 0, 0]))
+    cry = A.add("cry", C, only(m, merge({"body": track(position=keys({0: [0, 0, 0], C * 0.2: [0, 2 * k, 0], C * 0.7: [0, 2 * k, 0], C: [0, 0, 0]}),
+                                                     rotation=up([-10, 0, 0])),
+                                         "jaw": track(rotation=up([35, 0, 0])), "head": track(rotation=up([-14, 0, 0])),
+                                         "arm_right": track(rotation=up([-110, 0, 30])), "arm_left": track(rotation=up([-110, 0, -30]))},
+                                        flare, _extra(extras, "cry"))), loop=False)
+    R = 0.75 * slow
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k), tents(R, 24, 10), _extra(extras, "recoil"))), loop=False)
+    info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
+    battle_set(A, m, info, "hopper", k, slow, extras)
+    return A, info

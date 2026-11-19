@@ -1,0 +1,58 @@
+{
+ "idle": "animation.snapsprout.battle_idle",
+ "ground": "animation.snapsprout.ground_idle",
+ "actions": {
+  "cry": "animation.snapsprout.cry",
+  "recoil": "animation.snapsprout.recoil",
+  "attack": "animation.snapsprout.attack",
+  "critical": "animation.snapsprout.critical",
+  "special": "animation.snapsprout.special",
+  "recall": "animation.snapsprout.recall",
+  "sendout": "animation.snapsprout.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.snapsprout.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.snapsprout.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.snapsprout.faint",
+   "parts": []
+  }
+ },
+ "move": "SLEEP POWDER",
+ "attack_move": "VINE WHIP",
+ "scale": 0.859,
+ "height": 0.931,
+ "texture": "retromon:textures/mons/bellsprout.png",
+ "layers": [],
+ "name": "SNAPSPROUT",
+ "anchors": {
+  "mouth": [
+   0,
+   12.0,
+   -7.0
+  ],
+  "back": [
+   0,
+   15.9,
+   0.0
+  ],
+  "body": [
+   0,
+   6.8,
+   0.0
+  ],
+  "size": [
+   8.0,
+   14.9,
+   8.0
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

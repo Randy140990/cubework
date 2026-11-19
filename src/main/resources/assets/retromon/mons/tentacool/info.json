@@ -1,0 +1,72 @@
+{
+ "idle": "animation.driftsail.battle_idle",
+ "ground": "animation.driftsail.ground_idle",
+ "actions": {
+  "cry": "animation.driftsail.cry",
+  "recoil": "animation.driftsail.recoil",
+  "attack": "animation.driftsail.attack",
+  "critical": "animation.driftsail.critical",
+  "special": "animation.driftsail.special",
+  "recall": "animation.driftsail.recall",
+  "sendout": "animation.driftsail.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.driftsail.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.driftsail.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.driftsail.faint",
+   "parts": []
+  }
+ },
+ "move": "BUBBLEBEAM",
+ "attack_move": "POISON STING",
+ "scale": 0.784,
+ "height": 1.212,
+ "texture": "retromon:textures/mons/tentacool.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/tentacool_glow_0.png",
+    "retromon:textures/mons/tentacool_glow_1.png",
+    "retromon:textures/mons/tentacool_glow_2.png",
+    "retromon:textures/mons/tentacool_glow_3.png",
+    "retromon:textures/mons/tentacool_glow_4.png",
+    "retromon:textures/mons/tentacool_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "DRIFTSAIL",
+ "anchors": {
+  "mouth": [
+   0,
+   12.5,
+   -5.9
+  ],
+  "back": [
+   0,
+   20.4,
+   0.0
+  ],
+  "body": [
+   0,
+   15.2,
+   0.0
+  ],
+  "size": [
+   7.04,
+   19.4,
+   10.47
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.snapbulb.ground_idle",
+ "ground": "animation.snapbulb.ground_idle",
+ "actions": {
+  "cry": "animation.snapbulb.cry",
+  "recoil": "animation.snapbulb.recoil",
+  "attack": "animation.snapbulb.attack",
+  "critical": "animation.snapbulb.critical",
+  "special": "animation.snapbulb.special",
+  "recall": "animation.snapbulb.recall",
+  "sendout": "animation.snapbulb.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.snapbulb.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.snapbulb.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.snapbulb.faint",
+   "parts": []
+  }
+ },
+ "move": "STUN SPORE",
+ "attack_move": "WRAP",
+ "scale": 1.43,
+ "height": 0.769,
+ "texture": "retromon:textures/mons/weepinbell.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/weepinbell_glow_0.png",
+    "retromon:textures/mons/weepinbell_glow_1.png",
+    "retromon:textures/mons/weepinbell_glow_2.png",
+    "retromon:textures/mons/weepinbell_glow_3.png",
+    "retromon:textures/mons/weepinbell_glow_4.png",
+    "retromon:textures/mons/weepinbell_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SNAPBULB",
+ "anchors": {
+  "mouth": [
+   0,
+   9.0,
+   -7.5
+  ],
+  "back": [
+   0,
+   13.3,
+   0.0
+  ],
+  "body": [
+   0,
+   1.0,
+   0.0
+  ],
+  "size": [
+   16.6,
+   12.3,
+   24.0
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

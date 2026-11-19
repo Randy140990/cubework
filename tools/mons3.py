@@ -11,7 +11,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 from monlib import CLEAR, Cube, Mat, Model, blob, face_blob, hash01, mix, rgb, track, wave, keys, write  # noqa: E402
-from monanims import crawler, cocoon, insect, serpent, four_legs, hopper, flyer, burrower, biped  # noqa: E402
+from monanims import crawler, cocoon, insect, serpent, four_legs, hopper, flyer, burrower, biped, floater  # noqa: E402
 from mons import leaf_mat, sharp_claw_mat, fx_for, open_mouth, stout_legs, whisker_mat, dragon_wing, membrane_mat, shag_mat  # noqa: E402
 from monlib import flame  # noqa: E402
 from mons2 import fur, brush, n  # noqa: E402
@@ -1828,11 +1828,500 @@ def quadrilla():
     gorilla("machamp", "QUADRILLA", 2.2, 2)
 
 
+# ======================================================================================================
+# The flytraps: SNAPSPROUT > SNAPBULB > GULPTRAP (in place of Bellsprout, Weepinbell, Victreebel)
+# ======================================================================================================
+
+def bristle_mat(base, tip):
+    """Stiff bristles along a trap's rim on a flat part lying along z (their roots at the back): thin spines side by side,
+    running pale towards their points."""
+    B, T = rgb(base), rgb(tip)
+    return Mat(base, lambda a: CLEAR if a.col % 2 else mix(B, T, 1 - a.lz), noise=0, edge=0, flat=True)
+
+
+def spotted(base, light, dark, spot, inner=None, inner_face="bottom", seed="sp", rate=0.06):
+    """A plant's skin: lighter on top, flecked with poison spots; (inner) the trap's red lining on one face."""
+    F = fur(base, light, dark, speck=0.2)
+
+    def f(at):
+        if inner is not None and at.face == inner_face:
+            return mix(inner, "#FFFFFF", 0.15 * hash01("in", at.col, at.row))
+        if hash01(seed, round(at.x), round(at.y), round(at.z)) < rate and at.face != "bottom":
+            return rgb(spot)
+        return F(at)
+    return f
+
+
+def trap_lobes(m, parent, w, y, z_front, depth, h_up, h_low, lid, mouth, bristle, b_len, hinge_z, open_deg=16, side_bristles=True, jaw_b=1):
+    """A flytrap's two lobes hinged at the back: the lid (the head) and the lower lobe (the jaw), each with a row of
+    bristles along its rim, red inside."""
+    m.bone("head", parent, [0, y, hinge_z], blob([-w / 2, y, z_front], [w, h_up, depth], lid) +
+           [Cube([-w / 2, y + 0.3, z_front - b_len], [n(w), 0, n(b_len)], bristle)] +
+           ([Cube([-w / 2 - b_len, y + 0.3, z_front + 1], [n(b_len), 0, n(depth - 2)], bristle, [0, 0, -12], [-w / 2, y + 0.3, 0]),
+             Cube([w / 2, y + 0.3, z_front + 1], [n(b_len), 0, n(depth - 2)], bristle, [0, 0, 12], [w / 2, y + 0.3, 0])] if side_bristles else []),
+           rotation=[-open_deg, 0, 0])
+    m.bone("jaw", parent, [0, y, hinge_z], blob([-w / 2 + 0.5, y - h_low, z_front + 0.3], [w - 1, h_low, depth - 0.3], mouth, b=jaw_b) +
+           [Cube([-w / 2 + 0.5, y - 0.3, z_front + 0.3 - b_len], [n(w - 1), 0, n(b_len)], bristle)], rotation=[open_deg * 0.4, 0, 0])
+
+
+def leaf_arm(m, x, y, z, stalk, leaf_l, leaf_w, stalk_m, leaf, rest=(0, 0, 50), blade_rest=(0, 0, 20)):
+    """A leaf on a stalk for an arm: the stalk (from the shoulder) and the leaf blade (bending at its base)."""
+    m.pair("arm_right", "body", [-x, y, z], [Cube([-x - stalk, y - 0.5, z - 0.5], [n(stalk), 1, 1], stalk_m)], rotation=list(rest))
+    m.pair("forearm_right", "arm_right", [-x - stalk, y, z], [Cube([-x - stalk - leaf_w / 2, y - leaf_l, z], [n(leaf_w), n(leaf_l), 0], leaf, [0, 0, 90], [-x - stalk, y, z])],
+           rotation=list(blade_rest))
+
+
+def flytrap(sid, name, stands, stage):
+    """A walking flytrap. The sprout is a small two-lobed trap fringed with bristles on a thin stalk, two leaves for
+    arms, walking on its roots, button eyes on its lid. The second is a fat spotted bulb that opens as a great trap,
+    a leaf at each side and a vine curling from its back; it hops. The last is a huge gaping trap with long bristles,
+    big leaves, a long jointed vine ending in a leaf, sitting on a knot of roots."""
+    m = Model()
+    G, G_L, G_D, RED, SPOT, ROOT = "#7AB83A", "#A8D860", "#4A7A24", "#E0485A", "#8A4AA8", "#8A6A3A"
+    if stage == 2:
+        G, G_L, G_D = "#9AC040", "#C8E070", "#5A7A20"
+    lid = Mat(G, spotted(G, G_L, G_D, SPOT, RED, "bottom"), noise=0.02)
+    mouth = Mat(G, spotted(G, G_L, G_D, SPOT, RED, "top", seed="sp2"), noise=0.02)
+    stalk = Mat(G_D, fur(G_D, G, mix(G_D, "#000000", 0.2), speck=0.1), noise=0.02)
+    bristle = bristle_mat(G_L, "#FFF4C0")
+    leaf = leaf_mat(G_L, G_D, "#E8F4B0")
+    rootm = Mat(ROOT, fur(ROOT, "#A88A5A", "#5A4426", speck=0.2), noise=0.02)
+    m.bone("root", None, [0, 0, 0])
+    if stage == 0:
+        m.bone("body", "root", [0, 4, 0], [Cube([-1, 3, -1], [2, 8, 2], stalk), Cube([-1.5, 2.6, -1.5], [3, 1, 3], rootm)])
+        trap_lobes(m, "body", 5, 12, -5, 6, 2.5, 2, lid, mouth, bristle, 1.5, 0.5, open_deg=18, side_bristles=False)
+        m.eyes("head", x_inner=0.5, y=12.9, z=-5, w=1, h=1, iris="#141018", pupil="#141018", skin=G, grid=["P"])
+        leaf_arm(m, 1, 7.5, -0.2, 1.5, 5, 3, stalk, leaf_mat(G_L, G_D, "#E8F4B0", base_end=1), rest=(0, 0, 30), blade_rest=(0, 0, 30))
+        upright_legs(m, 1.0, 3.2, 0, 1, rootm, rootm, 3, ntoes=2, toe_m=Mat("#5A4426", noise=0, edge=0), thigh_w=1.4)
+        moves(m, "VINE WHIP", "SLEEP POWDER")
+        A, info = biped(name.lower(), m, walk=0.45, stride=30, k=0.6, guard=0,
+                        extras={"idle": {"head": track(rotation=[wave(2, 5, 0, -2), wave(4, 10), 0]), "jaw": track(rotation=[wave(2, 4, 180), 0, 0])}})
+        write(sid, name, m, A, info, stands)
+        return
+    big = stage == 2
+    if not big:
+        m.bone("body", "root", [0, 6, 0], [Cube([-2, 0, -2], [4, 1.5, 4], rootm)])
+        trap_lobes(m, "body", 10, 9, -5, 10, 3, 7.5, lid, mouth, bristle, 2, 4.5, open_deg=20, jaw_b=2)
+        m.eyes("head", x_inner=1.2, y=9.8, z=-5, w=2, h=2, iris="#E8C030", pupil="#141008", skin=G, iris_light="#FFE880", grid=["IW", "PP"])
+        leaf_arm(m, 4.8, 5, 0, 1.5, 6, 4, stalk, leaf_mat(G_L, G_D, "#E8F4B0", base_end=1), rest=(0, 0, 30), blade_rest=(0, 0, 20))
+        names, zt = tail_bones(m, "head", 11, 3.5, [(1, 1, 2.5)] * 4, stalk, (40, 30, 30, 30))
+        tip = bone_of(m, names[-1])
+        tip.cubes.append(Cube([-1.5, tip.pivot[1], zt - 0.5], [3, 0, 4], leaf_mat(G_L, G_D, "#E8F4B0", along="z")))
+        moves(m, "WRAP", "STUN SPORE")
+        k, hop, hh = 0.8, 0.55, 2.0
+    else:
+        m.bone("body", "root", [0, 8, 0], [Cube([-3, 0, -3], [6, 3, 6], rootm), Cube([-2, 2.5, -2], [4, 6, 4], stalk)] +
+               [Cube([-1, 0, -1], [2, 1, 5], rootm, [0, a, 0], [0, 0, 0]) for a in (-150, -90, -30, 30, 90, 150)])
+        trap_lobes(m, "body", 14, 14, -9, 14, 4, 5.5, lid, mouth, bristle, 3.5, 5, open_deg=30, jaw_b=2)
+        m.eyes("head", x_inner=1.5, y=15, z=-9, w=3, h=2, iris="#E8A020", pupil="#141008", skin=G, iris_light="#FFE070", grid=["LLL", "IPW"])
+        leaf_arm(m, 2, 6.5, 0, 2.5, 10, 6, stalk, leaf_mat(G_L, G_D, "#E8F4B0", base_end=1), rest=(0, 0, 40), blade_rest=(0, 0, 12))
+        names, zt = tail_bones(m, "head", 17, 4.5, [(1.5, 1.5, 3)] * 5, stalk, (60, 30, 25, 25, 30))
+        tip = bone_of(m, names[-1])
+        tip.cubes.append(Cube([-2.5, tip.pivot[1], zt - 0.5], [5, 0, 7], leaf_mat(G_L, G_D, "#E8F4B0", along="z")))
+        moves(m, "RAZOR LEAF", "SLEEP POWDER")
+        k, hop, hh = 1.1, 0.7, 1.6
+    fx_for(m, k)
+    A, info = hopper(name.lower(), m, hop=hop, height=hh, k=k, extras={"idle": {"head": track(rotation=[wave(2.4, 5, 0, -3), 0, 0])},
+                                                                          "cry": {"head": track(rotation=keys({0: [0, 0, 0], 0.2: [-30, 0, 0], 0.7: [-30, 0, 0], 1.0: [0, 0, 0]}))}})
+    write(sid, name, m, A, info, stands)
+
+
+def snapsprout():
+    flytrap("bellsprout", "SNAPSPROUT", 0.8, 0)
+
+
+def snapbulb():
+    flytrap("weepinbell", "SNAPBULB", 1.1, 1)
+
+
+def gulptrap():
+    flytrap("victreebel", "GULPTRAP", 1.7, 2)
+
+
+# ======================================================================================================
+# The sail jellies: DRIFTSAIL > STORMSAIL (in place of Tentacool, Tentacruel)
+# ======================================================================================================
+
+def crest_mat(base, light, rib):
+    """A floating jelly's crest on a flat part standing along its back: rising in a ruffled arc, pale ribs up it, its top
+    edge rippling."""
+    B, Lt, R = rgb(base), rgb(light), rgb(rib)
+
+    def f(at):
+        u, v = at.lz, at.ly
+        top = math.sin(math.pi * u) ** 0.6 * (0.82 + 0.18 * math.cos(u * math.pi * 7))
+        if v > top:
+            return CLEAR
+        col = mix(B, Lt, v / max(0.05, top))
+        if abs(((u * 6) % 1.0) - 0.5) < 0.1:
+            col = mix(col, R, 0.5)
+        return col
+    return Mat(base, f, noise=0.01, edge=0, flat=True)
+
+
+def dangle(m, parent, x, y, z, segs, mat, rests, prefix, tip=None):
+    """A tentacle hanging in joints: segs [(w, length)], each running down from the one before; rests: each joint's
+    resting tilt. Its joints are named prefix_right, prefix + 'b'_right... (and mirrored on the left). Gives the names."""
+    letters = "abcdefgh"
+    prev, names = parent, []
+    for i, ((w, L), r) in enumerate(zip(segs, rests)):
+        nm = f"{prefix}{letters[i]}_right"
+        cubes = [Cube([-x - w / 2, y - L - 0.2, z - w / 2], [n(w), n(L + 0.3), n(w)], mat)]
+        if tip is not None and i == len(segs) - 1:
+            cubes.append(Cube([-x - w / 2, y - L - 0.6, z - w / 2], [n(w), 1, n(w)], tip))
+        m.pair(nm, prev, [-x, y, z], cubes, rotation=[r, 0, 0])
+        prev, y = nm, y - L
+        names.append(nm)
+    return names
+
+
+def man_o_war(sid, name, stands, big):
+    """A floating sail jelly. The first is a small glossy blue float with a pink ruffled crest along its back, button
+    eyes, glowing spots on its sides, and long tentacles in joints trailing below. Grown, a great storm-blue float
+    with a tall ribbed crest, a scowl, rows of glowing spots, a beard of short stinging polyps, and eight jointed
+    tentacles, the front pair long and heavy."""
+    m = Model()
+    s = 1.0 if not big else 1.5
+    S = lambda v: [x * s for x in v]
+    if not big:
+        F, F_L, F_D, CREST, CREST_L, TENT, TIP = "#7A9CF0", "#BCD0FF", "#4A5CB8", "#E070C0", "#FFC0E8", "#4A5CB8", "#C8D8FF"
+    else:
+        F, F_L, F_D, CREST, CREST_L, TENT, TIP = "#4A6CD0", "#90B0FF", "#283A8A", "#C04AA8", "#FF9AD8", "#2A3A8A", "#A8C0FF"
+    GLOW = "#7AF8FF"
+    floatm = Mat(F, lambda a: rgb(F_D) if a.face == "bottom" else (rgb(mix(F_L, "#FFFFFF", 0.3)) if a.face == "top" and hash01("gl", a.col, a.row) < 0.1 else
+                                                                   fur(F, F_L, F_D, speck=0.1)(a)), noise=0.015)
+    tent = Mat(TENT, lambda a: rgb(mix(TENT, TIP, 0.5)) if a.row % 3 == 0 else None, noise=0.02)
+    tipm = Mat(TIP, noise=0.0, edge=0)
+    m.bone("root", None, [0, 0, 0])
+    fy = 13 if not big else 15
+    m.bone("body", "root", S([0, fy, 0]), blob(S([-3.5, fy - 2, -5]), S([7, 5, 10]), floatm) +
+           [Cube(S([0, fy + 2.4, -4]), [0, n(4.5 * s), n(8 * s)], crest_mat(CREST, CREST_L, "#FFFFFF"))])
+    if big:
+        bone_of(m, "body").cubes += blob(S([-4, fy - 2.5, -3]), S([8, 4, 7]), floatm)
+    m.bone("head", "body", S([0, fy, -5]), [Cube(S([-3, fy - 1.5, -5.4]), [n(6 * s), n(3.5 * s), 1], floatm)])
+    m.eyes("head", x_inner=0.8 * s, y=(fy - 0.6) * s, z=-5.4 * s, w=2, h=2, iris="#141018" if not big else "#E03A4A", pupil="#141018",
+           skin=F, iris_light="#FF8A8A", grid=["PW", "PP"] if not big else ["IW", "PI"])
+    if big:
+        m.brows("head", [Cube(S([-3, fy + 1.4, -5.8]), [n(2.4 * s), 1, 1], Mat(F_D, noise=0, edge=0), [0, 0, -20], S([-0.8, fy + 1.8, -5.6]))])
+    spots = glow_patch(GLOW, "diamond")
+    body = bone_of(m, "body")
+    for i in range(2 if not big else 4):
+        zz = (-2.5 + i * (4 if not big else 2.2)) * s
+        body.cubes += [Cube([-3.52 * s, (fy - 0.6) * s, zz], [0, n(1.4 * s), n(1.4 * s)], spots), Cube([3.52 * s, (fy - 0.6) * s, zz], [0, n(1.4 * s), n(1.4 * s)], spots)]
+    under = (fy - 2) * s
+    tents = []
+    if not big:
+        tents.append(dangle(m, "body", 1.4, under, -2.5, [(1, 2)] * 5, tent, (8, 6, 6, 8, 10), "tlong", tipm))
+        tents.append(dangle(m, "body", 2.2, under, 1, [(1, 1.8)] * 3, tent, (14, 8, 8), "tshort", tipm))
+        tents.append(dangle(m, "body", 0.8, under, 3.5, [(1, 1.6)] * 3, tent, (20, 10, 10), "tback", tipm))
+    else:
+        tents.append(dangle(m, "body", 2 * s, under, -3 * s, [(2, 2.6)] + [(1.5, 2.6)] * 5, tent, (6, 6, 6, 8, 8, 10), "tlong", tipm))
+        for j, (tx, tz) in enumerate(((3, -0.5), (2.4, 2.5), (1, 4.6))):
+            tents.append(dangle(m, "body", tx * s, under, tz * s, [(1.2, 2.4)] * 4, tent, (14 + j * 4, 8, 8, 10), "tm" + "xyz"[j], tipm))
+        pol = Mat("#8AA0F0", lambda a: rgb("#C8D8FF") if a.ly < 0.3 else None, noise=0.02)
+        body.cubes += [Cube([px * s - 0.5, under - 2, pz * s - 0.5], [1, 2, 1], pol) for px, pz in ((-1.2, -1), (1.2, -1), (0, 0.5), (-0.6, 1.8), (0.6, 1.8), (0, -2.2))]
+    fx_for(m, 0.7 * s)
+    moves(m, "POISON STING" if not big else "CONSTRICT", "BUBBLEBEAM" if not big else "HYDRO PUMP")
+    all_t = [nm for ch in tents for nm in ch] + [nm.replace("right", "left") for ch in tents for nm in ch]
+    chains = [ch for ch in tents] + [[nm.replace("right", "left") for nm in ch] for ch in tents]
+    A, info = floater(name.lower(), m, tentacles=chains, k=0.8 * s, bob=0.8, pulse_bell=0.04)
+    write(sid, name, m, A, info, stands)
+
+
+def driftsail():
+    man_o_war("tentacool", "DRIFTSAIL", 0.95, False)
+
+
+def stormsail():
+    man_o_war("tentacruel", "STORMSAIL", 2.0, True)
+
+
+# ======================================================================================================
+# The geodes: GEODINK > GEOBRUTE > GEOTITAN (in place of Geodude, Graveler, Golem)
+# ======================================================================================================
+
+def rock_mat(base, light, dark, crack=None, seed="rk"):
+    """Rough stone: faceted patches of lighter and darker grey-brown, paler on top, (crack) dark cracks running across."""
+    B, L, D = rgb(base), rgb(light), rgb(dark)
+
+    def f(at):
+        h = hash01(seed, math.floor(at.x / 2), math.floor(at.y / 2), math.floor(at.z / 2))
+        c = mix(D, L, 0.25 + h * 0.6)
+        if at.face == "top":
+            c = mix(c, L, 0.3)
+        if at.face == "bottom":
+            c = mix(c, D, 0.4)
+        if crack and hash01(seed + "c", round(at.x), round(at.y), round(at.z)) < 0.05:
+            return rgb(crack)
+        return c
+    return Mat(base, f, noise=0.03)
+
+
+def crystal_mat(base, tip):
+    return taper_mat(base, tip, glow=None)
+
+
+def crystals(bone, pts, mat, qw=1.4):
+    """A cluster of crystals bursting out (pts: (x, y, z, length, rotation))."""
+    for x, y, z, L, rot in pts:
+        bone.cubes += spike(x, y, z, L, rot, mat, qw)
+
+
+def geode(sid, name, stands, stage):
+    """A living geode. The first is a round grey-brown stone that floats, a crack across its front glinting with violet
+    crystals, a stony brow over small eyes, and two arms ending in rocky fists. The second is a big lumpy boulder on
+    stubby legs, four arms, crystals bursting from the cracks along its back. The last is a great boulder with a
+    shell's dome and a ridge of amethyst spines, a stony head jutting out the front with a heavy jaw, and thick
+    clawed limbs."""
+    m = Model()
+    R, R_L, R_D, CRK = "#8A8070", "#B0A690", "#5A5246", "#2A2620"
+    CRY, CRY_L = "#8A4AE8", "#F0E0FF"
+    rock = rock_mat(R, R_L, R_D, CRK)
+    skin = Mat("#9A8E7A", lambda a: rgb("#B8AC96") if a.face == "front" and a.ly > 0.5 else None, noise=0.025)
+    cry = crystal_mat(CRY, CRY_L)
+    jaw_m = Mat(R_D, open_mouth("#6A3A3A", "#3A3430"), noise=0.02)
+    brow = Mat(R_D, noise=0.02, edge=0)
+    m.bone("root", None, [0, 0, 0])
+    if stage == 0:
+        y0 = 4
+        m.bone("body", "root", [0, y0 + 3.5, 0], blob([-4, y0, -3.5], [8, 7, 7], rock, b=2) + blob([-3.5, y0 + 0.5, -3], [7, 6.5, 6.5], rock))
+        crystals(bone_of(m, "body"), [(-1.5, y0 + 6.6, -0.5, 3.5, [-20, 0, 15]), (0.8, y0 + 6.6, 0.5, 4.5, [-35, 0, -10]), (2.6, y0 + 5.5, 1.5, 3, [-50, 0, -40]),
+                                      (-2.4, y0 + 5.2, 2.4, 3, [-70, 0, 40])], cry, 1.8)
+        m.bone("head", "body", [0, y0 + 3, -3.5], [Cube([-3, y0 + 1, -3.9], [6, 4.5, 1], rock)])
+        m.eyes("head", x_inner=0.5, y=y0 + 3, z=-3.9, w=2, h=1, iris="#20180E", pupil="#20180E", skin=R, grid=["PW"])
+        m.brows("head", [Cube([-3, y0 + 4, -4.4], [3, 1, 1], brow, [0, 0, 12], [-0.4, y0 + 4.4, -4.2])])
+        m.bone("jaw", "head", [0, y0 + 1.8, -3.9], [Cube([-1.5, y0 + 1.2, -4.2], [3, 1, 1], jaw_m)])
+        crystals(bone_of(m, "head"), [(-2.4, y0 + 2.4, -3.9, 2.5, [180 + 20, 0, 0]), (2.2, y0 + 1.8, -3.9, 2.5, [180 + 10, 20, 0])], cry, 1.4)
+        upright_arms(m, 4.2, y0 + 4.5, -0.5, 2.5, 2, 2, rock, rock, hw=3, hh=2.5, rest=(-25, 0, 35), fore_rest=(-45, 0, -15))
+        moves(m, "TACKLE", "ROCK THROW")
+        fx_for(m, 0.7)
+        A, info = floater(name.lower(), m, k=0.7, bob=0.6)
+        write(sid, name, m, A, info, stands)
+        return
+    big = stage == 2
+    if not big:
+        hip = 4
+        m.bone("body", "root", [0, hip + 4, 0], blob([-5.5, hip - 1, -5], [11, 10, 10], rock, b=2) + blob([-4.5, hip + 7, -4], [9, 4, 8], rock) +
+               blob([-6.5, hip + 2, -2], [3, 5, 4], rock) + blob([3.5, hip + 2, -2], [3, 5, 4], rock))
+        crystals(bone_of(m, "body"), [(-2, hip + 10.5, 1, 3, [-30, 0, 20]), (1, hip + 10.5, 0, 4, [-15, 0, -10]), (3, hip + 9, 2.5, 3, [-50, 0, -40]),
+                                      (-3.5, hip + 8, 3.5, 2.5, [-70, 0, 30]), (0, hip + 7, 4.8, 3, [-80, 0, 0])], cry, 1.6)
+        m.bone("head", "body", [0, hip + 5, -5], [Cube([-3.5, hip + 2.5, -5.4], [7, 5, 1], rock)])
+        m.eyes("head", x_inner=0.6, y=hip + 5, z=-5.4, w=2, h=1, iris="#E07A2A", pupil="#20180E", skin=R, grid=["IP"])
+        m.brows("head", [Cube([-3.4, hip + 6, -5.9], [3, 1, 1], brow, [0, 0, 18], [-0.5, hip + 6.4, -5.7])])
+        m.bone("jaw", "head", [0, hip + 3.6, -5.4], [Cube([-2, hip + 2.8, -5.8], [4, 1, 1.5], jaw_m)])
+        upright_arms(m, 6, hip + 8.5, -1, 3.5, 3, 2.5, rock, rock, hw=3.5, hh=2.5, thick=3, fore_w=3, rest=(-10, 0, 20), fore_rest=(-30, 0, 0))
+        upright_arms(m, 5.6, hip + 4.5, -1, 3, 2.5, 2, rock, rock, hw=3, hh=2.5, name="arm2", rest=(-20, 0, 30), fore_rest=(-50, 0, 0))
+        upright_legs(m, 2.8, hip, 0, 3, rock, rock, 4, ntoes=3, toe_m=Mat(R_D, noise=0, edge=0), thigh_w=4)
+        moves(m, "ROCK THROW", "MAGNITUDE")
+        k, guard, s = 1.0, 40, 1.0
+    else:
+        hip = 6
+        m.bone("body", "root", [0, hip + 5, 0], blob([-7, hip - 1, -6], [14, 13, 13], rock, b=2) + blob([-6, hip + 11, -5], [12, 3, 11], rock))
+        crystals(bone_of(m, "body"), [(0, hip + 13.5, -3 + i * 2.6, 5 + (i % 2) * 2, [-20 - i * 12, 0, 0]) for i in range(5)] +
+                 [(sx * 5.2, hip + 10.5, -2 + i * 3.5, 4, [-40 - i * 15, 0, sx * -45]) for sx in (-1, 1) for i in range(3)], cry, 3)
+        bone_of(m, "body").cubes.append(Cube([-5, hip, -6.4], [10, 9, 1], skin))
+        hy = hip + 8
+        m.bone("head", "body", [0, hy, -6], face_blob([-3, hy - 2, -10], [6, 5, 5], skin) + [Cube([-3.4, hy + 1.4, -10.4], [6.8, 1.2, 1.4], brow)])
+        crystals(bone_of(m, "head"), [(0, hy + 3, -8, 2.5, [-60, 0, 0])], cry, 1.2)
+        m.bone("jaw", "head", [0, hy - 1.4, -7], [Cube([-2.8, hy - 3, -10.6], [5.6, 2, 4], Mat("#9A8E7A", open_mouth("#6A3A3A", "#7A6E5E"), noise=0.02))])
+        m.eyes("head", x_inner=0.7, y=hy - 0.4, z=-10, w=2, h=2, iris="#E8401E", pupil="#180604", skin="#9A8E7A", iris_light="#FF9050", grid=["LL", "IP"])
+        upright_arms(m, 8, hip + 10, -1, 4, 4, 4, skin, skin, hw=5, hh=2, thick=5, fore_w=4, claws=3, rest=(-14, 0, 24), fore_rest=(-30, 0, 0))
+        upright_legs(m, 4, hip, 0, 4, skin, skin, 5, ntoes=3, sharp=True, thigh_w=5, toe_len=2)
+        moves(m, "ROLLOUT", "EARTHQUAKE")
+        k, guard, s = 1.3, 30, 1.0
+    fx_for(m, k)
+    A, info = biped(name.lower(), m, walk=0.7 if not big else 0.85, stride=20, k=k, slow=1.1 if not big else 1.25, guard=guard,
+                    extras={"battle": {"arm2_right": track(rotation=[wave(0.6, 6, 180, -20), 0, 6]), "arm2_left": track(rotation=[wave(0.6, 6, 0, -20), 0, -6])},
+                            "walk": {"arm2_right": track(rotation=[wave(0.8, 14), 0, 0]), "arm2_left": track(rotation=[wave(0.8, -14), 0, 0])}} if not big else None)
+    write(sid, name, m, A, info, stands)
+
+
+def geodink():
+    geode("geodude", "GEODINK", 0.8, 0)
+
+
+def geobrute():
+    geode("graveler", "GEOBRUTE", 1.3, 1)
+
+
+def geotitan():
+    geode("golem", "GEOTITAN", 1.8, 2)
+
+
+# ======================================================================================================
+# The fire deer: EMBERFAWN > BLAZEHART (in place of Ponyta, Rapidash)
+# ======================================================================================================
+
+def fire_deer(sid, name, stands, big):
+    """A deer of fire. The fawn is warm tan with a dappling of pale spots, big ears, long slender jointed legs on cloven
+    hooves, two glowing ember nubs where its antlers will grow, a flame mane down its neck and a little flame of a
+    tail. Grown, a tall pale-gold stag with branching antlers tipped with flames, a blazing mane, a flame tail, and
+    flames licking round its hooves."""
+    m = Model()
+    s = 1.0 if not big else 1.4
+    S = lambda v: [x * s for x in v]
+    if not big:
+        FUR, FUR_L, FUR_D, BELLY, SPOT = "#C88A58", "#E8B482", "#8A5630", "#FFF0DC", "#FFF4E6"
+    else:
+        FUR, FUR_L, FUR_D, BELLY, SPOT = "#E4C48A", "#FFF0C6", "#A8844C", "#FFF8EA", None
+    top = 7 if not big else 9
+    base = fur(FUR, FUR_L, FUR_D, belly=BELLY, below=(top + 1.4) * s)
+
+    def coat(at):
+        if SPOT and at.face in ("top", "nx", "px") and at.y > (top + 2.6) * s and hash01("dap", round(at.x / 1.2), round(at.y / 1.2), round(at.z / 1.2)) < 0.2:
+            return rgb(SPOT)
+        return base(at)
+    furm = Mat(FUR, coat, noise=0.02)
+    face = Mat(FUR, lambda a: rgb(BELLY) if a.face == "bottom" or (a.face == "front" and a.ly < 0.4) else None, noise=0.02)
+    muzzle = Mat(FUR_D, lambda a: rgb("#1A1210") if a.face == "front" and a.ly > 0.45 else None, noise=0.02)
+    jaw_m = Mat(BELLY, open_mouth("#A83A3A", "#E8D0B0"), noise=0.02)
+    ear = ear_mat(FUR, "#F8D8C8", "rabbit", rim=None)
+    legm = Mat(FUR, lambda a: rgb(mix(FUR, FUR_D, 0.35)) if a.ly < 0.4 else None, noise=0.02)
+    hoof = Mat("#2A1E18", lambda a: rgb("#4A3A30") if a.face == "top" else None, noise=0.01)
+    m.bone("root", None, [0, 0, 0])
+    m.bone("body", "root", S([0, top + 2.5, 0]), blob(S([-2.6, top, -5]), S([5.2, 5, 10]), furm))
+    hy = top + 5
+    m.bone("neck", "body", S([0, hy - 1, -4]), blob(S([-1.6, hy - 2, -6]), S([3.2, 6, 3]), furm), rotation=[-28, 0, 0])
+    m.bone("head", "neck", S([0, hy + 3.5, -5.5]), face_blob(S([-2.2, hy + 2.5, -9]), S([4.4, 3.6, 4]), face) +
+           [Cube(S([-1.3, hy + 2.5, -11.4]), [n(2.6 * s), n(2.4 * s), n(2.6 * s)], muzzle)], rotation=[28, 0, 0])
+    m.bone("jaw", "head", S([0, hy + 2.8, -9]), [Cube(S([-1.1, hy + 2, -11.2]), [n(2.2 * s), 1, n(2.6 * s)], jaw_m)])
+    m.eyes("head", x_inner=1.0 * s, y=(hy + 4) * s, z=-9 * s, w=2, h=2, iris="#3A1A0A", pupil="#100804", skin=FUR, iris_light="#8A4A20",
+           grid=["PW", "PP"] if not big else ["LL", "IP"], corner=None)
+    m.pair("ear_right", "head", S([-2, hy + 5.6, -6.8]), [Cube(S([-5.6, hy + 4.6, -6.8]), [n(3.6 * s), n(2.2 * s), 0], ear_mat(FUR, "#F8D8C8", "round"))],
+           rotation=[0, 20, 20])
+    head = bone_of(m, "head")
+    if not big:
+        head.cubes += [Cube(S([-1.6, hy + 6, -7.6]), [1, n(1.4), 1], Mat("#FF9A3A", glow=lambda a: rgb("#FFB050"), noise=0, edge=0)),
+                       Cube(S([0.6, hy + 6, -7.6]), [1, n(1.4), 1], Mat("#FF9A3A", glow=lambda a: rgb("#FFB050"), noise=0, edge=0))]
+    else:
+        ant = Mat("#E8D8B0", lambda a: rgb("#B8A07A") if a.ly < 0.3 else None, noise=0.02)
+        for sx in (-1, 1):
+            bx, by_, bz = sx * 1.2 * s, (hy + 6) * s, -7.4 * s
+            beam = [(0, 4, 0, [-15, 0, sx * -20]), ]
+            head.cubes.append(Cube([bx - 0.5, by_ - 0.2, bz - 0.5], [1, n(5 * s), 1], ant, [-15, 0, sx * -22], [bx, by_, bz]))
+            tx, ty, tz = bx + sx * 1.9 * s, by_ + 4.6 * s, bz + 1.3 * s
+            head.cubes.append(Cube([tx - 0.5, ty - 0.2, tz - 0.5], [1, n(4 * s), 1], ant, [-35, 0, sx * -12], [tx, ty, tz]))
+            head.cubes.append(Cube([tx - 0.5, ty - 0.2, tz - 0.5], [1, n(3.4 * s), 1], ant, [30, 0, sx * -30], [tx, ty, tz]))
+            mx, my, mz = bx + sx * 0.9 * s, by_ + 2.2 * s, bz + 0.6 * s
+            head.cubes.append(Cube([mx - 0.5, my - 0.2, mz - 0.5], [1, n(3 * s), 1], ant, [-70, 0, sx * -10], [mx, my, mz]))
+            for fx_, fy_, fz_ in ((tx + sx * 0.6 * s, ty + 3.6 * s, tz + 1.2 * s), (tx + sx * 1.4 * s, ty + 2.6 * s, tz - 1.6 * s), (mx, my + 1 * s, mz - 2.8 * s)):
+                head.cubes += flame([fx_, fy_, fz_], n(1.6 * s), n(2.6 * s))
+    neck = bone_of(m, "neck")
+    nf = 3 if not big else 5
+    for i in range(nf):
+        t = i / max(1, nf - 1)
+        neck.cubes += flame([0, (hy - 1 + t * 5) * s, (-4.2 - t * 1.2) * s], n((2.2 if not big else 2.6) * s), n((3 + (1 - t) * 1.5) * s))
+    stout_legs(m, 1.6 * s, (-3.6 * s, 3.6 * s), round(top * s), max(2, round(1.6 * s)), legm, hoof, 2, foot=hoof)
+    tl = 2 if not big else 3
+    names, zt = tail_bones(m, "body", (top + 4.4) * s, 4.8 * s, [(1.6 * s, 1.6 * s, 1.6 * s)] * tl, furm, (30, 10, 10)[:tl])
+    tip = bone_of(m, names[-1])
+    tip.cubes += flame([0, tip.pivot[1] - 0.4 * s, zt - 0.6 * s], n((2.4 if not big else 3) * s), n((3.4 if not big else 5) * s))
+    if big:
+        for b in m.bones:
+            if b.name.startswith("shin_"):
+                x = b.pivot[0]
+                b.cubes += flame([x, 1.6 * s, b.pivot[2]], n(2 * s), n(2.4 * s))
+    fx_for(m, 0.8 * s)
+    moves(m, "STOMP" if not big else "FURY ATTACK", "EMBER" if not big else "FIRE SPIN")
+    A, info = four_legs(name.lower(), m, walk=0.5 if not big else 0.6, stride=36, k=0.7 * s)
+    write(sid, name, m, A, info, stands)
+
+
+def emberfawn():
+    fire_deer("ponyta", "EMBERFAWN", 1.2, False)
+
+
+def blazehart():
+    fire_deer("rapidash", "BLAZEHART", 2.0, True)
+
+
+# ======================================================================================================
+# The salamanders: SLOWMANDER > SHELLMANDER (in place of Slowpoke, Slowbro)
+# ======================================================================================================
+
+def conch_mat(base, band, knob):
+    """A conch snail's shell: cream, a violet band spiralling round it, darker knobs."""
+    B, Bd, K = rgb(base), rgb(band), rgb(knob)
+
+    def f(at):
+        a = math.atan2(at.x, at.z - at.cube.origin[2] - at.cube.size[2] / 2)
+        if ((at.y * 0.9 + a * 1.2) % 3.0) < 0.9:
+            return Bd
+        if hash01("kn", round(at.x), round(at.y), round(at.z)) < 0.06:
+            return K
+        return mix(B, "#FFFFFF", 0.2 if at.face == "top" else 0.0)
+    return Mat(base, f, noise=0.02)
+
+
+def salamander(sid, name, stands, big):
+    """A dozy salamander. The first is long, low and pink, a broad flat head with a wide easy smile, small heavy-lidded
+    eyes, frilled folds of skin along its sides, short legs with round toes, and a long thick tail in joints with a pale
+    tip it likes to dangle in the water. Grown, it stands up on its hind legs, and a conch snail has clamped itself on
+    the end of its tail, its spiralled shell knobbed and banded violet."""
+    m = Model()
+    P, P_L, P_D, BELLY, FRILL = "#EE9AAE", "#FFC4D0", "#C06A80", "#FFF0E2", "#D8809A"
+    skin = Mat(P, fur(P, P_L, P_D, belly=BELLY, below=None, speck=0.15), noise=0.015)
+    bellym = Mat(BELLY, noise=0.02)
+    face = Mat(P, lambda a: rgb(BELLY) if a.face == "bottom" else None, noise=0.015)
+    jaw_m = Mat(BELLY, open_mouth("#C04A5A", "#F0D0D0"), noise=0.02)
+    toe = Mat(P_L, noise=0, edge=0)
+    frill = Mat(FRILL, lambda a: CLEAR if a.ly < 0.35 * (0.5 + 0.5 * math.cos(a.lz * math.pi * 6)) else mix(FRILL, P_L, a.ly * 0.4), noise=0.01, edge=0, flat=True)
+    tipm = Mat(BELLY, noise=0.02)
+    m.bone("root", None, [0, 0, 0])
+    if not big:
+        top = 3
+        m.bone("body", "root", [0, top + 2, 0], blob([-3.5, top, -6], [7, 4, 12], skin) + [Cube([-3, top - 0.1, -5], [6, 1, 10], bellym)] +
+               [Cube([-3.6, top + 0.5, -5], [0, 2, 10], frill, [0, 0, -25], [-3.5, top + 2.4, 0]), Cube([3.6, top + 0.5, -5], [0, 2, 10], frill, [0, 0, 25], [3.5, top + 2.4, 0])])
+        hy = top + 1
+        m.bone("head", "body", [0, hy + 1.5, -6], face_blob([-4.5, hy, -11], [9, 4, 5.5], face))
+        m.bone("jaw", "head", [0, hy + 0.6, -7], [Cube([-4, hy - 0.4, -11.2], [8, 1, 4.5], jaw_m)])
+        m.eyes("head", x_inner=1.6, y=hy + 2.2, z=-11, w=2, h=2, iris="#3A2024", pupil="#120808", skin=P, grid=["DD", "PW"])
+        stout_legs(m, 2.6, (-3.5, 3.5), top, 2, skin, toe, 4, claw_len=1)
+        segs = [((3.6 - i * 0.5), (3.2 - i * 0.4), 3) for i in range(5)]
+        names, zt = tail_bones(m, "body", top + 2, 5.5, segs, skin, (-10, -4, 2, 4, 6))
+        tip = bone_of(m, names[-1])
+        tip.cubes.append(Cube([-0.8, tip.pivot[1] - 0.8, zt - 0.5], [2, 2, 1.5], tipm))
+        moves(m, "WATER GUN", "CONFUSION")
+        fx_for(m, 0.8)
+        A, info = four_legs(name.lower(), m, walk=0.9, stride=26, k=0.7, slow=1.4)
+        write(sid, name, m, A, info, stands)
+        return
+    m.bone("body", "root", [0, 7, 0], blob([-4.5, 5, -3.5], [9, 11, 7], skin) + [Cube([-3.5, 6, -3.9], [7, 8, 1], bellym)] +
+           [Cube([-4.6, 6, -2.5], [0, 2, 6], frill, [0, 0, -20], [-4.5, 8, 0]), Cube([4.6, 6, -2.5], [0, 2, 6], frill, [0, 0, 20], [4.5, 8, 0])])
+    hy = 16
+    m.bone("head", "body", [0, hy, -1], face_blob([-4.5, hy, -5.5], [9, 4.5, 7], face))
+    m.bone("jaw", "head", [0, hy + 0.6, -2.5], [Cube([-4, hy - 0.4, -5.8], [8, 1, 4], jaw_m)])
+    m.eyes("head", x_inner=1.6, y=hy + 2.4, z=-5.5, w=2, h=2, iris="#3A2024", pupil="#120808", skin=P, grid=["DD", "PW"])
+    upright_arms(m, 5.2, 14, -0.5, 3.5, 3.5, 2, skin, skin, hw=3, hh=1, fingers=3, finger_m=toe, finger_len=1.5, rest=(-6, 0, 16), fore_rest=(-20, 0, 0))
+    upright_legs(m, 2.6, 6, 0.5, 3, skin, skin, 5, ntoes=4, toe_m=toe, thigh_w=4)
+    segs = [((3.6 - i * 0.5), (3.2 - i * 0.4), 3) for i in range(4)]
+    names, zt = tail_bones(m, "body", 6.5, 3, segs, skin, (-24, -6, 4, 6))
+    tip = bone_of(m, names[-1])
+    ty = tip.pivot[1]
+    shell = conch_mat("#F2E4D6", "#9A6AB8", "#7A5A6A")
+    tip.cubes += blob([-3, ty - 3, zt - 1.5], [6, 6, 6], shell) + blob([-2, ty + 2.5, zt - 0.5], [4, 3, 4], shell) + [Cube([-1, ty + 5, zt + 0.5], [2, 2, 2], shell)]
+    tip.cubes += spike(-2.8, ty + 1, zt + 1.5, 2, [0, -90, 0], taper_mat("#E8D8C8", "#FFFFFF"), 1) + spike(2.8, ty + 1, zt + 1.5, 2, [0, 90, 0], taper_mat("#E8D8C8", "#FFFFFF"), 1)
+    tip.cubes += [Cube([-0.6, ty - 3.4, zt - 2], [0, 2, 1], Mat("#C8A0B0", noise=0, edge=0)), Cube([0.6, ty - 3.4, zt - 2], [0, 2, 1], Mat("#C8A0B0", noise=0, edge=0))]
+    moves(m, "HEADBUTT", "PSYCHIC")
+    fx_for(m, 1.0)
+    A, info = biped(name.lower(), m, walk=0.9, stride=20, k=1.0, slow=1.4, guard=16)
+    write(sid, name, m, A, info, stands)
+
+
+def slowmander():
+    salamander("slowpoke", "SLOWMANDER", 1.0, False)
+
+
+def shellmander():
+    salamander("slowbro", "SHELLMANDER", 1.6, True)
+
+
 ALL3 = (leafgrub, huskalis, veilmoth, stinglet, barbcase, lancewasp, coilet, frillasp, pangrit, spirepang, lunabun, lunahare,
         fennember, solfennec, puffchin, choruschin,
         duskbat, nightmaw, tuberlet, droopbud, rafflora, shroomshell, funguard, fuzzgnat, toxilace, starsnout, triosnout, lynxkit, sabrelynx,
         achebill, tidebill, kindlepup, pyrewolf, droptad, frillfrog, brawltoad, slumbersier, mindsier, sagesier, knucklet, brawlape,
-        quadrilla)
+        quadrilla, snapsprout, snapbulb, gulptrap, driftsail, stormsail, geodink, geobrute, geotitan, emberfawn, blazehart, slowmander,
+        shellmander)
 
 
 def main(names):

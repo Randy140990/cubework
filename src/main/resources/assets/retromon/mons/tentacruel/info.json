@@ -1,0 +1,72 @@
+{
+ "idle": "animation.stormsail.battle_idle",
+ "ground": "animation.stormsail.ground_idle",
+ "actions": {
+  "cry": "animation.stormsail.cry",
+  "recoil": "animation.stormsail.recoil",
+  "attack": "animation.stormsail.attack",
+  "critical": "animation.stormsail.critical",
+  "special": "animation.stormsail.special",
+  "recall": "animation.stormsail.recall",
+  "sendout": "animation.stormsail.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.stormsail.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.stormsail.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.stormsail.faint",
+   "parts": []
+  }
+ },
+ "move": "HYDRO PUMP",
+ "attack_move": "CONSTRICT",
+ "scale": 0.967,
+ "height": 2.069,
+ "texture": "retromon:textures/mons/tentacruel.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/tentacruel_glow_0.png",
+    "retromon:textures/mons/tentacruel_glow_1.png",
+    "retromon:textures/mons/tentacruel_glow_2.png",
+    "retromon:textures/mons/tentacruel_glow_3.png",
+    "retromon:textures/mons/tentacruel_glow_4.png",
+    "retromon:textures/mons/tentacruel_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "STORMSAIL",
+ "anchors": {
+  "mouth": [
+   0,
+   21.25,
+   -8.6
+  ],
+  "back": [
+   0,
+   34.1,
+   0.33
+  ],
+  "body": [
+   0,
+   25.3,
+   0.33
+  ],
+  "size": [
+   12.0,
+   33.1,
+   16.85
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

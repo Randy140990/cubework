@@ -1,0 +1,72 @@
+{
+ "idle": "animation.slowmander.battle_idle",
+ "ground": "animation.slowmander.ground_idle",
+ "actions": {
+  "cry": "animation.slowmander.cry",
+  "recoil": "animation.slowmander.recoil",
+  "attack": "animation.slowmander.attack",
+  "critical": "animation.slowmander.critical",
+  "special": "animation.slowmander.special",
+  "recall": "animation.slowmander.recall",
+  "sendout": "animation.slowmander.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.slowmander.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.slowmander.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.slowmander.faint",
+   "parts": []
+  }
+ },
+ "move": "CONFUSION",
+ "attack_move": "WATER GUN",
+ "scale": 1.838,
+ "height": 0.544,
+ "texture": "retromon:textures/mons/slowpoke.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/slowpoke_glow_0.png",
+    "retromon:textures/mons/slowpoke_glow_1.png",
+    "retromon:textures/mons/slowpoke_glow_2.png",
+    "retromon:textures/mons/slowpoke_glow_3.png",
+    "retromon:textures/mons/slowpoke_glow_4.png",
+    "retromon:textures/mons/slowpoke_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SLOWMANDER",
+ "anchors": {
+  "mouth": [
+   0,
+   4.6,
+   -11.5
+  ],
+  "back": [
+   0,
+   8.0,
+   0.0
+  ],
+  "body": [
+   0,
+   4.95,
+   0.0
+  ],
+  "size": [
+   9.1,
+   8.7,
+   33.2
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}
