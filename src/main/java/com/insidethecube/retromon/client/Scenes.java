@@ -212,6 +212,14 @@ public final class Scenes {
 	 * stands off to one side, framed by its size.
 	 */
 	public static void model(GuiGraphics g, float secs, String species, double side) {
+		model(g, secs, species, side, secs, 0, false);
+	}
+
+	/**
+	 * The same, with the viewer's evolving touches: turnSecs sets how far round it has turned (held still, it stops
+	 * turning); glow (0 to 1) brings up the white glow round it, pulsing; hide leaves just the stand.
+	 */
+	public static void model(GuiGraphics g, float secs, String species, double side, float turnSecs, float glow, boolean hide) {
 		BedrockModel.Def def = BedrockModel.def(species);
 		double h = Math.max(0.6, def == null ? 1 : def.height), l = Math.max(0.6, h), d = Math.max(Math.max(h * 3.1, l * 2.3), 3.8);
 		Cam cam = new Cam().look(side, h * 0.62 + d * 0.16, d, side, h * 0.5, 0);
@@ -223,9 +231,19 @@ public final class Scenes {
 		V.rr(g, c[0] - rx * 1.1F, cy, rx * 2.2F, drop, 0, 0xFFA9DCCB);
 		V.ellipse(g, c[0], cy, rx * 1.1F, ry * 1.1F, 0xFFBFEFE0);
 		V.ellipse(g, c[0], cy, rx * 0.93F, ry * 0.93F, 0xFFE9FFF6);
-		Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
-		place(b, cam, null, species, 0, 0, 0, Math.PI + Math.sin(secs * 0.45) * 0.7, secs);
-		b.draw(g);
+		if (!hide) {
+			Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
+			place(b, cam, null, species, 0, 0, 0, Math.PI + Math.sin(turnSecs * 0.45) * 0.7, secs);
+			b.draw(g);
+		}
+		if (glow > 0) {
+			// The viewer's white glow: a ball of light round it (0.7 of its length across, 0.75 of its height up and
+			// down from its middle), pulsing quickly.
+			float[] mid = cam.at(0, h / 2, 0), up = cam.at(0, h / 2 + h * 0.75, 0), side2 = cam.at(l * 0.7, h / 2, 0);
+			float grx = Math.abs(side2[0] - mid[0]), gry = Math.abs(mid[1] - up[1]);
+			float a = Math.max(0, Math.min(1, glow * (0.65F + 0.3F * (float) Math.sin(secs * 12))));
+			V.ellipse(g, mid[0], mid[1], grx, gry, Ui.alpha(0xFFFFFFFF, a));
+		}
 	}
 
 	/** The picture of you as you look now (your outfit's skin, made if need be). */

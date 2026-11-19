@@ -1184,8 +1184,17 @@ public final class Game {
 
 	public static void blackout(ServerPlayer p) {
 		PlayerData d = data(p);
-		if (d.hasHeal) p.teleportTo(d.healX, d.healY, d.healZ);
-		else toStart(p);
+		if (!d.hasHeal) {
+			toStart(p);
+			return;
+		}
+		// Back to where you were last healed, in the world or inside (out of the other first, if that's where you are).
+		ServerLevel to = d.healInside ? Interiors.ensure(p.level().getServer()) : p.level().getServer().overworld();
+		if (to == null || to == p.level()) p.teleportTo(d.healX, d.healY, d.healZ);
+		else {
+			leavingLevel(p);
+			p.teleportTo(to, d.healX, d.healY, d.healZ, java.util.Set.of(), p.getYRot(), p.getXRot(), true);
+		}
 	}
 
 	// ---------- the story: Oak's Parcel (Red and Blue's first errand) ----------
@@ -1506,8 +1515,8 @@ public final class Game {
 		n.getNavigation().stop();
 		n.talker = p;
 		switch (n.role()) {
-			case Npc.NURSE -> dialogue(p, n, "heal", List.of("Welcome to our POKéMON CENTER!", "We heal your POKéMON back to perfect health!",
-					"Shall we heal your POKéMON?"));
+			case Npc.NURSE -> dialogue(p, n, "heal", List.of("NURSE: Hello, and welcome to the POKéMON CENTER!",
+					"NURSE: We heal tired POKéMON back to full health. Shall we heal yours?"));
 			case Npc.CLERK -> {
 				// Viridian's Mart before the errand: OAK's PARCEL, and no shopping until it's delivered.
 				if (viridianMart(n) && d.started && !d.hasDex()) {
@@ -1663,19 +1672,21 @@ public final class Game {
 		switch (mode) {
 			case "heal" -> {
 				if (!yes) {
-					dialogue(p, n, "talk", List.of("We hope to see you again!"));
+					dialogue(p, n, "talk", List.of("NURSE: We hope to see you again!"));
 					return;
 				}
 				d.healAll();
 				d.hasHeal = true;
+				d.healInside = Interiors.in(p);
 				d.healX = p.getX();
 				d.healY = p.getY();
 				d.healZ = p.getZ();
 				sync(p);
-				CompoundTag s = new CompoundTag();
-				s.putString("sound", "heal");
-				Net.send(p, "sound", s);
-				dialogue(p, n, "talk", List.of("Thank you for waiting.", "We've restored your POKéMON to full health.", "We hope to see you again!"));
+				// The viewer's: your balls go into the machine on the first line (the notes play, it lights up), then on.
+				CompoundTag h = new CompoundTag();
+				h.putInt("healing", 0);
+				dialogue(p, n, "talk", List.of("NURSE: OK. I'll take your POKéMON for a few seconds.", "NURSE: Thank you for waiting. Your POKéMON are fighting fit!",
+						"NURSE: We hope to see you again!"), h);
 			}
 			case "mart" -> {
 				CompoundTag m = new CompoundTag();
@@ -1943,7 +1954,7 @@ public final class Game {
 				m.levelFriendship();
 				if (!m.fainted()) m.hp = Math.min(m.maxHp(), m.hp + m.maxHp() - oldMax);
 				sync(p);
-				message(p, List.of(m.name() + " grew to level " + m.level + "!"));
+				message(p, List.of(m.name() + " grew to Lv. " + m.level + "!"));
 				for (String mv : m.species.learnsAt(m.level)) offerMove(p, i, mv);
 				offerEvolution(p, i, "level", null);
 				return;

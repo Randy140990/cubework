@@ -24,7 +24,7 @@ import net.minecraft.nbt.CompoundTag;
  */
 public class MenuScreen extends DeviceScreen {
 	private enum View {
-		MENU, PARTY, PARTY_ACTION, SUMMARY, BAG, BAG_ACTION, USE_ON, CARD, SAVE, WAIT, OPTION, MESSAGE
+		MENU, PARTY, PARTY_ACTION, SUMMARY, BAG, BAG_ACTION, USE_ON, CARD, SAVE, SAVING, WAIT, OPTION, MESSAGE
 	}
 
 	/** Which OPTION row the keys change: 0 text speed, 1 music, 2 the Pokédex voice, 3 nights, 4 wild Pokémon, 5 walking with you, 6 the POKéMON LOOK. */
@@ -57,7 +57,11 @@ public class MenuScreen extends DeviceScreen {
 	public void tick() {
 		super.tick();
 		if (message != null) message.tick();
+		if (view == View.SAVING && ticks - savingAt >= 30) say(View.MENU, name() + " saved the game.");
 	}
+
+	/** When "Saving..." came up (ticks). */
+	private int savingAt;
 
 	/** Lines from the game (an item's effect) shown here, then back to where you were. */
 	public void message(List<String> lines) {
@@ -326,10 +330,15 @@ public class MenuScreen extends DeviceScreen {
 		}
 		Sounds.press();
 		onClose();
+		String[] times = {"morning", "midday", "evening", "night"};
 		Hud.fadeThrough(() -> {
 			CompoundTag t = new CompoundTag();
 			t.putInt("until", which);
 			ClientPlayNetworking.send(new Net.Act("wait", t));
+		}, "Time passes...", () -> {
+			// Then the viewer's word on it.
+			net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+			if (mc.screen == null) mc.setScreen(new DialogueScreen(List.of("It's " + times[which] + " now."), "talk", -1, new CompoundTag()));
 		});
 	}
 
@@ -338,7 +347,25 @@ public class MenuScreen extends DeviceScreen {
 		// The save slot's picture and details (where you are, badges, time) are brought up to date too.
 		SlotSnapshot.soon();
 		Sounds.jingle("get_key_item");
-		say(View.MENU, name() + " saved the game.");
+		// The viewer's: "Saving... Don't turn off the power." with the disc spinning, then it's saved.
+		view = View.SAVING;
+		savingAt = ticks;
+	}
+
+	/** Your save's details (the viewer's card): you, where you are, badges, the Pokédex and time played. */
+	private void saveCard(GuiGraphics g, PlayerData d) {
+		float x = 330, y = 70, w = 620, h = 300;
+		V.panel(g, x, y, w, h);
+		com.insidethecube.retromon.engine.Places.Place pl = com.insidethecube.retromon.engine.Places.get(d.place);
+		String[][] rows = {{"Player", name()}, {"Place", pl == null ? d.place.toUpperCase().replace('_', ' ') : pl.name()}, {"Badges", String.valueOf(d.badges.size())},
+				{"Pokédex", d.hasDex() ? String.valueOf(d.caught.size()) : "-"}, {"Time", String.format("%d:%02d", (int) d.played / 3600, (int) d.played / 60 % 60)}};
+		float lw = 0;
+		for (String[] r : rows) lw = Math.max(lw, V.labelWidth(r[0]));
+		for (int i = 0; i < rows.length; i++) {
+			float ry = y + 24 + i * (h - 48) / rows.length + 8;
+			V.label(g, rows[i][0], x + 30, ry + 7);
+			V.text(g, rows[i][1], x + 30 + lw + 24, ry, 22, V.TEXT, true);
+		}
 	}
 
 	private void setSpeed(int sp) {
@@ -375,7 +402,7 @@ public class MenuScreen extends DeviceScreen {
 		PlayerData d = ClientState.data;
 		int m = 6 * s, h = boxHeight();
 		switch (view) {
-			case MENU, SAVE, WAIT -> drawMenu(g);
+			case MENU, SAVE, SAVING, WAIT -> drawMenu(g);
 			default -> {
 			}
 		}
@@ -407,7 +434,21 @@ public class MenuScreen extends DeviceScreen {
 				}
 			}
 			case CARD -> drawCard(g, d);
+			case SAVING -> {
+				g.fill(0, 0, width, height, 0x80061A1E);
+				saveCard(g, d);
+				TextBox.still("Saving... Don't turn off the power.").renderV(g, font, 140, 26, 1000, ticks, partial, false);
+				g.pose().pushMatrix();
+				float cx = V.x(640), cy = V.y(440);
+				g.pose().translate(cx, cy);
+				g.pose().rotate((ticks + partial) / 20F * (float) Math.PI * 2);
+				g.pose().translate(-cx, -cy);
+				V.icon(g, "icon_save", 600, 400, 80);
+				g.pose().popMatrix();
+			}
 			case SAVE -> {
+				g.fill(0, 0, width, height, 0x80061A1E);
+				saveCard(g, d);
 				TextBox.still("Would you like to save the game?").renderV(g, font, 140, 26, 1000, ticks, partial, false);
 				vchoice(g, yesNo, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), 300, i -> {
 					if (i == 0) save();

@@ -33,8 +33,8 @@ public class LearnScreen extends GameScreen {
 		this.index = t.getIntOr("i", 0);
 		this.move = t.getStringOr("move", "");
 		String name = mon() == null ? "It" : mon().name(), mv = Move.find(move) == null ? move : Move.get(move).name();
-		box = new TextBox(List.of(name + " is trying to learn " + mv + ".", "But " + name + " can't learn more than four moves!",
-				"Delete an older move to make room for " + mv + "?"));
+		// The UI Viewer's words.
+		box = new TextBox(List.of(name + " wants to learn the move " + mv + ".", "But " + name + " already knows four moves. Forget one to make room for " + mv + "?"));
 	}
 
 	private Mon mon() {
@@ -58,12 +58,9 @@ public class LearnScreen extends GameScreen {
 			if (yes) {
 				step = Step.PICK;
 				box.set(List.of("Which move should be forgotten?"));
-			} else {
-				step = Step.GIVE_UP;
-				box.set(List.of("Stop learning " + mv + "?"));
-			}
+			} else finish(-1, List.of((m == null ? "It" : m.name()) + " didn't learn " + mv + "."));
 		} else if (step == Step.GIVE_UP) {
-			if (yes) finish(-1, List.of((m == null ? "It" : m.name()) + " did not learn " + mv + "."));
+			if (yes) finish(-1, List.of((m == null ? "It" : m.name()) + " didn't learn " + mv + "."));
 			else {
 				step = Step.ASK;
 				box.set(List.of("Delete an older move to make room for " + mv + "?"));
@@ -76,8 +73,16 @@ public class LearnScreen extends GameScreen {
 		if (m == null || slot < 0 || slot >= m.moves.size()) return;
 		String old = Move.get(m.moves.get(slot)).name(), mv = Move.get(move).name();
 		m.replace(slot, move);
-		finish(slot, List.of("1, 2 and... Poof!", m.name() + " forgot " + old + ".", "And...", m.name() + " learned " + mv + "!"));
+		finish(slot, List.of("1, 2 and... Poof!", m.name() + " forgot " + old + "...", "...and learned " + mv + "!"));
 		Music.jingle("level_up");
+	}
+
+	/** A row of the list: one of its moves to forget, or (the last) the new one, so it doesn't learn it. */
+	private void pick(int row) {
+		Mon m = mon();
+		Sounds.select();
+		if (m != null && row < m.moves.size()) forget(row);
+		else finish(-1, List.of((m == null ? "It" : m.name()) + " didn't learn " + (Move.find(move) == null ? move : Move.get(move).name()) + "."));
 	}
 
 	private void finish(int slot, List<String> lines) {
@@ -105,14 +110,11 @@ public class LearnScreen extends GameScreen {
 			}
 			case PICK -> {
 				Mon m = mon();
-				int n = m == null ? 1 : m.moves.size();
+				int n = (m == null ? 0 : m.moves.size()) + 1;
 				if (Ui.isUp(e)) at = Math.floorMod(at - 1, n);
 				else if (Ui.isDown(e)) at = Math.floorMod(at + 1, n);
-				else if (Ui.isA(e)) forget(at);
-				else if (Ui.isB(e)) {
-					step = Step.GIVE_UP;
-					box.set(List.of("Stop learning " + Move.get(move).name() + "?"));
-				}
+				else if (Ui.isA(e)) pick(at);
+				else if (Ui.isB(e)) pick(n - 1);
 			}
 			case DONE -> {
 				if ((Ui.isA(e) || Ui.isB(e)) && box.press() && minecraft != null) minecraft.setScreen(null);
@@ -134,28 +136,26 @@ public class LearnScreen extends GameScreen {
 
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
-		int h = boxHeight(), m = 6 * s;
-		box.render(g, font, m, height - h - m, width - 2 * m, h, s, ticks, yesNo == null && step != Step.PICK);
-		if (yesNo != null) {
-			int w = yesNo.width(font, s);
-			choice(g, yesNo, width - w - m, height - h - m - yesNo.height(s) - 4 * s, w, i -> answer(i == 0));
-		}
+		// The UI Viewer's text box and YES/NO; the moves to forget in its list at the right, each with its type.
+		box.renderV(g, font, 140, 26, 1000, ticks, partial, yesNo == null && step != Step.PICK);
+		if (yesNo != null) vchoice(g, yesNo, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), 300, i -> answer(i == 0));
 		if (step == Step.PICK) {
 			Mon mon = mon();
 			if (mon == null) return;
-			int w = Math.min(width - 2 * m, 200 * s), row = 16 * s, x = (width - w) / 2, y = m;
-			Ui.panel(g, x, y, w, row * (mon.moves.size() + 1) + 8 * s, s);
-			for (int i = 0; i <= mon.moves.size(); i++) {
+			int n = mon.moves.size() + 1;
+			float x = 760, y = 120, w = 480, pad = 12, rh = 46, gap = 8;
+			V.panel(g, x, y, w, V.choiceHeight(n));
+			for (int i = 0; i < n; i++) {
 				String id = i < mon.moves.size() ? mon.moves.get(i) : move;
 				Move mv = Move.get(id);
-				int ry = y + 4 * s + i * row;
-				int idx = i;
-				if (i < mon.moves.size() && over(x, ry, w, row)) at = i;
-				boolean on = i == at && i < mon.moves.size();
-				Ui.round(g, x + 4 * s, ry + s, w - 8 * s, row - 2 * s, Ui.alpha(Ui.typeColor(mv.type()), on ? 0.85F : i == mon.moves.size() ? 0.3F : 0.45F), s);
-				Ui.text(g, font, (i == mon.moves.size() ? "NEW: " : "") + mv.name(), x + 10 * s, ry + 5 * s, Ui.TEXT, s);
-				Ui.right(g, font, mv.type().label.toUpperCase() + "  PP " + mv.pp(), x + w - 10 * s, ry + 5 * s, Ui.TEXT, s);
-				if (i < mon.moves.size()) hit(x, ry, w, row, () -> forget(idx));
+				float rx = x + pad, ry = y + pad + i * (rh + gap), rw = w - pad * 2;
+				int row = i;
+				if (vover(rx, ry, rw, rh)) at = i;
+				V.item(g, mv.name(), null, rx, ry, rw, rh, i == at, false, 21);
+				String t = mv.type().label.toUpperCase();
+				float cw = Math.max(70, V.width(t, 12, true) + 12 * 1.8F);
+				V.type(g, t, Ui.typeColor(mv.type()), rx + rw - 18 - cw, ry + (rh - 12 * 1.75F) / 2, 70, 12);
+				vhit(rx, ry, rw, rh, () -> pick(row));
 			}
 		}
 	}

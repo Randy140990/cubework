@@ -29,6 +29,8 @@ public class PlayerData {
 	/** Where you last healed (you go back there if you black out, or use an ESCAPE ROPE). */
 	public boolean hasHeal;
 	public double healX, healY, healZ;
+	/** Whether the last place you were healed is inside (an interior), not out in the world. */
+	public boolean healInside;
 	/** Steps of REPEL left. */
 	public int repel;
 	/** The place you're in (or were last in). */
@@ -114,6 +116,7 @@ public class PlayerData {
 		t.putString("statics", join(statics));
 		t.putBoolean("started", started);
 		t.putBoolean("hasHeal", hasHeal);
+		t.putBoolean("hin", healInside);
 		t.putDouble("hx", healX);
 		t.putDouble("hy", healY);
 		t.putDouble("hz", healZ);
@@ -153,6 +156,7 @@ public class PlayerData {
 		split(t.getStringOr("statics", ""), d.statics);
 		d.started = t.getBooleanOr("started", false);
 		d.hasHeal = t.getBooleanOr("hasHeal", false);
+		d.healInside = t.getBooleanOr("hin", false);
 		d.healX = t.getDoubleOr("hx", 0);
 		d.healY = t.getDoubleOr("hy", 0);
 		d.healZ = t.getDoubleOr("hz", 0);

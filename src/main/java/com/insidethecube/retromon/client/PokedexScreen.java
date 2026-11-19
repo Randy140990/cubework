@@ -14,16 +14,22 @@ import com.insidethecube.retromon.game.Trainers;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
+import org.lwjgl.glfw.GLFW;
 
 /**
- * The Pokédex: Kanto's 151 or the National 251, each one you've seen with its picture (a shadow if you
- * haven't caught it), a Poké Ball by the ones you own. The page on the right: number, name, kind, types,
- * height and weight and the entry for the ones you've caught, and for any you've seen, where to find them
- * (which can be shown on the Town Map).
+ * The Pokédex, as the UI Viewer's "Pokédex" and "Pokédex entry" pages.
+ * <ul>
+ * <li>The list: every POKéMON in order, nine at a time. Those you've caught have their picture and a ball by
+ * them, those you've only seen a dark shape, the rest "?????". The one you're on turns on a stand at the right,
+ * with its name, types and what it stands in for beneath it. TAB shows only the ones you've caught.</li>
+ * <li>The entry (A): its number and name, its types, how tall it is in blocks, what it's like, and where to find
+ * it. V reads it out; A shows where on the Town Map.</li>
+ * </ul>
+ * Kanto's 151 to begin with; once you've seen one from further afield, the National list.
  */
 public class PokedexScreen extends DeviceScreen {
 	private final Screen parent;
-	private boolean national;
+	private boolean caughtOnly, entry;
 	private int at, top;
 	private static Map<String, Set<String>> areas;
 
@@ -32,13 +38,33 @@ public class PokedexScreen extends DeviceScreen {
 		this.parent = parent;
 	}
 
-	private int count() {
-		return national ? 251 : 151;
-	}
-
-	private static Species byDex(int n) {
+	static Species byDex(int n) {
 		for (Species s : Species.ALL.values()) if (s.dex() == n) return s;
 		return null;
+	}
+
+	/** The numbers to show: Kanto's (the National list once you've seen one past 151), or just those caught. */
+	private List<Integer> list() {
+		PlayerData d = ClientState.data;
+		int count = 151;
+		for (String id : d.seen) {
+			Species sp = Species.ALL.get(id);
+			if (sp != null && sp.dex() > 151) count = 251;
+		}
+		List<Integer> out = new ArrayList<>();
+		for (int n = 1; n <= count; n++) {
+			Species sp = byDex(n);
+			if (sp == null) continue;
+			if (!caughtOnly || d.caught.contains(sp.id())) out.add(n);
+		}
+		return out;
+	}
+
+	private Species current() {
+		List<Integer> l = list();
+		if (l.isEmpty()) return null;
+		at = Math.max(0, Math.min(at, l.size() - 1));
+		return byDex(l.get(at));
 	}
 
 	/** Where each Pokémon lives: the places of its wild tables and one-off encounters. */
@@ -58,35 +84,89 @@ public class PokedexScreen extends DeviceScreen {
 		return areas.getOrDefault(species, Set.of());
 	}
 
+	/** Its places by their names, in a line ("ROUTE 1, ROUTE 2, VIRIDIAN FOREST"), or "" if it's not in the wild. */
+	static String placeNames(String species) {
+		List<String> names = new ArrayList<>();
+		for (String place : areas(species)) {
+			Places.Place pl = Places.get(place);
+			String n = pl == null ? place.toUpperCase().replace('_', ' ') : pl.name();
+			if (!names.contains(n)) names.add(n);
+		}
+		return String.join(", ", names);
+	}
+
 	private void move(int d) {
-		at = Math.floorMod(at + d, count());
+		int n = list().size();
+		if (n == 0) return;
+		int was = at;
+		at = Math.max(0, Math.min(n - 1, at + d));
+		if (at != was) Sounds.press();
 	}
 
 	@Override
-	protected boolean key(KeyEvent e) {
-		if (Ui.isUp(e)) move(-1);
-		else if (Ui.isDown(e)) move(1);
-		else if (Ui.isLeft(e)) move(-8);
-		else if (Ui.isRight(e)) move(8);
-		else if (e.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_TAB) {
-			national = !national;
-			at = Math.min(at, count() - 1);
-			Sounds.press();
-		} else if (e.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_V) listen();
-		else if (Ui.isA(e)) showArea();
-		else if (Ui.isB(e)) back();
+	protected boolean wantsTab() {
 		return true;
 	}
 
 	@Override
+	protected boolean key(KeyEvent e) {
+		Species sp = current();
+		if (entry) {
+			if (e.key() == GLFW.GLFW_KEY_V) listen();
+			else if (Ui.isA(e)) showArea();
+			else if (Ui.isB(e)) {
+				Sounds.press();
+				Sounds.stopVoice();
+				entry = false;
+			} else if (Ui.isUp(e) || Ui.isDown(e)) {
+				// Up and down turn to the next one you've seen.
+				List<Integer> l = list();
+				for (int i = at + (Ui.isDown(e) ? 1 : -1); i >= 0 && i < l.size(); i += Ui.isDown(e) ? 1 : -1) {
+					Species o = byDex(l.get(i));
+					if (o != null && ClientState.data.seen.contains(o.id())) {
+						Sounds.stopVoice();
+						Sounds.press();
+						at = i;
+						break;
+					}
+				}
+			}
+			return true;
+		}
+		if (Ui.isUp(e)) move(-1);
+		else if (Ui.isDown(e)) move(1);
+		else if (Ui.isLeft(e)) move(-9);
+		else if (Ui.isRight(e)) move(9);
+		else if (e.key() == GLFW.GLFW_KEY_TAB) {
+			Species was = sp;
+			caughtOnly = !caughtOnly;
+			Sounds.press();
+			// Stay on the same one if it's still in the list.
+			List<Integer> l = list();
+			at = 0;
+			if (was != null) for (int i = 0; i < l.size(); i++) if (l.get(i) == was.dex()) at = i;
+		} else if (e.key() == GLFW.GLFW_KEY_V) listen();
+		else if (Ui.isA(e)) open();
+		else if (Ui.isB(e)) back();
+		return true;
+	}
+
+	private void open() {
+		Species sp = current();
+		if (sp == null || !ClientState.data.seen.contains(sp.id())) return;
+		Sounds.press();
+		entry = true;
+	}
+
+	@Override
 	public boolean mouseScrolled(double x, double y, double dx, double dy) {
-		move(dy > 0 ? -3 : 3);
+		if (!entry) move(dy > 0 ? -3 : 3);
 		return true;
 	}
 
 	/** V: the Pokédex reads the entry aloud (for one you've caught). */
 	private void listen() {
-		Species sp = byDex(at + 1);
+		Species sp = current();
 		if (sp != null && ClientState.data.caught.contains(sp.id())) {
 			Settings.set("voice", 1);
 			Sounds.dexVoice(sp.id());
@@ -102,12 +182,17 @@ public class PokedexScreen extends DeviceScreen {
 	@Override
 	protected void back() {
 		Sounds.press();
+		if (entry) {
+			Sounds.stopVoice();
+			entry = false;
+			return;
+		}
 		to(parent);
 	}
 
 	private void showArea() {
-		Species sp = byDex(at + 1);
-		if (sp == null || !ClientState.data.seen.contains(sp.id()) || minecraft == null) return;
+		Species sp = current();
+		if (sp == null || !ClientState.data.seen.contains(sp.id()) || areas(sp.id()).isEmpty() || minecraft == null) return;
 		Sounds.press();
 		TownMapScreen map = new TownMapScreen(this);
 		map.highlight(sp.name(), areas(sp.id()));
@@ -117,119 +202,115 @@ public class PokedexScreen extends DeviceScreen {
 	@Override
 	protected void drawScreen(GuiGraphics g, float partial) {
 		PlayerData d = ClientState.data;
-		g.fill(0, 0, width, height, 0x400A1C20);
-		int m = 8 * s;
-		// The header: the title, the two lists, and how many you've seen and own.
-		Ui.round(g, m, m, width - 2 * m, 22 * s, 0xFFE5525C, 3 * s);
-		Ui.draw(g, font, Ui.bold("POKéDEX"), m + 10 * s, m + 7 * s, 0xFFFFFFFF, s, true);
-		int tx = m + 70 * s;
-		for (int i = 0; i < 2; i++) {
-			int tw = 64 * s, bx = tx + i * (tw + 4 * s);
-			boolean on = (i == 1) == national;
-			Ui.round(g, bx, m + 4 * s, tw, 14 * s, on ? Ui.CREAM : 0x55FFFFFF, 2 * s);
-			Ui.draw(g, font, Ui.bold(i == 0 ? "KANTO" : "NATIONAL"), bx + 8 * s, m + 7 * s, on ? Ui.CREAM_INK : 0xFFFFFFFF, s, false);
-			boolean nat = i == 1;
-			hit(bx, m + 4 * s, tw, 14 * s, () -> {
-				national = nat;
-				at = Math.min(at, count() - 1);
-			});
+		float secs = (ticks + partial) / 20F;
+		Scenes.backdrop(g, "dex");
+		Species sp = current();
+		if (entry && sp != null) {
+			Scenes.model(g, secs, sp.id(), -1.05);
+			page(g, sp, d.caught.contains(sp.id()));
+			boolean got = d.caught.contains(sp.id()), map = !areas(sp.id()).isEmpty();
+			if (got && map) V.hints(g, "A", "On the map", "V", "Read it out", "B", "Back");
+			else if (got) V.hints(g, "V", "Read it out", "B", "Back");
+			else if (map) V.hints(g, "A", "On the map", "B", "Back");
+			else V.hints(g, "B", "Back");
+			return;
 		}
-		int seen = 0, own = 0;
-		for (int n = 1; n <= count(); n++) {
-			Species sp = byDex(n);
-			if (sp == null) continue;
-			if (d.seen.contains(sp.id())) seen++;
-			if (d.caught.contains(sp.id())) own++;
-		}
-		Ui.right(g, font, "SEEN " + seen + "    OWN " + own, width - m - 10 * s, m + 7 * s, 0xFFFFFFFF, s);
-		// The list on the left.
-		int ly = m + 28 * s, lw = Math.min(150 * s, width / 2 - m), row = 14 * s, rows = Math.max(3, (height - ly - m - 14 * s) / row);
+		boolean saw = sp != null && d.seen.contains(sp.id());
+		if (saw) Scenes.model(g, secs, sp.id(), -1.05);
+		// The header: POKéDEX, and how many you've seen and caught.
+		int seen = 0, caught = 0;
+		for (String id : d.seen) if (Species.ALL.containsKey(id)) seen++;
+		for (String id : d.caught) if (Species.ALL.containsKey(id)) caught++;
+		V.header(g, "icon_dex", "POKéDEX", "SEEN " + seen + "   CAUGHT " + caught);
+		// The list on the left: nine rows.
+		List<Integer> l = list();
+		float lx = 28, ly = 110, lw = 520, lh = 560, rh = 54;
+		V.panel(g, lx, ly, lw, lh);
 		if (at < top) top = at;
-		if (at >= top + rows) top = at - rows + 1;
-		top = Math.max(0, Math.min(top, count() - rows));
-		Ui.panel(g, m, ly, lw, rows * row + 6 * s, s);
-		for (int r = 0; r < rows && top + r < count(); r++) {
-			int n = top + r + 1, y = ly + 3 * s + r * row;
-			Species sp = byDex(n);
-			boolean on = n - 1 == at;
-			if (over(m, y, lw, row)) at = n - 1;
-			Ui.pill(g, m + 3 * s, y, lw - 6 * s, row - 2 * s, on, s);
-			int ink = on ? Ui.CREAM_INK : Ui.TEXT;
-			Ui.draw(g, font, Ui.ui(String.format("%03d", n)), m + 8 * s, y + 3 * s, on ? 0xFF7A849E : Ui.MUTED, s, false);
-			boolean saw = sp != null && d.seen.contains(sp.id()), got = sp != null && d.caught.contains(sp.id());
-			if (saw) Ui.portrait(g, sp.id(), m + 26 * s, y - s, row);
-			Ui.draw(g, font, Ui.bold(saw ? sp.name() : "-----"), m + 26 * s + row + 3 * s, y + 3 * s, saw ? ink : Ui.DIM, s, false);
-			if (got) ball(g, m + lw - 16 * s, y + 2 * s, 8 * s);
-			int idx = n - 1;
-			hit(m, y, lw, row, () -> {
-				if (at == idx) showArea();
-				at = idx;
+		if (at > top + 8) top = at - 8;
+		top = Math.max(0, Math.min(top, Math.max(0, l.size() - 9)));
+		if (l.isEmpty()) V.text(g, "None caught yet.", lx + 40, ly + 24, 21, V.DIM, true);
+		for (int j = 0; j < 9 && top + j < l.size(); j++) {
+			int i = top + j, n = l.get(i);
+			Species s = byDex(n);
+			if (s == null) continue;
+			boolean on = i == at, seenIt = d.seen.contains(s.id()), got = d.caught.contains(s.id());
+			float rx = lx + 12, ry = ly + 12 + j * rh, rw = lw - 24;
+			V.item(g, "", null, rx, ry, rw, rh, on, false, 21);
+			int ink = on ? V.INK : V.TEXT;
+			float ty = ry + (rh - 21 * 1.15F) / 2;
+			V.text(g, String.format("%03d", n), rx + 40, ty, 21, Ui.alpha(ink, 0.75F), true);
+			if (seenIt) V.img(g, Look.portrait(s.id()), rx + 112, ry + 3, 48, 48, 128, 128, got ? 0xFFFFFFFF : 0x73000000);
+			V.text(g, seenIt ? s.name() : "?????", rx + 174, ty, 21, seenIt ? ink : Ui.alpha(ink, 0.45F), true);
+			if (got) V.icon(g, "icon_ball", rx + rw - 22 - 22, ry + 16, 22);
+			vhit(rx, ry, rw, rh, () -> {
+				if (at == i) open();
+				else at = i;
 			});
 		}
-		Ui.text(g, font, "Tab: KANTO / NATIONAL   A: where to find it", m, height - m - 9 * s, Ui.DIM, s);
-		page(g, d, m + lw + 8 * s, ly, width - m - (m + lw + 8 * s), height - ly - m - 14 * s);
-	}
-
-	/** A little Poké Ball (the ones you own). */
-	private void ball(GuiGraphics g, int x, int y, int size) {
-		Ui.round(g, x, y, size, size, 0xFFE5525C, size / 2);
-		g.fill(x, y + size / 2, x + size, y + size, 0xFFF4F4F4);
-		g.fill(x, y + size / 2 - Math.max(1, s / 2), x + size, y + size / 2 + Math.max(1, s / 2), 0xFF222222);
-		g.fill(x + size / 2 - s, y + size / 2 - s, x + size / 2 + s, y + size / 2 + s, 0xFFFFFFFF);
-	}
-
-	private void page(GuiGraphics g, PlayerData d, int x, int y, int w, int h) {
-		Species sp = byDex(at + 1);
-		Ui.round(g, x, y, w, h, 0xF0F7F1E3, 3 * s);
-		if (sp == null) return;
-		boolean saw = d.seen.contains(sp.id()), got = d.caught.contains(sp.id());
-		int ps = Math.min(w / 2, h / 2);
-		if (saw) Ui.portrait(g, sp.id(), x + 8 * s, y + 8 * s, ps);
-		else {
-			Ui.round(g, x + 8 * s, y + 8 * s, ps, ps, 0x22000000, 4 * s);
-			Ui.draw(g, font, Ui.bold("?"), x + 8 * s + ps / 2 - 3 * s, y + 8 * s + ps / 2 - 4 * s, 0xFF9AA0B4, s * 2, false);
-		}
-		int rx = x + 16 * s + ps, rw = w - (rx - x) - 8 * s;
-		Ui.draw(g, font, Ui.ui("No. " + String.format("%03d", sp.dex())), rx, y + 10 * s, 0xFF7A849E, s, false);
-		Ui.draw(g, font, Ui.bold(saw ? sp.name() : "?????"), rx, y + 22 * s, Ui.CREAM_INK, s, false);
-		String[] e = DexScreen.entries().get(sp.dex());
-		if (got && e != null) {
-			Ui.draw(g, font, Ui.ui(e[0] + " POKéMON"), rx, y + 34 * s, 0xFF4A5578, s, false);
-			int cx = rx;
-			cx += Ui.chip(g, font, sp.type1().label.toUpperCase(), cx, y + 46 * s, Ui.typeColor(sp.type1()), s) + 3 * s;
-			if (sp.type2() != null && sp.type2() != sp.type1()) Ui.chip(g, font, sp.type2().label.toUpperCase(), cx, y + 46 * s, Ui.typeColor(sp.type2()), s);
-			Ui.draw(g, font, Ui.ui("HT " + e[1] + "    WT " + e[2] + " lb"), rx, y + 60 * s, 0xFF4A5578, s, false);
-		} else if (saw) {
-			Ui.draw(g, font, Ui.ui("Seen, not caught yet."), rx, y + 34 * s, 0xFF7A849E, s, false);
-		}
-		int ty = y + 16 * s + ps;
-		if (got && e != null) {
-			List<String> lines = Ui.wrap(font, e[3], (w - 16 * s) / s);
-			for (int i = 0; i < lines.size() && i < 4; i++) Ui.draw(g, font, Ui.ui(lines.get(i)), x + 8 * s, ty + i * 11 * s, Ui.CREAM_INK, s, false);
-			ty += Math.min(4, lines.size()) * 11 * s + 6 * s;
-		}
+		// The one you're on, under its stand: its name and types, and what it stands in for.
+		float ix = 800, iy = 560, iw = 440;
+		V.panel(g, ix, iy, iw, 84, 24, true);
 		if (saw) {
-			Ui.draw(g, font, Ui.bold("WHERE TO FIND IT"), x + 8 * s, ty, 0xFFE5525C, s, false);
-			List<String> names = new ArrayList<>();
-			for (String place : areas(sp.id())) {
-				Places.Place pl = Places.get(place);
-				String n = pl == null ? place.toUpperCase().replace('_', ' ') : pl.name();
-				if (!names.contains(n)) names.add(n);
-			}
-			String where = names.isEmpty() ? "Not in the wild: from people, evolution or trades." : String.join(",  ", names);
-			List<String> wl = Ui.wrap(font, where, (w - 16 * s) / s);
-			int maxLines = Math.max(1, (y + h - ty - 24 * s) / (11 * s));
-			for (int i = 0; i < wl.size() && i < maxLines; i++) Ui.draw(g, font, Ui.ui(wl.get(i)), x + 8 * s, ty + 12 * s + i * 11 * s, Ui.CREAM_INK, s, false);
-			if (got) {
-				int lw2 = 60 * s, lx = x + w - lw2 - 8 * s - (names.isEmpty() ? 0 : 64 * s), ly2 = y + h - 20 * s;
-				Ui.button(g, font, lx, ly2, lw2, 14 * s, "LISTEN (V)", 0xFFE5525C, over(lx, ly2, lw2, 14 * s), s);
-				hit(lx, ly2, lw2, 14 * s, this::listen);
-			}
-			if (!names.isEmpty()) {
-				int bw = 60 * s, bx = x + w - bw - 8 * s, by = y + h - 20 * s;
-				Ui.button(g, font, bx, by, bw, 14 * s, "ON MAP", 0xFF4CB8A0, over(bx, by, bw, 14 * s), s);
-				hit(bx, by, bw, 14 * s, this::showArea);
-			}
+			V.text(g, sp.name(), ix + 20, iy + 12, 26, V.TEXT, true);
+			float tx = ix + 20 + V.width(sp.name(), 26, true) + 10;
+			tx += V.type(g, sp.type1().label, Ui.typeColor(sp.type1()), tx, iy + 16, 70, 12) + 6;
+			if (sp.type2() != null && sp.type2() != sp.type1()) V.type(g, sp.type2().label, Ui.typeColor(sp.type2()), tx, iy + 16, 70, 12);
+			V.draw(g, V.raw(standsFor(sp), true), ix + 20, iy + 52, 15, V.MUTED, false);
+		} else V.text(g, "?????", ix + 20, iy + 22, 26, V.TEXT, true);
+		V.hints(g, "A", "Entry", "B", "Back", "TAB", caughtOnly ? "All of them" : "Caught only");
+	}
+
+	/** "Stands in for #025 PIKACHU" (our creatures); "No. 025 MOUSE POKéMON" with Cobblemon's. */
+	private static String standsFor(Species sp) {
+		String no = String.format("%03d", sp.dex());
+		if (Look.ours() && Look.has(sp.id())) return "Stands in for #" + no + " " + sp.name();
+		String[] e = DexScreen.entries().get(sp.dex());
+		return "No. " + no + (e == null || e[0].isEmpty() ? "" : "   " + e[0].toUpperCase() + " POKéMON");
+	}
+
+	/**
+	 * A POKéMON's entry (the viewer's "Pokédex entry"), in the panel on the left: number, name, types, height in
+	 * blocks and what it stands in for, what it's like, and where to find it. (The creature on its stand is drawn
+	 * beside it.) Shared with the page you see the first time you catch one.
+	 */
+	static void page(GuiGraphics g, Species sp, boolean got) {
+		float x = 28, y = 28, w = 600, h = 640, px = x + 30, pw = w - 60;
+		V.panel(g, x, y, w, h);
+		String[] e = DexScreen.entries().get(sp.dex());
+		float cy = y + 26;
+		V.label(g, "No. " + String.format("%03d", sp.dex()), px, cy);
+		cy += 18 + 14;
+		V.text(g, sp.name(), px, cy, 46, V.TEXT, true);
+		cy += 46 + 14;
+		float tx = px;
+		tx += V.type(g, sp.type1().label, Ui.typeColor(sp.type1()), tx, cy, 92, 13.5F) + 8;
+		if (sp.type2() != null && sp.type2() != sp.type1()) V.type(g, sp.type2().label, Ui.typeColor(sp.type2()), tx, cy, 92, 13.5F);
+		cy += 24 + 14;
+		// Height (in blocks, from its model) and what it stands in for (or its weight, with Cobblemon's).
+		float bw = (pw - 10) / 2, bh = 70;
+		BedrockModel.Def def = BedrockModel.def(sp.id());
+		String height = def == null ? (e == null ? "?" : e[1]) : String.format("%.2f blocks", def.height);
+		boolean ours = Look.ours() && Look.has(sp.id());
+		String[][] boxes = {{"Height", height}, ours ? new String[] {"Stands in for", sp.name()} : new String[] {"Weight", e == null ? "?" : e[2] + " lb"}};
+		for (int i = 0; i < 2; i++) {
+			float bx = px + i * (bw + 10);
+			V.panel(g, bx, cy, bw, bh, 16, true);
+			V.label(g, boxes[i][0], bx + 16, cy + 12);
+			if (i == 1 && ours) V.draw(g, V.raw(boxes[i][1], true), bx + 16, cy + 32, 22, V.TEXT, false);
+			else V.text(g, boxes[i][1], bx + 16, cy + 32, 22, V.TEXT, true);
 		}
+		cy += bh + 14;
+		// What it's like (once it's caught).
+		String about = got && e != null && !e[3].isEmpty() ? e[3] : got ? "Its entry is still being written." : "Catch one to learn more about it.";
+		List<String> lines = V.wrap(about, pw, 22, true);
+		for (int i = 0; i < lines.size() && i < 6; i++) V.text(g, lines.get(i), px, cy + i * 33 + 4, 22, 0xFFE8F4EF, true);
+		cy += Math.min(6, lines.size()) * 33 + 14 + 4;
+		V.label(g, "Where to find it", px, cy);
+		cy += 18 + 14;
+		String where = placeNames(sp.id());
+		if (where.isEmpty()) where = "Not in the wild: from people, evolution or trades.";
+		List<String> wl = V.wrap(where, pw, 19, true);
+		for (int i = 0; i < wl.size() && cy + i * 26 < y + h - 30; i++) V.text(g, wl.get(i), px, cy + i * 26, 19, V.TEXT, true);
 	}
 }

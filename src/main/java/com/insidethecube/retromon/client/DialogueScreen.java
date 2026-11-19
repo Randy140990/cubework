@@ -28,6 +28,10 @@ public class DialogueScreen extends GameScreen {
 	private final java.util.List<String> said;
 	/** When the line showing came up (ticks), for the cards that pop up with it. */
 	private int lineAt;
+	/** The nurse's line while your POKéMON are in the machine (-1: none), and when it began (ticks; -1: not yet). */
+	private final int healLine;
+	private int healAt = -1;
+	private static final int HEAL_TICKS = 52;
 	private static final String[] BADGES = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
 
 	/** A line that starts with who's speaking: "OAK: ..." (capitals, before a colon). */
@@ -65,6 +69,7 @@ public class DialogueScreen extends GameScreen {
 				}
 			}
 		});
+		this.healLine = extra.getIntOr("healing", -1);
 		String cry = extra.getStringOr("cry", "");
 		if (!cry.isEmpty()) Sounds.cry(cry, 1F);
 		// The camera closes in on the two of you, and the black bars come in, as in a cutscene.
@@ -87,10 +92,24 @@ public class DialogueScreen extends GameScreen {
 			if (j != null) Music.jingle(j);
 		}
 		if (asks() && yesNo == null && box.atEnd()) yesNo = new Choice(List.of("YES", "NO"));
+		// The healing: once the nurse's line is out, the machine's notes play for a few seconds, then she goes on.
+		if (healLine >= 0 && healAt < 0 && line == healLine && box.typedOut()) {
+			healAt = ticks;
+			Sounds.heal();
+		}
+		if (healing() && ticks - healAt >= HEAL_TICKS) {
+			healAt = -2;
+			if (box.press()) done(false);
+		}
+	}
+
+	private boolean healing() {
+		return healAt >= 0;
 	}
 
 	@Override
 	protected boolean key(KeyEvent e) {
+		if (healing()) return true;
 		if (yesNo != null) {
 			if (yesNo.key(e)) return true;
 			if (Ui.isA(e)) {
@@ -108,7 +127,7 @@ public class DialogueScreen extends GameScreen {
 
 	@Override
 	protected void clickAnywhere() {
-		if (yesNo == null && box.press()) done(false);
+		if (!healing() && yesNo == null && box.press()) done(false);
 	}
 
 	@Override
@@ -149,8 +168,15 @@ public class DialogueScreen extends GameScreen {
 		float rise = (1 - in * in * (3 - 2 * in)) * 90;
 		g.pose().pushMatrix();
 		g.pose().translate(0, V.s(rise));
-		box.renderV(g, font, 140, 26, 1000, ticks, partial, yesNo == null);
+		box.renderV(g, font, 140, 26, 1000, ticks, partial, yesNo == null && !healing());
 		g.pose().popMatrix();
+		if (healing()) {
+			// The machine's notes (the viewer's), popping in and bobbing.
+			float ht = (ticks - healAt + partial) / 20F, pop = Math.min(1, ht / 0.4F), bob = (float) Math.sin(ht * Math.PI * 2) * 4;
+			int c = Ui.alpha(V.GOLD, pop);
+			V.text(g, "♫ ♪", 560 + 4, 210 + 14 + 3 + bob, 46, Ui.alpha(0x59000000, pop), true);
+			V.text(g, "♫ ♪", 560, 210 + 14 + bob, 46, c, true);
+		}
 		// Getting something: the UI Viewer's card held up over the world (a badge spins in instead).
 		int line = box.message();
 		if (line >= 0 && line < said.size()) {

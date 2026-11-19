@@ -82,7 +82,13 @@ public class BattleScreen extends GameScreen {
 	private int wipe = WIPE;
 	/** Your money, shown at the top left once it changes (prize money, Pay Day, blacking out): from, to, and ticks since. */
 	private int moneyFrom, moneyTo, moneyAt = -1;
-	private static final int MONEY_COUNT = 24;
+	private static final int MONEY_COUNT = 18;
+	/** A level gained (the viewer's panel at the right while "grew to Lv." shows): each stat before and after. */
+	private int[] levelBefore, levelAfter;
+	/** When everything began to fade to white (your last one fainted), or -1. */
+	private int whiteAt = -1;
+	/** When it was caught ("Gotcha!" pops up), or -1. */
+	private int gotchaAt = -1;
 
 	public BattleScreen(CompoundTag start) {
 		super("Battle");
@@ -355,6 +361,7 @@ public class BattleScreen extends GameScreen {
 				Music.stop();
 				Sounds.caught();
 				BattleScene.caughtStars();
+				gotchaAt = ticks;
 				sides[1].shown = false;
 				wait = 40;
 			}
@@ -367,6 +374,15 @@ public class BattleScreen extends GameScreen {
 			}
 			case LEVEL -> {
 				if (e.b() == sides[0].index) sides[0].level = e.a();
+				if (e.b() >= 0 && e.b() < mine.size()) {
+					Mon lm = mine.get(e.b());
+					int keep = lm.level;
+					lm.level = e.a() - 1;
+					levelBefore = stats(lm);
+					lm.level = e.a();
+					levelAfter = stats(lm);
+					lm.level = Math.max(keep, e.a());
+				}
 				Sounds.levelUp();
 				wait = 30;
 			}
@@ -405,7 +421,13 @@ public class BattleScreen extends GameScreen {
 		return 0;
 	}
 
+	private static int[] stats(Mon m) {
+		return new int[] {m.maxHp(), m.attack(), m.defense(), m.spAttack(), m.spDefense(), m.speed()};
+	}
+
 	private void say(String text) {
+		if (text == null || !text.contains(" grew to ")) levelAfter = null;
+		if ("... ... ...".equals(text) && whiteAt < 0) whiteAt = ticks;
 		// (Our creatures' names in place before it's typed out, so the old name never shows part way.)
 		message = text == null ? "" : Look.text(text);
 		typed = 0;
@@ -778,9 +800,13 @@ public class BattleScreen extends GameScreen {
 		boolean plates = mode != Mode.BAG && mode != Mode.PARTY && mode != Mode.BAG_TARGET;
 		if (them.shown && plates) plate(g, them, false);
 		if (me.shown && plates) plate(g, me, true);
-		if (moneyAt >= 0) moneyChip(g, m, m + 13 * s, partial);
+		if (moneyAt >= 0) moneyBox(g, partial);
+		if (levelAfter != null && levelBefore != null) levelPanel(g);
+		if (gotchaAt >= 0) V.callout(g, "Gotcha!", 640, 150, (ticks - gotchaAt + partial) / 20F);
 		if (message != null && message.endsWith(" wants to battle!") && !kind.equals("WILD")) drawChallenge(g, message.substring(0, message.length() - 17), partial);
 		else challengeAt = -1;
+		// Your last one's fainted: everything fades to white (the words still over it).
+		if (whiteAt >= 0) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, Math.min(1, (ticks - whiteAt + partial) / 24F)));
 		switch (mode) {
 			case MAIN -> drawMain(g, m, by, bh);
 			case FIGHT -> drawFight(g, m, by, bh);
@@ -967,31 +993,33 @@ public class BattleScreen extends GameScreen {
 		V.textBox(g, 520, 26, 724, null, lines, arrow && message != null && typed >= message.length(), (ticks + partial) / 20F);
 	}
 
-	/**
-	 * Your money, sliding in at the top left when it changes: the total counting up (or down) to what you have now,
-	 * with the change beneath it in green (or red).
-	 */
-	private void moneyChip(GuiGraphics g, int x0, int y, float partial) {
-		float t = moneyAt + partial, in = Math.min(1, t / 6F), k = 1 - (1 - in) * (1 - in);
-		float c = Math.min(1, t / MONEY_COUNT);
+	/** Your money (the viewer's box at the top left) when it changes: counting up, or down, to what you have now. */
+	private void moneyBox(GuiGraphics g, float partial) {
+		float t = moneyAt + partial, c = Math.min(1, t / MONEY_COUNT), in = Math.min(1, t / 8F);
 		int shown = Math.round(moneyFrom + (moneyTo - moneyFrom) * (1 - (1 - c) * (1 - c)));
-		int delta = moneyTo - moneyFrom;
-		String total = Ui.money(shown), change = (delta >= 0 ? "+" : "-") + Ui.money(Math.abs(delta));
-		int w = Math.max(Ui.boldWidth(font, total, s), Ui.width(font, "MONEY", s) + Ui.width(font, change, s) + 8 * s) + 22 * s, h = 30 * s;
-		int x = (int) (x0 - (w + x0) * (1 - k));
-		Ui.round(g, x + s, y + 2 * s, w, h, 0x50000000, 3 * s);
-		Ui.round(g, x, y, w, h, 0xFFFFD45A, 3 * s);
-		Ui.round(g, x + s, y + s, w - 2 * s, h - 2 * s, 0xF0123C38, 3 * s);
-		Ui.rr(g, x + 5 * s, y + 2 * s, w - 10 * s, s, s / 2F, 0x26FFFFFF);
-		// A gold coin with the ₽ on it.
-		int cx = x + 6 * s, cy = y + 6 * s, cs = 9 * s;
-		Ui.round(g, cx, cy, cs, cs, 0xFFE0A526, 4 * s);
-		Ui.round(g, cx + s, cy + s, cs - 2 * s, cs - 2 * s, 0xFFFFD45A, 4 * s);
-		Ui.text(g, font, "₽", cx + 2 * s, cy + s, 0xFF8A5A10, s);
-		Ui.draw(g, font, Ui.bold(total), x + 18 * s, y + 6 * s, 0xFFFFFFFF, s, true);
-		Ui.text(g, font, "MONEY", x + 6 * s, y + 18 * s, 0xFF8FE6FF, s);
-		float lift = Math.max(0, 1 - t / 10F) * 4 * s;
-		Ui.right(g, font, change, x + w - 7 * s, y + 18 * s + Math.round(lift), delta >= 0 ? 0xFF7CF0A8 : 0xFFFF8A8A, s);
+		float x = 30, y = 30, w = 300, h = 12 + 18 + 36 + 12;
+		g.pose().pushMatrix();
+		float k = 0.85F + 0.15F * in, px = V.x(x + w / 2), py = V.y(y + h / 2);
+		g.pose().translate(px, py);
+		g.pose().scale(k, k);
+		g.pose().translate(-px, -py);
+		V.panel(g, x, y, w, h);
+		V.label(g, "Money", x + 22, y + 12);
+		V.text(g, Ui.money(shown), x + 22, y + 12 + 18, 30, V.TEXT, true);
+		g.pose().popMatrix();
+	}
+
+	/** A level gained: the viewer's panel at the right, each stat's new value and what it went up by in green. */
+	private void levelPanel(GuiGraphics g) {
+		String[] names = {"HP", "ATTACK", "DEFENSE", "SPCL.ATK", "SPCL.DEF", "SPEED"};
+		float x = 860, y = 120, w = 380, rh = 24, gap = 8, h = 32 + 6 * rh + 5 * gap;
+		V.panel(g, x, y, w, h);
+		for (int i = 0; i < 6; i++) {
+			float ry = y + 16 + i * (rh + gap);
+			V.label(g, names[i], x + 22, ry + 5);
+			V.right(g, String.valueOf(levelAfter[i]), x + w - 22 - 70, ry, 20, V.TEXT, true);
+			V.right(g, "+" + Math.max(1, levelAfter[i] - levelBefore[i]), x + w - 22, ry, 20, V.EDGE_LIGHT, true);
+		}
 	}
 
 	/** The party's six Poké Balls in a row: one for each Pokémon (grey if it's fainted), empty slots after. */

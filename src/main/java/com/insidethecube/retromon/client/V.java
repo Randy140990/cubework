@@ -215,6 +215,11 @@ public final class V {
 		return bold ? Ui.bold(text) : Ui.ui(text);
 	}
 
+	/** Words as written, with no names swapped for our creatures' ("Stands in for #025 PIKACHU"). */
+	public static Component raw(String text, boolean bold) {
+		return Component.literal(text).withStyle((bold ? Ui.bold("") : Ui.ui("")).getStyle());
+	}
+
 	/** Words at a canvas font size (the viewer's px), their top at y. */
 	public static void text(GuiGraphics g, String text, float x, float y, float size, int color, boolean bold) {
 		draw(g, comp(Look.text(text), bold), x, y, size, color, false);
@@ -472,6 +477,39 @@ public final class V {
 			if (py >= ry && py <= ry + 46) return i;
 		}
 		return -1;
+	}
+
+	/**
+	 * The viewer's callout ("Congratulations!", "Gotcha!"): big gold letters edged in brown, tilted a little, popping
+	 * in and floating up as they fade (1.4 seconds). secs: since it came up.
+	 */
+	public static void callout(GuiGraphics g, String text, float cx, float cy, float secs) {
+		if (secs < 0 || secs > 1.4F) return;
+		float p = secs / 1.4F, sc, a = 1, lift = 0, size = 64, tw = width(text, size, true), th = size * 1.2F;
+		if (p < 0.15F) {
+			sc = 0.4F + 0.75F * (p / 0.15F);
+			a = p / 0.15F;
+		} else if (p < 0.25F) sc = 1.15F - 0.15F * ((p - 0.15F) / 0.1F);
+		else sc = 1;
+		if (p > 0.8F) {
+			a = 1 - (p - 0.8F) / 0.2F;
+			lift = th * 0.2F * (p - 0.8F) / 0.2F;
+		}
+		float px = x(cx), py = y(cy - lift);
+		g.pose().pushMatrix();
+		g.pose().translate(px, py);
+		g.pose().rotate((float) Math.toRadians(-6));
+		g.pose().scale(sc, sc);
+		g.pose().translate(-px, -py);
+		float x0 = cx - tw / 2, y0 = cy - lift - size * 0.55F;
+		text(g, text, x0, y0 + 6, size, Ui.alpha(0x40000000, a), true);
+		int edge = Ui.alpha(0xFF7A4A00, a);
+		for (int i = 0; i < 8; i++) {
+			double an = i * Math.PI / 4;
+			text(g, text, x0 + (float) Math.cos(an) * 3, y0 + (float) Math.sin(an) * 3, size, edge, true);
+		}
+		text(g, text, x0, y0, size, Ui.alpha(0xFFFFE07A, a), true);
+		g.pose().popMatrix();
 	}
 
 	/** Whether the mouse is in a box on the canvas. */

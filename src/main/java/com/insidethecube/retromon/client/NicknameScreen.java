@@ -28,7 +28,7 @@ public class NicknameScreen extends GameScreen {
 		this.index = t.getIntOr("i", 0);
 		this.species = t.getStringOr("species", "");
 		Species sp = Species.ALL.get(species);
-		box = TextBox.still("Give a nickname to " + (sp == null ? "it" : sp.name()) + "?");
+		box = TextBox.still("Do you want to give a nickname to " + (sp == null ? "it" : sp.name()) + "?");
 	}
 
 	private void answer(boolean yes) {
@@ -86,6 +86,9 @@ public class NicknameScreen extends GameScreen {
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
 		if (!naming) {
+			// The UI Viewer's "Being given a POKéMON": it held up on its stand against the warm light.
+			Scenes.backdrop(g, "gift");
+			if (Species.ALL.containsKey(species)) Scenes.model(g, (ticks + partial) / 20F, species, 0);
 			box.renderV(g, font, 140, 26, 1000, ticks, partial, false);
 			vchoice(g, yesNo, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(2), 300, i -> answer(i == 0));
 			return;

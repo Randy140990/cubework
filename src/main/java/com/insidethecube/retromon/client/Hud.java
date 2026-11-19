@@ -42,14 +42,26 @@ public final class Hud {
 	/** The words shown at the darkest ("Time passes..." for WAIT; none going through a door). */
 	private static String fadeWords = "";
 
+	/** How long this fade lasts (ticks): a door's is quick; WAIT's is the viewer's (in, "Time passes...", out). */
+	private static int fadeLen = FADE;
+	private static final int WAIT_FADE = 56;
+	/** What to do once it's faded back (WAIT: "It's morning now."). */
+	private static Runnable afterFade;
+
 	public static void fadeThrough(Runnable then) {
 		fadeThrough(then, "Time passes...");
 	}
 
 	public static void fadeThrough(Runnable then, String words) {
-		fade = FADE;
-		atDark = then;
+		fadeThrough(then, words, null);
+	}
+
+	public static void fadeThrough(Runnable then, String words, Runnable after) {
 		fadeWords = words == null ? "" : words;
+		fadeLen = fadeWords.isEmpty() ? FADE : WAIT_FADE;
+		fade = fadeLen;
+		atDark = then;
+		afterFade = after;
 	}
 
 	public static void tick(Minecraft mc) {
@@ -61,9 +73,14 @@ public final class Hud {
 		if (Math.abs(cine - (want ? 1 : 0)) < 0.01F) cine = want ? 1 : 0;
 		if (fade > 0) {
 			fade--;
-			if (fade == FADE / 2 && atDark != null) {
+			if (fade == fadeLen / 2 && atDark != null) {
 				atDark.run();
 				atDark = null;
+			}
+			if (fade == 0 && afterFade != null) {
+				Runnable r = afterFade;
+				afterFade = null;
+				r.run();
 			}
 		}
 		moneyTick(mc);
@@ -162,14 +179,21 @@ public final class Hud {
 
 	private static void fade(GuiGraphics g, DeltaTracker delta) {
 		if (fade <= 0) return;
-		float t = FADE - fade + delta.getGameTimeDeltaPartialTick(true);
-		float half = FADE / 2F, a = t < half ? t / half : 1 - (t - half) / half;
-		a = Math.max(0, Math.min(1, a * 1.25F));
-		g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF05070F, a));
-		if (a > 0.85F && !fadeWords.isEmpty()) {
-			Minecraft mc = Minecraft.getInstance();
-			int s = Ui.scale(g.guiHeight());
-			Ui.centred(g, mc.font, fadeWords, g.guiWidth() / 2, g.guiHeight() / 2 - 4 * s, Ui.alpha(0xFFE8ECFF, (a - 0.85F) / 0.15F), s, false);
+		float t = fadeLen - fade + delta.getGameTimeDeltaPartialTick(true);
+		if (fadeWords.isEmpty()) {
+			// Through a door: to dark and straight back.
+			float half = FADE / 2F, a = t < half ? t / half : 1 - (t - half) / half;
+			a = Math.max(0, Math.min(1, a * 1.25F));
+			g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF05070F, a));
+			return;
+		}
+		// WAIT, as the viewer's: the screen dims (0.7 s), "Time passes..." comes up and goes, and it lightens again.
+		float a = t < 14 ? t / 14 : t > fadeLen - 14 ? (fadeLen - t) / 14 : 1;
+		g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF000000, Math.max(0, Math.min(1, a)) * 0.92F));
+		float w = t < 18 ? 0 : t < 28 ? (t - 18) / 10 : t < 46 ? 1 : Math.max(0, 1 - (t - 46) / 10);
+		if (w > 0) {
+			V.fit(g.guiWidth(), g.guiHeight());
+			V.centred(g, fadeWords, 640, 330, 34, Ui.alpha(V.TEXT, w), true);
 		}
 	}
 

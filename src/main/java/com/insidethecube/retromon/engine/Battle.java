@@ -1510,7 +1510,7 @@ public class Battle {
 			if (next < 0) {
 				// The trainer pays for their last Pokémon's level; Pay Day's coins are picked up after.
 				if (kind == Kind.TRAINER) {
-					out.add(Event.text(playerName + " defeated " + trainer + "!"));
+					out.add(Event.text("You defeated " + trainer + "!"));
 					prize = prizeBase * them().level;
 					if (prize > 0) {
 						out.add(new Event(Event.Kind.MONEY, 0, null, prize, purse + prize));
@@ -1534,7 +1534,7 @@ public class Battle {
 			participants.remove(active);
 			field[0].clear();
 			if (firstHealthy(mine) < 0) {
-				out.add(Event.text(playerName + " is out of usable POKéMON!"));
+				out.add(Event.text(playerName + " has no POKéMON left that can fight!"));
 				if (!lenient) {
 					lost = purse / 2;
 					if (lost > 0) {
@@ -1542,7 +1542,8 @@ public class Battle {
 						out.add(Event.text(kind == Kind.TRAINER ? playerName + " paid " + money(lost) + " to the winner."
 								: playerName + " panicked and dropped " + money(lost) + "..."));
 					}
-					out.add(Event.text(playerName + " blacked out!"));
+					out.add(Event.text("... ... ..."));
+					out.add(Event.text(playerName + " whited out!"));
 				}
 				end(Result.LOSS, out);
 			} else {
@@ -1575,7 +1576,7 @@ public class Battle {
 				m.hp = Math.min(m.maxHp(), m.hp + (m.maxHp() - oldMax));
 				out.add(new Event(Event.Kind.LEVEL, 0, null, m.level, i));
 				if (i == active) out.add(Event.hp(0, m.hp, m.maxHp()));
-				out.add(Event.text(m.name() + " grew to level " + m.level + "!"));
+				out.add(Event.text(m.name() + " grew to Lv. " + m.level + "!"));
 				for (String mv : m.species.learnsAt(m.level)) {
 					if (m.moves.contains(mv) || Move.find(mv) == null) continue;
 					if (m.moves.size() < 4) {
