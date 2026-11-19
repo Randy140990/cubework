@@ -1,0 +1,20 @@
+{
+ "idle": "animation.jerbolt.ground_idle",
+ "ground": "animation.jerbolt.ground_idle",
+ "actions": {
+  "cry": "animation.jerbolt.cry",
+  "recoil": "animation.jerbolt.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.jerbolt.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 0.727,
+ "height": 1.65,
+ "texture": "retromon:textures/mons/raticate.png",
+ "layers": [],
+ "name": "JERBOLT",
+ "parts": []
+}

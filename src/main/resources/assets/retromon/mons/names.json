@@ -1,7 +1,16 @@
 {
+ "blastoise": "TSUNAPIR",
  "bulbasaur": "FERNADILLO",
+ "charizard": "PYRIBEX",
  "charmander": "CINDERKID",
+ "charmeleon": "EMBERAM",
+ "ivysaur": "BRAMBADILLO",
+ "pidgeot": "REGALQUAIL",
+ "pidgeotto": "PLUMQUAIL",
  "pidgey": "QUAILET",
+ "raticate": "JERBOLT",
  "rattata": "JERBIT",
- "squirtle": "TIDAPIR"
+ "squirtle": "TIDAPIR",
+ "venusaur": "GROVADON",
+ "wartortle": "SURFAPIR"
 }

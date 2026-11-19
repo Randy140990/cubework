@@ -1,0 +1,28 @@
+{
+ "idle": "animation.regalquail.ground_idle",
+ "ground": "animation.regalquail.ground_idle",
+ "actions": {
+  "cry": "animation.regalquail.cry",
+  "recoil": "animation.regalquail.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.regalquail.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.regalquail.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.regalquail.air_hover",
+   "parts": []
+  }
+ },
+ "scale": 0.864,
+ "height": 2.594,
+ "texture": "retromon:textures/mons/pidgeot.png",
+ "layers": [],
+ "name": "REGALQUAIL",
+ "parts": []
+}

@@ -1,0 +1,763 @@
+{
+ "format_version": "1.8.0",
+ "animations": {
+  "animation.regalquail.ground_idle": {
+   "loop": true,
+   "animation_length": 4.8,
+   "bones": {
+    "body": {
+     "position": [
+      0,
+      "math.sin(q.anim_time * 150 + 0) * 0.24",
+      0
+     ],
+     "scale": [
+      "1 + math.sin(q.anim_time * 300 + 0) * 0.015",
+      "1 + math.sin(q.anim_time * 300 + 90) * 0.021",
+      "1 + math.sin(q.anim_time * 300 + 0) * 0.015"
+     ]
+    },
+    "neck": {
+     "rotation": [
+      "math.sin(q.anim_time * 150 + 0) * 3",
+      0,
+      0
+     ]
+    },
+    "head": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "2.64": [
+       0,
+       0,
+       0
+      ],
+      "2.82": [
+       0,
+       25,
+       0
+      ],
+      "3.48": [
+       0,
+       25,
+       0
+      ],
+      "3.66": [
+       0,
+       -20,
+       0
+      ],
+      "4.32": [
+       0,
+       -20,
+       0
+      ],
+      "4.5": [
+       0,
+       0,
+       0
+      ],
+      "4.8": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "plume": {
+     "rotation": [
+      "math.sin(q.anim_time * 300 + 0) * 6",
+      0,
+      0
+     ]
+    },
+    "plume_tip": {
+     "rotation": [
+      "math.sin(q.anim_time * 300 + 60) * 10",
+      0,
+      0
+     ]
+    },
+    "tail": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "1.2": [
+       0,
+       0,
+       0
+      ],
+      "1.296": [
+       -16,
+       0,
+       0
+      ],
+      "1.44": [
+       0,
+       0,
+       0
+      ],
+      "4.8": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "wing_right": {
+     "rotation": [
+      0,
+      0,
+      "math.sin(q.anim_time * 150 + 0) * 1.5"
+     ]
+    },
+    "wing_left": {
+     "rotation": [
+      0,
+      0,
+      "math.sin(q.anim_time * 150 + 0) * -1.5"
+     ]
+    },
+    "eyelid_right": {
+     "scale": [
+      1,
+      "(q.anim_time > 1.824) * (q.anim_time < 1.964)",
+      1
+     ]
+    },
+    "eyelid_left": {
+     "scale": [
+      1,
+      "(q.anim_time > 1.824) * (q.anim_time < 1.964)",
+      1
+     ]
+    },
+    "tail2": {
+     "rotation": [
+      "math.sin(q.anim_time * 75 + 0) * 3",
+      "math.sin(q.anim_time * 150 + 0) * 4",
+      0
+     ]
+    }
+   }
+  },
+  "animation.regalquail.ground_walk": {
+   "loop": true,
+   "animation_length": 0.65,
+   "bones": {
+    "leg_right": {
+     "rotation": [
+      "math.sin(q.anim_time * 553.846 + 0) * 30",
+      0,
+      0
+     ]
+    },
+    "leg_left": {
+     "rotation": [
+      "math.sin(q.anim_time * 553.846 + 0) * -30",
+      0,
+      0
+     ]
+    },
+    "foot_right": {
+     "rotation": [
+      "math.abs(math.sin(q.anim_time * 276.923 + 0)) * -18",
+      0,
+      0
+     ]
+    },
+    "foot_left": {
+     "rotation": [
+      "math.abs(math.sin(q.anim_time * 276.923 + 90)) * -18",
+      0,
+      0
+     ]
+    },
+    "body": {
+     "rotation": [
+      0,
+      0,
+      "math.sin(q.anim_time * 553.846 + 0) * 4"
+     ],
+     "position": [
+      0,
+      "math.abs(math.sin(q.anim_time * 553.846 + 0)) * 0.8",
+      0
+     ]
+    },
+    "head": {
+     "position": [
+      0,
+      0,
+      "math.sin(q.anim_time * 1107.692 + 0) * 0.8"
+     ]
+    },
+    "neck": {
+     "rotation": [
+      "math.sin(q.anim_time * 1107.692 + 0) * 4",
+      0,
+      0
+     ]
+    },
+    "plume": {
+     "rotation": [
+      "math.sin(q.anim_time * 1107.692 + 0) * 10",
+      0,
+      0
+     ]
+    },
+    "tail": {
+     "rotation": [
+      "math.sin(q.anim_time * 1107.692 + 0) * 6",
+      0,
+      0
+     ]
+    },
+    "eyelid_right": {
+     "scale": [
+      1,
+      "(q.anim_time > 0.39) * (q.anim_time < 0.53)",
+      1
+     ]
+    },
+    "eyelid_left": {
+     "scale": [
+      1,
+      "(q.anim_time > 0.39) * (q.anim_time < 0.53)",
+      1
+     ]
+    }
+   }
+  },
+  "animation.regalquail.air_fly": {
+   "loop": true,
+   "animation_length": 0.5,
+   "bones": {
+    "body": {
+     "rotation": [
+      14,
+      0,
+      0
+     ],
+     "position": [
+      0,
+      "math.sin(q.anim_time * 720 + 90) * 0.96",
+      0
+     ]
+    },
+    "leg_right": {
+     "rotation": [
+      60,
+      0,
+      0
+     ]
+    },
+    "leg_left": {
+     "rotation": [
+      60,
+      0,
+      0
+     ]
+    },
+    "head": {
+     "rotation": [
+      -12,
+      0,
+      0
+     ]
+    },
+    "neck": {
+     "rotation": [
+      -8,
+      0,
+      0
+     ]
+    },
+    "plume": {
+     "rotation": [
+      24,
+      0,
+      0
+     ]
+    },
+    "tail": {
+     "rotation": [
+      "10 + math.sin(q.anim_time * 720 + 0) * 6",
+      0,
+      0
+     ]
+    },
+    "wing_right": {
+     "rotation": [
+      0,
+      0,
+      "70 + math.sin(q.anim_time * 720 + 0) * 52"
+     ]
+    },
+    "wing_left": {
+     "rotation": [
+      0,
+      0,
+      "-70 + math.sin(q.anim_time * 720 + 0) * -52"
+     ]
+    },
+    "wing_mid_right": {
+     "rotation": [
+      0,
+      "math.sin(q.anim_time * 720 + 40) * 18",
+      0
+     ]
+    },
+    "wing_mid_left": {
+     "rotation": [
+      0,
+      "math.sin(q.anim_time * 720 + 40) * -18",
+      0
+     ]
+    },
+    "wing_tip_right": {
+     "rotation": [
+      0,
+      0,
+      "math.sin(q.anim_time * 720 + 70) * 20.8"
+     ]
+    },
+    "wing_tip_left": {
+     "rotation": [
+      0,
+      0,
+      "math.sin(q.anim_time * 720 + 70) * -20.8"
+     ]
+    },
+    "eyelid_right": {
+     "scale": [
+      1,
+      "(q.anim_time > 0.25) * (q.anim_time < 0.39)",
+      1
+     ]
+    },
+    "eyelid_left": {
+     "scale": [
+      1,
+      "(q.anim_time > 0.25) * (q.anim_time < 0.39)",
+      1
+     ]
+    },
+    "tail2": {
+     "rotation": [
+      "-5 + math.sin(q.anim_time * 720 + 0) * 4",
+      0,
+      0
+     ]
+    }
+   }
+  },
+  "animation.regalquail.air_hover": {
+   "loop": true,
+   "animation_length": 0.75,
+   "bones": {
+    "body": {
+     "rotation": [
+      -6,
+      0,
+      0
+     ],
+     "position": [
+      0,
+      "math.sin(q.anim_time * 480 + 90) * 1.28",
+      0
+     ]
+    },
+    "leg_right": {
+     "rotation": [
+      25,
+      0,
+      0
+     ]
+    },
+    "leg_left": {
+     "rotation": [
+      25,
+      0,
+      0
+     ]
+    },
+    "plume": {
+     "rotation": [
+      "math.sin(q.anim_time * 480 + 0) * 10",
+      0,
+      0
+     ]
+    },
+    "tail": {
+     "rotation": [
+      "18 + math.sin(q.anim_time * 480 + 0) * 8",
+      0,
+      0
+     ]
+    },
+    "wing_right": {
+     "rotation": [
+      0,
+      0,
+      "65 + math.sin(q.anim_time * 480 + 0) * 42"
+     ]
+    },
+    "wing_left": {
+     "rotation": [
+      0,
+      0,
+      "-65 + math.sin(q.anim_time * 480 + 0) * -42"
+     ]
+    },
+    "wing_mid_right": {
+     "rotation": [
+      0,
+      "math.sin(q.anim_time * 480 + 40) * 24",
+      0
+     ]
+    },
+    "wing_mid_left": {
+     "rotation": [
+      0,
+      "math.sin(q.anim_time * 480 + 40) * -24",
+      0
+     ]
+    },
+    "wing_tip_right": {
+     "rotation": [
+      0,
+      0,
+      "math.sin(q.anim_time * 480 + 70) * 16.8"
+     ]
+    },
+    "wing_tip_left": {
+     "rotation": [
+      0,
+      0,
+      "math.sin(q.anim_time * 480 + 70) * -16.8"
+     ]
+    },
+    "eyelid_right": {
+     "scale": [
+      1,
+      "(q.anim_time > 0.375) * (q.anim_time < 0.515)",
+      1
+     ]
+    },
+    "eyelid_left": {
+     "scale": [
+      1,
+      "(q.anim_time > 0.375) * (q.anim_time < 0.515)",
+      1
+     ]
+    }
+   }
+  },
+  "animation.regalquail.cry": {
+   "loop": false,
+   "animation_length": 1.2,
+   "bones": {
+    "neck": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.24": [
+       -14,
+       0,
+       0
+      ],
+      "0.72": [
+       -14,
+       0,
+       0
+      ],
+      "1.2": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "head": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.24": [
+       -28,
+       0,
+       0
+      ],
+      "0.48": [
+       -22,
+       0,
+       0
+      ],
+      "0.72": [
+       -28,
+       0,
+       0
+      ],
+      "1.2": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "beak_lower": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.24": [
+       30,
+       0,
+       0
+      ],
+      "0.48": [
+       12,
+       0,
+       0
+      ],
+      "0.72": [
+       30,
+       0,
+       0
+      ],
+      "0.96": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "plume": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.24": [
+       -25,
+       0,
+       0
+      ],
+      "0.72": [
+       12,
+       0,
+       0
+      ],
+      "1.2": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "wing_right": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.24": [
+       0,
+       0,
+       55
+      ],
+      "0.48": [
+       0,
+       0,
+       35
+      ],
+      "0.72": [
+       0,
+       0,
+       55
+      ],
+      "1.2": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "wing_left": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.24": [
+       0,
+       0,
+       -55
+      ],
+      "0.48": [
+       0,
+       0,
+       -35
+      ],
+      "0.72": [
+       0,
+       0,
+       -55
+      ],
+      "1.2": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "body": {
+     "position": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.24": [
+       0,
+       1.6,
+       0
+      ],
+      "0.72": [
+       0,
+       1.6,
+       0
+      ],
+      "1.2": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "tail": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.24": [
+       -20,
+       0,
+       0
+      ],
+      "0.72": [
+       -20,
+       0,
+       0
+      ],
+      "1.2": [
+       0,
+       0,
+       0
+      ]
+     }
+    }
+   }
+  },
+  "animation.regalquail.recoil": {
+   "loop": false,
+   "animation_length": 0.6,
+   "bones": {
+    "body": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.12": [
+       -14,
+       0,
+       0
+      ],
+      "0.6": [
+       0,
+       0,
+       0
+      ]
+     },
+     "position": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.12": [
+       0,
+       0.96,
+       1.92
+      ],
+      "0.6": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "wing_right": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.12": [
+       0,
+       0,
+       40
+      ],
+      "0.6": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "wing_left": {
+     "rotation": {
+      "0": [
+       0,
+       0,
+       0
+      ],
+      "0.12": [
+       0,
+       0,
+       -40
+      ],
+      "0.6": [
+       0,
+       0,
+       0
+      ]
+     }
+    }
+   }
+  }
+ }
+}

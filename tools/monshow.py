@@ -16,6 +16,8 @@ import portraits  # noqa: E402  (its geometry is built as the mod builds it)
 ROOT = portraits.ROOT
 MONS = os.path.join(ROOT, "mons")
 ORDER = ["bulbasaur", "charmander", "squirtle", "pidgey", "rattata"]
+ALL = ["bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon", "charizard", "squirtle", "wartortle", "blastoise", "pidgey", "pidgeotto", "pidgeot",
+       "rattata", "raticate"]
 TYPES = {"bulbasaur": ("GRASS", "#4FA64A"), "charmander": ("FIRE", "#E8662C"), "squirtle": ("WATER", "#2F74BA"), "pidgey": ("NORMAL · FLYING", "#8C80A8"),
          "rattata": ("NORMAL", "#B7864A")}
 FONT = "/usr/share/fonts/truetype/google-fonts/Poppins-Bold.ttf"
@@ -264,7 +266,7 @@ def portraits_for_screens():
     """Their pictures for the party, the Pokédex and the summaries (as tools/portraits.py makes Cobblemon's), at the same view."""
     out = os.path.join(ROOT, "textures", "gui", "mon_r")
     os.makedirs(out, exist_ok=True)
-    for sid in ORDER:
+    for sid in ALL:
         pic, _ = render(Creature(sid), 0, 128, yaw=-26, pitch=12, ss=3, fill=0.86)
         pic.save(os.path.join(out, sid + ".png"), optimize=True)
 
@@ -276,3 +278,60 @@ if __name__ == "__main__":
     lineup(os.path.join(out, "retromon_creatures.jpg"))
     if "--film" in sys.argv:
         film(os.path.join(out, "retromon_creatures.mp4"))
+
+
+def families_sheet(out_path, sizes_path):
+    """Every family in a row, each creature with its type, its height in blocks beside Cobblemon's, and its base stats."""
+    sizes = json.load(open(sizes_path))
+    rows = {}
+    for line in open(os.path.join(ROOT, "..", "..", "retromon", "data", "species.tsv"), encoding="utf-8"):
+        if line.startswith("#") or not line.strip():
+            continue
+        f = line.rstrip("\n").split("\t")
+        rows[f[1]] = {"name": f[2], "types": [t for t in (f[3], f[4]) if t != "-"], "bst": sum(int(x) for x in f[5:11]),
+                      "stats": [int(x) for x in (f[5], f[6], f[7], f[9], f[10], f[8])]}
+    fams = [ALL[0:3], ALL[3:6], ALL[6:9], ALL[9:12], ALL[12:14]]
+    tcol = {"GRASS": "#4E9F45", "POISON": "#8E54B8", "FIRE": "#E0602A", "FLYING": "#7A88D8", "WATER": "#3479C9", "NORMAL": "#938C74"}
+    cw, ch = 560, 500
+    W, H = cw * 3 + 40, ch * len(fams) + 40
+    im = backdrop(W, H, "#EAF4EF", "#CFE6DC")
+    d = ImageDraw.Draw(im)
+    f_name = ImageFont.truetype(FONT, 30)
+    f_big = ImageFont.truetype(FONT, 34)
+    f_sub = ImageFont.truetype(FONT.replace("Bold", "Medium") if os.path.exists(FONT.replace("Bold", "Medium")) else FONT, 18)
+    f_small = ImageFont.truetype(FONT, 16)
+    for r, fam in enumerate(fams):
+        for c, sid in enumerate(fam):
+            x, y = 20 + c * cw, 20 + r * ch
+            d.rounded_rectangle([x + 6, y + 6, x + cw - 6, y + ch - 6], radius=22, fill="#FFFFFF")
+            cr = Creature(sid)
+            pic, _ = render(cr, 0.3, 300, yaw=-35, pitch=12, ss=2)
+            shadow(im, x + 150 + 10, y + 300 - 32, 90, 10, 50)
+            im.alpha_composite(pic, (x + 10, y + 6))
+            info = rows[sid]
+            tx = x + 320
+            d.text((tx, y + 24), cr.name, font=f_name, fill="#10302B")
+            d.text((tx, y + 66), "for " + info["name"].title(), font=f_sub, fill="#4E6E68")
+            ty = y + 100
+            for t in info["types"]:
+                w = d.textlength(t, font=f_small) + 22
+                d.rounded_rectangle([tx, ty, tx + w, ty + 26], radius=13, fill=tcol.get(t, "#938C74"))
+                d.text((tx + 11, ty + 3), t, font=f_small, fill="white")
+                tx += w + 6
+            tx = x + 320
+            s = sizes.get(sid, {})
+            ours, theirs = s.get("ours", [0, 0, 0]), s.get("theirs", [0, 0, 0])
+            d.text((tx, y + 142), "HEIGHT (BLOCKS)", font=f_small, fill="#4E6E68")
+            d.text((tx, y + 162), f"{ours[0]:.2f}", font=f_big, fill="#178A69")
+            d.text((tx, y + 206), f"Cobblemon's: {theirs[0]:.2f}", font=f_small, fill="#6A7D9A")
+            d.text((tx, y + 232), f"Length {ours[1]:.2f} · width {ours[2]:.2f}", font=f_small, fill="#4E6E68")
+            labels = ["HP", "ATK", "DEF", "SPA", "SPD", "SPE"]
+            by = y + 330
+            d.text((x + 24, by - 6), f"BASE STATS {info['bst']}", font=f_small, fill="#4E6E68")
+            for i, (lab, v) in enumerate(zip(labels, info["stats"])):
+                yy = by + 22 + i * 22
+                d.text((x + 24, yy), lab, font=f_small, fill="#4E6E68")
+                d.text((x + 70, yy), str(v), font=f_small, fill="#10302B")
+                d.rounded_rectangle([x + 110, yy + 5, x + cw - 30, yy + 15], radius=5, fill="#E3EFEA")
+                d.rounded_rectangle([x + 110, yy + 5, x + 110 + max(10, (cw - 140) * min(1, v / 160)), yy + 15], radius=5, fill="#2E9E7B")
+    im.convert("RGB").save(out_path, quality=90)

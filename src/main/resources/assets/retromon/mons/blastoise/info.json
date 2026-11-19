@@ -1,0 +1,20 @@
+{
+ "idle": "animation.tsunapir.battle_idle",
+ "ground": "animation.tsunapir.ground_idle",
+ "actions": {
+  "cry": "animation.tsunapir.cry",
+  "recoil": "animation.tsunapir.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.tsunapir.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 1.305,
+ "height": 2.375,
+ "texture": "retromon:textures/mons/blastoise.png",
+ "layers": [],
+ "name": "TSUNAPIR",
+ "parts": []
+}

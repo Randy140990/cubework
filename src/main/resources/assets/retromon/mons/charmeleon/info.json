@@ -1,0 +1,32 @@
+{
+ "idle": "animation.emberam.battle_idle",
+ "ground": "animation.emberam.ground_idle",
+ "actions": {
+  "cry": "animation.emberam.cry",
+  "recoil": "animation.emberam.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.emberam.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 0.632,
+ "height": 2.438,
+ "texture": "retromon:textures/mons/charmeleon.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/charmeleon_glow_0.png",
+    "retromon:textures/mons/charmeleon_glow_1.png",
+    "retromon:textures/mons/charmeleon_glow_2.png",
+    "retromon:textures/mons/charmeleon_glow_3.png"
+   ],
+   "fps": 8,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "EMBERAM",
+ "parts": []
+}

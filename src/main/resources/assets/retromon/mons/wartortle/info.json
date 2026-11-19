@@ -1,0 +1,20 @@
+{
+ "idle": "animation.surfapir.battle_idle",
+ "ground": "animation.surfapir.ground_idle",
+ "actions": {
+  "cry": "animation.surfapir.cry",
+  "recoil": "animation.surfapir.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.surfapir.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 0.8,
+ "height": 1.25,
+ "texture": "retromon:textures/mons/wartortle.png",
+ "layers": [],
+ "name": "SURFAPIR",
+ "parts": []
+}

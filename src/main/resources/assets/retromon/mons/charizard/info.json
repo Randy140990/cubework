@@ -1,0 +1,40 @@
+{
+ "idle": "animation.pyribex.battle_idle",
+ "ground": "animation.pyribex.ground_idle",
+ "actions": {
+  "cry": "animation.pyribex.cry",
+  "recoil": "animation.pyribex.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.pyribex.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.pyribex.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.pyribex.air_hover",
+   "parts": []
+  }
+ },
+ "scale": 0.962,
+ "height": 4.312,
+ "texture": "retromon:textures/mons/charizard.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/charizard_glow_0.png",
+    "retromon:textures/mons/charizard_glow_1.png",
+    "retromon:textures/mons/charizard_glow_2.png",
+    "retromon:textures/mons/charizard_glow_3.png"
+   ],
+   "fps": 8,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PYRIBEX",
+ "parts": []
+}

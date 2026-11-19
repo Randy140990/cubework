@@ -1,0 +1,20 @@
+{
+ "idle": "animation.brambadillo.battle_idle",
+ "ground": "animation.brambadillo.ground_idle",
+ "actions": {
+  "cry": "animation.brambadillo.cry",
+  "recoil": "animation.brambadillo.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.brambadillo.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 0.908,
+ "height": 1.156,
+ "texture": "retromon:textures/mons/ivysaur.png",
+ "layers": [],
+ "name": "BRAMBADILLO",
+ "parts": []
+}

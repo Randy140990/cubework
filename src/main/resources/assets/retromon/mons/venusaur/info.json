@@ -1,0 +1,20 @@
+{
+ "idle": "animation.grovadon.battle_idle",
+ "ground": "animation.grovadon.ground_idle",
+ "actions": {
+  "cry": "animation.grovadon.cry",
+  "recoil": "animation.grovadon.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.grovadon.ground_walk",
+   "parts": []
+  }
+ },
+ "scale": 1.138,
+ "height": 2.312,
+ "texture": "retromon:textures/mons/venusaur.png",
+ "layers": [],
+ "name": "GROVADON",
+ "parts": []
+}

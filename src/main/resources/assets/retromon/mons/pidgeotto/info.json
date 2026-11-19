@@ -1,0 +1,28 @@
+{
+ "idle": "animation.plumquail.ground_idle",
+ "ground": "animation.plumquail.ground_idle",
+ "actions": {
+  "cry": "animation.plumquail.cry",
+  "recoil": "animation.plumquail.recoil"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.plumquail.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.plumquail.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.plumquail.air_hover",
+   "parts": []
+  }
+ },
+ "scale": 0.948,
+ "height": 1.562,
+ "texture": "retromon:textures/mons/pidgeotto.png",
+ "layers": [],
+ "name": "PLUMQUAIL",
+ "parts": []
+}
