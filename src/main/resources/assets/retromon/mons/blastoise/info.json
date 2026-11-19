@@ -25,6 +25,7 @@
   }
  },
  "move": "HYDRO PUMP",
+ "attack_move": "TACKLE",
  "scale": 1.305,
  "height": 2.375,
  "texture": "retromon:textures/mons/blastoise.png",

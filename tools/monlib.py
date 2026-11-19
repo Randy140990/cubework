@@ -232,16 +232,12 @@ class Model:
     def battle_fx(self, head, top, cz, mouth, front, size=1.0):
         """The battle effects every creature has: stars that circle above its head when it's confused (top: the head's
         top, cz: its middle front to back), and a burst where a critical hit lands (in front of its mouth)."""
-        st = star_mat()
-        n = max(5, round(5 * size)) // 2 * 2 + 1
-        r, py = 4.5 * size, top + 2.5 * size
-        stars = []
-        for i in range(3):
-            a = i * 120
-            px, pz = r * math.sin(math.radians(a)), cz + r * math.cos(math.radians(a))
-            for extra in (0, 90):
-                stars.append(Cube([px - n / 2, py - n / 2, pz], [n, n, 0], st, [0, a + extra, 0], [px, py, pz], effect=True))
-        self.bone("fx_stars", head, [0, py, cz], stars)
+        # The stars are sized when the creature is written, once its size in the world is known: the same size above
+        # every creature, big or small, and well clear of its head.
+        hw = max((abs(v) for b in self.bones if b.name == head for c in b.cubes if not c.effect for v in (c.origin[0], c.origin[0] + c.size[0])),
+                 default=3.0)
+        self.stars_spec = (head, top, cz, hw)
+        self.bone("fx_stars", head, [0, top, cz], [])
         bm = burst_mat()
         m = max(8, round(12 * size))
         bz = front - 4 * size
@@ -550,17 +546,27 @@ def smoke_shape(at, fi, frames=FRAMES):
     return mix("#5E5654", "#B4ACA8", v), alpha
 
 
-STAR = ["..Y..", ".YYY.", "YYWYY", ".YYY.", ".Y.Y."]
+STAR = ["....O....",
+        "...OYO...",
+        "...OYO...",
+        "OOOOWYOOO",
+        ".OYYWYYO.",
+        "..OYYYO..",
+        ".OYYOYYO.",
+        ".OYO.OYO.",
+        ".OO...OO."]
 
 
 def star_shape(at, fi):
-    """A little five-pointed star, bright yellow with a pale heart, twinkling from frame to frame."""
-    col, row = int(at.lx * 5 - 1e-9), int((1 - at.ly) * 5 - 1e-9)
-    ch = STAR[max(0, min(4, row))][max(0, min(4, col))]
+    """A five-pointed star drawn as pixel art: bright yellow, a pale streak of light down its middle, a deep gold rim."""
+    col, row = int(at.lx * 9 - 1e-9), int((1 - at.ly) * 9 - 1e-9)
+    ch = STAR[max(0, min(8, row))][max(0, min(8, col))]
     if ch == ".":
         return None
     if ch == "W":
         return rgb("#FFFBE0"), 255
+    if ch == "O":
+        return rgb("#E08A1A"), 255
     return rgb("#FFD83A"), 255
 
 
@@ -569,23 +575,79 @@ def star_mat():
 
 
 def burst_shape(at, fi):
-    """A critical hit's impact: a jagged burst of eight spikes round a white-hot heart."""
+    """A hit's impact, drawn like a comic's "pow": ten spikes, long and short by turns, round a white-hot heart, yellow,
+    then orange, rimmed in red; a white shock ring spreading out behind it."""
     dx, dy = at.lx - 0.5, at.ly - 0.5
     r = math.hypot(dx, dy)
-    th = math.atan2(dy, dx)
-    R = 0.16 + 0.34 * abs(math.cos(4 * th + fi * 0.4)) ** 2.5
-    if r > R:
-        return None
-    k = r / R
-    if k < 0.4:
-        return rgb("#FFFFFF"), 255
-    if k < 0.72:
-        return rgb("#FFE45A"), 255
-    return rgb("#FF9A30"), 235
+    th = math.atan2(dy, dx) + fi * 0.05
+    i = int(math.floor((th + math.pi) / (2 * math.pi) * 10))
+    f = ((th + math.pi) / (2 * math.pi) * 10) % 1.0
+    tip = 0.47 if i % 2 == 0 else 0.33
+    R = 0.17 + (tip - 0.17) * (1 - abs(f - 0.5) * 2) ** 1.6
+    if r <= R:
+        k = r / R
+        if k < 0.38:
+            return rgb("#FFFFFF"), 255
+        if k < 0.66:
+            return rgb("#FFE45A"), 255
+        if k < 0.86:
+            return rgb("#FF9A30"), 255
+        return rgb("#C8301E"), 255
+    ring = 0.3 + 0.03 * fi
+    if abs(r - ring) < 0.025 and r < 0.5:
+        return rgb("#FFFFFF"), 170
+    return None
 
 
 def burst_mat():
     return Mat("#FFE45A", lambda a: CLEAR, glow=lambda a, fi: burst_shape(a, fi), frames=True, noise=0, edge=0)
+
+
+def ring_shape(at, fi):
+    """A blow landing: a bright ring of shock spreading out, broken into dashes."""
+    dx, dy = at.lx - 0.5, at.ly - 0.5
+    r = math.hypot(dx, dy)
+    if not 0.34 < r < 0.48:
+        return None
+    if int(math.floor((math.atan2(dy, dx) + math.pi) / (2 * math.pi) * 12)) % 3 == 2:
+        return None
+    k = abs(r - 0.41) / 0.07
+    return mix("#FFFFFF", "#FFE890", k), 235 - 100 * k
+
+
+def ring_mat():
+    return Mat("#FFFFFF", lambda a: CLEAR, glow=lambda a, fi: ring_shape(a, fi), frames=True, noise=0, edge=0)
+
+
+def claw_shape(at, fi):
+    """A scratch: three bright claw marks raked diagonally through the air."""
+    u, v = (at.lz, at.ly) if at.cube.size[0] == 0 else (at.lx, at.ly)
+    if not 0.08 < v < 0.92:
+        return None
+    for c in (0.18, 0.4, 0.62):
+        d = abs((u - v * 0.45) - c + 0.1)
+        w = 0.045 * math.sin(math.pi * v)
+        if d < w:
+            return (rgb("#FFFFFF"), 255)
+        if d < w + 0.035:
+            return (rgb("#FFE48A"), 190)
+    return None
+
+
+def claw_mat():
+    return Mat("#FFFFFF", lambda a: CLEAR, glow=lambda a, fi: claw_shape(a, fi), frames=True, noise=0, edge=0)
+
+
+def streak_shape(at, fi):
+    """A speed line: a thin white streak, bright at its front, fading out behind."""
+    t = at.lz
+    if (fi + int(at.cube.origin[1] * 3)) % 3 == 0 and t > 0.8:
+        return None
+    return mix("#FFFFFF", "#CFE8FF", t), max(40, 230 * (1 - t))
+
+
+def streak_mat():
+    return Mat("#FFFFFF", lambda a: CLEAR, glow=lambda a, fi: streak_shape(a, fi), frames=True, noise=0, edge=0)
 
 
 def wind_shape(at, fi):
@@ -786,9 +848,40 @@ def pulse(period, amp):
 
 # ---------- writing ----------
 
+def place_stars(model, stands, anims=None):
+    """Builds the confused stars: three crisp nine-pixel stars circling a little above the head. They're drawn at full
+    detail and the confused pose scales them, so they come out the same size above every creature, big or small
+    (about a third of a block), whatever the creature's own scale."""
+    spec = getattr(model, "stars_spec", None)
+    if not spec:
+        return
+    head, top, cz, hw = spec
+    body_top = max(c.origin[1] + c.size[1] for c in model.cubes() if not c.effect)
+    scale = stands / (body_top / 16)
+    n = 9
+    f = (5.0 / scale) / n            # the pose's scale for the stars: 5 world pixels across, about a third of a block
+    # Above whatever solid part is highest (a shell, horns, a crest), not just the head; flames don't count.
+    solid_top = max(c.origin[1] + c.size[1] for c in model.cubes() if not c.effect and not c.mat.frames)
+    py = max(top, min(solid_top, top + 6)) + 6.0 / scale
+    r = max(5.0 / scale, hw * 0.8) / f
+    st = star_mat()
+    stars = []
+    for i in range(3):
+        a = i * 120
+        px, pz = r * math.sin(math.radians(a)), cz + r * math.cos(math.radians(a))
+        for extra in (0, 90):
+            stars.append(Cube([px - n / 2, py - n / 2, pz], [n, n, 0], st, [0, a + extra, 0], [px, py, pz], effect=True))
+    b = next(x for x in model.bones if x.name == "fx_stars")
+    b.pivot, b.cubes = [0, py, cz], stars
+    for name, an in (anims.all.items() if anims is not None else []):
+        if name.endswith(".confused") and "fx_stars" in an.get("bones", {}):
+            an["bones"]["fx_stars"]["scale"] = [round(f, 4)] * 3
+
+
 def write(sid, name, model, anims, info, stands):
     """Writes a creature: model, animations, info and textures. stands sets its size in the world: the height, in blocks, its
     cubes would reach unturned (set so it comes out about as big overall as the Cobblemon model it stands in for)."""
+    place_stars(model, stands, anims)
     cubes = model.cubes()
     tw, th = pack(cubes)
     img, glows = paint(cubes, tw, th)

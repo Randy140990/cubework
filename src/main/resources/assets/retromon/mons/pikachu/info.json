@@ -25,8 +25,9 @@
   }
  },
  "move": "THUNDERSHOCK",
- "scale": 0.818,
- "height": 0.954,
+ "attack_move": "QUICK ATTACK",
+ "scale": 0.783,
+ "height": 0.996,
  "texture": "retromon:textures/mons/pikachu.png",
  "layers": [
   {

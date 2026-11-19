@@ -25,6 +25,7 @@
   }
  },
  "move": "EMBER",
+ "attack_move": "SCRATCH",
  "scale": 0.582,
  "height": 1.719,
  "texture": "retromon:textures/mons/charmander.png",

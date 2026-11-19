@@ -25,6 +25,7 @@
   }
  },
  "move": "RAZOR LEAF",
+ "attack_move": "TACKLE",
  "scale": 1.138,
  "height": 2.312,
  "texture": "retromon:textures/mons/venusaur.png",

@@ -25,7 +25,8 @@
   }
  },
  "move": "HYPER FANG",
- "scale": 0.533,
+ "attack_move": "QUICK ATTACK",
+ "scale": 0.693,
  "height": 1.125,
  "texture": "retromon:textures/mons/rattata.png",
  "layers": [

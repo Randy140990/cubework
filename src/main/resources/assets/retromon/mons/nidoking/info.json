@@ -25,6 +25,7 @@
   }
  },
  "move": "POISON STING",
+ "attack_move": "HORN ATTACK",
  "scale": 1.224,
  "height": 1.471,
  "texture": "retromon:textures/mons/nidoking.png",

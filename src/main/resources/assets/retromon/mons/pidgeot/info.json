@@ -33,6 +33,7 @@
   }
  },
  "move": "GUST",
+ "attack_move": "TACKLE",
  "scale": 0.864,
  "height": 2.594,
  "texture": "retromon:textures/mons/pidgeot.png",

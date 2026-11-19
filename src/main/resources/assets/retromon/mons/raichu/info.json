@@ -25,8 +25,9 @@
   }
  },
  "move": "THUNDERBOLT",
- "scale": 1.099,
- "height": 1.456,
+ "attack_move": "QUICK ATTACK",
+ "scale": 1.059,
+ "height": 1.511,
  "texture": "retromon:textures/mons/raichu.png",
  "layers": [
   {

@@ -33,6 +33,7 @@
   }
  },
  "move": "FLAMETHROWER",
+ "attack_move": "SCRATCH",
  "scale": 0.935,
  "height": 4.438,
  "texture": "retromon:textures/mons/charizard.png",

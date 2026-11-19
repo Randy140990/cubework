@@ -25,8 +25,9 @@
   }
  },
  "move": "POISON STING",
- "scale": 1.481,
- "height": 1.08,
+ "attack_move": "SCRATCH",
+ "scale": 1.452,
+ "height": 1.102,
  "texture": "retromon:textures/mons/nidoqueen.png",
  "layers": [
   {

@@ -25,8 +25,9 @@
   }
  },
  "move": "THUNDERSHOCK",
- "scale": 0.782,
- "height": 0.767,
+ "attack_move": "QUICK ATTACK",
+ "scale": 0.752,
+ "height": 0.798,
  "texture": "retromon:textures/mons/pichu.png",
  "layers": [
   {

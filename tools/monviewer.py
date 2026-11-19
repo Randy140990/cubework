@@ -51,7 +51,7 @@ def model(folder):
             if g_im.size == im.size:
                 painted |= np.array(g_im)[..., 3] > 0
     texels = int(painted.sum())
-    return {"geo": g, "anims": anims, "info": {k: info.get(k) for k in ("scale", "idle", "ground", "parts", "poses", "actions", "name", "move")},
+    return {"geo": g, "anims": anims, "info": {k: info.get(k) for k in ("scale", "idle", "ground", "parts", "poses", "actions", "name", "move", "attack_move")},
             "texture": data_uri(info["texture"]), "layers": layers,
             "detail": {"cubes": cubes, "bones": len(g["bones"]), "texture": f"{im.size[0]}×{im.size[1]}", "texels": texels, "animations": len(anims)}}
 

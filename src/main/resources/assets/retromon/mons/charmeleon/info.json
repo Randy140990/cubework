@@ -25,6 +25,7 @@
   }
  },
  "move": "EMBER",
+ "attack_move": "SCRATCH",
  "scale": 0.616,
  "height": 2.5,
  "texture": "retromon:textures/mons/charmeleon.png",

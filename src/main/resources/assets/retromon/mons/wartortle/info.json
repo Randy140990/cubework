@@ -25,6 +25,7 @@
   }
  },
  "move": "WATER GUN",
+ "attack_move": "TACKLE",
  "scale": 0.8,
  "height": 1.25,
  "texture": "retromon:textures/mons/wartortle.png",

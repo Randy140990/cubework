@@ -152,4 +152,5 @@ def battle(A, m, info, kind, k=1.0, slow=1.0, extras=None):
     fnt = A.add("faint", F, only(m, merge(faint(F, k, kind, half_width(m)), _extra(e, "faint"))), loop="hold_on_last_frame")
     info["actions"].update({"attack": atk, "critical": crit, "special": spec, "recall": recall, "sendout": out})
     info["move"] = getattr(m, "move_name", "SPECIAL")
+    info["attack_move"] = getattr(m, "attack_name", "ATTACK")
     info["poses"].update({"confused": {"anim": conf, "parts": []}, "faint": {"anim": fnt, "parts": []}})

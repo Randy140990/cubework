@@ -33,6 +33,7 @@
   }
  },
  "move": "FURY ATTACK",
+ "attack_move": "PECK",
  "scale": 0.648,
  "height": 1.019,
  "texture": "retromon:textures/mons/spearow.png",

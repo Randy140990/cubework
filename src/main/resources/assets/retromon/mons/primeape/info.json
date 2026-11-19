@@ -25,6 +25,7 @@
   }
  },
  "move": "KARATE CHOP",
+ "attack_move": "SCRATCH",
  "scale": 1.125,
  "height": 1.067,
  "texture": "retromon:textures/mons/primeape.png",

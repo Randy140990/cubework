@@ -25,7 +25,8 @@
   }
  },
  "move": "HYPER FANG",
- "scale": 0.727,
+ "attack_move": "QUICK ATTACK",
+ "scale": 0.836,
  "height": 1.65,
  "texture": "retromon:textures/mons/raticate.png",
  "layers": [

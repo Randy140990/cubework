@@ -25,6 +25,7 @@
   }
  },
  "move": "RAZOR LEAF",
+ "attack_move": "TACKLE",
  "scale": 0.908,
  "height": 1.156,
  "texture": "retromon:textures/mons/ivysaur.png",

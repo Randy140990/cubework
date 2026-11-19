@@ -18,7 +18,8 @@ Run: python3 tools/mons.py
 import json, math, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from monlib import (CLEAR, Cube, Mat, Model, OUT_MODELS, blob, cell, face_blob, flame, hash01, jet, merge, away, blade_mat, wind_mat, fang_mat, mix, ramp, rgb, track, wave, bounce, keys, pulse,  # noqa: E402
+from monlib import (CLEAR, Cube, Mat, Model, OUT_MODELS, blob, cell, face_blob, flame, hash01, jet, merge, away, blade_mat, wind_mat, fang_mat,
+                    ring_mat, claw_mat, streak_mat, burst_mat, mix, ramp, rgb, track, wave, bounce, keys, pulse,  # noqa: E402
                     write)
 from monanims import bird, four_legs, hopper, wings  # noqa: E402
 
@@ -164,6 +165,67 @@ def fx_for(m, size=1.0):
     mouth = jaw.pivot[1] if jaw else min(c.origin[1] for c in cs) + 1
     m.battle_fx("head", top, (front + back) / 2, mouth, front, size)
     return top, front, mouth
+
+
+def head_geo(m):
+    """The head's top, front, mouth height and middle (front to back), and the beak's tip if it has one."""
+    head = next(b for b in m.bones if b.name == "head")
+    cs = [c for c in head.cubes if not c.effect and not c.rotation]
+    top = max(c.origin[1] + c.size[1] for c in cs)
+    front = min(c.origin[2] for c in cs)
+    back = max(c.origin[2] + c.size[2] for c in cs)
+    jaw = next((b for b in m.bones if b.name in ("jaw", "beak_lower")), None)
+    mouth = jaw.pivot[1] if jaw else min(c.origin[1] for c in cs) + 1
+    beak = next((b for b in m.bones if b.name == "beak"), None)
+    tip = min(c.origin[2] for c in beak.cubes) if beak and beak.cubes else front
+    return top, front, mouth, (front + back) / 2, tip
+
+
+def attack_move(m, name, slow=1.0, size=1.0, kind="legs4"):
+    """Its everyday attack, as the move it really uses, with that move's own look (each move looks the same on whoever
+    uses it): TACKLE (a charge and a ring of shock where it lands), SCRATCH (a forepaw raked down, three claw marks in
+    the air), HORN ATTACK (head down, a spark off the horn), PECK (a jab, a spark at the beak), QUICK ATTACK (a dash too
+    fast to see, speed lines streaming behind)."""
+    T = 0.9 * slow
+    p = lambda f: T * f
+    top, front, mouth, cz, tip = head_geo(m)
+    fx, t = [], {}
+    show = lambda a, b, big=1000, grow=1.0: keys({0: [1, 1, 1], p(a - .02): [1, 1, 1], p(a): [big * 0.6] * 3, p((a + b) / 2): [big] * 3,
+                                               p(b): [big * grow] * 3, p(b + .02): [1, 1, 1]})
+    if name == "TACKLE":
+        r, z = max(8, round(11 * size)), front - 3 * size
+        m.bone("fx_hit", "root", [0, mouth, z], [Cube([-r / 2, mouth - r / 2, z], [r, r, 0], ring_mat(), effect=True),
+                                                 Cube([-r / 2, mouth - r / 2, z], [r, r, 0], ring_mat(), [0, 90, 0], [0, mouth, z], effect=True)])
+        fx, t = ["fx_hit"], {"fx_hit": track(scale=show(.44, .6, 1000, 1.7))}
+    elif name == "SCRATCH":
+        w, z, y = max(8, round(10 * size)), front - 3 * size, mouth + 1.5 * size
+        m.bone("fx_claw", "root", [0, y, z], [Cube([-w / 2, y - w / 2, z], [w, w, 0], claw_mat(), effect=True),
+                                              Cube([0, y - w / 2, z - w / 2], [0, w, w], claw_mat(), effect=True)])
+        fx, t = ["fx_claw"], {"fx_claw": track(scale=show(.42, .64), rotation=keys({0: [0, 0, 0], p(.42): [0, 0, 15], p(.64): [0, 0, -10]}))}
+        if kind == "hopper":
+            t["arm_right"] = track(rotation=keys({0: [0, 0, 0], p(.28): [-130, 0, 25], p(.45): [-20, 0, -10], p(.6): [0, 0, 0], T: [0, 0, 0]}))
+        else:
+            t["leg_front_right"] = track(rotation=keys({0: [0, 0, 0], p(.28): [-75, 0, 15], p(.45): [-5, 0, -10], p(.6): [0, 0, 0], T: [0, 0, 0]}))
+    elif name in ("HORN ATTACK", "PECK"):
+        n_ = max(6, round(7 * size))
+        y, z = (top + 1, front + 1) if name == "HORN ATTACK" else (mouth + 0.5, tip - 1.5)
+        m.bone("fx_spark", "head", [0, y, z], [Cube([-n_ / 2, y - n_ / 2, z], [n_, n_, 0], burst_mat(), effect=True)])
+        fx = ["fx_spark"]
+        t = {"fx_spark": track(scale=show(.44, .56, 800)),
+             "head": track(rotation=keys({0: [0, 0, 0], p(.3): [-18, 0, 0], p(.45): [30 if name == "PECK" else 26, 0, 0], p(.6): [4, 0, 0], T: [0, 0, 0]})),
+             "neck": track(rotation=keys({0: [0, 0, 0], p(.3): [-10, 0, 0], p(.45): [16, 0, 0], T: [0, 0, 0]}))}
+    elif name == "QUICK ATTACK":
+        body = next(b for b in m.bones if b.name == "body")
+        cs = [c for c in body.cubes if not c.effect]
+        zb = max(c.origin[2] + c.size[2] for c in cs)
+        ys = [min(c.origin[1] for c in cs) + f * (max(c.origin[1] + c.size[1] for c in cs) - min(c.origin[1] for c in cs)) for f in (0.2, 0.5, 0.8)]
+        L = max(8, round(14 * size))
+        lines = [Cube([x - 0.5, y, zb], [1, 0, L], streak_mat(), effect=True) for x, y in ((-2 * size, ys[0]), (2 * size, ys[1]), (0, ys[2]), (-1 * size, ys[1]))]
+        m.bone("fx_speed", "body", [0, ys[1], zb], lines)
+        fx = ["fx_speed"]
+        t = {"fx_speed": track(scale=show(.3, .62)),
+             "body": track(position=keys({0: [0, 0, 0], p(.25): [0, 0, 2 * size], p(.45): [0, 0.3 * size, -14 * size], p(.62): [0, 0, -10 * size], T: [0, 0, 0]}))}
+    m.attack_name, m.attack_extras = name, {"all": away(*fx), "attack": t}
 
 
 def fly_out(bone, t0, dur, to, spin=(0, 0, 0), grow=1.0):
@@ -382,6 +444,7 @@ def fernadillo():
 
     fx_for(m, 1.0)
     razor_leaf(m, 1.6, 1.0, c["leaf_l"], c["leaf_d"], c["vein"])
+    attack_move(m, "TACKLE", 1.0, 1.0)
     A, info = four_legs("fernadillo", m, walk=0.8, stride=30, extras={
         "idle": {"shell": track(rotation=[wave(2, 1.2), 0, 0]), "crest": track(rotation=[wave(1, 4), 0, 0])},
         "battle": {"shell": track(rotation=[wave(1, 2), 0, 0]), "crest": track(rotation=[wave(0.5, 6), 0, 0])},
@@ -444,6 +507,7 @@ def brambadillo():
 
     fx_for(m, 1.3)
     razor_leaf(m, 1.6, 1.3, LEAF_L, LEAF_D, VEIN)
+    attack_move(m, "TACKLE", 1.0, 1.3)
     A, info = four_legs("brambadillo", m, walk=0.9, stride=26, k=1.2, extras={
         "idle": {"shell": track(rotation=[wave(2, 1), 0, 0]), "crest": track(rotation=[wave(2, 5), 0, 0])},
         "battle": {"crest": track(rotation=[wave(0.5, 8), 0, 0])},
@@ -527,6 +591,7 @@ def grovadon():
 
     fx_for(m, 2.0)
     razor_leaf(m, 2.24, 2.0, LEAF_L, LEAF_D, VEIN)
+    attack_move(m, "TACKLE", 1.4, 2.0)
     A, info = four_legs("grovadon", m, walk=1.2, stride=18, k=1.8, slow=1.4, extras={
         "idle": {"ferns": track(rotation=[wave(2.8, 3), 0, wave(2.8, 3, 90)]), "toadstools": track(scale=pulse(5.6, 0.02)),
                  "beard": track(rotation=[wave(2.8, 4), 0, 0])},
@@ -651,6 +716,7 @@ def cinderkid():
     m.bone("tail2", "tail", [0, 13.5, 6], flame([0, 13.5, 6], 5, 8), rotation=[40, 0, 0])
     flick = {"fringe": track(scale=[1, wave(0.5, 0.12, 0, 1), 1]), "tail2": track(scale=[wave(0.4, 0.08, 0, 1), wave(0.3, 0.16, 0, 1), 1])}
     embers(m, 1.6, 1.0)
+    attack_move(m, "SCRATCH", 1.0, 1.0)
     A, info = four_legs("cinderkid", m, walk=0.7, stride=30, extras={
         "all": flick,
         "cry": {"tail2": track(scale=keys({0: [1, 1, 1], 0.25: [1.3, 1.6, 1.3], 0.8: [1.3, 1.6, 1.3], 1.2: [1, 1, 1]})),
@@ -704,6 +770,7 @@ def emberam():
     flick = {"fringe": track(scale=[1, wave(0.5, 0.12, 0, 1), 1]), "mane": track(scale=[1, wave(0.4, 0.1, 30, 1), wave(0.6, 0.06, 0, 1)]),
              "tail2": track(scale=[wave(0.4, 0.08, 0, 1), wave(0.3, 0.16, 0, 1), 1])}
     embers(m, 1.6, 1.3)
+    attack_move(m, "SCRATCH", 1.0, 1.3)
     A, info = four_legs("emberam", m, walk=0.75, stride=28, k=1.2, extras={
         "all": flick,
         "cry": {"mane": track(scale=keys({0: [1, 1, 1], 0.25: [1.3, 1.5, 1.3], 0.8: [1.3, 1.5, 1.3], 1.2: [1, 1, 1]})),
@@ -786,6 +853,7 @@ def pyribex():
                                   "leg_front_right": track(rotation=[-25, 0, 0]), "leg_front_left": track(rotation=[-20, 0, 0]),
                                   "leg_back_right": track(rotation=[20, 0, 0]), "leg_back_left": track(rotation=[20, 0, 0])}, wings(14, 35, 80, 0.9))}
     embers(m, 2.0, 1.8, n=6, name="FLAMETHROWER")
+    attack_move(m, "SCRATCH", 1.25, 1.8)
     A, info = four_legs("pyribex", m, walk=1.0, stride=24, k=2.0, slow=1.25, fly=fly, extras={
         "all": flick, "idle": fold, "walk": fold,
         "battle": {"wing_right": track(rotation=[0, 0, wave(1.25, 5, 0, 22)]), "wing_left": track(rotation=[0, 0, wave(1.25, -5, 0, -22)])},
@@ -828,7 +896,7 @@ def tapir_paint(blue, blue_l, blue_d, foam, belly, waves, belly_below, head=Fals
     return f
 
 
-def stout_legs(m, cx, zs, top, w, leg, toe, ntoes, extra=None, foot=None):
+def stout_legs(m, cx, zs, top, w, leg, toe, ntoes, extra=None, foot=None, claw_len=1):
     """Four sturdy jointed legs: a thick upper leg, a knee cap (front) or a hock jutting back (back) at the joint, a
     slimmer lower leg that bends there, and a broad foot with its toes or claws along the front."""
     body = next(b for b in m.bones if b.name == "body")
@@ -846,7 +914,7 @@ def stout_legs(m, cx, zs, top, w, leg, toe, ntoes, extra=None, foot=None):
         joint = Cube([-cx - jw / 2, knee - 1, z0 - 1], [jw, 2, 1], leg) if end == "front" else Cube([-cx - jw / 2, knee - 1, z0 + w], [jw, 2, 1], leg)
         m.pair(f"leg_{end}_right", "body", [-cx, top, z], upper + [joint] + (extra(z) if extra else []))
         lower = [Cube([-cx - wl / 2, fh, z - wl / 2], [wl, knee - fh + 1, wl], leg), Cube([x0, 0, z0 - 1], [w, fh, w + 1], foot)]
-        toes = [Cube([x0 + (i + 0.5) * w / ntoes - tw / 2, 0, z0 - 2], [tw, 1 if tw == 1 else fh, 1], toe) for i in range(ntoes)]
+        toes = [Cube([x0 + (i + 0.5) * w / ntoes - tw / 2, 0, z0 - 1 - claw_len], [tw, 1 if tw == 1 else fh, claw_len], toe) for i in range(ntoes)]
         m.pair(f"shin_{end}_right", f"leg_{end}_right", [-cx, knee, z], lower + toes)
 
 
@@ -886,6 +954,7 @@ def tidapir():
     m.bone("tail", "body", [0, 9, 6], [Cube([-0.5, 8, 6], [1, 2, 2], fin), Cube([-1.5, 8.5, 7.5], [3, 1, 1], fin)], rotation=[-20, 0, 0])
     fx_for(m, 1.0)
     water_gun(m, 1.6)
+    attack_move(m, "TACKLE", 1.0, 1.0)
     A, info = four_legs("tidapir", m, walk=0.8, stride=28, idle="ground", extras={
         "all": hidden("spray"),
         "idle": {"trunk": track(rotation=[wave(1.33, 6), wave(2, 5), 0]), "trunk2": track(rotation=[wave(1, 8, 60), 0, 0]),
@@ -934,7 +1003,8 @@ def surfapir():
     m.bone("tail", "body", [0, 12, 8], [Cube([-0.5, 11, 8], [1, 2, 3], fin)], rotation=[-15, 0, 0])
     m.bone("tail2", "tail", [0, 12, 11], [Cube([-3, 11.5, 10.5], [6, 0, 3], fin)], rotation=[10, 0, 0])
     fx_for(m, 1.2)
-    water_gun(m, 1.6)
+    water_gun(m, 1.6, 1.3)
+    attack_move(m, "TACKLE", 1.0, 1.2)
     A, info = four_legs("surfapir", m, walk=0.85, stride=26, k=1.2, idle="battle", extras={
         "all": hidden("spray"),
         "idle": {"trunk": track(rotation=[wave(1.33, 6), wave(2, 5), 0]), "trunk2": track(rotation=[wave(1, 8, 60), 0, 0]),
@@ -997,6 +1067,7 @@ def tsunapir():
     m.bone("tail2", "tail", [0, 20, 20], [Cube([-6, 20, 19.5], [12, 0, 5], fin)], rotation=[10, 0, 0])
     fx_for(m, 2.0)
     water_gun(m, 2.24, 1.5, "HYDRO PUMP")
+    attack_move(m, "TACKLE", 1.4, 2.0)
     A, info = four_legs("tsunapir", m, walk=1.25, stride=16, k=2.0, slow=1.4, idle="battle", extras={
         "all": hidden("spray"),
         "idle": {"trunk": track(rotation=[wave(1.87, 5), wave(2.8, 4), 0]), "trunk2": track(rotation=[wave(1.4, 6, 60), 0, 0]),
@@ -1123,13 +1194,20 @@ def quail_feet(m, x, y_hip, leg_h, mat, scale=1.0, talon=None, trouser=None):
         cubes += [Cube([-x - tw / 2, y_hip - th, -tw / 2], [tw, th + 1, tw], trouser),
                   Cube([-x - (tw - 1) / 2, y_hip - th - 1, -(tw - 1) / 2], [tw - 1, 1, tw - 1], trouser)]
     m.pair("leg_right", "body", [-x, y_hip, 0], cubes)
-    L = max(2, round(2.2 * scale + 0.4))
+    tw = 1 if scale < 1.4 else 2
+    th = tw
+    L = max(3, round(2.6 * scale))
+    cl = 2 if scale < 1.4 else 3
     toes = []
-    for a in (-30, 0, 30):
-        toes += [Cube([-x - 0.5, 0, -L], [1, 1, L], mat, [0, a, 0], [-x, 0.5, 0]),
-                 Cube([-x - 0.5, 0, -L - 1], [1, 1, 1], talon, [0, a, 0], [-x, 0.5, 0])]
-    hb = max(1, round(L * 0.55))
-    toes += [Cube([-x - 0.5, 0, 0], [1, 1, hb], mat), Cube([-x - 0.5, 0, hb], [1, 1, 1], talon)]
+    for a in (-32, 0, 32):
+        # The toe, a knuckle on top of it, then the talon hooked down from its tip.
+        sa, ca = math.sin(math.radians(a)), math.cos(math.radians(a))
+        tx, tz = -x + L * sa, -L * ca
+        toes += [Cube([-x - tw / 2, 0, -L], [tw, th, L], mat, [0, a, 0], [-x, 0.5, 0]),
+                 Cube([-x - tw / 2, th, -L * 0.6], [tw, 1, max(1, round(L * 0.3))], mat, [0, a, 0], [-x, 0.5, 0]),
+                 Cube([tx - tw / 2, th - 1, tz - cl], [tw, 1, cl], talon, [38, a, 0], [tx, th, tz])]
+    hb = max(2, round(L * 0.55))
+    toes += [Cube([-x - tw / 2, 0, 0], [tw, th, hb], mat), Cube([-x - tw / 2, th - 1, hb], [tw, 1, cl], talon, [-38, 0, 0], [-x, th, hb])]
     m.pair("foot_right", "leg_right", [-x, y_hip - leg_h, 0], toes)
 
 
@@ -1167,6 +1245,7 @@ def quailet():
     quail_feet(m, 1.25, 2.5, 1.5, legm)
     fx_for(m, 0.9)
     gust(m, 1.6, 0.9)
+    attack_move(m, "TACKLE", 1.0, 0.9, "bird")
     A, info = bird("quailet", m, walk=0.5, stride=40)
     write("pidgey", "QUAILET", m, A, info, 0.73)
 
@@ -1220,6 +1299,7 @@ def plumquail():
     quail_feet(m, 2, 5, 4, legm, trouser=trousers(LIL, LIL_L, LIL_D))
     fx_for(m, 1.2)
     gust(m, 1.6, 1.2)
+    attack_move(m, "TACKLE", 1.0, 1.2, "bird")
     A, info = bird("plumquail", m, walk=0.55, stride=36, k=1.2)
     write("pidgeotto", "PLUMQUAIL", m, A, info, 1.48)
 
@@ -1305,6 +1385,7 @@ def regalquail():
                      Cube([-5.75, 32.6, -8], [2, 1, 3], bushy, [18, 0, 8], [-4.75, 33.1, -8])])
     fx_for(m, 1.7)
     gust(m, 1.92, 1.7)
+    attack_move(m, "TACKLE", 1.2, 1.7, "bird")
     A, info = bird("regalquail", m, walk=0.65, stride=30, k=1.6, slow=1.2, flap=0.5, extras={
         "idle": {"tail2": track(rotation=[wave(4.8, 3), wave(2.4, 4), 0])},
         "fly": {"tail2": track(rotation=[wave(0.5, 4, 0, -5), 0, 0])}})
@@ -1433,6 +1514,7 @@ def jerboa(sid, name, stands, big=False):
         m.brows("head", [Cube([-3 * s - 0.5, 11.2 * s - 0.6, -7.5 * s - 0.4], [round(2 * s) + 1, 1, 2], Mat(STRIPE, noise=0.02, edge=0), [8, 0, 24],
                               [-0.5 * s, 11.2 * s, -7.5 * s])])
     hyper_fang(m, 1.6, s, k=s)
+    attack_move(m, "QUICK ATTACK", 1.0, s, "hopper")
     A, info = hopper(sid.replace("rattata", "jerbit").replace("raticate", "jerbolt"), m, hop=0.45 if not big else 0.5, height=2.0, k=s)
     write(sid, name, m, A, info, stands)
 
@@ -1443,9 +1525,9 @@ def main():
         if not only or f.__name__ in only:
             f()
     if not only or "jerbit" in only:
-        jerboa("rattata", "JERBIT", 0.6)
+        jerboa("rattata", "JERBIT", 0.78)
     if not only or "jerbolt" in only:
-        jerboa("raticate", "JERBOLT", 1.2, big=True)
+        jerboa("raticate", "JERBOLT", 1.38, big=True)
     names = {}
     for sid in sorted(os.listdir(OUT_MODELS)):
         p = os.path.join(OUT_MODELS, sid, "info.json")

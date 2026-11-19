@@ -33,8 +33,9 @@
   }
  },
  "move": "DRILL PECK",
- "scale": 0.73,
- "height": 3.219,
+ "attack_move": "PECK",
+ "scale": 0.596,
+ "height": 3.944,
  "texture": "retromon:textures/mons/fearow.png",
  "layers": [
   {

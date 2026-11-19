@@ -25,6 +25,7 @@
   }
  },
  "move": "KARATE CHOP",
+ "attack_move": "SCRATCH",
  "scale": 1.001,
  "height": 0.719,
  "texture": "retromon:textures/mons/mankey.png",

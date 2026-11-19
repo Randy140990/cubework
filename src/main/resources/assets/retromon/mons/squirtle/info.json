@@ -25,6 +25,7 @@
   }
  },
  "move": "WATER GUN",
+ "attack_move": "TACKLE",
  "scale": 0.795,
  "height": 0.906,
  "texture": "retromon:textures/mons/squirtle.png",

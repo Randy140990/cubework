@@ -30,12 +30,10 @@ def _hit(R, k, body_back=4.0, lift=1.2, rear=14, roll=8, head=(22, -14)):
 
 def with_move(m, extras):
     """The creature's own extras, with its signature move's (its effect's parts kept away, and their flight)."""
-    mv = getattr(m, "move_extras", None)
-    if not mv:
-        return extras
     out = dict(extras or {})
-    for key, tracks in mv.items():
-        out[key] = merge(out.get(key), tracks)
+    for mv in (getattr(m, "move_extras", None), getattr(m, "attack_extras", None)):
+        for key, tracks in (mv or {}).items():
+            out[key] = merge(out.get(key), tracks)
     return out
 
 

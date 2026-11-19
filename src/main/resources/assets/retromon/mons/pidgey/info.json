@@ -33,6 +33,7 @@
   }
  },
  "move": "GUST",
+ "attack_move": "TACKLE",
  "scale": 0.753,
  "height": 0.969,
  "texture": "retromon:textures/mons/pidgey.png",

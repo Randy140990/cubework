@@ -23,7 +23,7 @@ from monlib import (CLEAR, Cube, Mat, Model, OUT_MODELS, FRAMES, blob, cell, fac
                     merge, away, write, wind_mat, burst_mat)
 from monanims import four_legs, bird  # noqa: E402
 from mons import (stout_legs, fx_for, fly_out, talon_mat, trousers, quail_feet, folded_wing, feather_plane,  # noqa: E402
-                  jaw_teeth)
+                  jaw_teeth, attack_move)
 
 
 # ---------- shared painting ----------
@@ -62,8 +62,8 @@ def brush(base, light, dark, tip=None, tip_from=0.7, band=None):
 
 
 def bolt_shape(at, fi, frames=FRAMES):
-    """A crackling bolt of lightning along a flat part: a jagged line that jumps about from frame to frame, white-hot at
-    its core, yellow round it, a pale blue glow at its edge."""
+    """Lightning along a flat part, frame by frame: a thick jagged bolt with sharp corners that jumps about, a fork
+    branching off it, white-hot at the core, yellow round it, a pale blue glow at its edges."""
     c = at.cube
     if c.size[1] == 0:
         u, v = at.lz, at.lx
@@ -71,20 +71,25 @@ def bolt_shape(at, fi, frames=FRAMES):
         u, v = (at.lz, at.ly) if c.size[2] else (at.ly, at.lz)
     else:
         u, v = at.lx, at.ly
-    seg = 5
-    p = u * seg
-    i = int(math.floor(p))
-    k = p - i
-    e0 = hash01("bolt", i, fi) * 2 - 1
-    e1 = hash01("bolt", i + 1, fi) * 2 - 1
-    line = 0.5 + 0.32 * (e0 + (e1 - e0) * k)
-    d = abs(v - line)
-    if d < 0.07:
+
+    def line(u, seed, amp, seg):
+        p = u * seg
+        i = int(math.floor(p))
+        k = p - i
+        e0 = hash01(seed, i, fi) * 2 - 1
+        e1 = hash01(seed, i + 1, fi) * 2 - 1
+        return 0.5 + amp * (e0 + (e1 - e0) * k)
+
+    d = abs(v - line(u, "bolt", 0.34, 4))
+    if u > 0.45:
+        fork = line(u, "fork", 0.2, 3) + (u - 0.45) * (0.5 if hash01("fd", fi) > 0.5 else -0.5)
+        d = min(d, abs(v - fork) + 0.03)
+    if d < 0.08:
         return rgb("#FFFFFF"), 255
-    if d < 0.14:
-        return rgb("#FFF27A"), 255
-    if d < 0.24:
-        return rgb("#86EEFF"), 150
+    if d < 0.16:
+        return rgb("#FFF06A"), 255
+    if d < 0.27:
+        return rgb("#86EEFF"), 140
     return None
 
 
@@ -106,6 +111,27 @@ def slash_shape(at, fi):
 
 def slash_mat():
     return Mat("#FFFFFF", lambda a: CLEAR, glow=lambda a, fi: slash_shape(a, fi), frames=True, noise=0, edge=0)
+
+
+def lift(m, dy):
+    """Raises everything built so far by dy (to stand it on longer legs added after)."""
+    for b in m.bones:
+        b.pivot = [b.pivot[0], b.pivot[1] + dy, b.pivot[2]]
+        for c in b.cubes:
+            c.origin = [c.origin[0], c.origin[1] + dy, c.origin[2]]
+            if c.pivot:
+                c.pivot = [c.pivot[0], c.pivot[1] + dy, c.pivot[2]]
+
+
+def ear_shape(u, v, pointed):
+    """Where an ear is, on its flat part: rounded (a broad oval on a narrower base) or long and pointed."""
+    if pointed:
+        hw = 0.5 * (1 - v) ** 0.7 if v > 0.25 else 0.32 + 0.18 * v / 0.25
+    elif v < 0.5:
+        hw = 0.3 + 0.2 * v / 0.5
+    else:
+        hw = 0.5 * math.sqrt(max(0.0, 1 - ((v - 0.5) / 0.5) ** 2))
+    return abs(u - 0.5) <= hw, hw
 
 
 def S_(s):
@@ -153,6 +179,27 @@ def porcupine(sid, name, stands, stage, male):
         return mix("#FFFFFF", Q_B, 0.4 + 0.6 * t) if (at.col + at.row) % 3 else mix(Q_B, Q_T, 0.25)
 
     quill = Mat(Q_B, quill_p, glow=(lambda a: rgb(VENOM) if a.lz > 0.86 else None) if stage == 2 else None, noise=0.01, edge=0)
+
+    def spike_p(at, tip_front=False):
+        # A quill as a sharp spike: wide at its root, drawn to a needle point, banded pale to dark at the tip.
+        c = at.cube
+        u = at.lx if c.size[1] == 0 else at.ly
+        t = 1 - at.lz if tip_front else at.lz
+        hw = 0.5 * (1 - t) ** 0.85 + 0.04
+        if abs(u - 0.5) > hw:
+            return CLEAR
+        if t > 0.55:
+            return mix(Q_T, "#1A1430", (t - 0.55) * 1.2)
+        if abs(u - 0.5) < 0.12:
+            return mix("#FFFFFF", Q_B, 0.3)
+        return mix(Q_B, mix(Q_B, Q_T, 0.35), t / 0.55)
+
+    spike = Mat(Q_B, spike_p, glow=(lambda a: rgb(VENOM) if a.lz > 0.82 else None) if stage == 2 else None, noise=0.0, edge=0)
+    qw = 3 if stage == 0 else 4
+
+    def quill_cubes(x, y, z, L, rot, mat=spike):
+        """A spike: two crossed flat parts along z, so it's sharp from every side."""
+        return [Cube([x - qw / 2, y, z], [qw, 0, L], mat, rot, [x, y, z]), Cube([x, y - qw / 2, z], [0, qw, L], mat, rot, [x, y, z])]
 
     m.bone("root", None, [0, 0, 0])
     bb = max(1, round(s * 0.8))
@@ -205,29 +252,34 @@ def porcupine(sid, name, stands, stage, male):
             x = xf * 2.6 * s
             y = 7.5 * s - abs(xf) ** 2 * 1.4 * s
             L = n((2.4 + 1.6 * fr + 0.8 * hash01("q", r, c)) * s) + (1 if stage == 2 else 0)
-            qs.append(Cube([x - 0.5, y - 0.5, z], [1, 1, L], quill, [38 + 24 * fr, xf * 18, xf * 30], [x, y, z]))
+            qs += quill_cubes(x, y, z, L + 1, [38 + 24 * fr, xf * 18, xf * 30])
     m.bone("quills", "body", S([0, 7, 0]), qs)
-    m.bone("tail", "body", S([0, 4.5, 4.5]), [Cube(S([-1.5, 3.5, 4.3]), [n(3 * s), n(2 * s), n(2.5 * s)], body)] +
-           [Cube([dx - 0.5, 5 * s, 6 * s], [1, 1, n(2.5 * s)], quill, [25, dx * 10, 0], [dx, 5 * s, 6 * s]) for dx in (-s, 0, s)], rotation=[-10, 0, 0])
-    stout_legs(m, 2.4 * s, (-2.8 * s, 2.8 * s), round(3 * s), max(2, round(2.2 * s)), legm, claw, 3)
+    tl = 4.5 if stage == 2 else 2.5
+    tq = [quill_cubes(dx, 5 * s, (4.3 + tl * 0.6) * s, n(2.8 * s), [25, dx * 10, 0]) for dx in ((-s, 0, s) if stage < 2 else (-1.5 * s, -0.5 * s, 0.5 * s, 1.5 * s))]
+    m.bone("tail", "body", S([0, 4.5, 4.5]), [Cube(S([-1.5, 3.5, 4.3]), [n(3 * s), n(2 * s), n(tl * s)], body)] + [c for q in tq for c in q], rotation=[-10, 0, 0])
+    stout_legs(m, 2.4 * s, (-2.8 * s, 2.8 * s), round(3 * s), max(2, round(2.2 * s)), legm, claw, 3, claw_len=2)
 
     # POISON STING: barbed quills shot from its back, their tips glowing with venom.
     fx_for(m, s)
-    barb = Mat(Q_B, lambda a: rgb(VENOM) if a.lz < 0.3 else mix("#FFFFFF", Q_B, a.lz), glow=lambda a: rgb(VENOM) if a.lz < 0.3 else None,
-               noise=0.01, edge=0)
+    barb = Mat(Q_B, lambda a: (rgb(VENOM) if a.lz < 0.3 else mix("#FFFFFF", Q_B, a.lz)) if spike_p(a, True) is not CLEAR else CLEAR,
+               glow=lambda a: rgb(VENOM) if a.lz < 0.3 and spike_p(a, True) is not CLEAR else None, noise=0.0, edge=0)
     St = 1.6 * (1.3 if stage == 2 else 1.0)
     names, sp = [], {}
-    for i, dx in enumerate((-1.5 * s, 0, 1.5 * s)):
+    for i in range(10):
+        # A volley of ten barbs, fired one after another from all over its back.
         nm = f"fx_barb{i + 1}"
-        y, z = 8.5 * s, -1 * s
-        m.bone(nm, "root", [dx, y, z], [Cube([dx - 0.5, y - 0.5, z], [1, 1, n(4 * s)], barb, effect=True)])
+        dx, dy = (hash01("bx", i) - 0.5) * 4 * s, (hash01("by", i) - 0.5) * 2 * s
+        y, z = 8.5 * s + dy, -1 * s + (i % 3) * s
+        L = n(4 * s)
+        m.bone(nm, "root", [dx, y, z], [Cube([dx - qw / 2, y, z], [qw, 0, L], barb, effect=True), Cube([dx, y - qw / 2, z], [0, qw, L], barb, effect=True)])
         names.append(nm)
-        sp.update(fly_out(nm, St * (0.45 + 0.07 * i), St * 0.3, [dx * 0.5, -2.5 * s, -55 * s], spin=(0, 0, 720)))
+        sp.update(fly_out(nm, St * (0.40 + 0.045 * i), St * 0.26, [dx * 0.4, -2.5 * s - dy, -55 * s], spin=(0, 0, 720)))
     sp["quills"] = track(rotation=keys({0: [0, 0, 0], St * 0.3: [-14, 0, 0], St * 0.5: [8, 0, 0], St: [0, 0, 0]}))
     m.move_name, m.move_extras = "POISON STING", {"all": away(*names), "special": sp}
 
     bristle = {"quills": track(rotation=keys({0: [0, 0, 0], 0.25: [-16, 0, 0], 0.9: [-16, 0, 0], 1.2: [0, 0, 0]}),
                                scale=keys({0: [1, 1, 1], 0.25: [1.08, 1.12, 1.1], 0.9: [1.08, 1.12, 1.1], 1.2: [1, 1, 1]}))}
+    attack_move(m, "HORN ATTACK" if male else "SCRATCH", 1.0 + 0.15 * stage, s)
     A, info = four_legs(sid.replace("_", ""), m, walk=0.6 + 0.15 * stage, stride=34 - 6 * stage, k=s, slow=1.0 + 0.15 * stage, idle="battle", extras={
         "idle": {"quills": track(scale=[1, wave(3, 0.02, 0, 1), 1])},
         "cry": bristle, "recoil": {"quills": track(rotation=keys({0: [0, 0, 0], 0.1: [-20, 0, 0], 0.5: [0, 0, 0]}))}})
@@ -341,6 +393,7 @@ def mongoose(sid, name, stands, stage):
                             rotation=keys({0: [0, 0, 0], q(.44): [-70, 0, 0], q(.6): [60, 0, 0]}))}
     m.move_name, m.move_extras = "KARATE CHOP", {"all": away("fx_slash"), "special": sp}
     stamp = {"leg_front_right": track(rotation=keys({0: [0, 0, 0], 0.2: [-40, 0, 0], 0.35: [5, 0, 0], 0.55: [-40, 0, 0], 0.7: [5, 0, 0], 1.2: [0, 0, 0]}))}
+    attack_move(m, "SCRATCH", 1.0 + 0.1 * stage, s)
     A, info = four_legs(name.lower(), m, walk=0.5 + 0.1 * stage, stride=36, k=s, slow=1.0 + 0.1 * stage, idle="battle",
                         extras={"cry": stamp, "battle": {"tail3": track(rotation=[wave(0.6, 10), wave(1.2, 14), 0])}})
     done(sid, name, m, A, info, stands)
@@ -424,13 +477,16 @@ def shrike(sid, name, stands, stage):
         tail += [Cube([-0.5 * s + d, 5 * s, 3.5 * s], [n(s), 0, n(11 * s)], tfea, [0, d * 4, 0], [d, 5 * s, 3.5 * s]) for d in (-0.8 * s, 0.8 * s)]
         tail += [Cube([-0.75 * s, 5 * s + 0.2, 3.5 * s], [n(1.5 * s), 0, n(7 * s)], tfea, [0, ry, 0], [0, 5 * s, 3.5 * s]) for ry in (-45, -22, 22, 45)]
     m.bone("tail", "body", S([0, 5, 4]), tail, rotation=[-20, 0, 0])
-    quail_feet(m, 1.4 * s, 3 * s, (1.8 if stage == 0 else 2.6) * s, legm, max(1.0, s * 0.8), talon=talon_mat(),
+    dy = 0 if stage == 0 else 4.0 * s  # Galeshrike stands tall on long legs
+    if dy:
+        lift(m, dy)
+    quail_feet(m, 1.4 * s, 3 * s + dy, (1.8 if stage == 0 else 2.6) * s + dy, legm, max(1.0, s * 0.8), talon=talon_mat(),
                trouser=trousers(BACK, BACK_L, BACK_D) if stage == 1 else None)
 
     fx_for(m, s)
     St = 1.6 * (1.1 if stage else 1.0)
     q = lambda f: St * f
-    by, bz = (8.6 + hy) * s, (-6 - bl + hz) * s - 1
+    by, bz = (8.6 + hy) * s + dy, (-6 - bl + hz) * s - 1
     if stage == 0:
         # FURY ATTACK: three quick pecks, a spark where each lands.
         m.bone("fx_peck", "head", [0, by, bz], [Cube([-3, by - 3, bz], [6, 6, 0], burst_mat(), effect=True)])
@@ -453,6 +509,7 @@ def shrike(sid, name, stands, stage):
               "body": track(position=keys({0: [0, 0, 0], q(.3): [0, 1 * s, 2 * s], q(.55): [0, 0, -7 * s], q(.8): [0, 0, -5 * s], St: [0, 0, 0]}),
                             rotation=keys({0: [0, 0, 0], q(.3): [-6, 0, 0], q(.55): [12, 0, 0], St: [0, 0, 0]}))}
         m.move_name, m.move_extras = "DRILL PECK", {"all": away("fx_drill"), "special": sp}
+    attack_move(m, "PECK", 1.0 + 0.15 * stage, s, "bird")
     A, info = bird(name.lower(), m, walk=0.5 + 0.1 * stage, stride=36 - 6 * stage, k=s, slow=1.0 + 0.15 * stage, flap=0.34 + 0.12 * stage)
     done(sid, name, m, A, info, stands)
 
@@ -521,8 +578,34 @@ def glider(sid, name, stands, stage):
            [Cube(S([-1.25, 3.6, -8.6]), [n(2.5 * s), n(1.6 * s), n(1.1 * s)], snout), Cube([-0.5 * n(1.2 * s), 4.6 * s + 0.4, -8.6 * s - 0.5], [n(1.2 * s), 1, 1], nose)])
     m.bone("jaw", "head", S([0, 3.6, -6]), [Cube(S([-1, 3.1, -8.4]), [n(2 * s), 1, n(3 * s)], jaw)])
     ew, eh = (3, 4) if stage == 0 else (3, 4) if stage == 1 else (2.5, 5.5)
-    m.pair("ear_right", "head", S([-hx * 0.7, 3.6 + hh, -5.5]), [Cube(S([-hx * 0.7 - ew * 0.6, 3.6 + hh - 0.5, -5.8]), [n(ew * s), n(eh * s), 1], ear)],
-           rotation=[0, -15, -25 if stage < 2 else -15])
+    pointed = stage == 2
+
+    def ear_front(at):
+        if at.face != "front":
+            return CLEAR
+        inside, hw = ear_shape(at.lx, at.ly, pointed)
+        if not inside:
+            return CLEAR
+        if abs(at.lx - 0.5) < hw - 0.17 and 0.12 < at.ly < 0.86:
+            return mix("#F6CDBE", "#E8A090", at.ly)
+        if pointed and at.ly > 0.82:
+            return rgb(FUR_D)
+        return mix(FUR, FUR_L, at.ly * 0.5)
+
+    def ear_back(at):
+        if at.face != "back":
+            return CLEAR
+        inside, hw = ear_shape(at.lx, at.ly, pointed)
+        if not inside:
+            return CLEAR
+        return rgb(FUR_D) if pointed and at.ly > 0.82 else mix(FUR_D, FUR, 0.4 + 0.6 * at.ly)
+
+    ewn, ehn = n(ew * s * 1.2), n(eh * s * 1.15)
+    ex, ey, ez = -hx * 0.7 * s - ewn * 0.5, (3.6 + hh) * s - 1, -5.8 * s
+    m.pair("ear_right", "head", S([-hx * 0.7, 3.6 + hh, -5.5]),
+           [Cube([ex, ey, ez], [ewn, ehn, 0], Mat(FUR, ear_front, noise=0.015, edge=0)),
+            Cube([ex, ey, ez + 0.06], [ewn, ehn, 0], Mat(FUR, ear_back, noise=0.015, edge=0))],
+           rotation=[-8, -15, -25 if stage < 2 else -12])
     if stage < 2:
         m.eyes("head", x_inner=0.45 * s, y=5.4 * s * (1.04 if stage == 0 else 1.0), z=-7.5 * s, w=2 if stage == 1 else 3, h=3, iris="#2A1A12",
                pupil="#0A0604", skin=FUR, iris_light="#6A4A30", grid=["LL", "PW", "PP"] if stage == 1 else ["SLS", "PPW", "SPS"])
@@ -554,7 +637,14 @@ def glider(sid, name, stands, stage):
         L = n(4 * s)
         m.bone(nm, "body", S([x, y, z]), [Cube([x * s - L / 2, y * s - L / 4, z * s], [L, n(L / 2), 0], bm, [0, ry, 0], S([x, y, z]), effect=True)])
         sparks.append(nm)
-    bl, bw = n((24 if stage < 2 else 34) * s), n(4 * s)
+    # The aura: crackling bolts all round its body while it charges and fires (it glows with it).
+    aura = []
+    for i, ry in enumerate((0, 60, 120)):
+        L = n(9 * s)
+        aura.append(Cube([-L / 2, 2 * s, 0], [L, n(6 * s), 0], bm, [0, ry, 90 if i == 1 else 0], [0, 4.5 * s, 0], effect=True))
+    m.bone("fx_aura", "body", [0, 4.5 * s, 0], aura)
+    sparks.append("fx_aura")
+    bl, bw = n((26 if stage < 2 else 36) * s), n((5 if stage < 2 else 7) * s)
     yb, zb = 5 * s, -9 * s
     m.bone("fx_bolt", "root", [0, yb, zb], [Cube([-bw / 2, yb, zb - bl], [bw, 0, bl], bm, effect=True),
                                             Cube([0, yb - bw / 2, zb - bl], [0, bw, bl], bm, effect=True)])
@@ -568,6 +658,7 @@ def glider(sid, name, stands, stage):
     sp["tail2"] = track(rotation=keys({0: [0, 0, 0], q(.2): [-30, 0, 0], q(.8): [-30, 0, 0], St: [0, 0, 0]}))
     m.move_name = "THUNDERSHOCK" if stage < 2 else "THUNDERBOLT"
     m.move_extras = {"all": away(*sparks, "fx_bolt"), "special": sp}
+    attack_move(m, "QUICK ATTACK", 1.0, s)
     A, info = four_legs(name.lower(), m, walk=0.45 + 0.05 * stage, stride=34, k=s, slow=1.0, idle="battle",
                         extras={"idle": {"ear_right": track(rotation=[0, 0, wave(3, 4)]), "ear_left": track(rotation=[0, 0, wave(3, -4)])},
                                 "cry": {k: track(scale=keys({0: [1, 1, 1], 0.2: [1000, 1000, 1000], 0.3: [700, 1200, 700], 0.4: [1000, 1000, 1000],

@@ -347,8 +347,11 @@ function sizeOf(model) {
   model.holder.updateMatrixWorld(true);
   const box = new THREE.Box3(), tmp = new THREE.Box3();
   const shown = o => { for (let x = o; x; x = x.parent) if (!x.visible) return false; return true; };
+  const ws = new THREE.Vector3(), hs = (model.info.scale || 1) / 16;
   model.holder.traverse(o => {
     if (!o.isMesh || !shown(o)) return;
+    // Parts kept away (shrunk to nothing, like the battle effects) don't count.
+    o.getWorldScale(ws); if (Math.min(Math.abs(ws.x), Math.abs(ws.y), Math.abs(ws.z)) < hs * 0.02) return;
     o.geometry.computeBoundingBox();
     tmp.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);
     box.union(tmp);
@@ -388,7 +391,8 @@ function place() {
 function setAnims() {
   const move = (cur.ours.info.move || "Special").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
   const poses = [["idle", "Idle"], ["walk", "Walk"], ["fly", "Fly"], ["hover", "Hover"], ["confused", "Confused"], ["faint", "Faint"]];
-  const acts = [["cry", "Call"], ["recoil", "Hit"], ["attack", "Attack"], ["special", move], ["critical", "Critical"], ["recall", "Recall"]];
+  const atk = (cur.ours.info.attack_move || "Attack").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+  const acts = [["cry", "Call"], ["recoil", "Hit"], ["attack", atk], ["special", move], ["critical", "Critical"], ["recall", "Recall"]];
   const pe = $("#poses"), ae = $("#anims"); pe.innerHTML = ""; ae.innerHTML = "";
   for (const [k, label] of poses) {
     const has = !!(animFor(cur.ours, k) || animFor(cur.theirs, k));
@@ -414,28 +418,34 @@ function setAnims() {
     ? "Grid squares are 1 block. Battle moves are Retromon's own: the Cobblemon model stays idle." : "Grid squares are 1 block.";
 }
 
-// ---------- the ball, for recall ----------
-const ball = (() => {
+// ---------- the ball, for recall and sending out ----------
+function makeBall() {
   const g = new THREE.Group(), r = 0.13;
   const red = new THREE.MeshLambertMaterial({ color: 0xD8322E }), white = new THREE.MeshLambertMaterial({ color: 0xF4F2EE });
   const dark = new THREE.MeshLambertMaterial({ color: 0x202024 });
-  const top = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 9, 0, Math.PI * 2, 0, Math.PI / 2), red);
+  // The top half hinges open at the back.
+  const lid = new THREE.Group(); lid.position.set(0, 0, -r);
+  const top = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 9, 0, Math.PI * 2, 0, Math.PI / 2), red); top.position.z = r;
+  const btn = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.3, r * 0.3, r * 0.12, 14), white);
+  btn.rotation.x = Math.PI / 2; btn.position.set(0, 0.02, r * 1.98);
+  lid.add(top, btn);
   const bot = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 9, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), white);
   const band = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.01, r * 1.01, r * 0.16, 18, 1, true), dark);
-  const btn = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.3, r * 0.3, r * 0.12, 14), white);
-  btn.rotation.x = Math.PI / 2; btn.position.z = r * 0.98;
-  g.add(top, bot, band, btn); g.visible = false; stage.add(g);
-  return g;
-})();
-const beamMat = new THREE.MeshBasicMaterial({ color: 0xFF3A30, transparent: true, opacity: 0.6, depthWrite: false });
-const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1, 8, 1, true), beamMat);
-beam.visible = false; stage.add(beam);
-function placeBeam(from, to) {
+  const glow = new THREE.Mesh(new THREE.SphereGeometry(r * 1.2, 16, 10), new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0, depthWrite: false }));
+  g.add(lid, bot, band, glow); g.visible = false; stage.add(g);
+  const bm = new THREE.MeshBasicMaterial({ color: 0xFF3A30, transparent: true, opacity: 0.6, depthWrite: false });
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1, 8, 1, true), bm);
+  beam.visible = false; stage.add(beam);
+  return { g, lid, glow, beam, bm };
+}
+const balls = { theirs: makeBall(), ours: makeBall() };
+function placeBeam(beam, from, to) {
   const d = new THREE.Vector3().subVectors(to, from), len = d.length();
   beam.position.copy(from).addScaledVector(d, 0.5);
   beam.scale.set(1, len, 1);
   beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
 }
+const lerp3 = (a, b, f) => a.clone().lerp(b, f);
 
 // ---------- the side panel ----------
 const TYPE = { GRASS: "--t-grass", POISON: "--t-poison", FIRE: "--t-fire", FLYING: "--t-flying", WATER: "--t-water", NORMAL: "--t-normal",
@@ -523,17 +533,19 @@ function frame(now) {
   const t = Math.max(0, (now - t0) / 1000);
   const tA = Math.max(0, (now - ta) / 1000);
   let flash = 0, toast = "";
-  ball.visible = false; beam.visible = false;
+  for (const b of Object.values(balls)) { b.g.visible = false; b.beam.visible = false; }
   if (cur) {
-    // Recall: a red beam from the ball draws it in (shrinking, tinted red), the ball rests, then it's sent back out.
+    // Recall and send out, as in a battle: a red beam from the ball in the player's hand draws it back in (tinted red,
+    // shrinking); the ball is thrown in an arc, bounces, pops open with a white flash, and out it comes, glowing white.
     const recall = state.act === "recall";
-    const RIN = 0.7, REST = 1.6, ROUT = 2.2, REND = 3.4;
-    if (recall && tA > REND) { state.act = null; state.anim = "idle"; t0 = now; setAnims(); }
+    const R1 = 0.8, R2 = 1.3, R3 = 2.0, R4 = 2.2, R5 = 2.35, R6 = 2.95, R7 = 3.4, END = 3.6;
+    if (recall && tA > END) { state.act = null; state.anim = "idle"; t0 = now; setAnims(); }
     for (const [who, model] of [["theirs", cur.theirs], ["ours", cur.ours]]) {
-      const key = recall && tA >= REST ? "idle" : state.anim;
+      const out = recall && tA >= R5;
+      const key = out ? "idle" : state.anim;
       const baseAnim = animFor(model, key) || animFor(model, "idle");
       setParts(model, key === "idle" ? null : key);
-      const list = [[baseAnim, recall && tA >= REST ? tA - REST : t]];
+      const list = [[baseAnim, out ? tA - R5 : t]];
       if (state.act && !recall) {
         const act = animFor(model, state.act);
         if (act) {
@@ -547,25 +559,37 @@ function frame(now) {
         }
       }
       pose(model, list);
-      let k = 1, tint = 0;
+      let k = 1, red = 0, white = 0;
       if (recall) {
-        if (tA < RIN) { k = Math.max(0.001, 1 - Math.max(0, tA - 0.15) / (RIN - 0.15)); tint = Math.min(1, tA / 0.2); }
-        else if (tA < REST) k = 0.001;
-        else if (tA < ROUT) { const f = (tA - REST) / (ROUT - REST); k = Math.min(1.1, f * 1.25); tint = 1 - f; if (who === "ours" && f < 0.3) flash = Math.max(flash, 0.35); }
+        if (tA < R1) { k = Math.max(0.001, 1 - Math.max(0, tA - 0.15) / (R1 - 0.15)); red = Math.min(1, tA / 0.2); }
+        else if (tA < R5) k = 0.001;
+        else if (tA < R6) { const f = (tA - R5) / (R6 - R5); k = f < 0.7 ? Math.max(0.001, f / 0.7 * 1.1) : 1.1 - (f - 0.7) / 0.3 * 0.1; white = 1 - f; }
       }
       model.holder.scale.setScalar(((model.info.scale || 1) / 16) * k);
-      model.mat.color.setRGB(1, 1 - 0.65 * tint, 1 - 0.68 * tint);
-      if (recall && tA < ROUT && model.holder.parent) {
-        // The ball sits on the ground in front of it, towards the camera.
-        const p = new THREE.Vector3(); model.holder.getWorldPosition(p); stage.worldToLocal(p);
-        const cam = stage.worldToLocal(camera.position.clone()); const dir = cam.sub(p).setY(0).normalize();
-        const bp = p.clone().addScaledVector(dir, 1.6); bp.y = 0.13 + (tA > RIN && tA < REST ? Math.abs(Math.sin(tA * 9)) * 0.05 : 0);
-        ball.position.copy(bp); ball.rotation.z = tA > RIN && tA < REST ? Math.sin(tA * 12) * 0.3 : 0;
-        ball.lookAt(stage.localToWorld(p.clone().setY(0.13))); ball.visible = true;
-        if (tA < RIN || tA >= REST) {
-          const h = (cur.sizes ? cur.sizes[who].h : 1) * 0.5 * Math.max(0.2, k);
-          placeBeam(bp, p.clone().setY(h)); beam.visible = true; beamMat.opacity = 0.35 + 0.3 * Math.abs(Math.sin(tA * 20));
-        }
+      model.mat.color.setRGB(1, 1 - 0.65 * red, 1 - 0.68 * red);
+      model.mat.emissive.setRGB(white * 0.9, white * 0.9, white * 0.9);
+      const B = balls[who];
+      if (recall && tA < R7 && model.holder.parent) {
+        const p = new THREE.Vector3(); model.holder.getWorldPosition(p); stage.worldToLocal(p); p.y = 0;
+        const toCam = stage.worldToLocal(camera.position.clone()).sub(p).setY(0).normalize();
+        const hand = player.visible ? player.position.clone().add(new THREE.Vector3(0, 1.0, 0)).addScaledVector(p.clone().sub(player.position).setY(0).normalize(), 0.35)
+                                    : p.clone().addScaledVector(toCam, 3).setY(1.0);
+        const land = p.clone().addScaledVector(hand.clone().sub(p).setY(0).normalize(), 1.1).setY(0.13);
+        const mid = p.clone().setY((cur.sizes ? cur.sizes[who].h : 1) * 0.45);
+        let bp = hand.clone(), open = 0, spin = 0;
+        if (tA < R2) { if (tA > R1) spin = Math.sin(tA * 14) * 0.25; }
+        else if (tA < R3) { const f = (tA - R2) / (R3 - R2); bp = lerp3(hand, land, f); bp.y += Math.sin(Math.PI * f) * 1.4; spin = f * Math.PI * 4; }
+        else if (tA < R4) { bp = land.clone(); bp.y += Math.abs(Math.sin((tA - R3) / (R4 - R3) * Math.PI)) * 0.15; }
+        else if (tA < R6) { bp = land.clone(); open = Math.min(1, (tA - R4) / (R5 - R4)); }
+        else { const f = (tA - R6) / (R7 - R6); bp = lerp3(land, hand, f); bp.y += Math.sin(Math.PI * f) * 0.9; open = Math.max(0, 1 - f * 3); }
+        B.g.position.copy(bp); B.g.visible = true;
+        B.g.lookAt(stage.localToWorld(p.clone().setY(bp.y))); B.g.rotateX(spin);
+        B.lid.rotation.x = -open * 1.9;
+        const gl = tA >= R4 && tA < R6 ? Math.max(0, 1 - Math.abs(tA - R5) / 0.35) : 0;
+        B.glow.material.opacity = gl * 0.85; B.glow.scale.setScalar(1 + gl * 1.6);
+        if (who === "ours" && tA >= R4 && tA < R5 + 0.25) flash = Math.max(flash, 0.5 * (1 - Math.abs(tA - R5) / 0.3));
+        if (tA < R1) { placeBeam(B.beam, bp, mid.clone().setY(mid.y * Math.max(0.2, k))); B.bm.color.setHex(0xFF3A30); B.beam.visible = true; B.bm.opacity = 0.35 + 0.3 * Math.abs(Math.sin(tA * 20)); }
+        else if (tA >= R5 && tA < R6) { placeBeam(B.beam, bp, mid.clone().setY(mid.y * Math.max(0.2, k))); B.bm.color.setHex(0xFFFFFF); B.beam.visible = true; B.bm.opacity = 0.7 * (1 - (tA - R5) / (R6 - R5)); }
       }
       for (const g of model.glowLayers) g.m.map = g.maps[Math.floor(t * g.fps) % g.maps.length] || g.maps[0];
     }

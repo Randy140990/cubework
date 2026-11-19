@@ -25,8 +25,9 @@
   }
  },
  "move": "POISON STING",
- "scale": 1.0,
- "height": 0.72,
+ "attack_move": "SCRATCH",
+ "scale": 0.922,
+ "height": 0.781,
  "texture": "retromon:textures/mons/nidorina.png",
  "layers": [
   {
