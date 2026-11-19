@@ -70,7 +70,7 @@ public final class ClientState {
 				}
 			}
 			// Through a door, down the stairs: the screen goes black and comes back (the server moves you at the darkest).
-			case "fade" -> Hud.fadeThrough(null);
+			case "fade" -> Hud.fadeThrough(null, "");
 			case "intro" -> {
 				introPending = true;
 				introStopped = t.getBooleanOr("stop", false);

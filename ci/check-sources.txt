@@ -1,8 +1,3 @@
-net/minecraft/server/level/DistanceManager.java
-net/minecraft/server/level/ChunkMap.java
-net/minecraft/server/level/ServerPlayer.java
-net/minecraft/server/players/PlayerList.java
-net/minecraft/server/network/ServerGamePacketListenerImpl.java
-net/minecraft/server/level/ServerChunkCache.java
-net/minecraft/server/level/ServerLevel.java
-grep teleportTo|snapTo|removePlayer|setLevel|resetPosition net/minecraft/world/entity/Entity.java
+grep startWaitingForNewLevel|LevelLoadingScreen|ReceivingLevelScreen|handleRespawn|levelLoadTracker|LevelLoadTracker net/minecraft/client/multiplayer/ClientPacketListener.java
+net/minecraft/client/gui/screens/LevelLoadingScreen.java
+grep class|LevelLoadTracker|isLevelReady|ready|close net/minecraft/client/multiplayer/LevelLoadTracker.java

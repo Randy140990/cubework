@@ -151,10 +151,12 @@ public final class Game {
 			return;
 		}
 		p.setGameMode(GameType.ADVENTURE);
-		// A new adventure starts in Pallet Town, with empty pockets.
+		// A new adventure starts in Pallet Town, with empty pockets. Moving you to your room waits a few ticks: this
+		// runs while the game is still placing you in the world, and taking you to another dimension part way
+		// through that leaves you counted in both (which crashes the server the first time you go back outside).
 		if (!data(p).started) {
 			p.getInventory().clearContent();
-			toStart(p);
+			TO_START.put(p.getUUID(), 3);
 		}
 		setAdventure(p, true);
 		setSpeed(1);
@@ -526,6 +528,22 @@ public final class Game {
 	/** Pallet Town, outside your house. */
 	public static final int START_X = -806, START_Y = 18, START_Z = 700;
 
+	/** Players waiting to be taken to their room (ticks left), once they're properly in the world. */
+	private static final Map<UUID, Integer> TO_START = new HashMap<>();
+
+	/**
+	 * Just before you're taken to another dimension (into a building or back out): what this side remembers about
+	 * where you've been is dropped, and your partner walking with you goes (it comes back beside you there).
+	 */
+	public static void leavingLevel(ServerPlayer p) {
+		UUID id = p.getUUID();
+		LAST.remove(id);
+		RECENT.remove(id);
+		TRAIL.remove(id);
+		Integer f = FOLLOWERS.remove(id);
+		if (f != null && p.level().getEntity(f) instanceof WorldMon w) w.discard();
+	}
+
 	private static void toStart(ServerPlayer p) {
 		// Your room, upstairs at home (an inside of its own; your world's outside is outside its door).
 		if (Interiors.start(p)) return;
@@ -754,8 +772,18 @@ public final class Game {
 			COOLDOWN.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			BUSY.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			AFTER_BATTLE.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
+			Integer ts = TO_START.get(id);
+			if (ts != null) {
+				if (ts > 1) TO_START.put(id, ts - 1);
+				else {
+					TO_START.remove(id);
+					if (!data(p).started) toStart(p);
+				}
+				continue;
+			}
 			recent(p);
-			Interiors.tick(p);
+			// Taken through a door this tick: nothing else about where you were applies until next tick.
+			if (Interiors.tick(p)) continue;
 			// Inside a building, the outside's checks (its places, Oak at the town's edge, grass, trainers' sight) don't apply.
 			boolean inside = Interiors.in(p);
 			if (!inside && s.getTickCount() % 2 == 0) enter(p, placeAt(p.getX(), p.getZ()));

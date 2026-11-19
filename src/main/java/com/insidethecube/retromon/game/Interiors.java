@@ -285,6 +285,7 @@ public final class Interiors {
 		if (level == null || r == null) return false;
 		COOL.put(p.getUUID(), FADE_TICKS + 20);
 		Runnable move = () -> {
+			if (p.level() != level) Game.leavingLevel(p);
 			p.teleportTo(level, r.ox() + x, r.oy(), r.oz() + z, java.util.Set.of(), yaw, 30F, true);
 			p.setDeltaMovement(Vec3.ZERO);
 			LAST.remove(p.getUUID());
@@ -307,6 +308,7 @@ public final class Interiors {
 		Net.send(p, "fade", new CompoundTag());
 		PENDING_T.put(p.getUUID(), FADE_TICKS);
 		PENDING.put(p.getUUID(), () -> {
+			if (p.level() != world) Game.leavingLevel(p);
 			p.teleportTo(world, d.x(), d.y(), d.z(), java.util.Set.of(), 0F, 30F, true);
 			p.setDeltaMovement(Vec3.ZERO);
 			LAST.remove(p.getUUID());
@@ -317,8 +319,11 @@ public final class Interiors {
 		return PENDING.containsKey(p.getUUID());
 	}
 
-	/** Every tick, for each player: the way in at a door, the mats and stairs inside. */
-	public static void tick(ServerPlayer p) {
+	/**
+	 * Every tick, for each player: the way in at a door, the mats and stairs inside. True when it has just moved
+	 * you (through a door, up or down stairs), or you're on your way (the screen gone dark).
+	 */
+	public static boolean tick(ServerPlayer p) {
 		UUID id = p.getUUID();
 		Integer pt = PENDING_T.get(id);
 		if (pt != null) {
@@ -328,22 +333,22 @@ public final class Interiors {
 				Runnable r = PENDING.remove(id);
 				if (r != null) r.run();
 			}
-			return;
+			return true;
 		}
 		COOL.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 		Vec3 here = p.position(), last = LAST.put(id, here);
 		double dz = last == null ? 0 : here.z - last.z;
-		if (COOL.containsKey(id)) return;
+		if (COOL.containsKey(id)) return false;
 		float yaw = Mth.wrapDegrees(p.getYRot());
 		boolean facingSouth = Math.abs(yaw) < 55, facingNorth = Math.abs(Mth.wrapDegrees(yaw - 180)) < 55;
 		if (in(p)) {
 			Room r = roomAt(p.getX());
-			if (r == null) return;
+			if (r == null) return false;
 			double lx = p.getX() - r.ox(), ly = p.getY() - r.oy(), lz = p.getZ() - r.oz();
 			// Fallen out of a room somehow (under a floor): back to where you come in.
 			if (ly < -3 && r.warps().stream().noneMatch(w -> w.kind().equals("down"))) {
 				go(p, r, r.ex(), r.ez(), r.eyaw(), false);
-				return;
+				return true;
 			}
 			for (Warp w : r.warps()) {
 				switch (w.kind()) {
@@ -356,31 +361,31 @@ public final class Interiors {
 								p.teleportTo(p.getX(), p.getY(), r.oz() + w.z0() - 1.2);
 								COOL.put(id, 20);
 								Game.message(p, List.of("OAK: Hey! Don't go away yet!"));
-								return;
+								return false;
 							}
 							out(p, d);
-							return;
+							return true;
 						}
 					}
 					case "up" -> {
 						if (ly >= 1.45 && lx > w.x0() && lz > w.z0() - 0.5 && lz < w.z1() + 0.5) {
 							go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
-							return;
+							return true;
 						}
 					}
 					case "down" -> {
 						if (ly <= -1.45) {
 							go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
-							return;
+							return true;
 						}
 					}
 					default -> {
 					}
 				}
 			}
-			return;
+			return false;
 		}
-		if (p.level().dimension() != Level.OVERWORLD) return;
+		if (p.level().dimension() != Level.OVERWORLD) return false;
 		for (Door d : DOORS.values()) {
 			double x0 = 1e9, x1 = -1e9, zf = 0, y = 0;
 			for (BlockPos b : d.blocks()) {
@@ -394,9 +399,10 @@ public final class Interiors {
 					&& (dz < -0.01 || facingNorth)) {
 				Room r = ROOMS.get(d.room());
 				if (r != null) go(p, r, r.ex(), r.ez(), r.eyaw(), true);
-				return;
+				return r != null;
 			}
 		}
+		return false;
 	}
 
 	/** Somewhere free to stand near a spot in a room (for people who come in: your rival, say). */
@@ -419,6 +425,16 @@ public final class Interiors {
 
 	/** What's straight ahead of you in a room, 0.5 to 2.1 blocks on (as a sign is read): its lines, or null. */
 	public static List<String> lookAt(Entity e) {
+		Ahead a = ahead(e);
+		return a == null ? null : a.lines();
+	}
+
+	/** Something in a room you're facing: what it says, and how far ahead it is. */
+	public record Ahead(List<String> lines, double distance) {
+	}
+
+	/** The thing straight ahead of you in a room (0.5 to 2.1 blocks on), or null. */
+	public static Ahead ahead(Entity e) {
 		Room r = roomOf(e);
 		if (r == null) return null;
 		Vec3 look = Vec3.directionFromRotation(0, e.getYRot());
@@ -435,7 +451,7 @@ public final class Interiors {
 					}
 				}
 			}
-			if (best != null && !best.lines().isEmpty()) return best.lines();
+			if (best != null && !best.lines().isEmpty()) return new Ahead(best.lines(), d);
 		}
 		return null;
 	}

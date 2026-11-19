@@ -44,6 +44,12 @@ public final class Figures {
 		/** A one-off animation (Pokémon): cry, recoil..., and how far into it (seconds). */
 		String action;
 		float actionSecs;
+		/** A Pokémon's pose out in the world (walk, fly, hover), or null for its idle. */
+		String poseName;
+		/** Towards you (picture pixels): who's drawn in front where figures overlap. */
+		float depth;
+		/** Pixels to a block, if it's sized by the world (a scene seen through a camera), not by tall. */
+		float perBlock;
 
 		Fig(Identifier skin, String species, float cx, float feet, float tall) {
 			this.skin = skin;
@@ -51,6 +57,24 @@ public final class Figures {
 			this.cx = cx;
 			this.feet = feet;
 			this.tall = tall;
+		}
+
+		/** A Pokémon walking, flying or hovering (its world pose), or null for standing. */
+		public Fig pose(String name) {
+			poseName = name;
+			return this;
+		}
+
+		/** Nearer (positive) or further (negative) than the others, for overlaps. */
+		public Fig depth(float z) {
+			depth = z;
+			return this;
+		}
+
+		/** Sized by the world: so many pixels to a block (its height is then the model's own). */
+		public Fig perBlock(float px) {
+			perBlock = px;
+			return this;
 		}
 
 		/** Turned to face the screen's right (positive) or left (negative), in degrees. */
@@ -225,7 +249,7 @@ public final class Figures {
 			pose.translate(-(st.x1() - st.x0()) / 2F, 0, 0);
 			for (Fig f : st.figs()) {
 				pose.pushPose();
-				pose.translate(f.cx - st.x0(), f.feet - st.y0() - f.hop, 0);
+				pose.translate(f.cx - st.x0(), f.feet - st.y0() - f.hop, f.depth);
 				if (f.squash != 1) pose.scale(1 / (float) Math.sqrt(f.squash), f.squash, 1 / (float) Math.sqrt(f.squash));
 				if (f.skin != null) drawPerson(f, pose);
 				else drawMon(f, pose);
@@ -408,14 +432,15 @@ public final class Figures {
 			BedrockModel m = mons.computeIfAbsent((Look.ours() ? "r:" : "c:") + f.species, k -> BedrockModel.create(f.species));
 			if (m == null) return;
 			float h = Math.max(0.3F, m.def.height);
-			float k = f.tall / h;
-			pose.translate(0, -f.tall / 2F, 0);
+			float k = f.perBlock > 0 ? f.perBlock : f.tall / h;
+			float tall = f.perBlock > 0 ? h * f.perBlock : f.tall;
+			pose.translate(0, -tall / 2F, 0);
 			pose.mulPose(Axis.XP.rotationDegrees(f.pitch));
-			pose.translate(0, f.tall / 2F, 0);
+			pose.translate(0, tall / 2F, 0);
 			pose.mulPose(Axis.YP.rotationDegrees(-(f.facing + f.spin)));
 			pose.scale(k * m.def.scale, k * m.def.scale, k * m.def.scale);
 			pose.translate(0F, -1.501F, 0F);
-			m.pose(f.seconds, f.action, f.actionSecs);
+			m.pose(f.seconds, f.poseName, f.action, f.actionSecs);
 			m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityCutoutNoCull(m.def.texture)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 			for (BedrockModel.Layer l : m.def.layers) {
 				m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityTranslucentEmissive(l.frame(f.seconds))), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);

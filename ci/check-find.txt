@@ -1,1 +1,0 @@
-networking.*(PlayerList|PlayerManager|ServerPlayNetworkAddon|ServerGamePacket)

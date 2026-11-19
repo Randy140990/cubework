@@ -38,10 +38,17 @@ public final class Hud {
 	private static int fade;
 	private static final int FADE = 36;
 	private static Runnable atDark;
+	/** The words shown at the darkest ("Time passes..." for WAIT; none going through a door). */
+	private static String fadeWords = "";
 
 	public static void fadeThrough(Runnable then) {
+		fadeThrough(then, "Time passes...");
+	}
+
+	public static void fadeThrough(Runnable then, String words) {
 		fade = FADE;
 		atDark = then;
+		fadeWords = words == null ? "" : words;
 	}
 
 	public static void tick(Minecraft mc) {
@@ -122,10 +129,10 @@ public final class Hud {
 		float half = FADE / 2F, a = t < half ? t / half : 1 - (t - half) / half;
 		a = Math.max(0, Math.min(1, a * 1.25F));
 		g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF05070F, a));
-		if (a > 0.85F) {
+		if (a > 0.85F && !fadeWords.isEmpty()) {
 			Minecraft mc = Minecraft.getInstance();
 			int s = Ui.scale(g.guiHeight());
-			Ui.centred(g, mc.font, "Time passes...", g.guiWidth() / 2, g.guiHeight() / 2 - 4 * s, Ui.alpha(0xFFE8ECFF, (a - 0.85F) / 0.15F), s, false);
+			Ui.centred(g, mc.font, fadeWords, g.guiWidth() / 2, g.guiHeight() / 2 - 4 * s, Ui.alpha(0xFFE8ECFF, (a - 0.85F) / 0.15F), s, false);
 		}
 	}
 

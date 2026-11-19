@@ -183,25 +183,30 @@ public final class Adventure {
 		double bestScore = 1e9;
 		Vec3 me = mc.player.position();
 		Vec3 look = Vec3.directionFromRotation(0, mc.player.getYRot());
+		double bestDist = 1e9;
 		for (Entity e : mc.level.entitiesForRendering()) {
 			if (!(e instanceof Npc) && !(e instanceof WorldMon)) continue;
-			Vec3 to = e.position().subtract(me);
+			Vec3 to = e.position().subtract(me).multiply(1, 0, 1);
 			double d = to.length();
 			if (d > 3.5) continue;
-			double facingBonus = to.normalize().dot(look);
-			double score = d - facingBonus * 1.5;
+			double facing = d < 1e-3 ? 1 : to.normalize().dot(look);
+			// Someone you're facing (or right up against you); not whoever happens to be behind you.
+			if (facing < 0.35 && d > 1.1) continue;
+			double score = d - facing * 1.5 + (e instanceof WorldMon ? 0.8 : 0);
 			if (score < bestScore) {
 				bestScore = score;
 				best = e;
+				bestDist = d;
 			}
 		}
+		// Inside, the thing in front of you (the TV, a shelf, the fridge) says what it is, unless someone's nearer
+		// in front of it.
+		com.insidethecube.retromon.game.Interiors.Ahead ahead = com.insidethecube.retromon.game.Interiors.ahead(mc.player);
+		if (ahead != null && (best == null || bestDist > ahead.distance() + 0.35)) {
+			mc.setScreen(new DialogueScreen(ahead.lines(), "sign", -1, new CompoundTag()));
+			return;
+		}
 		if (best == null) {
-			// Inside, the thing in front of you (the TV, a shelf, the fridge) says what it is.
-			java.util.List<String> lines = com.insidethecube.retromon.game.Interiors.lookAt(mc.player);
-			if (lines != null) {
-				mc.setScreen(new DialogueScreen(lines, "sign", -1, new CompoundTag()));
-				return;
-			}
 			readSign(mc);
 			return;
 		}

@@ -77,6 +77,9 @@ public class StarterScreen extends GameScreen {
 			toLab++;
 			// At the darkest, you're at the lab's door and Oak goes on.
 			if (toLab == LAB_FADE / 2) {
+				// The lab's inside is its own place: Minecraft puts up its loading screen over this one while you
+				// go, so this comes back when that's done, and Oak carries on.
+				GameScreen.resume = this;
 				ClientPlayNetworking.send(new Net.Act("lab", new CompoundTag()));
 				step = Step.WELCOME;
 				box.set(labLines);
@@ -114,6 +117,7 @@ public class StarterScreen extends GameScreen {
 
 	private void advance() {
 		if (toLab >= 0) return;
+		if (GameScreen.resume == this) GameScreen.resume = null;
 		if (step == Step.STOP && box.press()) {
 			toLab = 0;
 			Sounds.sfx("run");
