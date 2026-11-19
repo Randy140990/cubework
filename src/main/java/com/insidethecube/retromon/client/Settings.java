@@ -73,6 +73,11 @@ public final class Settings {
 		return get("effects", 1, 0, 1) == 1;
 	}
 
+	/** BATTLE STYLE: SWITCH (0, the default) asks whether you'll change POKéMON when a trainer's about to send out their next; SET (1) doesn't. */
+	public static boolean switchStyle() {
+		return get("style", 0, 0, 1) == 0;
+	}
+
 	/** The Pokédex reads entries aloud (1) or not (0). */
 	public static boolean voice() {
 		return get("voice", 1, 0, 1) == 1;

@@ -232,6 +232,7 @@ public final class Battles {
 		t.putInt("active", b.active);
 		t.putInt("enemy", b.enemy);
 		t.putString("state", b.state.name());
+		if (b.state == Battle.State.SHIFT && b.pendingFoe >= 0 && b.pendingFoe < b.theirs.size()) t.putString("next", b.theirs.get(b.pendingFoe).name());
 		t.putString("kind", b.kind.name());
 		t.putBoolean("locked", b.locked());
 		t.putBoolean("canRun", b.canRun());

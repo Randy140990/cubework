@@ -61,7 +61,7 @@ public class BattleScreen extends GameScreen {
 	private String caughtSpecies;
 
 	private enum Mode {
-		PLAY, MAIN, FIGHT, PARTY, BAG, BAG_TARGET, WAIT, AIM
+		PLAY, MAIN, FIGHT, PARTY, BAG, BAG_TARGET, WAIT, AIM, ASK
 	}
 
 	private final Side[] sides = {new Side(), new Side()};
@@ -77,6 +77,10 @@ public class BattleScreen extends GameScreen {
 	private String message;
 	private int typed, hold, wait, waited;
 	private boolean forced;
+	/** BATTLE STYLE SWITCH: the trainer's next one (its name) is coming; YES or NO to changing yours, then picking. */
+	private String nextFoe = "", trainerName = "";
+	private Choice ask;
+	private boolean shifting;
 	private int mainAt, fightAt, partyAt, bagAt;
 	private String bagItem, lastBall = "poke_ball";
 	private int wipe = WIPE;
@@ -105,6 +109,8 @@ public class BattleScreen extends GameScreen {
 		theirs = MonTag.loadAll(t.getListOrEmpty("theirs"));
 		active = t.getIntOr("active", 0);
 		state = t.getStringOr("state", "CHOOSE");
+		nextFoe = t.getStringOr("next", "");
+		trainerName = t.getStringOr("trainer", trainerName);
 		kind = t.getStringOr("kind", "WILD");
 		locked = t.getBooleanOr("locked", false);
 		canRun = t.getBooleanOr("canRun", true);
@@ -343,8 +349,9 @@ public class BattleScreen extends GameScreen {
 				}
 			}
 			case RECALL -> {
-				if (d != null) d.sizeTarget = 0;
-				wait = 14;
+				// Called back: red light streams from it into the ball in its trainer's hand (the Creature Viewer's recall).
+				BattleScene.recall(e.side());
+				wait = 18;
 			}
 			case BALL -> {
 				BattleScene.throwBall(lastBall);
@@ -461,6 +468,16 @@ public class BattleScreen extends GameScreen {
 			mode = Mode.PARTY;
 			return;
 		}
+		if (state.equals("SHIFT")) {
+			// The trainer's about to send out their next one: on SWITCH you're asked if you'll change yours first.
+			if (!Settings.switchStyle()) {
+				send("SWITCH", -1, null);
+				return;
+			}
+			ask = new Choice(List.of("YES", "NO"));
+			mode = Mode.ASK;
+			return;
+		}
 		// Carrying on with a move that takes more than one turn: no choice to make.
 		if (locked) {
 			send("MOVE", -1, null);
@@ -488,7 +505,28 @@ public class BattleScreen extends GameScreen {
 
 	// ---------- your choices ----------
 
+	/** "Will you change POKéMON?": YES to pick one, NO to keep the one that's out. */
+	private void askPick(int i) {
+		Sounds.select();
+		if (i == 0) {
+			shifting = true;
+			forced = false;
+			partyAt = active;
+			for (int k = 0; k < mine.size(); k++) if (k != active && !mine.get(k).fainted()) {
+				partyAt = k;
+				break;
+			}
+			mode = Mode.PARTY;
+		} else send("SWITCH", -1, null);
+	}
+
+	private String askLine() {
+		String who = trainerName.isEmpty() ? "The trainer" : trainerName;
+		return who + " is about to use " + nextFoe + ". Will you change POKéMON?";
+	}
+
 	private void send(String act, int i, String item) {
+		shifting = false;
 		CompoundTag t = new CompoundTag();
 		t.putString("act", act);
 		t.putInt("i", i);
@@ -658,10 +696,16 @@ public class BattleScreen extends GameScreen {
 			case PARTY, BAG_TARGET -> {
 				int n = mine.size();
 				if (n == 0) return true;
-				if (Ui.isB(e) && !forced) mode = mode == Mode.BAG_TARGET ? Mode.BAG : Mode.MAIN;
+				if (Ui.isB(e) && shifting && mode == Mode.PARTY) mode = Mode.ASK;
+				else if (Ui.isB(e) && !forced) mode = mode == Mode.BAG_TARGET ? Mode.BAG : Mode.MAIN;
 				else if (Ui.isUp(e) || Ui.isLeft(e)) partyAt = Math.floorMod(partyAt - 1, n);
 				else if (Ui.isDown(e) || Ui.isRight(e)) partyAt = Math.floorMod(partyAt + 1, n);
 				else if (Ui.isA(e)) pickParty(partyAt);
+			}
+			case ASK -> {
+				if (ask.key(e)) return true;
+				if (Ui.isA(e)) askPick(ask.at);
+				else if (Ui.isB(e)) askPick(1);
 			}
 			case AIM -> {
 				if (Ui.isA(e)) throwBall();
@@ -724,8 +768,10 @@ public class BattleScreen extends GameScreen {
 		switch (mode) {
 			case FIGHT, BAG -> mode = Mode.MAIN;
 			case PARTY -> {
-				if (!forced) mode = Mode.MAIN;
+				if (shifting) mode = Mode.ASK;
+				else if (!forced) mode = Mode.MAIN;
 			}
+			case ASK -> askPick(1);
 			case BAG_TARGET, AIM -> mode = Mode.BAG;
 			default -> clickAnywhere();
 		}
@@ -815,6 +861,10 @@ public class BattleScreen extends GameScreen {
 			case PARTY, BAG_TARGET -> drawParty(g, m, by, bh);
 			case BAG -> drawBag(g, m, by, bh);
 			case AIM -> drawAim(g, m, by, bh, partial);
+			case ASK -> {
+				say(g, askLine(), false, partial);
+				vchoice(g, ask, 520 + 724 - 300, V.H - 26 - 120 - 12 - V.choiceHeight(2), 300, this::askPick);
+			}
 			default -> say(g, message == null ? "" : message.substring(0, Math.min(typed, message.length())), true, partial);
 		}
 		if (toDex >= 0 || fromDex > 0) {

@@ -26,6 +26,11 @@ public class Battle {
 		CHOOSE,
 		/** Your Pokémon fainted: waiting for which one to send out next. */
 		SWITCH,
+		/**
+		 * The trainer's one fainted and they're about to send out the next (pendingFoe): you may change yours first
+		 * (BATTLE STYLE SWITCH). A SWITCH choice with a party slot changes it; with -1 you keep the one that's out.
+		 */
+		SHIFT,
 		OVER
 	}
 
@@ -96,6 +101,8 @@ public class Battle {
 	public final String playerName;
 	public int active, enemy;
 	public State state = State.CHOOSE;
+	/** In SHIFT: which of the trainer's comes out next. */
+	public int pendingFoe = -1;
 	public Result result = Result.NONE;
 	/** Money won (when you beat a trainer, and from Pay Day), and the Pokémon you caught. */
 	public int prize, payDay;
@@ -208,6 +215,22 @@ public class Battle {
 			state = State.CHOOSE;
 			return out;
 		}
+		if (state == State.SHIFT) {
+			if (c.act() != Act.SWITCH) return out;
+			int i = c.index();
+			// Yours first (called back, the new one thrown out), then theirs.
+			if (i >= 0 && i < mine.size() && i != active && !mine.get(i).fainted()) {
+				out.add(Event.text(me().name() + ", come back!"));
+				out.add(Event.of(Event.Kind.RECALL, 0));
+				participants.clear();
+				sendOut(0, i, out);
+			}
+			int foe = pendingFoe;
+			pendingFoe = -1;
+			state = State.CHOOSE;
+			if (foe >= 0 && foe < theirs.size()) sendOut(1, foe, out);
+			return out;
+		}
 		for (Field f : field) {
 			f.flinched = false;
 			f.protecting = false;
@@ -303,6 +326,12 @@ public class Battle {
 		}
 		if (state != State.OVER) endOfTurn(out);
 		return out;
+	}
+
+	/** Whether you've another Pokémon that can fight, besides the one that's out. */
+	private boolean otherHealthy() {
+		for (int i = 0; i < mine.size(); i++) if (i != active && !mine.get(i).fainted()) return true;
+		return false;
 	}
 
 	private static boolean anyPp(Mon m) {
@@ -1504,7 +1533,11 @@ public class Battle {
 				if (next >= 0) {
 					participants.clear();
 					if (!me().fainted()) participants.add(active);
-					sendOut(1, next, out);
+					// A trainer's next one: you may change yours first, if you've another that can fight.
+					if (kind == Kind.TRAINER && !me().fainted() && otherHealthy()) {
+						pendingFoe = next;
+						state = State.SHIFT;
+					} else sendOut(1, next, out);
 				}
 			}
 			if (next < 0) {

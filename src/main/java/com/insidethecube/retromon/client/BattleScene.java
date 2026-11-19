@@ -621,6 +621,21 @@ public final class BattleScene {
 		});
 	}
 
+	/**
+	 * Called back (switching): as the Creature Viewer's recall, it's tinted red and shrinks as red light streams from it
+	 * into the ball in its trainer's hand.
+	 */
+	public static void recall(int side) {
+		MonDisplay d = display(side);
+		if (d == null) return;
+		Vec3 p = spot(side).add(0, 0.2 + height(side) * 0.3, 0);
+		Vec3 back = trainerOf(side);
+		d.red = 16;
+		d.sizeTarget = 0;
+		if (back != null) FX.add(new Fx(BEAM, p, back, dust(0xFF3A3A, 1.1F), dust(0xFFFFFF, 0.8F), 9, 0, new int[1], 3));
+		Sounds.ball();
+	}
+
 	/** Things to do a little later (after so many ticks). */
 	private record Later(int[] ticks, Runnable then) {}
 
@@ -941,7 +956,12 @@ public final class BattleScene {
 			flash(0xFFE23A, 10);
 		}
 		if (sendBall != null && !sendBall.flying()) {
+			// The ball pops open in a flash of white light, and out it comes glowing white (the Creature Viewer's).
 			burst(sendBall.position().add(0, 0.4, 0), ParticleTypes.POOF, 12, 0.3);
+			burst(sendBall.position().add(0, 0.6, 0), dust(0xFFFFFF, 1.3F), 18, 0.45);
+			flash(0xFFFFFF, 6);
+			MonDisplay popped = display(sendSide);
+			if (popped != null) popped.white = MonDisplay.WHITE;
 			Sounds.poof();
 			level.removeEntity(sendBall.getId(), Entity.RemovalReason.DISCARDED);
 			sendBall = null;

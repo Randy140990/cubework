@@ -841,14 +841,15 @@ public class MenuScreen extends DeviceScreen {
 
 	/** What each option does (the viewer's top panel). */
 	/** OPTION's rows (the UI Viewer's, with ours for your partner and the look), what each does, and their values. */
-	private static final String[] OPTION_LABELS = {"TEXT SPEED", "MUSIC", "SOUND", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "BATTLE EFFECTS", "WALK WITH YOU",
-			"POKéMON LOOK", "CONTROLS"};
+	private static final String[] OPTION_LABELS = {"TEXT SPEED", "MUSIC", "SOUND", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "BATTLE EFFECTS", "BATTLE STYLE",
+			"WALK WITH YOU", "POKéMON LOOK", "CONTROLS"};
 	private static final String[] OPTION_LINES = {"How quickly words appear in text boxes.", "How loud the music plays.", "How loud cries and menu sounds are.",
 			"Whether the POKéDEX reads its entries out loud.", "How dark nights get outside.", "Whether wild POKéMON show in the grass, or jump out at you.",
-			"Whether moves play their animations in battle.", "Whether your partner walks with you.",
+			"Whether moves play their animations in battle.", "SWITCH asks if you want to change POKéMON when a trainer is about to send out their next one.",
+			"Whether your partner walks with you.",
 			"COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures.", "See every key: what it does in game, and what's turned off."};
 	private static final String[][] OPTION_VALUES = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"},
-			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"OFF", "ON"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {}};
+			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"OFF", "ON"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {}};
 
 	/**
 	 * OPTION, as the UI Viewer's: what the row does in a panel at the top, then the rows (the one you're on cream),
@@ -861,10 +862,10 @@ public class MenuScreen extends DeviceScreen {
 		V.panel(g, 170, 40, 940, 96);
 		List<String> dl = V.wrap(OPTION_LINES[optionRow], 880, 22, true);
 		for (int i = 0; i < Math.min(2, dl.size()); i++) V.text(g, dl.get(i), 200, 62 + i * 30, 22, V.TEXT, true);
-		float rh = 51;
+		float rh = 46;
 		V.panel(g, 170, 160, 940, n * rh + 36);
 		int[] now = {d.textSpeed, Music.level(), Settings.sound(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0, Settings.effects() ? 1 : 0,
-				Settings.follower() ? 1 : 0, Settings.look(), 0};
+				Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), 0};
 		for (int r = 0; r < n; r++) {
 			float ry = 160 + 18 + r * rh, rx = 188, rw = 904;
 			if (vover(rx, ry, rw, rh)) optionRow = r;
@@ -905,11 +906,12 @@ public class MenuScreen extends DeviceScreen {
 				Settings.sendPrefs();
 			}
 			case 6 -> Settings.set("effects", Settings.effects() ? 0 : 1);
-			case 7 -> {
+			case 7 -> Settings.set("style", Settings.switchStyle() ? 1 : 0);
+			case 8 -> {
 				Settings.set("follow", Settings.follower() ? 0 : 1);
 				Settings.sendPrefs();
 			}
-			case 8 -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
+			case 9 -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
 			default -> {
 				Sounds.press();
 				if (minecraft != null) minecraft.setScreen(new KeyMapScreen(this));
