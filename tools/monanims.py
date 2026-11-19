@@ -414,3 +414,63 @@ def serpent(sid, m, segs, necks=("neck", "neck2"), k=1.0, slow=1.0, extras=None)
     info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
     battle_set(A, m, info, "legs4", k, slow, extras)
     return A, info
+
+
+def flyer(sid, m, flap=0.5, amp=40, rest=20, span=1.0, unfold=75, k=1.0, slow=1.0, extras=None, legs=()):
+    """A creature always on the wing (a bat): its jointed wings unfolded and beating in a wave (wings), its body bobbing
+    as it hovers, its feet hanging. Dives forward to fly, beats harder to call."""
+    extras = with_move(m, extras)
+    A = Anims(sid)
+    dangle = {lg: track(rotation=[wave(1.4 * slow, 8, i * 40), 0, 0]) for i, lg in enumerate(legs)}
+    P = 2.0 * slow
+    ground = A.add("ground_idle", P, only(m, merge({"body": track(position=[0, wave(flap * 2, 1.4 * k, 90), 0], rotation=[wave(P, 3), 0, wave(P * 2, 2)]),
+                                                     "head": track(rotation=[wave(P, 4, 90), wave(P * 2, 10), 0]),
+                                                     "ear_right": track(rotation=[0, 0, wave(P / 2, 6)]), "ear_left": track(rotation=[0, 0, wave(P / 2, -6)])},
+                                                    wings(10, amp, rest, flap, span=span, unfold=unfold), dangle, eyelids(P * 0.7), _extra(extras, "idle"))))
+    B = 1.0 * slow
+    battle = A.add("battle_idle", flap * 2, only(m, merge({"body": track(position=[0, wave(flap * 2, 1.8 * k, 90), 0], rotation=[-4, 0, 0])},
+                                                          wings(12, amp * 1.1, rest, flap, span=span, unfold=unfold), dangle, eyelids(B), _extra(extras, "battle"))))
+    walk_id = A.add("ground_walk", flap * 2, only(m, merge({"body": track(position=[0, wave(flap * 2, 1.4 * k, 90), 0], rotation=[14, 0, 0])},
+                                                           wings(12, amp, rest, flap, span=span, unfold=unfold), dangle, eyelids(B), _extra(extras, "walk"))))
+    fly = A.add("air_fly", flap * 2, only(m, merge({"body": track(position=[0, wave(flap * 2, 2 * k, 90), 0], rotation=[20, 0, 0])},
+                                                   wings(14, amp * 1.2, rest, flap * 0.9, span=span, unfold=unfold), dangle, eyelids(B), _extra(extras, "fly"))))
+    C = 1.2 * slow
+    cry = A.add("cry", C, only(m, merge({
+        "body": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-12, 0, 0], C * 0.65: [-12, 0, 0], C: [0, 0, 0]})),
+        "head": track(rotation=keys({0: [0, 0, 0], C * 0.2: [-20, 0, 0], C * 0.65: [-20, 0, 0], C: [0, 0, 0]})),
+        "jaw": track(rotation=keys({0: [0, 0, 0], C * 0.2: [45, 0, 0], C * 0.65: [45, 0, 0], C * 0.85: [0, 0, 0]})),
+    }, wings(14, amp * 1.4, rest + 10, flap * 0.8, span=span, unfold=unfold), _extra(extras, "cry"))), loop=False)
+    R = 0.75 * slow
+    recoil = A.add("recoil", R, only(m, merge(_hit(R, k), wings(10, amp, rest, flap, span=span, unfold=unfold), _extra(extras, "recoil"))), loop=False)
+    info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil},
+            "poses": {"walk": {"anim": walk_id, "parts": []}, "fly": {"anim": fly, "parts": []}}}
+    battle_set(A, m, info, "bird", k, slow, extras)
+    return A, info
+
+
+def burrower(sid, m, bodies=("body",), k=1.0, slow=1.0, extras=None):
+    """Creatures that live in a mound of earth (moles): each body bobs up and down out of it, sniffing; they dip under
+    and pop up again to move, and rise high out of the mound to call."""
+    extras = with_move(m, extras)
+    A = Anims(sid)
+    P = 2.4 * slow
+    bob = lambda per, amp, ph=0.0: {b: track(position=[0, wave(per, amp * k, ph + i * 120), 0], rotation=[0, wave(per * 2, 8, ph + i * 90), 0])
+                                    for i, b in enumerate(bodies)}
+    ground = A.add("ground_idle", P, only(m, merge(bob(P, 0.4), {"head": track(rotation=[wave(P, 4), wave(P, 8), 0])},
+                                                   eyelids(P * 0.7), _extra(extras, "idle"))))
+    B = 1.2 * slow
+    battle = A.add("battle_idle", B, only(m, merge(bob(B, 0.7), eyelids(B * 0.7), _extra(extras, "battle"))))
+    W = 0.8 * slow
+    walk_id = A.add("ground_walk", W, only(m, merge({b: track(position=[0, f"(math.sin(q.anim_time * {450 / W:.1f} + {i * 90}) - 0.4) * {2.5 * k:.2f}", 0])
+                                                     for i, b in enumerate(bodies)}, {"mound": track(scale=[1, wave(W / 2, 0.06, 0, 1), 1])},
+                                                    eyelids(W), _extra(extras, "walk"))))
+    C = 1.2 * slow
+    cry = A.add("cry", C, only(m, merge({b: track(position=keys({0: [0, 0, 0], C * 0.2: [0, 3 * k, 0], C * 0.7: [0, 3 * k, 0], C: [0, 0, 0]}))
+                                         for b in bodies}, {"jaw": track(rotation=keys({0: [0, 0, 0], C * 0.2: [35, 0, 0], C * 0.7: [35, 0, 0], C: [0, 0, 0]}))},
+                                        _extra(extras, "cry"))), loop=False)
+    R = 0.75 * slow
+    recoil = A.add("recoil", R, only(m, merge({b: track(position=keys({0: [0, 0, 0], R * 0.15: [0, -2 * k, 1 * k], R * 0.6: [0, 0, 0]}))
+                                               for b in bodies}, squeeze(R), _extra(extras, "recoil"))), loop=False)
+    info = {"idle": battle, "ground": ground, "actions": {"cry": cry, "recoil": recoil}, "poses": {"walk": {"anim": walk_id, "parts": []}}}
+    battle_set(A, m, info, "legs4", k, slow, extras)
+    return A, info

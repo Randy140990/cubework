@@ -1,0 +1,72 @@
+{
+ "idle": "animation.rafflora.ground_idle",
+ "ground": "animation.rafflora.ground_idle",
+ "actions": {
+  "cry": "animation.rafflora.cry",
+  "recoil": "animation.rafflora.recoil",
+  "attack": "animation.rafflora.attack",
+  "critical": "animation.rafflora.critical",
+  "special": "animation.rafflora.special",
+  "recall": "animation.rafflora.recall",
+  "sendout": "animation.rafflora.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.rafflora.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.rafflora.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.rafflora.faint",
+   "parts": []
+  }
+ },
+ "move": "PETAL DANCE",
+ "attack_move": "ACID",
+ "scale": 1.341,
+ "height": 1.007,
+ "texture": "retromon:textures/mons/vileplume.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/vileplume_glow_0.png",
+    "retromon:textures/mons/vileplume_glow_1.png",
+    "retromon:textures/mons/vileplume_glow_2.png",
+    "retromon:textures/mons/vileplume_glow_3.png",
+    "retromon:textures/mons/vileplume_glow_4.png",
+    "retromon:textures/mons/vileplume_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "RAFFLORA",
+ "anchors": {
+  "mouth": [
+   0,
+   5.94,
+   -3.74
+  ],
+  "back": [
+   0,
+   17.12,
+   0.1
+  ],
+  "body": [
+   0,
+   6.39,
+   0.1
+  ],
+  "size": [
+   16.0,
+   16.12,
+   25.56
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

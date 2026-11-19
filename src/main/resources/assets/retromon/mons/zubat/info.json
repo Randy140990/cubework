@@ -1,0 +1,76 @@
+{
+ "idle": "animation.duskbat.battle_idle",
+ "ground": "animation.duskbat.ground_idle",
+ "actions": {
+  "cry": "animation.duskbat.cry",
+  "recoil": "animation.duskbat.recoil",
+  "attack": "animation.duskbat.attack",
+  "critical": "animation.duskbat.critical",
+  "special": "animation.duskbat.special",
+  "recall": "animation.duskbat.recall",
+  "sendout": "animation.duskbat.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.duskbat.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.duskbat.air_fly",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.duskbat.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.duskbat.faint",
+   "parts": []
+  }
+ },
+ "move": "SUPERSONIC",
+ "attack_move": "LEECH LIFE",
+ "scale": 0.667,
+ "height": 1.2,
+ "texture": "retromon:textures/mons/zubat.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/zubat_glow_0.png",
+    "retromon:textures/mons/zubat_glow_1.png",
+    "retromon:textures/mons/zubat_glow_2.png",
+    "retromon:textures/mons/zubat_glow_3.png",
+    "retromon:textures/mons/zubat_glow_4.png",
+    "retromon:textures/mons/zubat_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "DUSKBAT",
+ "anchors": {
+  "mouth": [
+   0,
+   10.0,
+   -6.5
+  ],
+  "back": [
+   0,
+   20.2,
+   0.0
+  ],
+  "body": [
+   0,
+   10.0,
+   0.0
+  ],
+  "size": [
+   6.8,
+   19.2,
+   11.4
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

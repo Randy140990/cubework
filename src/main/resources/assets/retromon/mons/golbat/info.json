@@ -1,0 +1,76 @@
+{
+ "idle": "animation.nightmaw.battle_idle",
+ "ground": "animation.nightmaw.ground_idle",
+ "actions": {
+  "cry": "animation.nightmaw.cry",
+  "recoil": "animation.nightmaw.recoil",
+  "attack": "animation.nightmaw.attack",
+  "critical": "animation.nightmaw.critical",
+  "special": "animation.nightmaw.special",
+  "recall": "animation.nightmaw.recall",
+  "sendout": "animation.nightmaw.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.nightmaw.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.nightmaw.air_fly",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.nightmaw.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.nightmaw.faint",
+   "parts": []
+  }
+ },
+ "move": "CONFUSE RAY",
+ "attack_move": "WING ATTACK",
+ "scale": 0.712,
+ "height": 1.965,
+ "texture": "retromon:textures/mons/golbat.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/golbat_glow_0.png",
+    "retromon:textures/mons/golbat_glow_1.png",
+    "retromon:textures/mons/golbat_glow_2.png",
+    "retromon:textures/mons/golbat_glow_3.png",
+    "retromon:textures/mons/golbat_glow_4.png",
+    "retromon:textures/mons/golbat_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "NIGHTMAW",
+ "anchors": {
+  "mouth": [
+   0,
+   17.0,
+   -10.7
+  ],
+  "back": [
+   0,
+   32.44,
+   -0.76
+  ],
+  "body": [
+   0,
+   16.95,
+   -0.76
+  ],
+  "size": [
+   11.56,
+   31.44,
+   18.99
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

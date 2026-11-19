@@ -1,0 +1,72 @@
+{
+ "idle": "animation.fuzzgnat.battle_idle",
+ "ground": "animation.fuzzgnat.ground_idle",
+ "actions": {
+  "cry": "animation.fuzzgnat.cry",
+  "recoil": "animation.fuzzgnat.recoil",
+  "attack": "animation.fuzzgnat.attack",
+  "critical": "animation.fuzzgnat.critical",
+  "special": "animation.fuzzgnat.special",
+  "recall": "animation.fuzzgnat.recall",
+  "sendout": "animation.fuzzgnat.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.fuzzgnat.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.fuzzgnat.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.fuzzgnat.faint",
+   "parts": []
+  }
+ },
+ "move": "CONFUSION",
+ "attack_move": "TACKLE",
+ "scale": 1.026,
+ "height": 0.975,
+ "texture": "retromon:textures/mons/venonat.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/venonat_glow_0.png",
+    "retromon:textures/mons/venonat_glow_1.png",
+    "retromon:textures/mons/venonat_glow_2.png",
+    "retromon:textures/mons/venonat_glow_3.png",
+    "retromon:textures/mons/venonat_glow_4.png",
+    "retromon:textures/mons/venonat_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "FUZZGNAT",
+ "anchors": {
+  "mouth": [
+   0,
+   5.0,
+   -7.0
+  ],
+  "back": [
+   0,
+   16.6,
+   0.5
+  ],
+  "body": [
+   0,
+   7.0,
+   0.5
+  ],
+  "size": [
+   10.4,
+   15.6,
+   13.0
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

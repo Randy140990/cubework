@@ -1,0 +1,72 @@
+{
+ "idle": "animation.triosnout.battle_idle",
+ "ground": "animation.triosnout.ground_idle",
+ "actions": {
+  "cry": "animation.triosnout.cry",
+  "recoil": "animation.triosnout.recoil",
+  "attack": "animation.triosnout.attack",
+  "critical": "animation.triosnout.critical",
+  "special": "animation.triosnout.special",
+  "recall": "animation.triosnout.recall",
+  "sendout": "animation.triosnout.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.triosnout.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.triosnout.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.triosnout.faint",
+   "parts": []
+  }
+ },
+ "move": "EARTHQUAKE",
+ "attack_move": "SLASH",
+ "scale": 1.304,
+ "height": 0.652,
+ "texture": "retromon:textures/mons/dugtrio.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/dugtrio_glow_0.png",
+    "retromon:textures/mons/dugtrio_glow_1.png",
+    "retromon:textures/mons/dugtrio_glow_2.png",
+    "retromon:textures/mons/dugtrio_glow_3.png",
+    "retromon:textures/mons/dugtrio_glow_4.png",
+    "retromon:textures/mons/dugtrio_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TRIOSNOUT",
+ "anchors": {
+  "mouth": [
+   0,
+   6.44,
+   -5.79
+  ],
+  "back": [
+   0,
+   11.44,
+   -1.83
+  ],
+  "body": [
+   0,
+   5.22,
+   -1.83
+  ],
+  "size": [
+   17.0,
+   10.44,
+   15.0
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

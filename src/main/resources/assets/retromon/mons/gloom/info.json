@@ -1,0 +1,72 @@
+{
+ "idle": "animation.droopbud.ground_idle",
+ "ground": "animation.droopbud.ground_idle",
+ "actions": {
+  "cry": "animation.droopbud.cry",
+  "recoil": "animation.droopbud.recoil",
+  "attack": "animation.droopbud.attack",
+  "critical": "animation.droopbud.critical",
+  "special": "animation.droopbud.special",
+  "recall": "animation.droopbud.recall",
+  "sendout": "animation.droopbud.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.droopbud.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.droopbud.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.droopbud.faint",
+   "parts": []
+  }
+ },
+ "move": "SLEEP POWDER",
+ "attack_move": "ACID",
+ "scale": 0.764,
+ "height": 1.309,
+ "texture": "retromon:textures/mons/gloom.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/gloom_glow_0.png",
+    "retromon:textures/mons/gloom_glow_1.png",
+    "retromon:textures/mons/gloom_glow_2.png",
+    "retromon:textures/mons/gloom_glow_3.png",
+    "retromon:textures/mons/gloom_glow_4.png",
+    "retromon:textures/mons/gloom_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "DROOPBUD",
+ "anchors": {
+  "mouth": [
+   0,
+   5.06,
+   -2.8
+  ],
+  "back": [
+   0,
+   21.94,
+   -0.1
+  ],
+  "body": [
+   0,
+   5.61,
+   -0.1
+  ],
+  "size": [
+   9.0,
+   20.94,
+   12.71
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

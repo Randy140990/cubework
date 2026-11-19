@@ -1,0 +1,72 @@
+{
+ "idle": "animation.tuberlet.ground_idle",
+ "ground": "animation.tuberlet.ground_idle",
+ "actions": {
+  "cry": "animation.tuberlet.cry",
+  "recoil": "animation.tuberlet.recoil",
+  "attack": "animation.tuberlet.attack",
+  "critical": "animation.tuberlet.critical",
+  "special": "animation.tuberlet.special",
+  "recall": "animation.tuberlet.recall",
+  "sendout": "animation.tuberlet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.tuberlet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.tuberlet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.tuberlet.faint",
+   "parts": []
+  }
+ },
+ "move": "POISONPOWDER",
+ "attack_move": "ABSORB",
+ "scale": 1.256,
+ "height": 0.637,
+ "texture": "retromon:textures/mons/oddish.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/oddish_glow_0.png",
+    "retromon:textures/mons/oddish_glow_1.png",
+    "retromon:textures/mons/oddish_glow_2.png",
+    "retromon:textures/mons/oddish_glow_3.png",
+    "retromon:textures/mons/oddish_glow_4.png",
+    "retromon:textures/mons/oddish_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TUBERLET",
+ "anchors": {
+  "mouth": [
+   0,
+   4.4,
+   -2.5
+  ],
+  "back": [
+   0,
+   11.2,
+   0.0
+  ],
+  "body": [
+   0,
+   4.9,
+   0.0
+  ],
+  "size": [
+   8.0,
+   10.2,
+   14.1
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}
