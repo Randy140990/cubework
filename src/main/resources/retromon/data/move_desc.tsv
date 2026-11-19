@@ -1,0 +1,252 @@
+# Each move: what it does (from the Creature Viewer's move library).
+pound	No added effect.
+karate_chop	High critical-hit ratio.
+doubleslap	Hits 2 to 5 times.
+comet_punch	Hits 2 to 5 times.
+mega_punch	No added effect.
+pay_day	Scatters coins to pick up after the battle.
+fire_punch	May burn (10%).
+ice_punch	May freeze (10%).
+thunderpunch	May paralyse (10%).
+scratch	No added effect.
+vicegrip	No added effect.
+guillotine	Knocks the target out in one hit. Fails against a higher level.
+razor_wind	Charges up on the first turn, strikes on the second. High critical-hit ratio.
+swords_dance	Sharply raises the user's Attack.
+cut	No added effect.
+gust	Double power against a target in the air with Fly.
+wing_attack	No added effect.
+whirlwind	Ends a wild battle, or makes a trainer's Pokémon switch out. Goes last.
+fly	Flies up out of reach on the first turn, swoops down on the second.
+bind	Traps the target and hurts it for 2 to 5 turns.
+slam	No added effect.
+vine_whip	No added effect.
+stomp	May make the target flinch (30%). Double power against a target that used Minimize.
+double_kick	Hits twice.
+mega_kick	No added effect.
+jump_kick	If it misses, the user is hurt by 1/8 of the damage it would have done.
+rolling_kick	May make the target flinch (30%).
+sand_attack	Lowers the target's accuracy.
+headbutt	May make the target flinch (30%).
+horn_attack	No added effect.
+fury_attack	Hits 2 to 5 times.
+horn_drill	Knocks the target out in one hit. Fails against a higher level.
+tackle	No added effect.
+body_slam	May paralyse (30%).
+wrap	Traps the target and hurts it for 2 to 5 turns.
+take_down	The user takes 1/4 of the damage it does as recoil.
+thrash	Attacks for 2 or 3 turns, then the user is confused.
+double_edge	The user takes 1/4 of the damage it does as recoil.
+tail_whip	Lowers the target's Defense.
+poison_sting	May poison (30%).
+twineedle	Hits twice. May poison (20%).
+pin_missile	Hits 2 to 5 times.
+leer	Lowers the target's Defense.
+bite	May make the target flinch (30%).
+growl	Lowers the target's Attack.
+roar	Ends a wild battle, or makes a trainer's Pokémon switch out. Goes last.
+sing	Puts the target to sleep.
+supersonic	Confuses the target.
+sonicboom	Always does 20 HP of damage.
+disable	Stops the target using its last move for a few turns.
+acid	May lower the target's Defense (10%).
+ember	May burn (10%).
+flamethrower	May burn (10%).
+mist	Stops the target lowering the user's stats.
+water_gun	No added effect.
+hydro_pump	No added effect.
+surf	No added effect.
+ice_beam	May freeze (10%).
+blizzard	May freeze (10%).
+psybeam	May confuse (10%).
+bubblebeam	May lower the target's Speed (10%).
+aurora_beam	May lower the target's Attack (10%).
+hyper_beam	The user must recharge on the next turn.
+peck	No added effect.
+drill_peck	No added effect.
+submission	The user takes 1/4 of the damage it does as recoil.
+low_kick	May make the target flinch (30%).
+counter	Hits back with double the physical damage taken this turn. Goes last.
+seismic_toss	Does damage equal to the user's level.
+strength	No added effect.
+absorb	Heals the user by half the damage done.
+mega_drain	Heals the user by half the damage done.
+leech_seed	Drains 1/8 of the target's max HP to the user each turn. Grass types are immune.
+growth	Raises the user's Special Attack.
+razor_leaf	High critical-hit ratio.
+solarbeam	Charges up on the first turn, strikes on the second. No charging in sunshine.
+poisonpowder	Poisons the target.
+stun_spore	Paralyses the target.
+sleep_powder	Puts the target to sleep.
+petal_dance	Attacks for 2 or 3 turns, then the user is confused.
+string_shot	Lowers the target's Speed.
+dragon_rage	Always does 40 HP of damage.
+fire_spin	Traps the target and hurts it for 2 to 5 turns.
+thundershock	May paralyse (10%).
+thunderbolt	May paralyse (10%).
+thunder_wave	Paralyses the target.
+thunder	May paralyse (30%). Hits a target in the air with Fly. Never misses in rain.
+rock_throw	No added effect.
+earthquake	Double power against a target that is underground with Dig.
+fissure	Knocks the target out in one hit. Fails against a higher level.
+dig	Digs underground out of reach on the first turn, strikes on the second.
+toxic	Badly poisons the target. The damage grows every turn.
+confusion	May confuse (10%).
+psychic_m	May lower the target's Special Defense (10%).
+hypnosis	Puts the target to sleep.
+meditate	Raises the user's Attack.
+agility	Sharply raises the user's Speed.
+quick_attack	Strikes first.
+rage	The user's Attack rises every time it's hit while it rages.
+teleport	Escapes from a wild battle.
+night_shade	Does damage equal to the user's level.
+mimic	Copies the target's last move for the rest of the battle.
+screech	Sharply lowers the target's Defense.
+double_team	Raises the user's evasion.
+recover	Restores half the user's max HP.
+harden	Raises the user's Defense.
+minimize	Raises the user's evasion.
+smokescreen	Lowers the target's accuracy.
+confuse_ray	Confuses the target.
+withdraw	Raises the user's Defense.
+defense_curl	Raises the user's Defense and doubles Rollout's power.
+barrier	Sharply raises the user's Defense.
+light_screen	Halves special damage to the user's side for 5 turns.
+haze	Resets every Pokémon's stat changes.
+reflect	Halves physical damage to the user's side for 5 turns.
+focus_energy	Raises the user's critical-hit ratio.
+bide	Waits 2 or 3 turns, then hits back with double the damage taken.
+metronome	Uses a move picked at random.
+mirror_move	Uses the move the target just used.
+selfdestruct	The user faints. The target's Defense is halved for the hit.
+egg_bomb	No added effect.
+lick	May paralyse (30%).
+smog	May poison (40%).
+sludge	May poison (30%).
+bone_club	May make the target flinch (10%).
+fire_blast	May burn (10%).
+waterfall	No added effect.
+clamp	Traps the target and hurts it for 2 to 5 turns.
+swift	Never misses.
+skull_bash	Tucks in and raises Defense on the first turn, strikes on the second.
+spike_cannon	Hits 2 to 5 times.
+constrict	May lower the target's Speed (10%).
+amnesia	Sharply raises the user's Special Defense.
+kinesis	Lowers the target's accuracy.
+softboiled	Restores half the user's max HP.
+hi_jump_kick	If it misses, the user is hurt by 1/8 of the damage it would have done.
+glare	Paralyses the target.
+dream_eater	Only works on a sleeping target. Heals the user by half the damage.
+poison_gas	Poisons the target.
+barrage	Hits 2 to 5 times.
+leech_life	Heals the user by half the damage done.
+lovely_kiss	Puts the target to sleep.
+sky_attack	Charges up on the first turn, strikes on the second.
+transform	Turns into a copy of the target.
+bubble	May lower the target's Speed (10%).
+dizzy_punch	May confuse (20%).
+spore	Puts the target to sleep.
+flash	Lowers the target's accuracy.
+psywave	Random damage up to 1.5 times the user's level.
+splash	Does nothing at all.
+acid_armor	Sharply raises the user's Defense.
+crabhammer	High critical-hit ratio.
+explosion	The user faints. The target's Defense is halved for the hit.
+fury_swipes	Hits 2 to 5 times.
+bonemerang	Hits twice.
+rest	Sleeps for 2 turns to restore all HP and cure status problems.
+rock_slide	May make the target flinch (30%).
+hyper_fang	May make the target flinch (10%).
+sharpen	Raises the user's Attack.
+conversion	Changes the user's type to the type of one of its moves.
+tri_attack	May burn, freeze or paralyse (20%).
+super_fang	Halves the target's HP.
+slash	High critical-hit ratio.
+substitute	Spends 1/4 of the user's max HP on a decoy that takes hits for it.
+struggle	Used only when the user has no PP left. The user takes 1/4 of the damage as recoil.
+sketch	Permanently learns the target's last move.
+triple_kick	Hits up to 3 times, harder each time.
+thief	Steals the target's held item if the user isn't holding one.
+spider_web	Stops the target fleeing or switching out.
+mind_reader	The user's next move can't miss.
+nightmare	A sleeping target loses 1/4 of its max HP each turn.
+flame_wheel	May burn (10%). Thaws the user if it's frozen.
+snore	Only works while asleep. May make the target flinch (30%).
+curse	Not a Ghost: lowers Speed, raises Attack and Defense. A Ghost: spends half its HP to curse the target, who loses 1/4 HP a turn.
+flail	Stronger the lower the user's HP.
+conversion2	Changes the user's type to one that resists the last move that hit it.
+aeroblast	High critical-hit ratio.
+cotton_spore	Sharply lowers the target's Speed.
+reversal	Stronger the lower the user's HP.
+spite	Cuts the PP of the target's last move.
+powder_snow	May freeze (10%).
+protect	Blocks every move this turn. Less likely to work used in a row. Goes first.
+mach_punch	Strikes first.
+scary_face	Sharply lowers the target's Speed.
+faint_attack	Never misses.
+sweet_kiss	Confuses the target.
+belly_drum	Spends half the user's HP to max out its Attack.
+sludge_bomb	May poison (30%).
+mud_slap	Lowers the target's accuracy.
+octazooka	May lower the target's accuracy (50%).
+spikes	Scatters spikes that hurt each foe that switches in.
+zap_cannon	Paralyses the target.
+foresight	Lets Normal and Fighting moves hit a Ghost, and ignores evasion.
+destiny_bond	If the user faints before its next move, its attacker faints too.
+perish_song	Every Pokémon that hears it faints in 3 turns unless it switches out.
+icy_wind	Lowers the target's Speed.
+detect	Blocks every move this turn. Less likely to work used in a row. Goes first.
+bone_rush	Hits 2 to 5 times.
+lock_on	The user's next move can't miss.
+outrage	Attacks for 2 or 3 turns, then the user is confused.
+sandstorm	A sandstorm for 5 turns hurts all but Rock, Ground and Steel types.
+giga_drain	Heals the user by half the damage done.
+endure	Survives any hit this turn with at least 1 HP. Goes first.
+charm	Sharply lowers the target's Attack.
+rollout	Rolls on for 5 turns, doubling in power with each hit.
+false_swipe	Always leaves the target with at least 1 HP.
+swagger	Confuses the target, but sharply raises its Attack.
+milk_drink	Restores half the user's max HP.
+spark	May paralyse (30%).
+fury_cutter	Doubles in power each time it hits in a row.
+steel_wing	May raise the user's Defense (10%).
+mean_look	Stops the target fleeing or switching out.
+attract	Infatuates a target of the opposite gender.
+sleep_talk	While asleep, uses one of its other moves at random.
+heal_bell	Cures the status problems of the whole party.
+return	Stronger the more the user likes its trainer.
+present	A random gift: a hit of 40, 80 or 120 power, or it heals the target.
+frustration	Stronger the less the user likes its trainer.
+safeguard	Protects the user's side from status problems for 5 turns.
+pain_split	Adds the user's and target's HP together and shares it evenly.
+sacred_fire	May burn (50%). Thaws the user if it's frozen.
+magnitude	Random power from 10 to 150. Double power against Dig.
+dynamicpunch	Confuses the target.
+megahorn	No added effect.
+dragonbreath	May paralyse (30%).
+baton_pass	Switches out and passes stat changes to the next Pokémon.
+encore	Makes the target repeat its last move for a few turns.
+pursuit	Double power, and hits first, if the target is switching out.
+rapid_spin	Frees the user from Bind, Wrap, Leech Seed and Spikes.
+sweet_scent	Lowers the target's evasion.
+iron_tail	May lower the target's Defense (30%).
+metal_claw	May raise the user's Attack (10%).
+vital_throw	Never misses.
+morning_sun	Heals the user: more in the morning, and more again in sunshine.
+synthesis	Heals the user: more in the daytime, and more again in sunshine.
+moonlight	Heals the user: more at night, and more again in sunshine.
+hidden_power	Its type and power depend on the user's DVs.
+cross_chop	High critical-hit ratio.
+twister	May make the target flinch (20%). Double power against a target in the air with Fly.
+rain_dance	Rain for 5 turns: Water moves stronger, Fire moves weaker.
+sunny_day	Sunshine for 5 turns: Fire moves stronger, Water moves weaker.
+crunch	May lower the target's Special Defense (20%).
+mirror_coat	Hits back with double the special damage taken this turn. Goes last.
+psych_up	Copies the target's stat changes.
+extremespeed	Strikes first.
+ancientpower	May raise all the user's stats (10%).
+shadow_ball	May lower the target's Special Defense (20%).
+future_sight	Strikes two turns later.
+rock_smash	May lower the target's Defense (50%).
+whirlpool	Traps the target and hurts it for 2 to 5 turns.
+beat_up	Every healthy Pokémon in the party joins in with a hit.

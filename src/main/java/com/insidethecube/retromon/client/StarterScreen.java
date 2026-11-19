@@ -167,7 +167,9 @@ public class StarterScreen extends GameScreen {
 
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
-		int h = boxHeight(), m = 6 * s, boxTop = height - h - m - height / 14;
+		// The text box is the UI Viewer's (its canvas: 140 from the left, 1000 wide, 26 up from the bottom); the cards and
+		// people stand on its top.
+		int h = boxHeight(), m = 6 * s, boxTop = Math.round(V.y(V.H - 26 - 120));
 		float secs = (ticks + partial) / 20F;
 		if (step == Step.STOP) g.fillGradient(0, height / 2, width, height, 0x000A0E24, 0x900A0E24);
 		else g.fillGradient(0, 0, width, height, 0x700A0E24, 0xC00A0E24);
@@ -231,15 +233,12 @@ public class StarterScreen extends GameScreen {
 				Ui.bubble(g, "star", mxp + mt / 3, boxTop - mt - (int) hop, s, Math.min(1, since / 6F));
 			} else b.draw(g);
 		}
-		box.render(g, font, m * 2, boxTop, width - 4 * m, h, s, ticks, step == Step.STOP || step == Step.WELCOME || step == Step.AFTER);
+		box.renderV(g, font, 140, 26, 1000, ticks, partial, step == Step.STOP || step == Step.WELCOME || step == Step.AFTER);
 		if (toLab >= 0) {
 			float t = (toLab + partial) / LAB_FADE;
 			float a = Math.min(1, (t < 0.5F ? t : 1 - t) * 2.6F);
 			g.fill(0, 0, width, height, Ui.alpha(0xFF05070F, a));
 		}
-		if (step == Step.CONFIRM) {
-			int w = yesNo.width(font, s);
-			choice(g, yesNo, width - w - m * 2, boxTop - yesNo.height(s) - 4 * s, w, i -> confirm(i == 0));
-		}
+		if (step == Step.CONFIRM) vchoice(g, yesNo, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(2), 300, i -> confirm(i == 0));
 	}
 }

@@ -97,26 +97,29 @@ public final class Hud {
 		if (moneyTicks >= 0 && mc.screen == null && !BattleScene.active() && ++moneyTicks > MONEY_SHOW) moneyTicks = -1;
 	}
 
+	/** Your money changing (prize money, a sale), as the UI Viewer's notice: a pill popping up at the top middle. */
 	private static void money(GuiGraphics g, DeltaTracker delta) {
 		Minecraft mc = Minecraft.getInstance();
 		if (!Adventure.active() || BattleScene.active() || moneyTicks < 0 || mc.screen != null || mc.options.hideGui) return;
-		int s = Ui.scale(g.guiHeight());
+		V.fit(g.guiWidth(), g.guiHeight());
 		float t = moneyTicks + delta.getGameTimeDeltaPartialTick(true);
 		float k = Math.max(0, Math.min(1, Math.min(t / 8F, (MONEY_SHOW - t) / 10F)));
-		k = 1 - (1 - k) * (1 - k);
 		float c = Math.max(0, Math.min(1, (t - 8) / 24F));
 		int shown = Math.round(moneyFrom + (moneyTo - moneyFrom) * (1 - (1 - c) * (1 - c)));
 		int d = moneyTo - moneyFrom;
 		String total = Ui.money(shown), change = (d >= 0 ? "+" : "-") + Ui.money(Math.abs(d));
-		int w = Math.max(Ui.width(mc.font, Ui.money(Math.max(moneyFrom, moneyTo)), s), Ui.width(mc.font, change, s)) + 34 * s, h = 30 * s;
-		int x = g.guiWidth() - 6 * s - w + Math.round((w + 6 * s) * (1 - k)), y = Adventure.speed > 1 ? 24 * s : 6 * s;
-		Ui.tagged(g, x, y, w, h, s, Ui.GOLD);
-		int cs = 9 * s, cx = x + 10 * s, cy = y + 5 * s;
-		Ui.round(g, cx, cy, cs, cs, 0xFFE0A526, 4 * s);
-		Ui.round(g, cx + s, cy + s, cs - 2 * s, cs - 2 * s, 0xFFFFD45A, 4 * s);
-		Ui.text(g, mc.font, total, cx + cs + 4 * s, y + 6 * s, Ui.TEXT, s);
-		Ui.text(g, mc.font, change, cx + cs + 4 * s, y + 17 * s, d >= 0 ? 0xFF7CF0A8 : 0xFFFF8A8A, s);
+		float tw = V.width(total, 20, true), cw = V.width(change, 18, true), w = 12 + 34 + 12 + tw + 16 + cw + 22, y = 96 - (1 - k) * 20;
+		int a = Math.round(k * 255);
+		if (a < 4) return;
+		g.pose().pushMatrix();
+		V.panel(g, 640 - w / 2, y, w, 54, 27, true);
+		V.rr(g, 640 - w / 2 + 12, y + 10, 34, 34, 17, Ui.alpha(0xFFE0A526, k));
+		V.centred(g, "₽", 640 - w / 2 + 29, y + 15, 20, Ui.alpha(0xFF5A3A00, k), true);
+		V.text(g, total, 640 - w / 2 + 58, y + 15, 20, Ui.alpha(V.TEXT, k), true);
+		V.text(g, change, 640 - w / 2 + 58 + tw + 16, y + 16, 18, Ui.alpha(d >= 0 ? 0xFF7CF0A8 : 0xFFFF8A8A, k), true);
+		g.pose().popMatrix();
 	}
+
 
 	private static void cinema(GuiGraphics g, DeltaTracker delta) {
 		float k = cineOld + (cine - cineOld) * delta.getGameTimeDeltaPartialTick(true);
@@ -143,50 +146,86 @@ public final class Hud {
 		return k == null ? "?" : k.getTranslatedKeyMessage().getString().toUpperCase(java.util.Locale.ROOT);
 	}
 
-	/** What's what: SPACE to talk, ENTER for the menu, TAB for speed, and the time of day with the sun or the moon. */
+	/**
+	 * What's over the world (the UI Viewer's HUD): the keys along the bottom right (SPACE Talk, ENTER Menu, TAB
+	 * Speed), the time beside them, and what to do next in its panel at the top right.
+	 */
 	private static void hints(GuiGraphics g, DeltaTracker delta) {
 		Minecraft mc = Minecraft.getInstance();
 		if (!Adventure.active() || BattleScene.active() || mc.screen != null || mc.level == null || mc.options.hideGui || Device.busy()) return;
-		int s = Ui.scale(g.guiHeight()), w = g.guiWidth(), h = g.guiHeight();
+		V.fit(g.guiWidth(), g.guiHeight());
 		long t = Math.floorMod(mc.level.getDayTime(), 24000L);
 		int hour = (int) ((t / 1000 + 6) % 24), minute = (int) ((t % 1000) * 60 / 1000);
 		boolean night = Night.nightness() > 0.5F;
 		String clock = String.format("%d:%02d %s", hour % 12 == 0 ? 12 : hour % 12, minute, hour < 12 ? "AM" : "PM");
-		String[][] keys = {{key(mc.options.keyJump), "Talk"}, {key(Adventure.START), "Menu"}, {key(Adventure.SPEED), "Speed"}};
-		int pad = 5 * s, gap = 8 * s, x = w - pad, y = h - pad - 14 * s;
-		// The keys, right to left.
-		for (int i = keys.length - 1; i >= 0; i--) {
-			int lw = Ui.width(mc.font, keys[i][1], s), kw = Ui.boldWidth(mc.font, keys[i][0], s) + 8 * s;
-			x -= lw;
-			Ui.text(g, mc.font, keys[i][1], x, y + 3 * s, 0xE0E8ECFF, s);
-			x -= kw + 3 * s;
-			Ui.rr(g, x + 0.5F * s, y + s, kw, 13 * s, 6.5F * s, 0x50000000);
-			Ui.rr(g, x, y, kw, 13 * s, 6.5F * s, 0xD8123C38);
-			Ui.draw(g, mc.font, Ui.bold(keys[i][0]), x + 4 * s, y + 3 * s, Ui.GOLD, s, false);
-			x -= gap;
+		V.hints(g, key(mc.options.keyJump), "Talk", key(Adventure.START), "Menu", key(Adventure.SPEED), "Speed x" + Adventure.speed);
+		// The time, at the bottom left, with a sun or a moon.
+		float cw = V.width(clock, 17, true) + 44;
+		V.panel(g, 22, V.H - 14 - 36, cw, 36, 18, true);
+		V.rr(g, 34, V.H - 14 - 36 + 11, 14, 14, 7, night ? 0xFFE8ECFF : 0xFFFFC94A);
+		if (night) V.rr(g, 38, V.H - 14 - 36 + 9, 12, 12, 6, 0xFF123C38);
+		V.text(g, clock, 56, V.H - 14 - 36 + 9, 17, V.TEXT, true);
+		// What to do next.
+		String goal = goal(mc);
+		if (goal != null) {
+			float w = 380, x = V.W - 24 - w, y = 20;
+			V.panel(g, x, y, w, 76, 24, true);
+			V.label(g, "Next", x + 18, y + 14);
+			V.icon(g, "icon_map", x + 18, y + 36, 28);
+			V.text(g, goal, x + 56, y + 38, 19, V.TEXT, true);
+			String far = goalDistance(mc);
+			if (far != null) V.right(g, far, x + w - 18, y + 41, 16, V.MUTED, true);
 		}
-		// The time, with a sun or a moon.
-		int cw = Ui.width(mc.font, clock, s) + 22 * s;
-		x -= cw;
-		Ui.rr(g, x + 0.5F * s, y + s, cw, 13 * s, 6.5F * s, 0x50000000);
-		Ui.rr(g, x, y, cw, 13 * s, 6.5F * s, 0xD8123C38);
-		Ui.rr(g, x + 4 * s, y + 3 * s, 7 * s, 7 * s, 3.5F * s, night ? 0xFFE8ECFF : 0xFFFFC94A);
-		if (night) Ui.rr(g, x + 6 * s, y + 2 * s, 6 * s, 6 * s, 3 * s, 0xFF123C38);
-		Ui.text(g, mc.font, clock, x + 15 * s, y + 3 * s, Ui.TEXT, s);
 	}
 
-	/** The place's name, sliding in at the top left as you arrive (as the later games do), then away. */
+	/** What to do next in the story, as far as it goes yet. */
+	private static String goal(Minecraft mc) {
+		if (!ClientState.data.started) return com.insidethecube.retromon.game.Interiors.in(mc.player) ? null : "Go to PROF. OAK's lab";
+		return null;
+	}
+
+	/** How far it is to the next thing (the lab's door, before you've a POKéMON), or null. */
+	private static String goalDistance(Minecraft mc) {
+		if (ClientState.data.started || mc.player == null || com.insidethecube.retromon.game.Interiors.in(mc.player)) return null;
+		double d = Math.hypot(mc.player.getX() - LAB_DOOR_X, mc.player.getZ() - LAB_DOOR_Z);
+		return Math.round(d) + " m";
+	}
+
+	/** Oak's lab's door in the Kanto map (outside it). */
+	private static final double LAB_DOOR_X = -782.5, LAB_DOOR_Z = 695.6;
+
+	/**
+	 * The place's name, as the UI Viewer's banner: a deep teal band sliding in from the left with mint lines above
+	 * and below, the name large and the town's line from its sign under it; then away.
+	 */
 	private static void place(GuiGraphics g, DeltaTracker delta) {
 		Minecraft mc = Minecraft.getInstance();
 		int t = ClientState.placeTicks;
-		if (!Adventure.active() || BattleScene.active() || t < 0 || t > 110 || ClientState.placeName.isEmpty() || mc.screen != null && !(mc.screen instanceof GameScreen)) return;
-		int s = Ui.scale(g.guiHeight());
-		float in = Math.min(1, (t + delta.getGameTimeDeltaPartialTick(true)) / 8F), out = Math.min(1, (110 - t) / 10F), k = Math.min(in, out);
-		String name = ClientState.placeName;
-		int w = Ui.width(mc.font, name, s) + 24 * s, h = 22 * s;
-		int x = (int) (-w + (w + 6 * s) * (1 - (1 - k) * (1 - k))), y = 6 * s;
-		Ui.tagged(g, x, y, w, h, s, Ui.GOLD);
-		Ui.text(g, mc.font, name, x + 12 * s, y + 7 * s, Ui.TEXT, s);
+		if (!Adventure.active() || BattleScene.active() || t < 0 || t > 90 || ClientState.placeName.isEmpty() || mc.screen != null && !(mc.screen instanceof GameScreen)) return;
+		V.fit(g.guiWidth(), g.guiHeight());
+		float f = t + delta.getGameTimeDeltaPartialTick(true);
+		float in = Math.min(1, f / 10F), e = 1 - (1 - in) * (1 - in) * (1 - in), out = f > 64 ? Math.min(1, (f - 64) / 12F) : 0;
+		float slide = (1 - e) * -60 - out * 60, alpha = Math.min(in * 1.4F, 1) * (1 - out);
+		String name = ClientState.placeName, line = Adventure.signLine(name);
+		float h = line.isEmpty() ? 100 : 128, x = -V.ox / V.k + slide, w = 760 + V.ox / V.k, y = 210;
+		// The band: solid on the left, fading out to the right.
+		float solid = w * 0.6F;
+		g.fill(Math.round(V.x(x)), Math.round(V.y(y)), Math.round(V.x(x + solid)), Math.round(V.y(y + h)), Ui.alpha(0xF2123C38, alpha));
+		hband(g, x + solid, y, w - solid, h, Ui.alpha(0xF2123C38, alpha));
+		hband(g, x, y, w, 3, Ui.alpha(0xFF8FF5C0, alpha));
+		hband(g, x, y + h - 3, w, 3, Ui.alpha(0xFF8FF5C0, alpha));
+		V.text(g, name, x + V.ox / V.k + 60, y + 18, 54, Ui.alpha(0xFFF4F6FF, alpha), true);
+		if (!line.isEmpty()) V.text(g, line, x + V.ox / V.k + 60, y + 86, 21, Ui.alpha(0xFFCFEDE3, alpha), true);
+	}
+
+	/** A strip fading out to the right (canvas pixels). */
+	private static void hband(GuiGraphics g, float x, float y, float w, float h, int c) {
+		int x0 = Math.round(V.x(x)), x1 = Math.round(V.x(x + w)), y0 = Math.round(V.y(y)), y1 = Math.max(y0 + 1, Math.round(V.y(y + h)));
+		int steps = Math.max(1, (x1 - x0) / 3);
+		for (int i = 0; i < steps; i++) {
+			int a = x0 + (x1 - x0) * i / steps, b = x0 + (x1 - x0) * (i + 1) / steps;
+			g.fill(a, y0, b, y1, Ui.alpha(c, 1 - i / (float) steps));
+		}
 	}
 
 	/** The game speed, when it's sped up. */

@@ -60,6 +60,7 @@ public abstract class GameScreen extends Screen {
 		mx = mouseX;
 		my = mouseY;
 		hits.clear();
+		V.fit(width, height);
 		draw(g, partial);
 		// Widgets (the nickname box).
 		super.render(g, mouseX, mouseY, partial);
@@ -71,6 +72,16 @@ public abstract class GameScreen extends Screen {
 	/** Something clickable, drawn this frame. */
 	protected void hit(int x, int y, int w, int h, Runnable click) {
 		hits.add(new Hit(x + ox, y + oy, w, h, click));
+	}
+
+	/** Something clickable on the viewer's canvas (V): its box in canvas pixels. */
+	protected void vhit(float x, float y, float w, float h, Runnable click) {
+		hit(Math.round(V.x(x)) - ox, Math.round(V.y(y)) - oy, Math.round(V.s(w)), Math.round(V.s(h)), click);
+	}
+
+	/** Whether the mouse is over a box on the viewer's canvas. */
+	protected boolean vover(float x, float y, float w, float h) {
+		return V.over(mx, my, x, y, w, h);
 	}
 
 	protected boolean over(int x, int y, int w, int h) {
@@ -155,6 +166,18 @@ public abstract class GameScreen extends Screen {
 			Ui.draw(g, font, Ui.bold(c.options.get(i)), x + 10 * s, ty, on ? Ui.CREAM_INK : Ui.TEXT, s, false);
 			hit(x, ty - 2 * s, w, 13 * s, () -> pick.accept(row));
 		}
+	}
+
+	/** A list to pick from as the UI Viewer draws it (V): a panel of rows at x, y (canvas), w wide. Returns its height. */
+	protected float vchoice(GuiGraphics g, Choice c, float x, float y, float w, IntConsumer pick) {
+		int at = V.choiceAt(c.options.size(), x, y, w, mx, my);
+		if (at >= 0) c.at = at;
+		float h = V.choice(g, c.options, null, c.at, x, y, w);
+		for (int i = 0; i < c.options.size(); i++) {
+			int row = i;
+			vhit(x + 12, y + 12 + i * 54, w - 24, 46, () -> pick.accept(row));
+		}
+		return h;
 	}
 
 	/** The text box: the lines to say, typed out two lines at a time. */
@@ -245,6 +268,24 @@ public abstract class GameScreen extends Screen {
 			page++;
 			typed = 0;
 			return page >= pages.size();
+		}
+
+		/**
+		 * Drawn as the UI Viewer's text box: on its canvas (V) at x, its bottom edge bottom pixels up from the
+		 * canvas's bottom, w wide: teal glass, white words with names in gold, the speaker on a cream tab, the mint
+		 * arrow when there's more.
+		 */
+		public void renderV(GuiGraphics g, Font f, float x, float bottom, float w, int ticks, float partial, boolean arrow) {
+			layout(f, (int) ((w - 68) * 8.5F / 25 * 0.9F));
+			List<String> lines = new ArrayList<>();
+			if (page < pages.size()) {
+				String[] p = pages.get(page);
+				int left = typed;
+				lines.add(p[0].substring(0, Math.min(p[0].length(), Math.max(0, left))));
+				left -= p[0].length();
+				if (!p[1].isEmpty()) lines.add(left > 0 ? p[1].substring(0, Math.min(p[1].length(), left)) : "");
+			}
+			V.textBox(g, x, bottom, w, speaker, lines, arrow && typedOut() && page < pages.size(), (ticks + partial) / 20F);
 		}
 
 		public void render(GuiGraphics g, Font f, int x, int y, int w, int h, int s, int ticks, boolean arrow) {

@@ -24,16 +24,30 @@ public class DialogueScreen extends GameScreen {
 	private final java.util.Map<Integer, String> cues = new java.util.HashMap<>();
 	private int cued = -1;
 
+	/** A line that starts with who's speaking: "OAK: ..." (capitals, before a colon). */
+	private static final java.util.regex.Pattern SPEAKER = java.util.regex.Pattern.compile("^([A-Z][A-Z .'é&]{1,20}): (.+)$");
+
 	public DialogueScreen(List<String> lines, String mode, int npc, CompoundTag extra) {
 		super("Dialogue");
-		this.box = new TextBox(lines);
+		// "OAK: Hey! Wait!": the speaker goes on the tab over the box (as the viewer shows it), not in the words.
+		String who = null;
+		java.util.List<String> said = new java.util.ArrayList<>();
+		for (String l : lines) {
+			java.util.regex.Matcher m = SPEAKER.matcher(l);
+			if (m.matches() && (who == null || who.equals(m.group(1)))) {
+				who = m.group(1);
+				said.add(m.group(2));
+			} else said.add(l);
+		}
+		this.box = new TextBox(said);
+		if (who != null) box.speaker = who;
 		this.mode = mode;
 		this.npc = npc;
 		this.extra = extra;
 		String t = extra.getStringOr("trainer", "");
 		this.trainer = t.isEmpty() ? null : t;
 		Trainers.Trainer tr = Trainers.get(trainer);
-		if (tr != null) box.speaker = tr.title();
+		if (tr != null && box.speaker == null) box.speaker = tr.title();
 		for (net.minecraft.nbt.Tag c : extra.getListOrEmpty("cues")) c.asString().ifPresent(v -> {
 			int at = v.indexOf(':');
 			if (at > 0) {
@@ -116,13 +130,17 @@ public class DialogueScreen extends GameScreen {
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
 		// (The cinema frame fades in and out round this, from the HUD.) The box rises into place.
-		int h = boxHeight(), m = 6 * s;
+		// The UI Viewer's text box (teal glass, the speaker on a cream tab, names in gold), rising into place; a
+		// question's answers in its list above the box's right end.
 		float in = Math.min(1, (ticks + partial) / 5F);
-		int rise = Math.round((1 - in * in * (3 - 2 * in)) * (h + m) * 0.6F);
-		box.render(g, font, m, height - h - m + rise, width - 2 * m, h, s, ticks, yesNo == null);
+		float rise = (1 - in * in * (3 - 2 * in)) * 90;
+		g.pose().pushMatrix();
+		g.pose().translate(0, V.s(rise));
+		box.renderV(g, font, 140, 26, 1000, ticks, partial, yesNo == null);
+		g.pose().popMatrix();
 		if (yesNo != null) {
-			int w = yesNo.width(font, s);
-			choice(g, yesNo, width - w - m, height - h - m - yesNo.height(s) - 4 * s, w, i -> done(i == 0));
+			float w = 300;
+			vchoice(g, yesNo, V.W - 140 - w, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), w, i -> done(i == 0));
 		}
 	}
 }

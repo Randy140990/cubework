@@ -16,8 +16,12 @@ import net.minecraft.resources.Identifier;
  * of its own (retromon:dynamic/hero) that your player wears in a Retromon save.
  */
 public final class Outfit {
-	public static final String[] SKINS = {"FAIR", "LIGHT", "TAN", "DEEP"};
-	private static final int[] SKIN_RGB = {0xF2CBAE, 0xE6B48E, 0xC08A60, 0x86563A};
+	/** Skin tones: the first four as ever, then four more (the maker's new ones). */
+	public static final String[] SKINS = {"FAIR", "LIGHT", "TAN", "DEEP", "PALE", "MEDIUM", "BROWN", "DARK"};
+	public static final int[] SKIN_RGB = {0xF2CBAE, 0xE6B48E, 0xC08A60, 0x86563A, 0xF8DCC8, 0xD69E72, 0xA2683F, 0x5C3824};
+	/** Eye colours: the face layer's irises (45, 50, 80) take this colour. */
+	public static final String[] EYES = {"NAVY", "BROWN", "HAZEL", "GREEN", "BLUE", "GREY", "AMBER", "VIOLET"};
+	public static final int[] EYE_RGB = {0x2D3250, 0x5A3A22, 0x7A6A34, 0x3A7A44, 0x3A6FD0, 0x6E7A88, 0xB87A22, 0x6A4AA8};
 	public static final String[] HAIRS = {"short", "spiky", "long", "ponytail", "pigtails", "bun"};
 	public static final String[] HATS = {"none", "cap", "beanie", "sunhat"};
 	public static final String[] TOPS = {"jacket", "tee", "hoodie", "vest"};
@@ -35,12 +39,13 @@ public final class Outfit {
 			0x283A6E, 0xF0E2BE};
 
 	/** What's being picked: the parts in order, and their values (style or colour index). */
-	public static final String[] PARTS = {"skin", "hair", "hairc", "hat", "capp", "capb", "hatc", "top", "topc", "bot", "botc", "shoec", "bag", "bagc"};
+	public static final String[] PARTS = {"skin", "eyes", "hair", "hairc", "hat", "capp", "capb", "hatc", "top", "topc", "bot", "botc", "shoec", "bag", "bagc"};
 	public final Map<String, Integer> v = new LinkedHashMap<>();
 
 	public static Outfit defaults(boolean girl) {
 		Outfit o = new Outfit();
 		o.v.put("skin", 0);
+		o.v.put("eyes", 0);
 		o.v.put("hair", girl ? 4 : 0);
 		o.v.put("hairc", girl ? 9 : 4);
 		o.v.put("hat", girl ? 3 : 1);
@@ -86,6 +91,7 @@ public final class Outfit {
 	public static int options(String part) {
 		return switch (part) {
 			case "skin" -> SKINS.length;
+			case "eyes" -> EYES.length;
 			case "hair" -> HAIRS.length;
 			case "hat" -> HATS.length;
 			case "top" -> TOPS.length;
@@ -100,6 +106,7 @@ public final class Outfit {
 	public static String label(String part, int i) {
 		return switch (part) {
 			case "skin" -> SKINS[i];
+			case "eyes" -> EYES[i];
 			case "hair" -> HAIRS[i].toUpperCase();
 			case "hat" -> HATS[i].toUpperCase();
 			case "top" -> TOPS[i].toUpperCase();
@@ -136,6 +143,16 @@ public final class Outfit {
 		int skin = SKIN_RGB[Math.floorMod(get("skin"), SKIN_RGB.length)];
 		layer(out, "body", skin);
 		layer(out, "face", -1);
+		// The eyes in their colour, and the brows a shade of the hair (the face layer marks them in two set colours).
+		int eye = EYE_RGB[Math.floorMod(get("eyes"), EYE_RGB.length)], hairc = colour("hairc");
+		for (int y = 0; y < out.getHeight(); y++)
+			for (int x = 0; x < out.getWidth(); x++) {
+				int c = out.getPixel(x, y);
+				int r = (c >> 16) & 255, gg = (c >> 8) & 255, b = c & 255, a = c & 0xFF000000;
+				if (r == 45 && gg == 50 && b == 80) out.setPixel(x, y, a | eye);
+				else if (r == 70 && gg == 50 && b == 40)
+					out.setPixel(x, y, a | (int) (((hairc >> 16) & 255) * 0.62F) << 16 | (int) (((hairc >> 8) & 255) * 0.62F) << 8 | (int) ((hairc & 255) * 0.62F));
+			}
 		layer(out, "bottom_" + BOTTOMS[Math.floorMod(get("bot"), BOTTOMS.length)], colour("botc"));
 		layer(out, "shoes", colour("shoec"));
 		String top = TOPS[Math.floorMod(get("top"), TOPS.length)];

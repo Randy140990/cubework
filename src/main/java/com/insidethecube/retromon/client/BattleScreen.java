@@ -773,22 +773,19 @@ public class BattleScreen extends GameScreen {
 		int m = 8 * s, bh = 36 * s;
 		Side them = sides[1], me = sides[0];
 		int by = height - bh - m;
-		// The plates: theirs at the top right, yours down at the bottom left (level with the bottom of the buttons).
+		// The plates (the UI Viewer's): theirs at the top right, yours at the bottom left, the party's balls above each.
 		// Out of the way while the bag or your party is up.
 		boolean plates = mode != Mode.BAG && mode != Mode.PARTY && mode != Mode.BAG_TARGET;
-		int mineH = PLATE_W * s * 160 / 600, foeY = m + 13 * s, myY = height - m - mineH;
-		if (them.shown && plates) foeCard(g, them, width - m - PLATE_W * s, foeY);
-		if (me.shown && plates) myCard(g, me, m, myY);
-		if (moneyAt >= 0) moneyChip(g, m, foeY, partial);
-		// What's said runs along the bottom beside your plate.
-		barX = me.shown && plates ? m + PLATE_W * s + 8 * s : m;
+		if (them.shown && plates) plate(g, them, false);
+		if (me.shown && plates) plate(g, me, true);
+		if (moneyAt >= 0) moneyChip(g, m, m + 13 * s, partial);
 		switch (mode) {
 			case MAIN -> drawMain(g, m, by, bh);
 			case FIGHT -> drawFight(g, m, by, bh);
 			case PARTY, BAG_TARGET -> drawParty(g, m, by, bh);
 			case BAG -> drawBag(g, m, by, bh);
 			case AIM -> drawAim(g, m, by, bh, partial);
-			default -> messageBar(g, barX, by, width - m - barX, bh, message == null ? "" : message.substring(0, Math.min(typed, message.length())), true);
+			default -> say(g, message == null ? "" : message.substring(0, Math.min(typed, message.length())), true, partial);
 		}
 		if (toDex >= 0 || fromDex > 0) {
 			float a = toDex >= 0 ? Math.min(1, (toDex + partial) / DEX_FADE) : Math.max(0, (fromDex - partial) / DEX_FADE);
@@ -874,51 +871,58 @@ public class BattleScreen extends GameScreen {
 	private int barX;
 
 	/**
-	 * A Pokémon's plate (Let's Go): dark see-through teal with a bright mint edge; the name, then its level and
-	 * whether it's male (blue) or female (pink) on the right; a thick HP bar with a white rim; for yours the HP
-	 * numbers and a thin EXP line. The party's Poké Balls sit above it (grey for one that's fainted).
+	 * A Pokémon's plate, as the UI Viewer's: a teal glass panel (yours at the bottom left, theirs at the top right);
+	 * the name, male or female, any status, and the level; the HP bar (and for yours the numbers and the EXP); the
+	 * party's balls above it.
 	 */
-	private void card(GuiGraphics g, Side sd, int x, int y, int w, boolean mine) {
-		int h = mine ? w * 160 / 600 : w * 128 / 600;
-		Ui.pic(g, mine ? PLATE_MINE : PLATE_FOE, x, y, w, h, 600, mine ? 160 : 128, 0xFFFFFFFF);
-		int tx = x + 10 * s, ty = y + (mine ? 7 : 6) * s, right = x + w - 13 * s;
-		Ui.heading(g, font, sd.name, tx, ty, 0xFFFFFFFF, s);
-		// Right: the gender mark (bigger, in its colour), and the level before it.
+	private void plate(GuiGraphics g, Side sd, boolean mine) {
+		float x = mine ? 36 : 820, y = mine ? 560 : 36, w = mine ? 470 : 420, h = mine ? 118 : 92, px = x + 22;
+		V.panel(g, x, y, w, h, 22, false);
+		float ty = y + (mine ? 14 : 12);
+		V.text(g, sd.name, px, ty, 27, V.TEXT, true);
+		float nx = px + V.width(sd.name, 27, true) + 10;
 		if (!sd.gender.isEmpty()) {
 			boolean she = sd.gender.contains("\u2640");
-			Ui.draw(g, font, Ui.bold(sd.gender), right - Ui.boldWidth(font, sd.gender, s), ty, she ? 0xFFFF7FA8 : 0xFF6FB8FF, s, true);
-			right -= Ui.boldWidth(font, sd.gender, s) + 3 * s;
+			V.text(g, sd.gender, nx, ty + 6, 20, she ? 0xFFFF8FB8 : 0xFF6FB8FF, true);
+			nx += V.width(sd.gender, 20, true) + 10;
 		}
-		String lv = String.valueOf(sd.level);
-		int lvx = right - Ui.boldWidth(font, lv, s);
-		Ui.draw(g, font, Ui.bold(lv), lvx, ty, 0xFFFFFFFF, s, true);
-		int lw = Ui.width(font, "Lv.", s);
-		Ui.text(g, font, "Lv.", lvx - lw - s, ty, 0xFFBFF5DA, s);
-		if (!sd.status.isEmpty()) Ui.chip(g, font, sd.status, lvx - lw - 8 * s - Ui.width(font, sd.status, s), ty - s, Ui.statusColor(sd.status), s);
-		// The HP bar: a white rim, a dark track, the colour (green, then yellow, then red), lit along its top.
-		float frac = Math.max(0, Math.min(1, sd.hp / Math.max(1F, sd.max)));
-		int bx = tx, bw = x + w - 13 * s - tx, bh = 6 * s, byy = y + (mine ? 18 : 17) * s;
-		Ui.rr(g, bx - s, byy - s, bw + 2 * s, bh + 2 * s, bh / 2F + s, 0xFFEFFFF6);
-		Ui.rr(g, bx, byy, bw, bh, bh / 2F, 0xFF0B1A19);
-		float fw = bw * frac;
-		if (frac > 0 && fw < 1) fw = 1;
-		if (fw > 0) {
-			int col = frac > 0.5F ? 0xFF46DB78 : frac > 0.2F ? 0xFFF2C53A : 0xFFEF4A4A;
-			Ui.rrv(g, bx, byy, fw, bh, Math.min(bh, fw) / 2F, Ui.lighter(col, 0.3F), Ui.darker(col, 0.8F));
-			if (fw > 2 * s) Ui.rr(g, bx + s, byy + 0.6F * s, fw - 2 * s, Math.max(1, bh / 4F), bh / 8F, Ui.alpha(0xFFFFFFFF, 0.35F));
+		if (!sd.status.isEmpty()) {
+			float sw = V.width(sd.status, 13, true) + 16;
+			V.rr(g, nx, ty + 7, sw, 22, 7, Ui.statusColor(sd.status));
+			V.text(g, sd.status, nx + 8, ty + 10, 13, 0xFFFFFFFF, true);
 		}
+		V.right(g, "Lv. " + sd.level, x + w - 22, ty + 5, 21, V.TEXT, true);
+		float hy = ty + 34 + 8, frac = Math.max(0, Math.min(1, sd.hp / Math.max(1F, sd.max)));
+		V.text(g, "HP", px, hy + 2, 14, V.GOLD, true);
+		float bw = mine ? 260 : 320;
+		V.bar(g, px + 32, hy + 3, bw, 14, frac, V.hpColour(frac));
 		if (mine) {
-			Ui.text(g, font, Math.round(sd.hp) + "/" + sd.max, tx, byy + bh + 3 * s, 0xFFFFFFFF, s);
+			V.text(g, Math.round(sd.hp) + "/" + sd.max, px + 32 + bw + 12, hy - 1, 20, V.TEXT, true);
 			Species sp = Species.ALL.get(sd.species);
+			float ef = 0;
 			if (sp != null) {
 				int now = sp.growth().expAt(sd.level), next = sd.level >= 100 ? now + 1 : sp.growth().expAt(sd.level + 1);
-				float ef = Math.max(0, Math.min(1, (sd.exp - now) / Math.max(1F, next - now)));
-				int ex = x + w / 2, ew = x + w - 13 * s - ex, ey = byy + bh + 6 * s;
-				Ui.plain(g, font, "EXP", ex - Ui.width(font, "EXP", s) - 3 * s, byy + bh + 3 * s, 0xFF8FE6FF, s);
-				Ui.rr(g, ex, ey, ew, 2 * s, s, 0xA00B1A19);
-				if (ef > 0) Ui.rr(g, ex, ey, Math.max(2 * s, ew * ef), 2 * s, s, 0xFF5AD2FF);
+				ef = Math.max(0, Math.min(1, (sd.exp - now) / Math.max(1F, next - now)));
 			}
+			float ey = hy + 24 + 6;
+			V.text(g, "EXP", px, ey - 2, 12, 0xFF6FC3FF, true);
+			V.pill(g, px + 42, ey + 1, w - 44 - 42, 7, 0xFF0B2A2C);
+			if (ef > 0) V.pill(g, px + 42, ey + 1, Math.max(7, (w - 44 - 42) * ef), 7, 0xFF6FC3FF);
 		}
+		// The party's balls above the plate: one for each (grey if it's fainted).
+		List<Mon> party = mine ? mine : theirs;
+		if (!mine && kind.equals("WILD")) return;
+		for (int i = 0; i < party.size() && i < 6; i++) {
+			float bx = mine ? x + 18 + i * 26 : x + w - 18 - 22 - i * 26;
+			V.icon(g, "icon_ball", bx, y - 30, 22, party.get(i).fainted() ? 0x73808890 : 0xFFFFFFFF);
+		}
+	}
+
+	/** What's said in battle, in the UI Viewer's text box (beside your plate: 520 from the left, 724 wide). */
+	private void say(GuiGraphics g, String text, boolean arrow, float partial) {
+		List<String> lines = V.wrap(text, 724 - 68, 25, true);
+		if (lines.size() > 2) lines = lines.subList(lines.size() - 2, lines.size());
+		V.textBox(g, 520, 26, 724, null, lines, arrow && message != null && typed >= message.length(), (ticks + partial) / 20F);
 	}
 
 	/**
@@ -958,17 +962,6 @@ public class BattleScreen extends GameScreen {
 		}
 	}
 
-	private void foeCard(GuiGraphics g, Side them, int x, int y) {
-		card(g, them, x, y, PLATE_W * s, false);
-		// A trainer's party (a wild one's on its own).
-		if (!kind.equals("WILD")) balls(g, theirs, x + PLATE_W * s - 6 * s, y - 11 * s, true);
-	}
-
-	private void myCard(GuiGraphics g, Side me, int x, int y) {
-		card(g, me, x, y, PLATE_W * s, true);
-		balls(g, mine, x + 6 * s, y - 11 * s, false);
-	}
-
 	/** The message bar along the bottom (the line typing out, the arrow when it's done). */
 	private void messageBar(GuiGraphics g, int x, int y, int w, int h, String text, boolean arrow) {
 		float r = 8 * s;
@@ -991,46 +984,48 @@ public class BattleScreen extends GameScreen {
 	}
 
 	/**
-	 * What to do (Let's Go): big round buttons along the bottom right, FIGHT, POKéMON and BAG, rising a little to
-	 * the right, with RUN smaller above BAG; the one picked grows, with the white pointer bobbing beside it. The
-	 * question sits in a pill beside RUN, clear of them.
+	 * What to do, as the UI Viewer has it: a stack of wide buttons at the bottom right (FIGHT, POKéMON, BAG, RUN),
+	 * each in its colour with a sheen and its own picture, the one you're on slid out with a cream rim and an arrow
+	 * pointing at it; the question above them.
 	 */
 	private void drawMain(GuiGraphics g, int m, int by, int bh) {
 		Mon mon = me();
-		int d = 52 * s, gap = 7 * s;
-		int[] row = {0, 2, 1};
-		int[][] at = new int[4][];
-		// FIGHT, POKéMON, BAG left to right, each clear of the next (with room to grow when picked), stepping up a little.
-		for (int k = 0; k < 3; k++) at[row[k]] = new int[] {width - m - d / 2 - 3 * s - (2 - k) * (d + gap), height - m - d / 2 - 3 * s - k * d / 9, d};
-		int rd = d * 3 / 5;
-		at[3] = new int[] {at[1][0] + d / 2 - rd / 2, at[1][1] - d / 2 - rd / 2 - 9 * s, rd};
-		for (int i = 0; i < 4; i++) if (dist(mx, my, at[i][0], at[i][1]) <= at[i][2] / 2F) mainAt = i;
-		// The question, in a pill beside RUN (above FIGHT and POKéMON).
-		String q = "What will " + (mon == null ? "you" : mon.name()) + " do?";
-		int qh = 16 * s, qw = Ui.width(font, q, s) + 18 * s, qx = at[3][0] - rd / 2 - 6 * s - qw, qy = at[3][1] - qh / 2;
-		Ui.rr(g, qx + s * 0.6F, qy + 1.5F * s, qw, qh, qh / 2F, 0x50000000);
-		Ui.rr(g, qx, qy, qw, qh, qh / 2F, 0xFF8FF5C0);
-		Ui.rr(g, qx + 1.5F * s, qy + 1.5F * s, qw - 3 * s, qh - 3 * s, qh / 2F - 1.5F * s, 0xF0123C38);
-		Ui.text(g, font, q, qx + 9 * s, qy + 4 * s, 0xFFFFFFFF, s);
-		String[] names = {"FIGHT", "BAG", "POKéMON", "RUN"};
-		// The others first, the picked one last (on top).
-		for (int pass = 0; pass < 2; pass++) {
-			for (int i = 0; i < 4; i++) {
-				boolean on = i == mainAt;
-				if (on != (pass == 1)) continue;
-				boolean dim = i == 3 && !kind.equals("WILD");
-				float grow = on ? 1.12F + 0.02F * (float) Math.sin(ticks * 0.3) : 1F;
-				int size = Math.round(at[i][2] * grow), cx = at[i][0], cy = at[i][1];
-				Ui.pic(g, BUTTONS[i], cx - size / 2, cy - size / 2, size, size, 256, 256, dim ? 0xFF8A8F99 : on ? 0xFFFFFFFF : 0xFFE4E4E4);
-				int ts = i == 3 ? Math.max(1, s) : s;
-				int tw = Ui.boldWidth(font, names[i], ts);
-				Ui.draw(g, font, Ui.bold(names[i]), cx - tw / 2, cy - 4 * ts, dim ? 0xFFD0D0D0 : 0xFFFFFFFF, ts, true);
-				int idx = i;
-				hit(cx - size / 2, cy - size / 2, size, size, () -> pickMain(idx));
-				if (on) {
-					int ps = 13 * s, bob = (int) (Math.sin(ticks * 0.35) * 2 * s);
-					Ui.pic(g, POINTER, cx - size / 2 - ps - 2 * s + bob, cy - ps / 2, ps, ps, 64, 64, 0xFFFFFFFF);
-				}
+		String[] names = {"FIGHT", "BAG", "POKéMON", "RUN"}, icons = {"cmd_fight", "cmd_bag", "cmd_pokemon", "cmd_run"};
+		int[] colours = {0xFFE5525C, 0xFFE9A830, 0xFF36B07A, 0xFF4A8FE0};
+		float X = 948, W = 300;
+		float[][] at = {{404, 80}, {566, 62}, {494, 62}, {638, 62}};
+		for (int i = 0; i < 4; i++) if (vover(X - 14, at[i][0], W + 14, at[i][1])) mainAt = i;
+		// The question, right-aligned over the stack.
+		String q = "What will " + (mon == null ? "you" : Look.text(mon.name())) + " do?";
+		float qw = V.width(q, 19, true) + 44;
+		V.panel(g, X + W - qw, 330, qw, 46, 23, true);
+		V.draw(g, V.rich(q, true, V.TEXT), X + W - qw + 22, 341, 19, V.TEXT, false);
+		for (int i = 0; i < 4; i++) {
+			boolean on = i == mainAt, big = i == 0, dim = i == 3 && !kind.equals("WILD");
+			float y = at[i][0], hh = at[i][1], x = X - (on ? 14 : 0);
+			int c = colours[i];
+			if (dim) c = Ui.mix(c, 0xFF707680, 0.6F);
+			if (!on) c = Ui.mix(c, 0xFF000000, 0.08F);
+			V.rr(g, x, y + 6, W, hh, hh / 2, Ui.darker(c, 0.55F));
+			V.rr(g, x, y + 12, W, hh, hh / 2, 0x30000000);
+			V.rr(g, x, y, W, hh, hh / 2, on ? V.CREAM : 0xE6FFFFFF);
+			V.rrv(g, x + 3, y + 3, W - 6, (hh - 6) * 0.48F + 1, (hh - 6) / 2, Ui.lighter(c, 0.18F), c);
+			V.rrv(g, x + 3, y + 3 + (hh - 6) * 0.48F, W - 6, (hh - 6) * 0.52F, (hh - 6) / 2, c, Ui.darker(c, 0.78F));
+			V.rrv(g, x + 10, y + 4, W - 20, (hh - 6) * 0.42F, (hh - 6) * 0.21F, 0x59FFFFFF, 0x00FFFFFF);
+			float ir = big ? 56 : 44, ix = x + (big ? 12 : 10);
+			V.rr(g, ix, y + (hh - ir) / 2, ir, ir, ir / 2, Ui.darker(c, 0.7F));
+			float is = big ? 40 : 30;
+			V.icon(g, icons[i], ix + (ir - is) / 2, y + (hh - is) / 2, is);
+			float ts = big ? 32 : 24;
+			V.text(g, names[i], ix + ir + 14, y + (hh - ts * 1.15F) / 2 + 2, ts, Ui.darker(c, 0.55F), true);
+			V.text(g, names[i], ix + ir + 14, y + (hh - ts * 1.15F) / 2, ts, 0xFFFFFFFF, true);
+			int idx = i;
+			vhit(x, y, W, hh, () -> pickMain(idx));
+			if (on) {
+				float bob = (float) Math.sin(ticks * 0.45) * 3.5F - 3.5F;
+				V.tri(g, X - 54 + 18 + bob, y + hh / 2 + 2, 30, 0, 0x4D000000);
+				V.tri(g, X - 54 + 18 + bob, y + hh / 2, 30, 0, V.INK);
+				V.tri(g, X - 54 + 18 + bob - 1, y + hh / 2, 22, 0, V.CREAM);
 			}
 		}
 	}
@@ -1047,59 +1042,88 @@ public class BattleScreen extends GameScreen {
 		return k == 0 ? "No effect" : k > 1 ? "Super effective" : k < 1 ? "Not very effective" : "Effective";
 	}
 
+	/** What a move does, in a few words (the Creature Viewer's move library). */
+	private static Map<String, String> moveText;
+
+	private static String moveDesc(String id) {
+		if (moveText == null) {
+			moveText = new java.util.HashMap<>();
+			for (String[] r : Species.table("move_desc.tsv")) if (r.length > 1 && !r[0].startsWith("#")) moveText.put(r[0].trim(), r[1]);
+		}
+		return moveText.getOrDefault(id, "");
+	}
+
+	/**
+	 * The moves, as the UI Viewer has them: four pills at the right (the type's colour fading into teal; the one
+	 * you're on cream), each with its type, name and PP; above them a panel with what the picked one is: its type and
+	 * kind, how it'll do against theirs, its power and accuracy, and what it does.
+	 */
 	private void drawFight(GuiGraphics g, int m, int by, int bh) {
 		Mon mon = me();
 		if (mon == null) return;
-		int cw = 170 * s, ph = 22 * s, gap = 4 * s, n = mon.moves.size();
-		int x0 = width - m - cw - 7 * s, y0 = by + bh - 4 * ph - 3 * gap;
+		int n = mon.moves.size();
+		float X = 830, W = 410, Y = 420;
 		for (int i = 0; i < 4; i++) {
-			int y = y0 + i * (ph + gap);
+			float y = Y + i * 58;
 			if (i >= n) {
-				Ui.slab(g, x0, y, cw, ph, 0x60202A40, 0x60101626, 7 * s, 0, 0);
-				Ui.centred(g, font, "-", x0 + cw / 2, y + (ph - 8 * s) / 2, Ui.DIM, s, false);
+				V.pill(g, X, y, W, 48, 0x60123C38);
+				V.centred(g, "-", X + W / 2, y + 12, 21, V.DIM, true);
 				continue;
 			}
 			Move mv = Move.get(mon.moves.get(i));
-			int idx = i;
-			if (over(x0 - 12 * s, y, cw + 19 * s, ph)) fightAt = i;
+			if (vover(X, y, W, 48)) fightAt = i;
 			boolean on = i == fightAt;
-			int x = x0 - (on ? 12 * s : 0);
 			int col = Ui.typeColor(mv.type()), pp = mon.pp.get(i);
-			bigBar(g, x, y, cw, ph, col, on, pp == 0);
-			// The type on a white tag, the move's name, its PP.
-			String type = mv.type().label.toUpperCase();
-			int tw = Math.max(40 * s, Ui.boldWidth(font, type, s) + 10 * s), th = ph - 8 * s;
-			Ui.rr(g, x + 6 * s, y + 4 * s, tw, th, th / 2F, 0xF0FFFFFF);
-			Ui.draw(g, font, Ui.bold(type), x + 6 * s + (tw - Ui.boldWidth(font, type, s)) / 2, y + 4 * s + (th - 8 * s) / 2 + s / 2, Ui.darker(col, 0.8F), s, false);
-			Ui.draw(g, font, Ui.bold(mv.name()), x + tw + 12 * s, y + (ph - 8 * s) / 2, 0xFFFFFFFF, s, true);
-			String ppText = pp + "/" + mv.pp();
-			int ppc = pp == 0 ? 0xFFFF9A9A : pp * 4 <= mv.pp() ? 0xFFFFE08A : 0xFFFFFFFF;
-			int px = x + cw + 2 * s - Ui.boldWidth(font, ppText, s);
-			Ui.draw(g, font, Ui.bold(ppText), px, y + (ph - 8 * s) / 2, ppc, s, true);
-			Ui.draw(g, font, Ui.ui("PP"), px - Ui.width(font, "PP", s) - 3 * s, y + (ph - 8 * s) / 2, 0xD0FFFFFF, s, true);
-			hit(x, y, cw + 7 * s, ph, () -> pickMove(idx));
-		}
-		// What the picked move is, in a panel above the moves: its type and kind, how it'll do, power and accuracy.
-		int ih = 36 * s, ix = x0 - 12 * s, iw = cw + 19 * s, iy = y0 - ih - 7 * s;
-		Move sel = fightAt < n ? Move.get(mon.moves.get(fightAt)) : null;
-		messageBar(g, ix, iy, iw, ih, "", false);
-		if (sel != null) {
-			String type = sel.type().label.toUpperCase();
-			int cx = ix + 9 * s;
-			cx += Ui.chip(g, font, type, cx, iy + 6 * s, Ui.typeColor(sel.type()), s) + 4 * s;
-			String cat = sel.power() <= 0 ? "STATUS" : sel.type().special() ? "SPECIAL" : "PHYSICAL";
-			cx += Ui.chip(g, font, cat, cx, iy + 6 * s, 0xFF4A5578, s) + 6 * s;
-			String eff = effectiveness(sel);
-			if (eff != null) {
-				int ec = eff.equals("Super effective") ? 0xFF5CD65C : eff.equals("No effect") ? 0xFFEF4F4F : eff.equals("Effective") ? Ui.MUTED : 0xFFF2C744;
-				Ui.text(g, font, eff, cx, iy + 7 * s, ec, s);
+			if (on) {
+				V.pill(g, X - 3, y - 3, W + 6, 54, 0x59FFF4D8);
+				V.pill(g, X, y, W, 48, 0xFFFFFFFF);
+				V.pill(g, X + 3, y + 3, W - 6, 42, V.CREAM);
+			} else {
+				V.pill(g, X, y, W, 48, 0x668FF5C0);
+				// The type's colour fading into teal by the middle.
+				V.pill(g, X + 3, y + 3, W - 6, 42, 0xF2123C38);
+				float fw = (W - 6) * 0.6F;
+				for (int k = 0; k < 24; k++) {
+					float t0 = k / 24F;
+					V.rr(g, X + 3 + fw * t0, y + 3, fw / 24 + 1, 42, k == 0 ? 21 : 0, Ui.mix(col, 0xF2123C38, t0));
+				}
+				V.rr(g, X + 3, y + 3, 42, 42, 21, col);
 			}
-			String stats = "POWER " + (sel.power() <= 1 ? "-" : sel.power()) + "   ACCURACY " + (sel.accuracy() <= 0 ? "-" : sel.accuracy());
-			Ui.text(g, font, stats, ix + 9 * s, iy + 21 * s, Ui.MUTED, s);
+			String type = mv.type().label.toUpperCase();
+			String t3 = type.length() > 3 ? type.substring(0, 3) : type;
+			float tw = Math.max(44, V.width(t3, 11, true) + 16);
+			V.pill(g, X + 10, y + 13, tw, 22, col);
+			V.text(g, t3, X + 10 + (tw - V.width(t3, 11, true)) / 2, y + 17, 11, 0xFFFFFFFF, true);
+			int tc = on ? V.INK : 0xFFFFFFFF;
+			V.text(g, mv.name(), X + 10 + tw + 12, y + 11, 21, tc, true);
+			String ppText = pp + "/" + mv.pp();
+			V.right(g, ppText, X + W - 18, y + 11, 21, pp == 0 ? 0xFFFF7A7A : on ? V.INK : pp * 4 <= mv.pp() ? 0xFFFFE08A : 0xFFFFFFFF, true);
+			int idx = i;
+			vhit(X, y, W, 48, () -> pickMove(idx));
 		}
-		int back = 40 * s, bx = ix + iw - back - 6 * s, bby = iy + ih - 17 * s;
-		Ui.button(g, font, bx, bby, back, 13 * s, "BACK", 0xFF5A6070, over(bx, bby, back, 13 * s), s);
-		hit(bx, bby, back, 13 * s, () -> mode = Mode.MAIN);
+		// What the picked move is.
+		Move sel = fightAt < n ? Move.get(mon.moves.get(fightAt)) : null;
+		if (sel != null) {
+			String desc = moveDesc(sel.id());
+			List<String> dl = desc.isEmpty() ? List.of() : V.wrap(desc, W - 40, 17, true);
+			float ih = 14 + 28 + 8 + 26 + (dl.isEmpty() ? 0 : 6 + dl.size() * 23) + 14, iy = Y - 10 - ih;
+			V.panel(g, X, iy, W, ih);
+			String type = sel.type().label.toUpperCase();
+			float cx = X + 20;
+			cx += V.type(g, type, Ui.typeColor(sel.type()), cx, iy + 14, 92, 13.5F) + 10;
+			String cat = sel.power() <= 0 ? "STATUS" : sel.type().special() ? "SPECIAL" : "PHYSICAL";
+			V.label(g, cat, cx, iy + 20);
+			String eff = effectiveness(sel);
+			if (eff != null) V.right(g, eff, X + W - 20, iy + 17, 15, eff.equals("Super effective") ? 0xFF8FF5C0 : eff.equals("No effect") || eff.startsWith("Not") ? 0xFFFFB3B8 : V.MUTED, true);
+			float sy = iy + 14 + 28 + 8;
+			V.label(g, "Power", X + 20, sy + 5);
+			V.text(g, sel.power() <= 1 ? "-" : String.valueOf(sel.power()), X + 20 + V.labelWidth("Power") + 8, sy, 18, V.TEXT, true);
+			float ax = X + 20 + V.labelWidth("Power") + 8 + V.width("000", 18, true) + 22;
+			V.label(g, "Accuracy", ax, sy + 5);
+			V.text(g, sel.accuracy() <= 0 ? "-" : String.valueOf(sel.accuracy()), ax + V.labelWidth("Accuracy") + 8, sy, 18, V.TEXT, true);
+			for (int i = 0; i < dl.size(); i++) V.text(g, dl.get(i), X + 20, sy + 32 + i * 23, 17, 0xFFE8F4EF, true);
+		}
+		V.hints(g, "A", "Use", "B", "Back");
 	}
 
 	/**
@@ -1194,7 +1218,14 @@ public class BattleScreen extends GameScreen {
 			Ui.centred(g, font, chance >= 0.5F ? "Easy" : chance >= 0.25F ? "Fair" : chance >= 0.1F ? "Hard" : "Very hard", c[0], c[1] + r + 6 * s, col, s, true);
 		}
 		Item it = Item.find(aimBall);
-		messageBar(g, barX, by, width - m - barX, bh, "Throw the " + (it == null ? "BALL" : it.name()) + "!   A or click: throw.   B: back.", false);
+		float tw = V.width("Press  or click to throw!", 22, true) + V.width("SPACE", 14, true) + 14 + 44;
+		V.panel(g, 640 - tw / 2, 96, tw, 52, 26, false);
+		float tx = 640 - tw / 2 + 22;
+		V.text(g, "Press", tx, 108, 22, V.TEXT, true);
+		tx += V.width("Press ", 22, true);
+		tx += V.key(g, "SPACE", tx, 108, 28) + 6;
+		V.text(g, "or click to throw!", tx, 108, 22, V.TEXT, true);
+		V.hints(g, "A", "Throw " + (it == null ? "BALL" : it.name()), "B", "Back");
 	}
 
 	private static Map<String, String> itemText;

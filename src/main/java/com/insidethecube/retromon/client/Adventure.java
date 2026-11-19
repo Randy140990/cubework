@@ -229,6 +229,11 @@ public final class Adventure {
 		return true;
 	}
 
+	/** A town's or route's line from its sign (Pallet Town: "Shades of your journey await!"), or "". */
+	public static String signLine(String place) {
+		return SIGNS.getOrDefault(place, "");
+	}
+
 	/** The signs of the games' towns and routes (read from a shelf standing in for a sign). */
 	private static final java.util.Map<String, String> SIGNS = java.util.Map.ofEntries(java.util.Map.entry("PALLET TOWN", "Shades of your journey await!"),
 			java.util.Map.entry("ROUTE 1", "PALLET TOWN - VIRIDIAN CITY"), java.util.Map.entry("VIRIDIAN CITY", "The Eternally Green Paradise"),

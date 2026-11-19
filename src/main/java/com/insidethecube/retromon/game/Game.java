@@ -1482,6 +1482,9 @@ public final class Game {
 		if (!rival.isEmpty() && (!d.started || d.rival.isEmpty())) d.rival = rival;
 		String g = t.getStringOr("gender", "");
 		if (g.equals("boy") || g.equals("girl")) d.gender = g;
+		// How you made yourself in the new game's maker (skin, eyes, hair, clothes).
+		String o = t.getStringOr("outfit", "");
+		if (!o.isEmpty() && o.length() <= 200 && (!d.started || d.outfit.isEmpty())) d.outfit = o;
 		sync(p);
 	}
 
