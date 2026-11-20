@@ -257,7 +257,7 @@ function ballIcon(n) {
   const [top, mark, bot] = BALL_LOOK[n] || BALL_LOOK["POKé BALL"];
   return `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="${bot || "#F4F6F5"}"/><path d="M8 32a24 24 0 0 1 48 0z" fill="${top}"/>${mark}<path d="M16 15q6-5 13-6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".45"/><rect x="8" y="29" width="48" height="6" fill="#26304A"/><circle cx="32" cy="32" r="8" fill="#26304A"/><circle cx="32" cy="32" r="4.5" fill="#fff"/><circle cx="32" cy="32" r="24" fill="none" stroke="#26304A" stroke-width="2.5"/></svg>`;
 }
-const ITEM_ICON = n => /PARCEL/.test(n) ? ICON.parcel : /BALL/.test(n) ? ballIcon(n) : /POTION|HEAL|ANTIDOTE|AWAKENING/.test(n) ? ICON.potion : /^TM|^HM/.test(n) ? ICON.disc : /MAP/.test(n) ? ICON.map : /ROPE|REPEL/.test(n) ? ICON.bag : ICON.key;
+const ITEM_ICON = n => /PARCEL/.test(n) ? ICON.parcel : typeof ITEM_ART !== "undefined" && ITEM_ART[itemSlug(n)] ? ITEM_ART[itemSlug(n)] : /BALL/.test(n) ? ballIcon(n) : /POTION|HEAL|ANTIDOTE|AWAKENING/.test(n) ? ICON.potion : /^TM|^HM/.test(n) ? ICON.disc : /MAP/.test(n) ? ICON.map : /ROPE|REPEL/.test(n) ? ICON.bag : ICON.key;
 // Each sort of thing's colours in a list (light, middle, deep), as the menu's big buttons; the game's V.GOODS.
 const GOODS = { ball: ["#F27682", "#D94452", "#AE2E3C"], med: ["#6BDCA2", "#39B27A", "#22855A"], tm: ["#8EC4F6", "#4A8FE0", "#2F64B0"], key: ["#FFD27A", "#F0A030", "#C87818"], field: ["#C6AEF4", "#8A62D8", "#6440B0"] };
 const ITEM_KIND = n => /BALL/.test(n) ? "ball" : /POTION|HEAL|ANTIDOTE|AWAKENING|REVIVE|ETHER|ELIXIR/.test(n) ? "med" : /^TM|^HM/.test(n) ? "tm" : /ROPE|REPEL/.test(n) ? "field" : "key";
@@ -388,7 +388,7 @@ function choiceBox(items, o = {}) {
   let sel = o.sel || 0;
   const rows = items.map((it, i) => {
     const t = typeof it === "string" ? { label: it } : it;
-    const r = t.goods ? h("div", "g-goodswrap", goodsRow(t.goods, t.right)) : h("div", "g-item" + (t.off ? " off" : ""), `<span>${rich(T(t.label))}</span>${t.right != null ? `<span class="r">${t.right}</span>` : ""}`);
+    const r = t.goods ? h("div", "g-goodswrap", goodsRow(t.goods, t.right)) : h("div", "g-item" + (t.off ? " off" : ""), `${t.pic ? pic(t.pic, 36, "margin:-6px 0 -6px -8px") : ""}<span>${rich(T(t.label))}</span>${t.right != null ? `<span class="r">${t.right}</span>` : ""}`);
     r.addEventListener("mouseenter", () => { sel = i; paint(); if (o.onMove) o.onMove(sel); });
     r.addEventListener("click", e => { e.stopPropagation(); sel = i; paint(); pick(); });
     list.appendChild(r); return r;

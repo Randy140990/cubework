@@ -122,7 +122,7 @@ def main():
     page, out = sys.argv[1], sys.argv[2]
     head = open(os.path.join(HERE, "uiviewer", "head.html")).read()
     shared = [os.path.join(HERE, "interior", n) for n in ("tex.js", "world.js", "figure.js", "creature.js", "rooms.js")]
-    own = [os.path.join(HERE, "uiviewer", n) for n in ("lang.js", "ui.js", "faces.js", "scenes.js", "screens1.js", "screens2.js", "screens3.js", "roster", "screens4.js", "main.js")]
+    own = [os.path.join(HERE, "uiviewer", n) for n in ("lang.js", "ui.js", "items.js", "faces.js", "scenes.js", "screens1.js", "screens2.js", "screens3.js", "roster", "screens4.js", "main.js")]
     def src(p):
         # The Person Viewer's roster (everyone in the mod), wrapped so its names don't clash: the cast screens show the same people.
         if p.endswith("roster"):

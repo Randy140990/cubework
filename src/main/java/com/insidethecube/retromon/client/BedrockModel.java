@@ -313,7 +313,8 @@ public final class BedrockModel {
 		}
 		apply(pd != null ? pd.anim() : def.idle, seconds, true);
 		Anim one = action == null ? null : def.actions.get(action);
-		if (one != null && actionSeconds >= 0 && actionSeconds <= one.length) apply(one, actionSeconds, false);
+		// (A faint holds its last frame: it stays down.)
+		if (one != null && actionSeconds >= 0 && (actionSeconds <= one.length || "faint".equals(action))) apply(one, actionSeconds, false);
 	}
 
 	private void visibility(List<JsonObject> list) {

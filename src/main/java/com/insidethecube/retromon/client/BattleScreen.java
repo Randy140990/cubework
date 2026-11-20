@@ -711,12 +711,15 @@ public class BattleScreen extends GameScreen {
 				}
 			}
 			case PARTY, BAG_TARGET -> {
-				int n = mine.size();
+				int n = mine.size(), rows = n + (forced ? 0 : 1);
 				if (n == 0) return true;
-				if (Ui.isB(e) && shifting && mode == Mode.PARTY) mode = Mode.ASK;
-				else if (Ui.isB(e) && !forced) mode = mode == Mode.BAG_TARGET ? Mode.BAG : Mode.MAIN;
-				else if (Ui.isUp(e) || Ui.isLeft(e)) partyAt = Math.floorMod(partyAt - 1, n);
-				else if (Ui.isDown(e) || Ui.isRight(e)) partyAt = Math.floorMod(partyAt + 1, n);
+				boolean cancel = Ui.isB(e) || Ui.isA(e) && partyAt >= n;
+				if (cancel && shifting && mode == Mode.PARTY) mode = Mode.ASK;
+				else if (cancel && !forced) {
+					Sounds.press();
+					mode = mode == Mode.BAG_TARGET ? Mode.BAG : Mode.MAIN;
+				} else if (Ui.isUp(e) || Ui.isLeft(e)) partyAt = Math.floorMod(partyAt - 1, rows);
+				else if (Ui.isDown(e) || Ui.isRight(e)) partyAt = Math.floorMod(partyAt + 1, rows);
 				else if (Ui.isA(e)) pickParty(partyAt);
 			}
 			case ASK -> {
@@ -889,7 +892,7 @@ public class BattleScreen extends GameScreen {
 		int by = height - bh - m;
 		// The plates (the UI Viewer's): theirs at the top right, yours at the bottom left, the party's balls above each.
 		// Out of the way while the bag or your party is up.
-		boolean plates = mode != Mode.BAG && mode != Mode.PARTY && mode != Mode.BAG_TARGET;
+		boolean plates = mode != Mode.AIM && mode != Mode.HOLD;
 		if (them.shown && plates) plate(g, them, false);
 		if (me.shown && plates) plate(g, me, true);
 		if (moneyAt >= 0) moneyBox(g, partial);
@@ -1198,7 +1201,7 @@ public class BattleScreen extends GameScreen {
 			if (dim) c = Ui.mix(c, 0xFF707680, 0.6F);
 			if (!on) c = Ui.mix(c, 0xFF000000, 0.08F);
 			V.rr(g, x, y + 6, W, hh, hh / 2, Ui.darker(c, 0.55F));
-			V.rr(g, x, y + 12, W, hh, hh / 2, 0x30000000);
+			V.softShadow(g, x, y + 12, W, hh, 22, 0x4D000000);
 			V.rr(g, x, y, W, hh, hh / 2, on ? V.CREAM : 0xE6FFFFFF);
 			// The button's face in one piece (as two halves, each rounded, it showed notches at both ends).
 			V.rrStops(g, x + 3, y + 3, W - 6, hh - 6, (hh - 6) / 2, new float[] {0, 0.48F, 1}, new int[] {Ui.lighter(c, 0.18F), c, Ui.darker(c, 0.78F)});
@@ -1258,133 +1261,96 @@ public class BattleScreen extends GameScreen {
 		Mon mon = me();
 		if (mon == null) return;
 		int n = mon.moves.size();
-		float X = 830, W = 410, Y = 420;
-		for (int i = 0; i < 4; i++) {
-			float y = Y + i * 58;
-			if (i >= n) {
-				V.pill(g, X, y, W, 48, 0x60123C38);
-				V.centred(g, "-", X + W / 2, y + 12, 21, V.DIM, true);
-				continue;
-			}
+		// Rows 50.6 tall (3px rim, 8px padding, a 21px line), 10 apart, from 420 down; the card above from 230.
+		float X = 830, W = 410, Y = 420, RH = 50.6F, STEP = 60.6F;
+		for (int i = 0; i < n; i++) {
+			float y = Y + i * STEP;
 			Move mv = Move.get(mon.moves.get(i));
-			if (vover(X, y, W, 48)) fightAt = i;
+			if (vover(X, y, W, RH)) fightAt = i;
 			boolean on = i == fightAt;
 			int col = Ui.typeColor(mv.type()), pp = mon.pp.get(i);
 			if (on) {
-				V.pill(g, X - 3, y - 3, W + 6, 54, 0x59FFF4D8);
-				V.pill(g, X, y, W, 48, 0xFFFFFFFF);
-				V.pill(g, X + 3, y + 3, W - 6, 42, V.CREAM);
+				// Pale cream with a white rim.
+				V.pill(g, X, y, W, RH, 0xFFFFFFFF);
+				V.pill(g, X + 3, y + 3, W - 6, RH - 6, 0xFFFFF4D8);
 			} else {
-				V.pill(g, X, y, W, 48, 0x668FF5C0);
-				// The type's colour fading into teal by the middle.
-				V.pill(g, X + 3, y + 3, W - 6, 42, 0xF2123C38);
-				float fw = (W - 6) * 0.6F;
-				for (int k = 0; k < 24; k++) {
-					float t0 = k / 24F;
-					V.rr(g, X + 3 + fw * t0, y + 3, fw / 24 + 1, 42, k == 0 ? 21 : 0, Ui.mix(col, 0xF2123C38, t0));
-				}
-				V.rr(g, X + 3, y + 3, 42, 42, 21, col);
+				// The type's colour fading into deep teal six tenths along, under a see-through mint rim (3px).
+				int[] cols = {col, 0xF2123C38, 0xF2123C38};
+				V.rrh(g, X, y, W, RH, RH / 2, new float[] {0, 0.6F, 1}, cols);
+				V.pill(g, X, y, W, RH, 0x668FF5C0);
+				V.rrh(g, X + 3, y + 3, W - 6, RH - 6, (RH - 6) / 2, new float[] {0, (0.6F * W - 3) / (W - 6), 1}, cols);
 			}
+			// Its type's first three letters on a chip (g-type: 11px, 1px apart, 44 wide at least), its name, its PP.
 			String type = mv.type().label.toUpperCase();
 			String t3 = type.length() > 3 ? type.substring(0, 3) : type;
-			float tw = Math.max(44, V.width(t3, 11, true) + 16);
-			V.pill(g, X + 10, y + 13, tw, 22, col);
-			V.text(g, t3, X + 10 + (tw - V.width(t3, 11, true)) / 2, y + 17, 11, 0xFFFFFFFF, true);
+			float tw = V.trackedWidth(t3, 11, 1), cw = Math.max(44, tw + 16), ch = 19, cy = y + (RH - ch) / 2;
+			V.pill(g, X + 13, cy, cw, ch, col);
+			V.tracked(g, t3, X + 13 + (cw - tw) / 2, V.capsTop(cy + ch / 2, 11), 11, 0xFFFFFFFF, 1);
 			int tc = on ? V.INK : 0xFFFFFFFF;
-			V.text(g, mv.name(), X + 10 + tw + 12, y + 11, 21, tc, true);
-			String ppText = pp + "/" + mv.pp();
-			V.right(g, ppText, X + W - 18, y + 11, 21, pp == 0 ? 0xFFFF7A7A : on ? V.INK : pp * 4 <= mv.pp() ? 0xFFFFE08A : 0xFFFFFFFF, true);
+			float ty = V.capsTop(y + RH / 2, 21);
+			V.text(g, mv.name(), X + 13 + cw + 12, ty, 21, tc, true);
+			V.right(g, pp + "/" + mv.pp(), X + W - 21, ty, 21, tc, true);
 			int idx = i;
-			vhit(X, y, W, 48, () -> pickMove(idx));
+			vhit(X, y, W, RH, () -> pickMove(idx));
 		}
-		// What the picked move is.
+		// What the picked move is: its type and kind, how it'll do against theirs, its power and accuracy, what it does.
 		Move sel = fightAt < n ? Move.get(mon.moves.get(fightAt)) : null;
 		if (sel != null) {
 			String desc = moveDesc(sel.id());
-			List<String> dl = desc.isEmpty() ? List.of() : V.wrap(desc, W - 40, 17, true);
-			float ih = 14 + 28 + 8 + 26 + (dl.isEmpty() ? 0 : 6 + dl.size() * 23) + 14, iy = Y - 10 - ih;
+			List<String> dl = desc.isEmpty() ? List.of() : V.wrap(desc, W - 46, 17, true);
+			float iy = 230, r1 = 24.4F, r2 = 24.5F, ln = 23.2F;
+			float ih = 3 + 14 + r1 + 8 + r2 + (dl.isEmpty() ? 0 : 6 + dl.size() * ln) + 14 + 3;
 			V.panel(g, X, iy, W, ih);
+			float cx = X + 23, top = iy + 17, mid = top + r1 / 2;
 			String type = sel.type().label.toUpperCase();
-			float cx = X + 20;
-			cx += V.type(g, type, Ui.typeColor(sel.type()), cx, iy + 14, 92, 13.5F) + 10;
+			cx += V.type(g, type, Ui.typeColor(sel.type()), cx, mid - 13.5F * 1.75F / 2, 92, 13.5F) + 10;
 			String cat = sel.power() <= 0 ? "STATUS" : sel.type().special() ? "SPECIAL" : "PHYSICAL";
-			V.label(g, cat, cx, iy + 20);
+			V.label(g, cat, cx, V.capsTop(mid, 13));
 			String eff = effectiveness(sel);
-			if (eff != null) V.right(g, eff, X + W - 20, iy + 17, 15, eff.equals("Super effective") ? 0xFF8FF5C0 : eff.equals("No effect") || eff.startsWith("Not") ? 0xFFFFB3B8 : V.MUTED, true);
-			float sy = iy + 14 + 28 + 8;
-			V.label(g, "Power", X + 20, sy + 5);
-			V.text(g, sel.power() <= 1 ? "-" : String.valueOf(sel.power()), X + 20 + V.labelWidth("Power") + 8, sy, 18, V.TEXT, true);
-			float ax = X + 20 + V.labelWidth("Power") + 8 + V.width("000", 18, true) + 22;
-			V.label(g, "Accuracy", ax, sy + 5);
-			V.text(g, sel.accuracy() <= 0 ? "-" : String.valueOf(sel.accuracy()), ax + V.labelWidth("Accuracy") + 8, sy, 18, V.TEXT, true);
-			for (int i = 0; i < dl.size(); i++) V.text(g, dl.get(i), X + 20, sy + 32 + i * 23, 17, V.TEXT, true);
+			if (eff != null) V.right(g, eff, X + W - 23, V.capsTop(mid, 15), 15, eff.equals("Super effective") ? 0xFF8FF5C0 : eff.equals("No effect") || eff.startsWith("Not") ? 0xFFFFB3B8 : 0xFFA9D4C6, true);
+			float m2 = top + r1 + 8 + r2 / 2, vy = V.capsTop(m2, 18), ly = V.capsTop(m2, 13);
+			V.label(g, "Power", X + 23, ly);
+			float px = X + 23 + V.labelWidth("Power") + V.width(" ", 18, true);
+			String pw = sel.power() <= 1 ? "-" : String.valueOf(sel.power());
+			V.text(g, pw, px, vy, 18, V.TEXT, true);
+			float ax = px + V.width(pw, 18, true) + 22;
+			V.label(g, "Accuracy", ax, ly);
+			V.text(g, sel.accuracy() <= 0 ? "-" : String.valueOf(sel.accuracy()), ax + V.labelWidth("Accuracy") + V.width(" ", 18, true), vy, 18, V.TEXT, true);
+			float dy = top + r1 + 8 + r2 + 6;
+			for (int i = 0; i < dl.size(); i++) V.text(g, dl.get(i), X + 23, V.capsTop(dy + i * ln + ln / 2, 17), 17, V.TEXT, true);
 		}
-		V.hints(g, "A", "Use", "B", "Back");
 	}
 
 	/**
-	 * Your Pokémon in battle (Let's Go): a column of slanted plates (picture, name, level, HP, status; the one in
-	 * battle marked), the picked one sliding out, and on the right that one in 3D on a stand with its types and moves.
+	 * Your POKéMON in battle, as the UI Viewer's: the stage faded behind, a list in a panel at the bottom right (each
+	 * one's picture, name and level; the fainted ones greyed), CANCEL at its foot unless you must pick one. When it's
+	 * for an item, or you must send one out, what for in a pill over it.
 	 */
 	private void drawParty(GuiGraphics g, int m, int by, int bh) {
-		int top = m + height / 14, bottom = by - 6 * s;
-		int n = mine.size(), gap = 3 * s, ph = Math.min(30 * s, (bottom - top - gap * 5) / 6), pw = Math.min(176 * s, (width - 2 * m) / 2);
-		partyAt = Math.max(0, Math.min(partyAt, Math.max(0, n - 1)));
-		for (int i = 0; i < n; i++) {
-			Mon mon = mine.get(i);
-			int y = top + i * (ph + gap);
-			int idx = i;
-			if (over(m, y, pw + 10 * s, ph)) partyAt = i;
-			boolean on = i == partyAt, out = i == active, down = mon.fainted();
-			int x = m + (on ? 10 * s : 0);
-			int c1 = down ? 0xF04A2430 : on ? 0xFFFFF4D8 : 0xF0263252, c2 = down ? 0xF02A141C : on ? 0xFFF0DFB4 : 0xF0121A2E;
-			Ui.slab(g, x + s, y + 2 * s, pw, ph, 0x50000000, 0x50000000, 6 * s, 0, 0);
-			Ui.slab(g, x, y, pw, ph, c1, c2, 6 * s, on ? 0xFFFFFFFF : 0x40FFFFFF, on ? s : Math.max(1, s / 2));
-			Ui.portrait(g, mon.species.id(), x + 5 * s, y + s, ph - 2 * s);
-			int tx = x + ph + 6 * s, ink = on ? Ui.CREAM_INK : Ui.TEXT;
-			Ui.draw(g, font, Ui.bold(mon.name()), tx, y + 4 * s, ink, s, false);
-			String lv = "Lv" + mon.level;
-			Ui.draw(g, font, Ui.ui(lv), x + pw - 6 * s - Ui.width(font, lv, s), y + 4 * s, on ? 0xFF7A6A40 : Ui.GOLD, s, false);
-			float frac = mon.hp / Math.max(1F, mon.maxHp());
-			int hx = tx, hw = pw - (tx - x) - 54 * s;
-			Ui.bar(g, hx, y + ph - 10 * s, hw, 4 * s, frac, Ui.hpColor(frac), s);
-			String hp = mon.hp + "/" + mon.maxHp();
-			Ui.draw(g, font, Ui.ui(hp), x + pw - 6 * s - Ui.width(font, hp, s), y + ph - 12 * s, on ? 0xFF4A5068 : Ui.MUTED, s, false);
-			if (!mon.status.tag.isEmpty()) Ui.chip(g, font, mon.status.tag, tx + Ui.boldWidth(font, mon.name(), s) + 4 * s, y + 3 * s, Ui.statusColor(mon.status.tag), s);
-			if (out) Ui.chip(g, font, "IN BATTLE", x + pw - 54 * s, y + 3 * s, 0xFF4A8FE0, s);
-			hit(m, y, pw + 10 * s, ph, () -> pickParty(idx));
+		int n = mine.size(), rows = n + (forced ? 0 : 1);
+		g.fill(0, 0, width, height, 0x8C061A1E);
+		partyAt = Math.max(0, Math.min(partyAt, rows - 1));
+		float X = 800, W = 450, H = V.choiceHeight(rows), Y = V.H - 24 - H;
+		if (mode == Mode.BAG_TARGET || forced) {
+			String q = mode == Mode.BAG_TARGET ? "Use it on which POKéMON?" : "Bring out which POKéMON?";
+			float qw = V.width(q, 19, true) + 44, qy = Y - 14 - 46;
+			V.panel(g, X + W - qw, qy, qw, 46, 23, true);
+			V.text(g, q, X + W - qw + 22, V.capsTop(qy + 23, 19), 19, V.TEXT, true);
 		}
-		// The picked one, in 3D on a stand, with its types and moves.
-		if (partyAt < n) {
-			Mon mon = mine.get(partyAt);
-			int rx = m + pw + 22 * s, rw = width - m - rx, cx = rx + rw / 2;
-			int stand = Math.min(bottom - top - 60 * s, rw * 3 / 5), feet = top + 14 * s + stand;
-			Ui.glow(g, cx, feet - stand / 2, rw / 2, stand / 2 + 6 * s, 0x0CFFFFFF);
-			Ui.round(g, cx - rw / 3, feet - 5 * s, rw * 2 / 3, 10 * s, 0x90263252, 5 * s);
-			Ui.round(g, cx - rw / 4, feet - 3 * s, rw / 2, 6 * s, 0x60FFFFFF, 3 * s);
-			Figures.Batch b = Figures.batch(rx, top, width - m, bottom);
-			b.mon(mon.species.id(), cx, feet, stand * 0.8F).at((ticks) / 20F).pitch(8).facing(-20).spin((float) Math.sin(ticks / 30.0) * 12);
-			b.draw(g);
-			int ty = feet + 10 * s, chx = rx + 6 * s;
-			chx += Ui.chip(g, font, mon.species.type1().label.toUpperCase(), chx, ty, Ui.typeColor(mon.species.type1()), s) + 3 * s;
-			if (mon.species.type2() != null && mon.species.type2() != mon.species.type1())
-				Ui.chip(g, font, mon.species.type2().label.toUpperCase(), chx, ty, Ui.typeColor(mon.species.type2()), s);
-			int mw = (rw - 16 * s) / 2;
-			for (int i = 0; i < mon.moves.size(); i++) {
-				Move mv = Move.get(mon.moves.get(i));
-				int mx2 = rx + 6 * s + (i % 2) * (mw + 4 * s), my2 = ty + 14 * s + (i / 2) * 14 * s;
-				if (my2 + 12 * s > bottom) break;
-				int col = Ui.typeColor(mv.type());
-				Ui.slab(g, mx2, my2, mw - 4 * s, 12 * s, Ui.lighter(col, 0.1F), Ui.darker(col, 0.75F), 4 * s, 0, 0);
-				Ui.draw(g, font, Ui.ui(mv.name()), mx2 + 6 * s, my2 + 2 * s, 0xFFFFFFFF, s, true);
+		V.panel(g, X, Y, W, H);
+		for (int i = 0; i < rows; i++) {
+			float rx = X + 15, ry = Y + 15 + i * 54, rw = W - 30;
+			if (vover(rx, ry, rw, 46)) partyAt = i;
+			boolean on = i == partyAt;
+			if (i == n) {
+				V.item(g, "CANCEL", null, rx, ry, rw, 46, on, false, 21);
+				vhit(rx, ry, rw, 46, this::back);
+				continue;
 			}
-		}
-		String prompt = mode == Mode.BAG_TARGET ? "Use it on which POKéMON?" : forced ? "Bring out which POKéMON?" : "Choose a POKéMON.";
-		messageBar(g, m, by, width - 2 * m - (forced ? 0 : 50 * s), bh, prompt, false);
-		if (!forced) {
-			int back = 44 * s, bx = width - m - back;
-			Ui.button(g, font, bx, by, back, bh, "BACK", 0xFF5A6070, over(bx, by, back, bh), s);
-			hit(bx, by, back, bh, this::back);
+			Mon mon = mine.get(i);
+			V.itemPic(g, mon.species.id(), mon.name(), "Lv. " + mon.level, rx, ry, rw, 46, on, mon.fainted(), 21);
+			int idx = i;
+			vhit(rx, ry, rw, 46, () -> pickParty(idx));
 		}
 	}
 
@@ -1487,54 +1453,59 @@ public class BattleScreen extends GameScreen {
 		g.fill(0, 0, width, height, 0x8C061A1E);
 		float px = 190, py = 70, pw = 900, ph = 540;
 		V.panel(g, px, py, pw, ph);
-		V.icon(g, "icon_bag", px + 30, py + 20, 44);
-		V.text(g, "BAG", px + 86, py + 26, 30, V.TEXT, true);
-		String[] pockets = {"POKé BALLS", "MEDICINE"};
-		int[][] pc = {{0xFFF27682, 0xFFD94452, 0xFFB02E3C}, {0xFF6BDCA2, 0xFF39B27A, 0xFF22855A}};
+		// Inside the panel's rim (3px), as the viewer places them.
+		float ix = px + 3, iy = py + 3;
+		V.icon(g, "icon_bag", ix + 30, iy + 20, 44);
+		V.title(g, "BAG", ix + 86, iy + 24, 30, V.TEXT);
+		String[] pockets = {"POKé BALLS", "MEDICINE"}, icons = {"icon_ball", "icon_potion"};
 		for (int i = 0; i < 2; i++) {
-			float tx = px + 30, ty = py + 90 + i * 128, tw = 300, th = 108;
+			float tx = ix + 30, ty = iy + 90 + i * 128, tw = 300, th = 108;
 			boolean on = bagPocket == i;
 			int kinds = count(i);
-			if (on) V.rr(g, tx - 5, ty - 5, tw + 10, th + 10, 31, 0x73FFF4D8);
+			int[] c = V.GOODS[i == 0 ? 0 : 1];
+			// A hard shadow 5px under it; when it's the pocket you're in, a cream ring (3px) in a pale halo (8px).
 			V.rr(g, tx, ty + 5, tw, th, 26, 0x40000000);
-			V.rrStops(g, tx, ty, tw, th, 26, new float[] {0, 0.5F, 1}, on ? pc[i] : new int[] {Ui.mix(pc[i][0], 0xFF123C38, 0.55F), Ui.mix(pc[i][1], 0xFF123C38, 0.55F),
-					Ui.mix(pc[i][2], 0xFF123C38, 0.55F)});
-			if (on) V.ring(g, tx, ty, tw, th, 26, 3, V.CREAM);
-			V.ellipse(g, tx + 54, ty + th / 2, 36, 36, on ? 0xFFFFFFFF : 0xB3FFFFFF);
-			itemIcon(g, Item.find(i == 0 ? "poke_ball" : "potion"), Math.round(V.x(tx + 54 - 22)), Math.round(V.y(ty + th / 2 - 22)), Math.round(V.s(44)), 1);
-			V.text(g, pockets[i], tx + 104, ty + 24, 24, on ? 0xFFFFFFFF : 0xFFCFEDE3, true);
+			if (on) {
+				V.rr(g, tx - 8, ty - 8, tw + 16, th + 16, 34, 0x73FFF4D8);
+				V.rr(g, tx - 3, ty - 3, tw + 6, th + 6, 29, 0xFFFFF4D8);
+			}
+			int[] cols = on ? c : new int[] {Ui.mix(c[0], 0xFF123C38, 0.55F), Ui.mix(c[1], 0xFF123C38, 0.55F), Ui.mix(c[2], 0xFF123C38, 0.55F)};
+			V.rrStops(g, tx, ty, tw, th, 26, new float[] {0, 0.5F, 1}, cols);
+			V.ellipse(g, tx + 18 + 36, ty + 18 + 36, 36, 36, on ? 0xFFFFFFFF : 0xB3FFFFFF);
+			V.icon(g, icons[i], tx + 18 + 14, ty + 18 + 14, 44);
+			V.text(g, pockets[i], tx + 104, ty + 22, 24, on ? 0xFFFFFFFF : 0xFFCFEDE3, true);
 			V.text(g, kinds == 0 ? "Empty" : kinds + (kinds == 1 ? " kind" : " kinds"), tx + 104, ty + 58, 19, on ? 0xE6FFFFFF : 0xB3CFEDE3, true);
 			int idx = i;
 			vhit(tx, ty, tw, th, () -> {
 				if (bagPocket != idx) pocket(idx - bagPocket);
 			});
 		}
-		// What's in it.
-		float lx = px + 360, ly = py + 90, lw = pw - 390, rowH = 54, gap = 8;
-		int rows = 6, first = Math.max(0, Math.min(bagAt - rows / 2, l.size() - rows));
+		// What's in it: coloured bars, five at a time (above the card that says what the picked one does).
+		float lx = ix + 360, ly = iy + 90, lw = 510, rowH = 54, gap = 8;
+		int rows = 5, first = Math.max(0, Math.min(bagAt - rows / 2, l.size() - rows));
 		for (int k = 0; k < rows && first + k < l.size(); k++) {
 			int i = first + k;
 			float ry = ly + k * (rowH + gap);
 			if (vover(lx, ry, lw, rowH)) bagAt = i;
-			boolean on = i == bagAt;
 			Item it = Item.find(l.get(i));
-			V.goods(g, it.name(), "x" + ClientState.data.count(it.id()), lx, ry, lw, rowH, on, 21);
+			V.goods(g, it.name(), "x" + ClientState.data.count(it.id()), lx, ry, lw, rowH, i == bagAt, 21);
 			int idx = i;
 			vhit(lx, ry, lw, rowH, () -> pickItem(idx));
 		}
 		if (l.isEmpty()) {
 			String none = bagPocket == 0 ? "No POKé BALLS yet. A POKé MART sells them." : "No medicine to use in battle.";
+			float ey = ly + 14;
 			for (String line : V.wrap(none, lw - 20, 21, true)) {
-				V.text(g, line, lx + 10, ly + 14, 21, V.MUTED, true);
-				ly += 30;
+				V.text(g, line, lx + 10, ey, 21, V.MUTED, true);
+				ey += 29;
 			}
 		}
 		// What the picked one does.
-		float dy = py + ph - 30 - 92;
-		V.panel(g, lx, dy, lw, 92, 20, true);
-		String desc = bagAt < l.size() ? describe(l.get(bagAt)) : bagPocket == 0 ? "Throw one at a wild POKéMON to catch it." : "Heal or help your POKéMON.";
-		List<String> lines = V.wrap(desc, lw - 48, 19, true);
-		for (int i = 0; i < Math.min(2, lines.size()); i++) V.text(g, lines.get(i), lx + 24, dy + 18 + i * 28, 19, V.SOFT_TEXT, true);
+		float dy = iy + 418;
+		V.panel(g, lx, dy, lw, 92, 22, true);
+		String desc = bagAt < l.size() ? describe(l.get(bagAt)) : "";
+		List<String> lines = V.wrap(desc, lw - 54, 19, true);
+		for (int i = 0; i < Math.min(2, lines.size()); i++) V.text(g, lines.get(i), lx + 27, dy + 21 + i * 26, 19, V.MUTED, true);
 		V.hints(g, "A", "Use", "B", "Back", "TAB", "Pocket");
 	}
 

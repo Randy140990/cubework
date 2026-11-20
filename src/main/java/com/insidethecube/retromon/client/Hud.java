@@ -240,7 +240,7 @@ public final class Hud {
 		word = Lang.t(word);
 		float kw = V.keyWidth(k, 30), ww = V.width(word, 17, false), w = 5 + kw + 8 + ww + 16, h = 40, x = cx - w / 2, y = cy - h;
 		V.pill(g, x - 2, y - 2, w + 4, h + 4, 0x99FFFFFF);
-		V.pill(g, x, y + 4, w, h, 0x2A1E2854);
+		V.softShadow(g, x, y + 4, w, h, 12, 0x381E2854);
 		V.pill(g, x, y, w, h, 0xF2FFFFFF);
 		V.key(g, k, x + 5, y + 5, 30);
 		V.text(g, word, x + 5 + kw + 8, V.capsTop(y + 20, 17), 17, V.INK, false);

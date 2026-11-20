@@ -598,7 +598,7 @@ public class MenuScreen extends DeviceScreen {
 	/** How each shows: POKéMON is PARTY, as Let's Go has it. */
 	private static final String[] SHOWN = {"POKéDEX", "PARTY", "BAG", "MAP", "CLOTHES", "CARD", "WAIT", "SAVE", "OPTION", "EXIT"};
 	/** The tiles' white pictures (the viewer's PICTO) and the pills' icons. */
-	private static final String[] PICTOS = {"picto_dex_white", "picto_ball_white", "picto_bag_white", "picto_map_white", null, null, null, "picto_save_white", null, null};
+	private static final String[] PICTOS = {"picto_dex_red", "picto_ball_green", "picto_bag_orange", "picto_map_blue", null, null, null, "picto_save_purple", null, null};
 	private static final String[] TILE_ICONS = {"icon_dex", "icon_ball", "icon_bag", "icon_map", "icon_cap", "icon_card", "icon_clock", "icon_save", "icon_cog", "icon_close"};
 
 	/** The menu's rows (indexes into ITEMS): the five tiles in Let's Go's order (POKéDEX, BAG, PARTY, MAP, SAVE), then the five pills. */
@@ -686,12 +686,13 @@ public class MenuScreen extends DeviceScreen {
 			g.pose().translate(pcx, pcy);
 			g.pose().scale(sc, sc);
 			g.pose().translate(-pcx, -pcy);
+			// The viewer's: off, a firm drop and a soft shadow (0 7px 0, 0 12px 24px); on, a white ring, a glow in its
+			// colour all round (0 0 30px 10px) and the soft shadow.
 			if (on) {
-				V.rr(g, sx - 16, sy - 16, sq + 32, sq + 32, 50, Ui.alpha(col[0], 0.45F));
-				V.rr(g, sx - 8, sy - 8, sq + 16, sq + 16, 42, Ui.alpha(0xFFFFFFFF, 0.9F));
-			}
-			V.rr(g, sx, sy + 7, sq, sq, 34, 0x2E1E2854);
-			V.shadow(g, sx, sy, sq, sq, 34, 0.9F);
+				V.softShadow(g, sx - 10, sy - 10, sq + 20, sq + 20, 30, Ui.alpha(col[1], 0.7F));
+				V.rr(g, sx - 4, sy - 4, sq + 8, sq + 8, 38, Ui.alpha(0xFFFFFFFF, 0.9F));
+			} else V.rr(g, sx, sy + 7, sq, sq, 34, 0x2E1E2854);
+			V.softShadow(g, sx, sy + 12, sq, sq, 24, 0x401E2854);
 			V.rr(g, sx, sy, sq, sq, 34, 0xFFFFFFFF);
 			int a = on ? 0xFF : 0xEB;
 			V.rrStops(g, sx + 4, sy + 4, sq - 8, sq - 8, 30, new float[] {0, 0.58F, 1}, new int[] {Ui.alpha(col[0], a / 255F), Ui.alpha(col[1], a / 255F), Ui.alpha(col[2], a / 255F)});
@@ -1175,7 +1176,7 @@ public class MenuScreen extends DeviceScreen {
 			if (it == null) continue;
 			int[] kc = V.GOODS[V.goodsKind(it.name())];
 			if (on) {
-				V.rr(g, x, y + 6, tw, th, 22, 0x4DE8961E);
+				V.softShadow(g, x, y + 8, tw, th, 16, 0x4DE8961E);
 				V.rr(g, x - 6, y - 6, tw + 12, th + 12, 28, 0xFFFFC93C);
 				V.rr(g, x - 3, y - 3, tw + 6, th + 6, 25, 0xFFFFFFFF);
 				V.sel(g, x, y, tw, th, 22);

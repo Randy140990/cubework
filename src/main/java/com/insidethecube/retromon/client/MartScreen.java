@@ -291,7 +291,7 @@ public class MartScreen extends GameScreen {
 			String name = it == null ? stock.get(k) : it.name();
 			int[] kc = V.GOODS[V.goodsKind(name)];
 			if (on) {
-				V.rr(g, x, y + 8, tw, th, 22, 0x4DE8961E);
+				V.softShadow(g, x, y + 8, tw, th, 16, 0x4DE8961E);
 				V.rr(g, x - 6, y - 6, tw + 12, th + 12, 28, 0xFFFFC93C);
 				V.rr(g, x - 3, y - 3, tw + 6, th + 6, 25, 0xFFFFFFFF);
 				V.sel(g, x, y, tw, th, 22);

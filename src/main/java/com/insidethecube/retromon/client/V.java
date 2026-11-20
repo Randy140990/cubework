@@ -102,11 +102,31 @@ public final class V {
 		rr(g, x, y, w, h, h / 2, c);
 	}
 
-	/** A soft drop shadow under a box (the viewer's 0 12px 30px rgba(30,40,84,.22)), as widening navy layers. */
+	/** A soft drop shadow under a box (the viewer's 0 12px 30px rgba(30,40,84,.22)), strength times as dark. */
 	public static void shadow(GuiGraphics g, float x, float y, float w, float h, float r, float strength) {
-		for (int i = 4; i >= 1; i--) {
-			float grow = i * 5;
-			rr(g, x - grow + 2, y + 10 + grow * 0.4F, w + grow * 2 - 4, h + grow * 0.6F, r + grow, Ui.alpha(0xFF1E2854, strength * 0.075F));
+		softShadow(g, x, y + 12, w, h, 30, Ui.alpha(0xFF1E2854, Math.min(1, 0.22F * strength)));
+	}
+
+	/**
+	 * A shadow as CSS's box-shadow draws one: the box (canvas pixels) blurred by blur, in colour (its see-through how
+	 * dark). From one blurred picture (textures/gui/shape/shadow.png: a 128 square blurred in a 256 sheet), its corners
+	 * kept and its sides and middle stretched, so it's smooth at any size.
+	 */
+	public static void softShadow(GuiGraphics g, float x, float y, float w, float h, float blur, int colour) {
+		if (w <= 0 || h <= 0 || (colour >>> 24) == 0) return;
+		float m = blur * 2, X = x - m, Y = y - m, W = w + 2 * m, H = h + 2 * m;
+		float c = 1.5F * m, cw = Math.min(c, W / 2), ch = Math.min(c, H / 2);
+		float uc = 96F / 256 * cw / c, vc = 96F / 256 * ch / c, um = 128F / 256;
+		float[] xs = {X, X + cw, X + W - cw, X + W}, ys = {Y, Y + ch, Y + H - ch, Y + H};
+		float[] us = {0, uc, um, um, 1 - uc, 1}, vs = {0, vc, um, um, 1 - vc, 1};
+		for (int j = 0; j < 3; j++) {
+			for (int i = 0; i < 3; i++) {
+				float x0 = xs[i], x1 = xs[i + 1], y0 = ys[j], y1 = ys[j + 1];
+				if (x1 - x0 < 0.01F || y1 - y0 < 0.01F) continue;
+				float u0 = i == 0 ? 0 : i == 1 ? um : 1 - uc, u1 = i == 0 ? uc : i == 1 ? um : 1;
+				float v0 = j == 0 ? 0 : j == 1 ? um : 1 - vc, v1 = j == 0 ? vc : j == 1 ? um : 1;
+				Ui.blitSmooth(g, Ui.SHADOW, x(x0), y(y0), x(x1), y(y1), u0, u1, v0, v1, colour);
+			}
 		}
 	}
 
@@ -610,7 +630,7 @@ public final class V {
 		for (int i = 0; i < n; i++) {
 			String kk = keyName(pairs[i * 2]), l = Lang.t(pairs[i * 2 + 1]);
 			pill(g, x - 2, y - 2, ws[i] + 4, 44, 0x99FFFFFF);
-			pill(g, x, y + 4, ws[i], 40, 0x2A1E2854);
+			softShadow(g, x, y + 4, ws[i], 40, 12, 0x381E2854);
 			pill(g, x, y, ws[i], 40, 0xF2FFFFFF);
 			float kw = key(g, kk, x + 5, y + 5, 30);
 			text(g, l, x + 5 + kw + 8, capsTop(y + 20, 17), 17, INK, false);
@@ -664,7 +684,7 @@ public final class V {
 		float lift = on ? 3 : 0, hh = 62;
 		y -= lift;
 		pill(g, x, y + 6 + lift, w, hh, 0x2E1E2854);
-		shadow(g, x, y, w, hh, hh / 2, 0.7F);
+		softShadow(g, x, y + 10 + lift, w, hh, 24, 0x381E2854);
 		pill(g, x, y, w, hh, 0xFFFFFFFF);
 		if (go) rrv(g, x + 3, y + 3, w - 6, hh - 6, (hh - 6) / 2, 0xFF6BE0A6, 0xFF2FA86C);
 		else rrv(g, x + 3, y + 3, w - 6, hh - 6, (hh - 6) / 2, 0xFFFFFFFF, 0xFFEEF2FB);
@@ -693,7 +713,7 @@ public final class V {
 	public static float chip(GuiGraphics g, String text, float x, float y, float size, boolean on, boolean sel) {
 		float tw = width(text, size, false), w = tw + 28 + 4, h = size * 1.45F + 12 + 4;
 		if (on) {
-			pill(g, x, y + 3, w, h, 0x4DE8961E);
+			softShadow(g, x, y + 3, w, h, 8, 0x4DE8961E);
 			pill(g, x, y, w, h, 0xFFFFFFFF);
 			rrv(g, x + 2, y + 2, w - 4, h - 4, (h - 4) / 2, SEL_TOP, SEL_BOTTOM);
 		} else {
@@ -720,13 +740,13 @@ public final class V {
 	/** A row in a list (the viewer's g-item): sunny yellow with a white rim, a warm glow and a red arrow when picked. */
 	public static void item(GuiGraphics g, String text, String right, float x, float y, float w, float h, boolean on, boolean off, float size) {
 		if (on) {
-			pill(g, x - 1, y + 5, w + 2, h, 0x59E8961E);
+			softShadow(g, x, y + 5, w, h, 14, 0x59E8961E);
 			pill(g, x - 2.5F, y - 2.5F, w + 5, h + 5, 0xFFFFFFFF);
 			sel(g, x, y, w, h, h / 2);
 			tri(g, x + 15 + 6, y + h / 2, 12, 0, RED);
 		}
 		int c = on ? INK : off ? DIM : TEXT;
-		draw(g, rich(text, false, c), x + 40, capsTop(y + h / 2, size), size, c, false);
+		draw(g, comp(Look.text(text), false), x + 40, capsTop(y + h / 2, size), size, c, false);
 		if (right != null && !right.isEmpty()) right(g, right, x + w - 22, capsTop(y + h / 2, size), size, c, false);
 	}
 
@@ -749,12 +769,30 @@ public final class V {
 			"lure_ball", "moon_ball", "friend_ball", "love_ball", "heavy_ball", "fast_ball");
 
 	/** An item's picture (the viewer's): balls, medicine, discs for TMs, the map, a bag for ropes and repels, else a key. */
+	/** The items drawn each their own way (textures/gui/v/item_*.png, from the viewer's items.js). */
+	private static final java.util.Set<String> ITEMS = java.util.Set.of("antidote", "awakening", "berry", "berry_juice", "bicycle", "big_pearl", "bitter_berry", "blk_apricorn", "blu_apricorn", "bluesky_mail",
+			"burn_heal", "burnt_berry", "calcium", "carbos", "dire_hit", "elixer", "eon_mail", "escape_rope", "ether", "everstone",
+			"fire_stone", "flower_mail", "fresh_water", "full_heal", "full_restore", "gold_berry", "good_rod", "grn_apricorn", "guard_spec", "hard_stone",
+			"hp_up", "hyper_potion", "ice_berry", "ice_heal", "iron", "leaf_stone", "lemonade", "litebluemail", "lovely_mail", "max_elixer",
+			"max_ether", "max_potion", "max_repel", "max_revive", "mint_berry", "miracleberry", "mirage_mail", "moomoo_milk", "moon_stone", "morph_mail",
+			"music_mail", "mysteryberry", "nugget", "old_rod", "parlyz_heal", "pearl", "pnk_apricorn", "portraitmail", "potion", "pp_up",
+			"protein", "przcureberry", "psncureberry", "rare_candy", "red_apricorn", "repel", "revive", "sacred_ash", "secretpotion", "soda_pop",
+			"star_piece", "stardust", "sun_stone", "super_potion", "super_repel", "super_rod", "surf_mail", "thunderstone", "water_stone", "wht_apricorn",
+			"x_accuracy", "x_attack", "x_defend", "x_special", "x_speed", "ylw_apricorn");
+
+	/** An item's name as its picture's (lower case, other letters as _): POKé DOLL is poke_doll. */
+	public static String itemSlug(String name) {
+		return name.toLowerCase(java.util.Locale.ROOT).replace("é", "e").replaceAll("[^a-z0-9]+", "_").replaceAll("^_|_$", "");
+	}
+
 	public static String itemIcon(String name) {
 		String n = name.toUpperCase();
 		if (n.contains("PARCEL")) return "icon_parcel";
+		String slug = itemSlug(name);
+		if (ITEMS.contains(slug)) return "item_" + slug;
 		if (n.contains("BALL")) {
-			String slug = n.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z]+", "_").replaceAll("^_|_$", "");
-			return BALLS.contains(slug) ? "ball_" + slug : "ball_pok_ball";
+			String b = n.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z]+", "_").replaceAll("^_|_$", "");
+			return BALLS.contains(b) ? "ball_" + b : "ball_pok_ball";
 		}
 		if (n.contains("POTION") || n.contains("HEAL") || n.contains("ANTIDOTE") || n.contains("AWAKENING") || n.contains("REVIVE")) return "icon_potion";
 		if (n.startsWith("TM") || n.startsWith("HM")) return "icon_disc";
@@ -771,24 +809,28 @@ public final class V {
 	public static void goods(GuiGraphics g, String name, String right, float x, float y, float w, float h, boolean on, float size) {
 		int[] c = GOODS[goodsKind(name)];
 		if (on) {
+			// Cream (--g-cream) with a white rim; a pale halo 3px round it over a soft shadow (0 6px 16px).
+			softShadow(g, x, y + 6, w, h, 16, 0x40000000);
 			pill(g, x - 3, y - 3, w + 6, h + 6, 0x59FFF4D8);
-			pill(g, x, y + 4, w, h, 0x40000000);
 			pill(g, x, y, w, h, 0xFFFFFFFF);
-			rrv(g, x + 2, y + 2, w - 4, h - 4, (h - 4) / 2, SEL_TOP, SEL_BOTTOM);
+			pill(g, x + 2, y + 2, w - 4, h - 4, CREAM);
 		} else {
+			// Its colours lit from the top, under a see-through white rim (2px), a hard shadow 3px under it.
+			float[] at = {0, 0.6F, 1};
 			pill(g, x, y + 3, w, h, 0x30000000);
+			rrStops(g, x, y, w, h, h / 2, at, c);
 			pill(g, x, y, w, h, 0x73FFFFFF);
-			rrStops(g, x + 2, y + 2, w - 4, h - 4, (h - 4) / 2, new float[] {0, 0.6F, 1}, c);
+			rrStops(g, x + 2, y + 2, w - 4, h - 4, (h - 4) / 2, at, c);
 		}
-		float ir = (h - 10) / 2, icx = x + 5 + ir, icy = y + h / 2;
-		if (on) ellipse(g, icx, icy, ir + 2.5F, ir + 2.5F, c[1]);
+		float ir = (h - 10) / 2, icx = x + 7 + ir, icy = y + h / 2;
+		if (on) ellipse(g, icx, icy, ir + 3, ir + 3, c[1]);
 		ellipse(g, icx, icy, ir, ir, 0xFFFFFFFF);
-		float is = ir * 1.45F;
+		float is = ir * 1.44F;
 		icon(g, itemIcon(name), icx - is / 2, icy - is / 2, is);
 		float ms = h - 16;
-		icon(g, "icon_ballmark", x + w - 10 - ms, y + 8, ms, on ? Ui.alpha(c[1], 0.55F) : 0x4DFFFFFF);
+		icon(g, "icon_ballmark", x + w - 12 - ms, y + 8, ms, on ? Ui.alpha(c[1], 0.55F) : 0x4DFFFFFF);
 		int ink = on ? INK : 0xFFFFFFFF;
-		float tx = x + 5 + 2 * ir + 14, ty = capsTop(y + h / 2, size), rx = x + w - 10 - ms - 14;
+		float tx = x + 7 + 2 * ir + 14, ty = capsTop(y + h / 2, size), rx = x + w - 12 - ms - 14;
 		if (!on) text(g, name, tx, ty + 2, size, 0x40000000, true, false);
 		text(g, name, tx, ty, size, ink, true, false);
 		if (right != null && !right.isEmpty()) {
@@ -907,7 +949,8 @@ public final class V {
 
 	/** A list in a panel (the viewer's choice box): rows of g-items. Returns its height. */
 	public static float choice(GuiGraphics g, List<String> items, List<String> rights, int sel, float x, float y, float w) {
-		float pad = 12, rh = 46, gap = 8, h = pad * 2 + items.size() * rh + (items.size() - 1) * gap;
+		// The panel's rim (3px) and its padding (12px) round the rows.
+		float pad = 15, rh = 46, gap = 8, h = choiceHeight(items.size());
 		panel(g, x, y, w, h);
 		for (int i = 0; i < items.size(); i++)
 			item(g, Lang.t(items.get(i)), rights == null ? null : rights.get(i), x + pad, y + pad + i * (rh + gap), w - pad * 2, rh, i == sel, false, 21);
@@ -915,7 +958,16 @@ public final class V {
 	}
 
 	public static float choiceHeight(int n) {
-		return 24 + n * 46 + Math.max(0, n - 1) * 8;
+		return 30 + n * 46 + Math.max(0, n - 1) * 8;
+	}
+
+	/** A row in a list with a POKéMON's picture before its words (the viewer's g-item with a 36px picture in it). */
+	public static void itemPic(GuiGraphics g, String species, String text, String right, float x, float y, float w, float h, boolean on, boolean off, float size) {
+		item(g, "", right, x, y, w, h, on, off, size);
+		float ps = 36, py = y + (h - ps) / 2;
+		Ui.blitSmooth(g, Look.portrait(species), x(x + 32), y(py), x(x + 32 + ps), y(py + ps), 0, 1, 0, 1, 0xFFFFFFFF);
+		int c = on ? INK : off ? DIM : TEXT;
+		draw(g, comp(Look.text(text), false), x + 82, capsTop(y + h / 2, size), size, c, false);
 	}
 
 	/** Which row of a choice box the mouse is over (canvas coordinates), or -1. */
@@ -923,7 +975,7 @@ public final class V {
 		float px = vx(mx), py = vy(my);
 		if (px < x || px > x + w) return -1;
 		for (int i = 0; i < n; i++) {
-			float ry = y + 12 + i * 54;
+			float ry = y + 15 + i * 54;
 			if (py >= ry && py <= ry + 46) return i;
 		}
 		return -1;

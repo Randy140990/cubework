@@ -1109,7 +1109,7 @@ public class IntroScreen extends GameScreen {
 				if (confirm == null && vover(x, by, bw, 46)) slotAt = SLOTS;
 				boolean on = slotAt == SLOTS;
 				if (on) {
-					V.pill(g, x - 1, by + 5, bw + 2, 46, 0x59E8961E);
+					V.softShadow(g, x, by + 5, bw, 46, 14, 0x59E8961E);
 					V.pill(g, x - 2.5F, by - 2.5F, bw + 5, 51, 0xFFFFFFFF);
 					V.sel(g, x, by, bw, 46, 23);
 					V.tri(g, x + 21, by + 23, 12, 0, V.RED);

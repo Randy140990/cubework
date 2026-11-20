@@ -142,7 +142,8 @@ public final class Battles {
 					// The first one, in the lab: Oak sees to your Pokémon after.
 					if (s.trainer.key().equals("rival_lab")) d.healAll();
 					after.addAll(Game.fill(p, s.trainer.defeat()));
-					after.addAll(Game.fill(p, s.trainer.after()));
+					// What he says after, he says to your face back in the world, before he heads off.
+					Game.rivalSpeech(p, Game.fill(p, s.trainer.after()));
 				} else if (s.trainer != null) {
 					d.beaten.add(s.trainer.key());
 					List<String> said = Game.fill(p, s.trainer.leader() ? s.trainer.defeat() : s.trainer.after());

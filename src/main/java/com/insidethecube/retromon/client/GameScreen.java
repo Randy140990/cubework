@@ -204,7 +204,7 @@ public abstract class GameScreen extends Screen {
 		float h = V.choice(g, c.options, null, c.at, x, y, w);
 		for (int i = 0; i < c.options.size(); i++) {
 			int row = i;
-			vhit(x + 12, y + 12 + i * 54, w - 24, 46, () -> pick.accept(row));
+			vhit(x + 15, y + 15 + i * 54, w - 30, 46, () -> pick.accept(row));
 		}
 		return h;
 	}

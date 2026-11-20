@@ -73,7 +73,11 @@ public final class BattleScene {
 	}
 
 	public static boolean hides(Entity e) {
-		return active && revealed && e.getId() == hiddenNpc;
+		if (!active || !revealed) return false;
+		if (e.getId() == hiddenNpc) return true;
+		// Inside (no stage: the room itself), the room's people and POKéMON step out of the picture too, so no one
+		// stands in the way (the stage's own you and them have ids below 0).
+		return kind.equals("inside") && e.getId() >= 0 && !(e instanceof net.minecraft.world.entity.player.Player);
 	}
 
 	/** 0: yours, 1: theirs (or the one evolving). */
@@ -145,7 +149,7 @@ public final class BattleScene {
 		Vec3 f = them.subtract(you).multiply(1, 0, 1);
 		if (f.lengthSqr() < 0.25) f = look.lengthSqr() < 1e-4 ? new Vec3(0, 0, -1) : look;
 		double dist = f.length();
-		f = f.normalize();
+		f = roomAxis(you.lerp(them, 0.5), f.normalize(), Math.max(1.7, dist / 2 - 1.0));
 		axBack = f.scale(-1);
 		axRight = new Vec3(-f.z, 0, f.x);
 		Vec3 mid = you.lerp(them, 0.5);
@@ -166,6 +170,42 @@ public final class BattleScene {
 			Vec3 foeAt = local(enemyAt, 1.3, 0, -1.4);
 			foe = person(foeKey, foeRole, foeAt, face(foeAt, mineAt));
 		}
+	}
+
+	/**
+	 * Inside, which way to look across the room: the way from you to them, or the nearest turn of it (in eighths)
+	 * that has a wall behind them (a background, not the black outside), space for both of you along it, and
+	 * room behind yours for the camera.
+	 */
+	private static Vec3 roomAxis(Vec3 mid, Vec3 want, double half) {
+		Vec3 eye = mid.add(0, 1.9, 0), best = want;
+		double bestScore = -1e9, a0 = Math.atan2(want.z, want.x);
+		for (int i = 0; i < 8; i++) {
+			double a = a0 + i * Math.PI / 4;
+			Vec3 d = new Vec3(Math.cos(a), 0, Math.sin(a));
+			double ahead = reach(eye, d, 24), behind = reach(eye, d.scale(-1), 24);
+			double score = 0;
+			if (ahead >= 23.5) score -= 40;
+			if (ahead < half + 1.6) score -= 30;
+			if (behind < half + 1.2) score -= 30;
+			score += Math.min(behind - half, 6.5) * 2 + Math.min(ahead, 9) * 0.5;
+			// Rather the way you were facing them, turned as little as can be.
+			score -= Math.min(i, 8 - i) * 1.2;
+			if (score > bestScore) {
+				bestScore = score;
+				best = d;
+			}
+		}
+		return best;
+	}
+
+	/** How far you can see from a point along a way before a block (up to max). */
+	private static double reach(Vec3 from, Vec3 dir, double max) {
+		Vec3 to = from.add(dir.scale(max));
+		net.minecraft.world.phys.BlockHitResult hit = level.clip(new net.minecraft.world.level.ClipContext(from, to, net.minecraft.world.level.ClipContext.Block.VISUAL,
+				net.minecraft.world.level.ClipContext.Fluid.NONE, Minecraft.getInstance().player));
+		if (hit == null || hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS) return max;
+		return from.distanceTo(hit.getLocation());
 	}
 
 	/** Where a camera can be on the way from what it looks at towards where it would like to be, short of any wall. */
@@ -644,9 +684,13 @@ public final class BattleScene {
 		holding = true;
 	}
 
+	/** A win's been celebrated: the camera stays in front of yours from then on (not back to theirs). */
+	private static boolean celebrated;
+
 	public static void cheer() {
 		if (!active) return;
 		cheerTicks = cheerMax = 52;
+		celebrated = true;
 		MonDisplay d = display(0);
 		if (d != null) {
 			d.cheer = MonDisplay.CHEER;
@@ -681,6 +725,7 @@ public final class BattleScene {
 		MonDisplay d = display(side);
 		if (d == null) return;
 		d.faint = MonDisplay.FAINT;
+		d.down = true;
 		d.act("faint");
 		Sounds.faint();
 		// A trainer's is called back; a wild one just lies there till the battle's over.
@@ -1006,6 +1051,7 @@ public final class BattleScene {
 		ARROWS.clear();
 		cheerTicks = 0;
 		holding = false;
+		celebrated = false;
 		introTicks = 0;
 		LATER.clear();
 		hero = foe = null;
@@ -1119,6 +1165,8 @@ public final class BattleScene {
 			if (age >= f.life()) FX.remove(i);
 		}
 		if (cheerTicks > 0) cheerTicks--;
+		// Once yours has celebrated, the camera stays round in front of it (half way through its move round).
+		if (celebrated) cheerTicks = Math.max(cheerTicks, cheerMax / 2);
 		if (holding) {
 			// Held in front of yours (half way through the cheer's move round), the two of you still celebrating.
 			cheerTicks = Math.max(cheerTicks, cheerMax / 2);

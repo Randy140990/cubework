@@ -118,7 +118,7 @@ public final class NameEntry {
 				if (on) V.rrv(g, kx, ky, kw, 50, 14, 0xFF6BE0A6, 0xFF2FA86C);
 				else V.rr(g, kx, ky, kw, 50, 14, 0xFFD9F5E6);
 			} else if (on) {
-				V.rr(g, kx, ky + 4, kw, 50, 14, 0x59E8961E);
+				V.softShadow(g, kx, ky + 4, kw, 50, 12, 0x59E8961E);
 				V.rr(g, kx - 2, ky - 2, kw + 4, 54, 16, 0xFFFFFFFF);
 				V.sel(g, kx, ky, kw, 50, 14);
 			} else V.rr(g, kx, ky, kw, 50, 14, 0xFFEEF2FB);

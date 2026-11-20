@@ -308,6 +308,13 @@ public final class Ui {
 			// Each triangle as a quad with its last corner twice (the GUI draws quads).
 			for (int i = 0; i + 2 < xy.length / 2; i += 3) {
 				int a = i, b = i + 1, d = i + 2;
+				// The GUI's own quads go round one way (top left, bottom left, bottom right): any the other way is turned.
+				float cross = (xy[b * 2] - xy[a * 2]) * (xy[d * 2 + 1] - xy[a * 2 + 1]) - (xy[b * 2 + 1] - xy[a * 2 + 1]) * (xy[d * 2] - xy[a * 2]);
+				if (cross > 0) {
+					int t = b;
+					b = d;
+					d = t;
+				}
 				v.addVertexWith2DPose(pose, xy[a * 2], xy[a * 2 + 1]).setColor(c[a]);
 				v.addVertexWith2DPose(pose, xy[b * 2], xy[b * 2 + 1]).setColor(c[b]);
 				v.addVertexWith2DPose(pose, xy[d * 2], xy[d * 2 + 1]).setColor(c[d]);
@@ -589,11 +596,30 @@ public final class Ui {
 	}
 
 	/** A soft round glow (a light behind something), built up from see-through rounded boxes. */
+	private static final net.minecraft.resources.Identifier GLOW = com.insidethecube.retromon.Retromon.id("textures/gui/shape/glow.png");
+	public static final net.minecraft.resources.Identifier SHADOW = com.insidethecube.retromon.Retromon.id("textures/gui/shape/shadow.png");
+
+	/** A glow: light falling off smoothly from the middle out to rx, ry (the colour's see-through at the middle, a little stronger). */
 	public static void glow(GuiGraphics g, int cx, int cy, int rx, int ry, int color) {
-		for (int i = 0; i < 7; i++) {
-			int x = rx - i * rx / 8, y = ry - i * ry / 8;
-			round(g, cx - x, cy - y, 2 * x, 2 * y, color, Math.max(1, Math.min(x, y) / 3));
-		}
+		if (rx <= 0 || ry <= 0) return;
+		int a = Math.min(255, Math.round((color >>> 24) * 2.2F));
+		blitSmooth(g, GLOW, cx - rx, cy - ry, cx + rx, cy + ry, 0, 1, 0, 1, (a << 24) | (color & 0xFFFFFF));
+	}
+
+	/** A picture (or part: u and v 0 to 1) into a box, smoothed (linear filtering) whatever its own setting, tinted. */
+	public static void blitSmooth(GuiGraphics g, net.minecraft.resources.Identifier id, float x0, float y0, float x1, float y1, float u0, float u1, float v0, float v1, int color) {
+		net.minecraft.client.renderer.texture.AbstractTexture t = net.minecraft.client.Minecraft.getInstance().getTextureManager().getTexture(id);
+		if (t == null || x1 <= x0 || y1 <= y0) return;
+		org.joml.Matrix3x2f pose = new org.joml.Matrix3x2f(g.pose());
+		// Whole pixels for the state's box, the rest by the pose (so a fraction of a pixel still moves it).
+		int X0 = (int) Math.floor(x0), Y0 = (int) Math.floor(y0);
+		float w = x1 - x0, h = y1 - y0;
+		int W = Math.max(1, Math.round(w)), H = Math.max(1, Math.round(h));
+		pose.translate(x0, y0).scale(w / W, h / H);
+		g.guiRenderState.submitGuiElement(new net.minecraft.client.gui.render.state.BlitRenderState(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
+				net.minecraft.client.gui.render.TextureSetup.singleTexture(t.getTextureView(),
+						com.mojang.blaze3d.systems.RenderSystem.getSamplerCache().getClampToEdge(com.mojang.blaze3d.textures.FilterMode.LINEAR)),
+				pose, 0, 0, W, H, u0, u1, v0, v1, color, g.scissorStack.peek()));
 	}
 
 	/** A colour mixed towards white by k (0 to 1). */

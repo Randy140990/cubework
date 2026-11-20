@@ -387,7 +387,14 @@ public final class Game {
 	/** Each player's rival when he's about (in the lab, on Route 22, at Oak's), and ticks left as he heads off. */
 	private static final Map<UUID, Npc> RIVALS = new HashMap<>();
 	private static final Map<UUID, Integer> RIVAL_LEAVING = new HashMap<>();
-	private static final int LEAVE_TICKS = 230;
+	private static final int LEAVE_TICKS = 230, WALK_OFF = LEAVE_TICKS - 8;
+	/** What your rival says to you, back in the world after you beat him, before he heads off. */
+	private static final Map<UUID, List<String>> RIVAL_SPEECH = new HashMap<>();
+
+	/** Your rival's words after a battle you won: said to you face to face once the battle's closed, then he goes. */
+	public static void rivalSpeech(ServerPlayer p, List<String> lines) {
+		if (lines != null && !lines.isEmpty()) RIVAL_SPEECH.put(p.getUUID(), List.copyOf(lines));
+	}
 	/** Who's still looking at their battle's last words (till the battle screen closes, or 30 s). */
 	private static final Map<UUID, Integer> AFTER_BATTLE = new HashMap<>();
 
@@ -437,13 +444,15 @@ public final class Game {
 				default -> d.hasDex();
 			};
 			if (!done) continue;
-			// He stands and looks at you a moment, then walks off, and is gone once he's out of the way.
+			// He turns to you and has his say, then walks straight off, and is gone once he's out of the door.
 			Integer left = RIVAL_LEAVING.get(id);
 			if (left == null) {
 				n.getNavigation().stop();
 				n.setFacing(n.yawTo(p));
 				RIVAL_LEAVING.put(id, LEAVE_TICKS);
-			} else if (left == LEAVE_TICKS - 30) {
+				List<String> say = RIVAL_SPEECH.remove(id);
+				if (say != null) dialogue(p, n, "talk", say);
+			} else if (left == WALK_OFF) {
 				// Inside, he heads out the way he came in, through the door; outside, off away from you.
 				Vec3 out = Interiors.exitOf(n);
 				if (out != null) n.getNavigation().moveTo(out.x, out.y, out.z, 0.9);
@@ -454,12 +463,13 @@ public final class Game {
 					n.getNavigation().moveTo(to.x, n.getY(), to.z, 0.9);
 				}
 				RIVAL_LEAVING.put(id, left - 1);
-			} else if (left < LEAVE_TICKS - 30 && Interiors.exitOf(n) != null && n.position().distanceTo(Interiors.exitOf(n)) < 1.1) {
+			} else if (left < WALK_OFF && Interiors.exitOf(n) != null
+					&& (n.position().distanceTo(Interiors.exitOf(n)) < 2.2 || n.getNavigation().isDone() && n.position().distanceTo(Interiors.exitOf(n)) < 4.5)) {
 				// Out through the door.
 				n.discard();
 				RIVALS.remove(id);
 				RIVAL_LEAVING.remove(id);
-			} else if (left <= 0 || (left < LEAVE_TICKS - 30 && n.distanceTo(p) > 22)) {
+			} else if (left <= 0 || (left < WALK_OFF && n.distanceTo(p) > 22)) {
 				n.discard();
 				RIVALS.remove(id);
 				RIVAL_LEAVING.remove(id);

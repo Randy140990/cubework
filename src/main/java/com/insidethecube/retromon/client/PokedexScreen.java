@@ -294,7 +294,7 @@ public class PokedexScreen extends DeviceScreen {
 			boolean seenIt = s0 != null && d.seen.contains(s0.id());
 			String t = "No. " + String.format("%03d", l.get(onAt)) + " " + (seenIt ? s0.name() : "?????");
 			float tw = V.width(t, 15, true) + 28, th = 15 * 1.36F + 6, tx = onX + cw / 2 - tw / 2, ty = onY - 12;
-			V.pill(g, tx, ty + 4, tw, th, 0x40002850);
+			V.softShadow(g, tx, ty + 4, tw, th, 10, 0x40002850);
 			V.pill(g, tx, ty, tw, th, 0xFFFFFFFF);
 			V.text(g, t, tx + 14, V.capsTop(ty + th / 2, 15), 15, V.INK, true);
 		}

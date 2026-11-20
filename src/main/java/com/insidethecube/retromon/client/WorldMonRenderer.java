@@ -36,6 +36,13 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 	}
 
 	@Override
+	public boolean shouldRender(WorldMon e, net.minecraft.client.renderer.culling.Frustum frustum, double x, double y, double z) {
+		// Out of the picture in a battle fought in the room itself.
+		if (BattleScene.hides(e)) return false;
+		return super.shouldRender(e, frustum, x, y, z);
+	}
+
+	@Override
 	public void extractRenderState(WorldMon e, State s, float partial) {
 		super.extractRenderState(e, s, partial);
 		// (Made again when POKéMON LOOK changes: its model is the look's.)

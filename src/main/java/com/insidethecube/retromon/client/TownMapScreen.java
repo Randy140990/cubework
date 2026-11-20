@@ -452,7 +452,7 @@ public class TownMapScreen extends DeviceScreen {
 			if (TownMap.overW() <= 0) return;
 			int x0 = (int) Math.round((a[0] - wx0) * k) + clipX0, y0 = (int) Math.round((a[1] - wz0) * k) + clipY0;
 			int x1 = (int) Math.round((a[0] + TownMap.overW() * TownMap.OVER - wx0) * k) + clipX0, y1 = (int) Math.round((a[1] + TownMap.overH() * TownMap.OVER - wz0) * k) + clipY0;
-			g.blit(RenderPipelines.GUI_TEXTURED, TownMap.OVERVIEW, x0, y0, 0, 0, x1 - x0, y1 - y0, TownMap.overW(), TownMap.overH(), TownMap.overW(), TownMap.overH());
+			Ui.blitSmooth(g, TownMap.OVERVIEW, x0, y0, x1, y1, 0, 1, 0, 1, 0xFFFFFFFF);
 			return;
 		}
 		for (TownMap.Region r : TownMap.regions()) {
@@ -461,7 +461,8 @@ public class TownMapScreen extends DeviceScreen {
 			int x0 = (int) Math.round((r.rx * TownMap.R - wx0) * k) + clipX0, y0 = (int) Math.round((r.rz * TownMap.R - wz0) * k) + clipY0;
 			int x1 = (int) Math.round(((r.rx + 1) * TownMap.R - wx0) * k) + clipX0, y1 = (int) Math.round(((r.rz + 1) * TownMap.R - wz0) * k) + clipY0;
 			if (x1 < clipX0 || y1 < clipY0 || x0 > clipX1 || y0 > clipY1) continue;
-			g.blit(RenderPipelines.GUI_TEXTURED, tex, x0, y0, 0, 0, x1 - x0, y1 - y0, TownMap.R, TownMap.R, TownMap.R, TownMap.R);
+			if (k < 1.5) Ui.blitSmooth(g, tex, x0, y0, x1, y1, 0, 1, 0, 1, 0xFFFFFFFF);
+			else g.blit(RenderPipelines.GUI_TEXTURED, tex, x0, y0, 0, 0, x1 - x0, y1 - y0, TownMap.R, TownMap.R, TownMap.R, TownMap.R);
 		}
 	}
 
@@ -807,7 +808,7 @@ public class TownMapScreen extends DeviceScreen {
 			boolean ok = seen && canFly();
 			float bh = 43;
 			if (ok) {
-				V.pill(g, px, fy + 3, cw, bh, 0x4DE8961E);
+				V.softShadow(g, px, fy + 3, cw, bh, 8, 0x4DE8961E);
 				V.pill(g, px, fy, cw, bh, 0xFFFFFFFF);
 				V.rrv(g, px + 2, fy + 2, cw - 4, bh - 4, (bh - 4) / 2, V.SEL_TOP, V.SEL_BOTTOM);
 				V.centred(g, Lang.t("A: FLY HERE"), px + cw / 2, V.capsTop(fy + bh / 2, 17), 17, V.INK, false);

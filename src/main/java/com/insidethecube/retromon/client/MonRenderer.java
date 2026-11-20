@@ -72,9 +72,9 @@ public class MonRenderer extends EntityRenderer<MonDisplay, MonRenderer.State> {
 			if (p < 0.4F) s.spin = p / 0.4F * 360F;
 		} else s.spin = 0;
 		s.keel = 0;
-		if (e.faint > 0) {
-			// Fainting: sags, then keels over onto its side and settles a little lower.
-			float p = Math.min(1, (MonDisplay.FAINT - e.faint + partial) / MonDisplay.FAINT);
+		if (e.faint > 0 || e.down) {
+			// Fainting: sags, then keels over onto its side and settles a little lower (and stays there).
+			float p = e.faint > 0 ? Math.min(1, (MonDisplay.FAINT - e.faint + partial) / MonDisplay.FAINT) : 1;
 			float k = ease(Math.max(0, p - 0.12F) / 0.38F);
 			s.keel = 82F * k;
 			s.lift = -0.12F * k + (p < 0.12F ? -0.05F * Mth.sin((float) Math.PI * p / 0.12F) : 0);
