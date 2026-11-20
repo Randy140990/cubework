@@ -842,6 +842,8 @@ public final class Game {
 	 * name in the place banner (PROF. OAK's LAB, YOUR HOUSE, BLUE's HOUSE).
 	 */
 	public static void roomEntered(ServerPlayer p, Interiors.Room r, boolean banner) {
+		// A room that's a place of its own (Viridian Forest, Route 2's gates): you're there now (its wild POKéMON, its name).
+		if (!r.place().isEmpty() && !r.place().equals(data(p).place)) enter(p, r.place());
 		Places.Place pl = Places.get(r.place());
 		CompoundTag t = new CompoundTag();
 		String name = fill(p, List.of(r.name().replace("Rival's", "{rival}'s"))).get(0).toUpperCase().replace("POKÉ", "POKé");
