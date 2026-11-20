@@ -438,6 +438,35 @@ public final class Scenes {
 		}
 	}
 
+	/**
+	 * Evolving (the viewer's morph): the old form and the new on one stand, framed for the old one, each turned to
+	 * white light (white 0 to 1) and grown or shrunk (ka, kb: 0 gone, 1 its size), the glow round them.
+	 */
+	public static void morph(GuiGraphics g, float secs, String a, String b, float ka, float kb, float white, float glow, float turnSecs) {
+		BedrockModel.Def def = BedrockModel.def(a);
+		double h = Math.max(0.6, def == null ? 1 : def.height), l = Math.max(0.6, h), d = Math.max(Math.max(h * 3.1, l * 2.3), 3.8);
+		Cam cam = new Cam().look(0, h * 0.62 + d * 0.16, d, 0, h * 0.5, 0);
+		double sc = Math.max(0.5, Math.min(3, l * 0.55));
+		float[] c = cam.at(0, 0, 0), e = cam.at(1.4 * sc, 0, 0), lo = cam.at(0, -0.16, 0), n = cam.at(0, 0, -1.4 * sc), s0 = cam.at(0, 0, 1.4 * sc);
+		float rx = Math.abs(e[0] - c[0]), ry = Math.abs(s0[1] - n[1]) / 2, cy = (s0[1] + n[1]) / 2, drop = lo[1] - c[1];
+		V.ellipse(g, c[0], cy + drop + 6, rx * 1.1F, ry * 1.1F, 0x30000000);
+		V.ellipse(g, c[0], cy + drop, rx * 1.1F, ry * 1.1F, 0xFF9FD6C4);
+		V.rr(g, c[0] - rx * 1.1F, cy, rx * 2.2F, drop, 0, 0xFFA9DCCB);
+		V.ellipse(g, c[0], cy, rx * 1.1F, ry * 1.1F, 0xFFBFEFE0);
+		V.ellipse(g, c[0], cy, rx * 0.93F, ry * 0.93F, 0xFFE9FFF6);
+		Figures.Batch bt = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
+		double yaw = Math.PI + Math.sin(turnSecs * 0.45) * 0.7;
+		if (ka > 0.001F) place(bt, cam, null, a, 0, 0, 0, yaw, secs).white(white).grow(ka);
+		if (kb > 0.001F && b != null) place(bt, cam, null, b, 0, 0, 0, yaw, secs).white(white).grow(kb);
+		bt.draw(g);
+		if (glow > 0) {
+			float[] mid = cam.at(0, h / 2, 0), up = cam.at(0, h / 2 + h * 0.75, 0), side2 = cam.at(l * 0.7, h / 2, 0);
+			float grx = Math.abs(side2[0] - mid[0]), gry = Math.abs(mid[1] - up[1]);
+			float al = Math.max(0, Math.min(1, glow * (0.65F + 0.3F * (float) Math.sin(secs * 12))));
+			V.ellipse(g, mid[0], mid[1], grx, gry, Ui.alpha(0xFFFFFFFF, al * 0.55F));
+		}
+	}
+
 	/** A creature with no stand under it (the summary, Let's Go's STATS page), turning gently, framed by its size, side over. */
 	public static void modelBare(GuiGraphics g, float secs, String species, double side) {
 		BedrockModel.Def def = BedrockModel.def(species);

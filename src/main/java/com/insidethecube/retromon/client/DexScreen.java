@@ -96,7 +96,7 @@ public class DexScreen extends GameScreen {
 		// word at the top right that it's new.
 		float t = ticks + partial, secs = t / 20F;
 		if (sp == null) {
-			Scenes.backdrop(g, "dex");
+			Scenes.bg2(g, "dex");
 			return;
 		}
 		// Its page in its own colour, as Let's Go's: a blue one's blue, a fiery one's orange.

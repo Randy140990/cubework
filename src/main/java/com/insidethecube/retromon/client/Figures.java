@@ -38,6 +38,8 @@ public final class Figures {
 		final String species;
 		final float cx, feet, tall;
 		float facing, pitch, wave, talk, hop, spin, look, lookDown, nod, seconds, squash = 1, walk, floss, lookUp;
+		/** Turned to white light (0 to 1), and grown or shrunk about its feet (evolving). */
+		float white, grow = 1;
 		/** A gesture (people): one of the EMOTES, and how far into it (seconds). */
 		int emote = -1;
 		float emoteSecs;
@@ -159,6 +161,16 @@ public final class Figures {
 		}
 
 		/** Squashed (below 1) or stretched (above 1) up and down, for a landing or a spring. */
+		public Fig white(float k) {
+			white = Math.max(0, Math.min(1, k));
+			return this;
+		}
+
+		public Fig grow(float k) {
+			grow = k;
+			return this;
+		}
+
 		public Fig squash(float k) {
 			squash = k;
 			return this;
@@ -273,6 +285,7 @@ public final class Figures {
 				pose.translate(f.cx - st.x0(), f.feet - st.y0() - f.hop, f.depth * Z_SQUEEZE);
 				pose.scale(1, 1, Z_SQUEEZE);
 				if (f.squash != 1) pose.scale(1 / (float) Math.sqrt(f.squash), f.squash, 1 / (float) Math.sqrt(f.squash));
+				if (f.grow != 1) pose.scale(Math.max(1e-4F, f.grow), Math.max(1e-4F, f.grow), Math.max(1e-4F, f.grow));
 				if (f.skin != null) drawPerson(f, pose);
 				else drawMon(f, pose);
 				pose.popPose();
@@ -484,7 +497,8 @@ public final class Figures {
 			pose.scale(k * m.def.scale, k * m.def.scale, k * m.def.scale);
 			pose.translate(0F, -1.501F, 0F);
 			m.pose(f.seconds, f.poseName, f.action, f.actionSecs);
-			m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityCutoutNoCull(m.def.texture)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+			int overlay = f.white > 0 ? OverlayTexture.pack(OverlayTexture.u(f.white), OverlayTexture.v(false)) : OverlayTexture.NO_OVERLAY;
+			m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityCutoutNoCull(m.def.texture)), FULL_BRIGHT, overlay);
 			for (BedrockModel.Layer l : m.def.layers) {
 				m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityTranslucentEmissive(l.frame(f.seconds))), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 			}

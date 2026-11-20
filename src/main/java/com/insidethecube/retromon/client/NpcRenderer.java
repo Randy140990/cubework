@@ -202,7 +202,44 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		s.throwK = npc.throwing > 0 ? 1 - Math.max(0, npc.throwing - partial) / Npc.THROW : 0;
 	}
 
+	/** Each look's other versions (the Person Viewer's): a family's skins that exist, the look itself first. */
+	private static final java.util.Map<String, java.util.List<String>> FAMILIES = new java.util.HashMap<>();
+	private static final java.util.Map<String, String[]> NAMED = java.util.Map.of("nurse", new String[] {"nurse", "nurse_2", "nurse_m", "nurse_m2"}, "clerk",
+			new String[] {"clerk", "clerk_2", "clerk_f", "clerk_f2"}, "officer_m", new String[] {"officer_m", "officer_m2", "officer_f2"}, "rocket",
+			new String[] {"rocket", "rocket_2", "rocket_3", "rocket_4", "rocket_5", "rocket_6", "rocket_7", "rocket_8", "rocket_9", "rocket_f"});
+
+	private static java.util.List<String> family(String base) {
+		return FAMILIES.computeIfAbsent(base, b -> {
+			java.util.List<String> out = new java.util.ArrayList<>();
+			String[] named = NAMED.get(b);
+			java.util.List<String> want = new java.util.ArrayList<>();
+			if (named != null) want.addAll(java.util.List.of(named));
+			else {
+				want.add(b);
+				for (int i = 2; i <= 9; i++) want.add(b + "_" + i);
+			}
+			var rm = Minecraft.getInstance().getResourceManager();
+			for (String w : want) if (rm.getResource(Retromon.id("textures/entity/npc/" + w + ".png")).isPresent()) out.add(w);
+			if (out.isEmpty()) out.add(b);
+			return out;
+		});
+	}
+
+	/** One of a look's versions, the same every time for the same person (and, behind a counter, the same in each town). */
+	private static String variant(Npc npc, String base) {
+		java.util.List<String> f = family(base);
+		if (f.size() <= 1) return base;
+		String seed = npc.key() + (npc.role() == Npc.NURSE || npc.role() == Npc.CLERK ? "@" + ClientState.data.place : "");
+		return f.get(Math.floorMod(seed.hashCode() * 31 + 7, f.size()));
+	}
+
 	static String sprite(Npc npc) {
+		String base = baseSprite(npc);
+		if (base.equals("blue") || base.equals("hero")) return base;
+		return variant(npc, base);
+	}
+
+	private static String baseSprite(Npc npc) {
 		String key = npc.key();
 		// Your rival (wherever he turns up), and you yourself (on the battle stage).
 		if (key.startsWith("rival")) return "blue";

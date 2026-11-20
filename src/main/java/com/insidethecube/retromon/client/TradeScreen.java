@@ -119,7 +119,7 @@ public class TradeScreen extends GameScreen {
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
 		float secs = (ticks + partial) / 20F;
-		Scenes.backdrop(g, "trade");
+		Scenes.bg2(g, "trade");
 		float swap = step == Step.CROSS ? (ticks - crossAt + partial) / CROSS : step == Step.TALK ? 1 : -1;
 		Scenes.trade(g, secs, send, get, swap);
 		if (step == Step.OFFER) {
@@ -134,15 +134,15 @@ public class TradeScreen extends GameScreen {
 	private void card(GuiGraphics g, float x, String who, String species, String name, int level, String trainer) {
 		float y = 40, w = 400, h = 150;
 		V.panel(g, x, y, w, h);
-		V.label(g, who, x + 22, y + 16);
-		V.text(g, name, x + 22, y + 38, 28, V.TEXT, true);
-		V.right(g, "Lv. " + level, x + w - 22, y + 44, 20, V.TEXT, true);
+		V.label(g, Lang.t(who), x + 22, y + 16);
+		V.title(g, name, x + 22, y + 16 + 18 + 4, 28, V.INK);
+		V.right(g, "Lv. " + level, x + w - 22, y + 16 + 18 + 4 + 6, 20, V.INK, true);
 		Species sp = Species.ALL.get(species);
 		if (sp != null) {
 			float tx = x + 22;
-			tx += V.type(g, sp.type1().label, Ui.typeColor(sp.type1()), tx, y + 82, 80, 12.5F) + 8;
-			if (sp.type2() != null && sp.type2() != sp.type1()) V.type(g, sp.type2().label, Ui.typeColor(sp.type2()), tx, y + 82, 80, 12.5F);
+			tx += PokedexScreen.typeChip(g, sp.type1(), tx, y + 82) + 8;
+			if (sp.type2() != null && sp.type2() != sp.type1()) PokedexScreen.typeChip(g, sp.type2(), tx, y + 82);
 		}
-		V.text(g, "Trainer: " + trainer, x + 22, y + 116, 16, V.MUTED, true);
+		V.text(g, Lang.t("Trainer: {0}", trainer), x + 22, y + 116, 16, V.MUTED, true);
 	}
 }

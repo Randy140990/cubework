@@ -93,7 +93,7 @@ public class NicknameScreen extends GameScreen {
 	protected void draw(GuiGraphics g, float partial) {
 		if (!naming) {
 			// The UI Viewer's "Being given a POKéMON": it held up on its stand against the warm light.
-			Scenes.backdrop(g, "gift");
+			Scenes.bg2(g, "gift");
 			if (Species.ALL.containsKey(species)) Scenes.model(g, (ticks + partial) / 20F, species, 0);
 			box.renderV(g, font, 140, 26, 1000, ticks, partial, false);
 			vchoice(g, yesNo, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(2), 300, i -> answer(i == 0));

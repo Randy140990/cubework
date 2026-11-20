@@ -34,10 +34,10 @@ public class KeyMapScreen extends GameScreen {
 		ROLE.put("KeyS", new String[] {"game", "Walk south", "In menus: down."});
 		ROLE.put("KeyD", new String[] {"game", "Walk east", "In menus: right."});
 		ROLE.put("Space", new String[] {"game", "Talk, look at things, choose", "In menus: A."});
-		ROLE.put("Enter", new String[] {"game", "Open the menu (START)", "In menus: A."});
+		ROLE.put("Enter", new String[] {"menu", "Choose, in menus (A)", "In the world it opens the menu too, as E does."});
 		ROLE.put("Tab", new String[] {"game", "Speed up: x1, x2, x3", "In menus: the next tab or pocket. (Moved off R, which reloads shaders.)"});
 		ROLE.put("Escape", new String[] {"game", "Pause", "In menus: back."});
-		ROLE.put("KeyE", new String[] {"menu", "Choose, in menus (A)", "In the world it would open Minecraft's inventory: turned off. On the Town Map, zoom in."});
+		ROLE.put("KeyE", new String[] {"game", "Open the menu (START)", "Where Minecraft opens its inventory, E opens ours. Press it again in the menu to close it."});
 		ROLE.put("KeyQ", new String[] {"menu", "Back, in menus (B)", "In the world it would drop what you hold: turned off. On the Town Map, zoom out."});
 		ROLE.put("KeyZ", new String[] {"menu", "Choose, in menus (A)", ""});
 		ROLE.put("KeyX", new String[] {"menu", "Back, in menus (B)", "On a name, delete a letter."});
@@ -57,7 +57,7 @@ public class KeyMapScreen extends GameScreen {
 		ROLE.put("KeyR", new String[] {"off", "Reload shaders", "Iris's key. Off: the game's look can't be changed."});
 		ROLE.put("KeyK", new String[] {"off", "Shaders on or off", "Iris's key. Off: the shaders stay on."});
 		ROLE.put("KeyO", new String[] {"off", "Shader packs", "Iris's menu. Off."});
-		ROLE.put("KeyM", new String[] {"off", "World map mods", "Map mods' keys (and the like): off. The Town Map is in the menu."});
+		ROLE.put("KeyM", new String[] {"off", "Other mods' keys", "Every other mod's key is turned off while you play (a map mod on M, for one). The Town Map is in the menu."});
 		ROLE.put("KeyJ", new String[] {"off", "Map mods", "Off."});
 		ROLE.put("KeyL", new String[] {"off", "Advancements", "Off."});
 		ROLE.put("KeyP", new String[] {"off", "Social interactions", "Off."});
@@ -79,7 +79,7 @@ public class KeyMapScreen extends GameScreen {
 		ROLE.put("Esc", ROLE.get("Escape"));
 	}
 	private static final String[] ROLES = {"game", "menu", "dev", "free", "off", "decide"};
-	private static final int[][] ROLE_COLOURS = {{0xFF4FB896, 0xFF062019}, {0xFFFFF4D8, 0xFF26304A}, {0xFF8E6BC8, 0xFFFFFFFF}, {0xFF7C8A99, 0xFFFFFFFF}, {0xFFE5525C, 0xFFFFFFFF}, {0xFFF0B43C, 0xFF26304A}};
+	private static final int[][] ROLE_COLOURS = {{0xFF41BF84, 0xFFFFFFFF}, {0xFFFFD34E, 0xFF26304A}, {0xFF8E6BC8, 0xFFFFFFFF}, {0xFF7C8A99, 0xFFFFFFFF}, {0xFFE5525C, 0xFFFFFFFF}, {0xFFF0B43C, 0xFF26304A}};
 	private static final String[] ROLE_NAMES = {"In game", "In menus", "For building", "Minecraft's, kept", "Turned off", "To decide"};
 
 	public KeyMapScreen(Screen parent) {
@@ -137,7 +137,7 @@ public class KeyMapScreen extends GameScreen {
 
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
-		Scenes.backdrop(g, "keymap");
+		Scenes.bg2(g, "keymap");
 		// What the colours mean, along the top.
 		float lx = X0;
 		for (int i = 0; i < ROLES.length; i++) {
@@ -157,9 +157,12 @@ public class KeyMapScreen extends GameScreen {
 					int ri2 = role == null ? -1 : roleIndex(role[0]);
 					boolean on = r == ri && c == ci;
 					float lift = on ? 3 : 0;
-					int bg = ri2 < 0 ? 0x14FFFFFF : ROLE_COLOURS[ri2][0], fg = ri2 < 0 ? V.MUTED : ROLE_COLOURS[ri2][1];
-					if (on) V.rr(g, x - 4, ky - lift - 4, kw + 8, U - 6 + 8, 16, V.CREAM);
-					V.rr(g, x, ky - lift + 3, kw, U - 6, 12, 0x4D000000);
+					int bg = ri2 < 0 ? 0xFFFFFFFF : ROLE_COLOURS[ri2][0], fg = ri2 < 0 ? V.DIM : ROLE_COLOURS[ri2][1];
+					if (on) {
+						V.shadow(g, x, ky - lift, kw, U - 6, 12, 1.2F);
+						V.rr(g, x - 6, ky - lift - 6, kw + 12, U - 6 + 12, 18, V.RED);
+						V.rr(g, x - 3, ky - lift - 3, kw + 6, U - 6 + 6, 15, 0xFFFFFFFF);
+					} else V.rr(g, x, ky - lift + 3, kw, U - 6, 12, 0x2E1E2854);
 					V.rr(g, x, ky - lift, kw, U - 6, 12, bg);
 					// Turned off: striped.
 					if (ri2 >= 0 && ROLES[ri2].equals("off"))
@@ -179,21 +182,22 @@ public class KeyMapScreen extends GameScreen {
 		String[] k = KB[ri][ci], role = ROLE.get(k[2]);
 		V.panel(g, 40, 470, 760, 220);
 		float kw = Math.max(56, V.width(k[0].isEmpty() ? " " : k[0], 18, true) + 20);
-		V.rr(g, 64, 488 + 2, kw, 40, 9, 0x40000000);
-		V.rr(g, 64, 488, kw, 40, 9, V.CREAM);
+		V.rr(g, 64, 488 + 3, kw, 40, 10, 0x2E1E2854);
+		V.rr(g, 64, 488, kw, 40, 10, 0xFFDDE3F0);
+		V.rr(g, 66, 490, kw - 4, 36, 8, 0xFFFFFFFF);
 		V.centred(g, k[0], 64 + kw / 2, 488 + (40 - 18 * 1.15F) / 2, 18, V.INK, true);
 		if (role != null) {
 			int i = roleIndex(role[0]);
-			V.text(g, role[1], 64 + kw + 14, 490, 28, V.TEXT, true);
+			V.title(g, role[1], 64 + kw + 14, V.capsTop(508, 28), 28, V.INK);
 			if (i >= 0) {
 				float cw = V.width(ROLE_NAMES[i], 14, true) + 24;
 				V.pill(g, 40 + 760 - 24 - cw, 496, cw, 26, ROLE_COLOURS[i][0]);
 				V.text(g, ROLE_NAMES[i], 40 + 760 - 24 - cw + 12, 500, 14, ROLE_COLOURS[i][1], true);
 			}
 			List<String> lines = V.wrap(role[2], 712, 20, true);
-			for (int j = 0; j < lines.size() && j < 4; j++) V.text(g, lines.get(j), 64, 542 + j * 30, 20, 0xFFE8F4EF, true);
+			for (int j = 0; j < lines.size() && j < 4; j++) V.text(g, lines.get(j), 64, 542 + j * 30, 20, V.TEXT, true);
 		} else {
-			V.text(g, "Not used", 64 + kw + 14, 492, 26, V.MUTED, true);
+			V.title(g, "Not used", 64 + kw + 14, V.capsTop(508, 26), 26, V.MUTED);
 			V.text(g, "Free for now.", 64, 542, 19, V.MUTED, true);
 		}
 		// Also turned off.
@@ -204,7 +208,7 @@ public class KeyMapScreen extends GameScreen {
 		float oy = 512;
 		for (String o : off) {
 			List<String> ol = V.wrap(o, 350, 17, true);
-			V.text(g, "■", 852, oy, 17, 0xFFFF9AA0, true);
+			V.text(g, "■", 852, oy, 17, 0xFFE5525C, true);
 			for (int j = 0; j < ol.size(); j++) V.text(g, ol.get(j), 874, oy + j * 20, 17, V.TEXT, true);
 			oy += ol.size() * 20 + 4;
 		}

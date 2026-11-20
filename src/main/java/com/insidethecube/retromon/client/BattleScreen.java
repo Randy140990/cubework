@@ -440,7 +440,15 @@ public class BattleScreen extends GameScreen {
 		return new int[] {m.maxHp(), m.attack(), m.defense(), m.spAttack(), m.spDefense(), m.speed()};
 	}
 
+	/** The EXP the last one got (for the win's card), from "gained 214 EXP. Points!". */
+	private int expGained;
+	private static final java.util.regex.Pattern GAINED = java.util.regex.Pattern.compile("gained (\\d+) EXP");
+
 	private void say(String text) {
+		if (text != null) {
+			java.util.regex.Matcher gm = GAINED.matcher(text);
+			if (gm.find()) expGained = Integer.parseInt(gm.group(1));
+		}
 		if (text == null || !text.contains(" grew to ")) levelAfter = null;
 		if ("... ... ...".equals(text) && whiteAt < 0) whiteAt = ticks;
 		// (Our creatures' names in place before it's typed out, so the old name never shows part way.)
@@ -871,8 +879,7 @@ public class BattleScreen extends GameScreen {
 		if (moneyAt >= 0) moneyBox(g, partial);
 		if (levelAfter != null && levelBefore != null) levelPanel(g);
 		if (gotchaAt >= 0) V.callout(g, "Gotcha!", 640, 150, (ticks - gotchaAt + partial) / 20F);
-		if (message != null && message.endsWith(" wants to battle!") && !kind.equals("WILD")) drawChallenge(g, message.substring(0, message.length() - 17), partial);
-		else challengeAt = -1;
+		if (!kind.equals("WILD") && (challengeAt >= 0 || message != null && message.startsWith("You are challenged by "))) drawChallenge(g, partial);
 		// Your last one's fainted: everything fades to white (the words still over it).
 		if (whiteAt >= 0) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, Math.min(1, (ticks - whiteAt + partial) / 24F)));
 		switch (mode) {
@@ -886,10 +893,9 @@ public class BattleScreen extends GameScreen {
 				vchoice(g, ask, 520 + 724 - 300, V.H - 26 - 120 - 12 - V.choiceHeight(2), 300, this::askPick);
 			}
 			case HOLD -> {
-				// The win, held: yours and you celebrating; carry on when you like.
-				String who = sides[0].name;
-				say(g, "WIN".equals(result) ? who + " is overjoyed!" : who + " cheers for the catch!", false, partial);
-				V.hints(g, "A", "Continue");
+				// The win, held (the viewer's): yours and you celebrating, its EXP on a card; carry on when you like.
+				holdCard(g, partial);
+				V.actsRight(g, 26, 40, 0, "A", "Continue");
 			}
 			default -> say(g, message == null ? "" : message.substring(0, Math.min(typed, message.length())), true, partial);
 		}
@@ -903,40 +909,55 @@ public class BattleScreen extends GameScreen {
 	private int challengeAt = -1;
 
 	/**
-	 * "BLUE wants to battle!", as the UI Viewer has it: speed lines streaming across, and the trainer's card sliding
-	 * in from the right, a red band leaning forward with gold edges, TRAINER and their name on it.
+	 * A trainer challenges you, as the UI Viewer's (Let's Go's): a rush of light sweeps across, streaks of white and
+	 * mint, gone in a little over a second, and the words come up. No name card: just the scene and the words.
 	 */
-	private void drawChallenge(GuiGraphics g, String who, float partial) {
+	private void drawChallenge(GuiGraphics g, float partial) {
 		if (challengeAt < 0) challengeAt = ticks;
 		float t = (ticks - challengeAt + partial) / 20F;
-		// The speed lines: pale slanted streaks sliding right.
-		float shift = (t / 0.5F % 1) * 400;
-		for (float x = -400 + shift - V.ox / V.k; x < V.W + V.ox / V.k + 400; x += 400) {
-			for (int k2 = 0; k2 < 13; k2++) {
-				float lx = x + k2 * 30;
-				g.pose().pushMatrix();
-				g.pose().translate(V.x(lx), V.y(0));
-				g.pose().mul(new org.joml.Matrix3x2f(1, 0, -0.2126F, 1, 0, 0));
-				g.fill(0, 0, Math.max(1, Math.round(V.s(4))), Math.round(V.s(V.H)), 0x47FFFFFF);
-				g.pose().popMatrix();
-			}
-		}
-		float in = Math.min(1, t / 0.5F), e = 1 - (1 - in) * (1 - in) * (1 - in), x = 1280 - 640 * e, y = 180, w = 640 + V.ox / V.k + 60, h = 52 * 1.15F + 13 * 1.3F + 44 + 8;
+		if (t >= 1.2F) return;
+		float p = t / 1.15F, a = p < 0.15F ? p / 0.15F : p < 0.7F ? 1 : Math.max(0, 1 - (p - 0.7F) / 0.3F);
+		a = V.bezier(0, 0, 0.58F, 1, Math.max(0, Math.min(1, a)));
+		if (a <= 0.01F) return;
+		// The glow in the middle, wide and low.
 		g.pose().pushMatrix();
-		g.pose().translate(V.x(x), V.y(y));
-		g.pose().mul(new org.joml.Matrix3x2f(1, 0, -0.2126F, 1, 0, 0));
-		float k = V.k;
-		// The band: clear at its left end, red by a quarter of the way.
-		int steps = 32;
-		for (int i = 0; i < steps; i++) {
-			float t0 = i / (float) steps, a = Math.min(1, t0 / 0.25F) * 0.95F;
-			g.fill(Math.round(w * k * t0), 0, Math.round(w * k * (i + 1) / steps), Math.round(h * k), Ui.alpha(0xFFE5525C, a));
-		}
-		g.fill(0, 0, Math.round(w * k), Math.round(4 * k), V.GOLD);
-		g.fill(0, Math.round((h - 4) * k), Math.round(w * k), Math.round(h * k), V.GOLD);
+		float cx = V.x(640), cy = V.y(720 * 0.55F);
+		g.pose().translate(cx, cy);
+		g.pose().scale(1, 360 / 896F);
+		g.pose().translate(-cx, -cy);
+		V.radialSoft(g, 640, 720 * 0.55F, 896 * 0.8F, new float[] {0, 0.55F / 0.8F, 1}, new int[] {Ui.alpha(0xFFFFFFF0, 0.85F * a), Ui.alpha(0xFFDCFFD2, 0.35F * a), 0x00FFFFFF});
 		g.pose().popMatrix();
-		V.label(g, "Trainer", x + 160, y + 26, 0xFFFFE6C0);
-		V.text(g, who, x + 160 - 6, y + 26 + 20, 52, V.TEXT, true);
+		// Sixteen streaks, each sliding across at its own speed.
+		for (int i = 0; i < 16; i++) {
+			float dur = 0.45F + (i % 4) * 0.08F, delay = -((i * 0.13F) % 0.5F);
+			float q = (((t - delay) % dur) + dur) % dur / dur;
+			float w = 1280 * 1.8F, x = -1280 * 0.4F + (-0.6F + 1.2F * q) * w, y = 720 * (0.04F + i * 0.06F), h = 2 + (i * 7) % 5;
+			int c = i % 3 != 0 ? 0xFFFFFFFF : 0xFFBEFFBE;
+			V.rrh(g, x, y, w, h, h / 2, new float[] {0, 0.5F, 1}, new int[] {c & 0x00FFFFFF, Ui.alpha(c, 0.9F * a), c & 0x00FFFFFF});
+		}
+	}
+
+	/** The win's card (the viewer's): yours, its level, the EXP bar filling with what it got. */
+	private void holdCard(GuiGraphics g, float partial) {
+		Side me = sides[0];
+		float x = 40, y = 520, w = 460, h = 16 + 26 * 1.2F + 8 + 14 + 16;
+		V.panel(g, x, y, w, h);
+		V.title(g, me.name, x + 22, y + 16, 26, V.INK);
+		V.right(g, "Lv. " + me.level, x + w - 22, y + 16 + 4, 20, V.INK, true);
+		Species sp = Species.ALL.get(me.species);
+		float ef = 0;
+		if (sp != null) {
+			int now = sp.growth().expAt(me.level), next = me.level >= 100 ? now + 1 : sp.growth().expAt(me.level + 1);
+			ef = Math.max(0, Math.min(1, (me.exp - now) / Math.max(1F, next - now)));
+		}
+		float ey = y + 16 + 26 * 1.2F + 8;
+		V.tracked(g, "EXP", x + 22, ey, 13, 0xFF3C8DE4, 1);
+		String gain = expGained > 0 ? "+" + expGained : "";
+		float gw = gain.isEmpty() ? 0 : V.width(gain, 15, true) + 10;
+		float bx = x + 22 + V.trackedWidth("EXP", 13, 1) + 10, bw = x + w - 22 - gw - bx;
+		V.pill(g, bx, ey + 2, bw, 10, 0xFFDDE3F0);
+		if (ef > 0) V.rrh(g, bx, ey + 2, Math.max(10, bw * ef), 10, 5, new float[] {0, 1}, new int[] {0xFF7CC2FA, 0xFF3C8DE4});
+		if (!gain.isEmpty()) V.right(g, gain, x + w - 22, ey - 1, 15, 0xFF3C8DE4, true);
 	}
 
 	/** Where a side's Pokémon is on the screen (the middle of it), or null. */
@@ -1091,13 +1112,13 @@ public class BattleScreen extends GameScreen {
 	/** A level gained: the viewer's panel at the right, each stat's new value and what it went up by in green. */
 	private void levelPanel(GuiGraphics g) {
 		String[] names = {"HP", "ATTACK", "DEFENSE", "SPCL.ATK", "SPCL.DEF", "SPEED"};
-		float x = 860, y = 120, w = 380, rh = 24, gap = 8, h = 32 + 6 * rh + 5 * gap;
+		float x = 860, y = 120, w = 380, rh = 20 * 1.36F, gap = 8, h = 16 * 2 + 6 * rh + 5 * gap;
 		V.panel(g, x, y, w, h);
 		for (int i = 0; i < 6; i++) {
-			float ry = y + 16 + i * (rh + gap);
-			V.label(g, names[i], x + 22, ry + 5);
-			V.right(g, String.valueOf(levelAfter[i]), x + w - 22 - 70, ry, 20, V.TEXT, true);
-			V.right(g, "+" + Math.max(1, levelAfter[i] - levelBefore[i]), x + w - 22, ry, 20, V.EDGE_LIGHT, true);
+			float ry = y + 16 + i * (rh + gap), mid = ry + rh / 2;
+			V.label(g, names[i], x + 22, V.capsTop(mid, 13));
+			V.right(g, String.valueOf(levelAfter[i]), x + w - 22 - 70, V.capsTop(mid, 20), 20, V.INK, true);
+			V.right(g, "+" + Math.max(1, levelAfter[i] - levelBefore[i]), x + w - 22, V.capsTop(mid, 20), 20, 0xFF2FA86C, true);
 		}
 	}
 
@@ -1275,7 +1296,7 @@ public class BattleScreen extends GameScreen {
 			float ax = X + 20 + V.labelWidth("Power") + 8 + V.width("000", 18, true) + 22;
 			V.label(g, "Accuracy", ax, sy + 5);
 			V.text(g, sel.accuracy() <= 0 ? "-" : String.valueOf(sel.accuracy()), ax + V.labelWidth("Accuracy") + 8, sy, 18, V.TEXT, true);
-			for (int i = 0; i < dl.size(); i++) V.text(g, dl.get(i), X + 20, sy + 32 + i * 23, 17, 0xFFE8F4EF, true);
+			for (int i = 0; i < dl.size(); i++) V.text(g, dl.get(i), X + 20, sy + 32 + i * 23, 17, V.TEXT, true);
 		}
 		V.hints(g, "A", "Use", "B", "Back");
 	}

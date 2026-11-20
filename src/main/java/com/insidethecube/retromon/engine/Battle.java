@@ -194,7 +194,7 @@ public class Battle {
 			out.add(Event.sendOut(1, enemy, them().hp));
 			out.add(Event.text("Wild " + them().name() + " appeared!"));
 		} else {
-			out.add(Event.text(trainer + " wants to battle!"));
+			out.add(Event.text("You are challenged by " + trainer + "!"));
 			out.add(Event.sendOut(1, enemy, them().hp));
 			out.add(Event.text(trainer + " sent out " + them().name() + "!"));
 		}
