@@ -28,7 +28,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
       const ramps = R.ramps.map(rp => { const [x0, z0, x1, z1] = rp.rect, xs = []; for (let x = x0; x <= x1 + 1e-6; x += 0.125) xs.push([x, rp.h(x, (z0 + z1) / 2)]); return { rect: rp.rect, h: xs }; });
       rooms[id] = {
         id, name: R.name, floor: R.floor, W: R.W, D: R.D, H: R.H, faces, solids: R.solids, ramps,
-        acts: R.acts.map(a => ({ rect: a.rect, label: a.label || "Look", lines: a.lines || null, ask: !!a.ask, pc: !!a.pc, hit: !!a.hit })),
+        acts: R.acts.map(a => ({ rect: a.rect, label: a.label || "Look", lines: a.lines || null, ask: !!a.ask, pc: !!a.pc, hit: !!a.hit, map: !!a.map })),
         npcs: R.npcs.map(n => ({ name: n.name, x: n.x, z: n.z, yaw: n.yaw, seated: !!n.seated, skin: n.look && n.look.skin, role: n.role || null, key: n.key || null, lines: n.talk ? n.talk(null).map(l => l.text) : [] })),
         spawn: R.spawn, floors: R._floors, door: R._door, mats: R._mats || [], stairs: R._stairs || [], screens: R._screens || [],
       };

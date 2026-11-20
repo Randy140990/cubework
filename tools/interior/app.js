@@ -223,6 +223,9 @@ async function doAct(a) {
   } else if (a.ask) {
     const yes = await say([{ text: "Have a rest?", ask: ["Yes", "No"] }]);
     if (yes === 0) { await fadeTo(1, 420); await sleep(380); await fadeTo(0, 420); await say([{ text: "You had a good rest. Your team is full of energy!" }]); }
+  } else if (a.map) {
+    await say((a.lines || []).slice(0, 1).map(t => ({ text: t })));
+    await showMap();
   } else if (a.pc) {
     const pick = await say([{ text: "You booted up the PC.", ask: ["Item storage", "Log off"] }]);
     if (pick === 0) await say([{ text: "Item storage: one POTION, kept for you." }, { text: "In game, your boxes and stored items open from here." }]);
@@ -231,6 +234,24 @@ async function doAct(a) {
     await say((a.lines || ["Nothing special."]).map(t => ({ text: t })));
   }
   busy = false;
+}
+
+// The Town Map, as a wall map opens it: the world from above, till you press a key or click.
+function showMap() {
+  return new Promise(res => {
+    const v = document.createElement("div"); v.className = "mapview";
+    const c = document.createElement("canvas"); c.width = WORLDMAP.w; c.height = WORLDMAP.h;
+    const id = new ImageData(WORLDMAP.w, WORLDMAP.h), b = atob(WORLDMAP.d);
+    for (let i = 0, n = WORLDMAP.w * WORLDMAP.h; i < n; i++) { id.data[i * 4] = b.charCodeAt(i * 3); id.data[i * 4 + 1] = b.charCodeAt(i * 3 + 1); id.data[i * 4 + 2] = b.charCodeAt(i * 3 + 2); id.data[i * 4 + 3] = 255; }
+    c.getContext("2d").putImageData(id, 0, 0);
+    v.innerHTML = '<div class="card"><h3>TOWN MAP</h3></div>';
+    v.querySelector(".card").append(c);
+    const p = document.createElement("p"); p.textContent = "The world from above. In game, the Town Map opens here: zoom, pan and pick a place. Any key or click to close."; v.querySelector(".card").append(p);
+    viewerEl.append(v);
+    const done = () => { window.removeEventListener("keydown", key, true); v.remove(); actQueued = false; res(); };
+    const key = e => { e.preventDefault(); e.stopPropagation(); done(); };
+    setTimeout(() => { window.addEventListener("keydown", key, true); v.addEventListener("pointerdown", e => { e.stopPropagation(); done(); }); }, 250);
+  });
 }
 
 // ---------- input ----------

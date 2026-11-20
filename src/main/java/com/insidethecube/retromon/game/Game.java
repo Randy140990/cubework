@@ -1502,7 +1502,10 @@ public final class Game {
 				n.setFacing(n.yawTo(p));
 				return false;
 			}
-			if (dist > 1.9 && n.approaching > 0) {
+			// The clerk behind his counter (Viridian's Mart, calling you over for OAK's PARCEL) and the nurse behind
+			// hers don't come round: they talk to you from where they are, after the "!".
+			boolean stays = n.role() == Npc.CLERK || n.role() == Npc.NURSE;
+			if (dist > 1.9 && n.approaching > 0 && !stays) {
 				if (n.approaching % 5 == 0 || n.getNavigation().isDone()) n.getNavigation().moveTo(p, 0.95);
 				return false;
 			}
@@ -2356,8 +2359,9 @@ public final class Game {
 				changed = true;
 			}
 		}
-		// The nurse and the clerk who stood outside (on the roofs) before there were insides: gone, once.
-		if (!done.contains("indoors:viridian")) {
+		// The nurse and the clerk who stood outside (on the roofs) before there were insides: gone, and kept gone
+		// (looked for every couple of seconds while that part of Viridian is loaded; they're inside now).
+		{
 			boolean all = true;
 			for (int[] o : OLD_OUTSIDE) {
 				BlockPos at = new BlockPos(o[0], START_Y, o[1]);
@@ -2368,7 +2372,7 @@ public final class Game {
 				net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(o[0] - 14, level.getMinY(), o[1] - 14, o[0] + 14, level.getMaxY(), o[1] + 14);
 				for (Npc n : level.getEntitiesOfClass(Npc.class, box, n -> n.role() == Npc.NURSE || n.role() == Npc.CLERK)) n.discard();
 			}
-			if (all) {
+			if (all && !done.contains("indoors:viridian")) {
 				placed.add("indoors:viridian");
 				done.add("indoors:viridian");
 				changed = true;

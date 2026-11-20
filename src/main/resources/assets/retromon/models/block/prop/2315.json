@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/blue_trim","blue_trim":"retromon:block/interior/blue_trim"},"elements":[{"from":[14.88,7.2,16],"to":[16.0,8.8,16],"faces":{"north":{"uv":[0.0,7.2,1.12,8.8],"texture":"#blue_trim"}}}]}

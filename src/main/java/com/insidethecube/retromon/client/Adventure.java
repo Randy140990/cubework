@@ -281,6 +281,12 @@ public final class Adventure {
 		// in front of it.
 		com.insidethecube.retromon.game.Interiors.Ahead ahead = com.insidethecube.retromon.game.Interiors.ahead(mc.player);
 		if (ahead != null && (best == null || bestDist > ahead.distance() + 0.35)) {
+			// A map on the wall (or Daisy's on the table) opens the Town Map; B puts you back in the room.
+			if (ahead.map()) {
+				Sounds.press();
+				mc.setScreen(new TownMapScreen(null));
+				return;
+			}
 			mc.setScreen(new DialogueScreen(ahead.lines(), "sign", -1, new CompoundTag()));
 			return;
 		}

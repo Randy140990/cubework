@@ -33,6 +33,13 @@ def skindata():
             out[grp][n] = "data:image/png;base64," + base64.b64encode(open(f, "rb").read()).decode()
     return out
 
+def worldmap():
+    """The world map picture (tools/worldmap.py), as raw RGB for the wall maps and the Town Map view."""
+    import base64
+    from PIL import Image
+    im = Image.open(os.path.join(HERE, "interior", "worldmap.png")).convert("RGB")
+    return {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
+
 def engine():
     s = open(os.path.join(HERE, "monviewer.html")).read()
     a = s.index("// ---------- Molang")
@@ -46,7 +53,7 @@ def main():
     js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "figure.js", "creature.js", "rooms.js", "app.js"))
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
-            + "const DATA = " + data + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
+            + "const DATA = " + data + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
             + engine() + "\n" + js + "\n</script>\n")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     open(out, "w").write(html)
