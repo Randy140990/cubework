@@ -59,6 +59,28 @@ function typeBackdrop(t) { const c = typeHex(t); backdrop(`linear-gradient(160de
 // A band in the creature's colour across the top of its page, for its name (Scenes.typeBand).
 function typeBand(t, x, y, w, hh) { const c = typeHex(t); return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${hh}px;border-radius:22px;background:linear-gradient(180deg, ${lighterHex(c, 0.12)}, ${darkerHex(c, 0.14)} 55%, ${darkerHex(c, 0.32)});box-shadow:0 0 0 2px rgba(255,255,255,.4), 0 4px 0 rgba(0,0,0,.2)"></div>`; }
 const TYPECOL = t => `var(--t-${String(t).toLowerCase()})`;
+// Each type's own little mark, white (ours, drawn plain): for the move bars, as Let's Go marks each move with its type.
+const TYPE_GLYPH = {
+  NORMAL: `<circle cx="32" cy="32" r="17" fill="none" stroke="#fff" stroke-width="7"/>`,
+  FIRE: `<path d="M32 6c4 10 15 15 15 29 0 10-7 19-15 19s-15-9-15-19c0-7 4-11 6-16 2 5 4 7 6 8 0-7 0-14 3-21z" fill="#fff"/>`,
+  WATER: `<path d="M32 6C38 17 48 27 48 38a16 16 0 0 1 -32 0C16 27 26 17 32 6z" fill="#fff"/>`,
+  GRASS: `<path d="M32 6C46 14 52 28 48 41 44 51 38 56 32 58 26 56 20 51 16 41 12 28 18 14 32 6z" fill="#fff"/><path d="M32 14V54" stroke="currentColor" stroke-width="3" opacity=".5"/>`,
+  ELECTRIC: `<path d="M37 5L17 35h12l-5 24 23-33H35z" fill="#fff"/>`,
+  ICE: `<g stroke="#fff" stroke-width="5" stroke-linecap="round"><path d="M32 7v50M10 19.5l44 25M10 44.5l44-25"/><path d="M26 11l6 6 6-6M26 53l6-6 6 6"/></g>`,
+  FIGHTING: `<path d="M16 26c0-5 4-8 8-8h18c6 0 10 4 10 10v10c0 9-7 16-16 16h-6c-8 0-14-6-14-14z" fill="#fff"/><path d="M24 18v10M33 18v10M42 18v10" stroke="currentColor" stroke-width="3" opacity=".45"/>`,
+  POISON: `<circle cx="32" cy="38" r="15" fill="#fff"/><circle cx="22" cy="16" r="6" fill="#fff"/><circle cx="41" cy="12" r="4" fill="#fff"/>`,
+  GROUND: `<path d="M6 46L22 20l9 13 7-9 20 22z" fill="#fff"/><path d="M8 52h48" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`,
+  FLYING: `<path d="M8 40c10-22 28-30 48-30-6 6-9 12-10 18 4 0 7-1 10-3-4 10-12 16-22 17 3 1 5 2 8 2-10 6-24 4-34-4z" fill="#fff"/>`,
+  PSYCHIC: `<path d="M6 32c8-12 17-18 26-18s18 6 26 18c-8 12-17 18-26 18S14 44 6 32z" fill="#fff"/><circle cx="32" cy="32" r="8" fill="currentColor" opacity=".55"/>`,
+  BUG: `<ellipse cx="32" cy="37" rx="14" ry="18" fill="#fff"/><path d="M26 18q-6-10-12-10M38 18q6-10 12-10" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M32 22v32" stroke="currentColor" stroke-width="3" opacity=".45"/>`,
+  ROCK: `<path d="M12 42L10 28 19 15 34 10 48 16 55 31 50 47 34 55 19 52z" fill="#fff"/><path d="M19 15L27 30 48 16M27 30L34 55" stroke="currentColor" stroke-width="2.5" opacity=".4" fill="none"/>`,
+  GHOST: `<path d="M14 56V28a18 18 0 0 1 36 0v28l-6-5-6 5-6-5-6 5-6-5z" fill="#fff"/><circle cx="25" cy="29" r="4" fill="currentColor" opacity=".6"/><circle cx="39" cy="29" r="4" fill="currentColor" opacity=".6"/>`,
+  DRAGON: `<path d="M14 54C14 30 26 12 50 8 40 18 38 26 40 34 46 30 50 30 54 32 44 40 34 46 14 54z" fill="#fff"/>`,
+  DARK: `<path d="M40 8a24 24 0 1 0 16 40 20 20 0 1 1 -16 -40z" fill="#fff"/>`,
+  STEEL: `<path d="M32 6l22 13v26L32 58 10 45V19z" fill="#fff"/><circle cx="32" cy="32" r="9" fill="currentColor" opacity=".5"/>`,
+  FAIRY: `<path d="M32 4l6 20 20 2-15 13 5 21-16-11-16 11 5-21L6 26l20-2z" fill="#fff"/>`,
+};
+function typeGlyph(t, size, extra = "") { const g = TYPE_GLYPH[String(t).toUpperCase()] || TYPE_GLYPH.NORMAL; return `<svg viewBox="0 0 64 64" width="${size}" height="${size}" style="display:block;color:${TYPECOL(t)};${extra}">${g}</svg>`; }
 function typeChip(t) { return `<span class="g-type" style="background:${TYPECOL(t)}">${esc(t)}</span>`; }
 const STATUS = { PSN: "#AB6AC8", BRN: "#F08436", PAR: "#D9B42C", SLP: "#8A93A6", FRZ: "#6FCFD0", FNT: "#B0475A" };
 function statusChip(s) { return s ? `<span class="g-status" style="background:${STATUS[s] || "#666"}">${s}</span>` : ""; }
@@ -115,6 +137,24 @@ function monBackdrop(sid, o = {}) {
     bits += `<span style="position:absolute;left:${x}%;top:${y}%;transform:scale(${sc});${P[kind]()};animation:${an}"></span>`; }
   bgAdd(bits + `<style>@keyframes bgRise{from{transform:translate(0,120px);opacity:0}15%{opacity:1}to{transform:translate(30px,-260px);opacity:0}}@keyframes bgFall{from{transform:translate(0,-140px) rotate(0);opacity:0}15%{opacity:1}to{transform:translate(-60px,260px) rotate(320deg);opacity:0}}@keyframes bgTwinkle{0%,100%{opacity:.15;transform:scale(.5)}50%{opacity:1;transform:scale(1.1)}}</style>`);
   return { cols, kind };
+}
+
+// The bright pages (saves, options, the maker, the bag, the card...) get the same kind of backdrop as the creatures, to
+// a degree: their colour as a sweep, a great soft swirl of light, blurred dots, a few motes twinkling, and the bloom of
+// light from a corner. Placed by the screen, so each page's swirl sits in its own place.
+const BRIGHT = { sky: ["#F6FCFF", "#93D2F6", "#4A8EDD"], lime: ["#FCFFE6", "#CDEB72", "#73B53C"], peach: ["#FFF7F0", "#FFC9A6", "#E8826A"], mint: ["#F2FFF8", "#9EE9C8", "#40AE8C"], dream: ["#F6FEFF", "#A9E2EF", "#4182C0"] };
+function swirlBackdrop(name, o = {}) {
+  const cols = BRIGHT[name] || BRIGHT.sky;
+  let seed = hashStr((o.seed || "") + name + (typeof curId !== "undefined" ? curId : "")); const rnd = () => (seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) / 4294967296;
+  const cx = o.cx ?? 30 + rnd() * 40, cy = o.cy ?? 40 + rnd() * 25, sx = cx + (rnd() - 0.5) * 30, sy = cy + (rnd() - 0.5) * 20, lx = o.lx ?? 85, ly = o.ly ?? 5;
+  backdrop(`radial-gradient(circle at ${lx}% ${ly}%, rgba(255,255,255,.7) 0%, rgba(255,255,255,.25) 18%, transparent 40%),
+    radial-gradient(ellipse 55% 65% at ${cx}% ${cy}%, rgba(255,255,255,.42) 0%, rgba(255,255,255,.14) 32%, transparent 60%),
+    radial-gradient(circle at ${sx}% ${sy}%, transparent 32%, rgba(255,255,255,.26) 39%, rgba(255,255,255,.09) 46%, transparent 54%),
+    radial-gradient(circle at ${sx - 7}% ${sy + 9}%, transparent 48%, rgba(255,255,255,.16) 54%, transparent 62%),
+    linear-gradient(${125 + Math.round(rnd() * 30)}deg, ${cols[0]} 0%, ${cols[1]} 48%, ${cols[2]} 100%)`);
+  let dots = ""; for (let i = 0; i < 10; i++) { const r = 18 + rnd() * 50; dots += `<span style="position:absolute;left:${rnd() * 100}%;top:${rnd() * 100}%;width:${r}px;height:${r}px;border-radius:50%;background:rgba(255,255,255,${0.1 + rnd() * 0.18});filter:blur(${2 + rnd() * 6}px)"></span>`; }
+  for (let i = 0; i < 14; i++) { const dl = -rnd() * 5; dots += `<span style="position:absolute;left:${rnd() * 100}%;top:${rnd() * 100}%;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 8px #fff;animation:bgTwinkle ${2 + rnd() * 3}s ease-in-out ${dl}s infinite"></span>`; }
+  bgAdd(dots + `<style>@keyframes bgTwinkle{0%,100%{opacity:.15;transform:scale(.5)}50%{opacity:1;transform:scale(1.1)}}</style>`);
 }
 
 // ---------- little pictures of our creatures, for lists: each drawn once from its model, three-quarters on ----------
@@ -227,8 +267,9 @@ function go(id, arg) {
 }
 function step(d) { const i = SCREENS.indexOf(curDef); go(SCREENS[(i + d + SCREENS.length) % SCREENS.length].id); }
 // What each key does, bottom right: buttons you can click as well as press (each sends its key).
-const HINTKEY = { A: "a", SPACE: "a", B: "b", ESC: "b", TAB: "tab", X: "x", Y: "y" };
-function pressKey(k) { if (cur && cur.key) cur.key(k); }
+const HINTKEY = { A: "a", SPACE: "a", B: "b", ESC: "b", TAB: "tab", X: "x", Y: "y", E: "e" };
+function pressE() { if (cur && cur.raw && cur.raw({ code: "KeyE" })) return true; return false; }
+function pressKey(k) { if (k === "e") { pressE(); return; } if (cur && cur.key) cur.key(k); }
 function hints(list, o = {}) {
   // A and B are the keyboard's SPACE and ESC (the letter A on a keyboard is "left"), so say so.
   const KB = { A: "SPACE", B: "ESC" };
@@ -282,7 +323,7 @@ function textBox(lines, o = {}) {
   }
   function finished() {
     const L = lines[i];
-    if (L.ask) { if (!choice) choice = choiceBox(L.ask, { x: 1280 - 140 - 300, y: null, bottom: (o.bottom ?? 26) + 150, onPick: k => { const c = choice; choice = null; c.el.remove(); end(k); } }); }
+    if (L.ask) { if (!choice) choice = choiceBox(L.ask, { x: 1280 - 140 - 300, y: null, bottom: (o.bottom ?? 26) + 150, onPick: k => { const c = choice; choice = null; c.el.remove(); end(k); }, onBack: () => { const c = choice; choice = null; c.el.remove(); end(-1); } }); }
     else if (!(o.keep && i === lines.length - 1)) more.hidden = false;
   }
   function end(v) { if (i < lines.length - 1) { i++; show(); } else { if (!o.keep) { dead = true; el.remove(); } res(v); if (o.onDone) o.onDone(v); } }
@@ -337,6 +378,7 @@ function gridMove(i, n, cols, k) {
 // ---------- input ----------
 const KEY = { ArrowUp: "up", KeyW: "up", ArrowDown: "down", KeyS: "down", ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right",
   KeyE: "a", Enter: "a", NumpadEnter: "a", Space: "a", KeyZ: "a", KeyQ: "b", Backspace: "b", Escape: "b", KeyX: "b", Tab: "tab" };
+const ESC_TO = { splash: "title", prof: "saves", rival: "name", ready: "rival", talk: "hud", itemget: "hud", badgeget: "hud", wait: "menu", mart: "hud", center: "hud", trade: "hud", gift: "hud", starter: "hud", levelup: "hud", evolve: "hud", victory: "hud", whiteout: "center" };
 let stageActive = false;
 stageEl.addEventListener("pointerdown", () => { stageActive = true; stageEl.focus({ preventScroll: true }); });
 document.addEventListener("pointerdown", e => { if (!stageEl.contains(e.target)) stageActive = false; });
@@ -347,7 +389,9 @@ window.addEventListener("keydown", e => {
   if (cur && cur.raw && cur.raw(e)) { e.preventDefault(); return; }
   const k = KEY[e.code]; if (!k) return;
   if (e.repeat && (k === "a" || k === "b")) { e.preventDefault(); return; }
-  const handled = cur && cur.key ? cur.key(k) : false;
+  let handled = cur && cur.key ? cur.key(k) : false;
+  // ESC always gets you out: where a screen doesn't use B itself (a conversation, a gift, the intro), it goes back a step.
+  if (handled === false && k === "b" && ESC_TO[curId]) { go(ESC_TO[curId]); handled = true; }
   if (handled !== false || k === "tab" || k === "a" || k.length < 6) e.preventDefault();
 });
 

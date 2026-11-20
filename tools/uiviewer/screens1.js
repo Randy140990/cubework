@@ -35,12 +35,12 @@ screen("splash", "Start", "Opening", {
       <div class="g-title" style="font-size:64px;letter-spacing:10px;color:#F4F6FF">INSID3 TH3 CUB3</div><div style="font-size:24px;letter-spacing:6px;color:var(--g-muted);font-weight:700">presents</div></div>`);
     e.style.opacity = 0; e.style.transition = "opacity .9s ease";
     later(80, () => e.style.opacity = 1); later(2300, () => e.style.opacity = 0); later(3300, () => go("title"));
-    return { key: k => { if (k === "a") go("title"); return true; } };
+    return { key: k => { if (k === "a" || k === "b") go("title"); return true; } };
   }
 });
 screen("title", "Start", "Title screen", {
   scene: "title", pixel: 5,
-  what: "The title. RETROMON look: the word built of little blocks, as Minecraft's own title is, over a blocky hill with clouds and trees and a few of our creatures, all drawn as pixel art. COBBLEMON look: the old title, the pixel Charizard against the night sky, reading POKéMON.",
+  what: "The title, as Let's Go's: RETROMON over a sunny meadow built of Minecraft's own blocks, drawn as pixel art. Grass blocks with short grass and flowers, leaf-block bushes, oak trees framing it and more on the horizon, clouds drifting across, and the sun top right with its glare and soft dots of light (all behind the scene). PRESS SPACE says which key. COBBLEMON look: the old title, the pixel Charizard against the night sky, reading POKéMON.",
   tags: ["New look"], mod: "IntroScreen: the pixel Charizard against the night sky, RETROMON, PRESS START.",
   make() {
     const night = LOOK === "theirs";
@@ -48,13 +48,21 @@ screen("title", "Start", "Title screen", {
       backdrop("radial-gradient(ellipse at 50% 30%, #2A3F7A 0%, #142454 45%, #070D26 100%)");
       add(h("div", "", `<div style="position:absolute;inset:0;background:radial-gradient(circle at 12% 18%,#fff 0 1.5px,transparent 2.5px),radial-gradient(circle at 78% 12%,#fff 0 2px,transparent 3px),radial-gradient(circle at 64% 34%,#cfe 0 1.5px,transparent 2.5px),radial-gradient(circle at 30% 42%,#fff 0 1px,transparent 2px),radial-gradient(circle at 88% 46%,#fff 0 1.5px,transparent 2.5px);background-size:320px 260px"></div><div style="position:absolute;right:120px;top:70px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#FFF8DC,#E8DDB0);box-shadow:0 0 40px rgba(255,248,220,.5)"></div>`));
     } else {
-      backdrop("linear-gradient(180deg,#5FB0E8 0%,#9ED6F5 50%,#D6F0FB 64%,#9ED68A 64.2%,#6DB85B 100%)");
-      add(h("div", "", `<div style="position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 0%, rgba(255,255,255,.12) 0 5deg, transparent 5deg 15deg)"></div>`));
+      // A clear sky, paling to the horizon. The sun sits top right, behind the clouds and trees: a soft glare and a few
+      // round dots of light drifting down from it, as Let's Go's title has. All of it behind the scene.
+      backdrop("linear-gradient(180deg,#3F98E2 0%,#69B6EE 22%,#A5D8F6 40%,#E4F6FF 52%,#BFE3A8 60%,#7CC35A 100%)");
+      bgAdd("", { background: `radial-gradient(circle at 90% 4%, rgba(255,255,248,.98) 0%, rgba(255,252,226,.85) 5%, rgba(255,246,200,.45) 13%, rgba(255,240,190,.16) 26%, transparent 42%),
+        radial-gradient(ellipse 70% 30% at 80% 0%, rgba(255,255,255,.35), transparent 70%)` });
+      const dot = (x, y, r, c, a, blur = 0) => `<i style="position:absolute;left:${x - r}px;top:${y - r}px;width:${r * 2}px;height:${r * 2}px;border-radius:50%;background:radial-gradient(circle, ${c} 0%, ${c} 55%, transparent 72%);opacity:${a};${blur ? `filter:blur(${blur}px);` : ""}animation:tglint ${5 + r % 4}s ease-in-out ${(x % 7) / 3}s infinite alternate"></i>`;
+      bgAdd(`<style>@keyframes tglint{from{transform:translate(0,0)}to{transform:translate(-6px,5px)}}</style>
+        ${dot(1100, 92, 34, "rgba(255,255,236,.9)", .55, 1)}${dot(1032, 150, 16, "rgba(210,246,255,.95)", .6)}${dot(980, 196, 52, "rgba(255,236,250,.8)", .28, 2)}
+        ${dot(918, 244, 10, "rgba(255,255,255,.95)", .7)}${dot(866, 292, 26, "rgba(220,255,236,.85)", .32, 1)}${dot(1180, 160, 12, "rgba(255,255,255,.95)", .55)}${dot(1214, 58, 20, "rgba(255,244,214,.9)", .5, 1)}`);
     }
     if (night) box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="POKéMON" src="${wordmark("POKéMON", { top: [255, 236, 120], bottom: [240, 170, 40], side: [40, 60, 140], line: [12, 18, 48] })}" style="max-width:1080px;image-rendering:pixelated;filter:drop-shadow(0 10px 0 rgba(0,0,0,.18))"></div>`);
     // RETROMON in round, heavy letters on a gentle arch (tools/wordmark.py), with its own edge and shadow.
     else box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="RETROMON" src="${wordmark("RETROMON")}" style="width:838px;height:152px"></div>`);
-    box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#fff;color:#26304A;font-size:30px;line-height:36px;letter-spacing:6px;box-shadow:0 0 0 4px rgba(255,255,255,.5),0 6px 0 rgba(0,0,0,.18)">${esc(T("PRESS START"))}</span></div>`);
+    // Which key, said plainly (Let's Go's "Press the A Button"): SPACE, in its own key cap.
+    box(0, 612, 1280, null, "", `<div style="text-align:center"><style>@keyframes tpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.62;transform:scale(.97)}}</style><span class="g-title" style="animation:tpulse 1.8s ease-in-out infinite;display:inline-flex;align-items:center;gap:14px;padding:7px 14px 7px 30px;border-radius:999px;background:#fff;color:#26304A;font-size:28px;line-height:36px;letter-spacing:4px;box-shadow:0 0 0 4px rgba(255,255,255,.5),0 6px 0 rgba(0,0,0,.18)">${T("PRESS {0}").split("{0}").map(esc).join(`<span style="display:inline-grid;place-items:center;height:40px;padding:0 22px;border-radius:12px;background:linear-gradient(180deg,#3A4566,#26304A);color:#fff;font-size:20px;letter-spacing:3px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.35)">SPACE</span>`)}</span></div>`);
     box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">INSID3 TH3 CUB3</div>`);
     box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">Version 0.28</div>`);
     return { key: k => { if (k === "a") go("saves"); return true; } };
@@ -67,7 +75,7 @@ screen("saves", "Start", "Continue or new game", {
   mod: "IntroScreen's save slots: rounded cards with a picture, a SLOT pill and DELETE.",
   try: ["Up and down between slots, A to load or start, B for the title."],
   make() {
-    backdrop(SKY); rays(85, 10); const C = ctl();
+    swirlBackdrop("sky", { lx: 85, ly: 10 }); const C = ctl();
     const slots = [{ used: true }, {}, {}];
     let sel = 0;
     const wrap = box(70, 90, 640, null, "", "");
@@ -106,7 +114,7 @@ screen("options", "Start", "Options", {
   mod: "MenuScreen's OPTION: TEXT SPEED, MUSIC, POKéDEX VOICE, NIGHTS, WILD POKéMON.",
   tags: ["New: sound, battle effects, battle style, controls"],
   make(arg) {
-    backdrop(LIME); rays(15, 0, 0.2); let sel = 0;
+    swirlBackdrop("lime", { lx: 15, ly: 0 }); let sel = 0;
     const desc = box(170, 40, 940, 96, "g-panel", ""); desc.style.padding = "22px 30px"; desc.style.fontSize = "22px"; desc.style.fontWeight = "800";
     const P = box(170, 160, 940, 470, "g-panel", ""); P.style.padding = "18px";
     const rows = OPTS.concat([["CONTROLS", null, null, "See every key: what it does in game, and what's turned off."]]);
@@ -130,17 +138,18 @@ screen("options", "Start", "Options", {
   }
 });
 screen("keys", "Start", "Keys check", {
-  what: "Before the first game: shows the keys you'll use, with a way to see the full key map.",
+  what: "Before the first game: shows the keys you'll use, with a way to see the full key map. E opens the menu, as Minecraft's inventory key does, and every other mod's keys are turned off while you play.",
   tags: ["New"],
   make() {
-    backdrop(PEACH); rays(80, 0); const C = ctl();
-    box(180, 110, 640, 420, "g-panel g-fadein", `<div style="padding:34px 40px;display:grid;gap:20px"><div class="g-title" style="font-size:36px">These are your keys</div>
+    swirlBackdrop("peach", { lx: 80, ly: 0 }); const C = ctl();
+    box(180, 100, 640, 470, "g-panel g-fadein", `<div style="padding:34px 40px;display:grid;gap:20px"><div class="g-title" style="font-size:36px">These are your keys</div>
       <div style="display:grid;grid-template-columns:auto 1fr;gap:14px 22px;align-items:center;font-size:22px;font-weight:800">
         <span><span class="g-key">W</span> <span class="g-key">A</span> <span class="g-key">S</span> <span class="g-key">D</span></span><span>Walk</span>
         <span><span class="g-key" style="min-width:120px">SPACE</span></span><span>Talk, look, choose</span>
-        <span><span class="g-key" style="min-width:80px">ENTER</span></span><span>Open the menu</span>
+        <span><span class="g-key">E</span></span><span>Open the menu (as Minecraft's inventory)</span>
         <span><span class="g-key" style="min-width:64px">TAB</span></span><span>Speed up</span>
-        <span><span class="g-key">Q</span> <span class="g-key">X</span></span><span>Back</span></div></div>`);
+        <span><span class="g-key">Q</span> <span class="g-key">X</span></span><span>Back</span></div>
+      <div style="font-size:16px;font-weight:800;color:var(--g-muted);line-height:1.4">Other mods' keys are turned off while you play, so nothing else opens on these (a map mod on M, say).</div></div>`);
     C.choose(["Use these keys", "Show the key map", "Back"], { x: 860, y: 300, w: 300 }).then(i => go(i === 1 ? "keymap" : i === 2 || i < 0 ? "saves" : "prof"));
     return { key: k => C.key(k) };
   }
@@ -153,7 +162,7 @@ screen("prof", "A new game", "The professor", {
   tags: ["Retromon creatures"], mod: "IntroScreen: Prof. Oak talks the whole time he's speaking.",
   try: ["A to go on."],
   make() {
-    backdrop(DREAM);
+    swirlBackdrop("dream", { lx: 50, ly: 0, cx: 50, cy: 58 });
     add(h("div", "", `<div style="position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.6) 0 2px,transparent 3px),radial-gradient(circle at 80% 20%,rgba(255,255,255,.7) 0 2px,transparent 3px),radial-gradient(circle at 70% 70%,rgba(255,255,255,.5) 0 2px,transparent 3px),radial-gradient(circle at 30% 80%,rgba(255,255,255,.6) 0 2px,transparent 3px);background-size:240px 200px;animation:gbob 4s ease-in-out infinite"></div>`));
     const C = ctl(), S = SC.prof;
     // The professor's words on a dark band at the foot of the screen, no box (as Let's Go's opening).
@@ -190,17 +199,20 @@ function maker(C, tabs, o) {
     rows = makerRows(tabs[tab]);
     const tabBar = tabs.length > 1 ? `<div style="display:flex;gap:8px;margin:2px 0 8px 10px">${tabs.map((t, i) => `<span class="g-chip${i === tab ? " on" : ""}" data-t="${i}" style="font-size:14px;padding:3px 14px">${t === "you" ? "YOU" : "CLOTHES"}</span>`).join("")}<span style="margin-left:auto;font-size:12px;font-weight:900;color:var(--g-muted);align-self:center">TAB switches</span></div>` : "";
     // Rows go in cards by what they're for (hat, top, bottoms...), with room to breathe: big swatches and chips.
-    const GROUP = { "BODY": "YOU", "SKIN": "YOU", "EYES": "YOU", "HAIR": "HAIR", "HAIR COLOUR": "HAIR", "HAT": "HAT", "CAP": "HAT", "CAP WAY": "HAT", "HAT COLOUR": "HAT",
+    // YOU is one card: body, skin, eyes, then hair style and hair colour under them.
+    const GROUP = { "BODY": "YOU", "SKIN": "YOU", "EYES": "YOU", "HAIR": "YOU", "HAIR COLOUR": "YOU", "HAT": "HAT", "CAP": "HAT", "CAP WAY": "HAT", "HAT COLOUR": "HAT",
       "TOP": "TOP", "TOP COLOUR": "TOP", "BOTTOMS": "BOTTOMS", "BOTTOMS COLOUR": "BOTTOMS", "SHOES": "SHOES", "BAG": "BAG", "BAG COLOUR": "BAG" };
-    const short = (r, g) => r.label === g ? (g === "SHOES" ? "COLOUR" : "STYLE") : r.label.startsWith(g + " ") ? r.label.slice(g.length + 1) : r.label;
+    const short = (r, g) => r.label === "HAIR" && g === "YOU" ? "HAIR STYLE" : r.label === g ? (g === "SHOES" ? "COLOUR" : "STYLE") : r.label.startsWith(g + " ") ? r.label.slice(g.length + 1) : r.label;
+    const one = tabs[tab] === "you";
     const rowHtml = (r, i, g) => { const dim = r.off && r.off(), on = i === sel;
-      return `<div style="display:grid;grid-template-columns:70px 1fr;align-items:center;gap:8px;padding:4px 8px;border-radius:14px;transition:background .15s;${dim ? "opacity:.4;" : ""}${on ? "background:#FFF6CF;box-shadow:inset 0 0 0 2.5px #FFC93C" : ""}">
+      return `<div style="display:grid;grid-template-columns:${one ? 112 : 70}px 1fr;align-items:center;gap:10px;padding:${one ? "9px 12px" : "4px 8px"};border-radius:14px;transition:background .15s;${dim ? "opacity:.4;" : ""}${on ? "background:#FFF6CF;box-shadow:inset 0 0 0 2.5px #FFC93C" : ""}">
       <span class="g-label" style="font-size:12.5px;${on ? "color:var(--g-red)" : ""}">${on ? "&#9656; " : ""}${short(r, g)}</span>
-      <span style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">${opts(r).map(([v, l], j) => r.swatches
-        ? `<span class="g-swatch${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="position:relative;width:30px;height:30px;border-width:3px;border-radius:9px;background:linear-gradient(160deg,rgba(255,255,255,.28),rgba(0,0,0,.12)),${l}">${r.newFrom != null && j >= r.newFrom ? `<i style="position:absolute;right:-4px;top:-4px;width:10px;height:10px;border-radius:50%;background:#FFD45A;box-shadow:0 0 0 2px #fff"></i>` : ""}</span>`
+      <span style="display:flex;flex-wrap:wrap;gap:${one ? 6 : 7}px;align-items:center">${opts(r).map(([v, l], j) => r.swatches
+        ? `<span class="g-swatch${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="position:relative;width:${one ? 29 : 30}px;height:${one ? 29 : 30}px;border-width:3px;border-radius:9px;background:linear-gradient(160deg,rgba(255,255,255,.28),rgba(0,0,0,.12)),${l}">${r.newFrom != null && j >= r.newFrom ? `<i style="position:absolute;right:-4px;top:-4px;width:10px;height:10px;border-radius:50%;background:#FFD45A;box-shadow:0 0 0 2px #fff"></i>` : ""}</span>`
         : `<span class="g-chip${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="font-size:14px;padding:3px 11px">${esc(l)}</span>`).join("")}</span></div>`; };
     const groups = []; rows.forEach((r, i) => { const g = GROUP[r.label] || r.label; let G2 = groups[groups.length - 1]; if (!G2 || G2.g !== g) groups.push(G2 = { g, rows: [] }); G2.rows.push([r, i]); });
-    P.innerHTML = tabBar + `<div style="columns:2;column-gap:10px">${groups.map(G2 => `<div style="border-radius:18px;background:#F3F6FC;padding:8px 6px 8px 6px;display:grid;gap:2px;break-inside:avoid;margin-bottom:10px">
+    // Rows sit apart (a clear gap under the one you're on), the YOU card full width, CLOTHES in two columns.
+    P.innerHTML = tabBar + `<div style="${one ? "" : "columns:2;column-gap:10px"}">${groups.map(G2 => `<div style="border-radius:18px;background:#F3F6FC;padding:${one ? "12px 12px 14px" : "8px 6px"};display:grid;gap:${one ? 20 : 8}px;break-inside:avoid;margin-bottom:12px">
       <div class="g-title" style="font-size:17px;letter-spacing:2px;padding:2px 12px 2px;color:var(--g-red)">${G2.g}</div>${G2.rows.map(([r, i]) => rowHtml(r, i, G2.g)).join("")}</div>`).join("")}</div>` +
       `<div style="display:flex;gap:12px;margin-top:0;padding:0 10px;align-items:center"><span class="g-item${sel === rows.length ? " on" : ""}" data-done="1">${esc(T(o.done || "DONE"))}</span><span class="g-item${sel === rows.length + 1 ? " on" : ""}" data-rand="1">${esc(T("MIX IT UP"))}</span>
         ${tabs[tab] === "you" ? `<span style="margin-left:auto;font-size:12.5px;font-weight:800;color:var(--g-muted)"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#FFD45A;margin-right:5px"></i>New: four more skin tones, eye colour</span>` : ""}</div>`;
@@ -227,11 +239,11 @@ function maker(C, tabs, o) {
 }
 screen("creator", "A new game", "Character maker", {
   scene: "creator", sceneOpts: () => ({ side: -1.95 }),
-  what: "Make yourself on Minecraft's player model, its corners just softened: boy or girl, skin tone, hair and its colour, eyes, then your clothes. It's the mod's own wardrobe (the same layers and colours CLOTHES uses), with four more skin tones and eye colour added.",
+  what: "Make yourself on Minecraft's player model, its corners just softened. YOU is one card: body, skin tone, eyes, then hair style and hair colour under them, each row with room round it. CLOTHES is the second tab. It's the mod's own wardrobe (the same layers and colours CLOTHES uses), with four more skin tones and eye colour added.",
   tags: ["The mod's wardrobe", "New: 4 skin tones, eye colour"], mod: "Outfit: FAIR, LIGHT, TAN, DEEP skin; 6 hair styles; cap, beanie or sun hat; jacket, tee, hoodie or vest; jeans, shorts or skirt; shoes; backpack or satchel; 14 colours.",
   try: ["Up and down between rows, left and right to change, A on DONE.", "MIX IT UP picks at random."],
   make() {
-    backdrop(PEACH); rays(80, 10);
+    swirlBackdrop("peach", { lx: 80, ly: 10, cx: 78, cy: 62 });
     const C = ctl();
     box(900, 34, 360, null, "", `<div class="g-title" style="text-align:center;font-size:26px;color:#26304A">${esc(T("What do you look like?"))}</div>`);
     maker(C, ["you", "clothes"], { done: "THAT'S ME", onDone: () => go("name", { who: "you" }), onBack: () => go("prof") });
@@ -270,7 +282,7 @@ screen("name", "A new game", "Your name", {
   mod: "IntroScreen: YOUR NAME, with ready names and NEW NAME.",
   try: ["Type on your keyboard (Shift for W, A, S, D, E, Q, X and Z), or move round the letters and press A.", "OK when you're done."],
   make(arg) {
-    backdrop(PEACH); rays(80, 10);
+    swirlBackdrop("peach", { lx: 80, ly: 10, cx: 78, cy: 62 });
     const C = ctl(), girl = !!G.outfit.girl;
     const presets = girl ? ["LEAF", "LYRA", "KRIS"] : ["RED", "KRIS", "ETHAN"];
     C.choose(["NEW NAME"].concat(presets), { x: 980, y: 190, w: 250, back: false }).then(i => {
@@ -288,7 +300,7 @@ screen("rival", "A new game", "Your rival's name", {
   what: "The professor's grandson, your rival since you were small. Pick or type his name.",
   mod: "IntroScreen: YOUR RIVAL'S NAME.",
   make() {
-    backdrop(DREAM); const C = ctl(), S = SC.prof; C.sayAt = { film: true };
+    swirlBackdrop("dream", { lx: 50, ly: 0, cx: 50, cy: 58 }); const C = ctl(), S = SC.prof; C.sayAt = { film: true };
     (async () => {
       S.talking = true;
       await C.say([{ who: "PROF. OAK", text: "So you're **{N}**! A fine name." }, { who: "PROF. OAK", text: "And this is my grandson. You two have been racing each other since you could walk." }, { who: "PROF. OAK", text: "Now, what was his name again...?" }], { keep: true });
@@ -307,7 +319,7 @@ screen("ready", "A new game", "Off you go", {
   scene: "prof", sceneOpts: () => ({ mode: "you" }),
   what: "You, as you made yourself, beside the professor, before the game loads.",
   make() {
-    backdrop(DREAM); const C = ctl(), S = SC.prof; C.sayAt = { film: true };
+    swirlBackdrop("dream", { lx: 50, ly: 0, cx: 50, cy: 58 }); const C = ctl(), S = SC.prof; C.sayAt = { film: true };
     // You look up (so your eyes show under the cap), then at "Off you go" you do the floss while he waves.
     S.talking = true; S.youWave = 0; S.youFloss = 0; S.youLookUp = 0.38; S.wave = 0;
     C.say([{ who: "PROF. OAK", text: "**{N}**, your own adventure starts today." }, { who: "PROF. OAK", text: "There's a whole region out there, full of POKéMON to meet. I'll be right next door at my lab." },

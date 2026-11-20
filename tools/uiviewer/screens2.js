@@ -7,7 +7,7 @@ function blurOver() { add(h("div", "g-blur")); }
 screen("hud", "In the world", "The HUD", {
   scene: "town", sceneOpts: () => ({}),
   what: "What's over the world while you walk: where you are and the time, what to do next, the keys, and a word when something happens.",
-  mod: "Hud: the clock, and the keys for Talk, Menu and Speed.",
+  mod: "Hud: the clock, and the keys for Talk, Menu and Speed. To come: E for the menu (ENTER still works).",
   tags: ["New: the place banner, the next thing to do, notices"],
   try: ["A replays the place banner and a notice.", "Tab changes the speed shown.", "B opens the menu."],
   make() {
@@ -17,7 +17,7 @@ screen("hud", "In the world", "The HUD", {
     const goal = box(1280 - 24 - 390, 20, 390, null, "", `<div style="position:relative;padding:22px 18px 12px;border-radius:22px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 6px 16px rgba(30,40,84,.25)">
       <span style="position:absolute;left:16px;top:-11px;padding:2px 14px;border-radius:999px;background:linear-gradient(180deg,#7CC2FA,#3C8DE4);color:#fff;font-weight:900;font-size:13px;letter-spacing:1.4px;box-shadow:0 0 0 3px #fff">${esc(T("NEXT"))}</span>
       <span style="display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900;color:#26304A"><span style="width:30px;height:30px">${PICTO.map("#3C8DE4").replace('fill="#fff"', 'fill="#E3F0FC"')}</span>${esc(T("Go to PROF. OAK's lab"))}<span style="margin-left:auto;color:var(--g-muted);font-size:16px">32 m</span></span></div>`);
-    const keys = () => { const e = $("#hkeys"); if (e) e.remove(); const k = hints([["SPACE", "Talk"], ["ENTER", "Menu"], ["TAB", `Speed x${spd}`]]); k.id = "hkeys"; };
+    const keys = () => { const e = $("#hkeys"); if (e) e.remove(); const k = hints([["SPACE", "Talk"], ["E", "Menu"], ["TAB", `Speed x${spd}`]]); k.id = "hkeys"; };
     keys();
     const banner = () => {
       // The place's name sliding in: a white band fading out to the right, a sunny stripe along its top.
@@ -37,7 +37,7 @@ screen("hud", "In the world", "The HUD", {
       later(1800, () => e.remove());
     };
     later(500, banner); later(4200, () => toast(ICON.save, "Game saved")); later(2000, emote);
-    return { key: k => { if (k === "a") { banner(); later(800, () => toast(ICON.potion, "You found a POTION!")); later(300, emote); return true; } if (k === "tab") { spd = spd % 3 + 1; keys(); return true; } if (k === "b") { go("menu"); return true; } return false; } };
+    return { raw: e => { if (e.code === "KeyE" || e.code === "Enter" || e.code === "NumpadEnter") { go("menu"); return true; } return false; }, key: k => { if (k === "a") { banner(); later(800, () => toast(ICON.potion, "You found a POTION!")); later(300, emote); return true; } if (k === "tab") { spd = spd % 3 + 1; keys(); return true; } if (k === "b") { go("menu"); return true; } return false; } };
   }
 });
 screen("door", "In the world", "Going through a door", {
@@ -103,7 +103,7 @@ screen("itemget", "In the world", "Getting an item", {
 });
 screen("badgeget", "In the world", "Getting a badge", {
   scene: "town", sceneOpts: () => ({}),
-  what: "Winning a badge: the badge spins in over a burst of light, the leader's words, then it flies up into a notice on the HUD that shows where it sits among the eight. Every badge is our own design.",
+  what: "Winning a badge: the badge spins in over a burst of light, the leader's words, then it flies up into a notice on the HUD that shows where it sits among the eight. Every badge is our own design, shaped after its name: BOULDER a faceted rock, CASCADE a drop, THUNDER a burst round a bolt, RAINBOW a flower, SOUL a heart, MARSH rings of gold, VOLCANO a flame, EARTH a leaf.",
   tags: ["New: badges of our own", "New: the badge notice"],
   try: ["Left and right to see each badge.", "A to move the words on."],
   make(arg) {
@@ -118,8 +118,7 @@ screen("badgeget", "In the world", "Getting a badge", {
         @keyframes bgfly{to{left:1018px;top:100px;width:56px;height:56px;opacity:.0}}@keyframes bgtoast{from{opacity:0;transform:translateX(40px)}}</style>
         <div style="position:absolute;inset:-120px;border-radius:50%;background:repeating-conic-gradient(${col}55 0 10deg,transparent 10deg 20deg);animation:bgrays 14s linear infinite;-webkit-mask:radial-gradient(circle,#000 30%,transparent 68%);mask:radial-gradient(circle,#000 30%,transparent 68%)"></div>
         <div style="position:absolute;inset:-30px;border-radius:50%;background:radial-gradient(circle,rgba(255,244,216,.9),rgba(255,244,216,0) 65%)"></div>
-        <div style="position:absolute;inset:30px;perspective:600px"><div style="width:100%;height:100%;animation:bgspin 1.1s cubic-bezier(.2,.8,.3,1) both;filter:drop-shadow(0 14px 18px rgba(0,0,0,.35));position:relative;overflow:hidden;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)">${badgeSvg(i)}
-        <div style="position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:bgshine 2.6s 1s ease-in-out infinite"></div></div></div>`);
+        <div style="position:absolute;inset:30px;perspective:600px"><div style="width:100%;height:100%;animation:bgspin 1.1s cubic-bezier(.2,.8,.3,1) both;filter:drop-shadow(0 14px 18px rgba(0,0,0,.35));position:relative">${badgeSvg(i, { shine: true })}</div></div>`);
       C.say([{ text: `**${G.name}** received the **${name}** from **${lead}**!` }, { text: `It's pinned to your **TRAINER CARD** now. That's **${i + 1} of 8**.` }]).then(() => {
         if (!C.alive() || me !== run) return;
         big.style.animation = "bgfly .7s ease-in forwards"; later(700, () => big.remove()); dim.style.transition = "opacity .5s"; dim.style.opacity = 0;
@@ -136,16 +135,16 @@ screen("badgeget", "In the world", "Getting a badge", {
     return { key: k => { if (k === "left" || k === "right") { go("badgeget", { badge: (i + (k === "right" ? 1 : 7)) % 8 }); return true; } return C.key(k); } };
   }
 });
-const MENU = [["POKéDEX", "dex", "dex", "Every POKéMON you've seen and caught."], ["POKéMON", "ball", "party", "Your team: check them, switch them, pick who follows you."], ["BAG", "bag", "bag", "Your items, in four pockets."],
+const MENU = [["POKéDEX", "dex", "dex", "Every POKéMON you've seen and caught."], ["PARTY", "ball", "party", "Your team: check them, switch them, pick who follows you."], ["BAG", "bag", "bag", "Your items, in four pockets."],
   ["MAP", "map", "map", "The whole region, and where you are in it."], ["CLOTHES", "cap", "clothes", "Change your clothes, hat and bag."], ["CARD", "card", "card", "Your trainer card: your name, money and badges."],
   ["WAIT", "clock", "wait", "Let the time pass: morning, midday, evening or night."], ["SAVE", "save", "save", "Save your adventure so far."], ["OPTION", "cog", "options", "Text speed, music, nights and more."], ["EXIT", "close", "hud", "Close the menu."]];
-// The five big ones in Let's Go's order (POKéDEX, BAG, POKéMON, MAP, SAVE), each its own colour; then the small ones.
+// The five big ones in Let's Go's order (POKéDEX, BAG, PARTY, MAP, SAVE), each its own colour; then the small ones.
 const MENU_MAIN = [0, 2, 1, 3, 7], MENU_SIDE = [4, 5, 6, 8, 9];
 const MENU_COLS = [["#FF8C8C", "#E5484F", "#B92F3A"], ["#FFC566", "#F59A2A", "#D2731A"], ["#7FE3A6", "#3DB873", "#228A52"], ["#7CC2FA", "#3C8DE4", "#2763B8"], ["#C9A8F7", "#8F60DE", "#6740B6"]];
 screen("menu", "In the world", "The menu", {
   scene: "town", sceneOpts: () => ({}),
-  what: "The menu as Let's Go's player menu: your partner's face at the top (ours, drawn flat, where Let's Go has its Pikachu) with PLAY WITH under it; a row of five rounded tiles, each its own colour with a white picture, the one you're on lifted with a red arrow and a green line under its name; the smaller things in white pills underneath.",
-  mod: "MenuScreen: POKéDEX, BAG, POKéMON, MAP and SAVE as the five tiles; CLOTHES, CARD, WAIT, OPTION and EXIT as pills; the partner's face opens its summary.",
+  what: "The menu as Let's Go's player menu: your partner's emblem at the top (the shape of its head in its own colour, as Let's Go draws its Pikachu there), on its own; a row of five rounded tiles, each its own colour with a white picture. The one you're on lifts and glows in its colour, a big white arrow points at it from the side, and a line in its colour runs under its name. The smaller things are white pills underneath.",
+  mod: "MenuScreen: POKéDEX, BAG, PARTY, MAP and SAVE as the five tiles (POKéMON becomes PARTY, as Let's Go has it); CLOTHES, CARD, WAIT, OPTION and EXIT as pills; the partner's emblem opens its summary.",
   tags: ["New look: Let's Go's player menu"], try: ["Left and right along a row; up to your partner, down to the small ones; A to open, B to close."],
   make(arg) {
     blurOver();
@@ -154,13 +153,14 @@ screen("menu", "In the world", "The menu", {
     // row 0 is your partner, 1 the tiles, 2 the pills; col along it.
     let row = 1, col = 0;
     if (arg && arg.sel != null) { const m = MENU_MAIN.indexOf(arg.sel), q = MENU_SIDE.indexOf(arg.sel); if (m >= 0) col = m; else if (q >= 0) { row = 2; col = q; } }
-    const face = h("div", "", `<div style="display:grid;justify-items:center;gap:6px;cursor:pointer">${faceOf(lead.sid, 210)}
-      <div class="g-title" style="font-size:19px;letter-spacing:2px;color:#26304A;padding:4px 18px;border-radius:999px;white-space:nowrap;background:rgba(255,255,255,.88);box-shadow:0 3px 10px rgba(30,40,84,.18)">${esc(T("PLAY WITH {0}", ourName(lead.sid)))}</div></div>`, { position: "absolute", left: "535px", top: "44px", width: "210px", transition: "transform .15s" });
+    // Just the emblem, nothing under it.
+    const face = h("div", "", `<div style="display:grid;justify-items:center;cursor:pointer">${emblemOf(lead.sid, 230)}</div>`, { position: "absolute", left: "525px", top: "58px", width: "230px", transition: "transform .15s" });
     face.onmouseenter = () => { row = 0; draw(); }; face.onclick = () => { row = 0; open(); };
     add(face);
     MENU_MAIN.forEach((i, c) => {
       const [n, ic] = MENU[i], col0 = MENU_COLS[c], cx = 640 + (c - 2) * 172;
-      const t = h("div", "m-tile", `<span class="arr">&#9654;</span><div class="sq" style="background:linear-gradient(180deg, ${col0[0]}, ${col0[1]} 58%, ${col0[2]})"><div class="gloss"></div>${PICTO[ic](col0[1])}</div><div class="nm">${esc(T(n))}</div><div class="ul"></div>`);
+      const t = h("div", "m-tile", `<div class="sq" style="background:linear-gradient(180deg, ${col0[0]}, ${col0[1]} 58%, ${col0[2]})"><div class="gloss"></div>${PICTO[ic](col0[1])}</div><span class="arr"><svg viewBox="0 0 40 48"><path d="M6 4L36 24 6 44Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><path d="M11 13L28 24 11 35Z" fill="#DDE3EE"/></svg></span><div class="nm">${esc(T(n))}</div><div class="ul"></div>`);
+      t.style.setProperty("--c", col0[1]); t.style.setProperty("--glow", col0[0]);
       t.style.left = (cx - 70) + "px"; t.style.top = "352px";
       t.onmouseenter = () => { row = 1; col = c; draw(); }; t.onclick = () => { row = 1; col = c; open(); }; els["1:" + c] = add(t);
     });
@@ -175,9 +175,12 @@ screen("menu", "In the world", "The menu", {
       .m-tile .sq svg{width:74px;height:74px;position:relative;filter:drop-shadow(0 3px 0 rgba(0,0,0,.14))}
       .m-tile .gloss{position:absolute;left:8%;right:8%;top:5%;height:40%;border-radius:26px 26px 50% 50%;background:linear-gradient(180deg,rgba(255,255,255,.45),rgba(255,255,255,0))}
       .m-tile .nm{font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:1px;color:#26304A;-webkit-text-stroke:5px #fff;paint-order:stroke fill;transition:transform .14s}
-      .m-tile .ul{width:0;height:6px;border-radius:999px;background:#41BF84;margin-top:-6px;transition:width .14s;box-shadow:0 2px 0 rgba(0,0,0,.12)}
-      .m-tile .arr{position:absolute;left:-14px;top:46px;font-size:30px;color:#E5525C;opacity:0;transition:opacity .12s;-webkit-text-stroke:3px #fff;paint-order:stroke fill}
-      .m-tile.on .sq{transform:translateY(-10px) scale(1.08)} .m-tile.on .nm{transform:translateY(-4px)} .m-tile.on .ul{width:96px} .m-tile.on .arr{opacity:1}
+      .m-tile .ul{width:0;height:6px;border-radius:999px;background:var(--c);margin-top:-6px;transition:width .14s;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+      .m-tile .arr{position:absolute;z-index:3;left:-26px;top:28px;width:40px;height:48px;opacity:0;transform:translateX(-8px);transition:opacity .12s,transform .14s;filter:drop-shadow(0 3px 4px rgba(30,40,84,.35))}
+      .m-tile .arr svg{width:100%;height:100%;display:block}
+      .m-tile.on .sq{transform:translateY(-10px) scale(1.08);box-shadow:0 0 0 4px rgba(255,255,255,.9),0 0 30px 10px var(--glow),0 12px 24px rgba(30,40,84,.25)}
+      .m-tile.on .nm{transform:translateY(-4px)} .m-tile.on .ul{width:96px} .m-tile.on .arr{opacity:1;transform:translateX(0)}
+      .m-tile:not(.on) .sq{opacity:.92}
       .m-pill{position:absolute;width:190px;height:54px;border-radius:999px;display:flex;align-items:center;gap:12px;padding-left:7px;cursor:pointer;background:#fff;color:#26304A;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:19px;
         box-shadow:0 0 0 2px rgba(255,255,255,.7),0 5px 14px rgba(30,40,84,.22);transition:transform .12s}
       .m-pill .ic{width:40px;height:40px;border-radius:50%;background:#F1F4FB;display:grid;place-items:center}.m-pill .ic svg{width:30px;height:30px}
@@ -188,11 +191,11 @@ screen("menu", "In the world", "The menu", {
       for (const k in els) els[k].classList.toggle("on", k === row + ":" + col);
       face.style.transform = row === 0 ? "translateY(-6px) scale(1.05)" : "none";
       const i = item();
-      line.innerHTML = i == null ? esc(T("PLAY WITH {0}", ourName(lead.sid))) : esc(T(MENU[i][3]));
+      line.innerHTML = i == null ? esc(T("See how {0} is doing.", ourName(lead.sid))) : esc(T(MENU[i][3]));
     };
     const open = () => { const i = item(); if (i == null) go("summary", { i: 0 }); else go(MENU[i][2], { from: "menu" }); };
     draw(); hints([["A", "Open"], ["B", "Close"]]);
-    return { key: k => {
+    return { raw: e => { if (e.code === "KeyE") { go("hud"); return true; } return false; }, key: k => {
       if (k === "a") { open(); return true; } if (k === "b") { go("hud"); return true; }
       if (row > 0 && (k === "left" || k === "right")) col = (col + (k === "right" ? 1 : 4)) % 5;
       else if (k === "up") row = Math.max(0, row - 1);
@@ -294,7 +297,7 @@ screen("party", "Menus", "Your team", {
   mod: "MenuScreen's POKéMON, with SUMMARY, SWITCH, FOLLOW ME and CANCEL.",
   tags: ["New look", "Moving pictures"],
   make() {
-    backdrop(LIME); rays(20, 0, 0.22); const C = ctl();
+    swirlBackdrop("lime", { lx: 20, ly: 0, cx: 50, cy: 55 }); const C = ctl();
     header(PICTO.ball("#3DB873"), "POKéMON");
     add(h("style", "", "@keyframes pbob{from{transform:translateY(2px)}to{transform:translateY(-8px)}}@keyframes pidle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-2deg)}}"));
     let sel = 0;
@@ -347,16 +350,18 @@ screen("summary", "Menus", "Summary", {
   scene: "model", sceneOpts: () => ({ sid: G.party[0].sid, ox: 1.05, stand: false }),
   what: "One of your team in full, as Let's Go's STATS page: it stands on its own backdrop (its type's colours, a great soft swirl of light, blurred light, and its own drifting things: embers, bubbles, leaves, sparks), the judge's stamp top left, its six stats as a lime hexagon with a word for each, and its name plate bottom right. INFO and MOVES are the other pages.",
   mod: "MenuScreen's SUMMARY: ATTACK, DEFENSE, SPCL.ATK, SPCL.DEF, SPEED.",
-  tags: ["New look: Let's Go's STATS", "Each creature's own backdrop"], try: ["Tab, or left and right, for the next page. Up and down for the next of your team."],
+  tags: ["New look: Let's Go's STATS", "Each creature's own backdrop"], try: ["Tab, or left and right, for the next page. Up and down for the next of your team (on MOVES, up and down go through its moves)."],
   make(arg) {
-    let i = arg && arg.i || 0, page = 1;
+    let i = arg && arg.i || 0, page = 1, msel = 0;
+    // A soft shade down the right, behind the words, so white and lime read on any creature's backdrop.
+    const scrim = box(520, 0, 760, 720, "", ""); scrim.style.background = "linear-gradient(90deg, rgba(24,30,60,0) 0%, rgba(24,30,60,.22) 30%, rgba(24,30,60,.42) 100%)"; scrim.style.pointerEvents = "none"; scrim.style.transition = "opacity .2s";
     const stamp = box(24, 20, 260, 190, "", ""), right = box(720, 40, 540, 470, "", ""), plate = box(700, 512, 560, null, "", ""), dexNo = box(0, 640, 260, null, "", "");
     const tabs = box(0, 10, 1280, null, "", "");
     const glass = "background:rgba(28,36,60,.42);border:2px solid rgba(255,255,255,.55);backdrop-filter:blur(6px);color:#fff";
     const draw = () => {
       const p = G.party[i], d = sp(p.sid), tc = typeHex(d.stats.types[0]), f = p.hp / p.maxhp; SC.model.show(p.sid);
       bgArt.innerHTML = ""; monBackdrop(p.sid, { cx: 33, cy: 64 });
-      stamp.innerHTML = page === 1 ? statStamp(p.stats, p.lv) : "";
+      stamp.innerHTML = page === 1 ? statStamp(p.stats, p.lv) : ""; scrim.style.opacity = page === 1 ? 0 : 1;
       tabs.innerHTML = `<div style="display:flex;justify-content:center;gap:10px">${["INFO", "STATS", "MOVES"].map((t, j) => `<span data-p="${j}" style="cursor:pointer;padding:5px 20px;border-radius:999px;font-family:Fredoka,sans-serif;font-weight:600;font-size:17px;letter-spacing:1px;${j === page ? "background:#fff;color:#26304A;box-shadow:0 4px 12px rgba(30,40,84,.25)" : "background:rgba(255,255,255,.28);color:#fff"}">${t}</span>`).join("")}</div>`;
       tabs.querySelectorAll("[data-p]").forEach(e => e.onclick = () => { page = +e.dataset.p; draw(); });
       // The name plate, Let's Go's: dark glass, a ball's outline in it, name, level, types, HP.
@@ -365,17 +370,46 @@ screen("summary", "Menus", "Summary", {
         <div style="display:flex;align-items:center;gap:10px"><span class="g-title" style="font-size:32px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-weight:900;font-size:22px">Lv. ${p.lv}</span></div>
         <div style="display:flex;gap:8px;margin:6px 0 10px">${d.stats.types.map(typeChip).join("")}</div>
         <div style="display:flex;align-items:center;gap:10px"><span style="font-weight:900;font-size:14px;color:#FFE04A">HP</span><div class="g-hp" style="flex:1;background:rgba(0,0,0,.3)"><i style="width:${f * 100}%;background:${hpCol(f)}"></i></div><span style="font-weight:900;font-size:19px">${p.hp}/${p.maxhp}</span></div></div>`;
-      dexNo.innerHTML = `<div style="padding:10px 22px;border-radius:0 18px 0 0;${glass};border-left:0;border-bottom:0;font-weight:800;font-size:17px;line-height:1.4">${esc(ourName(p.sid))}<br>POKéDEX No. ${String(d.dex).padStart(3, "0")}</div>`;
+      // Bottom left, as Let's Go's: its name and number, and (on INFO) its EXP: how many it has and how many to the next level.
+      const toGo = Math.round((1 - p.exp) * 1200), have = Math.round(p.lv * p.lv * p.lv * 0.8 + p.exp * 1200);
+      dexNo.style.top = (page === 0 ? 566 : 640) + "px"; dexNo.style.width = (page === 0 ? 440 : 260) + "px";
+      dexNo.innerHTML = `<div style="padding:10px 22px 12px;border-radius:0 18px 0 0;${glass};border-left:0;border-bottom:0;font-weight:800;font-size:17px;line-height:1.4">${esc(ourName(p.sid))}<br>POKéDEX No. ${String(d.dex).padStart(3, "0")}
+        ${page === 0 ? `<div style="display:grid;grid-template-columns:1fr auto;gap:2px 16px;margin-top:6px;font-size:16px"><span>${esc(T("EXP points"))}</span><span>${have.toLocaleString("en-GB")}</span><span>${esc(T("To the next level"))}</span><span>${toGo.toLocaleString("en-GB")}</span></div>
+          <div style="margin-top:6px;height:9px;border-radius:999px;background:rgba(0,0,0,.3);overflow:hidden"><i style="display:block;height:100%;width:${p.exp * 100}%;border-radius:999px;background:linear-gradient(90deg,#7CC2FA,#3C8DE4)"></i></div>` : ""}</div>`;
       const card = `position:relative;border-radius:26px;background:rgba(255,255,255,.9);border:4px solid #fff;box-shadow:0 10px 24px rgba(30,40,84,.25);color:#26304A`;
-      if (page === 0) right.innerHTML = `<div style="${card};padding:24px 30px;margin-top:40px"><div style="display:grid;grid-template-columns:auto 1fr;gap:12px 22px;font-size:21px;font-weight:800"><span class="g-label">Trainer</span><span>${esc(G.name)}</span><span class="g-label">ID No.</span><span>${G.id}</span><span class="g-label">Nature</span><span>Brave</span><span class="g-label">Item</span><span>None</span><span class="g-label">Met</span><span>ROUTE 1, at Lv. ${Math.max(2, p.lv - 18)}</span></div>
-        <div style="margin-top:20px"><div class="g-label">EXP to Lv. ${p.lv + 1}</div><div class="g-exp" style="margin-top:8px;height:10px;background:#DDE3F0"><i style="width:${p.exp * 100}%;background:linear-gradient(90deg,#7CC2FA,#3C8DE4)"></i></div></div></div>`;
+      // INFO as Let's Go's: no card, the words straight on the creature's backdrop in white, what they are in lime,
+      // a lime line under the trainer.
+      if (page === 0) { const lime = "#C9F55A", row = (l, v) => `<div style="font-size:26px;font-weight:700">${esc(l)}: <span style="color:${lime}">${v}</span></div>`;
+        right.innerHTML = `<div style="margin-top:34px;padding-left:24px;color:#fff;font-family:Fredoka,system-ui,sans-serif;text-shadow:0 2px 0 rgba(20,24,48,.25),0 0 14px rgba(20,24,48,.35);display:grid;gap:10px">
+          <div style="font-size:30px;font-weight:600;color:${lime};padding-bottom:8px;margin-right:-40px;border-bottom:3px solid ${lime};box-shadow:0 3px 0 -1px rgba(20,24,48,.12)">${esc(T("Original Trainer"))}: ${esc(G.name)}</div>
+          ${row(T("ID No."), G.id)}${row(T("Nature"), "Brave")}${row(T("Met"), "ROUTE 1")}${row(T("Level met"), Math.max(2, p.lv - 18))}${row(T("Likes"), "Napping in the sun")}
+          </div>`; }
       else if (page === 1) right.innerHTML = `<div style="display:grid;justify-items:center;margin-top:20px">${statHex(p.stats, p.lv, tc)}</div>`;
-      else right.innerHTML = `<div style="display:grid;gap:12px;margin-top:40px">${p.moves.map(n => { const m = MOVE[n] || { type: "NORMAL", pp: 20 }, c = typeHex(m.type);
-        return `<div style="position:relative;display:flex;align-items:center;gap:14px;height:62px;padding:0 22px 0 8px;border-radius:999px;border:3px solid #fff;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2);background:linear-gradient(180deg, ${lighterHex(c, 0.25)}, ${c} 55%, ${darkerHex(c, 0.18)});box-shadow:0 6px 14px rgba(30,40,84,.25)">
-          <span style="padding:3px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:${darkerHex(c, 0.25)};font-weight:900;font-size:13px;letter-spacing:1px;text-shadow:none">${esc(m.type)}</span><span class="g-title" style="font-size:24px">${esc(n)}</span><span style="margin-left:auto;font-weight:900;font-size:20px;font-variant-numeric:tabular-nums">${m.pp}/${m.pp}</span></div>`; }).join("")}</div>`;
+      else {
+        // MOVES as Let's Go's: each a bar in its type's colour, the type's mark in a white circle and its name on a
+        // tag, the move's name big, the mark again faint behind, and the PP on a dark slanted cap at the end.
+        // The one you're on has the white arrow, and what it does is in the card underneath.
+        const ms = p.moves, mv = ms[Math.min(msel, ms.length - 1)], M = MOVE[mv] || { type: "NORMAL", pp: 20 };
+        right.innerHTML = `<div style="display:grid;gap:12px;margin-top:34px">${ms.map((n, j) => { const m = MOVE[n] || { type: "NORMAL", pp: 20 }, c = typeHex(m.type), on = j === msel, used = Math.max(0, m.pp - (j === 0 ? 3 : j === 2 ? 1 : 0));
+          return `<div data-m="${j}" style="position:relative;height:64px;cursor:pointer;transform:${on ? "translateX(-10px)" : "none"};transition:transform .12s">
+            ${on ? `<svg viewBox="0 0 40 48" style="position:absolute;left:-40px;top:9px;width:38px;height:46px;z-index:2;filter:drop-shadow(0 3px 4px rgba(30,40,84,.35))"><path d="M6 4L36 24 6 44Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><path d="M11 13L28 24 11 35Z" fill="#DDE3EE"/></svg>` : ""}
+            <div style="position:absolute;inset:0;overflow:hidden;border-radius:34px 12px 12px 34px;border:3px solid ${on ? "#fff" : "rgba(255,255,255,.75)"};background:linear-gradient(180deg, ${lighterHex(c, 0.3)}, ${c} 55%, ${darkerHex(c, 0.15)});box-shadow:${on ? "0 0 0 3px rgba(255,255,255,.4)," : ""}0 6px 14px rgba(30,40,84,.25)">
+              <span style="position:absolute;right:118px;top:-14px;opacity:.28">${typeGlyph(m.type, 92)}</span>
+              <span style="position:absolute;right:-16px;top:0;bottom:0;width:132px;transform:skewX(-18deg);background:linear-gradient(180deg,rgba(24,30,56,.62),rgba(24,30,56,.78));border-left:3px solid rgba(255,255,255,.55)"></span>
+              <span style="position:absolute;right:18px;top:0;bottom:0;display:flex;align-items:center;gap:6px;color:#fff;font-weight:900;font-variant-numeric:tabular-nums"><span style="font-size:13px;opacity:.75">PP</span><span style="font-size:26px">${used}</span><span style="font-size:18px;opacity:.85">/${m.pp}</span></span>
+            </div>
+            <div style="position:absolute;left:6px;top:6px;bottom:6px;display:flex;align-items:center;gap:10px">
+              <span style="width:52px;height:52px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 2px 0 rgba(0,0,0,.15)">${typeGlyph(m.type, 34, "filter:brightness(.9)").replace(/fill="#fff"/g, `fill="${c}"`).replace(/stroke="#fff"/g, `stroke="${c}"`)}</span>
+              <span style="padding:2px 10px;border-radius:7px;background:${darkerHex(c, 0.3)};color:#fff;font-weight:900;font-size:12px;letter-spacing:1.5px">${esc(m.type)}</span>
+              <span class="g-title" style="font-size:26px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.22)">${esc(title(n))}</span></div></div>`; }).join("")}
+          <div style="border-radius:20px;${glass};padding:14px 20px;margin-top:4px;display:grid;gap:6px"><div style="display:flex;align-items:center;gap:14px;font-size:17px;font-weight:900">${typeChip(M.type)}<span style="font-size:14px;letter-spacing:1px;opacity:.8">${esc(M.category || "")}</span>
+            <span style="margin-left:auto"><span style="opacity:.75;font-size:13px">POWER</span> ${M.power > 1 ? M.power : "-"}</span><span><span style="opacity:.75;font-size:13px">ACCURACY</span> ${M.accuracy || "-"}</span></div>
+            <div style="font-size:17px;font-weight:800;line-height:1.35">${esc(M.desc || "")}</div></div></div>`;
+        right.querySelectorAll("[data-m]").forEach(e => { e.onmouseenter = () => { if (msel !== +e.dataset.m) { msel = +e.dataset.m; draw(); } }; });
+      }
     };
     draw(); hints([["TAB", "Page"], ["B", "Back"]]);
-    return { key: k => { if (k === "tab" || k === "right") { page = (page + 1) % 3; draw(); return true; } if (k === "left") { page = (page + 2) % 3; draw(); return true; } if (k === "up" || k === "down") { i = (i + (k === "down" ? 1 : 5)) % 6; draw(); return true; } if (k === "b") { go("party"); return true; } return true; } };
+    return { key: k => { if (k === "tab" || k === "right") { page = (page + 1) % 3; draw(); return true; } if (k === "left") { page = (page + 2) % 3; draw(); return true; } if (k === "up" || k === "down") { if (page === 2) { const n = G.party[i].moves.length; msel = (msel + (k === "down" ? 1 : n - 1)) % n; } else i = (i + (k === "down" ? 1 : 5)) % 6; draw(); return true; } if (k === "b") { go("party"); return true; } return true; } };
   }
 });
 // The bag's pockets: each its own colour and picture.
@@ -385,7 +419,7 @@ screen("bag", "Menus", "Bag", {
   mod: "MenuScreen's BAG: ITEMS, BALLS, KEY ITEMS and TM & HM.",
   tags: ["New look: Let's Go's"], try: ["Tab, or Q and E, for a pocket; arrows round the items; A to use."],
   make() {
-    backdrop(LIME); rays(85, 0, 0.25); const C = ctl();
+    swirlBackdrop("lime", { lx: 85, ly: 0 }); const C = ctl();
     const pockets = Object.keys(G.bag); let pk = 0, sel = 0;
     const page = box(60, 40, 1160, 610, "g-panel", ""); page.style.borderRadius = "36px";
     box(36, 18, null, null, "", `<div style="padding:6px 18px 6px 10px;border-radius:999px;background:#fff;box-shadow:0 0 0 3px #FFC93C,0 6px 14px rgba(30,40,84,.2);display:flex;align-items:center;gap:8px;font-weight:900;font-size:19px;color:#26304A"><span style="padding:2px 10px;border-radius:999px;background:#FFC93C;font-size:12px;letter-spacing:1px">MONEY</span>${money(G.money)}</div>`);
@@ -431,15 +465,18 @@ const BEEN = ["pallet_town", "route_1", "viridian_city", "route_22", "route_2", 
 let MAPIMG = null;
 function mapImage() { if (!MAPIMG) { MAPIMG = new Image(); MAPIMG.src = MAPDATA.img; } return MAPIMG; }
 screen("map", "Menus", "Town Map", {
-  what: "The real Town Map: Kanto as it is in your world, drawn from above in soft colours from the blocks themselves. Every town and route is marked; point at one to see what's there.",
+  what: "The real Town Map: Kanto as it is in your world, drawn from above in soft colours from the blocks themselves. Every town, route and place is a square with its name beside it, at every zoom (a name is only left out where it would sit on another). Point at one to see what's there, with a picture of it at the top of the panel (the pictures are to come: until then it's the map, close in).",
   mod: "TownMapScreen and TownMap: the same baked map (townmap/r.*.bin), the same colours and shading. Q and E zoom, C comes back to you, a town you've been to can be flown to. In game the places come from the zones you mark.",
-  try: ["Arrows to move between places.", "+ and - (or the mouse wheel) to zoom, drag to look around.", "C to come back to you. A on a town you've been to: FLY HERE."],
+  try: ["Arrows to move between places; left again from the westmost one (or the JOHTO arrow) goes to Johto.", "+ and - (or the mouse wheel) to zoom, drag to look around.", "C to come back to you. A on a town you've been to: FLY HERE."],
   make() {
     backdrop("#348CCE");
     const P = MAPDATA.points, [bx0, bz0] = MAPDATA.box, MW = MAPDATA.w, MH = MAPDATA.h, VW = 900, VH = 680;
     const FIT = Math.min(VW / MW, VH / MH), ZOOMS = [FIT, 1.5, 3, 6];
     let zi = 0, cx = bx0 + MW / 2, cz = bz0 + MH / 2, tx = cx, tz = cz, sel = 0, t0 = performance.now(), alive = true;
     const YOU = { x: -797, z: 702, yaw: 0 };
+    // Kanto and Johto: an arrow at the map's side flips between them. Johto lies west, past the end of ROUTE 27; if
+    // you're over that line when you open the map, it opens on Johto.
+    const JOHTO_X = -1180; let region = YOU.x < JOHTO_X ? "johto" : "kanto", slide = 0;
     const M = box(20, 20, VW, VH, "g-panel", ""); M.style.overflow = "hidden"; M.style.padding = "0"; M.style.cursor = "grab";
     const cv = document.createElement("canvas"); cv.width = VW * 2; cv.height = VH * 2; Object.assign(cv.style, { width: VW + "px", height: VH + "px", display: "block" }); M.appendChild(cv);
     const ctx = cv.getContext("2d");
@@ -452,28 +489,53 @@ screen("map", "Menus", "Town Map", {
     const KIND = { town: "Town", route: "Route", spot: "Place" };
     const rr = (x, y, w, hh, r) => { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + hh, r); ctx.arcTo(x + w, y + hh, x, y + hh, r); ctx.arcTo(x, y + hh, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); };
     const label = (text, x, y, big) => {
-      ctx.font = `900 ${big ? 13 : 11}px Nunito, system-ui, sans-serif`; const w = ctx.measureText(text).width + 14, hh = big ? 22 : 18;
+      ctx.font = `900 ${big ? 13 : 10.5}px Nunito, system-ui, sans-serif`; const w = ctx.measureText(text).width + 12, hh = big ? 21 : 16;
       rr(x - w / 2, y, w, hh, hh / 2); ctx.fillStyle = "rgba(255,255,255,.95)"; ctx.fill(); ctx.strokeStyle = "rgba(30,40,84,.18)"; ctx.lineWidth = 1.5; ctx.stroke();
       ctx.fillStyle = "#26304A"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, x, y + hh / 2 + 0.5);
     };
     const paint = now => {
       if (!alive) return;
       cx += (tx - cx) * 0.2; cz += (tz - cz) * 0.2;
+      slide += ((region === "johto" ? 1 : 0) - slide) * 0.16;
       ctx.setTransform(2, 0, 0, 2, 0, 0); ctx.fillStyle = "#348CCE"; ctx.fillRect(0, 0, VW, VH);
+      if (slide > 0.01) {
+        // Johto: its land isn't in the world yet, so its page waits, in the same sea.
+        const ox = (slide - 1) * VW;
+        ctx.save(); ctx.translate(ox, 0); ctx.fillStyle = "#3A93D2"; ctx.fillRect(0, 0, VW, VH);
+        ctx.strokeStyle = "rgba(255,255,255,.08)"; ctx.lineWidth = 1; for (let x = 0; x < VW; x += 28) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, VH); ctx.stroke(); } for (let y = 0; y < VH; y += 28) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(VW, y); ctx.stroke(); }
+        ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = "#fff"; ctx.font = "600 64px Fredoka, Nunito, system-ui, sans-serif"; ctx.fillText("JOHTO", VW / 2, VH / 2 - 40);
+        ctx.font = "800 17px Nunito, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.9)"; ctx.fillText("Its land isn't in your world yet.", VW / 2, VH / 2 + 18); ctx.fillText("When it is, its towns and routes show here as Kanto's do.", VW / 2, VH / 2 + 44);
+        ctx.restore();
+        if (slide > 0.99) { requestAnimationFrame(paint); return; }
+        ctx.save(); ctx.translate(slide * VW, 0);
+      } else ctx.save();
       const img = mapImage(), z = zoom();
       if (img.complete) { ctx.imageSmoothingEnabled = z < 1; const [ox, oy] = toScreen(bx0, bz0); ctx.drawImage(img, ox, oy, MW * z, MH * z); }
       // The zones the mod knows, faintly, once you're in close.
       if (zi >= 1) for (const p of P) if (p.zone) { const [a, b] = toScreen(p.zone[0], p.zone[1]), [c, d] = toScreen(p.zone[2], p.zone[3]); ctx.strokeStyle = "rgba(255,244,216,.55)"; ctx.setLineDash([6, 5]); ctx.lineWidth = 1.5; ctx.strokeRect(a, b, c - a, d - b); ctx.setLineDash([]); }
       const pulse = (Math.sin((now - t0) / 260) + 1) / 2;
+      // Every place is a square: towns big and filled (red once you've been, grey before), routes and other places
+      // smaller, white with a red edge. The one you're on is yellow, with a pulse round it.
+      const sq = (sx, sy, r, fill, edge, lw) => { rr(sx - r, sy - r, r * 2, r * 2, Math.max(3, r * 0.42)); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = lw; ctx.strokeStyle = edge; ctx.stroke(); };
+      const spots = [];
       P.forEach((p, i) => {
         const [sx, sy] = toScreen(p.x, p.z); if (sx < -40 || sy < -40 || sx > VW + 40 || sy > VH + 40) return;
-        const on = i === sel, been = BEEN.includes(p.key);
-        if (p.kind === "town") { const r = zi >= 2 ? 9 : 7; rr(sx - r, sy - r, r * 2, r * 2, 4); ctx.fillStyle = on ? "#FFD45A" : been ? "#E5525C" : "#B9C4C0"; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#FFFFFF"; ctx.stroke(); }
-        else if (p.kind === "spot") { ctx.save(); ctx.translate(sx, sy); ctx.rotate(Math.PI / 4); ctx.fillStyle = on ? "#FFC93C" : "#fff"; ctx.fillRect(-5, -5, 10, 10); ctx.strokeStyle = "#E5525C"; ctx.lineWidth = 2; ctx.strokeRect(-5, -5, 10, 10); ctx.restore(); }
-        else { ctx.beginPath(); ctx.arc(sx, sy, on ? 6 : 4, 0, 7); ctx.fillStyle = on ? "#FFC93C" : "#fff"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#E5525C"; ctx.stroke(); }
-        if (on) { ctx.beginPath(); ctx.arc(sx, sy, 15 + pulse * 5, 0, 7); ctx.strokeStyle = `rgba(255,212,90,${0.9 - pulse * 0.5})`; ctx.lineWidth = 3; ctx.stroke(); }
-        if (p.kind === "town" || on || zi >= 2) label(p.name, sx, sy + (p.kind === "town" ? 12 : 9), p.kind === "town");
+        const on = i === sel, been = BEEN.includes(p.key), town = p.kind === "town", r = (town ? 10 : 7.5) + (zi >= 2 ? 2 : 0) + (on ? 1.5 : 0);
+        if (on) { ctx.beginPath(); ctx.arc(sx, sy, r + 9 + pulse * 5, 0, 7); ctx.strokeStyle = `rgba(255,212,90,${0.9 - pulse * 0.5})`; ctx.lineWidth = 3; ctx.stroke(); }
+        if (town) sq(sx, sy, r, on ? "#FFD45A" : been ? "#E5525C" : "#B9C4C0", "#FFFFFF", 3);
+        else sq(sx, sy, r, on ? "#FFD45A" : "#FFFFFF", p.kind === "spot" ? "#8F60DE" : "#E5525C", 2.5);
+        if (town) { rr(sx - r * 0.42, sy - r * 0.42, r * 0.84, r * 0.84, 2); ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.fill(); }
+        spots.push({ p, i, sx, sy, r, on, town });
       });
+      // Labels: towns and the one you're on first, then routes and places, each left out only where it would cover another.
+      const taken = [], fits = (x, y, w, hh) => !taken.some(b => x < b[0] + b[2] && x + w > b[0] && y < b[1] + b[3] && y + hh > b[1]);
+      spots.sort((a, b) => (b.on - a.on) || (b.town - a.town));
+      for (const q of spots) {
+        const big = q.town || q.on; ctx.font = `900 ${big ? 13 : 10.5}px Nunito, system-ui, sans-serif`;
+        const w = ctx.measureText(q.p.name).width + 12, hh = big ? 21 : 16, x = q.sx - w / 2, y = q.sy + q.r + 3;
+        if (!q.on && !fits(x, y, w, hh)) continue;
+        taken.push([x, y, w, hh]); label(q.p.name, q.sx, y, big);
+      }
       // You: the arrow, the way you face.
       const [yx, yy] = toScreen(YOU.x, YOU.z);
       ctx.save(); ctx.translate(yx, yy); ctx.rotate(YOU.yaw); ctx.beginPath(); ctx.moveTo(0, -11); ctx.lineTo(8, 8); ctx.lineTo(0, 4); ctx.lineTo(-8, 8); ctx.closePath();
@@ -482,12 +544,22 @@ screen("map", "Menus", "Town Map", {
       const blocks = zi === 0 ? 200 : zi === 1 ? 100 : zi === 2 ? 50 : 20, bw = blocks * z;
       ctx.fillStyle = "rgba(255,255,255,.9)"; rr(14, VH - 40, bw + 90, 26, 13); ctx.fill(); ctx.fillStyle = "#26304A"; ctx.fillRect(26, VH - 28, bw, 4);
       ctx.font = "900 12px Nunito, system-ui, sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(blocks + " blocks", 34 + bw, VH - 26);
+      ctx.restore();
       requestAnimationFrame(paint);
     };
     const drawInfo = () => {
+      if (region === "johto") { info.innerHTML = `<div class="g-label">Region</div><div class="g-title" style="font-size:34px;margin:6px 0 10px">JOHTO</div>
+        <div style="font-size:18px;font-weight:800;line-height:1.45;color:var(--g-text)">West of Kanto, past the end of ROUTE 27.</div>
+        <div style="margin-top:14px;font-size:16px;font-weight:800;line-height:1.45;color:var(--g-muted)">Its towns and routes show here, with their pictures, once its land is in your world. Cross the line on ROUTE 27 and the map opens here by itself.</div>
+        <div style="margin-top:auto" class="g-chip" onclick="">&#9654; Back to KANTO</div>`; info.lastElementChild.onclick = () => flip(); return; }
       const p = P[sel], been = BEEN.includes(p.key), here = TOWN_HERE[p.name] || p.here || [];
-      const wild = p.wild.slice(0, GYMS[p.name] ? 4 : 12);
-      info.innerHTML = `<div class="g-label">${p.key === "pallet_town" ? "You are here" : KIND[p.kind] || "Place"}</div>
+      const wild = p.wild.slice(0, GYMS[p.name] ? 4 : 8);
+      // A picture of the place at the top, as Let's Go's map has. Its own pictures are to come (one for every town,
+      // route and place); until then it's the map itself, close in round it.
+      info.innerHTML = `<div style="position:relative;margin:-8px -8px 14px;height:150px;border-radius:18px;overflow:hidden;background:#348CCE;box-shadow:0 0 0 3px #fff,0 6px 14px rgba(30,40,84,.22);transform:rotate(-1.2deg)">
+          <canvas id="mapPic" width="544" height="300" style="width:100%;height:100%;display:block"></canvas>
+          <span style="position:absolute;left:10px;bottom:8px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.92);font-size:11.5px;font-weight:900;letter-spacing:1px;color:#6F7A99">PICTURE TO COME</span></div>
+        <div class="g-label">${p.key === "pallet_town" ? "You are here" : KIND[p.kind] || "Place"}</div>
         <div class="g-title" style="font-size:${p.name.length > 14 ? 27 : 32}px;line-height:1.1;margin:6px 0 10px">${esc(p.name)}</div>
         ${p.tag ? `<div style="font-size:18px;font-weight:800;line-height:1.45;color:var(--g-text);font-style:italic">"${esc(p.tag)}"</div>` : ""}
         ${here.length ? `<div class="g-label" style="margin-top:16px">Here</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px">${here.map(x => `<span style="display:inline-flex;align-items:center;gap:7px;font-size:14.5px;font-weight:900;padding:4px 11px;border-radius:999px;background:#F1F4FB"><span style="width:8px;height:8px;border-radius:3px;background:#E5525C"></span>${esc(x)}</span>`).join("")}</div>` : ""}
@@ -500,6 +572,10 @@ screen("map", "Menus", "Town Map", {
         <div style="margin-top:auto;padding-top:12px;display:grid;gap:8px">
           ${p.kind === "town" ? (been ? `<div class="g-chip on" style="justify-content:center;font-size:17px;padding:8px">A: FLY HERE</div>` : `<div class="g-chip" style="justify-content:center;font-size:15px;padding:8px;opacity:.7">Not been here yet</div>`) : ""}
           <div style="font-size:12.5px;font-weight:800;color:var(--g-muted);line-height:1.35">${p.zone ? `Zone in the mod: ${p.zone[0]}, ${p.zone[1]} to ${p.zone[2]}, ${p.zone[3]}` : `About ${p.x}, ${p.z} on your map`}</div></div>`;
+      const pc = $("#mapPic"), img = mapImage();
+      const paintPic = () => { if (!pc || !img.complete) return; const g = pc.getContext("2d"), k = 5, w = pc.width / k, hh = pc.height / k; g.imageSmoothingEnabled = false;
+        g.fillStyle = "#348CCE"; g.fillRect(0, 0, pc.width, pc.height); g.drawImage(img, p.x - bx0 - w / 2, p.z - bz0 - hh / 2, w, hh, 0, 0, pc.width, pc.height); };
+      if (img.complete) paintPic(); else img.addEventListener("load", paintPic, { once: true });
     };
     const near = k => { const p = P[sel], dir = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] }[k]; let best = sel, bd = 1e9;
       P.forEach((q, i) => { if (i === sel) return; const dx = q.x - p.x, dz = q.z - p.z, along = dx * dir[0] + dz * dir[1]; if (along <= 4) return; const d = along + Math.abs(dx * dir[1] - dz * dir[0]) * 2.2; if (d < bd) { bd = d; best = i; } }); return best; };
@@ -508,13 +584,28 @@ screen("map", "Menus", "Town Map", {
     // Mouse: drag to look around, wheel to zoom, click a place to point at it.
     let drag = null;
     M.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, tx, tz, moved: false }; M.setPointerCapture(e.pointerId); M.style.cursor = "grabbing"; });
-    M.addEventListener("pointermove", e => { if (!drag) return; const k = uiScale(), dx = (e.clientX - drag.x) / k, dy = (e.clientY - drag.y) / k; if (Math.hypot(dx, dy) > 4) drag.moved = true; tx = drag.tx - dx / zoom(); tz = drag.tz - dy / zoom(); clampC(); cx = tx; cz = tz; });
+    // Pointing at a place picks it (no need to hit it exactly: the nearest within a finger's width).
+    const nearest = e => { if (region === "johto") return -1; const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k; let best = -1, bd = 24;
+      P.forEach((p, i) => { const [sx, sy] = toScreen(p.x, p.z), dd = Math.hypot(sx - mx, sy - my); if (dd < bd) { bd = dd; best = i; } }); return best; };
+    M.addEventListener("pointermove", e => { if (!drag) { const b = nearest(e); if (b >= 0 && b !== sel) { sel = b; drawInfo(); } M.style.cursor = b >= 0 ? "pointer" : "grab"; return; } const k = uiScale(), dx = (e.clientX - drag.x) / k, dy = (e.clientY - drag.y) / k; if (Math.hypot(dx, dy) > 4) drag.moved = true; tx = drag.tx - dx / zoom(); tz = drag.tz - dy / zoom(); clampC(); cx = tx; cz = tz; });
     M.addEventListener("pointerup", e => { M.style.cursor = "grab"; const d = drag; drag = null; if (!d || d.moved) return;
-      const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k; let best = -1, bd = 22;
-      P.forEach((p, i) => { const [sx, sy] = toScreen(p.x, p.z), dd = Math.hypot(sx - mx, sy - my); if (dd < bd) { bd = dd; best = i; } }); if (best >= 0) pick(best); });
+      const best = nearest(e); if (best >= 0) pick(best); });
     M.addEventListener("wheel", e => { e.preventDefault(); const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k;
       const wx = cx + (mx - VW / 2) / zoom(), wz = cz + (my - VH / 2) / zoom(); setZoom(zi + (e.deltaY < 0 ? 1 : -1), wx, wz); }, { passive: false });
     pick(0); requestAnimationFrame(paint);
+    // The way to the other region: an arrow tab at the map's edge, bobbing gently, JOHTO on the left, KANTO on the right.
+    const side = box(0, 0, null, null, "", ""); side.style.zIndex = "3";
+    add(h("style", "", `@keyframes mapbobL{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}@keyframes mapbobR{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+      .m-reg{position:absolute;display:flex;align-items:center;gap:8px;height:56px;padding:0 18px;border-radius:999px;background:#fff;color:#26304A;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:20px;letter-spacing:2px;cursor:pointer;box-shadow:0 0 0 3px rgba(255,255,255,.5),0 8px 18px rgba(30,40,84,.3)}
+      .m-reg svg{width:26px;height:26px}.m-reg:hover{background:var(--g-sel)}`));
+    const drawSide = () => {
+      side.innerHTML = region === "kanto"
+        ? `<div class="m-reg" style="left:34px;top:${20 + VH / 2 - 28}px;animation:mapbobL 1.6s ease-in-out infinite"><svg viewBox="0 0 24 24"><path d="M16 4L7 12l9 8" fill="none" stroke="#E5525C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>JOHTO</div>`
+        : `<div class="m-reg" style="left:${20 + VW - 160}px;top:${20 + VH / 2 - 28}px;animation:mapbobR 1.6s ease-in-out infinite">KANTO<svg viewBox="0 0 24 24"><path d="M8 4l9 8-9 8" fill="none" stroke="#E5525C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+      side.firstChild.onclick = () => flip();
+    };
+    const flip = () => { region = region === "kanto" ? "johto" : "kanto"; drawSide(); drawInfo(); };
+    drawSide();
     // A big, plain way out: BACK, top left over the map.
     const back = box(38, 36, null, null, "", `<span class="g-act" style="min-width:0;height:52px;font-size:20px;padding:0 20px 0 8px"><span class="g-key k-b" style="width:36px;height:36px">B</span>${esc(T("Back"))}</span>`);
     back.onclick = () => { alive = false; go("menu", { sel: 3 }); };
@@ -525,36 +616,59 @@ screen("map", "Menus", "Town Map", {
       key: k => { if (k === "b") { alive = false; go("menu", { sel: 3 }); return true; }
         if (k === "tab") { let i = sel; do { i = (i + 1) % P.length; } while (P[i].kind !== "town"); pick(i); return true; }
         if (k === "a") { const p = P[sel]; if (p.kind === "town" && BEEN.includes(p.key)) { alive = false; G.place = p.name; go("hud"); } return true; }
-        if (["left", "right", "up", "down"].includes(k)) { pick(near(k)); return true; } return true; },
+        if (region === "johto") { if (k === "right") flip(); return true; }
+        if (["left", "right", "up", "down"].includes(k)) { const n = near(k); if (n === sel && k === "left") { flip(); return true; } pick(n); return true; } return true; },
       leave() { alive = false; }
     };
   }
 });
-// Our own badges: every one a six-sided enamel pin with a silver rim, its town's colour and its own mark in cream.
-const BADGES = [["BOULDERBADGE", "#8E8A84"], ["CASCADEBADGE", "#3F86D0"], ["THUNDERBADGE", "#E2B320"], ["RAINBOWBADGE", "#4FA84A"], ["SOULBADGE", "#B0509A"], ["MARSHBADGE", "#D6962A"], ["VOLCANOBADGE", "#D8443C"], ["EARTHBADGE", "#5E8A3A"]];
-const BADGE_MARK = [
-  // a block: a cube seen from the corner
-  `<path d="M32 17l12 6v13l-12 6-12-6V23z" fill="#FFF4D8"/><path d="M32 29l12-6v13l-12 6z" fill="#D9CDB0"/><path d="M32 29L20 23v13l12 6z" fill="#EFE3C6"/><path d="M26 32l3 2" stroke="#8E8A84" stroke-width="1.6"/>`,
-  // three waves
-  `<path d="M18 24q3.5-4 7 0t7 0 7 0 7 0M18 32q3.5-4 7 0t7 0 7 0 7 0M18 40q3.5-4 7 0t7 0 7 0 7 0" fill="none" stroke="#FFF4D8" stroke-width="3.4" stroke-linecap="round"/>`,
-  // a bolt
-  `<path d="M35 14L22 34h9l-3 16 14-22h-9z" fill="#FFF4D8"/>`,
-  // a bow over a sprout
-  `<path d="M18 36a14 14 0 0 1 28 0" fill="none" stroke="#FFF4D8" stroke-width="3"/><path d="M23 36a9 9 0 0 1 18 0" fill="none" stroke="#FFD45A" stroke-width="2.4"/><path d="M32 48V38" stroke="#FFF4D8" stroke-width="2.6"/><path d="M32 41q-6-1-7-6 6 0 7 6zM32 41q6-1 7-6-6 0-7 6z" fill="#FFF4D8"/>`,
-  // a crescent and a star
-  `<path d="M36 16a16 16 0 1 0 0 32 13 13 0 1 1 0-32z" fill="#FFF4D8"/><path d="M41 27l1.6 3.4 3.7.4-2.8 2.5.8 3.7-3.3-1.9-3.3 1.9.8-3.7-2.8-2.5 3.7-.4z" fill="#FFF4D8"/>`,
-  // an eye in a diamond
-  `<path d="M32 15l15 17-15 17-15-17z" fill="none" stroke="#FFF4D8" stroke-width="3"/><path d="M22 32q10-9 20 0-10 9-20 0z" fill="#FFF4D8"/><circle cx="32" cy="32" r="3.6" fill="#D6962A"/>`,
-  // a peak with a flame
-  `<path d="M16 46l11-15 4 4 5-8 12 19z" fill="#FFF4D8"/><path d="M33 26q-5-5 0-12 1 5 4 6 1 4-4 6z" fill="#FFD45A"/>`,
-  // a world with a mountain on it
-  `<circle cx="32" cy="32" r="14" fill="none" stroke="#FFF4D8" stroke-width="3"/><path d="M19 36l7-8 4 4 5-7 10 11q-2 6-13 9-10-2-13-9z" fill="#FFF4D8"/>`];
-function badgeSvg(i) {
-  const [, c] = BADGES[i];
-  return `<svg viewBox="0 0 64 64" style="display:block;width:100%;height:100%"><defs><linearGradient id="bg${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity="1"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>
-    <linearGradient id="br${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#B8C4CC"/><stop offset="1" stop-color="#6E7A84"/></linearGradient></defs>
-    <path d="M32 3l25 14.5v29L32 61 7 46.5v-29z" fill="url(#br${i})"/><path d="M32 8l20.7 12v24L32 56 11.3 44V20z" fill="${c}"/><path d="M32 8l20.7 12v24L32 56 11.3 44V20z" fill="url(#bg${i})"/>
-    <path d="M32 8l20.7 12v4L32 12 11.3 24v-4z" fill="#fff" opacity=".28"/>${BADGE_MARK[i]}</svg>`;
+// Our own badges, each shaped after its name as the eight are: BOULDER a faceted grey rock, CASCADE a drop of water,
+// THUNDER a burst of light round a bolt, RAINBOW a flower of rainbow petals, SOUL a heart, MARSH rings of gold,
+// VOLCANO a flame, EARTH a leaf. Enamel in the badge's colours inside a polished silver rim, with a shine.
+const BADGES = [["BOULDERBADGE", "#8E8A84"], ["CASCADEBADGE", "#3F86D0"], ["THUNDERBADGE", "#E2B320"], ["RAINBOWBADGE", "#4FA84A"], ["SOULBADGE", "#D04A8E"], ["MARSHBADGE", "#D6962A"], ["VOLCANOBADGE", "#D8443C"], ["EARTHBADGE", "#4E9A3A"]];
+const BURST = (() => { let d = ""; for (let i = 0; i < 16; i++) { const a = i * Math.PI / 8 - Math.PI / 2, r = i % 2 ? 17 : 27; d += (i ? "L" : "M") + (32 + Math.cos(a) * r).toFixed(1) + " " + (32 + Math.sin(a) * r).toFixed(1); } return d + "Z"; })();
+const PETALS = (() => { const cols = ["#E5484F", "#F59A2A", "#F7D433", "#4FBF5A", "#3C8DE4", "#5A5FD8", "#9A5ADE", "#E86AB8"]; return cols.map((c, i) => { const a = i * Math.PI / 4 - Math.PI / 2; return [32 + Math.cos(a) * 15, 32 + Math.sin(a) * 15, c]; }); })();
+const BADGE_SHAPE = [
+  "M13 40L11 27 19 15 33 9 47 14 55 28 51 45 37 55 21 52Z",
+  "M32 5C38 15 51 27 51 39A19 19 0 0 1 13 39C13 27 26 15 32 5Z",
+  BURST,
+  PETALS.map(([x, y]) => `M${(x - 10.5).toFixed(1)} ${y.toFixed(1)}a10.5 10.5 0 1 0 21 0a10.5 10.5 0 1 0 -21 0`).join("") + "M18 32a14 14 0 1 0 28 0a14 14 0 1 0 -28 0",
+  "M32 54C19 45 8 36 8 24 8 15 15 9 22 9c5 0 8 3 10 6 2-3 5-6 10-6 7 0 14 6 14 15 0 12-11 21-24 30Z",
+  "M7 32a25 25 0 1 0 50 0a25 25 0 1 0 -50 0",
+  "M32 4C36 14 47 19 48 33 49 46 41 56 32 58 23 56 15 46 16 33 17 25 22 21 24 14 27 19 28 22 30 23 30 16 30 10 32 4Z",
+  "M32 4C46 12 54 26 50 40 46 52 38 58 32 60 26 58 18 52 14 40 10 26 18 12 32 4Z",
+];
+const BADGE_INNER = [
+  // facets of the rock: light up top left, dark down the right
+  `<path d="M33 9L19 15 26 29Z" fill="#fff" opacity=".35"/><path d="M19 15L11 27 26 29Z" fill="#fff" opacity=".18"/><path d="M33 9L47 14 40 27 26 29Z" fill="#fff" opacity=".22"/>
+   <path d="M47 14L55 28 40 27Z" fill="#000" opacity=".08"/><path d="M55 28L51 45 40 27Z" fill="#000" opacity=".2"/><path d="M51 45L37 55 40 27Z" fill="#000" opacity=".26"/><path d="M37 55L21 52 26 29 40 27Z" fill="#000" opacity=".14"/>
+   <path d="M21 52L13 40 11 27 26 29Z" fill="#000" opacity=".06"/><path d="M26 29L40 27" stroke="#fff" stroke-width="1.2" opacity=".5"/><path d="M28 37l5 3M34 21l4-2" stroke="#5E5A54" stroke-width="1.4" stroke-linecap="round"/>`,
+  // a wave across the drop, and its shine
+  `<path d="M16 40q4-5 8 0t8 0 8 0 8 0v6a17 15 0 0 1 -32 0z" fill="#BFE6FF" opacity=".7"/><path d="M19 38q4-5 8 0t8 0 8 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/><ellipse cx="25" cy="27" rx="4" ry="7" transform="rotate(28 25 27)" fill="#fff" opacity=".55"/>`,
+  // the bolt in the middle
+  `<circle cx="32" cy="32" r="14" fill="#FFF3B0" opacity=".55"/><path d="M35 19L24 35h7l-3 11 12-17h-7z" fill="#fff" stroke="#B8801A" stroke-width="1.4" stroke-linejoin="round"/>`,
+  // each petal its own colour, a gold middle
+  PETALS.map(([x, y, c]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8.6" fill="${c}"/><circle cx="${(x - 2.5).toFixed(1)}" cy="${(y - 2.5).toFixed(1)}" r="3" fill="#fff" opacity=".45"/>`).join("") + `<circle cx="32" cy="32" r="9" fill="#FFD45A" stroke="#C8901E" stroke-width="1.6"/><circle cx="29.5" cy="29.5" r="2.6" fill="#fff" opacity=".6"/>`,
+  // a shine on the heart
+  `<path d="M16 21c1-5 5-8 9-7" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".6"/><circle cx="44" cy="20" r="2.5" fill="#fff" opacity=".5"/>`,
+  // rings of gold, one inside another
+  `<circle cx="32" cy="32" r="18" fill="none" stroke="#FFE7A0" stroke-width="3.4"/><circle cx="32" cy="32" r="11" fill="none" stroke="#FFE7A0" stroke-width="3.4"/><circle cx="32" cy="32" r="4.5" fill="#FFE7A0"/>
+   <circle cx="32" cy="32" r="18" fill="none" stroke="#8A5A10" stroke-width="1" opacity=".5" transform="translate(1 1)"/><circle cx="32" cy="32" r="11" fill="none" stroke="#8A5A10" stroke-width="1" opacity=".5" transform="translate(1 1)"/>`,
+  // the flame's hot heart
+  `<path d="M32 22C35 29 41 33 41 41 41 48 37 53 32 54 27 53 23 48 23 41 23 36 26 33 28 28 30 31 31 33 32 34 32 30 31 26 32 22Z" fill="#FFB43A"/><path d="M32 36C34 40 37 42 37 46 37 50 35 52 32 52 29 52 27 50 27 46 27 43 30 40 32 36Z" fill="#FFF0A0"/>`,
+  // the leaf's veins
+  `<path d="M32 10V56" stroke="#D8F5B0" stroke-width="2.4" stroke-linecap="round"/><path d="M32 22l-10 8M32 22l10 8M32 32l-12 9M32 32l12 9M32 42l-9 7M32 42l9 7" stroke="#D8F5B0" stroke-width="1.8" stroke-linecap="round"/><ellipse cx="24" cy="22" rx="4" ry="8" transform="rotate(30 24 22)" fill="#fff" opacity=".3"/>`,
+];
+let BADGE_N = 0;
+function badgeSvg(i, o = {}) {
+  const [, c] = BADGES[i], u = "b" + i + "_" + (BADGE_N++), d = BADGE_SHAPE[i];
+  return `<svg viewBox="-2 -2 68 68" style="display:block;width:100%;height:100%;overflow:visible"><defs><linearGradient id="${u}f" x1="0" y1="0" x2=".4" y2="1"><stop offset="0" stop-color="${lighterHex(c, 0.35)}"/><stop offset=".55" stop-color="${c}"/><stop offset="1" stop-color="${darkerHex(c, 0.3)}"/></linearGradient>
+    <linearGradient id="${u}r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#C4CDD4"/><stop offset=".7" stop-color="#8C98A2"/><stop offset="1" stop-color="#E6ECF0"/></linearGradient>
+    <clipPath id="${u}c"><path d="${d}"/></clipPath></defs>
+    <path d="${d}" fill="none" stroke="${darkerHex(c, 0.55)}" stroke-width="7.5" stroke-linejoin="round" opacity=".35" transform="translate(0 1.6)"/>
+    <path d="${d}" fill="url(#${u}f)" stroke="url(#${u}r)" stroke-width="4.2" stroke-linejoin="round"/>
+    <g clip-path="url(#${u}c)">${BADGE_INNER[i]}<path d="M-10 -10H74V22Q32 30 -10 18Z" fill="#fff" opacity=".16"/>
+      ${o.shine ? `<rect x="-40" y="-10" width="18" height="90" fill="#fff" opacity=".55" transform="skewX(-20)"><animate attributeName="x" values="-40;-40;90" keyTimes="0;.55;1" dur="2.6s" repeatCount="indefinite"/></rect>` : ""}</g></svg>`;
 }
 // The gyms, for the Town Map's city panels: leader, type, badge (index into BADGES), and their team's levels.
 const GYMS = { "PEWTER CITY": ["BROCK", "ROCK", 0, "12 to 14"], "CERULEAN CITY": ["MISTY", "WATER", 1, "18 to 21"], "VERMILION CITY": ["LT. SURGE", "ELECTRIC", 2, "18 to 24"],
@@ -562,15 +676,33 @@ const GYMS = { "PEWTER CITY": ["BROCK", "ROCK", 0, "12 to 14"], "CERULEAN CITY":
   "CINNABAR ISLAND": ["BLAINE", "FIRE", 6, "40 to 47"], "VIRIDIAN CITY": ["GIOVANNI", "GROUND", 7, "42 to 50"] };
 screen("card", "Menus", "Trainer card", {
   scene: "creator", sceneOpts: () => ({ side: 2.1 }),
-  what: "Your TRAINER CARD: you as you look, your name and ID, money, POKéDEX, time, and the eight badges.",
+  what: "Your TRAINER CARD: you as you look on the left, on its own soft swirl of light. The card has a coral band with your ID, your name big, money, POKéDEX, time and when you started on pale fields, and the badge case: a dark tray with eight sunken slots, the ones you've won shining in them. A pearly sheen drifts across it now and then.",
   mod: "MenuScreen's TRAINER CARD with the eight badges.",
   make() {
-    backdrop(SKY); rays(15, 10, 0.2);
-    box(470, 60, 770, 600, "g-panel g-fadein", `<div style="padding:28px 34px;display:grid;gap:16px"><div style="display:flex;align-items:center;gap:14px"><span style="width:46px;height:46px">${ICON.card}</span><span class="g-title" style="font-size:34px">TRAINER CARD</span></div>
-      <div style="display:grid;grid-template-columns:200px 1fr;gap:12px 20px;font-size:23px;font-weight:900">
-      <span class="g-label">Name</span><span>${esc(G.name)}</span><span class="g-label">ID No.</span><span>${G.id}</span><span class="g-label">Money</span><span>${money(G.money)}</span>
-      <span class="g-label">Pokédex</span><span>${G.caught}</span><span class="g-label">Play time</span><span>${G.time}</span><span class="g-label">Started</span><span>${G.started}</span></div>
-      <div class="g-label" style="margin-top:6px">Badges</div><div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px">${BADGES.map(([n, c], i) => `<div title="${n}" style="aspect-ratio:1;border-radius:18px;background:#F1F4FB;display:grid;place-items:center;${i < G.badges ? "" : "filter:grayscale(1) brightness(.5);opacity:.55"}"><span style="width:66px;height:66px">${badgeSvg(i)}</span></div>`).join("")}</div></div>`);
+    swirlBackdrop("sky", { lx: 15, ly: 10, cx: 22, cy: 62 });
+    // The card itself, as a real trainer card: a coral band along the top with its stripes and a ball's outline, your ID
+    // in a pill; the details on pale fields; the badge case below, a dark tray with eight sunken slots; a pearly sheen
+    // that drifts across it now and then.
+    const field = (l, v) => `<div style="display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 18px;border-radius:14px;background:#F2F5FB;box-shadow:inset 0 2px 0 rgba(30,40,84,.06)"><span class="g-label">${esc(T(l))}</span><span style="font-size:21px;font-weight:900">${v}</span></div>`;
+    box(470, 70, 770, 580, "g-fadein", `<style>@keyframes tcsheen{0%,70%{transform:translateX(-120%) skewX(-18deg)}100%{transform:translateX(260%) skewX(-18deg)}}</style>
+      <div style="position:absolute;inset:0;border-radius:30px;overflow:hidden;background:#fff;box-shadow:0 0 0 5px #fff,0 0 0 8px rgba(255,255,255,.45),0 18px 40px rgba(30,40,84,.32)">
+        <div style="position:relative;height:104px;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.12) 0 14px,transparent 14px 28px),linear-gradient(100deg,#FF8A7A,#E5525C 55%,#C93A5A);overflow:hidden">
+          <svg viewBox="0 0 100 100" width="230" height="230" style="position:absolute;right:-40px;top:-62px;opacity:.22"><circle cx="50" cy="50" r="44" fill="none" stroke="#fff" stroke-width="7"/><path d="M6 50h88" stroke="#fff" stroke-width="7"/><circle cx="50" cy="50" r="14" fill="none" stroke="#fff" stroke-width="7"/></svg>
+          <div style="position:absolute;left:30px;top:26px;display:flex;align-items:center;gap:14px"><span style="width:52px;height:52px;border-radius:16px;background:#fff;display:grid;place-items:center;box-shadow:0 3px 0 rgba(0,0,0,.15)"><span style="width:38px;height:38px">${ICON.card}</span></span>
+            <span class="g-title" style="font-size:36px;color:#fff;text-shadow:0 3px 0 rgba(120,20,40,.3)">${esc(T("TRAINER CARD"))}</span></div>
+          <span style="position:absolute;right:28px;top:34px;padding:6px 16px;border-radius:999px;background:#fff;font-weight:900;font-size:18px;color:#26304A;box-shadow:0 3px 0 rgba(0,0,0,.15)"><span class="g-label" style="margin-right:8px">ID No.</span>${G.id}</span></div>
+        <div style="padding:22px 30px 0;display:grid;grid-template-columns:1fr 1fr;gap:10px 14px">
+          <div style="grid-column:1/-1;display:flex;align-items:baseline;gap:14px;padding:0 4px 6px;border-bottom:3px dashed #EEF1F8"><span class="g-label">${esc(T("Name"))}</span><span class="g-title" style="font-size:38px">${esc(G.name)}</span></div>
+          ${field("Money", money(G.money))}${field("Pokédex", G.caught + " caught")}${field("Play time", G.time)}${field("Started", G.started)}</div>
+        <div style="margin:18px 30px 0;padding:14px 18px 12px;border-radius:22px;background:linear-gradient(180deg,#2E3A62,#1E2746);box-shadow:inset 0 3px 8px rgba(0,0,0,.4)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span class="g-label" style="color:#C9D3F0">${esc(T("Badges"))}</span><span style="font-weight:900;font-size:14px;color:#FFD45A">${G.badges} / 8</span></div>
+          <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px">${BADGES.map(([n], i) => `<div title="${n}" style="display:grid;justify-items:center;gap:4px"><span style="width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#161D36,#0E1428);box-shadow:inset 0 3px 6px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.12)">
+            <span style="width:50px;height:50px;${i < G.badges ? "" : "filter:grayscale(1) brightness(.45);opacity:.45"}">${badgeSvg(i)}</span></span><span style="font-size:11px;font-weight:900;color:#8E9AC0">${i + 1}</span></div>`).join("")}</div></div>
+        <div style="margin:16px 30px 0;display:flex;align-items:center;gap:14px"><span style="width:58px;height:52px;flex:none">${emblemOf(G.party[0].sid, 58)}</span>
+          <div style="display:grid"><span class="g-label">${esc(T("Partner"))}</span><span style="font-size:21px;font-weight:900">${esc(ourName(G.party[0].sid))}</span></div>
+          <div style="margin-left:auto;text-align:right;display:grid"><span class="g-label">${esc(T("Hall of Fame"))}</span><span style="font-size:18px;font-weight:900;color:var(--g-muted)">${esc(T("Not yet"))}</span></div></div>
+        <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:30px"><div style="position:absolute;top:0;bottom:0;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),rgba(214,190,255,.25),transparent);animation:tcsheen 6s ease-in-out 1s infinite"></div></div>
+      </div>`);
     hints([["B", "Back"]]);
     return { key: k => { if (k === "b") go("menu", { sel: 5 }); return true; } };
   }
@@ -593,13 +725,16 @@ screen("save", "Menus", "Saving", {
   mod: "MenuScreen's SAVE.",
   tags: ["New look: Let's Go's"],
   make() {
-    backdrop(SKY); rays(80, 0, 0.2); const C = ctl();
-    box(560, 60, 660, null, "g-panel g-pop", `<div style="padding:22px 30px;display:grid;grid-template-columns:1fr 210px;gap:20px">
+    swirlBackdrop("sky", { lx: 80, ly: 0, cx: 24, cy: 60 }); const C = ctl();
+    // The card, then the two buttons under it with clear room between (they used to sit over its foot).
+    const col = box(560, 50, 660, null, "", ""); col.style.display = "grid"; col.style.gap = "28px";
+    const cardEl = h("div", "g-panel g-pop", `<div style="padding:22px 30px;display:grid;grid-template-columns:1fr 210px;gap:20px">
       <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 24px;font-size:21px;font-weight:900">${[["Name", esc(G.name)], ["ID No.", G.id], ["Pokédex", G.caught + " POKéMON"], ["Money", money(G.money)], ["Play time", G.time], ["Started", G.started]].map(([l, v]) => `<span class="g-label" style="align-self:center">${esc(T(l))}</span><span style="text-align:right;border-bottom:2px solid #EEF1F8;padding-bottom:4px">${v}</span>`).join("")}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${G.party.map(p => `<span style="aspect-ratio:1;border-radius:50%;background:linear-gradient(180deg,#fff,${lighterHex(typeHex(sp(p.sid).stats.types[0]), 0.7)});box-shadow:0 0 0 3px #fff,0 4px 10px rgba(30,40,84,.2);display:grid;place-items:center;overflow:hidden">${pic(p.sid, 84)}</span>`).join("")}</div></div>`);
-    const btns = box(600, 430, 580, null, "", "");
+    cardEl.style.position = "relative"; col.appendChild(cardEl);
+    const btns = h("div", "", ""); btns.style.padding = "0 40px"; col.appendChild(btns);
     let sel = 0;
-    const draw = () => { btns.innerHTML = [["SAVE YOUR PROGRESS", "#FFEC8A", "#FFC93C"], ["BACK TO YOUR ADVENTURE", "#FFFFFF", "#EEF2FB"]].map(([l, a, b], i) => `<div data-i="${i}" style="position:relative;margin-bottom:16px;height:62px;border-radius:999px;display:grid;place-items:center;cursor:pointer;font-family:Fredoka,sans-serif;font-weight:600;font-size:24px;color:#26304A;
+    const draw = () => { btns.innerHTML = [["SAVE YOUR PROGRESS", "#FFEC8A", "#FFC93C"], ["BACK TO YOUR ADVENTURE", "#FFFFFF", "#EEF2FB"]].map(([l, a, b], i) => `<div data-i="${i}" style="position:relative;margin-bottom:${i ? 0 : 18}px;height:62px;border-radius:999px;display:grid;place-items:center;cursor:pointer;font-family:Fredoka,sans-serif;font-weight:600;font-size:24px;color:#26304A;
       background:linear-gradient(180deg,${a},${b});border:3px solid #fff;box-shadow:${i === sel ? "0 0 0 4px #E5525C," : ""}0 6px 16px rgba(30,40,84,.22)">${i === sel ? `<span style="position:absolute;left:-30px;font-size:26px;color:#E5525C">&#9654;</span>` : ""}${l}</div>`).join("");
       btns.querySelectorAll("[data-i]").forEach(e => e.onclick = () => { sel = +e.dataset.i; pick(); }); };
     let busy = false;
@@ -607,7 +742,7 @@ screen("save", "Menus", "Saving", {
       if (busy) return; busy = true;
       if (sel === 1) { go("menu", { sel: 7 }); return; }
       btns.style.opacity = .4;
-      const sp_ = box(600, 590, 580, null, "", `<div style="display:flex;align-items:center;justify-content:center;gap:14px;font-weight:900;font-size:20px;color:#26304A"><span style="width:44px;height:44px;animation:spin 1s linear infinite">${PICTO.save("#8F60DE").replace('fill="#fff"', 'fill="#8F60DE"')}</span>Saving... don't switch off.</div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>`);
+      const sp_ = box(600, 656, 580, null, "", `<div style="display:flex;align-items:center;justify-content:center;gap:14px;font-weight:900;font-size:20px;color:#26304A"><span style="width:44px;height:44px;animation:spin 1s linear infinite">${PICTO.save("#8F60DE").replace('fill="#fff"', 'fill="#8F60DE"')}</span>Saving... don't switch off.</div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>`);
       await C.wait(1400); sp_.remove();
       await C.say([{ text: "**{N}** saved the game." }]); if (C.alive()) go("hud");
     };

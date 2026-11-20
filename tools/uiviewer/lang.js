@@ -45,7 +45,8 @@ L("CARD", "FICHA", "DRESSEUR", "PASS", "SCHEDA", "カード", "카드", "卡片"
 L("WAIT", "ESPERAR", "ATTENDRE", "WARTEN", "ATTENDI", "まつ", "기다리기", "等待", "等待");
 L("OPTION", "OPCIONES", "OPTIONS", "OPTIONEN", "OPZIONI", "せってい", "설정", "设置", "設定");
 L("EXIT", "SALIR", "QUITTER", "ENDE", "ESCI", "とじる", "닫기", "关闭", "關閉");
-L("PLAY WITH {0}", "JUGAR CON {0}", "JOUER AVEC {0}", "MIT {0} SPIELEN", "GIOCA CON {0}", "{0}と あそぶ", "{0}와 놀기", "和{0}玩", "和{0}玩");
+L("PARTY", "EQUIPO", "ÉQUIPE", "TEAM", "SQUADRA", "てもち", "파티", "队伍", "隊伍");
+L("See how {0} is doing.", "Mira cómo está {0}.", "Vois comment va {0}.", "Sieh nach, wie es {0} geht.", "Guarda come sta {0}.", "{0}の ようすを みる", "{0}의 상태를 본다", "看看{0}的状态", "看看{0}的狀態");
 L("Every POKéMON you've seen and caught.", "Todos los POKéMON que has visto y capturado.", "Tous les POKéMON vus et capturés.", "Alle POKéMON, die du gesehen und gefangen hast.", "Tutti i POKéMON che hai visto e catturato.", "みつけた ポケモンと つかまえた ポケモン。", "본 포켓몬과 잡은 포켓몬 전부.", "你见过和捕获的所有宝可梦。", "你見過和捕獲的所有寶可夢。");
 L("Your team: check them, switch them, pick who follows you.", "Tu equipo: revísalo, cámbialo y elige quién te sigue.", "Ton équipe : consulte-la, réorganise-la, choisis qui te suit.", "Dein Team: ansehen, tauschen, wählen, wer dir folgt.", "La tua squadra: controllala, cambiala, scegli chi ti segue.", "てもちの ポケモン。いれかえや つれあるきも ここで。", "지닌 포켓몬. 순서를 바꾸고 데리고 다닐 포켓몬을 고르자.", "你的队伍：查看、调换、选择跟着你的宝可梦。", "你的隊伍：查看、調換、選擇跟著你的寶可夢。");
 L("Your items, in four pockets.", "Tus objetos, en cuatro bolsillos.", "Tes objets, en quatre poches.", "Deine Items, in vier Taschen.", "I tuoi strumenti, in quattro tasche.", "どうぐは 4つの ポケットに。", "도구는 4개의 포켓에.", "你的道具，分在四个口袋里。", "你的道具，分在四個口袋裡。");
@@ -61,6 +62,7 @@ L("FIGHT", "LUCHAR", "ATTAQUE", "KAMPF", "LOTTA", "たたかう", "싸운다", "
 L("RUN", "HUIR", "FUITE", "FLUCHT", "FUGA", "にげる", "도망간다", "逃走", "逃走");
 L("What will **{0}** do?", "¿Qué hará **{0}**?", "Que doit faire **{0}** ?", "Was soll **{0}** tun?", "Cosa deve fare **{0}**?", "**{0}**は どうする？", "**{0}**은(는) 무엇을 할까?", "要让**{0}**做什么？", "要讓**{0}**做什麼？");
 // Title and saves.
+L("PRESS {0}", "PULSA {0}", "APPUIE SUR {0}", "DRÜCKE {0}", "PREMI {0}", "{0}を おしてね", "{0}를 누르세요", "请按 {0}", "請按 {0}");
 L("PRESS START", "PULSA START", "APPUIE SUR START", "DRÜCKE START", "PREMI START", "スタートを おしてね", "START를 누르세요", "请按开始键", "請按開始鍵");
 L("NEW GAME", "PARTIDA NUEVA", "NOUVELLE PARTIE", "NEUES SPIEL", "NUOVA PARTITA", "さいしょから", "처음부터", "新游戏", "新遊戲");
 L("Empty", "Vacía", "Vide", "Leer", "Vuoto", "からっぽ", "비어 있음", "空", "空");

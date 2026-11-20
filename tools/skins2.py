@@ -114,6 +114,7 @@ def person(spec, seed):
     top(S, spec, tone)
     hair(S, spec, hairc, tone)
     extras(S, spec, tone, hairc)
+    more(S, spec, tone, hairc)
     return S
 
 
@@ -474,6 +475,136 @@ def extras(S, spec, tone, hc):
         x, y, w, h = S.face("head", "left"); S.px(x + 1, y + 5, e)
 
 
+# ---------- more variety (the 15:14 notes): patterns, two-tone sleeves, closed and quilted jackets, chest motifs,
+# hoods up, caps backwards, bucket hats, berets, headbands, bobble hats, headphones, joggers ----------
+MOTIFS = {
+    "heart": [".x.x.", "xxxxx", "xxxxx", ".xxx.", "..x.."], "star": ["..x..", ".xxx.", "xxxxx", ".x.x.", "x...x"],
+    "ball": [".xxxx.", "xxxxxx", "oo..oo", "oooooo", ".oooo."], "bolt": ["..xx", ".xx.", "xxxx", ".xx.", "xx.."],
+    "leaf": ["...xx", "..xxx", ".xxx.", "xxx..", "x...."], "flame": ["..x..", ".xx..", ".xxx.", "xxxxx", ".xxx."],
+    "drop": [".x..", ".xx.", "xxxx", "xxxx", ".xx."], "moon": [".xxx.", "xx...", "xx...", "xx...", ".xxx."],
+    "note": ["..xx", "..x.", "..x.", "xxx.", "xx.."], "seven": ["xxxx", "...x", "..x.", ".x..", ".x.."],
+    "chevron": ["x....x", ".x..x.", "..xx.."], "crown": ["x.xx.x", "xxxxxx", "xxxxxx"], "paw": ["x.x.x", ".....", ".xxx.", "xxxxx", ".xxx."],
+    "flower": [".x.x.", "xxoxx", ".xxx.", "..x..", ".xx.."], "smile": [".xxxx.", "xoxxox", "xxxxxx", "xoooox", ".xxxx."], "wave": ["......", ".x..x.", "x.xx.x", "......"],
+}
+
+
+def more(S, spec, tone, hc):
+    col = C(spec.get("topc", "3A6FD0"))
+    kind = spec.get("top", "tee")
+    sleeves = spec.get("sleeves", {"tee": 4, "tank": 0, "shirt": 12, "jumper": 12, "hoodie": 12, "dress": 4, "blouse": 12, "none": 0}.get(kind, 12))
+    # Patterns over the top: checks, dots, stripes down, or a yoke of another colour across the shoulders.
+    pat = spec.get("pattern")
+    if pat and kind != "bare":
+        pc = C(spec.get("patc", "F4F4F4"))
+        for s_ in ("front", "back", "right", "left"):
+            x, y, w, h = S.face("body", s_)
+            for j in range(h):
+                for i in range(w):
+                    if pat == "check" and (i % 3 == 0 or j % 3 == 0): S.px(x + i, y + j, mix(S.get(x + i, y + j)[:3], pc, 0.45 if (i % 3 == 0 and j % 3 == 0) else 0.28))
+                    elif pat == "dots" and (i + (j // 2) * 2) % 4 == 1 and j % 2 == 1: S.px(x + i, y + j, pc)
+                    elif pat == "vstripe" and i % 3 == 1: S.px(x + i, y + j, mix(S.get(x + i, y + j)[:3], pc, 0.7))
+                    elif pat == "yoke" and j < 4: S.px(x + i, y + j, sh(pc, 0.06 - j * 0.02))
+        if pat == "yoke":
+            for arm in ("rarm", "larm"):
+                if sleeves: S.paint(arm, pc, (0, min(4, sleeves)), grad=(0.08, -0.04))
+    # Two-tone: sleeves in another colour (a raglan tee, a baseball top).
+    if spec.get("sleevec") and sleeves and kind != "bare":
+        sc = C(spec["sleevec"])
+        for arm in ("rarm", "larm"):
+            S.paint(arm, sc, (0, sleeves), grad=(0.08, -0.08)); S.around(arm, sleeves - 1, sh(sc, -0.14))
+            x, y, w, h = S.face(arm, "top"); [S.px(x + i, y + j, sh(sc, 0.04)) for i in range(w) for j in range(h)]
+    # A closed jacket: done up, a zip down the middle; quilted (a puffer) with seams across; or sleeves in another colour.
+    if spec.get("coat") and spec.get("closed"):
+        cc = C(spec.get("coatc", "F4F4F2"))
+        ox, oy, ow, oh = S.face("body", "front", outer=True)
+        for j in range(12):
+            for i in (3, 4): S.px(ox + i, oy + j, sh(cc, 0.06 - j * 0.012))
+        for j in range(1, 12): S.px(ox + 4, oy + j, sh(cc, -0.28))
+        S.px(ox + 4, oy + 1, (220, 220, 214))
+        if spec.get("puffer"):
+            for row in (3, 6, 9):
+                S.around("body", row, sh(cc, -0.16), outer=True)
+                for arm in ("rarm", "larm"): S.around(arm, row, sh(cc, -0.16), outer=True)
+        for arm in ("rarm", "larm"): S.around(arm, 11, sh(cc, -0.22), outer=True)
+        S.around("body", 11, sh(cc, -0.22), outer=True)
+    if spec.get("coat") and spec.get("coatsleevec"):
+        sc = C(spec["coatsleevec"])
+        for arm in ("rarm", "larm"):
+            S.paint(arm, sc, (0, spec.get("coatsleeve", 12)), outer=True, grad=(0.08, -0.06))
+            S.around(arm, spec.get("coatsleeve", 12) - 1, sh(sc, -0.15), outer=True)
+    # The mark of a team or a motif on the chest: big on a top, or on a jacket done up.
+    motif = spec.get("motif")
+    if motif:
+        m = MOTIFS[motif]; mc = C(spec.get("motifc", "F4F4F4")); m2 = C(spec.get("motif2", "F4F4F4"))
+        outer = bool(spec.get("coat") and spec.get("closed"))
+        x, y, w, h = S.face("body", "front", outer=outer)
+        left = (8 - len(m[0])) // 2 + spec.get("motifx", 0); top = spec.get("motify", 2)
+        for j, row in enumerate(m):
+            for i, ch in enumerate(row):
+                if ch == "x": S.px(x + left + i, y + top + j, sh(mc, -0.04 * (j % 2)))
+                elif ch == "o": S.px(x + left + i, y + top + j, m2)
+    if spec.get("bigmark"):
+        # A team's own mark, big on a jacket done up (the ring cut through).
+        lc = C(spec["bigmark"]); x, y, w, h = S.face("body", "front", outer=bool(spec.get("coat") and spec.get("closed")))
+        for (i, j) in [(3, 2), (4, 2), (2, 3), (5, 3), (2, 4), (5, 4), (3, 5), (4, 5), (4, 3), (3, 4)]: S.px(x + i, y + j, lc)
+    # Joggers: a cuff at the ankle and a stripe down the side.
+    if spec.get("bottom") == "joggers" or spec.get("jog"):
+        bc = C(spec.get("botc", "3A4A6A"))
+        for leg in ("rleg", "lleg"):
+            S.around(leg, 9, sh(bc, -0.25))
+            if spec.get("stripec"):
+                x, y, w, h = S.face(leg, "right" if leg == "rleg" else "left")
+                for j in range(9): S.px(x + 1, y + j, C(spec["stripec"])); S.px(x + 2, y + j, sh(C(spec["stripec"]), -0.1))
+    # Headwear on the hat layer.
+    def ov(side, cells, c, k=0.0):
+        x, y, w, h = S.face("head", side, outer=True)
+        for (i, j) in cells: S.px(x + i, y + j, sh(c, k + (S.r.random() - 0.5) * 0.06))
+    def clear(side, cells):
+        x, y, w, h = S.face("head", side, outer=True)
+        for (i, j) in cells: S.p[x + i, y + j] = (0, 0, 0, 0)
+    allt = [(i, j) for i in range(8) for j in range(8)]
+    hw = spec.get("hw")
+    hcol = C(spec.get("hwc", spec.get("topc", "3A6FD0")))
+    if hw == "hood":
+        # The hood up over the head, framing the face.
+        for side in ("top", "back", "right", "left"): ov(side, allt, hcol, -0.04 if side != "top" else 0.06)
+        x, y, w, h = S.face("head", "front", outer=True)
+        clear("front", allt)
+        ov("front", [(i, j) for i in range(8) for j in range(2)] + [(i, j) for i in (0, 7) for j in range(2, 8)], hcol, -0.1)
+        ov("front", [(i, 2) for i in (1, 6)], hcol, -0.22)
+    elif hw in ("capback", "cap"):
+        for side in ("front", "back", "right", "left"): clear(side, allt)
+        ov("top", allt, hcol, 0.1)
+        for side in ("front", "back", "right", "left"): ov(side, [(i, j) for i in range(8) for j in range(3)], hcol, -0.02)
+        brim = "back" if hw == "capback" else "front"
+        ov(brim, [(i, 2) for i in range(8)], hcol, -0.28)
+        if hw == "capback": clear("front", [(3, 2), (4, 2)]); ov("front", [(3, 2), (4, 2)], hcol, -0.4)
+        if spec.get("hwlogo"): ov("front" if hw == "cap" else "back", [(3, 0), (4, 0), (3, 1), (4, 1)], C(spec["hwlogo"]))
+    elif hw == "bucket":
+        for side in ("front", "back", "right", "left"): clear(side, allt)
+        ov("top", allt, hcol, 0.08)
+        for side in ("front", "back", "right", "left"): ov(side, [(i, j) for i in range(8) for j in range(3)], hcol, -0.02); ov(side, [(i, 3) for i in range(8)], hcol, -0.22)
+        if spec.get("bandc"):
+            for side in ("front", "back", "right", "left"): ov(side, [(i, 2) for i in range(8)], C(spec["bandc"]), 0.0)
+    elif hw == "beret":
+        ov("top", allt, hcol, 0.06); ov("top", [(3, 3), (4, 3), (3, 4), (4, 4)], hcol, 0.2)
+        for side in ("front", "back", "right", "left"): ov(side, [(i, j) for i in range(8) for j in range(2)], hcol, -0.06)
+        ov("left", [(i, 2) for i in range(1, 7)], hcol, -0.12)
+    elif hw == "headband":
+        for side in ("front", "back", "right", "left"): ov(side, [(i, 2) for i in range(8)], hcol, 0.0)
+    elif hw == "bobble":
+        for side in ("front", "back", "right", "left"): clear(side, allt)
+        ov("top", allt, hcol, 0.08)
+        for side in ("front", "back", "right", "left"): ov(side, [(i, j) for i in range(8) for j in range(3)], hcol, -0.02); ov(side, [(i, 2) for i in range(8)], hcol, -0.2)
+        ov("top", [(3, 3), (4, 3), (3, 4), (4, 4), (2, 3), (5, 4)], C(spec.get("bobc", "F4F4F4")), 0.05)
+        for side in ("front", "back", "right", "left"): ov(side, [(i, 0) for i in range(0, 8, 2)], C(spec.get("bobc", "F4F4F4")), -0.05)
+    if spec.get("phones"):
+        pc = C(spec["phones"])
+        ov("top", [(i, j) for i in (3, 4) for j in range(8)], pc, -0.1)
+        ov("right", [(i, j) for i in range(2, 6) for j in range(3, 6)], pc, 0.0); ov("left", [(i, j) for i in range(2, 6) for j in range(3, 6)], pc, 0.0)
+        ov("right", [(3, 4), (4, 4)], pc, 0.25); ov("left", [(3, 4), (4, 4)], pc, 0.25)
+
+
 # ---------- everyone ----------
 # Skin tones by name (pale, fair, light, tan, medium, brown, deep, dark); colours as hex.
 PEOPLE = {}
@@ -602,8 +733,9 @@ P("blue", tone="light", hair="swept", hairc="2A3A6A", eyes="grey", brows="stern"
 P("red", tone="fair", hair="short", hairc="2A2420", eyes="dark", smile=False, top="hoodie", topc="34343E", stripe="B83A3A", stripe_rows=(5,), bottom="trousers", botc="1E1E26", hat="cap", hatc="2E3A6A", shoec="F4F4F4", soles="B83A3A")
 P("nurse", tone="fair", hair="bun", hairc="8A4A2A", eyes="teal", fem=True, top="blouse", topc="9ED8C8", collarc="FFFFFF", bottom="skirt", botc="7AC0B0", hat="nurse", hatc="FFFFFF", crossc="2AA58A", shoec="F8F8F8", apron="FFFFFF", socks="FFFFFF")
 P("officer_jenny", tone="brown", hair="bob", hairc="1A1A1A", eyes="dark", fem=True, top="shirt", topc="3A5AA8", collarc="3A5AA8", bottom="trousers", botc="243A6A", hat="police", hatc="243A6A", badgec="F2C12E", badge="F2C12E", belt="1A1A1A", gloves="F4F4F4", shoec="1A1A1A")
-P("jessie", tone="pale", hair="bob", hairc="D8D8E0", eyes="violet", fem=True, top="tee", topc="2A2A34", bottom="trousers", botc="2A2A34", coat="jacket", coatc="3A3A46", coatsleeve=12, letter="D83A4A", mark=EMBLEM, gloves="D83A4A", shoec="1A1A1A", lips="8A2A5A", earrings="D83A4A")
-P("james", tone="light", hair="spiky", hairc="1A1A1A", eyes="green", top="tee", topc="2A2A34", bottom="trousers", botc="2A2A34", coat="jacket", coatc="3A3A46", coatsleeve=12, letter="D83A4A", mark=EMBLEM, gloves="D83A4A", shoec="1A1A1A")
+# JESSIE and JAMES stand out from the grunts: red jackets done up, the mark in black (the grunts wear black with the mark in red).
+P("jessie", tone="pale", hair="bob", hairc="D8D8E0", eyes="violet", fem=True, top="tee", topc="2A2A34", bottom="trousers", botc="2A2A34", coat="jacket", closed=True, coatc="C8323C", coatsleeve=12, bigmark="1E1E24", gloves="1E1E24", shoec="1A1A1A", lips="8A2A5A", earrings="1E1E24")
+P("james", tone="light", hair="spiky", hairc="1A1A1A", eyes="green", top="tee", topc="2A2A34", bottom="trousers", botc="2A2A34", coat="jacket", closed=True, coatc="C8323C", coatsleeve=12, bigmark="1E1E24", gloves="1E1E24", shoec="1A1A1A")
 P("giovanni", tone="tan", hair="swept", hairc="4A4A4A", eyes="grey", brows="stern", smile=False, top="shirt", topc="1A1A1A", collarc="1A1A1A", bottom="trousers", botc="2A2A2A", coat="suit", coatc="5A1A2A", coatlen=16, tie="C8A23A", shoec="1A1A1A")
 P("rocket", tone="medium", hair="short", hairc="1A1A1A", top="tee", topc="2A2A34", bottom="trousers", botc="2A2A34", hat="beanie", hatc="2A2A34", gloves="D83A4A", letter="D83A4A", mark=EMBLEM, shoec="1A1A1A")
 P("rocket_f", tone="fair", hair="ponytail", hairc="C83A3A", fem=True, top="tee", topc="2A2A34", bottom="skirt", botc="2A2A34", gloves="D83A4A", letter="D83A4A", mark=EMBLEM, shoec="1A1A1A", socks="2A2A34", tiec="D83A4A")

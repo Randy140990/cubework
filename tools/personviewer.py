@@ -25,7 +25,7 @@ def names(page):
 def main():
     page, out = sys.argv[1], sys.argv[2]
     head = open(os.path.join(HERE, "personviewer", "head.html")).read()
-    js = "\n".join(open(os.path.join(HERE, *p)).read() for p in (("interior", "figure.js"), ("personviewer", "roster.js"), ("personviewer", "app.js")))
+    js = "\n".join(open(os.path.join(HERE, *p)).read() for p in (("interior", "figure.js"), ("personviewer", "roster.js"), ("personviewer", "more.js"), ("personviewer", "app.js")))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
             + "const SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst NAMES = " + json.dumps(names(page), separators=(",", ":"))
             + ";\nconst $ = (s, el = document) => el.querySelector(s);\n" + js + "\n</script>\n")

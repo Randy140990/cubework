@@ -24,7 +24,7 @@ function martPick(C, onMove) {
 }
 screen("mart", "Places", "Shop", {
   scene: "counter", sceneOpts: () => ({ kind: "mart" }),
-  what: "Buying and selling, in the real Mart: the clerk's welcome behind his counter, then the shelf as Let's Go's (a white page of tiles, each with its picture and price), how many, are you sure, thank you.",
+  what: "Buying and selling, in the real Mart: you and the clerk face each other across his counter; his welcome, then the shelf as Let's Go's (a white page of tiles, each with its picture and price), how many, are you sure, thank you.",
   tags: ["New look: the shop's shelf"],
   mod: "MartScreen: BUY and SELL, MONEY, CANCEL.",
   try: ["BUY, pick an item, up and down for how many, A to buy."],
@@ -72,7 +72,7 @@ screen("mart", "Places", "Shop", {
 });
 screen("center", "Places", "Healing desk", {
   scene: "counter", sceneOpts: () => ({ kind: "center" }),
-  what: "Healing, in the real Center: the nurse's welcome, yes or no, then your balls go onto her machine one at a time, it hums and they flash, and they come back to you good as new.",
+  what: "Healing, in the real Center: you and the nurse face each other across the counter; her welcome, yes or no, then your balls go onto her machine one at a time, it hums and they flash, and they come back to you good as new.",
   tags: ["New: the healing machine"], mod: "The nurse behind her counter in Viridian's Center.",
   make() {
     const C = ctl(), S = SC.counter;
@@ -279,27 +279,53 @@ function movePanel(p, foeSid, onPick, onBack) {
   paint();
   return { key(k) { if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : 3)) % 4; paint(); return true; } if (k === "a") { onPick(sel); return true; } if (k === "b") { onBack(); return true; } return true; }, remove() { info.remove(); L.remove(); } };
 }
+// The camera gliding from one shot to another (eye and the point it looks at), eased.
+function camGlide(p0, t0, p1, t1, ms) {
+  return new Promise(res => { const st = performance.now(), A = V(...p0), B = V(...p1), TA = V(...t0), TB = V(...t1), P = V(0, 0, 0), T = V(0, 0, 0);
+    const f = () => { const k = Math.min(1, (performance.now() - st) / ms), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; P.lerpVectors(A, B, e); T.lerpVectors(TA, TB, e); look3(P.x, P.y, P.z, T.x, T.y, T.z); if (k < 1) requestAnimationFrame(f); else res(); }; f(); });
+}
+// A ball thrown out: its arc to the spot, a burst of light, and the creature growing out of it.
+function sendOut(S, from, to, who, grow) {
+  return new Promise(res => S.ballPath([{ from: V(...from), to: V(...to), dur: 0.75, arc: 1.6, spin: 14, at: () => { S.ball.visible = false; S.burst(V(to[0], 0.7, to[2]), 2.6); if (S[who]) playOnce(S[who], "cry");
+    const t0 = performance.now(), f = () => { const k = Math.min(1, (performance.now() - t0) / 420); grow(1 - k * k * (3 - 2 * k)); if (k < 1) requestAnimationFrame(f); else res(); }; f(); } }]));
+}
 screen("challenge", "Battle", "A trainer challenges you", {
   scene: "battle", sceneOpts: () => ({ ours: "pikachu", foe: "spearow", trainer: true }),
-  what: "A trainer spots you: their card slides in with speed lines, then they send out their first POKéMON and you send out yours.",
-  tags: ["New look"], mod: "BattleScreen: trainers throw overarm; your rival's battle.",
+  what: "A trainer challenges you, as Let's Go's do: a rush of light sweeps across, then you're looking over your own shoulder at them as the words come up. The camera swings to them as they throw: the ball arcs out, bursts in light and their POKéMON grows out of it. Then it pulls back wide and you throw yours. No name card: just the scene and the words.",
+  tags: ["New: Let's Go's way in"], mod: "BattleScreen: trainers throw overarm; your rival's battle. To come: the shoulder shot, the swing to them, the throws.",
   make() {
-    const C = ctl(), S = SC.battle; C.sayAt = { x: 520, w: 724 };
-    look3(0.6, 1.5, 3.4, 2.2, 1.05, -2.4);
-    const lines = box(0, 0, 1280, 720, "", `<div style="position:absolute;inset:0;background:repeating-linear-gradient(-12deg, rgba(255,255,255,.0) 0 26px, rgba(255,255,255,.28) 26px 30px);background-size:400px 100%;animation:sl 0.5s linear infinite"></div><style>@keyframes sl{to{background-position:400px 0}}</style>`);
-    const card = box(1280, 180, 640, null, "", `<div style="background:linear-gradient(90deg,rgba(229,82,92,0),rgba(229,82,92,.95) 25%);padding:22px 60px 22px 160px;transform:skewX(-12deg);border-top:4px solid #FFD45A;border-bottom:4px solid #FFD45A"><div style="transform:skewX(12deg)"><div class="g-label" style="color:var(--g-text)">Trainer</div><div class="g-title" style="font-size:52px">${FOE_TRAINER}</div></div></div>`);
-    card.style.transition = "left .5s cubic-bezier(.2,.9,.2,1)"; later(60, () => card.style.left = "640px");
+    const C = ctl(), S = SC.battle; C.sayAt = { x: 120, w: 1040 };
+    S.holdCam = true; S.foeHidden = 1; S.oursHidden = 1;
+    // Over your shoulder: you big on the left, your back to us; them across the way on the right.
+    const SHOULDER = [[-2.1, 2.15, 10.3], [-0.2, 1.2, -1.5]], AT_THEM = [[-0.6, 1.95, 4.4], [0.9, 0.5, -1.0]];
+    look3(...SHOULDER[0], ...SHOULDER[1]);
+    // The rush: streaks of white and mint light sweeping across, then gone before anything's said.
+    const rush = box(0, 0, 1280, 720, "", `<style>@keyframes csrush{from{transform:translateX(-60%)}to{transform:translateX(60%)}}@keyframes csfade{0%{opacity:0}15%{opacity:1}70%{opacity:1}100%{opacity:0}}</style>
+      <div style="position:absolute;inset:0;overflow:hidden;animation:csfade 1.15s ease-out forwards">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 55%, rgba(255,255,240,.85), rgba(220,255,210,.35) 55%, transparent 80%)"></div>
+        ${Array.from({ length: 16 }, (_, i) => `<div style="position:absolute;left:-40%;width:180%;top:${4 + i * 6}%;height:${2 + (i * 7) % 5}px;border-radius:999px;background:linear-gradient(90deg,transparent,${i % 3 ? "rgba(255,255,255,.9)" : "rgba(190,255,190,.9)"},transparent);animation:csrush ${0.45 + (i % 4) * 0.08}s linear ${-(i * 0.13) % 0.5}s infinite;filter:blur(${i % 2}px)"></div>`).join("")}</div>`);
+    later(1200, () => rush.remove());
     (async () => {
-      S.foePoint = 0;
+      await C.wait(900);
       await C.say([{ text: `You are challenged by **${FOE_TRAINER}**!` }]);
-      card.remove(); lines.remove(); S.frame(); S.foePoint = 1;
-      if (S.foe) playOnce(S.foe, "sendout");
+      if (!C.alive()) return;
+      // To them: they wind up and throw.
+      await camGlide(...SHOULDER, ...AT_THEM, 900);
+      S.foePoint = 1; await C.wait(250);
+      await sendOut(S, [2.0, 1.7, -2.2], [0, 0, 0], "foe", h => S.foeHidden = h);
+      S.foePoint = 0;
       await C.say([{ text: `**${FOE_TRAINER}** sent out **${ourName("spearow")}**!` }]);
-      S.foePoint = 0; S.point = 1; if (S.ours) playOnce(S.ours, "sendout");
+      if (!C.alive()) return;
+      // Wide, from behind your side, as you throw yours.
+      S.holdCam = false; const fh = S.foe ? Math.max(0.8, S.foe.m.size.h) : 1, oh = S.ours ? Math.max(0.8, S.ours.m.size.h) : 1, k = Math.max(1, Math.max(fh, oh) / 1.2);
+      await camGlide(...AT_THEM, [1.2 * k, 1.6 + 0.9 * k, 5.2 + 5.6 * k], [-1.0, 0.55 + fh * 0.3, 1.4], 900);
+      S.point = 1; await C.wait(200);
+      await sendOut(S, [-2.6, 1.6, 7.0], [-1.2, 0, 5.0], "ours", h => S.oursHidden = h);
+      S.point = 0;
       await C.say([{ text: `Go! **${ourName("pikachu")}**!` }]);
-      S.point = 0; if (C.alive()) go("battle");
+      if (C.alive()) go("battle");
     })();
-    return { key: k => C.key(k) };
+    return { key: k => C.key(k), leave() { S.holdCam = false; S.foeHidden = 0; S.oursHidden = 0; S.foePoint = 0; S.point = 0; } };
   }
 });
 screen("battle", "Battle", "Battle: commands and moves", {
@@ -347,7 +373,7 @@ screen("battle", "Battle", "Battle: commands and moves", {
 });
 screen("catch", "Battle", "Catching", {
   scene: "battle", sceneOpts: () => ({ ours: "pikachu", foe: "pidgey", trainer: false }),
-  what: "A wild POKéMON: throw a ball from the BAG (the list opens bottom right, where the buttons were). A ring closes in round it; press SPACE (or click) when it's small for Nice!, Great! or Excellent! Then the ball wobbles three times on the ground, and Gotcha!",
+  what: "A wild POKéMON: throw a ball from the BAG (the list opens bottom right, where the buttons were). A ring closes in round it; press SPACE (or click) when it's small for Nice!, Great! or Excellent! Then, slowly: the ball arcs out and hits it, bursts open, it turns to red light and is drawn in, the ball hangs, drops with a little bounce, wobbles three times, and Gotcha!",
   tags: ["New: throw timing and call-outs"], mod: "BattleScreen's BAG, POKé BALLS.",
   try: ["BAG, POKé BALLS, POKé BALL, then press SPACE (or click) as the ring shrinks."],
   make() {
@@ -376,16 +402,26 @@ screen("catch", "Battle", "Catching", {
         live = false; ring.remove(); tip.remove(); hit.remove();
         const call = r < 62 ? "Excellent!" : r < 90 ? "Great!" : r < 120 ? "Nice!" : null;
         await C.say([{ text: `**${G.name}** threw a **${it}**!` }], { keep: true });
+        // Slowly, so you can see it: the ball arcs out and hits it; bursts open; it turns to red light and is drawn
+        // in; the ball hangs a moment, drops to the ground with a little bounce, and lies still before it wobbles.
         S.point = 1;
-        await new Promise(res => S.throwBall(res));
-        S.point = 0;
-        if (call) { const c = add(h("div", "g-callout", call)); c.style.left = cx + "px"; c.style.top = (cy - 80) + "px"; later(1400, () => c.remove()); }
-        await new Promise(res => { const t0 = performance.now(); const f = () => { S.foeHidden = Math.min(1, (performance.now() - t0) / 350); if (S.foeHidden < 1) requestAnimationFrame(f); else res(); }; f(); });
+        const fh = S.foe ? S.foe.m.size.h : 0.8, HIT = V(0, Math.max(0.35, fh * 0.55), 0.18), UP = V(0, HIT.y + 0.55, 0.3), DOWN = V(0, 0.17, 0.52), REST = V(0, 0.17, 0.66);
+        await new Promise(res => S.ballPath([
+          { from: V(-2.8, 1.6, 6.2), to: HIT, dur: 1.2, arc: 2.0, spin: 9, at: () => {
+            S.point = 0; S.burst(HIT, 1.6);
+            if (call) { const c = add(h("div", "g-callout", call)); c.style.left = cx + "px"; c.style.top = (cy - 80) + "px"; later(1600, () => c.remove()); }
+            const t0 = performance.now(), f = () => { const k = Math.min(1, (performance.now() - t0) / 800); S.foeRed = Math.min(1, k * 2.2); S.foeHidden = k * k; if (k < 1) requestAnimationFrame(f); }; f(); } },
+          { from: HIT, to: UP, dur: 0.9, arc: 0, spin: 0, ease: "out" },
+          { from: UP, to: DOWN, dur: 0.45, arc: 0, spin: 6 },
+          { from: DOWN, to: REST, dur: 0.32, arc: 0.28, spin: 4 },
+        ], res));
+        S.foeRed = 0; S.restX = 0;
+        await C.wait(500);
         uiRoot.querySelectorAll(".g-text").forEach(x => x.remove());
         // The ball shakes three times on its own, a dot for each, then clicks shut.
         S.shakeT = 0;
         const dots = box(cx - 80, Math.max(90, cy - 150), 160, null, "g-panel g-pop", `<div id="shk" style="padding:10px 0;text-align:center;font-size:34px;font-weight:900;letter-spacing:10px;color:var(--g-gold)">&middot;</div>`); dots.style.borderRadius = "999px";
-        for (let n = 1; n <= 3; n++) { await C.wait(1100); const e = $("#shk"); if (e) e.innerHTML = "&middot;".repeat(Math.min(3, n + 1)); }
+        for (let n = 1; n <= 3; n++) { await C.wait(1500); const e = $("#shk"); if (e) e.innerHTML = "&middot;".repeat(Math.min(3, n + 1)); }
         dots.remove(); S.shakeT = null;
         const st = box(cx - 120, cy - 160, 240, 120, "g-pop", `<div style="font-size:60px;text-align:center;color:var(--g-gold);text-shadow:0 0 20px #FFD45A">&#10022; &#10022; &#10022;</div>`);
         const cg = add(h("div", "g-callout", "Gotcha!")); cg.style.left = "640px"; cg.style.top = "150px";
@@ -478,17 +514,24 @@ screen("victory", "Battle", "Winning", {
 });
 screen("whiteout", "Battle", "Losing", {
   scene: "battle", sceneOpts: () => ({ ours: "pikachu", foe: "spearow", trainer: true }),
-  what: "When your whole team faints: you drop some money, everything fades, and you wake at the last POKéMON CENTER.",
+  what: "When your whole team faints: the winner celebrates first (the camera swings round to them: their POKéMON jumps for joy and calls out, the trainer cheers with both arms up), then you drop some money, everything fades, and you wake at the last POKéMON CENTER.",
   make() {
     const C = ctl(), S = SC.battle; C.sayAt = { x: 520, w: 724 }; S.oursHidden = 1;
     (async () => {
+      // The winner celebrates: their creature jumps for joy and calls out, the trainer cheers with both arms up.
+      S.holdCam = true; await camGlide([1.2, 2.4, 9.0], [-1.0, 0.9, 1.4], [-0.4, 1.5, 4.2], [1.0, 0.95, -1.2], 900);
+      S.foeCheer = 1; let hop = true; const t0 = performance.now();
+      const jump = () => { if (!hop || !S.foe) return; const t = (performance.now() - t0) / 1000; S.foe.m.holder.position.y = Math.abs(Math.sin(t * 5.2)) * 0.32; requestAnimationFrame(jump); }; jump();
+      if (S.foe) playOnce(S.foe, "cry");
+      await C.say([{ who: FOE_TRAINER, text: "Yes! We did it! Great job, buddy!" }]);
+      hop = false; if (S.foe) S.foe.m.holder.position.y = 0; S.foeCheer = 0;
       await C.say([{ text: `**${G.name}** has no POKéMON left that can fight!` }, { text: `**${G.name}** panicked and dropped **₽120**...` }]);
       const d = box(0, 0, 1280, 720, "", `<div id="wo" style="position:absolute;inset:0;background:#fff;opacity:0;transition:opacity 1.2s"></div>`); later(30, () => $("#wo").style.opacity = 1);
       await C.wait(1300);
       await C.say([{ text: "... ... ..." }, { text: `**${G.name}** whited out!` }]);
       S.oursHidden = 0; if (C.alive()) go("center");
     })();
-    return { key: k => C.key(k), leave() { S.oursHidden = 0; } };
+    return { key: k => C.key(k), leave() { S.oursHidden = 0; S.foeCheer = 0; S.holdCam = false; if (S.foe) S.foe.m.holder.position.y = 0; } };
   }
 });
 
@@ -503,15 +546,15 @@ const KB = [
 ];
 const ROLE = {
   KeyW: ["game", "Walk north", "In menus: up."], KeyA: ["game", "Walk west", "In menus: left."], KeyS: ["game", "Walk south", "In menus: down."], KeyD: ["game", "Walk east", "In menus: right."],
-  Space: ["game", "Talk, look at things, choose", "In menus: A."], Enter: ["game", "Open the menu (START)", "In menus: A."], Tab: ["game", "Speed up: x1, x2, x3", "In menus: the next tab or pocket. (Moved off R, which reloads shaders.)"],
-  Escape: ["game", "Pause", "In menus: back."], KeyE: ["menu", "Choose, in menus (A)", "In the world it would open Minecraft's inventory: turned off. On the Town Map, zoom in."],
+  Space: ["game", "Talk, look at things, choose", "In menus: A."], Enter: ["menu", "Choose, in menus (A)", "In the world it opens the menu too, as E does."], Tab: ["game", "Speed up: x1, x2, x3", "In menus: the next tab or pocket. (Moved off R, which reloads shaders.)"],
+  Escape: ["game", "Pause", "In menus: back."], KeyE: ["game", "Open the menu (START)", "Where Minecraft opens its inventory, E opens ours. Press it again in the menu to close it."],
   KeyQ: ["menu", "Back, in menus (B)", "In the world it would drop what you hold: turned off. On the Town Map, zoom out."], KeyZ: ["menu", "Choose, in menus (A)", ""], KeyX: ["menu", "Back, in menus (B)", "On a name, delete a letter."],
   Backspace: ["menu", "Back, in menus (B)", "On a name, delete a letter."], KeyC: ["menu", "Town Map: back to where you are", ""], KeyV: ["menu", "Pokédex: read the entry out", ""],
   ArrowUp: ["menu", "Move, in menus", "In the world, W A S D walk."], ArrowDown: ["menu", "Move, in menus", ""], ArrowLeft: ["menu", "Move, in menus", ""], ArrowRight: ["menu", "Move, in menus", ""],
   F7: ["dev", "Retromon on or off", "For building and testing only. Off in the finished game."], F2: ["free", "Screenshot", "Minecraft's own, kept."], F11: ["free", "Full screen", "Minecraft's own, kept."], F1: ["free", "Hide the HUD", "Kept, for screenshots."],
   F3: ["off", "Debug screen", "Shows coordinates and more: off in the Retromon game."], F5: ["off", "Camera view", "The camera is fixed: off."],
   KeyR: ["off", "Reload shaders", "Iris's key. Off: the game's look can't be changed."], KeyK: ["off", "Shaders on or off", "Iris's key. Off: the shaders stay on."], KeyO: ["off", "Shader packs", "Iris's menu. Off."],
-  KeyM: ["off", "World map mods", "Map mods' keys (and the like): off. The Town Map is in the menu."], KeyJ: ["off", "Map mods", "Off."], KeyL: ["off", "Advancements", "Off."], KeyP: ["off", "Social interactions", "Off."],
+  KeyM: ["off", "Other mods' keys", "Every other mod's key is turned off while you play (a map mod on M, for one). The Town Map is in the menu."], KeyJ: ["off", "Map mods", "Off."], KeyL: ["off", "Advancements", "Off."], KeyP: ["off", "Social interactions", "Off."],
   KeyT: ["decide", "Chat", "Off in single player. On servers: to decide."], Slash: ["off", "Commands", "Off, except for whoever runs the server."], KeyF: ["off", "Swap hands", "Off."],
   ShiftLeft: ["decide", "Crouch", "To decide: off, or run."], ShiftRight: ["decide", "Crouch", "To decide."], ControlLeft: ["decide", "Sprint", "To decide: run, or off."],
   Digit1: ["off", "Hotbar", "1 to 9: off. There's no hotbar."], Digit2: ["off", "Hotbar", ""], Digit3: ["off", "Hotbar", ""], Digit4: ["off", "Hotbar", ""], Digit5: ["off", "Hotbar", ""], Digit6: ["off", "Hotbar", ""], Digit7: ["off", "Hotbar", ""], Digit8: ["off", "Hotbar", ""], Digit9: ["off", "Hotbar", ""],
@@ -519,10 +562,10 @@ const ROLE = {
 const ROLECOL = { game: ["#41BF84", "#fff", "In game"], menu: ["#FFD34E", "#26304A", "In menus"], dev: ["#8E6BC8", "#fff", "For building"], free: ["#7C8A99", "#fff", "Minecraft's, kept"], off: ["#E5525C", "#fff", "Turned off"], decide: ["#F0B43C", "#26304A", "To decide"] };
 screen("keymap", "Controls", "Key map", {
   what: "Every key: what it does in the world, what it does in menus, and what Retromon turns off (Axiom, shaders on and off, map mods, the hotbar, the inventory, the camera view).",
-  tags: ["New"], mod: "Adventure: SPACE talks, ENTER opens the menu, TAB speeds up, F7 turns Retromon on and off.",
+  tags: ["New"], mod: "Adventure: SPACE talks, ENTER opens the menu, TAB speeds up, F7 turns Retromon on and off. To come: E opens the menu, and other mods' keys are turned off.",
   try: ["Point at a key, or move round them with the arrows."],
   make(arg) {
-    backdrop(SKY); rays(85, 0, 0.18);
+    swirlBackdrop("sky", { lx: 85, ly: 0 });
     let ri = 2, ci = 2;
     const U = 62, X0 = 40, Y0 = 60;
     const kb = box(0, 0, 1280, 720, "", "");
