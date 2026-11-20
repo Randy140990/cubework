@@ -14,9 +14,10 @@ vec2 levels(vec2 lmcoord) {
     return clamp((lmcoord - 1.0 / 32.0) * (16.0 / 15.0), 0.0, 1.0);
 }
 
-// Lamps, torches: warm, falling off quickly.
+// Lamps, torches: warm, bright close by and reaching a fair way (as far as Minecraft's light does).
 vec3 lampLight(float block) {
-    return vec3(1.0, 0.80, 0.58) * (pow(block, 2.6) * 1.55);
+    float b2 = block * block;
+    return vec3(1.0, 0.66, 0.36) * (b2 * 1.9 + b2 * b2 * b2 * 2.4) * LAMP_BRIGHTNESS;
 }
 
 #ifdef INSIDE
@@ -43,21 +44,27 @@ float sunHeight() {
 void skyLight(out vec3 direct, out vec3 ambient) {
     float h = sunHeight();
     float day = smoothstep(-0.08, 0.22, h);
-    float dusk = smoothstep(-0.14, 0.04, h) * (1.0 - smoothstep(0.04, 0.38, h));
+    float dusk = smoothstep(-0.10, 0.04, h) * (1.0 - smoothstep(0.04, 0.38, h));
     vec3 sun = mix(vec3(1.00, 0.95, 0.86) * 1.10, vec3(1.00, 0.58, 0.30) * 0.95, dusk) * SUN_STRENGTH;
-    vec3 moon = vec3(0.42, 0.56, 0.95) * 0.34 * NIGHT_BRIGHTNESS;
+    vec3 moon = vec3(0.34, 0.52, 1.00) * 0.50 * NIGHT_BRIGHTNESS;
     // The sun hands over to the moon at the horizon: dim through the swap, so the shadows don't jump.
     direct = mix(moon, sun, day) * smoothstep(0.0, 0.09, abs(h));
     vec3 dayAmb = vec3(0.50, 0.60, 0.76) * 0.62;
     vec3 duskAmb = vec3(0.64, 0.48, 0.54) * 0.50;
-    vec3 nightAmb = vec3(0.10, 0.15, 0.34) * 0.78 * NIGHT_BRIGHTNESS;
+    vec3 nightAmb = vec3(0.07, 0.14, 0.42) * 0.95 * NIGHT_BRIGHTNESS;
     ambient = mix(nightAmb, mix(dayAmb, duskAmb, dusk), day);
     direct *= 1.0 - 0.75 * rainStrength;
     ambient = mix(ambient, vec3(dot(ambient, vec3(0.333))) * 0.9, rainStrength * 0.6);
 }
 
-// All the light on a surface (view-space normal; lightmap levels; how lit by the sun or moon it is).
-vec3 worldLight(vec3 nView, vec2 lm, float sunlit) {
+// How far into the night it is: 0 by day, 1 once the sun's well down.
+float nightAmount() {
+    return 1.0 - smoothstep(-0.16, 0.04, sunHeight());
+}
+
+// The light on a surface (view-space normal; lightmap levels; how lit by the sun or moon it is), in two parts:
+// the sky's, sun's and moon's, and the lamps'.
+void worldLight(vec3 nView, vec2 lm, float sunlit, out vec3 skyPart, out vec3 lampPart) {
     vec3 direct, ambient;
     skyLight(direct, ambient);
     float up = dot(nView, normalize(upPosition)) * 0.5 + 0.5;
@@ -67,7 +74,14 @@ vec3 worldLight(vec3 nView, vec2 lm, float sunlit) {
     vec3 dir = direct * sunlit * smoothstep(0.05, 0.6, lm.y);
     // Lamps matter less in daylight (as in Minecraft, where the brighter of the two wins).
     float day = smoothstep(-0.08, 0.22, sunHeight());
-    return amb + dir + lampLight(lm.x) * (1.0 - 0.6 * lm.y * day) + vec3(0.012);
+    skyPart = amb + dir + vec3(0.010, 0.012, 0.022);
+    lampPart = lampLight(lm.x) * (1.0 - 0.65 * lm.y * day);
+}
+
+vec3 worldLight(vec3 nView, vec2 lm, float sunlit) {
+    vec3 a, b;
+    worldLight(nView, lm, sunlit, a, b);
+    return a + b;
 }
 
 #endif

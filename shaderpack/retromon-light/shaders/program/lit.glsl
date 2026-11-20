@@ -9,6 +9,16 @@
 #include "/lib/shadow.glsl"
 #endif
 #include "/lib/sky.glsl"
+#ifdef WAVING_PROGRAM
+#include "/lib/wave.glsl"
+#endif
+#ifdef WATER_PROGRAM
+#include "/lib/water.glsl"
+#ifndef WAVING_PROGRAM
+uniform float frameTimeCounter;
+uniform vec3 cameraPosition;
+#endif
+#endif
 
 uniform sampler2D gtexture;
 uniform float alphaTestRef;
@@ -23,11 +33,17 @@ uniform vec4 entityColor;
 
 #ifdef VSH
 
+#if defined WAVING_PROGRAM || defined WATER_PROGRAM
+in vec4 mc_Entity;
+in vec4 at_midBlock;
+#endif
 out vec2 uv;
 out vec2 lm;
 out vec4 vcol;
 out vec3 nView;
 out vec3 viewPos;
+flat out float blockId;
+flat out float emit;
 
 void main() {
     uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
@@ -44,6 +60,17 @@ void main() {
     nView = normalize(gl_NormalMatrix * gl_Normal);
     #endif
     vec4 vp = gl_ModelViewMatrix * gl_Vertex;
+    blockId = 0.0;
+    emit = 0.0;
+    #if defined WAVING_PROGRAM || defined WATER_PROGRAM
+    blockId = mc_Entity.x;
+    emit = clamp(at_midBlock.w / 15.0, 0.0, 1.0);
+    #endif
+    #ifdef WAVING_PROGRAM
+    vec3 pp = (gbufferModelViewInverse * vp).xyz;
+    pp += wave(pp, mc_Entity.x, at_midBlock);
+    vp = gbufferModelView * vec4(pp, 1.0);
+    #endif
     viewPos = vp.xyz;
     gl_Position = gl_ProjectionMatrix * vp;
 }
@@ -57,6 +84,8 @@ in vec2 lm;
 in vec4 vcol;
 in vec3 nView;
 in vec3 viewPos;
+flat in float blockId;
+flat in float emit;
 
 /* RENDERTARGETS: 0 */
 layout(location = 0) out vec4 outColor;
@@ -91,16 +120,57 @@ void main() {
     #else
     float sunlit = NdotL;
     #endif
-    vec3 light = worldLight(n, lm, sunlit);
+    vec3 skyPart, lampPart;
+    worldLight(n, lm, sunlit, skyPart, lampPart);
     // Night vision: Retromon lifts it a little as night falls (OPTION's NIGHTS says how much), so here it brings
     // in more of the night's blue light rather than turning everything grey. Rooms are lit as they are.
-    light += vec3(0.16, 0.22, 0.42) * nightVision * (0.35 + 0.65 * lm.y);
+    skyPart += vec3(0.14, 0.22, 0.46) * nightVision * (0.35 + 0.65 * lm.y);
+    // By moonlight colours fade towards blue-grey (as our eyes see them at night); lamplight keeps them warm.
+    float nightK = nightAmount() * NIGHT_BLUE;
+    vec3 moonAlbedo = mix(albedo, vec3(dot(albedo, vec3(0.2126, 0.7152, 0.0722))), clamp(nightK * 0.55, 0.0, 0.9));
+    vec3 light = skyPart + lampPart;
     #endif
 
     #ifdef EMISSIVE
     light = max(light, vec3(1.0));
     #endif
+    // Lamps, torches and other light blocks glow: their bright parts (the flame, the glass), not their frames.
+    if (emit > 0.0) {
+        float bright = smoothstep(0.30, 0.75, max(c.r, max(c.g, c.b)));
+        light = max(light, vec3(2.4 * emit * bright * LAMP_BRIGHTNESS));
+    }
+    #ifdef INSIDE
     vec3 col = albedo * light;
+    #else
+    vec3 col = moonAlbedo * (light - lampPart) + albedo * lampPart;
+    #endif
+    float alpha = c.a;
+
+    #if defined WATER_PROGRAM && !defined INSIDE
+    if (int(blockId + 0.5) == 10003) {
+        vec3 pPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
+        vec3 nW = mat3(gbufferModelViewInverse) * n;
+        if (nW.y > 0.5) nW = waterNormal(pPos.xz + cameraPosition.xz, frameTimeCounter);
+        vec3 nV = mat3(gbufferModelView) * nW;
+        vec3 v = normalize(viewPos);
+        float cosT = clamp(dot(-v, nV), 0.0, 1.0);
+        float fres = 0.04 + 0.96 * pow(1.0 - cosT, 5.0);
+        vec3 r = reflect(v, nV);
+        // The sky in it (less under a roof), and the sun's (or moon's) glint.
+        vec3 refl = pow(skyAt(r), vec3(2.2)) / EXPOSURE * (0.12 + 0.88 * lm.y * lm.y);
+        vec3 direct, ambient;
+        skyLight(direct, ambient);
+        float glint = pow(max(dot(r, normalize(shadowLightPosition)), 0.0), 220.0) * 14.0;
+        refl += direct * glint * sunlit / max(NdotL, 0.05);
+        // The water itself: Minecraft's colour for it here, deepened, clear in the shallows.
+        vec3 body = mix(albedo, vec3(0.015, 0.10, 0.14), 0.45) * light;
+        float depth = waterDepth(viewPos);
+        float a = clamp(1.0 - exp(-depth * 0.32), 0.28, 0.90);
+        float outA = a * (1.0 - fres) + fres;
+        col = (body * a * (1.0 - fres) + refl * fres) / max(outA, 1e-3);
+        alpha = outA;
+    }
+    #endif
 
     // Fog: into the sky at the edge of what's drawn (as Minecraft does), thick under water and in lava.
     float dist = length(viewPos);
@@ -127,7 +197,7 @@ void main() {
         fogTo *= 1.0 - dark;
     }
     col = mix(col, fogTo, fog);
-    outColor = vec4(col, c.a);
+    outColor = vec4(col, alpha);
 }
 
 #endif

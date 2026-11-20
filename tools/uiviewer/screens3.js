@@ -117,8 +117,9 @@ screen("gift", "Places", "Being given a POKéMON", {
 const FOE_TRAINER = "YOUNGSTER JOEY";
 function plate(side, p, o = {}) {
   const f = p.hp / p.maxhp, ours = side === "ours";
-  const e = box(ours ? 36 : 820, ours ? 560 : 36, ours ? 470 : 420, null, "g-panel", "");
-  e.style.padding = ours ? "14px 22px 14px" : "12px 22px"; e.style.borderRadius = "22px";
+  // Yours sits level with the text box beside it (574 to 694, its 120 tall), top and bottom.
+  const e = box(ours ? 36 : 820, ours ? 574 : 36, ours ? 470 : 420, ours ? 120 : null, "g-panel", "");
+  e.style.padding = ours ? "15px 22px 14px" : "12px 22px"; e.style.borderRadius = "22px"; e.style.boxSizing = "border-box";
   const balls = o.balls ? `<div style="position:absolute;${ours ? "top:-30px;left:18px" : "top:-30px;right:18px"};display:flex;gap:4px">${o.balls.map(s => `<span style="width:22px;height:22px;display:inline-block;${s ? "" : "filter:grayscale(1);opacity:.45"}">${ICON.ball}</span>`).join("")}</div>` : "";
   const draw = () => { const f = p.hp / p.maxhp; e.innerHTML = `${balls}<div style="display:flex;align-items:center;gap:10px"><span class="g-title" style="font-size:27px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-weight:900;font-size:21px">Lv. ${p.lv}</span></div>
     <div style="display:flex;align-items:center;gap:10px;margin-top:8px"><span style="font-weight:900;font-size:14px;letter-spacing:1px;color:#FFD45A">HP</span>${hpBar(f, ours ? 260 : 320)}${ours ? `<span style="font-weight:900;font-size:20px;font-variant-numeric:tabular-nums">${Math.ceil(p.hp)}/${p.maxhp}</span>` : ""}</div>

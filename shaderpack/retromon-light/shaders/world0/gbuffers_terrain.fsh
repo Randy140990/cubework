@@ -2,4 +2,5 @@
 // Retromon Light. Copyright (c) 2026 Insid3 Th3 Cub3. All rights reserved.
 #define FSH
 #define SUN_SHADOWS
+#define WAVING_PROGRAM
 #include "/program/lit.glsl"

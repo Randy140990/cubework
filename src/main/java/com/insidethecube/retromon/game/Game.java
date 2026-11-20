@@ -373,7 +373,11 @@ public final class Game {
 			Vec3 away = p.position().subtract(oak.position()).multiply(1, 0, 1);
 			if (away.lengthSqr() > 0.01) from = away.normalize().scale(5);
 		}
-		Npc n = rivalNpc(p, "rival_lab", spot(level, (int) Math.floor(p.getX() + from.x), (int) Math.floor(p.getZ() + from.z), 3));
+		// Inside (the lab): he comes in through the door and walks over to you.
+		Vec3 entry = Interiors.entryOf(p);
+		BlockPos at = entry != null ? BlockPos.containing(entry.x, entry.y + 0.1, entry.z)
+				: spot(level, (int) Math.floor(p.getX() + from.x), (int) Math.floor(p.getZ() + from.z), 3);
+		Npc n = rivalNpc(p, "rival_lab", at);
 		if (n == null) talkBattle(p, null, t);
 		else walkUp(p, n, t, "meet_rival", null);
 	}
@@ -440,11 +444,21 @@ public final class Game {
 				n.setFacing(n.yawTo(p));
 				RIVAL_LEAVING.put(id, LEAVE_TICKS);
 			} else if (left == LEAVE_TICKS - 30) {
-				Vec3 away = n.position().subtract(p.position()).multiply(1, 0, 1);
-				away = away.lengthSqr() < 0.01 ? new Vec3(-1, 0, 0) : away.normalize();
-				Vec3 to = n.position().add(away.scale(24));
-				n.getNavigation().moveTo(to.x, n.getY(), to.z, 0.9);
+				// Inside, he heads out the way he came in, through the door; outside, off away from you.
+				Vec3 out = Interiors.exitOf(n);
+				if (out != null) n.getNavigation().moveTo(out.x, out.y, out.z, 0.9);
+				else {
+					Vec3 away = n.position().subtract(p.position()).multiply(1, 0, 1);
+					away = away.lengthSqr() < 0.01 ? new Vec3(-1, 0, 0) : away.normalize();
+					Vec3 to = n.position().add(away.scale(24));
+					n.getNavigation().moveTo(to.x, n.getY(), to.z, 0.9);
+				}
 				RIVAL_LEAVING.put(id, left - 1);
+			} else if (left < LEAVE_TICKS - 30 && Interiors.exitOf(n) != null && n.position().distanceTo(Interiors.exitOf(n)) < 1.1) {
+				// Out through the door.
+				n.discard();
+				RIVALS.remove(id);
+				RIVAL_LEAVING.remove(id);
 			} else if (left <= 0 || (left < LEAVE_TICKS - 30 && n.distanceTo(p) > 22)) {
 				n.discard();
 				RIVALS.remove(id);
@@ -514,8 +528,20 @@ public final class Game {
 	/** The game's speed: 1 to 4 times (everything, as an emulator's fast-forward does). */
 	public static void setSpeed(int times) {
 		if (server == null) return;
-		server.tickRateManager().setTickRate(20F * Math.max(1, Math.min(4, times)));
+		int k = Math.max(1, Math.min(4, times));
+		server.tickRateManager().setTickRate(20F * k);
+		// Minecraft never runs your own side faster than 20 ticks a second, so you'd walk at your usual pace while
+		// the world hurried: you walk (and run) faster by the same amount instead.
+		for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+			AttributeInstance move = p.getAttribute(Attributes.MOVEMENT_SPEED);
+			if (move == null) continue;
+			move.removeModifier(SPEED_ID);
+			if (k > 1) move.addTransientModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(SPEED_ID, k - 1,
+					net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+		}
 	}
+
+	private static final net.minecraft.resources.Identifier SPEED_ID = Retromon.id("speed_up");
 
 	/** Map editing (`/retromon build on`): off, nobody can break or change the map in a Retromon save. */
 	public static boolean build;

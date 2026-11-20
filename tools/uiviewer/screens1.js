@@ -47,8 +47,10 @@ screen("title", "Start", "Title screen", {
       backdrop("linear-gradient(180deg,#5FB0E8 0%,#9ED6F5 50%,#D6F0FB 64%,#9ED68A 64.2%,#6DB85B 100%)");
       add(h("div", "", `<div style="position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 0%, rgba(255,255,255,.12) 0 5deg, transparent 5deg 15deg)"></div>`));
     }
-    box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="${night ? "POKéMON" : "RETROMON"}" src="${wordmark(night ? "POKéMON" : "RETROMON", night ? { top: [255, 236, 120], bottom: [240, 170, 40], side: [40, 60, 140], line: [12, 18, 48] } : {})}" style="max-width:1080px;image-rendering:pixelated;filter:drop-shadow(0 10px 0 rgba(0,0,0,.18))"></div>`);
-    box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#FFF4D8;color:#26304A;font-size:30px;letter-spacing:6px;box-shadow:0 6px 0 rgba(0,0,0,.18)">PRESS START</span></div>`);
+    if (night) box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="POKéMON" src="${wordmark("POKéMON", { top: [255, 236, 120], bottom: [240, 170, 40], side: [40, 60, 140], line: [12, 18, 48] })}" style="max-width:1080px;image-rendering:pixelated;filter:drop-shadow(0 10px 0 rgba(0,0,0,.18))"></div>`);
+    // RETROMON in round, heavy letters on a gentle arch (tools/wordmark.py), with its own edge and shadow.
+    else box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="RETROMON" src="${wordmark("RETROMON")}" style="width:838px;height:152px"></div>`);
+    box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#FFF4D8;color:#26304A;font-size:30px;line-height:36px;letter-spacing:6px;box-shadow:0 6px 0 rgba(0,0,0,.18)">PRESS START</span></div>`);
     box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">INSID3 TH3 CUB3</div>`);
     box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">Version 0.22</div>`);
     return { key: k => { if (k === "a") go("language"); return true; } };

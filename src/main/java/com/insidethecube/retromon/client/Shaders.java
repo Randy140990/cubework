@@ -11,23 +11,22 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 
 /**
- * The shaders, built in. When you start a Retromon game and Iris is installed, the pack OPTION's SHADERS names is
- * put in your shaderpacks folder and switched on: Retromon Light (ours, light and quick: the light moves with the
- * day, and rooms inside keep their own) or Tempered Light (the full one, to fall back on). OFF is Minecraft's own
- * light. Your own choice comes back when you leave. Without Iris, nothing happens and the game runs plain.
+ * The shaders, built in. When you start a Retromon game and Iris is installed, Retromon Light (ours, light and
+ * quick: the light moves with the day, plants sway, water shows the sky, and rooms inside keep their own light) is
+ * put in your shaderpacks folder and switched on, unless OPTION's SHADERS is OFF (Minecraft's own light). Your own
+ * choice comes back when you leave. Without Iris, nothing happens and the game runs plain.
  */
 public final class Shaders {
 	private Shaders() {}
 
-	public static final String RETROMON = "Retromon-Light-1.0.0.zip";
-	public static final String TEMPERED = "Tempered-Light-2.10.5.zip";
+	public static final String RETROMON = "Retromon-Light-1.1.0.zip";
 	private static boolean switched;
 	private static String previousPack;
 	private static boolean previousEnabled;
 
-	/** The pack for a SHADERS setting (1 Retromon Light, 2 Tempered Light), or null for OFF. */
+	/** The pack for a SHADERS setting (1 Retromon Light), or null for OFF. */
 	public static String pack(int mode) {
-		return mode == 1 ? RETROMON : mode == 2 ? TEMPERED : null;
+		return mode >= 1 ? RETROMON : null;
 	}
 
 	private static Object config() throws Exception {
@@ -55,7 +54,7 @@ public final class Shaders {
 		return true;
 	}
 
-	/** OPTION's SHADERS, switched now: 0 off (Minecraft's own light), 1 Retromon Light, 2 Tempered Light. */
+	/** OPTION's SHADERS, switched now: 0 off (Minecraft's own light), 1 Retromon Light. */
 	public static void set(int mode) {
 		if (!FabricLoader.getInstance().isModLoaded("iris")) return;
 		try {

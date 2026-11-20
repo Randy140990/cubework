@@ -250,6 +250,11 @@ public final class V {
 		return font().width(c) * size / EM;
 	}
 
+	/** Where to put words (their top, as text takes it) so their capitals sit centred on cy. */
+	public static float capsTop(float cy, float size) {
+		return cy - size * 0.6F;
+	}
+
 	public static void centred(GuiGraphics g, String text, float cx, float y, float size, int color, boolean bold) {
 		text(g, text, cx - width(text, size, bold) / 2, y, size, color, bold);
 	}
@@ -486,7 +491,7 @@ public final class V {
 			float tw = width(who, 21, true);
 			pill(g, x + 28, y - 20 + 3, tw + 36, 36, 0x40000000);
 			pill(g, x + 28, y - 20, tw + 36, 36, CREAM);
-			text(g, who, x + 28 + 18, y - 20 + 7, 21, INK, true);
+			text(g, who, x + 28 + 18, capsTop(y - 20 + 18, 21), 21, INK, true);
 		}
 		for (int i = 0; i < lines.size(); i++) draw(g, rich(lines.get(i), true, TEXT), x + 34, y + 22 + i * lh + (lh - size) / 2 - 2, size, TEXT, false);
 		if (more) {

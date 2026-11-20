@@ -40,6 +40,8 @@ public final class Battles {
 
 	/** Which set piece the battle is fought on: a route's field, a forest, a cave, the water's edge, a gym or a town square. */
 	private static String arena(ServerPlayer p, Session s) {
+		// Inside a building (your rival in the lab): fought in the room itself.
+		if (p.level().dimension() == Interiors.LEVEL) return "inside";
 		String place = Game.data(p).place;
 		if (s.trainer != null && s.trainer.boss() && !s.trainer.title().contains("ROCKET")) return "gym";
 		if (place.contains("gym") || place.contains("plateau") || place.contains("room") || place.contains("lance") || place.contains("champion")) return "gym";

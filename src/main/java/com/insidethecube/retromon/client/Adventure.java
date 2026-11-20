@@ -163,13 +163,17 @@ public final class Adventure {
 		lastFrame = now;
 		double ease = 1 - Math.exp(-dt * 3.2), easeRoom = 1 - Math.exp(-dt * 2.4);
 		focusIn += ((other != null ? 1 : 0) - focusIn) * ease;
-		Vec3 centre = follow;
-		if (other != null) centre = you.lerp(other.getPosition(partial).add(0, 0.9, 0), 0.5);
+		// While talking, between the two of you; afterwards it eases back from there (it jumped back before).
+		if (other != null) focusCentre = you.lerp(other.getPosition(partial).add(0, 0.9, 0), 0.5);
 		else focusId = -1;
+		Vec3 centre = focusCentre != null && focusIn > 0.002 ? focusCentre : follow;
+		if (focusIn <= 0.002) focusCentre = null;
 		Vec3 target = follow.lerp(centre, focusIn);
 		// Closing in only as far as the view stays clear: if the closer, lower camera would be inside a roof
-		// or a wall behind them, it stays up and back (no clipping into buildings).
-		if (focusIn > 0.01 && e.level() != null) {
+		// or a wall behind them, it stays up and back (no clipping into buildings). Inside a building the room's
+		// open to the camera above, so it just comes in (testing there made it jitter in and out by a wall).
+		if (room != null) focusRoom = 1;
+		else if (focusIn > 0.01 && e.level() != null) {
 			double[] full = camAt(target, 13, PITCH - 12);
 			var hit = e.level().clip(new net.minecraft.world.level.ClipContext(target, new Vec3(full[0], full[1], full[2]),
 					net.minecraft.world.level.ClipContext.Block.VISUAL, net.minecraft.world.level.ClipContext.Fluid.NONE, e));
@@ -181,7 +185,7 @@ public final class Adventure {
 		double dist = far + (13 - far) * k, pitchDeg = PITCH - 12 * k;
 		double[] at = camAt(target, dist, pitchDeg);
 		// Even so, never inside something: pulled in in front of whatever's in the way.
-		if (focusIn > 0.01 && e.level() != null) {
+		if (room == null && focusIn > 0.01 && e.level() != null) {
 			Vec3 c = new Vec3(at[0], at[1], at[2]);
 			var hit = e.level().clip(new net.minecraft.world.level.ClipContext(target, c, net.minecraft.world.level.ClipContext.Block.VISUAL,
 					net.minecraft.world.level.ClipContext.Fluid.NONE, e));
@@ -193,8 +197,9 @@ public final class Adventure {
 		return lastPose = new double[] {at[0], at[1], at[2], YAW, (float) pitchDeg};
 	}
 
-	/** How far the talking camera has room to close in (0 to 1). */
+	/** How far the talking camera has room to close in (0 to 1); and where it closed in on. */
 	private static double focusRoom = 1;
+	private static Vec3 focusCentre;
 	private static long lastFrame;
 
 	// ---------- what SPACE would talk to (the prompt over it) ----------

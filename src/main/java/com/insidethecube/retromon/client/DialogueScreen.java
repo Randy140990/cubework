@@ -186,12 +186,23 @@ public class DialogueScreen extends GameScreen {
 			int b = badgeIn(l);
 			float t = (ticks - lineAt + partial) / 20F;
 			if (b >= 0 && (l.contains("received") || l.contains("got"))) badgeCard(g, b, t);
-			else if (cues.containsKey(line) || l.matches(".*\\b(got|received|obtained|found)\\b.*!.*")) itemCard(g, l, t);
+			else if (cues.containsKey(line) || l.matches(".*\\b(got|received|obtained|found)\\b.*!.*") && !someoneElse(l)) itemCard(g, l, t);
 		}
 		if (yesNo != null) {
 			float w = 300;
 			vchoice(g, yesNo, V.W - 140 - w, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), w, i -> done(i == 0));
 		}
+	}
+
+	/**
+	 * Whether a line is about the one talking getting something (BLUE received a TIDAPIR!), not you: no card is held
+	 * up for that (it showed a key).
+	 */
+	private boolean someoneElse(String line) {
+		String who = box.speaker == null ? "" : box.speaker.trim().toUpperCase(java.util.Locale.ROOT);
+		if (who.isEmpty()) return false;
+		String u = line.trim().toUpperCase(java.util.Locale.ROOT);
+		return u.startsWith(who + " ") || u.startsWith(who + ":");
 	}
 
 	private static int badgeIn(String line) {

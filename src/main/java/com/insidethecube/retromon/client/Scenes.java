@@ -19,13 +19,14 @@ public final class Scenes {
 	public static final class Cam {
 		double px, py, pz;
 		final double[] f = new double[3], r = new double[3], u = new double[3];
-		double focal = V.H / 2 / Math.tan(Math.toRadians(17));
+		double focal = V.H / 2 / Math.tan(Math.toRadians(17)), ref = 6;
 
 		public Cam look(double px, double py, double pz, double tx, double ty, double tz) {
 			this.px = px;
 			this.py = py;
 			this.pz = pz;
 			double fx = tx - px, fy = ty - py, fz = tz - pz, fl = Math.sqrt(fx * fx + fy * fy + fz * fz);
+			ref = fl;
 			f[0] = fx / fl;
 			f[1] = fy / fl;
 			f[2] = fz / fl;
@@ -46,6 +47,11 @@ public final class Scenes {
 			double cz = dx * f[0] + dy * f[1] + dz * f[2], cx = dx * r[0] + dy * r[1] + dz * r[2], cy = dx * u[0] + dy * u[1] + dz * u[2];
 			cz = Math.max(0.05, cz);
 			return new float[] {(float) (V.W / 2 + cx / cz * focal), (float) (V.H / 2 - cy / cz * focal), (float) cz};
+		}
+
+		/** How far the camera is from what it looks at (the middle of the scene's depth). */
+		public float refDepth() {
+			return (float) ref;
 		}
 
 		/** Canvas pixels to a block at a depth. */
@@ -74,7 +80,10 @@ public final class Scenes {
 		float facing = (float) Math.toDegrees(yaw - Math.PI) - cam.towards(x, z);
 		float sx = V.x(p[0]) + V.bx, sy = V.y(p[1]) + V.by;
 		Figures.Fig f = skin != null ? b.person(skin, sx, sy, 1.8F * ppb) : b.mon(species, sx, sy, 1).perBlock(ppb);
-		return f.facing(wrap(facing)).pitch(cam.pitch()).depth((9 - p[2]) * 24).at(secs);
+		// How near it is, in the same pixels as its size (a block nearer is a block's width nearer), so the figures
+		// pass in front of and behind each other as they really stand (the viewer's 3D), not just a little apart.
+		float ref = cam.refDepth(), near = (ref - p[2]) * cam.perBlock(ref) * V.k;
+		return f.facing(wrap(facing)).pitch(cam.pitch()).depth(near).at(secs);
 	}
 
 	private static float wrap(float d) {
@@ -107,9 +116,13 @@ public final class Scenes {
 	 * the moon and Charizard), moving at 12 frames a second, pixel art as the viewer draws it.
 	 */
 	public static void title(GuiGraphics g, float secs, boolean ours) {
-		V.img(g, V.tex(ours ? "bg_title_day" : "bg_title_night"), -V.ox / V.k, -V.oy / V.k, V.gw / V.k, V.gh / V.k, 480, 270, 0xFFFFFFFF);
+		// The moving picture covers the whole window (wider or taller than the canvas, it's cut at the top or the
+		// sides, never left with bare strips), its ground kept at the bottom.
+		float wx = -V.ox / V.k, wy = -V.oy / V.k, ww = V.gw / V.k, wh = V.gh / V.k;
+		float sc = Math.max(ww / V.W, wh / V.H), w = V.W * sc, h = V.H * sc;
+		V.img(g, V.tex(ours ? "bg_title_day" : "bg_title_night"), wx, wy, ww, wh, 480, 270, 0xFFFFFFFF);
 		int frame = (int) (secs * 12) % 48;
-		V.sub(g, ours ? TITLE_OURS : TITLE_THEIRS, 0, 0, V.W, V.H, (frame % 8) * 256, (frame / 8) * 144, 256, 144, 2048, 864);
+		V.sub(g, ours ? TITLE_OURS : TITLE_THEIRS, wx + (ww - w) / 2, wy + wh - h, w, h, (frame % 8) * 256, (frame / 8) * 144, 256, 144, 2048, 864);
 	}
 
 	/** A backdrop picture (textures/gui/v/bg_*.png) filling the whole window. */

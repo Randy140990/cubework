@@ -219,6 +219,7 @@ public final class Figures {
 
 	/** Draws a frame's figures into its picture (registered with Fabric as a special GUI element). */
 	public static final class Renderer extends PictureInPictureRenderer<State> {
+		private static final float Z_SQUEEZE = 0.35F;
 		private PlayerModel person;
 		private boolean nested;
 		private final Map<String, BedrockModel> mons = new HashMap<>();
@@ -249,7 +250,10 @@ public final class Figures {
 			pose.translate(-(st.x1() - st.x0()) / 2F, 0, 0);
 			for (Fig f : st.figs()) {
 				pose.pushPose();
-				pose.translate(f.cx - st.x0(), f.feet - st.y0() - f.hop, f.depth);
+				// Depth squeezed a third (each figure's own depth with it, so what's in front stays in front), so a
+				// whole scene fits the picture's depth even on a big screen.
+				pose.translate(f.cx - st.x0(), f.feet - st.y0() - f.hop, f.depth * Z_SQUEEZE);
+				pose.scale(1, 1, Z_SQUEEZE);
 				if (f.squash != 1) pose.scale(1 / (float) Math.sqrt(f.squash), f.squash, 1 / (float) Math.sqrt(f.squash));
 				if (f.skin != null) drawPerson(f, pose);
 				else drawMon(f, pose);

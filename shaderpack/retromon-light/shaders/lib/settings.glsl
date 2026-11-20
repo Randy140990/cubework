@@ -6,6 +6,11 @@
 #define SHADOW_SOFTNESS 1.0 // [0.5 1.0 1.5 2.0]
 #define SHADOW_STRENGTH 0.85 // [0.6 0.7 0.85 1.0]
 #define INSIDE_BRIGHTNESS 1.0 // [0.8 0.9 1.0 1.1 1.2]
+#define LAMP_BRIGHTNESS 1.0 // [0.6 0.8 1.0 1.25 1.5]
+#define NIGHT_BLUE 1.0 // [0.0 0.5 1.0 1.5]
+#define WAVING 1 // [0 1]
+#define WIND_SPEED 1.0 // [0.5 0.75 1.0 1.5]
+#define WATER_WAVES 1.0 // [0.0 0.5 1.0 1.5]
 
 const int shadowMapResolution = 1536; // [1024 1536 2048]
 const float shadowDistance = 80.0; // [48.0 64.0 80.0 96.0 128.0]

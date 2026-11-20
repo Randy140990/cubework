@@ -4,17 +4,25 @@
 #define SHADOW_PASS
 #include "/lib/settings.glsl"
 #include "/lib/shadow.glsl"
+#include "/lib/wave.glsl"
 
 uniform sampler2D gtexture;
 uniform float alphaTestRef;
 
 #ifdef VSH
+uniform mat4 shadowModelView;
+uniform mat4 shadowModelViewInverse;
+in vec4 mc_Entity;
+in vec4 at_midBlock;
 out vec2 uv;
 out float alpha;
 void main() {
     uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
     alpha = gl_Color.a;
-    vec4 p = ftransform();
+    vec4 vp = gl_ModelViewMatrix * gl_Vertex;
+    vec3 pp = (shadowModelViewInverse * vp).xyz;
+    pp += wave(pp, mc_Entity.x, at_midBlock);
+    vec4 p = gl_ProjectionMatrix * (shadowModelView * vec4(pp, 1.0));
     p.xy = distortShadow(p.xy);
     gl_Position = p;
 }

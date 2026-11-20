@@ -137,10 +137,10 @@ public abstract class GameScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent e) {
-		// Esc opens Minecraft's menu, as anywhere in the game; closing it brings this screen back.
+		// Esc is the hints' ESC: back (as B), a step at a time; from the START menu itself, it closes it. (Minecraft's
+		// own menu is Esc out in the world.)
 		if (e.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE && minecraft != null && minecraft.level != null) {
-			resume = this;
-			minecraft.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
+			escape();
 			return true;
 		}
 		if (e.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_TAB && wantsTab() && key(e)) return true;
@@ -154,6 +154,11 @@ public abstract class GameScreen extends Screen {
 
 	/** A key: true if the screen used it. */
 	protected abstract boolean key(KeyEvent e);
+
+	/** Esc: as the B button (backspace), or back if the screen didn't take it. */
+	protected void escape() {
+		if (!key(new KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE, 0, 0))) back();
+	}
 
 	/** Whether TAB is this screen's own (pages, pockets) rather than the game's speed. */
 	protected boolean wantsTab() {

@@ -46,8 +46,15 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		s.lift = 0;
 		if (e.roams() && s.model != null) {
 			// Out in the grass or walking with you: walks when it moves, and a bird takes to the air.
+			// Walking when it's been moving these last few ticks (not just this one: the world's updates come in
+			// steps, and a tick without one left it gliding along in its standing pose).
 			double moved = Math.hypot(e.getX() - e.xo, e.getZ() - e.zo);
-			boolean moving = moved > 0.015;
+			double[] sp = PACE.computeIfAbsent(e, k -> new double[] {0, -1});
+			if (sp[1] != e.tickCount) {
+				sp[0] = Math.max(moved, sp[0] * 0.75);
+				sp[1] = e.tickCount;
+			}
+			boolean moving = sp[0] > 0.012;
 			s.yaw = Mth.rotLerp(partial, e.yBodyRotO, e.yBodyRot);
 			// Wild birds fly well above the grass (you walk under them; they come down to land now and then).
 			float target = e.airborne() ? (e.wild() ? 4.2F : 1.6F) + (float) Math.sin((e.tickCount + partial) * 0.12F) * (e.wild() ? 0.45F : 0.25F) : 0;
@@ -63,6 +70,8 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 	}
 
 	private static final java.util.WeakHashMap<WorldMon, Integer> TICKED = new java.util.WeakHashMap<>();
+	/** How fast each has been going lately (blocks a tick, easing off) and the tick that was worked out on. */
+	private static final java.util.WeakHashMap<WorldMon, double[]> PACE = new java.util.WeakHashMap<>();
 
 	/** Eases the flight height once a tick (not once a frame). */
 	private static int lastTick(WorldMon e) {

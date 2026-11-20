@@ -82,6 +82,12 @@ public class NicknameScreen extends GameScreen {
 		done("");
 	}
 
+	/** Esc: no nickname (while typing one too: it's kept as it is). */
+	@Override
+	protected void escape() {
+		done("");
+	}
+
 	/** "Do you want to give a nickname?" in the UI Viewer's text box and list; then its name entry. */
 	@Override
 	protected void draw(GuiGraphics g, float partial) {

@@ -85,12 +85,9 @@ public final class Settings {
 		return get("style", 0, 0, 1) == 0;
 	}
 
-	/**
-	 * SHADERS: RETROMON (1, the default: Retromon Light, ours, light and quick), TEMPERED (2: Tempered Light, the
-	 * full one) or OFF (0: Minecraft's own light). Saves from before 0.26.0 that had it on now get Retromon Light.
-	 */
+	/** SHADERS: RETROMON (1, the default: Retromon Light) or OFF (0: Minecraft's own light). */
 	public static int shaderMode() {
-		return get("shaders", 1, 0, 2);
+		return get("shaders", 1, 0, 2) == 0 ? 0 : 1;
 	}
 
 	public static boolean shaders() {

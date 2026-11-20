@@ -928,8 +928,13 @@ public class IntroScreen extends GameScreen {
 		Scenes.title(g, secs, ours);
 		int ww = ours ? 838 : 670;
 		Identifier mark = V.tex(ours ? "wordmark_ours" : "wordmark_theirs");
-		V.img(g, mark, (V.W - ww) / 2, 34 + 10, ww, 152, ww, 152, 0x2E000000);
-		V.img(g, mark, (V.W - ww) / 2, 34, ww, 152, ww, 152, 0xFFFFFFFF);
+		if (ours) {
+			// Round, heavy letters with their own edge and shadow (drawn at twice the size, for big screens).
+			V.img(g, mark, (V.W - ww) / 2, 34, ww, 152, 1676, 304, 0xFFFFFFFF);
+		} else {
+			V.img(g, mark, (V.W - ww) / 2, 34 + 10, ww, 152, ww, 152, 0x2E000000);
+			V.img(g, mark, (V.W - ww) / 2, 34, ww, 152, ww, 152, 0xFFFFFFFF);
+		}
 		int foot = ours ? 0xCC123C38 : 0xCCDDE6FF;
 		V.text(g, "INSID3 TH3 CUB3", 28, 680, 15, foot, true);
 		V.right(g, "Version " + version(), 1260, 680, 15, foot, true);
@@ -938,7 +943,7 @@ public class IntroScreen extends GameScreen {
 				float tw = V.width("PRESS START", 30, true) + 6 * 10, pw = tw + 68;
 				V.pill(g, 640 - pw / 2, 612 + 6, pw, 52, 0x2E000000);
 				V.pill(g, 640 - pw / 2, 612, pw, 52, V.CREAM);
-				V.centred(g, "P R E S S   S T A R T", 640, 624, 30, V.INK, true);
+				V.centred(g, "P R E S S   S T A R T", 640, V.capsTop(612 + 26, 30), 30, V.INK, true);
 			}
 			return;
 		}

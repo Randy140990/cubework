@@ -85,21 +85,101 @@ public final class Ui {
 		return DISC_IDS[i];
 	}
 
-	/** A quarter of a disc (corner 0 top left, 1 top right, 2 bottom left, 3 bottom right) into an R by R box. */
-	private static void quarter(GuiGraphics g, int x, int y, int R, int corner, int color) {
-		if (R <= 0 || (color >>> 24) == 0) return;
-		int i = disc(R), D = DISCS[i];
-		g.pose().pushMatrix();
-		g.pose().translate(x, y);
-		g.pose().scale(R / (float) D, R / (float) D);
-		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, discId(i), 0, 0, (corner & 1) * D, (corner >> 1) * D, D, D, 2 * D, 2 * D, color);
-		g.pose().popMatrix();
+	/**
+	 * One rounded shape as a single thing for the GUI to draw: its plain bands and its four textured corners in one
+	 * piece, with bounds that truly cover it. (Drawn as separate fills and blits, Minecraft could put the pieces of a
+	 * shape laid over another underneath the other's corners: it rounds the right and bottom edges of what each
+	 * covers down, misses the overlap, and sorts the two kinds of draw apart. That showed as thin lines down pills
+	 * and across panels.)
+	 */
+	private record Shape(com.mojang.blaze3d.pipeline.RenderPipeline pipeline, net.minecraft.client.gui.render.TextureSetup textureSetup,
+			org.joml.Matrix3x2f pose, float[] q, int[] c, int n, net.minecraft.client.gui.navigation.ScreenRectangle scissorArea,
+			net.minecraft.client.gui.navigation.ScreenRectangle bounds) implements net.minecraft.client.gui.render.state.GuiElementRenderState {
+		@Override
+		public void buildVertices(com.mojang.blaze3d.vertex.VertexConsumer v) {
+			for (int i = 0; i < n; i++) {
+				int o = i * 8, k = i * 2;
+				float x0 = q[o], y0 = q[o + 1], x1 = q[o + 2], y1 = q[o + 3], u0 = q[o + 4], v0 = q[o + 5], u1 = q[o + 6], v1 = q[o + 7];
+				v.addVertexWith2DPose(pose, x0, y0).setUv(u0, v0).setColor(c[k]);
+				v.addVertexWith2DPose(pose, x0, y1).setUv(u0, v1).setColor(c[k + 1]);
+				v.addVertexWith2DPose(pose, x1, y1).setUv(u1, v1).setColor(c[k + 1]);
+				v.addVertexWith2DPose(pose, x1, y0).setUv(u1, v0).setColor(c[k]);
+			}
+		}
+	}
+
+	/** Collects a shape's pieces (screen pixels; turned into GUI pixels as they go in). */
+	private static final class ShapeBuilder {
+		private final float k;
+		private float[] q = new float[8 * 12];
+		private int[] c = new int[2 * 12];
+		private int n;
+
+		ShapeBuilder(float k) {
+			this.k = k;
+		}
+
+		/** A plain band from (x0, y0) to (x1, y1), top colour to bottom colour: the disc's solid middle. */
+		void band(int x0, int y0, int x1, int y1, int top, int bottom) {
+			if (x1 <= x0 || y1 <= y0) return;
+			add(x0, y0, x1, y1, 0.5F, 0.5F, 0.5F, 0.5F, top, bottom);
+		}
+
+		/** A quarter disc (corner 0 top left, 1 top right, 2 bottom left, 3 bottom right) in an R by R box. */
+		void quarter(int x, int y, int R, int corner, int top, int bottom) {
+			if (R <= 0) return;
+			float u0 = (corner & 1) * 0.5F, v0 = (corner >> 1) * 0.5F;
+			add(x, y, x + R, y + R, u0, v0, u0 + 0.5F, v0 + 0.5F, top, bottom);
+		}
+
+		private void add(int x0, int y0, int x1, int y1, float u0, float v0, float u1, float v1, int top, int bottom) {
+			if (n * 8 + 8 > q.length) {
+				q = java.util.Arrays.copyOf(q, q.length * 2);
+				c = java.util.Arrays.copyOf(c, c.length * 2);
+			}
+			int o = n * 8;
+			q[o] = x0 / k;
+			q[o + 1] = y0 / k;
+			q[o + 2] = x1 / k;
+			q[o + 3] = y1 / k;
+			q[o + 4] = u0;
+			q[o + 5] = v0;
+			q[o + 6] = u1;
+			q[o + 7] = v1;
+			c[n * 2] = top;
+			c[n * 2 + 1] = bottom;
+			n++;
+		}
+
+		/** Hands the shape to the GUI (with the disc texture for radius R), covering X, Y, W, H (screen pixels). */
+		void submit(GuiGraphics g, int R, int X, int Y, int W, int H) {
+			if (n == 0) return;
+			net.minecraft.client.renderer.texture.AbstractTexture t = net.minecraft.client.Minecraft.getInstance().getTextureManager().getTexture(discId(disc(Math.max(1, R))));
+			org.joml.Matrix3x2f pose = new org.joml.Matrix3x2f(g.pose());
+			float[] xs = new float[4], ys = new float[4];
+			float[][] corners = {{X / k, Y / k}, {(X + W) / k, Y / k}, {X / k, (Y + H) / k}, {(X + W) / k, (Y + H) / k}};
+			for (int i = 0; i < 4; i++) {
+				org.joml.Vector2f p = pose.transformPosition(corners[i][0], corners[i][1], new org.joml.Vector2f());
+				xs[i] = p.x;
+				ys[i] = p.y;
+			}
+			int bx0 = (int) Math.floor(Math.min(Math.min(xs[0], xs[1]), Math.min(xs[2], xs[3]))), by0 = (int) Math.floor(Math.min(Math.min(ys[0], ys[1]), Math.min(ys[2], ys[3])));
+			int bx1 = (int) Math.ceil(Math.max(Math.max(xs[0], xs[1]), Math.max(xs[2], xs[3]))), by1 = (int) Math.ceil(Math.max(Math.max(ys[0], ys[1]), Math.max(ys[2], ys[3])));
+			net.minecraft.client.gui.navigation.ScreenRectangle bounds = new net.minecraft.client.gui.navigation.ScreenRectangle(bx0, by0, Math.max(1, bx1 - bx0), Math.max(1, by1 - by0));
+			net.minecraft.client.gui.navigation.ScreenRectangle scissor = g.scissorStack.peek();
+			if (scissor != null) {
+				bounds = scissor.intersection(bounds);
+				if (bounds == null) return;
+			}
+			g.guiRenderState.submitGuiElement(new Shape(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
+					net.minecraft.client.gui.render.TextureSetup.singleTexture(t.getTextureView(), t.getSampler()), pose, q, c, n, scissor, bounds));
+		}
 	}
 
 	/**
-	 * A rounded rectangle shaded from top (at its top) to bottom (stop of the way down, flat after that). Drawn as
-	 * a few plain bands and four textured corners (a handful of quads, not one per pixel), at the screen's own
-	 * resolution, its curved edges anti-aliased. Nothing is drawn twice, so see-through colours stay even.
+	 * A rounded rectangle shaded from top (at its top) to bottom (stop of the way down, flat after that): a few
+	 * plain bands and four smooth corners, at the screen's own resolution, drawn as one shape. Nothing is drawn twice,
+	 * so see-through colours stay even.
 	 */
 	public static void rrv(GuiGraphics g, float x, float y, float w, float h, float r, int top, int bottom, float stop) {
 		if (w <= 0 || h <= 0 || ((top >>> 24) == 0 && (bottom >>> 24) == 0)) return;
@@ -107,19 +187,23 @@ public final class Ui {
 		int X = Math.round(x * k), Y = Math.round(y * k), W = Math.round((x + w) * k) - X, H = Math.round((y + h) * k) - Y;
 		if (W <= 0 || H <= 0) return;
 		int R = (int) Math.max(0, Math.min(Math.round(r * k), Math.min(W, H) / 2));
-		g.pose().pushMatrix();
-		g.pose().scale(1 / k, 1 / k);
 		float st = Math.max(0.001F, stop);
 		java.util.function.IntUnaryOperator at = yy -> top == bottom ? top : mix(top, bottom, (yy - Y) / (H * st));
-		// The bands: across the top and bottom between the corners, and the whole width between them.
-		bands(g, X + R, Y, X + W - R, Y + R, Y, H, st, top, bottom);
-		bands(g, X, Y + R, X + W, Y + H - R, Y, H, st, top, bottom);
-		bands(g, X + R, Y + H - R, X + W - R, Y + H, Y, H, st, top, bottom);
-		quarter(g, X, Y, R, 0, at.applyAsInt(Y + R / 2));
-		quarter(g, X + W - R, Y, R, 1, at.applyAsInt(Y + R / 2));
-		quarter(g, X, Y + H - R, R, 2, at.applyAsInt(Y + H - R / 2));
-		quarter(g, X + W - R, Y + H - R, R, 3, at.applyAsInt(Y + H - R / 2));
-		g.pose().popMatrix();
+		ShapeBuilder b = new ShapeBuilder(k);
+		int ys = top == bottom ? Y + H : Y + Math.round(H * st);
+		// The bands (across the top and bottom between the corners, and the whole width between them), each split
+		// where the shading stops.
+		int[][] rows = {{X + R, Y, X + W - R, Y + R}, {X, Y + R, X + W, Y + H - R}, {X + R, Y + H - R, X + W - R, Y + H}};
+		for (int[] rw : rows) {
+			int y0 = rw[1], y1 = rw[3];
+			if (y0 < ys) b.band(rw[0], y0, rw[2], Math.min(y1, ys), at.applyAsInt(y0), at.applyAsInt(Math.min(y1, ys)));
+			if (y1 > ys) b.band(rw[0], Math.max(y0, ys), rw[2], y1, bottom, bottom);
+		}
+		b.quarter(X, Y, R, 0, at.applyAsInt(Y), at.applyAsInt(Y + R));
+		b.quarter(X + W - R, Y, R, 1, at.applyAsInt(Y), at.applyAsInt(Y + R));
+		b.quarter(X, Y + H - R, R, 2, at.applyAsInt(Y + H - R), at.applyAsInt(Y + H));
+		b.quarter(X + W - R, Y + H - R, R, 3, at.applyAsInt(Y + H - R), at.applyAsInt(Y + H));
+		b.submit(g, R, X, Y, W, H);
 	}
 
 	/**
@@ -138,47 +222,27 @@ public final class Ui {
 			for (int i = 1; i < at.length; i++) if (t <= at[i]) return mix(cols[i - 1], cols[i], (t - at[i - 1]) / Math.max(1e-4F, at[i] - at[i - 1]));
 			return cols[cols.length - 1];
 		};
-		g.pose().pushMatrix();
-		g.pose().scale(1 / k, 1 / k);
-		stops(g, X + R, Y, X + W - R, Y + R, Y, H, at, col);
-		stops(g, X, Y + R, X + W, Y + H - R, Y, H, at, col);
-		stops(g, X + R, Y + H - R, X + W - R, Y + H, Y, H, at, col);
-		quarter(g, X, Y, R, 0, col.applyAsInt(Y + R / 2));
-		quarter(g, X + W - R, Y, R, 1, col.applyAsInt(Y + R / 2));
-		quarter(g, X, Y + H - R, R, 2, col.applyAsInt(Y + H - R / 2));
-		quarter(g, X + W - R, Y + H - R, R, 3, col.applyAsInt(Y + H - R / 2));
-		g.pose().popMatrix();
-	}
-
-	/** A box shaded by col, in gradients between the stops. */
-	private static void stops(GuiGraphics g, int x0, int y0, int x1, int y1, int Y, int H, float[] at, java.util.function.IntUnaryOperator col) {
-		if (x1 <= x0 || y1 <= y0) return;
-		java.util.List<Integer> ys = new java.util.ArrayList<>();
-		ys.add(y0);
-		for (float a : at) {
-			int yy = Y + Math.round(H * a);
-			if (yy > y0 && yy < y1) ys.add(yy);
+		ShapeBuilder b = new ShapeBuilder(k);
+		int[][] rows = {{X + R, Y, X + W - R, Y + R}, {X, Y + R, X + W, Y + H - R}, {X + R, Y + H - R, X + W - R, Y + H}};
+		for (int[] rw : rows) {
+			// Split at each stop, so the shading between stops is as asked.
+			java.util.List<Integer> cuts = new java.util.ArrayList<>();
+			cuts.add(rw[1]);
+			for (float a : at) {
+				int yy = Y + Math.round(H * a);
+				if (yy > rw[1] && yy < rw[3]) cuts.add(yy);
+			}
+			cuts.add(rw[3]);
+			for (int i = 0; i + 1 < cuts.size(); i++) {
+				int a = cuts.get(i), c = cuts.get(i + 1);
+				if (c > a) b.band(rw[0], a, rw[2], c, col.applyAsInt(a), col.applyAsInt(c));
+			}
 		}
-		ys.add(y1);
-		for (int i = 0; i + 1 < ys.size(); i++) {
-			int a = ys.get(i), b = ys.get(i + 1);
-			if (b > a) g.fillGradient(x0, a, x1, b, col.applyAsInt(a), col.applyAsInt(b));
-		}
-	}
-
-	/** A box from x0, y0 to x1, y1 (screen pixels) in its shading: top to bottom over stop of H from Y, then flat. */
-	private static void bands(GuiGraphics g, int x0, int y0, int x1, int y1, int Y, int H, float stop, int top, int bottom) {
-		if (x1 <= x0 || y1 <= y0) return;
-		if (top == bottom) {
-			g.fill(x0, y0, x1, y1, top);
-			return;
-		}
-		int ys = Y + Math.round(H * stop);
-		if (y0 < ys) {
-			int e = Math.min(y1, ys);
-			g.fillGradient(x0, y0, x1, e, mix(top, bottom, (y0 - Y) / (H * stop)), mix(top, bottom, (e - Y) / (H * stop)));
-		}
-		if (y1 > ys) g.fill(x0, Math.max(y0, ys), x1, y1, bottom);
+		b.quarter(X, Y, R, 0, col.applyAsInt(Y), col.applyAsInt(Y + R));
+		b.quarter(X + W - R, Y, R, 1, col.applyAsInt(Y), col.applyAsInt(Y + R));
+		b.quarter(X, Y + H - R, R, 2, col.applyAsInt(Y + H - R), col.applyAsInt(Y + H));
+		b.quarter(X + W - R, Y + H - R, R, 3, col.applyAsInt(Y + H - R), col.applyAsInt(Y + H));
+		b.submit(g, R, X, Y, W, H);
 	}
 
 	/** A rounded ring (an outline): radius r, t thick, smooth like rr. */

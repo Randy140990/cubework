@@ -122,10 +122,74 @@ public final class BattleScene {
 		revealed = false;
 	}
 
+	/** The battle's own directions: to your right, and back behind you (away from them). A stage's are the world's. */
+	private static Vec3 axRight = new Vec3(1, 0, 0), axBack = new Vec3(0, 0, 1);
+
+	/** A point offset from another along the battle's directions: right, up, back. */
+	private static Vec3 local(Vec3 from, double right, double up, double back) {
+		return from.add(axRight.scale(right)).add(0, up, 0).add(axBack.scale(back));
+	}
+
+	/**
+	 * Battling inside a building (your rival in the lab): no stage. It's fought where you stand, in the room itself
+	 * (as Let's Go has it), the two of you where you are, your Pokémon out between, and the camera behind yours,
+	 * kept inside the room's walls.
+	 */
+	private static void setUpInside() {
+		float h = stageH;
+		Minecraft mc = Minecraft.getInstance();
+		Vec3 you = mc.player.position();
+		Entity t = hiddenNpc >= 0 ? level.getEntity(hiddenNpc) : null;
+		Vec3 look = Vec3.directionFromRotation(0, mc.player.getYRot()).multiply(1, 0, 1);
+		Vec3 them = t != null ? t.position() : you.add(look.normalize().scale(6));
+		Vec3 f = them.subtract(you).multiply(1, 0, 1);
+		if (f.lengthSqr() < 0.25) f = look.lengthSqr() < 1e-4 ? new Vec3(0, 0, -1) : look;
+		double dist = f.length();
+		f = f.normalize();
+		axBack = f.scale(-1);
+		axRight = new Vec3(-f.z, 0, f.x);
+		Vec3 mid = you.lerp(them, 0.5);
+		double half = Math.max(1.7, dist / 2 - 1.0);
+		centre = new Vec3(mid.x, you.y, mid.z);
+		mineAt = local(centre, -0.35, 0, half);
+		enemyAt = local(centre, 0.5, 0, -half - Math.max(0, h - 1.5) * 0.4);
+		mine = spawn(mineAt, face(mineAt, enemyAt));
+		theirs = spawn(enemyAt, face(enemyAt, mineAt));
+		Vec3 target = mineAt.lerp(enemyAt, 0.5).add(0, 0.8 + Math.max(0, h - 1) * 0.15, 0);
+		Vec3 want = local(mineAt, -1.2, 2.0 + Math.max(0, h - 2) * 0.4, 4.6 + Math.max(0, h - 2) * 0.9);
+		cam = clear(target, want);
+		aim(target);
+		introTicks = INTRO;
+		Vec3 heroAt = local(mineAt, -1.3, 0, 1.4);
+		hero = person("hero", com.insidethecube.retromon.game.Npc.PERSON, heroAt, face(heroAt, enemyAt));
+		if (foeKey != null && !foeKey.isEmpty()) {
+			Vec3 foeAt = local(enemyAt, 1.3, 0, -1.4);
+			foe = person(foeKey, foeRole, foeAt, face(foeAt, mineAt));
+		}
+	}
+
+	/** Where a camera can be on the way from what it looks at towards where it would like to be, short of any wall. */
+	private static Vec3 clear(Vec3 from, Vec3 to) {
+		Minecraft mc = Minecraft.getInstance();
+		net.minecraft.world.phys.BlockHitResult hit = level.clip(new net.minecraft.world.level.ClipContext(from, to, net.minecraft.world.level.ClipContext.Block.VISUAL,
+				net.minecraft.world.level.ClipContext.Fluid.NONE, mc.player));
+		if (hit == null || hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS) return to;
+		Vec3 d = to.subtract(from);
+		double len = d.length();
+		double keep = Math.max(1.5, from.distanceTo(hit.getLocation()) - 0.45);
+		return len < 1e-3 ? to : from.add(d.scale(Math.min(1, keep / len)));
+	}
+
 	/** Puts up the stage, the two Pokémon (not out yet), you and their trainer, and the camera. */
 	private static void setUp() {
 		built = true;
 		float h = stageH;
+		axRight = new Vec3(1, 0, 0);
+		axBack = new Vec3(0, 0, 1);
+		if (kind.equals("inside")) {
+			setUpInside();
+			return;
+		}
 		build(stageAt);
 		double far = 6.0 + Math.max(0, h - 1.5) * 1.3;
 		mineAt = centre.add(-0.6, 0, 2.2);
@@ -571,6 +635,15 @@ public final class BattleScene {
 	/** Your Pokémon celebrating a win: the camera comes round in front of it as it hops for joy. */
 	private static int cheerTicks, cheerMax = 1;
 
+	/** The win held on: the camera stays in front of yours as it (and you) celebrate, till you carry on. */
+	public static boolean holding;
+
+	public static void hold() {
+		if (!active) return;
+		if (!holding) cheer();
+		holding = true;
+	}
+
 	public static void cheer() {
 		if (!active) return;
 		cheerTicks = cheerMax = 52;
@@ -610,13 +683,9 @@ public final class BattleScene {
 		d.faint = MonDisplay.FAINT;
 		d.act("faint");
 		Sounds.faint();
+		// A trainer's is called back; a wild one just lies there till the battle's over.
 		later(30, () -> {
 			if (trainerOf(side) != null) recallWithBall(side);
-			else {
-				Vec3 p = spot(side).add(0, 0.2 + height(side) * 0.3, 0);
-				d.sizeTarget = 0;
-				burst(p, dust(0xFFFFFF, 0.9F), 12, 0.35);
-			}
 		});
 	}
 
@@ -936,6 +1005,7 @@ public final class BattleScene {
 		IMPACTS.clear();
 		ARROWS.clear();
 		cheerTicks = 0;
+		holding = false;
 		introTicks = 0;
 		LATER.clear();
 		hero = foe = null;
@@ -1049,6 +1119,13 @@ public final class BattleScene {
 			if (age >= f.life()) FX.remove(i);
 		}
 		if (cheerTicks > 0) cheerTicks--;
+		if (holding) {
+			// Held in front of yours (half way through the cheer's move round), the two of you still celebrating.
+			cheerTicks = Math.max(cheerTicks, cheerMax / 2);
+			if (hero != null && hero.cheer <= 0) hero.cheer = com.insidethecube.retromon.game.Npc.CHEER;
+			MonDisplay mineNow = display(0);
+			if (mineNow != null && mineNow.cheer <= 0) mineNow.cheer = MonDisplay.CHEER;
+		}
 		if (introTicks > 0) introTicks--;
 		for (int i = IMPACTS.size() - 1; i >= 0; i--) if (++IMPACTS.get(i).age > IMPACTS.get(i).life) IMPACTS.remove(i);
 		for (int i = ARROWS.size() - 1; i >= 0; i--) if (++ARROWS.get(i).age > Arrows.LIFE) ARROWS.remove(i);
@@ -1068,7 +1145,8 @@ public final class BattleScene {
 			double w = Math.min(1, Math.max(0, (t - 0.15) / 0.85));
 			w = w * w * (3 - 2 * w);
 			Vec3 them = foe != null ? enemyAt.lerp(foe.position(), 0.35) : enemyAt;
-			Vec3 from = enemyAt.add(-3.6, 1.4 + height(1) * 0.3, 4.6);
+			Vec3 from = local(enemyAt, -3.6, 1.4 + height(1) * 0.3, 4.6);
+			if (kind.equals("inside")) from = clear(enemyAt.add(0, 0.8, 0), from);
 			Vec3 lookFrom = them.add(0, 0.6 + height(1) * 0.35, 0);
 			x = from.x + (x - from.x) * w;
 			y = from.y + (y - from.y) * w;
@@ -1085,6 +1163,7 @@ public final class BattleScene {
 			toFoe = new Vec3(toFoe.x, 0, toFoe.z).normalize();
 			double h = height(0);
 			Vec3 front = me.add(toFoe.scale(2.6 + h * 0.9)).add(-toFoe.z * 1.1, 0.9 + h * 0.4, toFoe.x * 1.1);
+			if (kind.equals("inside")) front = clear(me.add(0, 0.6, 0), front);
 			Vec3 look = me.add(0, 0.25 + h * 0.5, 0);
 			x += (front.x - x) * w;
 			y += (front.y - y) * w;

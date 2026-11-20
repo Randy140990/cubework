@@ -196,6 +196,21 @@ public final class Interiors {
 		return in(e) ? roomAt(e.getX()) : null;
 	}
 
+	/** Just inside the way in of the room someone's in (where you stand coming through the door), or null outside. */
+	public static Vec3 entryOf(Entity e) {
+		Room r = roomOf(e);
+		return r == null ? null : new Vec3(r.ox() + r.ex(), r.oy(), r.oz() + r.ez());
+	}
+
+	/** Out through the way in: a step past the entry, onto the mat (where walking takes you out). */
+	public static Vec3 exitOf(Entity e) {
+		Room r = roomOf(e);
+		if (r == null) return null;
+		for (Warp w : r.warps())
+			if (w.kind().equals("mat")) return new Vec3(r.ox() + (w.x0() + w.x1()) / 2, r.oy(), r.oz() + w.z0() - 0.2);
+		return new Vec3(r.ox() + r.ex(), r.oy(), r.oz() + r.ez() + 1.5);
+	}
+
 	// ---------- building them ----------
 
 	private static boolean built;
@@ -441,7 +456,8 @@ public final class Interiors {
 		Room r = roomOf(e);
 		if (r == null) return null;
 		Vec3 look = Vec3.directionFromRotation(0, e.getYRot());
-		for (double d = 0.5; d <= 2.1 + 1e-6; d += 0.4) {
+		// Only what's just in front of you (a step or so), so things on the walls don't call from across the room.
+		for (double d = 0.4; d <= 1.3 + 1e-6; d += 0.3) {
 			double x = e.getX() + look.x * d - r.ox(), z = e.getZ() + look.z * d - r.oz();
 			Act best = null;
 			double bd = 1e9;

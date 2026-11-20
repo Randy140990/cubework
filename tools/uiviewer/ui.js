@@ -88,6 +88,8 @@ const WM_GLYPHS = {
   "é": ["....11.", "...11..", "111111", "11....", "11111.", "11....", "111111"],
 };
 function wordmark(text, o = {}) {
+  // Our name has its own drawn wordmark now (round letters, not blocks).
+  if (text === "RETROMON" && typeof WORDMARK_OURS !== "undefined") return WORDMARK_OURS;
   const u = o.unit || 14, depth = o.depth || 4, gap = 1, rows = 7, top = o.top || [255, 238, 150], bot = o.bottom || [242, 140, 30];
   const side = o.side || [120, 58, 18], line = o.line || [36, 18, 8];
   const glyphs = [...text].map(c => WM_GLYPHS[c] || WM_GLYPHS[c.toUpperCase()] || ["."]);

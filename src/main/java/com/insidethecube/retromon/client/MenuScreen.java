@@ -849,9 +849,9 @@ public class MenuScreen extends DeviceScreen {
 			"Whether moves play their animations in battle.", "SWITCH asks if you want to change POKéMON when a trainer is about to send out their next one.",
 			"Whether your partner walks with you.",
 			"COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures.",
-			"RETROMON is our own light: the sun moves with the day, with soft shadows and blue nights. TEMPERED is Tempered Light. OFF is Minecraft's own.", "See every key: what it does in game, and what's turned off."};
+			"RETROMON is our own light: the sun moves with the day, soft shadows, swaying grass, blue nights and glowing lamps. OFF is Minecraft's own.", "See every key: what it does in game, and what's turned off."};
 	private static final String[][] OPTION_VALUES = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"},
-			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"OFF", "ON"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON", "TEMPERED"}, {}};
+			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"OFF", "ON"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {}};
 
 	/**
 	 * OPTION, as the UI Viewer's: what the row does in a panel at the top, then the rows (the one you're on cream),
@@ -915,7 +915,7 @@ public class MenuScreen extends DeviceScreen {
 			}
 			case 9 -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
 			case 10 -> {
-				Settings.set("shaders", Math.floorMod(Settings.shaderMode() + step, 3));
+				Settings.set("shaders", Settings.shaderMode() == 0 ? 1 : 0);
 				Shaders.set(Settings.shaderMode());
 			}
 			default -> {

@@ -61,7 +61,7 @@ public class BattleScreen extends GameScreen {
 	private String caughtSpecies;
 
 	private enum Mode {
-		PLAY, MAIN, FIGHT, PARTY, BAG, BAG_TARGET, WAIT, AIM, ASK
+		PLAY, MAIN, FIGHT, PARTY, BAG, BAG_TARGET, WAIT, AIM, ASK, HOLD
 	}
 
 	private final Side[] sides = {new Side(), new Side()};
@@ -262,7 +262,12 @@ public class BattleScreen extends GameScreen {
 				return;
 			}
 			case END -> {
-				close();
+				// A win (or a catch) holds on yours celebrating, with your team's EXP showing, till you carry on.
+				if (("WIN".equals(result) || "CAUGHT".equals(result)) && sides[0].shown && whiteAt < 0) {
+					mode = Mode.HOLD;
+					message = null;
+					BattleScene.hold();
+				} else close();
 				return;
 			}
 			case NOTICE_DONE -> {
@@ -616,10 +621,7 @@ public class BattleScreen extends GameScreen {
 
 	private void pickItem(int i) {
 		List<String> l = battleItems();
-		if (i >= l.size()) {
-			mode = Mode.MAIN;
-			return;
-		}
+		if (i >= l.size()) return;
 		Item it = Item.find(l.get(i));
 		if (it.ball()) {
 			if (!kind.equals("WILD")) {
@@ -671,6 +673,12 @@ public class BattleScreen extends GameScreen {
 			return true;
 		}
 		switch (mode) {
+			case HOLD -> {
+				if (Ui.isA(e) || Ui.isB(e)) {
+					Sounds.press();
+					close();
+				}
+			}
 			case PLAY, WAIT -> {
 				if (message != null && Ui.isA(e)) advance();
 			}
@@ -713,7 +721,7 @@ public class BattleScreen extends GameScreen {
 				else if (Ui.isB(e)) mode = Mode.BAG;
 			}
 			case BAG -> {
-				int n = battleItems().size() + 1;
+				int n = Math.max(1, battleItems().size());
 				if (Ui.isB(e)) mode = Mode.MAIN;
 				else if (Ui.isUp(e)) bagAt = Math.floorMod(bagAt - 1, n);
 				else if (Ui.isDown(e)) bagAt = Math.floorMod(bagAt + 1, n);
@@ -722,6 +730,12 @@ public class BattleScreen extends GameScreen {
 			}
 		}
 		return true;
+	}
+
+	/** TAB turns the bag's pockets (not the game's speed) while the bag's open. */
+	@Override
+	protected boolean wantsTab() {
+		return mode == Mode.BAG;
 	}
 
 	private static int row(int command) {
@@ -738,6 +752,11 @@ public class BattleScreen extends GameScreen {
 
 	@Override
 	protected void clickAnywhere() {
+		if (mode == Mode.HOLD) {
+			Sounds.press();
+			close();
+			return;
+		}
 		if (mode == Mode.PLAY || mode == Mode.WAIT) advance();
 		else if (mode == Mode.AIM) throwBall();
 	}
@@ -865,6 +884,12 @@ public class BattleScreen extends GameScreen {
 			case ASK -> {
 				say(g, askLine(), false, partial);
 				vchoice(g, ask, 520 + 724 - 300, V.H - 26 - 120 - 12 - V.choiceHeight(2), 300, this::askPick);
+			}
+			case HOLD -> {
+				// The win, held: yours and you celebrating; carry on when you like.
+				String who = sides[0].name;
+				say(g, "WIN".equals(result) ? who + " is overjoyed!" : who + " cheers for the catch!", false, partial);
+				V.hints(g, "A", "Continue");
 			}
 			default -> say(g, message == null ? "" : message.substring(0, Math.min(typed, message.length())), true, partial);
 		}
@@ -997,9 +1022,10 @@ public class BattleScreen extends GameScreen {
 	 * party's balls above it.
 	 */
 	private void plate(GuiGraphics g, Side sd, boolean ours) {
-		float x = ours ? 36 : 820, y = ours ? 560 : 36, w = ours ? 470 : 420, h = ours ? 118 : 92, px = x + 22;
+		// Yours sits level with the text box beside it (574 to 694), top and bottom.
+		float x = ours ? 36 : 820, y = ours ? 574 : 36, w = ours ? 470 : 420, h = ours ? 120 : 92, px = x + 22;
 		V.panel(g, x, y, w, h, 22, false);
-		float ty = y + (ours ? 14 : 12);
+		float ty = y + (ours ? 15 : 12);
 		V.text(g, sd.name, px, ty, 27, V.TEXT, true);
 		float nx = px + V.width(sd.name, 27, true) + 10;
 		if (!sd.gender.isEmpty()) {
@@ -1397,73 +1423,75 @@ public class BattleScreen extends GameScreen {
 	}
 
 	/**
-	 * The bag in battle: a card over the stage (dimmed behind it), its two pockets as big tabs down the left (POKé
-	 * BALLS and MEDICINE, with how many kinds are in each), what's in the picked pocket on the right with how many
-	 * you have, what the picked one does underneath, and BACK. An empty pocket says so (and where to get some).
+	 * The bag in battle, in the UI Viewer's look: a panel over the stage (dimmed behind it), its two pockets as big
+	 * coloured cards down the left (POKé BALLS red, MEDICINE green, with how many kinds are in each), what's in the
+	 * picked pocket on the right with how many you have, what the picked one does underneath, and the keys as buttons
+	 * (ESC Back closes it). An empty pocket says so, and where to get some.
 	 */
 	private void drawBag(GuiGraphics g, int m, int by, int bh) {
 		List<String> l = battleItems();
-		bagAt = Math.min(bagAt, l.size());
-		g.fill(0, 0, width, height, 0x80060A10);
-		int w = Math.min(width - 2 * m, 380 * s), h = Math.min(height - 2 * m, 220 * s), x = (width - w) / 2, y = (height - h) / 2;
-		Ui.rr(g, x + s, y + 3 * s, w, h, 10 * s, 0x60000000);
-		Ui.rr(g, x, y, w, h, 10 * s, 0xFF8FF5C0);
-		Ui.rr(g, x + 1.5F * s, y + 1.5F * s, w - 3 * s, h - 3 * s, 8.5F * s, 0xF8123C38);
-		Ui.draw(g, font, Ui.bold("BAG"), x + 12 * s, y + 9 * s, 0xFFFFFFFF, s, true);
-		// The pockets, down the left.
+		bagAt = Math.max(0, Math.min(bagAt, l.size() - 1));
+		g.fill(0, 0, width, height, 0x8C061A1E);
+		float px = 190, py = 70, pw = 900, ph = 540;
+		V.panel(g, px, py, pw, ph);
+		V.icon(g, "icon_bag", px + 30, py + 20, 44);
+		V.text(g, "BAG", px + 86, py + 26, 30, V.TEXT, true);
 		String[] pockets = {"POKé BALLS", "MEDICINE"};
-		int[] pc = {0xFFE5525C, 0xFF41BF84};
-		int tw = Math.min(110 * s, w / 3), th = 34 * s, tx = x + 10 * s;
+		int[][] pc = {{0xFFF27682, 0xFFD94452, 0xFFB02E3C}, {0xFF6BDCA2, 0xFF39B27A, 0xFF22855A}};
 		for (int i = 0; i < 2; i++) {
-			int ty = y + 26 * s + i * (th + 6 * s);
+			float tx = px + 30, ty = py + 90 + i * 128, tw = 300, th = 108;
 			boolean on = bagPocket == i;
 			int kinds = count(i);
-			Ui.rr(g, tx, ty, tw, th, th / 2F, on ? 0xFFFFFFFF : 0x30FFFFFF);
-			Ui.rr(g, tx + 1.5F * s, ty + 1.5F * s, tw - 3 * s, th - 3 * s, th / 2F - 1.5F * s, on ? pc[i] : Ui.darker(pc[i], 0.45F));
-			// A ball (or a bottle) in a white round, then the pocket's name and how many kinds.
-			int ic = th - 10 * s;
-			Ui.rr(g, tx + 5 * s, ty + 5 * s, ic, ic, ic / 2F, 0xF0FFFFFF);
-			itemIcon(g, Item.find(i == 0 ? "poke_ball" : "potion"), tx + 5 * s + ic / 6, ty + 5 * s + ic / 6, ic * 2 / 3, s);
-			Ui.draw(g, font, Ui.bold(pockets[i]), tx + ic + 11 * s, ty + 7 * s, 0xFFFFFFFF, s, true);
-			Ui.draw(g, font, Ui.ui(kinds == 0 ? "Empty" : kinds + (kinds == 1 ? " kind" : " kinds")), tx + ic + 11 * s, ty + 18 * s, 0xD0FFFFFF, s, false);
+			if (on) V.rr(g, tx - 5, ty - 5, tw + 10, th + 10, 31, 0x73FFF4D8);
+			V.rr(g, tx, ty + 5, tw, th, 26, 0x40000000);
+			V.rrStops(g, tx, ty, tw, th, 26, new float[] {0, 0.5F, 1}, on ? pc[i] : new int[] {Ui.mix(pc[i][0], 0xFF123C38, 0.55F), Ui.mix(pc[i][1], 0xFF123C38, 0.55F),
+					Ui.mix(pc[i][2], 0xFF123C38, 0.55F)});
+			if (on) V.ring(g, tx, ty, tw, th, 26, 3, V.CREAM);
+			V.ellipse(g, tx + 54, ty + th / 2, 36, 36, on ? 0xFFFFFFFF : 0xB3FFFFFF);
+			itemIcon(g, Item.find(i == 0 ? "poke_ball" : "potion"), Math.round(V.x(tx + 54 - 22)), Math.round(V.y(ty + th / 2 - 22)), Math.round(V.s(44)), 1);
+			V.text(g, pockets[i], tx + 104, ty + 24, 24, on ? 0xFFFFFFFF : 0xFFCFEDE3, true);
+			V.text(g, kinds == 0 ? "Empty" : kinds + (kinds == 1 ? " kind" : " kinds"), tx + 104, ty + 58, 19, on ? 0xE6FFFFFF : 0xB3CFEDE3, true);
 			int idx = i;
-			hit(tx, ty, tw, th, () -> {
+			vhit(tx, ty, tw, th, () -> {
 				if (bagPocket != idx) pocket(idx - bagPocket);
 			});
 		}
 		// What's in it.
-		int lx = tx + tw + 10 * s, lw = x + w - 10 * s - lx, ly = y + 26 * s, descH = 34 * s, row = 18 * s;
-		int rows = Math.max(1, (y + h - 10 * s - descH - 6 * s - ly) / row);
-		int n = l.size() + 1;
-		int first = Math.max(0, Math.min(bagAt - rows / 2, n - rows));
-		for (int k = 0; k < rows && first + k < n; k++) {
-			int i = first + k, ry = ly + k * row;
-			int idx = i;
-			if (over(lx, ry, lw, row - 3 * s)) bagAt = i;
+		float lx = px + 360, ly = py + 90, lw = pw - 390, rowH = 54, gap = 8;
+		int rows = 6, first = Math.max(0, Math.min(bagAt - rows / 2, l.size() - rows));
+		for (int k = 0; k < rows && first + k < l.size(); k++) {
+			int i = first + k;
+			float ry = ly + k * (rowH + gap);
+			if (vover(lx, ry, lw, rowH)) bagAt = i;
 			boolean on = i == bagAt;
-			Ui.pill(g, lx, ry, lw, row - 3 * s, on, s);
-			int ink = on ? Ui.CREAM_INK : Ui.TEXT;
-			if (i == l.size()) Ui.draw(g, font, Ui.bold("BACK"), lx + 12 * s, ry + 4 * s, on ? Ui.CREAM_INK : Ui.MUTED, s, false);
-			else {
-				Item it = Item.find(l.get(i));
-				itemIcon(g, it, lx + 6 * s, ry + 2 * s, row - 7 * s, s);
-				Ui.draw(g, font, Ui.bold(it.name()), lx + row + 6 * s, ry + 4 * s, ink, s, false);
-				String count = "×" + ClientState.data.count(it.id());
-				Ui.draw(g, font, Ui.bold(count), lx + lw - 10 * s - Ui.boldWidth(font, count, s), ry + 4 * s, on ? Ui.CREAM_INK : Ui.GOLD, s, false);
-			}
-			hit(lx, ry, lw, row - 3 * s, () -> pickItem(idx));
+			Item it = Item.find(l.get(i));
+			int accent = bagPocket == 0 ? pc[0][1] : pc[1][1];
+			if (on) {
+				V.pill(g, lx - 3, ry - 3, lw + 6, rowH + 6, 0x59FFF4D8);
+				V.pill(g, lx, ry, lw, rowH, V.CREAM);
+			} else V.pill(g, lx, ry, lw, rowH, 0x24FFFFFF);
+			V.pill(g, lx + 6, ry + 6, rowH - 12, rowH - 12, on ? Ui.alpha(accent, 0.22F) : 0x33FFFFFF);
+			itemIcon(g, it, Math.round(V.x(lx + 14)), Math.round(V.y(ry + 14)), Math.round(V.s(rowH - 28)), 1);
+			int ink = on ? V.INK : V.TEXT;
+			V.text(g, it.name(), lx + rowH + 10, V.capsTop(ry + rowH / 2, 21), 21, ink, true);
+			V.right(g, "x" + ClientState.data.count(it.id()), lx + lw - 22, V.capsTop(ry + rowH / 2, 21), 21, on ? V.INK : V.GOLD, true);
+			int idx = i;
+			vhit(lx, ry, lw, rowH, () -> pickItem(idx));
 		}
 		if (l.isEmpty()) {
 			String none = bagPocket == 0 ? "No POKé BALLS yet. A POKé MART sells them." : "No medicine to use in battle.";
-			Ui.text(g, font, none, lx + 4 * s, ly + row + 4 * s, Ui.MUTED, s);
+			for (String line : V.wrap(none, lw - 20, 21, true)) {
+				V.text(g, line, lx + 10, ly + 14, 21, V.MUTED, true);
+				ly += 30;
+			}
 		}
 		// What the picked one does.
-		int dy = y + h - 10 * s - descH;
-		Ui.rr(g, lx, dy, lw, descH, 6 * s, 0xF0FBF5E6);
-		String desc = bagAt < l.size() ? describe(l.get(bagAt)) : "Close the bag.";
-		List<String> lines = Ui.wrap(font, desc, (lw - 16 * s) / s);
-		for (int i = 0; i < Math.min(2, lines.size()); i++) Ui.plain(g, font, lines.get(i), lx + 8 * s, dy + 6 * s + i * 11 * s, Ui.CREAM_INK, s);
-		Ui.text(g, font, "Up/down: item   Left/right: pocket   A: use   B: back", x + 12 * s, y + h - 12 * s, 0x90FFFFFF, s);
+		float dy = py + ph - 30 - 92;
+		V.panel(g, lx, dy, lw, 92, 20, true);
+		String desc = bagAt < l.size() ? describe(l.get(bagAt)) : bagPocket == 0 ? "Throw one at a wild POKéMON to catch it." : "Heal or help your POKéMON.";
+		List<String> lines = V.wrap(desc, lw - 48, 19, true);
+		for (int i = 0; i < Math.min(2, lines.size()); i++) V.text(g, lines.get(i), lx + 24, dy + 18 + i * 28, 19, V.SOFT_TEXT, true);
+		V.hints(g, "A", "Use", "B", "Back", "TAB", "Pocket");
 	}
 
 	/** How many kinds of thing are in a pocket. */
