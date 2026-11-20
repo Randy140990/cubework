@@ -93,11 +93,23 @@ public final class Scenes {
 		return d;
 	}
 
-	/** A soft round shadow on the ground under something (radius in blocks). */
+	/** A soft round shadow on the ground under something (radius in blocks): one smooth soft-edged ellipse. */
 	public static void blob(GuiGraphics g, Cam cam, double x, double z, double radius, int alpha) {
 		float[] c = cam.at(x, 0.01, z), e = cam.at(x + radius, 0.01, z), n = cam.at(x, 0.01, z - radius);
-		float rx = Math.abs(e[0] - c[0]), ry = Math.max(2, Math.abs(n[1] - c[1]));
-		for (int i = 3; i >= 1; i--) V.ellipse(g, c[0], c[1], rx * (0.6F + i * 0.15F), ry * (0.6F + i * 0.15F), Ui.alpha(0xFF0E2A28, alpha / 255F * 0.28F));
+		float rx = Math.abs(e[0] - c[0]) / 0.6F, ry = Math.max(2, Math.abs(n[1] - c[1])) / 0.6F;
+		Ui.blitSmooth(g, Ui.BLOB, V.x(c[0] - rx), V.y(c[1] - ry), V.x(c[0] + rx), V.y(c[1] + ry), 0, 1, 0, 1, Ui.alpha(0xFF0E2A28, alpha / 255F * 0.34F));
+	}
+
+	/**
+	 * A shadow cast on the ground as the viewer's sun casts it (from up and to the front left: a thing h tall throws
+	 * its shadow back and a little right, 0.46 h back and 0.17 h across), as a soft-edged shape under it and along
+	 * the way it falls; w and l its footprint across and front to back (blocks).
+	 */
+	public static void cast(GuiGraphics g, Cam cam, double x, double z, double w, double l, double h, int alpha) {
+		double dx = 0.17 * h, dz = -0.46 * h, cx = x + dx / 2, cz = z + dz / 2, ax = w / 2 + Math.abs(dx) / 2, az = l / 2 + Math.abs(dz) / 2;
+		float[] c = cam.at(cx, 0.01, cz), e = cam.at(cx + ax, 0.01, cz), n = cam.at(cx, 0.01, cz - az), s = cam.at(cx, 0.01, cz + az);
+		float rx = Math.abs(e[0] - c[0]) / 0.6F, ry = Math.max(2, Math.abs(s[1] - n[1]) / 2) / 0.6F, my = (s[1] + n[1]) / 2;
+		Ui.blitSmooth(g, Ui.BLOB, V.x(c[0] - rx), V.y(my - ry), V.x(c[0] + rx), V.y(my + ry), 0, 1, 0, 1, Ui.alpha(0xFF0E2A28, alpha / 255F * 0.36F));
 	}
 
 	/** A flat disc on the ground (the stage under the professor, a stand's top), radius in blocks. */
@@ -242,10 +254,13 @@ public final class Scenes {
 	 * end he stops, turns to you, and the camera comes in close. Mode intro, rival (his grandson beside him) or you.
 	 */
 	public static final class ProfWalk {
-		private static final Object[][] SPOTS = {{"pikachu", -0.85, 0.95, 0.35, 0.0}, {"cubone", -1.8, 0.35, 0.55, 0.0}, {"oddish", 0.55, 1.35, -0.1, 0.0},
-				{"clefairy", -1.3, 1.55, 0.2, 0.0}, {"pidgey", -1.45, -0.55, 0.4, 1.55}};
-		private static final String[] PARADE = {"growlithe", "exeggutor", "psyduck", "ponyta", "jigglypuff", "onix", "meowth", "machoke", "vulpix", "snorlax", "butterfree",
+		// Behind him (further from you than he is), so he's always in front of them.
+		private static final Object[][] SPOTS = {{"pikachu", -0.95, -0.75, 0.35, 0.0}, {"cubone", -1.8, -1.2, 0.55, 0.0}, {"oddish", 0.85, -1.05, -0.1, 0.0},
+				{"clefairy", -1.55, -1.45, 0.2, 0.0}, {"pidgey", -0.55, -1.15, 0.4, 1.65}};
+		private static final String[] ALL_PARADE = {"growlithe", "exeggutor", "psyduck", "ponyta", "jigglypuff", "onix", "meowth", "machoke", "vulpix", "snorlax", "butterfree",
 				"nidoking", "eevee", "lapras", "pidgeot"};
+		/** The parade: only ones with our own look when ours are showing (never one of theirs among ours). */
+		private final String[] PARADE = java.util.Arrays.stream(ALL_PARADE).filter(sid -> !Look.ours() || Look.has(sid)).toArray(String[]::new);
 		public String mode = "intro";
 		public boolean talking, walking, hurry, done;
 		public float walkX, turnT, wave, youWave, floss, lookUp;
@@ -254,7 +269,7 @@ public final class Scenes {
 		private float nextCry = 2, cryAt = -9;
 		private int crier = -1;
 		private final java.util.Random rnd = new java.util.Random();
-		private final float end = 3.8F + (PARADE.length - 1) * 1.15F + 1.4F;
+		private final float end = 3.8F + Math.max(0, PARADE.length - 1) * 1.15F + 1.4F;
 
 		public void startWalk() {
 			walking = true;
@@ -300,12 +315,9 @@ public final class Scenes {
 				double x = mode.equals("intro") ? -0.3 : 0.2;
 				cam = new Cam().look(x, 2.35, 6.6, x, 0.62, 0.3);
 			}
-			// The long floor of light (40 by 9 blocks, its middle at x 8), and the bright disc where he starts.
-			for (int i = 0; i < 24; i++) {
-				double z0 = -4.3 + i * 9.0 / 24, z1 = z0 + 9.0 / 24;
-				float[] a = cam.at(-12, 0, z1), b = cam.at(28, 0, z1), c = cam.at(-12, 0, z0);
-				V.rr(g, a[0], c[1], b[0] - a[0], Math.max(1, a[1] - c[1]) + 0.5F, 0, 0x80DFF6F4);
-			}
+			// The long floor of light (40 by 9 blocks, its middle at x 8) in one piece, and the bright disc where he starts.
+			float[] f0 = cam.at(-12, 0, -4.3), f1 = cam.at(28, 0, -4.3), f2 = cam.at(28, 0, 4.7), f3 = cam.at(-12, 0, 4.7);
+			V.polySmooth(g, new float[] {f0[0], f0[1], f1[0], f1[1], f2[0], f2[1], f3[0], f3[1]}, 0x80DFF6F4);
 			disc(g, cam, 0, 0.005, 0, 2.0, 0x73FFFFFF);
 			Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
 			float px = walking ? walkX : 0;
@@ -315,16 +327,16 @@ public final class Scenes {
 				float e = turnT * turnT * (3 - 2 * turnT);
 				yaw = (-Math.PI / 2 - 0.55) + (-Math.PI - (-Math.PI / 2 - 0.55)) * e;
 			}
-			blob(g, cam, px, 0, 0.45, 200);
+			cast(g, cam, px, 0, 0.6, 0.4, 1.8, 200);
 			Figures.Fig oak = place(b, cam, OAK, null, px, 0, 0, yaw, t);
 			if (walking && !done) oak.walk(1);
 			if (talking) oak.talk(0.85F);
 			if (wave > 0) oak.wave(wave);
 			if (mode.equals("rival")) {
-				blob(g, cam, 1.45, 0.45, 0.45, 200);
+				cast(g, cam, 1.45, 0.45, 0.6, 0.4, 1.8, 200);
 				place(b, cam, RIVAL, null, 1.45, 0, 0.45, Math.PI - 0.25, t).look((float) Math.toDegrees(Math.sin(t * 0.7) * 0.2));
 			} else if (mode.equals("you") && you != null) {
-				blob(g, cam, 1.25, 0.6, 0.45, 200);
+				cast(g, cam, 1.25, 0.6, 0.6, 0.4, 1.8, 200);
 				Figures.Fig y = place(b, cam, you, null, 1.25, 0, 0.6, Math.PI + 0.12, t).floss(floss).lookUp(lookUp);
 				if (youWave > 0) y.wave(youWave);
 			}
@@ -335,7 +347,8 @@ public final class Scenes {
 				String pose = fly > 0 ? "fly" : null;
 				int with = sid.equals("pikachu") ? 0 : sid.equals("cubone") ? 1 : sid.equals("pidgey") ? 2 : -1;
 				if (walking && with >= 0) {
-					double[][] off = {{0.85, 0.75, 0}, {-1.0, -0.45, 0}, {-0.4, -0.6, 1.7}};
+					// Walking with him, behind him and to his left (so all of them end up off to the left of him).
+					double[][] off = {{-0.95, -0.8, 0}, {-1.85, -1.05, 0}, {-1.25, -1.15, 1.75}};
 					double tx = px + off[with][0], tz = off[with][1];
 					if (walkers[i] == null) walkers[i] = new double[] {x, z};
 					walkers[i][0] += (tx - walkers[i][0]) * Math.min(1, 0.05 * 3);
@@ -347,14 +360,20 @@ public final class Scenes {
 					my = off[with][2] > 0 ? off[with][2] + Math.sin(t * 2.4) * 0.12 : 0;
 					pose = off[with][2] > 0 ? "fly" : moving ? "walk" : null;
 				} else if (sid.equals("cubone")) {
+					// To and fro along the back, behind him and the others (never across in front of him).
 					double a = t * 0.35;
-					mx = Math.cos(a) * 2.55;
-					mz = 0.35 + Math.sin(a) * 2.25;
-					myaw = Math.atan2(Math.sin(a) * 2.55, -Math.cos(a) * 2.25);
+					mx = Math.cos(a) * 2.4;
+					mz = -1.75 + Math.sin(a) * 0.45;
+					myaw = Math.atan2(Math.sin(a) * 2.4, -Math.cos(a) * 0.45);
 					pose = "walk";
 				}
-				if (my < 0.3) blob(g, cam, mx, mz, 0.32, 180);
-				Figures.Fig f = place(b, cam, null, sid, mx, my, mz, myaw, t + i * 0.7F).pose(pose);
+				// (The bone-helmet one has no look of ours yet: one of ours walks the loop instead.)
+				String shown = sid.equals("cubone") && Look.ours() && !Look.has("cubone") ? "rattata" : sid;
+				BedrockModel.Def sd = BedrockModel.def(shown);
+				double sh = sd == null ? 0.8 : Math.max(0.3, sd.height);
+				if (my < 0.3) cast(g, cam, mx, mz, Math.max(0.35, sh * 0.6), Math.max(0.35, sh * 0.6), sh, 180);
+				else blob(g, cam, mx + 0.17 * (my + sh), mz - 0.46 * (my + sh), 0.3, 110);
+				Figures.Fig f = place(b, cam, null, shown, mx, my, mz, myaw, t + i * 0.7F).pose(pose);
 				if (i == crier && t - cryAt < 1.2F && !(walking && sid.equals("pikachu"))) f.action("cry", t - cryAt);
 			}
 			if (mode.equals("intro")) {
@@ -362,11 +381,13 @@ public final class Scenes {
 					String sid = PARADE[i];
 					BedrockModel.Def def = BedrockModel.def(sid);
 					if (def == null) continue;
-					double h = Math.max(0.3, def.height), big = h > 2.2 ? 2.2 / h : 1, x = 3.8 + i * 1.15, row = new double[] {1.4, -1.35, -2.4}[i % 3];
+					// In three rows behind his path (little ones nearest, big ones at the back), the fliers above them.
+					double h = Math.max(0.3, def.height), big = h > 2.2 ? 2.2 / h : 1, x = 3.8 + i * 1.15, row = new double[] {-1.3, -2.15, -3.0}[i % 3];
 					boolean flyer = sid.equals("butterfree") || sid.equals("pidgeot");
-					double hh = h * big, z = flyer ? -0.9 : hh > 1.3 ? -2.4 : hh > 0.9 && row > 0 ? -1.35 : row, fly = flyer ? 1.5 + Math.sin(t * 2.1 + x) * 0.14 : 0;
+					double hh = h * big, z = flyer ? -1.6 : hh > 1.3 ? -3.0 : hh > 0.9 ? Math.min(row, -2.15) : row, fly = flyer ? 1.6 + Math.sin(t * 2.1 + x) * 0.14 : 0;
 					double look = walking ? Math.max(-0.6, Math.min(0.6, (px - x) * 0.4)) : 0;
-					if (!flyer) blob(g, cam, x, z, 0.32 * Math.max(1, hh), 160);
+					if (!flyer) cast(g, cam, x, z, Math.max(0.4, hh * 0.6), Math.max(0.4, hh * 0.6), hh, 160);
+					else blob(g, cam, x + 0.17 * (fly + hh), z - 0.46 * (fly + hh), 0.35, 100);
 					Figures.Fig f = place(b, cam, null, sid, x, fly, z, Math.PI + (i % 3 - 1) * 0.35 - look, t + i * 0.37F).pose(flyer ? "fly" : null);
 					if (big < 1) f.perBlock(f.perBlock * (float) big);
 					if (SPOTS.length + i == crier && t - cryAt < 1.2F) f.action("cry", t - cryAt);

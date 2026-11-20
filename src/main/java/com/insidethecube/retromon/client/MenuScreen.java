@@ -786,8 +786,10 @@ public class MenuScreen extends DeviceScreen {
 			boolean on = i == partyAt, fnt = mon.fainted();
 			if (on) y -= 6;
 			int tc = Ui.typeColor(mon.species.type1()) | 0xFF000000;
+			// One soft shadow (0 8px 20px; picked, 0 16px 30px and a sunny ring 5px round it).
+			if (on) V.softShadow(g, x, y + 16, cw, ch, 30, 0x521E2854);
+			else V.softShadow(g, x, y + 8, cw, ch, 20, 0x331E2854);
 			if (on) V.rr(g, x - 5, y - 5, cw + 10, ch + 10, 33, 0xFFFFC93C);
-			V.shadow(g, x, y, cw, ch, 28, on ? 1.3F : 0.9F);
 			V.rr(g, x, y, cw, ch, 28, 0xFFFFFFFF);
 			int c1 = Ui.mix(tc, 0xFFFFFFFF, 0.78F), c2 = Ui.mix(tc, 0xFFFFFFFF, 0.55F);
 			if (fnt) {
@@ -800,9 +802,15 @@ public class MenuScreen extends DeviceScreen {
 				Component ar = V.raw("▶", true);
 				V.stroked(g, ar, x - 26, y + 96, 30, V.RED, 0xFFFFFFFF, 6);
 			}
-			// Its picture, bobbing (the one you're on bouncing).
-			float bob = on ? -3 - 5 * (float) Math.sin(secs * Math.PI * 2) : -1.5F + 1.5F * (float) Math.cos(secs * Math.PI * 2 / (2.4F + i * 0.3F));
-			V.img(g, Look.portrait(mon.species.id()), x + 8 + 5, y + 4 + 5 + bob, 160, 160, 128, 128, fnt ? 0x99FFFFFF : 0xFFFFFFFF);
+			// Its picture, gently moving; the one you're on walks on the spot, in 3D.
+			if (on && !fnt) {
+				Figures.Batch fb = Figures.batch(Math.round(V.x(x + 4)), Math.round(V.y(y + 4)), Math.round(V.x(x + 8 + 170)), Math.round(V.y(y + 4 + 176)));
+				fb.mon(mon.species.id(), V.x(x + 8 + 85), V.y(y + 4 + 158), V.s(118)).pose("walk").at(secs).facing(-32).pitch(6);
+				fb.draw(g);
+			} else {
+				float bob = -1.5F + 1.5F * (float) Math.cos(secs * Math.PI * 2 / (2.4F + i * 0.3F));
+				V.img(g, Look.portrait(mon.species.id()), x + 8 + 5, y + 4 + 5 + bob, 160, 160, 128, 128, fnt ? 0x99FFFFFF : 0xFFFFFFFF);
+			}
 			float tx = x + 4 + 168, ty = y + 4 + 14 + 6;
 			V.title(g, mon.name(), tx, V.capsTop(ty + 14, 25), 25, V.INK);
 			String gm = mon.genderMark();
@@ -876,10 +884,10 @@ public class MenuScreen extends DeviceScreen {
 		int tc = Ui.typeColor(sp.type1()) | 0xFF000000;
 		// A soft shade down the right on INFO and MOVES, so white and lime read on any backdrop.
 		if (summaryPage != 1) {
-			for (int i = 0; i < 24; i++) {
-				float k = i / 23F, a = k < 0.3F ? 0.22F * k / 0.3F : 0.22F + 0.2F * (k - 0.3F) / 0.7F;
-				V.rr(g, 520 + i * 760 / 24F, -V.oy / V.k, 760 / 24F + 1, V.gh / V.k, 0, Ui.alpha(0xFF181E3C, a));
-			}
+			// One smooth shade (the viewer's 0, .22 at 30%, .42), on out to the screen's right edge.
+			float top = V.vy(0), bottom = V.vy(V.gh), right = Math.max(1280, V.vx(V.gw));
+			V.rrh(g, 520, top, 760, bottom - top, 0, new float[] {0, 0.3F, 1}, new int[] {0x00181E3C, 0x38181E3C, 0x6B181E3C});
+			if (right > 1280) V.rr(g, 1280, top, right - 1280 + 1, bottom - top, 0, 0x6B181E3C);
 		}
 		// The tabs.
 		String[] pages = {"INFO", "STATS", "MOVES"};
@@ -890,7 +898,7 @@ public class MenuScreen extends DeviceScreen {
 			float w = V.titleTrackedWidth(pages[j], 17, 1) + 40, hh = 17 * 1.5F + 10;
 			boolean on = j == summaryPage;
 			if (on) {
-				V.shadow(g, tx, 10, w, hh, hh / 2, 0.6F);
+				V.softShadow(g, tx, 14, w, hh, 12, 0x401E2854);
 				V.pill(g, tx, 10, w, hh, 0xFFFFFFFF);
 			} else V.pill(g, tx, 10, w, hh, 0x47FFFFFF);
 			V.titleTracked(g, pages[j], tx + 20, V.capsTop(10 + hh / 2, 17), 17, on ? V.INK : 0xFFFFFFFF, 1);
@@ -920,7 +928,10 @@ public class MenuScreen extends DeviceScreen {
 			Component ot = V.titleComp(Lang.t("Original Trainer") + ": " + name());
 			V.draw(g, ot, rx + 0.5F, V.capsTop(ry + 22, 30) + 2, 30, 0x40141830, false);
 			V.draw(g, ot, rx, V.capsTop(ry + 22, 30), 30, lime, false);
-			V.rr(g, rx, ry + 45 + 3, 540 - 24 + 40 - 40, 3, 1.5F, lime);
+			// The lime line under it, out past the words to the screen's right edge (its faint shadow under it).
+			float lineR = Math.max(1280, V.vx(V.gw)) + 4;
+			V.rr(g, rx, ry + 45 + 5, lineR - rx, 2, 0, 0x1F141830);
+			V.rr(g, rx, ry + 45 + 3, lineR - rx, 3, 0, lime);
 			int seed = Math.abs((sp.id().hashCode() * 31) ^ (mon.dvAtk * 17 + mon.dvDef * 5 + mon.dvSpe));
 			String[][] rows = {{"ID No.", String.format("%05d", Math.abs(name().hashCode()) % 100000)}, {"Nature", NATURES[seed % NATURES.length]},
 					{"Met", d.place.isEmpty() ? "KANTO" : d.place.toUpperCase().replace('_', ' ')}, {"Level met", String.valueOf(Math.max(2, mon.level - 3))},
@@ -936,13 +947,11 @@ public class MenuScreen extends DeviceScreen {
 			}
 		} else drawMoves(g, mon);
 		// The name plate: dark glass, a ball's outline in it, name, level, types, HP.
+		// Let's Go's dark glass: round at the left (60), less so at the right (24); a ball's outline in it, cut to its shape.
 		float px = 700, py = 512, pw = 560, ph = 14 + 48 + 6 + 24 + 10 + 22 + 14;
-		V.shadow(g, px, py, pw, ph, 44, 0.9F);
-		V.rr(g, px, py, pw, ph, 44, 0x8CFFFFFF);
-		V.rr(g, px + 2, py + 2, pw - 4, ph - 4, 42, 0x6B1C243C);
-		g.enableScissor(Math.round(V.x(px + 2)), Math.round(V.y(py + 2)), Math.round(V.x(px + pw - 2)), Math.round(V.y(py + ph - 2)));
-		V.icon(g, "icon_ballmark", px - 34, py - 28, 150, 0x59FFFFFF);
-		g.disableScissor();
+		V.softShadow(g, px, py + 10, pw, ph, 24, 0x4D141830);
+		V.glass(g, px, py, pw, ph, 60, 24, 24, 60);
+		V.img(g, V.tex("plate_ball"), px + 2 - 34, py + 2 - 28, 150, 150, 600, 600, 0xFFFFFFFF);
 		float nx = px + 92, ny = py + 14 + 24;
 		V.title(g, mon.name(), nx, V.capsTop(ny, 32), 32, 0xFFFFFFFF);
 		float gx = nx + V.titleWidth(mon.name(), 32) + 10;
@@ -970,9 +979,8 @@ public class MenuScreen extends DeviceScreen {
 		V.right(g, hpT, px + pw - 24, V.capsTop(hy + 9, 19), 19, 0xFFFFFFFF, true);
 		// Its name and number at the bottom left (and its EXP, on INFO).
 		boolean info = summaryPage == 0;
-		float dw = info ? 440 : 260, dy = info ? 566 : 640, dh = V.H - dy + 40;
-		V.rr(g, -40, dy, dw + 40, dh, 18, 0x8CFFFFFF);
-		V.rr(g, -40, dy + 2, dw + 38, dh, 16, 0x6B1C243C);
+		float dw = info ? 440 : 260, dy = info ? 566 : 640, left = Math.min(0, V.vx(0)) - 4, dh = Math.max(V.H, V.vy(V.gh)) - dy + 4;
+		V.glass(g, left, dy, dw - left, dh, 0, 18, 0, 0);
 		V.text(g, mon.name(), 22, dy + 10 + 3, 17, 0xFFFFFFFF, false);
 		V.text(g, "POKéDEX No. " + String.format("%03d", sp.dex()), 22, dy + 10 + 3 + 24, 17, 0xFFFFFFFF, false);
 		if (info) {
@@ -1008,10 +1016,10 @@ public class MenuScreen extends DeviceScreen {
 			return q;
 		};
 		// Its shadow, the aqua inside, the lime rim (light at the top left, green at the foot right), the spokes, the half ring.
-		V.poly(g, ring.apply(R * 1.06F + 8, 4F), 0x2E000000);
-		V.poly(g, ring.apply(R + 7, 0F), 0xFF3FD06A);
-		V.poly(g, ring.apply(R + 3, 0F), 0xFFA6EE6A);
-		V.poly(g, ring.apply(R - 7, 0F), 0xB86ED6BE);
+		V.polySmooth(g, ring.apply(R * 1.06F + 8, 4F), 0x2E000000);
+		V.polySmooth(g, ring.apply(R + 7, 0F), 0xFF3FD06A);
+		V.polySmooth(g, ring.apply(R + 3, 0F), 0xFFA6EE6A);
+		V.polySmooth(g, ring.apply(R - 7, 0F), 0xB86ED6BE);
 		for (int k = 0; k < 6; k++) V.line(g, cx, cy, cx + pt[k][0] * R, cy + pt[k][1] * R, 1.5F, 0x80FFFFFF);
 		float[] half = ring.apply(R * 0.5F, 0F);
 		for (int k = 0; k < 6; k++) V.line(g, half[k * 2], half[k * 2 + 1], half[(k + 1) % 6 * 2], half[(k + 1) % 6 * 2 + 1], 1.5F, 0x66FFFFFF);
@@ -1022,7 +1030,7 @@ public class MenuScreen extends DeviceScreen {
 			val[k * 2] = cx + pt[k][0] * R * f;
 			val[k * 2 + 1] = cy + pt[k][1] * R * f;
 		}
-		V.poly(g, val, 0xD9E9FF8A);
+		V.polySmooth(g, val, 0xD9E9FF8A);
 		for (int k = 0; k < 6; k++) V.line(g, val[k * 2], val[k * 2 + 1], val[(k + 1) % 6 * 2], val[(k + 1) % 6 * 2 + 1], 2.5F, 0xFFFFFFFF);
 		int ink = 0xFF1F3A2C;
 		for (int k = 0; k < 6; k++) {
@@ -1041,64 +1049,72 @@ public class MenuScreen extends DeviceScreen {
 		for (int j = 0; j < mon.moves.size(); j++) {
 			Move m = Move.get(mon.moves.get(j));
 			int c = Ui.typeColor(m.type()) | 0xFF000000;
+			String glyph = "glyph_" + m.type().name().toLowerCase(java.util.Locale.ROOT);
 			float y = y0 + j * (bh + 12);
 			if (vover(x0, y, bw, bh)) moveAt = j;
 			boolean on = j == moveAt;
 			float x = x0 - (on ? 10 : 0);
-			if (on) {
-				V.rr(g, x - 3, y - 3, bw + 6, bh + 6, 35, 0x66FFFFFF);
-				V.tri(g, x - 40 + 19, y + 32, 40, 0, 0xFFFFFFFF);
-				V.tri(g, x - 40 + 18, y + 32, 20, 0, 0xFFDDE3EE);
-			}
-			V.shadow(g, x, y, bw, bh, 32, 0.8F);
-			V.rr(g, x, y, bw, bh, 32, on ? 0xFFFFFFFF : 0xBFFFFFFF);
-			V.rrStops(g, x + 3, y + 3, bw - 6, bh - 6, 29, new float[] {0, 0.55F, 1}, new int[] {Ui.lighter(c, 0.3F), c, Ui.darker(c, 0.85F)});
-			g.enableScissor(Math.round(V.x(x + 3)), Math.round(V.y(y + 3)), Math.round(V.x(x + bw - 3)), Math.round(V.y(y + bh - 3)));
-			V.icon(g, "glyph_" + m.type().name().toLowerCase(java.util.Locale.ROOT), x + bw - 118 - 92, y - 14, 92, 0x47FFFFFF);
-			// The PP cap: slanted, dark, a white edge.
-			float sx = x + bw - 132 + 16, slant = (bh) * (float) Math.tan(Math.toRadians(18));
-			V.poly(g, new float[] {sx + slant / 2 - 3, y, x + bw + 20, y, x + bw + 20, y + bh, sx - slant / 2 - 3, y + bh}, 0x8CFFFFFF);
-			V.poly(g, new float[] {sx + slant / 2, y, x + bw + 20, y, x + bw + 20, y + bh, sx - slant / 2, y + bh}, 0xBA181E38);
+			// Its shadow (0 6px 14px), and when it's the one you're on a pale halo 3px round it.
+			V.softShadow(g, x, y + 6, bw, bh, 14, 0x401E2854);
+			if (on) V.shape(g, x - 3, y - 3, bw + 6, bh + 6, 37, 15, 15, 37, 0x66FFFFFF, 0, 0);
+			V.shape(g, x, y, bw, bh, 34, 12, 12, 34, new float[] {0, 0.55F, 1}, new int[] {Ui.lighter(c, 0.3F), c, Ui.darker(c, 0.85F)}, 3, on ? 0xFFFFFFFF : 0xBFFFFFFF);
+			// Inside the border: the type's mark faint behind, the PP cap (slanted 18 degrees, dark, a pale edge).
+			float ix = x + 3, iy = y + 3, iw = bw - 6, ih = bh - 6;
+			g.enableScissor(Math.round(V.x(ix)), Math.round(V.y(iy)), Math.round(V.x(ix + iw)), Math.round(V.y(iy + ih)));
+			V.icon(g, glyph, ix + iw - 118 - 92, iy - 14, 92, 0x47FFFFFF);
 			g.disableScissor();
+			float lean = ih / 2 * (float) Math.tan(Math.toRadians(18)), capL = ix + iw + 16 - 132, capR = ix + iw - 9;
+			int cap = 0xB3181E38;
+			V.polySmooth(g, new float[] {capL + 3 + lean, iy, capR, iy, capR, iy + ih, capL + 3 - lean, iy + ih}, cap);
+			V.shape(g, capR, iy, 9, ih, 0, 9, 9, 0, cap, 0, 0);
+			V.polySmooth(g, new float[] {capL + lean, iy, capL + 3 + lean, iy, capL + 3 - lean, iy + ih, capL - lean, iy + ih}, 0x8CFFFFFF);
 			int left = j < mon.pp.size() ? mon.pp.get(j) : m.pp();
 			String ppn = String.valueOf(left), ppt = "/" + m.pp();
-			float rx = x + bw - 18, cy = y + bh / 2;
+			float rx = ix + iw - 18, cy = y + bh / 2;
 			V.text(g, ppt, rx - V.width(ppt, 18, true), V.capsTop(cy, 18), 18, 0xD9FFFFFF, true);
 			float pw2 = V.width(ppn, 26, true);
 			V.text(g, ppn, rx - V.width(ppt, 18, true) - 6 - pw2, V.capsTop(cy, 26), 26, 0xFFFFFFFF, true);
 			V.text(g, "PP", rx - V.width(ppt, 18, true) - 6 - pw2 - 6 - V.width("PP", 13, true), V.capsTop(cy, 13), 13, 0xBFFFFFFF, true);
-			V.ellipse(g, x + 6 + 26, cy + 2, 26, 26, 0x26000000);
-			V.ellipse(g, x + 6 + 26, cy, 26, 26, 0xFFFFFFFF);
-			V.icon(g, "glyph_" + m.type().name().toLowerCase(java.util.Locale.ROOT), x + 6 + 26 - 17, cy - 17, 34, Ui.darker(c, 0.9F));
+			// At the left: its mark in a white circle, its type on a tag, its name.
+			float ccx = ix + 6 + 26;
+			V.ellipse(g, ccx, cy + 2, 26, 26, 0x26000000);
+			V.ellipse(g, ccx, cy, 26, 26, 0xFFFFFFFF);
+			V.icon(g, glyph, ccx - 17, cy - 17, 34, Ui.darker(c, 0.9F));
 			String tn = m.type().label.toUpperCase();
-			float tw = V.trackedWidth(tn, 12, 1.5F) + 20;
-			V.rr(g, x + 6 + 52 + 10, cy - 10, tw, 20, 7, Ui.darker(c, 0.7F));
-			V.tracked(g, tn, x + 6 + 52 + 10 + 10, V.capsTop(cy, 12), 12, 0xFFFFFFFF, 1.5F);
-			V.title(g, m.name(), x + 6 + 52 + 10 + tw + 10, V.capsTop(cy, 26) + 2, 26, 0x38000000);
-			V.title(g, m.name(), x + 6 + 52 + 10 + tw + 10, V.capsTop(cy, 26), 26, 0xFFFFFFFF);
+			float tw = V.trackedWidth(tn, 12, 1.5F) + 20, tagX = ix + 6 + 52 + 10;
+			V.rr(g, tagX, cy - 10, tw, 20, 7, Ui.darker(c, 0.7F));
+			V.tracked(g, tn, tagX + 10, V.capsTop(cy, 12), 12, 0xFFFFFFFF, 1.5F);
+			V.title(g, m.name(), tagX + tw + 10, V.capsTop(cy, 26) + 2, 26, 0x38000000);
+			V.title(g, m.name(), tagX + tw + 10, V.capsTop(cy, 26), 26, 0xFFFFFFFF);
+			// The white arrow at the one you're on.
+			if (on) {
+				V.tri(g, x - 40 + 19, y + 32 + 3, 40, 0, 0x591E2854);
+				V.tri(g, x - 40 + 19, y + 32, 40, 0, 0xFFFFFFFF);
+				V.tri(g, x - 40 + 18, y + 32, 20, 0, 0xFFDDE3EE);
+			}
 			int jj = j;
 			vhit(x0, y, bw, bh, () -> moveAt = jj);
 		}
 		// What the one you're on does, in a glass card underneath.
 		if (!mon.moves.isEmpty()) {
 			Move m = Move.get(mon.moves.get(moveAt));
-			float cy = y0 + mon.moves.size() * (bh + 12) + 4, ch = 14 + 26 + 6 + 2 * 17 * 1.35F + 14;
-			V.rr(g, x0, cy, bw, ch, 20, 0x8CFFFFFF);
-			V.rr(g, x0 + 2, cy + 2, bw - 4, ch - 4, 18, 0x6B1C243C);
-			float tw = V.type(g, m.type().label, Ui.typeColor(m.type()) | 0xFF000000, x0 + 20, cy + 14, 92, 13.5F);
+			float cy = y0 + mon.moves.size() * (bh + 12) + 4, ch = 2 + 14 + 26 + 6 + 2 * 17 * 1.35F + 14 + 2;
+			V.glass(g, x0, cy, bw, ch, 20, 20, 20, 20);
+			float row = cy + 2 + 14 + 13;
+			float tw = V.type(g, m.type().label, Ui.typeColor(m.type()) | 0xFF000000, x0 + 22, row - 13.5F * 1.75F / 2, 92, 13.5F);
 			String cat = !m.damaging() ? "STATUS" : java.util.EnumSet.of(Type.FIRE, Type.WATER, Type.GRASS, Type.ELECTRIC, Type.PSYCHIC, Type.ICE, Type.DRAGON).contains(m.type()) ? "SPECIAL" : "PHYSICAL";
-			V.tracked(g, cat, x0 + 20 + tw + 14, V.capsTop(cy + 14 + 12, 14), 14, 0xCCFFFFFF, 1);
+			V.tracked(g, cat, x0 + 22 + tw + 14, V.capsTop(row, 14), 14, 0xCCFFFFFF, 1);
 			String acc = m.accuracy() > 0 ? String.valueOf(m.accuracy()) : "-", pow = m.power() > 1 ? String.valueOf(m.power()) : "-";
-			float ar = x0 + bw - 20;
-			V.text(g, acc, ar - V.width(acc, 17, true), V.capsTop(cy + 26, 17), 17, 0xFFFFFFFF, true);
+			float ar = x0 + bw - 22;
+			V.text(g, acc, ar - V.width(acc, 17, true), V.capsTop(row, 17), 17, 0xFFFFFFFF, true);
 			ar -= V.width(acc, 17, true) + 6;
-			V.text(g, "ACCURACY", ar - V.width("ACCURACY", 13, true), V.capsTop(cy + 26, 13), 13, 0xBFFFFFFF, true);
+			V.text(g, "ACCURACY", ar - V.width("ACCURACY", 13, true), V.capsTop(row, 13), 13, 0xBFFFFFFF, true);
 			ar -= V.width("ACCURACY", 13, true) + 14;
-			V.text(g, pow, ar - V.width(pow, 17, true), V.capsTop(cy + 26, 17), 17, 0xFFFFFFFF, true);
+			V.text(g, pow, ar - V.width(pow, 17, true), V.capsTop(row, 17), 17, 0xFFFFFFFF, true);
 			ar -= V.width(pow, 17, true) + 6;
-			V.text(g, "POWER", ar - V.width("POWER", 13, true), V.capsTop(cy + 26, 13), 13, 0xBFFFFFFF, true);
-			List<String> desc = V.wrap(BattleScreen.moveText(m.id()), bw - 40, 17, false);
-			for (int i = 0; i < Math.min(2, desc.size()); i++) V.text(g, desc.get(i), x0 + 20, cy + 14 + 26 + 6 + i * 17 * 1.35F, 17, 0xFFFFFFFF, false);
+			V.text(g, "POWER", ar - V.width("POWER", 13, true), V.capsTop(row, 13), 13, 0xBFFFFFFF, true);
+			List<String> desc = V.wrap(BattleScreen.moveText(m.id()), bw - 44, 17, true);
+			for (int i = 0; i < Math.min(2, desc.size()); i++) V.text(g, desc.get(i), x0 + 22, cy + 2 + 14 + 26 + 6 + i * 17 * 1.35F, 17, 0xFFFFFFFF, true);
 		}
 	}
 

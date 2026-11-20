@@ -196,7 +196,10 @@ public final class Adventure {
 		} else focusRoom = 1;
 		double k = focusIn * focusRoom;
 		double far = room != null ? room.camDist() : distance;
-		double dist = far + (13 - far) * k, pitchDeg = PITCH - 12 * k;
+		// (In, never back: in a small room, where the camera's already near, it only comes in a little, and tips up
+		// less, so it doesn't end up looking at the floor.)
+		double near = room != null ? Math.min(13, far * 0.8) : 13;
+		double dist = far + (near - far) * k, pitchDeg = PITCH - (room != null ? 7 : 12) * k;
 		double[] at = camAt(target, dist, pitchDeg);
 		// Even so, never inside something: pulled in in front of whatever's in the way.
 		if (room == null && focusIn > 0.01 && e.level() != null) {
@@ -234,22 +237,29 @@ public final class Adventure {
 		Vec3 me = mc.player.position();
 		Vec3 look = Vec3.directionFromRotation(0, mc.player.getYRot());
 		dist[0] = 1e9;
+		acrossCounter = false;
 		for (Entity e : mc.level.entitiesForRendering()) {
 			if (!(e instanceof Npc) && !(e instanceof WorldMon) || e.isInvisible()) continue;
 			Vec3 to = e.position().subtract(me).multiply(1, 0, 1);
 			double d = to.length();
-			if (d > 3.5) continue;
 			double facing = d < 1e-3 ? 1 : to.normalize().dot(look);
+			// Someone behind a counter (the nurse, a shop's clerk) you're facing: further, but still to talk to.
+			boolean across = e instanceof Npc && facing > 0.8 && d <= 4.2;
+			if (d > 3.5 && !across) continue;
 			if (facing < 0.35 && d > 1.1) continue;
 			double score = d - facing * 1.5 + (e instanceof WorldMon ? 0.8 : 0);
 			if (score < bestScore) {
 				bestScore = score;
 				best = e;
 				dist[0] = d;
+				acrossCounter = across;
 			}
 		}
 		return best;
 	}
+
+	/** Whether the one you'd talk to is a person right in front of you (across a counter, say): they come before what's between. */
+	private static boolean acrossCounter;
 
 	/** Works out the prompt (each tick): someone to talk to, or the thing in front of you inside. */
 	private static void updatePrompt(Minecraft mc) {
@@ -258,7 +268,7 @@ public final class Adventure {
 		double[] d = new double[1];
 		Entity best = talkTarget(mc, d);
 		com.insidethecube.retromon.game.Interiors.Ahead ahead = com.insidethecube.retromon.game.Interiors.ahead(mc.player);
-		if (ahead != null && ahead.at() != null && (best == null || d[0] > ahead.distance() + 0.35)) {
+		if (ahead != null && ahead.at() != null && (best == null || !acrossCounter && d[0] > ahead.distance() + 0.35)) {
 			prompt = new Prompt(ahead.at(), "Look");
 			return;
 		}
@@ -294,7 +304,7 @@ public final class Adventure {
 		// Inside, the thing in front of you (the TV, a shelf, the fridge) says what it is, unless someone's nearer
 		// in front of it.
 		com.insidethecube.retromon.game.Interiors.Ahead ahead = com.insidethecube.retromon.game.Interiors.ahead(mc.player);
-		if (ahead != null && (best == null || bestDist > ahead.distance() + 0.35)) {
+		if (ahead != null && (best == null || !acrossCounter && bestDist > ahead.distance() + 0.35)) {
 			// A map on the wall (or Daisy's on the table) opens the Town Map; B puts you back in the room.
 			if (ahead.map()) {
 				Sounds.press();

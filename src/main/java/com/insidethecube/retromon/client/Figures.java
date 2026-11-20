@@ -282,7 +282,8 @@ public final class Figures {
 				pose.pushPose();
 				// Depth squeezed a third (each figure's own depth with it, so what's in front stays in front), so a
 				// whole scene fits the picture's depth even on a big screen.
-				pose.translate(f.cx - st.x0(), f.feet - st.y0() - f.hop, f.depth * Z_SQUEEZE);
+				// (Minecraft's picture in picture turns z round: away from you is +z here, so nearer is -depth.)
+				pose.translate(f.cx - st.x0(), f.feet - st.y0() - f.hop, -f.depth * Z_SQUEEZE);
 				pose.scale(1, 1, Z_SQUEEZE);
 				if (f.squash != 1) pose.scale(1 / (float) Math.sqrt(f.squash), f.squash, 1 / (float) Math.sqrt(f.squash));
 				if (f.grow != 1) pose.scale(Math.max(1e-4F, f.grow), Math.max(1e-4F, f.grow), Math.max(1e-4F, f.grow));

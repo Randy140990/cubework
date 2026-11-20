@@ -289,11 +289,18 @@ public final class V {
 
 	/** One of the viewer's pictures (icons, badges, command pictures: 128 by 128) in a box. */
 	public static void icon(GuiGraphics g, String name, float x, float y, float size) {
-		img(g, tex(name), x, y, size, size, 128, 128, 0xFFFFFFFF);
+		icon(g, name, x, y, size, 0xFFFFFFFF);
 	}
 
+	/**
+	 * Drawn small, from a smaller copy of it (64 or 32 across, shrunk smoothly when they were made), so its thin lines
+	 * don't break up as a big picture squeezed small does.
+	 */
 	public static void icon(GuiGraphics g, String name, float x, float y, float size, int tint) {
-		img(g, tex(name), x, y, size, size, 128, 128, tint);
+		float px = s(size) * (float) Math.max(1, net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScale());
+		if (px <= 40) img(g, tex(name + "_m32"), x, y, size, size, 32, 32, tint);
+		else if (px <= 84) img(g, tex(name + "_m64"), x, y, size, size, 64, 64, tint);
+		else img(g, tex(name), x, y, size, size, 128, 128, tint);
 	}
 
 	/** A whole picture (tw by th) into a box on the canvas, tinted (0xFFFFFFFF for none). */
@@ -457,12 +464,38 @@ public final class V {
 		Ui.poly(g, q, colour);
 	}
 
-	/** A line on the canvas, w thick. */
+	/** A line on the canvas, w thick, its sides smooth. */
 	public static void line(GuiGraphics g, float x0, float y0, float x1, float y1, float w, int colour) {
-		float dx = x1 - x0, dy = y1 - y0, l = (float) Math.sqrt(dx * dx + dy * dy);
-		if (l <= 0) return;
-		float nx = -dy / l * w / 2, ny = dx / l * w / 2;
-		poly(g, new float[] {x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny}, colour);
+		Ui.line(g, x(x0), y(y0), x(x1), y(y1), s(w), colour);
+	}
+
+	/** A filled convex shape on the canvas with smooth edges (a soft line of its colour along each side). */
+	public static void polySmooth(GuiGraphics g, float[] pts, int colour) {
+		poly(g, pts, colour);
+		int n = pts.length / 2;
+		float px = 1 / k;
+		for (int i = 0; i < n; i++) {
+			int j = (i + 1) % n;
+			line(g, pts[i * 2], pts[i * 2 + 1], pts[j * 2], pts[j * 2 + 1], px, colour);
+		}
+	}
+
+	/**
+	 * A box with its own radius at each corner (top left, top right, bottom right, bottom left), filled top to
+	 * bottom through stops, its border t thick in edge over its rim (CSS's border over its background), on the canvas.
+	 */
+	public static void shape(GuiGraphics g, float x, float y, float w, float h, float rtl, float rtr, float rbr, float rbl, float[] at, int[] cols, float t, int edge) {
+		Ui.shape(g, x(x), y(y), s(w), s(h), s(rtl), s(rtr), s(rbr), s(rbl), at, cols, s(t), edge);
+	}
+
+	/** As shape, one colour. */
+	public static void shape(GuiGraphics g, float x, float y, float w, float h, float rtl, float rtr, float rbr, float rbl, int fill, float t, int edge) {
+		shape(g, x, y, w, h, rtl, rtr, rbr, rbl, new float[] {0}, new int[] {fill}, t, edge);
+	}
+
+	/** Let's Go's dark glass (the summary's): see-through navy, a pale border 2px round it. */
+	public static void glass(GuiGraphics g, float x, float y, float w, float h, float rtl, float rtr, float rbr, float rbl) {
+		shape(g, x, y, w, h, rtl, rtr, rbr, rbl, 0x6B1C243C, 2, 0x8CFFFFFF);
 	}
 
 	/** Words with an edge round them (the viewer's paint-order stroke), in a component's own font. */

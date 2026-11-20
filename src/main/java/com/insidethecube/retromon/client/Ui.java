@@ -366,31 +366,210 @@ public final class Ui {
 
 	/** A rounded ring (an outline): radius r, t thick, smooth like rr. */
 	public static void ring(GuiGraphics g, float x, float y, float w, float h, float r, float t, int color) {
-		if (w <= 0 || h <= 0 || t <= 0) return;
-		float k = gs();
-		float X = x * k, Y = y * k, W = w * k, H = h * k, R = Math.min(r * k, Math.min(W, H) / 2), T = t * k;
-		float iX = X + T, iY = Y + T, iW = W - 2 * T, iH = H - 2 * T, iR = Math.max(0, R - T);
-		g.pose().pushMatrix();
-		g.pose().scale(1 / k, 1 / k);
-		int midA = (int) Math.ceil(Y + Math.max(R, T)), midB = (int) Math.floor(Y + H - Math.max(R, T));
-		for (int row = (int) Math.floor(Y); row < (int) Math.ceil(Y + H); row++) {
-			if (row >= midA && row < midB) {
-				// The straight sides: one block each (not a row at a time).
-				block(g, midA, midB, X, X + T, color);
-				block(g, midA, midB, X + W - T, X + W, color);
-				row = midB - 1;
-				continue;
-			}
-			float cy = row + 0.5F;
-			float[] o = extent(X, Y, W, H, R, cy);
-			if (o == null) continue;
-			float[] in = iW > 0 && iH > 0 ? extent(iX, iY, iW, iH, iR, cy) : null;
-			if (in == null) span(g, row, o[0], o[1], color);
-			else {
-				span(g, row, o[0], in[0], color);
-				span(g, row, in[1], o[1], color);
+		shape(g, x, y, w, h, r, r, r, r, NONE_AT, NONE, t, color);
+	}
+
+	private static final float[] NONE_AT = {0};
+	private static final int[] NONE = {0};
+
+	// ---------- shapes with their corners from made pictures: smooth every way, a radius of their own each ----------
+
+	/** Discs and rings made at the screen's resolution (radius r, t thick; t 0 a disc), white, kept by size. */
+	private static final java.util.Map<Integer, net.minecraft.resources.Identifier> ROUND = new java.util.HashMap<>();
+
+	/** A white disc (t 0) or ring t thick, radius r (whole screen pixels), 2r across, its edge measured 4 by 4 a pixel. */
+	private static net.minecraft.resources.Identifier round(int r, int t) {
+		r = Math.max(1, Math.min(r, 600));
+		// (t below 0: everything outside the disc, for cutting corners off.)
+		boolean outside = t < 0;
+		t = outside ? 1023 : Math.max(0, Math.min(t, r));
+		int key = r * 1024 + t;
+		net.minecraft.resources.Identifier id = ROUND.get(key);
+		if (id != null) return id;
+		int n = 2 * r;
+		com.mojang.blaze3d.platform.NativeImage img = new com.mojang.blaze3d.platform.NativeImage(n, n, true);
+		float ri = t <= 0 ? -1 : r - t;
+		for (int y = 0; y < n; y++) {
+			for (int x = 0; x < n; x++) {
+				int hit = 0;
+				for (int sy = 0; sy < 4; sy++) {
+					for (int sx = 0; sx < 4; sx++) {
+						float dx = x + (sx + 0.5F) / 4 - r, dy = y + (sy + 0.5F) / 4 - r;
+						float d = (float) Math.sqrt(dx * dx + dy * dy);
+						if (outside ? d > r : d <= r && d >= ri) hit++;
+					}
+				}
+				img.setPixel(x, y, (Math.round(hit * 255 / 16F) << 24) | 0xFFFFFF);
 			}
 		}
+		id = com.insidethecube.retromon.Retromon.id("dynamic/round_" + r + "_" + t);
+		net.minecraft.client.Minecraft.getInstance().getTextureManager().register(id, new net.minecraft.client.renderer.texture.DynamicTexture(() -> "Retromon round", img));
+		ROUND.put(key, id);
+		return id;
+	}
+
+	/** The colour part way down (0 to 1) through stops. */
+	private static int stopAt(float[] at, int[] cols, float f) {
+		if (cols.length == 1 || f <= at[0]) return cols[0];
+		for (int i = 1; i < at.length; i++) if (f <= at[i]) return mix(cols[i - 1], cols[i], (f - at[i - 1]) / Math.max(1e-4F, at[i] - at[i - 1]));
+		return cols[cols.length - 1];
+	}
+
+	/**
+	 * A box with a radius of its own at each corner (top left, top right, bottom right, bottom left), filled top to
+	 * bottom through the stops (cols at the fractions at of its height; all see-through for none), and a border t
+	 * thick in edge over its rim, as CSS draws a border over the background. Snapped to whole screen pixels, its
+	 * corners from made pictures, so they're smooth whichever way you look at them (GUI pixels in).
+	 */
+	public static void shape(GuiGraphics g, float x, float y, float w, float h, float rtl, float rtr, float rbr, float rbl, float[] at, int[] cols, float t, int edge) {
+		if (w <= 0 || h <= 0) return;
+		float k = gs();
+		int X0 = Math.round(x * k), Y0 = Math.round(y * k), X1 = Math.round((x + w) * k), Y1 = Math.round((y + h) * k);
+		int W = X1 - X0, H = Y1 - Y0;
+		if (W <= 0 || H <= 0) return;
+		int lim = Math.min(W, H) / 2;
+		int[] R = {Math.min(lim, Math.round(rtl * k)), Math.min(lim, Math.round(rtr * k)), Math.min(lim, Math.round(rbr * k)), Math.min(lim, Math.round(rbl * k))};
+		int Tk = t <= 0 ? 0 : Math.max(1, Math.round(t * k));
+		boolean fill = false;
+		for (int c : cols) fill |= (c >>> 24) != 0;
+		g.pose().pushMatrix();
+		g.pose().scale(1 / k, 1 / k);
+		if (fill) shapeFill(g, X0, Y0, X1, Y1, R, at, cols);
+		if (Tk > 0 && (edge >>> 24) != 0) shapeRing(g, X0, Y0, X1, Y1, R, Math.min(Tk, lim), edge);
+		g.pose().popMatrix();
+	}
+
+	/** One row of a corner's picture (radius r, t thick) at x: which quarter (0 top left, 1 top right, 2 bottom right, 3 bottom left), v its row. */
+	private static void cornerRow(GuiGraphics g, int r, int t, int corner, int x, int row, int v, int color) {
+		if (r <= 0) return;
+		int u = corner == 1 || corner == 2 ? r : 0;
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, round(r, t), x, row, u, v, r, 1, r, 1, 2 * r, 2 * r, color);
+	}
+
+	private static void shapeFill(GuiGraphics g, int X0, int Y0, int X1, int Y1, int[] R, float[] at, int[] cols) {
+		int H = Y1 - Y0, top = Math.max(R[0], R[1]), bot = Math.max(R[2], R[3]);
+		for (int row = Y0; row < Y1; row++) {
+			int ry = row - Y0;
+			if (ry >= top && ry < H - bot) {
+				// The middle, all the way across, in blocks between the stops.
+				int end = Y1 - bot;
+				int ya = row;
+				for (float a : at) {
+					int yb = Y0 + Math.round(a * H);
+					if (yb > ya && yb < end) {
+						g.fillGradient(X0, ya, X1, yb, stopAt(at, cols, (ya - Y0) / (float) H), stopAt(at, cols, (yb - Y0) / (float) H));
+						ya = yb;
+					}
+				}
+				if (end > ya) g.fillGradient(X0, ya, X1, end, stopAt(at, cols, (ya - Y0) / (float) H), stopAt(at, cols, (end - Y0) / (float) H));
+				row = end - 1;
+				continue;
+			}
+			int c = stopAt(at, cols, (ry + 0.5F) / H);
+			int left = X0, right = X1;
+			if (ry < R[0]) {
+				cornerRow(g, R[0], 0, 0, X0, row, ry, c);
+				left = X0 + R[0];
+			} else if (ry >= H - R[3]) {
+				cornerRow(g, R[3], 0, 3, X0, row, R[3] + ry - (H - R[3]), c);
+				left = X0 + R[3];
+			}
+			if (ry < R[1]) {
+				cornerRow(g, R[1], 0, 1, X1 - R[1], row, ry, c);
+				right = X1 - R[1];
+			} else if (ry >= H - R[2]) {
+				cornerRow(g, R[2], 0, 2, X1 - R[2], row, R[2] + ry - (H - R[2]), c);
+				right = X1 - R[2];
+			}
+			if (right > left) g.fill(left, row, right, row + 1, c);
+		}
+	}
+
+	private static void shapeRing(GuiGraphics g, int X0, int Y0, int X1, int Y1, int[] R, int T, int c) {
+		int H = Y1 - Y0, top = Math.max(T, Math.max(R[0], R[1])), bot = Math.max(T, Math.max(R[2], R[3]));
+		for (int row = Y0; row < Y1; row++) {
+			int ry = row - Y0;
+			if (ry >= top && ry < H - bot) {
+				// The straight sides.
+				int end = Y1 - bot;
+				g.fill(X0, row, X0 + T, end, c);
+				g.fill(X1 - T, row, X1, end, c);
+				row = end - 1;
+				continue;
+			}
+			int left, right;
+			if (ry < R[0]) {
+				cornerRow(g, R[0], T, 0, X0, row, ry, c);
+				left = X0 + R[0];
+			} else if (ry >= H - R[3]) {
+				cornerRow(g, R[3], T, 3, X0, row, R[3] + ry - (H - R[3]), c);
+				left = X0 + R[3];
+			} else {
+				g.fill(X0, row, X0 + T, row + 1, c);
+				left = X0 + T;
+			}
+			if (ry < R[1]) {
+				cornerRow(g, R[1], T, 1, X1 - R[1], row, ry, c);
+				right = X1 - R[1];
+			} else if (ry >= H - R[2]) {
+				cornerRow(g, R[2], T, 2, X1 - R[2], row, R[2] + ry - (H - R[2]), c);
+				right = X1 - R[2];
+			} else {
+				g.fill(X1 - T, row, X1, row + 1, c);
+				right = X1 - T;
+			}
+			// The top and bottom edges, between the corners.
+			if ((ry < T || ry >= H - T) && right > left) g.fill(left, row, right, row + 1, c);
+		}
+	}
+
+	/**
+	 * A box's corners cut round (radius r, GUI pixels): what's outside the curve in each corner painted over in that
+	 * corner's colour (top left, top right, bottom right, bottom left), smooth, for rounding off a picture.
+	 */
+	public static void cornersOut(GuiGraphics g, float x, float y, float w, float h, float r, int[] cols) {
+		float k = gs();
+		int R = Math.max(1, Math.round(r * k));
+		net.minecraft.resources.Identifier id = round(R, -1);
+		float rr = R / k;
+		float[][] at = {{x, y}, {x + w - rr, y}, {x + w - rr, y + h - rr}, {x, y + h - rr}};
+		float[][] uv = {{0, 0.5F, 0, 0.5F}, {0.5F, 1, 0, 0.5F}, {0.5F, 1, 0.5F, 1}, {0, 0.5F, 0.5F, 1}};
+		for (int i = 0; i < 4; i++)
+			blitSmooth(g, id, at[i][0], at[i][1], at[i][0] + rr, at[i][1] + rr, uv[i][0], uv[i][1], uv[i][2], uv[i][3], cols[i]);
+	}
+
+	// ---------- smooth lines: a soft-edged strip turned to lie along them ----------
+
+	/** Strips w wide (in quarter screen pixels) with a pixel's soft edge each side, 64 rows across, kept by width. */
+	private static final java.util.Map<Integer, net.minecraft.resources.Identifier> STRIPS = new java.util.HashMap<>();
+
+	private static net.minecraft.resources.Identifier strip(int q) {
+		net.minecraft.resources.Identifier id = STRIPS.get(q);
+		if (id != null) return id;
+		float w = q / 4F, across = w + 2;
+		com.mojang.blaze3d.platform.NativeImage img = new com.mojang.blaze3d.platform.NativeImage(4, 64, true);
+		for (int y = 0; y < 64; y++) {
+			float yc = (y + 0.5F) / 64 * across;
+			float cover = Math.max(0, Math.min(yc + 0.5F, 1 + w) - Math.max(yc - 0.5F, 1));
+			int a = Math.round(Math.min(1, cover) * 255);
+			for (int x = 0; x < 4; x++) img.setPixel(x, y, (a << 24) | 0xFFFFFF);
+		}
+		id = com.insidethecube.retromon.Retromon.id("dynamic/strip_" + q);
+		net.minecraft.client.Minecraft.getInstance().getTextureManager().register(id, new net.minecraft.client.renderer.texture.DynamicTexture(() -> "Retromon strip", img));
+		STRIPS.put(q, id);
+		return id;
+	}
+
+	/** A smooth line from one point to another (GUI pixels), w thick, its sides soft (a pixel of the screen). */
+	public static void line(GuiGraphics g, float x0, float y0, float x1, float y1, float w, int color) {
+		float k = gs(), dx = x1 - x0, dy = y1 - y0, len = (float) Math.sqrt(dx * dx + dy * dy);
+		if (len <= 1e-3F || w <= 0) return;
+		int q = Math.max(1, Math.round(w * k * 4));
+		float across = (q / 4F + 2) / k;
+		g.pose().pushMatrix();
+		g.pose().translate(x0, y0);
+		g.pose().rotate((float) Math.atan2(dy, dx));
+		blitSmooth(g, strip(q), 0, -across / 2, len, across / 2, 0, 1, 0, 1, color);
 		g.pose().popMatrix();
 	}
 
@@ -598,6 +777,8 @@ public final class Ui {
 	/** A soft round glow (a light behind something), built up from see-through rounded boxes. */
 	private static final net.minecraft.resources.Identifier GLOW = com.insidethecube.retromon.Retromon.id("textures/gui/shape/glow.png");
 	public static final net.minecraft.resources.Identifier SHADOW = com.insidethecube.retromon.Retromon.id("textures/gui/shape/shadow.png");
+	/** A soft-edged dark ellipse (its half-way edge at 0.6 of the picture's half): shadows on the ground. */
+	public static final net.minecraft.resources.Identifier BLOB = com.insidethecube.retromon.Retromon.id("textures/gui/shape/blob.png");
 
 	/** A glow: light falling off smoothly from the middle out to rx, ry (the colour's see-through at the middle, a little stronger). */
 	public static void glow(GuiGraphics g, int cx, int cy, int rx, int ry, int color) {

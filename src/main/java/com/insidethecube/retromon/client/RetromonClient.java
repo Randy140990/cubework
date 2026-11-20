@@ -16,6 +16,9 @@ import net.minecraft.network.chat.Component;
 
 /** Retromon on your screen: the camera, the keys, the people and Pokémon, the screens, the music and the title button. */
 public class RetromonClient implements ClientModInitializer {
+	/** When you last came into a world (ms), so Minecraft's pause menu opening as it loads can be closed. */
+	private static long joinedAt;
+
 	@Override
 	public void onInitializeClient() {
 		EntityRendererRegistry.register(Retromon.NPC, NpcRenderer::new);
@@ -57,7 +60,10 @@ public class RetromonClient implements ClientModInitializer {
 			if (renderer instanceof net.minecraft.client.renderer.entity.player.AvatarRenderer<?> avatar) helper.register(new GearLayer<>(avatar));
 		});
 		// Into the world: it fades in from black (the loading screen's black), not all at once.
-		ClientPlayConnectionEvents.JOIN.register((handler, sender, mc) -> Hud.arrive());
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, mc) -> {
+			joinedAt = System.currentTimeMillis();
+			Hud.arrive();
+		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> {
 			SlotSnapshot.leaving(mc);
 			TownMap.leaving();
@@ -66,6 +72,14 @@ public class RetromonClient implements ClientModInitializer {
 			BattleScene.end();
 			Music.stop();
 			mc.execute(Shaders::leave);
+		});
+		// Just into the world, Minecraft's own pause menu (it opens when the window wasn't in front as the world
+		// loaded) is closed again: you're in the game, not paused.
+		ScreenEvents.AFTER_INIT.register((client, screen, w, h) -> {
+			if (screen instanceof net.minecraft.client.gui.screens.PauseScreen && System.currentTimeMillis() - joinedAt < 8000 && client.level != null)
+				client.execute(() -> {
+					if (client.screen == screen) client.setScreen(null);
+				});
 		});
 		// Retromon on the title screen, top left (clear of the menu and other mods' buttons).
 		ScreenEvents.AFTER_INIT.register((client, screen, w, h) -> {

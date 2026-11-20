@@ -41,6 +41,7 @@ public final class Sounds {
 
 	public static void tick() {
 		now++;
+		voiceTick();
 		Iterator<Note> it = QUEUE.iterator();
 		while (it.hasNext()) {
 			Note n = it.next();
@@ -58,18 +59,46 @@ public final class Sounds {
 
 	private static SoundInstance voice;
 
-	/** The Pokédex reads a Pokémon's entry aloud (if that's on in OPTION). */
+	/** The entry waiting to be read (once the music's down), and ticks it's waited. */
+	private static String voiceNext;
+	private static int voiceWait;
+
+	/**
+	 * The Pokédex reads a Pokémon's entry aloud (if that's on in OPTION): the music goes down first (about a
+	 * second), then the voice, and the music comes back up once it's done.
+	 */
 	public static void dexVoice(String species) {
 		stopVoice();
 		if (species == null || species.isEmpty() || !Settings.voice()) return;
-		voice = new SimpleSoundInstance(Retromon.id("dex." + species), SoundSource.NEUTRAL, 1F, 1F, RandomSource.create(), false, 0,
-				SoundInstance.Attenuation.NONE, 0, 0, 0, true);
-		Minecraft.getInstance().getSoundManager().play(voice);
+		Music.duck(true);
+		voiceNext = species;
+		voiceWait = 0;
+	}
+
+	private static void voiceTick() {
+		Minecraft mc = Minecraft.getInstance();
+		if (voiceNext != null) {
+			if (Music.ducked() || ++voiceWait > 26) {
+				voice = new SimpleSoundInstance(Retromon.id("dex." + voiceNext), SoundSource.NEUTRAL, 1F, 1F, RandomSource.create(), false, 0,
+						SoundInstance.Attenuation.NONE, 0, 0, 0, true);
+				voiceNext = null;
+				mc.getSoundManager().play(voice);
+				voiceWait = 0;
+			}
+			return;
+		}
+		// (A few ticks' grace: a sound isn't active the moment it's played.)
+		if (voice != null && !mc.getSoundManager().isActive(voice) && ++voiceWait > 6) {
+			voice = null;
+			Music.duck(false);
+		}
 	}
 
 	public static void stopVoice() {
 		if (voice != null) Minecraft.getInstance().getSoundManager().stop(voice);
 		voice = null;
+		voiceNext = null;
+		Music.duck(false);
 	}
 
 	public static void cry(String species, float pitch) {

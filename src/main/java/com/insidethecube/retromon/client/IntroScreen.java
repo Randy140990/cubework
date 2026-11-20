@@ -713,7 +713,7 @@ public class IntroScreen extends GameScreen {
 		Scenes.bg2(g, "keys");
 		V.panel(g, 180, 100, 640, 470);
 		V.title(g, Lang.t("These are your keys"), 220, V.capsTop(100 + 34 + 27, 36), 36, V.INK);
-		String[][] rows = {{"W A S D", "Walk"}, {"SPACE", "Talk, look, choose"}, {"E", "Open the menu (as Minecraft's inventory)"}, {"TAB", "Speed up"}, {"Q X", "Back"}};
+		String[][] rows = {{"W A S D", "Walk"}, {"SPACE", "Talk, look, choose"}, {"E", "Open the menu"}, {"TAB", "Speed up"}, {"Q X", "Back"}};
 		float[] widths = {0, 120, 0, 64, 0};
 		float y = 100 + 34 + 54 + 20;
 		for (int r = 0; r < rows.length; r++) {

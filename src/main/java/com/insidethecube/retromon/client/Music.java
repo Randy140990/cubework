@@ -76,8 +76,37 @@ public final class Music {
 	}
 
 	private static SoundInstance sound(String id, boolean loop) {
-		return new SimpleSoundInstance(Retromon.id("music." + id), SOURCE, volume(), 1.0F, RandomSource.create(), loop, 0,
-				SoundInstance.Attenuation.NONE, 0, 0, 0, true);
+		return new Song(Retromon.id("music." + id), loop);
+	}
+
+	/** How loud the music is let play (1 normally; down to a fifth while the Pokédex reads an entry out), and where it's going. */
+	private static float duck = 1, duckTo = 1;
+
+	/** Turns the music down (a fifth) or back up again, over about a second. */
+	public static void duck(boolean down) {
+		duckTo = down ? 0.2F : 1;
+	}
+
+	/** Whether the music's all the way down for a voice to be heard over it. */
+	public static boolean ducked() {
+		return duck <= 0.25F;
+	}
+
+	/** A song: its volume follows the music's volume and the ducking as it plays (Minecraft asks it each tick). */
+	private static final class Song extends net.minecraft.client.resources.sounds.AbstractTickableSoundInstance {
+		Song(Identifier id, boolean loop) {
+			super(net.minecraft.sounds.SoundEvent.createVariableRangeEvent(id), SOURCE, RandomSource.create());
+			this.looping = loop;
+			this.delay = 0;
+			this.attenuation = SoundInstance.Attenuation.NONE;
+			this.relative = true;
+			this.volume = volume() * duck;
+		}
+
+		@Override
+		public void tick() {
+			volume = volume() * duck;
+		}
 	}
 
 	/** Plays a song (from its intro, if it has one), replacing what's playing. */
@@ -148,6 +177,8 @@ public final class Music {
 	}
 
 	public static void tick(Minecraft mc) {
+		// Ducking eases there and back over about a second.
+		if (duck != duckTo) duck = duck < duckTo ? Math.min(duckTo, duck + 0.045F) : Math.max(duckTo, duck - 0.045F);
 		if (mc.level == null && !(mc.screen instanceof IntroScreen)) {
 			if (current != null || jingle != null) {
 				stop();

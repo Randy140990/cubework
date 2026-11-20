@@ -419,12 +419,9 @@ public class TownMapScreen extends DeviceScreen {
 		Ui.tris(g, xy, cs);
 	}
 
-	/** Rounds a box's corners off (canvas), painting outside radius r in each corner's colour (tl, tr, br, bl), out to r + spread. */
+	/** Rounds a box's corners off (canvas), painting outside radius r in each corner's colour (tl, tr, br, bl), smoothly. */
 	private static void corners(GuiGraphics g, float x, float y, float w, float h, float r, float spread, int[] cols) {
-		float k = V.s(1);
-		float[][] c = {{x + r, y + r}, {x + w - r, y + r}, {x + w - r, y + h - r}, {x + r, y + h - r}};
-		double[] a = {Math.PI, -Math.PI / 2, 0, Math.PI / 2};
-		for (int i = 0; i < 4; i++) arc(g, V.x(c[i][0]), V.y(c[i][1]), r * k, (r + spread) * k, a[i], a[i] + Math.PI / 2, cols[i]);
+		Ui.cornersOut(g, V.x(x), V.y(y), V.s(w), V.s(h), V.s(r), cols);
 	}
 
 	/** A rounded square with its edge drawn over the line (the viewer's fill then stroke). */
@@ -721,10 +718,7 @@ public class TownMapScreen extends DeviceScreen {
 			worldCut(g, p.x() - gw / 2.0 / k, p.z() - gh / 2.0 / k, gw, gh, k, gx, gy);
 		}
 		// Its corners rounded off in white (the rim round it, and the panel behind).
-		float kk = V.s(1);
-		float[][] cc = {{picX + 18, picY + 18}, {picX + pw - 18, picY + 18}, {picX + pw - 18, picY + ph - 18}, {picX + 18, picY + ph - 18}};
-		double[] an = {Math.PI, -Math.PI / 2, 0, Math.PI / 2};
-		for (int i = 0; i < 4; i++) arc(g, V.x(cc[i][0]), V.y(cc[i][1]), 18 * kk, 27 * kk, an[i], an[i] + Math.PI / 2, 0xFFFFFFFF);
+		Ui.cornersOut(g, V.x(picX), V.y(picY), V.s(pw), V.s(ph), V.s(18), new int[] {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF});
 		if (pic == null) {
 			String t = "PICTURE TO COME";
 			float tw = V.trackedWidth(t, 11.5F, 1) + 20, th = 11.5F * 1.36F + 6;

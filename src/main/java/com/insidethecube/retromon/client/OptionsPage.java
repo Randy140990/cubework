@@ -116,7 +116,8 @@ public final class OptionsPage {
 		float ty = 40 + (96 - Math.min(2, dl.size()) * 22 * 1.45F) / 2;
 		for (int i = 0; i < Math.min(2, dl.size()); i++) V.text(g, dl.get(i), 170 + 30, ty + i * 22 * 1.45F + 2, 22, V.INK, false);
 		// The rows: 44 tall (40 with this many), ruled apart, in a panel 18 in.
-		float rh = n > 10 ? 40 : 44, top = 160;
+		// (Short enough that its foot stays clear of the key buttons along the bottom: 18px over them at least.)
+		float top = 156, rh = Math.min(44, (720 - 14 - 40 - 18 - top - 36) / n);
 		V.panel(g, 170, top, 940, n * rh + 36);
 		int[] now = now();
 		for (int r = 0; r < n; r++) {

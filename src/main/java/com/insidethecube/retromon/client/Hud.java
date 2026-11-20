@@ -71,7 +71,13 @@ public final class Hud {
 		fade = fadeLen;
 		atDark = then;
 		afterFade = after;
+		doorLevel = Minecraft.getInstance().level;
+		doorHold = 0;
 	}
+
+	/** The level a door's iris began in (an interior is a level of its own), and ticks to stay black once it's changed. */
+	private static Object doorLevel;
+	private static int doorHold;
 
 	public static void tick(Minecraft mc) {
 		cineOld = cine;
@@ -80,7 +86,23 @@ public final class Hud {
 						|| mc.screen == null && Adventure.frozen > 0);
 		cine += ((want ? 1 : 0) - cine) * (want ? 0.14F : 0.2F);
 		if (Math.abs(cine - (want ? 1 : 0)) < 0.01F) cine = want ? 1 : 0;
-		if (fade > 0) {
+		boolean hold = false;
+		if (fade > 0 && fadeWords.isEmpty()) {
+			// Through a door into another level (an interior): the iris stays shut while Minecraft's loading screen
+			// is up and a moment after you're in (so the room's there), then opens round you; if the change came
+			// after it began to open, it shuts again first.
+			if (mc.level != doorLevel) {
+				if (doorLevel != null && fadeLen - fade > 11) fade = Math.max(fade, fadeLen - 13);
+				doorHold = 6;
+				doorLevel = mc.level;
+			}
+			boolean loading = mc.level == null || mc.screen != null && !(mc.screen instanceof GameScreen) && !(mc.screen instanceof net.minecraft.client.gui.screens.PauseScreen);
+			if (fadeLen - fade >= 13 && (loading || doorHold > 0)) {
+				hold = true;
+				if (!loading) doorHold--;
+			}
+		}
+		if (fade > 0 && !hold) {
 			fade--;
 			if (fade == fadeLen / 2 && atDark != null) {
 				atDark.run();
@@ -320,8 +342,8 @@ public final class Hud {
 	private static final double LAB_DOOR_X = -782.5, LAB_DOOR_Z = 695.6;
 
 	/**
-	 * The place's name, as the UI Viewer's banner: a deep teal band sliding in from the left with mint lines above
-	 * and below, the name large and the town's line from its sign under it; then away.
+	 * The place's name, as the UI Viewer's banner: the place pill drawn big in the middle near the top (a pearly-rimmed
+	 * white pill, the sunny dot, the name, the town's line in coral under it), popping up, then fading away.
 	 */
 	private static void place(GuiGraphics g, DeltaTracker delta) {
 		Minecraft mc = Minecraft.getInstance();
@@ -329,18 +351,34 @@ public final class Hud {
 		if (!Adventure.active() || BattleScene.active() || t < 0 || t > 90 || ClientState.placeName.isEmpty() || mc.screen != null && !(mc.screen instanceof GameScreen)) return;
 		V.fit(g.guiWidth(), g.guiHeight());
 		float f = t + delta.getGameTimeDeltaPartialTick(true);
-		float in = Math.min(1, f / 10F), e = 1 - (1 - in) * (1 - in) * (1 - in), out = f > 64 ? Math.min(1, (f - 64) / 12F) : 0;
-		float slide = (1 - e) * -60 - out * 60, alpha = Math.min(in * 1.4F, 1) * (1 - out);
+		float in = Math.min(1, f / 8F), out = f > 64 ? Math.min(1, (f - 64) / 12F) : 0, alpha = in * (1 - out);
+		// The viewer's pop: from a little small, overshooting a touch, settling.
+		float k = in >= 1 ? 1 : 0.86F + 0.14F * (1 + 2.2F * (in - 1) * (in - 1) * (in - 1) + 1.2F * (in - 1) * (in - 1) * (in - 1) * (in - 1));
 		String name = ClientState.placeName, line = Adventure.signLine(name);
-		float h = 6 + 20 + 54 * 1.5F + (line.isEmpty() ? 0 : 21 * 1.5F) + 22, x = -V.ox / V.k + slide, w = 780 + V.ox / V.k, y = 210;
-		// The band: white, solid to 58% and fading out to the right, a sunny stripe along its top, a soft shadow.
-		float solid = w * 0.58F;
-		hband(g, x, y + h, w, 14, Ui.alpha(0x1E1E2854, alpha));
-		g.fill(Math.round(V.x(x)), Math.round(V.y(y)), Math.round(V.x(x + solid)), Math.round(V.y(y + h)), Ui.alpha(0xFFFFFFFF, alpha));
-		hband(g, x + solid, y, w - solid, h, Ui.alpha(0xFFFFFFFF, alpha));
-		hband(g, x, y, w, 6, Ui.alpha(0xFFFFC93C, alpha));
-		V.titleTracked(g, name, x + V.ox / V.k + 60, V.capsTop(y + 6 + 20 + 54 * 0.75F, 54), 54, Ui.alpha(V.INK, alpha), 4);
-		if (!line.isEmpty()) V.text(g, Lang.t(line), x + V.ox / V.k + 60, V.capsTop(y + 6 + 20 + 54 * 1.5F + 21 * 0.75F, 21), 21, Ui.alpha(0xFFE5525C, alpha), false);
+		line = line.isEmpty() ? "" : Lang.t(line);
+		float nw = V.titleTrackedWidth(name, 48, 3), lw = line.isEmpty() ? 0 : V.width(line, 20, true);
+		float w = 3 + 26 + 30 + 18 + Math.max(nw, lw) + 40 + 3, h = 3 + 18 + 48 * 1.1F + (line.isEmpty() ? 0 : 20 * 1.36F) + 20 + 3, x = 640 - w / 2, y = 150;
+		if (alpha <= 0.05F) return;
+		g.pose().pushMatrix();
+		float cx = V.x(640), cy = V.y(y + h / 2);
+		g.pose().translate(cx, cy);
+		g.pose().scale(k, k);
+		g.pose().translate(-cx, -cy);
+		// The g-panel (its shadow, the pearly rim, white to #F7F9FF), each colour faded with it.
+		float r = h / 2;
+		V.softShadow(g, x, y + 12, w, h, 30, Ui.alpha(0x381E2854, alpha));
+		int[] holo = new int[V.HOLO.length];
+		for (int i = 0; i < holo.length; i++) holo[i] = Ui.alpha(V.HOLO[i], alpha);
+		V.rrh(g, x, y, w, h, r, V.HOLO_AT, holo);
+		V.rrv(g, x + 3, y + 3, w - 6, h - 6, r - 3, Ui.alpha(0xFFFFFFFF, alpha), Ui.alpha(0xFFF7F9FF, alpha));
+		float dx = x + 3 + 26 + 15, dy = y + h / 2;
+		V.ellipse(g, dx, dy, 20, 20, Ui.alpha(0xFFFFE9A0, alpha));
+		V.ellipse(g, dx, dy, 15, 15, Ui.alpha(0xFFFFC93C, alpha));
+		V.ellipse(g, dx - 3.5F, dy - 3.5F, 8, 8, Ui.alpha(0xCCFFF3A6, alpha));
+		float tx = x + 3 + 26 + 30 + 18, ty = y + 3 + 18;
+		V.titleTracked(g, name, tx, V.capsTop(ty + 48 * 0.55F, 48), 48, Ui.alpha(V.INK, alpha), 3);
+		if (!line.isEmpty()) V.text(g, line, tx, V.capsTop(ty + 48 * 1.1F + 20 * 0.68F, 20), 20, Ui.alpha(0xFFE5525C, alpha), true);
+		g.pose().popMatrix();
 	}
 
 	/** A strip fading out to the right (canvas pixels). */
