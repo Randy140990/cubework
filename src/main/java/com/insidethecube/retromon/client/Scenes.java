@@ -215,6 +215,167 @@ public final class Scenes {
 		b.draw(g);
 	}
 
+	/** A signed-off screen's backdrop (textures/gui/v/bg2_<id>.png, baked from the UI Viewer), covering the whole window. */
+	public static void bg2(GuiGraphics g, String id) {
+		cover(g, V.tex("bg2_" + id), 640, 360);
+	}
+
+	/** A creature's own backdrop (its first type's swirl, embers, bubbles...): mid true for the middle-centred one. */
+	public static void typeBg(GuiGraphics g, com.insidethecube.retromon.engine.Type t, boolean mid) {
+		String n = t == null ? "normal" : t.name().toLowerCase(java.util.Locale.ROOT);
+		if (n.equals("curse")) n = "ghost";
+		cover(g, V.tex("bgt_" + n + (mid ? "_mid" : "")), 640, 360);
+	}
+
+	/** A 16:9 picture over the whole window, cut at the sides or the top and bottom rather than stretched. */
+	public static void cover(GuiGraphics g, Identifier id, int tw, int th) {
+		float wx = -V.ox / V.k, wy = -V.oy / V.k, ww = V.gw / V.k, wh = V.gh / V.k;
+		float sc = Math.max(ww / V.W, wh / V.H), w = V.W * sc, h = V.H * sc;
+		V.img(g, id, wx + (ww - w) / 2, wy + (wh - h) / 2, w, h, tw, th, 0xFFFFFFFF);
+	}
+
+	/**
+	 * The professor's opening, as the viewer's (signed off 20 Nov): him on a long pale floor of light with our
+	 * creatures about him; then, as Let's Go's, he sets off to the right as he talks, the camera going with him past a
+	 * whole parade of POKéMON (big ones at the back, little ones near), each turning to watch him go; the little
+	 * yellow one trots at his side, the bone-helmet one follows behind and the bird flies over his shoulder. At the far
+	 * end he stops, turns to you, and the camera comes in close. Mode intro, rival (his grandson beside him) or you.
+	 */
+	public static final class ProfWalk {
+		private static final Object[][] SPOTS = {{"pikachu", -0.85, 0.95, 0.35, 0.0}, {"cubone", -1.8, 0.35, 0.55, 0.0}, {"oddish", 0.55, 1.35, -0.1, 0.0},
+				{"clefairy", -1.3, 1.55, 0.2, 0.0}, {"pidgey", -1.45, -0.55, 0.4, 1.55}};
+		private static final String[] PARADE = {"growlithe", "exeggutor", "psyduck", "ponyta", "jigglypuff", "onix", "meowth", "machoke", "vulpix", "snorlax", "butterfree",
+				"nidoking", "eevee", "lapras", "pidgeot"};
+		public String mode = "intro";
+		public boolean talking, walking, hurry, done;
+		public float walkX, turnT, wave, youWave, floss, lookUp;
+		private float camX = Float.NaN, t;
+		private final double[][] walkers = new double[5][];
+		private float nextCry = 2, cryAt = -9;
+		private int crier = -1;
+		private final java.util.Random rnd = new java.util.Random();
+		private final float end = 3.8F + (PARADE.length - 1) * 1.15F + 1.4F;
+
+		public void startWalk() {
+			walking = true;
+		}
+
+		public void stopWalk() {
+			walking = true;
+			hurry = true;
+		}
+
+		public boolean arrived() {
+			return done && turnT >= 1;
+		}
+
+		/** Moves it all on by dt seconds. */
+		public void tick(float dt) {
+			t += dt;
+			if (walking && !done) {
+				walkX = Math.min(end, walkX + dt * (hurry ? 3.2F : 1.25F));
+				if (walkX >= end) {
+					done = true;
+					turnT = 0;
+				}
+			}
+			if (done) turnT = Math.min(1, turnT + dt * 2.2F);
+			if (walking) camX = Float.isNaN(camX) ? walkX : camX + (walkX + 0.4F - camX) * Math.min(1, dt * 2.5F);
+			nextCry -= dt;
+			if (nextCry < 0) {
+				crier = rnd.nextInt(SPOTS.length + (mode.equals("intro") ? PARADE.length : 0));
+				cryAt = t;
+				nextCry = 2 + rnd.nextFloat() * 2;
+			}
+		}
+
+		public void draw(GuiGraphics g, Identifier you) {
+			bg2(g, "prof");
+			Cam cam;
+			if (mode.equals("you")) cam = new Cam().look(0.75, 1.45, 5.6, 0.75, 1.05, 0.3);
+			else if (walking && !Float.isNaN(camX)) {
+				float close = done ? turnT * turnT * (3 - 2 * turnT) : 0;
+				cam = new Cam().look(camX - 0.2 * close, 2.35 - 0.55 * close, 6.6 - 2.1 * close, camX, 0.62 + 0.25 * close, 0.3);
+			} else {
+				double x = mode.equals("intro") ? -0.3 : 0.2;
+				cam = new Cam().look(x, 2.35, 6.6, x, 0.62, 0.3);
+			}
+			// The long floor of light (40 by 9 blocks, its middle at x 8), and the bright disc where he starts.
+			for (int i = 0; i < 24; i++) {
+				double z0 = -4.3 + i * 9.0 / 24, z1 = z0 + 9.0 / 24;
+				float[] a = cam.at(-12, 0, z1), b = cam.at(28, 0, z1), c = cam.at(-12, 0, z0);
+				V.rr(g, a[0], c[1], b[0] - a[0], Math.max(1, a[1] - c[1]) + 0.5F, 0, 0x80DFF6F4);
+			}
+			disc(g, cam, 0, 0.005, 0, 2.0, 0x73FFFFFF);
+			Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
+			float px = walking ? walkX : 0;
+			double yaw = Math.PI;
+			if (walking && !done) yaw = -Math.PI / 2 - 0.55;
+			else if (done) {
+				float e = turnT * turnT * (3 - 2 * turnT);
+				yaw = (-Math.PI / 2 - 0.55) + (-Math.PI - (-Math.PI / 2 - 0.55)) * e;
+			}
+			blob(g, cam, px, 0, 0.45, 200);
+			Figures.Fig oak = place(b, cam, OAK, null, px, 0, 0, yaw, t);
+			if (walking && !done) oak.walk(1);
+			if (talking) oak.talk(0.85F);
+			if (wave > 0) oak.wave(wave);
+			if (mode.equals("rival")) {
+				blob(g, cam, 1.45, 0.45, 0.45, 200);
+				place(b, cam, RIVAL, null, 1.45, 0, 0.45, Math.PI - 0.25, t).look((float) Math.toDegrees(Math.sin(t * 0.7) * 0.2));
+			} else if (mode.equals("you") && you != null) {
+				blob(g, cam, 1.25, 0.6, 0.45, 200);
+				Figures.Fig y = place(b, cam, you, null, 1.25, 0, 0.6, Math.PI + 0.12, t).floss(floss).lookUp(lookUp);
+				if (youWave > 0) y.wave(youWave);
+			}
+			for (int i = 0; i < SPOTS.length; i++) {
+				String sid = (String) SPOTS[i][0];
+				double x = (double) SPOTS[i][1], z = (double) SPOTS[i][2], turn = (double) SPOTS[i][3], fly = (double) SPOTS[i][4];
+				double mx = x, my = fly > 0 ? fly + Math.sin(t * 2.2) * 0.12 : 0, mz = z, myaw = Math.PI + turn + Math.sin(t * 0.4 + x) * 0.15;
+				String pose = fly > 0 ? "fly" : null;
+				int with = sid.equals("pikachu") ? 0 : sid.equals("cubone") ? 1 : sid.equals("pidgey") ? 2 : -1;
+				if (walking && with >= 0) {
+					double[][] off = {{0.85, 0.75, 0}, {-1.0, -0.45, 0}, {-0.4, -0.6, 1.7}};
+					double tx = px + off[with][0], tz = off[with][1];
+					if (walkers[i] == null) walkers[i] = new double[] {x, z};
+					walkers[i][0] += (tx - walkers[i][0]) * Math.min(1, 0.05 * 3);
+					walkers[i][1] += (tz - walkers[i][1]) * Math.min(1, 0.05 * 3);
+					boolean moving = !done || Math.abs(tx - walkers[i][0]) > 0.05;
+					mx = walkers[i][0];
+					mz = walkers[i][1];
+					myaw = moving ? -Math.PI / 2 - 0.25 : Math.PI + (sid.equals("pikachu") ? -0.4 : 0.3);
+					my = off[with][2] > 0 ? off[with][2] + Math.sin(t * 2.4) * 0.12 : 0;
+					pose = off[with][2] > 0 ? "fly" : moving ? "walk" : null;
+				} else if (sid.equals("cubone")) {
+					double a = t * 0.35;
+					mx = Math.cos(a) * 2.55;
+					mz = 0.35 + Math.sin(a) * 2.25;
+					myaw = Math.atan2(Math.sin(a) * 2.55, -Math.cos(a) * 2.25);
+					pose = "walk";
+				}
+				if (my < 0.3) blob(g, cam, mx, mz, 0.32, 180);
+				Figures.Fig f = place(b, cam, null, sid, mx, my, mz, myaw, t + i * 0.7F).pose(pose);
+				if (i == crier && t - cryAt < 1.2F && !(walking && sid.equals("pikachu"))) f.action("cry", t - cryAt);
+			}
+			if (mode.equals("intro")) {
+				for (int i = 0; i < PARADE.length; i++) {
+					String sid = PARADE[i];
+					BedrockModel.Def def = BedrockModel.def(sid);
+					if (def == null) continue;
+					double h = Math.max(0.3, def.height), big = h > 2.2 ? 2.2 / h : 1, x = 3.8 + i * 1.15, row = new double[] {1.4, -1.35, -2.4}[i % 3];
+					boolean flyer = sid.equals("butterfree") || sid.equals("pidgeot");
+					double hh = h * big, z = flyer ? -0.9 : hh > 1.3 ? -2.4 : hh > 0.9 && row > 0 ? -1.35 : row, fly = flyer ? 1.5 + Math.sin(t * 2.1 + x) * 0.14 : 0;
+					double look = walking ? Math.max(-0.6, Math.min(0.6, (px - x) * 0.4)) : 0;
+					if (!flyer) blob(g, cam, x, z, 0.32 * Math.max(1, hh), 160);
+					Figures.Fig f = place(b, cam, null, sid, x, fly, z, Math.PI + (i % 3 - 1) * 0.35 - look, t + i * 0.37F).pose(flyer ? "fly" : null);
+					if (big < 1) f.perBlock(f.perBlock * (float) big);
+					if (SPOTS.length + i == crier && t - cryAt < 1.2F) f.action("cry", t - cryAt);
+				}
+			}
+			b.draw(g);
+		}
+	}
+
 	// ---------- you on a stand ----------
 
 	/**

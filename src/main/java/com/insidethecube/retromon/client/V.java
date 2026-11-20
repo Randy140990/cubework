@@ -546,6 +546,22 @@ public final class V {
 		}
 	}
 
+	/** The big buttons at the right (the viewer's actions(..., {right: true})): right px in from the right edge. */
+	public static void actsRight(GuiGraphics g, float bottom, float right, int on, String... pairs) {
+		int n = pairs.length / 2;
+		float[] ws = new float[n];
+		float total = 0;
+		for (int i = 0; i < n; i++) {
+			ws[i] = Math.max(230, 10 + 40 + 12 + titleWidth(Lang.t(pairs[i * 2 + 1]), 24) + 12 + 16 + 26);
+			total += ws[i] + (i > 0 ? 18 : 0);
+		}
+		float x = W - right - total;
+		for (int i = 0; i < n; i++) {
+			act(g, x, H - bottom - 62, ws[i], pairs[i * 2], Lang.t(pairs[i * 2 + 1]), i == on);
+			x += ws[i] + 18;
+		}
+	}
+
 	/** One big button at x, y (62 tall). */
 	public static void act(GuiGraphics g, float x, float y, float w, String key, String words, boolean on) {
 		boolean go = "A".equals(key);

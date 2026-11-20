@@ -153,6 +153,23 @@ public final class Outfit {
 		}
 	}
 
+	/** Skins made for looks other than yours (the maker's starting faces), by name, made once each. */
+	private static final java.util.Map<String, Identifier> LOOKS = new java.util.HashMap<>();
+
+	/** A skin for any look (not the hero's), registered as dynamic/look_<key>; null if it couldn't be made. */
+	public static Identifier skinFor(String key, Outfit o) {
+		return LOOKS.computeIfAbsent(key + ":" + o.write(), k -> {
+			try {
+				Identifier id = Retromon.id("dynamic/look_" + key.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9_]", "_"));
+				Minecraft.getInstance().getTextureManager().register(id, new DynamicTexture(() -> "Retromon look", o.compose()));
+				return id;
+			} catch (Exception e) {
+				Retromon.LOG.warn("Couldn't make a look: {}", e.toString());
+				return null;
+			}
+		});
+	}
+
 	private NativeImage compose() throws Exception {
 		NativeImage out = new NativeImage(64, 64, true);
 		int skin = SKIN_RGB[Math.floorMod(get("skin"), SKIN_RGB.length)];

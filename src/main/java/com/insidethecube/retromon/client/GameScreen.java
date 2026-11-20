@@ -61,10 +61,12 @@ public abstract class GameScreen extends Screen {
 		my = mouseY;
 		hits.clear();
 		V.HINTS.clear();
+		V.ACTS.clear();
 		V.fit(width, height);
 		draw(g, partial);
-		// The key hints work as buttons too (SPACE, ESC, TAB...).
+		// The key hints work as buttons too (SPACE, ESC, TAB...), and so do the big Back and Continue.
 		for (V.Hint h : List.copyOf(V.HINTS)) vhit(h.x(), h.y(), h.w(), h.h(), () -> pressHint(h.key()));
+		for (V.Hint h : List.copyOf(V.ACTS)) vhit(h.x(), h.y(), h.w(), h.h(), () -> pressHint(h.key()));
 		// Widgets (the nickname box).
 		super.render(g, mouseX, mouseY, partial);
 	}
@@ -343,6 +345,11 @@ public abstract class GameScreen extends Screen {
 
 		public boolean typedOut() {
 			return typed >= length();
+		}
+
+		/** Every page shown and pressed past. */
+		public boolean finished() {
+			return laidOut >= 0 && page >= pages.size();
 		}
 
 		public boolean atEnd() {

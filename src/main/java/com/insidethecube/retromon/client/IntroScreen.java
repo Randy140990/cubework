@@ -30,17 +30,18 @@ import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * The game's start, as the handheld games had it. The title: the pixel Charizard against the night sky,
- * RETROMON, PRESS START. Then CONTINUE (your save slots) or NEW GAME: Professor Oak's welcome, boy or girl,
- * your name and your rival's, and then the Kanto map (from the Kanto map mod, Retromon's second jar) is
- * copied as a new save slot and you're off to Pallet Town.
+ * The game's start, as the UI Viewer has it (signed off by John, 20 Nov). INSID3 TH3 CUB3 presents; the painted
+ * title (our look) or the pixel Charizard (Cobblemon's); your saves as cards with OPTIONS under them; the keys;
+ * the professor walking past a parade of POKéMON as he talks, his words on a dark band at the foot; the maker (a
+ * starting face for every skin tone, then the glass panel); your name; your rival's; off you go (you floss); and
+ * then the Kanto map (from Retromon Map, the second jar) is copied as a new save slot and you're off to Pallet Town.
  */
 public class IntroScreen extends GameScreen {
 	private static final Identifier ART = Retromon.id("textures/gui/intro.png");
 	private static final int ART_W = 480, ART_H = 270;
 
 	private enum Step {
-		OPENING, TITLE, MENU, SLOTS, KEYS, TALK, MAKER, NAME, COPYING, FAILED
+		OPENING, TITLE, MENU, SLOTS, OPTIONS, KEYS, TALK, MAKER, NAME, COPYING, FAILED
 	}
 
 	private final Screen parent;
@@ -84,6 +85,22 @@ public class IntroScreen extends GameScreen {
 	private String slotName;
 	/** Who's on screen while Oak talks: oak, hero (you) or rival. */
 	private String scene = "oak";
+	/** The professor's scene: his walk past the parade, his grandson, you. */
+	private Scenes.ProfWalk prof = new Scenes.ProfWalk();
+	private long lastNanos;
+	/** After his words: waiting for him to reach the end and turn, then a fade to black (ticks), then the maker. */
+	private boolean waitArrive;
+	private int arriveAt = -1, fadeAt = -1;
+	/** The options page (from OPTIONS under the slots). */
+	private final OptionsPage options = new OptionsPage(() -> {
+		if (minecraft != null) minecraft.setScreen(new KeyMapScreen(this));
+	});
+	/** The maker: 1 the starting faces, 2 making it yours (the glass panel); the face picked; each column's scroll. */
+	private int makerStage = 1, pickFace = 3;
+	private final float[] faceScroll = new float[2];
+	private float side, sideGoal;
+	/** Off you go: when his words ended (ticks), then the game loads 1.6 seconds on. */
+	private int readyEndAt = -1;
 	/**
 	 * A save to open once this tick is over: opening a world from inside a screen's tick trips Fabric's screen
 	 * events (the screen changes under them), so it waits for the end of the tick.
@@ -131,6 +148,23 @@ public class IntroScreen extends GameScreen {
 		}
 		if (titleTicks < 99) titleTicks++;
 		if (talk != null) talk.tick();
+		if (waitArrive && prof.arrived()) {
+			if (arriveAt < 0) arriveAt = ticks;
+			if (ticks - arriveAt >= 10 && fadeAt < 0) fadeAt = ticks;
+		}
+		if (fadeAt >= 0 && ticks - fadeAt >= 19) {
+			fadeAt = -1;
+			waitArrive = false;
+			arriveAt = -1;
+			startMaker();
+		}
+		if (readyEndAt >= 0 && ticks - readyEndAt >= 32) {
+			readyEndAt = -1;
+			prof.floss = 0;
+			prof.wave = 0;
+			loadingAt = ticks;
+			newGame();
+		}
 		// "Off you go, then!": you wave, then the game loads.
 		if (waveAt >= 0 && ticks - waveAt > 18 && step == Step.TALK) {
 			// Then everything fades to black, and the game loads behind it.
@@ -281,21 +315,27 @@ public class IntroScreen extends GameScreen {
 	private void toTitle() {
 		opened = true;
 		step = Step.TITLE;
-		titleTicks = 0;
-		Sounds.cry("charizard", 1F);
+		// Ours comes up as the viewer's does (no flash, no cry); the old one with its flash and Charizard's roar.
+		titleTicks = Look.ours() ? 99 : 0;
+		titleSince = ticks;
+		if (!Look.ours()) Sounds.cry("charizard", 1F);
 		Music.play("title_screen");
 	}
 
+	/** When the title came up (ticks), for its logo rising in. */
+	private int titleSince;
+
+	/** The saves (the viewer's "Continue or new game"): your three slots as cards, OPTIONS under them. */
 	private void openMenu() {
 		readSlots();
-		List<String> options = new ArrayList<>();
-		if (anySlot()) options.add("CONTINUE");
-		options.add("NEW GAME");
-		options.add("OPTIONS");
-		options.add("MINECRAFT");
-		options.add("QUIT");
-		menu = new Choice(options);
-		step = Step.MENU;
+		replacing = false;
+		confirm = null;
+		slotAt = 0;
+		for (int k = 0; k < SLOTS; k++) if (slotCards[k] != null && !slotCards[k].empty()) {
+			slotAt = k;
+			break;
+		}
+		step = Step.SLOTS;
 	}
 
 	private void menuPick(int i) {
@@ -365,25 +405,72 @@ public class IntroScreen extends GameScreen {
 		Music.play("meet_prof_oak");
 		hopAt = -1;
 		waveAt = -1;
-		say(List.of("Ah, there you are! Welcome. I'm OAK. Most people round here call me the POKéMON PROF.",
-				"This world is full of creatures we call POKéMON. You'll find them in the grass, the sea, the caves, even in town.",
+		prof = new Scenes.ProfWalk();
+		prof.mode = "intro";
+		prof.talking = true;
+		say(List.of("Ah, there you are! Welcome. I'm **OAK**. Most people round here call me the **POKéMON PROF**.",
+				"This world is full of creatures we call **POKéMON**. You'll find them in the grass, the sea, the caves, even in town.",
 				"Some people keep them as friends. Some raise them for battles. Me? I study them.",
-				"But that's enough about me. First, tell me a little about yourself."), this::startMaker);
+				"But that's enough about me. First, tell me a little about yourself."), () -> {
+					// He walks on to the end, turns to you, and it fades to black.
+					prof.talking = false;
+					prof.stopWalk();
+					waitArrive = true;
+				});
 	}
 
 	/** What do you look like? The maker: you (body, skin, eyes, hair), then your clothes. */
 	private void startMaker() {
-		Outfit o = Outfit.parse(look, girl);
-		maker = new Maker(o, girl, new String[] {"you", "clothes"}, "THAT'S ME", () -> {
-			Sounds.press();
-			girl = maker.girl;
-			look = maker.outfit.write();
-			startNaming(false);
-		}, this::startOak, () -> {
+		makerStage = 1;
+		side = sideGoal = 0;
+		maker = null;
+		pickLook(pickFace);
+		talk = TextBox.still("What do you look like?");
+		step = Step.MAKER;
+	}
+
+	/** The viewer's starting looks: a boy and a girl for every skin tone, lightest to darkest, eyes to suit. */
+	private static final int[] TONE_ORDER = {8, 4, 9, 0, 1, 5, 10, 2, 6, 3, 7, 11}, LOOK_EYES = {4, 3, 2, 4, 1, 2, 1, 1, 1, 1, 1, 1};
+	private static final int[] BOY_HAIR = {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0}, BOY_HAIRC = {14, 15, 9, 4, 17, 9, 4, 17, 4, 4, 4, 4};
+	private static final int[] GIRL_HAIR = {3, 2, 4, 2, 5, 3, 2, 4, 5, 3, 2, 5}, GIRL_HAIRC = {14, 15, 16, 9, 17, 15, 4, 9, 4, 17, 4, 4};
+	private static final int PER_SIDE = 12;
+
+	private static Outfit lookOf(int i) {
+		boolean gl = i >= PER_SIDE;
+		int k = i % PER_SIDE;
+		Outfit o = Outfit.defaults(gl);
+		o.v.put("skin", TONE_ORDER[k]);
+		o.v.put("hair", gl ? GIRL_HAIR[k] : BOY_HAIR[k]);
+		o.v.put("hairc", Math.min(Outfit.COLOURS.length - 1, gl ? GIRL_HAIRC[k] : BOY_HAIRC[k]));
+		o.v.put("eyes", Math.min(Outfit.EYE_RGB.length - 1, LOOK_EYES[k]));
+		return o;
+	}
+
+	private void pickLook(int i) {
+		pickFace = i;
+		girl = i >= PER_SIDE;
+		look = lookOf(i).write();
+	}
+
+	/** On to making it your own: you glide aside, the glass panel comes in on the right. */
+	private void makeItYours() {
+		Sounds.press();
+		makerStage = 2;
+		sideGoal = 2.1F;
+		talk = TextBox.still("Make it yours. Change anything you like.");
+		maker = new Maker(Outfit.parse(look, girl), girl, new String[] {"you", "clothes"}, null, () -> {}, () -> {
+			makerStage = 1;
+			sideGoal = 0;
+			maker = null;
+			talk = TextBox.still("What do you look like?");
+		}, () -> {
 			girl = maker.girl;
 			look = maker.outfit.write();
 		});
-		step = Step.MAKER;
+		maker.px = 650;
+		maker.py = 24;
+		maker.pw = 600;
+		maker.maxH = 528;
 	}
 
 	private void startNaming(boolean rival) {
@@ -393,6 +480,7 @@ public class IntroScreen extends GameScreen {
 		if (rival) {
 			talk = TextBox.still("Now, what was his name again...?");
 			talk.speaker = "PROF. OAK";
+			prof.talking = false;
 		}
 		List<String> opts = new ArrayList<>();
 		opts.add("NEW NAME");
@@ -410,15 +498,26 @@ public class IntroScreen extends GameScreen {
 		entry = null;
 		if (!namingRival) {
 			playerName = name;
-			say(List.of("So you're " + name + "! A fine name.", "And this is my grandson. You two have been racing each other since you could walk.",
+			prof = new Scenes.ProfWalk();
+			prof.mode = "rival";
+			prof.talking = true;
+			say(List.of("So you're **" + name + "**! A fine name.", "And this is my grandson. You two have been racing each other since you could walk.",
 					"Now, what was his name again...?"), "rival", () -> startNaming(true));
 		} else {
 			rivalName = name;
-			say(List.of("That's right! I remember now. His name is " + name + "!"), "rival", () -> say(List.of(playerName + ", your own adventure starts today.",
-					"There's a whole region out there, full of POKéMON to meet. I'll be right next door at my lab.", "Off you go, then!"), "hero", () -> {
-						waveAt = ticks;
-						Sounds.jingle("get_key_item");
-					}));
+			prof.talking = true;
+			say(List.of("That's right! I remember now. His name is **" + name + "**!"), "rival", () -> {
+				prof = new Scenes.ProfWalk();
+				prof.mode = "you";
+				prof.talking = true;
+				prof.lookUp = 0.22F;
+				say(List.of("**" + playerName + "**, your own adventure starts today.",
+						"There's a whole region out there, full of POKéMON to meet. I'll be right next door at my lab.", "Off you go, then!"), "hero", () -> {
+							prof.talking = false;
+							readyEndAt = ticks;
+							waveAt = -1;
+						});
+			});
 		}
 	}
 
@@ -434,11 +533,17 @@ public class IntroScreen extends GameScreen {
 			case OPENING -> toTitle();
 			case TITLE -> {
 				if (Ui.isA(e)) {
-					// START: Charizard roars, as the title's Pokémon did.
 					Sounds.press();
-					Sounds.cry("charizard", 1F);
+					if (!Look.ours()) Sounds.cry("charizard", 1F);
 					openMenu();
 				} else if (Ui.isB(e)) onClose();
+			}
+			case OPTIONS -> {
+				if (Ui.isB(e)) {
+					Sounds.press();
+					step = Step.SLOTS;
+					slotAt = SLOTS;
+				} else options.key(e);
 			}
 			case MENU -> {
 				if (menu.key(e)) return true;
@@ -466,21 +571,47 @@ public class IntroScreen extends GameScreen {
 				}
 				if (Ui.isUp(e) || Ui.isLeft(e)) slotAt = Math.floorMod(slotAt - 1, n);
 				else if (Ui.isDown(e) || Ui.isRight(e)) slotAt = Math.floorMod(slotAt + 1, n);
-				else if (Ui.isB(e)) step = Step.MENU;
-				else if (Ui.isA(e)) pickSlot(slotAt);
+				else if (Ui.isB(e)) {
+					step = Step.TITLE;
+					titleSince = ticks - 40;
+				} else if (Ui.isA(e)) pickSlot(slotAt);
 			}
 			case TALK -> {
-				if (waveAt < 0 && (Ui.isA(e) || Ui.isB(e)) && talk.press()) afterTalk.run();
+				if (waveAt < 0 && readyEndAt < 0 && !waitArrive && Ui.isA(e) && talk.press()) afterTalk.run();
 			}
-			case MAKER -> maker.key(e);
+			case MAKER -> {
+				if (makerStage == 2) {
+					if (Ui.isA(e)) {
+						Sounds.press();
+						girl = maker.girl;
+						look = maker.outfit.write();
+						startNaming(false);
+						return true;
+					}
+					return maker.key(e);
+				}
+				// The faces: up and down a column, left and right between the boys and the girls.
+				if (Ui.isUp(e) || Ui.isDown(e)) {
+					int sideK = pickFace >= PER_SIDE ? PER_SIDE : 0, rowK = Math.floorMod(pickFace % PER_SIDE + (Ui.isDown(e) ? 1 : -1), PER_SIDE);
+					pickLook(sideK + rowK);
+					Sounds.select();
+				} else if (Ui.isLeft(e) || Ui.isRight(e)) {
+					pickLook((pickFace + PER_SIDE) % (PER_SIDE * 2));
+					Sounds.select();
+				} else if (Ui.isA(e)) makeItYours();
+				else if (Ui.isB(e)) startOak();
+			}
 			case NAME -> {
 				if (entry != null) return entry.key(e);
 				if (names.key(e)) return true;
 				if (Ui.isA(e)) pickName(names.at);
-				else if (Ui.isB(e) && !namingRival) startMaker();
+				else if (Ui.isB(e) && !namingRival) {
+					startMaker();
+					makeItYours();
+				}
 			}
 			case FAILED -> {
-				if (Ui.isA(e) || Ui.isB(e)) step = Step.MENU;
+				if (Ui.isA(e) || Ui.isB(e)) openMenu();
 			}
 			default -> {
 			}
@@ -503,7 +634,9 @@ public class IntroScreen extends GameScreen {
 	private void pickSlot(int i) {
 		Sounds.press();
 		if (i >= SLOTS) {
-			step = Step.MENU;
+			// OPTIONS, under the slots.
+			options.row = 0;
+			step = Step.OPTIONS;
 			return;
 		}
 		SlotInfo c = slotCards[i];
@@ -572,29 +705,33 @@ public class IntroScreen extends GameScreen {
 		if (i == 0) startOak();
 		else if (i == 1) {
 			if (minecraft != null) minecraft.setScreen(new KeyMapScreen(this));
-		} else step = Step.MENU;
+		} else step = Step.SLOTS;
 	}
 
-	/** "These are your keys": walking, talking, the menu, speeding up and going back, then go on or see them all. */
+	/** "These are your keys" (the viewer's Keys check): walking, talking, the menu (E), speeding up, going back; then go on or see them all. */
 	private void drawKeys(GuiGraphics g) {
-		Scenes.backdrop(g, "sky");
-		V.panel(g, 180, 110, 640, 420);
-		V.text(g, "These are your keys", 220, 144, 36, V.TEXT, true);
-		String[][] rows = {{"W A S D", "Walk"}, {"SPACE", "Talk, look, choose"}, {"ENTER", "Open the menu"}, {"TAB", "Speed up"}, {"Q X", "Back"}};
-		int[] widths = {0, 120, 80, 64, 0};
-		float y = 144 + 36 + 20 + 20;
+		Scenes.bg2(g, "keys");
+		V.panel(g, 180, 100, 640, 470);
+		V.title(g, Lang.t("These are your keys"), 220, V.capsTop(100 + 34 + 27, 36), 36, V.INK);
+		String[][] rows = {{"W A S D", "Walk"}, {"SPACE", "Talk, look, choose"}, {"E", "Open the menu (as Minecraft's inventory)"}, {"TAB", "Speed up"}, {"Q X", "Back"}};
+		float[] widths = {0, 120, 0, 64, 0};
+		float y = 100 + 34 + 54 + 20;
 		for (int r = 0; r < rows.length; r++) {
-			float x = 220;
+			float x = 220, cy = y + 16;
 			if (widths[r] > 0) {
-				float w = widths[r];
-				V.rr(g, x, y + 2, w, 28, 9, 0x40000000);
-				V.rr(g, x, y, w, 28, 9, V.CREAM);
-				V.centred(g, rows[r][0], x + w / 2, y + (28 - 14 * 1.1F) / 2, 14, V.INK, true);
-				x += w;
-			} else for (String k : rows[r][0].split(" ")) x += V.key(g, k, x, y, 28) + 6;
-			V.text(g, rows[r][1], 220 + 200, y + 1, 22, V.TEXT, true);
-			y += 28 + 14 + 12;
+				V.rr(g, x, cy - 15, widths[r], 30, 15, V.INK);
+				V.centred(g, rows[r][0], x + widths[r] / 2, V.capsTop(cy, 13), 13, 0xFFFFFFFF, true);
+				x += widths[r] + 6;
+			} else for (String k : rows[r][0].split(" ")) {
+				V.ellipse(g, x + 15, cy, 15, 15, V.INK);
+				V.centred(g, k, x + 15, V.capsTop(cy, 13), 13, 0xFFFFFFFF, true);
+				x += 30 + 6;
+			}
+			V.text(g, Lang.t(rows[r][1]), 220 + 166 + 22, V.capsTop(cy, 22), 22, V.INK, false);
+			y += 32 + 14;
 		}
+		List<String> note = V.wrap(Lang.t("Other mods' keys are turned off while you play, so nothing else opens on these (a map mod on M, say)."), 560, 16, false);
+		for (int i = 0; i < note.size(); i++) V.text(g, note.get(i), 220, y + 6 + i * 22.4F, 16, V.MUTED, false);
 		vchoice(g, keysChoice, 860, 300, 300, this::keysPick);
 	}
 
@@ -629,11 +766,12 @@ public class IntroScreen extends GameScreen {
 	protected void clickAnywhere() {
 		if (step == Step.OPENING) toTitle();
 		else if (step == Step.TITLE) {
-			Sounds.cry("charizard", 1F);
+			if (!Look.ours()) Sounds.cry("charizard", 1F);
 			openMenu();
 		}
-		else if (step == Step.TALK && waveAt < 0 && talk.press()) afterTalk.run();
-		else if (step == Step.FAILED) step = Step.MENU;
+		// A click anywhere moves the words on, as SPACE does.
+		else if (step == Step.TALK && waveAt < 0 && readyEndAt < 0 && !waitArrive && talk.press()) afterTalk.run();
+		else if (step == Step.FAILED) openMenu();
 	}
 
 	@Override
@@ -642,9 +780,9 @@ public class IntroScreen extends GameScreen {
 			case TITLE -> {
 				// Retromon is the start: there's nowhere to go back to.
 			}
-			case MENU -> step = Step.TITLE;
-			case SLOTS, FAILED, KEYS -> step = Step.MENU;
-			case TALK -> clickAnywhere();
+			case MENU, SLOTS -> step = Step.TITLE;
+			case FAILED, KEYS -> openMenu();
+			case OPTIONS -> step = Step.SLOTS;
 			default -> {
 			}
 		}
@@ -655,7 +793,13 @@ public class IntroScreen extends GameScreen {
 		// No world yet: Esc goes back to the menu (or out, from the title).
 		if (e.key() == GLFW.GLFW_KEY_ESCAPE) {
 			if (step == Step.TITLE) onClose();
-			else if (step != Step.COPYING) {
+			else if (step == Step.SLOTS && confirm == null) step = Step.TITLE;
+			else if (step == Step.OPTIONS) step = Step.SLOTS;
+			else if (step == Step.MAKER && makerStage == 2) maker.key(new KeyEvent(GLFW.GLFW_KEY_BACKSPACE, 0, 0));
+			else if (step == Step.SLOTS && confirm != null) {
+				confirm = null;
+				deleting = false;
+			} else if (step != Step.COPYING && readyEndAt < 0) {
 				openMenu();
 				Music.play("title_screen");
 			}
@@ -852,8 +996,9 @@ public class IntroScreen extends GameScreen {
 
 	// ---------- drawing (the UI Viewer's screens, on its 1280 by 720 canvas) ----------
 
-	private static final String[] TIPS = {"Press TAB to speed the game up. Press it again to go back.", "Talk to people with SPACE. Some have things to give you.",
-			"Your POKéMON follow you around. Talk to them too.", "In the bag, the KEY ITEMS pocket is its lid.", "Nights are darker outside. Change it under OPTION, NIGHTS."};
+	private static final String[] TIPS = {"Press TAB to speed the game up. Press it again to go back.", "Creatures 1 block tall or less can ride on your shoulder.",
+			"Talk to people with SPACE. Some have things to give you.", "Your POKéMON follow you around. Talk to them too.", "In the bag, the KEY ITEMS pocket is its lid.",
+			"Nights are darker outside. Change it under OPTIONS, NIGHTS."};
 	private final String tip = TIPS[(int) (Math.random() * TIPS.length)];
 
 	private Identifier you() {
@@ -868,6 +1013,9 @@ public class IntroScreen extends GameScreen {
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
 		float secs = (ticks + partial) / 20F;
+		long now = System.nanoTime();
+		float dt = lastNanos == 0 ? 0 : Math.min(0.1F, (now - lastNanos) / 1e9F);
+		lastNanos = now;
 		if (step == Step.OPENING) {
 			drawOpening(g, openTicks + partial);
 			return;
@@ -875,188 +1023,278 @@ public class IntroScreen extends GameScreen {
 		switch (step) {
 			case TITLE, MENU -> drawTitle(g, secs);
 			case SLOTS -> drawSlots(g, secs);
+			case OPTIONS -> options.draw(g, this::vhit, mx, my);
 			case KEYS -> drawKeys(g);
 			case TALK -> {
-				String mode = scene.equals("rival") ? "rival" : scene.equals("hero") ? "you" : "intro";
-				// "Some people keep them as friends": the little yellow one jumps up onto his shoulder.
-				if (mode.equals("intro") && hopAt < 0 && talk.message() == 2) hopAt = ticks;
-				float hop = hopAt < 0 ? -1 : (ticks - hopAt + partial) / 20F;
-				float wave = waveAt < 0 ? 0 : Math.min(1, (ticks - waveAt + partial) / 6F);
-				Scenes.prof(g, secs, mode, waveAt < 0, wave, mode.equals("intro") ? hop : -1, you());
-				talk.renderV(g, font, 140, 26, 1000, ticks, partial, waveAt < 0);
-				if (fadeOutAt >= 0) g.fill(0, 0, width, height, Ui.alpha(0xFF000000, Math.min(1, (ticks - fadeOutAt + partial) / FADE_OUT)));
+				// His words set things going: on the second line he sets off, on the last he hurries to the end; at "Off
+				// you go" you floss and he waves.
+				if (prof.mode.equals("intro") && talk.message() >= 1 && !prof.walking) prof.startWalk();
+				if (prof.mode.equals("intro") && talk.message() >= 3 && !prof.hurry) prof.stopWalk();
+				if (prof.mode.equals("you") && talk.message() >= 2) {
+					prof.floss = 1;
+					prof.wave = 1;
+				}
+				prof.tick(dt);
+				prof.draw(g, you());
+				if (!talk.finished()) talk.renderFilm(g, font, ticks, partial, true);
+				if (fadeAt >= 0) g.fill(0, 0, width, height, Ui.alpha(0xFF000000, Math.min(1, (ticks - fadeAt + partial) / 16F)));
 			}
-			case MAKER -> {
-				Scenes.backdrop(g, "maker");
-				Scenes.stand(g, secs, you(), -1.95, 0, true);
-				V.centred(g, "What do you look like?", 760 + 240, 640, 24, 0xFF123C38, true);
-				maker.draw(g, this::vhit, secs);
-				V.hints(g, "A", "Choose", "B", "Back");
-			}
-			case NAME -> drawNames(g, secs, partial);
+			case MAKER -> drawMaker(g, secs, dt, partial);
+			case NAME -> drawNames(g, secs, partial, dt);
 			case COPYING -> drawLoading(g, secs);
 			case FAILED -> {
-				Scenes.backdrop(g, "night");
-				List<String> lines = V.wrap("The new game couldn't be made: " + failure, 740, 22, true);
+				Scenes.bg2(g, "loading");
+				List<String> lines = V.wrap("The new game couldn't be made: " + failure, 740, 22, false);
 				float h = 60 + lines.size() * 32;
 				V.panel(g, 240, 360 - h / 2, 800, h);
-				for (int i = 0; i < lines.size(); i++) V.text(g, lines.get(i), 270, 360 - h / 2 + 30 + i * 32, 22, V.TEXT, true);
+				for (int i = 0; i < lines.size(); i++) V.text(g, lines.get(i), 270, 360 - h / 2 + 30 + i * 32, 22, V.INK, false);
 				V.hints(g, "A", "Back");
 			}
 			default -> {
 			}
 		}
-		// Into the title from the opening: a white flash, fading.
+		// Into the old title from the opening: a white flash, fading.
 		if (titleTicks < 14) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, 1 - (titleTicks + partial) / 14F));
 	}
 
-	/** The opening: INSID3 TH3 CUB3 presents, fading in on black and out again, then a white flash into the title. */
+	/** The opening (the viewer's): INSID3 TH3 CUB3 in spaced Fredoka over "presents", fading in on black and out again. */
 	private void drawOpening(GuiGraphics g, float t) {
 		g.fill(0, 0, width, height, 0xFF000000);
-		float a = Math.min(1, Math.max(0, (t - 2) / 18F)) * Math.min(1, Math.max(0, (OPEN_END - 14 - t) / 18F));
-		V.centred(g, "INSID3 TH3 CUB3", 640, 300, 64, Ui.alpha(0xFFF4F6FF, a), true);
-		V.centred(g, "presents", 640, 388, 24, Ui.alpha(0xFFA9D4C6, a), true);
-		if (t > OPEN_END - 8) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, Math.min(1, (t - (OPEN_END - 8)) / 8F)));
+		float ms = t * 50, a = ms < 2300 ? Math.max(0, Math.min(1, (ms - 80) / 900F)) : Math.max(0, 1 - (ms - 2300) / 900F);
+		if (a <= 0) return;
+		float w = V.titleTrackedWidth("INSID3 TH3 CUB3", 64, 10);
+		V.titleTracked(g, "INSID3 TH3 CUB3", 640 - w / 2, V.capsTop(337, 64), 64, Ui.alpha(0xFFF4F6FF, a), 10);
+		String pr = Lang.t("presents");
+		V.tracked(g, pr, 640 - V.trackedWidth(pr, 24, 6) / 2, V.capsTop(413, 24), 24, Ui.alpha(V.MUTED, a), 6);
 	}
 
 	/**
-	 * The title: RETROMON in blocks over the blocky hill and our creatures (the Retromon look), or POKéMON over
-	 * Charizard at night (the Cobblemon look); PRESS START; then the menu over it.
+	 * The title: ours, the painted meadow with your partner (Title); Cobblemon's, the old POKéMON over Charizard at
+	 * night with PRESS START.
 	 */
 	private void drawTitle(GuiGraphics g, float secs) {
-		boolean ours = Look.ours();
-		Scenes.title(g, secs, ours);
-		int ww = ours ? 838 : 670;
-		Identifier mark = V.tex(ours ? "wordmark_ours" : "wordmark_theirs");
-		if (ours) {
-			// Round, heavy letters with their own edge and shadow (drawn at twice the size, for big screens).
-			V.img(g, mark, (V.W - ww) / 2, 34, ww, 152, 1676, 304, 0xFFFFFFFF);
-		} else {
-			V.img(g, mark, (V.W - ww) / 2, 34 + 10, ww, 152, ww, 152, 0x2E000000);
-			V.img(g, mark, (V.W - ww) / 2, 34, ww, 152, ww, 152, 0xFFFFFFFF);
-		}
-		int foot = ours ? 0xCC123C38 : 0xCCDDE6FF;
-		V.text(g, "INSID3 TH3 CUB3", 28, 680, 15, foot, true);
-		V.right(g, "Version " + version(), 1260, 680, 15, foot, true);
-		if (step == Step.TITLE) {
-			if ((secs % 1.1F) < 0.55F) {
-				float tw = V.width("PRESS START", 30, true) + 6 * 10, pw = tw + 68;
-				V.pill(g, 640 - pw / 2, 612 + 6, pw, 52, 0x2E000000);
-				V.pill(g, 640 - pw / 2, 612, pw, 52, V.CREAM);
-				V.centred(g, "P R E S S   S T A R T", 640, V.capsTop(612 + 26, 30), 30, V.INK, true);
-			}
+		if (Look.ours()) {
+			Title.draw(g, (ticks - titleSince) / 20F + (secs - ticks / 20F), "pikachu", version());
 			return;
 		}
-		// The menu: the viewer's list, under the word.
-		float w = 360, x = 640 - w / 2, y = 250;
-		vchoice(g, menu, x, y, w, this::menuPick);
-		V.hints(g, "A", "Choose", "B", "Back");
+		Scenes.title(g, secs, false);
+		int ww = 670;
+		Identifier mark = V.tex("wordmark_theirs");
+		V.img(g, mark, (V.W - ww) / 2, 34 + 10, ww, 152, ww, 152, 0x2E000000);
+		V.img(g, mark, (V.W - ww) / 2, 34, ww, 152, ww, 152, 0xFFFFFFFF);
+		int foot = 0xCCDDE6FF;
+		V.text(g, "INSID3 TH3 CUB3", 28, 680, 15, foot, true);
+		V.right(g, "Version " + version(), 1260, 680, 15, foot, true);
+		if ((secs % 1.1F) < 0.55F) {
+			String ps = Lang.t("PRESS START");
+			float tw = V.titleTrackedWidth(ps, 30, 6), pw = tw + 68;
+			V.pill(g, 640 - pw / 2, 612, pw, 52, 0xFFFFFFFF);
+			V.titleTracked(g, ps, 640 - tw / 2, V.capsTop(612 + 26, 30), 30, V.INK, 6);
+		}
 	}
 
-	/** Your saves as cards (the viewer's): who, where, how far; pick one to carry on, an empty one for a new game. */
+	/** Your saves as cards (the viewer's): who, where, how far; an empty one for a new game; OPTIONS under them. */
 	private final List<Runnable> deletes = new ArrayList<>();
 
 	private void drawSlots(GuiGraphics g, float secs) {
-		Scenes.backdrop(g, "sky");
+		Scenes.bg2(g, "saves");
 		Scenes.stand(g, secs, you(), -1.6, 0, true);
-		float x = 70, y = 90 - (replacing ? 0 : 0), w = 640;
-		if (replacing) V.text(g, "All three slots are full: choose a game to start over in.", x, 40, 20, 0xFF123C38, true);
+		float x = 70, y = 90, w = 640;
 		for (int k = 0; k <= SLOTS; k++) {
 			int idx = k;
 			if (k == SLOTS) {
-				// BACK, as the viewer's OPTIONS row sits.
-				float bw = V.width("BACK", 21, true) + 62;
-				if (confirm == null && vover(x, y + 4, bw, 46)) slotAt = SLOTS;
-				V.item(g, "BACK", null, x, y + 4, bw, 46, slotAt == SLOTS, false, 21);
-				if (confirm == null) vhit(x, y + 4, bw, 46, () -> pickSlot(SLOTS));
+				// OPTIONS: a row with the cog, white when you're not on it.
+				String ot = Lang.t("OPTIONS");
+				float bw = 40 + 26 + 14 + V.width(ot, 21, false) + 22, by = y + 4;
+				if (confirm == null && vover(x, by, bw, 46)) slotAt = SLOTS;
+				boolean on = slotAt == SLOTS;
+				if (on) {
+					V.pill(g, x - 1, by + 5, bw + 2, 46, 0x59E8961E);
+					V.pill(g, x - 2.5F, by - 2.5F, bw + 5, 51, 0xFFFFFFFF);
+					V.sel(g, x, by, bw, 46, 23);
+					V.tri(g, x + 21, by + 23, 12, 0, V.RED);
+				} else V.pill(g, x, by, bw, 46, 0xD9FFFFFF);
+				V.icon(g, "icon_cog", x + 40, by + 10, 26);
+				V.text(g, ot, x + 40 + 26 + 14, V.capsTop(by + 23, 21), 21, V.INK, false);
+				if (confirm == null) vhit(x, by, bw, 46, () -> pickSlot(SLOTS));
 				break;
 			}
 			SlotInfo c = slotCards[k];
 			boolean used = c != null && !c.empty(), on = slotAt == k;
-			float h = used ? 160 : 76;
+			float h = used ? 36 + 30 * 1.5F + 6 + 4 * 19 * 1.45F + 6 : 22 * 2 + 28 * 1.5F;
 			if (confirm == null && vover(x, y, w, h)) slotAt = k;
-			if (on) V.panelOn(g, x, y, w, h, 24);
-			else V.panel(g, x, y, w, h);
+			if (on) V.rr(g, x - 5, y - 5, w + 10, h + 10, 27, 0xFFFFC93C);
+			V.panel(g, x, y, w, h);
 			if (used) {
 				// The picture: the save's own (as it was when you left it), or a little Pallet Town.
-				float px = x + 22, py = y + 18, pw = 150, ph = h - 36;
+				float px = x + 3 + 22, py = y + 3 + 18, pw = 150, ph = h - 6 - 36;
 				if (c.picture() != null) {
 					float k1 = Math.max(pw / c.picW(), ph / c.picH());
-					V.rr(g, px, py, pw, ph, 16, 0xFF1E4A40);
+					V.rr(g, px, py, pw, ph, 16, 0xFF9ED8F2);
 					g.enableScissor(Math.round(V.x(px)), Math.round(V.y(py)), Math.round(V.x(px + pw)), Math.round(V.y(py + ph)));
 					V.img(g, c.picture(), px + (pw - c.picW() * k1) / 2, py + (ph - c.picH() * k1) / 2, c.picW() * k1, c.picH() * k1, c.picW(), c.picH(), 0xFFFFFFFF);
 					g.disableScissor();
 				} else {
-					V.rrv(g, px, py, pw, ph * 0.55F, 16, 0xFF9ED8F2, 0xFFBFEFE0);
-					V.rrv(g, px, py + ph * 0.55F, pw, ph * 0.45F, 16, 0xFF6DB257, 0xFF5FA24C);
-					V.rr(g, px + 18, py + ph - 62, 56, 40, 4, 0xFFF2E8D2);
-					V.rr(g, px + 12, py + ph - 80, 68, 22, 6, 0xFFC9493F);
+					V.rrStops(g, px, py, pw, ph, 16, new float[] {0, 0.55F, 0.56F, 1}, new int[] {0xFF9ED8F2, 0xFFBFEFE0, 0xFF6DB257, 0xFF5FA24C});
+					V.rr(g, px + 18, py + ph - 22 - 40, 56, 40, 4, 0xFFF2E8D2);
+					V.rr(g, px + 12, py + ph - 58 - 22, 68, 22, 6, 0xFFC9493F);
 				}
-				float ix = px + pw + 20;
-				float tw = V.width("SLOT " + (k + 1), 14, true) + 24;
-				V.pill(g, ix, y + 22, tw, 24, V.CREAM);
-				V.text(g, "SLOT " + (k + 1), ix + 12, y + 26, 14, V.INK, true);
-				V.text(g, c.str("name", "TRAINER"), ix + tw + 12, y + 16, 30, V.TEXT, true);
+				float ix = px + pw + 20, ty = py;
+				String sl = Lang.t("SLOT {0}", k + 1);
+				float tw = V.width(sl, 14, true) + 24;
+				V.rrv(g, ix, ty + 45 / 2F - 11, tw, 22, 11, 0xFFFF9473, 0xFFE5525C);
+				V.text(g, sl, ix + 12, V.capsTop(ty + 45 / 2F, 14), 14, 0xFFFFFFFF, true);
+				V.title(g, c.str("name", "TRAINER"), ix + tw + 12, V.capsTop(ty + 45 / 2F, 30), 30, V.INK);
 				String[][] rows = {{"Place", c.str("place", "KANTO")},
 						{"Pokédex", c.info().has("dex") && c.info().get("dex").getAsBoolean() ? String.valueOf(c.num("caught")) : "None yet"},
 						{"Badges", String.valueOf(c.num("badges"))}, {"Play time", c.num("played") / 3600 + ":" + String.format("%02d", c.num("played") / 60 % 60)}};
+				float ry = ty + 45 + 6, lw = 0;
+				for (String[] r : rows) lw = Math.max(lw, V.labelWidth(Lang.t(r[0])));
 				for (int r = 0; r < rows.length; r++) {
-					V.label(g, rows[r][0], ix, y + 60 + r * 23 + 4);
-					V.text(g, rows[r][1], ix + 110, y + 60 + r * 23, 19, V.TEXT, true);
+					float rcy = ry + r * (19 * 1.45F + 2) + 19 * 1.45F / 2;
+					V.label(g, Lang.t(rows[r][0]), ix, V.capsTop(rcy, 13));
+					V.text(g, rows[r][1], ix + lw + 18, V.capsTop(rcy, 19), 19, V.INK, false);
 				}
-				if (!replacing) {
-					float dw = V.width("DELETE", 13, true) + 24, dx = x + w - 16 - dw, dy = y + 14;
-					boolean overDel = confirm == null && vover(dx, dy, dw, 24);
-					if (overDel) V.pill(g, dx, dy, dw, 24, V.RED);
-					V.ring(g, dx, dy, dw, 24, 12, 2, 0xB3E5525C);
-					V.text(g, "DELETE", dx + 12, dy + 5, 13, overDel ? 0xFFFFFFFF : 0xFFFFB3B8, true);
-					// (Its click is added after the card's, so it wins over loading the game.)
-					if (confirm == null) deletes.add(() -> vhit(dx, dy, dw, 24, () -> askDelete(idx)));
-				}
+				float dw = V.width(Lang.t("DELETE"), 13, true) + 28, dx = x + w - 16 - dw, dy = y + 14;
+				boolean overDel = confirm == null && vover(dx, dy, dw, 24);
+				V.pill(g, dx, dy, dw, 24, overDel ? 0xFFE5525C : 0xFFF3A6AC);
+				V.pill(g, dx + 2, dy + 2, dw - 4, 20, overDel ? 0xFFE5525C : 0xFFFFFFFF);
+				V.text(g, Lang.t("DELETE"), dx + 14, V.capsTop(dy + 12, 13), 13, overDel ? 0xFFFFFFFF : 0xFFD9404A, true);
+				// (Its click is added after the card's, so it wins over loading the game.)
+				if (confirm == null) deletes.add(() -> vhit(dx, dy, dw, 24, () -> askDelete(idx)));
 			} else {
-				float tw = V.width("SLOT " + (k + 1), 14, true) + 24;
-				V.pill(g, x + 24, y + 26, tw, 24, 0x33FFF4D8);
-				V.text(g, "SLOT " + (k + 1), x + 36, y + 30, 14, V.TEXT, true);
-				V.text(g, "NEW GAME", x + 24 + tw + 16, y + 22, 28, V.TEXT, true);
-				V.right(g, "Empty", x + w - 24, y + 30, 17, V.MUTED, true);
+				String sl = Lang.t("SLOT {0}", k + 1);
+				float tw = V.width(sl, 14, true) + 24, cy = y + h / 2;
+				V.pill(g, x + 3 + 24, cy - 11, tw, 22, 0xFFEEF2FB);
+				V.text(g, sl, x + 3 + 24 + 12, V.capsTop(cy, 14), 14, V.MUTED, true);
+				V.title(g, Lang.t("NEW GAME"), x + 3 + 24 + tw + 16, V.capsTop(cy, 28), 28, V.INK);
+				String em = Lang.t("Empty");
+				V.text(g, em, x + w - 3 - 24 - V.width(em, 17, false), V.capsTop(cy, 17), 17, V.MUTED, false);
 			}
 			if (confirm == null) vhit(x, y, w, h, () -> pickSlot(idx));
 			for (Runnable r : deletes) r.run();
 			deletes.clear();
 			y += h + 18;
 		}
-		V.hints(g, "A", "Choose", "B", "Back");
+		V.actsRight(g, 22, 28, -1, "B", "Back", "A", "Continue");
 		if (confirm != null) {
 			SlotInfo c = slotCards[slotAt];
-			String q = deleting ? "Delete SLOT " + (slotAt + 1) + "?" : "Start over in SLOT " + (slotAt + 1) + "?";
+			String q = "Delete SLOT " + (slotAt + 1) + "?";
 			String more = c.str("name", "This") + "'s game (" + c.str("place", "KANTO") + ") is moved to retromon-old-saves (the last three are kept there).";
-			g.fill(0, 0, width, height, 0x90000000);
-			List<String> lines = V.wrap(more, 620, 20, true);
-			float h = 90 + lines.size() * 28;
+			g.fill(0, 0, width, height, 0x661E2854);
+			List<String> lines = V.wrap(more, 580, 20, false);
+			float h = 96 + lines.size() * 28;
 			V.panel(g, 320, 200, 640, h);
-			V.text(g, q, 350, 226, 28, V.TEXT, true);
-			for (int i = 0; i < lines.size(); i++) V.text(g, lines.get(i), 350, 270 + i * 28, 20, V.SOFT_TEXT, true);
+			V.title(g, q, 350, V.capsTop(200 + 46, 28), 28, V.INK);
+			for (int i = 0; i < lines.size(); i++) V.text(g, lines.get(i), 350, 272 + i * 28, 20, V.MUTED, false);
 			vchoice(g, confirm, 440, 200 + h + 16, 400, i -> confirmed(i == 0));
 		}
 	}
 
-	/** Your name (you on your stand, the ready names, or the letters), or your rival's (beside Oak, his line kept up). */
-	private void drawNames(GuiGraphics g, float secs, float partial) {
-		if (namingRival) {
-			Scenes.prof(g, secs, "rival", false, 0, -1, you());
-			if (entry == null && talk != null) talk.renderV(g, font, 140, 26, 1000, ticks, partial, false);
-			if (entry == null) vchoice(g, names, 980, 140, 250, this::pickName);
-		} else {
-			Scenes.backdrop(g, "name");
-			Scenes.stand(g, secs, you(), 0, 0, true);
-			V.centred(g, "And what's your name?", 640, 70, 30, 0xFF123C38, true);
-			if (entry == null) vchoice(g, names, 980, 190, 250, this::pickName);
-		}
-		if (entry != null) entry.draw(g, this::vhit, secs);
-		V.hints(g, "A", "Choose", "B", "Back");
+	/**
+	 * The maker (the viewer's): first a starting look, the boys down the left and the girls down the right, a face
+	 * on a glossy card for every skin tone, four in view at a time; you stand in the middle on a pool of light.
+	 * Continue, and you glide aside for the glass panel to make it yours.
+	 */
+	private void drawMaker(GuiGraphics g, float secs, float dt, float partial) {
+		Scenes.bg2(g, "creator");
+		side += (sideGoal - side) * Math.min(1, dt * 5);
+		Scenes.stand(g, secs, you(), side, 0, true);
+		if (makerStage == 1) drawFaces(g, secs, dt);
+		else if (maker != null) maker.draw(g, this::vhit, secs);
+		talk.renderV(g, font, 150, 26, 470, ticks, partial, false);
+		V.actsRight(g, 22, 28, -1, "B", "Back", "A", "Continue");
 	}
 
-	/** While the world's made and loads: a ball spinning, where you're going, how far along, and a tip. */
+	private void drawFaces(GuiGraphics g, float secs, float dt) {
+		float top = 34, colH = 516, cardW = 240, cardH = 104, gap = 18, padTop = 14;
+		float content = padTop + PER_SIDE * cardH + (PER_SIDE - 1) * gap + 14;
+		for (int col = 0; col < 2; col++) {
+			float cx = col == 0 ? 40 : 950;
+			// Keep the one you're on in view (the nearest edge), smoothly.
+			if (pickFace / PER_SIDE == col) {
+				float ct = padTop + (pickFace % PER_SIDE) * (cardH + gap), goal = faceScroll[col];
+				if (ct - 14 < goal) goal = ct - 14;
+				if (ct + cardH + 14 > goal + colH) goal = ct + cardH + 14 - colH;
+				goal = Math.max(0, Math.min(content - colH, goal));
+				faceScroll[col] += (goal - faceScroll[col]) * Math.min(1, dt * 9);
+			}
+			g.enableScissor(Math.round(V.x(cx - 30)), Math.round(V.y(top)), Math.round(V.x(cx + 290 + 30)), Math.round(V.y(top + colH)));
+			for (int r = 0; r < PER_SIDE; r++) {
+				int i = col * PER_SIDE + r;
+				float x = cx + 18, y = top + padTop + r * (cardH + gap) - faceScroll[col];
+				if (y + cardH < top - 30 || y > top + colH + 30) continue;
+				boolean on = i == pickFace;
+				g.pose().pushMatrix();
+				if (on) {
+					float mx0 = V.x(x + cardW / 2), my0 = V.y(y + cardH / 2);
+					g.pose().translate(mx0, my0);
+					g.pose().scale(1.06F, 1.06F);
+					g.pose().translate(-mx0, -my0);
+					V.rr(g, x - 22, y - 22, cardW + 44, cardH + 44, 46, 0x38FFFFFF);
+					V.rr(g, x - 9, y - 9, cardW + 18, cardH + 18, 33, 0x8CFFFFFF);
+				}
+				V.shadow(g, x, y, cardW, cardH, 24, 0.8F);
+				V.rr(g, x - 3, y - 3, cardW + 6, cardH + 6, 27, on ? 0xFFFFFFFF : 0xD9FFFFFF);
+				V.rrh(g, x, y, cardW, cardH, 24, new float[] {0, 0.45F, 1}, new int[] {0xFFFFFFFF, 0xFFF2FBEA, 0xFFD9F3A8});
+				// The face: the front of the head and its hat layer, from the skin the look makes.
+				float fx = x + (cardW - 80) / 2, fy = y + (cardH - 80) / 2;
+				V.rr(g, fx - 1, fy + 6, 82, 80, 14, 0x4D143C5A);
+				V.rr(g, fx - 3, fy - 3, 86, 86, 15, 0xFFFFFFFF);
+				Identifier skin = Outfit.skinFor("start" + i, lookOf(i));
+				if (skin != null) {
+					V.sub(g, skin, fx, fy, 80, 80, 8, 8, 8, 8, 64, 64);
+					V.sub(g, skin, fx, fy, 80, 80, 40, 8, 8, 8, 64, 64);
+				}
+				V.rrv(g, x + 10, y + 6, cardW - 20, cardH * 0.36F, 20, 0xBFFFFFFF, 0x00FFFFFF);
+				V.rr(g, x + cardW - 14 - 18 - 2, y + cardH - 10 - 18 - 2, 22, 22, 8, 0xFFFFFFFF);
+				V.rr(g, x + cardW - 14 - 18, y + cardH - 10 - 18, 18, 18, 6, 0xFF000000 | Outfit.SKIN_RGB[TONE_ORDER[i % PER_SIDE]]);
+				g.pose().popMatrix();
+				if (vover(x, Math.max(top, y), cardW, Math.min(y + cardH, top + colH) - Math.max(top, y)) && pickFace != i) pickLook(i);
+				int ii = i;
+				vhit(x, Math.max(top, y), cardW, Math.max(1, Math.min(y + cardH, top + colH) - Math.max(top, y)), () -> {
+					pickLook(ii);
+					makeItYours();
+				});
+			}
+			g.disableScissor();
+			// The scroll bar: rounded, mint.
+			float trackTop = top + 22, trackH = colH - 44, thumbH = Math.max(40, trackH * colH / content), thumbY = trackTop + (trackH - thumbH) * (faceScroll[col] / (content - colH));
+			V.rrv(g, cx + 290 - 12 + 3, thumbY, 6, thumbH, 3, 0xFF9FF0D8, 0xFF41BF84);
+		}
+	}
+
+	@Override
+	public boolean mouseScrolled(double x, double y, double h, double v) {
+		float vx = V.vx(x), vy = V.vy(y);
+		if (step == Step.MAKER && makerStage == 2 && maker != null && maker.scrolled(vx, vy, v)) return true;
+		if (step == Step.MAKER && makerStage == 1) {
+			int col = vx < 640 ? 0 : 1;
+			float content = 14 + PER_SIDE * 104 + (PER_SIDE - 1) * 18 + 14;
+			faceScroll[col] = Math.max(0, Math.min(content - 516, faceScroll[col] - (float) v * 60));
+			return true;
+		}
+		return super.mouseScrolled(x, y, h, v);
+	}
+
+	/** Your name (you on your stand, the ready names, or the letters), or your rival's (beside Oak, his line kept up). */
+	private void drawNames(GuiGraphics g, float secs, float partial, float dt) {
+		if (namingRival) {
+			prof.tick(dt);
+			prof.draw(g, you());
+			if (entry == null && talk != null) talk.renderFilm(g, font, ticks, partial, false);
+			if (entry == null) vchoice(g, names, 980, 140, 250, this::pickName);
+		} else {
+			Scenes.bg2(g, "name");
+			Scenes.stand(g, secs, you(), 0, 0, true);
+			V.titleCentred(g, Lang.t("And what's your name?"), 640, V.capsTop(70 + 22, 30), 30, V.INK);
+			if (entry == null) vchoice(g, names, 980, 190, 250, this::pickName);
+			V.actsRight(g, 22, 28, -1, "B", "Back", "A", "Continue");
+		}
+		if (entry != null) entry.draw(g, this::vhit, secs);
+	}
+
+	/** While the world's made and loads (the viewer's): a ball spinning, where you're going, how far along, and a tip. */
 	private void drawLoading(GuiGraphics g, float secs) {
 		drawLoadingPage(g, secs);
 		float t = loadingAt < 0 ? 99 : ticks - loadingAt;
@@ -1064,25 +1302,30 @@ public class IntroScreen extends GameScreen {
 	}
 
 	private void drawLoadingPage(GuiGraphics g, float secs) {
-		Scenes.backdrop(g, "night");
-		float cx = 640, cy = 317;
+		Scenes.bg2(g, "loading");
+		// Its middle at 44% down: the ball (110), 22, the place (40px), 22, the bar (18).
+		float cx = 640, top = 720 * 0.44F - (110 + 22 + 60 + 22 + 18) / 2F;
 		g.pose().pushMatrix();
-		g.pose().translate(V.x(cx), V.y(cy - 70));
+		g.pose().translate(V.x(cx), V.y(top + 55));
 		g.pose().rotate((float) (secs / 1.1F * Math.PI * 2));
-		g.pose().translate(-V.x(cx), -V.y(cy - 70));
-		V.icon(g, "icon_ball", cx - 55, cy - 125, 110);
+		g.pose().translate(-V.x(cx), -V.y(top + 55));
+		V.icon(g, "icon_ball", cx - 55, top, 110);
 		g.pose().popMatrix();
-		V.centred(g, "PALLET TOWN", cx, cy + 6, 40, V.TEXT, true);
+		String place = "PALLET TOWN";
+		float pw0 = V.titleTrackedWidth(place, 40, 4);
+		V.titleTracked(g, place, cx - pw0 / 2, V.capsTop(top + 110 + 22 + 30, 40), 40, 0xFFFFFFFF, 4);
 		float pct = 0;
 		java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)%").matcher(progress);
 		if (m.find()) pct = Integer.parseInt(m.group(1)) / 100F;
 		else if (progress.startsWith("Setting")) pct = 1;
-		V.pill(g, cx - 260, cy + 70, 520, 18, 0xFF0B2A2C);
-		if (pct > 0) V.rrv(g, cx - 258, cy + 72, Math.max(14, 516 * pct), 14, 7, 0xFF4FB896, 0xFF8FF5C0);
-		V.centred(g, progress, cx, cy + 100, 15, V.MUTED, true);
-		float tw = V.labelWidth("TIP") + 12 + V.width(tip, 20, true), pw = tw + 60;
-		V.panel(g, cx - pw / 2, V.H - 60 - 58, pw, 58, 24, true);
-		V.label(g, "TIP", cx - pw / 2 + 30, V.H - 60 - 58 + 22);
-		V.text(g, tip, cx - pw / 2 + 30 + V.labelWidth("TIP") + 12, V.H - 60 - 58 + 17, 20, V.TEXT, true);
+		float by = top + 110 + 22 + 60 + 22;
+		V.pill(g, cx - 260, by, 520, 18, V.TRACK);
+		if (pct > 0) V.rrh(g, cx - 258, by + 2, Math.max(14, 516 * pct), 14, 7, new float[] {0, 1}, new int[] {0xFF4FB896, 0xFF8FF5C0});
+		V.centred(g, progress, cx, by + 30, 15, 0xCCFFFFFF, false);
+		String tp = Lang.t(tip), tl = Lang.t("Tip");
+		float tw = V.labelWidth(tl) + 12 + V.width(tp, 20, false), pw = tw + 60;
+		V.panel(g, cx - pw / 2, V.H - 60 - 62, pw, 62, 31, true);
+		V.label(g, tl, cx - pw / 2 + 30, V.capsTop(V.H - 60 - 31, 13));
+		V.text(g, tp, cx - pw / 2 + 30 + V.labelWidth(tl) + 12, V.capsTop(V.H - 60 - 31, 20), 20, V.INK, false);
 	}
 }

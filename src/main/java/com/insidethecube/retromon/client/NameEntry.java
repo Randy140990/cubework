@@ -84,18 +84,19 @@ public final class NameEntry {
 		return true;
 	}
 
-	/** Draws it (the viewer's box at 240, 150, 800 by 430), registering clicks. */
+	/** Draws it (the viewer's box at 240, 150, 800 by 430: its label, seven letter boxes, the keys), registering clicks. */
 	public void draw(GuiGraphics g, Maker.Hits hits, float secs) {
 		float x = 240, y = 150, w = 800, h = 430, px = x + 30, py = y + 24, iw = w - 60;
 		V.panel(g, x, y, w, h);
-		V.label(g, label, px, py + 21);
-		float bx = px + V.labelWidth(label) + 18, bw = Math.min(56, (iw - (bx - px) - 6 * 8) / MAX);
+		String lab = Lang.t(label);
+		V.label(g, lab, px, V.capsTop(py + 28, 13));
+		float bx = px + V.labelWidth(lab) + 18, bw = Math.min(56, (iw - (bx - px) - 6 * 8) / MAX);
 		for (int i = 0; i < MAX; i++) {
 			float cx = bx + i * (bw + 8);
 			boolean filled = i < name.length();
-			V.rr(g, cx, py, bw, 56, 14, filled ? V.CREAM : 0x14FFFFFF);
-			if (i == name.length()) V.ring(g, cx, py, bw, 56, 14, 3, V.EDGE_LIGHT);
-			if (filled) V.centred(g, String.valueOf(name.charAt(i)), cx + bw / 2, py + 10, 34, V.INK, true);
+			V.rr(g, cx, py, bw, 56, 14, filled ? 0xFFFFF6CF : 0xFFEEF2FB);
+			if (i == name.length()) V.ring(g, cx, py, bw, 56, 14, 3, V.RED);
+			if (filled) V.titleCentred(g, String.valueOf(name.charAt(i)), cx + bw / 2, V.capsTop(py + 28, 34), 34, V.INK);
 		}
 		float gy = py + 56 + 18, cw = (iw - 8 * (COLS - 1)) / COLS;
 		for (int i = 0; i < count(); i++) {
@@ -112,13 +113,22 @@ public final class NameEntry {
 				kw = cw * 2 + 8;
 			}
 			float kx = px + col * (cw + 8), ky = gy + row * 58;
-			boolean on = i == sel;
-			int bg = i == KEYS.length + 1 ? (on ? V.GREEN : 0x4041BF84) : on ? V.CREAM : 0x12FFFFFF;
-			V.rr(g, kx, ky, kw, 50, 14, bg);
+			boolean on = i == sel, ok = i == KEYS.length + 1;
+			if (ok) {
+				if (on) V.rrv(g, kx, ky, kw, 50, 14, 0xFF6BE0A6, 0xFF2FA86C);
+				else V.rr(g, kx, ky, kw, 50, 14, 0xFFD9F5E6);
+			} else if (on) {
+				V.rr(g, kx, ky + 4, kw, 50, 14, 0x59E8961E);
+				V.rr(g, kx - 2, ky - 2, kw + 4, 54, 16, 0xFFFFFFFF);
+				V.sel(g, kx, ky, kw, 50, 14);
+			} else V.rr(g, kx, ky, kw, 50, 14, 0xFFEEF2FB);
 			boolean space = i < KEYS.length && KEYS[i].equals(" ");
-			String t = i < KEYS.length ? (space ? "SPACE" : KEYS[i]) : i == KEYS.length ? "DELETE" : "OK";
-			float size = i < KEYS.length && !space ? 26 : space ? 13 : 18;
-			V.centred(g, t, kx + kw / 2, ky + (50 - size * 1.15F) / 2, size, i == KEYS.length + 1 ? 0xFFFFFFFF : on ? V.INK : V.TEXT, true);
+			int c = ok ? (on ? 0xFFFFFFFF : 0xFF1F8A55) : V.INK;
+			if (i < KEYS.length) V.titleCentred(g, space ? "␣" : KEYS[i], kx + kw / 2, V.capsTop(ky + 25, 26), 26, c);
+			else {
+				String t = i == KEYS.length ? Lang.t("DELETE") : "OK";
+				V.centred(g, t, kx + kw / 2, V.capsTop(ky + 25, 18), 18, c, true);
+			}
 			int ii = i;
 			hits.add(kx, ky, kw, 50, () -> {
 				sel = ii;

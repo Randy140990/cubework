@@ -37,7 +37,7 @@ public final class Figures {
 		final Identifier skin;
 		final String species;
 		final float cx, feet, tall;
-		float facing, pitch, wave, talk, hop, spin, look, lookDown, nod, seconds, squash = 1;
+		float facing, pitch, wave, talk, hop, spin, look, lookDown, nod, seconds, squash = 1, walk, floss, lookUp;
 		/** A gesture (people): one of the EMOTES, and how far into it (seconds). */
 		int emote = -1;
 		float emoteSecs;
@@ -92,6 +92,24 @@ public final class Figures {
 		/** Waving (0 to 1): the right arm up and waving. */
 		public Fig wave(float amount) {
 			wave = amount;
+			return this;
+		}
+
+		/** Walking (0 to 1): legs and arms swinging (people). */
+		public Fig walk(float amount) {
+			walk = amount;
+			return this;
+		}
+
+		/** The floss (0 to 1), as the viewer's: both arms swinging to one side and then the other, one in front and one behind, the hips going the other way. */
+		public Fig floss(float amount) {
+			floss = amount;
+			return this;
+		}
+
+		/** Looking up (radians), so a face shows under a cap. */
+		public Fig lookUp(float amount) {
+			lookUp = amount;
 			return this;
 		}
 
@@ -321,6 +339,24 @@ public final class Figures {
 				m.rightArm.xRot = (1 - w) * m.rightArm.xRot + w * -0.15F;
 				m.head.zRot = w * (float) Math.sin(t * 5.5) * 0.06F;
 			}
+			if (f.walk > 0) {
+				float ph = t * 8, sw = (float) Math.sin(ph) * f.walk;
+				m.rightLeg.xRot = sw * 0.62F;
+				m.leftLeg.xRot = -sw * 0.62F;
+				m.rightArm.xRot += -sw * 0.5F;
+				m.leftArm.xRot += sw * 0.5F;
+			}
+			if (f.floss > 0) {
+				float k = Math.min(1, f.floss), w = t * 6.4F, pp = (float) Math.sin(w), hp = (float) Math.sin(w * 2);
+				m.rightArm.zRot = 0.55F * pp * k;
+				m.leftArm.zRot = 0.55F * pp * k;
+				m.rightArm.xRot = -0.55F * pp * k;
+				m.leftArm.xRot = 0.55F * pp * k;
+				m.body.zRot = 0.08F * hp * k;
+				m.rightLeg.x += -1F * hp * k;
+				m.leftLeg.x += -1F * hp * k;
+			}
+			m.head.xRot -= f.lookUp;
 			if (f.emote >= 0) gesture(m, f.emote, f.emoteSecs);
 			if (!nested) {
 				copy(m.head, m.hat);
