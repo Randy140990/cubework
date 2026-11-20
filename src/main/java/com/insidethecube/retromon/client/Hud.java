@@ -118,13 +118,13 @@ public final class Hud {
 		float t = badgeTicks + delta.getGameTimeDeltaPartialTick(true), in = Math.min(1, t / 9F), out = t > 76 ? Math.min(1, (t - 76) / 10F) : 0;
 		float a = in * (1 - out), x = 870 + (1 - in) * 40, y = 96;
 		if (a < 0.02F) return;
-		V.panel(g, x, y, 386, 98, 22, false);
-		V.icon(g, "badge_" + badgeShown, x + 12, y + 20, 58);
-		V.label(g, "Badge", x + 84, y + 14);
-		V.text(g, BADGE_NAMES[badgeShown], x + 84, y + 32, 21, V.TEXT, true);
+		V.panel(g, x, y, 386, 94, 22, false);
+		V.icon(g, "badge_" + badgeShown, x + 3 + 12, y + 3 + 15, 58);
+		V.label(g, Lang.t("Badge"), x + 3 + 12 + 58 + 14, y + 3 + 12);
+		V.text(g, BADGE_NAMES[badgeShown], x + 3 + 12 + 58 + 14, y + 3 + 12 + 20, 21, V.INK, true);
 		java.util.Set<String> have = ClientState.data.badges;
 		for (int j = 0; j < 8; j++)
-			V.icon(g, "badge_" + j, x + 84 + j * 27, y + 64, 22, have.contains(BADGE_NAMES[j]) || j == badgeShown ? 0xFFFFFFFF : 0x8055595E);
+			V.icon(g, "badge_" + j, x + 3 + 12 + 58 + 14 + j * 27, y + 3 + 12 + 20 + 30 + 2, 22, have.contains(BADGE_NAMES[j]) || j == badgeShown ? 0xFFFFFFFF : 0x80767B85);
 	}
 
 	// ---------- your money, sliding in at the top right when it changes (after a battle, say) ----------
@@ -174,8 +174,8 @@ public final class Hud {
 		V.panel(g, 640 - w / 2, y, w, 54, 27, true);
 		V.rr(g, 640 - w / 2 + 12, y + 10, 34, 34, 17, Ui.alpha(0xFFE0A526, k));
 		V.centred(g, "₽", 640 - w / 2 + 29, y + 15, 20, Ui.alpha(0xFF5A3A00, k), true);
-		V.text(g, total, 640 - w / 2 + 58, y + 15, 20, Ui.alpha(V.TEXT, k), true);
-		V.text(g, change, 640 - w / 2 + 58 + tw + 16, y + 16, 18, Ui.alpha(d >= 0 ? 0xFF7CF0A8 : 0xFFFF8A8A, k), true);
+		V.text(g, total, 640 - w / 2 + 58, y + 15, 20, Ui.alpha(V.INK, k), true);
+		V.text(g, change, 640 - w / 2 + 58 + tw + 16, y + 16, 18, Ui.alpha(d >= 0 ? 0xFF2FA86C : 0xFFE5525C, k), true);
 		g.pose().popMatrix();
 	}
 
@@ -202,7 +202,7 @@ public final class Hud {
 		float w = t < 18 ? 0 : t < 28 ? (t - 18) / 10 : t < 46 ? 1 : Math.max(0, 1 - (t - 46) / 10);
 		if (w > 0) {
 			V.fit(g.guiWidth(), g.guiHeight());
-			V.centred(g, fadeWords, 640, 330, 34, Ui.alpha(V.TEXT, w), true);
+			V.titleCentred(g, fadeWords, 640, 330, 34, Ui.alpha(0xFFFFFFFF, w));
 		}
 	}
 
@@ -219,12 +219,13 @@ public final class Hud {
 		if (at == null) return;
 		float cx = V.vx(at[0]), cy = V.vy(at[1]) - 6 + (float) Math.sin((mc.level.getGameTime() + delta.getGameTimeDeltaPartialTick(true)) / 6.0) * 2;
 		String k = key(mc.options.keyJump), word = pr.word();
-		float kw = Math.max(28, V.width(k, 14, true) + 14), ww = V.width(word, 17, true), w = 5 + kw + 8 + ww + 14, h = 38, x = cx - w / 2, y = cy - h;
-		V.shadow(g, x, y, w, h, h / 2, 0.8F);
-		V.pill(g, x, y, w, h, V.EDGE_LIGHT);
-		V.pill(g, x + 1.5F, y + 1.5F, w - 3, h - 3, 0xF2123C38);
-		V.key(g, k, x + 5, y + 5, 28);
-		V.text(g, word, x + 5 + kw + 8, y + 10, 17, V.TEXT, true);
+		word = Lang.t(word);
+		float kw = V.keyWidth(k, 30), ww = V.width(word, 17, false), w = 5 + kw + 8 + ww + 16, h = 40, x = cx - w / 2, y = cy - h;
+		V.pill(g, x - 2, y - 2, w + 4, h + 4, 0x99FFFFFF);
+		V.pill(g, x, y + 4, w, h, 0x2A1E2854);
+		V.pill(g, x, y, w, h, 0xF2FFFFFF);
+		V.key(g, k, x + 5, y + 5, 30);
+		V.text(g, word, x + 5 + kw + 8, V.capsTop(y + 20, 17), 17, V.INK, false);
 	}
 
 	// ---------- the buttons and the time, small at the bottom right ----------
@@ -246,25 +247,41 @@ public final class Hud {
 		int hour = (int) ((t / 1000 + 6) % 24), minute = (int) ((t % 1000) * 60 / 1000);
 		boolean night = Night.nightness() > 0.5F;
 		String clock = String.format("%d:%02d %s", hour % 12 == 0 ? 12 : hour % 12, minute, hour < 12 ? "AM" : "PM");
-		V.hints(g, key(mc.options.keyJump), "Talk", key(Adventure.START), "Menu", key(Adventure.SPEED), "Speed x" + Adventure.speed);
+		V.hints(g, "SPACE".equals(key(mc.options.keyJump)) ? "SPACE" : key(mc.options.keyJump), "Talk", key(Adventure.START), "Menu", key(Adventure.SPEED),
+				Lang.t("Speed x1").replace("1", String.valueOf(Adventure.speed)));
 		V.HINTS.clear();
 		prompt(g, mc, delta);
-		// The time, at the bottom left, with a sun or a moon.
-		float cw = V.width(clock, 17, true) + 44;
-		V.panel(g, 22, V.H - 14 - 36, cw, 36, 18, true);
-		V.rr(g, 34, V.H - 14 - 36 + 11, 14, 14, 7, night ? 0xFFE8ECFF : 0xFFFFC94A);
-		if (night) V.rr(g, 38, V.H - 14 - 36 + 9, 12, 12, 6, 0xFF123C38);
-		V.text(g, clock, 56, V.H - 14 - 36 + 9, 17, V.TEXT, true);
-		// What to do next.
+		// Where you are: a white pill, a sunny dot (a moon's at night), the place in Fredoka and the time on a coral tab.
+		String place = ClientState.placeName.isEmpty() ? "KANTO" : ClientState.placeName;
+		float pw = V.titleWidth(place, 24), tw = V.width(clock, 13, true) + 1 + 24, w0 = 14 + 16 + 12 + pw + 12 + 6 + tw + 8, ph = 24 * 1.5F + 12, px = 24, py = 20;
+		V.pill(g, px - 3, py - 3, w0 + 6, ph + 6, 0x8CFFFFFF);
+		V.shadow(g, px, py, w0, ph, ph / 2, 0.6F);
+		V.pill(g, px, py, w0, ph, 0xFFFFFFFF);
+		float dx = px + 14, dcy = py + ph / 2;
+		V.ellipse(g, dx + 8, dcy, 11, 11, night ? 0xFFDDE3F0 : 0xFFFFE9A0);
+		V.ellipse(g, dx + 8, dcy, 8, 8, night ? 0xFFF4F6FF : 0xFFFFD34E);
+		V.title(g, place, dx + 16 + 12, V.capsTop(dcy, 24), 24, V.INK);
+		float tx = dx + 16 + 12 + pw + 12 + 6;
+		V.rrv(g, tx, dcy - 11.5F, tw, 23, 11.5F, 0xFFFF9473, 0xFFE5525C);
+		V.text(g, clock, tx + 12, V.capsTop(dcy, 13), 13, 0xFFFFFFFF, true);
+		// What to do next: a white card, a blue NEXT tab, the map's pin, and how far.
 		String goal = goal(mc);
 		if (goal != null) {
-			float w = 380, x = V.W - 24 - w, y = 20;
-			V.panel(g, x, y, w, 76, 24, true);
-			V.label(g, "Next", x + 18, y + 14);
-			V.icon(g, "icon_map", x + 18, y + 36, 28);
-			V.text(g, goal, x + 56, y + 38, 19, V.TEXT, true);
+			goal = Lang.t(goal);
+			float w = 390, x = V.W - 24 - w, y = 20, hh = 22 + 21 * 1.5F + 12;
+			V.rr(g, x - 3, y - 3, w + 6, hh + 6, 25, 0x8CFFFFFF);
+			V.shadow(g, x, y, w, hh, 22, 0.6F);
+			V.rr(g, x, y, w, hh, 22, 0xFFFFFFFF);
+			String nx = Lang.t("NEXT");
+			float nw = V.trackedWidth(nx, 13, 1.4F) + 28;
+			V.pill(g, x + 16 - 3, y - 11 - 3, nw + 6, 26, 0xFFFFFFFF);
+			V.rrv(g, x + 16, y - 11, nw, 20, 10, 0xFF7CC2FA, 0xFF3C8DE4);
+			V.tracked(g, nx, x + 16 + 14, V.capsTop(y - 1, 13), 13, 0xFFFFFFFF, 1.4F);
+			float cy = y + 22 + 21 * 1.5F / 2;
+			V.icon(g, "picto_map", x + 18, cy - 15, 30);
+			V.text(g, goal, x + 18 + 30 + 10, V.capsTop(cy, 21), 21, V.INK, true);
 			String far = goalDistance(mc);
-			if (far != null) V.right(g, far, x + w - 18, y + 41, 16, V.MUTED, true);
+			if (far != null) V.right(g, far, x + w - 18, V.capsTop(cy, 16), 16, V.MUTED, true);
 		}
 	}
 
@@ -297,15 +314,15 @@ public final class Hud {
 		float in = Math.min(1, f / 10F), e = 1 - (1 - in) * (1 - in) * (1 - in), out = f > 64 ? Math.min(1, (f - 64) / 12F) : 0;
 		float slide = (1 - e) * -60 - out * 60, alpha = Math.min(in * 1.4F, 1) * (1 - out);
 		String name = ClientState.placeName, line = Adventure.signLine(name);
-		float h = line.isEmpty() ? 100 : 128, x = -V.ox / V.k + slide, w = 760 + V.ox / V.k, y = 210;
-		// The band: solid on the left, fading out to the right.
-		float solid = w * 0.6F;
-		g.fill(Math.round(V.x(x)), Math.round(V.y(y)), Math.round(V.x(x + solid)), Math.round(V.y(y + h)), Ui.alpha(0xF2123C38, alpha));
-		hband(g, x + solid, y, w - solid, h, Ui.alpha(0xF2123C38, alpha));
-		hband(g, x, y, w, 3, Ui.alpha(0xFF8FF5C0, alpha));
-		hband(g, x, y + h - 3, w, 3, Ui.alpha(0xFF8FF5C0, alpha));
-		V.text(g, name, x + V.ox / V.k + 60, y + 18, 54, Ui.alpha(0xFFF4F6FF, alpha), true);
-		if (!line.isEmpty()) V.text(g, line, x + V.ox / V.k + 60, y + 86, 21, Ui.alpha(0xFFCFEDE3, alpha), true);
+		float h = 6 + 20 + 54 * 1.5F + (line.isEmpty() ? 0 : 21 * 1.5F) + 22, x = -V.ox / V.k + slide, w = 780 + V.ox / V.k, y = 210;
+		// The band: white, solid to 58% and fading out to the right, a sunny stripe along its top, a soft shadow.
+		float solid = w * 0.58F;
+		hband(g, x, y + h, w, 14, Ui.alpha(0x1E1E2854, alpha));
+		g.fill(Math.round(V.x(x)), Math.round(V.y(y)), Math.round(V.x(x + solid)), Math.round(V.y(y + h)), Ui.alpha(0xFFFFFFFF, alpha));
+		hband(g, x + solid, y, w - solid, h, Ui.alpha(0xFFFFFFFF, alpha));
+		hband(g, x, y, w, 6, Ui.alpha(0xFFFFC93C, alpha));
+		V.titleTracked(g, name, x + V.ox / V.k + 60, V.capsTop(y + 6 + 20 + 54 * 0.75F, 54), 54, Ui.alpha(V.INK, alpha), 4);
+		if (!line.isEmpty()) V.text(g, Lang.t(line), x + V.ox / V.k + 60, V.capsTop(y + 6 + 20 + 54 * 1.5F + 21 * 0.75F, 21), 21, Ui.alpha(0xFFE5525C, alpha), false);
 	}
 
 	/** A strip fading out to the right (canvas pixels). */

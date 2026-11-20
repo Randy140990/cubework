@@ -55,7 +55,8 @@ public final class Adventure {
 	public static boolean hidden;
 
 	public static void register() {
-		START = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.retromon.start", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_ENTER, CATEGORY));
+		// E, as Minecraft's inventory key (a new name, so an old ENTER setting isn't carried over); ENTER still works.
+		START = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.retromon.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_E, CATEGORY));
 		// TAB, not R: shader packs reload on R. (A new name, so the old R setting isn't carried over.)
 		SPEED = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.retromon.fast", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, CATEGORY));
 		TOGGLE = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.retromon.toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F7, CATEGORY));
@@ -129,6 +130,19 @@ public final class Adventure {
 			if (m != null && m.matches(e)) return false;
 		// The arrow keys walk too.
 		return k != GLFW.GLFW_KEY_UP && k != GLFW.GLFW_KEY_DOWN && k != GLFW.GLFW_KEY_LEFT && k != GLFW.GLFW_KEY_RIGHT;
+	}
+
+	/**
+	 * The menu key (E, as Minecraft's inventory; ENTER too) out in the world: it opens the game's menu, and nothing
+	 * else sees it (so E never opens the inventory). True when it was the menu key.
+	 */
+	public static boolean menuKey(net.minecraft.client.input.KeyEvent e, int action) {
+		Minecraft mc = Minecraft.getInstance();
+		if (!active() || mc.player == null || mc.screen != null) return false;
+		boolean menu = (START != null && START.matches(e)) || e.key() == GLFW.GLFW_KEY_ENTER || e.key() == GLFW.GLFW_KEY_KP_ENTER;
+		if (!menu) return false;
+		if (action == GLFW.GLFW_PRESS && !Device.busy()) Device.open(MenuScreen::new);
+		return true;
 	}
 
 	/** The game's speed: 1x, 2x, 3x, 4x and round again (the world, and battles with it). */

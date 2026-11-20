@@ -39,6 +39,11 @@ public class MenuScreen extends DeviceScreen {
 	private static final String[] POCKETS = {"ITEMS", "BALLS", "KEY ITEMS", "TM & HM"};
 
 	private View view = View.MENU, afterMessage = View.MENU;
+	private final OptionsPage options = new OptionsPage(() -> {
+		if (minecraft != null) minecraft.setScreen(new KeyMapScreen(this));
+	});
+	/** The menu's rows: 0 your partner's emblem, 1 the five tiles, 2 the five pills. */
+	private int menuRow = 1;
 	private int menuAt, partyAt, swapFrom = -1, pocket, bagAt, bagTop, actionAt;
 	private Choice yesNo, waitChoice;
 	private TextBox message;
@@ -129,6 +134,15 @@ public class MenuScreen extends DeviceScreen {
 			}
 			default -> onClose();
 		}
+	}
+
+	/** Your partner's emblem chosen: its summary. */
+	private void openLead() {
+		if (ClientState.data.party.isEmpty()) return;
+		Sounds.press();
+		partyAt = 0;
+		summaryPage = 0;
+		view = View.SUMMARY;
 	}
 
 	private void pickParty(int i) {
@@ -229,14 +243,32 @@ public class MenuScreen extends DeviceScreen {
 		PlayerData d = ClientState.data;
 		switch (view) {
 			case MENU -> {
-				// Two rows (the five big ones, then the five small): left and right along a row, up and down between them.
+				// Your partner on top, the five tiles, the five pills: left and right along a row, up and down between them.
+				if (e.key() == GLFW.GLFW_KEY_E) {
+					onClose();
+					return true;
+				}
 				int[] rc = menuPlace(menuAt);
 				int[] row = rc[0] == 0 ? MAIN_ROW : SIDE_ROW;
-				if (Ui.isLeft(e)) menuAt = row[Math.floorMod(rc[1] - 1, row.length)];
-				else if (Ui.isRight(e)) menuAt = row[Math.floorMod(rc[1] + 1, row.length)];
-				else if (Ui.isUp(e) || Ui.isDown(e)) menuAt = (rc[0] == 0 ? SIDE_ROW : MAIN_ROW)[rc[1]];
-				else if (Ui.isA(e)) pickMenu(menuAt);
-				else if (Ui.isB(e)) onClose();
+				if (menuRow > 0 && Ui.isLeft(e)) menuAt = row[Math.floorMod(rc[1] - 1, row.length)];
+				else if (menuRow > 0 && Ui.isRight(e)) menuAt = row[Math.floorMod(rc[1] + 1, row.length)];
+				else if (Ui.isUp(e)) {
+					if (menuRow == 2) {
+						menuRow = 1;
+						menuAt = MAIN_ROW[rc[1]];
+					} else if (menuRow == 1 && !d.party.isEmpty()) menuRow = 0;
+				} else if (Ui.isDown(e)) {
+					if (menuRow == 0) {
+						menuRow = 1;
+						menuAt = MAIN_ROW[2];
+					} else if (menuRow == 1) {
+						menuRow = 2;
+						menuAt = SIDE_ROW[rc[1]];
+					}
+				} else if (Ui.isA(e)) {
+					if (menuRow == 0) openLead();
+					else pickMenu(menuAt);
+				} else if (Ui.isB(e)) onClose();
 				if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isUp(e) || Ui.isDown(e)) Sounds.select();
 			}
 			case PARTY, USE_ON -> {
@@ -294,11 +326,8 @@ public class MenuScreen extends DeviceScreen {
 				else if (Ui.isA(e)) save();
 			}
 			case OPTION -> {
-				if (Ui.isUp(e) || Ui.isDown(e)) optionRow = Math.floorMod(optionRow + (Ui.isUp(e) ? -1 : 1), OPTION_LABELS.length);
-				else if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isA(e)) {
-					if (optionRow == OPTION_LABELS.length - 1 && !Ui.isA(e)) return true;
-					changeOption(optionRow, Ui.isLeft(e) ? -1 : 1);
-				} else if (Ui.isB(e)) view = View.MENU;
+				if (Ui.isB(e)) view = View.MENU;
+				else options.key(e);
 			}
 			case MESSAGE -> {
 				if ((Ui.isA(e) || Ui.isB(e)) && message.press()) view = afterMessage;
@@ -440,7 +469,7 @@ public class MenuScreen extends DeviceScreen {
 					else view = View.MENU;
 				});
 			}
-			case OPTION -> drawOptions(g, d);
+			case OPTION -> options.draw(g, this::vhit, mx, my);
 			case WAIT -> {
 				TextBox.still("Wait until when?").renderV(g, font, 140, 26, 1000, ticks, partial, false);
 				vchoice(g, waitChoice, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(waitChoice.options.size()), 300, this::waitUntil);
@@ -456,102 +485,158 @@ public class MenuScreen extends DeviceScreen {
 		}
 	}
 
-	/** What each tile does, in a line (the UI Viewer's words). */
+	/** What each does, in a line (the UI Viewer's words). */
 	private static final String[] LINES = {"Every POKéMON you've seen and caught.", "Your team: check them, switch them, pick who follows you.", "Your items, in four pockets.",
-			"The TOWN MAP: where you are, and where everywhere else is.", "Change what you're wearing.", "Your TRAINER CARD and badges.",
-			"Let time pass, to morning, midday, evening or night.", "Save your game.", "Text speed, music, nights and more.", "Close the menu."};
+			"The whole region, and where you are in it.", "Change your clothes, hat and bag.", "Your trainer card: your name, money and badges.",
+			"Let the time pass: morning, midday, evening or night.", "Save your adventure so far.", "Text speed, music, nights and more.", "Close the menu."};
+	/** How each shows: POKéMON is PARTY, as Let's Go has it. */
+	private static final String[] SHOWN = {"POKéDEX", "PARTY", "BAG", "MAP", "CLOTHES", "CARD", "WAIT", "SAVE", "OPTION", "EXIT"};
+	/** The tiles' white pictures (the viewer's PICTO) and the pills' icons. */
+	private static final String[] PICTOS = {"picto_dex_white", "picto_ball_white", "picto_bag_white", "picto_map_white", null, null, null, "picto_save_white", null, null};
 	private static final String[] TILE_ICONS = {"icon_dex", "icon_ball", "icon_bag", "icon_map", "icon_cap", "icon_card", "icon_clock", "icon_save", "icon_cog", "icon_close"};
 
-	/**
-	 * The menu, as the UI Viewer's: MENU at the top, the ten big round tiles in two rows of five (our own symbols on
-	 * teal; the one you're on cream, lifted and glowing), what it does in a panel underneath.
-	 */
-	/** The menu's rows (indexes into ITEMS): the five big ones (as Let's Go's), then the five small ones. */
-	private static final int[] MAIN_ROW = {0, 1, 2, 3, 7}, SIDE_ROW = {4, 5, 6, 8, 9};
-	/** Each big one's colours, light at the top to deep at the foot. */
-	private static final int[][] MAIN_COLS = {{0xFFF58A94, 0xFFD94452, 0xFFAE2E3C}, {0xFF7EE3AE, 0xFF39B27A, 0xFF22855A}, {0xFFFFD27A, 0xFFF0A030, 0xFFC87818},
-			{0xFF8EC4F6, 0xFF4A8FE0, 0xFF2F64B0}, {0xFFC6AEF4, 0xFF8A62D8, 0xFF6440B0}};
+	/** The menu's rows (indexes into ITEMS): the five tiles in Let's Go's order (POKéDEX, BAG, PARTY, MAP, SAVE), then the five pills. */
+	private static final int[] MAIN_ROW = {0, 2, 1, 3, 7}, SIDE_ROW = {4, 5, 6, 8, 9};
+	/** Each tile's colours (light, middle, deep), by its place in the row: red, orange, green, blue, purple. */
+	private static final int[][] MAIN_COLS = {{0xFFFF8C8C, 0xFFE5484F, 0xFFB92F3A}, {0xFFFFC566, 0xFFF59A2A, 0xFFD2731A}, {0xFF7FE3A6, 0xFF3DB873, 0xFF228A52},
+			{0xFF7CC2FA, 0xFF3C8DE4, 0xFF2763B8}, {0xFFC9A8F7, 0xFF8F60DE, 0xFF6740B6}};
 
-	/** Which row an item's in (0 the big ones, 1 the small) and where along it. */
+	/** Which row an item's in (0 the tiles, 1 the pills) and where along it. */
 	private static int[] menuPlace(int item) {
 		for (int i = 0; i < MAIN_ROW.length; i++) if (MAIN_ROW[i] == item) return new int[] {0, i};
 		for (int i = 0; i < SIDE_ROW.length; i++) if (SIDE_ROW[i] == item) return new int[] {1, i};
 		return new int[] {0, 0};
 	}
 
+	/** Words with a thick white edge (the viewer's -webkit-text-stroke: 5px #fff), in Fredoka. */
+	private static void stroked(GuiGraphics g, String t, float cx, float y, float size, int ink) {
+		float w = V.titleTrackedWidth(t, size, 1), x = cx - w / 2;
+		for (int i = 0; i < 12; i++) {
+			double an = i * Math.PI / 6;
+			V.titleTracked(g, t, x + (float) Math.cos(an) * 2.5F, y + (float) Math.sin(an) * 2.5F, size, 0xFFFFFFFF, 1);
+		}
+		V.titleTracked(g, t, x, y, size, ink, 1);
+	}
+
 	/**
-	 * The START menu, as Let's Go lays it out: your partner in a round badge at the top (where Let's Go has its
-	 * Pikachu), five big round buttons in their own colours (POKéDEX, POKéMON, BAG, MAP, SAVE) with their pictures,
-	 * then five smaller ones under them (CLOTHES, CARD, WAIT, OPTION, EXIT), and what the one you're on does.
+	 * The menu, as the UI Viewer's (Let's Go's player menu, signed off 20 Nov): the world behind washed pale; your
+	 * partner's emblem at the top (the shape of its head in its own colour); a row of five rounded tiles, each its own
+	 * colour with a white picture (the one you're on lifts and glows in its colour, a big white arrow points at it,
+	 * a line in its colour runs under its name); the smaller things as white pills underneath; what it does.
 	 */
 	private void drawMenu(GuiGraphics g) {
 		PlayerData d = ClientState.data;
 		float secs = (ticks + Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true)) / 20F;
-		// Your partner's badge (or the name, before you have one).
+		// The world washed pale (the viewer's blur over it), whiter towards the foot.
+		g.fill(0, 0, width, height, 0x38ECF4FF);
+		int top = Math.round(V.y(720 * 0.3F)), mid = Math.round(V.y(720 * 0.62F));
+		g.fillGradient(0, top, width, mid, 0x00FFFFFF, 0x8CFFFFFF);
+		g.fillGradient(0, mid, width, height, 0x8CFFFFFF, 0xCCFFFFFF);
+		boolean menu = view == View.MENU;
+		// Your partner's emblem, on its own.
 		String lead = d.party.isEmpty() ? null : d.party.get(0).species.id();
-		float bx = 640, by = 118, br = 64;
-		V.ellipse(g, bx, by + 6, br + 6, br + 6, 0x40000000);
-		V.ellipse(g, bx, by, br + 6, br + 6, 0xFFFFFFFF);
 		if (lead != null) {
-			Species sp = Species.ALL.get(lead);
-			int ring = sp == null ? V.EDGE : Ui.typeColor(sp.type1()) | 0xFF000000;
-			V.ellipse(g, bx, by, br + 2, br + 2, ring);
-			V.rrStops(g, bx - br + 3, by - br + 3, 2 * br - 6, 2 * br - 6, br - 3, new float[] {0, 1}, new int[] {0xFFFFFBF0, Ui.mix(ring, 0xFFFFFFFF, 0.72F)});
-			float ps = 2 * br - 18 + (float) Math.sin(secs * 2.2) * 2;
-			V.img(g, Look.portrait(lead), bx - ps / 2, by - ps / 2, ps, ps, 128, 128, 0xFFFFFFFF);
-			String nm = d.party.get(0).name();
-			float nw = V.width(nm, 17, true) + 34;
-			V.pill(g, bx - nw / 2, by + br - 6, nw, 30, ring);
-			V.centred(g, nm, bx, V.capsTop(by + br + 9, 17), 17, 0xFFFFFFFF, true);
-		} else {
-			V.rrStops(g, bx - br + 3, by - br + 3, 2 * br - 6, 2 * br - 6, br - 3, new float[] {0, 1}, new int[] {0xFFFFFBF0, 0xFFE6F4EE});
-			V.icon(g, "icon_ball", bx - 40, by - 40, 80);
+			float ew = 230, ex = 525, ey = 58;
+			if (menu && vover(ex, ey, ew, ew * 0.9F)) menuRow = 0;
+			boolean on = menu && menuRow == 0;
+			g.pose().pushMatrix();
+			if (on) {
+				float cx0 = V.x(640), cy0 = V.y(ey + ew * 0.45F);
+				g.pose().translate(cx0, cy0 - V.s(6));
+				g.pose().scale(1.05F, 1.05F);
+				g.pose().translate(-cx0, -cy0);
+			}
+			if (java.util.Set.of("pikachu", "charmander", "bulbasaur", "squirtle").contains(lead))
+				V.img(g, V.tex("emblem_" + lead), ex, ey - (ew - ew * 0.9F) / 2, ew, ew, 256, 256, 0xFFFFFFFF);
+			else {
+				Species sp = Species.ALL.get(lead);
+				int col = sp == null ? 0xFFF6B42A : Ui.typeColor(sp.type1()) | 0xFF000000;
+				for (int i = 0; i < 8; i++) {
+					double an = i * Math.PI / 4;
+					V.img(g, Look.portrait(lead), ex + (float) Math.cos(an) * 4, ey + (float) Math.sin(an) * 4, ew, ew, 128, 128, 0xFFFFFFFF);
+				}
+				V.img(g, Look.portrait(lead), ex, ey, ew, ew, 128, 128, Ui.mix(col, 0xFFFFFFFF, 0.15F));
+			}
+			g.pose().popMatrix();
+			if (menu) vhit(ex, ey, ew, ew * 0.9F, () -> {
+				menuRow = 0;
+				openLead();
+			});
 		}
-		// The five big ones.
+		// The five tiles.
 		for (int c = 0; c < MAIN_ROW.length; c++) {
 			int i = MAIN_ROW[c];
-			float cx = 240 + c * 200, cy = 330, r = 70;
+			int[] col = MAIN_COLS[c];
+			float cx = 640 + (c - 2) * 172, tx = cx - 70, ty = 352, sq = 124;
 			boolean off = ITEMS[i].equals("POKéDEX") && !d.hasDex() || ITEMS[i].equals("POKéMON") && d.party.isEmpty();
-			if (view == View.MENU && vover(cx - r, cy - r, 2 * r, 2 * r + 50)) menuAt = i;
-			boolean on = i == menuAt && view == View.MENU;
-			float lift = on ? -10 : 0, rr = on ? r * 1.08F : r;
-			int[] col = off ? new int[] {0xFF9AA6A2, 0xFF7A8682, 0xFF5E6864} : MAIN_COLS[c];
-			if (on) V.ellipse(g, cx, cy + lift, rr + 12, rr + 12, 0x66FFF4D8);
-			V.ellipse(g, cx, cy + lift + 8, rr + 2, rr + 2, 0x4D000000);
-			V.ellipse(g, cx, cy + lift, rr + 4, rr + 4, on ? V.CREAM : 0xFFFFFFFF);
-			V.rrStops(g, cx - rr, cy + lift - rr, 2 * rr, 2 * rr, rr, new float[] {0, 0.55F, 1}, col);
-			// Its pale face, with the picture on it.
-			float fr = rr * 0.72F;
-			V.rrStops(g, cx - fr, cy + lift - fr, 2 * fr, 2 * fr, fr, new float[] {0, 1}, new int[] {0xFFFFFFFF, Ui.mix(col[0], 0xFFFFFFFF, 0.74F)});
-			float is = rr;
-			V.icon(g, TILE_ICONS[i], cx - is / 2, cy + lift - is / 2, is, off ? 0x99FFFFFF : 0xFFFFFFFF);
-			V.centred(g, ITEMS[i], cx, cy + r + 18 + 2 + lift, 21, 0x80000000, true);
-			V.centred(g, ITEMS[i], cx, cy + r + 18 + lift, 21, on ? V.CREAM : off ? V.DIM : V.TEXT, true);
+			if (menu && vover(tx, ty, 140, sq + 10 + 32)) {
+				menuRow = 1;
+				menuAt = i;
+			}
+			boolean on = menu && menuRow == 1 && i == menuAt;
+			float lift = on ? -10 : 0, sc = on ? 1.08F : 1, sx = cx - sq / 2, sy = ty + lift;
+			g.pose().pushMatrix();
+			float pcx = V.x(cx), pcy = V.y(sy + sq / 2);
+			g.pose().translate(pcx, pcy);
+			g.pose().scale(sc, sc);
+			g.pose().translate(-pcx, -pcy);
+			if (on) {
+				V.rr(g, sx - 16, sy - 16, sq + 32, sq + 32, 50, Ui.alpha(col[0], 0.45F));
+				V.rr(g, sx - 8, sy - 8, sq + 16, sq + 16, 42, Ui.alpha(0xFFFFFFFF, 0.9F));
+			}
+			V.rr(g, sx, sy + 7, sq, sq, 34, 0x2E1E2854);
+			V.shadow(g, sx, sy, sq, sq, 34, 0.9F);
+			V.rr(g, sx, sy, sq, sq, 34, 0xFFFFFFFF);
+			int a = on ? 0xFF : 0xEB;
+			V.rrStops(g, sx + 4, sy + 4, sq - 8, sq - 8, 30, new float[] {0, 0.58F, 1}, new int[] {Ui.alpha(col[0], a / 255F), Ui.alpha(col[1], a / 255F), Ui.alpha(col[2], a / 255F)});
+			V.rrv(g, sx + 4 + sq * 0.08F, sy + 4 + sq * 0.05F, sq - 8 - sq * 0.16F, sq * 0.4F, 26, 0x73FFFFFF, 0x00FFFFFF);
+			String pic = PICTOS[i] != null ? PICTOS[i] : TILE_ICONS[i];
+			V.icon(g, pic, cx - 37, sy + sq / 2 - 37 + 3, 74, 0x24000000);
+			V.icon(g, pic, cx - 37, sy + sq / 2 - 37, 74, off ? 0x99FFFFFF : 0xFFFFFFFF);
+			g.pose().popMatrix();
+			// Its name with a thick white edge, lifted when on, and a line in its colour under it.
+			float ny = ty + sq + 10 + (on ? -4 : 0);
+			stroked(g, Lang.t(SHOWN[i]), cx, ny + 4, 21, off ? V.DIM : V.INK);
+			if (on) V.pill(g, cx - 48, ny + 31.5F - 6 + 2, 96, 6, 0x1F000000);
+			if (on) V.pill(g, cx - 48, ny + 31.5F - 6, 96, 6, col[1]);
+			// The big white arrow pointing at it from the side.
+			if (on) {
+				float ax = tx - 26 + 20, ay = ty + 28 + 24;
+				V.tri(g, ax + 1, ay + 3, 46, 0, 0x591E2854);
+				V.tri(g, ax, ay, 46, 0, 0xFFFFFFFF);
+				V.tri(g, ax - 1, ay, 24, 0, 0xFFDDE3EE);
+			}
 			int idx = i;
-			if (view == View.MENU) vhit(cx - r, cy - r, 2 * r, 2 * r + 50, () -> pickMenu(idx));
+			if (menu) vhit(tx, ty, 140, sq + 10 + 32, () -> pickMenu(idx));
 		}
-		// The five small ones, as pills.
+		// The five pills.
 		for (int c = 0; c < SIDE_ROW.length; c++) {
 			int i = SIDE_ROW[c];
-			float w = 186, h = 54, x = 640 - (5 * w + 4 * 16) / 2 + c * (w + 16), y = 486;
-			if (view == View.MENU && vover(x, y, w, h)) menuAt = i;
-			boolean on = i == menuAt && view == View.MENU;
-			if (on) V.pill(g, x - 4, y - 4, w + 8, h + 8, 0x66FFF4D8);
-			V.pill(g, x, y + 4, w, h, 0x40000000);
-			if (on) V.pill(g, x, y, w, h, V.CREAM);
-			else {
-				V.pill(g, x, y, w, h, V.EDGE);
-				V.rrStops(g, x + 2.5F, y + 2.5F, w - 5, h - 5, (h - 5) / 2, new float[] {0, 1}, new int[] {0xF51D5A52, 0xF5123C38});
+			float w = 190, h = 54, x = 640 - (5 * w + 4 * 14) / 2 + c * (w + 14), y = 560;
+			if (menu && vover(x, y, w, h)) {
+				menuRow = 2;
+				menuAt = i;
 			}
-			V.ellipse(g, x + h / 2, y + h / 2, h / 2 - 7, h / 2 - 7, on ? 0xFF26304A : 0x40FFFFFF);
-			V.icon(g, TILE_ICONS[i], x + h / 2 - 15, y + h / 2 - 15, 30, 0xFFFFFFFF);
-			V.text(g, ITEMS[i], x + h + 6, V.capsTop(y + h / 2, 19), 19, on ? V.INK : V.TEXT, true);
+			boolean on = menu && menuRow == 2 && i == menuAt;
+			if (on) {
+				y -= 3;
+				V.pill(g, x - 6, y - 6, w + 12, h + 12, 0xFF41BF84);
+				V.pill(g, x - 3, y - 3, w + 6, h + 6, 0xFFFFFFFF);
+				V.sel(g, x, y, w, h, h / 2);
+			} else {
+				V.pill(g, x - 2, y - 2, w + 4, h + 4, 0xB3FFFFFF);
+				V.shadow(g, x, y, w, h, h / 2, 0.6F);
+				V.pill(g, x, y, w, h, 0xFFFFFFFF);
+			}
+			V.ellipse(g, x + 7 + 20, y + h / 2, 20, 20, on ? 0xFFFFFFFF : 0xFFF1F4FB);
+			V.icon(g, TILE_ICONS[i], x + 7 + 5, y + h / 2 - 15, 30);
+			V.title(g, Lang.t(SHOWN[i]), x + 7 + 40 + 12, V.capsTop(y + h / 2, 19), 19, V.INK);
 			int idx = i;
-			if (view == View.MENU) vhit(x, y, w, h, () -> pickMenu(idx));
+			if (menu) vhit(x, y, w, h, () -> pickMenu(idx));
 		}
-		V.panel(g, 240, 576, 800, 58, 24, true);
-		V.centred(g, LINES[Math.max(0, Math.min(LINES.length - 1, menuAt))], 640, V.capsTop(576 + 29, 21), 21, V.TEXT, true);
-		V.hints(g, "A", "Open", "B", "Close");
+		String line = menuRow == 0 && lead != null ? Lang.t("See how {0} is doing.", d.party.get(0).name()) : Lang.t(LINES[Math.max(0, Math.min(LINES.length - 1, menuAt))]);
+		V.centred(g, line, 640, V.capsTop(640 + 14, 19), 19, V.INK, false);
+		if (menu) V.hints(g, "A", "Open", "B", "Close");
 	}
 
 	/** One Pokémon as a card: name, level, HP bar and numbers, status and types. */
