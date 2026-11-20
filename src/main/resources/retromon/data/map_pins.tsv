@@ -1,0 +1,99 @@
+# The Town Map's places, as the UI Viewer has them (written by tools/map_pins.py from tools/uiviewer/*_points.tsv).
+# region	key	x	z	kind	name	zone	how	wild	here
+kanto	pallet_town	-795	695	town	PALLET TOWN	-845,655,-745,735	Fishing	staryu,tentacool	-
+kanto	route_1	-795	622	route	ROUTE 1	-845,590,-745,654	Grass	pidgey,rattata	-
+kanto	viridian_city	-787	542	town	VIRIDIAN CITY	-830,495,-745,589	Fishing	poliwag	-
+kanto	route_22	-866	530	route	ROUTE 22	-900,495,-831,565	Grass|Fishing	nidoran_m,nidoran_f,mankey,rattata,spearow,poliwag,poliwhirl	-
+kanto	route_2	-787	417	route	ROUTE 2	-830,340,-745,494	Grass	rattata,pidgey,nidoran_m,nidoran_f,weedle	-
+kanto	pewter_city	-790	295	town	PEWTER CITY	-	Fishing	magikarp,krabby,corsola,staryu,kingler	-
+kanto	route_3	-665	305	route	ROUTE 3	-	Grass	spearow,mankey,sandshrew,rattata,igglybuff	-
+kanto	mt_moon	-570	262	spot	MT.MOON	-	Grass	zubat,geodude,sandshrew,clefairy,paras	-
+kanto	route_4	-480	262	route	ROUTE 4	-	Grass|Fishing	spearow,mankey,sandshrew,rattata,ekans,cleffa,goldeen,seaking	-
+kanto	cerulean_city	-345	258	town	CERULEAN CITY	-	Fishing	goldeen,seaking	-
+kanto	route_24	-352	180	route	ROUTE 24	-	Grass|Fishing	oddish,bellsprout,pidgey,venonat,pidgeotto,kakuna,weedle,goldeen,seaking	-
+kanto	route_25	-262	150	route	ROUTE 25	-	Grass|Fishing	oddish,bellsprout,pidgey,venonat,pidgeotto,kakuna,weedle,bulbasaur,krabby,kingler	-
+kanto	route_9	-230	262	route	ROUTE 9	-	Grass	nidoran_m,nidoran_f,rattata,spearow,nidorino,nidorina,raticate,fearow,ekans	-
+kanto	route_10	-128	262	route	ROUTE 10	-	Grass|Fishing	magnemite,rattata,nidoran_m,nidoran_f,raticate,machop,ekans,krabby,horsea,kingler	-
+kanto	rock_tunnel	-140	321	spot	ROCK TUNNEL	-	Grass	zubat,geodude,machop,onix	-
+kanto	route_5	-342	335	route	ROUTE 5	-	Grass	pidgey,rattata,abra,pidgeotto,jigglypuff,meowth	-
+kanto	saffron_city	-350	422	town	SAFFRON CITY	-	Fishing	magikarp,krabby,corsola,staryu,kingler	-
+kanto	route_7	-430	424	route	ROUTE 7	-	Grass	pidgey,rattata,abra,pidgeotto,jigglypuff,meowth,vulpix,houndour,murkrow	-
+kanto	celadon_city	-512	422	town	CELADON CITY	-	Fishing	goldeen	-
+kanto	route_16	-620	418	route	ROUTE 16	-	Grass	spearow,doduo,rattata,fearow,raticate,murkrow,slugma	-
+kanto	route_8	-230	420	route	ROUTE 8	-	Grass	pidgey,rattata,abra,pidgeotto,jigglypuff,kadabra,ekans,meowth,vulpix	-
+kanto	lavender_town	-126	425	town	LAVENDER TOWN	-	Fishing	magikarp,krabby,corsola,staryu,kingler	-
+kanto	route_6	-355	505	route	ROUTE 6	-	Grass|Surfing|Fishing	pidgey,rattata,abra,pidgeotto,jigglypuff,meowth,squirtle,psyduck,golduck,goldeen	-
+kanto	vermilion_city	-355	580	town	VERMILION CITY	-	Fishing	tentacool,horsea	-
+kanto	route_11	-230	585	route	ROUTE 11	-	Grass|Fishing	pidgey,rattata,drowzee,pidgeotto,raticate,ekans,tentacool,horsea	-
+kanto	route_12	-124	560	route	ROUTE 12	-	Grass|Surfing|Fishing	oddish,bellsprout,pidgey,pidgeotto,gloom,weepinbell,farfetchd,slowpoke,slowbro,horsea,seadra	-
+kanto	route_13	-195	710	route	ROUTE 13	-	Grass|Surfing|Fishing	oddish,bellsprout,pidgeotto,pidgey,gloom,weepinbell,farfetchd,slowpoke,slowbro,horsea,tentacool,seadra	-
+kanto	route_14	-270	745	route	ROUTE 14	-	Grass	oddish,bellsprout,venonat,pidgeotto,gloom,weepinbell,venomoth	-
+kanto	route_15	-360	785	route	ROUTE 15	-	Grass	oddish,bellsprout,venonat,pidgeotto,gloom,weepinbell,venomoth	-
+kanto	fuchsia_city	-500	785	town	FUCHSIA CITY	-	Fishing	magikarp,gyarados	-
+kanto	route_18	-590	782	route	ROUTE 18	-	Grass|Fishing	spearow,doduo,rattata,fearow,raticate,slugma,tentacool,shellder	-
+kanto	route_17	-640	590	route	ROUTE 17	-	Grass|Fishing	doduo,fearow,ponyta,dodrio,slugma,tentacool,shellder	-
+kanto	route_19	-500	870	route	ROUTE 19	-	Surfing|Fishing	tentacool,staryu,tentacruel	-
+kanto	route_20	-575	920	route	ROUTE 20	-	Surfing|Fishing	tentacool,tentacruel,staryu	-
+kanto	seafoam_islands	-630	925	town	SEAFOAM ISLANDS	-	Grass|Surfing|Fishing	zubat,krabby,golbat,slowpoke,kingler,seel,slowbro,dewgong,tentacool,staryu	-
+kanto	cinnabar_island	-825	912	town	CINNABAR ISLAND	-	Fishing	staryu,tentacool	-
+kanto	route_21	-795	805	route	ROUTE 21	-	Grass|Surfing|Fishing	pidgey,rattata,raticate,pidgeotto,tentacool,staryu,tentacruel	-
+kanto	route_23	-910	440	route	ROUTE 23	-	Grass|Fishing	nidorino,nidorina,mankey,fearow,primeape,arbok,ekans,poliwag,poliwhirl	-
+kanto	victory_road	-910	300	spot	VICTORY ROAD	-	Grass	geodude,zubat,onix,graveler,golbat,machoke	-
+kanto	indigo_plateau	-910	170	town	INDIGO PLATEAU	-	-	-	-
+kanto	route_26	-985	640	route	ROUTE 26	-	-	-	-
+kanto	route_27	-1120	756	route	ROUTE 27	-	-	-	-
+kanto	route_28	-1080	527	route	ROUTE 28	-	-	-	-
+kanto	viridian_forest	-815	410	spot	VIRIDIAN FOREST	-	Grass	caterpie,metapod,pidgey,pidgeotto,kakuna,pikachu,weedle,pichu	-
+kanto	digletts_cave	-775	432	spot	DIGLETT's CAVE	-	Grass	diglett,dugtrio	-
+kanto	power_plant	-150	228	spot	POWER PLANT	-	Grass	magnemite,magneton,voltorb,grimer,muk,electabuzz,pikachu,raichu,elekid	-
+kanto	pokemon_tower	-115	416	spot	POKéMON TOWER	-	Grass	gastly,haunter,cubone	-
+kanto	safari_zone	-505	752	spot	SAFARI ZONE	-	Grass|Fishing	nidoran_m,nidoran_f,exeggcute,tauros,nidorina,cubone,marowak,chansey,scyther,rhyhorn,kangaskhan,pinsir,nidorino,tangela,parasect,paras,magikarp,dratini,dragonair	-
+kanto	pokemon_mansion	-858	890	spot	POKéMON MANSION	-	Grass	rattata,raticate,grimer,growlithe,koffing,vulpix,weezing,charmander,muk,magmar,ditto	-
+kanto	cerulean_cave	-388	240	spot	CERULEAN CAVE	-	Grass|Fishing	golbat,graveler,sandslash,rhyhorn,ditto,gloom,weepinbell,rhydon,electrode,wigglytuff,chansey,lickitung,arbok,raichu,venomoth,parasect,hypno,goldeen,seaking	-
+kanto	tohjo_falls	-1190	742	spot	TOHJO FALLS	-	-	-	-
+johto	new_bark_town	-1452	772	town	NEW BARK TOWN	-	Surfing|Fishing|Headbutt	tentacool,tentacruel,magikarp,chinchou,shellder,lanturn,venonat,abra,venomoth,magnemite	-
+johto	route_29	-1588	758	route	ROUTE 29	-	Grass|Fishing|Headbutt	pidgey,sentret,rattata,hoothoot,magikarp,krabby,corsola,staryu,kingler,spearow,aipom,heracross	-
+johto	cherrygrove_city	-1712	770	town	CHERRYGROVE CITY	-	Surfing|Fishing	tentacool,tentacruel,magikarp,krabby,corsola,staryu,kingler	-
+johto	route_30	-1716	640	route	ROUTE 30	-	Grass|Surfing|Fishing|Headbutt	ledyba,weedle,kakuna,pidgey,caterpie,metapod,hoothoot,rattata,spinarak,poliwag,poliwhirl,magikarp,spearow,aipom,heracross	-
+johto	route_31	-1765	556	route	ROUTE 31	-	Grass|Surfing|Fishing|Headbutt	ledyba,weedle,bellsprout,kakuna,pidgey,caterpie,metapod,hoothoot,rattata,spinarak,poliwag,poliwhirl,magikarp,spearow,aipom,heracross	-
+johto	violet_city	-1842	542	town	VIOLET CITY	-	Surfing|Fishing|Headbutt	poliwag,poliwhirl,magikarp,venonat,abra,venomoth,magnemite	-
+johto	sprout_tower	-1846	478	spot	SPROUT TOWER	-	Grass|Fishing	rattata,gastly,magikarp,krabby,corsola,staryu,kingler	-
+johto	route_32	-1900	672	route	ROUTE 32	-	Grass|Surfing|Fishing|Headbutt	bellsprout,ekans,mareep,hoppip,rattata,wooper,zubat,totodile,tentacool,quagsire,tentacruel,magikarp,qwilfish,spearow,aipom,heracross	-
+johto	ruins_of_alph	-2060	590	spot	RUINS OF ALPH	-	Grass|Surfing|Fishing	natu,smeargle,unown,wooper,quagsire,magikarp,poliwag,krabby,corsola,staryu,kingler	-
+johto	union_cave	-1912	838	spot	UNION CAVE	-	Grass|Surfing|Fishing	geodude,rattata,zubat,onix,sandshrew,raticate,golbat,wooper,quagsire,tentacool,tentacruel,magikarp,goldeen,seaking,krabby,corsola,staryu,kingler	-
+johto	route_33	-1950	866	route	ROUTE 33	-	Grass|Fishing|Headbutt	hoppip,ekans,spearow,rattata,zubat,magikarp,krabby,corsola,staryu,kingler,aipom,heracross	-
+johto	azalea_town	-2005	866	town	AZALEA TOWN	-	Fishing|Headbutt	magikarp,krabby,corsola,staryu,kingler,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
+johto	slowpoke_well	-1990	848	spot	SLOWPOKE WELL	-	Grass|Surfing|Fishing|Rock Smash	zubat,slowpoke,golbat,slowbro,magikarp,goldeen,seaking,krabby,shuckle	-
+johto	ilex_forest	-2075	905	spot	ILEX FOREST	-	Grass|Surfing|Fishing|Headbutt	weedle,kakuna,paras,zubat,caterpie,metapod,oddish,psyduck,golduck,magikarp,poliwag,exeggcute,butterfree,pineco,beedrill	-
+johto	route_34	-2100	800	route	ROUTE 34	-	Grass|Surfing|Fishing|Headbutt	drowzee,rattata,abra,ditto,tentacool,tentacruel,magikarp,krabby,corsola,staryu,kingler,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
+johto	goldenrod_city	-2100	700	town	GOLDENROD CITY	-	Fishing	magikarp,krabby,corsola,staryu,kingler	-
+johto	radio_tower	-2080	664	spot	RADIO TOWER	-	-	-	-
+johto	route_35	-2095	600	route	ROUTE 35	-	Grass|Surfing|Fishing|Headbutt|Swarms	nidoran_f,nidoran_m,drowzee,abra,pidgey,ditto,yanma,hoothoot,psyduck,golduck,magikarp,poliwag,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
+johto	national_park	-2126	486	spot	NATIONAL PARK	-	Grass|Fishing|Bug-Catching Contest	weedle,kakuna,pidgey,caterpie,metapod,sunkern,togepi,hoothoot,magikarp,krabby,corsola,staryu,kingler,butterfree,beedrill,venonat,paras,scyther,pinsir	-
+johto	route_36	-1975	512	route	ROUTE 36	-	Grass|Fishing|Headbutt	nidoran_f,nidoran_m,pidgey,vulpix,stantler,growlithe,hoothoot,magikarp,krabby,corsola,staryu,kingler,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
+johto	route_37	-2040	455	route	ROUTE 37	-	Grass|Fishing|Headbutt	ledyba,stantler,pidgey,vulpix,growlithe,pidgeotto,cyndaquil,hoothoot,spinarak,magikarp,krabby,corsola,staryu,kingler,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
+johto	ecruteak_city	-2032	392	town	ECRUTEAK CITY	-	Surfing|Fishing|Headbutt	poliwag,poliwhirl,magikarp,venonat,abra,venomoth,magnemite	-
+johto	tin_tower	-1980	350	spot	TIN TOWER	-	Grass|Fishing	rattata,gastly,magikarp,krabby,corsola,staryu,kingler	-
+johto	burned_tower	-2066	358	spot	BURNED TOWER	-	Grass|Fishing	rattata,koffing,zubat,raticate,magby,magmar,magikarp,krabby,corsola,staryu,kingler	-
+johto	route_38	-2182	392	route	ROUTE 38	-	Grass|Fishing|Headbutt|Swarms	meowth,raticate,magnemite,farfetch_d,miltank,tauros,snubbull,rattata,magikarp,krabby,corsola,staryu,kingler,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
+johto	route_39	-2306	452	route	ROUTE 39	-	Grass|Fishing|Headbutt	meowth,raticate,magnemite,farfetch_d,miltank,tauros,rattata,magikarp,krabby,corsola,staryu,kingler,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
+johto	olivine_city	-2268	560	town	OLIVINE CITY	-	Surfing|Fishing	tentacool,tentacruel,magikarp,krabby,corsola,staryu,kingler,chinchou,shellder,lanturn	-
+johto	lighthouse	-2222	582	spot	LIGHTHOUSE	-	Fishing	magikarp,krabby,corsola,staryu,kingler	-
+johto	battle_tower	-2390	575	spot	BATTLE TOWER	-	-	-	-
+johto	route_40	-2372	620	route	ROUTE 40	-	Surfing|Fishing|Rock Smash	tentacool,tentacruel,magikarp,krabby,corsola,staryu,kingler,shuckle	-
+johto	whirl_islands	-2432	762	town	WHIRL ISLANDS	-	Grass|Surfing|Fishing	krabby,zubat,seel,golbat,tentacool,horsea,tentacruel,seadra,magikarp,kingler	-
+johto	route_41	-2482	742	route	ROUTE 41	-	Surfing|Fishing	tentacool,tentacruel,mantine,magikarp,chinchou,shellder,lanturn	-
+johto	cianwood_city	-2536	762	town	CIANWOOD CITY	-	Surfing|Fishing|Rock Smash	tentacool,tentacruel,magikarp,krabby,corsola,staryu,kingler,shuckle	-
+johto	route_42	-1935	398	route	ROUTE 42	-	Grass|Surfing|Fishing|Headbutt	mareep,spearow,flaaffy,mankey,zubat,goldeen,seaking,magikarp,aipom,heracross	-
+johto	mt_mortar	-1840	352	spot	MT.MORTAR	-	Grass|Surfing|Fishing|Swarms	zubat,machop,rattata,geodude,marill,tyrogue,graveler,machoke,raticate,golbat,goldeen,seaking,magikarp	-
+johto	mahogany_town	-1762	410	town	MAHOGANY TOWN	-	Fishing|Headbutt	magikarp,krabby,corsola,staryu,kingler,venonat,abra,venomoth,magnemite	-
+johto	route_43	-1772	300	route	ROUTE 43	-	Grass|Surfing|Fishing|Headbutt	flaaffy,girafarig,pidgeotto,mareep,venonat,noctowl,magikarp,poliwag,spearow,aipom,heracross	-
+johto	lake_of_rage	-1780	215	spot	LAKE OF RAGE	-	Surfing|Fishing|Headbutt	magikarp,gyarados,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
+johto	route_44	-1640	386	route	ROUTE 44	-	Grass|Surfing|Fishing|Headbutt	tangela,weepinbell,bellsprout,lickitung,poliwag,poliwhirl,magikarp,remoraid,spearow,aipom,heracross	-
+johto	ice_path	-1560	398	spot	ICE PATH	-	Grass|Fishing	swinub,golbat,delibird,zubat,jynx,smoochum,magikarp,dratini,dragonair	-
+johto	blackthorn_city	-1476	372	town	BLACKTHORN CITY	-	Surfing|Fishing|Headbutt	magikarp,poliwag,venonat,abra,venomoth,magnemite	-
+johto	dragons_den	-1482	316	spot	DRAGON'S DEN	-	Surfing|Fishing	magikarp,dratini,dragonair	-
+johto	route_45	-1506	572	route	ROUTE 45	-	Grass|Surfing|Fishing|Headbutt	geodude,graveler,phanpy,skarmory,gligar,teddiursa,magikarp,dratini,dragonair,spearow,aipom,heracross	-
+johto	dark_cave	-1700	546	spot	DARK CAVE	-	Grass|Surfing|Fishing|Rock Smash|Swarms	geodude,zubat,dunsparce,graveler,wobbuffet,golbat,magikarp,goldeen,seaking,krabby,shuckle	-
+johto	route_46	-1585	692	route	ROUTE 46	-	Grass|Fishing|Headbutt	geodude,spearow,rattata,jigglypuff,chikorita,magikarp,krabby,corsola,staryu,kingler,aipom,heracross	-
+johto	silver_cave	-1200	545	spot	SILVER CAVE	-	Grass|Surfing|Fishing	onix,donphan,graveler,golbat,larvitar,ursaring,quagsire,golduck,misdreavus,tangela,ponyta,rapidash,doduo,dodrio,sneasel,seaking,goldeen,poliwhirl,poliwag,magikarp	-

@@ -1,14 +1,13 @@
 package com.insidethecube.retromon.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.insidethecube.retromon.engine.Places;
 import com.insidethecube.retromon.engine.Species;
 import com.insidethecube.retromon.game.Net;
 import com.insidethecube.retromon.game.PlayerData;
@@ -20,113 +19,146 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 /**
- * The Town Map, on your Pokédex. MAP: the world itself, drawn from above in the newer games' soft colours (see
- * TownMap), from the whole land down to the houses of a town: the mouse wheel (or Q and E) zooms, dragging (or
- * the arrows) moves it, C comes back to you. The places marked on the map have their names on it; picking one
- * shows its picture (taken the first time you were there) and, for a town you've been to, FLY HERE. You're the
- * arrow, pointing the way you face. KANTO and JOHTO: the games' own Town Map of each region, every place on it.
- * The Pokédex can open it with a Pokémon's places marked.
+ * The Town Map, as the UI Viewer's (signed off 20 Nov): Kanto, and Johto beside it (the arrow at the side, or left
+ * past the westmost place), as they are in your world, drawn from above in soft colours from the blocks themselves
+ * (TownMap). Every town, route and place is a square with its name beside it, where the viewer has it
+ * (data/map_pins.tsv, from tools/uiviewer/*_points.tsv); the one you're on is framed in a bright box. Its panel says
+ * what's there, its gym, how its POKéMON are found and shows them, and FLY HERE for a town you've been to. + and -
+ * (or Q, E and the wheel) zoom, drag to look around, C comes back to you, TAB goes town to town. The Pokédex can open
+ * it with a POKéMON's places marked.
  */
 public class TownMapScreen extends DeviceScreen {
-	/** A spot on the games' map: a town, a route or a place (cave, tower, forest...). */
-	public record Point(String key, String region, int x, int y, String kind, String name) {}
+	/** A place on the map: where it is (block x, z), what kind (town, route, spot), its name, its zone if known, how its POKéMON are found, which, what else is there. */
+	public record Pin(String region, String key, int x, int z, String kind, String name, int[] zone, List<String> how, List<String> wild, List<String> here) {}
 
-	private static Map<String, Point> points;
+	private static List<Pin> pins;
 	private static Map<String, String> placeToPoint;
-	private static List<String[]> edges;
+
+	/** Each region's box (blocks: x0, z0, x1, z1), as the viewer's (tools/uiviewer.py MAP_BOX, JOHTO_BOX). */
+	private static final int[] KANTO_BOX = {-1250, 120, -46, 1000}, JOHTO_BOX = {-2640, 140, -1150, 1000};
+	/** West of this you're in Johto. */
+	private static final int JOHTO_X = -1180;
+	/** The map's window on the canvas. */
+	private static final float MX = 20, MY = 20, VW = 900, VH = 680;
 
 	private final Screen parent;
-	/** MAP (the world), KANTO or JOHTO (the games' maps). */
-	private String tab = "map";
 	private String region = "kanto";
-	private String at;
+	private List<Pin> P = new ArrayList<>();
+	private int[] box = KANTO_BOX;
+	private int mw, mh;
+	private double[] zooms;
+	private int zi, sel;
+	private double cx, cz, tx, tz;
+	private long lastNanos;
+	/** A POKéMON's places, from the Pokédex ("Where X lives"). */
 	private String highlightTitle;
 	private final Set<String> highlight = new HashSet<>();
-	private final Set<String> highlightPlaces = new HashSet<>();
-
-	// The world map: where it's looking (a world x, z in the middle), and how big a block is (screen pixels).
-	private double cx, cz, zoom = 1.6, zoomTo = 1.6;
-	private boolean dragging;
-	private String picked;
-	private int mapW, mapH;
+	/** Flipping between regions: when, and which way the map slides in (-1 from the left, 1 from the right). */
+	private float flipAt = -10, slide;
+	// Dragging the map.
+	private boolean dragging, dragMoved;
+	private double dragX, dragY, dragTx, dragTz;
+	private boolean overUi;
 
 	public TownMapScreen(Screen parent) {
 		super("Town Map");
 		this.parent = parent;
 		load();
-		String here = placeToPoint.get(ClientState.data.place);
-		Point p = here == null ? null : points.get(here);
-		region = p == null ? "kanto" : p.region();
-		at = p == null ? first(region) : p.key();
 		var me = net.minecraft.client.Minecraft.getInstance().player;
-		if (me != null) {
-			cx = me.getX();
-			cz = me.getZ();
-		} else {
-			cx = (TownMap.view[0] + TownMap.view[2]) / 2.0;
-			cz = (TownMap.view[1] + TownMap.view[3]) / 2.0;
-		}
-		picked = ClientState.data.place == null || ClientState.data.place.isEmpty() ? null : ClientState.data.place;
+		String reg = me != null && me.getX() < JOHTO_X ? "johto" : "kanto";
+		setRegion(reg);
+		int at = indexOf(mine());
+		pick(Math.max(0, at), false);
 	}
 
 	private static void load() {
-		if (points != null) return;
-		points = new LinkedHashMap<>();
-		for (String[] r : Species.table("map_points.tsv")) {
-			points.put(r[0], new Point(r[0], r[1], Integer.parseInt(r[2].trim()), Integer.parseInt(r[3].trim()), r[4], r[5]));
+		if (pins != null) return;
+		pins = new ArrayList<>();
+		for (String[] r : Species.table("map_pins.tsv")) {
+			if (r.length < 10) continue;
+			int[] zone = null;
+			if (!r[6].equals("-")) zone = Arrays.stream(r[6].split(",")).mapToInt(v -> Integer.parseInt(v.trim())).toArray();
+			pins.add(new Pin(r[0], r[1], Integer.parseInt(r[2].trim()), Integer.parseInt(r[3].trim()), r[4], r[5], zone, list(r[7], "\\|"), list(r[8], ","), list(r[9], "\\|")));
 		}
 		placeToPoint = new HashMap<>();
 		for (String[] r : Species.table("place_landmarks.tsv")) placeToPoint.put(r[0], r[1]);
-		edges = new ArrayList<>();
-		for (String[] r : Species.table("map_edges.tsv")) edges.add(new String[] {r[0], r[1]});
 	}
 
-	/** Marks a Pokémon's places (from the Pokédex). */
-	public void highlight(String title, Set<String> places) {
-		highlightTitle = title;
-		highlightPlaces.addAll(places);
-		for (String pl : places) {
-			String k = placeToPoint.get(pl);
-			if (k != null) highlight.add(k);
-		}
-		for (String k : highlight) {
-			Point p = points.get(k);
-			if (p != null) {
-				region = p.region();
-				at = k;
-				break;
-			}
-		}
-		// On the world map if one of its places is marked there (centred on it); the games' map otherwise.
-		ClientState.Zone z = ClientState.zones.stream().filter(zz -> places.contains(zz.place())).findFirst().orElse(null);
-		if (z != null) {
-			cx = (z.x1() + z.x2()) / 2.0;
-			cz = (z.z1() + z.z2()) / 2.0;
-			zoom = zoomTo = 1.0;
-		} else tab = region;
+	private static List<String> list(String s, String sep) {
+		if (s == null || s.isEmpty() || s.equals("-")) return List.of();
+		return List.of(s.split(sep));
 	}
 
-	private String first(String reg) {
-		for (Point p : points.values()) if (p.region().equals(reg) && p.kind().equals("town")) return p.key();
+	private void setRegion(String reg) {
+		region = reg;
+		box = reg.equals("johto") ? JOHTO_BOX : KANTO_BOX;
+		mw = box[2] - box[0];
+		mh = box[3] - box[1];
+		P = new ArrayList<>();
+		for (Pin p : pins) if (p.region().equals(reg)) P.add(p);
+		double fit = Math.min(VW / mw, VH / mh);
+		zooms = new double[] {fit, 1.5, 3, 6};
+		zi = 0;
+		cx = tx = box[0] + mw / 2.0;
+		cz = tz = box[1] + mh / 2.0;
+		sel = 0;
+	}
+
+	/** The pin a place belongs to: its own, one it's a part of (safari_zone_east, safari_zone), or its landmark's. */
+	private String claim(String place) {
+		if (place == null || place.isEmpty()) return null;
+		for (Pin p : pins) if (p.key().equals(place)) return place;
+		String best = null;
+		for (Pin p : pins) if (place.startsWith(p.key() + "_") && (best == null || p.key().length() > best.length())) best = p.key();
+		if (best != null) return best;
+		String lm = placeToPoint.getOrDefault(place, place);
+		for (Pin p : pins) if (p.key().equals(lm)) return lm;
 		return null;
 	}
 
-	private List<Point> inRegion() {
-		List<Point> out = new ArrayList<>();
-		for (Point p : points.values()) if (p.region().equals(region)) out.add(p);
-		return out;
+	/** Where you are (its pin), or null. */
+	private String mine() {
+		return claim(ClientState.data.place);
 	}
 
-	private boolean visited(String key) {
-		for (String pl : ClientState.data.visited) if (key.equals(placeToPoint.get(pl))) return true;
+	private int indexOf(String key) {
+		if (key == null) return -1;
+		for (int i = 0; i < P.size(); i++) if (P.get(i).key().equals(key)) return i;
+		return -1;
+	}
+
+	/** Marks a POKéMON's places (from the Pokédex). */
+	public void highlight(String title, Set<String> places) {
+		highlightTitle = title;
+		for (String pl : places) {
+			String k = claim(pl);
+			if (k != null) highlight.add(k);
+		}
+		for (Pin p : pins) {
+			if (!highlight.contains(p.key())) continue;
+			if (!p.region().equals(region)) setRegion(p.region());
+			pick(indexOf(p.key()), false);
+			break;
+		}
+	}
+
+	// ---------- where you've been, and flying ----------
+
+	private boolean been(String key) {
+		PlayerData d = ClientState.data;
+		if (d.visited.contains(key)) return true;
+		for (String pl : d.visited) if (key.equals(claim(pl))) return true;
 		return false;
 	}
 
-	/** The place to fly to for a point: a place you've visited that's in this town. */
+	/** The place to fly to for a pin: a place you've visited that's in this town. */
 	private String flyPlace(String key) {
-		for (String pl : ClientState.data.visited) if (key.equals(placeToPoint.get(pl)) && !pl.contains("_gym") && !pl.contains("house")) return pl;
+		PlayerData d = ClientState.data;
+		if (d.visited.contains(key)) return key;
+		for (String pl : d.visited) if (key.equals(claim(pl)) && !pl.contains("_gym") && !pl.contains("house")) return pl;
 		return null;
 	}
 
@@ -135,7 +167,10 @@ public class TownMapScreen extends DeviceScreen {
 		return d.badges.contains("THUNDERBADGE") && d.party.stream().anyMatch(m -> m.moves.contains("fly") && !m.fainted());
 	}
 
-	private void flyTo(String place) {
+	private void fly() {
+		if (P.isEmpty()) return;
+		Pin p = P.get(sel);
+		String place = p.kind().equals("town") ? flyPlace(p.key()) : null;
 		if (place == null || !canFly() || minecraft == null) return;
 		Sounds.press();
 		CompoundTag t = new CompoundTag();
@@ -144,86 +179,112 @@ public class TownMapScreen extends DeviceScreen {
 		minecraft.setScreen(null);
 	}
 
-	private void fly() {
-		flyTo(flyPlace(at));
+	// ---------- the view ----------
+
+	private double zoom() {
+		return zooms[zi];
 	}
 
-	/** A place on the world map can be flown to: a town you've been to. */
-	private boolean flyable(String place) {
-		if (place == null || !ClientState.data.visited.contains(place)) return false;
-		Point p = points.get(placeToPoint.getOrDefault(place, ""));
-		return p != null && p.kind().equals("town");
+	private float sx(double x) {
+		return (float) ((x - cx) * zoom() + VW / 2 + MX);
 	}
 
-	/** The nearest point in a direction (dx, dy), for the arrow keys. */
-	private void step(int dx, int dy) {
-		Point from = points.get(at);
-		if (from == null) {
-			at = first(region);
-			return;
+	private float sy(double z) {
+		return (float) ((z - cz) * zoom() + VH / 2 + MY);
+	}
+
+	private void clampC() {
+		double hw = VW / 2 / zoom(), hh = VH / 2 / zoom();
+		tx = mw * zoom() <= VW ? box[0] + mw / 2.0 : Math.max(box[0] + hw, Math.min(box[2] - hw, tx));
+		tz = mh * zoom() <= VH ? box[1] + mh / 2.0 : Math.max(box[1] + hh, Math.min(box[3] - hh, tz));
+	}
+
+	/** Zoomed in, the map follows the place you're on when it nears the edge. */
+	private void follow() {
+		if (P.isEmpty()) return;
+		Pin p = P.get(sel);
+		double x = (p.x() - tx) * zoom() + VW / 2, y = (p.z() - tz) * zoom() + VH / 2;
+		if (zi > 0 && (x < 120 || x > VW - 120 || y < 90 || y > VH - 90)) {
+			tx = p.x();
+			tz = p.z();
+			clampC();
 		}
-		Point best = null;
-		double bestScore = 1e9;
-		for (Point p : inRegion()) {
-			if (p.key().equals(at)) continue;
-			int vx = p.x() - from.x(), vy = p.y() - from.y();
-			double along = vx * dx + vy * dy;
-			if (along <= 0) continue;
-			double across = Math.abs(vx * dy - vy * dx);
-			double score = along + across * 2;
-			if (score < bestScore) {
-				bestScore = score;
-				best = p;
+	}
+
+	private void setZoom(int n, Double ax, Double az) {
+		n = Math.max(0, Math.min(zooms.length - 1, n));
+		if (n == zi) return;
+		zi = n;
+		if (ax != null) {
+			tx = ax;
+			tz = az;
+		} else if (!P.isEmpty()) {
+			tx = P.get(sel).x();
+			tz = P.get(sel).z();
+		}
+		clampC();
+		cx = tx;
+		cz = tz;
+		Sounds.select();
+	}
+
+	private void pick(int i, boolean sound) {
+		if (i < 0 || i >= P.size()) return;
+		if (sound && i != sel) Sounds.select();
+		sel = i;
+		follow();
+	}
+
+	/** The nearest place in a direction (the viewer's near()). */
+	private int near(int dx, int dz) {
+		if (P.isEmpty()) return sel;
+		Pin p = P.get(sel);
+		int best = sel;
+		double bd = 1e9;
+		for (int i = 0; i < P.size(); i++) {
+			if (i == sel) continue;
+			Pin q = P.get(i);
+			double ddx = q.x() - p.x(), ddz = q.z() - p.z(), along = ddx * dx + ddz * dz;
+			if (along <= 4) continue;
+			double d = along + Math.abs(ddx * dz - ddz * dx) * 2.2;
+			if (d < bd) {
+				bd = d;
+				best = i;
 			}
 		}
-		if (best != null) {
-			at = best.key();
-			Sounds.press();
-		}
+		return best;
 	}
 
-	// ---------- the world map's view ----------
-
-	/** The least zoom: the whole land in view. */
-	private double fit() {
-		int[] v = TownMap.view;
-		if (mapW <= 0 || mapH <= 0) return 0.2;
-		return Math.min(mapW / (double) (v[2] - v[0]), mapH / (double) (v[3] - v[1]));
-	}
-
-	private static final double MAX_ZOOM = 6;
-
-	private void zoomBy(double k, double sx, double sy) {
-		double before = zoomTo;
-		zoomTo = Math.max(fit(), Math.min(MAX_ZOOM, zoomTo * k));
-		// Keep the point under the mouse where it is.
-		double wx = cx + (sx - mapW / 2.0) / zoom, wz = cz + (sy - mapH / 2.0) / zoom;
-		double after = zoomTo;
-		cx = wx - (wx - cx) * before / after;
-		cz = wz - (wz - cz) * before / after;
-		clampView();
-	}
-
-	private void clampView() {
-		int[] a = TownMap.all;
-		cx = Math.max(a[0], Math.min(a[2], cx));
-		cz = Math.max(a[1], Math.min(a[3], cz));
-	}
-
-	private void centreOnYou() {
-		var me = net.minecraft.client.Minecraft.getInstance().player;
-		if (me == null) return;
-		cx = me.getX();
-		cz = me.getZ();
-		if (zoomTo < 1.2) zoomTo = 1.6;
+	private void flip() {
+		String to = region.equals("kanto") ? "johto" : "kanto";
+		slide = region.equals("kanto") ? -1 : 1;
+		flipAt = (ticks + 0F) / 20F;
+		setRegion(to);
+		int at = indexOf(mine());
+		pick(Math.max(0, at), false);
 		Sounds.press();
 	}
 
-	@Override
-	public void tick() {
-		super.tick();
-		zoom += (zoomTo - zoom) * 0.35;
-		if (Math.abs(zoom - zoomTo) < 0.001) zoom = zoomTo;
+	private boolean youHere() {
+		var me = minecraft == null ? null : minecraft.player;
+		return me != null && me.getX() >= box[0] && me.getX() <= box[2] && me.getZ() >= box[1] && me.getZ() <= box[3];
+	}
+
+	private void toYou() {
+		if (!youHere()) {
+			flip();
+			return;
+		}
+		var me = minecraft.player;
+		int at = indexOf(mine());
+		if (at >= 0) pick(at, false);
+		int n = Math.max(zi, 2);
+		if (n == zi) {
+			tx = me.getX();
+			tz = me.getZ();
+			clampC();
+		} else setZoom(n, me.getX(), me.getZ());
+		Sounds.press();
 	}
 
 	// ---------- keys and the mouse ----------
@@ -231,66 +292,94 @@ public class TownMapScreen extends DeviceScreen {
 	@Override
 	protected boolean key(KeyEvent e) {
 		int k = e.key();
-		if (k == org.lwjgl.glfw.GLFW.GLFW_KEY_TAB) {
-			tab = tab.equals("map") ? "kanto" : tab.equals("kanto") ? "johto" : "map";
-			if (!tab.equals("map")) {
-				region = tab;
-				at = first(region);
-			}
-			Sounds.press();
-			return true;
-		}
 		if (Ui.isB(e)) {
 			back();
 			return true;
 		}
-		if (tab.equals("map")) {
-			double stepBlocks = 40 / Math.max(0.2, zoom);
-			if (Ui.isUp(e)) cz -= stepBlocks;
-			else if (Ui.isDown(e)) cz += stepBlocks;
-			else if (Ui.isLeft(e)) cx -= stepBlocks;
-			else if (Ui.isRight(e)) cx += stepBlocks;
-			else if (k == org.lwjgl.glfw.GLFW.GLFW_KEY_E || k == org.lwjgl.glfw.GLFW.GLFW_KEY_EQUAL || k == org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ADD)
-				zoomBy(1.5, mapW / 2.0, mapH / 2.0);
-			else if (k == org.lwjgl.glfw.GLFW.GLFW_KEY_Q || k == org.lwjgl.glfw.GLFW.GLFW_KEY_MINUS || k == org.lwjgl.glfw.GLFW.GLFW_KEY_KP_SUBTRACT)
-				zoomBy(1 / 1.5, mapW / 2.0, mapH / 2.0);
-			else if (k == org.lwjgl.glfw.GLFW.GLFW_KEY_C) centreOnYou();
-			else if (Ui.isA(e) && picked != null && flyable(picked)) flyTo(picked);
-			clampView();
-			return true;
+		if (k == GLFW.GLFW_KEY_EQUAL || k == GLFW.GLFW_KEY_KP_ADD || k == GLFW.GLFW_KEY_E) setZoom(zi + 1, null, null);
+		else if (k == GLFW.GLFW_KEY_MINUS || k == GLFW.GLFW_KEY_KP_SUBTRACT || k == GLFW.GLFW_KEY_Q) setZoom(zi - 1, null, null);
+		else if (k == GLFW.GLFW_KEY_C) toYou();
+		else if (k == GLFW.GLFW_KEY_TAB) {
+			int i = sel;
+			for (int n = 0; n < P.size(); n++) {
+				i = (i + 1) % P.size();
+				if (P.get(i).kind().equals("town")) break;
+			}
+			pick(i, true);
+		} else if (Ui.isA(e)) fly();
+		else if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isUp(e) || Ui.isDown(e)) {
+			int dx = Ui.isLeft(e) ? -1 : Ui.isRight(e) ? 1 : 0, dz = Ui.isUp(e) ? -1 : Ui.isDown(e) ? 1 : 0;
+			int n = near(dx, dz);
+			if (n == sel && ((dx < 0 && region.equals("kanto")) || (dx > 0 && region.equals("johto")))) flip();
+			else pick(n, true);
 		}
-		if (Ui.isUp(e)) step(0, -1);
-		else if (Ui.isDown(e)) step(0, 1);
-		else if (Ui.isLeft(e)) step(-1, 0);
-		else if (Ui.isRight(e)) step(1, 0);
-		else if (Ui.isA(e)) fly();
 		return true;
 	}
 
 	@Override
-	public boolean mouseScrolled(double x, double y, double dx, double dy) {
-		if (!tab.equals("map")) return true;
-		double[] p = onScreen(x, y);
-		if (p == null) return true;
-		zoomBy(dy > 0 ? 1.25 : 1 / 1.25, p[0], p[1] - mapTop());
+	protected void pressHint(String key) {
+		switch (key) {
+			case "+" -> setZoom(zi + 1, null, null);
+			case "-" -> setZoom(zi - 1, null, null);
+			case "C" -> toYou();
+			default -> super.pressHint(key);
+		}
+	}
+
+	private boolean inMap(double gx, double gy) {
+		float vx = V.vx(gx), vy = V.vy(gy);
+		return vx >= MX && vy >= MY && vx < MX + VW && vy < MY + VH;
+	}
+
+	/** The place nearest the mouse (within a finger's width), or -1. */
+	private int nearest(double gx, double gy) {
+		float vx = V.vx(gx), vy = V.vy(gy);
+		int best = -1;
+		double bd = 24;
+		for (int i = 0; i < P.size(); i++) {
+			Pin p = P.get(i);
+			double d = Math.hypot(sx(p.x()) - vx, sy(p.z()) - vy);
+			if (d < bd) {
+				bd = d;
+				best = i;
+			}
+		}
+		return best;
+	}
+
+	@Override
+	public boolean mouseScrolled(double x, double y, double h, double v) {
+		if (!inMap(x, y) || v == 0) return true;
+		float vx = V.vx(x) - MX, vy = V.vy(y) - MY;
+		double wx = cx + (vx - VW / 2) / zoom(), wz = cz + (vy - VH / 2) / zoom();
+		setZoom(zi + (v > 0 ? 1 : -1), wx, wz);
 		return true;
 	}
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (tab.equals("map") && event.button() == 0) {
-			double[] p = onScreen(event.x(), event.y());
-			dragging = p != null && p[1] > mapTop();
+		if (event.button() == 0 && !overUi && inMap(event.x(), event.y())) {
+			dragging = true;
+			dragMoved = false;
+			dragX = event.x();
+			dragY = event.y();
+			dragTx = tx;
+			dragTz = tz;
+			return true;
 		}
 		return super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-		if (dragging && tab.equals("map")) {
-			cx -= dx / zoom;
-			cz -= dy / zoom;
-			clampView();
+		if (dragging) {
+			double ddx = (event.x() - dragX) / V.s(1), ddy = (event.y() - dragY) / V.s(1);
+			if (Math.hypot(ddx, ddy) > 4) dragMoved = true;
+			tx = dragTx - ddx / zoom();
+			tz = dragTz - ddy / zoom();
+			clampC();
+			cx = tx;
+			cz = tz;
 			return true;
 		}
 		return super.mouseDragged(event, dx, dy);
@@ -298,7 +387,11 @@ public class TownMapScreen extends DeviceScreen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
-		dragging = false;
+		if (dragging) {
+			dragging = false;
+			if (!dragMoved) pick(nearest(event.x(), event.y()), true);
+			return true;
+		}
 		return super.mouseReleased(event);
 	}
 
@@ -308,392 +401,520 @@ public class TownMapScreen extends DeviceScreen {
 		to(parent);
 	}
 
-	/** A thick line from one point to another (the route between two places). */
-	private static void line(GuiGraphics g, int x0, int y0, int x1, int y1, int thick, int color) {
-		int steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) / Math.max(1, thick / 2) + 1;
-		for (int i = 0; i <= steps; i++) {
-			int x = x0 + (x1 - x0) * i / steps, y = y0 + (y1 - y0) * i / steps;
-			g.fill(x - thick / 2, y - thick / 2, x + (thick + 1) / 2, y + (thick + 1) / 2, color);
+	// ---------- drawing ----------
+
+	/** A quarter (or any part) of a ring, a0 to a1 (radians), from radius r0 out to r1, in GUI pixels. */
+	private static void arc(GuiGraphics g, float cx, float cy, float r0, float r1, double a0, double a1, int col) {
+		int n = 10;
+		float[] xy = new float[n * 12];
+		int[] cs = new int[n * 6];
+		for (int i = 0; i < n; i++) {
+			double b0 = a0 + (a1 - a0) * i / n, b1 = a0 + (a1 - a0) * (i + 1) / n;
+			float c0 = (float) Math.cos(b0), s0 = (float) Math.sin(b0), c1 = (float) Math.cos(b1), s1 = (float) Math.sin(b1);
+			float[] q = {cx + c0 * r0, cy + s0 * r0, cx + c0 * r1, cy + s0 * r1, cx + c1 * r1, cy + s1 * r1, cx + c0 * r0, cy + s0 * r0, cx + c1 * r1, cy + s1 * r1, cx + c1 * r0,
+					cy + s1 * r0};
+			System.arraycopy(q, 0, xy, i * 12, 12);
+		}
+		Arrays.fill(cs, col);
+		Ui.tris(g, xy, cs);
+	}
+
+	/** Rounds a box's corners off (canvas), painting outside radius r in each corner's colour (tl, tr, br, bl), out to r + spread. */
+	private static void corners(GuiGraphics g, float x, float y, float w, float h, float r, float spread, int[] cols) {
+		float k = V.s(1);
+		float[][] c = {{x + r, y + r}, {x + w - r, y + r}, {x + w - r, y + h - r}, {x + r, y + h - r}};
+		double[] a = {Math.PI, -Math.PI / 2, 0, Math.PI / 2};
+		for (int i = 0; i < 4; i++) arc(g, V.x(c[i][0]), V.y(c[i][1]), r * k, (r + spread) * k, a[i], a[i] + Math.PI / 2, cols[i]);
+	}
+
+	/** A rounded square with its edge drawn over the line (the viewer's fill then stroke). */
+	private static void sq(GuiGraphics g, float x, float y, float r, int fill, int edge, float lw) {
+		float rad = Math.max(3, r * 0.42F);
+		V.rr(g, x - r - lw / 2, y - r - lw / 2, 2 * r + lw, 2 * r + lw, rad + lw / 2, edge);
+		V.rr(g, x - r + lw / 2, y - r + lw / 2, 2 * r - lw, 2 * r - lw, Math.max(0, rad - lw / 2), fill);
+	}
+
+	/** A ring centred on a circle's line (radius r, lw wide). */
+	private static void circle(GuiGraphics g, float x, float y, float r, float lw, int col) {
+		float o = r + lw / 2;
+		V.ring(g, x - o, y - o, 2 * o, 2 * o, o, lw, col);
+	}
+
+	/** A rounded box's edge, centred on its line. */
+	private static void stroke(GuiGraphics g, float x, float y, float w, float h, float r, float lw, int col) {
+		V.ring(g, x - lw / 2, y - lw / 2, w + lw, h + lw, r + lw / 2, lw, col);
+	}
+
+	/** The baked map (TownMap's) of a box of the world into a box on the screen (GUI pixels), k GUI pixels a block. */
+	private void world(GuiGraphics g, double wx0, double wz0, double k, int clipX0, int clipY0, int clipX1, int clipY1) {
+		if (k < 0.6) {
+			int[] a = TownMap.all;
+			if (TownMap.overW() <= 0) return;
+			int x0 = (int) Math.round((a[0] - wx0) * k) + clipX0, y0 = (int) Math.round((a[1] - wz0) * k) + clipY0;
+			int x1 = (int) Math.round((a[0] + TownMap.overW() * TownMap.OVER - wx0) * k) + clipX0, y1 = (int) Math.round((a[1] + TownMap.overH() * TownMap.OVER - wz0) * k) + clipY0;
+			g.blit(RenderPipelines.GUI_TEXTURED, TownMap.OVERVIEW, x0, y0, 0, 0, x1 - x0, y1 - y0, TownMap.overW(), TownMap.overH(), TownMap.overW(), TownMap.overH());
+			return;
+		}
+		for (TownMap.Region r : TownMap.regions()) {
+			Identifier tex = TownMap.texture(r);
+			if (tex == null) continue;
+			int x0 = (int) Math.round((r.rx * TownMap.R - wx0) * k) + clipX0, y0 = (int) Math.round((r.rz * TownMap.R - wz0) * k) + clipY0;
+			int x1 = (int) Math.round(((r.rx + 1) * TownMap.R - wx0) * k) + clipX0, y1 = (int) Math.round(((r.rz + 1) * TownMap.R - wz0) * k) + clipY0;
+			if (x1 < clipX0 || y1 < clipY0 || x0 > clipX1 || y0 > clipY1) continue;
+			g.blit(RenderPipelines.GUI_TEXTURED, tex, x0, y0, 0, 0, x1 - x0, y1 - y0, TownMap.R, TownMap.R, TownMap.R, TownMap.R);
 		}
 	}
 
-	// ---------- drawing ----------
-
-	private int mapTop() {
-		return 0;
+	/**
+	 * The same, cut to a box by hand (for the panel's picture, which is turned a little, so it can't be cut by the
+	 * screen's scissor): only the part of each region inside the box is drawn. Box and k in GUI pixels.
+	 */
+	private void worldCut(GuiGraphics g, double wx0, double wz0, double bw, double bh, float k, float x, float y) {
+		double wx1 = wx0 + bw / k, wz1 = wz0 + bh / k;
+		for (TownMap.Region r : TownMap.regions()) {
+			Identifier tex = TownMap.texture(r);
+			if (tex == null) continue;
+			int rx0 = r.rx * TownMap.R, rz0 = r.rz * TownMap.R;
+			int ax = (int) Math.max(rx0, Math.floor(wx0)), az = (int) Math.max(rz0, Math.floor(wz0));
+			int bx = (int) Math.min(rx0 + TownMap.R, Math.ceil(wx1)), bz = (int) Math.min(rz0 + TownMap.R, Math.ceil(wz1));
+			if (bx <= ax || bz <= az) continue;
+			// Inside the box only (whole blocks: the last may poke a little past its edge, so trim to it).
+			float px0 = (float) Math.max(0, (ax - wx0) * k), pz0 = (float) Math.max(0, (az - wz0) * k);
+			float px1 = (float) Math.min(bw, (bx - wx0) * k), pz1 = (float) Math.min(bh, (bz - wz0) * k);
+			if (px1 <= px0 || pz1 <= pz0) continue;
+			float u = (float) (wx0 + px0 / k - rx0), v = (float) (wz0 + pz0 / k - rz0);
+			float uw = (px1 - px0) / k, vh = (pz1 - pz0) / k;
+			g.pose().pushMatrix();
+			g.pose().translate(x + px0, y + pz0);
+			float sw = px1 - px0, sh = pz1 - pz0;
+			int iw = Math.max(1, Math.round(uw)), ih = Math.max(1, Math.round(vh));
+			g.pose().scale(sw / iw, sh / ih);
+			g.blit(RenderPipelines.GUI_TEXTURED, tex, 0, 0, u, v, iw, ih, iw, ih, TownMap.R, TownMap.R);
+			g.pose().popMatrix();
+		}
 	}
 
 	@Override
 	protected void drawScreen(GuiGraphics g, float partial) {
-		if (tab.equals("map")) drawWorld(g, partial);
-		else drawRegion(g, partial);
-		drawTabs(g);
+		long now = System.nanoTime();
+		float dt = lastNanos == 0 ? 0 : Math.min(0.1F, (now - lastNanos) / 1e9F);
+		lastNanos = now;
+		float secs = (ticks + partial) / 20F;
+		double ease = 1 - Math.pow(0.8, dt * 60);
+		cx += (tx - cx) * ease;
+		cz += (tz - cz) * ease;
+		g.fill(0, 0, width, height, 0xFF348CCE);
+		overUi = false;
+		// The map, sliding in when you've just turned to the other region.
+		float since = secs - flipAt, slideX = 0, cover = 0;
+		if (since < 0.38F) {
+			float q = since / 0.38F;
+			q = 1 - (1 - q) * (1 - q) * (1 - q);
+			slideX = slide * 60 * (1 - q);
+			cover = 1 - q;
+		}
+		g.pose().pushMatrix();
+		g.pose().translate(V.s(slideX), 0);
+		drawMap(g, secs);
+		g.pose().popMatrix();
+		if (cover > 0) g.fill(Math.round(V.x(MX - 8)), Math.round(V.y(MY - 8)), Math.round(V.x(MX + VW + 8)), Math.round(V.y(MY + VH + 12)), Ui.alpha(0xFF348CCE, cover));
+		drawInfo(g);
+		drawSide(g, secs);
+		drawBack(g);
+		V.hints(g, "+", "Zoom in", "-", "Zoom out", "C", "You", "B", "Back");
 	}
 
-	/** The tabs along the top: MAP, KANTO, JOHTO. */
-	private void drawTabs(GuiGraphics g) {
-		int m = 6 * s, x = m;
-		String[] tabs = {"map", "kanto", "johto"};
-		for (String t : tabs) {
-			String label = t.toUpperCase();
-			int tw = Ui.boldWidth(font, label, s) + 16 * s;
-			boolean on = t.equals(tab);
-			Ui.round(g, x + s, m + 2 * s, tw, 14 * s, 0x50000000, 4 * s);
-			Ui.round(g, x, m, tw, 14 * s, on ? Ui.CREAM : 0xD0123C38, 4 * s);
-			Ui.draw(g, font, Ui.bold(label), x + 8 * s, m + 3 * s, on ? Ui.CREAM_INK : Ui.TEXT, s, false);
-			hit(x, m, tw, 14 * s, () -> {
-				tab = t;
-				if (!t.equals("map")) {
-					region = t;
-					at = first(region);
-				}
-			});
-			x += tw + 4 * s;
-		}
-		if (highlightTitle != null) {
-			String h = "Where " + highlightTitle + " lives";
-			int hw = Ui.width(font, h, s) + 12 * s;
-			Ui.round(g, x + 4 * s, m, hw, 14 * s, 0xD0123C38, 4 * s);
-			Ui.text(g, font, h, x + 10 * s, m + 3 * s, 0xFFFFD34A, s);
-		}
-	}
-
-	/** The world, from above. */
-	private void drawWorld(GuiGraphics g, float partial) {
-		mapW = width;
-		mapH = height;
-		if (zoomTo < fit()) zoomTo = fit();
-		g.fill(0, 0, width, height, TownMap.SEA);
+	/** The map's window: the world, the zones, the place you're on framed, every place's square and name, you, the scale. */
+	private void drawMap(GuiGraphics g, float secs) {
+		PlayerData d = ClientState.data;
+		V.shadow(g, MX, MY, VW, VH, 22, 1);
+		V.holo(g, MX, MY, VW, VH, 22);
+		int c0 = Math.round(V.x(MX + 3)), r0 = Math.round(V.y(MY + 3)), c1 = Math.round(V.x(MX + VW - 3)), r1 = Math.round(V.y(MY + VH - 3));
+		g.enableScissor(c0, r0, c1, r1);
+		g.fill(c0, r0, c1, r1, TownMap.SEA);
+		double z = zoom();
 		if (!TownMap.ready()) {
-			Ui.centred(g, font, "Drawing the map...", width / 2, height / 2 - 4 * s, Ui.TEXT, s, true);
-			return;
-		}
-		TownMap.upload();
-		double z = zoom;
-		// A pixel for every 4 blocks when it's zoomed right out; the regions themselves closer in.
-		if (z < 0.6) {
-			int[] a = TownMap.all;
-			int x0 = sx(a[0], z), y0 = sy(a[1], z), x1 = sx(a[0] + TownMap.overW() * TownMap.OVER, z), y1 = sy(a[1] + TownMap.overH() * TownMap.OVER, z);
-			if (TownMap.overW() > 0) g.blit(RenderPipelines.GUI_TEXTURED, TownMap.OVERVIEW, x0, y0, 0, 0, x1 - x0, y1 - y0, TownMap.overW(), TownMap.overH(),
-					TownMap.overW(), TownMap.overH());
+			V.centred(g, Lang.t("Drawing the map..."), MX + VW / 2, MY + VH / 2 - 10, 21, 0xFFFFFFFF, true);
 		} else {
-			for (TownMap.Region r : TownMap.regions()) {
-				Identifier tex = TownMap.texture(r);
-				if (tex == null) continue;
-				int x0 = sx(r.rx * TownMap.R, z), y0 = sy(r.rz * TownMap.R, z), x1 = sx((r.rx + 1) * TownMap.R, z), y1 = sy((r.rz + 1) * TownMap.R, z);
-				if (x1 < 0 || y1 < 0 || x0 > width || y0 > height) continue;
-				g.blit(RenderPipelines.GUI_TEXTURED, tex, x0, y0, 0, 0, x1 - x0, y1 - y0, TownMap.R, TownMap.R, TownMap.R, TownMap.R);
-			}
+			TownMap.upload();
+			double k = z * V.s(1);
+			// The box's top left on the screen: where world x, z of (cx - VW/2/z, cz - VH/2/z) lands.
+			int ox = Math.round(V.x(MX)), oy = Math.round(V.y(MY));
+			world(g, cx - VW / 2 / z, cz - VH / 2 / z, k, ox, oy, Math.round(V.x(MX + VW)), Math.round(V.y(MY + VH)));
 		}
-		// The places: marked ones glow (a Pokémon's, from the Pokédex), then names.
-		String hover = null;
-		for (ClientState.Zone zn : ClientState.zones) {
-			int x0 = sx(zn.x1(), z), y0 = sy(zn.z1(), z), x1 = sx(zn.x2() + 1, z), y1 = sy(zn.z2() + 1, z);
-			if (highlightPlaces.contains(zn.place())) {
-				float pulse = (float) (0.5 + 0.5 * Math.sin((ticks + partial) * 0.2));
-				g.fill(x0, y0, x1, y1, Ui.alpha(0xFFFFD34A, 0.18F + 0.14F * pulse));
-				frame(g, x0, y0, x1, y1, 0xFFFFD34A);
-			}
-			if (zn.place().equals(picked)) frame(g, x0, y0, x1, y1, 0xCCFFFFFF);
-			if (over(x0, y0, x1 - x0, y1 - y0)) hover = zn.place();
+		// The zones the mod knows, faintly, once you're in close.
+		if (zi >= 1) for (Pin p : P) {
+			int[] zn = zoneOf(p);
+			if (zn == null) continue;
+			dashed(g, sx(zn[0]), sy(zn[1]), sx(zn[2]) - sx(zn[0]), sy(zn[3]) - sy(zn[1]), 0x8CFFF4D8);
 		}
-		// Clicking the map picks the place under the mouse (the names, over it, are clicked first).
-		String under = hover;
-		hit(0, 0, width, height, () -> pick(under));
-		// Names: towns always (bigger), routes once it's close enough to read them.
-		List<int[]> taken = new ArrayList<>();
-		for (ClientState.Zone zn : ClientState.zones) {
-			Point pt = points.get(placeToPoint.getOrDefault(zn.place(), ""));
-			boolean town = pt != null && pt.kind().equals("town");
-			if (!town && z < 0.9) continue;
-			Places.Place pl = Places.get(zn.place());
-			String name = pl == null ? zn.place().toUpperCase().replace('_', ' ') : pl.name();
-			int lx = sx((zn.x1() + zn.x2()) / 2.0, z), ly = town ? sy(zn.z1(), z) + 6 * s : sy((zn.z1() + zn.z2()) / 2.0, z);
-			int lw = (town ? Ui.boldWidth(font, name, s) : Ui.width(font, name, s)) + 12 * s, lh = 13 * s;
-			int bx = lx - lw / 2, by = ly - lh / 2;
+		float pulse = (float) (Math.sin(secs * 1000 / 260) + 1) / 2;
+		// The place you're on, framed as the old Town Map frames it: a bright box round its area, the land inside lit a
+		// little, the rest of the map dimmed a touch.
+		if (!P.isEmpty()) {
+			Pin p = P.get(sel);
+			int[] zn = zoneOf(p);
+			float a1, b1, a2, b2;
+			if (zn != null) {
+				a1 = sx(zn[0]);
+				b1 = sy(zn[1]);
+				a2 = sx(zn[2]);
+				b2 = sy(zn[3]);
+			} else {
+				int hw = p.kind().equals("town") ? 34 : p.kind().equals("spot") ? 20 : 26;
+				a1 = sx(p.x() - hw);
+				b1 = sy(p.z() - hw);
+				a2 = sx(p.x() + hw);
+				b2 = sy(p.z() + hw);
+			}
+			float pad = 4, x = Math.min(a1, a2) - pad, y = Math.min(b1, b2) - pad, w = Math.abs(a2 - a1) + pad * 2, hh = Math.abs(b2 - b1) + pad * 2;
+			int dim = 0x2E101E3C;
+			V.rr(g, MX, MY, VW, Math.max(0, y - MY), 0, dim);
+			V.rr(g, MX, y + hh, VW, Math.max(0, MY + VH - y - hh), 0, dim);
+			V.rr(g, MX, y, Math.max(0, x - MX), hh, 0, dim);
+			V.rr(g, x + w, y, Math.max(0, MX + VW - x - w), hh, 0, dim);
+			V.rr(g, x, y, w, hh, 8, 0x24FFF8D6);
+			stroke(g, x, y, w, hh, 8, 6, Ui.alpha(0xFFFFD45A, 0.35F + pulse * 0.3F));
+			stroke(g, x, y, w, hh, 8, 2.5F, 0xFFFFFFFF);
+		}
+		// Every place is a square: towns big and filled (red once you've been, grey before), routes and other places
+		// smaller, white with a red edge (purple for a place). The one you're on is yellow, with a pulse round it.
+		record Spot(Pin p, int i, float sx, float sy, float r, boolean on, boolean town) {}
+		List<Spot> spots = new ArrayList<>();
+		for (int i = 0; i < P.size(); i++) {
+			Pin p = P.get(i);
+			float x = sx(p.x()), y = sy(p.z());
+			if (x < MX - 40 || y < MY - 40 || x > MX + VW + 40 || y > MY + VH + 40) continue;
+			boolean on = i == sel, town = p.kind().equals("town"), seen = been(p.key());
+			float r = (town ? 10 : 7.5F) + (zi >= 2 ? 2 : 0) + (on ? 1.5F : 0);
+			if (highlight.contains(p.key())) {
+				V.glow(g, x, y, r + 16, r + 16, Ui.alpha(0xFFFFD34A, 0.55F + 0.3F * pulse));
+				circle(g, x, y, r + 6, 2.5F, Ui.alpha(0xFFFFD34A, 0.8F));
+			}
+			if (on) circle(g, x, y, r + 9 + pulse * 5, 3, Ui.alpha(0xFFFFD45A, 0.9F - pulse * 0.5F));
+			if (town) sq(g, x, y, r, on ? 0xFFFFD45A : seen ? 0xFFE5525C : 0xFFB9C4C0, 0xFFFFFFFF, 3);
+			else sq(g, x, y, r, on ? 0xFFFFD45A : 0xFFFFFFFF, p.kind().equals("spot") ? 0xFF8F60DE : 0xFFE5525C, 2.5F);
+			if (town) V.rr(g, x - r * 0.42F, y - r * 0.42F, r * 0.84F, r * 0.84F, 2, 0xD9FFFFFF);
+			spots.add(new Spot(p, i, x, y, r, on, town));
+		}
+		// Labels: towns and the one you're on first, then routes and places, each left out only where it would cover another.
+		List<float[]> taken = new ArrayList<>();
+		spots.sort((a, b) -> a.on() != b.on() ? (a.on() ? -1 : 1) : a.town() != b.town() ? (a.town() ? -1 : 1) : 0);
+		for (Spot q : spots) {
+			boolean big = q.town() || q.on();
+			float size = big ? 13 : 10.5F, w = V.width(q.p().name(), size, true) + 12, hh = big ? 21 : 16, x = q.sx() - w / 2, y = q.sy() + q.r() + 3;
 			boolean clash = false;
-			for (int[] t : taken) if (bx < t[0] + t[2] && bx + lw > t[0] && by < t[1] + t[3] && by + lh > t[1]) clash = true;
-			if (clash && !zn.place().equals(picked)) continue;
-			taken.add(new int[] {bx, by, lw, lh});
-			boolean been = ClientState.data.visited.contains(zn.place());
-			boolean sel = zn.place().equals(picked);
-			Ui.round(g, bx + s, by + 2 * s, lw, lh, 0x50000000, 4 * s);
-			Ui.round(g, bx, by, lw, lh, sel ? Ui.CREAM : town ? (been ? 0xF0E5525C : 0xE0485068) : 0xD0123C38, 4 * s);
-			int ink = sel ? Ui.CREAM_INK : 0xFFFFFFFF;
-			if (town) Ui.draw(g, font, Ui.bold(name), bx + 6 * s, by + 3 * s, ink, s, false);
-			else Ui.plain(g, font, name, bx + 6 * s, by + 3 * s, sel ? Ui.CREAM_INK : Ui.TEXT, s);
-			String place = zn.place();
-			hit(bx, by, lw, lh, () -> pick(place));
+			for (float[] b : taken) if (x < b[0] + b[2] && x + w > b[0] && y < b[1] + b[3] && y + hh > b[1]) clash = true;
+			if (clash && !q.on()) continue;
+			taken.add(new float[] {x, y, w, hh});
+			V.pill(g, x - 0.75F, y - 0.75F, w + 1.5F, hh + 1.5F, 0x2E1E2854);
+			V.pill(g, x + 0.75F, y + 0.75F, w - 1.5F, hh - 1.5F, 0xF2FFFFFF);
+			V.centred(g, q.p().name(), q.sx(), V.capsTop(y + hh / 2 + 0.5F, size), size, V.INK, true);
 		}
-		// You: an arrow the way you face, with a ring.
+		// You: the arrow, the way you face.
 		var me = minecraft == null ? null : minecraft.player;
-		if (me != null) {
-			double px = me.getX(), pz = me.getZ();
-			int mx0 = sx(px, z), my0 = sy(pz, z);
-			float pulse = (float) (0.5 + 0.5 * Math.sin((ticks + partial) * 0.25));
-			int rr = (int) ((9 + 3 * pulse) * s);
-			Device.disc(g, mx0, my0, rr, rr, Ui.alpha(0xFFFF4A5A, 0.25F + 0.15F * pulse));
-			Device.disc(g, mx0, my0, 7 * s, 7 * s, 0xFFFFFFFF);
-			Device.disc(g, mx0, my0, 6 * s, 6 * s, 0xFFE5394A);
-			g.pose().pushMatrix();
-			g.pose().translate(mx0, my0);
-			g.pose().rotate((float) Math.toRadians(me.getYRot() + 180));
-			Ui.icon(g, "icon/arrow", -5 * s, -5 * s, 10 * s, 0xFFFFFFFF);
-			g.pose().popMatrix();
+		if (me != null && youHere()) {
+			float x = sx(me.getX()), y = sy(me.getZ());
+			double a = Math.toRadians(me.getYRot() + 180);
+			float ca = (float) Math.cos(a), sa = (float) Math.sin(a);
+			float[] pts = {0, -11, 8, 8, 0, 4, -8, 8};
+			float[] q = new float[8];
+			for (int i = 0; i < 4; i++) {
+				q[i * 2] = x + pts[i * 2] * ca - pts[i * 2 + 1] * sa;
+				q[i * 2 + 1] = y + pts[i * 2] * sa + pts[i * 2 + 1] * ca;
+			}
+			V.poly(g, new float[] {q[0], q[1], q[2], q[3], q[4], q[5]}, 0xFFFFD45A);
+			V.poly(g, new float[] {q[0], q[1], q[4], q[5], q[6], q[7]}, 0xFFFFD45A);
+			for (int i = 0; i < 4; i++) {
+				int j = (i + 1) % 4;
+				V.line(g, q[i * 2], q[i * 2 + 1], q[j * 2], q[j * 2 + 1], 2.5F, V.INK);
+				V.ellipse(g, q[i * 2], q[i * 2 + 1], 1.25F, 1.25F, V.INK);
+			}
 		}
-		drawCompass(g, z);
-		drawCard(g);
-		Ui.text(g, font, "Wheel/Q/E: zoom   Drag/arrows: move   C: you   Tab: maps", 6 * s, height - 10 * s, 0xE0FFFFFF, s);
-	}
-
-	private void pick(String place) {
-		if (place != null && place.equals(picked) && flyable(place) && canFly()) {
-			flyTo(place);
-			return;
+		// The scale.
+		int blocks = zi == 0 ? 200 : zi == 1 ? 100 : zi == 2 ? 50 : 20;
+		float bw = (float) (blocks * z);
+		V.rr(g, MX + 14, MY + VH - 40, bw + 90, 26, 13, 0xE6FFFFFF);
+		V.rr(g, MX + 26, MY + VH - 28, bw, 4, 0, V.INK);
+		V.text(g, blocks + " " + Lang.t("blocks"), MX + 34 + bw, V.capsTop(MY + VH - 26, 12), 12, V.INK, true);
+		// The window's rounded corners: the rim's colours, then the sea round it.
+		corners(g, MX + 3, MY + 3, VW - 6, VH - 6, 19, 3, new int[] {0xFFFFB8D2, 0xFFFFE7A1, 0xFFFFE7A1, 0xFFFFB8D2});
+		corners(g, MX, MY, VW, VH, 22, 10, new int[] {0xFF348CCE, 0xFF348CCE, 0xFF348CCE, 0xFF348CCE});
+		g.disableScissor();
+		// Pointing at a place picks it.
+		if (!dragging && inMap(mx, my)) {
+			int b = nearest(mx, my);
+			if (b >= 0 && b != sel) pick(b, false);
 		}
-		picked = place;
-		if (place != null) Sounds.select();
 	}
 
-	private int sx(double wx, double z) {
-		return (int) Math.round((wx - cx) * z + mapW / 2.0);
+	/** A pin's zone: the one you've marked in game, or the one the viewer knows. */
+	private int[] zoneOf(Pin p) {
+		for (ClientState.Zone z : ClientState.zones) if (z.place().equals(p.key())) return new int[] {z.x1(), z.z1(), z.x2() + 1, z.z2() + 1};
+		return p.zone();
 	}
 
-	private int sy(double wz, double z) {
-		return (int) Math.round((wz - cz) * z + mapH / 2.0);
-	}
-
-	private void frame(GuiGraphics g, int x0, int y0, int x1, int y1, int col) {
-		int t = Math.max(1, s);
-		g.fill(x0, y0, x1, y0 + t, col);
-		g.fill(x0, y1 - t, x1, y1, col);
-		g.fill(x0, y0, x0 + t, y1, col);
-		g.fill(x1 - t, y0, x1, y1, col);
-	}
-
-	/** North, and how far 100 blocks (metres) is, at the bottom right; the zoom on the right. */
-	private void drawCompass(GuiGraphics g, double z) {
-		int r = 9 * s, cxp = width - r - 8 * s, cyp = 8 * s + r + 18 * s;
-		Device.disc(g, cxp, cyp + s, r, r, 0x50000000);
-		Device.disc(g, cxp, cyp, r, r, 0xF0123C38);
-		for (int i = 0; i < r - 2 * s; i++) g.fill(cxp - Math.max(1, (r - 2 * s - i) / 3), cyp - i, cxp + Math.max(1, (r - 2 * s - i) / 3), cyp - i + 1, 0xFFE5525C);
-		Ui.centred(g, font, "N", cxp, cyp - r - 10 * s, 0xFFFFFFFF, s, true);
-		// The scale: a bar for a round distance.
-		int[] steps = {10, 25, 50, 100, 250, 500, 1000};
-		int len = 10;
-		for (int st : steps) {
-			len = st;
-			if (st * z >= 40 * s) break;
+	private static void dashed(GuiGraphics g, float x, float y, float w, float h, int col) {
+		float lw = 1.5F;
+		for (float d = 0; d < w; d += 11) {
+			float l = Math.min(6, w - d);
+			V.rr(g, x + d, y - lw / 2, l, lw, 0, col);
+			V.rr(g, x + d, y + h - lw / 2, l, lw, 0, col);
 		}
-		int bw = (int) Math.round(len * z), bx = width - bw - 10 * s, by = height - 24 * s;
-		g.fill(bx, by, bx + bw, by + 3 * s, 0xFFFFFFFF);
-		g.fill(bx, by - 3 * s, bx + s, by + 3 * s, 0xFFFFFFFF);
-		g.fill(bx + bw - s, by - 3 * s, bx + bw, by + 3 * s, 0xFFFFFFFF);
-		Ui.right(g, font, len + " m", bx + bw, by - 12 * s, 0xFFFFFFFF, s);
-		// The zoom, with + and - to click.
-		int zx = width - 18 * s, zy = cyp + r + 12 * s, zh = Math.max(30 * s, height - zy - 46 * s);
-		Ui.round(g, zx, zy, 12 * s, zh, 0xD0123C38, 4 * s);
-		double f = (Math.log(z) - Math.log(fit())) / Math.max(0.01, Math.log(MAX_ZOOM) - Math.log(fit()));
-		int ky = zy + zh - 14 * s - (int) ((zh - 28 * s) * Math.max(0, Math.min(1, f)));
-		Ui.round(g, zx + 2 * s, ky + 4 * s, 8 * s, 6 * s, Ui.CREAM, 2 * s);
-		Ui.centred(g, font, "+", zx + 6 * s, zy + 2 * s, 0xFFFFFFFF, s, false);
-		Ui.centred(g, font, "-", zx + 6 * s, zy + zh - 11 * s, 0xFFFFFFFF, s, false);
-		hit(zx, zy, 12 * s, 12 * s, () -> zoomBy(1.5, mapW / 2.0, mapH / 2.0));
-		hit(zx, zy + zh - 12 * s, 12 * s, 12 * s, () -> zoomBy(1 / 1.5, mapW / 2.0, mapH / 2.0));
+		for (float d = 0; d < h; d += 11) {
+			float l = Math.min(6, h - d);
+			V.rr(g, x - lw / 2, y + d, lw, l, 0, col);
+			V.rr(g, x + w - lw / 2, y + d, lw, l, 0, col);
+		}
 	}
 
-	/** The gyms (the UI Viewer's city panels): leader, type, badge number and their team's levels, by town. */
-	private static final java.util.Map<String, String[]> GYMS = java.util.Map.of("pewter_city", new String[] {"BROCK", "ROCK", "0", "12 to 14"}, "cerulean_city",
+	/** The town's buildings, for the panel (the places file only has the outside of a town): the viewer's TOWN_HERE. */
+	private static final Map<String, List<String>> TOWN_HERE = Map.ofEntries(Map.entry("PALLET TOWN", List.of("PROF. OAK's LAB", "Your house", "Rival's house")),
+			Map.entry("VIRIDIAN CITY", List.of("POKéMON CENTER", "POKé MART", "GYM")), Map.entry("PEWTER CITY", List.of("POKéMON CENTER", "POKé MART", "GYM", "MUSEUM")),
+			Map.entry("CERULEAN CITY", List.of("POKéMON CENTER", "POKé MART", "GYM", "BIKE SHOP")),
+			Map.entry("SAFFRON CITY", List.of("POKéMON CENTER", "POKé MART", "GYM", "SILPH CO.")),
+			Map.entry("VERMILION CITY", List.of("POKéMON CENTER", "POKé MART", "GYM", "FAN CLUB")), Map.entry("LAVENDER TOWN", List.of("POKéMON CENTER", "POKé MART", "TOWER")),
+			Map.entry("CELADON CITY", List.of("POKéMON CENTER", "DEPT. STORE", "GYM", "GAME CORNER")),
+			Map.entry("FUCHSIA CITY", List.of("POKéMON CENTER", "POKé MART", "GYM", "SAFARI ZONE")),
+			Map.entry("CINNABAR ISLAND", List.of("POKéMON CENTER", "POKé MART", "GYM", "LAB")), Map.entry("INDIGO PLATEAU", List.of("POKéMON CENTER", "POKéMON LEAGUE")));
+	/** The gyms: leader, type, badge (0 to 7) and their team's levels, by town. */
+	private static final Map<String, String[]> GYMS = Map.of("pewter_city", new String[] {"BROCK", "ROCK", "0", "12 to 14"}, "cerulean_city",
 			new String[] {"MISTY", "WATER", "1", "18 to 21"}, "vermilion_city", new String[] {"LT. SURGE", "ELECTRIC", "2", "18 to 24"}, "celadon_city",
 			new String[] {"ERIKA", "GRASS", "3", "24 to 29"}, "fuchsia_city", new String[] {"KOGA", "POISON", "4", "37 to 43"}, "saffron_city",
 			new String[] {"SABRINA", "PSYCHIC", "5", "37 to 43"}, "cinnabar_island", new String[] {"BLAINE", "FIRE", "6", "40 to 47"}, "viridian_city",
 			new String[] {"GIOVANNI", "GROUND", "7", "42 to 50"});
 	private static final String[] BADGE_NAMES = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
-	private static java.util.Map<String, List<String>> wild;
-
-	/** The wild POKéMON of a place (each once, in the order of the table). */
-	private static List<String> wildIn(String place) {
-		if (wild == null) {
-			java.util.Map<String, List<String>> m = new java.util.HashMap<>();
-			for (String[] r : com.insidethecube.retromon.engine.Species.table("wild.tsv")) {
-				if (r.length < 5 || r[0].startsWith("#")) continue;
-				List<String> l = m.computeIfAbsent(r[0], k -> new java.util.ArrayList<>());
-				for (String slot : r[4].split(",")) {
-					String sp = slot.split(":")[0].trim();
-					if (!sp.isEmpty() && !l.contains(sp)) l.add(sp);
-				}
-			}
-			wild = m;
-		}
-		return wild.getOrDefault(place, List.of());
-	}
+	/** How a place's POKéMON are found, each its own colour. */
+	private static final Map<String, Integer> HOW_COLS = Map.of("Grass", 0xFFD9F5C8, "Surfing", 0xFFCFE8FF, "Fishing", 0xFFCFF2F0, "Headbutt", 0xFFF3E2C8, "Rock Smash",
+			0xFFE8E2DA, "Swarms", 0xFFFFE3CC, "Bug-Catching Contest", 0xFFEEF6C8);
 
 	/**
-	 * The picked place, as the UI Viewer's panel down the right: what kind of place, its name and the line from its
-	 * sign, its picture if you've been, its gym (leader, type, badge, levels), the wild POKéMON there, and FLY HERE
-	 * for a town you've been to.
+	 * The panel down the right, as the viewer's: a picture of the place at the top (yours from when you were there,
+	 * else the map close in round it), what kind of place and its name, the line from its sign, what's there, its gym,
+	 * how its POKéMON are found and which, and FLY HERE for a town you've been to.
 	 */
-	private void drawCard(GuiGraphics g) {
-		if (picked == null) return;
-		Places.Place pl = Places.get(picked);
-		String name = pl == null ? picked.toUpperCase().replace('_', ' ') : pl.name();
-		Point pt = points.get(placeToPoint.getOrDefault(picked, ""));
-		boolean town = pt != null && pt.kind().equals("town"), been = ClientState.data.visited.contains(picked), here = picked.equals(ClientState.data.place);
-		float x = 940, y = 20, w = 320, h = 626, px = x + 24;
+	private void drawInfo(GuiGraphics g) {
+		float x = 940, y = 20, w = 320, h = 626;
 		V.panel(g, x, y, w, h);
 		vhit(x, y, w, h, () -> {
 		});
-		V.label(g, here ? "You are here" : town ? "Town" : pt != null && pt.kind().equals("route") ? "Route" : "Place", px, y + 22);
-		V.text(g, name, px, y + 42, name.length() > 14 ? 27 : 32, V.TEXT, true);
-		float cy = y + 42 + 44;
-		String line = Adventure.signLine(name);
-		if (!line.isEmpty()) {
-			for (String l : V.wrap("\"" + line + "\"", w - 48, 18, true)) {
-				V.text(g, l, px, cy, 18, 0xFFE8F4EF, true);
-				cy += 26;
+		if (P.isEmpty()) return;
+		Pin p = P.get(sel);
+		boolean town = p.kind().equals("town"), seen = been(p.key());
+		float px = x + 24, cw = w - 48;
+		// The picture, turned a little.
+		float pw = cw + 16, ph = 150, picX = px - 8, picY = y + 22 - 8;
+		V.shadow(g, picX, picY, pw, ph, 18, 0.9F);
+		g.pose().pushMatrix();
+		float pcx = V.x(picX + pw / 2), pcy = V.y(picY + ph / 2);
+		g.pose().translate(pcx, pcy);
+		g.pose().rotate((float) Math.toRadians(-1.2));
+		g.pose().translate(-pcx, -pcy);
+		V.rr(g, picX - 3, picY - 3, pw + 6, ph + 6, 21, 0xFFFFFFFF);
+		Identifier pic = Postcards.picture(p.key());
+		int gx = Math.round(V.x(picX)), gy = Math.round(V.y(picY)), gw = Math.round(V.s(pw)), gh = Math.round(V.s(ph));
+		g.fill(gx, gy, gx + gw, gy + gh, TownMap.SEA);
+		if (pic != null) g.blit(RenderPipelines.GUI_TEXTURED, pic, gx, gy, 0, 8, gw, gh, 384, 200, 384, 216);
+		else if (TownMap.ready()) {
+			float k = 2.5F * V.s(1);
+			worldCut(g, p.x() - gw / 2.0 / k, p.z() - gh / 2.0 / k, gw, gh, k, gx, gy);
+		}
+		// Its corners rounded off in white (the rim round it, and the panel behind).
+		float kk = V.s(1);
+		float[][] cc = {{picX + 18, picY + 18}, {picX + pw - 18, picY + 18}, {picX + pw - 18, picY + ph - 18}, {picX + 18, picY + ph - 18}};
+		double[] an = {Math.PI, -Math.PI / 2, 0, Math.PI / 2};
+		for (int i = 0; i < 4; i++) arc(g, V.x(cc[i][0]), V.y(cc[i][1]), 18 * kk, 27 * kk, an[i], an[i] + Math.PI / 2, 0xFFFFFFFF);
+		if (pic == null) {
+			String t = "PICTURE TO COME";
+			float tw = V.trackedWidth(t, 11.5F, 1) + 20, th = 11.5F * 1.36F + 6;
+			V.pill(g, picX + 10, picY + ph - 8 - th, tw, th, 0xEBFFFFFF);
+			V.tracked(g, t, picX + 20, V.capsTop(picY + ph - 8 - th / 2, 11.5F), 11.5F, V.MUTED, 1);
+		}
+		g.pose().popMatrix();
+		float cy = picY + ph + 14;
+		// What kind of place, and where; its name.
+		String kind = switch (p.kind()) {
+			case "town" -> "Town";
+			case "route" -> "Route";
+			default -> "Place";
+		};
+		boolean mineHere = p.key().equals(mine());
+		V.label(g, mineHere ? Lang.t("You are here") : Lang.t(kind) + " · " + (region.equals("johto") ? "JOHTO" : "KANTO"), px, cy);
+		cy += 18 + 6;
+		float ts = p.name().length() > 14 ? 27 : 32;
+		for (String l : wrapTitle(p.name(), cw, ts)) {
+			V.title(g, l, px, cy, ts, V.INK);
+			cy += ts * 1.1F;
+		}
+		cy += 10;
+		String tag = Adventure.signLine(p.name());
+		if (!tag.isEmpty()) {
+			for (String l : V.wrap("\"" + tag + "\"", cw, 18, false)) {
+				V.text(g, l, px, cy, 18, V.TEXT, false);
+				cy += 18 * 1.45F;
 			}
-			cy += 6;
 		}
-		Identifier pic = Postcards.picture(picked);
-		if (pic != null) {
-			float pw = w - 48, ph = pw * 9 / 16;
-			V.rr(g, px - 2, cy - 2, pw + 4, ph + 4, 14, 0x33000000);
-			V.img(g, pic, px, cy, pw, ph, 384, 216, 0xFFFFFFFF);
-			cy += ph + 14;
+		// What's there.
+		List<String> here = TOWN_HERE.getOrDefault(p.name(), p.here());
+		if (!here.isEmpty()) {
+			cy += 16;
+			V.label(g, Lang.t("Here"), px, cy);
+			cy += 18 + 7;
+			cy = chips(g, here, px, cy, cw, 14.5F, 11, 4, 6, null, true);
 		}
-		String[] gym = GYMS.get(picked);
+		// Its gym.
+		String[] gym = GYMS.get(p.key());
 		if (gym != null) {
-			V.label(g, "Gym", px, cy);
-			cy += 22;
-			V.rr(g, px, cy, w - 48, 86, 16, 0x2E000000);
+			cy += 16;
+			V.label(g, Lang.t("Gym"), px, cy);
+			cy += 18 + 8;
+			float gh2 = 10 + 64 + 10;
+			V.rr(g, px, cy, cw, gh2, 16, 0xFFF1F4FB);
 			int b = Integer.parseInt(gym[2]);
-			V.icon(g, "badge_" + b, px + 12, cy + 14, 58);
-			V.text(g, gym[0], px + 82, cy + 10, 19, V.TEXT, true);
-			V.text(g, gym[1] + " type · " + BADGE_NAMES[b], px + 82, cy + 38, 13, V.MUTED, true);
-			V.text(g, "Team from level " + gym[3], px + 82, cy + 58, 13, 0xFFE8F4EF, true);
-			cy += 86 + 16;
+			V.icon(g, "badge_" + b, px + 12, cy + (gh2 - 58) / 2, 58);
+			float tx0 = px + 12 + 58 + 12;
+			V.text(g, gym[0], tx0, cy + 10, 19, V.INK, true);
+			V.text(g, Lang.t("{0} type", gym[1]) + " · " + BADGE_NAMES[b], tx0, cy + 10 + 26, 14, V.MUTED, true);
+			V.text(g, Lang.t("Team from level {0}", gym[3]), tx0, cy + 10 + 26 + 19, 14, V.TEXT, false);
+			cy += gh2;
 		}
-		List<String> wl = wildIn(picked);
+		// How its POKéMON are found, and which.
+		if (!p.how().isEmpty()) {
+			cy += 14;
+			cy = chips(g, p.how(), px, cy, cw, 12, 9, 3, 5, HOW_COLS, false);
+		}
+		List<String> wl = p.wild().subList(0, Math.min(p.wild().size(), gym != null ? 4 : 8));
+		float bottom = y + h - 22 - (town ? 43 + 8 + 17 : 17) - 12;
 		if (!wl.isEmpty()) {
-			V.label(g, "Wild POKéMON", px, cy);
-			cy += 22;
-			int per = 4, max = gym != null ? 4 : 8;
-			float cell = (w - 48 - 3 * 6) / per;
-			for (int i = 0; i < Math.min(max, wl.size()); i++) {
-				float cx = px + (i % per) * (cell + 6), cyy = cy + (i / per) * (cell + 6);
-				V.rr(g, cx, cyy, cell, cell, 12, 0x2E000000);
-				V.img(g, Look.portrait(wl.get(i)), cx + 6, cyy + 6, cell - 12, cell - 12, 128, 128, 0xFFFFFFFF);
+			cy += 10;
+			String lab = Lang.t("Wild POKéMON");
+			V.label(g, lab, px, cy);
+			V.label(g, "(" + p.wild().size() + ")", px + V.labelWidth(lab) + 6, cy, V.MUTED);
+			cy += 18 + 8;
+			float cell = (cw - 3 * 6) / 4;
+			for (int i = 0; i < wl.size(); i++) {
+				float wx = px + (i % 4) * (cell + 6), wy = cy + (i / 4) * (cell + 6);
+				if (wy + cell > bottom) break;
+				V.rr(g, wx, wy, cell, cell, 12, 0xFFF1F4FB);
+				String sid = wl.get(i);
+				if (Species.ALL.containsKey(sid)) V.img(g, Look.portrait(sid), wx + (cell - 56) / 2, wy + (cell - 56) / 2, 56, 56, 128, 128, 0xFFFFFFFF);
+				else V.centred(g, "?", wx + cell / 2, V.capsTop(wy + cell / 2, 26), 26, V.DIM, true);
 			}
 		}
-		// FLY HERE (a town you've been to), or not been yet.
-		float by = y + h - 22 - 46;
+		// The foot: FLY HERE, or not been yet; where it is.
+		float fy = bottom + 12;
 		if (town) {
-			boolean ok = flyable(picked) && canFly();
-			if (been && ok) {
-				V.pill(g, px, by, w - 48, 46, V.CREAM);
-				V.centred(g, "A: FLY HERE", x + w / 2, by + 13, 17, V.INK, true);
-				String place = picked;
-				vhit(px, by, w - 48, 46, () -> flyTo(place));
+			boolean ok = seen && canFly();
+			float bh = 43;
+			if (ok) {
+				V.pill(g, px, fy + 3, cw, bh, 0x4DE8961E);
+				V.pill(g, px, fy, cw, bh, 0xFFFFFFFF);
+				V.rrv(g, px + 2, fy + 2, cw - 4, bh - 4, (bh - 4) / 2, V.SEL_TOP, V.SEL_BOTTOM);
+				V.centred(g, Lang.t("A: FLY HERE"), px + cw / 2, V.capsTop(fy + bh / 2, 17), 17, V.INK, false);
+				vhit(px, fy, cw, bh, this::fly);
 			} else {
-				V.ring(g, px, by, w - 48, 46, 23, 2, 0x598FF5C0);
-				V.centred(g, been ? "Can't fly from here" : "Not been here yet", x + w / 2, by + 14, 15, Ui.alpha(V.TEXT, 0.7F), true);
+				V.pill(g, px, fy, cw, bh, Ui.alpha(0xFFDDE3F0, 0.7F));
+				V.pill(g, px + 2, fy + 2, cw - 4, bh - 4, Ui.alpha(0xFFFFFFFF, 0.7F));
+				V.centred(g, Lang.t(seen ? "You can't fly yet" : "Not been here yet"), px + cw / 2, V.capsTop(fy + bh / 2, 15), 15, Ui.alpha(V.INK, 0.7F), false);
 			}
+			fy += bh + 8;
 		}
+		int[] zn = zoneOf(p);
+		String where = zn != null ? Lang.t("Zone in the mod: {0}, {1} to {2}, {3}", zn[0], zn[1], zn[2], zn[3]) : Lang.t("About {0}, {1} on your map", p.x(), p.z());
+		V.text(g, where, px, fy, 12.5F, V.MUTED, true);
 	}
 
-	/** The games' own map of Kanto or Johto: every place, joined by its routes. */
-	private void drawRegion(GuiGraphics g, float partial) {
-		g.fill(0, 0, width, height, 0xFF0E2240);
-		int m = 8 * s;
-		for (int y = 0; y < height; y += 2 * s) g.fill(0, y, width, y + s, 0x08FFFFFF);
-		List<Point> pts = inRegion();
-		if (pts.isEmpty()) return;
-		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
-		for (Point p : pts) {
-			minX = Math.min(minX, p.x());
-			minY = Math.min(minY, p.y());
-			maxX = Math.max(maxX, p.x());
-			maxY = Math.max(maxY, p.y());
+	/** A name in Fredoka, wrapped to a width. */
+	private static List<String> wrapTitle(String t, float w, float size) {
+		List<String> out = new ArrayList<>();
+		String line = "";
+		for (String word : t.split(" ")) {
+			String next = line.isEmpty() ? word : line + " " + word;
+			if (!line.isEmpty() && V.titleWidth(next, size) > w) {
+				out.add(line);
+				line = word;
+			} else line = next;
 		}
-		int panelW = 110 * s;
-		int areaX = m + 6 * s, areaY = m + 22 * s, areaW = width - 2 * m - panelW - 18 * s, areaH = height - areaY - m - 10 * s;
-		float k = Math.min(areaW / (float) Math.max(1, maxX - minX), areaH / (float) Math.max(1, maxY - minY));
-		int fMinX = minX, fMinY = minY;
-		int offX = areaX + (int) ((areaW - (maxX - minX) * k) / 2), offY = areaY + (int) ((areaH - (maxY - minY) * k) / 2);
-		Map<String, int[]> at2 = new HashMap<>();
-		for (Point p : pts) at2.put(p.key(), new int[] {offX + Math.round((p.x() - fMinX) * k), offY + Math.round((p.y() - fMinY) * k)});
-		for (String[] e : edges) {
-			int[] a = at2.get(e[0]), b = at2.get(e[1]);
-			if (a == null || b == null) continue;
-			line(g, a[0], a[1], b[0], b[1], 12 * s, 0xFF3E8C4A);
-		}
-		for (Point p : pts) {
-			int[] c = at2.get(p.key());
-			Ui.round(g, c[0] - 7 * s, c[1] - 7 * s, 14 * s, 14 * s, 0xFF3E8C4A, 6 * s);
-		}
-		for (String[] e : edges) {
-			int[] a = at2.get(e[0]), b = at2.get(e[1]);
-			if (a == null || b == null) continue;
-			line(g, a[0], a[1], b[0], b[1], 3 * s, 0xFFE9D8A6);
-		}
-		String here = placeToPoint.get(ClientState.data.place);
-		for (Point p : pts) {
-			int[] c = at2.get(p.key());
-			boolean been = visited(p.key()), sel = p.key().equals(at);
-			if (over(c[0] - 8 * s, c[1] - 8 * s, 16 * s, 16 * s)) at = p.key();
-			if (highlight.contains(p.key())) {
-				float pulse = (float) (0.5 + 0.5 * Math.sin((ticks + partial) * 0.2));
-				int r = (int) ((9 + 3 * pulse) * s);
-				Ui.round(g, c[0] - r, c[1] - r, 2 * r, 2 * r, Ui.alpha(0xFFFFD34A, 0.45F + 0.3F * pulse), r);
+		if (!line.isEmpty()) out.add(line);
+		return out;
+	}
+
+	/** Words in pills, wrapping (gap apart); a red dot before each if dot. Returns the y under them. */
+	private float chips(GuiGraphics g, List<String> words, float x, float y, float w, float size, float padX, float padY, float gap, Map<String, Integer> cols, boolean dot) {
+		float h = size * 1.36F + padY * 2, cx = x;
+		List<String> seenWords = new ArrayList<>();
+		for (String t : words) {
+			if (seenWords.contains(t)) continue;
+			seenWords.add(t);
+			String shown = Lang.t(t);
+			float tw = dot ? V.width(shown, size, true) : V.trackedWidth(shown, size, 0.5F);
+			float cw = padX * 2 + (dot ? 8 + 7 : 0) + tw;
+			if (cx > x && cx + cw > x + w) {
+				cx = x;
+				y += h + gap;
 			}
-			switch (p.kind()) {
-				case "town" -> {
-					int z = 6 * s;
-					Ui.round(g, c[0] - z, c[1] - z, 2 * z, 2 * z, sel ? Ui.CREAM : 0xFF1C2742, 2 * s);
-					Ui.round(g, c[0] - z + s, c[1] - z + s, 2 * z - 2 * s, 2 * z - 2 * s, been ? 0xFFE5525C : 0xFF6C7590, 2 * s);
-				}
-				case "route" -> {
-					int z = 3 * s;
-					Ui.round(g, c[0] - z, c[1] - z, 2 * z, 2 * z, sel ? Ui.CREAM : been ? 0xFFF4F0E0 : 0xFF9AA2B8, z);
-				}
-				default -> {
-					int z = 4 * s;
-					Ui.round(g, c[0] - z, c[1] - z, 2 * z, 2 * z, sel ? Ui.CREAM : been ? 0xFF8E6CD8 : 0xFF5A6080, s);
-				}
-			}
-			if (p.key().equals(here)) {
-				float pulse = (float) (0.5 + 0.5 * Math.sin((ticks + partial) * 0.3));
-				int r = (int) ((10 + 2 * pulse) * s);
-				int col = Ui.alpha(0xFFFF3B4A, 0.5F + 0.4F * pulse);
-				g.fill(c[0] - r, c[1] - r, c[0] + r, c[1] - r + s, col);
-				g.fill(c[0] - r, c[1] + r - s, c[0] + r, c[1] + r, col);
-				g.fill(c[0] - r, c[1] - r, c[0] - r + s, c[1] + r, col);
-				g.fill(c[0] + r - s, c[1] - r, c[0] + r, c[1] + r, col);
-			}
-			String key = p.key();
-			hit(c[0] - 8 * s, c[1] - 8 * s, 16 * s, 16 * s, () -> {
-				if (key.equals(at)) fly();
-				at = key;
-			});
+			int bg = cols == null ? 0xFFF1F4FB : cols.getOrDefault(t, 0xFFF1F4FB);
+			V.pill(g, cx, y, cw, h, bg);
+			float tx0 = cx + padX;
+			if (dot) {
+				V.rr(g, tx0, y + h / 2 - 4, 8, 8, 3, 0xFFE5525C);
+				tx0 += 8 + 7;
+				V.text(g, shown, tx0, V.capsTop(y + h / 2, size), size, V.INK, true);
+			} else V.tracked(g, shown, tx0, V.capsTop(y + h / 2, size), size, V.INK, 0.5F);
+			cx += cw + gap;
 		}
-		// The panel: the picked place.
-		int px = width - m - panelW, py = m + 22 * s, ph = 92 * s;
-		Ui.round(g, px, py, panelW, ph, 0xF0123C38, 3 * s);
-		Point sel = points.get(at);
-		if (sel != null) {
-			List<String> nm = Ui.wrap(font, sel.name(), (panelW - 16 * s) / s);
-			for (int i = 0; i < nm.size() && i < 2; i++) Ui.draw(g, font, Ui.bold(nm.get(i)), px + 8 * s, py + 8 * s + i * 11 * s, Ui.TEXT, s, true);
-			String kind = sel.kind().equals("town") ? "Town" : sel.kind().equals("route") ? "Route" : "Place";
-			Ui.text(g, font, kind + (visited(sel.key()) ? "  ·  Visited" : "  ·  Not yet visited"), px + 8 * s, py + 32 * s, Ui.MUTED, s);
-			if (sel.key().equals(here)) Ui.text(g, font, "You are here.", px + 8 * s, py + 44 * s, 0xFFFF6B76, s);
-			if (sel.kind().equals("town")) {
-				boolean ok = flyPlace(sel.key()) != null && canFly();
-				int bw = panelW - 16 * s, bx = px + 8 * s, by = py + ph - 20 * s;
-				Ui.button(g, font, bx, by, bw, 13 * s, "FLY HERE", ok ? 0xFF4A8FE0 : 0xFF4A5068, ok && over(bx, by, bw, 13 * s), s);
-				if (ok) hit(bx, by, bw, 13 * s, this::fly);
-				else Ui.text(g, font, canFly() ? "Visit it first." : "Needs FLY + THUNDERBADGE.", px + 8 * s, py + ph - 32 * s, Ui.DIM, s);
-			}
+		return y + h;
+	}
+
+	/** The way to the other region: an arrow tab at the map's edge, bobbing gently, JOHTO on the left, KANTO on the right. */
+	private void drawSide(GuiGraphics g, float secs) {
+		boolean kanto = region.equals("kanto");
+		String word = kanto ? "JOHTO" : "KANTO";
+		float tw = V.titleTrackedWidth(word, 20, 2), w = 18 + 26 + 8 + tw + 18, h = 56;
+		float bob = (float) (1 - Math.cos(secs / 1.6F * Math.PI * 2)) / 2 * 6;
+		float x = kanto ? 34 - bob : MX + VW - 160 + bob, y = MY + VH / 2 - 28;
+		boolean on = vover(x, y, w, h);
+		if (on) overUi = true;
+		V.shadow(g, x, y, w, h, h / 2, 1.3F);
+		V.pill(g, x - 3, y - 3, w + 6, h + 6, 0x80FFFFFF);
+		if (on) V.rrv(g, x, y, w, h, h / 2, V.SEL_TOP, V.SEL_BOTTOM);
+		else V.pill(g, x, y, w, h, 0xFFFFFFFF);
+		float ax, tx0;
+		if (kanto) {
+			ax = x + 18;
+			tx0 = ax + 26 + 8;
+		} else {
+			tx0 = x + 18;
+			ax = tx0 + tw + 8;
 		}
-		Ui.text(g, font, "Arrows: move   Tab: maps   A: fly   B: back", m, height - m - 4 * s, Ui.DIM, s);
+		float u = 26 / 24F, cy = y + h / 2, lw = 4 * u;
+		float[] pts = kanto ? new float[] {16, 4, 7, 12, 16, 20} : new float[] {8, 4, 17, 12, 8, 20};
+		for (int i = 0; i < 2; i++) V.line(g, ax + pts[i * 2] * u, cy - 13 + pts[i * 2 + 1] * u, ax + pts[i * 2 + 2] * u, cy - 13 + pts[i * 2 + 3] * u, lw, 0xFFE5525C);
+		for (int i = 0; i < 3; i++) V.ellipse(g, ax + pts[i * 2] * u, cy - 13 + pts[i * 2 + 1] * u, lw / 2, lw / 2, 0xFFE5525C);
+		V.titleTracked(g, word, tx0, V.capsTop(cy, 20), 20, V.INK, 2);
+		vhit(x, y, w, h, this::flip);
+	}
+
+	/** A big, plain way out: BACK, top left over the map (and, from the Pokédex, whose places these are). */
+	private void drawBack(GuiGraphics g) {
+		float x = 38, y = 36, hh = 52, w = 8 + 36 + 12 + V.titleWidth(Lang.t("Back"), 20) + 20;
+		boolean on = vover(x, y, w, hh);
+		if (on) overUi = true;
+		V.pill(g, x, y + 6, w, hh, 0x2E1E2854);
+		V.shadow(g, x, y, w, hh, hh / 2, 0.7F);
+		V.pill(g, x, y, w, hh, on ? 0xFFFFC93C : 0xFFFFFFFF);
+		V.rrv(g, x + 3, y + 3, w - 6, hh - 6, (hh - 6) / 2, on ? V.SEL_TOP : 0xFFFFFFFF, on ? V.SEL_BOTTOM : 0xFFEEF2FB);
+		V.rrv(g, x + 8, y + hh / 2 - 18, 36, 36, 18, 0xFFFF8A7A, 0xFFE5525C);
+		V.text(g, "B", x + 8 + 18 - V.width("B", 13, true) / 2, V.capsTop(y + hh / 2, 13), 13, 0xFFFFFFFF, true);
+		V.title(g, Lang.t("Back"), x + 8 + 36 + 12, V.capsTop(y + hh / 2, 20), 20, V.INK);
+		vhit(x, y, w, hh, this::back);
+		if (highlightTitle != null) {
+			String t = Lang.t("Where {0} lives", highlightTitle);
+			float tw = V.width(t, 14, true) + 32, th = 44, hx = 170, hy = 40;
+			if (vover(hx, hy, tw, th)) overUi = true;
+			V.shadow(g, hx, hy, tw, th, th / 2, 0.8F);
+			V.rrv(g, hx, hy, tw, th, th / 2, V.SEL_TOP, V.SEL_BOTTOM);
+			V.text(g, t, hx + 16, V.capsTop(hy + th / 2, 14), 14, V.INK, true);
+		}
 	}
 }

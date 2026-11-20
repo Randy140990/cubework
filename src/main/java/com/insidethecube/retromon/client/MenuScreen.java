@@ -29,7 +29,6 @@ public class MenuScreen extends DeviceScreen {
 	}
 
 	/** Which OPTION row the keys change: 0 text speed, 1 music, 2 the Pokédex voice, 3 nights, 4 wild Pokémon, 5 walking with you, 6 the POKéMON LOOK. */
-	private int optionRow;
 	private static final String[] ITEMS = {"POKéDEX", "POKéMON", "BAG", "MAP", "CLOTHES", "CARD", "WAIT", "SAVE", "OPTION", "EXIT"};
 	/** Each app's picture (textures/gui/icon). */
 	private static final String[] ICONS = {"dex", "ball", "backpack", "map", "cap", "card", "clock", "save", "cog", "close"};
@@ -1393,76 +1392,6 @@ public class MenuScreen extends DeviceScreen {
 			g.disableScissor();
 		}
 		V.hints(g, "B", "Back");
-	}
-
-	private void drawOptions(GuiGraphics g, PlayerData d) {
-		Scenes.backdrop(g, "sky");
-		int n = OPTION_LABELS.length;
-		optionRow = Math.max(0, Math.min(n - 1, optionRow));
-		V.panel(g, 170, 40, 940, 96);
-		List<String> dl = V.wrap(OPTION_LINES[optionRow], 880, 22, true);
-		for (int i = 0; i < Math.min(2, dl.size()); i++) V.text(g, dl.get(i), 200, 62 + i * 30, 22, V.TEXT, true);
-		float rh = n > 11 ? 42 : 46;
-		V.panel(g, 170, 160, 940, n * rh + 36);
-		int[] now = {d.textSpeed, Music.level(), Settings.sound(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0, Settings.effects() ? 1 : 0,
-				Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), Settings.shaderMode(), 0};
-		for (int r = 0; r < n; r++) {
-			float ry = 160 + 18 + r * rh, rx = 188, rw = 904;
-			if (vover(rx, ry, rw, rh)) optionRow = r;
-			boolean on = r == optionRow;
-			V.item(g, OPTION_LABELS[r], null, rx, ry, rw, rh, on, false, 21);
-			int c = on ? V.INK : V.TEXT;
-			if (OPTION_VALUES[r].length == 0) V.tri(g, rx + rw - 22 - 6, ry + rh / 2, 12, 0, Ui.alpha(c, 0.6F));
-			else {
-				String v = OPTION_VALUES[r][Math.max(0, Math.min(OPTION_VALUES[r].length - 1, now[r]))];
-				float vx = rx + rw - 22 - 130;
-				V.tri(g, vx - 14, ry + rh / 2, 12, 2, Ui.alpha(c, 0.6F));
-				V.centred(g, v, vx + 65, ry + (rh - 21 * 1.15F) / 2, 21, c, true);
-				V.tri(g, vx + 130 + 14, ry + rh / 2, 12, 0, Ui.alpha(c, 0.6F));
-			}
-			int row = r;
-			vhit(rx, ry, rw, rh, () -> {
-				optionRow = row;
-				changeOption(row, 1);
-			});
-		}
-		V.hints(g, "A", "Change", "B", "Back");
-	}
-
-	/** Changes an option by a step (left -1, right or A +1); CONTROLS opens the key map. */
-	private void changeOption(int row, int step) {
-		PlayerData d = ClientState.data;
-		switch (row) {
-			case 0 -> setSpeed(Math.floorMod(d.textSpeed + step, 3));
-			case 1 -> Music.setLevel(Math.floorMod(Music.level() + step, 5));
-			case 2 -> Settings.set("sound", Math.floorMod(Settings.sound() + step, 5));
-			case 3 -> Settings.set("voice", Settings.voice() ? 0 : 1);
-			case 4 -> {
-				Settings.set("nights", Math.floorMod(Settings.nights() + step, 3));
-				Night.send();
-			}
-			case 5 -> {
-				Settings.set("seen", Settings.seen() ? 0 : 1);
-				Settings.sendPrefs();
-			}
-			case 6 -> Settings.set("effects", Settings.effects() ? 0 : 1);
-			case 7 -> Settings.set("style", Settings.switchStyle() ? 1 : 0);
-			case 8 -> {
-				Settings.set("follow", Settings.follower() ? 0 : 1);
-				Settings.sendPrefs();
-			}
-			case 9 -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
-			case 10 -> {
-				Settings.set("shaders", Settings.shaderMode() == 0 ? 1 : 0);
-				Shaders.set(Settings.shaderMode());
-			}
-			default -> {
-				Sounds.press();
-				if (minecraft != null) minecraft.setScreen(new KeyMapScreen(this));
-				return;
-			}
-		}
-		Sounds.press();
 	}
 
 	@SuppressWarnings("unused")
