@@ -6,3 +6,9 @@ grep interface net/minecraft/client/renderer/SubmitNodeCollector.java
 net/minecraft/client/gui/render/GuiRenderer.java
 net/minecraft/client/gui/render/state/GuiRenderState.java
 net/minecraft/client/gui/GuiGraphics.java
+net/minecraft/client/gui/render/state/GuiElementRenderState.java
+net/minecraft/client/gui/render/state/ColoredRectangleRenderState.java
+net/minecraft/client/gui/render/state/BlitRenderState.java
+net/minecraft/client/gui/render/TextureSetup.java
+net/minecraft/client/gui/navigation/ScreenRectangle.java
+net/minecraft/client/gui/render/state/ScreenArea.java
