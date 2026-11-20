@@ -991,7 +991,8 @@ public final class Game {
 				w.setAirborne(air);
 				for (int tries = 0; tries < 6; tries++) {
 					int x = w.getBlockX() + RNG.nextInt(11) - 5, z = w.getBlockZ() + RNG.nextInt(11) - 5;
-					BlockPos to = grassAt(level, x, z, w.getBlockY(), !grassy);
+					// (In a room's grass, the forest's, it wanders within the grass.)
+					BlockPos to = Interiors.in(p) ? Interiors.grassNear(w, p.getRandom()) : grassAt(level, x, z, w.getBlockY(), !grassy);
 					if (to == null) continue;
 					w.getNavigation().moveTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5, air ? 1.4 : 1.0);
 					break;
@@ -1005,7 +1006,7 @@ public final class Game {
 		for (int tries = 0; tries < 14; tries++) {
 			double a = RNG.nextDouble() * Math.PI * 2, r = 5 + RNG.nextDouble() * (SEEN_NEAR - 5);
 			int x = (int) Math.floor(p.getX() + Math.cos(a) * r), z = (int) Math.floor(p.getZ() + Math.sin(a) * r);
-			BlockPos at = grassAt(level, x, z, p.getBlockY(), !grassy);
+			BlockPos at = Interiors.in(p) ? Interiors.grassNear(p, p.getRandom()) : grassAt(level, x, z, p.getBlockY(), !grassy);
 			if (at == null) continue;
 			Mon foe = table.roll(RNG);
 			// A REPEL keeps away ones weaker than your lead.
@@ -1306,7 +1307,7 @@ public final class Game {
 		if (!d.started || !d.anyHealthy() || COOLDOWN.containsKey(p.getUUID()) || d.place.isEmpty()) return;
 		// Seen in the grass (as Let's Go): you meet them by walking into them, not at random.
 		if (seenMode(p)) return;
-		boolean inGrass = grass(p.level().getBlockState(pos)) || grass(p.level().getBlockState(pos.above()));
+		boolean inGrass = grass(p.level().getBlockState(pos)) || grass(p.level().getBlockState(pos.above())) || Interiors.inGrass(p);
 		if (!inGrass && !anywhere(d.place)) return;
 		Wild.Table table = Wild.get(d.place, "grass", Wild.timeOfDay(p.level().getDayTime()));
 		if (table == null || table.ratePer256() <= 0 || !Wild.has(d.place)) return;

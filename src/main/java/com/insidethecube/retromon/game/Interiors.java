@@ -58,7 +58,12 @@ public final class Interiors {
 
 	public record Room(String id, int ox, int oy, int oz, double w, double d, double h, String name, String floor, String place, double sx, double sz,
 			float syaw, double ex, double ez, float eyaw, double camX, double camZ, double camDist, int[] cells, List<Warp> warps, List<Person> people,
-			List<Act> acts) {
+			List<Act> acts, List<double[]> grass) {
+		/** Big enough to walk about in (the forest): the camera follows you, as it does outside. */
+		public boolean big() {
+			return w > 26 || d > 26;
+		}
+
 		public double cx() {
 			return ox + camX;
 		}
@@ -68,7 +73,7 @@ public final class Interiors {
 		}
 	}
 
-	public record Door(String key, String room, List<BlockPos> blocks, double x, double y, double z) {}
+	public record Door(String key, String room, List<BlockPos> blocks, double x, double y, double z, boolean north, float yaw) {}
 
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */
@@ -129,8 +134,9 @@ public final class Interiors {
 				JsonObject w = we.getAsJsonObject();
 				JsonObject ws = w.has("spawn") && w.get("spawn").isJsonObject() ? w.getAsJsonObject("spawn") : null;
 				String kind = w.get("kind").getAsString();
-				double x0 = num(w, "x0", 0), x1 = kind.equals("mat") ? num(w, "x1", 0) : x0 + 4;
-				double z0 = kind.equals("mat") ? num(w, "z", 0) : num(w, "z0", 0), z1 = kind.equals("mat") ? 999 : num(w, "z1", 0);
+				boolean north = kind.equals("north");
+				double x0 = num(w, "x0", 0), x1 = kind.equals("mat") || north ? num(w, "x1", 0) : x0 + 4;
+				double z0 = kind.equals("mat") ? num(w, "z", 0) : north ? -999 : num(w, "z0", 0), z1 = kind.equals("mat") ? 999 : north ? num(w, "z", 1) : num(w, "z1", 0);
 				warps.add(new Warp(kind, x0, x1, z0, z1, w.has("door") && !w.get("door").isJsonNull() ? w.get("door").getAsString() : null,
 						w.has("to") && !w.get("to").isJsonNull() ? w.get("to").getAsString() : null, num(ws, "x", 0), num(ws, "z", 0), (float) num(ws, "yaw", 0)));
 			}
@@ -148,10 +154,15 @@ public final class Interiors {
 				acts.add(new Act(rc.get(0).getAsDouble(), rc.get(1).getAsDouble(), rc.get(2).getAsDouble(), rc.get(3).getAsDouble(), strings(a.get("lines")),
 						a.has("map") && a.get("map").getAsBoolean(), a.has("pc") && a.get("pc").getAsBoolean()));
 			}
+			List<double[]> grass = new ArrayList<>();
+			if (r.has("grass")) for (JsonElement ge : r.getAsJsonArray("grass")) {
+				JsonArray g = ge.getAsJsonArray();
+				grass.add(new double[] {g.get(0).getAsDouble(), g.get(1).getAsDouble(), g.get(2).getAsDouble(), g.get(3).getAsDouble()});
+			}
 			Room room = new Room(e.getKey(), o.get(0).getAsInt(), o.get(1).getAsInt(), o.get(2).getAsInt(), num(r, "W", 16), num(r, "D", 14), num(r, "H", 4),
 					r.get("name").getAsString(), r.get("floor").getAsString(), r.get("place").getAsString(), num(sp, "x", 0), num(sp, "z", 0),
 					(float) num(sp, "yaw", 0), num(en, "x", 0), num(en, "z", 0), (float) num(en, "yaw", 180), num(cam, "x", 8), num(cam, "z", 7),
-					num(cam, "dist", 30), cells, warps, people, acts);
+					num(cam, "dist", 30), cells, warps, people, acts, grass);
 			ROOMS.put(room.id(), room);
 		}
 		for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("doors").entrySet()) {
@@ -162,8 +173,9 @@ public final class Interiors {
 				blocks.add(new BlockPos(a.get(0).getAsInt(), a.get(1).getAsInt(), a.get(2).getAsInt()));
 			}
 			JsonArray out = d.getAsJsonArray("out");
+			boolean north = d.has("face") && d.get("face").getAsString().equals("n");
 			DOORS.put(e.getKey(), new Door(e.getKey(), d.get("room").getAsString(), blocks, out.get(0).getAsDouble(), out.get(1).getAsDouble(),
-					out.get(2).getAsDouble()));
+					out.get(2).getAsDouble(), north, (float) num(d, "yaw", north ? 180 : 0)));
 		}
 		JsonObject st = DATA.getAsJsonObject("start");
 		if (st != null) {
@@ -342,7 +354,7 @@ public final class Interiors {
 		PENDING_T.put(p.getUUID(), FADE_TICKS);
 		PENDING.put(p.getUUID(), () -> {
 			if (p.level() != world) Game.leavingLevel(p);
-			p.teleportTo(world, d.x(), d.y(), d.z(), java.util.Set.of(), 0F, 30F, true);
+			p.teleportTo(world, d.x(), d.y(), d.z(), java.util.Set.of(), d.yaw(), 30F, true);
 			p.setDeltaMovement(Vec3.ZERO);
 			LAST.remove(p.getUUID());
 			Game.roomLeft(p);
@@ -388,6 +400,11 @@ public final class Interiors {
 				switch (w.kind()) {
 					case "mat" -> {
 						if (lz > w.z0() && lx > w.x0() && lx < w.x1() && (dz > 0.01 || facingSouth)) {
+							// Through to another room (the forest and its gates).
+							if (w.to() != null && ROOMS.containsKey(w.to())) {
+								go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
+								return true;
+							}
 							Door d = w.door() == null ? null : DOORS.get(w.door());
 							if (d == null) continue;
 							if (r.id().equals("lab") && !Game.data(p).started) {
@@ -397,6 +414,19 @@ public final class Interiors {
 								Game.message(p, List.of("OAK: Hey! Don't go away yet!"));
 								return false;
 							}
+							out(p, d);
+							return true;
+						}
+					}
+					case "north" -> {
+						// Through a way in the north wall: to the next room, or out to the world (the north gate).
+						if (lz < w.z1() && lx > w.x0() && lx < w.x1() && (dz < -0.01 || facingNorth)) {
+							if (w.to() != null && ROOMS.containsKey(w.to())) {
+								go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
+								return true;
+							}
+							Door d = w.door() == null ? null : DOORS.get(w.door());
+							if (d == null) continue;
 							out(p, d);
 							return true;
 						}
@@ -428,15 +458,38 @@ public final class Interiors {
 				zf = b.getZ() + 1;
 				y = b.getY();
 			}
-			// Up against the door's outside (south) face, heading in.
-			if (p.getX() > x0 - 0.2 && p.getX() < x1 + 0.2 && p.getZ() > zf - 1.0 && p.getZ() < zf + 0.55 && Math.abs(p.getY() - y) < 1.2
-					&& (dz < -0.01 || facingNorth)) {
+			// Up against the door's outside (south) face, heading in; a north door's, from the north, heading south.
+			boolean at = d.north() ? p.getZ() > zf - 2.55 && p.getZ() < zf - 0.95 && (dz > 0.01 || facingSouth)
+					: p.getZ() > zf - 1.0 && p.getZ() < zf + 0.55 && (dz < -0.01 || facingNorth);
+			if (p.getX() > x0 - 0.2 && p.getX() < x1 + 0.2 && at && Math.abs(p.getY() - y) < 1.2) {
 				Room r = ROOMS.get(d.room());
 				if (r != null) go(p, r, r.ex(), r.ez(), r.eyaw(), true);
 				return r != null;
 			}
 		}
 		return false;
+	}
+
+	/** Whether you're standing in a room's wild grass (the forest's). */
+	public static boolean inGrass(Entity e) {
+		Room r = roomOf(e);
+		if (r == null) return false;
+		double x = e.getX() - r.ox(), z = e.getZ() - r.oz();
+		for (double[] g : r.grass()) if (x > g[0] && x < g[2] && z > g[1] && z < g[3]) return true;
+		return false;
+	}
+
+	/** A spot in a room's wild grass near you (between 4 and 12 blocks away), for a wild one to appear; or null. */
+	public static BlockPos grassNear(Entity e, net.minecraft.util.RandomSource rnd) {
+		Room r = roomOf(e);
+		if (r == null || r.grass().isEmpty()) return null;
+		for (int tries = 0; tries < 12; tries++) {
+			double[] g = r.grass().get(rnd.nextInt(r.grass().size()));
+			double x = r.ox() + g[0] + 0.5 + rnd.nextDouble() * Math.max(0, g[2] - g[0] - 1), z = r.oz() + g[1] + 0.5 + rnd.nextDouble() * Math.max(0, g[3] - g[1] - 1);
+			double dist = Math.hypot(x - e.getX(), z - e.getZ());
+			if (dist >= 4 && dist <= 12) return BlockPos.containing(x, r.oy(), z);
+		}
+		return null;
 	}
 
 	/** Somewhere free to stand near a spot in a room (for people who come in: your rival, say). */

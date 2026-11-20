@@ -13,6 +13,9 @@ const PLACES = [
   { id: "mart", name: "Poké Mart", floor: "Viridian City", group: "Viridian City" },
   { id: "trainer1", name: "Trainer House", floor: "1F", group: "Viridian City" },
   { id: "trainer2", name: "Trainer House", floor: "B1F", group: "Viridian City" },
+  { id: "gate_s", name: "Route 2 gate", floor: "South", group: "Viridian Forest" },
+  { id: "forest", name: "Viridian Forest", floor: "Route 2", group: "Viridian Forest" },
+  { id: "gate_n", name: "Route 2 gate", floor: "North", group: "Viridian Forest" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
 ];
 const FROM_TOWN = { x: 6.0, z: 12.5, yaw: FACE.n };
@@ -24,6 +27,12 @@ const STAIRS_TOP = { x: 15.5, z: 2.9, yaw: FACE.s };
 const CENTER_DOOR = [9, 11], CENTER_IN = { x: 10.0, z: 14.5, yaw: FACE.n };
 const MART_DOOR = [7, 9], MART_IN = { x: 8.0, z: 12.5, yaw: FACE.n };
 // The Trainer House (Viridian City): its way in, and the stairs between its floors (as your house's are).
+// Viridian Forest and its two gatehouses (Route 2): the south gate's way in, its door through to the forest, the
+// forest's ways out (south at the bottom right, north at the top left), the north gate's.
+const GATE_DOOR = [6, 8], FOREST_W = 36, FOREST_D = 52, FOREST_IN = [28, 30], FOREST_OUT = [5, 7];
+const GS_IN = { x: 7.0, z: 8.5, yaw: FACE.n }, GS_FROM_FOREST = { x: 7.0, z: 2.6, yaw: FACE.s };
+const FOREST_FROM_S = { x: 29.0, z: FOREST_D - 2.6, yaw: FACE.n }, FOREST_FROM_N = { x: 6.0, z: 2.6, yaw: FACE.s };
+const GN_FROM_FOREST = { x: 7.0, z: 8.5, yaw: FACE.n }, GN_IN = { x: 7.0, z: 2.6, yaw: FACE.s };
 const TH_DOOR = [7, 9], TH_IN = { x: 8.0, z: 12.5, yaw: FACE.n }, TH_FOOT = { x: 11.1, z: 1.1, yaw: FACE.s }, TH_TOP = { x: 15.5, z: 2.9, yaw: FACE.s };
 
 // The Trainer House's big screen: the battle downstairs, two trainers and a ball flying between, VS flashing.
@@ -117,13 +126,14 @@ function drawScoreboard(P, f) {
     for (let y = 0; y < WORLDMAP.h; y++) for (let x = 0; x < WORLDMAP.w; x++) { const i = (y * WORLDMAP.w + x) * 3; P.set(x + 3, y + 3, [b.charCodeAt(i), b.charCodeAt(i + 1), b.charCodeAt(i + 2)]); }
   }, { fit: true });
   // Each room's own mat at the door, as carpet: its colour, a border, and a ball (or stripes) in the middle.
-  const mat = (base, edge) => (P, r) => {
+  const mat = (base, edge, north) => (P, r) => {
     const cream = hx("#F6F1EA");
     P.fill(hx(base), 0.04, r);
     P.rect(0, 0, 32, 2, hx(edge)); P.rect(0, 30, 32, 2, hx(edge)); P.rect(0, 0, 2, 32, hx(edge)); P.rect(30, 0, 2, 32, hx(edge));
     P.rect(4, 4, 24, 1, cream); P.rect(4, 27, 24, 1, cream); P.rect(4, 4, 1, 24, cream); P.rect(27, 4, 1, 24, cream);
     // Two chevrons, pointing south (out).
-    for (const y0 of [8, 16]) for (let k = 0; k < 7; k++) { P.rect(8 + k, y0 + k, 2, 2, cream); P.rect(22 - k, y0 + k, 2, 2, cream); }
+    // (Pointing north for a way through the north wall.)
+    for (const y0 of [8, 16]) for (let k = 0; k < 7; k++) { const y = north ? 30 - (y0 + k) - 2 : y0 + k; P.rect(8 + k, y, 2, 2, cream); P.rect(22 - k, y, 2, 2, cream); }
   };
   reg("matHome", 32, 32, mat("#C9433F", "#8E2A2A"), { fit: true });
   reg("matRival", 32, 32, mat("#33477A", "#1E2A4A"), { fit: true });
@@ -131,6 +141,15 @@ function drawScoreboard(P, f) {
   reg("matCenter", 32, 32, mat("#F08A3C", "#C7502E"), { fit: true });
   reg("matMart", 32, 32, mat("#3A6FD0", "#24479A"), { fit: true });
   reg("matTrainer", 32, 32, mat("#E8823A", "#A9531F"), { fit: true });
+  reg("matForest", 32, 32, mat("#4E9A4A", "#2F6B33"), { fit: true });
+  reg("matForestN", 32, 32, mat("#4E9A4A", "#2F6B33", true), { fit: true });
+  // The forest's own: the ground under the trees, a wall of leaves round it, the gates' boards and paper.
+  reg("forestGround", 16, 16, (P, r) => { P.fill(hx("#7DB65A"), 0.08, r); for (let i = 0; i < 10; i++) P.set(r() * 16, r() * 16, hx("#6AA24C")); });
+  reg("forestPath", 16, 16, (P, r) => mcStone(P, r, hx("#D8BE88"), 0.05, 4));
+  reg("leafWall", 16, 16, (P, r) => leaves(P, r, hx("#3F8A44"), hx("#6DBA5A"), hx("#255C2D"), 0));
+  reg("paperGate", 16, 16, (P, r) => mcStone(P, r, hx("#EEF1E6"), 0.03, 2));
+  reg("gateBoards", 16, 16, (P, r) => { P.fill(hx("#C9A36B"), 0.05, r); for (let y = 0; y < 16; y += 4) P.rect(0, y, 16, 1, hx("#B08A55")); });
+  reg("greenTrim", 16, 16, (P, r) => { P.fill(hx("#4E9A4A"), 0.04, r); P.rect(0, 0, 16, 2, hx("#78C06E")); });
   // The Trainer House's own: warm cream walls (and cool grey downstairs), an orange trim, a peach check floor,
   // its counter, the battle room's wooden court floor.
   reg("paperTrainer", 16, 16, (P, r) => mcStone(P, r, hx("#FBF3E8"), 0.03, 2));
@@ -759,6 +778,77 @@ const BUILD = {
     R.npcs.push({ name: "Cooltrainer", role: "trainer", key: "trainer_house", x: 8.0, z: 5.4, yaw: FACE.s, look: { skin: "cooltrainer_m" },
       talk: () => [{ text: "I'm today's challenger. Think you can beat me?" }, { text: "Win, and the prize upstairs is yours!" }] });
     R.spawn = TH_FOOT;
+    return R;
+  },
+
+  gate_s() {
+    // The gate on Route 2 into Viridian Forest, south side: you come in from the route, a guard at a desk, and the
+    // way through to the forest in the north wall.
+    const R = new Room("gate_s", { name: "Route 2 gate", floor: "South", W: 14, D: 10, outsideSize: "15 by 12" });
+    shell(R, { paper: "paperGate", floor: "gateBoards", door: GATE_DOOR, skirt: "greenTrim" });
+    band(R, 1.05, "greenTrim");
+    const G = R.geo;
+    G.box(10, 0, 2.6, 13, 1.0, 3.4, { all: "counterBlue", top: "lab" }); R.solid(10, 2.6, 13, 3.4);
+    passageN(R, GATE_DOOR[0], GATE_DOOR[1], { to: "forest", spawn: FOREST_FROM_S, mat: "matForestN" });
+    plant(R, 1.0, 9.0, 1.0); plant(R, 13.0, 9.0, 1.0);
+    framed(R, 1.6, 1.4, 2.4, 1.2, "worldMap", "n", { frameMat: "walnut", act: { label: "Look", map: true, lines: ["A map of the region. VIRIDIAN FOREST is the green between VIRIDIAN and PEWTER.", "In game, this opens the TOWN MAP."] } });
+    doormat(R, GATE_DOOR[0], GATE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matForest" });
+    R.npcs.push({ name: "Old man", key: "gate_s_man", x: 11.5, z: 1.8, yaw: FACE.s, look: { skin: "old_man" },
+      talk: () => [{ text: "VIRIDIAN FOREST is a natural maze. Many trainers get lost in there!" }, { text: "Keep your eyes on the path, and you'll come out at PEWTER CITY." }] });
+    R.spawn = GS_IN;
+    return R;
+  },
+
+  forest() {
+    // Viridian Forest, as the old games have it: a maze of trees from the south gate (bottom right) to the north
+    // gate (top left), tall grass along the way where wild POKéMON live, bug catchers in the clearings, signs.
+    const W = FOREST_W, D = FOREST_D;
+    const R = new Room("forest", { name: "Viridian Forest", floor: "Route 2", W, D, H: 4 });
+    shell(R, { paper: "leafWall", floor: "forestGround", door: FOREST_IN, skirt: "bark", rail: false });
+    // The way through: east side north, across the middle, up the middle, across the top, up to the exit.
+    const paths = [[27, 34, 31, D], [10, 30, 31, 35], [10, 12, 16, 35], [3, 10, 16, 16], [3, 0, 9, 16]];
+    for (const [x0, z0, x1, z1] of paths) patch(R, x0, z0, x1, z1, "forestPath");
+    // Clearings off the path, and the grass where the wild ones are.
+    const open = paths.concat([[18, 38, 26, 46], [18, 14, 26, 22], [2, 22, 9, 30], [12, 2, 20, 9]]);
+    wildGrass(R, 27, 40, 31, 46); wildGrass(R, 19, 39, 25, 45); wildGrass(R, 14, 30, 22, 35); wildGrass(R, 3, 23, 8, 29);
+    wildGrass(R, 10, 18, 16, 26); wildGrass(R, 19, 15, 25, 21); wildGrass(R, 3, 10, 9, 15); wildGrass(R, 13, 3, 19, 8);
+    // Trees everywhere else, close together (their canopies touching), so the path is the only way.
+    const inOpen = (x, z) => open.some(([a, b, c, d]) => x > a - 1.0 && x < c + 1.0 && z > b - 1.0 && z < d + 1.0);
+    for (let z = 1.4; z < D - 0.8; z += 2.3) for (let x = 1.3 + ((Math.round(z / 2.3) % 2) ? 1.15 : 0); x < W - 0.8; x += 2.3)
+      if (!inOpen(x, z)) tree(R, x, z, 0.95);
+    // Signs along the way.
+    const sign = (x, z, key, text, lines) => { textBoard(key, text, 52); R.geo.box(x - 0.05, 0, z - 0.05, x + 0.05, 1.0, z + 0.05, "walnut");
+      R.geo.box(x - 0.9, 0.8, z - 0.04, x + 0.9, 1.4, z + 0.04, { s: key, all: "walnut" }); R.solid(x - 0.9, z - 0.15, x + 0.9, z + 0.15); R.act([x - 1, z - 0.6, x + 1, z + 0.6], { label: "Read", lines }); };
+    sign(26, D - 4, "signForestIn", "VIRIDIAN FOREST", ["VIRIDIAN FOREST. Leave only footprints!", "Wild POKéMON live in the tall grass."]);
+    sign(14, 33.6, "signForestTip1", "TRAINER TIPS", ["TRAINER TIPS: no stealing other trainers' POKéMON! Catch only wild ones."]);
+    sign(6, 18.6, "signForestTip2", "TRAINER TIPS", ["TRAINER TIPS: weaken a POKéMON before you try to catch it. A sleeping one is easier still."]);
+    sign(8, 3.4, "signForestOut", "PEWTER CITY", ["Leaving VIRIDIAN FOREST. PEWTER CITY ahead."]);
+    // Its trainers (the old games' bug catchers and the lass), each by the path, looking out for you.
+    R.npcs.push({ name: "Bug Catcher", role: "trainer", key: "viridian_forest_0", x: 26.2, z: 38.0, yaw: FACE.e, look: { skin: "bug_catcher" }, talk: () => [{ text: "Hey! You have POKéMON! Come on! Let's battle 'em!" }] });
+    R.npcs.push({ name: "Bug Catcher", role: "trainer", key: "viridian_forest_1", x: 20.0, z: 30.0, yaw: FACE.s, look: { skin: "bug_catcher" }, talk: () => [{ text: "Yo! You can't jam out if you're a POKéMON trainer!" }] });
+    R.npcs.push({ name: "Bug Catcher", role: "trainer", key: "viridian_forest_2", x: 17.2, z: 18.0, yaw: FACE.w, look: { skin: "bug_catcher" }, talk: () => [{ text: "Hey, wait up! What's the hurry?" }] });
+    R.npcs.push({ name: "Lass", role: "trainer", key: "viridian_forest_3", x: 2.6, z: 21.0, yaw: FACE.e, look: { skin: "lass" }, talk: () => [{ text: "Hi, do you have a PIKACHU?" }] });
+    R.npcs.push({ name: "Bug Catcher", role: "trainer", key: "viridian_forest_4", x: 10.2, z: 6.0, yaw: FACE.w, look: { skin: "bug_catcher" }, talk: () => [{ text: "I'm gonna be the best. You just can't beat me!" }] });
+    passageN(R, FOREST_OUT[0], FOREST_OUT[1], { to: "gate_n", spawn: GN_FROM_FOREST, mat: "matForestN", frame: "bark" });
+    doormat(R, FOREST_IN[0], FOREST_IN[1], { to: "gate_s", spawn: GS_FROM_FOREST, mat: "matForest" });
+    R.spawn = FOREST_FROM_S;
+    return R;
+  },
+
+  gate_n() {
+    // The gate on the forest's north side: in from the forest, a desk, and out through the north wall to Route 2
+    // (and PEWTER CITY).
+    const R = new Room("gate_n", { name: "Route 2 gate", floor: "North", W: 14, D: 10, outsideSize: "15 by 16" });
+    shell(R, { paper: "paperGate", floor: "gateBoards", door: GATE_DOOR, skirt: "greenTrim" });
+    band(R, 1.05, "greenTrim");
+    const G = R.geo;
+    G.box(10, 0, 2.6, 13, 1.0, 3.4, { all: "counterBlue", top: "lab" }); R.solid(10, 2.6, 13, 3.4);
+    passageN(R, GATE_DOOR[0], GATE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matForestN" });
+    plant(R, 1.0, 9.0, 1.0); plant(R, 13.0, 9.0, 1.0);
+    doormat(R, GATE_DOOR[0], GATE_DOOR[1], { to: "forest", spawn: FOREST_FROM_N, mat: "matForest" });
+    R.npcs.push({ name: "Lass", key: "gate_n_lass", x: 11.5, z: 1.8, yaw: FACE.s, look: { skin: "lass" },
+      talk: () => [{ text: "Are you off to PEWTER CITY? Its GYM LEADER, BROCK, uses rock POKéMON." }, { text: "Water and grass moves work well on rock!" }] });
+    R.spawn = GN_IN;
     return R;
   },
 

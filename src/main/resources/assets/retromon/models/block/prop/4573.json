@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/bark","bark":"retromon:block/interior/bark"},"elements":[{"from":[13.0,16,15.4],"to":[16.0,16,16.0],"faces":{"down":{"uv":[13.0,0.0,16.0,0.6],"texture":"#bark"}}}]}

@@ -168,6 +168,8 @@ public final class Adventure {
 		follow = you;
 		// Inside a building the camera holds still on the whole room (as the Interior Viewer shows it), not on you.
 		com.insidethecube.retromon.game.Interiors.Room room = com.insidethecube.retromon.game.Interiors.roomOf(e);
+		// (A big one, the forest, you walk about in: the camera follows you there, as outside.)
+		if (room != null && room.big()) room = null;
 		if (room != null) follow = new Vec3(room.cx(), room.oy() + 0.9, room.cz());
 		// Talking to someone: ease in towards the middle of the two of you, closer and a little lower.
 		Entity other = focusId >= 0 && e.level() != null ? e.level().getEntity(focusId) : null;
