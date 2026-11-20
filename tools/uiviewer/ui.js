@@ -24,7 +24,10 @@ const G = {
   party: [], place: "PALLET TOWN",
   bag: {
     "ITEMS": [["POTION", 5, "Restores 20 HP to one POKéMON."], ["SUPER POTION", 2, "Restores 50 HP to one POKéMON."], ["ANTIDOTE", 3, "Cures a POKéMON of poison."], ["PARLYZ HEAL", 1, "Cures a POKéMON of paralysis."], ["AWAKENING", 1, "Wakes a sleeping POKéMON."], ["ESCAPE ROPE", 1, "Takes you back out of a cave in a flash."], ["REPEL", 4, "Keeps weak wild POKéMON away for 100 steps."]],
-    "BALLS": [["POKé BALL", 12, "A ball for catching wild POKéMON."], ["GREAT BALL", 3, "A better ball, with a higher chance of a catch."]],
+    "BALLS": [["POKé BALL", 12, "A ball for catching wild POKéMON."], ["GREAT BALL", 3, "A better ball, with a higher chance of a catch."], ["ULTRA BALL", 2, "A very good ball: better than a GREAT BALL."],
+      ["MASTER BALL", 1, "The best ball there is. It catches any wild POKéMON without fail."], ["SAFARI BALL", 30, "For the SAFARI ZONE only."], ["PARK BALL", 20, "For the Bug-Catching Contest in the NATIONAL PARK."],
+      ["LEVEL BALL", 1, "Better the higher your POKéMON's level is than theirs. Made by KURT from an apricorn."], ["LURE BALL", 1, "Good for POKéMON hooked on a rod. Made by KURT."], ["MOON BALL", 1, "Good for POKéMON that evolve with a MOON STONE. Made by KURT."],
+      ["FRIEND BALL", 1, "A POKéMON caught in it is friendly to you at once. Made by KURT."], ["LOVE BALL", 1, "Good for a POKéMON of the other gender to yours. Made by KURT."], ["HEAVY BALL", 1, "Better the heavier the POKéMON is. Made by KURT."], ["FAST BALL", 1, "Good for POKéMON that run away. Made by KURT."]],
     "KEY ITEMS": [["TOWN MAP", 1, "A map of Kanto. Shows where you are."], ["BICYCLE", 1, "A folding bike, for getting about twice as fast."], ["OLD ROD", 1, "An old fishing rod. Fish in any water."]],
     "TM & HM": [["TM01 MEGA PUNCH", 1, "Teaches MEGA PUNCH."], ["TM28 DIG", 1, "Teaches DIG."], ["HM01 CUT", 1, "Teaches CUT. Clears small trees outside battle."]],
   },
@@ -235,7 +238,26 @@ const ICON = {
   sparkle: `<svg viewBox="0 0 40 40"><path d="M20 2l4 14 14 4-14 4-4 14-4-14-14-4 14-4z" fill="#fff"/></svg>`,
   badge: c => `<svg viewBox="0 0 64 64"><path d="M32 6l8 14 16 2-12 11 3 16-15-8-15 8 3-16L8 22l16-2z" fill="${c}"/><circle cx="32" cy="28" r="6" fill="#fff" opacity=".5"/></svg>`,
 };
-const ITEM_ICON = n => /PARCEL/.test(n) ? ICON.parcel : /BALL/.test(n) ? ICON.ball : /POTION|HEAL|ANTIDOTE|AWAKENING/.test(n) ? ICON.potion : /^TM|^HM/.test(n) ? ICON.disc : /MAP/.test(n) ? ICON.map : /ROPE|REPEL/.test(n) ? ICON.bag : ICON.key;
+// Every ball its own: the colours and marks it's known by, on the same round shape with its band and button.
+const BALL_LOOK = {
+  "POKé BALL": ["#E5525C", ""], "GREAT BALL": ["#3C8DE4", `<path d="M14 22q6-8 12-8M50 22q-6-8-12-8" stroke="#E5525C" stroke-width="5" fill="none" stroke-linecap="round"/>`],
+  "ULTRA BALL": ["#2E2E36", `<path d="M20 12v14M44 12v14" stroke="#F2C12E" stroke-width="6" stroke-linecap="round"/><path d="M20 26q12 4 24 0" stroke="#F2C12E" stroke-width="5" fill="none"/>`],
+  "MASTER BALL": ["#8E52C8", `<circle cx="20" cy="19" r="4.5" fill="#F07AB0"/><circle cx="44" cy="19" r="4.5" fill="#F07AB0"/><path d="M26 24l3-8 3 5 3-5 3 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linejoin="round"/>`],
+  "SAFARI BALL": ["#8DA44A", `<path d="M14 24q5-6 10-2M40 14q6 2 8 8M28 12q4 4 2 9" stroke="#5E6E2C" stroke-width="3.5" fill="none" stroke-linecap="round"/>`, "#D9CB8C"],
+  "PARK BALL": ["#F2C12E", `<path d="M12 24h40" stroke="#3C8DE4" stroke-width="3.5"/><path d="M22 12v12M32 9v15M42 12v12" stroke="#3C8DE4" stroke-width="3.2"/>`, "#3C8DE4"],
+  "LEVEL BALL": ["#E5525C", `<rect x="10" y="20" width="44" height="7" rx="2" fill="#F2C12E"/>`, "#2E2E36"],
+  "LURE BALL": ["#3C8DE4", `<path d="M10 22h44" stroke="#E5525C" stroke-width="4"/><path d="M10 15h44" stroke="#3FA34D" stroke-width="3"/>`],
+  "MOON BALL": ["#3A5AA8", `<path d="M40 11a10 10 0 1 0 6 12 7 7 0 1 1 -6 -12z" fill="#F2E27A"/><circle cx="20" cy="20" r="2" fill="#F2E27A"/><circle cx="27" cy="13" r="1.6" fill="#F2E27A"/>`],
+  "FRIEND BALL": ["#3FA34D", `<path d="M14 22q5-8 12-3 1 5-5 7-5 0-7-4zM50 22q-5-8-12-3-1 5 5 7 5 0 7-4z" fill="#E5525C"/>`],
+  "LOVE BALL": ["#F08FB6", `<path d="M32 26c-6-4-10-7-10-11 0-3 2-5 5-5 2 0 4 1 5 3 1-2 3-3 5-3 3 0 5 2 5 5 0 4-4 7-10 11z" fill="#E5525C"/>`],
+  "HEAVY BALL": ["#6E7480", `<rect x="13" y="13" width="38" height="11" rx="3" fill="#3A3F4A"/><rect x="18" y="16" width="5" height="5" rx="1" fill="#B8BEC8"/><rect x="41" y="16" width="5" height="5" rx="1" fill="#B8BEC8"/>`],
+  "FAST BALL": ["#F2C12E", `<path d="M10 24l9-11h8l-9 11zM26 24l9-11h8l-9 11z" fill="#E5525C"/>`],
+};
+function ballIcon(n) {
+  const [top, mark, bot] = BALL_LOOK[n] || BALL_LOOK["POKé BALL"];
+  return `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="${bot || "#F4F6F5"}"/><path d="M8 32a24 24 0 0 1 48 0z" fill="${top}"/>${mark}<path d="M16 15q6-5 13-6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".45"/><rect x="8" y="29" width="48" height="6" fill="#26304A"/><circle cx="32" cy="32" r="8" fill="#26304A"/><circle cx="32" cy="32" r="4.5" fill="#fff"/><circle cx="32" cy="32" r="24" fill="none" stroke="#26304A" stroke-width="2.5"/></svg>`;
+}
+const ITEM_ICON = n => /PARCEL/.test(n) ? ICON.parcel : /BALL/.test(n) ? ballIcon(n) : /POTION|HEAL|ANTIDOTE|AWAKENING/.test(n) ? ICON.potion : /^TM|^HM/.test(n) ? ICON.disc : /MAP/.test(n) ? ICON.map : /ROPE|REPEL/.test(n) ? ICON.bag : ICON.key;
 // Each sort of thing's colours in a list (light, middle, deep), as the menu's big buttons; the game's V.GOODS.
 const GOODS = { ball: ["#F27682", "#D94452", "#AE2E3C"], med: ["#6BDCA2", "#39B27A", "#22855A"], tm: ["#8EC4F6", "#4A8FE0", "#2F64B0"], key: ["#FFD27A", "#F0A030", "#C87818"], field: ["#C6AEF4", "#8A62D8", "#6440B0"] };
 const ITEM_KIND = n => /BALL/.test(n) ? "ball" : /POTION|HEAL|ANTIDOTE|AWAKENING|REVIVE|ETHER|ELIXIR/.test(n) ? "med" : /^TM|^HM/.test(n) ? "tm" : /ROPE|REPEL/.test(n) ? "field" : "key";
@@ -300,12 +322,28 @@ function actions(list, o = {}) {
 
 // ---------- the text box: letters come in at the chosen text speed; A goes on ----------
 function speedCps() { return [28, 52, 110][G.opts.textSpeed]; }
+// Typing a line out letter by letter with its names already in gold: the ** marks never show, and a gold word is gold
+// from its first letter.
+function plainLen(s) { return String(s).replace(/\*\*/g, "").length; }
+function richUpTo(s, n) {
+  let out = "", bold = false, left = n;
+  for (const part of String(s).split("**")) { if (left <= 0) break; const t = part.slice(0, left); left -= t.length; out += bold ? `<b>${esc(t)}</b>` : esc(t); bold = !bold; }
+  return out;
+}
+// Our own "more to read" mark: a little cube turning, in the text's colour (not anyone's ball).
+const MORE_MARK = `<svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 2.5l8.5 4.9v9.2L12 21.5l-8.5-4.9V7.4z" fill="currentColor" opacity=".2"/><path d="M12 2.5l8.5 4.9L12 12.3 3.5 7.4z" fill="currentColor"/><path d="M12 12.3v9.2l-8.5-4.9V7.4z" fill="currentColor" opacity=".7"/><path d="M12 12.3l8.5-4.9v9.2L12 21.5z" fill="currentColor" opacity=".45"/></svg>`;
+// A click anywhere on the picture moves the words on, as SPACE does (not just a click on the box).
+const LIVE_TEXT = [];
+stageEl.addEventListener("click", ev => {
+  if (ev.target.closest("button, a, select, input, [data-i], [data-p], [data-r], [data-t], [data-m], .g-btn, .g-act, .g-item, .g-choice, .m-tile, .m-pill, .mk-face, .mk-glass, .g-hints, canvas.mapcv")) return;
+  for (let i = LIVE_TEXT.length - 1; i >= 0; i--) { const w = LIVE_TEXT[i]; if (!w.el.isConnected) { LIVE_TEXT.splice(i, 1); continue; } w.tap(); return; }
+});
 function textBox(lines, o = {}) {
   lines = lines.map(l => typeof l === "string" ? { text: l } : l);
   const el = box(o.x ?? 140, null, o.w ?? 1000, null, "g-panel g-text g-fadein" + (o.film ? " film" : ""));
   el.style.top = "auto"; el.style.left = (o.x ?? 140) + "px"; el.style.right = "auto"; el.style.bottom = (o.bottom ?? 26) + "px";
   if (o.film) { el.style.left = "0"; el.style.width = "1280px"; el.style.bottom = "0"; }
-  const who = h("span", "who"), body = h("span", ""), more = h("span", "more");
+  const who = h("span", "who"), body = h("span", ""), more = h("span", "more", MORE_MARK);
   el.append(who, body, more);
   let i = 0, shown = 0, t0 = 0, full = "", raf = 0, choice = null, dead = false;
   let res; const done = new Promise(r => res = r);
@@ -317,9 +355,9 @@ function textBox(lines, o = {}) {
   }
   function tick() {
     if (dead) return;
-    const n = Math.min(full.length, Math.floor((performance.now() - t0) / 1000 * speedCps()));
-    if (n !== shown) { shown = n; body.innerHTML = rich(full.slice(0, shown)); }
-    if (shown < full.length) raf = requestAnimationFrame(tick); else finished();
+    const n = Math.min(plainLen(full), Math.floor((performance.now() - t0) / 1000 * speedCps()));
+    if (n !== shown) { shown = n; body.innerHTML = richUpTo(full, shown); }
+    if (shown < plainLen(full)) raf = requestAnimationFrame(tick); else finished();
   }
   function finished() {
     const L = lines[i];
@@ -330,14 +368,16 @@ function textBox(lines, o = {}) {
   function key(k) {
     if (choice) return choice.key(k);
     if (k !== "a") return false;
-    if (shown < full.length) { shown = full.length; body.innerHTML = rich(full); cancelAnimationFrame(raf); finished(); return true; }
+    if (shown < plainLen(full)) { shown = plainLen(full); body.innerHTML = rich(full); cancelAnimationFrame(raf); finished(); return true; }
     if (lines[i].ask) return true;
     if (o.keep && i === lines.length - 1) { res(); if (o.onDone) o.onDone(); return true; }
     end(); return true;
   }
-  el.addEventListener("click", () => key("a"));
+  el.addEventListener("click", ev => { ev.stopPropagation(); key("a"); });
   show();
-  return { el, key, done, kill() { dead = true; cancelAnimationFrame(raf); el.remove(); if (choice) choice.el.remove(); } };
+  const w = { el, key, done, tap() { if (!choice) key("a"); }, kill() { dead = true; cancelAnimationFrame(raf); el.remove(); if (choice) choice.el.remove(); } };
+  LIVE_TEXT.push(w);
+  return w;
 }
 // A list in a panel: up and down to pick, A to choose, B to go back.
 function choiceBox(items, o = {}) {

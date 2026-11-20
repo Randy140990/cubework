@@ -220,16 +220,23 @@ function makerRows(tab) {
     sw("SHOES", "shoec", OUTFIT.COLOURS.slice(0, OUTFIT.CLOTHES)), ch("BAG", "bag", OUTFIT.BAGS), sw("BAG COLOUR", "bagc", OUTFIT.COLOURS.slice(0, OUTFIT.CLOTHES))];
 }
 function maker(C, tabs, o) {
-  let tab = 0, sel = 0, rows = makerRows(tabs[0]);
+  const skip = new Set(o.skip || []), rowsOf = t => makerRows(t).filter(r => !skip.has(r.label));
+  let tab = 0, sel = 0, rows = rowsOf(tabs[0]);
   const glass = !!o.glass;
   const P = box(o.x ?? 24, o.y ?? 20, o.w ?? 870, null, glass ? "mk-glass" : "g-panel", ""); P.style.padding = glass ? "16px 16px 14px" : "12px 14px"; P.style.maxHeight = (o.maxH || 650) + "px"; P.style.overflow = "auto";
   if (glass && !document.getElementById("mkGlassCss")) document.head.appendChild(h("style", "", `.mk-glass{border-radius:30px;background:linear-gradient(160deg,rgba(40,80,140,.42),rgba(22,46,92,.52));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-    box-shadow:0 0 0 2px rgba(255,255,255,.6),0 0 0 6px rgba(255,255,255,.14),0 20px 44px rgba(16,60,96,.28);color:#fff;scrollbar-width:thin}
-    .mk-glass .g-label{color:rgba(255,255,255,.92);text-shadow:0 1px 4px rgba(10,40,70,.35)}.mk-glass .g-title{color:#fff!important;text-shadow:0 2px 8px rgba(10,40,70,.35)}`, { id: "mkGlassCss" }));
+    box-shadow:0 0 0 2px rgba(255,255,255,.6),0 0 0 6px rgba(255,255,255,.14),0 20px 44px rgba(16,60,96,.28);color:#fff}
+    .mk-glass .g-label{color:rgba(255,255,255,.92);text-shadow:0 1px 4px rgba(10,40,70,.35)}.mk-glass .g-title{color:#fff!important;text-shadow:0 2px 8px rgba(10,40,70,.35)}
+    .mk-glass .mk-btn{display:inline-flex;align-items:center;gap:10px;padding:8px 20px 8px 14px;border-radius:999px;color:#fff;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 2px rgba(255,255,255,.55);font-family:Fredoka,system-ui,sans-serif;font-weight:600;letter-spacing:1px}
+    .mk-glass .mk-btn.on{background:linear-gradient(180deg,#FFEC8A,#FFC93C);color:#26304A;box-shadow:0 0 0 3px #fff}.mk-glass .mk-btn svg{width:22px;height:22px}
+    .mk-scroll{scrollbar-width:thin;scrollbar-color:#7FE3C8 transparent}
+    .mk-scroll::-webkit-scrollbar,.mk-glass::-webkit-scrollbar{width:12px}.mk-scroll::-webkit-scrollbar-track,.mk-glass::-webkit-scrollbar-track{background:transparent;margin:22px 0}
+    .mk-scroll::-webkit-scrollbar-thumb,.mk-glass::-webkit-scrollbar-thumb{border-radius:999px;border:3px solid transparent;background:linear-gradient(180deg,#9FF0D8,#41BF84) padding-box}`, { id: "mkGlassCss" }));
+  if (glass) P.classList.add("mk-scroll");
   const opts = r => r.swatches ? r.swatches.map((c, i) => [i, c]) : r.chips;
   const idxOf = r => Math.max(0, opts(r).findIndex(([v]) => v === r.get()));
   const draw = () => {
-    rows = makerRows(tabs[tab]);
+    rows = rowsOf(tabs[tab]);
     const tabBar = tabs.length > 1 ? `<div style="display:flex;gap:8px;margin:2px 0 8px 10px">${tabs.map((t, i) => `<span class="g-chip${i === tab ? " on" : ""}" data-t="${i}" style="font-size:14px;padding:3px 14px">${t === "you" ? "YOU" : "CLOTHES"}</span>`).join("")}<span style="margin-left:auto;font-size:12px;font-weight:900;color:${glass ? "rgba(255,255,255,.85)" : "var(--g-muted)"};align-self:center">TAB switches</span></div>` : "";
     // Rows go in cards by what they're for (hat, top, bottoms...), with room to breathe: big swatches and chips.
     // YOU is one card: body, skin, eyes, then hair style and hair colour under them.
@@ -247,20 +254,22 @@ function maker(C, tabs, o) {
     // Rows sit apart (a clear gap under the one you're on), the YOU card full width, CLOTHES in two columns.
     P.innerHTML = tabBar + `<div style="${one ? "" : "columns:2;column-gap:10px"}">${groups.map(G2 => `<div style="border-radius:18px;background:${glass ? "rgba(255,255,255,.1);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)" : "#F3F6FC"};padding:${one ? "12px 12px 14px" : "8px 6px"};display:grid;gap:${glass ? 12 : one ? 20 : 8}px;break-inside:avoid;margin-bottom:12px">
       <div class="g-title" style="font-size:17px;letter-spacing:2px;padding:2px 12px 2px;color:var(--g-red)">${G2.g}</div>${G2.rows.map(([r, i]) => rowHtml(r, i, G2.g)).join("")}</div>`).join("")}</div>` +
-      `<div style="display:flex;gap:12px;margin-top:0;padding:0 10px;align-items:center"><span class="g-item${sel === rows.length ? " on" : ""}" data-done="1">${esc(T(o.done || "DONE"))}</span><span class="g-item${sel === rows.length + 1 ? " on" : ""}" data-rand="1">${esc(T("MIX IT UP"))}</span>
+      `<div style="display:flex;gap:12px;margin-top:0;padding:0 10px;align-items:center">${o.noDone ? "" : `<span class="g-item${sel === rows.length ? " on" : ""}${glass ? " mk-btn" : ""}" data-done="1">${esc(T(o.done || "DONE"))}</span>`}<span class="g-item${sel === rows.length + (o.noDone ? 0 : 1) ? " on" : ""}${glass ? " mk-btn" : ""}" data-rand="1">${glass ? MIX_ICON : ""}${esc(T("MIX IT UP"))}</span>
         ${tabs[tab] === "you" && !glass ? `<span style="margin-left:auto;font-size:12.5px;font-weight:800;color:var(--g-muted)"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#FFD45A;margin-right:5px"></i>New: four more skin tones, eye colour</span>` : ""}</div>`;
     P.querySelectorAll("[data-r]").forEach(e => e.onclick = () => { const r = rows[+e.dataset.r]; sel = +e.dataset.r; r.set(opts(r)[+e.dataset.j][0]); changed(); });
     P.querySelectorAll("[data-t]").forEach(e => e.onclick = () => { tab = +e.dataset.t; sel = 0; draw(); });
-    P.querySelector("[data-done]").onclick = () => o.onDone(); P.querySelector("[data-rand]").onclick = () => mix();
+    if (P.querySelector("[data-done]")) P.querySelector("[data-done]").onclick = () => o.onDone(); P.querySelector("[data-rand]").onclick = () => mix();
+    const onEl = P.querySelector(".on, [style*='FFE07A']"); if (onEl && glass) onEl.scrollIntoView({ block: "nearest" });
   };
   const changed = () => { draw(); if (SC.creator) SC.creator.refresh(); };
-  const mix = () => { for (const t of tabs) for (const r of makerRows(t)) { if (r.label === "BODY") continue; const os = opts(r); r.set(os[Math.floor(Math.random() * os.length)][0]); } changed(); };
+  const mix = () => { for (const t of tabs) for (const r of rowsOf(t)) { if (r.label === "BODY" || r.label === "SKIN") continue; const os = opts(r); r.set(os[Math.floor(Math.random() * os.length)][0]); } changed(); };
   draw();
+  const extra = o.noDone ? 1 : 2;
   const w = { el: P, key(k) {
-    const n = rows.length + 2;
+    const n = rows.length + extra;
     if (k === "tab" && tabs.length > 1) { tab = (tab + 1) % tabs.length; sel = 0; draw(); return true; }
     if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : n - 1)) % n; draw(); return true; }
-    if (sel >= rows.length) { if (k === "a") { if (sel === rows.length) o.onDone(); else mix(); return true; } if (k === "left" || k === "right") { sel = sel === rows.length ? rows.length + 1 : rows.length; draw(); return true; } }
+    if (sel >= rows.length) { if (k === "a") { if (sel === rows.length && !o.noDone) o.onDone(); else mix(); return true; } if ((k === "left" || k === "right") && !o.noDone) { sel = sel === rows.length ? rows.length + 1 : rows.length; draw(); return true; } }
     if (k === "a") { o.onDone(); return true; }
     const r = rows[sel];
     if (r && (k === "left" || k === "right")) { const os = opts(r); r.set(os[(idxOf(r) + (k === "right" ? 1 : os.length - 1)) % os.length][0]); changed(); return true; }
@@ -270,10 +279,18 @@ function maker(C, tabs, o) {
   C.push(w);
   return w;
 }
-// Eight starting looks for the maker: four boys, four girls, light to dark, each their own hair.
-const STARTERS_LOOK = [
-  { girl: 0, skin: 4, hair: 1, hairc: 14, eyes: 4 }, { girl: 0, skin: 1, hair: 0, hairc: 9, eyes: 1 }, { girl: 0, skin: 5, hair: 1, hairc: 4, eyes: 2 }, { girl: 0, skin: 7, hair: 0, hairc: 4, eyes: 1 },
-  { girl: 1, skin: 4, hair: 3, hairc: 15, eyes: 3 }, { girl: 1, skin: 1, hair: 2, hairc: 16, eyes: 4 }, { girl: 1, skin: 5, hair: 4, hairc: 17, eyes: 6 }, { girl: 1, skin: 7, hair: 5, hairc: 4, eyes: 1 }];
+// The starting looks: a boy and a girl in every skin tone, lightest to darkest, each with their own hair; eyes to suit.
+const MIX_ICON = `<svg viewBox="0 0 24 24"><path d="M4 7h3.5c2 0 3.2 1 4.3 2.6l2.4 3.8C15.3 15 16.5 16 18.5 16H21M4 17h3.5c1.4 0 2.4-.5 3.2-1.4M15 8.4c.8-.9 1.8-1.4 3.5-1.4H21M18 4l3 3-3 3M18 13l3 3-3 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const TONE_ORDER = [8, 4, 9, 0, 1, 5, 10, 2, 6, 3, 7, 11];   // IVORY, PALE, PEACH, FAIR, LIGHT, MEDIUM, OLIVE, TAN, BROWN, DEEP, DARK, ESPRESSO
+const LOOK_EYES = [4, 3, 2, 4, 1, 2, 1, 1, 1, 1, 1, 1];
+const STARTERS_LOOK = [];
+TONE_ORDER.forEach((skin, i) => {
+  STARTERS_LOOK.push({ girl: 0, skin, hair: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0][i], hairc: [14, 15, 9, 4, 17, 9, 4, 17, 4, 4, 4, 4][i], eyes: LOOK_EYES[i] });
+});
+TONE_ORDER.forEach((skin, i) => {
+  STARTERS_LOOK.push({ girl: 1, skin, hair: [3, 2, 4, 2, 5, 3, 2, 4, 5, 3, 2, 5][i], hairc: [14, 15, 16, 9, 17, 15, 4, 9, 4, 17, 4, 4][i], eyes: LOOK_EYES[i] });
+});
+const PER_SIDE = TONE_ORDER.length;
 function lookOf(i) { const p = STARTERS_LOOK[i]; return Object.assign(OUTFIT.defaults(!!p.girl), { skin: p.skin, hair: p.hair, hairc: p.hairc, eyes: p.eyes }); }
 // A Minecraft face, big: the front of the head and the hat layer over it, from the skin the look makes.
 function faceCanvas(outfit, px) {
@@ -284,44 +301,46 @@ function faceCanvas(outfit, px) {
 }
 screen("creator", "A new game", "Character maker", {
   scene: "creator", sceneOpts: () => ({ side: 0 }),
-  what: "Make yourself, as Let's Go does it: first a starting look. Four boys' faces down the left and four girls' down the right, each a Minecraft face on a glossy card, light skin to dark, and you in the middle on a pool of light. The one you're on lifts in a white frame. Then THAT'S ME and you move aside for the glass panel, where YOU (body, skin, eyes, hair style, hair colour) and CLOTHES make it your own. No white card: everything floats on the soft blue light.",
-  tags: ["New look: Let's Go's", "The mod's wardrobe", "New: 4 skin tones, eye colour"], mod: "Outfit: FAIR, LIGHT, TAN, DEEP skin; 6 hair styles; cap, beanie or sun hat; jacket, tee, hoodie or vest; jeans, shorts or skirt; shoes; backpack or satchel; 14 colours.",
-  try: ["Up and down a column, left and right between boys and girls, A to start from that look.", "Then up and down between rows, left and right to change, A to carry on. MIX IT UP picks at random."],
+  what: "Make yourself, as Let's Go does it. First a starting look: the boys down the left and the girls down the right, a Minecraft face on a glossy card for every skin tone, lightest to darkest. Four show at a time; scroll (or go up and down) for the rest. You stand in the middle on a pool of light. Continue, and you move aside for the glass panel to make it your own: YOU (eyes, hair style, hair colour) and CLOTHES, with MIX IT UP. The face you picked set your skin, so there's no skin row there. No white cards: everything floats on the soft blue light.",
+  tags: ["New look: Let's Go's", "The mod's wardrobe", "Every skin tone"], mod: "Outfit: FAIR, LIGHT, TAN, DEEP skin; 6 hair styles; cap, beanie or sun hat; jacket, tee, hoodie or vest; jeans, shorts or skirt; shoes; backpack or satchel; 14 colours.",
+  try: ["Up and down a column (it scrolls), left and right between boys and girls, A to start from that look.", "Then up and down between rows, left and right to change, A (or Continue) to carry on. MIX IT UP picks at random."],
   make(arg) {
     swirlBackdrop("dream", { lx: 50, ly: 0, cx: 50, cy: 60 });
     bgAdd("", { background: "radial-gradient(ellipse 22% 9% at 50% 86%, rgba(255,255,255,.75), rgba(200,250,255,.25) 55%, transparent 80%)" });
     const C = ctl(), S = SC.creator;
-    let stage = arg && arg.stage === 2 ? 2 : 1, pick = 0;
-    const cards = box(0, 0, 1280, 720, "", ""); cards.style.pointerEvents = "none";
-    add(h("style", "", `.mk-face{position:absolute;width:250px;height:104px;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:18px;cursor:pointer;pointer-events:auto;
+    let stage = arg && arg.stage === 2 ? 2 : 1, pick = arg && arg.pick != null ? arg.pick : 3;
+    add(h("style", "", `.mk-col{position:absolute;top:34px;width:290px;height:516px;overflow-y:auto;overflow-x:hidden;padding:14px 22px 14px 18px;display:grid;gap:18px;align-content:start;pointer-events:auto;
+        -webkit-mask:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%);mask:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%)}
+      .mk-face{position:relative;width:240px;height:104px;border-radius:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;
         background:linear-gradient(110deg,#FFFFFF 0%,#F2FBEA 45%,#D9F3A8 100%);box-shadow:0 0 0 3px rgba(255,255,255,.85),0 10px 22px rgba(16,60,96,.25);transition:transform .16s, box-shadow .16s}
-      .mk-face.on{transform:scale(1.07);box-shadow:0 0 0 3px #fff,0 0 0 9px rgba(255,255,255,.55),0 0 30px 8px rgba(255,255,255,.65),0 14px 26px rgba(16,60,96,.3)}
-      .mk-face .gl{position:absolute;inset:6px 10px auto;height:36%;border-radius:20px 20px 40% 40%;background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,0));pointer-events:none}`));
-    const faces = STARTERS_LOOK.map((p, i) => { const e = h("div", "mk-face", ""); const girl = i >= 4, row = i % 4;
-      e.style.left = (girl ? 960 : 70) + "px"; e.style.top = (70 + row * 122) + "px";
-      e.appendChild(faceCanvas(lookOf(i), 80)); e.insertAdjacentHTML("beforeend", `<span class="gl"></span>`);
-      e.onmouseenter = () => { if (stage === 1) { pick = i; show(); } }; e.onclick = () => { pick = i; show(); start(); };
-      cards.appendChild(e); return e; });
-    let tb = null, panel = null, acts = null;
-    const say = text => { if (tb) tb.kill(); tb = textBox([{ text }], { x: 190, w: 580, keep: true }); };
-    const show = () => { faces.forEach((e, i) => e.classList.toggle("on", i === pick)); G.outfit = lookOf(pick); if (S) S.refresh(); };
+      .mk-face.on{transform:scale(1.06);box-shadow:0 0 0 3px #fff,0 0 0 9px rgba(255,255,255,.55),0 0 30px 8px rgba(255,255,255,.65),0 14px 26px rgba(16,60,96,.3)}
+      .mk-face .gl{position:absolute;inset:6px 10px auto;height:36%;border-radius:20px 20px 40% 40%;background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,0));pointer-events:none}
+      .mk-face .tone{position:absolute;right:14px;bottom:10px;width:18px;height:18px;border-radius:6px;box-shadow:0 0 0 2px #fff}`));
+    const cols = [box(40, 34, 290, null, "mk-col mk-scroll", ""), box(950, 34, 290, null, "mk-col mk-scroll", "")];
+    const faces = STARTERS_LOOK.map((p, i) => { const e = h("div", "mk-face", ""); e.appendChild(faceCanvas(lookOf(i), 80));
+      e.insertAdjacentHTML("beforeend", `<span class="gl"></span><span class="tone" style="background:${hex(skinRGB(p.skin))}"></span>`);
+      e.onmouseenter = () => { if (stage === 1 && pick !== i) { pick = i; show(false); } }; e.onclick = () => { pick = i; show(false); start(); };
+      cols[p.girl].appendChild(e); return e; });
+    let tb = null, panel = null;
+    const say = text => { if (tb) tb.kill(); tb = textBox([{ text }], { x: 150, w: 470, keep: true }); };
+    const show = scroll => { faces.forEach((e, i) => e.classList.toggle("on", i === pick)); if (scroll !== false) faces[pick].scrollIntoView({ block: "nearest", behavior: "smooth" }); G.outfit = lookOf(pick); if (S) S.refresh(); };
     // On to making it your own: you slide left, the glass panel comes in on the right.
     const start = () => {
       if (stage === 2 && panel) return; stage = 2;
-      cards.style.transition = "opacity .3s"; cards.style.opacity = 0; later(320, () => cards.style.display = "none");
+      for (const c of cols) { c.style.transition = "opacity .3s"; c.style.opacity = 0; later(320, () => c.style.display = "none"); }
       if (S) S.sideGoal = 2.1;
       say(T("Make it yours. Change anything you like."));
-      panel = maker(C, ["you", "clothes"], { glass: true, x: 650, y: 24, w: 600, maxH: 560, done: "THAT'S ME", onDone: () => go("name", { who: "you" }), onBack: () => back() });
+      panel = maker(C, ["you", "clothes"], { glass: true, skip: ["BODY", "SKIN"], noDone: true, x: 650, y: 24, w: 600, maxH: 528, onDone: () => go("name", { who: "you" }), onBack: () => back() });
       panel.el.style.animation = "gfade .35s ease-out";
     };
-    const back = () => { if (stage === 2) { go("creator"); return; } go("prof"); };
+    const back = () => { if (stage === 2) { go("creator", { pick }); return; } go("prof"); };
     show(); say(T("What do you look like?"));
     if (stage === 2) start();
     actions([{ key: "b", label: "Back" }, { key: "a", label: "Continue" }], { right: true });
     return { key: k => {
-      if (stage === 2) return C.key(k) || (k === "b" ? (back(), true) : false);
-      if (k === "up" || k === "down") { const col = pick >= 4 ? 4 : 0, row = (pick % 4 + (k === "down" ? 1 : 3)) % 4; pick = col + row; show(); return true; }
-      if (k === "left" || k === "right") { pick = (pick + 4) % 8; show(); return true; }
+      if (stage === 2) { if (k === "a") { go("name", { who: "you" }); return true; } return C.key(k) || (k === "b" ? (back(), true) : false); }
+      if (k === "up" || k === "down") { const side = pick >= PER_SIDE ? PER_SIDE : 0, row = (pick % PER_SIDE + (k === "down" ? 1 : PER_SIDE - 1)) % PER_SIDE; pick = side + row; show(); return true; }
+      if (k === "left" || k === "right") { pick = (pick + PER_SIDE) % (PER_SIDE * 2); show(); return true; }
       if (k === "a") { start(); return true; } if (k === "b") { back(); return true; } return true; } };
   }
 });
@@ -394,7 +413,7 @@ screen("ready", "A new game", "Off you go", {
   make() {
     swirlBackdrop("dream", { lx: 50, ly: 0, cx: 50, cy: 58 }); const C = ctl(), S = SC.prof; C.sayAt = { film: true };
     // You look up (so your eyes show under the cap), then at "Off you go" you do the floss while he waves.
-    S.talking = true; S.youWave = 0; S.youFloss = 0; S.youLookUp = 0.38; S.wave = 0;
+    S.talking = true; S.youWave = 0; S.youFloss = 0; S.youLookUp = 0.22; S.wave = 0;
     C.say([{ who: "PROF. OAK", text: "**{N}**, your own adventure starts today." }, { who: "PROF. OAK", text: "There's a whole region out there, full of POKéMON to meet. I'll be right next door at my lab." },
       { who: "PROF. OAK", text: "Off you go, then!", on: () => { S.youFloss = 1; S.wave = 1; } }])
       .then(() => { S.talking = false; return C.wait(1600); }).then(() => { S.youFloss = 0; S.wave = 0; if (C.alive()) go("loading"); });

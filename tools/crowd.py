@@ -281,6 +281,65 @@ STAFF_MORE = [
 ]
 
 
+# ---------- Johto: its gym leaders, its Elite Four (at the same INDIGO PLATEAU), its story's people, its trainers ----------
+JOHTO = [
+    ("leaders", "U", "leader_falkner", "FALKNER", "VIOLET CITY GYM. The elegant master of flying POKéMON. ZEPHYRBADGE.", "VIOLET CITY", ["pidgey", "pidgeotto"],
+     dict(tone="light", hair="swept", hairc="243A6A", eyes="blue", top="shirt", topc="F4F4F2", collarc="F4F4F2", coat="jacket", closed=True, coatc="3A6FD0", coatsleevec="243A6A", bottom="trousers", botc="243A6A", shoec="1E1E24", scarf="6AB8E8")),
+    ("leaders", "U", "leader_bugsy", "BUGSY", "AZALEA TOWN GYM. The walking bug encyclopedia. HIVEBADGE.", "AZALEA TOWN", ["metapod", "kakuna", "scyther"],
+     dict(tone="fair", hair="bob", hairc="8A5AC8", eyes="green", top="shirt", topc="9ACD3A", collarc="F4F4F2", bottom="shorts", botc="3F7A44", socks="F4F4F2", shoec="5A3A22", bag="satchel", bagc="C8A87A")),
+    ("leaders", "U", "leader_whitney", "WHITNEY", "GOLDENROD CITY GYM. The incredibly pretty girl, and her MILTANK. PLAINBADGE.", "GOLDENROD CITY", ["clefairy", "miltank"],
+     dict(tone="fair", fem=True, hair="pigtails", hairc="F28AB2", tiec="F4F4F2", eyes="brown", top="tee", topc="F4F4F2", coat="jacket", coatc="F7D433", coatsleeve=4, bottom="shorts", botc="4A5F8A", shoec="F4F4F2", soles="F28AB2", socks="F4F4F2")),
+    ("leaders", "U", "leader_morty", "MORTY", "ECRUTEAK CITY GYM. The mystic seer of the future. FOGBADGE.", "ECRUTEAK CITY", ["gastly", "haunter", "gengar"],
+     dict(tone="pale", hair="swept", hairc="E8C870", eyes="violet", top="jumper", topc="1E1E24", coat="suit", coatlen=15, coatc="3A2A5A", bottom="trousers", botc="2A2A34", scarf="8A52C8", hw="headband", hwc="8A52C8", shoec="1E1E24")),
+    ("leaders", "U", "leader_chuck", "CHUCK", "CIANWOOD CITY GYM. His roaring fists do the talking. STORMBADGE.", "CIANWOOD CITY", ["primeape", "poliwrath"],
+     dict(tone="tan", hair="buzz", hairc="1A1A1A", moustache=True, beardc="1A1A1A", brows="stern", top="tank", topc="F4F4F2", bottom="trousers", botc="C8A87A", belt="1E1E24", wristband="D8343C", shoec="B07448")),
+    ("leaders", "U", "leader_jasmine", "JASMINE", "OLIVINE CITY GYM. The steel-clad defence girl. MINERALBADGE.", "OLIVINE CITY", ["magnemite", "steelix"],
+     dict(tone="fair", fem=True, hair="pigtails", hairc="6A4428", tiec="F28A2A", eyes="brown", top="blouse", topc="F4F4F2", bottom="dress", botc="F4F4F2", sash="F28A2A", shoec="8A8E96")),
+    ("leaders", "U", "leader_pryce", "PRYCE", "MAHOGANY TOWN GYM. The teacher of winter's harshness. GLACIERBADGE.", "MAHOGANY TOWN", ["seel", "dewgong", "piloswine"],
+     dict(tone="light", hair="short", hairc="E8E8E8", beard=True, beardc="F4F4F2", glasses=True, top="jumper", topc="8A6A4A", coat="jacket", puffer=True, closed=True, coatc="5A3A22", bottom="trousers", botc="4A4A4A", scarf="F4F4F2", shoec="3A2A1A")),
+    ("leaders", "U", "leader_clair", "CLAIR", "BLACKTHORN CITY GYM. The blessed user of dragon POKéMON. RISINGBADGE.", "BLACKTHORN CITY", ["dragonair", "kingdra"],
+     dict(tone="light", fem=True, hair="ponytail", hairc="2A6AA8", tiec="243A6A", eyes="teal", brows="stern", top="tank", topc="243A6A", coat="jacket", coatlen=15, coatc="1E3A6A", gloves="3A6FD0", bottom="trousers", botc="1E1E24", shoec="1E1E24")),
+    ("leaders", "U", "leader_janine", "JANINE", "FUCHSIA CITY GYM, after KOGA. His daughter, a poison ninja too. SOULBADGE.", "FUCHSIA CITY", ["zubat", "venomoth", "weezing"],
+     dict(tone="fair", fem=True, hair="ponytail", hairc="6A2A8A", tiec="F28AB2", eyes="violet", top="jumper", topc="3A2A4A", bottom="shorts", botc="2A1A34", scarf="F28AB2", gloves="8A52C8", socks="3A2A4A", shoec="1E1E24")),
+    ("leaders", "U", "blue", "BLUE (VIRIDIAN LEADER)", "VIRIDIAN CITY GYM, after GIOVANNI: your rival, three years on. EARTHBADGE.", "VIRIDIAN CITY", ["pidgeot", "alakazam", "rhydon", "gyarados", "exeggutor", "arcanine"], None),
+    ("elite", "U", "will", "WILL", "Johto's ELITE FOUR, first: psychic. The same INDIGO PLATEAU, new faces.", "INDIGO PLATEAU", ["xatu", "jynx", "exeggutor", "slowbro", "xatu"],
+     dict(tone="light", hair="swept", hairc="6A4AA8", glasses=True, lens=True, glassc="8A52C8", top="shirt", topc="8A52C8", collarc="F4F4F2", coat="suit", coatc="243A6A", bottom="trousers", botc="243A6A", tie="D8343C", shoec="1E1E24")),
+    ("elite", "U", "leader_koga", "KOGA (ELITE FOUR)", "Johto's ELITE FOUR, second: poison. He left Fuchsia's gym to JANINE.", "INDIGO PLATEAU", ["ariados", "forretress", "muk", "venomoth", "crobat"], None),
+    ("elite", "U", "bruno", "BRUNO (JOHTO)", "Johto's ELITE FOUR, third: fighting, still.", "INDIGO PLATEAU", ["hitmontop", "hitmonlee", "hitmonchan", "onix", "machamp"], None),
+    ("elite", "U", "karen", "KAREN", "Johto's ELITE FOUR, fourth: dark POKéMON.", "INDIGO PLATEAU", ["umbreon", "vileplume", "gengar", "murkrow", "houndoom"],
+     dict(tone="medium", fem=True, hair="long", hairc="2A2A3A", eyes="dark", top="tank", topc="1E1E24", coat="jacket", coatc="7A2A3A", coatsleeve=12, bottom="trousers", botc="1E1E24", earrings="C8C8C8", shoec="1E1E24")),
+    ("elite", "U", "lance", "LANCE (CHAMPION)", "Johto's CHAMPION: the dragon master, who stepped up when BLUE stepped down.", "INDIGO PLATEAU", ["gyarados", "dragonite", "charizard", "aerodactyl", "dragonite", "dragonite"], None),
+    ("story", "U", "prof_elm", "PROF. ELM", "Johto's POKéMON professor: he studies how POKéMON evolve and where eggs come from. Gives you your Johto partner.", "His lab, NEW BARK TOWN", [],
+     dict(tone="fair", hair="swept", hairc="6A4428", glasses=True, lens=True, top="shirt", topc="7AA86A", collarc="F4F4F2", coat="lab", coatc="F6F7F5", coatlen=16, bottom="trousers", botc="5A5A6A", shoec="5A3A22")),
+    ("story", "U", "elm_aide", "ELM's AIDE", "Helps in PROF. ELM's lab. Brings you the egg in VIOLET CITY.", "ELM's lab, VIOLET CITY", [],
+     dict(tone="brown", fem=True, hair="bun", hairc="1A1A1A", glasses=True, top="blouse", topc="9EC3E6", bottom="trousers", botc="4A4E5E", coat="lab", coatc="F6F7F5", coatlen=15, shoec="3A3A44")),
+    ("story", "U", "mr_pokemon", "MR. POKéMON", "Loves strange old things. Gives you the mystery egg.", "ROUTE 30", [],
+     dict(tone="light", hair="bald", hairc="C8C8C8", moustache=True, beardc="E8E8E8", top="jumper", topc="8A6A4A", coat="vest", coatsleeve=1, coatc="5A3A22", bottom="trousers", botc="4A4A4A", shoec="3A2A1A")),
+    ("story", "U", "kurt", "KURT", "Makes balls from apricorns: LEVEL, LURE, MOON, FRIEND, LOVE, HEAVY and FAST.", "AZALEA TOWN", [],
+     dict(tone="tan", hair="short", hairc="E8E8E8", beard=True, beardc="F0F0F0", brows="stern", top="jumper", topc="5A6A8A", apron="8A6A4A", bottom="trousers", botc="3A3A44", shoec="3A2A1A")),
+    ("story", "U", "silver", "SILVER", "Your Johto rival: he stole his POKéMON from ELM's lab, and wants only strong ones.", "Everywhere in Johto", ["sneasel", "golbat", "magneton", "kadabra", "haunter", "feraligatr"],
+     dict(tone="pale", hair="long", hairc="C8323C", eyes="grey", brows="stern", smile=False, top="tee", topc="1E1E24", coat="jacket", coatc="3A2A4A", coatsleevec="1E1E24", bottom="jeans", botc="2A2A3A", shoec="C8323C", soles="1E1E24")),
+    ("story", "U", "eusine", "EUSINE", "Chases SUICUNE all over Johto.", "ECRUTEAK, CIANWOOD", ["drowzee", "haunter", "electrode"],
+     dict(tone="light", hair="swept", hairc="4A5FA8", eyes="blue", top="shirt", topc="F4F4F2", collarc="F4F4F2", coat="suit", coatlen=16, coatc="F4F4F2", tie="4A5FA8", bottom="trousers", botc="4A5FA8", shoec="1E1E24")),
+    ("story", "G", "kimono_girl", "KIMONO GIRL", "Dances at the theatre in ECRUTEAK, each with her own EEVEE evolution.", "ECRUTEAK CITY", ["flareon", "vaporeon", "jolteon", "espeon", "umbreon"],
+     dict(tone="fair", fem=True, hair="bun", hairc="1A1A1A", eyes="dark", lips="C83A3A", top="dress", topc="C8323C", bottom="dress", botc="C8323C", sash="F2C12E", shoec="F4F4F2")),
+    ("story", "G", "sage", "SAGE", "Keeps SPROUT TOWER. Each one has a BELLSPROUT.", "SPROUT TOWER, VIOLET CITY", ["bellsprout", "bellsprout"],
+     dict(tone="tan", hair="bald", hairc="8A8E96", top="shirt", topc="8A8E96", coat="lab", coatc="6E7480", coatlen=17, bottom="trousers", botc="6E7480", sash="F2C12E", shoec="3A2A1A")),
+    ("trainers", "G", "schoolboy", "SCHOOLBOY", "Top of the class, and wants you to know it.", "ROUTES 29 to 33, Johto", ["sentret", "pidgey"],
+     dict(tone="fair", hair="short", hairc="3A2A20", glasses=True, top="shirt", topc="F4F4F2", coat="blazer", coatc="2E5E3A", tie="D8343C", bottom="shorts", botc="3A3C44", socks="F4F4F2", shoec="1E1E24", bag="backpack", bagc="3F7A44")),
+    ("trainers", "G", "firebreather", "FIREBREATHER", "Breathes fire for a living.", "BURNED TOWER, ROUTE 28", ["koffing", "magmar"],
+     dict(tone="brown", hair="spiky", hairc="F28A2A", top="tank", topc="F28A2A", bottom="trousers", botc="3A2A2A", belt="1E1E24", wristband="F7D433", shoec="1E1E24")),
+    ("trainers", "G", "medium", "MEDIUM", "Calls on spirits in the towers.", "TIN TOWER, POKéMON TOWER", ["gastly", "haunter"],
+     dict(tone="pale", fem=True, hair="long", hairc="E8E8E8", smile=False, top="dress", topc="E8E0F0", bottom="dress", botc="8A7AB0", sash="6A4AA8", shoec="3A3A4A")),
+    ("trainers", "G", "skier", "SKIER", "On the snow round the ICE PATH.", "ROUTE 44, ICE PATH", ["dewgong", "swinub"],
+     dict(tone="fair", fem=True, hair="ponytail", hairc="E8C870", top="jumper", topc="F4F4F2", coat="jacket", puffer=True, closed=True, coatc="D8343C", bottom="trousers", botc="243A6A", hw="bobble", hwc="D8343C", bobc="F4F4F2", gloves="243A6A", shoec="1E1E24")),
+    ("trainers", "G", "boarder", "BOARDER", "Snowboards down anything.", "ICE PATH", ["swinub", "jynx"],
+     dict(tone="medium", hair="short", hairc="3A2A20", top="hoodie", topc="2A9A92", motif="wave", motifc="F4F4F2", bottom="trousers", jog=True, botc="1E1E24", hw="bobble", hwc="F7D433", bobc="1E1E24", shades=True, shoec="F4F4F2")),
+    ("trainers", "G", "officer_johto", "OFFICER", "Out at night, on patrol.", "Johto's routes, at night", ["growlithe", "growlithe"],
+     dict(tone="deep", hair="short", hairc="1A1A1A", top="shirt", topc="243A6A", collarc="243A6A", bottom="trousers", botc="1E2A4A", hat="police", hatc="1E2A4A", badgec="F2C12E", badge="F2C12E", belt="1E1E24", shoec="1E1E24")),
+]
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     rows, groups = [], [["crowd", "Busy places", "Extra people for the parks, the museum and the big cities: every skin tone, all sorts of clothes."]]
@@ -302,9 +361,15 @@ def main():
         paint(key, sp, 9500 + len(rows)); rows.append(["helpers", "G", key, name, who, where, []])
     # JESSIE and JAMES: red jackets done up, the mark in black, so they stand out from the grunts.
     for key, seed in (("jessie", 41), ("james", 42)): paint(key, PEOPLE[key], seed)
+    for i, (grp, kind, key, name, who, where, team, sp) in enumerate(JOHTO):
+        if sp: paint(key, sp, 12000 + i)
+        rows.append([grp, kind, key, name, who, where, team])
     js = "// More people (tools/crowd.py): 100 townspeople for busy places, more trainer looks, Team Rocket grunts, and more staff.\n"
     js += "GROUPS.splice(GROUPS.findIndex(g => g[0] === \"folk\") + 1, 0, ..." + json.dumps(groups, ensure_ascii=False) + ");\n"
     js += "PEOPLE.push(\n" + ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in rows) + "\n);\n"
+    js += 'for (let i = PEOPLE.length - 1; i >= 0; i--) if (PEOPLE[i][2] === "leader") PEOPLE.splice(i, 1);\n'
+    js += 'GROUPS.find(g => g[0] === "leaders")[2] = "Kanto\'s eight, then Johto\'s eight, then the two who run Kanto gyms three years on: JANINE and BLUE.";\n'
+    js += 'GROUPS.find(g => g[0] === "elite")[2] = "At the INDIGO PLATEAU: Kanto\'s ELITE FOUR and champion, then Johto\'s, in the same rooms.";\n'
     js += 'for (const k of ["jessie", "james"]) { const p = PEOPLE.find(q => q[2] === k); if (p) p[4] = p[4] + " Red jacket, the mark in black: the grunts wear it the other way round."; }\n'
     open(os.path.join(HERE, "personviewer", "more.js"), "w").write(js)
     print(len(rows), "more people painted")

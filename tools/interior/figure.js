@@ -187,10 +187,12 @@ function poseFigure(f, o) {
   // The floss: both arms swung straight to one side and the other, one in front and one behind (swapping each
   // swing), the hips swaying the other way.
   if (o.floss) {
-    const k = o.floss, p = Math.sin(t * 7.2), q = Math.cos(t * 7.2) >= 0 ? 1 : -1;
-    f.armL.j.rotation.z = f.armR.j.rotation.z = 0.62 * p * k;
-    f.armL.j.rotation.x = 0.42 * q * k; f.armR.j.rotation.x = -0.42 * q * k;
-    f.hips.position.x = -0.07 * p * k; f.hips.rotation.z = 0.06 * p * k;
+    // Both arms straight and out to one side together; as they swing across they swap, so the arm on the far side is
+    // always the one in front of the body and the other behind. The hips swing the other way, twice as quick.
+    const k = o.floss, w = t * 6.4, p = Math.sin(w), hp = Math.sin(w * 2);
+    f.armL.j.rotation.z = f.armR.j.rotation.z = 0.55 * p * k;
+    f.armR.j.rotation.x = -0.55 * p * k; f.armL.j.rotation.x = 0.55 * p * k;
+    f.hips.position.x = -0.06 * hp * k; f.hips.rotation.z = 0.08 * hp * k;
   } else { f.hips.position.x = 0; f.hips.rotation.z = 0; }
   f.head.rotation.y = o.headYaw || 0;
   f.head.rotation.x = o.talk ? Math.sin(performance.now() / 120) * 0.05 : (o.nod || 0) - (o.lookUp || 0);

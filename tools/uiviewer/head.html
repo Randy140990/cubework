@@ -92,14 +92,16 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 90
 .g-text { position: absolute; left: 140px; right: 140px; bottom: 26px; min-height: 120px; padding: 22px 34px 24px; font-size: 25px; font-weight: 800; line-height: 1.45; letter-spacing: .2px; color: #26304A;
   background: linear-gradient(100deg, #FFFFFF 0%, #FFFFFF 60%, #FFF1F8 78%, #ECF4FF 90%, #EEFFF7 100%) padding-box, var(--g-holo) border-box }
 .g-text .who { position: absolute; top: -20px; left: 28px; padding: 3px 18px; border-radius: 999px; background: linear-gradient(180deg, #FF9473, #E5525C); color: #fff; font-family: Fredoka, system-ui, sans-serif; font-weight: 600; font-size: 21px; letter-spacing: .6px; box-shadow: 0 0 0 3px #fff, 0 4px 12px rgba(30,40,84,.25) }
-.g-text .more { position: absolute; right: 26px; bottom: 16px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 13px solid var(--g-edge-light); animation: gbob .9s ease-in-out infinite }
+.g-text .more { position: absolute; right: 24px; bottom: 14px; width: 26px; height: 26px; color: var(--g-edge-light); animation: gmore 1.6s ease-in-out infinite }
+.g-text .more svg { display: block }
+@keyframes gmore { 0%,100% { transform: translateY(0) rotate(0) } 50% { transform: translateY(-4px) rotate(180deg) } }
 .g-text b, .g-hl { color: var(--g-gold) }
 /* The intro's words (the professor's): no box, white on a dark band fading up from the foot of the screen. */
 .g-text.film { left: 0; right: 0; bottom: 0; border: 0; border-radius: 0; min-height: 0; padding: 60px 180px 44px; color: #fff; box-shadow: none; text-shadow: 0 2px 6px rgba(0,0,0,.45);
   background: linear-gradient(180deg, rgba(12,22,48,0), rgba(12,22,48,.55) 38%, rgba(12,22,48,.84)) }
 .g-text.film .who { position: static; display: block; width: max-content; margin-bottom: 6px; padding: 0; background: none; box-shadow: none; color: #FFD45A; font-size: 19px; letter-spacing: 1.6px; text-shadow: 0 2px 4px rgba(0,0,0,.5) }
 .g-text.film b { color: #FFD45A }
-.g-text.film .more { right: 180px; bottom: 26px; border-top-color: #fff }
+.g-text.film .more { right: 180px; bottom: 26px; color: #fff }
 .g-list { display: grid; gap: 8px }
 .g-goods { position: relative; display: flex; align-items: center; gap: 14px; padding: 0 10px 0 5px; border-radius: 999px; box-sizing: border-box; font-weight: 800; font-size: 21px; color: #fff; cursor: pointer;
   background: linear-gradient(180deg, var(--c0), var(--c1) 60%, var(--c2)); border: 2px solid rgba(255,255,255,.45); text-shadow: 0 2px 0 rgba(0,0,0,.25); box-shadow: 0 3px 0 rgba(0,0,0,.19) }

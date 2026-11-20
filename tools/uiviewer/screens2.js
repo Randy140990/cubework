@@ -467,10 +467,13 @@ const MAPIMG = {};
 const REGION = r => r === "johto" ? MAPDATA.johto : MAPDATA;
 function mapImage(r = "kanto") { if (!MAPIMG[r]) { MAPIMG[r] = new Image(); MAPIMG[r].src = REGION(r).img; } return MAPIMG[r]; }
 const JOHTO_X = -1180;
+// Where John's moved places are kept so Claude can read them: the published page's own shared store (pins/kanto,
+// pins/johto). Opened offline, or where the store isn't there, it's null and the moves stay in this browser only.
+const PIN_DB = (() => { let pr = null; return () => pr || (pr = (window.claude && window.claude.use ? Promise.resolve(window.claude.use("db")) : Promise.resolve(null)).catch(() => null)); })();
 screen("map", "Menus", "Town Map", {
   what: "The real Town Map: Kanto, and Johto beside it (the arrow at the side, or left past the westmost place), as they are in your world, drawn from above in soft colours from the blocks themselves. The place you're on is framed in a bright box. Its panel says how its POKéMON are found (grass, surfing, fishing, headbutting trees, smashing rocks) and shows them. Every town, route and place is a square with its name beside it, at every zoom (a name is only left out where it would sit on another). Point at one to see what's there, with a picture of it at the top of the panel (the pictures are to come: until then it's the map, close in).",
   mod: "TownMapScreen and TownMap: the same baked map (townmap/r.*.bin), the same colours and shading. Q and E zoom, C comes back to you, a town you've been to can be flown to. In game the places come from the zones you mark.",
-  try: ["Arrows to move between places; left again from the westmost one (or the JOHTO arrow) goes to Johto.", "+ and - (or the mouse wheel) to zoom, drag to look around.", "C to come back to you. A on a town you've been to: FLY HERE."],
+  try: ["MOVE PLACES (viewer only): every place's name shows; drag its square onto where it really is. Each move saves straight away where Claude can read it (moved ones ring green). COPY THE LIST is there too.", "Arrows to move between places; left again from the westmost one (or the JOHTO arrow) goes to Johto.", "+ and - (or the mouse wheel) to zoom, drag to look around.", "C to come back to you. A on a town you've been to: FLY HERE."],
   make(arg) {
     backdrop("#348CCE");
     const YOU = { x: -797, z: 702, yaw: 0 };
@@ -482,7 +485,7 @@ screen("map", "Menus", "Town Map", {
     let zi = 0, cx = bx0 + MW / 2, cz = bz0 + MH / 2, tx = cx, tz = cz, sel = 0, t0 = performance.now(), alive = true;
     const youHere = YOU.x >= bx0 && YOU.x <= bx0 + MW && YOU.z >= bz0 && YOU.z <= bz0 + MH;
     const M = box(20, 20, VW, VH, "g-panel", ""); M.style.overflow = "hidden"; M.style.padding = "0"; M.style.cursor = "grab";
-    const cv = document.createElement("canvas"); cv.width = VW * 2; cv.height = VH * 2; Object.assign(cv.style, { width: VW + "px", height: VH + "px", display: "block" }); M.appendChild(cv);
+    const cv = document.createElement("canvas"); cv.className = "mapcv"; cv.width = VW * 2; cv.height = VH * 2; Object.assign(cv.style, { width: VW + "px", height: VH + "px", display: "block" }); M.appendChild(cv);
     const ctx = cv.getContext("2d");
     const info = box(940, 20, 320, 626, "g-panel", ""); info.style.padding = "22px 24px"; info.style.overflow = "hidden"; info.style.display = "flex"; info.style.flexDirection = "column";
     const zoom = () => ZOOMS[zi];
@@ -524,6 +527,7 @@ screen("map", "Menus", "Town Map", {
         if (on) { ctx.beginPath(); ctx.arc(sx, sy, r + 9 + pulse * 5, 0, 7); ctx.strokeStyle = `rgba(255,212,90,${0.9 - pulse * 0.5})`; ctx.lineWidth = 3; ctx.stroke(); }
         if (town) sq(sx, sy, r, on ? "#FFD45A" : been ? "#E5525C" : "#B9C4C0", "#FFFFFF", 3);
         else sq(sx, sy, r, on ? "#FFD45A" : "#FFFFFF", p.kind === "spot" ? "#8F60DE" : "#E5525C", 2.5);
+        if (editing && p.moved) { ctx.beginPath(); ctx.arc(sx, sy, r + 5, 0, 7); ctx.strokeStyle = "#3FD07A"; ctx.lineWidth = 3; ctx.stroke(); }
         if (town) { rr(sx - r * 0.42, sy - r * 0.42, r * 0.84, r * 0.84, 2); ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.fill(); }
         spots.push({ p, i, sx, sy, r, on, town });
       });
@@ -533,7 +537,7 @@ screen("map", "Menus", "Town Map", {
       for (const q of spots) {
         const big = q.town || q.on; ctx.font = `900 ${big ? 13 : 10.5}px Nunito, system-ui, sans-serif`;
         const w = ctx.measureText(q.p.name).width + 12, hh = big ? 21 : 16, x = q.sx - w / 2, y = q.sy + q.r + 3;
-        if (!q.on && !fits(x, y, w, hh)) continue;
+        if (!q.on && !editing && !fits(x, y, w, hh)) continue;
         taken.push([x, y, w, hh]); label(q.p.name, q.sx, y, big);
       }
       // You: the arrow, the way you face.
@@ -579,7 +583,26 @@ screen("map", "Menus", "Town Map", {
     const pick = i => { sel = i; drawInfo(); follow(); };
     // Mouse: drag to look around, wheel to zoom, click a place to point at it.
     let drag = null;
-    M.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, tx, tz, moved: false }; M.setPointerCapture(e.pointerId); M.style.cursor = "grabbing"; });
+    // For you, John, in the viewer only: MOVE PLACES lets you drag a place's square onto where it really is. Your moves
+    // are kept in this browser, and COPY puts the whole list on the clipboard to send back.
+    // Every move is also saved to the page's shared store, so Claude reads them straight back: no copying needed.
+    const SAVE_KEY = "rm-map-places-" + region, MOVED = {};
+    const apply = sv => { for (const p of P) if (sv[p.key]) { p.x = sv[p.key][0]; p.z = sv[p.key][1]; p.moved = true; MOVED[p.key] = sv[p.key]; delete p.zone; } };
+    try { apply(JSON.parse(localStorage.getItem(SAVE_KEY) || "{}")); } catch (e) {}
+    let editing = false, moving = -1, status = "";
+    PIN_DB().then(db => db ? db.doc("pins/" + region).get() : null).then(snap => { if (!alive || !snap || !snap.exists) return; apply((snap.data() || {}).places || {}); drawInfo(); }).catch(() => {});
+    const saveMoves = () => {
+      for (const p of P) if (p.moved) MOVED[p.key] = [p.x, p.z];
+      try { localStorage.setItem(SAVE_KEY, JSON.stringify(MOVED)); } catch (e) {}
+      PIN_DB().then(db => db ? db.doc("pins/" + region).set({ places: { ...MOVED }, count: Object.keys(MOVED).length, at: new Date().toISOString() }).then(() => true) : false)
+        .then(ok => { status = ok ? `Saved: ${Object.keys(MOVED).length} moved, Claude can see them` : "Kept in this browser: COPY THE LIST to send them"; if (alive) drawEdit(); })
+        .catch(() => { status = "Couldn't save for Claude: COPY THE LIST instead"; if (alive) drawEdit(); }); };
+    const toWorld = e => { const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k; return [Math.round(cx + (mx - VW / 2) / zoom()), Math.round(cz + (my - VH / 2) / zoom())]; };
+    M.addEventListener("pointerdown", e => {
+      if (editing) { const b = nearest(e); if (b >= 0) { moving = b; sel = b; drawInfo(); M.setPointerCapture(e.pointerId); return; } }
+      drag = { x: e.clientX, y: e.clientY, tx, tz, moved: false }; M.setPointerCapture(e.pointerId); M.style.cursor = "grabbing"; });
+    M.addEventListener("pointermove", e => { if (moving >= 0) { const [wx, wz] = toWorld(e), p = P[moving]; p.x = wx; p.z = wz; p.moved = true; delete p.zone; e.stopImmediatePropagation(); } }, true);
+    M.addEventListener("pointerup", e => { if (moving >= 0) { moving = -1; saveMoves(); drawInfo(); e.stopImmediatePropagation(); } }, true);
     // Pointing at a place picks it (no need to hit it exactly: the nearest within a finger's width).
     const nearest = e => { const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k; let best = -1, bd = 24;
       P.forEach((p, i) => { const [sx, sy] = toScreen(p.x, p.z), dd = Math.hypot(sx - mx, sy - my); if (dd < bd) { bd = dd; best = i; } }); return best; };
@@ -604,6 +627,15 @@ screen("map", "Menus", "Town Map", {
     const flip = () => { alive = false; go("map", { region: region === "kanto" ? "johto" : "kanto", slide: region === "kanto" ? -1 : 1 }); };
     drawSide();
     // A big, plain way out: BACK, top left over the map.
+    const edit = box(170, 40, null, null, "", ""); edit.style.zIndex = "3";
+    const drawEdit = () => { edit.innerHTML = `<div style="display:flex;gap:8px"><span data-ed="1" style="display:inline-flex;align-items:center;height:44px;padding:0 16px;border-radius:999px;cursor:pointer;font-weight:900;font-size:14px;letter-spacing:1px;${editing ? "background:linear-gradient(180deg,#FFEC8A,#FFC93C);color:#26304A" : "background:rgba(255,255,255,.88);color:#26304A"};box-shadow:0 4px 12px rgba(30,40,84,.25)">${editing ? "DONE MOVING" : "MOVE PLACES"}</span>
+      ${editing ? `<span data-cp="1" style="display:inline-flex;align-items:center;height:44px;padding:0 16px;border-radius:999px;cursor:pointer;font-weight:900;font-size:14px;letter-spacing:1px;background:#26304A;color:#fff;box-shadow:0 4px 12px rgba(30,40,84,.25)">COPY THE LIST</span><span id="cpOk" style="align-self:center;font-weight:900;font-size:13px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)">${esc(status)}</span>` : ""}</div>`;
+      edit.querySelector("[data-ed]").onclick = ev => { ev.stopPropagation(); editing = !editing; drawEdit(); };
+      const cp = edit.querySelector("[data-cp]"); if (cp) cp.onclick = ev => { ev.stopPropagation(); const txt = P.map(p => `${p.key}\t${p.x}\t${p.z}`).join("\n");
+        const ok = () => { status = "Copied: paste it to Claude"; drawEdit(); };
+        const fallback = () => { const ta = box(200, 120, 520, 440, "g-panel", ""); ta.style.padding = "14px"; ta.innerHTML = `<div class="g-label" style="margin-bottom:8px">Select all and copy</div><textarea style="width:100%;height:370px;font:13px monospace">${esc(txt)}</textarea>`; ta.querySelector("textarea").select(); ta.onclick = ev2 => ev2.stopPropagation(); };
+        try { navigator.clipboard.writeText(txt).then(ok, fallback); } catch (e2) { fallback(); } }; };
+    drawEdit();
     const back = box(38, 36, null, null, "", `<span class="g-act" style="min-width:0;height:52px;font-size:20px;padding:0 20px 0 8px"><span class="g-key k-b" style="width:36px;height:36px">B</span>${esc(T("Back"))}</span>`);
     back.onclick = () => { alive = false; go("menu", { sel: 3 }); };
     hints([["+", "Zoom in"], ["-", "Zoom out"], ["C", "You"], ["B", "Back"]]);

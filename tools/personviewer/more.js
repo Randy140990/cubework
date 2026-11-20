@@ -151,6 +151,38 @@ PEOPLE.push(
   ["helpers", "G", "officer_f2", "POLICE OFFICER", "On the beat, in the bigger cities.", "Cities", []],
   ["helpers", "G", "officer_m2", "POLICE OFFICER", "On the beat, in the bigger cities.", "Cities", []],
   ["helpers", "G", "clerk_2", "CLERK", "Behind the counter in every POKé MART.", "Every POKé MART", []],
-  ["helpers", "G", "clerk_f2", "CLERK", "Behind the counter in every POKé MART.", "Every POKé MART, the DEPT. STORE", []]
+  ["helpers", "G", "clerk_f2", "CLERK", "Behind the counter in every POKé MART.", "Every POKé MART, the DEPT. STORE", []],
+  ["leaders", "U", "leader_falkner", "FALKNER", "VIOLET CITY GYM. The elegant master of flying POKéMON. ZEPHYRBADGE.", "VIOLET CITY", ["pidgey", "pidgeotto"]],
+  ["leaders", "U", "leader_bugsy", "BUGSY", "AZALEA TOWN GYM. The walking bug encyclopedia. HIVEBADGE.", "AZALEA TOWN", ["metapod", "kakuna", "scyther"]],
+  ["leaders", "U", "leader_whitney", "WHITNEY", "GOLDENROD CITY GYM. The incredibly pretty girl, and her MILTANK. PLAINBADGE.", "GOLDENROD CITY", ["clefairy", "miltank"]],
+  ["leaders", "U", "leader_morty", "MORTY", "ECRUTEAK CITY GYM. The mystic seer of the future. FOGBADGE.", "ECRUTEAK CITY", ["gastly", "haunter", "gengar"]],
+  ["leaders", "U", "leader_chuck", "CHUCK", "CIANWOOD CITY GYM. His roaring fists do the talking. STORMBADGE.", "CIANWOOD CITY", ["primeape", "poliwrath"]],
+  ["leaders", "U", "leader_jasmine", "JASMINE", "OLIVINE CITY GYM. The steel-clad defence girl. MINERALBADGE.", "OLIVINE CITY", ["magnemite", "steelix"]],
+  ["leaders", "U", "leader_pryce", "PRYCE", "MAHOGANY TOWN GYM. The teacher of winter's harshness. GLACIERBADGE.", "MAHOGANY TOWN", ["seel", "dewgong", "piloswine"]],
+  ["leaders", "U", "leader_clair", "CLAIR", "BLACKTHORN CITY GYM. The blessed user of dragon POKéMON. RISINGBADGE.", "BLACKTHORN CITY", ["dragonair", "kingdra"]],
+  ["leaders", "U", "leader_janine", "JANINE", "FUCHSIA CITY GYM, after KOGA. His daughter, a poison ninja too. SOULBADGE.", "FUCHSIA CITY", ["zubat", "venomoth", "weezing"]],
+  ["leaders", "U", "blue", "BLUE (VIRIDIAN LEADER)", "VIRIDIAN CITY GYM, after GIOVANNI: your rival, three years on. EARTHBADGE.", "VIRIDIAN CITY", ["pidgeot", "alakazam", "rhydon", "gyarados", "exeggutor", "arcanine"]],
+  ["elite", "U", "will", "WILL", "Johto's ELITE FOUR, first: psychic. The same INDIGO PLATEAU, new faces.", "INDIGO PLATEAU", ["xatu", "jynx", "exeggutor", "slowbro", "xatu"]],
+  ["elite", "U", "leader_koga", "KOGA (ELITE FOUR)", "Johto's ELITE FOUR, second: poison. He left Fuchsia's gym to JANINE.", "INDIGO PLATEAU", ["ariados", "forretress", "muk", "venomoth", "crobat"]],
+  ["elite", "U", "bruno", "BRUNO (JOHTO)", "Johto's ELITE FOUR, third: fighting, still.", "INDIGO PLATEAU", ["hitmontop", "hitmonlee", "hitmonchan", "onix", "machamp"]],
+  ["elite", "U", "karen", "KAREN", "Johto's ELITE FOUR, fourth: dark POKéMON.", "INDIGO PLATEAU", ["umbreon", "vileplume", "gengar", "murkrow", "houndoom"]],
+  ["elite", "U", "lance", "LANCE (CHAMPION)", "Johto's CHAMPION: the dragon master, who stepped up when BLUE stepped down.", "INDIGO PLATEAU", ["gyarados", "dragonite", "charizard", "aerodactyl", "dragonite", "dragonite"]],
+  ["story", "U", "prof_elm", "PROF. ELM", "Johto's POKéMON professor: he studies how POKéMON evolve and where eggs come from. Gives you your Johto partner.", "His lab, NEW BARK TOWN", []],
+  ["story", "U", "elm_aide", "ELM's AIDE", "Helps in PROF. ELM's lab. Brings you the egg in VIOLET CITY.", "ELM's lab, VIOLET CITY", []],
+  ["story", "U", "mr_pokemon", "MR. POKéMON", "Loves strange old things. Gives you the mystery egg.", "ROUTE 30", []],
+  ["story", "U", "kurt", "KURT", "Makes balls from apricorns: LEVEL, LURE, MOON, FRIEND, LOVE, HEAVY and FAST.", "AZALEA TOWN", []],
+  ["story", "U", "silver", "SILVER", "Your Johto rival: he stole his POKéMON from ELM's lab, and wants only strong ones.", "Everywhere in Johto", ["sneasel", "golbat", "magneton", "kadabra", "haunter", "feraligatr"]],
+  ["story", "U", "eusine", "EUSINE", "Chases SUICUNE all over Johto.", "ECRUTEAK, CIANWOOD", ["drowzee", "haunter", "electrode"]],
+  ["story", "G", "kimono_girl", "KIMONO GIRL", "Dances at the theatre in ECRUTEAK, each with her own EEVEE evolution.", "ECRUTEAK CITY", ["flareon", "vaporeon", "jolteon", "espeon", "umbreon"]],
+  ["story", "G", "sage", "SAGE", "Keeps SPROUT TOWER. Each one has a BELLSPROUT.", "SPROUT TOWER, VIOLET CITY", ["bellsprout", "bellsprout"]],
+  ["trainers", "G", "schoolboy", "SCHOOLBOY", "Top of the class, and wants you to know it.", "ROUTES 29 to 33, Johto", ["sentret", "pidgey"]],
+  ["trainers", "G", "firebreather", "FIREBREATHER", "Breathes fire for a living.", "BURNED TOWER, ROUTE 28", ["koffing", "magmar"]],
+  ["trainers", "G", "medium", "MEDIUM", "Calls on spirits in the towers.", "TIN TOWER, POKéMON TOWER", ["gastly", "haunter"]],
+  ["trainers", "G", "skier", "SKIER", "On the snow round the ICE PATH.", "ROUTE 44, ICE PATH", ["dewgong", "swinub"]],
+  ["trainers", "G", "boarder", "BOARDER", "Snowboards down anything.", "ICE PATH", ["swinub", "jynx"]],
+  ["trainers", "G", "officer_johto", "OFFICER", "Out at night, on patrol.", "Johto's routes, at night", ["growlithe", "growlithe"]]
 );
+for (let i = PEOPLE.length - 1; i >= 0; i--) if (PEOPLE[i][2] === "leader") PEOPLE.splice(i, 1);
+GROUPS.find(g => g[0] === "leaders")[2] = "Kanto's eight, then Johto's eight, then the two who run Kanto gyms three years on: JANINE and BLUE.";
+GROUPS.find(g => g[0] === "elite")[2] = "At the INDIGO PLATEAU: Kanto's ELITE FOUR and champion, then Johto's, in the same rooms.";
 for (const k of ["jessie", "james"]) { const p = PEOPLE.find(q => q[2] === k); if (p) p[4] = p[4] + " Red jacket, the mark in black: the grunts wear it the other way round."; }

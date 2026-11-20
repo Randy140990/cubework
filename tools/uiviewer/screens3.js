@@ -122,7 +122,7 @@ const STARTERS = [["bulbasaur", "GRASS", "A leafy armadillo. It curls up in its 
   ["squirtle", "WATER", "A sea tapir. It sprays water from its soft snout, and the curl of wave on its head never dries."]];
 screen("starter", "Places", "Choosing your first POKéMON", {
   scene: "model", sceneOpts: () => ({ sid: "charmander", ox: 0, stand: false, zoom: 0.92 }),
-  what: "Choosing your first: three balls on the professor's table along the foot of the screen. The one you're on rolls forward and pops open, and its creature stands out big in the middle on its own backdrop (embers for the fire one, leaves for the grass one, bubbles for the water one), with its name, type and a line about it on a plate. A to choose it, and the professor asks if you're sure.",
+  what: "Choosing your first: three balls on the professor's table along the foot of the screen. The one you're on rolls forward and pops open; a white light builds up out of it over half a second and fills the screen, then fades to show its creature standing big in the middle on its own backdrop (embers for the fire one, leaves for the grass one, bubbles for the water one), with its name, type and a line about it on a plate. A to choose it, and the professor asks if you're sure.",
   mod: "StarterScreen.",
   tags: ["New: a better way to choose"], try: ["Left and right to look in each ball, A to choose, then YES or NO."],
   make() {
@@ -138,9 +138,23 @@ screen("starter", "Places", "Choosing your first POKéMON", {
       <path d="M8 50a42 42 0 0 0 84 0z" fill="#F4F6F5" stroke="#26304A" stroke-width="5"/><rect x="8" y="46" width="84" height="8" fill="#26304A"/>
       <circle cx="50" cy="50" r="13" fill="#F4F6F5" stroke="#26304A" stroke-width="5"/><circle cx="50" cy="50" r="6" fill="${on ? c : "#F4F6F5"}" stroke="#26304A" stroke-width="2"/>
       ${open ? `<ellipse cx="50" cy="40" rx="30" ry="12" fill="#fff" opacity=".85" style="filter:blur(3px)"/>` : ""}</svg>`;
+    // Looking in a ball: a white light builds up out of it for about a second, filling the screen; at its brightest the
+    // creature and its backdrop are there behind it; the light fades off them; then its plate comes in.
+    let run = 0;
+    const reveal = () => {
+      const me = ++run, [sid] = STARTERS[sel];
+      plate.style.transition = "none"; plate.style.opacity = 0; SC.model.hide = true;
+      flash.style.transition = "none"; flash.style.opacity = 1;
+      flash.innerHTML = `<div id="stGlow" style="position:absolute;inset:0;background:radial-gradient(circle at ${[34, 50, 66][sel]}% 74%, #fff 0%, rgba(255,255,255,.95) 18%, rgba(255,255,255,0) 40%);opacity:0;transform-origin:${[34, 50, 66][sel]}% 74%;transform:scale(.3);transition:opacity .9s ease-in, transform .95s cubic-bezier(.6,0,.9,.6)"></div>
+        <div id="stWhite" style="position:absolute;inset:0;background:#fff;opacity:0;transition:opacity .55s ease-in .45s"></div>`;
+      requestAnimationFrame(() => requestAnimationFrame(() => { const g = $("#stGlow"), w = $("#stWhite"); if (g) { g.style.opacity = 1; g.style.transform = "scale(3)"; } if (w) w.style.opacity = .92; }));
+      later(1000, () => { if (me !== run) return; bgArt.innerHTML = ""; monBackdrop(sid, { cx: 50, cy: 52 }); SC.model.show(sid); SC.model.hide = false; SC.model.glowOn = 1;
+        flash.style.transition = "opacity .5s ease-out"; flash.style.opacity = 0;
+        later(420, () => { if (me !== run) return; SC.model.glowOn = 0; plate.style.transition = "opacity .3s ease-out, transform .3s ease-out"; plate.style.opacity = 1; }); });
+    };
     const draw = (burst) => {
       const [sid, kind, line] = STARTERS[sel], d = sp(sid), tc = typeHex(kind);
-      bgArt.innerHTML = ""; monBackdrop(sid, { cx: 50, cy: 52 }); SC.model.show(sid);
+      if (!burst) { bgArt.innerHTML = ""; monBackdrop(sid, { cx: 50, cy: 52 }); SC.model.show(sid); }
       balls.innerHTML = `<div style="display:flex;justify-content:center;gap:150px">${STARTERS.map(([s2, k2], i) => { const on = i === sel;
         return `<div data-i="${i}" style="display:grid;justify-items:center;gap:6px;cursor:pointer;animation:${on ? "stOpen .45s ease-out forwards" : "none"}">
           <div style="width:96px;height:96px;${on ? "" : "animation:stWob 2.4s ease-in-out " + i * 0.4 + "s infinite"}">${ball(on, on, typeHex(k2))}</div>
@@ -149,7 +163,7 @@ screen("starter", "Places", "Choosing your first POKéMON", {
       plate.innerHTML = `<div class="g-fadein" style="position:relative;padding:18px 24px;border-radius:26px;background:rgba(255,255,255,.9);border:4px solid #fff;box-shadow:0 12px 28px rgba(30,40,84,.28)">
         <div style="font-weight:900;font-size:14px;letter-spacing:1.2px;color:${darkerHex(tc, 0.2)}">THE ${kind} POKéMON</div><div class="g-title" style="font-size:36px;line-height:1.1;color:#26304A">${esc(ourName(sid))}</div>
         <div style="display:flex;gap:8px;margin:8px 0 10px">${d.stats.types.map(typeChip).join("")}</div><div style="font-size:18px;font-weight:800;line-height:1.45;color:#26304A">${esc(line)}</div></div>`;
-      if (burst) { flash.innerHTML = `<div style="position:absolute;left:50%;top:48%;width:420px;height:420px;margin:-210px 0 0 -210px;border-radius:50%;background:radial-gradient(circle,#fff 0,rgba(255,255,255,.6) 30%,transparent 65%);animation:stBurst .5s ease-out forwards"></div>`; }
+      if (burst) reveal();
     };
     const pick = async () => {
       picking = false; const [sid, kind] = STARTERS[sel], n = ourName(sid);
@@ -190,11 +204,11 @@ function plate(side, p, o = {}) {
   const f = p.hp / p.maxhp, ours = side === "ours";
   // Yours sits level with the text box beside it (574 to 694, its 120 tall), top and bottom.
   const e = box(ours ? 36 : 820, ours ? 574 : 36, ours ? 470 : 420, ours ? 120 : null, "g-panel", "");
-  e.style.padding = ours ? "15px 22px 14px" : "12px 22px"; e.style.borderRadius = "22px"; e.style.boxSizing = "border-box";
+  e.style.padding = ours ? "12px 22px 20px" : "12px 22px"; e.style.borderRadius = "22px"; e.style.boxSizing = "border-box";
   const balls = o.balls ? `<div style="position:absolute;${ours ? "top:-30px;left:18px" : "top:-30px;right:18px"};display:flex;gap:4px">${o.balls.map(s => `<span style="width:22px;height:22px;display:inline-block;${s ? "" : "filter:grayscale(1);opacity:.45"}">${ICON.ball}</span>`).join("")}</div>` : "";
   const draw = () => { const f = p.hp / p.maxhp; e.innerHTML = `${balls}<div style="display:flex;align-items:center;gap:10px"><span class="g-title" style="font-size:27px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-weight:900;font-size:21px">Lv. ${p.lv}</span></div>
-    <div style="display:flex;align-items:center;gap:10px;margin-top:8px"><span style="font-weight:900;font-size:14px;letter-spacing:1px;color:var(--g-gold)">HP</span>${hpBar(f, ours ? 260 : 320)}${ours ? `<span style="font-weight:900;font-size:20px;font-variant-numeric:tabular-nums">${Math.ceil(p.hp)}/${p.maxhp}</span>` : ""}</div>
-    ${ours ? `<div style="display:flex;align-items:center;gap:10px;margin-top:6px"><span style="font-weight:900;font-size:12px;letter-spacing:1px;color:#3C8DE4">EXP</span><div class="g-exp" style="flex:1"><i style="width:${(p.exp || 0) * 100}%"></i></div></div>` : ""}`; };
+    <div style="display:flex;align-items:center;gap:10px;margin-top:${ours ? 4 : 8}px"><span style="font-weight:900;font-size:14px;letter-spacing:1px;color:var(--g-gold)">HP</span>${hpBar(f, ours ? 260 : 320)}${ours ? `<span style="font-weight:900;font-size:20px;font-variant-numeric:tabular-nums">${Math.ceil(p.hp)}/${p.maxhp}</span>` : ""}</div>
+    ${ours ? `<div style="display:flex;align-items:center;gap:10px;margin-top:4px"><span style="font-weight:900;font-size:12px;letter-spacing:1px;color:#3C8DE4">EXP</span><div class="g-exp" style="flex:1"><i style="width:${(p.exp || 0) * 100}%"></i></div></div>` : ""}`; };
   draw(); return { el: e, draw };
 }
 const CHART = { ELECTRIC: { FLYING: 2, WATER: 2, GROUND: 0, GRASS: 0.5, ELECTRIC: 0.5 }, NORMAL: { ROCK: 0.5, GHOST: 0 }, FLYING: { GRASS: 2, BUG: 2, FIGHTING: 2, ELECTRIC: 0.5, ROCK: 0.5 } };
@@ -373,7 +387,7 @@ screen("battle", "Battle", "Battle: commands and moves", {
 });
 screen("catch", "Battle", "Catching", {
   scene: "battle", sceneOpts: () => ({ ours: "pikachu", foe: "pidgey", trainer: false }),
-  what: "A wild POKéMON: throw a ball from the BAG (the list opens bottom right, where the buttons were). A ring closes in round it; press SPACE (or click) when it's small for Nice!, Great! or Excellent! Then, slowly: the ball arcs out and hits it, bursts open, it turns to red light and is drawn in, the ball hangs, drops with a little bounce, wobbles three times, and Gotcha!",
+  what: "A wild POKéMON: throw a ball from the BAG (the list opens bottom right, where the buttons were). A ring closes in round it; press SPACE (or click) when it's small for Nice!, Great! or Excellent! Then, slowly: the ball arcs out and hits it, bursts open, it turns to red light and is drawn in, the ball hangs, drops with a little bounce, wobbles three times (the ball itself shows them; no counter), then clicks shut with a burst of gold sparkles, and Gotcha!",
   tags: ["New: throw timing and call-outs"], mod: "BattleScreen's BAG, POKé BALLS.",
   try: ["BAG, POKé BALLS, POKé BALL, then press SPACE (or click) as the ring shrinks."],
   make() {
@@ -420,10 +434,12 @@ screen("catch", "Battle", "Catching", {
         uiRoot.querySelectorAll(".g-text").forEach(x => x.remove());
         // The ball shakes three times on its own, a dot for each, then clicks shut.
         S.shakeT = 0;
-        const dots = box(cx - 80, Math.max(90, cy - 150), 160, null, "g-panel g-pop", `<div id="shk" style="padding:10px 0;text-align:center;font-size:34px;font-weight:900;letter-spacing:10px;color:var(--g-gold)">&middot;</div>`); dots.style.borderRadius = "999px";
-        for (let n = 1; n <= 3; n++) { await C.wait(1500); const e = $("#shk"); if (e) e.innerHTML = "&middot;".repeat(Math.min(3, n + 1)); }
-        dots.remove(); S.shakeT = null;
-        const st = box(cx - 120, cy - 160, 240, 120, "g-pop", `<div style="font-size:60px;text-align:center;color:var(--g-gold);text-shadow:0 0 20px #FFD45A">&#10022; &#10022; &#10022;</div>`);
+        // The ball itself shows the wobbles; then, caught, it clicks shut with a burst of gold sparkles off it.
+        await C.wait(4500); S.shakeT = null;
+        const bp = S.ball.position.clone().project(cam3), bx = (bp.x + 1) / 2 * 1280, by = (1 - bp.y) / 2 * 720;
+        const st = box(bx - 120, by - 120, 240, 240, "", `<style>@keyframes ctSpark{0%{transform:translate(0,0) scale(.3);opacity:0}25%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1);opacity:0}}</style>
+          ${Array.from({ length: 9 }, (_, i) => { const a = -Math.PI / 2 + (i - 4) * 0.36, r = 70 + (i % 3) * 18; return `<span style="position:absolute;left:108px;top:108px;width:24px;height:24px;background:#FFE07A;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);filter:drop-shadow(0 0 6px #FFC93C);--dx:${(Math.cos(a) * r).toFixed(0)}px;--dy:${(Math.sin(a) * r).toFixed(0)}px;animation:ctSpark .9s ease-out ${i * 0.03}s both"></span>`; }).join("")}`);
+        st.style.pointerEvents = "none";
         const cg = add(h("div", "g-callout", "Gotcha!")); cg.style.left = "640px"; cg.style.top = "150px";
         await C.say([{ text: `Gotcha! **${foeN}** was caught!` }]); st.remove();
         await C.say([{ text: `**${foeN}**'s data was added to the **POKéDEX**.` }]);
@@ -463,7 +479,7 @@ screen("levelup", "Battle", "EXP and levelling up", {
 });
 screen("evolve", "Battle", "Evolving", {
   scene: "model", sceneOpts: () => ({ sid: "bulbasaur", ox: 0 }),
-  what: "Evolution: 'What? It's evolving!', the creature glowing white and pulsing, then its new form.",
+  what: "Evolution: 'What? It's evolving!'. The creature turns to white light; then it and its new form swap back and forth, each growing as the other shrinks, slowly at first and then quicker and quicker, until the new one stays and its colours come back through the white. B (or ESC) while it's going stops it.",
   mod: "EvolutionScreen.",
   try: ["B while it glows stops it, as the old games let you."],
   make() {
@@ -475,10 +491,11 @@ screen("evolve", "Battle", "Evolving", {
       S.turn = false; S.glowOn = 1;
       const tip = box(440, 300, 400, null, "g-panel g-pop", `<div style="padding:12px 18px;text-align:center;font-size:20px;font-weight:900">Press <span class="g-key round">B</span> to stop it</div>`); tip.style.borderRadius = "999px";
       const stop = { key(k) { if (k === "b") stopped = true; return true; } }; C.push(stop);
-      await C.wait(1200); S.hide = true; await C.wait(900);
-      C.pop(stop); tip.remove();
-      if (stopped) { S.hide = false; S.glowOn = 0; S.turn = true; await C.say([{ text: `Huh? **${a}** stopped evolving!` }]); if (C.alive()) go("victory"); return; }
-      await S.show("ivysaur"); S.hide = false; await C.wait(400); S.glowOn = 0; S.turn = true;
+      const how = await S.morph("ivysaur", () => stopped);
+      C.pop(stop); tip.remove(); S.glowOn = 0; S.turn = true;
+      if (how === "stopped") { await C.say([{ text: `Huh? **${a}** stopped evolving!` }]); if (C.alive()) go("victory"); return; }
+      // A burst of light as it settles.
+      const fb = box(0, 0, 1280, 720, "", ""); fb.style.background = "radial-gradient(circle at 50% 50%, #fff 0, rgba(255,255,255,.7) 25%, transparent 60%)"; fb.style.pointerEvents = "none"; fb.style.transition = "opacity .8s"; later(30, () => fb.style.opacity = 0); later(900, () => fb.remove());
       add(h("div", "g-callout", "Congratulations!")).style.cssText += "left:640px;top:120px";
       await C.say([{ text: `**${a}** evolved into **${b}**!` }]);
       if (C.alive()) go("victory");

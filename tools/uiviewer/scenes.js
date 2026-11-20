@@ -169,7 +169,7 @@ const SCENES = {
       const i = pi++, x = 3.8 + i * 1.15, row = [1.4, -1.35, -2.4][i % 3];
       mon(sid).then(st => { const big = st.m.size.h > 2.2 ? 2.2 / st.m.size.h : 1; if (big < 1) { st.m.holder.scale.multiplyScalar(big); st.m.size = { ...st.m.size, h: st.m.size.h * big, w: st.m.size.w * big, l: st.m.size.l * big, cx: st.m.size.cx * big, cz: st.m.size.cz * big }; }
         const flyer = ["butterfree", "pidgeot"].includes(sid), z = flyer ? -0.9 : st.m.size.h > 1.3 ? -2.4 : st.m.size.h > 0.9 && row > 0 ? -1.35 : row;
-        st.base = flyer ? "fly" : "ground"; st.home = [x, z, (i % 3 - 1) * 0.35, flyer ? 1.5 : 0]; group.add(st.m.holder); S.parade.push(st); placeMon(st, x, z, Math.PI + st.home[2], st.home[3]); });
+        st.base = flyer ? "fly" : "ground"; st.home = [x, z, (i % 3 - 1) * 0.35, flyer ? 1.5 : 0]; group.add(st.m.holder); S.parade.push(st); st.m.holder.visible = S.mode === "intro"; placeMon(st, x, z, Math.PI + st.home[2], st.home[3]); });
     }
     S.nextCry = 2;
     S.hop = () => { if (S.hopT == null) { S.hopT = 0; const r = S.runners.find(q => q.sid === "pikachu"); if (r) playOnce(r, "cry"); } };
@@ -184,11 +184,12 @@ const SCENES = {
       rival.root.visible = S.mode === "rival";
       for (const p of S.parade) p.m.holder.visible = S.mode === "intro";
       const k = JSON.stringify(G.look);
-      if (S.mode === "you") { if (k !== lookKey || !you) { if (you) group.remove(you.root); you = figureOf(G.look); you.root.position.set(1.45, 0, 0.45); you.root.rotation.y = Math.PI - 0.25; group.add(you.root); lookKey = k; } you.root.visible = true; }
+      if (S.mode === "you") { if (k !== lookKey || !you) { if (you) group.remove(you.root); you = figureOf(G.look); group.add(you.root); lookKey = k; } you.root.position.set(1.25, 0, 0.6); you.root.rotation.y = Math.PI + 0.12; you.root.visible = true; }
       else if (you) you.root.visible = false;
       lightFor(0, 0, 8, 14); hemi3.color.set(0xf2fbff); hemi3.groundColor.set(0x9fb8c0);
       const x = S.mode === "intro" ? -0.3 : 0.2;
-      look3(x, 2.35, 6.6, x, 0.62, 0.3);
+      // For you at the end: down at eye height, so your face shows under the cap.
+      if (S.mode === "you") look3(0.75, 1.45, 5.6, 0.75, 1.05, 0.3); else look3(x, 2.35, 6.6, x, 0.62, 0.3);
     };
     S.tick = (dt, t) => {
       const W = S.walk;
@@ -271,7 +272,7 @@ const SCENES = {
         for (const f of S.figs) group.remove(f.root); S.figs = [];
         const n = list.length, gap = 1.3;
         list.forEach((c, i) => { let f; if (c.creature) { f = { root: new THREE.Group(), creature: true }; mon(c.creature).then(st => { st.base = "ground"; f.st = st; f.root.add(st.m.holder); placeMon(st, 0, 0, 0); }); } else f = makeFigure(c.spec); f.root.position.set((i - (n - 1) / 2) * gap, 0, 0); f.root.rotation.y = Math.PI; group.add(f.root); f.x = f.root.position.x; f.z = 0; S.figs.push(f); });
-        S.key = key; const W = (n - 1) * gap + 1.2, d = Math.max(5.2, W / (2 * Math.tan(17 * D2R) * cam3.aspect) * 1.12);
+        S.key = key; const W = (Math.max(n, 7) - 1) * gap + 1.2, d = Math.max(5.2, W / (2 * Math.tan(17 * D2R) * cam3.aspect) * 1.12);
         look3(0, 2.1 + d * 0.06, d, 0, 0.75, 0);
       }
       S.sel = sel; const c = list[sel];
@@ -317,6 +318,32 @@ const SCENES = {
         look3(S.ox || 0, H * 0.62 + d * 0.16, d, S.ox || 0, H * 0.5, 0);
         stand.scale.setScalar(Math.max(0.5, Math.min(3, L * 0.55)));
       });
+    };
+    // Evolving: both forms loaded, each turned to pure white light; they swap back and forth, each growing as the other
+    // shrinks, quicker and quicker, until the new one stays; then its colours come back through the white.
+    const whiten = (st, k) => st.m.holder.traverse(m => { if (m.isMesh && m.material && m.material.emissive) { m.material.emissive.setRGB(k, k, k); } });
+    S.morph = async (into, isStopped) => {
+      const a = S.st; if (!a) return "none";
+      const b = await mon(into); turn.add(b.m.holder); placeMon(b, 0, 0, 0); b.m.holder.visible = false;
+      const sa = a.m.holder.scale.x, sb = b.m.holder.scale.x;
+      // White up.
+      await new Promise(r => { const t0 = performance.now(), f = () => { const k = Math.min(1, (performance.now() - t0) / 900); whiten(a, k); if (k < 1) requestAnimationFrame(f); else r(); }; f(); });
+      whiten(b, 1);
+      // The swaps: 14 of them, from a slow one to a flicker.
+      for (let i = 0; i < 14; i++) {
+        if (isStopped()) { b.m.holder.visible = false; turn.remove(b.m.holder); a.m.holder.visible = true; a.m.holder.scale.setScalar(sa);
+          await new Promise(r => { const t0 = performance.now(), f = () => { const k = Math.min(1, (performance.now() - t0) / 600); whiten(a, 1 - k); if (k < 1) requestAnimationFrame(f); else r(); }; f(); }); return "stopped"; }
+        const dur = Math.max(70, 520 * Math.pow(0.8, i)), toB = i % 2 === 0;
+        await new Promise(r => { const t0 = performance.now(), f = () => { const k = Math.min(1, (performance.now() - t0) / dur), e = k * k * (3 - 2 * k);
+          a.m.holder.visible = true; b.m.holder.visible = true;
+          a.m.holder.scale.setScalar(sa * (toB ? 1 - e : e) + 1e-4); b.m.holder.scale.setScalar(sb * (toB ? e : 1 - e) + 1e-4);
+          if (k < 1) requestAnimationFrame(f); else r(); }; f(); });
+      }
+      a.m.holder.visible = false; turn.remove(a.m.holder); b.m.holder.scale.setScalar(sb);
+      S.st = b; const H = Math.max(0.6, b.m.size.h), L = Math.max(b.m.size.l, b.m.size.w, 0.6), d = Math.max(H * 3.1, L * 2.3, 3.8) * (S.zoom || 1);
+      glow.scale.set(L * 0.7, H * 0.75, L * 0.7); glow.position.y = H / 2; look3(S.ox || 0, H * 0.62 + d * 0.16, d, S.ox || 0, H * 0.5, 0);
+      await new Promise(r => { const t0 = performance.now(), f = () => { const k = Math.min(1, (performance.now() - t0) / 900); whiten(b, 1 - k); if (k < 1) requestAnimationFrame(f); else r(); }; f(); });
+      return "done";
     };
     S.enter = o => { S.ox = o.ox || 0; S.zoom = o.zoom || 1; stand.visible = o.stand !== false; S.spin = 0; S.glowOn = 0; S.hide = false; S.turn = true; turn.rotation.y = Math.PI; lightFor(0, 0, 6, 12); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); if (o.sid) S.show(o.sid); };
     S.tick = (dt, t) => { S.spin += dt * (S.turn === false ? 0 : 0.45); turn.rotation.y = Math.PI + Math.sin(S.spin) * 0.7; glow.material.opacity += ((S.glowOn || 0) * (0.65 + 0.3 * Math.sin(t * 12)) - glow.material.opacity) * Math.min(1, dt * 8); if (S.st) { S.st.m.holder.visible = !S.hide; tickMon(S.st, dt); } };

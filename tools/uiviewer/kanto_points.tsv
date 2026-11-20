@@ -8,16 +8,16 @@ viridian_city	-787	542	-830,495,-745,589
 route_22	-866	530	-900,495,-831,565
 route_2	-787	417	-830,340,-745,494
 pewter_city	-790	295
-route_3	-700	303
-mt_moon	-612	270
+route_3	-665	305
+mt_moon	-570	262
 route_4	-480	262
 cerulean_city	-345	258
 route_24	-352	180
 route_25	-262	150
 route_9	-230	262
 route_10	-128	262
-rock_tunnel	-130	305
-route_5	-357	330
+rock_tunnel	-140	321
+route_5	-342	335
 saffron_city	-350	422
 route_7	-430	424
 celadon_city	-512	422
@@ -45,10 +45,10 @@ indigo_plateau	-910	170
 route_26	-985	640
 route_27	-1120	756
 route_28	-1080	527
-viridian_forest	-800	360
-digletts_cave	-805	388
+viridian_forest	-815	410
+digletts_cave	-775	432
 power_plant	-150	228
-pokemon_tower	-142	412
+pokemon_tower	-115	416
 safari_zone	-505	752
 pokemon_mansion	-858	890
 cerulean_cave	-388	240
