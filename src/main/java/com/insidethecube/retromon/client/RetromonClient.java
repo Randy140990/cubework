@@ -31,6 +31,7 @@ public class RetromonClient implements ClientModInitializer {
 		Colours.register();
 		// 3D figures on screens (Oak, you, the starters, the Pokédex), drawn without a world.
 		net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(ctx -> new Figures.Renderer(ctx.vertexConsumers()));
+		net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(ctx -> new Figures.ShadowRenderer(ctx.vertexConsumers()));
 		// The Retromon Look pack (Pokémon-style grass, leaves, flowers, paths): in Resource Packs, off until you switch it on.
 		net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(Retromon.ID).ifPresent(c -> net.fabricmc.fabric.api.resource.ResourceManagerHelper
 				.registerBuiltinResourcePack(Retromon.id("retromon_look"), c, Component.literal("Retromon Look"),

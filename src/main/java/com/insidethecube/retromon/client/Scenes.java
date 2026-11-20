@@ -327,17 +327,14 @@ public final class Scenes {
 				float e = turnT * turnT * (3 - 2 * turnT);
 				yaw = (-Math.PI / 2 - 0.55) + (-Math.PI - (-Math.PI / 2 - 0.55)) * e;
 			}
-			cast(g, cam, px, 0, 0.6, 0.4, 1.8, 200);
-			Figures.Fig oak = place(b, cam, OAK, null, px, 0, 0, yaw, t);
+			Figures.Fig oak = place(b, cam, OAK, null, px, 0, 0, yaw, t).cast(true);
 			if (walking && !done) oak.walk(1);
 			if (talking) oak.talk(0.85F);
 			if (wave > 0) oak.wave(wave);
 			if (mode.equals("rival")) {
-				cast(g, cam, 1.45, 0.45, 0.6, 0.4, 1.8, 200);
-				place(b, cam, RIVAL, null, 1.45, 0, 0.45, Math.PI - 0.25, t).look((float) Math.toDegrees(Math.sin(t * 0.7) * 0.2));
+				place(b, cam, RIVAL, null, 1.45, 0, 0.45, Math.PI - 0.25, t).cast(true).look((float) Math.toDegrees(Math.sin(t * 0.7) * 0.2));
 			} else if (mode.equals("you") && you != null) {
-				cast(g, cam, 1.25, 0.6, 0.6, 0.4, 1.8, 200);
-				Figures.Fig y = place(b, cam, you, null, 1.25, 0, 0.6, Math.PI + 0.12, t).floss(floss).lookUp(lookUp);
+				Figures.Fig y = place(b, cam, you, null, 1.25, 0, 0.6, Math.PI + 0.12, t).cast(true).floss(floss).lookUp(lookUp);
 				if (youWave > 0) y.wave(youWave);
 			}
 			for (int i = 0; i < SPOTS.length; i++) {
@@ -371,9 +368,8 @@ public final class Scenes {
 				String shown = sid.equals("cubone") && Look.ours() && !Look.has("cubone") ? "rattata" : sid;
 				BedrockModel.Def sd = BedrockModel.def(shown);
 				double sh = sd == null ? 0.8 : Math.max(0.3, sd.height);
-				if (my < 0.3) cast(g, cam, mx, mz, Math.max(0.35, sh * 0.6), Math.max(0.35, sh * 0.6), sh, 180);
-				else blob(g, cam, mx + 0.17 * (my + sh), mz - 0.46 * (my + sh), 0.3, 110);
-				Figures.Fig f = place(b, cam, null, shown, mx, my, mz, myaw, t + i * 0.7F).pose(pose);
+				if (my >= 0.3) blob(g, cam, mx + 0.17 * (my + sh), mz - 0.46 * (my + sh), 0.3, 110);
+				Figures.Fig f = place(b, cam, null, shown, mx, my, mz, myaw, t + i * 0.7F).pose(pose).cast(my < 0.3);
 				if (i == crier && t - cryAt < 1.2F && !(walking && sid.equals("pikachu"))) f.action("cry", t - cryAt);
 			}
 			if (mode.equals("intro")) {
@@ -386,13 +382,14 @@ public final class Scenes {
 					boolean flyer = sid.equals("butterfree") || sid.equals("pidgeot");
 					double hh = h * big, z = flyer ? -1.6 : hh > 1.3 ? -3.0 : hh > 0.9 ? Math.min(row, -2.15) : row, fly = flyer ? 1.6 + Math.sin(t * 2.1 + x) * 0.14 : 0;
 					double look = walking ? Math.max(-0.6, Math.min(0.6, (px - x) * 0.4)) : 0;
-					if (!flyer) cast(g, cam, x, z, Math.max(0.4, hh * 0.6), Math.max(0.4, hh * 0.6), hh, 160);
-					else blob(g, cam, x + 0.17 * (fly + hh), z - 0.46 * (fly + hh), 0.35, 100);
-					Figures.Fig f = place(b, cam, null, sid, x, fly, z, Math.PI + (i % 3 - 1) * 0.35 - look, t + i * 0.37F).pose(flyer ? "fly" : null);
+					if (flyer) blob(g, cam, x + 0.17 * (fly + hh), z - 0.46 * (fly + hh), 0.35, 100);
+					Figures.Fig f = place(b, cam, null, sid, x, fly, z, Math.PI + (i % 3 - 1) * 0.35 - look, t + i * 0.37F).pose(flyer ? "fly" : null).cast(!flyer);
 					if (big < 1) f.perBlock(f.perBlock * (float) big);
 					if (SPOTS.length + i == crier && t - cryAt < 1.2F) f.action("cry", t - cryAt);
 				}
 			}
+			// The shadows they cast (the viewer's sun's), then them.
+			b.drawShadows(g, 82);
 			b.draw(g);
 		}
 	}

@@ -61,6 +61,14 @@ public final class Figures {
 			this.tall = tall;
 		}
 
+		/** Casts its own shadow on the ground (drawn by Batch.drawShadows, before the figures). */
+		boolean cast;
+
+		public Fig cast(boolean on) {
+			cast = on;
+			return this;
+		}
+
 		/** A Pokémon walking, flying or hovering (its world pose), or null for standing. */
 		public Fig pose(String name) {
 			poseName = name;
@@ -203,6 +211,14 @@ public final class Figures {
 	public record State(List<Fig> figs, int x0, int y0, int x1, int y1, float scale, ScreenRectangle scissorArea, ScreenRectangle bounds)
 			implements PictureInPictureRenderState {}
 
+	/**
+	 * The figures' shadows for one frame: their shapes flattened on the ground along the sun, solid in their own
+	 * picture, then laid over the scene see-through (tint), so where two overlap it's no darker. (Their own kind of
+	 * picture: Minecraft keeps one picture per kind a frame.)
+	 */
+	public record ShadowState(List<Fig> figs, int x0, int y0, int x1, int y1, float scale, ScreenRectangle scissorArea, ScreenRectangle bounds, int tint)
+			implements PictureInPictureRenderState {}
+
 	/** Figures over an area of the screen (usually the whole screen): add them, then draw. */
 	public static final class Batch {
 		private final List<Fig> figs = new ArrayList<>();
@@ -231,6 +247,16 @@ public final class Figures {
 
 		public boolean isEmpty() {
 			return figs.isEmpty();
+		}
+
+		/** Their shadows on the ground (the ones that cast them), alpha how dark (0 to 255). Draw before draw(). */
+		public void drawShadows(GuiGraphics g, int alpha) {
+			List<Fig> cast = new ArrayList<>();
+			for (Fig f : figs) if (f.cast) cast.add(f);
+			if (cast.isEmpty() || x1 <= x0 || y1 <= y0) return;
+			int a = Math.max(0, Math.min(255, alpha));
+			g.guiRenderState.submitPicturesInPictureState(new ShadowState(cast, x0, y0, x1, y1, 1F, null, PictureInPictureRenderState.getBounds(x0, y0, x1, y1, null),
+					(a << 24) | (a << 16) | (a << 8) | a));
 		}
 
 		/** Puts the figures on the screen (in the drawing order of the screen: what's drawn after goes on top). */
@@ -275,15 +301,24 @@ public final class Figures {
 
 		@Override
 		protected void renderToTexture(State st, PoseStack pose) {
+			figures(st.figs(), st.x0(), st.y0(), st.x1(), pose, false);
+		}
+
+		/** Drawing shadows (each figure flattened on the ground along the sun, in black). */
+		private boolean shadowMode;
+
+		void figures(List<Fig> figs, int x0, int y0, int x1, PoseStack pose, boolean shadows) {
+			shadowMode = shadows;
 			Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
-			// Picture space: screen pixels from the area's top left, y down, z towards you.
-			pose.translate(-(st.x1() - st.x0()) / 2F, 0, 0);
+			// Picture space: screen pixels from the area's top left, y down, z away from you (Minecraft turns z round).
+			pose.translate(-(x1 - x0) / 2F, 0, 0);
+			State st = new State(figs, x0, y0, x1, 0, 1F, null, null);
 			for (Fig f : st.figs()) {
 				pose.pushPose();
 				// Depth squeezed a third (each figure's own depth with it, so what's in front stays in front), so a
 				// whole scene fits the picture's depth even on a big screen.
 				// (Minecraft's picture in picture turns z round: away from you is +z here, so nearer is -depth.)
-				pose.translate(f.cx - st.x0(), f.feet - st.y0() - f.hop, -f.depth * Z_SQUEEZE);
+				pose.translate(f.cx - st.x0(), f.feet - st.y0() - (shadowMode ? 0 : f.hop), -f.depth * Z_SQUEEZE);
 				pose.scale(1, 1, Z_SQUEEZE);
 				if (f.squash != 1) pose.scale(1 / (float) Math.sqrt(f.squash), f.squash, 1 / (float) Math.sqrt(f.squash));
 				if (f.grow != 1) pose.scale(Math.max(1e-4F, f.grow), Math.max(1e-4F, f.grow), Math.max(1e-4F, f.grow));
@@ -388,12 +423,14 @@ public final class Figures {
 			pose.translate(0, -f.tall / 2F, 0);
 			pose.mulPose(Axis.XP.rotationDegrees(f.pitch));
 			pose.translate(0, f.tall / 2F, 0);
+			if (shadowMode) flatten(pose);
 			pose.mulPose(Axis.YP.rotationDegrees(-(f.facing + f.spin)));
 			pose.scale(k, k, k);
 			pose.translate(0F, -1.5F, 0F);
-			m.renderToBuffer(pose, bufferSource.getBuffer(m.renderType(f.skin)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+			if (shadowMode) m.renderToBuffer(pose, bufferSource.getBuffer(m.renderType(f.skin)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0xFF000000);
+			else m.renderToBuffer(pose, bufferSource.getBuffer(m.renderType(f.skin)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 			// You (in your clothes): your cap and bag too, as in the world.
-			if (Outfit.HERO.equals(f.skin)) GearLayer.drawOn(m, pose, bufferSource, Outfit.heroOutfit(), Outfit.heroGirl(), FULL_BRIGHT);
+			if (!shadowMode && Outfit.HERO.equals(f.skin)) GearLayer.drawOn(m, pose, bufferSource, Outfit.heroOutfit(), Outfit.heroGirl(), FULL_BRIGHT);
 			bufferSource.endBatch();
 		}
 
@@ -494,16 +531,89 @@ public final class Figures {
 			pose.translate(0, -tall / 2F, 0);
 			pose.mulPose(Axis.XP.rotationDegrees(f.pitch));
 			pose.translate(0, tall / 2F, 0);
+			if (shadowMode) flatten(pose);
 			pose.mulPose(Axis.YP.rotationDegrees(-(f.facing + f.spin)));
 			pose.scale(k * m.def.scale, k * m.def.scale, k * m.def.scale);
 			pose.translate(0F, -1.501F, 0F);
 			m.pose(f.seconds, f.poseName, f.action, f.actionSecs);
 			int overlay = f.white > 0 ? OverlayTexture.pack(OverlayTexture.u(f.white), OverlayTexture.v(false)) : OverlayTexture.NO_OVERLAY;
+			if (shadowMode) {
+				m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityCutoutNoCull(m.def.texture)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0xFF000000);
+				bufferSource.endBatch();
+				return;
+			}
 			m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityCutoutNoCull(m.def.texture)), FULL_BRIGHT, overlay);
 			for (BedrockModel.Layer l : m.def.layers) {
 				m.root.render(pose, bufferSource.getBuffer(RenderTypes.entityTranslucentEmissive(l.frame(f.seconds))), FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 			}
 			bufferSource.endBatch();
+		}
+	}
+
+	/**
+	 * Each figure's shadow in its upright frame (feet at 0, y down): everything brought down to the ground, moved
+	 * back and a little right the higher it was, as the viewer's sun (up and to the front left) throws it.
+	 */
+	static void flatten(PoseStack pose) {
+		org.joml.Matrix4f m = new org.joml.Matrix4f();
+		m.m10(-0.17F);
+		m.m11(0F);
+		m.m12(-0.46F);
+		pose.last().pose().mul(m);
+	}
+
+	/** Draws figures' shadows (ShadowState) into their own picture, then lays it over the scene see-through. */
+	public static final class ShadowRenderer extends PictureInPictureRenderer<ShadowState> {
+		private final Renderer core;
+
+		public ShadowRenderer(MultiBufferSource.BufferSource buffers) {
+			super(buffers);
+			core = new Renderer(buffers);
+		}
+
+		@Override
+		public Class<ShadowState> getRenderStateClass() {
+			return ShadowState.class;
+		}
+
+		@Override
+		protected String getTextureLabel() {
+			return "retromon shadows";
+		}
+
+		@Override
+		protected float getTranslateY(int height, int guiScale) {
+			return 0;
+		}
+
+		@Override
+		protected void renderToTexture(ShadowState st, PoseStack pose) {
+			core.figures(st.figs(), st.x0(), st.y0(), st.x1(), pose, true);
+		}
+
+		@Override
+		protected void blitTexture(ShadowState st, net.minecraft.client.gui.render.state.GuiRenderState gs) {
+			com.mojang.blaze3d.textures.GpuTextureView view = colourView();
+			if (view == null) return;
+			gs.submitBlitToCurrentLayer(new net.minecraft.client.gui.render.state.BlitRenderState(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
+					net.minecraft.client.gui.render.TextureSetup.singleTexture(view,
+							com.mojang.blaze3d.systems.RenderSystem.getSamplerCache().getRepeat(com.mojang.blaze3d.textures.FilterMode.NEAREST)),
+					st.pose(), st.x0(), st.y0(), st.x1(), st.y1(), 0F, 1F, 1F, 0F, st.tint(), st.scissorArea(), null));
+		}
+
+		/** The picture's colour (its view isn't open to us: found among the fields by its kind). */
+		private com.mojang.blaze3d.textures.GpuTextureView colourView() {
+			try {
+				for (java.lang.reflect.Field f : PictureInPictureRenderer.class.getDeclaredFields()) {
+					if (f.getType() != com.mojang.blaze3d.textures.GpuTextureView.class) continue;
+					f.setAccessible(true);
+					com.mojang.blaze3d.textures.GpuTextureView v = (com.mojang.blaze3d.textures.GpuTextureView) f.get(this);
+					if (v != null && v.texture().getFormat() == com.mojang.blaze3d.textures.TextureFormat.RGBA8) return v;
+				}
+			} catch (ReflectiveOperationException | RuntimeException e) {
+				return null;
+			}
+			return null;
 		}
 	}
 }
