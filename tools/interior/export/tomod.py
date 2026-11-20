@@ -302,7 +302,8 @@ def main():
             # Someone seated sits on their chair, as the Interior Viewer has them.
             people.append({"key": key, "name": n["name"].upper(), "skin": n["skin"] or "youngster", "x": round(x, 3), "z": round(z, 3),
                            "yaw": round((180 - math.degrees(yaw)) % 360, 1), "lines": n["lines"], "role": n.get("role"), "seated": bool(n["seated"])})
-        acts = [dict({"rect": a["rect"], "label": a["label"], "lines": a["lines"]}, **({"map": True} if a.get("map") else {})) for a in room["acts"] if a["lines"]]
+        acts = [dict({"rect": a["rect"], "label": a["label"], "lines": a["lines"]}, **({"map": True} if a.get("map") else {}), **({"pc": True} if a.get("pc") else {}))
+                for a in room["acts"] if a["lines"]]
         sp = room["spawn"]
         rooms_out[rid] = {"origin": list(o), "W": room["W"], "D": room["D"], "H": room["H"], "name": room["name"], "floor": room["floor"],
                           "place": PLACE[rid], "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360},

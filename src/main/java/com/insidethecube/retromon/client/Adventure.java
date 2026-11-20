@@ -311,6 +311,11 @@ public final class Adventure {
 				mc.setScreen(new TownMapScreen(null));
 				return;
 			}
+			// The storage PC in a POKéMON CENTER: BILL's PC.
+			if (ahead.pc()) {
+				mc.setScreen(new PcScreen());
+				return;
+			}
 			mc.setScreen(new DialogueScreen(ahead.lines(), "sign", -1, new CompoundTag()));
 			return;
 		}

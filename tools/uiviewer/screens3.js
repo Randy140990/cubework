@@ -94,6 +94,80 @@ screen("center", "Places", "Healing desk", {
     return { key: k => C.key(k) };
   }
 });
+// BILL's PC, as Let's Go's box: your team down the left as small cards, the box as a grid of round-cornered tiles
+// on one big white page (30 to a box, its name between arrows), what the one you're on is along the foot. A on one:
+// PUT IN BOX (from your team, never your last one) or TAKE OUT (when there's room), CANCEL.
+const PC_BOX = [["rattata", 4], ["pidgey", 6], ["spearow", 5], ["caterpie", 3], ["weedle", 4], ["nidoran_f", 7], ["mankey", 8], ["zubat", 9], ["oddish", 10],
+  ["geodude", 9], ["psyduck", 12], ["growlithe", 14], ["vulpix", 11], ["meowth", 10]];
+function pcCard(p, on, i) {
+  const d = sp(p.sid), f = p.hp / p.maxhp;
+  return `<div data-t="${i}" style="position:relative;height:80px;box-sizing:border-box;padding:0 16px 0 8px;display:flex;align-items:center;gap:10px;border-radius:22px;cursor:pointer;color:#26304A;
+    background:${on ? "var(--g-sel)" : "#fff"};box-shadow:${on ? "0 0 0 3px #fff,0 0 0 6px #FFC93C,0 8px 16px rgba(232,150,30,.3)" : "0 6px 14px rgba(30,40,84,.18)"};${p.status === "FNT" ? "filter:saturate(.3)" : ""}">
+    ${on ? `<span style="position:absolute;left:-22px;font-size:20px;color:#E5525C">&#9654;</span>` : ""}
+    ${pic(p.sid, 64, "flex:none")}
+    <div style="display:grid;gap:4px;min-width:0"><span class="g-title" style="font-size:21px;line-height:1.1;white-space:nowrap">${esc(ourName(p.sid))}</span>
+      <span style="display:flex;align-items:center;gap:8px;font-weight:900;font-size:16px">Lv. ${p.lv}<span class="g-hp" style="width:70px;height:8px"><i style="width:${Math.max(0, f) * 100}%;background:${hpCol(f)}"></i></span></span></div></div>`;
+}
+screen("pc", "Places", "BILL's PC", {
+  what: "The POKéMON STORAGE SYSTEM at a POKéMON CENTER, as Let's Go's box: your team down the left, the box as a grid on a big white page (30 to a box, the arrows to the next), the one you're on along the foot. A to put one in the box or take one out (never your last).",
+  mod: "PcScreen, from the storage PC in a POKéMON CENTER (its Use).", tags: ["New"],
+  try: ["Arrows move round your team and the box; TAB for the next box.", "A on one of your team puts it in the box; on one in the box, takes it out."],
+  make() {
+    swirlBackdrop("sky", { lx: 15, ly: 0, cx: 62, cy: 48 }); const C = ctl();
+    header(PICTO.ball("#28B6D6"), "BILL'S PC");
+    const team = G.party.map(p => Object.assign({}, p)), boxed = PC_BOX.map(([sid, lv]) => { const st = statsAt(sid, lv); return { sid, lv, hp: st.HP, maxhp: st.HP, status: "", gender: "M" }; });
+    let side = 1, sel = 0, page = 0;
+    const lab = box(44, 92, 300, null, "", ""), col = box(44, 116, 300, 540, "", ""), pg = box(370, 96, 870, 470, "g-panel", ""), foot = box(370, 584, 870, 72, "g-panel soft", "");
+    pg.style.borderRadius = "36px"; foot.style.borderRadius = "999px";
+    const pages = () => Math.max(1, Math.ceil((boxed.length + 1) / 30));
+    const draw = () => {
+      lab.innerHTML = `<span class="g-label">${esc(T("YOUR TEAM"))} ${team.length}/6</span>`;
+      col.innerHTML = `<div style="display:grid;gap:10px">${team.map((p, i) => pcCard(p, side === 0 && i === sel, i)).join("")}</div>`;
+      const first = page * 30, cells = [];
+      for (let k = 0; k < 30; k++) { const p = boxed[first + k], on = side === 1 && sel === k;
+        cells.push(p ? `<div data-b="${k}" style="position:relative;height:64px;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:6px;padding:0 12px 0 6px;cursor:pointer;
+          background:${on ? "var(--g-sel)" : "#F5F8FD"};box-shadow:${on ? "0 0 0 3px #fff,0 0 0 6px #FFC93C,0 8px 16px rgba(232,150,30,.3)" : "inset 0 0 0 2px #E8EDF6"}">${pic(p.sid, 52, "flex:none")}<span style="margin-left:auto;font-weight:900;font-size:15px;color:#26304A">Lv. ${p.lv}</span></div>`
+          : `<div data-b="${k}" style="height:64px;box-sizing:border-box;border-radius:20px;background:#FAFCFE;box-shadow:inset 0 0 0 2px ${on ? "#FFC93C" : "#EEF2F8"}"></div>`); }
+      pg.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;gap:18px;padding-top:20px">
+          <span data-a="-1" style="width:40px;height:40px;border-radius:50%;background:#EEF3FA;display:grid;place-items:center;cursor:pointer;color:#6F7A99;font-size:18px">&#9664;</span>
+          <span class="g-title" style="font-size:28px;min-width:150px;text-align:center">${esc(T("BOX"))} ${page + 1}</span>
+          <span data-a="1" style="width:40px;height:40px;border-radius:50%;background:#EEF3FA;display:grid;place-items:center;cursor:pointer;color:#6F7A99;font-size:18px">&#9654;</span></div>
+        <span class="g-label" style="position:absolute;right:34px;top:34px">${Math.min(30, Math.max(0, boxed.length - first))}/30</span>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px 12px;padding:18px 30px 0">${cells.join("")}</div>`;
+      const cur = side === 0 ? team[sel] : boxed[first + sel];
+      foot.innerHTML = cur ? `<div style="display:flex;align-items:center;gap:14px;height:100%;padding:0 30px 0 26px;box-sizing:border-box"><span class="g-title" style="font-size:26px">${esc(ourName(cur.sid))}</span>${gender(cur.gender)}
+          <span style="display:flex;gap:6px">${sp(cur.sid).stats.types.map(t => typeChip(t).replace("min-width:92px", "")).join("")}</span><span style="margin-left:auto;font-weight:900;font-size:20px">Lv. ${cur.lv}</span>
+          <span style="font-weight:900;font-size:16px;color:#6F7A99">${side === 0 ? esc(T("A: put it in the box")) : esc(T("A: take it out"))}</span></div>`
+        : `<div style="display:flex;align-items:center;height:100%;padding:0 30px;font-size:20px;font-weight:800;color:#6F7A99">${esc(T("An empty space in the box."))}</div>`;
+      col.querySelectorAll("[data-t]").forEach(e => { e.onmouseenter = () => { side = 0; sel = +e.dataset.t; draw(); }; e.onclick = () => pick(); });
+      pg.querySelectorAll("[data-b]").forEach(e => { e.onmouseenter = () => { side = 1; sel = +e.dataset.b; draw(); }; e.onclick = () => pick(); });
+      pg.querySelectorAll("[data-a]").forEach(e => e.onclick = () => { page = (page + +e.dataset.a + pages()) % pages(); draw(); });
+    };
+    const pick = async () => {
+      const first = page * 30, cur = side === 0 ? team[sel] : boxed[first + sel];
+      if (!cur) return;
+      const out = side === 0, i = await C.choose([out ? "PUT IN BOX" : "TAKE OUT", "CANCEL"], { x: 940, y: 300, w: 280 });
+      if (i === 0 && out) { if (team.length <= 1) { await C.say([{ text: "That's your last POKéMON! It has to stay with you." }]); return; }
+        boxed.push(team.splice(sel, 1)[0]); sel = Math.max(0, Math.min(sel, team.length - 1)); await C.say([{ text: `**${ourName(cur.sid)}** went into the box.` }]); }
+      else if (i === 0) { if (team.length >= 6) { await C.say([{ text: "Your team's full! Put one in the box first." }]); return; }
+        team.push(boxed.splice(first + sel, 1)[0]); await C.say([{ text: `**${ourName(cur.sid)}** joined your team.` }]); }
+      draw();
+    };
+    draw(); hints([["A", "Choose"], ["B", "Back"], ["TAB", "Next box"]]);
+    C.push({ key(k) {
+      if (k === "tab") { page = (page + 1) % pages(); draw(); return true; }
+      if (k === "a") { pick(); return true; }
+      if (k === "b") { go("center"); return true; }
+      if (side === 0) {
+        if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : team.length - 1)) % Math.max(1, team.length); draw(); return true; }
+        if (k === "right") { side = 1; sel = Math.min(29, Math.floor(sel * 5 / 6) * 6); draw(); return true; }
+        return true;
+      }
+      if (k === "left" && sel % 6 === 0) { side = 0; sel = Math.min(team.length - 1, Math.floor(sel / 6)); draw(); return true; }
+      const n = sel; sel = gridMove(sel, 30, 6, k); if (n !== sel) draw(); return true; } });
+    return { key: k => C.key(k) };
+  }
+});
 screen("trade", "Places", "Trading", {
   scene: "trade", sceneOpts: () => ({ a: "sandshrew", b: "farfetch_d" }),
   what: "A trade with someone in town: what they want, the two side by side, the balls crossing, take good care of it.",

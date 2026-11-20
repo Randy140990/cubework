@@ -122,6 +122,7 @@ public class Retromon implements ModInitializer {
 			case "wait" -> Game.waitUntil(p, t);
 			case "nights", "prefs" -> Game.nights(p, t);
 			case "follow" -> Game.follow(p, t);
+			case "pc" -> Game.pc(p, t);
 			case "read" -> Game.read(p, t);
 			case "device" -> Game.device(p, t.getBooleanOr("on", false));
 			default -> {

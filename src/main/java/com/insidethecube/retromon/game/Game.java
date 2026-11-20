@@ -1128,6 +1128,35 @@ public final class Game {
 	}
 
 	/** FOLLOW from the party: that one walks with you now. */
+	/**
+	 * BILL's PC: one of your team into the box (never your last one able to battle), or one out of the box onto
+	 * your team (when there's room for it).
+	 */
+	public static void pc(ServerPlayer p, CompoundTag t) {
+		PlayerData d = data(p);
+		int i = t.getIntOr("i", -1);
+		switch (t.getStringOr("op", "")) {
+			case "deposit" -> {
+				if (i < 0 || i >= d.party.size() || d.party.size() <= 1) return;
+				Mon m = d.party.get(i);
+				long able = d.party.stream().filter(x -> !x.fainted()).count();
+				if (!m.fainted() && able <= 1) return;
+				d.party.remove(i);
+				d.box.add(m);
+				if (d.follow == i || d.follow >= d.party.size()) d.follow = 0;
+				else if (d.follow > i) d.follow--;
+			}
+			case "withdraw" -> {
+				if (i < 0 || i >= d.box.size() || d.party.size() >= 6) return;
+				d.party.add(d.box.remove(i));
+			}
+			default -> {
+				return;
+			}
+		}
+		sync(p);
+	}
+
 	public static void follow(ServerPlayer p, CompoundTag t) {
 		PlayerData d = data(p);
 		int i = t.getIntOr("i", 0);

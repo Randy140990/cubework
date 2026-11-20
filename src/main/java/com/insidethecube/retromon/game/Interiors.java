@@ -54,7 +54,7 @@ public final class Interiors {
 	public record Person(String key, String name, String skin, double x, double z, float yaw, List<String> lines, String role, boolean seated) {}
 
 	/** Something to look at in a room; map, a wall map that opens the Town Map. */
-	public record Act(double x0, double z0, double x1, double z1, List<String> lines, boolean map) {}
+	public record Act(double x0, double z0, double x1, double z1, List<String> lines, boolean map, boolean pc) {}
 
 	public record Room(String id, int ox, int oy, int oz, double w, double d, double h, String name, String floor, String place, double sx, double sz,
 			float syaw, double ex, double ez, float eyaw, double camX, double camZ, double camDist, int[] cells, List<Warp> warps, List<Person> people,
@@ -146,7 +146,7 @@ public final class Interiors {
 				JsonObject a = ae.getAsJsonObject();
 				JsonArray rc = a.getAsJsonArray("rect");
 				acts.add(new Act(rc.get(0).getAsDouble(), rc.get(1).getAsDouble(), rc.get(2).getAsDouble(), rc.get(3).getAsDouble(), strings(a.get("lines")),
-						a.has("map") && a.get("map").getAsBoolean()));
+						a.has("map") && a.get("map").getAsBoolean(), a.has("pc") && a.get("pc").getAsBoolean()));
 			}
 			Room room = new Room(e.getKey(), o.get(0).getAsInt(), o.get(1).getAsInt(), o.get(2).getAsInt(), num(r, "W", 16), num(r, "D", 14), num(r, "H", 4),
 					r.get("name").getAsString(), r.get("floor").getAsString(), r.get("place").getAsString(), num(sp, "x", 0), num(sp, "z", 0),
@@ -464,7 +464,7 @@ public final class Interiors {
 	}
 
 	/** Something in a room you're facing: what it says, how far ahead it is, and whether it's a map (the Town Map). */
-	public record Ahead(List<String> lines, double distance, Vec3 at, boolean map) {
+	public record Ahead(List<String> lines, double distance, Vec3 at, boolean map, boolean pc) {
 	}
 
 	/** The thing straight ahead of you in a room (0.5 to 2.1 blocks on), or null. */
@@ -487,7 +487,7 @@ public final class Interiors {
 				}
 			}
 			if (best != null && !best.lines().isEmpty())
-				return new Ahead(best.lines(), d, new Vec3(r.ox() + (best.x0() + best.x1()) / 2, r.oy() + 1.6, r.oz() + (best.z0() + best.z1()) / 2), best.map());
+				return new Ahead(best.lines(), d, new Vec3(r.ox() + (best.x0() + best.x1()) / 2, r.oy() + 1.6, r.oz() + (best.z0() + best.z1()) / 2), best.map(), best.pc());
 		}
 		return null;
 	}
