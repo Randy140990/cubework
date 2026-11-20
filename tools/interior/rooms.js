@@ -244,11 +244,14 @@ function boardStand(room, x0, z, w, f = "s", lines, mat = "boardLab") {
   room.act(F.rect(0, -0.2, w, 1.0), { label: "Read", lines });
   room.item("Whiteboard on a stand", "Steel frame on wheels; notes in marker, a pen tray.");
 }
-function healer(room, X, w) {
+function healer(room, X, w, o = {}) {
   const F = room.F(X, 0, "s");
   F.box(0, 0, 0, w, 1.1, 1.0, { all: "cupboardWhite", top: "lab", back: null, bottom: null });
   F.box(0.2, 1.1, 0.15, w - 0.2, 1.2, 0.85, "greyPlastic");
-  for (let i = 0; i < 6; i++) { const lx = 0.45 + (i % 3) * ((w - 0.9) / 2), lz = 0.35 + Math.floor(i / 3) * 0.3; F.box(lx - 0.1, 1.2, lz - 0.1, lx + 0.1, 1.38, lz + 0.1, { all: "ball", top: "ballTop" }); }
+  // Six slots on its top: balls resting in them (the lab's), or empty cups waiting for yours (the Center's).
+  for (let i = 0; i < 6; i++) { const lx = 0.45 + (i % 3) * ((w - 0.9) / 2), lz = 0.35 + Math.floor(i / 3) * 0.3;
+    if (o.empty) F.box(lx - 0.13, 1.2, lz - 0.13, lx + 0.13, 1.24, lz + 0.13, { all: "steel", top: "rubber" });
+    else F.box(lx - 0.1, 1.2, lz - 0.1, lx + 0.1, 1.38, lz + 0.1, { all: "ball", top: "ballTop" }); }
   F.box(0, 1.1, 0, w, 2.4, 0.15, { front: "labPanel", all: "greyPlastic" });
   F.solid(0, 0, w, 1.0);
   room.act(F.rect(0, 0.5, w, 1.5), { label: "Look", lines: ["A machine for resting creatures, six slots on its top.", "It's warm. Someone was using it this morning."] });
@@ -592,7 +595,7 @@ const BUILD = {
     R.act([5, 5.4, 15, 6.6], { label: "Talk", lines: ["The counter. The nurse will look after your POKéMON."] });
     R.item("The counter", "Long and red, a white top and stripe; a little bell in the middle and a till at the right.");
     // Behind it: the healing machine on the left, the PC and a big screen on the right.
-    healer(R, 6.0, 3);
+    healer(R, 6.0, 3, { empty: true });
     deskPC(R, 12.2, 0, "s", R.screen("pcNurse", 40, 26, drawPC, 0.9), { top: "lab", lines: ["The nurse's PC: today's patients, and a note to order more POTIONS."] });
     officeChair(R, 13.35, 1.6, "n", "redFabric");
     wallScreen(R, 11.9, 2.05, 2.9, 1.3, R.screen("centerAd", 40, 18, drawCenterAd, 1), ["A heart beating over a ball. WE HOPE TO SEE YOU AGAIN!"]);

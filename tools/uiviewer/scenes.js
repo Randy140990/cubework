@@ -110,7 +110,7 @@ const SCENES = {
     S.tick = (dt, t) => {
       poseFigure(prof, { talk: S.talking, point: S.point || 0, wave: S.wave || 0 });
       if (rival.root.visible) poseFigure(rival, { headYaw: Math.sin(t * 0.7) * 0.2 });
-      if (you && you.root.visible) poseFigure(you, { wave: S.youWave || 0 });
+      if (you && you.root.visible) poseFigure(you, { wave: S.youWave || 0, floss: S.youFloss || 0, lookUp: S.youLookUp || 0 });
       S.nextCry -= dt;
       if (S.nextCry < 0 && S.runners.length) { const r = S.runners[Math.floor(Math.random() * S.runners.length)]; playOnce(r, "cry"); S.nextCry = 2.5 + Math.random() * 2.5; }
       for (const r of S.runners) {
@@ -268,47 +268,63 @@ const SCENES = {
     return S;
   },
   // A shop or the healing desk: a counter, someone behind it, you in front.
+  // At the counter: the real Pokémon Center and Poké Mart (the Interior Viewer's rooms), the nurse or the clerk behind
+  // it and you in front. At the Center your balls go onto her machine one by one, glow, and come back.
   counter() {
     const group = new THREE.Group(), S = { group };
-    const build = kind => {
-      const R = new Room("ctr" + kind, { W: 12, D: 9, H: 4 });
-      shell(R, { paper: kind === "center" ? "paperMum" : "paperRival", floor: kind === "center" ? "checker" : "paleFloor" });
-      const F = R.F(2.5, 3.2, "s");
-      for (let i = 0; i < 7; i++) counterUnit(R, F, i, 1, kind === "center" ? "cupboardWhite" : "cupboard", "counter", kind === "center" ? "paint" : "mintPaint");
-      if (kind === "center") {
-        for (const x of [0.6, 4.0]) R.geo.box(x, 0, 0, x + 2.2, 3.0, 0.7, { all: "paint", s: "cupboardWhite" });
-        const M = R.F(7.2, 0.0, "s"); M.box(0, 0, 0, 2.4, 1.7, 1.0, { all: "silver", top: "darkTop" }); M.box(0.1, 1.7, 0.1, 2.3, 2.3, 0.9, { all: "glass" });
-        windowN(R, 9.8, 1.6, 1.8, 1.6, { pool: false });
-      } else {
-        bookshelf(R, 0.3, 0, "s", 2.4, 3.2, { trinkets: { 0: "ball", 2: "plant" } }); bookshelf(R, 2.9, 0, "s", 2.4, 3.2, { trinkets: { 1: "ball" } }); bookshelf(R, 9.3, 0, "s", 2.4, 3.2, {});
-        R.geo.box(5.6, 0, 0, 9.0, 2.6, 0.8, { all: "paint", s: "fridge" });
-      }
-      R.finish(); return R;
-    };
+    const build = id => { const R = BUILD[id](); R.finish(); return R; };
     S.rooms = { mart: build("mart"), center: build("center") };
     for (const r of Object.values(S.rooms)) group.add(r.group);
     const staff = { mart: figureOf(CLERK_LOOK), center: figureOf(NURSE_LOOK) };
-    for (const [k, f] of Object.entries(staff)) { f.root.position.set(6.0, 0, 2.4); f.root.rotation.y = Math.PI; group.add(f.root); }
+    staff.center.root.position.set(10.0, 0, 3.3); staff.center.root.rotation.y = 0;
+    staff.mart.root.position.set(1.7, 0, 9.4); staff.mart.root.rotation.y = Math.PI / 2;
+    for (const f of Object.values(staff)) group.add(f.root);
     let you = null, lookKey = "";
+    // Six balls: from you to the nurse, onto the machine's six cups (x 6.45 to 8.55, z .35 and .65 at y 1.24), lit, back.
+    const SLOT = i => new THREE.Vector3(6.45 + (i % 3) * 1.05, 1.36, 0.35 + Math.floor(i / 3) * 0.3);
+    const HAND = new THREE.Vector3(10.0, 1.2, 4.0);
     S.balls = [];
-    for (let i = 0; i < 6; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 10), new THREE.MeshLambertMaterial({ color: 0xE5525C, emissive: 0x000000 })); b.position.set(7.55 + (i % 3) * 0.55, 1.88, 0.3 + Math.floor(i / 3) * 0.45); group.add(b); S.balls.push(b); }
+    for (let i = 0; i < 6; i++) {
+      const b = new THREE.Group(), r = 0.15;
+      const top = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0xE5525C, emissive: 0 }));
+      const bot = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 10, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), new THREE.MeshLambertMaterial({ color: 0xF4F6F5, emissive: 0 }));
+      const band = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.02, r * 1.02, r * 0.18, 18), new THREE.MeshLambertMaterial({ color: 0x26304A }));
+      b.add(top, bot, band); b.visible = false; b.userData.m = [top.material, bot.material]; group.add(b); S.balls.push(b);
+    }
+    // The machine's glow while it works.
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.6), new THREE.MeshBasicMaterial({ color: 0xFFB8C8, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+    glow.position.set(7.5, 1.9, 0.18); group.add(glow);
     S.enter = o => {
       S.kind = o.kind || "mart";
       for (const [k, r] of Object.entries(S.rooms)) r.group.visible = k === S.kind;
       for (const [k, f] of Object.entries(staff)) f.root.visible = k === S.kind;
-      for (const b of S.balls) { b.visible = S.kind === "center"; b.material.emissive.setHex(0); }
+      for (const b of S.balls) b.visible = false;
       S.staff = staff[S.kind];
       const k = JSON.stringify(G.look);
       if (k !== lookKey) { if (you) group.remove(you.root); you = figureOf(G.look); group.add(you.root); lookKey = k; }
-      you.root.position.set(5.0, 0, 5.4); you.root.rotation.y = -0.2;
-      lightFor(6, 4, 10, 16); hemi3.color.set(0xfff6e8); hemi3.groundColor.set(0x8a7f74);
-      look3(4.6, 4.6, 10.6, 6.0, 1.3, 3.0);
+      if (S.kind === "center") { you.root.position.set(10.0, 0, 6.3); you.root.rotation.y = Math.PI; lightFor(10, 6, 12, 16); look3(12.6, 5.6, 13.2, 9.0, 1.4, 3.4); }
+      else { you.root.position.set(5.5, 0, 9.4); you.root.rotation.y = -Math.PI / 2; lightFor(5, 8, 12, 16); look3(9.4, 5.0, 14.6, 3.6, 1.3, 8.6); }
+      hemi3.color.set(0xfffaf2); hemi3.groundColor.set(0x9a9fb0);
       S.heal = 0;
     };
+    const ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
     S.tick = (dt, t) => {
-      if (S.staff) poseFigure(S.staff, { talk: S.talking, nod: S.bow ? 0.35 : 0 });
+      const R = S.rooms[S.kind]; if (R) for (const sc of R.screens) sc.tick(performance.now());
+      if (S.staff) poseFigure(S.staff, { talk: S.talking, nod: S.bow ? 0.35 : 0, point: S.kind === "center" && S.heal > 0 && S.heal < 0.42 ? 0.6 : 0 });
       if (you) poseFigure(you, {});
-      if (S.kind === "center") S.balls.forEach((b, i) => { const on = S.heal > 0 && S.heal * 6 > i; b.material.emissive.setHex(on ? (Math.sin(t * 14 + i) > 0 ? 0x8a2a30 : 0xff9aa0) : 0); });
+      // Healing: 0 to .4 the balls go on one by one, .4 to .75 the machine works (the balls flashing), .75 to 1 they come back.
+      const h = S.heal || 0, n = Math.min(6, G.party.length);
+      glow.material.opacity = S.kind === "center" && h > 0.4 && h < 0.78 ? 0.35 + 0.3 * Math.sin(t * 16) : 0;
+      S.balls.forEach((b, i) => {
+        if (S.kind !== "center" || !h || i >= n) { b.visible = false; return; }
+        const on0 = i * 0.06, a = ease((h - on0) / 0.06), back = ease((h - 0.78 - i * 0.02) / 0.12);
+        b.visible = h > on0 && back < 1;
+        const p = HAND.clone().lerp(SLOT(i), a); p.y += Math.sin(a * Math.PI) * 0.45;
+        if (back > 0) { p.copy(SLOT(i).lerp(HAND, back)); p.y += Math.sin(back * Math.PI) * 0.45; }
+        b.position.copy(p); b.rotation.y = t * 2;
+        const lit = h > 0.4 && h < 0.78 && Math.sin(t * 14 + i * 1.3) > 0;
+        for (const m of b.userData.m) m.emissive.setHex(lit ? 0x7A3040 : 0);
+      });
     };
     return S;
   },

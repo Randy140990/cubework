@@ -3,9 +3,29 @@ const MART = [["POKé BALL", 200], ["GREAT BALL", 600], ["POTION", 300], ["SUPER
 function bagCount(n) { for (const p of Object.values(G.bag)) for (const it of p) if (it[0] === n) return it[1]; return 0; }
 function addToBag(n, c) { for (const p of Object.values(G.bag)) for (const it of p) if (it[0] === n) { it[1] += c; return; } (/BALL/.test(n) ? G.bag["BALLS"] : G.bag["ITEMS"]).push([n, c, ""]); }
 function moneyBox() { const m = box(30, 30, 300, null, "g-panel", ""); m.style.padding = "12px 22px"; const draw = () => m.innerHTML = `<div class="g-label">Money</div><div style="font-size:30px;font-weight:900;font-variant-numeric:tabular-nums">${money(G.money)}</div>`; draw(); return draw; }
+// The shop's shelf, as Let's Go's: a white page of tiles, each thing's picture in its colour, its name and price; the
+// one you're on in sunny yellow with a red arrow. Resolves with the one picked, or -1.
+function martPick(C, onMove) {
+  return new Promise(res => {
+    const P = box(600, 30, 650, null, "g-panel g-pop", ""); P.style.padding = "22px 22px 18px"; P.style.borderRadius = "30px";
+    let sel = 0;
+    const draw = () => {
+      P.innerHTML = `<div class="g-title" style="font-size:22px;color:#E5525C;margin:0 0 12px 8px">${esc(T("BUY"))}</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">${MART.map(([n, pr], i) => { const on = i === sel, kc = GOODS[ITEM_KIND(n)];
+        return `<div data-i="${i}" style="position:relative;display:flex;align-items:center;gap:12px;height:74px;padding:0 16px 0 10px;border-radius:22px;cursor:pointer;background:${on ? "var(--g-sel)" : "#F5F8FD"};box-shadow:${on ? "0 0 0 3px #fff,0 0 0 6px #FFC93C,0 8px 16px rgba(232,150,30,.3)" : "inset 0 0 0 2px #E8EDF6"}">
+          ${on ? `<span style="position:absolute;left:-18px;font-size:20px;color:#E5525C">&#9654;</span>` : ""}
+          <span style="width:52px;height:52px;flex:none;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 0 0 3px ${kc[1]}"><span style="width:34px;height:34px">${ITEM_ICON(n)}</span></span>
+          <span style="font-weight:900;font-size:17px;color:#26304A;line-height:1.15">${esc(n)}</span><span style="margin-left:auto;font-weight:900;font-size:18px;color:#26304A">${money(pr)}</span></div>`; }).join("")}</div>`;
+      P.querySelectorAll("[data-i]").forEach(e => { e.onmouseenter = () => { sel = +e.dataset.i; draw(); onMove(sel); }; e.onclick = () => { sel = +e.dataset.i; done(sel); }; });
+    };
+    const w = { key(k) { if (["left", "right", "up", "down"].includes(k)) { sel = gridMove(sel, MART.length, 2, k); draw(); onMove(sel); return true; } if (k === "a") { done(sel); return true; } if (k === "b") { done(-1); return true; } return true; } };
+    const done = v => { C.pop(w); P.remove(); res(v); };
+    C.push(w); draw();
+  });
+}
 screen("mart", "Places", "Shop", {
   scene: "counter", sceneOpts: () => ({ kind: "mart" }),
-  what: "Buying and selling: the clerk's welcome, the list with prices and your money, how many, are you sure, thank you.",
+  what: "Buying and selling, in the real Mart: the clerk's welcome behind his counter, then the shelf as Let's Go's (a white page of tiles, each with its picture and price), how many, are you sure, thank you.",
+  tags: ["New look: the shop's shelf"],
   mod: "MartScreen: BUY and SELL, MONEY, CANCEL.",
   try: ["BUY, pick an item, up and down for how many, A to buy."],
   make() {
@@ -23,12 +43,12 @@ screen("mart", "Places", "Shop", {
           const showBag = i => inBag.innerHTML = `<span class="g-label">In your bag</span>&nbsp;&nbsp;<span style="font-size:22px;font-weight:900">${bagCount(MART[i][0])}</span>`;
           showBag(0);
           while (C.alive()) {
-            const i = await C.choose(MART.map(([n, p]) => ({ goods: n, right: money(p) })).concat([{ label: "CANCEL" }]), { x: 760, y: 30, w: 480, onMove: k => { if (k < MART.length) showBag(k); } });
-            if (i < 0 || i === MART.length) break;
+            const i = await martPick(C, showBag);
+            if (i < 0) break;
             const [n, p] = MART[i];
             let q = 1; const max = Math.max(1, Math.min(99, Math.floor(G.money / p)));
             const Q = box(440, 300, 300, null, "g-panel g-pop", ""); Q.style.padding = "16px 22px";
-            const dq = () => Q.innerHTML = `<div class="g-label">How many?</div><div style="display:flex;align-items:center;gap:18px;margin-top:6px"><span style="font-size:38px;font-weight:900">x${String(q).padStart(2, "0")}</span><span style="margin-left:auto;font-size:26px;font-weight:900">${money(q * p)}</span></div><div style="font-size:14px;color:#A9D4C6;font-weight:800">Up and down to change</div>`;
+            const dq = () => Q.innerHTML = `<div class="g-label">How many?</div><div style="display:flex;align-items:center;gap:18px;margin-top:6px"><span style="font-size:38px;font-weight:900">x${String(q).padStart(2, "0")}</span><span style="margin-left:auto;font-size:26px;font-weight:900">${money(q * p)}</span></div><div style="font-size:14px;color:var(--g-muted);font-weight:800">Up and down to change</div>`;
             dq();
             const ok = await new Promise(res => { const w = { key(k) { if (k === "up" || k === "down") { q = Math.max(1, Math.min(max, q + (k === "up" ? 1 : -1))); dq(); return true; } if (k === "right" || k === "left") { q = Math.max(1, Math.min(max, q + (k === "right" ? 10 : -10))); dq(); return true; } if (k === "a") { C.pop(w); res(true); return true; } if (k === "b") { C.pop(w); res(false); return true; } return true; } }; C.push(w); });
             Q.remove(); if (!ok) continue;
@@ -52,8 +72,8 @@ screen("mart", "Places", "Shop", {
 });
 screen("center", "Places", "Healing desk", {
   scene: "counter", sceneOpts: () => ({ kind: "center" }),
-  what: "Healing: the nurse's welcome, yes or no, your balls going into the machine and lighting up, then good as new.",
-  tags: ["New"], mod: "Today the nurse is on the roof; interiors come next.",
+  what: "Healing, in the real Center: the nurse's welcome, yes or no, then your balls go onto her machine one at a time, it hums and they flash, and they come back to you good as new.",
+  tags: ["New: the healing machine"], mod: "The nurse behind her counter in Viridian's Center.",
   make() {
     const C = ctl(), S = SC.counter;
     (async () => {
@@ -62,9 +82,9 @@ screen("center", "Places", "Healing desk", {
       if (v === 0) {
         await C.say([{ who: "NURSE", text: "OK. I'll take your POKéMON for a few seconds." }]);
         S.talking = false;
-        const notes = box(560, 210, 160, 80, "g-pop", `<div style="font-size:46px;color:#FFD45A;text-shadow:0 3px 6px rgba(0,0,0,.35)">&#9835; &#9834;</div>`);
-        await new Promise(r => { const t0 = performance.now(); const f = () => { if (!C.alive()) return; S.heal = Math.min(1, (performance.now() - t0) / 2600); if (S.heal < 1) requestAnimationFrame(f); else r(); }; f(); });
-        notes.remove(); S.heal = 0; for (const p of G.party) { p.hp = p.maxhp; p.status = ""; }
+        // Your balls go onto her machine one at a time, it hums and they flash, then they come back to you.
+        await new Promise(r => { const t0 = performance.now(); const f = () => { if (!C.alive()) return; S.heal = Math.min(1, (performance.now() - t0) / 5200); if (S.heal < 1) requestAnimationFrame(f); else r(); }; f(); });
+        S.heal = 0; for (const p of G.party) { p.hp = p.maxhp; p.status = ""; }
         S.talking = true; S.bow = true;
         await C.say([{ who: "NURSE", text: "Thank you for waiting. Your POKéMON are fighting fit!" }, { who: "NURSE", text: "We hope to see you again!" }]);
         S.bow = false;
@@ -84,7 +104,7 @@ screen("trade", "Places", "Trading", {
     (async () => {
       const v = await C.say([{ who: "TRADER", text: `I'm looking for a **${a}**. Will you trade one for my **${b}**?`, ask: ["YES", "NO"] }]);
       if (v !== 0) { await C.say([{ who: "TRADER", text: "Aww. If you change your mind, I'll be here." }]); if (C.alive()) go("hud"); return; }
-      const card = (who, sid, lv, ot) => `<div class="g-panel" style="position:relative;padding:16px 22px;width:400px"><div class="g-label">${who}</div><div style="display:flex;align-items:center;gap:10px;margin-top:4px"><span class="g-title" style="font-size:28px">${esc(ourName(sid))}</span><span style="margin-left:auto;font-weight:900;font-size:20px">Lv. ${lv}</span></div><div style="display:flex;gap:8px;margin-top:8px">${sp(sid).stats.types.map(typeChip).join("")}</div><div style="margin-top:8px;font-size:16px;font-weight:800;color:#A9D4C6">Trainer: ${esc(ot)}</div></div>`;
+      const card = (who, sid, lv, ot) => `<div class="g-panel" style="position:relative;padding:16px 22px;width:400px"><div class="g-label">${who}</div><div style="display:flex;align-items:center;gap:10px;margin-top:4px"><span class="g-title" style="font-size:28px">${esc(ourName(sid))}</span><span style="margin-left:auto;font-weight:900;font-size:20px">Lv. ${lv}</span></div><div style="display:flex;gap:8px;margin-top:8px">${sp(sid).stats.types.map(typeChip).join("")}</div><div style="margin-top:8px;font-size:16px;font-weight:800;color:var(--g-muted)">Trainer: ${esc(ot)}</div></div>`;
       const offer = box(60, 40, 1160, null, "", `<div style="display:flex;justify-content:space-between">${card("You send", "sandshrew", 18, G.name)}${card("You get", "farfetch_d", 18, "TRADER")}</div>`);
       const go_ = await C.choose(["TRADE", "CANCEL"], { x: 490, y: 360, w: 300 });
       offer.remove(); if (go_ !== 0) { if (C.alive()) go("hud"); return; }
@@ -167,8 +187,8 @@ function plate(side, p, o = {}) {
   e.style.padding = ours ? "15px 22px 14px" : "12px 22px"; e.style.borderRadius = "22px"; e.style.boxSizing = "border-box";
   const balls = o.balls ? `<div style="position:absolute;${ours ? "top:-30px;left:18px" : "top:-30px;right:18px"};display:flex;gap:4px">${o.balls.map(s => `<span style="width:22px;height:22px;display:inline-block;${s ? "" : "filter:grayscale(1);opacity:.45"}">${ICON.ball}</span>`).join("")}</div>` : "";
   const draw = () => { const f = p.hp / p.maxhp; e.innerHTML = `${balls}<div style="display:flex;align-items:center;gap:10px"><span class="g-title" style="font-size:27px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-weight:900;font-size:21px">Lv. ${p.lv}</span></div>
-    <div style="display:flex;align-items:center;gap:10px;margin-top:8px"><span style="font-weight:900;font-size:14px;letter-spacing:1px;color:#FFD45A">HP</span>${hpBar(f, ours ? 260 : 320)}${ours ? `<span style="font-weight:900;font-size:20px;font-variant-numeric:tabular-nums">${Math.ceil(p.hp)}/${p.maxhp}</span>` : ""}</div>
-    ${ours ? `<div style="display:flex;align-items:center;gap:10px;margin-top:6px"><span style="font-weight:900;font-size:12px;letter-spacing:1px;color:#6FC3FF">EXP</span><div class="g-exp" style="flex:1"><i style="width:${(p.exp || 0) * 100}%"></i></div></div>` : ""}`; };
+    <div style="display:flex;align-items:center;gap:10px;margin-top:8px"><span style="font-weight:900;font-size:14px;letter-spacing:1px;color:var(--g-gold)">HP</span>${hpBar(f, ours ? 260 : 320)}${ours ? `<span style="font-weight:900;font-size:20px;font-variant-numeric:tabular-nums">${Math.ceil(p.hp)}/${p.maxhp}</span>` : ""}</div>
+    ${ours ? `<div style="display:flex;align-items:center;gap:10px;margin-top:6px"><span style="font-weight:900;font-size:12px;letter-spacing:1px;color:#3C8DE4">EXP</span><div class="g-exp" style="flex:1"><i style="width:${(p.exp || 0) * 100}%"></i></div></div>` : ""}`; };
   draw(); return { el: e, draw };
 }
 const CHART = { ELECTRIC: { FLYING: 2, WATER: 2, GROUND: 0, GRASS: 0.5, ELECTRIC: 0.5 }, NORMAL: { ROCK: 0.5, GHOST: 0 }, FLYING: { GRASS: 2, BUG: 2, FIGHTING: 2, ELECTRIC: 0.5, ROCK: 0.5 } };
@@ -192,12 +212,12 @@ function commandButtons(onPick, o = {}) {
     const e = box(X, y, W, hh, "", `<div style="position:relative;width:100%;height:100%;border-radius:${hh / 2}px;overflow:hidden;display:flex;align-items:center;gap:14px;padding:0 22px 0 ${big ? 12 : 10}px;
       background:linear-gradient(180deg, ${lighterHex(c, 0.18)} 0%, ${c} 48%, ${darkerHex(c, 0.22)} 100%);border:3px solid rgba(255,255,255,.9);box-shadow:0 6px 0 ${darkerHex(c, 0.45)},0 12px 22px rgba(0,0,0,.3);transition:transform .15s, box-shadow .15s">
       <span style="position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0))"></span>
-      <span style="position:absolute;right:-30px;top:-40px;width:${hh * 2}px;height:${hh * 2}px;border-radius:50%;background:rgba(255,255,255,.08)"></span>
+      <span style="position:absolute;right:-30px;top:-40px;width:${hh * 2}px;height:${hh * 2}px;border-radius:50%;background:#F1F4FB"></span>
       <span style="position:relative;width:${big ? 56 : 44}px;height:${big ? 56 : 44}px;flex:none;border-radius:50%;background:${darkerHex(c, 0.3)};display:grid;place-items:center;box-shadow:inset 0 3px 6px rgba(0,0,0,.25)"><span style="width:${big ? 40 : 30}px;height:${big ? 40 : 30}px">${CMD_ICON[n]}</span></span>
       <span style="position:relative;font-family:Fredoka,Nunito,sans-serif;font-weight:700;font-size:${big ? 32 : 24}px;letter-spacing:1.5px;color:#fff;text-shadow:0 2px 0 ${darkerHex(c, 0.45)}">${n}</span></div>`);
     e.style.cursor = "pointer"; e.onclick = () => { sel = i; paint(); onPick(i); }; e.onmouseenter = () => { sel = i; paint(); }; return e; });
   const arrow = box(X - 46, 0, 36, 36, "", `<style>@keyframes cmdbob{50%{transform:translateX(-7px)}}</style><svg viewBox="0 0 36 36" style="animation:cmdbob .7s ease-in-out infinite;filter:drop-shadow(0 3px 0 rgba(0,0,0,.3))"><path d="M6 4l26 14L6 32l6-14z" fill="#FFF4D8" stroke="#26304A" stroke-width="3" stroke-linejoin="round"/></svg>`);
-  const pill = box(null, 330, null, null, "g-panel soft", `<div style="padding:11px 22px;font-size:19px;font-weight:900;white-space:nowrap">What will <span style="color:#FFD45A">${esc(o.who)}</span> do?</div>`); pill.style.borderRadius = "999px"; pill.style.left = "auto"; pill.style.right = (1280 - X - W) + "px";
+  const pill = box(null, 330, null, null, "g-panel soft", `<div style="padding:11px 22px;font-size:19px;font-weight:900;white-space:nowrap">What will <span style="color:var(--g-gold)">${esc(o.who)}</span> do?</div>`); pill.style.borderRadius = "999px"; pill.style.left = "auto"; pill.style.right = (1280 - X - W) + "px";
   const paint = () => { els.forEach((e, i) => { const d = e.firstChild, on = i === sel; d.style.transform = on ? "translateX(-14px) scale(1.03)" : "none"; d.style.borderColor = on ? "#FFF4D8" : "rgba(255,255,255,.75)"; d.style.filter = on ? "none" : "saturate(.8) brightness(.92)"; });
     const [, , y, hh] = B[sel]; arrow.style.top = (y + hh / 2 - 18) + "px"; arrow.style.left = (X - 54) + "px"; };
   paint();
@@ -221,8 +241,8 @@ function battleBag(C, o = {}) {
             <div style="position:absolute;left:18px;top:18px;width:72px;height:72px;border-radius:50%;background:${on ? "#fff" : "rgba(255,255,255,.7)"};display:grid;place-items:center"><span style="width:44px;height:44px">${ICON[ic]}</span></div>
             <div style="position:absolute;left:104px;top:22px;font-size:24px;font-weight:900;color:${on ? "#fff" : "#CFEDE3"}">${n}</div>
             <div style="position:absolute;left:104px;top:58px;font-size:19px;font-weight:800;color:${on ? "rgba(255,255,255,.9)" : "rgba(207,237,227,.7)"}">${k ? k + (k === 1 ? " kind" : " kinds") : "Empty"}</div></div>`; }).join("")}
-        <div style="position:absolute;left:360px;top:90px;width:510px">${items.map(([n, c], i) => `<div data-i="${i}" style="margin-bottom:8px">${goodsRow(n, "x" + c, i === sel, 54)}</div>`).join("") || `<div style="font-size:21px;font-weight:800;color:#A9D4C6;padding:14px 10px">${pk === 0 ? "No POKé BALLS yet. A POKé MART sells them." : "No medicine to use in battle."}</div>`}</div>
-        <div class="g-panel soft" style="position:absolute;left:360px;top:418px;width:510px;height:92px;box-sizing:border-box;padding:18px 24px;font-size:19px;font-weight:800;color:#CFEDE3">${items[sel] ? esc(items[sel][2]) : ""}</div>`;
+        <div style="position:absolute;left:360px;top:90px;width:510px">${items.map(([n, c], i) => `<div data-i="${i}" style="margin-bottom:8px">${goodsRow(n, "x" + c, i === sel, 54)}</div>`).join("") || `<div style="font-size:21px;font-weight:800;color:var(--g-muted);padding:14px 10px">${pk === 0 ? "No POKé BALLS yet. A POKé MART sells them." : "No medicine to use in battle."}</div>`}</div>
+        <div class="g-panel soft" style="position:absolute;left:360px;top:418px;width:510px;height:92px;box-sizing:border-box;padding:18px 24px;font-size:19px;font-weight:800;color:var(--g-muted)">${items[sel] ? esc(items[sel][2]) : ""}</div>`;
       P.querySelectorAll("[data-p]").forEach(e => e.onclick = () => { pk = +e.dataset.p; sel = 0; draw(); });
       P.querySelectorAll("[data-i]").forEach(e => { e.onmouseenter = () => { sel = +e.dataset.i; draw(); }; e.onclick = () => { sel = +e.dataset.i; done(items[sel][0]); }; });
     };
@@ -247,7 +267,7 @@ function movePanel(p, foeSid, onPick, onBack) {
       <span class="g-type" style="background:${TYPECOL(m.type)};min-width:44px;padding:2px 8px;font-size:11px">${esc((m.type || "").slice(0, 3))}</span><span>${esc(n)}</span><span style="margin-left:auto;font-variant-numeric:tabular-nums">${m.pp}/${m.pp}</span></div>`; }).join("");
     const m = MOVE[p.moves[sel]] || {}, e = eff(m.type, foeSid);
     info.innerHTML = `<div style="display:flex;align-items:center;gap:10px">${typeChip(m.type)}<span class="g-label">${esc(m.category || "")}</span><span style="margin-left:auto;font-weight:900;font-size:15px;color:${e > 1 ? "#8FF5C0" : e < 1 ? "#FFB3B8" : "#A9D4C6"}">${e > 1 ? "Super effective" : e === 0 ? "No effect" : e < 1 ? "Not very effective" : "Effective"}</span></div>
-      <div style="display:flex;gap:22px;margin-top:8px;font-size:18px;font-weight:900"><span><span class="g-label">Power</span> ${m.power > 1 ? m.power : "—"}</span><span><span class="g-label">Accuracy</span> ${m.accuracy || "—"}</span></div><div style="margin-top:6px;font-size:17px;font-weight:800;color:#E8F4EF">${esc(m.desc || "")}</div>`;
+      <div style="display:flex;gap:22px;margin-top:8px;font-size:18px;font-weight:900"><span><span class="g-label">Power</span> ${m.power > 1 ? m.power : "—"}</span><span><span class="g-label">Accuracy</span> ${m.accuracy || "—"}</span></div><div style="margin-top:6px;font-size:17px;font-weight:800;color:var(--g-text)">${esc(m.desc || "")}</div>`;
     L.querySelectorAll("[data-i]").forEach(el => el.onclick = () => { sel = +el.dataset.i; paint(); onPick(sel); });
   };
   paint();
@@ -261,7 +281,7 @@ screen("challenge", "Battle", "A trainer challenges you", {
     const C = ctl(), S = SC.battle; C.sayAt = { x: 520, w: 724 };
     look3(0.6, 1.5, 3.4, 2.2, 1.05, -2.4);
     const lines = box(0, 0, 1280, 720, "", `<div style="position:absolute;inset:0;background:repeating-linear-gradient(-12deg, rgba(255,255,255,.0) 0 26px, rgba(255,255,255,.28) 26px 30px);background-size:400px 100%;animation:sl 0.5s linear infinite"></div><style>@keyframes sl{to{background-position:400px 0}}</style>`);
-    const card = box(1280, 180, 640, null, "", `<div style="background:linear-gradient(90deg,rgba(229,82,92,0),rgba(229,82,92,.95) 25%);padding:22px 60px 22px 160px;transform:skewX(-12deg);border-top:4px solid #FFD45A;border-bottom:4px solid #FFD45A"><div style="transform:skewX(12deg)"><div class="g-label" style="color:#FFE6C0">Trainer</div><div class="g-title" style="font-size:52px">${FOE_TRAINER}</div></div></div>`);
+    const card = box(1280, 180, 640, null, "", `<div style="background:linear-gradient(90deg,rgba(229,82,92,0),rgba(229,82,92,.95) 25%);padding:22px 60px 22px 160px;transform:skewX(-12deg);border-top:4px solid #FFD45A;border-bottom:4px solid #FFD45A"><div style="transform:skewX(12deg)"><div class="g-label" style="color:var(--g-text)">Trainer</div><div class="g-title" style="font-size:52px">${FOE_TRAINER}</div></div></div>`);
     card.style.transition = "left .5s cubic-bezier(.2,.9,.2,1)"; later(60, () => card.style.left = "640px");
     (async () => {
       S.foePoint = 0;
@@ -358,10 +378,10 @@ screen("catch", "Battle", "Catching", {
         uiRoot.querySelectorAll(".g-text").forEach(x => x.remove());
         // The ball shakes three times on its own, a dot for each, then clicks shut.
         S.shakeT = 0;
-        const dots = box(cx - 80, Math.max(90, cy - 150), 160, null, "g-panel g-pop", `<div id="shk" style="padding:10px 0;text-align:center;font-size:34px;font-weight:900;letter-spacing:10px;color:#FFD45A">&middot;</div>`); dots.style.borderRadius = "999px";
+        const dots = box(cx - 80, Math.max(90, cy - 150), 160, null, "g-panel g-pop", `<div id="shk" style="padding:10px 0;text-align:center;font-size:34px;font-weight:900;letter-spacing:10px;color:var(--g-gold)">&middot;</div>`); dots.style.borderRadius = "999px";
         for (let n = 1; n <= 3; n++) { await C.wait(1100); const e = $("#shk"); if (e) e.innerHTML = "&middot;".repeat(Math.min(3, n + 1)); }
         dots.remove(); S.shakeT = null;
-        const st = box(cx - 120, cy - 160, 240, 120, "g-pop", `<div style="font-size:60px;text-align:center;color:#FFD45A;text-shadow:0 0 20px #FFD45A">&#10022; &#10022; &#10022;</div>`);
+        const st = box(cx - 120, cy - 160, 240, 120, "g-pop", `<div style="font-size:60px;text-align:center;color:var(--g-gold);text-shadow:0 0 20px #FFD45A">&#10022; &#10022; &#10022;</div>`);
         const cg = add(h("div", "g-callout", "Gotcha!")); cg.style.left = "640px"; cg.style.top = "150px";
         await C.say([{ text: `Gotcha! **${foeN}** was caught!` }]); st.remove();
         await C.say([{ text: `**${foeN}**'s data was added to the **POKéDEX**.` }]);
@@ -386,7 +406,7 @@ screen("levelup", "Battle", "EXP and levelling up", {
       uiRoot.querySelectorAll(".g-text").forEach(x => x.remove());
       p.lv++; p.exp = 0.08; const before = p.stats, after = statsAt(p.sid, p.lv); p.stats = after; p.maxhp = after.HP; P1.draw();
       const names = [["HP", "HP"], ["Attack", "ATTACK"], ["Defense", "DEFENSE"], ["Sp. Atk", "SPCL.ATK"], ["Sp. Def", "SPCL.DEF"], ["Speed", "SPEED"]];
-      const T = box(860, 120, 380, null, "g-panel g-pop", `<div style="padding:16px 22px;display:grid;gap:8px">${names.map(([k, l]) => `<div style="display:flex;align-items:center;font-size:20px;font-weight:900"><span class="g-label" style="width:140px">${l}</span><span style="flex:1;text-align:right;font-variant-numeric:tabular-nums">${after[k]}</span><span style="width:70px;text-align:right;color:#8FF5C0">+${Math.max(1, after[k] - before[k])}</span></div>`).join("")}</div>`);
+      const T = box(860, 120, 380, null, "g-panel g-pop", `<div style="padding:16px 22px;display:grid;gap:8px">${names.map(([k, l]) => `<div style="display:flex;align-items:center;font-size:20px;font-weight:900"><span class="g-label" style="width:140px">${l}</span><span style="flex:1;text-align:right;font-variant-numeric:tabular-nums">${after[k]}</span><span style="width:70px;text-align:right;color:#2FA86C">+${Math.max(1, after[k] - before[k])}</span></div>`).join("")}</div>`);
       await C.say([{ text: `**${n}** grew to Lv. **${p.lv}**!` }]); T.remove();
       const v = await C.say([{ text: `**${n}** wants to learn the move **SWIFT**.` }, { text: `But **${n}** already knows four moves. Forget one to make room for **SWIFT**?`, ask: ["YES", "NO"] }]);
       if (v === 0) {
@@ -426,7 +446,7 @@ screen("evolve", "Battle", "Evolving", {
 });
 screen("victory", "Battle", "Winning", {
   scene: "battle", sceneOpts: () => ({ ours: "pikachu", foe: "spearow", trainer: true }),
-  what: "You've won: the trainer has their say, and you get prize money, counting up.",
+  what: "You've won: the trainer has their say, you get prize money, counting up, then the celebration holds with your EXP until you press Continue.",
   mod: "BattleScreen: after a win you celebrate, a different way each time.",
   make() {
     const C = ctl(), S = SC.battle; C.sayAt = { x: 520, w: 724 }; S.foeHidden = 1;
@@ -437,6 +457,14 @@ screen("victory", "Battle", "Winning", {
       const draw = moneyBox(); const start = G.money; G.money += 240;
       await new Promise(r => { const t0 = performance.now(); const f = () => { const k = Math.min(1, (performance.now() - t0) / 900); const m = Math.round(start + 240 * k); const keep = G.money; G.money = m; draw(); G.money = keep; if (k < 1) requestAnimationFrame(f); else { draw(); r(); } }; f(); });
       await C.say([{ text: `**${G.name}** got **₽240** for winning!` }]);
+      // The celebration holds (EXP shown) until you choose to carry on.
+      uiRoot.querySelectorAll(".g-text").forEach(e => e.remove());
+      const lead = G.party[0];
+      box(40, 520, 460, null, "g-panel g-pop", `<div style="padding:16px 22px;display:grid;gap:8px"><div style="display:flex;align-items:center;gap:10px"><span class="g-title" style="font-size:26px">${esc(ourName(lead.sid))}</span><span style="margin-left:auto;font-weight:900;font-size:20px">Lv. ${lead.lv}</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-weight:900;font-size:13px;color:#3C8DE4;letter-spacing:1px">EXP</span><div class="g-exp" style="flex:1;height:10px;background:#DDE3F0"><i id="vx" style="width:${lead.exp * 100}%;background:linear-gradient(90deg,#7CC2FA,#3C8DE4)"></i></div><span style="font-weight:900;color:#3C8DE4">+214</span></div></div>`);
+      later(200, () => { const e = $("#vx"); if (e) e.style.width = Math.min(100, lead.exp * 100 + 25) + "%"; });
+      actions([{ key: "a", label: "Continue" }], { right: true });
+      await new Promise(r => C.push({ key(k) { if (k === "a") { r(); return true; } return true; } }));
       S.cheer = 0; if (C.alive()) go("whiteout");
     })();
     return { key: k => C.key(k), leave() { S.cheer = 0; } };
@@ -482,33 +510,33 @@ const ROLE = {
   ShiftLeft: ["decide", "Crouch", "To decide: off, or run."], ShiftRight: ["decide", "Crouch", "To decide."], ControlLeft: ["decide", "Sprint", "To decide: run, or off."],
   Digit1: ["off", "Hotbar", "1 to 9: off. There's no hotbar."], Digit2: ["off", "Hotbar", ""], Digit3: ["off", "Hotbar", ""], Digit4: ["off", "Hotbar", ""], Digit5: ["off", "Hotbar", ""], Digit6: ["off", "Hotbar", ""], Digit7: ["off", "Hotbar", ""], Digit8: ["off", "Hotbar", ""], Digit9: ["off", "Hotbar", ""],
 };
-const ROLECOL = { game: ["#4FB896", "#062019", "In game"], menu: ["#FFF4D8", "#26304A", "In menus"], dev: ["#8E6BC8", "#fff", "For building"], free: ["#7C8A99", "#fff", "Minecraft's, kept"], off: ["#E5525C", "#fff", "Turned off"], decide: ["#F0B43C", "#26304A", "To decide"] };
+const ROLECOL = { game: ["#41BF84", "#fff", "In game"], menu: ["#FFD34E", "#26304A", "In menus"], dev: ["#8E6BC8", "#fff", "For building"], free: ["#7C8A99", "#fff", "Minecraft's, kept"], off: ["#E5525C", "#fff", "Turned off"], decide: ["#F0B43C", "#26304A", "To decide"] };
 screen("keymap", "Controls", "Key map", {
   what: "Every key: what it does in the world, what it does in menus, and what Retromon turns off (Axiom, shaders on and off, map mods, the hotbar, the inventory, the camera view).",
   tags: ["New"], mod: "Adventure: SPACE talks, ENTER opens the menu, TAB speeds up, F7 turns Retromon on and off.",
   try: ["Point at a key, or move round them with the arrows."],
   make(arg) {
-    backdrop("linear-gradient(160deg,#1D5A52,#123C38 60%,#0A2422)");
+    backdrop(SKY); rays(85, 0, 0.18);
     let ri = 2, ci = 2;
     const U = 62, X0 = 40, Y0 = 60;
     const kb = box(0, 0, 1280, 720, "", "");
     const info = box(40, 470, 760, 220, "g-panel", ""); info.style.padding = "18px 24px";
     const side = box(830, 470, 410, 220, "g-panel", ""); side.style.padding = "16px 22px";
     side.innerHTML = `<div class="g-label">Also turned off</div><div style="display:grid;gap:6px;margin-top:8px;font-size:17px;font-weight:800">
-      <div><span style="color:#FF9AA0">&#9632;</span> Axiom: its editor and every key it adds</div><div><span style="color:#FF9AA0">&#9632;</span> Mouse: breaking, placing, picking blocks, the hotbar wheel</div>
-      <div><span style="color:#FF9AA0">&#9632;</span> Minecraft's inventory, recipes and creative menus</div><div><span style="color:#FF9AA0">&#9632;</span> Turning the shaders off, or swapping them</div></div>`;
+      <div><span style="color:#E5525C">&#9632;</span> Axiom: its editor and every key it adds</div><div><span style="color:#E5525C">&#9632;</span> Mouse: breaking, placing, picking blocks, the hotbar wheel</div>
+      <div><span style="color:#E5525C">&#9632;</span> Minecraft's inventory, recipes and creative menus</div><div><span style="color:#E5525C">&#9632;</span> Turning the shaders off, or swapping them</div></div>`;
     const draw = () => {
       let html = "";
       KB.forEach((row, r) => { let x = X0; row.forEach(([l, w, code], c) => { const role = ROLE[code], col = role ? ROLECOL[role[0]] : null, on = r === ri && c === ci;
         if (l !== "" || code.startsWith("x") === false) html += `<div data-r="${r}" data-c="${c}" style="position:absolute;left:${x}px;top:${Y0 + r * (U + 6)}px;width:${w * U - 6}px;height:${U - 6}px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:${l.length > 3 ? 15 : 19}px;cursor:pointer;
-          background:${col ? col[0] : "rgba(255,255,255,.08)"};color:${col ? col[1] : "#A9D4C6"};${role && role[0] === "off" ? "background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.15) 0 6px,transparent 6px 12px);" : ""}
-          box-shadow:${on ? "0 0 0 4px #FFF4D8, 0 8px 18px rgba(0,0,0,.4)" : "0 3px 0 rgba(0,0,0,.3)"};transform:${on ? "translateY(-3px)" : "none"}">${code.startsWith("x") ? "" : l}</div>`;
+          background:${col ? col[0] : "#fff"};color:${col ? col[1] : "var(--g-dim)"};${role && role[0] === "off" ? "background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.15) 0 6px,transparent 6px 12px);" : ""}
+          box-shadow:${on ? "0 0 0 3px #fff, 0 0 0 6px #E5525C, 0 8px 18px rgba(30,40,84,.3)" : "0 3px 0 rgba(30,40,84,.18)"};transform:${on ? "translateY(-3px)" : "none"}">${code.startsWith("x") ? "" : l}</div>`;
         x += w * U; }); });
-      html += `<div style="position:absolute;left:${X0}px;top:20px;display:flex;gap:16px;font-size:15px;font-weight:900">${Object.values(ROLECOL).map(([b, f, n]) => `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:16px;height:16px;border-radius:5px;background:${b}"></span>${n}</span>`).join("")}</div>`;
+      html += `<div style="position:absolute;left:${X0}px;top:20px;display:flex;gap:16px;font-size:15px;font-weight:900;color:#26304A">${Object.values(ROLECOL).map(([b, f, n]) => `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:16px;height:16px;border-radius:5px;background:${b}"></span>${n}</span>`).join("")}</div>`;
       kb.innerHTML = html;
       const [l, , code] = KB[ri][ci], role = ROLE[code];
-      info.innerHTML = role ? `<div style="display:flex;align-items:center;gap:14px"><span class="g-key" style="min-width:56px;height:40px;font-size:18px">${l}</span><span class="g-title" style="font-size:28px">${esc(role[1])}</span><span style="margin-left:auto;padding:3px 12px;border-radius:999px;background:${ROLECOL[role[0]][0]};color:${ROLECOL[role[0]][1]};font-weight:900;font-size:14px">${ROLECOL[role[0]][2]}</span></div><div style="margin-top:12px;font-size:20px;font-weight:800;color:#E8F4EF;line-height:1.5">${esc(role[2])}</div>`
-        : `<div style="display:flex;align-items:center;gap:14px"><span class="g-key" style="min-width:56px;height:40px;font-size:18px">${l || "&nbsp;"}</span><span class="g-title" style="font-size:26px;color:#A9D4C6">Not used</span></div><div style="margin-top:12px;font-size:19px;font-weight:800;color:#A9D4C6">Free for now.</div>`;
+      info.innerHTML = role ? `<div style="display:flex;align-items:center;gap:14px"><span class="g-key" style="min-width:56px;height:40px;font-size:18px">${l}</span><span class="g-title" style="font-size:28px">${esc(role[1])}</span><span style="margin-left:auto;padding:3px 12px;border-radius:999px;background:${ROLECOL[role[0]][0]};color:${ROLECOL[role[0]][1]};font-weight:900;font-size:14px">${ROLECOL[role[0]][2]}</span></div><div style="margin-top:12px;font-size:20px;font-weight:800;color:var(--g-text);line-height:1.5">${esc(role[2])}</div>`
+        : `<div style="display:flex;align-items:center;gap:14px"><span class="g-key" style="min-width:56px;height:40px;font-size:18px">${l || "&nbsp;"}</span><span class="g-title" style="font-size:26px;color:var(--g-muted)">Not used</span></div><div style="margin-top:12px;font-size:19px;font-weight:800;color:var(--g-muted)">Free for now.</div>`;
       kb.querySelectorAll("[data-r]").forEach(e => { e.onmouseenter = () => { ri = +e.dataset.r; ci = +e.dataset.c; draw(); }; });
     };
     draw();

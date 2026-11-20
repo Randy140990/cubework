@@ -184,6 +184,14 @@ function poseFigure(f, o) {
   if (o.wave) { f.armR.j.rotation.z = 2.7 * o.wave + Math.sin(t * 9) * 0.25 * o.wave; f.armR.j.rotation.x = 0; }
   if (o.point) { f.armR.j.rotation.x = 1.5 * o.point; f.armR.j.rotation.z = 0.1; }
   if (o.cheer) { f.armL.j.rotation.z = -2.7 * o.cheer; f.armR.j.rotation.z = 2.7 * o.cheer; f.armL.j.rotation.x = f.armR.j.rotation.x = 0; f.hips.position.y += Math.abs(Math.sin(t * 7)) * 0.12 * o.cheer; }
+  // The floss: both arms swung straight to one side and the other, one in front and one behind (swapping each
+  // swing), the hips swaying the other way.
+  if (o.floss) {
+    const k = o.floss, p = Math.sin(t * 7.2), q = Math.cos(t * 7.2) >= 0 ? 1 : -1;
+    f.armL.j.rotation.z = f.armR.j.rotation.z = 0.62 * p * k;
+    f.armL.j.rotation.x = 0.42 * q * k; f.armR.j.rotation.x = -0.42 * q * k;
+    f.hips.position.x = -0.07 * p * k; f.hips.rotation.z = 0.06 * p * k;
+  } else { f.hips.position.x = 0; f.hips.rotation.z = 0; }
   f.head.rotation.y = o.headYaw || 0;
-  f.head.rotation.x = o.talk ? Math.sin(performance.now() / 120) * 0.05 : (o.nod || 0);
+  f.head.rotation.x = o.talk ? Math.sin(performance.now() / 120) * 0.05 : (o.nod || 0) - (o.lookUp || 0);
 }

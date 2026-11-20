@@ -139,9 +139,11 @@ const ICON = {
   key: `<svg viewBox="0 0 64 64"><circle cx="22" cy="24" r="12" fill="none" stroke="#FFD45A" stroke-width="7"/><path d="M30 32l20 20M42 44l6-6M48 50l5-5" stroke="#FFD45A" stroke-width="7" stroke-linecap="round"/></svg>`,
   disc: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#5A8EA1"/><circle cx="32" cy="32" r="24" fill="none" stroke="#9FD3E2" stroke-width="3"/><circle cx="32" cy="32" r="7" fill="#123C38"/><path d="M18 24a16 16 0 0 1 14-8" stroke="#fff" stroke-width="3" fill="none" opacity=".7"/></svg>`,
   heal: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#F08AA8"/><rect x="27" y="16" width="10" height="32" rx="3" fill="#fff"/><rect x="16" y="27" width="32" height="10" rx="3" fill="#fff"/></svg>`,
+  parcel: `<svg viewBox="0 0 64 64"><path d="M8 22l24-10 24 10v26L32 58 8 48z" fill="#D9A867"/><path d="M8 22l24 10 24-10" fill="none" stroke="#B07D3E" stroke-width="2.5"/><path d="M32 32v26" stroke="#B07D3E" stroke-width="2.5"/><path d="M8 22l24 10 24-10L32 12z" fill="#ECC489"/><path d="M20 17l24 10v10" stroke="#E5525C" stroke-width="4" fill="none"/><path d="M44 17L20 27" stroke="#E5525C" stroke-width="4"/><rect x="36" y="38" width="14" height="9" rx="2" fill="#FFF6E0" transform="skewY(-22)"/></svg>`,
+  sparkle: `<svg viewBox="0 0 40 40"><path d="M20 2l4 14 14 4-14 4-4 14-4-14-14-4 14-4z" fill="#fff"/></svg>`,
   badge: c => `<svg viewBox="0 0 64 64"><path d="M32 6l8 14 16 2-12 11 3 16-15-8-15 8 3-16L8 22l16-2z" fill="${c}"/><circle cx="32" cy="28" r="6" fill="#fff" opacity=".5"/></svg>`,
 };
-const ITEM_ICON = n => /BALL/.test(n) ? ICON.ball : /POTION|HEAL|ANTIDOTE|AWAKENING/.test(n) ? ICON.potion : /^TM|^HM/.test(n) ? ICON.disc : /MAP/.test(n) ? ICON.map : /ROPE|REPEL/.test(n) ? ICON.bag : ICON.key;
+const ITEM_ICON = n => /PARCEL/.test(n) ? ICON.parcel : /BALL/.test(n) ? ICON.ball : /POTION|HEAL|ANTIDOTE|AWAKENING/.test(n) ? ICON.potion : /^TM|^HM/.test(n) ? ICON.disc : /MAP/.test(n) ? ICON.map : /ROPE|REPEL/.test(n) ? ICON.bag : ICON.key;
 // Each sort of thing's colours in a list (light, middle, deep), as the menu's big buttons; the game's V.GOODS.
 const GOODS = { ball: ["#F27682", "#D94452", "#AE2E3C"], med: ["#6BDCA2", "#39B27A", "#22855A"], tm: ["#8EC4F6", "#4A8FE0", "#2F64B0"], key: ["#FFD27A", "#F0A030", "#C87818"], field: ["#C6AEF4", "#8A62D8", "#6440B0"] };
 const ITEM_KIND = n => /BALL/.test(n) ? "ball" : /POTION|HEAL|ANTIDOTE|AWAKENING|REVIVE|ETHER|ELIXIR/.test(n) ? "med" : /^TM|^HM/.test(n) ? "tm" : /ROPE|REPEL/.test(n) ? "field" : "key";
@@ -172,11 +174,34 @@ function go(id, arg) {
   try { history.replaceState(null, "", "#" + id); } catch (e) {}
 }
 function step(d) { const i = SCREENS.indexOf(curDef); go(SCREENS[(i + d + SCREENS.length) % SCREENS.length].id); }
+// What each key does, bottom right: buttons you can click as well as press (each sends its key).
+const HINTKEY = { A: "a", SPACE: "a", B: "b", ESC: "b", TAB: "tab", X: "x", Y: "y" };
+function pressKey(k) { if (cur && cur.key) cur.key(k); }
 function hints(list, o = {}) {
   // A and B are the keyboard's SPACE and ESC (the letter A on a keyboard is "left"), so say so.
   const KB = { A: "SPACE", B: "ESC" };
-  const e = h("div", "g-hints", list.map(([k, l]) => { k = KB[k] || k; return `<span><span class="g-key${k.length === 1 ? " round" : ""}">${esc(k)}</span>${esc(l)}</span>`; }).join(""));
+  const e = h("div", "g-hints");
+  for (const [k0, l] of list) {
+    const k = KB[k0] || k0, cls = { SPACE: "k-a", ESC: "k-b", TAB: "k-tab", X: "k-x" }[k] || "";
+    const b = h("span", "g-btn", `<span class="g-key ${cls}${k.length === 1 ? " round" : ""}">${esc(k)}</span>${esc(T(l))}`);
+    const send = HINTKEY[k0] || HINTKEY[k];
+    if (send) b.addEventListener("click", ev => { ev.stopPropagation(); pressKey(send); });
+    e.appendChild(b);
+  }
   if (o.left) { e.style.right = "auto"; e.style.left = "22px"; }
+  return add(e);
+}
+// The big buttons on the screens you step through: [B Back] and [A Continue] (or whatever they're called), centred
+// at the foot of the screen, clicked or pressed.
+function actions(list, o = {}) {
+  const e = h("div", "g-acts");
+  if (o.bottom != null) e.style.bottom = o.bottom + "px";
+  if (o.right) { e.style.justifyContent = "flex-end"; e.style.right = "28px"; e.style.left = "auto"; }
+  for (const it of list) {
+    const go = it.key === "a", b = h("span", "g-act" + (go ? " go" : ""), `<span class="g-key ${go ? "" : "k-b"}">${go ? "A" : "B"}</span><span>${esc(T(it.label))}</span><span class="ar">${go ? "&#9654;" : "&#9664;"}</span>`);
+    b.addEventListener("click", ev => { ev.stopPropagation(); pressKey(it.key); });
+    e.appendChild(b);
+  }
   return add(e);
 }
 
@@ -184,14 +209,15 @@ function hints(list, o = {}) {
 function speedCps() { return [28, 52, 110][G.opts.textSpeed]; }
 function textBox(lines, o = {}) {
   lines = lines.map(l => typeof l === "string" ? { text: l } : l);
-  const el = box(o.x ?? 140, null, o.w ?? 1000, null, "g-panel g-text g-fadein");
+  const el = box(o.x ?? 140, null, o.w ?? 1000, null, "g-panel g-text g-fadein" + (o.film ? " film" : ""));
   el.style.top = "auto"; el.style.left = (o.x ?? 140) + "px"; el.style.right = "auto"; el.style.bottom = (o.bottom ?? 26) + "px";
+  if (o.film) { el.style.left = "0"; el.style.width = "1280px"; el.style.bottom = "0"; }
   const who = h("span", "who"), body = h("span", ""), more = h("span", "more");
   el.append(who, body, more);
   let i = 0, shown = 0, t0 = 0, full = "", raf = 0, choice = null, dead = false;
   let res; const done = new Promise(r => res = r);
   function show() {
-    const L = lines[i]; who.hidden = !L.who; who.textContent = L.who || ""; full = L.text; shown = 0; t0 = performance.now(); more.hidden = true;
+    const L = lines[i]; who.hidden = !L.who; who.textContent = L.who ? T(L.who) : ""; full = T(L.text); shown = 0; t0 = performance.now(); more.hidden = true;
     if (L.on) L.on();
     if (choice) { choice.el.remove(); choice = null; }
     tick();
@@ -229,7 +255,7 @@ function choiceBox(items, o = {}) {
   let sel = o.sel || 0;
   const rows = items.map((it, i) => {
     const t = typeof it === "string" ? { label: it } : it;
-    const r = t.goods ? h("div", "g-goodswrap", goodsRow(t.goods, t.right)) : h("div", "g-item" + (t.off ? " off" : ""), `<span>${rich(t.label)}</span>${t.right != null ? `<span class="r">${t.right}</span>` : ""}`);
+    const r = t.goods ? h("div", "g-goodswrap", goodsRow(t.goods, t.right)) : h("div", "g-item" + (t.off ? " off" : ""), `<span>${rich(T(t.label))}</span>${t.right != null ? `<span class="r">${t.right}</span>` : ""}`);
     r.addEventListener("mouseenter", () => { sel = i; paint(); if (o.onMove) o.onMove(sel); });
     r.addEventListener("click", e => { e.stopPropagation(); sel = i; paint(); pick(); });
     list.appendChild(r); return r;

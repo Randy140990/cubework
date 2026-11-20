@@ -13,13 +13,18 @@ function ctl() {
   return C;
 }
 function header(icon, text, right) {
-  const e = box(28, 22, null, null, "g-panel soft", `<div style="display:flex;align-items:center;gap:12px;padding:8px 22px 8px 12px"><span style="width:42px;height:42px;display:grid;place-items:center">${icon || ""}</span><span class="g-title" style="font-size:28px">${esc(text)}</span>${right ? `<span style="margin-left:18px" class="g-label">${right}</span>` : ""}</div>`);
+  const e = box(28, 22, null, null, "g-panel soft", `<div style="display:flex;align-items:center;gap:12px;padding:8px 22px 8px 12px"><span style="width:42px;height:42px;display:grid;place-items:center">${icon || ""}</span><span class="g-title" style="font-size:28px">${esc(T(text))}</span>${right ? `<span style="margin-left:18px" class="g-label">${right}</span>` : ""}</div>`);
   e.style.borderRadius = "999px"; e.querySelector("svg") && (e.querySelector("svg").style.width = "40px");
   return e;
 }
-const SKY = "radial-gradient(ellipse at 30% 20%, #F6FFFB 0%, #BFEFE0 38%, #7FD3C2 70%, #3F9C8A 100%)";
+// Each screen on its own bright backdrop, as Let's Go's are: sky, lime, peach, with soft rays from a corner.
+const SKY = "radial-gradient(ellipse at 30% 20%, #FFFFFF 0%, #E2F4FF 32%, #A6D8F7 66%, #6AAEE6 100%)";
+const LIME = "radial-gradient(ellipse at 25% 15%, #FFFFF2 0%, #F4FAB8 35%, #CDEB6E 70%, #96C73A 100%)";
+const PEACH = "radial-gradient(ellipse at 30% 20%, #FFFFFF 0%, #FFEDE0 35%, #FFC9A6 70%, #F2946A 100%)";
+const MINT = "radial-gradient(ellipse at 30% 20%, #FFFFFF 0%, #E3FAEF 35%, #A9EBCB 70%, #5CC79A 100%)";
+function rays(x = 20, y = 10, a = 0.16) { return add(h("div", "", "", { position: "absolute", inset: "0", background: `repeating-conic-gradient(from 0deg at ${x}% ${y}%, rgba(255,255,255,${a}) 0 6deg, transparent 6deg 14deg)`, pointerEvents: "none" })); }
 const DREAM = "radial-gradient(circle at 50% 42%, #FFFFFF 0%, #E3F8FA 20%, #9EDCEB 48%, #4C9CC7 78%, #2E5F96 100%)";
-const NIGHT = "radial-gradient(ellipse at 50% 40%, #1D5A52 0%, #123C38 45%, #071816 100%)";
+const NIGHT = "radial-gradient(ellipse at 50% 40%, #5FA8E8 0%, #2F64B0 50%, #1A3470 100%)";
 
 // ===================== Start =====================
 screen("splash", "Start", "Opening", {
@@ -28,7 +33,7 @@ screen("splash", "Start", "Opening", {
   make() {
     backdrop("#000");
     const e = box(0, 0, 1280, 720, "", `<div style="position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:10px">
-      <div class="g-title" style="font-size:64px;letter-spacing:10px;color:#F4F6FF">INSID3 TH3 CUB3</div><div style="font-size:24px;letter-spacing:6px;color:#A9D4C6;font-weight:700">presents</div></div>`);
+      <div class="g-title" style="font-size:64px;letter-spacing:10px;color:#F4F6FF">INSID3 TH3 CUB3</div><div style="font-size:24px;letter-spacing:6px;color:var(--g-muted);font-weight:700">presents</div></div>`);
     e.style.opacity = 0; e.style.transition = "opacity .9s ease";
     later(80, () => e.style.opacity = 1); later(2300, () => e.style.opacity = 0); later(3300, () => go("title"));
     return { key: k => { if (k === "a") go("title"); return true; } };
@@ -50,54 +55,40 @@ screen("title", "Start", "Title screen", {
     if (night) box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="POKéMON" src="${wordmark("POKéMON", { top: [255, 236, 120], bottom: [240, 170, 40], side: [40, 60, 140], line: [12, 18, 48] })}" style="max-width:1080px;image-rendering:pixelated;filter:drop-shadow(0 10px 0 rgba(0,0,0,.18))"></div>`);
     // RETROMON in round, heavy letters on a gentle arch (tools/wordmark.py), with its own edge and shadow.
     else box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="RETROMON" src="${wordmark("RETROMON")}" style="width:838px;height:152px"></div>`);
-    box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#FFF4D8;color:#26304A;font-size:30px;line-height:36px;letter-spacing:6px;box-shadow:0 6px 0 rgba(0,0,0,.18)">PRESS START</span></div>`);
+    box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#fff;color:#26304A;font-size:30px;line-height:36px;letter-spacing:6px;box-shadow:0 0 0 4px rgba(255,255,255,.5),0 6px 0 rgba(0,0,0,.18)">${esc(T("PRESS START"))}</span></div>`);
     box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">INSID3 TH3 CUB3</div>`);
-    box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">Version 0.22</div>`);
-    return { key: k => { if (k === "a") go("language"); return true; } };
+    box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">Version 0.28</div>`);
+    return { key: k => { if (k === "a") go("saves"); return true; } };
   }
 });
 const LANGS = [["English", "English"], ["Español", "Spanish"], ["Français", "French"], ["Deutsch", "German"], ["Italiano", "Italian"], ["日本語", "Japanese"], ["한국어", "Korean"], ["简体中文", "Chinese, simplified"], ["繁體中文", "Chinese, traditional"]];
-screen("language", "Start", "Language", {
-  what: "Pick a language the first time you play. You can change it later in OPTIONS.",
-  tags: ["New"], try: ["Up and down to pick, A to choose."],
-  make() {
-    backdrop(SKY); const C = ctl();
-    box(90, 170, 560, 330, "g-panel g-fadein", `<div style="padding:40px 44px;display:grid;gap:18px"><div class="g-title" style="font-size:38px">Which language would you like to play in?</div>
-      <div style="font-size:21px;font-weight:700;color:#CFEDE3;line-height:1.5">All the words in the game will be shown in it. You can change it later in OPTIONS.</div>
-      <div class="g-label" style="margin-top:6px">Chosen: <span id="lname" style="color:#FFD45A">${esc(G.lang)}</span></div></div>`);
-    const cb = choiceBox(LANGS.map(([n, e]) => ({ label: n, right: `<span style="font-size:15px;opacity:.65">${esc(e)}</span>` })), { x: 760, y: 70, w: 420, sel: Math.max(0, LANGS.findIndex(l => l[0] === G.lang)),
-      onMove: i => { $("#lname").textContent = LANGS[i][0]; }, onPick: i => { G.lang = LANGS[i][0]; go("saves"); }, onBack: () => go("title") });
-    C.push(cb); hints([["A", "Choose"], ["B", "Back"]]);
-    return { key: k => C.key(k) };
-  }
-});
 screen("saves", "Start", "Continue or new game", {
   scene: "creator", sceneOpts: () => ({ side: -1.6 }),
   what: "Your saves as cards: who, where, how far. Pick one to carry on, or an empty slot to start again.",
   mod: "IntroScreen's save slots: rounded cards with a picture, a SLOT pill and DELETE.",
   try: ["Up and down between slots, A to load or start, B for the title."],
   make() {
-    backdrop(SKY); const C = ctl();
+    backdrop(SKY); rays(85, 10); const C = ctl();
     const slots = [{ used: true }, {}, {}];
     let sel = 0;
     const wrap = box(70, 90, 640, null, "", "");
     const draw = () => {
       wrap.innerHTML = slots.map((s, i) => s.used ? `
-        <div class="g-panel" style="position:relative;margin-bottom:18px;padding:18px 22px;display:grid;grid-template-columns:150px 1fr;gap:20px;${i === sel ? "border-color:#FFF4D8;box-shadow:0 0 0 4px rgba(255,244,216,.4),0 14px 36px rgba(0,0,0,.4)" : ""}">
+        <div class="g-panel" style="position:relative;margin-bottom:18px;padding:18px 22px;display:grid;grid-template-columns:150px 1fr;gap:20px;${i === sel ? "box-shadow:0 0 0 5px #FFC93C,0 14px 36px rgba(30,40,84,.3)" : ""}">
           <div style="border-radius:16px;background:linear-gradient(180deg,#9ED8F2,#BFEFE0 55%,#6DB257 56%,#5FA24C);position:relative;overflow:hidden">
             <div style="position:absolute;left:18px;bottom:22px;width:56px;height:40px;background:#F2E8D2;border-radius:4px"></div><div style="position:absolute;left:12px;bottom:58px;width:68px;height:22px;background:#C9493F;border-radius:6px 6px 0 0"></div>
             <div style="position:absolute;right:18px;bottom:16px;width:22px;height:44px;border-radius:4px;background:${hex(colourOf(G.outfit.topc))}"></div><div style="position:absolute;right:20px;bottom:58px;width:18px;height:18px;border-radius:3px;background:${hex(skinRGB(G.outfit.skin))}"></div></div>
-          <div style="display:grid;gap:6px"><div style="display:flex;align-items:center;gap:12px"><span style="padding:2px 12px;border-radius:999px;background:#FFF4D8;color:#26304A;font-weight:900;font-size:14px;letter-spacing:1px">SLOT ${i + 1}</span><span class="g-title" style="font-size:30px">${esc(G.name)}</span></div>
-            <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 18px;font-size:19px;font-weight:800"><span class="g-label">Place</span><span>${esc(G.place)}</span><span class="g-label">Pokédex</span><span>${G.caught}</span><span class="g-label">Badges</span><span>${G.badges}</span><span class="g-label">Play time</span><span>${G.time}</span></div></div>
-          <span style="position:absolute;right:16px;top:14px;padding:2px 12px;border-radius:999px;border:2px solid rgba(229,82,92,.7);color:#FFB3B8;font-weight:900;font-size:13px">DELETE</span></div>` : `
-        <div class="g-panel" style="position:relative;margin-bottom:18px;padding:22px 24px;display:flex;align-items:center;gap:16px;${i === sel ? "border-color:#FFF4D8;box-shadow:0 0 0 4px rgba(255,244,216,.4),0 14px 36px rgba(0,0,0,.4)" : "opacity:.85"}">
-          <span style="padding:2px 12px;border-radius:999px;background:rgba(255,244,216,.2);font-weight:900;font-size:14px;letter-spacing:1px">SLOT ${i + 1}</span><span class="g-title" style="font-size:28px">NEW GAME</span><span style="margin-left:auto;font-size:17px;color:#A9D4C6;font-weight:800">Empty</span></div>`).join("") +
-        `<div class="g-item${sel === 3 ? " on" : ""}" style="display:inline-flex;margin-top:4px">${ICON.cog.replace("<svg", '<svg style="width:26px;height:26px"')}<span>OPTIONS</span></div>`;
+          <div style="display:grid;gap:6px"><div style="display:flex;align-items:center;gap:12px"><span style="padding:2px 12px;border-radius:999px;background:linear-gradient(180deg,#FF9473,#E5525C);color:#fff;font-weight:900;font-size:14px;letter-spacing:1px">${esc(T("SLOT {0}", i + 1))}</span><span class="g-title" style="font-size:30px">${esc(G.name)}</span></div>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 18px;font-size:19px;font-weight:800"><span class="g-label">${esc(T("Place"))}</span><span>${esc(G.place)}</span><span class="g-label">${esc(T("Pokédex"))}</span><span>${G.caught}</span><span class="g-label">${esc(T("Badges"))}</span><span>${G.badges}</span><span class="g-label">${esc(T("Play time"))}</span><span>${G.time}</span></div></div>
+          <span style="position:absolute;right:16px;top:14px;padding:2px 12px;border-radius:999px;border:2px solid #F3A6AC;color:#D9404A;font-weight:900;font-size:13px">${esc(T("DELETE"))}</span></div>` : `
+        <div class="g-panel" style="position:relative;margin-bottom:18px;padding:22px 24px;display:flex;align-items:center;gap:16px;${i === sel ? "box-shadow:0 0 0 5px #FFC93C,0 14px 36px rgba(30,40,84,.3)" : "opacity:.92"}">
+          <span style="padding:2px 12px;border-radius:999px;background:#EEF2FB;color:var(--g-muted);font-weight:900;font-size:14px;letter-spacing:1px">${esc(T("SLOT {0}", i + 1))}</span><span class="g-title" style="font-size:28px">${esc(T("NEW GAME"))}</span><span style="margin-left:auto;font-size:17px;color:var(--g-muted);font-weight:800">${esc(T("Empty"))}</span></div>`).join("") +
+        `<div class="g-item${sel === 3 ? " on" : ""}" style="display:inline-flex;margin-top:4px;background:${sel === 3 ? "" : "rgba(255,255,255,.85)"}">${ICON.cog.replace("<svg", '<svg style="width:26px;height:26px"')}<span>${esc(T("OPTIONS"))}</span></div>`;
       [...wrap.children].forEach((c, i) => c.onclick = () => { sel = i; draw(); pick(); });
     };
     const pick = () => { if (sel === 0) go("loading"); else if (sel === 3) go("options"); else go("prof"); };
     draw();
-    hints([["A", "Choose"], ["B", "Back"]]);
+    actions([{ key: "b", label: "Back" }, { key: "a", label: "Continue" }], { right: true });
     return { key: k => { if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : 3)) % 4; draw(); return true; } if (k === "a") { pick(); return true; } if (k === "b") { go("title"); return true; } return false; } };
   }
 });
@@ -114,24 +105,23 @@ const OPTS = [
 screen("options", "Start", "Options", {
   what: "Settings, a row each: left and right to change. What the row does is written at the top.",
   mod: "MenuScreen's OPTION: TEXT SPEED, MUSIC, POKéDEX VOICE, NIGHTS, WILD POKéMON.",
-  tags: ["New: sound, battle effects, battle style, language, controls"],
+  tags: ["New: sound, battle effects, battle style, controls"],
   make(arg) {
-    backdrop(SKY); let sel = 0;
+    backdrop(LIME); rays(15, 0, 0.2); let sel = 0;
     const desc = box(170, 40, 940, 96, "g-panel", ""); desc.style.padding = "22px 30px"; desc.style.fontSize = "22px"; desc.style.fontWeight = "800";
     const P = box(170, 160, 940, 470, "g-panel", ""); P.style.padding = "18px";
-    const rows = OPTS.concat([["LANGUAGE", null, null, "The language the game's words are shown in."], ["CONTROLS", null, null, "See every key: what it does in game, and what's turned off."]]);
+    const rows = OPTS.concat([["CONTROLS", null, null, "See every key: what it does in game, and what's turned off."]]);
     const draw = () => {
-      desc.innerHTML = esc(rows[sel][3]);
+      desc.innerHTML = esc(T(rows[sel][3]));
       P.innerHTML = rows.map(([l, k, vals], i) => {
-        const v = k ? vals[G.opts[k]] : l === "LANGUAGE" ? G.lang : "";
-        return `<div class="g-item${i === sel ? " on" : ""}" style="min-height:41px;padding-top:5px;padding-bottom:5px"><span style="width:280px">${esc(l)}</span><span class="r" style="display:flex;align-items:center;gap:14px">${k ? `<span style="opacity:.6">&#9664;</span><span style="min-width:110px;text-align:center">${esc(v)}</span><span style="opacity:.6">&#9654;</span>` : `<span>${esc(v)}</span><span style="opacity:.6">&#9654;</span>`}</span></div>`;
+        const v = k ? T(vals[G.opts[k]]) : "";
+        return `<div class="g-item${i === sel ? " on" : ""}" style="min-height:44px;padding-top:5px;padding-bottom:5px;${i === sel ? "" : "border-bottom:1.5px solid #EEF1F8;border-radius:0"}"><span style="width:340px">${esc(T(l))}</span><span class="r" style="display:flex;align-items:center;gap:14px">${k ? `<span style="color:var(--g-red)">&#9664;</span><span style="min-width:120px;text-align:center">${esc(v)}</span><span style="color:var(--g-red)">&#9654;</span>` : `<span style="color:var(--g-red)">&#9654;</span>`}</span></div>`;
       }).join("");
       [...P.children].forEach((c, i) => c.onclick = () => { sel = i; act("a"); });
     };
     const act = k => {
       const [l, key, vals] = rows[sel];
       if (key && (k === "left" || k === "right" || k === "a")) { G.opts[key] = (G.opts[key] + (k === "left" ? vals.length - 1 : 1)) % vals.length; draw(); return true; }
-      if (l === "LANGUAGE" && k === "a") { go("language"); return true; }
       if (l === "CONTROLS" && k === "a") { go("keymap", arg); return true; }
       return false;
     };
@@ -144,7 +134,7 @@ screen("keys", "Start", "Keys check", {
   what: "Before the first game: shows the keys you'll use, with a way to see the full key map.",
   tags: ["New"],
   make() {
-    backdrop(SKY); const C = ctl();
+    backdrop(PEACH); rays(80, 0); const C = ctl();
     box(180, 110, 640, 420, "g-panel g-fadein", `<div style="padding:34px 40px;display:grid;gap:20px"><div class="g-title" style="font-size:36px">These are your keys</div>
       <div style="display:grid;grid-template-columns:auto 1fr;gap:14px 22px;align-items:center;font-size:22px;font-weight:800">
         <span><span class="g-key">W</span> <span class="g-key">A</span> <span class="g-key">S</span> <span class="g-key">D</span></span><span>Walk</span>
@@ -167,9 +157,11 @@ screen("prof", "A new game", "The professor", {
     backdrop(DREAM);
     add(h("div", "", `<div style="position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.6) 0 2px,transparent 3px),radial-gradient(circle at 80% 20%,rgba(255,255,255,.7) 0 2px,transparent 3px),radial-gradient(circle at 70% 70%,rgba(255,255,255,.5) 0 2px,transparent 3px),radial-gradient(circle at 30% 80%,rgba(255,255,255,.6) 0 2px,transparent 3px);background-size:240px 200px;animation:gbob 4s ease-in-out infinite"></div>`));
     const C = ctl(), S = SC.prof;
+    // The professor's words on a dark band at the foot of the screen, no box (as Let's Go's opening).
+    C.sayAt = { film: true };
     S.talking = true;
     C.say([
-      { who: "PROF. OAK", text: "Ah, there you are! Welcome. I'm OAK. Most people round here call me the POKéMON PROF." },
+      { who: "PROF. OAK", text: "Ah, there you are! Welcome. I'm **OAK**. Most people round here call me the **POKéMON PROF**." },
       { who: "PROF. OAK", text: "This world is full of creatures we call **POKéMON**. You'll find them in the grass, the sea, the caves, even in town." },
       { who: "PROF. OAK", text: "Some people keep them as friends. Some raise them for battles. Me? I study them.", on: () => S.hop && S.hop() },
       { who: "PROF. OAK", text: "But that's enough about me. First, tell me a little about yourself." },
@@ -197,22 +189,22 @@ function maker(C, tabs, o) {
   const idxOf = r => Math.max(0, opts(r).findIndex(([v]) => v === r.get()));
   const draw = () => {
     rows = makerRows(tabs[tab]);
-    const tabBar = tabs.length > 1 ? `<div style="display:flex;gap:8px;margin:2px 0 8px 10px">${tabs.map((t, i) => `<span class="g-chip${i === tab ? " on" : ""}" data-t="${i}" style="font-size:14px;padding:3px 14px">${t === "you" ? "YOU" : "CLOTHES"}</span>`).join("")}<span style="margin-left:auto;font-size:12px;font-weight:900;color:#A9D4C6;align-self:center">TAB switches</span></div>` : "";
+    const tabBar = tabs.length > 1 ? `<div style="display:flex;gap:8px;margin:2px 0 8px 10px">${tabs.map((t, i) => `<span class="g-chip${i === tab ? " on" : ""}" data-t="${i}" style="font-size:14px;padding:3px 14px">${t === "you" ? "YOU" : "CLOTHES"}</span>`).join("")}<span style="margin-left:auto;font-size:12px;font-weight:900;color:var(--g-muted);align-self:center">TAB switches</span></div>` : "";
     // Rows go in cards by what they're for (hat, top, bottoms...), with room to breathe: big swatches and chips.
     const GROUP = { "BODY": "YOU", "SKIN": "YOU", "EYES": "YOU", "HAIR": "HAIR", "HAIR COLOUR": "HAIR", "HAT": "HAT", "CAP": "HAT", "CAP WAY": "HAT", "HAT COLOUR": "HAT",
       "TOP": "TOP", "TOP COLOUR": "TOP", "BOTTOMS": "BOTTOMS", "BOTTOMS COLOUR": "BOTTOMS", "SHOES": "SHOES", "BAG": "BAG", "BAG COLOUR": "BAG" };
     const short = (r, g) => r.label === g ? (g === "SHOES" ? "COLOUR" : "STYLE") : r.label.startsWith(g + " ") ? r.label.slice(g.length + 1) : r.label;
     const rowHtml = (r, i, g) => { const dim = r.off && r.off(), on = i === sel;
-      return `<div style="display:grid;grid-template-columns:70px 1fr;align-items:center;gap:8px;padding:4px 8px;border-radius:14px;transition:background .15s;${dim ? "opacity:.4;" : ""}${on ? "background:rgba(255,244,216,.13);box-shadow:inset 0 0 0 2px rgba(255,244,216,.55)" : ""}">
-      <span class="g-label" style="font-size:12.5px;${on ? "color:#FFF4D8" : ""}">${on ? "&#9656; " : ""}${short(r, g)}</span>
+      return `<div style="display:grid;grid-template-columns:70px 1fr;align-items:center;gap:8px;padding:4px 8px;border-radius:14px;transition:background .15s;${dim ? "opacity:.4;" : ""}${on ? "background:#FFF6CF;box-shadow:inset 0 0 0 2.5px #FFC93C" : ""}">
+      <span class="g-label" style="font-size:12.5px;${on ? "color:var(--g-red)" : ""}">${on ? "&#9656; " : ""}${short(r, g)}</span>
       <span style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">${opts(r).map(([v, l], j) => r.swatches
-        ? `<span class="g-swatch${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="position:relative;width:30px;height:30px;border-width:3px;border-radius:9px;background:linear-gradient(160deg,rgba(255,255,255,.28),rgba(0,0,0,.12)),${l}">${r.newFrom != null && j >= r.newFrom ? `<i style="position:absolute;right:-4px;top:-4px;width:10px;height:10px;border-radius:50%;background:#FFD45A;box-shadow:0 0 0 2px #123C38"></i>` : ""}</span>`
+        ? `<span class="g-swatch${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="position:relative;width:30px;height:30px;border-width:3px;border-radius:9px;background:linear-gradient(160deg,rgba(255,255,255,.28),rgba(0,0,0,.12)),${l}">${r.newFrom != null && j >= r.newFrom ? `<i style="position:absolute;right:-4px;top:-4px;width:10px;height:10px;border-radius:50%;background:#FFD45A;box-shadow:0 0 0 2px #fff"></i>` : ""}</span>`
         : `<span class="g-chip${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="font-size:14px;padding:3px 11px">${esc(l)}</span>`).join("")}</span></div>`; };
     const groups = []; rows.forEach((r, i) => { const g = GROUP[r.label] || r.label; let G2 = groups[groups.length - 1]; if (!G2 || G2.g !== g) groups.push(G2 = { g, rows: [] }); G2.rows.push([r, i]); });
-    P.innerHTML = tabBar + `<div style="columns:2;column-gap:10px">${groups.map(G2 => `<div style="border-radius:18px;background:rgba(0,0,0,.16);padding:8px 6px 8px 6px;display:grid;gap:2px;break-inside:avoid;margin-bottom:10px">
-      <div class="g-title" style="font-size:17px;letter-spacing:2px;padding:2px 12px 2px;color:#8FF5C0">${G2.g}</div>${G2.rows.map(([r, i]) => rowHtml(r, i, G2.g)).join("")}</div>`).join("")}</div>` +
-      `<div style="display:flex;gap:12px;margin-top:0;padding:0 10px;align-items:center"><span class="g-item${sel === rows.length ? " on" : ""}" data-done="1">${esc(o.done || "DONE")}</span><span class="g-item${sel === rows.length + 1 ? " on" : ""}" data-rand="1">MIX IT UP</span>
-        ${tabs[tab] === "you" ? `<span style="margin-left:auto;font-size:12.5px;font-weight:800;color:#CFEDE3"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#FFD45A;margin-right:5px"></i>New: four more skin tones, eye colour</span>` : ""}</div>`;
+    P.innerHTML = tabBar + `<div style="columns:2;column-gap:10px">${groups.map(G2 => `<div style="border-radius:18px;background:#F3F6FC;padding:8px 6px 8px 6px;display:grid;gap:2px;break-inside:avoid;margin-bottom:10px">
+      <div class="g-title" style="font-size:17px;letter-spacing:2px;padding:2px 12px 2px;color:var(--g-red)">${G2.g}</div>${G2.rows.map(([r, i]) => rowHtml(r, i, G2.g)).join("")}</div>`).join("")}</div>` +
+      `<div style="display:flex;gap:12px;margin-top:0;padding:0 10px;align-items:center"><span class="g-item${sel === rows.length ? " on" : ""}" data-done="1">${esc(T(o.done || "DONE"))}</span><span class="g-item${sel === rows.length + 1 ? " on" : ""}" data-rand="1">${esc(T("MIX IT UP"))}</span>
+        ${tabs[tab] === "you" ? `<span style="margin-left:auto;font-size:12.5px;font-weight:800;color:var(--g-muted)"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#FFD45A;margin-right:5px"></i>New: four more skin tones, eye colour</span>` : ""}</div>`;
     P.querySelectorAll("[data-r]").forEach(e => e.onclick = () => { const r = rows[+e.dataset.r]; sel = +e.dataset.r; r.set(opts(r)[+e.dataset.j][0]); changed(); });
     P.querySelectorAll("[data-t]").forEach(e => e.onclick = () => { tab = +e.dataset.t; sel = 0; draw(); });
     P.querySelector("[data-done]").onclick = () => o.onDone(); P.querySelector("[data-rand]").onclick = () => mix();
@@ -225,6 +217,7 @@ function maker(C, tabs, o) {
     if (k === "tab" && tabs.length > 1) { tab = (tab + 1) % tabs.length; sel = 0; draw(); return true; }
     if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : n - 1)) % n; draw(); return true; }
     if (sel >= rows.length) { if (k === "a") { if (sel === rows.length) o.onDone(); else mix(); return true; } if (k === "left" || k === "right") { sel = sel === rows.length ? rows.length + 1 : rows.length; draw(); return true; } }
+    if (k === "a") { o.onDone(); return true; }
     const r = rows[sel];
     if (r && (k === "left" || k === "right")) { const os = opts(r); r.set(os[(idxOf(r) + (k === "right" ? 1 : os.length - 1)) % os.length][0]); changed(); return true; }
     if (k === "b" && o.onBack) { o.onBack(); return true; }
@@ -239,11 +232,12 @@ screen("creator", "A new game", "Character maker", {
   tags: ["The mod's wardrobe", "New: 4 skin tones, eye colour"], mod: "Outfit: FAIR, LIGHT, TAN, DEEP skin; 6 hair styles; cap, beanie or sun hat; jacket, tee, hoodie or vest; jeans, shorts or skirt; shoes; backpack or satchel; 14 colours.",
   try: ["Up and down between rows, left and right to change, A on DONE.", "MIX IT UP picks at random."],
   make() {
-    backdrop("radial-gradient(ellipse at 70% 45%, #FFFFFF 0%, #DFF6EE 35%, #9EDCC9 70%, #4FA88E 100%)");
+    backdrop(PEACH); rays(80, 10);
     const C = ctl();
-    box(760, 640, 480, null, "", `<div class="g-title" style="text-align:center;font-size:24px;color:#123C38">What do you look like?</div>`);
+    box(900, 34, 360, null, "", `<div class="g-title" style="text-align:center;font-size:26px;color:#26304A">${esc(T("What do you look like?"))}</div>`);
     maker(C, ["you", "clothes"], { done: "THAT'S ME", onDone: () => go("name", { who: "you" }), onBack: () => go("prof") });
-    hints([["A", "Choose"], ["B", "Back"]]);
+    // Plain to see: Back and Continue, bottom right (left and right change a row; A carries on from anywhere).
+    actions([{ key: "b", label: "Back" }, { key: "a", label: "Continue" }], { right: true });
     return { key: k => C.key(k) };
   }
 });
@@ -253,11 +247,11 @@ function nameEntry(C, o) {
   const P = box(240, 150, 800, 430, "g-panel g-pop", ""); P.style.padding = "24px 30px";
   const all = KEYS_AZ.length + 2;
   const draw = () => {
-    P.innerHTML = `<div style="display:flex;align-items:center;gap:18px;margin-bottom:18px"><span class="g-label">${esc(o.label)}</span>
-      <span style="flex:1;display:flex;gap:8px">${Array.from({ length: 7 }, (_, i) => `<span style="flex:1;max-width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-family:Fredoka;font-weight:600;font-size:34px;background:${i < name.length ? "#FFF4D8" : "rgba(255,255,255,.08)"};color:#26304A;${i === name.length ? "box-shadow:inset 0 0 0 3px #8FF5C0" : ""}">${esc(name[i] || "")}</span>`).join("")}</span></div>
-      <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:8px">${KEYS_AZ.map((c, i) => `<span data-i="${i}" style="height:50px;border-radius:14px;display:grid;place-items:center;font-family:Fredoka;font-weight:600;font-size:26px;cursor:pointer;${i === sel ? "background:#FFF4D8;color:#26304A" : "background:rgba(255,255,255,.07)"}">${c === " " ? "&#9251;" : esc(c)}</span>`).join("")}
-      <span data-i="${KEYS_AZ.length}" style="grid-column:span 2;height:50px;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:18px;cursor:pointer;${sel === KEYS_AZ.length ? "background:#FFF4D8;color:#26304A" : "background:rgba(255,255,255,.07)"}">DELETE</span>
-      <span data-i="${KEYS_AZ.length + 1}" style="grid-column:span 2;height:50px;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:18px;cursor:pointer;${sel === KEYS_AZ.length + 1 ? "background:#41BF84;color:#fff" : "background:rgba(65,191,132,.25)"}">OK</span></div>`;
+    P.innerHTML = `<div style="display:flex;align-items:center;gap:18px;margin-bottom:18px"><span class="g-label">${esc(T(o.label))}</span>
+      <span style="flex:1;display:flex;gap:8px">${Array.from({ length: 7 }, (_, i) => `<span style="flex:1;max-width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-family:Fredoka;font-weight:600;font-size:34px;background:${i < name.length ? "#FFF6CF" : "#EEF2FB"};color:#26304A;${i === name.length ? "box-shadow:inset 0 0 0 3px #E5525C" : ""}">${esc(name[i] || "")}</span>`).join("")}</span></div>
+      <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:8px">${KEYS_AZ.map((c, i) => `<span data-i="${i}" style="height:50px;border-radius:14px;display:grid;place-items:center;font-family:Fredoka;font-weight:600;font-size:26px;cursor:pointer;${i === sel ? "background:var(--g-sel);color:#26304A;box-shadow:0 0 0 2px #fff,0 4px 10px rgba(232,150,30,.35)" : "background:#EEF2FB"}">${c === " " ? "&#9251;" : esc(c)}</span>`).join("")}
+      <span data-i="${KEYS_AZ.length}" style="grid-column:span 2;height:50px;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:18px;cursor:pointer;${sel === KEYS_AZ.length ? "background:var(--g-sel);color:#26304A" : "background:#EEF2FB"}">${esc(T("DELETE"))}</span>
+      <span data-i="${KEYS_AZ.length + 1}" style="grid-column:span 2;height:50px;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:18px;cursor:pointer;${sel === KEYS_AZ.length + 1 ? "background:linear-gradient(180deg,#6BE0A6,#2FA86C);color:#fff" : "background:#D9F5E6;color:#1F8A55"}">OK</span></div>`;
     P.querySelectorAll("[data-i]").forEach(e => e.onclick = () => { sel = +e.dataset.i; press(); });
   };
   const press = () => { if (sel < KEYS_AZ.length) { if (name.length < 7) name += KEYS_AZ[sel]; } else if (sel === KEYS_AZ.length) name = name.slice(0, -1); else if (name.trim()) { o.onDone(name.trim()); return; } draw(); };
@@ -277,7 +271,7 @@ screen("name", "A new game", "Your name", {
   mod: "IntroScreen: YOUR NAME, with ready names and NEW NAME.",
   try: ["Type on your keyboard (Shift for W, A, S, D, E, Q, X and Z), or move round the letters and press A.", "OK when you're done."],
   make(arg) {
-    backdrop("radial-gradient(ellipse at 50% 45%, #FFFFFF 0%, #DFF6EE 35%, #9EDCC9 70%, #4FA88E 100%)");
+    backdrop(PEACH); rays(80, 10);
     const C = ctl(), girl = !!G.outfit.girl;
     const presets = girl ? ["LEAF", "LYRA", "KRIS"] : ["RED", "KRIS", "ETHAN"];
     C.choose(["NEW NAME"].concat(presets), { x: 980, y: 190, w: 250, back: false }).then(i => {
@@ -285,9 +279,9 @@ screen("name", "A new game", "Your name", {
       const w = nameEntry(C, { label: "YOUR NAME", start: "", onDone: n => { G.name = n.toUpperCase(); go("rival"); }, onBack: () => go("creator") });
       cur.raw = e => w.raw(e);
     });
-    box(0, 70, 1280, null, "", `<div class="g-title" style="text-align:center;font-size:30px;color:#123C38">And what's your name?</div>`);
-    hints([["A", "Choose"], ["B", "Back"]]);
-    return { key: k => C.key(k) };
+    box(0, 70, 1280, null, "", `<div class="g-title" style="text-align:center;font-size:30px;color:#26304A">${esc(T("And what's your name?"))}</div>`);
+    actions([{ key: "b", label: "Back" }, { key: "a", label: "Continue" }], { right: true });
+    return { key: k => C.key(k) || (k === "b" ? (go("creator"), true) : false) };
   }
 });
 screen("rival", "A new game", "Your rival's name", {
@@ -295,15 +289,15 @@ screen("rival", "A new game", "Your rival's name", {
   what: "The professor's grandson, your rival since you were small. Pick or type his name.",
   mod: "IntroScreen: YOUR RIVAL'S NAME.",
   make() {
-    backdrop(DREAM); const C = ctl(), S = SC.prof;
+    backdrop(DREAM); const C = ctl(), S = SC.prof; C.sayAt = { film: true };
     (async () => {
       S.talking = true;
-      await C.say([{ who: "PROF. OAK", text: `So you're **${G.name}**! A fine name.` }, { who: "PROF. OAK", text: "And this is my grandson. You two have been racing each other since you could walk." }, { who: "PROF. OAK", text: "Now, what was his name again...?" }], { keep: true });
+      await C.say([{ who: "PROF. OAK", text: "So you're **{N}**! A fine name." }, { who: "PROF. OAK", text: "And this is my grandson. You two have been racing each other since you could walk." }, { who: "PROF. OAK", text: "Now, what was his name again...?" }], { keep: true });
       S.talking = false;
       const names = ["BLUE", "GARY", "JOHN"];
       const i = await C.choose(["NEW NAME"].concat(names), { x: 980, y: 140, w: 250, back: false });
       if (!C.alive()) return;
-      const done = async n => { G.rival = n; uiRoot.querySelectorAll(".g-text").forEach(e => e.remove()); S.talking = true; await C.say([{ who: "PROF. OAK", text: `That's right! I remember now. His name is **${G.rival}**!` }]); S.talking = false; if (C.alive()) go("ready"); };
+      const done = async n => { G.rival = n; uiRoot.querySelectorAll(".g-text").forEach(e => e.remove()); S.talking = true; await C.say([{ who: "PROF. OAK", text: "That's right! I remember now. His name is **{R}**!" }]); S.talking = false; if (C.alive()) go("ready"); };
       if (i > 0) done(names[i - 1]);
       else { uiRoot.querySelectorAll(".g-text").forEach(e => e.remove()); const w = nameEntry(C, { label: "YOUR RIVAL'S NAME", onDone: n => { C.pop(w); uiRoot.querySelectorAll(".g-panel.g-pop").forEach(e => e.remove()); done(n.toUpperCase()); } }); cur.raw = e => w.raw(e); }
     })();
@@ -314,10 +308,12 @@ screen("ready", "A new game", "Off you go", {
   scene: "prof", sceneOpts: () => ({ mode: "you" }),
   what: "You, as you made yourself, beside the professor, before the game loads.",
   make() {
-    backdrop(DREAM); const C = ctl(), S = SC.prof;
-    S.talking = true; S.youWave = 0;
-    C.say([{ who: "PROF. OAK", text: `**${G.name}**, your own adventure starts today.` }, { who: "PROF. OAK", text: "There's a whole region out there, full of POKéMON to meet. I'll be right next door at my lab." }, { who: "PROF. OAK", text: "Off you go, then!" }])
-      .then(() => { S.talking = false; S.youWave = 1; return C.wait(900); }).then(() => { if (C.alive()) go("loading"); });
+    backdrop(DREAM); const C = ctl(), S = SC.prof; C.sayAt = { film: true };
+    // You look up (so your eyes show under the cap), then at "Off you go" you do the floss while he waves.
+    S.talking = true; S.youWave = 0; S.youFloss = 0; S.youLookUp = 0.38; S.wave = 0;
+    C.say([{ who: "PROF. OAK", text: "**{N}**, your own adventure starts today." }, { who: "PROF. OAK", text: "There's a whole region out there, full of POKéMON to meet. I'll be right next door at my lab." },
+      { who: "PROF. OAK", text: "Off you go, then!", on: () => { S.youFloss = 1; S.wave = 1; } }])
+      .then(() => { S.talking = false; return C.wait(1600); }).then(() => { S.youFloss = 0; S.wave = 0; if (C.alive()) go("loading"); });
     return { key: k => C.key(k) };
   }
 });

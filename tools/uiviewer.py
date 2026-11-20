@@ -5,6 +5,8 @@ Viewer's world, figures and creatures (tools/interior/*), and the creatures' lig
     python3 tools/uiviewer.py <built creature-viewer.html> <out.html>
 """
 import base64, json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from interiorviewer import worldmap
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -94,11 +96,11 @@ def main():
     page, out = sys.argv[1], sys.argv[2]
     head = open(os.path.join(HERE, "uiviewer", "head.html")).read()
     shared = [os.path.join(HERE, "interior", n) for n in ("tex.js", "world.js", "figure.js", "creature.js", "rooms.js")]
-    own = [os.path.join(HERE, "uiviewer", n) for n in ("ui.js", "scenes.js", "screens1.js", "screens2.js", "screens3.js", "screens4.js", "main.js")]
+    own = [os.path.join(HERE, "uiviewer", n) for n in ("lang.js", "ui.js", "faces.js", "scenes.js", "screens1.js", "screens2.js", "screens3.js", "screens4.js", "main.js")]
     js = "\n".join(open(p).read() for p in shared + own)
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
-            + "const DATA = " + data + ";\nconst WORDMARK_OURS = " + json.dumps(wordmark_png()) + ";\nconst EMOTE = " + json.dumps(emote_pngs()) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst MAPDATA = " + json.dumps(mapdata(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
+            + "const DATA = " + data + ";\nconst WORDMARK_OURS = " + json.dumps(wordmark_png()) + ";\nconst EMOTE = " + json.dumps(emote_pngs()) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst MAPDATA = " + json.dumps(mapdata(), separators=(",", ":")) + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
             + engine() + "\n" + js + "\n</script>\n")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     open(out, "w").write(html)

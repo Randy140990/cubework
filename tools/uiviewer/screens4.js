@@ -107,11 +107,11 @@ for (const [id, name, people] of CAST) {
         const [spec, nm, who, where, team, ace] = people[sel];
         info.innerHTML = `<div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start">
           <div style="display:grid;gap:6px"><div style="display:flex;align-items:center;gap:14px"><span class="g-title" style="font-size:36px">${esc(nm)}</span><span class="g-label">${esc(where)}</span></div>
-            <div style="font-size:20px;font-weight:800;color:#E8F4EF">${esc(who)}</div>
-            ${ace ? `<div style="font-size:15px;font-weight:800;color:#A9D4C6">With them: ${esc(ourName(ace))}<span id="acenote"></span></div>` : ""}
+            <div style="font-size:20px;font-weight:800;color:var(--g-text)">${esc(who)}</div>
+            ${ace ? `<div style="font-size:15px;font-weight:800;color:var(--g-muted)">With them: ${esc(ourName(ace))}<span id="acenote"></span></div>` : ""}
             <div class="g-label" style="margin-top:4px">${spec.creature ? "A POKéMON: Retromon's own model" : spec.outfit ? "Skin: made from your clothes" : spec.player ? "Skin: player/" + spec.player : "Skin: npc/" + esc(spec.skin)}</div></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:620px">${team.map(t => sp(t) ? `<div style="display:grid;justify-items:center;width:96px"><div style="width:76px;height:76px;border-radius:20px;background:rgba(255,255,255,.08);display:grid;place-items:center">${pic(t, 72)}</div><span style="font-size:12.5px;font-weight:900;text-align:center;line-height:1.15;margin-top:4px">${esc(ourName(t))}</span></div>`
-            : `<div style="display:grid;justify-items:center;width:96px"><div style="width:76px;height:76px;border-radius:20px;background:rgba(255,255,255,.05);display:grid;place-items:center;color:#6B9A8E;font-size:30px;font-weight:900">?</div><span style="font-size:12px;font-weight:800;text-align:center;line-height:1.15;margin-top:4px;color:#A9D4C6">${esc(title(t))}<br>not built yet</span></div>`).join("")}</div></div>`;
+          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:620px">${team.map(t => sp(t) ? `<div style="display:grid;justify-items:center;width:96px"><div style="width:76px;height:76px;border-radius:20px;background:#F1F4FB;display:grid;place-items:center">${pic(t, 72)}</div><span style="font-size:12.5px;font-weight:900;text-align:center;line-height:1.15;margin-top:4px">${esc(ourName(t))}</span></div>`
+            : `<div style="display:grid;justify-items:center;width:96px"><div style="width:76px;height:76px;border-radius:20px;background:#F6F8FD;display:grid;place-items:center;color:var(--g-dim);font-size:30px;font-weight:900">?</div><span style="font-size:12px;font-weight:800;text-align:center;line-height:1.15;margin-top:4px;color:var(--g-muted)">${esc(title(t))}<br>not built yet</span></div>`).join("")}</div></div>`;
       };
       show();
       timers.push(setInterval(() => { const e = $("#acenote"); if (e) e.textContent = SC.cast.ace && SC.cast.aceScale < 1 ? ` (shown smaller: really ${(SC.cast.ace.m.size.h / SC.cast.aceScale).toFixed(1)} blocks tall)` : ""; }, 300));

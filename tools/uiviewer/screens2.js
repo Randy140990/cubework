@@ -1,6 +1,7 @@
 // ===================== In the world =====================
+// Where you are: a white pill, a sunny dot, the time on a coral tab.
 function placePill(right) {
-  return box(24, 20, null, null, "g-panel soft", `<div style="display:flex;align-items:center;gap:12px;padding:8px 20px 8px 14px"><span style="width:14px;height:14px;border-radius:50%;background:#8FF5C0;box-shadow:0 0 10px #8FF5C0"></span><span class="g-title" style="font-size:24px">${esc(G.place)}</span><span class="g-label" style="margin-left:6px">${right || "9:15 AM, MORNING"}</span></div>`);
+  return box(24, 20, null, null, "", `<div style="display:flex;align-items:center;gap:12px;padding:6px 8px 6px 14px;border-radius:999px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 6px 16px rgba(30,40,84,.25)"><span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 3px #FFE9A0"></span><span class="g-title" style="font-size:24px;color:#26304A">${esc(G.place)}</span><span style="margin-left:6px;padding:3px 12px;border-radius:999px;background:linear-gradient(180deg,#FF9473,#E5525C);color:#fff;font-weight:900;font-size:13px;letter-spacing:1px">${right || "9:15 AM"}</span></div>`);
 }
 function blurOver() { add(h("div", "g-blur")); }
 screen("hud", "In the world", "The HUD", {
@@ -12,27 +13,52 @@ screen("hud", "In the world", "The HUD", {
   make() {
     let spd = 1;
     const pill = placePill();
-    const goal = box(1280 - 24 - 380, 20, 380, null, "g-panel soft", `<div style="padding:12px 18px;display:grid;gap:4px"><span class="g-label">Next</span><span style="display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900"><span style="width:28px;height:28px">${ICON.map}</span>Go to PROF. OAK's lab<span style="margin-left:auto;color:#A9D4C6;font-size:16px">32 m</span></span></div>`);
+    // What to do next: a white card with a blue NEXT tab and a pin.
+    const goal = box(1280 - 24 - 390, 20, 390, null, "", `<div style="position:relative;padding:22px 18px 12px;border-radius:22px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 6px 16px rgba(30,40,84,.25)">
+      <span style="position:absolute;left:16px;top:-11px;padding:2px 14px;border-radius:999px;background:linear-gradient(180deg,#7CC2FA,#3C8DE4);color:#fff;font-weight:900;font-size:13px;letter-spacing:1.4px;box-shadow:0 0 0 3px #fff">${esc(T("NEXT"))}</span>
+      <span style="display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900;color:#26304A"><span style="width:30px;height:30px">${PICTO.map("#3C8DE4").replace('fill="#fff"', 'fill="#E3F0FC"')}</span>${esc(T("Go to PROF. OAK's lab"))}<span style="margin-left:auto;color:var(--g-muted);font-size:16px">32 m</span></span></div>`);
     const keys = () => { const e = $("#hkeys"); if (e) e.remove(); const k = hints([["SPACE", "Talk"], ["ENTER", "Menu"], ["TAB", `Speed x${spd}`]]); k.id = "hkeys"; };
     keys();
     const banner = () => {
-      const b = box(0, 210, 760, null, "g-slide", `<div style="background:linear-gradient(90deg,rgba(18,60,56,.95) 60%,rgba(18,60,56,0));padding:22px 120px 22px 60px;border-top:3px solid #8FF5C0;border-bottom:3px solid #8FF5C0">
-        <div class="g-title" style="font-size:54px;letter-spacing:4px">${esc(G.place)}</div><div style="font-size:21px;font-weight:800;color:#CFEDE3">A quiet start to a long road.</div></div>`);
+      // The place's name sliding in: a white band fading out to the right, a sunny stripe along its top.
+      const b = box(0, 210, 780, null, "g-slide", `<div style="background:linear-gradient(90deg,#fff 58%,rgba(255,255,255,0));padding:20px 130px 22px 60px;border-top:6px solid #FFC93C;box-shadow:0 10px 24px rgba(30,40,84,.12)">
+        <div class="g-title" style="font-size:54px;letter-spacing:4px;color:#26304A">${esc(G.place)}</div><div style="font-size:21px;font-weight:800;color:#E5525C">A quiet start to a long road.</div></div>`);
       later(3200, () => { b.style.transition = "opacity .6s, transform .6s"; b.style.opacity = 0; b.style.transform = "translateX(-60px)"; });
       later(4000, () => b.remove());
     };
     const toast = (icon, text) => {
-      const t = box(0, 96, null, null, "g-panel g-pop", `<div style="display:flex;align-items:center;gap:12px;padding:10px 22px 10px 12px;font-size:20px;font-weight:900"><span style="width:34px;height:34px">${icon}</span>${text}</div>`);
+      const t = box(0, 96, null, null, "g-panel g-pop", `<div style="display:flex;align-items:center;gap:12px;padding:10px 22px 10px 12px;font-size:20px;font-weight:900"><span style="width:34px;height:34px">${icon}</span>${esc(T(text))}</div>`);
       t.style.left = "50%"; t.style.transform = "translateX(-50%)"; t.style.borderRadius = "999px";
       later(2600, () => { t.style.transition = "opacity .5s"; t.style.opacity = 0; }); later(3200, () => t.remove());
     };
     const emote = () => {
-      const e = box(0, 0, 64, 64, "g-pop", `<img src="${EMOTE.note}" style="width:64px;height:64px">`);
+      const e = box(0, 0, 64, 64, "g-pop", `<img src="${EMOTE.heart}" style="width:64px;height:64px">`);
       const p = V(8.1, 1.35, 11.4).project(cam3); e.style.left = ((p.x + 1) / 2 * 1280 - 32) + "px"; e.style.top = ((1 - p.y) / 2 * 720 - 62) + "px";
       later(1800, () => e.remove());
     };
     later(500, banner); later(4200, () => toast(ICON.save, "Game saved")); later(2000, emote);
     return { key: k => { if (k === "a") { banner(); later(800, () => toast(ICON.potion, "You found a POTION!")); later(300, emote); return true; } if (k === "tab") { spd = spd % 3 + 1; keys(); return true; } if (k === "b") { go("menu"); return true; } return false; } };
+  }
+});
+screen("door", "In the world", "Going through a door", {
+  scene: "town", sceneOpts: () => ({}),
+  what: "Going in or out of a door: a circle closes in on you until it's black, the place changes, and the circle opens out again round you (the games' iris).",
+  tags: ["New"], try: ["A to go through again."],
+  make() {
+    const ring = box(0, 0, 1280, 720, "", "");
+    ring.style.pointerEvents = "none";
+    let run = 0;
+    const go1 = () => {
+      const me = ++run, t0 = performance.now(), Rmax = 760, cx = 640, cy = 360;
+      const f = () => { if (me !== run || !uiRoot.contains(ring)) return; const t = (performance.now() - t0) / 1000;
+        // 0 to .55 closing, .55 to .9 black, .9 to 1.45 opening.
+        const k = t < 0.55 ? 1 - (t / 0.55) ** 1.6 : t < 0.9 ? 0 : Math.min(1, ((t - 0.9) / 0.55) ** 0.8);
+        ring.style.background = `radial-gradient(circle at ${cx}px ${cy}px, transparent ${k * Rmax}px, #000 ${k * Rmax + 1}px)`;
+        if (t < 1.5) requestAnimationFrame(f); else ring.style.background = "none"; };
+      f();
+    };
+    later(500, go1);
+    return { key: k => { if (k === "a") { go1(); return true; } if (k === "b") { go("hud"); return true; } return false; } };
   }
 });
 screen("talk", "In the world", "Talking to someone", {
@@ -51,16 +77,28 @@ screen("talk", "In the world", "Talking to someone", {
     return { key: k => C.key(k) };
   }
 });
+const GETS = [{ item: "TOWN MAP", from: "MUM", pocket: "KEY ITEMS", n: 1 }, { item: "OAK's PARCEL", from: "the CLERK", pocket: "KEY ITEMS", n: 1 }, { item: "POKé BALL", from: "PROF. OAK", pocket: "POKé BALLS", n: 5 }];
 screen("itemget", "In the world", "Getting an item", {
   scene: "town", sceneOpts: () => ({ mum: true }),
-  what: "Getting something: the item held up in a card with a little tune, then where it went in your bag.",
-  tags: ["New card"],
-  make() {
-    const C = ctl();
-    const card = box(490, 120, 300, 300, "g-panel g-pop", `<div style="position:absolute;inset:0;display:grid;place-items:center"><div style="position:absolute;inset:24px;border-radius:50%;background:radial-gradient(circle,rgba(255,244,216,.45),transparent 70%);animation:gbob 1.6s ease-in-out infinite"></div><div style="width:150px;height:150px;position:relative">${ICON.map}</div></div>
-      <div style="position:absolute;left:18px;top:14px;font-size:30px;color:#FFD45A">&#9835;</div><div style="position:absolute;right:22px;top:40px;font-size:24px;color:#8FF5C0">&#9834;</div>`);
-    C.say([{ text: `**${G.name}** got a **TOWN MAP** from MUM!` }, { text: `**${G.name}** put the **TOWN MAP** in the **KEY ITEMS** pocket.` }]).then(() => { if (C.alive()) go("menu"); });
-    return { key: k => C.key(k) };
+  what: "Getting something, as Let's Go does it: the thing itself (its own picture: a map, the parcel, a ball) pops up in a round pearly medallion with sparkles; more than one counts in, x1 to x5; then it drops into your bag and the words say which pocket.",
+  tags: ["New look", "No box, no notes"], try: ["Left and right for the parcel and the five POKé BALLS.", "A to go on."],
+  make(arg) {
+    const C = ctl(), g = GETS[(arg && arg.k) || 0];
+    const card = box(490, 70, 300, 340, "", `<style>@keyframes igpop{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}@keyframes igspin{to{transform:rotate(360deg)}}
+      @keyframes igtw{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}@keyframes igdrop{to{transform:translate(40px,300px) scale(.2);opacity:0}}@keyframes igin{from{transform:translateY(-30px) scale(.4);opacity:0}}</style>
+      <div id="igm" style="position:absolute;left:30px;top:20px;width:240px;height:240px;animation:igpop .5s cubic-bezier(.2,1.4,.4,1) both">
+        <div style="position:absolute;inset:-40px;border-radius:50%;background:repeating-conic-gradient(rgba(255,255,255,.55) 0 8deg,transparent 8deg 22deg);animation:igspin 12s linear infinite;-webkit-mask:radial-gradient(circle,#000 35%,transparent 70%);mask:radial-gradient(circle,#000 35%,transparent 70%)"></div>
+        <div style="position:absolute;inset:0;border-radius:50%;padding:6px;background:var(--g-holo);box-shadow:0 14px 30px rgba(30,40,84,.3)"><div style="width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 40% 30%,#fff,#F3F6FD);display:grid;place-items:center"><div id="igpic" style="width:140px;height:140px;position:relative">${ITEM_ICON(g.item)}</div></div></div>
+        ${[[-6, 20, 34, 0], [210, 10, 26, .5], [222, 170, 22, 1], [-14, 180, 18, 1.4]].map(([x, y, w, d]) => `<span style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${w}px;animation:igtw 1.6s ${d}s ease-in-out infinite;filter:drop-shadow(0 0 6px #FFE27A)">${ICON.sparkle}</span>`).join("")}
+      </div>
+      <div id="igc" style="position:absolute;left:0;right:0;top:272px;text-align:center"></div>`);
+    // More than one: they count in, a little ball at a time, x1 up to x5.
+    if (g.n > 1) { const c = $("#igc"); for (let k = 1; k <= g.n; k++) later(350 + k * 260, () => { c.innerHTML = `<span style="display:inline-flex;gap:6px;align-items:center;padding:6px 14px;border-radius:999px;background:#fff;box-shadow:0 6px 16px rgba(30,40,84,.25)">${Array.from({ length: k }, (_, q) => `<span style="width:30px;height:30px;${q === k - 1 ? "animation:igin .3s ease-out" : ""}">${ITEM_ICON(g.item)}</span>`).join("")}<span class="g-title" style="font-size:24px;color:#E5525C;margin-left:4px">x${k}</span></span>`; }); }
+    C.say([{ text: `**{N}** got ${g.n > 1 ? g.n + " " : "a "}**${g.item}${g.n > 1 ? "S" : ""}** from ${g.from}!` },
+      { text: `**{N}** put the **${g.item}${g.n > 1 ? "S" : ""}** in the **${g.pocket}** pocket.`, on: () => { const m = $("#igm"); if (m) m.style.animation = "igdrop .6s ease-in forwards"; const c = $("#igc"); if (c) c.style.opacity = 0; } }])
+      .then(() => { if (C.alive()) go("menu"); });
+    const at = (arg && arg.k) || 0;
+    return { key: k => { if (k === "left" || k === "right") { go("itemget", { k: (at + (k === "right" ? 1 : 2)) % 3 }); return true; } return C.key(k); } };
   }
 });
 screen("badgeget", "In the world", "Getting a badge", {
@@ -99,62 +137,67 @@ screen("badgeget", "In the world", "Getting a badge", {
   }
 });
 const MENU = [["POKéDEX", "dex", "dex", "Every POKéMON you've seen and caught."], ["POKéMON", "ball", "party", "Your team: check them, switch them, pick who follows you."], ["BAG", "bag", "bag", "Your items, in four pockets."],
-  ["MAP", "map", "map", "The TOWN MAP: where you are, and where everywhere else is."], ["CLOTHES", "cap", "clothes", "Change what you're wearing."], ["CARD", "card", "card", "Your TRAINER CARD and badges."],
-  ["WAIT", "clock", "wait", "Let time pass, to morning, midday, evening or night."], ["SAVE", "save", "save", "Save your game."], ["OPTION", "cog", "options", "Text speed, music, nights and more."], ["EXIT", "close", "hud", "Close the menu."]];
-const MENU_MAIN = [0, 1, 2, 3, 7], MENU_SIDE = [4, 5, 6, 8, 9];
-const MENU_COLS = [["#F58A94", "#D94452", "#AE2E3C"], ["#7EE3AE", "#39B27A", "#22855A"], ["#FFD27A", "#F0A030", "#C87818"], ["#8EC4F6", "#4A8FE0", "#2F64B0"], ["#C6AEF4", "#8A62D8", "#6440B0"]];
+  ["MAP", "map", "map", "The whole region, and where you are in it."], ["CLOTHES", "cap", "clothes", "Change your clothes, hat and bag."], ["CARD", "card", "card", "Your trainer card: your name, money and badges."],
+  ["WAIT", "clock", "wait", "Let the time pass: morning, midday, evening or night."], ["SAVE", "save", "save", "Save your adventure so far."], ["OPTION", "cog", "options", "Text speed, music, nights and more."], ["EXIT", "close", "hud", "Close the menu."]];
+// The five big ones in Let's Go's order (POKéDEX, BAG, POKéMON, MAP, SAVE), each its own colour; then the small ones.
+const MENU_MAIN = [0, 2, 1, 3, 7], MENU_SIDE = [4, 5, 6, 8, 9];
+const MENU_COLS = [["#FF8C8C", "#E5484F", "#B92F3A"], ["#FFC566", "#F59A2A", "#D2731A"], ["#7FE3A6", "#3DB873", "#228A52"], ["#7CC2FA", "#3C8DE4", "#2763B8"], ["#C9A8F7", "#8F60DE", "#6740B6"]];
 screen("menu", "In the world", "The menu", {
   scene: "town", sceneOpts: () => ({}),
-  what: "The menu in Let's Go's layout: your partner in a round badge at the top (where Let's Go has its Pikachu), five big round buttons in their own colours with their pictures, five smaller ones under them, and what the one you're on does.",
-  mod: "MenuScreen: POKéDEX, POKéMON, BAG, MAP and SAVE as the big ones; CLOTHES, CARD, WAIT, OPTION and EXIT as the small ones.",
-  tags: ["New look", "Colour"], try: ["Left and right along a row, up and down between the rows, A to open, B to close."],
+  what: "The menu as Let's Go's player menu: your partner's face at the top (ours, drawn flat, where Let's Go has its Pikachu) with PLAY WITH under it; a row of five rounded tiles, each its own colour with a white picture, the one you're on lifted with a red arrow and a green line under its name; the smaller things in white pills underneath.",
+  mod: "MenuScreen: POKéDEX, BAG, POKéMON, MAP and SAVE as the five tiles; CLOTHES, CARD, WAIT, OPTION and EXIT as pills; the partner's face opens its summary.",
+  tags: ["New look: Let's Go's player menu"], try: ["Left and right along a row; up to your partner, down to the small ones; A to open, B to close."],
   make(arg) {
-    blurOver(); let sel = arg && arg.sel || 0;
-    const lead = G.party[0], ring = TYPECOL(sp(lead.sid).stats.types[0]);
-    add(h("div", "", `<div style="position:absolute;inset:0;border-radius:50%;background:#fff;box-shadow:0 8px 0 rgba(0,0,0,.25)"></div>
-      <div style="position:absolute;inset:4px;border-radius:50%;background:${ring}"></div>
-      <div style="position:absolute;inset:8px;border-radius:50%;background:radial-gradient(circle at 50% 35%, #FFFBF0, color-mix(in srgb, ${ring} 28%, #fff))"></div>
-      <div style="position:absolute;inset:14px;display:grid;place-items:center">${pic(lead.sid, 110, "animation:menuBob 2.9s ease-in-out infinite")}</div>
-      <div style="position:absolute;left:50%;top:122px;transform:translateX(-50%);background:${ring};color:#fff;padding:2px 17px;border-radius:999px;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:17px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.2)">${esc(ourName(lead.sid))}</div>
-      <style>@keyframes menuBob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}</style>`, { position: "absolute", left: (640 - 70) + "px", top: (118 - 70) + "px", width: "140px", height: "140px" }));
-    const els = {};
+    blurOver();
+    add(h("div", "", "", { position: "absolute", inset: "0", background: "linear-gradient(180deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.55) 62%, rgba(255,255,255,.8))" }));
+    const lead = G.party[0], els = {};
+    // row 0 is your partner, 1 the tiles, 2 the pills; col along it.
+    let row = 1, col = 0;
+    if (arg && arg.sel != null) { const m = MENU_MAIN.indexOf(arg.sel), q = MENU_SIDE.indexOf(arg.sel); if (m >= 0) col = m; else if (q >= 0) { row = 2; col = q; } }
+    const face = h("div", "", `<div style="display:grid;justify-items:center;gap:6px;cursor:pointer">${faceOf(lead.sid, 210)}
+      <div class="g-title" style="font-size:19px;letter-spacing:2px;color:#26304A;padding:4px 18px;border-radius:999px;white-space:nowrap;background:rgba(255,255,255,.88);box-shadow:0 3px 10px rgba(30,40,84,.18)">${esc(T("PLAY WITH {0}", ourName(lead.sid)))}</div></div>`, { position: "absolute", left: "535px", top: "44px", width: "210px", transition: "transform .15s" });
+    face.onmouseenter = () => { row = 0; draw(); }; face.onclick = () => { row = 0; open(); };
+    add(face);
     MENU_MAIN.forEach((i, c) => {
-      const [n, ic] = MENU[i], col = MENU_COLS[c], cx = 240 + c * 200, cy = 330;
-      const t = h("div", "", `<div class="ring"></div><div class="disc" style="background:linear-gradient(180deg, ${col[0]}, ${col[1]} 55%, ${col[2]})"><div class="face" style="background:linear-gradient(180deg, #fff, color-mix(in srgb, ${col[0]} 26%, #fff))">${ICON[ic]}</div></div><div class="nm">${esc(n)}</div>`);
-      t.className = "g-big"; t.style.left = (cx - 75) + "px"; t.style.top = (cy - 75) + "px";
-      t.onmouseenter = () => { sel = i; draw(); }; t.onclick = () => { sel = i; open(); }; els[i] = add(t);
+      const [n, ic] = MENU[i], col0 = MENU_COLS[c], cx = 640 + (c - 2) * 172;
+      const t = h("div", "m-tile", `<span class="arr">&#9654;</span><div class="sq" style="background:linear-gradient(180deg, ${col0[0]}, ${col0[1]} 58%, ${col0[2]})"><div class="gloss"></div>${PICTO[ic](col0[1])}</div><div class="nm">${esc(T(n))}</div><div class="ul"></div>`);
+      t.style.left = (cx - 70) + "px"; t.style.top = "352px";
+      t.onmouseenter = () => { row = 1; col = c; draw(); }; t.onclick = () => { row = 1; col = c; open(); }; els["1:" + c] = add(t);
     });
     MENU_SIDE.forEach((i, c) => {
-      const [n, ic] = MENU[i], w = 186, x = 640 - (5 * w + 4 * 16) / 2 + c * (w + 16);
-      const t = h("div", "g-small", `<span class="dot">${ICON[ic]}</span><span>${esc(n)}</span>`);
-      t.style.left = x + "px"; t.style.top = "486px";
-      t.onmouseenter = () => { sel = i; draw(); }; t.onclick = () => { sel = i; open(); }; els[i] = add(t);
+      const [n, ic] = MENU[i], w = 190, x = 640 - (5 * w + 4 * 14) / 2 + c * (w + 14);
+      const t = h("div", "m-pill", `<span class="ic">${ICON[ic]}</span><span>${esc(T(n))}</span>`);
+      t.style.left = x + "px"; t.style.top = "560px";
+      t.onmouseenter = () => { row = 2; col = c; draw(); }; t.onclick = () => { row = 2; col = c; open(); }; els["2:" + c] = add(t);
     });
-    add(h("style", "", `.g-big{position:absolute;width:150px;display:grid;justify-items:center;gap:10px;cursor:pointer}
-      .g-big .disc{position:relative;width:140px;height:140px;border-radius:50%;display:grid;place-items:center;border:4px solid #fff;box-shadow:0 8px 0 rgba(0,0,0,.3);transition:transform .12s}
-      .g-big .face{width:100px;height:100px;border-radius:50%;display:grid;place-items:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.08)}
-      .g-big .face svg{width:70px;height:70px}
-      .g-big .ring{position:absolute;left:-7px;top:-7px;width:164px;height:164px;border-radius:50%;background:rgba(255,244,216,.4);opacity:0;transition:opacity .12s}
-      .g-big .nm{font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:1px;text-shadow:0 2px 0 rgba(0,0,0,.5);transition:transform .12s}
-      .g-big.on .disc{transform:translateY(-10px) scale(1.08);border-color:var(--g-cream)}
-      .g-big.on .ring{opacity:1;transform:translateY(-10px)}
-      .g-big.on .nm{color:var(--g-cream);transform:translateY(-10px)}
-      .g-small{position:absolute;width:186px;height:54px;box-sizing:border-box;border-radius:999px;display:flex;align-items:center;gap:12px;padding-left:7px;cursor:pointer;
-        background:linear-gradient(180deg,rgba(29,90,82,.96),rgba(18,60,56,.96));border:2.5px solid var(--g-edge);box-shadow:0 4px 0 rgba(0,0,0,.25);font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:19px}
-      .g-small .dot{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center}
-      .g-small .dot svg{width:30px;height:30px}
-      .g-small.on{background:var(--g-cream);border-color:#fff;color:#26304A;box-shadow:0 0 0 4px rgba(255,244,216,.4),0 4px 0 rgba(0,0,0,.25)}
-      .g-small.on .dot{background:#26304A}`));
-    const line = box(240, 576, 800, null, "g-panel soft", ""); line.style.padding = "14px 26px"; line.style.textAlign = "center"; line.style.fontSize = "21px"; line.style.fontWeight = "800";
-    const draw = () => { for (const k in els) els[k].classList.toggle("on", +k === sel); line.innerHTML = esc(MENU[sel][3]); };
-    const open = () => go(MENU[sel][2], { from: "menu" });
+    add(h("style", "", `.m-tile{position:absolute;width:140px;display:grid;justify-items:center;gap:10px;cursor:pointer}
+      .m-tile .sq{position:relative;width:124px;height:124px;border-radius:34px;display:grid;place-items:center;border:4px solid #fff;box-shadow:0 7px 0 rgba(30,40,84,.18),0 12px 24px rgba(30,40,84,.25);transition:transform .14s;overflow:hidden}
+      .m-tile .sq svg{width:74px;height:74px;position:relative;filter:drop-shadow(0 3px 0 rgba(0,0,0,.14))}
+      .m-tile .gloss{position:absolute;left:8%;right:8%;top:5%;height:40%;border-radius:26px 26px 50% 50%;background:linear-gradient(180deg,rgba(255,255,255,.45),rgba(255,255,255,0))}
+      .m-tile .nm{font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:1px;color:#26304A;-webkit-text-stroke:5px #fff;paint-order:stroke fill;transition:transform .14s}
+      .m-tile .ul{width:0;height:6px;border-radius:999px;background:#41BF84;margin-top:-6px;transition:width .14s;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+      .m-tile .arr{position:absolute;left:-14px;top:46px;font-size:30px;color:#E5525C;opacity:0;transition:opacity .12s;-webkit-text-stroke:3px #fff;paint-order:stroke fill}
+      .m-tile.on .sq{transform:translateY(-10px) scale(1.08)} .m-tile.on .nm{transform:translateY(-4px)} .m-tile.on .ul{width:96px} .m-tile.on .arr{opacity:1}
+      .m-pill{position:absolute;width:190px;height:54px;border-radius:999px;display:flex;align-items:center;gap:12px;padding-left:7px;cursor:pointer;background:#fff;color:#26304A;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:19px;
+        box-shadow:0 0 0 2px rgba(255,255,255,.7),0 5px 14px rgba(30,40,84,.22);transition:transform .12s}
+      .m-pill .ic{width:40px;height:40px;border-radius:50%;background:#F1F4FB;display:grid;place-items:center}.m-pill .ic svg{width:30px;height:30px}
+      .m-pill.on{background:var(--g-sel);transform:translateY(-3px);box-shadow:0 0 0 3px #fff,0 0 0 6px #41BF84,0 8px 18px rgba(30,40,84,.25)} .m-pill.on .ic{background:#fff}`));
+    const line = box(340, 640, 600, null, "", ""); line.style.textAlign = "center"; line.style.fontSize = "19px"; line.style.fontWeight = "800"; line.style.color = "#26304A";
+    const item = () => row === 0 ? null : (row === 1 ? MENU_MAIN : MENU_SIDE)[col];
+    const draw = () => {
+      for (const k in els) els[k].classList.toggle("on", k === row + ":" + col);
+      face.style.transform = row === 0 ? "translateY(-6px) scale(1.05)" : "none";
+      const i = item();
+      line.innerHTML = i == null ? esc(T("PLAY WITH {0}", ourName(lead.sid))) : esc(T(MENU[i][3]));
+    };
+    const open = () => { const i = item(); if (i == null) go("summary", { i: 0 }); else go(MENU[i][2], { from: "menu" }); };
     draw(); hints([["A", "Open"], ["B", "Close"]]);
     return { key: k => {
       if (k === "a") { open(); return true; } if (k === "b") { go("hud"); return true; }
-      const top = MENU_MAIN.indexOf(sel) >= 0, row = top ? MENU_MAIN : MENU_SIDE, at = row.indexOf(sel);
-      if (k === "left") sel = row[(at + row.length - 1) % row.length];
-      else if (k === "right") sel = row[(at + 1) % row.length];
-      else if (k === "up" || k === "down") sel = (top ? MENU_SIDE : MENU_MAIN)[at];
+      if (row > 0 && (k === "left" || k === "right")) col = (col + (k === "right" ? 1 : 4)) % 5;
+      else if (k === "up") row = Math.max(0, row - 1);
+      else if (k === "down") row = Math.min(2, row + 1);
+      if (row === 0) col = 2;
       draw(); return true; } };
   }
 });
@@ -175,75 +218,92 @@ const DEXTEXT = {
   caterpie: "Its short feet have suction pads, so it can climb walls and trees without slipping.",
 };
 function dexText(sid) { const d = sp(sid); return DEXTEXT[sid] || `A ${d.stats.types.map(t => t.toLowerCase()).join(" and ")}-type POKéMON. Its entry is still being written.`; }
+// The POKéDEX's own look, as Let's Go's: bright aqua with a fine grid, white type.
+const DEXBG = "linear-gradient(0deg, rgba(255,255,255,.07) 1px, transparent 1px) 0 0/28px 28px, linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px) 0 0/28px 28px, radial-gradient(ellipse at 50% 30%, #6FE3F2 0%, #28B6D6 50%, #1786B8 100%)";
+// Reading an entry out (POKéDEX VOICE): the browser's own voice here; the game has its own.
+function readOut(text) { try { const u = new SpeechSynthesisUtterance(text.replace(/POKéMON/g, "Pokémon")); u.rate = 0.95; u.pitch = 0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }
+function stopReading() { try { speechSynthesis.cancel(); } catch (e) {} }
 screen("dex", "Menus", "Pokédex", {
-  scene: "model", sceneOpts: () => ({ sid: "pikachu", ox: -1.05 }),
-  what: "Every POKéMON in order: those you've caught marked with a ball, those you've only seen in grey, the rest unknown. The one you're on turns on the right.",
-  mod: "PokedexScreen: the list, SEEN and CAUGHT, and the entry.",
-  try: ["Up and down, left and right a page, A for the entry."],
+  what: "Every POKéMON as a grid of little pictures on the POKéDEX's aqua, as Let's Go's: the ones you've caught in full colour, the ones you've only seen as shadows, the rest a faint ball. The one you're on gets its number and name on a label.",
+  mod: "PokedexScreen: SEEN and CAUGHT, the grid, and the entry.",
+  tags: ["New look: Let's Go's"], try: ["Arrows round the grid, A for the entry, B back."],
   make(arg) {
-    backdrop("linear-gradient(160deg,#5AC8E8,#2E8FC0 55%,#1E5F96)");
-    let sel = Math.max(0, DEXLIST.findIndex(x => x.sid === (arg && arg.sid || "pikachu"))), top = Math.max(0, sel - 4);
-    header(ICON.dex, "POKéDEX", `SEEN ${SEEN.size}&nbsp;&nbsp;&nbsp;CAUGHT ${CAUGHT.size}`);
-    const L = box(28, 110, 520, 560, "g-panel", ""); L.style.padding = "12px";
-    const info = box(800, 560, 440, null, "g-panel soft", ""); info.style.padding = "12px 20px";
+    backdrop(DEXBG);
+    const COLS = 7, ROWS = 4;
+    let sel = Math.max(0, DEXLIST.findIndex(x => x.sid === (arg && arg.sid || "pikachu"))), top = Math.floor(Math.max(0, sel - COLS) / COLS) * COLS;
+    box(0, 0, 1280, 64, "", `<div style="display:flex;justify-content:center;gap:120px;padding-top:16px;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:22px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.18)"><span>POKéMON caught&nbsp;&nbsp;<b style="font-size:28px">${CAUGHT.size}</b></span><span>POKéMON seen&nbsp;&nbsp;<b style="font-size:28px">${SEEN.size}</b></span></div>`);
+    const grid = box(150, 86, 980, 540, "", "");
     const draw = () => {
-      if (sel < top) top = sel; if (sel > top + 8) top = sel - 8;
-      L.innerHTML = DEXLIST.slice(top, top + 9).map((x, j) => { const i = top + j, seen = SEEN.has(x.sid), got = CAUGHT.has(x.sid);
-        return `<div class="g-item${i === sel ? " on" : ""}" style="min-height:54px;padding-top:2px;padding-bottom:2px"><span style="width:58px;opacity:.75;font-variant-numeric:tabular-nums">${String(x.n).padStart(3, "0")}</span><span style="width:48px;height:48px;display:inline-grid;place-items:center">${seen ? pic(x.sid, 48, got ? "" : "filter:brightness(0) opacity(.45)") : ""}</span><span style="${seen ? "" : "opacity:.45"}">${seen ? esc(ourName(x.sid)) : "?????"}</span><span class="r" style="width:22px;height:22px">${got ? ICON.ball : ""}</span></div>`; }).join("");
-      const x = DEXLIST[sel], seen = SEEN.has(x.sid);
-      info.innerHTML = seen ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="g-title" style="font-size:26px">${esc(ourName(x.sid))}</span>${x.d.stats.types.map(typeChip).join("")}</div><div style="font-size:15px;font-weight:800;color:#A9D4C6">Stands in for #${String(x.n).padStart(3, "0")} ${esc(x.d.pname)}</div>` : `<span class="g-title" style="font-size:26px">?????</span>`;
-      SC.model.hide = !seen; if (seen) SC.model.show(x.sid);
-      [...L.children].forEach((c, j) => c.onclick = () => { sel = top + j; draw(); });
+      if (sel < top) top = Math.floor(sel / COLS) * COLS; if (sel >= top + COLS * ROWS) top = (Math.floor(sel / COLS) - ROWS + 1) * COLS;
+      grid.innerHTML = `<div style="display:grid;grid-template-columns:repeat(${COLS},1fr);gap:14px 10px">${DEXLIST.slice(top, top + COLS * ROWS).map((x, j) => { const i = top + j, seen = SEEN.has(x.sid), got = CAUGHT.has(x.sid), on = i === sel;
+        return `<div data-i="${i}" style="position:relative;height:120px;display:grid;place-items:center;cursor:pointer">
+          ${on ? `<div style="position:absolute;inset:4px 10px;border-radius:24px;background:rgba(255,255,255,.28);box-shadow:0 0 0 3px #fff"></div>` : ""}
+          <div style="position:relative;transform:${on ? "scale(1.15)" : "none"};transition:transform .12s">${seen ? pic(x.sid, 96, got ? "filter:drop-shadow(0 4px 4px rgba(0,40,80,.3))" : "filter:brightness(0) opacity(.35)") : `<span style="display:block;width:44px;height:44px;opacity:.28">${PICTO.ball("#28B6D6")}</span>`}</div>
+          <span style="position:absolute;bottom:2px;font-weight:900;font-size:14px;color:rgba(255,255,255,.85)">${String(x.n).padStart(3, "0")}</span>
+          ${on ? `<span style="position:absolute;top:-12px;padding:3px 14px;border-radius:999px;background:#fff;color:#26304A;font-weight:900;font-size:15px;white-space:nowrap;box-shadow:0 4px 10px rgba(0,40,80,.25)">No. ${String(x.n).padStart(3, "0")} ${seen ? esc(ourName(x.sid)) : "?????"}</span>` : ""}</div>`; }).join("")}</div>`;
+      grid.querySelectorAll("[data-i]").forEach(e => e.onclick = () => { sel = +e.dataset.i; draw(); if (SEEN.has(DEXLIST[sel].sid)) go("dexentry", { sid: DEXLIST[sel].sid }); });
     };
     draw(); hints([["A", "Entry"], ["B", "Back"], ["TAB", "Caught only"]]);
-    return { key: k => { if (k === "up" || k === "down") { sel = Math.max(0, Math.min(DEXLIST.length - 1, sel + (k === "down" ? 1 : -1))); draw(); return true; } if (k === "left" || k === "right") { sel = Math.max(0, Math.min(DEXLIST.length - 1, sel + (k === "right" ? 9 : -9))); draw(); return true; }
-      if (k === "a" && SEEN.has(DEXLIST[sel].sid)) { go("dexentry", { sid: DEXLIST[sel].sid }); return true; } if (k === "b") { go("menu"); return true; } return true; } };
+    return { key: k => {
+      if (k === "left" || k === "right" || k === "up" || k === "down") { const d = { left: -1, right: 1, up: -COLS, down: COLS }[k]; sel = Math.max(0, Math.min(DEXLIST.length - 1, sel + d)); draw(); return true; }
+      if (k === "a" && SEEN.has(DEXLIST[sel].sid)) { go("dexentry", { sid: DEXLIST[sel].sid }); return true; } if (k === "b") { go("menu", { sel: 0 }); return true; } return true; } };
   }
 });
 screen("dexentry", "Menus", "Pokédex entry", {
-  scene: "model", sceneOpts: () => ({ sid: "pikachu", ox: -1.05 }),
-  what: "One POKéMON's page: its number and name, its types, how tall it is in blocks, what it's like, and where to find it.",
-  mod: "PokedexScreen's entry, with POKéDEX VOICE reading it out (V).",
+  scene: "model", sceneOpts: () => ({ sid: "pikachu", ox: 0, stand: false, zoom: 1.05 }),
+  what: "One POKéMON's page, as Let's Go's: it stands big in the middle on its own colour; its number, name, types and height on a clear card top left; how many you've caught top right; what it's like across the bottom, read out loud (POKéDEX VOICE).",
+  mod: "PokedexScreen's entry, with POKéDEX VOICE reading it out.",
+  tags: ["New look", "Read out loud"], try: ["V (or the button) to read it again."],
   make(arg) {
-    const sid = arg && arg.sid || "pikachu", d = sp(sid);
-    typeBackdrop(d.stats.types[0]);
+    const sid = arg && arg.sid || "pikachu", d = sp(sid), tc = typeHex(d.stats.types[0]);
+    typeBackdrop(d.stats.types[0]); rays(50, 40, 0.12);
     SC.model.show(sid).then(() => { const e = $("#hgt"); if (e && SC.model.st) e.textContent = SC.model.st.m.size.h.toFixed(2) + " blocks"; });
-    box(28, 28, 600, 640, "g-panel g-fadein", `${typeBand(d.stats.types[0], 12, 12, 576, 96)}<div style="position:relative;padding:26px 30px;display:grid;gap:14px">
-      <div class="g-label" style="color:rgba(255,255,255,.85)">No. ${String(d.dex).padStart(3, "0")}</div><div class="g-title" style="font-size:46px;line-height:1;text-shadow:0 2px 0 rgba(0,0,0,.33)">${esc(ourName(sid))}</div>
-      <div style="display:flex;gap:8px">${d.stats.types.map(typeChip).join("")}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="g-panel soft" style="position:relative;padding:10px 16px;border-radius:16px"><div class="g-label">Height</div><div style="font-size:22px;font-weight:900" id="hgt">...</div></div>
-        <div class="g-panel soft" style="position:relative;padding:10px 16px;border-radius:16px"><div class="g-label">Stands in for</div><div style="font-size:22px;font-weight:900">${esc(d.pname)}</div></div></div>
-      <div style="font-size:22px;font-weight:800;line-height:1.5;color:#E8F4EF">${esc(dexText(sid))}</div>
-      <div class="g-label" style="margin-top:4px">Where to find it</div><div style="font-size:19px;font-weight:800">${CAUGHT.has(sid) ? "ROUTE 1, ROUTE 2, VIRIDIAN FOREST" : "Not found yet"}</div></div>`);
+    const glass = `background:rgba(255,255,255,.86);border:3px solid #fff;border-radius:22px;color:#26304A;box-shadow:0 8px 20px rgba(30,40,84,.2)`;
+    box(40, 34, 420, null, "g-fadein", `<div style="${glass};padding:16px 22px;display:grid;gap:6px"><div style="font-weight:900;font-size:16px;letter-spacing:1px;color:${darkerHex(tc, 0.25)}">POKéDEX No. ${String(d.dex).padStart(3, "0")}</div>
+      <div class="g-title" style="font-size:40px;line-height:1">${esc(ourName(sid))}</div><div style="display:flex;gap:8px">${d.stats.types.map(typeChip).join("")}</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 16px;margin-top:6px;font-size:19px;font-weight:800"><span style="opacity:.8">Height</span><span id="hgt">...</span><span style="opacity:.8">Stands in for</span><span>${esc(d.pname)}</span></div></div>`);
+    box(940, 34, 300, null, "g-fadein", `<div style="${glass};padding:16px 22px;display:grid;gap:4px"><div style="font-weight:900;font-size:16px;letter-spacing:1px;opacity:.9">Number caught</div><div class="g-title" style="font-size:40px">${CAUGHT.has(sid) ? 1 : 0}</div>
+      <div style="font-weight:900;font-size:16px;letter-spacing:1px;opacity:.9;margin-top:4px">Where to find it</div><div style="font-size:17px;font-weight:800">${CAUGHT.has(sid) ? "ROUTE 1, ROUTE 2, VIRIDIAN FOREST" : "Not found yet"}</div></div>`);
+    const text = dexText(sid);
+    box(0, 548, 1280, 172, "", `<div style="position:absolute;inset:0;background:linear-gradient(180deg, ${tc}00, ${darkerHex(tc, 0.45)}cc 45%, ${darkerHex(tc, 0.6)}ee)"></div>
+      <div style="position:absolute;left:200px;right:200px;top:46px;text-align:center;font-size:27px;font-weight:800;line-height:1.45;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35)">${esc(text)}</div>
+      <div id="rd" style="position:absolute;left:150px;top:52px;width:36px;height:36px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 0 0 0 rgba(255,255,255,.6);animation:rdp 1.2s ease-out infinite"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 9h4l5-4v14l-5-4H4z" fill="${tc}"/><path d="M16 8q3 4 0 8M18.5 5.5q5 6.5 0 13" stroke="${tc}" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <style>@keyframes rdp{to{box-shadow:0 0 0 16px rgba(255,255,255,0)}}</style>`);
+    later(600, () => readOut(text));
     hints([["V", "Read it out"], ["B", "Back"]]);
-    return { key: k => { if (k === "b") { go("dex", { sid }); return true; } return true; } };
+    return { leave: stopReading, key: k => { if (k === "b") { stopReading(); go("dex", { sid }); return true; } if (k === "v" || k === "a") { readOut(text); return true; } return true; } };
   }
 });
 function monCard(p, on, i) {
-  const f = p.hp / p.maxhp, d = sp(p.sid);
-  return `<div class="g-panel" style="position:relative;height:262px;padding:14px 18px;border-radius:26px;${on ? "background:linear-gradient(180deg,#FFF8E6,#FFF0CC);color:#26304A;border-color:#fff;box-shadow:0 0 0 4px rgba(255,244,216,.4),0 14px 30px rgba(0,0,0,.35)" : ""}${p.status === "FNT" ? ";filter:saturate(.35)" : ""}">
-    <div style="position:absolute;left:10px;top:8px;width:156px;height:156px;border-radius:26px;background:radial-gradient(circle at 50% 62%, ${on ? "rgba(255,212,90,.45)" : "rgba(143,245,192,.22)"}, transparent 68%)">${pic(p.sid, 156)}</div>
-    <div style="margin-left:160px;display:grid;gap:8px;padding-top:4px">
+  const f = p.hp / p.maxhp, d = sp(p.sid), tc = typeHex(d.stats.types[0]);
+  return `<div style="position:relative;height:250px;padding:14px 18px;border-radius:28px;border:4px solid #fff;cursor:pointer;transition:transform .14s;
+    background:linear-gradient(170deg, #FFFFFF 0%, ${lighterHex(tc, 0.78)} 55%, ${lighterHex(tc, 0.55)} 100%);color:#26304A;
+    box-shadow:${on ? "0 0 0 5px #FFC93C, 0 16px 30px rgba(30,40,84,.32)" : "0 8px 20px rgba(30,40,84,.2)"};${on ? "transform:translateY(-6px)" : ""}${p.status === "FNT" ? ";filter:saturate(.3)" : ""}">
+    ${on ? `<span style="position:absolute;left:-26px;top:96px;font-size:30px;color:#E5525C;-webkit-text-stroke:3px #fff;paint-order:stroke fill">&#9654;</span>` : ""}
+    <div style="position:absolute;left:8px;top:4px;width:170px;height:170px;display:grid;place-items:center"><div style="animation:${on ? "pbob .5s ease-in-out infinite alternate" : `pidle ${2.4 + i * 0.3}s ease-in-out infinite`}">${pic(p.sid, 160)}</div></div>
+    <div style="margin-left:168px;display:grid;gap:8px;padding-top:6px">
       <div style="display:flex;align-items:center;gap:6px"><span class="g-title" style="font-size:25px;line-height:1.1">${esc(ourName(p.sid))}</span>${gender(p.gender)}</div>
       <div style="font-weight:900;font-size:20px">Lv. ${p.lv}</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${d.stats.types.map(t => typeChip(t).replace("min-width:92px", "")).join("")}</div>
-      <div>${statusChip(p.status)}${i === 0 ? `<span style="display:inline-block;margin-left:${p.status ? 6 : 0}px;padding:2px 10px;border-radius:999px;background:${on ? "#26304A" : "#8FF5C0"};color:${on ? "#FFF4D8" : "#123C38"};font-weight:900;font-size:12px;letter-spacing:.8px">FOLLOWING YOU</span>` : ""}</div></div>
-    <div style="position:absolute;left:20px;right:20px;bottom:18px;display:flex;align-items:center;gap:10px"><span style="font-weight:900;font-size:14px;letter-spacing:1px;color:${on ? "#B8860B" : "#FFD45A"}">HP</span>
+      <div>${statusChip(p.status)}${i === 0 ? `<span style="display:inline-block;margin-left:${p.status ? 6 : 0}px;padding:2px 10px;border-radius:999px;background:linear-gradient(180deg,#6BE0A6,#2FA86C);color:#fff;font-weight:900;font-size:12px;letter-spacing:.8px">FOLLOWING YOU</span>` : ""}</div></div>
+    <div style="position:absolute;left:20px;right:20px;bottom:18px;display:flex;align-items:center;gap:10px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.85)"><span style="font-weight:900;font-size:14px;letter-spacing:1px;color:#E5525C">HP</span>
       <div class="g-hp" style="flex:1"><i style="width:${Math.max(0, f) * 100}%;background:${hpCol(f)}"></i></div><span style="font-weight:900;font-size:19px;font-variant-numeric:tabular-nums">${p.hp}/${p.maxhp}</span></div></div>`;
 }
 screen("party", "Menus", "Your team", {
-  what: "Your six as cards, three across: a picture of each, name, level, types, HP and any status, and which one is following you. A on one for SUMMARY, SWITCH, FOLLOW ME.",
+  what: "Your six as Let's Go's party cards: each in its own type's colour, its picture moving (the one you're on bouncing), name, level, types, HP. A on one for SUMMARY, SWITCH, FOLLOW ME.",
   mod: "MenuScreen's POKéMON, with SUMMARY, SWITCH, FOLLOW ME and CANCEL.",
+  tags: ["New look", "Moving pictures"],
   make() {
-    backdrop("linear-gradient(160deg,#9EE3C9,#4FA88E 60%,#2B6E61)"); const C = ctl();
-    header(ICON.ball, "POKéMON");
+    backdrop(LIME); rays(20, 0, 0.22); const C = ctl();
+    header(PICTO.ball("#3DB873"), "POKéMON");
+    add(h("style", "", "@keyframes pbob{from{transform:translateY(2px)}to{transform:translateY(-8px)}}@keyframes pidle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-2deg)}}"));
     let sel = 0;
-    const grid = box(30, 100, 1220, 560, "", "");
-    const draw = () => { grid.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px 22px">${G.party.map((p, i) => monCard(p, i === sel, i)).join("")}</div>`; [...grid.firstChild.children].forEach((c, i) => c.onclick = () => { sel = i; draw(); menu(); }); };
+    const grid = box(50, 104, 1180, 560, "", "");
+    const draw = () => { grid.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px 28px">${G.party.map((p, i) => monCard(p, i === sel, i)).join("")}</div>`; [...grid.firstChild.children].forEach((c, i) => c.onclick = () => { sel = i; draw(); menu(); }); };
     const menu = async () => {
       const i = await C.choose(["SUMMARY", "SWITCH", "FOLLOW ME", "CANCEL"], { x: 950, y: null, bottom: 30, w: 290 });
       if (i === 0) go("summary", { i: sel });
-      else if (i === 2) { const tb = C.say([{ text: `**${ourName(G.party[sel].sid)}** will follow you now.` }]); }
+      else if (i === 2) { C.say([{ text: `**${ourName(G.party[sel].sid)}** will follow you now.` }]); }
     };
     draw(); hints([["A", "Choose"], ["B", "Back"]]);
     const nav = { key(k) { if (k === "a") { menu(); return true; } if (k === "b") { go("menu", { sel: 1 }); return true; } const n = sel; sel = gridMove(sel, 6, 3, k); if (n !== sel) draw(); return true; } };
@@ -251,75 +311,86 @@ screen("party", "Menus", "Your team", {
     return { key: k => C.key(k) };
   }
 });
+// A hexagon of the six stats (Let's Go's): the outline in white, the creature's own share filled in its colour.
+function statHex(st, lv, tc) {
+  const keys = [["HP", "HP"], ["Attack", "ATTACK"], ["Defense", "DEFENSE"], ["Speed", "SPEED"], ["Sp. Def", "SP. DEF"], ["Sp. Atk", "SP. ATK"]], R = 120, cx = 170, cy = 160, mx = lv * 2.6 + 30;
+  const pt = (k, r) => { const a = -Math.PI / 2 + k * Math.PI / 3; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; };
+  const ring = f => keys.map((_, k) => pt(k, R * f).join(",")).join(" ");
+  const val = keys.map(([k], q) => pt(q, R * Math.max(0.12, Math.min(1, st[k] / mx))).join(",")).join(" ");
+  return `<svg viewBox="0 0 340 320" width="340" height="320"><polygon points="${ring(1)}" fill="rgba(255,255,255,.35)" stroke="#fff" stroke-width="3"/><polygon points="${ring(0.66)}" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><polygon points="${ring(0.33)}" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/>
+    <polygon points="${val}" fill="${darkerHex(tc, 0.12)}" fill-opacity=".9" stroke="#fff" stroke-width="2.5"/>
+    ${keys.map(([k, l], q) => { const [x, y] = pt(q, R + 26); return `<text x="${x}" y="${y - 6}" text-anchor="middle" font-family="Nunito Sans,sans-serif" font-weight="900" font-size="13" fill="#fff" stroke="${darkerHex(tc, 0.35)}" stroke-width="3" paint-order="stroke">${l}</text><text x="${x}" y="${y + 12}" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="19" fill="#fff" stroke="${darkerHex(tc, 0.35)}" stroke-width="3" paint-order="stroke">${st[k]}</text>`; }).join("")}</svg>`;
+}
 screen("summary", "Menus", "Summary", {
-  scene: "model", sceneOpts: () => ({ sid: G.party[0].sid, ox: -1.05 }),
-  what: "One of your team in full: its stats as bars, its moves with their types and PP, its EXP to the next level.",
+  scene: "model", sceneOpts: () => ({ sid: G.party[0].sid, ox: 1.15, stand: false }),
+  what: "One of your team in full, as Let's Go's: it stands big on the left on its own colour (light rays behind it), its name plate bottom left with its HP; on the right, a page each for INFO, STATS (a hexagon of its six stats) and MOVES (each a bar in its type's colour, with PP).",
   mod: "MenuScreen's SUMMARY: ATTACK, DEFENSE, SPCL.ATK, SPCL.DEF, SPEED.",
-  try: ["Tab, or left and right, for the next page. Up and down for the next of your team."],
+  tags: ["New look: Let's Go's"], try: ["Tab, or left and right, for the next page. Up and down for the next of your team."],
   make(arg) {
-    let i = arg && arg.i || 0, page = 0;
-    const P = box(28, 28, 640, 660, "g-panel", ""); P.style.padding = "24px 28px"; P.style.boxSizing = "border-box";
+    let i = arg && arg.i || 0, page = 1;
+    const plate = box(40, 556, 520, null, "", ""), P = box(650, 40, 600, 600, "", "");
+    const tabs = box(650, 0, 600, null, "", "");
     const draw = () => {
-      const p = G.party[i], d = sp(p.sid); SC.model.show(p.sid); typeBackdrop(d.stats.types[0]);
-      const tc = typeHex(d.stats.types[0]);
-      const tabs = ["INFO", "STATS", "MOVES"].map((t, j) => `<span class="g-chip${j === page ? " on" : ""}" style="font-size:15px">${t}</span>`).join("");
-      let body = "";
-      if (page === 0) body = `<div style="display:grid;grid-template-columns:auto 1fr;gap:10px 22px;font-size:21px;font-weight:800"><span class="g-label">No.</span><span>${String(d.dex).padStart(3, "0")}</span><span class="g-label">Types</span><span>${d.stats.types.map(typeChip).join(" ")}</span>
+      const p = G.party[i], d = sp(p.sid), tc = typeHex(d.stats.types[0]), f = p.hp / p.maxhp; SC.model.show(p.sid); typeBackdrop(d.stats.types[0]);
+      uiRoot.querySelectorAll(".sumrays").forEach(e => e.remove()); const r = rays(22, 55, 0.14); r.classList.add("sumrays"); uiRoot.prepend(r);
+      plate.innerHTML = `<div style="position:relative;padding:14px 22px 14px;border-radius:26px;background:linear-gradient(180deg,#fff,${lighterHex(tc, 0.82)});border:4px solid #fff;box-shadow:0 10px 24px rgba(30,40,84,.28)">
+        <div style="display:flex;align-items:center;gap:10px"><span class="g-title" style="font-size:32px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-weight:900;font-size:22px">Lv. ${p.lv}</span></div>
+        <div style="display:flex;gap:8px;margin:6px 0 10px">${d.stats.types.map(typeChip).join("")}</div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-weight:900;font-size:14px;color:#E5525C">HP</span><div class="g-hp" style="flex:1"><i style="width:${f * 100}%;background:${hpCol(f)}"></i></div><span style="font-weight:900;font-size:19px">${p.hp}/${p.maxhp}</span></div></div>`;
+      tabs.innerHTML = `<div style="display:flex;justify-content:center;gap:10px;padding-top:4px">${["INFO", "STATS", "MOVES"].map((t, j) => `<span data-p="${j}" style="cursor:pointer;padding:6px 22px;border-radius:999px;font-family:Fredoka,sans-serif;font-weight:600;font-size:18px;letter-spacing:1px;${j === page ? `background:#fff;color:${darkerHex(tc, 0.3)};box-shadow:0 4px 12px rgba(30,40,84,.25)` : "background:rgba(255,255,255,.3);color:#fff"}">${t}</span>`).join("")}</div>`;
+      tabs.querySelectorAll("[data-p]").forEach(e => e.onclick = () => { page = +e.dataset.p; draw(); });
+      const card = `position:relative;border-radius:26px;background:rgba(255,255,255,.92);border:4px solid #fff;box-shadow:0 10px 24px rgba(30,40,84,.25);color:#26304A`;
+      if (page === 0) P.innerHTML = `<div style="${card};padding:24px 30px;margin-top:20px"><div style="display:grid;grid-template-columns:auto 1fr;gap:12px 22px;font-size:21px;font-weight:800"><span class="g-label">POKéDEX No.</span><span>${String(d.dex).padStart(3, "0")}</span>
         <span class="g-label">Trainer</span><span>${esc(G.name)}</span><span class="g-label">ID No.</span><span>${G.id}</span><span class="g-label">Item</span><span>None</span><span class="g-label">Met</span><span>ROUTE 1, at Lv. ${Math.max(2, p.lv - 18)}</span></div>
-        <div style="margin-top:16px"><div class="g-label">EXP to Lv. ${p.lv + 1}</div><div class="g-exp" style="margin-top:6px"><i style="width:${p.exp * 100}%"></i></div></div>`;
-      else if (page === 1) { const st = p.stats, names = [["HP", "HP"], ["Attack", "ATTACK"], ["Defense", "DEFENSE"], ["Sp. Atk", "SPCL.ATK"], ["Sp. Def", "SPCL.DEF"], ["Speed", "SPEED"]];
-        body = `<div style="display:grid;gap:12px">${names.map(([k, l]) => `<div style="display:grid;grid-template-columns:150px 70px 1fr;align-items:center;gap:12px;font-size:19px;font-weight:900"><span class="g-label">${l}</span><span style="text-align:right">${k === "HP" ? p.hp + "/" + st[k] : st[k]}</span><div class="g-hp" style="height:16px"><i style="width:${Math.min(100, st[k] / (p.lv * 2.6 + 30) * 100)}%;background:linear-gradient(180deg,${lighterHex(tc, 0.45)},${tc})"></i></div></div>`).join("")}</div>`; }
-      else body = `<div style="display:grid;gap:10px">${p.moves.map(n => { const m = MOVE[n] || { type: "NORMAL", pp: 20, category: "Physical", power: 40 }; return `<div class="g-panel soft" style="position:relative;padding:10px 16px;border-radius:18px;display:flex;align-items:center;gap:14px">${typeChip(m.type)}<span style="font-size:21px;font-weight:900">${esc(n)}</span><span style="margin-left:auto;font-weight:900;font-variant-numeric:tabular-nums">PP ${m.pp}/${m.pp}</span></div>`; }).join("")}</div>`;
-      P.innerHTML = `${typeBand(d.stats.types[0], 12, 12, 616, 64)}<div style="position:relative;display:flex;align-items:center;gap:12px;text-shadow:0 2px 0 rgba(0,0,0,.33)"><span class="g-title" style="font-size:36px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-size:24px;font-weight:900">Lv. ${p.lv}</span></div>
-        <div style="display:flex;gap:8px;margin:14px 0 18px">${tabs}</div>${body}`;
+        <div style="margin-top:20px"><div class="g-label">EXP to Lv. ${p.lv + 1}</div><div class="g-exp" style="margin-top:8px;height:10px;background:#DDE3F0"><i style="width:${p.exp * 100}%;background:linear-gradient(90deg,#7CC2FA,#3C8DE4)"></i></div></div></div>`;
+      else if (page === 1) P.innerHTML = `<div style="display:grid;justify-items:center;margin-top:30px">${statHex(p.stats, p.lv, tc)}</div><div style="${card};margin:10px 60px 0;padding:12px 22px;display:flex;justify-content:space-between;font-weight:900;font-size:18px"><span class="g-label">Nature</span><span>Brave</span></div>`;
+      else P.innerHTML = `<div style="display:grid;gap:12px;margin-top:30px">${p.moves.map(n => { const m = MOVE[n] || { type: "NORMAL", pp: 20 }, c = typeHex(m.type);
+        return `<div style="position:relative;display:flex;align-items:center;gap:14px;height:64px;padding:0 22px 0 8px;border-radius:999px;border:3px solid #fff;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2);background:linear-gradient(180deg, ${lighterHex(c, 0.25)}, ${c} 55%, ${darkerHex(c, 0.18)});box-shadow:0 6px 14px rgba(30,40,84,.25)">
+          <span style="padding:3px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:${darkerHex(c, 0.25)};font-weight:900;font-size:13px;letter-spacing:1px;text-shadow:none">${esc(m.type)}</span><span class="g-title" style="font-size:24px">${esc(n)}</span><span style="margin-left:auto;font-weight:900;font-size:20px;font-variant-numeric:tabular-nums">${m.pp}/${m.pp}</span></div>`; }).join("")}</div>`;
     };
     draw(); hints([["TAB", "Page"], ["B", "Back"]]);
     return { key: k => { if (k === "tab" || k === "right") { page = (page + 1) % 3; draw(); return true; } if (k === "left") { page = (page + 2) % 3; draw(); return true; } if (k === "up" || k === "down") { i = (i + (k === "down" ? 1 : 5)) % 6; draw(); return true; } if (k === "b") { go("party"); return true; } return true; } };
   }
 });
+// The bag's pockets: each its own colour and picture.
+const POCKETS = { "ITEMS": ["#3DB873", "potion"], "BALLS": ["#E5484F", "ball"], "KEY ITEMS": ["#F59A2A", "key"], "TM & HM": ["#3C8DE4", "disc"] };
 screen("bag", "Menus", "Bag", {
-  what: "Your bag with its four pockets: ITEMS (the main body), BALLS (the front), KEY ITEMS (the lid), TM & HM (the side). What's in the picked one is listed, with what it does.",
-  mod: "MenuScreen's BAG: the backpack in its colour and its four pockets.",
-  try: ["Left and right (or Tab) for a pocket, up and down for an item, A to use."],
+  what: "The bag as Let's Go's: one big white page on a sunny backdrop, your money in its corner. The pockets along the top, each a round picture in its colour (the one you're on lifted, a red arrow and a green line under its name); what's in it as tiles below, each with its picture and how many; what it does along the foot.",
+  mod: "MenuScreen's BAG: ITEMS, BALLS, KEY ITEMS and TM & HM.",
+  tags: ["New look: Let's Go's"], try: ["Tab, or Q and E, for a pocket; arrows round the items; A to use."],
   make() {
-    backdrop("linear-gradient(160deg,#FFE7B8,#F6C46B 55%,#D99A3A)"); const C = ctl();
+    backdrop(LIME); rays(85, 0, 0.25); const C = ctl();
     const pockets = Object.keys(G.bag); let pk = 0, sel = 0;
-    header(ICON.bag, "BAG");
-    const bag = box(48, 96, 400, 540, "", ""); const L = box(480, 110, 740, 440, "g-panel", ""); L.style.padding = "14px";
-    const desc = box(480, 570, 740, 110, "g-panel soft", ""); desc.style.padding = "18px 26px"; desc.style.fontSize = "21px"; desc.style.fontWeight = "800";
-    add(h("div", "", pic(G.party[0].sid, 680, "position:absolute;right:-90px;bottom:-120px;opacity:.09;filter:saturate(.6)"))).style.cssText = "position:absolute;inset:0;pointer-events:none;overflow:hidden";
-    uiRoot.insertBefore(uiRoot.lastChild, uiRoot.firstChild);
+    const page = box(60, 40, 1160, 610, "g-panel", ""); page.style.borderRadius = "36px";
+    box(36, 18, null, null, "", `<div style="padding:6px 18px 6px 10px;border-radius:999px;background:#fff;box-shadow:0 0 0 3px #FFC93C,0 6px 14px rgba(30,40,84,.2);display:flex;align-items:center;gap:8px;font-weight:900;font-size:19px;color:#26304A"><span style="padding:2px 10px;border-radius:999px;background:#FFC93C;font-size:12px;letter-spacing:1px">MONEY</span>${money(G.money)}</div>`);
     const draw = () => {
-      const col = hex(colourOf(G.outfit.bagc)), dk = darkerHex(col, 0.22), dd = darkerHex(col, 0.38), lt = lighterHex(col, 0.18), on = { "ITEMS": "body", "BALLS": "front", "KEY ITEMS": "lid", "TM & HM": "side" }[pockets[pk]];
-      const hl = p => p === on ? `stroke="#FFF4D8" stroke-width="6" filter="url(#gl)"` : `stroke="${dd}" stroke-width="3"`;
-      const lift = p => p === on ? `transform="translate(0,-6)"` : "";
-      bag.innerHTML = `<svg viewBox="0 0 400 500" width="400" height="500"><defs><filter id="gl" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#FFF4D8" flood-opacity=".9"/></filter>
-          <pattern id="weave" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${col}"/><rect width="4" height="4" fill="${lt}" opacity=".25"/><rect x="4" y="4" width="4" height="4" fill="${dk}" opacity=".18"/></pattern></defs>
-        <rect x="150" y="18" width="100" height="56" rx="18" fill="none" stroke="${dd}" stroke-width="14"/>
-        <rect x="64" y="96" width="44" height="300" rx="10" fill="${dk}"/><rect x="292" y="96" width="44" height="300" rx="10" fill="${dk}"/>
-        <g ${lift("body")}><rect x="60" y="70" width="280" height="390" rx="30" fill="url(#weave)" ${hl("body")}/>
-          <rect x="76" y="86" width="248" height="358" rx="22" fill="none" stroke="${dd}" stroke-width="2.5" stroke-dasharray="8 7" opacity=".7"/><rect x="60" y="430" width="280" height="30" rx="14" fill="${dd}" opacity=".55"/></g>
-        <g ${lift("side")}><rect x="318" y="230" width="62" height="170" rx="14" fill="${dk}" ${hl("side")}/><rect x="326" y="210" width="46" height="34" rx="8" fill="#5A8EA1"/><circle cx="349" cy="227" r="12" fill="#9FD3E2"/><circle cx="349" cy="227" r="4" fill="#123C38"/>
-          <rect x="324" y="300" width="50" height="6" rx="3" fill="${dd}"/></g>
-        <g ${lift("front")}><rect x="100" y="262" width="200" height="160" rx="26" fill="${lt}" ${hl("front")}/><path d="M118 300 H282" stroke="${dd}" stroke-width="5" stroke-linecap="round"/><rect x="190" y="292" width="20" height="16" rx="4" fill="#F4F6F5" stroke="${dd}" stroke-width="2"/>
-          <g transform="translate(200 362)"><circle r="28" fill="#F4F6F5"/><path d="M-28 0 a28 28 0 0 1 56 0z" fill="#E5525C"/><rect x="-28" y="-3" width="56" height="6" fill="#26304A"/><circle r="9" fill="#26304A"/><circle r="5" fill="#fff"/></g></g>
-        <g ${lift("lid")}><path d="M60 140 V108 Q60 66 104 64 H296 Q340 66 340 108 V140 Q340 200 290 206 H110 Q60 200 60 140Z" fill="${dk}" ${hl("lid")}/>
-          <path d="M80 120 Q200 96 320 120" stroke="${lt}" stroke-width="3" fill="none" opacity=".5"/><rect x="176" y="176" width="48" height="46" rx="9" fill="#FFD45A" stroke="#B8860B" stroke-width="3"/><rect x="190" y="190" width="20" height="18" rx="4" fill="#B8860B"/></g>
-      </svg>
-      <div style="position:absolute;left:0;right:0;top:500px;display:flex;justify-content:center;gap:6px">${pockets.map((p, i) => `<span class="g-chip${i === pk ? " on" : ""}" style="font-size:13px;padding:3px 10px">${esc(p)}</span>`).join("")}</div>`;
-      const items = G.bag[pockets[pk]];
-      L.innerHTML = items.map(([n, c], i) => `<div style="margin-bottom:8px">${goodsRow(n, "x" + c, i === sel)}</div>`).join("") || `<div style="padding:20px;font-size:21px;font-weight:800;color:#A9D4C6">Empty</div>`;
-      desc.innerHTML = items[sel] ? esc(items[sel][2]) : "";
-      [...L.children].forEach((c, i) => c.onclick = () => { sel = i; draw(); use(); });
+      const items = G.bag[pockets[pk]], COLS = 4;
+      page.innerHTML = `<div style="display:flex;justify-content:center;gap:54px;padding-top:26px">${pockets.map((p, i) => { const [c, ic] = POCKETS[p] || ["#8A93A6", "bag"], on = i === pk;
+          return `<div data-p="${i}" style="position:relative;display:grid;justify-items:center;gap:6px;cursor:pointer;transform:${on ? "translateY(-4px)" : "none"};transition:transform .12s">
+            ${on ? `<span style="position:absolute;left:-26px;top:22px;font-size:24px;color:#E5525C">&#9654;</span>` : ""}
+            <span style="width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:0 0 0 4px ${on ? c : "#E4E9F4"},0 6px 14px rgba(30,40,84,.18)"><span style="width:48px;height:48px">${ICON[ic]}</span></span>
+            <span style="font-family:Fredoka,sans-serif;font-weight:600;font-size:17px;color:${on ? c : "#8A93A6"}">${esc(p)}</span><span style="width:${on ? 70 : 0}px;height:5px;border-radius:999px;background:#41BF84;transition:width .14s"></span></div>`; }).join("")}</div>
+        <div style="margin:22px 44px 0;border-top:2px dashed #E4E9F4"></div>
+        <div style="display:grid;grid-template-columns:repeat(${COLS},1fr);gap:14px;padding:22px 50px 0">${items.map(([n, c], i) => { const on = i === sel, kc = GOODS[ITEM_KIND(n)];
+          return `<div data-i="${i}" style="position:relative;display:flex;align-items:center;gap:12px;height:76px;padding:0 16px 0 10px;border-radius:22px;cursor:pointer;
+            background:${on ? "var(--g-sel)" : "#F5F8FD"};box-shadow:${on ? "0 0 0 3px #fff,0 0 0 6px #FFC93C,0 8px 16px rgba(232,150,30,.3)" : "inset 0 0 0 2px #E8EDF6"}">
+            ${on ? `<span style="position:absolute;left:-18px;font-size:20px;color:#E5525C">&#9654;</span>` : ""}
+            <span style="width:54px;height:54px;flex:none;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 0 0 3px ${kc[1]}"><span style="width:36px;height:36px">${ITEM_ICON(n)}</span></span>
+            <span style="font-weight:900;font-size:17px;color:#26304A;line-height:1.15">${esc(n)}</span><span style="margin-left:auto;font-weight:900;font-size:18px;color:${kc[2]}">x${c}</span></div>`; }).join("") || `<div style="grid-column:1/-1;padding:30px;text-align:center;font-size:21px;font-weight:800;color:var(--g-muted)">Nothing in this pocket yet.</div>`}</div>
+        <div style="position:absolute;left:40px;right:40px;bottom:26px;min-height:62px;padding:16px 26px;border-radius:22px;background:#F5F8FD;font-size:21px;font-weight:800;color:#26304A">${items[sel] ? esc(items[sel][2]) : ""}</div>`;
+      page.querySelectorAll("[data-p]").forEach(e => e.onclick = () => { pk = +e.dataset.p; sel = 0; draw(); });
+      page.querySelectorAll("[data-i]").forEach(e => { e.onmouseenter = () => { sel = +e.dataset.i; draw(); }; e.onclick = () => { sel = +e.dataset.i; use(); }; });
     };
     const use = async () => {
       const it = G.bag[pockets[pk]][sel]; if (!it) return;
       const i = await C.choose(pockets[pk] === "KEY ITEMS" ? ["USE", "REGISTER", "CANCEL"] : ["USE", "GIVE", "TOSS", "CANCEL"], { x: 940, y: 300, w: 260 });
       if (i === 0) C.say([{ text: pockets[pk] === "BALLS" ? "You can only throw that in a battle with a wild POKéMON!" : `Which POKéMON should get the **${it[0]}**?` }]);
     };
-    draw(); hints([["A", "Choose"], ["B", "Back"], ["TAB", "Pocket"]]);
-    C.push({ key(k) { if (k === "left" || k === "right" || k === "tab") { pk = (pk + (k === "left" ? pockets.length - 1 : 1)) % pockets.length; sel = 0; draw(); return true; }
-      if (k === "up" || k === "down") { const n = G.bag[pockets[pk]].length; sel = (sel + (k === "down" ? 1 : n - 1)) % n; draw(); return true; } if (k === "a") { use(); return true; } if (k === "b") { go("menu", { sel: 2 }); return true; } return false; } });
+    draw(); hints([["A", "Use"], ["B", "Back"], ["TAB", "Pocket"]]);
+    C.push({ key(k) { const items = G.bag[pockets[pk]];
+      if (k === "tab") { pk = (pk + 1) % pockets.length; sel = 0; draw(); return true; }
+      if (["left", "right", "up", "down"].includes(k) && items.length) { const n = sel; sel = gridMove(sel, items.length, 4, k); if (n !== sel) draw(); return true; }
+      if (k === "a") { use(); return true; } if (k === "b") { go("menu", { sel: 2 }); return true; } return false; } });
     return { key: k => C.key(k) };
   }
 });
@@ -356,8 +427,8 @@ screen("map", "Menus", "Town Map", {
     const rr = (x, y, w, hh, r) => { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + hh, r); ctx.arcTo(x + w, y + hh, x, y + hh, r); ctx.arcTo(x, y + hh, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); };
     const label = (text, x, y, big) => {
       ctx.font = `900 ${big ? 13 : 11}px Nunito, system-ui, sans-serif`; const w = ctx.measureText(text).width + 14, hh = big ? 22 : 18;
-      rr(x - w / 2, y, w, hh, hh / 2); ctx.fillStyle = "rgba(18,60,56,.88)"; ctx.fill(); ctx.strokeStyle = "#4FB896"; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.fillStyle = "#FFF4D8"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, x, y + hh / 2 + 0.5);
+      rr(x - w / 2, y, w, hh, hh / 2); ctx.fillStyle = "rgba(255,255,255,.95)"; ctx.fill(); ctx.strokeStyle = "rgba(30,40,84,.18)"; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = "#26304A"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, x, y + hh / 2 + 0.5);
     };
     const paint = now => {
       if (!alive) return;
@@ -372,8 +443,8 @@ screen("map", "Menus", "Town Map", {
         const [sx, sy] = toScreen(p.x, p.z); if (sx < -40 || sy < -40 || sx > VW + 40 || sy > VH + 40) return;
         const on = i === sel, been = BEEN.includes(p.key);
         if (p.kind === "town") { const r = zi >= 2 ? 9 : 7; rr(sx - r, sy - r, r * 2, r * 2, 4); ctx.fillStyle = on ? "#FFD45A" : been ? "#E5525C" : "#B9C4C0"; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#FFFFFF"; ctx.stroke(); }
-        else if (p.kind === "spot") { ctx.save(); ctx.translate(sx, sy); ctx.rotate(Math.PI / 4); ctx.fillStyle = on ? "#FFD45A" : "#8FF5C0"; ctx.fillRect(-5, -5, 10, 10); ctx.strokeStyle = "#123C38"; ctx.lineWidth = 2; ctx.strokeRect(-5, -5, 10, 10); ctx.restore(); }
-        else { ctx.beginPath(); ctx.arc(sx, sy, on ? 6 : 4, 0, 7); ctx.fillStyle = on ? "#FFD45A" : "#FFF4D8"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#123C38"; ctx.stroke(); }
+        else if (p.kind === "spot") { ctx.save(); ctx.translate(sx, sy); ctx.rotate(Math.PI / 4); ctx.fillStyle = on ? "#FFC93C" : "#fff"; ctx.fillRect(-5, -5, 10, 10); ctx.strokeStyle = "#E5525C"; ctx.lineWidth = 2; ctx.strokeRect(-5, -5, 10, 10); ctx.restore(); }
+        else { ctx.beginPath(); ctx.arc(sx, sy, on ? 6 : 4, 0, 7); ctx.fillStyle = on ? "#FFC93C" : "#fff"; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#E5525C"; ctx.stroke(); }
         if (on) { ctx.beginPath(); ctx.arc(sx, sy, 15 + pulse * 5, 0, 7); ctx.strokeStyle = `rgba(255,212,90,${0.9 - pulse * 0.5})`; ctx.lineWidth = 3; ctx.stroke(); }
         if (p.kind === "town" || on || zi >= 2) label(p.name, sx, sy + (p.kind === "town" ? 12 : 9), p.kind === "town");
       });
@@ -383,7 +454,7 @@ screen("map", "Menus", "Town Map", {
       ctx.fillStyle = "#FFD45A"; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#26304A"; ctx.stroke(); ctx.restore();
       // Scale bar.
       const blocks = zi === 0 ? 200 : zi === 1 ? 100 : zi === 2 ? 50 : 20, bw = blocks * z;
-      ctx.fillStyle = "rgba(18,60,56,.8)"; rr(14, VH - 40, bw + 90, 26, 13); ctx.fill(); ctx.fillStyle = "#FFF4D8"; ctx.fillRect(26, VH - 28, bw, 4);
+      ctx.fillStyle = "rgba(255,255,255,.9)"; rr(14, VH - 40, bw + 90, 26, 13); ctx.fill(); ctx.fillStyle = "#26304A"; ctx.fillRect(26, VH - 28, bw, 4);
       ctx.font = "900 12px Nunito, system-ui, sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(blocks + " blocks", 34 + bw, VH - 26);
       requestAnimationFrame(paint);
     };
@@ -392,17 +463,17 @@ screen("map", "Menus", "Town Map", {
       const wild = p.wild.slice(0, GYMS[p.name] ? 4 : 12);
       info.innerHTML = `<div class="g-label">${p.key === "pallet_town" ? "You are here" : KIND[p.kind] || "Place"}</div>
         <div class="g-title" style="font-size:${p.name.length > 14 ? 27 : 32}px;line-height:1.1;margin:6px 0 10px">${esc(p.name)}</div>
-        ${p.tag ? `<div style="font-size:18px;font-weight:800;line-height:1.45;color:#E8F4EF;font-style:italic">"${esc(p.tag)}"</div>` : ""}
-        ${here.length ? `<div class="g-label" style="margin-top:16px">Here</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px">${here.map(x => `<span style="display:inline-flex;align-items:center;gap:7px;font-size:14.5px;font-weight:900;padding:4px 11px;border-radius:999px;background:rgba(0,0,0,.18)"><span style="width:8px;height:8px;border-radius:3px;background:#8FF5C0"></span>${esc(x)}</span>`).join("")}</div>` : ""}
-        ${GYMS[p.name] ? (([lead, type, b, lv]) => `<div class="g-label" style="margin-top:16px">Gym</div><div style="display:grid;grid-template-columns:58px 1fr;gap:4px 12px;align-items:center;margin-top:8px;padding:10px 12px;border-radius:16px;background:rgba(0,0,0,.18)">
+        ${p.tag ? `<div style="font-size:18px;font-weight:800;line-height:1.45;color:var(--g-text);font-style:italic">"${esc(p.tag)}"</div>` : ""}
+        ${here.length ? `<div class="g-label" style="margin-top:16px">Here</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px">${here.map(x => `<span style="display:inline-flex;align-items:center;gap:7px;font-size:14.5px;font-weight:900;padding:4px 11px;border-radius:999px;background:#F1F4FB"><span style="width:8px;height:8px;border-radius:3px;background:#E5525C"></span>${esc(x)}</span>`).join("")}</div>` : ""}
+        ${GYMS[p.name] ? (([lead, type, b, lv]) => `<div class="g-label" style="margin-top:16px">Gym</div><div style="display:grid;grid-template-columns:58px 1fr;gap:4px 12px;align-items:center;margin-top:8px;padding:10px 12px;border-radius:16px;background:#F1F4FB">
           <span style="grid-row:span 3;width:58px;height:58px">${badgeSvg(b)}</span><span style="font-size:19px;font-weight:900">${esc(lead)}</span>
-          <span style="font-size:14px;font-weight:900;color:#A9D4C6">${esc(type)} type · ${esc(BADGES[b][0])}</span><span style="font-size:14px;font-weight:800;color:#E8F4EF">Team from level ${esc(lv)}</span></div>`)(GYMS[p.name]) : ""}
+          <span style="font-size:14px;font-weight:900;color:var(--g-muted)">${esc(type)} type · ${esc(BADGES[b][0])}</span><span style="font-size:14px;font-weight:800;color:var(--g-text)">Team from level ${esc(lv)}</span></div>`)(GYMS[p.name]) : ""}
         ${wild.length ? `<div class="g-label" style="margin-top:16px">Wild POKéMON</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">${wild.map(sid => DATA.species[sid]
-          ? `<div title="${esc(DATA.species[sid].pname)}" style="aspect-ratio:1;border-radius:12px;background:rgba(0,0,0,.18);display:grid;place-items:center">${pic(sid, 56)}</div>`
-          : `<div title="${esc(sid)}" style="aspect-ratio:1;border-radius:12px;background:rgba(0,0,0,.18);display:grid;place-items:center;font-size:26px;font-weight:900;color:#5E8E82">?</div>`).join("")}</div>` : ""}
+          ? `<div title="${esc(DATA.species[sid].pname)}" style="aspect-ratio:1;border-radius:12px;background:#F1F4FB;display:grid;place-items:center">${pic(sid, 56)}</div>`
+          : `<div title="${esc(sid)}" style="aspect-ratio:1;border-radius:12px;background:#F1F4FB;display:grid;place-items:center;font-size:26px;font-weight:900;color:var(--g-dim)">?</div>`).join("")}</div>` : ""}
         <div style="margin-top:auto;padding-top:12px;display:grid;gap:8px">
           ${p.kind === "town" ? (been ? `<div class="g-chip on" style="justify-content:center;font-size:17px;padding:8px">A: FLY HERE</div>` : `<div class="g-chip" style="justify-content:center;font-size:15px;padding:8px;opacity:.7">Not been here yet</div>`) : ""}
-          <div style="font-size:12.5px;font-weight:800;color:#A9D4C6;line-height:1.35">${p.zone ? `Zone in the mod: ${p.zone[0]}, ${p.zone[1]} to ${p.zone[2]}, ${p.zone[3]}` : `About ${p.x}, ${p.z} on your map`}</div></div>`;
+          <div style="font-size:12.5px;font-weight:800;color:var(--g-muted);line-height:1.35">${p.zone ? `Zone in the mod: ${p.zone[0]}, ${p.zone[1]} to ${p.zone[2]}, ${p.zone[3]}` : `About ${p.x}, ${p.z} on your map`}</div></div>`;
     };
     const near = k => { const p = P[sel], dir = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] }[k]; let best = sel, bd = 1e9;
       P.forEach((q, i) => { if (i === sel) return; const dx = q.x - p.x, dz = q.z - p.z, along = dx * dir[0] + dz * dir[1]; if (along <= 4) return; const d = along + Math.abs(dx * dir[1] - dz * dir[0]) * 2.2; if (d < bd) { bd = d; best = i; } }); return best; };
@@ -418,6 +489,9 @@ screen("map", "Menus", "Town Map", {
     M.addEventListener("wheel", e => { e.preventDefault(); const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k;
       const wx = cx + (mx - VW / 2) / zoom(), wz = cz + (my - VH / 2) / zoom(); setZoom(zi + (e.deltaY < 0 ? 1 : -1), wx, wz); }, { passive: false });
     pick(0); requestAnimationFrame(paint);
+    // A big, plain way out: BACK, top left over the map.
+    const back = box(38, 36, null, null, "", `<span class="g-act" style="min-width:0;height:52px;font-size:20px;padding:0 20px 0 8px"><span class="g-key k-b" style="width:36px;height:36px">B</span>${esc(T("Back"))}</span>`);
+    back.onclick = () => { alive = false; go("menu", { sel: 3 }); };
     hints([["+", "Zoom in"], ["-", "Zoom out"], ["C", "You"], ["B", "Back"]]);
     return {
       raw(e) { if (e.code === "Equal" || e.code === "NumpadAdd") { setZoom(zi + 1); return true; } if (e.code === "Minus" || e.code === "NumpadSubtract") { setZoom(zi - 1); return true; }
@@ -465,12 +539,12 @@ screen("card", "Menus", "Trainer card", {
   what: "Your TRAINER CARD: you as you look, your name and ID, money, POKéDEX, time, and the eight badges.",
   mod: "MenuScreen's TRAINER CARD with the eight badges.",
   make() {
-    backdrop("linear-gradient(160deg,#BFD8F7,#4A8FE0 60%,#2F5D96)");
+    backdrop(SKY); rays(15, 10, 0.2);
     box(470, 60, 770, 600, "g-panel g-fadein", `<div style="padding:28px 34px;display:grid;gap:16px"><div style="display:flex;align-items:center;gap:14px"><span style="width:46px;height:46px">${ICON.card}</span><span class="g-title" style="font-size:34px">TRAINER CARD</span></div>
       <div style="display:grid;grid-template-columns:200px 1fr;gap:12px 20px;font-size:23px;font-weight:900">
       <span class="g-label">Name</span><span>${esc(G.name)}</span><span class="g-label">ID No.</span><span>${G.id}</span><span class="g-label">Money</span><span>${money(G.money)}</span>
       <span class="g-label">Pokédex</span><span>${G.caught}</span><span class="g-label">Play time</span><span>${G.time}</span><span class="g-label">Started</span><span>${G.started}</span></div>
-      <div class="g-label" style="margin-top:6px">Badges</div><div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px">${BADGES.map(([n, c], i) => `<div title="${n}" style="aspect-ratio:1;border-radius:18px;background:rgba(0,0,0,.2);display:grid;place-items:center;${i < G.badges ? "" : "filter:grayscale(1) brightness(.5);opacity:.55"}"><span style="width:66px;height:66px">${badgeSvg(i)}</span></div>`).join("")}</div></div>`);
+      <div class="g-label" style="margin-top:6px">Badges</div><div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px">${BADGES.map(([n, c], i) => `<div title="${n}" style="aspect-ratio:1;border-radius:18px;background:#F1F4FB;display:grid;place-items:center;${i < G.badges ? "" : "filter:grayscale(1) brightness(.5);opacity:.55"}"><span style="width:66px;height:66px">${badgeSvg(i)}</span></div>`).join("")}</div></div>`);
     hints([["B", "Back"]]);
     return { key: k => { if (k === "b") go("menu", { sel: 5 }); return true; } };
   }
@@ -488,20 +562,31 @@ screen("clothes", "Menus", "Clothes", {
   }
 });
 screen("save", "Menus", "Saving", {
-  scene: "town", sceneOpts: () => ({}),
-  what: "Saving: your save card, are you sure, then a moment while it writes.",
-  mod: "MenuScreen's SAVE, YES or NO.",
+  scene: "creator", sceneOpts: () => ({ side: 2.1 }),
+  what: "Saving, as Let's Go's: you on the left; your card on the right (name, ID, POKéDEX, money, time, when you started, and your team's faces); two big buttons under it, SAVE YOUR PROGRESS in yellow and BACK TO YOUR ADVENTURE; then a moment while it writes.",
+  mod: "MenuScreen's SAVE.",
+  tags: ["New look: Let's Go's"],
   make() {
-    blurOver(); const C = ctl();
-    box(330, 70, 620, 300, "g-panel g-pop", `<div style="padding:24px 30px;display:grid;grid-template-columns:auto 1fr;gap:10px 24px;font-size:22px;font-weight:900"><span class="g-label">Player</span><span>${esc(G.name)}</span><span class="g-label">Place</span><span>${esc(G.place)}</span><span class="g-label">Badges</span><span>${G.badges}</span><span class="g-label">Pokédex</span><span>${G.caught}</span><span class="g-label">Time</span><span>${G.time}</span></div>`);
-    (async () => {
-      const v = await C.say([{ text: "Would you like to save the game?", ask: ["YES", "NO"] }]);
-      if (v !== 0) { if (C.alive()) go("menu", { sel: 7 }); return; }
-      const sp_ = box(600, 400, 80, 80, "", `<div style="width:80px;height:80px;animation:spin 1s linear infinite">${ICON.save}</div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>`);
-      await C.say([{ text: "Saving... Don't turn off the power." }], { keep: true });
-      await C.wait(300); sp_.remove(); uiRoot.querySelectorAll(".g-text").forEach(e => e.remove());
-      await C.say([{ text: `**${G.name}** saved the game.` }]); if (C.alive()) go("hud");
-    })();
+    backdrop(SKY); rays(80, 0, 0.2); const C = ctl();
+    box(560, 60, 660, null, "g-panel g-pop", `<div style="padding:22px 30px;display:grid;grid-template-columns:1fr 210px;gap:20px">
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:9px 24px;font-size:21px;font-weight:900">${[["Name", esc(G.name)], ["ID No.", G.id], ["Pokédex", G.caught + " POKéMON"], ["Money", money(G.money)], ["Play time", G.time], ["Started", G.started]].map(([l, v]) => `<span class="g-label" style="align-self:center">${esc(T(l))}</span><span style="text-align:right;border-bottom:2px solid #EEF1F8;padding-bottom:4px">${v}</span>`).join("")}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${G.party.map(p => `<span style="aspect-ratio:1;border-radius:50%;background:linear-gradient(180deg,#fff,${lighterHex(typeHex(sp(p.sid).stats.types[0]), 0.7)});box-shadow:0 0 0 3px #fff,0 4px 10px rgba(30,40,84,.2);display:grid;place-items:center;overflow:hidden">${pic(p.sid, 84)}</span>`).join("")}</div></div>`);
+    const btns = box(600, 430, 580, null, "", "");
+    let sel = 0;
+    const draw = () => { btns.innerHTML = [["SAVE YOUR PROGRESS", "#FFEC8A", "#FFC93C"], ["BACK TO YOUR ADVENTURE", "#FFFFFF", "#EEF2FB"]].map(([l, a, b], i) => `<div data-i="${i}" style="position:relative;margin-bottom:16px;height:62px;border-radius:999px;display:grid;place-items:center;cursor:pointer;font-family:Fredoka,sans-serif;font-weight:600;font-size:24px;color:#26304A;
+      background:linear-gradient(180deg,${a},${b});border:3px solid #fff;box-shadow:${i === sel ? "0 0 0 4px #E5525C," : ""}0 6px 16px rgba(30,40,84,.22)">${i === sel ? `<span style="position:absolute;left:-30px;font-size:26px;color:#E5525C">&#9654;</span>` : ""}${l}</div>`).join("");
+      btns.querySelectorAll("[data-i]").forEach(e => e.onclick = () => { sel = +e.dataset.i; pick(); }); };
+    let busy = false;
+    const pick = async () => {
+      if (busy) return; busy = true;
+      if (sel === 1) { go("menu", { sel: 7 }); return; }
+      btns.style.opacity = .4;
+      const sp_ = box(600, 590, 580, null, "", `<div style="display:flex;align-items:center;justify-content:center;gap:14px;font-weight:900;font-size:20px;color:#26304A"><span style="width:44px;height:44px;animation:spin 1s linear infinite">${PICTO.save("#8F60DE").replace('fill="#fff"', 'fill="#8F60DE"')}</span>Saving... don't switch off.</div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>`);
+      await C.wait(1400); sp_.remove();
+      await C.say([{ text: "**{N}** saved the game." }]); if (C.alive()) go("hud");
+    };
+    draw(); hints([["A", "Choose"], ["B", "Back"]]);
+    C.push({ key(k) { if (k === "up" || k === "down") { sel = 1 - sel; draw(); return true; } if (k === "a") { pick(); return true; } if (k === "b") { go("menu", { sel: 7 }); return true; } return false; } });
     return { key: k => C.key(k) };
   }
 });
