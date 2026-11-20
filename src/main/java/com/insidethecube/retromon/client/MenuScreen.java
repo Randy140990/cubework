@@ -63,11 +63,16 @@ public class MenuScreen extends DeviceScreen {
 	public void tick() {
 		super.tick();
 		if (message != null) message.tick();
-		if (view == View.SAVING && ticks - savingAt >= 30) say(View.MENU, name() + " saved the game.");
+		if (view == View.SAVING && ticks - savingAt >= 28) {
+			say(View.MENU, "**{N}** saved the game.");
+			closeAfter = true;
+		}
 	}
 
 	/** When "Saving..." came up (ticks). */
 	private int savingAt;
+	/** After this message, back to the world (saved). */
+	private boolean closeAfter;
 
 	/** Lines from the game (an item's effect) shown here, then back to where you were. */
 	public void message(List<String> lines) {
@@ -125,7 +130,7 @@ public class MenuScreen extends DeviceScreen {
 			}
 			case "CARD" -> view = View.CARD;
 			case "SAVE" -> {
-				yesNo = new Choice(List.of("YES", "NO"));
+				yesNo = new Choice(List.of("SAVE YOUR PROGRESS", "BACK TO YOUR ADVENTURE"));
 				view = View.SAVE;
 			}
 			case "OPTION" -> view = View.OPTION;
@@ -330,16 +335,20 @@ public class MenuScreen extends DeviceScreen {
 				else if (Ui.isA(e)) waitUntil(waitChoice.at);
 			}
 			case SAVE -> {
-				if (yesNo.key(e)) return true;
-				if (Ui.isB(e) || (Ui.isA(e) && yesNo.at == 1)) view = View.MENU;
+				if (Ui.isUp(e) || Ui.isDown(e)) {
+					yesNo.at ^= 1;
+					Sounds.select();
+				} else if (Ui.isB(e) || (Ui.isA(e) && yesNo.at == 1)) view = View.MENU;
 				else if (Ui.isA(e)) save();
+			}
+			case SAVING -> {
 			}
 			case OPTION -> {
 				if (Ui.isB(e)) view = View.MENU;
 				else options.key(e);
 			}
 			case MESSAGE -> {
-				if ((Ui.isA(e) || Ui.isB(e)) && message.press()) view = afterMessage;
+				if ((Ui.isA(e) || Ui.isB(e)) && message.press()) messageDone();
 			}
 		}
 		return true;
@@ -375,20 +384,117 @@ public class MenuScreen extends DeviceScreen {
 		savingAt = ticks;
 	}
 
-	/** Your save's details (the viewer's card): you, where you are, badges, the Pokédex and time played. */
-	private void saveCard(GuiGraphics g, PlayerData d) {
-		float x = 330, y = 70, w = 620, h = 300;
-		V.panel(g, x, y, w, h);
-		com.insidethecube.retromon.engine.Places.Place pl = com.insidethecube.retromon.engine.Places.get(d.place);
-		String[][] rows = {{"Player", name()}, {"Place", pl == null ? d.place.toUpperCase().replace('_', ' ') : pl.name()}, {"Badges", String.valueOf(d.badges.size())},
-				{"Pokédex", d.hasDex() ? String.valueOf(d.caught.size()) : "-"}, {"Time", String.format("%d:%02d", (int) d.played / 3600, (int) d.played / 60 % 60)}};
-		float lw = 0;
-		for (String[] r : rows) lw = Math.max(lw, V.labelWidth(r[0]));
-		for (int i = 0; i < rows.length; i++) {
-			float ry = y + 24 + i * (h - 48) / rows.length + 8;
-			V.label(g, rows[i][0], x + 30, ry + 7);
-			V.text(g, rows[i][1], x + 30 + lw + 24, ry, 22, V.TEXT, true);
+	/** The world behind, washed pale (the viewer's g-blur). */
+	private void wash(GuiGraphics g) {
+		g.fill(0, 0, width, height, 0x38ECF4FF);
+	}
+
+	/** Your trainer number (five figures, from your name, the same on the card and the save). */
+	private static String idNo() {
+		return String.format("%05d", Math.abs(name().hashCode()) % 100000);
+	}
+
+	private static String playTime(PlayerData d) {
+		return String.format("%d:%02d", (int) d.played / 3600, (int) d.played / 60 % 60);
+	}
+
+	/** When you started, as the viewer writes it (19/11/2026). */
+	private static String started(PlayerData d) {
+		if (d.since <= 0) return "-";
+		return new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date(d.since));
+	}
+
+	/** Your partner's emblem (the four drawn ones, else its portrait in its colour with a white edge). */
+	private static void emblem(GuiGraphics g, String lead, float ex, float ey, float ew) {
+		if (java.util.Set.of("pikachu", "charmander", "bulbasaur", "squirtle").contains(lead))
+			V.img(g, V.tex("emblem_" + lead), ex, ey - (ew - ew * 0.9F) / 2, ew, ew, 256, 256, 0xFFFFFFFF);
+		else {
+			Species sp = Species.ALL.get(lead);
+			int col = sp == null ? 0xFFF6B42A : Ui.typeColor(sp.type1()) | 0xFF000000;
+			float e = ew / 58;
+			for (int i = 0; i < 8; i++) {
+				double an = i * Math.PI / 4;
+				V.img(g, Look.portrait(lead), ex + (float) Math.cos(an) * e, ey + (float) Math.sin(an) * e, ew, ew, 128, 128, 0xFFFFFFFF);
+			}
+			V.img(g, Look.portrait(lead), ex, ey, ew, ew, 128, 128, Ui.mix(col, 0xFFFFFFFF, 0.15F));
 		}
+	}
+
+	/**
+	 * Saving, as the UI Viewer's (Let's Go's): you on the left on a swirl of sky; your card on the right (name, ID,
+	 * POKéDEX, money, time, when you started, and your team's faces); two big buttons under it, SAVE YOUR PROGRESS in
+	 * yellow and BACK TO YOUR ADVENTURE; then a moment while it writes, the purple save picture spinning.
+	 */
+	private void drawSave(GuiGraphics g, PlayerData d, float partial) {
+		float secs = (ticks + partial) / 20F;
+		Scenes.bg2(g, "save");
+		Scenes.stand(g, secs, Scenes.you(d.outfit, "girl".equals(d.gender)), 2.1, 0, true);
+		// The card: details on the left, your team's faces on the right (two across).
+		float x = 560, y = 50, w = 660;
+		String[][] rows = {{"Name", name()}, {"ID No.", idNo()}, {"Pokédex", (d.hasDex() ? d.caught.size() : 0) + " POKéMON"}, {"Money", Ui.money(d.money)},
+				{"Play time", playTime(d)}, {"Started", started(d)}};
+		float rowH = 21 * 1.36F + 4 + 2, gap = 9;
+		float listH = rows.length * rowH + (rows.length - 1) * gap;
+		int n = Math.min(6, d.party.size());
+		float face = (210 - 10) / 2F;
+		float facesH = n == 0 ? 0 : ((n + 1) / 2) * face + ((n + 1) / 2 - 1) * 10;
+		float h = 22 * 2 + Math.max(listH, facesH);
+		V.panel(g, x, y, w, h);
+		float lx = x + 30, lw = w - 60 - 210 - 20;
+		float labW = 0;
+		for (String[] r : rows) labW = Math.max(labW, V.labelWidth(Lang.t(r[0])));
+		for (int i = 0; i < rows.length; i++) {
+			float ry = y + 22 + i * (rowH + gap);
+			V.label(g, Lang.t(rows[i][0]), lx, V.capsTop(ry + rowH / 2 - 1, 13));
+			V.right(g, rows[i][1], lx + lw, ry + 2, 21, V.INK, true);
+			V.rr(g, lx + labW + 24, ry + rowH - 2, lw - labW - 24, 2, 0, 0xFFEEF1F8);
+		}
+		float fx = x + w - 30 - 210;
+		for (int i = 0; i < n; i++) {
+			Mon m = d.party.get(i);
+			float cx = fx + (i % 2) * (face + 10) + face / 2, cy = y + 22 + (i / 2) * (face + 10) + face / 2;
+			V.shadow(g, cx - face / 2, cy - face / 2, face, face, face / 2, 0.9F);
+			V.ellipse(g, cx, cy, face / 2 + 3, face / 2 + 3, 0xFFFFFFFF);
+			int tc = Ui.typeColor(m.species.type1()) | 0xFF000000;
+			V.rrv(g, cx - face / 2, cy - face / 2, face, face, face / 2, 0xFFFFFFFF, Ui.mix(tc, 0xFFFFFFFF, 0.7F));
+			V.img(g, Look.portrait(m.species.id()), cx - 42, cy - 42, 84, 84, 128, 128, 0xFFFFFFFF);
+		}
+		// The two buttons.
+		boolean saving = view == View.SAVING || closeAfter;
+		float bx = x + 40, bw = w - 80, by = y + h + 28;
+		String[] labels = {"SAVE YOUR PROGRESS", "BACK TO YOUR ADVENTURE"};
+		int[][] cols = {{0xFFFFEC8A, 0xFFFFC93C}, {0xFFFFFFFF, 0xFFEEF2FB}};
+		float fade = saving ? 0.4F : 1;
+		for (int i = 0; i < 2; i++) {
+			float yy = by + i * (62 + 18);
+			boolean on = !saving && yesNo != null && yesNo.at == i;
+			if (!saving && vover(bx, yy, bw, 62) && yesNo != null) yesNo.at = i;
+			V.shadow(g, bx, yy, bw, 62, 31, 0.9F * fade);
+			if (on) V.pill(g, bx - 7, yy - 7, bw + 14, 62 + 14, 0xFFE5525C);
+			V.pill(g, bx - 3, yy - 3, bw + 6, 62 + 6, Ui.alpha(0xFFFFFFFF, fade));
+			V.rrv(g, bx, yy, bw, 62, 31, Ui.alpha(cols[i][0], fade), Ui.alpha(cols[i][1], fade));
+			V.titleCentred(g, Lang.t(labels[i]), bx + bw / 2, V.capsTop(yy + 31, 24), 24, Ui.alpha(V.INK, fade));
+			if (on) V.text(g, "▶", bx - 30 - 3, V.capsTop(yy + 31, 26), 26, 0xFFE5525C, true);
+			int idx = i;
+			if (view == View.SAVE) vhit(bx, yy, bw, 62, () -> {
+				yesNo.at = idx;
+				if (idx == 0) save();
+				else view = View.MENU;
+			});
+		}
+		if (view == View.SAVING) {
+			String t = Lang.t("Saving... don't switch off.");
+			float tw = 44 + 14 + V.width(t, 20, true), sx = 600 + (580 - tw) / 2, sy = 656 + 22;
+			g.pose().pushMatrix();
+			float cx = V.x(sx + 22), cy = V.y(sy);
+			g.pose().translate(cx, cy);
+			g.pose().rotate(secs * (float) Math.PI * 2);
+			g.pose().translate(-cx, -cy);
+			V.icon(g, "picto_save_white", sx, sy - 22, 44, 0xFF8F60DE);
+			g.pose().popMatrix();
+			V.text(g, t, sx + 44 + 14, V.capsTop(sy, 20), 20, V.INK, true);
+		}
+		if (view == View.SAVE) V.hints(g, "A", "Choose", "B", "Back");
 	}
 
 	private void setSpeed(int sp) {
@@ -400,7 +506,15 @@ public class MenuScreen extends DeviceScreen {
 
 	@Override
 	protected void clickAnywhere() {
-		if (view == View.MESSAGE && message.press()) view = afterMessage;
+		if (view == View.MESSAGE && message.press()) messageDone();
+	}
+
+	private void messageDone() {
+		view = afterMessage;
+		if (closeAfter) {
+			closeAfter = false;
+			onClose();
+		}
 	}
 
 	@Override
@@ -425,7 +539,7 @@ public class MenuScreen extends DeviceScreen {
 		PlayerData d = ClientState.data;
 		int m = 6 * s, h = boxHeight();
 		switch (view) {
-			case MENU, SAVE, SAVING, WAIT -> drawMenu(g);
+			case MENU -> drawMenu(g);
 			default -> {
 			}
 		}
@@ -459,35 +573,17 @@ public class MenuScreen extends DeviceScreen {
 				}
 			}
 			case CARD -> drawCard(g, d);
-			case SAVING -> {
-				g.fill(0, 0, width, height, 0x80061A1E);
-				saveCard(g, d);
-				TextBox.still("Saving... Don't turn off the power.").renderV(g, font, 140, 26, 1000, ticks, partial, false);
-				g.pose().pushMatrix();
-				float cx = V.x(640), cy = V.y(440);
-				g.pose().translate(cx, cy);
-				g.pose().rotate((ticks + partial) / 20F * (float) Math.PI * 2);
-				g.pose().translate(-cx, -cy);
-				V.icon(g, "icon_save", 600, 400, 80);
-				g.pose().popMatrix();
-			}
-			case SAVE -> {
-				g.fill(0, 0, width, height, 0x80061A1E);
-				saveCard(g, d);
-				TextBox.still("Would you like to save the game?").renderV(g, font, 140, 26, 1000, ticks, partial, false);
-				vchoice(g, yesNo, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), 300, i -> {
-					if (i == 0) save();
-					else view = View.MENU;
-				});
-			}
+			case SAVE, SAVING -> drawSave(g, d, partial);
 			case OPTION -> options.draw(g, this::vhit, mx, my);
 			case WAIT -> {
+				wash(g);
 				TextBox.still("Wait until when?").renderV(g, font, 140, 26, 1000, ticks, partial, false);
 				vchoice(g, waitChoice, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(waitChoice.options.size()), 300, this::waitUntil);
 			}
 			case MESSAGE -> {
 				if (afterMessage == View.BAG) drawBag(g, d);
 				else if (afterMessage == View.PARTY) drawParty(g, d);
+				else if (closeAfter) drawSave(g, d, partial);
 				else drawMenu(g);
 				message.renderV(g, font, 140, 26, 1000, ticks, partial, true);
 			}
@@ -1186,54 +1282,119 @@ public class MenuScreen extends DeviceScreen {
 	 * Your TRAINER CARD, as the UI Viewer's: you on a stand at the left, the card at the right with your name, ID,
 	 * money, POKéDEX, play time, and the eight badges (our own designs; dark until you've won each).
 	 */
+	/** The gym badges' names, in order (the card's case). */
+	private static final String[] BADGE_NAMES = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
+
+	/**
+	 * The trainer card, as the UI Viewer's: you as you look on the left, on a soft swirl of light. The card has a coral
+	 * band with your ID, your name big, money, POKéDEX, time and when you started on pale fields, and the badge case: a
+	 * dark tray with eight sunken slots, the ones you've won shining in them. A pearly sheen drifts across it now and then.
+	 */
 	private void drawCard(GuiGraphics g, PlayerData d) {
-		Scenes.backdrop(g, "card");
-		float secs = (ticks) / 20F;
-		boolean girl = "girl".equals(d.gender);
-		Scenes.stand(g, secs, Scenes.you(d.outfit, girl), 2.1, 0, true);
-		float x = 470, y = 60, w = 770, h = 600;
-		V.panel(g, x, y, w, h);
+		float secs = (ticks + Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true)) / 20F;
+		Scenes.bg2(g, "card");
+		Scenes.stand(g, secs, Scenes.you(d.outfit, "girl".equals(d.gender)), 2.1, 0, true);
+		float x = 470, y = 70, w = 770, h = 580, r = 30;
 		vhit(x, y, w, h, () -> view = View.MENU);
-		V.icon(g, "icon_card", x + 34, y + 28, 46);
-		V.text(g, "TRAINER CARD", x + 34 + 46 + 14, y + 34, 34, V.TEXT, true);
-		String[][] rows = {{"Name", name()}, {"ID No.", String.format("%05d", Math.abs(name().hashCode()) % 100000)}, {"Money", Ui.money(d.money)},
-				{"Pokédex", d.hasDex() ? String.valueOf(d.caught.size()) : "-"}, {"Play time", String.format("%d:%02d", (int) d.played / 3600, (int) d.played / 60 % 60)}};
-		float ry = y + 28 + 46 + 16;
-		for (String[] r : rows) {
-			V.label(g, r[0], x + 34, ry + 7);
-			V.text(g, r[1], x + 34 + 220, ry, 23, V.TEXT, true);
-			ry += 23 * 1.3F + 12;
+		// Its edge: a white ring, a softer one round that, and its shadow.
+		V.shadow(g, x, y, w, h, r, 1.45F);
+		V.rr(g, x - 8, y - 8, w + 16, h + 16, r + 8, 0x73FFFFFF);
+		V.rr(g, x - 5, y - 5, w + 10, h + 10, r + 5, 0xFFFFFFFF);
+		V.rr(g, x, y, w, h, r, 0xFFFFFFFF);
+		// The coral band, its stripes and a ball's outline (cut to the band).
+		float bandH = 104;
+		g.enableScissor(Math.round(V.x(x)), Math.round(V.y(y)), Math.round(V.x(x + w)), Math.round(V.y(y + bandH)));
+		V.rrh(g, x, y, w, bandH + r, r, new float[] {0, 0.55F, 1}, new int[] {0xFFFF8A7A, 0xFFE5525C, 0xFFC93A5A});
+		// -45deg stripes, 14 on and 14 off (measured across them: about 19.8 along the band).
+		float step = 28 * 1.41421F, on = 14 * 1.41421F;
+		for (float sx = x - bandH; sx < x + w + bandH; sx += step)
+			V.poly(g, new float[] {sx, y + bandH, sx + on, y + bandH, sx + on + bandH, y, sx + bandH, y}, 0x1FFFFFFF);
+		float bcx = x + w - 75, bcy = y + 53, R = 101.2F, t = 16.1F;
+		V.ring(g, bcx - R - t / 2, bcy - R - t / 2, 2 * R + t, 2 * R + t, R + t / 2, t, 0x38FFFFFF);
+		float r2 = 32.2F;
+		V.ring(g, bcx - r2 - t / 2, bcy - r2 - t / 2, 2 * r2 + t, 2 * r2 + t, r2 + t / 2, t, 0x38FFFFFF);
+		V.rr(g, bcx - R + t / 2, bcy - t / 2, R - t / 2 - r2 - t / 2, t, 0, 0x38FFFFFF);
+		V.rr(g, bcx + r2 + t / 2, bcy - t / 2, R - t / 2 - r2 - t / 2, t, 0, 0x38FFFFFF);
+		g.disableScissor();
+		// The card's picture in a white box, and its name.
+		V.rr(g, x + 30, y + 26 + 3, 52, 52, 16, 0x26000000);
+		V.rr(g, x + 30, y + 26, 52, 52, 16, 0xFFFFFFFF);
+		V.icon(g, "icon_card", x + 30 + 7, y + 26 + 7, 38);
+		String head = Lang.t("TRAINER CARD");
+		V.title(g, head, x + 30 + 52 + 14, V.capsTop(y + 52, 36) + 3, 36, 0x4D781428);
+		V.title(g, head, x + 30 + 52 + 14, V.capsTop(y + 52, 36), 36, 0xFFFFFFFF);
+		// ID No. in a pill at the right.
+		String id = idNo();
+		float pw = 16 + V.labelWidth("ID No.") + 8 + V.width(id, 18, true) + 16, ph = 36, px = x + w - 28 - pw, py = y + 34;
+		V.pill(g, px, py + 3, pw, ph, 0x26000000);
+		V.pill(g, px, py, pw, ph, 0xFFFFFFFF);
+		V.label(g, "ID No.", px + 16, V.capsTop(py + ph / 2, 13) + 1);
+		V.text(g, id, px + 16 + V.labelWidth("ID No.") + 8, V.capsTop(py + ph / 2, 18), 18, V.INK, true);
+		// Your name, big, over a dashed line.
+		float cx0 = x + 30, cw = w - 60, ny = y + bandH + 22;
+		V.label(g, Lang.t("Name"), cx0 + 4, ny + 17.5F);
+		V.title(g, name(), cx0 + 4 + V.labelWidth(Lang.t("Name")) + 14, ny, 38, V.INK);
+		for (float dx = cx0; dx < cx0 + cw; dx += 18) V.rr(g, dx, ny + 46 + 6, Math.min(9, cx0 + cw - dx), 3, 0, 0xFFEEF1F8);
+		// The four fields.
+		String[][] fields = {{"Money", Ui.money(d.money)}, {"Pokédex", Lang.t("{0} caught", String.valueOf(d.hasDex() ? d.caught.size() : 0))},
+				{"Play time", playTime(d)}, {"Started", started(d)}};
+		float fy = ny + 55 + 10, fw = (cw - 14) / 2;
+		for (int i = 0; i < 4; i++) {
+			float fx = cx0 + (i % 2) * (fw + 14), yy = fy + (i / 2) * (46 + 10);
+			V.rr(g, fx, yy, fw, 46, 14, 0xFFE9EDF5);
+			V.rr(g, fx, yy + 2, fw, 44, 14, 0xFFF2F5FB);
+			V.label(g, Lang.t(fields[i][0]), fx + 18, V.capsTop(yy + 23, 13) + 1);
+			V.right(g, fields[i][1], fx + fw - 18, V.capsTop(yy + 23, 21), 21, V.INK, true);
 		}
-		ry += 6;
-		V.label(g, "Badges", x + 34, ry);
-		String[] badges = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
-		float bw = (w - 68 - 7 * 10) / 8, by = ry + 26;
+		// The badge case: a dark tray, eight sunken slots.
+		float kx = cx0, ky = fy + 46 * 2 + 10 + 18, kw = cw, kh = 14 + 18 + 10 + 64 + 4 + 15 + 12;
+		V.rr(g, kx, ky, kw, kh, 22, 0xFF141A33);
+		V.rrv(g, kx, ky + 3, kw, kh - 3, 22, 0xFF2A365C, 0xFF1E2746);
+		V.label(g, Lang.t("Badges"), kx + 18, ky + 14 + 2, 0xFFC9D3F0);
+		String got = d.badges.size() + " / 8";
+		V.right(g, got, kx + kw - 18, ky + 14 + 1, 14, 0xFFFFD45A, true);
+		float colW = (kw - 36 - 70) / 8F, sy = ky + 14 + 18 + 10;
 		for (int i = 0; i < 8; i++) {
-			boolean got = d.badges.contains(badges[i]);
-			float bx = x + 34 + i * (bw + 10);
-			V.rr(g, bx, by, bw, bw, 18, 0x33000000);
-			V.icon(g, "badge_" + i, bx + (bw - 66) / 2, by + (bw - 66) / 2, 66, got ? 0xFFFFFFFF : 0x8C55595E);
+			boolean won = d.badges.contains(BADGE_NAMES[i]);
+			float scx = kx + 18 + i * (colW + 10) + colW / 2, scy = sy + 32;
+			V.ellipse(g, scx, scy + 1, 32, 32, 0x1FFFFFFF);
+			V.ellipse(g, scx, scy, 32, 32, 0xFF0B1022);
+			V.ellipse(g, scx, scy + 1.5F, 30, 30, 0xFF0E1428);
+			V.ellipse(g, scx, scy - 4, 22, 22, 0xFF131A31);
+			V.ellipse(g, scx, scy - 6.4F, 14, 14, 0xFF161D36);
+			V.icon(g, "badge_" + i, scx - 25, scy - 25, 50, won ? 0xFFFFFFFF : 0x73737373);
+			V.centred(g, String.valueOf(i + 1), scx, sy + 64 + 4, 11, 0xFF8E9AC0, true);
+		}
+		// Your partner, and the Hall of Fame.
+		float ry = ky + kh + 16;
+		if (!d.party.isEmpty()) {
+			Mon lead = d.party.get(0);
+			emblem(g, lead.species.id(), cx0, ry - 3, 58);
+			V.label(g, Lang.t("Partner"), cx0 + 58 + 14, ry + 5);
+			V.text(g, lead.species.name(), cx0 + 58 + 14, ry + 5 + 17, 21, V.INK, true);
+		}
+		float rx = cx0 + cw;
+		V.label(g, Lang.t("Hall of Fame"), rx - V.labelWidth(Lang.t("Hall of Fame")), ry + 5);
+		V.right(g, Lang.t("Not yet"), rx, ry + 5 + 18, 18, V.MUTED, true);
+		// The pearly sheen, now and then (every 6 seconds, crossing in the last 1.8).
+		float cyc = (((secs - 1) % 6) + 6) % 6 / 6F;
+		if (cyc > 0.7F) {
+			float q = (cyc - 0.7F) / 0.3F;
+			q = q * q * (3 - 2 * q);
+			float bw = w * 0.3F, left = x + (-1.2F + 3.8F * q) * bw, sk = 0.3249F * h / 2;
+			g.enableScissor(Math.round(V.x(x)), Math.round(V.y(y)), Math.round(V.x(x + w)), Math.round(V.y(y + h)));
+			float[] at = {0, 1 / 3F, 2 / 3F, 1};
+			int[] cs = {0x00FFFFFF, 0x80FFFFFF, 0x40D6BEFF, 0x00D6BEFF};
+			for (int k = 0; k < 3; k++) {
+				float a0 = left + at[k] * bw, a1 = left + at[k + 1] * bw;
+				float[] xy = {V.x(a0 + sk), V.y(y), V.x(a1 + sk), V.y(y), V.x(a1 - sk), V.y(y + h), V.x(a0 + sk), V.y(y), V.x(a1 - sk), V.y(y + h), V.x(a0 - sk), V.y(y + h)};
+				Ui.tris(g, xy, new int[] {cs[k], cs[k + 1], cs[k + 1], cs[k], cs[k + 1], cs[k]});
+			}
+			g.disableScissor();
 		}
 		V.hints(g, "B", "Back");
 	}
 
-	/** What each option does (the viewer's top panel). */
-	/** OPTION's rows (the UI Viewer's, with ours for your partner and the look), what each does, and their values. */
-	private static final String[] OPTION_LABELS = {"TEXT SPEED", "MUSIC", "SOUND", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "BATTLE EFFECTS", "BATTLE STYLE",
-			"WALK WITH YOU", "POKéMON LOOK", "SHADERS", "CONTROLS"};
-	private static final String[] OPTION_LINES = {"How quickly words appear in text boxes.", "How loud the music plays.", "How loud cries and menu sounds are.",
-			"Whether the POKéDEX reads its entries out loud.", "How dark nights get outside.", "Whether wild POKéMON show in the grass, or jump out at you.",
-			"Whether moves play their animations in battle.", "SWITCH asks if you want to change POKéMON when a trainer is about to send out their next one.",
-			"Whether your partner walks with you.",
-			"COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures.",
-			"RETROMON is our own light: the sun moves with the day, soft shadows, swaying grass, blue nights and glowing lamps. OFF is Minecraft's own.", "See every key: what it does in game, and what's turned off."};
-	private static final String[][] OPTION_VALUES = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"},
-			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"OFF", "ON"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {}};
-
-	/**
-	 * OPTION, as the UI Viewer's: what the row does in a panel at the top, then the rows (the one you're on cream),
-	 * each with its value between arrows; left and right (or a click) change it. CONTROLS opens the key map.
-	 */
 	private void drawOptions(GuiGraphics g, PlayerData d) {
 		Scenes.backdrop(g, "sky");
 		int n = OPTION_LABELS.length;

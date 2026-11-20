@@ -78,6 +78,7 @@ public class ClothesScreen extends GameScreen {
 		if (maker == null) {
 			boolean girl = "girl".equals(ClientState.data.gender);
 			maker = new Maker(outfit, girl, new String[] {"clothes"}, "UNDO", this::undo, this::back, () -> preview = maker.outfit.write());
+			maker.maxH = 600;
 		}
 		return maker;
 	}
@@ -88,12 +89,19 @@ public class ClothesScreen extends GameScreen {
 		return true;
 	}
 
-	/** You on a stand at the right, turning gently; the maker's cards of clothes on the left (as the viewer has it). */
+	/** The wheel scrolls the maker's glass panel. */
+	@Override
+	public boolean mouseScrolled(double x, double y, double h, double v) {
+		if (maker().scrolled(V.vx(x), V.vy(y), v)) return true;
+		return super.mouseScrolled(x, y, h, v);
+	}
+
+	/** As the UI Viewer's: you on your stand at the left, turning gently, on a warm peach light; the glass maker at the right. */
 	@Override
 	protected void draw(GuiGraphics g, float partial) {
-		Scenes.backdrop(g, "clothes");
+		Scenes.bg2(g, "clothes");
 		boolean girl = "girl".equals(ClientState.data.gender);
-		Scenes.stand(g, (ticks + partial) / 20F, Scenes.you(preview == null ? outfit.write() : preview, girl), -1.95, 0, true);
+		Scenes.stand(g, (ticks + partial) / 20F, Scenes.you(preview == null ? outfit.write() : preview, girl), 2.1, 0, true);
 		maker().draw(g, this::vhit, (ticks + partial) / 20F);
 		V.hints(g, "A", "Choose", "B", "Keep and close");
 	}

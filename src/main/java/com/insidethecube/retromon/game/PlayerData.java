@@ -50,6 +50,8 @@ public class PlayerData {
 
 	/** Time played, in real seconds (the game's speed doesn't count). */
 	public double played;
+	/** When this game began (milliseconds since 1970; 0 if it's from before 0.28). */
+	public long since;
 
 	public boolean hasDex() {
 		return story.contains("pokedex");
@@ -131,6 +133,7 @@ public class PlayerData {
 		t.putString("visited", join(visited));
 		t.putString("story", join(story));
 		t.putDouble("played", played);
+		t.putLong("since", since);
 		return t;
 	}
 
@@ -169,6 +172,7 @@ public class PlayerData {
 		d.gender = t.getStringOr("gender", "boy");
 		d.outfit = t.getStringOr("outfit", "");
 		d.played = t.getDoubleOr("played", 0);
+		d.since = t.getLongOr("since", 0L);
 		if (t.contains("story")) split(t.getStringOr("story", ""), d.story);
 		// A save from before the errand (0.8 and older): you already had the POKéDEX.
 		else if (d.started) d.story.add("pokedex");

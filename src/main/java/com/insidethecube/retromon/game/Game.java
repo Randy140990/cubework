@@ -1549,6 +1549,7 @@ public final class Game {
 		// How you made yourself in the new game's maker (skin, eyes, hair, clothes).
 		String o = t.getStringOr("outfit", "");
 		if (!o.isEmpty() && o.length() <= 200 && (!d.started || d.outfit.isEmpty())) d.outfit = o;
+		if (d.since == 0) d.since = System.currentTimeMillis();
 		sync(p);
 	}
 
