@@ -12,3 +12,4 @@ net/minecraft/client/gui/render/state/BlitRenderState.java
 net/minecraft/client/gui/render/TextureSetup.java
 net/minecraft/client/gui/navigation/ScreenRectangle.java
 net/minecraft/client/gui/render/state/ScreenArea.java
+net/minecraft/client/gui/render/pip/PictureInPictureRenderer.java

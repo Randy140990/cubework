@@ -16,9 +16,9 @@ from PIL import Image
 EPS = 1e-6
 SKIP = {"aoN", "aoW", "aoE", "deep", "sunPool", "shadowBlob"}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
-          "mart": (384, 64, 0)}
+          "mart": (384, 64, 0), "trainer1": (448, 64, 0), "trainer2": (512, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
-         "mart": "viridian_city"}
+         "mart": "viridian_city", "trainer1": "viridian_city", "trainer2": "viridian_city"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -27,11 +27,14 @@ DOORS = {
     # Viridian City: the Pokémon Center (red roof) and the Poké Mart (blue roof), their open doorways 3 wide.
     "viridian_center": {"room": "center", "door": [[-787, 26, 557], [-786, 26, 557], [-785, 26, 557]], "out": [-785.5, 26.0, 558.6]},
     "viridian_mart": {"room": "mart", "door": [[-767, 26, 543], [-766, 26, 543], [-765, 26, 543]], "out": [-765.5, 26.0, 544.6]},
+    # Viridian's Trainer House (the orange roof north of the Mart): its door a dark column of deepslate tiles.
+    "trainer_house": {"room": "trainer1", "door": [[-767, 26, 526]], "out": [-766.5, 26.0, 527.8]},
 }
-MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart"}
+MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart", "trainer1": "trainer_house"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).
-ENTRY = {"house1": {"x": 6.0, "z": 12.9, "yaw": 180.0}, "rival1": {"x": 6.0, "z": 12.9, "yaw": 180.0}, "lab": {"x": 9.0, "z": 18.9, "yaw": 180.0},
-         "center": {"x": 10.0, "z": 14.9, "yaw": 180.0}, "mart": {"x": 8.0, "z": 12.9, "yaw": 180.0}}
+# (On the mat's inner half: the mats are two deep, and you're out once you're past their middle.)
+ENTRY = {"house1": {"x": 6.0, "z": 12.5, "yaw": 180.0}, "rival1": {"x": 6.0, "z": 12.5, "yaw": 180.0}, "lab": {"x": 9.0, "z": 18.5, "yaw": 180.0},
+         "center": {"x": 10.0, "z": 14.5, "yaw": 180.0}, "mart": {"x": 8.0, "z": 12.5, "yaw": 180.0}, "trainer1": {"x": 8.0, "z": 12.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 4.2, "z": 9.5, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -287,7 +290,7 @@ def main():
         o = ORIGIN[rid]
         warps = []
         for m in room["mats"]:
-            warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 0.42, "door": MAT_DOOR.get(rid), "to": None})
+            warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 1.0, "door": MAT_DOOR.get(rid), "to": None})
         for s in room["stairs"]:
             to = s["to"]; sp = s["spawn"]
             warps.append({"kind": s["dir"], "x0": s["x0"], "z0": s["z0"], "z1": s["z0"] + s["depth"], "to": to,

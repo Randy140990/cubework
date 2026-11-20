@@ -2,7 +2,7 @@
 // Inside, a room is 16 blocks wide (west to east) and 14 deep (north to south), its walls 4 high: twice the old games' 8 by 7
 // tiles of floor. Outside, the houses are 8 by 6, so they're bigger on the inside, as the old games were.
 const FACE = { n: 0, w: Math.PI / 2, s: Math.PI, e: -Math.PI / 2 };
-const DOOR = [4.5, 7.5];
+const DOOR = [5, 7];
 const PLACES = [
   { id: "house2", name: "Your room", floor: "Upstairs", group: "Your house" },
   { id: "house1", name: "Your house", floor: "Downstairs", group: "Your house" },
@@ -11,16 +11,37 @@ const PLACES = [
   { id: "lab", name: "Prof. Oak's lab", floor: "Ground floor", group: "Prof. Oak's lab" },
   { id: "center", name: "Pokémon Center", floor: "Viridian City", group: "Viridian City" },
   { id: "mart", name: "Poké Mart", floor: "Viridian City", group: "Viridian City" },
+  { id: "trainer1", name: "Trainer House", floor: "1F", group: "Viridian City" },
+  { id: "trainer2", name: "Trainer House", floor: "B1F", group: "Viridian City" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
 ];
-const FROM_TOWN = { x: 6.0, z: 12.9, yaw: FACE.n };
-const LAB_DOOR = [7.5, 10.5], LAB_IN = { x: 9.0, z: 18.9, yaw: FACE.n }, FROM_LAB = { x: 25.0, z: 23.1, yaw: FACE.s };
+const FROM_TOWN = { x: 6.0, z: 12.5, yaw: FACE.n };
+const LAB_DOOR = [8, 10], LAB_IN = { x: 9.0, z: 18.5, yaw: FACE.n }, FROM_LAB = { x: 25.0, z: 23.1, yaw: FACE.s };
 const STAIRS_FOOT = { x: 11.1, z: 1.1, yaw: FACE.s };
 const STAIRS_TOP = { x: 15.5, z: 2.9, yaw: FACE.s };
 
 // The Pokémon Center's and the Poké Mart's ways in (2 wide, in the middle of the front), and where you stand coming in.
-const CENTER_DOOR = [9, 11], CENTER_IN = { x: 10.0, z: 14.9, yaw: FACE.n };
-const MART_DOOR = [7, 9], MART_IN = { x: 8.0, z: 12.9, yaw: FACE.n };
+const CENTER_DOOR = [9, 11], CENTER_IN = { x: 10.0, z: 14.5, yaw: FACE.n };
+const MART_DOOR = [7, 9], MART_IN = { x: 8.0, z: 12.5, yaw: FACE.n };
+// The Trainer House (Viridian City): its way in, and the stairs between its floors (as your house's are).
+const TH_DOOR = [7, 9], TH_IN = { x: 8.0, z: 12.5, yaw: FACE.n }, TH_FOOT = { x: 11.1, z: 1.1, yaw: FACE.s }, TH_TOP = { x: 15.5, z: 2.9, yaw: FACE.s };
+
+// The Trainer House's big screen: the battle downstairs, two trainers and a ball flying between, VS flashing.
+function drawTrainerTV(P, f) {
+  for (let y = 0; y < P.h; y++) for (let x = 0; x < P.w; x++) P.set(x, y, mixc(hx("#5A8EE0"), hx("#1E2A4A"), y / P.h));
+  P.rect(0, P.h - 7, P.w, 7, hx("#6DB55A")); P.rect(Math.floor(P.w / 2), P.h - 7, 1, 7, hx("#F6F1EA"));
+  P.rect(5, P.h - 13, 3, 6, hx("#E5525C")); P.rect(5, P.h - 15, 3, 2, hx("#F2C79A"));
+  P.rect(P.w - 8, P.h - 13, 3, 6, hx("#3A6FD0")); P.rect(P.w - 8, P.h - 15, 3, 2, hx("#F2C79A"));
+  const t = (f % 16) / 16, bx = 9 + t * (P.w - 18), by = P.h - 12 - Math.sin(t * Math.PI) * 6;
+  P.disc(bx, by, 1.6, hx("#E5525C")); P.rect(Math.round(bx) - 1, Math.round(by), 3, 1, hx("#F4F4F4"));
+  if (f % 4 < 2) P.text("VS", Math.floor(P.w / 2) - 5, 2, hx("#FFE04A"));
+}
+// Downstairs, the scoreboard: TODAY on top, a row of lights going round.
+function drawScoreboard(P, f) {
+  P.fill(hx("#1A2130"));
+  P.text("TODAY", Math.floor(P.w / 2) - 12, 3, hx("#FFE04A"));
+  for (let i = 0; i < 8; i++) P.rect(4 + i * 5, P.h - 6, 3, 3, (i === f % 8) ? hx("#8FF5C0") : hx("#2E3A50"));
+}
 
 // ---------- the Center's and the Mart's own materials ----------
 (function () {
@@ -96,18 +117,31 @@ const MART_DOOR = [7, 9], MART_IN = { x: 8.0, z: 12.9, yaw: FACE.n };
     for (let y = 0; y < WORLDMAP.h; y++) for (let x = 0; x < WORLDMAP.w; x++) { const i = (y * WORLDMAP.w + x) * 3; P.set(x + 3, y + 3, [b.charCodeAt(i), b.charCodeAt(i + 1), b.charCodeAt(i + 2)]); }
   }, { fit: true });
   // Each room's own mat at the door, as carpet: its colour, a border, and a ball (or stripes) in the middle.
-  const mat = (base, edge, motif) => (P, r) => {
-    P.fill(hx(base), 0.05, r);
-    P.rect(0, 0, 32, 2, hx(edge)); P.rect(0, 18, 32, 2, hx(edge)); P.rect(0, 0, 2, 20, hx(edge)); P.rect(30, 0, 2, 20, hx(edge));
-    P.rect(3, 3, 26, 1, hx("#F6F1EA")); P.rect(3, 16, 26, 1, hx("#F6F1EA")); P.rect(3, 3, 1, 14, hx("#F6F1EA")); P.rect(28, 3, 1, 14, hx("#F6F1EA"));
-    if (motif === "ball") { P.disc(15.5, 9.5, 4.6, hx("#F6F1EA")); P.rect(11, 9, 10, 1, hx(edge)); P.disc(15.5, 9.5, 1.6, hx(edge)); P.disc(15.5, 9.5, 0.8, hx("#F6F1EA")); }
-    else for (let x = 6; x < 27; x += 4) P.rect(x, 6, 2, 8, hx(edge));
+  const mat = (base, edge) => (P, r) => {
+    const cream = hx("#F6F1EA");
+    P.fill(hx(base), 0.04, r);
+    P.rect(0, 0, 32, 2, hx(edge)); P.rect(0, 30, 32, 2, hx(edge)); P.rect(0, 0, 2, 32, hx(edge)); P.rect(30, 0, 2, 32, hx(edge));
+    P.rect(4, 4, 24, 1, cream); P.rect(4, 27, 24, 1, cream); P.rect(4, 4, 1, 24, cream); P.rect(27, 4, 1, 24, cream);
+    // Two chevrons, pointing south (out).
+    for (const y0 of [8, 16]) for (let k = 0; k < 7; k++) { P.rect(8 + k, y0 + k, 2, 2, cream); P.rect(22 - k, y0 + k, 2, 2, cream); }
   };
-  reg("matHome", 32, 20, mat("#C9433F", "#8E2A2A", "ball"), { fit: true });
-  reg("matRival", 32, 20, mat("#33477A", "#1E2A4A", "stripes"), { fit: true });
-  reg("matLab", 32, 20, mat("#2F9C8A", "#1D6B5E", "ball"), { fit: true });
-  reg("matCenter", 32, 20, mat("#F08A3C", "#C7502E", "ball"), { fit: true });
-  reg("matMart", 32, 20, mat("#3A6FD0", "#24479A", "stripes"), { fit: true });
+  reg("matHome", 32, 32, mat("#C9433F", "#8E2A2A"), { fit: true });
+  reg("matRival", 32, 32, mat("#33477A", "#1E2A4A"), { fit: true });
+  reg("matLab", 32, 32, mat("#2F9C8A", "#1D6B5E"), { fit: true });
+  reg("matCenter", 32, 32, mat("#F08A3C", "#C7502E"), { fit: true });
+  reg("matMart", 32, 32, mat("#3A6FD0", "#24479A"), { fit: true });
+  reg("matTrainer", 32, 32, mat("#E8823A", "#A9531F"), { fit: true });
+  // The Trainer House's own: warm cream walls (and cool grey downstairs), an orange trim, a peach check floor,
+  // its counter, the battle room's wooden court floor.
+  reg("paperTrainer", 16, 16, (P, r) => mcStone(P, r, hx("#FBF3E8"), 0.03, 2));
+  reg("paperTrainerB", 16, 16, (P, r) => mcStone(P, r, hx("#E8EDF5"), 0.03, 2));
+  reg("orangeTrim", 16, 16, (P, r) => { P.fill(hx("#E8823A"), 0.04, r); P.rect(0, 0, 16, 2, hx("#F4A866")); });
+  reg("counterOrange", 16, 16, front("#E8823A"));
+  reg("mcPeachCheck", 32, 32, (P, r) => mcCheck(P, r, hx("#FBF1E4"), hx("#F2D4B8")), { per: 2 });
+  reg("courtWood", 16, 16, (P, r) => { P.fill(hx("#D9A86A"), 0.05, r); for (let y = 0; y < 16; y += 4) P.rect(0, y, 16, 1, hx("#C79358")); });
+  RUGS.thRun = (i, j, w, d) => (i === 0 || i === w - 1) ? "#FBF1E4" : (j % 3 === 1 ? "#F09A56" : "#E8823A");
+  // The battle court: green, white lines round it and across its middle.
+  RUGS.court = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1 || j === Math.floor(d / 2)) ? "#F6F1EA" : ((i + j) % 2 ? "#7FC36A" : "#6DB55A");
   // The Center's runner, door to counter: red, cream edges. The Mart's: blue, white edges.
   RUGS.centerRun = (i, j, w, d) => (i === 0 || i === w - 1) ? "#F6F1EA" : (j % 3 === 1 ? "#E26A64" : "#D9524E");
   RUGS.martRun = (i, j, w, d) => (i === 0 || i === w - 1) ? "#F2F6FA" : (j % 3 === 1 ? "#5A8EE0" : "#3A6FD0");
@@ -605,8 +639,8 @@ const BUILD = {
     deskPC(R, 15.7, 0, "s", R.screen("pcCenter", 40, 26, drawPC, 0.9), { top: "lab", pc: true, lines: ["The POKéMON STORAGE SYSTEM."] });
     officeChair(R, 16.85, 1.6, "n", "redFabric");
     bookshelf(R, 20, 2.4, "w", 2.2, 2.8, { wood: "pale", trinkets: { 2: "ball" }, lines: ["A shelf of guides: TYPES and how they match up, and one called THE TRAINER'S HANDBOOK."] });
-    // Stairs either side, up to the 2F (not open).
-    sideStairs(R, "w", 11.4, { frame: "redPlastic" }); sideStairs(R, "e", 11.4, { frame: "redPlastic" });
+    // A bench each side, by the waiting areas.
+    sofa(R, 0, 11.4, "e", 3, { fabric: "redFabric" }); sofa(R, 20, 8.4, "w", 3, { fabric: "redFabric" });
     // The waiting areas: a glass-topped table and two armchairs each side.
     glassTable(R, 4.3, 8.4, 5.9, 9.9);
     armchair(R, 3.45, 9.15, "e", "yellowFabric"); armchair(R, 6.75, 9.15, "w", "blueFabric");
@@ -673,6 +707,58 @@ const BUILD = {
     R.npcs.push({ name: "Lady", x: 13.8, z: 9.2, yaw: FACE.e, look: { skin: "middle_aged_woman" },
       talk: () => [{ text: "This shop sells many ANTIDOTEs." }] });
     R.spawn = MART_IN;
+    return R;
+  },
+
+  trainer1() {
+    // The Trainer House's ground floor (HeartGold and SoulSilver's, in Viridian City): the counter where the
+    // receptionist tells you who's waiting today, the big screen showing the battles downstairs, benches to watch
+    // from, an orange runner to the door, and the stairs down at the back.
+    const R = new Room("trainer1", { name: "Trainer House", floor: "1F", outsideSize: "11 by 7" });
+    shell(R, { paper: "paperTrainer", floor: "mcPeachCheck", floorRects: [[0, 0, 12, 14], [12, 2, 16, 14]], door: TH_DOOR, skirt: "orangeTrim" });
+    band(R, 1.05, "orangeTrim");
+    const G = R.geo;
+    // The counter, in the west corner: its front, its side back to the wall, its white top; the receptionist behind.
+    G.box(0, 0, 4.2, 4.4, 1.05, 5.2, { all: "counterOrange", top: "lab" });
+    G.box(3.4, 0, 0, 4.4, 1.05, 4.2, { all: "counterOrange", top: "lab" });
+    G.box(-0.05, 1.05, 4.1, 4.5, 1.15, 5.3, "lab");
+    R.solid(0, 0, 4.5, 5.3);
+    till(R, 2.9, 4.7, 1.15, "s");
+    R.act([0, 5.2, 4.4, 6.2], { label: "Talk", lines: ["The counter. The receptionist knows who's waiting downstairs today."] });
+    R.item("The counter", "Orange, a white top and stripe, a till.");
+    // The big screen: the battle room downstairs, live.
+    wallScreen(R, 5.4, 1.3, 4.8, 2.2, R.screen("thTV", 44, 22, drawTrainerTV, 1), ["The screen shows the battle room downstairs. Today's challenger is warming up."]);
+    // Benches facing it, and the stairs down at the back.
+    sofa(R, 7.8, 6.6, "n", 2.4, { fabric: "yellowFabric" }); sofa(R, 10.4, 6.6, "n", 2.4, { fabric: "blueFabric" });
+    stairsDown(R, 12, 0, 2, { to: "trainer2", spawn: TH_FOOT, paper: "paperTrainer" });
+    bookshelf(R, 16, 5.0, "w", 2.2, 1.6, { wood: "pale", lines: ["A rack of leaflets: THE TRAINER HOUSE. ONE BATTLE A DAY. A PRIZE FOR THE WINNER!"] });
+    plant(R, 1.0, 12.9, 1.1, { lines: ["A big leafy plant."] }); plant(R, 15.0, 12.9, 1.1, { lines: ["A big leafy plant."] });
+    rug(R, 7, 8, 9, 12, "thRun");
+    doormat(R, TH_DOOR[0], TH_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matTrainer" });
+    R.npcs.push({ name: "Receptionist", key: "trainer_house_desk", x: 1.8, z: 2.6, yaw: FACE.s, look: { skin: "link_receptionist" },
+      talk: () => [{ text: "Welcome to the TRAINER HOUSE, the newest and most happening place in VIRIDIAN!" },
+        { text: "Trainers come from all over to battle here. Today's challenger is waiting downstairs." },
+        { text: "Win, and there's a prize for you. One battle a day!" }] });
+    R.npcs.push({ name: "Youngster", key: "trainer_house_fan", x: 12.4, z: 8.2, yaw: FACE.n, look: { skin: "youngster" },
+      talk: () => [{ text: "There's someone new downstairs every day." }, { text: "I just watch them on the screen. They're SO strong!" }] });
+    R.spawn = TH_IN;
+    return R;
+  },
+
+  trainer2() {
+    // Downstairs: the battle room. A court marked out on the wooden floor, today's challenger waiting at its far
+    // end, the scoreboard over them, benches along the sides, the stairs back up.
+    const R = new Room("trainer2", { name: "Trainer House", floor: "B1F", W: 16, D: 16 });
+    shell(R, { paper: "paperTrainerB", floor: "courtWood", skirt: "orangeTrim" });
+    band(R, 1.05, "orangeTrim");
+    stairsUp(R, 12, 0, 2, { to: "trainer1", spawn: TH_TOP });
+    rug(R, 3, 4, 13, 15, "court");
+    wallScreen(R, 4.4, 1.6, 4.6, 1.9, R.screen("thBoard", 44, 20, drawScoreboard, 1), ["The scoreboard: TODAY'S CHALLENGER, and a tally of everyone they've beaten."]);
+    sofa(R, 0, 10.6, "e", 3, { fabric: "blueFabric" }); sofa(R, 16, 7.6, "w", 3, { fabric: "yellowFabric" });
+    plant(R, 1.0, 1.0, 1.1); plant(R, 1.0, 15.0, 1.1); plant(R, 15.0, 15.0, 1.1);
+    R.npcs.push({ name: "Cooltrainer", role: "trainer", key: "trainer_house", x: 8.0, z: 5.4, yaw: FACE.s, look: { skin: "cooltrainer_m" },
+      talk: () => [{ text: "I'm today's challenger. Think you can beat me?" }, { text: "Win, and the prize upstairs is yours!" }] });
+    R.spawn = TH_FOOT;
     return R;
   },
 

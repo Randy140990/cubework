@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/paper_trainer","paper_trainer":"retromon:block/interior/paper_trainer"},"elements":[{"from":[9.6,0.0,0],"to":[16.0,16.0,0],"faces":{"south":{"uv":[9.6,0.0,16.0,16.0],"texture":"#paper_trainer"}}}]}

@@ -144,6 +144,9 @@ public final class Battles {
 					after.addAll(Game.fill(p, s.trainer.defeat()));
 					// What he says after, he says to your face back in the world, before he heads off.
 					Game.rivalSpeech(p, Game.fill(p, s.trainer.after()));
+				} else if (s.trainer != null && s.trainer.key().equals("trainer_house")) {
+					// The Trainer House: the prize (and the challenger's done for today).
+					after.addAll(Game.trainerHouseWon(p));
 				} else if (s.trainer != null) {
 					d.beaten.add(s.trainer.key());
 					List<String> said = Game.fill(p, s.trainer.leader() ? s.trainer.defeat() : s.trainer.after());

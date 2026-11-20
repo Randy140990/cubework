@@ -41,7 +41,8 @@ public final class Colours {
 		// Greens (hue about a third) lean a little towards yellow; everything gets more colour and light.
 		if (h > 0.2F && h < 0.45F) h -= 0.018F;
 		s = Math.min(1, s * 1.3F + 0.05F);
-		v = Math.min(1, v * 1.14F + 0.03F);
+		// (A touch brighter again: the grass floors read dark under Retromon Light.)
+		v = Math.min(1, v * 1.2F + 0.04F);
 		int i = (int) Math.floor(h * 6);
 		float f = h * 6 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
 		float rr, gg, bb;

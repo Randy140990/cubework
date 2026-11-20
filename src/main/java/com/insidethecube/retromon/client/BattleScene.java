@@ -912,12 +912,21 @@ public final class BattleScene {
 		set(x, y - 2, z, Blocks.STONE.defaultBlockState());
 	}
 
-	/** A ring of trees at a radius (n of them, height h), leaving the space behind the camera open. */
+	/** Where the battle's camera stands on the stage (x, z), so the trees and hedges keep clear of it. */
+	private static double[] camSpot(int cx, int cz) {
+		return new double[] {cx + 0.5 - 1.4, cz + 0.5 + 9.8 + Math.max(0, stageH - 2) * 0.9};
+	}
+
+	/**
+	 * A ring of trees at a radius (n of them, height h), all the way round (so there's something behind yours when
+	 * the camera comes round to it), but none where the camera itself stands.
+	 */
 	private static void ring(int cx, int y, int cz, double radius, int n, int h, boolean mixed) {
+		double[] cam = camSpot(cx, cz);
 		for (int i = 0; i < n; i++) {
 			double a = Math.toRadians(i * 360.0 / n + RNG.nextInt(10));
 			int tx = cx + (int) Math.round(Math.sin(a) * radius), tz = cz + (int) Math.round(Math.cos(a) * radius);
-			if (tz - cz > 2 && Math.abs(tx - cx) < 10) continue;
+			if (Math.hypot(tx - cam[0], tz - cam[1]) < 6.5) continue;
 			int kindOf = mixed ? RNG.nextInt(3) : 0;
 			BlockState log = kindOf == 1 ? Blocks.SPRUCE_LOG.defaultBlockState() : kindOf == 2 ? Blocks.BIRCH_LOG.defaultBlockState() : Blocks.OAK_LOG.defaultBlockState();
 			BlockState leaves = (kindOf == 1 ? Blocks.SPRUCE_LEAVES : kindOf == 2 ? Blocks.BIRCH_LEAVES : Blocks.OAK_LEAVES).defaultBlockState()
@@ -928,10 +937,11 @@ public final class BattleScene {
 
 	/** Low hedges (leaves a block or two high) round the field's edge, between two radii, clear of the camera. */
 	private static void hedges(int cx, int y, int cz, double from, double to, boolean mixed) {
+		double[] cam = camSpot(cx, cz);
 		for (int dx = (int) -to; dx <= to; dx++) {
 			for (int dz = (int) -to; dz <= to; dz++) {
 				double d = Math.sqrt(dx * dx + dz * dz);
-				if (d < from || d > to || dz > 1 && Math.abs(dx) < 10 || RNG.nextInt(10) < 3) continue;
+				if (d < from || d > to || Math.hypot(cx + dx - cam[0], cz + dz - cam[1]) < 4 || RNG.nextInt(10) < 3) continue;
 				BlockState leaves = (mixed && RNG.nextInt(3) == 0 ? Blocks.SPRUCE_LEAVES : Blocks.OAK_LEAVES).defaultBlockState()
 						.setValue(LeavesBlock.PERSISTENT, true);
 				set(cx + dx, y + 1, cz + dz, leaves);

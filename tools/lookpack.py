@@ -145,6 +145,8 @@ def main():
     save("azure_bluet", flower((245, 245, 250, 255), (250, 220, 90, 255)))
     save("dirt_path_top", speckled((222, 196, 150), (190, 160, 115), (238, 220, 180), 3))
     save("sand", speckled((240, 226, 172), (214, 196, 140), (250, 242, 205), 4))
+    # Moss (the map's moss floors and carpets): the same lively green as the brightened grass, so it doesn't look dark beside it.
+    save("moss_block", speckled((124, 196, 74), (98, 168, 58), (156, 214, 98), 5))
     print("look pack written")
 
 

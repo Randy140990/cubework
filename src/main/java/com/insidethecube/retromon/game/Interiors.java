@@ -284,7 +284,7 @@ public final class Interiors {
 		for (Npc n : level.getEntitiesOfClass(Npc.class, box, n -> true)) n.discard();
 		for (Person p : r.people()) {
 			// The nurse heals and the clerk sells, as the games' nurse and clerk do (their own ways of talking).
-			int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : Npc.PERSON;
+			int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : "trainer".equals(p.role()) ? Npc.TRAINER : Npc.PERSON;
 			Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
 			if (n != null) {
 				n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));

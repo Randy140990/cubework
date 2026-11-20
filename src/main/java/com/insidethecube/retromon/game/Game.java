@@ -357,8 +357,64 @@ public final class Game {
 		return switch (key) {
 			case "rival_lab" -> rivalLab(p);
 			case "rival_22" -> rival22(p);
+			case "trainer_house" -> trainerHouse(p);
 			default -> Trainers.get(key);
 		};
+	}
+
+	// ---------- the Trainer House (Viridian City) ----------
+
+	/** Who's waiting there each day (a new one each day, going round), and what they give the winner. */
+	private static final String[] TH_NAMES = {"GAVEN", "BETH", "JAKE", "MEGAN", "ALLEN", "LOIS", "KEVIN", "CARA", "PAUL", "ROXY"};
+	private static final String[] TH_PRIZES = {"rare_candy", "pp_up", "nugget", "max_potion", "ultra_ball", "full_restore", "rare_candy"};
+	/** The kinds of POKéMON they bring (ones with our own looks, from early on). */
+	private static final String[] TH_POOL = {"pidgeotto", "raticate", "nidorino", "nidorina", "fearow", "primeape", "growlithe", "psyduck", "poliwhirl", "machop",
+			"geodude", "ponyta", "vulpix", "gloom", "weepinbell", "sandshrew", "ekans", "meowth", "clefairy", "jigglypuff", "golbat", "venonat", "kadabra", "pikachu",
+			"ivysaur", "charmeleon", "wartortle"};
+
+	/** Today (the real day: the Trainer House's challenger changes at midnight). */
+	private static long thDay() {
+		return java.time.LocalDate.now().toEpochDay();
+	}
+
+	private static String thToday() {
+		return "trainer_house:" + thDay();
+	}
+
+	/** Today's challenger: their name, and a team as strong as your best (two or three of them). */
+	static Trainers.Trainer trainerHouse(ServerPlayer p) {
+		PlayerData d = data(p);
+		long day = thDay();
+		java.util.Random r = new java.util.Random(day * 7919L + 17);
+		int top = 5;
+		for (Mon m : d.party) top = Math.max(top, m.level);
+		int n = Math.min(3, Math.max(2, d.party.size()));
+		List<Trainers.Member> team = new ArrayList<>();
+		List<String> pool = new ArrayList<>();
+		for (String s : TH_POOL) if (Species.ALL.containsKey(s)) pool.add(s);
+		for (int i = 0; i < n && !pool.isEmpty(); i++)
+			team.add(new Trainers.Member(pool.remove(r.nextInt(pool.size())), Math.max(5, Math.min(100, top - (i == n - 1 ? 0 : 1 + r.nextInt(2))))));
+		if (team.isEmpty()) team.add(new Trainers.Member("rattata", top));
+		String name = TH_NAMES[(int) Math.floorMod(day, TH_NAMES.length)];
+		return new Trainers.Trainer("trainer_house", "viridian_city", "COOLTRAINER " + name, "cooltrainer_m", "down", 0, 40, team, null,
+				List.of("I'm " + name + ", today's challenger at the TRAINER HOUSE!", "Think you can beat me? Let's find out!"),
+				List.of("You're really good!"), List.of("That was a great battle!"));
+	}
+
+	/** Today's prize (the same all day). */
+	private static String thPrize() {
+		return TH_PRIZES[(int) Math.floorMod(thDay(), TH_PRIZES.length)];
+	}
+
+	/** You beat today's challenger: the prize, and they're done for the day. */
+	static List<String> trainerHouseWon(ServerPlayer p) {
+		PlayerData d = data(p);
+		d.story.add(thToday());
+		String prize = thPrize();
+		d.give(prize, 1);
+		Item it = Item.find(prize);
+		String nm = it == null ? prize.toUpperCase() : it.name();
+		return List.of("You won the TRAINER HOUSE's prize!", player(p) + " received a " + nm + "!");
 	}
 
 	/** After your first Pokémon gets its name: your rival turns up, takes his, and walks over to battle you. */
@@ -1645,6 +1701,20 @@ public final class Game {
 				dialogue(p, n, "talk", lines);
 			}
 			case Npc.TRAINER, Npc.LEADER -> {
+				// The Trainer House's challenger: one battle a day.
+				if (n.key().equals("trainer_house")) {
+					if (d.story.contains(thToday())) {
+						dialogue(p, n, "talk", List.of("That was a great battle!", "Come back tomorrow: there'll be someone new waiting here."));
+						return;
+					}
+					if (!d.started || !d.anyHealthy()) {
+						dialogue(p, n, "talk", List.of("You don't have any POKéMON that can battle!"));
+						return;
+					}
+					d.beaten.remove("trainer_house");
+					talkBattle(p, n, trainerHouse(p));
+					return;
+				}
 				Trainers.Trainer t = Trainers.get(n.key());
 				if (t == null) {
 					dialogue(p, n, "talk", List.of("..."));

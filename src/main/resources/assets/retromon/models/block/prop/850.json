@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/mc_sage","mc_sage":"retromon:block/interior/mc_sage"},"elements":[{"from":[9.6,0.0,0],"to":[16.0,16.0,0],"faces":{"south":{"uv":[9.6,0.0,16.0,16.0],"texture":"#mc_sage"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cap","cap":"retromon:block/interior/cap"},"elements":[{"from":[3.84,16,0.96],"to":[16.0,16,14.4],"faces":{"down":{"uv":[3.84,1.6,16.0,15.04],"texture":"#cap"}}}]}

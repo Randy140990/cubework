@@ -106,6 +106,10 @@ public final class Trainers {
 	}
 
 	static {
+		// The Trainer House in Viridian (HeartGold and SoulSilver's): today's challenger downstairs (Game.trainerHouse
+		// makes who it is and their team each day; this is how they look).
+		ALL.put("trainer_house", new Trainer("trainer_house", "viridian_city", "COOLTRAINER", "cooltrainer_m", "down", 0, 40, List.of(new Member("rattata", 5)),
+				null, List.of(), List.of(), List.of()));
 		// A practice trainer for Route 1 (Gold and Silver's Youngster Joey).
 		ALL.put("youngster_joey", new Trainer("youngster_joey", "route_1", "YOUNGSTER JOEY", "youngster", "down", 4, 16, List.of(new Member("rattata", 4)),
 				null, List.of("Hey! You have POKéMON!", "Come on! Let's battle 'em!"), List.of("I lost..."),

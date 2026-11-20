@@ -455,10 +455,10 @@ function stairsDown(room, x0, z0 = 0, depth = 2, o = {}) {
 }
 function doormat(room, x0, x1, o = {}) {
   const D = room.D, G = room.geo;
-  G.box(x0, 0, D - 1.2, x1, 0.03, D, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
-  sunPool(room, x0 - 0.6, D - 3.2, x1 + 0.6, D);
+  G.box(x0, 0, D - 2, x1, 0.03, D, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
+  sunPool(room, x0 - 0.6, D - 3.6, x1 + 0.6, D);
   room.exitArrow = { x: (x0 + x1) / 2, z: D - 0.55 };
-  room.warps.push({ test: (p, input) => p.z > D - 0.42 && p.x > x0 && p.x < x1 && input.down, to: o.to, spawn: o.spawn, fx: "fadeOut", why: "out" });
+  room.warps.push({ test: (p, input) => p.z > D - 1.0 && p.x > x0 && p.x < x1 && input.down, to: o.to, spawn: o.spawn, fx: "fadeOut", why: "out" });
   room.item("Door mat", o.mat ? "This place's own mat, in its colours. Walk off it, south, to go out." : "Coir mat with a stitched border. Walk off it, south, to go out.");
 }
 
