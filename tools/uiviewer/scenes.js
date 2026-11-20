@@ -256,7 +256,7 @@ const SCENES = {
       S.enter = () => {
         if (!S.back) S.back = titleBack();
         lightFor(0, 0, 3, 8); sun3.position.set(-2.6, 4.5, 3.2); sun3.target.position.set(0, 0.5, 0);
-        hemi3.color.set(0xfff6e4); hemi3.groundColor.set(0x8cc070); look3(-0.7, 0.66, 2.35, -0.7, 0.6, 0);
+        hemi3.color.set(0xfff6e4); hemi3.groundColor.set(0x8cc070); look3(-0.82, 0.66, 2.35, -0.82, 0.6, 0);
       };
     }
     S.tick = (dt, t) => { for (const m of S.mons) tickMon(m, dt); if (S.back && S.back.canvas.isConnected) S.back.render(dt, t); if (S.zard) S.zard.m.holder.position.y = -0.55 + Math.sin(t * 1.6) * 0.12; S.clouds.forEach((c, i) => { c.position.x += dt * (S.night ? 0.12 : 0.55) * (1 + (i % 3) * 0.25); const lim = S.night ? 7 : 30; if (c.position.x > lim) c.position.x = -lim; }); };
