@@ -357,7 +357,7 @@ public final class Hud {
 		String name = ClientState.placeName, line = Adventure.signLine(name);
 		line = line.isEmpty() ? "" : Lang.t(line);
 		float nw = V.titleTrackedWidth(name, 48, 3), lw = line.isEmpty() ? 0 : V.width(line, 20, true);
-		float w = 3 + 26 + 30 + 18 + Math.max(nw, lw) + 40 + 3, h = 3 + 18 + 48 * 1.1F + (line.isEmpty() ? 0 : 20 * 1.36F) + 20 + 3, x = 640 - w / 2, y = 150;
+		float w = 3 + 26 + 30 + 18 + Math.max(nw, lw) + 40 + 3, h = 3 + 18 + 48 * 1.1F + (line.isEmpty() ? 0 : 20 * 1.36F) + 20 + 3, x = 640 - w / 2, y = 172;
 		if (alpha <= 0.05F) return;
 		g.pose().pushMatrix();
 		float cx = V.x(640), cy = V.y(y + h / 2);

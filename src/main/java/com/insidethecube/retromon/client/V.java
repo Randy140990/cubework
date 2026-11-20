@@ -473,7 +473,8 @@ public final class V {
 	public static void polySmooth(GuiGraphics g, float[] pts, int colour) {
 		poly(g, pts, colour);
 		int n = pts.length / 2;
-		float px = 1 / k;
+		// (One screen pixel wide: its soft sides do the smoothing.)
+		float px = 1 / (k * (float) Math.max(1, net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScale()));
 		for (int i = 0; i < n; i++) {
 			int j = (i + 1) % n;
 			line(g, pts[i * 2], pts[i * 2 + 1], pts[j * 2], pts[j * 2 + 1], px, colour);

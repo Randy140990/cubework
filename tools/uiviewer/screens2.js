@@ -22,7 +22,7 @@ screen("hud", "In the world", "The HUD", {
     const banner = () => {
       // The place's name popping up in the middle, as the place pill is drawn but big: a pearly-rimmed white pill,
       // the sunny dot, the name, the town's line in coral under it.
-      const b = box(0, 150, null, null, "g-panel g-pop", `<div style="display:flex;align-items:center;gap:18px;padding:18px 40px 20px 26px"><span style="flex:none;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 5px #FFE9A0"></span>
+      const b = box(0, 172, null, null, "g-panel g-pop", `<div style="display:flex;align-items:center;gap:18px;padding:18px 40px 20px 26px"><span style="flex:none;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 5px #FFE9A0"></span>
         <div><div class="g-title" style="font-size:48px;letter-spacing:3px;color:#26304A;line-height:1.1;white-space:nowrap">${esc(G.place)}</div><div style="font-size:20px;font-weight:800;color:#E5525C;white-space:nowrap">A quiet start to a long road.</div></div></div>`);
       b.style.left = "50%"; b.style.marginLeft = "0"; b.style.borderRadius = "999px"; b.style.translate = "-50% 0";
       later(3200, () => { b.style.transition = "opacity .6s"; b.style.opacity = 0; });
