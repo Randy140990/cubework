@@ -85,9 +85,16 @@ public final class Settings {
 		return get("style", 0, 0, 1) == 0;
 	}
 
-	/** SHADERS: Tempered Light on (1, the default) or off (0: Minecraft's own light, much quicker). */
+	/**
+	 * SHADERS: RETROMON (1, the default: Retromon Light, ours, light and quick), TEMPERED (2: Tempered Light, the
+	 * full one) or OFF (0: Minecraft's own light). Saves from before 0.26.0 that had it on now get Retromon Light.
+	 */
+	public static int shaderMode() {
+		return get("shaders", 1, 0, 2);
+	}
+
 	public static boolean shaders() {
-		return get("shaders", 1, 0, 1) == 1;
+		return shaderMode() != 0;
 	}
 
 	/** The Pokédex reads entries aloud (1) or not (0). */

@@ -1,7 +1,6 @@
 package com.insidethecube.retromon.client;
 
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -12,17 +11,24 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 
 /**
- * Tempered Light, built in: when you start a Retromon game and Iris is installed, the pack Retromon carries is
- * put in your shaderpacks folder and switched on (once a session), so the lights show at night. Your own
- * choice comes back when you leave. Without Iris, nothing happens and the game runs plain.
+ * The shaders, built in. When you start a Retromon game and Iris is installed, the pack OPTION's SHADERS names is
+ * put in your shaderpacks folder and switched on: Retromon Light (ours, light and quick: the light moves with the
+ * day, and rooms inside keep their own) or Tempered Light (the full one, to fall back on). OFF is Minecraft's own
+ * light. Your own choice comes back when you leave. Without Iris, nothing happens and the game runs plain.
  */
 public final class Shaders {
 	private Shaders() {}
 
-	public static final String PACK = "Tempered-Light-2.10.5.zip";
+	public static final String RETROMON = "Retromon-Light-1.0.0.zip";
+	public static final String TEMPERED = "Tempered-Light-2.10.5.zip";
 	private static boolean switched;
 	private static String previousPack;
 	private static boolean previousEnabled;
+
+	/** The pack for a SHADERS setting (1 Retromon Light, 2 Tempered Light), or null for OFF. */
+	public static String pack(int mode) {
+		return mode == 1 ? RETROMON : mode == 2 ? TEMPERED : null;
+	}
 
 	private static Object config() throws Exception {
 		Class<?> iris = Class.forName("net.irisshaders.iris.Iris");
@@ -33,11 +39,24 @@ public final class Shaders {
 		Class.forName("net.irisshaders.iris.Iris").getMethod("reload").invoke(null);
 	}
 
-	/**
-	 * OPTION's SHADERS, switched now: on (Tempered Light) or off (Minecraft's own light, much quicker). Your own
-	 * setting comes back when you leave the game, as ever.
-	 */
-	public static void set(boolean on) {
+	/** Puts the pack Retromon carries in the shaderpacks folder (again if it's changed). False if it couldn't. */
+	private static boolean install(String name) throws Exception {
+		Path dir = Minecraft.getInstance().gameDirectory.toPath().resolve("shaderpacks");
+		Files.createDirectories(dir);
+		Path pack = dir.resolve(name);
+		try (InputStream in = Shaders.class.getResourceAsStream("/retromon/shaders/" + name)) {
+			if (in == null) return Files.exists(pack);
+			byte[] bytes = in.readAllBytes();
+			if (Files.exists(pack) && Files.size(pack) == bytes.length) return true;
+			Path tmp = dir.resolve(name + ".part");
+			Files.write(tmp, bytes);
+			Files.move(tmp, pack, StandardCopyOption.REPLACE_EXISTING);
+		}
+		return true;
+	}
+
+	/** OPTION's SHADERS, switched now: 0 off (Minecraft's own light), 1 Retromon Light, 2 Tempered Light. */
+	public static void set(int mode) {
 		if (!FabricLoader.getInstance().isModLoaded("iris")) return;
 		try {
 			Object cfg = config();
@@ -47,58 +66,42 @@ public final class Shaders {
 				previousPack = current.orElse(null);
 				previousEnabled = (Boolean) cfg.getClass().getMethod("areShadersEnabled").invoke(cfg);
 			}
-			if (on) {
-				Path pack = Minecraft.getInstance().gameDirectory.toPath().resolve("shaderpacks").resolve(PACK);
-				if (!Files.exists(pack)) {
-					Files.createDirectories(pack.getParent());
-					try (InputStream in = Shaders.class.getResourceAsStream("/retromon/shaders/" + PACK)) {
-						if (in != null) Files.copy(in, pack, StandardCopyOption.REPLACE_EXISTING);
-					}
-				}
-				cfg.getClass().getMethod("setShaderPackName", String.class).invoke(cfg, PACK);
-			}
+			String name = pack(mode);
+			boolean on = name != null && install(name);
+			if (on) cfg.getClass().getMethod("setShaderPackName", String.class).invoke(cfg, name);
 			cfg.getClass().getMethod("setShadersEnabled", boolean.class).invoke(cfg, on);
 			cfg.getClass().getMethod("save").invoke(cfg);
 			reload();
 			switched = true;
 		} catch (Throwable t) {
-			Retromon.LOG.warn("Couldn't switch the shaders {}: {}", on ? "on" : "off", t.toString());
+			Retromon.LOG.warn("Couldn't switch the shaders to {}: {}", mode, t.toString());
 		}
 	}
 
-	/** Entering a Retromon save: Tempered Light on (if Iris is here and it isn't already), or off if OPTION says so. */
+	/** Entering a Retromon save: the pack OPTION names on (if Iris is here and it isn't already), or off. */
 	public static void enter() {
 		if (switched || !FabricLoader.getInstance().isModLoaded("iris")) return;
-		if (!Settings.shaders()) {
-			set(false);
-			return;
-		}
+		int mode = Settings.shaderMode();
+		String name = pack(mode);
 		try {
-			Path dir = Minecraft.getInstance().gameDirectory.toPath().resolve("shaderpacks");
-			Files.createDirectories(dir);
-			Path pack = dir.resolve(PACK);
-			if (!Files.exists(pack)) {
-				try (InputStream in = Shaders.class.getResourceAsStream("/retromon/shaders/" + PACK)) {
-					if (in == null) return;
-					Files.copy(in, pack, StandardCopyOption.REPLACE_EXISTING);
-				}
-			}
 			Object cfg = config();
 			@SuppressWarnings("unchecked")
 			Optional<String> current = (Optional<String>) cfg.getClass().getMethod("getShaderPackName").invoke(cfg);
 			boolean enabled = (Boolean) cfg.getClass().getMethod("areShadersEnabled").invoke(cfg);
-			if (enabled && current.isPresent() && current.get().startsWith("Tempered-Light")) return;
-			previousPack = current.orElse(null);
-			previousEnabled = enabled;
-			Method setName = cfg.getClass().getMethod("setShaderPackName", String.class);
-			setName.invoke(cfg, PACK);
-			cfg.getClass().getMethod("setShadersEnabled", boolean.class).invoke(cfg, true);
-			cfg.getClass().getMethod("save").invoke(cfg);
-			reload();
-			switched = true;
+			if (name != null && enabled && current.isPresent() && current.get().equals(name)) {
+				// Already on; still put in the latest copy of the pack if Retromon's has changed.
+				previousPack = name;
+				previousEnabled = true;
+				Path have = Minecraft.getInstance().gameDirectory.toPath().resolve("shaderpacks").resolve(name);
+				long size = Files.exists(have) ? Files.size(have) : -1;
+				install(name);
+				if (Files.size(have) != size) reload();
+				return;
+			}
 		} catch (Throwable t) {
-			Retromon.LOG.warn("Couldn't switch Tempered Light on: {}", t.toString());
+			Retromon.LOG.warn("Couldn't read the shader settings: {}", t.toString());
 		}
+		set(mode);
 	}
 
 	/** Leaving: your own shader choice back. */

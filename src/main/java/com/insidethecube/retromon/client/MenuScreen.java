@@ -849,9 +849,9 @@ public class MenuScreen extends DeviceScreen {
 			"Whether moves play their animations in battle.", "SWITCH asks if you want to change POKéMON when a trainer is about to send out their next one.",
 			"Whether your partner walks with you.",
 			"COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures.",
-			"Tempered Light's sun, shadows and night sky. OFF is Minecraft's own light, and much quicker.", "See every key: what it does in game, and what's turned off."};
+			"RETROMON is our own light: the sun moves with the day, with soft shadows and blue nights. TEMPERED is Tempered Light. OFF is Minecraft's own.", "See every key: what it does in game, and what's turned off."};
 	private static final String[][] OPTION_VALUES = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"},
-			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"OFF", "ON"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "ON"}, {}};
+			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"OFF", "ON"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON", "TEMPERED"}, {}};
 
 	/**
 	 * OPTION, as the UI Viewer's: what the row does in a panel at the top, then the rows (the one you're on cream),
@@ -867,7 +867,7 @@ public class MenuScreen extends DeviceScreen {
 		float rh = n > 11 ? 42 : 46;
 		V.panel(g, 170, 160, 940, n * rh + 36);
 		int[] now = {d.textSpeed, Music.level(), Settings.sound(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0, Settings.effects() ? 1 : 0,
-				Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), Settings.shaders() ? 1 : 0, 0};
+				Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), Settings.shaderMode(), 0};
 		for (int r = 0; r < n; r++) {
 			float ry = 160 + 18 + r * rh, rx = 188, rw = 904;
 			if (vover(rx, ry, rw, rh)) optionRow = r;
@@ -915,8 +915,8 @@ public class MenuScreen extends DeviceScreen {
 			}
 			case 9 -> Settings.set("look", Settings.look() == 1 ? 0 : 1);
 			case 10 -> {
-				Settings.set("shaders", Settings.shaders() ? 0 : 1);
-				Shaders.set(Settings.shaders());
+				Settings.set("shaders", Math.floorMod(Settings.shaderMode() + step, 3));
+				Shaders.set(Settings.shaderMode());
 			}
 			default -> {
 				Sounds.press();

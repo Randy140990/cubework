@@ -358,7 +358,7 @@ public class IntroScreen extends GameScreen {
 
 	private void startOak() {
 		if (bundledMap() == null) {
-			failure = "The Kanto map isn't installed. Put retromon-kanto-map.jar in your mods folder (beside Retromon), then restart.";
+			failure = "The map isn't installed. Put Retromon-Map-1.0.0.jar in your mods folder (beside Retromon), then restart.";
 			step = Step.FAILED;
 			return;
 		}
@@ -676,10 +676,15 @@ public class IntroScreen extends GameScreen {
 		pendingParent = parent;
 	}
 
-	/** The Kanto map: inside the Kanto map mod (Retromon's second jar), or a world or zip in .minecraft/retromon (for map makers). */
+	/**
+	 * The map: inside Retromon Map (Retromon's second jar, Retromon-Map-1.0.0.jar; the older retromon-kanto-map jar
+	 * still works), or a world or zip in .minecraft/retromon (for map makers).
+	 */
 	private static Path bundledMap() {
-		Optional<Path> inJar = FabricLoader.getInstance().getModContainer("retromon_kanto").flatMap(c -> c.findPath("retromon/maps/kanto.zip"));
-		if (inJar.isPresent()) return inJar.get();
+		for (String id : new String[] {"retromon_map", "retromon_kanto"}) {
+			Optional<Path> inJar = FabricLoader.getInstance().getModContainer(id).flatMap(c -> c.findPath("retromon/maps/kanto.zip"));
+			if (inJar.isPresent()) return inJar.get();
+		}
 		Path dir = mapFolder();
 		if (Files.isDirectory(dir)) {
 			try (Stream<Path> s = Files.walk(dir, 4)) {
