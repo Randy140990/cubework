@@ -40,7 +40,7 @@ screen("splash", "Start", "Opening", {
 });
 screen("title", "Start", "Title screen", {
   scene: "title", pixel: () => LOOK === "theirs" ? 5 : 0,
-  what: "The title, as Let's Go's, smooth (no pixels): RETROMON big at the top left with its own tag, A FAN-MADE ADVENTURE, over a painted meadow: blue sky lit by a sun off the screen past the top right corner (never seen itself): its warm haze and soft shafts of light coming in, and the lens's faint rings strung across the frame, hazy trees far off, a big tree on the left and leafy canopy on the right, a path, a rock, long grass swaying and flowers, blurred leaves right at the front. Your partner stands big on the right, looking out at you. Press SPACE, in white words. COBBLEMON look: the old title, the pixel Charizard against the night sky, reading POKéMON.",
+  what: "The title, as Let's Go's, smooth (no pixels): RETROMON big at the top left with its own tag, A FAN-MADE ADVENTURE, over a painted meadow: blue sky lit by a sun off the screen past the top right corner (never seen itself): the sky lighter on that side and the lens's faint rings near the top, hazy trees far off, a big tree on the left and leafy canopy on the right, a path, a rock, long grass swaying and flowers, blurred leaves right at the front. Your partner stands big on the right, looking out at you. Press SPACE, in white words. COBBLEMON look: the old title, the pixel Charizard against the night sky, reading POKéMON.",
   tags: ["New look: Let's Go's title"], mod: "IntroScreen: the pixel Charizard against the night sky, RETROMON, PRESS START. To come: this painted title.",
   make() {
     const night = LOOK === "theirs";
@@ -56,7 +56,7 @@ screen("title", "Start", "Title screen", {
       // foot of the frame; a soft vignette at the corners.
       backdrop("linear-gradient(180deg,#3E9FE6 0%,#7CC6F2 30%,#CBEBFA 52%,#E9F6E2 60%,#8CC867 70%,#5FA846 100%)");
       if (SC.title && SC.title.back) bgArt.appendChild(SC.title.back.canvas);
-      bgAdd("", { background: "radial-gradient(ellipse 60% 70% at 108% -26%, rgba(255,250,232,.7) 0%, rgba(255,244,212,.32) 34%, rgba(255,238,196,.08) 62%, transparent 80%)" });
+      bgAdd("", { background: "radial-gradient(ellipse 70% 80% at 108% -26%, rgba(255,252,240,.85) 0%, rgba(228,245,255,.5) 34%, rgba(210,238,255,.16) 62%, transparent 82%)" });
       const blades = (hh, texel, blur, dark, seedN, opac) => { const cv = document.createElement("canvas"); cv.width = 1280 / texel | 0; cv.height = hh / texel | 0; const x = cv.getContext("2d");
         let sd = seedN; const r = () => (sd = (Math.imul(sd, 1103515245) + 12345) >>> 0) / 4294967296;
         const GR = dark ? ["#2F6E2A", "#3A7F31", "#2A5F27", "#46913A"] : ["#4E9E3A", "#5DB345", "#79C653", "#3F8A34", "#8ED65E"];
@@ -67,23 +67,16 @@ screen("title", "Start", "Title screen", {
       const g1 = blades(150, 9, 0.6, false, 7, 1), g2 = blades(230, 22, 7, true, 19, 0.95);
       g1.style.animation = "tsway 4.2s ease-in-out infinite alternate"; g2.style.animation = "tsway 5.5s ease-in-out -2s infinite alternate";
       add(h("style", "", "@keyframes tsway{from{transform:skewX(-1.2deg)}to{transform:skewX(1.6deg)}}")); add(g1); add(g2);
-      // The sun as Let's Go's title has it: off the screen, up past the top right corner, never seen itself. Only its
-      // light comes in: a warm haze in from that corner, soft shafts of sunlight slanting down across the meadow, and
-      // the lens's faint rings and discs strung out from that corner across the frame, as if you're looking towards it.
-      // It all drifts a little, as if you're holding the camera.
-      const SUN = [1430, -200], MID = [640, 360];
+      // The sun as Let's Go's title has it: off the screen, up past the top right corner, never seen itself. You only
+      // know it's there: the sky lighter on that side, a soft haze in from the corner, and the lens's faint rings and
+      // discs near the top, close to where the light comes from. It all drifts a little, as if you're holding the camera.
+      const SUN = [1360, -120], MID = [300, 230];
       const fl = h("div", "", "", { position: "absolute", inset: "0", pointerEvents: "none", mixBlendMode: "screen", overflow: "hidden" });
-      const SHAFT_MASK = "radial-gradient(circle,#000 0,rgba(0,0,0,.8) 30%,rgba(0,0,0,.45) 58%,transparent 86%)";
-      fl.innerHTML = `<div data-f="veil" style="position:absolute;inset:0"></div>
-        <div data-f="shafts" style="position:absolute;width:3000px;height:3000px;transform:translate(-50%,-50%);
-          background:conic-gradient(from 200deg,transparent 0deg,rgba(255,244,214,.41) 4deg,transparent 7deg,transparent 11deg,rgba(255,240,206,.56) 13deg,rgba(255,240,206,.20) 17deg,transparent 19deg,
-            transparent 24deg,rgba(255,246,220,.32) 27deg,transparent 31deg,transparent 35deg,rgba(255,236,196,.5) 36.5deg,transparent 39deg,transparent 46deg,rgba(255,244,214,.35) 50deg,transparent 55deg,
-            transparent 60deg,rgba(255,240,206,.26) 63deg,transparent 66deg,transparent 360deg);
-          -webkit-mask-image:${SHAFT_MASK};mask-image:${SHAFT_MASK};filter:blur(4px)"></div>`;
+      fl.innerHTML = `<div data-f="veil" style="position:absolute;inset:0"></div>`;
       // The lens's ghosts: [how far along the line (0 the sun, 1 the middle of the frame), size, kind, colour]. Soft and
       // faint, as a real lens shows them.
-      const GHOSTS = [[0.36, 150, "disc", "255,236,190"], [0.5, 46, "disc", "255,255,240"], [0.64, 110, "ring", ""], [0.86, 60, "disc", "170,236,214"],
-        [1.08, 34, "disc", "255,240,200"], [1.28, 200, "ring", ""], [1.5, 80, "disc", "200,180,255"], [1.74, 130, "ring", ""]];
+      const GHOSTS = [[0.25, 140, "disc", "255,240,206"], [0.35, 40, "disc", "255,255,244"], [0.45, 100, "ring", ""], [0.55, 56, "disc", "180,236,220"],
+        [0.65, 26, "disc", "255,244,210"], [0.78, 150, "ring", ""], [0.9, 64, "disc", "210,196,255"]];
       const gEls = GHOSTS.map(([at, sz, kind, c]) => {
         const g = document.createElement("div");
         Object.assign(g.style, { position: "absolute", width: sz + "px", height: sz + "px", transform: "translate(-50%,-50%)", borderRadius: "50%", filter: "blur(1.5px)" });
@@ -93,13 +86,12 @@ screen("title", "Start", "Title screen", {
         fl.appendChild(g); return [g, at]; });
       add(fl);
       const t0 = performance.now(), place = (el, x, y) => { el.style.left = x + "px"; el.style.top = y + "px"; };
-      const veil = fl.querySelector('[data-f="veil"]'), shafts = fl.querySelector('[data-f="shafts"]');
+      const veil = fl.querySelector('[data-f="veil"]');
       const drift = () => {
         if (!fl.isConnected) return;
         const t = (performance.now() - t0) / 1000, sx = SUN[0] + Math.sin(t * 0.23) * 14 + Math.sin(t * 0.61) * 3, sy = SUN[1] + Math.cos(t * 0.17) * 8;
         const shine = 0.88 + 0.08 * Math.sin(t * 0.9) + 0.04 * Math.sin(t * 2.3);
-        veil.style.background = `radial-gradient(ellipse 980px 760px at ${sx}px ${sy}px,rgba(255,242,210,${0.56 * shine}),rgba(255,236,200,${0.18 * shine}) 46%,transparent 74%)`;
-        place(shafts, sx, sy); shafts.style.opacity = shine; shafts.style.transform = `translate(-50%,-50%) rotate(${Math.sin(t * 0.11) * 1.6}deg)`;
+        veil.style.background = `radial-gradient(ellipse 1050px 800px at ${sx}px ${sy}px,rgba(255,250,236,${0.6 * shine}),rgba(226,244,255,${0.26 * shine}) 40%,rgba(210,238,255,${0.08 * shine}) 62%,transparent 76%)`;
         for (const [g, at] of gEls) { place(g, sx + (MID[0] - sx) * at, sy + (MID[1] - sy) * at); g.style.opacity = (0.7 + 0.3 * Math.sin(t * 0.8 + at * 5)) * shine; }
         requestAnimationFrame(drift); };
       drift();

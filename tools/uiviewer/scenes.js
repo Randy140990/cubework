@@ -117,7 +117,7 @@ function titleBack() {
   for (let i = 0; i < 24; i++) oak(-70 + i * 6 + Math.floor(rnd() * 3), -55 - Math.floor(rnd() * 15), 5 + Math.floor(rnd() * 2));
   const mesh = G.build(); scene.add(mesh);
   const clouds = [], cm = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.55 });
-  for (const [x, y, z, w, d] of [[-30, 22, -80, 16, 6], [4, 26, -95, 22, 8], [34, 20, -85, 12, 5], [-8, 30, -110, 18, 6], [54, 24, -100, 14, 6]]) { const c = new THREE.Group(); for (const [bx, bz, bw, bd] of [[0, 0, w, d], [-w * 0.2, -d * 0.6, w * 0.5, d * 0.4], [w * 0.25, d * 0.6, w * 0.4, d * 0.4]]) { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, 2, bd), cm); m.position.set(bx, 0, bz); c.add(m); } c.position.set(x, y, z); scene.add(c); clouds.push(c); }
+  for (const [x, y, z, w, d] of [[-30, 22, -80, 16, 6], [4, 26, -95, 22, 8], [34, 20, -85, 12, 5], [-8, 30, -110, 18, 6], [54, 24, -100, 14, 6], [-16, 18, -70, 10, 4], [20, 23, -76, 14, 5], [-48, 27, -104, 20, 7], [12, 33, -124, 24, 8]]) { const c = new THREE.Group(); for (const [bx, bz, bw, bd] of [[0, 0, w, d], [-w * 0.2, -d * 0.6, w * 0.5, d * 0.4], [w * 0.25, d * 0.6, w * 0.4, d * 0.4]]) { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, 2, bd), cm); m.position.set(bx, 0, bz); c.add(m); } c.position.set(x, y, z); scene.add(c); clouds.push(c); }
   cam.position.set(0, 0.55, 5); cam.lookAt(0, 2.6, -20);
   return { canvas: cv, render(dt, t) { for (const [i, c] of clouds.entries()) { c.position.x += dt * (0.6 + i * 0.15); if (c.position.x > 80) c.position.x = -80; } cam.position.x = Math.sin(t * 0.08) * 0.25; cam.lookAt(0, 2.6, -20); R.render(scene, cam); } };
 }
