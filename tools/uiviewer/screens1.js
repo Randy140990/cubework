@@ -38,48 +38,6 @@ screen("splash", "Start", "Opening", {
     return { key: k => { if (k === "a" || k === "b") go("title"); return true; } };
   }
 });
-// The title's painting: soft and smooth (an SVG drawn once), with the grass swaying, clouds drifting, motes of light.
-function titleArt() {
-  let seed = 11; const r = () => (seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) / 4294967296;
-  const blobs = (cx, cy, w, hgt, n, fill, rMin, rMax) => { let o = ""; for (let i = 0; i < n; i++) { const x = cx + (r() - 0.5) * w, y = cy + (r() - 0.5) * hgt, rr = rMin + r() * (rMax - rMin); o += `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${rr.toFixed(0)}" fill="${fill}"/>`; } return o; };
-  // A canopy: dark underneath, mid, then sunlit clumps up top where the light falls.
-  const canopy = (cx, cy, w, hgt, k = 1) => blobs(cx, cy + hgt * 0.12, w, hgt * 0.8, Math.round(22 * k), "url(#cDk)", 40 * k, 90 * k) + blobs(cx, cy, w * 0.92, hgt * 0.7, Math.round(20 * k), "url(#cMd)", 34 * k, 78 * k)
-    + blobs(cx + w * 0.12, cy - hgt * 0.16, w * 0.7, hgt * 0.45, Math.round(14 * k), "url(#cLt)", 22 * k, 52 * k);
-  // Long grass: curved blades, short at the back, long at the front.
-  let grass = ""; for (let i = 0; i < 300; i++) { const x = r() * 1280, base = 480 + Math.pow(r(), 0.55) * 250, hgt = 14 + r() * (base > 650 ? 80 : base > 560 ? 44 : 24), lean = (r() - 0.4) * 26, g = ["#4E9E3A", "#5DB345", "#79C653", "#3F8A34", "#8ED65E"][Math.floor(r() * 5)];
-    grass += `<path d="M${(x - 3).toFixed(0)} ${base.toFixed(0)} Q${(x + lean * 0.4).toFixed(0)} ${(base - hgt * 0.6).toFixed(0)} ${(x + lean).toFixed(0)} ${(base - hgt).toFixed(0)} Q${(x + lean * 0.3 + 3).toFixed(0)} ${(base - hgt * 0.5).toFixed(0)} ${(x + 4).toFixed(0)} ${base.toFixed(0)}Z" fill="${g}"/>`; }
-  let flowers = ""; for (let i = 0; i < 46; i++) { const x = r() * 1280, y = 540 + r() * 170, c = ["#FFFFFF", "#FFF3A6", "#FF8FA8", "#FFD45A", "#E84A4A"][Math.floor(r() * 5)], s = 3 + r() * 5 + (y > 640 ? 3 : 0);
-    flowers += `<g transform="translate(${x.toFixed(0)} ${y.toFixed(0)})">${[0, 72, 144, 216, 288].map(a => `<circle cx="${(Math.cos(a * Math.PI / 180) * s * 0.9).toFixed(1)}" cy="${(Math.sin(a * Math.PI / 180) * s * 0.9).toFixed(1)}" r="${(s * 0.62).toFixed(1)}" fill="${c}"/>`).join("")}<circle r="${(s * 0.42).toFixed(1)}" fill="#F2B01E"/></g>`; }
-  let motes = ""; for (let i = 0; i < 18; i++) motes += `<circle cx="${(r() * 1280).toFixed(0)}" cy="${(120 + r() * 480).toFixed(0)}" r="${(2 + r() * 3).toFixed(1)}" fill="#FFFDE8" style="animation:tmote ${(4 + r() * 4).toFixed(1)}s ease-in-out ${(-r() * 4).toFixed(1)}s infinite"/>`;
-  return `<svg viewBox="0 0 1280 720" width="1280" height="720" style="position:absolute;inset:0;display:block"><defs>
-    <radialGradient id="tSun" cx="0.9" cy="0.02" r="0.6"><stop offset="0" stop-color="#FFFFF4" stop-opacity="1"/><stop offset=".12" stop-color="#FFF8D6" stop-opacity=".85"/><stop offset=".35" stop-color="#FFF4CC" stop-opacity=".25"/><stop offset="1" stop-color="#FFF4CC" stop-opacity="0"/></radialGradient>
-    <linearGradient id="cDk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F7A3A"/><stop offset="1" stop-color="#1F5A30"/></linearGradient>
-    <linearGradient id="cMd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5EB64C"/><stop offset="1" stop-color="#3B8E3E"/></linearGradient>
-    <linearGradient id="cLt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C4EE7A"/><stop offset="1" stop-color="#7CCB56"/></linearGradient>
-    <linearGradient id="tFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A6DDB6"/><stop offset="1" stop-color="#7FC497"/></linearGradient>
-    <linearGradient id="tMeadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B3E27A"/><stop offset=".35" stop-color="#86CB55"/><stop offset="1" stop-color="#54A83E"/></linearGradient>
-    <linearGradient id="tPath" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4E2B0"/><stop offset="1" stop-color="#DCC08A"/></linearGradient>
-    <linearGradient id="tRock" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EDE7DB"/><stop offset=".5" stop-color="#BDB4A6"/><stop offset="1" stop-color="#8E8576"/></linearGradient>
-    <linearGradient id="tTrunk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6A4A30"/><stop offset=".55" stop-color="#8A6440"/><stop offset="1" stop-color="#5A3E28"/></linearGradient>
-    <filter id="tb1" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.4"/></filter><filter id="tb3" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4"/></filter>
-    <filter id="tb8" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter><filter id="tb16" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="18"/></filter></defs>
-    <style>@keyframes tsway{from{transform:skewX(-1.5deg)}to{transform:skewX(2deg)}}@keyframes tcloud{from{transform:translateX(0)}to{transform:translateX(70px)}}@keyframes tmote{0%,100%{opacity:.1;transform:translateY(0)}50%{opacity:.9;transform:translateY(-14px)}}
-      .tsw{transform-box:fill-box;transform-origin:50% 100%;animation:tsway 3.6s ease-in-out infinite alternate}</style>
-    <rect width="1280" height="720" fill="url(#tSun)"/>
-    <g filter="url(#tb8)" opacity=".92" style="animation:tcloud 38s ease-in-out infinite alternate">${blobs(420, 220, 300, 34, 8, "#FFFFFF", 24, 46)}${blobs(820, 170, 320, 36, 9, "#FFFFFF", 22, 44)}</g>
-    <g filter="url(#tb8)">${blobs(640, 395, 1500, 80, 44, "url(#tFar)", 44, 100)}</g>
-    <g filter="url(#tb3)" opacity=".95">${blobs(600, 432, 1000, 46, 20, "#6DB86A", 30, 60)}</g>
-    <path d="M0 470 C 260 432 520 452 700 462 S 1100 442 1280 452 V720 H0Z" fill="url(#tMeadow)"/>
-    <path d="M0 470 C 260 432 520 452 700 462 S 1100 442 1280 452 V506 C 900 490 500 504 0 524Z" fill="#E6F7B0" opacity=".45" filter="url(#tb3)"/>
-    <path d="M612 468 C 642 520 566 592 470 720 H770 C 724 600 694 520 664 466Z" fill="url(#tPath)" opacity=".85"/>
-    <g filter="url(#tb1)"><rect x="268" y="210" width="56" height="290" rx="18" fill="url(#tTrunk)"/><path d="M292 320 Q 250 270 206 256" stroke="#6A4A30" stroke-width="16" fill="none" stroke-linecap="round"/>${canopy(250, 150, 560, 280)}</g>
-    <g filter="url(#tb1)"><rect x="1168" y="250" width="48" height="240" rx="14" fill="url(#tTrunk)" opacity=".95"/>${canopy(1170, 140, 420, 300, 1.05)}</g>
-    <g filter="url(#tb1)">${blobs(880, 468, 280, 28, 10, "#3F8E3E", 24, 46)}${blobs(900, 452, 240, 18, 8, "#6DBB55", 18, 34)}${blobs(120, 486, 320, 28, 10, "#3F8E3E", 26, 50)}</g>
-    <path d="M44 644 C 32 566 112 514 212 524 C 302 532 334 604 304 654 C 244 694 94 694 44 644Z" fill="url(#tRock)"/><path d="M94 566 C 134 534 204 532 244 554" stroke="#F8F4EC" stroke-width="10" fill="none" stroke-linecap="round" opacity=".7"/>
-    <g class="tsw">${grass}</g>${flowers}
-    <g filter="url(#tb16)" opacity=".92">${blobs(70, 706, 260, 60, 8, "#2E7A34", 50, 92)}${blobs(1250, 706, 240, 60, 7, "#3A8A3A", 50, 92)}</g>
-    <rect width="1280" height="720" fill="url(#tSun)" opacity=".5"/>${motes}</svg>`;
-}
 screen("title", "Start", "Title screen", {
   scene: "title", pixel: () => LOOK === "theirs" ? 5 : 0,
   what: "The title, as Let's Go's, smooth (no pixels): RETROMON big at the top left with its own tag, A FAN-MADE ADVENTURE, over a painted meadow: blue sky with the sun's glare top right, hazy trees far off, a big tree on the left and leafy canopy on the right, a path, a rock, long grass swaying and flowers, blurred leaves right at the front. Your partner stands big on the right, looking out at you. Press SPACE, in white words. COBBLEMON look: the old title, the pixel Charizard against the night sky, reading POKéMON.",
@@ -93,22 +51,42 @@ screen("title", "Start", "Title screen", {
       // As Let's Go's title: a painted meadow in soft light (no pixels): sky and the sun's glare top right, hazy trees far
       // off, a big tree on the left and leafy canopy behind on the right, a sunlit meadow with a path and a rock, long
       // grass and flowers, and blurred leaves right at the front, out of focus. Your partner stands big on the right.
-      backdrop("linear-gradient(180deg,#4AAEEC 0%,#8ED3F7 34%,#DDF4FF 56%,#B9E39A 60%,#7CC456 100%)");
-      bgAdd(titleArt());
+      // Like a film's opening shot: the Minecraft meadow behind, out of focus (its own canvas); the sun in the gap
+      // between the two big oaks, its glow spilling down; your partner sharp in front; grass blades close up across the
+      // foot of the frame; a soft vignette at the corners.
+      backdrop("linear-gradient(180deg,#3E9FE6 0%,#7CC6F2 30%,#CBEBFA 52%,#E9F6E2 60%,#8CC867 70%,#5FA846 100%)");
+      if (SC.title && SC.title.back) bgArt.appendChild(SC.title.back.canvas);
+      bgAdd("", { background: "radial-gradient(ellipse 34% 46% at 50% -4%, rgba(255,252,236,1) 0%, rgba(255,246,214,.75) 24%, rgba(255,238,196,.25) 52%, transparent 74%)" });
+      const blades = (hh, texel, blur, dark, seedN, opac) => { const cv = document.createElement("canvas"); cv.width = 1280 / texel | 0; cv.height = hh / texel | 0; const x = cv.getContext("2d");
+        let sd = seedN; const r = () => (sd = (Math.imul(sd, 1103515245) + 12345) >>> 0) / 4294967296;
+        const GR = dark ? ["#2F6E2A", "#3A7F31", "#2A5F27", "#46913A"] : ["#4E9E3A", "#5DB345", "#79C653", "#3F8A34", "#8ED65E"];
+        for (let i = 0; i < cv.width; i++) { if (r() < 0.12) continue; const bh = (0.25 + Math.pow(r(), 1.4) * 0.75) * cv.height; const c = GR[Math.floor(r() * GR.length)];
+          x.fillStyle = c; x.fillRect(i, cv.height - bh, 1, bh); x.fillStyle = "rgba(255,255,220,.35)"; x.fillRect(i, cv.height - bh, 1, 1); }
+        Object.assign(cv.style, { position: "absolute", left: "0", top: (720 - hh) + "px", width: "1280px", height: hh + "px", imageRendering: "pixelated", filter: `blur(${blur}px)`, opacity: opac, transformOrigin: "50% 100%" });
+        return cv; };
+      const g1 = blades(150, 9, 0.6, false, 7, 1), g2 = blades(230, 22, 7, true, 19, 0.95);
+      g1.style.animation = "tsway 4.2s ease-in-out infinite alternate"; g2.style.animation = "tsway 5.5s ease-in-out -2s infinite alternate";
+      add(h("style", "", "@keyframes tsway{from{transform:skewX(-1.2deg)}to{transform:skewX(1.6deg)}}")); add(g1); add(g2);
+      add(h("div", "", "", { position: "absolute", inset: "0", pointerEvents: "none", mixBlendMode: "screen", background: "radial-gradient(ellipse 30% 40% at 52% -6%, rgba(255,240,200,.55), transparent 70%)" }));
+      add(h("div", "", "", { position: "absolute", inset: "0", pointerEvents: "none", background: "radial-gradient(ellipse 75% 70% at 50% 42%, transparent 58%, rgba(8,26,24,.42) 100%)" }));
     }
     if (night) box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="POKéMON" src="${wordmark("POKéMON", { top: [255, 236, 120], bottom: [240, 170, 40], side: [40, 60, 140], line: [12, 18, 48] })}" style="max-width:1080px;image-rendering:pixelated;filter:drop-shadow(0 10px 0 rgba(0,0,0,.18))"></div>`);
     // RETROMON in round, heavy letters on a gentle arch (tools/wordmark.py), with its own edge and shadow.
-    // RETROMON big, upper left, as Let's Go's logo sits, with its own tag under it: A FAN-MADE ADVENTURE.
-    else box(70, 54, 760, null, "", `<style>@keyframes tlogo{from{transform:translateY(-14px) scale(.96);opacity:0}to{transform:none;opacity:1}}</style><div style="position:relative;animation:tlogo .8s cubic-bezier(.2,.9,.3,1.2) both">
-      <img alt="RETROMON" src="${wordmark("RETROMON")}" style="width:760px;height:138px;display:block;filter:drop-shadow(0 8px 0 rgba(255,255,255,.65)) drop-shadow(0 14px 18px rgba(20,60,90,.28))">
-      <div style="position:absolute;left:300px;top:128px;transform:rotate(-4deg);display:inline-flex;align-items:center;gap:12px;padding:8px 26px 8px 12px;border-radius:999px;background:#fff;box-shadow:0 0 0 4px #26304A,0 8px 0 rgba(38,48,74,.35),0 12px 22px rgba(20,60,90,.25)">
-        <svg viewBox="0 0 24 24" width="34" height="34"><path d="M12 2l2.6 6.6L21.5 9l-5.2 4.6L18 21l-6-3.6L6 21l1.7-7.4L2.5 9l6.9-.4z" fill="#FFC93C" stroke="#E5583E" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        <span style="font-family:Fredoka,system-ui,sans-serif;font-weight:700;font-size:30px;letter-spacing:1.5px;color:#26304A;white-space:nowrap">${esc(T("A FAN-MADE ADVENTURE"))}</span></div></div>`);
+    // The title as a big game's logo: RETROMON in heavy, leaning letters, lit from above (warm white into gold into
+    // ember), on its own soft shadow and glow; A FAN-MADE ADVENTURE in small spaced capitals between two fine rules
+    // under it. It rises in slowly.
+    else box(78, 64, 760, null, "", `<style>@keyframes tlogo{from{transform:translateY(18px);opacity:0;filter:blur(6px)}to{transform:none;opacity:1;filter:blur(0)}}
+      .t-word{font-family:"Archivo Black","Arial Black",Impact,system-ui,sans-serif;font-weight:900;font-size:128px;line-height:.9;letter-spacing:-2px;font-style:italic;transform:skewX(-6deg);transform-origin:0 100%;
+        background:linear-gradient(180deg,#FFFDF4 0%,#FFF0C2 30%,#FFC85A 58%,#F2843A 82%,#C9472C 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+        filter:drop-shadow(0 3px 0 rgba(120,44,20,.55)) drop-shadow(0 14px 22px rgba(10,30,30,.45)) drop-shadow(0 0 28px rgba(255,196,110,.35))}
+      .t-sub{display:flex;align-items:center;gap:18px;margin:16px 0 0 12px;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:19px;letter-spacing:9px;color:#fff;text-shadow:0 2px 10px rgba(0,30,30,.55)}
+      .t-sub i{display:block;height:2px;width:70px;background:linear-gradient(90deg,transparent,rgba(255,236,190,.95))}.t-sub i:last-child{background:linear-gradient(90deg,rgba(255,236,190,.95),transparent)}</style>
+      <div style="animation:tlogo 1.4s cubic-bezier(.2,.8,.2,1) both"><div class="t-word">RETROMON</div><div class="t-sub"><i></i>${esc(T("A FAN-MADE ADVENTURE"))}<i></i></div></div>`);
     // Which key, said plainly (Let's Go's "Press the A Button"): white words with a soft edge, SPACE in its own key cap.
     if (night) box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#fff;color:#26304A;font-size:30px;letter-spacing:6px">${esc(T("PRESS START"))}</span></div>`);
-    else box(330, 626, 560, null, "", `<style>@keyframes tpulse{0%,100%{opacity:1}50%{opacity:.55}}</style><div style="text-align:center;animation:tpulse 2s ease-in-out infinite;font-family:Fredoka,system-ui,sans-serif;font-weight:700;font-size:36px;letter-spacing:1px;color:#fff;-webkit-text-stroke:7px rgba(38,48,74,.55);paint-order:stroke fill;text-shadow:0 4px 12px rgba(20,40,60,.35)">${T("Press {0}").split("{0}").map(esc).join(`<span style="display:inline-grid;place-items:center;vertical-align:middle;height:44px;margin:0 8px;padding:0 20px;border-radius:12px;background:linear-gradient(180deg,#fff,#E6ECF6);color:#26304A;-webkit-text-stroke:0;font-size:20px;letter-spacing:3px;box-shadow:0 0 0 3px rgba(38,48,74,.55),inset 0 -4px 0 rgba(38,48,74,.15)">SPACE</span>`)}</div>`);
-    box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">INSID3 TH3 CUB3</div>`);
-    box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">Version 0.28</div>`);
+    else box(340, 640, 600, null, "", `<style>@keyframes tpulse{0%,100%{opacity:.95}50%{opacity:.4}}</style><div style="text-align:center;animation:tpulse 2.4s ease-in-out infinite;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:17px;letter-spacing:7px;color:#fff;text-shadow:0 2px 10px rgba(0,20,20,.7)">${T("Press {0}").toUpperCase().split("{0}").map(esc).join(`<span style="display:inline-grid;place-items:center;vertical-align:middle;height:30px;margin:0 10px;padding:0 14px;border:2px solid rgba(255,255,255,.85);border-radius:8px;font-size:13px;letter-spacing:4px">SPACE</span>`)}</div>`);
+    box(28, 684, 400, null, "", `<div style="font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:12px;letter-spacing:4px;color:#fff;opacity:.8;text-shadow:0 1px 6px rgba(0,0,0,.5)">INSID3 TH3 CUB3</div>`);
+    box(1060, 684, 200, null, "", `<div style="text-align:right;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:12px;letter-spacing:4px;color:#fff;opacity:.8;text-shadow:0 1px 6px rgba(0,0,0,.5)">VERSION 0.28</div>`);
     return { key: k => { if (k === "a") go("saves"); return true; } };
   }
 });
@@ -202,8 +180,8 @@ screen("keys", "Start", "Keys check", {
 // ===================== A new game =====================
 screen("prof", "A new game", "The professor", {
   scene: "prof", sceneOpts: () => ({ mode: "intro" }),
-  what: "The professor welcomes you, with our creatures about him: one wanders round, the bird hovers flapping, and when he says some keep them as friends, the little yellow one jumps up onto his shoulder.",
-  tags: ["Retromon creatures"], mod: "IntroScreen: Prof. Oak talks the whole time he's speaking.",
+  what: "The professor welcomes you, standing with our creatures about him (one wanders round, the bird hovers flapping). Then, as Let's Go's opening, he sets off to the right as he talks, the camera going with him past a whole parade of POKéMON, big ones at the back and little ones near, each turning to watch him go. ZAPGLIDER trots at his side, the bone-helmet one follows behind and the bird flies over his shoulder. At the far end he stops, turns to you, the camera comes in close, and it fades to black before you make yourself.",
+  tags: ["New: his walk past them all"], mod: "IntroScreen: Prof. Oak talks the whole time he's speaking. To come: the walk.",
   try: ["A to go on."],
   make() {
     swirlBackdrop("dream", { lx: 50, ly: 0, cx: 50, cy: 58 });
@@ -214,10 +192,17 @@ screen("prof", "A new game", "The professor", {
     S.talking = true;
     C.say([
       { who: "PROF. OAK", text: "Ah, there you are! Welcome. I'm **OAK**. Most people round here call me the **POKéMON PROF**." },
-      { who: "PROF. OAK", text: "This world is full of creatures we call **POKéMON**. You'll find them in the grass, the sea, the caves, even in town." },
-      { who: "PROF. OAK", text: "Some people keep them as friends. Some raise them for battles. Me? I study them.", on: () => S.hop && S.hop() },
-      { who: "PROF. OAK", text: "But that's enough about me. First, tell me a little about yourself." },
-    ]).then(() => { S.talking = false; if (C.alive()) go("creator"); });
+      { who: "PROF. OAK", text: "This world is full of creatures we call **POKéMON**. You'll find them in the grass, the sea, the caves, even in town.", on: () => S.startWalk && S.startWalk() },
+      { who: "PROF. OAK", text: "Some people keep them as friends. Some raise them for battles. Me? I study them." },
+      { who: "PROF. OAK", text: "But that's enough about me. First, tell me a little about yourself.", on: () => S.stopWalk && S.stopWalk() },
+    ]).then(async () => {
+      S.talking = false; if (!C.alive()) return;
+      // Wait for him to reach the end and turn, then fade to black.
+      while (C.alive() && !(S.walk && S.walk.done && S.walk.turnT >= 1)) await C.wait(100);
+      await C.wait(500); if (!C.alive()) return;
+      const fade = box(0, 0, 1280, 720, "", ""); fade.style.background = "#000"; fade.style.opacity = 0; fade.style.transition = "opacity .8s"; later(20, () => fade.style.opacity = 1);
+      await C.wait(950); if (C.alive()) go("creator");
+    });
     return { key: k => C.key(k) };
   }
 });
@@ -236,30 +221,34 @@ function makerRows(tab) {
 }
 function maker(C, tabs, o) {
   let tab = 0, sel = 0, rows = makerRows(tabs[0]);
-  const P = box(24, 20, 870, null, "g-panel", ""); P.style.padding = "12px 14px"; P.style.maxHeight = "650px"; P.style.overflow = "auto";
+  const glass = !!o.glass;
+  const P = box(o.x ?? 24, o.y ?? 20, o.w ?? 870, null, glass ? "mk-glass" : "g-panel", ""); P.style.padding = glass ? "16px 16px 14px" : "12px 14px"; P.style.maxHeight = (o.maxH || 650) + "px"; P.style.overflow = "auto";
+  if (glass && !document.getElementById("mkGlassCss")) document.head.appendChild(h("style", "", `.mk-glass{border-radius:30px;background:linear-gradient(160deg,rgba(40,80,140,.42),rgba(22,46,92,.52));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    box-shadow:0 0 0 2px rgba(255,255,255,.6),0 0 0 6px rgba(255,255,255,.14),0 20px 44px rgba(16,60,96,.28);color:#fff;scrollbar-width:thin}
+    .mk-glass .g-label{color:rgba(255,255,255,.92);text-shadow:0 1px 4px rgba(10,40,70,.35)}.mk-glass .g-title{color:#fff!important;text-shadow:0 2px 8px rgba(10,40,70,.35)}`, { id: "mkGlassCss" }));
   const opts = r => r.swatches ? r.swatches.map((c, i) => [i, c]) : r.chips;
   const idxOf = r => Math.max(0, opts(r).findIndex(([v]) => v === r.get()));
   const draw = () => {
     rows = makerRows(tabs[tab]);
-    const tabBar = tabs.length > 1 ? `<div style="display:flex;gap:8px;margin:2px 0 8px 10px">${tabs.map((t, i) => `<span class="g-chip${i === tab ? " on" : ""}" data-t="${i}" style="font-size:14px;padding:3px 14px">${t === "you" ? "YOU" : "CLOTHES"}</span>`).join("")}<span style="margin-left:auto;font-size:12px;font-weight:900;color:var(--g-muted);align-self:center">TAB switches</span></div>` : "";
+    const tabBar = tabs.length > 1 ? `<div style="display:flex;gap:8px;margin:2px 0 8px 10px">${tabs.map((t, i) => `<span class="g-chip${i === tab ? " on" : ""}" data-t="${i}" style="font-size:14px;padding:3px 14px">${t === "you" ? "YOU" : "CLOTHES"}</span>`).join("")}<span style="margin-left:auto;font-size:12px;font-weight:900;color:${glass ? "rgba(255,255,255,.85)" : "var(--g-muted)"};align-self:center">TAB switches</span></div>` : "";
     // Rows go in cards by what they're for (hat, top, bottoms...), with room to breathe: big swatches and chips.
     // YOU is one card: body, skin, eyes, then hair style and hair colour under them.
     const GROUP = { "BODY": "YOU", "SKIN": "YOU", "EYES": "YOU", "HAIR": "YOU", "HAIR COLOUR": "YOU", "HAT": "HAT", "CAP": "HAT", "CAP WAY": "HAT", "HAT COLOUR": "HAT",
       "TOP": "TOP", "TOP COLOUR": "TOP", "BOTTOMS": "BOTTOMS", "BOTTOMS COLOUR": "BOTTOMS", "SHOES": "SHOES", "BAG": "BAG", "BAG COLOUR": "BAG" };
     const short = (r, g) => r.label === "HAIR" && g === "YOU" ? "HAIR STYLE" : r.label === g ? (g === "SHOES" ? "COLOUR" : "STYLE") : r.label.startsWith(g + " ") ? r.label.slice(g.length + 1) : r.label;
-    const one = tabs[tab] === "you";
+    const one = glass || tabs[tab] === "you";
     const rowHtml = (r, i, g) => { const dim = r.off && r.off(), on = i === sel;
-      return `<div style="display:grid;grid-template-columns:${one ? 112 : 70}px 1fr;align-items:center;gap:10px;padding:${one ? "9px 12px" : "4px 8px"};border-radius:14px;transition:background .15s;${dim ? "opacity:.4;" : ""}${on ? "background:#FFF6CF;box-shadow:inset 0 0 0 2.5px #FFC93C" : ""}">
-      <span class="g-label" style="font-size:12.5px;${on ? "color:var(--g-red)" : ""}">${on ? "&#9656; " : ""}${short(r, g)}</span>
+      return `<div style="display:grid;grid-template-columns:${glass ? "1fr" : (one ? 112 : 70) + "px 1fr"};align-items:center;gap:${glass ? 8 : 10}px;padding:${one ? "9px 12px" : "4px 8px"};border-radius:14px;transition:background .15s;${dim ? "opacity:.4;" : ""}${on ? (glass ? "background:rgba(255,236,150,.32);box-shadow:inset 0 0 0 2.5px #FFE07A" : "background:#FFF6CF;box-shadow:inset 0 0 0 2.5px #FFC93C") : ""}">
+      <span class="g-label" style="font-size:12.5px;${on ? (glass ? "color:#FFF3B0" : "color:var(--g-red)") : ""}">${on ? "&#9656; " : ""}${short(r, g)}</span>
       <span style="display:flex;flex-wrap:wrap;gap:${one ? 6 : 7}px;align-items:center">${opts(r).map(([v, l], j) => r.swatches
         ? `<span class="g-swatch${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="position:relative;width:${one ? 29 : 30}px;height:${one ? 29 : 30}px;border-width:3px;border-radius:9px;background:linear-gradient(160deg,rgba(255,255,255,.28),rgba(0,0,0,.12)),${l}">${r.newFrom != null && j >= r.newFrom ? `<i style="position:absolute;right:-4px;top:-4px;width:10px;height:10px;border-radius:50%;background:#FFD45A;box-shadow:0 0 0 2px #fff"></i>` : ""}</span>`
         : `<span class="g-chip${v === r.get() ? " on" : ""}" data-r="${i}" data-j="${j}" style="font-size:14px;padding:3px 11px">${esc(l)}</span>`).join("")}</span></div>`; };
     const groups = []; rows.forEach((r, i) => { const g = GROUP[r.label] || r.label; let G2 = groups[groups.length - 1]; if (!G2 || G2.g !== g) groups.push(G2 = { g, rows: [] }); G2.rows.push([r, i]); });
     // Rows sit apart (a clear gap under the one you're on), the YOU card full width, CLOTHES in two columns.
-    P.innerHTML = tabBar + `<div style="${one ? "" : "columns:2;column-gap:10px"}">${groups.map(G2 => `<div style="border-radius:18px;background:#F3F6FC;padding:${one ? "12px 12px 14px" : "8px 6px"};display:grid;gap:${one ? 20 : 8}px;break-inside:avoid;margin-bottom:12px">
+    P.innerHTML = tabBar + `<div style="${one ? "" : "columns:2;column-gap:10px"}">${groups.map(G2 => `<div style="border-radius:18px;background:${glass ? "rgba(255,255,255,.1);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)" : "#F3F6FC"};padding:${one ? "12px 12px 14px" : "8px 6px"};display:grid;gap:${glass ? 12 : one ? 20 : 8}px;break-inside:avoid;margin-bottom:12px">
       <div class="g-title" style="font-size:17px;letter-spacing:2px;padding:2px 12px 2px;color:var(--g-red)">${G2.g}</div>${G2.rows.map(([r, i]) => rowHtml(r, i, G2.g)).join("")}</div>`).join("")}</div>` +
       `<div style="display:flex;gap:12px;margin-top:0;padding:0 10px;align-items:center"><span class="g-item${sel === rows.length ? " on" : ""}" data-done="1">${esc(T(o.done || "DONE"))}</span><span class="g-item${sel === rows.length + 1 ? " on" : ""}" data-rand="1">${esc(T("MIX IT UP"))}</span>
-        ${tabs[tab] === "you" ? `<span style="margin-left:auto;font-size:12.5px;font-weight:800;color:var(--g-muted)"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#FFD45A;margin-right:5px"></i>New: four more skin tones, eye colour</span>` : ""}</div>`;
+        ${tabs[tab] === "you" && !glass ? `<span style="margin-left:auto;font-size:12.5px;font-weight:800;color:var(--g-muted)"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#FFD45A;margin-right:5px"></i>New: four more skin tones, eye colour</span>` : ""}</div>`;
     P.querySelectorAll("[data-r]").forEach(e => e.onclick = () => { const r = rows[+e.dataset.r]; sel = +e.dataset.r; r.set(opts(r)[+e.dataset.j][0]); changed(); });
     P.querySelectorAll("[data-t]").forEach(e => e.onclick = () => { tab = +e.dataset.t; sel = 0; draw(); });
     P.querySelector("[data-done]").onclick = () => o.onDone(); P.querySelector("[data-rand]").onclick = () => mix();
@@ -267,7 +256,7 @@ function maker(C, tabs, o) {
   const changed = () => { draw(); if (SC.creator) SC.creator.refresh(); };
   const mix = () => { for (const t of tabs) for (const r of makerRows(t)) { if (r.label === "BODY") continue; const os = opts(r); r.set(os[Math.floor(Math.random() * os.length)][0]); } changed(); };
   draw();
-  const w = { key(k) {
+  const w = { el: P, key(k) {
     const n = rows.length + 2;
     if (k === "tab" && tabs.length > 1) { tab = (tab + 1) % tabs.length; sel = 0; draw(); return true; }
     if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : n - 1)) % n; draw(); return true; }
@@ -281,19 +270,59 @@ function maker(C, tabs, o) {
   C.push(w);
   return w;
 }
+// Eight starting looks for the maker: four boys, four girls, light to dark, each their own hair.
+const STARTERS_LOOK = [
+  { girl: 0, skin: 4, hair: 1, hairc: 14, eyes: 4 }, { girl: 0, skin: 1, hair: 0, hairc: 9, eyes: 1 }, { girl: 0, skin: 5, hair: 1, hairc: 4, eyes: 2 }, { girl: 0, skin: 7, hair: 0, hairc: 4, eyes: 1 },
+  { girl: 1, skin: 4, hair: 3, hairc: 15, eyes: 3 }, { girl: 1, skin: 1, hair: 2, hairc: 16, eyes: 4 }, { girl: 1, skin: 5, hair: 4, hairc: 17, eyes: 6 }, { girl: 1, skin: 7, hair: 5, hairc: 4, eyes: 1 }];
+function lookOf(i) { const p = STARTERS_LOOK[i]; return Object.assign(OUTFIT.defaults(!!p.girl), { skin: p.skin, hair: p.hair, hairc: p.hairc, eyes: p.eyes }); }
+// A Minecraft face, big: the front of the head and the hat layer over it, from the skin the look makes.
+function faceCanvas(outfit, px) {
+  const src = composeOutfit(outfit), cv = document.createElement("canvas"); cv.width = cv.height = 8; const x = cv.getContext("2d");
+  x.drawImage(src, 8, 8, 8, 8, 0, 0, 8, 8); x.drawImage(src, 40, 8, 8, 8, 0, 0, 8, 8);
+  Object.assign(cv.style, { position: "relative", left: "auto", top: "auto", width: px + "px", height: px + "px", imageRendering: "pixelated", display: "block", borderRadius: "12px", boxShadow: "0 0 0 3px #fff, 0 6px 12px rgba(20,60,90,.3)" });
+  return cv;
+}
 screen("creator", "A new game", "Character maker", {
-  scene: "creator", sceneOpts: () => ({ side: -1.95 }),
-  what: "Make yourself on Minecraft's player model, its corners just softened. YOU is one card: body, skin tone, eyes, then hair style and hair colour under them, each row with room round it. CLOTHES is the second tab. It's the mod's own wardrobe (the same layers and colours CLOTHES uses), with four more skin tones and eye colour added.",
-  tags: ["The mod's wardrobe", "New: 4 skin tones, eye colour"], mod: "Outfit: FAIR, LIGHT, TAN, DEEP skin; 6 hair styles; cap, beanie or sun hat; jacket, tee, hoodie or vest; jeans, shorts or skirt; shoes; backpack or satchel; 14 colours.",
-  try: ["Up and down between rows, left and right to change, A on DONE.", "MIX IT UP picks at random."],
-  make() {
-    swirlBackdrop("peach", { lx: 80, ly: 10, cx: 78, cy: 62 });
-    const C = ctl();
-    box(900, 34, 360, null, "", `<div class="g-title" style="text-align:center;font-size:26px;color:#26304A">${esc(T("What do you look like?"))}</div>`);
-    maker(C, ["you", "clothes"], { done: "THAT'S ME", onDone: () => go("name", { who: "you" }), onBack: () => go("prof") });
-    // Plain to see: Back and Continue, bottom right (left and right change a row; A carries on from anywhere).
+  scene: "creator", sceneOpts: () => ({ side: 0 }),
+  what: "Make yourself, as Let's Go does it: first a starting look. Four boys' faces down the left and four girls' down the right, each a Minecraft face on a glossy card, light skin to dark, and you in the middle on a pool of light. The one you're on lifts in a white frame. Then THAT'S ME and you move aside for the glass panel, where YOU (body, skin, eyes, hair style, hair colour) and CLOTHES make it your own. No white card: everything floats on the soft blue light.",
+  tags: ["New look: Let's Go's", "The mod's wardrobe", "New: 4 skin tones, eye colour"], mod: "Outfit: FAIR, LIGHT, TAN, DEEP skin; 6 hair styles; cap, beanie or sun hat; jacket, tee, hoodie or vest; jeans, shorts or skirt; shoes; backpack or satchel; 14 colours.",
+  try: ["Up and down a column, left and right between boys and girls, A to start from that look.", "Then up and down between rows, left and right to change, A to carry on. MIX IT UP picks at random."],
+  make(arg) {
+    swirlBackdrop("dream", { lx: 50, ly: 0, cx: 50, cy: 60 });
+    bgAdd("", { background: "radial-gradient(ellipse 22% 9% at 50% 86%, rgba(255,255,255,.75), rgba(200,250,255,.25) 55%, transparent 80%)" });
+    const C = ctl(), S = SC.creator;
+    let stage = arg && arg.stage === 2 ? 2 : 1, pick = 0;
+    const cards = box(0, 0, 1280, 720, "", ""); cards.style.pointerEvents = "none";
+    add(h("style", "", `.mk-face{position:absolute;width:250px;height:104px;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:18px;cursor:pointer;pointer-events:auto;
+        background:linear-gradient(110deg,#FFFFFF 0%,#F2FBEA 45%,#D9F3A8 100%);box-shadow:0 0 0 3px rgba(255,255,255,.85),0 10px 22px rgba(16,60,96,.25);transition:transform .16s, box-shadow .16s}
+      .mk-face.on{transform:scale(1.07);box-shadow:0 0 0 3px #fff,0 0 0 9px rgba(255,255,255,.55),0 0 30px 8px rgba(255,255,255,.65),0 14px 26px rgba(16,60,96,.3)}
+      .mk-face .gl{position:absolute;inset:6px 10px auto;height:36%;border-radius:20px 20px 40% 40%;background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,0));pointer-events:none}`));
+    const faces = STARTERS_LOOK.map((p, i) => { const e = h("div", "mk-face", ""); const girl = i >= 4, row = i % 4;
+      e.style.left = (girl ? 960 : 70) + "px"; e.style.top = (70 + row * 122) + "px";
+      e.appendChild(faceCanvas(lookOf(i), 80)); e.insertAdjacentHTML("beforeend", `<span class="gl"></span>`);
+      e.onmouseenter = () => { if (stage === 1) { pick = i; show(); } }; e.onclick = () => { pick = i; show(); start(); };
+      cards.appendChild(e); return e; });
+    let tb = null, panel = null, acts = null;
+    const say = text => { if (tb) tb.kill(); tb = textBox([{ text }], { x: 190, w: 580, keep: true }); };
+    const show = () => { faces.forEach((e, i) => e.classList.toggle("on", i === pick)); G.outfit = lookOf(pick); if (S) S.refresh(); };
+    // On to making it your own: you slide left, the glass panel comes in on the right.
+    const start = () => {
+      if (stage === 2 && panel) return; stage = 2;
+      cards.style.transition = "opacity .3s"; cards.style.opacity = 0; later(320, () => cards.style.display = "none");
+      if (S) S.sideGoal = 2.1;
+      say(T("Make it yours. Change anything you like."));
+      panel = maker(C, ["you", "clothes"], { glass: true, x: 650, y: 24, w: 600, maxH: 560, done: "THAT'S ME", onDone: () => go("name", { who: "you" }), onBack: () => back() });
+      panel.el.style.animation = "gfade .35s ease-out";
+    };
+    const back = () => { if (stage === 2) { go("creator"); return; } go("prof"); };
+    show(); say(T("What do you look like?"));
+    if (stage === 2) start();
     actions([{ key: "b", label: "Back" }, { key: "a", label: "Continue" }], { right: true });
-    return { key: k => C.key(k) };
+    return { key: k => {
+      if (stage === 2) return C.key(k) || (k === "b" ? (back(), true) : false);
+      if (k === "up" || k === "down") { const col = pick >= 4 ? 4 : 0, row = (pick % 4 + (k === "down" ? 1 : 3)) % 4; pick = col + row; show(); return true; }
+      if (k === "left" || k === "right") { pick = (pick + 4) % 8; show(); return true; }
+      if (k === "a") { start(); return true; } if (k === "b") { back(); return true; } return true; } };
   }
 });
 const KEYS_AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").concat(["-", "'", ".", " ", "0", "1", "2", "3", "4", "5"]);
@@ -331,12 +360,12 @@ screen("name", "A new game", "Your name", {
     const presets = girl ? ["LEAF", "LYRA", "KRIS"] : ["RED", "KRIS", "ETHAN"];
     C.choose(["NEW NAME"].concat(presets), { x: 980, y: 190, w: 250, back: false }).then(i => {
       if (i > 0) { G.name = presets[i - 1]; go("rival"); return; }
-      const w = nameEntry(C, { label: "YOUR NAME", start: "", onDone: n => { G.name = n.toUpperCase(); go("rival"); }, onBack: () => go("creator") });
+      const w = nameEntry(C, { label: "YOUR NAME", start: "", onDone: n => { G.name = n.toUpperCase(); go("rival"); }, onBack: () => go("creator", { stage: 2 }) });
       cur.raw = e => w.raw(e);
     });
     box(0, 70, 1280, null, "", `<div class="g-title" style="text-align:center;font-size:30px;color:#26304A">${esc(T("And what's your name?"))}</div>`);
     actions([{ key: "b", label: "Back" }, { key: "a", label: "Continue" }], { right: true });
-    return { key: k => C.key(k) || (k === "b" ? (go("creator"), true) : false) };
+    return { key: k => C.key(k) || (k === "b" ? (go("creator", { stage: 2 }), true) : false) };
   }
 });
 screen("rival", "A new game", "Your rival's name", {

@@ -59,6 +59,69 @@ function figureOf(look) { const f = makeFigure(look); poseFigure(f, {}); return 
 
 const PROF_LOOK = { skin: "oak" }, RIVAL_LOOK = { skin: "blue" }, NURSE_LOOK = { skin: "nurse" }, CLERK_LOOK = { skin: "clerk" }, BUGBOY_LOOK = { skin: "youngster" }, MUM_LOOK = { skin: "mum" };
 
+// The title's own Minecraft blocks: short grass, five flowers, oak log and leaves, and the plain far greens.
+function titleBlocks() {
+  if (MATDEF.tShort) return;
+  const sprite = (key, draw) => { TEXDEF[key] = [16, 16, draw]; MATDEF[key] = { tex: key, fit: true, cut: true, double: true }; };
+  sprite("tShort", (P, r) => { for (let x = 0; x < 16; x++) { if (r() < 0.2) continue; const hgt = 5 + ((r() * 10) | 0); for (let y = 16 - hgt; y < 16; y++) P.set(x, y, shadec(hx("#5AAE45"), (y - 16 + hgt) * -0.012 + (x % 2 ? 0.07 : -0.05) + (y === 16 - hgt ? 0.2 : 0))); } });
+  const flower = (key, petal, centre, shape) => sprite(key, (P, r) => {
+    P.line(8, 6, 8, 15, hx("#3E8A34")); P.set(7, 11, hx("#58A845")); P.set(6, 10, hx("#58A845")); P.set(9, 13, hx("#58A845")); P.set(10, 12, hx("#58A845"));
+    for (const [dx, dy] of shape) P.set(8 + dx, 4 + dy, (dy < 0 ? shadec(petal, 0.18) : dy > 0 ? shadec(petal, -0.15) : petal));
+    if (centre) P.set(8, 4, centre);
+  });
+  const ROUND = [[0, -2], [-1, -1], [0, -1], [1, -1], [-2, 0], [-1, 0], [1, 0], [2, 0], [-1, 1], [0, 1], [1, 1], [0, 2]];
+  flower("tPoppy", hx("#E0362E"), hx("#2A2A2A"), ROUND);
+  flower("tDandelion", hx("#F7D433"), hx("#E8A21E"), [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]]);
+  flower("tDaisy", hx("#F6F6F0"), hx("#F2C12E"), ROUND);
+  flower("tCornflower", hx("#4A7BE0"), hx("#2E4FA8"), [[0, -2], [-1, -1], [1, -1], [-2, 0], [2, 0], [-1, 1], [1, 1], [0, 1], [-1, 0], [1, 0]]);
+  flower("tAllium", hx("#B66FE0"), null, [[0, -2], [-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [0, 1], [-1, 1], [1, 1]]);
+  TEXDEF.tLog = [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#6E4F32"), (x % 4 === 0 ? -0.22 : x % 4 === 2 ? 0.06 : 0) + ((y * 7 + x * 3) % 9 === 0 ? -0.12 : 0) + (r() - 0.5) * 0.1)); }];
+  TEXDEF.tLogTop = [16, 16, (P, r) => { P.fill(hx("#6E4F32"), 0.05, r); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) { const d = Math.max(Math.abs(x - 7.5), Math.abs(y - 7.5)); if (d < 6.5) P.set(x, y, shadec(hx("#B8925C"), (Math.floor(d) % 2 ? -0.1 : 0.04) + (r() - 0.5) * 0.05)); } }];
+  TEXDEF.tLeaf = [16, 16, (P, r) => leaves(P, r, hx("#4A9A3C"), hx("#78C45A"), hx("#2E6A2A"), 0.1)];
+  MATDEF.tLog = { tex: "tLog", per: 1 }; MATDEF.tLogTop = { tex: "tLogTop", per: 1 }; MATDEF.tLeaf = { tex: "tLeaf", per: 1, cut: true };
+  TEXDEF.tFar = [4, 4, (P, r) => P.fill(hx("#7DC25A"), 0.0, r)]; MATDEF.tFar = { tex: "tFar", per: 40 };
+  TEXDEF.tFarLeaf1 = [16, 16, (P, r) => leaves(P, r, hx("#5FA858"), hx("#86C478"), hx("#447F44"), 0)]; MATDEF.tFarLeaf1 = { tex: "tFarLeaf1", per: 1 };
+  TEXDEF.tFarLeaf2 = [16, 16, (P, r) => leaves(P, r, hx("#86BE88"), hx("#A2D2A2"), hx("#6E9E72"), 0)]; MATDEF.tFarLeaf2 = { tex: "tFarLeaf2", per: 1 };
+  TEXDEF.tFarLog = [4, 4, (P, r) => P.fill(hx("#8C7A62"), 0.0, r)]; MATDEF.tFarLog = { tex: "tFarLog", per: 1 };
+}
+
+// The title's meadow, behind your partner: Minecraft's own blocks (grass blocks, short grass and flowers as crossed
+// cut-outs, leaf-block bushes, oaks grown as Minecraft grows them, flat blocky clouds), seen from down in the grass
+// with its own camera and drawn on its own canvas behind, out of focus, as a camera close on your partner would see it.
+// Two big oaks frame the sky, and the sun sits in the gap between them.
+function titleBack() {
+  titleBlocks();
+  const cv = document.createElement("canvas"); cv.width = 1280; cv.height = 720;
+  Object.assign(cv.style, { position: "absolute", left: "0", top: "0", width: "1280px", height: "720px", filter: "blur(3.5px) saturate(1.08)", transform: "scale(1.02)" });
+  const R = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); R.setClearColor(0x000000, 0); R.setPixelRatio(1);
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(42, 16 / 9, 0.1, 300);
+  scene.add(new THREE.HemisphereLight(0xfff4dc, 0x7aa860, 0.85)); const sun = new THREE.DirectionalLight(0xfff0d0, 0.55); sun.position.set(0, 20, -30); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xdff2ff, 0.35); fill.position.set(-10, 8, 20); scene.add(fill);
+  scene.fog = new THREE.Fog(0xcfeaf6, 30, 120);
+  let seed = 23; const rnd = () => (seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) / 4294967296;
+  const G = new Geo();
+  G.box(-60, -1, -90, 60, 0, 6, { top: "grass", all: null });
+  const cross = (x, z, k, hgt = 1) => { G.box(x + 0.15, 0, z + 0.5, x + 0.85, hgt, z + 0.5, { s: k, all: null }); G.box(x + 0.5, 0, z + 0.15, x + 0.5, hgt, z + 0.85, { e: k, all: null }); };
+  const FL = ["tPoppy", "tDandelion", "tDaisy", "tCornflower", "tAllium"];
+  for (let x = -22; x < 22; x++) for (let z = -30; z < 3; z++) { const v = rnd(); if (v < 0.5) cross(x, z, "tShort", 0.55 + rnd() * 0.35); else if (v < 0.58) cross(x, z, FL[Math.floor(rnd() * FL.length)], 0.7); }
+  for (let i = 0; i < 26; i++) { const x = -24 + Math.floor(rnd() * 48), z = -8 - Math.floor(rnd() * 24); G.box(x, 0, z, x + 1, 1, z + 1, "tLeaf"); if (rnd() < 0.6) G.box(x + 1, 0, z, x + 2, 1, z + 1, "tLeaf"); if (rnd() < 0.3) G.box(x, 1, z, x + 1, 2, z + 1, "tLeaf"); }
+  const oak = (x, z, hgt, s = 2) => {
+    G.box(x, 0, z, x + 1, hgt, z + 1, { all: "tLog", top: "tLogTop" });
+    for (const [y, r, cut] of [[hgt - 2, s, 0.6], [hgt - 1, s, 0.75], [hgt, Math.max(1, s - 1), 0.3], [hgt + 1, 1, 1]]) for (let i = -r; i <= r; i++) for (let k = -r; k <= r; k++) {
+      if (i === 0 && k === 0 && y < hgt) continue; const corner = Math.abs(i) === r && Math.abs(k) === r; if (y === hgt + 1 && corner) continue; if (corner && rnd() < cut) continue;
+      G.box(x + i, y, z + k, x + i + 1, y + 1, z + k + 1, "tLeaf"); }
+  };
+  // The two that frame the sky (big, a dark oak's spread), then a line of them far off.
+  const bigOak = (x, z) => { G.box(x, 0, z, x + 2, 9, z + 2, { all: "tLog", top: "tLogTop" }); for (let y = 6; y < 12; y++) { const r = y < 10 ? 4 : y < 11 ? 3 : 2; for (let i = -r; i <= r + 1; i++) for (let k = -r; k <= r + 1; k++) { if (Math.hypot(i - 0.5, k - 0.5) > r + 0.6 + rnd() * 0.5) continue; G.box(x + i, y, z + k, x + i + 1, y + 1, z + k + 1, "tLeaf"); } } };
+  bigOak(-15, -20); bigOak(13, -24);
+  for (let i = 0; i < 24; i++) oak(-70 + i * 6 + Math.floor(rnd() * 3), -55 - Math.floor(rnd() * 15), 5 + Math.floor(rnd() * 2));
+  const mesh = G.build(); scene.add(mesh);
+  const clouds = [], cm = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.55 });
+  for (const [x, y, z, w, d] of [[-30, 22, -80, 16, 6], [4, 26, -95, 22, 8], [34, 20, -85, 12, 5], [-8, 30, -110, 18, 6], [54, 24, -100, 14, 6]]) { const c = new THREE.Group(); for (const [bx, bz, bw, bd] of [[0, 0, w, d], [-w * 0.2, -d * 0.6, w * 0.5, d * 0.4], [w * 0.25, d * 0.6, w * 0.4, d * 0.4]]) { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, 2, bd), cm); m.position.set(bx, 0, bz); c.add(m); } c.position.set(x, y, z); scene.add(c); clouds.push(c); }
+  cam.position.set(0, 0.55, 5); cam.lookAt(0, 2.6, -20);
+  return { canvas: cv, render(dt, t) { for (const [i, c] of clouds.entries()) { c.position.x += dt * (0.6 + i * 0.15); if (c.position.x > 80) c.position.x = -80; } cam.position.x = Math.sin(t * 0.08) * 0.25; cam.lookAt(0, 2.6, -20); R.render(scene, cam); } };
+}
+
 const SCENES = {
   // Pallet Town, from the Interior Viewer: you outside your door, your partner beside you.
   town() {
@@ -87,19 +150,39 @@ const SCENES = {
   },
   // The professor, with creatures running round him, on a glowing floor.
   prof() {
-    const group = new THREE.Group(), S = { group, runners: [] };
-    group.add(disc(4.2, 0xDFF6F4, 0.0, 0.55)); group.add(disc(2.0, 0xFFFFFF, 0.005, 0.45));
+    const group = new THREE.Group(), S = { group, runners: [], parade: [] };
+    // A long pale floor of light, so he can walk along it past them all.
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 9), new THREE.MeshLambertMaterial({ color: 0xDFF6F4, transparent: true, opacity: 0.5 })); floor.rotation.x = -Math.PI / 2; floor.position.set(8, 0, 0.2); floor.receiveShadow = true; group.add(floor);
+    group.add(disc(2.0, 0xFFFFFF, 0.005, 0.45));
     const prof = figureOf(PROF_LOOK); prof.root.position.set(0, 0, 0); prof.root.rotation.y = Math.PI; group.add(prof.root); S.prof = prof;
     const rival = figureOf(RIVAL_LOOK); rival.root.position.set(1.45, 0, 0.45); rival.root.rotation.y = Math.PI - 0.25; group.add(rival.root); S.rival = rival;
     let you = null, lookKey = "";
-    // Our creatures beside him: standing about, now and then one calling out.
+    // Our creatures beside him: standing about, now and then one calling out. ZAPGLIDER, the bone-helmet one and the
+    // bird walk with him when he sets off.
     const SPOTS = [["pikachu", -0.85, 0.95, 0.35], ["cubone", -1.8, 0.35, 0.55], ["oddish", 0.55, 1.35, -0.1], ["clefairy", -1.3, 1.55, 0.2], ["pidgey", -1.45, -0.55, 0.4, 1.55]];
     SPOTS.forEach(([sid, x, z, turn, fly]) => mon(sid).then(st => { st.base = "ground"; st.home = [x, z, turn, fly || 0]; group.add(st.m.holder); S.runners.push(st); placeMon(st, x, z, Math.PI + turn, fly || 0); }));
+    // Further along, the ones he walks past: a parade of all sorts, big ones further back, little ones near.
+    const PARADE = ["growlithe", "exeggutor", "psyduck", "ponyta", "jigglypuff", "onix", "meowth", "machoke", "vulpix", "snorlax", "butterfree", "nidoking", "eevee", "lapras", "pidgeot"];
+    let pi = 0;
+    for (const sid of PARADE) {
+      if (!DATA.species[sid]) continue;
+      const i = pi++, x = 3.8 + i * 1.15, row = [1.4, -1.35, -2.4][i % 3];
+      mon(sid).then(st => { const big = st.m.size.h > 2.2 ? 2.2 / st.m.size.h : 1; if (big < 1) { st.m.holder.scale.multiplyScalar(big); st.m.size = { ...st.m.size, h: st.m.size.h * big, w: st.m.size.w * big, l: st.m.size.l * big, cx: st.m.size.cx * big, cz: st.m.size.cz * big }; }
+        const flyer = ["butterfree", "pidgeot"].includes(sid), z = flyer ? -0.9 : st.m.size.h > 1.3 ? -2.4 : st.m.size.h > 0.9 && row > 0 ? -1.35 : row;
+        st.base = flyer ? "fly" : "ground"; st.home = [x, z, (i % 3 - 1) * 0.35, flyer ? 1.5 : 0]; group.add(st.m.holder); S.parade.push(st); placeMon(st, x, z, Math.PI + st.home[2], st.home[3]); });
+    }
     S.nextCry = 2;
     S.hop = () => { if (S.hopT == null) { S.hopT = 0; const r = S.runners.find(q => q.sid === "pikachu"); if (r) playOnce(r, "cry"); } };
+    // The walk: he sets off to the right along them, talking; the camera goes with him; at the far end he stops and
+    // turns to you, and the camera comes in close.
+    const END = 3.8 + Math.max(0, PARADE.length - 1) * 1.15 + 1.4;
+    S.startWalk = () => { if (S.walk == null) S.walk = { x: 0, speed: 1.25, done: false }; };
+    S.stopWalk = () => { S.startWalk(); S.walk.hurry = true; };
     S.enter = o => {
-      S.mode = o.mode || "intro"; S.hopT = null;
+      S.mode = o.mode || "intro"; S.hopT = null; S.walk = null; S.camX = null;
+      prof.root.position.set(0, 0, 0); prof.root.rotation.y = Math.PI;
       rival.root.visible = S.mode === "rival";
+      for (const p of S.parade) p.m.holder.visible = S.mode === "intro";
       const k = JSON.stringify(G.look);
       if (S.mode === "you") { if (k !== lookKey || !you) { if (you) group.remove(you.root); you = figureOf(G.look); you.root.position.set(1.45, 0, 0.45); you.root.rotation.y = Math.PI - 0.25; group.add(you.root); lookKey = k; } you.root.visible = true; }
       else if (you) you.root.visible = false;
@@ -108,15 +191,34 @@ const SCENES = {
       look3(x, 2.35, 6.6, x, 0.62, 0.3);
     };
     S.tick = (dt, t) => {
-      poseFigure(prof, { talk: S.talking, point: S.point || 0, wave: S.wave || 0 });
+      const W = S.walk;
+      if (W && !W.done) {
+        W.x = Math.min(END, W.x + dt * (W.hurry ? 3.2 : W.speed));
+        prof.root.position.x = W.x; prof.root.rotation.y = -Math.PI / 2 - 0.55; prof.phase += dt * (W.hurry ? 11 : 8);
+        if (W.x >= END) { W.done = true; W.turnT = 0; }
+        lightFor(W.x, 0, 8, 14);
+      }
+      if (W && W.done) { W.turnT = Math.min(1, W.turnT + dt * 2.2); const e = W.turnT * W.turnT * (3 - 2 * W.turnT); prof.root.rotation.y = (-Math.PI / 2 - 0.55) + (-Math.PI - (-Math.PI / 2 - 0.55)) * e; }
+      poseFigure(prof, { walk: W && !W.done ? 1 : 0, talk: S.talking, point: W ? 0 : S.point || 0, wave: S.wave || 0 });
+      // The camera: with him as he walks, then in close when he stops.
+      if (W) { const px = prof.root.position.x, close = W.done ? W.turnT : 0; S.camX = S.camX == null ? px : S.camX + (px + 0.4 - S.camX) * Math.min(1, dt * 2.5);
+        look3(S.camX - 0.2 * close, 2.35 - 0.55 * close, 6.6 - 2.1 * close, S.camX, 0.62 + 0.25 * close, 0.3); }
       if (rival.root.visible) poseFigure(rival, { headYaw: Math.sin(t * 0.7) * 0.2 });
       if (you && you.root.visible) poseFigure(you, { wave: S.youWave || 0, floss: S.youFloss || 0, lookUp: S.youLookUp || 0 });
       S.nextCry -= dt;
-      if (S.nextCry < 0 && S.runners.length) { const r = S.runners[Math.floor(Math.random() * S.runners.length)]; playOnce(r, "cry"); S.nextCry = 2.5 + Math.random() * 2.5; }
+      const all = S.runners.concat(S.parade.filter(p => p.m.holder.visible));
+      if (S.nextCry < 0 && all.length) { const r = all[Math.floor(Math.random() * all.length)]; if (!W || r.sid !== "pikachu") playOnce(r, "cry"); S.nextCry = 2 + Math.random() * 2; }
       for (const r of S.runners) {
-        const [x, z, turn, fly] = r.home;
-        if (r.sid === "cubone") {
-          // Wandering round in a slow loop, facing the way it goes.
+        const [x, z, turn, fly] = r.home, px = prof.root.position.x;
+        if (W && ["pikachu", "cubone", "pidgey"].includes(r.sid)) {
+          // Walking with him: ZAPGLIDER at his side in front, the bone-helmet one behind, the bird over his shoulder.
+          const off = { pikachu: [0.85, 0.75, 0], cubone: [-1.0, -0.45, 0], pidgey: [-0.4, -0.6, 1.7] }[r.sid];
+          const tx = px + off[0], tz = off[1], cx = r.walkX == null ? x : r.walkX, cz = r.walkZ == null ? z : r.walkZ;
+          r.walkX = cx + (tx - cx) * Math.min(1, dt * 3); r.walkZ = cz + (tz - cz) * Math.min(1, dt * 3);
+          const moving = !W.done || Math.abs(tx - r.walkX) > 0.05;
+          placeMon(r, r.walkX, r.walkZ, moving ? -Math.PI / 2 - 0.25 : Math.PI + (r.sid === "pikachu" ? -0.4 : 0.3), off[2] ? off[2] + Math.sin(t * 2.4) * 0.12 : 0);
+          r.base = off[2] ? "fly" : moving ? "walk" : "ground";
+        } else if (r.sid === "cubone") {
           // Round the professor in a wide loop, clear of the others, facing the way it walks.
           const a = t * 0.35, wx = Math.cos(a) * 2.55, wz = 0.35 + Math.sin(a) * 2.25;
           placeMon(r, wx, wz, Math.atan2(Math.sin(a) * 2.55, -Math.cos(a) * 2.25)); r.base = "walk";
@@ -128,10 +230,13 @@ const SCENES = {
         } else { placeMon(r, x, z, Math.PI + turn + Math.sin(t * 0.4 + x) * 0.15, fly ? fly + Math.sin(t * 2.2) * 0.12 : 0); if (fly) r.base = "fly"; }
         tickMon(r, dt);
       }
+      // The parade: each turns its head to him as he passes.
+      for (const r of S.parade) { if (!r.m.holder.visible) continue; const [x, z, turn, fly] = r.home, px = prof.root.position.x, look = W ? Math.max(-0.6, Math.min(0.6, (px - x) * 0.4)) : 0;
+        placeMon(r, x, z, Math.PI + turn - look, fly ? fly + Math.sin(t * 2.1 + x) * 0.14 : 0); tickMon(r, dt); }
     };
     return S;
   },
-  // The title: a few of our creatures, drawn as pixel art (the scene is rendered small and blown up).
+  // The title: your partner big in front of the meadow (ours), or the pixel Charizard against the night (the old look).
   title() {
     const group = new THREE.Group(), S = { group, mons: [], clouds: [] }, night = LOOK === "theirs";
     const box = (w, h, d, c, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color: c })); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; group.add(m); return m; };
@@ -142,18 +247,18 @@ const SCENES = {
         st.base = "hover"; st.fly = true; group.add(st.m.holder); placeMon(st, 0.15, 0, Math.PI - 0.45, -0.55); S.mons.push(st); S.zard = st; });
       S.enter = () => { lightFor(-2, 3, 4, 10); hemi3.color.set(0x9fb6ff); hemi3.groundColor.set(0x1a2244); look3(0, 1.45, 8.2, 0, 1.15, 0); };
     } else {
-      // As Let's Go's title: the painted meadow is the page behind (titleArt), and just your partner-to-be stands big
-      // in front of it on the right, three-quarters on, looking out at you, in smooth light (not pixel art).
+      // As Let's Go's title, shot like a film: your partner big and sharp on the right, close enough that its feet are
+      // below the frame, with the Minecraft meadow behind out of focus (titleBack, its own canvas behind the scene).
       mon("pikachu").then(st => { const k = 0.95 / Math.max(0.5, st.m.size.h); st.m.holder.scale.multiplyScalar(k); st.m.size = { ...st.m.size, h: st.m.size.h * k, w: st.m.size.w * k, l: st.m.size.l * k, cx: st.m.size.cx * k, cz: st.m.size.cz * k };
-        st.base = "ground"; group.add(st.m.holder); placeMon(st, 0, 0, Math.PI - 0.42); S.mons.push(st); S.star = st; });
-      const sh = blob(1.25); sh.position.set(0.02, 0.01, 0.05); sh.material = sh.material.clone(); sh.material.opacity = 0.55; group.add(sh);
-      S.nextCry = 2.5;
+        st.base = "ground"; group.add(st.m.holder); placeMon(st, 0, 0, Math.PI - 0.38); S.mons.push(st); S.star = st; });
+      S.back = null;
       S.enter = () => {
-        lightFor(0, 0, 3, 8); sun3.position.set(3.2, 5.5, 1.2); sun3.target.position.set(0, 0.4, 0);
-        hemi3.color.set(0xfff8e8); hemi3.groundColor.set(0x9ccf78); look3(-0.98, 0.66, 2.9, -0.98, 0.56, 0);
+        if (!S.back) S.back = titleBack();
+        lightFor(0, 0, 3, 8); sun3.position.set(-2.6, 4.5, 3.2); sun3.target.position.set(0, 0.5, 0);
+        hemi3.color.set(0xfff6e4); hemi3.groundColor.set(0x8cc070); look3(-0.7, 0.66, 2.35, -0.7, 0.6, 0);
       };
     }
-    S.tick = (dt, t) => { for (const m of S.mons) tickMon(m, dt); if (S.zard) S.zard.m.holder.position.y = -0.55 + Math.sin(t * 1.6) * 0.12; S.clouds.forEach((c, i) => { c.position.x += dt * (S.night ? 0.12 : 0.55) * (1 + (i % 3) * 0.25); const lim = S.night ? 7 : 30; if (c.position.x > lim) c.position.x = -lim; }); };
+    S.tick = (dt, t) => { for (const m of S.mons) tickMon(m, dt); if (S.back && S.back.canvas.isConnected) S.back.render(dt, t); if (S.zard) S.zard.m.holder.position.y = -0.55 + Math.sin(t * 1.6) * 0.12; S.clouds.forEach((c, i) => { c.position.x += dt * (S.night ? 0.12 : 0.55) * (1 + (i % 3) * 0.25); const lim = S.night ? 7 : 30; if (c.position.x > lim) c.position.x = -lim; }); };
     return S;
   },
   // Everyone of a kind, side by side on a stage: the one you pick steps forward and waves, with their partner behind.
@@ -189,8 +294,9 @@ const SCENES = {
     group.add(disc(0.85, 0xE9FFF6, 0.002));
     const turn = new THREE.Group(); group.add(turn);
     S.refresh = () => { if (S.fig) turn.remove(S.fig.root); S.fig = figureOf(G.look); turn.add(S.fig.root); };
-    S.enter = o => { S.refresh(); S.spin = 0; S.side = o.side || 0; lightFor(0, 0, 4, 10); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); look3(o.side || 0, 1.35, 6.3, o.side || 0, 0.92, 0); };
-    S.tick = (dt, t) => { S.spin += dt * (S.paused ? 0 : 0.55); turn.rotation.y = Math.PI + Math.sin(S.spin) * 0.9 + (S.face || 0); if (S.fig) poseFigure(S.fig, { wave: S.wave || 0 }); };
+    S.enter = o => { S.refresh(); S.spin = 0; S.side = S.sideGoal = o.side || 0; lightFor(0, 0, 4, 10); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); look3(S.side, 1.35, 6.3, S.side, 0.92, 0); };
+    S.tick = (dt, t) => { if (Math.abs(S.sideGoal - S.side) > 0.001) { S.side += (S.sideGoal - S.side) * Math.min(1, dt * 5); look3(S.side, 1.35, 6.3, S.side, 0.92, 0); }
+      S.spin += dt * (S.paused ? 0 : 0.55); turn.rotation.y = Math.PI + Math.sin(S.spin) * 0.9 + (S.face || 0); if (S.fig) poseFigure(S.fig, { wave: S.wave || 0 }); };
     return S;
   },
   // One creature on a stand: the Pokédex, a catch, an evolution.

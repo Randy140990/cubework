@@ -708,13 +708,13 @@ screen("card", "Menus", "Trainer card", {
   }
 });
 screen("clothes", "Menus", "Clothes", {
-  scene: "creator", sceneOpts: () => ({ side: -1.95 }),
+  scene: "creator", sceneOpts: () => ({ side: 2.1 }),
   what: "Change what you wear, as the mod's CLOTHES does: hat (cap, beanie, sun hat), cap pattern and which way round, top, bottoms, shoes and bag, each in one of 14 colours. B keeps what you chose, UNDO puts back what you came in with.",
   mod: "ClothesScreen: CAP STYLE, BACKWARDS, colours; B keeps, UNDO restores.",
   make() {
     backdrop("radial-gradient(ellipse at 70% 45%, #FFFFFF 0%, #FFF0E0 35%, #F6C99A 70%, #D98A52 100%)");
     const C = ctl(), before = JSON.stringify(G.outfit);
-    maker(C, ["clothes"], { done: "UNDO", onDone: () => { G.outfit = JSON.parse(before); SC.creator.refresh(); go("clothes"); }, onBack: () => go("menu", { sel: 4 }) });
+    maker(C, ["clothes"], { glass: true, x: 650, y: 24, w: 600, maxH: 600, done: "UNDO", onDone: () => { G.outfit = JSON.parse(before); SC.creator.refresh(); go("clothes"); }, onBack: () => go("menu", { sel: 4 }) });
     hints([["A", "Choose"], ["B", "Keep and close"]]);
     return { key: k => C.key(k) };
   }
