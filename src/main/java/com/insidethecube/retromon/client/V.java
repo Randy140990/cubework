@@ -1,5 +1,6 @@
 package com.insidethecube.retromon.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.insidethecube.retromon.Retromon;
@@ -159,6 +160,74 @@ public final class V {
 
 	public static void ellipse(GuiGraphics g, float cx, float cy, float rx, float ry, int c) {
 		Ui.ellipse(g, x(cx), y(cy), s(rx), s(ry), c);
+	}
+
+	/** A ring (canvas): from radius r0 out to r1, shaded c0 at the inside to c1 at the outside. */
+	public static void annulus(GuiGraphics g, float cx, float cy, float r0, float r1, int c0, int c1) {
+		int n = 64;
+		float[] xy = new float[n * 12];
+		int[] cs = new int[n * 6];
+		float X = x(cx), Y = y(cy), R0 = s(r0), R1 = s(r1);
+		for (int i = 0; i < n; i++) {
+			double b0 = i * Math.PI * 2 / n, b1 = (i + 1) * Math.PI * 2 / n;
+			float c0x = (float) Math.cos(b0), s0 = (float) Math.sin(b0), c1x = (float) Math.cos(b1), s1 = (float) Math.sin(b1);
+			float[] q = {X + c0x * R0, Y + s0 * R0, X + c0x * R1, Y + s0 * R1, X + c1x * R1, Y + s1 * R1, X + c0x * R0, Y + s0 * R0, X + c1x * R1, Y + s1 * R1, X + c1x * R0, Y + s1 * R0};
+			System.arraycopy(q, 0, xy, i * 12, 12);
+			int[] k = {c0, c1, c1, c0, c1, c0};
+			System.arraycopy(k, 0, cs, i * 6, 6);
+		}
+		Ui.tris(g, xy, cs);
+	}
+
+	/**
+	 * A light behind something: radial stops (at, 0 to 1 of radius r) of colours with their own see-through, drawn as
+	 * rings so the see-through doesn't pile up.
+	 */
+	public static void radialSoft(GuiGraphics g, float cx, float cy, float r, float[] at, int[] cols) {
+		int steps = 24;
+		for (int i = 0; i < steps; i++) {
+			float t0 = i / (float) steps, t1 = (i + 1) / (float) steps;
+			annulus(g, cx, cy, r * t0, r * t1, stop(t0, at, cols), stop(t1, at, cols));
+		}
+	}
+
+	/**
+	 * Rays (the viewer's repeating-conic-gradient behind a won thing): wedges of on degrees every every degrees,
+	 * turned by turn (radians), solid out to r0 and fading to nothing at r1 (its mask).
+	 */
+	public static void rays(GuiGraphics g, float cx, float cy, float r0, float r1, float on, float every, double turn, int col) {
+		List<Float> xy = new ArrayList<>();
+		List<Integer> cs = new ArrayList<>();
+		float X = x(cx), Y = y(cy), R0 = s(r0), R1 = s(r1);
+		int clear = col & 0x00FFFFFF;
+		for (float a = 0; a < 360; a += every) {
+			double a0 = Math.toRadians(a - 90) + turn, a1 = Math.toRadians(Math.min(a + on, 360) - 90) + turn;
+			float c0 = (float) Math.cos(a0), s0 = (float) Math.sin(a0), c1 = (float) Math.cos(a1), s1 = (float) Math.sin(a1);
+			float[] q = {X, Y, X + c0 * R0, Y + s0 * R0, X + c1 * R0, Y + s1 * R0, X + c0 * R0, Y + s0 * R0, X + c0 * R1, Y + s0 * R1, X + c1 * R1, Y + s1 * R1, X + c0 * R0,
+					Y + s0 * R0, X + c1 * R1, Y + s1 * R1, X + c1 * R0, Y + s1 * R0};
+			int[] k = {col, col, col, col, clear, clear, col, clear, col};
+			for (float v : q) xy.add(v);
+			for (int v : k) cs.add(v);
+		}
+		float[] a = new float[xy.size()];
+		for (int i = 0; i < a.length; i++) a[i] = xy.get(i);
+		int[] c = new int[cs.size()];
+		for (int i = 0; i < c.length; i++) c[i] = cs.get(i);
+		Ui.tris(g, a, c);
+	}
+
+	/** CSS's cubic-bezier(x1, y1, x2, y2) at t (0 to 1). */
+	public static float bezier(float x1, float y1, float x2, float y2, float t) {
+		if (t <= 0) return 0;
+		if (t >= 1) return 1;
+		double u = t;
+		for (int i = 0; i < 8; i++) {
+			double x = 3 * (1 - u) * (1 - u) * u * x1 + 3 * (1 - u) * u * u * x2 + u * u * u - t;
+			double dx = 3 * (1 - u) * (1 - u) * x1 + 6 * (1 - u) * u * (x2 - x1) + 3 * u * u * (1 - x2);
+			if (Math.abs(dx) < 1e-6) break;
+			u = Math.max(0, Math.min(1, u - x / dx));
+		}
+		return (float) (3 * (1 - u) * (1 - u) * u * y1 + 3 * (1 - u) * u * u * y2 + u * u * u);
 	}
 
 	/** A soft glow (light falling off from the middle). */

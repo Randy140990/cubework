@@ -45,6 +45,8 @@ public final class Hud {
 	/** How long this fade lasts (ticks): a door's is quick; WAIT's is the viewer's (in, "Time passes...", out). */
 	private static int fadeLen = FADE;
 	private static final int WAIT_FADE = 56;
+	/** A door's iris (the viewer's): closing 0.55 s, black while the server moves you, opening 0.55 s. */
+	private static final int DOOR_FADE = 32;
 	/** What to do once it's faded back (WAIT: "It's morning now."). */
 	private static Runnable afterFade;
 
@@ -65,7 +67,7 @@ public final class Hud {
 
 	public static void fadeThrough(Runnable then, String words, Runnable after) {
 		fadeWords = words == null ? "" : words;
-		fadeLen = fadeWords.isEmpty() ? FADE : WAIT_FADE;
+		fadeLen = fadeWords.isEmpty() ? DOOR_FADE : WAIT_FADE;
 		fade = fadeLen;
 		atDark = then;
 		afterFade = after;
@@ -110,21 +112,34 @@ public final class Hud {
 	private static void badgeNotice(GuiGraphics g, DeltaTracker delta) {
 		Minecraft mc = Minecraft.getInstance();
 		if (badgeShown < 0 || !Adventure.active() || mc.screen != null) return;
-		if (badgeTicks > 90) {
+		if (badgeTicks > 14 + 76 + 10) {
 			badgeShown = -1;
 			return;
 		}
 		V.fit(g.guiWidth(), g.guiHeight());
-		float t = badgeTicks + delta.getGameTimeDeltaPartialTick(true), in = Math.min(1, t / 9F), out = t > 76 ? Math.min(1, (t - 76) / 10F) : 0;
-		float a = in * (1 - out), x = 870 + (1 - in) * 40, y = 96;
+		float t = badgeTicks + delta.getGameTimeDeltaPartialTick(true);
+		// First (the viewer's): the big badge flies up to where the notice will be, fading, as the dim lifts.
+		if (t < 14) {
+			float q = V.bezier(0.42F, 0, 1, 1, Math.min(1, t / 14F)), dim = Math.max(0, 1 - t / 10F);
+			if (dim > 0) g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF0A181E, 0.3F * dim));
+			float x0 = 520, y0 = 100, s0 = 240, x1 = 1018, y1 = 100, s1 = 56;
+			float bx = x0 + (x1 - x0) * q, by = y0 + (y1 - y0) * q, bs = s0 + (s1 - s0) * q;
+			V.icon(g, "badge_" + badgeShown, bx, by, bs, Ui.alpha(0xFFFFFFFF, 1 - q));
+		}
+		// Then the notice: the badge, its name, and the eight slots with the ones you have lit.
+		float nt = t - 14, in = Math.max(0, Math.min(1, nt / 9F)), out = nt > 76 ? Math.min(1, (nt - 76) / 10F) : 0;
+		float a = in * (1 - out), x = 870 + (1 - V.bezier(0, 0, 0.58F, 1, in)) * 40, y = 96;
 		if (a < 0.02F) return;
-		V.panel(g, x, y, 386, 94, 22, false);
-		V.icon(g, "badge_" + badgeShown, x + 3 + 12, y + 3 + 15, 58);
-		V.label(g, Lang.t("Badge"), x + 3 + 12 + 58 + 14, y + 3 + 12);
-		V.text(g, BADGE_NAMES[badgeShown], x + 3 + 12 + 58 + 14, y + 3 + 12 + 20, 21, V.INK, true);
+		float h = 12 + 18 + 6 + 21 * 1.36F + 6 + 22 + 12;
+		V.panel(g, x, y, 386, h, 22, false);
+		V.icon(g, "badge_" + badgeShown, x + 12, y + (h - 58) / 2, 58, Ui.alpha(0xFFFFFFFF, a));
+		float tx = x + 12 + 58 + 14;
+		V.label(g, Lang.t("Badge"), tx, y + 12, Ui.alpha(V.MUTED, a));
+		V.text(g, BADGE_NAMES[badgeShown], tx, y + 12 + 18 + 6, 21, Ui.alpha(V.INK, a), true);
 		java.util.Set<String> have = ClientState.data.badges;
 		for (int j = 0; j < 8; j++)
-			V.icon(g, "badge_" + j, x + 3 + 12 + 58 + 14 + j * 27, y + 3 + 12 + 20 + 30 + 2, 22, have.contains(BADGE_NAMES[j]) || j == badgeShown ? 0xFFFFFFFF : 0x80767B85);
+			V.icon(g, "badge_" + j, tx + j * 27, y + 12 + 18 + 6 + 21 * 1.36F + 6, 22,
+					Ui.alpha(have.contains(BADGE_NAMES[j]) || j == badgeShown ? 0xFFFFFFFF : 0x808C8C8C, a));
 	}
 
 	// ---------- your money, sliding in at the top right when it changes (after a battle, say) ----------
@@ -190,10 +205,13 @@ public final class Hud {
 		if (fade <= 0) return;
 		float t = fadeLen - fade + delta.getGameTimeDeltaPartialTick(true);
 		if (fadeWords.isEmpty()) {
-			// Through a door: to dark and straight back.
-			float half = FADE / 2F, a = t < half ? t / half : 1 - (t - half) / half;
-			a = Math.max(0, Math.min(1, a * 1.25F));
-			g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF05070F, a));
+			// Through a door, as the games' iris: a circle closes in on you until it's black, the place changes,
+			// and the circle opens out again round you.
+			float secs = t / 20F, k = secs < 0.55F ? 1 - (float) Math.pow(secs / 0.55F, 1.6) : secs < 1.05F ? 0 : (float) Math.min(1, Math.pow((secs - 1.05F) / 0.55F, 0.8));
+			V.fit(g.guiWidth(), g.guiHeight());
+			float r = k * 760, far = (float) Math.hypot(g.guiWidth(), g.guiHeight()) / V.s(1) + 40;
+			if (r < 1) g.fill(0, 0, g.guiWidth(), g.guiHeight(), 0xFF000000);
+			else V.annulus(g, 640, 360, r, far, 0xFF000000, 0xFF000000);
 			return;
 		}
 		// WAIT, as the viewer's: the screen dims (0.7 s), "Time passes..." comes up and goes, and it lightens again.

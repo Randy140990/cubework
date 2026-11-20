@@ -100,14 +100,14 @@ public class DexScreen extends GameScreen {
 			return;
 		}
 		// Its page in its own colour, as Let's Go's: a blue one's blue, a fiery one's orange.
-		Scenes.typeBackdrop(g, sp.type1());
-		Scenes.model(g, secs, sp.id(), -1.05);
-		PokedexScreen.page(g, sp, true);
+		Scenes.typeBg(g, sp.type1(), true);
+		Scenes.modelBare(g, secs, sp.id(), 0);
+		PokedexScreen.page(g, sp, true, secs);
 		float in = Math.min(1, Math.max(0, (t - 8) / 6F)), k = 1 - (1 - in) * (1 - in);
-		String word = "Added to your POKéDEX!";
-		float ww = V.width(word, 20, true) + 50;
-		V.panel(g, V.W - 30 - ww, 30 - (1 - k) * 20, ww, 52, 26, true);
-		V.text(g, word, V.W - 30 - ww + 25, 30 - (1 - k) * 20 + 14, 20, Ui.alpha(V.GOLD, k), true);
+		String word = Lang.t("Added to your POKéDEX!");
+		float ww = V.width(word, 20, true) + 50, wy = 500 - (1 - k) * 20;
+		V.panel(g, 640 - ww / 2, wy, ww, 46, 23, true);
+		V.text(g, word, 640 - ww / 2 + 25, V.capsTop(wy + 23, 20), 20, Ui.alpha(V.GOLD, k), true);
 		V.hints(g, "V", "Read it out", "A", "Done");
 		// In from white, out to white.
 		float white = t < FADE ? 1 - t / FADE : 0;

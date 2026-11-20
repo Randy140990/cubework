@@ -34,6 +34,36 @@ public class DialogueScreen extends GameScreen {
 	private static final int HEAL_TICKS = 52;
 	private static final String[] BADGES = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
 
+	/** Something got, for the card held up: its name, how many, a badge (0 to 7, -1 for none), and whether it's going into the bag now. */
+	private record Get(String name, int n, int badge, boolean away) {}
+
+	/** Line numbers (as shown) to what was got on them. */
+	private final java.util.Map<Integer, Get> gets = new java.util.HashMap<>();
+	private int healLineAt = -1;
+
+	/** "got 5 POKé BALLs!", "received a POTION!", "found TM28!": what, and how many. */
+	private static final java.util.regex.Pattern GOT = java.util.regex.Pattern.compile("\\b(?:got|received|obtained|found) (?:a |an |the )?(?:(\\d+) )?([^!]+?)(?: from [^!]+)?!");
+
+	private static Get itemGet(String line) {
+		java.util.regex.Matcher m = GOT.matcher(line.replace("**", ""));
+		if (!m.find()) return null;
+		int n = m.group(1) == null ? 1 : Math.max(1, Math.min(99, Integer.parseInt(m.group(1))));
+		String name = m.group(2).trim();
+		com.insidethecube.retromon.engine.Item it = findItem(name);
+		if (it != null) return new Get(it.name(), n, -1, false);
+		String u = name.toUpperCase(java.util.Locale.ROOT);
+		if (u.contains("POKéDEX") || u.contains("POKEDEX") || u.contains("TOWN MAP")) return new Get(name, n, -1, false);
+		return null;
+	}
+
+	/** An item by its name ("POKé BALLs" finds POKé BALL). */
+	private static com.insidethecube.retromon.engine.Item findItem(String name) {
+		String n = name.trim();
+		for (com.insidethecube.retromon.engine.Item it : com.insidethecube.retromon.engine.Item.ALL.values())
+			if (it.name().equalsIgnoreCase(n) || (n.endsWith("s") || n.endsWith("S")) && it.name().equalsIgnoreCase(n.substring(0, n.length() - 1))) return it;
+		return null;
+	}
+
 	/** A line that starts with who's speaking: "OAK: ..." (capitals, before a colon). */
 	private static final java.util.regex.Pattern SPEAKER = java.util.regex.Pattern.compile("^([A-Z][A-Z .'é&]{1,20}): (.+)$");
 
@@ -49,6 +79,49 @@ public class DialogueScreen extends GameScreen {
 				said.add(m.group(2));
 			} else said.add(l);
 		}
+		// The cues (jingles on lines) and the nurse's line, by the server's line numbers.
+		java.util.Map<Integer, String> serverCues = new java.util.HashMap<>();
+		for (net.minecraft.nbt.Tag c : extra.getListOrEmpty("cues")) c.asString().ifPresent(v -> {
+			int at = v.indexOf(':');
+			if (at > 0) {
+				try {
+					serverCues.put(Integer.parseInt(v.substring(0, at)), v.substring(at + 1));
+				} catch (NumberFormatException ignored) {
+					// Not a cue.
+				}
+			}
+		});
+		int heal = extra.getIntOr("healing", -1);
+		// Getting something, as the viewer's: after "got the TOWN MAP!", where it went ("put the TOWN MAP in the KEY
+		// ITEMS pocket."); after a badge, that it's on your card now. The lines after move along one.
+		java.util.List<String> out = new java.util.ArrayList<>();
+		String whoNow = who;
+		for (int i = 0; i < said.size(); i++) {
+			String l = said.get(i);
+			int at = out.size();
+			if (serverCues.containsKey(i)) cues.put(at, serverCues.get(i));
+			if (i == heal) heal = -100 - at;
+			out.add(l);
+			int b = badgeIn(l);
+			if (b >= 0 && (l.contains("received") || l.contains("got")) && !someoneElse(whoNow, l)) {
+				gets.put(at, new Get(null, 1, b, false));
+				out.add("It's pinned to your **TRAINER CARD** now. That's **" + (b + 1) + " of 8**.");
+				gets.put(at + 1, new Get(null, 1, b, true));
+				continue;
+			}
+			Get it = itemGet(l);
+			if (it != null && !someoneElse(whoNow, l)) {
+				gets.put(at, it);
+				com.insidethecube.retromon.engine.Item item = findItem(it.name());
+				if (item != null) {
+					String pocket = item.teaches() ? "TM & HM" : item.keyItem() ? "KEY ITEMS" : item.ball() ? "BALLS" : "ITEMS";
+					out.add("**{N}** put the **" + it.name() + "** in the **" + pocket + "** pocket.");
+					gets.put(at + 1, new Get(it.name(), it.n(), -1, true));
+				}
+			}
+		}
+		said = out;
+		this.healLineAt = heal <= -100 ? -100 - heal : heal;
 		this.box = new TextBox(said);
 		this.said = said;
 		if (who != null) box.speaker = who;
@@ -61,17 +134,7 @@ public class DialogueScreen extends GameScreen {
 		if (tr != null && box.speaker == null) box.speaker = tr.title();
 		String whoTag = extra.getStringOr("who", "");
 		if (box.speaker == null && !whoTag.isEmpty()) box.speaker = whoTag;
-		for (net.minecraft.nbt.Tag c : extra.getListOrEmpty("cues")) c.asString().ifPresent(v -> {
-			int at = v.indexOf(':');
-			if (at > 0) {
-				try {
-					cues.put(Integer.parseInt(v.substring(0, at)), v.substring(at + 1));
-				} catch (NumberFormatException ignored) {
-					// Not a cue.
-				}
-			}
-		});
-		this.healLine = extra.getIntOr("healing", -1);
+		this.healLine = healLineAt;
 		String cry = extra.getStringOr("cry", "");
 		if (!cry.isEmpty()) Sounds.cry(cry, 1F);
 		// The camera closes in on the two of you, and the black bars come in, as in a cutscene.
@@ -179,14 +242,15 @@ public class DialogueScreen extends GameScreen {
 			V.text(g, "♫ ♪", 560 + 4, 210 + 14 + 3 + bob, 46, Ui.alpha(0x59000000, pop), true);
 			V.text(g, "♫ ♪", 560, 210 + 14 + bob, 46, c, true);
 		}
-		// Getting something: the UI Viewer's card held up over the world (a badge spins in instead).
+		// Getting something: the UI Viewer's medallion held up over the world (a badge spins in instead).
 		int line = box.message();
-		if (line >= 0 && line < said.size()) {
-			String l = said.get(line);
-			int b = badgeIn(l);
+		Get got = gets.get(line);
+		if (got != null) {
 			float t = (ticks - lineAt + partial) / 20F;
-			if (b >= 0 && (l.contains("received") || l.contains("got"))) badgeCard(g, b, t);
-			else if (cues.containsKey(line) || l.matches(".*\\b(got|received|obtained|found)\\b.*!.*") && !someoneElse(l)) itemCard(g, l, t);
+			if (got.badge() >= 0) {
+				if (!got.away()) badgeCard(g, got.badge(), t, (ticks + partial) / 20F);
+				else badgeCard(g, got.badge(), 99, (ticks + partial) / 20F);
+			} else itemCard(g, got, t, (ticks + partial) / 20F);
 		}
 		if (yesNo != null) {
 			float w = 300;
@@ -198,8 +262,8 @@ public class DialogueScreen extends GameScreen {
 	 * Whether a line is about the one talking getting something (BLUE received a TIDAPIR!), not you: no card is held
 	 * up for that (it showed a key).
 	 */
-	private boolean someoneElse(String line) {
-		String who = box.speaker == null ? "" : box.speaker.trim().toUpperCase(java.util.Locale.ROOT);
+	private static boolean someoneElse(String speaker, String line) {
+		String who = speaker == null ? "" : speaker.trim().toUpperCase(java.util.Locale.ROOT);
 		if (who.isEmpty()) return false;
 		String u = line.trim().toUpperCase(java.util.Locale.ROOT);
 		return u.startsWith(who + " ") || u.startsWith(who + ":");
@@ -211,37 +275,123 @@ public class DialogueScreen extends GameScreen {
 		return -1;
 	}
 
-	/** The picture for something you've got: a ball, medicine, a disc for a TM, the map, a key for the rest. */
-	private static String itemPicture(String line) {
-		String u = line.toUpperCase();
-		if (u.contains("BALL")) return "icon_ball";
-		if (u.contains("POTION") || u.contains("HEAL") || u.contains("ANTIDOTE") || u.contains("REVIVE")) return "icon_potion";
-		if (u.contains(" TM") || u.contains(" HM")) return "icon_disc";
-		if (u.contains("MAP")) return "icon_map";
+	/** The picture for something you've got (the viewer's ITEM_ICON): its own, the POKéDEX's, the map's. */
+	private static String itemPicture(String name) {
+		String u = name.toUpperCase(java.util.Locale.ROOT);
 		if (u.contains("POKéDEX") || u.contains("POKEDEX")) return "icon_dex";
-		return "icon_key";
+		return V.itemIcon(name);
 	}
 
-	/** The item held up in a card (the viewer's): a soft glow bobbing behind it, a couple of notes. */
-	private void itemCard(GuiGraphics g, String line, float t) {
-		float pop = Math.min(1, t / 0.4F), k = pop < 1 ? (float) (0.85 + 0.15 * Math.sin(pop * Math.PI / 2) + Math.sin(pop * Math.PI) * 0.08) : 1;
-		float w = 300 * k, x = 640 - w / 2, y = 120 + (300 - w) / 2;
-		V.panel(g, x, y, w, w);
-		float bob = (float) Math.sin(t * Math.PI / 0.8) * 2;
-		V.glow(g, 640, 270 + bob, 126 * k, 126 * k, 0x2EFFF4D8);
-		V.icon(g, itemPicture(line), 640 - 75 * k, 270 - 75 * k, 150 * k);
-		V.text(g, "♫", x + 18, y + 14, 30, V.GOLD, true);
-		V.text(g, "♪", x + w - 22 - 16, y + 40, 24, V.EDGE_LIGHT, true);
+	/**
+	 * Getting something, as Let's Go does it (the viewer's): the thing itself pops up in a round pearly medallion,
+	 * rays turning behind it and sparkles round it; more than one counts in, x1 up to x5; on the next line it drops
+	 * into your bag.
+	 */
+	private void itemCard(GuiGraphics g, Get it, float t, float secs) {
+		float mx0 = 520, my0 = 90, cx = mx0 + 120, cy = my0 + 120;
+		float scale, a;
+		float dx = 0, dy = 0;
+		if (!it.away()) {
+			float p = Math.min(1, t / 0.5F);
+			if (p < 0.6F) {
+				float q = V.bezier(0.2F, 1.4F, 0.4F, 1, p / 0.6F);
+				scale = 0.2F + (1.12F - 0.2F) * q;
+				a = Math.max(0, Math.min(1, q));
+			} else {
+				float q = V.bezier(0.2F, 1.4F, 0.4F, 1, (p - 0.6F) / 0.4F);
+				scale = 1.12F + (1 - 1.12F) * q;
+				a = 1;
+			}
+		} else {
+			float p = Math.min(1, t / 0.6F), q = V.bezier(0.42F, 0, 1, 1, p);
+			dx = 40 * q;
+			dy = 300 * q;
+			scale = 1 - 0.8F * q;
+			a = 1 - q;
+		}
+		if (a <= 0.01F) return;
+		g.pose().pushMatrix();
+		g.pose().translate(V.x(cx + dx), V.y(cy + dy));
+		g.pose().scale(scale, scale);
+		g.pose().translate(-V.x(cx), -V.y(cy));
+		// The rays, turning slowly behind it.
+		V.rays(g, cx, cy, 79, 158, 8, 22, secs / 12 * Math.PI * 2, Ui.alpha(0xFFFFFFFF, 0.55F * a));
+		// The medallion: a pearly rim, white inside, the thing in the middle.
+		V.shadow(g, mx0, my0, 240, 240, 120, 1.3F * a);
+		V.rrh(g, mx0, my0, 240, 240, 120, V.HOLO_AT, alphas(V.HOLO, a));
+		V.ellipse(g, cx, cy, 114, 114, Ui.alpha(0xFFF3F6FD, a));
+		V.glow(g, mx0 + 6 + 228 * 0.4F, my0 + 6 + 228 * 0.3F, 150, 150, Ui.alpha(0xFFFFFFFF, a));
+		V.icon(g, itemPicture(it.name()), cx - 70, cy - 70, 140, Ui.alpha(0xFFFFFFFF, a));
+		// The sparkles, twinkling.
+		float[][] sp = {{-6, 20, 34, 0}, {210, 10, 26, 0.5F}, {222, 170, 22, 1}, {-14, 180, 18, 1.4F}};
+		for (float[] k : sp) {
+			float ph = (((secs - k[3]) % 1.6F) + 1.6F) % 1.6F / 1.6F, tw = (float) Math.sin(ph * Math.PI);
+			float sz = k[2] * (0.4F + 0.6F * tw), scx = mx0 + k[0] + k[2] / 2, scy = my0 + k[1] + k[2] / 2;
+			if (tw * a < 0.02F) continue;
+			V.glow(g, scx, scy, sz * 0.8F, sz * 0.8F, Ui.alpha(0xFFFFE27A, 0.8F * tw * a));
+			V.icon(g, "icon_sparkle", scx - sz / 2, scy - sz / 2, sz, Ui.alpha(0xFFFFFFFF, tw * a));
+		}
+		g.pose().popMatrix();
+		// More than one: they count in, one at a time.
+		if (!it.away() && it.n() > 1) {
+			int k = Math.max(0, Math.min(it.n(), (int) Math.floor((t * 1000 - 350) / 260)));
+			if (k >= 1) {
+				String x = "x" + k;
+				float w = 14 + k * 30 + (k - 1) * 6 + 6 + 4 + V.titleWidth(x, 24) + 14, h = 42, px = 640 - w / 2, py = 70 + 272;
+				V.shadow(g, px, py, w, h, h / 2, 1);
+				V.pill(g, px, py, w, h, 0xFFFFFFFF);
+				float since = (t * 1000 - 350 - k * 260) / 300F;
+				for (int q = 0; q < k; q++) {
+					float ix = px + 14 + q * 36, iy = py + 6, ia = 1, isz = 30;
+					if (q == k - 1 && since < 1) {
+						float e = Math.max(0, since);
+						iy -= 30 * (1 - e);
+						isz = 30 * (0.4F + 0.6F * e);
+						ia = e;
+						ix += (30 - isz) / 2;
+						iy += (30 - isz) / 2;
+					}
+					V.icon(g, itemPicture(it.name()), ix, iy, isz, Ui.alpha(0xFFFFFFFF, ia));
+				}
+				V.title(g, x, px + 14 + k * 30 + (k - 1) * 6 + 6 + 4, V.capsTop(py + h / 2, 24), 24, 0xFFE5525C);
+			}
+		}
 	}
 
-	/** A badge won (the viewer's): a burst of light, the badge spinning in and shining. */
-	private void badgeCard(GuiGraphics g, int b, float t) {
-		g.fill(0, 0, width, height, 0x59061A1E);
-		V.glow(g, 640, 220, 190, 190, 0x26FFF4D8);
-		V.glow(g, 640, 220, 120, 120, 0x40FFF4D8);
-		float in = Math.min(1, t / 1.1F), e = 1 - (1 - in) * (1 - in) * (1 - in);
-		float spin = (float) Math.cos((1 - e) * Math.PI * 3), sc = 0.2F + 0.8F * e + (in < 1 ? (float) Math.sin(in * Math.PI) * 0.08F : 0);
-		float size = 240 * sc, w = Math.max(4, size * Math.abs(spin));
-		V.img(g, V.tex("badge_" + b), 640 - w / 2, 220 - size / 2, w, size, 128, 128, 0xFFFFFFFF);
+	private static int[] alphas(int[] cols, float a) {
+		int[] out = new int[cols.length];
+		for (int i = 0; i < cols.length; i++) out[i] = Ui.alpha(cols[i], a);
+		return out;
+	}
+
+	/**
+	 * A badge won (the viewer's): the world dimmed round a warm light, rays in the badge's colour turning behind it,
+	 * the badge spinning in (once round and a half, a little past, back) and settling.
+	 */
+	private void badgeCard(GuiGraphics g, int b, float t, float secs) {
+		int[] cols = {0xFF8E8A84, 0xFF3F86D0, 0xFFE2B320, 0xFF4FA84A, 0xFFD04A8E, 0xFFD6962A, 0xFFD8443C, 0xFF4E9A3A};
+		float dimIn = Math.min(1, t / 0.4F);
+		V.radialSoft(g, 640, 302, 459, new float[] {0, 1}, new int[] {0x00FFF4D8, Ui.alpha(0xFF0A181E, 0.55F * dimIn)});
+		V.annulus(g, 640, 302, 459, 1600, Ui.alpha(0xFF0A181E, 0.55F * dimIn), Ui.alpha(0xFF0A181E, 0.55F * dimIn));
+		float cx = 640, cy = 220;
+		V.rays(g, cx, cy, 115, 260, 10, 20, secs / 14 * Math.PI * 2, Ui.alpha(cols[b], 0.33F));
+		V.radialSoft(g, cx, cy, 165, new float[] {0, 1}, new int[] {0xE6FFF4D8, 0x00FFF4D8});
+		// The spin: from small and turned away to a little big, then settled.
+		float p = Math.min(1, t / 1.1F), q;
+		float sc, turn, a;
+		if (p < 0.7F) {
+			q = V.bezier(0.2F, 0.8F, 0.3F, 1, p / 0.7F);
+			sc = 0.2F + (1.08F - 0.2F) * q;
+			turn = 540 + (-12 - 540) * q;
+			a = q;
+		} else {
+			q = V.bezier(0.2F, 0.8F, 0.3F, 1, (p - 0.7F) / 0.3F);
+			sc = 1.08F + (1 - 1.08F) * q;
+			turn = -12 + 12 * q;
+			a = 1;
+		}
+		float size = 240 * sc, w = Math.max(3, size * Math.abs((float) Math.cos(Math.toRadians(turn))));
+		V.img(g, V.tex("badge_" + b), cx - w / 2, cy - size / 2 + 14, w, size, 128, 128, Ui.alpha(0xFF000000, 0.3F * a));
+		V.img(g, V.tex("badge_" + b), cx - w / 2, cy - size / 2, w, size, 128, 128, Ui.alpha(0xFFFFFFFF, a));
 	}
 }
