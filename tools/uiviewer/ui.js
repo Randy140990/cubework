@@ -260,7 +260,7 @@ function go(id, arg) {
   curDef = BY[id]; curId = id; curArg = arg;
   if (SKYFOR[curDef.scene]) backdrop(SKYFOR[curDef.scene]);
   setScene(curDef.scene, curDef.sceneOpts && curDef.sceneOpts(arg));
-  setPixel(curDef.pixel || 0);
+  setPixel(typeof curDef.pixel === "function" ? curDef.pixel() : curDef.pixel || 0);
   cur = curDef.make(arg) || {};
   renderFlows(); renderNotes();
   try { history.replaceState(null, "", "#" + id); } catch (e) {}

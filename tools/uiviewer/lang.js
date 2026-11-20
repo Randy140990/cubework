@@ -62,6 +62,8 @@ L("FIGHT", "LUCHAR", "ATTAQUE", "KAMPF", "LOTTA", "たたかう", "싸운다", "
 L("RUN", "HUIR", "FUITE", "FLUCHT", "FUGA", "にげる", "도망간다", "逃走", "逃走");
 L("What will **{0}** do?", "¿Qué hará **{0}**?", "Que doit faire **{0}** ?", "Was soll **{0}** tun?", "Cosa deve fare **{0}**?", "**{0}**は どうする？", "**{0}**은(는) 무엇을 할까?", "要让**{0}**做什么？", "要讓**{0}**做什麼？");
 // Title and saves.
+L("Press {0}", "Pulsa {0}", "Appuie sur {0}", "Drücke {0}", "Premi {0}", "{0}を おしてね", "{0}를 누르세요", "请按 {0}", "請按 {0}");
+L("A FAN-MADE ADVENTURE", "UNA AVENTURA DE FANS", "UNE AVENTURE DE FANS", "EIN FAN-ABENTEUER", "UN'AVVENTURA DEI FAN", "ファンメイドの ぼうけん", "팬이 만든 모험", "粉丝制作的冒险", "粉絲製作的冒險");
 L("PRESS {0}", "PULSA {0}", "APPUIE SUR {0}", "DRÜCKE {0}", "PREMI {0}", "{0}を おしてね", "{0}를 누르세요", "请按 {0}", "請按 {0}");
 L("PRESS START", "PULSA START", "APPUIE SUR START", "DRÜCKE START", "PREMI START", "スタートを おしてね", "START를 누르세요", "请按开始键", "請按開始鍵");
 L("NEW GAME", "PARTIDA NUEVA", "NOUVELLE PARTIE", "NEUES SPIEL", "NUOVA PARTITA", "さいしょから", "처음부터", "新游戏", "新遊戲");

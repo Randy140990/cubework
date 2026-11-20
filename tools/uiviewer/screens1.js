@@ -38,31 +38,75 @@ screen("splash", "Start", "Opening", {
     return { key: k => { if (k === "a" || k === "b") go("title"); return true; } };
   }
 });
+// The title's painting: soft and smooth (an SVG drawn once), with the grass swaying, clouds drifting, motes of light.
+function titleArt() {
+  let seed = 11; const r = () => (seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) / 4294967296;
+  const blobs = (cx, cy, w, hgt, n, fill, rMin, rMax) => { let o = ""; for (let i = 0; i < n; i++) { const x = cx + (r() - 0.5) * w, y = cy + (r() - 0.5) * hgt, rr = rMin + r() * (rMax - rMin); o += `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${rr.toFixed(0)}" fill="${fill}"/>`; } return o; };
+  // A canopy: dark underneath, mid, then sunlit clumps up top where the light falls.
+  const canopy = (cx, cy, w, hgt, k = 1) => blobs(cx, cy + hgt * 0.12, w, hgt * 0.8, Math.round(22 * k), "url(#cDk)", 40 * k, 90 * k) + blobs(cx, cy, w * 0.92, hgt * 0.7, Math.round(20 * k), "url(#cMd)", 34 * k, 78 * k)
+    + blobs(cx + w * 0.12, cy - hgt * 0.16, w * 0.7, hgt * 0.45, Math.round(14 * k), "url(#cLt)", 22 * k, 52 * k);
+  // Long grass: curved blades, short at the back, long at the front.
+  let grass = ""; for (let i = 0; i < 300; i++) { const x = r() * 1280, base = 480 + Math.pow(r(), 0.55) * 250, hgt = 14 + r() * (base > 650 ? 80 : base > 560 ? 44 : 24), lean = (r() - 0.4) * 26, g = ["#4E9E3A", "#5DB345", "#79C653", "#3F8A34", "#8ED65E"][Math.floor(r() * 5)];
+    grass += `<path d="M${(x - 3).toFixed(0)} ${base.toFixed(0)} Q${(x + lean * 0.4).toFixed(0)} ${(base - hgt * 0.6).toFixed(0)} ${(x + lean).toFixed(0)} ${(base - hgt).toFixed(0)} Q${(x + lean * 0.3 + 3).toFixed(0)} ${(base - hgt * 0.5).toFixed(0)} ${(x + 4).toFixed(0)} ${base.toFixed(0)}Z" fill="${g}"/>`; }
+  let flowers = ""; for (let i = 0; i < 46; i++) { const x = r() * 1280, y = 540 + r() * 170, c = ["#FFFFFF", "#FFF3A6", "#FF8FA8", "#FFD45A", "#E84A4A"][Math.floor(r() * 5)], s = 3 + r() * 5 + (y > 640 ? 3 : 0);
+    flowers += `<g transform="translate(${x.toFixed(0)} ${y.toFixed(0)})">${[0, 72, 144, 216, 288].map(a => `<circle cx="${(Math.cos(a * Math.PI / 180) * s * 0.9).toFixed(1)}" cy="${(Math.sin(a * Math.PI / 180) * s * 0.9).toFixed(1)}" r="${(s * 0.62).toFixed(1)}" fill="${c}"/>`).join("")}<circle r="${(s * 0.42).toFixed(1)}" fill="#F2B01E"/></g>`; }
+  let motes = ""; for (let i = 0; i < 18; i++) motes += `<circle cx="${(r() * 1280).toFixed(0)}" cy="${(120 + r() * 480).toFixed(0)}" r="${(2 + r() * 3).toFixed(1)}" fill="#FFFDE8" style="animation:tmote ${(4 + r() * 4).toFixed(1)}s ease-in-out ${(-r() * 4).toFixed(1)}s infinite"/>`;
+  return `<svg viewBox="0 0 1280 720" width="1280" height="720" style="position:absolute;inset:0;display:block"><defs>
+    <radialGradient id="tSun" cx="0.9" cy="0.02" r="0.6"><stop offset="0" stop-color="#FFFFF4" stop-opacity="1"/><stop offset=".12" stop-color="#FFF8D6" stop-opacity=".85"/><stop offset=".35" stop-color="#FFF4CC" stop-opacity=".25"/><stop offset="1" stop-color="#FFF4CC" stop-opacity="0"/></radialGradient>
+    <linearGradient id="cDk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F7A3A"/><stop offset="1" stop-color="#1F5A30"/></linearGradient>
+    <linearGradient id="cMd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5EB64C"/><stop offset="1" stop-color="#3B8E3E"/></linearGradient>
+    <linearGradient id="cLt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C4EE7A"/><stop offset="1" stop-color="#7CCB56"/></linearGradient>
+    <linearGradient id="tFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A6DDB6"/><stop offset="1" stop-color="#7FC497"/></linearGradient>
+    <linearGradient id="tMeadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B3E27A"/><stop offset=".35" stop-color="#86CB55"/><stop offset="1" stop-color="#54A83E"/></linearGradient>
+    <linearGradient id="tPath" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4E2B0"/><stop offset="1" stop-color="#DCC08A"/></linearGradient>
+    <linearGradient id="tRock" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EDE7DB"/><stop offset=".5" stop-color="#BDB4A6"/><stop offset="1" stop-color="#8E8576"/></linearGradient>
+    <linearGradient id="tTrunk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6A4A30"/><stop offset=".55" stop-color="#8A6440"/><stop offset="1" stop-color="#5A3E28"/></linearGradient>
+    <filter id="tb1" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.4"/></filter><filter id="tb3" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="tb8" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter><filter id="tb16" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="18"/></filter></defs>
+    <style>@keyframes tsway{from{transform:skewX(-1.5deg)}to{transform:skewX(2deg)}}@keyframes tcloud{from{transform:translateX(0)}to{transform:translateX(70px)}}@keyframes tmote{0%,100%{opacity:.1;transform:translateY(0)}50%{opacity:.9;transform:translateY(-14px)}}
+      .tsw{transform-box:fill-box;transform-origin:50% 100%;animation:tsway 3.6s ease-in-out infinite alternate}</style>
+    <rect width="1280" height="720" fill="url(#tSun)"/>
+    <g filter="url(#tb8)" opacity=".92" style="animation:tcloud 38s ease-in-out infinite alternate">${blobs(420, 220, 300, 34, 8, "#FFFFFF", 24, 46)}${blobs(820, 170, 320, 36, 9, "#FFFFFF", 22, 44)}</g>
+    <g filter="url(#tb8)">${blobs(640, 395, 1500, 80, 44, "url(#tFar)", 44, 100)}</g>
+    <g filter="url(#tb3)" opacity=".95">${blobs(600, 432, 1000, 46, 20, "#6DB86A", 30, 60)}</g>
+    <path d="M0 470 C 260 432 520 452 700 462 S 1100 442 1280 452 V720 H0Z" fill="url(#tMeadow)"/>
+    <path d="M0 470 C 260 432 520 452 700 462 S 1100 442 1280 452 V506 C 900 490 500 504 0 524Z" fill="#E6F7B0" opacity=".45" filter="url(#tb3)"/>
+    <path d="M612 468 C 642 520 566 592 470 720 H770 C 724 600 694 520 664 466Z" fill="url(#tPath)" opacity=".85"/>
+    <g filter="url(#tb1)"><rect x="268" y="210" width="56" height="290" rx="18" fill="url(#tTrunk)"/><path d="M292 320 Q 250 270 206 256" stroke="#6A4A30" stroke-width="16" fill="none" stroke-linecap="round"/>${canopy(250, 150, 560, 280)}</g>
+    <g filter="url(#tb1)"><rect x="1168" y="250" width="48" height="240" rx="14" fill="url(#tTrunk)" opacity=".95"/>${canopy(1170, 140, 420, 300, 1.05)}</g>
+    <g filter="url(#tb1)">${blobs(880, 468, 280, 28, 10, "#3F8E3E", 24, 46)}${blobs(900, 452, 240, 18, 8, "#6DBB55", 18, 34)}${blobs(120, 486, 320, 28, 10, "#3F8E3E", 26, 50)}</g>
+    <path d="M44 644 C 32 566 112 514 212 524 C 302 532 334 604 304 654 C 244 694 94 694 44 644Z" fill="url(#tRock)"/><path d="M94 566 C 134 534 204 532 244 554" stroke="#F8F4EC" stroke-width="10" fill="none" stroke-linecap="round" opacity=".7"/>
+    <g class="tsw">${grass}</g>${flowers}
+    <g filter="url(#tb16)" opacity=".92">${blobs(70, 706, 260, 60, 8, "#2E7A34", 50, 92)}${blobs(1250, 706, 240, 60, 7, "#3A8A3A", 50, 92)}</g>
+    <rect width="1280" height="720" fill="url(#tSun)" opacity=".5"/>${motes}</svg>`;
+}
 screen("title", "Start", "Title screen", {
-  scene: "title", pixel: 5,
-  what: "The title, as Let's Go's: RETROMON over a sunny meadow built of Minecraft's own blocks, drawn as pixel art. Grass blocks with short grass and flowers, leaf-block bushes, oak trees framing it and more on the horizon, clouds drifting across, and the sun top right with its glare and soft dots of light (all behind the scene). PRESS SPACE says which key. COBBLEMON look: the old title, the pixel Charizard against the night sky, reading POKéMON.",
-  tags: ["New look"], mod: "IntroScreen: the pixel Charizard against the night sky, RETROMON, PRESS START.",
+  scene: "title", pixel: () => LOOK === "theirs" ? 5 : 0,
+  what: "The title, as Let's Go's, smooth (no pixels): RETROMON big at the top left with its own tag, A FAN-MADE ADVENTURE, over a painted meadow: blue sky with the sun's glare top right, hazy trees far off, a big tree on the left and leafy canopy on the right, a path, a rock, long grass swaying and flowers, blurred leaves right at the front. Your partner stands big on the right, looking out at you. Press SPACE, in white words. COBBLEMON look: the old title, the pixel Charizard against the night sky, reading POKéMON.",
+  tags: ["New look: Let's Go's title"], mod: "IntroScreen: the pixel Charizard against the night sky, RETROMON, PRESS START. To come: this painted title.",
   make() {
     const night = LOOK === "theirs";
     if (night) {
       backdrop("radial-gradient(ellipse at 50% 30%, #2A3F7A 0%, #142454 45%, #070D26 100%)");
       add(h("div", "", `<div style="position:absolute;inset:0;background:radial-gradient(circle at 12% 18%,#fff 0 1.5px,transparent 2.5px),radial-gradient(circle at 78% 12%,#fff 0 2px,transparent 3px),radial-gradient(circle at 64% 34%,#cfe 0 1.5px,transparent 2.5px),radial-gradient(circle at 30% 42%,#fff 0 1px,transparent 2px),radial-gradient(circle at 88% 46%,#fff 0 1.5px,transparent 2.5px);background-size:320px 260px"></div><div style="position:absolute;right:120px;top:70px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#FFF8DC,#E8DDB0);box-shadow:0 0 40px rgba(255,248,220,.5)"></div>`));
     } else {
-      // A clear sky, paling to the horizon. The sun sits top right, behind the clouds and trees: a soft glare and a few
-      // round dots of light drifting down from it, as Let's Go's title has. All of it behind the scene.
-      backdrop("linear-gradient(180deg,#3F98E2 0%,#69B6EE 22%,#A5D8F6 40%,#E4F6FF 52%,#BFE3A8 60%,#7CC35A 100%)");
-      bgAdd("", { background: `radial-gradient(circle at 90% 4%, rgba(255,255,248,.98) 0%, rgba(255,252,226,.85) 5%, rgba(255,246,200,.45) 13%, rgba(255,240,190,.16) 26%, transparent 42%),
-        radial-gradient(ellipse 70% 30% at 80% 0%, rgba(255,255,255,.35), transparent 70%)` });
-      const dot = (x, y, r, c, a, blur = 0) => `<i style="position:absolute;left:${x - r}px;top:${y - r}px;width:${r * 2}px;height:${r * 2}px;border-radius:50%;background:radial-gradient(circle, ${c} 0%, ${c} 55%, transparent 72%);opacity:${a};${blur ? `filter:blur(${blur}px);` : ""}animation:tglint ${5 + r % 4}s ease-in-out ${(x % 7) / 3}s infinite alternate"></i>`;
-      bgAdd(`<style>@keyframes tglint{from{transform:translate(0,0)}to{transform:translate(-6px,5px)}}</style>
-        ${dot(1100, 92, 34, "rgba(255,255,236,.9)", .55, 1)}${dot(1032, 150, 16, "rgba(210,246,255,.95)", .6)}${dot(980, 196, 52, "rgba(255,236,250,.8)", .28, 2)}
-        ${dot(918, 244, 10, "rgba(255,255,255,.95)", .7)}${dot(866, 292, 26, "rgba(220,255,236,.85)", .32, 1)}${dot(1180, 160, 12, "rgba(255,255,255,.95)", .55)}${dot(1214, 58, 20, "rgba(255,244,214,.9)", .5, 1)}`);
+      // As Let's Go's title: a painted meadow in soft light (no pixels): sky and the sun's glare top right, hazy trees far
+      // off, a big tree on the left and leafy canopy behind on the right, a sunlit meadow with a path and a rock, long
+      // grass and flowers, and blurred leaves right at the front, out of focus. Your partner stands big on the right.
+      backdrop("linear-gradient(180deg,#4AAEEC 0%,#8ED3F7 34%,#DDF4FF 56%,#B9E39A 60%,#7CC456 100%)");
+      bgAdd(titleArt());
     }
     if (night) box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="POKéMON" src="${wordmark("POKéMON", { top: [255, 236, 120], bottom: [240, 170, 40], side: [40, 60, 140], line: [12, 18, 48] })}" style="max-width:1080px;image-rendering:pixelated;filter:drop-shadow(0 10px 0 rgba(0,0,0,.18))"></div>`);
     // RETROMON in round, heavy letters on a gentle arch (tools/wordmark.py), with its own edge and shadow.
-    else box(0, 34, 1280, null, "", `<div style="text-align:center"><img alt="RETROMON" src="${wordmark("RETROMON")}" style="width:838px;height:152px"></div>`);
-    // Which key, said plainly (Let's Go's "Press the A Button"): SPACE, in its own key cap.
-    box(0, 612, 1280, null, "", `<div style="text-align:center"><style>@keyframes tpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.62;transform:scale(.97)}}</style><span class="g-title" style="animation:tpulse 1.8s ease-in-out infinite;display:inline-flex;align-items:center;gap:14px;padding:7px 14px 7px 30px;border-radius:999px;background:#fff;color:#26304A;font-size:28px;line-height:36px;letter-spacing:4px;box-shadow:0 0 0 4px rgba(255,255,255,.5),0 6px 0 rgba(0,0,0,.18)">${T("PRESS {0}").split("{0}").map(esc).join(`<span style="display:inline-grid;place-items:center;height:40px;padding:0 22px;border-radius:12px;background:linear-gradient(180deg,#3A4566,#26304A);color:#fff;font-size:20px;letter-spacing:3px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.35)">SPACE</span>`)}</span></div>`);
+    // RETROMON big, upper left, as Let's Go's logo sits, with its own tag under it: A FAN-MADE ADVENTURE.
+    else box(70, 54, 760, null, "", `<style>@keyframes tlogo{from{transform:translateY(-14px) scale(.96);opacity:0}to{transform:none;opacity:1}}</style><div style="position:relative;animation:tlogo .8s cubic-bezier(.2,.9,.3,1.2) both">
+      <img alt="RETROMON" src="${wordmark("RETROMON")}" style="width:760px;height:138px;display:block;filter:drop-shadow(0 8px 0 rgba(255,255,255,.65)) drop-shadow(0 14px 18px rgba(20,60,90,.28))">
+      <div style="position:absolute;left:300px;top:128px;transform:rotate(-4deg);display:inline-flex;align-items:center;gap:12px;padding:8px 26px 8px 12px;border-radius:999px;background:#fff;box-shadow:0 0 0 4px #26304A,0 8px 0 rgba(38,48,74,.35),0 12px 22px rgba(20,60,90,.25)">
+        <svg viewBox="0 0 24 24" width="34" height="34"><path d="M12 2l2.6 6.6L21.5 9l-5.2 4.6L18 21l-6-3.6L6 21l1.7-7.4L2.5 9l6.9-.4z" fill="#FFC93C" stroke="#E5583E" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span style="font-family:Fredoka,system-ui,sans-serif;font-weight:700;font-size:30px;letter-spacing:1.5px;color:#26304A;white-space:nowrap">${esc(T("A FAN-MADE ADVENTURE"))}</span></div></div>`);
+    // Which key, said plainly (Let's Go's "Press the A Button"): white words with a soft edge, SPACE in its own key cap.
+    if (night) box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#fff;color:#26304A;font-size:30px;letter-spacing:6px">${esc(T("PRESS START"))}</span></div>`);
+    else box(330, 626, 560, null, "", `<style>@keyframes tpulse{0%,100%{opacity:1}50%{opacity:.55}}</style><div style="text-align:center;animation:tpulse 2s ease-in-out infinite;font-family:Fredoka,system-ui,sans-serif;font-weight:700;font-size:36px;letter-spacing:1px;color:#fff;-webkit-text-stroke:7px rgba(38,48,74,.55);paint-order:stroke fill;text-shadow:0 4px 12px rgba(20,40,60,.35)">${T("Press {0}").split("{0}").map(esc).join(`<span style="display:inline-grid;place-items:center;vertical-align:middle;height:44px;margin:0 8px;padding:0 20px;border-radius:12px;background:linear-gradient(180deg,#fff,#E6ECF6);color:#26304A;-webkit-text-stroke:0;font-size:20px;letter-spacing:3px;box-shadow:0 0 0 3px rgba(38,48,74,.55),inset 0 -4px 0 rgba(38,48,74,.15)">SPACE</span>`)}</div>`);
     box(28, 680, 400, null, "", `<div style="font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">INSID3 TH3 CUB3</div>`);
     box(1080, 680, 180, null, "", `<div style="text-align:right;font-weight:800;font-size:15px;color:${night ? "#DDE6FF" : "#123C38"};opacity:.8">Version 0.28</div>`);
     return { key: k => { if (k === "a") go("saves"); return true; } };

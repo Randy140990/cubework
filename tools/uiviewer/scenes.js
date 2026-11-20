@@ -59,32 +59,6 @@ function figureOf(look) { const f = makeFigure(look); poseFigure(f, {}); return 
 
 const PROF_LOOK = { skin: "oak" }, RIVAL_LOOK = { skin: "blue" }, NURSE_LOOK = { skin: "nurse" }, CLERK_LOOK = { skin: "clerk" }, BUGBOY_LOOK = { skin: "youngster" }, MUM_LOOK = { skin: "mum" };
 
-// The title's own Minecraft blocks: short grass, five flowers, oak log and leaves, and the plain far greens.
-function titleBlocks() {
-  if (MATDEF.tShort) return;
-  const sprite = (key, draw) => { TEXDEF[key] = [16, 16, draw]; MATDEF[key] = { tex: key, fit: true, cut: true, double: true }; };
-  sprite("tShort", (P, r) => { for (let x = 0; x < 16; x++) { if (r() < 0.2) continue; const hgt = 5 + ((r() * 10) | 0); for (let y = 16 - hgt; y < 16; y++) P.set(x, y, shadec(hx("#5AAE45"), (y - 16 + hgt) * -0.012 + (x % 2 ? 0.07 : -0.05) + (y === 16 - hgt ? 0.2 : 0))); } });
-  const flower = (key, petal, centre, shape) => sprite(key, (P, r) => {
-    P.line(8, 6, 8, 15, hx("#3E8A34")); P.set(7, 11, hx("#58A845")); P.set(6, 10, hx("#58A845")); P.set(9, 13, hx("#58A845")); P.set(10, 12, hx("#58A845"));
-    for (const [dx, dy] of shape) P.set(8 + dx, 4 + dy, (dy < 0 ? shadec(petal, 0.18) : dy > 0 ? shadec(petal, -0.15) : petal));
-    if (centre) P.set(8, 4, centre);
-  });
-  const ROUND = [[0, -2], [-1, -1], [0, -1], [1, -1], [-2, 0], [-1, 0], [1, 0], [2, 0], [-1, 1], [0, 1], [1, 1], [0, 2]];
-  flower("tPoppy", hx("#E0362E"), hx("#2A2A2A"), ROUND);
-  flower("tDandelion", hx("#F7D433"), hx("#E8A21E"), [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]]);
-  flower("tDaisy", hx("#F6F6F0"), hx("#F2C12E"), ROUND);
-  flower("tCornflower", hx("#4A7BE0"), hx("#2E4FA8"), [[0, -2], [-1, -1], [1, -1], [-2, 0], [2, 0], [-1, 1], [1, 1], [0, 1], [-1, 0], [1, 0]]);
-  flower("tAllium", hx("#B66FE0"), null, [[0, -2], [-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [0, 1], [-1, 1], [1, 1]]);
-  TEXDEF.tLog = [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#6E4F32"), (x % 4 === 0 ? -0.22 : x % 4 === 2 ? 0.06 : 0) + ((y * 7 + x * 3) % 9 === 0 ? -0.12 : 0) + (r() - 0.5) * 0.1)); }];
-  TEXDEF.tLogTop = [16, 16, (P, r) => { P.fill(hx("#6E4F32"), 0.05, r); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) { const d = Math.max(Math.abs(x - 7.5), Math.abs(y - 7.5)); if (d < 6.5) P.set(x, y, shadec(hx("#B8925C"), (Math.floor(d) % 2 ? -0.1 : 0.04) + (r() - 0.5) * 0.05)); } }];
-  TEXDEF.tLeaf = [16, 16, (P, r) => leaves(P, r, hx("#4A9A3C"), hx("#78C45A"), hx("#2E6A2A"), 0.1)];
-  MATDEF.tLog = { tex: "tLog", per: 1 }; MATDEF.tLogTop = { tex: "tLogTop", per: 1 }; MATDEF.tLeaf = { tex: "tLeaf", per: 1, cut: true };
-  TEXDEF.tFar = [4, 4, (P, r) => P.fill(hx("#7DC25A"), 0.0, r)]; MATDEF.tFar = { tex: "tFar", per: 40 };
-  TEXDEF.tFarLeaf1 = [16, 16, (P, r) => leaves(P, r, hx("#5FA858"), hx("#86C478"), hx("#447F44"), 0)]; MATDEF.tFarLeaf1 = { tex: "tFarLeaf1", per: 1 };
-  TEXDEF.tFarLeaf2 = [16, 16, (P, r) => leaves(P, r, hx("#86BE88"), hx("#A2D2A2"), hx("#6E9E72"), 0)]; MATDEF.tFarLeaf2 = { tex: "tFarLeaf2", per: 1 };
-  TEXDEF.tFarLog = [4, 4, (P, r) => P.fill(hx("#8C7A62"), 0.0, r)]; MATDEF.tFarLog = { tex: "tFarLog", per: 1 };
-}
-
 const SCENES = {
   // Pallet Town, from the Interior Viewer: you outside your door, your partner beside you.
   town() {
@@ -168,69 +142,15 @@ const SCENES = {
         st.base = "hover"; st.fly = true; group.add(st.m.holder); placeMon(st, 0.15, 0, Math.PI - 0.45, -0.55); S.mons.push(st); S.zard = st; });
       S.enter = () => { lightFor(-2, 3, 4, 10); hemi3.color.set(0x9fb6ff); hemi3.groundColor.set(0x1a2244); look3(0, 1.45, 8.2, 0, 1.15, 0); };
     } else {
-      // As Let's Go's title, built from Minecraft's own blocks: a meadow of grass blocks, short grass and flowers as
-      // crossed cut-outs, leaf-block bushes, oak trees (a log of bark, leaves in Minecraft's oak shape) framing it
-      // and running back to the horizon, and flat blocky clouds drifting across. The sun is in the sky behind (the
-      // page's glare, top right), so the light comes from the right.
-      titleBlocks();
-      let seed = 7; const rnd = () => (seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) / 4294967296;
-      const G = new Geo(), far = new Geo();
-      // The ground: grass blocks near, the same green, plain, further out (so it doesn't shimmer at a distance).
-      G.box(-14, -1, -14, 14, 0, 8, { top: "grass", all: null });
-      far.box(-80, -1.002, -90, 80, -0.002, 8, { top: "tFar", all: null });
-      const cross = (x, z, k, hgt = 1) => { G.box(x + 0.15, 0, z + 0.5, x + 0.85, hgt, z + 0.5, { s: k, all: null }); G.box(x + 0.5, 0, z + 0.15, x + 0.5, hgt, z + 0.85, { e: k, all: null }); };
-      const clear = (x, z) => Math.abs(x + 0.5) < 2.6 && z > -1.6 && z < 1.8;
-      const FL = ["tPoppy", "tDandelion", "tDaisy", "tCornflower", "tAllium"];
-      // Grass and flowers kept light: a scatter round the creatures' feet and out to the sides, thinning towards you,
-      // so the meadow reads as grass without a wall of it in front.
-      for (let x = -14; x < 14; x++) for (let z = -13; z < 4; z++) {
-        const v = rnd(), front = z > 0, mid = Math.abs(x + 0.5) < 3.5;
-        if (front && mid) continue;
-        if (clear(x, z)) { if (v < 0.1) cross(x, z, "tShort", 0.4); continue; }
-        const p = front ? 0.1 : z > -4 ? 0.22 : 0.3;
-        if (v < p) cross(x, z, "tShort", 0.45 + rnd() * 0.25);
-        else if (v < p + 0.06 && !front) cross(x, z, FL[Math.floor(rnd() * FL.length)], 0.6);
-      }
-      // Bushes behind: a leaf block, or two or three together, scattered across the meadow.
-      for (let i = 0; i < 16; i++) { const x = -13 + Math.floor(rnd() * 26), z = -5 - Math.floor(rnd() * 9); if (Math.abs(x) < 2 && z > -7) continue;
-        G.box(x, 0, z, x + 1, 1, z + 1, "tLeaf"); if (rnd() < 0.6) G.box(x + 1, 0, z, x + 2, 1, z + 1, "tLeaf"); if (rnd() < 0.35) G.box(x, 1, z, x + 1, 2, z + 1, "tLeaf"); }
-      // An oak, as Minecraft grows one: a log 4 to 6 high; two layers of leaves 5 across with the corners mostly gone;
-      // a layer 3 across; a plus on top.
-      const oak = (Gx, x, z, hgt, leaf = "tLeaf", log = "tLog") => {
-        Gx.box(x, 0, z, x + 1, hgt, z + 1, { all: log, top: "tLogTop" });
-        for (const [y, r, cut] of [[hgt - 2, 2, 0.6], [hgt - 1, 2, 0.75], [hgt, 1, 0.3], [hgt + 1, 1, 1]]) {
-          for (let i = -r; i <= r; i++) for (let k = -r; k <= r; k++) {
-            if (i === 0 && k === 0 && y < hgt) continue;
-            const corner = Math.abs(i) === r && Math.abs(k) === r;
-            if (y === hgt + 1 && corner) continue;
-            if (corner && rnd() < cut) continue;
-            Gx.box(x + i, y, z + k, x + i + 1, y + 1, z + k + 1, leaf);
-          }
-        }
-      };
-      // A big one on the left, framing the creatures; a smaller one further back on the right, below the sun, so the sky
-      // and the sun's glare stay open top right. One more far back each side.
-      oak(G, -8, -3, 5); oak(G, 9, -9, 4); oak(G, -13, -12, 5); oak(G, 14, -16, 4);
-      // The horizon: oaks and bushes a long way off, with gaps between, in plain greens that pale with distance.
-      for (let i = 0; i < 26; i++) {
-        const z = -42 - Math.floor(rnd() * 20), x = Math.round(-70 + i * 5.6 + (rnd() - 0.5) * 3), hz = Math.min(1, (-z - 40) / 20);
-        if (rnd() < 0.8) oak(far, x, z, 4 + Math.floor(rnd() * 2), hz < 0.5 ? "tFarLeaf1" : "tFarLeaf2", "tFarLog");
-        far.box(x + 3, 0, z + 2, x + 5 + Math.floor(rnd() * 2), 1 + (rnd() < 0.5 ? 1 : 0), z + 4, hz < 0.5 ? "tFarLeaf1" : "tFarLeaf2");
-      }
-      const near = G.build(), farG = far.build(); group.add(near); group.add(farG);
-      farG.traverse(o => { if (o.isMesh) o.castShadow = false; });
-      // Minecraft's clouds: flat white slabs, blocky at the edges, drifting slowly across.
-      const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.35 });
-      for (const [x, y, z, w, d] of [[-7, 5.0, -16, 6, 2], [4, 6.2, -20, 8, 3], [12, 4.6, -18, 4, 2], [-1, 7.4, -26, 7, 3], [-15, 5.6, -22, 5, 2], [20, 6.6, -24, 6, 2]]) {
-        const c = new THREE.Group();
-        const slab = (bx, bz, bw, bd) => { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, 0.8, bd), cloudMat); m.position.set(bx, 0, bz); c.add(m); };
-        slab(0, 0, w, d); slab(-w * 0.2, -d * 0.5 - 0.5, w * 0.5, 1); slab(w * 0.25, d * 0.5 + 0.5, w * 0.4, 1);
-        c.position.set(x, y, z); group.add(c); S.clouds.push(c);
-      }
-      [["charmander", -1.45, 0.05, 0.45], ["pikachu", 0, 0.8, 0.0], ["bulbasaur", 1.45, 0.05, -0.45], ["squirtle", 0.75, -1.05, -0.2]].forEach(([sid, x, z, turn]) => mon(sid).then(st => { st.base = "ground"; group.add(st.m.holder); placeMon(st, x, z, Math.PI + turn, 0); S.mons.push(st); }));
+      // As Let's Go's title: the painted meadow is the page behind (titleArt), and just your partner-to-be stands big
+      // in front of it on the right, three-quarters on, looking out at you, in smooth light (not pixel art).
+      mon("pikachu").then(st => { const k = 0.95 / Math.max(0.5, st.m.size.h); st.m.holder.scale.multiplyScalar(k); st.m.size = { ...st.m.size, h: st.m.size.h * k, w: st.m.size.w * k, l: st.m.size.l * k, cx: st.m.size.cx * k, cz: st.m.size.cz * k };
+        st.base = "ground"; group.add(st.m.holder); placeMon(st, 0, 0, Math.PI - 0.42); S.mons.push(st); S.star = st; });
+      const sh = blob(1.25); sh.position.set(0.02, 0.01, 0.05); sh.material = sh.material.clone(); sh.material.opacity = 0.55; group.add(sh);
+      S.nextCry = 2.5;
       S.enter = () => {
-        lightFor(0, 0, 7, 14); sun3.position.set(6, 11, 1.5); sun3.target.position.set(0, 0, 0);
-        hemi3.color.set(0xffffff); hemi3.groundColor.set(0xa8d08c); look3(0, 1.3, 6.4, 0, 1.06, 0);
+        lightFor(0, 0, 3, 8); sun3.position.set(3.2, 5.5, 1.2); sun3.target.position.set(0, 0.4, 0);
+        hemi3.color.set(0xfff8e8); hemi3.groundColor.set(0x9ccf78); look3(-0.98, 0.66, 2.9, -0.98, 0.56, 0);
       };
     }
     S.tick = (dt, t) => { for (const m of S.mons) tickMon(m, dt); if (S.zard) S.zard.m.holder.position.y = -0.55 + Math.sin(t * 1.6) * 0.12; S.clouds.forEach((c, i) => { c.position.x += dt * (S.night ? 0.12 : 0.55) * (1 + (i % 3) * 0.25); const lim = S.night ? 7 : 30; if (c.position.x > lim) c.position.x = -lim; }); };
