@@ -256,7 +256,7 @@ screen("dexentry", "Menus", "Pokédex entry", {
   tags: ["New look", "Read out loud"], try: ["V (or the button) to read it again."],
   make(arg) {
     const sid = arg && arg.sid || "pikachu", d = sp(sid), tc = typeHex(d.stats.types[0]);
-    typeBackdrop(d.stats.types[0]); rays(50, 40, 0.12);
+    monBackdrop(sid, { cx: 50, cy: 58 });
     SC.model.show(sid).then(() => { const e = $("#hgt"); if (e && SC.model.st) e.textContent = SC.model.st.m.size.h.toFixed(2) + " blocks"; });
     const glass = `background:rgba(255,255,255,.86);border:3px solid #fff;border-radius:22px;color:#26304A;box-shadow:0 8px 20px rgba(30,40,84,.2)`;
     box(40, 34, 420, null, "g-fadein", `<div style="${glass};padding:16px 22px;display:grid;gap:6px"><div style="font-weight:900;font-size:16px;letter-spacing:1px;color:${darkerHex(tc, 0.25)}">POKéDEX No. ${String(d.dex).padStart(3, "0")}</div>
@@ -311,41 +311,67 @@ screen("party", "Menus", "Your team", {
     return { key: k => C.key(k) };
   }
 });
-// A hexagon of the six stats (Let's Go's): the outline in white, the creature's own share filled in its colour.
+// How good a stat is for its level, in a word (as Let's Go's judge puts it).
+function statWord(v, lv) { const f = v / (lv * 2.6 + 30); return f > 0.8 ? "Best" : f > 0.62 ? "Great" : f > 0.45 ? "Good" : f > 0.3 ? "Decent" : "Fair"; }
+// The six stats as Let's Go's hexagon: a bright lime rim, a soft aqua inside, spokes; each stat's name and its word
+// outside it, the number under; the creature's own share filled in.
 function statHex(st, lv, tc) {
-  const keys = [["HP", "HP"], ["Attack", "ATTACK"], ["Defense", "DEFENSE"], ["Speed", "SPEED"], ["Sp. Def", "SP. DEF"], ["Sp. Atk", "SP. ATK"]], R = 120, cx = 170, cy = 160, mx = lv * 2.6 + 30;
+  const keys = [["HP", "HP"], ["Attack", "Attack"], ["Defense", "Defense"], ["Speed", "Speed"], ["Sp. Def", "Sp. Def"], ["Sp. Atk", "Sp. Atk"]], R = 118, cx = 190, cy = 178, mx = lv * 2.6 + 30;
   const pt = (k, r) => { const a = -Math.PI / 2 + k * Math.PI / 3; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; };
   const ring = f => keys.map((_, k) => pt(k, R * f).join(",")).join(" ");
-  const val = keys.map(([k], q) => pt(q, R * Math.max(0.12, Math.min(1, st[k] / mx))).join(",")).join(" ");
-  return `<svg viewBox="0 0 340 320" width="340" height="320"><polygon points="${ring(1)}" fill="rgba(255,255,255,.35)" stroke="#fff" stroke-width="3"/><polygon points="${ring(0.66)}" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><polygon points="${ring(0.33)}" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/>
-    <polygon points="${val}" fill="${darkerHex(tc, 0.12)}" fill-opacity=".9" stroke="#fff" stroke-width="2.5"/>
-    ${keys.map(([k, l], q) => { const [x, y] = pt(q, R + 26); return `<text x="${x}" y="${y - 6}" text-anchor="middle" font-family="Nunito Sans,sans-serif" font-weight="900" font-size="13" fill="#fff" stroke="${darkerHex(tc, 0.35)}" stroke-width="3" paint-order="stroke">${l}</text><text x="${x}" y="${y + 12}" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="19" fill="#fff" stroke="${darkerHex(tc, 0.35)}" stroke-width="3" paint-order="stroke">${st[k]}</text>`; }).join("")}</svg>`;
+  const val = keys.map(([k], q) => pt(q, R * Math.max(0.15, Math.min(1, st[k] / mx))).join(",")).join(" ");
+  const ink = "#1F3A2C";
+  return `<svg viewBox="0 0 380 360" width="380" height="360"><defs><linearGradient id="hxr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D6FF6A"/><stop offset="1" stop-color="#3FD06A"/></linearGradient></defs>
+    <polygon points="${ring(1.06)}" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="16" transform="translate(0,4)"/>
+    <polygon points="${ring(1)}" fill="rgba(110,214,190,.72)" stroke="url(#hxr)" stroke-width="14" stroke-linejoin="round"/>
+    ${keys.map((_, q) => `<line x1="${cx}" y1="${cy}" x2="${pt(q, R)[0]}" y2="${pt(q, R)[1]}" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>`).join("")}
+    <polygon points="${ring(0.5)}" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+    <polygon points="${val}" fill="#E9FF8A" fill-opacity=".85" stroke="#fff" stroke-width="2.5"/>
+    ${keys.map(([k, l], q) => { const [x, y] = pt(q, R + 40), w = statWord(st[k], lv);
+      return `<text x="${x}" y="${y - 10}" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="19" fill="#fff" stroke="${ink}" stroke-width="4" paint-order="stroke">${l}</text>
+        <text x="${x}" y="${y + 12}" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="20" fill="#FFE04A" stroke="${ink}" stroke-width="4" paint-order="stroke">${w}</text>
+        <text x="${x}" y="${y + 30}" text-anchor="middle" font-family="Nunito Sans,sans-serif" font-weight="900" font-size="13" fill="#fff" stroke="${ink}" stroke-width="3" paint-order="stroke">${st[k]}</text>`; }).join("")}</svg>`;
+}
+// The judge's stamp, top left: how good its stats are all told.
+function statStamp(st, lv) {
+  const f = Object.values(st).reduce((a, v) => a + v, 0) / 6 / (lv * 2.6 + 30), word = f > 0.62 ? "AMAZING" : f > 0.48 ? "GREAT" : f > 0.36 ? "GOOD" : "DECENT", stars = f > 0.62 ? 3 : f > 0.48 ? 2 : 1;
+  return `<svg viewBox="0 0 260 190" width="260" height="190" style="opacity:.92;transform:rotate(-8deg)"><g fill="none" stroke="#fff" stroke-width="4">
+    <path d="M30 40l40-22h120l40 22v70l-40 40H70l-40-40z" fill="rgba(255,255,255,.18)"/><path d="M42 46l34-18h108l34 18v60l-34 34H76l-34-34z" stroke-dasharray="7 5" stroke-width="2.5"/></g>
+    <path d="M112 20l8-12 10 10 10-10 8 12z" fill="#fff"/>
+    <rect x="8" y="108" width="244" height="34" rx="6" fill="#fff" transform="rotate(-4 130 125)"/>
+    <text x="130" y="82" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="30" fill="#fff">${word}</text>
+    <text x="130" y="132" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="24" fill="#E5525C" transform="rotate(-4 130 125)">STATS!</text>
+    ${[0, 1, 2].map(k => `<path d="M${108 + k * 22} 158l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="${k < stars ? "#FFE04A" : "rgba(255,255,255,.4)"}"/>`).join("")}</svg>`;
 }
 screen("summary", "Menus", "Summary", {
-  scene: "model", sceneOpts: () => ({ sid: G.party[0].sid, ox: 1.15, stand: false }),
-  what: "One of your team in full, as Let's Go's: it stands big on the left on its own colour (light rays behind it), its name plate bottom left with its HP; on the right, a page each for INFO, STATS (a hexagon of its six stats) and MOVES (each a bar in its type's colour, with PP).",
+  scene: "model", sceneOpts: () => ({ sid: G.party[0].sid, ox: 1.05, stand: false }),
+  what: "One of your team in full, as Let's Go's STATS page: it stands on its own backdrop (its type's colours, a great soft swirl of light, blurred light, and its own drifting things: embers, bubbles, leaves, sparks), the judge's stamp top left, its six stats as a lime hexagon with a word for each, and its name plate bottom right. INFO and MOVES are the other pages.",
   mod: "MenuScreen's SUMMARY: ATTACK, DEFENSE, SPCL.ATK, SPCL.DEF, SPEED.",
-  tags: ["New look: Let's Go's"], try: ["Tab, or left and right, for the next page. Up and down for the next of your team."],
+  tags: ["New look: Let's Go's STATS", "Each creature's own backdrop"], try: ["Tab, or left and right, for the next page. Up and down for the next of your team."],
   make(arg) {
     let i = arg && arg.i || 0, page = 1;
-    const plate = box(40, 556, 520, null, "", ""), P = box(650, 40, 600, 600, "", "");
-    const tabs = box(650, 0, 600, null, "", "");
+    const stamp = box(24, 20, 260, 190, "", ""), right = box(720, 40, 540, 470, "", ""), plate = box(700, 512, 560, null, "", ""), dexNo = box(0, 640, 260, null, "", "");
+    const tabs = box(0, 10, 1280, null, "", "");
+    const glass = "background:rgba(28,36,60,.42);border:2px solid rgba(255,255,255,.55);backdrop-filter:blur(6px);color:#fff";
     const draw = () => {
-      const p = G.party[i], d = sp(p.sid), tc = typeHex(d.stats.types[0]), f = p.hp / p.maxhp; SC.model.show(p.sid); typeBackdrop(d.stats.types[0]);
-      uiRoot.querySelectorAll(".sumrays").forEach(e => e.remove()); const r = rays(22, 55, 0.14); r.classList.add("sumrays"); uiRoot.prepend(r);
-      plate.innerHTML = `<div style="position:relative;padding:14px 22px 14px;border-radius:26px;background:linear-gradient(180deg,#fff,${lighterHex(tc, 0.82)});border:4px solid #fff;box-shadow:0 10px 24px rgba(30,40,84,.28)">
+      const p = G.party[i], d = sp(p.sid), tc = typeHex(d.stats.types[0]), f = p.hp / p.maxhp; SC.model.show(p.sid);
+      bgArt.innerHTML = ""; monBackdrop(p.sid, { cx: 33, cy: 64 });
+      stamp.innerHTML = page === 1 ? statStamp(p.stats, p.lv) : "";
+      tabs.innerHTML = `<div style="display:flex;justify-content:center;gap:10px">${["INFO", "STATS", "MOVES"].map((t, j) => `<span data-p="${j}" style="cursor:pointer;padding:5px 20px;border-radius:999px;font-family:Fredoka,sans-serif;font-weight:600;font-size:17px;letter-spacing:1px;${j === page ? "background:#fff;color:#26304A;box-shadow:0 4px 12px rgba(30,40,84,.25)" : "background:rgba(255,255,255,.28);color:#fff"}">${t}</span>`).join("")}</div>`;
+      tabs.querySelectorAll("[data-p]").forEach(e => e.onclick = () => { page = +e.dataset.p; draw(); });
+      // The name plate, Let's Go's: dark glass, a ball's outline in it, name, level, types, HP.
+      plate.innerHTML = `<div style="position:relative;overflow:hidden;padding:14px 24px 14px 92px;border-radius:60px 24px 24px 60px;${glass};box-shadow:0 10px 24px rgba(20,24,48,.3)">
+        <svg viewBox="0 0 100 100" width="150" height="150" style="position:absolute;left:-34px;top:-28px;opacity:.35"><circle cx="50" cy="50" r="44" fill="none" stroke="#fff" stroke-width="8"/><path d="M6 50h88" stroke="#fff" stroke-width="8"/><circle cx="50" cy="50" r="14" fill="none" stroke="#fff" stroke-width="8"/></svg>
         <div style="display:flex;align-items:center;gap:10px"><span class="g-title" style="font-size:32px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-weight:900;font-size:22px">Lv. ${p.lv}</span></div>
         <div style="display:flex;gap:8px;margin:6px 0 10px">${d.stats.types.map(typeChip).join("")}</div>
-        <div style="display:flex;align-items:center;gap:10px"><span style="font-weight:900;font-size:14px;color:#E5525C">HP</span><div class="g-hp" style="flex:1"><i style="width:${f * 100}%;background:${hpCol(f)}"></i></div><span style="font-weight:900;font-size:19px">${p.hp}/${p.maxhp}</span></div></div>`;
-      tabs.innerHTML = `<div style="display:flex;justify-content:center;gap:10px;padding-top:4px">${["INFO", "STATS", "MOVES"].map((t, j) => `<span data-p="${j}" style="cursor:pointer;padding:6px 22px;border-radius:999px;font-family:Fredoka,sans-serif;font-weight:600;font-size:18px;letter-spacing:1px;${j === page ? `background:#fff;color:${darkerHex(tc, 0.3)};box-shadow:0 4px 12px rgba(30,40,84,.25)` : "background:rgba(255,255,255,.3);color:#fff"}">${t}</span>`).join("")}</div>`;
-      tabs.querySelectorAll("[data-p]").forEach(e => e.onclick = () => { page = +e.dataset.p; draw(); });
-      const card = `position:relative;border-radius:26px;background:rgba(255,255,255,.92);border:4px solid #fff;box-shadow:0 10px 24px rgba(30,40,84,.25);color:#26304A`;
-      if (page === 0) P.innerHTML = `<div style="${card};padding:24px 30px;margin-top:20px"><div style="display:grid;grid-template-columns:auto 1fr;gap:12px 22px;font-size:21px;font-weight:800"><span class="g-label">POKéDEX No.</span><span>${String(d.dex).padStart(3, "0")}</span>
-        <span class="g-label">Trainer</span><span>${esc(G.name)}</span><span class="g-label">ID No.</span><span>${G.id}</span><span class="g-label">Item</span><span>None</span><span class="g-label">Met</span><span>ROUTE 1, at Lv. ${Math.max(2, p.lv - 18)}</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-weight:900;font-size:14px;color:#FFE04A">HP</span><div class="g-hp" style="flex:1;background:rgba(0,0,0,.3)"><i style="width:${f * 100}%;background:${hpCol(f)}"></i></div><span style="font-weight:900;font-size:19px">${p.hp}/${p.maxhp}</span></div></div>`;
+      dexNo.innerHTML = `<div style="padding:10px 22px;border-radius:0 18px 0 0;${glass};border-left:0;border-bottom:0;font-weight:800;font-size:17px;line-height:1.4">${esc(ourName(p.sid))}<br>POKéDEX No. ${String(d.dex).padStart(3, "0")}</div>`;
+      const card = `position:relative;border-radius:26px;background:rgba(255,255,255,.9);border:4px solid #fff;box-shadow:0 10px 24px rgba(30,40,84,.25);color:#26304A`;
+      if (page === 0) right.innerHTML = `<div style="${card};padding:24px 30px;margin-top:40px"><div style="display:grid;grid-template-columns:auto 1fr;gap:12px 22px;font-size:21px;font-weight:800"><span class="g-label">Trainer</span><span>${esc(G.name)}</span><span class="g-label">ID No.</span><span>${G.id}</span><span class="g-label">Nature</span><span>Brave</span><span class="g-label">Item</span><span>None</span><span class="g-label">Met</span><span>ROUTE 1, at Lv. ${Math.max(2, p.lv - 18)}</span></div>
         <div style="margin-top:20px"><div class="g-label">EXP to Lv. ${p.lv + 1}</div><div class="g-exp" style="margin-top:8px;height:10px;background:#DDE3F0"><i style="width:${p.exp * 100}%;background:linear-gradient(90deg,#7CC2FA,#3C8DE4)"></i></div></div></div>`;
-      else if (page === 1) P.innerHTML = `<div style="display:grid;justify-items:center;margin-top:30px">${statHex(p.stats, p.lv, tc)}</div><div style="${card};margin:10px 60px 0;padding:12px 22px;display:flex;justify-content:space-between;font-weight:900;font-size:18px"><span class="g-label">Nature</span><span>Brave</span></div>`;
-      else P.innerHTML = `<div style="display:grid;gap:12px;margin-top:30px">${p.moves.map(n => { const m = MOVE[n] || { type: "NORMAL", pp: 20 }, c = typeHex(m.type);
-        return `<div style="position:relative;display:flex;align-items:center;gap:14px;height:64px;padding:0 22px 0 8px;border-radius:999px;border:3px solid #fff;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2);background:linear-gradient(180deg, ${lighterHex(c, 0.25)}, ${c} 55%, ${darkerHex(c, 0.18)});box-shadow:0 6px 14px rgba(30,40,84,.25)">
+      else if (page === 1) right.innerHTML = `<div style="display:grid;justify-items:center;margin-top:20px">${statHex(p.stats, p.lv, tc)}</div>`;
+      else right.innerHTML = `<div style="display:grid;gap:12px;margin-top:40px">${p.moves.map(n => { const m = MOVE[n] || { type: "NORMAL", pp: 20 }, c = typeHex(m.type);
+        return `<div style="position:relative;display:flex;align-items:center;gap:14px;height:62px;padding:0 22px 0 8px;border-radius:999px;border:3px solid #fff;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2);background:linear-gradient(180deg, ${lighterHex(c, 0.25)}, ${c} 55%, ${darkerHex(c, 0.18)});box-shadow:0 6px 14px rgba(30,40,84,.25)">
           <span style="padding:3px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:${darkerHex(c, 0.25)};font-weight:900;font-size:13px;letter-spacing:1px;text-shadow:none">${esc(m.type)}</span><span class="g-title" style="font-size:24px">${esc(n)}</span><span style="margin-left:auto;font-weight:900;font-size:20px;font-variant-numeric:tabular-nums">${m.pp}/${m.pp}</span></div>`; }).join("")}</div>`;
     };
     draw(); hints([["TAB", "Page"], ["B", "Back"]]);

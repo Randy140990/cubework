@@ -22,7 +22,6 @@ const SKY = "radial-gradient(ellipse at 30% 20%, #FFFFFF 0%, #E2F4FF 32%, #A6D8F
 const LIME = "radial-gradient(ellipse at 25% 15%, #FFFFF2 0%, #F4FAB8 35%, #CDEB6E 70%, #96C73A 100%)";
 const PEACH = "radial-gradient(ellipse at 30% 20%, #FFFFFF 0%, #FFEDE0 35%, #FFC9A6 70%, #F2946A 100%)";
 const MINT = "radial-gradient(ellipse at 30% 20%, #FFFFFF 0%, #E3FAEF 35%, #A9EBCB 70%, #5CC79A 100%)";
-function rays(x = 20, y = 10, a = 0.16) { return add(h("div", "", "", { position: "absolute", inset: "0", background: `repeating-conic-gradient(from 0deg at ${x}% ${y}%, rgba(255,255,255,${a}) 0 6deg, transparent 6deg 14deg)`, pointerEvents: "none" })); }
 const DREAM = "radial-gradient(circle at 50% 42%, #FFFFFF 0%, #E3F8FA 20%, #9EDCEB 48%, #4C9CC7 78%, #2E5F96 100%)";
 const NIGHT = "radial-gradient(ellipse at 50% 40%, #5FA8E8 0%, #2F64B0 50%, #1A3470 100%)";
 

@@ -115,47 +115,53 @@ screen("trade", "Places", "Trading", {
     return { key: k => C.key(k) };
   }
 });
-// The three starters on their cards, as StarterScreen draws them (canvas units): each card in its type's colours.
-const STARTERS = [["bulbasaur", "GRASS", ["#9BE08A", "#4FB848", "#2A7A34"]], ["charmander", "FIRE", ["#FFC06E", "#F0782E", "#B8401E"]], ["squirtle", "WATER", ["#8CCBF6", "#3F8EDC", "#2459A6"]]];
+// The three starters: three balls on the professor's table; the one you're on rolls forward, opens, and its creature
+// stands out big on its own backdrop (as the STATS page has it), its plate beside it. Then the professor asks.
+const STARTERS = [["bulbasaur", "GRASS", "A leafy armadillo. It curls up in its bark-hard bands, and the sprout on its head drinks in the sun."],
+  ["charmander", "FIRE", "A little black goat with a flame between its horns. The happier it is, the brighter the flame."],
+  ["squirtle", "WATER", "A sea tapir. It sprays water from its soft snout, and the curl of wave on its head never dries."]];
 screen("starter", "Places", "Choosing your first POKéMON", {
-  scene: "town", sceneOpts: () => ({}),
-  what: "In the lab, the three on the table, each on a card in its own type's colours: leafy greens, fiery oranges, sea blues. The one you're on lifts, brighter, with a white rim, hops and twirls, and a heart pops up over it.",
-  mod: "StarterScreen: the cards, then So! You want the FIRE POKéMON...? YES or NO.",
-  tags: ["Colour"], try: ["Left and right to look, A to choose, then YES or NO."],
+  scene: "model", sceneOpts: () => ({ sid: "charmander", ox: 0, stand: false, zoom: 0.92 }),
+  what: "Choosing your first: three balls on the professor's table along the foot of the screen. The one you're on rolls forward and pops open, and its creature stands out big in the middle on its own backdrop (embers for the fire one, leaves for the grass one, bubbles for the water one), with its name, type and a line about it on a plate. A to choose it, and the professor asks if you're sure.",
+  mod: "StarterScreen.",
+  tags: ["New: a better way to choose"], try: ["Left and right to look in each ball, A to choose, then YES or NO."],
   make() {
-    blurOver(); add(h("div", "", "", { position: "absolute", inset: "0", background: "linear-gradient(180deg, rgba(10,14,36,.44), rgba(10,14,36,.75))" }));
-    const C = ctl(); let sel = 1, picking = true;
-    const cw = 300, ch = 330, gap = 40, x0 = 640 - (3 * cw + 2 * gap) / 2, y = 214;
-    add(h("style", "", `@keyframes stHop{0%{transform:translateY(0) rotate(0)}25%{transform:translateY(-30px) rotate(180deg)}50%{transform:translateY(0) rotate(360deg) scaleY(.9)}75%{transform:translateY(-14px) rotate(360deg)}100%{transform:translateY(0) rotate(360deg)}}
-      @keyframes stPop{from{transform:scale(0)}60%{transform:scale(1.2)}to{transform:scale(1)}}`));
-    const cards = STARTERS.map(([sid, kind, c], i) => {
-      const e = box(x0 + i * (cw + gap), y, cw, ch, "", ""); e.style.cursor = "pointer";
-      e.onmouseenter = () => { if (picking) { sel = i; paint(); } }; e.onclick = () => { if (picking) { sel = i; paint(); pick(); } };
-      return e;
-    });
-    const paint = () => cards.forEach((e, i) => {
-      const [sid, kind, c] = STARTERS[i], on = i === sel, dim = (hx, k) => `color-mix(in srgb, ${hx} ${Math.round((1 - k) * 100)}%, #0E2A28)`;
-      const cols = on ? c : [dim(c[0], 0.42), dim(c[1], 0.5), dim(c[2], 0.55)];
-      e.style.transform = on ? "translateY(-12px)" : "none";
-      e.innerHTML = `<div style="position:absolute;inset:-9px;border-radius:38px;background:${on ? "rgba(255,244,216,.33)" : "transparent"}"></div>
-        <div style="position:absolute;inset:0;border-radius:30px;background:linear-gradient(180deg, ${cols[0]}, ${cols[1]} 50%, ${cols[2]});border:3px solid ${on ? "#fff" : "rgba(255,255,255,.31)"};box-shadow:0 9px 0 rgba(0,0,0,.27);box-sizing:border-box;margin:-3px"></div>
-        <div style="position:absolute;left:${cw * 0.1}px;right:${cw * 0.1}px;top:40px;height:${ch * 0.56}px;border-radius:50%;background:rgba(255,255,255,${on ? 0.18 : 0.07})"></div>
-        <div style="position:absolute;left:${cw * 0.14}px;right:${cw * 0.14}px;top:${40 + ch * 0.5 - 16}px;height:32px;border-radius:50%;background:${darkerHex(c[2], 0.3)};opacity:${on ? 0.9 : 0.6}"></div>
-        <div style="position:absolute;left:50%;top:${40 + ch * 0.5}px;transform:translate(-50%,-100%)"><div style="${on ? "animation:stHop 1.1s ease-out 1" : ""};transform-origin:50% 90%">${pic(sid, ch * 0.5, on ? "" : "filter:brightness(.82)")}</div></div>
-        ${on ? `<div style="position:absolute;left:${cw / 2 + ch * 0.5 / 3 - 28}px;top:${34 - 54}px;width:56px;height:56px;animation:stPop .3s ease-out .2s both"><img src="${EMOTE.heart}" style="width:56px;height:56px"></div>` : ""}
-        <div class="g-title" style="position:absolute;left:0;right:0;top:${ch - 86}px;text-align:center;font-size:32px;color:${on ? "#fff" : "#E4ECE8"};text-shadow:0 2px 0 rgba(0,0,0,.4)">${esc(ourName(sid))}</div>
-        <div style="position:absolute;left:50%;top:${ch - 46}px;transform:translateX(-50%);height:30px;padding:0 17px;border-radius:999px;display:grid;place-items:center;background:${on ? "#fff" : "rgba(255,255,255,.19)"};color:${on ? darkerHex(c[2], 0.15) : "#fff"};font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:1px">${kind}</div>`;
-    });
+    const C = ctl(); C.sayAt = { film: true };
+    let sel = 1, picking = true;
+    add(h("style", "", `@keyframes stOpen{0%{transform:translateY(0) scale(1)}40%{transform:translateY(-22px) scale(1.08)}100%{transform:translateY(-14px) scale(1.04)}}
+      @keyframes stBurst{from{transform:scale(.2);opacity:1}to{transform:scale(1.6);opacity:0}}@keyframes stWob{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}`));
+    const balls = box(0, 486, 1280, 120, "", ""), plate = box(860, 150, 380, null, "", ""), flash = box(0, 0, 1280, 720, "", "");
+    flash.style.pointerEvents = "none";
+    const ball = (on, open, c) => `<svg viewBox="0 0 100 100" width="96" height="96" style="overflow:visible">
+      <ellipse cx="50" cy="96" rx="34" ry="7" fill="rgba(0,0,0,.22)"/>
+      <g transform="${open ? "translate(-6 -14) rotate(-42 8 50)" : ""}"><path d="M8 50a42 42 0 0 1 84 0z" fill="#E5525C" stroke="#26304A" stroke-width="5"/><path d="M22 30q10-12 24-14" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".55"/></g>
+      <path d="M8 50a42 42 0 0 0 84 0z" fill="#F4F6F5" stroke="#26304A" stroke-width="5"/><rect x="8" y="46" width="84" height="8" fill="#26304A"/>
+      <circle cx="50" cy="50" r="13" fill="#F4F6F5" stroke="#26304A" stroke-width="5"/><circle cx="50" cy="50" r="6" fill="${on ? c : "#F4F6F5"}" stroke="#26304A" stroke-width="2"/>
+      ${open ? `<ellipse cx="50" cy="40" rx="30" ry="12" fill="#fff" opacity=".85" style="filter:blur(3px)"/>` : ""}</svg>`;
+    const draw = (burst) => {
+      const [sid, kind, line] = STARTERS[sel], d = sp(sid), tc = typeHex(kind);
+      bgArt.innerHTML = ""; monBackdrop(sid, { cx: 50, cy: 52 }); SC.model.show(sid);
+      balls.innerHTML = `<div style="display:flex;justify-content:center;gap:150px">${STARTERS.map(([s2, k2], i) => { const on = i === sel;
+        return `<div data-i="${i}" style="display:grid;justify-items:center;gap:6px;cursor:pointer;animation:${on ? "stOpen .45s ease-out forwards" : "none"}">
+          <div style="width:96px;height:96px;${on ? "" : "animation:stWob 2.4s ease-in-out " + i * 0.4 + "s infinite"}">${ball(on, on, typeHex(k2))}</div>
+          <span style="padding:2px 14px;border-radius:999px;font-weight:900;font-size:14px;letter-spacing:1px;background:${on ? "#fff" : "rgba(255,255,255,.4)"};color:${on ? typeHex(k2) : "#fff"}">${k2}</span></div>`; }).join("")}</div>`;
+      balls.querySelectorAll("[data-i]").forEach(e => { e.onmouseenter = () => { if (picking && sel !== +e.dataset.i) { sel = +e.dataset.i; draw(true); } }; e.onclick = () => { if (picking) { sel = +e.dataset.i; draw(); pick(); } }; });
+      plate.innerHTML = `<div class="g-fadein" style="position:relative;padding:18px 24px;border-radius:26px;background:rgba(255,255,255,.9);border:4px solid #fff;box-shadow:0 12px 28px rgba(30,40,84,.28)">
+        <div style="font-weight:900;font-size:14px;letter-spacing:1.2px;color:${darkerHex(tc, 0.2)}">THE ${kind} POKéMON</div><div class="g-title" style="font-size:36px;line-height:1.1;color:#26304A">${esc(ourName(sid))}</div>
+        <div style="display:flex;gap:8px;margin:8px 0 10px">${d.stats.types.map(typeChip).join("")}</div><div style="font-size:18px;font-weight:800;line-height:1.45;color:#26304A">${esc(line)}</div></div>`;
+      if (burst) { flash.innerHTML = `<div style="position:absolute;left:50%;top:48%;width:420px;height:420px;margin:-210px 0 0 -210px;border-radius:50%;background:radial-gradient(circle,#fff 0,rgba(255,255,255,.6) 30%,transparent 65%);animation:stBurst .5s ease-out forwards"></div>`; }
+    };
     const pick = async () => {
       picking = false; const [sid, kind] = STARTERS[sel], n = ourName(sid);
       const v = await C.say([{ who: "PROF. OAK", text: `So! You want the ${kind} POKéMON, **${n}**?`, ask: ["YES", "NO"] }]);
       if (!C.alive()) return;
-      if (v !== 0) { picking = true; C.say([{ who: "PROF. OAK", text: "Which POKéMON will you choose?" }], { keep: true }); return; }
-      await C.say([{ text: `**${G.name}** received **${n}**!` }, { who: "PROF. OAK", text: "ROUTE 1 is just north of here. Good luck!" }]); if (C.alive()) go("hud");
+      if (v !== 0) { picking = true; C.say([{ who: "PROF. OAK", text: "Take your time. Which one will you choose?" }], { keep: true }); return; }
+      await C.say([{ text: `**{N}** received **${n}**!` }, { who: "PROF. OAK", text: "ROUTE 1 is just north of here. Good luck!" }]); if (C.alive()) go("hud");
     };
-    paint(); C.say([{ who: "PROF. OAK", text: "Which POKéMON will you choose?" }], { keep: true });
+    draw(); C.say([{ who: "PROF. OAK", text: "Three balls, three POKéMON. Look in each one. Which will you choose?" }], { keep: true });
+    hints([["A", "Choose"]]);
     return { key: k => {
-      if (picking && (k === "left" || k === "right")) { sel = (sel + (k === "right" ? 1 : 2)) % 3; paint(); return true; }
+      if (picking && (k === "left" || k === "right")) { sel = (sel + (k === "right" ? 1 : 2)) % 3; draw(true); return true; }
       if (picking && k === "a") { pick(); return true; }
       return C.key(k); } };
   }

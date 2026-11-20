@@ -1,6 +1,10 @@
 // ---------- the game screen: built at 1280 by 720, scaled to whatever the stage is ----------
 const stageEl = $("#stage"), uiRoot = $("#ui"), bgEl = $("#bg");
-function fitUI() { const w = stageEl.clientWidth || 1280; uiRoot.style.transform = `scale(${w / 1280})`; }
+// What's drawn on the backdrop itself (glows, swirls, drifting embers and bubbles): behind the 3D scene, never over it.
+const bgArt = document.createElement("div");
+Object.assign(bgArt.style, { position: "absolute", left: "0", top: "0", width: "1280px", height: "720px", transformOrigin: "0 0", overflow: "hidden", pointerEvents: "none" });
+bgEl.appendChild(bgArt);
+function fitUI() { const w = stageEl.clientWidth || 1280; uiRoot.style.transform = `scale(${w / 1280})`; bgArt.style.transform = `scale(${w / 1280})`; }
 new ResizeObserver(fitUI).observe(stageEl);
 function uiScale() { return (stageEl.clientWidth || 1280) / 1280; }
 function h(tag, cls, html, style) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; if (style) Object.assign(e.style, style); return e; }
@@ -64,6 +68,54 @@ function gender(g) { return g === "F" ? `<span style="color:#FF8FB1">&#9792;</sp
 function darkerHex(c, k) { const v = mixc(hx(c), [0, 0, 0], k); return "#" + v.map(x => Math.round(x).toString(16).padStart(2, "0")).join(""); }
 function lighterHex(c, k) { const v = mixc(hx(c), [255, 255, 255], k); return "#" + v.map(x => Math.round(x).toString(16).padStart(2, "0")).join(""); }
 function money(n) { return "&#8381;" + n.toLocaleString("en-GB"); }
+
+// ---------- the backdrop's own light: soft glows and swirls, behind everything (never lines over the creatures) ----------
+function bgAdd(html, style) { const e = h("div", "", html, Object.assign({ position: "absolute", inset: "0" }, style || {})); bgArt.appendChild(e); return e; }
+// A soft bloom of light from a point (x, y in %), with a wide pale ring round it, as Let's Go's backdrops glow.
+function rays(x = 20, y = 10, a = 0.16) {
+  return bgAdd("", { background: `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,${Math.min(0.85, a * 4.2)}) 0%, rgba(255,255,255,${a * 1.6}) 22%, transparent 48%),
+    radial-gradient(circle at ${x}% ${y}%, transparent 52%, rgba(255,255,255,${a}) 60%, transparent 70%)` });
+}
+// Each creature's own backdrop (as Let's Go's STATS pages): its type's colours (both types if it has two), a great
+// soft swirl of light, blurred dots of light, and its own drifting things: embers for fire, bubbles for water, leaves
+// for grass, sparks for electric, snow for ice... Placed by its name, so each creature's is its own.
+const MONBG = {
+  FIRE: [["#FFE2A0", "#F48A5A", "#B4466E"], "ember"], WATER: [["#DDF7FF", "#5FC4EE", "#2C66B4"], "bubble"], GRASS: [["#F3FFC0", "#71D18C", "#1D8A78"], "leaf"],
+  ELECTRIC: [["#FFF8BE", "#FFD43E", "#E3841C"], "spark"], NORMAL: [["#FFF6EA", "#F5C8B6", "#C687A6"], "mote"], POISON: [["#F5DEFF", "#B97BE2", "#64358F"], "bubble"],
+  GROUND: [["#FFF2D2", "#E1AE6C", "#966338"], "dust"], ROCK: [["#F5EFDD", "#C9B487", "#7A6646"], "dust"], FLYING: [["#F6FBFF", "#A9C9F5", "#6684D6"], "mote"],
+  PSYCHIC: [["#FFE8F2", "#F08AB6", "#934897"], "star"], BUG: [["#F7FFCA", "#B6DA4C", "#5A882A"], "firefly"], ICE: [["#F4FFFF", "#A9E9F2", "#57A4C6"], "snow"],
+  FIGHTING: [["#FFE3D3", "#E27C5C", "#963838"], "ember"], GHOST: [["#ECE4FF", "#8C7CD2", "#382C66"], "wisp"], DRAGON: [["#E2EDFF", "#6C8CEA", "#37379A"], "star"],
+  STEEL: [["#F2F6FA", "#ACBACA", "#5B6B80"], "glint"], DARK: [["#ECE4EC", "#8C7C8C", "#382E3C"], "mote"], FAIRY: [["#FFEAF4", "#F6A6CC", "#B65C9C"], "star"] };
+function hashStr(s) { let x = 2166136261; for (const c of String(s)) { x ^= c.charCodeAt(0); x = Math.imul(x, 16777619); } return x >>> 0; }
+function monBackdrop(sid, o = {}) {
+  const d = sp(sid), types = d.stats.types.map(t => String(t).toUpperCase()), [cols, kind] = MONBG[types[0]] || MONBG.NORMAL, two = types[1] && MONBG[types[1]] ? MONBG[types[1]][0] : null;
+  let seed = hashStr(sid); const rnd = () => (seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) / 4294967296;
+  // The swirl's middle sits behind the creature (cx, cy), its arc sweeping round it.
+  const cx = o.cx ?? 32, cy = o.cy ?? 62, sx = cx + 18 + rnd() * 14, sy = cy - 22 + rnd() * 16;
+  backdrop(`radial-gradient(ellipse 60% 70% at ${cx}% ${cy}%, rgba(255,255,255,.62) 0%, rgba(255,255,255,.22) 30%, transparent 58%),
+    radial-gradient(circle at ${sx}% ${sy}%, transparent 30%, rgba(255,255,255,.34) 37%, rgba(255,255,255,.12) 44%, transparent 52%),
+    radial-gradient(circle at ${sx - 6}% ${sy + 8}%, transparent 46%, rgba(255,255,255,.2) 52%, transparent 60%),
+    ${two ? `radial-gradient(ellipse at 100% 0%, ${two[1]}cc 0%, transparent 55%),` : ""}
+    linear-gradient(${120 + Math.round(rnd() * 40)}deg, ${cols[0]} 0%, ${cols[1]} 46%, ${cols[2]} 100%)`);
+  // Blurred dots of light.
+  let dots = ""; for (let i = 0; i < 14; i++) { const r = 18 + rnd() * 46; dots += `<span style="position:absolute;left:${rnd() * 100}%;top:${rnd() * 100}%;width:${r}px;height:${r}px;border-radius:50%;background:rgba(255,255,255,${0.12 + rnd() * 0.22});filter:blur(${2 + rnd() * 6}px)"></span>`; }
+  bgAdd(dots);
+  // Its own drifting things.
+  const P = { ember: (c) => `width:7px;height:7px;border-radius:50%;background:radial-gradient(circle,#FFF6C0,${cols[1]} 60%,transparent 72%);box-shadow:0 0 10px ${cols[1]}`,
+    bubble: () => `width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.75);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.7) 0 18%,transparent 30%)`,
+    leaf: () => `width:20px;height:10px;border-radius:0 100% 0 100%;background:linear-gradient(135deg,#C8F28A,#4FAE5C)`,
+    spark: () => `width:12px;height:12px;background:#FFFBE0;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);filter:drop-shadow(0 0 4px #FFE45A)`,
+    star: () => `width:12px;height:12px;background:#fff;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);filter:drop-shadow(0 0 4px #fff)`,
+    snow: () => `width:9px;height:9px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff`, firefly: () => `width:7px;height:7px;border-radius:50%;background:#F8FFB0;box-shadow:0 0 12px #EFFF7A`,
+    dust: () => `width:6px;height:6px;border-radius:50%;background:rgba(255,246,220,.8)`, mote: () => `width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 0 8px #fff`,
+    wisp: () => `width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,rgba(220,210,255,.9),transparent 70%)`, glint: () => `width:10px;height:10px;background:#fff;clip-path:polygon(50% 0,58% 42%,100% 50%,58% 58%,50% 100%,42% 58%,0 50%,42% 42%)` };
+  const rise = { ember: 1, bubble: 1, spark: 0, star: 0, wisp: 1, firefly: 0, glint: 0, mote: 0, dust: 0 }[kind], fall = kind === "leaf" || kind === "snow";
+  let bits = ""; for (let i = 0; i < 22; i++) { const x = rnd() * 100, y = rnd() * 100, t = 5 + rnd() * 7, dl = -rnd() * t, sc = 0.6 + rnd() * 0.9;
+    const an = rise ? `bgRise ${t}s linear ${dl}s infinite` : fall ? `bgFall ${t * 1.3}s linear ${dl}s infinite` : `bgTwinkle ${2 + rnd() * 3}s ease-in-out ${dl}s infinite`;
+    bits += `<span style="position:absolute;left:${x}%;top:${y}%;transform:scale(${sc});${P[kind]()};animation:${an}"></span>`; }
+  bgAdd(bits + `<style>@keyframes bgRise{from{transform:translate(0,120px);opacity:0}15%{opacity:1}to{transform:translate(30px,-260px);opacity:0}}@keyframes bgFall{from{transform:translate(0,-140px) rotate(0);opacity:0}15%{opacity:1}to{transform:translate(-60px,260px) rotate(320deg);opacity:0}}@keyframes bgTwinkle{0%,100%{opacity:.15;transform:scale(.5)}50%{opacity:1;transform:scale(1.1)}}</style>`);
+  return { cols, kind };
+}
 
 // ---------- little pictures of our creatures, for lists: each drawn once from its model, three-quarters on ----------
 const PORTRAIT = {}, portraitWaits = {};
@@ -164,7 +216,7 @@ function later(ms, fn) { const t = setTimeout(fn, ms); timers.push(t); return t;
 function clearTimers() { for (const t of timers) { clearTimeout(t); clearInterval(t); } timers = []; }
 function go(id, arg) {
   if (cur && cur.leave) cur.leave();
-  clearTimers(); uiRoot.innerHTML = ""; backdrop(null);
+  clearTimers(); uiRoot.innerHTML = ""; bgArt.innerHTML = ""; backdrop(null);
   curDef = BY[id]; curId = id; curArg = arg;
   if (SKYFOR[curDef.scene]) backdrop(SKYFOR[curDef.scene]);
   setScene(curDef.scene, curDef.sceneOpts && curDef.sceneOpts(arg));
