@@ -462,21 +462,25 @@ const TOWN_HERE = { "PALLET TOWN": ["PROF. OAK's LAB", "Your house", "Rival's ho
   "FUCHSIA CITY": ["POKéMON CENTER", "POKé MART", "GYM", "SAFARI ZONE"], "CINNABAR ISLAND": ["POKéMON CENTER", "POKé MART", "GYM", "LAB"],
   "INDIGO PLATEAU": ["POKéMON CENTER", "POKéMON LEAGUE"] };
 const BEEN = ["pallet_town", "route_1", "viridian_city", "route_22", "route_2", "pewter_city"];
-let MAPIMG = null;
-function mapImage() { if (!MAPIMG) { MAPIMG = new Image(); MAPIMG.src = MAPDATA.img; } return MAPIMG; }
+// Kanto and Johto, each its own baked map; Johto lies west, past the end of ROUTE 27.
+const MAPIMG = {};
+const REGION = r => r === "johto" ? MAPDATA.johto : MAPDATA;
+function mapImage(r = "kanto") { if (!MAPIMG[r]) { MAPIMG[r] = new Image(); MAPIMG[r].src = REGION(r).img; } return MAPIMG[r]; }
+const JOHTO_X = -1180;
 screen("map", "Menus", "Town Map", {
-  what: "The real Town Map: Kanto as it is in your world, drawn from above in soft colours from the blocks themselves. Every town, route and place is a square with its name beside it, at every zoom (a name is only left out where it would sit on another). Point at one to see what's there, with a picture of it at the top of the panel (the pictures are to come: until then it's the map, close in).",
+  what: "The real Town Map: Kanto, and Johto beside it (the arrow at the side, or left past the westmost place), as they are in your world, drawn from above in soft colours from the blocks themselves. The place you're on is framed in a bright box. Its panel says how its POKéMON are found (grass, surfing, fishing, headbutting trees, smashing rocks) and shows them. Every town, route and place is a square with its name beside it, at every zoom (a name is only left out where it would sit on another). Point at one to see what's there, with a picture of it at the top of the panel (the pictures are to come: until then it's the map, close in).",
   mod: "TownMapScreen and TownMap: the same baked map (townmap/r.*.bin), the same colours and shading. Q and E zoom, C comes back to you, a town you've been to can be flown to. In game the places come from the zones you mark.",
   try: ["Arrows to move between places; left again from the westmost one (or the JOHTO arrow) goes to Johto.", "+ and - (or the mouse wheel) to zoom, drag to look around.", "C to come back to you. A on a town you've been to: FLY HERE."],
-  make() {
+  make(arg) {
     backdrop("#348CCE");
-    const P = MAPDATA.points, [bx0, bz0] = MAPDATA.box, MW = MAPDATA.w, MH = MAPDATA.h, VW = 900, VH = 680;
+    const YOU = { x: -797, z: 702, yaw: 0 };
+    // Kanto and Johto: an arrow at the map's side flips between them. If you're past the line on ROUTE 27 when you open
+    // the map, it opens on Johto.
+    const region = arg && arg.region ? arg.region : YOU.x < JOHTO_X ? "johto" : "kanto", RD = REGION(region);
+    const P = RD.points, [bx0, bz0] = RD.box, MW = RD.w, MH = RD.h, VW = 900, VH = 680;
     const FIT = Math.min(VW / MW, VH / MH), ZOOMS = [FIT, 1.5, 3, 6];
     let zi = 0, cx = bx0 + MW / 2, cz = bz0 + MH / 2, tx = cx, tz = cz, sel = 0, t0 = performance.now(), alive = true;
-    const YOU = { x: -797, z: 702, yaw: 0 };
-    // Kanto and Johto: an arrow at the map's side flips between them. Johto lies west, past the end of ROUTE 27; if
-    // you're over that line when you open the map, it opens on Johto.
-    const JOHTO_X = -1180; let region = YOU.x < JOHTO_X ? "johto" : "kanto", slide = 0;
+    const youHere = YOU.x >= bx0 && YOU.x <= bx0 + MW && YOU.z >= bz0 && YOU.z <= bz0 + MH;
     const M = box(20, 20, VW, VH, "g-panel", ""); M.style.overflow = "hidden"; M.style.padding = "0"; M.style.cursor = "grab";
     const cv = document.createElement("canvas"); cv.width = VW * 2; cv.height = VH * 2; Object.assign(cv.style, { width: VW + "px", height: VH + "px", display: "block" }); M.appendChild(cv);
     const ctx = cv.getContext("2d");
@@ -496,20 +500,8 @@ screen("map", "Menus", "Town Map", {
     const paint = now => {
       if (!alive) return;
       cx += (tx - cx) * 0.2; cz += (tz - cz) * 0.2;
-      slide += ((region === "johto" ? 1 : 0) - slide) * 0.16;
       ctx.setTransform(2, 0, 0, 2, 0, 0); ctx.fillStyle = "#348CCE"; ctx.fillRect(0, 0, VW, VH);
-      if (slide > 0.01) {
-        // Johto: its land isn't in the world yet, so its page waits, in the same sea.
-        const ox = (slide - 1) * VW;
-        ctx.save(); ctx.translate(ox, 0); ctx.fillStyle = "#3A93D2"; ctx.fillRect(0, 0, VW, VH);
-        ctx.strokeStyle = "rgba(255,255,255,.08)"; ctx.lineWidth = 1; for (let x = 0; x < VW; x += 28) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, VH); ctx.stroke(); } for (let y = 0; y < VH; y += 28) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(VW, y); ctx.stroke(); }
-        ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = "#fff"; ctx.font = "600 64px Fredoka, Nunito, system-ui, sans-serif"; ctx.fillText("JOHTO", VW / 2, VH / 2 - 40);
-        ctx.font = "800 17px Nunito, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.9)"; ctx.fillText("Its land isn't in your world yet.", VW / 2, VH / 2 + 18); ctx.fillText("When it is, its towns and routes show here as Kanto's do.", VW / 2, VH / 2 + 44);
-        ctx.restore();
-        if (slide > 0.99) { requestAnimationFrame(paint); return; }
-        ctx.save(); ctx.translate(slide * VW, 0);
-      } else ctx.save();
-      const img = mapImage(), z = zoom();
+      const img = mapImage(region), z = zoom();
       if (img.complete) { ctx.imageSmoothingEnabled = z < 1; const [ox, oy] = toScreen(bx0, bz0); ctx.drawImage(img, ox, oy, MW * z, MH * z); }
       // The zones the mod knows, faintly, once you're in close.
       if (zi >= 1) for (const p of P) if (p.zone) { const [a, b] = toScreen(p.zone[0], p.zone[1]), [c, d] = toScreen(p.zone[2], p.zone[3]); ctx.strokeStyle = "rgba(255,244,216,.55)"; ctx.setLineDash([6, 5]); ctx.lineWidth = 1.5; ctx.strokeRect(a, b, c - a, d - b); ctx.setLineDash([]); }
@@ -517,6 +509,14 @@ screen("map", "Menus", "Town Map", {
       // Every place is a square: towns big and filled (red once you've been, grey before), routes and other places
       // smaller, white with a red edge. The one you're on is yellow, with a pulse round it.
       const sq = (sx, sy, r, fill, edge, lw) => { rr(sx - r, sy - r, r * 2, r * 2, Math.max(3, r * 0.42)); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = lw; ctx.strokeStyle = edge; ctx.stroke(); };
+      // The place you're on, framed as the old Town Map frames it: a bright box round its area (its zone where the
+      // mod knows it), the land inside lit a little, the rest of the map dimmed a touch.
+      { const p = P[sel], hw = p.zone ? null : p.kind === "town" ? 34 : p.kind === "spot" ? 20 : 26;
+        const [a1, b1] = p.zone ? toScreen(p.zone[0], p.zone[1]) : toScreen(p.x - hw, p.z - hw), [a2, b2] = p.zone ? toScreen(p.zone[2], p.zone[3]) : toScreen(p.x + hw, p.z + hw);
+        const pad = 4, x = Math.min(a1, a2) - pad, y = Math.min(b1, b2) - pad, w = Math.abs(a2 - a1) + pad * 2, hh = Math.abs(b2 - b1) + pad * 2;
+        ctx.save(); ctx.fillStyle = "rgba(16,30,60,.18)"; ctx.beginPath(); ctx.rect(0, 0, VW, VH); rr(x, y, w, hh, 8); ctx.fill("evenodd"); ctx.restore();
+        rr(x, y, w, hh, 8); ctx.fillStyle = "rgba(255,248,214,.14)"; ctx.fill();
+        ctx.lineWidth = 6; ctx.strokeStyle = `rgba(255,212,90,${0.35 + pulse * 0.3})`; ctx.stroke(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#FFFFFF"; ctx.stroke(); }
       const spots = [];
       P.forEach((p, i) => {
         const [sx, sy] = toScreen(p.x, p.z); if (sx < -40 || sy < -40 || sx > VW + 40 || sy > VH + 40) return;
@@ -538,41 +538,37 @@ screen("map", "Menus", "Town Map", {
       }
       // You: the arrow, the way you face.
       const [yx, yy] = toScreen(YOU.x, YOU.z);
-      ctx.save(); ctx.translate(yx, yy); ctx.rotate(YOU.yaw); ctx.beginPath(); ctx.moveTo(0, -11); ctx.lineTo(8, 8); ctx.lineTo(0, 4); ctx.lineTo(-8, 8); ctx.closePath();
-      ctx.fillStyle = "#FFD45A"; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#26304A"; ctx.stroke(); ctx.restore();
+      if (youHere) { ctx.save(); ctx.translate(yx, yy); ctx.rotate(YOU.yaw); ctx.beginPath(); ctx.moveTo(0, -11); ctx.lineTo(8, 8); ctx.lineTo(0, 4); ctx.lineTo(-8, 8); ctx.closePath();
+      ctx.fillStyle = "#FFD45A"; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = "#26304A"; ctx.stroke(); ctx.restore(); }
       // Scale bar.
       const blocks = zi === 0 ? 200 : zi === 1 ? 100 : zi === 2 ? 50 : 20, bw = blocks * z;
       ctx.fillStyle = "rgba(255,255,255,.9)"; rr(14, VH - 40, bw + 90, 26, 13); ctx.fill(); ctx.fillStyle = "#26304A"; ctx.fillRect(26, VH - 28, bw, 4);
       ctx.font = "900 12px Nunito, system-ui, sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(blocks + " blocks", 34 + bw, VH - 26);
-      ctx.restore();
       requestAnimationFrame(paint);
     };
     const drawInfo = () => {
-      if (region === "johto") { info.innerHTML = `<div class="g-label">Region</div><div class="g-title" style="font-size:34px;margin:6px 0 10px">JOHTO</div>
-        <div style="font-size:18px;font-weight:800;line-height:1.45;color:var(--g-text)">West of Kanto, past the end of ROUTE 27.</div>
-        <div style="margin-top:14px;font-size:16px;font-weight:800;line-height:1.45;color:var(--g-muted)">Its towns and routes show here, with their pictures, once its land is in your world. Cross the line on ROUTE 27 and the map opens here by itself.</div>
-        <div style="margin-top:auto" class="g-chip" onclick="">&#9654; Back to KANTO</div>`; info.lastElementChild.onclick = () => flip(); return; }
       const p = P[sel], been = BEEN.includes(p.key), here = TOWN_HERE[p.name] || p.here || [];
       const wild = p.wild.slice(0, GYMS[p.name] ? 4 : 8);
       // A picture of the place at the top, as Let's Go's map has. Its own pictures are to come (one for every town,
       // route and place); until then it's the map itself, close in round it.
-      info.innerHTML = `<div style="position:relative;margin:-8px -8px 14px;height:150px;border-radius:18px;overflow:hidden;background:#348CCE;box-shadow:0 0 0 3px #fff,0 6px 14px rgba(30,40,84,.22);transform:rotate(-1.2deg)">
+      info.innerHTML = `<div style="position:relative;flex:none;margin:-8px -8px 14px;height:150px;border-radius:18px;overflow:hidden;background:#348CCE;box-shadow:0 0 0 3px #fff,0 6px 14px rgba(30,40,84,.22);transform:rotate(-1.2deg)">
           <canvas id="mapPic" width="544" height="300" style="width:100%;height:100%;display:block"></canvas>
           <span style="position:absolute;left:10px;bottom:8px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.92);font-size:11.5px;font-weight:900;letter-spacing:1px;color:#6F7A99">PICTURE TO COME</span></div>
-        <div class="g-label">${p.key === "pallet_town" ? "You are here" : KIND[p.kind] || "Place"}</div>
+        <div class="g-label" style="flex:none">${p.key === "pallet_town" && region === "kanto" ? "You are here" : (KIND[p.kind] || "Place") + " · " + (region === "johto" ? "JOHTO" : "KANTO")}</div>
         <div class="g-title" style="font-size:${p.name.length > 14 ? 27 : 32}px;line-height:1.1;margin:6px 0 10px">${esc(p.name)}</div>
         ${p.tag ? `<div style="font-size:18px;font-weight:800;line-height:1.45;color:var(--g-text);font-style:italic">"${esc(p.tag)}"</div>` : ""}
         ${here.length ? `<div class="g-label" style="margin-top:16px">Here</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px">${here.map(x => `<span style="display:inline-flex;align-items:center;gap:7px;font-size:14.5px;font-weight:900;padding:4px 11px;border-radius:999px;background:#F1F4FB"><span style="width:8px;height:8px;border-radius:3px;background:#E5525C"></span>${esc(x)}</span>`).join("")}</div>` : ""}
         ${GYMS[p.name] ? (([lead, type, b, lv]) => `<div class="g-label" style="margin-top:16px">Gym</div><div style="display:grid;grid-template-columns:58px 1fr;gap:4px 12px;align-items:center;margin-top:8px;padding:10px 12px;border-radius:16px;background:#F1F4FB">
           <span style="grid-row:span 3;width:58px;height:58px">${badgeSvg(b)}</span><span style="font-size:19px;font-weight:900">${esc(lead)}</span>
           <span style="font-size:14px;font-weight:900;color:var(--g-muted)">${esc(type)} type · ${esc(BADGES[b][0])}</span><span style="font-size:14px;font-weight:800;color:var(--g-text)">Team from level ${esc(lv)}</span></div>`)(GYMS[p.name]) : ""}
-        ${wild.length ? `<div class="g-label" style="margin-top:16px">Wild POKéMON</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">${wild.map(sid => DATA.species[sid]
+        ${p.how && p.how.length ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:14px">${p.how.filter((x, i, a) => a.indexOf(x) === i).map(x => `<span style="font-size:12px;font-weight:900;letter-spacing:.5px;padding:3px 9px;border-radius:999px;background:${{ Grass: "#D9F5C8", Surfing: "#CFE8FF", Fishing: "#CFF2F0", Headbutt: "#F3E2C8", "Rock Smash": "#E8E2DA", Swarms: "#FFE3CC", "Bug-Catching Contest": "#EEF6C8" }[x] || "#F1F4FB"};color:#26304A">${esc(x)}</span>`).join("")}</div>` : ""}
+        ${wild.length ? `<div class="g-label" style="margin-top:10px">Wild POKéMON <span style="color:var(--g-muted)">(${p.wild.length})</span></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">${wild.map(sid => DATA.species[sid]
           ? `<div title="${esc(DATA.species[sid].pname)}" style="aspect-ratio:1;border-radius:12px;background:#F1F4FB;display:grid;place-items:center">${pic(sid, 56)}</div>`
           : `<div title="${esc(sid)}" style="aspect-ratio:1;border-radius:12px;background:#F1F4FB;display:grid;place-items:center;font-size:26px;font-weight:900;color:var(--g-dim)">?</div>`).join("")}</div>` : ""}
         <div style="margin-top:auto;padding-top:12px;display:grid;gap:8px">
           ${p.kind === "town" ? (been ? `<div class="g-chip on" style="justify-content:center;font-size:17px;padding:8px">A: FLY HERE</div>` : `<div class="g-chip" style="justify-content:center;font-size:15px;padding:8px;opacity:.7">Not been here yet</div>`) : ""}
           <div style="font-size:12.5px;font-weight:800;color:var(--g-muted);line-height:1.35">${p.zone ? `Zone in the mod: ${p.zone[0]}, ${p.zone[1]} to ${p.zone[2]}, ${p.zone[3]}` : `About ${p.x}, ${p.z} on your map`}</div></div>`;
-      const pc = $("#mapPic"), img = mapImage();
+      const pc = $("#mapPic"), img = mapImage(region);
       const paintPic = () => { if (!pc || !img.complete) return; const g = pc.getContext("2d"), k = 5, w = pc.width / k, hh = pc.height / k; g.imageSmoothingEnabled = false;
         g.fillStyle = "#348CCE"; g.fillRect(0, 0, pc.width, pc.height); g.drawImage(img, p.x - bx0 - w / 2, p.z - bz0 - hh / 2, w, hh, 0, 0, pc.width, pc.height); };
       if (img.complete) paintPic(); else img.addEventListener("load", paintPic, { once: true });
@@ -585,14 +581,15 @@ screen("map", "Menus", "Town Map", {
     let drag = null;
     M.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, tx, tz, moved: false }; M.setPointerCapture(e.pointerId); M.style.cursor = "grabbing"; });
     // Pointing at a place picks it (no need to hit it exactly: the nearest within a finger's width).
-    const nearest = e => { if (region === "johto") return -1; const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k; let best = -1, bd = 24;
+    const nearest = e => { const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k; let best = -1, bd = 24;
       P.forEach((p, i) => { const [sx, sy] = toScreen(p.x, p.z), dd = Math.hypot(sx - mx, sy - my); if (dd < bd) { bd = dd; best = i; } }); return best; };
     M.addEventListener("pointermove", e => { if (!drag) { const b = nearest(e); if (b >= 0 && b !== sel) { sel = b; drawInfo(); } M.style.cursor = b >= 0 ? "pointer" : "grab"; return; } const k = uiScale(), dx = (e.clientX - drag.x) / k, dy = (e.clientY - drag.y) / k; if (Math.hypot(dx, dy) > 4) drag.moved = true; tx = drag.tx - dx / zoom(); tz = drag.tz - dy / zoom(); clampC(); cx = tx; cz = tz; });
     M.addEventListener("pointerup", e => { M.style.cursor = "grab"; const d = drag; drag = null; if (!d || d.moved) return;
       const best = nearest(e); if (best >= 0) pick(best); });
     M.addEventListener("wheel", e => { e.preventDefault(); const r = M.getBoundingClientRect(), k = uiScale(), mx = (e.clientX - r.left) / k, my = (e.clientY - r.top) / k;
       const wx = cx + (mx - VW / 2) / zoom(), wz = cz + (my - VH / 2) / zoom(); setZoom(zi + (e.deltaY < 0 ? 1 : -1), wx, wz); }, { passive: false });
-    pick(0); requestAnimationFrame(paint);
+    pick(Math.max(0, arg && arg.key ? P.findIndex(q => q.key === arg.key) : 0)); requestAnimationFrame(paint);
+    if (arg && arg.slide) { M.animate([{ transform: `translateX(${arg.slide * 60}px)`, opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 380, easing: "cubic-bezier(.2,.8,.2,1)" }); }
     // The way to the other region: an arrow tab at the map's edge, bobbing gently, JOHTO on the left, KANTO on the right.
     const side = box(0, 0, null, null, "", ""); side.style.zIndex = "3";
     add(h("style", "", `@keyframes mapbobL{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}@keyframes mapbobR{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
@@ -604,7 +601,7 @@ screen("map", "Menus", "Town Map", {
         : `<div class="m-reg" style="left:${20 + VW - 160}px;top:${20 + VH / 2 - 28}px;animation:mapbobR 1.6s ease-in-out infinite">KANTO<svg viewBox="0 0 24 24"><path d="M8 4l9 8-9 8" fill="none" stroke="#E5525C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
       side.firstChild.onclick = () => flip();
     };
-    const flip = () => { region = region === "kanto" ? "johto" : "kanto"; drawSide(); drawInfo(); };
+    const flip = () => { alive = false; go("map", { region: region === "kanto" ? "johto" : "kanto", slide: region === "kanto" ? -1 : 1 }); };
     drawSide();
     // A big, plain way out: BACK, top left over the map.
     const back = box(38, 36, null, null, "", `<span class="g-act" style="min-width:0;height:52px;font-size:20px;padding:0 20px 0 8px"><span class="g-key k-b" style="width:36px;height:36px">B</span>${esc(T("Back"))}</span>`);
@@ -612,12 +609,11 @@ screen("map", "Menus", "Town Map", {
     hints([["+", "Zoom in"], ["-", "Zoom out"], ["C", "You"], ["B", "Back"]]);
     return {
       raw(e) { if (e.code === "Equal" || e.code === "NumpadAdd") { setZoom(zi + 1); return true; } if (e.code === "Minus" || e.code === "NumpadSubtract") { setZoom(zi - 1); return true; }
-        if (e.code === "KeyC") { pick(0); setZoom(Math.max(zi, 2), YOU.x, YOU.z); return true; } return false; },
+        if (e.code === "KeyC") { if (!youHere) { flip(); return true; } pick(0); setZoom(Math.max(zi, 2), YOU.x, YOU.z); return true; } return false; },
       key: k => { if (k === "b") { alive = false; go("menu", { sel: 3 }); return true; }
         if (k === "tab") { let i = sel; do { i = (i + 1) % P.length; } while (P[i].kind !== "town"); pick(i); return true; }
         if (k === "a") { const p = P[sel]; if (p.kind === "town" && BEEN.includes(p.key)) { alive = false; G.place = p.name; go("hud"); } return true; }
-        if (region === "johto") { if (k === "right") flip(); return true; }
-        if (["left", "right", "up", "down"].includes(k)) { const n = near(k); if (n === sel && k === "left") { flip(); return true; } pick(n); return true; } return true; },
+        if (["left", "right", "up", "down"].includes(k)) { const n = near(k); if (n === sel && ((k === "left" && region === "kanto") || (k === "right" && region === "johto"))) { flip(); return true; } pick(n); return true; } return true; },
       leave() { alive = false; }
     };
   }

@@ -36,42 +36,68 @@ def skindata():
     return out
 
 MAP_BOX = (-1250, 120, -46, 1000)   # Kanto, in blocks (x0, z0, x1, z1); the top stops short of the island to the north
+JOHTO_BOX = (-2640, 140, -1150, 1000)   # Johto: just above the Lake of Rage to just below the forest point in the south
+
+METHOD = {"grass": "Grass", "water": "Surfing", "old_rod": "Fishing", "good_rod": "Fishing", "super_rod": "Fishing", "headbutt": "Headbutt",
+          "rock_smash": "Rock Smash", "contest": "Bug-Catching Contest", "swarm": "Swarms"}
+SPOT_NAME = {"viridian_forest": "VIRIDIAN FOREST", "pokemon_tower": "POKéMON TOWER", "safari_zone": "SAFARI ZONE", "pokemon_mansion": "POKéMON MANSION",
+             "cerulean_cave": "CERULEAN CAVE", "digletts_cave": "DIGLETT's CAVE", "power_plant": "POWER PLANT", "tohjo_falls": "TOHJO FALLS"}
 
 def mapdata():
-    """The real Town Map of Kanto (baked from the world, as TownMap draws it) and its places, for the Town Map screen."""
+    """The real Town Map (baked from the world, as TownMap draws it) of Kanto and of Johto, with their places, for the Town Map screen."""
     import base64, io, re
     sys.path.insert(0, HERE)
     from townmap_render import render
-    im = render(MAP_BOX, 1)
-    buf = io.BytesIO(); im.save(buf, "PNG", optimize=True)
     data = os.path.join(HERE, "..", "src", "main", "resources", "retromon", "data")
     rows = lambda f: [l.rstrip("\n").split("\t") for l in open(os.path.join(data, f), encoding="utf-8") if l.strip() and not l.startswith("#")]
-    pts = {r[0]: r for r in rows("map_points.tsv") if r[1] == "kanto"}
     land = {r[0]: r[1] for r in rows("place_landmarks.tsv")}
     names = {r[0]: r[2] for r in rows("places.tsv")}
-    wild = {}
-    for r in rows("wild.tsv"):
-        k = land.get(r[0], r[0])
-        for slot in r[4].split(","):
-            sp = slot.split(":")[0]
-            if sp and sp not in wild.setdefault(k, []): wild[k].append(sp)
-    here = {}
-    for place, k in land.items():
-        if place != k and place in names: here.setdefault(k, []).append(names[place])
+    wildrows = rows("wild.tsv")
     java = open(os.path.join(HERE, "..", "src", "main", "java", "com", "insidethecube", "retromon", "client", "Adventure.java"), encoding="utf-8").read()
     signs = dict(re.findall(r'entry\("([A-Z .\']+)", "([^"]+)"\)', java))
-    out = []
-    for l in open(os.path.join(HERE, "uiviewer", "kanto_points.tsv"), encoding="utf-8"):
-        if l.startswith("#") or not l.strip(): continue
-        c = l.rstrip("\n").split("\t")
-        key, x, z = c[0], int(c[1]), int(c[2])
-        mp = pts.get(key)
-        name = mp[5] if mp else names.get(key, key.upper().replace("_", " "))
-        kind = mp[4] if mp else "spot"
-        o = {"key": key, "name": name, "kind": kind, "x": x, "z": z, "wild": wild.get(key, []), "here": sorted(set(here.get(key, [])))[:8], "tag": signs.get(name, "")}
-        if len(c) > 3 and c[3]: o["zone"] = [int(v) for v in c[3].split(",")]
-        out.append(o)
-    return {"img": "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode(), "box": MAP_BOX, "w": im.width, "h": im.height, "points": out}
+    def region(box, tsv, reg):
+        im = render(box, 1)
+        buf = io.BytesIO(); im.save(buf, "PNG", optimize=True)
+        pts = {r[0]: r for r in rows("map_points.tsv") if r[1] == reg}
+        mine = []
+        for l in open(os.path.join(HERE, "uiviewer", tsv), encoding="utf-8"):
+            if l.startswith("#") or not l.strip(): continue
+            mine.append(l.rstrip("\n").split("\t"))
+        keys = [c[0] for c in mine]
+        # Which point a place's wild POKéMON belong to: its own point, a point it's a part of (safari_zone_east ->
+        # safari_zone), or the point of its landmark.
+        def claim(pl):
+            if pl in keys: return pl
+            for k in sorted(keys, key=len, reverse=True):
+                if pl.startswith(k + "_"): return k
+            lm = land.get(pl, pl)
+            return lm if lm in keys else None
+        wild, how, here = {}, {}, {}
+        for r in wildrows:
+            k = claim(r[0])
+            if not k: continue
+            how.setdefault(k, [])
+            m = METHOD.get(r[1], r[1])
+            if m not in how[k]: how[k].append(m)
+            for slot in r[4].split(","):
+                sp = slot.split(":")[0]
+                if sp and sp not in wild.setdefault(k, []): wild[k].append(sp)
+        for pl, lm in land.items():
+            k = claim(pl)
+            if k and pl != k and pl in names and not pl.startswith(k + "_"): here.setdefault(k, []).append(names[pl])
+        out = []
+        for c in mine:
+            key, x, z = c[0], int(c[1]), int(c[2])
+            mp = pts.get(key)
+            name = SPOT_NAME.get(key) or (mp[5] if mp else names.get(key, key.upper().replace("_", " ")))
+            kind = mp[4] if mp and key not in SPOT_NAME else "spot" if key in SPOT_NAME or not mp else mp[4]
+            o = {"key": key, "name": name, "kind": kind, "x": x, "z": z, "wild": wild.get(key, []), "how": how.get(key, []), "here": sorted(set(here.get(key, [])) - {name})[:8], "tag": signs.get(name, "")}
+            if len(c) > 3 and c[3]: o["zone"] = [int(v) for v in c[3].split(",")]
+            out.append(o)
+        return {"img": "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode(), "box": box, "w": im.width, "h": im.height, "points": out}
+    k = region(MAP_BOX, "kanto_points.tsv", "kanto")
+    k["johto"] = region(JOHTO_BOX, "johto_points.tsv", "johto")
+    return k
 
 def emote_pngs():
     """The emote bubbles (tools/emotes.py's), as the game has them, for the screens that show one."""
