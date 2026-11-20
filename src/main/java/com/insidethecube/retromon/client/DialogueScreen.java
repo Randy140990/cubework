@@ -31,7 +31,8 @@ public class DialogueScreen extends GameScreen {
 	/** The nurse's line while your POKéMON are in the machine (-1: none), and when it began (ticks; -1: not yet). */
 	private final int healLine;
 	private int healAt = -1;
-	private static final int HEAL_TICKS = 52;
+	/** The machine's turn (the viewer's 5.2 s): the balls go on one by one, it works, they come back. */
+	private static final int HEAL_TICKS = 104;
 	private static final String[] BADGES = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE", "EARTHBADGE"};
 
 	/** Something got, for the card held up: its name, how many, a badge (0 to 7, -1 for none), and whether it's going into the bag now. */
@@ -158,10 +159,7 @@ public class DialogueScreen extends GameScreen {
 		}
 		if (asks() && yesNo == null && box.atEnd()) yesNo = new Choice(List.of("YES", "NO"));
 		// The healing: once the nurse's line is out, the machine's notes play for a few seconds, then she goes on.
-		if (healLine >= 0 && healAt < 0 && line == healLine && box.typedOut()) {
-			healAt = ticks;
-			Sounds.heal();
-		}
+
 		if (healing() && ticks - healAt >= HEAL_TICKS) {
 			healAt = -2;
 			if (box.press()) done(false);
@@ -170,6 +168,14 @@ public class DialogueScreen extends GameScreen {
 
 	private boolean healing() {
 		return healAt >= 0;
+	}
+
+	/** The nurse's "I'll take your POKéMON" line said and moved on: her machine's turn (the text box goes meanwhile). */
+	private boolean startHeal() {
+		if (healLine < 0 || healAt != -1 || box.message() != healLine || !box.typedOut()) return false;
+		healAt = ticks;
+		Sounds.heal();
+		return true;
 	}
 
 	@Override
@@ -184,6 +190,7 @@ public class DialogueScreen extends GameScreen {
 			return true;
 		}
 		if (Ui.isA(e) || Ui.isB(e)) {
+			if (startHeal()) return true;
 			if (box.press()) done(false);
 			return true;
 		}
@@ -192,7 +199,8 @@ public class DialogueScreen extends GameScreen {
 
 	@Override
 	protected void clickAnywhere() {
-		if (!healing() && yesNo == null && box.press()) done(false);
+		if (healing() || yesNo != null || startHeal()) return;
+		if (box.press()) done(false);
 	}
 
 	@Override
@@ -231,17 +239,12 @@ public class DialogueScreen extends GameScreen {
 		// question's answers in its list above the box's right end.
 		float in = Math.min(1, (ticks + partial) / 5F);
 		float rise = (1 - in * in * (3 - 2 * in)) * 90;
-		g.pose().pushMatrix();
-		g.pose().translate(0, V.s(rise));
-		box.renderV(g, font, 140, 26, 1000, ticks, partial, yesNo == null && !healing());
-		g.pose().popMatrix();
-		if (healing()) {
-			// The machine's notes (the viewer's), popping in and bobbing.
-			float ht = (ticks - healAt + partial) / 20F, pop = Math.min(1, ht / 0.4F), bob = (float) Math.sin(ht * Math.PI * 2) * 4;
-			int c = Ui.alpha(V.GOLD, pop);
-			V.text(g, "♫ ♪", 560 + 4, 210 + 14 + 3 + bob, 46, Ui.alpha(0x59000000, pop), true);
-			V.text(g, "♫ ♪", 560, 210 + 14 + bob, 46, c, true);
-		}
+		if (!healing()) {
+			g.pose().pushMatrix();
+			g.pose().translate(0, V.s(rise));
+			box.renderV(g, font, 140, 26, 1000, ticks, partial, yesNo == null);
+			g.pose().popMatrix();
+		} else machine(g, (ticks - healAt + partial) / HEAL_TICKS, (ticks + partial) / 20F);
 		// Getting something: the UI Viewer's medallion held up over the world (a badge spins in instead).
 		int line = box.message();
 		Get got = gets.get(line);
@@ -267,6 +270,60 @@ public class DialogueScreen extends GameScreen {
 		if (who.isEmpty()) return false;
 		String u = line.trim().toUpperCase(java.util.Locale.ROOT);
 		return u.startsWith(who + " ") || u.startsWith(who + ":");
+	}
+
+	/**
+	 * The nurse's machine at work, as the viewer's: your balls (up to six) go from her hands onto its six cups one by
+	 * one, it glows and they flash, then they come back. Drawn where the machine is behind her counter (the Center's
+	 * room has it 6.45 to 8.55 across, 0.35 and 0.65 back, 1.36 up; she stands at 10, 3.3).
+	 */
+	private void machine(GuiGraphics g, float h, float secs) {
+		net.minecraft.world.entity.Entity nurse = minecraft == null || minecraft.level == null ? null : minecraft.level.getEntity(npc);
+		if (nurse == null) return;
+		net.minecraft.world.phys.Vec3 n = nurse.position();
+		int w = g.guiWidth(), gh = g.guiHeight();
+		// The machine's glow while it works.
+		if (h > 0.4F && h < 0.78F) {
+			float[] gp = Adventure.project(n.add(7.5 - 10, 1.9, 0.18 - 3.3), w, gh);
+			float[] ge = Adventure.project(n.add(7.5 - 10 + 1.6, 1.9, 0.18 - 3.3), w, gh);
+			if (gp != null && ge != null) {
+				float rx = Math.abs(ge[0] - gp[0]);
+				int a = (int) ((0.35 + 0.3 * Math.sin(secs * 16)) * 255);
+				Ui.glow(g, Math.round(gp[0]), Math.round(gp[1]), Math.round(rx), Math.round(rx / 2), (a << 24) | 0xFFB8C8);
+			}
+		}
+		int count = Math.min(6, ClientState.data.party.size());
+		for (int i = 0; i < count; i++) {
+			float on0 = i * 0.06F, a = ease((h - on0) / 0.06F), back = ease((h - 0.78F - i * 0.02F) / 0.12F);
+			if (h <= on0 || back >= 1) continue;
+			double sx = 6.45 + (i % 3) * 1.05 - 10, sy = 1.36, sz = 0.35 + (i / 3) * 0.3 - 3.3;
+			double hx = 0, hy = 1.2, hz = 0.7;
+			double px, py, pz;
+			if (back > 0) {
+				px = sx + (hx - sx) * back;
+				py = sy + (hy - sy) * back + Math.sin(back * Math.PI) * 0.45;
+				pz = sz + (hz - sz) * back;
+			} else {
+				px = hx + (sx - hx) * a;
+				py = hy + (sy - hy) * a + Math.sin(a * Math.PI) * 0.45;
+				pz = hz + (sz - hz) * a;
+			}
+			net.minecraft.world.phys.Vec3 at = n.add(px, py, pz);
+			float[] c = Adventure.project(at, w, gh), top = Adventure.project(at.add(0, 0.15, 0), w, gh);
+			if (c == null || top == null) continue;
+			float r = Math.max(2, Math.abs(c[1] - top[1]));
+			boolean lit = h > 0.4F && h < 0.78F && Math.sin(secs * 14 + i * 1.3) > 0;
+			if (lit) Ui.glow(g, Math.round(c[0]), Math.round(c[1]), Math.round(r * 2.4F), Math.round(r * 2.4F), 0xB3FF8FA8);
+			g.pose().pushMatrix();
+			g.pose().translate(c[0] - r, c[1] - r);
+			g.pose().scale(2 * r / 128F, 2 * r / 128F);
+			g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, V.tex("ball_pok_ball"), 0, 0, 0, 0, 128, 128, 128, 128);
+			g.pose().popMatrix();
+		}
+	}
+
+	private static float ease(float x) {
+		return x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
 	}
 
 	private static int badgeIn(String line) {
