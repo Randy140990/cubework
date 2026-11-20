@@ -185,7 +185,7 @@ public class BattleScreen extends GameScreen {
 			return;
 		}
 		if (message != null) {
-			typed = Math.min(message.length(), typed + textSpeed());
+			typed = Math.min(message.length(), typed + Math.max(1, Math.round(textSpeed())));
 			if (typed >= message.length() && ++hold > 30 && mode == Mode.PLAY) message = null;
 			return;
 		}

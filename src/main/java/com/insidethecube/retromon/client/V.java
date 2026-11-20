@@ -14,8 +14,9 @@ import net.minecraft.resources.Identifier;
 /**
  * The UI Viewer's look, drawn the same way in game. Every screen is laid out on the viewer's own 1280 by 720
  * canvas, which is fitted to the window (as large as it goes, centred), so a panel at (70, 90) here is where it is
- * in the viewer. Its panels (teal glass, a mint rim and a soft shadow), pills, chips, keys, text sizes and colours
- * are the viewer's, in canvas pixels; the backdrop behind them fills the whole window.
+ * in the viewer. Its look is the one John signed off (20 Nov), after Let's Go: white panels with a pastel, pearly
+ * rim and a soft navy shadow; dark ink words in Nunito Sans; titles in Fredoka; names picked out in coral; the one
+ * you're on in sunny yellow; keys in their colours; every screen on its own bright backdrop, filling the window.
  */
 public final class V {
 	private V() {}
@@ -32,10 +33,18 @@ public final class V {
 	 */
 	public static int bx, by;
 
-	// The viewer's colours.
-	public static final int PANEL = 0xFF123C38, PANEL_HI = 0xFF1D5A52, EDGE = 0xFF4FB896, EDGE_LIGHT = 0xFF8FF5C0, TEXT = 0xFFF4F6FF, MUTED = 0xFFA9D4C6,
-			DIM = 0xFF6B9A8E, CREAM = 0xFFFFF4D8, INK = 0xFF26304A, GOLD = 0xFFFFD45A, RED = 0xFFE5525C, AMBER = 0xFFF0B43C, GREEN = 0xFF41BF84, BLUE = 0xFF4A8FE0,
-			SOFT_TEXT = 0xFFCFEDE3;
+	// The viewer's colours (head.html's --g-...): white panels, ink words, coral names, sunny yellow picks.
+	public static final int PANEL = 0xFFFFFFFF, PANEL_HI = 0xFFF4F7FF, EDGE = 0xFFD9DFF0, EDGE_LIGHT = 0xFFF07850, TEXT = 0xFF26304A, MUTED = 0xFF6F7A99,
+			DIM = 0xFFA7AFC6, CREAM = 0xFFFFD34E, INK = 0xFF26304A, GOLD = 0xFFE5583E, RED = 0xFFE5525C, AMBER = 0xFFF0B43C, GREEN = 0xFF41BF84, BLUE = 0xFF4A8FE0,
+			SOFT_TEXT = 0xFF6F7A99, WHITE = 0xFFFFFFFF, TRACK = 0xFFDDE3F0;
+	/** What's picked: the viewer's --g-sel, sunny yellow lit from the top. */
+	public static final int SEL_TOP = 0xFFFFEC8A, SEL_BOTTOM = 0xFFFFC93C;
+	/** The pearly rim round every panel (--g-holo, pink to lilac to sky to mint to butter). */
+	public static final float[] HOLO_AT = {0, 0.26F, 0.5F, 0.74F, 1};
+	public static final int[] HOLO = {0xFFFFB8D2, 0xFFD4BEFF, 0xFFA9DCFF, 0xFFA8F0D2, 0xFFFFE7A1};
+	/** The text box's sheen along to its right end. */
+	private static final float[] SHEEN_AT = {0, 0.6F, 0.78F, 0.9F, 1};
+	private static final int[] SHEEN = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFF1F8, 0xFFECF4FF, 0xFFEEFFF7};
 
 	/** Fits the canvas to a window w by h (GUI pixels). Call at the start of drawing. */
 	public static void fit(int w, int h) {
@@ -92,37 +101,48 @@ public final class V {
 		rr(g, x, y, w, h, h / 2, c);
 	}
 
-	/** A soft drop shadow under a box (the viewer's 0 14px 36px), as a few widening translucent layers. */
+	/** A soft drop shadow under a box (the viewer's 0 12px 30px rgba(30,40,84,.22)), as widening navy layers. */
 	public static void shadow(GuiGraphics g, float x, float y, float w, float h, float r, float strength) {
 		for (int i = 4; i >= 1; i--) {
 			float grow = i * 5;
-			rr(g, x - grow + 1, y + 8 + grow * 0.6F, w + grow * 2 - 2, h + grow * 0.8F, r + grow, Ui.alpha(0xFF000000, strength * 0.09F));
+			rr(g, x - grow + 2, y + 10 + grow * 0.4F, w + grow * 2 - 4, h + grow * 0.6F, r + grow, Ui.alpha(0xFF1E2854, strength * 0.075F));
 		}
 	}
 
-	/** A panel: teal glass, light at the top, a mint rim, a faint inner line and its shadow. */
+	/** Shaded left to right through stops, on the canvas. */
+	public static void rrh(GuiGraphics g, float x, float y, float w, float h, float r, float[] at, int[] cols) {
+		Ui.rrh(g, x(x), y(y), s(w), s(h), s(r), at, cols);
+	}
+
+	/** The sunny yellow of what's picked (--g-sel), as a rounded box. */
+	public static void sel(GuiGraphics g, float x, float y, float w, float h, float r) {
+		rrv(g, x, y, w, h, r, SEL_TOP, SEL_BOTTOM);
+	}
+
+	/** The pearly rim: a rounded box in the holo colours, its inside drawn over it t in. */
+	public static void holo(GuiGraphics g, float x, float y, float w, float h, float r) {
+		rrh(g, x, y, w, h, r, HOLO_AT, HOLO);
+	}
+
+	/** A panel (the viewer's g-panel): its shadow, the pearly rim (3px), white shading to #F7F9FF, a faint line inside its foot. */
 	public static void panel(GuiGraphics g, float x, float y, float w, float h) {
-		panel(g, x, y, w, h, 24, false);
+		panel(g, x, y, w, h, 22, false);
 	}
 
 	public static void panel(GuiGraphics g, float x, float y, float w, float h, float r, boolean soft) {
 		shadow(g, x, y, w, h, r, 1);
-		rr(g, x, y, w, h, r, EDGE);
-		float e = 2.5F;
-		if (soft) rr(g, x + e, y + e, w - 2 * e, h - 2 * e, r - e, 0xD1123C38);
-		else {
-			// rgba(29,90,82,.95) to rgba(18,60,56,.95) by 55%, then flat: in one pass (laying the shading over a flat
-			// panel drew the glass twice above the 55% line, which showed as a line across).
-			Ui.rrv(g, x(x + e), y(y + e), s(w - 2 * e), s(h - 2 * e), s(r - e), 0xF21D5A52, 0xF2123C38, 0.55F);
-		}
-		ring(g, x + e, y + e, w - 2 * e, h - 2 * e, r - e, 1.5F, 0x2E8FF5C0);
+		holo(g, x, y, w, h, r);
+		float e = 3;
+		if (soft) rr(g, x + e, y + e, w - 2 * e, h - 2 * e, Math.max(0, r - e), 0xEBFFFFFF);
+		else rrv(g, x + e, y + e, w - 2 * e, h - 2 * e, Math.max(0, r - e), 0xFFFFFFFF, 0xFFF7F9FF);
+		if (h > 24) rr(g, x + e + r * 0.5F, y + h - e - 3, w - 2 * e - r, 3, 1.5F, 0x1F96A0CD);
 	}
 
-	/** A panel picked out: a cream rim and a cream glow round it. */
+	/** A panel picked out: a sunny rim and a warm glow round it. */
 	public static void panelOn(GuiGraphics g, float x, float y, float w, float h, float r) {
-		rr(g, x - 4, y - 4, w + 8, h + 8, r + 4, 0x66FFF4D8);
+		rr(g, x - 5, y - 5, w + 10, h + 10, r + 5, 0x59FFC93C);
 		panel(g, x, y, w, h, r, false);
-		ring(g, x, y, w, h, r, 2.5F, CREAM);
+		ring(g, x, y, w, h, r, 3, 0xFFFFC93C);
 	}
 
 	/** A triangle pointing right (dir 0), down (1), left (2) or up (3), centred at cx, cy. */
@@ -207,7 +227,7 @@ public final class V {
 
 	// ---------- words ----------
 
-	/** The font's em in GUI pixels at scale 1 (Poppins at 8.5). */
+	/** The font's em in GUI pixels at scale 1 (Nunito Sans and Fredoka at 8.5). */
 	private static final float EM = 8.5F;
 
 	private static Font font() {
@@ -216,6 +236,32 @@ public final class V {
 
 	public static Component comp(String text, boolean bold) {
 		return bold ? Ui.bold(text) : Ui.ui(text);
+	}
+
+	private static final Style TITLE = Style.EMPTY.withFont(new net.minecraft.network.chat.FontDescription.Resource(Retromon.id("title")));
+
+	/** Words in the titles' font (the viewer's g-title: Fredoka 600). */
+	public static Component titleComp(String text) {
+		return Component.literal(Look.text(text)).withStyle(TITLE);
+	}
+
+	/** A title (g-title) at a size, its top at y. */
+	public static void title(GuiGraphics g, String text, float x, float y, float size, int color) {
+		draw(g, titleComp(text), x, y, size, color, false);
+	}
+
+	public static float titleWidth(String text, float size) {
+		return width(titleComp(text), size);
+	}
+
+	public static void titleCentred(GuiGraphics g, String text, float cx, float y, float size, int color) {
+		title(g, text, cx - titleWidth(text, size) / 2, y, size, color);
+	}
+
+	/** Words with a soft dark shadow under them (white words on a bright backdrop: text-shadow 0 2px 4px). */
+	public static void soft(GuiGraphics g, Component c, float x, float y, float size, int color) {
+		draw(g, c.copy(), x + 0.6F, y + 2, size, 0x47000000, false);
+		draw(g, c, x, y, size, color, false);
 	}
 
 	/** Words as written, with no names swapped for our creatures' ("Stands in for #025 PIKACHU"). */
@@ -282,6 +328,36 @@ public final class V {
 		return Math.max(0, w - spacing);
 	}
 
+	/** The title's other fonts: Archivo (700) for its small spaced words. */
+	public static final Style ARCHIVO = Style.EMPTY.withFont(new net.minecraft.network.chat.FontDescription.Resource(Retromon.id("archivo")));
+
+	/** Words in a font of their own (style), their letters spaced apart. */
+	public static void trackedIn(GuiGraphics g, Style font, String text, float x, float y, float size, int color, float spacing) {
+		String t = Look.text(text);
+		float cx = x;
+		for (int i = 0; i < t.length(); i++) {
+			Component ch = Component.literal(t.substring(i, i + 1)).withStyle(font);
+			draw(g, ch, cx, y, size, color, false);
+			cx += width(ch, size) + spacing;
+		}
+	}
+
+	public static float trackedWidthIn(Style font, String text, float size, float spacing) {
+		String t = Look.text(text);
+		float w = 0;
+		for (int i = 0; i < t.length(); i++) w += width(Component.literal(t.substring(i, i + 1)).withStyle(font), size) + spacing;
+		return Math.max(0, w - spacing);
+	}
+
+	/** Title-font words with their letters spaced apart. */
+	public static void titleTracked(GuiGraphics g, String text, float x, float y, float size, int color, float spacing) {
+		trackedIn(g, TITLE, text, x, y, size, color, spacing);
+	}
+
+	public static float titleTrackedWidth(String text, float size, float spacing) {
+		return trackedWidthIn(TITLE, text, size, spacing);
+	}
+
 	/** A label (the viewer's g-label): 13px capitals, 1.4px apart. */
 	public static void label(GuiGraphics g, String text, float x, float y, int color) {
 		String t = Look.text(text.toUpperCase());
@@ -319,7 +395,13 @@ public final class V {
 	 * own lines, words in capitals (names, places, things).
 	 */
 	public static Component rich(String text, boolean bold, int color) {
-		text = Look.text(text);
+		return richIn(text, bold, color, GOLD);
+	}
+
+	/** As rich, with the names in a colour of its own (gold on the professor's dark band). */
+	public static Component richIn(String text, boolean bold, int color, int nameColour) {
+		final int GOLD = nameColour;
+		text = Look.text(Lang.t(text));
 		MutableComponent out = Component.empty();
 		Style base = (bold ? Ui.bold("") : Ui.ui("")).getStyle();
 		if (text.contains("**")) {
@@ -351,7 +433,11 @@ public final class V {
 		return out;
 	}
 
-	/** A word in capitals (two or more letters, all upper case: OAK, POKéMON, ROUTE 1's ROUTE), not "I" or "A". */
+	/** A word in capitals (two or more letters, all upper case: OAK, POKéMON), not "I" or "A". */
+	public static boolean capsWord(String w) {
+		return caps(w);
+	}
+
 	private static boolean caps(String w) {
 		int letters = 0, upper = 0;
 		for (int i = 0; i < w.length(); i++) {
@@ -371,14 +457,29 @@ public final class V {
 
 	// ---------- the viewer's pieces ----------
 
-	/** A key cap (the viewer's g-key): cream, dark letters; round for one letter. Returns its width. */
+	/** A key's colours (the viewer's g-key: SPACE green, ESC red, TAB blue, X amber, the rest ink). */
+	private static int[] keyCols(String k) {
+		return switch (k) {
+			case "SPACE", "A" -> new int[] {0xFF5BD69A, 0xFF2FA86C};
+			case "ESC", "B" -> new int[] {0xFFFF8A7A, 0xFFE5525C};
+			case "TAB" -> new int[] {0xFF7CB8F2, 0xFF4A8FE0};
+			case "X" -> new int[] {0xFFFFD27A, 0xFFF0A030};
+			default -> new int[] {INK, INK};
+		};
+	}
+
+	/** A key cap (the viewer's g-key): a pill in its key's colour, white capitals; round for one letter. Returns its width. */
 	public static float key(GuiGraphics g, String k, float x, float y, float size) {
-		float tw = width(k, 14 * size / 28, true), w = Math.max(size, tw + 14 * size / 28);
-		boolean round = k.length() == 1;
-		rr(g, x, y + 2 * size / 28, w, size, round ? size / 2 : 9 * size / 28, 0x40000000);
-		rr(g, x, y, w, size, round ? size / 2 : 9 * size / 28, CREAM);
-		text(g, k, x + (w - tw) / 2, y + (size - 14 * size / 28 * 1.1F) / 2, 14 * size / 28, INK, true);
+		float fs = 13 * size / 30, tw = width(k, fs, true), w = k.length() == 1 ? size : Math.max(size, tw + 18 * size / 30);
+		int[] c = keyCols(k);
+		rrv(g, x, y, w, size, size / 2, c[0], c[1]);
+		text(g, k, x + (w - tw) / 2, capsTop(y + size / 2, fs), fs, 0xFFFFFFFF, true);
 		return w;
+	}
+
+	public static float keyWidth(String k, float size) {
+		float fs = 13 * size / 30;
+		return k.length() == 1 ? size : Math.max(size, width(k, fs, true) + 18 * size / 30);
 	}
 
 	/** A key hint drawn this frame (its box on the canvas and its key), so it can be clicked like a button. */
@@ -391,18 +492,81 @@ public final class V {
 	 * is also a button: clicking it does what the key does.
 	 */
 	public static void hints(GuiGraphics g, String... pairs) {
-		float x = W - 22, y = H - 14 - 28;
-		for (int i = pairs.length - 2; i >= 0; i -= 2) {
-			String kk = keyName(pairs[i]), l = pairs[i + 1];
-			float lw = width(l, 17, true), right = x;
-			x -= lw;
-			text(g, l, x, y + 5, 17, TEXT, true, true);
-			float kw = Math.max(28, width(kk, 14, true) + 14);
-			x -= 7 + kw;
-			key(g, kk, x, y, 28);
-			HINTS.add(new Hint(x - 6, y - 6, right - x + 12, 40, pairs[i]));
-			x -= 18;
+		hintsAt(g, false, pairs);
+	}
+
+	/** The key buttons along the bottom, at the left instead (the viewer's hints(list, {left: true})). */
+	public static void hintsLeft(GuiGraphics g, String... pairs) {
+		hintsAt(g, true, pairs);
+	}
+
+	private static void hintsAt(GuiGraphics g, boolean left, String... pairs) {
+		// Each: a white pill (5px in, 16px at the right), the key (30), 8px, its words (17px); 10px apart.
+		int n = pairs.length / 2;
+		float[] ws = new float[n];
+		float total = 0;
+		for (int i = 0; i < n; i++) {
+			String kk = keyName(pairs[i * 2]), l = Lang.t(pairs[i * 2 + 1]);
+			ws[i] = 5 + keyWidth(kk, 30) + 8 + width(l, 17, false) + 16;
+			total += ws[i] + (i > 0 ? 10 : 0);
 		}
+		float x = left ? 22 : W - 22 - total, y = H - 14 - 40;
+		for (int i = 0; i < n; i++) {
+			String kk = keyName(pairs[i * 2]), l = Lang.t(pairs[i * 2 + 1]);
+			pill(g, x - 2, y - 2, ws[i] + 4, 44, 0x99FFFFFF);
+			pill(g, x, y + 4, ws[i], 40, 0x2A1E2854);
+			pill(g, x, y, ws[i], 40, 0xF2FFFFFF);
+			float kw = key(g, kk, x + 5, y + 5, 30);
+			text(g, l, x + 5 + kw + 8, capsTop(y + 20, 17), 17, INK, false);
+			HINTS.add(new Hint(x, y, ws[i], 40, pairs[i * 2]));
+			x += ws[i] + 10;
+		}
+	}
+
+	/** A big button drawn this frame (Continue, Back), so it can be clicked. */
+	public static final List<Hint> ACTS = new java.util.ArrayList<>();
+
+	/**
+	 * The big buttons on the screens you step through (the viewer's g-acts): [B Back] and [A Continue], centred at
+	 * the foot of the screen (bottom 22), 62 tall, at least 230 wide; Continue green with white words. on: which is
+	 * picked or under the mouse (lifted). pairs: key, words, key, words...
+	 */
+	public static void acts(GuiGraphics g, float bottom, int on, String... pairs) {
+		int n = pairs.length / 2;
+		float[] ws = new float[n];
+		float total = 0;
+		for (int i = 0; i < n; i++) {
+			ws[i] = Math.max(230, 10 + 40 + 12 + titleWidth(Lang.t(pairs[i * 2 + 1]), 24) + 12 + 16 + 26);
+			total += ws[i] + (i > 0 ? 18 : 0);
+		}
+		float x = (W - total) / 2;
+		for (int i = 0; i < n; i++) {
+			act(g, x, H - bottom - 62, ws[i], pairs[i * 2], Lang.t(pairs[i * 2 + 1]), i == on);
+			x += ws[i] + 18;
+		}
+	}
+
+	/** One big button at x, y (62 tall). */
+	public static void act(GuiGraphics g, float x, float y, float w, String key, String words, boolean on) {
+		boolean go = "A".equals(key);
+		float lift = on ? 3 : 0, hh = 62;
+		y -= lift;
+		pill(g, x, y + 6 + lift, w, hh, 0x2E1E2854);
+		shadow(g, x, y, w, hh, hh / 2, 0.7F);
+		pill(g, x, y, w, hh, 0xFFFFFFFF);
+		if (go) rrv(g, x + 3, y + 3, w - 6, hh - 6, (hh - 6) / 2, 0xFF6BE0A6, 0xFF2FA86C);
+		else rrv(g, x + 3, y + 3, w - 6, hh - 6, (hh - 6) / 2, 0xFFFFFFFF, 0xFFEEF2FB);
+		// The key: 40 round, white see-through on Continue, red on Back.
+		if (go) ellipse(g, x + 10 + 20, y + hh / 2, 20, 20, 0x47FFFFFF);
+		else rrv(g, x + 10, y + hh / 2 - 20, 40, 40, 20, 0xFFFF8A7A, 0xFFE5525C);
+		String kk = go ? "A" : "B";
+		float kw = width(kk, 13, true);
+		text(g, kk, x + 30 - kw / 2, capsTop(y + hh / 2, 13), 13, 0xFFFFFFFF, true);
+		int c = go ? 0xFFFFFFFF : INK;
+		if (go) title(g, words, x + 62, capsTop(y + hh / 2, 24) + 2, 24, 0x2E000000);
+		title(g, words, x + 62, capsTop(y + hh / 2, 24), 24, c);
+		tri(g, x + w - 26 - 7, y + hh / 2, 14, go ? 0 : 2, Ui.alpha(c, 0.85F));
+		ACTS.add(new Hint(x, y, w, hh, key));
 	}
 
 	public static String keyName(String k) {
@@ -413,19 +577,23 @@ public final class V {
 		};
 	}
 
-	/** A chip (the viewer's g-chip): an outlined pill, cream when on. Returns its width. */
+	/** A chip (the viewer's g-chip): a white pill with a pale rim; sunny yellow when on; a red rim when you're on it. Returns its width. */
 	public static float chip(GuiGraphics g, String text, float x, float y, float size, boolean on, boolean sel) {
-		float tw = width(text, size, true), w = tw + size * 1.65F, h = size * 1.75F;
-		if (on) pill(g, x, y, w, h, CREAM);
-		else {
-			Ui.ring(g, x(x), y(y), s(w), s(h), s(h / 2), s(2), sel ? EDGE_LIGHT : 0x598FF5C0);
+		float tw = width(text, size, false), w = tw + 28 + 4, h = size * 1.45F + 12 + 4;
+		if (on) {
+			pill(g, x, y + 3, w, h, 0x4DE8961E);
+			pill(g, x, y, w, h, 0xFFFFFFFF);
+			rrv(g, x + 2, y + 2, w - 4, h - 4, (h - 4) / 2, SEL_TOP, SEL_BOTTOM);
+		} else {
+			pill(g, x, y, w, h, sel ? RED : 0xFFDDE3F0);
+			pill(g, x + 2, y + 2, w - 4, h - 4, 0xFFFFFFFF);
 		}
-		text(g, text, x + (w - tw) / 2, y + (h - size * 1.1F) / 2, size, on ? INK : TEXT, true);
+		text(g, text, x + (w - tw) / 2, capsTop(y + h / 2, size), size, INK, false);
 		return w;
 	}
 
 	public static float chipWidth(String text, float size) {
-		return width(text, size, true) + size * 1.65F;
+		return width(text, size, false) + 32;
 	}
 
 	/** A type's chip (the viewer's g-type): its colour, white capitals. */
@@ -437,17 +605,17 @@ public final class V {
 		return w;
 	}
 
-	/** A row in a list (the viewer's g-item): cream with a dark arrow when picked. */
+	/** A row in a list (the viewer's g-item): sunny yellow with a white rim, a warm glow and a red arrow when picked. */
 	public static void item(GuiGraphics g, String text, String right, float x, float y, float w, float h, boolean on, boolean off, float size) {
 		if (on) {
-			pill(g, x - 3, y - 3, w + 6, h + 6, 0x59FFF4D8);
-			pill(g, x, y + 4, w, h, 0x30000000);
-			pill(g, x, y, w, h, CREAM);
-			tri(g, x + 21, y + h / 2, 12, 0, INK);
+			pill(g, x - 1, y + 5, w + 2, h, 0x59E8961E);
+			pill(g, x - 2.5F, y - 2.5F, w + 5, h + 5, 0xFFFFFFFF);
+			sel(g, x, y, w, h, h / 2);
+			tri(g, x + 15 + 6, y + h / 2, 12, 0, RED);
 		}
 		int c = on ? INK : off ? DIM : TEXT;
-		draw(g, rich(text, true, c), x + 40, y + (h - size * 1.15F) / 2, size, c, false);
-		if (right != null && !right.isEmpty()) right(g, right, x + w - 22, y + (h - size * 1.15F) / 2, size, c, true);
+		draw(g, rich(text, false, c), x + 40, capsTop(y + h / 2, size), size, c, false);
+		if (right != null && !right.isEmpty()) right(g, right, x + w - 22, capsTop(y + h / 2, size), size, c, false);
 	}
 
 	/** Each sort of thing's colours in a list (light, middle, deep), as the menu's big buttons: balls, medicine, TMs, key items, the rest. */
@@ -484,9 +652,9 @@ public final class V {
 		int[] c = GOODS[goodsKind(name)];
 		if (on) {
 			pill(g, x - 3, y - 3, w + 6, h + 6, 0x59FFF4D8);
-			pill(g, x, y + 4, w, h, 0x30000000);
+			pill(g, x, y + 4, w, h, 0x40000000);
 			pill(g, x, y, w, h, 0xFFFFFFFF);
-			pill(g, x + 2, y + 2, w - 4, h - 4, CREAM);
+			rrv(g, x + 2, y + 2, w - 4, h - 4, (h - 4) / 2, SEL_TOP, SEL_BOTTOM);
 		} else {
 			pill(g, x, y + 3, w, h, 0x30000000);
 			pill(g, x, y, w, h, 0x73FFFFFF);
@@ -509,54 +677,112 @@ public final class V {
 		}
 	}
 
-	/** A colour swatch (round, a white rim; cream and bigger when picked). */
+	/** A colour swatch (g-swatch): round, a 3px white rim; a sunny ring and a touch bigger when picked. */
 	public static void swatch(GuiGraphics g, int colour, float x, float y, float size, boolean on, float radius) {
-		if (on) rr(g, x - 4, y - 4, size + 8, size + 8, radius + 4, 0x73FFF4D8);
-		rr(g, x, y, size, size, radius, on ? CREAM : 0x59FFFFFF);
-		rrv(g, x + 3, y + 3, size - 6, size - 6, Math.max(0, radius - 3), Ui.mix(colour | 0xFF000000, 0xFFFFFFFF, 0.25F), Ui.mix(colour | 0xFF000000, 0xFF000000, 0.12F));
+		if (on) {
+			float gr = size * 0.05F;
+			x -= gr;
+			y -= gr;
+			size += gr * 2;
+			radius += gr;
+			rr(g, x - 4, y - 4, size + 8, size + 8, radius + 4, 0xFFFFC93C);
+		}
+		rr(g, x, y + 2, size, size, radius, 0x401E2854);
+		rr(g, x, y, size, size, radius, 0xFFFFFFFF);
+		rr(g, x + 3, y + 3, size - 6, size - 6, Math.max(0, radius - 3), colour | 0xFF000000);
 	}
 
-	/** A bar (HP, EXP): a dark track, the fill rounded. */
+	/** A bar (HP, EXP), the viewer's g-hp: a pale track 2px round the fill, the fill rounded. */
 	public static void bar(GuiGraphics g, float x, float y, float w, float h, float frac, int colour) {
-		pill(g, x, y, w, h, 0xFF0B2A2C);
+		pill(g, x, y, w, h, TRACK);
 		frac = Math.max(0, Math.min(1, frac));
 		if (frac > 0) pill(g, x + 2, y + 2, Math.max(h - 4, (w - 4) * frac), h - 4, colour);
+	}
+
+	/** The EXP bar (g-exp): 7 tall, the pale track, sky blue. */
+	public static void expBar(GuiGraphics g, float x, float y, float w, float frac) {
+		pill(g, x, y, w, 7, TRACK);
+		frac = Math.max(0, Math.min(1, frac));
+		if (frac > 0) pill(g, x, y, Math.max(7, w * frac), 7, 0xFF6FC3FF);
 	}
 
 	public static int hpColour(float frac) {
 		return frac > 0.5F ? 0xFF4CD27E : frac > 0.2F ? 0xFFF2C744 : 0xFFEF4F4F;
 	}
 
-	/** The rounded header pill at the top left of a menu page: its picture and its name. */
+	/** The rounded header pill at the top left of a menu page (the viewer's header()): its picture, its name, a label. */
 	public static void header(GuiGraphics g, String icon, String text, String right) {
-		float tw = width(text, 28, true), rw = right == null ? 0 : labelWidth(right) + 18, w = 12 + 42 + 12 + tw + 22 + rw;
-		panel(g, 28, 22, w, 58, 29, true);
-		if (icon != null) icon(g, icon, 28 + 12 + 1, 22 + 9, 40);
-		text(g, text, 28 + 66, 22 + 13, 28, TEXT, true);
-		if (right != null) label(g, right, 28 + 66 + tw + 18, 22 + 24);
+		text = Lang.t(text);
+		float tw = titleWidth(text, 28), rw = right == null ? 0 : 18 + labelWidth(right), w = 12 + 42 + 12 + tw + rw + 22, hh = 58;
+		panel(g, 28, 22, w, hh, hh / 2, true);
+		if (icon != null) icon(g, icon, 28 + 12 + 1, 22 + 8 + 1, 40);
+		title(g, text, 28 + 12 + 42 + 12, capsTop(22 + hh / 2, 28), 28, INK);
+		if (right != null) label(g, right, 28 + 12 + 42 + 12 + tw + 18, capsTop(22 + hh / 2, 13));
 	}
 
 	// ---------- the text box ----------
 
 	/**
-	 * The text box (the viewer's g-text): a panel along the bottom (x, its bottom edge, width), the speaker on a
-	 * cream tab at its top left, the words in white with names in gold, and the mint arrow bobbing when there's more.
-	 * lines: what's typed out so far, one entry a line.
+	 * The text box (the viewer's g-text), Let's Go's: white with a pearly sheen at its right end and the pastel rim;
+	 * the speaker on a coral tab at its top left; the words in ink (25px, 800) with names in coral; our turning
+	 * cube bobbing at its foot when there's more. lines: what's typed out so far, one entry a line.
 	 */
 	public static void textBox(GuiGraphics g, float x, float bottom, float w, String who, List<String> lines, boolean more, float secs) {
-		float size = 25, lh = size * 1.45F, h = Math.max(120, 22 + 24 + lines.size() * lh), y = H - bottom - h;
-		panel(g, x, y, w, h);
+		float size = 25, lh = size * 1.45F, h = Math.max(120, 22 + 24 + Math.max(1, lines.size()) * lh), y = H - bottom - h, r = 22;
+		shadow(g, x, y, w, h, r, 1);
+		holo(g, x, y, w, h, r);
+		rrh(g, x + 3, y + 3, w - 6, h - 6, r - 3, SHEEN_AT, SHEEN);
 		if (who != null && !who.isEmpty()) {
-			float tw = width(who, 21, true);
-			pill(g, x + 28, y - 20 + 3, tw + 36, 36, 0x40000000);
-			pill(g, x + 28, y - 20, tw + 36, 36, CREAM);
-			text(g, who, x + 28 + 18, capsTop(y - 20 + 18, 21), 21, INK, true);
+			String wn = Lang.t(who);
+			float tw = titleWidth(wn, 21), tx = x + 3 + 28, ty = y + 3 - 20, th = 36;
+			pill(g, tx - 1, ty + 4, tw + 36 + 2, th, 0x401E2854);
+			pill(g, tx - 3, ty - 3, tw + 36 + 6, th + 6, 0xFFFFFFFF);
+			rrv(g, tx, ty, tw + 36, th, th / 2, 0xFFFF9473, 0xFFE5525C);
+			title(g, wn, tx + 18, capsTop(ty + th / 2, 21), 21, 0xFFFFFFFF);
 		}
-		for (int i = 0; i < lines.size(); i++) draw(g, rich(lines.get(i), true, TEXT), x + 34, y + 22 + i * lh + (lh - size) / 2 - 2, size, TEXT, false);
-		if (more) {
-			float bob = (float) Math.sin(secs * Math.PI / 0.45F) > 0 ? 4 : 0;
-			tri(g, x + w - 26 - 10, y + h - 16 - 13 / 2F + bob, 13, 1, EDGE_LIGHT);
+		for (int i = 0; i < lines.size(); i++) draw(g, rich(lines.get(i), false, INK), x + 3 + 34, y + 3 + 22 + i * lh + (lh - size) / 2, size, INK, false);
+		if (more) moreCube(g, x + w - 3 - 24 - 13, y + h - 3 - 14 - 13, 26, secs, EDGE_LIGHT);
+	}
+
+	/**
+	 * The words over the picture (the viewer's g-text.film, the professor's): no box, white on a dark band fading up
+	 * from the foot of the screen, the speaker in gold capitals above, names in gold, the white cube when there's more.
+	 */
+	public static void filmBox(GuiGraphics g, String who, List<String> lines, boolean more, float secs) {
+		float size = 25, lh = size * 1.45F, top = 60, h = top + (who != null && !who.isEmpty() ? 19 * 1.45F + 6 : 0) + Math.max(1, lines.size()) * lh + 44, y = H - h;
+		// linear-gradient(180deg, rgba(12,22,48,0), rgba(12,22,48,.55) 38%, rgba(12,22,48,.84)): across the whole window.
+		float gy = y(y), gb = gh;
+		int mid = (int) (gy + (gb - gy) * 0.38F);
+		g.fillGradient(0, (int) gy, gw, mid, 0x000C1630, 0x8C0C1630);
+		g.fillGradient(0, mid, gw, (int) gb, 0x8C0C1630, 0xD60C1630);
+		float ty = y + top;
+		if (who != null && !who.isEmpty()) {
+			String wn = Lang.t(who).toUpperCase();
+			tracked(g, wn, 180 + 0.5F, ty + 2, 19, 0x80000000, 1.6F);
+			tracked(g, wn, 180, ty, 19, 0xFFFFD45A, 1.6F);
+			ty += 19 * 1.45F + 6;
 		}
+		for (int i = 0; i < lines.size(); i++) {
+			Component c = richIn(lines.get(i), false, 0xFFFFFFFF, 0xFFFFD45A);
+			draw(g, c.copy(), 180 + 0.5F, ty + i * lh + (lh - size) / 2 + 2, size, 0x73000000, false);
+			draw(g, c, 180, ty + i * lh + (lh - size) / 2, size, 0xFFFFFFFF, false);
+		}
+		if (more) moreCube(g, W - 180 - 26, H - 26 - 26, 26, secs, 0xFFFFFFFF);
+	}
+
+	/**
+	 * Our own "more to read" mark (the viewer's MORE_MARK): a little cube, its three faces in one colour at three
+	 * strengths, bobbing up 4px and turning half round every 1.6 seconds.
+	 */
+	public static void moreCube(GuiGraphics g, float x, float y, float size, float secs, int colour) {
+		float ph = (secs % 1.6F) / 1.6F, e = (float) (0.5 - 0.5 * Math.cos(ph * Math.PI * 2)), bob = -4 * e, turn = (float) Math.PI * e;
+		float cx = x + size / 2, cy = y + size / 2 + bob;
+		g.pose().pushMatrix();
+		g.pose().translate(x(cx), y(cy));
+		g.pose().rotate(turn);
+		g.pose().scale(s(size) / 128, s(size) / 128);
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, tex("more_cube"), -64, -64, 0, 0, 128, 128, 128, 128, 128, 128, colour);
+		g.pose().popMatrix();
 	}
 
 	/** A list in a panel (the viewer's choice box): rows of g-items. Returns its height. */
@@ -564,7 +790,7 @@ public final class V {
 		float pad = 12, rh = 46, gap = 8, h = pad * 2 + items.size() * rh + (items.size() - 1) * gap;
 		panel(g, x, y, w, h);
 		for (int i = 0; i < items.size(); i++)
-			item(g, items.get(i), rights == null ? null : rights.get(i), x + pad, y + pad + i * (rh + gap), w - pad * 2, rh, i == sel, false, 21);
+			item(g, Lang.t(items.get(i)), rights == null ? null : rights.get(i), x + pad, y + pad + i * (rh + gap), w - pad * 2, rh, i == sel, false, 21);
 		return h;
 	}
 

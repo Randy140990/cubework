@@ -14,7 +14,7 @@ import com.insidethecube.retromon.Retromon;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * The look of Retromon's screens: deep navy glass panels with soft rounded corners, clean white text (Poppins,
+ * The look of Retromon's screens (the older pieces; V has the viewer's own): rounded panels, words in Nunito Sans (the viewer's font,
  * a rounded modern font, as the newer games use), cream highlights for what's picked, colour for what you can
  * press (FIGHT red, BAG amber, POKéMON green, RUN blue), type colours on moves, smooth HP and EXP bars.
  */
@@ -98,12 +98,12 @@ public final class Ui {
 		@Override
 		public void buildVertices(com.mojang.blaze3d.vertex.VertexConsumer v) {
 			for (int i = 0; i < n; i++) {
-				int o = i * 8, k = i * 2;
+				int o = i * 8, k = i * 4;
 				float x0 = q[o], y0 = q[o + 1], x1 = q[o + 2], y1 = q[o + 3], u0 = q[o + 4], v0 = q[o + 5], u1 = q[o + 6], v1 = q[o + 7];
 				v.addVertexWith2DPose(pose, x0, y0).setUv(u0, v0).setColor(c[k]);
 				v.addVertexWith2DPose(pose, x0, y1).setUv(u0, v1).setColor(c[k + 1]);
-				v.addVertexWith2DPose(pose, x1, y1).setUv(u1, v1).setColor(c[k + 1]);
-				v.addVertexWith2DPose(pose, x1, y0).setUv(u1, v0).setColor(c[k]);
+				v.addVertexWith2DPose(pose, x1, y1).setUv(u1, v1).setColor(c[k + 2]);
+				v.addVertexWith2DPose(pose, x1, y0).setUv(u1, v0).setColor(c[k + 3]);
 			}
 		}
 	}
@@ -112,7 +112,7 @@ public final class Ui {
 	private static final class ShapeBuilder {
 		private final float k;
 		private float[] q = new float[8 * 12];
-		private int[] c = new int[2 * 12];
+		private int[] c = new int[4 * 12];
 		private int n;
 
 		ShapeBuilder(float k) {
@@ -122,17 +122,30 @@ public final class Ui {
 		/** A plain band from (x0, y0) to (x1, y1), top colour to bottom colour: the disc's solid middle. */
 		void band(int x0, int y0, int x1, int y1, int top, int bottom) {
 			if (x1 <= x0 || y1 <= y0) return;
-			add(x0, y0, x1, y1, 0.5F, 0.5F, 0.5F, 0.5F, top, bottom);
+			add(x0, y0, x1, y1, 0.5F, 0.5F, 0.5F, 0.5F, top, bottom, bottom, top);
+		}
+
+		/** A plain band shaded left to right. */
+		void hband(int x0, int y0, int x1, int y1, int left, int right) {
+			if (x1 <= x0 || y1 <= y0) return;
+			add(x0, y0, x1, y1, 0.5F, 0.5F, 0.5F, 0.5F, left, left, right, right);
+		}
+
+		/** A quarter disc shaded left to right. */
+		void hquarter(int x, int y, int R, int corner, int left, int right) {
+			if (R <= 0) return;
+			float u0 = (corner & 1) * 0.5F, v0 = (corner >> 1) * 0.5F;
+			add(x, y, x + R, y + R, u0, v0, u0 + 0.5F, v0 + 0.5F, left, left, right, right);
 		}
 
 		/** A quarter disc (corner 0 top left, 1 top right, 2 bottom left, 3 bottom right) in an R by R box. */
 		void quarter(int x, int y, int R, int corner, int top, int bottom) {
 			if (R <= 0) return;
 			float u0 = (corner & 1) * 0.5F, v0 = (corner >> 1) * 0.5F;
-			add(x, y, x + R, y + R, u0, v0, u0 + 0.5F, v0 + 0.5F, top, bottom);
+			add(x, y, x + R, y + R, u0, v0, u0 + 0.5F, v0 + 0.5F, top, bottom, bottom, top);
 		}
 
-		private void add(int x0, int y0, int x1, int y1, float u0, float v0, float u1, float v1, int top, int bottom) {
+		private void add(int x0, int y0, int x1, int y1, float u0, float v0, float u1, float v1, int c00, int c01, int c11, int c10) {
 			if (n * 8 + 8 > q.length) {
 				q = java.util.Arrays.copyOf(q, q.length * 2);
 				c = java.util.Arrays.copyOf(c, c.length * 2);
@@ -146,8 +159,10 @@ public final class Ui {
 			q[o + 5] = v0;
 			q[o + 6] = u1;
 			q[o + 7] = v1;
-			c[n * 2] = top;
-			c[n * 2 + 1] = bottom;
+			c[n * 4] = c00;
+			c[n * 4 + 1] = c01;
+			c[n * 4 + 2] = c11;
+			c[n * 4 + 3] = c10;
 			n++;
 		}
 
@@ -242,6 +257,45 @@ public final class Ui {
 		b.quarter(X + W - R, Y, R, 1, col.applyAsInt(Y), col.applyAsInt(Y + R));
 		b.quarter(X, Y + H - R, R, 2, col.applyAsInt(Y + H - R), col.applyAsInt(Y + H));
 		b.quarter(X + W - R, Y + H - R, R, 3, col.applyAsInt(Y + H - R), col.applyAsInt(Y + H));
+		b.submit(g, R, X, Y, W, H);
+	}
+
+	/**
+	 * A rounded rectangle shaded left to right through several colours (cols[i] at the fraction at[i] of its width):
+	 * the viewer's pearly rims and its text box's sheen, in one shape.
+	 */
+	public static void rrh(GuiGraphics g, float x, float y, float w, float h, float r, float[] at, int[] cols) {
+		if (w <= 0 || h <= 0) return;
+		float k = gs();
+		int X = Math.round(x * k), Y = Math.round(y * k), W = Math.round((x + w) * k) - X, H = Math.round((y + h) * k) - Y;
+		if (W <= 0 || H <= 0) return;
+		int R = (int) Math.max(0, Math.min(Math.round(r * k), Math.min(W, H) / 2));
+		java.util.function.IntUnaryOperator col = xx -> {
+			float t = (xx - X) / (float) W;
+			if (t <= at[0]) return cols[0];
+			for (int i = 1; i < at.length; i++) if (t <= at[i]) return mix(cols[i - 1], cols[i], (t - at[i - 1]) / Math.max(1e-4F, at[i] - at[i - 1]));
+			return cols[cols.length - 1];
+		};
+		ShapeBuilder b = new ShapeBuilder(k);
+		// The middle, full height, cut at each stop; the two ends, between their corners.
+		java.util.List<Integer> cuts = new java.util.ArrayList<>();
+		cuts.add(X + R);
+		for (float a : at) {
+			int xx = X + Math.round(W * a);
+			if (xx > X + R && xx < X + W - R) cuts.add(xx);
+		}
+		cuts.add(X + W - R);
+		java.util.Collections.sort(cuts);
+		for (int i = 0; i + 1 < cuts.size(); i++) {
+			int a = cuts.get(i), c = cuts.get(i + 1);
+			if (c > a) b.hband(a, Y, c, Y + H, col.applyAsInt(a), col.applyAsInt(c));
+		}
+		b.hband(X, Y + R, X + R, Y + H - R, col.applyAsInt(X), col.applyAsInt(X + R));
+		b.hband(X + W - R, Y + R, X + W, Y + H - R, col.applyAsInt(X + W - R), col.applyAsInt(X + W));
+		b.hquarter(X, Y, R, 0, col.applyAsInt(X), col.applyAsInt(X + R));
+		b.hquarter(X + W - R, Y, R, 1, col.applyAsInt(X + W - R), col.applyAsInt(X + W));
+		b.hquarter(X, Y + H - R, R, 2, col.applyAsInt(X), col.applyAsInt(X + R));
+		b.hquarter(X + W - R, Y + H - R, R, 3, col.applyAsInt(X + W - R), col.applyAsInt(X + W));
 		b.submit(g, R, X, Y, W, H);
 	}
 

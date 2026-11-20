@@ -170,11 +170,11 @@ public abstract class GameScreen extends Screen {
 	}
 
 	/** Characters typed per tick, by the text speed in OPTION. */
-	public static int textSpeed() {
+	public static float textSpeed() {
 		return switch (ClientState.data.textSpeed) {
-			case 0 -> 1;
-			case 1 -> 2;
-			default -> 4;
+			case 0 -> 1.4F;
+			case 1 -> 2.6F;
+			default -> 5.5F;
 		};
 	}
 
@@ -214,6 +214,7 @@ public abstract class GameScreen extends Screen {
 		/** Which message each page comes from. */
 		private final List<Integer> owners = new ArrayList<>();
 		private int page, typed, laidOut = -1;
+		private float typing;
 		/** Who's speaking (shown on a tab above the box), or null. */
 		public String speaker;
 
@@ -252,9 +253,11 @@ public abstract class GameScreen extends Screen {
 			pages = new ArrayList<>();
 			owners.clear();
 			for (int mi = 0; mi < messages.size(); mi++) {
-				List<String> lines = Ui.wrap(f, Look.text(messages.get(mi)), width);
-				for (int i = 0; i < lines.size(); i += 2) {
-					pages.add(new String[] {lines.get(i), i + 1 < lines.size() ? lines.get(i + 1) : ""});
+				// The whole message on one page (the box grows to fit it), as the viewer's text box does; a very long
+				// one goes over three lines a page.
+				List<String> lines = Ui.wrap(f, names(Look.text(Lang.t(messages.get(mi)))), width);
+				for (int i = 0; i < lines.size(); i += 3) {
+					pages.add(lines.subList(i, Math.min(lines.size(), i + 3)).toArray(new String[0]));
 					owners.add(mi);
 				}
 			}
@@ -263,12 +266,74 @@ public abstract class GameScreen extends Screen {
 
 		private int length() {
 			if (page >= pages.size()) return 0;
-			String[] p = pages.get(page);
-			return p[0].length() + p[1].length();
+			int n = 0;
+			for (String l : pages.get(page)) n += plain(l).length();
+			return n;
 		}
 
 		public void tick() {
-			if (typed < length()) typed = Math.min(length(), typed + textSpeed());
+			if (typed < length()) {
+				typing += textSpeed();
+				int step = (int) typing;
+				typing -= step;
+				typed = Math.min(length(), typed + step);
+			}
+		}
+
+		/** Names (words in capitals: OAK, POKéMON, PALLET TOWN) marked ** as the viewer's lines mark them, unless the line has its own. */
+		static String names(String line) {
+			if (line.contains("**")) return line;
+			StringBuilder out = new StringBuilder();
+			String[] words = line.split(" ", -1);
+			boolean open = false;
+			for (int i = 0; i < words.length; i++) {
+				String w = words[i];
+				boolean caps = V.capsWord(w);
+				if (caps && !open) {
+					out.append("**");
+					open = true;
+				} else if (!caps && open) {
+					// Closed before the space that led here.
+					out.setLength(out.length() - 1);
+					out.append("** ");
+					open = false;
+				}
+				out.append(w);
+				if (i < words.length - 1) out.append(' ');
+			}
+			if (open) out.append("**");
+			return out.toString();
+		}
+
+		/** A line without its ** marks. */
+		static String plain(String l) {
+			return l.replace("**", "");
+		}
+
+		/** The first n letters of a line, its ** marks kept, so a name is coloured from its first letter (the viewer's richUpTo). */
+		static String upTo(String l, int n) {
+			StringBuilder out = new StringBuilder();
+			String[] parts = l.split("\\*\\*", -1);
+			for (int i = 0; i < parts.length && n > 0; i++) {
+				if (i > 0) out.append("**");
+				String t = parts[i].substring(0, Math.min(parts[i].length(), n));
+				n -= t.length();
+				out.append(t);
+			}
+			return out.toString();
+		}
+
+		/** What's typed out so far on this page, a line each. */
+		private List<String> shown() {
+			List<String> lines = new ArrayList<>();
+			if (page < pages.size()) {
+				int left = typed;
+				for (String l : pages.get(page)) {
+					lines.add(upTo(l, Math.max(0, left)));
+					left -= plain(l).length();
+				}
+			}
+			return lines;
 		}
 
 		/** The message (line given) showing now, or -1 before it's laid out. */
@@ -303,16 +368,15 @@ public abstract class GameScreen extends Screen {
 		 * arrow when there's more.
 		 */
 		public void renderV(GuiGraphics g, Font f, float x, float bottom, float w, int ticks, float partial, boolean arrow) {
-			layout(f, (int) ((w - 68) * 8.5F / 25 * 0.9F));
-			List<String> lines = new ArrayList<>();
-			if (page < pages.size()) {
-				String[] p = pages.get(page);
-				int left = typed;
-				lines.add(p[0].substring(0, Math.min(p[0].length(), Math.max(0, left))));
-				left -= p[0].length();
-				if (!p[1].isEmpty()) lines.add(left > 0 ? p[1].substring(0, Math.min(p[1].length(), left)) : "");
-			}
-			V.textBox(g, x, bottom, w, speaker, lines, arrow && typedOut() && page < pages.size(), (ticks + partial) / 20F);
+			// The box's words: 25px across w less its padding (34 each side, and the rim).
+			layout(f, (int) ((w - 74) * 8.5F / 25));
+			V.textBox(g, x, bottom, w, speaker, shown(), arrow && typedOut() && page < pages.size(), (ticks + partial) / 20F);
+		}
+
+		/** Drawn as the professor's words (the viewer's film text): white on the dark band across the foot of the screen. */
+		public void renderFilm(GuiGraphics g, Font f, int ticks, float partial, boolean arrow) {
+			layout(f, (int) ((V.W - 360) * 8.5F / 25));
+			V.filmBox(g, speaker, shown(), arrow && typedOut() && page < pages.size(), (ticks + partial) / 20F);
 		}
 
 		public void render(GuiGraphics g, Font f, int x, int y, int w, int h, int s, int ticks, boolean arrow) {
@@ -329,13 +393,8 @@ public abstract class GameScreen extends Screen {
 			}
 			layout(f, (w - 20 * s) / s);
 			if (page >= pages.size()) return;
-			String[] p = pages.get(page);
-			int left = typed;
-			String a = p[0].substring(0, Math.min(p[0].length(), Math.max(0, left)));
-			left -= p[0].length();
-			String b = left > 0 ? p[1].substring(0, Math.min(p[1].length(), left)) : "";
-			Ui.plain(g, f, a, x + 14 * s, y + 10 * s, Ui.CREAM_INK, s);
-			Ui.plain(g, f, b, x + 14 * s, y + 10 * s + 12 * s, Ui.CREAM_INK, s);
+			List<String> sh = shown();
+			for (int i = 0; i < sh.size(); i++) Ui.plain(g, f, plain(sh.get(i)), x + 14 * s, y + 10 * s + i * 12 * s, Ui.CREAM_INK, s);
 			if (arrow && typedOut()) Ui.triangle(g, x + w - 14 * s, y + h - 11 * s + ((ticks / 6) % 2) * s, 8 * s, 2, 0xFFE5525C);
 		}
 	}
