@@ -3,3 +3,6 @@ data data/minecraft/dimension_type/overworld.json
 grep keyPress net/minecraft/client/KeyboardHandler.java
 grep submitCustomGeometry net/minecraft/client/renderer/SubmitNodeCollector.java
 grep interface net/minecraft/client/renderer/SubmitNodeCollector.java
+net/minecraft/client/gui/render/GuiRenderer.java
+net/minecraft/client/gui/render/state/GuiRenderState.java
+net/minecraft/client/gui/GuiGraphics.java
