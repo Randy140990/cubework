@@ -299,11 +299,9 @@ def main():
             if not key and n["name"] == "Aide" and aides and not n["seated"]: key = aides.pop(0)
             if not key: key = "in_%s_%d" % (rid, i)
             x, z, yaw = n["x"], n["z"], n["yaw"]
-            if n["seated"]:
-                # Standing just behind their chair, till people can sit.
-                x += math.sin(yaw) * 0.85; z += math.cos(yaw) * 0.85
+            # Someone seated sits on their chair, as the Interior Viewer has them.
             people.append({"key": key, "name": n["name"].upper(), "skin": n["skin"] or "youngster", "x": round(x, 3), "z": round(z, 3),
-                           "yaw": round((180 - math.degrees(yaw)) % 360, 1), "lines": n["lines"], "role": n.get("role")})
+                           "yaw": round((180 - math.degrees(yaw)) % 360, 1), "lines": n["lines"], "role": n.get("role"), "seated": bool(n["seated"])})
         acts = [{"rect": a["rect"], "label": a["label"], "lines": a["lines"]} for a in room["acts"] if a["lines"]]
         sp = room["spawn"]
         rooms_out[rid] = {"origin": list(o), "W": room["W"], "D": room["D"], "H": room["H"], "name": room["name"], "floor": room["floor"],

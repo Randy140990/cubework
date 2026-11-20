@@ -32,6 +32,8 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		/** Celebrating a win: how (-1 for not), and ticks in. */
 		int dance = -1;
 		float danceT;
+		/** Sitting on a chair. */
+		boolean seated;
 	}
 
 	/** The figure: the usual walk and stand, with a proper overarm throw and your celebrations on top. */
@@ -45,6 +47,15 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		@Override
 		public void setupAnim(State s) {
 			super.setupAnim(s);
+			if (s.seated) {
+				// As the Interior Viewer seats people: thighs straight out on the seat, a little apart; hands forward
+				// on the desk.
+				rightLeg.xRot = leftLeg.xRot = -(float) Math.PI / 2 + 0.08F;
+				rightLeg.yRot = 0.08F;
+				leftLeg.yRot = -0.08F;
+				rightLeg.zRot = leftLeg.zRot = 0;
+				rightArm.xRot = leftArm.xRot = -0.5F;
+			}
 			if (s.throwK > 0) throwing(s.throwK);
 			switch (s.dance) {
 				case 0 -> armsUp(s.danceT);
@@ -154,7 +165,8 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 
 	@Override
 	public net.minecraft.world.phys.Vec3 getRenderOffset(State s) {
-		return super.getRenderOffset(s).add(0, s.hop, 0);
+		// Sat down: the hips at the chair's seat (0.56 up, as the Interior Viewer has it) instead of 0.75.
+		return super.getRenderOffset(s).add(0, s.hop - (s.seated ? 0.19 : 0), 0);
 	}
 
 	/** You as you look in the world: your clothes if you've chosen some, else the boy or the girl. */
@@ -181,6 +193,7 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 	public void extractRenderState(Npc npc, State s, float partial) {
 		super.extractRenderState(npc, s, partial);
 		s.sprite = sprite(npc);
+		s.seated = npc.seated();
 		float in = Npc.CHEER - npc.cheer + partial;
 		s.dance = npc.cheer > 0 ? npc.dance : -1;
 		s.danceT = in;

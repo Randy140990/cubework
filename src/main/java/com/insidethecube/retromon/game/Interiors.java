@@ -51,7 +51,7 @@ public final class Interiors {
 	public record Warp(String kind, double x0, double x1, double z0, double z1, String door, String to, double sx, double sz, float syaw) {}
 
 	/** Someone in a room; role: "nurse" (heals), "clerk" (sells) or null (just talks). */
-	public record Person(String key, String name, String skin, double x, double z, float yaw, List<String> lines, String role) {}
+	public record Person(String key, String name, String skin, double x, double z, float yaw, List<String> lines, String role, boolean seated) {}
 
 	public record Act(double x0, double z0, double x1, double z1, List<String> lines) {}
 
@@ -137,7 +137,8 @@ public final class Interiors {
 			for (JsonElement pe : r.getAsJsonArray("people")) {
 				JsonObject p = pe.getAsJsonObject();
 				people.add(new Person(p.get("key").getAsString(), p.get("name").getAsString(), p.get("skin").getAsString(), num(p, "x", 0), num(p, "z", 0),
-						(float) num(p, "yaw", 0), strings(p.get("lines")), p.has("role") && !p.get("role").isJsonNull() ? p.get("role").getAsString() : null));
+						(float) num(p, "yaw", 0), strings(p.get("lines")), p.has("role") && !p.get("role").isJsonNull() ? p.get("role").getAsString() : null,
+						p.has("seated") && p.get("seated").getAsBoolean()));
 			}
 			List<Act> acts = new ArrayList<>();
 			for (JsonElement ae : r.getAsJsonArray("acts")) {
@@ -172,8 +173,15 @@ public final class Interiors {
 		version = DATA.get("version").getAsString() + "-" + STATES + "-" + DATA.toString().length();
 		// The people inside, as the game's people (their skin and what they say), unless the games had them already.
 		for (Room r : ROOMS.values())
-			for (Person p : r.people())
+			for (Person p : r.people()) {
 				if (p.role() == null) Trainers.PEOPLE.putIfAbsent(p.key(), new Trainers.Person(p.key(), r.place(), p.skin(), "down", "stay", p.lines()));
+				// The lab's aides on their feet potter about between the shelves (the one at his desk sits; the one
+				// at the big machine keeps at it).
+				if ("AIDE".equals(p.name()) && !p.seated() && !p.key().equals("oaks_lab_p3")) {
+					Trainers.Person old = Trainers.PEOPLE.get(p.key());
+					Trainers.PEOPLE.put(p.key(), new Trainers.Person(p.key(), r.place(), p.skin(), "any_dir", "walk", old != null ? old.lines() : p.lines()));
+				}
+			}
 	}
 
 	/** A prop state's collision (and outline) shape. */
@@ -276,7 +284,10 @@ public final class Interiors {
 			// The nurse heals and the clerk sells, as the games' nurse and clerk do (their own ways of talking).
 			int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : Npc.PERSON;
 			Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
-			if (n != null) n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));
+			if (n != null) {
+				n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));
+				if (p.seated()) n.setSeated(true);
+			}
 		}
 	}
 

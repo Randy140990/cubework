@@ -28,6 +28,8 @@ public class Npc extends PathfinderMob {
 	private static final EntityDataAccessor<Integer> ROLE = SynchedEntityData.defineId(Npc.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<String> KEY = SynchedEntityData.defineId(Npc.class, EntityDataSerializers.STRING);
 	private static final EntityDataAccessor<Float> FACING = SynchedEntityData.defineId(Npc.class, EntityDataSerializers.FLOAT);
+	/** Sitting on a chair (an aide at his desk): stays put, legs forward. */
+	private static final EntityDataAccessor<Boolean> SEATED = SynchedEntityData.defineId(Npc.class, EntityDataSerializers.BOOLEAN);
 	/** Walking up to someone they've spotted (server only): ticks left, or 0. */
 	public int approaching;
 	/** On the battle stage (your screen only): cheering a win, ticks left, and how (see NpcRenderer.Figure). */
@@ -62,6 +64,18 @@ public class Npc extends PathfinderMob {
 		b.define(ROLE, NURSE);
 		b.define(KEY, "");
 		b.define(FACING, 0F);
+		b.define(SEATED, false);
+	}
+
+	public boolean seated() {
+		return entityData.get(SEATED);
+	}
+
+	/** Sat on the chair where they stand: they don't fall or get pushed off it (it's a solid prop), or wander. */
+	public void setSeated(boolean on) {
+		entityData.set(SEATED, on);
+		setNoGravity(on);
+		noPhysics = on;
 	}
 
 	public int role() {
@@ -155,6 +169,15 @@ public class Npc extends PathfinderMob {
 			walking = false;
 			if (!Float.isNaN(faceAfter)) entityData.set(FACING, faceAfter);
 			faceAfter = Float.NaN;
+		}
+		if (seated()) {
+			getNavigation().stop();
+			setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+			if (home != null && tickCount >= nextWander) {
+				nextWander = tickCount + 40;
+				entityData.set(FACING, homeFacing);
+			}
+			return;
 		}
 		if (role() == PERSON) wander();
 		else if (role() == TRAINER) patrol();
@@ -255,6 +278,7 @@ public class Npc extends PathfinderMob {
 		out.putInt("Role", role());
 		out.putString("Key", key());
 		out.putFloat("Facing", facing());
+		if (seated()) out.putBoolean("Seated", true);
 		if (home != null) {
 			out.putInt("HomeX", home.getX());
 			out.putInt("HomeY", home.getY());
@@ -269,6 +293,7 @@ public class Npc extends PathfinderMob {
 		setRole(in.getIntOr("Role", NURSE));
 		setKey(in.getStringOr("Key", ""));
 		setFacing(in.getFloatOr("Facing", 0F));
+		if (in.getBooleanOr("Seated", false)) setSeated(true);
 		int hy = in.getIntOr("HomeY", Integer.MIN_VALUE);
 		if (hy != Integer.MIN_VALUE) {
 			home = new BlockPos(in.getIntOr("HomeX", 0), hy, in.getIntOr("HomeZ", 0));

@@ -1147,7 +1147,9 @@ public final class Game {
 		boolean fighting = false, device = false;
 		for (ServerPlayer p : s.getPlayerList().getPlayers()) {
 			if (!adventure(p)) continue;
-			if (Battles.in(p)) fighting = true;
+			// The clock waits through the battle and its last words too (the cheering and the EXP after a win, up to
+			// Continue): the server's battle is over before your screen is, and the sky jumped on when it closed.
+			if (Battles.in(p) || AFTER_BATTLE.containsKey(p.getUUID())) fighting = true;
 			if (DEVICES.contains(p.getUUID())) device = true;
 		}
 		// With your Pokédex out (playing alone), the whole world waits: people and Pokémon stand still too.
@@ -1228,7 +1230,8 @@ public final class Game {
 	public static void afterBattle(ServerPlayer p) {
 		COOLDOWN.put(p.getUUID(), 60);
 		GRACE.put(p.getUUID(), 4);
-		AFTER_BATTLE.put(p.getUUID(), 600);
+		// Till the battle screen closes (the cheering, the EXP, Continue): 5 minutes at most, in case it never says.
+		AFTER_BATTLE.put(p.getUUID(), 6000);
 	}
 
 	public static void blackout(ServerPlayer p) {
@@ -2306,6 +2309,18 @@ public final class Game {
 	 */
 	private static final Object[][] DEFAULTS = {{"joey", Npc.TRAINER, "youngster_joey", -790, 600, 0F}};
 	private static final int[][] OLD_OUTSIDE = {{-785, 561}, {-766, 549}};
+	/**
+	 * People who stand somewhere on John's map other than where the games' grid puts them: Pallet's girl ("I'm
+	 * raising POKéMON too!") by the flower beds and roses in the middle of town, as Let's Go has her, rather than
+	 * out at the west edge. Key, then x and z.
+	 */
+	private static final Object[][] SPOTS = {{"pallet_town_p1", -801, 698}};
+
+	/** Where someone in SPOTS stands (x, z), or null. */
+	private static int[] spotOf(String key) {
+		for (Object[] o : SPOTS) if (o[0].equals(key)) return new int[] {(Integer) o[1], (Integer) o[2]};
+		return null;
+	}
 
 	/** Puts the first people in place once their part of the map is loaded (each only once per save). */
 	private static void placeTouchPoints(MinecraftServer s) {
@@ -2359,6 +2374,22 @@ public final class Game {
 				changed = true;
 			}
 		}
+		// Those in SPOTS: moved there (or put there, if they're missing), once per save.
+		for (Object[] o : SPOTS) {
+			String key = (String) o[0], doneKey = "spot:" + key;
+			int x = (Integer) o[1], z = (Integer) o[2];
+			Trainers.Person who = Trainers.PEOPLE.get(key);
+			if (done.contains(doneKey) || who == null || !done.contains("place:" + who.place())) continue;
+			if (!level.hasChunkAt(new BlockPos(x, START_Y, z))) continue;
+			BlockPos at = spot(level, x, z, 6);
+			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 120, level.getMinY(), z - 120, x + 120, level.getMaxY(), z + 120);
+			List<Npc> found = level.getEntitiesOfClass(Npc.class, box, n -> key.equals(n.key()));
+			if (found.isEmpty()) place(level, Npc.PERSON, key, at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
+			else for (Npc n : found) n.rehome(at);
+			placed.add(doneKey);
+			done.add(doneKey);
+			changed = true;
+		}
 		for (Object[] d : DEFAULTS) {
 			String key = (String) d[0];
 			if (done.contains(key)) continue;
@@ -2408,7 +2439,8 @@ public final class Game {
 		for (Trainers.Person ps : Trainers.peopleIn(place)) {
 			// Oak at the edge of Pallet Town is the one who stops you (he comes to you); he doesn't stand there.
 			if (ps.key().equals("pallet_town_p0")) continue;
-			BlockPos at = gameSpot(level, z, size, Trainers.POS.get(ps.key()));
+			int[] own = spotOf(ps.key());
+			BlockPos at = own != null ? (level.hasChunkAt(new BlockPos(own[0], START_Y, own[1])) ? spot(level, own[0], own[1], 6) : null) : gameSpot(level, z, size, Trainers.POS.get(ps.key()));
 			if (at == null) continue;
 			String sp = ps.species();
 			if (sp != null) {
