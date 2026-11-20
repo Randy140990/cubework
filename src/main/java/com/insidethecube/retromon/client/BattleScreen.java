@@ -1194,6 +1194,11 @@ public class BattleScreen extends GameScreen {
 	/** What a move does, in a few words (the Creature Viewer's move library). */
 	private static Map<String, String> moveText;
 
+	/** What a move does, in a line (move_desc.tsv), for the summary's MOVES too. */
+	public static String moveText(String id) {
+		return moveDesc(id);
+	}
+
 	private static String moveDesc(String id) {
 		if (moveText == null) {
 			moveText = new java.util.HashMap<>();

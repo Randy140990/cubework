@@ -358,6 +358,33 @@ public final class V {
 		return trackedWidthIn(TITLE, text, size, spacing);
 	}
 
+	/** A filled convex shape on the canvas (corners x, y, x, y...). */
+	public static void poly(GuiGraphics g, float[] pts, int colour) {
+		float[] q = new float[pts.length];
+		for (int i = 0; i < pts.length; i += 2) {
+			q[i] = x(pts[i]);
+			q[i + 1] = y(pts[i + 1]);
+		}
+		Ui.poly(g, q, colour);
+	}
+
+	/** A line on the canvas, w thick. */
+	public static void line(GuiGraphics g, float x0, float y0, float x1, float y1, float w, int colour) {
+		float dx = x1 - x0, dy = y1 - y0, l = (float) Math.sqrt(dx * dx + dy * dy);
+		if (l <= 0) return;
+		float nx = -dy / l * w / 2, ny = dx / l * w / 2;
+		poly(g, new float[] {x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny}, colour);
+	}
+
+	/** Words with an edge round them (the viewer's paint-order stroke), in a component's own font. */
+	public static void stroked(GuiGraphics g, Component c, float x, float y, float size, int fill, int edge, float width) {
+		for (int i = 0; i < 12; i++) {
+			double an = i * Math.PI / 6;
+			draw(g, c, x + (float) Math.cos(an) * width / 2, y + (float) Math.sin(an) * width / 2, size, edge, false);
+		}
+		draw(g, c, x, y, size, fill, false);
+	}
+
 	/** A label (the viewer's g-label): 13px capitals, 1.4px apart. */
 	public static void label(GuiGraphics g, String text, float x, float y, int color) {
 		String t = Look.text(text.toUpperCase());
@@ -648,10 +675,18 @@ public final class V {
 		return 3;
 	}
 
+	/** The balls drawn each their own way (textures/gui/v/ball_*.png). */
+	private static final java.util.Set<String> BALLS = java.util.Set.of("pok_ball", "great_ball", "ultra_ball", "master_ball", "safari_ball", "park_ball", "level_ball",
+			"lure_ball", "moon_ball", "friend_ball", "love_ball", "heavy_ball", "fast_ball");
+
 	/** An item's picture (the viewer's): balls, medicine, discs for TMs, the map, a bag for ropes and repels, else a key. */
 	public static String itemIcon(String name) {
 		String n = name.toUpperCase();
-		if (n.contains("BALL")) return "icon_ball";
+		if (n.contains("PARCEL")) return "icon_parcel";
+		if (n.contains("BALL")) {
+			String slug = n.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z]+", "_").replaceAll("^_|_$", "");
+			return BALLS.contains(slug) ? "ball_" + slug : "ball_pok_ball";
+		}
 		if (n.contains("POTION") || n.contains("HEAL") || n.contains("ANTIDOTE") || n.contains("AWAKENING") || n.contains("REVIVE")) return "icon_potion";
 		if (n.startsWith("TM") || n.startsWith("HM")) return "icon_disc";
 		if (n.contains("MAP")) return "icon_map";

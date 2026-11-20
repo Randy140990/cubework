@@ -299,6 +299,64 @@ public final class Ui {
 		b.submit(g, R, X, Y, W, H);
 	}
 
+	/** Triangles in one colour each corner (GUI pixels), as one thing for the GUI to draw: a hexagon, a slanted cap. */
+	private record Tris(com.mojang.blaze3d.pipeline.RenderPipeline pipeline, net.minecraft.client.gui.render.TextureSetup textureSetup, org.joml.Matrix3x2f pose,
+			float[] xy, int[] c, net.minecraft.client.gui.navigation.ScreenRectangle scissorArea, net.minecraft.client.gui.navigation.ScreenRectangle bounds)
+			implements net.minecraft.client.gui.render.state.GuiElementRenderState {
+		@Override
+		public void buildVertices(com.mojang.blaze3d.vertex.VertexConsumer v) {
+			// Each triangle as a quad with its last corner twice (the GUI draws quads).
+			for (int i = 0; i + 2 < xy.length / 2; i += 3) {
+				int a = i, b = i + 1, d = i + 2;
+				v.addVertexWith2DPose(pose, xy[a * 2], xy[a * 2 + 1]).setColor(c[a]);
+				v.addVertexWith2DPose(pose, xy[b * 2], xy[b * 2 + 1]).setColor(c[b]);
+				v.addVertexWith2DPose(pose, xy[d * 2], xy[d * 2 + 1]).setColor(c[d]);
+				v.addVertexWith2DPose(pose, xy[d * 2], xy[d * 2 + 1]).setColor(c[d]);
+			}
+		}
+	}
+
+	/** Triangles (x, y in GUI pixels, three corners each), a colour for each corner. */
+	public static void tris(GuiGraphics g, float[] xy, int[] cols) {
+		if (xy.length < 6) return;
+		org.joml.Matrix3x2f pose = new org.joml.Matrix3x2f(g.pose());
+		float x0 = Float.MAX_VALUE, y0 = Float.MAX_VALUE, x1 = -Float.MAX_VALUE, y1 = -Float.MAX_VALUE;
+		for (int i = 0; i < xy.length / 2; i++) {
+			org.joml.Vector2f q = pose.transformPosition(xy[i * 2], xy[i * 2 + 1], new org.joml.Vector2f());
+			x0 = Math.min(x0, q.x);
+			y0 = Math.min(y0, q.y);
+			x1 = Math.max(x1, q.x);
+			y1 = Math.max(y1, q.y);
+		}
+		net.minecraft.client.gui.navigation.ScreenRectangle bounds = new net.minecraft.client.gui.navigation.ScreenRectangle((int) Math.floor(x0), (int) Math.floor(y0),
+				Math.max(1, (int) Math.ceil(x1 - x0) + 1), Math.max(1, (int) Math.ceil(y1 - y0) + 1));
+		net.minecraft.client.gui.navigation.ScreenRectangle scissor = g.scissorStack.peek();
+		if (scissor != null) {
+			bounds = scissor.intersection(bounds);
+			if (bounds == null) return;
+		}
+		g.guiRenderState.submitGuiElement(new Tris(net.minecraft.client.renderer.RenderPipelines.GUI, net.minecraft.client.gui.render.TextureSetup.noTexture(), pose, xy, cols, scissor, bounds));
+	}
+
+	/** A filled convex shape (its corners in order, GUI pixels) in one colour. */
+	public static void poly(GuiGraphics g, float[] pts, int colour) {
+		int n = pts.length / 2;
+		if (n < 3) return;
+		float[] xy = new float[(n - 2) * 6];
+		int[] c = new int[(n - 2) * 3];
+		for (int i = 1; i + 1 < n; i++) {
+			int o = (i - 1) * 6;
+			xy[o] = pts[0];
+			xy[o + 1] = pts[1];
+			xy[o + 2] = pts[i * 2];
+			xy[o + 3] = pts[i * 2 + 1];
+			xy[o + 4] = pts[(i + 1) * 2];
+			xy[o + 5] = pts[(i + 1) * 2 + 1];
+		}
+		java.util.Arrays.fill(c, colour);
+		tris(g, xy, c);
+	}
+
 	/** A rounded ring (an outline): radius r, t thick, smooth like rr. */
 	public static void ring(GuiGraphics g, float x, float y, float w, float h, float r, float t, int color) {
 		if (w <= 0 || h <= 0 || t <= 0) return;

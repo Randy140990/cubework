@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.nbt.CompoundTag;
@@ -291,21 +292,29 @@ public class MenuScreen extends DeviceScreen {
 				// As the viewer: TAB or left and right for the page, up and down for the next of your team.
 				if (e.key() == GLFW.GLFW_KEY_TAB || Ui.isRight(e)) summaryPage = (summaryPage + 1) % 3;
 				else if (Ui.isLeft(e)) summaryPage = (summaryPage + 2) % 3;
-				else if (Ui.isUp(e)) partyAt = Math.floorMod(partyAt - 1, d.party.size());
+				else if ((Ui.isUp(e) || Ui.isDown(e)) && summaryPage == 2) {
+					Mon mm = d.party.get(Math.min(partyAt, d.party.size() - 1));
+					moveAt = Math.floorMod(moveAt + (Ui.isUp(e) ? -1 : 1), Math.max(1, mm.moves.size()));
+				} else if (Ui.isUp(e)) partyAt = Math.floorMod(partyAt - 1, d.party.size());
 				else if (Ui.isDown(e)) partyAt = Math.floorMod(partyAt + 1, d.party.size());
 				else if (Ui.isB(e)) view = View.PARTY;
 			}
 			case BAG -> {
-				int n = pocketItems().size() + 1;
-				if (Ui.isLeft(e) || Ui.isRight(e) || e.key() == GLFW.GLFW_KEY_TAB) {
-					pocket = Math.floorMod(pocket + (Ui.isLeft(e) ? -1 : 1), POCKETS.length);
+				int n = pocketItems().size();
+				if (e.key() == GLFW.GLFW_KEY_TAB) {
+					pocket = Math.floorMod(pocket + 1, POCKETS.length);
 					bagAt = 0;
 					bagTop = 0;
-				} else if (Ui.isUp(e)) bagAt = Math.floorMod(bagAt - 1, n);
-				else if (Ui.isDown(e)) bagAt = Math.floorMod(bagAt + 1, n);
-				else if (Ui.isA(e)) pickBag(bagAt);
+					Sounds.select();
+				} else if (n > 0 && (Ui.isLeft(e) || Ui.isRight(e) || Ui.isUp(e) || Ui.isDown(e))) {
+					int was = bagAt;
+					if (Ui.isLeft(e)) bagAt = Math.floorMod(bagAt - 1, n);
+					else if (Ui.isRight(e)) bagAt = Math.floorMod(bagAt + 1, n);
+					else if (Ui.isUp(e)) bagAt = bagAt - 4 >= 0 ? bagAt - 4 : bagAt;
+					else bagAt = bagAt + 4 < n ? bagAt + 4 : bagAt;
+					if (was != bagAt) Sounds.select();
+				} else if (Ui.isA(e) && n > 0) pickBag(bagAt);
 				else if (Ui.isB(e)) view = View.MENU;
-				if (Ui.isLeft(e) || Ui.isRight(e)) Sounds.select();
 			}
 			case BAG_ACTION -> {
 				if (Ui.isUp(e) || Ui.isDown(e)) actionAt ^= 1;
@@ -434,6 +443,7 @@ public class MenuScreen extends DeviceScreen {
 					Choice c = new Choice(List.of("SUMMARY", "SWITCH", "FOLLOW ME", "CANCEL"));
 					c.at = actionAt;
 					vchoice(g, c, 950, V.H - 30 - V.choiceHeight(4), 290, this::partyAction);
+					V.hints(g, "A", "Choose", "B", "Back");
 					actionAt = c.at;
 				}
 			}
@@ -443,7 +453,8 @@ public class MenuScreen extends DeviceScreen {
 				if (view == View.BAG_ACTION) {
 					Choice c = new Choice(List.of("USE", "CANCEL"));
 					c.at = actionAt;
-					vchoice(g, c, V.W - 140 - 300, V.H - 26 - 150 - V.choiceHeight(c.options.size()), 300, this::bagAction);
+					vchoice(g, c, 940, 300, 260, this::bagAction);
+					V.hints(g, "A", "Choose", "B", "Back");
 					actionAt = c.at;
 				}
 			}
@@ -662,151 +673,337 @@ public class MenuScreen extends DeviceScreen {
 	}
 
 	/**
-	 * Your team as the UI Viewer has it: six cards, three across, each with a picture of the POKéMON, its name,
-	 * level, types, status, HP; the one you're on cream and glowing; FOLLOWING YOU on your partner.
+	 * Your team as the UI Viewer's (Let's Go's party cards, signed off 20 Nov): six cards, three across, each in its
+	 * own type's colour, its picture bobbing (the one you're on bouncing), name, level, types, status, HP on a white
+	 * strip; the one you're on lifted with a sunny ring and a red arrow; FOLLOWING YOU on your partner.
 	 */
 	private void drawParty(GuiGraphics g, PlayerData d) {
-		Scenes.backdrop(g, "party");
-		V.header(g, "icon_ball", "POKéMON", null);
-		float cw = (1220 - 2 * 22) / 3F, ch = 262;
+		Scenes.bg2(g, "party");
+		V.header(g, "picto_ball_green", "POKéMON", null);
+		float secs = (ticks + Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true)) / 20F;
+		float cw = (1180 - 2 * 28) / 3F, ch = 250;
 		for (int i = 0; i < d.party.size(); i++) {
 			Mon mon = d.party.get(i);
-			float x = 30 + (i % 3) * (cw + 22), y = 100 + (i / 3) * (ch + 22);
+			float x = 50 + (i % 3) * (cw + 28), y = 104 + (i / 3) * (ch + 24);
 			int idx = i;
 			if (vover(x, y, cw, ch) && (view == View.PARTY || view == View.USE_ON)) partyAt = i;
 			boolean on = i == partyAt, fnt = mon.fainted();
+			if (on) y -= 6;
+			int tc = Ui.typeColor(mon.species.type1()) | 0xFF000000;
+			if (on) V.rr(g, x - 5, y - 5, cw + 10, ch + 10, 33, 0xFFFFC93C);
+			V.shadow(g, x, y, cw, ch, 28, on ? 1.3F : 0.9F);
+			V.rr(g, x, y, cw, ch, 28, 0xFFFFFFFF);
+			int c1 = Ui.mix(tc, 0xFFFFFFFF, 0.78F), c2 = Ui.mix(tc, 0xFFFFFFFF, 0.55F);
+			if (fnt) {
+				c1 = Ui.mix(c1, 0xFFD8D8D8, 0.7F);
+				c2 = Ui.mix(c2, 0xFFC8C8C8, 0.7F);
+			}
+			V.rrStops(g, x + 4, y + 4, cw - 8, ch - 8, 24, new float[] {0, 0.55F, 1}, new int[] {0xFFFFFFFF, c1, c2});
+			if (i == swapFrom) V.ring(g, x, y, cw, ch, 28, 4, V.BLUE);
 			if (on) {
-				V.rr(g, x - 4, y - 4, cw + 8, ch + 8, 30, 0x66FFF4D8);
-				V.shadow(g, x, y, cw, ch, 26, 1.2F);
-				V.rr(g, x, y, cw, ch, 26, 0xFFFFFFFF);
-				V.rrv(g, x + 2.5F, y + 2.5F, cw - 5, ch - 5, 23.5F, 0xFFFFF8E6, 0xFFFFF0CC);
-			} else V.panel(g, x, y, cw, ch, 26, false);
-			if (i == swapFrom) V.ring(g, x, y, cw, ch, 26, 4, V.GOLD);
-			int ink = on ? V.INK : V.TEXT;
-			V.glow(g, x + 10 + 78, y + 8 + 97, 70, 70, on ? 0x3AFFD45A : 0x228FF5C0);
-			V.img(g, Look.portrait(mon.species.id()), x + 10, y + 8, 156, 156, 128, 128, fnt ? 0x99FFFFFF : 0xFFFFFFFF);
-			float tx = x + 18 + 160, ty = y + 18;
-			V.text(g, mon.name(), tx, ty, 25, ink, true);
+				Component ar = V.raw("▶", true);
+				V.stroked(g, ar, x - 26, y + 96, 30, V.RED, 0xFFFFFFFF, 6);
+			}
+			// Its picture, bobbing (the one you're on bouncing).
+			float bob = on ? -3 - 5 * (float) Math.sin(secs * Math.PI * 2) : -1.5F + 1.5F * (float) Math.cos(secs * Math.PI * 2 / (2.4F + i * 0.3F));
+			V.img(g, Look.portrait(mon.species.id()), x + 8 + 5, y + 4 + 5 + bob, 160, 160, 128, 128, fnt ? 0x99FFFFFF : 0xFFFFFFFF);
+			float tx = x + 4 + 168, ty = y + 4 + 14 + 6;
+			V.title(g, mon.name(), tx, V.capsTop(ty + 14, 25), 25, V.INK);
 			String gm = mon.genderMark();
-			if (gm != null && !gm.isEmpty()) V.text(g, gm, tx + V.width(mon.name(), 25, true) + 6, ty + 4, 20, gm.contains("\u2640") ? 0xFFFF8FB1 : 0xFF7FB8FF, true);
-			V.text(g, "Lv. " + mon.level, tx, ty + 38, 20, ink, true);
-			float cx = tx;
-			cx += V.type(g, mon.species.type1().label, Ui.typeColor(mon.species.type1()), cx, ty + 70, 0, 13.5F) + 6;
-			if (mon.species.type2() != null) V.type(g, mon.species.type2().label, Ui.typeColor(mon.species.type2()), cx, ty + 70, 0, 13.5F);
-			float sx = tx;
+			if (gm != null && !gm.isEmpty()) V.text(g, gm, tx + V.titleWidth(mon.name(), 25) + 6, V.capsTop(ty + 14, 22), 22, gm.contains("\u2640") ? 0xFFFF8FB1 : 0xFF7FB8FF, true);
+			V.text(g, "Lv. " + mon.level, tx, V.capsTop(ty + 28 + 8 + 15, 20), 20, V.INK, true);
+			float cx = tx, chy = ty + 28 + 8 + 30 + 8;
+			cx += V.type(g, mon.species.type1().label, tc, cx, chy, 0, 13.5F) + 6;
+			if (mon.species.type2() != null) V.type(g, mon.species.type2().label, Ui.typeColor(mon.species.type2()) | 0xFF000000, cx, chy, 0, 13.5F);
+			float sx = tx, sy = chy + 24 + 8;
 			String st = fnt ? "FNT" : mon.status.tag;
 			if (!st.isEmpty()) {
 				float sw = V.width(st, 13, true) + 16;
-				V.rr(g, sx, ty + 104, sw, 22, 7, Ui.statusColor(st));
-				V.text(g, st, sx + 8, ty + 107, 13, 0xFFFFFFFF, true);
+				V.rr(g, sx, sy, sw, 21, 7, Ui.statusColor(st));
+				V.text(g, st, sx + 8, V.capsTop(sy + 10.5F, 13), 13, 0xFFFFFFFF, true);
 				sx += sw + 6;
 			}
 			if (i == d.follow) {
-				float fw = V.width("FOLLOWING YOU", 12, true) + 20;
-				V.pill(g, sx, ty + 105, fw, 21, on ? V.INK : V.EDGE_LIGHT);
-				V.text(g, "FOLLOWING YOU", sx + 10, ty + 109, 12, on ? V.CREAM : 0xFF123C38, true);
+				String fy = Lang.t("FOLLOWING YOU");
+				float fw = V.trackedWidth(fy, 12, 0.8F) + 20;
+				V.rrv(g, sx, sy + 1, fw, 19, 9.5F, 0xFF6BE0A6, 0xFF2FA86C);
+				V.tracked(g, fy, sx + 10, V.capsTop(sy + 10.5F, 12), 12, 0xFFFFFFFF, 0.8F);
 			}
-			float frac = mon.hp / (float) Math.max(1, mon.maxHp()), hy = y + ch - 18 - 24;
-			V.text(g, "HP", x + 20, hy + 4, 14, on ? 0xFFB8860B : V.GOLD, true);
+			// HP on a white strip along its foot.
+			float frac = mon.hp / (float) Math.max(1, mon.maxHp()), hx = x + 4 + 20, hw = cw - 8 - 40, hh = 14 + 12, hy = y + ch - 4 - 18 - hh;
+			V.pill(g, hx, hy, hw, hh, 0xD9FFFFFF);
+			V.tracked(g, "HP", hx + 12, V.capsTop(hy + hh / 2, 14), 14, 0xFFE5525C, 1);
 			String hpT = mon.hp + "/" + mon.maxHp();
-			float hw = V.width(hpT, 19, true);
-			V.bar(g, x + 20 + 34, hy + 5, cw - 40 - 34 - hw - 12, 14, frac, V.hpColour(frac));
-			V.right(g, hpT, x + cw - 20, hy, 19, ink, true);
+			float nw = V.width(hpT, 19, true), bx = hx + 12 + V.trackedWidth("HP", 14, 1) + 10;
+			V.bar(g, bx, hy + 6, hw - (bx - hx) - 10 - nw - 12, 14, frac, V.hpColour(frac));
+			V.right(g, hpT, hx + hw - 12, V.capsTop(hy + hh / 2, 19), 19, V.INK, true);
 			if (view == View.PARTY) vhit(x, y, cw, ch, () -> pickParty(idx));
 			if (view == View.USE_ON) vhit(x, y, cw, ch, () -> use(pocketItems().get(Math.min(bagAt, pocketItems().size() - 1)), idx));
 		}
-		V.hints(g, "A", "Choose", "B", "Back");
+		if (view != View.PARTY_ACTION) V.hints(g, "A", "Choose", "B", "Back");
 	}
 
-	/** The summary's page: INFO, STATS or MOVES. */
-	private int summaryPage;
+	/** The summary's page (INFO, STATS or MOVES), and the move picked on MOVES. */
+	private int summaryPage = 1, moveAt;
 
 	@Override
 	protected boolean wantsTab() {
 		return view == View.SUMMARY || view == View.BAG;
 	}
 
+	private static final String[] NATURES = {"Hardy", "Lonely", "Brave", "Adamant", "Naughty", "Bold", "Docile", "Relaxed", "Impish", "Lax", "Timid", "Hasty",
+			"Serious", "Jolly", "Naive", "Modest", "Mild", "Quiet", "Bashful", "Rash", "Calm", "Gentle", "Sassy", "Careful", "Quirky"};
+	private static final String[] LIKES = {"Napping in the sun", "Running about", "Berries", "Splashing in water", "Being brushed", "Sitting on your shoulder",
+			"Bright lights", "Quiet places", "Chasing butterflies", "Big meals"};
+
+	/** How good a stat is for its level, in a word (the viewer's statWord). */
+	private static String statWord(int v, int lv) {
+		float f = v / (lv * 2.6F + 30);
+		return f > 0.8F ? "Best" : f > 0.62F ? "Great" : f > 0.45F ? "Good" : f > 0.3F ? "Decent" : "Fair";
+	}
+
 	/**
-	 * One of your team in full, as the UI Viewer's summary: it in 3D on a stand at the right; on the left its name,
-	 * level and three pages: INFO (number, types, trainer, EXP), STATS (as bars) and MOVES (with types and PP).
+	 * One of your team in full, as the UI Viewer's (Let's Go's STATS page, signed off 20 Nov): it stands on its own
+	 * backdrop (its type's swirl and drifting things), INFO / STATS / MOVES along the top; STATS: the judge's stamp
+	 * top left and its six stats as a lime hexagon with a word for each; INFO: who caught it and when, in white and
+	 * lime, its EXP at the foot; MOVES: each a bar in its type's colour with its mark and PP, what the one you're on
+	 * does underneath. Its name plate at the bottom right, its number at the bottom left.
 	 */
 	private void drawSummary(GuiGraphics g, PlayerData d) {
 		if (d.party.isEmpty()) return;
-		Mon mon = d.party.get(Math.min(partyAt, d.party.size() - 1));
+		partyAt = Math.min(partyAt, d.party.size() - 1);
+		Mon mon = d.party.get(partyAt);
 		Species sp = mon.species;
-		// The page in its own colour (its first type's), its name on a band of it.
-		Scenes.typeBackdrop(g, sp.type1());
-		Scenes.model(g, (ticks) / 20F, sp.id(), -1.05);
-		float x = 28, y = 28, w = 640, h = 660, px = x + 28;
-		V.panel(g, x, y, w, h);
-		Scenes.typeBand(g, sp.type1(), x + 12, y + 12, w - 24, 64);
-		float ty = y + 24;
-		V.text(g, mon.name(), px, ty + 2, 36, 0x55000000, true);
-		V.text(g, mon.name(), px, ty, 36, V.TEXT, true);
-		float nx = px + V.width(mon.name(), 36, true) + 12;
+		float secs = (ticks + Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true)) / 20F;
+		Scenes.typeBg(g, sp.type1(), false);
+		Scenes.modelBare(g, secs, sp.id(), 1.05);
+		int tc = Ui.typeColor(sp.type1()) | 0xFF000000;
+		// A soft shade down the right on INFO and MOVES, so white and lime read on any backdrop.
+		if (summaryPage != 1) {
+			for (int i = 0; i < 24; i++) {
+				float k = i / 23F, a = k < 0.3F ? 0.22F * k / 0.3F : 0.22F + 0.2F * (k - 0.3F) / 0.7F;
+				V.rr(g, 520 + i * 760 / 24F, -V.oy / V.k, 760 / 24F + 1, V.gh / V.k, 0, Ui.alpha(0xFF181E3C, a));
+			}
+		}
+		// The tabs.
+		String[] pages = {"INFO", "STATS", "MOVES"};
+		float tw = 0;
+		for (String t : pages) tw += V.titleTrackedWidth(t, 17, 1) + 40 + 10;
+		float tx = 640 - (tw - 10) / 2;
+		for (int j = 0; j < 3; j++) {
+			float w = V.titleTrackedWidth(pages[j], 17, 1) + 40, hh = 17 * 1.5F + 10;
+			boolean on = j == summaryPage;
+			if (on) {
+				V.shadow(g, tx, 10, w, hh, hh / 2, 0.6F);
+				V.pill(g, tx, 10, w, hh, 0xFFFFFFFF);
+			} else V.pill(g, tx, 10, w, hh, 0x47FFFFFF);
+			V.titleTracked(g, pages[j], tx + 20, V.capsTop(10 + hh / 2, 17), 17, on ? V.INK : 0xFFFFFFFF, 1);
+			int jj = j;
+			vhit(tx, 10, w, hh, () -> summaryPage = jj);
+			tx += w + 10;
+		}
+		int[] stats = {mon.maxHp(), mon.attack(), mon.defense(), mon.speed(), mon.spDefense(), mon.spAttack()};
+		if (summaryPage == 1) {
+			// The judge's stamp, tilted.
+			float f = 0;
+			for (int v : stats) f += v;
+			f = f / 6 / (mon.level * 2.6F + 30);
+			String word = f > 0.62F ? "amazing" : f > 0.48F ? "great" : f > 0.36F ? "good" : "decent";
+			g.pose().pushMatrix();
+			float scx = V.x(24 + 130), scy = V.y(20 + 95);
+			g.pose().translate(scx, scy);
+			g.pose().rotate((float) Math.toRadians(-8));
+			g.pose().translate(-scx, -scy);
+			V.img(g, V.tex("stamp_" + word), 24 + (260 - 190) / 2F, 20, 190, 190, 128, 128, 0xEBFFFFFF);
+			g.pose().popMatrix();
+			statHex(g, stats, mon.level, 720 + 270 - 190, 40 + 20);
+		} else if (summaryPage == 0) {
+			// Who caught it, as Let's Go's: white Fredoka on its backdrop, what each is in lime, a lime line under the trainer.
+			float rx = 720 + 24, ry = 40 + 34;
+			int lime = 0xFFC9F55A;
+			Component ot = V.titleComp(Lang.t("Original Trainer") + ": " + name());
+			V.draw(g, ot, rx + 0.5F, V.capsTop(ry + 22, 30) + 2, 30, 0x40141830, false);
+			V.draw(g, ot, rx, V.capsTop(ry + 22, 30), 30, lime, false);
+			V.rr(g, rx, ry + 45 + 3, 540 - 24 + 40 - 40, 3, 1.5F, lime);
+			int seed = Math.abs((sp.id().hashCode() * 31) ^ (mon.dvAtk * 17 + mon.dvDef * 5 + mon.dvSpe));
+			String[][] rows = {{"ID No.", String.format("%05d", Math.abs(name().hashCode()) % 100000)}, {"Nature", NATURES[seed % NATURES.length]},
+					{"Met", d.place.isEmpty() ? "KANTO" : d.place.toUpperCase().replace('_', ' ')}, {"Level met", String.valueOf(Math.max(2, mon.level - 3))},
+					{"Likes", LIKES[(seed / 7) % LIKES.length]}};
+			float yy = ry + 45 + 8 + 10;
+			for (String[] r : rows) {
+				Component lab = V.titleComp(Lang.t(r[0]) + ": ");
+				float lw = V.width(lab, 26);
+				V.draw(g, lab, rx + 0.5F, V.capsTop(yy + 19, 26) + 2, 26, 0x40141830, false);
+				V.draw(g, lab, rx, V.capsTop(yy + 19, 26), 26, 0xFFFFFFFF, false);
+				V.draw(g, V.titleComp(r[1]), rx + lw, V.capsTop(yy + 19, 26), 26, lime, false);
+				yy += 39 + 10;
+			}
+		} else drawMoves(g, mon);
+		// The name plate: dark glass, a ball's outline in it, name, level, types, HP.
+		float px = 700, py = 512, pw = 560, ph = 14 + 48 + 6 + 24 + 10 + 22 + 14;
+		V.shadow(g, px, py, pw, ph, 44, 0.9F);
+		V.rr(g, px, py, pw, ph, 44, 0x8CFFFFFF);
+		V.rr(g, px + 2, py + 2, pw - 4, ph - 4, 42, 0x6B1C243C);
+		g.enableScissor(Math.round(V.x(px + 2)), Math.round(V.y(py + 2)), Math.round(V.x(px + pw - 2)), Math.round(V.y(py + ph - 2)));
+		V.icon(g, "icon_ballmark", px - 34, py - 28, 150, 0x59FFFFFF);
+		g.disableScissor();
+		float nx = px + 92, ny = py + 14 + 24;
+		V.title(g, mon.name(), nx, V.capsTop(ny, 32), 32, 0xFFFFFFFF);
+		float gx = nx + V.titleWidth(mon.name(), 32) + 10;
 		String gm = mon.genderMark();
 		if (gm != null && !gm.isEmpty()) {
-			V.text(g, gm, nx, ty + 10, 22, gm.contains("\u2640") ? 0xFFFF8FB1 : 0xFF7FB8FF, true);
-			nx += V.width(gm, 22, true) + 10;
+			V.text(g, gm, gx, V.capsTop(ny, 24), 24, gm.contains("\u2640") ? 0xFFFF8FB1 : 0xFF7FB8FF, true);
+			gx += V.width(gm, 24, true) + 10;
 		}
 		String st = mon.fainted() ? "FNT" : mon.status.tag;
 		if (!st.isEmpty()) {
 			float sw = V.width(st, 13, true) + 16;
-			V.rr(g, nx, ty + 12, sw, 22, 7, Ui.statusColor(st));
-			V.text(g, st, nx + 8, ty + 15, 13, 0xFFFFFFFF, true);
+			V.rr(g, gx, ny - 10.5F, sw, 21, 7, Ui.statusColor(st));
+			V.text(g, st, gx + 8, V.capsTop(ny, 13), 13, 0xFFFFFFFF, true);
 		}
-		V.right(g, "Lv. " + mon.level, x + w - 28, ty + 8 + 2, 24, 0x55000000, true);
-		V.right(g, "Lv. " + mon.level, x + w - 28, ty + 8, 24, V.TEXT, true);
-		float cx = px, cy = ty + 50 + 14;
-		String[] tabs = {"INFO", "STATS", "MOVES"};
-		for (int t = 0; t < 3; t++) {
-			int tt = t;
-			float tw = V.chip(g, tabs[t], cx, cy, 15, t == summaryPage, false);
-			vhit(cx, cy, tw, 26, () -> summaryPage = tt);
-			cx += tw + 8;
-		}
-		float by = cy + 26 + 18;
-		if (summaryPage == 0) {
-			String[][] rows = {{"No.", String.format("%03d", sp.dex())}, {"Types", ""}, {"Trainer", name()}, {"Item", "None"}};
-			for (int r = 0; r < rows.length; r++) {
-				float ry = by + r * 40;
-				V.label(g, rows[r][0], px, ry + 7);
-				if (r == 1) {
-					float tx = px + 140;
-					tx += V.type(g, sp.type1().label, Ui.typeColor(sp.type1()), tx, ry + 2, 92, 13.5F) + 8;
-					if (sp.type2() != null) V.type(g, sp.type2().label, Ui.typeColor(sp.type2()), tx, ry + 2, 92, 13.5F);
-				} else V.text(g, rows[r][1], px + 140, ry, 21, V.TEXT, true);
-			}
+		V.right(g, "Lv. " + mon.level, px + pw - 24, V.capsTop(ny, 22), 22, 0xFFFFFFFF, true);
+		float cy = py + 14 + 48 + 6, cx = nx;
+		cx += V.type(g, sp.type1().label, tc, cx, cy, 92, 13.5F) + 8;
+		if (sp.type2() != null) V.type(g, sp.type2().label, Ui.typeColor(sp.type2()) | 0xFF000000, cx, cy, 92, 13.5F);
+		float hy = cy + 24 + 10, frac = mon.hp / (float) Math.max(1, mon.maxHp());
+		V.tracked(g, "HP", nx, V.capsTop(hy + 9, 14), 14, 0xFFFFE04A, 1);
+		String hpT = mon.hp + "/" + mon.maxHp();
+		float nw = V.width(hpT, 19, true), bx = nx + V.trackedWidth("HP", 14, 1) + 10;
+		V.pill(g, bx, hy + 2, px + pw - 24 - nw - 10 - bx, 14, 0x4D000000);
+		if (frac > 0) V.pill(g, bx + 2, hy + 4, Math.max(10, (px + pw - 24 - nw - 10 - bx - 4) * frac), 10, V.hpColour(frac));
+		V.right(g, hpT, px + pw - 24, V.capsTop(hy + 9, 19), 19, 0xFFFFFFFF, true);
+		// Its name and number at the bottom left (and its EXP, on INFO).
+		boolean info = summaryPage == 0;
+		float dw = info ? 440 : 260, dy = info ? 566 : 640, dh = V.H - dy + 40;
+		V.rr(g, -40, dy, dw + 40, dh, 18, 0x8CFFFFFF);
+		V.rr(g, -40, dy + 2, dw + 38, dh, 16, 0x6B1C243C);
+		V.text(g, mon.name(), 22, dy + 10 + 3, 17, 0xFFFFFFFF, false);
+		V.text(g, "POKéDEX No. " + String.format("%03d", sp.dex()), 22, dy + 10 + 3 + 24, 17, 0xFFFFFFFF, false);
+		if (info) {
 			int now = sp.growth().expAt(mon.level), next = mon.level >= 100 ? now : sp.growth().expAt(mon.level + 1);
-			float ey = by + rows.length * 40 + 16;
-			V.label(g, "EXP to Lv. " + Math.min(100, mon.level + 1) + "  (" + Math.max(0, next - mon.exp) + " more)", px, ey);
-			V.pill(g, px, ey + 22, w - 56, 7, 0xFF0B2A2C);
+			float ey = dy + 10 + 3 + 24 + 30;
+			V.text(g, Lang.t("EXP points"), 22, ey, 16, 0xFFFFFFFF, false);
+			V.right(g, String.format("%,d", mon.exp), dw - 22, ey, 16, 0xFFFFFFFF, false);
+			V.text(g, Lang.t("To the next level"), 22, ey + 22, 16, 0xFFFFFFFF, false);
+			V.right(g, String.format("%,d", Math.max(0, next - mon.exp)), dw - 22, ey + 22, 16, 0xFFFFFFFF, false);
 			float ef = next <= now ? 1 : (mon.exp - now) / (float) (next - now);
-			if (ef > 0) V.pill(g, px, ey + 22, Math.max(7, (w - 56) * ef), 7, 0xFF6FC3FF);
-		} else if (summaryPage == 1) {
-			String[] names = {"HP", "ATTACK", "DEFENSE", "SPCL.ATK", "SPCL.DEF", "SPEED"};
-			int[] stats = {mon.maxHp(), mon.attack(), mon.defense(), mon.spAttack(), mon.spDefense(), mon.speed()};
-			for (int i = 0; i < 6; i++) {
-				float ry = by + i * 40;
-				V.label(g, names[i], px, ry + 6);
-				V.right(g, i == 0 ? mon.hp + "/" + stats[0] : String.valueOf(stats[i]), px + 150 + 70, ry, 19, V.TEXT, true);
-				float f = Math.min(1, stats[i] / (mon.level * 2.6F + 30));
-				V.pill(g, px + 150 + 82, ry + 3, w - 56 - 232, 16, 0xFF0B2A2C);
-				int tc = Ui.typeColor(sp.type1()) | 0xFF000000;
-				if (f > 0) V.rrv(g, px + 150 + 84, ry + 5, Math.max(12, (w - 56 - 236) * f), 12, 6, Ui.lighter(tc, 0.45F), tc);
-			}
-		} else {
-			for (int i = 0; i < mon.moves.size(); i++) {
-				Move mv = Move.get(mon.moves.get(i));
-				float ry = by + i * 62;
-				V.panel(g, px, ry, w - 56, 52, 18, true);
-				float tw = V.type(g, mv.type().label, Ui.typeColor(mv.type()), px + 16, ry + 13, 92, 13.5F);
-				V.text(g, mv.name(), px + 16 + tw + 14, ry + 13, 21, V.TEXT, true);
-				V.right(g, "PP " + mon.pp.get(i) + "/" + mv.pp(), px + w - 56 - 16, ry + 15, 18, V.TEXT, true);
-			}
+			V.pill(g, 22, ey + 22 + 28, dw - 44, 9, 0x4D000000);
+			if (ef > 0) V.rrh(g, 22, ey + 22 + 28, Math.max(9, (dw - 44) * ef), 9, 4.5F, new float[] {0, 1}, new int[] {0xFF7CC2FA, 0xFF3C8DE4});
 		}
-		vhit(x, y + h - 60, w, 60, () -> view = View.PARTY);
+		vhit(0, 600, 300, 120, () -> view = View.PARTY);
 		V.hints(g, "TAB", "Page", "B", "Back");
+	}
+
+	/** The six stats as Let's Go's hexagon (the viewer's statHex, 380 by 360 at x, y): its rim, its share in lime, a word and a number for each. */
+	private static void statHex(GuiGraphics g, int[] st, int lv, float ox, float oy) {
+		String[] labels = {"HP", "Attack", "Defense", "Speed", "Sp. Def", "Sp. Atk"};
+		float R = 118, cx = ox + 190, cy = oy + 178, mx = lv * 2.6F + 30;
+		float[][] pt = new float[6][];
+		for (int k = 0; k < 6; k++) {
+			double a = -Math.PI / 2 + k * Math.PI / 3;
+			pt[k] = new float[] {(float) Math.cos(a), (float) Math.sin(a)};
+		}
+		java.util.function.BiFunction<Float, Float, float[]> ring = (r, dy) -> {
+			float[] q = new float[12];
+			for (int k = 0; k < 6; k++) {
+				q[k * 2] = cx + pt[k][0] * r;
+				q[k * 2 + 1] = cy + pt[k][1] * r + dy;
+			}
+			return q;
+		};
+		// Its shadow, the aqua inside, the lime rim (light at the top left, green at the foot right), the spokes, the half ring.
+		V.poly(g, ring.apply(R * 1.06F + 8, 4F), 0x2E000000);
+		V.poly(g, ring.apply(R + 7, 0F), 0xFF3FD06A);
+		V.poly(g, ring.apply(R + 3, 0F), 0xFFA6EE6A);
+		V.poly(g, ring.apply(R - 7, 0F), 0xB86ED6BE);
+		for (int k = 0; k < 6; k++) V.line(g, cx, cy, cx + pt[k][0] * R, cy + pt[k][1] * R, 1.5F, 0x80FFFFFF);
+		float[] half = ring.apply(R * 0.5F, 0F);
+		for (int k = 0; k < 6; k++) V.line(g, half[k * 2], half[k * 2 + 1], half[(k + 1) % 6 * 2], half[(k + 1) % 6 * 2 + 1], 1.5F, 0x66FFFFFF);
+		// Its own share.
+		float[] val = new float[12];
+		for (int k = 0; k < 6; k++) {
+			float f = Math.max(0.15F, Math.min(1, st[k] / mx));
+			val[k * 2] = cx + pt[k][0] * R * f;
+			val[k * 2 + 1] = cy + pt[k][1] * R * f;
+		}
+		V.poly(g, val, 0xD9E9FF8A);
+		for (int k = 0; k < 6; k++) V.line(g, val[k * 2], val[k * 2 + 1], val[(k + 1) % 6 * 2], val[(k + 1) % 6 * 2 + 1], 2.5F, 0xFFFFFFFF);
+		int ink = 0xFF1F3A2C;
+		for (int k = 0; k < 6; k++) {
+			float x = cx + pt[k][0] * (R + 40), y = cy + pt[k][1] * (R + 40);
+			Component l = V.titleComp(Lang.t(labels[k])), w = V.titleComp(Lang.t(statWord(st[k], lv))), n = V.raw(String.valueOf(st[k]), true);
+			V.stroked(g, l, x - V.width(l, 19) / 2, y - 10 - 19 * 0.8F, 19, 0xFFFFFFFF, ink, 4);
+			V.stroked(g, w, x - V.width(w, 20) / 2, y + 12 - 20 * 0.8F, 20, 0xFFFFE04A, ink, 4);
+			V.stroked(g, n, x - V.width(n, 13) / 2, y + 30 - 13 * 0.8F, 13, 0xFFFFFFFF, ink, 3);
+		}
+	}
+
+	/** MOVES as Let's Go's: each a bar in its type's colour, its mark in a white circle, its type on a tag, its name big, PP on a dark slanted cap. */
+	private void drawMoves(GuiGraphics g, Mon mon) {
+		moveAt = Math.max(0, Math.min(mon.moves.size() - 1, moveAt));
+		float x0 = 720, y0 = 40 + 34, bw = 540, bh = 64;
+		for (int j = 0; j < mon.moves.size(); j++) {
+			Move m = Move.get(mon.moves.get(j));
+			int c = Ui.typeColor(m.type()) | 0xFF000000;
+			float y = y0 + j * (bh + 12);
+			if (vover(x0, y, bw, bh)) moveAt = j;
+			boolean on = j == moveAt;
+			float x = x0 - (on ? 10 : 0);
+			if (on) {
+				V.rr(g, x - 3, y - 3, bw + 6, bh + 6, 35, 0x66FFFFFF);
+				V.tri(g, x - 40 + 19, y + 32, 40, 0, 0xFFFFFFFF);
+				V.tri(g, x - 40 + 18, y + 32, 20, 0, 0xFFDDE3EE);
+			}
+			V.shadow(g, x, y, bw, bh, 32, 0.8F);
+			V.rr(g, x, y, bw, bh, 32, on ? 0xFFFFFFFF : 0xBFFFFFFF);
+			V.rrStops(g, x + 3, y + 3, bw - 6, bh - 6, 29, new float[] {0, 0.55F, 1}, new int[] {Ui.lighter(c, 0.3F), c, Ui.darker(c, 0.85F)});
+			g.enableScissor(Math.round(V.x(x + 3)), Math.round(V.y(y + 3)), Math.round(V.x(x + bw - 3)), Math.round(V.y(y + bh - 3)));
+			V.icon(g, "glyph_" + m.type().name().toLowerCase(java.util.Locale.ROOT), x + bw - 118 - 92, y - 14, 92, 0x47FFFFFF);
+			// The PP cap: slanted, dark, a white edge.
+			float sx = x + bw - 132 + 16, slant = (bh) * (float) Math.tan(Math.toRadians(18));
+			V.poly(g, new float[] {sx + slant / 2 - 3, y, x + bw + 20, y, x + bw + 20, y + bh, sx - slant / 2 - 3, y + bh}, 0x8CFFFFFF);
+			V.poly(g, new float[] {sx + slant / 2, y, x + bw + 20, y, x + bw + 20, y + bh, sx - slant / 2, y + bh}, 0xBA181E38);
+			g.disableScissor();
+			int left = j < mon.pp.size() ? mon.pp.get(j) : m.pp();
+			String ppn = String.valueOf(left), ppt = "/" + m.pp();
+			float rx = x + bw - 18, cy = y + bh / 2;
+			V.text(g, ppt, rx - V.width(ppt, 18, true), V.capsTop(cy, 18), 18, 0xD9FFFFFF, true);
+			float pw2 = V.width(ppn, 26, true);
+			V.text(g, ppn, rx - V.width(ppt, 18, true) - 6 - pw2, V.capsTop(cy, 26), 26, 0xFFFFFFFF, true);
+			V.text(g, "PP", rx - V.width(ppt, 18, true) - 6 - pw2 - 6 - V.width("PP", 13, true), V.capsTop(cy, 13), 13, 0xBFFFFFFF, true);
+			V.ellipse(g, x + 6 + 26, cy + 2, 26, 26, 0x26000000);
+			V.ellipse(g, x + 6 + 26, cy, 26, 26, 0xFFFFFFFF);
+			V.icon(g, "glyph_" + m.type().name().toLowerCase(java.util.Locale.ROOT), x + 6 + 26 - 17, cy - 17, 34, Ui.darker(c, 0.9F));
+			String tn = m.type().label.toUpperCase();
+			float tw = V.trackedWidth(tn, 12, 1.5F) + 20;
+			V.rr(g, x + 6 + 52 + 10, cy - 10, tw, 20, 7, Ui.darker(c, 0.7F));
+			V.tracked(g, tn, x + 6 + 52 + 10 + 10, V.capsTop(cy, 12), 12, 0xFFFFFFFF, 1.5F);
+			V.title(g, m.name(), x + 6 + 52 + 10 + tw + 10, V.capsTop(cy, 26) + 2, 26, 0x38000000);
+			V.title(g, m.name(), x + 6 + 52 + 10 + tw + 10, V.capsTop(cy, 26), 26, 0xFFFFFFFF);
+			int jj = j;
+			vhit(x0, y, bw, bh, () -> moveAt = jj);
+		}
+		// What the one you're on does, in a glass card underneath.
+		if (!mon.moves.isEmpty()) {
+			Move m = Move.get(mon.moves.get(moveAt));
+			float cy = y0 + mon.moves.size() * (bh + 12) + 4, ch = 14 + 26 + 6 + 2 * 17 * 1.35F + 14;
+			V.rr(g, x0, cy, bw, ch, 20, 0x8CFFFFFF);
+			V.rr(g, x0 + 2, cy + 2, bw - 4, ch - 4, 18, 0x6B1C243C);
+			float tw = V.type(g, m.type().label, Ui.typeColor(m.type()) | 0xFF000000, x0 + 20, cy + 14, 92, 13.5F);
+			String cat = !m.damaging() ? "STATUS" : java.util.EnumSet.of(Type.FIRE, Type.WATER, Type.GRASS, Type.ELECTRIC, Type.PSYCHIC, Type.ICE, Type.DRAGON).contains(m.type()) ? "SPECIAL" : "PHYSICAL";
+			V.tracked(g, cat, x0 + 20 + tw + 14, V.capsTop(cy + 14 + 12, 14), 14, 0xCCFFFFFF, 1);
+			String acc = m.accuracy() > 0 ? String.valueOf(m.accuracy()) : "-", pow = m.power() > 1 ? String.valueOf(m.power()) : "-";
+			float ar = x0 + bw - 20;
+			V.text(g, acc, ar - V.width(acc, 17, true), V.capsTop(cy + 26, 17), 17, 0xFFFFFFFF, true);
+			ar -= V.width(acc, 17, true) + 6;
+			V.text(g, "ACCURACY", ar - V.width("ACCURACY", 13, true), V.capsTop(cy + 26, 13), 13, 0xBFFFFFFF, true);
+			ar -= V.width("ACCURACY", 13, true) + 14;
+			V.text(g, pow, ar - V.width(pow, 17, true), V.capsTop(cy + 26, 17), 17, 0xFFFFFFFF, true);
+			ar -= V.width(pow, 17, true) + 6;
+			V.text(g, "POWER", ar - V.width("POWER", 13, true), V.capsTop(cy + 26, 13), 13, 0xBFFFFFFF, true);
+			List<String> desc = V.wrap(BattleScreen.moveText(m.id()), bw - 40, 17, false);
+			for (int i = 0; i < Math.min(2, desc.size()); i++) V.text(g, desc.get(i), x0 + 20, cy + 14 + 26 + 6 + i * 17 * 1.35F, 17, 0xFFFFFFFF, false);
+		}
 	}
 
 	/** Your bag's colour (from your clothes), or yellow. */
@@ -815,64 +1012,108 @@ public class MenuScreen extends DeviceScreen {
 		return 0xFF000000 | Outfit.COLOURS[Math.floorMod(o.get("bagc"), Outfit.COLOURS.length)];
 	}
 
+	/** Each pocket's colour and picture (the viewer's POCKETS). */
+	private static final int[] POCKET_COLS = {0xFF3DB873, 0xFFE5484F, 0xFFF59A2A, 0xFF3C8DE4};
+	private static final String[] POCKET_ICONS = {"icon_potion", "icon_ball", "icon_key", "icon_disc"};
+
 	/**
-	 * The bag: your backpack on the left, in its colour, its four pockets to pick (the big pocket for ITEMS,
-	 * the front pocket for BALLS, the lid for KEY ITEMS, the side pocket for TMs and HMs); what's in the picked
-	 * one on the right, with what the item under the cursor does.
+	 * The bag as the UI Viewer's (Let's Go's, signed off 20 Nov): one big white page on a sunny backdrop, your money
+	 * in its corner; the pockets along the top, each a round picture in its colour (the one you're on lifted, a red
+	 * arrow and a green line under its name); what's in it as tiles below, four across, each with its picture and
+	 * how many; what the one you're on does along the foot.
 	 */
 	private void drawBag(GuiGraphics g, PlayerData d) {
-		Scenes.backdrop(g, "bag");
-		V.header(g, "icon_bag", "BAG", null);
-		bagPicture(g, 48, 96);
-		// The pockets' names under the bag.
-		float tw = 0;
-		for (String p : POCKETS) tw += V.chipWidth(p, 13) + 6;
-		float cx = 48 + 200 - (tw - 6) / 2;
+		Scenes.bg2(g, "bag");
+		float px = 60, py = 40, pw = 1160, ph = 610;
+		V.panel(g, px, py, pw, ph, 36, false);
+		// Your money.
+		String cash = Ui.money(d.money);
+		float mw = 10 + V.trackedWidth("MONEY", 12, 1) + 20 + 8 + V.width(cash, 19, true) + 18, mh = 19 * 1.5F + 12;
+		V.pill(g, 36 - 3, 18 - 3, mw + 6, mh + 6, 0xFFFFC93C);
+		V.shadow(g, 36, 18, mw, mh, mh / 2, 0.6F);
+		V.pill(g, 36, 18, mw, mh, 0xFFFFFFFF);
+		float tagw = V.trackedWidth("MONEY", 12, 1) + 20;
+		V.pill(g, 36 + 10, 18 + mh / 2 - 10, tagw, 20, 0xFFFFC93C);
+		V.tracked(g, "MONEY", 36 + 10 + 10, V.capsTop(18 + mh / 2, 12), 12, V.INK, 1);
+		V.text(g, cash, 36 + 10 + tagw + 8, V.capsTop(18 + mh / 2, 19), 19, V.INK, true);
+		// The pockets.
+		float[] colW = new float[POCKETS.length];
+		float total = 0;
 		for (int i = 0; i < POCKETS.length; i++) {
+			colW[i] = Math.max(76, V.titleWidth(Lang.t(POCKETS[i]), 17));
+			total += colW[i] + (i > 0 ? 54 : 0);
+		}
+		float cx = 640 - total / 2, top = py + 3 + 26;
+		for (int i = 0; i < POCKETS.length; i++) {
+			boolean on = i == pocket;
+			float mid = cx + colW[i] / 2, y = top - (on ? 4 : 0);
+			int c = POCKET_COLS[i];
+			if (on) V.text(g, "▶", mid - 38 - 26, y + 22, 24, V.RED, true);
+			V.shadow(g, mid - 38, y, 76, 76, 38, 0.6F);
+			V.ellipse(g, mid, y + 38, 42, 42, on ? c : 0xFFE4E9F4);
+			V.ellipse(g, mid, y + 38, 38, 38, 0xFFFFFFFF);
+			V.icon(g, POCKET_ICONS[i], mid - 24, y + 38 - 24, 48);
+			V.titleCentred(g, Lang.t(POCKETS[i]), mid, V.capsTop(y + 76 + 6 + 12.75F, 17), 17, on ? c : 0xFF8A93A6);
+			if (on) V.pill(g, mid - 35, y + 76 + 6 + 25.5F + 6, 70, 5, 0xFF41BF84);
 			int idx = i;
-			float w = V.chip(g, POCKETS[i], cx, 96 + 500, 13, i == pocket, false);
-			if (view == View.BAG) vhit(cx, 596, w, 24, () -> {
+			if (view == View.BAG) vhit(cx, y, colW[i], 76 + 40, () -> {
 				pocket = idx;
 				bagAt = 0;
 				bagTop = 0;
 			});
-			cx += w + 6;
+			cx += colW[i] + 54;
 		}
-		// What's in the picked pocket, with how many.
+		float dashY = top + 76 + 6 + 25.5F + 6 + 5 + 22;
+		for (float x = px + 3 + 44; x < px + pw - 3 - 44; x += 12) V.rr(g, x, dashY, 6, 2, 1, 0xFFE4E9F4);
+		// The tiles: four across, three rows in view.
 		List<String> l = pocketItems();
-		float lx = 480, ly = 110, lw = 740, lh = 440;
-		V.panel(g, lx, ly, lw, lh);
-		int rows = 7, n = l.size() + 1;
-		if (bagAt < bagTop) bagTop = bagAt;
-		if (bagAt >= bagTop + rows) bagTop = bagAt - rows + 1;
-		bagTop = Math.max(0, Math.min(bagTop, Math.max(0, n - rows)));
-		for (int k = 0; k < rows && bagTop + k < n; k++) {
-			int i = bagTop + k, idx = i;
-			float ty = ly + 14 + k * 54;
-			if (vover(lx + 14, ty, lw - 28, 46) && view == View.BAG) bagAt = i;
-			boolean on = i == bagAt;
-			if (i == l.size()) V.item(g, "CLOSE BAG", null, lx + 14, ty, lw - 28, 46, on, !on, 21);
-			else {
-				Item it = Item.find(l.get(i));
-				V.goods(g, it.name(), "x" + d.count(it.id()), lx + 14, ty, lw - 28, 46, on, 21);
+		int cols = 4, rows = 3;
+		float gx = px + 3 + 50, gy = dashY + 2 + 22, gw = pw - 6 - 100, tw = (gw - 14 * (cols - 1)) / cols, th = 76;
+		if (bagAt / cols < bagTop) bagTop = bagAt / cols;
+		if (bagAt / cols >= bagTop + rows) bagTop = bagAt / cols - rows + 1;
+		for (int k = bagTop * cols; k < Math.min(l.size(), (bagTop + rows) * cols); k++) {
+			int idx = k, r = k / cols - bagTop, c0 = k % cols;
+			float x = gx + c0 * (tw + 14), y = gy + r * (th + 14);
+			if (vover(x, y, tw, th) && view == View.BAG) bagAt = k;
+			boolean on = k == bagAt;
+			Item it = Item.find(l.get(k));
+			if (it == null) continue;
+			int[] kc = V.GOODS[V.goodsKind(it.name())];
+			if (on) {
+				V.rr(g, x, y + 6, tw, th, 22, 0x4DE8961E);
+				V.rr(g, x - 6, y - 6, tw + 12, th + 12, 28, 0xFFFFC93C);
+				V.rr(g, x - 3, y - 3, tw + 6, th + 6, 25, 0xFFFFFFFF);
+				V.sel(g, x, y, tw, th, 22);
+				V.text(g, "▶", x - 18 - 6, V.capsTop(y + th / 2, 20), 20, V.RED, true);
+			} else {
+				V.rr(g, x, y, tw, th, 22, 0xFFE8EDF6);
+				V.rr(g, x + 2, y + 2, tw - 4, th - 4, 20, 0xFFF5F8FD);
 			}
-			if (view == View.BAG) vhit(lx + 14, ty, lw - 28, 46, () -> pickBag(idx));
+			float icx = x + 10 + 27, icy = y + th / 2;
+			V.ellipse(g, icx, icy, 30, 30, kc[1]);
+			V.ellipse(g, icx, icy, 27, 27, 0xFFFFFFFF);
+			V.icon(g, V.itemIcon(it.name()), icx - 18, icy - 18, 36);
+			String cnt = "x" + d.count(it.id());
+			float cw = V.width(cnt, 18, true);
+			V.text(g, cnt, x + tw - 16 - cw, V.capsTop(icy, 18), 18, kc[2], true);
+			List<String> nl = V.wrap(it.name(), tw - 10 - 54 - 12 - 16 - cw - 8, 17, true);
+			float lh = 17 * 1.15F, ny = icy - Math.min(2, nl.size()) * lh / 2;
+			for (int q = 0; q < Math.min(2, nl.size()); q++) V.text(g, nl.get(q), x + 10 + 54 + 12, ny + q * lh + 1, 17, V.INK, true);
+			if (view == View.BAG) vhit(x, y, tw, th, () -> pickBag(idx));
 		}
-		if (bagTop > 0) V.tri(g, lx + lw / 2, ly + 6, 14, 3, V.MUTED);
-		if (bagTop + rows < n) V.tri(g, lx + lw / 2, ly + lh - 6, 14, 1, V.MUTED);
-		if (l.isEmpty()) V.text(g, "Empty", lx + 34, ly + 14 + 54 + 12, 21, V.MUTED, true);
-		// What it does.
-		V.panel(g, 480, 570, 740, 110, 24, true);
-		String desc = bagAt < l.size() ? BattleScreen.describe(l.get(bagAt)) : "Put the bag away.";
-		List<String> dl = V.wrap(desc, 740 - 52, 21, true);
-		for (int i = 0; i < Math.min(2, dl.size()); i++) V.text(g, dl.get(i), 506, 570 + 20 + i * 30, 21, V.TEXT, true);
-		V.hints(g, "A", "Choose", "B", "Back", "TAB", "Pocket");
+		if (l.isEmpty()) V.centred(g, Lang.t("Nothing in this pocket yet."), 640, gy + 30, 21, V.MUTED, false);
+		int lines = (l.size() + cols - 1) / cols;
+		if (bagTop > 0) V.tri(g, 640, gy - 10, 14, 3, V.MUTED);
+		if (bagTop + rows < lines) V.tri(g, 640, gy + rows * (th + 14) - 4, 14, 1, V.MUTED);
+		// What it does, along the foot.
+		float fx = px + 3 + 40, fw = pw - 6 - 80, fh = 62, fy = py + ph - 3 - 26 - fh;
+		V.rr(g, fx, fy, fw, fh, 22, 0xFFF5F8FD);
+		String desc = bagAt < l.size() ? BattleScreen.describe(l.get(bagAt)) : "";
+		List<String> dl = V.wrap(desc, fw - 52, 21, false);
+		for (int i = 0; i < Math.min(1, dl.size()); i++) V.text(g, dl.get(i), fx + 26, V.capsTop(fy + fh / 2, 21), 21, V.INK, false);
+		if (view == View.BAG) V.hints(g, "A", "Use", "B", "Back", "TAB", "Pocket");
 	}
 
-	/**
-	 * Your backpack (the viewer's picture), in its colour: its body (ITEMS), front pocket (BALLS), lid (KEY ITEMS)
-	 * and side pocket (TM & HM); the picked one lifted with a cream outline. Clicking a pocket picks it.
-	 */
 	private void bagPicture(GuiGraphics g, float ox, float oy) {
 		int col = bagColour(), dk = Ui.darker(col, 0.78F), dd = Ui.darker(col, 0.62F), lt = Ui.lighter(col, 0.18F);
 		float k = 1;
