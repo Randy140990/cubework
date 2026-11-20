@@ -201,7 +201,7 @@ public class MartScreen extends GameScreen {
 			if (i == l.size()) V.item(g, "CANCEL", null, lx + 12, ty, lw - 24, 46, on, false, 21);
 			else {
 				Item it = Item.find(l.get(i));
-				V.item(g, it == null ? l.get(i) : it.name(), Ui.money(price(l.get(i))), lx + 12, ty, lw - 24, 46, on, false, 21);
+				V.goods(g, it == null ? l.get(i) : it.name(), Ui.money(price(l.get(i))), lx + 12, ty, lw - 24, 46, on, 21);
 			}
 			if (step != Step.HOW_MANY) vhit(lx + 12, ty, lw - 24, 46, () -> pick(idx));
 		}

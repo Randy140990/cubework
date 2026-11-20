@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Retromon UI Viewer</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -89,6 +90,18 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 90
 .g-text b, .g-hl { color: var(--g-gold) }
 @keyframes gbob { 50% { transform: translateY(4px) } }
 .g-list { display: grid; gap: 8px }
+.g-goods { position: relative; display: flex; align-items: center; gap: 14px; padding: 0 10px 0 5px; border-radius: 999px; box-sizing: border-box; font-weight: 800; font-size: 21px; color: #fff; cursor: pointer;
+  background: linear-gradient(180deg, var(--c0), var(--c1) 60%, var(--c2)); border: 2px solid rgba(255,255,255,.45); text-shadow: 0 2px 0 rgba(0,0,0,.25); box-shadow: 0 3px 0 rgba(0,0,0,.19) }
+.g-goods .ic { flex: none; border-radius: 50%; background: #fff; display: grid; place-items: center }
+.g-goods .ic svg { width: 72%; height: 72% }
+.g-goods .r { margin-left: auto; font-variant-numeric: tabular-nums }
+.g-goods .mark { flex: none; opacity: .3; display: grid }
+.g-goods .mark svg { width: 100%; height: 100% }
+.g-goods.on { background: var(--g-cream); color: var(--g-cream-ink); border-color: #fff; text-shadow: none; box-shadow: 0 0 0 3px rgba(255,244,216,.35), 0 6px 16px rgba(0,0,0,.25) }
+.g-goods.on .ic { box-shadow: 0 0 0 3px var(--c1) }
+.g-goods.on .mark { opacity: .55 }
+.g-goods.on .mark svg * { stroke: var(--c1) }
+.g-goodswrap { margin-bottom: 8px }
 .g-item { position: relative; display: flex; align-items: center; gap: 14px; padding: 9px 22px 9px 40px; border-radius: 999px; font-weight: 800; font-size: 21px; color: var(--g-text); cursor: pointer; min-height: 46px }
 .g-item.on { background: var(--g-cream); color: var(--g-cream-ink); box-shadow: 0 0 0 3px rgba(255,244,216,.35), 0 6px 16px rgba(0,0,0,.25) }
 .g-item.on::before { content: ""; position: absolute; left: 15px; top: 50%; transform: translateY(-50%); border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 12px solid var(--g-cream-ink) }

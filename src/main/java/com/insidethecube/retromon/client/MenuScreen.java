@@ -229,9 +229,12 @@ public class MenuScreen extends DeviceScreen {
 		PlayerData d = ClientState.data;
 		switch (view) {
 			case MENU -> {
-				if (Ui.isLeft(e)) menuAt = Math.floorMod(menuAt - 1, ITEMS.length);
-				else if (Ui.isRight(e)) menuAt = Math.floorMod(menuAt + 1, ITEMS.length);
-				else if (Ui.isUp(e) || Ui.isDown(e)) menuAt = Math.floorMod(menuAt + COLS, ITEMS.length);
+				// Two rows (the five big ones, then the five small): left and right along a row, up and down between them.
+				int[] rc = menuPlace(menuAt);
+				int[] row = rc[0] == 0 ? MAIN_ROW : SIDE_ROW;
+				if (Ui.isLeft(e)) menuAt = row[Math.floorMod(rc[1] - 1, row.length)];
+				else if (Ui.isRight(e)) menuAt = row[Math.floorMod(rc[1] + 1, row.length)];
+				else if (Ui.isUp(e) || Ui.isDown(e)) menuAt = (rc[0] == 0 ? SIDE_ROW : MAIN_ROW)[rc[1]];
 				else if (Ui.isA(e)) pickMenu(menuAt);
 				else if (Ui.isB(e)) onClose();
 				if (Ui.isLeft(e) || Ui.isRight(e) || Ui.isUp(e) || Ui.isDown(e)) Sounds.select();
@@ -463,36 +466,91 @@ public class MenuScreen extends DeviceScreen {
 	 * The menu, as the UI Viewer's: MENU at the top, the ten big round tiles in two rows of five (our own symbols on
 	 * teal; the one you're on cream, lifted and glowing), what it does in a panel underneath.
 	 */
+	/** The menu's rows (indexes into ITEMS): the five big ones (as Let's Go's), then the five small ones. */
+	private static final int[] MAIN_ROW = {0, 1, 2, 3, 7}, SIDE_ROW = {4, 5, 6, 8, 9};
+	/** Each big one's colours, light at the top to deep at the foot. */
+	private static final int[][] MAIN_COLS = {{0xFFF58A94, 0xFFD94452, 0xFFAE2E3C}, {0xFF7EE3AE, 0xFF39B27A, 0xFF22855A}, {0xFFFFD27A, 0xFFF0A030, 0xFFC87818},
+			{0xFF8EC4F6, 0xFF4A8FE0, 0xFF2F64B0}, {0xFFC6AEF4, 0xFF8A62D8, 0xFF6440B0}};
+
+	/** Which row an item's in (0 the big ones, 1 the small) and where along it. */
+	private static int[] menuPlace(int item) {
+		for (int i = 0; i < MAIN_ROW.length; i++) if (MAIN_ROW[i] == item) return new int[] {0, i};
+		for (int i = 0; i < SIDE_ROW.length; i++) if (SIDE_ROW[i] == item) return new int[] {1, i};
+		return new int[] {0, 0};
+	}
+
+	/**
+	 * The START menu, as Let's Go lays it out: your partner in a round badge at the top (where Let's Go has its
+	 * Pikachu), five big round buttons in their own colours (POKéDEX, POKéMON, BAG, MAP, SAVE) with their pictures,
+	 * then five smaller ones under them (CLOTHES, CARD, WAIT, OPTION, EXIT), and what the one you're on does.
+	 */
 	private void drawMenu(GuiGraphics g) {
 		PlayerData d = ClientState.data;
-		// Over the frosted world (the viewer's), no backdrop of its own.
-		V.centred(g, "M E N U", 640, 30 + 2, 30, 0x66000000, true);
-		V.centred(g, "M E N U", 640, 30, 30, V.TEXT, true);
-		for (int i = 0; i < ITEMS.length; i++) {
-			float tx = 110 + (i % 5) * 220, ty = 130 + (i / 5) * 230;
-			boolean off = ITEMS[i].equals("POKéDEX") && !d.hasDex() || ITEMS[i].equals("POKéMON") && d.party.isEmpty();
-			if (view == View.MENU && vover(tx + 10, ty, 160, 180)) menuAt = i;
-			boolean on = i == menuAt && view == View.MENU;
-			float lift = on ? -8 : 0, sc = on ? 1.08F : 1, ds = 120 * sc, dx = tx + 30 - (ds - 120) / 2, dy = ty + lift - (ds - 120) / 2;
-			if (on) {
-				V.rr(g, dx - 5, dy - 5, ds + 10, ds + 10, 34 * sc + 5, 0x59FFF4D8);
-				V.shadow(g, dx, dy, ds, ds, 34 * sc, 1.4F);
-				V.rr(g, dx, dy, ds, ds, 34 * sc, 0xFFFFFFFF);
-				V.rr(g, dx + 3, dy + 3, ds - 6, ds - 6, 34 * sc - 3, V.CREAM);
-			} else {
-				V.shadow(g, dx, dy, ds, ds, 34, 0.8F);
-				V.rr(g, dx, dy, ds, ds, 34, V.EDGE);
-				V.rrv(g, dx + 3, dy + 3, ds - 6, ds - 6, 31, 0xF51D5A52, 0xF5123C38);
-			}
-			float is = 66 * sc;
-			V.icon(g, TILE_ICONS[i], dx + (ds - is) / 2, dy + (ds - is) / 2, is, off ? 0x80FFFFFF : 0xFFFFFFFF);
-			V.centred(g, ITEMS[i], tx + 90, ty + 120 + 8 + 2 + lift, 19, 0x80000000, true);
-			V.centred(g, ITEMS[i], tx + 90, ty + 120 + 8 + lift, 19, on ? V.CREAM : off ? V.DIM : V.TEXT, true);
-			int idx = i;
-			if (view == View.MENU) vhit(tx + 10, ty, 160, 180, () -> pickMenu(idx));
+		float secs = (ticks + Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true)) / 20F;
+		// Your partner's badge (or the name, before you have one).
+		String lead = d.party.isEmpty() ? null : d.party.get(0).species.id();
+		float bx = 640, by = 118, br = 64;
+		V.ellipse(g, bx, by + 6, br + 6, br + 6, 0x40000000);
+		V.ellipse(g, bx, by, br + 6, br + 6, 0xFFFFFFFF);
+		if (lead != null) {
+			Species sp = Species.ALL.get(lead);
+			int ring = sp == null ? V.EDGE : Ui.typeColor(sp.type1()) | 0xFF000000;
+			V.ellipse(g, bx, by, br + 2, br + 2, ring);
+			V.rrStops(g, bx - br + 3, by - br + 3, 2 * br - 6, 2 * br - 6, br - 3, new float[] {0, 1}, new int[] {0xFFFFFBF0, Ui.mix(ring, 0xFFFFFFFF, 0.72F)});
+			float ps = 2 * br - 18 + (float) Math.sin(secs * 2.2) * 2;
+			V.img(g, Look.portrait(lead), bx - ps / 2, by - ps / 2, ps, ps, 128, 128, 0xFFFFFFFF);
+			String nm = d.party.get(0).name();
+			float nw = V.width(nm, 17, true) + 34;
+			V.pill(g, bx - nw / 2, by + br - 6, nw, 30, ring);
+			V.centred(g, nm, bx, V.capsTop(by + br + 9, 17), 17, 0xFFFFFFFF, true);
+		} else {
+			V.rrStops(g, bx - br + 3, by - br + 3, 2 * br - 6, 2 * br - 6, br - 3, new float[] {0, 1}, new int[] {0xFFFFFBF0, 0xFFE6F4EE});
+			V.icon(g, "icon_ball", bx - 40, by - 40, 80);
 		}
-		V.panel(g, 240, 600, 800, 58, 24, true);
-		V.centred(g, LINES[Math.max(0, Math.min(LINES.length - 1, menuAt))], 640, 615, 21, V.TEXT, true);
+		// The five big ones.
+		for (int c = 0; c < MAIN_ROW.length; c++) {
+			int i = MAIN_ROW[c];
+			float cx = 240 + c * 200, cy = 330, r = 70;
+			boolean off = ITEMS[i].equals("POKéDEX") && !d.hasDex() || ITEMS[i].equals("POKéMON") && d.party.isEmpty();
+			if (view == View.MENU && vover(cx - r, cy - r, 2 * r, 2 * r + 50)) menuAt = i;
+			boolean on = i == menuAt && view == View.MENU;
+			float lift = on ? -10 : 0, rr = on ? r * 1.08F : r;
+			int[] col = off ? new int[] {0xFF9AA6A2, 0xFF7A8682, 0xFF5E6864} : MAIN_COLS[c];
+			if (on) V.ellipse(g, cx, cy + lift, rr + 12, rr + 12, 0x66FFF4D8);
+			V.ellipse(g, cx, cy + lift + 8, rr + 2, rr + 2, 0x4D000000);
+			V.ellipse(g, cx, cy + lift, rr + 4, rr + 4, on ? V.CREAM : 0xFFFFFFFF);
+			V.rrStops(g, cx - rr, cy + lift - rr, 2 * rr, 2 * rr, rr, new float[] {0, 0.55F, 1}, col);
+			// Its pale face, with the picture on it.
+			float fr = rr * 0.72F;
+			V.rrStops(g, cx - fr, cy + lift - fr, 2 * fr, 2 * fr, fr, new float[] {0, 1}, new int[] {0xFFFFFFFF, Ui.mix(col[0], 0xFFFFFFFF, 0.74F)});
+			float is = rr;
+			V.icon(g, TILE_ICONS[i], cx - is / 2, cy + lift - is / 2, is, off ? 0x99FFFFFF : 0xFFFFFFFF);
+			V.centred(g, ITEMS[i], cx, cy + r + 18 + 2 + lift, 21, 0x80000000, true);
+			V.centred(g, ITEMS[i], cx, cy + r + 18 + lift, 21, on ? V.CREAM : off ? V.DIM : V.TEXT, true);
+			int idx = i;
+			if (view == View.MENU) vhit(cx - r, cy - r, 2 * r, 2 * r + 50, () -> pickMenu(idx));
+		}
+		// The five small ones, as pills.
+		for (int c = 0; c < SIDE_ROW.length; c++) {
+			int i = SIDE_ROW[c];
+			float w = 186, h = 54, x = 640 - (5 * w + 4 * 16) / 2 + c * (w + 16), y = 486;
+			if (view == View.MENU && vover(x, y, w, h)) menuAt = i;
+			boolean on = i == menuAt && view == View.MENU;
+			if (on) V.pill(g, x - 4, y - 4, w + 8, h + 8, 0x66FFF4D8);
+			V.pill(g, x, y + 4, w, h, 0x40000000);
+			if (on) V.pill(g, x, y, w, h, V.CREAM);
+			else {
+				V.pill(g, x, y, w, h, V.EDGE);
+				V.rrStops(g, x + 2.5F, y + 2.5F, w - 5, h - 5, (h - 5) / 2, new float[] {0, 1}, new int[] {0xF51D5A52, 0xF5123C38});
+			}
+			V.ellipse(g, x + h / 2, y + h / 2, h / 2 - 7, h / 2 - 7, on ? 0xFF26304A : 0x40FFFFFF);
+			V.icon(g, TILE_ICONS[i], x + h / 2 - 15, y + h / 2 - 15, 30, 0xFFFFFFFF);
+			V.text(g, ITEMS[i], x + h + 6, V.capsTop(y + h / 2, 19), 19, on ? V.INK : V.TEXT, true);
+			int idx = i;
+			if (view == View.MENU) vhit(x, y, w, h, () -> pickMenu(idx));
+		}
+		V.panel(g, 240, 576, 800, 58, 24, true);
+		V.centred(g, LINES[Math.max(0, Math.min(LINES.length - 1, menuAt))], 640, V.capsTop(576 + 29, 21), 21, V.TEXT, true);
 		V.hints(g, "A", "Open", "B", "Close");
 	}
 
@@ -591,11 +649,14 @@ public class MenuScreen extends DeviceScreen {
 		if (d.party.isEmpty()) return;
 		Mon mon = d.party.get(Math.min(partyAt, d.party.size() - 1));
 		Species sp = mon.species;
-		Scenes.backdrop(g, "summary");
+		// The page in its own colour (its first type's), its name on a band of it.
+		Scenes.typeBackdrop(g, sp.type1());
 		Scenes.model(g, (ticks) / 20F, sp.id(), -1.05);
 		float x = 28, y = 28, w = 640, h = 660, px = x + 28;
 		V.panel(g, x, y, w, h);
+		Scenes.typeBand(g, sp.type1(), x + 12, y + 12, w - 24, 64);
 		float ty = y + 24;
+		V.text(g, mon.name(), px, ty + 2, 36, 0x55000000, true);
 		V.text(g, mon.name(), px, ty, 36, V.TEXT, true);
 		float nx = px + V.width(mon.name(), 36, true) + 12;
 		String gm = mon.genderMark();
@@ -609,6 +670,7 @@ public class MenuScreen extends DeviceScreen {
 			V.rr(g, nx, ty + 12, sw, 22, 7, Ui.statusColor(st));
 			V.text(g, st, nx + 8, ty + 15, 13, 0xFFFFFFFF, true);
 		}
+		V.right(g, "Lv. " + mon.level, x + w - 28, ty + 8 + 2, 24, 0x55000000, true);
 		V.right(g, "Lv. " + mon.level, x + w - 28, ty + 8, 24, V.TEXT, true);
 		float cx = px, cy = ty + 50 + 14;
 		String[] tabs = {"INFO", "STATS", "MOVES"};
@@ -645,7 +707,8 @@ public class MenuScreen extends DeviceScreen {
 				V.right(g, i == 0 ? mon.hp + "/" + stats[0] : String.valueOf(stats[i]), px + 150 + 70, ry, 19, V.TEXT, true);
 				float f = Math.min(1, stats[i] / (mon.level * 2.6F + 30));
 				V.pill(g, px + 150 + 82, ry + 3, w - 56 - 232, 16, 0xFF0B2A2C);
-				if (f > 0) V.rrv(g, px + 150 + 84, ry + 5, Math.max(12, (w - 56 - 236) * f), 12, 6, 0xFF4FB896, 0xFF8FF5C0);
+				int tc = Ui.typeColor(sp.type1()) | 0xFF000000;
+				if (f > 0) V.rrv(g, px + 150 + 84, ry + 5, Math.max(12, (w - 56 - 236) * f), 12, 6, Ui.lighter(tc, 0.45F), tc);
 			}
 		} else {
 			for (int i = 0; i < mon.moves.size(); i++) {
@@ -706,8 +769,7 @@ public class MenuScreen extends DeviceScreen {
 			if (i == l.size()) V.item(g, "CLOSE BAG", null, lx + 14, ty, lw - 28, 46, on, !on, 21);
 			else {
 				Item it = Item.find(l.get(i));
-				V.item(g, "      " + it.name(), "x" + d.count(it.id()), lx + 14, ty, lw - 28, 46, on, false, 21);
-				V.icon(g, itemIcon(it), lx + 14 + 40, ty + 6, 34);
+				V.goods(g, it.name(), "x" + d.count(it.id()), lx + 14, ty, lw - 28, 46, on, 21);
 			}
 			if (view == View.BAG) vhit(lx + 14, ty, lw - 28, 46, () -> pickBag(idx));
 		}
@@ -720,17 +782,6 @@ public class MenuScreen extends DeviceScreen {
 		List<String> dl = V.wrap(desc, 740 - 52, 21, true);
 		for (int i = 0; i < Math.min(2, dl.size()); i++) V.text(g, dl.get(i), 506, 570 + 20 + i * 30, 21, V.TEXT, true);
 		V.hints(g, "A", "Choose", "B", "Back", "TAB", "Pocket");
-	}
-
-	/** An item's picture in the bag (the viewer's): balls, medicine, discs for TMs, the map, else a key. */
-	private static String itemIcon(Item it) {
-		String n = it.name().toUpperCase();
-		if (n.contains("BALL")) return "icon_ball";
-		if (n.contains("POTION") || n.contains("HEAL") || n.contains("ANTIDOTE") || n.contains("AWAKENING") || n.contains("REVIVE")) return "icon_potion";
-		if (n.startsWith("TM") || n.startsWith("HM")) return "icon_disc";
-		if (n.contains("MAP")) return "icon_map";
-		if (n.contains("ROPE") || n.contains("REPEL")) return "icon_bag";
-		return "icon_key";
 	}
 
 	/**

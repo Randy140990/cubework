@@ -20,7 +20,8 @@ import net.minecraft.resources.Identifier;
 public class StarterScreen extends GameScreen {
 	private static final String[] IDS = {"bulbasaur", "charmander", "squirtle"};
 	private static final String[] KINDS = {"GRASS", "FIRE", "WATER"};
-	private static final int[] COLORS = {0xFF5DB850, 0xFFF08436, 0xFF4D90D5};
+	/** Each card's colours, light at the top to deep at the foot: leafy, fiery, sea. */
+	private static final int[][] CARD = {{0xFF9BE08A, 0xFF4FB848, 0xFF2A7A34}, {0xFFFFC06E, 0xFFF0782E, 0xFFB8401E}, {0xFF8CCBF6, 0xFF3F8EDC, 0xFF2459A6}};
 	private static final Identifier OAK = Retromon.id("textures/entity/npc/oak.png");
 
 	private enum Step {
@@ -176,48 +177,56 @@ public class StarterScreen extends GameScreen {
 		Figures.Batch b = Figures.batch(0, 0, width, height);
 		boolean choosing = step == Step.CHOOSE || step == Step.CONFIRM;
 		if (choosing) {
-			// The three on the table, each on its card.
-			int cw = Math.min(118 * s, (width - 6 * m) / 3), gap = 2 * m, total = 3 * cw + 2 * gap, x0 = (width - total) / 2;
-			int ch = Math.min(124 * s, boxTop - height / 9 - 18 * s), y = boxTop - ch - 16 * s;
-			if (step == Step.CHOOSE) for (int i = 0; i < 3; i++) if (over(x0 + i * (cw + gap), y, cw, ch)) at = i;
+			// The three on the table, each on a card in its own type's colours (leafy greens, fiery oranges, sea
+			// blues), lit from the top; the one you're on lifts, brighter, with a white rim. Canvas units, as the
+			// UI Viewer's.
+			float cw = 300, ch = 330, gap = 40, x0 = 640 - (3 * cw + 2 * gap) / 2, y = 214;
+			if (step == Step.CHOOSE) for (int i = 0; i < 3; i++) if (vover(x0 + i * (cw + gap), y, cw, ch)) at = i;
 			if (at != lastAt) {
 				if (lastAt >= 0 || step == Step.CHOOSE) Sounds.cry(IDS[at], 1F);
 				lastAt = at;
 				atSince = ticks;
 			}
 			float since = ticks - atSince + partial;
-			int tall = (int) (ch * 0.48F);
+			float tall = ch * 0.5F;
 			for (int i = 0; i < 3; i++) {
-				int x = x0 + i * (cw + gap);
+				float x = x0 + i * (cw + gap), cx = x + cw / 2;
 				int idx = i;
 				boolean on = i == at;
-				int lift = on ? 4 * s : 0;
-				Ui.rr(g, x - s, y - s - lift, cw + 2 * s, ch + 2 * s, 9 * s, on ? 0xFFFFFFFF : 0x38FFFFFF);
-				Ui.rrv(g, x, y - lift, cw, ch, 8 * s, on ? Ui.darker(COLORS[i], 0.62F) | 0xFF000000 : 0xF0154440, on ? 0xF0103430 : 0xF00A2422);
-				// A round pad for it to stand on, in its colour.
-				int cx = x + cw / 2, feet = y - lift + 14 * s + tall;
-				Ui.glow(g, cx, feet - tall / 2, cw / 2, tall / 2 + 4 * s, on ? 0x10FFFFFF : 0x06FFFFFF);
-				Ui.round(g, cx - cw * 3 / 8, feet - 5 * s, cw * 3 / 4, 10 * s, Ui.alpha(COLORS[i], on ? 0.75F : 0.4F), 4 * s);
-				Ui.round(g, cx - cw * 3 / 10, feet - 3 * s, cw * 3 / 5, 6 * s, Ui.alpha(0xFFFFFFFF, on ? 0.35F : 0.15F), 3 * s);
-				Figures.Fig f = b.mon(IDS[i], cx, feet, tall).at(secs + i * 0.7F).pitch(10).facing(i == 0 ? 14 : i == 2 ? -14 : 0);
-				if (on && step == Step.CHOOSE) f.action("cry", since / 20F);
+				float lift = on ? 12 : 0, top = y - lift;
+				int[] c = CARD[i];
+				int[] cols = on ? c : new int[] {Ui.mix(c[0], 0xFF0E2A28, 0.42F), Ui.mix(c[1], 0xFF0E2A28, 0.5F), Ui.mix(c[2], 0xFF0E2A28, 0.55F)};
+				if (on) V.rr(g, x - 9, top - 9, cw + 18, ch + 18, 38, 0x55FFF4D8);
+				V.rr(g, x, top + 9, cw, ch, 30, 0x45000000);
+				V.rr(g, x - 3, top - 3, cw + 6, ch + 6, 33, on ? 0xFFFFFFFF : 0x50FFFFFF);
+				V.rrStops(g, x, top, cw, ch, 30, new float[] {0, 0.5F, 1}, cols);
+				// A soft light behind it, and a round pad in the card's deep colour for it to stand on.
+				float feet = top + 40 + tall;
+				V.ellipse(g, cx, feet - tall * 0.5F, cw * 0.4F, tall * 0.56F, on ? 0x2EFFFFFF : 0x12FFFFFF);
+				V.ellipse(g, cx, feet, cw * 0.36F, 16, Ui.alpha(Ui.darker(c[2], 0.7F), on ? 0.9F : 0.6F));
+				V.ellipse(g, cx, feet - 2, cw * 0.27F, 9, on ? 0x40FFFFFF : 0x1CFFFFFF);
+				Figures.Fig f = b.mon(IDS[i], V.x(cx), V.y(feet), V.s(tall)).at(secs + i * 0.7F).pitch(10).facing(i == 0 ? 14 : i == 2 ? -14 : 0);
 				if (on && step == Step.CHOOSE) {
+					f.action("cry", since / 20F);
 					// Hops twice, twirling on the first, and lands with a squash.
 					if (since < 22) {
 						float p = since / 11F;
 						float arc = (float) Math.abs(Math.sin(p * Math.PI));
-						f.hop(arc * 12 * s).squash(arc < 0.25F ? 0.88F + arc * 0.48F : 1.04F);
+						f.hop(V.s(arc * 30)).squash(arc < 0.25F ? 0.88F + arc * 0.48F : 1.04F);
 						if (since < 11) f.spin(since / 11F * 360F);
-					} else f.hop((float) Math.abs(Math.sin((since - 22) / 20F * Math.PI)) * 2 * s);
+					} else f.hop(V.s((float) Math.abs(Math.sin((since - 22) / 20F * Math.PI)) * 5));
 				}
 				String nm = Species.get(IDS[i]).name();
-				Ui.draw(g, font, Ui.bold(nm), cx - Ui.boldWidth(font, nm, s) / 2, y - lift + ch - 30 * s, 0xFFFFFFFF, s, true);
-				Ui.chip(g, font, KINDS[i], cx - (Ui.width(font, KINDS[i], s) + 6 * s) / 2, y - lift + ch - 17 * s, COLORS[i], s);
-				if (step == Step.CHOOSE) hit(x, y - lift, cw, ch, () -> choose(idx));
+				V.centred(g, nm, cx, top + ch - 86 + 2, 32, 0x66000000, true);
+				V.centred(g, nm, cx, top + ch - 86, 32, on ? 0xFFFFFFFF : 0xFFE4ECE8, true);
+				float pw = V.width(KINDS[i], 17, true) + 34;
+				V.pill(g, cx - pw / 2, top + ch - 46, pw, 30, on ? 0xFFFFFFFF : 0x30FFFFFF);
+				V.centred(g, KINDS[i], cx, V.capsTop(top + ch - 31, 17), 17, on ? Ui.darker(c[2], 0.85F) | 0xFF000000 : 0xFFFFFFFF, true);
+				if (step == Step.CHOOSE) vhit(x, top, cw, ch, () -> choose(idx));
 			}
 			b.draw(g);
-			int cx = x0 + at * (cw + gap) + cw / 2;
-			Ui.bubble(g, "heart", cx + tall / 3, y + 10 * s, s, step == Step.CHOOSE ? Math.min(1, Math.max(0, since - 4) / 6F) : 1);
+			float hx = x0 + at * (cw + gap) + cw / 2 + tall / 3, hy = y - 12 + 34;
+			Ui.bubble(g, "heart", Math.round(V.x(hx)), Math.round(V.y(hy)), s, step == Step.CHOOSE ? Math.min(1, Math.max(0, since - 4) / 6F) : 1);
 		} else {
 			// Oak on the right, standing on the text box; after you've chosen, yours beside him, pleased.
 			int top = height / 9 + 4 * s, tall = boxTop - top + 2 * s, ox = width - 16 * s - tall / 3 - 6 * s;

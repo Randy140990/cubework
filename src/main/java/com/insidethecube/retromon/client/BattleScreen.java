@@ -1465,16 +1465,7 @@ public class BattleScreen extends GameScreen {
 			if (vover(lx, ry, lw, rowH)) bagAt = i;
 			boolean on = i == bagAt;
 			Item it = Item.find(l.get(i));
-			int accent = bagPocket == 0 ? pc[0][1] : pc[1][1];
-			if (on) {
-				V.pill(g, lx - 3, ry - 3, lw + 6, rowH + 6, 0x59FFF4D8);
-				V.pill(g, lx, ry, lw, rowH, V.CREAM);
-			} else V.pill(g, lx, ry, lw, rowH, 0x24FFFFFF);
-			V.pill(g, lx + 6, ry + 6, rowH - 12, rowH - 12, on ? Ui.alpha(accent, 0.22F) : 0x33FFFFFF);
-			itemIcon(g, it, Math.round(V.x(lx + 14)), Math.round(V.y(ry + 14)), Math.round(V.s(rowH - 28)), 1);
-			int ink = on ? V.INK : V.TEXT;
-			V.text(g, it.name(), lx + rowH + 10, V.capsTop(ry + rowH / 2, 21), 21, ink, true);
-			V.right(g, "x" + ClientState.data.count(it.id()), lx + lw - 22, V.capsTop(ry + rowH / 2, 21), 21, on ? V.INK : V.GOLD, true);
+			V.goods(g, it.name(), "x" + ClientState.data.count(it.id()), lx, ry, lw, rowH, on, 21);
 			int idx = i;
 			vhit(lx, ry, lw, rowH, () -> pickItem(idx));
 		}

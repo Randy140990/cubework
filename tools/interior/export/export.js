@@ -20,7 +20,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
     const oup = window.stairsUp; window.stairsUp = function (room, x0, z0 = 0, depth = 2, o = {}) { (room._stairs || (room._stairs = [])).push({ dir: "up", x0, z0, depth, to: o.to, spawn: o.spawn }); return oup(room, x0, z0, depth, o); };
     const odown = window.stairsDown; window.stairsDown = function (room, x0, z0 = 0, depth = 2, o = {}) { (room._stairs || (room._stairs = [])).push({ dir: "down", x0, z0, depth, to: o.to, spawn: o.spawn }); return odown(room, x0, z0, depth, o); };
     const rooms = {}, used = {};
-    for (const id of ["house1", "house2", "rival1", "rival2", "lab"]) {
+    for (const id of ["house1", "house2", "rival1", "rival2", "lab", "center", "mart"]) {
       const R = BUILD[id]();
       const faces = (R.geo._faces || []).slice();
       for (const pt of R.parts) for (const f of (pt.geo._faces || [])) faces.push(f);
@@ -29,7 +29,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
       rooms[id] = {
         id, name: R.name, floor: R.floor, W: R.W, D: R.D, H: R.H, faces, solids: R.solids, ramps,
         acts: R.acts.map(a => ({ rect: a.rect, label: a.label || "Look", lines: a.lines || null, ask: !!a.ask, pc: !!a.pc, hit: !!a.hit })),
-        npcs: R.npcs.map(n => ({ name: n.name, x: n.x, z: n.z, yaw: n.yaw, seated: !!n.seated, skin: n.look && n.look.skin, lines: n.talk ? n.talk(null).map(l => l.text) : [] })),
+        npcs: R.npcs.map(n => ({ name: n.name, x: n.x, z: n.z, yaw: n.yaw, seated: !!n.seated, skin: n.look && n.look.skin, role: n.role || null, key: n.key || null, lines: n.talk ? n.talk(null).map(l => l.text) : [] })),
         spawn: R.spawn, floors: R._floors, door: R._door, mats: R._mats || [], stairs: R._stairs || [], screens: R._screens || [],
       };
     }

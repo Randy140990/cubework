@@ -46,6 +46,14 @@ for (const [sid, lv, moves, hp, status] of PARTY) {
   G.party.push({ sid, lv, moves, maxhp: st.HP, hp: Math.round(st.HP * hp), status, stats: st, exp: 0.3 + (lv % 5) / 10, gender: sid === "clefairy" ? "F" : (lv % 2 ? "M" : "F") });
 }
 const MOVE = {}; for (const m of DATA.moves) MOVE[m.name] = m;
+// The game's type colours (Ui.typeColor), for pages in a creature's own colour.
+const TYPEHEX = { NORMAL: "#9DA0AA", FIRE: "#F08436", WATER: "#4D90D5", ELECTRIC: "#E9C72E", GRASS: "#5DB850", ICE: "#6FCFD0", FIGHTING: "#CE4069", POISON: "#AB6AC8", GROUND: "#D97746",
+  FLYING: "#8FA8DD", PSYCHIC: "#F66F71", BUG: "#90C12C", ROCK: "#C5B78C", GHOST: "#5269AC", DRAGON: "#0A6DC4", DARK: "#5A5366", STEEL: "#5A8EA1" };
+const typeHex = t => TYPEHEX[String(t).toUpperCase()] || "#8A8FA3";
+// A page's backdrop in its creature's colour (Scenes.typeBackdrop): lit from the top left, shaded to the bottom right.
+function typeBackdrop(t) { const c = typeHex(t); backdrop(`linear-gradient(160deg, ${lighterHex(c, 0.62)}, ${c} 55%, ${darkerHex(c, 0.38)})`); }
+// A band in the creature's colour across the top of its page, for its name (Scenes.typeBand).
+function typeBand(t, x, y, w, hh) { const c = typeHex(t); return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${hh}px;border-radius:22px;background:linear-gradient(180deg, ${lighterHex(c, 0.12)}, ${darkerHex(c, 0.14)} 55%, ${darkerHex(c, 0.32)});box-shadow:0 0 0 2px rgba(255,255,255,.4), 0 4px 0 rgba(0,0,0,.2)"></div>`; }
 const TYPECOL = t => `var(--t-${String(t).toLowerCase()})`;
 function typeChip(t) { return `<span class="g-type" style="background:${TYPECOL(t)}">${esc(t)}</span>`; }
 const STATUS = { PSN: "#AB6AC8", BRN: "#F08436", PAR: "#D9B42C", SLP: "#8A93A6", FRZ: "#6FCFD0", FNT: "#B0475A" };
@@ -134,6 +142,16 @@ const ICON = {
   badge: c => `<svg viewBox="0 0 64 64"><path d="M32 6l8 14 16 2-12 11 3 16-15-8-15 8 3-16L8 22l16-2z" fill="${c}"/><circle cx="32" cy="28" r="6" fill="#fff" opacity=".5"/></svg>`,
 };
 const ITEM_ICON = n => /BALL/.test(n) ? ICON.ball : /POTION|HEAL|ANTIDOTE|AWAKENING/.test(n) ? ICON.potion : /^TM|^HM/.test(n) ? ICON.disc : /MAP/.test(n) ? ICON.map : /ROPE|REPEL/.test(n) ? ICON.bag : ICON.key;
+// Each sort of thing's colours in a list (light, middle, deep), as the menu's big buttons; the game's V.GOODS.
+const GOODS = { ball: ["#F27682", "#D94452", "#AE2E3C"], med: ["#6BDCA2", "#39B27A", "#22855A"], tm: ["#8EC4F6", "#4A8FE0", "#2F64B0"], key: ["#FFD27A", "#F0A030", "#C87818"], field: ["#C6AEF4", "#8A62D8", "#6440B0"] };
+const ITEM_KIND = n => /BALL/.test(n) ? "ball" : /POTION|HEAL|ANTIDOTE|AWAKENING|REVIVE|ETHER|ELIXIR/.test(n) ? "med" : /^TM|^HM/.test(n) ? "tm" : /ROPE|REPEL/.test(n) ? "field" : "key";
+const BALLMARK = `<svg viewBox="0 0 128 128"><circle cx="64" cy="64" r="48.5" fill="none" stroke="#fff" stroke-width="11"/><path d="M10 64h33M85 64h33" stroke="#fff" stroke-width="11"/><circle cx="64" cy="64" r="12" fill="none" stroke="#fff" stroke-width="10"/></svg>`;
+// A thing in a list (the bag, the shop) as a coloured bar, as V.goods draws it: its sort's colours, its picture in a
+// white circle, a Poké Ball mark at the right end; the one you're on cream.
+function goodsRow(name, right, on, hh = 46) {
+  const c = GOODS[ITEM_KIND(name)];
+  return `<div class="g-goods${on ? " on" : ""}" style="--c0:${c[0]};--c1:${c[1]};--c2:${c[2]};height:${hh}px"><span class="ic" style="width:${hh - 10}px;height:${hh - 10}px">${ITEM_ICON(name)}</span><span class="nm">${esc(name)}</span><span class="r">${right == null ? "" : right}</span><span class="mark" style="width:${hh - 16}px;height:${hh - 16}px">${BALLMARK}</span></div>`;
+}
 
 // ---------- screens, and moving between them ----------
 const SCREENS = [], BY = {};
@@ -211,12 +229,12 @@ function choiceBox(items, o = {}) {
   let sel = o.sel || 0;
   const rows = items.map((it, i) => {
     const t = typeof it === "string" ? { label: it } : it;
-    const r = h("div", "g-item" + (t.off ? " off" : ""), `<span>${rich(t.label)}</span>${t.right != null ? `<span class="r">${t.right}</span>` : ""}`);
+    const r = t.goods ? h("div", "g-goodswrap", goodsRow(t.goods, t.right)) : h("div", "g-item" + (t.off ? " off" : ""), `<span>${rich(t.label)}</span>${t.right != null ? `<span class="r">${t.right}</span>` : ""}`);
     r.addEventListener("mouseenter", () => { sel = i; paint(); if (o.onMove) o.onMove(sel); });
     r.addEventListener("click", e => { e.stopPropagation(); sel = i; paint(); pick(); });
     list.appendChild(r); return r;
   });
-  function paint() { rows.forEach((r, i) => r.classList.toggle("on", i === sel)); }
+  function paint() { rows.forEach((r, i) => { r.classList.toggle("on", i === sel); const gd = r.querySelector(".g-goods"); if (gd) gd.classList.toggle("on", i === sel); }); }
   function pick() { if (o.onPick) o.onPick(sel); }
   paint();
   return {

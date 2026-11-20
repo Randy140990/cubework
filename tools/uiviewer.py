@@ -4,7 +4,7 @@ Viewer's world, figures and creatures (tools/interior/*), and the creatures' lig
 
     python3 tools/uiviewer.py <built creature-viewer.html> <out.html>
 """
-import json, os, sys
+import base64, json, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -71,6 +71,16 @@ def mapdata():
         out.append(o)
     return {"img": "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode(), "box": MAP_BOX, "w": im.width, "h": im.height, "points": out}
 
+def emote_pngs():
+    """The emote bubbles (tools/emotes.py's), as the game has them, for the screens that show one."""
+    d = os.path.join(HERE, "..", "src", "main", "resources", "assets", "retromon", "textures", "gui", "emote")
+    out = {}
+    for n in ("heart", "star", "exclaim", "note", "happy", "dots"):
+        with open(os.path.join(d, n + ".png"), "rb") as f:
+            out[n] = "data:image/png;base64," + base64.b64encode(f.read()).decode()
+    return out
+
+
 def wordmark_png():
     import base64
     f = os.path.join(HERE, "..", "src", "main", "resources", "assets", "retromon", "textures", "gui", "v", "wordmark_ours.png")
@@ -88,7 +98,7 @@ def main():
     js = "\n".join(open(p).read() for p in shared + own)
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
-            + "const DATA = " + data + ";\nconst WORDMARK_OURS = " + json.dumps(wordmark_png()) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst MAPDATA = " + json.dumps(mapdata(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
+            + "const DATA = " + data + ";\nconst WORDMARK_OURS = " + json.dumps(wordmark_png()) + ";\nconst EMOTE = " + json.dumps(emote_pngs()) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst MAPDATA = " + json.dumps(mapdata(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
             + engine() + "\n" + js + "\n</script>\n")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     open(out, "w").write(html)

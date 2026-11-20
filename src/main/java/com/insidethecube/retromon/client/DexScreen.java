@@ -95,8 +95,12 @@ public class DexScreen extends GameScreen {
 		// The UI Viewer's Pokédex entry: the creature turning on its stand at the right, its page on the left, a
 		// word at the top right that it's new.
 		float t = ticks + partial, secs = t / 20F;
-		Scenes.backdrop(g, "dex");
-		if (sp == null) return;
+		if (sp == null) {
+			Scenes.backdrop(g, "dex");
+			return;
+		}
+		// Its page in its own colour, as Let's Go's: a blue one's blue, a fiery one's orange.
+		Scenes.typeBackdrop(g, sp.type1());
 		Scenes.model(g, secs, sp.id(), -1.05);
 		PokedexScreen.page(g, sp, true);
 		float in = Math.min(1, Math.max(0, (t - 8) / 6F)), k = 1 - (1 - in) * (1 - in);

@@ -450,6 +450,65 @@ public final class V {
 		if (right != null && !right.isEmpty()) right(g, right, x + w - 22, y + (h - size * 1.15F) / 2, size, c, true);
 	}
 
+	/** Each sort of thing's colours in a list (light, middle, deep), as the menu's big buttons: balls, medicine, TMs, key items, the rest. */
+	public static final int[][] GOODS = {{0xFFF27682, 0xFFD94452, 0xFFAE2E3C}, {0xFF6BDCA2, 0xFF39B27A, 0xFF22855A}, {0xFF8EC4F6, 0xFF4A8FE0, 0xFF2F64B0},
+			{0xFFFFD27A, 0xFFF0A030, 0xFFC87818}, {0xFFC6AEF4, 0xFF8A62D8, 0xFF6440B0}};
+
+	/** Which sort an item is, by its name: 0 a ball, 1 medicine, 2 a TM or HM, 3 a key item, 4 the rest (escape ropes, repels). */
+	public static int goodsKind(String name) {
+		String n = name.toUpperCase();
+		if (n.contains("BALL")) return 0;
+		if (n.contains("POTION") || n.contains("HEAL") || n.contains("ANTIDOTE") || n.contains("AWAKENING") || n.contains("REVIVE") || n.contains("ETHER") || n.contains("ELIXIR")) return 1;
+		if (n.startsWith("TM") || n.startsWith("HM")) return 2;
+		if (n.contains("ROPE") || n.contains("REPEL")) return 4;
+		return 3;
+	}
+
+	/** An item's picture (the viewer's): balls, medicine, discs for TMs, the map, a bag for ropes and repels, else a key. */
+	public static String itemIcon(String name) {
+		String n = name.toUpperCase();
+		if (n.contains("BALL")) return "icon_ball";
+		if (n.contains("POTION") || n.contains("HEAL") || n.contains("ANTIDOTE") || n.contains("AWAKENING") || n.contains("REVIVE")) return "icon_potion";
+		if (n.startsWith("TM") || n.startsWith("HM")) return "icon_disc";
+		if (n.contains("MAP")) return "icon_map";
+		if (n.contains("ROPE") || n.contains("REPEL")) return "icon_bag";
+		return "icon_key";
+	}
+
+	/**
+	 * A thing in a list (the bag, the shop) as a coloured bar, Let's Go's way: its sort's colours lit from the top,
+	 * its picture in a white circle at the left, a Poké Ball mark at the right end, white words; the one you're on
+	 * cream, its circle ringed in its colour.
+	 */
+	public static void goods(GuiGraphics g, String name, String right, float x, float y, float w, float h, boolean on, float size) {
+		int[] c = GOODS[goodsKind(name)];
+		if (on) {
+			pill(g, x - 3, y - 3, w + 6, h + 6, 0x59FFF4D8);
+			pill(g, x, y + 4, w, h, 0x30000000);
+			pill(g, x, y, w, h, 0xFFFFFFFF);
+			pill(g, x + 2, y + 2, w - 4, h - 4, CREAM);
+		} else {
+			pill(g, x, y + 3, w, h, 0x30000000);
+			pill(g, x, y, w, h, 0x73FFFFFF);
+			rrStops(g, x + 2, y + 2, w - 4, h - 4, (h - 4) / 2, new float[] {0, 0.6F, 1}, c);
+		}
+		float ir = (h - 10) / 2, icx = x + 5 + ir, icy = y + h / 2;
+		if (on) ellipse(g, icx, icy, ir + 2.5F, ir + 2.5F, c[1]);
+		ellipse(g, icx, icy, ir, ir, 0xFFFFFFFF);
+		float is = ir * 1.45F;
+		icon(g, itemIcon(name), icx - is / 2, icy - is / 2, is);
+		float ms = h - 16;
+		icon(g, "icon_ballmark", x + w - 10 - ms, y + 8, ms, on ? Ui.alpha(c[1], 0.55F) : 0x4DFFFFFF);
+		int ink = on ? INK : 0xFFFFFFFF;
+		float tx = x + 5 + 2 * ir + 14, ty = capsTop(y + h / 2, size), rx = x + w - 10 - ms - 14;
+		if (!on) text(g, name, tx, ty + 2, size, 0x40000000, true, false);
+		text(g, name, tx, ty, size, ink, true, false);
+		if (right != null && !right.isEmpty()) {
+			if (!on) right(g, right, rx, ty + 2, size, 0x40000000, true);
+			right(g, right, rx, ty, size, ink, true);
+		}
+	}
+
 	/** A colour swatch (round, a white rim; cream and bigger when picked). */
 	public static void swatch(GuiGraphics g, int colour, float x, float y, float size, boolean on, float radius) {
 		if (on) rr(g, x - 4, y - 4, size + 8, size + 8, radius + 4, 0x73FFF4D8);

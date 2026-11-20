@@ -778,9 +778,10 @@ public final class Game {
 	public static void roomEntered(ServerPlayer p, Interiors.Room r, boolean banner) {
 		Places.Place pl = Places.get(r.place());
 		CompoundTag t = new CompoundTag();
-		String name = fill(p, List.of(r.name().replace("Rival's", "{rival}'s"))).get(0).toUpperCase();
+		String name = fill(p, List.of(r.name().replace("Rival's", "{rival}'s"))).get(0).toUpperCase().replace("POKÉ", "POKé");
 		t.putString("name", banner ? name : "");
-		t.putString("music", r.name().toLowerCase().contains("lab") ? "oaks_lab" : pl == null ? "" : pl.music());
+		String nm = r.name().toLowerCase(java.util.Locale.ROOT);
+		t.putString("music", nm.contains("lab") ? "oaks_lab" : nm.contains("center") ? "pokecenter" : pl == null ? "" : pl.music());
 		Net.send(p, "room", t);
 	}
 
@@ -2299,9 +2300,12 @@ public final class Game {
 		}
 	}
 
-	/** The first people on the Kanto map: the Viridian nurse and clerk (until the interiors), and a practice trainer on Route 1. */
-	private static final Object[][] DEFAULTS = {{"nurse", Npc.NURSE, "", -785, 561, 0F}, {"clerk", Npc.CLERK, "viridian_city", -766, 549, 0F},
-			{"joey", Npc.TRAINER, "youngster_joey", -790, 600, 0F}};
+	/**
+	 * The first people on the Kanto map: a practice trainer on Route 1. (Viridian's nurse and clerk are inside the
+	 * Pokémon Center and the Mart now; the ones earlier versions stood outside, on the roofs, are taken away.)
+	 */
+	private static final Object[][] DEFAULTS = {{"joey", Npc.TRAINER, "youngster_joey", -790, 600, 0F}};
+	private static final int[][] OLD_OUTSIDE = {{-785, 561}, {-766, 549}};
 
 	/** Puts the first people in place once their part of the map is loaded (each only once per save). */
 	private static void placeTouchPoints(MinecraftServer s) {
@@ -2334,6 +2338,24 @@ public final class Game {
 				unplantSigns(s, level, z);
 				placed.add("unsigns:" + z.place() + z.x1() + "," + z.z1());
 				done.add("unsigns:" + z.place() + z.x1() + "," + z.z1());
+				changed = true;
+			}
+		}
+		// The nurse and the clerk who stood outside (on the roofs) before there were insides: gone, once.
+		if (!done.contains("indoors:viridian")) {
+			boolean all = true;
+			for (int[] o : OLD_OUTSIDE) {
+				BlockPos at = new BlockPos(o[0], START_Y, o[1]);
+				if (!level.hasChunkAt(at)) {
+					all = false;
+					continue;
+				}
+				net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(o[0] - 14, level.getMinY(), o[1] - 14, o[0] + 14, level.getMaxY(), o[1] + 14);
+				for (Npc n : level.getEntitiesOfClass(Npc.class, box, n -> n.role() == Npc.NURSE || n.role() == Npc.CLERK)) n.discard();
+			}
+			if (all) {
+				placed.add("indoors:viridian");
+				done.add("indoors:viridian");
 				changed = true;
 			}
 		}

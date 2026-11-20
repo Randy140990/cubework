@@ -348,12 +348,9 @@ public final class Hud {
 		double t = Math.tan(Math.toRadians(Adventure.FOV) / 2);
 		double nx = v.dot(r) / depth / (t * w / h), ny = v.dot(u) / depth / t;
 		int sx = (int) ((nx + 1) / 2 * w), sy = (int) ((1 - ny) / 2 * h);
-		int s = Ui.scale(h), bw = 12 * s, bh = 14 * s;
-		// Pops up, then stays.
+		int s = Ui.scale(h);
+		// Pops up, then stays: the same smooth bubble as every other emote.
 		float pop = Math.min(1, (40 - ClientState.exclaimTicks) / 4F);
-		int lift = (int) ((1 - pop) * 6 * s);
-		Ui.round(g, sx - bw / 2, sy - bh - lift, bw, bh, 0xFFFFFFFF, s);
-		Ui.round(g, sx - bw / 2 + s, sy - bh - lift + s, bw - 2 * s, bh - 2 * s, Ui.RED, s);
-		Ui.centred(g, mc.font, "!", sx, sy - bh - lift + 3 * s, 0xFFFFFFFF, s, true);
+		Ui.bubble(g, "exclaim", sx, sy - (int) ((1 - pop) * 6 * s), s, pop);
 	}
 }

@@ -130,6 +130,23 @@ public final class Scenes {
 		V.img(g, V.tex("bg_" + name), -V.ox / V.k, -V.oy / V.k, V.gw / V.k, V.gh / V.k, 480, 270, 0xFFFFFFFF);
 	}
 
+	/**
+	 * A page's backdrop in a creature's own colour (its first type's, as Let's Go's pages are): the colour, lit from
+	 * the top left and shaded to the bottom right, as the UI Viewer's typeBackdrop.
+	 */
+	public static void typeBackdrop(GuiGraphics g, com.insidethecube.retromon.engine.Type t) {
+		g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.typeColor(t) | 0xFF000000);
+		V.img(g, V.tex("bg_sheen"), -V.ox / V.k, -V.oy / V.k, V.gw / V.k, V.gh / V.k, 480, 270, 0xFFFFFFFF);
+	}
+
+	/** A band in a creature's colour across the top of its page, for its name: the colour lit from the top. */
+	public static void typeBand(GuiGraphics g, com.insidethecube.retromon.engine.Type t, float x, float y, float w, float h) {
+		int c = Ui.typeColor(t) | 0xFF000000;
+		V.rr(g, x, y + 4, w, h, 22, 0x33000000);
+		V.rr(g, x - 2, y - 2, w + 4, h + 4, 24, 0x66FFFFFF);
+		V.rrStops(g, x, y, w, h, 22, new float[] {0, 0.55F, 1}, new int[] {Ui.lighter(c, 0.12F), Ui.darker(c, 0.86F), Ui.darker(c, 0.68F)});
+	}
+
 	// ---------- the professor ----------
 
 	private static final Identifier OAK = Retromon.id("textures/entity/npc/oak.png"), RIVAL = Retromon.id("textures/entity/npc/blue.png");

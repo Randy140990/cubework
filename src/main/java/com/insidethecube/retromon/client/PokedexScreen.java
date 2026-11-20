@@ -203,8 +203,9 @@ public class PokedexScreen extends DeviceScreen {
 	protected void drawScreen(GuiGraphics g, float partial) {
 		PlayerData d = ClientState.data;
 		float secs = (ticks + partial) / 20F;
-		Scenes.backdrop(g, "dex");
 		Species sp = current();
+		if (entry && sp != null) Scenes.typeBackdrop(g, sp.type1());
+		else Scenes.backdrop(g, "dex");
 		if (entry && sp != null) {
 			Scenes.model(g, secs, sp.id(), -1.05);
 			page(g, sp, d.caught.contains(sp.id()));
@@ -278,9 +279,12 @@ public class PokedexScreen extends DeviceScreen {
 		float x = 28, y = 28, w = 600, h = 640, px = x + 30, pw = w - 60;
 		V.panel(g, x, y, w, h);
 		String[] e = DexScreen.entries().get(sp.dex());
+		// Its number and name on a band of its own colour.
+		Scenes.typeBand(g, sp.type1(), x + 12, y + 12, w - 24, 96);
 		float cy = y + 26;
-		V.label(g, "No. " + String.format("%03d", sp.dex()), px, cy);
+		V.label(g, "No. " + String.format("%03d", sp.dex()), px, cy, 0xD9FFFFFF);
 		cy += 18 + 14;
+		V.text(g, sp.name(), px, cy + 2, 46, 0x55000000, true);
 		V.text(g, sp.name(), px, cy, 46, V.TEXT, true);
 		cy += 46 + 14;
 		float tx = px;

@@ -460,23 +460,20 @@ public final class Ui {
 	}
 
 	/**
-	 * A speech bubble with an emote in it (heart, star, exclaim, note, happy), its tail pointing down at (cx,
-	 * bottom). pop (0 to 1) is how far it has popped up.
+	 * A speech bubble with an emote in it (heart, star, exclaim, note, happy, dots), its tail's tip at (cx, bottom):
+	 * one smooth picture (textures/gui/emote/, made by tools/emotes.py), white with a pale rim and a soft shadow.
+	 * pop (0 to 1) is how far it has popped up.
 	 */
 	public static void bubble(GuiGraphics g, String emote, int cx, int bottom, int s, float pop) {
 		if (pop <= 0) return;
 		float k = pop < 1 ? (float) (1 + Math.sin(pop * Math.PI) * 0.25) * pop : 1;
-		int size = Math.round(22 * s * k), half = size / 2;
-		int top = bottom - size - Math.round(5 * s * k);
-		round(g, cx - half - s, top - s, size + 2 * s, size + 2 * s, 0x50000000, 3 * s);
-		round(g, cx - half, top, size, size, 0xFFFFFFFF, 3 * s);
-		// The tail.
-		for (int i = 0; i < 5 * s * k; i++) {
-			int w = Math.max(0, Math.round(4 * s * k) - i);
-			g.fill(cx - w, top + size + i, cx + w, top + size + i + 1, 0xFFFFFFFF);
-		}
-		int in = Math.round(size * 0.72F);
-		icon(g, "emote/" + emote, cx - in / 2, top + (size - in) / 2, in, 0xFFFFFFFF);
+		float size = 28 * s * k;
+		g.pose().pushMatrix();
+		g.pose().translate(cx - size / 2, bottom - size * 124 / 128F);
+		g.pose().scale(size / 128F, size / 128F);
+		g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, Retromon.id("textures/gui/emote/" + emote + ".png"), 0, 0, 0, 0, 128, 128, 128, 128, 128, 128,
+				0xFFFFFFFF);
+		g.pose().popMatrix();
 	}
 
 	/** A soft round glow (a light behind something), built up from see-through rounded boxes. */

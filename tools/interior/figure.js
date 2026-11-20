@@ -9,12 +9,15 @@ const skinsReady = (typeof SKINDATA === "undefined" ? Promise.resolve() : Promis
 const OUTFIT = {
   SKINS: ["FAIR", "LIGHT", "TAN", "DEEP"], SKIN_RGB: [0xF2CBAE, 0xE6B48E, 0xC08A60, 0x86563A],
   // Proposed: four more skin tones in between and either side, for everyone to see themselves.
-  SKINS_NEW: ["PALE", "MEDIUM", "BROWN", "DARK"], SKIN_RGB_NEW: [0xF8DCC8, 0xD69E72, 0xA2683F, 0x5C3824],
+  SKINS_NEW: ["PALE", "MEDIUM", "BROWN", "DARK", "IVORY", "PEACH", "OLIVE", "ESPRESSO"], SKIN_RGB_NEW: [0xF8DCC8, 0xD69E72, 0xA2683F, 0x5C3824, 0xFCE7D9, 0xEDBF9C, 0xB58A5F, 0x4A2C1C],
   HAIRS: ["short", "spiky", "long", "ponytail", "pigtails", "bun"], HATS: ["none", "cap", "beanie", "sunhat"], TOPS: ["jacket", "tee", "hoodie", "vest"],
   BOTTOMS: ["jeans", "shorts", "skirt"], CAPS: ["pokeball", "greatball", "ultraball", "plain"], CAP_NAMES: ["POKé BALL", "GREAT BALL", "ULTRA BALL", "PLAIN"],
   BAGS: ["backpack", "satchel", "none"],
-  COLOUR_NAMES: ["RED", "BLUE", "GREEN", "YELLOW", "BLACK", "WHITE", "PINK", "ORANGE", "PURPLE", "BROWN", "TEAL", "GREY", "NAVY", "CREAM"],
-  COLOURS: [0xD8343C, 0x3A6FD0, 0x3FA34D, 0xF2C12E, 0x2A2A30, 0xF2F2F2, 0xF08FB6, 0xF07D2A, 0x8A52C8, 0x7A5030, 0x2AA5A0, 0x8C8F99, 0x283A6E, 0xF0E2BE],
+  // The first 14 for clothes; hair has its own natural shades as well, at the end.
+  COLOUR_NAMES: ["RED", "BLUE", "GREEN", "YELLOW", "BLACK", "WHITE", "PINK", "ORANGE", "PURPLE", "BROWN", "TEAL", "GREY", "NAVY", "CREAM",
+    "BLONDE", "AUBURN", "SILVER", "CHESTNUT"],
+  COLOURS: [0xD8343C, 0x3A6FD0, 0x3FA34D, 0xF2C12E, 0x2A2A30, 0xF2F2F2, 0xF08FB6, 0xF07D2A, 0x8A52C8, 0x7A5030, 0x2AA5A0, 0x8C8F99, 0x283A6E, 0xF0E2BE,
+    0xE8CF8A, 0xA8542A, 0xC9CED6, 0x5A3420], CLOTHES: 14,
   EYES: ["NAVY", "BROWN", "HAZEL", "GREEN", "BLUE", "GREY", "AMBER", "VIOLET"], EYE_RGB: [0x2D3250, 0x5A3A22, 0x7A6A34, 0x3A7A44, 0x3A6FD0, 0x6E7A88, 0xB87A22, 0x6A4AA8],
   defaults(girl) {
     return { girl: !!girl, skin: 0, hair: girl ? 4 : 0, hairc: girl ? 9 : 4, hat: girl ? 3 : 1, hatc: girl ? 5 : 0, top: girl ? 1 : 0, topc: girl ? 10 : 0,
@@ -22,7 +25,7 @@ const OUTFIT = {
   },
 };
 function skinRGB(i) { const all = OUTFIT.SKIN_RGB.concat(OUTFIT.SKIN_RGB_NEW); return all[((i % all.length) + all.length) % all.length]; }
-const colourOf = i => OUTFIT.COLOURS[((i % 14) + 14) % 14];
+const colourOf = i => OUTFIT.COLOURS[((i % OUTFIT.COLOURS.length) + OUTFIT.COLOURS.length) % OUTFIT.COLOURS.length];
 // One layer stacked on, tinted (-1 for its own colours): as Outfit.layer does it, pixel for pixel.
 function stack(out, img, rgb) {
   if (!img) return;

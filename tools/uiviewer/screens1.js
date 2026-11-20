@@ -186,9 +186,9 @@ function makerRows(tab) {
     Object.assign(sw("SKIN", "skin", OUTFIT.SKIN_RGB.concat(OUTFIT.SKIN_RGB_NEW)), { newFrom: 4 }), Object.assign(sw("EYES", "eyes", OUTFIT.EYE_RGB), { newFrom: 0 }),
     ch("HAIR", "hair", OUTFIT.HAIRS), sw("HAIR COLOUR", "hairc", OUTFIT.COLOURS),
   ];
-  return [ch("HAT", "hat", OUTFIT.HATS), ch("CAP", "capp", OUTFIT.CAP_NAMES, () => O().hat !== 1), ch("CAP WAY", "capb", ["Forwards", "Backwards"], () => O().hat !== 1), sw("HAT COLOUR", "hatc", OUTFIT.COLOURS),
-    ch("TOP", "top", OUTFIT.TOPS), sw("TOP COLOUR", "topc", OUTFIT.COLOURS), ch("BOTTOMS", "bot", OUTFIT.BOTTOMS), sw("BOTTOMS COLOUR", "botc", OUTFIT.COLOURS),
-    sw("SHOES", "shoec", OUTFIT.COLOURS), ch("BAG", "bag", OUTFIT.BAGS), sw("BAG COLOUR", "bagc", OUTFIT.COLOURS)];
+  return [ch("HAT", "hat", OUTFIT.HATS), ch("CAP", "capp", OUTFIT.CAP_NAMES, () => O().hat !== 1), ch("CAP WAY", "capb", ["Forwards", "Backwards"], () => O().hat !== 1), sw("HAT COLOUR", "hatc", OUTFIT.COLOURS.slice(0, OUTFIT.CLOTHES)),
+    ch("TOP", "top", OUTFIT.TOPS), sw("TOP COLOUR", "topc", OUTFIT.COLOURS.slice(0, OUTFIT.CLOTHES)), ch("BOTTOMS", "bot", OUTFIT.BOTTOMS), sw("BOTTOMS COLOUR", "botc", OUTFIT.COLOURS.slice(0, OUTFIT.CLOTHES)),
+    sw("SHOES", "shoec", OUTFIT.COLOURS.slice(0, OUTFIT.CLOTHES)), ch("BAG", "bag", OUTFIT.BAGS), sw("BAG COLOUR", "bagc", OUTFIT.COLOURS.slice(0, OUTFIT.CLOTHES))];
 }
 function maker(C, tabs, o) {
   let tab = 0, sel = 0, rows = makerRows(tabs[0]);

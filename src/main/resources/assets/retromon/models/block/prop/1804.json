@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cupboard_white","cupboard_white":"retromon:block/interior/cupboard_white"},"elements":[{"from":[0.0,0.0,0],"to":[8.0,1.6,0],"faces":{"south":{"uv":[13.3333,0.0,16.0,1.4545],"texture":"#cupboard_white"}}}]}

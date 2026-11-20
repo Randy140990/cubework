@@ -17,8 +17,8 @@ import net.minecraft.resources.Identifier;
  */
 public final class Outfit {
 	/** Skin tones: the first four as ever, then four more (the maker's new ones). */
-	public static final String[] SKINS = {"FAIR", "LIGHT", "TAN", "DEEP", "PALE", "MEDIUM", "BROWN", "DARK"};
-	public static final int[] SKIN_RGB = {0xF2CBAE, 0xE6B48E, 0xC08A60, 0x86563A, 0xF8DCC8, 0xD69E72, 0xA2683F, 0x5C3824};
+	public static final String[] SKINS = {"FAIR", "LIGHT", "TAN", "DEEP", "PALE", "MEDIUM", "BROWN", "DARK", "IVORY", "PEACH", "OLIVE", "ESPRESSO"};
+	public static final int[] SKIN_RGB = {0xF2CBAE, 0xE6B48E, 0xC08A60, 0x86563A, 0xF8DCC8, 0xD69E72, 0xA2683F, 0x5C3824, 0xFCE7D9, 0xEDBF9C, 0xB58A5F, 0x4A2C1C};
 	/** Eye colours: the face layer's irises (45, 50, 80) take this colour. */
 	public static final String[] EYES = {"NAVY", "BROWN", "HAZEL", "GREEN", "BLUE", "GREY", "AMBER", "VIOLET"};
 	public static final int[] EYE_RGB = {0x2D3250, 0x5A3A22, 0x7A6A34, 0x3A7A44, 0x3A6FD0, 0x6E7A88, 0xB87A22, 0x6A4AA8};
@@ -34,9 +34,11 @@ public final class Outfit {
 	public static final String[] CAP_WAYS = {"FORWARDS", "BACKWARDS"};
 	public static final String[] BAGS = {"backpack", "satchel", "none"};
 	public static final String[] COLOUR_NAMES = {"RED", "BLUE", "GREEN", "YELLOW", "BLACK", "WHITE", "PINK", "ORANGE", "PURPLE", "BROWN", "TEAL", "GREY", "NAVY",
-			"CREAM"};
+			"CREAM", "BLONDE", "AUBURN", "SILVER", "CHESTNUT"};
+	/** The colours: the first CLOTHES for clothes, all of them for hair (its own natural shades at the end). */
 	public static final int[] COLOURS = {0xD8343C, 0x3A6FD0, 0x3FA34D, 0xF2C12E, 0x2A2A30, 0xF2F2F2, 0xF08FB6, 0xF07D2A, 0x8A52C8, 0x7A5030, 0x2AA5A0, 0x8C8F99,
-			0x283A6E, 0xF0E2BE};
+			0x283A6E, 0xF0E2BE, 0xE8CF8A, 0xA8542A, 0xC9CED6, 0x5A3420};
+	public static final int CLOTHES = 14;
 
 	/** What's being picked: the parts in order, and their values (style or colour index). */
 	public static final String[] PARTS = {"skin", "eyes", "hair", "hairc", "hat", "capp", "capb", "hatc", "top", "topc", "bot", "botc", "shoec", "bag", "bagc"};
@@ -99,7 +101,8 @@ public final class Outfit {
 			case "capp" -> CAPS.length;
 			case "capb" -> CAP_WAYS.length;
 			case "bag" -> BAGS.length;
-			default -> COLOURS.length;
+			case "hairc" -> COLOURS.length;
+			default -> CLOTHES;
 		};
 	}
 

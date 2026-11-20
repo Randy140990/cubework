@@ -50,7 +50,8 @@ public final class Interiors {
 
 	public record Warp(String kind, double x0, double x1, double z0, double z1, String door, String to, double sx, double sz, float syaw) {}
 
-	public record Person(String key, String name, String skin, double x, double z, float yaw, List<String> lines) {}
+	/** Someone in a room; role: "nurse" (heals), "clerk" (sells) or null (just talks). */
+	public record Person(String key, String name, String skin, double x, double z, float yaw, List<String> lines, String role) {}
 
 	public record Act(double x0, double z0, double x1, double z1, List<String> lines) {}
 
@@ -136,7 +137,7 @@ public final class Interiors {
 			for (JsonElement pe : r.getAsJsonArray("people")) {
 				JsonObject p = pe.getAsJsonObject();
 				people.add(new Person(p.get("key").getAsString(), p.get("name").getAsString(), p.get("skin").getAsString(), num(p, "x", 0), num(p, "z", 0),
-						(float) num(p, "yaw", 0), strings(p.get("lines"))));
+						(float) num(p, "yaw", 0), strings(p.get("lines")), p.has("role") && !p.get("role").isJsonNull() ? p.get("role").getAsString() : null));
 			}
 			List<Act> acts = new ArrayList<>();
 			for (JsonElement ae : r.getAsJsonArray("acts")) {
@@ -172,7 +173,7 @@ public final class Interiors {
 		// The people inside, as the game's people (their skin and what they say), unless the games had them already.
 		for (Room r : ROOMS.values())
 			for (Person p : r.people())
-				Trainers.PEOPLE.putIfAbsent(p.key(), new Trainers.Person(p.key(), r.place(), p.skin(), "down", "stay", p.lines()));
+				if (p.role() == null) Trainers.PEOPLE.putIfAbsent(p.key(), new Trainers.Person(p.key(), r.place(), p.skin(), "down", "stay", p.lines()));
 	}
 
 	/** A prop state's collision (and outline) shape. */
@@ -272,7 +273,9 @@ public final class Interiors {
 		AABB box = new AABB(r.ox() - 4, r.oy() - 8, r.oz() - 4, r.ox() + W + 4, r.oy() + 8, r.oz() + D + 4);
 		for (Npc n : level.getEntitiesOfClass(Npc.class, box, n -> true)) n.discard();
 		for (Person p : r.people()) {
-			Npc n = Game.place(level, Npc.PERSON, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
+			// The nurse heals and the clerk sells, as the games' nurse and clerk do (their own ways of talking).
+			int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : Npc.PERSON;
+			Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
 			if (n != null) n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));
 		}
 	}

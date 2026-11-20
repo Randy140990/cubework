@@ -15,17 +15,23 @@ from PIL import Image
 
 EPS = 1e-6
 SKIP = {"aoN", "aoW", "aoE", "deep", "sunPool", "shadowBlob"}
-ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0)}
-PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town"}
+ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
+          "mart": (384, 64, 0)}
+PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
+         "mart": "viridian_city"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
     "rival": {"room": "rival1", "door": [[-785, 19, 679], [-784, 19, 679]], "out": [-784.0, 19.0, 680.6]},
     "lab": {"room": "lab", "door": [[-783, 19, 694], [-782, 19, 694]], "out": [-782.0, 19.0, 695.6]},
+    # Viridian City: the Pokémon Center (red roof) and the Poké Mart (blue roof), their open doorways 3 wide.
+    "viridian_center": {"room": "center", "door": [[-787, 26, 557], [-786, 26, 557], [-785, 26, 557]], "out": [-785.5, 26.0, 558.6]},
+    "viridian_mart": {"room": "mart", "door": [[-767, 26, 543], [-766, 26, 543], [-765, 26, 543]], "out": [-765.5, 26.0, 544.6]},
 }
-MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab"}
+MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).
-ENTRY = {"house1": {"x": 6.0, "z": 12.9, "yaw": 180.0}, "rival1": {"x": 6.0, "z": 12.9, "yaw": 180.0}, "lab": {"x": 9.0, "z": 18.9, "yaw": 180.0}}
+ENTRY = {"house1": {"x": 6.0, "z": 12.9, "yaw": 180.0}, "rival1": {"x": 6.0, "z": 12.9, "yaw": 180.0}, "lab": {"x": 9.0, "z": 18.9, "yaw": 180.0},
+         "center": {"x": 10.0, "z": 14.9, "yaw": 180.0}, "mart": {"x": 8.0, "z": 12.9, "yaw": 180.0}}
 START = {"room": "house2", "x": 4.2, "z": 9.5, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -289,7 +295,7 @@ def main():
         people, aides = [], list(AIDES_FROM_GAMES)
         for i, n in enumerate(room["npcs"]):
             if n["name"] == "Blue": continue  # your rival comes in himself when it's time
-            key = PEOPLE.get((rid, n["name"]))
+            key = n.get("key") or PEOPLE.get((rid, n["name"]))
             if not key and n["name"] == "Aide" and aides and not n["seated"]: key = aides.pop(0)
             if not key: key = "in_%s_%d" % (rid, i)
             x, z, yaw = n["x"], n["z"], n["yaw"]
@@ -297,7 +303,7 @@ def main():
                 # Standing just behind their chair, till people can sit.
                 x += math.sin(yaw) * 0.85; z += math.cos(yaw) * 0.85
             people.append({"key": key, "name": n["name"].upper(), "skin": n["skin"] or "youngster", "x": round(x, 3), "z": round(z, 3),
-                           "yaw": round((180 - math.degrees(yaw)) % 360, 1), "lines": n["lines"]})
+                           "yaw": round((180 - math.degrees(yaw)) % 360, 1), "lines": n["lines"], "role": n.get("role")})
         acts = [{"rect": a["rect"], "label": a["label"], "lines": a["lines"]} for a in room["acts"] if a["lines"]]
         sp = room["spawn"]
         rooms_out[rid] = {"origin": list(o), "W": room["W"], "D": room["D"], "H": room["H"], "name": room["name"], "floor": room["floor"],

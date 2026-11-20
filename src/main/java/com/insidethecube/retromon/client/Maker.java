@@ -77,14 +77,14 @@ public final class Maker {
 			r.add(new Row("STYLE", "HAT", "hat", titled(Outfit.HATS), null, range(Outfit.HATS.length), -1));
 			r.add(new Row("CAP", "HAT", "capp", CAP_LABELS, null, CAP_VALUES, -1));
 			r.add(new Row("CAP WAY", "HAT", "capb", new String[] {"Forwards", "Backwards"}, null, new int[] {0, 1}, -1));
-			r.add(new Row("COLOUR", "HAT", "hatc", null, Outfit.COLOURS, range(Outfit.COLOURS.length), -1));
+			r.add(new Row("COLOUR", "HAT", "hatc", null, Outfit.COLOURS, range(Outfit.CLOTHES), -1));
 			r.add(new Row("STYLE", "TOP", "top", titled(Outfit.TOPS), null, range(Outfit.TOPS.length), -1));
-			r.add(new Row("COLOUR", "TOP", "topc", null, Outfit.COLOURS, range(Outfit.COLOURS.length), -1));
+			r.add(new Row("COLOUR", "TOP", "topc", null, Outfit.COLOURS, range(Outfit.CLOTHES), -1));
 			r.add(new Row("STYLE", "BOTTOMS", "bot", titled(Outfit.BOTTOMS), null, range(Outfit.BOTTOMS.length), -1));
-			r.add(new Row("COLOUR", "BOTTOMS", "botc", null, Outfit.COLOURS, range(Outfit.COLOURS.length), -1));
-			r.add(new Row("COLOUR", "SHOES", "shoec", null, Outfit.COLOURS, range(Outfit.COLOURS.length), -1));
+			r.add(new Row("COLOUR", "BOTTOMS", "botc", null, Outfit.COLOURS, range(Outfit.CLOTHES), -1));
+			r.add(new Row("COLOUR", "SHOES", "shoec", null, Outfit.COLOURS, range(Outfit.CLOTHES), -1));
 			r.add(new Row("STYLE", "BAG", "bag", titled(Outfit.BAGS), null, range(Outfit.BAGS.length), -1));
-			r.add(new Row("COLOUR", "BAG", "bagc", null, Outfit.COLOURS, range(Outfit.COLOURS.length), -1));
+			r.add(new Row("COLOUR", "BAG", "bagc", null, Outfit.COLOURS, range(Outfit.CLOTHES), -1));
 		}
 		return r;
 	}

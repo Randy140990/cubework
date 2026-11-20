@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/counter_red","counter_red":"retromon:block/interior/counter_red"},"elements":[{"from":[13.6,0.0,16],"to":[16.0,0.8,16],"faces":{"north":{"uv":[0.0,15.2,2.4,16.0],"texture":"#counter_red"}}}]}

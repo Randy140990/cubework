@@ -27,8 +27,8 @@ screen("hud", "In the world", "The HUD", {
       later(2600, () => { t.style.transition = "opacity .5s"; t.style.opacity = 0; }); later(3200, () => t.remove());
     };
     const emote = () => {
-      const e = box(0, 0, 56, 56, "g-pop", `<div style="width:56px;height:56px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:30px;color:#E5525C;box-shadow:0 6px 14px rgba(0,0,0,.3)">&#9834;</div>`);
-      const p = V(8.1, 1.35, 11.4).project(cam3); e.style.left = ((p.x + 1) / 2 * 1280 - 28) + "px"; e.style.top = ((1 - p.y) / 2 * 720 - 70) + "px";
+      const e = box(0, 0, 64, 64, "g-pop", `<img src="${EMOTE.note}" style="width:64px;height:64px">`);
+      const p = V(8.1, 1.35, 11.4).project(cam3); e.style.left = ((p.x + 1) / 2 * 1280 - 32) + "px"; e.style.top = ((1 - p.y) / 2 * 720 - 62) + "px";
       later(1800, () => e.remove());
     };
     later(500, banner); later(4200, () => toast(ICON.save, "Game saved")); later(2000, emote);
@@ -101,20 +101,61 @@ screen("badgeget", "In the world", "Getting a badge", {
 const MENU = [["POKéDEX", "dex", "dex", "Every POKéMON you've seen and caught."], ["POKéMON", "ball", "party", "Your team: check them, switch them, pick who follows you."], ["BAG", "bag", "bag", "Your items, in four pockets."],
   ["MAP", "map", "map", "The TOWN MAP: where you are, and where everywhere else is."], ["CLOTHES", "cap", "clothes", "Change what you're wearing."], ["CARD", "card", "card", "Your TRAINER CARD and badges."],
   ["WAIT", "clock", "wait", "Let time pass, to morning, midday, evening or night."], ["SAVE", "save", "save", "Save your game."], ["OPTION", "cog", "options", "Text speed, music, nights and more."], ["EXIT", "close", "hud", "Close the menu."]];
+const MENU_MAIN = [0, 1, 2, 3, 7], MENU_SIDE = [4, 5, 6, 8, 9];
+const MENU_COLS = [["#F58A94", "#D94452", "#AE2E3C"], ["#7EE3AE", "#39B27A", "#22855A"], ["#FFD27A", "#F0A030", "#C87818"], ["#8EC4F6", "#4A8FE0", "#2F64B0"], ["#C6AEF4", "#8A62D8", "#6440B0"]];
 screen("menu", "In the world", "The menu", {
   scene: "town", sceneOpts: () => ({}),
-  what: "The menu over the blurred world: big round tiles, our own symbols, no Communicate and no Play-with tile.",
-  mod: "MenuScreen: POKéDEX, POKéMON, BAG, MAP, CLOTHES, CARD, WAIT, SAVE, OPTION, EXIT, in a grid.",
-  tags: ["New look"], try: ["Arrows to move, A to open, B to close."],
+  what: "The menu in Let's Go's layout: your partner in a round badge at the top (where Let's Go has its Pikachu), five big round buttons in their own colours with their pictures, five smaller ones under them, and what the one you're on does.",
+  mod: "MenuScreen: POKéDEX, POKéMON, BAG, MAP and SAVE as the big ones; CLOTHES, CARD, WAIT, OPTION and EXIT as the small ones.",
+  tags: ["New look", "Colour"], try: ["Left and right along a row, up and down between the rows, A to open, B to close."],
   make(arg) {
     blurOver(); let sel = arg && arg.sel || 0;
-    box(0, 30, 1280, null, "", `<div class="g-title" style="text-align:center;font-size:30px;letter-spacing:8px;text-shadow:0 3px 8px rgba(0,0,0,.5)">MENU</div>`);
-    const tiles = MENU.map(([n, ic], i) => { const t = h("div", "g-tile", `<div class="disc">${ICON[ic]}</div><div class="nm">${esc(n)}</div>`); t.style.left = (110 + (i % 5) * 220) + "px"; t.style.top = (130 + Math.floor(i / 5) * 230) + "px"; t.onmouseenter = () => { sel = i; draw(); }; t.onclick = () => { sel = i; open(); }; return add(t); });
-    const line = box(240, 600, 800, null, "g-panel soft", ""); line.style.padding = "14px 26px"; line.style.textAlign = "center"; line.style.fontSize = "21px"; line.style.fontWeight = "800";
-    const draw = () => { tiles.forEach((t, i) => t.classList.toggle("on", i === sel)); line.innerHTML = esc(MENU[sel][3]); };
+    const lead = G.party[0], ring = TYPECOL(sp(lead.sid).stats.types[0]);
+    add(h("div", "", `<div style="position:absolute;inset:0;border-radius:50%;background:#fff;box-shadow:0 8px 0 rgba(0,0,0,.25)"></div>
+      <div style="position:absolute;inset:4px;border-radius:50%;background:${ring}"></div>
+      <div style="position:absolute;inset:8px;border-radius:50%;background:radial-gradient(circle at 50% 35%, #FFFBF0, color-mix(in srgb, ${ring} 28%, #fff))"></div>
+      <div style="position:absolute;inset:14px;display:grid;place-items:center">${pic(lead.sid, 110, "animation:menuBob 2.9s ease-in-out infinite")}</div>
+      <div style="position:absolute;left:50%;top:122px;transform:translateX(-50%);background:${ring};color:#fff;padding:2px 17px;border-radius:999px;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:17px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.2)">${esc(ourName(lead.sid))}</div>
+      <style>@keyframes menuBob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}</style>`, { position: "absolute", left: (640 - 70) + "px", top: (118 - 70) + "px", width: "140px", height: "140px" }));
+    const els = {};
+    MENU_MAIN.forEach((i, c) => {
+      const [n, ic] = MENU[i], col = MENU_COLS[c], cx = 240 + c * 200, cy = 330;
+      const t = h("div", "", `<div class="ring"></div><div class="disc" style="background:linear-gradient(180deg, ${col[0]}, ${col[1]} 55%, ${col[2]})"><div class="face" style="background:linear-gradient(180deg, #fff, color-mix(in srgb, ${col[0]} 26%, #fff))">${ICON[ic]}</div></div><div class="nm">${esc(n)}</div>`);
+      t.className = "g-big"; t.style.left = (cx - 75) + "px"; t.style.top = (cy - 75) + "px";
+      t.onmouseenter = () => { sel = i; draw(); }; t.onclick = () => { sel = i; open(); }; els[i] = add(t);
+    });
+    MENU_SIDE.forEach((i, c) => {
+      const [n, ic] = MENU[i], w = 186, x = 640 - (5 * w + 4 * 16) / 2 + c * (w + 16);
+      const t = h("div", "g-small", `<span class="dot">${ICON[ic]}</span><span>${esc(n)}</span>`);
+      t.style.left = x + "px"; t.style.top = "486px";
+      t.onmouseenter = () => { sel = i; draw(); }; t.onclick = () => { sel = i; open(); }; els[i] = add(t);
+    });
+    add(h("style", "", `.g-big{position:absolute;width:150px;display:grid;justify-items:center;gap:10px;cursor:pointer}
+      .g-big .disc{position:relative;width:140px;height:140px;border-radius:50%;display:grid;place-items:center;border:4px solid #fff;box-shadow:0 8px 0 rgba(0,0,0,.3);transition:transform .12s}
+      .g-big .face{width:100px;height:100px;border-radius:50%;display:grid;place-items:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.08)}
+      .g-big .face svg{width:70px;height:70px}
+      .g-big .ring{position:absolute;left:-7px;top:-7px;width:164px;height:164px;border-radius:50%;background:rgba(255,244,216,.4);opacity:0;transition:opacity .12s}
+      .g-big .nm{font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:1px;text-shadow:0 2px 0 rgba(0,0,0,.5);transition:transform .12s}
+      .g-big.on .disc{transform:translateY(-10px) scale(1.08);border-color:var(--g-cream)}
+      .g-big.on .ring{opacity:1;transform:translateY(-10px)}
+      .g-big.on .nm{color:var(--g-cream);transform:translateY(-10px)}
+      .g-small{position:absolute;width:186px;height:54px;box-sizing:border-box;border-radius:999px;display:flex;align-items:center;gap:12px;padding-left:7px;cursor:pointer;
+        background:linear-gradient(180deg,rgba(29,90,82,.96),rgba(18,60,56,.96));border:2.5px solid var(--g-edge);box-shadow:0 4px 0 rgba(0,0,0,.25);font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:19px}
+      .g-small .dot{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center}
+      .g-small .dot svg{width:30px;height:30px}
+      .g-small.on{background:var(--g-cream);border-color:#fff;color:#26304A;box-shadow:0 0 0 4px rgba(255,244,216,.4),0 4px 0 rgba(0,0,0,.25)}
+      .g-small.on .dot{background:#26304A}`));
+    const line = box(240, 576, 800, null, "g-panel soft", ""); line.style.padding = "14px 26px"; line.style.textAlign = "center"; line.style.fontSize = "21px"; line.style.fontWeight = "800";
+    const draw = () => { for (const k in els) els[k].classList.toggle("on", +k === sel); line.innerHTML = esc(MENU[sel][3]); };
     const open = () => go(MENU[sel][2], { from: "menu" });
     draw(); hints([["A", "Open"], ["B", "Close"]]);
-    return { key: k => { if (k === "a") { open(); return true; } if (k === "b") { go("hud"); return true; } const n = sel; sel = gridMove(sel, MENU.length, 5, k); if (n !== sel) draw(); return true; } };
+    return { key: k => {
+      if (k === "a") { open(); return true; } if (k === "b") { go("hud"); return true; }
+      const top = MENU_MAIN.indexOf(sel) >= 0, row = top ? MENU_MAIN : MENU_SIDE, at = row.indexOf(sel);
+      if (k === "left") sel = row[(at + row.length - 1) % row.length];
+      else if (k === "right") sel = row[(at + 1) % row.length];
+      else if (k === "up" || k === "down") sel = (top ? MENU_SIDE : MENU_MAIN)[at];
+      draw(); return true; } };
   }
 });
 
@@ -165,10 +206,10 @@ screen("dexentry", "Menus", "Pokédex entry", {
   mod: "PokedexScreen's entry, with POKéDEX VOICE reading it out (V).",
   make(arg) {
     const sid = arg && arg.sid || "pikachu", d = sp(sid);
-    backdrop("linear-gradient(160deg,#5AC8E8,#2E8FC0 55%,#1E5F96)");
+    typeBackdrop(d.stats.types[0]);
     SC.model.show(sid).then(() => { const e = $("#hgt"); if (e && SC.model.st) e.textContent = SC.model.st.m.size.h.toFixed(2) + " blocks"; });
-    box(28, 28, 600, 640, "g-panel g-fadein", `<div style="padding:26px 30px;display:grid;gap:14px">
-      <div class="g-label">No. ${String(d.dex).padStart(3, "0")}</div><div class="g-title" style="font-size:46px;line-height:1">${esc(ourName(sid))}</div>
+    box(28, 28, 600, 640, "g-panel g-fadein", `${typeBand(d.stats.types[0], 12, 12, 576, 96)}<div style="position:relative;padding:26px 30px;display:grid;gap:14px">
+      <div class="g-label" style="color:rgba(255,255,255,.85)">No. ${String(d.dex).padStart(3, "0")}</div><div class="g-title" style="font-size:46px;line-height:1;text-shadow:0 2px 0 rgba(0,0,0,.33)">${esc(ourName(sid))}</div>
       <div style="display:flex;gap:8px">${d.stats.types.map(typeChip).join("")}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="g-panel soft" style="position:relative;padding:10px 16px;border-radius:16px"><div class="g-label">Height</div><div style="font-size:22px;font-weight:900" id="hgt">...</div></div>
         <div class="g-panel soft" style="position:relative;padding:10px 16px;border-radius:16px"><div class="g-label">Stands in for</div><div style="font-size:22px;font-weight:900">${esc(d.pname)}</div></div></div>
@@ -217,19 +258,19 @@ screen("summary", "Menus", "Summary", {
   try: ["Tab, or left and right, for the next page. Up and down for the next of your team."],
   make(arg) {
     let i = arg && arg.i || 0, page = 0;
-    backdrop("linear-gradient(160deg,#FFE7B8,#F6B26B 55%,#D9733A)");
-    const P = box(28, 28, 640, 660, "g-panel", ""); P.style.padding = "24px 28px";
+    const P = box(28, 28, 640, 660, "g-panel", ""); P.style.padding = "24px 28px"; P.style.boxSizing = "border-box";
     const draw = () => {
-      const p = G.party[i], d = sp(p.sid); SC.model.show(p.sid);
+      const p = G.party[i], d = sp(p.sid); SC.model.show(p.sid); typeBackdrop(d.stats.types[0]);
+      const tc = typeHex(d.stats.types[0]);
       const tabs = ["INFO", "STATS", "MOVES"].map((t, j) => `<span class="g-chip${j === page ? " on" : ""}" style="font-size:15px">${t}</span>`).join("");
       let body = "";
       if (page === 0) body = `<div style="display:grid;grid-template-columns:auto 1fr;gap:10px 22px;font-size:21px;font-weight:800"><span class="g-label">No.</span><span>${String(d.dex).padStart(3, "0")}</span><span class="g-label">Types</span><span>${d.stats.types.map(typeChip).join(" ")}</span>
         <span class="g-label">Trainer</span><span>${esc(G.name)}</span><span class="g-label">ID No.</span><span>${G.id}</span><span class="g-label">Item</span><span>None</span><span class="g-label">Met</span><span>ROUTE 1, at Lv. ${Math.max(2, p.lv - 18)}</span></div>
         <div style="margin-top:16px"><div class="g-label">EXP to Lv. ${p.lv + 1}</div><div class="g-exp" style="margin-top:6px"><i style="width:${p.exp * 100}%"></i></div></div>`;
       else if (page === 1) { const st = p.stats, names = [["HP", "HP"], ["Attack", "ATTACK"], ["Defense", "DEFENSE"], ["Sp. Atk", "SPCL.ATK"], ["Sp. Def", "SPCL.DEF"], ["Speed", "SPEED"]];
-        body = `<div style="display:grid;gap:12px">${names.map(([k, l]) => `<div style="display:grid;grid-template-columns:150px 70px 1fr;align-items:center;gap:12px;font-size:19px;font-weight:900"><span class="g-label">${l}</span><span style="text-align:right">${k === "HP" ? p.hp + "/" + st[k] : st[k]}</span><div class="g-hp" style="height:16px"><i style="width:${Math.min(100, st[k] / (p.lv * 2.6 + 30) * 100)}%;background:linear-gradient(90deg,#4FB896,#8FF5C0)"></i></div></div>`).join("")}</div>`; }
+        body = `<div style="display:grid;gap:12px">${names.map(([k, l]) => `<div style="display:grid;grid-template-columns:150px 70px 1fr;align-items:center;gap:12px;font-size:19px;font-weight:900"><span class="g-label">${l}</span><span style="text-align:right">${k === "HP" ? p.hp + "/" + st[k] : st[k]}</span><div class="g-hp" style="height:16px"><i style="width:${Math.min(100, st[k] / (p.lv * 2.6 + 30) * 100)}%;background:linear-gradient(180deg,${lighterHex(tc, 0.45)},${tc})"></i></div></div>`).join("")}</div>`; }
       else body = `<div style="display:grid;gap:10px">${p.moves.map(n => { const m = MOVE[n] || { type: "NORMAL", pp: 20, category: "Physical", power: 40 }; return `<div class="g-panel soft" style="position:relative;padding:10px 16px;border-radius:18px;display:flex;align-items:center;gap:14px">${typeChip(m.type)}<span style="font-size:21px;font-weight:900">${esc(n)}</span><span style="margin-left:auto;font-weight:900;font-variant-numeric:tabular-nums">PP ${m.pp}/${m.pp}</span></div>`; }).join("")}</div>`;
-      P.innerHTML = `<div style="display:flex;align-items:center;gap:12px"><span class="g-title" style="font-size:36px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-size:24px;font-weight:900">Lv. ${p.lv}</span></div>
+      P.innerHTML = `${typeBand(d.stats.types[0], 12, 12, 616, 64)}<div style="position:relative;display:flex;align-items:center;gap:12px;text-shadow:0 2px 0 rgba(0,0,0,.33)"><span class="g-title" style="font-size:36px">${esc(ourName(p.sid))}</span>${gender(p.gender)}${statusChip(p.status)}<span style="margin-left:auto;font-size:24px;font-weight:900">Lv. ${p.lv}</span></div>
         <div style="display:flex;gap:8px;margin:14px 0 18px">${tabs}</div>${body}`;
     };
     draw(); hints([["TAB", "Page"], ["B", "Back"]]);
@@ -267,7 +308,7 @@ screen("bag", "Menus", "Bag", {
       </svg>
       <div style="position:absolute;left:0;right:0;top:500px;display:flex;justify-content:center;gap:6px">${pockets.map((p, i) => `<span class="g-chip${i === pk ? " on" : ""}" style="font-size:13px;padding:3px 10px">${esc(p)}</span>`).join("")}</div>`;
       const items = G.bag[pockets[pk]];
-      L.innerHTML = items.map(([n, c], i) => `<div class="g-item${i === sel ? " on" : ""}"><span style="width:34px;height:34px">${ITEM_ICON(n)}</span><span>${esc(n)}</span><span class="r">x${c}</span></div>`).join("") || `<div style="padding:20px;font-size:21px;font-weight:800;color:#A9D4C6">Empty</div>`;
+      L.innerHTML = items.map(([n, c], i) => `<div style="margin-bottom:8px">${goodsRow(n, "x" + c, i === sel)}</div>`).join("") || `<div style="padding:20px;font-size:21px;font-weight:800;color:#A9D4C6">Empty</div>`;
       desc.innerHTML = items[sel] ? esc(items[sel][2]) : "";
       [...L.children].forEach((c, i) => c.onclick = () => { sel = i; draw(); use(); });
     };

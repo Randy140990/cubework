@@ -23,7 +23,7 @@ screen("mart", "Places", "Shop", {
           const showBag = i => inBag.innerHTML = `<span class="g-label">In your bag</span>&nbsp;&nbsp;<span style="font-size:22px;font-weight:900">${bagCount(MART[i][0])}</span>`;
           showBag(0);
           while (C.alive()) {
-            const i = await C.choose(MART.map(([n, p]) => ({ label: n, right: money(p) })).concat([{ label: "CANCEL" }]), { x: 760, y: 30, w: 480, onMove: k => { if (k < MART.length) showBag(k); } });
+            const i = await C.choose(MART.map(([n, p]) => ({ goods: n, right: money(p) })).concat([{ label: "CANCEL" }]), { x: 760, y: 30, w: 480, onMove: k => { if (k < MART.length) showBag(k); } });
             if (i < 0 || i === MART.length) break;
             const [n, p] = MART[i];
             let q = 1; const max = Math.max(1, Math.min(99, Math.floor(G.money / p)));
@@ -39,7 +39,7 @@ screen("mart", "Places", "Shop", {
           inBag.remove();
         } else {
           const items = G.bag["ITEMS"];
-          const i = await C.choose(items.map(([n, c]) => ({ label: n, right: "x" + c })).concat([{ label: "CANCEL" }]), { x: 760, y: 30, w: 480 });
+          const i = await C.choose(items.map(([n, c]) => ({ goods: n, right: "x" + c })).concat([{ label: "CANCEL" }]), { x: 760, y: 30, w: 480 });
           if (i >= 0 && i < items.length) { const price = (MART.find(m => m[0] === items[i][0]) || [0, 200])[1] / 2;
             const yes = await C.say([{ who: "CLERK", text: `I can pay ₽${price} for the ${items[i][0]}. Is that OK?`, ask: ["YES", "NO"] }]);
             if (yes === 0) { G.money += price; items[i][1]--; draw(); await C.say([{ text: `You handed over the **${items[i][0]}** and got ₽${price}.` }]); } }
@@ -93,6 +93,51 @@ screen("trade", "Places", "Trading", {
       if (C.alive()) go("hud");
     })();
     return { key: k => C.key(k) };
+  }
+});
+// The three starters on their cards, as StarterScreen draws them (canvas units): each card in its type's colours.
+const STARTERS = [["bulbasaur", "GRASS", ["#9BE08A", "#4FB848", "#2A7A34"]], ["charmander", "FIRE", ["#FFC06E", "#F0782E", "#B8401E"]], ["squirtle", "WATER", ["#8CCBF6", "#3F8EDC", "#2459A6"]]];
+screen("starter", "Places", "Choosing your first POKéMON", {
+  scene: "town", sceneOpts: () => ({}),
+  what: "In the lab, the three on the table, each on a card in its own type's colours: leafy greens, fiery oranges, sea blues. The one you're on lifts, brighter, with a white rim, hops and twirls, and a heart pops up over it.",
+  mod: "StarterScreen: the cards, then So! You want the FIRE POKéMON...? YES or NO.",
+  tags: ["Colour"], try: ["Left and right to look, A to choose, then YES or NO."],
+  make() {
+    blurOver(); add(h("div", "", "", { position: "absolute", inset: "0", background: "linear-gradient(180deg, rgba(10,14,36,.44), rgba(10,14,36,.75))" }));
+    const C = ctl(); let sel = 1, picking = true;
+    const cw = 300, ch = 330, gap = 40, x0 = 640 - (3 * cw + 2 * gap) / 2, y = 214;
+    add(h("style", "", `@keyframes stHop{0%{transform:translateY(0) rotate(0)}25%{transform:translateY(-30px) rotate(180deg)}50%{transform:translateY(0) rotate(360deg) scaleY(.9)}75%{transform:translateY(-14px) rotate(360deg)}100%{transform:translateY(0) rotate(360deg)}}
+      @keyframes stPop{from{transform:scale(0)}60%{transform:scale(1.2)}to{transform:scale(1)}}`));
+    const cards = STARTERS.map(([sid, kind, c], i) => {
+      const e = box(x0 + i * (cw + gap), y, cw, ch, "", ""); e.style.cursor = "pointer";
+      e.onmouseenter = () => { if (picking) { sel = i; paint(); } }; e.onclick = () => { if (picking) { sel = i; paint(); pick(); } };
+      return e;
+    });
+    const paint = () => cards.forEach((e, i) => {
+      const [sid, kind, c] = STARTERS[i], on = i === sel, dim = (hx, k) => `color-mix(in srgb, ${hx} ${Math.round((1 - k) * 100)}%, #0E2A28)`;
+      const cols = on ? c : [dim(c[0], 0.42), dim(c[1], 0.5), dim(c[2], 0.55)];
+      e.style.transform = on ? "translateY(-12px)" : "none";
+      e.innerHTML = `<div style="position:absolute;inset:-9px;border-radius:38px;background:${on ? "rgba(255,244,216,.33)" : "transparent"}"></div>
+        <div style="position:absolute;inset:0;border-radius:30px;background:linear-gradient(180deg, ${cols[0]}, ${cols[1]} 50%, ${cols[2]});border:3px solid ${on ? "#fff" : "rgba(255,255,255,.31)"};box-shadow:0 9px 0 rgba(0,0,0,.27);box-sizing:border-box;margin:-3px"></div>
+        <div style="position:absolute;left:${cw * 0.1}px;right:${cw * 0.1}px;top:40px;height:${ch * 0.56}px;border-radius:50%;background:rgba(255,255,255,${on ? 0.18 : 0.07})"></div>
+        <div style="position:absolute;left:${cw * 0.14}px;right:${cw * 0.14}px;top:${40 + ch * 0.5 - 16}px;height:32px;border-radius:50%;background:${darkerHex(c[2], 0.3)};opacity:${on ? 0.9 : 0.6}"></div>
+        <div style="position:absolute;left:50%;top:${40 + ch * 0.5}px;transform:translate(-50%,-100%)"><div style="${on ? "animation:stHop 1.1s ease-out 1" : ""};transform-origin:50% 90%">${pic(sid, ch * 0.5, on ? "" : "filter:brightness(.82)")}</div></div>
+        ${on ? `<div style="position:absolute;left:${cw / 2 + ch * 0.5 / 3 - 28}px;top:${34 - 54}px;width:56px;height:56px;animation:stPop .3s ease-out .2s both"><img src="${EMOTE.heart}" style="width:56px;height:56px"></div>` : ""}
+        <div class="g-title" style="position:absolute;left:0;right:0;top:${ch - 86}px;text-align:center;font-size:32px;color:${on ? "#fff" : "#E4ECE8"};text-shadow:0 2px 0 rgba(0,0,0,.4)">${esc(ourName(sid))}</div>
+        <div style="position:absolute;left:50%;top:${ch - 46}px;transform:translateX(-50%);height:30px;padding:0 17px;border-radius:999px;display:grid;place-items:center;background:${on ? "#fff" : "rgba(255,255,255,.19)"};color:${on ? darkerHex(c[2], 0.15) : "#fff"};font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:1px">${kind}</div>`;
+    });
+    const pick = async () => {
+      picking = false; const [sid, kind] = STARTERS[sel], n = ourName(sid);
+      const v = await C.say([{ who: "PROF. OAK", text: `So! You want the ${kind} POKéMON, **${n}**?`, ask: ["YES", "NO"] }]);
+      if (!C.alive()) return;
+      if (v !== 0) { picking = true; C.say([{ who: "PROF. OAK", text: "Which POKéMON will you choose?" }], { keep: true }); return; }
+      await C.say([{ text: `**${G.name}** received **${n}**!` }, { who: "PROF. OAK", text: "ROUTE 1 is just north of here. Good luck!" }]); if (C.alive()) go("hud");
+    };
+    paint(); C.say([{ who: "PROF. OAK", text: "Which POKéMON will you choose?" }], { keep: true });
+    return { key: k => {
+      if (picking && (k === "left" || k === "right")) { sel = (sel + (k === "right" ? 1 : 2)) % 3; paint(); return true; }
+      if (picking && k === "a") { pick(); return true; }
+      return C.key(k); } };
   }
 });
 screen("gift", "Places", "Being given a POKéMON", {
@@ -157,6 +202,41 @@ function commandButtons(onPick, o = {}) {
     const [, , y, hh] = B[sel]; arrow.style.top = (y + hh / 2 - 18) + "px"; arrow.style.left = (X - 54) + "px"; };
   paint();
   return { key(k) { if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : 3)) % 4; paint(); return true; } if (k === "left" || k === "right") return true; if (k === "a") { onPick(sel); return true; } return false; }, remove() { els.forEach(e => e.remove()); pill.remove(); arrow.remove(); } };
+}
+// The bag in battle, as BattleScreen.drawBag: a panel over the dimmed stage, its two pockets as big coloured cards down
+// the left (POKé BALLS red, MEDICINE green, how many kinds in each), what's in the picked one as coloured bars on the
+// right, what it does underneath. Resolves with the item's name, or null for back.
+function battleBag(C, o = {}) {
+  return new Promise(res => {
+    const pockets = [["POKé BALLS", GOODS.ball, "ball", () => G.bag["BALLS"]], ["MEDICINE", GOODS.med, "potion", () => G.bag["ITEMS"].filter(([n]) => ITEM_KIND(n) === "med")]];
+    let pk = o.pocket || 0, sel = 0;
+    const dim = add(h("div", "", "", { position: "absolute", inset: "0", background: "rgba(6,26,30,.55)" }));
+    const P = box(190, 70, 900, 540, "g-panel", ""); P.style.padding = "0"; P.style.boxSizing = "border-box";
+    const mute = (c, k) => `color-mix(in srgb, ${c} ${Math.round((1 - k) * 100)}%, #123C38)`;
+    const draw = () => {
+      const items = pockets[pk][3](); sel = Math.max(0, Math.min(sel, items.length - 1));
+      P.innerHTML = `<div style="position:absolute;left:30px;top:20px;width:44px;height:44px">${ICON.bag}</div><div class="g-title" style="position:absolute;left:86px;top:24px;font-size:30px">BAG</div>
+        ${pockets.map(([n, c, ic, get], i) => { const on = i === pk, k = get().length, cols = on ? c : c.map(x => mute(x, 0.55));
+          return `<div data-p="${i}" style="position:absolute;left:30px;top:${90 + i * 128}px;width:300px;height:108px;border-radius:26px;cursor:pointer;background:linear-gradient(180deg, ${cols[0]}, ${cols[1]} 50%, ${cols[2]});box-shadow:${on ? "0 0 0 3px #FFF4D8, 0 0 0 8px rgba(255,244,216,.45), " : ""}0 5px 0 rgba(0,0,0,.25)">
+            <div style="position:absolute;left:18px;top:18px;width:72px;height:72px;border-radius:50%;background:${on ? "#fff" : "rgba(255,255,255,.7)"};display:grid;place-items:center"><span style="width:44px;height:44px">${ICON[ic]}</span></div>
+            <div style="position:absolute;left:104px;top:22px;font-size:24px;font-weight:900;color:${on ? "#fff" : "#CFEDE3"}">${n}</div>
+            <div style="position:absolute;left:104px;top:58px;font-size:19px;font-weight:800;color:${on ? "rgba(255,255,255,.9)" : "rgba(207,237,227,.7)"}">${k ? k + (k === 1 ? " kind" : " kinds") : "Empty"}</div></div>`; }).join("")}
+        <div style="position:absolute;left:360px;top:90px;width:510px">${items.map(([n, c], i) => `<div data-i="${i}" style="margin-bottom:8px">${goodsRow(n, "x" + c, i === sel, 54)}</div>`).join("") || `<div style="font-size:21px;font-weight:800;color:#A9D4C6;padding:14px 10px">${pk === 0 ? "No POKé BALLS yet. A POKé MART sells them." : "No medicine to use in battle."}</div>`}</div>
+        <div class="g-panel soft" style="position:absolute;left:360px;top:418px;width:510px;height:92px;box-sizing:border-box;padding:18px 24px;font-size:19px;font-weight:800;color:#CFEDE3">${items[sel] ? esc(items[sel][2]) : ""}</div>`;
+      P.querySelectorAll("[data-p]").forEach(e => e.onclick = () => { pk = +e.dataset.p; sel = 0; draw(); });
+      P.querySelectorAll("[data-i]").forEach(e => { e.onmouseenter = () => { sel = +e.dataset.i; draw(); }; e.onclick = () => { sel = +e.dataset.i; done(items[sel][0]); }; });
+    };
+    const hs = hints([["A", "Use"], ["B", "Back"], ["TAB", "Pocket"]]);
+    const w = { key(k) {
+      const items = pockets[pk][3]();
+      if (k === "left" || k === "right" || k === "tab") { pk = 1 - pk; sel = 0; draw(); return true; }
+      if ((k === "up" || k === "down") && items.length) { sel = (sel + (k === "down" ? 1 : items.length - 1)) % items.length; draw(); return true; }
+      if (k === "a" && items[sel]) { done(items[sel][0]); return true; }
+      if (k === "b") { done(null); return true; }
+      return true; } };
+    const done = v => { C.pop(w); P.remove(); dim.remove(); if (hs && hs.remove) hs.remove(); else uiRoot.querySelectorAll(".g-hints").forEach(e => e.remove()); res(v); };
+    C.push(w); draw();
+  });
 }
 function movePanel(p, foeSid, onPick, onBack) {
   let sel = 0;
@@ -230,7 +310,7 @@ screen("battle", "Battle", "Battle: commands and moves", {
         C.pop(cb); cb.remove();
         if (i === 0) { const mp = movePanel(ours, foe.sid, j => { C.pop(mp); mp.remove(); turn(j); }, () => { C.pop(mp); mp.remove(); commands(); }); C.push(mp); }
         else if (i === 1) { const j = await C.choose(G.party.map(p => ({ label: `${pic(p.sid, 36, "vertical-align:middle;margin:-6px 8px -6px -8px")}${esc(ourName(p.sid))}`, right: `Lv. ${p.lv}`, off: p.status === "FNT" })).concat(["CANCEL"]), { x: 800, y: null, bottom: 24, w: 450 }); if (j > 0 && j < 6 && G.party[j].status !== "FNT") await C.say([{ text: `Come back, **${ourName(ours.sid)}**!` }, { text: "(In game, the other one goes out here.)" }]); commands(); }
-        else if (i === 2) { const j = await C.choose([{ label: "POKé BALLS", right: "2 kinds" }, { label: "MEDICINE", right: "4 kinds" }, "CANCEL"], { x: 800, y: null, bottom: 24, w: 450 }); if (j === 0) await C.say([{ text: "The trainer blocked the ball! Don't be a thief!" }]); else if (j === 1) { await C.say([{ text: `**${G.name}** used a **POTION**.` }]); await drain(ours, Math.min(ours.maxhp, ours.hp + 20), P1); await C.say([{ text: `**${ourName(ours.sid)}**'s HP was restored.` }]); } commands(); }
+        else if (i === 2) { const it = await battleBag(C), j = it == null ? -1 : /BALL/.test(it) ? 0 : 1; if (j === 0) await C.say([{ text: "The trainer blocked the ball! Don't be a thief!" }]); else if (j === 1) { await C.say([{ text: `**${G.name}** used a **POTION**.` }]); await drain(ours, Math.min(ours.maxhp, ours.hp + 20), P1); await C.say([{ text: `**${ourName(ours.sid)}**'s HP was restored.` }]); } commands(); }
         else { await C.say([{ text: "No! There's no running from a trainer battle!" }]); commands(); }
       }, { who: ourName(ours.sid) });
       C.push(cb);
@@ -255,8 +335,9 @@ screen("catch", "Battle", "Catching", {
         const pick = await new Promise(res => { const cb = commandButtons(i => { C.pop(cb); cb.remove(); res(i); }, { who: ourName(ours.sid) }); C.push(cb); });
         if (pick === 3) { await C.say([{ text: "Got away safely!" }]); if (C.alive()) go("hud"); return; }
         if (pick !== 2) { await C.say([{ text: "Try the BAG this time: it's for catching." }]); continue; }
-        const j = await C.choose([{ label: "POKé BALL", right: "x" + bagCount("POKé BALL") }, { label: "GREAT BALL", right: "x" + bagCount("GREAT BALL") }, "CANCEL"], { x: 800, y: null, bottom: 24, w: 450 });
-        if (j < 0 || j === 2) continue;
+        const it = await battleBag(C);
+        if (it == null) continue;
+        if (!/BALL/.test(it)) { await C.say([{ text: `**${G.name}** used a **${it}**.` }]); continue; }
         // The ring: smaller is better.
         const p = V(0, 0.4, 0).project(cam3), cx = (p.x + 1) / 2 * 1280, cy = (1 - p.y) / 2 * 720;
         const ring = box(cx - 150, cy - 150, 300, 300, "", `<svg viewBox="0 0 300 300" width="300" height="300"><circle cx="150" cy="150" r="60" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="6"/><circle id="rg" cx="150" cy="150" r="140" fill="none" stroke="#8FF5C0" stroke-width="8"/></svg>`);
@@ -268,7 +349,7 @@ screen("catch", "Battle", "Catching", {
         await new Promise(res => { const w = { key(k) { if (k === "a") { C.pop(w); res(); } return true; } }; C.push(w); hit.onclick = e => { e.stopPropagation(); C.pop(w); res(); }; });
         live = false; ring.remove(); tip.remove(); hit.remove();
         const call = r < 62 ? "Excellent!" : r < 90 ? "Great!" : r < 120 ? "Nice!" : null;
-        await C.say([{ text: `**${G.name}** threw a **${j ? "GREAT BALL" : "POKé BALL"}**!` }], { keep: true });
+        await C.say([{ text: `**${G.name}** threw a **${it}**!` }], { keep: true });
         S.point = 1;
         await new Promise(res => S.throwBall(res));
         S.point = 0;
