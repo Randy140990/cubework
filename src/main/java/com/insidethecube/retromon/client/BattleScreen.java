@@ -769,8 +769,24 @@ public class BattleScreen extends GameScreen {
 		else if (mode == Mode.AIM) throwBall();
 	}
 
+	/** The aiming ring (the viewer's): when aiming began (ticks), and the call-out for the last throw (and when). */
+	private int aimSince = -1, callAt = -1;
+	private String call;
+	private float callX, callY;
+
+	/** The closing ring's radius now (canvas pixels): in from 140 to 40 and out again, 144 a second. */
+	private float aimRadius(float partial) {
+		if (aimSince < 0) aimSince = ticks;
+		float t = (ticks - aimSince + partial) / 20F, p = (t * 144) % 200;
+		return p < 100 ? 140 - p : 40 + (p - 100);
+	}
+
 	private void throwBall() {
 		if (aimBall == null) return;
+		float r = aimRadius(0);
+		call = r < 62 ? "Excellent!" : r < 90 ? "Great!" : r < 120 ? "Nice!" : null;
+		callAt = ticks + 20;
+		aimSince = -1;
 		Sounds.press();
 		lastBall = aimBall;
 		ClientState.data.take(aimBall);
@@ -879,6 +895,11 @@ public class BattleScreen extends GameScreen {
 		if (moneyAt >= 0) moneyBox(g, partial);
 		if (levelAfter != null && levelBefore != null) levelPanel(g);
 		if (gotchaAt >= 0) V.callout(g, "Gotcha!", 640, 150, (ticks - gotchaAt + partial) / 20F);
+		if (call != null && callAt >= 0 && ticks >= callAt) {
+			float ct = (ticks - callAt + partial) / 20F;
+			if (ct < 1.6F) V.callout(g, call, callX, callY, ct);
+			else call = null;
+		}
 		if (!kind.equals("WILD") && (challengeAt >= 0 || message != null && message.startsWith("You are challenged by "))) drawChallenge(g, partial);
 		// Your last one's fainted: everything fades to white (the words still over it).
 		if (whiteAt >= 0) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, Math.min(1, (ticks - whiteAt + partial) / 24F)));
@@ -1377,29 +1398,35 @@ public class BattleScreen extends GameScreen {
 		}
 	}
 
-	/** Aiming: a white ring round the wild Pokémon and a coloured one closing inside it (green easy, red hard). */
+	/**
+	 * Aiming, as the UI Viewer's: a ring round the wild POKéMON and another closing in and opening out inside it; throw
+	 * when it's small for Nice!, Great! or Excellent! (white, then mint, then gold as it closes).
+	 */
 	private void drawAim(GuiGraphics g, int m, int by, int bh, float partial) {
-		var at = BattleScene.enemySpot().add(0, BattleScene.enemyHeight() * 0.5, 0);
+		var at = BattleScene.enemySpot().add(0, 0.4, 0);
 		int[] c = BattleScene.project(at, width, height);
+		float cx = 640, cy = 360;
 		if (c != null) {
-			int[] top = BattleScene.project(at.add(0, BattleScene.enemyHeight() * 0.6, 0), width, height);
-			int r = top == null ? 30 * s : Math.max(18 * s, Math.abs(c[1] - top[1]) + 10 * s);
-			float chance = catchChance();
-			int col = chance >= 0.5F ? 0xFF5CD65C : chance >= 0.25F ? 0xFFF2C12E : chance >= 0.1F ? 0xFFF07D2A : 0xFFE5525C;
-			float phase = ((ticks + partial) % 40) / 40F;
-			int inner = (int) (r * (1 - 0.7F * phase));
-			ring(g, c[0], c[1], r, 2 * s, 0xE6FFFFFF);
-			ring(g, c[0], c[1], inner, 3 * s, col);
-			Ui.centred(g, font, chance >= 0.5F ? "Easy" : chance >= 0.25F ? "Fair" : chance >= 0.1F ? "Hard" : "Very hard", c[0], c[1] + r + 6 * s, col, s, true);
+			cx = V.vx(c[0]);
+			cy = V.vy(c[1]);
+			float r = aimRadius(partial);
+			callX = cx;
+			callY = cy - 80;
+			V.ring(g, cx - 63, cy - 63, 126, 126, 63, 6, 0xB3FFFFFF);
+			int col = r < 70 ? 0xFFFFD45A : r < 100 ? 0xFF8FF5C0 : 0xFFFFFFFF;
+			V.ring(g, cx - r - 4, cy - r - 4, 2 * r + 8, 2 * r + 8, r + 4, 8, col);
 		}
 		Item it = Item.find(aimBall);
-		float tw = V.width("Press  or click to throw!", 22, true) + V.width("SPACE", 14, true) + 14 + 44;
-		V.panel(g, 640 - tw / 2, 96, tw, 52, 26, false);
-		float tx = 640 - tw / 2 + 22;
-		V.text(g, "Press", tx, 108, 22, V.TEXT, true);
-		tx += V.width("Press ", 22, true);
-		tx += V.key(g, "SPACE", tx, 108, 28) + 6;
-		V.text(g, "or click to throw!", tx, 108, 22, V.TEXT, true);
+		String a = "Press ", b = " or click to throw!";
+		float kw = V.keyWidth("SPACE", 30), tw = V.width(a, 22, true) + kw + V.width(b, 22, true), pw = 480, ph = 22 * 1.36F + 24;
+		float px = 400, py = Math.max(96, cy - 230);
+		V.panel(g, px, py, pw, ph, ph / 2, false);
+		float tx = px + (pw - tw) / 2, mid = py + ph / 2;
+		V.text(g, a, tx, V.capsTop(mid, 22), 22, V.INK, true);
+		tx += V.width(a, 22, true);
+		V.key(g, "SPACE", tx, mid - 15, 30);
+		tx += kw;
+		V.text(g, b, tx, V.capsTop(mid, 22), 22, V.INK, true);
 		V.hints(g, "A", "Throw " + (it == null ? "BALL" : it.name()), "B", "Back");
 	}
 
