@@ -762,6 +762,63 @@ public final class V {
 		return width(text, size, false) + 32;
 	}
 
+	/** A move bar's shadow (drawn for all the bars before any bar, so one's shadow never shows through the next one's rim). */
+	public static void moveBarShadow(GuiGraphics g, float x, float y, float bw, float bh) {
+		float k = bh / 64F;
+		softShadow(g, x, y + 6 * k, bw, bh, 14 * k, 0x401E2854);
+	}
+
+	/**
+	 * A move as Let's Go shows it (the summary's MOVES, and the battle's FIGHT): a bar in its type's colour, its mark in a
+	 * white circle, its type on a tag, its name big, the mark again faint behind (stopping short of the PP), and its PP
+	 * on a dark slanted cap; the one you're on has a pale halo, a white rim and the white arrow. 64 tall is the
+	 * summary's size; everything scales with the height.
+	 */
+	public static void moveBar(GuiGraphics g, com.insidethecube.retromon.engine.Move m, int left, float x, float y, float bw, float bh, boolean on) {
+		float k = bh / 64F;
+		int c = Ui.typeColor(m.type()) | 0xFF000000;
+		String glyph = "glyph_" + m.type().name().toLowerCase(java.util.Locale.ROOT);
+		float R = 34 * k, r = 12 * k;
+		if (on) shape(g, x - 3, y - 3, bw + 6, bh + 6, R + 3, r + 3, r + 3, R + 3, 0x66FFFFFF, 0, 0);
+		// (The rim's solid: three quarters white over the type's colour, so nothing behind shows through it.)
+		shape(g, x, y, bw, bh, R, r, r, R, new float[] {0, 0.55F, 1}, new int[] {Ui.lighter(c, 0.3F), c, Ui.darker(c, 0.85F)}, 3,
+				on ? 0xFFFFFFFF : Ui.mix(c, 0xFFFFFFFF, 0.75F));
+		float ix = x + 3, iy = y + 3, iw = bw - 6, ih = bh - 6;
+		float lean = ih / 2 * (float) Math.tan(Math.toRadians(18)), capL = ix + iw + 16 * k - 132 * k, capR = ix + iw - 9 * k;
+		// The type's mark faint behind, clipped short of the PP cap.
+		g.enableScissor(Math.round(x(ix)), Math.round(y(iy)), Math.round(x(capL - lean)), Math.round(y(iy + ih)));
+		icon(g, glyph, ix + iw - 118 * k - 92 * k, iy - 14 * k, 92 * k, 0x47FFFFFF);
+		g.disableScissor();
+		int cap = 0xE6181E38;
+		polySmooth(g, new float[] {capL + 3 + lean, iy, capR, iy, capR, iy + ih, capL + 3 - lean, iy + ih}, cap);
+		shape(g, capR, iy, 9 * k, ih, 0, 9 * k, 9 * k, 0, cap, 0, 0);
+		polySmooth(g, new float[] {capL + lean, iy, capL + 3 + lean, iy, capL + 3 - lean, iy + ih, capL - lean, iy + ih}, 0x8CFFFFFF);
+		String ppn = String.valueOf(left), ppt = "/" + m.pp();
+		float rx = ix + iw - 18 * k, cy = y + bh / 2, s18 = 18 * k, s26 = 26 * k, s13 = 13 * k;
+		text(g, ppt, rx - width(ppt, s18, true), capsTop(cy, s18), s18, 0xD9FFFFFF, true);
+		float pw2 = width(ppn, s26, true);
+		text(g, ppn, rx - width(ppt, s18, true) - 6 * k - pw2, capsTop(cy, s26), s26, left == 0 ? 0xFFFFB3B8 : 0xFFFFFFFF, true);
+		text(g, "PP", rx - width(ppt, s18, true) - 6 * k - pw2 - 6 * k - width("PP", s13, true), capsTop(cy, s13), s13, 0xBFFFFFFF, true);
+		// At the left: its mark in a white circle, its type on a tag, its name.
+		float ccx = ix + 6 * k + 26 * k, cr = 26 * k;
+		ellipse(g, ccx, cy + 2 * k, cr, cr, 0x26000000);
+		ellipse(g, ccx, cy, cr, cr, 0xFFFFFFFF);
+		icon(g, glyph, ccx - 17 * k, cy - 17 * k, 34 * k, Ui.darker(c, 0.9F));
+		String tn = m.type().label.toUpperCase();
+		float s12 = 12 * k, tw = trackedWidth(tn, s12, 1.5F) + 20 * k, tagX = ix + 6 * k + 52 * k + 10 * k;
+		rr(g, tagX, cy - 10 * k, tw, 20 * k, 7 * k, Ui.darker(c, 0.7F));
+		tracked(g, tn, tagX + 10 * k, capsTop(cy, s12), s12, 0xFFFFFFFF, 1.5F);
+		title(g, m.name(), tagX + tw + 10 * k, capsTop(cy, s26) + 2 * k, s26, 0x38000000);
+		title(g, m.name(), tagX + tw + 10 * k, capsTop(cy, s26), s26, 0xFFFFFFFF);
+		// The white arrow at the one you're on.
+		if (on) {
+			float ax = x - 40 * k + 19 * k, ay = y + bh / 2;
+			tri(g, ax, ay + 3 * k, 40 * k, 0, 0x591E2854);
+			tri(g, ax, ay, 40 * k, 0, 0xFFFFFFFF);
+			tri(g, ax - 1, ay, 20 * k, 0, 0xFFDDE3EE);
+		}
+	}
+
 	/** A type's chip (the viewer's g-type): its colour, white capitals. */
 	public static float type(GuiGraphics g, String type, int colour, float x, float y, float minW, float size) {
 		String t = type.toUpperCase();

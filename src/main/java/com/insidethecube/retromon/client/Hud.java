@@ -78,6 +78,9 @@ public final class Hud {
 	/** The level a door's iris began in (an interior is a level of its own), and ticks to stay black once it's changed. */
 	private static Object doorLevel;
 	private static int doorHold;
+	/** Where you were when the iris shut (a door within the same level: a room to the next, up the stairs): it stays shut till you've been moved. */
+	private static net.minecraft.world.phys.Vec3 darkAt;
+	private static int darkWait;
 
 	public static void tick(Minecraft mc) {
 		cineOld = cine;
@@ -95,6 +98,17 @@ public final class Hud {
 				if (doorLevel != null && fadeLen - fade > 11) fade = Math.max(fade, fadeLen - 13);
 				doorHold = 6;
 				doorLevel = mc.level;
+				darkAt = null;
+			}
+			// Black till you've actually been moved, so you never glimpse where you were (or the next room arriving)
+			// as it opens; then a moment for the new room to be drawn.
+			if (darkAt != null && fadeLen - fade >= 13) {
+				boolean moved = mc.player == null || mc.player.position().distanceToSqr(darkAt) > 2.5 * 2.5;
+				if (moved) {
+					darkAt = null;
+					doorHold = Math.max(doorHold, 4);
+				} else if (darkWait-- > 0) hold = true;
+				else darkAt = null;
 			}
 			boolean loading = mc.level == null || mc.screen != null && !(mc.screen instanceof GameScreen) && !(mc.screen instanceof net.minecraft.client.gui.screens.PauseScreen);
 			if (fadeLen - fade >= 13 && (loading || doorHold > 0)) {
@@ -107,6 +121,10 @@ public final class Hud {
 			if (fade == fadeLen / 2 && atDark != null) {
 				atDark.run();
 				atDark = null;
+				if (fadeWords.isEmpty() && mc.player != null) {
+					darkAt = mc.player.position();
+					darkWait = 60;
+				}
 			}
 			if (fade == 0 && afterFade != null) {
 				Runnable r = afterFade;
@@ -286,7 +304,7 @@ public final class Hud {
 		long t = Math.floorMod(mc.level.getDayTime(), 24000L);
 		int hour = (int) ((t / 1000 + 6) % 24), minute = (int) ((t % 1000) * 60 / 1000);
 		boolean night = Night.nightness() > 0.5F;
-		String clock = String.format("%d:%02d %s", hour % 12 == 0 ? 12 : hour % 12, minute, hour < 12 ? "AM" : "PM");
+		String clock = "DAY " + day() + "  \u00B7  " + String.format("%d:%02d %s", hour % 12 == 0 ? 12 : hour % 12, minute, hour < 12 ? "AM" : "PM");
 		V.hints(g, "SPACE".equals(key(mc.options.keyJump)) ? "SPACE" : key(mc.options.keyJump), "Talk", key(Adventure.START), "Menu", key(Adventure.SPEED),
 				Lang.t("Speed x1").replace("1", String.valueOf(Adventure.speed)));
 		V.HINTS.clear();
@@ -372,7 +390,8 @@ public final class Hud {
 		// The streak, wiping in from the left: the place's colours, fading at both ends, with a light stroke along
 		// its top and a deeper one under it (a brush's marks).
 		int[] pal = placeColours(name);
-		float sx = 300, sw = 680, sy = top + 20;
+		// (Right up to the two lines: from just under the top one to just over the bottom one.)
+		float sx = 240, sw = 800, sy = top + 8, sh = 74;
 		if (wipe > 0.01F) {
 			g.enableScissor(0, 0, Math.round(V.x(sx + sw * wipe)), g.guiHeight());
 			float[] at = new float[pal.length + 2];
@@ -385,11 +404,11 @@ public final class Hud {
 			}
 			at[pal.length + 1] = 1;
 			cols[pal.length + 1] = Ui.alpha(pal[pal.length - 1] & 0xFFFFFF, alpha);
-			V.rrh(g, sx, sy, sw, 52, 26, at, cols);
-			V.rrh(g, sx + 40, sy + 4, sw - 110, 12, 6, new float[] {0, 0.3F, 0.7F, 1},
+			V.rrh(g, sx, sy, sw, sh, 0, at, cols);
+			V.rrh(g, sx + 60, sy + 6, sw - 150, 14, 7, new float[] {0, 0.3F, 0.7F, 1},
 					new int[] {Ui.alpha(0x00FFFFFF, alpha), Ui.alpha(0x52FFFFFF, alpha), Ui.alpha(0x2EFFFFFF, alpha), Ui.alpha(0x00FFFFFF, alpha)});
 			int last = pal[pal.length - 1];
-			V.rrh(g, sx + 90, sy + 37, sw - 120, 10, 5, new float[] {0, 0.6F, 1},
+			V.rrh(g, sx + 120, sy + sh - 16, sw - 160, 10, 5, new float[] {0, 0.6F, 1},
 					new int[] {Ui.alpha(pal[0] & 0xFFFFFF, alpha), Ui.alpha(0x80000000 | last, alpha), Ui.alpha(last & 0xFFFFFF, alpha)});
 			g.disableScissor();
 		}
@@ -456,15 +475,37 @@ public final class Hud {
 		}
 	}
 
-	/** The game speed, when it's sped up. */
-	private static void speed(GuiGraphics g, DeltaTracker delta) {
-		if (!Adventure.active() || Adventure.speed <= 1) return;
+	/** Which day of your adventure it is (the first is day 1), from the time of day and the day it began. */
+	public static long day() {
 		Minecraft mc = Minecraft.getInstance();
-		int s = Ui.scale(g.guiHeight());
-		String t = "\u25B6\u25B6 x" + Adventure.speed;
-		int w = Ui.width(mc.font, t, s) + 12 * s;
-		Ui.rr(g, g.guiWidth() - w - 6 * s, 6 * s, w, 14 * s, 7 * s, 0xD8123C38);
-		Ui.text(g, mc.font, t, g.guiWidth() - w, 9 * s, Ui.GOLD, s);
+		if (mc.level == null) return 1;
+		long t = mc.level.getDayTime(), d0 = Math.max(0, ClientState.data.day0);
+		return Math.max(1, Math.floorDiv(t - d0, 24000L) + 1);
+	}
+
+	/**
+	 * The game speed, when it's sped up: a white pill as the place's (the UI Viewer's), a teal disc with the two
+	 * arrows and the speed beside it. Under the place's pill out in the world; at the top left in a battle.
+	 */
+	private static void speed(GuiGraphics g, DeltaTracker delta) {
+		Minecraft mc = Minecraft.getInstance();
+		if (!Adventure.active() || Adventure.speed <= 1 || mc.options.hideGui) return;
+		V.fit(g.guiWidth(), g.guiHeight());
+		boolean world = mc.screen == null && !BattleScene.active() && !Device.busy();
+		String t = "x" + Adventure.speed;
+		float h = 40, tw = V.titleWidth(t, 22), w = 8 + 28 + 10 + V.trackedWidth("SPEED", 12, 1.5F) + 10 + tw + 16, x = 24, y = world ? 20 + 48 + 12 : 20;
+		V.pill(g, x - 3, y - 3, w + 6, h + 6, 0x8CFFFFFF);
+		V.shadow(g, x, y, w, h, h / 2, 0.6F);
+		V.pill(g, x, y, w, h, 0xFFFFFFFF);
+		float cx = x + 8 + 14, cy = y + h / 2;
+		V.ellipse(g, cx, cy + 1, 14, 14, 0x33123C38);
+		V.ellipse(g, cx, cy, 14, 14, 0xFF2BB5A0);
+		V.ellipse(g, cx, cy, 12, 12, 0xFF3CCBB2);
+		V.tri(g, cx - 3.5F, cy, 9, 0, 0xFFFFFFFF);
+		V.tri(g, cx + 3.5F, cy, 9, 0, 0xFFFFFFFF);
+		float lx = x + 8 + 28 + 10;
+		V.tracked(g, "SPEED", lx, V.capsTop(cy, 12), 12, 0xFF8A93A8, 1.5F);
+		V.title(g, t, lx + V.trackedWidth("SPEED", 12, 1.5F) + 10, V.capsTop(cy, 22), 22, V.INK);
 	}
 
 	/** The "!" bubble, over the trainer's head, where the camera sees it. */

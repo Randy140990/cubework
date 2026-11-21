@@ -16,9 +16,11 @@ from PIL import Image
 EPS = 1e-6
 SKIP = {"aoN", "aoW", "aoE", "deep", "sunPool", "shadowBlob"}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
-          "mart": (384, 64, 0), "school": (448, 64, 0), "trainer2": (512, 64, 0), "gate_s": (576, 64, 0), "nickhouse": (640, 64, 0), "gate_n": (704, 64, 0)}
+          "mart": (384, 64, 0), "school": (448, 64, 0), "trainer2": (512, 64, 0), "gate_s": (576, 64, 0), "nickhouse": (640, 64, 0), "gate_n": (704, 64, 0),
+          "gate_league": (768, 64, 0), "gate_johto": (832, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
-         "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2"}
+         "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
+         "gate_league": "route_22", "gate_johto": "route_22"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -35,15 +37,32 @@ DOORS = {
     # so you come out facing north).
     "forest_south": {"room": "gate_s", "door": [[x, 27, 446] for x in range(-805, -799)], "out": [-802.5, 27.0, 449.8]},
     "forest_north": {"room": "gate_n", "door": [[x, 30, 374] for x in range(-805, -799)], "out": [-802.5, 30.0, 370.2], "face": "n", "yaw": 180.0},
+    # Route 22's POKéMON LEAGUE gate (its glass doors, 4 wide): in from ROUTE 22 at the south, on to ROUTE 23 at
+    # the north (the guard lets only BOULDERBADGE holders through), coming back from there into the north nook.
+    "league_s": {"room": "gate_league", "door": [[x, 27, 534] for x in range(-919, -915)], "out": [-917.5, 27.0, 536.6]},
+    "league_n": {"room": "gate_league", "door": [[x, 27, 514] for x in range(-919, -915)], "out": [-917.5, 27.0, 512.2], "face": "n", "yaw": 180.0,
+                 "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    # The Route 28 Gate: in at its east door off ROUTE 22 (a sideways gate); its far side comes out of the gate house
+    # on the far side of the mountain, at ROUTE 28 (facing west), or (for the CHAMPION) at ROUTE 26's gate (facing
+    # south). Coming back in either of those, you're at its west side.
+    "johto_e": {"room": "gate_johto", "door": [[-951, 28, z] for z in range(540, 544)], "out": [-946.6, 26.0, 541.5], "face": "e", "yaw": -90.0},
+    "route28": {"room": "gate_johto", "door": [[-1039, 28, z] for z in range(540, 544)], "out": [-1042.6, 26.0, 541.5], "face": "w", "yaw": 90.0,
+                "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
+    "route26": {"room": "gate_johto", "door": [[x, 27, 586] for x in range(-993, -987)], "out": [-990.5, 26.0, 589.6], "yaw": 0.0,
+                "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
 }
-MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart", "school": "viridian_school", "nickhouse": "viridian_house", "gate_s": "forest_south"}
+MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart", "school": "viridian_school", "nickhouse": "viridian_house", "gate_s": "forest_south",
+            "gate_league": "league_s"}
 # Ways out through the north wall to the world (the north gate's).
-NORTH_DOOR = {"gate_n": "forest_north"}
+NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n"}
+# Ways out through the side walls (a sideways gate's), by room and wall.
+SIDE_DOOR = {("gate_johto", "e"): "johto_e"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).
 # (On the mat's inner half: the mats are two deep, and you're out once you're past their middle.)
 ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "lab": {"x": 8.0, "z": 14.5, "yaw": 180.0},
          "center": {"x": 9.0, "z": 12.5, "yaw": 180.0}, "mart": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "school": {"x": 6.0, "z": 9.5, "yaw": 180.0},
-         "nickhouse": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "gate_s": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "gate_n": {"x": 7.0, "z": 2.6, "yaw": 0.0}}
+         "nickhouse": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "gate_s": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_n": {"x": 7.0, "z": 1.4, "yaw": 0.0},
+         "gate_league": {"x": 7.0, "z": 14.5, "yaw": 180.0}, "gate_johto": {"x": 14.4, "z": 5.0, "yaw": 90.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -341,9 +360,14 @@ def main():
                 warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 1.0, "door": None, "to": m["to"], "spawn": spawn_of(m["spawn"])})
         for m in room.get("passes", []):
             if m.get("to") in (None, "town"):
-                warps.append({"kind": "north", "x0": m["x0"], "x1": m["x1"], "z": 1.0, "door": NORTH_DOOR.get(rid), "to": None})
+                warps.append({"kind": "north", "x0": m["x0"], "x1": m["x1"], "z": 1.0, "door": NORTH_DOOR.get(rid), "to": None, "needs": m.get("needs")})
             else:
                 warps.append({"kind": "north", "x0": m["x0"], "x1": m["x1"], "z": 1.0, "door": None, "to": m["to"], "spawn": spawn_of(m["spawn"])})
+        for m in room.get("sides", []):
+            # Through a side wall: out to the world (or asked where to: the Route 28 Gate's west way).
+            east = m["wall"] == "e"
+            warps.append({"kind": "east" if east else "west", "x": room["W"] - 1.0 if east else 1.0, "z0": m["z0"], "z1": m["z1"],
+                          "door": SIDE_DOOR.get((rid, m["wall"])), "to": None, "choice": m.get("choice")})
         for s in room["stairs"]:
             to = s["to"]; sp = s["spawn"]
             warps.append({"kind": s["dir"], "x0": s["x0"], "z0": s["z0"], "z1": s["z0"] + s["depth"], "to": to,

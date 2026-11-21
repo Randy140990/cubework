@@ -112,6 +112,10 @@ public final class ClientState {
 				}
 				show(() -> new DialogueScreen(lines, mode, npc, t));
 			}
+			case "hold" -> {
+				// Still a cutscene (someone walking off): the black bars stay, and you stand still.
+				Adventure.frozen = Math.max(Adventure.frozen, t.getIntOr("ticks", 10));
+			}
 			case "exclaim" -> {
 				exclaimNpc = t.getIntOr("npc", -1);
 				exclaimTicks = 40;

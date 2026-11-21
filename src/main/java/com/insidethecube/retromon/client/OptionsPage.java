@@ -18,15 +18,16 @@ import net.minecraft.nbt.CompoundTag;
  */
 public final class OptionsPage {
 	public static final String[] LABELS = {"TEXT SPEED", "MUSIC", "SOUND", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "BATTLE EFFECTS", "BATTLE STYLE", "WALK WITH YOU",
-			"POKéMON LOOK", "SHADERS", "CONTROLS"};
+			"POKéMON LOOK", "SHADERS", "DAY AND NIGHT", "CONTROLS"};
 	private static final String[] LINES = {"How quickly words appear in text boxes.", "How loud the music plays.", "How loud cries, steps and menu sounds are.",
 			"Whether the POKéDEX reads its entries out loud.", "How dark nights get outside.", "Whether wild POKéMON show in the grass, or jump out at you.",
 			"Whether moves play their animations in battle.", "SWITCH asks if you want to change POKéMON when a trainer's sends out the next one.",
 			"Whether your partner walks with you.", "COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures.",
 			"RETROMON is our own light: the sun moves with the day, soft shadows, swaying grass, blue nights and glowing lamps. OFF is Minecraft's own.",
+			"ON lets the day go by, morning to night. OFF holds it at half past ten in the morning (the day count waits too).",
 			"See every key: what it does in game, and what's turned off."};
 	private static final String[][] VALUES = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"},
-			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"ON", "OFF"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {}};
+			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"ON", "OFF"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {"ON", "OFF"}, {}};
 	public int row;
 	/** Opens the key map (from CONTROLS). */
 	private final Runnable keymap;
@@ -37,7 +38,7 @@ public final class OptionsPage {
 
 	private static int[] now() {
 		return new int[] {ClientState.data.textSpeed, Music.level(), Settings.sound(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0,
-				Settings.effects() ? 0 : 1, Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), Settings.shaderMode(), 0};
+				Settings.effects() ? 0 : 1, Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), Settings.shaderMode(), Settings.cycle() ? 0 : 1, 0};
 	}
 
 	private static boolean online() {
@@ -78,6 +79,10 @@ public final class OptionsPage {
 			case 10 -> {
 				Settings.set("shaders", Settings.shaderMode() == 0 ? 1 : 0);
 				Shaders.set(Settings.shaderMode());
+			}
+			case 11 -> {
+				Settings.set("cycle", Settings.cycle() ? 0 : 1);
+				if (online()) Settings.sendPrefs();
 			}
 			default -> {
 				Sounds.press();

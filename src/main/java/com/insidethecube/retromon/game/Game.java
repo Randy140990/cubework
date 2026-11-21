@@ -338,7 +338,8 @@ public final class Game {
 				List.of("{rival}: Heh, I don't need to be greedy like you!", "{rival}: I'll take this one, then!", "{rival} received a " + name + "!",
 						"{rival}: Wait, {player}! Let's check out our POKéMON!", "Come on, I'll take you on!"),
 				List.of("WHAT? Unbelievable! I picked the wrong POKéMON!"),
-				List.of("{rival}: Okay! I'll make my POKéMON fight to toughen it up!", "{player}! Gramps! Smell ya later!"));
+				List.of("{rival}: Okay! I'll make my POKéMON fight to toughen it up!", "{rival}: And you'd better get out there and start your own adventure, {player}!",
+						"{player}! Gramps! Smell ya later!"));
 	}
 
 	/** Route 22, after the POKéDEX: your rival on his way to the League (Red and Blue's first Route 22 battle). */
@@ -441,6 +442,28 @@ public final class Game {
 
 	// ---------- your rival in person ----------
 
+	/** Where your rival came from (Route 22: along the route), so he goes back that way. */
+	private static final Map<UUID, Vec3> RIVAL_FROM = new HashMap<>();
+
+	/**
+	 * Good ground along the way you'd see someone come (dir: -1 0 west), from far to near, on your own level (a step up
+	 * or down at most) and in plain sight of you, so they walk up the route rather than down a cliff; or null.
+	 */
+	private static BlockPos alongRoute(ServerLevel level, ServerPlayer p, int dirX, int dirZ, int far, int near) {
+		BlockPos at = p.blockPosition();
+		for (int d = far; d >= near; d--)
+			for (int side : new int[] {0, 1, -1, 2, -2})
+				for (int dy : new int[] {0, -1, 1}) {
+					BlockPos c = at.offset(dirX * d + dirZ * side, dy, dirZ * d + dirX * side);
+					if (!goodGround(level, c)) continue;
+					Vec3 eye = new Vec3(c.getX() + 0.5, c.getY() + 1.5, c.getZ() + 0.5);
+					var hit = level.clip(new net.minecraft.world.level.ClipContext(eye, p.getEyePosition(), net.minecraft.world.level.ClipContext.Block.COLLIDER,
+							net.minecraft.world.level.ClipContext.Fluid.NONE, p));
+					if (hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS) return c;
+				}
+		return null;
+	}
+
 	/** Each player's rival when he's about (in the lab, on Route 22, at Oak's), and ticks left as he heads off. */
 	private static final Map<UUID, Npc> RIVALS = new HashMap<>();
 	private static final Map<UUID, Integer> RIVAL_LEAVING = new HashMap<>();
@@ -525,14 +548,29 @@ public final class Game {
 			} else if (left == WALK_OFF) {
 				// Inside, he heads out the way he came in, through the door; outside, off away from you.
 				Vec3 out = Interiors.exitOf(n);
+				Vec3 from = RIVAL_FROM.remove(id);
 				if (out != null) n.getNavigation().moveTo(out.x, out.y, out.z, 0.9);
-				else {
+				else if (from != null) {
+					// Back the way he came, along the route, and on past it.
+					Vec3 away = from.subtract(p.position()).multiply(1, 0, 1);
+					away = away.lengthSqr() < 0.01 ? new Vec3(-1, 0, 0) : away.normalize();
+					Vec3 to = from.add(away.scale(14));
+					n.getNavigation().moveTo(to.x, from.y, to.z, 0.9);
+				} else {
 					Vec3 away = n.position().subtract(p.position()).multiply(1, 0, 1);
 					away = away.lengthSqr() < 0.01 ? new Vec3(-1, 0, 0) : away.normalize();
 					Vec3 to = n.position().add(away.scale(24));
 					n.getNavigation().moveTo(to.x, n.getY(), to.z, 0.9);
 				}
 				RIVAL_LEAVING.put(id, left - 1);
+			}
+			// While he walks off: still a cutscene (the black bars, you stood still) till he's gone.
+			if (left != null && left <= WALK_OFF && s.getTickCount() % 5 == 0) {
+				CompoundTag hold = new CompoundTag();
+				hold.putInt("ticks", 12);
+				Net.send(p, "hold", hold);
+			}
+			if (left == null || left == WALK_OFF) {
 			} else if (left < WALK_OFF && Interiors.exitOf(n) != null
 					&& (n.position().distanceTo(Interiors.exitOf(n)) < 2.2 || n.getNavigation().isDone() && n.position().distanceTo(Interiors.exitOf(n)) < 4.5)) {
 				// Out through the door.
@@ -806,7 +844,7 @@ public final class Game {
 
 	/** Pallet Town to Route 2 on Insid3 Th3 Cub3's Kanto map, to begin with (mark the rest with /retromon zone). */
 	private static final Zone[] DEFAULT_ZONES = {new Zone("pallet_town", -845, 655, -745, 735), new Zone("route_1", -845, 590, -745, 654),
-			new Zone("viridian_city", -830, 495, -745, 589), new Zone("route_22", -900, 495, -831, 565), new Zone("route_2", -830, 340, -745, 494)};
+			new Zone("viridian_city", -830, 495, -745, 589), new Zone("route_22", -900, 495, -831, 565), new Zone("route_22", -1000, 512, -901, 600), new Zone("route_2", -830, 340, -745, 494)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -815,11 +853,18 @@ public final class Game {
 				JsonObject o = e.getAsJsonObject();
 				zones.add(new Zone(o.get("place").getAsString(), o.get("x1").getAsInt(), o.get("z1").getAsInt(), o.get("x2").getAsInt(), o.get("z2").getAsInt()));
 			}
+			// Route 22 out to its west end (its sign, the League gate, the Route 28 Gate), in saves from before.
+			if (placeAt(-919.5, 550.5) == null) {
+				zones.add(0, ROUTE_22_WEST);
+				saveMarker();
+			}
 		} else {
 			zones.addAll(List.of(DEFAULT_ZONES));
 			saveMarker();
 		}
 	}
+
+	private static final Zone ROUTE_22_WEST = new Zone("route_22", -1000, 512, -901, 600);
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -858,6 +903,15 @@ public final class Game {
 	 * name in the place banner (PROF. OAK's LAB, YOUR HOUSE, BLUE's HOUSE).
 	 */
 	public static void roomEntered(ServerPlayer p, Interiors.Room r, boolean banner) {
+		PlayerData dd = data(p);
+		if (r.id().equals("lab") && dd.started && (dd.story.contains("parcel") || dd.hasDex()) && !dd.beaten.contains("rival_lab") && !dd.party.isEmpty()
+				&& !RIVALS.containsKey(p.getUUID()) && p.level() instanceof ServerLevel lv) {
+			Npc rv = rivalNpc(p, "rival_lab", BlockPos.containing(r.ox() + 10.2, r.oy(), r.oz() + 4.6));
+			if (rv != null) {
+				rv.setFacing(90F);
+				rv.rehome(rv.blockPosition());
+			}
+		}
 		// A room that's a place of its own (Viridian Forest, Route 2's gates): you're there now (its wild POKéMON, its name).
 		if (!r.place().isEmpty() && !r.place().equals(data(p).place)) enter(p, r.place());
 		Places.Place pl = Places.get(r.place());
@@ -900,6 +954,11 @@ public final class Game {
 			if (!adventure(p)) continue;
 			UUID id = p.getUUID();
 			p.getFoodData().setFoodLevel(20);
+			if (data(p).day0 < 0) {
+				long now = s.overworld().getDayTime();
+				data(p).day0 = now - Math.floorMod(now, 24000L);
+				sync(p);
+			}
 			data(p).played += 1.0 / Math.max(1F, s.tickRateManager().tickrate());
 			if (p.getHealth() < p.getMaxHealth()) p.setHealth(p.getMaxHealth());
 			COOLDOWN.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
@@ -921,6 +980,7 @@ public final class Game {
 			boolean inside = Interiors.in(p);
 			if (!inside && s.getTickCount() % 2 == 0) enter(p, placeAt(p.getX(), p.getZ()));
 			if (!inside && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
+			if (!inside && s.getTickCount() % 2 == 0 && !BUSY.containsKey(id)) gymShut(p);
 			if (s.getTickCount() % 5 == 0) story(p);
 			if (s.getTickCount() % 40 == 0) moonlight(p);
 			follower(p);
@@ -940,6 +1000,7 @@ public final class Game {
 			if (s.getTickCount() % 4 == 0) watch(p);
 		}
 		approach(s);
+		mumsGoHome();
 		rivalsLeave(s);
 		rocketsLeave(s);
 		if (s.getTickCount() % 40 == 0) placeTouchPoints(s);
@@ -953,6 +1014,7 @@ public final class Game {
 		NIGHTS.put(p.getUUID(), Math.max(0, Math.min(2, t.getIntOr("nights", 1))));
 		if (t.contains("seen")) SEEN.put(p.getUUID(), t.getBooleanOr("seen", true));
 		if (t.contains("follow")) FOLLOW_ON.put(p.getUUID(), t.getBooleanOr("follow", true));
+		if (t.contains("cycle")) CYCLE.put(p.getUUID(), t.getBooleanOr("cycle", true));
 		moonlight(p);
 	}
 
@@ -964,6 +1026,8 @@ public final class Game {
 	private static final Map<UUID, Integer> FOLLOWERS = new HashMap<>();
 	/** Seen in the grass (the default) or the classic hidden ones; and whether one walks with you. */
 	private static final Map<UUID, Boolean> SEEN = new HashMap<>(), FOLLOW_ON = new HashMap<>();
+	/** DAY AND NIGHT from each player's OPTION: true lets the day go by (the default), false holds it in the morning. */
+	private static final Map<UUID, Boolean> CYCLE = new HashMap<>();
 	/** Up to this many out at once, appearing this near you, gone when this far. */
 	private static final int SEEN_MAX = 4, SEEN_NEAR = 10, SEEN_GONE = 22;
 
@@ -1204,6 +1268,7 @@ public final class Game {
 				}
 			}
 		}
+		if (best == null && Trainers.signsIn(place).size() == 1) best = Trainers.signsIn(place).get(0);
 		Places.Place pl = Places.get(place);
 		List<String> lines = best != null ? fill(p, best.lines()) : List.of(pl == null ? place.toUpperCase().replace('_', ' ') : pl.name());
 		dialogue(p, null, "talk", lines);
@@ -1281,6 +1346,23 @@ public final class Game {
 		}
 		fighting |= device;
 		ServerLevel level = s.overworld();
+		// DAY AND NIGHT off (OPTION): the clock's held at half past ten in the morning (the shadows fall nicely; clouds
+		// still drift). The days stop counting meanwhile.
+		boolean still = false;
+		for (ServerPlayer p : s.getPlayerList().getPlayers()) if (adventure(p) && !CYCLE.getOrDefault(p.getUUID(), true)) still = true;
+		if (still) {
+			long now = level.getDayTime(), want = now - Math.floorMod(now, 24000L) + 4500;
+			if (now != want) level.setDayTime(want);
+			if (heldTime != -2) {
+				heldTime = -2;
+				level.getGameRules().set(GameRules.ADVANCE_TIME, false, s);
+			}
+			return;
+		}
+		if (heldTime == -2) {
+			heldTime = -1;
+			level.getGameRules().set(GameRules.ADVANCE_TIME, true, s);
+		}
 		if (fighting == heldTime >= 0) return;
 		// The clock stops (the game rule, so your screen's clock stops too, with no jumps back) and starts again after.
 		heldTime = fighting ? level.getDayTime() : -1;
@@ -1403,6 +1485,17 @@ public final class Game {
 				return;
 			}
 		}
+		// MUM outside the lab once you've your first POKéMON, with the TOWN MAP (Let's Go's way). Saves from further on
+		// have it already.
+		if (!d.story.contains("townmap")) {
+			if (d.hasDex() || d.story.contains("parcel") || d.visited.contains("viridian_city")) {
+				d.story.add("townmap");
+				sync(p);
+			} else if ("pallet_town".equals(d.place) && !Interiors.in(p) && !MUMS.containsKey(p.getUUID()) && p.onGround()) {
+				mumComes(p, level);
+				return;
+			}
+		}
 		// TEAM ROCKET (JESSIE and JAMES, and their MEOWTH), the first time you're out in VIRIDIAN with a POKéMON.
 		if (!d.story.contains("rocket_viridian") && !d.hasDex() && d.anyHealthy() && "viridian_city".equals(d.place) && !Interiors.in(p) && !ROCKETS.containsKey(p.getUUID())
 				&& p.onGround()) {
@@ -1411,9 +1504,29 @@ public final class Game {
 		}
 		// Your rival, from the League's way, once you have the POKéDEX.
 		if (d.hasDex() && d.anyHealthy() && !d.beaten.contains("rival_22") && "route_22".equals(d.place) && !RIVALS.containsKey(p.getUUID())) {
-			Npc n = rivalNpc(p, "rival_22", spot(level, p.getBlockX() - 9, p.getBlockZ(), 5));
-			if (n != null) walkUp(p, n, rival22(p), "meet_rival", null);
+			BlockPos from = alongRoute(level, p, -1, 0, 12, 6);
+			if (from == null) from = spot(level, p.getBlockX() - 9, p.getBlockZ(), 5);
+			Npc n = rivalNpc(p, "rival_22", from);
+			if (n != null) {
+				RIVAL_FROM.put(p.getUUID(), Vec3.atBottomCenterOf(from));
+				walkUp(p, n, rival22(p), "meet_rival", null);
+			}
 		}
+	}
+
+	/** Walked up to the Viridian GYM's door: it's locked (its LEADER's away), said once each time. */
+	private static final Map<UUID, Boolean> GYM_SHUT = new HashMap<>();
+
+	private static void gymShut(ServerPlayer p) {
+		if (!"viridian_city".equals(data(p).place)) return;
+		double x = p.getX(), z = p.getZ();
+		boolean at = x > -769.4 && x < -764.6 && z > 524.6 && z < 527.2 && Math.abs(net.minecraft.util.Mth.wrapDegrees(p.getYRot() - 180)) < 60;
+		if (!at) {
+			GYM_SHUT.remove(p.getUUID());
+			return;
+		}
+		if (GYM_SHUT.put(p.getUUID(), true) != null) return;
+		message(p, List.of("VIRIDIAN CITY POKéMON GYM", "The GYM's doors are locked...", "It looks like the GYM LEADER isn't here."));
 	}
 
 	/** JESSIE and JAMES in Viridian (JESSIE comes up to you; JAMES with her), while they're about. */
@@ -1484,6 +1597,55 @@ public final class Game {
 		if (n != null) n.talker = p;
 		dialogue(p, n, "talk", fill(p, List.of("Hey! You came from PALLET TOWN?", "You know PROF.OAK, right?", "His order came in. Will you take it to him?",
 				"{player} got OAK's PARCEL!", "Okay! Say hi to PROF.OAK for me!")), cues(3, "get_key_item"));
+	}
+
+	/** MUM, come out to see you off with the TOWN MAP (and the ticks left till she's home again). */
+	private static final Map<UUID, Npc> MUMS = new HashMap<>();
+	private static final Map<UUID, Integer> MUM_HOME = new HashMap<>();
+
+	private static void mumComes(ServerPlayer p, ServerLevel level) {
+		BlockPos at = alongRoute(level, p, 0, -1, 9, 5);
+		if (at == null) at = spot(level, p.getBlockX(), p.getBlockZ() - 7, 4);
+		if (at == null) return;
+		Npc mum = place(level, Npc.PERSON, "in_house1_0", at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
+		if (mum == null) return;
+		mum.setCustomName(net.minecraft.network.chat.Component.literal("MUM"));
+		MUMS.put(p.getUUID(), mum);
+		walkUp(p, mum, null, "", () -> {
+			PlayerData d = data(p);
+			d.story.add("townmap");
+			sync(p);
+			mum.talker = p;
+			dialogue(p, mum, "mum_map", fill(p, List.of("MUM: {player}! Wait a moment!", "MUM: So that's your very own POKéMON? It's lovely!",
+					"MUM: You'll be going a long way from home now. Here, take this with you.", "{player} got the TOWN MAP!",
+					"MUM: Look at it from the BAG in your menu, so you never get lost.", "MUM: Take care, love! Come home any time you need a rest.")),
+					cues(3, "get_key_item"));
+		});
+	}
+
+	/** MUM's said her goodbye: back home she goes (and is gone once she's away). */
+	private static void mumHeadsHome(ServerPlayer p) {
+		Npc mum = MUMS.get(p.getUUID());
+		if (mum == null || mum.isRemoved()) {
+			MUMS.remove(p.getUUID());
+			return;
+		}
+		mum.talker = null;
+		Vec3 home = new Vec3(-802.0, mum.getY(), 680.6);
+		mum.getNavigation().moveTo(home.x, home.y, home.z, 0.8);
+		MUM_HOME.put(p.getUUID(), 140);
+	}
+
+	private static void mumsGoHome() {
+		for (Map.Entry<UUID, Integer> e : List.copyOf(MUM_HOME.entrySet())) {
+			Npc mum = MUMS.get(e.getKey());
+			int left = e.getValue() - 1;
+			if (mum == null || mum.isRemoved() || left <= 0 || mum.position().distanceTo(new Vec3(-802.0, mum.getY(), 680.6)) < 1.6) {
+				if (mum != null && !mum.isRemoved()) mum.discard();
+				MUMS.remove(e.getKey());
+				MUM_HOME.remove(e.getKey());
+			} else MUM_HOME.put(e.getKey(), left);
+		}
 	}
 
 	/** Lines a dialogue plays a jingle on (line index, then the jingle). */
@@ -1591,6 +1753,36 @@ public final class Game {
 		List<String> ch = fill(p, List.of("{rival}: Wait, {player}! Gramps gave us POKéMON, so let's check them out!", "{rival}: Come on, I'll take you on!"));
 		if (rv != null && !rv.isRemoved()) dialogue(p, rv, "rival", ch, new CompoundTag());
 		else rivalChallenge(p);
+	}
+
+	/** Whether you have what a guarded way needs (a badge by its name, or "CHAMPION"). */
+	public static boolean meets(ServerPlayer p, String needs) {
+		PlayerData d = data(p);
+		if (needs.equals("CHAMPION")) return d.story.contains("champion");
+		return d.badges.contains(needs);
+	}
+
+	/** Turned back at a guarded way: the guard says why. */
+	public static void gateBlocked(ServerPlayer p, String needs) {
+		String b = needs.equals("CHAMPION") ? "the POKéMON LEAGUE's title" : "the " + needs;
+		dialogue(p, null, "talk", List.of("GUARD: Hold it right there!", "GUARD: Only TRAINERS who have " + b + " may go on from here.",
+				"GUARD: Come back when you've earned it!"), whoTag("GUARD"));
+	}
+
+	private static CompoundTag whoTag(String who) {
+		CompoundTag t = new CompoundTag();
+		t.putString("who", who);
+		return t;
+	}
+
+	/** At the Route 28 Gate's west way: where to? ROUTE 28 (under the mountain), or ROUTE 26 and JOHTO. */
+	public static void gateChoice(ServerPlayer p, String key) {
+		if (!key.equals("johto")) return;
+		CompoundTag t = whoTag("GUARD");
+		ListTag ch = new ListTag();
+		for (String c : List.of("ROUTE 28", "ROUTE 26 / JOHTO", "STAY HERE")) ch.add(StringTag.valueOf(c));
+		t.put("choices", ch);
+		dialogue(p, null, "gate_choice", List.of("GUARD: The way west goes under the mountain. Which way are you headed?"), t);
 	}
 
 	/** North of Viridian before the POKéDEX: the old man won't let you by, and you're put back. */
@@ -1750,7 +1942,14 @@ public final class Game {
 		// How you made yourself in the new game's maker (skin, eyes, hair, clothes).
 		String o = t.getStringOr("outfit", "");
 		if (!o.isEmpty() && o.length() <= 200 && (!d.started || d.outfit.isEmpty())) d.outfit = o;
-		if (d.since == 0) d.since = System.currentTimeMillis();
+		if (d.since == 0) {
+			d.since = System.currentTimeMillis();
+			// A new adventure begins at six in the morning: day 1.
+			ServerLevel lv = p.level().getServer().overworld();
+			long now = lv.getDayTime(), base = now - Math.floorMod(now, 24000L);
+			lv.setDayTime(base);
+			d.day0 = base;
+		}
 		sync(p);
 	}
 
@@ -2028,6 +2227,16 @@ public final class Game {
 				Net.send(p, "mart", m);
 			}
 			case "parcel" -> rivalAfterParcel(p);
+			case "gate_choice" -> {
+				int c = t.getIntOr("choice", -1);
+				if (c == 0) Interiors.outThrough(p, "route28");
+				else if (c == 1) {
+					if (meets(p, "CHAMPION")) Interiors.outThrough(p, "route26");
+					else dialogue(p, null, "talk", List.of("GUARD: ROUTE 26 leads to the JOHTO region, and the POKéMON LEAGUE's back way.",
+							"GUARD: Only the CHAMPION may go that way. Come back once you've beaten the ELITE FOUR!"), whoTag("GUARD"));
+				}
+			}
+			case "mum_map" -> mumHeadsHome(p);
 			case "rival" -> {
 				if (!d.beaten.contains("rival_lab") && !d.party.isEmpty()) Battles.trainer(p, rivalLab(p));
 			}
@@ -2568,7 +2777,7 @@ public final class Game {
 	 * raising POKéMON too!") by the flower beds and roses in the middle of town, as Let's Go has her, rather than
 	 * out at the west edge. Key, then x and z.
 	 */
-	private static final Object[][] SPOTS = {{"pallet_town_p1", -801, 698}};
+	private static final Object[][] SPOTS = {{"pallet_town_p1", -801, 698}, {"pallet_town_p2", -798, 689}};
 
 	/** Where someone in SPOTS stands (x, z), or null. */
 	private static int[] spotOf(String key) {

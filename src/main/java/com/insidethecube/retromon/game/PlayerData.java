@@ -52,6 +52,8 @@ public class PlayerData {
 	public double played;
 	/** When this game began (milliseconds since 1970; 0 if it's from before 0.28). */
 	public long since;
+	/** The world's time (ticks) at six in the morning of the adventure's first day, for the day count; -1 not yet known. */
+	public long day0 = -1;
 
 	public boolean hasDex() {
 		return story.contains("pokedex");
@@ -134,6 +136,7 @@ public class PlayerData {
 		t.putString("story", join(story));
 		t.putDouble("played", played);
 		t.putLong("since", since);
+		t.putLong("day0", day0);
 		return t;
 	}
 
@@ -173,6 +176,7 @@ public class PlayerData {
 		d.outfit = t.getStringOr("outfit", "");
 		d.played = t.getDoubleOr("played", 0);
 		d.since = t.getLongOr("since", 0L);
+		d.day0 = t.getLongOr("day0", -1L);
 		if (t.contains("story")) split(t.getStringOr("story", ""), d.story);
 		// A save from before the errand (0.8 and older): you already had the POKéDEX.
 		else if (d.started) d.story.add("pokedex");

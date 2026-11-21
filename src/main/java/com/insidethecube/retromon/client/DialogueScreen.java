@@ -183,7 +183,14 @@ public class DialogueScreen extends GameScreen {
 	}
 
 	private boolean asks() {
-		return mode.equals("heal") || mode.equals("gift") || mode.equals("trade") || mode.equals("quiz");
+		return mode.equals("heal") || mode.equals("gift") || mode.equals("trade") || mode.equals("quiz") || extra.contains("choices");
+	}
+
+	/** The choices to pick from at the end (a gate's ways: ROUTE 28, ROUTE 26 / JOHTO...), else YES and NO. */
+	private List<String> choices() {
+		List<String> out = new java.util.ArrayList<>();
+		for (net.minecraft.nbt.Tag e : extra.getListOrEmpty("choices")) e.asString().ifPresent(out::add);
+		return out.isEmpty() ? List.of("YES", "NO") : out;
 	}
 
 	/** Whether YES or NO was picked (not closed with B). */
@@ -200,7 +207,9 @@ public class DialogueScreen extends GameScreen {
 			String j = cues.get(line);
 			if (j != null) Music.jingle(j);
 		}
-		if (asks() && yesNo == null && box.atEnd()) yesNo = new Choice(List.of("YES", "NO"));
+		if (asks() && yesNo == null && box.atEnd()) yesNo = new Choice(choices());
+		// While the nurse's machine works, the camera looks up at its big screen.
+		Adventure.healView = healing();
 		// The healing: once the nurse's line is out, the machine's notes play for a few seconds, then she goes on.
 
 		if (healing() && ticks - healAt >= HEAL_TICKS) {
@@ -261,6 +270,8 @@ public class DialogueScreen extends GameScreen {
 		t.putInt("npc", npc);
 		t.putString("mode", mode);
 		t.putBoolean("yes", yes);
+		if (yesNo != null && answered) t.putInt("choice", yesNo.at);
+		Adventure.healView = false;
 		// (A choice actually made, YES or NO, not just closed: the teacher's question needs to know.)
 		if (answered) t.putBoolean("answered", true);
 		if (trainer != null) t.putString("trainer", trainer);
@@ -306,6 +317,7 @@ public class DialogueScreen extends GameScreen {
 			float w = 300;
 			vchoice(g, yesNo, V.W - 140 - w, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), w, i -> {
 				answered = true;
+				yesNo.at = i;
 				done(i == 0);
 			});
 		}

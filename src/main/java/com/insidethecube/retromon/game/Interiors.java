@@ -48,7 +48,11 @@ public final class Interiors {
 
 	public static final ResourceKey<Level> LEVEL = ResourceKey.create(Registries.DIMENSION, Retromon.id("interiors"));
 
-	public record Warp(String kind, double x0, double x1, double z0, double z1, String door, String to, double sx, double sz, float syaw) {}
+	/**
+	 * A way out of a room. choice: the game asks you where to there (the Route 28 Gate's west way: ROUTE 28, or ROUTE
+	 * 26 and JOHTO); needs: what you must have to go through (a badge: the League gate's guard).
+	 */
+	public record Warp(String kind, double x0, double x1, double z0, double z1, String door, String to, double sx, double sz, float syaw, String choice, String needs) {}
 
 	/** Someone in a room; role: "nurse" (heals), "clerk" (sells) or null (just talks). */
 	public record Person(String key, String name, String skin, double x, double z, float yaw, List<String> lines, String role, boolean seated) {}
@@ -73,7 +77,11 @@ public final class Interiors {
 		}
 	}
 
-	public record Door(String key, String room, List<BlockPos> blocks, double x, double y, double z, boolean north, float yaw) {}
+	/**
+	 * A door in the world into a room: its blocks, where you come out (and facing), which way it faces (s, n, e or w:
+	 * the side you walk up to it from) and, for a room with more than one way in, where you arrive (x, z, yaw), else null.
+	 */
+	public record Door(String key, String room, List<BlockPos> blocks, double x, double y, double z, boolean north, float yaw, String face, double[] in) {}
 
 	/**
 	 * A room's battle arena (Let's Go's: a battle indoors is fought in a round hall built from that room's own
@@ -160,8 +168,18 @@ public final class Interiors {
 				boolean north = kind.equals("north");
 				double x0 = num(w, "x0", 0), x1 = kind.equals("mat") || north ? num(w, "x1", 0) : x0 + 4;
 				double z0 = kind.equals("mat") ? num(w, "z", 0) : north ? -999 : num(w, "z0", 0), z1 = kind.equals("mat") ? 999 : north ? num(w, "z", 1) : num(w, "z1", 0);
+				// Through the east wall (past x, heading east) or the west (short of x, heading west).
+				if (kind.equals("east")) {
+					x0 = num(w, "x", 0);
+					x1 = 999;
+				} else if (kind.equals("west")) {
+					x0 = -999;
+					x1 = num(w, "x", 1);
+				}
 				warps.add(new Warp(kind, x0, x1, z0, z1, w.has("door") && !w.get("door").isJsonNull() ? w.get("door").getAsString() : null,
-						w.has("to") && !w.get("to").isJsonNull() ? w.get("to").getAsString() : null, num(ws, "x", 0), num(ws, "z", 0), (float) num(ws, "yaw", 0)));
+						w.has("to") && !w.get("to").isJsonNull() ? w.get("to").getAsString() : null, num(ws, "x", 0), num(ws, "z", 0), (float) num(ws, "yaw", 0),
+						w.has("choice") && !w.get("choice").isJsonNull() ? w.get("choice").getAsString() : null,
+						w.has("needs") && !w.get("needs").isJsonNull() ? w.get("needs").getAsString() : null));
 			}
 			List<Person> people = new ArrayList<>();
 			for (JsonElement pe : r.getAsJsonArray("people")) {
@@ -203,9 +221,12 @@ public final class Interiors {
 				blocks.add(new BlockPos(a.get(0).getAsInt(), a.get(1).getAsInt(), a.get(2).getAsInt()));
 			}
 			JsonArray out = d.getAsJsonArray("out");
-			boolean north = d.has("face") && d.get("face").getAsString().equals("n");
+			String face = d.has("face") ? d.get("face").getAsString() : "s";
+			boolean north = face.equals("n");
+			JsonObject in = d.has("in") && d.get("in").isJsonObject() ? d.getAsJsonObject("in") : null;
 			DOORS.put(e.getKey(), new Door(e.getKey(), d.get("room").getAsString(), blocks, out.get(0).getAsDouble(), out.get(1).getAsDouble(),
-					out.get(2).getAsDouble(), north, (float) num(d, "yaw", north ? 180 : 0)));
+					out.get(2).getAsDouble(), north, (float) num(d, "yaw", north ? 180 : face.equals("e") ? -90 : face.equals("w") ? 90 : 0), face,
+					in == null ? null : new double[] {num(in, "x", 0), num(in, "z", 0), num(in, "yaw", 0)}));
 		}
 		JsonObject st = DATA.getAsJsonObject("start");
 		if (st != null) {
@@ -443,6 +464,12 @@ public final class Interiors {
 		});
 	}
 
+	/** Out through one of the doors by its key (the Route 28 Gate's choice: ROUTE 28's door, or ROUTE 26's). */
+	public static void outThrough(ServerPlayer p, String key) {
+		Door d = DOORS.get(key);
+		if (d != null) out(p, d);
+	}
+
 	public static boolean busy(ServerPlayer p) {
 		return PENDING.containsKey(p.getUUID());
 	}
@@ -465,10 +492,11 @@ public final class Interiors {
 		}
 		COOL.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 		Vec3 here = p.position(), last = LAST.put(id, here);
-		double dz = last == null ? 0 : here.z - last.z;
+		double dz = last == null ? 0 : here.z - last.z, dx = last == null ? 0 : here.x - last.x;
 		if (COOL.containsKey(id)) return false;
 		float yaw = Mth.wrapDegrees(p.getYRot());
 		boolean facingSouth = Math.abs(yaw) < 55, facingNorth = Math.abs(Mth.wrapDegrees(yaw - 180)) < 55;
+		boolean facingEast = Math.abs(Mth.wrapDegrees(yaw + 90)) < 55, facingWest = Math.abs(Mth.wrapDegrees(yaw - 90)) < 55;
 		if (in(p)) {
 			Room r = roomAt(p.getX());
 			if (r == null) return false;
@@ -500,9 +528,36 @@ public final class Interiors {
 							return true;
 						}
 					}
+					case "east", "west" -> {
+						// Through a way in a side wall (a sideways gate's): out to the world, to the next room, or asked where to.
+						boolean east = w.kind().equals("east");
+						if ((east ? lx > w.x0() : lx < w.x1()) && lz > w.z0() && lz < w.z1() && (east ? dx > 0.01 || facingEast : dx < -0.01 || facingWest)) {
+							if (w.choice() != null) {
+								p.teleportTo(p.getX() + (east ? -1.3 : 1.3), p.getY(), p.getZ());
+								COOL.put(id, 30);
+								Game.gateChoice(p, w.choice());
+								return true;
+							}
+							if (w.to() != null && ROOMS.containsKey(w.to())) {
+								go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
+								return true;
+							}
+							Door d = w.door() == null ? null : DOORS.get(w.door());
+							if (d == null) continue;
+							out(p, d);
+							return true;
+						}
+					}
 					case "north" -> {
 						// Through a way in the north wall: to the next room, or out to the world (the north gate).
 						if (lz < w.z1() && lx > w.x0() && lx < w.x1() && (dz < -0.01 || facingNorth)) {
+							// A guard's way (the League gate's): only with what it needs (a badge); else you're turned back.
+							if (w.needs() != null && !Game.meets(p, w.needs())) {
+								p.teleportTo(p.getX(), p.getY(), p.getZ() + 1.4);
+								COOL.put(id, 30);
+								Game.gateBlocked(p, w.needs());
+								return true;
+							}
 							if (w.to() != null && ROOMS.containsKey(w.to())) {
 								go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
 								return true;
@@ -533,19 +588,30 @@ public final class Interiors {
 		}
 		if (p.level().dimension() != Level.OVERWORLD) return false;
 		for (Door d : DOORS.values()) {
-			double x0 = 1e9, x1 = -1e9, zf = 0, y = 0;
+			double x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9, y = 0;
 			for (BlockPos b : d.blocks()) {
 				x0 = Math.min(x0, b.getX());
 				x1 = Math.max(x1, b.getX() + 1);
-				zf = b.getZ() + 1;
+				z0 = Math.min(z0, b.getZ());
+				z1 = Math.max(z1, b.getZ() + 1);
 				y = b.getY();
 			}
-			// Up against the door's outside (south) face, heading in; a north door's, from the north, heading south.
-			boolean at = d.north() ? p.getZ() > zf - 2.55 && p.getZ() < zf - 0.95 && (dz > 0.01 || facingSouth)
-					: p.getZ() > zf - 1.0 && p.getZ() < zf + 0.55 && (dz < -0.01 || facingNorth);
-			if (p.getX() > x0 - 0.2 && p.getX() < x1 + 0.2 && at && Math.abs(p.getY() - y) < 1.2) {
+			// Up against the door's outside face, heading in: a south door's from the south heading north; a north
+			// door's from the north heading south; an east door's (the Route 28 Gate's) from the east heading west; a
+			// west door's from the west heading east.
+			boolean acrossX = p.getX() > x0 - 0.2 && p.getX() < x1 + 0.2, acrossZ = p.getZ() > z0 - 0.2 && p.getZ() < z1 + 0.2;
+			boolean at = switch (d.face()) {
+				case "n" -> acrossX && p.getZ() > z1 - 2.55 && p.getZ() < z1 - 0.95 && (dz > 0.01 || facingSouth);
+				case "e" -> acrossZ && p.getX() > x1 - 1.0 && p.getX() < x1 + 0.55 && (dx < -0.01 || facingWest);
+				case "w" -> acrossZ && p.getX() > x0 - 0.55 && p.getX() < x0 + 1.0 && (dx > 0.01 || facingEast);
+				default -> acrossX && p.getZ() > z1 - 1.0 && p.getZ() < z1 + 0.55 && (dz < -0.01 || facingNorth);
+			};
+			if (at && Math.abs(p.getY() - y) < 1.2) {
 				Room r = ROOMS.get(d.room());
-				if (r != null) go(p, r, r.ex(), r.ez(), r.eyaw(), true);
+				if (r != null) {
+					if (d.in() != null) go(p, r, d.in()[0], d.in()[1], (float) d.in()[2], true);
+					else go(p, r, r.ex(), r.ez(), r.eyaw(), true);
+				}
 				return r != null;
 			}
 		}

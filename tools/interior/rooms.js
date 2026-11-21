@@ -15,6 +15,8 @@ const PLACES = [
   { id: "nickhouse", name: "Viridian house", floor: "Ground floor", group: "Viridian City" },
   { id: "gate_s", name: "Route 2 gate", floor: "South", group: "Route 2" },
   { id: "gate_n", name: "Route 2 gate", floor: "North", group: "Route 2" },
+  { id: "gate_league", name: "Pokémon League Gate", floor: "Route 22", group: "Route 22" },
+  { id: "gate_johto", name: "Route 28 Gate", floor: "Route 22", group: "Route 22" },
   { id: "arena_lab", name: "Lab battle", floor: "Battle arena", group: "Battle arenas" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
 ];
@@ -41,7 +43,7 @@ const SCHOOL_DOOR = [5, 7], SCHOOL_IN = { x: 6.0, z: 9.5, yaw: FACE.n }, SCHOOL_
 const VHOUSE_DOOR = [5, 7], VHOUSE_IN = { x: 6.0, z: 9.5, yaw: FACE.n };
 // The Route 2 gates, as Let's Go has them (one design for every gate, its people its own): in from the route at the
 // south, a long blue runner to the way on at the north.
-const LG_GATE_DOOR = [6, 8], LG_GATE_IN = { x: 7.0, z: 10.5, yaw: FACE.n }, LG_GATE_FROM_N = { x: 7.0, z: 2.6, yaw: FACE.s };
+const LG_GATE_DOOR = [6, 8], LG_GATE_NOOK = [5, 9], LG_GATE_IN = { x: 7.0, z: 12.5, yaw: FACE.n }, LG_GATE_FROM_N = { x: 7.0, z: 1.4, yaw: FACE.s };
 
 // The Trainer House's big screen: the battle downstairs, two trainers and a ball flying between, VS flashing.
 function drawTrainerTV(P, f) {
@@ -232,13 +234,32 @@ function drawScoreboard(P, f) {
   reg("dvdFront", 16, 8, (P, r) => { P.fill(hx("#2A2D33"), 0.03, r); P.rect(2, 3, 8, 1, hx("#111318")); P.set(13, 3, hx("#58D3A0")); }, { fit: true });
   // Rugs: Mum's salmon one under the table, green and blue kitchen mats, your big red rug, the Center's ring at the door.
   RUGS.salmon = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#E07A6A" : ((i + j) % 2 ? "#F4A08E" : "#F6AE9C");
-  RUGS.kitchenGreen = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#3F8A44" : "#5DAE52";
+  RUGS.kitchenGreen = (i, j, w, d) => (i + j) % 2 ? "#3F8A44" : "#7CC56B";
   RUGS.kitchenBlue = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#2E4A7A" : "#4A6FA8";
   RUGS.redRoom = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#9A2C34" : ((i + j) % 2 ? "#D9424A" : "#CF3A42");
   RUGS.centerRing = (i, j, w, d) => { const t = Math.hypot((i + 0.5 - w / 2) / (w / 2), (j + 0.5 - d / 2) / (d / 2)); return t > 1.05 ? "#F4A866" : (t > 0.66 && t < 0.92) || t < 0.22 ? "#F6F1EA" : "#E8823A"; };
   matReg("matHouseV", "#3E8A6E", "#2A5E4B");
   matReg("matGate", "#3A63B8", "#25418A");
   matReg("matGateN", "#3A63B8", "#25418A", true);
+  // Mats for ways through the side walls: their arrows pointing east or west (2 across, 4 along the wall).
+  const matSide = (base, edge, east) => (P, r) => {
+    const cream = hx("#F6F1EA"), w = P.w, h = P.h, cy = h / 2;
+    P.fill(hx(base), 0.04, r);
+    P.rect(0, 0, w, 2, hx(edge)); P.rect(0, h - 2, w, 2, hx(edge)); P.rect(0, 0, 2, h, hx(edge)); P.rect(w - 2, 0, 2, h, hx(edge));
+    P.rect(4, 4, w - 8, 1, cream); P.rect(4, h - 5, w - 8, 1, cream); P.rect(4, 4, 1, h - 8, cream); P.rect(w - 5, 4, 1, h - 8, cream);
+    for (const x0 of [8, 16]) for (let k = 0; k < 7; k++) { const x = east ? x0 + k : w - (x0 + k) - 2; P.rect(x, cy - 8 + k, 2, 2, cream); P.rect(x, cy + 6 - k, 2, 2, cream); }
+  };
+  reg("matGateE", 32, 64, matSide("#3A63B8", "#25418A", true), { fit: true });
+  reg("matGateW", 32, 64, matSide("#3A63B8", "#25418A", false), { fit: true });
+  reg("seedDish", 8, 8, (P, r) => { P.fill(hx("#B98A4E"), 0.12, r); for (let k = 0; k < 9; k++) P.set(Math.floor(r() * 8), Math.floor(r() * 8), hx("#7A5428")); });
+  reg("plateSpeary", 16, 8, (P, r) => { P.fill(hx("#F1E6C8"), 0.02, r); P.rect(0, 0, 16, 1, hx("#8A6A3A")); P.rect(0, 7, 16, 1, hx("#8A6A3A")); P.rect(3, 3, 10, 2, hx("#6A4A2A")); }, { fit: true });
+  reg("ballStone", 16, 16, (P, r) => { P.fill(hx("#C4C9CF"), 0.05, r); for (let x = 0; x < 16; x++) { P.set(x, 7, hx("#5E646C")); P.set(x, 8, hx("#5E646C")); } for (let y = 9; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#AEB4BB"), (r() - 0.5) * 0.06)); P.rect(6, 6, 4, 4, hx("#5E646C")); P.rect(7, 7, 2, 2, hx("#E4E7EA")); }, { fit: true });
+  reg("ballStoneTop", 16, 16, (P, r) => { P.fill(hx("#C9CED4"), 0.05, r); P.rect(3, 3, 3, 2, hx("#E2E5E8")); });
+  reg("bushPink", 16, 16, (P, r) => { P.fill(hx("#4E9A44"), 0.12, r); for (let k = 0; k < 9; k++) { const x = Math.floor(r() * 14), y = Math.floor(r() * 14); P.rect(x, y, 2, 2, hx("#F48FB8")); P.set(x, y, hx("#FFD1E3")); } });
+  // Let's Go's League gate carpet: deep red, a gold line down each side.
+  RUGS.leagueRed = (i, j, w, d) => (i === 0 || i === w - 1) ? "#E2B455" : (j % 3 === 1 ? "#B8323A" : "#A82A32");
+  // A runner along a sideways gate (east to west): blue, a yellow line round it.
+  RUGS.gateRunX = (i, j, w, d) => (i === 0 || i === w - 1 || j === 0 || j === d - 1) ? "#E9D27A" : (i % 3 === 1 ? "#5A8EE0" : "#4A7FD4");
   // The gate's runner: blue, a yellow line round it.
   RUGS.gateRun = (i, j, w, d) => (i === 0 || i === w - 1 || j === 0 || j === d - 1) ? "#E9D27A" : (j % 3 === 1 ? "#5A8EE0" : "#4A7FD4");
   RUGS.thRun = (i, j, w, d) => (i === 0 || i === w - 1) ? "#FBF1E4" : (j % 3 === 1 ? "#F09A56" : "#E8823A");
@@ -253,8 +274,9 @@ function drawScoreboard(P, f) {
 
 // A band of colour round the three walls you can see, at a height.
 function band(room, y, mat, h = 0.22) {
-  const G = room.geo, W = room.W, D = room.Dm || room.D;
-  G.box(0, y, 0, W, y + h, 0.04, { s: mat, all: null }); G.box(0, y, 0, 0.04, y + h, D, { e: mat, all: null }); G.box(W - 0.04, y, 0, W, y + h, D, { w: mat, all: null });
+  const G = room.geo, W = room.W, D = room.Dm || room.D, N = room.Nm || 0, nn = room.northNook;
+  for (const [a, c] of nn ? [[0, nn[0]], [nn[1], W]] : [[0, W]]) G.box(a, y, N, c, y + h, N + 0.04, { s: mat, all: null });
+  G.box(0, y, N, 0.04, y + h, D, { e: mat, all: null }); G.box(W - 0.04, y, N, W, y + h, D, { w: mat, all: null });
 }
 // Shelves of goods (the Mart's): white uprights, a coloured kick, goods on every shelf.
 function martShelf(room, X, Z, f, w = 4, h = 2.2, o = {}) {
@@ -330,8 +352,8 @@ function labMachine(room, X, w, screenKey, o = {}) {
 }
 // A ball as the design has it, rounded: three crossed boxes (a bevelled cube, as a Minecraft build rounds a small thing),
 // not a sharp-cornered block.
-function roundBall(G, cx, y, cz, s) {
-  const h = s / 2, r = s * 0.2, m = { all: "ball", top: "ballTop" };
+function roundBall(G, cx, y, cz, s, m = { all: "ball", top: "ballTop" }) {
+  const h = s / 2, r = s * 0.2;
   G.box(cx - h, y + r, cz - h + r, cx + h, y + s - r, cz + h - r, m);
   G.box(cx - h + r, y, cz - h + r, cx + h - r, y + s, cz + h - r, m);
   G.box(cx - h + r, y + r, cz - h, cx + h - r, y + s - r, cz + h, m);
@@ -531,28 +553,30 @@ function cornerPost(R, x, z, s = 0.42, mat = "beam") {
 // ({ to } for a real one, { none, lines } for one that goes nowhere yet).
 function lgGate(R, o) {
   const D = R.D;
-  shell(R, { paper: "paperGateLG", floor: "gateCheck", door: LG_GATE_DOOR, entry: true, skirt: "gateWhite", ledge: "gateBlue", ledgeTop: "gateWhite" });
+  shell(R, { paper: "paperGateLG", floor: "gateCheck", door: LG_GATE_DOOR, entry: true, northNook: LG_GATE_NOOK, skirt: "gateWhite", ledge: "gateBlue", ledgeTop: "gateWhite" });
+  const N = R.Nm;
   // The blue lower walls, a white rail over them.
   band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
   // Windows down both sides.
-  for (const z of [2.6, 6.2]) for (const wall of ["w", "e"]) crossWindow(R, wall, z, 1.6, 2.0, 1.4, ["Outside: the trees along ROUTE 2."]);
-  // The way at the north (dark, the forest's green beyond), palms either side.
+  for (const z of [2.6 + N, 6.2 + N]) for (const wall of ["w", "e"]) crossWindow(R, wall, z, 1.6, 2.0, 1.4, ["Outside: the trees along ROUTE 2."]);
+  // The way on at the north: a nook as deep as the one at the door (4 by 2), dark at its back (the forest's green
+  // beyond), its mat its whole width with the arrows pointing out; palms either side.
   const north = o.north || {};
-  passageN(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], north.none ? { none: true, mat: "matGateN", frame: "paint" } : { to: north.to, spawn: north.spawn, mat: "matGateN", frame: "paint" });
-  if (north.none) R.act([LG_GATE_DOOR[0], 0, LG_GATE_DOOR[1], 1.2], { label: "Look", lines: north.lines });
-  palm(R, 4.6, 0.9, 1.0); palm(R, 9.4, 0.9, 1.0);
+  passageN(R, LG_GATE_NOOK[0], LG_GATE_NOOK[1], north.none ? { none: true, mat: "matGateN", frame: "paint" } : { to: north.to, spawn: north.spawn, mat: "matGateN", frame: "paint" });
+  if (north.none) R.act([LG_GATE_NOOK[0], 0, LG_GATE_NOOK[1], 1.2], { label: "Look", lines: north.lines });
+  palm(R, 3.9, N + 0.8, 1.0); palm(R, 10.1, N + 0.8, 1.0);
   // The runner, from the way on at the north to the door at the south.
-  rug(R, 5, 2, 9, R.Dm, "gateRun");
+  rug(R, 5, N, 9, R.Dm, "gateRun");
   // Stools round two glass tables on the east side, a few along the west wall; plants; a bin.
-  glassTable(R, 10.4, 3.0, 11.9, 4.4, { lines: ["A glass table. There's a leaflet: VIRIDIAN FOREST, A WALK FOR ALL AGES!"] });
-  stool(R, 12.6, 3.7); stool(R, 11.15, 2.3); stool(R, 9.7, 3.7);
-  glassTable(R, 10.4, 6.2, 11.9, 7.6, { lines: ["A glass table. Someone's left a map of ROUTE 2 on it."] });
-  stool(R, 12.6, 6.9); stool(R, 11.15, 8.3); stool(R, 9.7, 6.9);
-  stool(R, 1.0, 6.6); stool(R, 1.0, 7.8);
-  slimPlant(R, 0.8, 3.4, 1.0); plant(R, 1.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); slimPlant(R, 13.2, R.Dm - 1.0, 1.0);
-  bin(R, 13.3, 1.0);
+  glassTable(R, 10.4, 3.0 + N, 11.9, 4.4 + N, { lines: ["A glass table. There's a leaflet: VIRIDIAN FOREST, A WALK FOR ALL AGES!"] });
+  stool(R, 12.6, 3.7 + N); stool(R, 11.15, 2.3 + N); stool(R, 9.7, 3.7 + N);
+  glassTable(R, 10.4, 6.2 + N, 11.9, 7.6 + N, { lines: ["A glass table. Someone's left a map of ROUTE 2 on it."] });
+  stool(R, 12.6, 6.9 + N); stool(R, 11.15, 8.3 + N); stool(R, 9.7, 6.9 + N);
+  stool(R, 1.0, 6.6 + N); stool(R, 1.0, 7.8 + N);
+  slimPlant(R, 0.8, 3.4 + N, 1.0); plant(R, 1.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); slimPlant(R, 13.2, R.Dm - 1.0, 1.0);
+  bin(R, 13.3, 1.0 + N);
   const south = o.south || {};
-  doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], south.none ? { none: true, mat: "matGate" } : { to: south.to, spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matGate" });
+  doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], south.none ? { none: true, mat: "matGate" } : { to: south.to, spawn: { x: 6.9, z: D - 2.0, yaw: FACE.s }, mat: "matGate" });
   if (south.none) R.act([LG_GATE_DOOR[0], D - 1.4, LG_GATE_DOOR[1], D], { label: "Look", lines: south.lines });
 }
 // A soft armchair (as the Centers' waiting seats): x, z its middle, face the way you'd look sitting in it.
@@ -696,6 +720,27 @@ function statueBall(R, x, z, y, s = 0.8) {
   roundBall(G, x, y + 0.2, z, s);
   R.item("Ball statues", "A big ball on a white stand at each end of the counter.");
 }
+// A ball statue as Let's Go's League gate has them: a grey stone ball on a tall grey pedestal (a darker band round it).
+function leagueStatue(R, x, z) {
+  const G = R.geo;
+  G.box(x - 0.5, 0, z - 0.5, x + 0.5, 0.18, z + 0.5, "silver");
+  G.box(x - 0.36, 0.18, z - 0.36, x + 0.36, 1.05, z + 0.36, { all: "silver", top: "steel" });
+  G.box(x - 0.38, 0.8, z - 0.38, x + 0.38, 0.88, z + 0.38, "steel");
+  G.box(x - 0.44, 1.05, z - 0.44, x + 0.44, 1.12, z + 0.44, "silver");
+  roundBall(G, x, 1.12, z, 0.82, { all: "ballStone", top: "ballStoneTop" });
+  R.solid(x - 0.5, z - 0.5, x + 0.5, z + 0.5);
+  R.act([x - 0.6, z - 0.6, x + 0.6, z + 0.6], { label: "Look", lines: ["A statue of a POKé BALL on a stone pedestal.", "The plate reads: TO THE TRAINERS WHO CHALLENGE THE POKéMON LEAGUE."] });
+  R.item("Ball statues", "Grey stone balls on tall grey pedestals, down both sides of the carpet.");
+}
+// A round bush with pink flowers (the League gate's, at the statues' feet).
+function flowerBush(R, x, z, s = 1) {
+  const G = R.geo, a = 0.42 * s, b = 0.3 * s;
+  G.box(x - a, 0, z - b, x + a, 0.62 * s, z + b, "bushPink");
+  G.box(x - b, 0, z - a, x + b, 0.62 * s, z + a, "bushPink");
+  G.box(x - b, 0.62 * s, z - b, x + b, 0.8 * s, z + b, "bushPink");
+  R.solid(x - a, z - a, x + a, z + a);
+  R.item("Bushes", "Round green bushes dotted with pink flowers.");
+}
 // The Center's counter, curving round the nurse (stepped round, as a Minecraft build rounds one): its straight front
 // from cx-3 to cx+3, then stepping back to the wall either side.
 function curvedCounter(R, cx, o = {}) {
@@ -806,7 +851,7 @@ const BUILD = {
   house1() {
     // Downstairs, as Let's Go's: the kitchen down the left-hand wall on its green mat, the dresser of plates, a plant and
     // the TV along the back, the stairs up at the back on the right, the table in the middle on a salmon rug with two
-    // green-cushioned chairs each side, Mum at one of them. The mat in its nook at the door.
+    // green-cushioned chairs each side. Mum at the kitchen counter, as Let's Go has her. The mat in its nook at the door.
     const R = new Room("house1", { name: "Your house", floor: "Downstairs", paper: "paperMum", W: 14, D: 13, outsideSize: "8 by 6" });
     shell(R, { paper: "mcCream", floor: "sqHoney", door: DOOR, entry: true, entryFloor: "mcQuartzCheck", skirt: "mcStripped", ledge: "honey" });
     kitchen(R, 0, "e", { z: 7.4 });
@@ -829,7 +874,7 @@ const BUILD = {
     R.item("Photos", "Framed in walnut on the east wall.");
     plant(R, 1.0, 10.0, 1.0); plant(R, 13.0, 10.0, 1.0);
     doormat(R, DOOR[0], DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHome" });
-    R.npcs.push({ name: "Mum", x: 5.75, z: 6.9, yaw: FACE.e, seated: true,
+    R.npcs.push({ name: "Mum", x: 1.55, z: 4.4, yaw: FACE.w,
       look: { skin: "middle_aged_woman" },
       talk: f => f && f.h > 3.4 ? [
         { text: "...Is that coming in too? Mind the ceiling, love!" },
@@ -1158,15 +1203,24 @@ const BUILD = {
     R.act([10.0, 2.4, 11.9, 4.4], { label: "Look", lines: ["A red book on the desk: SPEARY'S FIRST YEAR. Every page has a photo of SPEARY."] });
     crossWindow(R, "e", 2.6, 1.6, 1.8, 1.2, ["Outside: VIRIDIAN CITY's rooftops."]);
     crossWindow(R, "e", 5.8, 1.5, 1.6, 1.3, ["Outside: the TRAINER SCHOOL's green roof."]);
-    G.box(11.1, 0, 6.5, 11.3, 1.3, 6.7, "walnut"); G.box(10.7, 1.3, 6.55, 11.7, 1.38, 6.65, "walnut");
-    R.act([10.4, 6.1, 12, 7.1], { label: "Look", lines: ["A perch with a name carved on it: SPEARY.", "SPEARY's out for a fly."] });
+    // SPEARY's perch: a stand on a round foot, a T-bar on top with a knob at each end, a seed dish on a little tray
+    // half way up, and its name on a plate.
+    G.box(10.8, 0, 6.2, 11.6, 0.06, 7.0, "walnut"); G.box(10.9, 0.06, 6.3, 11.5, 0.1, 6.9, "walnut");
+    G.box(11.15, 0.1, 6.55, 11.25, 1.35, 6.65, "walnut");
+    G.box(10.6, 1.35, 6.54, 11.8, 1.43, 6.66, "walnut");
+    G.box(10.55, 1.31, 6.5, 10.68, 1.47, 6.7, "walnut"); G.box(11.72, 1.31, 6.5, 11.85, 1.47, 6.7, "walnut");
+    G.box(11.25, 0.72, 6.48, 11.62, 0.76, 6.72, "walnut"); G.box(11.3, 0.76, 6.5, 11.58, 0.86, 6.7, { all: "redPlastic", top: "seedDish" });
+    G.box(10.95, 0.42, 6.66, 11.45, 0.6, 6.68, { s: "plateSpeary", all: null });
+    R.solid(10.8, 6.2, 11.6, 7.0);
+    R.act([10.4, 6.1, 12, 7.1], { label: "Look", lines: ["SPEARY's perch, a seed dish on its tray and SPEARY's name on a little plate.", "SPEARY's out for a fly."] });
+    R.item("Perch", "SPEARY the SPEAROW's perch: a T-bar on a stand, a seed dish half way up, a name plate.");
     // The table in the middle on the green rug: a white top in a wooden trim, a fruit bowl, four cushioned chairs.
-    G.box(3.6, 0, 3.4, 8.4, 0.03, 7.4, { top: "rugGreen", all: "cap", bottom: null });
-    table(R, 4.8, 4.4, 7.2, 6.4, { top: "lab", leg: "walnut", h: 0.86, name: "Table", note: "A white top in a walnut trim, a bowl of fruit in the middle." });
-    G.box(4.74, 0.74, 4.34, 7.26, 0.88, 4.44, "walnut"); G.box(4.74, 0.74, 6.36, 7.26, 0.88, 6.46, "walnut");
-    G.box(4.74, 0.74, 4.44, 4.84, 0.88, 6.36, "walnut"); G.box(7.16, 0.74, 4.44, 7.26, 0.88, 6.36, "walnut");
-    fruitBowl(R, 6.0, 5.4, 0.86);
-    for (const z of [4.95, 5.85]) { chair(R, 4.15, z, "e", { seat: "cushion" }); chair(R, 7.85, z, "w", { seat: "cushion" }); }
+    G.box(3.6, 0, 2.4, 8.4, 0.03, 6.4, { top: "rugGreen", all: "cap", bottom: null });
+    table(R, 4.8, 3.4, 7.2, 5.4, { top: "lab", leg: "walnut", h: 0.86, name: "Table", note: "A white top in a walnut trim, a bowl of fruit in the middle." });
+    G.box(4.74, 0.74, 3.34, 7.26, 0.88, 3.44, "walnut"); G.box(4.74, 0.74, 5.36, 7.26, 0.88, 5.46, "walnut");
+    G.box(4.74, 0.74, 3.44, 4.84, 0.88, 5.36, "walnut"); G.box(7.16, 0.74, 3.44, 7.26, 0.88, 5.36, "walnut");
+    fruitBowl(R, 6.0, 4.4, 0.86);
+    for (const z of [3.95, 4.85]) { chair(R, 4.15, z, "e", { seat: "cushion" }); chair(R, 7.85, z, "w", { seat: "cushion" }); }
     R.item("Chairs", "Four walnut chairs with yellow cushions, two each side.");
     plant(R, 10.8, 7.7, 0.85, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
     doormat(R, VHOUSE_DOOR[0], VHOUSE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHouseV" });
@@ -1195,15 +1249,65 @@ const BUILD = {
     return R;
   },
 
+  gate_league() {
+    // ROUTE 22's POKéMON LEAGUE gate, as Let's Go's: a red carpet up the middle from the door to the way on at the
+    // north (a nook, as at the door), grey ball statues on pedestals down both sides with pink-flowered bushes
+    // between them, palms by the way on, and a guard beside it: only TRAINERS with the BOULDERBADGE may go on to
+    // ROUTE 23 and VICTORY ROAD.
+    const R = new Room("gate_league", { name: "Pokémon League Gate", floor: "Route 22", W: 14, D: 16, outsideSize: "18 by 21" });
+    shell(R, { paper: "paperGateLG", floor: "gateCheck", door: LG_GATE_DOOR, entry: true, northNook: LG_GATE_NOOK, skirt: "gateWhite", ledge: "gateBlue", ledgeTop: "gateWhite" });
+    const N = R.Nm;
+    band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
+    passageN(R, LG_GATE_NOOK[0], LG_GATE_NOOK[1], { to: "town", needs: "BOULDERBADGE", mat: "matGateN", frame: "paint",
+      lines: ["GUARD: Only TRAINERS with the BOULDERBADGE may go on to VICTORY ROAD.", "GUARD: The rules are the rules!"] });
+    palm(R, 3.9, N + 0.8, 1.0); palm(R, 10.1, N + 0.8, 1.0);
+    rug(R, 5, N, 9, R.Dm, "leagueRed");
+    for (const x of [2.5, 11.5]) for (const z of [N + 2.6, N + 5.8, N + 9.0]) leagueStatue(R, x, z);
+    for (const x of [2.5, 11.5]) for (const z of [N + 4.2, N + 7.4]) flowerBush(R, x, z);
+    for (const x of [0.9, 13.1]) for (const z of [N + 2.6, N + 5.8, N + 9.0]) flowerBush(R, x, z, 0.8);
+    plant(R, 1.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); plant(R, 13.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+    doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], { to: "town", spawn: { x: 6.9, z: R.D - 2.0, yaw: FACE.s }, mat: "matGate" });
+    R.npcs.push({ name: "Guard", key: "league_gate_guard", x: 10.6, z: N + 1.0, yaw: FACE.s, look: { skin: "guard" },
+      talk: () => [{ text: "This is the POKéMON LEAGUE's FRONT GATE." }, { text: "Only TRAINERS who have the BOULDERBADGE may go on to VICTORY ROAD." }] });
+    R.spawn = { x: 7.0, z: R.D - 1.5, yaw: FACE.n };
+    return R;
+  },
+
+  gate_johto() {
+    // The gate at the west end of ROUTE 22, sideways (its ways through are in its east and west walls): in from
+    // ROUTE 22 at the east; at the west the way on under the mountain, to ROUTE 28 (or, for the CHAMPION, round to
+    // ROUTE 26 and JOHTO; the game asks which). A guard at his desk on the north wall, a blue runner between the
+    // ways through, glass tables and stools along the front.
+    const R = new Room("gate_johto", { name: "Route 28 Gate", floor: "Route 22", W: 16, D: 10, outsideSize: "9 by 12" });
+    shell(R, { paper: "paperGateLG", floor: "gateCheck", skirt: "gateWhite" });
+    band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
+    passageSide(R, "e", 3, 7, { to: "town", mat: "matGateE", frame: "paint" });
+    passageSide(R, "w", 3, 7, { to: "town", mat: "matGateW", frame: "paint", choice: "johto" });
+    rug(R, 2, 4, 14, 6, "gateRunX");
+    table(R, 6.4, 1.3, 9.6, 2.0, { top: "lab", leg: "steel", h: 0.95, name: "Guard's desk", note: "A white-topped desk on steel legs, a logbook open on it." });
+    R.geo.box(7.3, 0.95, 1.45, 8.1, 0.99, 1.85, { all: "linen", top: "bookOpen" });
+    R.act([6.2, 1.1, 9.8, 2.3], { label: "Read", lines: ["The guard's logbook: who's gone through, and which way.", "ROUTE 28... ROUTE 28... ROUTE 26 (CHAMPION)..."] });
+    palm(R, 1.0, 1.0, 1.0); palm(R, 15.0, 1.0, 1.0);
+    glassTable(R, 3.2, 7.6, 4.6, 9.0, { lines: ["A glass table. A leaflet: MT. SILVER, FOR THE STRONGEST ONLY."] });
+    stool(R, 2.5, 8.3); stool(R, 5.3, 8.3);
+    glassTable(R, 11.4, 7.6, 12.8, 9.0, { lines: ["A glass table. A map of JOHTO, folded up small."] });
+    stool(R, 10.7, 8.3); stool(R, 13.5, 8.3);
+    slimPlant(R, 0.8, 9.2, 1.0); slimPlant(R, 15.2, 9.2, 1.0);
+    R.npcs.push({ name: "Guard", key: "johto_gate_guard", x: 8.0, z: 0.8, yaw: FACE.s, look: { skin: "officer_m" },
+      talk: () => [{ text: "West of here, under the mountain, is ROUTE 28." }, { text: "ROUTE 26 and the JOHTO region are that way too, but only the CHAMPION may go to JOHTO." }] });
+    R.spawn = { x: 14.4, z: 5.0, yaw: FACE.w };
+    return R;
+  },
+
   gate_s() {
     // Route 2's gate south of Viridian Forest, as Let's Go's gates are (one design for every gate; who's in it is its
     // own): a cream and yellow check, blue lower walls, a long blue runner from the door to the way on at the north,
     // palms by the way on, stools round glass tables, people waiting. The way on to the forest goes nowhere yet.
-    const R = new Room("gate_s", { name: "Route 2 gate", floor: "South", W: 14, D: 12, outsideSize: "15 by 12" });
+    const R = new Room("gate_s", { name: "Route 2 gate", floor: "South", W: 14, D: 14, outsideSize: "15 by 12" });
     lgGate(R, { south: { to: "town" }, north: { none: true, lines: ["The way on to VIRIDIAN FOREST."] } });
-    R.npcs.push({ name: "Girl", key: "gate_s_girl", x: 3.0, z: 5.6, yaw: FACE.e, look: { skin: "girl" },
+    R.npcs.push({ name: "Girl", key: "gate_s_girl", x: 3.0, z: 7.6, yaw: FACE.e, look: { skin: "girl" },
       talk: () => [{ text: "Some POKéMON only live in forests and caves." }, { text: "Look everywhere if you want to find them all!" }] });
-    R.npcs.push({ name: "Lady", key: "gate_s_lady", x: 12.6, z: 6.9, yaw: FACE.w, seated: true, look: { skin: "lady" },
+    R.npcs.push({ name: "Lady", key: "gate_s_lady", x: 12.6, z: 8.9, yaw: FACE.w, seated: true, look: { skin: "lady" },
       talk: () => [{ text: "VIRIDIAN FOREST is a natural maze." }, { text: "Stick to the path, or you'll be wandering in circles!" }] });
     R.spawn = LG_GATE_IN;
     return R;
@@ -1212,11 +1316,11 @@ const BUILD = {
   gate_n() {
     // The gate on the forest's north side, the same design: in from Route 2 through the way at the north, the forest
     // to the south (that way goes nowhere yet).
-    const R = new Room("gate_n", { name: "Route 2 gate", floor: "North", W: 14, D: 12, outsideSize: "15 by 16" });
+    const R = new Room("gate_n", { name: "Route 2 gate", floor: "North", W: 14, D: 14, outsideSize: "15 by 16" });
     lgGate(R, { north: { to: "town" }, south: { none: true, lines: ["The way back into VIRIDIAN FOREST."] } });
-    R.npcs.push({ name: "Youngster", key: "gate_n_kid", x: 3.0, z: 7.0, yaw: FACE.e, look: { skin: "youngster" },
+    R.npcs.push({ name: "Youngster", key: "gate_n_kid", x: 3.0, z: 9.0, yaw: FACE.e, look: { skin: "youngster" },
       talk: () => [{ text: "Off to PEWTER CITY? Its GYM LEADER, BROCK, uses ROCK-type POKéMON." }, { text: "WATER and GRASS moves work well on ROCK!" }] });
-    R.npcs.push({ name: "Hiker", key: "gate_n_hiker", x: 12.6, z: 3.7, yaw: FACE.w, seated: true, look: { skin: "hiker" },
+    R.npcs.push({ name: "Hiker", key: "gate_n_hiker", x: 12.6, z: 5.7, yaw: FACE.w, seated: true, look: { skin: "hiker" },
       talk: () => [{ text: "Phew! That forest goes on and on." }, { text: "It's easy to lose your way among all those trees." }] });
     R.spawn = LG_GATE_FROM_N;
     return R;

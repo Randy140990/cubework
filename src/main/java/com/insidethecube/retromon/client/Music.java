@@ -75,8 +75,20 @@ public final class Music {
 				.getResource(Identifier.fromNamespaceAndPath(Retromon.ID, "sounds/music/" + k + ".ogg")).isPresent());
 	}
 
+	/** Every song and jingle started (so anything still going that shouldn't be is stopped: never two at once). */
+	private static final java.util.List<SoundInstance> STARTED = new java.util.ArrayList<>();
+
 	private static SoundInstance sound(String id, boolean loop) {
 		return new Song(Retromon.id("music." + id), loop);
+	}
+
+	/** Plays a song or jingle, first stopping any other of ours still going. */
+	private static void start(SoundInstance s) {
+		Minecraft mc = Minecraft.getInstance();
+		for (SoundInstance o : STARTED) if (o != s) mc.getSoundManager().stop(o);
+		STARTED.clear();
+		STARTED.add(s);
+		mc.getSoundManager().play(s);
 	}
 
 	/** How loud the music is let play (1 normally; down to a fifth while the Pokédex reads an entry out), and where it's going. */
@@ -129,7 +141,7 @@ public final class Music {
 		looping = !inIntro;
 		playing = sound(inIntro ? id + "_intro" : id, !inIntro);
 		Minecraft.getInstance().getMusicManager().stopPlaying();
-		if (jingle == null) Minecraft.getInstance().getSoundManager().play(playing);
+		if (jingle == null) start(playing);
 	}
 
 	/** A song played once through (a jingle that pauses the music). */
@@ -140,7 +152,7 @@ public final class Music {
 		if (playing != null) mc.getSoundManager().stop(playing);
 		jingle = id;
 		jinglePlaying = sound(id, false);
-		mc.getSoundManager().play(jinglePlaying);
+		start(jinglePlaying);
 	}
 
 	/** The place you're in now: its music plays (unless a battle's on). */
@@ -173,6 +185,9 @@ public final class Music {
 
 	private static void stopSound() {
 		if (playing != null) Minecraft.getInstance().getSoundManager().stop(playing);
+		// (And anything else of ours left going.)
+		for (SoundInstance o : STARTED) if (o != jinglePlaying) Minecraft.getInstance().getSoundManager().stop(o);
+		STARTED.removeIf(o -> o != jinglePlaying);
 		playing = null;
 	}
 
@@ -195,7 +210,7 @@ public final class Music {
 				inIntro = false;
 				looping = true;
 				playing = sound(current, true);
-				mc.getSoundManager().play(playing);
+				start(playing);
 			}
 			return;
 		}
@@ -204,11 +219,11 @@ public final class Music {
 			inIntro = false;
 			looping = true;
 			playing = sound(current, true);
-			mc.getSoundManager().play(playing);
+			start(playing);
 		} else if (looping && !mc.getSoundManager().isActive(playing)) {
 			// Stopped by something else (loading a world stops every sound): start again.
 			playing = sound(current, true);
-			mc.getSoundManager().play(playing);
+			start(playing);
 		}
 	}
 }

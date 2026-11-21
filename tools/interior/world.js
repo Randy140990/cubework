@@ -185,20 +185,34 @@ function shell(room, o = {}) {
   const { W, D, H } = room, G = room.geo, T = T_WALL, paper = o.paper || "paperMum";
   const ent = o.entry ? (o.entry === true ? [o.door[0] - 1, o.door[1] + 1] : o.entry) : null, Dm = ent ? D - 2 : D;
   room.Dm = Dm; room.entry = ent;
-  const floors = o.floorRects || (ent ? [[0, 0, W, Dm], [ent[0], Dm, ent[1], D]] : [[0, 0, W, D]]);
+  // A nook in the north wall too (a gate's way on, as deep as the one at the door): the room proper starts 2 in.
+  const nn = o.northNook || null, N = nn ? 2 : 0;
+  room.Nm = N; room.northNook = nn;
+  const floors = o.floorRects || [...(ent ? [[0, N, W, Dm], [ent[0], Dm, ent[1], D]] : [[0, N, W, D]]), ...(nn ? [[nn[0], 0, nn[1], N]] : [])];
   // The slab, cut along the front so its edge shows as a section.
   for (const [x0, z0, x1, z1] of floors) {
     const nook = ent && z0 >= Dm - 1e-6;
     G.box(x0, -0.35, z0, x1, 0, z1, { top: (nook && o.entryFloor) || o.floor || "oak", s: z1 >= Dm - 1e-6 ? "cap" : null, n: null, e: nook ? "cap" : null, w: nook ? "cap" : null, bottom: null });
   }
-  G.box(-T, -0.35, -T, 0, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
-  G.box(W, -0.35, -T, W + T, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
+  G.box(-T, -0.35, N - T, 0, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
+  G.box(W, -0.35, N - T, W + T, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
   for (const z of o.zones || []) G.box(z[0], 0, z[1], z[2], 0.012, z[3], { top: z[4], s: z[3] >= Dm - 1e-6 ? "cap" : null, n: null, e: null, w: null, bottom: null });
   // Walls: north, west and east. Their tops and cut ends are drawn dark, as a section.
-  G.box(-T, 0, -T, W + T, H, 0, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
-  G.box(-T, 0, 0, 0, H, Dm, { e: paper, top: "cap", s: "cap", n: null, w: null, bottom: null });
-  G.box(W, 0, 0, W + T, H, Dm, { w: paper, top: "cap", s: "cap", n: null, e: null, bottom: null });
-  room.solid(-5, -5, W + 5, 0); room.solid(-5, -5, 0, D + 5); room.solid(W, -5, W + 5, D + 5);
+  if (nn) {
+    // Either side of the nook, and round the nook itself (its back and its two sides).
+    G.box(-T, 0, N - T, nn[0], H, N, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
+    G.box(nn[1], 0, N - T, W + T, H, N, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
+    G.box(nn[0] - T, 0, -T, nn[1] + T, H, 0, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
+    G.box(nn[0] - T, 0, 0, nn[0], H, N - T, { e: paper, top: "cap", n: null, s: null, w: null, bottom: null });
+    G.box(nn[1], 0, 0, nn[1] + T, H, N - T, { w: paper, top: "cap", n: null, s: null, e: null, bottom: null });
+    room.solid(-5, -5, nn[0], N); room.solid(nn[1], -5, W + 5, N); room.solid(nn[0], -5, nn[1], 0);
+  } else {
+    G.box(-T, 0, -T, W + T, H, 0, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
+    room.solid(-5, -5, W + 5, 0);
+  }
+  G.box(-T, 0, N, 0, H, Dm, { e: paper, top: "cap", s: "cap", n: null, w: null, bottom: null });
+  G.box(W, 0, N, W + T, H, Dm, { w: paper, top: "cap", s: "cap", n: null, e: null, bottom: null });
+  room.solid(-5, -5, 0, D + 5); room.solid(W, -5, W + 5, D + 5);
   // The open front: solid but for the door.
   const door = o.door;
   if (ent) {
@@ -214,19 +228,20 @@ function shell(room, o = {}) {
   } else if (door) { room.solid(-5, D, door[0], D + 5); room.solid(door[1], D, W + 5, D + 5); } else room.solid(-5, D, W + 5, D + 5);
   // Skirting boards and a picture rail.
   const sk = o.skirt || "paint", skh = o.skirtH || 0.24;
-  G.box(0, 0, 0, W, skh, 0.07, { all: sk, n: null, bottom: null });
-  G.box(0, 0, 0, 0.07, skh, Dm, { all: sk, w: null, bottom: null });
-  G.box(W - 0.07, 0, 0, W, skh, Dm, { all: sk, e: null, bottom: null });
+  const northRuns = nn ? [[0, nn[0]], [nn[1], W]] : [[0, W]];
+  for (const [a, b] of northRuns) G.box(a, 0, N, b, skh, N + 0.07, { all: sk, n: null, bottom: null });
+  G.box(0, 0, N, 0.07, skh, Dm, { all: sk, w: null, bottom: null });
+  G.box(W - 0.07, 0, N, W, skh, Dm, { all: sk, e: null, bottom: null });
   if (o.rail !== false) {
     const ry = H - 0.55;
-    G.box(0, ry, 0, W, ry + 0.1, 0.06, { all: sk, n: null });
-    G.box(0, ry, 0, 0.06, ry + 0.1, Dm, { all: sk, w: null });
-    G.box(W - 0.06, ry, 0, W, ry + 0.1, Dm, { all: sk, e: null });
+    for (const [a, b] of northRuns) G.box(a, ry, N, b, ry + 0.1, N + 0.06, { all: sk, n: null });
+    G.box(0, ry, N, 0.06, ry + 0.1, Dm, { all: sk, w: null });
+    G.box(W - 0.06, ry, N, W, ry + 0.1, Dm, { all: sk, e: null });
   }
   // The soft shade where the walls meet the floor.
-  G.box(0, 0.02, 0, W, 0.02, 1.1, { top: "aoN", all: null });
-  G.box(0, 0.02, 0, 1.1, 0.02, Dm, { top: "aoW", all: null });
-  G.box(W - 1.1, 0.02, 0, W, 0.02, Dm, { top: "aoE", all: null });
+  G.box(0, 0.02, N, W, 0.02, N + 1.1, { top: "aoN", all: null });
+  G.box(0, 0.02, N, 1.1, 0.02, Dm, { top: "aoW", all: null });
+  G.box(W - 1.1, 0.02, N, W, 0.02, Dm, { top: "aoE", all: null });
 }
 // ---------- light through the windows, by the time of day (the mod's RoomLight does the very same sums) ----------
 // A pool of light on the floor: where it falls at midday ([x0, z0, x1, z1]), dir the way the light goes in (0 south
@@ -545,11 +560,32 @@ function doormat(room, x0, x1, o = {}) {
 
 function passageN(room, x0, x1, o = {}) {
   const G = room.geo;
+  if (room.northNook) [x0, x1] = room.northNook;
+  const m = o.mat || "doormat", mk = x1 - x0 > 3 && MATDEF[m + "W"] ? m + "W" : m;
   G.box(x0 - 0.15, 0, 0, x1 + 0.15, 2.6, 0.1, { s: o.frame || "walnut", all: null });
   G.box(x0, 0, 0.1, x1, 2.4, 0.11, { s: "doorDark", all: null });
-  G.box(x0, 0, 0.11, x1, 0.03, 2, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
-  if (!o.none) room.warps.push({ test: (p, input) => p.z < 1.0 && p.x > x0 && p.x < x1 && input.up, to: o.to, spawn: o.spawn, fx: "fade", why: "north" });
-  room.item("Way through", "An open doorway in the north wall, a mat at its foot. Walk north through it.");
+  G.box(x0, 0, 0.11, x1, 0.03, 2, { top: mk, s: "cap", all: "cap", bottom: null });
+  // (A way the viewer can't let you through, a guard's, is only something to look at here.)
+  if (o.needs) room.act([x0, 0, x1, 1.4], { label: "Look", lines: o.lines || ["You can't go this way yet."] });
+  else if (!o.none) room.warps.push({ test: (p, input) => p.z < 1.0 && p.x > x0 && p.x < x1 && input.up, to: o.to, spawn: o.spawn, fx: "fade", why: "north" });
+  room.item("Way through", room.northNook ? "A nook in the north wall as deep as the one at the door, its mat its whole width, the arrows pointing on. Walk north through it."
+    : "An open doorway in the north wall, a mat at its foot. Walk north through it.");
+}
+// A way through the east or west wall (a sideways gate's): a dark doorway, a mat in front of it (2 deep, its
+// arrows pointing out). wall "e" or "w"; z0 to z1 along the wall. choice: what the mod asks you there (where to).
+function passageSide(room, wall, z0, z1, o = {}) {
+  const G = room.geo, W = room.W, e = wall === "e", fr = o.frame || "walnut";
+  if (e) {
+    G.box(W - 0.1, 0, z0 - 0.15, W, 2.6, z1 + 0.15, { w: fr, all: null });
+    G.box(W - 0.11, 0, z0, W - 0.1, 2.4, z1, { w: "doorDark", all: null });
+    G.box(W - 2, 0, z0, W - 0.11, 0.03, z1, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
+  } else {
+    G.box(0, 0, z0 - 0.15, 0.1, 2.6, z1 + 0.15, { e: fr, all: null });
+    G.box(0.1, 0, z0, 0.11, 2.4, z1, { e: "doorDark", all: null });
+    G.box(0.11, 0, z0, 2, 0.03, z1, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
+  }
+  if (!o.none) room.warps.push({ test: (p, input) => (e ? p.x > W - 1.0 && input.right : p.x < 1.0 && input.left) && p.z > z0 && p.z < z1, to: o.to, spawn: o.spawn, fx: "fade", why: e ? "east" : "west" });
+  room.item("Way through", "An open doorway in the " + (e ? "east" : "west") + " wall, a mat at its foot, its arrows pointing out. Walk " + (e ? "east" : "west") + " through it." + (o.choice ? " (In the game you're asked where to: ROUTE 28, or ROUTE 26 and JOHTO.)" : ""));
 }
 function wildGrass(room, x0, z0, x1, z1) {
   (room.grass || (room.grass = [])).push([x0, z0, x1, z1]);

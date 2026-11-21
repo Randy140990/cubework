@@ -106,8 +106,14 @@ public class Battle {
 	public Result result = Result.NONE;
 	/** Money won (when you beat a trainer, and from Pay Day), and the Pokémon you caught. */
 	public int prize, payDay;
-	/** The money you came in with, and what you lose if you black out (half, as in the games). */
+	/**
+	 * The money you came in with, and what you lose if you black out: as Let's Go (and the games since Diamond),
+	 * the level of your strongest POKéMON times 8 with no badges (16, 24, 36, 48, 64, 80, 100, 120 with more).
+	 */
 	public int purse, lost;
+	/** How many badges you have (for what a blackout costs). */
+	public int badges;
+	private static final int[] BLACKOUT = {8, 16, 24, 36, 48, 64, 80, 100, 120};
 	/** A battle you can lose without blacking out (your rival's first two): no money lost either. */
 	public boolean lenient;
 	public Mon caught;
@@ -1571,7 +1577,9 @@ public class Battle {
 			if (firstHealthy(mine) < 0) {
 				out.add(Event.text(playerName + " has no POKéMON left that can fight!"));
 				if (!lenient) {
-					lost = purse / 2;
+					int top = 1;
+					for (Mon x : mine) top = Math.max(top, x.level);
+					lost = Math.min(purse, BLACKOUT[Math.max(0, Math.min(8, badges))] * top);
 					if (lost > 0) {
 						out.add(new Event(Event.Kind.MONEY, 0, null, -lost, purse - lost));
 						out.add(Event.text(kind == Kind.TRAINER ? playerName + " paid " + money(lost) + " to the winner."

@@ -115,7 +115,13 @@ public final class Settings {
 		t.putInt("nights", nights());
 		t.putBoolean("seen", seen());
 		t.putBoolean("follow", follower());
+		t.putBoolean("cycle", cycle());
 		net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.insidethecube.retromon.game.Net.Act("prefs", t));
+	}
+
+	/** DAY AND NIGHT: the day goes by (1, the default) or it's held at half past ten in the morning (0). */
+	public static boolean cycle() {
+		return get("cycle", 1, 0, 1) == 1;
 	}
 
 	/** Nights: 0 dark (as Minecraft), 1 soft (the default: a blue, moonlit night you can see in), 2 bright. */

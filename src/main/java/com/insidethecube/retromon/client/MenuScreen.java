@@ -110,7 +110,8 @@ public class MenuScreen extends DeviceScreen {
 				else if (minecraft != null) minecraft.setScreen(new PokedexScreen(this));
 			}
 			case "MAP" -> {
-				if (minecraft != null) minecraft.setScreen(new TownMapScreen(this));
+				if (!ClientState.data.story.contains("townmap")) say(View.MENU, "You don't have a TOWN MAP yet.");
+				else if (minecraft != null) minecraft.setScreen(new TownMapScreen(this));
 			}
 			case "CLOTHES" -> {
 				if (minecraft != null) minecraft.setScreen(new ClothesScreen(this));
@@ -1046,52 +1047,14 @@ public class MenuScreen extends DeviceScreen {
 	private void drawMoves(GuiGraphics g, Mon mon) {
 		moveAt = Math.max(0, Math.min(mon.moves.size() - 1, moveAt));
 		float x0 = 720, y0 = 40 + 34, bw = 540, bh = 64;
+		for (int j = 0; j < mon.moves.size(); j++) if (vover(x0, y0 + j * (bh + 12), bw, bh)) moveAt = j;
+		// Every shadow first (0 6px 14px), then the bars, so one's shadow never shows through the next one's rim.
+		for (int j = 0; j < mon.moves.size(); j++) V.moveBarShadow(g, x0 - (j == moveAt ? 10 : 0), y0 + j * (bh + 12), bw, bh);
 		for (int j = 0; j < mon.moves.size(); j++) {
 			Move m = Move.get(mon.moves.get(j));
-			int c = Ui.typeColor(m.type()) | 0xFF000000;
-			String glyph = "glyph_" + m.type().name().toLowerCase(java.util.Locale.ROOT);
 			float y = y0 + j * (bh + 12);
-			if (vover(x0, y, bw, bh)) moveAt = j;
 			boolean on = j == moveAt;
-			float x = x0 - (on ? 10 : 0);
-			// Its shadow (0 6px 14px), and when it's the one you're on a pale halo 3px round it.
-			V.softShadow(g, x, y + 6, bw, bh, 14, 0x401E2854);
-			if (on) V.shape(g, x - 3, y - 3, bw + 6, bh + 6, 37, 15, 15, 37, 0x66FFFFFF, 0, 0);
-			V.shape(g, x, y, bw, bh, 34, 12, 12, 34, new float[] {0, 0.55F, 1}, new int[] {Ui.lighter(c, 0.3F), c, Ui.darker(c, 0.85F)}, 3, on ? 0xFFFFFFFF : 0xBFFFFFFF);
-			// Inside the border: the type's mark faint behind, the PP cap (slanted 18 degrees, dark, a pale edge).
-			float ix = x + 3, iy = y + 3, iw = bw - 6, ih = bh - 6;
-			g.enableScissor(Math.round(V.x(ix)), Math.round(V.y(iy)), Math.round(V.x(ix + iw)), Math.round(V.y(iy + ih)));
-			V.icon(g, glyph, ix + iw - 118 - 92, iy - 14, 92, 0x47FFFFFF);
-			g.disableScissor();
-			float lean = ih / 2 * (float) Math.tan(Math.toRadians(18)), capL = ix + iw + 16 - 132, capR = ix + iw - 9;
-			int cap = 0xB3181E38;
-			V.polySmooth(g, new float[] {capL + 3 + lean, iy, capR, iy, capR, iy + ih, capL + 3 - lean, iy + ih}, cap);
-			V.shape(g, capR, iy, 9, ih, 0, 9, 9, 0, cap, 0, 0);
-			V.polySmooth(g, new float[] {capL + lean, iy, capL + 3 + lean, iy, capL + 3 - lean, iy + ih, capL - lean, iy + ih}, 0x8CFFFFFF);
-			int left = j < mon.pp.size() ? mon.pp.get(j) : m.pp();
-			String ppn = String.valueOf(left), ppt = "/" + m.pp();
-			float rx = ix + iw - 18, cy = y + bh / 2;
-			V.text(g, ppt, rx - V.width(ppt, 18, true), V.capsTop(cy, 18), 18, 0xD9FFFFFF, true);
-			float pw2 = V.width(ppn, 26, true);
-			V.text(g, ppn, rx - V.width(ppt, 18, true) - 6 - pw2, V.capsTop(cy, 26), 26, 0xFFFFFFFF, true);
-			V.text(g, "PP", rx - V.width(ppt, 18, true) - 6 - pw2 - 6 - V.width("PP", 13, true), V.capsTop(cy, 13), 13, 0xBFFFFFFF, true);
-			// At the left: its mark in a white circle, its type on a tag, its name.
-			float ccx = ix + 6 + 26;
-			V.ellipse(g, ccx, cy + 2, 26, 26, 0x26000000);
-			V.ellipse(g, ccx, cy, 26, 26, 0xFFFFFFFF);
-			V.icon(g, glyph, ccx - 17, cy - 17, 34, Ui.darker(c, 0.9F));
-			String tn = m.type().label.toUpperCase();
-			float tw = V.trackedWidth(tn, 12, 1.5F) + 20, tagX = ix + 6 + 52 + 10;
-			V.rr(g, tagX, cy - 10, tw, 20, 7, Ui.darker(c, 0.7F));
-			V.tracked(g, tn, tagX + 10, V.capsTop(cy, 12), 12, 0xFFFFFFFF, 1.5F);
-			V.title(g, m.name(), tagX + tw + 10, V.capsTop(cy, 26) + 2, 26, 0x38000000);
-			V.title(g, m.name(), tagX + tw + 10, V.capsTop(cy, 26), 26, 0xFFFFFFFF);
-			// The white arrow at the one you're on.
-			if (on) {
-				V.tri(g, x - 40 + 19, y + 32 + 3, 40, 0, 0x591E2854);
-				V.tri(g, x - 40 + 19, y + 32, 40, 0, 0xFFFFFFFF);
-				V.tri(g, x - 40 + 18, y + 32, 20, 0, 0xFFDDE3EE);
-			}
+			V.moveBar(g, m, j < mon.pp.size() ? mon.pp.get(j) : m.pp(), x0 - (on ? 10 : 0), y, bw, bh, on);
 			int jj = j;
 			vhit(x0, y, bw, bh, () -> moveAt = jj);
 		}

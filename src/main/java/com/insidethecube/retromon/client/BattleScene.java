@@ -765,8 +765,12 @@ public final class BattleScene {
 
 	public static void cheer() {
 		if (!active) return;
-		cheerTicks = cheerMax = 52;
+		// (Again, a level up say: it carries on from where it is, in front of yours, rather than swinging round again.)
+		if (!celebrated) cheerTicks = cheerMax = 52;
+		else cheerTicks = Math.max(cheerTicks, cheerMax / 2);
 		celebrated = true;
+		// In a hall (the lab's) you're not in the picture while it's fought; as it turns round to yours, there you are.
+		if (hero != null) hero.setInvisible(false);
 		MonDisplay d = display(0);
 		if (d != null) {
 			d.cheer = MonDisplay.CHEER;

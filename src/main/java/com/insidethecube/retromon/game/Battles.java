@@ -88,6 +88,7 @@ public final class Battles {
 	private static void begin(ServerPlayer p, Session s, String music) {
 		ON.put(p.getUUID(), s);
 		s.battle.purse = Game.data(p).money;
+		s.battle.badges = Game.data(p).badges.size();
 		s.battle.lenient = s.trainer != null && (s.trainer.key().equals("rival_lab") || s.trainer.key().equals("rival_22") || s.trainer.key().equals("rocket_viridian"));
 		List<Event> ev = s.battle.start();
 		CompoundTag t = turn(s, ev);
@@ -187,6 +188,7 @@ public final class Battles {
 					d.beaten.add("rival_lab");
 					d.healAll();
 					after.addAll(Game.fill(p, List.of("{rival}: Yeah! Am I great or what?", "{rival}: Okay! I'll make my POKéMON fight to toughen it up!",
+							"{rival}: And you'd better get out there and start your own adventure, {player}!",
 							"{player}! Gramps! Smell ya later!", "OAK: Your POKéMON look tired. Here, let me heal them for you.")));
 				} else {
 					d.money = Math.max(0, d.money - b.lost);

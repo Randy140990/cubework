@@ -209,7 +209,9 @@ public class Npc extends PathfinderMob {
 			boolean upDown = facing.equals("up_down"), leftRight = facing.equals("left_right");
 			int dx = upDown ? 0 : random.nextInt(7) - 3, dz = leftRight ? 0 : random.nextInt(7) - 3;
 			if (dx == 0 && dz == 0) return;
-			walkTo(home.offset(dx, 0, dz), Float.NaN);
+			BlockPos to = home.offset(dx, 0, dz);
+			if (!level().getEntitiesOfClass(Npc.class, new net.minecraft.world.phys.AABB(to.getX(), to.getY(), to.getZ(), to.getX() + 1, to.getY() + 2, to.getZ() + 1).inflate(2.5), o -> o != this).isEmpty()) return;
+			walkTo(to, Float.NaN);
 		} else if (facing.equals("any_dir") || facing.equals("none")) {
 			// Stands still, but looks about now and then.
 			if (random.nextInt(3) == 0) setFacing(random.nextInt(4) * 90F);

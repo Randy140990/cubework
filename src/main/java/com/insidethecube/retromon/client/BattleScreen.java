@@ -337,6 +337,13 @@ public class BattleScreen extends GameScreen {
 					d.species = sd.species;
 					d.size = d.sizeOld = 0;
 					d.sizeTarget = 0;
+					// The next one out is up on its feet (the one before fainted and was lying there).
+					d.down = false;
+					d.faint = 0;
+					d.action = null;
+					d.actionAge = 0;
+					d.red = 0;
+					d.cheer = 0;
 				}
 				// Yours (and a trainer's) come out of a ball; a wild one is just there.
 				if (e.side() == 0 || !kind.equals("WILD")) {
@@ -1262,35 +1269,17 @@ public class BattleScreen extends GameScreen {
 		Mon mon = me();
 		if (mon == null) return;
 		int n = mon.moves.size();
-		// Rows 50.6 tall (3px rim, 8px padding, a 21px line), 10 apart, from 420 down; the card above from 230.
-		float X = 830, W = 410, Y = 420, RH = 50.6F, STEP = 60.6F;
+		// As the summary's MOVES (Let's Go's battle has the same bars): each a bar in its type's colour with its type's
+		// full name on a tag and its PP on the dark cap, the one you're on lifted out with the white arrow. 54 tall, 10
+		// apart, from 420 down; the card above from 230.
+		float X = 830, W = 410, Y = 420, RH = 54, STEP = 64;
+		for (int i = 0; i < n; i++) if (vover(X, Y + i * STEP, W, RH)) fightAt = i;
+		for (int i = 0; i < n; i++) V.moveBarShadow(g, X - (i == fightAt ? 8 : 0), Y + i * STEP, W, RH);
 		for (int i = 0; i < n; i++) {
 			float y = Y + i * STEP;
 			Move mv = Move.get(mon.moves.get(i));
-			if (vover(X, y, W, RH)) fightAt = i;
 			boolean on = i == fightAt;
-			int col = Ui.typeColor(mv.type()), pp = mon.pp.get(i);
-			if (on) {
-				// Pale cream with a white rim.
-				V.pill(g, X, y, W, RH, 0xFFFFFFFF);
-				V.pill(g, X + 3, y + 3, W - 6, RH - 6, 0xFFFFF4D8);
-			} else {
-				// The type's colour fading into deep teal six tenths along, under a see-through mint rim (3px).
-				int[] cols = {col, 0xF2123C38, 0xF2123C38};
-				V.rrh(g, X, y, W, RH, RH / 2, new float[] {0, 0.6F, 1}, cols);
-				V.pill(g, X, y, W, RH, 0x668FF5C0);
-				V.rrh(g, X + 3, y + 3, W - 6, RH - 6, (RH - 6) / 2, new float[] {0, (0.6F * W - 3) / (W - 6), 1}, cols);
-			}
-			// Its type's first three letters on a chip (g-type: 11px, 1px apart, 44 wide at least), its name, its PP.
-			String type = mv.type().label.toUpperCase();
-			String t3 = type.length() > 3 ? type.substring(0, 3) : type;
-			float tw = V.trackedWidth(t3, 11, 1), cw = Math.max(44, tw + 16), ch = 19, cy = y + (RH - ch) / 2;
-			V.pill(g, X + 13, cy, cw, ch, col);
-			V.tracked(g, t3, X + 13 + (cw - tw) / 2, V.capsTop(cy + ch / 2, 11), 11, 0xFFFFFFFF, 1);
-			int tc = on ? V.INK : 0xFFFFFFFF;
-			float ty = V.capsTop(y + RH / 2, 21);
-			V.text(g, mv.name(), X + 13 + cw + 12, ty, 21, tc, true);
-			V.right(g, pp + "/" + mv.pp(), X + W - 21, ty, 21, tc, true);
+			V.moveBar(g, mv, mon.pp.get(i), X - (on ? 8 : 0), y, W, RH, on);
 			int idx = i;
 			vhit(X, y, W, RH, () -> pickMove(idx));
 		}

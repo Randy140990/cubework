@@ -48,6 +48,10 @@ public final class Adventure {
 	/** Ticks till the talking camera lets go (it holds a moment, so one conversation straight after another doesn't bounce). */
 	private static int focusRelease;
 
+	/** The nurse's machine is healing: the camera eases up to see its big screen (and back after). */
+	public static boolean healView;
+	private static double healIn;
+
 	public static void focus(int entityId) {
 		if (entityId < 0) {
 			if (focusId >= 0) focusRelease = 12;
@@ -133,6 +137,11 @@ public final class Adventure {
 		if (mc.screen != null) return false;
 		int k = e.key();
 		if (k == GLFW.GLFW_KEY_ESCAPE || k == GLFW.GLFW_KEY_F1 || k == GLFW.GLFW_KEY_F2 || k == GLFW.GLFW_KEY_F11) return false;
+		// Lightlens (recording and photos: F10, F12 and its GIF key) works in the game too, as do F10 and F12 for any
+		// recording mod: Minecraft has nothing on them.
+		if (k == GLFW.GLFW_KEY_F10 || k == GLFW.GLFW_KEY_F12) return false;
+		for (KeyMapping m : mc.options.keyMappings)
+			if (m.getName().startsWith("key.lightlens") && m.matches(e)) return false;
 		var o = mc.options;
 		for (KeyMapping m : new KeyMapping[] {o.keyUp, o.keyDown, o.keyLeft, o.keyRight, o.keyJump, o.keyShift, o.keySprint, START, SPEED, TOGGLE, o.keyScreenshot,
 				o.keyFullscreen})
@@ -221,17 +230,15 @@ public final class Adventure {
 		// less, so it doesn't end up looking at the floor.)
 		double near = room != null ? Math.min(13, far * 0.8) : 13;
 		double dist = far + (near - far) * k, pitchDeg = PITCH - (room != null ? 7 : 12) * k;
-		double[] at = camAt(target, dist, pitchDeg);
-		// Even so, never inside something: pulled in in front of whatever's in the way.
-		if (room == null && focusIn > 0.01 && e.level() != null) {
-			Vec3 c = new Vec3(at[0], at[1], at[2]);
-			var hit = e.level().clip(new net.minecraft.world.level.ClipContext(target, c, net.minecraft.world.level.ClipContext.Block.VISUAL,
-					net.minecraft.world.level.ClipContext.Fluid.NONE, e));
-			if (hit.getType() != net.minecraft.world.phys.HitResult.Type.MISS && focusRoom < 0.5) {
-				double d = Math.max(4, hit.getLocation().distanceTo(target) - 0.6);
-				if (d < dist) at = camAt(target, dist + (d - dist) * focusIn, pitchDeg);
-			}
+		// Healing: up and in towards the machine's screen on the back wall (and down again after).
+		healIn += ((healView && room != null ? 1 : 0) - healIn) * ease;
+		if (healIn > 0.002) {
+			target = target.add(0, 1.9 * healIn, -2.0 * healIn);
+			pitchDeg -= 12 * healIn;
 		}
+		// (Where the closer camera would be in something, it stays up and back as it was: focusRoom. It used to pull
+		// in in front of whatever was in the way, which put it almost on the ground by a tree in VIRIDIAN.)
+		double[] at = camAt(target, dist, pitchDeg);
 		return lastPose = new double[] {at[0], at[1], at[2], YAW, (float) pitchDeg};
 	}
 

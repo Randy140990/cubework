@@ -495,9 +495,15 @@ public final class Scenes {
 
 	/** walk: it walks on the spot (the summary's, as the party's one does), turned a little towards you, not swinging. */
 	public static void modelBare(GuiGraphics g, float secs, String species, double side, boolean walk) {
+		modelBare(g, secs, species, side, walk, 0);
+	}
+
+	/** lift: how far up the screen to stand it (canvas pixels), clear of what's in front (the starter's balls). */
+	public static void modelBare(GuiGraphics g, float secs, String species, double side, boolean walk, float lift) {
 		BedrockModel.Def def = BedrockModel.def(species);
 		double h = Math.max(0.6, def == null ? 1 : def.height), l = Math.max(0.6, h), d = Math.max(Math.max(h * 3.1, l * 2.3), 3.8);
-		Cam cam = new Cam().look(side, h * 0.62 + d * 0.16, d, side, h * 0.5, 0);
+		double rise = lift * d / (V.H / 2 / Math.tan(Math.toRadians(17)));
+		Cam cam = new Cam().look(side, h * 0.62 + d * 0.16 - rise, d, side, h * 0.5 - rise, 0);
 		blob(g, cam, 0, 0, Math.max(0.4, l * 0.4), 150);
 		Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
 		if (walk) place(b, cam, null, species, 0, 0, 0, Math.PI - 0.55, secs).pose("walk");
