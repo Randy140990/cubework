@@ -136,7 +136,7 @@ jobs:
         if: matrix.mods == 'shaders'
         shell: bash
         run: |
-          RUN=build/run/clientGameTest
+          RUN=ci-stage
           mkdir -p $RUN/mods $RUN/shaderpacks $RUN/config
           for p in sodium iris; do
             URL=$(curl -s "https://api.modrinth.com/v2/project/$p/version?game_versions=%5B%221.21.11%22%5D&loaders=%5B%22fabric%22%5D" \

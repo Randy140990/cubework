@@ -46,6 +46,18 @@ loom {
 	}
 }
 
+// The in-game test with shaders: CI downloads Sodium, Iris and Tempered Light into ci-stage/ (mods, shaderpacks,
+// config); they're copied in after the test's run folder is wiped and before the game starts (as in Lightreel).
+tasks.register("stageTestMods", Copy) {
+	from("ci-stage")
+	into("build/run/clientGameTest")
+	mustRunAfter("deleteGameTestRunDir")
+	onlyIf { file("ci-stage").exists() }
+}
+tasks.matching { it.name == "runClientGameTest" }.configureEach {
+	dependsOn("stageTestMods")
+}
+
 // The jar: Lightlens-0.1.0-for-MC1.21.11.jar
 remapJar {
 	archiveFileName = "Lightlens-${project.mod_version}-for-MC${project.minecraft_version}.jar"
