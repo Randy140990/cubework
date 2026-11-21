@@ -25,6 +25,17 @@ loom {
 	}
 }
 
+// In-game tests: a real client records, takes photos and checks the files (./gradlew runClientGameTest).
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "lightlens-gametest"
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}
+
 // The jar: Lightlens-0.1.0-for-MC1.21.11.jar
 remapJar {
 	archiveFileName = "Lightlens-${project.mod_version}-for-MC${project.minecraft_version}.jar"

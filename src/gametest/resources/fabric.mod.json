@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "lightlens-gametest",
+  "name": "Lightlens in-game tests",
+  "version": "1.0.0",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": ["com.lumenforge.lens.test.LensGameTest"]
+  },
+  "depends": { "lightlens": "*", "fabric-api": "*" }
+}

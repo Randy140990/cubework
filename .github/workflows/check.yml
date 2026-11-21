@@ -107,3 +107,73 @@ jobs:
           git add -f out
           git commit -m "Compile check for ${GITHUB_SHA}" > /dev/null
           git push -f origin HEAD:$BR
+
+  # A real 1.21.11 client records, takes photos and checks the files. Runs when the commit message has [ingame].
+  ingame:
+    if: contains(github.event.head_commit.message, '[ingame]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        mods: [vanilla, shaders]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: FFmpeg and a virtual screen
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg xvfb mesa-utils libgl1-mesa-dri
+      - name: Sodium, Iris and Tempered Light
+        if: matrix.mods == 'shaders'
+        shell: bash
+        run: |
+          RUN=build/run/clientGameTest
+          mkdir -p $RUN/mods $RUN/shaderpacks $RUN/config
+          for p in sodium iris; do
+            URL=$(curl -s "https://api.modrinth.com/v2/project/$p/version?game_versions=%5B%221.21.11%22%5D&loaders=%5B%22fabric%22%5D" \
+              | python3 -c "import json,sys; v=json.load(sys.stdin); f=[x for x in v[0]['files'] if x.get('primary')] or v[0]['files']; print(f[0]['url'])" || true)
+            echo "$p -> $URL"
+            if [ -n "$URL" ]; then curl -sL -o "$RUN/mods/$p.jar" "$URL"; fi
+          done
+          cp ci/Tempered-Light-*.zip $RUN/shaderpacks/
+          PACK=$(ls ci/Tempered-Light-*.zip | head -n 1 | xargs basename)
+          printf 'shaderPack=%s\nenableShaders=true\n' "$PACK" > $RUN/config/iris.properties
+          ls -la $RUN/mods
+      - name: Run the in-game test
+        shell: bash
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: |
+          chmod +x gradlew
+          mkdir -p ci-test
+          ./gradlew runClientGameTest --stacktrace 2>&1 | tee ci-test/gradle.txt; test ${PIPESTATUS[0]} -eq 0
+      - name: Save the results
+        if: always()
+        shell: bash
+        run: |
+          RUN=build/run/clientGameTest
+          mkdir -p /tmp/out/screenshots /tmp/out/captures
+          cp ci-test/gradle.txt /tmp/out/ 2>/dev/null || true
+          cp $RUN/logs/latest.log /tmp/out/latest.log 2>/dev/null || true
+          grep -h "lightlens-test\|Lightlens" $RUN/logs/latest.log > /tmp/out/summary.txt 2>/dev/null || true
+          grep -h "lightlens-test" ci-test/gradle.txt >> /tmp/out/summary.txt 2>/dev/null || true
+          cp $RUN/screenshots/*.png /tmp/out/screenshots/ 2>/dev/null || true
+          ls -laR $RUN/test-captures > /tmp/out/files.txt 2>/dev/null || true
+          ls -laR $RUN/lightlens >> /tmp/out/files.txt 2>/dev/null || true
+          find $RUN/test-captures -type f \( -name "*.jpg" -o -name "*.png" \) -size -12M -exec cp {} /tmp/out/captures/ \; 2>/dev/null || true
+          find $RUN/test-captures -type f -name "*.mp4" -size -40M -exec cp {} /tmp/out/captures/ \; 2>/dev/null || true
+          cp $RUN/crash-reports/*.txt /tmp/out/ 2>/dev/null || true
+          echo "${GITHUB_SHA}" > /tmp/out/commit.txt
+          git config user.name "lightlens-ci"
+          git config user.email "lightlens-ci@users.noreply.github.com"
+          git checkout --orphan ci-test-tmp
+          git rm -rf --cached . > /dev/null 2>&1 || true
+          rm -rf ci-test && mkdir ci-test && cp -r /tmp/out/. ci-test/
+          git add -f ci-test
+          git commit -m "In-game test (${{ matrix.mods }}) for ${GITHUB_SHA}" > /dev/null
+          git push -f origin HEAD:ci-test-lightlens-${{ matrix.mods }}
