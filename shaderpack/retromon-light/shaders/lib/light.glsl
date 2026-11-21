@@ -46,12 +46,12 @@ void skyLight(out vec3 direct, out vec3 ambient) {
     float day = smoothstep(-0.08, 0.22, h);
     float dusk = smoothstep(-0.10, 0.04, h) * (1.0 - smoothstep(0.04, 0.38, h));
     vec3 sun = mix(vec3(1.00, 0.95, 0.86) * 1.10, vec3(1.00, 0.58, 0.30) * 0.95, dusk) * SUN_STRENGTH;
-    vec3 moon = vec3(0.34, 0.52, 1.00) * 0.50 * NIGHT_BRIGHTNESS;
+    vec3 moon = vec3(0.36, 0.54, 1.00) * 0.58 * NIGHT_BRIGHTNESS;
     // The sun hands over to the moon at the horizon: dim through the swap, so the shadows don't jump.
     direct = mix(moon, sun, day) * smoothstep(0.0, 0.09, abs(h));
     vec3 dayAmb = vec3(0.52, 0.62, 0.76) * 0.84;
     vec3 duskAmb = vec3(0.64, 0.48, 0.54) * 0.50;
-    vec3 nightAmb = vec3(0.07, 0.14, 0.42) * 0.95 * NIGHT_BRIGHTNESS;
+    vec3 nightAmb = vec3(0.075, 0.145, 0.42) * 1.03 * NIGHT_BRIGHTNESS;
     ambient = mix(nightAmb, mix(dayAmb, duskAmb, dusk), day);
     direct *= 1.0 - 0.75 * rainStrength;
     ambient = mix(ambient, vec3(dot(ambient, vec3(0.333))) * 0.9, rainStrength * 0.6);

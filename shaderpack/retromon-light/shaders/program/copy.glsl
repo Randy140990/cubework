@@ -1,10 +1,12 @@
 // Retromon Light. Copyright (c) 2026 Insid3 Th3 Cub3. All rights reserved.
 // After everything solid is drawn and before any water: a copy of the picture, so the water can show what's
 // behind it (the bottom, bent by the waves and coloured by the depth) and mirror the world around it.
+// It goes in colortex4: Iris lets the world's own programs (the water among them) read only colortex4 and up;
+// colortex0 to 3 read there come back as the block atlas.
 
 /*
-const int colortex1Format = RGBA16F;
-const bool colortex1Clear = false;
+const int colortex4Format = RGBA16F;
+const bool colortex4Clear = false;
 */
 
 uniform sampler2D colortex0;
@@ -19,7 +21,7 @@ void main() {
 
 #ifdef FSH
 in vec2 texcoord;
-/* RENDERTARGETS: 1 */
+/* RENDERTARGETS: 4 */
 layout(location = 0) out vec4 outBehind;
 void main() {
     outBehind = vec4(texture(colortex0, texcoord).rgb, 1.0);

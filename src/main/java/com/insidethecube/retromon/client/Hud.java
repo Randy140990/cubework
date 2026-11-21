@@ -45,8 +45,11 @@ public final class Hud {
 	/** How long this fade lasts (ticks): a door's is quick; WAIT's is the viewer's (in, "Time passes...", out). */
 	private static int fadeLen = FADE;
 	private static final int WAIT_FADE = 56;
-	/** A door's iris (the viewer's): closing 0.55 s, black while the server moves you, opening 0.55 s. */
-	private static final int DOOR_FADE = 32;
+	/**
+	 * A door's iris (the viewer's): closing on you over 0.85 s right down to nothing, black while the server moves you,
+	 * opening round you over 0.7 s. CLOSED: the tick it's fully shut.
+	 */
+	private static final int DOOR_FADE = 42, CLOSED = 17;
 	/** What to do once it's faded back (WAIT: "It's morning now."). */
 	private static Runnable afterFade;
 
@@ -131,14 +134,14 @@ public final class Hud {
 			// is up and a moment after you're in (so the room's there), then opens round you; if the change came
 			// after it began to open, it shuts again first.
 			if (mc.level != doorLevel) {
-				if (doorLevel != null && fadeLen - fade > 11) fade = Math.max(fade, fadeLen - 13);
+				if (doorLevel != null && fadeLen - fade > CLOSED) fade = Math.max(fade, fadeLen - CLOSED - 2);
 				doorHold = 6;
 				doorLevel = mc.level;
 				darkAt = null;
 			}
 			// Black till you've actually been moved, so you never glimpse where you were (or the next room arriving)
 			// as it opens; then a moment for the new room to be drawn.
-			if (darkAt != null && fadeLen - fade >= 13) {
+			if (darkAt != null && fadeLen - fade >= CLOSED + 2) {
 				boolean moved = mc.player == null || mc.player.position().distanceToSqr(darkAt) > 2.5 * 2.5;
 				if (moved) {
 					darkAt = null;
@@ -147,7 +150,7 @@ public final class Hud {
 				else darkAt = null;
 			}
 			boolean loading = mc.level == null || mc.screen != null && !(mc.screen instanceof GameScreen) && !(mc.screen instanceof net.minecraft.client.gui.screens.PauseScreen);
-			if (fadeLen - fade >= 13 && (loading || doorHold > 0)) {
+			if (fadeLen - fade >= CLOSED + 2 && (loading || doorHold > 0)) {
 				hold = true;
 				if (!loading) doorHold--;
 			}
@@ -287,12 +290,22 @@ public final class Hud {
 		float t = fadeLen - fade + delta.getGameTimeDeltaPartialTick(true);
 		if (fadeWords.isEmpty()) {
 			// Through a door, as the games' iris: a circle closes in on you until it's black, the place changes,
-			// and the circle opens out again round you.
-			float secs = t / 20F, k = secs < 0.55F ? 1 - (float) Math.pow(secs / 0.55F, 1.6) : secs < 1.05F ? 0 : (float) Math.min(1, Math.pow((secs - 1.05F) / 0.55F, 0.8));
+			// and the circle opens out again round you (centred on you, wherever you are on the screen).
+			float close = CLOSED / 20F, open = 0.7F, dark = (fadeLen / 20F) - close - open;
+			float secs = t / 20F, k = secs < close ? 1 - (float) Math.pow(secs / close, 1.5) : secs < close + dark ? 0 : (float) Math.min(1, Math.pow((secs - close - dark) / open, 0.8));
 			V.fit(g.guiWidth(), g.guiHeight());
-			float r = k * 760, far = (float) Math.hypot(g.guiWidth(), g.guiHeight()) / V.s(1) + 40;
+			float ox = 640, oy = 360;
+			Minecraft mc = Minecraft.getInstance();
+			if (mc.player != null) {
+				float[] at = Adventure.project(mc.player.getPosition(delta.getGameTimeDeltaPartialTick(true)).add(0, 1.0, 0), g.guiWidth(), g.guiHeight());
+				if (at != null) {
+					ox = Math.max(0, Math.min(1280, V.vx(at[0])));
+					oy = Math.max(0, Math.min(720, V.vy(at[1])));
+				}
+			}
+			float far = (float) Math.hypot(g.guiWidth(), g.guiHeight()) / V.s(1) + 40, r = k * far;
 			if (r < 1) g.fill(0, 0, g.guiWidth(), g.guiHeight(), 0xFF000000);
-			else V.annulus(g, 640, 360, r, far, 0xFF000000, 0xFF000000);
+			else V.annulus(g, ox, oy, r, far * 2, 0xFF000000, 0xFF000000);
 			return;
 		}
 		// WAIT, as the viewer's: the screen dims (0.7 s), "Time passes..." comes up and goes, and it lightens again.

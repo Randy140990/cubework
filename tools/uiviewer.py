@@ -6,7 +6,7 @@ Viewer's world, figures and creatures (tools/interior/*), and the creatures' lig
 """
 import base64, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from interiorviewer import worldmap
+from interiorviewer import worldmap, packtex
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -132,7 +132,7 @@ def main():
     js = "\n".join(src(p) for p in shared + own)
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
-            + "const DATA = " + data + ";\nconst WORDMARK_OURS = " + json.dumps(wordmark_png()) + ";\nconst EMOTE = " + json.dumps(emote_pngs()) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst MAPDATA = " + json.dumps(mapdata(), separators=(",", ":")) + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
+            + "const DATA = " + data + ";\nconst WORDMARK_OURS = " + json.dumps(wordmark_png()) + ";\nconst EMOTE = " + json.dumps(emote_pngs()) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst MAPDATA = " + json.dumps(mapdata(), separators=(",", ":")) + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
             + engine() + "\n" + js + "\n</script>\n")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     open(out, "w").write(html)

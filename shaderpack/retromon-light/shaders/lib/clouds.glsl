@@ -12,9 +12,15 @@ float cloudNoise(vec2 p) {
     return mix(mix(cloudHash(i), cloudHash(i + vec2(1.0, 0.0)), f.x), mix(cloudHash(i + vec2(0.0, 1.0)), cloudHash(i + vec2(1.0, 1.0)), f.x), f.y);
 }
 
-// How much sun gets through the clouds at a point (world x, z): 1 in the clear, less under a cloud.
+// How much of a cloud is overhead at a point (world x, z): 0 in the clear, up to 1 under a thick one. Patches a
+// few dozen blocks across with soft edges, so from up above you always see a few drifting by.
+float cloudCover(vec2 xz, float t) {
+    vec2 p = (xz + vec2(t * 3.2, t * 1.3)) / 38.0;
+    float n = cloudNoise(p) * 0.60 + cloudNoise(p * 2.1 + vec2(7.1, 3.7)) * 0.28 + cloudNoise(p * 4.7 + vec2(1.3, 9.2)) * 0.12;
+    return smoothstep(0.44, 0.66, n);
+}
+
+// How much sun (or moon) gets through the clouds at a point: 1 in the clear, less under a cloud.
 float cloudShadow(vec2 xz, float t) {
-    vec2 p = (xz + vec2(t * 2.4, t * 1.0)) / 64.0;
-    float n = cloudNoise(p) * 0.62 + cloudNoise(p * 2.3 + vec2(7.1, 3.7)) * 0.28 + cloudNoise(p * 5.1 + vec2(1.3, 9.2)) * 0.10;
-    return 1.0 - smoothstep(0.50, 0.70, n) * CLOUD_SHADOWS;
+    return 1.0 - cloudCover(xz, t) * CLOUD_SHADOWS;
 }

@@ -12,7 +12,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
   const data = await p.evaluate(() => {
     const v = o => [o.x, o.y, o.z];
     const oface = Geo.prototype.face;
-    Geo.prototype.face = function (k, BL, R, U, w, h, n) { if (k && w > 0 && h > 0) (this._faces || (this._faces = [])).push({ k, bl: v(BL), r: v(R), u: v(U), w, h, n: n ? v(n) : null }); return oface.call(this, k, BL, R, U, w, h, n); };
+    Geo.prototype.face = function (k, BL, R, U, w, h, n, sub) { if (k && w > 0 && h > 0) (this._faces || (this._faces = [])).push({ k, bl: v(BL), r: v(R), u: v(U), w, h, n: n ? v(n) : null, sub: sub || null }); return oface.call(this, k, BL, R, U, w, h, n, sub); };
     const oscreen = Room.prototype.screen;
     Room.prototype.screen = function (key, w, h, draw, glow) { (this._screens || (this._screens = [])).push({ key, w, h, draw: draw.name }); return oscreen.call(this, key, w, h, draw, glow); };
     const oshell = window.shell; window.shell = function (room, o = {}) { room._floors = o.floorRects || [[0, 0, room.W, room.D]]; room._door = o.door || null; room._paper = o.paper; return oshell(room, o); };
@@ -32,7 +32,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
         id, name: R.name, floor: R.floor, W: R.W, D: R.D, H: R.H, faces, solids: R.solids, ramps,
         acts: R.acts.map(a => ({ rect: a.rect, label: a.label || "Look", lines: a.lines || null, ask: !!a.ask, pc: !!a.pc, hit: !!a.hit, map: !!a.map })),
         npcs: R.npcs.map(n => ({ name: n.name, x: n.x, z: n.z, yaw: n.yaw, seated: !!n.seated, skin: n.look && n.look.skin, role: n.role || null, key: n.key || null, lines: n.talk ? n.talk(null).map(l => l.text) : [] })),
-        spawn: R.spawn, floors: R._floors, door: R._door, pools: R.pools || [], Dm: R.Dm || R.D, mats: R._mats || [], passes: R._passes || [], sides: R._sides || [], grass: R.grass || [], stairs: R._stairs || [], screens: R._screens || [],
+        spawn: R.spawn, floors: R._floors, door: R._door, pools: R.pools || [], Dm: R.Dm || R.D, mats: R._mats || [], passes: R._passes || [], sides: R._sides || [], grass: R.grass || [], stairs: R._stairs || [], screens: R._screens || [], clocks: R.clocks || [],
       };
     }
     // Textures: each material's picture (screens as a strip of frames).
@@ -48,9 +48,9 @@ const { chromium } = require('playwright'); const fs = require('fs');
       } else m.png = pixTex(d.tex).image.toDataURL();
       mats[k] = m;
     }
-    // The light through the windows: the pools' pictures and the windows' at dusk and at night.
+    // The windows' pictures at dusk and at night (the light over the floor is worked out in the mod).
     const light = {};
-    for (const k of ["sunPool", "sunPoolSoft", "sunBeam", "windowDusk", "windowNight", "doorDusk", "doorNight"]) light[k] = pixTex(k).image.toDataURL();
+    for (const k of ["windowDusk", "windowNight", "doorDusk", "doorNight"]) light[k] = pixTex(k).image.toDataURL();
     return { rooms, mats, light };
   });
   fs.writeFileSync(out, JSON.stringify(data));

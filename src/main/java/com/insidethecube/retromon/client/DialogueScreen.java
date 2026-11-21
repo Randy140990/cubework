@@ -409,6 +409,9 @@ public class DialogueScreen extends GameScreen {
 	 * (as the UI Viewer's).
 	 */
 	private static void healScreen(GuiGraphics g, net.minecraft.world.phys.Vec3 n, float h, float secs) {
+		// Drawn on the screen itself, in the room (RoomLightRenderer), so it lies flat in the screen's frame.
+		RoomLightRenderer.healAt(n, h);
+		if (RoomLightRenderer.HEAL_IN_ROOM) return;
 		if (h <= 0 || h >= 1) return;
 		int w = g.guiWidth(), gh = g.guiHeight();
 		float[] tl = Adventure.project(n.add(-2.4, 3.85, 0.145 - 3.0), w, gh), br = Adventure.project(n.add(2.4, 2.55, 0.145 - 3.0), w, gh);

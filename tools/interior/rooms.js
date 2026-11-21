@@ -521,11 +521,11 @@ function glassTable(room, x0, z0, x1, z1, o = {}) {
 function palm(room, x, z, s = 1, o = {}) {
   const G = room.geo, p = 0.3 * s;
   G.box(x - p, 0, z - p, x + p, 0.5 * s, z + p, { all: "potWhite", top: "soil" });
-  G.box(x - p * 1.15, 0.42 * s, z - p * 1.15, x + p * 1.15, 0.5 * s, z + p * 1.15, "potWhite");
+  G.box(x - p * 1.15, 0.42 * s, z - p * 1.15, x + p * 1.15, 0.5 * s, z + p * 1.15, { all: "potWhite", top: "soil" });
   G.box(x - 0.05, 0.5 * s, z - 0.05, x + 0.05, 1.45 * s, z + 0.05, "walnut");
-  G.box(x - 0.8 * s, 1.2 * s, z - 0.02, x + 0.8 * s, 1.75 * s, z + 0.02, "leaf");
-  G.box(x - 0.02, 1.2 * s, z - 0.8 * s, x + 0.02, 1.75 * s, z + 0.8 * s, "leaf");
-  G.box(x - 0.28 * s, 1.35 * s, z - 0.28 * s, x + 0.28 * s, 1.62 * s, z + 0.28 * s, "leafSolid");
+  // Fronds from John's asset pack (its big fern's) out from the top in a star, a little crown of leaves in the middle.
+  for (const [w, d, h, y] of [[0.85, 0.05, 0.6, 1.1], [0.05, 0.85, 0.6, 1.1], [0.6, 0.6, 0.75, 0.95]]) cross(G, x, z, w * s, d * s, h * s, "fernTall", y * s - 0.5);
+  leafyBall(G, x, 1.35 * s, z, 0.22 * s, 0.22 * s, "leaf", "leafSolid");
   room.solid(x - p, z - p, x + p, z + p);
   room.act([x - p, z - p, x + p, z + p], { label: "Look", lines: o.lines || ["A palm in a round white pot."] });
   room.item("Palm", "Fronds on a slim trunk, in a round white pot.");
@@ -533,9 +533,8 @@ function palm(room, x, z, s = 1, o = {}) {
 function slimPlant(room, x, z, s = 1, o = {}) {
   const G = room.geo, p = 0.17 * s;
   G.box(x - p, 0, z - p, x + p, 0.85 * s, z + p, { all: "potWhite", top: "soil" });
-  G.box(x - 0.3 * s, 0.85 * s, z - 0.3 * s, x + 0.3 * s, 1.3 * s, z + 0.3 * s, "leafSolid");
-  G.box(x - 0.2 * s, 1.3 * s, z - 0.2 * s, x + 0.2 * s, 1.55 * s, z + 0.2 * s, "leafSolid");
-  G.box(x - 0.42 * s, 0.95 * s, z - 0.02, x + 0.42 * s, 1.35 * s, z + 0.02, "leaf");
+  leafyBall(G, x, 0.85 * s, z, 0.3 * s, 0.5 * s, "leaf", "leafSolid");
+  cross(G, x, z, 0.36 * s, 0.36 * s, 0.55 * s, "azaleaPlant", 0.45 * s);
   room.solid(x - p, z - p, x + p, z + p);
   room.act([x - p, z - p, x + p, z + p], { label: "Look", lines: o.lines || ["A slim plant in a tall white pot."] });
   room.item("Slim plant", "A small leafy bush in a tall, narrow white pot.");
@@ -738,9 +737,7 @@ function crossWindowN(R, x, y, w, h, lines) {
 function footstool(R, x, z, w = 0.9, d = 0.9, fab = "blueFabric") {
   const G = R.geo, a = w / 2, b = d / 2;
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const fx = x + sx * (a - 0.14), fz = z + sz * (b - 0.14); G.box(fx - 0.05, 0, fz - 0.05, fx + 0.05, 0.1, fz + 0.05, "steel"); }
-  G.box(x - a, 0.1, z - b + 0.07, x + a, 0.42, z + b - 0.07, fab);
-  G.box(x - a + 0.07, 0.1, z - b, x + a - 0.07, 0.42, z + b, fab);
-  R.solid(x - a, z - b, x + a, z + b);
+  pouf(R, x, z, Math.min(w, d), 0.1, 0.46, fab);
   R.act([x - a, z - b, x + a, z + b], { label: "Sit", lines: ["A padded footstool. Comfy enough for a short wait."] });
   R.item("Footstools", "Padded blue footstools on little steel feet, round the coffee tables.");
 }
@@ -764,14 +761,12 @@ function leagueStatue(R, x, z) {
   R.act([x - 0.6, z - 0.6, x + 0.6, z + 0.6], { label: "Look", lines: ["A statue of a POKé BALL on a stone pedestal.", "The plate reads: TO THE TRAINERS WHO CHALLENGE THE POKéMON LEAGUE."] });
   R.item("Ball statues", "Grey stone balls on tall grey pedestals, down both sides of the carpet.");
 }
-// A round bush with pink flowers (the League gate's, at the statues' feet).
+// A round bush with pink flowers (the League gate's, at the statues' feet): flowering azalea, from John's asset pack.
 function flowerBush(R, x, z, s = 1) {
-  const G = R.geo, a = 0.42 * s, b = 0.3 * s;
-  G.box(x - a, 0, z - b, x + a, 0.62 * s, z + b, "bushPink");
-  G.box(x - b, 0, z - a, x + b, 0.62 * s, z + a, "bushPink");
-  G.box(x - b, 0.62 * s, z - b, x + b, 0.8 * s, z + b, "bushPink");
+  const G = R.geo, a = 0.42 * s;
+  leafyBall(G, x, 0, z, a, 0.62 * s, "flowerLeaf", "flowerLeafSolid");
   R.solid(x - a, z - a, x + a, z + a);
-  R.item("Bushes", "Round green bushes dotted with pink flowers.");
+  R.item("Bushes", "Round flowering azalea bushes (John's asset pack's leaves), pink flowers among the green.");
 }
 // The Center's counter, curving round the nurse (stepped round, as a Minecraft build rounds one): its straight front
 // from cx-3 to cx+3, then stepping back to the wall either side.
@@ -904,7 +899,7 @@ const BUILD = {
     crossWindow(R, "e", 4.4, 1.5, 2.0, 1.4, ["Out of the window: Pallet Town's flowers, and the lab's roof past the trees."]);
     framed(R, 7.6, 1.8, 1.2, 0.9, "photos", "e", { act: { label: "Look", lines: ["You, Mum and a very small partner on the beach."] } });
     R.item("Photos", "Framed in walnut on the east wall.");
-    plant(R, 1.0, 10.0, 1.0); plant(R, 13.0, 10.0, 1.0);
+    plant(R, 1.0, 10.0, 1.0, { kind: "fern", lines: ["A big fern. Its fronds tickle as you go by."] }); plant(R, 13.0, 10.0, 1.0, { kind: "leafy", lines: ["A big-leafed plant. Mum wipes the leaves on Sundays."] });
     doormat(R, DOOR[0], DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHome" });
     R.npcs.push({ name: "Mum", x: 1.55, z: 4.4, yaw: FACE.w,
       look: { skin: "middle_aged_woman" },
@@ -1173,7 +1168,7 @@ const BUILD = {
       "A POKéMON CENTER puts every one of them right."];
     R.act([4.25, 0.5, 7.75, 1.2], { label: "Read", lines: board });
     crossWindowN(R, 1.0, 1.6, 2.0, 1.4, ["Outside: the POKéMON CENTER's red roof."]);
-    bookshelf(R, 9.4, 0, "s", 2.1, 2.6, { wood: "mcDarkOak", drawers: true, lines: ["Books on POKéMON: TYPES, MOVES, and HOW TO CARE FOR YOUR FIRST POKéMON.", "The drawers along the bottom are full of chalk."], name: "Bookcase", note: "Solid dark wood, books on its shelves, drawers along the bottom." });
+    bookshelf(R, 9.4, 0, "s", 2.1, 2.6, { wood: "darkWood", drawers: true, lines: ["Books on POKéMON: TYPES, MOVES, and HOW TO CARE FOR YOUR FIRST POKéMON.", "The drawers along the bottom are full of chalk."], name: "Bookcase", note: "Solid dark wood, books on its shelves, drawers along the bottom." });
     framed(R, 2.4, 1.7, 1.2, 0.9, "painting", "w", { act: { label: "Look", lines: ["A painting of the sea south of PALLET TOWN."] } });
     framed(R, 4.6, 1.7, 1.2, 0.9, "paintingHills", "w", { act: { label: "Look", lines: ["A painting of the hills round VIRIDIAN CITY."] } });
     R.item("Pictures", "Two paintings on the left-hand wall.");

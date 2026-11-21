@@ -177,11 +177,13 @@ const OPTS = [
   ["POKéMON LOOK", "look", ["COBBLEMON", "RETROMON"], "COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures."],
   ["SHADERS", "shaders", ["OFF", "RETROMON"], "RETROMON is our own light: the sun moves with the day, soft shadows, swaying grass, blue nights and glowing lamps. OFF is Minecraft's own."],
   ["DAY AND NIGHT", "cycle", ["ON", "OFF"], "ON lets the day go by, morning to night. OFF holds it at half past ten in the morning (the day count waits too)."],
+  ["BATTLES", "battles", ["ON", "OFF"], "OFF: no wild POKéMON jump out and trainers let you by, to look round quickly. Your rival's and TEAM ROCKET's battles still happen."],
+  ["FAST TRAVEL", "travel", ["OFF", "ON"], "ON: the TOWN MAP takes you anywhere. A on any place goes there, or right-click any spot on the map."],
 ];
 screen("options", "Start", "Options", {
   what: "Settings, a row each: left and right to change. What the row does is written at the top.",
-  mod: "OptionsPage (the title's OPTION and the menu's): TEXT SPEED, MUSIC, SOUND, POKéDEX VOICE, NIGHTS, WILD POKéMON, BATTLE EFFECTS, BATTLE STYLE, WALK WITH YOU, POKéMON LOOK, SHADERS, DAY AND NIGHT, CONTROLS.",
-  tags: ["New: sound, battle effects, battle style, controls"],
+  mod: "OptionsPage (the title's OPTION and the menu's): TEXT SPEED, MUSIC, SOUND, POKéDEX VOICE, NIGHTS, WILD POKéMON, BATTLE EFFECTS, BATTLE STYLE, WALK WITH YOU, POKéMON LOOK, SHADERS, DAY AND NIGHT, BATTLES, FAST TRAVEL, CONTROLS.",
+  tags: ["New: BATTLES (off for looking round quickly) and FAST TRAVEL (the TOWN MAP goes anywhere)"],
   make(arg) {
     swirlBackdrop("lime", { lx: 15, ly: 0 }); let sel = 0;
     const desc = box(170, 40, 940, 96, "g-panel", ""); desc.style.padding = "22px 30px"; desc.style.fontSize = "22px"; desc.style.fontWeight = "800";

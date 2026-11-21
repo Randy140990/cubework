@@ -116,7 +116,19 @@ public final class Settings {
 		t.putBoolean("seen", seen());
 		t.putBoolean("follow", follower());
 		t.putBoolean("cycle", cycle());
+		t.putBoolean("battles", battles());
+		t.putBoolean("travel", fastTravel());
 		net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.insidethecube.retromon.game.Net.Act("prefs", t));
+	}
+
+	/** BATTLES: on (1, the default), or off (0: no wild POKéMON or trainers battle you; the story's battles still happen). */
+	public static boolean battles() {
+		return get("battles", 1, 0, 1) == 1;
+	}
+
+	/** FAST TRAVEL: off (0, the default), or on (1: the TOWN MAP takes you anywhere on it). */
+	public static boolean fastTravel() {
+		return get("travel", 0, 0, 1) == 1;
 	}
 
 	/** DAY AND NIGHT: the day goes by (1, the default) or it's held at half past ten in the morning (0). */

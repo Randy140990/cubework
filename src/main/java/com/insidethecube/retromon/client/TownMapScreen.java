@@ -167,9 +167,24 @@ public class TownMapScreen extends DeviceScreen {
 		return d.badges.contains("THUNDERBADGE") && d.party.stream().anyMatch(m -> m.moves.contains("fly") && !m.fainted());
 	}
 
+	/** FAST TRAVEL (on in OPTIONS): straight to a point in the world (a pin's, or one picked on the map). */
+	private void travel(double x, double z) {
+		if (!Settings.fastTravel() || minecraft == null) return;
+		Sounds.press();
+		CompoundTag t = new CompoundTag();
+		t.putInt("x", (int) Math.floor(x));
+		t.putInt("z", (int) Math.floor(z));
+		ClientPlayNetworking.send(new Net.Act("travel", t));
+		minecraft.setScreen(null);
+	}
+
 	private void fly() {
 		if (P.isEmpty()) return;
 		Pin p = P.get(sel);
+		if (Settings.fastTravel()) {
+			travel(p.x() + 0.5, p.z() + 0.5);
+			return;
+		}
 		String place = p.kind().equals("town") ? flyPlace(p.key()) : null;
 		if (place == null || !canFly() || minecraft == null) return;
 		Sounds.press();
@@ -358,6 +373,12 @@ public class TownMapScreen extends DeviceScreen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		// FAST TRAVEL: right-click any spot on the map to go there.
+		if (event.button() == 1 && Settings.fastTravel() && inMap(event.x(), event.y())) {
+			float vx = V.vx(event.x()) - MX, vy = V.vy(event.y()) - MY;
+			travel(cx + (vx - VW / 2) / zoom(), cz + (vy - VH / 2) / zoom());
+			return true;
+		}
 		if (event.button() == 0 && !overUi && inMap(event.x(), event.y())) {
 			dragging = true;
 			dragMoved = false;
@@ -798,9 +819,17 @@ public class TownMapScreen extends DeviceScreen {
 				else V.centred(g, "?", wx + cell / 2, V.capsTop(wy + cell / 2, 26), 26, V.DIM, true);
 			}
 		}
-		// The foot: FLY HERE, or not been yet; where it is.
+		// The foot: FLY HERE, or not been yet; where it is. (With FAST TRAVEL, GO HERE on every place.)
 		float fy = bottom + 12;
-		if (town) {
+		if (Settings.fastTravel()) {
+			float bh = 43;
+			V.softShadow(g, px, fy + 3, cw, bh, 8, 0x4DE8961E);
+			V.pill(g, px, fy, cw, bh, 0xFFFFFFFF);
+			V.rrv(g, px + 2, fy + 2, cw - 4, bh - 4, (bh - 4) / 2, V.SEL_TOP, V.SEL_BOTTOM);
+			V.centred(g, Lang.t("A: GO HERE"), px + cw / 2, V.capsTop(fy + bh / 2, 17), 17, V.INK, false);
+			vhit(px, fy, cw, bh, this::fly);
+			fy += bh + 8;
+		} else if (town) {
 			boolean ok = seen && canFly();
 			float bh = 43;
 			if (ok) {

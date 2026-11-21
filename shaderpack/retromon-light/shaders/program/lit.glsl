@@ -131,13 +131,17 @@ void main() {
     #else
     float sunlit = NdotL;
     #endif
+    // Under a passing cloud, less sun (or moon), and a little less of the sky's light: its shadow drifting over
+    // the land by day and by night.
+    float cover = 0.0;
     #ifndef CLOUDS
-    // Under a passing cloud, less sun (its shadow drifting over the land).
     vec3 cloudAt = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz + cameraPosition;
-    sunlit *= cloudShadow(cloudAt.xz, frameTimeCounter);
+    cover = cloudCover(cloudAt.xz, frameTimeCounter) * CLOUD_SHADOWS;
+    sunlit *= 1.0 - cover;
     #endif
     vec3 skyPart, lampPart;
     worldLight(n, lm, sunlit, skyPart, lampPart);
+    skyPart *= 1.0 - 0.16 * cover;
     // Night vision: Retromon lifts it a little as night falls (OPTION's NIGHTS says how much), so here it brings
     // in more of the night's blue light rather than turning everything grey. Rooms are lit as they are.
     skyPart += vec3(0.14, 0.22, 0.46) * nightVision * (0.35 + 0.65 * lm.y);
@@ -197,7 +201,7 @@ void main() {
             if (dT < 1.0) depth = mix(depth, distance(viewPos, bedT), 0.7);
             d1 = dT;
         }
-        vec3 behind = texture(colortex1, rUV).rgb;
+        vec3 behind = texture(colortex4, rUV).rgb;
 
         vec3 body;
         if (!below) {

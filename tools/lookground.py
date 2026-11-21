@@ -197,6 +197,37 @@ def recolour(src, ramp, keep=None):
 DRIP = [hexc(c) for c in ("#8A5F3A", "#A97C4C", "#C49A63", "#D9B47C", "#E8C892")]
 # Azalea leaves (Kanto's trees with the birch): Let's Go's bright tree greens, deep shade to sunlit yellow-green.
 AZALEA = [hexc(c) for c in ("#2F6A24", "#4C9330", "#6FB63C", "#94D14C", "#BCE56C")]
+# Fallen leaves: the trees' greens, a shade deeper (lying in the grass's shadow).
+LITTER = [hexc(c) for c in ("#2A5E22", "#40852B", "#5FA634", "#84C247", "#A9D961")]
+# Cobblestone (Route 1's steps): John's asset pack's cobbles in a light, warm grey (the ledges' and paths' family),
+# the gaps between them deeper; the mossy ones' moss in the grass greens.
+STONE = [hexc(c) for c in ("#5E5850", "#857D71", "#A8A091", "#C6BFAE", "#E0DAC9")]
+MOSS = [hexc(c) for c in ("#2E5E22", "#467F2C", "#63A23A", "#86C04C", "#A8D766")]
+PROPS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "art", "shards_props")
+
+
+def recolour_mossy(src):
+    """The mossy cobbles: the moss (the green pixels) on the grass greens, the stones on STONE, each by brightness."""
+    im = Image.open(src).convert("RGBA")
+    p = im.load()
+    w, h = im.size
+    green = lambda r, g, b: g > r + 6 and g > b + 10
+    lum = lambda r, g, b: 0.3 * r + 0.59 * g + 0.11 * b
+    sets = {True: [], False: []}
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = p[x, y]
+            if a: sets[green(r, g, b)].append(lum(r, g, b))
+    rng = {k: (min(v), max(v)) if v else (0, 255) for k, v in sets.items()}
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = p[x, y]
+            if not a: continue
+            k = green(r, g, b); lo, hi = rng[k]; ramp = MOSS if k else STONE
+            t = (lum(r, g, b) - lo) / max(1.0, hi - lo)
+            seg = t * (len(ramp) - 1); i = min(len(ramp) - 2, int(seg))
+            p[x, y] = rgb(*mix(ramp[i], ramp[i + 1], seg - i))[:3] + (a,)
+    return im
 
 
 # ---------- the rounded, tufted edges (CTM overlays, OptiFine's 17 tiles) ----------
@@ -359,6 +390,16 @@ def build(save):
     save("azalea_leaves", recolour(os.path.join(VANILLA, "textures/block/azalea_leaves.png"), AZALEA))
     pinkish = lambda r, g, b: r > g + 12
     save("flowering_azalea_leaves", recolour(os.path.join(VANILLA, "textures/block/flowering_azalea_leaves.png"), AZALEA, keep=pinkish))
+    # John's asset pack's cobblestone and mossy cobblestone (Route 1's steps, their slabs and stairs), and its fallen
+    # leaves (in the trees' greens, not tinted by the biome as Minecraft's are).
+    save("cobblestone", recolour(os.path.join(PROPS, "cobblestone.png"), STONE))
+    save("mossy_cobblestone", recolour_mossy(os.path.join(PROPS, "mossy_cobblestone.png")))
+    save("leaf_litter", recolour(os.path.join(PROPS, "leaf_litter.png"), LITTER))
+    for n in range(1, 5):
+        m = json.load(open(os.path.join(VANILLA, "models/block/template_leaf_litter_%d.json" % n)))
+        for el in m["elements"]:
+            for f in el["faces"].values(): f.pop("tintindex", None)
+        write_json("models/block/template_leaf_litter_%d.json" % n, m)
     write_repeat("grass_repeat", "grass_block", g64)
     write_repeat("moss_repeat", "moss_block moss_carpet", m64)
     write_repeat("powder_repeat", "green_concrete_powder", c64)
@@ -378,9 +419,11 @@ def build(save):
                                                      "west": carpet_face("west", [0, 15, 16, 16]), "east": carpet_face("east", [0, 15, 16, 16])}}]})
     # The edges: the moss's tufts onto the paths, the grass's onto the paths and the moss, their shadow on the paths.
     grassy = "grass_block green_concrete_powder"
-    write_overlay("path_shade", "dirt_path coarse_dirt rooted_dirt", "moss_block " + grassy, shade, tint=False)
-    write_overlay("moss_on_path", "dirt_path coarse_dirt rooted_dirt", "moss_block", lambda t: fringe(t, m16))
-    write_overlay("grass_on_path", "dirt_path coarse_dirt rooted_dirt", grassy, lambda t: fringe(t, g16))
+    # (The League gate's brick forecourt and its brown border take the grass's rounded edge too.)
+    paths = "dirt_path coarse_dirt rooted_dirt mud_bricks brown_concrete_powder"
+    write_overlay("path_shade", paths, "moss_block " + grassy, shade, tint=False)
+    write_overlay("moss_on_path", paths, "moss_block", lambda t: fringe(t, m16))
+    write_overlay("grass_on_path", paths, grassy, lambda t: fringe(t, g16))
     write_overlay("grass_on_moss", "moss_block", grassy, lambda t: fringe(t, g16))
     return {"g64": g64, "m64": m64, "c64": c64, "p64": p64}
 

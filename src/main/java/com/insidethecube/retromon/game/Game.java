@@ -1011,8 +1011,26 @@ public final class Game {
 	/** Each player's NIGHTS setting (0 dark, 1 soft, 2 bright), sent from their OPTION. */
 	private static final Map<UUID, Integer> NIGHTS = new HashMap<>();
 
+	/**
+	 * For looking round quickly (OPTIONS): BATTLES OFF (no wild POKéMON jump out, walking into one does nothing,
+	 * and trainers don't battle you; the story's battles, your rival's and TEAM ROCKET's, still happen), and FAST
+	 * TRAVEL (the TOWN MAP takes you anywhere on it).
+	 */
+	private static final java.util.Set<UUID> BATTLES_OFF = new java.util.HashSet<>(), FAST_TRAVEL = new java.util.HashSet<>();
+
+	public static boolean battlesOff(ServerPlayer p) {
+		return BATTLES_OFF.contains(p.getUUID());
+	}
+
+	/** A battle the story needs (your rival's, TEAM ROCKET's): it happens even with BATTLES OFF. */
+	static boolean storyBattle(Trainers.Trainer t) {
+		return t != null && (t.key().startsWith("rival") || t.key().startsWith("rocket"));
+	}
+
 	public static void nights(ServerPlayer p, CompoundTag t) {
 		NIGHTS.put(p.getUUID(), Math.max(0, Math.min(2, t.getIntOr("nights", 1))));
+		if (t.contains("battles")) { if (t.getBooleanOr("battles", true)) BATTLES_OFF.remove(p.getUUID()); else BATTLES_OFF.add(p.getUUID()); }
+		if (t.contains("travel")) { if (t.getBooleanOr("travel", false)) FAST_TRAVEL.add(p.getUUID()); else FAST_TRAVEL.remove(p.getUUID()); }
 		if (t.contains("seen")) SEEN.put(p.getUUID(), t.getBooleanOr("seen", true));
 		if (t.contains("follow")) FOLLOW_ON.put(p.getUUID(), t.getBooleanOr("follow", true));
 		if (t.contains("cycle")) CYCLE.put(p.getUUID(), t.getBooleanOr("cycle", true));
@@ -1125,7 +1143,7 @@ public final class Game {
 
 	/** Walking into a wild one you can see: the battle with exactly that one. */
 	private static boolean touchWild(ServerPlayer p) {
-		if (COOLDOWN.containsKey(p.getUUID()) || AFTER_BATTLE.containsKey(p.getUUID()) || !data(p).anyHealthy()) return false;
+		if (battlesOff(p) || COOLDOWN.containsKey(p.getUUID()) || AFTER_BATTLE.containsKey(p.getUUID()) || !data(p).anyHealthy()) return false;
 		// Only when you walk into it: standing still, one wandering by doesn't drag you into a battle.
 		Integer walked = WALKING.get(p.getUUID());
 		if (walked == null || p.level().getServer().getTickCount() - walked > 6) return false;
@@ -1412,7 +1430,7 @@ public final class Game {
 			}
 		}
 		if (d.repel > 0 && --d.repel == 0) message(p, List.of("REPEL's effect wore off."));
-		if (!d.started || !d.anyHealthy() || COOLDOWN.containsKey(p.getUUID()) || d.place.isEmpty()) return;
+		if (!d.started || !d.anyHealthy() || COOLDOWN.containsKey(p.getUUID()) || d.place.isEmpty() || battlesOff(p)) return;
 		// Seen in the grass (as Let's Go): you meet them by walking into them, not at random.
 		if (seenMode(p)) return;
 		boolean inGrass = grass(p.level().getBlockState(pos)) || grass(p.level().getBlockState(pos.above())) || Interiors.inGrass(p);
@@ -1973,7 +1991,7 @@ public final class Game {
 		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(11))) {
 			if (n.role() != Npc.TRAINER && n.role() != Npc.LEADER || n.approaching > 0 || n.talker != null) continue;
 			Trainers.Trainer t = Trainers.get(n.key());
-			if (t == null || t.sight() <= 0 || d.beaten.contains(t.key()) || !spots(n, p, t)) continue;
+			if (t == null || t.sight() <= 0 || d.beaten.contains(t.key()) || (battlesOff(p) && !storyBattle(t)) || !spots(n, p, t)) continue;
 			walkUp(p, n, t, spottedMusic(t), null);
 			return;
 		}
@@ -2379,11 +2397,11 @@ public final class Game {
 			}
 			case "battle" -> {
 				Trainers.Trainer tr = trainerFor(p, t.getStringOr("trainer", ""));
-				if (tr != null && !d.beaten.contains(tr.key()) && d.anyHealthy()) Battles.trainer(p, tr);
+				if (tr != null && !d.beaten.contains(tr.key()) && d.anyHealthy() && !(battlesOff(p) && !storyBattle(tr))) Battles.trainer(p, tr);
 			}
 			case "static" -> {
 				Trainers.Static st = Trainers.STATICS.get(t.getStringOr("static", ""));
-				if (st == null || d.statics.contains(st.id()) || !d.anyHealthy()) return;
+				if (st == null || d.statics.contains(st.id()) || !d.anyHealthy() || battlesOff(p)) return;
 				Battles.wild(p, new Mon(Species.get(st.species()), st.level(), RNG), st.id());
 			}
 			case "trade" -> {
@@ -2542,6 +2560,26 @@ public final class Game {
 		BlockPos at = spot(level, (z.x1() + z.x2()) / 2, (z.z1() + z.z2()) / 2, 16);
 		p.teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
 		enter(p, place);
+	}
+
+	/**
+	 * FAST TRAVEL (on in OPTIONS): straight to a point on the TOWN MAP (a place's pin, or anywhere you pick on it),
+	 * onto good ground there, out of a room if you're in one.
+	 */
+	public static void travel(ServerPlayer p, CompoundTag t) {
+		if (!FAST_TRAVEL.contains(p.getUUID()) || Battles.in(p) || !data(p).started) return;
+		ServerLevel world = p.level().getServer().overworld();
+		BlockPos at = spot(world, t.getIntOr("x", 0), t.getIntOr("z", 0), 24);
+		if (at == null) {
+			message(p, List.of("There's nowhere to land there."));
+			return;
+		}
+		if (p.level() != world) Interiors.jumpOut(p, world, at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+		else {
+			p.teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+			p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+		}
+		enter(p, placeAt(at.getX() + 0.5, at.getZ() + 0.5));
 	}
 
 	/** Your clothes, from the wardrobe. */

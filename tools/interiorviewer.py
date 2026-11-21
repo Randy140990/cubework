@@ -40,6 +40,18 @@ def worldmap():
     im = Image.open(os.path.join(HERE, "interior", "worldmap.png")).convert("RGB")
     return {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
 
+def packtex():
+    """The pictures from John's asset pack for the rooms' plants and pots (tools/propsart.py), as raw RGBA."""
+    import base64, glob
+    from PIL import Image
+    out = {}
+    for f in sorted(glob.glob(os.path.join(HERE, "art", "shards_props", "*.png"))):
+        n = os.path.splitext(os.path.basename(f))[0]
+        if n in ("cobblestone", "mossy_cobblestone", "leaf_litter"): continue
+        im = Image.open(f).convert("RGBA")
+        out[n] = {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
+    return out
+
 def engine():
     s = open(os.path.join(HERE, "monviewer.html")).read()
     a = s.index("// ---------- Molang")
@@ -53,7 +65,7 @@ def main():
     js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "figure.js", "creature.js", "rooms.js", "app.js"))
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
-            + "const DATA = " + data + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
+            + "const DATA = " + data + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
             + engine() + "\n" + js + "\n</script>\n")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     open(out, "w").write(html)

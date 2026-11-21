@@ -120,6 +120,13 @@ public class IntroScreen extends GameScreen {
 		mc.createWorldOpenFlows().openWorld(folder, () -> mc.setScreen(new IntroScreen(parent)));
 	}
 
+	/** Where you're arriving (a new game's PALLET TOWN, or where the save you continue was left). */
+	private static String arrivingAt = "PALLET TOWN";
+
+	private static String arrivingPlace() {
+		return arrivingAt == null || arrivingAt.isBlank() ? "PALLET TOWN" : arrivingAt.toUpperCase(java.util.Locale.ROOT);
+	}
+
 	/** When the game was set going (ms), so Minecraft's own loading screens show ours instead till you're in; or 0. */
 	private static long launchedAt;
 
@@ -154,13 +161,13 @@ public class IntroScreen extends GameScreen {
 		g.pose().translate(-V.x(cx), -V.y(top + 55));
 		V.icon(g, "icon_ball", cx - 55, top, 110);
 		g.pose().popMatrix();
-		String place = "PALLET TOWN";
+		String place = arrivingPlace();
 		float pw0 = V.titleTrackedWidth(place, 40, 4);
 		V.titleTracked(g, place, cx - pw0 / 2, V.capsTop(top + 110 + 22 + 30, 40), 40, 0xFFFFFFFF, 4);
 		float by = top + 110 + 22 + 60 + 22;
 		V.pill(g, cx - 260, by, 520, 18, V.TRACK);
 		V.rrh(g, cx - 258, by + 2, 516, 14, 7, new float[] {0, 1}, new int[] {0xFF4FB896, 0xFF8FF5C0});
-		V.centred(g, Lang.t("Arriving in PALLET TOWN..."), cx, by + 30, 15, 0xCCFFFFFF, false);
+		V.centred(g, Lang.t("Arriving in {0}...", place), cx, by + 30, 15, 0xCCFFFFFF, false);
 	}
 
 	public IntroScreen(Screen parent) {
@@ -696,6 +703,8 @@ public class IntroScreen extends GameScreen {
 		}
 		SlotInfo c = slotCards[i];
 		if (!replacing && !c.empty()) {
+			// The loading page names where this save is (not always PALLET TOWN).
+			arrivingAt = c.str("place", "PALLET TOWN");
 			load(c.folder().getFileName().toString());
 			return;
 		}
@@ -1053,6 +1062,7 @@ public class IntroScreen extends GameScreen {
 	}
 
 	private void newGame() {
+		arrivingAt = "PALLET TOWN";
 		Path map = bundledMap();
 		if (map == null) return;
 		int k = targetSlot >= 0 ? targetSlot : firstEmpty();
@@ -1539,7 +1549,7 @@ public class IntroScreen extends GameScreen {
 		g.pose().translate(-V.x(cx), -V.y(top + 55));
 		V.icon(g, "icon_ball", cx - 55, top, 110);
 		g.pose().popMatrix();
-		String place = "PALLET TOWN";
+		String place = arrivingPlace();
 		float pw0 = V.titleTrackedWidth(place, 40, 4);
 		V.titleTracked(g, place, cx - pw0 / 2, V.capsTop(top + 110 + 22 + 30, 40), 40, 0xFFFFFFFF, 4);
 		float pct = 0;

@@ -114,7 +114,7 @@ float caustics(vec3 worldPos) {
 
 #ifdef FSH
 uniform sampler2D depthtex1;
-uniform sampler2D colortex1;
+uniform sampler2D colortex4;
 uniform float viewWidth;
 uniform float viewHeight;
 uniform mat4 gbufferProjection;
@@ -158,7 +158,7 @@ vec4 waterMirror(vec3 viewPos, vec3 dir) {
             vec3 hs = viewToScreen(b);
             vec2 e = min(hs.xy, 1.0 - hs.xy);
             float fade = clamp(min(e.x, e.y) * 9.0, 0.0, 1.0) * clamp(float(28 - i) / 4.0, 0.0, 1.0);
-            return vec4(texture(colortex1, hs.xy).rgb, fade);
+            return vec4(texture(colortex4, hs.xy).rgb, fade);
         }
         prev = p;
         p += dir * stepLen;

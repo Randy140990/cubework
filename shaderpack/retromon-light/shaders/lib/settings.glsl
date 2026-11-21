@@ -28,6 +28,6 @@ const float ambientOcclusionLevel = 1.0;
 #define VIGNETTE 0.06 // [0.0 0.06 0.14 0.22]
 // The darks lifted a little (the newer games' bright, airy look), and clouds' shadows drifting over the land.
 #define LIFT 0.06 // [0.0 0.03 0.06 0.1]
-#define CLOUD_SHADOWS 0.4 // [0.0 0.2 0.4 0.6]
+#define CLOUD_SHADOWS 0.7 // [0.0 0.3 0.5 0.7 0.85]
 
 #define INFO 0 // [0]

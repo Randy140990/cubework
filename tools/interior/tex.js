@@ -25,6 +25,15 @@ class Pix {
   disc(cx, cy, rad, c, a = 1) { for (let j = Math.floor(cy - rad); j <= cy + rad; j++) for (let i = Math.floor(cx - rad); i <= cx + rad; i++) if ((i - cx) ** 2 + (j - cy) ** 2 <= rad * rad) this.set(i, j, c, a); }
   ring(cx, cy, rad, c, a = 1) { for (let t = 0; t < 64; t++) this.set(Math.round(cx + Math.cos(t / 64 * 6.283) * rad), Math.round(cy + Math.sin(t / 64 * 6.283) * rad), c, a); }
   text(s, x, y, c, a = 1) { let cx = x; for (const ch of s.toUpperCase()) { const g = FONT3[ch]; if (g) for (let j = 0; j < 5; j++) for (let i = 0; i < 3; i++) if (g[j * 3 + i] === "1") this.set(cx + i, y + j, c, a); cx += ch === " " ? 3 : 4; } return cx; }
+  // A picture from John's asset pack (PACKTEX), at x, y; f(r, g, b, a) may change each pixel.
+  pack(name, x = 0, y = 0, f) {
+    const t = PACKTEX[name], d = atob(t.d);
+    for (let j = 0; j < t.h; j++) for (let i = 0; i < t.w; i++) {
+      const o = (j * t.w + i) * 4; let c = [d.charCodeAt(o), d.charCodeAt(o + 1), d.charCodeAt(o + 2), d.charCodeAt(o + 3)];
+      if (f) c = f(c);
+      if (c[3]) this.set(x + i, y + j, c, c[3] / 255);
+    }
+  }
   canvas() { const cv = document.createElement("canvas"); cv.width = this.w; cv.height = this.h; cv.getContext("2d").putImageData(new ImageData(this.d, this.w, this.h), 0, 0); return cv; }
 }
 function textWidth(s) { let n = 0; for (const ch of s) n += ch === " " ? 3 : 4; return n - 1; }
@@ -138,10 +147,12 @@ const TEXDEF = {
   vent: [16, 16, (P, r) => { P.fill(hx("#B9C1BF"), 0.03, r); for (let y = 2; y < 16; y += 3) P.rect(1, y, 14, 1, hx("#7E8886")); }],
   mcGlass: [16, 16, (P, r) => { P.fill(hx("#DDEFF5"), 0.02, r); P.rect(0, 0, 16, 1, hx("#FFFFFF")); P.rect(0, 15, 16, 1, hx("#BFD6DD")); P.rect(0, 0, 1, 16, hx("#FFFFFF")); P.rect(15, 0, 1, 16, hx("#BFD6DD")); P.line(3, 6, 6, 3, hx("#FFFFFF")); P.line(3, 9, 9, 3, hx("#FFFFFF")); }],
 
-  oak: [32, 32, (P, r) => planks(P, r, C.oak, C.oakL, C.oakD, C.gap, 4, 16)],
-  walnut: [32, 32, (P, r) => planks(P, r, C.walnut, C.walnutL, C.walnutD, hx("#3E2614"), 4, 16)],
-  honey: [32, 32, (P, r) => planks(P, r, hx("#D8A866"), hx("#EDC88B"), hx("#B07E45"), hx("#7A5129"), 4, 32)],
-  pale: [32, 32, (P, r) => planks(P, r, hx("#E3C79A"), hx("#F1DDB8"), hx("#C4A472"), hx("#9C7C4E"), 4, 16)],
+  // Furniture woods: one smooth colour each (lacquered, no planks).
+  oak: [32, 32, (P, r) => P.fill(C.oak, 0.025, r)],
+  walnut: [32, 32, (P, r) => P.fill(C.walnut, 0.025, r)],
+  honey: [32, 32, (P, r) => P.fill(hx("#DDB37A"), 0.02, r)],
+  pale: [32, 32, (P, r) => P.fill(hx("#E6CDA4"), 0.02, r)],
+  darkWood: [32, 32, (P, r) => P.fill(hx("#4E3524"), 0.025, r)],
   oakFloor: [32, 32, (P, r) => planks(P, r, hx("#C99A5E"), hx("#E0B57A"), hx("#A5733F"), hx("#7A4E2A"), 8, 32)],
   honeyFloor: [32, 32, (P, r) => planks(P, r, hx("#D9AA68"), hx("#EDC88B"), hx("#B9894F"), hx("#86592F"), 8, 32)],
   paleFloor: [32, 32, (P, r) => planks(P, r, hx("#E2C899"), hx("#F1DDB8"), hx("#C9AB79"), hx("#A08256"), 8, 32)],
@@ -191,11 +202,24 @@ const TEXDEF = {
     const cols = [hx("#3F5F9E"), hx("#2E3F66"), hx("#C9524E"), hx("#E8E2D2")];
     for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = cols[(tx * 3 + ty) % 4]; for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) P.set(tx * 8 + x, ty * 8 + y, shadec(c, ((x + y) % 2 ? 0.03 : -0.03) + (x === 0 || y === 0 ? -0.12 : 0))); }
   }],
-  leaf: [16, 16, (P, r) => leaves(P, r, C.leaf, C.leafL, C.leafD, 0.14)],
-  leafSolid: [16, 16, (P, r) => leaves(P, r, C.leaf, C.leafL, C.leafD, 0)],
+  // Leaves from John's asset pack: the azalea's sprigs (cut out), solid over a deep green for a bush's inside.
+  leaf: [64, 64, P => P.pack("azalea_leaves")],
+  leafSolid: [64, 64, P => P.pack("azalea_leaves_solid")],
+  flowerLeaf: [64, 64, P => P.pack("flowering_azalea_leaves")],
+  flowerLeafSolid: [64, 64, P => P.pack("flowering_azalea_leaves_solid")],
+  azaleaPlant: [64, 64, P => P.pack("azalea_plant")],
+  fern: [64, 64, P => P.pack("fern")],
+  fernTall: [64, 64, P => P.pack("large_fern_top")],
+  // The big leaf turned four ways (its tip north, east, south, west), so a plant's leaves point out from its middle.
+  bigLeaf0: [64, 64, P => P.pack("big_leaf")],
+  bigLeaf1: [64, 64, P => { const Q = new Pix(64, 64); Q.pack("big_leaf"); for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) if (Q.alpha(x, y)) P.set(63 - y, x, Q.get(x, y), Q.alpha(x, y)); }],
+  bigLeaf2: [64, 64, P => { const Q = new Pix(64, 64); Q.pack("big_leaf"); for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) if (Q.alpha(x, y)) P.set(63 - x, 63 - y, Q.get(x, y), Q.alpha(x, y)); }],
+  bigLeaf3: [64, 64, P => { const Q = new Pix(64, 64); Q.pack("big_leaf"); for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) if (Q.alpha(x, y)) P.set(y, 63 - x, Q.get(x, y), Q.alpha(x, y)); }],
+  stem: [16, 16, (P, r) => P.fill(hx("#4F8A34"), 0.12, r)],
   treeLeaf: [16, 16, (P, r) => leaves(P, r, hx("#3F8A44"), hx("#6DBA5A"), hx("#255C2D"), 0)],
-  pot: [16, 16, (P, r) => { P.fill(C.terracotta, 0.06, r); P.rect(0, 0, 16, 2, shadec(C.terracotta, 0.15)); P.rect(0, 2, 16, 1, shadec(C.terracotta, -0.2)); }],
-  potWhite: [16, 16, (P, r) => { P.fill(hx("#EDEFF0"), 0.04, r); P.rect(0, 0, 16, 2, hx("#FFFFFF")); P.rect(0, 5, 16, 1, hx("#7FB9D8")); }],
+  // Pots from John's asset pack's flower pot: its smooth terracotta, and the same shading glazed white (a blue band).
+  pot: [20, 64, P => P.pack("pot")],
+  potWhite: [20, 64, P => { P.pack("pot_white"); for (let x = 0; x < 20; x++) for (const y of [18, 19, 20]) P.set(x, y, mixc(P.get(x, y), hx("#6FAED3"), 0.75)); }],
   soil: [16, 16, (P, r) => P.fill(hx("#5A3D27"), 0.2, r)],
   gold: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, mixc(C.goldL, C.gold, (Math.sin(x * 0.7 + y * 0.3) + 1) / 2 * 0.8 + r() * 0.2)); }],
   silver: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, mixc(hx("#F2F4F6"), hx("#A9B2BA"), (Math.sin(x * 0.7 + y * 0.3) + 1) / 2 * 0.8 + r() * 0.2)); }],
@@ -447,6 +471,11 @@ const TEXDEF = {
     P.disc(12, 14, 4, hx("#F08A3C")); P.line(8, 12, 2, 6, hx("#F08A3C")); P.line(16, 12, 22, 6, hx("#F08A3C")); P.line(2, 6, 7, 14, hx("#F08A3C")); P.line(22, 6, 17, 14, hx("#F08A3C"));
     P.line(12, 18, 12, 26, hx("#F08A3C")); P.set(11, 13, hx("#FFFFFF")); P.set(13, 13, hx("#FFFFFF"));
   }],
+  // The wall clock's dial: cream, a tick at every hour (longer at 12, 3, 6 and 9); its hands are drawn apart.
+  clockDial: [32, 32, (P, r) => {
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const d = Math.hypot(x - 15.5, y - 15.5); P.set(x, y, d > 15 ? hx("#E9DFC8") : shadec(hx("#FBF6EA"), -d / 15 * 0.06)); }
+    for (let t = 0; t < 12; t++) { const a = t / 12 * 6.283, L = t % 3 ? 1 : 2; for (let k = 0; k <= L; k++) P.set(Math.round(15.5 + Math.cos(a) * (13 - k)), Math.round(15.5 + Math.sin(a) * (13 - k)), hx("#5A4A3E")); }
+  }],
   clock: [16, 16, (P, r) => {
     P.disc(7.5, 7.5, 7.4, hx("#7C5134")); P.disc(7.5, 7.5, 6, hx("#FBF6EA"));
     for (let t = 0; t < 12; t++) P.set(Math.round(7.5 + Math.cos(t / 12 * 6.283) * 5), Math.round(7.5 + Math.sin(t / 12 * 6.283) * 5), hx("#5A4A3E"));
@@ -500,11 +529,8 @@ const TEXDEF = {
   // tints it). The door's has no cross.
   // The light through a window on the floor: a soft glow, no edge anywhere (it brightens smoothly from its rim to
   // its middle), drawn a block wider all round than where the window's light falls, so it spills softly past it.
-  sunPool: [128, 128, (P, r) => { const ss = t => t * t * (3 - 2 * t); for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) { const ex = ss(Math.min(1, Math.min(x, 127 - x) / 63.5)), ey = ss(Math.min(1, Math.min(y, 127 - y) / 63.5)); P.set(x, y, [255, 255, 255], Math.pow(ex * ey, 0.85)); } }],
   // A shaft of light from a window to the floor: brightest at the window, fading as it goes, soft at its sides.
   // The shaft in the air: faint, soft across its whole width, coming in from the window and gone by the floor.
-  sunBeam: [64, 128, (P, r) => { const ss = t => t * t * (3 - 2 * t); for (let y = 0; y < 128; y++) for (let x = 0; x < 64; x++) { const e = ss(Math.min(1, Math.min(x, 63 - x) / 28)), v = y / 127; P.set(x, y, [255, 255, 255], e * ss(Math.min(1, v / 0.12)) * Math.pow(1 - v, 1.6) * 0.8); } }],
-  sunPoolSoft: [128, 128, (P, r) => { const ss = t => t * t * (3 - 2 * t); for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) { const ex = ss(Math.min(1, Math.min(x, 127 - x) / 63.5)), ey = ss(Math.min(1, Math.min(y, 127 - y) / 63.5)); P.set(x, y, [255, 255, 255], Math.pow(ex * ey, 1.1)); } }],
   aoN: [4, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 4; x++) P.set(x, y, [0, 0, 0], 0.34 * Math.pow(1 - y / 15, 2)); }],
   aoW: [16, 4, (P, r) => { for (let y = 0; y < 4; y++) for (let x = 0; x < 16; x++) P.set(x, y, [0, 0, 0], 0.3 * Math.pow(1 - x / 15, 2)); }],
   aoE: [16, 4, (P, r) => { for (let y = 0; y < 4; y++) for (let x = 0; x < 16; x++) P.set(x, y, [0, 0, 0], 0.3 * Math.pow(x / 15, 2)); }],
@@ -512,6 +538,33 @@ const TEXDEF = {
   exitArrow: [16, 16, (P, r) => { for (let j = 0; j < 6; j++) for (let i = j; i < 11 - j; i++) P.set(i + 2, j + 5, [255, 255, 255], 0.85); }],
 };
 const texCache = {};
+// A cushion's top in a fabric: puffed (lighter in the middle, shading off to its edges) and tufted (creases in to the
+// button), stretched over the top; and a fabric a shade darker or lighter (its piping).
+function cushionTop(fab) {
+  const k = "top_" + fab;
+  if (MATDEF[k]) return k;
+  const base = TEXDEF[fab] ? (() => { const Q = new Pix(16, 16); TEXDEF[fab][2](Q, rng(1)); return Q.get(5, 5); })() : [200, 200, 200];
+  TEXDEF[k] = [32, 32, (P, r) => {
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+      const dx = (x - 15.5) / 16, dy = (y - 15.5) / 16, e = Math.max(Math.abs(dx), Math.abs(dy)), d = Math.hypot(dx, dy);
+      let c = shadec(base, 0.1 - e * e * 0.28 + ((x + y) % 2 ? 0.02 : -0.02) + (r() - 0.5) * 0.03);
+      // Creases from the corners in towards the button, and a dimple round it.
+      const diag = Math.min(Math.abs(dx - dy), Math.abs(dx + dy));
+      if (diag < 0.05 && d > 0.12 && d < 0.95) c = shadec(c, -0.12 * (1 - d));
+      if (d < 0.14) c = shadec(c, -0.1);
+      P.set(x, y, c);
+    }
+  }];
+  MATDEF[k] = { tex: k, fit: true };
+  return k;
+}
+function shadeMat(fab, s) {
+  const k = "shade_" + fab + "_" + s;
+  if (MATDEF[k]) return k;
+  TEXDEF[k] = [16, 16, (P, r) => { TEXDEF[fab][2](P, r); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(P.get(x, y), s)); }];
+  MATDEF[k] = { tex: k, per: 1 };
+  return k;
+}
 function pixTex(name) {
   if (texCache[name]) return texCache[name];
   const [w, h, draw] = TEXDEF[name];

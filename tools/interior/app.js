@@ -64,29 +64,34 @@ function renderMe() { const el = $("#meSeg"); if (el) setSeg(el, me.as); }
 const built = {};
 let room = null;
 function getRoom(id) { if (!built[id]) { const r = BUILD[id](); r.finish(); prepareRoom(r); built[id] = r; } return built[id]; }
-// The light through the windows: each pool a soft rect on the floor (over the carpets), placed and tinted by the time
-// of day; the windows' glass a sunset or a night sky.
+// The light through the windows: from each, the daylight spread in over the floor (over the carpets), strongest by
+// the window and fading with no edge, by the time of day; the windows' glass a sunset or a night sky.
 function makePools(r) {
   r.poolMeshes = (r.pools || []).map(p => {
-    const m = new THREE.MeshBasicMaterial({ map: pixTex(p[4] === 3 ? "sunPoolSoft" : "sunPool"), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), m);
-    mesh.rotation.x = -Math.PI / 2; mesh.renderOrder = 3; mesh.userData.pool = p; r.group.add(mesh);
-    // Its shaft from the window (rebuilt as the time changes).
-    const bm = new THREE.MeshBasicMaterial({ map: pixTex("sunBeam"), transparent: true, depthWrite: false, side: THREE.DoubleSide });
-    mesh.userData.beam = new THREE.Mesh(new THREE.BufferGeometry(), bm); mesh.userData.beam.renderOrder = 5; r.group.add(mesh.userData.beam);
+    const m = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const mesh = new THREE.Mesh(new THREE.BufferGeometry(), m);
+    mesh.renderOrder = 3; mesh.userData.pool = p; r.group.add(mesh);
     return mesh;
   });
 }
-function setBeam(beam, quads) {
-  const pos = [], uv = [], idx = [];
-  for (const q of quads) {
-    const b = pos.length / 3;
-    for (const [x, y, z, u, v] of q) { pos.push(x, y, z); uv.push(u, 1 - v); }
-    idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
+// The light's grid over the floor (washGrid and washAt, the mod's sums), as a mesh coloured point by point.
+function setWash(mesh, p, t, col) {
+  const g = washGrid(p, t.k, t.side, t.m);
+  mesh.visible = !!g;
+  if (!g) return;
+  const [a0, a1, d0, d1, na, nd, s] = g, peak = col[3] * 0.65 * s;
+  const pos = [], cols = [], idx = [];
+  for (let j = 0; j <= nd; j++) for (let i = 0; i <= na; i++) {
+    const a = a0 + (a1 - a0) * i / na, d = d0 + (d1 - d0) * j / nd, [x, z] = floorAt(p, a, d);
+    pos.push(x, 0.07, z); cols.push(col[0], col[1], col[2], washAt(p, a, d, t.k, t.side, t.m) * peak);
   }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
-  beam.geometry.dispose(); beam.geometry = g; beam.visible = quads.length > 0;
+  for (let j = 0; j < nd; j++) for (let i = 0; i < na; i++) {
+    const v = j * (na + 1) + i;
+    idx.push(v, v + na + 1, v + na + 2, v, v + na + 2, v + 1);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute("color", new THREE.Float32BufferAttribute(cols, 4)); geo.setIndex(idx);
+  mesh.geometry.dispose(); mesh.geometry = geo; mesh.material.side = THREE.DoubleSide;
 }
 function applyTime() {
   const t = TIMES[TOD];
@@ -99,21 +104,25 @@ function applyTime() {
   // An open way out's daylight (the League gate's): sunset light at evening, dark at night.
   const dm = matCache.doorLight;
   if (dm) { const tx = pixTex(t.m > 0.5 ? "doorNight" : t.k > 0.5 ? "doorDusk" : "doorLight"); dm.map = tx; dm.emissiveMap = tx; dm.color.setHex(0x1a1a1a); dm.needsUpdate = true; }
+  if (room) setClocks(room, t.clock);
   if (!room || !room.poolMeshes) return;
-  const [cr, cg, cb, ca, cs] = poolLight(t.k, t.m);
-  for (const mesh of room.poolMeshes) {
-    const q = poolRect(mesh.userData.pool, t.k, t.side, t.m);
-    mesh.visible = !!q;
-    setBeam(mesh.userData.beam, q ? beamQuads(mesh.userData.pool, q) : []);
-    if (!q) continue;
-    // (A block wider all round: the glow fades out past where the light falls.)
-    mesh.position.set((q[0] + q[2]) / 2, 0.07, (q[1] + q[3]) / 2); mesh.scale.set(q[2] - q[0] + 2, q[3] - q[1] + 2, 1);
-    mesh.material.color.setRGB(cr, cg, cb); mesh.material.opacity = ca * q[4];
-    const bm = mesh.userData.beam.material; bm.color.setRGB(cr, cg, cb); bm.opacity = cs * q[4];
-  }
+  const col = poolLight(t.k, t.m);
+  for (const mesh of room.poolMeshes) setWash(mesh, mesh.userData.pool, t, col);
+}
+// The wall clocks' hands: an hour hand and a minute hand each, turned to the time of day shown.
+function makeClocks(r) {
+  r.clockHands = (r.clocks || []).map(([x, y, z]) => {
+    const mk = (L, W, c) => { const m = new THREE.Mesh(new THREE.BoxGeometry(W, L, 0.012), new THREE.MeshLambertMaterial({ color: c })); m.geometry.translate(0, L / 2 - 0.02, 0); m.position.set(x, y, z + 0.006); r.group.add(m); return m; };
+    const pin = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.02), new THREE.MeshLambertMaterial({ color: 0xc9a23a })); pin.position.set(x, y, z + 0.016); r.group.add(pin);
+    return { h: mk(0.15, 0.035, 0x2b2420), m: mk(0.22, 0.025, 0x2b2420) };
+  });
+}
+function setClocks(r, hours) {
+  for (const c of r.clockHands || []) { c.h.rotation.z = -((hours % 12) / 12) * Math.PI * 2; c.m.rotation.z = -((hours % 1) * Math.PI * 2); }
 }
 function prepareRoom(r) {
   makePools(r);
+  makeClocks(r);
   r.npcFigs = r.npcs.map(n => {
     const f = makeFigure(n.look); f.root.position.set(n.x, 0, n.z); f.root.rotation.y = n.yaw; r.group.add(f.root);
     poseFigure(f, { seated: n.seated });

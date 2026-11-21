@@ -19,6 +19,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 public class RoomLight extends Entity {
 	/** The room's pools and windows (as Interiors reads them), and where this stands in the room (its middle). */
 	public List<double[]> pools = List.of(), panes = List.of();
+	/** Its wall clocks ([x, y, z]: the middle of each dial, on the north wall), whose hands keep the world's time. */
+	public List<double[]> clocks = List.of();
 	public double cx, cz;
 
 	public RoomLight(EntityType<?> type, Level level) {

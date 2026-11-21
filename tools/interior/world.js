@@ -15,7 +15,7 @@ const MATDEF = {
   steel: { tex: "steel", per: 1 }, plastic: { tex: "plastic", per: 1 }, greyPlastic: { tex: "greyPlastic", per: 1 }, sofa: { tex: "sofa", per: 1 }, sofaL: { tex: "sofaL", per: 1 },
   redFabric: { tex: "redFabric", per: 1 }, blueFabric: { tex: "blueFabric", per: 1 }, cushion: { tex: "cushion", per: 1 }, linen: { tex: "linen", per: 1 },
   quilt: { tex: "quilt", per: 1 }, quiltBlue: { tex: "quiltBlue", per: 1 }, leaf: { tex: "leaf", per: 1, cut: true }, leafSolid: { tex: "leafSolid", per: 1 }, treeLeaf: { tex: "treeLeaf", per: 2 },
-  pot: { tex: "pot", per: 1 }, potWhite: { tex: "potWhite", per: 1 }, soil: { tex: "soil", per: 1 }, gold: { tex: "gold", per: 1, shine: true }, silver: { tex: "silver", per: 1, shine: true },
+  pot: { tex: "pot", fit: true }, potWhite: { tex: "potWhite", fit: true }, soil: { tex: "soil", per: 1 }, gold: { tex: "gold", per: 1, shine: true }, silver: { tex: "silver", per: 1, shine: true },
   curtain: { tex: "curtain", per: 1 }, curtainBlue: { tex: "curtainBlue", per: 1 }, leather: { tex: "leather", per: 1 }, bark: { tex: "bark", per: 1 }, grass: { tex: "grass", per: 1 },
   path: { tex: "path", per: 1 }, stone: { tex: "stone", per: 1 }, siding: { tex: "siding", per: 1 }, labWall: { tex: "labWall", per: 1 }, roofRed: { tex: "roofRed", per: 1 },
   roofBlue: { tex: "roofBlue", per: 1 }, roofGrey: { tex: "roofGrey", per: 1 }, fence: { tex: "fence", per: 1 }, water: { tex: "water", per: 2 }, rubber: { tex: "rubber", per: 1 },
@@ -30,8 +30,16 @@ const MATDEF = {
   ball: { tex: "ball", fit: true }, ballTop: { tex: "ballTop", fit: true }, flowerTop: { tex: "flowerTop", per: 1 }, flower: { tex: "flower", fit: true, cut: true, double: true }, tallGrass: { tex: "tallGrass", fit: true, cut: true, double: true },
   mailbox: { tex: "mailbox", fit: true }, keyboard: { tex: "keyboard", fit: true }, console: { tex: "console", fit: true }, bunting: { tex: "bunting", fit: true, cut: true, double: true },
   trophyPlate: { tex: "trophyPlate", fit: true },
+  // From John's asset pack: the azalea's leaves (sprigs with gaps, and solid for a bush's inside), flowering too, a
+  // potted azalea's sprigs, a fern, a big leaf (turned four ways), the pot.
+  flowerLeaf: { tex: "flowerLeaf", per: 1, cut: true }, flowerLeafSolid: { tex: "flowerLeafSolid", per: 1 },
+  azaleaPlant: { tex: "azaleaPlant", fit: true, cut: true, double: true }, fern: { tex: "fern", fit: true, cut: true, double: true },
+  fernTall: { tex: "fernTall", fit: true, cut: true, double: true },
+  bigLeaf0: { tex: "bigLeaf0", fit: true, cut: true, double: true }, bigLeaf1: { tex: "bigLeaf1", fit: true, cut: true, double: true },
+  bigLeaf2: { tex: "bigLeaf2", fit: true, cut: true, double: true }, bigLeaf3: { tex: "bigLeaf3", fit: true, cut: true, double: true },
+  stem: { tex: "stem", per: 1 }, darkWood: { tex: "darkWood", per: 2 }, clockDial: { tex: "clockDial", fit: true },
   aoN: { tex: "aoN", fit: true, overlay: true }, aoW: { tex: "aoW", fit: true, overlay: true }, aoE: { tex: "aoE", fit: true, overlay: true },
-  deep: { tex: "deep", fit: true, overlay: true }, sunPool: { tex: "sunPool", fit: true, overlay: true, add: true }, shadowBlob: { tex: "shadowBlob", fit: true, overlay: true },
+  deep: { tex: "deep", fit: true, overlay: true }, shadowBlob: { tex: "shadowBlob", fit: true, overlay: true },
 };
 // Text boards: a wooden board with words painted on, as a sign or a door plate.
 function textBoard(key, text, w = 40, ink = "#FFF4D8", board = "#8F5F2F") {
@@ -75,17 +83,29 @@ class Geo {
     b.idx.push(base + 3, base, base + 1, base + 3, base + 1, base + 2);
   }
   // A face's texture coordinates: stretched over it ("fit"), or laid in blocks from the world's own axes so neighbours line up.
-  faceUV(k, BL, R, U, w, h) {
+  faceUV(k, BL, R, U, w, h, sub) {
     const d = MATDEF[k] || {};
-    if (d.fit) return [0, 0, 1, 0, 1, 1, 0, 1];
+    if (d.fit) { const [s0, t0, s1, t1] = sub || [0, 0, 1, 1]; return [s0, t0, s1, t0, s1, t1, s0, t1]; }
     const per = Array.isArray(d.per) ? d.per : [d.per || 1, d.per || 1];
     const u0 = BL.dot(R) / per[0], v0 = BL.dot(U) / per[1], u1 = u0 + w / per[0], v1 = v0 + h / per[1];
     return [u0, v0, u1, v0, u1, v1, u0, v1];
   }
-  face(k, BL, R, U, w, h, n) {
+  // sub: for a picture stretched over a face ("fit"), the part of it this piece shows ([u0, v0, u1, v1]).
+  face(k, BL, R, U, w, h, n, sub) {
     if (!k || w <= 0 || h <= 0) return;
     const BR = BL.clone().addScaledVector(R, w), TL = BL.clone().addScaledVector(U, h), TR = BR.clone().addScaledVector(U, h);
-    this.quad(k, BL, BR, TR, TL, this.faceUV(k, BL, R, U, w, h), n);
+    this.quad(k, BL, BR, TR, TL, this.faceUV(k, BL, R, U, w, h, sub), n);
+  }
+  // Whether a box gets its edges rounded: furniture and the like (once the room's shell is up), not walls, glass,
+  // leaves or anything too thin.
+  roundable(w, h, d, S) {
+    if (!this.round || Math.min(w, h, d) < 0.08) return false;
+    for (const k of Object.values(S)) {
+      if (!k) continue;
+      const m = MATDEF[k];
+      if (!m || m.cut || m.alpha || m.overlay || m.glow || m.dyn || m.double || k === "cap" || /^(paper|wool)/.test(k) || (this.noRound && this.noRound.has(k))) return false;
+    }
+    return true;
   }
   // spec: a material for every face, or { all, side, top, bottom, n, s, e, w } (null leaves a face out).
   box(x0, y0, z0, x1, y1, z1, spec) {
@@ -93,6 +113,25 @@ class Geo {
     const pick = (f, vert) => (f in S) ? S[f] : (vert && "side" in S) ? S.side : S.all;
     const w = x1 - x0, h = y1 - y0, d = z1 - z0;
     const X = V(1, 0, 0), Y = V(0, 1, 0), Z = V(0, 0, 1);
+    if (this.roundable(w, h, d, S)) {
+      // Its edges rounded a pixel (as a Minecraft build rounds one): each face set in a pixel all round, and a pixel
+      // wide strip a pixel further in along each of its edges, its picture kept where it was.
+      const r = Math.min(this.round, Math.min(w, h, d) / 4);
+      const faces = [[pick("s", 1), V(x0, y0, z1), X, Y, w, h, Z], [pick("n", 1), V(x1, y0, z0), X.clone().negate(), Y, w, h, Z.clone().negate()],
+        [pick("e", 1), V(x1, y0, z1), Z.clone().negate(), Y, d, h, X], [pick("w", 1), V(x0, y0, z0), Z, Y, d, h, X.clone().negate()],
+        [pick("top", 0), V(x0, y1, z1), X, Z.clone().negate(), w, d, Y], [pick("bottom", 0), V(x0, y0, z0), X, Z, w, d, Y.clone().negate()]];
+      for (const [k, BL, Rv, Uv, fw, fh, N] of faces) {
+        if (!k) continue;
+        const at = (base, a, b) => base.clone().addScaledVector(Rv, a).addScaledVector(Uv, b);
+        const su = r / fw, sv = r / fh, In = BL.clone().addScaledVector(N, -r);
+        this.face(k, at(BL, r, r), Rv, Uv, fw - 2 * r, fh - 2 * r, N, [su, sv, 1 - su, 1 - sv]);
+        this.face(k, at(In, r, 0), Rv, Uv, fw - 2 * r, r, N, [su, 0, 1 - su, sv]);
+        this.face(k, at(In, r, fh - r), Rv, Uv, fw - 2 * r, r, N, [su, 1 - sv, 1 - su, 1]);
+        this.face(k, at(In, 0, r), Rv, Uv, r, fh - 2 * r, N, [0, sv, su, 1 - sv]);
+        this.face(k, at(In, fw - r, r), Rv, Uv, r, fh - 2 * r, N, [1 - su, sv, 1, 1 - sv]);
+      }
+      return;
+    }
     this.face(pick("s", 1), V(x0, y0, z1), X, Y, w, h, Z);
     this.face(pick("n", 1), V(x1, y0, z0), X.clone().negate(), Y, w, h, Z.clone().negate());
     this.face(pick("e", 1), V(x1, y0, z1), Z.clone().negate(), Y, d, h, X);
@@ -260,6 +299,8 @@ function shell(room, o = {}) {
   }
   // The soft shade where the walls meet the floor.
   G.box(L, 0.02, N, Rx, 0.02, N + 1.1, { top: "aoN", all: null });
+  // Everything put in from here on (the furniture) has its edges rounded a pixel; the walls' paper never.
+  G.round = 1 / 16; G.noRound = new Set([paper]);
   G.box(L, 0.02, N, L + 1.1, 0.02, Dm, { top: "aoW", all: null });
   G.box(Rx - 1.1, 0.02, N, Rx, 0.02, Dm, { top: "aoE", all: null });
 }
@@ -277,49 +318,52 @@ function sunPool(room, x0, z0, x1, z1, dir = 0, bounds, win) {
 // The times the viewer shows. k: how low and golden the sun is (morning or evening); side: where it is (-1 the east,
 // in the morning, 1 the west, in the evening); m: how far it's night (the moon's light, the windows dark).
 const TIMES = {
-  morning: { k: 1, side: -1, m: 0, name: "Morning", note: "The sun low in the east: golden light, long pools, the east windows brightest" },
-  day: { k: 0, side: 1, m: 0, name: "Day", note: "The sun high: warm white pools under the windows" },
-  evening: { k: 1, side: 1, m: 0, name: "Evening", note: "The sun low in the west: orange light, long pools, a sunset in the windows" },
-  night: { k: 0, side: 1, m: 1, name: "Night", note: "Moonlight: faint blue pools, the windows dark with stars (the lamps keep the room bright)" },
+  morning: { k: 1, side: -1, m: 0, clock: 7.2, name: "Morning", note: "The sun low in the east: golden light reaching further in, the east windows brightest" },
+  day: { k: 0, side: 1, m: 0, clock: 12.25, name: "Day", note: "The sun high: warm white daylight spreading in from the windows, no edge to it" },
+  evening: { k: 1, side: 1, m: 0, clock: 18.5, name: "Evening", note: "The sun low in the west: orange light reaching further in, a sunset in the windows" },
+  night: { k: 0, side: 1, m: 1, clock: 22.25, name: "Night", note: "Moonlight: a faint blue light in from the windows, the windows dark with stars (the lamps keep the room bright)" },
 };
 let TOD = "day";
 // The light's colour and strength: warm white by day, golden low down, a faint cool blue at night.
-// [r, g, b, the pool's strength, the shaft's].
+// [r, g, b, its strength, (unused)].
 function poolLight(k, m) {
   const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
   return mix(mix([1, 0.95, 0.84, 0.22, 0.035], [1, 0.8, 0.56, 0.22, 0.045], k), [0.6, 0.72, 1, 0.1, 0.015], m);
 }
-// Where a pool falls at a time, and how strong it is there: [x0, z0, x1, z1, strength], or null. A low sun throws it
-// further in and longer, and to one side (the morning's west of the window, the evening's east); a window facing
-// away from a low sun is in shade.
-function poolRect(p, k, side, m) {
-  let [x0, z0, x1, z1, dir, bx0, bz0, bx1, bz1] = p;
-  const shift = 0.6 * k, scale = 1 + 0.7 * k - 0.15 * m, lat = 0.8 * k * side;
+// The window's light over the floor at a time: [a from, a to, d from, d to, columns, rows, strength], or null; a runs
+// along the window's wall, d in from it (the mod's RoomLight has the very same sums). It's kept inside the room, up to
+// its walls; a low sun throws it further in and to one side, and a window facing away from a low sun is dimmer.
+function washGrid(p, k, side, m) {
+  const dir = p[4];
+  if (p.length < 14 || p[11] <= p[10]) return null;
+  const wc = p[9], L = washReach(k, m);
+  const bx0 = p[5] - 0.3, bz0 = p[6] - 0.3, bx1 = p[7] + 0.3, bz1 = p[8] + 0.3;
+  const dMax = Math.min(3.2 * L, dir === 0 ? bz1 - wc : dir === 1 ? wc - bx0 : bx1 - wc);
+  if (dMax < 0.3) return null;
+  const half = (p[11] - p[10]) / 2, mid = (p[10] + p[11]) / 2 + washShift(dir, k, side);
+  const reachA = half + 2.6 * washSpread(dMax, k);
+  let a0 = mid - reachA, a1 = mid + reachA;
+  if (dir === 0) { a0 = Math.max(a0, bx0); a1 = Math.min(a1, bx1); } else { a0 = Math.max(a0, bz0); a1 = Math.min(a1, bz1); }
+  if (a1 - a0 < 0.3) return null;
   let s = 1;
-  if (dir === 0) { const l = (z1 - z0) * scale; z0 += shift; z1 = z0 + l; x0 += lat; x1 += lat; }
-  else if (dir === 3) z0 = z1 - (z1 - z0) * scale;
-  else if (dir === 1) { const l = (x1 - x0) * scale; x1 -= shift; x0 = x1 - l; if (side > 0) s = 1 - 0.65 * k; }
-  else { const l = (x1 - x0) * scale; x0 += shift; x1 = x0 + l; if (side < 0) s = 1 - 0.65 * k; }
-  x0 = Math.max(x0, bx0); z0 = Math.max(z0, bz0); x1 = Math.min(x1, bx1); z1 = Math.min(z1, bz1);
-  return x1 - x0 > 0.1 && z1 - z0 > 0.1 ? [x0, z0, x1, z1, s] : null;
+  if (dir === 1 && side > 0) s = 1 - 0.65 * k;
+  if (dir === 2 && side < 0) s = 1 - 0.65 * k;
+  return [a0, a1, 0, dMax, Math.max(2, Math.ceil((a1 - a0) / 0.4)), Math.max(2, Math.ceil(dMax / 0.4)), s];
 }
-// The shaft from a pool's window down to where it falls (q, from poolRect): four sheets (its top, bottom and sides),
-// each [corner, corner, corner, corner] of [x, y, z, u, v] (v 0 at the window, 1 on the floor); none for the door.
-function beamQuads(p, q, y = 0.07) {
-  const [, , , , dir, , , , , wc, a0, a1, wy0, wy1] = p;
-  if (dir === 3 || wy1 <= wy0) return [];
-  const [x0, z0, x1, z1] = q;
-  // a: along the wall, d: in from it.
-  const la0 = dir === 0 ? x0 : z0, la1 = dir === 0 ? x1 : z1;
-  const near = dir === 0 ? z0 : dir === 1 ? x1 : x0, far = dir === 0 ? z1 : dir === 1 ? x0 : x1;
-  const P = (a, yy, d, u, v) => dir === 0 ? [a, yy, d, u, v] : [d, yy, a, u, v];
-  return [
-    [P(a0, wy1, wc, 0, 0), P(a1, wy1, wc, 1, 0), P(la1, y, far, 1, 1), P(la0, y, far, 0, 1)],
-    [P(a0, wy0, wc, 0, 0), P(a1, wy0, wc, 1, 0), P(la1, y, near, 1, 1), P(la0, y, near, 0, 1)],
-    [P(a0, wy0, wc, 0, 0), P(a0, wy1, wc, 1, 0), P(la0, y, far, 1, 1), P(la0, y, near, 0, 1)],
-    [P(a1, wy0, wc, 0, 0), P(a1, wy1, wc, 1, 0), P(la1, y, far, 1, 1), P(la1, y, near, 0, 1)],
-  ];
+// How far in the light reaches (blocks): further with a low sun, less by moonlight.
+const washReach = (k, m) => 2.0 + 1.6 * k - 0.4 * m;
+// How far to one side a low sun throws the light from a window in the north wall.
+const washShift = (dir, k, side) => dir === 0 ? 0.8 * k * side : 0;
+// How soft its sides are, d in from the window: it widens as it goes.
+const washSpread = (d, k) => 0.55 + 0.3 * d + 0.3 * k;
+// How strong the window's light is at a point on the floor (a along its wall, d in from it), 0 to 1.
+function washAt(p, a, d, k, side, m) {
+  const half = (p[11] - p[10]) / 2, mid = (p[10] + p[11]) / 2 + washShift(p[4], k, side);
+  const off = Math.max(0, Math.abs(a - mid) - half), sg = washSpread(d, k), t = Math.min(1, d / 1.2);
+  return Math.exp(-d / washReach(k, m)) * (0.6 + 0.4 * t * t * (3 - 2 * t)) * Math.exp(-off * off / (2 * sg * sg));
 }
+// A point given along the window's wall and in from it, as [x, z] in the room.
+const floorAt = (p, a, d) => p[4] === 0 ? [a, p[9] + d] : p[4] === 1 ? [p[9] - d, a] : [p[9] + d, a];
 
 // ---------- windows and things on walls ----------
 function windowN(room, x, y, w = 2.2, h = 2, o = {}) {
@@ -349,10 +393,19 @@ function framed(room, x, y, w, h, mat, wall = "n", o = {}) {
   else { if (t) G.box(W - d, y - t, x - t, W, y + h + t, x + w + t, { all: fm, e: null }); G.box(W - d - 0.01, y, x, W - d, y + h, x + w, { w: mat, all: null }); room.act([W - 0.6, x, W, x + w], o.act || {}); }
 }
 function clock(room, x, y) {
-  room.geo.box(x, y, 0, x + 0.8, y + 0.8, 0.06, { s: "clock", all: null });
-  room.geo.box(x + 0.1, y + 0.1, 0, x + 0.7, y + 0.7, 0.05, { all: "walnut", n: null, s: null });
-  room.act([x - 0.2, 0, x + 1.0, 0.6], { label: "Look", lines: ["It's a quarter past nine. Plenty of morning left."] });
-  room.item("Wall clock", "Round, wooden rim, hands at a quarter past nine.");
+  // A round wooden case standing off the wall (stepped round), its rim proud of the dial, a knob on top; the hands
+  // are drawn on their own and keep the time of day (the mod's: the world's).
+  const G = room.geo, c = x + 0.4, m = y + 0.4;
+  G.box(x + 0.12, y, 0, x + 0.68, y + 0.8, 0.12, { all: "walnut", n: null });
+  G.box(x, y + 0.12, 0, x + 0.8, y + 0.68, 0.12, { all: "walnut", n: null });
+  G.box(x + 0.05, y + 0.05, 0, x + 0.75, y + 0.75, 0.1, { all: "walnut", n: null });
+  G.box(x + 0.14, y + 0.14, 0.12, x + 0.66, y + 0.66, 0.125, { s: "clockDial", all: null });
+  G.box(x + 0.08, y + 0.66, 0.12, x + 0.72, y + 0.72, 0.17, "walnut"); G.box(x + 0.08, y + 0.08, 0.12, x + 0.72, y + 0.14, 0.17, "walnut");
+  G.box(x + 0.08, y + 0.14, 0.12, x + 0.14, y + 0.66, 0.17, "walnut"); G.box(x + 0.66, y + 0.14, 0.12, x + 0.72, y + 0.66, 0.17, "walnut");
+  G.box(c - 0.05, y + 0.8, 0.03, c + 0.05, y + 0.87, 0.1, "gold");
+  (room.clocks || (room.clocks = [])).push([c, m, 0.13]);
+  room.act([x - 0.2, 0, x + 1.0, 0.6], { label: "Look", lines: ["The wall clock. It keeps good time."] });
+  room.item("Wall clock", "A round wooden clock standing off the wall, its rim proud of the dial; its hands keep the time of day.");
 }
 function whiteboard(room, x, y, w, h, mat = "whiteboard", lines) {
   const G = room.geo;
@@ -513,16 +566,44 @@ function sideboard(room, X, Z, f, w = 2.4, o = {}) {
   room.act(F.rect(0, 0.4, w, 1.3), { label: "Look", lines: o.lines || ["Family photos. In one of them you're holding a fishing rod the wrong way round."] });
   room.item("Sideboard", "Honey-wood drawers, photo frames, a vase of flowers.");
 }
+// A potted plant, from John's asset pack: a round azalea bush, a fern, or a big-leafed plant, picked by where it
+// stands so a room has a mix (o.kind says which); o.pot its pot.
 function plant(room, x, z, s = 1, o = {}) {
-  const G = room.geo, p = 0.28 * s;
-  G.box(x - p, 0, z - p, x + p, 0.55 * s, z + p, { all: o.pot || "pot", top: "soil" });
-  G.box(x - p * 1.5, 0.55 * s, z - p * 1.5, x + p * 1.5, 1.05 * s, z + p * 1.5, "leafSolid");
-  G.box(x - p * 1.15, 1.05 * s, z - p * 1.15, x + p * 1.15, 1.45 * s, z + p * 1.15, "leafSolid");
-  G.box(x - p * 0.7, 1.45 * s, z - p * 0.7, x + p * 0.7, 1.7 * s, z + p * 0.7, "leafSolid");
-  G.box(x - p * 1.8, 0.75 * s, z - 0.02, x + p * 1.8, 1.25 * s, z + 0.02, "leaf"); G.box(x - 0.02, 0.75 * s, z - p * 1.8, x + 0.02, 1.25 * s, z + p * 1.8, "leaf");
+  const G = room.geo, p = 0.28 * s, pot = o.pot || "pot";
+  const kind = o.kind || ["bush", "fern", "leafy"][Math.abs(Math.round(x * 7 + z * 13)) % 3];
+  G.box(x - p, 0, z - p, x + p, 0.5 * s, z + p, { all: pot, top: "soil" });
+  G.box(x - p * 1.12, 0.44 * s, z - p * 1.12, x + p * 1.12, 0.56 * s, z + p * 1.12, { all: pot, top: "soil" });
+  if (kind === "bush") leafyBall(G, x, 0.5 * s, z, p * 1.7, 0.85 * s, "leaf", "leafSolid");
+  else if (kind === "fern") {
+    // Fronds in a star: two crossed pairs, the inner taller.
+    cross(G, x, z, 0.56 * s, 0.56 * s, 0.75 * s, "fern", 0.18 * s);
+    cross(G, x, z, 0.5 * s, 0.5 * s, 1.05 * s, "fernTall", -0.12 * s);
+    cross(G, x, z, 0.5 * s, 0.6 * s, 0.6 * s, "fern", 0);
+  } else {
+    // Big leaves on green stems, each its own way out from the middle and at its own height (best seen from above).
+    G.box(x - 0.03, 0.5 * s, z - 0.03, x + 0.03, 1.2 * s, z + 0.03, "stem");
+    const L = 0.62 * s;
+    for (const [dx, dz, y, k] of [[0, -1, 0.95, 0], [1, 0, 0.85, 1], [0, 1, 1.05, 2], [-1, 0, 0.78, 3], [0.7, -0.7, 1.2, 0], [-0.7, 0.7, 1.28, 2]]) {
+      const cx = x + dx * L * 0.62, cz = z + dz * L * 0.62;
+      G.box(cx - L / 2, y * s, cz - L / 2, cx + L / 2, y * s + 0.008, cz + L / 2, { top: "bigLeaf" + k, bottom: "bigLeaf" + k, all: null });
+    }
+  }
   room.solid(x - p, z - p, x + p, z + p);
-  room.act([x - p, z - p, x + p, z + p], { label: "Look", lines: o.lines || ["A leafy fern. Mum talks to it every morning."] });
-  room.item("Potted plant", "Terracotta pot, leaves in layers with cut-out sprigs.");
+  room.act([x - p, z - p, x + p, z + p], { label: "Look", lines: o.lines || ["A leafy plant. Mum talks to it every morning."] });
+  room.item("Potted plant", "A terracotta pot; an azalea bush, a fern or a big-leafed plant in it (from John's asset pack).");
+}
+// Two crossed sheets (a plant's sprigs or fronds), w wide and d deep, h high from y0 over the pot.
+function cross(G, x, z, w, d, h, mat, y0 = 0) {
+  const y = 0.5 + y0, t = 0.006;
+  G.box(x - w, y, z - t, x + w, y + h, z + t, { s: mat, n: mat, all: null });
+  G.box(x - t, y, z - d, x + t, y + h, z + d, { e: mat, w: mat, all: null });
+}
+// A leafy ball (a bush, a tree's crown): a solid core of leaves, sprigs standing out of it all round, a smaller cap.
+function leafyBall(G, x, y, z, a, h, cut, solid) {
+  G.box(x - a * 0.8, y + 0.04, z - a * 0.8, x + a * 0.8, y + h * 0.92, z + a * 0.8, solid);
+  G.box(x - a, y, z - a, x + a, y + h, z + a, cut);
+  G.box(x - a * 0.62, y + h - 0.04, z - a * 0.62, x + a * 0.62, y + h + a * 0.4, z + a * 0.62, cut);
+  G.box(x - a * 0.5, y + h - 0.02, z - a * 0.5, x + a * 0.5, y + h + a * 0.3, z + a * 0.5, solid);
 }
 
 // ---------- stairs ----------
@@ -665,7 +746,21 @@ function wardrobe(room, X, Z, f) {
   room.act(F.rect(0, 0.4, 2, 1.4), { label: "Open", lines: ["Your clothes. In game you change them from CLOTHES on the menu."] });
   room.item("Wardrobe", "Two-door honey-wood wardrobe, a bag and a box on top.");
 }
-function cushionSeat(room, x, z, mat) { room.geo.box(x - 0.4, 0, z - 0.4, x + 0.4, 0.22, z + 0.4, { all: mat, top: mat }); room.item("Floor cushions", "Two square cushions for playing games."); }
+// A plump cushion (floor cushions, the Center's footstools): a fat square pad, rounded at its edges, a piped seam
+// round it near the top, its top puffed up in two steps and pulled in by a button in the middle (tufted).
+function pouf(room, x, z, w, y0, y1, fab) {
+  const G = room.geo, a = w / 2, h = y1 - y0, top = cushionTop(fab), seam = shadeMat(fab, -0.12);
+  G.box(x - a, y0, z - a, x + a, y1 - 0.07, z + a, { all: fab, top });
+  G.box(x - a - 0.012, y1 - 0.15, z - a - 0.012, x + a + 0.012, y1 - 0.12, z + a + 0.012, seam);
+  G.box(x - a + 0.06, y1 - 0.07, z - a + 0.06, x + a - 0.06, y1 - 0.02, z + a - 0.06, { all: fab, top });
+  G.box(x - a + 0.16, y1 - 0.02, z - a + 0.16, x + a - 0.16, y1 + 0.01, z + a - 0.16, { all: fab, top });
+  G.box(x - 0.035, y1 + 0.01, z - 0.035, x + 0.035, y1 + 0.025, z + 0.035, seam);
+  room.solid(x - a, z - a, x + a, z + a);
+}
+function cushionSeat(room, x, z, mat) {
+  pouf(room, x, z, 0.82, 0, 0.46, mat);
+  room.item("Floor cushions", "Two plump square cushions for playing games: piped, tufted, as high as a footstool.");
+}
 function gameConsole(room, x, z) {
   const G = room.geo;
   G.box(x - 0.35, 0, z - 0.25, x + 0.35, 0.18, z + 0.25, { all: "greyPlastic", top: "console" });

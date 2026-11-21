@@ -14,7 +14,7 @@ import base64, io, json, math, os, re, sys
 from PIL import Image
 
 EPS = 1e-6
-SKIP = {"aoN", "aoW", "aoE", "deep", "sunPool", "shadowBlob"}
+SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob"}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
           "mart": (384, 64, 0), "school": (448, 64, 0), "trainer2": (512, 64, 0), "gate_s": (576, 64, 0), "nickhouse": (640, 64, 0), "gate_n": (704, 64, 0),
           "gate_league": (768, 64, 0), "gate_johto": (832, 64, 0)}
@@ -193,7 +193,10 @@ def slice_face(f, tex, cells):
             to = [round((hi[q] - cell[q]) * 16, 3) for q in range(3)]
             # Texture: the piece's place in its repeat, as 0..16 over the padded picture (v down from the top).
             if t["fit"]:
-                us, ue, vs, ve = a0 / w, a1 / w, b0 / h, b1 / h
+                # (A piece of a face whose picture is stretched over it, the part of the picture it shows: "sub".)
+                s0, t0, s1, t1 = f.get("sub") or (0.0, 0.0, 1.0, 1.0)
+                us, ue = s0 + (s1 - s0) * a0 / w, s0 + (s1 - s0) * a1 / w
+                vs, ve = t0 + (t1 - t0) * b0 / h, t0 + (t1 - t0) * b1 / h
             else:
                 us, ue = u0 + a0 / pu, u0 + a1 / pu
                 vs, ve = v0 + b0 / pv, v0 + b1 / pv
@@ -284,7 +287,7 @@ def fit_camera(W, D, H, aspect=16 / 9, pitch=52.0, fov=34.0):
     return {"x": round(W / 2, 3), "z": round(best[0], 3), "dist": round(best[1], 2)}
 
 
-LIGHT_TEX = {"sunPool": "pool", "sunPoolSoft": "pool_soft", "sunBeam": "beam", "windowDusk": "window_dusk", "windowNight": "window_night",
+LIGHT_TEX = {"windowDusk": "window_dusk", "windowNight": "window_night",
              "doorDusk": "door_dusk", "doorNight": "door_night"}
 
 
@@ -390,7 +393,7 @@ def main():
         rooms_out[rid] = {"origin": list(o), "W": room["W"], "D": room["D"], "H": room["H"], "name": room["name"], "floor": room["floor"],
                           "place": PLACE[rid], "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360},
                           "entry": ENTRY.get(rid), "cam": fit_camera(room["W"], room["D"], room["H"]), "cells": placed, "warps": warps, "people": people, "acts": acts,
-                          "grass": room.get("grass", []), "pools": room.get("pools", []), "panes": panes_of(room)}
+                          "grass": room.get("grass", []), "pools": room.get("pools", []), "panes": panes_of(room), "clocks": room.get("clocks", [])}
     # Models and the block's states.
     mdir = os.path.join(res, "assets/retromon/models/block/prop")
     os.makedirs(mdir, exist_ok=True)

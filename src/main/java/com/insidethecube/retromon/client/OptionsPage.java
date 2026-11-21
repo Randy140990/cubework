@@ -13,21 +13,23 @@ import net.minecraft.nbt.CompoundTag;
  * OPTIONS, as the UI Viewer's (signed off 20 Nov), from the save slots and from the menu alike: on its own lime
  * backdrop, what the row you're on does in a panel at the top, then the rows (the one you're on in sunny yellow,
  * the rest ruled apart), each with its value between red arrows; left and right (or a click, or A) change it.
- * CONTROLS opens the key map. The viewer's eight, then the mod's own three (walking with you, the creatures' look
- * and the light), then CONTROLS.
+ * CONTROLS opens the key map. The viewer's eight, then the mod's own (walking with you, the creatures' look, the
+ * light, the day going by, and for looking round quickly BATTLES and FAST TRAVEL), then CONTROLS.
  */
 public final class OptionsPage {
 	public static final String[] LABELS = {"TEXT SPEED", "MUSIC", "SOUND", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "BATTLE EFFECTS", "BATTLE STYLE", "WALK WITH YOU",
-			"POKéMON LOOK", "SHADERS", "DAY AND NIGHT", "CONTROLS"};
+			"POKéMON LOOK", "SHADERS", "DAY AND NIGHT", "BATTLES", "FAST TRAVEL", "CONTROLS"};
 	private static final String[] LINES = {"How quickly words appear in text boxes.", "How loud the music plays.", "How loud cries, steps and menu sounds are.",
 			"Whether the POKéDEX reads its entries out loud.", "How dark nights get outside.", "Whether wild POKéMON show in the grass, or jump out at you.",
 			"Whether moves play their animations in battle.", "SWITCH asks if you want to change POKéMON when a trainer's sends out the next one.",
 			"Whether your partner walks with you.", "COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures.",
 			"RETROMON is our own light: the sun moves with the day, soft shadows, swaying grass, blue nights and glowing lamps. OFF is Minecraft's own.",
 			"ON lets the day go by, morning to night. OFF holds it at half past ten in the morning (the day count waits too).",
+			"OFF: no wild POKéMON jump out and trainers let you by, to look round quickly. Your rival's and TEAM ROCKET's battles still happen.",
+			"ON: the TOWN MAP takes you anywhere. A on any place goes there, or right-click any spot on the map.",
 			"See every key: what it does in game, and what's turned off."};
 	private static final String[][] VALUES = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"},
-			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"ON", "OFF"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {"ON", "OFF"}, {}};
+			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"ON", "OFF"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {"ON", "OFF"}, {"ON", "OFF"}, {"OFF", "ON"}, {}};
 	public int row;
 	/** Opens the key map (from CONTROLS). */
 	private final Runnable keymap;
@@ -38,7 +40,8 @@ public final class OptionsPage {
 
 	private static int[] now() {
 		return new int[] {ClientState.data.textSpeed, Music.level(), Settings.sound(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0,
-				Settings.effects() ? 0 : 1, Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), Settings.shaderMode(), Settings.cycle() ? 0 : 1, 0};
+				Settings.effects() ? 0 : 1, Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), Settings.shaderMode(), Settings.cycle() ? 0 : 1,
+				Settings.battles() ? 0 : 1, Settings.fastTravel() ? 1 : 0, 0};
 	}
 
 	private static boolean online() {
@@ -82,6 +85,14 @@ public final class OptionsPage {
 			}
 			case 11 -> {
 				Settings.set("cycle", Settings.cycle() ? 0 : 1);
+				if (online()) Settings.sendPrefs();
+			}
+			case 12 -> {
+				Settings.set("battles", Settings.battles() ? 0 : 1);
+				if (online()) Settings.sendPrefs();
+			}
+			case 13 -> {
+				Settings.set("travel", Settings.fastTravel() ? 0 : 1);
 				if (online()) Settings.sendPrefs();
 			}
 			default -> {

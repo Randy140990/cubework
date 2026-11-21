@@ -62,7 +62,7 @@ public final class Interiors {
 
 	public record Room(String id, int ox, int oy, int oz, double w, double d, double h, String name, String floor, String place, double sx, double sz,
 			float syaw, double ex, double ez, float eyaw, double camX, double camZ, double camDist, int[] cells, List<Warp> warps, List<Person> people,
-			List<Act> acts, List<double[]> grass, List<double[]> pools, List<double[]> panes) {
+			List<Act> acts, List<double[]> grass, List<double[]> pools, List<double[]> panes, List<double[]> clocks) {
 		/** Big enough to walk about in (the forest): the camera follows you, as it does outside. */
 		public boolean big() {
 			return w > 26 || d > 26;
@@ -203,7 +203,7 @@ public final class Interiors {
 			Room room = new Room(e.getKey(), o.get(0).getAsInt(), o.get(1).getAsInt(), o.get(2).getAsInt(), num(r, "W", 16), num(r, "D", 14), num(r, "H", 4),
 					r.get("name").getAsString(), r.get("floor").getAsString(), r.get("place").getAsString(), num(sp, "x", 0), num(sp, "z", 0),
 					(float) num(sp, "yaw", 0), num(en, "x", 0), num(en, "z", 0), (float) num(en, "yaw", 180), num(cam, "x", 8), num(cam, "z", 7),
-					num(cam, "dist", 30), cells, warps, people, acts, grass, rows(r, "pools"), rows(r, "panes"));
+					num(cam, "dist", 30), cells, warps, people, acts, grass, rows(r, "pools"), rows(r, "panes"), rows(r, "clocks"));
 			ROOMS.put(room.id(), room);
 		}
 		if (DATA.has("arenas")) for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("arenas").entrySet()) {
@@ -412,7 +412,8 @@ public final class Interiors {
 	/** Who's on their way somewhere (after the fade to black): ticks left, and where to. */
 	private static final Map<UUID, Integer> PENDING_T = new HashMap<>();
 	private static final Map<UUID, Runnable> PENDING = new HashMap<>();
-	private static final int FADE_TICKS = 17;
+	/** (After the client's iris has shut right down: it closes over 17 ticks.) */
+	private static final int FADE_TICKS = 21;
 	private static final Map<UUID, Vec3> LAST = new HashMap<>();
 
 	/** A new game: you wake up in your room. */
@@ -463,6 +464,15 @@ public final class Interiors {
 			LAST.remove(p.getUUID());
 			Game.roomLeft(p);
 		});
+	}
+
+	/** Straight out of a room to a point in the world (FAST TRAVEL), no door or fade. */
+	public static void jumpOut(ServerPlayer p, ServerLevel world, double x, double y, double z) {
+		Game.leavingLevel(p);
+		p.teleportTo(world, x, y, z, java.util.Set.of(), p.getYRot(), 30F, true);
+		p.setDeltaMovement(Vec3.ZERO);
+		LAST.remove(p.getUUID());
+		Game.roomLeft(p);
 	}
 
 	/** Out through one of the doors by its key (the Route 28 Gate's choice: ROUTE 28's door, or ROUTE 26's). */
