@@ -1,0 +1,36 @@
+121:	private final OptionInstance<Integer> framerateLimit = new OptionInstance<>(
+122:		"options.framerateLimit",
+125:			? genericValueLabel(component, Component.translatable("options.framerateLimit.max"))
+313:	public @Nullable String fullscreenVideoModeString;
+478:	private final OptionInstance<Boolean> enableVsync = OptionInstance.createBoolean("options.vsync", true, boolean_ -> {
+537:	private final OptionInstance<Boolean> fullscreen = OptionInstance.createBoolean("options.fullscreen", false, boolean_ -> {
+541:			this.fullscreen().set(minecraftx.getWindow().isFullscreen());
+603:	public final KeyMapping keyScreenshot = new KeyMapping("key.screenshot", 291, KeyMapping.Category.MISC);
+606:	public final KeyMapping keyFullscreen = new KeyMapping("key.fullscreen", 300, KeyMapping.Category.MISC);
+696:				this.keyScreenshot,
+717:	public boolean hideGui;
+822:	private final OptionInstance<Integer> guiScale = new OptionInstance<>(
+823:		"options.guiScale",
+825:		(component, integer) -> integer == 0 ? Component.translatable("options.guiScale.auto") : Component.literal(Integer.toString(integer)),
+930:	public OptionInstance<Integer> framerateLimit() {
+931:		return this.framerateLimit;
+1145:	public OptionInstance<Boolean> enableVsync() {
+1146:		return this.enableVsync;
+1197:	public final float getFinalSoundSourceVolume(SoundSource soundSource) {
+1199:			? this.getSoundSourceVolume(soundSource)
+1200:			: this.getSoundSourceVolume(soundSource) * this.getSoundSourceVolume(SoundSource.MASTER);
+1203:	public final float getSoundSourceVolume(SoundSource soundSource) {
+1215:			if ((soundSource == SoundSource.MASTER || soundSource == SoundSource.MUSIC) && this.getFinalSoundSourceVolume(SoundSource.MUSIC) > 0.0F) {
+1242:	public OptionInstance<Boolean> fullscreen() {
+1243:		return this.fullscreen;
+1295:	public OptionInstance<Integer> fov() {
+1331:	public OptionInstance<Integer> guiScale() {
+1332:		return this.guiScale;
+1404:		optionAccess.process("enableVsync", this.enableVsync);
+1416:		optionAccess.process("fullscreen", this.fullscreen);
+1418:		optionAccess.process("guiScale", this.guiScale);
+1421:		optionAccess.process("maxFps", this.framerateLimit);
+1633:			compoundTag2.getString("fullscreenResolution").ifPresent(string -> this.fullscreenVideoModeString = string);
+1718:				printWriter.println("fullscreenResolution:" + string);
+1730:			return this.fullscreenVideoModeString;
+1835:		list.add(Pair.of("fullscreenResolution", String.valueOf(this.fullscreenVideoModeString)));

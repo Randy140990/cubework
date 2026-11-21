@@ -1,0 +1,34 @@
+44:public class SoundManager extends SimplePreparableReloadListener<SoundManager.Preparations> {
+45:	public static final Identifier EMPTY_SOUND_LOCATION = Identifier.withDefaultNamespace("empty");
+46:	public static final Sound EMPTY_SOUND = new Sound(EMPTY_SOUND_LOCATION, ConstantFloat.of(1.0F), ConstantFloat.of(1.0F), 1, Sound.Type.FILE, false, false, 16);
+47:	public static final Identifier INTENTIONALLY_EMPTY_SOUND_LOCATION = Identifier.withDefaultNamespace("intentionally_empty");
+48:	public static final WeighedSoundEvents INTENTIONALLY_EMPTY_SOUND_EVENT = new WeighedSoundEvents(INTENTIONALLY_EMPTY_SOUND_LOCATION, null);
+49:	public static final Sound INTENTIONALLY_EMPTY_SOUND = new Sound(
+60:	public SoundManager(Options options) {
+121:	public List<String> getAvailableSoundDevices() {
+125:	public ListenerTransform getListenerTransform() {
+139:	public @Nullable WeighedSoundEvents getSoundEvent(Identifier identifier) {
+143:	public Collection<Identifier> getAvailableSounds() {
+147:	public void queueTickingSound(TickableSoundInstance tickableSoundInstance) {
+151:	public SoundEngine.PlayResult play(SoundInstance soundInstance) {
+155:	public void playDelayed(SoundInstance soundInstance, int i) {
+159:	public void updateSource(Camera camera) {
+163:	public void pauseAllExcept(SoundSource... soundSources) {
+167:	public void stop() {
+171:	public void destroy() {
+175:	public void emergencyShutdown() {
+179:	public void tick(boolean bl) {
+183:	public void resume() {
+187:	public void refreshCategoryVolume(SoundSource soundSource) {
+191:	public void stop(SoundInstance soundInstance) {
+195:	public void updateCategoryVolume(SoundSource soundSource, float f) {
+199:	public boolean isActive(SoundInstance soundInstance) {
+203:	public void addListener(SoundEventListener soundEventListener) {
+207:	public void removeListener(SoundEventListener soundEventListener) {
+211:	public void stop(@Nullable Identifier identifier, @Nullable SoundSource soundSource) {
+215:	public String getDebugString() {
+219:	public void reload() {
+260:							public int getWeight() {
+265:							public Sound getSound(RandomSource randomSource) {
+285:							public void preloadIfRequired(SoundEngine soundEngine) {
+301:		public void apply(Map<Identifier, WeighedSoundEvents> map, Map<Identifier, Resource> map2, SoundEngine soundEngine) {

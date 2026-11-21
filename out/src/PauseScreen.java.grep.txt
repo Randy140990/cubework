@@ -1,0 +1,27 @@
+17:import net.minecraft.client.gui.layouts.GridLayout;
+41:public class PauseScreen extends Screen {
+60:	private final boolean showPauseMenu;
+65:		this.showPauseMenu = bl;
+69:		return this.showPauseMenu;
+74:		if (this.showPauseMenu) {
+75:			this.createPauseMenu();
+79:		this.addRenderableWidget(new StringWidget(this.width / 2 - i / 2, this.showPauseMenu ? 40 : 10, i, 9, this.title, this.font));
+82:	private void createPauseMenu() {
+83:		GridLayout gridLayout = new GridLayout();
+85:		GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(2);
+86:		rowHelper.addChild(Button.builder(RETURN_TO_GAME, button -> {
+107:			Button.builder(
+122:		gridLayout.visitWidgets(this::addRenderableWidget);
+143:	static void addFeedbackButtons(Screen screen, GridLayout.RowHelper rowHelper) {
+152:	private void addFeedbackSubscreenAndCustomDialogButtons(Minecraft minecraft, Holder<Dialog> holder, GridLayout.RowHelper rowHelper) {
+155:			Button.builder(holder.value().common().computeExternalTitle(), button -> minecraft.player.connection.showDialog(holder, this))
+176:		if (this.showPauseMenu && this.minecraft.getReportingContext().hasDraftReport() && this.disconnectButton != null) {
+190:		if (this.showPauseMenu) {
+197:		return options.musicToast().get().renderInPauseScreen() && options.getFinalSoundSourceVolume(SoundSource.MUSIC) > 0.0F && this.showPauseMenu;
+201:		return Button.builder(component, button -> this.minecraft.setScreen(supplier.get())).width(98).build();
+205:		return Button.builder(component, ConfirmLinkScreen.confirmLink(screen, uRI)).width(98).build();
+209:	static class FeedbackSubScreen extends Screen {
+222:			GridLayout gridLayout = this.layout.addToContents(new GridLayout());
+224:			GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(2);
+226:			this.layout.addToFooter(Button.builder(CommonComponents.GUI_BACK, button -> this.onClose()).width(200).build());
+227:			this.layout.visitWidgets(this::addRenderableWidget);

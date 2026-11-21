@@ -1,0 +1,14 @@
+135:	private final GuiRenderer guiRenderer;
+166:		this.guiRenderer = new GuiRenderer(
+189:		this.guiRenderer.close();
+257:	public void processBlurEffect() {
+325:	public void resize(int i, int j) {
+416:	private void renderItemInHand(float f, boolean bl, Matrix4f matrix4f) {
+465:	public void render(DeltaTracker deltaTracker, boolean bl) {
+497:				this.renderLevel(deltaTracker);
+577:			this.guiRenderer.render(this.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
+578:			this.guiRenderer.incrementFrameNumber();
+721:	public void renderLevel(DeltaTracker deltaTracker) {
+765:			.renderLevel(
+776:		this.renderItemInHand(f, bl3, matrix4f2);
+828:	public Camera getMainCamera() {

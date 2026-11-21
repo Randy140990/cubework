@@ -1,0 +1,9 @@
+48:	public static void _disableScissorTest() {
+53:	public static void _enableScissorTest() {
+250:	public static void _glBindFramebuffer(int i, int j) {
+270:	public static void _glBlitFrameBuffer(int i, int j, int k, int l, int m, int n, int o, int p, int q, int r) {
+275:	public static void _glDeleteFramebuffers(int i) {
+292:	public static void _glFramebufferTexture2D(int i, int j, int k, int l, int m) {
+402:	public static void _bindTexture(int i) {
+425:	public static void _viewport(int i, int j, int k, int l) {
+478:	public static void _readPixels(int i, int j, int k, int l, int m, int n, long o) {

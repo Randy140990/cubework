@@ -1,0 +1,5 @@
+Compiled from "GpuBuffer.java"
+public interface com.mojang.blaze3d.buffers.GpuBuffer$MappedView extends java.lang.AutoCloseable {
+  public abstract java.nio.ByteBuffer data();
+  public abstract void close();
+}

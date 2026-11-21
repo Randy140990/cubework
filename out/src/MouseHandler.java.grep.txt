@@ -1,0 +1,27 @@
+42:	private double xpos;
+43:	private double ypos;
+177:				Locale.ROOT, "Scaled: (%f, %f). Absolute: (%f, %f)", getScaledXPos(window, this.xpos), getScaledYPos(window, this.ypos), this.xpos, this.ypos
+185:				window.getGuiScaledWidth(),
+186:				window.getGuiScaledHeight(),
+187:				window.getWidth(),
+189:				window.getGuiScale()
+270:				this.xpos = d;
+271:				this.ypos = e;
+275:					this.accumulatedDX = this.accumulatedDX + (d - this.xpos);
+276:					this.accumulatedDY = this.accumulatedDY + (e - this.ypos);
+279:				this.xpos = d;
+280:				this.ypos = e;
+339:		return d * window.getGuiScaledWidth() / window.getScreenWidth();
+343:		return getScaledXPos(window, this.xpos);
+347:		return d * window.getGuiScaledHeight() / window.getScreenHeight();
+351:		return getScaledYPos(window, this.ypos);
+395:	public double xpos() {
+396:		return this.xpos;
+399:	public double ypos() {
+400:		return this.ypos;
+419:				this.xpos = this.minecraft.getWindow().getScreenWidth() / 2;
+420:				this.ypos = this.minecraft.getWindow().getScreenHeight() / 2;
+421:				InputConstants.grabOrReleaseMouse(this.minecraft.getWindow(), 212995, this.xpos, this.ypos);
+432:			this.xpos = this.minecraft.getWindow().getScreenWidth() / 2;
+433:			this.ypos = this.minecraft.getWindow().getScreenHeight() / 2;
+434:			InputConstants.grabOrReleaseMouse(this.minecraft.getWindow(), 212993, this.xpos, this.ypos);

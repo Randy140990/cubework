@@ -1,0 +1,18 @@
+Compiled from "SystemToast.java"
+public class net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId {
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId NARRATOR_TOGGLE;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId WORLD_BACKUP;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId PACK_LOAD_FAILURE;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId WORLD_ACCESS_FAILURE;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId PACK_COPY_FAILURE;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId FILE_DROP_FAILURE;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId PERIODIC_NOTIFICATION;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId LOW_DISK_SPACE;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId CHUNK_LOAD_FAILURE;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId CHUNK_SAVE_FAILURE;
+  public static final net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId UNSECURE_SERVER_WARNING;
+  final long displayTime;
+  public net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId(long);
+  public net.minecraft.client.gui.components.toasts.SystemToast$SystemToastId();
+  static {};
+}

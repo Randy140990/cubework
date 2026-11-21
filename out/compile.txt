@@ -1,0 +1,14 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+
+> Configure project :
+Fabric Loom: 1.18.4
+
+Cannot remap modifiers because it does not exist in any of the targets [] or their parents.
+
+> Task :compileJava
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1795263525708.json
+
+BUILD SUCCESSFUL in 29s
+1 actionable task: 1 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.7.1/userguide/configuration_cache_enabling.html
+exit=0

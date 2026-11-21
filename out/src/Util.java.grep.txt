@@ -1,0 +1,8 @@
+463:	public static Util.OS getPlatform() {
+1107:		public void openUri(URI uRI) {
+1118:		public void openFile(File file) {
+1119:			this.openUri(file.toURI());
+1122:		public void openPath(Path path) {
+1123:			this.openUri(path.toUri());
+1135:		public void openUri(String string) {
+1137:				this.openUri(new URI(string));

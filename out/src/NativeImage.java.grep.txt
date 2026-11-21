@@ -1,0 +1,55 @@
+40:public final class NativeImage implements AutoCloseable {
+53:	public NativeImage(int i, int j, boolean bl) {
+57:	public NativeImage(NativeImage.Format format, int i, int j, boolean bl) {
+79:	public NativeImage(NativeImage.Format format, int i, int j, boolean bl, long l) {
+93:	public String toString() {
+101:	public static NativeImage read(InputStream inputStream) throws IOException {
+105:	public static NativeImage read(NativeImage.@Nullable Format format, InputStream inputStream) throws IOException {
+117:	public static NativeImage read(ByteBuffer byteBuffer) throws IOException {
+121:	public static NativeImage read(byte[] bs) throws IOException {
+146:	public static NativeImage read(NativeImage.@Nullable Format format, ByteBuffer byteBuffer) throws IOException {
+179:	public void close() {
+193:	public int getWidth() {
+197:	public int getHeight() {
+201:	public NativeImage.Format format() {
+219:	public int getPixel(int i, int j) {
+223:	public void setPixelABGR(int i, int j, int k) {
+237:	public void setPixel(int i, int j, int k) {
+241:	public NativeImage mappedCopy(IntUnaryOperator intUnaryOperator) {
+261:	public int[] getPixelsABGR() {
+272:	public int[] getPixels() {
+282:	public byte getLuminanceOrAlpha(int i, int j) {
+296:	public int[] makePixelArray() {
+313:	public void writeToFile(File file) throws IOException {
+317:	public boolean copyFromFont(FT_Face fT_Face, int i) {
+342:	public void writeToFile(Path path) throws IOException {
+376:	public void copyFrom(NativeImage nativeImage) {
+398:	public void fillRect(int i, int j, int k, int l, int m) {
+406:	public void copyRect(int i, int j, int k, int l, int m, int n, boolean bl, boolean bl2) {
+410:	public void copyRect(NativeImage nativeImage, int i, int j, int k, int l, int m, int n, boolean bl, boolean bl2) {
+421:	public void resizeSubRectTo(int i, int j, int k, int l, NativeImage nativeImage) {
+433:	public void untrack() {
+437:	public long getPointer() {
+442:	public enum Format {
+489:		public int components() {
+493:		public boolean hasRed() {
+497:		public boolean hasGreen() {
+501:		public boolean hasBlue() {
+505:		public boolean hasLuminance() {
+509:		public boolean hasAlpha() {
+513:		public int redOffset() {
+517:		public int greenOffset() {
+521:		public int blueOffset() {
+525:		public int luminanceOffset() {
+529:		public int alphaOffset() {
+533:		public boolean hasLuminanceOrRed() {
+537:		public boolean hasLuminanceOrGreen() {
+541:		public boolean hasLuminanceOrBlue() {
+545:		public boolean hasLuminanceOrAlpha() {
+549:		public int luminanceOrRedOffset() {
+553:		public int luminanceOrGreenOffset() {
+557:		public int luminanceOrBlueOffset() {
+561:		public int luminanceOrAlphaOffset() {
+565:		public boolean supportedByStb() {
+594:		public void invoke(long l, long m, int i) {
+604:		public void throwIfException() throws IOException {

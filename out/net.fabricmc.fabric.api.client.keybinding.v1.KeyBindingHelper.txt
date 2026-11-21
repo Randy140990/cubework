@@ -1,0 +1,6 @@
+Compiled from "KeyBindingHelper.java"
+public final class net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper {
+  private net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper();
+  public static net.minecraft.client.KeyMapping registerKeyBinding(net.minecraft.client.KeyMapping);
+  public static com.mojang.blaze3d.platform.InputConstants$Key getBoundKeyOf(net.minecraft.client.KeyMapping);
+}

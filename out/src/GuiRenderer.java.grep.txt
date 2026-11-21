@@ -1,0 +1,30 @@
+90:	private static final Comparator<GuiElementRenderState> ELEMENT_SORT_COMPARATOR = Comparator.comparing(GuiElementRenderState::scissorArea, SCISSOR_COMPARATOR)
+115:	private @Nullable ScreenRectangle previousScissorArea = null;
+191:		this.previousScissorArea = null;
+197:			this.recordMesh(this.bufferBuilder, this.previousPipeline, this.previousTextureSetup, this.previousScissorArea);
+206:				this.guiProjectionMatrixBuffer.getBuffer((float)window.getWidth() / window.getGuiScale(), (float)window.getHeight() / window.getGuiScale()),
+272:		ScreenRectangle screenRectangle = guiElementRenderState.scissorArea();
+274:			|| this.scissorChanged(screenRectangle, this.previousScissorArea)
+277:				this.recordMesh(this.bufferBuilder, this.previousPipeline, this.previousTextureSetup, this.previousScissorArea);
+283:			this.previousScissorArea = screenRectangle;
+292:			final ScreenRectangle screenRectangle = guiTextRenderState.scissor;
+313:			int i = this.getGuiScaleInvalidatingItemAtlasIfChanged();
+398:		int i = Minecraft.getInstance().getWindow().getGuiScale();
+421:		RenderSystem.enableScissorForRenderTypeDraws(i, this.itemsAtlas.getHeight(0) - j - k, k, k);
+425:		RenderSystem.disableScissorForRenderTypeDraws();
+447:					guiItemRenderState.scissorArea(),
+478:			int k = this.itemsAtlas.getWidth(0) / i;
+481:				return this.itemsAtlas.getWidth(0);
+492:	private int getGuiScaleInvalidatingItemAtlasIfChanged() {
+493:		int i = Minecraft.getInstance().getWindow().getGuiScale();
+571:						meshToDraw.scissorArea
+615:		ScreenRectangle screenRectangle = draw.scissorArea();
+617:			this.enableScissor(screenRectangle, renderPass);
+619:			renderPass.disableScissor();
+642:	private boolean scissorChanged(@Nullable ScreenRectangle screenRectangle, @Nullable ScreenRectangle screenRectangle2) {
+650:	private void enableScissor(ScreenRectangle screenRectangle, RenderPass renderPass) {
+652:		int i = window.getHeight();
+653:		int j = window.getGuiScale();
+658:		renderPass.enableScissor((int)d, (int)e, Math.max(0, (int)f), Math.max(0, (int)g));
+716:		@Nullable ScreenRectangle scissorArea
+721:	record MeshToDraw(MeshData mesh, RenderPipeline pipeline, TextureSetup textureSetup, @Nullable ScreenRectangle scissorArea) implements AutoCloseable {

@@ -1,0 +1,50 @@
+285:	public final LevelRenderer levelRenderer;
+297:	public final Options options;
+303:	public final File gameDirectory;
+318:	private final RenderTarget mainRenderTarget;
+359:	public boolean noRender;
+397:		this.gameDirectory = gameConfig.location.gameDirectory;
+402:		Path path = this.gameDirectory.toPath();
+416:		this.services = Services.create(yggdrasilAuthenticationService, this.gameDirectory);
+439:		this.options = new Options(this, this.gameDirectory);
+440:		this.debugEntries = new DebugScreenEntryList(this.gameDirectory);
+471:					ClientShutdownWatchdog.startShutdownWatchdog(gameConfig.location.gameDirectory, Minecraft.this.gameThread.threadId());
+496:		this.mainRenderTarget = new MainTarget(this.window.getWidth(), this.window.getHeight());
+596:		this.levelRenderer = new LevelRenderer(
+604:		this.resourceManager.registerReloadListener(this.levelRenderer);
+605:		this.resourceManager.registerReloadListener(this.levelRenderer.getCloudRenderer());
+613:		if (this.mainRenderTarget.width != this.window.getWidth() || this.mainRenderTarget.height != this.window.getHeight()) {
+631:			this.window.setWindowed(this.mainRenderTarget.width, this.mainRenderTarget.height);
+646:		this.resizeDisplay();
+690:		Window window = this.getWindow();
+695:		Window window = this.getWindow();
+700:		Window window = this.getWindow();
+861:		ToastManager toastManager = this.getToastManager();
+935:	public RenderTarget getMainRenderTarget() {
+936:		return this.mainRenderTarget;
+957:			crash(this, this.gameDirectory, this.delayedCrash.get());
+965:		crash(this, this.gameDirectory, crashReport2);
+1030:					this.levelRenderer.allChanged();
+1112:	public void setScreen(@Nullable Screen screen) {
+1150:			this.noRender = false;
+1211:			this.levelRenderer.close();
+1233:	private void runTick(boolean bl) {
+1281:		try (Gizmos.TemporaryCollection temporaryCollection2 = this.levelRenderer.collectPerFrameGizmos()) {
+1302:			RenderTarget renderTarget = this.getMainRenderTarget();
+1305:			if (!this.noRender) {
+1306:				this.gameRenderer.render(this.deltaTracker, bl);
+1311:				renderTarget.blitToScreen();
+1413:	public void resizeDisplay() {
+1420:		RenderTarget renderTarget = this.getMainRenderTarget();
+1431:	public int getFps() {
+1496:			new ClientMetricsSamplersProvider(Util.timeSource, this.levelRenderer), Util.timeSource, Util.ioPool(), new MetricsPersister("client"), profileResults -> {
+1887:			this.levelRenderer.needsUpdate();
+2205:	public void setScreenAndShow(Screen screen) {
+2223:		this.levelRenderer.setLevel(clientLevel);
+2493:	public boolean isPaused() {
+2501:	public SoundManager getSoundManager() {
+2609:	public ToastManager getToastManager() {
+2617:	public boolean isWindowActive() {
+2652:		RenderTarget renderTarget = this.getMainRenderTarget();
+2696:				this.gameRenderer.renderLevel(DeltaTracker.ONE);
+2738:	public Window getWindow() {

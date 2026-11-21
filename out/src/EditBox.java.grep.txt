@@ -1,0 +1,54 @@
+33:public class EditBox extends AbstractWidget {
+37:	public static final int BACKWARDS = -1;
+38:	public static final int FORWARDS = 1;
+41:	public static final int DEFAULT_TEXT_COLOR = -2039584;
+42:	public static final Style DEFAULT_HINT_STYLE = Style.EMPTY.withColor(ChatFormatting.DARK_GRAY);
+43:	public static final Style SEARCH_HINT_STYLE = Style.EMPTY.applyFormats(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+68:	public EditBox(Font font, int i, int j, Component component) {
+72:	public EditBox(Font font, int i, int j, int k, int l, Component component) {
+76:	public EditBox(Font font, int i, int j, int k, int l, @Nullable EditBox editBox, Component component) {
+86:	public void setResponder(Consumer<String> consumer) {
+90:	public void addFormatter(EditBox.TextFormatter textFormatter) {
+100:	public void setValue(String string) {
+114:	public String getValue() {
+118:	public String getHighlighted() {
+125:	public void setX(int i) {
+131:	public void setY(int i) {
+136:	public void setFilter(Predicate<String> predicate) {
+140:	public void insertText(String string) {
+182:	public void deleteWords(int i) {
+192:	public void deleteChars(int i) {
+196:	public void deleteCharsToPos(int i) {
+214:	public int getWordPosition(int i) {
+252:	public void moveCursor(int i, boolean bl) {
+260:	public void moveCursorTo(int i, boolean bl) {
+269:	public void setCursorPosition(int i) {
+274:	public void moveCursorToStart(boolean bl) {
+278:	public void moveCursorToEnd(boolean bl) {
+283:	public boolean keyPressed(KeyEvent keyEvent) {
+357:	public boolean canConsumeInput() {
+362:	public boolean charTyped(CharacterEvent characterEvent) {
+393:	public void onClick(MouseButtonEvent mouseButtonEvent, boolean bl) {
+407:	public void playDownSound(SoundManager soundManager) {
+411:	public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+493:	public void setMaxLength(int i) {
+505:	public int getCursorPosition() {
+509:	public boolean isBordered() {
+513:	public void setBordered(boolean bl) {
+518:	public void setTextColor(int i) {
+522:	public void setTextColorUneditable(int i) {
+527:	public void setFocused(boolean bl) {
+540:	public void setEditable(boolean bl) {
+548:	public void setCentered(boolean bl) {
+553:	public void setTextShadow(boolean bl) {
+557:	public void setInvertHighlightedTextColor(boolean bl) {
+561:	public int getInnerWidth() {
+565:	public void setHighlightPos(int i) {
+590:	public void setCanLoseFocus(boolean bl) {
+594:	public boolean isVisible() {
+598:	public void setVisible(boolean bl) {
+602:	public void setSuggestion(@Nullable String string) {
+606:	public int getScreenX(int i) {
+611:	public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+615:	public void setHint(Component component) {
+622:	public interface TextFormatter {

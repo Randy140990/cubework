@@ -1,0 +1,21 @@
+Compiled from "GpuBuffer.java"
+public abstract class com.mojang.blaze3d.buffers.GpuBuffer implements java.lang.AutoCloseable {
+  public static final int USAGE_MAP_READ;
+  public static final int USAGE_MAP_WRITE;
+  public static final int USAGE_HINT_CLIENT_STORAGE;
+  public static final int USAGE_COPY_DST;
+  public static final int USAGE_COPY_SRC;
+  public static final int USAGE_VERTEX;
+  public static final int USAGE_INDEX;
+  public static final int USAGE_UNIFORM;
+  public static final int USAGE_UNIFORM_TEXEL_BUFFER;
+  private final int usage;
+  private final long size;
+  public com.mojang.blaze3d.buffers.GpuBuffer(int, long);
+  public long size();
+  public int usage();
+  public abstract boolean isClosed();
+  public abstract void close();
+  public com.mojang.blaze3d.buffers.GpuBufferSlice slice(long, long);
+  public com.mojang.blaze3d.buffers.GpuBufferSlice slice();
+}

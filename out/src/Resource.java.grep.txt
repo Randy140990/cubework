@@ -1,0 +1,9 @@
+14:public class Resource implements FabricResource {
+20:	public Resource(PackResources packResources, IoSupplier<InputStream> ioSupplier, IoSupplier<ResourceMetadata> ioSupplier2) {
+26:	public Resource(PackResources packResources, IoSupplier<InputStream> ioSupplier) {
+33:	public PackResources source() {
+37:	public String sourcePackId() {
+41:	public Optional<KnownPack> knownPackInfo() {
+45:	public InputStream open() throws IOException {
+49:	public BufferedReader openAsReader() throws IOException {
+53:	public ResourceMetadata metadata() throws IOException {

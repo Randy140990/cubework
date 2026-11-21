@@ -1,0 +1,26 @@
+30:public class Camera implements TrackedWaypoint.Camera {
+52:	public void setup(Level level, Entity entity, boolean bl, boolean bl2, float f) {
+104:	public void tick() {
+157:	public Vec3 position() {
+161:	public BlockPos blockPosition() {
+165:	public float xRot() {
+169:	public float yRot() {
+174:	public float yaw() {
+178:	public Quaternionf rotation() {
+182:	public Entity entity() {
+186:	public boolean isInitialized() {
+190:	public boolean isDetached() {
+194:	public EnvironmentAttributeProbe attributeProbe() {
+198:	public Camera.NearPlane getNearPlane() {
+209:	public FogType getFluidInCamera() {
+240:	public Vector3fc forwardVector() {
+244:	public Vector3fc upVector() {
+248:	public Vector3fc leftVector() {
+252:	public void reset() {
+259:	public float getPartialTickTime() {
+264:	public static class NearPlane {
+275:		public Vec3 getTopLeft() {
+279:		public Vec3 getTopRight() {
+283:		public Vec3 getBottomLeft() {
+287:		public Vec3 getBottomRight() {
+291:		public Vec3 getPointOnPlane(float f, float g) {

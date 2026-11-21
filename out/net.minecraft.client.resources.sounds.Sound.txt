@@ -1,0 +1,27 @@
+Compiled from "Sound.java"
+public class net.minecraft.client.resources.sounds.Sound implements net.minecraft.client.sounds.Weighted<net.minecraft.client.resources.sounds.Sound> {
+  public static final net.minecraft.resources.FileToIdConverter SOUND_LISTER;
+  private final net.minecraft.resources.Identifier location;
+  private final net.minecraft.util.valueproviders.SampledFloat volume;
+  private final net.minecraft.util.valueproviders.SampledFloat pitch;
+  private final int weight;
+  private final net.minecraft.client.resources.sounds.Sound$Type type;
+  private final boolean stream;
+  private final boolean preload;
+  private final int attenuationDistance;
+  public net.minecraft.client.resources.sounds.Sound(net.minecraft.resources.Identifier, net.minecraft.util.valueproviders.SampledFloat, net.minecraft.util.valueproviders.SampledFloat, int, net.minecraft.client.resources.sounds.Sound$Type, boolean, boolean, int);
+  public net.minecraft.resources.Identifier getLocation();
+  public net.minecraft.resources.Identifier getPath();
+  public net.minecraft.util.valueproviders.SampledFloat getVolume();
+  public net.minecraft.util.valueproviders.SampledFloat getPitch();
+  public int getWeight();
+  public net.minecraft.client.resources.sounds.Sound getSound(net.minecraft.util.RandomSource);
+  public void preloadIfRequired(net.minecraft.client.sounds.SoundEngine);
+  public net.minecraft.client.resources.sounds.Sound$Type getType();
+  public boolean shouldStream();
+  public boolean shouldPreload();
+  public int getAttenuationDistance();
+  public java.lang.String toString();
+  public java.lang.Object getSound(net.minecraft.util.RandomSource);
+  static {};
+}

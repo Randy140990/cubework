@@ -1,0 +1,39 @@
+22:public class KeyMapping implements Comparable<KeyMapping> {
+33:	public static void click(InputConstants.Key key) {
+37:	public static void set(InputConstants.Key key, boolean bl) {
+50:	public static void setAll() {
+60:	public static void releaseAll() {
+66:	public static void restoreToggleStatesOnScreenClosed() {
+74:	public static void resetToggleKeys() {
+82:	public static void resetMapping() {
+90:	public KeyMapping(String string, int i, KeyMapping.Category category) {
+94:	public KeyMapping(String string, InputConstants.Type type, int i, KeyMapping.Category category) {
+98:	public KeyMapping(String string, InputConstants.Type type, int i, KeyMapping.Category category, int j) {
+108:	public boolean isDown() {
+112:	public KeyMapping.Category getCategory() {
+116:	public boolean consumeClick() {
+134:	public String getName() {
+138:	public InputConstants.Key getDefaultKey() {
+142:	public void setKey(InputConstants.Key key) {
+146:	public int compareTo(KeyMapping keyMapping) {
+154:	public static Supplier<Component> createNameSupplier(String string) {
+159:	public boolean same(KeyMapping keyMapping) {
+163:	public boolean isUnbound() {
+167:	public boolean matches(KeyEvent keyEvent) {
+173:	public boolean matchesMouse(MouseButtonEvent mouseButtonEvent) {
+177:	public Component getTranslatedKeyMessage() {
+181:	public boolean isDefault() {
+185:	public String saveString() {
+189:	public void setDown(boolean bl) {
+197:	public static @Nullable KeyMapping get(String string) {
+202:	public record Category(Identifier id) {
+204:		public static final KeyMapping.Category MOVEMENT = register("movement");
+205:		public static final KeyMapping.Category MISC = register("misc");
+206:		public static final KeyMapping.Category MULTIPLAYER = register("multiplayer");
+207:		public static final KeyMapping.Category GAMEPLAY = register("gameplay");
+208:		public static final KeyMapping.Category INVENTORY = register("inventory");
+209:		public static final KeyMapping.Category CREATIVE = register("creative");
+210:		public static final KeyMapping.Category SPECTATOR = register("spectator");
+211:		public static final KeyMapping.Category DEBUG = register("debug");
+217:		public static KeyMapping.Category register(Identifier identifier) {
+227:		public Component label() {

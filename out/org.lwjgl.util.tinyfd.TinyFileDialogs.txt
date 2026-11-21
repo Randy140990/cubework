@@ -1,0 +1,45 @@
+Compiled from "TinyFileDialogs.java"
+public class org.lwjgl.util.tinyfd.TinyFileDialogs {
+  public static final java.lang.String tinyfd_version;
+  public static final java.lang.String tinyfd_needs;
+  public static final java.lang.String tinyfd_response;
+  public static final java.lang.String tinyfd_verbose;
+  public static final java.lang.String tinyfd_silent;
+  public static final java.lang.String tinyfd_allowCursesDialogs;
+  public static final java.lang.String tinyfd_forceConsole;
+  public static final java.lang.String tinyfd_assumeGraphicDisplay;
+  public static final java.lang.String tinyfd_winUtf8;
+  protected org.lwjgl.util.tinyfd.TinyFileDialogs();
+  public static native long ntinyfd_getGlobalChar(long);
+  public static java.lang.String tinyfd_getGlobalChar(java.nio.ByteBuffer);
+  public static java.lang.String tinyfd_getGlobalChar(java.lang.CharSequence);
+  public static native int ntinyfd_getGlobalInt(long);
+  public static int tinyfd_getGlobalInt(java.nio.ByteBuffer);
+  public static int tinyfd_getGlobalInt(java.lang.CharSequence);
+  public static native int ntinyfd_setGlobalInt(long, int);
+  public static int tinyfd_setGlobalInt(java.nio.ByteBuffer, int);
+  public static int tinyfd_setGlobalInt(java.lang.CharSequence, int);
+  public static native void tinyfd_beep();
+  public static native int ntinyfd_notifyPopup(long, long, long);
+  public static int tinyfd_notifyPopup(java.nio.ByteBuffer, java.nio.ByteBuffer, java.nio.ByteBuffer);
+  public static int tinyfd_notifyPopup(java.lang.CharSequence, java.lang.CharSequence, java.lang.CharSequence);
+  public static native int ntinyfd_messageBox(long, long, long, long, int);
+  public static boolean tinyfd_messageBox(java.nio.ByteBuffer, java.nio.ByteBuffer, java.nio.ByteBuffer, java.nio.ByteBuffer, boolean);
+  public static boolean tinyfd_messageBox(java.lang.CharSequence, java.lang.CharSequence, java.lang.CharSequence, java.lang.CharSequence, boolean);
+  public static native long ntinyfd_inputBox(long, long, long);
+  public static java.lang.String tinyfd_inputBox(java.nio.ByteBuffer, java.nio.ByteBuffer, java.nio.ByteBuffer);
+  public static java.lang.String tinyfd_inputBox(java.lang.CharSequence, java.lang.CharSequence, java.lang.CharSequence);
+  public static native long ntinyfd_saveFileDialog(long, long, int, long, long);
+  public static java.lang.String tinyfd_saveFileDialog(java.nio.ByteBuffer, java.nio.ByteBuffer, org.lwjgl.PointerBuffer, java.nio.ByteBuffer);
+  public static java.lang.String tinyfd_saveFileDialog(java.lang.CharSequence, java.lang.CharSequence, org.lwjgl.PointerBuffer, java.lang.CharSequence);
+  public static native long ntinyfd_openFileDialog(long, long, int, long, long, int);
+  public static java.lang.String tinyfd_openFileDialog(java.nio.ByteBuffer, java.nio.ByteBuffer, org.lwjgl.PointerBuffer, java.nio.ByteBuffer, boolean);
+  public static java.lang.String tinyfd_openFileDialog(java.lang.CharSequence, java.lang.CharSequence, org.lwjgl.PointerBuffer, java.lang.CharSequence, boolean);
+  public static native long ntinyfd_selectFolderDialog(long, long);
+  public static java.lang.String tinyfd_selectFolderDialog(java.nio.ByteBuffer, java.nio.ByteBuffer);
+  public static java.lang.String tinyfd_selectFolderDialog(java.lang.CharSequence, java.lang.CharSequence);
+  public static native long ntinyfd_colorChooser(long, long, long, long);
+  public static java.lang.String tinyfd_colorChooser(java.nio.ByteBuffer, java.nio.ByteBuffer, java.nio.ByteBuffer, java.nio.ByteBuffer);
+  public static java.lang.String tinyfd_colorChooser(java.lang.CharSequence, java.lang.CharSequence, java.nio.ByteBuffer, java.nio.ByteBuffer);
+  static {};
+}

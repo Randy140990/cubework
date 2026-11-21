@@ -1,0 +1,11 @@
+8:public interface DeltaTracker {
+27:		public float getGameTimeDeltaTicks() {
+32:		public float getGameTimeDeltaPartialTick(boolean bl) {
+37:		public float getRealtimeDeltaTicks() {
+55:		public Timer(float f, long l, FloatUnaryOperator floatUnaryOperator) {
+61:		public int advanceTime(long l, boolean bl) {
+80:		public void updatePauseState(boolean bl) {
+104:		public void updateFrozenState(boolean bl) {
+109:		public float getGameTimeDeltaTicks() {
+114:		public float getGameTimeDeltaPartialTick(boolean bl) {
+123:		public float getRealtimeDeltaTicks() {

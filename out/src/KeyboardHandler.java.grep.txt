@@ -1,0 +1,17 @@
+142:	private void debugFeedbackEnabledStatus(String string, boolean bl) {
+146:	private void showDebugChat(Component component) {
+158:	private void debugWarningComponent(Component component) {
+162:	private void debugFeedbackComponent(Component component) {
+166:	private void debugFeedbackTranslated(String string, Object... objects) {
+170:	private void debugFeedback(String string) {
+348:	private void copyRecreateCommand(boolean bl, boolean bl2) {
+399:	private void copyCreateBlockCommand(BlockState blockState, BlockPos blockPos, @Nullable CompoundTag compoundTag) {
+409:	private void copyCreateEntityCommand(Identifier identifier, Vec3 vec3, @Nullable CompoundTag compoundTag) {
+423:	private void keyPress(long l, @KeyEvent.Action int i, KeyEvent keyEvent) {
+514:						if (screen.keyPressed(keyEvent)) {
+524:					CrashReport crashReport = CrashReport.forThrowable(throwable, "keyPressed event handler");
+593:	private void charTyped(long l, CharacterEvent characterEvent) {
+611:	public void setup(Window window) {
+614:			this.minecraft.execute(() -> this.keyPress(l, k, keyEvent));
+629:	public void setClipboard(String string) {
+635:	public void tick() {

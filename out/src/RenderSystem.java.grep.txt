@@ -1,0 +1,10 @@
+95:	public static boolean isOnRenderThread() {
+100:		if (!isOnRenderThread()) {
+120:	public static void flipFrame(Window window, @Nullable TracyFrameCapture tracyFrameCapture) {
+186:		apiDescription = getDevice().getImplementationInformation();
+255:	public static void queueFencedTask(Runnable runnable) {
+256:		PENDING_FENCES.addLast(new RenderSystem.GpuAsyncTask(runnable, getDevice().createCommandEncoder().createFence()));
+259:	public static void executePendingTasks() {
+275:	public static GpuDevice getDevice() {
+277:			throw new IllegalStateException("Can't getDevice() before it was initialized");
+364:					this.buffer = RenderSystem.getDevice().createBuffer(() -> "Auto Storage index buffer", 64, byteBuffer);

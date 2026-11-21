@@ -1,0 +1,17 @@
+26:public class ToastManager {
+36:	public ToastManager(Minecraft minecraft, Options options) {
+41:	public void update() {
+83:	public void render(GuiGraphics guiGraphics) {
+122:	public <T extends Toast> @Nullable T getToast(Class<? extends T> class_, Object object) {
+138:	public void clear() {
+144:	public void addToast(Toast toast) {
+148:	public void showNowPlayingToast() {
+155:	public void hideNowPlayingToast() {
+161:	public Minecraft getMinecraft() {
+165:	public double getNotificationDisplayTimeMultiplier() {
+177:	public void setMusicToastDisplayState(MusicToastDisplayState musicToastDisplayState) {
+213:		public T getToast() {
+217:		public void resetToast() {
+226:		public boolean hasFinishedRendering() {
+240:		public void update() {
+267:		public void render(GuiGraphics guiGraphics, int i) {

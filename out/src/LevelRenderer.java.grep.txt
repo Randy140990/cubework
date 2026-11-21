@@ -1,0 +1,56 @@
+122:public class LevelRenderer implements ResourceManagerReloadListener, AutoCloseable {
+125:	public static final int SECTION_SIZE = 16;
+126:	public static final int HALF_SECTION_SIZE = 8;
+127:	public static final int NEARBY_SECTION_DISTANCE_IN_BLOCKS = 32;
+139:	public final DebugRenderer debugRenderer = new DebugRenderer();
+140:	public final GameTestBlockHighlightRenderer gameTestBlockHighlightRenderer = new GameTestBlockHighlightRenderer();
+172:	public LevelRenderer(
+190:	public void close() {
+207:	public void onResourceManagerReload(ResourceManager resourceManager) {
+216:	public void initOutline() {
+238:	public void doEntityOutline() {
+248:	public void setLevel(@Nullable ClientLevel clientLevel) {
+279:	public void allChanged() {
+307:	public void resize(int i, int j) {
+314:	public @Nullable String getSectionStatistics() {
+332:	public @Nullable SectionRenderDispatcher getSectionRenderDispatcher() {
+336:	public double getTotalSections() {
+340:	public double getLastViewDistance() {
+344:	public int countRenderedSections() {
+356:	public void resetSampler() {
+364:	public @Nullable String getEntityStatistics() {
+422:	public static Frustum offsetFrustum(Frustum frustum) {
+435:	public void addRecentlyCompiledSection(SectionRenderDispatcher.RenderSection renderSection) {
+456:	public void renderLevel(
+568:			public void beforeExecutePass(String string) {
+573:			public void afterExecutePass(String string) {
+1091:	public void endFrame() {
+1095:	public void captureFrustum() {
+1099:	public void killFrustum() {
+1103:	public void tick(Camera camera) {
+1295:	public void blockChanged(BlockGetter blockGetter, BlockPos blockPos, BlockState blockState, BlockState blockState2, @Block.UpdateFlags int i) {
+1309:	public void setBlocksDirty(int i, int j, int k, int l, int m, int n) {
+1319:	public void setBlockDirty(BlockPos blockPos, BlockState blockState, BlockState blockState2) {
+1325:	public void setSectionDirtyWithNeighbors(int i, int j, int k) {
+1329:	public void setSectionRangeDirty(int i, int j, int k, int l, int m, int n) {
+1339:	public void setSectionDirty(int i, int j, int k) {
+1347:	public void onSectionBecomingNonEmpty(long l) {
+1355:	public void destroyBlockProgress(int i, BlockPos blockPos, int j) {
+1381:	public boolean hasRenderedAllSections() {
+1385:	public void onChunkReadyToRender(ChunkPos chunkPos) {
+1389:	public void needsUpdate() {
+1394:	public static int getLightColor(BlockAndTintGetter blockAndTintGetter, BlockPos blockPos) {
+1398:	public static int getLightColor(
+1416:	public boolean isSectionCompiledAndVisible(BlockPos blockPos) {
+1423:	public @Nullable RenderTarget entityOutlineTarget() {
+1427:	public @Nullable RenderTarget getTranslucentTarget() {
+1431:	public @Nullable RenderTarget getItemEntityTarget() {
+1435:	public @Nullable RenderTarget getParticlesTarget() {
+1439:	public @Nullable RenderTarget getWeatherTarget() {
+1443:	public @Nullable RenderTarget getCloudsTarget() {
+1448:	public ObjectArrayList<SectionRenderDispatcher.RenderSection> getVisibleSections() {
+1453:	public SectionOcclusionGraph getSectionOcclusionGraph() {
+1457:	public @Nullable Frustum getCapturedFrustum() {
+1461:	public CloudRenderer getCloudRenderer() {
+1465:	public Gizmos.TemporaryCollection collectPerFrameGizmos() {
+1489:	public interface BrightnessGetter {

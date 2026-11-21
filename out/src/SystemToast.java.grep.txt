@@ -1,0 +1,44 @@
+19:public class SystemToast implements Toast {
+24:	private final SystemToast.SystemToastId id;
+33:	public SystemToast(SystemToast.SystemToastId systemToastId, Component component, @Nullable Component component2) {
+42:	public static SystemToast multiline(Minecraft minecraft, SystemToast.SystemToastId systemToastId, Component component, Component component2) {
+49:	private SystemToast(SystemToast.SystemToastId systemToastId, Component component, List<FormattedCharSequence> list, int i) {
+61:	public int width() {
+66:	public int height() {
+70:	public void forceHide() {
+75:	public Toast.Visibility getWantedVisibility() {
+80:	public void update(ToastManager toastManager, long l) {
+92:	public void render(GuiGraphics guiGraphics, Font font, long l) {
+105:	public void reset(Component component, @Nullable Component component2) {
+111:	public SystemToast.SystemToastId getToken() {
+115:	public static void add(ToastManager toastManager, SystemToast.SystemToastId systemToastId, Component component, @Nullable Component component2) {
+119:	public static void addOrUpdate(ToastManager toastManager, SystemToast.SystemToastId systemToastId, Component component, @Nullable Component component2) {
+128:	public static void forceHide(ToastManager toastManager, SystemToast.SystemToastId systemToastId) {
+135:	public static void onWorldAccessFailure(Minecraft minecraft, String string) {
+137:			minecraft.getToastManager(), SystemToast.SystemToastId.WORLD_ACCESS_FAILURE, Component.translatable("selectWorld.access_failure"), Component.literal(string)
+141:	public static void onWorldDeleteFailure(Minecraft minecraft, String string) {
+143:			minecraft.getToastManager(), SystemToast.SystemToastId.WORLD_ACCESS_FAILURE, Component.translatable("selectWorld.delete_failure"), Component.literal(string)
+147:	public static void onPackCopyFailure(Minecraft minecraft, String string) {
+148:		add(minecraft.getToastManager(), SystemToast.SystemToastId.PACK_COPY_FAILURE, Component.translatable("pack.copyFailure"), Component.literal(string));
+151:	public static void onFileDropFailure(Minecraft minecraft, int i) {
+154:			SystemToast.SystemToastId.FILE_DROP_FAILURE,
+160:	public static void onLowDiskSpace(Minecraft minecraft) {
+163:			SystemToast.SystemToastId.LOW_DISK_SPACE,
+169:	public static void onChunkLoadFailure(Minecraft minecraft, ChunkPos chunkPos) {
+172:			SystemToast.SystemToastId.CHUNK_LOAD_FAILURE,
+178:	public static void onChunkSaveFailure(Minecraft minecraft, ChunkPos chunkPos) {
+181:			SystemToast.SystemToastId.CHUNK_SAVE_FAILURE,
+188:	public static class SystemToastId {
+189:		public static final SystemToast.SystemToastId NARRATOR_TOGGLE = new SystemToast.SystemToastId();
+190:		public static final SystemToast.SystemToastId WORLD_BACKUP = new SystemToast.SystemToastId();
+191:		public static final SystemToast.SystemToastId PACK_LOAD_FAILURE = new SystemToast.SystemToastId();
+192:		public static final SystemToast.SystemToastId WORLD_ACCESS_FAILURE = new SystemToast.SystemToastId();
+193:		public static final SystemToast.SystemToastId PACK_COPY_FAILURE = new SystemToast.SystemToastId();
+194:		public static final SystemToast.SystemToastId FILE_DROP_FAILURE = new SystemToast.SystemToastId();
+195:		public static final SystemToast.SystemToastId PERIODIC_NOTIFICATION = new SystemToast.SystemToastId();
+196:		public static final SystemToast.SystemToastId LOW_DISK_SPACE = new SystemToast.SystemToastId(10000L);
+197:		public static final SystemToast.SystemToastId CHUNK_LOAD_FAILURE = new SystemToast.SystemToastId();
+198:		public static final SystemToast.SystemToastId CHUNK_SAVE_FAILURE = new SystemToast.SystemToastId();
+199:		public static final SystemToast.SystemToastId UNSECURE_SERVER_WARNING = new SystemToast.SystemToastId(10000L);
+202:		public SystemToastId(long l) {
+206:		public SystemToastId() {
