@@ -50,9 +50,16 @@ public class LensClient implements ClientModInitializer {
 			Screens.getButtons(screen).add(b);
 		});
 
+		// FFmpeg and the graphics card's encoder are checked in the background as the game starts, so F10 is
+		// ready straight away; then anything a crash left unfinished is saved.
 		ClientLifecycleEvents.CLIENT_STARTED.register(mc -> {
-			Ffmpeg.find();
-			Rescue.runAsync();
+			Thread t = new Thread(() -> {
+				String exe = Ffmpeg.findNow();
+				if (exe != null) Ffmpeg.probe(exe);
+				Rescue.runAsync();
+			}, "Lightlens start-up checks");
+			t.setDaemon(true);
+			t.start();
 		});
 		ClientLifecycleEvents.CLIENT_STOPPING.register(mc -> Recorder.onShutdown());
 	}

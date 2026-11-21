@@ -141,6 +141,7 @@ public final class Recorder {
 			Ffmpeg.probeAsync();
 			return "Checking your graphics card's video encoder, try again in a moment";
 		}
+		if (Ffmpeg.h264() == null) return "This FFmpeg can't make video here. Pick another in config/lightlens.json (ffmpegPath)";
 		return null;
 	}
 
@@ -247,6 +248,7 @@ public final class Recorder {
 		paused = false;
 		pausedNanos = 0;
 		lastSlot = -1;
+		phase = -1;
 		nextSpaceCheck = System.currentTimeMillis() + 5000;
 		startNanos = System.nanoTime();
 		state = State.RECORDING;
@@ -318,7 +320,8 @@ public final class Recorder {
 			READBACK.ensure(outW, outH);
 			TARGET.ensure(outW, outH);
 			READBACK.collect(Recorder::hand, false);
-			if (!paused && !sharp && winW > 0 && winH > 0) {
+			// Minimised, the game doesn't show a frame: nothing new to record (the video holds the last picture).
+			if (!paused && !sharp && winW > 0 && winH > 0 && !Minecraft.getInstance().getWindow().isMinimized()) {
 				Gl.readFromWindow();
 				grab(winW, winH);
 			}
@@ -346,10 +349,16 @@ public final class Recorder {
 		}
 	}
 
-	/** If this frame's due (one per 1/fps of a second), copies what's bound for reading into the next buffer. */
+	/**
+	 * If this frame's due, copies what's bound for reading into the next buffer. The video's frame slots (1/fps of a
+	 * second each) are lined up with the first frame recorded, and a frame up to 30% of a slot early counts for it, so
+	 * a game running at the video's frame rate gives every slot one frame instead of now and then two and then none.
+	 */
 	private static void grab(int srcW, int srcH) {
 		long ms = clockMs();
-		long slot = ms * fps / 1000;
+		double frameMs = 1000.0 / fps;
+		if (phase < 0) phase = ms;
+		long slot = (long) Math.floor((ms - phase) / frameMs + 0.3);
 		if (slot <= lastSlot) return;
 		lastSlot = slot;
 		if (READBACK.full()) {
@@ -359,9 +368,12 @@ public final class Recorder {
 		int[] c = Sizes.crop(shape, srcW, srcH);
 		Gl.blitInto(TARGET, srcH, c[0], c[1], c[2], c[3]);
 		GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, TARGET.fbo);
-		READBACK.submit(Math.round(slot * 1000.0 / fps));
+		READBACK.submit(Math.round(phase + slot * frameMs));
 		captured++;
 	}
+
+	/** When the first frame was recorded (ms on the recording's clock), or -1 before it. */
+	private static double phase = -1;
 
 	/** A frame the graphics card has finished: copied out and queued for the writer, or dropped if it's behind. */
 	private static void hand(ByteBuffer rgba, long time) {
@@ -431,7 +443,7 @@ public final class Recorder {
 		String error = null;
 		try {
 			status = "Finishing the picture";
-			queue.put(new Frame(null, end));
+			while (!queue.offer(new Frame(null, end), 1, TimeUnit.SECONDS)) if (!w.isAlive()) break;
 			w.join(120_000);
 			if (!p.waitFor(180, TimeUnit.SECONDS)) {
 				p.destroyForcibly();
