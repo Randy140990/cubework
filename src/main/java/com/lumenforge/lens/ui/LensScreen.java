@@ -215,7 +215,7 @@ public final class LensScreen extends Screen {
 	private void footer(GuiGraphics g, float x, float y, float w, float h, String main, String note, int noteColour) {
 		float fy = y + h - 22;
 		rect(g, x + 10, fy - 4, w - 20, 1 / gs(), a(0x1AFFFFFF));
-		text(g, font, fit(font, main, MONO, Math.round(w - 20)), MONO, x + 10, fy + 4, a(SOFT));
+		text(g, font, fit(font, main, SEMI, Math.round(w - 20)), SEMI, x + 10, fy + 4, a(SOFT));
 		text(g, font, fit(font, note, UI, Math.round(w - 20)), UI, x + 10, fy + 13, a(noteColour));
 	}
 
@@ -248,7 +248,7 @@ public final class LensScreen extends Screen {
 			note = "Sharper draws " + k + "x the size: fewer fps";
 			colour = AMBER;
 		} else if (bigger) {
-			note = "Enlarged from your " + cropH + "p window";
+			note = "Enlarged from " + cropH + "p";
 		} else {
 			note = "About " + Sizes.bytes(per10) + " per 10 min";
 		}
@@ -295,27 +295,23 @@ public final class LensScreen extends Screen {
 
 	private void strip(GuiGraphics g, Settings s, float x, float y, float w, float h, boolean locked, int mx, int my) {
 		card(g, x, y, w, h, 7, a(CARD), a(CARD_EDGE));
-		float third = w / 3;
+		float saveW = w * 0.44F, encW = w * 0.32F;
 		float cy = y + h / 2;
 
-		// Save to.
+		// Save to: the label with the free space, the folder, and Choose / Open on the right.
 		Path folder = Lens.output();
-		float bx = x + third - 10;
+		float bx = x + saveW - 10;
 		bx = ghost(g, bx, cy, "Open", true, () -> openFolder(folder), mx, my, true) - 4;
-		bx = ghost(g, bx, cy, choosing ? "Choosing…" : "Choose", !choosing && !locked, this::chooseFolder, mx, my, true) - 6;
-		text(g, font, "SAVE TO", SEMI, x + 10, cy - 5, a(DIM));
+		bx = ghost(g, bx, cy, choosing ? "Choosing…" : "Choose", !choosing && !locked, this::chooseFolder, mx, my, true) - 8;
+		float lx = text(g, font, "SAVE TO", SEMI, x + 10, cy - 5, a(DIM));
 		long free = Capture.freeSpace(folder);
+		if (free >= 0) text(g, font, "· " + Sizes.bytes(free) + " free", UI, lx + 4, cy - 5, a(DIM));
 		String where = s.folderChosen ? folder.toString() : "Not chosen yet";
-		int roomW = Math.round(bx - (x + 10));
-		text(g, font, fitEnd(font, where, MONO, roomW), MONO, x + 10, cy + 5, a(s.folderChosen ? SOFT : AMBER));
-		if (free >= 0) {
-			String f = Sizes.bytes(free) + " free";
-			text(g, font, f, UI, bx - width(font, f, UI), cy - 5, a(DIM));
-		}
-		rect(g, x + third, y + 6, 1 / gs(), h - 12, a(0x1AFFFFFF));
+		text(g, font, fitEnd(font, where, UI, Math.round(bx - (x + 10))), UI, x + 10, cy + 5, a(s.folderChosen ? SOFT : AMBER));
+		rect(g, x + saveW, y + 6, 1 / gs(), h - 12, a(0x1AFFFFFF));
 
 		// Encoder.
-		float ex = x + third + 10, ew = third - 20;
+		float ex = x + saveW + 10, ew = encW - 20;
 		text(g, font, "ENCODER", SEMI, ex, cy - 5, a(DIM));
 		String exe = Ffmpeg.find();
 		boolean failed = install != null && install.startsWith("Download failed");
@@ -342,10 +338,10 @@ public final class LensScreen extends Screen {
 			dot(g, ex + 2.5F, cy + 5, 2.2F, a(hw ? GREEN : AMBER));
 			text(g, font, fit(font, line, UI, Math.round(ew - 8)), UI, ex + 8, cy + 5, a(hw ? TEXT : AMBER));
 		}
-		rect(g, x + 2 * third, y + 6, 1 / gs(), h - 12, a(0x1AFFFFFF));
+		rect(g, x + saveW + encW, y + 6, 1 / gs(), h - 12, a(0x1AFFFFFF));
 
 		// Shaders, or the last problem.
-		float sx = x + 2 * third + 10, sw = third - 20;
+		float sx = x + saveW + encW + 10, sw = w - saveW - encW - 20;
 		String err = Recorder.lastError;
 		if (err != null && !Recorder.busy()) {
 			text(g, font, "LAST TIME", SEMI, sx, cy - 5, a(DIM));
@@ -460,18 +456,21 @@ public final class LensScreen extends Screen {
 		void pick(int i);
 	}
 
-	/** The width of a row's label column. */
-	private static final float LABEL = 40;
+	/** The width of a row's label column (a little less in narrow cards). */
+	private static float label(float rowW) {
+		return rowW < 120 ? 34 : 40;
+	}
 
 	/** A row: its label, then a segmented control (a track with the picked part in the gradient). Returns the next row's y. */
 	private float seg(GuiGraphics g, float x, float y, float w, float rowH, String label, String[] opts, int sel, boolean locked, Pick pick, int mx, int my) {
 		float cy = y + rowH / 2;
 		text(g, font, label, UI, x, cy, a(MUTED));
-		float tx = x + LABEL, tw = w - LABEL, th = Math.min(13, rowH - 2);
+		float lw = label(w);
+		float tx = x + lw, tw = w - lw, th = Math.min(13, rowH - 2);
 		rr(g, tx, cy - th / 2, tw, th, th / 2, a(0x14FFFFFF));
 		float[] ws = new float[opts.length];
 		float total = 0;
-		for (int i = 0; i < opts.length; i++) total += ws[i] = width(font, opts[i], SEMI) + 8;
+		for (int i = 0; i < opts.length; i++) total += ws[i] = width(font, opts[i], SEMI) + 10;
 		// Equal parts when they fit (tidier); otherwise as wide as their words.
 		boolean equal = tw / opts.length >= max(ws);
 		float ox = tx;
@@ -495,9 +494,10 @@ public final class LensScreen extends Screen {
 	private float toggles(GuiGraphics g, float x, float y, float w, float rowH, String label, String[] names, boolean[] on, boolean locked, Pick flip, int mx, int my) {
 		float cy = y + rowH / 2;
 		text(g, font, label, UI, x, cy, a(MUTED));
-		float ox = x + LABEL, th = Math.min(13, rowH - 2);
+		float ox = x + label(w), th = Math.min(13, rowH - 2);
+		float each = (w - label(w) - 4 * (names.length - 1)) / names.length;
 		for (int i = 0; i < names.length; i++) {
-			float cw = width(font, names[i], UI) + 22;
+			float cw = Math.min(width(font, names[i], UI) + 22, each);
 			boolean hover = !locked && mx >= ox && my >= cy - th / 2 && mx < ox + cw && my < cy + th / 2;
 			if (on[i]) card(g, ox, cy - th / 2, cw, th, th / 2, a(fade(TEAL, 0.22F)), a(fade(TEAL, 0.7F)));
 			else card(g, ox, cy - th / 2, cw, th, th / 2, a(hover ? 0x22FFFFFF : 0x12FFFFFF), a(0x26FFFFFF));
