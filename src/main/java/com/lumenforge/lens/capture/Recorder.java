@@ -231,8 +231,9 @@ public final class Recorder {
 		Thread logReader = new Thread(() -> readLog(p.getInputStream()), "Lightlens FFmpeg log");
 		logReader.setDaemon(true);
 		logReader.start();
-		MkvWriter mkv = new MkvWriter(new BufferedOutputStream(p.getOutputStream(), 1 << 20), outW, outH);
-		writer = new Thread(() -> writeLoop(p, mkv), "Lightlens video writer");
+		OutputStream pipe = new BufferedOutputStream(p.getOutputStream(), 1 << 20);
+		MkvWriter mkv = new MkvWriter(pipe, outW, outH);
+		writer = new Thread(() -> writeLoop(p, pipe, mkv), "Lightlens video writer");
 		writer.setDaemon(true);
 		writer.start();
 
@@ -276,7 +277,7 @@ public final class Recorder {
 	}
 
 	/** The writer thread: frames to FFmpeg, in order, with their times. The last frame is held to close the video. */
-	private static void writeLoop(Process p, MkvWriter mkv) {
+	private static void writeLoop(Process p, OutputStream pipe, MkvWriter mkv) {
 		byte[] held = null;
 		try {
 			mkv.writeHeader(Lens.NAME + " " + Lens.version());
@@ -295,9 +296,11 @@ public final class Recorder {
 			writeError = new IOException(p.isAlive() ? e.getMessage() : "FFmpeg stopped. " + log(), e);
 		} catch (InterruptedException ignored) {
 		} finally {
+			// Closing sends what's buffered, then tells FFmpeg that's the end.
 			try {
-				p.getOutputStream().close();
-			} catch (IOException ignored) {
+				pipe.close();
+			} catch (IOException e) {
+				if (writeError == null) writeError = e;
 			}
 		}
 	}
