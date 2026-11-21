@@ -37,3 +37,14 @@ grep (public\s) net/minecraft/client/gui/components/EditBox.java
 grep (public\s) net/minecraft/client/DeltaTracker.java
 grep (public\s) net/minecraft/client/Camera.java
 grep (public\s|class\s) net/minecraft/client/renderer/LevelRenderer.java
+net/minecraft/client/Minecraft.java
+net/minecraft/client/renderer/GameRenderer.java
+com/mojang/blaze3d/opengl/GlStateManager.java
+com/mojang/blaze3d/systems/RenderSystem.java
+com/mojang/blaze3d/audio/ListenerTransform.java
+net/minecraft/network/chat/ClickEvent.java
+net/minecraft/network/chat/HoverEvent.java
+net/minecraft/client/gui/screens/PauseScreen.java
+grep (keyPress|private\svoid\s|public\svoid\s) net/minecraft/client/KeyboardHandler.java
+net/minecraft/client/gui/screens/options/controls/KeyBindsScreen.java
+grep (public\s) net/minecraft/server/packs/resources/Resource.java

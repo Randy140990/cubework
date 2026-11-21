@@ -6,8 +6,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * FREX "Flawless Frames": renderers such as Sodium call this entrypoint and hand us a switch.
- * While it's on, every frame waits until all visible chunks are built, so photos have no holes.
+ * FREX "Flawless Frames": renderers such as Sodium call this entrypoint and hand us a switch. While it's on, every
+ * frame waits until the chunks in view are built, so a big photo has no holes in the land.
  */
 public final class Flawless implements Consumer<Function<String, Consumer<Boolean>>> {
 	private static final List<Consumer<Boolean>> SWITCHES = new ArrayList<>();
