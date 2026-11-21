@@ -220,10 +220,8 @@ public final class Ffmpeg {
 		Process p = null;
 		try {
 			int w = 1280, h = 720, fps = 30;
-			List<String> cmd = new ArrayList<>(List.of(exe, "-hide_banner", "-loglevel", "error", "-nostdin", "-f", "matroska", "-i", "pipe:0"));
-			cmd.addAll(major >= 5 ? List.of("-fps_mode", "cfr") : List.of("-vsync", "cfr"));
-			cmd.addAll(List.of("-r", String.valueOf(fps)));
-			if (!takesRgba(enc)) cmd.addAll(List.of("-vf", "scale=out_color_matrix=bt709:out_range=tv,format=nv12"));
+			List<String> cmd = new ArrayList<>(List.of(exe, "-hide_banner", "-loglevel", "error", "-nostdin"));
+			cmd.addAll(pipeIn(enc, fps));
 			cmd.addAll(tuned ? videoArgs(enc, Quality.HIGH, w, h, fps) : plainArgs(enc, Quality.HIGH, w, h, fps));
 			cmd.addAll(List.of("-f", "null", "-"));
 			p = new ProcessBuilder(cmd).redirectErrorStream(true).start();
@@ -259,6 +257,19 @@ public final class Ffmpeg {
 		} finally {
 			if (p != null && p.isAlive()) p.destroyForcibly();
 		}
+	}
+
+	/**
+	 * Reading the game's frames from the pipe and making a steady frame rate: the same for a recording and for the
+	 * encoder check, so the check proves the recording will start. (No input queue options: FFmpeg 8 refuses
+	 * "-thread_queue_size" on an input, which stopped 0.1.0's recordings at once.)
+	 */
+	static List<String> pipeIn(String enc, int fps) {
+		List<String> c = new ArrayList<>(List.of("-f", "matroska", "-i", "pipe:0"));
+		c.addAll(major >= 5 ? List.of("-fps_mode", "cfr") : List.of("-vsync", "cfr"));
+		c.addAll(List.of("-r", String.valueOf(fps)));
+		if (!takesRgba(enc)) c.addAll(List.of("-vf", "scale=out_color_matrix=bt709:out_range=tv,format=nv12"));
+		return c;
 	}
 
 	/** Just the encoder and a bitrate: what any build of FFmpeg accepts. */
@@ -312,11 +323,8 @@ public final class Ffmpeg {
 	 * into a Matroska file (it's readable even if the game stops suddenly).
 	 */
 	public static List<String> liveCommand(String exe, String enc, Quality q, int w, int h, int fps, Path out) {
-		List<String> c = new ArrayList<>(List.of(exe, "-hide_banner", "-loglevel", "warning", "-nostdin", "-y",
-				"-f", "matroska", "-thread_queue_size", "256", "-i", "pipe:0"));
-		c.addAll(major >= 5 ? List.of("-fps_mode", "cfr") : List.of("-vsync", "cfr"));
-		c.addAll(List.of("-r", String.valueOf(fps)));
-		if (!takesRgba(enc)) c.addAll(List.of("-vf", "scale=out_color_matrix=bt709:out_range=tv,format=nv12"));
+		List<String> c = new ArrayList<>(List.of(exe, "-hide_banner", "-loglevel", "warning", "-nostdin", "-y"));
+		c.addAll(pipeIn(enc, fps));
 		c.addAll(encoderArgs(enc, q, w, h, fps));
 		if (!takesRgba(enc)) c.addAll(List.of("-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv"));
 		c.addAll(List.of("-f", "matroska", out.toString()));
