@@ -1,0 +1,33 @@
+build/run/clientGameTest/test-captures:
+total 155920
+drwxr-xr-x  4 runner runner      4096 Nov 21 12:27 .
+drwxr-xr-x 14 runner runner      4096 Nov 21 12:19 ..
+drwxr-xr-x  2 runner runner      4096 Nov 21 12:28 GIFs
+-rw-r--r--  1 runner runner 105885911 Nov 21 12:23 Lightlens 2026-11-21 at 12.19.23 (1920x1080 30fps).mp4
+-rw-r--r--  1 runner runner  53755014 Nov 21 12:27 Lightlens 2026-11-21 at 12.25.18 (1920x1080 30fps).mp4
+drwxr-xr-x  2 runner runner      4096 Nov 21 12:25 Photos
+
+build/run/clientGameTest/test-captures/GIFs:
+total 3828
+drwxr-xr-x 2 runner runner    4096 Nov 21 12:28 .
+drwxr-xr-x 4 runner runner    4096 Nov 21 12:27 ..
+-rw-r--r-- 1 runner runner 2150409 Nov 21 12:27 Lightlens 2026-11-21 at 12.27.40 (480x270).gif
+-rw-r--r-- 1 runner runner 1753410 Nov 21 12:28 Lightlens 2026-11-21 at 12.27.56 (480x270 timelapse).gif
+
+build/run/clientGameTest/test-captures/Photos:
+total 19132
+drwxr-xr-x 2 runner runner    4096 Nov 21 12:25 .
+drwxr-xr-x 4 runner runner    4096 Nov 21 12:27 ..
+-rw-r--r-- 1 runner runner 9894849 Nov 21 12:23 Lightlens 2026-11-21 at 12.22.56 (3840x2160).png
+-rw-r--r-- 1 runner runner 8548092 Nov 21 12:25 Lightlens 2026-11-21 at 12.25.07 (3840x2160).png
+-rw-r--r-- 1 runner runner 1135739 Nov 21 12:25 Lightlens 2026-11-21 at 12.25.16 (1280x720).png
+build/run/clientGameTest/lightlens:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 12:19 .
+drwxr-xr-x 14 runner runner 4096 Nov 21 12:19 ..
+drwxr-xr-x  2 runner runner 4096 Nov 21 12:28 work
+
+build/run/clientGameTest/lightlens/work:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 12:28 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 12:19 ..

@@ -1,0 +1,86 @@
+[12:16:17] [Lightlens start-up checks/INFO] (Minecraft) [STDOUT]: [Lightlens] FFmpeg ffmpeg (version 6): H.264 libx264, H.265 null; last failed test: hevc_mf (plain): [vost#0:0 @ 0x55e8df54bd40] Unknown encoder 'hevc_mf'
+[12:16:38] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] FFmpeg: ffmpeg
+[12:16:38] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: FFmpeg found
+[12:16:38] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] encoder H.264: libx264, H.265: null
+[12:19:23] [Render thread/INFO] (Lightlens) Recording 1920x1080 at 30 fps with libx264: ffmpeg -hide_banner -loglevel warning -nostdin -y -f matroska -i pipe:0 -fps_mode cfr -r 30 -vf scale=out_color_matrix=bt709:out_range=tv,format=nv12 -c:v libx264 -preset veryfast -tune zerolatency -crf 20 -maxrate 18.0M -bufsize 24.0M -g 60 -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -f matroska /home/runner/work/cubework/cubework/build/run/clientGameTest/lightlens/work/Lightlens_2026-11-21_at_12.19.23/video.mkv
+[12:19:24] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: recording started (null)
+[12:19:24] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] recording 1920x1080 with libx264
+[12:23:07] [Lightlens photo/INFO] (Lightlens) Photo saved: /home/runner/work/cubework/cubework/build/run/clientGameTest/test-captures/Photos/Lightlens 2026-11-21 at 12.22.56 (3840x2160).png (3840x2160)
+[12:23:38] [Render thread/INFO] (Lightlens) Stopped: 254.43 s, 110 frames captured (0.4 a second), 0 skipped, first frame 1334 ms after pressing record, 1920x1080 at 30 fps, libx264
+[12:23:51] [Lightlens finishing/INFO] (Lightlens) Saved /home/runner/work/cubework/cubework/build/run/clientGameTest/test-captures/Lightlens 2026-11-21 at 12.19.23 (1920x1080 30fps).mp4 (110 frames captured, 0 dropped)
+[12:23:51] [Render thread/INFO] (Lightlens) Tip: Your game ran at about 0 fps while recording, so the 30 fps video repeats frames and looks jumpy. A smaller size or fewer shader effects will help.
+[12:23:51] [Render thread/INFO] (Minecraft) [System] [CHAT] [Lightlens] Video saved: Lightlens 2026-11-21 at 12.19.23 (1920x1080 30fps).mp4 (04:14, 1920x1080, 106 MB) [Open folder]
+[12:23:51] [Render thread/INFO] (Minecraft) [System] [CHAT] [Lightlens] Your game ran at about 0 fps while recording, so the 30 fps video repeats frames and looks jumpy. A smaller size or fewer shader effects will help.
+[12:23:51] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: video 1 saved (null)
+[12:23:51] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video1 Lightlens 2026-11-21 at 12.19.23 (1920x1080 30fps).mp4: stream|codec_name=h264|width=1920|height=1080|r_frame_rate=30/1|duration=254.433000|nb_frames=7633 stream|codec_name=aac|r_frame_rate=0/0|duration=254.430000|nb_frames=11928 format|duration=254.433000|size=105885911
+[12:23:51] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: video1 has a sound track
+[12:23:52] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video1 sound mean_volume: -50.1 dB
+[12:23:52] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video1 sound max_volume: -2.1 dB
+[12:23:52] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] frames captured 110, dropped 0
+[12:23:58] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: photo countdown running
+[12:25:14] [Lightlens photo/INFO] (Lightlens) Photo saved: /home/runner/work/cubework/cubework/build/run/clientGameTest/test-captures/Photos/Lightlens 2026-11-21 at 12.25.07 (3840x2160).png (3840x2160)
+[12:25:15] [Render thread/INFO] (Minecraft) [System] [CHAT] [Lightlens] Photo saved: Lightlens 2026-11-21 at 12.25.07 (3840x2160).png (3840x2160) [Open folder]
+[12:25:16] [Lightlens photo/INFO] (Lightlens) Photo saved: /home/runner/work/cubework/cubework/build/run/clientGameTest/test-captures/Photos/Lightlens 2026-11-21 at 12.25.16 (1280x720).png (1280x720)
+[12:25:17] [Render thread/INFO] (Minecraft) [System] [CHAT] [Lightlens] Photo saved: Lightlens 2026-11-21 at 12.25.16 (1280x720).png (1280x720) [Open folder]
+[12:25:18] [Render thread/INFO] (Lightlens) Recording 1920x1080 at 30 fps with libx264: ffmpeg -hide_banner -loglevel warning -nostdin -y -f matroska -i pipe:0 -fps_mode cfr -r 30 -vf scale=out_color_matrix=bt709:out_range=tv,format=nv12 -c:v libx264 -preset veryfast -tune zerolatency -crf 20 -maxrate 18.0M -bufsize 24.0M -g 60 -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -f matroska /home/runner/work/cubework/cubework/build/run/clientGameTest/lightlens/work/Lightlens_2026-11-21_at_12.25.18/video.mkv
+[12:25:21] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: sharp recording started
+[12:27:20] [Render thread/INFO] (Lightlens) Stopped: 119.66 s, 32 frames captured (0.3 a second), 0 skipped, first frame 2482 ms after pressing record, 1920x1080 at 30 fps, libx264, Sharper
+[12:27:29] [Lightlens finishing/INFO] (Lightlens) Saved /home/runner/work/cubework/cubework/build/run/clientGameTest/test-captures/Lightlens 2026-11-21 at 12.25.18 (1920x1080 30fps).mp4 (32 frames captured, 0 dropped)
+[12:27:30] [Render thread/INFO] (Lightlens) Tip: Your game ran at about 0 fps while recording, so the 30 fps video repeats frames and looks jumpy. Sharper draws the game at 2x the size; turn it off for smooth video.
+[12:27:30] [Render thread/INFO] (Minecraft) [System] [CHAT] [Lightlens] Video saved: Lightlens 2026-11-21 at 12.25.18 (1920x1080 30fps).mp4 (01:59, 1920x1080, 54 MB) [Open folder]
+[12:27:30] [Render thread/INFO] (Minecraft) [System] [CHAT] [Lightlens] Your game ran at about 0 fps while recording, so the 30 fps video repeats frames and looks jumpy. Sharper draws the game at 2x the size; turn it off for smooth video.
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: video 2 saved (null)
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video2 Lightlens 2026-11-21 at 12.25.18 (1920x1080 30fps).mp4: stream|codec_name=h264|width=1920|height=1080|r_frame_rate=30/1|duration=119.666000|nb_frames=3590 stream|codec_name=aac|r_frame_rate=0/0|duration=119.660000|nb_frames=5611 format|duration=119.666000|size=53755014
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: video2 has a sound track
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video2 sound mean_volume: -73.1 dB
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video2 sound max_volume: -32.4 dB
+[12:27:40] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: the game draws at the window's size again
+[12:27:40] [Render thread/INFO] (Lightlens) Recording 480x270 at 15 fps with libx264: ffmpeg -hide_banner -loglevel warning -nostdin -y -f matroska -i pipe:0 -fps_mode cfr -r 15 -vf scale=out_color_matrix=bt709:out_range=tv,format=nv12 -c:v libx264 -preset veryfast -tune zerolatency -crf 17 -maxrate 3.0M -bufsize 4.0M -g 30 -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -f matroska /home/runner/work/cubework/cubework/build/run/clientGameTest/lightlens/work/Lightlens_2026-11-21_at_12.27.40/video.mkv
+[12:27:40] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: GIF started
+[12:27:44] [Render thread/INFO] (Lightlens) Stopped: 3.16 s, 5 frames captured (1.6 a second), 0 skipped, first frame 778 ms after pressing record, 480x270 at 15 fps, libx264
+[12:27:46] [Lightlens finishing/INFO] (Lightlens) Saved /home/runner/work/cubework/cubework/build/run/clientGameTest/test-captures/GIFs/Lightlens 2026-11-21 at 12.27.40 (480x270).gif (5 frames captured)
+[12:27:46] [Render thread/INFO] (Minecraft) [System] [CHAT] [Lightlens] GIF saved: Lightlens 2026-11-21 at 12.27.40 (480x270).gif (480x270, 2 MB) [Open folder]
+[12:27:56] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: GIF saved (null)
+[12:27:56] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] gif Lightlens 2026-11-21 at 12.27.40 (480x270).gif: stream|codec_name=gif|width=480|height=270|nb_read_frames=58 format|duration=3.870000|size=2150409
+[12:27:56] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: gif is a GIF
+[12:27:56] [Render thread/INFO] (Lightlens) Recording 480x270 at 1 fps with libx264: ffmpeg -hide_banner -loglevel warning -nostdin -y -f matroska -i pipe:0 -fps_mode cfr -r 1 -vf scale=out_color_matrix=bt709:out_range=tv,format=nv12 -c:v libx264 -preset veryfast -tune zerolatency -crf 17 -maxrate 3.0M -bufsize 4.0M -g 2 -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -f matroska /home/runner/work/cubework/cubework/build/run/clientGameTest/lightlens/work/Lightlens_2026-11-21_at_12.27.56/video.mkv
+[12:27:57] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: GIF started (timelapse)
+[12:28:27] [Render thread/INFO] (Lightlens) Stopped: 30.13 s, 31 frames captured (1.0 a second), 0 skipped, first frame 771 ms after pressing record, 480x270 at 1 fps, libx264
+[12:28:29] [Lightlens finishing/INFO] (Lightlens) Saved /home/runner/work/cubework/cubework/build/run/clientGameTest/test-captures/GIFs/Lightlens 2026-11-21 at 12.27.56 (480x270 timelapse).gif (31 frames captured)
+[12:28:29] [Render thread/INFO] (Minecraft) [System] [CHAT] [Lightlens] GIF saved: Lightlens 2026-11-21 at 12.27.56 (480x270 timelapse).gif (480x270, 2 MB) [Open folder]
+[12:28:29] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: GIF saved (null)
+[12:28:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] gif-timelapse Lightlens 2026-11-21 at 12.27.56 (480x270 timelapse).gif: stream|codec_name=gif|width=480|height=270|nb_read_frames=32 format|duration=3.200000|size=1753410
+[12:28:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: gif-timelapse is a GIF
+[12:28:32] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] photo Photos/Lightlens 2026-11-21 at 12.22.56 (3840x2160).png 3840x2160
+[12:28:32] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] photo Photos/Lightlens 2026-11-21 at 12.25.16 (1280x720).png 1280x720
+[12:28:32] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] photo Photos/Lightlens 2026-11-21 at 12.25.07 (3840x2160).png 3840x2160
+[12:16:38] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] FFmpeg: ffmpeg
+[12:16:38] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: FFmpeg found
+[12:16:38] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] encoder H.264: libx264, H.265: null
+[12:19:24] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: recording started (null)
+[12:19:24] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] recording 1920x1080 with libx264
+[12:23:51] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: video 1 saved (null)
+[12:23:51] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video1 Lightlens 2026-11-21 at 12.19.23 (1920x1080 30fps).mp4: stream|codec_name=h264|width=1920|height=1080|r_frame_rate=30/1|duration=254.433000|nb_frames=7633 stream|codec_name=aac|r_frame_rate=0/0|duration=254.430000|nb_frames=11928 format|duration=254.433000|size=105885911
+[12:23:51] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: video1 has a sound track
+[12:23:52] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video1 sound mean_volume: -50.1 dB
+[12:23:52] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video1 sound max_volume: -2.1 dB
+[12:23:52] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] frames captured 110, dropped 0
+[12:23:58] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: photo countdown running
+[12:25:21] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: sharp recording started
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: video 2 saved (null)
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video2 Lightlens 2026-11-21 at 12.25.18 (1920x1080 30fps).mp4: stream|codec_name=h264|width=1920|height=1080|r_frame_rate=30/1|duration=119.666000|nb_frames=3590 stream|codec_name=aac|r_frame_rate=0/0|duration=119.660000|nb_frames=5611 format|duration=119.666000|size=53755014
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: video2 has a sound track
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video2 sound mean_volume: -73.1 dB
+[12:27:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] video2 sound max_volume: -32.4 dB
+[12:27:40] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: the game draws at the window's size again
+[12:27:40] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: GIF started
+[12:27:56] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: GIF saved (null)
+[12:27:56] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] gif Lightlens 2026-11-21 at 12.27.40 (480x270).gif: stream|codec_name=gif|width=480|height=270|nb_read_frames=58 format|duration=3.870000|size=2150409
+[12:27:56] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: gif is a GIF
+[12:27:57] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: GIF started (timelapse)
+[12:28:29] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: GIF saved (null)
+[12:28:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] gif-timelapse Lightlens 2026-11-21 at 12.27.56 (480x270 timelapse).gif: stream|codec_name=gif|width=480|height=270|nb_read_frames=32 format|duration=3.200000|size=1753410
+[12:28:30] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] ok: gif-timelapse is a GIF
+[12:28:32] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] photo Photos/Lightlens 2026-11-21 at 12.22.56 (3840x2160).png 3840x2160
+[12:28:32] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] photo Photos/Lightlens 2026-11-21 at 12.25.16 (1280x720).png 1280x720
+[12:28:32] [Test thread/INFO] (Minecraft) [STDOUT]: [lightlens-test] photo Photos/Lightlens 2026-11-21 at 12.25.07 (3840x2160).png 3840x2160
