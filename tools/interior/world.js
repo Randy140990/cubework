@@ -287,7 +287,7 @@ let TOD = "day";
 // [r, g, b, the pool's strength, the shaft's].
 function poolLight(k, m) {
   const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
-  return mix(mix([1, 0.96, 0.82, 0.55, 0.1], [1, 0.74, 0.44, 0.5, 0.13], k), [0.55, 0.7, 1, 0.28, 0.05], m);
+  return mix(mix([1, 0.95, 0.84, 0.22, 0.035], [1, 0.8, 0.56, 0.22, 0.045], k), [0.6, 0.72, 1, 0.1, 0.015], m);
 }
 // Where a pool falls at a time, and how strong it is there: [x0, z0, x1, z1, strength], or null. A low sun throws it
 // further in and longer, and to one side (the morning's west of the window, the evening's east); a window facing
@@ -405,7 +405,7 @@ const H_TOP = room => room.H;
 // ---------- tables, chairs, sofas ----------
 function table(room, x0, z0, x1, z1, o = {}) {
   const G = room.geo, top = o.top || "oak", leg = o.leg || "walnut", y = o.h || 0.86;
-  G.box(x0, y - 0.1, z0, x1, y, z1, { all: leg, top });
+  G.box(x0, y - 0.1, z0, x1, y, z1, { all: o.side || leg, top });
   for (const [lx, lz] of [[x0 + 0.08, z0 + 0.08], [x1 - 0.2, z0 + 0.08], [x0 + 0.08, z1 - 0.2], [x1 - 0.2, z1 - 0.2]]) G.box(lx, 0, lz, lx + 0.12, y - 0.1, lz + 0.12, leg);
   room.solid(x0, z0, x1, z1);
   if (o.cloth) G.box(x0 + (x1 - x0) * 0.3, y, z0 - 0.02, x0 + (x1 - x0) * 0.7, y + 0.01, z1 + 0.02, { all: o.cloth, bottom: null });
@@ -571,7 +571,7 @@ function doormat(room, x0, x1, o = {}) {
   const m = o.mat || "doormat", mk = x1 - x0 > 3 && MATDEF[m + "W"] ? m + "W" : m;
   G.box(x0, 0, D - 2, x1, 0.03, D, { top: mk, s: "cap", all: "cap", bottom: null });
   // The light in at the door: only at Oak's lab (its glass doors to the sunny town), not in homes or shops.
-  if (room.id === "lab" || o.doorLight) {
+  if (o.doorLight) {
     if (room.entry) sunPool(room, x0, D - 3.6, x1, D, 3, [x0, 0.3, x1, D]);
     else sunPool(room, x0 - 0.6, D - 3.6, x1 + 0.6, D, 3);
   }

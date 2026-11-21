@@ -14,8 +14,10 @@ import net.minecraft.resources.Identifier;
 
 /**
  * Your first Pokémon. As in the games, Oak stops you as you head out of Pallet Town ("Hey! Wait! Don't go
- * out!") and takes you to his lab: Bulbasaur, Charmander and Squirtle stand on the table in 3D, idling, and the
- * one you point at hops and twirls with a heart over it and its cry. Oak stands on the text box as he talks.
+ * out!") and takes you to his lab. Choosing: three balls; each one you look in (the first one too, as you
+ * arrive) opens, its light builds up and flashes, and its creature stands big in the middle. When you say YES, it
+ * jumps for joy right there with its cry and the jingle; then the screen fades to Oak, who talks you through
+ * what's next, up to asking whether you'd like to give it a nickname. Oak stands on the text box as he talks.
  */
 public class StarterScreen extends GameScreen {
 	private static final String[] IDS = {"bulbasaur", "charmander", "squirtle"};
@@ -31,13 +33,18 @@ public class StarterScreen extends GameScreen {
 	private int revealAt = -100, shownBefore = 1;
 
 	private enum Step {
-		STOP, WELCOME, CHOOSE, CONFIRM, AFTER
+		STOP, WELCOME, CHOOSE, CONFIRM, CHEER, AFTER
 	}
 
 	private Step step = Step.WELCOME;
 	/** Going to the lab: ticks into the fade to black and back (-1 when not). */
 	private int toLab = -1;
 	private static final int LAB_FADE = 24;
+	/** From the cheer on the choose screen to Oak: ticks into the fade (-1 when not). */
+	private int toOak = -1;
+	private static final int OAK_FADE = 20;
+	/** How long the jump for joy lasts before you can go on (ticks). */
+	private static final int CHEER_TICKS = 34;
 	private List<String> labLines = List.of();
 	private final TextBox box;
 	private int at = 1, lastAt = -1, atSince;
@@ -93,6 +100,16 @@ public class StarterScreen extends GameScreen {
 			}
 			if (toLab >= LAB_FADE) toLab = -1;
 		}
+		if (toOak >= 0) {
+			toOak++;
+			// At the darkest: Oak, talking you on (yours stands beside him, calm now).
+			if (toOak == OAK_FADE / 2) {
+				step = Step.AFTER;
+				box.set(List.of("Here are some POTIONS to start you off.", "If a wild POKéMON appears, your POKéMON can fight against it!",
+						"ROUTE 1 is just north of here. Afterward, go on to the next town, VIRIDIAN CITY.", "Press ENTER for your menu. Good luck, " + name + "!"));
+			}
+			if (toOak >= OAK_FADE) toOak = -1;
+		}
 	}
 
 	private void choose(int i) {
@@ -115,11 +132,16 @@ public class StarterScreen extends GameScreen {
 		Sounds.jingle("get_key_item");
 		Sounds.cry(IDS[at], 1F);
 		atSince = ticks;
-		step = Step.AFTER;
-		String mon = Species.get(IDS[at]).name();
-		box.set(List.of("**{N}** received **" + mon + "**!", "Here are some POTIONS to start you off.",
-				"If a wild POKéMON appears, your POKéMON can fight against it!",
-				"ROUTE 1 is just north of here. Afterward, go on to the next town, VIRIDIAN CITY.", "Press ENTER for your menu. Good luck, " + name + "!"));
+		// The jump for joy, here on the choose screen.
+		step = Step.CHEER;
+		box.set(List.of("**{N}** received **" + Species.get(IDS[at]).name() + "**!"));
+	}
+
+	/** Opens the ball you're on as you arrive at the choice, the way looking in any of them does. */
+	private void openFirst() {
+		shownBefore = at;
+		revealAt = ticks;
+		Sounds.select();
 	}
 
 	/** Looks in another ball: the light builds up out of it, then its creature's there. */
@@ -137,7 +159,7 @@ public class StarterScreen extends GameScreen {
 	}
 
 	private void advance() {
-		if (toLab >= 0) return;
+		if (toLab >= 0 || toOak >= 0) return;
 		if (GameScreen.resume == this) GameScreen.resume = null;
 		if (step == Step.STOP && box.press()) {
 			toLab = 0;
@@ -145,7 +167,10 @@ public class StarterScreen extends GameScreen {
 		} else if (step == Step.WELCOME && box.press()) {
 			step = Step.CHOOSE;
 			lastAt = -1;
+			openFirst();
 			box.set(List.of("Three balls, three POKéMON. Look in each one. Which will you choose?"));
+		} else if (step == Step.CHEER && ticks - atSince >= CHEER_TICKS && box.typedOut()) {
+			toOak = 0;
 		} else if (step == Step.AFTER && box.press()) {
 			Music.resumePlace();
 			if (minecraft != null) minecraft.setScreen(null);
@@ -155,7 +180,7 @@ public class StarterScreen extends GameScreen {
 	@Override
 	protected boolean key(KeyEvent e) {
 		switch (step) {
-			case STOP, WELCOME, AFTER -> {
+			case STOP, WELCOME, CHEER, AFTER -> {
 				if (Ui.isA(e) || Ui.isB(e)) advance();
 			}
 			case CHOOSE -> {
@@ -192,7 +217,7 @@ public class StarterScreen extends GameScreen {
 		// people stand on its top.
 		int h = boxHeight(), m = 6 * s, boxTop = Math.round(V.y(V.H - 26 - 120));
 		float secs = (ticks + partial) / 20F;
-		boolean choosing0 = step == Step.CHOOSE || step == Step.CONFIRM;
+		boolean choosing0 = step == Step.CHOOSE || step == Step.CONFIRM || step == Step.CHEER;
 		if (step == Step.STOP) g.fillGradient(0, height / 2, width, height, 0x000A0E24, 0x900A0E24);
 		else if (!choosing0) g.fillGradient(0, 0, width, height, 0x700A0E24, 0xC00A0E24);
 		Figures.Batch b = Figures.batch(0, 0, width, height);
@@ -205,19 +230,21 @@ public class StarterScreen extends GameScreen {
 			Ui.glow(g, ox, boxTop - tall / 2, tall * 2 / 5, tall / 2, 0x0AFFF4D8);
 			b.person(OAK, ox, boxTop + 2 * s, tall).facing(-22).pitch(-2).talk(box.typedOut() ? 0.25F : 1).at(secs);
 			if (step == Step.AFTER) {
-				float since = ticks - atSince + partial;
 				int mt = tall * 2 / 5, mxp = width / 2;
 				Ui.round(g, mxp - mt / 2, boxTop - 3 * s, mt, 6 * s, 0x50000000, 3 * s);
-				float hop = since < 30 ? (float) Math.abs(Math.sin(since / 10F * Math.PI)) * 10 * s : 0;
-				b.mon(IDS[at], mxp, boxTop + s, mt).at(secs).pitch(6).facing(10).hop(hop).action("cry", since / 20F);
-				b.draw(g);
-				Ui.bubble(g, "star", mxp + mt / 3, boxTop - mt - (int) hop, s, Math.min(1, since / 6F));
-			} else b.draw(g);
+				b.mon(IDS[at], mxp, boxTop + s, mt).at(secs).pitch(6).facing(10);
+			}
+			b.draw(g);
 		}
 		if (choosing) box.renderFilm(g, font, ticks, partial, false);
 		else box.renderV(g, font, 140, 26, 1000, ticks, partial, step == Step.STOP || step == Step.WELCOME || step == Step.AFTER);
 		if (toLab >= 0) {
 			float t = (toLab + partial) / LAB_FADE;
+			float a = Math.min(1, (t < 0.5F ? t : 1 - t) * 2.6F);
+			g.fill(0, 0, width, height, Ui.alpha(0xFF05070F, a));
+		}
+		if (toOak >= 0) {
+			float t = (toOak + partial) / OAK_FADE;
 			float a = Math.min(1, (t < 0.5F ? t : 1 - t) * 2.6F);
 			g.fill(0, 0, width, height, Ui.alpha(0xFF05070F, a));
 		}
@@ -238,7 +265,13 @@ public class StarterScreen extends GameScreen {
 		Scenes.typeBg(g, sp.type1(), true);
 		if (!(rt >= 0 && rt < 1)) {
 			if (rt >= 1 && rt < 1.42F) V.glow(g, 640, 330, 240, 280, Ui.alpha(0xFFFFFFFF, 0.5F));
-			Scenes.modelBare(g, secs, IDS[sid], 0, false, 128);
+			if (step == Step.CHEER) {
+				// Two happy jumps, then it stands pleased, its star over it.
+				float since = ticks - atSince + partial;
+				float hop = since < 30 ? (float) Math.abs(Math.sin(since / 15F * Math.PI)) * 30 : 0;
+				Scenes.modelCheer(g, secs, IDS[sid], 128, hop * V.k, since / 20F);
+				Ui.bubble(g, "star", Math.round(V.x(640 + 110)), Math.round(V.y(190 - hop)), s, Math.min(1, since / 6F));
+			} else Scenes.modelBare(g, secs, IDS[sid], 0, false, 128);
 		}
 		// The plate.
 		float plateA = !revealing ? 1 : rt < 1.42F ? 0 : Math.min(1, (rt - 1.42F) / 0.3F);
@@ -298,6 +331,7 @@ public class StarterScreen extends GameScreen {
 			if (white > 0) g.fill(0, 0, width, height, Ui.alpha(0xFFFFFFFF, white));
 		}
 		if (step == Step.CHOOSE) V.hints(g, "A", "Choose");
+		else if (step == Step.CHEER && ticks - atSince >= CHEER_TICKS) V.hints(g, "A", "Next");
 	}
 
 	/** The plate (the viewer's): THE FIRE POKéMON, its name, its types, a line about it, on clear white. */

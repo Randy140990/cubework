@@ -189,21 +189,26 @@ screen("trade", "Places", "Trading", {
     return { key: k => C.key(k) };
   }
 });
-// The three starters: three balls on the professor's table; the one you're on rolls forward, opens, and its creature
-// stands out big on its own backdrop (as the STATS page has it), its plate beside it. Then the professor asks.
+// The three starters: three balls on the professor's table; the one you're on (the first one too, as you arrive) rolls
+// forward, opens, flashes, and its creature stands out big on its own backdrop (as the STATS page has it), its plate
+// beside it. Then the professor asks; on YES it jumps for joy right there, and the screen fades to the professor, who
+// talks you on to the nickname question.
 const STARTERS = [["bulbasaur", "GRASS", "A leafy armadillo. It curls up in its bark-hard bands, and the sprout on its head drinks in the sun."],
   ["charmander", "FIRE", "A little black goat with a flame between its horns. The happier it is, the brighter the flame."],
   ["squirtle", "WATER", "A sea tapir. It sprays water from its soft snout, and the curl of wave on its head never dries."]];
 screen("starter", "Places", "Choosing your first POKéMON", {
   scene: "model", sceneOpts: () => ({ sid: "charmander", ox: 0, stand: false, zoom: 0.92 }),
-  what: "Choosing your first: three balls on the professor's table along the foot of the screen. The one you're on rolls forward and pops open; a white light builds up out of it over half a second and fills the screen, then fades to show its creature standing big in the middle on its own backdrop (embers for the fire one, leaves for the grass one, bubbles for the water one), with its name, type and a line about it on a plate. A to choose it, and the professor asks if you're sure.",
+  what: "Choosing your first: three balls on the professor's table along the foot of the screen. The one you're on rolls forward and pops open (the first one too, as you arrive, so its creature is never just there); a white light builds up out of it and fills the screen, then fades to show its creature standing big in the middle on its own backdrop (embers for the fire one, leaves for the grass one, bubbles for the water one), with its name, type and a line about it on a plate. A to choose it, and the professor asks if you're sure. On YES it jumps for joy right there with its cry, a star over it, as you receive it; then the screen fades to the professor, calm, who talks you on up to asking whether you'd like to give it a nickname.",
   mod: "StarterScreen.",
-  tags: ["New: a better way to choose"], try: ["Left and right to look in each ball, A to choose, then YES or NO."],
+  tags: ["New: the first ball opens and flashes too", "New: the jump for joy on the choose screen, then the professor"], try: ["Left and right to look in each ball, A to choose, then YES or NO."],
   make() {
     const C = ctl(); C.sayAt = { film: true };
     let sel = 1, picking = true;
+    // The words left up while you look (kept boxes), cleared before the next.
+    const clearWords = () => uiRoot.querySelectorAll(".g-text").forEach(e => e.remove());
     add(h("style", "", `@keyframes stOpen{0%{transform:translateY(0) scale(1)}40%{transform:translateY(-22px) scale(1.08)}100%{transform:translateY(-14px) scale(1.04)}}
-      @keyframes stBurst{from{transform:scale(.2);opacity:1}to{transform:scale(1.6);opacity:0}}@keyframes stWob{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}`));
+      @keyframes stBurst{from{transform:scale(.2);opacity:1}to{transform:scale(1.6);opacity:0}}@keyframes stWob{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+      @keyframes stStar{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}`));
     const balls = box(0, 486, 1280, 120, "", ""), plate = box(860, 150, 380, null, "", ""), flash = box(0, 0, 1280, 720, "", "");
     flash.style.pointerEvents = "none";
     const ball = (on, open, c) => `<svg viewBox="0 0 100 100" width="96" height="96" style="overflow:visible">
@@ -241,12 +246,30 @@ screen("starter", "Places", "Choosing your first POKéMON", {
     };
     const pick = async () => {
       picking = false; const [sid, kind] = STARTERS[sel], n = ourName(sid);
+      clearWords();
       const v = await C.say([{ who: "PROF. OAK", text: `So! You want the ${kind} POKéMON, **${n}**?`, ask: ["YES", "NO"] }]);
       if (!C.alive()) return;
-      if (v !== 0) { picking = true; C.say([{ who: "PROF. OAK", text: "Take your time. Which one will you choose?" }], { keep: true }); return; }
-      await C.say([{ text: `**{N}** received **${n}**!` }, { who: "PROF. OAK", text: "ROUTE 1 is just north of here. Good luck!" }]); if (C.alive()) go("hud");
+      if (v !== 0) { picking = true; clearWords(); C.say([{ who: "PROF. OAK", text: "Take your time. Which one will you choose?" }], { keep: true }); return; }
+      // The jump for joy, here on the choose screen: its cry, the jingle, a star over it.
+      SC.model.jump(); clearWords(); uiRoot.querySelectorAll(".g-hints").forEach(e => e.remove());
+      const star = box(744, 150, 80, 80, "", `<svg viewBox="0 0 64 64" width="64" height="64" style="animation:stStar .35s cubic-bezier(.3,1.6,.6,1) both"><path d="M32 6l7.6 15.4 17 2.5-12.3 12 2.9 16.9L32 44.8 16.8 52.8l2.9-16.9-12.3-12 17-2.5z" fill="#FFD45A" stroke="#26304A" stroke-width="4" stroke-linejoin="round"/></svg>`);
+      await C.say([{ text: `**{N}** received **${n}**!` }]); if (!C.alive()) return;
+      // Then the screen fades to the professor (no more cheering), who talks you on to the nickname question.
+      const fade = box(0, 0, 1280, 720, "", ""); Object.assign(fade.style, { background: "#05070F", opacity: 0, transition: "opacity .5s", zIndex: 50 });
+      requestAnimationFrame(() => requestAnimationFrame(() => { fade.style.opacity = 1; }));
+      await new Promise(r => later(560, r)); if (!C.alive()) return;
+      star.remove(); balls.innerHTML = ""; plate.innerHTML = ""; flash.innerHTML = ""; bgArt.innerHTML = "";
+      backdrop("linear-gradient(180deg, #F6EBD6 0%, #EBD9B8 55%, #C9AE84 100%)"); setScene("prof", { mode: "lab" }); SC.prof.withPartner(sid);
+      fade.style.opacity = 0; C.sayAt = null; hints([["A", "Next"]]);
+      await C.say([{ who: "PROF. OAK", text: "Here are some POTIONS to start you off." }, { who: "PROF. OAK", text: "If a wild POKéMON appears, your POKéMON can fight against it!" },
+        { who: "PROF. OAK", text: "ROUTE 1 is just north of here. Afterward, go on to the next town, VIRIDIAN CITY." }, { who: "PROF. OAK", text: `Press ENTER for your menu. Good luck, ${G.name}!` }]);
+      if (!C.alive()) return;
+      const v2 = await C.say([{ text: `Do you want to give a nickname to **${n}**?`, ask: ["YES", "NO"] }]); if (!C.alive()) return;
+      let nick = n;
+      if (v2 === 0) { nick = await new Promise(res => { const w = nameEntry(C, { label: `${n}'S NICKNAME`, onDone: x => { C.pop(w); uiRoot.querySelectorAll(".g-panel.g-pop").forEach(e => e.remove()); res(x.toUpperCase()); } }); cur.raw = e => w.raw(e); }); }
+      if (C.alive()) go("hud");
     };
-    draw(); C.say([{ who: "PROF. OAK", text: "Three balls, three POKéMON. Look in each one. Which will you choose?" }], { keep: true });
+    draw(true); C.say([{ who: "PROF. OAK", text: "Three balls, three POKéMON. Look in each one. Which will you choose?" }], { keep: true });
     hints([["A", "Choose"]]);
     return { key: k => {
       if (picking && (k === "left" || k === "right")) { sel = (sel + (k === "right" ? 1 : 2)) % 3; draw(true); return true; }

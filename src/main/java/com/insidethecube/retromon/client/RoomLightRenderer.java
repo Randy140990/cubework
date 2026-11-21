@@ -80,10 +80,11 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 			int pool = argb(c, (float) (c[3] * q[4])), shaft = argb(c, (float) (c[4] * q[4]));
 			out.submitCustomGeometry(pose, RenderTypes.entityTranslucentEmissive(p[4] == 3 ? POOL_SOFT : POOL), (pp, vc) -> {
 				// (Counter-clockwise seen from above.)
-				vert(vc, pp, q[0] - cx, POOL_Y, q[1] - cz, 0, 0, pool, 0, 1, 0);
-				vert(vc, pp, q[0] - cx, POOL_Y, q[3] - cz, 0, 1, pool, 0, 1, 0);
-				vert(vc, pp, q[2] - cx, POOL_Y, q[3] - cz, 1, 1, pool, 0, 1, 0);
-				vert(vc, pp, q[2] - cx, POOL_Y, q[1] - cz, 1, 0, pool, 0, 1, 0);
+				// (A block wider all round: the glow fades out past where the light falls, with no edge.)
+				vert(vc, pp, q[0] - 1 - cx, POOL_Y, q[1] - 1 - cz, 0, 0, pool, 0, 1, 0);
+				vert(vc, pp, q[0] - 1 - cx, POOL_Y, q[3] + 1 - cz, 0, 1, pool, 0, 1, 0);
+				vert(vc, pp, q[2] + 1 - cx, POOL_Y, q[3] + 1 - cz, 1, 1, pool, 0, 1, 0);
+				vert(vc, pp, q[2] + 1 - cx, POOL_Y, q[1] - 1 - cz, 1, 0, pool, 0, 1, 0);
 			});
 			double[][][] beam = beam(p, q);
 			if (beam.length > 0 && (shaft >>> 24) > 1)
@@ -155,7 +156,7 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 
 	/** The light's colour, its pools' strength and its shafts': warm white by day, golden low down, a faint blue at night. */
 	static float[] colour(float k, float m) {
-		float[] day = {1, 0.96F, 0.82F, 0.55F, 0.1F}, gold = {1, 0.74F, 0.44F, 0.5F, 0.13F}, moon = {0.55F, 0.7F, 1, 0.28F, 0.05F};
+		float[] day = {1, 0.95F, 0.84F, 0.22F, 0.035F}, gold = {1, 0.8F, 0.56F, 0.22F, 0.045F}, moon = {0.6F, 0.72F, 1, 0.1F, 0.015F};
 		float[] c = new float[5];
 		for (int i = 0; i < 5; i++) {
 			float a = day[i] + (gold[i] - day[i]) * k;

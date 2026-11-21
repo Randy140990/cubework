@@ -268,6 +268,8 @@ function drawScoreboard(P, f) {
       P.set(x, y, c);
     }
   }, { per: 2 });
+  // A table's top in one smooth colour (a painted or laminate top, not planks): warm cream, the faintest grain.
+  reg("tableTop", 16, 16, (P, r) => { P.fill(hx("#F3EBDD"), 0.012, r); });
   reg("paperLeague", 16, 16, (P, r) => { P.fill(hx("#B23C3C"), 0.03, r); P.rect(0, 0, 1, 16, hx("#952E30")); P.rect(8, 0, 1, 16, hx("#952E30")); P.rect(1, 0, 1, 16, hx("#C25050")); P.rect(9, 0, 1, 16, hx("#C25050")); });
   reg("leagueMaroon", 16, 16, (P, r) => { P.fill(hx("#7A2228"), 0.04, r); P.rect(0, 0, 16, 1, hx("#8E2E34")); });
   reg("leagueGold", 16, 16, (P, r) => { P.fill(hx("#D6A846"), 0.04, r); P.rect(0, 0, 16, 2, hx("#F2D27A")); P.rect(0, 14, 16, 2, hx("#A97E2A")); });
@@ -895,7 +897,7 @@ const BUILD = {
     clock(R, 8.6, 2.5);
     stairsUp(R, 10, 0, 2, { to: "house2", spawn: STAIRS_TOP });
     rug(R, 4, 4, 11, 9, "salmon");
-    table(R, 6.4, 5.0, 8.6, 7.6, { cloth: "linen", name: "Dining table", note: "Oak top, walnut legs, a linen runner, plates and a fruit bowl." });
+    table(R, 6.4, 5.0, 8.6, 7.6, { top: "tableTop", side: "tableTop", leg: "paint", name: "Dining table", note: "A smooth cream top in one piece on white legs, plates and a fruit bowl." });
     fruitBowl(R, 7.5, 6.3, 0.87); plates(R, [[6.9, 5.6], [8.1, 5.6], [6.9, 7.0], [8.1, 7.0]], 0.87);
     for (const z of [5.7, 6.9]) { chair(R, 5.75, z, "e", { seat: "greenFabric" }); chair(R, 9.25, z, "w", { seat: "greenFabric" }); }
     R.item("Chairs", "Walnut chairs with green cushions, two each side of the table.");

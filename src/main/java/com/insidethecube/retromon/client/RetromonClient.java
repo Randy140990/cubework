@@ -33,11 +33,11 @@ public class RetromonClient implements ClientModInitializer {
 		// 3D figures on screens (Oak, you, the starters, the Pokédex), drawn without a world.
 		net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(ctx -> new Figures.Renderer(ctx.vertexConsumers()));
 		net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(ctx -> new Figures.ShadowRenderer(ctx.vertexConsumers()));
-		// The Retromon Look pack (Pokémon-style grass, moss, paths, leaves, flowers; rounded edges with Continuity): on by
-		// default (in Resource Packs, where it can be switched off).
+		// The Retromon Look pack (Pokémon-style grass, moss, paths, plants, flowers, cliffs; rounded edges with Continuity):
+		// part of Retromon, always on (it can't be switched off, so it's never missing).
 		net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(Retromon.ID).ifPresent(c -> net.fabricmc.fabric.api.resource.ResourceManagerHelper
 				.registerBuiltinResourcePack(Retromon.id("retromon_look"), c, Component.literal("Retromon Look"),
-						net.fabricmc.fabric.api.resource.ResourcePackActivationType.DEFAULT_ENABLED));
+						net.fabricmc.fabric.api.resource.ResourcePackActivationType.ALWAYS_ENABLED));
 		ClientPlayNetworking.registerGlobalReceiver(Net.Push.TYPE, (payload, ctx) -> ClientState.receive(payload.kind(), payload.data()));
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 			IntroScreen.tickPending();

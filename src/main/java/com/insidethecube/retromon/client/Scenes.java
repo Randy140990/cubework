@@ -529,6 +529,21 @@ public final class Scenes {
 		b.draw(g);
 	}
 
+	/**
+	 * The starter you've just chosen, jumping for joy where it stood (its shadow staying on the ground): turned to
+	 * face you, hopPx screen pixels up, its cry cryAt seconds in.
+	 */
+	public static void modelCheer(GuiGraphics g, float secs, String species, float lift, float hopPx, float cryAt) {
+		BedrockModel.Def def = BedrockModel.def(species);
+		double h = Math.max(0.6, def == null ? 1 : def.height), l = Math.max(0.6, h), d = Math.max(Math.max(h * 3.1, l * 2.3), 3.8);
+		double rise = lift * d / (V.H / 2 / Math.tan(Math.toRadians(17)));
+		Cam cam = new Cam().look(0, h * 0.62 + d * 0.16 - rise, d, 0, h * 0.5 - rise, 0);
+		blob(g, cam, 0, 0, Math.max(0.4, l * 0.4) * (1 - Math.min(0.35, hopPx / Math.max(1, V.k) / 90)), 150);
+		Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
+		place(b, cam, null, species, 0, 0, 0, Math.PI, secs).hop(hopPx).action("cry", cryAt);
+		b.draw(g);
+	}
+
 	/** A round stand at (x, 0, 0): its side a band, its top a pale disc (radius in blocks). */
 	private static void standAt(GuiGraphics g, Cam cam, double x, double radius) {
 		float[] c = cam.at(x, 0, 0), e = cam.at(x + radius, 0, 0), lo = cam.at(x, -0.16, 0), n = cam.at(x, 0, -radius), s = cam.at(x, 0, radius);

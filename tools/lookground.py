@@ -353,6 +353,9 @@ def build(save):
     save("dirt_path_side", side)
     # Minecraft's own patterns, recoloured: the cliffs' dripstone, the azalea trees (their flowers kept).
     save("dripstone_block", recolour(os.path.join(VANILLA, "textures/block/dripstone_block.png"), DRIP))
+    # The mud brick steps up the ledges (their stairs and slabs): the same light earth as the ledges they're cut into,
+    # in their own brick pattern (mortar the darkest), so they match.
+    save("mud_bricks", recolour(os.path.join(VANILLA, "textures/block/mud_bricks.png"), DRIP))
     save("azalea_leaves", recolour(os.path.join(VANILLA, "textures/block/azalea_leaves.png"), AZALEA))
     pinkish = lambda r, g, b: r > g + 12
     save("flowering_azalea_leaves", recolour(os.path.join(VANILLA, "textures/block/flowering_azalea_leaves.png"), AZALEA, keep=pinkish))

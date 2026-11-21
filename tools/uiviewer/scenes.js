@@ -163,7 +163,7 @@ const SCENES = {
     // him just behind him, the ones who stay further back, the one walking its loop right at the back, the parade's
     // rows behind them all.)
     const SPOTS = [["pikachu", -0.95, -0.6, 0.35], ["cubone", -1.8, -2.6, 0.55], ["oddish", 0.6, -1.85, -0.1], ["clefairy", -1.55, -1.25, 0.2], ["pidgey", -0.55, -1.15, 0.4, 1.65]];
-    SPOTS.forEach(([sid, x, z, turn, fly]) => mon(sid).then(st => { st.base = "ground"; st.home = [x, z, turn, fly || 0]; group.add(st.m.holder); S.runners.push(st); placeMon(st, x, z, Math.PI + turn, fly || 0); }));
+    SPOTS.forEach(([sid, x, z, turn, fly]) => mon(sid).then(st => { st.base = "ground"; st.home = [x, z, turn, fly || 0]; group.add(st.m.holder); S.runners.push(st); st.m.holder.visible = S.mode !== "lab"; placeMon(st, x, z, Math.PI + turn, fly || 0); }));
     // Further along, the ones he walks past: a parade of all sorts, big ones further back, little ones near.
     const PARADE = ["growlithe", "exeggutor", "psyduck", "ponyta", "jigglypuff", "onix", "meowth", "machoke", "vulpix", "snorlax", "butterfree", "nidoking", "eevee", "lapras", "pidgeot"];
     let pi = 0;
@@ -175,6 +175,9 @@ const SCENES = {
         st.base = flyer ? "fly" : "ground"; st.home = [x, z, (i % 3 - 1) * 0.35, flyer ? 1.5 : 0]; group.add(st.m.holder); S.parade.push(st); st.m.holder.visible = S.mode === "intro"; placeMon(st, x, z, Math.PI + st.home[2], st.home[3]); });
     }
     S.nextCry = 2;
+    // Yours beside him in his lab (the starter you've just chosen), idling.
+    S.withPartner = sid => { if (S.partner) { group.remove(S.partner.m.holder); S.partner = null; }
+      mon(sid).then(st => { st.base = "ground"; group.add(st.m.holder); placeMon(st, -1.05, 0.35, Math.PI + 0.35, 0); st.m.holder.visible = S.mode === "lab"; S.partner = st; }); };
     S.hop = () => { if (S.hopT == null) { S.hopT = 0; const r = S.runners.find(q => q.sid === "pikachu"); if (r) playOnce(r, "cry"); } };
     // The walk: he sets off to the right along them, talking; the camera goes with him; at the far end he stops and
     // turns to you, and the camera comes in close.
@@ -186,6 +189,9 @@ const SCENES = {
       prof.root.position.set(0, 0, 0); prof.root.rotation.y = Math.PI;
       rival.root.visible = S.mode === "rival";
       for (const p of S.parade) p.m.holder.visible = S.mode === "intro";
+      // In his lab, after you've chosen: just him, and yours standing calm beside him.
+      for (const r of S.runners) r.m.holder.visible = S.mode !== "lab";
+      if (S.partner) S.partner.m.holder.visible = S.mode === "lab";
       const k = JSON.stringify(G.look);
       if (S.mode === "you") { if (k !== lookKey || !you) { if (you) group.remove(you.root); you = figureOf(G.look); group.add(you.root); lookKey = k; } you.root.position.set(1.25, 0, 0.6); you.root.rotation.y = Math.PI + 0.12; you.root.visible = true; }
       else if (you) you.root.visible = false;
@@ -210,6 +216,7 @@ const SCENES = {
       if (rival.root.visible) poseFigure(rival, { headYaw: Math.sin(t * 0.7) * 0.2 });
       if (you && you.root.visible) poseFigure(you, { wave: S.youWave || 0, floss: S.youFloss || 0, lookUp: S.youLookUp || 0 });
       S.nextCry -= dt;
+      if (S.partner && S.partner.m.holder.visible) tickMon(S.partner, dt);
       const all = S.runners.concat(S.parade.filter(p => p.m.holder.visible));
       if (S.nextCry < 0 && all.length) { const r = all[Math.floor(Math.random() * all.length)]; if (!W || r.sid !== "pikachu") playOnce(r, "cry"); S.nextCry = 2 + Math.random() * 2; }
       for (const r of S.runners) {
@@ -350,8 +357,11 @@ const SCENES = {
       await new Promise(r => { const t0 = performance.now(), f = () => { const k = Math.min(1, (performance.now() - t0) / 900); whiten(b, 1 - k); if (k < 1) requestAnimationFrame(f); else r(); }; f(); });
       return "done";
     };
-    S.enter = o => { S.ox = o.ox || 0; S.zoom = o.zoom || 1; stand.visible = o.stand !== false; S.spin = 0; S.glowOn = 0; S.hide = false; S.turn = true; S.walking = !!o.walk; turn.rotation.y = Math.PI; lightFor(0, 0, 6, 12); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); if (o.sid) S.show(o.sid); };
-    S.tick = (dt, t) => { S.spin += dt * (S.turn === false ? 0 : 0.45); turn.rotation.y = S.walking ? Math.PI - 0.55 : Math.PI + Math.sin(S.spin) * 0.7; glow.material.opacity += ((S.glowOn || 0) * (0.65 + 0.3 * Math.sin(t * 12)) - glow.material.opacity) * Math.min(1, dt * 8); if (S.st) { S.st.m.holder.visible = !S.hide; tickMon(S.st, dt); } };
+    // A jump for joy: turned to face you, two happy hops with its cry (the starter you've just chosen).
+    S.jump = () => { if (!S.st) return; S.jumpT = 0; S.baseY = S.st.m.holder.position.y; playOnce(S.st, "cry"); };
+    S.enter = o => { if (S.jumpT != null && S.st) S.st.m.holder.position.y = S.baseY; S.jumpT = null; S.ox = o.ox || 0; S.zoom = o.zoom || 1; stand.visible = o.stand !== false; S.spin = 0; S.glowOn = 0; S.hide = false; S.turn = true; S.walking = !!o.walk; turn.rotation.y = Math.PI; lightFor(0, 0, 6, 12); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); if (o.sid) S.show(o.sid); };
+    S.tick = (dt, t) => { S.spin += dt * (S.turn === false ? 0 : 0.45); turn.rotation.y = S.walking ? Math.PI - 0.55 : Math.PI + Math.sin(S.spin) * 0.7; glow.material.opacity += ((S.glowOn || 0) * (0.65 + 0.3 * Math.sin(t * 12)) - glow.material.opacity) * Math.min(1, dt * 8); if (S.st) { S.st.m.holder.visible = !S.hide; tickMon(S.st, dt); }
+      if (S.jumpT != null && S.st) { S.jumpT += dt; const k = S.jumpT; turn.rotation.y = Math.PI; S.st.m.holder.position.y = S.baseY + (k < 1.5 ? Math.abs(Math.sin(k / 0.75 * Math.PI)) * 0.3 * Math.max(0.6, S.st.m.size.h) : 0); } };
     return S;
   },
   // A battle: your creature from behind, theirs facing you, each on its patch of ground; you and their trainer behind.

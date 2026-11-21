@@ -1,4 +1,4 @@
-option.INFO=Retromon Light 1.2.3
+option.INFO=Retromon Light 1.2.4
 option.INFO.comment=Made for Retromon by Insid3 Th3 Cub3. The light moves with the day; inside buildings, rooms keep their own light.
 option.SUN_STRENGTH=Sunlight
 option.SUN_STRENGTH.comment=How bright the sun is.
@@ -25,7 +25,7 @@ option.WAVING=Swaying plants
 option.WAVING.comment=Grass, flowers and leaves move in the wind. (They part round you as you walk through them either way.)
 option.WIND_SPEED=Wind
 option.WATER_WAVES=Waves
-option.WATER_WAVES.comment=How rippled water is.
+option.WATER_WAVES.comment=How big the waves on water are (they follow the wind, as in Tempered Light).
 option.LIFT=Soft shade
 option.LIFT.comment=Lifts the darkest parts a little, for a brighter, airier look.
 option.CLOUD_SHADOWS=Cloud shadows

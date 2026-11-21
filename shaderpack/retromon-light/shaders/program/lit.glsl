@@ -74,6 +74,14 @@ void main() {
     pp += wave(pp, mc_Entity.x, at_midBlock);
     vp = gbufferModelView * vec4(pp, 1.0);
     #endif
+    #if defined WATER_PROGRAM && !defined INSIDE
+    // The swell: the top of the water rises and falls, so its waves have real height.
+    if (int(mc_Entity.x + 0.5) == 10003 && (mat3(gbufferModelViewInverse) * nView).y > 0.5) {
+        vec3 pw = (gbufferModelViewInverse * vp).xyz;
+        pw.y += waterSwell(pw.xz + cameraPosition.xz, waterClock());
+        vp = gbufferModelView * vec4(pw, 1.0);
+    }
+    #endif
     viewPos = vp.xyz;
     gl_Position = gl_ProjectionMatrix * vp;
 }
@@ -157,26 +165,106 @@ void main() {
     #if defined WATER_PROGRAM && !defined INSIDE
     if (int(blockId + 0.5) == 10003) {
         vec3 pPos = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz;
+        vec3 wPos = pPos + cameraPosition;
+        float wDist = length(pPos);
+        bool below = isEyeInWater == 1;
+        // The waves, on the top of the water (facing you, whichever side you see it from).
         vec3 nW = mat3(gbufferModelViewInverse) * n;
-        if (nW.y > 0.5) nW = waterNormal(pPos.xz + cameraPosition.xz, frameTimeCounter);
+        if (abs(nW.y) > 0.5) {
+            vec3 wn = waterNormal(wPos, wDist);
+            nW = nW.y > 0.0 ? wn : -wn;
+        }
         vec3 nV = mat3(gbufferModelView) * nW;
         vec3 v = normalize(viewPos);
-        float cosT = clamp(dot(-v, nV), 0.0, 1.0);
-        float fres = 0.04 + 0.96 * pow(1.0 - cosT, 5.0);
-        vec3 r = reflect(v, nV);
-        // The sky in it (less under a roof), and the sun's (or moon's) glint.
-        vec3 refl = pow(skyAt(r), vec3(2.2)) / EXPOSURE * (0.12 + 0.88 * lm.y * lm.y);
+        float NdotV = clamp(dot(nV, -v), 0.0, 1.0);
         vec3 direct, ambient;
         skyLight(direct, ambient);
-        float glint = pow(max(dot(r, normalize(shadowLightPosition)), 0.0), 220.0) * 14.0;
-        refl += direct * glint * sunlit / max(NdotL, 0.05);
-        // The water itself: Minecraft's colour for it here, deepened, clear in the shallows.
-        vec3 body = mix(albedo, vec3(0.015, 0.10, 0.14), 0.45) * light;
-        float depth = waterDepth(viewPos);
-        float a = clamp(1.0 - exp(-depth * 0.32), 0.28, 0.90);
-        float outA = a * (1.0 - fres) + fres;
-        col = (body * a * (1.0 - fres) + refl * fres) / max(outA, 1e-3);
-        alpha = outA;
+        vec3 lW = mat3(gbufferModelViewInverse) * normalize(shadowLightPosition);
+        // How much sun is on the water here (its shadows, a passing cloud's), 0 to 1.
+        float sunVis = clamp(sunlit / max(NdotL, 0.05), 0.0, 1.0);
+
+        // What's behind it: the bottom, a little bent by the waves (never onto anything in front of the water).
+        vec2 sc = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
+        float d1 = texture(depthtex1, sc).r;
+        float depth = d1 >= 1.0 ? 64.0 : distance(viewPos, screenToView(sc, d1));
+        vec2 rUV = sc;
+        float refr = below ? 0.09 : 0.035 * clamp(depth / 3.0, 0.0, 1.0);
+        vec2 tryUV = clamp(sc + nV.xy * refr / max(wDist * 0.06, 1.0), vec2(0.001), vec2(0.999));
+        float dT = texture(depthtex1, tryUV).r;
+        vec3 bedT = screenToView(tryUV, dT);
+        if (dT >= 1.0 || bedT.z < viewPos.z) {
+            rUV = tryUV;
+            if (dT < 1.0) depth = mix(depth, distance(viewPos, bedT), 0.7);
+            d1 = dT;
+        }
+        vec3 behind = texture(colortex1, rUV).rgb;
+
+        vec3 body;
+        if (!below) {
+            // Caustics: the sunlight on the bottom gathered into a moving web of light, fading with depth.
+            if (d1 < 1.0) {
+                vec3 bedW = (gbufferModelViewInverse * vec4(screenToView(rUV, d1), 1.0)).xyz + cameraPosition;
+                float day = smoothstep(0.0, 0.12, lW.y);
+                behind *= mix(1.0, caustics(bedW), 0.5 * sunVis * day * (0.4 + 0.6 * exp(-depth / 14.0)) * smoothstep(0.0, 0.4, depth));
+            }
+            // The water takes the red out first, then the green: clear in the shallows, turquoise, then blue.
+            vec3 absorb = waterAbsorption(), scat = waterScatter();
+            vec3 T = exp(-(absorb + scat) * depth);
+            // Light gets into the water from the sky and the sun, and some of it scatters back out towards you.
+            float sky = lm.y;
+            vec3 lightIn = ambient * sky * sky + direct * 0.32 * clamp(lW.y, 0.0, 1.0) * smoothstep(0.8, 0.97, sky) * sunVis;
+            // Minecraft's colour for the water here nudges the light it scatters.
+            vec3 biome = pow(vcol.rgb, vec3(2.2));
+            biome = mix(vec3(1.0), biome / max(dot(biome, vec3(0.2126, 0.7152, 0.0722)), 0.05), 0.35);
+            vec3 inscatter = lightIn * scat / (absorb + scat) * (1.0 - T) * 0.45 * biome;
+            body = behind * T + inscatter;
+        } else {
+            // From under the water: the world above through the surface, tinted by the water you're in.
+            body = behind * vec3(0.62, 0.86, 0.95);
+        }
+
+        // The sky and the world mirrored in it.
+        vec3 r = reflect(v, nV);
+        vec3 refl;
+        if (!below) {
+            vec3 rW = mat3(gbufferModelViewInverse) * r;
+            if (rW.y < 0.02) rW = normalize(vec3(rW.x, 0.02, rW.z));
+            refl = pow(skyAt(mat3(gbufferModelView) * rW), vec3(2.2)) / EXPOSURE * (0.12 + 0.88 * lm.y * lm.y);
+            vec4 mirror = waterMirror(viewPos, r);
+            refl = mix(refl, mirror.rgb, mirror.a);
+        } else {
+            refl = pow(fogColor, vec3(2.2)) * 0.6;
+        }
+        float F = 0.02 + 0.98 * pow(1.0 - NdotV, 5.0);
+        if (below) {
+            // Past the critical angle the surface above is a mirror.
+            float sinT = 1.333 * sqrt(1.0 - NdotV * NdotV);
+            F = sinT >= 1.0 ? 1.0 : mix(F, 1.0, smoothstep(0.95, 1.0, sinT));
+        }
+        col = mix(body, refl, F);
+
+        if (!below) {
+            // The sun (or the moon) on the water: its own image, a soft path round it, and close by small ripples
+            // glittering where they catch it.
+            vec3 vW = -normalize(pPos);
+            float tg = waterClock() * 2.2;
+            vec2 sl = vec2(0.0);
+            for (int k = 0; k < 6; k++) {
+                float ang = float(k) * 2.39996 + 0.7;
+                vec2 dk = vec2(cos(ang), sin(ang));
+                float kk = 9.0 * pow(1.38, float(k));
+                float ph = dot(wPos.xz, dk) * kk - tg * sqrt(kk) * 1.6 + float(k) * 1.9;
+                sl += dk * cos(ph) * (0.06 / (1.0 + 0.25 * float(k)));
+            }
+            float near = exp(-wDist / 40.0);
+            vec3 nF = normalize(nW + vec3(sl.x, 0.0, sl.y) * near);
+            float rl = max(dot(reflect(-vW, nW), lW), 0.0);
+            float spark = smoothstep(0.9982, 0.99985, dot(reflect(-vW, nF), lW)) * near;
+            float fF = 0.02 + 0.98 * pow(1.0 - clamp(dot(nF, vW), 0.0, 1.0), 5.0);
+            float sunUp = smoothstep(-0.02, 0.12, lW.y);
+            col += direct * sunVis * (pow(rl, 900.0) * 2.2 + pow(rl, 40.0) * 0.05 + spark * fF * 16.0 * sunUp);
+        }
+        alpha = 1.0;
     }
     #endif
 

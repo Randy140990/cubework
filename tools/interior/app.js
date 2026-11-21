@@ -106,7 +106,8 @@ function applyTime() {
     mesh.visible = !!q;
     setBeam(mesh.userData.beam, q ? beamQuads(mesh.userData.pool, q) : []);
     if (!q) continue;
-    mesh.position.set((q[0] + q[2]) / 2, 0.07, (q[1] + q[3]) / 2); mesh.scale.set(q[2] - q[0], q[3] - q[1], 1);
+    // (A block wider all round: the glow fades out past where the light falls.)
+    mesh.position.set((q[0] + q[2]) / 2, 0.07, (q[1] + q[3]) / 2); mesh.scale.set(q[2] - q[0] + 2, q[3] - q[1] + 2, 1);
     mesh.material.color.setRGB(cr, cg, cb); mesh.material.opacity = ca * q[4];
     const bm = mesh.userData.beam.material; bm.color.setRGB(cr, cg, cb); bm.opacity = cs * q[4];
   }

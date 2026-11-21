@@ -1497,11 +1497,15 @@ public final class Game {
 				return;
 			}
 		}
-		// TEAM ROCKET (JESSIE and JAMES, and their MEOWTH), the first time you're out in VIRIDIAN with a POKéMON.
-		if (!d.story.contains("rocket_viridian") && !d.hasDex() && d.anyHealthy() && "viridian_city".equals(d.place) && !Interiors.in(p) && !ROCKETS.containsKey(p.getUUID())
-				&& p.onGround()) {
-			rocketsArrive(p, level);
-			return;
+		// TEAM ROCKET (JESSIE and JAMES): as in Let's Go, already standing in VIRIDIAN, just up the steps from ROUTE 1 by
+		// the town's sign, the first time you come with a POKéMON. You see them as you walk up; when you're close,
+		// JESSIE comes over and they stop you.
+		if (!d.story.contains("rocket_viridian") && !d.hasDex() && d.anyHealthy() && !Interiors.in(p)) {
+			rocketsWait(p, level);
+			if (rocketsNear(p) && p.onGround()) {
+				rocketsMeet(p);
+				return;
+			}
 		}
 		// Your rival, from the League's way, once you have the POKéDEX.
 		if (d.hasDex() && d.anyHealthy() && !d.beaten.contains("rival_22") && "route_22".equals(d.place) && !RIVALS.containsKey(p.getUUID())) {
@@ -1543,36 +1547,52 @@ public final class Game {
 				List.of("JESSIE: You haven't seen the last of TEAM ROCKET!"));
 	}
 
-	private static void rocketsArrive(ServerPlayer p, ServerLevel level) {
-		Vec3 look = Vec3.directionFromRotation(0, p.getYRot()).multiply(1, 0, 1);
-		if (look.lengthSqr() < 1e-4) look = new Vec3(0, 0, -1);
-		look = look.normalize();
-		// On open ground ahead of you that you can see (the way you're going first, then either side, then behind), so
-		// they're in the picture and can walk straight up; only then anywhere near.
-		int ax = Math.abs(look.x) >= Math.abs(look.z) ? (int) Math.signum(look.x) : 0, az = ax == 0 ? (int) Math.signum(look.z) : 0;
-		BlockPos at = null;
-		for (int[] dir : new int[][] {{ax, az}, {-az, ax}, {az, -ax}, {-ax, -az}}) {
-			at = alongRoute(level, p, dir[0], dir[1], 7, 4);
-			if (at != null) {
-				look = new Vec3(dir[0], 0, dir[1]);
-				break;
+	/** Where they stand in VIRIDIAN (JESSIE, then JAMES): on the paving just up the steps from ROUTE 1, by the sign. */
+	private static final int[][] ROCKET_SPOTS = {{-796, 561}, {-793, 561}};
+
+	/** They're put there when you're coming (within 64 blocks), and go again if you go off before you meet them. */
+	private static void rocketsWait(ServerPlayer p, ServerLevel level) {
+		List<Npc> have = ROCKETS.get(p.getUUID());
+		double dx = p.getX() - ROCKET_SPOTS[0][0] - 0.5, dz = p.getZ() - ROCKET_SPOTS[0][1] - 0.5;
+		if (dx * dx + dz * dz > 64 * 64) {
+			if (have != null && !WALKS.containsKey(p.getUUID())) {
+				for (Npc n : have) if (!n.isRemoved()) n.discard();
+				ROCKETS.remove(p.getUUID());
 			}
+			return;
 		}
-		if (at == null) at = spot(level, (int) Math.floor(p.getX() + look.x * 6), (int) Math.floor(p.getZ() + look.z * 6), 4);
-		if (at == null) return;
-		Npc jessie = place(level, Npc.TRAINER, "rocket_viridian", at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
-		if (jessie == null) return;
-		jessie.setCustomName(net.minecraft.network.chat.Component.literal("JESSIE"));
-		jessie.setFacing(jessie.yawTo(p));
-		List<Npc> both = new ArrayList<>(List.of(jessie));
-		BlockPos side = spot(level, at.getX() + (int) Math.round(-look.z * 2), at.getZ() + (int) Math.round(look.x * 2), 2);
-		Npc james = side == null ? null : place(level, Npc.PERSON, "rocket_james", side.getX() + 0.5, side.getY(), side.getZ() + 0.5, 0F);
-		if (james != null) {
-			james.setCustomName(net.minecraft.network.chat.Component.literal("JAMES"));
-			james.setFacing(james.yawTo(p));
-			both.add(james);
+		if (have != null) return;
+		List<Npc> both = new ArrayList<>();
+		for (int i = 0; i < ROCKET_SPOTS.length; i++) {
+			int x = ROCKET_SPOTS[i][0], z = ROCKET_SPOTS[i][1];
+			if (!level.hasChunkAt(new BlockPos(x, START_Y, z))) return;
 		}
-		ROCKETS.put(p.getUUID(), both);
+		for (int i = 0; i < ROCKET_SPOTS.length; i++) {
+			BlockPos at = spot(level, ROCKET_SPOTS[i][0], ROCKET_SPOTS[i][1], 3);
+			if (at == null) continue;
+			// Facing south, down the steps: the way you come in.
+			Npc n = place(level, i == 0 ? Npc.TRAINER : Npc.PERSON, i == 0 ? "rocket_viridian" : "rocket_james", at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
+			if (n == null) continue;
+			n.setCustomName(net.minecraft.network.chat.Component.literal(i == 0 ? "JESSIE" : "JAMES"));
+			both.add(n);
+		}
+		if (!both.isEmpty() && both.get(0).key().equals("rocket_viridian")) ROCKETS.put(p.getUUID(), both);
+		else for (Npc n : both) n.discard();
+	}
+
+	/** Whether you've come up close to them (and nothing else is going on). */
+	private static boolean rocketsNear(ServerPlayer p) {
+		List<Npc> have = ROCKETS.get(p.getUUID());
+		if (have == null || have.isEmpty() || have.get(0).isRemoved() || WALKS.containsKey(p.getUUID()) || engaged(p)) return false;
+		Npc jessie = have.get(0);
+		return jessie.level() == p.level() && jessie.distanceTo(p) < 6.5;
+	}
+
+	/** They've seen you: both turn to you, and JESSIE comes over. */
+	private static void rocketsMeet(ServerPlayer p) {
+		List<Npc> both = ROCKETS.get(p.getUUID());
+		Npc jessie = both.get(0);
+		for (Npc n : both) n.setFacing(n.yawTo(p));
 		data(p).story.add("rocket_viridian");
 		jessie.talker = p;
 		walkUp(p, jessie, rocketViridian(), "meet_evil_trainer", null);
@@ -1623,9 +1643,46 @@ public final class Game {
 	private static final Map<UUID, Npc> MUMS = new HashMap<>();
 	private static final Map<UUID, Integer> MUM_HOME = new HashMap<>();
 
+	/** MUM's front door (out on the step), and just inside it (where she goes in, home again). */
+	private static final Vec3 MUM_DOOR = new Vec3(-802.0, 19.0, 680.6), MUM_IN = new Vec3(-802.0, 19.0, 679.2);
+	/** Her front door's two halves (the bottoms), opened as she goes in and shut again behind her. */
+	private static final BlockPos[] MUM_DOORS = {new BlockPos(-803, 19, 679), new BlockPos(-802, 19, 679)};
+
+	/** Opens (or shuts) MUM's front door, as anyone going in or out of a house does, with its sound. */
+	private static void mumDoor(net.minecraft.world.level.Level level, boolean open) {
+		for (BlockPos at : MUM_DOORS) {
+			var st = level.getBlockState(at);
+			if (st.getBlock() instanceof net.minecraft.world.level.block.DoorBlock door && st.getValue(net.minecraft.world.level.block.DoorBlock.OPEN) != open)
+				door.setOpen(null, level, st, at, open);
+		}
+	}
+
+	/**
+	 * Where MUM comes from: out of the town on the way from her house (never from behind the lab, so she doesn't come
+	 * through it), on open ground under the sky that you can see from where you are, 7 to 11 blocks off.
+	 */
+	private static BlockPos mumFrom(ServerLevel level, ServerPlayer p) {
+		double dx = MUM_DOOR.x - p.getX(), dz = MUM_DOOR.z - p.getZ(), len = Math.sqrt(dx * dx + dz * dz);
+		if (len < 1) return null;
+		dx /= len;
+		dz /= len;
+		for (int d = (int) Math.min(11, len); d >= 7; d--)
+			for (double side : new double[] {0, 1.5, -1.5, 3, -3}) {
+				int x = (int) Math.floor(p.getX() + dx * d - dz * side), z = (int) Math.floor(p.getZ() + dz * d + dx * side);
+				for (int dy : new int[] {0, -1, 1}) {
+					BlockPos c = new BlockPos(x, p.getBlockY() + dy, z);
+					if (!goodGround(level, c) || !level.canSeeSky(c.above())) continue;
+					Vec3 eye = new Vec3(c.getX() + 0.5, c.getY() + 1.5, c.getZ() + 0.5);
+					var hit = level.clip(new net.minecraft.world.level.ClipContext(eye, p.getEyePosition(), net.minecraft.world.level.ClipContext.Block.COLLIDER,
+							net.minecraft.world.level.ClipContext.Fluid.NONE, p));
+					if (hit.getType() == net.minecraft.world.phys.HitResult.Type.MISS) return c;
+				}
+			}
+		return null;
+	}
+
 	private static void mumComes(ServerPlayer p, ServerLevel level) {
-		BlockPos at = alongRoute(level, p, 0, -1, 9, 5);
-		if (at == null) at = spot(level, p.getBlockX(), p.getBlockZ() - 7, 4);
+		BlockPos at = mumFrom(level, p);
 		if (at == null) return;
 		Npc mum = place(level, Npc.PERSON, "in_house1_0", at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
 		if (mum == null) return;
@@ -1651,17 +1708,40 @@ public final class Game {
 			return;
 		}
 		mum.talker = null;
-		Vec3 home = new Vec3(-802.0, mum.getY(), 680.6);
-		mum.getNavigation().moveTo(home.x, home.y, home.z, 0.8);
-		MUM_HOME.put(p.getUUID(), 140);
+		mum.getNavigation().moveTo(MUM_DOOR.x, MUM_DOOR.y, MUM_DOOR.z, 0.8);
+		MUM_HOME.put(p.getUUID(), 600);
 	}
 
+	/** MUM on her way home: all the way to her door, then in through it (gone). If she can't get there, she only goes
+	 * once you're well away, so you never see her vanish. */
 	private static void mumsGoHome() {
 		for (Map.Entry<UUID, Integer> e : List.copyOf(MUM_HOME.entrySet())) {
 			Npc mum = MUMS.get(e.getKey());
 			int left = e.getValue() - 1;
-			if (mum == null || mum.isRemoved() || left <= 0 || mum.position().distanceTo(new Vec3(-802.0, mum.getY(), 680.6)) < 1.6) {
-				if (mum != null && !mum.isRemoved()) mum.discard();
+			boolean done = mum == null || mum.isRemoved();
+			if (!done) {
+				Vec3 at = mum.position();
+				double toDoor = Math.hypot(at.x - MUM_DOOR.x, at.z - MUM_DOOR.z), toIn = Math.hypot(at.x - MUM_IN.x, at.z - MUM_IN.z);
+				ServerPlayer p = mum.level().getServer() == null ? null : mum.level().getServer().getPlayerList().getPlayer(e.getKey());
+				boolean seen = p != null && p.level() == mum.level() && p.distanceTo(mum) < 28;
+				if (toIn < 0.45) done = true;
+				else if (toDoor < 1.2) {
+					// On the step: she opens the door and in she goes.
+					mumDoor(mum.level(), true);
+					mum.getNavigation().stop();
+					mum.setFacing(180F);
+					mum.getMoveControl().setWantedPosition(MUM_IN.x, MUM_IN.y, MUM_IN.z, 0.6);
+					if (left > 40) left = 40;
+				} else if (mum.getNavigation().isDone() && left % 20 == 0) mum.getNavigation().moveTo(MUM_DOOR.x, MUM_DOOR.y, MUM_DOOR.z, 0.8);
+				if (left <= 0 && (toDoor < 2 || !seen)) done = true;
+				if (left <= 0 && !done) left = 20;
+			}
+			if (done) {
+				if (mum != null && !mum.isRemoved()) {
+					// The door shut behind her.
+					mumDoor(mum.level(), false);
+					mum.discard();
+				}
 				MUMS.remove(e.getKey());
 				MUM_HOME.remove(e.getKey());
 			} else MUM_HOME.put(e.getKey(), left);

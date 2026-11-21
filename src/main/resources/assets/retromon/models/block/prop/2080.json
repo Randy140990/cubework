@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pot","pot":"retromon:block/interior/pot"},"elements":[{"from":[0.0,16,15.872],"to":[4.928,16,16.0],"faces":{"down":{"uv":[0.0,0.0,4.928,0.128],"texture":"#pot"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/paper_mart","paper_mart":"retromon:block/interior/paper_mart"},"elements":[{"from":[9.6,0.0,0],"to":[16.0,16.0,0],"faces":{"south":{"uv":[9.6,0.0,16.0,16.0],"texture":"#paper_mart"}}}]}

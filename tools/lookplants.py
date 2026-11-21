@@ -1,5 +1,6 @@
 """
-The Retromon Look pack's plants: short grass, tall grass, fern and large fern, from John's Shards of Arcadia set
+The Retromon Look pack's plants: short grass, tall grass, fern and large fern, and the red flowers (poppies, red
+tulips, rose bushes), from John's Shards of Arcadia set
 (tools/art/shards_plants: its models, its pictures and its OptiFine random variants), recoloured for Retromon.
 
 His pictures are greys with a lilac cast, made to take the biome's green; here they're put on clean greys (a warm
@@ -50,9 +51,72 @@ def recolour(src, dst, colours):
     im.save(dst)
 
 
+# The red flowers (Pallet Town's flower beds and the rose bushes by the houses): his poppies, red tulips and rose
+# bushes, their petals put on a clean, bright Let's Go red and their leaves and stems on fresh greens.
+PETAL = [(104, 18, 40), (186, 34, 52), (234, 64, 66), (255, 122, 110), (255, 196, 178)]
+LEAF = [(28, 66, 36), (48, 102, 46), (78, 140, 58), (122, 180, 80), (170, 212, 112)]
+EYE = [(30, 26, 40), (64, 46, 58)]
+FLOWERS = ("poppy", "red_tulip", "rose_bush_bottom", "rose_bush_top")
+
+
+def flower(src, dst):
+    """His flower picture in his pattern: each pixel by what it is (a petal, a leaf or stem, a poppy's dark eye), on
+    Retromon's colours for it by how light it is among its own kind."""
+    import colorsys
+    im = Image.open(src).convert("RGBA")
+    p = im.load()
+    w, h = im.size
+    kind = {}
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = p[x, y]
+            if a <= 8:
+                continue
+            hh, ss, vv = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+            if vv < 0.22 or (ss < 0.25 and vv < 0.4):
+                kind[x, y] = "eye"
+            elif (hh < 0.1 or hh > 0.88) and ss > 0.3:
+                kind[x, y] = "petal"
+            else:
+                kind[x, y] = "leaf"
+    for k, colours in (("petal", PETAL), ("leaf", LEAF), ("eye", EYE)):
+        px = [xy for xy, kk in kind.items() if kk == k]
+        if not px:
+            continue
+        lum = sorted(0.3 * p[xy][0] + 0.59 * p[xy][1] + 0.11 * p[xy][2] for xy in px)
+        lo, hi = lum[len(lum) // 40], lum[-1 - len(lum) // 40]
+        for xy in px:
+            r, g, b, a = p[xy]
+            t = (0.3 * r + 0.59 * g + 0.11 * b - lo) / max(1.0, hi - lo)
+            p[xy] = ramp(colours, t) + (a,)
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    im.save(dst)
+
+
 def build():
     if os.path.isdir(CTM):
         shutil.rmtree(CTM)
+    tex = os.path.join(ASSETS, "textures", "block")
+    models = os.path.join(ASSETS, "models", "block")
+    for name in FLOWERS:
+        flower(os.path.join(SRC, "textures", "block", name + ".png"), os.path.join(tex, name + ".png"))
+        shutil.copy(os.path.join(SRC, "models", "block", name + ".json"), os.path.join(models, name + ".json"))
+    # The shapes his flower models are made on (several crossed planes for a fuller plant).
+    for name in ("cross2", "cross4", "flower_bottom", "flower_top"):
+        shutil.copy(os.path.join(SRC, "models", "block", name + ".json"), os.path.join(models, name + ".json"))
+    root = os.path.join(SRC, "optifine", "ctm", "test", "flower")
+    for dirpath, _dirs, files in os.walk(root):
+        out = os.path.join(CTM, "flower", os.path.relpath(dirpath, root))
+        os.makedirs(out, exist_ok=True)
+        for f in files:
+            if f.endswith(".png"):
+                flower(os.path.join(dirpath, f), os.path.join(out, f))
+            elif f.endswith(".properties"):
+                shutil.copy(os.path.join(dirpath, f), os.path.join(out, f))
+    grasses()
+
+
+def grasses():
     tex = os.path.join(ASSETS, "textures", "block")
     for name in ("short_grass", "tall_grass_bottom", "tall_grass_top", "fern", "large_fern_bottom", "large_fern_top"):
         recolour(os.path.join(SRC, "textures", "block", name + ".png"), os.path.join(tex, name + ".png"), FERN if "fern" in name else GRASS)
