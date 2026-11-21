@@ -82,3 +82,34 @@ H.265 is about 60% of these. Good is 0.6× and Max is 1.6×.
 - Pick a folder; if needed, use Get FFmpeg; then press F10 and F12.
 - Check that the encoder shows NVENC or AMF, and the shaders line shows Tempered Light.
 - Try 4K at 60 with Sharper off and on, Axiom's UI while recording, and the size and time to finish a 10-minute clip.
+
+## 0.1.1 (21 Nov, after John's first test)
+
+John's report:
+- F10 gave no sign of recording; only something flashing at the top saying "0", probably the "●" in the window title.
+- He wanted the keys to work only in game.
+- He asked for a 10-second "shutter" photo.
+- He wasn't sure the photos kept detail, and asked whether a 988 KB JPG is 4K.
+
+Cause: FFmpeg 8 (the BtbN master build that Get FFmpeg downloads, and Lightreel's copy too) refuses `-thread_queue_size` on an input. FFmpeg exited at once, so every recording stopped as it started. The CI had used Ubuntu's FFmpeg 6.1, which accepts it.
+
+Fixes:
+- The option is removed. The live command and the encoder check now share `Ffmpeg.pipeIn`.
+- The encoder check sends the real stream (timed Matroska RGBA through the pipe) with the real encoder settings. If the tuned settings fail, it falls back to plain ones (`-c:v enc -b:v -g`) for that encoder.
+- CI's plain run now uses the BtbN master linux64 LGPL build (env `LIGHTLENS_FFMPEG`).
+- Each key press does one thing, with repeats within 1 s ignored. Before this, holding F10 started and then stopped a recording.
+- Keys only work in a world. Leaving the world stops and saves.
+- Failures are loud: a toast, a red chat line, a "Last time" line on the screen, and `.minecraft/lightlens/last-error.txt` with FFmpeg's log.
+- Cue sounds: a high pling at start (before game sound is noted, so it isn't recorded), a lower one at stop, and a click for a photo when not recording.
+- The REC box is bigger (u = height/216) and has a red underline.
+- Photo Wait setting: None, 3 s or 10 s. For a big photo the game draws at full size for the whole wait, so the shaders settle. The countdown box sits in the top right and is never in the photo. Pressing F12 again takes the photo straight away.
+- File names include the size: "Lightlens <date> at <time> (3840x2160).png" and "(1920x1080 60fps).mp4".
+
+Photos checked against John's Print Screen: the 2K photo is sharper and less grainy. The chat resizes uploads (to about 2576 wide), so 4K has to be checked from the file's Properties.
+
+CI (61baa90) with BtbN FFmpeg master:
+- Video 1 is 14 s with sound; Sharper video is 5 s; no frames were dropped.
+- The 4K photo with the 3 s wait and countdown was 3840x2160, and the Screen photo was 1280x720.
+- The new names show in chat.
+
+Jar: `Lightlens-0.1.1-for-MC1.21.11.jar`.
