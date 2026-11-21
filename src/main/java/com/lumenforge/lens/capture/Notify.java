@@ -34,6 +34,17 @@ public final class Notify {
 		});
 	}
 
+	/** A tip in chat (amber). */
+	public static void hint(String text) {
+		Minecraft mc = Minecraft.getInstance();
+		Lens.LOG.info("Tip: {}", text);
+		mc.execute(() -> {
+			if (mc.player == null) return;
+			mc.player.displayClientMessage(Component.literal("[" + Lens.NAME + "] ").withStyle(ChatFormatting.DARK_AQUA)
+					.append(Component.literal(text).withStyle(ChatFormatting.GOLD)), false);
+		});
+	}
+
 	/** A finished file: a toast, and in chat its name and a link to the folder. */
 	public static void saved(String title, Path file, String detail) {
 		Minecraft mc = Minecraft.getInstance();

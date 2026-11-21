@@ -117,24 +117,44 @@ public final class Gl {
 
 	/**
 	 * Reading frames back without stalling: each frame is read into one of a few pixel buffers, and a frame or two
-	 * later, when the graphics card says it's done, copied out.
+	 * later, when the graphics card says it's done, handed on.
+	 *
+	 * Where the graphics card allows (OpenGL 4.4 buffer storage: Windows and Linux drivers), the buffers stay mapped
+	 * and the writer thread copies the frame out itself, so the game's render thread never spends time copying (that
+	 * copy is 15 to 33 MB a frame at 2K and 4K). Otherwise the copy is made here, as the frame is collected.
 	 */
 	static final class Readback {
+		static final int FREE = 0, FLIGHT = 1, READY = 2;
 		private final int count;
 		private final int[] pbo;
 		private final long[] fence;
 		private final long[] stamp;
-		private int w, h, head, inFlight;
+		private final ByteBuffer[] mapped;
+		private final java.util.concurrent.atomic.AtomicIntegerArray state;
+		private int w, h;
+		private boolean persistent;
 
 		Readback(int count) {
 			this.count = count;
 			pbo = new int[count];
 			fence = new long[count];
 			stamp = new long[count];
+			mapped = new ByteBuffer[count];
+			state = new java.util.concurrent.atomic.AtomicIntegerArray(count);
 		}
 
-		int bytes() {
-			return w * h * 4;
+		/** True if the graphics card can keep buffers mapped (asked on the render thread). */
+		static boolean persistentSupported() {
+			try {
+				var caps = org.lwjgl.opengl.GL.getCapabilities();
+				return caps.OpenGL44 || caps.GL_ARB_buffer_storage;
+			} catch (Throwable t) {
+				return false;
+			}
+		}
+
+		boolean persistent() {
+			return persistent;
 		}
 
 		void ensure(int width, int height) {
@@ -142,66 +162,110 @@ public final class Gl {
 			free();
 			w = width;
 			h = height;
+			persistent = persistentSupported();
+			long size = (long) w * h * 4;
 			for (int i = 0; i < count; i++) {
 				pbo[i] = GL15.glGenBuffers();
 				GL15.glBindBuffer(GL21.GL_PIXEL_PACK_BUFFER, pbo[i]);
-				GL15.glBufferData(GL21.GL_PIXEL_PACK_BUFFER, (long) w * h * 4, GL15.GL_STREAM_READ);
+				if (persistent) {
+					int flags = GL30.GL_MAP_READ_BIT | org.lwjgl.opengl.GL44.GL_MAP_PERSISTENT_BIT | org.lwjgl.opengl.GL44.GL_MAP_COHERENT_BIT;
+					org.lwjgl.opengl.GL44.glBufferStorage(GL21.GL_PIXEL_PACK_BUFFER, size, flags);
+					mapped[i] = GL30.glMapBufferRange(GL21.GL_PIXEL_PACK_BUFFER, 0, size, flags);
+					if (mapped[i] == null) persistent = false;
+				} else {
+					GL15.glBufferData(GL21.GL_PIXEL_PACK_BUFFER, size, GL15.GL_STREAM_READ);
+				}
+				state.set(i, FREE);
+			}
+			if (!persistent) {
+				// Mapping failed part way: start again the plain way.
+				for (int i = 0; i < count; i++) {
+					GL15.glBindBuffer(GL21.GL_PIXEL_PACK_BUFFER, pbo[i]);
+					if (mapped[i] != null) GL15.glUnmapBuffer(GL21.GL_PIXEL_PACK_BUFFER);
+					GL15.glDeleteBuffers(pbo[i]);
+					mapped[i] = null;
+					pbo[i] = GL15.glGenBuffers();
+					GL15.glBindBuffer(GL21.GL_PIXEL_PACK_BUFFER, pbo[i]);
+					GL15.glBufferData(GL21.GL_PIXEL_PACK_BUFFER, size, GL15.GL_STREAM_READ);
+				}
 			}
 		}
 
-		/** True when every buffer is still waiting on the graphics card. */
-		boolean full() {
-			return inFlight >= count;
-		}
-
-		/** Starts reading the target (bound for reading) into the next buffer. */
-		void submit(long time) {
-			int i = (head + inFlight) % count;
-			GL15.glBindBuffer(GL21.GL_PIXEL_PACK_BUFFER, pbo[i]);
-			packDefaults();
-			GL11.glReadPixels(0, 0, w, h, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, 0L);
-			fence[i] = GL32.glFenceSync(GL32.GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-			stamp[i] = time;
-			inFlight++;
+		/** Starts reading the target (bound for reading) into a free buffer. False if they're all busy (the frame's skipped). */
+		boolean submit(long time) {
+			for (int i = 0; i < count; i++) {
+				if (state.get(i) != FREE) continue;
+				GL15.glBindBuffer(GL21.GL_PIXEL_PACK_BUFFER, pbo[i]);
+				packDefaults();
+				GL11.glReadPixels(0, 0, w, h, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, 0L);
+				fence[i] = GL32.glFenceSync(GL32.GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+				stamp[i] = time;
+				state.set(i, FLIGHT);
+				return true;
+			}
+			return false;
 		}
 
 		interface Sink {
-			/** Takes a finished frame (it's only valid during the call). */
-			void accept(ByteBuffer rgba, long time);
+			/** A finished frame, copied out now (the plain way: `rgba` is only valid during the call). */
+			void copy(ByteBuffer rgba, long time);
+
+			/** A finished frame left in mapped buffer `slot` for the writer, who calls release(slot) when it's copied it. */
+			boolean handOver(int slot, ByteBuffer rgba, long time);
 		}
 
 		/** Hands over the frames that are done, oldest first. With `wait`, waits for all of them (stopping). */
 		void collect(Sink sink, boolean wait) {
-			while (inFlight > 0) {
-				int i = head;
+			while (true) {
+				int i = -1;
+				for (int k = 0; k < count; k++) if (state.get(k) == FLIGHT && (i < 0 || stamp[k] < stamp[i])) i = k;
+				if (i < 0) return;
 				int r = GL32.glClientWaitSync(fence[i], wait ? GL32.GL_SYNC_FLUSH_COMMANDS_BIT : 0, wait ? 2_000_000_000L : 0L);
-				if (r != GL32.GL_ALREADY_SIGNALED && r != GL32.GL_CONDITION_SATISFIED) {
-					if (!wait) return;
-				}
+				if (r != GL32.GL_ALREADY_SIGNALED && r != GL32.GL_CONDITION_SATISFIED && !wait) return;
 				GL32.glDeleteSync(fence[i]);
 				fence[i] = 0;
-				GL15.glBindBuffer(GL21.GL_PIXEL_PACK_BUFFER, pbo[i]);
-				ByteBuffer data = GL30.glMapBufferRange(GL21.GL_PIXEL_PACK_BUFFER, 0, (long) w * h * 4, GL30.GL_MAP_READ_BIT);
-				if (data != null) {
-					try {
-						sink.accept(data, stamp[i]);
-					} finally {
-						GL15.glUnmapBuffer(GL21.GL_PIXEL_PACK_BUFFER);
+				if (persistent) {
+					state.set(i, READY);
+					ByteBuffer view = mapped[i].duplicate();
+					view.clear();
+					if (!sink.handOver(i, view, stamp[i])) state.set(i, FREE);
+				} else {
+					GL15.glBindBuffer(GL21.GL_PIXEL_PACK_BUFFER, pbo[i]);
+					ByteBuffer data = GL30.glMapBufferRange(GL21.GL_PIXEL_PACK_BUFFER, 0, (long) w * h * 4, GL30.GL_MAP_READ_BIT);
+					if (data != null) {
+						try {
+							sink.copy(data, stamp[i]);
+						} finally {
+							GL15.glUnmapBuffer(GL21.GL_PIXEL_PACK_BUFFER);
+						}
 					}
+					state.set(i, FREE);
 				}
-				head = (head + 1) % count;
-				inFlight--;
 			}
 		}
 
+		/** From the writer thread: it's copied the frame out of buffer `slot`, which can be used again. */
+		void release(int slot) {
+			state.set(slot, FREE);
+		}
+
+		/** Lets go of the buffers. Only once nothing is copying out of them (the writer has stopped). */
 		void free() {
 			for (int i = 0; i < count; i++) {
 				if (fence[i] != 0) GL32.glDeleteSync(fence[i]);
-				if (pbo[i] != 0) GL15.glDeleteBuffers(pbo[i]);
+				if (pbo[i] != 0) {
+					if (mapped[i] != null) {
+						GL15.glBindBuffer(GL21.GL_PIXEL_PACK_BUFFER, pbo[i]);
+						GL15.glUnmapBuffer(GL21.GL_PIXEL_PACK_BUFFER);
+					}
+					GL15.glDeleteBuffers(pbo[i]);
+				}
 				fence[i] = 0;
 				pbo[i] = 0;
+				mapped[i] = null;
+				state.set(i, FREE);
 			}
-			head = inFlight = 0;
+			GL15.glBindBuffer(GL21.GL_PIXEL_PACK_BUFFER, 0);
 		}
 	}
 

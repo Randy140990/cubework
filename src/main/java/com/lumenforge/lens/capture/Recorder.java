@@ -35,9 +35,8 @@ import java.util.concurrent.TimeUnit;
 public final class Recorder {
 	public enum State { IDLE, STARTING, RECORDING, FINISHING }
 
-	private record Frame(byte[] data, long time) {}
-
-	private static final Frame END = new Frame(null, -1);
+	/** A frame for the writer: copied already (`data`), or still in mapped buffer `slot` (`src`). `data` and `src` both null ends it. */
+	private record Frame(byte[] data, int slot, ByteBuffer src, long time) {}
 
 	private static volatile State state = State.IDLE;
 	/** What's happening, for the settings screen ("Finishing: adding the sound"). */
@@ -60,7 +59,9 @@ public final class Recorder {
 	private static final Gl.Target TARGET = new Gl.Target();
 	private static final Gl.Readback READBACK = new Gl.Readback(4);
 
-	private static long startNanos, pausedNanos, pauseStart;
+	private static long startNanos, pausedNanos, pauseStart, armedNanos, micStartNanos;
+	/** How long after pressing record the first frame came (ms), for the log. */
+	private static long firstFrameMs = -1;
 	private static volatile boolean paused;
 	private static long lastSlot;
 	public static volatile int captured, dropped;
@@ -119,7 +120,7 @@ public final class Recorder {
 	}
 
 	public static void togglePause() {
-		if (state != State.RECORDING) return;
+		if (state != State.RECORDING || startNanos == 0) return;
 		if (paused) {
 			pausedNanos += System.nanoTime() - pauseStart;
 			paused = false;
@@ -241,8 +242,10 @@ public final class Recorder {
 		int frameBytes = outW * outH * 4;
 		int slots = frameBytes >= 3840 * 2160 * 4 ? 4 : 6;
 		try {
+			// Mapped buffers: the writer copies frames out itself, into two arrays of its own. Otherwise a pool of
+			// arrays the render thread copies into.
 			pool = new ArrayBlockingQueue<>(slots);
-			for (int i = 0; i < slots; i++) pool.add(new byte[frameBytes]);
+			if (!Gl.Readback.persistentSupported()) for (int i = 0; i < slots; i++) pool.add(new byte[frameBytes]);
 		} catch (OutOfMemoryError e) {
 			pool = null;
 			Notify.failed("Can't record", "Not enough memory for " + outW + "x" + outH + ". Try a smaller size.");
@@ -277,6 +280,7 @@ public final class Recorder {
 
 		if (s.mic && !asGif) {
 			try {
+				micStartNanos = System.nanoTime();
 				Mic.start(micFile);
 			} catch (Exception e) {
 				Notify.toast("No microphone", "Recording without it: " + e.getMessage());
@@ -292,7 +296,11 @@ public final class Recorder {
 		lastSlot = -1;
 		phase = -1;
 		nextSpaceCheck = System.currentTimeMillis() + 5000;
-		startNanos = System.nanoTime();
+		// The clock starts with the first frame recorded, so the video and the sound both start at that moment
+		// (the first frame can take a while, e.g. while shaders resize for Sharper).
+		startNanos = 0;
+		armedNanos = System.nanoTime();
+		firstFrameMs = -1;
 		state = State.RECORDING;
 		status = asGif ? "Making a GIF" : "Recording";
 		if (sharp) RenderScale.setVideo(k);
@@ -325,21 +333,40 @@ public final class Recorder {
 		}
 	}
 
-	/** The writer thread: frames to FFmpeg, in order, with their times. The last frame is held to close the video. */
+	/**
+	 * The writer thread: frames to FFmpeg, in order, with their times. Frames still in a mapped buffer are copied out
+	 * here (into two arrays it swaps between) and the buffer given back. The last frame is held to close the video.
+	 */
 	private static void writeLoop(Process p, OutputStream pipe, MkvWriter mkv) {
-		byte[] held = null;
+		byte[] held = null, spareA = null, spareB = null;
+		boolean heldPooled = false;
 		try {
 			mkv.writeHeader(Lens.NAME + " " + Lens.version());
 			while (true) {
 				Frame f = queue.take();
-				if (f.data == null) {
+				if (f.data == null && f.src == null) {
 					// Stopping: the last picture again at the stop time, so the video lasts as long as the sound.
 					if (held != null && f.time > 0) mkv.writeFrame(f.time, held, 0);
 					break;
 				}
-				mkv.writeFrame(f.time, f.data, 0);
-				if (held != null) pool.offer(held);
-				held = f.data;
+				byte[] data;
+				boolean pooled;
+				if (f.src != null) {
+					int n = mkv.frameBytes();
+					if (spareA == null) spareA = new byte[n];
+					if (spareB == null) spareB = new byte[n];
+					data = held == spareA ? spareB : spareA;
+					f.src.get(0, data, 0, Math.min(n, f.src.capacity()));
+					READBACK.release(f.slot);
+					pooled = false;
+				} else {
+					data = f.data;
+					pooled = true;
+				}
+				mkv.writeFrame(f.time, data, 0);
+				if (held != null && heldPooled) pool.offer(held);
+				held = data;
+				heldPooled = pooled;
 			}
 		} catch (IOException e) {
 			writeError = new IOException(p.isAlive() ? e.getMessage() : "FFmpeg stopped. " + log(), e);
@@ -371,7 +398,7 @@ public final class Recorder {
 		try {
 			READBACK.ensure(outW, outH);
 			TARGET.ensure(outW, outH);
-			READBACK.collect(Recorder::hand, false);
+			READBACK.collect(SINK, false);
 			// Minimised, the game doesn't show a frame: nothing new to record (the video holds the last picture).
 			if (!paused && !sharp && winW > 0 && winH > 0 && !Minecraft.getInstance().getWindow().isMinimized()) {
 				Gl.readFromWindow();
@@ -411,39 +438,49 @@ public final class Recorder {
 	 * a game running at the video's frame rate gives every slot one frame instead of now and then two and then none.
 	 */
 	private static void grab(int srcW, int srcH) {
+		if (startNanos == 0) {
+			startNanos = System.nanoTime();
+			firstFrameMs = (startNanos - armedNanos) / 1_000_000L;
+		}
 		long ms = clockMs();
 		double frameMs = 1000.0 / fps;
 		if (phase < 0) phase = ms;
 		long slot = (long) Math.floor((ms - phase) / frameMs + 0.3);
 		if (slot <= lastSlot) return;
 		lastSlot = slot;
-		if (READBACK.full()) {
-			dropped++;
-			return;
-		}
 		int[] c = Sizes.crop(shape, srcW, srcH);
 		Gl.blitInto(TARGET, srcH, c[0], c[1], c[2], c[3]);
 		GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, TARGET.fbo);
-		READBACK.submit(Math.round(phase + slot * frameMs));
-		captured++;
+		if (READBACK.submit(Math.round(phase + slot * frameMs))) captured++;
+		else dropped++;
 	}
 
 	/** When the first frame was recorded (ms on the recording's clock), or -1 before it. */
 	private static double phase = -1;
 
-	/** A frame the graphics card has finished: copied out and queued for the writer, or dropped if it's behind. */
-	private static void hand(ByteBuffer rgba, long time) {
-		byte[] b = pool.poll();
-		if (b == null) {
-			dropped++;
-			return;
+	/** Frames the graphics card has finished, on their way to the writer (or dropped if it's behind). */
+	private static final Gl.Readback.Sink SINK = new Gl.Readback.Sink() {
+		@Override
+		public void copy(ByteBuffer rgba, long time) {
+			byte[] b = pool.poll();
+			if (b == null) {
+				dropped++;
+				return;
+			}
+			rgba.get(0, b, 0, Math.min(b.length, rgba.remaining()));
+			if (!queue.offer(new Frame(b, -1, null, time))) {
+				pool.offer(b);
+				dropped++;
+			}
 		}
-		rgba.get(0, b, 0, Math.min(b.length, rgba.remaining()));
-		if (!queue.offer(new Frame(b, time))) {
-			pool.offer(b);
+
+		@Override
+		public boolean handOver(int slot, ByteBuffer rgba, long time) {
+			if (queue.offer(new Frame(null, slot, rgba, time))) return true;
 			dropped++;
+			return false;
 		}
-	}
+	};
 
 	private static void checkSpace() {
 		long a = Capture.freeSpace(Lens.work()), b = Capture.freeSpace(Lens.output());
@@ -465,14 +502,14 @@ public final class Recorder {
 		try {
 			Gl.save();
 			try {
-				READBACK.collect(Recorder::hand, true);
+				READBACK.collect(SINK, true);
 			} finally {
 				Gl.restore();
 			}
 		} catch (Throwable t) {
 			Lens.LOG.warn("Collecting the last frames: {}", t.toString());
 		}
-		READBACK.free();
+		// The mapped buffers stay until the writer has copied the last frames out (freed when the finishing's done).
 		TARGET.free();
 		if (sharp) RenderScale.setVideo(1);
 		List<SoundMix.Voice> voices = GameSound.end(end / 1000.0);
@@ -488,6 +525,11 @@ public final class Recorder {
 		String name = work.getFileName().toString().replace('_', ' ') + (asGif ? " (" + outW + "x" + outH + (lapse ? " timelapse" : "") + ")"
 				: " (" + outW + "x" + outH + " " + fps + "fps)");
 		double seconds = end / 1000.0;
+		micSkip = mic != null && startNanos > 0 && micStartNanos > 0 ? Math.max(0, (startNanos - micStartNanos) / 1e9) : 0;
+		gameFps = seconds > 0.5 ? c / seconds : 0;
+		Lens.LOG.info("Stopped: {} s, {} frames captured ({} a second), {} skipped, first frame {} ms after pressing record, {}x{} at {} fps, {}{}",
+				String.format(java.util.Locale.ROOT, "%.2f", seconds), c, String.format(java.util.Locale.ROOT, "%.1f", gameFps), d, firstFrameMs, outW, outH, fps,
+				encoder, sharp ? ", Sharper" : "");
 		if (why != null) lastError = why;
 		Thread t = new Thread(() -> {
 			if (asGif) finishGif(why, exe, p, w, end, work, video, outDir, name, lapse, c, d);
@@ -498,6 +540,7 @@ public final class Recorder {
 	}
 
 	private static volatile Thread finishing;
+	private static volatile double micSkip, gameFps;
 	private static boolean gameSoundOn;
 
 	private static void finish(String why, String exe, Process p, Thread w, long end, List<SoundMix.Voice> voices, Path work, Path video, Path mic,
@@ -506,7 +549,7 @@ public final class Recorder {
 		String error = null;
 		try {
 			status = "Finishing the picture";
-			while (!queue.offer(new Frame(null, end), 1, TimeUnit.SECONDS)) if (!w.isAlive()) break;
+			while (!queue.offer(new Frame(null, -1, null, end), 1, TimeUnit.SECONDS)) if (!w.isAlive()) break;
 			w.join(120_000);
 			if (!p.waitFor(180, TimeUnit.SECONDS)) {
 				p.destroyForcibly();
@@ -539,7 +582,7 @@ public final class Recorder {
 			watch.setDaemon(true);
 			watch.start();
 			try {
-				Ffmpeg.run(Ffmpeg.finishCommand(exe, video, game, mic, Lens.settings.micVolume, gameSoundOn ? seconds : 0, part), 3600);
+				Ffmpeg.run(Ffmpeg.finishCommand(exe, video, game, mic, Lens.settings.micVolume, seconds, micSkip, gameSoundOn ? 1 : 0, part), 3600);
 			} finally {
 				watch.interrupt();
 			}
@@ -560,6 +603,7 @@ public final class Recorder {
 		Path saved = result;
 		String err = error;
 		Minecraft.getInstance().execute(() -> {
+			READBACK.free();
 			state = State.IDLE;
 			status = "";
 			gif = false;
@@ -571,7 +615,11 @@ public final class Recorder {
 				} catch (IOException ignored) {
 				}
 				String what = Sizes.clock((long) (seconds * 1000)) + ", " + outW + "x" + outH + ", " + Sizes.bytes(size);
-				Notify.saved(why != null ? why : "Video saved", saved, what + (d > c / 20 && c > 0 ? " · some frames were skipped" : ""));
+				Notify.saved(why != null ? why : "Video saved", saved, what);
+				if (gameFps > 0 && gameFps < fps * 0.8) {
+					Notify.hint("Your game ran at about " + Math.round(gameFps) + " fps while recording, so the " + fps + " fps video repeats frames and looks jumpy."
+							+ (sharp ? " Sharper draws the game at " + RenderScale.lastVideo() + "x the size; turn it off for smooth video." : " A smaller size or fewer shader effects will help."));
+				}
 			} else {
 				String reason = (why != null ? why + ". " : "") + (err == null ? "" : err);
 				lastError = reason;
@@ -588,7 +636,7 @@ public final class Recorder {
 		String error = null;
 		try {
 			status = "Finishing the GIF";
-			while (!queue.offer(new Frame(null, end), 1, TimeUnit.SECONDS)) if (!w.isAlive()) break;
+			while (!queue.offer(new Frame(null, -1, null, end), 1, TimeUnit.SECONDS)) if (!w.isAlive()) break;
 			w.join(60_000);
 			if (!p.waitFor(120, TimeUnit.SECONDS)) {
 				p.destroyForcibly();
@@ -616,6 +664,7 @@ public final class Recorder {
 		Path saved = result;
 		String err = error;
 		Minecraft.getInstance().execute(() -> {
+			READBACK.free();
 			state = State.IDLE;
 			status = "";
 			gif = false;

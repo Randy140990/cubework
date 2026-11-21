@@ -73,6 +73,14 @@ public final class LensGameTest implements FabricClientGameTest {
 			ctx.waitTicks(10);
 			ctx.takeScreenshot("ll-02-settings");
 			ctx.runOnClient(mc -> mc.setScreen(null));
+			// The same at 1080p (the usual window), then back to 720p for the rest.
+			ctx.getInput().resizeWindow(1920, 1080);
+			ctx.waitTicks(5);
+			ctx.runOnClient(mc -> mc.setScreen(new LensScreen(null, "Choose where your videos go, then press Record.")));
+			ctx.waitTicks(10);
+			ctx.takeScreenshot("ll-02b-settings-1080p");
+			ctx.runOnClient(mc -> mc.setScreen(null));
+			ctx.getInput().resizeWindow(1280, 720);
 			ctx.waitTicks(5);
 
 			// ---- Recording 1: 1K, as you see it.

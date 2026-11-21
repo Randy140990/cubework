@@ -1,0 +1,18 @@
+{
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "lightlens:inter-display.ttf",
+      "shift": [
+        0,
+        0.6
+      ],
+      "size": 8.5,
+      "oversample": 8.0
+    },
+    {
+      "type": "reference",
+      "id": "minecraft:default"
+    }
+  ]
+}

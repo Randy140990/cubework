@@ -20,7 +20,15 @@ public final class RenderScale {
 
 	static void setVideo(int v) {
 		video = Math.max(1, v);
+		if (video > 1) lastVideo = video;
 		apply();
+	}
+
+	private static int lastVideo = 2;
+
+	/** The scale the last Sharper recording used. */
+	static int lastVideo() {
+		return lastVideo;
 	}
 
 	static void setPhoto(int v) {

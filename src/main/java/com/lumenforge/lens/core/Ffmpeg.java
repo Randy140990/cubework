@@ -358,19 +358,30 @@ public final class Ffmpeg {
 	 * microphone mixed and encoded to AAC. Written as MP4 to a temporary name.
 	 */
 	public static List<String> finishCommand(String exe, Path video, Path gameWav, Path micWav, double micVolume, Path out) {
-		return finishCommand(exe, video, gameWav, micWav, micVolume, 0, out);
+		return finishCommand(exe, video, gameWav, micWav, micVolume, 0, 0, 0, out);
 	}
 
-	/** As above; with no sound files and `silence` seconds, a silent stereo track (editors expect one). */
-	public static List<String> finishCommand(String exe, Path video, Path gameWav, Path micWav, double micVolume, double silence, Path out) {
+	/**
+	 * As above. `seconds` (when above 0) is the recording's length: the file is cut to it, and with no sound files
+	 * a silent stereo track that long is added when `silence` (editors expect one). `micSkip` seconds are left off
+	 * the start of the mic (it started a moment before the first frame).
+	 */
+	public static List<String> finishCommand(String exe, Path video, Path gameWav, Path micWav, double micVolume, double seconds, double micSkip,
+			int silence, Path out) {
 		List<String> c = new ArrayList<>(List.of(exe, "-hide_banner", "-loglevel", "warning", "-nostdin", "-y", "-i", video.toString()));
-		if (gameWav == null && micWav == null && silence > 0) {
-			c.addAll(List.of("-f", "lavfi", "-t", String.format(Locale.ROOT, "%.3f", silence), "-i", "anullsrc=r=48000:cl=stereo"));
-			c.addAll(List.of("-map", "0:v:0", "-c:v", "copy", "-map", "1:a", "-c:a", "aac", "-b:a", "128k", "-f", "mp4", out.toString()));
+		List<String> limit = seconds > 0 ? List.of("-t", String.format(Locale.ROOT, "%.3f", seconds)) : List.of();
+		if (gameWav == null && micWav == null && silence > 0 && seconds > 0) {
+			c.addAll(List.of("-f", "lavfi", "-t", String.format(Locale.ROOT, "%.3f", seconds), "-i", "anullsrc=r=48000:cl=stereo"));
+			c.addAll(List.of("-map", "0:v:0", "-c:v", "copy", "-map", "1:a", "-c:a", "aac", "-b:a", "128k"));
+			c.addAll(limit);
+			c.addAll(List.of("-f", "mp4", out.toString()));
 			return c;
 		}
 		if (gameWav != null) c.addAll(List.of("-i", gameWav.toString()));
-		if (micWav != null) c.addAll(List.of("-i", micWav.toString()));
+		if (micWav != null) {
+			if (micSkip > 0.01) c.addAll(List.of("-ss", String.format(Locale.ROOT, "%.3f", micSkip)));
+			c.addAll(List.of("-i", micWav.toString()));
+		}
 		c.addAll(List.of("-map", "0:v:0", "-c:v", "copy"));
 		if (gameWav != null && micWav != null) {
 			c.addAll(List.of("-filter_complex", "[2:a]volume=" + fmt2(micVolume) + "[m];[1:a][m]amix=inputs=2:normalize=0:duration=longest[a]",
@@ -381,8 +392,14 @@ public final class Ffmpeg {
 			c.addAll(List.of("-filter:a", "volume=" + fmt2(micVolume), "-map", "1:a"));
 		}
 		if (gameWav != null || micWav != null) c.addAll(List.of("-c:a", "aac", "-b:a", "192k", "-ar", "48000"));
+		c.addAll(limit);
 		c.addAll(List.of("-f", "mp4", out.toString()));
 		return c;
+	}
+
+	/** A recording the game didn't finish (it closed or crashed): its picture, as an MP4. */
+	public static List<String> rescueCommand(String exe, Path video, Path micWav, Path out) {
+		return finishCommand(exe, video, null, micWav, 1.0, out);
 	}
 
 	/** Frames a second in a GIF (a timelapse GIF plays at 10, each frame a second of play). */
@@ -405,10 +422,6 @@ public final class Ffmpeg {
 		return (long) (w * (double) h * frames * 0.33);
 	}
 
-	/** A recording the game didn't finish (it closed or crashed): its picture, as an MP4. */
-	public static List<String> rescueCommand(String exe, Path video, Path micWav, Path out) {
-		return finishCommand(exe, video, null, micWav, 1.0, out);
-	}
 
 	private static String fmt(double mbps) {
 		return String.format(Locale.ROOT, "%.1fM", Math.max(1, mbps));
