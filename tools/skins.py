@@ -350,3 +350,7 @@ for name, im in SKINS.items():
     if os.path.exists(f) and not everyone: continue
     im.save(f)
     print(name)
+
+# Hands for everyone: the bottom of every sleeve in the person's own skin colour (tools/hands.py).
+import hands
+hands.main()

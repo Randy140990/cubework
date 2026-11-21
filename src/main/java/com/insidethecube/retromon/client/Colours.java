@@ -18,12 +18,20 @@ public final class Colours {
 		ColorProviderRegistry.BLOCK.register((state, level, pos, tint) -> {
 			int c = level != null && pos != null ? BiomeColors.getAverageGrassColor(level, pos) : GrassColor.getDefaultColor();
 			return Adventure.inSave ? brighten(c) : c;
-		}, Blocks.GRASS_BLOCK, Blocks.SHORT_GRASS, Blocks.TALL_GRASS, Blocks.FERN, Blocks.LARGE_FERN, Blocks.BUSH, Blocks.SUGAR_CANE);
+		}, Blocks.GRASS_BLOCK, Blocks.SHORT_GRASS, Blocks.TALL_GRASS, Blocks.FERN, Blocks.LARGE_FERN, Blocks.BUSH, Blocks.SUGAR_CANE,
+				// The map's moss (its fields and the borders of its paths) and green concrete powder (its lumps of grass):
+				// the Retromon Look pack draws them as the grass, so they take the grass's green.
+				Blocks.MOSS_BLOCK, Blocks.MOSS_CARPET, Blocks.GREEN_CONCRETE_POWDER);
 		ColorProviderRegistry.BLOCK.register((state, level, pos, tint) -> {
 			int c = level != null && pos != null ? BiomeColors.getAverageFoliageColor(level, pos) : FoliageColor.FOLIAGE_DEFAULT;
 			return Adventure.inSave ? brighten(c) : c;
 		}, Blocks.OAK_LEAVES, Blocks.JUNGLE_LEAVES, Blocks.ACACIA_LEAVES, Blocks.DARK_OAK_LEAVES, Blocks.MANGROVE_LEAVES, Blocks.VINE);
+		// Kanto's trees (birch leaves with azalea): Let's Go's sunny tree green, lighter than Minecraft's grey-green birch.
+		ColorProviderRegistry.BLOCK.register((state, level, pos, tint) -> Adventure.inSave ? KANTO_LEAVES : FoliageColor.FOLIAGE_BIRCH, Blocks.BIRCH_LEAVES);
 	}
+
+	/** Birch leaves in a Retromon save: a bright yellow-green (their greys times this give Let's Go's tree tops). */
+	private static final int KANTO_LEAVES = 0xFFCDFF69;
 
 	/** More saturated, a little lighter, and nudged towards yellow-green. */
 	static int brighten(int rgb) {

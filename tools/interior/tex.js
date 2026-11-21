@@ -498,10 +498,13 @@ const TEXDEF = {
   shadowBlob: [32, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const d = Math.hypot(x - 15.5, y - 15.5) / 16; P.set(x, y, [0, 0, 0], Math.max(0, 0.55 * (1 - d * d)) ); } }],
   // Light through a window on the floor: soft edges, the window's cross a shadow across it (white: the time of day
   // tints it). The door's has no cross.
-  sunPool: [32, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const ex = Math.min(x, 31 - x) / 4.5, ey = Math.min(y, 31 - y) / 4.5; const a = Math.pow(Math.min(1, ex) * Math.min(1, ey), 1.2); const bar = (x === 15 || x === 16 || y === 15 || y === 16) ? 0.3 : (x === 14 || x === 17 || y === 14 || y === 17) ? 0.75 : 1; P.set(x, y, [255, 255, 255], a * bar); } }],
+  // The light through a window on the floor: fine enough (128 across) that it never shows as squares, its edges
+  // fading softly a third of the way in, the window's cross only the faintest softer band through its middle.
+  sunPool: [128, 128, (P, r) => { const ss = t => t * t * (3 - 2 * t); for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) { const ex = Math.min(1, Math.min(x, 127 - x) / 42), ey = Math.min(1, Math.min(y, 127 - y) / 42); const cross = 1 - 0.14 * Math.exp(-Math.pow((x - 63.5) / 7, 2)) - 0.14 * Math.exp(-Math.pow((y - 63.5) / 7, 2)); P.set(x, y, [255, 255, 255], ss(ex) * ss(ey) * cross); } }],
   // A shaft of light from a window to the floor: brightest at the window, fading as it goes, soft at its sides.
-  sunBeam: [16, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 16; x++) { const e = Math.min(1, Math.min(x, 15 - x) / 5); P.set(x, y, [255, 255, 255], Math.pow(e, 1.3) * (1 - 0.75 * y / 31)); } }],
-  sunPoolSoft: [32, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const ex = Math.min(x, 31 - x) / 12, ey = Math.min(y, 31 - y) / 12; P.set(x, y, [255, 255, 255], Math.pow(Math.min(1, ex) * Math.min(1, ey), 1.6)); } }],
+  // The shaft in the air: faint, soft across its whole width, coming in from the window and gone by the floor.
+  sunBeam: [64, 128, (P, r) => { const ss = t => t * t * (3 - 2 * t); for (let y = 0; y < 128; y++) for (let x = 0; x < 64; x++) { const e = ss(Math.min(1, Math.min(x, 63 - x) / 28)), v = y / 127; P.set(x, y, [255, 255, 255], e * ss(Math.min(1, v / 0.12)) * Math.pow(1 - v, 1.6) * 0.8); } }],
+  sunPoolSoft: [128, 128, (P, r) => { const ss = t => t * t * (3 - 2 * t); for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) { const ex = Math.min(1, Math.min(x, 127 - x) / 56), ey = Math.min(1, Math.min(y, 127 - y) / 56); P.set(x, y, [255, 255, 255], ss(ex) * ss(ey)); } }],
   aoN: [4, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 4; x++) P.set(x, y, [0, 0, 0], 0.34 * Math.pow(1 - y / 15, 2)); }],
   aoW: [16, 4, (P, r) => { for (let y = 0; y < 4; y++) for (let x = 0; x < 16; x++) P.set(x, y, [0, 0, 0], 0.3 * Math.pow(1 - x / 15, 2)); }],
   aoE: [16, 4, (P, r) => { for (let y = 0; y < 4; y++) for (let x = 0; x < 16; x++) P.set(x, y, [0, 0, 0], 0.3 * Math.pow(x / 15, 2)); }],

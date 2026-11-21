@@ -14,16 +14,34 @@ vec3 windAt(vec3 wp, float amp) {
     return vec3(a, 0.0, b) * amp * gust;
 }
 
+// Where you are (Iris: the camera less your eyes), so the grass can part round you however far back the camera is.
+uniform vec3 relativeEyePosition;
+
+// Walking through: a plant's top bends away from you (and down a little), more the closer you are, as a clump
+// does round your legs. playerPos: the vertex from the camera.
+vec3 parting(vec3 playerPos) {
+    vec3 feet = -relativeEyePosition - vec3(0.0, 1.62, 0.0);
+    vec3 d = playerPos - feet;
+    if (d.y < -0.6 || d.y > 2.4) return vec3(0.0);
+    float r = length(d.xz);
+    float k = clamp(1.0 - r / 1.15, 0.0, 1.0);
+    if (k <= 0.0) return vec3(0.0);
+    k = k * k * (3.0 - 2.0 * k);
+    vec2 dir = r > 0.001 ? d.xz / r : vec2(0.0, 1.0);
+    return vec3(dir.x * 0.45, -0.2, dir.y * 0.45) * k;
+}
+
 // How far a vertex moves (player space). id: the block's (block.properties); midBlock: at_midBlock (x64, from the
 // vertex to the block's middle, so negative y at a block's top).
 vec3 wave(vec3 playerPos, float id, vec4 midBlock) {
-    if (id < 10000.5 || WAVING == 0) return vec3(0.0);
+    if (id < 10000.5) return vec3(0.0);
     vec3 wp = playerPos + cameraPosition;
     float top = midBlock.y < 0.0 ? 1.0 : 0.0;
     int k = int(id + 0.5);
-    if (k == 10001) return windAt(wp, 0.10) * top;
-    if (k == 10005) return windAt(wp, 0.10) * top * 0.5;
-    if (k == 10006) return windAt(wp, 0.10) * (0.5 + 0.5 * top);
-    if (k == 10002) return windAt(wp * 1.3, 0.035) + vec3(0.0, windAt(wp.zyx, 0.015).x, 0.0);
+    float sway = WAVING == 0 ? 0.0 : 1.0;
+    if (k == 10001) return (windAt(wp, 0.10) * sway + parting(playerPos)) * top;
+    if (k == 10005) return (windAt(wp, 0.10) * sway + parting(playerPos)) * top * 0.5;
+    if (k == 10006) return (windAt(wp, 0.10) * sway + parting(playerPos)) * (0.5 + 0.5 * top);
+    if (k == 10002) return (windAt(wp * 1.3, 0.035) + vec3(0.0, windAt(wp.zyx, 0.015).x, 0.0)) * sway;
     return vec3(0.0);
 }

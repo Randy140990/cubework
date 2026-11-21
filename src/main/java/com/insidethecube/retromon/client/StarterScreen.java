@@ -238,7 +238,7 @@ public class StarterScreen extends GameScreen {
 		Scenes.typeBg(g, sp.type1(), true);
 		if (!(rt >= 0 && rt < 1)) {
 			if (rt >= 1 && rt < 1.42F) V.glow(g, 640, 330, 240, 280, Ui.alpha(0xFFFFFFFF, 0.5F));
-			Scenes.modelBare(g, secs, IDS[sid], 0, false, 84);
+			Scenes.modelBare(g, secs, IDS[sid], 0, false, 128);
 		}
 		// The plate.
 		float plateA = !revealing ? 1 : rt < 1.42F ? 0 : Math.min(1, (rt - 1.42F) / 0.3F);

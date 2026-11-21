@@ -55,6 +55,42 @@ public final class Hud {
 
 	public static void arrive() {
 		arrive = 34;
+		// A new game: the loading page carries on over your room till it's drawn and running smoothly.
+		if (IntroScreen.starting()) {
+			page = 1;
+			pageTicks = 0;
+			smoothFrames = 0;
+		}
+	}
+
+	/**
+	 * The loading page over the world as a new game arrives (1 showing, 2 going to black, 0 gone), how long it's been up
+	 * (ticks), and how many frames in a row have come quickly (the world's settled: no more stalls as it's built).
+	 */
+	private static int page, pageTicks, pageOut, smoothFrames;
+	private static long lastFrame;
+
+	private static void arrivingPage(GuiGraphics g) {
+		if (page == 0) return;
+		long now = System.nanoTime();
+		smoothFrames = lastFrame != 0 && now - lastFrame < 45_000_000L ? smoothFrames + 1 : 0;
+		lastFrame = now;
+		IntroScreen.drawArriving(g);
+		if (page == 2) g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF000000, Math.min(1, pageOut / 10F)));
+	}
+
+	private static void arrivingTick(Minecraft mc) {
+		if (page == 0) return;
+		pageTicks++;
+		Adventure.frozen = Math.max(Adventure.frozen, 2);
+		arrive = 34;
+		boolean ready = mc.player != null && mc.level != null && mc.screen == null && pageTicks >= 30 && smoothFrames >= 40;
+		if (page == 1 && (ready || pageTicks > 600)) page = 2;
+		if (page == 2 && ++pageOut >= 10) {
+			// Black now: the world fades in from it, as it does after any loading.
+			page = 0;
+			pageOut = 0;
+		}
 	}
 
 	public static void fadeThrough(Runnable then) {
@@ -132,7 +168,8 @@ public final class Hud {
 				r.run();
 			}
 		}
-		if (arrive > 0 && mc.level != null && mc.screen == null || arrive > 0 && mc.screen instanceof DialogueScreen) arrive--;
+		arrivingTick(mc);
+		if (page == 0 && (arrive > 0 && mc.level != null && mc.screen == null || arrive > 0 && mc.screen instanceof DialogueScreen)) arrive--;
 		moneyTick(mc);
 		if (badgeShown >= 0 && mc.screen == null) badgeTicks++;
 	}
@@ -241,6 +278,10 @@ public final class Hud {
 	}
 
 	private static void fade(GuiGraphics g, DeltaTracker delta) {
+		if (page != 0) {
+			arrivingPage(g);
+			return;
+		}
 		if (arrive > 0) g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF000000, Math.min(1, (arrive - delta.getGameTimeDeltaPartialTick(true)) / 20F)));
 		if (fade <= 0) return;
 		float t = fadeLen - fade + delta.getGameTimeDeltaPartialTick(true);

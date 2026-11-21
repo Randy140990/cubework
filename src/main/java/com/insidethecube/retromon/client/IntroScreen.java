@@ -123,6 +123,11 @@ public class IntroScreen extends GameScreen {
 	/** When the game was set going (ms), so Minecraft's own loading screens show ours instead till you're in; or 0. */
 	private static long launchedAt;
 
+	/** Whether a new game's just been set going (the page stays up over the world till it's ready: Hud.arrive). */
+	public static boolean starting() {
+		return launchedAt != 0;
+	}
+
 	/** Whether the world's still loading after the new game set it going (a minute at most). */
 	public static boolean launching() {
 		Minecraft mc = Minecraft.getInstance();

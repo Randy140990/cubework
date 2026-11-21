@@ -8,6 +8,7 @@ import os
 import random
 
 import lookground
+import lookplants
 
 from PIL import Image
 
@@ -137,12 +138,14 @@ def main():
               open(os.path.join(PACK, "pack.mcmeta"), "w"), indent=1, ensure_ascii=False)
     # The ground (grass, dirt paths, moss, dirt) and its rounded edges (CTM, for Continuity): lookground.py.
     lookground.build(save)
-    save("grass_block_side_overlay", side_overlay())
-    save("short_grass", tuft())
-    save("tall_grass_bottom", tuft(tall_bottom=True))
-    save("tall_grass_top", tuft(tall_top=True))
+    # The plants (short and tall grass, fern, large fern): John's Shards of Arcadia set, recoloured: lookplants.py.
+    lookplants.build()
+    # (The trees keep Minecraft's leaves, as the map has them; only Kanto's colours are brighter: lookground.py and
+    # client/Colours.java. Earlier versions' own leaves are gone.)
     for wood in ("oak", "jungle", "acacia", "dark_oak", "mangrove"):
-        save(wood + "_leaves", leaves())
+        f = os.path.join(TEX, wood + "_leaves.png")
+        if os.path.exists(f):
+            os.remove(f)
     save("poppy", flower((225, 50, 60, 255), (250, 220, 90, 255)))
     save("dandelion", flower((250, 215, 60, 255), (240, 140, 40, 255)))
     save("azure_bluet", flower((245, 245, 250, 255), (250, 220, 90, 255)))

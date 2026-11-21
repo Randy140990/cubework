@@ -443,3 +443,6 @@ def preview(skins):
 
 if __name__ == "__main__":
     print(preview([oak(), boy(), girl(), rival(), boy(True), girl(True)]))
+    # Hands for everyone (tools/hands.py).
+    import hands
+    hands.main()

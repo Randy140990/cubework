@@ -267,6 +267,10 @@ public final class Scenes {
 		public boolean talking, walking, hurry, done;
 		public float walkX, turnT, wave, youWave, floss, lookUp;
 		private float camX = Float.NaN, t;
+		/** When he set off (s; -1 not yet), and how fast he's going (blocks a second): he turns first, standing, then
+		 * picks up speed, and slows to a stop at his mark, as anyone walking does. */
+		private float setOff = -1, speed;
+		private static final float TURN = 0.5F;
 		private final double[][] walkers = new double[5][];
 		private float nextCry = 2, cryAt = -9;
 		private int crier = -1;
@@ -290,13 +294,23 @@ public final class Scenes {
 		public void tick(float dt) {
 			t += dt;
 			if (walking && !done) {
-				walkX = Math.min(end, walkX + dt * (hurry ? 3.2F : 1.25F));
-				if (walkX >= end) {
+				if (setOff < 0) setOff = t;
+				// Standing, he turns the way he's going (TURN seconds); then he walks, easing up to his pace (quicker
+				// once he's told to hurry along), and eases down over his last steps to stop on his mark.
+				float want = t - setOff < TURN ? 0 : hurry ? 3.2F : 1.25F;
+				speed += (want - speed) * Math.min(1, dt * 3.5F);
+				float left = end - walkX;
+				if (left < 1.4F) speed = Math.min(speed, Math.max(0.3F, left * 1.5F));
+				walkX = Math.min(end, walkX + dt * speed);
+				if (walkX >= end - 0.01F) {
+					walkX = end;
+					speed = 0;
 					done = true;
 					turnT = 0;
 				}
 			}
-			if (done) turnT = Math.min(1, turnT + dt * 2.2F);
+			// At his mark: a breath, standing still, then he turns to you.
+			if (done) turnT = Math.min(1, turnT + dt * 1.8F);
 			if (walking) camX = Float.isNaN(camX) ? walkX : camX + (walkX + 0.4F - camX) * Math.min(1, dt * 2.5F);
 			nextCry -= dt;
 			if (nextCry < 0) {
@@ -324,13 +338,17 @@ public final class Scenes {
 			Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
 			float px = walking ? walkX : 0;
 			double yaw = Math.PI;
-			if (walking && !done) yaw = -Math.PI / 2 - 0.55;
-			else if (done) {
-				float e = turnT * turnT * (3 - 2 * turnT);
+			if (walking && !done) {
+				// (Turning from you to the way he's going, before a step.)
+				float k = setOff < 0 ? 0 : Math.min(1, (t - setOff) / TURN), e = k * k * (3 - 2 * k);
+				yaw = Math.PI + (Math.PI / 2 - 0.55) * e;
+			} else if (done) {
+				float k = Math.max(0, turnT * 1.25F - 0.25F), e = k * k * (3 - 2 * k);
 				yaw = (-Math.PI / 2 - 0.55) + (-Math.PI - (-Math.PI / 2 - 0.55)) * e;
 			}
 			Figures.Fig oak = place(b, cam, OAK, null, px, 0, 0, yaw, t).cast(true);
-			if (walking && !done) oak.walk(1);
+			// His legs go as fast as he does (still while he turns, and as he comes to a stop).
+			if (walking && !done && speed > 0.05F) oak.walk(Math.min(1, speed / 1.0F));
 			if (talking) oak.talk(0.85F);
 			if (wave > 0) oak.wave(wave);
 			if (mode.equals("rival")) {

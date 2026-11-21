@@ -242,9 +242,10 @@ public final class Interiors {
 				if (p.role() == null) Trainers.PEOPLE.putIfAbsent(p.key(), new Trainers.Person(p.key(), r.place(), p.skin(), "down", "stay", p.lines()));
 				// The lab's aides on their feet potter about between the shelves (the one at his desk sits; the one
 				// at the big machine keeps at it).
+				// (Under the games' own place for them, the lab, not the town round it: else the town put one outside too.)
 				if ("AIDE".equals(p.name()) && !p.seated() && !p.key().equals("oaks_lab_p3")) {
 					Trainers.Person old = Trainers.PEOPLE.get(p.key());
-					Trainers.PEOPLE.put(p.key(), new Trainers.Person(p.key(), r.place(), p.skin(), "any_dir", "walk", old != null ? old.lines() : p.lines()));
+					Trainers.PEOPLE.put(p.key(), new Trainers.Person(p.key(), old != null ? old.place() : "oaks_lab", p.skin(), "any_dir", "walk", old != null ? old.lines() : p.lines()));
 				}
 			}
 	}

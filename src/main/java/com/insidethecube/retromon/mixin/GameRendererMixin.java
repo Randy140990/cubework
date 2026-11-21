@@ -26,6 +26,12 @@ public abstract class GameRendererMixin {
 		if (Adventure.active()) ci.cancel();
 	}
 
+	/** No first-person hand in the adventure (see HandMixin; this is the same, a step earlier). */
+	@Inject(method = "renderItemInHand", at = @At("HEAD"), cancellable = true, require = 0)
+	private void retromon$noHand(CallbackInfo ci) {
+		if (Adventure.active()) ci.cancel();
+	}
+
 	@Inject(method = "bobHurt", at = @At("HEAD"), cancellable = true, require = 0)
 	private void retromon$noHurtBob(CallbackInfo ci) {
 		if (Adventure.active()) ci.cancel();

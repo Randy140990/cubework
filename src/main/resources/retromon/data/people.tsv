@@ -160,6 +160,7 @@ oaks_lab_p4	oaks_lab	scientist	none	stay	I study POKéMON as PROF.OAK's AIDE.	8	
 pallet_town_p0	pallet_town	oak	none	stay	OAK: Hey! Wait! Don't go out!	10	4
 pallet_town_p1	pallet_town	girl	any_dir	walk	I'm raising POKéMON too! | When they get strong, they can protect me!	3	8
 pallet_town_p2	pallet_town	fisher	any_dir	stay	Technology is incredible! | You can now store and recall items and POKéMON as data via PC!	11	14
+pallet_town_p3	pallet_town	scientist	down	stay	I study POKéMON as PROF.OAK's AIDE. | PROF.OAK's LAB is just over there. Do go in!	7	10
 pewter_city_p0	pewter_city	cooltrainer_f	none	stay	It's rumored that CLEFAIRYs came from the moon! | They appeared after MOON STONE fell on MT.MOON.	8	15
 pewter_city_p1	pewter_city	cooltrainer_m	none	stay	There aren't many serious POKéMON trainers here! | They're all like BUG CATCHERs, but PEWTER GYM's BROCK is totally into it!	17	25
 pewter_city_p2	pewter_city	super_nerd	none	stay	Did you check out the MUSEUM?	27	17

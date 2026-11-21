@@ -25,7 +25,8 @@
     "MessageScreenMixin",
     "ModelPartAccessor",
     "CubeAccessor",
-    "KeyboardHandlerMixin"
+    "KeyboardHandlerMixin",
+    "HandMixin"
   ],
   "injectors": {
     "defaultRequire": 1

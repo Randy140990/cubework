@@ -287,7 +287,7 @@ let TOD = "day";
 // [r, g, b, the pool's strength, the shaft's].
 function poolLight(k, m) {
   const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
-  return mix(mix([1, 0.96, 0.82, 0.6, 0.16], [1, 0.74, 0.44, 0.55, 0.2], k), [0.55, 0.7, 1, 0.3, 0.08], m);
+  return mix(mix([1, 0.96, 0.82, 0.55, 0.1], [1, 0.74, 0.44, 0.5, 0.13], k), [0.55, 0.7, 1, 0.28, 0.05], m);
 }
 // Where a pool falls at a time, and how strong it is there: [x0, z0, x1, z1, strength], or null. A low sun throws it
 // further in and longer, and to one side (the morning's west of the window, the evening's east); a window facing
@@ -570,9 +570,11 @@ function doormat(room, x0, x1, o = {}) {
   if (room.entry) [x0, x1] = room.entry;
   const m = o.mat || "doormat", mk = x1 - x0 > 3 && MATDEF[m + "W"] ? m + "W" : m;
   G.box(x0, 0, D - 2, x1, 0.03, D, { top: mk, s: "cap", all: "cap", bottom: null });
-  // The light in at the door (only as wide as the nook, when there's one).
-  if (room.entry) sunPool(room, x0, D - 3.6, x1, D, 3, [x0, 0.3, x1, D]);
-  else sunPool(room, x0 - 0.6, D - 3.6, x1 + 0.6, D, 3);
+  // The light in at the door: only at Oak's lab (its glass doors to the sunny town), not in homes or shops.
+  if (room.id === "lab" || o.doorLight) {
+    if (room.entry) sunPool(room, x0, D - 3.6, x1, D, 3, [x0, 0.3, x1, D]);
+    else sunPool(room, x0 - 0.6, D - 3.6, x1 + 0.6, D, 3);
+  }
   room.exitArrow = { x: (x0 + x1) / 2, z: D - 0.55 };
   if (!o.none) room.warps.push({ test: (p, input) => p.z > D - 1.0 && p.x > x0 && p.x < x1 && input.down, to: o.to, spawn: o.spawn, fx: "fadeOut", why: "out" });
   room.item("Door mat", o.mat ? "This place's own mat, in its colours. Walk off it, south, to go out." : "Coir mat with a stitched border. Walk off it, south, to go out.");

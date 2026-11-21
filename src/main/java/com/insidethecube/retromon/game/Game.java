@@ -923,11 +923,12 @@ public final class Game {
 		Net.send(p, "room", t);
 	}
 
-	/** Back outside: the place's own music again. */
+	/** Back outside: the place's own music again, and its name back on the pill (without its banner). */
 	public static void roomLeft(ServerPlayer p) {
 		Places.Place pl = Places.get(data(p).place);
 		CompoundTag t = new CompoundTag();
 		t.putString("name", "");
+		t.putString("here", pl == null ? data(p).place.toUpperCase().replace('_', ' ') : pl.name());
 		t.putString("music", pl == null ? "" : pl.music());
 		Net.send(p, "room", t);
 	}
@@ -1491,7 +1492,7 @@ public final class Game {
 			if (d.hasDex() || d.story.contains("parcel") || d.visited.contains("viridian_city")) {
 				d.story.add("townmap");
 				sync(p);
-			} else if ("pallet_town".equals(d.place) && !Interiors.in(p) && !MUMS.containsKey(p.getUUID()) && p.onGround()) {
+			} else if ("pallet_town".equals(d.place) && !Interiors.in(p) && !MUMS.containsKey(p.getUUID()) && p.onGround() && clearOfLab(p)) {
 				mumComes(p, level);
 				return;
 			}
@@ -1546,7 +1547,18 @@ public final class Game {
 		Vec3 look = Vec3.directionFromRotation(0, p.getYRot()).multiply(1, 0, 1);
 		if (look.lengthSqr() < 1e-4) look = new Vec3(0, 0, -1);
 		look = look.normalize();
-		BlockPos at = spot(level, (int) Math.floor(p.getX() + look.x * 7), (int) Math.floor(p.getZ() + look.z * 7), 4);
+		// On open ground ahead of you that you can see (the way you're going first, then either side, then behind), so
+		// they're in the picture and can walk straight up; only then anywhere near.
+		int ax = Math.abs(look.x) >= Math.abs(look.z) ? (int) Math.signum(look.x) : 0, az = ax == 0 ? (int) Math.signum(look.z) : 0;
+		BlockPos at = null;
+		for (int[] dir : new int[][] {{ax, az}, {-az, ax}, {az, -ax}, {-ax, -az}}) {
+			at = alongRoute(level, p, dir[0], dir[1], 7, 4);
+			if (at != null) {
+				look = new Vec3(dir[0], 0, dir[1]);
+				break;
+			}
+		}
+		if (at == null) at = spot(level, (int) Math.floor(p.getX() + look.x * 6), (int) Math.floor(p.getZ() + look.z * 6), 4);
 		if (at == null) return;
 		Npc jessie = place(level, Npc.TRAINER, "rocket_viridian", at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
 		if (jessie == null) return;
@@ -1597,6 +1609,14 @@ public final class Game {
 		if (n != null) n.talker = p;
 		dialogue(p, n, "talk", fill(p, List.of("Hey! You came from PALLET TOWN?", "You know PROF.OAK, right?", "His order came in. Will you take it to him?",
 				"{player} got OAK's PARCEL!", "Okay! Say hi to PROF.OAK for me!")), cues(3, "get_key_item"));
+	}
+
+	/** Whether you're a few steps out from the lab's door (MUM waits till then). */
+	private static boolean clearOfLab(ServerPlayer p) {
+		Interiors.Door door = Interiors.DOORS.get("lab");
+		if (door == null) return true;
+		double dx = p.getX() - door.x(), dz = p.getZ() - door.z();
+		return dx * dx + dz * dz > 4.5 * 4.5;
 	}
 
 	/** MUM, come out to see you off with the TOWN MAP (and the ticks left till she's home again). */
@@ -1833,6 +1853,28 @@ public final class Game {
 
 	private static final Map<UUID, Walk> WALKS = new HashMap<>();
 
+	/**
+	 * A walk-up called off (you went through a door before they reached you): you're let go on your screen, and
+	 * whoever was coming (MUM with the TOWN MAP, TEAM ROCKET) goes, to come again next time you're out.
+	 */
+	private static void walkOff(ServerPlayer p, Npc n) {
+		BUSY.remove(p.getUUID());
+		n.approaching = 0;
+		n.talker = null;
+		Net.send(p, "release", new CompoundTag());
+		if (MUMS.get(p.getUUID()) == n) {
+			n.discard();
+			MUMS.remove(p.getUUID());
+			MUM_HOME.remove(p.getUUID());
+		}
+		List<Npc> rockets = ROCKETS.get(p.getUUID());
+		if (rockets != null && rockets.contains(n)) {
+			for (Npc r : rockets) if (!r.isRemoved()) r.discard();
+			ROCKETS.remove(p.getUUID());
+			data(p).story.remove("rocket_viridian");
+		}
+	}
+
 	/** Talking to someone or in a battle: people you're with stay put and face you until it's over. */
 	static boolean engaged(ServerPlayer p) {
 		return BUSY.containsKey(p.getUUID()) || Battles.in(p);
@@ -1887,6 +1929,11 @@ public final class Game {
 			Npc n = w.npc();
 			ServerPlayer p = w.player();
 			if (n.isRemoved() || p.isRemoved() || p.hasDisconnected()) return true;
+			// You've gone through a door since they saw you (into a room, back out): it's off, and you can move again.
+			if (n.level() != p.level()) {
+				walkOff(p, n);
+				return true;
+			}
 			n.approaching--;
 			double dist = n.distanceTo(p);
 			// The "!" (a second), then they come over: round whatever's in the way, not just in a line.
@@ -1903,6 +1950,16 @@ public final class Game {
 				return false;
 			}
 			n.getNavigation().stop();
+			// Still not with you (something's in their way): they step up beside you, so you're face to face.
+			if (dist > 3.5 && !stays && n.level() instanceof ServerLevel lv) {
+				int sx = (int) Math.signum(Math.round(n.getX() - p.getX())), sz = (int) Math.signum(Math.round(n.getZ() - p.getZ()));
+				BlockPos near = alongRoute(lv, p, sx != 0 ? sx : 0, sx != 0 ? 0 : (sz != 0 ? sz : 1), 2, 2);
+				if (near == null) near = spot(lv, p.getBlockX() + sx * 2, p.getBlockZ() + sz * 2, 2);
+				if (near != null) {
+					n.teleportTo(near.getX() + 0.5, near.getY(), near.getZ() + 0.5);
+					n.setFacing(n.yawTo(p));
+				}
+			}
 			n.approaching = 0;
 			n.talker = p;
 			BUSY.remove(p.getUUID());
@@ -2777,7 +2834,7 @@ public final class Game {
 	 * raising POKéMON too!") by the flower beds and roses in the middle of town, as Let's Go has her, rather than
 	 * out at the west edge. Key, then x and z.
 	 */
-	private static final Object[][] SPOTS = {{"pallet_town_p1", -801, 698}, {"pallet_town_p2", -798, 689}};
+	private static final Object[][] SPOTS = {{"pallet_town_p1", -801, 698}, {"pallet_town_p2", -798, 689}, {"pallet_town_p3", -807, 692}};
 
 	/** Where someone in SPOTS stands (x, z), or null. */
 	private static int[] spotOf(String key) {
@@ -2835,6 +2892,19 @@ public final class Game {
 			if (all && !done.contains("indoors:viridian")) {
 				placed.add("indoors:viridian");
 				done.add("indoors:viridian");
+				changed = true;
+			}
+		}
+		// The lab's aides belong in the lab: one the town had put outside too (by the pond) goes. (PROF.OAK's AIDE out
+		// in town is his own person, by the town's sign: pallet_town_p3.)
+		if (!done.contains("cleanup:lab_aides") && done.contains("place:pallet_town")) {
+			Zone pz = null;
+			for (Zone z : zones) if (z.place().equals("pallet_town")) pz = z;
+			if (pz != null && level.hasChunkAt(new BlockPos(pz.x1(), START_Y, pz.z1())) && level.hasChunkAt(new BlockPos(pz.x2(), START_Y, pz.z2()))) {
+				net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(pz.x1() - 8, level.getMinY(), pz.z1() - 8, pz.x2() + 8, level.getMaxY(), pz.z2() + 8);
+				for (Npc n : level.getEntitiesOfClass(Npc.class, box, n -> n.key().startsWith("oaks_lab_") || n.key().startsWith("in_lab_"))) n.discard();
+				placed.add("cleanup:lab_aides");
+				done.add("cleanup:lab_aides");
 				changed = true;
 			}
 		}

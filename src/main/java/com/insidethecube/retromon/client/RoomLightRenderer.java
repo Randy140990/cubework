@@ -155,7 +155,7 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 
 	/** The light's colour, its pools' strength and its shafts': warm white by day, golden low down, a faint blue at night. */
 	static float[] colour(float k, float m) {
-		float[] day = {1, 0.96F, 0.82F, 0.6F, 0.16F}, gold = {1, 0.74F, 0.44F, 0.55F, 0.2F}, moon = {0.55F, 0.7F, 1, 0.3F, 0.08F};
+		float[] day = {1, 0.96F, 0.82F, 0.55F, 0.1F}, gold = {1, 0.74F, 0.44F, 0.5F, 0.13F}, moon = {0.55F, 0.7F, 1, 0.28F, 0.05F};
 		float[] c = new float[5];
 		for (int i = 0; i < 5; i++) {
 			float a = day[i] + (gold[i] - day[i]) * k;

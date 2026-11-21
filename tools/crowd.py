@@ -377,3 +377,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # Hands for everyone (tools/hands.py).
+    import hands
+    hands.main()

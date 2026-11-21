@@ -84,8 +84,21 @@ public final class ClientState {
 					placeName = name;
 					placeTicks = 0;
 				}
+				// Back outside: the place's name back on the pill (no banner: you've only been indoors).
+				String here = t.getStringOr("here", "");
+				if (!here.isEmpty() && name.isEmpty()) {
+					placeName = here;
+					if (placeTicks >= 0 && placeTicks < 100) placeTicks = 100;
+				}
 				String music = t.getStringOr("music", "");
 				if (!music.isEmpty()) Music.setPlace(music);
+			}
+			case "release" -> {
+				// Someone who was coming over won't now (you went through a door): you can move again.
+				Adventure.frozen = 0;
+				exclaimTicks = 0;
+				exclaimNpc = -1;
+				Adventure.focus(-1);
 			}
 			case "place" -> {
 				placeName = t.getStringOr("name", "");
