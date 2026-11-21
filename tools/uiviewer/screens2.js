@@ -3,6 +3,17 @@
 function placePill(right) {
   return box(24, 20, null, null, "", `<div style="display:flex;align-items:center;gap:12px;padding:6px 8px 6px 14px;border-radius:999px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 6px 16px rgba(30,40,84,.25)"><span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 3px #FFE9A0"></span><span class="g-title" style="font-size:24px;color:#26304A">${esc(G.place)}</span><span style="margin-left:6px;padding:3px 12px;border-radius:999px;background:linear-gradient(180deg,#FF9473,#E5525C);color:#fff;font-weight:900;font-size:13px;letter-spacing:1px">${right || "9:15 AM"}</span></div>`);
 }
+// Each place's colours for its banner streak (left to right): the towns' own (as their signs and names have them),
+// routes green into teal, anywhere else (rooms) violet into blue into cyan, as Let's Go's banner.
+function placeColours(place) {
+  const P = { "PALLET TOWN": ["#FF6F91", "#FFB547", "#4FC3F7"], "VIRIDIAN CITY": ["#1E9E5A", "#3CC47C", "#9BE05A"], "PEWTER CITY": ["#5F6B80", "#98A2B3", "#6E7A8C"],
+    "CERULEAN CITY": ["#2E7BE0", "#3FB5F0", "#7FDBFF"], "VERMILION CITY": ["#F04A2C", "#FF8A3D", "#FFC45A"], "LAVENDER TOWN": ["#7A4FD0", "#A178E8", "#C9A8F7"],
+    "CELADON CITY": ["#FF5C7F", "#FFC233", "#3CC47C", "#3C9BEB", "#A06CDB"], "FUCHSIA CITY": ["#D02F7E", "#FF5FA2", "#FF9BC8"], "SAFFRON CITY": ["#E8900F", "#FFC233", "#FFE070"],
+    "CINNABAR ISLAND": ["#D9302C", "#FF6A3C", "#FFA84A"], "INDIGO PLATEAU": ["#3A3FA8", "#6C6FE0", "#A8A6FF"] };
+  if (P[place]) return P[place];
+  if (/ROUTE|FOREST|GATE/.test(place)) return ["#2FA864", "#2FA88E", "#4FA8F0"];
+  return ["#7A4FD0", "#3C7FE0", "#36B8F0"];
+}
 function blurOver() { add(h("div", "g-blur")); }
 screen("hud", "In the world", "The HUD", {
   scene: "town", sceneOpts: () => ({}),
@@ -20,17 +31,28 @@ screen("hud", "In the world", "The HUD", {
     const keys = () => { const e = $("#hkeys"); if (e) e.remove(); const k = hints([["SPACE", "Talk"], ["E", "Menu"], ["TAB", `Speed x${spd}`]]); k.id = "hkeys"; };
     keys();
     const banner = () => {
-      // The place's name in the middle near the top, with nothing behind it: big white letters with a dark edge and
-      // a soft shadow, a sunny dot between two gold rules under them, the town's line in cream. It drifts down as it
-      // fades in, holds, then fades away as it lifts.
-      const b = box(0, 150, null, null, "", `<div style="text-align:center;opacity:0;transform:translateY(-16px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.3,1)">
-        <div class="g-title" style="font-size:52px;letter-spacing:6px;color:#fff;line-height:1.1;white-space:nowrap;text-shadow:-2px 0 0 #203050,2px 0 0 #203050,0 -2px 0 #203050,0 2px 0 #203050,-1.5px -1.5px 0 #203050,1.5px -1.5px 0 #203050,-1.5px 1.5px 0 #203050,1.5px 1.5px 0 #203050,0 6px 18px rgba(14,24,48,.55)">${esc(G.place)}</div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 6px"><span style="width:76px;height:3px;border-radius:2px;background:linear-gradient(90deg,rgba(255,210,90,0),#FFD25A);box-shadow:0 1px 0 rgba(32,48,80,.5)"></span><span style="width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 4px rgba(255,233,160,.6),0 1px 2px rgba(32,48,80,.6)"></span><span style="width:76px;height:3px;border-radius:2px;background:linear-gradient(90deg,#FFD25A,rgba(255,210,90,0));box-shadow:0 1px 0 rgba(32,48,80,.5)"></span></div>
-        <div style="font-size:20px;font-weight:800;color:#FFF4DC;white-space:nowrap;text-shadow:-1px 0 0 #203050,1px 0 0 #203050,0 -1px 0 #203050,0 1px 0 #203050,0 3px 10px rgba(14,24,48,.6)">A quiet start to a long road.</div></div>`);
-      b.style.left = "50%"; b.style.marginLeft = "0"; b.style.translate = "-50% 0";
-      const words = b.firstElementChild;
-      requestAnimationFrame(() => requestAnimationFrame(() => { words.style.opacity = 1; words.style.transform = "none"; }));
-      later(3200, () => { words.style.opacity = 0; words.style.transform = "translateY(-10px)"; });
+      // The place's name low on the screen, as Let's Go shows it: two fine white lines sweep out across the width,
+      // a soft brushed streak in the town's own colours wipes in between them (Viridian green, Cerulean blue,
+      // Lavender purple; routes green into teal), and the name sits on it in big white letters with a dark edge,
+      // the sunny dot before it and the town's line under it. It holds, then fades as it sinks.
+      const pal = placeColours(G.place), rgba = (c, a) => `rgba(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3, 5), 16)},${parseInt(c.slice(5, 7), 16)},${a})`;
+      const stops = pal.map((c, i) => `${rgba(c, 0.9)} ${Math.round(16 + 68 * i / (pal.length - 1))}%`).join(",");
+      const edge = "-2px 0 0 #203050,2px 0 0 #203050,0 -2px 0 #203050,0 2px 0 #203050,-1.5px -1.5px 0 #203050,1.5px -1.5px 0 #203050,-1.5px 1.5px 0 #203050,1.5px 1.5px 0 #203050,0 5px 14px rgba(14,24,48,.5)";
+      const line = top => `<i style="position:absolute;left:0;width:1280px;top:${top}px;height:2px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.92) 24%,rgba(255,255,255,.92) 76%,rgba(255,255,255,0));transform:scaleX(0);transition:transform .75s cubic-bezier(.2,.8,.3,1)"></i>`;
+      const b = box(0, 560, 1280, 92, "", `<div class="pb" style="position:absolute;inset:0;opacity:0;transition:opacity .5s ease,transform .8s ease">
+        <b style="position:absolute;left:0;width:1280px;top:8px;height:74px;background:linear-gradient(90deg,rgba(16,24,52,0),rgba(16,24,52,.2) 30%,rgba(16,24,52,.2) 70%,rgba(16,24,52,0))"></b>
+        ${line(6)}${line(82)}
+        <div class="pb-streak" style="position:absolute;left:300px;width:680px;top:20px;height:52px;clip-path:inset(0 100% 0 0);transition:clip-path .9s cubic-bezier(.3,.7,.3,1) .12s">
+          <div style="position:absolute;inset:0;border-radius:26px;background:linear-gradient(90deg,${rgba(pal[0], 0)} 0%,${stops},${rgba(pal[pal.length - 1], 0)} 100%);filter:blur(1px)"></div>
+          <div style="position:absolute;left:40px;right:70px;top:4px;height:12px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.32) 30%,rgba(255,255,255,.18) 70%,rgba(255,255,255,0))"></div>
+          <div style="position:absolute;left:90px;right:30px;bottom:5px;height:10px;border-radius:5px;background:linear-gradient(90deg,${rgba(pal[0], 0)},${rgba(pal[pal.length - 1], .5)} 60%,${rgba(pal[pal.length - 1], 0)})"></div></div>
+        <div style="position:absolute;left:0;width:1280px;top:${G.line === "" ? 26 : 16}px;display:flex;align-items:center;justify-content:center;gap:14px">
+          <span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 3px rgba(255,233,160,.7),0 1px 2px rgba(32,48,80,.6)"></span>
+          <span class="g-title" style="font-size:44px;letter-spacing:5px;color:#fff;line-height:1;white-space:nowrap;text-shadow:${edge}">${esc(G.place)}</span></div>
+        <div style="position:absolute;left:0;width:1280px;top:60px;text-align:center;font-size:16px;font-weight:800;color:#FFF4DC;white-space:nowrap;text-shadow:-1px 0 0 #203050,1px 0 0 #203050,0 -1px 0 #203050,0 1px 0 #203050,0 2px 8px rgba(14,24,48,.6)">A quiet start to a long road.</div></div>`);
+      const w = b.firstElementChild;
+      requestAnimationFrame(() => requestAnimationFrame(() => { w.style.opacity = 1; w.querySelectorAll("i").forEach(l => l.style.transform = "none"); w.querySelector(".pb-streak").style.clipPath = "inset(0 0 0 0)"; }));
+      later(3200, () => { w.style.opacity = 0; w.style.transform = "translateY(8px)"; });
       later(4100, () => b.remove());
     };
     const toast = (icon, text) => {

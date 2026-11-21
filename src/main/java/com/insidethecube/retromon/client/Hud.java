@@ -342,47 +342,104 @@ public final class Hud {
 	private static final double LAB_DOOR_X = -782.5, LAB_DOOR_Z = 695.6;
 
 	/**
-	 * The place's name, as the UI Viewer's banner: the place pill drawn big in the middle near the top (a pearly-rimmed
-	 * white pill, the sunny dot, the name, the town's line in coral under it), popping up, then fading away.
+	 * The place's name low on the screen, as Let's Go shows it (and the UI Viewer's banner): two fine white lines
+	 * sweep out across the width, a soft brushed streak in the place's own colours wipes in between them, and the
+	 * name sits on it in big white letters with a dark edge, the sunny dot before it and the town's line under it.
+	 * It holds, then fades as it sinks.
 	 */
 	private static void place(GuiGraphics g, DeltaTracker delta) {
 		Minecraft mc = Minecraft.getInstance();
 		int t = ClientState.placeTicks;
 		if (!Adventure.active() || BattleScene.active() || t < 0 || t > 90 || ClientState.placeName.isEmpty() || mc.screen != null && !(mc.screen instanceof GameScreen)) return;
+		// Low on the screen, so not under someone's words (the text box is there).
+		if (mc.screen instanceof DialogueScreen) return;
 		V.fit(g.guiWidth(), g.guiHeight());
 		float f = t + delta.getGameTimeDeltaPartialTick(true);
-		// In as smoothly as it goes out: drifting down as it fades in (0.8 s), held, then lifting as it fades away.
-		float in = smooth(Math.min(1, f / 16F)), out = f > 64 ? smooth(Math.min(1, (f - 64) / 16F)) : 0, alpha = in * (1 - out);
+		float in = smooth(Math.min(1, f / 10F)), out = f > 64 ? smooth(Math.min(1, (f - 64) / 16F)) : 0, alpha = in * (1 - out);
 		if (alpha <= 0.02F) return;
+		float lines = easeOut(Math.min(1, f / 15F)), wipe = easeOut(Math.max(0, Math.min(1, (f - 2.4F) / 18F)));
 		String name = ClientState.placeName, line = Adventure.signLine(name);
 		line = line.isEmpty() ? "" : Lang.t(line);
-		// The viewer's: no panel, the words on their own (white with a dark edge and a soft shadow), a sunny dot
-		// between two gold rules under them, the town's line in cream.
-		float size = 52, track = 6, nw = V.titleTrackedWidth(name, size, track), y = 150 - 16 * (1 - in) - 10 * out;
-		float nx = 640 - nw / 2, ny = V.capsTop(y + size * 0.55F, size);
-		V.softShadow(g, nx + 10, y + 10, nw - 20, size * 0.9F, 34, Ui.alpha(0x2A0E1830, alpha));
+		float top = 560 + 8 * out;
+		// A soft shade between the lines, so the white name reads on bright grass and sand.
+		V.rrh(g, 0, top + 8, V.W, 74, 0, new float[] {0, 0.3F, 0.7F, 1},
+				new int[] {Ui.alpha(0x00101834, alpha), Ui.alpha(0x33101834, alpha), Ui.alpha(0x33101834, alpha), Ui.alpha(0x00101834, alpha)});
+		// The two lines, from the middle outwards, fading at the ends.
+		float hw = 640 * lines;
+		for (float ly : new float[] {top + 6, top + 82})
+			V.rrh(g, 640 - hw, ly, hw * 2, 2, 0, new float[] {0, 0.24F, 0.76F, 1},
+					new int[] {Ui.alpha(0x00FFFFFF, alpha), Ui.alpha(0xEBFFFFFF, alpha), Ui.alpha(0xEBFFFFFF, alpha), Ui.alpha(0x00FFFFFF, alpha)});
+		// The streak, wiping in from the left: the place's colours, fading at both ends, with a light stroke along
+		// its top and a deeper one under it (a brush's marks).
+		int[] pal = placeColours(name);
+		float sx = 300, sw = 680, sy = top + 20;
+		if (wipe > 0.01F) {
+			g.enableScissor(0, 0, Math.round(V.x(sx + sw * wipe)), g.guiHeight());
+			float[] at = new float[pal.length + 2];
+			int[] cols = new int[pal.length + 2];
+			at[0] = 0;
+			cols[0] = Ui.alpha(pal[0] & 0xFFFFFF, alpha);
+			for (int k = 0; k < pal.length; k++) {
+				at[k + 1] = 0.16F + 0.68F * k / Math.max(1, pal.length - 1);
+				cols[k + 1] = Ui.alpha(0xE6000000 | pal[k], alpha);
+			}
+			at[pal.length + 1] = 1;
+			cols[pal.length + 1] = Ui.alpha(pal[pal.length - 1] & 0xFFFFFF, alpha);
+			V.rrh(g, sx, sy, sw, 52, 26, at, cols);
+			V.rrh(g, sx + 40, sy + 4, sw - 110, 12, 6, new float[] {0, 0.3F, 0.7F, 1},
+					new int[] {Ui.alpha(0x00FFFFFF, alpha), Ui.alpha(0x52FFFFFF, alpha), Ui.alpha(0x2EFFFFFF, alpha), Ui.alpha(0x00FFFFFF, alpha)});
+			int last = pal[pal.length - 1];
+			V.rrh(g, sx + 90, sy + 37, sw - 120, 10, 5, new float[] {0, 0.6F, 1},
+					new int[] {Ui.alpha(pal[0] & 0xFFFFFF, alpha), Ui.alpha(0x80000000 | last, alpha), Ui.alpha(last & 0xFFFFFF, alpha)});
+			g.disableScissor();
+		}
+		// The name, with the sunny dot (a moon's at night) before it.
+		float size = 44, track = 5, nw = V.titleTrackedWidth(name, size, track), gap = 14, dot = 16, total = dot + gap + nw;
+		float rowY = top + 16 + 22, nx = 640 - total / 2 + dot + gap, ny = V.capsTop(rowY, size);
+		boolean night = Night.nightness() > 0.5F;
+		float dcx = 640 - total / 2 + dot / 2;
+		// (Radii: the glow round it, its dark edge, the dot, its shine.)
+		V.ellipse(g, dcx, rowY, dot / 2 + 3, dot / 2 + 3, Ui.alpha(night ? 0xB3DDE3F0 : 0xB3FFE9A0, alpha));
+		V.ellipse(g, dcx, rowY + 0.5F, dot / 2 + 0.5F, dot / 2 + 0.5F, Ui.alpha(0x99203050, alpha));
+		V.ellipse(g, dcx, rowY, dot / 2, dot / 2, Ui.alpha(night ? 0xFFF4F6FF : 0xFFFFC93C, alpha));
+		V.ellipse(g, dcx - 2, rowY - 2, dot * 0.2F, dot * 0.2F, Ui.alpha(night ? 0xFFFFFFFF : 0xCCFFF3A6, alpha));
+		V.softShadow(g, nx + 10, rowY - size * 0.3F + 5, nw - 20, size * 0.6F, 18, Ui.alpha(0x3A0E1830, alpha));
 		int edge = Ui.alpha(0xFF203050, alpha);
-		float[][] at = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}, {-1.5F, -1.5F}, {1.5F, -1.5F}, {-1.5F, 1.5F}, {1.5F, 1.5F}};
-		for (float[] o : at) V.titleTracked(g, name, nx + o[0], ny + o[1], size, edge, track);
+		float[][] off = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}, {-1.5F, -1.5F}, {1.5F, -1.5F}, {-1.5F, 1.5F}, {1.5F, 1.5F}};
+		for (float[] o : off) V.titleTracked(g, name, nx + o[0], ny + o[1], size, edge, track);
 		V.titleTracked(g, name, nx, ny, size, Ui.alpha(0xFFFFFFFF, alpha), track);
-		float ry = y + size * 1.1F + 8 + 7;
-		V.pill(g, 640 - 7 - 12 - 76, ry - 1.5F + 1, 76, 3, Ui.alpha(0x80203050, alpha));
-		V.pill(g, 640 + 7 + 12, ry - 1.5F + 1, 76, 3, Ui.alpha(0x80203050, alpha));
-		for (int i = 0; i < 8; i++) {
-			// (The rules fade in towards the dot.)
-			float a = alpha * (i + 1) / 8F;
-			V.pill(g, 640 - 7 - 12 - 76 + i * 9.5F, ry - 1.5F, 10, 3, Ui.alpha(0xFFFFD25A, a));
-			V.pill(g, 640 + 7 + 12 + 76 - 10 - i * 9.5F, ry - 1.5F, 10, 3, Ui.alpha(0xFFFFD25A, a));
-		}
-		V.ellipse(g, 640, ry, 11, 11, Ui.alpha(0x99FFE9A0, alpha));
-		V.ellipse(g, 640, ry + 0.5F, 7.5F, 7.5F, Ui.alpha(0xFF203050, alpha * 0.5F));
-		V.ellipse(g, 640, ry, 7, 7, Ui.alpha(0xFFFFC93C, alpha));
-		V.ellipse(g, 638.5F, ry - 1.5F, 3.5F, 3.5F, Ui.alpha(0xCCFFF3A6, alpha));
 		if (!line.isEmpty()) {
-			float lw = V.width(line, 20, true), lx = 640 - lw / 2, ly = V.capsTop(ry + 7 + 6 + 20 * 0.68F, 20);
-			for (float[] o : new float[][] {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) V.text(g, line, lx + o[0], ly + o[1], 20, edge, true);
-			V.text(g, line, lx, ly, 20, Ui.alpha(0xFFFFF4DC, alpha), true);
+			float lw = V.width(line, 16, true), lx = 640 - lw / 2, ly = V.capsTop(top + 60 + 9, 16);
+			for (float[] o : new float[][] {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) V.text(g, line, lx + o[0], ly + o[1], 16, edge, true);
+			V.text(g, line, lx, ly, 16, Ui.alpha(0xFFFFF4DC, alpha), true);
 		}
+	}
+
+	/**
+	 * Each place's colours for its banner's streak (left to right, RGB): the towns' own, as their signs and names
+	 * have them; routes green into teal; anywhere else (rooms) violet into blue into cyan, as Let's Go's banner.
+	 */
+	private static int[] placeColours(String place) {
+		return switch (place) {
+			case "PALLET TOWN" -> new int[] {0xFF6F91, 0xFFB547, 0x4FC3F7};
+			case "VIRIDIAN CITY" -> new int[] {0x1E9E5A, 0x3CC47C, 0x9BE05A};
+			case "PEWTER CITY" -> new int[] {0x5F6B80, 0x98A2B3, 0x6E7A8C};
+			case "CERULEAN CITY" -> new int[] {0x2E7BE0, 0x3FB5F0, 0x7FDBFF};
+			case "VERMILION CITY" -> new int[] {0xF04A2C, 0xFF8A3D, 0xFFC45A};
+			case "LAVENDER TOWN" -> new int[] {0x7A4FD0, 0xA178E8, 0xC9A8F7};
+			case "CELADON CITY" -> new int[] {0xFF5C7F, 0xFFC233, 0x3CC47C, 0x3C9BEB, 0xA06CDB};
+			case "FUCHSIA CITY" -> new int[] {0xD02F7E, 0xFF5FA2, 0xFF9BC8};
+			case "SAFFRON CITY" -> new int[] {0xE8900F, 0xFFC233, 0xFFE070};
+			case "CINNABAR ISLAND" -> new int[] {0xD9302C, 0xFF6A3C, 0xFFA84A};
+			case "INDIGO PLATEAU" -> new int[] {0x3A3FA8, 0x6C6FE0, 0xA8A6FF};
+			default -> place.contains("ROUTE") || place.contains("FOREST") || place.contains("GATE") ? new int[] {0x2FA864, 0x2FA88E, 0x4FA8F0}
+					: new int[] {0x7A4FD0, 0x3C7FE0, 0x36B8F0};
+		};
+	}
+
+	private static float easeOut(float x) {
+		float k = 1 - x;
+		return 1 - k * k * k;
 	}
 
 	private static float smooth(float x) {
