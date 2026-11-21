@@ -236,34 +236,77 @@ public final class Interiors {
 
 	// ---------- building them ----------
 
-	private static boolean built;
+	/**
+	 * The world (its server) the rooms were last checked for. Per world, not once per launch: a second game started
+	 * after leaving the first (without restarting Minecraft) had no rooms at all, so you fell into the black.
+	 */
+	private static MinecraftServer builtFor;
 
-	/** Builds the rooms (once per world, and again when they change). */
+	/** A new world's started: its rooms are checked again, and nobody's left half way through a door. */
+	public static void serverStarted(MinecraftServer s) {
+		builtFor = null;
+		COOL.clear();
+		PENDING_T.clear();
+		PENDING.clear();
+		LAST.clear();
+	}
+
+	/** Builds the rooms (once per world, and again when they change, or when one's missing). */
 	public static ServerLevel ensure(MinecraftServer s) {
 		ServerLevel level = s.getLevel(LEVEL);
 		if (level == null) {
 			Retromon.LOG.warn("Retromon: the interiors dimension isn't loaded (retromon:interiors)");
 			return null;
 		}
-		if (built) return level;
-		built = true;
+		if (builtFor == s) return level;
+		builtFor = s;
 		Path mark = s.getWorldPath(LevelResource.ROOT).resolve("retromon_interiors.txt");
+		boolean current = false;
 		try {
-			if (Files.exists(mark) && Files.readString(mark).trim().equals(version)) return level;
+			current = Files.exists(mark) && Files.readString(mark).trim().equals(version);
 		} catch (Exception ignored) {
 			// Built again.
 		}
-		for (Room r : ROOMS.values()) build(level, r);
+		int made = 0;
+		for (Room r : ROOMS.values()) {
+			// Up to date by the note, but a room with nothing where it should be is built anyway.
+			if (current && !missing(level, r)) continue;
+			if (build(level, r)) made++;
+		}
 		try {
 			Files.writeString(mark, version);
 		} catch (Exception e) {
 			Retromon.LOG.warn("Couldn't note the interiors as built", e);
 		}
-		Retromon.LOG.info("Retromon: built {} interiors", ROOMS.size());
+		Retromon.LOG.info("Retromon: interiors {} ({} built, {} rooms)", version, made, ROOMS.size());
 		return level;
 	}
 
-	private static void build(ServerLevel level, Room r) {
+	/** Whether a room isn't there (its first, middle and last pieces aren't the room's blocks). */
+	private static boolean missing(ServerLevel level, Room r) {
+		int[] c = r.cells();
+		int n = c.length / 4;
+		if (n == 0) return false;
+		BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
+		for (int i : new int[] {0, n / 2, n - 1}) {
+			at.set(r.ox() + c[i * 4], r.oy() + c[i * 4 + 1], r.oz() + c[i * 4 + 2]);
+			if (!level.getBlockState(at).is(Retromon.PROP)) return true;
+		}
+		return false;
+	}
+
+	/** Builds one room; a problem with one is noted and the rest still get built. */
+	private static boolean build(ServerLevel level, Room r) {
+		try {
+			buildRoom(level, r);
+			return true;
+		} catch (Exception e) {
+			Retromon.LOG.error("Retromon: couldn't build the room {}", r.id(), e);
+			return false;
+		}
+	}
+
+	private static void buildRoom(ServerLevel level, Room r) {
 		int W = (int) Math.ceil(r.w()), D = (int) Math.ceil(r.d());
 		// Every chunk the room and its black ground touch, loaded.
 		for (int cx = (r.ox() - 26) >> 4; cx <= (r.ox() + W + 26) >> 4; cx++)
@@ -297,10 +340,14 @@ public final class Interiors {
 		for (Person p : r.people()) {
 			// The nurse heals and the clerk sells, as the games' nurse and clerk do (their own ways of talking).
 			int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : "trainer".equals(p.role()) ? Npc.TRAINER : Npc.PERSON;
-			Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
-			if (n != null) {
-				n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));
-				if (p.seated()) n.setSeated(true);
+			try {
+				Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
+				if (n != null) {
+					n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));
+					if (p.seated()) n.setSeated(true);
+				}
+			} catch (Exception e) {
+				Retromon.LOG.error("Retromon: couldn't place {} in {}", p.key(), r.id(), e);
 			}
 		}
 	}
@@ -326,6 +373,10 @@ public final class Interiors {
 		MinecraftServer s = p.level().getServer();
 		ServerLevel level = ensure(s);
 		if (level == null || r == null) return false;
+		if (missing(level, r)) {
+			Retromon.LOG.warn("Retromon: {} wasn't there; building it now", r.id());
+			build(level, r);
+		}
 		COOL.put(p.getUUID(), FADE_TICKS + 20);
 		Runnable move = () -> {
 			boolean fromOutside = p.level() != level;

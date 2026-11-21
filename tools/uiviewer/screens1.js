@@ -113,10 +113,19 @@ screen("title", "Start", "Title screen", {
     if (night) box(0, 612, 1280, null, "", `<div style="text-align:center"><span class="g-title g-blink" style="display:inline-block;padding:8px 34px;border-radius:999px;background:#fff;color:#26304A;font-size:30px;letter-spacing:6px">${esc(T("PRESS START"))}</span></div>`);
     else box(340, 640, 600, null, "", `<style>@keyframes tpulse{0%,100%{opacity:.95}50%{opacity:.4}}</style><div style="text-align:center;animation:tpulse 2.4s ease-in-out infinite;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:17px;letter-spacing:7px;color:#fff;text-shadow:0 2px 10px rgba(0,20,20,.7)">${T("Press {0}").toUpperCase().split("{0}").map(esc).join(`<span style="display:inline-grid;place-items:center;vertical-align:middle;height:30px;margin:0 10px;padding:0 14px;border:2px solid rgba(255,255,255,.85);border-radius:8px;font-size:13px;letter-spacing:4px">SPACE</span>`)}</div>`);
     box(28, 684, 400, null, "", `<div style="font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:12px;letter-spacing:4px;color:#fff;opacity:.8;text-shadow:0 1px 6px rgba(0,0,0,.5)">INSID3 TH3 CUB3</div>`);
-    box(1060, 684, 200, null, "", `<div style="text-align:right;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:12px;letter-spacing:4px;color:#fff;opacity:.8;text-shadow:0 1px 6px rgba(0,0,0,.5)">VERSION 0.28</div>`);
-    return { key: k => { if (k === "a") go("saves"); return true; } };
+    box(1060, 684, 200, null, "", `<div style="text-align:right;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:12px;letter-spacing:4px;color:#fff;opacity:.8;text-shadow:0 1px 6px rgba(0,0,0,.5)">VERSION 0.31</div>`);
+    // MINECRAFT, top right: out to Minecraft's own title screen (your other worlds and servers, with your mods).
+    const mc = box(760, 23, 486, null, "", `<div style="display:flex;justify-content:flex-end"><span class="t-mc" style="display:inline-flex;align-items:center;gap:12px;height:46px;padding:0 12px;border-radius:999px;background:rgba(0,20,20,.25);cursor:pointer;font-family:Archivo,system-ui,sans-serif;font-weight:700;font-size:15px;letter-spacing:6px;color:#fff;text-shadow:1px 2px 0 rgba(0,20,20,.5)">${ICON.grass.replace("<svg", '<svg style="width:26px;height:26px"')}${esc(T("MINECRAFT"))}<span style="display:inline-grid;place-items:center;height:28px;margin-left:2px;padding:0 12px;border:2px solid rgba(255,255,255,.85);border-radius:8px;font-size:13px;letter-spacing:4px;text-shadow:none">M</span></span></div>`);
+    mc.style.pointerEvents = "none"; mc.querySelector(".t-mc").style.pointerEvents = "auto";
+    mc.querySelector(".t-mc").onclick = e => { e.stopPropagation(); mcNote(); };
+    return { raw: e => { if (e.code === "KeyM") { mcNote(); return true; } return false; }, key: k => { if (k === "a") go("saves"); return true; } };
   }
 });
+// MINECRAFT in the viewer: a note saying what the mod does there (Minecraft's own title screen opens).
+function mcNote() {
+  const n = box(340, 300, 600, null, "", `<div class="g-panel" style="padding:22px 28px;text-align:center;font-size:20px;font-weight:800;line-height:1.4">${ICON.grass.replace("<svg", '<svg style="width:40px;height:40px;display:block;margin:0 auto 10px"')}${esc(T("In the game, this opens Minecraft's own title screen: your other worlds and servers, played as normal with your mods. Its Retromon button brings you back."))}</div>`);
+  setTimeout(() => n.remove(), 3200);
+}
 const LANGS = [["English", "English"], ["Español", "Spanish"], ["Français", "French"], ["Deutsch", "German"], ["Italiano", "Italian"], ["日本語", "Japanese"], ["한국어", "Korean"], ["简体中文", "Chinese, simplified"], ["繁體中文", "Chinese, traditional"]];
 screen("saves", "Start", "Continue or new game", {
   scene: "creator", sceneOpts: () => ({ side: -1.6 }),
@@ -139,13 +148,20 @@ screen("saves", "Start", "Continue or new game", {
           <span style="position:absolute;right:16px;top:14px;padding:2px 12px;border-radius:999px;border:2px solid #F3A6AC;color:#D9404A;font-weight:900;font-size:13px">${esc(T("DELETE"))}</span></div>` : `
         <div class="g-panel" style="position:relative;margin-bottom:18px;padding:22px 24px;display:flex;align-items:center;gap:16px;${i === sel ? "box-shadow:0 0 0 5px #FFC93C,0 14px 36px rgba(30,40,84,.3)" : "opacity:.92"}">
           <span style="padding:2px 12px;border-radius:999px;background:#EEF2FB;color:var(--g-muted);font-weight:900;font-size:14px;letter-spacing:1px">${esc(T("SLOT {0}", i + 1))}</span><span class="g-title" style="font-size:28px">${esc(T("NEW GAME"))}</span><span style="margin-left:auto;font-size:17px;color:var(--g-muted);font-weight:800">${esc(T("Empty"))}</span></div>`).join("") +
-        `<div class="g-item${sel === 3 ? " on" : ""}" style="display:inline-flex;margin-top:4px;background:${sel === 3 ? "" : "rgba(255,255,255,.85)"}">${ICON.cog.replace("<svg", '<svg style="width:26px;height:26px"')}<span>${esc(T("OPTIONS"))}</span></div>`;
-      [...wrap.children].forEach((c, i) => c.onclick = () => { sel = i; draw(); pick(); });
+        `<div style="display:flex;gap:16px;margin-top:4px">` +
+        `<div class="g-item${sel === 3 ? " on" : ""}" style="display:inline-flex;background:${sel === 3 ? "" : "rgba(255,255,255,.85)"}">${ICON.cog.replace("<svg", '<svg style="width:26px;height:26px"')}<span>${esc(T("OPTIONS"))}</span></div>` +
+        // MINECRAFT beside it: out to Minecraft's own title screen (your other worlds, with your mods).
+        `<div class="g-item${sel === 4 ? " on" : ""}" style="display:inline-flex;background:${sel === 4 ? "" : "rgba(255,255,255,.85)"}">${ICON.grass.replace("<svg", '<svg style="width:26px;height:26px"')}<span>${esc(T("MINECRAFT"))}</span></div></div>`;
+      [...wrap.children].slice(0, 3).forEach((c, i) => c.onclick = () => { sel = i; draw(); pick(); });
+      const row = wrap.children[3].children;
+      row[0].onclick = () => { sel = 3; draw(); pick(); };
+      row[1].onclick = () => { sel = 4; draw(); pick(); };
     };
-    const pick = () => { if (sel === 0) go("loading"); else if (sel === 3) go("options"); else go("prof"); };
+    const pick = () => { if (sel === 0) go("loading"); else if (sel === 3) go("options"); else if (sel === 4) mcNote(); else go("prof"); };
     draw();
     actions([{ key: "b", label: "Back" }, { key: "a", label: "Continue" }], { right: true });
-    return { key: k => { if (k === "up" || k === "down") { sel = (sel + (k === "down" ? 1 : 3)) % 4; draw(); return true; } if (k === "a") { pick(); return true; } if (k === "b") { go("title"); return true; } return false; } };
+    return { raw: e => { if (e.code === "KeyM") { mcNote(); return true; } return false; },
+      key: k => { if (k === "up" || k === "down" || k === "left" || k === "right") { sel = (sel + (k === "down" || k === "right" ? 1 : 4)) % 5; draw(); return true; } if (k === "a") { pick(); return true; } if (k === "b") { go("title"); return true; } return false; } };
   }
 });
 const OPTS = [

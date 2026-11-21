@@ -79,6 +79,7 @@ public final class Game {
 
 	public static void serverStarted(MinecraftServer s) {
 		server = s;
+		Interiors.serverStarted(s);
 		Path m = marker(s);
 		ourSave = Files.exists(m);
 		Flags.solidSigns = ourSave;

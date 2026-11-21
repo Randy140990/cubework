@@ -220,6 +220,8 @@ function wordmark(text, o = {}) {
 
 // ---------- icons: drawn here, simple round shapes in the same palette ----------
 const ICON = {
+  // MINECRAFT's picture: a little grass block (green on top, earth under it).
+  grass: `<svg viewBox="0 0 26 26"><rect width="26" height="26" rx="5.7" fill="#8A5A36"/><rect x="5.2" y="14.3" width="3.6" height="3.6" rx="1.3" fill="#6B4226"/><rect x="16.1" y="18.7" width="3.6" height="3.6" rx="1.3" fill="#6B4226"/><rect width="26" height="10.9" rx="5.2" fill="#62B84A"/><rect x="3.1" y="7.8" width="4.2" height="5.2" rx="1.6" fill="#62B84A"/><rect x="14.3" y="7.8" width="5.2" height="4.4" rx="1.6" fill="#62B84A"/></svg>`,
   dex: `<svg viewBox="0 0 64 64"><rect x="10" y="6" width="44" height="52" rx="10" fill="#E5525C"/><rect x="16" y="14" width="32" height="20" rx="5" fill="#BFEAF5"/><circle cx="22" cy="45" r="5" fill="#FFD45A"/><rect x="32" y="42" width="14" height="5" rx="2.5" fill="#123C38"/><circle cx="18" cy="10" r="2" fill="#fff"/></svg>`,
   ball: `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#F4F6F5"/><path d="M8 32a24 24 0 0 1 48 0z" fill="#E5525C"/><rect x="8" y="29" width="48" height="6" fill="#26304A"/><circle cx="32" cy="32" r="8" fill="#26304A"/><circle cx="32" cy="32" r="4.5" fill="#fff"/></svg>`,
   bag: `<svg viewBox="0 0 64 64"><rect x="12" y="18" width="40" height="38" rx="11" fill="#E9B43C"/><path d="M22 18v-4a10 10 0 0 1 20 0v4" stroke="#9A6A1E" stroke-width="5" fill="none"/><rect x="18" y="32" width="28" height="14" rx="5" fill="#C98B22"/><rect x="29" y="30" width="6" height="8" rx="2" fill="#26304A"/></svg>`,

@@ -571,7 +571,8 @@ public class IntroScreen extends GameScreen {
 		switch (step) {
 			case OPENING -> toTitle();
 			case TITLE -> {
-				if (Ui.isA(e)) {
+				if (e.key() == GLFW.GLFW_KEY_M) toMinecraft();
+				else if (Ui.isA(e)) {
 					Sounds.press();
 					if (!Look.ours()) Sounds.cry("charizard", 1F);
 					openMenu();
@@ -595,6 +596,7 @@ public class IntroScreen extends GameScreen {
 				else if (Ui.isA(e)) keysPick(keysChoice.at);
 			}
 			case SLOTS -> {
+				if (busy) return true;
 				if (confirm != null) {
 					if (confirm.key(e)) return true;
 					if (Ui.isB(e)) {
@@ -603,9 +605,13 @@ public class IntroScreen extends GameScreen {
 					} else if (Ui.isA(e)) confirmed(confirm.at == 0);
 					return true;
 				}
-				int n = SLOTS + 1;
+				int n = SLOTS + 2;
 				if (e.key() == GLFW.GLFW_KEY_DELETE || e.key() == GLFW.GLFW_KEY_X) {
 					askDelete(slotAt);
+					return true;
+				}
+				if (e.key() == GLFW.GLFW_KEY_M) {
+					toMinecraft();
 					return true;
 				}
 				if (Ui.isUp(e) || Ui.isLeft(e)) slotAt = Math.floorMod(slotAt - 1, n);
@@ -671,6 +677,11 @@ public class IntroScreen extends GameScreen {
 	 * full, it asks before starting over in it.
 	 */
 	private void pickSlot(int i) {
+		if (busy) return;
+		if (i == SLOTS + 1) {
+			toMinecraft();
+			return;
+		}
 		Sounds.press();
 		if (i >= SLOTS) {
 			// OPTIONS, under the slots.
@@ -716,13 +727,7 @@ public class IntroScreen extends GameScreen {
 		confirm = null;
 		if (deleting) {
 			deleting = false;
-			SlotInfo c = slotCards[slotAt];
-			try {
-				if (c != null && c.folder() != null) moveAside(c.folder());
-			} catch (IOException e) {
-				Retromon.LOG.warn("Couldn't move slot {} aside", slotAt + 1, e);
-			}
-			readSlots();
+			deleteSlot(slotAt);
 			return;
 		}
 		targetSlot = slotAt;
@@ -774,13 +779,123 @@ public class IntroScreen extends GameScreen {
 		vchoice(g, keysChoice, 860, 300, 300, this::keysPick);
 	}
 
-	/** The game in a slot, moved aside into .minecraft/retromon-old-saves (the newest three are kept there). */
+	/** Deleting a slot (in the background), and a line about it after when it couldn't be. */
+	private volatile boolean busy;
+	private String notice;
+	private int noticeAt;
+
+	/** The slot's game moved aside (DELETE, after YES): off the main thread, the cards read again after. */
+	private void deleteSlot(int k) {
+		SlotInfo c = k >= 0 && k < SLOTS ? slotCards[k] : null;
+		if (c == null || c.folder() == null) return;
+		Path folder = c.folder();
+		busy = true;
+		notice = null;
+		Thread t = new Thread(() -> {
+			String why = null;
+			try {
+				moveAside(folder);
+			} catch (Exception e) {
+				Retromon.LOG.warn("Couldn't delete slot {} ({})", k + 1, folder, e);
+				why = e.getMessage() == null ? e.toString() : e.getMessage();
+			}
+			String fail = why;
+			Minecraft.getInstance().execute(() -> {
+				busy = false;
+				readSlots();
+				if (slotCards[k] != null && !slotCards[k].empty()) {
+					notice = Lang.t("Couldn't delete SLOT {0}: something still has it open. Try again in a moment.", k + 1)
+							+ (fail == null ? "" : " (" + fail + ")");
+					noticeAt = ticks;
+				}
+			});
+		}, "Retromon delete");
+		t.setDaemon(true);
+		t.start();
+	}
+
+	/**
+	 * The game in a slot, moved aside into .minecraft/retromon-old-saves (the newest three are kept there). Tried
+	 * again for a few seconds when something's still letting go of it (a game just left, another mod's files); if
+	 * it still can't be moved whole, it's copied there and cleared out instead, so the slot's free either way.
+	 */
 	private static void moveAside(Path folder) throws IOException {
 		// Beside the map folder, not in it (the map folder is searched for a map when the map mod isn't there).
 		Path old = root().resolve("retromon-old-saves");
 		Files.createDirectories(old);
 		String stamp = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HHmmss").format(java.time.LocalDateTime.now());
-		Files.move(folder, old.resolve(folder.getFileName() + " " + stamp));
+		Path to = old.resolve(folder.getFileName() + " " + stamp);
+		IOException last = null;
+		for (int t = 0; t < 12 && Files.exists(folder); t++) {
+			try {
+				Files.move(folder, to);
+				last = null;
+				break;
+			} catch (IOException e) {
+				last = e;
+				try {
+					Thread.sleep(250);
+				} catch (InterruptedException ie) {
+					Thread.currentThread().interrupt();
+					break;
+				}
+			}
+		}
+		if (Files.exists(folder)) {
+			Retromon.LOG.warn("Couldn't move {} aside whole; copying it and clearing it out instead", folder, last);
+			copyAside(folder, to);
+			clearOut(folder);
+		}
+		try {
+			// Dated now, so "the newest three" counts from when it was put aside.
+			if (Files.exists(to)) Files.setLastModifiedTime(to, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
+		} catch (IOException ignored) {
+			// Kept either way.
+		}
+		try {
+			pruneOld(old);
+		} catch (IOException e) {
+			// The slot's free already; the oldest old game is left for now.
+			Retromon.LOG.warn("Couldn't tidy retromon-old-saves", e);
+		}
+	}
+
+	/** A copy of the slot's files kept aside (what can be read; a file still held open is skipped). */
+	private static void copyAside(Path from, Path to) {
+		try (Stream<Path> st = Files.walk(from)) {
+			for (Path f : st.filter(Files::isRegularFile).toList()) {
+				if (f.getFileName().toString().equals("session.lock")) continue;
+				try {
+					Path out = to.resolve(from.relativize(f).toString());
+					Files.createDirectories(out.getParent());
+					Files.copy(f, out, StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					Retromon.LOG.warn("Couldn't keep a copy of {}", f, e);
+				}
+			}
+		} catch (IOException | RuntimeException e) {
+			Retromon.LOG.warn("Couldn't copy {} aside", from, e);
+		}
+	}
+
+	/** Everything that can be deleted in the folder, deleted; it's only a failure if the game itself is still there. */
+	private static void clearOut(Path dir) throws IOException {
+		IOException last = null;
+		try (Stream<Path> st = Files.walk(dir)) {
+			for (Path p : st.sorted(Comparator.reverseOrder()).toList()) {
+				try {
+					Files.deleteIfExists(p);
+				} catch (IOException e) {
+					last = e;
+				}
+			}
+		}
+		if (Files.exists(dir.resolve("level.dat")) || Files.exists(dir.resolve(Game.MARKER)))
+			throw last != null ? last : new IOException("The save is still there");
+	}
+
+	/** Only the newest three old games are kept in retromon-old-saves. */
+	private static void pruneOld(Path old) throws IOException {
 		List<Path> kept = new ArrayList<>();
 		try (Stream<Path> st = Files.list(old)) {
 			st.filter(Files::isDirectory).forEach(kept::add);
@@ -850,8 +965,47 @@ public class IntroScreen extends GameScreen {
 	@Override
 	public void onClose() {
 		if (step == Step.COPYING) return;
+		toMinecraft();
+	}
+
+	/**
+	 * Out of Retromon to Minecraft's own title screen: your other worlds, servers and mods, played as normal with
+	 * Retromon still installed. Its Retromon button (top left) comes back here. (Before, going back from the title
+	 * only brought Retromon's title round again.)
+	 */
+	private void toMinecraft() {
+		Sounds.press();
 		Music.stop();
-		if (minecraft != null) minecraft.setScreen(parent);
+		minecraftTitle = true;
+		if (minecraft != null) minecraft.setScreen(parent instanceof net.minecraft.client.gui.screens.TitleScreen ? parent
+				: new net.minecraft.client.gui.screens.TitleScreen());
+	}
+
+	/** A little grass block (MINECRAFT's picture): green on top, earth under it. */
+	private static void grassBlock(GuiGraphics g, float x, float y, float s) {
+		V.rr(g, x, y, s, s, s * 0.22F, 0xFF8A5A36);
+		V.rr(g, x + s * 0.2F, y + s * 0.55F, s * 0.14F, s * 0.14F, s * 0.05F, 0xFF6B4226);
+		V.rr(g, x + s * 0.62F, y + s * 0.72F, s * 0.14F, s * 0.14F, s * 0.05F, 0xFF6B4226);
+		V.rr(g, x, y, s, s * 0.42F, s * 0.2F, 0xFF62B84A);
+		V.rr(g, x + s * 0.12F, y + s * 0.3F, s * 0.16F, s * 0.2F, s * 0.06F, 0xFF62B84A);
+		V.rr(g, x + s * 0.55F, y + s * 0.3F, s * 0.2F, s * 0.17F, s * 0.06F, 0xFF62B84A);
+	}
+
+	/** MINECRAFT on the title, top right (M, or click it): Minecraft as normal, with your mods. */
+	private void drawMinecraftKey(GuiGraphics g) {
+		String label = Lang.t("MINECRAFT");
+		float kw = V.trackedWidthIn(V.ARCHIVO, "M", 13, 4) + 24, lw = V.trackedWidthIn(V.ARCHIVO, label, 15, 6);
+		float total = 26 + 12 + lw + 14 + kw, bx = 1260 - 14 - total - 12, cy = 46, bw = total + 24, bh = 46;
+		boolean on = vover(bx, cy - bh / 2, bw, bh);
+		V.pill(g, bx, cy - bh / 2, bw, bh, on ? 0x66FFFFFF : 0x40001414);
+		float x = bx + 12;
+		grassBlock(g, x, cy - 13, 26);
+		V.trackedIn(g, V.ARCHIVO, label, x + 38 + 1, V.capsTop(cy, 15) + 2, 15, 0x80001414, 6);
+		V.trackedIn(g, V.ARCHIVO, label, x + 38, V.capsTop(cy, 15), 15, 0xFFFFFFFF, 6);
+		float kx = x + 38 + lw + 14;
+		V.ring(g, kx, cy - 14, kw, 28, 8, 2, 0xD9FFFFFF);
+		V.trackedIn(g, V.ARCHIVO, "M", kx + 12, V.capsTop(cy, 13), 13, 0xFFFFFFFF, 4);
+		vhit(bx, cy - bh / 2, bw, bh, this::toMinecraft);
 	}
 
 	private void load(String folder) {
@@ -916,6 +1070,13 @@ public class IntroScreen extends GameScreen {
 				if (aside && Files.exists(to)) {
 					progress = "Moving the old game aside...";
 					moveAside(to);
+				} else if (Files.exists(to)) {
+					// An empty slot with something left in its folder (a delete that couldn't finish): cleared first.
+					try {
+						moveAside(to);
+					} catch (IOException e) {
+						Retromon.LOG.warn("Couldn't clear what was left in {}", to, e);
+					}
 				}
 				Files.createDirectories(to);
 				if (Files.isDirectory(map)) copyFolder(map, to);
@@ -1114,6 +1275,7 @@ public class IntroScreen extends GameScreen {
 	private void drawTitle(GuiGraphics g, float secs) {
 		if (Look.ours()) {
 			Title.draw(g, (ticks - titleSince) / 20F + (secs - ticks / 20F), "pikachu", version());
+			drawMinecraftKey(g);
 			return;
 		}
 		Scenes.title(g, secs, false);
@@ -1124,6 +1286,7 @@ public class IntroScreen extends GameScreen {
 		int foot = 0xCCDDE6FF;
 		V.text(g, "INSID3 TH3 CUB3", 28, 680, 15, foot, true);
 		V.right(g, "Version " + version(), 1260, 680, 15, foot, true);
+		drawMinecraftKey(g);
 		if ((secs % 1.1F) < 0.55F) {
 			String ps = Lang.t("PRESS START");
 			float tw = V.titleTrackedWidth(ps, 30, 6), pw = tw + 68;
@@ -1156,6 +1319,20 @@ public class IntroScreen extends GameScreen {
 				V.icon(g, "icon_cog", x + 40, by + 10, 26);
 				V.text(g, ot, x + 40 + 26 + 14, V.capsTop(by + 23, 21), 21, V.INK, false);
 				if (confirm == null) vhit(x, by, bw, 46, () -> pickSlot(SLOTS));
+				// MINECRAFT beside it: out to Minecraft's own title screen (your other worlds, with your mods).
+				String mt = Lang.t("MINECRAFT");
+				float mx0 = x + bw + 16, mw = 40 + 26 + 14 + V.width(mt, 21, false) + 22;
+				if (confirm == null && vover(mx0, by, mw, 46)) slotAt = SLOTS + 1;
+				boolean mon = slotAt == SLOTS + 1;
+				if (mon) {
+					V.softShadow(g, mx0, by + 5, mw, 46, 14, 0x59E8961E);
+					V.pill(g, mx0 - 2.5F, by - 2.5F, mw + 5, 51, 0xFFFFFFFF);
+					V.sel(g, mx0, by, mw, 46, 23);
+					V.tri(g, mx0 + 21, by + 23, 12, 0, V.RED);
+				} else V.pill(g, mx0, by, mw, 46, 0xD9FFFFFF);
+				grassBlock(g, mx0 + 40, by + 10, 26);
+				V.text(g, mt, mx0 + 40 + 26 + 14, V.capsTop(by + 23, 21), 21, V.INK, false);
+				if (confirm == null) vhit(mx0, by, mw, 46, () -> pickSlot(SLOTS + 1));
 				break;
 			}
 			SlotInfo c = slotCards[k];
@@ -1216,6 +1393,13 @@ public class IntroScreen extends GameScreen {
 			y += h + 18;
 		}
 		V.actsRight(g, 22, 28, -1, "B", "Back", "A", "Continue");
+		String note = busy ? Lang.t("Deleting...") : notice != null && ticks - noticeAt < 160 ? notice : null;
+		if (note != null) {
+			List<String> nl = V.wrap(note, 560, 18, false);
+			float nh = 20 + nl.size() * 24, ny = 700 - nh;
+			V.rr(g, 70, ny, 600, nh, 18, busy ? 0xF2FFFFFF : 0xF2FFE9EA);
+			for (int i = 0; i < nl.size(); i++) V.text(g, nl.get(i), 90, ny + 12 + i * 24, 18, busy ? V.INK : 0xFFC8323C, false);
+		}
 		if (confirm != null) {
 			SlotInfo c = slotCards[slotAt];
 			String q = "Delete SLOT " + (slotAt + 1) + "?";
