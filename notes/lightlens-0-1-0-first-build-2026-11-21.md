@@ -135,3 +135,36 @@ John asked for a GIF maker ("record for 10 seconds, a frame a second?").
   - Video, photos and Sharper all still pass.
 
 Jar: `Lightlens-0.1.2-for-MC1.21.11.jar`.
+
+## 0.1.3: full-screen settings, smoother recording (21 Nov)
+
+John's asks:
+- Modernise the settings screen in the LumenForge look: full screen, see-through so the game shows behind, neater.
+- Fix jitter: the game was jumpy while recording, and so was the video. His settings were 2K, 30 fps, Max, H.264, Sharper on, game sound, in a 1920x1032 window.
+- He asked whether Wait is an exposure. Answer: no. For photos bigger than the window, the game draws at full size during the wait, so the shaders settle; for Screen-size photos it's only a countdown. A real long-exposure (frame-averaging) option was offered, not built yet.
+
+### The video he sent
+- 567 frames, 464 of them unique.
+- About 30 new frames a second for 12 s, then about 15 a second. The game itself had slowed: Sharper drew 3840x2064, four times the pixels, with Tempered Light.
+- Video was 18.9 s and audio 17.2 s.
+- NVENC was confirmed (tag `h264_nvenc`, colour bt470bg as expected for RGBA input).
+
+### Fixes
+- **Mapped readback.** With OpenGL 4.4 buffer storage, the pixel buffers stay mapped (persistent, coherent). The render thread only polls fences; the writer thread copies the frame out (into two arrays it swaps between) and releases the buffer. The plain fallback is unchanged. Buffers are freed only after the writer has finished, on the main thread, before going idle.
+- **Clock starts at the first recorded frame,** not on F10. A slow first frame, such as Sharper resizing Iris, no longer offsets the video against the sound. The mic is cut by the same lead (`-ss`), and the final file is cut to the recording's length (`-t`).
+- **Stats are logged at stop:** seconds, frames captured and per second, frames skipped, first-frame delay, size, fps, encoder, and whether Sharper was on. If the game ran below 80% of the video's fps, an amber chat tip says so, and names Sharper if it was on.
+- **Test (BtbN FFmpeg):** video and sound lengths now match (12.966 vs 12.962 s, 5.233 vs 5.208 s). All checks pass, including GIFs, photos and Sharper.
+
+### The new screen
+- Full screen, with a light tint (about 43%, darker bands at the top and bottom) and no blur. It fades and rises in over 220 ms.
+- **Top bar:** the mark (a gradient rounded square with a lens and red dot), "Lightlens" in Inter Display with a teal full stop, the tagline, a status pill on the right (Ready, Recording with its clock, GIF time left, Finishing, FFmpeg needed), and a gradient hairline under it.
+- **Cards:** Video (red dot), Photo (teal) and GIF (violet). Rows are a label plus a segmented control: a rounded track with the picked segment in the gradient. Sound uses teal on/off chips. Each card's footer has the size and a note: the size per 10 minutes, "Enlarged from 1032p", or an amber "Sharper draws 2x the size: fewer fps".
+- **Strip:**
+  - Save to: free space, the folder (cut to keep its end), Choose and Open.
+  - Encoder: a green or amber dot, or Get FFmpeg with a gradient progress bar.
+  - Shaders, or the last error in red.
+- **Actions:** Record (gradient, with an F10 key chip), Photo (F12), GIF (G), and Done (Esc). While recording, Stop is red.
+- **`ui/Draw`:** anti-aliased rounded shapes drawn per screen-pixel column at the window's resolution, the gradient in strips, a fading hairline, and Inter / Geist Mono fonts (copied from Lightreel; OFL notices in `assets/lightlens/font`).
+- Checked by screenshot at 1080p and 720p (`ll-02b-settings-1080p`, `ll-02-settings`).
+
+Jar: `Lightlens-0.1.3-for-MC1.21.11.jar`.
