@@ -75,6 +75,14 @@ public final class Interiors {
 
 	public record Door(String key, String room, List<BlockPos> blocks, double x, double y, double z, boolean north, float yaw) {}
 
+	/**
+	 * A room's battle arena (Let's Go's: a battle indoors is fought in a round hall built from that room's own
+	 * things): its blocks from its corner, as rooms have theirs. The battle scene puts it up over you for the battle.
+	 */
+	public record Arena(double w, double d, double h, int[] cells) {}
+
+	public static final Map<String, Arena> ARENAS = new LinkedHashMap<>();
+
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */
 	public static final int STATES = DATA == null ? 1 : DATA.get("states").getAsInt();
@@ -164,6 +172,13 @@ public final class Interiors {
 					(float) num(sp, "yaw", 0), num(en, "x", 0), num(en, "z", 0), (float) num(en, "yaw", 180), num(cam, "x", 8), num(cam, "z", 7),
 					num(cam, "dist", 30), cells, warps, people, acts, grass);
 			ROOMS.put(room.id(), room);
+		}
+		if (DATA.has("arenas")) for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("arenas").entrySet()) {
+			JsonObject a = e.getValue().getAsJsonObject();
+			JsonArray c = a.getAsJsonArray("cells");
+			int[] cells = new int[c.size()];
+			for (int i = 0; i < cells.length; i++) cells[i] = c.get(i).getAsInt();
+			ARENAS.put(e.getKey(), new Arena(num(a, "W", 24), num(a, "D", 24), num(a, "H", 7), cells));
 		}
 		for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("doors").entrySet()) {
 			JsonObject d = e.getValue().getAsJsonObject();
@@ -309,13 +324,14 @@ public final class Interiors {
 	private static void buildRoom(ServerLevel level, Room r) {
 		int W = (int) Math.ceil(r.w()), D = (int) Math.ceil(r.d());
 		// Every chunk the room and its black ground touch, loaded.
-		for (int cx = (r.ox() - 26) >> 4; cx <= (r.ox() + W + 26) >> 4; cx++)
-			for (int cz = (r.oz() - 22) >> 4; cz <= (r.oz() + D + 26) >> 4; cz++) level.getChunk(cx, cz);
+		for (int cx = (r.ox() - 26) >> 4; cx <= (r.ox() + Math.max(W, 40) + 26) >> 4; cx++)
+			for (int cz = (r.oz() - 22) >> 4; cz <= (r.oz() + Math.max(D, 40) + 26) >> 4; cz++) level.getChunk(cx, cz);
 		BlockState air = Blocks.AIR.defaultBlockState();
 		BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
-		for (int x = r.ox() - 3; x <= r.ox() + W + 3; x++)
+		// (Cleared well past the room, so a bigger room it was before leaves nothing behind.)
+		for (int x = r.ox() - 8; x <= r.ox() + 40; x++)
 			for (int y = r.oy() - 7; y <= r.oy() + 8; y++)
-				for (int z = r.oz() - 3; z <= r.oz() + D + 3; z++) {
+				for (int z = r.oz() - 8; z <= r.oz() + 40; z++) {
 					at.set(x, y, z);
 					if (!level.getBlockState(at).isAir()) level.setBlock(at, air, Block.UPDATE_CLIENTS);
 				}
@@ -335,7 +351,7 @@ public final class Interiors {
 				if (level.getBlockState(at).isAir()) level.setBlock(at, light, Block.UPDATE_CLIENTS);
 			}
 		// The people inside.
-		AABB box = new AABB(r.ox() - 4, r.oy() - 8, r.oz() - 4, r.ox() + W + 4, r.oy() + 8, r.oz() + D + 4);
+		AABB box = new AABB(r.ox() - 8, r.oy() - 8, r.oz() - 8, r.ox() + 40, r.oy() + 8, r.oz() + 40);
 		for (Npc n : level.getEntitiesOfClass(Npc.class, box, n -> true)) n.discard();
 		for (Person p : r.people()) {
 			// The nurse heals and the clerk sells, as the games' nurse and clerk do (their own ways of talking).

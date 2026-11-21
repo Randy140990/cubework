@@ -511,7 +511,7 @@ public final class Game {
 			boolean done = switch (n.key()) {
 				case "rival_lab" -> d.beaten.contains("rival_lab");
 				case "rival_22" -> d.beaten.contains("rival_22");
-				default -> d.hasDex();
+				default -> d.hasDex() && d.beaten.contains("rival_lab");
 			};
 			if (!done) continue;
 			// He turns to you and has his say, then walks straight off, and is gone once he's out of the door.
@@ -1540,6 +1540,10 @@ public final class Game {
 			deliverParcel(p, n);
 			return;
 		}
+		if (d.hasDex() && !d.beaten.contains("rival_lab") && !d.party.isEmpty() && !RIVALS.containsKey(p.getUUID())) {
+			rivalChallenge(p);
+			return;
+		}
 		if (!d.hasDex()) {
 			dialogue(p, n, "talk", fill(p, List.of("OAK: If a wild POKéMON appears, your POKéMON can fight against it!", "Afterward, go on to the next town.",
 					"VIRIDIAN CITY is just north, past ROUTE 1.")));
@@ -1575,13 +1579,24 @@ public final class Game {
 				"OAK: You can't get detailed data on POKéMON by just seeing them.", "You must catch them! Use these to capture wild POKéMON.",
 				"{player} got 5 POKé BALLs!", "When a wild POKéMON appears, it's fair game. Throw a POKé BALL at it and try to catch it!",
 				"This won't always work, though. A healthy POKéMON could escape. You have to be lucky!");
-		dialogue(p, n, "talk", fill(p, lines), cues(4, "get_key_item", 11, "get_key_item", 21, "get_item"));
+		// Then your rival wants a battle, right there (the first, as Let's Go has it): you can't go on north without it.
+		dialogue(p, n, d.beaten.contains("rival_lab") ? "talk" : "parcel", fill(p, lines), cues(4, "get_key_item", 11, "get_key_item", 21, "get_item"));
+	}
+
+	/** Oak's done talking (the parcel, the POKéDEX): your rival turns to you and wants a battle. */
+	private static void rivalAfterParcel(ServerPlayer p) {
+		PlayerData d = data(p);
+		if (d.beaten.contains("rival_lab") || d.party.isEmpty()) return;
+		Npc rv = RIVALS.get(p.getUUID());
+		List<String> ch = fill(p, List.of("{rival}: Wait, {player}! Gramps gave us POKéMON, so let's check them out!", "{rival}: Come on, I'll take you on!"));
+		if (rv != null && !rv.isRemoved()) dialogue(p, rv, "rival", ch, new CompoundTag());
+		else rivalChallenge(p);
 	}
 
 	/** North of Viridian before the POKéDEX: the old man won't let you by, and you're put back. */
 	private static boolean oldManStops(ServerPlayer p, String place) {
 		PlayerData d = data(p);
-		if (!ourSave || !d.started || d.hasDex() || !"viridian_city".equals(d.place)) return false;
+		if (!ourSave || !d.started || d.hasDex() && d.beaten.contains("rival_lab") || !"viridian_city".equals(d.place)) return false;
 		if (!place.matches("route_2(_.*)?") && !place.startsWith("viridian_forest") && !place.startsWith("pewter") && !place.startsWith("diglett")) return false;
 		ServerLevel level = (ServerLevel) p.level();
 		// You stop where you are: back only the step you've just taken out of Viridian.
@@ -2012,6 +2027,7 @@ public final class Game {
 				m.putString("mart", t.getStringOr("mart", d.place));
 				Net.send(p, "mart", m);
 			}
+			case "parcel" -> rivalAfterParcel(p);
 			case "rival" -> {
 				if (!d.beaten.contains("rival_lab") && !d.party.isEmpty()) Battles.trainer(p, rivalLab(p));
 			}
@@ -2331,7 +2347,7 @@ public final class Game {
 		d.give("potion", 3);
 		d.money = 3000;
 		sync(p);
-		if (town() != null) RIVAL_PENDING.add(p.getUUID());
+		// (Your rival battles you when you bring Oak's Parcel back, as Let's Go has it, not now.)
 		askNickname(p, "party", 0);
 	}
 

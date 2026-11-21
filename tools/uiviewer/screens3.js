@@ -377,6 +377,14 @@ function sendOut(S, from, to, who, grow) {
   return new Promise(res => S.ballPath([{ from: V(...from), to: V(...to), dur: 0.75, arc: 1.6, spin: 14, at: () => { S.ball.visible = false; S.burst(V(to[0], 0.7, to[2]), 2.6); if (S[who]) playOnce(S[who], "cry");
     const t0 = performance.now(), f = () => { const k = Math.min(1, (performance.now() - t0) / 420); grow(1 - k * k * (3 - 2 * k)); if (k < 1) requestAnimationFrame(f); else res(); }; f(); } }]));
 }
+// Your rival's battle in the lab (when you bring Oak's Parcel back): the same way in, fought in the lab's round hall.
+screen("rivallab", "Battle", "Your rival, in the lab", {
+  scene: "battle", sceneOpts: () => ({ ours: "pikachu", foe: "squirtle", trainer: true, arena: "lab" }),
+  what: "Your rival's first battle, when you bring OAK's PARCEL back, as Let's Go's: not among the lab's desks, but in a round hall built from the lab's own things (its desk and map at the back, the incubator, white shelves and boxes round the edge), with no one else about. Just your POKéMON, theirs, and your rival.",
+  tags: ["New: battle arenas indoors"], mod: "BattleScene: an indoor battle in a room with an arena is fought in it (put up over you, taken away after).",
+  try: ["As the challenge: SPACE moves the words on."],
+  make() { SC.battle.foeName = "RIVAL " + G.rival; SC.battle.foeMon = "squirtle"; const r = BY.challenge.make.call(this); return r; }
+});
 screen("challenge", "Battle", "A trainer challenges you", {
   scene: "battle", sceneOpts: () => ({ ours: "pikachu", foe: "spearow", trainer: true }),
   what: "A trainer challenges you, as Let's Go's do: a rush of light sweeps across, then you're looking over your own shoulder at them as the words come up. The camera swings to them as they throw: the ball arcs out, bursts in light and their POKéMON grows out of it. Then it pulls back wide and you throw yours. No name card: just the scene and the words.",
@@ -395,14 +403,15 @@ screen("challenge", "Battle", "A trainer challenges you", {
     later(1200, () => rush.remove());
     (async () => {
       await C.wait(900);
-      await C.say([{ text: `You are challenged by **${FOE_TRAINER}**!` }]);
+      const foeName = SC.battle.foeName || FOE_TRAINER, foeMon = SC.battle.foeMon || "spearow";
+      await C.say([{ text: `You are challenged by **${foeName}**!` }]);
       if (!C.alive()) return;
       // To them: they wind up and throw.
       await camGlide(...SHOULDER, ...AT_THEM, 900);
       S.foePoint = 1; await C.wait(250);
       await sendOut(S, [2.0, 1.7, -2.2], [0, 0, 0], "foe", h => S.foeHidden = h);
       S.foePoint = 0;
-      await C.say([{ text: `**${FOE_TRAINER}** sent out **${ourName("spearow")}**!` }]);
+      await C.say([{ text: `**${foeName}** sent out **${ourName(foeMon)}**!` }]);
       if (!C.alive()) return;
       // Wide, from behind your side, as you throw yours.
       S.holdCam = false; const fh = S.foe ? Math.max(0.8, S.foe.m.size.h) : 1, oh = S.ours ? Math.max(0.8, S.ours.m.size.h) : 1, k = Math.max(1, Math.max(fh, oh) / 1.2);

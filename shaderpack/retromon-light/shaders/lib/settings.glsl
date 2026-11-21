@@ -5,7 +5,7 @@
 #define NIGHT_BRIGHTNESS 1.0 // [0.5 0.75 1.0 1.25 1.5]
 #define SHADOW_SOFTNESS 1.0 // [0.5 1.0 1.5 2.0]
 #define SHADOW_STRENGTH 0.7 // [0.5 0.6 0.7 0.85 1.0]
-#define INSIDE_BRIGHTNESS 1.0 // [0.8 0.9 1.0 1.1 1.2]
+#define INSIDE_BRIGHTNESS 1.35 // [1.0 1.15 1.35 1.5 1.7]
 #define LAMP_BRIGHTNESS 1.0 // [0.6 0.8 1.0 1.25 1.5]
 #define NIGHT_BLUE 1.0 // [0.0 0.5 1.0 1.5]
 #define WAVING 1 // [0 1]

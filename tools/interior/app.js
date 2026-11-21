@@ -151,7 +151,8 @@ function switchRoom(id, spawn) {
   const W = room.W, D = room.D;
   sun.position.set(W * 0.3, room.outside ? 26 : 18, D + 9); sun.target.position.set(W / 2, 0, D / 2);
   const S = Math.max(W, D) * 0.85; Object.assign(sun.shadow.camera, { left: -S, right: S, top: S, bottom: -S, near: 1, far: 80 }); sun.shadow.camera.updateProjectionMatrix();
-  sun.intensity = room.outside ? 0.78 : 0.6; hemi.intensity = room.outside ? 0.7 : 0.62;
+  // Inside, bright and airy (as the newer games' rooms are; the mod's light inside matches).
+  sun.intensity = room.outside ? 0.78 : 0.68; hemi.intensity = room.outside ? 0.7 : 0.78;
   hemi.color.set(room.outside ? 0xe8f4ff : 0xfff6e8); hemi.groundColor.set(room.outside ? 0x6f8a5a : 0x8a7f74);
   cam.fit = fitRoom(room); snapCam();
   $("#roomPick").value = id;

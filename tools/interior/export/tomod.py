@@ -271,13 +271,14 @@ def main():
     tex = write_textures(data["mats"], res)
     models, shapes_t, states = {}, {}, {}
     model_list, shape_list, state_list = [], [], []
-    rooms_out = {}
+    rooms_out, arenas_out = {}, {}
     for rid, room in data["rooms"].items():
         cells = {}
         for f in room["faces"]:
             if f["k"] in SKIP or f["k"] not in tex: continue
             slice_face(f, tex, cells)
-        col = collision(room)
+        # (An arena's only for looking at: it's put up on your screen alone, for the battle.)
+        col = {} if rid.startswith("arena_") else collision(room)
         placed = []
         for cell in set(cells) | set(col):
             els = cells.get(cell, [])
@@ -296,6 +297,10 @@ def main():
             if st not in states:
                 states[st] = len(state_list); state_list.append(st)
             placed += [cell[0], cell[1], cell[2], states[st]]
+        if rid.startswith("arena_"):
+            # A battle arena: its blocks only, as they stand from its corner (the mod builds it over you).
+            arenas_out[rid[len("arena_"):]] = {"W": room["W"], "D": room["D"], "H": room["H"], "cells": placed}
+            continue
         o = ORIGIN[rid]
         warps = []
         def spawn_of(sp):
@@ -341,7 +346,7 @@ def main():
     json.dump({"variants": {"m=%d" % s: {"model": "retromon:block/prop/%d" % st[0]} for s, st in enumerate(state_list)}},
               open(os.path.join(res, "assets/retromon/blockstates/prop.json"), "w"), separators=(",", ":"))
     os.makedirs(os.path.join(res, "retromon/interiors"), exist_ok=True)
-    out = {"version": 1, "states": len(state_list), "shapes": [shape_list[st[1]] for st in state_list], "rooms": rooms_out, "doors": DOORS, "start": START}
+    out = {"version": 1, "states": len(state_list), "shapes": [shape_list[st[1]] for st in state_list], "rooms": rooms_out, "arenas": arenas_out, "doors": DOORS, "start": START}
     json.dump(out, open(os.path.join(res, "retromon/interiors/rooms.json"), "w"), separators=(",", ":"))
     print("textures", len(tex), "models", len(model_list), "shapes", len(shape_list), "states", len(state_list))
     for rid, r in rooms_out.items(): print(rid, len(r["cells"]) // 4, "blocks,", len(r["people"]), "people,", len(r["acts"]), "acts,", len(r["warps"]), "warps")

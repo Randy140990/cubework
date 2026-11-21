@@ -15,6 +15,7 @@ const PLACES = [
   { id: "nickhouse", name: "Viridian house", floor: "Ground floor", group: "Viridian City" },
   { id: "gate_s", name: "Route 2 gate", floor: "South", group: "Route 2" },
   { id: "gate_n", name: "Route 2 gate", floor: "North", group: "Route 2" },
+  { id: "arena_lab", name: "Lab battle", floor: "Battle arena", group: "Battle arenas" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
 ];
 // Your house and the rival's (14 by 13, the mat in a nook at the door), the stairs at the back on the right.
@@ -197,7 +198,7 @@ function drawScoreboard(P, f) {
   // cushions and quilt, a green felt top, a white lamp shade, cardboard, a DVD player's front.
   matReg("matLabPurple", "#8F60DE", "#5E3AA6");
   reg("oakDiagonal", 32, 32, (P, r) => {
-    const base = hx("#E7DDCC"), gap = hx("#B4A690"), tones = [];
+    const base = hx("#F3E8D3"), gap = hx("#CDBB9C"), tones = [];
     for (let k = 0; k < 4; k++) tones.push((r() - 0.5) * 0.1);
     for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
       const d = (x + y) % 32, row = Math.floor(d / 8), along = (x - y + 64) % 32;
@@ -766,6 +767,36 @@ function tvUnit(R, X, w, screenKey, o = {}) {
   R.item("TV unit", "A long low cabinet with a top: a DVD player in one end, books in the other, doors between; the TV on it.");
 }
 
+// ---------- battle arenas ----------
+// A battle indoors isn't fought among the room's furniture: as Let's Go has it, it moves to a round hall built from
+// that room's own things (the lab's desks, shelves and incubator round its edge, a row of windows high up), with no one
+// else about. The mod puts it up over you for the battle, as it does the outdoor stages, and takes it away after.
+// o: floor, paper (the wall), post, low (the panelling), beam, ceiling; r the radius, h the height.
+function arenaShell(R, o) {
+  const G = R.geo, c = R.W / 2, rad = o.r || 11.5, H = o.h || 7, beam = o.beam || "walnut";
+  for (let j = 0; j < R.D; j++) {
+    const zc = j + 0.5 - c; if (Math.abs(zc) >= rad + 1) continue;
+    const half = Math.sqrt(Math.max(0, (rad + 1) ** 2 - zc * zc)), x0 = Math.max(0, Math.floor(c - half)), x1 = Math.min(R.W, Math.ceil(c + half));
+    G.box(x0, -0.35, j, x1, 0, j + 1, { top: o.floor, all: null });
+  }
+  // The wall: a ring of blocks round it (a block circle, as a Minecraft build rounds one): panelling low down, the
+  // room's own walls above, a dark beam, a row of windows high up, a post every thirty degrees.
+  for (let i = 0; i < R.W; i++) for (let j = 0; j < R.D; j++) {
+    const d = Math.hypot(i + 0.5 - c, j + 0.5 - c);
+    if (d < rad || d >= rad + 1) continue;
+    const a = Math.atan2(j + 0.5 - c, i + 0.5 - c), fr = ((a / (Math.PI / 6)) % 1 + 1) % 1, post = fr < 0.09 || fr > 0.91;
+    const pm = o.post || beam;
+    G.box(i, 0, j, i + 1, 0.9, j + 1, { all: post ? pm : (o.low || "walnut"), top: null, bottom: null });
+    G.box(i, 0.9, j, i + 1, 4.6, j + 1, { all: post ? pm : o.paper, top: null, bottom: null });
+    G.box(i, 4.6, j, i + 1, 5.0, j + 1, { all: beam, top: null, bottom: null });
+    G.box(i, 5.0, j, i + 1, 6.2, j + 1, { all: post ? pm : "window", top: null, bottom: null });
+    G.box(i, 6.2, j, i + 1, H, j + 1, { all: beam, top: "cap", bottom: null });
+    R.solid(i, j, i + 1, j + 1);
+  }
+  G.box(0, H, 0, R.W, H + 0.2, R.D, { bottom: o.ceiling || "paint", all: null });
+  R.item("The hall", "Round, a block circle: panelling, the room's walls, a dark beam, windows high up, posts every thirty degrees, a ceiling.");
+}
+
 function bunting(room, x0, x1, y) { room.geo.box(x0, y, 0.04, x1, y + 0.45, 0.05, { s: "bunting", all: null }); room.item("Bunting", "Pennants strung along the wall."); }
 
 const BUILD = {
@@ -1185,6 +1216,33 @@ const BUILD = {
     R.npcs.push({ name: "Hiker", key: "gate_n_hiker", x: 12.6, z: 3.7, yaw: FACE.w, seated: true, look: { skin: "hiker" },
       talk: () => [{ text: "Phew! That forest goes on and on." }, { text: "It's easy to lose your way among all those trees." }] });
     R.spawn = LG_GATE_FROM_N;
+    return R;
+  },
+
+  arena_lab() {
+    // The lab's battle (your rival's, when you bring Oak's Parcel back), as Let's Go's: a round hall with the lab's
+    // pale diagonal boards and walls, its teal desk with the PC and microscope at the back under the map, the
+    // incubator to the left, white shelves and boxes to the right. You battle across the middle, facing the back.
+    const R = new Room("arena_lab", { name: "Lab battle", floor: "Battle arena", W: 24, D: 24, H: 7 });
+    arenaShell(R, { floor: "oakDiagonal", paper: "mcLabWall", low: "walnut", beam: "walnut", ceiling: "mcLabWall" });
+    { const F = R.F(9.5, 1.05, "s");
+      for (let i = 0; i < 5; i++) counterUnit(R, F, i, 1, i % 2 ? "drawers" : "cupboardTeal", "lab", "tealPaint"); }
+    { const G = R.geo, sk = R.screen("pcArena", 40, 26, drawPC, 0.9), X = 11.5, Z = 1.05;
+      G.box(X + 0.75, 1.0, Z + 0.18, X + 1.2, 1.04, Z + 0.45, "greyPlastic"); G.box(X + 0.92, 1.04, Z + 0.25, X + 1.03, 1.2, Z + 0.35, "greyPlastic");
+      G.box(X + 0.48, 1.2, Z + 0.18, X + 1.48, 1.88, Z + 0.32, "greyPlastic"); G.box(X + 0.54, 1.26, Z + 0.32, X + 1.42, 1.82, Z + 0.33, { s: sk, all: null });
+      G.box(X + 0.55, 1.0, Z + 0.5, X + 1.4, 1.03, Z + 0.74, { top: "keyboard", all: "greyPlastic" });
+      G.box(10.0, 1.0, Z + 0.3, 10.25, 1.08, Z + 0.6, "greyPlastic"); G.box(10.09, 1.08, Z + 0.38, 10.17, 1.5, Z + 0.46, "steel"); G.box(10.03, 1.42, Z + 0.36, 10.23, 1.56, Z + 0.62, "greyPlastic"); }
+    officeChair(R, 12.1, 2.85, "n", "blueFabric");
+    // The map over the desk, on the wall behind it.
+    { const G = R.geo, w = 3.4, h = w * (WORLDMAP.h + 6) / (WORLDMAP.w + 6), x = 10.3, y = 1.95, z = 1.0;
+      G.box(x - 0.1, y - 0.1, z, x + w + 0.1, y + h + 0.1, z + 0.08, "silver"); G.box(x, y, z + 0.08, x + w, y + h, z + 0.09, { s: "worldMap", all: null }); }
+    incubator(R, 5.6, 5.4);
+    labShelf(R, 15.6, 2.2, "s", 2, 3.0); labShelf(R, 17.8, 3.9, "s", 2, 3.0, { rows: ["binders", "booksFull", "storeBoxes", "booksFull"] });
+    boxes(R, 19.8, 6.6); boxes(R, 4.2, 15.6);
+    plant(R, 3.6, 8.6, 1.2); plant(R, 20.4, 9.2, 1.1);
+    deskPC(R, 1.0, 14.4, "e", R.screen("pcArena2", 40, 26, drawLab, 0.9), { top: "lab" });
+    boxes(R, 20.6, 14.0); plant(R, 19.6, 17.8, 1.0);
+    R.spawn = { x: 12, z: 14.2, yaw: FACE.n };
     return R;
   },
 

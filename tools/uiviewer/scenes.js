@@ -366,6 +366,11 @@ const SCENES = {
     const band = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.018, 8, 32), new THREE.MeshLambertMaterial({ color: 0x26304A })); band.rotation.x = Math.PI / 2; const btn = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 16), new THREE.MeshLambertMaterial({ color: 0xffffff })); btn.rotation.x = Math.PI / 2; btn.position.z = 0.16;
     ball.add(top, bot, band, btn); ball.visible = false; group.add(ball); S.ball = ball;
     let you = null, lookKey = "", foeFig = figureOf(BUGBOY_LOOK); group.add(foeFig.root); foeFig.root.position.set(2.2, 0, -2.4); foeFig.root.rotation.y = Math.PI - 0.35; S.foeFig = foeFig;
+    // Indoors (your rival in the lab), the battle's in the room's own round hall (the Interior Viewer's lab arena), its
+    // middle where the field's would be; you're not in the picture, just the POKéMON and the one you're battling.
+    const outdoors = group.children.slice();
+    const hall = (() => { const R = BUILD.arena_lab(); R.finish(); R.group.position.set(-0.6 - 12, 0, 2.5 - 12); R.group.visible = false; group.add(R.group); return R; })();
+    const rivalFig = figureOf(RIVAL_LOOK); rivalFig.root.visible = false; group.add(rivalFig.root);
     S.load = async (ours, foe) => {
       S.key = ours + "|" + foe;
       const [a, b] = await Promise.all([mon(ours), mon(foe)]);
@@ -390,9 +395,16 @@ const SCENES = {
       const k = JSON.stringify(G.look);
       if (k !== lookKey) { if (you) group.remove(you.root); you = figureOf(G.look); group.add(you.root); lookKey = k; S.you = you; }
       you.root.position.set(-2.35, 0, 7.5); you.root.rotation.y = 0.2;
-      foeFig.root.visible = !!o.trainer;
+      const inside = o.arena === "lab";
+      if (!inside) { S.foeName = null; S.foeMon = null; }
+      for (const c of outdoors) if (c !== ball && c !== foeFig.root) c.visible = !inside;
+      hall.group.visible = inside; you.root.visible = !inside;
+      // (Their trainer: your rival in the lab, else whoever it is.)
+      S.foeFig = inside ? rivalFig : foeFig;
+      foeFig.root.visible = !!o.trainer && !inside; rivalFig.root.visible = !!o.trainer && inside;
+      rivalFig.root.position.copy(foeFig.root.position); rivalFig.root.rotation.y = foeFig.root.rotation.y;
       S.load(o.ours || "pikachu", o.foe || "caterpie");
-      S.frame(); lightFor(0, 3, 14, 22); hemi3.color.set(0xeaf6ff); hemi3.groundColor.set(0x7a9a5a);
+      S.frame(); lightFor(0, 3, 14, 22); hemi3.color.set(inside ? 0xffffff : 0xeaf6ff); hemi3.groundColor.set(inside ? 0xcfc6b8 : 0x7a9a5a);
       ball.visible = false; S.foeHidden = 0; S.oursHidden = 0; S.foeRed = 0; S.path = null; S.holdCam = false; S.foeCheer = 0;
     };
     S.throwBall = (onLand) => {
@@ -408,7 +420,7 @@ const SCENES = {
         ball.position.lerpVectors(L.from, L.to, e); ball.position.y += Math.sin(k * Math.PI) * (L.arc || 0); ball.rotation.x += dt * (L.spin ?? 12);
         if (k >= 1) { if (L.at) L.at(); P.i++; P.t = 0; if (P.i >= P.legs.length) { S.path = null; ball.rotation.set(0, 0, 0); if (P.done) P.done(); } } }
       if (you) poseFigure(you, { cheer: S.cheer || 0, point: S.point || 0 });
-      if (foeFig.root.visible) poseFigure(foeFig, { point: S.foePoint || 0, cheer: S.foeCheer || 0, wave: S.foeWave || 0 });
+      for (const ff of [foeFig, rivalFig]) if (ff.root.visible) poseFigure(ff, { point: S.foePoint || 0, cheer: S.foeCheer || 0, wave: S.foeWave || 0 });
       if (S.throw) {
         const th = S.throw; th.t += dt;
         if (th.t < 0.7) { const k = th.t / 0.7; ball.position.lerpVectors(th.from, th.to, k); ball.position.y += Math.sin(k * Math.PI) * 2.2; ball.rotation.x += dt * 16; }

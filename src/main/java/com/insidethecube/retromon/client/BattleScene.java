@@ -140,8 +140,14 @@ public final class BattleScene {
 	 * kept inside the room's walls.
 	 */
 	private static void setUpInside() {
-		float h = stageH;
 		Minecraft mc = Minecraft.getInstance();
+		com.insidethecube.retromon.game.Interiors.Room room = com.insidethecube.retromon.game.Interiors.roomOf(mc.player);
+		com.insidethecube.retromon.game.Interiors.Arena arena = room == null ? null : com.insidethecube.retromon.game.Interiors.ARENAS.get(room.id());
+		if (arena != null) {
+			setUpArena(arena);
+			return;
+		}
+		float h = stageH;
 		Vec3 you = mc.player.position();
 		Entity t = hiddenNpc >= 0 ? level.getEntity(hiddenNpc) : null;
 		Vec3 look = Vec3.directionFromRotation(0, mc.player.getYRot()).multiply(1, 0, 1);
@@ -170,6 +176,52 @@ public final class BattleScene {
 		hero = person("hero", com.insidethecube.retromon.game.Npc.PERSON, heroAt, face(heroAt, enemyAt));
 		if (foeKey != null && !foeKey.isEmpty()) {
 			Vec3 foeAt = local(enemyAt, 1.3, 0, -1.4);
+			foe = person(foeKey, foeRole, foeAt, face(foeAt, mineAt));
+		}
+	}
+
+	/**
+	 * A battle in a room with its own arena (the lab's): the round hall goes up over you (as the outdoor stages do, and
+	 * comes down after), lit by unseen lamps, and the battle's fought across its middle facing its back wall: your
+	 * Pokémon, theirs, and their trainer behind theirs. You're not in the picture (Let's Go's indoor battles show just
+	 * the Pokémon and the trainer you're battling); the throw still comes from where you'd stand.
+	 */
+	private static void setUpArena(com.insidethecube.retromon.game.Interiors.Arena a) {
+		float h = stageH;
+		Minecraft mc = Minecraft.getInstance();
+		BEFORE.clear();
+		BlockPos you = mc.player.blockPosition();
+		int y = Math.min(level.getMaxY() - 12, you.getY() + 26);
+		int ox = you.getX() - (int) Math.round(a.w() / 2), oz = you.getZ() - (int) Math.round(a.d() / 2);
+		// Clear the air it goes into first (nothing's there, but just in case), then its blocks, then the lamps.
+		net.minecraft.world.level.block.state.BlockState prop = Retromon.PROP.defaultBlockState();
+		int[] c = a.cells();
+		int states = com.insidethecube.retromon.game.Interiors.STATES;
+		for (int i = 0; i + 3 < c.length; i += 4)
+			set(ox + c[i], y + c[i + 1], oz + c[i + 2], prop.setValue(com.insidethecube.retromon.game.Prop.M, Math.min(states - 1, c[i + 3])));
+		net.minecraft.world.level.block.state.BlockState lamp = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 15);
+		double cxr = a.w() / 2, czr = a.d() / 2, rad = Math.min(cxr, czr) - 2;
+		for (int dx = 2; dx < a.w(); dx += 4)
+			for (int dz = 2; dz < a.d(); dz += 4) {
+				if (Math.hypot(dx + 0.5 - cxr, dz + 0.5 - czr) > rad) continue;
+				BlockPos lp = new BlockPos(ox + dx, y + 4, oz + dz);
+				if (level.getBlockState(lp).isAir()) set(lp.getX(), lp.getY(), lp.getZ(), lamp);
+			}
+		centre = new Vec3(ox + cxr, y, oz + czr);
+		double far = 6.0 + Math.max(0, h - 1.5) * 1.3;
+		mineAt = centre.add(-0.6, 0, 2.6);
+		enemyAt = centre.add(1.6, 0, 2.6 - far);
+		mine = spawn(mineAt, face(mineAt, enemyAt));
+		theirs = spawn(enemyAt, face(enemyAt, mineAt));
+		// Behind yours and a little above, looking across to theirs and their trainer, the hall's back wall behind them.
+		cam = centre.add(-1.2, 2.3 + Math.max(0, h - 2) * 0.4, 9.2 + Math.max(0, h - 2) * 0.6);
+		aim(mineAt.lerp(enemyAt, 0.5).add(0, 0.9 + Math.max(0, h - 1) * 0.15, 0));
+		introTicks = INTRO;
+		Vec3 heroAt = mineAt.add(-1.6, 0, 1.6);
+		hero = person("hero", com.insidethecube.retromon.game.Npc.PERSON, heroAt, face(heroAt, enemyAt));
+		hero.setInvisible(true);
+		if (foeKey != null && !foeKey.isEmpty()) {
+			Vec3 foeAt = enemyAt.add(2.0, 0, -1.7 - Math.max(0, h - 1.5) * 0.4);
 			foe = person(foeKey, foeRole, foeAt, face(foeAt, mineAt));
 		}
 	}

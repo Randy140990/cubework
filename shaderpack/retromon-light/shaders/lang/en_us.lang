@@ -1,4 +1,4 @@
-option.INFO=Retromon Light 1.2.0
+option.INFO=Retromon Light 1.2.1
 option.INFO.comment=Made for Retromon by Insid3 Th3 Cub3. The light moves with the day; inside buildings, rooms keep their own light.
 option.SUN_STRENGTH=Sunlight
 option.SUN_STRENGTH.comment=How bright the sun is.
@@ -9,7 +9,7 @@ option.SHADOW_SOFTNESS.comment=How soft the edges of shadows are.
 option.SHADOW_STRENGTH=Shadow depth
 option.SHADOW_STRENGTH.comment=How dark shadows are.
 option.INSIDE_BRIGHTNESS=Inside
-option.INSIDE_BRIGHTNESS.comment=How bright rooms are inside buildings.
+option.INSIDE_BRIGHTNESS.comment=How bright rooms are inside buildings (bright and airy, as the newer games have them).
 option.shadowMapResolution=Shadow detail
 option.shadowMapResolution.comment=Higher is sharper and slower.
 option.shadowDistance=Shadow distance
