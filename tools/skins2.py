@@ -636,6 +636,8 @@ P("fisher", tone="fair", hair="short", hairc="6A5A4A", beard=True, beardc="8A7A6
 P("fisher_f", tone="fair", hair="ponytail", hairc="2A2420", fem=True, top="shirt", topc="F2C12E", collarc="F2C12E", bottom="trousers", botc="3D5F8F", hat="sunhat", hatc="F2E2A0", shoec="3A3A2A")
 P("sailor", tone="tan", hair="short", hairc="2A2420", top="shirt", topc="F4F4F4", collarc="2E4A8A", bottom="trousers", botc="F4F4F4", hat="sailor", hatc="F4F4F4", stripe="2E4A8A", stripe_rows=(2, 3), shoec="2A2A2A")
 P("gentleman", tone="pale", hair="swept", hairc="C8C8C8", moustache=True, beardc="D8D8D8", top="shirt", topc="F4F4F4", bottom="trousers", botc="2A2A34", coat="suit", coatc="3A3A48", coatlen=14, tie="8A2A3A", shoec="1A1A1A")
+# The Trainer School's teacher (Let's Go's): dark hair, an orange jacket, a green dress.
+P("school_teacher", tone="light", hair="long", hairc="2A1E1A", eyes="brown", fem=True, top="blouse", topc="F6F1E6", collarc="FFFFFF", bottom="dress", botc="4E9A5A", coat="blazer", coatc="E8823A", coatsleeve=12, shoec="5A3A22", earrings="F2C12E", lips="C85A5A")
 P("lady", tone="fair", hair="bun", hairc="E8C870", fem=True, top="blouse", topc="F2D2E2", bottom="dress", botc="E8A2C2", shoec="F4F4F4", earrings="F2C12E", lips="D04070")
 P("rich_boy", tone="pale", hair="swept", hairc="E8C870", top="shirt", topc="F4F4F4", bottom="shorts", botc="2E3A6A", coat="blazer", coatc="2E3A6A", coatsleeve=12, tie="C83A3A", socks="F4F4F4", shoec="3A2A1A")
 P("beauty", tone="medium", hair="long", hairc="2A1A1A", fem=True, top="tank", topc="C83A6A", bottom="dress", botc="C83A6A", shoec="1A1A1A", earrings="F2C12E", lips="C03050")

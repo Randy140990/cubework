@@ -1,1 +1,0 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gate_white","gate_white":"retromon:block/interior/gate_white"},"elements":[{"from":[14.88,0.0,16],"to":[16.0,3.84,16],"faces":{"north":{"uv":[0.0,12.16,1.12,16.0],"texture":"#gate_white"}}}]}

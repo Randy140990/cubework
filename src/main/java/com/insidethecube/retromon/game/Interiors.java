@@ -82,7 +82,7 @@ public final class Interiors {
 	public static final Map<String, Room> ROOMS = new LinkedHashMap<>();
 	public static final Map<String, Door> DOORS = new LinkedHashMap<>();
 	private static String startRoom = "house2";
-	private static double startX = 4.2, startZ = 9.5;
+	private static double startX = 3.6, startZ = 6.4;
 	private static float startYaw;
 	private static String version = "0";
 

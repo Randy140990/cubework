@@ -324,8 +324,8 @@ public class DialogueScreen extends GameScreen {
 
 	/**
 	 * The nurse's machine at work, as the viewer's: your balls (up to six) go from her hands onto its six cups one by
-	 * one, it glows and they flash, then they come back. Drawn where the machine is behind her counter (the Center's
-	 * room has it 6.45 to 8.55 across, 0.35 and 0.65 back, 1.36 up; she stands at 10, 3.3).
+	 * one, it glows and they flash, then they come back. Drawn where the machine is, right behind her under the big
+	 * screen (the Center's room has its cups 7.95 to 10.05 across, 0.35 and 0.65 back, 1.36 up; she stands at 9, 3).
 	 */
 	private void machine(GuiGraphics g, float h, float secs) {
 		net.minecraft.world.entity.Entity nurse = minecraft == null || minecraft.level == null ? null : minecraft.level.getEntity(npc);
@@ -334,19 +334,20 @@ public class DialogueScreen extends GameScreen {
 		int w = g.guiWidth(), gh = g.guiHeight();
 		// The machine's glow while it works.
 		if (h > 0.4F && h < 0.78F) {
-			float[] gp = Adventure.project(n.add(7.5 - 10, 1.9, 0.18 - 3.3), w, gh);
-			float[] ge = Adventure.project(n.add(7.5 - 10 + 1.6, 1.9, 0.18 - 3.3), w, gh);
+			float[] gp = Adventure.project(n.add(0, 1.9, 0.18 - 3.0), w, gh);
+			float[] ge = Adventure.project(n.add(1.6, 1.9, 0.18 - 3.0), w, gh);
 			if (gp != null && ge != null) {
 				float rx = Math.abs(ge[0] - gp[0]);
 				int a = (int) ((0.35 + 0.3 * Math.sin(secs * 16)) * 255);
 				Ui.glow(g, Math.round(gp[0]), Math.round(gp[1]), Math.round(rx), Math.round(rx / 2), (a << 24) | 0xFFB8C8);
 			}
 		}
+		healScreen(g, n, h, secs);
 		int count = Math.min(6, ClientState.data.party.size());
 		for (int i = 0; i < count; i++) {
 			float on0 = i * 0.06F, a = ease((h - on0) / 0.06F), back = ease((h - 0.78F - i * 0.02F) / 0.12F);
 			if (h <= on0 || back >= 1) continue;
-			double sx = 6.45 + (i % 3) * 1.05 - 10, sy = 1.36, sz = 0.35 + (i / 3) * 0.3 - 3.3;
+			double sx = -1.05 + (i % 3) * 1.05, sy = 1.36, sz = 0.35 + (i / 3) * 0.3 - 3.0;
 			double hx = 0, hy = 1.2, hz = 0.7;
 			double px, py, pz;
 			if (back > 0) {
@@ -388,6 +389,35 @@ public class DialogueScreen extends GameScreen {
 
 	private static float ease(float x) {
 		return x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+	}
+
+	/**
+	 * The big screen over the machine (2.4 either side of her, 2.55 to 3.85 up, on the back wall): while they rest,
+	 * your POKéMON's pictures on it, each lit as its ball goes on, a light under each flashing while the machine works
+	 * (as the UI Viewer's).
+	 */
+	private static void healScreen(GuiGraphics g, net.minecraft.world.phys.Vec3 n, float h, float secs) {
+		if (h <= 0 || h >= 1) return;
+		int w = g.guiWidth(), gh = g.guiHeight();
+		float[] tl = Adventure.project(n.add(-2.4, 3.85, 0.145 - 3.0), w, gh), br = Adventure.project(n.add(2.4, 2.55, 0.145 - 3.0), w, gh);
+		if (tl == null || br == null) return;
+		float a = Math.min(1, Math.min(h / 0.05F, (1 - h) / 0.05F));
+		V.fit(w, gh);
+		float k = V.s(1), ox = V.x(0), oy = V.y(0);
+		float x0 = (tl[0] - ox) / k, y0 = (tl[1] - oy) / k, sw = (br[0] - tl[0]) / k, sh = (br[1] - tl[1]) / k;
+		if (sw <= 4 || sh <= 2) return;
+		V.rrv(g, x0, y0, sw, sh, sh * 0.06F, Ui.alpha(0xFFFFE0DA, a), Ui.alpha(0xFFF7B6B0, a));
+		int count = Math.min(6, ClientState.data.party.size());
+		for (int i = 0; i < 6; i++) {
+			float cx = x0 + sw * (18 + i * 76) / 480F, cy = y0 + sh * 22 / 130F, cw = sw * 68 / 480F, ch = sh * 86 / 130F;
+			boolean on = i < count && h > i * 0.06F + 0.04F;
+			V.rr(g, cx, cy, cw, ch, cw * 0.2F, Ui.alpha(on ? 0xEBFFFFFF : 0x59FFFFFF, a));
+			if (!on) continue;
+			float ps = Math.min(cw - 4, ch * 0.7F);
+			V.img(g, Look.portrait(ClientState.data.party.get(i).species.id()), cx + (cw - ps) / 2, cy + ch * 0.08F, ps, ps, 128, 128, Ui.alpha(0xFFFFFFFF, a));
+			boolean lit = h > 0.4F && h < 0.78F && Math.sin(secs * 14 + i) > 0;
+			V.ellipse(g, cx + cw / 2, cy + ch * 0.9F, cw * 0.06F, cw * 0.06F, Ui.alpha(lit ? 0xFF58D3A0 : 0xFFE5525C, a));
+		}
 	}
 
 	private static int badgeIn(String line) {

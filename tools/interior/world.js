@@ -177,37 +177,56 @@ class Room {
 
 // ---------- the shell: floor, the three walls you can see, skirting, and the shade where wall meets floor ----------
 const T_WALL = 0.4;
+// o.entry: the door's mat sits in a little nook two blocks deep (Let's Go's rooms have one): the room's floor and
+// side walls stop two blocks short of the front, a low wooden ledge runs across the front either side of the nook
+// and down both its sides, and the room opens up past it. true: a nook a block wider than the door each side; or
+// [x0, x1]. room.Dm is where the room proper ends (D without a nook).
 function shell(room, o = {}) {
   const { W, D, H } = room, G = room.geo, T = T_WALL, paper = o.paper || "paperMum";
-  const floors = o.floorRects || [[0, 0, W, D]];
+  const ent = o.entry ? (o.entry === true ? [o.door[0] - 1, o.door[1] + 1] : o.entry) : null, Dm = ent ? D - 2 : D;
+  room.Dm = Dm; room.entry = ent;
+  const floors = o.floorRects || (ent ? [[0, 0, W, Dm], [ent[0], Dm, ent[1], D]] : [[0, 0, W, D]]);
   // The slab, cut along the front so its edge shows as a section.
-  for (const [x0, z0, x1, z1] of floors) G.box(x0, -0.35, z0, x1, 0, z1, { top: o.floor || "oak", s: z1 >= D - 1e-6 ? "cap" : null, n: null, e: null, w: null, bottom: null });
-  G.box(-T, -0.35, -T, 0, 0, D, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
-  G.box(W, -0.35, -T, W + T, 0, D, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
-  for (const z of o.zones || []) G.box(z[0], 0, z[1], z[2], 0.012, z[3], { top: z[4], s: z[3] >= D - 1e-6 ? "cap" : null, n: null, e: null, w: null, bottom: null });
+  for (const [x0, z0, x1, z1] of floors) {
+    const nook = ent && z0 >= Dm - 1e-6;
+    G.box(x0, -0.35, z0, x1, 0, z1, { top: (nook && o.entryFloor) || o.floor || "oak", s: z1 >= Dm - 1e-6 ? "cap" : null, n: null, e: nook ? "cap" : null, w: nook ? "cap" : null, bottom: null });
+  }
+  G.box(-T, -0.35, -T, 0, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
+  G.box(W, -0.35, -T, W + T, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
+  for (const z of o.zones || []) G.box(z[0], 0, z[1], z[2], 0.012, z[3], { top: z[4], s: z[3] >= Dm - 1e-6 ? "cap" : null, n: null, e: null, w: null, bottom: null });
   // Walls: north, west and east. Their tops and cut ends are drawn dark, as a section.
   G.box(-T, 0, -T, W + T, H, 0, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
-  G.box(-T, 0, 0, 0, H, D, { e: paper, top: "cap", s: "cap", n: null, w: null, bottom: null });
-  G.box(W, 0, 0, W + T, H, D, { w: paper, top: "cap", s: "cap", n: null, e: null, bottom: null });
+  G.box(-T, 0, 0, 0, H, Dm, { e: paper, top: "cap", s: "cap", n: null, w: null, bottom: null });
+  G.box(W, 0, 0, W + T, H, Dm, { w: paper, top: "cap", s: "cap", n: null, e: null, bottom: null });
   room.solid(-5, -5, W + 5, 0); room.solid(-5, -5, 0, D + 5); room.solid(W, -5, W + 5, D + 5);
   // The open front: solid but for the door.
   const door = o.door;
-  if (door) { room.solid(-5, D, door[0], D + 5); room.solid(door[1], D, W + 5, D + 5); } else room.solid(-5, D, W + 5, D + 5);
+  if (ent) {
+    // The ledge: across the front either side of the nook, and down its two sides.
+    const lm = o.ledge || "walnut", lh = 0.7, lt = 0.3;
+    for (const [x0, x1] of [[0, ent[0]], [ent[1], W]]) if (x1 - x0 > 1e-6) {
+      G.box(x0, 0, Dm - lt, x1, lh, Dm, { all: lm, top: o.ledgeTop || lm, bottom: null });
+      G.box(x0, lh, Dm - lt - 0.03, x1, lh + 0.06, Dm + 0.03, o.ledgeTop || lm);
+    }
+    for (const x of [ent[0], ent[1] - 0.08]) G.box(x, 0, Dm, x + 0.08, 0.05, D, { all: "cap", bottom: null });
+    room.solid(-5, Dm - lt, ent[0], D + 5); room.solid(ent[1], Dm - lt, W + 5, D + 5);
+    room.item("Entry", "The mat in a little nook at the door, its whole width; a low wooden ledge across the front either side, a dark edge down the nook's sides; the room opens up past it.");
+  } else if (door) { room.solid(-5, D, door[0], D + 5); room.solid(door[1], D, W + 5, D + 5); } else room.solid(-5, D, W + 5, D + 5);
   // Skirting boards and a picture rail.
-  const sk = o.skirt || "paint";
-  G.box(0, 0, 0, W, 0.24, 0.07, { all: sk, n: null, bottom: null });
-  G.box(0, 0, 0, 0.07, 0.24, D, { all: sk, w: null, bottom: null });
-  G.box(W - 0.07, 0, 0, W, 0.24, D, { all: sk, e: null, bottom: null });
+  const sk = o.skirt || "paint", skh = o.skirtH || 0.24;
+  G.box(0, 0, 0, W, skh, 0.07, { all: sk, n: null, bottom: null });
+  G.box(0, 0, 0, 0.07, skh, Dm, { all: sk, w: null, bottom: null });
+  G.box(W - 0.07, 0, 0, W, skh, Dm, { all: sk, e: null, bottom: null });
   if (o.rail !== false) {
     const ry = H - 0.55;
     G.box(0, ry, 0, W, ry + 0.1, 0.06, { all: sk, n: null });
-    G.box(0, ry, 0, 0.06, ry + 0.1, D, { all: sk, w: null });
-    G.box(W - 0.06, ry, 0, W, ry + 0.1, D, { all: sk, e: null });
+    G.box(0, ry, 0, 0.06, ry + 0.1, Dm, { all: sk, w: null });
+    G.box(W - 0.06, ry, 0, W, ry + 0.1, Dm, { all: sk, e: null });
   }
   // The soft shade where the walls meet the floor.
   G.box(0, 0.02, 0, W, 0.02, 1.1, { top: "aoN", all: null });
-  G.box(0, 0.02, 0, 1.1, 0.02, D, { top: "aoW", all: null });
-  G.box(W - 1.1, 0.02, 0, W, 0.02, D, { top: "aoE", all: null });
+  G.box(0, 0.02, 0, 1.1, 0.02, Dm, { top: "aoW", all: null });
+  G.box(W - 1.1, 0.02, 0, W, 0.02, Dm, { top: "aoE", all: null });
 }
 function sunPool(room, x0, z0, x1, z1) { room.geo.box(x0, 0.03, z0, x1, 0.03, z1, { top: "sunPool", all: null }); }
 
@@ -222,8 +241,9 @@ function windowN(room, x, y, w = 2.2, h = 2, o = {}) {
   if (o.curtains) {
     const c = o.curtains;
     G.box(x - 0.45, y + h + 0.3, 0.12, x + w + 0.45, y + h + 0.38, 0.2, "steel");
-    G.box(x - 0.6, y - 0.4, 0.16, x - 0.05, y + h + 0.32, 0.34, c);
-    G.box(x + w + 0.05, y - 0.4, 0.16, x + w + 0.6, y + h + 0.32, 0.34, c);
+    const k = o.curtainIn || 0;
+    G.box(x - 0.6, y - 0.4, 0.16, x - 0.05 + k, y + h + 0.32, 0.34, c);
+    G.box(x + w + 0.05 - k, y - 0.4, 0.16, x + w + 0.6, y + h + 0.32, 0.34, c);
   }
   if (o.plant) { G.box(x + 0.15, y - t, 0.05, x + 0.55, y + 0.3 - t, 0.28, "potWhite"); G.box(x + 0.1, y + 0.3 - t, 0.02, x + 0.6, y + 0.85 - t, 0.32, "leafSolid"); }
   if (o.pool !== false) sunPool(room, x - 0.3, 1.2, x + w + 0.3, 1.2 + h * 1.4);
@@ -371,7 +391,8 @@ function bookshelf(room, X, Z, f, w = 2, h = 3, o = {}) {
     const y = 0.18 + i * 0.72;
     F.box(0.1, y, 0.05, w - 0.1, y + 0.06, d, wood);
     const skip = (o.trinkets || {})[i];
-    if (skip === "ball") { F.box(0.15, y + 0.06, 0.05, w * 0.55, y + 0.56, d - 0.12, { front: "books", all: "linen" }); F.box(w * 0.62, y + 0.06, 0.25, w * 0.62 + 0.36, y + 0.42, 0.61, { front: "ball", all: "ball" }); }
+    if (o.drawers && i === 0) F.box(0.12, y + 0.06, 0.05, w - 0.12, y + 0.66, d - 0.02, { front: "drawers", all: wood });
+    else if (skip === "ball") { F.box(0.15, y + 0.06, 0.05, w * 0.55, y + 0.56, d - 0.12, { front: "books", all: "linen" }); F.box(w * 0.62, y + 0.06, 0.25, w * 0.62 + 0.36, y + 0.42, 0.61, { front: "ball", all: "ball" }); }
     else if (skip === "plant") { F.box(0.15, y + 0.06, 0.05, w * 0.6, y + 0.56, d - 0.12, { front: "books", all: "linen" }); F.box(w * 0.68, y + 0.06, 0.25, w * 0.68 + 0.34, y + 0.32, 0.55, "potWhite"); F.box(w * 0.66, y + 0.32, 0.22, w * 0.66 + 0.4, y + 0.62, 0.58, "leafSolid"); }
     else if (skip === "trophy") { F.box(0.15, y + 0.06, 0.05, w * 0.5, y + 0.56, d - 0.12, { front: "books", all: "linen" }); trophy(F, w * 0.66, y + 0.06, 0.35, 0.6); }
     else F.box(0.15, y + 0.06, 0.05, w - 0.15, y + 0.56, d - 0.12, { front: "books", all: "linen", top: "linen" });
@@ -455,7 +476,9 @@ function stairsDown(room, x0, z0 = 0, depth = 2, o = {}) {
 }
 function doormat(room, x0, x1, o = {}) {
   const D = room.D, G = room.geo;
-  G.box(x0, 0, D - 2, x1, 0.03, D, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
+  if (room.entry) [x0, x1] = room.entry;
+  const m = o.mat || "doormat", mk = x1 - x0 > 3 && MATDEF[m + "W"] ? m + "W" : m;
+  G.box(x0, 0, D - 2, x1, 0.03, D, { top: mk, s: "cap", all: "cap", bottom: null });
   sunPool(room, x0 - 0.6, D - 3.6, x1 + 0.6, D);
   room.exitArrow = { x: (x0 + x1) / 2, z: D - 0.55 };
   if (!o.none) room.warps.push({ test: (p, input) => p.z > D - 1.0 && p.x > x0 && p.x < x1 && input.down, to: o.to, spawn: o.spawn, fx: "fadeOut", why: "out" });

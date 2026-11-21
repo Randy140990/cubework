@@ -259,7 +259,7 @@ public final class Game {
 	public static void toLab(ServerPlayer p) {
 		if (data(p).started) return;
 		Interiors.Room lab = Interiors.ROOMS.get("lab");
-		if (lab != null && Interiors.go(p, lab, 9.6, 6.3, 180F, false)) {
+		if (lab != null && Interiors.go(p, lab, 7.6, 6.2, 180F, false)) {
 			BUSY.put(p.getUUID(), 200);
 			return;
 		}

@@ -2,7 +2,7 @@
 // Inside, a room is 16 blocks wide (west to east) and 14 deep (north to south), its walls 4 high: twice the old games' 8 by 7
 // tiles of floor. Outside, the houses are 8 by 6, so they're bigger on the inside, as the old games were.
 const FACE = { n: 0, w: Math.PI / 2, s: Math.PI, e: -Math.PI / 2 };
-const DOOR = [5, 7];
+const DOOR = [6, 8];
 const PLACES = [
   { id: "house2", name: "Your room", floor: "Upstairs", group: "Your house" },
   { id: "house1", name: "Your house", floor: "Downstairs", group: "Your house" },
@@ -17,14 +17,15 @@ const PLACES = [
   { id: "gate_n", name: "Route 2 gate", floor: "North", group: "Route 2" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
 ];
-const FROM_TOWN = { x: 6.0, z: 12.5, yaw: FACE.n };
-const LAB_DOOR = [8, 10], LAB_IN = { x: 9.0, z: 18.5, yaw: FACE.n }, FROM_LAB = { x: 25.0, z: 23.1, yaw: FACE.s };
-const STAIRS_FOOT = { x: 11.1, z: 1.1, yaw: FACE.s };
-const STAIRS_TOP = { x: 15.5, z: 2.9, yaw: FACE.s };
+// Your house and the rival's (14 by 13, the mat in a nook at the door), the stairs at the back on the right.
+const FROM_TOWN = { x: 7.0, z: 11.5, yaw: FACE.n };
+const LAB_DOOR = [7, 9], LAB_IN = { x: 8.0, z: 14.5, yaw: FACE.n }, FROM_LAB = { x: 25.0, z: 23.1, yaw: FACE.s };
+const STAIRS_FOOT = { x: 9.1, z: 1.1, yaw: FACE.s };
+const STAIRS_TOP = { x: 13.5, z: 2.9, yaw: FACE.s };
 
 // The Pokémon Center's and the Poké Mart's ways in (2 wide, in the middle of the front), and where you stand coming in.
-const CENTER_DOOR = [9, 11], CENTER_IN = { x: 10.0, z: 14.5, yaw: FACE.n };
-const MART_DOOR = [7, 9], MART_IN = { x: 8.0, z: 12.5, yaw: FACE.n };
+const CENTER_DOOR = [8, 10], CENTER_IN = { x: 9.0, z: 12.5, yaw: FACE.n };
+const MART_DOOR = [6, 8], MART_IN = { x: 7.0, z: 10.5, yaw: FACE.n };
 // The Trainer House (Viridian City): its way in, and the stairs between its floors (as your house's are).
 // Viridian Forest and its two gatehouses (Route 2): the south gate's way in, its door through to the forest, the
 // forest's ways out (south at the bottom right, north at the top left), the north gate's.
@@ -35,8 +36,8 @@ const GN_FROM_FOREST = { x: 7.0, z: 8.5, yaw: FACE.n }, GN_IN = { x: 7.0, z: 2.6
 const TH_DOOR = [7, 9], TH_IN = { x: 8.0, z: 12.5, yaw: FACE.n }, TH_FOOT = { x: 11.1, z: 1.1, yaw: FACE.s }, TH_TOP = { x: 15.5, z: 2.9, yaw: FACE.s };
 // Viridian's two green-roofed buildings: the Trainer School above the Center (the Trainer House's battle room under
 // it), and the house above that. Both small, as their outsides are (10 by 6).
-const SCHOOL_DOOR = [5, 7], SCHOOL_IN = { x: 6.0, z: 8.5, yaw: FACE.n }, SCHOOL_TOP = { x: 13.5, z: 2.9, yaw: FACE.s };
-const VHOUSE_DOOR = [5, 7], VHOUSE_IN = { x: 6.0, z: 7.5, yaw: FACE.n };
+const SCHOOL_DOOR = [5, 7], SCHOOL_IN = { x: 6.0, z: 9.5, yaw: FACE.n }, SCHOOL_TOP = { x: 13.5, z: 2.9, yaw: FACE.s };
+const VHOUSE_DOOR = [5, 7], VHOUSE_IN = { x: 6.0, z: 9.5, yaw: FACE.n };
 // The Route 2 gates, as Let's Go has them (one design for every gate, its people its own): in from the route at the
 // south, a long blue runner to the way on at the north.
 const LG_GATE_DOOR = [6, 8], LG_GATE_IN = { x: 7.0, z: 10.5, yaw: FACE.n }, LG_GATE_FROM_N = { x: 7.0, z: 2.6, yaw: FACE.s };
@@ -133,22 +134,24 @@ function drawScoreboard(P, f) {
   }, { fit: true });
   // Each room's own mat at the door, as carpet: its colour, a border, and a ball (or stripes) in the middle.
   const mat = (base, edge, north) => (P, r) => {
-    const cream = hx("#F6F1EA");
+    const cream = hx("#F6F1EA"), w = P.w, cx = w / 2 - 16;
     P.fill(hx(base), 0.04, r);
-    P.rect(0, 0, 32, 2, hx(edge)); P.rect(0, 30, 32, 2, hx(edge)); P.rect(0, 0, 2, 32, hx(edge)); P.rect(30, 0, 2, 32, hx(edge));
-    P.rect(4, 4, 24, 1, cream); P.rect(4, 27, 24, 1, cream); P.rect(4, 4, 1, 24, cream); P.rect(27, 4, 1, 24, cream);
-    // Two chevrons, pointing south (out).
+    P.rect(0, 0, w, 2, hx(edge)); P.rect(0, 30, w, 2, hx(edge)); P.rect(0, 0, 2, 32, hx(edge)); P.rect(w - 2, 0, 2, 32, hx(edge));
+    P.rect(4, 4, w - 8, 1, cream); P.rect(4, 27, w - 8, 1, cream); P.rect(4, 4, 1, 24, cream); P.rect(w - 5, 4, 1, 24, cream);
+    // Two chevrons in the middle, pointing south (out).
     // (Pointing north for a way through the north wall.)
-    for (const y0 of [8, 16]) for (let k = 0; k < 7; k++) { const y = north ? 30 - (y0 + k) - 2 : y0 + k; P.rect(8 + k, y, 2, 2, cream); P.rect(22 - k, y, 2, 2, cream); }
+    for (const y0 of [8, 16]) for (let k = 0; k < 7; k++) { const y = north ? 30 - (y0 + k) - 2 : y0 + k; P.rect(cx + 8 + k, y, 2, 2, cream); P.rect(cx + 22 - k, y, 2, 2, cream); }
   };
-  reg("matHome", 32, 32, mat("#C9433F", "#8E2A2A"), { fit: true });
-  reg("matRival", 32, 32, mat("#33477A", "#1E2A4A"), { fit: true });
-  reg("matLab", 32, 32, mat("#2F9C8A", "#1D6B5E"), { fit: true });
-  reg("matCenter", 32, 32, mat("#F08A3C", "#C7502E"), { fit: true });
-  reg("matMart", 32, 32, mat("#3A6FD0", "#24479A"), { fit: true });
-  reg("matTrainer", 32, 32, mat("#E8823A", "#A9531F"), { fit: true });
-  reg("matForest", 32, 32, mat("#4E9A4A", "#2F6B33"), { fit: true });
-  reg("matForestN", 32, 32, mat("#4E9A4A", "#2F6B33", true), { fit: true });
+  // Each mat, and a wide one (4 across, for the nooks at the doors).
+  const matReg = (k, base, edge, north) => { reg(k, 32, 32, mat(base, edge, north), { fit: true }); reg(k + "W", 64, 32, mat(base, edge, north), { fit: true }); };
+  matReg("matHome", "#C9433F", "#8E2A2A");
+  matReg("matRival", "#33477A", "#1E2A4A");
+  matReg("matLab", "#2F9C8A", "#1D6B5E");
+  matReg("matCenter", "#F08A3C", "#C7502E");
+  matReg("matMart", "#3A6FD0", "#24479A");
+  matReg("matTrainer", "#E8823A", "#A9531F");
+  matReg("matForest", "#4E9A4A", "#2F6B33");
+  matReg("matForestN", "#4E9A4A", "#2F6B33", true);
   // The forest's own: the ground under the trees, a wall of leaves round it, the gates' boards and paper.
   reg("forestGround", 16, 16, (P, r) => { P.fill(hx("#7DB65A"), 0.08, r); for (let i = 0; i < 10; i++) P.set(r() * 16, r() * 16, hx("#6AA24C")); });
   reg("forestPath", 16, 16, (P, r) => mcStone(P, r, hx("#D8BE88"), 0.05, 4));
@@ -188,10 +191,53 @@ function drawScoreboard(P, f) {
   reg("gateWhite", 16, 16, (P, r) => P.fill(hx("#F4F6F4"), 0.02, r));
   reg("stoolTop", 16, 16, (P, r) => { P.fill(hx("#9A5B34"), 0.05, r); P.rect(0, 0, 16, 1, hx("#B8774A")); });
   reg("binRed", 16, 16, (P, r) => { P.fill(hx("#E0603A"), 0.04, r); P.rect(0, 0, 16, 2, hx("#F08A62")); });
-  reg("matSchool", 32, 32, mat("#9C6A3C", "#6B4524"), { fit: true });
-  reg("matHouseV", 32, 32, mat("#3E8A6E", "#2A5E4B"), { fit: true });
-  reg("matGate", 32, 32, mat("#3A63B8", "#25418A"), { fit: true });
-  reg("matGateN", 32, 32, mat("#3A63B8", "#25418A", true), { fit: true });
+  matReg("matSchool", "#9C6A3C", "#6B4524");
+  // The redesign from Let's Go: the lab's purple mat and its pale oak boards laid on the diagonal; the Mart's blue and
+  // white diamonds; dark wide boards (the school and the Viridian house); blush pink and blue corner posts; green
+  // cushions and quilt, a green felt top, a white lamp shade, cardboard, a DVD player's front.
+  matReg("matLabPurple", "#8F60DE", "#5E3AA6");
+  reg("oakDiagonal", 32, 32, (P, r) => {
+    const base = hx("#E7DDCC"), gap = hx("#B4A690"), tones = [];
+    for (let k = 0; k < 4; k++) tones.push((r() - 0.5) * 0.1);
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+      const d = (x + y) % 32, row = Math.floor(d / 8), along = (x - y + 64) % 32;
+      let c = shadec(base, tones[row] + (r() - 0.5) * 0.04 + Math.sin(along * 0.6 + row * 2) * 0.02);
+      if (d % 8 === 0) c = gap; else if ((along + row * 11) % 32 === 0) c = shadec(base, -0.2);
+      P.set(x, y, c);
+    }
+  }, { per: 2 });
+  reg("mcDiamondBlue", 32, 32, (P, r) => {
+    const a = hx("#F4F8FB"), b = hx("#8EC0E6"), line = hx("#C8DCEA");
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+      const u = (x + y) % 32, v = (x - y + 32) % 32;
+      let c = shadec((u < 16) === (v < 16) ? a : b, (r() - 0.5) * 0.04);
+      if (u === 0 || u === 16 || v === 0 || v === 16) c = mixc(c, line, 0.6);
+      P.set(x, y, c);
+    }
+  }, { per: 2 });
+  reg("midBoards", 32, 32, (P, r) => planks(P, r, hx("#A9764A"), hx("#C28E5E"), hx("#8C5C36"), hx("#5C3B1F"), 8, 32), { per: 2 });
+  reg("darkBoards", 32, 32, (P, r) => planks(P, r, hx("#6E4426"), hx("#84522E"), hx("#583418"), hx("#3A220F"), 8, 32), { per: 2 });
+  const post = (c, l, d) => (P, r) => { P.fill(hx(c), 0.04, r); P.rect(0, 0, 2, 16, hx(l)); P.rect(14, 0, 2, 16, hx(d)); };
+  reg("postPink", 16, 16, post("#E9B7BC", "#F6D2D6", "#C9939A"));
+  reg("postBlue", 16, 16, post("#4A86D8", "#7CAAF0", "#2F62AE"));
+  reg("greenFabric", 16, 16, (P, r) => fabric(P, r, hx("#6FB55A")));
+  reg("quiltGreen", 16, 16, (P, r) => {
+    const cols = [hx("#5DAE52"), hx("#8ACB6E"), hx("#3F8A44"), hx("#F4EEE2")];
+    for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = cols[(tx * 3 + ty) % 4]; for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) P.set(tx * 8 + x, ty * 8 + y, shadec(c, ((x + y) % 2 ? 0.03 : -0.03) + (x === 0 || y === 0 ? -0.12 : 0))); }
+  });
+  reg("feltGreen", 16, 16, (P, r) => fabric(P, r, hx("#86B86E"), 0.04));
+  reg("lampWhite", 16, 16, (P, r) => P.fill(hx("#F7F5EE"), 0.02, r), { glow: 0.6 });
+  reg("cardboard", 16, 16, (P, r) => { P.fill(hx("#C9A06A"), 0.05, r); P.rect(0, 7, 16, 2, hx("#E0C48E")); });
+  reg("dvdFront", 16, 8, (P, r) => { P.fill(hx("#2A2D33"), 0.03, r); P.rect(2, 3, 8, 1, hx("#111318")); P.set(13, 3, hx("#58D3A0")); }, { fit: true });
+  // Rugs: Mum's salmon one under the table, green and blue kitchen mats, your big red rug, the Center's ring at the door.
+  RUGS.salmon = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#E07A6A" : ((i + j) % 2 ? "#F4A08E" : "#F6AE9C");
+  RUGS.kitchenGreen = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#3F8A44" : "#5DAE52";
+  RUGS.kitchenBlue = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#2E4A7A" : "#4A6FA8";
+  RUGS.redRoom = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#9A2C34" : ((i + j) % 2 ? "#D9424A" : "#CF3A42");
+  RUGS.centerRing = (i, j, w, d) => { const t = Math.hypot((i + 0.5 - w / 2) / (w / 2), (j + 0.5 - d / 2) / (d / 2)); return t > 1.05 ? "#F4A866" : (t > 0.66 && t < 0.92) || t < 0.22 ? "#F6F1EA" : "#E8823A"; };
+  matReg("matHouseV", "#3E8A6E", "#2A5E4B");
+  matReg("matGate", "#3A63B8", "#25418A");
+  matReg("matGateN", "#3A63B8", "#25418A", true);
   // The gate's runner: blue, a yellow line round it.
   RUGS.gateRun = (i, j, w, d) => (i === 0 || i === w - 1 || j === 0 || j === d - 1) ? "#E9D27A" : (j % 3 === 1 ? "#5A8EE0" : "#4A7FD4");
   RUGS.thRun = (i, j, w, d) => (i === 0 || i === w - 1) ? "#FBF1E4" : (j % 3 === 1 ? "#F09A56" : "#E8823A");
@@ -206,7 +252,7 @@ function drawScoreboard(P, f) {
 
 // A band of colour round the three walls you can see, at a height.
 function band(room, y, mat, h = 0.22) {
-  const G = room.geo, W = room.W, D = room.D;
+  const G = room.geo, W = room.W, D = room.Dm || room.D;
   G.box(0, y, 0, W, y + h, 0.04, { s: mat, all: null }); G.box(0, y, 0, 0.04, y + h, D, { e: mat, all: null }); G.box(W - 0.04, y, 0, W, y + h, D, { w: mat, all: null });
 }
 // Shelves of goods (the Mart's): white uprights, a coloured kick, goods on every shelf.
@@ -289,8 +335,8 @@ function roundBall(G, cx, y, cz, s) {
   G.box(cx - h + r, y, cz - h + r, cx + h - r, y + s, cz + h - r, m);
   G.box(cx - h + r, y + r, cz - h, cx + h - r, y + s - r, cz + h, m);
 }
-function ballTable(room, x0, z0, x1, z1) {
-  table(room, x0, z0, x1, z1, { top: "lab", leg: "steel", h: 0.95, name: "The table of balls", note: "A white-topped steel table with three balls in a row." });
+function ballTable(room, x0, z0, x1, z1, o = {}) {
+  table(room, x0, z0, x1, z1, { top: o.top || "lab", leg: o.leg || "steel", h: 0.95, name: "The table of balls", note: o.note || "A white-topped steel table with three balls in a row." });
   const n = 3, s = 0.36, y = 0.95, cz = (z0 + z1) / 2;
   for (let i = 0; i < n; i++) { const cx = x0 + (x1 - x0) * (i + 1) / (n + 1); roundBall(room.geo, cx, y, cz, s); }
   room.act([x0, z0 - 0.3, x1, z1 + 0.3], { label: "Look", lines: ["Three balls, each with a creature inside.", "The professor will let you choose one when he's ready."] });
@@ -481,25 +527,25 @@ function cornerPost(R, x, z, s = 0.42, mat = "beam") {
 // ({ to } for a real one, { none, lines } for one that goes nowhere yet).
 function lgGate(R, o) {
   const D = R.D;
-  shell(R, { paper: "paperGateLG", floor: "gateCheck", door: LG_GATE_DOOR, skirt: "gateWhite" });
+  shell(R, { paper: "paperGateLG", floor: "gateCheck", door: LG_GATE_DOOR, entry: true, skirt: "gateWhite", ledge: "gateBlue", ledgeTop: "gateWhite" });
   // The blue lower walls, a white rail over them.
   band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
   // Windows down both sides.
-  for (const z of [2.6, 7.4]) for (const wall of ["w", "e"]) crossWindow(R, wall, z, 1.6, 2.0, 1.4, ["Outside: the trees along ROUTE 2."]);
+  for (const z of [2.6, 6.2]) for (const wall of ["w", "e"]) crossWindow(R, wall, z, 1.6, 2.0, 1.4, ["Outside: the trees along ROUTE 2."]);
   // The way at the north (dark, the forest's green beyond), palms either side.
   const north = o.north || {};
   passageN(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], north.none ? { none: true, mat: "matGateN", frame: "paint" } : { to: north.to, spawn: north.spawn, mat: "matGateN", frame: "paint" });
   if (north.none) R.act([LG_GATE_DOOR[0], 0, LG_GATE_DOOR[1], 1.2], { label: "Look", lines: north.lines });
   palm(R, 4.6, 0.9, 1.0); palm(R, 9.4, 0.9, 1.0);
   // The runner, from the way on at the north to the door at the south.
-  rug(R, 5, 2, 9, D - 2, "gateRun");
+  rug(R, 5, 2, 9, R.Dm, "gateRun");
   // Stools round two glass tables on the east side, a few along the west wall; plants; a bin.
-  glassTable(R, 10.4, 3.2, 11.9, 4.6, { lines: ["A glass table. There's a leaflet: VIRIDIAN FOREST, A WALK FOR ALL AGES!"] });
-  stool(R, 12.6, 3.9); stool(R, 11.15, 2.5); stool(R, 9.7, 3.9);
-  glassTable(R, 10.4, 6.9, 11.9, 8.3, { lines: ["A glass table. Someone's left a map of ROUTE 2 on it."] });
-  stool(R, 12.6, 7.6); stool(R, 11.15, 9.0); stool(R, 9.7, 7.6);
-  stool(R, 1.0, 7.6); stool(R, 1.0, 8.8);
-  slimPlant(R, 0.8, 3.6, 1.0); plant(R, 1.0, D - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); slimPlant(R, 13.2, D - 1.0, 1.0);
+  glassTable(R, 10.4, 3.0, 11.9, 4.4, { lines: ["A glass table. There's a leaflet: VIRIDIAN FOREST, A WALK FOR ALL AGES!"] });
+  stool(R, 12.6, 3.7); stool(R, 11.15, 2.3); stool(R, 9.7, 3.7);
+  glassTable(R, 10.4, 6.2, 11.9, 7.6, { lines: ["A glass table. Someone's left a map of ROUTE 2 on it."] });
+  stool(R, 12.6, 6.9); stool(R, 11.15, 8.3); stool(R, 9.7, 6.9);
+  stool(R, 1.0, 6.6); stool(R, 1.0, 7.8);
+  slimPlant(R, 0.8, 3.4, 1.0); plant(R, 1.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); slimPlant(R, 13.2, R.Dm - 1.0, 1.0);
   bin(R, 13.3, 1.0);
   const south = o.south || {};
   doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], south.none ? { none: true, mat: "matGate" } : { to: south.to, spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matGate" });
@@ -582,34 +628,174 @@ function drawMartAd(P, f) {
   if (f % 8 < 4) for (let i = 0; i < 3; i++) P.set(4 + i * 15, 3, hx("#FFFFFF"));
 }
 
+// ---------- the Let's Go redesign's own pieces ----------
+// A dresser (your house's): cupboards below, an open hutch above with plates standing on its shelves, a honey top.
+function dresser(R, X, w = 2.4, o = {}) {
+  const F = R.F(X, 0, "s"), body = o.body || "paint", top = o.top || "honey";
+  F.box(0, 0, 0, w, 0.1, 0.6, "cap");
+  F.box(0, 0.1, 0, w, 1.0, 0.66, { all: body, front: null, back: null, bottom: null });
+  const n = Math.max(2, Math.round(w / 1.1));
+  for (let i = 0; i < n; i++) F.box(i * w / n + 0.03, 0.14, 0.66, (i + 1) * w / n - 0.03, 0.96, 0.67, { front: "cupboardWhite", all: null });
+  F.box(-0.04, 1.0, -0.02, w + 0.04, 1.07, 0.71, top);
+  F.box(0.04, 1.07, 0, 0.14, 2.62, 0.42, body); F.box(w - 0.14, 1.07, 0, w - 0.04, 2.62, 0.42, body);
+  F.box(0.14, 1.07, 0, w - 0.14, 2.62, 0.04, { front: o.back || "mintPaint", all: null });
+  for (const y of [1.6, 2.12]) F.box(0.14, y, 0.04, w - 0.14, y + 0.05, 0.42, body);
+  for (const y of [1.07, 1.65, 2.17]) for (let p = 0.42; p < w - 0.3; p += 0.46) {
+    F.box(p - 0.17, y + 0.06, 0.1, p + 0.17, y + 0.3, 0.14, "potWhite");
+    F.box(p - 0.11, y, 0.1, p + 0.11, y + 0.36, 0.14, "potWhite");
+  }
+  F.box(-0.02, 2.62, -0.02, w + 0.02, 2.74, 0.48, top);
+  F.solid(0, 0, w, 0.71);
+  R.act(F.rect(0, 0.3, w, 1.3), { label: "Look", lines: o.lines || ["Mum's best plates, lined up on the dresser. Nobody's allowed to use them."] });
+  R.item(o.name || "Dresser", o.note || "Cupboards below, an open hutch above with plates standing on its shelves.");
+}
+// A chest of four drawers (beside your desk).
+function drawerUnit(R, X, Z, f, w = 0.9, h = 1.1, wood = "pale") {
+  const F = R.F(X, Z, f);
+  F.box(0, 0, 0, w, h, 0.62, { all: wood, front: null });
+  for (const [y0, y1] of [[0.06, h / 2 - 0.02], [h / 2 + 0.02, h - 0.06]]) F.box(0.05, y0, 0.62, w - 0.05, y1, 0.63, { front: "drawers", all: null });
+  F.solid(0, 0, w, 0.63);
+  R.item("Chest of drawers", "Four drawers, pale wood, beside the desk.");
+}
+// A toy box at the foot of the bed, books stacked on it.
+function toyBox(R, x0, z0, x1, z1) {
+  const G = R.geo;
+  G.box(x0, 0, z0, x1, 0.62, z1, { all: "pale", top: "honey" });
+  G.box(x0 + 0.08, 0.62, z0 + 0.1, x1 - 0.12, 0.8, z0 + 0.62, { all: "linen", front: "books", s: "books" });
+  G.box(x0 + 0.12, 0.8, z0 + 0.2, x1 - 0.2, 0.92, z0 + 0.55, { all: "redPlastic", top: "linen" });
+  R.solid(x0, z0, x1, z1);
+  R.act([x0 - 0.1, z0 - 0.1, x1 + 0.1, z1 + 0.1], { label: "Look", lines: ["Your toy box. Comics and an old field guide stacked on the lid."] });
+  R.item("Toy box", "A pale wooden box, books and comics stacked on its lid.");
+}
+// A window on the back wall with its panes crossed.
+function crossWindowN(R, x, y, w, h, lines) {
+  windowN(R, x, y, w, h, { lines });
+  const G = R.geo;
+  G.box(x + w / 2 - 0.05, y, 0.02, x + w / 2 + 0.05, y + h, 0.08, "paint");
+  G.box(x, y + h / 2 - 0.05, 0.02, x + w, y + h / 2 + 0.05, 0.08, "paint");
+}
+// A padded footstool (the Center's waiting seats, as Let's Go's): rounded at its corners, on little steel feet.
+function footstool(R, x, z, w = 0.9, d = 0.9, fab = "blueFabric") {
+  const G = R.geo, a = w / 2, b = d / 2;
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const fx = x + sx * (a - 0.14), fz = z + sz * (b - 0.14); G.box(fx - 0.05, 0, fz - 0.05, fx + 0.05, 0.1, fz + 0.05, "steel"); }
+  G.box(x - a, 0.1, z - b + 0.07, x + a, 0.42, z + b - 0.07, fab);
+  G.box(x - a + 0.07, 0.1, z - b, x + a - 0.07, 0.42, z + b, fab);
+  R.solid(x - a, z - b, x + a, z + b);
+  R.act([x - a, z - b, x + a, z + b], { label: "Sit", lines: ["A padded footstool. Comfy enough for a short wait."] });
+  R.item("Footstools", "Padded blue footstools on little steel feet, round the coffee tables.");
+}
+// A big ball on a white stand (one at each end of the Center's counter).
+function statueBall(R, x, z, y, s = 0.8) {
+  const G = R.geo;
+  G.box(x - 0.3, y, z - 0.3, x + 0.3, y + 0.1, z + 0.3, "lab");
+  G.box(x - 0.18, y + 0.1, z - 0.18, x + 0.18, y + 0.2, z + 0.18, "steel");
+  roundBall(G, x, y + 0.2, z, s);
+  R.item("Ball statues", "A big ball on a white stand at each end of the counter.");
+}
+// The Center's counter, curving round the nurse (stepped round, as a Minecraft build rounds one): its straight front
+// from cx-3 to cx+3, then stepping back to the wall either side.
+function curvedCounter(R, cx, o = {}) {
+  const G = R.geo, front = o.front || "counterOrange", top = o.top || "lab", h = 1.05;
+  const segs = [[-3, 3, 4.4, 5.2], [-3.8, -3, 3.9, 4.9], [3, 3.8, 3.9, 4.9], [-4.4, -3.8, 3.1, 4.3], [3.8, 4.4, 3.1, 4.3], [-4.8, -4.3, 0, 3.1], [4.3, 4.8, 0, 3.1]];
+  for (const [a, b, z0, z1] of segs) {
+    G.box(cx + a, 0, z0, cx + b, h, z1, { all: front, top: null, bottom: null });
+    G.box(cx + a, h, z0, cx + b, h + 0.1, z1, top);
+    R.solid(cx + a, z0, cx + b, z1);
+  }
+  R.item("The counter", "Curving round the nurse, orange and white, stepped round as a Minecraft build would round it; a big ball at each end.");
+}
+// The front corners cut on the slant, low (the ledge's height), as the back ones are: n blocks along each wall.
+function frontChamfer(R, n, mat = "paint", top = "lab") {
+  const G = R.geo, W = R.W, Dm = R.Dm, s = 0.5, rows = Math.round(n / s);
+  for (const east of [false, true]) for (let j = 0; j < rows; j++) {
+    const z0 = Dm - n + j * s, len = (j + 1) * s, [x0, x1] = east ? [W - len, W] : [0, len];
+    G.box(x0, 0, z0, x1, 0.7, z0 + s, { all: mat, top, bottom: null });
+    R.solid(x0, z0, x1, z0 + s);
+  }
+}
+// A post at the wall (x 0 or W), z0 to z1, floor to ceiling.
+function wallPost(R, west, z0, z1, mat, s = 0.5) {
+  const x0 = west ? 0 : R.W - s;
+  R.geo.box(x0, 0, z0, x0 + s, R.H, z1, { all: mat, top: "cap", bottom: null });
+  R.solid(x0, z0, x0 + s, z1);
+}
+// The Mart's shelves both sides of one spine (an island), white caps rounding its two ends.
+function islandShelf(R, X, Z, len, h = 1.6, o = {}) {
+  martShelf(R, X, Z, "w", len, h, { seed: o.seed || 0, lines: o.lines });
+  martShelf(R, X, Z + len, "e", len, h, { seed: (o.seed || 0) + 1, lines: o.lines });
+  const G = R.geo;
+  for (const [z0, z1, k] of [[Z - 0.3, Z, 0.12], [Z - 0.45, Z - 0.3, 0.36], [Z + len, Z + len + 0.3, 0.12], [Z + len + 0.3, Z + len + 0.45, 0.36]])
+    G.box(X - 0.8 + k, 0, z0, X + 0.8 - k, h, z1, { all: "shelfWhite", top: "lab" });
+  // On top: more goods laid out (seen from above).
+  G.box(X - 0.7, h, Z + 0.1, X + 0.7, h + 0.02, Z + len - 0.1, { top: "goodsTop", all: null });
+  R.solid(X - 0.8, Z - 0.45, X + 0.8, Z + len + 0.45);
+}
+// Cardboard boxes, one on another (the lab's).
+function boxes(R, x, z) {
+  const G = R.geo;
+  G.box(x - 0.4, 0, z - 0.35, x + 0.4, 0.6, z + 0.35, "cardboard"); G.box(x - 0.3, 0.6, z - 0.28, x + 0.25, 1.05, z + 0.25, "cardboard");
+  R.solid(x - 0.4, z - 0.35, x + 0.4, z + 0.35);
+  R.act([x - 0.45, z - 0.4, x + 0.45, z + 0.4], { label: "Look", lines: ["Boxes of new POKé BALLS, still taped shut."] });
+  R.item("Boxes", "Cardboard boxes stacked by the shelves.");
+}
+// A desk lamp with a white shade.
+function deskLamp(R, x, z, y) {
+  const G = R.geo;
+  G.box(x - 0.14, y, z - 0.14, x + 0.14, y + 0.05, z + 0.14, "steel"); G.box(x - 0.03, y + 0.05, z - 0.03, x + 0.03, y + 0.5, z + 0.03, "steel");
+  G.box(x - 0.2, y + 0.42, z - 0.2, x + 0.2, y + 0.68, z + 0.2, "lampWhite");
+}
+// The Viridian house's TV unit: a long low cabinet with a top, a DVD player in one compartment, books in another,
+// doors between; the TV on top.
+function tvUnit(R, X, w, screenKey, o = {}) {
+  const F = R.F(X, 0, "s"), wood = o.wood || "walnut", t = (w - 0.16) / 3;
+  F.box(0, 0, 0, w, 0.08, 0.72, "cap");
+  F.box(0, 0.08, 0, 0.08, 0.7, 0.75, wood); F.box(w - 0.08, 0.08, 0, w, 0.7, 0.75, wood);
+  F.box(0.08, 0.08, 0, w - 0.08, 0.14, 0.75, wood);
+  F.box(0.08, 0.14, 0, w - 0.08, 0.7, 0.04, { front: wood, all: null });
+  for (const k of [1, 2]) F.box(0.08 + k * t - 0.03, 0.14, 0.04, 0.08 + k * t + 0.03, 0.7, 0.75, wood);
+  F.box(-0.03, 0.7, -0.02, w + 0.03, 0.78, 0.8, wood);
+  F.box(0.2, 0.14, 0.12, 0.08 + t - 0.12, 0.27, 0.62, { all: "plastic", front: "dvdFront" });
+  F.box(0.08 + t + 0.03, 0.14, 0.74, 0.08 + 2 * t - 0.03, 0.7, 0.75, { front: "cupboard", all: null });
+  F.box(0.08 + 2 * t + 0.08, 0.14, 0.1, w - 0.14, 0.62, 0.6, { front: "books", all: "linen", top: "linen" });
+  const tw = o.tw || 1.9, th = o.th || 1.15, tx = (w - tw) / 2;
+  F.box(w / 2 - 0.3, 0.78, 0.2, w / 2 + 0.3, 0.84, 0.55, "plastic"); F.box(w / 2 - 0.08, 0.84, 0.3, w / 2 + 0.08, 0.98, 0.42, "plastic");
+  F.box(tx, 0.98, 0.25, tx + tw, 0.98 + th, 0.42, "plastic");
+  F.box(tx + 0.08, 1.06, 0.42, tx + tw - 0.08, 0.98 + th - 0.08, 0.43, { front: screenKey, all: null });
+  F.solid(0, 0, w, 0.8);
+  R.act(F.rect(0, 0.4, w, 1.5), { label: "Watch", lines: o.lines });
+  R.item("TV unit", "A long low cabinet with a top: a DVD player in one end, books in the other, doors between; the TV on it.");
+}
+
 function bunting(room, x0, x1, y) { room.geo.box(x0, y, 0.04, x1, y + 0.45, 0.05, { s: "bunting", all: null }); room.item("Bunting", "Pennants strung along the wall."); }
 
 const BUILD = {
   house1() {
-    const R = new Room("house1", { name: "Your house", floor: "Downstairs", paper: "paperMum", outsideSize: "8 by 6" });
-    shell(R, { paper: "mcCream", floor: "sqHoney", zones: [[0, 0, 8, 6, "mcQuartzCheck"]], door: DOOR, skirt: "mcStripped" });
-    kitchen(R, 0.2, "s");
-    clock(R, 6.85, 2.55);
-    tvSet(R, 7.75, 0, "s", R.screen("tvFilm", 40, 24, drawFilm, 0.9), { w: 3.2, speakers: true,
+    // Downstairs, as Let's Go's: the kitchen down the left-hand wall on its green mat, the dresser of plates, a plant and
+    // the TV along the back, the stairs up at the back on the right, the table in the middle on a salmon rug with two
+    // green-cushioned chairs each side, Mum at one of them. The mat in its nook at the door.
+    const R = new Room("house1", { name: "Your house", floor: "Downstairs", paper: "paperMum", W: 14, D: 13, outsideSize: "8 by 6" });
+    shell(R, { paper: "mcCream", floor: "sqHoney", door: DOOR, entry: true, entryFloor: "mcQuartzCheck", skirt: "mcStripped", ledge: "honey" });
+    kitchen(R, 0, "e", { z: 7.4 });
+    rug(R, 1, 2, 3, 7, "kitchenGreen");
+    bin(R, 0.55, 8.0);
+    dresser(R, 1.4, 2.4);
+    plant(R, 4.55, 0.8, 1.0);
+    tvSet(R, 5.4, 0, "s", R.screen("tvFilm", 40, 24, drawFilm, 0.9), { w: 2.8, speakers: true,
       lines: ["There's a film on. Four kids are setting off down a railway line.", "Maybe it's time you set off too."] });
     R.item("Television", "On a walnut stand with speakers; the film on it moves.");
-    stairsUp(R, 12, 0, 2, { to: "house2", spawn: STAIRS_TOP });
-    rug(R, 8, 3, 13, 9, "rugMum");
-    coffeeTable(R, 8.9, 4.6, 10.7, 5.5);
-    sofa(R, 11.4, 7.6, "n", 3.2);
-    floorLamp(R, 12.15, 7.2);
-    table(R, 1.6, 6.4, 4.9, 8.4, { cloth: "linen", name: "Dining table", note: "Oak top, walnut legs, a linen runner, plates and a fruit bowl." });
-    fruitBowl(R, 3.25, 7.4, 0.87); plates(R, [[2.4, 6.8], [4.1, 6.8], [2.4, 8.0], [4.1, 8.0]], 0.87);
-    chair(R, 2.4, 5.85, "s"); chair(R, 4.1, 5.85, "s"); chair(R, 2.4, 8.95, "n"); chair(R, 4.1, 8.95, "n"); chair(R, 5.45, 7.4, "w");
-    R.item("Chairs", "Walnut chairs, four round the table and one at its end for Mum.");
-    sideboard(R, 0, 12.2, "e", 2.4);
-    framed(R, 10.1, 2.0, 1.2, 0.9, "photos", "w", { act: { label: "Look", lines: ["You, Mum and a very small partner on the beach."] } });
-    bookshelf(R, 16, 9.0, "w", 2.2, 3.2, { trinkets: { 1: "plant", 3: "ball" } });
-    framed(R, 3.3, 1.5, 2.6, 1.9, "painting", "e", { act: { label: "Look", lines: ["A painting of the sea south of Pallet Town. Mum painted it."] } });
-    R.item("Paintings and photos", "Framed in walnut on the side walls.");
-    plant(R, 1.0, 12.9, 1.15); plant(R, 15.0, 12.9, 1.15);
+    clock(R, 8.6, 2.5);
+    stairsUp(R, 10, 0, 2, { to: "house2", spawn: STAIRS_TOP });
+    rug(R, 4, 4, 11, 9, "salmon");
+    table(R, 6.4, 5.0, 8.6, 7.6, { cloth: "linen", name: "Dining table", note: "Oak top, walnut legs, a linen runner, plates and a fruit bowl." });
+    fruitBowl(R, 7.5, 6.3, 0.87); plates(R, [[6.9, 5.6], [8.1, 5.6], [6.9, 7.0], [8.1, 7.0]], 0.87);
+    for (const z of [5.7, 6.9]) { chair(R, 5.75, z, "e", { seat: "greenFabric" }); chair(R, 9.25, z, "w", { seat: "greenFabric" }); }
+    R.item("Chairs", "Walnut chairs with green cushions, two each side of the table.");
+    crossWindow(R, "e", 4.4, 1.5, 2.0, 1.4, ["Out of the window: Pallet Town's flowers, and the lab's roof past the trees."]);
+    framed(R, 7.6, 1.8, 1.2, 0.9, "photos", "e", { act: { label: "Look", lines: ["You, Mum and a very small partner on the beach."] } });
+    R.item("Photos", "Framed in walnut on the east wall.");
+    plant(R, 1.0, 10.0, 1.0); plant(R, 13.0, 10.0, 1.0);
     doormat(R, DOOR[0], DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHome" });
-    R.npcs.push({ name: "Mum", x: 5.45, z: 7.4, yaw: FACE.w, seated: true,
+    R.npcs.push({ name: "Mum", x: 5.75, z: 6.9, yaw: FACE.e, seated: true,
       look: { skin: "middle_aged_woman" },
       talk: f => f && f.h > 3.4 ? [
         { text: "...Is that coming in too? Mind the ceiling, love!" },
@@ -623,57 +809,59 @@ const BUILD = {
   },
 
   house2() {
-    const R = new Room("house2", { name: "Your room", floor: "Upstairs", paper: "paperRoom" });
-    shell(R, { paper: "mcSky", floor: "sqLight", floorRects: [[0, 0, 12, 14], [12, 2, 16, 14]], skirt: "mcStripped" });
-    stairsDown(R, 12, 0, 2, { to: "house1", spawn: STAIRS_FOOT, paper: "mcSky" });
+    // Your room, as Let's Go's: the desk with its drawers and the PC in the back corner, the window with its red
+    // curtains drawn in, a poster and a clock; the green bed down the left-hand wall, the toy box at its foot; the TV on
+    // its low stand on a big red rug, the console and two cushions in front of it; the wardrobe; the stairs down.
+    const R = new Room("house2", { name: "Your room", floor: "Upstairs", paper: "paperRoom", W: 14, D: 12 });
+    shell(R, { paper: "mcSky", floor: "sqLight", floorRects: [[0, 0, 10, 12], [10, 2, 14, 12]], skirt: "mcStripped" });
+    stairsDown(R, 10, 0, 2, { to: "house1", spawn: STAIRS_FOOT, paper: "mcSky" });
     deskPC(R, 0.4, 0, "s", R.screen("pcScreen", 32, 24, drawPC, 1), { pc: true });
+    drawerUnit(R, 2.8, 0, "s");
     officeChair(R, 1.55, 1.6, "n");
-    whiteboard(R, 3.2, 1.45, 2.4, 1.2, "whiteboard", ["The whiteboard says:", "TO DO. 1, wake up (crossed out). 2, see the Prof. 3, become champion!"]);
-    windowN(R, 6.5, 1.5, 2.2, 2.0, { curtains: "curtainBlue" });
-    bookshelf(R, 9.3, 0, "s", 2, 2.6, { wood: "pale", trinkets: { 0: "ball", 2: "plant" }, lines: ["Comics, a field guide to Kanto's creatures, and a very old ball."], name: "Shelves", note: "Pale-wood shelves with books, a ball and a little plant." });
-    bed(R, 0, 10.6, "e", { w: 1.8, l: 2.9 });
-    nightstand(R, 0, 8.6, "e");
-    rug(R, 5, 6, 10, 10, "rugRoom");
-    tvSet(R, 6.0, 4.9, "s", R.screen("tvRace", 32, 24, drawRace, 0.95), { w: 2.4, tw: 1.7, th: 1.05, lines: ["A racing game, paused on lap 2. It'll keep."] });
-    gameConsole(R, 7.2, 6.8);
-    cushionSeat(R, 6.5, 8.3, "blueFabric"); cushionSeat(R, 8.0, 8.3, "cushion");
-    wardrobe(R, 16, 4.2, "w");
-    framed(R, 7.2, 1.6, 1.3, 1.75, "poster", "e", { frameMat: "honey", act: { label: "Look", lines: ["A poster of a famous trainer mid-throw. GO!"] } });
+    windowN(R, 4.6, 1.5, 2.2, 2.0, { curtains: "curtain", curtainIn: 0.35 });
+    framed(R, 7.4, 1.6, 1.1, 1.5, "poster", "n", { frameMat: "honey", act: { label: "Look", lines: ["A poster of a famous trainer mid-throw. GO!"] } });
     R.item("Poster", "A trainer mid-throw, drawn in silhouette on a sunburst.");
-    bagOnFloor(R, 3.6, 12.6, ["Your bag. Packed and ready for the road."]);
-    plant(R, 15.0, 12.8, 1.0, { lines: ["A little fern. You remember to water it, mostly."] });
-    R.spawn = { x: 4.2, z: 9.5, yaw: FACE.s };
+    clock(R, 8.9, 2.6);
+    bed(R, 0, 5.4, "e", { w: 1.8, l: 2.9, quilt: "quiltGreen" });
+    nightstand(R, 0, 6.3, "e");
+    toyBox(R, 3.0, 3.75, 3.7, 5.25);
+    rug(R, 4, 4, 10, 10, "redRoom");
+    tvSet(R, 5.6, 4.6, "s", R.screen("tvRace", 32, 24, drawRace, 0.95), { w: 2.4, tw: 1.7, th: 1.05, lines: ["A racing game, paused on lap 2. It'll keep."] });
+    gameConsole(R, 6.8, 6.5);
+    cushionSeat(R, 6.2, 8.0, "blueFabric"); cushionSeat(R, 7.6, 8.0, "cushion");
+    wardrobe(R, 14, 5.0, "w");
+    bagOnFloor(R, 11.8, 10.6, ["Your bag. Packed and ready for the road."]);
+    plant(R, 13.0, 11.0, 1.0, { lines: ["A little fern. You remember to water it, mostly."] });
+    R.spawn = { x: 3.6, z: 6.4, yaw: FACE.s };
     return R;
   },
 
   rival1() {
-    const R = new Room("rival1", { name: "Rival's house", floor: "Downstairs", paper: "paperRival", outsideSize: "8 by 6" });
-    shell(R, { paper: "mcSage", floor: "sqPale", zones: [[0, 0, 6, 6, "mcBlueCheck"]], door: DOOR, skirt: "mcStripped" });
-    const F = R.F(0.2, 0, "s");
-    counterUnit(R, F, 0, 1, "cupboardWhite", "counter", "paint"); counterUnit(R, F, 1, 1, "cupboardWhite", "sink", "paint");
-    counterUnit(R, F, 2, 1, "oven", "hob", "paint"); counterUnit(R, F, 3, 1, "cupboardWhite", "counter", "paint");
-    F.box(1.65, 1.0, 0.08, 1.75, 1.45, 0.18, "steel"); F.box(1.65, 1.38, 0.08, 1.75, 1.45, 0.48, "steel");
-    F.box(0, 1.0, 0, 4, 1.8, 0.03, { front: "tileWhite", all: null });
-    F.box(0, 2.2, 0, 1.5, 3.0, 0.55, { front: "cupboardWhite", all: "paint", back: null }); F.box(2.5, 2.2, 0, 4, 3.0, 0.55, { front: "cupboardWhite", all: "paint", back: null });
-    F.box(3.2, 1.0, 0.25, 3.7, 1.5, 0.7, { all: "plastic", top: "steel" });
-    R.act(F.rect(0, 0.5, 4, 1.4), { label: "Look", lines: ["A tidy little kitchen. The coffee machine is still warm."] });
-    R.item("Kitchen", "White cupboards, sink and tap, a hob and oven, white tiles and a coffee machine.");
-    bookshelf(R, 5.4, 0, "s", 2, 3.0, { lines: ["Books about battling. Most have the corners turned down."] });
-    bookshelf(R, 7.4, 0, "s", 2, 3.0, { trinkets: { 2: "trophy" }, lines: ["A row of training manuals, and a trophy shaped like a cup."] });
-    trophyCabinet(R, 9.7, 0, "s");
-    stairsUp(R, 12, 0, 2, { to: "rival2", spawn: STAIRS_TOP });
-    rug(R, 5, 5, 11, 10, "rugRival");
-    table(R, 5.8, 6.2, 9.4, 8.2, { top: "walnut", leg: "walnut", name: "Table", note: "Walnut table. The Town Map is lying on it." });
-    R.geo.box(6.4, 0.86, 6.62, 8.0, 0.89, 7.42, { top: "worldMap", all: "linen" });
-    R.act([6.2, 6.2, 8.2, 8.2], { label: "Look", map: true, lines: ["It's a Town Map. Daisy's keeping it safe for you.", "In game, this opens the TOWN MAP."] });
-    chair(R, 5.2, 7.2, "e", { wood: "walnut" }); chair(R, 7.6, 5.65, "s", { wood: "walnut" }); chair(R, 7.6, 8.75, "n", { wood: "walnut" });
-    plates(R, [[8.6, 7.2]], 0.86);
-    sofa(R, 16, 4.6, "w", 3, { fabric: "blueFabric", cushion: "linen", pillow: "cushion", pillow2: "cushion", lines: ["A blue sofa. There's a game controller down the side of the cushion."] });
-    framed(R, 6.0, 1.6, 2.4, 1.7, "paintingHills", "w", { act: { label: "Look", lines: ["A painting of the hills north of town, with a little red-roofed house."] } });
-    plant(R, 1.0, 12.9, 1.15); plant(R, 15.0, 12.9, 1.15);
-    floorLamp(R, 15.2, 8.4);
+    // The rival's house, laid out as yours: the kitchen down the left on a blue mat, shelves and the trophy cabinet and
+    // the TV along the back, the stairs at the back on the right, the table on his rug with the Town Map on it and Daisy
+    // at it, the blue sofa down the right. The mat in its nook at the door.
+    const R = new Room("rival1", { name: "Rival's house", floor: "Downstairs", paper: "paperRival", W: 14, D: 13, outsideSize: "8 by 6" });
+    shell(R, { paper: "mcSage", floor: "sqPale", door: DOOR, entry: true, entryFloor: "mcBlueCheck", skirt: "mcStripped", ledge: "walnut" });
+    kitchen(R, 0, "e", { z: 7.4 });
+    rug(R, 1, 2, 3, 7, "kitchenBlue");
+    bin(R, 0.55, 8.0);
+    bookshelf(R, 1.4, 0, "s", 2, 2.8, { trinkets: { 2: "trophy" }, lines: ["Books about battling. Most have the corners turned down."] });
+    trophyCabinet(R, 3.5, 0, "s");
+    tvSet(R, 5.8, 0, "s", R.screen("tvRival", 40, 24, drawFilm, 0.9), { w: 2.4, lines: ["A battle on TV. Daisy says her brother watches it every week."] });
+    clock(R, 8.6, 2.5);
+    stairsUp(R, 10, 0, 2, { to: "rival2", spawn: STAIRS_TOP });
+    rug(R, 4, 4, 11, 9, "rugRival");
+    table(R, 6.4, 5.0, 8.6, 7.6, { top: "walnut", leg: "walnut", name: "Table", note: "Walnut table. The Town Map is lying on it." });
+    R.geo.box(6.7, 0.86, 5.6, 8.3, 0.89, 6.4, { top: "worldMap", all: "linen" });
+    R.act([6.4, 5.0, 8.6, 7.6], { label: "Look", map: true, lines: ["It's a Town Map. Daisy's keeping it safe for you.", "In game, this opens the TOWN MAP."] });
+    for (const z of [5.7, 6.9]) { chair(R, 5.75, z, "e", { wood: "walnut", seat: "blueFabric" }); chair(R, 9.25, z, "w", { wood: "walnut", seat: "blueFabric" }); }
+    plates(R, [[7.5, 7.1]], 0.86);
+    sofa(R, 14, 4.4, "w", 3, { fabric: "blueFabric", cushion: "linen", pillow: "cushion", pillow2: "cushion", lines: ["A blue sofa. There's a game controller down the side of the cushion."] });
+    framed(R, 4.4, 2.3, 2.4, 1.2, "paintingHills", "e", { act: { label: "Look", lines: ["A painting of the hills north of town, with a little red-roofed house."] } });
+    floorLamp(R, 13.2, 8.6);
+    plant(R, 1.0, 10.0, 1.0); plant(R, 13.0, 10.0, 1.0);
     doormat(R, DOOR[0], DOOR[1], { to: "town", spawn: { x: 24.9, z: 10.0, yaw: FACE.s }, mat: "matRival" });
-    R.npcs.push({ name: "Daisy", x: 5.2, z: 7.2, yaw: FACE.e, seated: true,
+    R.npcs.push({ name: "Daisy", x: 5.75, z: 6.9, yaw: FACE.e, seated: true,
       look: { skin: "brunette_girl" },
       talk: () => [{ text: "Hi! My brother's already gone to Grandpa's lab." }, { text: "He always has to be first. You'd better catch him up!" }] });
     R.spawn = FROM_TOWN;
@@ -681,203 +869,190 @@ const BUILD = {
   },
 
   rival2() {
-    const R = new Room("rival2", { name: "Rival's room", floor: "Upstairs", paper: "paperRivalRoom" });
-    shell(R, { paper: "mcNavy", floor: "sqDark", floorRects: [[0, 0, 12, 14], [12, 2, 16, 14]], skirt: "mcDarkOak" });
-    stairsDown(R, 12, 0, 2, { to: "rival1", spawn: STAIRS_FOOT, paper: "mcNavy" });
+    // His room, laid out as yours: the desk and his locked PC in the back corner, the window, his posters; the bed down
+    // the left, his rug, a punching bag, trophies, a beanbag; the stairs down.
+    const R = new Room("rival2", { name: "Rival's room", floor: "Upstairs", paper: "paperRivalRoom", W: 14, D: 12 });
+    shell(R, { paper: "mcNavy", floor: "sqDark", floorRects: [[0, 0, 10, 12], [10, 2, 14, 12]], skirt: "mcDarkOak" });
+    stairsDown(R, 10, 0, 2, { to: "rival1", spawn: STAIRS_FOOT, paper: "mcNavy" });
     deskPC(R, 0.4, 0, "s", R.screen("pcLocked", 40, 24, drawLocked, 1), { top: "walnut", lines: ["His PC's locked. The password hint just says: ME."] });
+    drawerUnit(R, 2.8, 0, "s", 0.9, 1.1, "walnut");
     officeChair(R, 1.55, 1.6, "n", "redFabric");
-    whiteboard(R, 3.2, 1.45, 2.4, 1.2, "boardRival", ["BATTLE PLAN: win, win again, beat him.", "\"Beat him\" has your name next to it, crossed out three times."]);
-    windowN(R, 6.5, 1.5, 2.2, 2.0, { curtains: "curtain", lines: ["From up here you can see right into your own room."] });
-    framed(R, 9.4, 1.5, 1.2, 1.6, "posterRival", "n", { frame: false, act: { label: "Look", lines: ["A poster: CHAMP OR BUST."] } });
-    framed(R, 6.6, 1.6, 1.3, 1.75, "posterDragon", "e", { frame: false, act: { label: "Look", lines: ["A poster of a dragon breathing fire over the stars."] } });
+    windowN(R, 4.6, 1.5, 2.2, 2.0, { curtains: "curtain", curtainIn: 0.35, lines: ["From up here you can see right into your own room."] });
+    framed(R, 7.4, 1.5, 1.2, 1.6, "posterRival", "n", { frame: false, act: { label: "Look", lines: ["A poster: CHAMP OR BUST."] } });
+    framed(R, 2.4, 1.6, 1.3, 1.75, "posterDragon", "e", { frame: false, act: { label: "Look", lines: ["A poster of a dragon breathing fire over the stars."] } });
     R.item("Posters", "CHAMP OR BUST, and a dragon over the stars.");
-    bed(R, 16, 9.4, "w", { w: 1.8, l: 2.9, wood: "walnut", quilt: "quiltBlue", ask: false });
+    bunting(R, 0.3, 4.4, 3.1);
+    bed(R, 0, 5.4, "e", { w: 1.8, l: 2.9, wood: "walnut", quilt: "quiltBlue", ask: false });
     R.acts[R.acts.length - 1].lines = ["An unmade bed, clothes all over it."];
-    bookshelf(R, 0, 6.4, "e", 2.2, 2.6, { trinkets: { 0: "trophy", 1: "trophy", 2: "ball" }, lines: ["Trophies, and a ball signed by someone famous."], name: "Trophy shelf", note: "Walnut shelves with gold cups, books and a ball." });
-    framed(R, 7.6, 1.6, 0.8, 0.8, "dartboard", "w", { frame: false, act: { label: "Look", lines: ["A dartboard. All the darts are in the bullseye."] } });
+    framed(R, 7.4, 1.6, 0.8, 0.8, "dartboard", "w", { frame: false, act: { label: "Look", lines: ["A dartboard. All the darts are in the bullseye."] } });
     R.item("Dartboard", "On the west wall; every dart in the middle.");
-    punchingBag(R, 3.4, 9.4);
-    rug(R, 5, 6, 10, 11, "rugRival");
-    bagOnFloor(R, 9.0, 12.4, ["A sports bag, half unpacked. Running shoes, a towel, more trophies."]);
-    plant(R, 1.0, 12.8, 1.0, { lines: ["A cactus. It looks like it gets on with him."] });
-    beanBag(R, 12.6, 6.2, "redFabric"); dumbbells(R, 3.4, 12.6); bunting(R, 0.3, 6.2, 3.0);
-
+    bookshelf(R, 14, 8.6, "w", 2.2, 2.6, { trinkets: { 0: "trophy", 1: "trophy", 2: "ball" }, lines: ["Trophies, and a ball signed by someone famous."], name: "Trophy shelf", note: "Walnut shelves with gold cups, books and a ball." });
+    rug(R, 4, 4, 10, 10, "rugRival");
+    punchingBag(R, 11.6, 5.4);
+    beanBag(R, 8.6, 8.4, "redFabric");
+    dumbbells(R, 5.2, 9.4);
+    bagOnFloor(R, 2.4, 10.4, ["A sports bag, half unpacked. Running shoes, a towel, more trophies."]);
+    plant(R, 1.0, 11.0, 1.0, { lines: ["A cactus. It looks like it gets on with him."] });
     R.spawn = STAIRS_TOP;
     return R;
   },
 
   lab() {
-    // Inside the lab: 18 blocks by 20. Laid out as the newer games' lab: the professor's desk, the ball incubator and his
-    // machine along the north wall, the table of three balls, rows of white shelves, an aide's desk and board in the
-    // corner, and the door. (Only the inside: in the mod, the outside is your world.)
-    const R = new Room("lab", { name: "Prof. Oak's lab", floor: "Ground floor", W: 18, D: 20, outsideSize: "12 by 7" });
-    shell(R, { paper: "mcLabWall", floor: "mcLabTile", door: LAB_DOOR, skirt: "mcCyan" });
-    // North wall, west to east: a teal desk run with the PC, the incubator, the machine, the board with the map, the resting machine.
-    { const F = R.F(0.3, 0, "s"); counterUnit(R, F, 0, 1, "cupboardTeal", "lab", "tealPaint"); counterUnit(R, F, 1, 1, "drawers", "lab", "tealPaint"); counterUnit(R, F, 2, 1, "cupboardTeal", "lab", "tealPaint"); }
-    { const G = R.geo, sk = R.screen("pcLab", 40, 26, drawPC, 0.9);
-      G.box(1.05, 1.0, 0.18, 1.5, 1.04, 0.45, "greyPlastic"); G.box(1.22, 1.04, 0.25, 1.33, 1.2, 0.35, "greyPlastic"); G.box(0.78, 1.2, 0.18, 1.78, 1.88, 0.32, "greyPlastic"); G.box(0.84, 1.26, 0.32, 1.72, 1.82, 0.33, { s: sk, all: null });
-      G.box(0.85, 1.0, 0.5, 1.7, 1.03, 0.74, { top: "keyboard", all: "greyPlastic" });
-      G.box(2.35, 1.0, 0.3, 2.6, 1.08, 0.6, "greyPlastic"); G.box(2.44, 1.08, 0.38, 2.52, 1.5, 0.46, "steel"); G.box(2.38, 1.42, 0.36, 2.58, 1.56, 0.62, "greyPlastic");
-      R.act([0.3, 0, 2.3, 1.8], { label: "Use", lines: ["The professor's PC. Notes on every creature he's met, and a lot of unread email."] });
-      R.item("Teal desk run", "Teal cupboards and drawers, white tops, the PC and a microscope."); }
-    officeChair(R, 1.4, 1.75, "n", "blueFabric");
-    incubator(R, 1.8, 4.5);
-    labMachine(R, 3.9, 3, R.screen("labScreen", 44, 22, drawLab, 0.95), { name: "The professor's machine", lines: ["Numbers scroll by. A creature's heartbeat, its height and its weight.", "It's reading something new."] });
-    windowN(R, 7.5, 1.7, 2.2, 1.5, { lines: ["Out of the window: Pallet Town, and the sea past the houses."] });
-    wallMap(R, "n", 10.2, 1.45, 3.4, { frameMat: "silver", lines: ["A map of the whole region: every town, every route.", "The professor's pinned a note to it: THREE NEW TRAINERS, THREE NEW PARTNERS."] });
-    healer(R, 14.6, 3);
-    ballTable(R, 11.6, 4.3, 14.8, 5.6);
-    // Two rows of white shelves, back to back across the room, as in the games.
-    for (const X of [0.4, 2.4, 4.4]) labShelf(R, X, 9.6, "s", 2, 3.2, { lines: ["Books on creatures: their habits, their homes, how they change as they grow.", "It's all a bit much to take in."] });
-    for (const X of [11.6, 13.6, 15.6]) labShelf(R, X, 9.6, "s", 2, 3.2, { rows: ["binders", "booksFull", "storeBoxes", "booksFull"], lines: ["Research papers. One of them is called ON THE KEEPING OF SMALL CREATURES IN BALLS."] });
-    // A second row on the right, below the first, with aides either side.
-    for (const X of [11.6, 13.6, 15.6]) labShelf(R, X, 14.2, "s", 2, 3.2, { rows: ["booksFull", "storeBoxes", "booksFull", "binders"], lines: ["Field notes, filed by route: ROUTE 1, ROUTE 2, VIRIDIAN FOREST..."] });
-    // The aide's corner, bottom left: a desk against the west wall, his chair, and a board on a stand behind him.
-    deskPC(R, 0, 15.3, "e", R.screen("pcAide", 40, 26, drawLab, 0.9), { top: "lab", lines: ["The aide's PC: a spreadsheet of heights and weights, half filled in."] });
-    officeChair(R, 1.6, 14.15, "w", "blueFabric");
-    boardStand(R, 2.9, 12.0, 2.6, "s", ["NOTES, in marker: three lines of questions about sleep, food and growing.", "And a doodle of a very round, very green creature."]);
-    plant(R, 1.0, 18.9, 1.2); plant(R, 17.0, 18.9, 1.2); plant(R, 17.1, 8.6, 1.1);
-    doormat(R, LAB_DOOR[0], LAB_DOOR[1], { to: "town", spawn: FROM_LAB, mat: "matLab" });
-    R.npcs.push({ name: "Prof. Oak", x: 9.6, z: 3.7, yaw: FACE.s, look: { skin: "oak" },
+    // Inside the lab, as Let's Go's, tighter (16 by 14 past the nook): pale oak boards laid on the diagonal, a wooden
+    // skirting; the ball incubator in the back corner, the professor's teal desk with his PC and microscope, the board
+    // with the map over it, notes pinned up, the resting machine and a white bookshelf; the table of three balls (a
+    // green top) in the middle on the right; two rows of white shelves with a way between them; an aide's desk and
+    // board in the corner; the purple mat in its nook at the door, low white shelves either side.
+    const R = new Room("lab", { name: "Prof. Oak's lab", floor: "Ground floor", W: 16, D: 16, outsideSize: "12 by 7" });
+    shell(R, { paper: "mcLabWall", floor: "oakDiagonal", door: LAB_DOOR, entry: true, entryFloor: "mcLabTile", skirt: "walnut", skirtH: 0.5, ledge: "shelfWhite", ledgeTop: "lab" });
+    incubator(R, 2.0, 2.6);
+    { const F = R.F(4.0, 0, "s");
+      counterUnit(R, F, 0, 1, "cupboardTeal", "lab", "tealPaint"); counterUnit(R, F, 1, 1, "drawers", "lab", "tealPaint");
+      counterUnit(R, F, 2, 1, "cupboardTeal", "lab", "tealPaint"); counterUnit(R, F, 3, 1, "drawers", "lab", "tealPaint"); }
+    { const G = R.geo, sk = R.screen("pcLab", 40, 26, drawPC, 0.9), X = 6.0;
+      G.box(X + 0.75, 1.0, 0.18, X + 1.2, 1.04, 0.45, "greyPlastic"); G.box(X + 0.92, 1.04, 0.25, X + 1.03, 1.2, 0.35, "greyPlastic"); G.box(X + 0.48, 1.2, 0.18, X + 1.48, 1.88, 0.32, "greyPlastic"); G.box(X + 0.54, 1.26, 0.32, X + 1.42, 1.82, 0.33, { s: sk, all: null });
+      G.box(X + 0.55, 1.0, 0.5, X + 1.4, 1.03, 0.74, { top: "keyboard", all: "greyPlastic" });
+      G.box(4.35, 1.0, 0.3, 4.6, 1.08, 0.6, "greyPlastic"); G.box(4.44, 1.08, 0.38, 4.52, 1.5, 0.46, "steel"); G.box(4.38, 1.42, 0.36, 4.58, 1.56, 0.62, "greyPlastic");
+      R.act([4.0, 0, 8.0, 1.8], { label: "Use", lines: ["The professor's PC. Notes on every creature he's met, and a lot of unread email.", "Numbers scroll by: a creature's heartbeat, its height and its weight."] });
+      R.item("Teal desk", "Teal cupboards and drawers, a white top, the PC and a microscope."); }
+    officeChair(R, 6.6, 1.75, "n", "blueFabric");
+    wallMap(R, "n", 4.3, 2.0, 3.0, { frameMat: "silver", lines: ["A map of the whole region: every town, every route.", "The professor's pinned a note to it: THREE NEW TRAINERS, THREE NEW PARTNERS."] });
+    framed(R, 8.5, 1.9, 0.9, 1.2, "boardLab", "n", { frameMat: "walnut", act: { label: "Read", lines: ["A notice: RESEARCH IN PROGRESS. PLEASE DON'T TOUCH THE BALLS."] } });
+    framed(R, 9.7, 1.9, 0.9, 1.2, "boardLab", "n", { frameMat: "walnut", act: { label: "Read", lines: ["A chart of how creatures grow, with a big question mark at the end."] } });
+    healer(R, 11.0, 2);
+    labShelf(R, 13.4, 0, "s", 2.4, 3.0, { lines: ["Books on creatures: their habits, their homes, how they change as they grow."] });
+    boxes(R, 14.2, 1.3);
+    ballTable(R, 9.8, 4.2, 13.0, 5.6, { top: "feltGreen", leg: "lab", note: "A white table with a green felt top, three balls in a row." });
+    // Two rows of white shelves, a way between them.
+    for (const X of [0.4, 2.4]) labShelf(R, X, 8.0, "s", 2, 3.0, { lines: ["Books on creatures: their habits, their homes, how they change as they grow.", "It's all a bit much to take in."] });
+    for (const X of [11.6, 13.6]) labShelf(R, X, 8.0, "s", 2, 3.0, { rows: ["binders", "booksFull", "storeBoxes", "booksFull"], lines: ["Research papers. One of them is called ON THE KEEPING OF SMALL CREATURES IN BALLS."] });
+    // The aide's corner, bottom left: a desk against the west wall, his chair, a board on a stand.
+    deskPC(R, 0, 12.8, "e", R.screen("pcAide", 40, 26, drawLab, 0.9), { top: "lab", lines: ["The aide's PC: a spreadsheet of heights and weights, half filled in."] });
+    officeChair(R, 1.6, 11.65, "w", "blueFabric");
+    boardStand(R, 2.6, 10.0, 2.4, "s", ["NOTES, in marker: three lines of questions about sleep, food and growing.", "And a doodle of a very round, very green creature."]);
+    crossWindow(R, "e", 9.8, 1.5, 2.0, 1.4, ["Out of the window: Pallet Town, and the sea past the houses."]);
+    boxes(R, 14.6, 12.6); plant(R, 13.4, 12.8, 1.1); plant(R, 15.0, 6.8, 1.0);
+    doormat(R, LAB_DOOR[0], LAB_DOOR[1], { to: "town", spawn: FROM_LAB, mat: "matLabPurple" });
+    R.npcs.push({ name: "Prof. Oak", x: 7.6, z: 3.6, yaw: FACE.s, look: { skin: "oak" },
       talk: f => [
         { text: "Ah, there you are! I've been waiting." },
         f ? { text: "And you've brought a friend. Good, good. A creature that trusts you is a fine start." } : { text: "Those three balls on the table: each holds a creature. One of them is yours." },
         { text: "Take your time choosing. It's a partner for life." }
       ] });
-    R.npcs.push({ name: "Blue", x: 13.2, z: 6.7, yaw: FACE.n, look: { skin: "blue" },
+    R.npcs.push({ name: "Blue", x: 11.4, z: 6.6, yaw: FACE.n, look: { skin: "blue" },
       talk: () => [{ text: "Gramps said I could pick first. Well, after you. He made me promise." }, { text: "Hurry up, will you? I've got places to be." }] });
-    R.npcs.push({ name: "Aide", x: 5.4, z: 1.9, yaw: FACE.n, look: { skin: "scientist" },
+    R.npcs.push({ name: "Aide", x: 4.8, z: 1.8, yaw: FACE.n, look: { skin: "scientist" },
       talk: () => [{ text: "I'm the professor's aide. These readings won't record themselves!" }] });
-    R.npcs.push({ name: "Aide", x: 1.6, z: 14.15, yaw: FACE.w, seated: true, look: { skin: "scientist" },
+    R.npcs.push({ name: "Aide", x: 1.6, z: 11.65, yaw: FACE.w, seated: true, look: { skin: "scientist" },
       talk: () => [{ text: "The professor's writing a book. Every creature in the region, one page each." }, { text: "He's only up to the second page." }] });
-    R.npcs.push({ name: "Aide", x: 15.4, z: 12.5, yaw: FACE.n, look: { skin: "scientist_f" },
+    R.npcs.push({ name: "Aide", x: 12.6, z: 9.6, yaw: FACE.n, look: { skin: "scientist_f" },
       talk: () => [{ text: "Have you got a partner yet? The professor gives every new trainer one of their own." }, { text: "Look after it, and it'll look after you." }] });
-    R.npcs.push({ name: "Aide", x: 12.3, z: 12.5, yaw: FACE.n, look: { skin: "scientist" },
-      talk: () => [{ text: "Every book on this shelf, I've read twice. The professor's read them three times." }] });
-    R.npcs.push({ name: "Aide", x: 14.6, z: 16.4, yaw: FACE.n, look: { skin: "scientist_f" },
+    R.npcs.push({ name: "Aide", x: 3.4, z: 9.6, yaw: FACE.n, look: { skin: "scientist_f" },
       talk: () => [{ text: "I'm filing the notes from ROUTE 1. Bird POKéMON, mostly. And a lot of RATTATA." }] });
     R.spawn = LAB_IN;
     return R;
   },
 
   center() {
-    // A Pokémon Center as the games have one, tightened up: the back corners cut on the slant (as the building is
-    // outside); the long red counter with the nurse, her healing machine behind on the left and the PC and a screen
-    // on the right, a till on the counter; stairs up either side to the 2F (roped off); a glass-topped table and
-    // armchairs each side; the world map and bookshelves in the corners; the storage PC; a red runner to the door.
-    // No sign inside.
-    const R = new Room("center", { name: "Pokémon Center", floor: "Viridian City", W: 20, D: 16, outsideSize: "13 by 9" });
-    shell(R, { paper: "paperCenter", floor: "mcCenterCheck", door: CENTER_DOOR, skirt: "redPlastic" });
-    band(R, 1.05, "redPlastic");
-    chamfer(R, 2, { paper: "paperCenter", skirt: "redPlastic", band: [1.05, "redPlastic"] });
-    const G = R.geo;
-    // The counter: its front, its white top, and its ends back to the wall so no one walks round behind.
-    G.box(5, 0, 4.4, 15, 1.05, 5.4, { all: "counterRed", top: "lab" });
-    G.box(4.85, 1.05, 4.3, 15.15, 1.17, 5.55, "lab");
-    G.box(4.85, 0, 0, 5.35, 1.05, 4.4, { all: "counterRed", top: "lab" }); G.box(14.65, 0, 0, 15.15, 1.05, 4.4, { all: "counterRed", top: "lab" });
-    R.solid(4.85, 0, 15.15, 5.55);
-    G.box(9.6, 1.17, 4.6, 10.4, 1.3, 5.2, "greyPlastic"); G.box(9.9, 1.3, 4.75, 10.1, 1.36, 4.95, "gold");
-    till(R, 13.6, 4.95, 1.17, "s");
-    R.act([5, 5.4, 15, 6.6], { label: "Talk", lines: ["The counter. The nurse will look after your POKéMON."] });
-    R.item("The counter", "Long and red, a white top and stripe; a little bell in the middle and a till at the right.");
-    // Behind it: the healing machine on the left, the PC and a big screen on the right.
-    healer(R, 6.0, 3, { empty: true });
-    deskPC(R, 12.2, 0, "s", R.screen("pcNurse", 40, 26, drawPC, 0.9), { top: "lab", lines: ["The nurse's PC: today's patients, and a note to order more POTIONS."] });
-    officeChair(R, 13.35, 1.6, "n", "redFabric");
-    wallScreen(R, 11.9, 2.05, 2.9, 1.3, R.screen("centerAd", 40, 18, drawCenterAd, 1), ["A heart beating over a ball. WE HOPE TO SEE YOU AGAIN!"]);
-    // The corners: the world map and a bookshelf on the left, the storage PC on the right.
-    wallMap(R, "n", 2.2, 1.35, 2.5, { lines: ["A map of the whole region. VIRIDIAN CITY is marked with a red pin.", "In game, this opens the TOWN MAP."] });
-    bookshelf(R, 0, 4.6, "e", 2.2, 2.8, { wood: "pale", trinkets: { 1: "plant" }, lines: ["Books on caring for POKéMON: food, rest, and what to do about a cold."] });
-    deskPC(R, 15.7, 0, "s", R.screen("pcCenter", 40, 26, drawPC, 0.9), { top: "lab", pc: true, lines: ["The POKéMON STORAGE SYSTEM."] });
-    officeChair(R, 16.85, 1.6, "n", "redFabric");
-    bookshelf(R, 20, 2.4, "w", 2.2, 2.8, { wood: "pale", trinkets: { 2: "ball" }, lines: ["A shelf of guides: TYPES and how they match up, and one called THE TRAINER'S HANDBOOK."] });
-    // A bench each side, by the waiting areas.
-    sofa(R, 0, 11.4, "e", 3, { fabric: "redFabric" }); sofa(R, 20, 8.4, "w", 3, { fabric: "redFabric" });
-    // The waiting areas: a glass-topped table and two armchairs each side.
-    glassTable(R, 4.3, 8.4, 5.9, 9.9);
-    armchair(R, 3.45, 9.15, "e", "yellowFabric"); armchair(R, 6.75, 9.15, "w", "blueFabric");
-    glassTable(R, 14.1, 8.4, 15.7, 9.9, { lines: ["A glass table. Someone's left a puzzle book open: a crossword about BUG POKéMON."] });
-    armchair(R, 13.25, 9.15, "e", "blueFabric"); armchair(R, 16.55, 9.15, "w", "yellowFabric");
-    // Low bookshelves by the door, and plants.
-    bookshelf(R, 0, 14.0, "e", 2, 1.6, { wood: "pale", lines: ["Picture books for little trainers waiting with their mums."] });
-    bookshelf(R, 20, 12.0, "w", 2, 1.6, { wood: "pale", lines: ["Leaflets: RESTING IS GOOD FOR POKéMON TOO."] });
-    plant(R, 1.0, 14.9, 1.1, { lines: ["A big leafy plant. Its leaves are very shiny."] }); plant(R, 19.0, 14.9, 1.1, { lines: ["A big leafy plant."] });
-    plant(R, 4.2, 6.2, 0.95, { lines: ["A potted palm."] }); plant(R, 15.8, 6.2, 0.95, { lines: ["A potted palm."] });
-    rug(R, 8, 5.6, 12, 14, "centerRun");
+    // A Pokémon Center as Let's Go's, compact: the counter curving round the nurse, a big ball at each end of it; her
+    // healing machine right behind her under the big screen (it shows your POKéMON while they rest); her PC; the
+    // storage PC on the right wall with the world map past it; a magazine rack back left; footstools round two coffee
+    // tables each side; blue posts where the slanted corners meet the walls, the front corners slanted low as well; a
+    // ring in the floor at the door, the mat in its nook.
+    const R = new Room("center", { name: "Pokémon Center", floor: "Viridian City", W: 18, D: 14, outsideSize: "13 by 9" });
+    shell(R, { paper: "paperCenter", floor: "mcPeachCheck", door: CENTER_DOOR, entry: true, entryFloor: "mcCenterCheck", skirt: "redPlastic", ledge: "paint", ledgeTop: "lab" });
+    band(R, 1.05, "orangeTrim");
+    chamfer(R, 2, { paper: "paperCenter", skirt: "redPlastic", band: [1.05, "orangeTrim"] });
+    frontChamfer(R, 2);
+    for (const west of [true, false]) { wallPost(R, west, 2.0, 2.5, "postBlue"); wallPost(R, west, R.Dm - 2.5, R.Dm - 2.0, "postBlue"); }
+    R.item("Blue posts", "Blue posts where the slanted corners meet the walls, front and back.");
+    const G = R.geo, cx = 9.0;
+    curvedCounter(R, cx);
+    statueBall(R, cx - 4.1, 3.7, 1.15); statueBall(R, cx + 4.1, 3.7, 1.15);
+    G.box(cx - 0.4, 1.15, 4.5, cx + 0.4, 1.28, 5.1, "greyPlastic"); G.box(cx - 0.1, 1.28, 4.65, cx + 0.1, 1.34, 4.85, "gold");
+    till(R, cx + 2.0, 4.8, 1.15, "s");
+    R.act([cx - 3, 5.2, cx + 3, 6.4], { label: "Talk", lines: ["The counter. The nurse will look after your POKéMON."] });
+    // Behind her: the machine under the big screen, and her PC.
+    healer(R, cx - 1.5, 3, { empty: true });
+    wallScreen(R, cx - 2.4, 2.55, 4.8, 1.3, R.screen("centerAd", 48, 14, drawCenterAd, 1), ["The big screen. While your POKéMON rest, it shows them, one by one."]);
+    deskPC(R, cx + 2.0, 0, "s", R.screen("pcNurse", 40, 26, drawPC, 0.9), { top: "lab", lines: ["The nurse's PC: today's patients, and a note to order more POTIONS."] });
+    officeChair(R, cx + 3.15, 1.6, "n", "redFabric");
+    // The storage PC on the right wall, the world map past it; the magazine rack back left.
+    deskPC(R, 18, 3.2, "w", R.screen("pcCenter", 40, 26, drawPC, 0.9), { top: "lab", pc: true, lines: ["The POKéMON STORAGE SYSTEM."] });
+    officeChair(R, 16.4, 4.35, "e", "redFabric");
+    wallMap(R, "e", 6.4, 1.4, 2.4, { lines: ["A map of the whole region. VIRIDIAN CITY is marked with a red pin.", "In game, this opens the TOWN MAP."] });
+    bookshelf(R, 0, 5.4, "e", 2.2, 1.6, { wood: "pale", lines: ["Magazines: TRAINER WEEKLY, and a guide called RESTING IS GOOD FOR POKéMON TOO."], name: "Magazine rack", note: "A low rack of magazines and leaflets." });
+    // Footstools round two coffee tables each side.
+    for (const [x0, sx] of [[2.0, [1.0, 4.4]], [14.6, [13.6, 17.0]]]) for (const z0 of [6.6, 9.0]) {
+      glassTable(R, x0, z0, x0 + 1.4, z0 + 1.2, { lines: ["A coffee table. Someone's left a puzzle book open: a crossword about BUG POKéMON."] });
+      for (const x of sx) footstool(R, x, z0 + 0.6);
+    }
+    rug(R, 5, 6, 13, 12, "centerRing");
+    plant(R, 5.4, 11.0, 0.95, { lines: ["A big leafy plant. Its leaves are very shiny."] }); plant(R, 12.6, 11.0, 0.95, { lines: ["A big leafy plant."] });
     doormat(R, CENTER_DOOR[0], CENTER_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matCenter" });
-    R.npcs.push({ name: "Nurse", role: "nurse", key: "viridian_nurse", x: 10.0, z: 3.3, yaw: FACE.s, look: { skin: "nurse" },
+    R.npcs.push({ name: "Nurse", role: "nurse", key: "viridian_nurse", x: cx, z: 3.0, yaw: FACE.s, look: { skin: "nurse" },
       talk: () => [{ text: "Hello, and welcome to the POKéMON CENTER!" }, { text: "We heal tired POKéMON back to full health. Shall we heal yours?" }] });
-    R.npcs.push({ name: "Gentleman", x: 15.0, z: 11.6, yaw: FACE.n, look: { skin: "gentleman" },
+    R.npcs.push({ name: "Gentleman", x: 15.6, z: 5.9, yaw: FACE.e, look: { skin: "gentleman" },
       talk: () => [{ text: "You can use that PC in the corner." }, { text: "The receptionist told me. So kind!" }] });
-    R.npcs.push({ name: "Youngster", x: 5.0, z: 11.6, yaw: FACE.n, look: { skin: "youngster" },
+    R.npcs.push({ name: "Youngster", x: 5.2, z: 8.4, yaw: FACE.w, look: { skin: "youngster" },
       talk: () => [{ text: "There's a POKéMON CENTER in every town ahead." }, { text: "They don't charge any money either!" }] });
     R.spawn = CENTER_IN;
     return R;
   },
 
   mart() {
-    // A Poké Mart as the newer games have one: the back corners cut on the slant; the blue counter on the left as you
-    // come in, the clerk behind it with the till and a shelf of stock at his back; drinks coolers and a screen on the
-    // back wall; chest freezers down the right; a row of shelves and a glass display case in the middle; a blue runner
-    // from the door. No sign inside.
-    const R = new Room("mart", { name: "Poké Mart", floor: "Viridian City", W: 16, D: 14, outsideSize: "13 by 9" });
-    shell(R, { paper: "paperMart", floor: "mcMintCheck", door: MART_DOOR, skirt: "blueTrim" });
+    // A Poké Mart as Let's Go's: the blue counter at the front on the left, its end rounded, the clerk behind it with
+    // his stock at his back; the screen on the back wall and the drinks coolers along it to the right; island shelves
+    // on the right; a blue and white diamond floor; a plant by the door. The mat in its nook.
+    const R = new Room("mart", { name: "Poké Mart", floor: "Viridian City", W: 14, D: 12, outsideSize: "13 by 9" });
+    shell(R, { paper: "paperMart", floor: "mcDiamondBlue", door: MART_DOOR, entry: true, entryFloor: "mcMintCheck", skirt: "blueTrim", ledge: "paint", ledgeTop: "lab" });
     band(R, 1.05, "blueTrim");
     chamfer(R, 2, { paper: "paperMart", skirt: "blueTrim", band: [1.05, "blueTrim"] });
-    const G = R.geo;
-    G.box(3.2, 0, 6.6, 4.2, 1.05, 12.2, { all: "counterBlue", top: "lab" });
-    G.box(0, 0, 12.2, 4.2, 1.05, 13.0, { all: "counterBlue", top: "lab" });
-    G.box(3.1, 1.05, 6.5, 4.3, 1.15, 12.3, "lab");
-    R.solid(0, 6.5, 4.3, 13.0); R.solid(0, 6.5, 3.2, 6.6);
-    // The till and a basket of balls on the counter.
-    till(R, 3.7, 9.45, 1.15, "e");
-    for (const [bx, bz] of [[3.55, 7.3], [3.85, 7.5], [3.6, 7.75]]) G.box(bx - 0.13, 1.15, bz - 0.13, bx + 0.13, 1.41, bz + 0.13, { all: "ball", top: "ballTop" });
-    R.act([3.2, 6.6, 5.2, 12.2], { label: "Talk", lines: ["The counter. The clerk sells everything on the shelves."] });
-    R.item("The counter", "Blue, a white top and stripe, the till and a little basket of balls.");
-    // Stock at the clerk's back.
-    martShelf(R, 0, 11.8, "e", 4.4, 2.4, { seed: 1, depth: 0.6, lines: ["The stock behind the counter: boxes of POKé BALLS, POTIONS by the dozen."] });
-    // The back wall: drinks coolers, the screen, tall shelves.
-    cooler(R, 2.3, 0, "s", 2); cooler(R, 4.3, 0, "s", 2);
-    wallScreen(R, 6.9, 1.6, 2.6, 1.45, R.screen("martAd", 40, 22, drawMartAd, 1), ["An advert: a ball bouncing past a POTION and a can of REPEL. NEW STOCK IN EVERY WEEK!"]);
-    G.box(6.6, 0, 0, 9.8, 0.9, 0.9, { all: "shelfWhite", front: "cupboardWhite" }); G.box(6.6, 0.9, 0, 9.8, 0.98, 0.9, "lab"); R.solid(6.6, 0, 9.8, 0.9);
-    for (const [bx, bz] of [[7.2, 0.45], [7.6, 0.4], [8.6, 0.5], [9.1, 0.42]]) G.box(bx - 0.14, 0.98, bz - 0.14, bx + 0.14, 1.26, bz + 0.14, { all: "ball", top: "ballTop" });
-    martShelf(R, 10.2, 0, "s", 3.8, 2.6, { seed: 0 });
-    // Down the right: two chest freezers, then shelves of things for the road.
-    chestFreezer(R, 16, 2.6, "w", 2); chestFreezer(R, 16, 4.6, "w", 2);
-    martShelf(R, 16, 7.2, "w", 4, 2.4, { seed: 2, lines: ["REPELS, ESCAPE ROPES and things for camping. Most of them aren't in stock yet."] });
-    // The middle: a row of shelves facing the door, and a glass display case in front of it.
-    martShelf(R, 6.4, 3.4, "s", 5.4, 2.0, { seed: 1 });
-    displayCase(R, 6.8, 7.0, 11.4, 8.0, ["Under the glass: POKé BALLS and GREAT BALLS laid out in rows, and a box of POTIONS."]);
-    rug(R, 6, 9, 10, 12, "martRun");
-    plant(R, 15.0, 12.9, 1.1, { lines: ["A plant by the door. It looks well looked after."] });
-    plant(R, 12.6, 12.9, 0.9, { lines: ["A little potted palm."] });
+    const G = R.geo, h = 1.05;
+    for (const [x0, x1, z0, z1] of [[0, 3.6, 4.0, 4.6], [2.6, 3.6, 4.6, 8.4], [0, 2.6, 7.9, 8.4], [2.7, 3.5, 8.4, 8.65], [2.9, 3.3, 8.65, 8.8]]) {
+      G.box(x0, 0, z0, x1, h, z1, { all: "counterBlue", top: null, bottom: null });
+      G.box(x0, h, z0, x1, h + 0.1, z1, "lab");
+      R.solid(x0, z0, x1, z1);
+    }
+    till(R, 3.1, 6.4, 1.15, "e");
+    for (const [bx, bz] of [[2.95, 5.0], [3.25, 5.2], [3.0, 5.45]]) G.box(bx - 0.13, 1.15, bz - 0.13, bx + 0.13, 1.41, bz + 0.13, { all: "ball", top: "ballTop" });
+    R.act([3.6, 4.6, 5.0, 8.4], { label: "Talk", lines: ["The counter. The clerk sells everything on the shelves."] });
+    R.item("The counter", "Blue with a white top, its end rounded; the till and a little basket of balls.");
+    martShelf(R, 0, 7.8, "e", 3.2, 2.4, { seed: 1, depth: 0.6, lines: ["The stock behind the counter: boxes of POKé BALLS, POTIONS by the dozen."] });
+    wallScreen(R, 2.4, 1.7, 2.4, 1.3, R.screen("martAd", 40, 22, drawMartAd, 1), ["An advert: a ball bouncing past a POTION and a can of REPEL. NEW STOCK IN EVERY WEEK!"]);
+    cooler(R, 5.2, 0, "s", 2); cooler(R, 7.2, 0, "s", 2); cooler(R, 9.2, 0, "s", 2);
+    islandShelf(R, 10.0, 3.2, 4, 1.6, { lines: ["POTIONS, ANTIDOTES and POKé BALLS, both sides. The clerk at the counter sells them."] });
+    martShelf(R, 14, 3.0, "w", 4, 2.2, { seed: 2, lines: ["REPELS, ESCAPE ROPES and things for camping. Most of them aren't in stock yet."] });
+    // The freezers in the middle, back to back.
+    chestFreezer(R, 5.0, 3.4, "s", 2); chestFreezer(R, 7.0, 3.4, "n", 2);
+    plant(R, 1.0, 9.3, 1.1, { lines: ["A plant by the door. It looks well looked after."] });
     doormat(R, MART_DOOR[0], MART_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matMart" });
-    R.npcs.push({ name: "Clerk", role: "clerk", key: "viridian_city", x: 1.7, z: 9.4, yaw: FACE.e, look: { skin: "clerk" },
+    R.npcs.push({ name: "Clerk", role: "clerk", key: "viridian_city", x: 1.4, z: 6.4, yaw: FACE.e, look: { skin: "clerk" },
       talk: () => [{ text: "Hi there! May I help you?" }] });
-    R.npcs.push({ name: "Youngster", x: 9.6, z: 6.0, yaw: FACE.n, look: { skin: "youngster" },
+    R.npcs.push({ name: "Youngster", x: 7.6, z: 1.8, yaw: FACE.n, look: { skin: "youngster" },
       talk: () => [{ text: "No! POTIONs are all sold out." }] });
-    R.npcs.push({ name: "Lady", x: 13.8, z: 9.2, yaw: FACE.e, look: { skin: "middle_aged_woman" },
+    R.npcs.push({ name: "Lady", x: 12.0, z: 5.0, yaw: FACE.e, look: { skin: "middle_aged_woman" },
       talk: () => [{ text: "This shop sells many ANTIDOTEs." }] });
     R.spawn = MART_IN;
     return R;
   },
 
   school() {
-    // Viridian's Trainer School (the green roof above the Center), as Let's Go has it: small, posts in the corners,
-    // the board on a piece of wall that comes out at the front, the teacher by it, a bookcase in the right-hand
-    // corner, desks side by side in two blocks either side of the way in, pupils at them with their books open.
-    const R = new Room("school", { name: "Trainer School", floor: "Ground floor", W: 12, D: 10, outsideSize: "10 by 6" });
-    shell(R, { paper: "paperSchool", floor: "schoolWood", door: SCHOOL_DOOR, skirt: "schoolTrim" });
-    band(R, 1.0, "schoolTrim", 0.12);
-    const G = R.geo;
-    for (const [x, z] of [[0, 0], [11.58, 0], [0, 9.58], [11.58, 9.58]]) cornerPost(R, x, z);
+    // Viridian's Trainer School, as Let's Go's: small, dark wide boards, blush pink posts in the corners, no band
+    // round the walls; the board on a piece of wall that comes out at the front, the teacher by it with a window
+    // behind her; a solid dark bookcase in the right-hand corner (drawers along its bottom); the desks in the middle
+    // side by side, pupils at three of them; pictures on the left-hand wall, a window on the right. The mat in its nook.
+    const R = new Room("school", { name: "Trainer School", floor: "Ground floor", W: 12, D: 11, outsideSize: "10 by 6" });
+    shell(R, { paper: "paperSchool", floor: "darkBoards", door: SCHOOL_DOOR, entry: true, skirt: "schoolTrim", ledge: "walnut" });
+    const G = R.geo, Dm = R.Dm;
+    for (const [x, z] of [[0, 0], [11.58, 0], [0, Dm - 0.43], [11.58, Dm - 0.43]]) cornerPost(R, x, z, 0.42, "postPink");
     // The front: a piece of wall standing out from the back wall, the board on it, its chalk ledge.
-    G.box(3, 0, 0, 9, R.H, 0.5, { s: "paperSchool", e: "paperSchool", w: "paperSchool", top: "cap" });
-    G.box(3, 0, 0.5, 9, 0.24, 0.56, "schoolTrim");
-    R.solid(3, 0, 9, 0.5);
-    G.box(3.4, 1.2, 0.5, 8.6, 3.15, 0.58, "walnut");
-    G.box(3.55, 1.35, 0.58, 8.45, 3.0, 0.59, { s: "chalkboard", all: null });
-    G.box(3.4, 1.12, 0.5, 8.6, 1.2, 0.72, "walnut");
+    G.box(4, 0, 0, 8, R.H, 0.5, { s: "paperSchool", e: "paperSchool", w: "paperSchool", top: "cap" });
+    G.box(4, 0, 0.5, 8, 0.24, 0.56, "schoolTrim");
+    R.solid(4, 0, 8, 0.5);
+    G.box(4.25, 1.2, 0.5, 7.75, 3.0, 0.58, "walnut");
+    G.box(4.38, 1.33, 0.58, 7.62, 2.87, 0.59, { s: "chalkboard", all: null });
+    G.box(4.25, 1.12, 0.5, 7.75, 1.2, 0.72, "walnut");
     const board = ["The BLACKBOARD: what can go wrong for a POKéMON in battle.",
       "SLEEP: it can't attack until it wakes up. That can take a few turns.",
       "POISON: it loses HP every turn, and as you walk about with it too.",
@@ -885,65 +1060,85 @@ const BUILD = {
       "BURN: it loses HP every turn, and its physical attacks are weaker.",
       "FREEZE: it can't move at all until it thaws out.",
       "A POKéMON CENTER puts every one of them right."];
-    R.act([3.4, 0.5, 8.6, 1.2], { label: "Read", lines: board });
-    // The bookcase in the right-hand corner.
-    bookshelf(R, 9.4, 0, "s", 2.1, 2.6, { wood: "walnut", lines: ["Books on POKéMON: TYPES, MOVES, and HOW TO CARE FOR YOUR FIRST POKéMON."] });
-    // The desks: side by side in twos, two rows each side of the way in, a pupil at three of them, books open.
+    R.act([4.25, 0.5, 7.75, 1.2], { label: "Read", lines: board });
+    crossWindowN(R, 1.0, 1.6, 2.0, 1.4, ["Outside: the POKéMON CENTER's red roof."]);
+    bookshelf(R, 9.4, 0, "s", 2.1, 2.6, { wood: "mcDarkOak", drawers: true, lines: ["Books on POKéMON: TYPES, MOVES, and HOW TO CARE FOR YOUR FIRST POKéMON.", "The drawers along the bottom are full of chalk."], name: "Bookcase", note: "Solid dark wood, books on its shelves, drawers along the bottom." });
+    framed(R, 2.4, 1.7, 1.2, 0.9, "painting", "w", { act: { label: "Look", lines: ["A painting of the sea south of PALLET TOWN."] } });
+    framed(R, 4.6, 1.7, 1.2, 0.9, "paintingHills", "w", { act: { label: "Look", lines: ["A painting of the hills round VIRIDIAN CITY."] } });
+    R.item("Pictures", "Two paintings on the left-hand wall.");
+    crossWindow(R, "e", 3.6, 1.5, 1.8, 1.4, ["Outside: VIRIDIAN CITY's houses, and the GYM's roof over the trees."]);
+    // The desks: side by side in twos, two rows, the way to the board between them, a pupil at three.
     const notebook = ["A notebook, left open. TRAINER TIPS, page 1: weaken a wild POKéMON before you throw a POKé BALL.",
       "Page 2: a POKéMON that's asleep or paralysed is easier to catch.",
       "Page 3: you can carry six POKéMON. Any more you catch go to the PC in a POKéMON CENTER.",
       "Page 4: wild POKéMON live in the tall grass. Watch where you walk!"];
-    schoolDesk(R, 2.15, 3.3, { book: true }); schoolDesk(R, 3.25, 3.3, { book: true, lines: notebook });
-    schoolDesk(R, 8.75, 3.3); schoolDesk(R, 9.85, 3.3, { book: true });
-    schoolDesk(R, 2.15, 5.8); schoolDesk(R, 3.25, 5.8, { book: true });
-    schoolDesk(R, 8.75, 5.8, { book: true }); schoolDesk(R, 9.85, 5.8);
-    // Plants in white pots along the sides.
-    palm(R, 0.8, 7.6, 0.9); palm(R, 11.2, 7.6, 0.9);
-    crossWindow(R, "e", 4.2, 1.5, 1.8, 1.4, ["Outside: VIRIDIAN CITY's houses, and the GYM's roof over the trees."]);
-    crossWindow(R, "w", 4.2, 1.5, 1.8, 1.4, ["Outside: the POKéMON CENTER's red roof."]);
+    schoolDesk(R, 3.25, 3.4, { book: true }); schoolDesk(R, 4.35, 3.4, { book: true, lines: notebook });
+    schoolDesk(R, 7.65, 3.4); schoolDesk(R, 8.75, 3.4, { book: true });
+    schoolDesk(R, 3.25, 5.8); schoolDesk(R, 4.35, 5.8, { book: true });
+    schoolDesk(R, 7.65, 5.8, { book: true }); schoolDesk(R, 8.75, 5.8);
+    palm(R, 0.9, 7.2, 0.9); palm(R, 11.1, 7.2, 0.9);
     doormat(R, SCHOOL_DOOR[0], SCHOOL_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matSchool" });
-    R.npcs.push({ name: "Teacher", key: "viridian_school_teacher", x: 2.2, z: 1.5, yaw: FACE.s, look: { skin: "lady" },
+    R.npcs.push({ name: "Teacher", key: "viridian_school_teacher", x: 2.4, z: 1.6, yaw: FACE.s, look: { skin: "school_teacher" },
       talk: () => [{ text: "Welcome to the TRAINER SCHOOL! Shall I ask you a question?" }] });
-    R.npcs.push({ name: "Pupil", key: "viridian_school_kid", x: 2.15, z: 4.08, yaw: FACE.n, seated: true, look: { skin: "school_kid" },
+    R.npcs.push({ name: "Pupil", key: "viridian_school_kid", x: 3.25, z: 4.18, yaw: FACE.n, seated: true, look: { skin: "school_kid" },
       talk: () => [{ text: "Whew! I'm trying to learn all my notes by heart." }, { text: "The test is about STATUS problems. Look at the board!" }] });
-    R.npcs.push({ name: "Pupil", key: "viridian_school_girl", x: 9.85, z: 4.08, yaw: FACE.n, seated: true, look: { skin: "school_kid_f" },
+    R.npcs.push({ name: "Pupil", key: "viridian_school_girl", x: 8.75, z: 4.18, yaw: FACE.n, seated: true, look: { skin: "school_kid_f" },
       talk: () => [{ text: "The notebook on the desk up front has TRAINER TIPS in it." }, { text: "Have a read! It's really useful." }] });
-    R.npcs.push({ name: "Pupil", key: "viridian_school_kid2", x: 8.75, z: 6.58, yaw: FACE.n, seated: true, look: { skin: "schoolboy" },
+    R.npcs.push({ name: "Pupil", key: "viridian_school_kid2", x: 7.65, z: 6.58, yaw: FACE.n, seated: true, look: { skin: "schoolboy" },
       talk: () => [{ text: "A burnt POKéMON's attacks are weaker? I never knew that!" }, { text: "I'd better write it down." }] });
     R.spawn = SCHOOL_IN;
     return R;
   },
 
   nickhouse() {
-    // The house above the Trainer School, as Let's Go has it: dark wide boards, posts in the corners, the kitchen
-    // down the left-hand wall, the TV in the middle at the back with a bookshelf beside it, the table in the middle
-    // on a green rug, two windows on the right. A father and his little girl, and their SPEAROW's perch.
-    const R = new Room("nickhouse", { name: "Viridian house", floor: "Ground floor", W: 12, D: 9, outsideSize: "10 by 6" });
-    shell(R, { paper: "paperSchool", floor: "houseBoards", door: VHOUSE_DOOR, skirt: "beam" });
+    // The house above the Trainer School, as Let's Go's: darker wide boards, posts in the corners; the kitchen down
+    // the left-hand wall with the bin by the fridge; a cupboard, the TV on its unit (a DVD player and books in it) and
+    // a sideboard with books on it along the back, a clock over the sideboard; a desk on the right with a white lamp
+    // and a red book, under a window; the table in the middle on a green rug (a white top in a wooden trim, a fruit
+    // bowl, four cushioned chairs). A father and his little girl, and their SPEAROW's perch. The mat in its nook.
+    const R = new Room("nickhouse", { name: "Viridian house", floor: "Ground floor", W: 12, D: 11, outsideSize: "10 by 6" });
+    shell(R, { paper: "paperSchool", floor: "midBoards", door: VHOUSE_DOOR, entry: true, skirt: "beam", ledge: "walnut" });
     band(R, 1.0, "beam", 0.12);
-    const G = R.geo;
-    for (const [x, z] of [[0, 0], [11.58, 0], [0, 8.58], [11.58, 8.58]]) cornerPost(R, x, z);
-    // The kitchen down the left-hand wall (from the back corner towards you): fridge, sink, hob, a microwave above.
-    kitchen(R, 0, "e", { z: 6.2 });
-    // The TV in the middle at the back, on a low cabinet; the bookshelf beside it.
-    tvSet(R, 4.6, 0, "s", R.screen("tvHouseV", 40, 24, drawFilm, 0.9), { w: 2.8, lines: ["A nature programme: a flock of SPEAROW over the sea."] });
-    bookshelf(R, 7.8, 0, "s", 2.2, 1.6, { wood: "walnut", lines: ["Books: NAMING YOUR POKéMON, and A THOUSAND NICKNAMES FOR BIRD POKéMON."] });
-    // The table in the middle, on a green rug; a chair at the back of it and one at its right.
-    G.box(3.9, 0, 3.0, 8.1, 0.03, 6.6, { top: "rugGreen", all: "cap", bottom: null });
-    table(R, 5.0, 3.9, 7.0, 5.7, { top: "oak", leg: "walnut", h: 0.86, name: "Table", note: "Oak, a bowl of fruit in the middle." });
-    G.box(5.75, 0.86, 4.55, 6.25, 1.02, 5.05, { all: "honey", top: "flowerTop" });
-    chair(R, 6.0, 3.3, "s"); chair(R, 7.6, 4.8, "w");
-    // Two windows on the right, the SPEAROW's perch between them.
-    crossWindow(R, "e", 1.6, 1.4, 1.8, 1.4, ["Outside: VIRIDIAN CITY's rooftops."]);
-    crossWindow(R, "e", 5.4, 1.4, 1.8, 1.4, ["Outside: the TRAINER SCHOOL's green roof."]);
-    G.box(11.1, 0, 4.0, 11.3, 1.3, 4.2, "walnut"); G.box(10.7, 1.3, 4.05, 11.7, 1.38, 4.15, "walnut");
-    R.act([10.4, 3.6, 12, 4.6], { label: "Look", lines: ["A perch with a name carved on it: SPEARY.", "SPEARY's out for a fly."] });
-    bin(R, 0.7, 8.2);
-    plant(R, 11.1, 8.1, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+    const G = R.geo, Dm = R.Dm;
+    for (const [x, z] of [[0, 0], [11.58, 0], [0, Dm - 0.43], [11.58, Dm - 0.43]]) cornerPost(R, x, z);
+    kitchen(R, 0, "e", { z: 6.6 });
+    bin(R, 0.5, 7.15);
+    sideboard(R, 1.5, 0, "s", 1.6, { lines: ["A cupboard. Inside: a bag of bird seed, and SPEARY's spare perch."] });
+    tvUnit(R, 3.5, 3.0, R.screen("tvHouseV", 40, 24, drawFilm, 0.9), { lines: ["A nature programme: a flock of SPEAROW over the sea."] });
+    { const F = R.F(7.2, 0, "s"), w = 2.6;
+      F.box(0, 0, 0, w, 0.1, 0.62, "cap");
+      F.box(0, 0.1, 0, w, 0.92, 0.66, { all: "walnut", front: null });
+      for (let i = 0; i < 2; i++) F.box(i * w / 2 + 0.03, 0.12, 0.66, (i + 1) * w / 2 - 0.03, 0.9, 0.67, { front: "drawers", all: null });
+      F.box(-0.04, 0.92, -0.02, w + 0.04, 0.99, 0.7, "walnut");
+      F.box(0.2, 0.99, 0.1, 1.5, 1.44, 0.55, { front: "books", all: "linen", top: "linen" });
+      F.box(1.8, 0.99, 0.2, 2.1, 1.3, 0.5, "potWhite"); F.box(1.7, 1.3, 0.1, 2.2, 1.65, 0.6, "leafSolid");
+      F.solid(0, 0, w, 0.7);
+      R.act(F.rect(0, 0.3, w, 1.3), { label: "Look", lines: ["Books on the sideboard: NAMING YOUR POKéMON, and A THOUSAND NICKNAMES FOR BIRD POKéMON."] });
+      R.item("Sideboard", "Walnut, two drawers, a row of books and a plant on top."); }
+    clock(R, 8.1, 2.3);
+    // The desk on the right, under a window: a white lamp, a red book.
+    table(R, 10.9, 2.4, 11.85, 4.4, { top: "walnut", leg: "walnut", h: 0.8, name: "Desk", note: "A small walnut desk under the window: a lamp with a white shade, a red book." });
+    deskLamp(R, 11.4, 2.8, 0.8);
+    G.box(11.05, 0.8, 3.5, 11.6, 0.9, 4.1, { all: "redPlastic", top: "linen" });
+    chair(R, 10.3, 3.4, "e");
+    R.act([10.0, 2.4, 11.9, 4.4], { label: "Look", lines: ["A red book on the desk: SPEARY'S FIRST YEAR. Every page has a photo of SPEARY."] });
+    crossWindow(R, "e", 2.6, 1.6, 1.8, 1.2, ["Outside: VIRIDIAN CITY's rooftops."]);
+    crossWindow(R, "e", 5.8, 1.5, 1.6, 1.3, ["Outside: the TRAINER SCHOOL's green roof."]);
+    G.box(11.1, 0, 6.5, 11.3, 1.3, 6.7, "walnut"); G.box(10.7, 1.3, 6.55, 11.7, 1.38, 6.65, "walnut");
+    R.act([10.4, 6.1, 12, 7.1], { label: "Look", lines: ["A perch with a name carved on it: SPEARY.", "SPEARY's out for a fly."] });
+    // The table in the middle on the green rug: a white top in a wooden trim, a fruit bowl, four cushioned chairs.
+    G.box(3.6, 0, 3.4, 8.4, 0.03, 7.4, { top: "rugGreen", all: "cap", bottom: null });
+    table(R, 4.8, 4.4, 7.2, 6.4, { top: "lab", leg: "walnut", h: 0.86, name: "Table", note: "A white top in a walnut trim, a bowl of fruit in the middle." });
+    G.box(4.74, 0.74, 4.34, 7.26, 0.88, 4.44, "walnut"); G.box(4.74, 0.74, 6.36, 7.26, 0.88, 6.46, "walnut");
+    G.box(4.74, 0.74, 4.44, 4.84, 0.88, 6.36, "walnut"); G.box(7.16, 0.74, 4.44, 7.26, 0.88, 6.36, "walnut");
+    fruitBowl(R, 6.0, 5.4, 0.86);
+    for (const z of [4.95, 5.85]) { chair(R, 4.15, z, "e", { seat: "cushion" }); chair(R, 7.85, z, "w", { seat: "cushion" }); }
+    R.item("Chairs", "Four walnut chairs with yellow cushions, two each side.");
+    plant(R, 10.8, 7.7, 0.85, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
     doormat(R, VHOUSE_DOOR[0], VHOUSE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHouseV" });
-    R.npcs.push({ name: "Father", key: "viridian_house_dad", x: 2.0, z: 4.6, yaw: FACE.e, look: { skin: "middle_aged_man" },
+    R.npcs.push({ name: "Father", key: "viridian_house_dad", x: 2.4, z: 3.4, yaw: FACE.e, look: { skin: "middle_aged_man" },
       talk: () => [{ text: "Coming up with nicknames is fun, but it's harder than you'd think." }, { text: "Simple names are the easiest to remember." }] });
-    R.npcs.push({ name: "Little girl", key: "viridian_house_girl", x: 9.6, z: 5.6, yaw: FACE.w, look: { skin: "little_girl" },
+    R.npcs.push({ name: "Little girl", key: "viridian_house_girl", x: 9.4, z: 6.6, yaw: FACE.w, look: { skin: "little_girl" },
       talk: () => [{ text: "My daddy loves POKéMON too!" }, { text: "Our SPEAROW is called SPEARY. Daddy named it!" }] });
     R.spawn = VHOUSE_IN;
     return R;
@@ -974,7 +1169,7 @@ const BUILD = {
     lgGate(R, { south: { to: "town" }, north: { none: true, lines: ["The way on to VIRIDIAN FOREST."] } });
     R.npcs.push({ name: "Girl", key: "gate_s_girl", x: 3.0, z: 5.6, yaw: FACE.e, look: { skin: "girl" },
       talk: () => [{ text: "Some POKéMON only live in forests and caves." }, { text: "Look everywhere if you want to find them all!" }] });
-    R.npcs.push({ name: "Lady", key: "gate_s_lady", x: 12.6, z: 7.6, yaw: FACE.w, seated: true, look: { skin: "lady" },
+    R.npcs.push({ name: "Lady", key: "gate_s_lady", x: 12.6, z: 6.9, yaw: FACE.w, seated: true, look: { skin: "lady" },
       talk: () => [{ text: "VIRIDIAN FOREST is a natural maze." }, { text: "Stick to the path, or you'll be wandering in circles!" }] });
     R.spawn = LG_GATE_IN;
     return R;
@@ -987,7 +1182,7 @@ const BUILD = {
     lgGate(R, { north: { to: "town" }, south: { none: true, lines: ["The way back into VIRIDIAN FOREST."] } });
     R.npcs.push({ name: "Youngster", key: "gate_n_kid", x: 3.0, z: 7.0, yaw: FACE.e, look: { skin: "youngster" },
       talk: () => [{ text: "Off to PEWTER CITY? Its GYM LEADER, BROCK, uses ROCK-type POKéMON." }, { text: "WATER and GRASS moves work well on ROCK!" }] });
-    R.npcs.push({ name: "Hiker", key: "gate_n_hiker", x: 12.6, z: 3.9, yaw: FACE.w, seated: true, look: { skin: "hiker" },
+    R.npcs.push({ name: "Hiker", key: "gate_n_hiker", x: 12.6, z: 3.7, yaw: FACE.w, seated: true, look: { skin: "hiker" },
       talk: () => [{ text: "Phew! That forest goes on and on." }, { text: "It's easy to lose your way among all those trees." }] });
     R.spawn = LG_GATE_FROM_N;
     return R;

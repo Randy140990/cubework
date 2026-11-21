@@ -179,7 +179,17 @@ public final class Adventure {
 		com.insidethecube.retromon.game.Interiors.Room room = com.insidethecube.retromon.game.Interiors.roomOf(e);
 		// (A big one, the forest, you walk about in: the camera follows you there, as outside.)
 		if (room != null && room.big()) room = null;
-		if (room != null) follow = new Vec3(room.cx(), room.oy() + 0.9, room.cz());
+		// Inside, closer in than the whole room (as the Interior Viewer's game camera): seven tenths as far back (15 at
+		// least), following you up and down the room, and across it when it's wider than the view, held in from the
+		// walls so the room fills the screen.
+		double roomDist = 0;
+		if (room != null) {
+			roomDist = Math.max(15, room.camDist() * 0.72);
+			double vis = 2 * roomDist * Math.tan(Math.toRadians(FOV / 2)) * (16 / 9.0) * 0.92, hx = Math.min(room.w() / 2, vis / 2 - 0.5);
+			double lx = room.w() <= vis - 1 ? room.w() / 2 : Math.max(hx, Math.min(room.w() - hx, p.x - room.ox()));
+			double lz = Math.max(Math.min(room.d() / 2, 4.5), Math.min(Math.max(room.d() / 2, room.d() - 4.0), p.z - room.oz() - 0.6));
+			follow = new Vec3(room.ox() + lx, room.oy() + 0.9, room.oz() + lz);
+		}
 		// Talking to someone: ease in towards the middle of the two of you, closer and a little lower.
 		Entity other = focusId >= 0 && e.level() != null ? e.level().getEntity(focusId) : null;
 		// Eased by time, not by frames (at a high frame rate it snapped in and out).
@@ -206,7 +216,7 @@ public final class Adventure {
 			focusRoom += ((clear ? 1 : 0) - focusRoom) * easeRoom;
 		} else focusRoom = 1;
 		double k = focusIn * focusRoom;
-		double far = room != null ? room.camDist() : distance;
+		double far = room != null ? roomDist : distance;
 		// (In, never back: in a small room, where the camera's already near, it only comes in a little, and tips up
 		// less, so it doesn't end up looking at the floor.)
 		double near = room != null ? Math.min(13, far * 0.8) : 13;

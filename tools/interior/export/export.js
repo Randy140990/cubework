@@ -16,7 +16,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
     const oscreen = Room.prototype.screen;
     Room.prototype.screen = function (key, w, h, draw, glow) { (this._screens || (this._screens = [])).push({ key, w, h, draw: draw.name }); return oscreen.call(this, key, w, h, draw, glow); };
     const oshell = window.shell; window.shell = function (room, o = {}) { room._floors = o.floorRects || [[0, 0, room.W, room.D]]; room._door = o.door || null; room._paper = o.paper; return oshell(room, o); };
-    const omat = window.doormat; window.doormat = function (room, x0, x1, o = {}) { if (!o.none) (room._mats || (room._mats = [])).push({ x0, x1, to: o.to, spawn: o.spawn }); return omat(room, x0, x1, o); };
+    const omat = window.doormat; window.doormat = function (room, x0, x1, o = {}) { if (!o.none) (room._mats || (room._mats = [])).push(room.entry ? { x0: room.entry[0], x1: room.entry[1], to: o.to, spawn: o.spawn } : { x0, x1, to: o.to, spawn: o.spawn }); return omat(room, x0, x1, o); };
     const opass = window.passageN; window.passageN = function (room, x0, x1, o = {}) { if (!o.none) (room._passes || (room._passes = [])).push({ x0, x1, to: o.to, spawn: o.spawn }); return opass(room, x0, x1, o); };
     const oup = window.stairsUp; window.stairsUp = function (room, x0, z0 = 0, depth = 2, o = {}) { (room._stairs || (room._stairs = [])).push({ dir: "up", x0, z0, depth, to: o.to, spawn: o.spawn }); return oup(room, x0, z0, depth, o); };
     const odown = window.stairsDown; window.stairsDown = function (room, x0, z0 = 0, depth = 2, o = {}) { (room._stairs || (room._stairs = [])).push({ dir: "down", x0, z0, depth, to: o.to, spawn: o.spawn }); return odown(room, x0, z0, depth, o); };

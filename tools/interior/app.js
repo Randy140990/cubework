@@ -85,7 +85,7 @@ function prepareRoom(r) {
 
 // ---------- the camera: always facing north, looking down; the whole room, or following you ----------
 const PITCH = 52 * D2R, TALK_PITCH = 40 * D2R;
-const cam = { mode: "room", tx: 8, tz: 7, ty: 0, dist: 30, fit: null, pitch: PITCH };
+const cam = { mode: "close", tx: 8, tz: 7, ty: 0, dist: 30, fit: null, pitch: PITCH };
 const scratch = new THREE.PerspectiveCamera(34, 1.6, 0.1, 400), ndc = new THREE.Vector3();
 function placeCam(c, tx, ty, tz, d, pitch = PITCH) { c.position.set(tx, ty + Math.sin(pitch) * d, tz + Math.cos(pitch) * d); c.lookAt(tx, ty, tz); c.updateMatrixWorld(true); }
 // As the mod frames a room (tools/interior/export/tomod.py, fit_camera): every corner inside 90% of a 16:9 screen.
@@ -126,8 +126,16 @@ let focus = null;
 function camGoal() {
   if (focus) return { x: (me.x + focus.x) / 2, y: 0.9, z: (me.z + focus.z) / 2, d: 13, p: TALK_PITCH };
   if (cam.mode === "room" && cam.fit) return { x: room.W / 2, y: room.outside ? 0 : 0.9, z: cam.fit.tz, d: cam.fit.d, p: PITCH };
-  const d = room.outside ? 15 : 11.5, m = room.outside ? 6 : 4;
-  return { x: Math.max(Math.min(m, room.W / 2), Math.min(room.W - Math.min(m, room.W / 2), me.x)), y: me.y * 0.6, z: Math.max(2, Math.min(room.D - 2.5, me.z - 0.6)), d, p: PITCH };
+  // The game's, inside: closer in than the whole room (seven tenths as far back, 15 at least), following you up and
+  // down the room and across it when it's wider than the view, held in from the walls so the room fills the screen.
+  if (!room.outside && cam.fit) {
+    const d = Math.max(15, cam.fit.d * 0.72), vis = 2 * d * Math.tan(17 * D2R) * (16 / 9) * 0.92, hx = Math.min(room.W / 2, vis / 2 - 0.5);
+    const x = room.W <= vis - 1 ? room.W / 2 : Math.max(hx, Math.min(room.W - hx, me.x));
+    const z = Math.max(Math.min(room.D / 2, 4.5), Math.min(Math.max(room.D / 2, room.D - 4.0), me.z - 0.6));
+    return { x, y: 0.9, z, d, p: PITCH };
+  }
+  const d = room.outside ? 15 : 13.5, m = room.outside ? 6 : 5.5;
+  return { x: Math.max(Math.min(m, room.W / 2), Math.min(room.W - Math.min(m, room.W / 2), me.x)), y: me.y * 0.6 + (room.outside ? 0 : 0.9), z: Math.max(2.5, Math.min(room.D - 3, me.z - 0.6)), d, p: PITCH };
 }
 
 // ---------- going places ----------
@@ -478,7 +486,7 @@ function renderPanel() {
   const size = room.outside ? `${room.W} by ${room.D} blocks` : `${room.W} by ${room.D} blocks`;
   const facts = [["Floor", size], room.outside ? ["Houses", "8 by 6 outside"] : ["Walls", `${room.H} blocks high`]];
   if (room.outsideSize) facts.push(["From outside", room.outsideSize + " blocks"]);
-  facts.push(["Camera", cam.mode === "room" ? "The game's: north up, 52° down, held on the room" : "Close up, following you"]);
+  facts.push(["Camera", cam.mode === "room" ? "The whole room, north up, 52° down" : "The game's: close, following you, held in from the walls"]);
   let follower = `<p class="note">No follower. Pick any creature above.</p>`;
   if (d && fol.size) {
     const h = fol.size.h, ride = canRide();
