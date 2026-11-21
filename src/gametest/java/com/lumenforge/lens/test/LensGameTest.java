@@ -43,7 +43,15 @@ public final class LensGameTest implements FabricClientGameTest {
 			Lens.settings.sharp = false;
 			Lens.settings.photoSize = Sizes.Size.K4;
 		});
+		String custom = System.getenv("LIGHTLENS_FFMPEG");
+		if (custom != null && !custom.isBlank()) {
+			ctx.runOnClient(mc -> {
+				Lens.settings.ffmpegPath = custom;
+				Lens.setupFfmpeg();
+			});
+		}
 		String exe = Ffmpeg.findNow();
+		log("FFmpeg: " + exe);
 		check(exe != null, "FFmpeg found");
 		Ffmpeg.probe(exe);
 		log("encoder H.264: " + Ffmpeg.h264() + ", H.265: " + Ffmpeg.hevc());
@@ -91,9 +99,13 @@ public final class LensGameTest implements FabricClientGameTest {
 			probe(exe, v1, "video1");
 			log("frames captured " + Recorder.captured + ", dropped " + Recorder.dropped);
 
-			// ---- Photos, not recording: 4K (drawn bigger than the window) and window size.
+			// ---- Photos, not recording: 4K with a 3 s wait (drawn bigger than the window), and window size.
+			ctx.runOnClient(mc -> Lens.settings.photoWait = 3);
 			ctx.runOnClient(mc -> Photo.take());
+			ctx.waitTicks(10);
+			check(ctx.computeOnClient(mc -> Photo.countdown()) > 0, "photo countdown running");
 			ctx.waitFor(mc -> !Photo.busy(), 20 * 60);
+			ctx.runOnClient(mc -> Lens.settings.photoWait = 0);
 			ctx.runOnClient(mc -> Lens.settings.photoSize = Sizes.Size.SCREEN);
 			ctx.runOnClient(mc -> Photo.take());
 			ctx.waitFor(mc -> !Photo.busy(), 20 * 60);

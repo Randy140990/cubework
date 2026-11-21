@@ -187,27 +187,89 @@ public final class Ffmpeg {
 
 	public static synchronized void probe(String exe) {
 		if (probed) return;
+		PLAIN.clear();
 		h264 = first(exe, H264);
 		hevc = first(exe, HEVC);
 		probed = true;
+		System.out.println("[Lightlens] FFmpeg " + exe + " (version " + major + "): H.264 " + h264 + (PLAIN.contains(h264) ? " (plain settings)" : "")
+				+ ", H.265 " + hevc + (lastTestLog.isEmpty() ? "" : "; last failed test: " + lastTestLog));
 	}
 
 	private static String first(String exe, String[] list) {
-		for (String enc : list) if (test(exe, enc)) return enc;
+		for (String enc : list) {
+			if (test(exe, enc, true)) return enc;
+			if (test(exe, enc, false)) {
+				// It runs, but not with our tuned settings (an older driver or FFmpeg): use plain ones.
+				PLAIN.add(enc);
+				return enc;
+			}
+		}
 		return null;
 	}
 
-	/** Encodes a tiny clip with this encoder, fed the way a recording feeds it. */
-	static boolean test(String exe, String enc) {
+	/** Encoders that only run with plain settings (no preset or tuning). */
+	private static final java.util.Set<String> PLAIN = java.util.concurrent.ConcurrentHashMap.newKeySet();
+	/** What the last failed encoder test said, for the log. */
+	public static volatile String lastTestLog = "";
+
+	/**
+	 * Encodes a short clip with this encoder, fed the way a recording feeds it: the same colour conversion, the
+	 * steady frame rate, and (with `tuned`) the same encoder settings a recording uses.
+	 */
+	static boolean test(String exe, String enc, boolean tuned) {
+		Process p = null;
 		try {
-			List<String> cmd = new ArrayList<>(List.of(exe, "-hide_banner", "-loglevel", "error", "-f", "lavfi", "-i",
-					"color=c=black:s=640x360:r=30:d=0.3", "-vf", takesRgba(enc) ? "format=rgba" : "format=nv12", "-c:v", enc, "-f", "null", "-"));
-			Process p = new ProcessBuilder(cmd).redirectErrorStream(true).start();
-			p.getInputStream().readAllBytes();
-			return p.waitFor(25, TimeUnit.SECONDS) && p.exitValue() == 0;
+			int w = 1280, h = 720, fps = 30;
+			List<String> cmd = new ArrayList<>(List.of(exe, "-hide_banner", "-loglevel", "error", "-nostdin", "-f", "matroska", "-i", "pipe:0"));
+			cmd.addAll(major >= 5 ? List.of("-fps_mode", "cfr") : List.of("-vsync", "cfr"));
+			cmd.addAll(List.of("-r", String.valueOf(fps)));
+			if (!takesRgba(enc)) cmd.addAll(List.of("-vf", "scale=out_color_matrix=bt709:out_range=tv,format=nv12"));
+			cmd.addAll(tuned ? videoArgs(enc, Quality.HIGH, w, h, fps) : plainArgs(enc, Quality.HIGH, w, h, fps));
+			cmd.addAll(List.of("-f", "null", "-"));
+			p = new ProcessBuilder(cmd).redirectErrorStream(true).start();
+			Process proc = p;
+			StringBuilder log = new StringBuilder();
+			Thread reader = new Thread(() -> {
+				try {
+					log.append(new String(proc.getInputStream().readAllBytes(), StandardCharsets.UTF_8));
+				} catch (IOException ignored) {
+				}
+			});
+			reader.setDaemon(true);
+			reader.start();
+			// The same stream a recording sends: timed RGBA frames in Matroska.
+			try (java.io.OutputStream out = new java.io.BufferedOutputStream(p.getOutputStream(), 1 << 20)) {
+				MkvWriter mkv = new MkvWriter(out, w, h);
+				mkv.writeHeader("Lightlens test");
+				byte[] frame = new byte[w * h * 4];
+				for (int i = 0; i < 12; i++) {
+					java.util.Arrays.fill(frame, (byte) (i * 20));
+					mkv.writeFrame(i * 40L, frame, 0);
+				}
+			} catch (IOException ignored) {
+				// FFmpeg stopped reading: its exit code and log say why.
+			}
+			boolean ok = p.waitFor(30, TimeUnit.SECONDS) && p.exitValue() == 0;
+			reader.join(2000);
+			if (!ok) lastTestLog = enc + (tuned ? " (tuned)" : " (plain)") + ": " + tail(log.toString(), 300);
+			return ok;
 		} catch (Exception e) {
+			lastTestLog = enc + ": " + e;
 			return false;
+		} finally {
+			if (p != null && p.isAlive()) p.destroyForcibly();
 		}
+	}
+
+	/** Just the encoder and a bitrate: what any build of FFmpeg accepts. */
+	static List<String> plainArgs(String enc, Quality q, int w, int h, int fps) {
+		double mbps = Sizes.mbps(q, w, h, fps, enc != null && enc.startsWith("hevc"));
+		return new ArrayList<>(List.of("-c:v", enc, "-b:v", fmt(mbps), "-g", String.valueOf(fps * 2)));
+	}
+
+	/** The settings a recording uses for this encoder (plain ones if the tuned ones didn't run here). */
+	static List<String> encoderArgs(String enc, Quality q, int w, int h, int fps) {
+		return PLAIN.contains(enc) ? plainArgs(enc, q, w, h, fps) : videoArgs(enc, q, w, h, fps);
 	}
 
 	/** The H.264 encoder found (never null once probed: mpeg4 at worst), or null before the test. */
@@ -255,7 +317,7 @@ public final class Ffmpeg {
 		c.addAll(major >= 5 ? List.of("-fps_mode", "cfr") : List.of("-vsync", "cfr"));
 		c.addAll(List.of("-r", String.valueOf(fps)));
 		if (!takesRgba(enc)) c.addAll(List.of("-vf", "scale=out_color_matrix=bt709:out_range=tv,format=nv12"));
-		c.addAll(videoArgs(enc, q, w, h, fps));
+		c.addAll(encoderArgs(enc, q, w, h, fps));
 		if (!takesRgba(enc)) c.addAll(List.of("-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv"));
 		c.addAll(List.of("-f", "matroska", out.toString()));
 		return c;

@@ -132,6 +132,16 @@ jobs:
           pulseaudio -D --exit-idle-time=-1 || true
           pactl load-module module-null-sink sink_name=ci || true
           pactl set-default-sink ci || true
+      - name: The FFmpeg players get (BtbN, LGPL)
+        if: matrix.mods == 'vanilla'
+        shell: bash
+        run: |
+          mkdir -p /tmp/btbn && cd /tmp/btbn
+          curl -sL -o f.tar.xz https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-lgpl.tar.xz
+          tar -xJf f.tar.xz
+          F=$(find /tmp/btbn -name ffmpeg -type f | head -n 1)
+          $F -hide_banner -version | head -1
+          echo "LIGHTLENS_FFMPEG=$F" >> $GITHUB_ENV
       - name: Sodium, Iris and Tempered Light
         if: matrix.mods == 'shaders'
         shell: bash

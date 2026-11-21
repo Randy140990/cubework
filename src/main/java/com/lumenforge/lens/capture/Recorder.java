@@ -141,7 +141,7 @@ public final class Recorder {
 			Ffmpeg.probeAsync();
 			return "Checking your graphics card's video encoder, try again in a moment";
 		}
-		if (Ffmpeg.h264() == null) return "This FFmpeg can't make video here. Pick another in config/lightlens.json (ffmpegPath)";
+		if (Ffmpeg.h264() == null) return "FFmpeg couldn't make video on this PC: " + Ffmpeg.lastTestLog;
 		return null;
 	}
 
@@ -154,7 +154,8 @@ public final class Recorder {
 		}
 		String why = cantStart();
 		if (why != null) {
-			Notify.toast("Can't record", why);
+			lastError = why;
+			Notify.failed("Can't record", why);
 			return;
 		}
 		Path out = Lens.output();
@@ -162,7 +163,7 @@ public final class Recorder {
 			Files.createDirectories(out);
 			if (!Files.isWritable(out)) throw new IOException("can't write there");
 		} catch (Exception e) {
-			Notify.toast("Can't record", "The folder " + out + " can't be used: " + e.getMessage());
+			Notify.failed("Can't record", "The folder " + out + " can't be used: " + e.getMessage());
 			return;
 		}
 
@@ -172,7 +173,7 @@ public final class Recorder {
 		shape = s.shape;
 		int rw = Capture.realWidth(), rh = Capture.realHeight();
 		if (rw <= 0 || rh <= 0) {
-			Notify.toast("Can't record", "The game window is minimised");
+			Notify.failed("Can't record", "The game window is minimised");
 			return;
 		}
 		int[] size = Sizes.output(s.videoSize, shape, rw, rh);
@@ -184,7 +185,7 @@ public final class Recorder {
 		long perMin = Sizes.bytesPerMinute(s.quality, outW, outH, fps, hevc);
 		long free = Capture.freeSpace(out);
 		if (free >= 0 && free < perMin * 2 + 500_000_000L) {
-			Notify.toast("Can't record", "Not enough space in " + out.getFileName() + " (" + Sizes.bytes(free) + " free)");
+			Notify.failed("Can't record", "Not enough space in " + out.getFileName() + " (" + Sizes.bytes(free) + " free)");
 			return;
 		}
 
@@ -196,7 +197,7 @@ public final class Recorder {
 			Files.createDirectories(workDir);
 			Files.writeString(workDir.resolve("take.txt"), "name=" + stamp + "\nout=" + out + "\n", StandardCharsets.UTF_8);
 		} catch (IOException e) {
-			Notify.toast("Can't record", "Couldn't make the working folder: " + e.getMessage());
+			Notify.failed("Can't record", "Couldn't make the working folder: " + e.getMessage());
 			return;
 		}
 
@@ -207,7 +208,7 @@ public final class Recorder {
 			for (int i = 0; i < slots; i++) pool.add(new byte[frameBytes]);
 		} catch (OutOfMemoryError e) {
 			pool = null;
-			Notify.toast("Can't record", "Not enough memory for " + outW + "x" + outH + ". Try a smaller size.");
+			Notify.failed("Can't record", "Not enough memory for " + outW + "x" + outH + ". Try a smaller size.");
 			return;
 		}
 		queue = new ArrayBlockingQueue<>(slots);
@@ -223,7 +224,7 @@ public final class Recorder {
 		try {
 			ffmpeg = new ProcessBuilder(cmd).redirectErrorStream(true).start();
 		} catch (IOException e) {
-			Notify.toast("Can't record", "FFmpeg didn't start: " + e.getMessage());
+			Notify.failed("Can't record", "FFmpeg didn't start: " + e.getMessage());
 			pool = null;
 			return;
 		}
@@ -244,6 +245,8 @@ public final class Recorder {
 				Notify.toast("No microphone", "Recording without it: " + e.getMessage());
 			}
 		}
+		// The start cue plays before the game's sound is noted, so it's only for you.
+		com.lumenforge.lens.LensClient.cue(1.6F);
 		gameSoundOn = s.gameSound;
 		if (s.gameSound) GameSound.begin();
 
@@ -424,6 +427,7 @@ public final class Recorder {
 		TARGET.free();
 		if (sharp) RenderScale.setVideo(1);
 		List<SoundMix.Voice> voices = GameSound.end(end / 1000.0);
+		com.lumenforge.lens.LensClient.cue(0.8F);
 		mc.updateTitle();
 		int c = captured, d = dropped;
 		Path work = workDir, video = videoFile, mic = Mic.on() ? micFile : null;
@@ -431,7 +435,7 @@ public final class Recorder {
 		Thread w = writer;
 		String exe = Ffmpeg.find();
 		Path outDir = Lens.output();
-		String name = work.getFileName().toString().replace('_', ' ');
+		String name = work.getFileName().toString().replace('_', ' ') + " (" + outW + "x" + outH + " " + fps + "fps)";
 		double seconds = end / 1000.0;
 		if (why != null) lastError = why;
 		Thread t = new Thread(() -> finish(why, exe, p, w, end, voices, work, video, mic, outDir, name, seconds, c, d), "Lightlens finishing");
@@ -514,10 +518,23 @@ public final class Recorder {
 				String what = Sizes.clock((long) (seconds * 1000)) + ", " + outW + "x" + outH + ", " + Sizes.bytes(size);
 				Notify.saved(why != null ? why : "Video saved", saved, what + (d > c / 20 && c > 0 ? " · some frames were skipped" : ""));
 			} else {
-				lastError = err;
-				Notify.toast("Video not finished", (err == null ? "" : err) + " The picture is kept in .minecraft/lightlens/work.");
+				String reason = (why != null ? why + ". " : "") + (err == null ? "" : err);
+				lastError = reason;
+				writeErrorFile(reason);
+				Notify.failed("Recording didn't save", reason + " (details: .minecraft/lightlens/last-error.txt)");
 			}
 		});
+	}
+
+	/** The reason and FFmpeg's own words, for working out what went wrong. */
+	private static void writeErrorFile(String reason) {
+		try {
+			Files.createDirectories(Lens.root());
+			String text = "Lightlens " + Lens.version() + "\n" + reason + "\n\nEncoder: " + encoder + ", " + outW + "x" + outH + " " + fps + " fps\n"
+					+ "Encoder check: " + Ffmpeg.lastTestLog + "\n\nFFmpeg said:\n" + log() + "\n";
+			Files.writeString(Lens.root().resolve("last-error.txt"), text, StandardCharsets.UTF_8);
+		} catch (Exception ignored) {
+		}
 	}
 
 	/** Quitting the game mid-recording: stop, and wait (up to two minutes) for the MP4 to be saved. */

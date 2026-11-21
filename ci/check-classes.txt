@@ -23,3 +23,4 @@ net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 org.lwjgl.util.tinyfd.TinyFileDialogs
 org.lwjgl.opengl.GL30
+net.minecraft.client.resources.sounds.SimpleSoundInstance

@@ -25,18 +25,20 @@ import java.util.Iterator;
  * taken from those. Either way it's saved as PNG (or JPG) in the background.
  */
 public final class Photo {
-	private enum Phase { IDLE, WINDOW, WARMING, MAIN, SAVING }
+	private enum Phase { IDLE, WAITING, WINDOW, MAIN, SAVING }
 
 	/** Frames drawn at the bigger size before the picture's taken (shaders' light and blur settle in these). */
 	private static final int WARM_FRAMES = 14;
 
 	private static volatile Phase phase = Phase.IDLE;
 	private static int warm;
-	private static long warmStart;
+	private static long readyAt;
+	private static boolean big;
 	private static int outW, outH;
 	private static Sizes.Shape shape;
 	private static boolean jpg;
 	private static String name;
+	private static boolean restore;
 
 	private Photo() {}
 
@@ -44,8 +46,17 @@ public final class Photo {
 		return phase != Phase.IDLE;
 	}
 
-	/** F12. */
+	/** Milliseconds left on the countdown, or -1 when there's none. */
+	public static long countdown() {
+		return phase == Phase.WAITING ? Math.max(0, readyAt - System.currentTimeMillis()) : -1;
+	}
+
+	/** F12 (press again during the countdown to take it now). */
 	public static void take() {
+		if (phase == Phase.WAITING) {
+			readyAt = 0;
+			return;
+		}
 		if (phase != Phase.IDLE) return;
 		if (com.lumenforge.lens.compat.Lightreel.exporting()) {
 			Notify.toast("Can't take a photo", "Lightreel is exporting");
@@ -59,22 +70,21 @@ public final class Photo {
 		int[] size = Sizes.output(s.photoSize, shape, rw, rh);
 		outW = size[0];
 		outH = size[1];
-		name = Capture.stamp();
 		int screenH = Sizes.crop(shape, rw, rh)[3];
 		int k = RenderScale.needed(outH, screenH, 4);
-		if (k <= 1 || RenderScale.k() >= k) {
-			// The window (or what the game's drawing already) is big enough.
-			phase = RenderScale.k() > 1 ? Phase.MAIN : Phase.WINDOW;
-			return;
+		// Bigger than the window: the game draws at full size from now until the picture's taken, so the
+		// countdown is also time for the shaders' light, clouds and shadows to settle at that size.
+		big = k > 1 && RenderScale.k() < k;
+		if (big) {
+			RenderScale.setPhoto(k);
+			Flawless.set(true);
 		}
-		RenderScale.setPhoto(k);
-		Flawless.set(true);
-		warm = WARM_FRAMES;
-		warmStart = System.currentTimeMillis();
-		phase = Phase.WARMING;
+		warm = big ? WARM_FRAMES : 0;
+		readyAt = System.currentTimeMillis() + Math.max(s.photoWait * 1000L, big ? 300 : 0);
+		phase = Phase.WAITING;
 	}
 
-	/** From Capture, just before the frame's shown: counts the warm-up, or takes a window-sized photo. */
+	/** From Capture, just before the frame's shown: runs the countdown, or takes a window-sized photo. */
 	static void onFrameEnd(int winW, int winH) {
 		if (restore) {
 			// After the frame's been shown, so the game never shows a just-resized, empty picture.
@@ -82,9 +92,16 @@ public final class Photo {
 			RenderScale.setPhoto(1);
 			Flawless.set(false);
 		}
-		if (phase == Phase.WARMING) {
-			if (--warm <= 0 && System.currentTimeMillis() - warmStart > 300) phase = Phase.MAIN;
-			return;
+		if (phase == Phase.WAITING) {
+			if (warm > 0) warm--;
+			if (warm > 0 || System.currentTimeMillis() < readyAt) return;
+			name = Capture.stamp() + " (" + outW + "x" + outH + ")";
+			if (RenderScale.k() > 1) {
+				// Taken from the big picture on the next frame, as it's about to be shown.
+				phase = Phase.MAIN;
+				return;
+			}
+			phase = Phase.WINDOW;
 		}
 		if (phase != Phase.WINDOW) return;
 		Gl.save();
@@ -106,10 +123,8 @@ public final class Photo {
 		} finally {
 			Gl.restore();
 		}
-		restore = true;
+		if (big) restore = true;
 	}
-
-	private static boolean restore;
 
 	/** Reads the middle (the photo's shape) of what's bound for reading, then saves it on another thread. */
 	private static void read(int srcW, int srcH) {
@@ -126,6 +141,7 @@ public final class Photo {
 		Gl.readNow(c[0], srcH - (c[1] + ch), cw, ch, buf);
 		phase = Phase.SAVING;
 		if (Recorder.recording()) Indicator.flash();
+		else com.lumenforge.lens.LensClient.cue(2.0F);
 		int ow = outW, oh = outH;
 		boolean asJpg = jpg;
 		String n = name;

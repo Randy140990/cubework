@@ -22,6 +22,8 @@ public final class Settings {
 	public float micVolume = 1.0F;
 
 	public Sizes.Size photoSize = Sizes.Size.K4;
+	/** Seconds before a photo is taken (0, 3 or 10): a countdown, and time for the shaders to settle at full size. */
+	public int photoWait = 0;
 	public boolean jpg;
 	public boolean photosInSubfolder = true;
 
@@ -40,5 +42,6 @@ public final class Settings {
 		if (folder == null) folder = "";
 		if (ffmpegPath == null) ffmpegPath = "";
 		if (!(micVolume >= 0.1F && micVolume <= 3F)) micVolume = 1F;
+		if (photoWait != 0 && photoWait != 3 && photoWait != 10) photoWait = 0;
 	}
 }

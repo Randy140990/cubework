@@ -145,6 +145,8 @@ public final class LensScreen extends Screen {
 		ry = seg(g, rx, ry, colW, row, "Size", labels(Sizes.Size.PHOTO), index(Sizes.Size.PHOTO, s.photoSize), Photo.busy(),
 				i -> s.photoSize = Sizes.Size.PHOTO[i], mx, my);
 		ry = seg(g, rx, ry, colW, row, "Type", new String[] {"PNG", "JPG"}, s.jpg ? 1 : 0, false, i -> s.jpg = i == 1, mx, my);
+		ry = seg(g, rx, ry, colW, row, "Wait", new String[] {"None", "3 s", "10 s"}, s.photoWait == 10 ? 2 : s.photoWait == 3 ? 1 : 0, false,
+				i -> s.photoWait = i == 2 ? 10 : i == 1 ? 3 : 0, mx, my);
 		ry = seg(g, rx, ry, colW, row, "Shape", new String[] {"16:9", "Window"}, s.shape.ordinal(), locked, i -> s.shape = Sizes.Shape.values()[i], mx, my);
 		int[] po = Sizes.output(s.photoSize, s.shape, Math.max(2, rw), Math.max(2, rh));
 		g.drawString(font, po[0] + " x " + po[1] + (po[1] > Sizes.crop(s.shape, rw, rh)[3] ? " · drawn at full size" : ""), rx, ry + 1, MUTED, false);
@@ -227,6 +229,7 @@ public final class LensScreen extends Screen {
 
 	private int statusLines(GuiGraphics g, int x, int y, int w, int mx, int my) {
 		String exe = Ffmpeg.find();
+		if (Recorder.lastError != null && !Recorder.busy()) y = wrap(g, "! Last time: " + Recorder.lastError, x, y, w, RED);
 		boolean failed = install != null && install.startsWith("Download failed");
 		if (install != null) {
 			for (var line : font.split(Component.literal(install), w)) {

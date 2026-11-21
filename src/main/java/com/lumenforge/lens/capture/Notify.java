@@ -22,6 +22,18 @@ public final class Notify {
 		mc.execute(() -> SystemToast.addOrUpdate(mc.getToastManager(), ID, Component.literal(title), text == null ? null : Component.literal(text)));
 	}
 
+	/** Something went wrong: a toast, and the reason in chat (red), so it can't be missed. */
+	public static void failed(String title, String reason) {
+		Minecraft mc = Minecraft.getInstance();
+		toast(title, reason);
+		Lens.LOG.warn("{}: {}", title, reason);
+		mc.execute(() -> {
+			if (mc.player == null) return;
+			mc.player.displayClientMessage(Component.literal("[" + Lens.NAME + "] ").withStyle(ChatFormatting.DARK_AQUA)
+					.append(Component.literal(title + ": " + reason).withStyle(ChatFormatting.RED)), false);
+		});
+	}
+
 	/** A finished file: a toast, and in chat its name and a link to the folder. */
 	public static void saved(String title, Path file, String detail) {
 		Minecraft mc = Minecraft.getInstance();

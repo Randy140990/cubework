@@ -35,10 +35,13 @@ public class LensClient implements ClientModInitializer {
 		MENU = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.lightlens.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, CATEGORY));
 
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
-			while (RECORD.consumeClick()) Recorder.toggle();
-			while (PHOTO.consumeClick()) Photo.take();
-			while (PAUSE.consumeClick()) Recorder.togglePause();
+			// Only in a world (not on the title screen or the world list).
+			boolean inGame = mc.level != null && mc.player != null;
+			while (RECORD.consumeClick()) if (inGame) Recorder.toggle();
+			while (PHOTO.consumeClick()) if (inGame) Photo.take();
+			while (PAUSE.consumeClick()) if (inGame) Recorder.togglePause();
 			while (MENU.consumeClick()) mc.setScreen(new LensScreen(mc.screen, null));
+			if (!inGame && Recorder.recording()) Recorder.stop("Stopped and saved: you left the world");
 			GameSound.tick();
 		});
 
@@ -64,10 +67,19 @@ public class LensClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STOPPING.register(mc -> Recorder.onShutdown());
 	}
 
+	/** A short sound you hear (never in the video): higher to start, lower to stop, a click for a photo. */
+	public static void cue(float pitch) {
+		try {
+			Minecraft.getInstance().getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(
+					net.minecraft.sounds.SoundEvents.NOTE_BLOCK_PLING.value(), pitch, 0.6F));
+		} catch (Throwable ignored) {
+		}
+	}
+
 	/** With a menu open, our keys still work (only function keys, so typing is never caught). */
 	public static boolean keyInScreen(int action, KeyEvent e) {
 		Minecraft mc = Minecraft.getInstance();
-		if (action != GLFW.GLFW_PRESS || mc.screen == null || RECORD == null) return false;
+		if (action != GLFW.GLFW_PRESS || mc.screen == null || RECORD == null || mc.level == null || mc.player == null) return false;
 		if (mc.screen instanceof net.minecraft.client.gui.screens.options.controls.KeyBindsScreen) return false;
 		int key = e.key();
 		boolean functionKey = (key >= GLFW.GLFW_KEY_F1 && key <= GLFW.GLFW_KEY_F25) || key == GLFW.GLFW_KEY_PRINT_SCREEN || key == GLFW.GLFW_KEY_PAUSE
