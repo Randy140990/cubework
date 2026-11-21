@@ -138,7 +138,8 @@ def main():
               open(os.path.join(PACK, "pack.mcmeta"), "w"), indent=1, ensure_ascii=False)
     # The ground (grass, dirt paths, moss, dirt) and its rounded edges (CTM, for Continuity): lookground.py.
     lookground.build(save)
-    # The plants (short and tall grass, fern, large fern): John's Shards of Arcadia set, recoloured: lookplants.py.
+    # The plants (short and tall grass, fern, large fern, the red flowers): John's Shards of Arcadia set, recoloured:
+    # lookplants.py.
     lookplants.build()
     # (The trees keep Minecraft's leaves, as the map has them; only Kanto's colours are brighter: lookground.py and
     # client/Colours.java. Earlier versions' own leaves are gone.)
@@ -146,7 +147,7 @@ def main():
         f = os.path.join(TEX, wood + "_leaves.png")
         if os.path.exists(f):
             os.remove(f)
-    save("poppy", flower((225, 50, 60, 255), (250, 220, 90, 255)))
+    # (The poppy is John's now, with the other red flowers: lookplants.py.)
     save("dandelion", flower((250, 215, 60, 255), (240, 140, 40, 255)))
     save("azure_bluet", flower((245, 245, 250, 255), (250, 220, 90, 255)))
     save("sand", speckled((240, 226, 172), (214, 196, 140), (250, 242, 205), 4))
