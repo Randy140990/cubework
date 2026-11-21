@@ -7,6 +7,8 @@ import json
 import os
 import random
 
+import lookground
+
 from PIL import Image
 
 PACK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources", "resourcepacks", "retromon_look")
@@ -131,9 +133,10 @@ def side_overlay():
 
 def main():
     os.makedirs(TEX, exist_ok=True)
-    json.dump({"pack": {"description": "Retromon Look: Pokémon-style grass, leaves, flowers and paths", "pack_format": 75, "min_format": 75, "max_format": 75}},
+    json.dump({"pack": {"description": "Retromon Look: Pokémon-style grass, moss, leaves, flowers and paths", "pack_format": 75, "min_format": 75, "max_format": 75}},
               open(os.path.join(PACK, "pack.mcmeta"), "w"), indent=1, ensure_ascii=False)
-    save("grass_block_top", grass_top())
+    # The ground (grass, dirt paths, moss, dirt) and its rounded edges (CTM, for Continuity): lookground.py.
+    lookground.build(save)
     save("grass_block_side_overlay", side_overlay())
     save("short_grass", tuft())
     save("tall_grass_bottom", tuft(tall_bottom=True))
@@ -143,10 +146,7 @@ def main():
     save("poppy", flower((225, 50, 60, 255), (250, 220, 90, 255)))
     save("dandelion", flower((250, 215, 60, 255), (240, 140, 40, 255)))
     save("azure_bluet", flower((245, 245, 250, 255), (250, 220, 90, 255)))
-    save("dirt_path_top", speckled((222, 196, 150), (190, 160, 115), (238, 220, 180), 3))
     save("sand", speckled((240, 226, 172), (214, 196, 140), (250, 242, 205), 4))
-    # Moss (the map's moss floors and carpets): the same lively green as the brightened grass, so it doesn't look dark beside it.
-    save("moss_block", speckled((124, 196, 74), (98, 168, 58), (156, 214, 98), 5))
     print("look pack written")
 
 

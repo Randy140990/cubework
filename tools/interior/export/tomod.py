@@ -284,7 +284,8 @@ def fit_camera(W, D, H, aspect=16 / 9, pitch=52.0, fov=34.0):
     return {"x": round(W / 2, 3), "z": round(best[0], 3), "dist": round(best[1], 2)}
 
 
-LIGHT_TEX = {"sunPool": "pool", "sunPoolSoft": "pool_soft", "sunBeam": "beam", "windowDusk": "window_dusk", "windowNight": "window_night"}
+LIGHT_TEX = {"sunPool": "pool", "sunPoolSoft": "pool_soft", "sunBeam": "beam", "windowDusk": "window_dusk", "windowNight": "window_night",
+             "doorDusk": "door_dusk", "doorNight": "door_night"}
 
 
 def write_light(light, res):
@@ -301,13 +302,14 @@ def panes_of(room):
     W, D = room["W"], room["D"]
     out = []
     for f in room["faces"]:
-        if f["k"] != "window" or not f.get("n"): continue
+        if f["k"] not in ("window", "doorLight") or not f.get("n"): continue
         bl, r, u, n, w, h = f["bl"], f["r"], f["u"], f["n"], f["w"], f["h"]
         c = [bl[i] + r[i] * w / 2 + u[i] * h / 2 for i in range(3)]
         to = [W / 2 - c[0], 0, D / 2 - c[2]]
         l = math.hypot(to[0], to[2]) or 1
         if (n[0] * to[0] + n[2] * to[2]) / l < 0.3: continue  # its outside (a hall's ring of windows)
-        out.append([round(v, 4) for v in bl + [r[i] * w for i in range(3)] + [u[i] * h for i in range(3)] + n])
+        # (Last, what it is: 0 a window's glass, 1 an open way out's daylight.)
+        out.append([round(v, 4) for v in bl + [r[i] * w for i in range(3)] + [u[i] * h for i in range(3)] + n] + [1 if f["k"] == "doorLight" else 0])
     return out
 
 

@@ -30,7 +30,8 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 	private static final int FULL_BRIGHT = 15728880;
 	private static final Identifier POOL = Retromon.id("textures/light/pool.png"), POOL_SOFT = Retromon.id("textures/light/pool_soft.png"),
 			BEAM = Retromon.id("textures/light/beam.png"), DUSK = Retromon.id("textures/light/window_dusk.png"),
-			NIGHT = Retromon.id("textures/light/window_night.png");
+			NIGHT = Retromon.id("textures/light/window_night.png"), DOOR_DUSK = Retromon.id("textures/light/door_dusk.png"),
+			DOOR_NIGHT = Retromon.id("textures/light/door_night.png");
 	/** How high over the floor the pools lie (over the carpets). */
 	private static final double POOL_Y = 0.07;
 
@@ -94,8 +95,17 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 		// The windows' glass: a sunset (or sunrise) over the day's, then the night's over that.
 		float dusk = s.k * (1 - s.m), night = s.m;
 		if (!s.panes.isEmpty()) {
-			if (dusk > 0.01F) panes(out, pose, s.panes, DUSK, dusk, cx, cz);
-			if (night > 0.01F) panes(out, pose, s.panes, NIGHT, night, cx, cz);
+			// Windows' glass, and open ways out's daylight (the League gate's), each with their own skies.
+			List<double[]> glass = new java.util.ArrayList<>(), doors = new java.util.ArrayList<>();
+			for (double[] g : s.panes) (g.length > 12 && g[12] == 1 ? doors : glass).add(g);
+			if (dusk > 0.01F) {
+				if (!glass.isEmpty()) panes(out, pose, glass, DUSK, dusk, cx, cz);
+				if (!doors.isEmpty()) panes(out, pose, doors, DOOR_DUSK, dusk, cx, cz);
+			}
+			if (night > 0.01F) {
+				if (!glass.isEmpty()) panes(out, pose, glass, NIGHT, night, cx, cz);
+				if (!doors.isEmpty()) panes(out, pose, doors, DOOR_NIGHT, night, cx, cz);
+			}
 		}
 	}
 

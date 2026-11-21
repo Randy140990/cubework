@@ -1,7 +1,7 @@
 // ===================== In the world =====================
 // Where you are: a white pill, a sunny dot, the time on a coral tab.
 function placePill(right) {
-  return box(24, 20, null, null, "", `<div style="display:flex;align-items:center;gap:12px;padding:6px 8px 6px 14px;border-radius:999px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 6px 16px rgba(30,40,84,.25)"><span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 3px #FFE9A0"></span><span class="g-title" style="font-size:24px;color:#26304A">${esc(G.place)}</span><span style="margin-left:6px;padding:3px 12px;border-radius:999px;background:linear-gradient(180deg,#FF9473,#E5525C);color:#fff;font-weight:900;font-size:13px;letter-spacing:1px">${right || "9:15 AM"}</span></div>`);
+  return box(24, 20, null, null, "", `<div style="display:flex;align-items:center;gap:12px;padding:6px 8px 6px 14px;border-radius:999px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 6px 16px rgba(30,40,84,.25)"><span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 3px #FFE9A0"></span><span class="g-title" style="font-size:24px;color:#26304A">${esc(G.place)}</span><span style="margin-left:6px;padding:3px 12px;border-radius:999px;background:linear-gradient(180deg,#FF9473,#E5525C);color:#fff;font-weight:900;font-size:13px;letter-spacing:1px">${right || "DAY 1 &nbsp;·&nbsp; 10:30 AM"}</span></div>`);
 }
 // Each place's colours for its banner streak (left to right): the towns' own (as their signs and names have them),
 // routes green into teal, anywhere else (rooms) violet into blue into cyan, as Let's Go's banner.
@@ -17,8 +17,8 @@ function placeColours(place) {
 function blurOver() { add(h("div", "g-blur")); }
 screen("hud", "In the world", "The HUD", {
   scene: "town", sceneOpts: () => ({}),
-  what: "What's over the world while you walk: where you are and the time, what to do next, the keys, and a word when something happens.",
-  mod: "Hud: the clock, and the keys for Talk, Menu and Speed. To come: E for the menu (ENTER still works).",
+  what: "What's over the world while you walk: where you are, the day of your adventure and the time, what to do next, the keys, the game's speed when it's sped up, and a word when something happens.",
+  mod: "Hud: the place, DAY and the clock, the speed pill (TAB), and the keys for Talk, Menu and Speed.",
   tags: ["New: the place banner, the next thing to do, notices"],
   try: ["A replays the place banner and a notice.", "Tab changes the speed shown.", "B opens the menu."],
   make() {
@@ -28,7 +28,12 @@ screen("hud", "In the world", "The HUD", {
     const goal = box(1280 - 24 - 390, 20, 390, null, "", `<div style="position:relative;padding:22px 18px 12px;border-radius:22px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 6px 16px rgba(30,40,84,.25)">
       <span style="position:absolute;left:16px;top:-11px;padding:2px 14px;border-radius:999px;background:linear-gradient(180deg,#7CC2FA,#3C8DE4);color:#fff;font-weight:900;font-size:13px;letter-spacing:1.4px;box-shadow:0 0 0 3px #fff">${esc(T("NEXT"))}</span>
       <span style="display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900;color:#26304A"><span style="width:30px;height:30px">${PICTO.map("#3C8DE4").replace('fill="#fff"', 'fill="#E3F0FC"')}</span>${esc(T("Go to PROF. OAK's lab"))}<span style="margin-left:auto;color:var(--g-muted);font-size:16px">32 m</span></span></div>`);
-    const keys = () => { const e = $("#hkeys"); if (e) e.remove(); const k = hints([["SPACE", "Talk"], ["E", "Menu"], ["TAB", `Speed x${spd}`]]); k.id = "hkeys"; };
+    const keys = () => { const e = $("#hkeys"); if (e) e.remove(); const k = hints([["SPACE", "Talk"], ["E", "Menu"], ["TAB", `Speed x${spd}`]]); k.id = "hkeys";
+      const o = $("#hspeed"); if (o) o.remove();
+      if (spd > 1) { const s = box(24, 80, null, null, "", `<div style="display:flex;align-items:center;gap:10px;height:40px;padding:0 16px 0 8px;border-radius:999px;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.55),0 6px 16px rgba(30,40,84,.25)">
+        <span style="width:28px;height:28px;border-radius:50%;background:radial-gradient(circle,#3CCBB2 70%,#2BB5A0 72%);display:grid;place-items:center;box-shadow:0 1px 0 rgba(18,60,56,.2)"><svg viewBox="0 0 20 12" width="17" height="11"><path d="M1 1L9 6 1 11Z M10 1L18 6 10 11Z" fill="#fff"/></svg></span>
+        <span style="font-weight:900;font-size:12px;letter-spacing:1.5px;color:#8A93A8">SPEED</span><span class="g-title" style="font-size:22px;color:#26304A">x${spd}</span></div>`); s.id = "hspeed"; }
+    };
     keys();
     const banner = () => {
       // The place's name low on the screen, as Let's Go shows it: two fine white lines sweep out across the width,
@@ -42,10 +47,10 @@ screen("hud", "In the world", "The HUD", {
       const b = box(0, 560, 1280, 92, "", `<div class="pb" style="position:absolute;inset:0;opacity:0;transition:opacity .5s ease,transform .8s ease">
         <b style="position:absolute;left:0;width:1280px;top:8px;height:74px;background:linear-gradient(90deg,rgba(16,24,52,0),rgba(16,24,52,.2) 30%,rgba(16,24,52,.2) 70%,rgba(16,24,52,0))"></b>
         ${line(6)}${line(82)}
-        <div class="pb-streak" style="position:absolute;left:300px;width:680px;top:20px;height:52px;clip-path:inset(0 100% 0 0);transition:clip-path .9s cubic-bezier(.3,.7,.3,1) .12s">
-          <div style="position:absolute;inset:0;border-radius:26px;background:linear-gradient(90deg,${rgba(pal[0], 0)} 0%,${stops},${rgba(pal[pal.length - 1], 0)} 100%);filter:blur(1px)"></div>
-          <div style="position:absolute;left:40px;right:70px;top:4px;height:12px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.32) 30%,rgba(255,255,255,.18) 70%,rgba(255,255,255,0))"></div>
-          <div style="position:absolute;left:90px;right:30px;bottom:5px;height:10px;border-radius:5px;background:linear-gradient(90deg,${rgba(pal[0], 0)},${rgba(pal[pal.length - 1], .5)} 60%,${rgba(pal[pal.length - 1], 0)})"></div></div>
+        <div class="pb-streak" style="position:absolute;left:240px;width:800px;top:8px;height:74px;clip-path:inset(0 100% 0 0);transition:clip-path .9s cubic-bezier(.3,.7,.3,1) .12s">
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,${rgba(pal[0], 0)} 0%,${stops},${rgba(pal[pal.length - 1], 0)} 100%)"></div>
+          <div style="position:absolute;left:60px;right:90px;top:6px;height:14px;border-radius:7px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.32) 30%,rgba(255,255,255,.18) 70%,rgba(255,255,255,0))"></div>
+          <div style="position:absolute;left:120px;right:40px;bottom:6px;height:10px;border-radius:5px;background:linear-gradient(90deg,${rgba(pal[0], 0)},${rgba(pal[pal.length - 1], .5)} 60%,${rgba(pal[pal.length - 1], 0)})"></div></div>
         <div style="position:absolute;left:0;width:1280px;top:${G.line === "" ? 26 : 16}px;display:flex;align-items:center;justify-content:center;gap:14px">
           <span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 3px rgba(255,233,160,.7),0 1px 2px rgba(32,48,80,.6)"></span>
           <span class="g-title" style="font-size:44px;letter-spacing:5px;color:#fff;line-height:1;white-space:nowrap;text-shadow:${edge}">${esc(G.place)}</span></div>
@@ -291,11 +296,21 @@ screen("dexentry", "Menus", "Pokédex entry", {
     monBackdrop(sid, { cx: 50, cy: 58 });
     SC.model.show(sid).then(() => { const e = $("#hgt"); if (e && SC.model.st) e.textContent = SC.model.st.m.size.h.toFixed(2) + " blocks"; });
     const glass = `background:rgba(255,255,255,.86);border:3px solid #fff;border-radius:22px;color:#26304A;box-shadow:0 8px 20px rgba(30,40,84,.2)`;
-    box(40, 34, 420, null, "g-fadein", `<div style="${glass};padding:16px 22px;display:grid;gap:6px"><div style="font-weight:900;font-size:16px;letter-spacing:1px;color:${darkerHex(tc, 0.25)}">POKéDEX No. ${String(d.dex).padStart(3, "0")}</div>
+    box(40, 34, 420, null, "g-fadein", `<div id="dexLeft" style="${glass};padding:16px 22px;display:grid;gap:6px"><div style="font-weight:900;font-size:16px;letter-spacing:1px;color:${darkerHex(tc, 0.25)}">POKéDEX No. ${String(d.dex).padStart(3, "0")}</div>
       <div class="g-title" style="font-size:40px;line-height:1">${esc(ourName(sid))}</div><div style="display:flex;gap:8px">${d.stats.types.map(typeChip).join("")}</div>
       <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 16px;margin-top:6px;font-size:19px;font-weight:800"><span style="opacity:.8">Height</span><span id="hgt">...</span><span style="opacity:.8">Stands in for</span><span>${esc(d.pname)}</span></div></div>`);
-    box(940, 34, 300, null, "g-fadein", `<div style="${glass};padding:16px 22px;display:grid;gap:4px"><div style="font-weight:900;font-size:16px;letter-spacing:1px;opacity:.9">Number caught</div><div class="g-title" style="font-size:40px">${CAUGHT.has(sid) ? 1 : 0}</div>
-      <div style="font-weight:900;font-size:16px;letter-spacing:1px;opacity:.9;margin-top:4px">Where to find it</div><div style="font-size:17px;font-weight:800">${CAUGHT.has(sid) ? "ROUTE 1, ROUTE 2, VIRIDIAN FOREST" : "Not found yet"}</div></div>`);
+    // The right-hand card, as the left (as tall, its labels in the POKéMON's colour): how many caught beside a
+    // POKé BALL, a fine line, where to find it as chips tinted its colour.
+    const got = CAUGHT.has(sid), places = got ? ["ROUTE 1", "ROUTE 2", "VIRIDIAN FOREST"] : [];
+    const chip = p => `<span style="display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:13px;background:${mixHex(tc, "#FFFFFF", 0.8)};color:${darkerHex(tc, 0.55)};font-weight:900;font-size:13.5px;letter-spacing:.5px;white-space:nowrap">${esc(p)}</span>`;
+    box(940, 34, 300, null, "g-fadein", `<div id="dexRight" style="${glass};padding:16px 22px;display:flex;flex-direction:column">
+      <div style="font-weight:900;font-size:16px;letter-spacing:1px;color:${darkerHex(tc, 0.25)}">Number caught</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:6px;height:40px"><span style="width:36px;height:36px;display:block">${ballIcon("POKé BALL")}</span><span class="g-title" style="font-size:40px;line-height:1">${got ? 1 : 0}</span></div>
+      <div style="height:2px;border-radius:1px;background:rgba(38,48,74,.12);margin:12px 0"></div>
+      <div style="font-weight:900;font-size:16px;letter-spacing:1px;color:${darkerHex(tc, 0.25)}">Where to find it</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${got ? places.map(chip).join("") : `<span style="font-size:16px;font-weight:800;opacity:.55">Not found yet</span>`}</div></div>`);
+    // (As tall as the left card.)
+    requestAnimationFrame(() => { const l = document.querySelector("#dexLeft"), r = document.querySelector("#dexRight"); if (l && r) r.style.minHeight = l.offsetHeight + "px"; });
     const text = dexText(sid);
     box(0, 548, 1280, 172, "", `<div style="position:absolute;inset:0;background:linear-gradient(180deg, ${tc}00, ${darkerHex(tc, 0.45)}cc 45%, ${darkerHex(tc, 0.6)}ee)"></div>
       <div style="position:absolute;left:200px;right:200px;top:46px;text-align:center;font-size:27px;font-weight:800;line-height:1.45;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35)">${esc(text)}</div>
@@ -419,18 +434,7 @@ screen("summary", "Menus", "Summary", {
         // tag, the move's name big, the mark again faint behind, and the PP on a dark slanted cap at the end.
         // The one you're on has the white arrow, and what it does is in the card underneath.
         const ms = p.moves, mv = ms[Math.min(msel, ms.length - 1)], M = MOVE[mv] || { type: "NORMAL", pp: 20 };
-        right.innerHTML = `<div style="display:grid;gap:12px;margin-top:34px">${ms.map((n, j) => { const m = MOVE[n] || { type: "NORMAL", pp: 20 }, c = typeHex(m.type), on = j === msel, used = Math.max(0, m.pp - (j === 0 ? 3 : j === 2 ? 1 : 0));
-          return `<div data-m="${j}" style="position:relative;height:64px;cursor:pointer;transform:${on ? "translateX(-10px)" : "none"};transition:transform .12s">
-            ${on ? `<svg viewBox="0 0 40 48" style="position:absolute;left:-40px;top:9px;width:38px;height:46px;z-index:2;filter:drop-shadow(0 3px 4px rgba(30,40,84,.35))"><path d="M6 4L36 24 6 44Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><path d="M11 13L28 24 11 35Z" fill="#DDE3EE"/></svg>` : ""}
-            <div style="position:absolute;inset:0;overflow:hidden;border-radius:34px 12px 12px 34px;border:3px solid ${on ? "#fff" : "rgba(255,255,255,.75)"};background:linear-gradient(180deg, ${lighterHex(c, 0.3)}, ${c} 55%, ${darkerHex(c, 0.15)});box-shadow:${on ? "0 0 0 3px rgba(255,255,255,.4)," : ""}0 6px 14px rgba(30,40,84,.25)">
-              <span style="position:absolute;right:118px;top:-14px;opacity:.28">${typeGlyph(m.type, 92)}</span>
-              <span style="position:absolute;right:-16px;top:0;bottom:0;width:132px;transform:skewX(-18deg);background:linear-gradient(180deg,rgba(24,30,56,.62),rgba(24,30,56,.78));border-left:3px solid rgba(255,255,255,.55)"></span>
-              <span style="position:absolute;right:18px;top:0;bottom:0;display:flex;align-items:center;gap:6px;color:#fff;font-weight:900;font-variant-numeric:tabular-nums"><span style="font-size:13px;opacity:.75">PP</span><span style="font-size:26px">${used}</span><span style="font-size:18px;opacity:.85">/${m.pp}</span></span>
-            </div>
-            <div style="position:absolute;left:6px;top:6px;bottom:6px;display:flex;align-items:center;gap:10px">
-              <span style="width:52px;height:52px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 2px 0 rgba(0,0,0,.15)">${typeGlyph(m.type, 34, "filter:brightness(.9)").replace(/fill="#fff"/g, `fill="${c}"`).replace(/stroke="#fff"/g, `stroke="${c}"`)}</span>
-              <span style="padding:2px 10px;border-radius:7px;background:${darkerHex(c, 0.3)};color:#fff;font-weight:900;font-size:12px;letter-spacing:1.5px">${esc(m.type)}</span>
-              <span class="g-title" style="font-size:26px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.22)">${esc(title(n))}</span></div></div>`; }).join("")}
+        right.innerHTML = `<div style="display:grid;gap:12px;margin-top:34px">${ms.map((n, j) => `<div data-m="${j}" style="cursor:pointer">${moveBar(n, Math.max(0, (MOVE[n] || { pp: 20 }).pp - (j === 0 ? 3 : j === 2 ? 1 : 0)), j === msel, 64, 540)}</div>`).join("")}
           <div style="border-radius:20px;${glass};padding:14px 20px;margin-top:4px;display:grid;gap:6px"><div style="display:flex;align-items:center;gap:14px;font-size:17px;font-weight:900">${typeChip(M.type)}<span style="font-size:14px;letter-spacing:1px;opacity:.8">${esc(M.category || "")}</span>
             <span style="margin-left:auto"><span style="opacity:.75;font-size:13px">POWER</span> ${M.power > 1 ? M.power : "-"}</span><span><span style="opacity:.75;font-size:13px">ACCURACY</span> ${M.accuracy || "-"}</span></div>
             <div style="font-size:17px;font-weight:800;line-height:1.35">${esc(M.desc || "")}</div></div></div>`;
@@ -441,6 +445,24 @@ screen("summary", "Menus", "Summary", {
     return { key: k => { if (k === "tab" || k === "right") { page = (page + 1) % 3; draw(); return true; } if (k === "left") { page = (page + 2) % 3; draw(); return true; } if (k === "up" || k === "down") { if (page === 2) { const n = G.party[i].moves.length; msel = (msel + (k === "down" ? 1 : n - 1)) % n; } else i = (i + (k === "down" ? 1 : 5)) % 6; draw(); return true; } if (k === "b") { go("party"); return true; } return true; } };
   }
 });
+// A move as Let's Go shows it (the summary's MOVES, and the battle's FIGHT, the mod's V.moveBar): a bar in its type's
+// colour, its mark in a white circle, its type on a tag, its name big, the mark again faint behind (stopping short of
+// the PP cap), and its PP on a dark slanted cap; the one you're on lifted out with a white rim and the white arrow.
+// 64 tall is the summary's size (w its width); a smaller one is the same bar scaled down.
+function moveBar(n, left, on, h = 64, w = 400) {
+  const m = MOVE[n] || { type: "NORMAL", pp: 20 }, c = typeHex(m.type), k = h / 64, W = w / k;
+  return `<div style="position:relative;width:${w}px;height:${h}px"><div style="position:absolute;left:0;top:0;width:${W}px;height:64px;transform:scale(${k}) ${on ? "translateX(-10px)" : ""};transform-origin:0 0;transition:transform .12s">
+    ${on ? `<svg viewBox="0 0 40 48" style="position:absolute;left:-40px;top:9px;width:38px;height:46px;z-index:2;filter:drop-shadow(0 3px 4px rgba(30,40,84,.35))"><path d="M6 4L36 24 6 44Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><path d="M11 13L28 24 11 35Z" fill="#DDE3EE"/></svg>` : ""}
+    <div style="position:absolute;inset:0;overflow:hidden;border-radius:34px 12px 12px 34px;border:3px solid ${on ? "#fff" : mixHex(c, "#FFFFFF", 0.75)};background:linear-gradient(180deg, ${lighterHex(c, 0.3)}, ${c} 55%, ${darkerHex(c, 0.15)});box-shadow:${on ? "0 0 0 3px rgba(255,255,255,.4)," : ""}0 6px 14px rgba(30,40,84,.25)">
+      <span style="position:absolute;left:0;top:0;bottom:0;right:126px;overflow:hidden"><span style="position:absolute;right:-8px;top:-14px;opacity:.28">${typeGlyph(m.type, 92)}</span></span>
+      <span style="position:absolute;right:-16px;top:0;bottom:0;width:132px;transform:skewX(-18deg);background:rgba(24,30,56,.9);border-left:3px solid rgba(255,255,255,.55)"></span>
+      <span style="position:absolute;right:18px;top:0;bottom:0;display:flex;align-items:center;gap:6px;color:#fff;font-weight:900;font-variant-numeric:tabular-nums"><span style="font-size:13px;opacity:.75">PP</span><span style="font-size:26px;color:${left === 0 ? "#FFB3B8" : "#fff"}">${left}</span><span style="font-size:18px;opacity:.85">/${m.pp}</span></span>
+    </div>
+    <div style="position:absolute;left:6px;top:6px;bottom:6px;display:flex;align-items:center;gap:10px">
+      <span style="width:52px;height:52px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 2px 0 rgba(0,0,0,.15)">${typeGlyph(m.type, 34, "filter:brightness(.9)").replace(/fill="#fff"/g, `fill="${c}"`).replace(/stroke="#fff"/g, `stroke="${c}"`)}</span>
+      <span style="padding:2px 10px;border-radius:7px;background:${darkerHex(c, 0.3)};color:#fff;font-weight:900;font-size:12px;letter-spacing:1.5px">${esc(m.type)}</span>
+      <span class="g-title" style="font-size:26px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.22);white-space:nowrap">${esc(title(n))}</span></div></div></div>`;
+}
 // The bag's pockets: each its own colour and picture.
 const POCKETS = { "ITEMS": ["#3DB873", "potion"], "BALLS": ["#E5484F", "ball"], "KEY ITEMS": ["#F59A2A", "key"], "TM & HM": ["#3C8DE4", "disc"] };
 screen("bag", "Menus", "Bag", {

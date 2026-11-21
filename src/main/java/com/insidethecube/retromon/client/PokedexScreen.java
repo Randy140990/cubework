@@ -380,23 +380,55 @@ public class PokedexScreen extends DeviceScreen {
 			else V.text(g, r[1], px + lw + 16, cy + 2, 19, V.INK, false);
 			cy += rowH + 2;
 		}
-		// Top right: how many you've caught, where to find it.
-		float rx = 940, rw = 300, rpx = rx + 22;
-		String where = got ? PokedexScreen.placeNames(sp.id()) : "";
-		if (got && where.isEmpty()) where = Lang.t("Not in the wild: from people, evolution or trades.");
-		if (!got) where = Lang.t("Not found yet");
-		List<String> wl = V.wrap(where, rw - 44, 17, false);
-		int wn = Math.min(4, wl.size());
-		float rh = 16 + 16 * 1.36F + 4 + 40 * 1.2F + 4 + 4 + 16 * 1.36F + 4 + wn * 17 * 1.36F + 16;
+		// Top right, the same card as the left's (as tall, its labels in the POKéMON's colour): how many you've caught
+		// beside a POKé BALL; a fine line; where to find it, each place a chip tinted its colour.
+		float rx = 940, rw = 300, rpx = rx + 22, inner = rw - 44;
+		int label = Ui.mix(tc, 0xFF000000, 0.25F), chipBg = Ui.mix(tc, 0xFFFFFFFF, 0.8F), chipInk = Ui.mix(tc, 0xFF000000, 0.55F);
+		List<String> places = new java.util.ArrayList<>();
+		if (got) for (String n : PokedexScreen.placeNames(sp.id()).split(", ")) if (!n.isBlank()) places.add(n);
+		float pillH = 26, chipGap = 6, chipS = 13.5F;
+		// The chips, laid out in rows (three at most; any more say how many).
+		List<float[]> at = new java.util.ArrayList<>();
+		List<String> shown = new java.util.ArrayList<>();
+		float cx = 0;
+		int row = 0;
+		for (int i = 0; i < places.size(); i++) {
+			String l = places.get(i);
+			float cw = V.trackedWidth(l, chipS, 0.5F) + 22;
+			if (cx > 0 && cx + cw > inner) { row++; cx = 0; }
+			if (row == 3) {
+				// No room for the rest: the last chip says how many more there are.
+				float[] last = at.remove(at.size() - 1);
+				shown.remove(shown.size() - 1);
+				at.add(last); shown.add("+" + (places.size() - shown.size()) + " " + Lang.t("more"));
+				break;
+			}
+			at.add(new float[] {cx, row}); shown.add(l);
+			cx += cw + chipGap;
+		}
+		int nRows = shown.isEmpty() ? 0 : (int) at.get(at.size() - 1)[1] + 1;
+		List<String> note = got && places.isEmpty() ? V.wrap(Lang.t("Not in the wild: from people, evolution or trades."), inner, 16, false)
+				: !got ? List.of(Lang.t("Not found yet")) : List.of();
+		float body = nRows > 0 ? nRows * pillH + (nRows - 1) * chipGap : note.size() * 16 * 1.36F;
+		float rh = Math.max(h, 16 + 16 * 1.36F + 6 + 40 + 12 + 2 + 12 + 16 * 1.36F + 8 + body + 16);
 		glass(g, rx, y, rw, rh);
 		float ry = y + 16;
-		V.tracked(g, Lang.t("Number caught"), rpx, ry + 3, 16, Ui.alpha(V.INK, 0.9F), 1);
-		ry += 16 * 1.36F + 4;
-		V.title(g, String.valueOf(howMany(sp)), rpx, ry, 40, V.INK);
-		ry += 40 * 1.2F + 4 + 4;
-		V.tracked(g, Lang.t("Where to find it"), rpx, ry + 3, 16, Ui.alpha(V.INK, 0.9F), 1);
-		ry += 16 * 1.36F + 4;
-		for (int i = 0; i < wn; i++) V.text(g, wl.get(i), rpx, ry + i * 17 * 1.36F, 17, V.INK, false);
+		V.tracked(g, Lang.t("Number caught"), rpx, ry + 3, 16, label, 1);
+		ry += 16 * 1.36F + 6;
+		V.icon(g, "ball_pok_ball", rpx, ry + 2, 36);
+		V.title(g, String.valueOf(howMany(sp)), rpx + 46, ry - 2, 40, V.INK);
+		ry += 40 + 12;
+		V.rr(g, rpx, ry, inner, 2, 1, Ui.alpha(V.INK, 0.12F));
+		ry += 2 + 12;
+		V.tracked(g, Lang.t("Where to find it"), rpx, ry + 3, 16, label, 1);
+		ry += 16 * 1.36F + 8;
+		for (int i = 0; i < shown.size(); i++) {
+			String l = shown.get(i);
+			float cw = V.trackedWidth(l, chipS, 0.5F) + 22, ccx = rpx + at.get(i)[0], ccy = ry + at.get(i)[1] * (pillH + chipGap);
+			V.pill(g, ccx, ccy, cw, pillH, chipBg);
+			V.tracked(g, l, ccx + 11, V.capsTop(ccy + pillH / 2, chipS), chipS, chipInk, 0.5F);
+		}
+		for (int i = 0; i < note.size(); i++) V.text(g, note.get(i), rpx, ry + i * 16 * 1.36F, 16, Ui.alpha(V.INK, got ? 0.85F : 0.55F), false);
 		// The band across the bottom: what it's like, in white, the speaker at its left.
 		int c1 = Ui.mix(tc, 0xFF000000, 0.45F), c2 = Ui.mix(tc, 0xFF000000, 0.6F);
 		float by = 548, bh = 172;

@@ -188,39 +188,59 @@ function shell(room, o = {}) {
   // A nook in the north wall too (a gate's way on, as deep as the one at the door): the room proper starts 2 in.
   const nn = o.northNook || null, N = nn ? 2 : 0;
   room.Nm = N; room.northNook = nn;
-  const floors = o.floorRects || [...(ent ? [[0, N, W, Dm], [ent[0], Dm, ent[1], D]] : [[0, N, W, D]]), ...(nn ? [[nn[0], 0, nn[1], N]] : [])];
+  // Nooks in the side walls (a sideways gate's ways in and out, 2 deep, as the one at a door): the room proper is
+  // then between x L and Rx.
+  const wn = o.westNook || null, en = o.eastNook || null, L = wn ? 2 : 0, Rx = en ? W - 2 : W;
+  room.Lx = L; room.Rx = Rx; room.westNook = wn; room.eastNook = en;
+  const lm = o.ledge || "walnut", lh = 0.7, lt = 0.3, ltop = o.ledgeTop || lm;
+  const floors = o.floorRects || [...(ent ? [[L, N, Rx, Dm], [ent[0], Dm, ent[1], D]] : [[L, N, Rx, D]]), ...(nn ? [[nn[0], 0, nn[1], N]] : [])];
   // The slab, cut along the front so its edge shows as a section.
   for (const [x0, z0, x1, z1] of floors) {
     const nook = ent && z0 >= Dm - 1e-6;
     G.box(x0, -0.35, z0, x1, 0, z1, { top: (nook && o.entryFloor) || o.floor || "oak", s: z1 >= Dm - 1e-6 ? "cap" : null, n: null, e: nook ? "cap" : null, w: nook ? "cap" : null, bottom: null });
   }
-  G.box(-T, -0.35, N - T, 0, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
-  G.box(W, -0.35, N - T, W + T, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
+  if (wn) G.box(0, -0.35, wn[0], L, 0, wn[1], { top: o.floor || "oak", s: "cap", n: null, e: null, w: null, bottom: null });
+  if (en) G.box(Rx, -0.35, en[0], W, 0, en[1], { top: o.floor || "oak", s: "cap", n: null, e: null, w: null, bottom: null });
+  G.box(L - T, -0.35, N - T, L, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
+  G.box(Rx, -0.35, N - T, Rx + T, 0, Dm, { top: null, s: "cap", n: null, e: null, w: null, bottom: null });
   for (const z of o.zones || []) G.box(z[0], 0, z[1], z[2], 0.012, z[3], { top: z[4], s: z[3] >= Dm - 1e-6 ? "cap" : null, n: null, e: null, w: null, bottom: null });
   // Walls: north, west and east. Their tops and cut ends are drawn dark, as a section.
   if (nn) {
     // Either side of the nook, and round the nook itself (its back and its two sides).
-    G.box(-T, 0, N - T, nn[0], H, N, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
-    G.box(nn[1], 0, N - T, W + T, H, N, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
+    G.box(L - T, 0, N - T, nn[0], H, N, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
+    G.box(nn[1], 0, N - T, Rx + T, H, N, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
     G.box(nn[0] - T, 0, -T, nn[1] + T, H, 0, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
     G.box(nn[0] - T, 0, 0, nn[0], H, N - T, { e: paper, top: "cap", n: null, s: null, w: null, bottom: null });
     G.box(nn[1], 0, 0, nn[1] + T, H, N - T, { w: paper, top: "cap", n: null, s: null, e: null, bottom: null });
     room.solid(-5, -5, nn[0], N); room.solid(nn[1], -5, W + 5, N); room.solid(nn[0], -5, nn[1], 0);
   } else {
-    G.box(-T, 0, -T, W + T, H, 0, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
+    G.box(L - T, 0, -T, Rx + T, H, 0, { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
     room.solid(-5, -5, W + 5, 0);
   }
-  G.box(-T, 0, N, 0, H, Dm, { e: paper, top: "cap", s: "cap", n: null, w: null, bottom: null });
-  G.box(W, 0, N, W + T, H, Dm, { w: paper, top: "cap", s: "cap", n: null, e: null, bottom: null });
-  room.solid(-5, -5, 0, D + 5); room.solid(W, -5, W + 5, D + 5);
+  // The side walls: either side of a side nook (the stretch north of it stopping short of the nook's own wall).
+  const runs = k => k ? [[N, k[0] - T], [k[1], Dm]] : [[N, Dm]];
+  for (const [a, b] of runs(wn)) if (b - a > 1e-6) G.box(L - T, 0, a, L, H, b, { e: paper, top: "cap", s: "cap", n: null, w: null, bottom: null });
+  for (const [a, b] of runs(en)) if (b - a > 1e-6) G.box(Rx, 0, a, Rx + T, H, b, { w: paper, top: "cap", s: "cap", n: null, e: null, bottom: null });
+  if (wn) {
+    // Round a side nook: its back (the way through is in it), its north side full height, a low ledge along its south.
+    G.box(-T, 0, wn[0] - T, 0, H, wn[1] + lt, { e: paper, top: "cap", n: null, s: "cap", w: null, bottom: null });
+    G.box(0, 0, wn[0] - T, L, H, wn[0], { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
+    G.box(0, 0, wn[1], L - T, lh, wn[1] + lt, { all: lm, top: ltop, bottom: null });
+    room.solid(-5, -5, L, wn[0]); room.solid(-5, wn[1], L, D + 5); room.solid(-5, wn[0], 0, wn[1]);
+  } else room.solid(-5, -5, 0, D + 5);
+  if (en) {
+    G.box(W, 0, en[0] - T, W + T, H, en[1] + lt, { w: paper, top: "cap", n: null, s: "cap", e: null, bottom: null });
+    G.box(Rx, 0, en[0] - T, W, H, en[0], { s: paper, top: "cap", n: null, e: null, w: null, bottom: null });
+    G.box(Rx + T, 0, en[1], W, lh, en[1] + lt, { all: lm, top: ltop, bottom: null });
+    room.solid(Rx, -5, W + 5, en[0]); room.solid(Rx, en[1], W + 5, D + 5); room.solid(W, en[0], W + 5, en[1]);
+  } else room.solid(W, -5, W + 5, D + 5);
   // The open front: solid but for the door.
   const door = o.door;
   if (ent) {
     // The ledge: across the front either side of the nook, and down its two sides.
-    const lm = o.ledge || "walnut", lh = 0.7, lt = 0.3;
-    for (const [x0, x1] of [[0, ent[0]], [ent[1], W]]) if (x1 - x0 > 1e-6) {
-      G.box(x0, 0, Dm - lt, x1, lh, Dm, { all: lm, top: o.ledgeTop || lm, bottom: null });
-      G.box(x0, lh, Dm - lt - 0.03, x1, lh + 0.06, Dm + 0.03, o.ledgeTop || lm);
+    for (const [x0, x1] of [[L, ent[0]], [ent[1], Rx]]) if (x1 - x0 > 1e-6) {
+      G.box(x0, 0, Dm - lt, x1, lh, Dm, { all: lm, top: ltop, bottom: null });
+      G.box(x0, lh, Dm - lt - 0.03, x1, lh + 0.06, Dm + 0.03, ltop);
     }
     for (const x of [ent[0], ent[1] - 0.08]) G.box(x, 0, Dm, x + 0.08, 0.05, D, { all: "cap", bottom: null });
     room.solid(-5, Dm - lt, ent[0], D + 5); room.solid(ent[1], Dm - lt, W + 5, D + 5);
@@ -228,20 +248,20 @@ function shell(room, o = {}) {
   } else if (door) { room.solid(-5, D, door[0], D + 5); room.solid(door[1], D, W + 5, D + 5); } else room.solid(-5, D, W + 5, D + 5);
   // Skirting boards and a picture rail.
   const sk = o.skirt || "paint", skh = o.skirtH || 0.24;
-  const northRuns = nn ? [[0, nn[0]], [nn[1], W]] : [[0, W]];
+  const northRuns = nn ? [[L, nn[0]], [nn[1], Rx]] : [[L, Rx]], sideRuns = k => k ? [[N, k[0]], [k[1], Dm]] : [[N, Dm]];
   for (const [a, b] of northRuns) G.box(a, 0, N, b, skh, N + 0.07, { all: sk, n: null, bottom: null });
-  G.box(0, 0, N, 0.07, skh, Dm, { all: sk, w: null, bottom: null });
-  G.box(W - 0.07, 0, N, W, skh, Dm, { all: sk, e: null, bottom: null });
+  for (const [a, b] of sideRuns(wn)) G.box(L, 0, a, L + 0.07, skh, b, { all: sk, w: null, bottom: null });
+  for (const [a, b] of sideRuns(en)) G.box(Rx - 0.07, 0, a, Rx, skh, b, { all: sk, e: null, bottom: null });
   if (o.rail !== false) {
     const ry = H - 0.55;
     for (const [a, b] of northRuns) G.box(a, ry, N, b, ry + 0.1, N + 0.06, { all: sk, n: null });
-    G.box(0, ry, N, 0.06, ry + 0.1, Dm, { all: sk, w: null });
-    G.box(W - 0.06, ry, N, W, ry + 0.1, Dm, { all: sk, e: null });
+    for (const [a, b] of sideRuns(wn)) G.box(L, ry, a, L + 0.06, ry + 0.1, b, { all: sk, w: null });
+    for (const [a, b] of sideRuns(en)) G.box(Rx - 0.06, ry, a, Rx, ry + 0.1, b, { all: sk, e: null });
   }
   // The soft shade where the walls meet the floor.
-  G.box(0, 0.02, N, W, 0.02, N + 1.1, { top: "aoN", all: null });
-  G.box(0, 0.02, N, 1.1, 0.02, Dm, { top: "aoW", all: null });
-  G.box(W - 1.1, 0.02, N, W, 0.02, Dm, { top: "aoE", all: null });
+  G.box(L, 0.02, N, Rx, 0.02, N + 1.1, { top: "aoN", all: null });
+  G.box(L, 0.02, N, L + 1.1, 0.02, Dm, { top: "aoW", all: null });
+  G.box(Rx - 1.1, 0.02, N, Rx, 0.02, Dm, { top: "aoE", all: null });
 }
 // ---------- light through the windows, by the time of day (the mod's RoomLight does the very same sums) ----------
 // A pool of light on the floor: where it falls at midday ([x0, z0, x1, z1]), dir the way the light goes in (0 south
@@ -563,7 +583,7 @@ function passageN(room, x0, x1, o = {}) {
   if (room.northNook) [x0, x1] = room.northNook;
   const m = o.mat || "doormat", mk = x1 - x0 > 3 && MATDEF[m + "W"] ? m + "W" : m;
   G.box(x0 - 0.15, 0, 0, x1 + 0.15, 2.6, 0.1, { s: o.frame || "walnut", all: null });
-  G.box(x0, 0, 0.1, x1, 2.4, 0.11, { s: "doorDark", all: null });
+  G.box(x0, 0, 0.1, x1, 2.4, 0.11, { s: o.opening || "doorDark", all: null });
   G.box(x0, 0, 0.11, x1, 0.03, 2, { top: mk, s: "cap", all: "cap", bottom: null });
   // (A way the viewer can't let you through, a guard's, is only something to look at here.)
   if (o.needs) room.act([x0, 0, x1, 1.4], { label: "Look", lines: o.lines || ["You can't go this way yet."] });

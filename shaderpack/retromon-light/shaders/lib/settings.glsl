@@ -1,7 +1,7 @@
 // Retromon Light. Copyright (c) 2026 Insid3 Th3 Cub3. All rights reserved.
 // Settings (the pack's own menu).
 
-#define SUN_STRENGTH 1.0 // [0.6 0.8 1.0 1.2 1.4]
+#define SUN_STRENGTH 1.2 // [0.6 0.8 1.0 1.2 1.4]
 #define NIGHT_BRIGHTNESS 1.0 // [0.5 0.75 1.0 1.25 1.5]
 #define SHADOW_SOFTNESS 1.0 // [0.5 1.0 1.5 2.0]
 #define SHADOW_STRENGTH 0.7 // [0.5 0.6 0.7 0.85 1.0]
@@ -23,8 +23,8 @@ const float ambientOcclusionLevel = 1.0;
 #define SHADOW_DISTORT 0.85
 
 // The picture.
-#define EXPOSURE 0.74 // [0.5 0.55 0.62 0.7 0.74 0.8 0.9]
-#define SATURATION 1.12 // [0.9 1.0 1.08 1.12 1.15 1.25]
+#define EXPOSURE 0.8 // [0.5 0.55 0.62 0.7 0.74 0.8 0.9]
+#define SATURATION 1.15 // [0.9 1.0 1.08 1.12 1.15 1.25]
 #define VIGNETTE 0.06 // [0.0 0.06 0.14 0.22]
 // The darks lifted a little (the newer games' bright, airy look), and clouds' shadows drifting over the land.
 #define LIFT 0.06 // [0.0 0.03 0.06 0.1]

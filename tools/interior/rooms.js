@@ -256,8 +256,24 @@ function drawScoreboard(P, f) {
   reg("ballStone", 16, 16, (P, r) => { P.fill(hx("#C4C9CF"), 0.05, r); for (let x = 0; x < 16; x++) { P.set(x, 7, hx("#5E646C")); P.set(x, 8, hx("#5E646C")); } for (let y = 9; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#AEB4BB"), (r() - 0.5) * 0.06)); P.rect(6, 6, 4, 4, hx("#5E646C")); P.rect(7, 7, 2, 2, hx("#E4E7EA")); }, { fit: true });
   reg("ballStoneTop", 16, 16, (P, r) => { P.fill(hx("#C9CED4"), 0.05, r); P.rect(3, 3, 3, 2, hx("#E2E5E8")); });
   reg("bushPink", 16, 16, (P, r) => { P.fill(hx("#4E9A44"), 0.12, r); for (let k = 0; k < 9; k++) { const x = Math.floor(r() * 14), y = Math.floor(r() * 14); P.rect(x, y, 2, 2, hx("#F48FB8")); P.set(x, y, hx("#FFD1E3")); } });
-  // Let's Go's League gate carpet: deep red, a gold line down each side.
-  RUGS.leagueRed = (i, j, w, d) => (i === 0 || i === w - 1) ? "#E2B455" : (j % 3 === 1 ? "#B8323A" : "#A82A32");
+  // Let's Go's League gate: its carpet (deep crimson, a gold line down each side), floor (terracotta red with a gold
+  // lattice), walls (red panels), trims (maroon, gold), mats (crimson and gold) and the daylight in its way on.
+  RUGS.leagueRed = (i, j, w, d) => (i === 0 || i === w - 1) ? "#C9952F" : (j % 3 === 1 ? "#8E222A" : "#7E1C24");
+  reg("leagueFloor", 32, 32, (P, r) => {
+    const base = hx("#A8433B"), mid = hx("#B5544A"), gold = hx("#D8A64C");
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+      const u = (x + y) % 16, v = (x - y + 32) % 16;
+      let c = shadec(Math.min(u, 16 - u) + Math.min(v, 16 - v) > 9 ? mid : base, (r() - 0.5) * 0.05);
+      if (u === 0 || v === 0) c = gold; else if (u === 1 || v === 1) c = shadec(base, -0.12);
+      P.set(x, y, c);
+    }
+  }, { per: 2 });
+  reg("paperLeague", 16, 16, (P, r) => { P.fill(hx("#B23C3C"), 0.03, r); P.rect(0, 0, 1, 16, hx("#952E30")); P.rect(8, 0, 1, 16, hx("#952E30")); P.rect(1, 0, 1, 16, hx("#C25050")); P.rect(9, 0, 1, 16, hx("#C25050")); });
+  reg("leagueMaroon", 16, 16, (P, r) => { P.fill(hx("#7A2228"), 0.04, r); P.rect(0, 0, 16, 1, hx("#8E2E34")); });
+  reg("leagueGold", 16, 16, (P, r) => { P.fill(hx("#D6A846"), 0.04, r); P.rect(0, 0, 16, 2, hx("#F2D27A")); P.rect(0, 14, 16, 2, hx("#A97E2A")); });
+  reg("doorLight", 16, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 16; x++) P.set(x, y, y < 24 ? mixc(hx("#FFFFFF"), hx("#FFF4D8"), y / 23) : mixc(hx("#E8F4C8"), hx("#BFE09A"), (y - 24) / 7)); }, { fit: true, glow: 1 });
+  matReg("matLeague", "#8C222A", "#D9AE4E");
+  matReg("matLeagueN", "#8C222A", "#D9AE4E", true);
   // A runner along a sideways gate (east to west): blue, a yellow line round it.
   RUGS.gateRunX = (i, j, w, d) => (i === 0 || i === w - 1 || j === 0 || j === d - 1) ? "#E9D27A" : (i % 3 === 1 ? "#5A8EE0" : "#4A7FD4");
   // The gate's runner: blue, a yellow line round it.
@@ -274,9 +290,23 @@ function drawScoreboard(P, f) {
 
 // A band of colour round the three walls you can see, at a height.
 function band(room, y, mat, h = 0.22) {
-  const G = room.geo, W = room.W, D = room.Dm || room.D, N = room.Nm || 0, nn = room.northNook;
-  for (const [a, c] of nn ? [[0, nn[0]], [nn[1], W]] : [[0, W]]) G.box(a, y, N, c, y + h, N + 0.04, { s: mat, all: null });
-  G.box(0, y, N, 0.04, y + h, D, { e: mat, all: null }); G.box(W - 0.04, y, N, W, y + h, D, { w: mat, all: null });
+  const G = room.geo, W = room.W, D = room.Dm || room.D, N = room.Nm || 0, nn = room.northNook, L = room.Lx || 0, Rx = room.Rx == null ? W : room.Rx;
+  for (const [a, c] of nn ? [[L, nn[0]], [nn[1], Rx]] : [[L, Rx]]) G.box(a, y, N, c, y + h, N + 0.04, { s: mat, all: null });
+  const runs = k => k ? [[N, k[0]], [k[1], D]] : [[N, D]];
+  for (const [a, c] of runs(room.westNook)) G.box(L, y, a, L + 0.04, y + h, c, { e: mat, all: null });
+  for (const [a, c] of runs(room.eastNook)) G.box(Rx - 0.04, y, a, Rx, y + h, c, { w: mat, all: null });
+}
+// A hanging basket on a wall bracket (a pot on chains, leaves trailing down). wall "n", "w" or "e".
+function hangingPlant(R, x, z, wall = "n", top = 2.9) {
+  const G = R.geo, out = 0.55, ax = wall === "w" ? x + out : wall === "e" ? x - out : x, az = wall === "n" ? z + out : z;
+  if (wall === "n") G.box(x - 0.04, top - 0.08, z, x + 0.04, top, az + 0.04, "steel");
+  else G.box(Math.min(x, ax) - 0.02, top - 0.08, z - 0.04, Math.max(x, ax) + 0.02, top, z + 0.04, "steel");
+  G.box(ax - 0.015, top - 0.55, az - 0.015, ax + 0.015, top - 0.08, az + 0.015, "steel");
+  G.box(ax - 0.22, top - 0.85, az - 0.22, ax + 0.22, top - 0.55, az + 0.22, { all: "potWhite", top: "soil" });
+  G.box(ax - 0.3, top - 0.62, az - 0.3, ax + 0.3, top - 0.42, az + 0.3, "leafSolid");
+  G.box(ax - 0.34, top - 1.15, az - 0.03, ax + 0.34, top - 0.6, az + 0.03, "leaf");
+  G.box(ax - 0.03, top - 1.15, az - 0.34, ax + 0.03, top - 0.6, az + 0.34, "leaf");
+  R.item("Hanging baskets", "Leafy plants in white pots, hung from the walls on little brackets.");
 }
 // Shelves of goods (the Mart's): white uprights, a coloured kick, goods on every shelf.
 function martShelf(room, X, Z, f, w = 4, h = 2.2, o = {}) {
@@ -1255,18 +1285,23 @@ const BUILD = {
     // between them, palms by the way on, and a guard beside it: only TRAINERS with the BOULDERBADGE may go on to
     // ROUTE 23 and VICTORY ROAD.
     const R = new Room("gate_league", { name: "Pokémon League Gate", floor: "Route 22", W: 14, D: 16, outsideSize: "18 by 21" });
-    shell(R, { paper: "paperGateLG", floor: "gateCheck", door: LG_GATE_DOOR, entry: true, northNook: LG_GATE_NOOK, skirt: "gateWhite", ledge: "gateBlue", ledgeTop: "gateWhite" });
+    shell(R, { paper: "paperLeague", floor: "leagueFloor", door: LG_GATE_DOOR, entry: true, northNook: LG_GATE_NOOK, skirt: "leagueGold", ledge: "leagueMaroon", ledgeTop: "leagueGold" });
     const N = R.Nm;
-    band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
-    passageN(R, LG_GATE_NOOK[0], LG_GATE_NOOK[1], { to: "town", needs: "BOULDERBADGE", mat: "matGateN", frame: "paint",
+    band(R, 0.24, "leagueMaroon", 1.1); band(R, 1.34, "leagueGold", 0.12); band(R, R.H - 0.75, "leagueGold", 0.1);
+    passageN(R, LG_GATE_NOOK[0], LG_GATE_NOOK[1], { to: "town", needs: "BOULDERBADGE", mat: "matLeagueN", frame: "leagueGold", opening: "doorLight",
       lines: ["GUARD: Only TRAINERS with the BOULDERBADGE may go on to VICTORY ROAD.", "GUARD: The rules are the rules!"] });
+    // The way on's gold frame, thick, all round the nook's mouth; the daylight in through it, a shaft down to the carpet.
+    R.geo.box(LG_GATE_NOOK[0] - 0.3, 0, N - 0.12, LG_GATE_NOOK[0], R.H - 0.9, N + 0.06, "leagueGold");
+    R.geo.box(LG_GATE_NOOK[1], 0, N - 0.12, LG_GATE_NOOK[1] + 0.3, R.H - 0.9, N + 0.06, "leagueGold");
+    R.geo.box(LG_GATE_NOOK[0] - 0.3, R.H - 1.2, N - 0.12, LG_GATE_NOOK[1] + 0.3, R.H - 0.9, N + 0.06, "leagueGold");
+    sunPool(R, LG_GATE_NOOK[0] + 0.1, 0.3, LG_GATE_NOOK[1] - 0.1, 4.6, 0, [0.3, 0.15, R.W - 0.3, R.Dm - 0.3], [0.12, LG_GATE_NOOK[0], LG_GATE_NOOK[1], 0.02, 2.4]);
     palm(R, 3.9, N + 0.8, 1.0); palm(R, 10.1, N + 0.8, 1.0);
     rug(R, 5, N, 9, R.Dm, "leagueRed");
     for (const x of [2.5, 11.5]) for (const z of [N + 2.6, N + 5.8, N + 9.0]) leagueStatue(R, x, z);
     for (const x of [2.5, 11.5]) for (const z of [N + 4.2, N + 7.4]) flowerBush(R, x, z);
     for (const x of [0.9, 13.1]) for (const z of [N + 2.6, N + 5.8, N + 9.0]) flowerBush(R, x, z, 0.8);
     plant(R, 1.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); plant(R, 13.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
-    doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], { to: "town", spawn: { x: 6.9, z: R.D - 2.0, yaw: FACE.s }, mat: "matGate" });
+    doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], { to: "town", spawn: { x: 6.9, z: R.D - 2.0, yaw: FACE.s }, mat: "matLeague" });
     R.npcs.push({ name: "Guard", key: "league_gate_guard", x: 10.6, z: N + 1.0, yaw: FACE.s, look: { skin: "guard" },
       talk: () => [{ text: "This is the POKéMON LEAGUE's FRONT GATE." }, { text: "Only TRAINERS who have the BOULDERBADGE may go on to VICTORY ROAD." }] });
     R.spawn = { x: 7.0, z: R.D - 1.5, yaw: FACE.n };
@@ -1279,20 +1314,28 @@ const BUILD = {
     // ROUTE 26 and JOHTO; the game asks which). A guard at his desk on the north wall, a blue runner between the
     // ways through, glass tables and stools along the front.
     const R = new Room("gate_johto", { name: "Route 28 Gate", floor: "Route 22", W: 16, D: 10, outsideSize: "9 by 12" });
-    shell(R, { paper: "paperGateLG", floor: "gateCheck", skirt: "gateWhite" });
+    shell(R, { paper: "paperGateLG", floor: "gateCheck", skirt: "gateWhite", westNook: [3, 7], eastNook: [3, 7], ledge: "gateBlue", ledgeTop: "gateWhite" });
     band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
     passageSide(R, "e", 3, 7, { to: "town", mat: "matGateE", frame: "paint" });
     passageSide(R, "w", 3, 7, { to: "town", mat: "matGateW", frame: "paint", choice: "johto" });
-    rug(R, 2, 4, 14, 6, "gateRunX");
+    rug(R, 2, 3, 14, 7, "gateRunX");
+    // Two windows behind the guard (the light falls across his desk), the map of the way west beside them, a notice.
+    crossWindowN(R, 4.3, 1.5, 1.8, 1.4, ["Outside: the mountain's foot, and ROUTE 22's grass."]);
+    crossWindowN(R, 9.9, 1.5, 1.8, 1.4, ["Outside: the mountain going up and up into the clouds."]);
+    framed(R, 2.4, 1.45, 1.5, 1.1, "map", "n", { act: { label: "Look", lines: ["A map: ROUTE 22 here, ROUTE 28 west under the mountain, ROUTE 26 south to JOHTO."] } });
+    framed(R, 12.2, 1.6, 1.3, 0.9, "sign", "n", { act: { label: "Read", lines: ["WEST: ROUTE 28 and MT. SILVER. SOUTH: ROUTE 26 and JOHTO (CHAMPIONS ONLY)."] } });
+    hangingPlant(R, 3.6, 0, "n"); hangingPlant(R, 12.4, 0, "n");
+    hangingPlant(R, 2, 2.2, "w", 2.8); hangingPlant(R, 2, 7.9, "w", 2.8); hangingPlant(R, 14, 2.2, "e", 2.8); hangingPlant(R, 14, 7.9, "e", 2.8);
     table(R, 6.4, 1.3, 9.6, 2.0, { top: "lab", leg: "steel", h: 0.95, name: "Guard's desk", note: "A white-topped desk on steel legs, a logbook open on it." });
     R.geo.box(7.3, 0.95, 1.45, 8.1, 0.99, 1.85, { all: "linen", top: "bookOpen" });
     R.act([6.2, 1.1, 9.8, 2.3], { label: "Read", lines: ["The guard's logbook: who's gone through, and which way.", "ROUTE 28... ROUTE 28... ROUTE 26 (CHAMPION)..."] });
-    palm(R, 1.0, 1.0, 1.0); palm(R, 15.0, 1.0, 1.0);
-    glassTable(R, 3.2, 7.6, 4.6, 9.0, { lines: ["A glass table. A leaflet: MT. SILVER, FOR THE STRONGEST ONLY."] });
-    stool(R, 2.5, 8.3); stool(R, 5.3, 8.3);
-    glassTable(R, 11.4, 7.6, 12.8, 9.0, { lines: ["A glass table. A map of JOHTO, folded up small."] });
-    stool(R, 10.7, 8.3); stool(R, 13.5, 8.3);
-    slimPlant(R, 0.8, 9.2, 1.0); slimPlant(R, 15.2, 9.2, 1.0);
+    slimPlant(R, 2.6, 1.2, 1.0); slimPlant(R, 13.4, 1.2, 1.0);
+    glassTable(R, 4.0, 7.6, 5.4, 9.0, { lines: ["A glass table. A leaflet: MT. SILVER, FOR THE STRONGEST ONLY."] });
+    stool(R, 3.3, 8.3); stool(R, 6.1, 8.3);
+    glassTable(R, 10.6, 7.6, 12.0, 9.0, { lines: ["A glass table. A map of JOHTO, folded up small."] });
+    stool(R, 9.9, 8.3); stool(R, 12.7, 8.3);
+    palm(R, 2.8, 9.1, 1.0); palm(R, 13.2, 9.1, 1.0);
+    plant(R, 7.0, 9.2, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); plant(R, 9.0, 9.2, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
     R.npcs.push({ name: "Guard", key: "johto_gate_guard", x: 8.0, z: 0.8, yaw: FACE.s, look: { skin: "officer_m" },
       talk: () => [{ text: "West of here, under the mountain, is ROUTE 28." }, { text: "ROUTE 26 and the JOHTO region are that way too, but only the CHAMPION may go to JOHTO." }] });
     R.spawn = { x: 14.4, z: 5.0, yaw: FACE.w };

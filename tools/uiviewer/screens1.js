@@ -173,21 +173,27 @@ const OPTS = [
   ["WILD POKéMON", "wild", ["HIDDEN", "SEEN"], "Whether wild POKéMON show in the grass, or jump out at you."],
   ["BATTLE EFFECTS", "effects", ["ON", "OFF"], "Whether moves play their animations in battle."],
   ["BATTLE STYLE", "style", ["SWITCH", "SET"], "SWITCH asks if you want to change POKéMON when a trainer's sends out the next one."],
+  ["WALK WITH YOU", "follower", ["OFF", "ON"], "Whether your partner walks with you."],
+  ["POKéMON LOOK", "look", ["COBBLEMON", "RETROMON"], "COBBLEMON shows the POKéMON as Cobblemon draws them; RETROMON shows our own creatures."],
+  ["SHADERS", "shaders", ["OFF", "RETROMON"], "RETROMON is our own light: the sun moves with the day, soft shadows, swaying grass, blue nights and glowing lamps. OFF is Minecraft's own."],
+  ["DAY AND NIGHT", "cycle", ["ON", "OFF"], "ON lets the day go by, morning to night. OFF holds it at half past ten in the morning (the day count waits too)."],
 ];
 screen("options", "Start", "Options", {
   what: "Settings, a row each: left and right to change. What the row does is written at the top.",
-  mod: "MenuScreen's OPTION: TEXT SPEED, MUSIC, POKéDEX VOICE, NIGHTS, WILD POKéMON.",
+  mod: "OptionsPage (the title's OPTION and the menu's): TEXT SPEED, MUSIC, SOUND, POKéDEX VOICE, NIGHTS, WILD POKéMON, BATTLE EFFECTS, BATTLE STYLE, WALK WITH YOU, POKéMON LOOK, SHADERS, DAY AND NIGHT, CONTROLS.",
   tags: ["New: sound, battle effects, battle style, controls"],
   make(arg) {
     swirlBackdrop("lime", { lx: 15, ly: 0 }); let sel = 0;
     const desc = box(170, 40, 940, 96, "g-panel", ""); desc.style.padding = "22px 30px"; desc.style.fontSize = "22px"; desc.style.fontWeight = "800";
-    const P = box(170, 160, 940, 470, "g-panel", ""); P.style.padding = "18px";
     const rows = OPTS.concat([["CONTROLS", null, null, "See every key: what it does in game, and what's turned off."]]);
+    // The rows 44 tall, less with this many (the panel's foot clear of the key buttons), as the mod's.
+    const rh = Math.min(44, (720 - 14 - 40 - 18 - 156 - 36) / rows.length);
+    const P = box(170, 156, 940, rows.length * rh + 36, "g-panel", ""); P.style.padding = "18px";
     const draw = () => {
       desc.innerHTML = esc(T(rows[sel][3]));
       P.innerHTML = rows.map(([l, k, vals], i) => {
         const v = k ? T(vals[G.opts[k]]) : "";
-        return `<div class="g-item${i === sel ? " on" : ""}" style="min-height:44px;padding-top:5px;padding-bottom:5px;${i === sel ? "" : "border-bottom:1.5px solid #EEF1F8;border-radius:0"}"><span style="width:340px">${esc(T(l))}</span><span class="r" style="display:flex;align-items:center;gap:14px">${k ? `<span style="color:var(--g-red)">&#9664;</span><span style="min-width:120px;text-align:center">${esc(v)}</span><span style="color:var(--g-red)">&#9654;</span>` : `<span style="color:var(--g-red)">&#9654;</span>`}</span></div>`;
+        return `<div class="g-item${i === sel ? " on" : ""}" style="height:${rh}px;min-height:0;padding-top:0;padding-bottom:0;font-size:21px;${i === sel ? "" : "border-bottom:1.5px solid #EEF1F8;border-radius:0"}"><span style="width:340px">${esc(T(l))}</span><span class="r" style="display:flex;align-items:center;gap:14px">${k ? `<span style="color:var(--g-red)">&#9664;</span><span style="min-width:120px;text-align:center">${esc(v)}</span><span style="color:var(--g-red)">&#9654;</span>` : `<span style="color:var(--g-red)">&#9654;</span>`}</span></div>`;
       }).join("");
       [...P.children].forEach((c, i) => c.onclick = () => { sel = i; act("a"); });
     };

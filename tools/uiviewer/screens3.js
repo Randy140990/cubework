@@ -357,8 +357,8 @@ function movePanel(p, foeSid, onPick, onBack) {
   const info = box(830, 230, 410, null, "g-panel", ""); info.style.padding = "14px 20px";
   const L = box(830, 420, 410, null, "", "");
   const paint = () => {
-    L.innerHTML = p.moves.map((n, i) => { const m = MOVE[n] || {}; return `<div style="margin-bottom:10px;display:flex;align-items:center;gap:12px;padding:8px 18px 8px 10px;border-radius:999px;background:${i === sel ? "#FFF4D8" : `linear-gradient(90deg, ${TYPECOL(m.type)}, rgba(18,60,56,.95) 60%)`};color:${i === sel ? "#26304A" : "#fff"};border:3px solid ${i === sel ? "#fff" : "rgba(143,245,192,.4)"};font-weight:900;font-size:21px;cursor:pointer" data-i="${i}">
-      <span class="g-type" style="background:${TYPECOL(m.type)};min-width:44px;padding:2px 8px;font-size:11px">${esc((m.type || "").slice(0, 3))}</span><span>${esc(n)}</span><span style="margin-left:auto;font-variant-numeric:tabular-nums">${m.pp}/${m.pp}</span></div>`; }).join("");
+    // As the summary's MOVES (Let's Go's battle has the same bars), 54 tall and 10 apart.
+    L.innerHTML = p.moves.map((n, i) => `<div style="margin-bottom:10px;cursor:pointer" data-i="${i}">${moveBar(n, (MOVE[n] || { pp: 20 }).pp, i === sel, 54, 410)}</div>`).join("");
     const m = MOVE[p.moves[sel]] || {}, e = eff(m.type, foeSid);
     info.innerHTML = `<div style="display:flex;align-items:center;gap:10px">${typeChip(m.type)}<span class="g-label">${esc(m.category || "")}</span><span style="margin-left:auto;font-weight:900;font-size:15px;color:${e > 1 ? "#8FF5C0" : e < 1 ? "#FFB3B8" : "#A9D4C6"}">${e > 1 ? "Super effective" : e === 0 ? "No effect" : e < 1 ? "Not very effective" : "Effective"}</span></div>
       <div style="display:flex;gap:22px;margin-top:8px;font-size:18px;font-weight:900"><span><span class="g-label">Power</span> ${m.power > 1 ? m.power : "—"}</span><span><span class="g-label">Accuracy</span> ${m.accuracy || "—"}</span></div><div style="margin-top:6px;font-size:17px;font-weight:800;color:var(--g-text)">${esc(m.desc || "")}</div>`;

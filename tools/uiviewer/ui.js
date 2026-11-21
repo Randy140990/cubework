@@ -20,7 +20,7 @@ function title(s) { return String(s).toLowerCase().replace(/(^|[\s-])\w/g, c => 
 const G = {
   lang: "English", name: "RED", rival: "BLUE", money: 3150, badges: 2, seen: 34, caught: 12, time: "12:34", started: "19/11/2026", id: "40217",
   outfit: Object.assign(OUTFIT.defaults(false), { capp: 0, topc: 1, hairc: 9 }),
-  opts: { textSpeed: 1, music: 3, sound: 3, voice: 1, nights: 1, wild: 1, effects: 0, style: 0 },
+  opts: { textSpeed: 1, music: 3, sound: 3, voice: 1, nights: 1, wild: 1, effects: 0, style: 0, follower: 1, look: 1, shaders: 1, cycle: 0 },
   party: [], place: "PALLET TOWN",
   bag: {
     "ITEMS": [["POTION", 5, "Restores 20 HP to one POKéMON."], ["SUPER POTION", 2, "Restores 50 HP to one POKéMON."], ["ANTIDOTE", 3, "Cures a POKéMON of poison."], ["PARLYZ HEAL", 1, "Cures a POKéMON of paralysis."], ["AWAKENING", 1, "Wakes a sleeping POKéMON."], ["ESCAPE ROPE", 1, "Takes you back out of a cave in a flash."], ["REPEL", 4, "Keeps weak wild POKéMON away for 100 steps."]],
@@ -91,6 +91,7 @@ function hpCol(f) { return f > 0.5 ? "var(--hp-green)" : f > 0.2 ? "var(--hp-yel
 function hpBar(f, w) { return `<div class="g-hp" style="width:${w}px"><i style="width:${Math.max(0, f) * 100}%;background:${hpCol(f)}"></i></div>`; }
 function gender(g) { return g === "F" ? `<span style="color:#FF8FB1">&#9792;</span>` : g === "M" ? `<span style="color:#7FB8FF">&#9794;</span>` : ""; }
 function darkerHex(c, k) { const v = mixc(hx(c), [0, 0, 0], k); return "#" + v.map(x => Math.round(x).toString(16).padStart(2, "0")).join(""); }
+function mixHex(a, b, k) { const v = mixc(hx(a), hx(b), k); return "#" + v.map(x => Math.round(x).toString(16).padStart(2, "0")).join(""); }
 function lighterHex(c, k) { const v = mixc(hx(c), [255, 255, 255], k); return "#" + v.map(x => Math.round(x).toString(16).padStart(2, "0")).join(""); }
 function money(n) { return "&#8381;" + n.toLocaleString("en-GB"); }
 

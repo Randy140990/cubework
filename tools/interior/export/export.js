@@ -50,7 +50,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
     }
     // The light through the windows: the pools' pictures and the windows' at dusk and at night.
     const light = {};
-    for (const k of ["sunPool", "sunPoolSoft", "sunBeam", "windowDusk", "windowNight"]) light[k] = pixTex(k).image.toDataURL();
+    for (const k of ["sunPool", "sunPoolSoft", "sunBeam", "windowDusk", "windowNight", "doorDusk", "doorNight"]) light[k] = pixTex(k).image.toDataURL();
     return { rooms, mats, light };
   });
   fs.writeFileSync(out, JSON.stringify(data));

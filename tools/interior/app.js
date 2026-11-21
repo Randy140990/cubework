@@ -96,6 +96,9 @@ function applyTime() {
     // (Lit from outside: its own colours, as the mod shows it, not washed out by the room's light.)
     wm.map = tx; wm.emissiveMap = tx; wm.emissiveIntensity = 1; wm.color.setHex(0x1a1a1a); wm.needsUpdate = true;
   }
+  // An open way out's daylight (the League gate's): sunset light at evening, dark at night.
+  const dm = matCache.doorLight;
+  if (dm) { const tx = pixTex(t.m > 0.5 ? "doorNight" : t.k > 0.5 ? "doorDusk" : "doorLight"); dm.map = tx; dm.emissiveMap = tx; dm.color.setHex(0x1a1a1a); dm.needsUpdate = true; }
   if (!room || !room.poolMeshes) return;
   const [cr, cg, cb, ca, cs] = poolLight(t.k, t.m);
   for (const mesh of room.poolMeshes) {

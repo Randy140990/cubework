@@ -19,7 +19,7 @@ import net.minecraft.client.Minecraft;
 public final class Shaders {
 	private Shaders() {}
 
-	public static final String RETROMON = "Retromon-Light-1.2.1.zip";
+	public static final String RETROMON = "Retromon-Light-1.2.2.zip";
 	private static boolean switched;
 	private static String previousPack;
 	private static boolean previousEnabled;

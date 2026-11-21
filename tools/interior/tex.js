@@ -398,6 +398,9 @@ const TEXDEF = {
     P.rect(15, 0, 2, 32, fr); P.rect(0, 15, 32, 2, fr);
     P.rect(2, 2, 13, 1, ln); P.rect(17, 2, 13, 1, ln); P.rect(2, 17, 13, 1, ln); P.rect(17, 17, 13, 1, ln);
   }],
+  // An open way out (the League gate's) as the sun goes down, and after dark.
+  doorDusk: [16, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 16; x++) P.set(x, y, y < 24 ? mixc(hx("#F7B680"), hx("#FFE0A6"), y / 23) : mixc(hx("#8A8A52"), hx("#6E7442"), (y - 24) / 7)); }],
+  doorNight: [16, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 16; x++) P.set(x, y, y < 24 ? mixc(hx("#101A3A"), hx("#2C4274"), y / 23) : mixc(hx("#1C2C3E"), hx("#142230"), (y - 24) / 7)); for (const [sx, sy] of [[3, 4], [11, 7], [7, 12], [13, 16]]) P.set(sx, sy, hx("#E6EEFF"), 0.8); }],
   windowExt: [16, 16, (P, r) => {
     for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, mixc(hx("#5D9CC7"), hx("#B9DDF0"), (x + y) / 30));
     P.line(9, 2, 14, 7, hx("#E6F5FB")); P.line(10, 2, 14, 6, hx("#E6F5FB"));
