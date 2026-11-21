@@ -113,3 +113,25 @@ CI (61baa90) with BtbN FFmpeg master:
 - The new names show in chat.
 
 Jar: `Lightlens-0.1.1-for-MC1.21.11.jar`.
+
+## 0.1.2: GIFs (21 Nov)
+
+John asked for a GIF maker ("record for 10 seconds, a frame a second?").
+
+- **G makes a GIF.** It stops by itself after the length picked; G again stops it sooner. You can't make one during a recording: the toast tells you to stop the recording (F10) first. The screen's bottom bar has a "GIF (G)" button.
+- **Settings:**
+  - Length: 3, 5 or 10 s of GIF.
+  - Width: 480, 640 or 960, with the height from the Shape.
+  - Style: Normal (15 fps) or Timelapse. Timelapse captures one frame a second and plays at 10 fps, so a 10 s GIF is 100 s of play.
+  - The screen shows a size guess (about a third of a byte per pixel per frame).
+- **How:**
+  - The same recorder, at the GIF size: H.264 at Max quality, no sound, into the work folder; captured at 15 fps, or 1 fps for a timelapse.
+  - Then `Ffmpeg.gifCommand`: `fps=15` (or `setpts=PTS/10,fps=10`), split, palettegen `stats_mode=diff`, paletteuse `sierra2_4a`, `diff_mode=rectangle`, `-loop 0`.
+  - Saved to `<folder>/GIFs` as "Lightlens <date> at <time> (WxH).gif" ("timelapse" is added to the name for those).
+- **On screen:** the box counts the seconds left, in teal, and is never in the GIF.
+- **CI (d328cfa, BtbN FFmpeg):**
+  - The 3 s GIF at 480x270 had 47 frames and was 0.9 MB.
+  - The 3 s timelapse had 32 frames from 32 s of play and was 1.0 MB.
+  - Video, photos and Sharper all still pass.
+
+Jar: `Lightlens-0.1.2-for-MC1.21.11.jar`.
