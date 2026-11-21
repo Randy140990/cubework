@@ -46,9 +46,12 @@ public class Retromon implements ModInitializer {
 	private static final ResourceKey<EntityType<?>> NPC_KEY = ResourceKey.create(Registries.ENTITY_TYPE, id("npc"));
 	private static final ResourceKey<EntityType<?>> MON_KEY = ResourceKey.create(Registries.ENTITY_TYPE, id("mon_display"));
 	private static final ResourceKey<EntityType<?>> WORLD_MON_KEY = ResourceKey.create(Registries.ENTITY_TYPE, id("world_mon"));
+	private static final ResourceKey<EntityType<?>> ROOM_LIGHT_KEY = ResourceKey.create(Registries.ENTITY_TYPE, id("room_light"));
 	public static EntityType<Npc> NPC;
 	public static EntityType<MonDisplay> MON_DISPLAY;
 	public static EntityType<WorldMon> WORLD_MON;
+	/** The light through a room's windows (only on your screen). */
+	public static EntityType<com.insidethecube.retromon.game.RoomLight> ROOM_LIGHT;
 	public static final ResourceKey<net.minecraft.world.level.block.Block> PROP_KEY = ResourceKey.create(Registries.BLOCK, id("prop"));
 	/** The insides of buildings, block by block (see Interiors). */
 	public static net.minecraft.world.level.block.Block PROP;
@@ -64,6 +67,9 @@ public class Retromon implements ModInitializer {
 		MON_DISPLAY = Registry.register(BuiltInRegistries.ENTITY_TYPE, MON_KEY,
 				EntityType.Builder.<MonDisplay>of(MonDisplay::new, MobCategory.MISC).sized(0.8F, 1.0F).clientTrackingRange(0).noLootTable().noSave().noSummon()
 						.build(MON_KEY));
+		ROOM_LIGHT = Registry.register(BuiltInRegistries.ENTITY_TYPE, ROOM_LIGHT_KEY,
+				EntityType.Builder.<com.insidethecube.retromon.game.RoomLight>of(com.insidethecube.retromon.game.RoomLight::new, MobCategory.MISC).sized(0.1F, 0.1F)
+						.clientTrackingRange(0).noLootTable().noSave().noSummon().build(ROOM_LIGHT_KEY));
 		WORLD_MON = Registry.register(BuiltInRegistries.ENTITY_TYPE, WORLD_MON_KEY,
 				EntityType.Builder.<WorldMon>of(WorldMon::new, MobCategory.MISC).sized(1.0F, 1.2F).clientTrackingRange(10).noLootTable().build(WORLD_MON_KEY));
 		PROP = Registry.register(BuiltInRegistries.BLOCK, PROP_KEY, new com.insidethecube.retromon.game.Prop(

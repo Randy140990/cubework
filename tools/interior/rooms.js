@@ -518,6 +518,9 @@ function crossWindow(R, wall, z, y, w, h, lines) {
   G.box(x0, yc - 0.05, z, x1, yc + 0.05, z + w, "paint");
   const sx0 = wall === "w" ? 0 : R.W - 0.26, sx1 = sx0 + 0.26;
   G.box(sx0, y - 0.2, z - 0.15, sx1, y - 0.1, z + w + 0.15, "paint");
+  // Its light on the floor, in from the wall.
+  if (wall === "w") sunPool(R, 1.2, z - 0.2, 1.2 + h * 1.4, z + w + 0.2, 2, null, [0.1, z, z + w, y, y + h]);
+  else sunPool(R, R.W - 1.2 - h * 1.4, z - 0.2, R.W - 1.2, z + w + 0.2, 1, null, [R.W - 0.1, z, z + w, y, y + h]);
 }
 // A wooden post in a corner of the room (Let's Go's rooms have them), floor to ceiling.
 function cornerPost(R, x, z, s = 0.42, mat = "beam") {

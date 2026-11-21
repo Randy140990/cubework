@@ -228,7 +228,63 @@ function shell(room, o = {}) {
   G.box(0, 0.02, 0, 1.1, 0.02, Dm, { top: "aoW", all: null });
   G.box(W - 1.1, 0.02, 0, W, 0.02, Dm, { top: "aoE", all: null });
 }
-function sunPool(room, x0, z0, x1, z1) { room.geo.box(x0, 0.03, z0, x1, 0.03, z1, { top: "sunPool", all: null }); }
+// ---------- light through the windows, by the time of day (the mod's RoomLight does the very same sums) ----------
+// A pool of light on the floor: where it falls at midday ([x0, z0, x1, z1]), dir the way the light goes in (0 south
+// from a window in the north wall, 1 west from one in the east wall, 2 east from one in the west wall, 3 north in
+// at the door), and the rect it's kept inside (the room, short of the walls, or the nook it's in).
+// win: the window it comes through ([its wall's place, from and to along the wall, its foot and top]), for the
+// shaft of light from it down to the pool (none at the door).
+function sunPool(room, x0, z0, x1, z1, dir = 0, bounds, win) {
+  const Dm = room.Dm || room.D;
+  const b = bounds || (dir === 3 ? [0.3, 0.3, room.W - 0.3, room.D] : [0.3, 0.3, room.W - 0.3, Dm - 0.3]);
+  (room.pools || (room.pools = [])).push([x0, z0, x1, z1, dir].concat(b, win || [0, 0, 0, 0, 0]).map(v => Math.round(v * 1000) / 1000));
+}
+// The times the viewer shows. k: how low and golden the sun is (morning or evening); side: where it is (-1 the east,
+// in the morning, 1 the west, in the evening); m: how far it's night (the moon's light, the windows dark).
+const TIMES = {
+  morning: { k: 1, side: -1, m: 0, name: "Morning", note: "The sun low in the east: golden light, long pools, the east windows brightest" },
+  day: { k: 0, side: 1, m: 0, name: "Day", note: "The sun high: warm white pools under the windows" },
+  evening: { k: 1, side: 1, m: 0, name: "Evening", note: "The sun low in the west: orange light, long pools, a sunset in the windows" },
+  night: { k: 0, side: 1, m: 1, name: "Night", note: "Moonlight: faint blue pools, the windows dark with stars (the lamps keep the room bright)" },
+};
+let TOD = "day";
+// The light's colour and strength: warm white by day, golden low down, a faint cool blue at night.
+// [r, g, b, the pool's strength, the shaft's].
+function poolLight(k, m) {
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  return mix(mix([1, 0.96, 0.82, 0.6, 0.16], [1, 0.74, 0.44, 0.55, 0.2], k), [0.55, 0.7, 1, 0.3, 0.08], m);
+}
+// Where a pool falls at a time, and how strong it is there: [x0, z0, x1, z1, strength], or null. A low sun throws it
+// further in and longer, and to one side (the morning's west of the window, the evening's east); a window facing
+// away from a low sun is in shade.
+function poolRect(p, k, side, m) {
+  let [x0, z0, x1, z1, dir, bx0, bz0, bx1, bz1] = p;
+  const shift = 0.6 * k, scale = 1 + 0.7 * k - 0.15 * m, lat = 0.8 * k * side;
+  let s = 1;
+  if (dir === 0) { const l = (z1 - z0) * scale; z0 += shift; z1 = z0 + l; x0 += lat; x1 += lat; }
+  else if (dir === 3) z0 = z1 - (z1 - z0) * scale;
+  else if (dir === 1) { const l = (x1 - x0) * scale; x1 -= shift; x0 = x1 - l; if (side > 0) s = 1 - 0.65 * k; }
+  else { const l = (x1 - x0) * scale; x0 += shift; x1 = x0 + l; if (side < 0) s = 1 - 0.65 * k; }
+  x0 = Math.max(x0, bx0); z0 = Math.max(z0, bz0); x1 = Math.min(x1, bx1); z1 = Math.min(z1, bz1);
+  return x1 - x0 > 0.1 && z1 - z0 > 0.1 ? [x0, z0, x1, z1, s] : null;
+}
+// The shaft from a pool's window down to where it falls (q, from poolRect): four sheets (its top, bottom and sides),
+// each [corner, corner, corner, corner] of [x, y, z, u, v] (v 0 at the window, 1 on the floor); none for the door.
+function beamQuads(p, q, y = 0.07) {
+  const [, , , , dir, , , , , wc, a0, a1, wy0, wy1] = p;
+  if (dir === 3 || wy1 <= wy0) return [];
+  const [x0, z0, x1, z1] = q;
+  // a: along the wall, d: in from it.
+  const la0 = dir === 0 ? x0 : z0, la1 = dir === 0 ? x1 : z1;
+  const near = dir === 0 ? z0 : dir === 1 ? x1 : x0, far = dir === 0 ? z1 : dir === 1 ? x0 : x1;
+  const P = (a, yy, d, u, v) => dir === 0 ? [a, yy, d, u, v] : [d, yy, a, u, v];
+  return [
+    [P(a0, wy1, wc, 0, 0), P(a1, wy1, wc, 1, 0), P(la1, y, far, 1, 1), P(la0, y, far, 0, 1)],
+    [P(a0, wy0, wc, 0, 0), P(a1, wy0, wc, 1, 0), P(la1, y, near, 1, 1), P(la0, y, near, 0, 1)],
+    [P(a0, wy0, wc, 0, 0), P(a0, wy1, wc, 1, 0), P(la0, y, far, 1, 1), P(la0, y, near, 0, 1)],
+    [P(a1, wy0, wc, 0, 0), P(a1, wy1, wc, 1, 0), P(la1, y, far, 1, 1), P(la1, y, near, 0, 1)],
+  ];
+}
 
 // ---------- windows and things on walls ----------
 function windowN(room, x, y, w = 2.2, h = 2, o = {}) {
@@ -246,9 +302,9 @@ function windowN(room, x, y, w = 2.2, h = 2, o = {}) {
     G.box(x + w + 0.05 - k, y - 0.4, 0.16, x + w + 0.6, y + h + 0.32, 0.34, c);
   }
   if (o.plant) { G.box(x + 0.15, y - t, 0.05, x + 0.55, y + 0.3 - t, 0.28, "potWhite"); G.box(x + 0.1, y + 0.3 - t, 0.02, x + 0.6, y + 0.85 - t, 0.32, "leafSolid"); }
-  if (o.pool !== false) sunPool(room, x - 0.3, 1.2, x + w + 0.3, 1.2 + h * 1.4);
+  if (o.pool !== false) sunPool(room, x - 0.3, 1.2, x + w + 0.3, 1.2 + h * 1.4, 0, null, [0.03, x, x + w, y, y + h]);
   room.act([x, 0, x + w, 0.6], { label: "Look", lines: o.lines || ["It's a bright morning over Pallet Town."] });
-  room.item("Window", "Sky and hills painted on, lit from outside; light falls on the floor.");
+  room.item("Window", "Sky and hills painted on, lit from outside; its light falls on the floor, by the time of day (a sunset at evening, stars at night).");
 }
 function framed(room, x, y, w, h, mat, wall = "n", o = {}) {
   const G = room.geo, t = o.frame === false ? 0 : 0.1, fm = o.frameMat || "walnut", d = o.depth || 0.08;
@@ -479,7 +535,9 @@ function doormat(room, x0, x1, o = {}) {
   if (room.entry) [x0, x1] = room.entry;
   const m = o.mat || "doormat", mk = x1 - x0 > 3 && MATDEF[m + "W"] ? m + "W" : m;
   G.box(x0, 0, D - 2, x1, 0.03, D, { top: mk, s: "cap", all: "cap", bottom: null });
-  sunPool(room, x0 - 0.6, D - 3.6, x1 + 0.6, D);
+  // The light in at the door (only as wide as the nook, when there's one).
+  if (room.entry) sunPool(room, x0, D - 3.6, x1, D, 3, [x0, 0.3, x1, D]);
+  else sunPool(room, x0 - 0.6, D - 3.6, x1 + 0.6, D, 3);
   room.exitArrow = { x: (x0 + x1) / 2, z: D - 0.55 };
   if (!o.none) room.warps.push({ test: (p, input) => p.z > D - 1.0 && p.x > x0 && p.x < x1 && input.down, to: o.to, spawn: o.spawn, fx: "fadeOut", why: "out" });
   room.item("Door mat", o.mat ? "This place's own mat, in its colours. Walk off it, south, to go out." : "Coir mat with a stitched border. Walk off it, south, to go out.");

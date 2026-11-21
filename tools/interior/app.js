@@ -64,7 +64,52 @@ function renderMe() { const el = $("#meSeg"); if (el) setSeg(el, me.as); }
 const built = {};
 let room = null;
 function getRoom(id) { if (!built[id]) { const r = BUILD[id](); r.finish(); prepareRoom(r); built[id] = r; } return built[id]; }
+// The light through the windows: each pool a soft rect on the floor (over the carpets), placed and tinted by the time
+// of day; the windows' glass a sunset or a night sky.
+function makePools(r) {
+  r.poolMeshes = (r.pools || []).map(p => {
+    const m = new THREE.MeshBasicMaterial({ map: pixTex(p[4] === 3 ? "sunPoolSoft" : "sunPool"), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), m);
+    mesh.rotation.x = -Math.PI / 2; mesh.renderOrder = 3; mesh.userData.pool = p; r.group.add(mesh);
+    // Its shaft from the window (rebuilt as the time changes).
+    const bm = new THREE.MeshBasicMaterial({ map: pixTex("sunBeam"), transparent: true, depthWrite: false, side: THREE.DoubleSide });
+    mesh.userData.beam = new THREE.Mesh(new THREE.BufferGeometry(), bm); mesh.userData.beam.renderOrder = 5; r.group.add(mesh.userData.beam);
+    return mesh;
+  });
+}
+function setBeam(beam, quads) {
+  const pos = [], uv = [], idx = [];
+  for (const q of quads) {
+    const b = pos.length / 3;
+    for (const [x, y, z, u, v] of q) { pos.push(x, y, z); uv.push(u, 1 - v); }
+    idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+  beam.geometry.dispose(); beam.geometry = g; beam.visible = quads.length > 0;
+}
+function applyTime() {
+  const t = TIMES[TOD];
+  const wm = matCache.window;
+  if (wm) {
+    const tx = pixTex(t.m > 0.5 ? "windowNight" : t.k > 0.5 ? "windowDusk" : "window");
+    // (Lit from outside: its own colours, as the mod shows it, not washed out by the room's light.)
+    wm.map = tx; wm.emissiveMap = tx; wm.emissiveIntensity = 1; wm.color.setHex(0x1a1a1a); wm.needsUpdate = true;
+  }
+  if (!room || !room.poolMeshes) return;
+  const [cr, cg, cb, ca, cs] = poolLight(t.k, t.m);
+  for (const mesh of room.poolMeshes) {
+    const q = poolRect(mesh.userData.pool, t.k, t.side, t.m);
+    mesh.visible = !!q;
+    setBeam(mesh.userData.beam, q ? beamQuads(mesh.userData.pool, q) : []);
+    if (!q) continue;
+    mesh.position.set((q[0] + q[2]) / 2, 0.07, (q[1] + q[3]) / 2); mesh.scale.set(q[2] - q[0], q[3] - q[1], 1);
+    mesh.material.color.setRGB(cr, cg, cb); mesh.material.opacity = ca * q[4];
+    const bm = mesh.userData.beam.material; bm.color.setRGB(cr, cg, cb); bm.opacity = cs * q[4];
+  }
+}
 function prepareRoom(r) {
+  makePools(r);
   r.npcFigs = r.npcs.map(n => {
     const f = makeFigure(n.look); f.root.position.set(n.x, 0, n.z); f.root.rotation.y = n.yaw; r.group.add(f.root);
     poseFigure(f, { seated: n.seated });
@@ -155,6 +200,7 @@ function switchRoom(id, spawn) {
   sun.intensity = room.outside ? 0.78 : 0.68; hemi.intensity = room.outside ? 0.7 : 0.78;
   hemi.color.set(room.outside ? 0xe8f4ff : 0xfff6e8); hemi.groundColor.set(room.outside ? 0x6f8a5a : 0x8a7f74);
   cam.fit = fitRoom(room); snapCam();
+  applyTime();
   $("#roomPick").value = id;
   $("#placeName").textContent = room.name; $("#placeFloor").textContent = room.floor;
   closeTalk(); renderPanel();
@@ -479,6 +525,7 @@ function renderPickers() {
   for (const b of $("#meSeg").querySelectorAll("button")) b.onclick = () => { setMe(b.dataset.v); renderMe(); };
   for (const b of $("#lookSeg").querySelectorAll("button")) b.onclick = () => { fol.look = b.dataset.v; setSeg($("#lookSeg"), fol.look); if (fol.want) setFollower(fol.want); };
   for (const b of $("#camSeg").querySelectorAll("button")) b.onclick = () => { cam.mode = b.dataset.v; setSeg($("#camSeg"), cam.mode); };
+  for (const b of $("#timeSeg").querySelectorAll("button")) b.onclick = () => { TOD = b.dataset.v; setSeg($("#timeSeg"), TOD); applyTime(); renderPanel(); };
 }
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 function renderPanel() {
@@ -488,6 +535,7 @@ function renderPanel() {
   const facts = [["Floor", size], room.outside ? ["Houses", "8 by 6 outside"] : ["Walls", `${room.H} blocks high`]];
   if (room.outsideSize) facts.push(["From outside", room.outsideSize + " blocks"]);
   facts.push(["Camera", cam.mode === "room" ? "The whole room, north up, 52° down" : "The game's: close, following you, held in from the walls"]);
+  facts.push(["Light", TIMES[TOD].name + ": " + TIMES[TOD].note]);
   let follower = `<p class="note">No follower. Pick any creature above.</p>`;
   if (d && fol.size) {
     const h = fol.size.h, ride = canRide();

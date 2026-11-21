@@ -97,6 +97,8 @@ public final class BattleScene {
 	private static boolean built;
 	/** You, standing behind yours; their trainer behind theirs (on the stage only). */
 	private static com.insidethecube.retromon.game.Npc hero, foe;
+	/** A battle hall's light through its windows (by the time of day, as the rooms'). */
+	private static com.insidethecube.retromon.game.RoomLight hallLight;
 
 	/**
 	 * A battle's starting: npc is the trainer you're battling (or -1), enemies the Pokémon you'll face, arena the
@@ -208,6 +210,7 @@ public final class BattleScene {
 				if (level.getBlockState(lp).isAir()) set(lp.getX(), lp.getY(), lp.getZ(), lamp);
 			}
 		centre = new Vec3(ox + cxr, y, oz + czr);
+		if (!a.panes().isEmpty()) hallLight = RoomLightRenderer.spawn(level, -76001, ox, y, oz, a.w(), a.d(), java.util.List.of(), a.panes());
 		double far = 6.0 + Math.max(0, h - 1.5) * 1.3;
 		mineAt = centre.add(-0.6, 0, 2.6);
 		enemyAt = centre.add(1.6, 0, 2.6 - far);
@@ -1125,6 +1128,7 @@ public final class BattleScene {
 		if (level != null) {
 			for (MonDisplay d : new MonDisplay[] {mine, theirs, ball, sendBall, recallBall}) if (d != null) level.removeEntity(d.getId(), Entity.RemovalReason.DISCARDED);
 			for (Entity n : new Entity[] {hero, foe}) if (n != null) level.removeEntity(n.getId(), Entity.RemovalReason.DISCARDED);
+			RoomLightRenderer.remove(hallLight);
 			List<Map.Entry<BlockPos, BlockState>> back = new ArrayList<>(BEFORE.entrySet());
 			for (int i = back.size() - 1; i >= 0; i--) level.setBlock(back.get(i).getKey(), back.get(i).getValue(), 2 | 16, 0);
 		}
@@ -1138,6 +1142,7 @@ public final class BattleScene {
 		introTicks = 0;
 		LATER.clear();
 		hero = foe = null;
+		hallLight = null;
 		built = false;
 		shotTicks = flashTicks = 0;
 		boltIn = -1;

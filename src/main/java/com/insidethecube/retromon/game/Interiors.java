@@ -58,7 +58,7 @@ public final class Interiors {
 
 	public record Room(String id, int ox, int oy, int oz, double w, double d, double h, String name, String floor, String place, double sx, double sz,
 			float syaw, double ex, double ez, float eyaw, double camX, double camZ, double camDist, int[] cells, List<Warp> warps, List<Person> people,
-			List<Act> acts, List<double[]> grass) {
+			List<Act> acts, List<double[]> grass, List<double[]> pools, List<double[]> panes) {
 		/** Big enough to walk about in (the forest): the camera follows you, as it does outside. */
 		public boolean big() {
 			return w > 26 || d > 26;
@@ -79,7 +79,7 @@ public final class Interiors {
 	 * A room's battle arena (Let's Go's: a battle indoors is fought in a round hall built from that room's own
 	 * things): its blocks from its corner, as rooms have theirs. The battle scene puts it up over you for the battle.
 	 */
-	public record Arena(double w, double d, double h, int[] cells) {}
+	public record Arena(double w, double d, double h, int[] cells, List<double[]> panes) {}
 
 	public static final Map<String, Arena> ARENAS = new LinkedHashMap<>();
 
@@ -106,6 +106,21 @@ public final class Interiors {
 			Retromon.LOG.warn("Couldn't read the interiors", e);
 			return null;
 		}
+	}
+
+	/**
+	 * A list of rows of numbers (a room's pools of light through its windows, and its windows' glass: the client's
+	 * RoomLightRenderer draws them by the time of day).
+	 */
+	private static List<double[]> rows(JsonObject o, String k) {
+		List<double[]> out = new ArrayList<>();
+		if (o.has(k)) for (JsonElement e : o.getAsJsonArray(k)) {
+			JsonArray a = e.getAsJsonArray();
+			double[] v = new double[a.size()];
+			for (int i = 0; i < v.length; i++) v[i] = a.get(i).getAsDouble();
+			out.add(v);
+		}
+		return out;
 	}
 
 	private static double num(JsonObject o, String k, double d) {
@@ -170,7 +185,7 @@ public final class Interiors {
 			Room room = new Room(e.getKey(), o.get(0).getAsInt(), o.get(1).getAsInt(), o.get(2).getAsInt(), num(r, "W", 16), num(r, "D", 14), num(r, "H", 4),
 					r.get("name").getAsString(), r.get("floor").getAsString(), r.get("place").getAsString(), num(sp, "x", 0), num(sp, "z", 0),
 					(float) num(sp, "yaw", 0), num(en, "x", 0), num(en, "z", 0), (float) num(en, "yaw", 180), num(cam, "x", 8), num(cam, "z", 7),
-					num(cam, "dist", 30), cells, warps, people, acts, grass);
+					num(cam, "dist", 30), cells, warps, people, acts, grass, rows(r, "pools"), rows(r, "panes"));
 			ROOMS.put(room.id(), room);
 		}
 		if (DATA.has("arenas")) for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("arenas").entrySet()) {
@@ -178,7 +193,7 @@ public final class Interiors {
 			JsonArray c = a.getAsJsonArray("cells");
 			int[] cells = new int[c.size()];
 			for (int i = 0; i < cells.length; i++) cells[i] = c.get(i).getAsInt();
-			ARENAS.put(e.getKey(), new Arena(num(a, "W", 24), num(a, "D", 24), num(a, "H", 7), cells));
+			ARENAS.put(e.getKey(), new Arena(num(a, "W", 24), num(a, "D", 24), num(a, "H", 7), cells, rows(a, "panes")));
 		}
 		for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("doors").entrySet()) {
 			JsonObject d = e.getValue().getAsJsonObject();

@@ -265,10 +265,38 @@ def fit_camera(W, D, H, aspect=16 / 9, pitch=52.0, fov=34.0):
     return {"x": round(W / 2, 3), "z": round(best[0], 3), "dist": round(best[1], 2)}
 
 
+LIGHT_TEX = {"sunPool": "pool", "sunPoolSoft": "pool_soft", "sunBeam": "beam", "windowDusk": "window_dusk", "windowNight": "window_night"}
+
+
+def write_light(light, res):
+    """The light through the windows' pictures (the mod's RoomLight draws them)."""
+    out = os.path.join(res, "assets/retromon/textures/light")
+    os.makedirs(out, exist_ok=True)
+    for k, name in LIGHT_TEX.items():
+        if k in light: img_of(light[k]).save(os.path.join(out, name + ".png"))
+
+
+def panes_of(room):
+    """A room's windows' glass, facing in: [corner x y z, along it x y z, up it x y z, facing x y z] each (the mod lays
+    the dusk and night skies over them)."""
+    W, D = room["W"], room["D"]
+    out = []
+    for f in room["faces"]:
+        if f["k"] != "window" or not f.get("n"): continue
+        bl, r, u, n, w, h = f["bl"], f["r"], f["u"], f["n"], f["w"], f["h"]
+        c = [bl[i] + r[i] * w / 2 + u[i] * h / 2 for i in range(3)]
+        to = [W / 2 - c[0], 0, D / 2 - c[2]]
+        l = math.hypot(to[0], to[2]) or 1
+        if (n[0] * to[0] + n[2] * to[2]) / l < 0.3: continue  # its outside (a hall's ring of windows)
+        out.append([round(v, 4) for v in bl + [r[i] * w for i in range(3)] + [u[i] * h for i in range(3)] + n])
+    return out
+
+
 def main():
     src, res = sys.argv[1], sys.argv[2]
     data = json.load(open(src))
     tex = write_textures(data["mats"], res)
+    write_light(data.get("light", {}), res)
     models, shapes_t, states = {}, {}, {}
     model_list, shape_list, state_list = [], [], []
     rooms_out, arenas_out = {}, {}
@@ -299,7 +327,7 @@ def main():
             placed += [cell[0], cell[1], cell[2], states[st]]
         if rid.startswith("arena_"):
             # A battle arena: its blocks only, as they stand from its corner (the mod builds it over you).
-            arenas_out[rid[len("arena_"):]] = {"W": room["W"], "D": room["D"], "H": room["H"], "cells": placed}
+            arenas_out[rid[len("arena_"):]] = {"W": room["W"], "D": room["D"], "H": room["H"], "cells": placed, "panes": panes_of(room)}
             continue
         o = ORIGIN[rid]
         warps = []
@@ -336,7 +364,7 @@ def main():
         rooms_out[rid] = {"origin": list(o), "W": room["W"], "D": room["D"], "H": room["H"], "name": room["name"], "floor": room["floor"],
                           "place": PLACE[rid], "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360},
                           "entry": ENTRY.get(rid), "cam": fit_camera(room["W"], room["D"], room["H"]), "cells": placed, "warps": warps, "people": people, "acts": acts,
-                          "grass": room.get("grass", [])}
+                          "grass": room.get("grass", []), "pools": room.get("pools", []), "panes": panes_of(room)}
     # Models and the block's states.
     mdir = os.path.join(res, "assets/retromon/models/block/prop")
     os.makedirs(mdir, exist_ok=True)

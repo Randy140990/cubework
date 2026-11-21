@@ -375,6 +375,29 @@ const TEXDEF = {
     P.rect(15, 0, 2, 32, hx("#FFFFFF")); P.rect(0, 15, 32, 2, hx("#FFFFFF"));
     P.rect(2, 2, 13, 1, hx("#D3DEE3")); P.rect(17, 2, 13, 1, hx("#D3DEE3")); P.rect(2, 17, 13, 1, hx("#D3DEE3")); P.rect(17, 17, 13, 1, hx("#D3DEE3"));
   }],
+  // The same window as the sun goes down (and comes up): a pink and orange sky, the sun on the hills.
+  windowDusk: [32, 32, (P, r) => {
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) P.set(x, y, y < 16 ? mixc(hx("#5A4C93"), hx("#E7866A"), y / 15) : mixc(hx("#E7866A"), hx("#F7C47A"), Math.min(1, (y - 16) / 8)));
+    P.disc(10, 24, 4, hx("#FFE3A0")); P.disc(10, 24, 2.5, hx("#FFF4CF"));
+    for (let x = 0; x < 32; x++) { const h = 24 + Math.round(Math.sin(x * 0.35) * 1.5 + Math.sin(x * 0.9) * 0.8); for (let y = h; y < 32; y++) P.set(x, y, y === h ? hx("#6E7A52") : hx("#4F5E45")); }
+    for (const [cx, cy] of [[21, 10], [24, 9], [27, 10], [6, 6], [9, 5]]) P.disc(cx, cy, 1.8, hx("#F4A69A"));
+    const fr = hx("#FFF1E2"), ln = hx("#E8C9B5");
+    P.rect(0, 0, 32, 2, fr); P.rect(0, 30, 32, 2, fr); P.rect(0, 0, 2, 32, fr); P.rect(30, 0, 2, 32, fr);
+    P.rect(15, 0, 2, 32, fr); P.rect(0, 15, 32, 2, fr);
+    P.rect(2, 2, 13, 1, ln); P.rect(17, 2, 13, 1, ln); P.rect(2, 17, 13, 1, ln); P.rect(17, 17, 13, 1, ln);
+  }],
+  // And at night: a deep blue sky, stars and the moon, the hills dark with a lit window or two.
+  windowNight: [32, 32, (P, r) => {
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) P.set(x, y, mixc(hx("#0D1633"), hx("#2A3F73"), y / 31));
+    for (const [sx, sy, a] of [[5, 5, 1], [11, 9, 0.8], [20, 4, 0.9], [27, 12, 0.7], [8, 12, 0.6], [22, 13, 0.8], [4, 20, 0.6], [13, 21, 0.7], [28, 20, 0.6], [18, 9, 0.5]]) P.set(sx, sy, hx("#E6EEFF"), a);
+    P.disc(24, 7, 4, hx("#F4F1D8"), 0.18); P.disc(24, 7, 2.6, hx("#F4F1D8"));
+    for (let x = 0; x < 32; x++) { const h = 24 + Math.round(Math.sin(x * 0.35) * 1.5 + Math.sin(x * 0.9) * 0.8); for (let y = h; y < 32; y++) P.set(x, y, y === h ? hx("#26405A") : hx("#1B2C3E")); }
+    P.rect(6, 27, 1, 1, hx("#FFD27A")); P.rect(20, 28, 1, 1, hx("#FFD27A")); P.rect(25, 27, 1, 1, hx("#FFC870"));
+    const fr = hx("#D6DCE8"), ln = hx("#7F8CA8");
+    P.rect(0, 0, 32, 2, fr); P.rect(0, 30, 32, 2, fr); P.rect(0, 0, 2, 32, fr); P.rect(30, 0, 2, 32, fr);
+    P.rect(15, 0, 2, 32, fr); P.rect(0, 15, 32, 2, fr);
+    P.rect(2, 2, 13, 1, ln); P.rect(17, 2, 13, 1, ln); P.rect(2, 17, 13, 1, ln); P.rect(17, 17, 13, 1, ln);
+  }],
   windowExt: [16, 16, (P, r) => {
     for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, mixc(hx("#5D9CC7"), hx("#B9DDF0"), (x + y) / 30));
     P.line(9, 2, 14, 7, hx("#E6F5FB")); P.line(10, 2, 14, 6, hx("#E6F5FB"));
@@ -470,7 +493,12 @@ const TEXDEF = {
   glass: [16, 16, (P, r) => { P.fill(hx("#CFE9F2"), 0.02, r); P.line(3, 12, 12, 3, hx("#FFFFFF"), 0.7); }],
   lab: [16, 16, (P, r) => { P.fill(hx("#E9EDEC"), 0.03, r); P.rect(0, 0, 16, 1, hx("#FFFFFF")); }],
   shadowBlob: [32, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const d = Math.hypot(x - 15.5, y - 15.5) / 16; P.set(x, y, [0, 0, 0], Math.max(0, 0.55 * (1 - d * d)) ); } }],
-  sunPool: [32, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const ex = Math.min(x, 31 - x) / 11, ey = Math.min(y, 31 - y) / 11; const a = Math.pow(Math.min(1, ex) * Math.min(1, ey), 1.4); const bar = (x === 15 || x === 16 || y === 15 || y === 16) ? 0.55 : 1; P.set(x, y, [255, 240, 200], 0.15 * a * bar); } }],
+  // Light through a window on the floor: soft edges, the window's cross a shadow across it (white: the time of day
+  // tints it). The door's has no cross.
+  sunPool: [32, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const ex = Math.min(x, 31 - x) / 4.5, ey = Math.min(y, 31 - y) / 4.5; const a = Math.pow(Math.min(1, ex) * Math.min(1, ey), 1.2); const bar = (x === 15 || x === 16 || y === 15 || y === 16) ? 0.3 : (x === 14 || x === 17 || y === 14 || y === 17) ? 0.75 : 1; P.set(x, y, [255, 255, 255], a * bar); } }],
+  // A shaft of light from a window to the floor: brightest at the window, fading as it goes, soft at its sides.
+  sunBeam: [16, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 16; x++) { const e = Math.min(1, Math.min(x, 15 - x) / 5); P.set(x, y, [255, 255, 255], Math.pow(e, 1.3) * (1 - 0.75 * y / 31)); } }],
+  sunPoolSoft: [32, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const ex = Math.min(x, 31 - x) / 12, ey = Math.min(y, 31 - y) / 12; P.set(x, y, [255, 255, 255], Math.pow(Math.min(1, ex) * Math.min(1, ey), 1.6)); } }],
   aoN: [4, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 4; x++) P.set(x, y, [0, 0, 0], 0.34 * Math.pow(1 - y / 15, 2)); }],
   aoW: [16, 4, (P, r) => { for (let y = 0; y < 4; y++) for (let x = 0; x < 16; x++) P.set(x, y, [0, 0, 0], 0.3 * Math.pow(1 - x / 15, 2)); }],
   aoE: [16, 4, (P, r) => { for (let y = 0; y < 4; y++) for (let x = 0; x < 16; x++) P.set(x, y, [0, 0, 0], 0.3 * Math.pow(x / 15, 2)); }],

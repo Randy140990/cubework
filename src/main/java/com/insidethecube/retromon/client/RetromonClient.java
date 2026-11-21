@@ -24,6 +24,7 @@ public class RetromonClient implements ClientModInitializer {
 		EntityRendererRegistry.register(Retromon.NPC, NpcRenderer::new);
 		EntityRendererRegistry.register(Retromon.MON_DISPLAY, MonRenderer::new);
 		EntityRendererRegistry.register(Retromon.WORLD_MON, WorldMonRenderer::new);
+		EntityRendererRegistry.register(Retromon.ROOM_LIGHT, RoomLightRenderer::new);
 		Adventure.register();
 		Hud.register();
 		// The insides of buildings: cut-out (glass, leaves and the clock face show what's behind them).
@@ -44,6 +45,7 @@ public class RetromonClient implements ClientModInitializer {
 			Adventure.tick(mc);
 			ClientState.tick(mc);
 			BattleScene.tick(mc);
+			RoomLightRenderer.tick(mc);
 			for (int i = 1; i < Adventure.speed && BattleScene.active(); i++) {
 				BattleScene.tick(mc);
 				BattleScene.tickDisplays();
