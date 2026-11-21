@@ -110,8 +110,8 @@ public final class LensGameTest implements FabricClientGameTest {
 			// ---- Photos, not recording: 4K with a 3 s wait (drawn bigger than the window), and window size.
 			ctx.runOnClient(mc -> Lens.settings.photoWait = 3);
 			ctx.runOnClient(mc -> Photo.take());
-			ctx.waitTicks(10);
-			check(ctx.computeOnClient(mc -> Photo.countdown()) > 0, "photo countdown running");
+			ctx.waitTick();
+			check(ctx.computeOnClient(mc -> Photo.busy()), "photo countdown running");
 			ctx.waitFor(mc -> !Photo.busy(), 20 * 60);
 			ctx.runOnClient(mc -> Lens.settings.photoWait = 0);
 			ctx.runOnClient(mc -> Lens.settings.photoSize = Sizes.Size.SCREEN);

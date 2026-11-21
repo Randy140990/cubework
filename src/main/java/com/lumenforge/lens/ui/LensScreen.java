@@ -305,7 +305,8 @@ public final class LensScreen extends Screen {
 		bx = ghost(g, bx, cy, choosing ? "Choosing…" : "Choose", !choosing && !locked, this::chooseFolder, mx, my, true) - 8;
 		float lx = text(g, font, "SAVE TO", SEMI, x + 10, cy - 5, a(DIM));
 		long free = Capture.freeSpace(folder);
-		if (free >= 0) text(g, font, "· " + Sizes.bytes(free) + " free", UI, lx + 4, cy - 5, a(DIM));
+		String freeText = "· " + Sizes.bytes(free) + " free";
+		if (free >= 0 && lx + 4 + width(font, freeText, UI) < bx) text(g, font, freeText, UI, lx + 4, cy - 5, a(DIM));
 		String where = s.folderChosen ? folder.toString() : "Not chosen yet";
 		text(g, font, fitEnd(font, where, UI, Math.round(bx - (x + 10))), UI, x + 10, cy + 5, a(s.folderChosen ? SOFT : AMBER));
 		rect(g, x + saveW, y + 6, 1 / gs(), h - 12, a(0x1AFFFFFF));
