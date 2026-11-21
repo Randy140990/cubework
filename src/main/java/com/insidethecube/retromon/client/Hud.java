@@ -351,34 +351,42 @@ public final class Hud {
 		if (!Adventure.active() || BattleScene.active() || t < 0 || t > 90 || ClientState.placeName.isEmpty() || mc.screen != null && !(mc.screen instanceof GameScreen)) return;
 		V.fit(g.guiWidth(), g.guiHeight());
 		float f = t + delta.getGameTimeDeltaPartialTick(true);
-		float in = Math.min(1, f / 8F), out = f > 64 ? Math.min(1, (f - 64) / 12F) : 0, alpha = in * (1 - out);
-		// The viewer's pop: from a little small, overshooting a touch, settling.
-		float k = in >= 1 ? 1 : 0.86F + 0.14F * (1 + 2.2F * (in - 1) * (in - 1) * (in - 1) + 1.2F * (in - 1) * (in - 1) * (in - 1) * (in - 1));
+		// In as smoothly as it goes out: drifting down as it fades in (0.8 s), held, then lifting as it fades away.
+		float in = smooth(Math.min(1, f / 16F)), out = f > 64 ? smooth(Math.min(1, (f - 64) / 16F)) : 0, alpha = in * (1 - out);
+		if (alpha <= 0.02F) return;
 		String name = ClientState.placeName, line = Adventure.signLine(name);
 		line = line.isEmpty() ? "" : Lang.t(line);
-		float nw = V.titleTrackedWidth(name, 48, 3), lw = line.isEmpty() ? 0 : V.width(line, 20, true);
-		float w = 3 + 26 + 30 + 18 + Math.max(nw, lw) + 40 + 3, h = 3 + 18 + 48 * 1.1F + (line.isEmpty() ? 0 : 20 * 1.36F) + 20 + 3, x = 640 - w / 2, y = 172;
-		if (alpha <= 0.05F) return;
-		g.pose().pushMatrix();
-		float cx = V.x(640), cy = V.y(y + h / 2);
-		g.pose().translate(cx, cy);
-		g.pose().scale(k, k);
-		g.pose().translate(-cx, -cy);
-		// The g-panel (its shadow, the pearly rim, white to #F7F9FF), each colour faded with it.
-		float r = h / 2;
-		V.softShadow(g, x, y + 12, w, h, 30, Ui.alpha(0x381E2854, alpha));
-		int[] holo = new int[V.HOLO.length];
-		for (int i = 0; i < holo.length; i++) holo[i] = Ui.alpha(V.HOLO[i], alpha);
-		V.rrh(g, x, y, w, h, r, V.HOLO_AT, holo);
-		V.rrv(g, x + 3, y + 3, w - 6, h - 6, r - 3, Ui.alpha(0xFFFFFFFF, alpha), Ui.alpha(0xFFF7F9FF, alpha));
-		float dx = x + 3 + 26 + 15, dy = y + h / 2;
-		V.ellipse(g, dx, dy, 20, 20, Ui.alpha(0xFFFFE9A0, alpha));
-		V.ellipse(g, dx, dy, 15, 15, Ui.alpha(0xFFFFC93C, alpha));
-		V.ellipse(g, dx - 3.5F, dy - 3.5F, 8, 8, Ui.alpha(0xCCFFF3A6, alpha));
-		float tx = x + 3 + 26 + 30 + 18, ty = y + 3 + 18;
-		V.titleTracked(g, name, tx, V.capsTop(ty + 48 * 0.55F, 48), 48, Ui.alpha(V.INK, alpha), 3);
-		if (!line.isEmpty()) V.text(g, line, tx, V.capsTop(ty + 48 * 1.1F + 20 * 0.68F, 20), 20, Ui.alpha(0xFFE5525C, alpha), true);
-		g.pose().popMatrix();
+		// The viewer's: no panel, the words on their own (white with a dark edge and a soft shadow), a sunny dot
+		// between two gold rules under them, the town's line in cream.
+		float size = 52, track = 6, nw = V.titleTrackedWidth(name, size, track), y = 150 - 16 * (1 - in) - 10 * out;
+		float nx = 640 - nw / 2, ny = V.capsTop(y + size * 0.55F, size);
+		V.softShadow(g, nx + 10, y + 10, nw - 20, size * 0.9F, 34, Ui.alpha(0x2A0E1830, alpha));
+		int edge = Ui.alpha(0xFF203050, alpha);
+		float[][] at = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}, {-1.5F, -1.5F}, {1.5F, -1.5F}, {-1.5F, 1.5F}, {1.5F, 1.5F}};
+		for (float[] o : at) V.titleTracked(g, name, nx + o[0], ny + o[1], size, edge, track);
+		V.titleTracked(g, name, nx, ny, size, Ui.alpha(0xFFFFFFFF, alpha), track);
+		float ry = y + size * 1.1F + 8 + 7;
+		V.pill(g, 640 - 7 - 12 - 76, ry - 1.5F + 1, 76, 3, Ui.alpha(0x80203050, alpha));
+		V.pill(g, 640 + 7 + 12, ry - 1.5F + 1, 76, 3, Ui.alpha(0x80203050, alpha));
+		for (int i = 0; i < 8; i++) {
+			// (The rules fade in towards the dot.)
+			float a = alpha * (i + 1) / 8F;
+			V.pill(g, 640 - 7 - 12 - 76 + i * 9.5F, ry - 1.5F, 10, 3, Ui.alpha(0xFFFFD25A, a));
+			V.pill(g, 640 + 7 + 12 + 76 - 10 - i * 9.5F, ry - 1.5F, 10, 3, Ui.alpha(0xFFFFD25A, a));
+		}
+		V.ellipse(g, 640, ry, 11, 11, Ui.alpha(0x99FFE9A0, alpha));
+		V.ellipse(g, 640, ry + 0.5F, 7.5F, 7.5F, Ui.alpha(0xFF203050, alpha * 0.5F));
+		V.ellipse(g, 640, ry, 7, 7, Ui.alpha(0xFFFFC93C, alpha));
+		V.ellipse(g, 638.5F, ry - 1.5F, 3.5F, 3.5F, Ui.alpha(0xCCFFF3A6, alpha));
+		if (!line.isEmpty()) {
+			float lw = V.width(line, 20, true), lx = 640 - lw / 2, ly = V.capsTop(ry + 7 + 6 + 20 * 0.68F, 20);
+			for (float[] o : new float[][] {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) V.text(g, line, lx + o[0], ly + o[1], 20, edge, true);
+			V.text(g, line, lx, ly, 20, Ui.alpha(0xFFFFF4DC, alpha), true);
+		}
+	}
+
+	private static float smooth(float x) {
+		return x * x * (3 - 2 * x);
 	}
 
 	/** A strip fading out to the right (canvas pixels). */

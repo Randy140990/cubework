@@ -454,10 +454,23 @@ public final class Game {
 	/** Who's still looking at their battle's last words (till the battle screen closes, or 30 s). */
 	private static final Map<UUID, Integer> AFTER_BATTLE = new HashMap<>();
 
-	/** The battle screen's closed: the world goes on (your rival can head off). */
+	/**
+	 * The battle's done with on your screen (its cheering, the Pokédex entry, the nickname, any new moves or evolving):
+	 * the world goes on (your rival can head off). The wild ones right by you scatter, and a few seconds pass before
+	 * another can start a battle, so one never runs straight into the next.
+	 */
 	public static void battleClosed(ServerPlayer p) {
 		AFTER_BATTLE.remove(p.getUUID());
+		COOLDOWN.put(p.getUUID(), 100);
+		if (p.level() instanceof ServerLevel level) {
+			String tag = "wild:" + p.getUUID();
+			for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, p.getBoundingBox().inflate(6), w -> tag.equals(w.key()))) vanish(level, w);
+		}
 	}
+
+	/** When each player last walked (a tick count): a wild one only starts a battle when you walk into it, not by wandering into you. */
+	private static final Map<UUID, Integer> WALKING = new HashMap<>();
+	private static final Map<UUID, Vec3> WAS_AT = new HashMap<>();
 
 	/** Whether a rival in the world is one the game's using (else he's left over in a save, and goes). */
 	static boolean rivalKnown(Npc n) {
@@ -545,6 +558,8 @@ public final class Game {
 		BUSY.remove(p.getUUID());
 		RECENT.remove(p.getUUID());
 		AFTER_BATTLE.remove(p.getUUID());
+		WALKING.remove(p.getUUID());
+		WAS_AT.remove(p.getUUID());
 		setSpeed(1);
 	}
 
@@ -911,7 +926,9 @@ public final class Game {
 			if (s.getTickCount() % 10 == 0) roamers(p);
 			// Kept in Adventure mode (so nothing on the map can be broken, Axiom included) unless map editing is on.
 			if (!build && s.getTickCount() % 20 == 0 && p.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) p.setGameMode(GameType.ADVENTURE);
-			if (Battles.in(p) || BUSY.containsKey(id) || inside) {
+			Vec3 was = WAS_AT.put(id, p.position());
+			if (was != null && was.distanceToSqr(p.position().x, was.y, p.position().z) > 0.0004) WALKING.put(id, s.getTickCount());
+			if (Battles.in(p) || BUSY.containsKey(id) || inside || AFTER_BATTLE.containsKey(id)) {
 				LAST.put(id, p.blockPosition());
 				continue;
 			}
@@ -923,6 +940,7 @@ public final class Game {
 		}
 		approach(s);
 		rivalsLeave(s);
+		rocketsLeave(s);
 		if (s.getTickCount() % 40 == 0) placeTouchPoints(s);
 		holdTime(s);
 	}
@@ -995,13 +1013,14 @@ public final class Game {
 					int x = w.getBlockX() + RNG.nextInt(11) - 5, z = w.getBlockZ() + RNG.nextInt(11) - 5;
 					// (In a room's grass, the forest's, it wanders within the grass.)
 					BlockPos to = Interiors.in(p) ? Interiors.grassNear(w, p.getRandom()) : grassAt(level, x, z, w.getBlockY(), !grassy);
-					if (to == null) continue;
+					if (to == null || p.distanceToSqr(to.getX() + 0.5, p.getY(), to.getZ() + 0.5) < 9) continue;
 					w.getNavigation().moveTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5, air ? 1.4 : 1.0);
 					break;
 				}
 			}
 		}
-		if (!seenMode(p) || !d.started || !d.anyHealthy() || d.place == null || d.place.isEmpty() || out.size() >= SEEN_MAX || Battles.in(p)) return;
+		if (!seenMode(p) || !d.started || !d.anyHealthy() || d.place == null || d.place.isEmpty() || out.size() >= SEEN_MAX || Battles.in(p)
+				|| AFTER_BATTLE.containsKey(p.getUUID()) || COOLDOWN.containsKey(p.getUUID())) return;
 		if (RNG.nextInt(100) >= 40) return;
 		Wild.Table table = Wild.get(d.place, "grass", Wild.timeOfDay(level.getDayTime()));
 		if (table == null || table.ratePer256() <= 0 || !Wild.has(d.place)) return;
@@ -1040,7 +1059,10 @@ public final class Game {
 
 	/** Walking into a wild one you can see: the battle with exactly that one. */
 	private static boolean touchWild(ServerPlayer p) {
-		if (COOLDOWN.containsKey(p.getUUID()) || !data(p).anyHealthy()) return false;
+		if (COOLDOWN.containsKey(p.getUUID()) || AFTER_BATTLE.containsKey(p.getUUID()) || !data(p).anyHealthy()) return false;
+		// Only when you walk into it: standing still, one wandering by doesn't drag you into a battle.
+		Integer walked = WALKING.get(p.getUUID());
+		if (walked == null || p.level().getServer().getTickCount() - walked > 6) return false;
 		String tag = "wild:" + p.getUUID();
 		ServerLevel level = (ServerLevel) p.level();
 		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, p.getBoundingBox().inflate(0.9, 1.5, 0.9), w -> tag.equals(w.key()) && !w.airborne())) {
@@ -1380,11 +1402,76 @@ public final class Game {
 				return;
 			}
 		}
+		// TEAM ROCKET (JESSIE and JAMES, and their MEOWTH), the first time you're out in VIRIDIAN with a POKéMON.
+		if (!d.story.contains("rocket_viridian") && !d.hasDex() && d.anyHealthy() && "viridian_city".equals(d.place) && !Interiors.in(p) && !ROCKETS.containsKey(p.getUUID())
+				&& p.onGround()) {
+			rocketsArrive(p, level);
+			return;
+		}
 		// Your rival, from the League's way, once you have the POKéDEX.
 		if (d.hasDex() && d.anyHealthy() && !d.beaten.contains("rival_22") && "route_22".equals(d.place) && !RIVALS.containsKey(p.getUUID())) {
 			Npc n = rivalNpc(p, "rival_22", spot(level, p.getBlockX() - 9, p.getBlockZ(), 5));
 			if (n != null) walkUp(p, n, rival22(p), "meet_rival", null);
 		}
+	}
+
+	/** JESSIE and JAMES in Viridian (JESSIE comes up to you; JAMES with her), while they're about. */
+	private static final Map<UUID, List<Npc>> ROCKETS = new HashMap<>();
+
+	private static Trainers.Trainer rocketViridian() {
+		return new Trainers.Trainer("rocket_viridian", "viridian_city", "TEAM ROCKET", "jessie", "none", 0, 20,
+				List.of(new Trainers.Member("ekans", 6), new Trainers.Member("koffing", 6)), null,
+				List.of("JESSIE: Well, well! What have we here? A twerp with a brand-new POKéMON!", "JAMES: Fresh out of PALLET TOWN, by the look of it.",
+						"MEOWTH: Mrowr!", "JESSIE: We're TEAM ROCKET, twerp. We take the best POKéMON there are...",
+						"JAMES: ...and yours looks like it would do very nicely. Hand it over!"),
+				List.of("JESSIE: What?! Beaten by a twerp?!", "JAMES: This wasn't in the plan, Jessie!"),
+				List.of("JESSIE: You haven't seen the last of TEAM ROCKET!"));
+	}
+
+	private static void rocketsArrive(ServerPlayer p, ServerLevel level) {
+		Vec3 look = Vec3.directionFromRotation(0, p.getYRot()).multiply(1, 0, 1);
+		if (look.lengthSqr() < 1e-4) look = new Vec3(0, 0, -1);
+		look = look.normalize();
+		BlockPos at = spot(level, (int) Math.floor(p.getX() + look.x * 7), (int) Math.floor(p.getZ() + look.z * 7), 4);
+		if (at == null) return;
+		Npc jessie = place(level, Npc.TRAINER, "rocket_viridian", at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
+		if (jessie == null) return;
+		jessie.setCustomName(net.minecraft.network.chat.Component.literal("JESSIE"));
+		jessie.setFacing(jessie.yawTo(p));
+		List<Npc> both = new ArrayList<>(List.of(jessie));
+		BlockPos side = spot(level, at.getX() + (int) Math.round(-look.z * 2), at.getZ() + (int) Math.round(look.x * 2), 2);
+		Npc james = side == null ? null : place(level, Npc.PERSON, "rocket_james", side.getX() + 0.5, side.getY(), side.getZ() + 0.5, 0F);
+		if (james != null) {
+			james.setCustomName(net.minecraft.network.chat.Component.literal("JAMES"));
+			james.setFacing(james.yawTo(p));
+			both.add(james);
+		}
+		ROCKETS.put(p.getUUID(), both);
+		data(p).story.add("rocket_viridian");
+		jessie.talker = p;
+		walkUp(p, jessie, rocketViridian(), "meet_evil_trainer", null);
+	}
+
+	/** Once their battle's over and done with on your screen, JESSIE and JAMES are off ("blasting off", in a puff). */
+	private static void rocketsLeave(MinecraftServer s) {
+		for (Map.Entry<UUID, List<Npc>> e : List.copyOf(ROCKETS.entrySet())) {
+			ServerPlayer p = s.getPlayerList().getPlayer(e.getKey());
+			boolean gone = p == null || e.getValue().stream().allMatch(Npc::isRemoved);
+			if (!gone && (engaged(p) || WALKS.containsKey(e.getKey()) || AFTER_BATTLE.containsKey(e.getKey()) || !data(p).beaten.contains("rocket_viridian"))) continue;
+			for (Npc n : e.getValue()) {
+				if (n.isRemoved()) continue;
+				if (n.level() instanceof ServerLevel lv)
+					lv.sendParticles(net.minecraft.core.particles.ParticleTypes.POOF, n.getX(), n.getY() + 1, n.getZ(), 14, 0.3, 0.5, 0.3, 0.04);
+				n.discard();
+			}
+			ROCKETS.remove(e.getKey());
+		}
+	}
+
+	/** Whether one of TEAM ROCKET in the world is the game's (else they're left over in a save, and go). */
+	static boolean rocketKnown(Npc n) {
+		for (List<Npc> l : ROCKETS.values()) if (l.contains(n)) return true;
+		return false;
 	}
 
 	private static void giveParcel(ServerPlayer p, Npc n) {
@@ -1687,6 +1774,10 @@ public final class Game {
 					oakTalk(p, n);
 					return;
 				}
+				if (n.key().equals("viridian_school_teacher")) {
+					schoolQuestion(p, n);
+					return;
+				}
 				if (n.key().equals(OLD_MAN) && !d.hasDex()) {
 					dialogue(p, n, "talk", OLD_MAN_GRUMPY);
 					return;
@@ -1859,6 +1950,30 @@ public final class Game {
 	}
 
 	/** A text box closed: heal (if you said yes), open the Mart, start the battle, take the gift. */
+	/** The Trainer School's questions (YES or NO), each with what the teacher says after a right or a wrong answer. */
+	private record Question(String ask, boolean yes, String right, String wrong) {}
+
+	private static final List<Question> QUESTIONS = List.of(
+			new Question("Are FIRE-type moves strong against GRASS-type POKéMON?", true, "That's right! GRASS burns easily.", "Not quite. FIRE is strong against GRASS."),
+			new Question("Are WATER-type moves weak against FIRE-type POKéMON?", false, "Right! WATER puts FIRE out: it's strong against it.",
+					"Not quite. WATER is strong against FIRE."),
+			new Question("Can a POKéMON that's asleep still attack?", false, "Correct! It can't attack until it wakes up.", "Not quite. A sleeping POKéMON can't attack."),
+			new Question("Is a POKéMON with low HP easier to catch?", true, "That's right! Weaken it first, then throw your ball.",
+					"Not quite. The lower its HP, the easier it is to catch."),
+			new Question("Do ELECTRIC-type moves work on GROUND-type POKéMON?", false, "Right! GROUND isn't hurt by ELECTRIC at all.",
+					"Not quite. ELECTRIC moves don't affect GROUND-type POKéMON."),
+			new Question("Does a POKéMON CENTER heal your POKéMON for free?", true, "Correct! The NURSE will always help.", "Not quite. It's free, every time!"),
+			new Question("Is a BURN's damage the only thing it does?", false, "Right! A burnt POKéMON's physical attacks are weaker too.",
+					"Not quite. A BURN also weakens its physical attacks."),
+			new Question("Can you carry more than six POKéMON with you?", false, "Correct! Six at most. The rest go to the PC.", "Not quite. Six is the most you can carry."));
+
+	private static void schoolQuestion(ServerPlayer p, Npc n) {
+		int q = RNG.nextInt(QUESTIONS.size());
+		CompoundTag t = new CompoundTag();
+		t.putInt("q", q);
+		dialogue(p, n, "quiz", List.of("TEACHER: Welcome to the TRAINER SCHOOL! Here's a question for you.", "TEACHER: " + QUESTIONS.get(q).ask()), t);
+	}
+
 	public static void dialogueDone(ServerPlayer p, CompoundTag t) {
 		BUSY.remove(p.getUUID());
 		String mode = t.getStringOr("mode", "talk");
@@ -1867,6 +1982,12 @@ public final class Game {
 		Npc n = e instanceof Npc npc ? npc : null;
 		PlayerData d = data(p);
 		switch (mode) {
+			case "quiz" -> {
+				int q = t.getIntOr("q", -1);
+				if (q < 0 || q >= QUESTIONS.size() || !t.getBooleanOr("answered", false)) return;
+				Question qu = QUESTIONS.get(q);
+				dialogue(p, n, "talk", List.of("TEACHER: " + (yes == qu.yes() ? qu.right() : qu.wrong()), "TEACHER: Come back any time for another question!"));
+			}
 			case "heal" -> {
 				if (!yes) {
 					dialogue(p, n, "talk", List.of("NURSE: We hope to see you again!"));

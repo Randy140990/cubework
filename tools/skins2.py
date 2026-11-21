@@ -728,7 +728,7 @@ P("gym_guide", tone="medium", hair="spiky", hairc="2A2420", top="tee", topc="F4F
 # The story's named roles, in our own looks (not the games' or the show's designs). The files keep the role names
 # the mod already uses, so what the Person Viewer shows is what's in game.
 EMBLEM = [(3, 2), (4, 2), (2, 3), (5, 3), (2, 4), (5, 4), (3, 5), (4, 5), (4, 3), (3, 4)]   # the villains' own mark: a ring cut through
-P("oak", tone="fair", hair="short", hairc="D8D8D4", beard=True, beardc="F0F0F0", glasses=True, lens=True, eyes="dark", top="jumper", topc="2A8A8A", bottom="trousers", botc="6A5038", coat="lab", coatc="F6F7F5", coatlen=17, shoec="3A2A1A", badge="F2C12E")
+P("oak", tone="fair", hair="short", hairc="D8D8D4", beard=True, beardc="F0F0F0", eyes="brown", top="jumper", topc="2A8A8A", bottom="trousers", botc="6A5038", coat="lab", coatc="F6F7F5", coatlen=17, shoec="3A2A1A", badge="F2C12E")
 P("blue", tone="light", hair="swept", hairc="2A3A6A", eyes="grey", brows="stern", top="tee", topc="1A1A24", bottom="jeans", botc="3A3A48", coat="jacket", coatc="E07A2A", coatsleeve=12, shoec="F4F4F4", soles="E07A2A", wristband="E07A2A")
 P("red", tone="fair", hair="short", hairc="2A2420", eyes="dark", smile=False, top="hoodie", topc="34343E", stripe="B83A3A", stripe_rows=(5,), bottom="trousers", botc="1E1E26", hat="cap", hatc="2E3A6A", shoec="F4F4F4", soles="B83A3A")
 P("nurse", tone="fair", hair="bun", hairc="8A4A2A", eyes="teal", fem=True, top="blouse", topc="9ED8C8", collarc="FFFFFF", bottom="skirt", botc="7AC0B0", hat="nurse", hatc="FFFFFF", crossc="2AA58A", shoec="F8F8F8", apron="FFFFFF", socks="FFFFFF")

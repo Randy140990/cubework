@@ -420,6 +420,8 @@ public class Battle {
 		if (got) {
 			out.add(Event.of(Event.Kind.CAUGHT, 1));
 			out.add(Event.text("Gotcha! " + t.name() + " was caught!"));
+			// Catching one earns EXP, as beating it would (as in Let's Go).
+			giveExp(out);
 			caught = t;
 			end(Result.CAUGHT, out);
 			return true;

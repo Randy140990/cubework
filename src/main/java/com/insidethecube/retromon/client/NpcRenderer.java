@@ -244,6 +244,9 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		// Your rival (wherever he turns up), and you yourself (on the battle stage).
 		if (key.startsWith("rival")) return "blue";
 		if (key.equals("hero")) return "hero";
+		// TEAM ROCKET in Viridian: JESSIE (the one you battle) and JAMES.
+		if (key.equals("rocket_viridian")) return "jessie";
+		if (key.equals("rocket_james")) return "james";
 		return switch (npc.role()) {
 			case Npc.NURSE -> "nurse";
 			case Npc.CLERK -> "clerk";

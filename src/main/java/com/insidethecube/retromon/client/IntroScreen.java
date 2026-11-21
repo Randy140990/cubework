@@ -116,7 +116,46 @@ public class IntroScreen extends GameScreen {
 		pendingLoad = null;
 		pendingParent = null;
 		Minecraft mc = Minecraft.getInstance();
+		launchedAt = System.currentTimeMillis();
 		mc.createWorldOpenFlows().openWorld(folder, () -> mc.setScreen(new IntroScreen(parent)));
+	}
+
+	/** When the game was set going (ms), so Minecraft's own loading screens show ours instead till you're in; or 0. */
+	private static long launchedAt;
+
+	/** Whether the world's still loading after the new game set it going (a minute at most). */
+	public static boolean launching() {
+		Minecraft mc = Minecraft.getInstance();
+		if (launchedAt == 0) return false;
+		if (System.currentTimeMillis() - launchedAt > 60000 || mc.player != null && Adventure.active() && mc.screen == null) {
+			launchedAt = 0;
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * The loading page on its own (drawn over Minecraft's own loading screens while the world comes up): the ball
+	 * spinning, PALLET TOWN, a full bar and "Arriving...", as the page before it left off (not Minecraft's words).
+	 */
+	public static void drawArriving(GuiGraphics g) {
+		V.fit(g.guiWidth(), g.guiHeight());
+		float secs = (System.currentTimeMillis() % 100000) / 1000F;
+		Scenes.bg2(g, "loading");
+		float cx = 640, top = 720 * 0.44F - (110 + 22 + 60 + 22 + 18) / 2F;
+		g.pose().pushMatrix();
+		g.pose().translate(V.x(cx), V.y(top + 55));
+		g.pose().rotate((float) (secs / 1.1F * Math.PI * 2));
+		g.pose().translate(-V.x(cx), -V.y(top + 55));
+		V.icon(g, "icon_ball", cx - 55, top, 110);
+		g.pose().popMatrix();
+		String place = "PALLET TOWN";
+		float pw0 = V.titleTrackedWidth(place, 40, 4);
+		V.titleTracked(g, place, cx - pw0 / 2, V.capsTop(top + 110 + 22 + 30, 40), 40, 0xFFFFFFFF, 4);
+		float by = top + 110 + 22 + 60 + 22;
+		V.pill(g, cx - 260, by, 520, 18, V.TRACK);
+		V.rrh(g, cx - 258, by + 2, 516, 14, 7, new float[] {0, 1}, new int[] {0xFF4FB896, 0xFF8FF5C0});
+		V.centred(g, Lang.t("Arriving in PALLET TOWN..."), cx, by + 30, 15, 0xCCFFFFFF, false);
 	}
 
 	public IntroScreen(Screen parent) {

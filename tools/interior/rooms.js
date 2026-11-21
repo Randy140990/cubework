@@ -11,11 +11,11 @@ const PLACES = [
   { id: "lab", name: "Prof. Oak's lab", floor: "Ground floor", group: "Prof. Oak's lab" },
   { id: "center", name: "Pokémon Center", floor: "Viridian City", group: "Viridian City" },
   { id: "mart", name: "Poké Mart", floor: "Viridian City", group: "Viridian City" },
-  { id: "trainer1", name: "Trainer House", floor: "1F", group: "Viridian City" },
+  { id: "school", name: "Trainer School", floor: "1F", group: "Viridian City" },
   { id: "trainer2", name: "Trainer House", floor: "B1F", group: "Viridian City" },
-  { id: "gate_s", name: "Route 2 gate", floor: "South", group: "Viridian Forest" },
-  { id: "forest", name: "Viridian Forest", floor: "Route 2", group: "Viridian Forest" },
-  { id: "gate_n", name: "Route 2 gate", floor: "North", group: "Viridian Forest" },
+  { id: "nickhouse", name: "Viridian house", floor: "Ground floor", group: "Viridian City" },
+  { id: "gate_s", name: "Route 2 gate", floor: "South", group: "Route 2" },
+  { id: "gate_n", name: "Route 2 gate", floor: "North", group: "Route 2" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
 ];
 const FROM_TOWN = { x: 6.0, z: 12.5, yaw: FACE.n };
@@ -34,6 +34,13 @@ const GS_IN = { x: 7.0, z: 8.5, yaw: FACE.n }, GS_FROM_FOREST = { x: 7.0, z: 2.6
 const FOREST_FROM_S = { x: 29.0, z: FOREST_D - 2.6, yaw: FACE.n }, FOREST_FROM_N = { x: 6.0, z: 2.6, yaw: FACE.s };
 const GN_FROM_FOREST = { x: 7.0, z: 8.5, yaw: FACE.n }, GN_IN = { x: 7.0, z: 2.6, yaw: FACE.s };
 const TH_DOOR = [7, 9], TH_IN = { x: 8.0, z: 12.5, yaw: FACE.n }, TH_FOOT = { x: 11.1, z: 1.1, yaw: FACE.s }, TH_TOP = { x: 15.5, z: 2.9, yaw: FACE.s };
+// Viridian's two green-roofed buildings: the Trainer School above the Center (the Trainer House's battle room under
+// it), and the house above that. Both small, as their outsides are (10 by 6).
+const SCHOOL_DOOR = [6, 8], SCHOOL_IN = { x: 7.0, z: 9.5, yaw: FACE.n }, SCHOOL_TOP = { x: 13.5, z: 2.9, yaw: FACE.s };
+const VHOUSE_DOOR = [5, 7], VHOUSE_IN = { x: 6.0, z: 8.5, yaw: FACE.n };
+// The Route 2 gates, as Let's Go has them (one design for every gate, its people its own): in from the route at the
+// south, a long blue runner to the way on at the north.
+const LG_GATE_DOOR = [6, 8], LG_GATE_IN = { x: 7.0, z: 10.5, yaw: FACE.n }, LG_GATE_FROM_N = { x: 7.0, z: 2.6, yaw: FACE.s };
 
 // The Trainer House's big screen: the battle downstairs, two trainers and a ball flying between, VS flashing.
 function drawTrainerTV(P, f) {
@@ -158,6 +165,32 @@ function drawScoreboard(P, f) {
   reg("counterOrange", 16, 16, front("#E8823A"));
   reg("mcPeachCheck", 32, 32, (P, r) => mcCheck(P, r, hx("#FBF1E4"), hx("#F2D4B8")), { per: 2 });
   reg("courtWood", 16, 16, (P, r) => { P.fill(hx("#D9A86A"), 0.05, r); for (let y = 0; y < 16; y += 4) P.rect(0, y, 16, 1, hx("#C79358")); });
+  // The Trainer School's: a chalkboard, warm wood, yellow desks. The Let's Go gate's: a cream and yellow check, the
+  // blue lower walls, round brown stools, a red bin. The Viridian house's mat.
+  reg("chalkboard", 64, 32, (P, r) => {
+    P.fill(hx("#2F5D46"), 0.05, r);
+    const chalk = hx("#E8F0E4");
+    P.text("STATUS", 20, 3, hx("#FFE9A8"));
+    P.text("SLP PSN PAR", 9, 12, chalk); P.text("BRN FRZ", 17, 20, chalk);
+    P.rect(4, 28, 10, 1, chalk); P.rect(48, 27, 8, 2, hx("#F2F2F2"));
+  }, { fit: true });
+  reg("bookOpen", 16, 16, (P, r) => { P.fill(hx("#F8F4EA"), 0.02, r); P.rect(7, 0, 2, 16, hx("#C9BFA8")); for (let y = 3; y < 14; y += 3) { P.rect(1, y, 5, 1, hx("#8A8F9E")); P.rect(10, y, 5, 1, hx("#8A8F9E")); } });
+  reg("schoolWood", 16, 16, (P, r) => { P.fill(hx("#C98F55"), 0.05, r); for (let y = 0; y < 16; y += 4) P.rect(0, y, 16, 1, hx("#B37B45")); });
+  reg("deskYellow", 16, 16, (P, r) => { P.fill(hx("#F2C14E"), 0.04, r); P.rect(0, 0, 16, 1, hx("#F8D77E")); });
+  reg("paperSchool", 16, 16, (P, r) => mcStone(P, r, hx("#F6EEDC"), 0.03, 2));
+  reg("schoolTrim", 16, 16, (P, r) => { P.fill(hx("#9C6A3C"), 0.04, r); P.rect(0, 0, 16, 2, hx("#BE8A57")); });
+  reg("gateCheck", 32, 32, (P, r) => mcCheck(P, r, hx("#F7E7B4"), hx("#E9C977")), { per: 2 });
+  reg("paperGateLG", 16, 16, (P, r) => mcStone(P, r, hx("#F7F1E2"), 0.03, 2));
+  reg("gateBlue", 16, 16, (P, r) => { P.fill(hx("#5C8FB8"), 0.04, r); P.rect(0, 0, 16, 1, hx("#7FAAD0")); });
+  reg("gateWhite", 16, 16, (P, r) => P.fill(hx("#F4F6F4"), 0.02, r));
+  reg("stoolTop", 16, 16, (P, r) => { P.fill(hx("#9A5B34"), 0.05, r); P.rect(0, 0, 16, 1, hx("#B8774A")); });
+  reg("binRed", 16, 16, (P, r) => { P.fill(hx("#E0603A"), 0.04, r); P.rect(0, 0, 16, 2, hx("#F08A62")); });
+  reg("matSchool", 32, 32, mat("#9C6A3C", "#6B4524"), { fit: true });
+  reg("matHouseV", 32, 32, mat("#3E8A6E", "#2A5E4B"), { fit: true });
+  reg("matGate", 32, 32, mat("#3A63B8", "#25418A"), { fit: true });
+  reg("matGateN", 32, 32, mat("#3A63B8", "#25418A", true), { fit: true });
+  // The gate's runner: blue, a yellow line round it.
+  RUGS.gateRun = (i, j, w, d) => (i === 0 || i === w - 1 || j === 0 || j === d - 1) ? "#E9D27A" : (j % 3 === 1 ? "#5A8EE0" : "#4A7FD4");
   RUGS.thRun = (i, j, w, d) => (i === 0 || i === w - 1) ? "#FBF1E4" : (j % 3 === 1 ? "#F09A56" : "#E8823A");
   // The battle court: green, white lines round it and across its middle.
   RUGS.court = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1 || j === Math.floor(d / 2)) ? "#F6F1EA" : ((i + j) % 2 ? "#7FC36A" : "#6DB55A");
@@ -245,10 +278,18 @@ function labMachine(room, X, w, screenKey, o = {}) {
   room.act(F.rect(0, 0.6, w, 1.8), { label: "Look", lines: o.lines });
   room.item(o.name || "Machine", o.note || "A grey cabinet of dials and lights, its screen running.");
 }
+// A ball as the design has it, rounded: three crossed boxes (a bevelled cube, as a Minecraft build rounds a small thing),
+// not a sharp-cornered block.
+function roundBall(G, cx, y, cz, s) {
+  const h = s / 2, r = s * 0.2, m = { all: "ball", top: "ballTop" };
+  G.box(cx - h, y + r, cz - h + r, cx + h, y + s - r, cz + h - r, m);
+  G.box(cx - h + r, y, cz - h + r, cx + h - r, y + s, cz + h - r, m);
+  G.box(cx - h + r, y + r, cz - h, cx + h - r, y + s - r, cz + h, m);
+}
 function ballTable(room, x0, z0, x1, z1) {
   table(room, x0, z0, x1, z1, { top: "lab", leg: "steel", h: 0.95, name: "The table of balls", note: "A white-topped steel table with three balls in a row." });
   const n = 3, s = 0.36, y = 0.95, cz = (z0 + z1) / 2;
-  for (let i = 0; i < n; i++) { const cx = x0 + (x1 - x0) * (i + 1) / (n + 1); room.geo.box(cx - s / 2, y, cz - s / 2, cx + s / 2, y + s, cz + s / 2, { all: "ball", top: "ballTop" }); }
+  for (let i = 0; i < n; i++) { const cx = x0 + (x1 - x0) * (i + 1) / (n + 1); roundBall(room.geo, cx, y, cz, s); }
   room.act([x0, z0 - 0.3, x1, z1 + 0.3], { label: "Look", lines: ["Three balls, each with a creature inside.", "The professor will let you choose one when he's ready."] });
 }
 // White, modern shelves, packed full: books, binders and boxes, row on row.
@@ -275,7 +316,7 @@ function incubator(room, x, z) {
   const disc = (r, y0, y1, mat) => { const k = 0.62 * r, e = Math.min(0.01, (y1 - y0) / 4); G.box(x - r, y0, z - k, x + r, y1, z + k, mat); G.box(x - k, y0 + e, z - r, x + k, y1 - e, z + r, mat); };
   disc(1.08, 0, 0.82, "paint"); disc(1.12, 0.82, 0.94, "redPlastic"); disc(1.06, 0.94, 1.0, "paint");
   disc(0.62, 1.0, 1.12, "greyPlastic");
-  const ball = (bx, by, bz, s = 0.3) => G.box(x + bx - s / 2, by, z + bz - s / 2, x + bx + s / 2, by + s, z + bz + s / 2, { all: "ball", top: "ballTop" });
+  const ball = (bx, by, bz, s = 0.3) => roundBall(G, x + bx, by, z + bz, s);
   for (const [bx, bz] of [[-0.25, -0.15], [0.22, -0.2], [0.0, 0.2], [-0.3, 0.25], [0.3, 0.18]]) ball(bx, 1.12, bz, 0.26);
   for (const [bx, bz] of [[-0.86, 0.3], [-0.55, 0.78], [0.55, 0.78], [0.86, 0.3]]) ball(bx, 1.0, bz, 0.24);
   disc(0.8, 1.0, 2.35, "tankGlass");
@@ -304,7 +345,7 @@ function healer(room, X, w, o = {}) {
   // Six slots on its top: balls resting in them (the lab's), or empty cups waiting for yours (the Center's).
   for (let i = 0; i < 6; i++) { const lx = 0.45 + (i % 3) * ((w - 0.9) / 2), lz = 0.35 + Math.floor(i / 3) * 0.3;
     if (o.empty) F.box(lx - 0.13, 1.2, lz - 0.13, lx + 0.13, 1.24, lz + 0.13, { all: "steel", top: "rubber" });
-    else F.box(lx - 0.1, 1.2, lz - 0.1, lx + 0.1, 1.38, lz + 0.1, { all: "ball", top: "ballTop" }); }
+    else roundBall(F, lx, 1.2, lz, 0.2); }
   F.box(0, 1.1, 0, w, 2.4, 0.15, { front: "labPanel", all: "greyPlastic" });
   F.solid(0, 0, w, 1.0);
   room.act(F.rect(0, 0.5, w, 1.5), { label: "Look", lines: ["A machine for resting creatures, six slots on its top.", "It's warm. Someone was using it this morning."] });
@@ -371,6 +412,80 @@ function glassTable(room, x0, z0, x1, z1, o = {}) {
   room.solid(x0, z0, x1, z1);
   room.act([x0 - 0.2, z0 - 0.2, x1 + 0.2, z1 + 0.2], { label: "Look", lines: o.lines || ["A glass table. There's a magazine about famous trainers on the shelf underneath."] });
   room.item("Glass table", "Chrome legs, a glass top, a magazine on the shelf below and a little vase of flowers.");
+}
+// Plants as Let's Go's gates and school have them: a palm in a round white pot, and a slim one in a tall white pot.
+function palm(room, x, z, s = 1, o = {}) {
+  const G = room.geo, p = 0.3 * s;
+  G.box(x - p, 0, z - p, x + p, 0.5 * s, z + p, { all: "potWhite", top: "soil" });
+  G.box(x - p * 1.15, 0.42 * s, z - p * 1.15, x + p * 1.15, 0.5 * s, z + p * 1.15, "potWhite");
+  G.box(x - 0.05, 0.5 * s, z - 0.05, x + 0.05, 1.45 * s, z + 0.05, "walnut");
+  G.box(x - 0.8 * s, 1.2 * s, z - 0.02, x + 0.8 * s, 1.75 * s, z + 0.02, "leaf");
+  G.box(x - 0.02, 1.2 * s, z - 0.8 * s, x + 0.02, 1.75 * s, z + 0.8 * s, "leaf");
+  G.box(x - 0.28 * s, 1.35 * s, z - 0.28 * s, x + 0.28 * s, 1.62 * s, z + 0.28 * s, "leafSolid");
+  room.solid(x - p, z - p, x + p, z + p);
+  room.act([x - p, z - p, x + p, z + p], { label: "Look", lines: o.lines || ["A palm in a round white pot."] });
+  room.item("Palm", "Fronds on a slim trunk, in a round white pot.");
+}
+function slimPlant(room, x, z, s = 1, o = {}) {
+  const G = room.geo, p = 0.17 * s;
+  G.box(x - p, 0, z - p, x + p, 0.85 * s, z + p, { all: "potWhite", top: "soil" });
+  G.box(x - 0.3 * s, 0.85 * s, z - 0.3 * s, x + 0.3 * s, 1.3 * s, z + 0.3 * s, "leafSolid");
+  G.box(x - 0.2 * s, 1.3 * s, z - 0.2 * s, x + 0.2 * s, 1.55 * s, z + 0.2 * s, "leafSolid");
+  G.box(x - 0.42 * s, 0.95 * s, z - 0.02, x + 0.42 * s, 1.35 * s, z + 0.02, "leaf");
+  room.solid(x - p, z - p, x + p, z + p);
+  room.act([x - p, z - p, x + p, z + p], { label: "Look", lines: o.lines || ["A slim plant in a tall white pot."] });
+  room.item("Slim plant", "A small leafy bush in a tall, narrow white pot.");
+}
+// A round stool: a brown cushion (rounded, as two crossed boxes) on a steel stem and foot.
+function stool(room, x, z) {
+  const G = room.geo;
+  G.box(x - 0.22, 0, z - 0.22, x + 0.22, 0.05, z + 0.22, "steel");
+  G.box(x - 0.05, 0.05, z - 0.05, x + 0.05, 0.4, z + 0.05, "steel");
+  G.box(x - 0.3, 0.4, z - 0.21, x + 0.3, 0.52, z + 0.21, "stoolTop");
+  G.box(x - 0.21, 0.4, z - 0.3, x + 0.21, 0.52, z + 0.3, "stoolTop");
+  room.solid(x - 0.26, z - 0.26, x + 0.26, z + 0.26);
+  room.item("Stools", "Round stools, brown cushions on a steel stem.");
+}
+function bin(room, x, z) {
+  const G = room.geo;
+  G.box(x - 0.25, 0, z - 0.25, x + 0.25, 0.7, z + 0.25, { all: "binRed", top: "cap" });
+  room.solid(x - 0.25, z - 0.25, x + 0.25, z + 0.25);
+  room.act([x - 0.3, z - 0.3, x + 0.3, z + 0.3], { label: "Look", lines: ["A bin. Someone's thrown away a used-up REPEL."] });
+}
+// A pupil's desk (yellow top on steel legs) with its chair behind, facing the board (north).
+function schoolDesk(room, x, z, o = {}) {
+  table(room, x - 0.55, z - 0.35, x + 0.55, z + 0.35, { top: "deskYellow", leg: "steel", h: 0.74, name: "Desks", note: "Yellow-topped desks on steel legs, a chair at each." });
+  chair(room, x, z + 0.78, "n", { wood: "pale" });
+  if (o.book) room.geo.box(x - 0.25, 0.74, z - 0.15, x + 0.15, 0.78, z + 0.15, { all: "linen", top: "bookOpen" });
+  if (o.lines) room.act([x - 0.6, z - 0.5, x + 0.6, z + 0.45], { label: "Read", lines: o.lines });
+}
+// Let's Go's gate: the room both Route 2 gates (and later ones) are built from. o.south / o.north: the ways out
+// ({ to } for a real one, { none, lines } for one that goes nowhere yet).
+function lgGate(R, o) {
+  const D = R.D;
+  shell(R, { paper: "paperGateLG", floor: "gateCheck", door: LG_GATE_DOOR, skirt: "gateWhite" });
+  // The blue lower walls, a white rail over them.
+  band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
+  // Windows down both sides.
+  for (const z of [2.6, 7.4]) for (const wall of ["w", "e"]) framed(R, z, 1.6, 2.0, 1.3, "window", wall, { frameMat: "paint", act: { label: "Look", lines: ["Outside: the trees along ROUTE 2."] } });
+  // The way at the north (dark, the forest's green beyond), palms either side.
+  const north = o.north || {};
+  passageN(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], north.none ? { none: true, mat: "matGateN", frame: "paint" } : { to: north.to, spawn: north.spawn, mat: "matGateN", frame: "paint" });
+  if (north.none) R.act([LG_GATE_DOOR[0], 0, LG_GATE_DOOR[1], 1.2], { label: "Look", lines: north.lines });
+  palm(R, 4.6, 0.9, 1.0); palm(R, 9.4, 0.9, 1.0);
+  // The runner, from the way on at the north to the door at the south.
+  rug(R, 5, 2, 9, D - 2, "gateRun");
+  // Stools round two glass tables on the east side, a few along the west wall; plants; a bin.
+  glassTable(R, 10.4, 3.2, 11.9, 4.6, { lines: ["A glass table. There's a leaflet: VIRIDIAN FOREST, A WALK FOR ALL AGES!"] });
+  stool(R, 12.6, 3.9); stool(R, 11.15, 2.5); stool(R, 9.7, 3.9);
+  glassTable(R, 10.4, 6.9, 11.9, 8.3, { lines: ["A glass table. Someone's left a map of ROUTE 2 on it."] });
+  stool(R, 12.6, 7.6); stool(R, 11.15, 9.0); stool(R, 9.7, 7.6);
+  stool(R, 1.0, 7.6); stool(R, 1.0, 8.8);
+  slimPlant(R, 0.8, 3.6, 1.0); plant(R, 1.0, D - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); slimPlant(R, 13.2, D - 1.0, 1.0);
+  bin(R, 13.3, 1.0);
+  const south = o.south || {};
+  doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], south.none ? { none: true, mat: "matGate" } : { to: south.to, spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matGate" });
+  if (south.none) R.act([LG_GATE_DOOR[0], D - 1.4, LG_GATE_DOOR[1], D], { label: "Look", lines: south.lines });
 }
 // A soft armchair (as the Centers' waiting seats): x, z its middle, face the way you'd look sitting in it.
 function armchair(room, x, z, face, fab = "yellowFabric") {
@@ -670,7 +785,7 @@ const BUILD = {
     bookshelf(R, 20, 12.0, "w", 2, 1.6, { wood: "pale", lines: ["Leaflets: RESTING IS GOOD FOR POKéMON TOO."] });
     plant(R, 1.0, 14.9, 1.1, { lines: ["A big leafy plant. Its leaves are very shiny."] }); plant(R, 19.0, 14.9, 1.1, { lines: ["A big leafy plant."] });
     plant(R, 4.2, 6.2, 0.95, { lines: ["A potted palm."] }); plant(R, 15.8, 6.2, 0.95, { lines: ["A potted palm."] });
-    rug(R, 8, 5.6, 12, 14.8, "centerRun");
+    rug(R, 8, 5.6, 12, 14, "centerRun");
     doormat(R, CENTER_DOOR[0], CENTER_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matCenter" });
     R.npcs.push({ name: "Nurse", role: "nurse", key: "viridian_nurse", x: 10.0, z: 3.3, yaw: FACE.s, look: { skin: "nurse" },
       talk: () => [{ text: "Hello, and welcome to the POKéMON CENTER!" }, { text: "We heal tired POKéMON back to full health. Shall we heal yours?" }] });
@@ -715,7 +830,7 @@ const BUILD = {
     // The middle: a row of shelves facing the door, and a glass display case in front of it.
     martShelf(R, 6.4, 3.4, "s", 5.4, 2.0, { seed: 1 });
     displayCase(R, 6.8, 7.0, 11.4, 8.0, ["Under the glass: POKé BALLS and GREAT BALLS laid out in rows, and a box of POTIONS."]);
-    rug(R, 6, 9, 10, 12.8, "martRun");
+    rug(R, 6, 9, 10, 12, "martRun");
     plant(R, 15.0, 12.9, 1.1, { lines: ["A plant by the door. It looks well looked after."] });
     plant(R, 12.6, 12.9, 0.9, { lines: ["A little potted palm."] });
     doormat(R, MART_DOOR[0], MART_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matMart" });
@@ -729,38 +844,71 @@ const BUILD = {
     return R;
   },
 
-  trainer1() {
-    // The Trainer House's ground floor (HeartGold and SoulSilver's, in Viridian City): the counter where the
-    // receptionist tells you who's waiting today, the big screen showing the battles downstairs, benches to watch
-    // from, an orange runner to the door, and the stairs down at the back.
-    const R = new Room("trainer1", { name: "Trainer House", floor: "1F", outsideSize: "11 by 7" });
-    shell(R, { paper: "paperTrainer", floor: "mcPeachCheck", floorRects: [[0, 0, 12, 14], [12, 2, 16, 14]], door: TH_DOOR, skirt: "orangeTrim" });
-    band(R, 1.05, "orangeTrim");
-    const G = R.geo;
-    // The counter, in the west corner: its front, its side back to the wall, its white top; the receptionist behind.
-    G.box(0, 0, 4.2, 4.4, 1.05, 5.2, { all: "counterOrange", top: "lab" });
-    G.box(3.4, 0, 0, 4.4, 1.05, 4.2, { all: "counterOrange", top: "lab" });
-    G.box(-0.05, 1.05, 4.1, 4.5, 1.15, 5.3, "lab");
-    R.solid(0, 0, 4.5, 5.3);
-    till(R, 2.9, 4.7, 1.15, "s");
-    R.act([0, 5.2, 4.4, 6.2], { label: "Talk", lines: ["The counter. The receptionist knows who's waiting downstairs today."] });
-    R.item("The counter", "Orange, a white top and stripe, a till.");
-    // The big screen: the battle room downstairs, live.
-    wallScreen(R, 5.4, 1.3, 4.8, 2.2, R.screen("thTV", 44, 22, drawTrainerTV, 1), ["The screen shows the battle room downstairs. Today's challenger is warming up."]);
-    // Benches facing it, and the stairs down at the back.
-    sofa(R, 7.8, 6.6, "n", 2.4, { fabric: "yellowFabric" }); sofa(R, 10.4, 6.6, "n", 2.4, { fabric: "blueFabric" });
-    stairsDown(R, 12, 0, 2, { to: "trainer2", spawn: TH_FOOT, paper: "paperTrainer" });
-    bookshelf(R, 16, 5.0, "w", 2.2, 1.6, { wood: "pale", lines: ["A rack of leaflets: THE TRAINER HOUSE. ONE BATTLE A DAY. A PRIZE FOR THE WINNER!"] });
-    plant(R, 1.0, 12.9, 1.1, { lines: ["A big leafy plant."] }); plant(R, 15.0, 12.9, 1.1, { lines: ["A big leafy plant."] });
-    rug(R, 7, 8, 9, 12, "thRun");
-    doormat(R, TH_DOOR[0], TH_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matTrainer" });
-    R.npcs.push({ name: "Receptionist", key: "trainer_house_desk", x: 1.8, z: 2.6, yaw: FACE.s, look: { skin: "link_receptionist" },
-      talk: () => [{ text: "Welcome to the TRAINER HOUSE, the newest and most happening place in VIRIDIAN!" },
-        { text: "Trainers come from all over to battle here. Today's challenger is waiting downstairs." },
-        { text: "Win, and there's a prize for you. One battle a day!" }] });
-    R.npcs.push({ name: "Youngster", key: "trainer_house_fan", x: 12.4, z: 8.2, yaw: FACE.n, look: { skin: "youngster" },
-      talk: () => [{ text: "There's someone new downstairs every day." }, { text: "I just watch them on the screen. They're SO strong!" }] });
-    R.spawn = TH_IN;
+  school() {
+    // Viridian's Trainer School (the green roof above the Center), as Let's Go has it: the board at the front, the
+    // teacher by it, rows of yellow desks, the pupils. The stairs at the back go down to the Trainer House's battle
+    // room, where a new challenger waits each day.
+    const R = new Room("school", { name: "Trainer School", floor: "1F", W: 14, D: 11, outsideSize: "10 by 6" });
+    shell(R, { paper: "paperSchool", floor: "schoolWood", door: SCHOOL_DOOR, skirt: "schoolTrim" });
+    band(R, 1.0, "schoolTrim", 0.12);
+    const board = ["The BLACKBOARD: what can go wrong for a POKéMON in battle.",
+      "SLEEP: it can't attack until it wakes up. That can take a few turns.",
+      "POISON: it loses HP every turn, and as you walk about with it too.",
+      "PARALYSIS: it's slower, and some turns it can't move at all.",
+      "BURN: it loses HP every turn, and its physical attacks are weaker.",
+      "FREEZE: it can't move at all until it thaws out.",
+      "A POKéMON CENTER puts every one of them right."];
+    framed(R, 3.2, 1.25, 5.6, 1.9, "chalkboard", "n", { frameMat: "walnut", act: { label: "Read", lines: board } });
+    // The chalk ledge under it.
+    R.geo.box(3.1, 1.15, 0, 8.9, 1.22, 0.16, "walnut");
+    // The teacher's desk at the front, by the board.
+    table(R, 0.9, 2.0, 2.7, 2.9, { top: "oak", leg: "walnut", h: 0.86, name: "Teacher's desk", note: "Oak, with a register and a cup of pens." });
+    R.geo.box(1.2, 0.86, 2.2, 1.8, 0.9, 2.7, { all: "linen", top: "bookOpen" });
+    // Two rows of desks either side of the way in (the aisle from the door to the board is clear).
+    const notebook = ["A notebook, left open. TRAINER TIPS, page 1: weaken a wild POKéMON before you throw a POKé BALL.",
+      "Page 2: a POKéMON that's asleep or paralysed is easier to catch.",
+      "Page 3: you can carry six POKéMON. Any more you catch go to the PC in a POKéMON CENTER.",
+      "Page 4: wild POKéMON live in the tall grass. Watch where you walk!"];
+    schoolDesk(R, 2.6, 4.4); schoolDesk(R, 4.4, 4.4, { book: true, lines: notebook }); schoolDesk(R, 9.6, 4.4); schoolDesk(R, 11.4, 4.4);
+    schoolDesk(R, 2.6, 6.9); schoolDesk(R, 4.4, 6.9); schoolDesk(R, 9.6, 6.9); schoolDesk(R, 11.4, 6.9);
+    // The stairs down, at the back on the east side; books on the west wall; plants in the front corners.
+    stairsDown(R, 10, 0, 2, { to: "trainer2", spawn: TH_FOOT, paper: "paperSchool" });
+    bookshelf(R, 0, 4.0, "e", 2.4, 2.2, { wood: "walnut", lines: ["Books on POKéMON: TYPES, MOVES, and HOW TO CARE FOR YOUR FIRST POKéMON."] });
+    slimPlant(R, 0.8, 10.2, 1.0); palm(R, 13.2, 10.0, 0.95);
+    framed(R, 5.2, 1.4, 1.8, 1.4, "window", "e", { frameMat: "paint", act: { label: "Look", lines: ["Outside: VIRIDIAN CITY's houses, and the GYM's roof over the trees."] } });
+    doormat(R, SCHOOL_DOOR[0], SCHOOL_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matSchool" });
+    R.npcs.push({ name: "Teacher", key: "viridian_school_teacher", x: 3.4, z: 1.6, yaw: FACE.s, look: { skin: "lady" },
+      talk: () => [{ text: "Welcome to the TRAINER SCHOOL! Shall I ask you a question?" }] });
+    R.npcs.push({ name: "Pupil", key: "viridian_school_kid", x: 9.6, z: 5.18, yaw: FACE.n, seated: true, look: { skin: "school_kid" },
+      talk: () => [{ text: "Whew! I'm trying to learn all my notes by heart." }, { text: "The test is about STATUS problems. Look at the board!" }] });
+    R.npcs.push({ name: "Pupil", key: "viridian_school_girl", x: 2.6, z: 7.68, yaw: FACE.n, seated: true, look: { skin: "school_kid_f" },
+      talk: () => [{ text: "The notebook on the desk up front has TRAINER TIPS in it." }, { text: "Have a read! It's really useful." }] });
+    R.spawn = SCHOOL_IN;
+    return R;
+  },
+
+  nickhouse() {
+    // The house above the Trainer School: small and cosy, one floor. A father and his little girl (as in the old
+    // games, he's full of thoughts about nicknames), their SPEAROW's bed by the window.
+    const R = new Room("nickhouse", { name: "Viridian house", floor: "Ground floor", W: 12, D: 10, outsideSize: "10 by 6" });
+    shell(R, { paper: "paperMum", floor: "oak", door: VHOUSE_DOOR });
+    kitchen(R, 0.2, "s");
+    windowN(R, 7.4, 1.3, 2.2, 1.6, { curtains: "redFabric", lines: ["Outside, VIRIDIAN CITY's houses, and a SPEAROW circling over the roofs."] });
+    table(R, 1.4, 4.4, 3.4, 5.8, { cloth: "redFabric", name: "Dining table", note: "Oak, a red runner, two chairs." });
+    chair(R, 2.4, 3.8, "s"); chair(R, 2.4, 6.4, "n");
+    rug(R, 7, 4, 11, 7, "rugRoom");
+    sofa(R, 7.5, 7.6, "n", 3, { fabric: "blueFabric" });
+    bookshelf(R, 12, 1.2, "w", 2, 2.2, { lines: ["Books: NAMING YOUR POKéMON, and A THOUSAND NICKNAMES FOR BIRD POKéMON."] });
+    // Their SPEAROW's bed, under the window.
+    R.geo.box(9.9, 0, 1.0, 10.9, 0.18, 1.8, { all: "redFabric", top: "cushion" });
+    R.act([9.8, 0.6, 11.0, 2.0], { label: "Look", lines: ["A little bed with a name stitched on it: SPEARY.", "SPEARY's out for a fly."] });
+    plant(R, 0.9, 9.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+    doormat(R, VHOUSE_DOOR[0], VHOUSE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHouseV" });
+    R.npcs.push({ name: "Father", key: "viridian_house_dad", x: 8.6, z: 3.2, yaw: FACE.s, look: { skin: "middle_aged_man" },
+      talk: () => [{ text: "Coming up with nicknames is fun, but it's harder than you'd think." }, { text: "Simple names are the easiest to remember." }] });
+    R.npcs.push({ name: "Little girl", key: "viridian_house_girl", x: 2.4, z: 6.4, yaw: FACE.n, seated: true, look: { skin: "little_girl" },
+      talk: () => [{ text: "My daddy loves POKéMON too!" }, { text: "Our SPEAROW is called SPEARY. Daddy named it!" }] });
+    R.spawn = VHOUSE_IN;
     return R;
   },
 
@@ -770,7 +918,7 @@ const BUILD = {
     const R = new Room("trainer2", { name: "Trainer House", floor: "B1F", W: 16, D: 16 });
     shell(R, { paper: "paperTrainerB", floor: "courtWood", skirt: "orangeTrim" });
     band(R, 1.05, "orangeTrim");
-    stairsUp(R, 12, 0, 2, { to: "trainer1", spawn: TH_TOP });
+    stairsUp(R, 12, 0, 2, { to: "school", spawn: SCHOOL_TOP });
     rug(R, 3, 4, 13, 15, "court");
     wallScreen(R, 4.4, 1.6, 4.6, 1.9, R.screen("thBoard", 44, 20, drawScoreboard, 1), ["The scoreboard: TODAY'S CHALLENGER, and a tally of everyone they've beaten."]);
     sofa(R, 0, 10.6, "e", 3, { fabric: "blueFabric" }); sofa(R, 16, 7.6, "w", 3, { fabric: "yellowFabric" });
@@ -782,73 +930,29 @@ const BUILD = {
   },
 
   gate_s() {
-    // The gate on Route 2 into Viridian Forest, south side: you come in from the route, a guard at a desk, and the
-    // way through to the forest in the north wall.
-    const R = new Room("gate_s", { name: "Route 2 gate", floor: "South", W: 14, D: 10, outsideSize: "15 by 12" });
-    shell(R, { paper: "paperGate", floor: "gateBoards", door: GATE_DOOR, skirt: "greenTrim" });
-    band(R, 1.05, "greenTrim");
-    const G = R.geo;
-    G.box(10, 0, 2.6, 13, 1.0, 3.4, { all: "counterBlue", top: "lab" }); R.solid(10, 2.6, 13, 3.4);
-    passageN(R, GATE_DOOR[0], GATE_DOOR[1], { to: "forest", spawn: FOREST_FROM_S, mat: "matForestN" });
-    plant(R, 1.0, 9.0, 1.0); plant(R, 13.0, 9.0, 1.0);
-    framed(R, 1.6, 1.4, 2.4, 1.2, "worldMap", "n", { frameMat: "walnut", act: { label: "Look", map: true, lines: ["A map of the region. VIRIDIAN FOREST is the green between VIRIDIAN and PEWTER.", "In game, this opens the TOWN MAP."] } });
-    doormat(R, GATE_DOOR[0], GATE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matForest" });
-    R.npcs.push({ name: "Old man", key: "gate_s_man", x: 11.5, z: 1.8, yaw: FACE.s, look: { skin: "old_man" },
-      talk: () => [{ text: "VIRIDIAN FOREST is a natural maze. Many trainers get lost in there!" }, { text: "Keep your eyes on the path, and you'll come out at PEWTER CITY." }] });
-    R.spawn = GS_IN;
-    return R;
-  },
-
-  forest() {
-    // Viridian Forest, as the old games have it: a maze of trees from the south gate (bottom right) to the north
-    // gate (top left), tall grass along the way where wild POKéMON live, bug catchers in the clearings, signs.
-    const W = FOREST_W, D = FOREST_D;
-    const R = new Room("forest", { name: "Viridian Forest", floor: "Route 2", W, D, H: 4 });
-    shell(R, { paper: "leafWall", floor: "forestGround", door: FOREST_IN, skirt: "bark", rail: false });
-    // The way through: east side north, across the middle, up the middle, across the top, up to the exit.
-    const paths = [[27, 34, 31, D], [10, 30, 31, 35], [10, 12, 16, 35], [3, 10, 16, 16], [3, 0, 9, 16]];
-    for (const [x0, z0, x1, z1] of paths) patch(R, x0, z0, x1, z1, "forestPath");
-    // Clearings off the path, and the grass where the wild ones are.
-    const open = paths.concat([[18, 38, 26, 46], [18, 14, 26, 22], [2, 22, 9, 30], [12, 2, 20, 9]]);
-    wildGrass(R, 27, 40, 31, 46); wildGrass(R, 19, 39, 25, 45); wildGrass(R, 14, 30, 22, 35); wildGrass(R, 3, 23, 8, 29);
-    wildGrass(R, 10, 18, 16, 26); wildGrass(R, 19, 15, 25, 21); wildGrass(R, 3, 10, 9, 15); wildGrass(R, 13, 3, 19, 8);
-    // Trees everywhere else, close together (their canopies touching), so the path is the only way.
-    const inOpen = (x, z) => open.some(([a, b, c, d]) => x > a - 1.0 && x < c + 1.0 && z > b - 1.0 && z < d + 1.0);
-    for (let z = 1.4; z < D - 0.8; z += 2.3) for (let x = 1.3 + ((Math.round(z / 2.3) % 2) ? 1.15 : 0); x < W - 0.8; x += 2.3)
-      if (!inOpen(x, z)) tree(R, x, z, 0.95);
-    // Signs along the way.
-    const sign = (x, z, key, text, lines) => { textBoard(key, text, 52); R.geo.box(x - 0.05, 0, z - 0.05, x + 0.05, 1.0, z + 0.05, "walnut");
-      R.geo.box(x - 0.9, 0.8, z - 0.04, x + 0.9, 1.4, z + 0.04, { s: key, all: "walnut" }); R.solid(x - 0.9, z - 0.15, x + 0.9, z + 0.15); R.act([x - 1, z - 0.6, x + 1, z + 0.6], { label: "Read", lines }); };
-    sign(26, D - 4, "signForestIn", "VIRIDIAN FOREST", ["VIRIDIAN FOREST. Leave only footprints!", "Wild POKéMON live in the tall grass."]);
-    sign(14, 33.6, "signForestTip1", "TRAINER TIPS", ["TRAINER TIPS: no stealing other trainers' POKéMON! Catch only wild ones."]);
-    sign(6, 18.6, "signForestTip2", "TRAINER TIPS", ["TRAINER TIPS: weaken a POKéMON before you try to catch it. A sleeping one is easier still."]);
-    sign(8, 3.4, "signForestOut", "PEWTER CITY", ["Leaving VIRIDIAN FOREST. PEWTER CITY ahead."]);
-    // Its trainers (the old games' bug catchers and the lass), each by the path, looking out for you.
-    R.npcs.push({ name: "Bug Catcher", role: "trainer", key: "viridian_forest_0", x: 26.2, z: 38.0, yaw: FACE.e, look: { skin: "bug_catcher" }, talk: () => [{ text: "Hey! You have POKéMON! Come on! Let's battle 'em!" }] });
-    R.npcs.push({ name: "Bug Catcher", role: "trainer", key: "viridian_forest_1", x: 20.0, z: 30.0, yaw: FACE.s, look: { skin: "bug_catcher" }, talk: () => [{ text: "Yo! You can't jam out if you're a POKéMON trainer!" }] });
-    R.npcs.push({ name: "Bug Catcher", role: "trainer", key: "viridian_forest_2", x: 17.2, z: 18.0, yaw: FACE.w, look: { skin: "bug_catcher" }, talk: () => [{ text: "Hey, wait up! What's the hurry?" }] });
-    R.npcs.push({ name: "Lass", role: "trainer", key: "viridian_forest_3", x: 2.6, z: 21.0, yaw: FACE.e, look: { skin: "lass" }, talk: () => [{ text: "Hi, do you have a PIKACHU?" }] });
-    R.npcs.push({ name: "Bug Catcher", role: "trainer", key: "viridian_forest_4", x: 10.2, z: 6.0, yaw: FACE.w, look: { skin: "bug_catcher" }, talk: () => [{ text: "I'm gonna be the best. You just can't beat me!" }] });
-    passageN(R, FOREST_OUT[0], FOREST_OUT[1], { to: "gate_n", spawn: GN_FROM_FOREST, mat: "matForestN", frame: "bark" });
-    doormat(R, FOREST_IN[0], FOREST_IN[1], { to: "gate_s", spawn: GS_FROM_FOREST, mat: "matForest" });
-    R.spawn = FOREST_FROM_S;
+    // Route 2's gate south of Viridian Forest, as Let's Go's gates are (one design for every gate; who's in it is its
+    // own): a cream and yellow check, blue lower walls, a long blue runner from the door to the way on at the north,
+    // palms by the way on, stools round glass tables, people waiting. The way on to the forest goes nowhere yet.
+    const R = new Room("gate_s", { name: "Route 2 gate", floor: "South", W: 14, D: 12, outsideSize: "15 by 12" });
+    lgGate(R, { south: { to: "town" }, north: { none: true, lines: ["The way on to VIRIDIAN FOREST."] } });
+    R.npcs.push({ name: "Girl", key: "gate_s_girl", x: 3.0, z: 5.6, yaw: FACE.e, look: { skin: "girl" },
+      talk: () => [{ text: "Some POKéMON only live in forests and caves." }, { text: "Look everywhere if you want to find them all!" }] });
+    R.npcs.push({ name: "Lady", key: "gate_s_lady", x: 12.6, z: 7.6, yaw: FACE.w, seated: true, look: { skin: "lady" },
+      talk: () => [{ text: "VIRIDIAN FOREST is a natural maze." }, { text: "Stick to the path, or you'll be wandering in circles!" }] });
+    R.spawn = LG_GATE_IN;
     return R;
   },
 
   gate_n() {
-    // The gate on the forest's north side: in from the forest, a desk, and out through the north wall to Route 2
-    // (and PEWTER CITY).
-    const R = new Room("gate_n", { name: "Route 2 gate", floor: "North", W: 14, D: 10, outsideSize: "15 by 16" });
-    shell(R, { paper: "paperGate", floor: "gateBoards", door: GATE_DOOR, skirt: "greenTrim" });
-    band(R, 1.05, "greenTrim");
-    const G = R.geo;
-    G.box(10, 0, 2.6, 13, 1.0, 3.4, { all: "counterBlue", top: "lab" }); R.solid(10, 2.6, 13, 3.4);
-    passageN(R, GATE_DOOR[0], GATE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matForestN" });
-    plant(R, 1.0, 9.0, 1.0); plant(R, 13.0, 9.0, 1.0);
-    doormat(R, GATE_DOOR[0], GATE_DOOR[1], { to: "forest", spawn: FOREST_FROM_N, mat: "matForest" });
-    R.npcs.push({ name: "Lass", key: "gate_n_lass", x: 11.5, z: 1.8, yaw: FACE.s, look: { skin: "lass" },
-      talk: () => [{ text: "Are you off to PEWTER CITY? Its GYM LEADER, BROCK, uses rock POKéMON." }, { text: "Water and grass moves work well on rock!" }] });
-    R.spawn = GN_IN;
+    // The gate on the forest's north side, the same design: in from Route 2 through the way at the north, the forest
+    // to the south (that way goes nowhere yet).
+    const R = new Room("gate_n", { name: "Route 2 gate", floor: "North", W: 14, D: 12, outsideSize: "15 by 16" });
+    lgGate(R, { north: { to: "town" }, south: { none: true, lines: ["The way back into VIRIDIAN FOREST."] } });
+    R.npcs.push({ name: "Youngster", key: "gate_n_kid", x: 3.0, z: 7.0, yaw: FACE.e, look: { skin: "youngster" },
+      talk: () => [{ text: "Off to PEWTER CITY? Its GYM LEADER, BROCK, uses ROCK-type POKéMON." }, { text: "WATER and GRASS moves work well on ROCK!" }] });
+    R.npcs.push({ name: "Hiker", key: "gate_n_hiker", x: 12.6, z: 3.9, yaw: FACE.w, seated: true, look: { skin: "hiker" },
+      talk: () => [{ text: "Phew! That forest goes on and on." }, { text: "It's easy to lose your way among all those trees." }] });
+    R.spawn = LG_GATE_FROM_N;
     return R;
   },
 

@@ -75,7 +75,7 @@ public final class ClientState {
 				introPending = true;
 				introStopped = t.getBooleanOr("stop", false);
 				introLab = t.getBooleanOr("lab", false);
-				introDelay = introStopped ? 4 : 30;
+				introDelay = introStopped || introLab ? 2 : 30;
 			}
 			case "room" -> {
 				// A building's room (or back outside): its music; its name in the banner, coming in from outside.
@@ -165,7 +165,18 @@ public final class ClientState {
 		else QUEUE.add(screen);
 	}
 
+	/** A battle's screen has closed: the server's told once what follows it (nickname, moves, evolving) is done. */
+	private static boolean closing;
+
+	public static void battleClosing() {
+		closing = true;
+	}
+
 	public static void tick(Minecraft mc) {
+		if (closing && mc.player != null && mc.screen == null && QUEUE.isEmpty()) {
+			closing = false;
+			ClientPlayNetworking.send(new Net.Act("battle_closed", new CompoundTag()));
+		}
 		if (exclaimTicks > 0) exclaimTicks--;
 		if (placeTicks >= 0) placeTicks++;
 		if (mc.player == null) {

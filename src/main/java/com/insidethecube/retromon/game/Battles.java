@@ -88,7 +88,7 @@ public final class Battles {
 	private static void begin(ServerPlayer p, Session s, String music) {
 		ON.put(p.getUUID(), s);
 		s.battle.purse = Game.data(p).money;
-		s.battle.lenient = s.trainer != null && (s.trainer.key().equals("rival_lab") || s.trainer.key().equals("rival_22"));
+		s.battle.lenient = s.trainer != null && (s.trainer.key().equals("rival_lab") || s.trainer.key().equals("rival_22") || s.trainer.key().equals("rocket_viridian"));
 		List<Event> ev = s.battle.start();
 		CompoundTag t = turn(s, ev);
 		t.putString("music", music);
@@ -176,6 +176,12 @@ public final class Battles {
 					d.healAll();
 					after.addAll(Game.fill(p, List.of("{rival}: What? Why do I have 2 POKéMON? You should catch some more too!",
 							"{rival}: I heard POKéMON LEAGUE has many tough trainers! You should quit dawdling and get a move on!")));
+				} else if (s.trainer != null && s.trainer.key().equals("rocket_viridian")) {
+					// TEAM ROCKET in Viridian: they win, but have no time to take anything (they're wanted at MT. MOON).
+					d.beaten.add("rocket_viridian");
+					d.healAll();
+					after.addAll(List.of("JESSIE: Ha! Too easy! Now, about that POKéMON of yours...", "JAMES: Jessie! The boss wants us at MT. MOON, right now!",
+							"JESSIE: Ugh! Fine. Count yourself lucky, twerp!", "(Your POKéMON had a rest while they argued.)"));
 				} else if (s.trainer != null && s.trainer.key().equals("rival_lab")) {
 					// The first battle with your rival: no harm done if you lose (Oak sees to your Pokémon).
 					d.beaten.add("rival_lab");

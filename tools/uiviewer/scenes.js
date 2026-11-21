@@ -152,7 +152,7 @@ const SCENES = {
   prof() {
     const group = new THREE.Group(), S = { group, runners: [], parade: [] };
     // A long pale floor of light, so he can walk along it past them all.
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 9), new THREE.MeshLambertMaterial({ color: 0xDFF6F4, transparent: true, opacity: 0.5 })); floor.rotation.x = -Math.PI / 2; floor.position.set(8, 0, 0.2); floor.receiveShadow = true; group.add(floor);
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(56, 9), new THREE.MeshLambertMaterial({ color: 0xDFF6F4, transparent: true, opacity: 0.5 })); floor.rotation.x = -Math.PI / 2; floor.position.set(16, 0, 0.2); floor.receiveShadow = true; group.add(floor);
     group.add(disc(2.0, 0xFFFFFF, 0.005, 0.45));
     const prof = figureOf(PROF_LOOK); prof.root.position.set(0, 0, 0); prof.root.rotation.y = Math.PI; group.add(prof.root); S.prof = prof;
     const rival = figureOf(RIVAL_LOOK); rival.root.position.set(1.45, 0, 0.45); rival.root.rotation.y = Math.PI - 0.25; group.add(rival.root); S.rival = rival;
@@ -175,7 +175,7 @@ const SCENES = {
     S.hop = () => { if (S.hopT == null) { S.hopT = 0; const r = S.runners.find(q => q.sid === "pikachu"); if (r) playOnce(r, "cry"); } };
     // The walk: he sets off to the right along them, talking; the camera goes with him; at the far end he stops and
     // turns to you, and the camera comes in close.
-    const END = 3.8 + Math.max(0, PARADE.length - 1) * 1.15 + 1.4;
+    const END = 3.8 + Math.max(0, PARADE.length - 1) * 1.15 + 1.4 + 7.0;
     S.startWalk = () => { if (S.walk == null) S.walk = { x: 0, speed: 1.25, done: false }; };
     S.stopWalk = () => { S.startWalk(); S.walk.hurry = true; };
     S.enter = o => {
@@ -250,8 +250,8 @@ const SCENES = {
     } else {
       // As Let's Go's title, shot like a film: your partner big and sharp on the right, close enough that its feet are
       // below the frame, with the Minecraft meadow behind out of focus (titleBack, its own canvas behind the scene).
-      mon("pikachu").then(st => { const k = 0.95 / Math.max(0.5, st.m.size.h); st.m.holder.scale.multiplyScalar(k); st.m.size = { ...st.m.size, h: st.m.size.h * k, w: st.m.size.w * k, l: st.m.size.l * k, cx: st.m.size.cx * k, cz: st.m.size.cz * k };
-        st.base = "ground"; group.add(st.m.holder); placeMon(st, 0, 0, Math.PI - 0.38); S.mons.push(st); S.star = st; });
+      mon("pikachu").then(st => { const k = 1.05 / Math.max(0.5, st.m.size.h); st.m.holder.scale.multiplyScalar(k); st.m.size = { ...st.m.size, h: st.m.size.h * k, w: st.m.size.w * k, l: st.m.size.l * k, cx: st.m.size.cx * k, cz: st.m.size.cz * k };
+        st.base = "ground"; group.add(st.m.holder); placeMon(st, 0, 0, Math.PI - 0.38, -0.24); S.mons.push(st); S.star = st; });
       S.back = null;
       S.enter = () => {
         if (!S.back) S.back = titleBack();
@@ -313,6 +313,8 @@ const SCENES = {
         if (S.want !== sid) return;
         if (S.st) turn.remove(S.st.m.holder);
         S.st = st; turn.add(st.m.holder); placeMon(st, 0, 0, 0);
+        // (The summary's: it walks on the spot, as the party's one does, turned a little towards you.)
+        if (S.walking) st.base = "walk";
         const H = Math.max(0.6, st.m.size.h), L = Math.max(st.m.size.l, st.m.size.w, 0.6), d = Math.max(H * 3.1, L * 2.3, 3.8) * (S.zoom || 1);
         S.frame = { d, H }; glow.scale.set(L * 0.7, H * 0.75, L * 0.7); glow.position.y = H / 2;
         look3(S.ox || 0, H * 0.62 + d * 0.16, d, S.ox || 0, H * 0.5, 0);
@@ -345,8 +347,8 @@ const SCENES = {
       await new Promise(r => { const t0 = performance.now(), f = () => { const k = Math.min(1, (performance.now() - t0) / 900); whiten(b, 1 - k); if (k < 1) requestAnimationFrame(f); else r(); }; f(); });
       return "done";
     };
-    S.enter = o => { S.ox = o.ox || 0; S.zoom = o.zoom || 1; stand.visible = o.stand !== false; S.spin = 0; S.glowOn = 0; S.hide = false; S.turn = true; turn.rotation.y = Math.PI; lightFor(0, 0, 6, 12); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); if (o.sid) S.show(o.sid); };
-    S.tick = (dt, t) => { S.spin += dt * (S.turn === false ? 0 : 0.45); turn.rotation.y = Math.PI + Math.sin(S.spin) * 0.7; glow.material.opacity += ((S.glowOn || 0) * (0.65 + 0.3 * Math.sin(t * 12)) - glow.material.opacity) * Math.min(1, dt * 8); if (S.st) { S.st.m.holder.visible = !S.hide; tickMon(S.st, dt); } };
+    S.enter = o => { S.ox = o.ox || 0; S.zoom = o.zoom || 1; stand.visible = o.stand !== false; S.spin = 0; S.glowOn = 0; S.hide = false; S.turn = true; S.walking = !!o.walk; turn.rotation.y = Math.PI; lightFor(0, 0, 6, 12); hemi3.color.set(0xffffff); hemi3.groundColor.set(0x9fc8bc); if (o.sid) S.show(o.sid); };
+    S.tick = (dt, t) => { S.spin += dt * (S.turn === false ? 0 : 0.45); turn.rotation.y = S.walking ? Math.PI - 0.55 : Math.PI + Math.sin(S.spin) * 0.7; glow.material.opacity += ((S.glowOn || 0) * (0.65 + 0.3 * Math.sin(t * 12)) - glow.material.opacity) * Math.min(1, dt * 8); if (S.st) { S.st.m.holder.visible = !S.hide; tickMon(S.st, dt); } };
     return S;
   },
   // A battle: your creature from behind, theirs facing you, each on its patch of ground; you and their trainer behind.

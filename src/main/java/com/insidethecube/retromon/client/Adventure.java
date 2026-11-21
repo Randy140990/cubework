@@ -45,8 +45,16 @@ public final class Adventure {
 	private static int focusId = -1;
 	private static double focusIn;
 
+	/** Ticks till the talking camera lets go (it holds a moment, so one conversation straight after another doesn't bounce). */
+	private static int focusRelease;
+
 	public static void focus(int entityId) {
+		if (entityId < 0) {
+			if (focusId >= 0) focusRelease = 12;
+			return;
+		}
 		focusId = entityId;
+		focusRelease = 0;
 	}
 
 	/** The camera as last set (x, y, z, yaw, pitch), for putting things on screen over the world. */
@@ -83,6 +91,7 @@ public final class Adventure {
 	}
 
 	public static void tick(Minecraft mc) {
+		if (focusRelease > 0 && --focusRelease == 0) focusId = -1;
 		if (mc.player == null) {
 			on = false;
 			speed = 1;

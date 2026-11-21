@@ -255,8 +255,10 @@ public final class Scenes {
 	 */
 	public static final class ProfWalk {
 		// Behind him (further from you than he is), so he's always in front of them.
-		private static final Object[][] SPOTS = {{"pikachu", -0.95, -0.75, 0.35, 0.0}, {"cubone", -1.8, -1.2, 0.55, 0.0}, {"oddish", 0.85, -1.05, -0.1, 0.0},
-				{"clefairy", -1.55, -1.45, 0.2, 0.0}, {"pidgey", -0.55, -1.15, 0.4, 1.65}};
+		// (Each in a lane of its own, so none ever walks through another: the three who walk with him just behind him,
+		// the ones who stay further back, the one walking its loop right at the back, the parade's rows behind them all.)
+		private static final Object[][] SPOTS = {{"pikachu", -0.95, -0.6, 0.35, 0.0}, {"cubone", -1.8, -2.6, 0.55, 0.0}, {"oddish", 0.6, -1.85, -0.1, 0.0},
+				{"clefairy", -1.55, -1.25, 0.2, 0.0}, {"pidgey", -0.55, -1.15, 0.4, 1.65}};
 		private static final String[] ALL_PARADE = {"growlithe", "exeggutor", "psyduck", "ponyta", "jigglypuff", "onix", "meowth", "machoke", "vulpix", "snorlax", "butterfree",
 				"nidoking", "eevee", "lapras", "pidgeot"};
 		/** The parade: only ones with our own look when ours are showing (never one of theirs among ours). */
@@ -269,7 +271,7 @@ public final class Scenes {
 		private float nextCry = 2, cryAt = -9;
 		private int crier = -1;
 		private final java.util.Random rnd = new java.util.Random();
-		private final float end = 3.8F + Math.max(0, PARADE.length - 1) * 1.15F + 1.4F;
+		private final float end = 3.8F + Math.max(0, PARADE.length - 1) * 1.15F + 1.4F + 7.0F;
 
 		public void startWalk() {
 			walking = true;
@@ -316,7 +318,7 @@ public final class Scenes {
 				cam = new Cam().look(x, 2.35, 6.6, x, 0.62, 0.3);
 			}
 			// The long floor of light (40 by 9 blocks, its middle at x 8) in one piece, and the bright disc where he starts.
-			float[] f0 = cam.at(-12, 0, -4.3), f1 = cam.at(28, 0, -4.3), f2 = cam.at(28, 0, 4.7), f3 = cam.at(-12, 0, 4.7);
+			float[] f0 = cam.at(-12, 0, -4.3), f1 = cam.at(44, 0, -4.3), f2 = cam.at(44, 0, 4.7), f3 = cam.at(-12, 0, 4.7);
 			V.polySmooth(g, new float[] {f0[0], f0[1], f1[0], f1[1], f2[0], f2[1], f3[0], f3[1]}, 0x80DFF6F4);
 			disc(g, cam, 0, 0.005, 0, 2.0, 0x73FFFFFF);
 			Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
@@ -342,10 +344,11 @@ public final class Scenes {
 				double x = (double) SPOTS[i][1], z = (double) SPOTS[i][2], turn = (double) SPOTS[i][3], fly = (double) SPOTS[i][4];
 				double mx = x, my = fly > 0 ? fly + Math.sin(t * 2.2) * 0.12 : 0, mz = z, myaw = Math.PI + turn + Math.sin(t * 0.4 + x) * 0.15;
 				String pose = fly > 0 ? "fly" : null;
-				int with = sid.equals("pikachu") ? 0 : sid.equals("cubone") ? 1 : sid.equals("pidgey") ? 2 : -1;
+				int with = sid.equals("pikachu") ? 0 : sid.equals("clefairy") ? 1 : sid.equals("pidgey") ? 2 : -1;
 				if (walking && with >= 0) {
-					// Walking with him, behind him and to his left (so all of them end up off to the left of him).
-					double[][] off = {{-0.95, -0.8, 0}, {-1.85, -1.05, 0}, {-1.25, -1.15, 1.75}};
+					// Walking with him, behind him and to his left (so all of them end up off to the left of him), in
+					// their own lane, clear of the ones standing further back and of the parade.
+					double[][] off = {{-0.95, -0.6, 0}, {-1.85, -0.95, 0}, {-1.25, -1.15, 1.75}};
 					double tx = px + off[with][0], tz = off[with][1];
 					if (walkers[i] == null) walkers[i] = new double[] {x, z};
 					walkers[i][0] += (tx - walkers[i][0]) * Math.min(1, 0.05 * 3);
@@ -357,11 +360,11 @@ public final class Scenes {
 					my = off[with][2] > 0 ? off[with][2] + Math.sin(t * 2.4) * 0.12 : 0;
 					pose = off[with][2] > 0 ? "fly" : moving ? "walk" : null;
 				} else if (sid.equals("cubone")) {
-					// To and fro along the back, behind him and the others (never across in front of him).
+					// To and fro right at the back, behind him and all the others (never through any of them).
 					double a = t * 0.35;
 					mx = Math.cos(a) * 2.4;
-					mz = -1.75 + Math.sin(a) * 0.45;
-					myaw = Math.atan2(Math.sin(a) * 2.4, -Math.cos(a) * 0.45);
+					mz = -2.6 + Math.sin(a) * 0.2;
+					myaw = Math.atan2(Math.sin(a) * 2.4, -Math.cos(a) * 0.2);
 					pose = "walk";
 				}
 				// (The bone-helmet one has no look of ours yet: one of ours walks the loop instead.)
@@ -378,9 +381,9 @@ public final class Scenes {
 					BedrockModel.Def def = BedrockModel.def(sid);
 					if (def == null) continue;
 					// In three rows behind his path (little ones nearest, big ones at the back), the fliers above them.
-					double h = Math.max(0.3, def.height), big = h > 2.2 ? 2.2 / h : 1, x = 3.8 + i * 1.15, row = new double[] {-1.3, -2.15, -3.0}[i % 3];
+					double h = Math.max(0.3, def.height), big = h > 2.2 ? 2.2 / h : 1, x = 3.8 + i * 1.15, row = new double[] {-1.5, -2.35, -3.2}[i % 3];
 					boolean flyer = sid.equals("butterfree") || sid.equals("pidgeot");
-					double hh = h * big, z = flyer ? -1.6 : hh > 1.3 ? -3.0 : hh > 0.9 ? Math.min(row, -2.15) : row, fly = flyer ? 1.6 + Math.sin(t * 2.1 + x) * 0.14 : 0;
+					double hh = h * big, z = flyer ? -1.8 : hh > 1.3 ? -3.2 : hh > 0.9 ? Math.min(row, -2.35) : row, fly = flyer ? 1.6 + Math.sin(t * 2.1 + x) * 0.14 : 0;
 					double look = walking ? Math.max(-0.6, Math.min(0.6, (px - x) * 0.4)) : 0;
 					if (flyer) blob(g, cam, x + 0.17 * (fly + hh), z - 0.46 * (fly + hh), 0.35, 100);
 					Figures.Fig f = place(b, cam, null, sid, x, fly, z, Math.PI + (i % 3 - 1) * 0.35 - look, t + i * 0.37F).pose(flyer ? "fly" : null).cast(!flyer);
@@ -487,12 +490,18 @@ public final class Scenes {
 
 	/** A creature with no stand under it (the summary, Let's Go's STATS page), turning gently, framed by its size, side over. */
 	public static void modelBare(GuiGraphics g, float secs, String species, double side) {
+		modelBare(g, secs, species, side, false);
+	}
+
+	/** walk: it walks on the spot (the summary's, as the party's one does), turned a little towards you, not swinging. */
+	public static void modelBare(GuiGraphics g, float secs, String species, double side, boolean walk) {
 		BedrockModel.Def def = BedrockModel.def(species);
 		double h = Math.max(0.6, def == null ? 1 : def.height), l = Math.max(0.6, h), d = Math.max(Math.max(h * 3.1, l * 2.3), 3.8);
 		Cam cam = new Cam().look(side, h * 0.62 + d * 0.16, d, side, h * 0.5, 0);
 		blob(g, cam, 0, 0, Math.max(0.4, l * 0.4), 150);
 		Figures.Batch b = Figures.batch(V.bx, V.by, V.bx + V.gw, V.by + V.gh);
-		place(b, cam, null, species, 0, 0, 0, Math.PI + Math.sin(secs * 0.45) * 0.7, secs);
+		if (walk) place(b, cam, null, species, 0, 0, 0, Math.PI - 0.55, secs).pose("walk");
+		else place(b, cam, null, species, 0, 0, 0, Math.PI + Math.sin(secs * 0.45) * 0.7, secs);
 		b.draw(g);
 	}
 

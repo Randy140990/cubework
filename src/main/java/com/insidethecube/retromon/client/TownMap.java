@@ -93,8 +93,8 @@ public final class TownMap {
 	public static int[] view = {-2288, -48, -46, 1037}, all = {-2937, -48, -46, 1370};
 	private static boolean loaded;
 	private static CompletableFuture<Void> painting;
-	/** The whole world, small (a pixel for 4 by 4 blocks), for the zoomed-out map. */
-	public static final int OVER = 4;
+	/** The whole world, small (a pixel for 2 by 2 blocks: 4 by 4 looked blurred), for the zoomed-out map. */
+	public static final int OVER = 2;
 	private static int[] overArgb;
 	private static int overW, overH;
 	private static NativeImage overImage;

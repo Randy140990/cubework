@@ -458,7 +458,7 @@ function doormat(room, x0, x1, o = {}) {
   G.box(x0, 0, D - 2, x1, 0.03, D, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
   sunPool(room, x0 - 0.6, D - 3.6, x1 + 0.6, D);
   room.exitArrow = { x: (x0 + x1) / 2, z: D - 0.55 };
-  room.warps.push({ test: (p, input) => p.z > D - 1.0 && p.x > x0 && p.x < x1 && input.down, to: o.to, spawn: o.spawn, fx: "fadeOut", why: "out" });
+  if (!o.none) room.warps.push({ test: (p, input) => p.z > D - 1.0 && p.x > x0 && p.x < x1 && input.down, to: o.to, spawn: o.spawn, fx: "fadeOut", why: "out" });
   room.item("Door mat", o.mat ? "This place's own mat, in its colours. Walk off it, south, to go out." : "Coir mat with a stitched border. Walk off it, south, to go out.");
 }
 
@@ -467,7 +467,7 @@ function passageN(room, x0, x1, o = {}) {
   G.box(x0 - 0.15, 0, 0, x1 + 0.15, 2.6, 0.1, { s: o.frame || "walnut", all: null });
   G.box(x0, 0, 0.1, x1, 2.4, 0.11, { s: "doorDark", all: null });
   G.box(x0, 0, 0.11, x1, 0.03, 2, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
-  room.warps.push({ test: (p, input) => p.z < 1.0 && p.x > x0 && p.x < x1 && input.up, to: o.to, spawn: o.spawn, fx: "fade", why: "north" });
+  if (!o.none) room.warps.push({ test: (p, input) => p.z < 1.0 && p.x > x0 && p.x < x1 && input.up, to: o.to, spawn: o.spawn, fx: "fade", why: "north" });
   room.item("Way through", "An open doorway in the north wall, a mat at its foot. Walk north through it.");
 }
 function wildGrass(room, x0, z0, x1, z1) {

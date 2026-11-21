@@ -424,7 +424,7 @@ screen("battle", "Battle", "Battle: commands and moves", {
   make() {
     const C = ctl(), S = SC.battle; C.sayAt = { x: 520, w: 724 };
     const ours = Object.assign({}, G.party[0]), foe = { sid: "spearow", lv: 17, gender: "M", status: "" }; foe.maxhp = statsAt("spearow", 17).HP; foe.hp = foe.maxhp;
-    const P1 = plate("ours", ours, { balls: G.party.map(p => p.status !== "FNT") }), P2 = plate("foe", foe, { balls: [1, 1] });
+    const P1 = plate("ours", ours, { balls: G.party.map(p => p.status !== "FNT") }), P2 = plate("foe", foe);
     const turn = async mi => {
       const n = ours.moves[mi], m = MOVE[n] || {}, e = eff(m.type, foe.sid);
       await C.say([{ text: `**${ourName(ours.sid)}** used **${n}**!` }], { keep: true });

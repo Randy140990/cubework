@@ -40,6 +40,9 @@ void main() {
     vec2 d = texcoord - 0.5;
     c *= 1.0 - VIGNETTE * smoothstep(0.18, 0.75, dot(d, d) * 2.0);
     c = pow(c, vec3(1.0 / 2.2));
+    // The darks lifted a touch (shade reads soft, not black), the brights left alone.
+    float ls = dot(c, vec3(0.2126, 0.7152, 0.0722));
+    c += LIFT * (1.0 - smoothstep(0.0, 0.6, ls)) * (vec3(0.92, 0.96, 1.0) - c * 0.5);
     // A whisper of noise, so the night sky's gradient doesn't band.
     float n = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
     c += (n - 0.5) / 255.0;

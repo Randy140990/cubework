@@ -458,7 +458,8 @@ public class TownMapScreen extends DeviceScreen {
 			int x0 = (int) Math.round((r.rx * TownMap.R - wx0) * k) + clipX0, y0 = (int) Math.round((r.rz * TownMap.R - wz0) * k) + clipY0;
 			int x1 = (int) Math.round(((r.rx + 1) * TownMap.R - wx0) * k) + clipX0, y1 = (int) Math.round(((r.rz + 1) * TownMap.R - wz0) * k) + clipY0;
 			if (x1 < clipX0 || y1 < clipY0 || x0 > clipX1 || y0 > clipY1) continue;
-			if (k < 1.5) Ui.blitSmooth(g, tex, x0, y0, x1, y1, 0, 1, 0, 1, 0xFFFFFFFF);
+			// Smoothed only when it's drawn smaller than a pixel a block; at a pixel a block or more, sharp (it blurred).
+			if (k < 0.95) Ui.blitSmooth(g, tex, x0, y0, x1, y1, 0, 1, 0, 1, 0xFFFFFFFF);
 			else g.blit(RenderPipelines.GUI_TEXTURED, tex, x0, y0, 0, 0, x1 - x0, y1 - y0, TownMap.R, TownMap.R, TownMap.R, TownMap.R);
 		}
 	}
@@ -584,7 +585,8 @@ public class TownMapScreen extends DeviceScreen {
 			float x = sx(p.x()), y = sy(p.z());
 			if (x < MX - 40 || y < MY - 40 || x > MX + VW + 40 || y > MY + VH + 40) continue;
 			boolean on = i == sel, town = p.kind().equals("town"), seen = been(p.key());
-			float r = (town ? 10 : 7.5F) + (zi >= 2 ? 2 : 0) + (on ? 1.5F : 0);
+			// (Smaller zoomed right out, so they don't crowd the map; bigger as you zoom in.)
+			float r = (town ? new float[] {6.5F, 8.5F, 10, 12}[Math.min(3, zi)] : new float[] {4.5F, 6, 7.5F, 9.5F}[Math.min(3, zi)]) + (on ? 1.5F : 0);
 			if (highlight.contains(p.key())) {
 				V.glow(g, x, y, r + 16, r + 16, Ui.alpha(0xFFFFD34A, 0.55F + 0.3F * pulse));
 				circle(g, x, y, r + 6, 2.5F, Ui.alpha(0xFFFFD34A, 0.8F));
@@ -600,7 +602,7 @@ public class TownMapScreen extends DeviceScreen {
 		spots.sort((a, b) -> a.on() != b.on() ? (a.on() ? -1 : 1) : a.town() != b.town() ? (a.town() ? -1 : 1) : 0);
 		for (Spot q : spots) {
 			boolean big = q.town() || q.on();
-			float size = big ? 13 : 10.5F, w = V.width(q.p().name(), size, true) + 12, hh = big ? 21 : 16, x = q.sx() - w / 2, y = q.sy() + q.r() + 3;
+			float size = (big ? 13 : 10.5F) * (zi == 0 ? 0.88F : 1), w = V.width(q.p().name(), size, true) + 12, hh = (big ? 21 : 16) * (zi == 0 ? 0.88F : 1), x = q.sx() - w / 2, y = q.sy() + q.r() + 3;
 			boolean clash = false;
 			for (float[] b : taken) if (x < b[0] + b[2] && x + w > b[0] && y < b[1] + b[3] && y + hh > b[1]) clash = true;
 			if (clash && !q.on()) continue;

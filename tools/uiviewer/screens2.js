@@ -20,13 +20,18 @@ screen("hud", "In the world", "The HUD", {
     const keys = () => { const e = $("#hkeys"); if (e) e.remove(); const k = hints([["SPACE", "Talk"], ["E", "Menu"], ["TAB", `Speed x${spd}`]]); k.id = "hkeys"; };
     keys();
     const banner = () => {
-      // The place's name popping up in the middle, as the place pill is drawn but big: a pearly-rimmed white pill,
-      // the sunny dot, the name, the town's line in coral under it.
-      const b = box(0, 172, null, null, "g-panel g-pop", `<div style="display:flex;align-items:center;gap:18px;padding:18px 40px 20px 26px"><span style="flex:none;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 5px #FFE9A0"></span>
-        <div><div class="g-title" style="font-size:48px;letter-spacing:3px;color:#26304A;line-height:1.1;white-space:nowrap">${esc(G.place)}</div><div style="font-size:20px;font-weight:800;color:#E5525C;white-space:nowrap">A quiet start to a long road.</div></div></div>`);
-      b.style.left = "50%"; b.style.marginLeft = "0"; b.style.borderRadius = "999px"; b.style.translate = "-50% 0";
-      later(3200, () => { b.style.transition = "opacity .6s"; b.style.opacity = 0; });
-      later(4000, () => b.remove());
+      // The place's name in the middle near the top, with nothing behind it: big white letters with a dark edge and
+      // a soft shadow, a sunny dot between two gold rules under them, the town's line in cream. It drifts down as it
+      // fades in, holds, then fades away as it lifts.
+      const b = box(0, 150, null, null, "", `<div style="text-align:center;opacity:0;transform:translateY(-16px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.3,1)">
+        <div class="g-title" style="font-size:52px;letter-spacing:6px;color:#fff;line-height:1.1;white-space:nowrap;text-shadow:-2px 0 0 #203050,2px 0 0 #203050,0 -2px 0 #203050,0 2px 0 #203050,-1.5px -1.5px 0 #203050,1.5px -1.5px 0 #203050,-1.5px 1.5px 0 #203050,1.5px 1.5px 0 #203050,0 6px 18px rgba(14,24,48,.55)">${esc(G.place)}</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 6px"><span style="width:76px;height:3px;border-radius:2px;background:linear-gradient(90deg,rgba(255,210,90,0),#FFD25A);box-shadow:0 1px 0 rgba(32,48,80,.5)"></span><span style="width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF3A6,#FFC93C);box-shadow:0 0 0 4px rgba(255,233,160,.6),0 1px 2px rgba(32,48,80,.6)"></span><span style="width:76px;height:3px;border-radius:2px;background:linear-gradient(90deg,#FFD25A,rgba(255,210,90,0));box-shadow:0 1px 0 rgba(32,48,80,.5)"></span></div>
+        <div style="font-size:20px;font-weight:800;color:#FFF4DC;white-space:nowrap;text-shadow:-1px 0 0 #203050,1px 0 0 #203050,0 -1px 0 #203050,0 1px 0 #203050,0 3px 10px rgba(14,24,48,.6)">A quiet start to a long road.</div></div>`);
+      b.style.left = "50%"; b.style.marginLeft = "0"; b.style.translate = "-50% 0";
+      const words = b.firstElementChild;
+      requestAnimationFrame(() => requestAnimationFrame(() => { words.style.opacity = 1; words.style.transform = "none"; }));
+      later(3200, () => { words.style.opacity = 0; words.style.transform = "translateY(-10px)"; });
+      later(4100, () => b.remove());
     };
     const toast = (icon, text) => {
       const t = box(0, 96, null, null, "g-panel g-pop", `<div style="display:flex;align-items:center;gap:12px;padding:10px 22px 10px 12px;font-size:20px;font-weight:900"><span style="width:34px;height:34px">${icon}</span>${esc(T(text))}</div>`);
@@ -349,7 +354,7 @@ function statStamp(st, lv) {
     ${[0, 1, 2].map(k => `<path d="M${108 + k * 22} 158l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="${k < stars ? "#FFE04A" : "rgba(255,255,255,.4)"}"/>`).join("")}</svg>`;
 }
 screen("summary", "Menus", "Summary", {
-  scene: "model", sceneOpts: () => ({ sid: G.party[0].sid, ox: 1.05, stand: false }),
+  scene: "model", sceneOpts: () => ({ sid: G.party[0].sid, ox: 1.05, stand: false, walk: true }),
   what: "One of your team in full, as Let's Go's STATS page: it stands on its own backdrop (its type's colours, a great soft swirl of light, blurred light, and its own drifting things: embers, bubbles, leaves, sparks), the judge's stamp top left, its six stats as a lime hexagon with a word for each, and its name plate bottom right. INFO and MOVES are the other pages.",
   mod: "MenuScreen's SUMMARY: ATTACK, DEFENSE, SPCL.ATK, SPCL.DEF, SPEED.",
   tags: ["New look: Let's Go's STATS", "Each creature's own backdrop"], try: ["Tab, or left and right, for the next page. Up and down for the next of your team (on MOVES, up and down go through its moves)."],
@@ -525,7 +530,7 @@ screen("map", "Menus", "Town Map", {
       const spots = [];
       P.forEach((p, i) => {
         const [sx, sy] = toScreen(p.x, p.z); if (sx < -40 || sy < -40 || sx > VW + 40 || sy > VH + 40) return;
-        const on = i === sel, been = BEEN.includes(p.key), town = p.kind === "town", r = (town ? 10 : 7.5) + (zi >= 2 ? 2 : 0) + (on ? 1.5 : 0);
+        const on = i === sel, been = BEEN.includes(p.key), town = p.kind === "town", r = (town ? [6.5, 8.5, 10, 12][Math.min(3, zi)] : [4.5, 6, 7.5, 9.5][Math.min(3, zi)]) + (on ? 1.5 : 0);
         if (on) { ctx.beginPath(); ctx.arc(sx, sy, r + 9 + pulse * 5, 0, 7); ctx.strokeStyle = `rgba(255,212,90,${0.9 - pulse * 0.5})`; ctx.lineWidth = 3; ctx.stroke(); }
         if (town) sq(sx, sy, r, on ? "#FFD45A" : been ? "#E5525C" : "#B9C4C0", "#FFFFFF", 3);
         else sq(sx, sy, r, on ? "#FFD45A" : "#FFFFFF", p.kind === "spot" ? "#8F60DE" : "#E5525C", 2.5);
@@ -537,7 +542,7 @@ screen("map", "Menus", "Town Map", {
       const taken = [], fits = (x, y, w, hh) => !taken.some(b => x < b[0] + b[2] && x + w > b[0] && y < b[1] + b[3] && y + hh > b[1]);
       spots.sort((a, b) => (b.on - a.on) || (b.town - a.town));
       for (const q of spots) {
-        const big = q.town || q.on; ctx.font = `900 ${big ? 13 : 10.5}px Nunito, system-ui, sans-serif`;
+        const big = q.town || q.on, sz = zi === 0 ? 0.88 : 1; ctx.font = `900 ${(big ? 13 : 10.5) * sz}px Nunito, system-ui, sans-serif`;
         const w = ctx.measureText(q.p.name).width + 12, hh = big ? 21 : 16, x = q.sx - w / 2, y = q.sy + q.r + 3;
         if (!q.on && !editing && !fits(x, y, w, hh)) continue;
         taken.push([x, y, w, hh]); label(q.p.name, q.sx, y, big);

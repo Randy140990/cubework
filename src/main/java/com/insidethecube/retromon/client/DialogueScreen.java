@@ -37,6 +37,7 @@ public class DialogueScreen extends GameScreen {
 
 	/** Something got, for the card held up: its name, how many, a badge (0 to 7, -1 for none), and whether it's going into the bag now. */
 	private record Get(String name, int n, int badge, boolean away) {}
+	private static final java.util.regex.Pattern DELIVERED = java.util.regex.Pattern.compile("\\bdelivered (?:the )?([^.!]+)[.!]");
 
 	/** Line numbers (as shown) to what was got on them. */
 	private final java.util.Map<Integer, Get> gets = new java.util.HashMap<>();
@@ -110,6 +111,12 @@ public class DialogueScreen extends GameScreen {
 				gets.put(at + 1, new Get(null, 1, b, true));
 				continue;
 			}
+			// Handing something over ("delivered OAK's PARCEL."): its card held up as it goes.
+			java.util.regex.Matcher dm = DELIVERED.matcher(l.replace("**", ""));
+			if (dm.find() && findItem(dm.group(1)) != null) {
+				gets.put(at, new Get(findItem(dm.group(1)).name(), 1, -1, false));
+				continue;
+			}
 			Get it = itemGet(l);
 			if (it != null && !someoneElse(whoNow, l)) {
 				gets.put(at, it);
@@ -140,11 +147,47 @@ public class DialogueScreen extends GameScreen {
 		if (!cry.isEmpty()) Sounds.cry(cry, 1F);
 		// The camera closes in on the two of you, and the black bars come in, as in a cutscene.
 		Adventure.focus(npc);
+		// You turn to face whoever you're talking to (the clerk who calls you over, say), not stay looking away.
+		faceTalker(npc);
+	}
+
+	/** Turns you to face someone (by entity), as you would to talk to them. */
+	static void faceTalker(int id) {
+		net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+		if (id < 0 || mc.level == null || mc.player == null) return;
+		net.minecraft.world.entity.Entity who = mc.level.getEntity(id);
+		if (who == null || who == mc.player) return;
+		double dx = who.getX() - mc.player.getX(), dz = who.getZ() - mc.player.getZ();
+		if (dx * dx + dz * dz < 0.01) return;
+		float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+		mc.player.setYRot(yaw);
+		mc.player.yRotO = yaw;
+		mc.player.setYHeadRot(yaw);
+		mc.player.yHeadRotO = yaw;
+		mc.player.yBodyRot = yaw;
+		mc.player.yBodyRotO = yaw;
+	}
+
+	/** The balls on the nurse's machine: the real 3D ones (as the lab's), in the world, while it works. */
+	private final java.util.List<com.insidethecube.retromon.game.MonDisplay> healBalls = new java.util.ArrayList<>();
+
+	private void dropHealBalls() {
+		for (com.insidethecube.retromon.game.MonDisplay b : healBalls) BattleScene.removeLoose(b);
+		healBalls.clear();
+	}
+
+	@Override
+	public void removed() {
+		dropHealBalls();
+		super.removed();
 	}
 
 	private boolean asks() {
-		return mode.equals("heal") || mode.equals("gift") || mode.equals("trade");
+		return mode.equals("heal") || mode.equals("gift") || mode.equals("trade") || mode.equals("quiz");
 	}
+
+	/** Whether YES or NO was picked (not closed with B). */
+	private boolean answered;
 
 	@Override
 	public void tick() {
@@ -162,6 +205,7 @@ public class DialogueScreen extends GameScreen {
 
 		if (healing() && ticks - healAt >= HEAL_TICKS) {
 			healAt = -2;
+			dropHealBalls();
 			if (box.press()) done(false);
 		}
 	}
@@ -185,6 +229,7 @@ public class DialogueScreen extends GameScreen {
 			if (yesNo.key(e)) return true;
 			if (Ui.isA(e)) {
 				Sounds.select();
+				answered = true;
 				done(yesNo.at == 0);
 			} else if (Ui.isB(e)) done(false);
 			return true;
@@ -216,6 +261,8 @@ public class DialogueScreen extends GameScreen {
 		t.putInt("npc", npc);
 		t.putString("mode", mode);
 		t.putBoolean("yes", yes);
+		// (A choice actually made, YES or NO, not just closed: the teacher's question needs to know.)
+		if (answered) t.putBoolean("answered", true);
 		if (trainer != null) t.putString("trainer", trainer);
 		ClientPlayNetworking.send(new Net.Act("dialogue_done", t));
 		// A badge won: its notice on the HUD, where it sits among the eight.
@@ -257,7 +304,10 @@ public class DialogueScreen extends GameScreen {
 		}
 		if (yesNo != null) {
 			float w = 300;
-			vchoice(g, yesNo, V.W - 140 - w, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), w, i -> done(i == 0));
+			vchoice(g, yesNo, V.W - 140 - w, V.H - 26 - 150 - V.choiceHeight(yesNo.options.size()), w, i -> {
+				answered = true;
+				done(i == 0);
+			});
 		}
 	}
 
@@ -309,16 +359,30 @@ public class DialogueScreen extends GameScreen {
 				pz = hz + (sz - hz) * a;
 			}
 			net.minecraft.world.phys.Vec3 at = n.add(px, py, pz);
+			while (healBalls.size() <= i) {
+				com.insidethecube.retromon.game.MonDisplay b = BattleScene.looseBall(at);
+				if (b == null) break;
+				healBalls.add(b);
+			}
+			if (i < healBalls.size()) {
+				// (Its model sits on its base: down by its half height so it's where the picture's middle was.)
+				com.insidethecube.retromon.game.MonDisplay b = healBalls.get(i);
+				b.setPos(at.x, at.y - 0.12, at.z);
+				b.xo = b.xOld = at.x;
+				b.yo = b.yOld = at.y - 0.12;
+				b.zo = b.zOld = at.z;
+				b.size = b.sizeOld = b.sizeTarget = 1;
+			}
 			float[] c = Adventure.project(at, w, gh), top = Adventure.project(at.add(0, 0.15, 0), w, gh);
 			if (c == null || top == null) continue;
 			float r = Math.max(2, Math.abs(c[1] - top[1]));
 			boolean lit = h > 0.4F && h < 0.78F && Math.sin(secs * 14 + i * 1.3) > 0;
-			if (lit) Ui.glow(g, Math.round(c[0]), Math.round(c[1]), Math.round(r * 2.4F), Math.round(r * 2.4F), 0xB3FF8FA8);
-			g.pose().pushMatrix();
-			g.pose().translate(c[0] - r, c[1] - r);
-			g.pose().scale(2 * r / 128F, 2 * r / 128F);
-			g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, V.tex("ball_pok_ball"), 0, 0, 0, 0, 128, 128, 128, 128);
-			g.pose().popMatrix();
+			if (lit) Ui.glow(g, Math.round(c[0]), Math.round(c[1]), Math.round(r * 2.4F), Math.round(r * 2.4F), 0x8CFF8FA8);
+		}
+		// Ones not on their way yet, or back with her: out of sight.
+		for (int i = 0; i < healBalls.size(); i++) {
+			float on0 = i * 0.06F, back = ease((h - 0.78F - i * 0.02F) / 0.12F);
+			if (h <= on0 || back >= 1) healBalls.get(i).size = healBalls.get(i).sizeOld = healBalls.get(i).sizeTarget = 0;
 		}
 	}
 

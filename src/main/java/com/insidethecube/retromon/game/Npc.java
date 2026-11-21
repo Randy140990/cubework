@@ -145,6 +145,11 @@ public class Npc extends PathfinderMob {
 			discard();
 			return;
 		}
+		// TEAM ROCKET in Viridian, left over in a save: gone too.
+		if ((key().equals("rocket_viridian") || key().equals("rocket_james")) && !Game.rocketKnown(this)) {
+			discard();
+			return;
+		}
 		if (!settled) settled = Game.settle(this);
 		if (home == null) {
 			home = blockPosition();

@@ -16,9 +16,9 @@ from PIL import Image
 EPS = 1e-6
 SKIP = {"aoN", "aoW", "aoE", "deep", "sunPool", "shadowBlob"}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
-          "mart": (384, 64, 0), "trainer1": (448, 64, 0), "trainer2": (512, 64, 0), "gate_s": (576, 64, 0), "forest": (640, 64, 0), "gate_n": (704, 64, 0)}
+          "mart": (384, 64, 0), "school": (448, 64, 0), "trainer2": (512, 64, 0), "gate_s": (576, 64, 0), "nickhouse": (640, 64, 0), "gate_n": (704, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
-         "mart": "viridian_city", "trainer1": "viridian_city", "trainer2": "viridian_city", "gate_s": "route_2", "forest": "viridian_forest", "gate_n": "route_2"}
+         "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -27,21 +27,23 @@ DOORS = {
     # Viridian City: the Pokémon Center (red roof) and the Poké Mart (blue roof), their open doorways 3 wide.
     "viridian_center": {"room": "center", "door": [[-787, 26, 557], [-786, 26, 557], [-785, 26, 557]], "out": [-785.5, 26.0, 558.6]},
     "viridian_mart": {"room": "mart", "door": [[-767, 26, 543], [-766, 26, 543], [-765, 26, 543]], "out": [-765.5, 26.0, 544.6]},
-    # Viridian's Trainer House (the orange roof north of the Mart): its door a dark column of deepslate tiles.
-    "trainer_house": {"room": "trainer1", "door": [[-767, 26, 526]], "out": [-766.5, 26.0, 527.8]},
+    # Viridian's two green-roofed buildings (warped doors, 2 wide, set back under a porch): the Trainer School just
+    # above the Center (the Trainer House's battle room under it), and the house above that.
+    "viridian_school": {"room": "school", "door": [[-788, 26, 542], [-787, 26, 542]], "out": [-787.0, 26.0, 543.8]},
+    "viridian_house": {"room": "nickhouse", "door": [[-788, 26, 528], [-787, 26, 528]], "out": [-787.0, 26.0, 529.8]},
     # Route 2's gates into Viridian Forest: the south one's way in (its south side), the north one's (its north side,
     # so you come out facing north).
     "forest_south": {"room": "gate_s", "door": [[x, 27, 446] for x in range(-805, -799)], "out": [-802.5, 27.0, 449.8]},
     "forest_north": {"room": "gate_n", "door": [[x, 30, 374] for x in range(-805, -799)], "out": [-802.5, 30.0, 370.2], "face": "n", "yaw": 180.0},
 }
-MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart", "trainer1": "trainer_house", "gate_s": "forest_south"}
+MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart", "school": "viridian_school", "nickhouse": "viridian_house", "gate_s": "forest_south"}
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).
 # (On the mat's inner half: the mats are two deep, and you're out once you're past their middle.)
 ENTRY = {"house1": {"x": 6.0, "z": 12.5, "yaw": 180.0}, "rival1": {"x": 6.0, "z": 12.5, "yaw": 180.0}, "lab": {"x": 9.0, "z": 18.5, "yaw": 180.0},
-         "center": {"x": 10.0, "z": 14.5, "yaw": 180.0}, "mart": {"x": 8.0, "z": 12.5, "yaw": 180.0}, "trainer1": {"x": 8.0, "z": 12.5, "yaw": 180.0},
-         "gate_s": {"x": 7.0, "z": 8.5, "yaw": 180.0}, "gate_n": {"x": 7.0, "z": 2.6, "yaw": 0.0}}
+         "center": {"x": 10.0, "z": 14.5, "yaw": 180.0}, "mart": {"x": 8.0, "z": 12.5, "yaw": 180.0}, "school": {"x": 7.0, "z": 9.5, "yaw": 180.0},
+         "nickhouse": {"x": 6.0, "z": 8.5, "yaw": 180.0}, "gate_s": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "gate_n": {"x": 7.0, "z": 2.6, "yaw": 0.0}}
 START = {"room": "house2", "x": 4.2, "z": 9.5, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {

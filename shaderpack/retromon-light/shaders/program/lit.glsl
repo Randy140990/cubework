@@ -12,12 +12,15 @@
 #ifdef WAVING_PROGRAM
 #include "/lib/wave.glsl"
 #endif
-#ifdef WATER_PROGRAM
-#include "/lib/water.glsl"
 #ifndef WAVING_PROGRAM
 uniform float frameTimeCounter;
 uniform vec3 cameraPosition;
 #endif
+#ifdef WATER_PROGRAM
+#include "/lib/water.glsl"
+#endif
+#ifndef INSIDE
+#include "/lib/clouds.glsl"
 #endif
 
 uniform sampler2D gtexture;
@@ -119,6 +122,11 @@ void main() {
     float sunlit = sunlight(playerPos, nPlayer, NdotL);
     #else
     float sunlit = NdotL;
+    #endif
+    #ifndef CLOUDS
+    // Under a passing cloud, less sun (its shadow drifting over the land).
+    vec3 cloudAt = (gbufferModelViewInverse * vec4(viewPos, 1.0)).xyz + cameraPosition;
+    sunlit *= cloudShadow(cloudAt.xz, frameTimeCounter);
     #endif
     vec3 skyPart, lampPart;
     worldLight(n, lm, sunlit, skyPart, lampPart);

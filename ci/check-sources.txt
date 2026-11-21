@@ -13,3 +13,6 @@ net/minecraft/client/gui/render/TextureSetup.java
 net/minecraft/client/gui/navigation/ScreenRectangle.java
 net/minecraft/client/gui/render/state/ScreenArea.java
 net/minecraft/client/gui/render/pip/PictureInPictureRenderer.java
+net/minecraft/client/gui/screens/LevelLoadingScreen.java
+net/minecraft/client/gui/screens/GenericMessageScreen.java
+grep reloading|preparing|Preparing net/minecraft/client/Minecraft.java

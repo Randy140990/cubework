@@ -880,7 +880,7 @@ public class MenuScreen extends DeviceScreen {
 		Species sp = mon.species;
 		float secs = (ticks + Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true)) / 20F;
 		Scenes.typeBg(g, sp.type1(), false);
-		Scenes.modelBare(g, secs, sp.id(), 1.05);
+		Scenes.modelBare(g, secs, sp.id(), 1.05, true);
 		int tc = Ui.typeColor(sp.type1()) | 0xFF000000;
 		// A soft shade down the right on INFO and MOVES, so white and lime read on any backdrop.
 		if (summaryPage != 1) {

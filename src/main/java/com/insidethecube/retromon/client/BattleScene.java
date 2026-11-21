@@ -149,7 +149,9 @@ public final class BattleScene {
 		Vec3 f = them.subtract(you).multiply(1, 0, 1);
 		if (f.lengthSqr() < 0.25) f = look.lengthSqr() < 1e-4 ? new Vec3(0, 0, -1) : look;
 		double dist = f.length();
-		f = roomAxis(you.lerp(them, 0.5), f.normalize(), Math.max(1.7, dist / 2 - 1.0));
+		// Looking into the room, towards its back wall (the professor's end of the lab), never out through the door
+		// at the black outside: the rooms are open to the south for the camera.
+		f = roomAxis(you.lerp(them, 0.5), new Vec3(0, 0, -1), Math.max(1.7, dist / 2 - 1.0));
 		axBack = f.scale(-1);
 		axRight = new Vec3(-f.z, 0, f.x);
 		Vec3 mid = you.lerp(them, 0.5);
@@ -191,6 +193,7 @@ public final class BattleScene {
 			score += Math.min(behind - half, 6.5) * 2 + Math.min(ahead, 9) * 0.5;
 			// Rather the way you were facing them, turned as little as can be.
 			score -= Math.min(i, 8 - i) * 1.2;
+			if (d.z > 0.3) score -= 60;
 			if (score > bestScore) {
 				bestScore = score;
 				best = d;
@@ -334,6 +337,24 @@ public final class BattleScene {
 		if (n == null) return otherwise;
 		double yaw = Math.toRadians(n.getYRot());
 		return n.position().add(-Math.cos(yaw) * 0.4 - Math.sin(yaw) * 0.3, 1.45, -Math.sin(yaw) * 0.4 + Math.cos(yaw) * 0.3);
+	}
+
+	/** A Poké Ball on its own in the world, out of a battle (the nurse's machine): moved by whoever asked; removeLoose when done. */
+	public static MonDisplay looseBall(Vec3 p) {
+		ClientLevel lv = net.minecraft.client.Minecraft.getInstance().level;
+		if (lv == null) return null;
+		MonDisplay b = new MonDisplay(Retromon.MON_DISPLAY, lv);
+		b.setId(nextId--);
+		b.snapTo(p.x, p.y, p.z, 0, 0);
+		b.species = "poke_ball";
+		b.texture = Retromon.ID + ":textures/pokemon/ball_poke_ball.png";
+		b.size = b.sizeOld = b.sizeTarget = 1;
+		lv.addEntity(b);
+		return b;
+	}
+
+	public static void removeLoose(MonDisplay b) {
+		if (b != null && b.level() instanceof ClientLevel lv) lv.removeEntity(b.getId(), Entity.RemovalReason.DISCARDED);
 	}
 
 	private static MonDisplay ballAt(Vec3 p, String item) {

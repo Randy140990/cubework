@@ -512,7 +512,8 @@ public class BattleScreen extends GameScreen {
 	private void close() {
 		current = null;
 		BattleScene.end();
-		ClientPlayNetworking.send(new Net.Act("battle_closed", new CompoundTag()));
+		// (Said to the server once the nickname, new moves and evolving that follow are done too.)
+		ClientState.battleClosing();
 		Music.resumePlace();
 		if (minecraft != null && minecraft.screen == this) minecraft.setScreen(null);
 	}
@@ -1101,9 +1102,9 @@ public class BattleScreen extends GameScreen {
 			V.pill(g, px + 42, ey + 1, w - 44 - 42, 7, 0xFF0B2A2C);
 			if (ef > 0) V.pill(g, px + 42, ey + 1, Math.max(7, (w - 44 - 42) * ef), 7, 0xFF6FC3FF);
 		}
-		// The party's balls above the plate: one for each (grey if it's fainted).
-		List<Mon> party = ours ? mine : theirs;
-		if (!ours && kind.equals("WILD")) return;
+		// Your party's balls above your plate: one for each (grey if it's fainted). Only on yours (not theirs as well).
+		List<Mon> party = mine;
+		if (!ours) return;
 		for (int i = 0; i < party.size() && i < 6; i++) {
 			float bx = ours ? x + 18 + i * 26 : x + w - 18 - 22 - i * 26;
 			V.icon(g, "icon_ball", bx, y - 30, 22, party.get(i).fainted() ? 0x73808890 : 0xFFFFFFFF);
