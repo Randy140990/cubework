@@ -37,9 +37,10 @@ public class LensClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 			// Only in a world (not on the title screen or the world list).
 			boolean inGame = mc.level != null && mc.player != null;
-			while (RECORD.consumeClick()) if (inGame) Recorder.toggle();
-			while (PHOTO.consumeClick()) if (inGame) Photo.take();
-			while (PAUSE.consumeClick()) if (inGame) Recorder.togglePause();
+			// One press, one action: a key held down repeats, which would start and then stop at once.
+			if (pressed(RECORD, 0) && inGame) Recorder.toggle();
+			if (pressed(PHOTO, 1) && inGame) Photo.take();
+			if (pressed(PAUSE, 2) && inGame) Recorder.togglePause();
 			while (MENU.consumeClick()) mc.setScreen(new LensScreen(mc.screen, null));
 			if (!inGame && Recorder.recording()) Recorder.stop("Stopped and saved: you left the world");
 			GameSound.tick();
@@ -67,6 +68,23 @@ public class LensClient implements ClientModInitializer {
 		ClientLifecycleEvents.CLIENT_STOPPING.register(mc -> Recorder.onShutdown());
 	}
 
+	/** When each of our keys last did something (record, photo, pause). */
+	private static final long[] LAST = new long[3];
+
+	/** True once per press: the key's clicks this tick are taken, and repeats within a second are ignored. */
+	private static boolean pressed(KeyMapping key, int which) {
+		boolean clicked = false;
+		while (key.consumeClick()) clicked = true;
+		return clicked && fresh(which);
+	}
+
+	private static boolean fresh(int which) {
+		long now = System.currentTimeMillis();
+		if (now - LAST[which] < 1000) return false;
+		LAST[which] = now;
+		return true;
+	}
+
 	/** A short sound you hear (never in the video): higher to start, lower to stop, a click for a photo. */
 	public static void cue(float pitch) {
 		try {
@@ -86,15 +104,15 @@ public class LensClient implements ClientModInitializer {
 				|| key == GLFW.GLFW_KEY_SCROLL_LOCK;
 		if (!functionKey) return false;
 		if (RECORD.matches(e)) {
-			Recorder.toggle();
+			if (fresh(0)) Recorder.toggle();
 			return true;
 		}
 		if (PHOTO.matches(e)) {
-			Photo.take();
+			if (fresh(1)) Photo.take();
 			return true;
 		}
 		if (PAUSE.matches(e)) {
-			Recorder.togglePause();
+			if (fresh(2)) Recorder.togglePause();
 			return true;
 		}
 		return false;
