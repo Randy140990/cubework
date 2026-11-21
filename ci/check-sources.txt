@@ -1,0 +1,39 @@
+com/mojang/blaze3d/platform/Window.java
+com/mojang/blaze3d/pipeline/RenderTarget.java
+com/mojang/blaze3d/pipeline/MainTarget.java
+com/mojang/blaze3d/opengl/GlCommandEncoder.java
+com/mojang/blaze3d/systems/CommandEncoder.java
+com/mojang/blaze3d/systems/GpuDevice.java
+com/mojang/blaze3d/TracyFrameCapture.java
+com/mojang/blaze3d/buffers/GpuBuffer.java
+com/mojang/blaze3d/textures/GpuTexture.java
+com/mojang/blaze3d/opengl/GlTexture.java
+com/mojang/blaze3d/opengl/DirectStateAccess.java
+grep (_glBindFramebuffer|_glBlitFrameBuffer|_viewport|_glGenFramebuffers|_glDeleteFramebuffers|_glFramebufferTexture2D|_disableScissorTest|_enableScissorTest|_readPixels|_bindTexture) com/mojang/blaze3d/opengl/GlStateManager.java
+grep (queueFencedTask|getDevice|flipFrame|executePendingTasks|public\sstatic\s.*Fence|isOnRenderThread) com/mojang/blaze3d/systems/RenderSystem.java
+net/minecraft/client/Screenshot.java
+grep (resizeDisplay|blitToScreen|void\srunTick|getMainRenderTarget|isPaused|public\svoid\ssetScreen|getWindow\(|gameDirectory|getSoundManager|public\sfinal\sOptions|getToastManager|gameRenderer\.render|noRender|getFps|public\sboolean\sisWindowActive|levelRenderer|mainRenderTarget) net/minecraft/client/Minecraft.java
+grep (public\svoid\srender|renderLevel|public\svoid\sresize|getMainCamera|renderItemInHand|guiRenderer|processBlurEffect|void\srender\() net/minecraft/client/renderer/GameRenderer.java
+grep (getGuiScaledWidth|getScreenWidth|getWidth|getGuiScale|xpos|ypos) net/minecraft/client/MouseHandler.java
+grep (getGuiScale|scissor|Scissor|getWidth\(|getHeight\(|getGuiScaled) net/minecraft/client/gui/render/GuiRenderer.java
+net/minecraft/client/sounds/SoundEngine.java
+grep (public\s) net/minecraft/client/sounds/SoundManager.java
+net/minecraft/client/resources/sounds/SoundInstance.java
+net/minecraft/client/resources/sounds/Sound.java
+net/minecraft/client/resources/sounds/TickableSoundInstance.java
+net/minecraft/client/gui/screens/Screen.java
+grep (createPauseMenu|addRenderableWidget|GridLayout|Button\.builder|class\s|onDisconnect|showPauseMenu) net/minecraft/client/gui/screens/PauseScreen.java
+net/minecraft/client/gui/components/events/GuiEventListener.java
+net/minecraft/client/input/MouseButtonEvent.java
+net/minecraft/client/input/KeyEvent.java
+net/minecraft/client/input/CharacterEvent.java
+grep (public\s) net/minecraft/client/KeyMapping.java
+grep (public\s|SystemToastId) net/minecraft/client/gui/components/toasts/SystemToast.java
+grep (public\s) net/minecraft/client/gui/components/toasts/ToastManager.java
+grep (public\s) com/mojang/blaze3d/platform/NativeImage.java
+grep (guiScale|hideGui|getSoundSourceVolume|keyScreenshot|framerateLimit|enableVsync|public\sOptionInstance<Integer>\sfov|fullscreen|getFinalSoundSourceVolume) net/minecraft/client/Options.java
+grep (getPlatform|openFile|openPath|openUri|public\svoid\sopen) net/minecraft/util/Util.java
+grep (public\s) net/minecraft/client/gui/components/EditBox.java
+grep (public\s) net/minecraft/client/DeltaTracker.java
+grep (public\s) net/minecraft/client/Camera.java
+grep (public\s|class\s) net/minecraft/client/renderer/LevelRenderer.java

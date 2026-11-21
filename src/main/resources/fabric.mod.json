@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "lightlens",
+	"version": "${version}",
+	"name": "Lightlens",
+	"description": "Record video and take photos while you play, at 1K, 2K or 4K, with your shaders and everything you see. The video is encoded as you play, straight into the folder you pick. By Insid3 Th3 Cub3, a LumenForge mod.",
+	"authors": ["Insid3 Th3 Cub3"],
+	"contact": {
+		"homepage": "https://lumenforge-mc.co.uk/"
+	},
+	"license": "All-Rights-Reserved",
+	"icon": "assets/lightlens/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": ["com.lumenforge.lens.LensClient"],
+		"frex_flawless_frames": ["com.lumenforge.lens.compat.Flawless"]
+	},
+	"mixins": ["lightlens.mixins.json"],
+	"accessWidener": "lightlens.accesswidener",
+	"depends": {
+		"fabricloader": ">=0.16.0",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"iris": "*",
+		"sodium": "*"
+	}
+}

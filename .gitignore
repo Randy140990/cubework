@@ -1,0 +1,8 @@
+build/
+.gradle/
+classpath.txt
+out/
+run/
+*.class
+__pycache__/
+dist/
