@@ -185,6 +185,7 @@ jobs:
           ls -laR $RUN/lightlens >> /tmp/out/files.txt 2>/dev/null || true
           find $RUN/test-captures -type f \( -name "*.jpg" -o -name "*.png" \) -size -12M -exec cp {} /tmp/out/captures/ \; 2>/dev/null || true
           find $RUN/test-captures -type f -name "*.mp4" -size -40M -exec cp {} /tmp/out/captures/ \; 2>/dev/null || true
+          find $RUN/test-captures -type f -name "*.gif" -size -20M -exec cp {} /tmp/out/captures/ \; 2>/dev/null || true
           cp $RUN/crash-reports/*.txt /tmp/out/ 2>/dev/null || true
           echo "${GITHUB_SHA}" > /tmp/out/commit.txt
           git config user.name "lightlens-ci"

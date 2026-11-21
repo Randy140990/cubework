@@ -130,8 +130,26 @@ public final class LensScreen extends Screen {
 		long per10 = Sizes.bytesPerMinute(s.quality, out[0], out[1], s.fps, hevc) * 10;
 		g.drawString(font, out[0] + " x " + out[1] + " · about " + Sizes.bytes(per10) + " per 10 min", lx, ly + 1, MUTED, false);
 		ly += 11;
+		ly += 4;
+
+		// ---- GIF
+		heading(g, lx, ly, "GIF");
+		ly += 12;
+		ly = seg(g, lx, ly, colW, row, "Length", new String[] {"3 s", "5 s", "10 s"}, s.gifSeconds == 10 ? 2 : s.gifSeconds == 3 ? 0 : 1, locked,
+				i -> s.gifSeconds = i == 2 ? 10 : i == 0 ? 3 : 5, mx, my);
+		ly = seg(g, lx, ly, colW, row, "Width", new String[] {"480", "640", "960"}, s.gifWidth == 960 ? 2 : s.gifWidth == 480 ? 0 : 1, locked,
+				i -> s.gifWidth = i == 2 ? 960 : i == 0 ? 480 : 640, mx, my);
+		ly = seg(g, lx, ly, colW, row, "Style", new String[] {"Normal", "Timelapse"}, s.gifTimelapse ? 1 : 0, locked, i -> s.gifTimelapse = i == 1, mx, my);
+		int gw = s.gifWidth, gh = (int) Math.round(gw * out[1] / (double) Math.max(1, out[0])) & ~1;
+		String gifInfo = gw + " x " + gh + " · about " + Sizes.bytes(Ffmpeg.gifBytes(gw, gh, s.gifSeconds, s.gifTimelapse))
+				+ (s.gifTimelapse ? " · " + s.gifSeconds * 10 + " s of play" : "");
+		g.drawString(font, gifInfo, lx, ly + 1, MUTED, false);
+		ly += 12;
+
+		// The tip, if there's room for it above the buttons.
 		String hint = videoHint(s, out, rh);
-		if (hint != null) {
+		int bottom = y0 + ph - 30;
+		if (hint != null && ly + font.split(Component.literal(hint), colW).size() * 10 <= bottom) {
 			for (var line : font.split(Component.literal(hint), colW)) {
 				g.drawString(font, line, lx, ly + 1, DIM, false);
 				ly += 10;
@@ -177,13 +195,13 @@ public final class LensScreen extends Screen {
 		int fx = x0 + 10;
 		String recKey = LensClient.RECORD.getTranslatedKeyMessage().getString(), photoKey = LensClient.PHOTO.getTranslatedKeyMessage().getString();
 		if (Recorder.recording()) {
-			fx = primary(g, fx, by, "■ Stop and save (" + recKey + ")", RED, true, () -> {
+			fx = primary(g, fx, by, Recorder.gif() ? "■ Stop GIF" : "■ Stop and save (" + recKey + ")", RED, true, () -> {
 				Recorder.stop(null);
 			}, mx, my) + 6;
 			fx = button(g, fx, by, Recorder.paused() ? "Resume" : "Pause", true, Recorder::togglePause, mx, my) + 6;
 		} else {
 			boolean can = Recorder.state() == Recorder.State.IDLE;
-			String label = !s.folderChosen ? "Choose a folder first" : "● Start recording (" + recKey + ")";
+			String label = !s.folderChosen ? "Choose a folder first" : "● Record (" + recKey + ")";
 			fx = primary(g, fx, by, label, s.folderChosen ? VIOLET : DIM, can, () -> {
 				if (!Lens.settings.folderChosen) {
 					chooseFolder();
@@ -199,18 +217,32 @@ public final class LensScreen extends Screen {
 				Recorder.start();
 			}, mx, my) + 6;
 		}
-		fx = button(g, fx, by, "Take photo (" + photoKey + ")", !Photo.busy(), () -> {
+		fx = button(g, fx, by, "Photo (" + photoKey + ")", !Photo.busy(), () -> {
 			Lens.save();
 			minecraft.setScreen(null);
 			Photo.take();
 		}, mx, my) + 6;
+		if (!Recorder.busy()) {
+			String gifKey = LensClient.GIF.getTranslatedKeyMessage().getString();
+			fx = button(g, fx, by, "GIF (" + gifKey + ")", true, () -> {
+				String why = Recorder.cantStart();
+				if (why != null) {
+					message = why;
+					return;
+				}
+				Lens.save();
+				minecraft.setScreen(null);
+				Recorder.startGif();
+			}, mx, my) + 6;
+		}
 		int doneW = font.width("Done") + 16;
 		button(g, x0 + pw - 10 - doneW, by, "Done", true, this::onClose, mx, my);
 	}
 
 	private String recLine() {
 		return switch (Recorder.state()) {
-			case RECORDING -> (Recorder.paused() ? "❚❚ " : "● ") + Sizes.clock(Recorder.clockMs()) + "  " + Recorder.width() + "x" + Recorder.height() + " " + Recorder.fps() + " fps";
+			case RECORDING -> Recorder.gif() ? "GIF · " + ((Recorder.gifLeft() + 999) / 1000) + " s left"
+					: (Recorder.paused() ? "❚❚ " : "● ") + Sizes.clock(Recorder.clockMs()) + "  " + Recorder.width() + "x" + Recorder.height() + " " + Recorder.fps() + " fps";
 			case FINISHING -> Recorder.status;
 			case STARTING -> "Starting";
 			default -> null;

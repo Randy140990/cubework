@@ -5,6 +5,7 @@ import com.lumenforge.lens.Settings;
 import com.lumenforge.lens.audio.GameSound;
 import com.lumenforge.lens.core.Ffmpeg;
 import com.lumenforge.lens.core.Mic;
+import com.lumenforge.lens.core.Quality;
 import com.lumenforge.lens.core.MkvWriter;
 import com.lumenforge.lens.core.SoundMix;
 import com.lumenforge.lens.core.Sizes;
@@ -146,6 +147,38 @@ public final class Recorder {
 	}
 
 	public static void start() {
+		begin(false);
+	}
+
+	/** G: a short GIF. It stops by itself after the length you picked (press G again to stop sooner). */
+	public static void startGif() {
+		begin(true);
+	}
+
+	/** G: start a GIF, or stop the one being made. */
+	public static void toggleGif() {
+		if (state == State.RECORDING) {
+			if (gif) stop(null);
+			else Notify.toast("Already recording", "Stop the recording (" + com.lumenforge.lens.LensClient.RECORD.getTranslatedKeyMessage().getString()
+					+ ") to make a GIF");
+		} else if (state == State.IDLE) startGif();
+	}
+
+	/** True while the take is a GIF. */
+	public static boolean gif() {
+		return gif;
+	}
+
+	/** Milliseconds left of a GIF, or -1. */
+	public static long gifLeft() {
+		return gif && autoStopMs > 0 ? Math.max(0, autoStopMs - clockMs()) : -1;
+	}
+
+	private static volatile boolean gif;
+	private static boolean timelapse;
+	private static long autoStopMs;
+
+	private static void begin(boolean asGif) {
 		Minecraft mc = Minecraft.getInstance();
 		Settings s = Lens.settings;
 		if (!s.folderChosen) {
@@ -167,22 +200,26 @@ public final class Recorder {
 			return;
 		}
 
-		boolean hevc = s.hevc && Ffmpeg.hevc() != null;
+		boolean hevc = !asGif && s.hevc && Ffmpeg.hevc() != null;
 		encoder = hevc ? Ffmpeg.hevc() : Ffmpeg.h264();
-		fps = s.fps;
+		gif = asGif;
+		timelapse = asGif && s.gifTimelapse;
+		autoStopMs = asGif ? s.gifSeconds * 1000L * (timelapse ? 10 : 1) : 0;
+		fps = asGif ? (timelapse ? 1 : Ffmpeg.GIF_FPS) : s.fps;
 		shape = s.shape;
+		Quality quality = asGif ? Quality.MAX : s.quality;
 		int rw = Capture.realWidth(), rh = Capture.realHeight();
 		if (rw <= 0 || rh <= 0) {
 			Notify.failed("Can't record", "The game window is minimised");
 			return;
 		}
-		int[] size = Sizes.output(s.videoSize, shape, rw, rh);
+		int[] size = asGif ? gifSize(s.gifWidth, shape, rw, rh) : Sizes.output(s.videoSize, shape, rw, rh);
 		outW = size[0];
 		outH = size[1];
-		int k = s.sharp ? RenderScale.needed(outH, Sizes.crop(shape, rw, rh)[3], 3) : 1;
+		int k = !asGif && s.sharp ? RenderScale.needed(outH, Sizes.crop(shape, rw, rh)[3], 3) : 1;
 		sharp = k > 1;
 
-		long perMin = Sizes.bytesPerMinute(s.quality, outW, outH, fps, hevc);
+		long perMin = Sizes.bytesPerMinute(quality, outW, outH, fps, hevc);
 		long free = Capture.freeSpace(out);
 		if (free >= 0 && free < perMin * 2 + 500_000_000L) {
 			Notify.failed("Can't record", "Not enough space in " + out.getFileName() + " (" + Sizes.bytes(free) + " free)");
@@ -219,7 +256,7 @@ public final class Recorder {
 			LOG.setLength(0);
 		}
 
-		List<String> cmd = Ffmpeg.liveCommand(Ffmpeg.find(), encoder, s.quality, outW, outH, fps, videoFile);
+		List<String> cmd = Ffmpeg.liveCommand(Ffmpeg.find(), encoder, quality, outW, outH, fps, videoFile);
 		Lens.LOG.info("Recording {}x{} at {} fps with {}: {}", outW, outH, fps, encoder, String.join(" ", cmd));
 		try {
 			ffmpeg = new ProcessBuilder(cmd).redirectErrorStream(true).start();
@@ -238,7 +275,7 @@ public final class Recorder {
 		writer.setDaemon(true);
 		writer.start();
 
-		if (s.mic) {
+		if (s.mic && !asGif) {
 			try {
 				Mic.start(micFile);
 			} catch (Exception e) {
@@ -247,8 +284,8 @@ public final class Recorder {
 		}
 		// The start cue plays before the game's sound is noted, so it's only for you.
 		com.lumenforge.lens.LensClient.cue(1.6F);
-		gameSoundOn = s.gameSound;
-		if (s.gameSound) GameSound.begin();
+		gameSoundOn = s.gameSound && !asGif;
+		if (gameSoundOn) GameSound.begin();
 
 		paused = false;
 		pausedNanos = 0;
@@ -257,9 +294,17 @@ public final class Recorder {
 		nextSpaceCheck = System.currentTimeMillis() + 5000;
 		startNanos = System.nanoTime();
 		state = State.RECORDING;
-		status = "Recording";
+		status = asGif ? "Making a GIF" : "Recording";
 		if (sharp) RenderScale.setVideo(k);
 		mc.updateTitle();
+	}
+
+	/** A GIF's size: the width picked, the height from the picture's shape (even numbers). */
+	static int[] gifSize(int width, Sizes.Shape shape, int rw, int rh) {
+		int[] c = Sizes.crop(shape, rw, rh);
+		int w = Math.max(160, width) & ~1;
+		int h = Math.max(90, (int) Math.round(w * c[3] / (double) Math.max(1, c[2]))) & ~1;
+		return new int[] {w, h};
 	}
 
 	private static void readLog(InputStream in) {
@@ -334,6 +379,10 @@ public final class Recorder {
 			}
 		} finally {
 			Gl.restore();
+		}
+		if (autoStopMs > 0 && clockMs() >= autoStopMs) {
+			stop(null);
+			return;
 		}
 		long now = System.currentTimeMillis();
 		if (now > nextSpaceCheck) {
@@ -434,11 +483,16 @@ public final class Recorder {
 		Process p = ffmpeg;
 		Thread w = writer;
 		String exe = Ffmpeg.find();
-		Path outDir = Lens.output();
-		String name = work.getFileName().toString().replace('_', ' ') + " (" + outW + "x" + outH + " " + fps + "fps)";
+		boolean asGif = gif, lapse = timelapse;
+		Path outDir = asGif ? Lens.gifs() : Lens.output();
+		String name = work.getFileName().toString().replace('_', ' ') + (asGif ? " (" + outW + "x" + outH + (lapse ? " timelapse" : "") + ")"
+				: " (" + outW + "x" + outH + " " + fps + "fps)");
 		double seconds = end / 1000.0;
 		if (why != null) lastError = why;
-		Thread t = new Thread(() -> finish(why, exe, p, w, end, voices, work, video, mic, outDir, name, seconds, c, d), "Lightlens finishing");
+		Thread t = new Thread(() -> {
+			if (asGif) finishGif(why, exe, p, w, end, work, video, outDir, name, lapse, c, d);
+			else finish(why, exe, p, w, end, voices, work, video, mic, outDir, name, seconds, c, d);
+		}, "Lightlens finishing");
 		finishing = t;
 		t.start();
 	}
@@ -508,6 +562,7 @@ public final class Recorder {
 		Minecraft.getInstance().execute(() -> {
 			state = State.IDLE;
 			status = "";
+			gif = false;
 			if (saved != null) {
 				lastFile = saved;
 				long size = 0;
@@ -522,6 +577,61 @@ public final class Recorder {
 				lastError = reason;
 				writeErrorFile(reason);
 				Notify.failed("Recording didn't save", reason + " (details: .minecraft/lightlens/last-error.txt)");
+			}
+		});
+	}
+
+	/** A GIF: the short recording (made at the GIF's size) turned into a GIF with its own colour palette. */
+	private static void finishGif(String why, String exe, Process p, Thread w, long end, Path work, Path video, Path outDir, String name,
+			boolean lapse, int c, int d) {
+		Path result = null;
+		String error = null;
+		try {
+			status = "Finishing the GIF";
+			while (!queue.offer(new Frame(null, end), 1, TimeUnit.SECONDS)) if (!w.isAlive()) break;
+			w.join(60_000);
+			if (!p.waitFor(120, TimeUnit.SECONDS)) {
+				p.destroyForcibly();
+				throw new IOException("FFmpeg didn't finish");
+			}
+			if (p.exitValue() != 0 || !Files.isRegularFile(video) || Files.size(video) < 1000) throw new IOException("FFmpeg failed: " + log());
+			Files.createDirectories(outDir);
+			Path out = Capture.unique(outDir, name, ".gif");
+			Path part = out.resolveSibling(out.getFileName() + ".part");
+			status = "Making the GIF's colours";
+			Ffmpeg.run(Ffmpeg.gifCommand(exe, video, lapse, part), 900);
+			Files.move(part, out, StandardCopyOption.REPLACE_EXISTING);
+			result = out;
+			Capture.deleteTree(work);
+			Lens.LOG.info("Saved {} ({} frames captured)", out, c);
+		} catch (Exception e) {
+			error = e.getMessage();
+			Lens.LOG.error("Making the GIF failed; the clip is kept in {}", work, e);
+		} finally {
+			pool = null;
+			queue = null;
+			ffmpeg = null;
+			startNanos = 0;
+		}
+		Path saved = result;
+		String err = error;
+		Minecraft.getInstance().execute(() -> {
+			state = State.IDLE;
+			status = "";
+			gif = false;
+			if (saved != null) {
+				lastFile = saved;
+				long size = 0;
+				try {
+					size = Files.size(saved);
+				} catch (IOException ignored) {
+				}
+				Notify.saved(why != null ? why : "GIF saved", saved, outW + "x" + outH + ", " + Sizes.bytes(size));
+			} else {
+				String reason = (why != null ? why + ". " : "") + (err == null ? "" : err);
+				lastError = reason;
+				writeErrorFile(reason);
+				Notify.failed("GIF didn't save", reason + " (details: .minecraft/lightlens/last-error.txt)");
 			}
 		});
 	}

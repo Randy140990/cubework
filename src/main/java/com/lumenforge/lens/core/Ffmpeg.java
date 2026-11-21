@@ -385,6 +385,26 @@ public final class Ffmpeg {
 		return c;
 	}
 
+	/** Frames a second in a GIF (a timelapse GIF plays at 10, each frame a second of play). */
+	public static final int GIF_FPS = 15;
+
+	/**
+	 * A GIF from a short recording made at the GIF's size: one colour palette worked out for the whole clip (so the
+	 * colours hold steady), and light dithering. A timelapse plays ten times faster than it was recorded.
+	 */
+	public static List<String> gifCommand(String exe, Path video, boolean timelapse, Path out) {
+		String chain = (timelapse ? "setpts=PTS/10,fps=10" : "fps=" + GIF_FPS)
+				+ ",split[a][b];[a]palettegen=stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle";
+		return List.of(exe, "-hide_banner", "-loglevel", "warning", "-nostdin", "-y", "-i", video.toString(), "-filter_complex", "[0:v]" + chain,
+				"-loop", "0", "-f", "gif", out.toString());
+	}
+
+	/** A rough guess at a GIF's size: game footage is busy, about a third of a byte a pixel a frame. */
+	public static long gifBytes(int w, int h, int seconds, boolean timelapse) {
+		int frames = seconds * (timelapse ? 10 : GIF_FPS);
+		return (long) (w * (double) h * frames * 0.33);
+	}
+
 	/** A recording the game didn't finish (it closed or crashed): its picture, as an MP4. */
 	public static List<String> rescueCommand(String exe, Path video, Path micWav, Path out) {
 		return finishCommand(exe, video, null, micWav, 1.0, out);

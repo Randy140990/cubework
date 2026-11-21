@@ -27,6 +27,11 @@ public final class Settings {
 	public boolean jpg;
 	public boolean photosInSubfolder = true;
 
+	/** GIFs: how long (seconds of GIF), how wide, and timelapse (a frame a second, played ten times faster). */
+	public int gifSeconds = 5;
+	public int gifWidth = 640;
+	public boolean gifTimelapse;
+
 	/** The red dot and the clock in the corner while recording (never in the video). */
 	public boolean showDot = true;
 	/** A path to your own ffmpeg, if you'd rather. */
@@ -43,5 +48,7 @@ public final class Settings {
 		if (ffmpegPath == null) ffmpegPath = "";
 		if (!(micVolume >= 0.1F && micVolume <= 3F)) micVolume = 1F;
 		if (photoWait != 0 && photoWait != 3 && photoWait != 10) photoWait = 0;
+		if (gifSeconds != 3 && gifSeconds != 5 && gifSeconds != 10) gifSeconds = 5;
+		if (gifWidth != 480 && gifWidth != 640 && gifWidth != 960) gifWidth = 640;
 	}
 }

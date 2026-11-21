@@ -24,7 +24,7 @@ import org.lwjgl.glfw.GLFW;
 /** Keys (F10 record, F12 photo), the button in the pause menu, and the per-tick work. */
 public class LensClient implements ClientModInitializer {
 	public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Lens.id("lightlens"));
-	public static KeyMapping RECORD, PHOTO, PAUSE, MENU;
+	public static KeyMapping RECORD, PHOTO, PAUSE, MENU, GIF;
 
 	@Override
 	public void onInitializeClient() {
@@ -33,6 +33,7 @@ public class LensClient implements ClientModInitializer {
 		PHOTO = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.lightlens.photo", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F12, CATEGORY));
 		PAUSE = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.lightlens.pause", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, CATEGORY));
 		MENU = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.lightlens.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, CATEGORY));
+		GIF = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.lightlens.gif", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, CATEGORY));
 
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 			// Only in a world (not on the title screen or the world list).
@@ -41,6 +42,7 @@ public class LensClient implements ClientModInitializer {
 			if (pressed(RECORD, 0) && inGame) Recorder.toggle();
 			if (pressed(PHOTO, 1) && inGame) Photo.take();
 			if (pressed(PAUSE, 2) && inGame) Recorder.togglePause();
+			if (pressed(GIF, 3) && inGame) Recorder.toggleGif();
 			while (MENU.consumeClick()) mc.setScreen(new LensScreen(mc.screen, null));
 			if (!inGame && Recorder.recording()) Recorder.stop("Stopped and saved: you left the world");
 			GameSound.tick();
@@ -69,7 +71,7 @@ public class LensClient implements ClientModInitializer {
 	}
 
 	/** When each of our keys last did something (record, photo, pause). */
-	private static final long[] LAST = new long[3];
+	private static final long[] LAST = new long[4];
 
 	/** True once per press: the key's clicks this tick are taken, and repeats within a second are ignored. */
 	private static boolean pressed(KeyMapping key, int which) {
@@ -113,6 +115,10 @@ public class LensClient implements ClientModInitializer {
 		}
 		if (PAUSE.matches(e)) {
 			if (fresh(2)) Recorder.togglePause();
+			return true;
+		}
+		if (GIF.matches(e)) {
+			if (fresh(3)) Recorder.toggleGif();
 			return true;
 		}
 		return false;

@@ -126,6 +126,24 @@ public final class LensGameTest implements FabricClientGameTest {
 			ctx.waitTicks(10);
 			ctx.takeScreenshot("ll-06-back-to-normal");
 			check(ctx.computeOnClient(mc -> mc.getWindow().getWidth()) == 1280, "the game draws at the window's size again");
+
+			// ---- GIFs: 3 s at 480 wide, then a 3 s timelapse (30 s of play).
+			for (boolean lapse : new boolean[] {false, true}) {
+				ctx.runOnClient(mc -> {
+					Lens.settings.gifSeconds = 3;
+					Lens.settings.gifWidth = 480;
+					Lens.settings.gifTimelapse = lapse;
+					Recorder.startGif();
+				});
+				ctx.waitTick();
+				check(ctx.computeOnClient(mc -> Recorder.recording() && Recorder.gif()), "GIF started" + (lapse ? " (timelapse)" : ""));
+				ctx.runOnClient(mc -> mc.player.setYRot(mc.player.getYRot() + 30));
+				ctx.getInput().holdKeyFor(o -> o.keyLeft, 20);
+				ctx.waitFor(mc -> Recorder.state() == Recorder.State.IDLE, 20 * 60 * 3);
+				Path g = Recorder.lastFile;
+				check(g != null && g.toString().endsWith(".gif") && Files.isRegularFile(g), "GIF saved (" + Recorder.lastError + ")");
+				gifInfo(g, lapse ? "gif-timelapse" : "gif");
+			}
 		}
 
 		// Every photo: its size.
@@ -156,6 +174,19 @@ public final class LensGameTest implements FabricClientGameTest {
 			Files.createDirectories(shots);
 			List<String> cmd = List.of(exe, "-v", "error", "-y", "-ss", "2", "-i", video.toString(), "-frames:v", "1", shots.resolve("ll-frame-" + tag + ".png").toString());
 			new ProcessBuilder(cmd).redirectErrorStream(true).start().waitFor();
+		} catch (Exception e) {
+			throw new AssertionError("ffprobe failed: " + e);
+		}
+	}
+
+	private static void gifInfo(Path gif, String tag) {
+		try {
+			Process p = new ProcessBuilder("ffprobe", "-v", "error", "-count_frames", "-show_entries", "stream=codec_name,width,height,nb_read_frames:format=duration,size",
+					"-of", "compact", gif.toString()).redirectErrorStream(true).start();
+			String info = new String(p.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+			p.waitFor();
+			log(tag + " " + gif.getFileName() + ": " + info.replace('\n', ' '));
+			check(info.contains("codec_name=gif"), tag + " is a GIF");
 		} catch (Exception e) {
 			throw new AssertionError("ffprobe failed: " + e);
 		}

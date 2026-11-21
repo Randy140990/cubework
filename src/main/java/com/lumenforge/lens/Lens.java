@@ -61,6 +61,10 @@ public final class Lens {
 		return settings.photosInSubfolder ? output().resolve("Photos") : output();
 	}
 
+	public static Path gifs() {
+		return settings.photosInSubfolder ? output().resolve("GIFs") : output();
+	}
+
 	private static Path file() {
 		return FabricLoader.getInstance().getConfigDir().resolve("lightlens.json");
 	}

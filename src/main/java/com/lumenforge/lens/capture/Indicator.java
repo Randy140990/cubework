@@ -50,7 +50,9 @@ public final class Indicator {
 
 	/** The red dot and the recording's clock. Returns the box's bottom. */
 	private static int recBox(int winW, int winH, int u, int y0) {
-		long ms = Recorder.clockMs();
+		boolean gif = Recorder.gif();
+		long left = Recorder.gifLeft();
+		long ms = gif && left >= 0 ? left + 999 : Recorder.clockMs();
 		boolean paused = Recorder.paused();
 		boolean flash = System.currentTimeMillis() < flashUntil;
 		boolean on = paused || (System.currentTimeMillis() / 600) % 2 == 0 || flash;
@@ -60,9 +62,11 @@ public final class Indicator {
 		int w = pad + dot + 3 * u + textWidth(clock, u) + pad, h = dot + 2 * pad;
 		int x0 = winW - w - 4 * u;
 		Gl.windowRect(winH, x0, y0, w, h, 0.055F, 0.055F, 0.067F);
-		Gl.windowRect(winH, x0, y0 + h - Math.max(1, u / 2), w, Math.max(1, u / 2), 0.94F, 0.27F, 0.27F);
-		// The dot (a rounded square), red, amber when paused, white for a photo.
-		float r = flash ? 1F : paused ? 0.96F : 0.94F, g = flash ? 1F : paused ? 0.70F : 0.27F, b = flash ? 1F : paused ? 0.24F : 0.27F;
+		if (gif) Gl.windowRect(winH, x0, y0 + h - Math.max(1, u / 2), w, Math.max(1, u / 2), 0.08F, 0.72F, 0.65F);
+		else Gl.windowRect(winH, x0, y0 + h - Math.max(1, u / 2), w, Math.max(1, u / 2), 0.94F, 0.27F, 0.27F);
+		// The dot (a rounded square): red, teal for a GIF (counting down), amber when paused, white for a photo.
+		float r = flash ? 1F : paused ? 0.96F : gif ? 0.08F : 0.94F, g = flash ? 1F : paused ? 0.70F : gif ? 0.72F : 0.27F,
+				b = flash ? 1F : paused ? 0.24F : gif ? 0.65F : 0.27F;
 		int dx = x0 + pad, dy = y0 + pad;
 		if (on) {
 			Gl.windowRect(winH, dx + u, dy, dot - 2 * u, dot, r, g, b);
