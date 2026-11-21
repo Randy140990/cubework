@@ -24,7 +24,6 @@ public class RoomLight extends Entity {
 	public RoomLight(EntityType<?> type, Level level) {
 		super(type, level);
 		this.noPhysics = true;
-		this.noCulling = true;
 		setNoGravity(true);
 		setSilent(true);
 		setInvulnerable(true);

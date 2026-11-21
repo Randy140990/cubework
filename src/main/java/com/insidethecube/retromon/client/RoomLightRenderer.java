@@ -76,7 +76,7 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 		for (double[] p : s.pools) {
 			double[] q = rect(p, s.k, s.side, s.m);
 			if (q == null) continue;
-			int pool = argb(c, c[3] * q[4]), shaft = argb(c, c[4] * q[4]);
+			int pool = argb(c, (float) (c[3] * q[4])), shaft = argb(c, (float) (c[4] * q[4]));
 			out.submitCustomGeometry(pose, RenderTypes.entityTranslucentEmissive(p[4] == 3 ? POOL_SOFT : POOL), (pp, vc) -> {
 				// (Counter-clockwise seen from above.)
 				vert(vc, pp, q[0] - cx, POOL_Y, q[1] - cz, 0, 0, pool, 0, 1, 0);
