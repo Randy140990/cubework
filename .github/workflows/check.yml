@@ -144,8 +144,12 @@ jobs:
             echo "$p -> $URL"
             if [ -n "$URL" ]; then curl -sL -o "$RUN/mods/$p.jar" "$URL"; fi
           done
-          cp ci/Tempered-Light-*.zip $RUN/shaderpacks/
-          PACK=$(ls ci/Tempered-Light-*.zip | head -n 1 | xargs basename)
+          # The build server's software graphics only take core-profile shaders, which the Tempered Light zip here
+          # (2.4.4) doesn't compile as; Complementary Reimagined does, so it stands in to show shaders get recorded.
+          SURL=$(curl -s "https://api.modrinth.com/v2/project/complementary-reimagined/version" \
+            | python3 -c "import json,sys; v=json.load(sys.stdin); f=[x for x in v[0]['files'] if x.get('primary')] or v[0]['files']; print(f[0]['url'])" || true)
+          echo "shader -> $SURL"
+          if [ -n "$SURL" ]; then curl -sL -o "$RUN/shaderpacks/Complementary.zip" "$SURL"; PACK=Complementary.zip; else cp ci/Tempered-Light-*.zip $RUN/shaderpacks/; PACK=$(ls ci/Tempered-Light-*.zip | head -n 1 | xargs basename); fi
           printf 'shaderPack=%s\nenableShaders=true\n' "$PACK" > $RUN/config/iris.properties
           ls -la $RUN/mods
       - name: Run the in-game test

@@ -117,7 +117,7 @@ public final class LensScreen extends Screen {
 		ly += 12;
 		String[] sizes = labels(Sizes.Size.VIDEO);
 		ly = seg(g, lx, ly, colW, row, "Size", sizes, index(Sizes.Size.VIDEO, s.videoSize), locked, i -> s.videoSize = Sizes.Size.VIDEO[i], mx, my);
-		ly = seg(g, lx, ly, colW, row, "Frame rate", new String[] {"30", "60"}, s.fps == 60 ? 1 : 0, locked, i -> s.fps = i == 1 ? 60 : 30, mx, my);
+		ly = seg(g, lx, ly, colW, row, "FPS", new String[] {"30", "60"}, s.fps == 60 ? 1 : 0, locked, i -> s.fps = i == 1 ? 60 : 30, mx, my);
 		ly = seg(g, lx, ly, colW, row, "Quality", new String[] {"Good", "High", "Max"}, s.quality.ordinal(), locked, i -> s.quality = Quality.values()[i], mx, my);
 		boolean hevcOk = Ffmpeg.hevc() != null || !Ffmpeg.probed();
 		ly = seg(g, lx, ly, colW, row, "Format", new String[] {"H.264", "H.265"}, s.hevc ? 1 : 0, locked, i -> s.hevc = i == 1 && hevcOk, mx, my);
@@ -258,8 +258,7 @@ public final class LensScreen extends Screen {
 		y = wrap(g, pack != null ? "✔ Shaders: " + pack + ", in your video" : Shaders.irisInstalled() ? "Shaders: off" : "Shaders: Iris not installed", x, y, w,
 				pack != null ? GREEN : MUTED);
 		if (Lens.settings.mic && !Mic.available()) y = wrap(g, "! No microphone found", x, y, w, AMBER);
-		return wrap(g, "Keys: " + LensClient.RECORD.getTranslatedKeyMessage().getString() + " record, " + LensClient.PHOTO.getTranslatedKeyMessage().getString()
-				+ " photo (Controls to change)", x, y, w, DIM);
+		return y;
 	}
 
 	// ---------------------------------------------------------------- widgets
