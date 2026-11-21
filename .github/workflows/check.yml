@@ -127,7 +127,11 @@ jobs:
       - name: FFmpeg and a virtual screen
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y -q ffmpeg xvfb mesa-utils libgl1-mesa-dri
+          sudo apt-get install -y -q ffmpeg xvfb mesa-utils libgl1-mesa-dri pulseaudio
+          # A sound card that goes nowhere, so the game's sound system starts and its sound can be recorded.
+          pulseaudio -D --exit-idle-time=-1 || true
+          pactl load-module module-null-sink sink_name=ci || true
+          pactl set-default-sink ci || true
       - name: Sodium, Iris and Tempered Light
         if: matrix.mods == 'shaders'
         shell: bash

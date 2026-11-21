@@ -251,25 +251,15 @@ public final class LensScreen extends Screen {
 		} else {
 			String h = Ffmpeg.h264(), v = Ffmpeg.hevc();
 			boolean hw = Ffmpeg.hardware(h);
-			g.drawString(font, (hw ? "✔ " : "! ") + "Encoder: " + Ffmpeg.label(h) + (v != null ? " (H.264, H.265)" : " (H.264)"), x, y + 1, hw ? GREEN : AMBER, false);
-			y += 11;
-			if (!hw) {
-				g.drawString(font, "No graphics-card encoder found: 1K at 30 fps is best.", x, y + 1, DIM, false);
-				y += 11;
-			}
+			y = wrap(g, (hw ? "✔ " : "! ") + "Encoder: " + Ffmpeg.label(h) + (v != null ? " (H.264, H.265)" : " (H.264)"), x, y, w, hw ? GREEN : AMBER);
+			if (!hw) y = wrap(g, "No graphics-card encoder: 1K at 30 fps works best.", x, y, w, DIM);
 		}
 		String pack = Shaders.activePack();
-		g.drawString(font, fit(pack != null ? "✔ Shaders: " + pack + " (in your video)" : Shaders.irisInstalled() ? "Shaders: off" : "Shaders: Iris not installed", w), x, y + 1,
-				pack != null ? GREEN : MUTED, false);
-		y += 11;
-		if (Lens.settings.mic && !Mic.available()) {
-			g.drawString(font, "! No microphone found", x, y + 1, AMBER, false);
-			y += 11;
-		}
-		String keys = LensClient.RECORD.getTranslatedKeyMessage().getString() + " record · " + LensClient.PHOTO.getTranslatedKeyMessage().getString()
-				+ " photo · change in Controls";
-		g.drawString(font, fit(keys, w), x, y + 1, DIM, false);
-		return y + 11;
+		y = wrap(g, pack != null ? "✔ Shaders: " + pack + ", in your video" : Shaders.irisInstalled() ? "Shaders: off" : "Shaders: Iris not installed", x, y, w,
+				pack != null ? GREEN : MUTED);
+		if (Lens.settings.mic && !Mic.available()) y = wrap(g, "! No microphone found", x, y, w, AMBER);
+		return wrap(g, "Keys: " + LensClient.RECORD.getTranslatedKeyMessage().getString() + " record, " + LensClient.PHOTO.getTranslatedKeyMessage().getString()
+				+ " photo (Controls to change)", x, y, w, DIM);
 	}
 
 	// ---------------------------------------------------------------- widgets
@@ -282,14 +272,27 @@ public final class LensScreen extends Screen {
 		void pick(int i);
 	}
 
-	/** A row: label on the left, then pills, one picked. Returns the next row's y. */
+	/** Where the pills start, after a row's label. */
+	private static final int LABEL_W = 50;
+
+	/** A row: label on the left, then pills (as wide as their words, shrunk to fit), one picked. Returns the next row's y. */
 	private int seg(GuiGraphics g, int x, int y, int w, int rowH, String label, String[] opts, int sel, boolean locked, Pick pick, int mx, int my) {
 		g.drawString(font, label, x, y + (rowH - 8) / 2, MUTED, false);
-		int px = x + 58;
-		int avail = w - 58;
-		int pillW = Math.max(26, Math.min(48, (avail - (opts.length - 1) * 3) / opts.length));
+		int px = x + LABEL_W;
+		int avail = w - LABEL_W, gap = 3;
+		int[] pw = new int[opts.length];
+		int total = gap * (opts.length - 1);
+		for (int i = 0; i < opts.length; i++) {
+			pw[i] = Math.max(24, font.width(opts[i]) + 10);
+			total += pw[i];
+		}
+		if (total > avail) {
+			double k = (avail - gap * (opts.length - 1)) / (double) (total - gap * (opts.length - 1));
+			for (int i = 0; i < opts.length; i++) pw[i] = Math.max(font.width(opts[i]) + 4, (int) Math.floor(pw[i] * k));
+		}
 		int ph = rowH - 3;
 		for (int i = 0; i < opts.length; i++) {
+			int pillW = pw[i];
 			boolean on = i == sel, hover = !locked && mx >= px && my >= y && mx < px + pillW && my < y + ph;
 			if (on) gradient(g, px, y, pillW, ph);
 			else g.fill(px, y, px + pillW, y + ph, hover ? 0xFF22222A : PANEL);
@@ -300,16 +303,25 @@ public final class LensScreen extends Screen {
 				final int idx = i;
 				hits.add(new Hit(px, y, pillW, ph, () -> pick.pick(idx)));
 			}
-			px += pillW + 3;
+			px += pillW + gap;
 		}
 		return y + rowH;
+	}
+
+	/** Lines of text wrapped to the width. Returns the next y. */
+	private int wrap(GuiGraphics g, String text, int x, int y, int w, int colour) {
+		for (var line : font.split(Component.literal(text), w)) {
+			g.drawString(font, line, x, y + 1, colour, false);
+			y += 10;
+		}
+		return y + 1;
 	}
 
 	/** Game sound and microphone, each on or off. */
 	private int toggles(GuiGraphics g, int x, int y, int w, int rowH, String label, boolean locked, int mx, int my) {
 		Settings s = Lens.settings;
 		g.drawString(font, label, x, y + (rowH - 8) / 2, MUTED, false);
-		int px = x + 58, ph = rowH - 3;
+		int px = x + LABEL_W, ph = rowH - 3;
 		String[] names = {"Game", "Mic"};
 		boolean[] on = {s.gameSound, s.mic};
 		for (int i = 0; i < 2; i++) {

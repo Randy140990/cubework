@@ -244,6 +244,7 @@ public final class Recorder {
 				Notify.toast("No microphone", "Recording without it: " + e.getMessage());
 			}
 		}
+		gameSoundOn = s.gameSound;
 		if (s.gameSound) GameSound.begin();
 
 		paused = false;
@@ -439,6 +440,7 @@ public final class Recorder {
 	}
 
 	private static volatile Thread finishing;
+	private static boolean gameSoundOn;
 
 	private static void finish(String why, String exe, Process p, Thread w, long end, List<SoundMix.Voice> voices, Path work, Path video, Path mic,
 			Path outDir, String name, double seconds, int c, int d) {
@@ -479,7 +481,7 @@ public final class Recorder {
 			watch.setDaemon(true);
 			watch.start();
 			try {
-				Ffmpeg.run(Ffmpeg.finishCommand(exe, video, game, mic, Lens.settings.micVolume, part), 3600);
+				Ffmpeg.run(Ffmpeg.finishCommand(exe, video, game, mic, Lens.settings.micVolume, gameSoundOn ? seconds : 0, part), 3600);
 			} finally {
 				watch.interrupt();
 			}

@@ -135,7 +135,11 @@ public final class LensGameTest implements FabricClientGameTest {
 			String info = new String(p.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
 			p.waitFor();
 			log(tag + " " + video.getFileName() + ": " + info.replace('\n', ' '));
-			check(info.contains("codec_name=aac"), tag + " has sound");
+			check(info.contains("codec_name=aac"), tag + " has a sound track");
+			Process vd = new ProcessBuilder(exe, "-hide_banner", "-i", video.toString(), "-map", "0:a", "-af", "volumedetect", "-f", "null", "-").redirectErrorStream(true).start();
+			String vol = new String(vd.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+			vd.waitFor();
+			for (String line : vol.split("\n")) if (line.contains("max_volume") || line.contains("mean_volume")) log(tag + " sound " + line.substring(line.indexOf(']') + 1).trim());
 			Path shots = FabricLoader.getInstance().getGameDir().resolve("screenshots");
 			Files.createDirectories(shots);
 			List<String> cmd = List.of(exe, "-v", "error", "-y", "-ss", "2", "-i", video.toString(), "-frames:v", "1", shots.resolve("ll-frame-" + tag + ".png").toString());

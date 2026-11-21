@@ -288,7 +288,17 @@ public final class Ffmpeg {
 	 * microphone mixed and encoded to AAC. Written as MP4 to a temporary name.
 	 */
 	public static List<String> finishCommand(String exe, Path video, Path gameWav, Path micWav, double micVolume, Path out) {
+		return finishCommand(exe, video, gameWav, micWav, micVolume, 0, out);
+	}
+
+	/** As above; with no sound files and `silence` seconds, a silent stereo track (editors expect one). */
+	public static List<String> finishCommand(String exe, Path video, Path gameWav, Path micWav, double micVolume, double silence, Path out) {
 		List<String> c = new ArrayList<>(List.of(exe, "-hide_banner", "-loglevel", "warning", "-nostdin", "-y", "-i", video.toString()));
+		if (gameWav == null && micWav == null && silence > 0) {
+			c.addAll(List.of("-f", "lavfi", "-t", String.format(Locale.ROOT, "%.3f", silence), "-i", "anullsrc=r=48000:cl=stereo"));
+			c.addAll(List.of("-map", "0:v:0", "-c:v", "copy", "-map", "1:a", "-c:a", "aac", "-b:a", "128k", "-f", "mp4", out.toString()));
+			return c;
+		}
 		if (gameWav != null) c.addAll(List.of("-i", gameWav.toString()));
 		if (micWav != null) c.addAll(List.of("-i", micWav.toString()));
 		c.addAll(List.of("-map", "0:v:0", "-c:v", "copy"));
