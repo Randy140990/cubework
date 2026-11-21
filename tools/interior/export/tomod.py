@@ -42,8 +42,8 @@ NORTH_DOOR = {"gate_n": "forest_north"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).
 # (On the mat's inner half: the mats are two deep, and you're out once you're past their middle.)
 ENTRY = {"house1": {"x": 6.0, "z": 12.5, "yaw": 180.0}, "rival1": {"x": 6.0, "z": 12.5, "yaw": 180.0}, "lab": {"x": 9.0, "z": 18.5, "yaw": 180.0},
-         "center": {"x": 10.0, "z": 14.5, "yaw": 180.0}, "mart": {"x": 8.0, "z": 12.5, "yaw": 180.0}, "school": {"x": 7.0, "z": 9.5, "yaw": 180.0},
-         "nickhouse": {"x": 6.0, "z": 8.5, "yaw": 180.0}, "gate_s": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "gate_n": {"x": 7.0, "z": 2.6, "yaw": 0.0}}
+         "center": {"x": 10.0, "z": 14.5, "yaw": 180.0}, "mart": {"x": 8.0, "z": 12.5, "yaw": 180.0}, "school": {"x": 6.0, "z": 8.5, "yaw": 180.0},
+         "nickhouse": {"x": 6.0, "z": 7.5, "yaw": 180.0}, "gate_s": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "gate_n": {"x": 7.0, "z": 2.6, "yaw": 0.0}}
 START = {"room": "house2", "x": 4.2, "z": 9.5, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {

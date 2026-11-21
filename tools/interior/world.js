@@ -264,7 +264,7 @@ function counterUnit(room, F, lx, w, front = "cupboard", top = "counter", side =
 }
 function kitchen(room, X, f, o = {}) {
   // A run along a wall: fridge, cupboards, sink, hob with oven, and cupboards and a hood above.
-  const F = room.F(X, 0, f), G = room.geo;
+  const F = room.F(X, o.z || 0, f), G = room.geo;
   F.box(0, 0, 0, 1.2, 2.7, 0.95, { front: "fridge", all: "paint", back: null, bottom: null });
   F.box(0.15, 2.7, 0.2, 0.75, 3.05, 0.7, { all: "honey" });
   F.box(0.8, 2.7, 0.3, 1.1, 2.95, 0.6, { all: "cushion" });

@@ -62,8 +62,8 @@ public final class Title {
 		// (A touch bigger and higher than the viewer's 0.95: its model's height in the game runs over its body, so it
 		// came out small and low.)
 		// (Lower and a little nearer, as the viewer has it now: its feet go down out of the frame, not standing in the air.)
-		Figures.Fig f = Scenes.place(b, cam, null, partner, 0, -0.24, 0, Math.PI - 0.38, secs);
-		f.perBlock(f.perBlock * (float) (1.05 * 1.22 / h));
+		Figures.Fig f = Scenes.place(b, cam, null, partner, 0, -0.14, 0, Math.PI - 0.38, secs);
+		f.perBlock(f.perBlock * (float) (1.0 * 1.22 / h));
 		b.draw(g);
 		// The grass close up, swaying (the viewer's skewX about their foot, 4.2 and 5.5 seconds there and back).
 		blades(g, BLADES0, 0, 568, 1280, 152, (float) Math.toRadians(sway(secs, 4.2F, 0)), X, Y, sc);

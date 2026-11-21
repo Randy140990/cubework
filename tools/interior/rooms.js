@@ -12,7 +12,6 @@ const PLACES = [
   { id: "center", name: "Pokémon Center", floor: "Viridian City", group: "Viridian City" },
   { id: "mart", name: "Poké Mart", floor: "Viridian City", group: "Viridian City" },
   { id: "school", name: "Trainer School", floor: "1F", group: "Viridian City" },
-  { id: "trainer2", name: "Trainer House", floor: "B1F", group: "Viridian City" },
   { id: "nickhouse", name: "Viridian house", floor: "Ground floor", group: "Viridian City" },
   { id: "gate_s", name: "Route 2 gate", floor: "South", group: "Route 2" },
   { id: "gate_n", name: "Route 2 gate", floor: "North", group: "Route 2" },
@@ -36,8 +35,8 @@ const GN_FROM_FOREST = { x: 7.0, z: 8.5, yaw: FACE.n }, GN_IN = { x: 7.0, z: 2.6
 const TH_DOOR = [7, 9], TH_IN = { x: 8.0, z: 12.5, yaw: FACE.n }, TH_FOOT = { x: 11.1, z: 1.1, yaw: FACE.s }, TH_TOP = { x: 15.5, z: 2.9, yaw: FACE.s };
 // Viridian's two green-roofed buildings: the Trainer School above the Center (the Trainer House's battle room under
 // it), and the house above that. Both small, as their outsides are (10 by 6).
-const SCHOOL_DOOR = [6, 8], SCHOOL_IN = { x: 7.0, z: 9.5, yaw: FACE.n }, SCHOOL_TOP = { x: 13.5, z: 2.9, yaw: FACE.s };
-const VHOUSE_DOOR = [5, 7], VHOUSE_IN = { x: 6.0, z: 8.5, yaw: FACE.n };
+const SCHOOL_DOOR = [5, 7], SCHOOL_IN = { x: 6.0, z: 8.5, yaw: FACE.n }, SCHOOL_TOP = { x: 13.5, z: 2.9, yaw: FACE.s };
+const VHOUSE_DOOR = [5, 7], VHOUSE_IN = { x: 6.0, z: 7.5, yaw: FACE.n };
 // The Route 2 gates, as Let's Go has them (one design for every gate, its people its own): in from the route at the
 // south, a long blue runner to the way on at the north.
 const LG_GATE_DOOR = [6, 8], LG_GATE_IN = { x: 7.0, z: 10.5, yaw: FACE.n }, LG_GATE_FROM_N = { x: 7.0, z: 2.6, yaw: FACE.s };
@@ -179,7 +178,11 @@ function drawScoreboard(P, f) {
   reg("deskYellow", 16, 16, (P, r) => { P.fill(hx("#F2C14E"), 0.04, r); P.rect(0, 0, 16, 1, hx("#F8D77E")); });
   reg("paperSchool", 16, 16, (P, r) => mcStone(P, r, hx("#F6EEDC"), 0.03, 2));
   reg("schoolTrim", 16, 16, (P, r) => { P.fill(hx("#9C6A3C"), 0.04, r); P.rect(0, 0, 16, 2, hx("#BE8A57")); });
-  reg("gateCheck", 32, 32, (P, r) => mcCheck(P, r, hx("#F7E7B4"), hx("#E9C977")), { per: 2 });
+  reg("gateCheck", 32, 32, (P, r) => mcCheck(P, r, hx("#EED690"), hx("#DDB662")), { per: 2 });
+  reg("houseBoards", 32, 32, (P, r) => planks(P, r, hx("#9A6438"), hx("#B27A4A"), hx("#7C4E2A"), hx("#4E2E16"), 8, 32), { per: 2 });
+  reg("beam", 16, 16, (P, r) => { P.fill(hx("#8A5A34"), 0.05, r); P.rect(0, 0, 2, 16, hx("#A8744A")); P.rect(14, 0, 2, 16, hx("#6A4224")); });
+  reg("rugGreen", 32, 32, (P, r) => { P.fill(hx("#6FB55A"), 0.04, r); P.rect(0, 0, 32, 2, hx("#4E8E40")); P.rect(0, 30, 32, 2, hx("#4E8E40")); P.rect(0, 0, 2, 32, hx("#4E8E40")); P.rect(30, 0, 2, 32, hx("#4E8E40"));
+    P.rect(4, 4, 24, 1, hx("#A8D88E")); P.rect(4, 27, 24, 1, hx("#A8D88E")); P.rect(4, 4, 1, 24, hx("#A8D88E")); P.rect(27, 4, 1, 24, hx("#A8D88E")); }, { fit: true });
   reg("paperGateLG", 16, 16, (P, r) => mcStone(P, r, hx("#F7F1E2"), 0.03, 2));
   reg("gateBlue", 16, 16, (P, r) => { P.fill(hx("#5C8FB8"), 0.04, r); P.rect(0, 0, 16, 1, hx("#7FAAD0")); });
   reg("gateWhite", 16, 16, (P, r) => P.fill(hx("#F4F6F4"), 0.02, r));
@@ -459,6 +462,21 @@ function schoolDesk(room, x, z, o = {}) {
   if (o.book) room.geo.box(x - 0.25, 0.74, z - 0.15, x + 0.15, 0.78, z + 0.15, { all: "linen", top: "bookOpen" });
   if (o.lines) room.act([x - 0.6, z - 0.5, x + 0.6, z + 0.45], { label: "Read", lines: o.lines });
 }
+// A window on a side wall ("w" or "e"), its panes crossed (a white bar each way), a sill under it. z: where it starts
+// along the wall, w its width; y its foot, h its height.
+function crossWindow(R, wall, z, y, w, h, lines) {
+  framed(R, z, y, w, h, "window", wall, { frameMat: "paint", act: { label: "Look", lines } });
+  const G = R.geo, x0 = wall === "w" ? 0.09 : R.W - 0.15, x1 = x0 + 0.06, zc = z + w / 2, yc = y + h / 2;
+  G.box(x0, y, zc - 0.05, x1, y + h, zc + 0.05, "paint");
+  G.box(x0, yc - 0.05, z, x1, yc + 0.05, z + w, "paint");
+  const sx0 = wall === "w" ? 0 : R.W - 0.26, sx1 = sx0 + 0.26;
+  G.box(sx0, y - 0.2, z - 0.15, sx1, y - 0.1, z + w + 0.15, "paint");
+}
+// A wooden post in a corner of the room (Let's Go's rooms have them), floor to ceiling.
+function cornerPost(R, x, z, s = 0.42, mat = "beam") {
+  R.geo.box(x, 0, z, x + s, R.H, z + s, { all: mat, top: "cap", bottom: null });
+  R.solid(x, z, x + s, z + s);
+}
 // Let's Go's gate: the room both Route 2 gates (and later ones) are built from. o.south / o.north: the ways out
 // ({ to } for a real one, { none, lines } for one that goes nowhere yet).
 function lgGate(R, o) {
@@ -467,7 +485,7 @@ function lgGate(R, o) {
   // The blue lower walls, a white rail over them.
   band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
   // Windows down both sides.
-  for (const z of [2.6, 7.4]) for (const wall of ["w", "e"]) framed(R, z, 1.6, 2.0, 1.3, "window", wall, { frameMat: "paint", act: { label: "Look", lines: ["Outside: the trees along ROUTE 2."] } });
+  for (const z of [2.6, 7.4]) for (const wall of ["w", "e"]) crossWindow(R, wall, z, 1.6, 2.0, 1.4, ["Outside: the trees along ROUTE 2."]);
   // The way at the north (dark, the forest's green beyond), palms either side.
   const north = o.north || {};
   passageN(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], north.none ? { none: true, mat: "matGateN", frame: "paint" } : { to: north.to, spawn: north.spawn, mat: "matGateN", frame: "paint" });
@@ -845,12 +863,21 @@ const BUILD = {
   },
 
   school() {
-    // Viridian's Trainer School (the green roof above the Center), as Let's Go has it: the board at the front, the
-    // teacher by it, rows of yellow desks, the pupils. The stairs at the back go down to the Trainer House's battle
-    // room, where a new challenger waits each day.
-    const R = new Room("school", { name: "Trainer School", floor: "1F", W: 14, D: 11, outsideSize: "10 by 6" });
+    // Viridian's Trainer School (the green roof above the Center), as Let's Go has it: small, posts in the corners,
+    // the board on a piece of wall that comes out at the front, the teacher by it, a bookcase in the right-hand
+    // corner, desks side by side in two blocks either side of the way in, pupils at them with their books open.
+    const R = new Room("school", { name: "Trainer School", floor: "Ground floor", W: 12, D: 10, outsideSize: "10 by 6" });
     shell(R, { paper: "paperSchool", floor: "schoolWood", door: SCHOOL_DOOR, skirt: "schoolTrim" });
     band(R, 1.0, "schoolTrim", 0.12);
+    const G = R.geo;
+    for (const [x, z] of [[0, 0], [11.58, 0], [0, 9.58], [11.58, 9.58]]) cornerPost(R, x, z);
+    // The front: a piece of wall standing out from the back wall, the board on it, its chalk ledge.
+    G.box(3, 0, 0, 9, R.H, 0.5, { s: "paperSchool", e: "paperSchool", w: "paperSchool", top: "cap" });
+    G.box(3, 0, 0.5, 9, 0.24, 0.56, "schoolTrim");
+    R.solid(3, 0, 9, 0.5);
+    G.box(3.4, 1.2, 0.5, 8.6, 3.15, 0.58, "walnut");
+    G.box(3.55, 1.35, 0.58, 8.45, 3.0, 0.59, { s: "chalkboard", all: null });
+    G.box(3.4, 1.12, 0.5, 8.6, 1.2, 0.72, "walnut");
     const board = ["The BLACKBOARD: what can go wrong for a POKéMON in battle.",
       "SLEEP: it can't attack until it wakes up. That can take a few turns.",
       "POISON: it loses HP every turn, and as you walk about with it too.",
@@ -858,55 +885,65 @@ const BUILD = {
       "BURN: it loses HP every turn, and its physical attacks are weaker.",
       "FREEZE: it can't move at all until it thaws out.",
       "A POKéMON CENTER puts every one of them right."];
-    framed(R, 3.2, 1.25, 5.6, 1.9, "chalkboard", "n", { frameMat: "walnut", act: { label: "Read", lines: board } });
-    // The chalk ledge under it.
-    R.geo.box(3.1, 1.15, 0, 8.9, 1.22, 0.16, "walnut");
-    // The teacher's desk at the front, by the board.
-    table(R, 0.9, 2.0, 2.7, 2.9, { top: "oak", leg: "walnut", h: 0.86, name: "Teacher's desk", note: "Oak, with a register and a cup of pens." });
-    R.geo.box(1.2, 0.86, 2.2, 1.8, 0.9, 2.7, { all: "linen", top: "bookOpen" });
-    // Two rows of desks either side of the way in (the aisle from the door to the board is clear).
+    R.act([3.4, 0.5, 8.6, 1.2], { label: "Read", lines: board });
+    // The bookcase in the right-hand corner.
+    bookshelf(R, 9.4, 0, "s", 2.1, 2.6, { wood: "walnut", lines: ["Books on POKéMON: TYPES, MOVES, and HOW TO CARE FOR YOUR FIRST POKéMON."] });
+    // The desks: side by side in twos, two rows each side of the way in, a pupil at three of them, books open.
     const notebook = ["A notebook, left open. TRAINER TIPS, page 1: weaken a wild POKéMON before you throw a POKé BALL.",
       "Page 2: a POKéMON that's asleep or paralysed is easier to catch.",
       "Page 3: you can carry six POKéMON. Any more you catch go to the PC in a POKéMON CENTER.",
       "Page 4: wild POKéMON live in the tall grass. Watch where you walk!"];
-    schoolDesk(R, 2.6, 4.4); schoolDesk(R, 4.4, 4.4, { book: true, lines: notebook }); schoolDesk(R, 9.6, 4.4); schoolDesk(R, 11.4, 4.4);
-    schoolDesk(R, 2.6, 6.9); schoolDesk(R, 4.4, 6.9); schoolDesk(R, 9.6, 6.9); schoolDesk(R, 11.4, 6.9);
-    // The stairs down, at the back on the east side; books on the west wall; plants in the front corners.
-    stairsDown(R, 10, 0, 2, { to: "trainer2", spawn: TH_FOOT, paper: "paperSchool" });
-    bookshelf(R, 0, 4.0, "e", 2.4, 2.2, { wood: "walnut", lines: ["Books on POKéMON: TYPES, MOVES, and HOW TO CARE FOR YOUR FIRST POKéMON."] });
-    slimPlant(R, 0.8, 10.2, 1.0); palm(R, 13.2, 10.0, 0.95);
-    framed(R, 5.2, 1.4, 1.8, 1.4, "window", "e", { frameMat: "paint", act: { label: "Look", lines: ["Outside: VIRIDIAN CITY's houses, and the GYM's roof over the trees."] } });
+    schoolDesk(R, 2.15, 3.3, { book: true }); schoolDesk(R, 3.25, 3.3, { book: true, lines: notebook });
+    schoolDesk(R, 8.75, 3.3); schoolDesk(R, 9.85, 3.3, { book: true });
+    schoolDesk(R, 2.15, 5.8); schoolDesk(R, 3.25, 5.8, { book: true });
+    schoolDesk(R, 8.75, 5.8, { book: true }); schoolDesk(R, 9.85, 5.8);
+    // Plants in white pots along the sides.
+    palm(R, 0.8, 7.6, 0.9); palm(R, 11.2, 7.6, 0.9);
+    crossWindow(R, "e", 4.2, 1.5, 1.8, 1.4, ["Outside: VIRIDIAN CITY's houses, and the GYM's roof over the trees."]);
+    crossWindow(R, "w", 4.2, 1.5, 1.8, 1.4, ["Outside: the POKéMON CENTER's red roof."]);
     doormat(R, SCHOOL_DOOR[0], SCHOOL_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matSchool" });
-    R.npcs.push({ name: "Teacher", key: "viridian_school_teacher", x: 3.4, z: 1.6, yaw: FACE.s, look: { skin: "lady" },
+    R.npcs.push({ name: "Teacher", key: "viridian_school_teacher", x: 2.2, z: 1.5, yaw: FACE.s, look: { skin: "lady" },
       talk: () => [{ text: "Welcome to the TRAINER SCHOOL! Shall I ask you a question?" }] });
-    R.npcs.push({ name: "Pupil", key: "viridian_school_kid", x: 9.6, z: 5.18, yaw: FACE.n, seated: true, look: { skin: "school_kid" },
+    R.npcs.push({ name: "Pupil", key: "viridian_school_kid", x: 2.15, z: 4.08, yaw: FACE.n, seated: true, look: { skin: "school_kid" },
       talk: () => [{ text: "Whew! I'm trying to learn all my notes by heart." }, { text: "The test is about STATUS problems. Look at the board!" }] });
-    R.npcs.push({ name: "Pupil", key: "viridian_school_girl", x: 2.6, z: 7.68, yaw: FACE.n, seated: true, look: { skin: "school_kid_f" },
+    R.npcs.push({ name: "Pupil", key: "viridian_school_girl", x: 9.85, z: 4.08, yaw: FACE.n, seated: true, look: { skin: "school_kid_f" },
       talk: () => [{ text: "The notebook on the desk up front has TRAINER TIPS in it." }, { text: "Have a read! It's really useful." }] });
+    R.npcs.push({ name: "Pupil", key: "viridian_school_kid2", x: 8.75, z: 6.58, yaw: FACE.n, seated: true, look: { skin: "schoolboy" },
+      talk: () => [{ text: "A burnt POKéMON's attacks are weaker? I never knew that!" }, { text: "I'd better write it down." }] });
     R.spawn = SCHOOL_IN;
     return R;
   },
 
   nickhouse() {
-    // The house above the Trainer School: small and cosy, one floor. A father and his little girl (as in the old
-    // games, he's full of thoughts about nicknames), their SPEAROW's bed by the window.
-    const R = new Room("nickhouse", { name: "Viridian house", floor: "Ground floor", W: 12, D: 10, outsideSize: "10 by 6" });
-    shell(R, { paper: "paperMum", floor: "oak", door: VHOUSE_DOOR });
-    kitchen(R, 0.2, "s");
-    windowN(R, 7.4, 1.3, 2.2, 1.6, { curtains: "redFabric", lines: ["Outside, VIRIDIAN CITY's houses, and a SPEAROW circling over the roofs."] });
-    table(R, 1.4, 4.4, 3.4, 5.8, { cloth: "redFabric", name: "Dining table", note: "Oak, a red runner, two chairs." });
-    chair(R, 2.4, 3.8, "s"); chair(R, 2.4, 6.4, "n");
-    rug(R, 7, 4, 11, 7, "rugRoom");
-    sofa(R, 7.5, 7.6, "n", 3, { fabric: "blueFabric" });
-    bookshelf(R, 12, 1.2, "w", 2, 2.2, { lines: ["Books: NAMING YOUR POKéMON, and A THOUSAND NICKNAMES FOR BIRD POKéMON."] });
-    // Their SPEAROW's bed, under the window.
-    R.geo.box(9.9, 0, 1.0, 10.9, 0.18, 1.8, { all: "redFabric", top: "cushion" });
-    R.act([9.8, 0.6, 11.0, 2.0], { label: "Look", lines: ["A little bed with a name stitched on it: SPEARY.", "SPEARY's out for a fly."] });
-    plant(R, 0.9, 9.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+    // The house above the Trainer School, as Let's Go has it: dark wide boards, posts in the corners, the kitchen
+    // down the left-hand wall, the TV in the middle at the back with a bookshelf beside it, the table in the middle
+    // on a green rug, two windows on the right. A father and his little girl, and their SPEAROW's perch.
+    const R = new Room("nickhouse", { name: "Viridian house", floor: "Ground floor", W: 12, D: 9, outsideSize: "10 by 6" });
+    shell(R, { paper: "paperSchool", floor: "houseBoards", door: VHOUSE_DOOR, skirt: "beam" });
+    band(R, 1.0, "beam", 0.12);
+    const G = R.geo;
+    for (const [x, z] of [[0, 0], [11.58, 0], [0, 8.58], [11.58, 8.58]]) cornerPost(R, x, z);
+    // The kitchen down the left-hand wall (from the back corner towards you): fridge, sink, hob, a microwave above.
+    kitchen(R, 0, "e", { z: 6.2 });
+    // The TV in the middle at the back, on a low cabinet; the bookshelf beside it.
+    tvSet(R, 4.6, 0, "s", R.screen("tvHouseV", 40, 24, drawFilm, 0.9), { w: 2.8, lines: ["A nature programme: a flock of SPEAROW over the sea."] });
+    bookshelf(R, 7.8, 0, "s", 2.2, 1.6, { wood: "walnut", lines: ["Books: NAMING YOUR POKéMON, and A THOUSAND NICKNAMES FOR BIRD POKéMON."] });
+    // The table in the middle, on a green rug; a chair at the back of it and one at its right.
+    G.box(3.9, 0, 3.0, 8.1, 0.03, 6.6, { top: "rugGreen", all: "cap", bottom: null });
+    table(R, 5.0, 3.9, 7.0, 5.7, { top: "oak", leg: "walnut", h: 0.86, name: "Table", note: "Oak, a bowl of fruit in the middle." });
+    G.box(5.75, 0.86, 4.55, 6.25, 1.02, 5.05, { all: "honey", top: "flowerTop" });
+    chair(R, 6.0, 3.3, "s"); chair(R, 7.6, 4.8, "w");
+    // Two windows on the right, the SPEAROW's perch between them.
+    crossWindow(R, "e", 1.6, 1.4, 1.8, 1.4, ["Outside: VIRIDIAN CITY's rooftops."]);
+    crossWindow(R, "e", 5.4, 1.4, 1.8, 1.4, ["Outside: the TRAINER SCHOOL's green roof."]);
+    G.box(11.1, 0, 4.0, 11.3, 1.3, 4.2, "walnut"); G.box(10.7, 1.3, 4.05, 11.7, 1.38, 4.15, "walnut");
+    R.act([10.4, 3.6, 12, 4.6], { label: "Look", lines: ["A perch with a name carved on it: SPEARY.", "SPEARY's out for a fly."] });
+    bin(R, 0.7, 8.2);
+    plant(R, 11.1, 8.1, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
     doormat(R, VHOUSE_DOOR[0], VHOUSE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHouseV" });
-    R.npcs.push({ name: "Father", key: "viridian_house_dad", x: 8.6, z: 3.2, yaw: FACE.s, look: { skin: "middle_aged_man" },
+    R.npcs.push({ name: "Father", key: "viridian_house_dad", x: 2.0, z: 4.6, yaw: FACE.e, look: { skin: "middle_aged_man" },
       talk: () => [{ text: "Coming up with nicknames is fun, but it's harder than you'd think." }, { text: "Simple names are the easiest to remember." }] });
-    R.npcs.push({ name: "Little girl", key: "viridian_house_girl", x: 2.4, z: 6.4, yaw: FACE.n, seated: true, look: { skin: "little_girl" },
+    R.npcs.push({ name: "Little girl", key: "viridian_house_girl", x: 9.6, z: 5.6, yaw: FACE.w, look: { skin: "little_girl" },
       talk: () => [{ text: "My daddy loves POKéMON too!" }, { text: "Our SPEAROW is called SPEARY. Daddy named it!" }] });
     R.spawn = VHOUSE_IN;
     return R;

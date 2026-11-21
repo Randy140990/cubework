@@ -159,16 +159,19 @@ const SCENES = {
     let you = null, lookKey = "";
     // Our creatures beside him: standing about, now and then one calling out. ZAPGLIDER, the bone-helmet one and the
     // bird walk with him when he sets off.
-    const SPOTS = [["pikachu", -0.85, 0.95, 0.35], ["cubone", -1.8, 0.35, 0.55], ["oddish", 0.55, 1.35, -0.1], ["clefairy", -1.3, 1.55, 0.2], ["pidgey", -1.45, -0.55, 0.4, 1.55]];
+    // (Each in a lane of its own, as the mod has them, so none ever walks through another: the three who walk with
+    // him just behind him, the ones who stay further back, the one walking its loop right at the back, the parade's
+    // rows behind them all.)
+    const SPOTS = [["pikachu", -0.95, -0.6, 0.35], ["cubone", -1.8, -2.6, 0.55], ["oddish", 0.6, -1.85, -0.1], ["clefairy", -1.55, -1.25, 0.2], ["pidgey", -0.55, -1.15, 0.4, 1.65]];
     SPOTS.forEach(([sid, x, z, turn, fly]) => mon(sid).then(st => { st.base = "ground"; st.home = [x, z, turn, fly || 0]; group.add(st.m.holder); S.runners.push(st); placeMon(st, x, z, Math.PI + turn, fly || 0); }));
     // Further along, the ones he walks past: a parade of all sorts, big ones further back, little ones near.
     const PARADE = ["growlithe", "exeggutor", "psyduck", "ponyta", "jigglypuff", "onix", "meowth", "machoke", "vulpix", "snorlax", "butterfree", "nidoking", "eevee", "lapras", "pidgeot"];
     let pi = 0;
     for (const sid of PARADE) {
       if (!DATA.species[sid]) continue;
-      const i = pi++, x = 3.8 + i * 1.15, row = [1.4, -1.35, -2.4][i % 3];
+      const i = pi++, x = 3.8 + i * 1.15, row = [-1.5, -2.35, -3.2][i % 3];
       mon(sid).then(st => { const big = st.m.size.h > 2.2 ? 2.2 / st.m.size.h : 1; if (big < 1) { st.m.holder.scale.multiplyScalar(big); st.m.size = { ...st.m.size, h: st.m.size.h * big, w: st.m.size.w * big, l: st.m.size.l * big, cx: st.m.size.cx * big, cz: st.m.size.cz * big }; }
-        const flyer = ["butterfree", "pidgeot"].includes(sid), z = flyer ? -0.9 : st.m.size.h > 1.3 ? -2.4 : st.m.size.h > 0.9 && row > 0 ? -1.35 : row;
+        const flyer = ["butterfree", "pidgeot"].includes(sid), z = flyer ? -1.8 : st.m.size.h > 1.3 ? -3.2 : st.m.size.h > 0.9 ? Math.min(row, -2.35) : row;
         st.base = flyer ? "fly" : "ground"; st.home = [x, z, (i % 3 - 1) * 0.35, flyer ? 1.5 : 0]; group.add(st.m.holder); S.parade.push(st); st.m.holder.visible = S.mode === "intro"; placeMon(st, x, z, Math.PI + st.home[2], st.home[3]); });
     }
     S.nextCry = 2;
@@ -211,18 +214,18 @@ const SCENES = {
       if (S.nextCry < 0 && all.length) { const r = all[Math.floor(Math.random() * all.length)]; if (!W || r.sid !== "pikachu") playOnce(r, "cry"); S.nextCry = 2 + Math.random() * 2; }
       for (const r of S.runners) {
         const [x, z, turn, fly] = r.home, px = prof.root.position.x;
-        if (W && ["pikachu", "cubone", "pidgey"].includes(r.sid)) {
-          // Walking with him: ZAPGLIDER at his side in front, the bone-helmet one behind, the bird over his shoulder.
-          const off = { pikachu: [0.85, 0.75, 0], cubone: [-1.0, -0.45, 0], pidgey: [-0.4, -0.6, 1.7] }[r.sid];
+        if (W && ["pikachu", "clefairy", "pidgey"].includes(r.sid)) {
+          // Walking with him, behind him and to his left, in their own lane (clear of the ones further back and the parade).
+          const off = { pikachu: [-0.95, -0.6, 0], clefairy: [-1.85, -0.95, 0], pidgey: [-1.25, -1.15, 1.75] }[r.sid];
           const tx = px + off[0], tz = off[1], cx = r.walkX == null ? x : r.walkX, cz = r.walkZ == null ? z : r.walkZ;
           r.walkX = cx + (tx - cx) * Math.min(1, dt * 3); r.walkZ = cz + (tz - cz) * Math.min(1, dt * 3);
           const moving = !W.done || Math.abs(tx - r.walkX) > 0.05;
           placeMon(r, r.walkX, r.walkZ, moving ? -Math.PI / 2 - 0.25 : Math.PI + (r.sid === "pikachu" ? -0.4 : 0.3), off[2] ? off[2] + Math.sin(t * 2.4) * 0.12 : 0);
           r.base = off[2] ? "fly" : moving ? "walk" : "ground";
         } else if (r.sid === "cubone") {
-          // Round the professor in a wide loop, clear of the others, facing the way it walks.
-          const a = t * 0.35, wx = Math.cos(a) * 2.55, wz = 0.35 + Math.sin(a) * 2.25;
-          placeMon(r, wx, wz, Math.atan2(Math.sin(a) * 2.55, -Math.cos(a) * 2.25)); r.base = "walk";
+          // To and fro right at the back, behind him and all the others (never through any of them).
+          const a = t * 0.35, wx = Math.cos(a) * 2.4, wz = -2.6 + Math.sin(a) * 0.2;
+          placeMon(r, wx, wz, Math.atan2(Math.sin(a) * 2.4, -Math.cos(a) * 0.2)); r.base = "walk";
         } else if (r.sid === "pikachu" && S.hopT != null) {
           // Up onto his shoulder in a little arc, then riding there.
           S.hopT = Math.min(1, S.hopT + dt / 0.75); const k = S.hopT, e = k * k * (3 - 2 * k);
@@ -250,8 +253,8 @@ const SCENES = {
     } else {
       // As Let's Go's title, shot like a film: your partner big and sharp on the right, close enough that its feet are
       // below the frame, with the Minecraft meadow behind out of focus (titleBack, its own canvas behind the scene).
-      mon("pikachu").then(st => { const k = 1.05 / Math.max(0.5, st.m.size.h); st.m.holder.scale.multiplyScalar(k); st.m.size = { ...st.m.size, h: st.m.size.h * k, w: st.m.size.w * k, l: st.m.size.l * k, cx: st.m.size.cx * k, cz: st.m.size.cz * k };
-        st.base = "ground"; group.add(st.m.holder); placeMon(st, 0, 0, Math.PI - 0.38, -0.24); S.mons.push(st); S.star = st; });
+      mon("pikachu").then(st => { const k = 1.0 / Math.max(0.5, st.m.size.h); st.m.holder.scale.multiplyScalar(k); st.m.size = { ...st.m.size, h: st.m.size.h * k, w: st.m.size.w * k, l: st.m.size.l * k, cx: st.m.size.cx * k, cz: st.m.size.cz * k };
+        st.base = "ground"; group.add(st.m.holder); placeMon(st, 0, 0, Math.PI - 0.38, -0.14); S.mons.push(st); S.star = st; });
       S.back = null;
       S.enter = () => {
         if (!S.back) S.back = titleBack();

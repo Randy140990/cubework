@@ -22,6 +22,7 @@
     "OutlineColourMixin",
     "TitleMixin",
     "LoadingScreenMixin",
+    "MessageScreenMixin",
     "ModelPartAccessor",
     "CubeAccessor",
     "KeyboardHandlerMixin"
