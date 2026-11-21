@@ -36,6 +36,16 @@ fabricApi {
 	}
 }
 
+// As in Lightreel's tests: chunks load normally (the synchroniser held the world at "Preparing spawn area").
+loom {
+	runs {
+		clientGameTest {
+			property("fabric.client.gametest.disableNetworkSynchronizer", "true")
+			property("java.awt.headless", "true")
+		}
+	}
+}
+
 // The jar: Lightlens-0.1.0-for-MC1.21.11.jar
 remapJar {
 	archiveFileName = "Lightlens-${project.mod_version}-for-MC${project.minecraft_version}.jar"
