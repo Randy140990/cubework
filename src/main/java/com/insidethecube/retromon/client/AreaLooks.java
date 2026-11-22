@@ -36,63 +36,76 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 /**
- * Looks that only some places have: a block drawn differently where it is, without the map being changed (Pallet
- * Town's white fences, the HeartGold red tiles on your house's and Blue's roofs, the shelf signs as HeartGold's
- * signs, the grass's tufts onto the dripstone round the water). Which look, on which block, where: the games' data
- * (area_looks.tsv). Only in a Retromon save; anywhere else the blocks look as they always do.
+ * Looks that only some places have: a block drawn differently where it is, without the map being changed (the white
+ * fences of Pallet Town, Route 1, Viridian City and Route 22; the HeartGold red tiles on your house's and Blue's
+ * roofs; the signs as HeartGold's; the grass's tufts onto Pallet's dripstone round the water; Viridian's path, its
+ * kerbs and its black lampposts; Route 22's floor as a path; every Pokémon Center's reds and every Mart's blues as
+ * Let's Go's). Which look, on which blocks, where: the games' data (area_looks.tsv, from tools/arealooks.py). Only in
+ * a Retromon save; anywhere else the blocks look as they always do.
  *
  * Each block with a look keeps its own model, wrapped: outside its areas the wrapper draws the block as it was.
  */
 public final class AreaLooks {
 	private AreaLooks() {}
 
-	/** Part of the map (x and z, every height). */
-	private record Box(int x0, int z0, int x1, int z1) {
+	/** Part of the map: x and z, and the heights it covers (every height when y0 > y1). */
+	private record Box(int x0, int z0, int x1, int z1, int y0, int y1) {
 		boolean has(BlockPos p) {
-			return p.getX() >= x0 && p.getX() <= x1 && p.getZ() >= z0 && p.getZ() <= z1;
+			return p.getX() >= x0 && p.getX() <= x1 && p.getZ() >= z0 && p.getZ() <= z1 && (y0 > y1 || p.getY() >= y0 && p.getY() <= y1);
 		}
 	}
 
-	/** For each block with a look somewhere: each look's areas. */
-	private static final Map<Block, Map<String, List<Box>>> RULES = new HashMap<>();
+	/** One look somewhere: its name, its texture swaps ("block/tuff=lamp_tuff", "@4" for laid over 4 blocks), its areas. */
+	private record Rule(String look, String swaps, List<Box> boxes) {}
 
-	/** The signs' parts, by name ("board_l_north"): the models the mod puts where the shelves are. */
+	/** For each block with a look somewhere: its looks (by look and swaps). */
+	private static final Map<Block, Map<String, Rule>> RULES = new HashMap<>();
+
+	/** The signs' parts, by name ("board_l_north", "short_l_south", "wood_east"): the models put where the signs are. */
 	private static final Map<String, ExtraModelKey<BlockStateModel>> SIGN_PARTS = new HashMap<>();
 
 	static {
 		for (String[] r : Species.table("area_looks.tsv")) {
-			if (r.length < 6) continue;
-			Block b = BuiltInRegistries.BLOCK.getOptional(Identifier.withDefaultNamespace(r[1].trim())).orElse(null);
-			if (b == null || b == Blocks.AIR) continue;
+			if (r.length < 9) continue;
 			int x0 = Integer.parseInt(r[2].trim()), z0 = Integer.parseInt(r[3].trim()), x1 = Integer.parseInt(r[4].trim()), z1 = Integer.parseInt(r[5].trim());
-			RULES.computeIfAbsent(b, k -> new HashMap<>()).computeIfAbsent(r[0].trim(), k -> new ArrayList<>())
-					.add(new Box(Math.min(x0, x1), Math.min(z0, z1), Math.max(x0, x1), Math.max(z0, z1)));
+			boolean every = r[6].trim().equals("-") || r[7].trim().equals("-");
+			int ya = every ? 1 : Integer.parseInt(r[6].trim()), yb = every ? 0 : Integer.parseInt(r[7].trim());
+			Box box = new Box(Math.min(x0, x1), Math.min(z0, z1), Math.max(x0, x1), Math.max(z0, z1), every ? 1 : Math.min(ya, yb), every ? 0 : Math.max(ya, yb));
+			String look = r[0].trim(), swaps = r[8].trim();
+			for (String name : r[1].split(",")) {
+				Block b = BuiltInRegistries.BLOCK.getOptional(Identifier.withDefaultNamespace(name.trim())).orElse(null);
+				if (b == null || b == Blocks.AIR) continue;
+				RULES.computeIfAbsent(b, k -> new HashMap<>()).computeIfAbsent(look + "|" + swaps, k -> new Rule(look, swaps, new ArrayList<>())).boxes().add(box);
+			}
 		}
 	}
 
 	public static void register() {
 		ModelLoadingPlugin.register(ctx -> {
-			for (String row : new String[] {"board", "stand"}) {
+			for (Direction d : Direction.Plane.HORIZONTAL) {
 				for (String part : new String[] {"l", "r", "m", "s"}) {
-					for (Direction d : Direction.Plane.HORIZONTAL) {
-						String name = row + "_" + part + "_" + d.getSerializedName();
-						ExtraModelKey<BlockStateModel> key = ExtraModelKey.create(() -> "retromon sign " + name);
-						ctx.addModel(key, SimpleUnbakedExtraModel.blockStateModel(Retromon.id("block/area/sign_" + name)));
-						SIGN_PARTS.put(name, key);
-					}
+					for (String row : new String[] {"board", "stand", "short"}) part(ctx, row + "_" + part + "_" + d.getSerializedName(),
+							row.equals("short") ? "block/area/sign_short_" + part + "_" + d.getSerializedName() : "block/area/sign_" + row + "_" + part + "_" + d.getSerializedName());
 				}
+				part(ctx, "wood_" + d.getSerializedName(), "block/area/wood_sign_" + d.getSerializedName());
 			}
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
-				Map<String, List<Box>> looks = RULES.get(c.state().getBlock());
+				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
 				BlockStateModel out = model;
-				for (Map.Entry<String, List<Box>> e : looks.entrySet()) {
-					Look look = make(e.getKey(), c.baker());
-					if (look != null) out = new Wrapped(out, look, List.copyOf(e.getValue()));
+				for (Rule rule : looks.values()) {
+					Look look = make(rule, c.baker());
+					if (look != null) out = new Wrapped(out, look, List.copyOf(rule.boxes()));
 				}
 				return out;
 			});
 		});
+	}
+
+	private static void part(ModelLoadingPlugin.Context ctx, String name, String model) {
+		ExtraModelKey<BlockStateModel> key = ExtraModelKey.create(() -> "retromon sign " + name);
+		ctx.addModel(key, SimpleUnbakedExtraModel.blockStateModel(Retromon.id(model)));
+		SIGN_PARTS.put(name, key);
 	}
 
 	/** How a look draws a block that's in one of its areas (`base` is how the block's drawn anywhere else). */
@@ -132,29 +145,79 @@ public final class AreaLooks {
 		return baker.sprites().get(new Material(TextureAtlas.LOCATION_BLOCKS, Retromon.id("block/area/" + path)), () -> "retromon area looks");
 	}
 
-	private static Look make(String name, ModelBaker baker) {
-		return switch (name) {
-			case "white_fence" -> retexture(baker.sprites().spriteFinder(TextureAtlas.LOCATION_BLOCKS), sprite(baker, "white_fence"));
+	private static Look make(Rule rule, ModelBaker baker) {
+		return switch (rule.look()) {
+			case "swap" -> swap(baker, rule.swaps());
 			case "roof" -> new Roof(sprite(baker, "roof_tiles"), sprite(baker, "roof_edge"), sprite(baker, "roof_under"));
 			case "sign" -> AreaLooks::sign;
-			case "grass_edge" -> {
-				TextureAtlasSprite[] tufts = new TextureAtlasSprite[18], shade = new TextureAtlasSprite[18];
+			case "wood_sign" -> AreaLooks::woodSign;
+			case "grass_edge", "kerb" -> {
+				boolean kerb = rule.look().equals("kerb");
+				TextureAtlasSprite[] over = new TextureAtlasSprite[18], under = new TextureAtlasSprite[18];
 				for (int t = 1; t <= 17; t++) {
-					tufts[t] = sprite(baker, "grass_on_drip_" + t);
-					shade[t] = sprite(baker, "drip_shade_" + t);
+					over[t] = sprite(baker, (kerb ? "kerb_grass_" : "grass_on_drip_") + t);
+					under[t] = sprite(baker, (kerb ? "kerb_" : "drip_shade_") + t);
 				}
-				yield new GrassEdge(tufts, shade);
+				yield new GrassEdge(over, under, !kerb);
 			}
 			default -> null;
 		};
 	}
 
-	// ---------- one texture for another, same shape (the white fences) ----------
-	private static Look retexture(SpriteFinder finder, TextureAtlasSprite to) {
+	// ---------- textures swapped for others, same shapes (the white fences, the lamps, the roofs' colours, paths) ----------
+	/** A sprite to put in place of another, laid as the old one was (period 0) or from where it is, over `period` blocks. */
+	private record Swap(TextureAtlasSprite to, int period) {}
+
+	/**
+	 * Each face with one of the swapped textures gets its new one: in the old one's place on it (so a fence's posts and
+	 * rails keep their parts of the picture), or laid from where the face is ("@4": a picture four blocks across, as the
+	 * dirt paths' is), so neighbours run on.
+	 */
+	private static Look swap(ModelBaker baker, String spec) {
+		SpriteFinder finder = baker.sprites().spriteFinder(TextureAtlas.LOCATION_BLOCKS);
+		Map<Identifier, Swap> swaps = new HashMap<>();
+		for (String one : spec.split(",")) {
+			int eq = one.indexOf('=');
+			if (eq < 0) continue;
+			String from = one.substring(0, eq).trim(), to = one.substring(eq + 1).trim();
+			int period = 0, at = to.indexOf('@');
+			if (at >= 0) {
+				period = Integer.parseInt(to.substring(at + 1).trim());
+				to = to.substring(0, at);
+			}
+			Identifier fromId = from.contains(":") ? Identifier.parse(from) : Identifier.withDefaultNamespace(from);
+			swaps.put(fromId, new Swap(sprite(baker, to), period));
+		}
 		return (base, e, view, pos, state, random, cull) -> {
 			e.pushTransform(q -> {
 				TextureAtlasSprite from = finder.find(q);
-				if (from == null) return true;
+				Swap sw = from == null ? null : swaps.get(from.contents().name());
+				if (sw == null) return true;
+				TextureAtlasSprite to = sw.to();
+				if (sw.period() > 0) {
+					float[] s = new float[4], t = new float[4];
+					Direction f = q.lightFace();
+					float per = sw.period();
+					for (int i = 0; i < 4; i++) {
+						float wx = pos.getX() + q.x(i), wy = pos.getY() + q.y(i), wz = pos.getZ() + q.z(i);
+						switch (f.getAxis()) {
+							case Y -> {
+								s[i] = wx / per;
+								t[i] = wz / per;
+							}
+							case Z -> {
+								s[i] = wx / per;
+								t[i] = -wy / per;
+							}
+							default -> {
+								s[i] = wz / per;
+								t[i] = -wy / per;
+							}
+						}
+					}
+					lay(q, to, s, t);
+					return true;
+				}
 				float fu = from.getU1() - from.getU0(), fv = from.getV1() - from.getV0();
 				for (int i = 0; i < 4; i++) {
 					float nu = fu == 0 ? 0 : (q.u(i) - from.getU0()) / fu, nv = fv == 0 ? 0 : (q.v(i) - from.getV0()) / fv;
@@ -224,54 +287,81 @@ public final class AreaLooks {
 
 	// ---------- the signs ----------
 	/**
-	 * The shelves stacked as a sign: the top row is HeartGold's white board, the rows under it its grey stand. Each
-	 * shelf is the board's (or the stand's) left end, right end or a middle block as you look at its front, or the
-	 * whole of it when the sign is one block wide.
+	 * The way a sign faces: a shelf's facing, or a standing sign's turn when it's square to the map (south, west,
+	 * north or east); null for a standing sign at a slant (it keeps its own look).
+	 */
+	private static Direction facingOf(BlockState s) {
+		if (s.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) return s.getValue(BlockStateProperties.HORIZONTAL_FACING);
+		if (s.hasProperty(BlockStateProperties.ROTATION_16)) {
+			int r = s.getValue(BlockStateProperties.ROTATION_16);
+			if (r % 4 != 0) return null;
+			return r == 0 ? Direction.SOUTH : r == 4 ? Direction.WEST : r == 8 ? Direction.NORTH : Direction.EAST;
+		}
+		return null;
+	}
+
+	private static BlockStateModel extra(String name) {
+		ExtraModelKey<BlockStateModel> key = SIGN_PARTS.get(name);
+		if (key == null) return null;
+		try {
+			return ((FabricBakedModelManager) Minecraft.getInstance().getModelManager()).getModel(key);
+		} catch (RuntimeException ignored) {
+			return null;
+		}
+	}
+
+	/**
+	 * Signs as HeartGold's: the shelves stacked as a sign (the top row the white board, the rows under it its grey
+	 * stand), and standing pale oak signs (a block high: the board on a short stand, built round Minecraft's own
+	 * sign, so that never shows). Each block is the sign's left end, right end or a middle as you look at its front,
+	 * or the whole of it when the sign is one block wide.
 	 */
 	private static void sign(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
-		if (!state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+		Direction facing = facingOf(state);
+		if (facing == null) {
 			base.emitQuads(e, view, pos, state, random, cull);
 			return;
 		}
-		Direction facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
 		// You look at its front from in front of it: your left is its facing turned clockwise (north: east).
 		Direction left = facing.getClockWise();
-		boolean onLeft = sameSign(view, pos.relative(left), state), onRight = sameSign(view, pos.relative(left.getOpposite()), state);
+		boolean onLeft = sameSign(view, pos.relative(left), state, facing), onRight = sameSign(view, pos.relative(left.getOpposite()), state, facing);
 		String part = onLeft && onRight ? "m" : onRight ? "l" : onLeft ? "r" : "s";
-		String row = sameSign(view, pos.above(), state) ? "stand" : "board";
-		ExtraModelKey<BlockStateModel> key = SIGN_PARTS.get(row + "_" + part + "_" + facing.getSerializedName());
-		BlockStateModel m = null;
-		if (key != null) {
-			try {
-				m = ((FabricBakedModelManager) Minecraft.getInstance().getModelManager()).getModel(key);
-			} catch (RuntimeException ignored) {
-				m = null;
-			}
-		}
+		String row = state.hasProperty(BlockStateProperties.ROTATION_16) ? "short" : sameSign(view, pos.above(), state, facing) ? "stand" : "board";
+		BlockStateModel m = extra(row + "_" + part + "_" + facing.getSerializedName());
 		if (m == null) base.emitQuads(e, view, pos, state, random, cull);
 		else m.emitQuads(e, view, pos, state, random, cull);
 	}
 
-	private static boolean sameSign(BlockAndTintGetter view, BlockPos p, BlockState as) {
-		BlockState s = view.getBlockState(p);
-		return s.is(as.getBlock()) && s.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
-				&& s.getValue(BlockStateProperties.HORIZONTAL_FACING) == as.getValue(BlockStateProperties.HORIZONTAL_FACING);
+	/** A standing wooden sign as HeartGold's wooden sign, taller, built round Minecraft's own (that never shows). */
+	private static void woodSign(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
+		Direction facing = facingOf(state);
+		BlockStateModel m = facing == null ? null : extra("wood_" + facing.getSerializedName());
+		if (m == null) base.emitQuads(e, view, pos, state, random, cull);
+		else m.emitQuads(e, view, pos, state, random, cull);
 	}
 
-	// ---------- the grass's tufts onto the dripstone round the water ----------
+	private static boolean sameSign(BlockAndTintGetter view, BlockPos p, BlockState as, Direction facing) {
+		BlockState s = view.getBlockState(p);
+		return s.is(as.getBlock()) && facingOf(s) == facing;
+	}
+
+	// ---------- the grass's tufts onto the dripstone round the water, and Viridian's kerbs ----------
 	/**
+	 * (The same for Viridian City's path, "kerb": a light grey kerb along the grass, rounded at the corners, and the
+	 * grass's own small tufts onto it, on any of the path's blocks the grass meets.)
+	 *
 	 * The dripstone that borders water (within two blocks of it) takes the grass's rounded, tufted edge where grass
 	 * meets it, as the dirt paths do (the same 17 tiles: an edge, two, three or all four, or a corner), with their
 	 * soft shadow on the dripstone. The tufts take the grass's green (Colours tints them).
 	 */
-	private record GrassEdge(TextureAtlasSprite[] tufts, TextureAtlasSprite[] shade) implements Look {
+	private record GrassEdge(TextureAtlasSprite[] tufts, TextureAtlasSprite[] shade, boolean byWater) implements Look {
 		@Override
 		public void emit(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
 			base.emitQuads(e, view, pos, state, random, cull);
 			if (cull.test(Direction.UP)) return;
 			boolean n = grass(view, pos.north()), s = grass(view, pos.south()), w = grass(view, pos.west()), ea = grass(view, pos.east());
 			boolean nw = grass(view, pos.north().west()), ne = grass(view, pos.north().east()), sw = grass(view, pos.south().west()), se = grass(view, pos.south().east());
-			if (!(n || s || w || ea || nw || ne || sw || se) || !nearWater(view, pos)) return;
+			if (!(n || s || w || ea || nw || ne || sw || se) || byWater && !nearWater(view, pos)) return;
 			List<Integer> tiles = new ArrayList<>(4);
 			int edges = (n ? 1 : 0) | (ea ? 2 : 0) | (s ? 4 : 0) | (w ? 8 : 0);
 			switch (edges) {

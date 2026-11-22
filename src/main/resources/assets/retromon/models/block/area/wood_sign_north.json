@@ -1,0 +1,198 @@
+{
+ "parent": "minecraft:block/block",
+ "textures": {
+  "particle": "retromon:block/area/wood_sign_edge",
+  "t0": "retromon:block/area/wood_sign_front",
+  "t1": "retromon:block/area/wood_sign_back",
+  "t2": "retromon:block/area/wood_sign_edge",
+  "t3": "retromon:block/area/wood_post"
+ },
+ "elements": [
+  {
+   "from": [
+    -0.5,
+    9,
+    6.5
+   ],
+   "to": [
+    16.5,
+    25,
+    9.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#t0",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#t1",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#t2",
+     "uv": [
+      6,
+      0,
+      9,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#t2",
+     "uv": [
+      6,
+      0,
+      9,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#t2",
+     "uv": [
+      0,
+      6,
+      16,
+      9
+     ]
+    },
+    "down": {
+     "texture": "#t2",
+     "uv": [
+      0,
+      6,
+      16,
+      9
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    6.5,
+    0,
+    6.5
+   ],
+   "to": [
+    9.5,
+    9,
+    9.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#t3",
+     "uv": [
+      6,
+      7,
+      9,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#t3",
+     "uv": [
+      6,
+      7,
+      9,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#t3",
+     "uv": [
+      6,
+      7,
+      9,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#t3",
+     "uv": [
+      6,
+      7,
+      9,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#t3",
+     "uv": [
+      6,
+      6,
+      9,
+      9
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5,
+    25,
+    6
+   ],
+   "to": [
+    11,
+    26,
+    10
+   ],
+   "faces": {
+    "north": {
+     "texture": "#t3",
+     "uv": [
+      5,
+      0,
+      11,
+      1
+     ]
+    },
+    "south": {
+     "texture": "#t3",
+     "uv": [
+      5,
+      0,
+      11,
+      1
+     ]
+    },
+    "east": {
+     "texture": "#t3",
+     "uv": [
+      5,
+      0,
+      11,
+      1
+     ]
+    },
+    "west": {
+     "texture": "#t3",
+     "uv": [
+      5,
+      0,
+      11,
+      1
+     ]
+    },
+    "up": {
+     "texture": "#t3",
+     "uv": [
+      5,
+      6,
+      11,
+      10
+     ]
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,122 @@
+{
+ "parent": "minecraft:block/block",
+ "ambientocclusion": false,
+ "textures": {
+  "particle": "retromon:block/area/sign_edge_h",
+  "t0": "retromon:block/area/sign_short_front_m",
+  "t1": "retromon:block/area/sign_short_back_m",
+  "t2": "retromon:block/area/sign_edge_h",
+  "t3": "retromon:block/area/sign_stand",
+  "t4": "retromon:block/area/sign_foot"
+ },
+ "elements": [
+  {
+   "from": [
+    0,
+    8.5,
+    5
+   ],
+   "to": [
+    16,
+    18.5,
+    11
+   ],
+   "faces": {
+    "north": {
+     "texture": "#t0",
+     "uv": [
+      0,
+      0,
+      16,
+      10
+     ]
+    },
+    "south": {
+     "texture": "#t1",
+     "uv": [
+      0,
+      0,
+      16,
+      10
+     ]
+    },
+    "up": {
+     "texture": "#t2",
+     "uv": [
+      0,
+      5,
+      16,
+      11
+     ]
+    },
+    "down": {
+     "texture": "#t2",
+     "uv": [
+      0,
+      5,
+      16,
+      11
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    2,
+    6
+   ],
+   "to": [
+    16,
+    8.5,
+    10
+   ],
+   "faces": {
+    "north": {
+     "texture": "#t3",
+     "uv": [
+      0,
+      7.5,
+      16,
+      14
+     ]
+    },
+    "south": {
+     "texture": "#t3",
+     "uv": [
+      0,
+      7.5,
+      16,
+      14
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0,
+    0,
+    5
+   ],
+   "to": [
+    16,
+    2,
+    11
+   ],
+   "faces": {
+    "north": {
+     "texture": "#t4"
+    },
+    "south": {
+     "texture": "#t4"
+    },
+    "up": {
+     "texture": "#t4"
+    },
+    "down": {
+     "texture": "#t4"
+    }
+   }
+  }
+ ]
+}

@@ -1,11 +1,63 @@
-# Looks the mod gives some places only (client/AreaLooks): which look, on which block, over which part of the map
-# (x0 z0 to x1 z1, every height). Several rows with the same look and block add their areas together.
-# white_fence: solid white with a slight gradient. roof: HeartGold's roof red in rows of tiles along the eaves.
-# sign: the shelves stacked as signs become HeartGold's sign (the top row the board, the rows under it the stand).
-# grass_edge: the grass's rounded tufts onto the dripstone where it borders water.
-#look	block	x0	z0	x1	z1	where
-white_fence	pale_oak_fence	-845	590	-745	735	Pallet Town and Route 1
-roof	acacia_stairs	-806	673	-795	682	your house
-roof	acacia_stairs	-788	673	-777	682	Blue's house
-sign	pale_oak_shelf	-845	590	-745	735	Pallet Town and Route 1
-grass_edge	dripstone_block	-845	655	-745	735	Pallet Town
+# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,
+# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.
+# swap: textures for others (old=new, the new ones the mod's own, in textures/block/area; @4: laid from where the face
+# is, a picture four blocks across). roof: HeartGold's red tiles along the eaves. sign: shelves and standing pale oak
+# signs as HeartGold's signs. wood_sign: standing spruce signs as its wooden sign, taller. grass_edge: the grass's tufts
+# onto the dripstone round the water. kerb: a grey kerb with the grass rounded onto it, on a path's blocks.
+#look	blocks	x0	z0	x1	z1	y0	y1	swaps	where
+swap	pale_oak_fence	-845	590	-745	735	-	-	block/pale_oak_planks=white_fence	Pallet Town and Route 1
+swap	pale_oak_fence	-830	495	-745	589	-	-	block/pale_oak_planks=white_fence	Viridian City
+swap	pale_oak_fence	-960	495	-831	600	-	-	block/pale_oak_planks=white_fence	Route 22
+roof	acacia_stairs	-806	673	-795	682	-	-	-	your house
+roof	acacia_stairs	-788	673	-777	682	-	-	-	Blue's house
+sign	pale_oak_shelf,pale_oak_sign	-845	590	-745	735	-	-	-	Pallet Town and Route 1
+wood_sign	spruce_sign	-845	590	-745	735	-	-	-	Pallet Town and Route 1
+sign	pale_oak_shelf,pale_oak_sign	-830	495	-745	589	-	-	-	Viridian City
+wood_sign	spruce_sign	-830	495	-745	589	-	-	-	Viridian City
+sign	pale_oak_shelf,pale_oak_sign	-830	340	-745	494	-	-	-	Route 2
+wood_sign	spruce_sign	-830	340	-745	494	-	-	-	Route 2
+sign	pale_oak_shelf,pale_oak_sign	-960	495	-831	600	-	-	-	Route 22
+wood_sign	spruce_sign	-960	495	-831	600	-	-	-	Route 22
+grass_edge	dripstone_block	-845	655	-745	735	-	-	-	Pallet Town
+swap	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	block/calcite=path_calcite,block/diorite=path_diorite,block/polished_diorite=path_polished_diorite	Viridian City
+kerb	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	-	Viridian City
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-830	495	-745	589	-	-	block/tuff=lamp_tuff,block/polished_tuff=lamp_polished_tuff,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_gray_wool	Viridian City
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-960	495	-831	600	-	-	block/tuff=lamp_tuff,block/polished_tuff=lamp_polished_tuff,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_gray_wool	Route 22
+swap	mud_bricks	-960	495	-831	600	-	-	block/mud_bricks=route_path@4	Route 22
+swap	brown_concrete_powder	-960	495	-831	600	-	-	block/brown_concrete_powder=route_path_edge@4	Route 22
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2012	853	-2000	863	25	28	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	azalea_town Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1470	373	-1458	383	36	39	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	blackthorn_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-478	400	-466	410	38	41	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	celadon_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-365	255	-353	265	39	42	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	cerulean_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1702	750	-1690	760	24	27	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	cherrygrove_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2517	773	-2505	783	23	26	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	cianwood_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-796	920	-784	930	23	26	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	cinnabar_island Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2028	410	-2016	420	26	29	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	ecruteak_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-501	803	-489	813	36	39	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	fuchsia_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2122	717	-2110	727	25	28	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	goldenrod_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-148	408	-136	418	38	41	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	lavender_town Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1763	410	-1751	420	27	30	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	mahogany_town Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2299	561	-2287	571	24	27	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	olivine_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-811	308	-799	318	35	38	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	pewter_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-133	278	-121	288	38	41	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	route_10 Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1892	792	-1880	802	24	27	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	route_32 Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-613	249	-601	259	40	43	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	route_4 Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-370	435	-358	445	38	41	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	saffron_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1159	534	-1147	544	32	35	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	silver_cave_outside Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-375	550	-363	560	36	39	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	vermilion_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1834	559	-1822	569	27	30	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	violet_city Pokemon Center
+swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-792	550	-780	560	30	33	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	viridian_city Pokemon Center
+swap	blue_concrete,blue_wool,blue_carpet	-1991	848	-1979	856	21	28	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	azalea_town Mart
+swap	blue_concrete,blue_wool,blue_carpet	-1486	372	-1474	380	32	39	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	blackthorn_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-349	273	-337	281	35	42	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	cerulean_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-1719	750	-1707	758	20	27	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	cherrygrove_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-782	920	-770	928	19	26	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	cinnabar_island Mart
+swap	blue_concrete,blue_wool,blue_carpet	-2011	395	-1999	403	21	28	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	ecruteak_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-509	781	-497	789	31	38	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	fuchsia_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-123	431	-111	439	34	41	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	lavender_town Mart
+swap	blue_concrete,blue_wool,blue_carpet	-2266	561	-2254	569	20	27	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	olivine_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-789	294	-777	302	31	38	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	pewter_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-341	405	-329	413	34	41	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	saffron_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-349	572	-337	580	32	39	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	vermilion_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-1885	534	-1873	542	23	30	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	violet_city Mart
+swap	blue_concrete,blue_wool,blue_carpet	-772	536	-760	544	26	33	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	viridian_city Mart

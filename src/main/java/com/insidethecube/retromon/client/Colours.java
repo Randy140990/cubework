@@ -24,7 +24,9 @@ public final class Colours {
 				Blocks.MOSS_BLOCK, Blocks.MOSS_CARPET, Blocks.GREEN_CONCRETE_POWDER,
 				// The grass's tufts drawn onto the dripstone round the water (AreaLooks): the grass's green. (The dripstone's
 				// own faces aren't tinted.)
-				Blocks.DRIPSTONE_BLOCK);
+				Blocks.DRIPSTONE_BLOCK,
+				// ...and onto the kerbs of Viridian City's path.
+				Blocks.CALCITE, Blocks.DIORITE, Blocks.POLISHED_DIORITE);
 		ColorProviderRegistry.BLOCK.register((state, level, pos, tint) -> {
 			int c = level != null && pos != null ? BiomeColors.getAverageFoliageColor(level, pos) : FoliageColor.FOLIAGE_DEFAULT;
 			return Adventure.inSave ? brighten(c) : c;

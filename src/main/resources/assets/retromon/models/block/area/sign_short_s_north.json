@@ -1,0 +1,165 @@
+{
+ "parent": "minecraft:block/block",
+ "ambientocclusion": false,
+ "textures": {
+  "particle": "retromon:block/area/sign_edge_h",
+  "t0": "retromon:block/area/sign_short_front_s",
+  "t1": "retromon:block/area/sign_short_back_s",
+  "t2": "retromon:block/area/sign_edge_h",
+  "t3": "retromon:block/area/sign_edge_v",
+  "t4": "retromon:block/area/sign_stand",
+  "t5": "retromon:block/area/sign_foot"
+ },
+ "elements": [
+  {
+   "from": [
+    -0.25,
+    8.5,
+    5
+   ],
+   "to": [
+    16.25,
+    18.5,
+    11
+   ],
+   "faces": {
+    "north": {
+     "texture": "#t0",
+     "uv": [
+      0,
+      0,
+      16,
+      10
+     ]
+    },
+    "south": {
+     "texture": "#t1",
+     "uv": [
+      0,
+      0,
+      16,
+      10
+     ]
+    },
+    "up": {
+     "texture": "#t2",
+     "uv": [
+      0,
+      5,
+      16,
+      11
+     ]
+    },
+    "down": {
+     "texture": "#t2",
+     "uv": [
+      0,
+      5,
+      16,
+      11
+     ]
+    },
+    "east": {
+     "texture": "#t3",
+     "uv": [
+      5,
+      3,
+      11,
+      13
+     ]
+    },
+    "west": {
+     "texture": "#t3",
+     "uv": [
+      5,
+      3,
+      11,
+      13
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    2,
+    2,
+    6
+   ],
+   "to": [
+    14,
+    8.5,
+    10
+   ],
+   "faces": {
+    "north": {
+     "texture": "#t4",
+     "uv": [
+      2,
+      7.5,
+      14,
+      14
+     ]
+    },
+    "south": {
+     "texture": "#t4",
+     "uv": [
+      2,
+      7.5,
+      14,
+      14
+     ]
+    },
+    "east": {
+     "texture": "#t4",
+     "uv": [
+      6,
+      7.5,
+      10,
+      14
+     ]
+    },
+    "west": {
+     "texture": "#t4",
+     "uv": [
+      6,
+      7.5,
+      10,
+      14
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    1,
+    0,
+    5
+   ],
+   "to": [
+    15,
+    2,
+    11
+   ],
+   "faces": {
+    "north": {
+     "texture": "#t5"
+    },
+    "south": {
+     "texture": "#t5"
+    },
+    "up": {
+     "texture": "#t5"
+    },
+    "down": {
+     "texture": "#t5"
+    },
+    "east": {
+     "texture": "#t5"
+    },
+    "west": {
+     "texture": "#t5"
+    }
+   }
+  }
+ ]
+}

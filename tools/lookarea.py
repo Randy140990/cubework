@@ -11,9 +11,13 @@ The grass's tufts on the dripstone round the water are drawn by lookground.py (t
 Writes the mod's textures, models and blockstates under src/main/resources/assets/retromon.
 """
 import json
+import math
 import os
+import random
 
 from PIL import Image
+
+import lookground
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.join(HERE, "..", "src", "main", "resources", "assets", "retromon")
@@ -324,6 +328,277 @@ def mailbox_model():
         "facing=south": {"model": "retromon:block/mailbox", "y": 180}, "facing=west": {"model": "retromon:block/mailbox", "y": 270}}})
 
 
+# ---------- the short sign (HeartGold's) over a standing pale oak sign ----------
+def short_board(width, back=False):
+    """The board of a sign a block high (10 pixels): the same outline, frame and panel, one line of writing."""
+    im = Image.new("RGBA", (width, 16), (0, 0, 0, 0))
+    h = 10
+    for y in range(h):
+        for x in range(width):
+            if x == 0 or y == 0 or x == width - 1 or y == h - 1:
+                c = SIGN["outline"]
+            elif x <= 1 or y <= 1 or x >= width - 2 or y >= h - 2:
+                c = SIGN["bright"] if y == 1 else SIGN["white"]
+            elif x == 2 or y == 2 or x == width - 3 or y == h - 3:
+                c = SIGN["panel_rim"]
+            else:
+                c = SIGN["back_panel"] if back else SIGN["panel"]
+            im.putpixel((x, y), c)
+    if not back:
+        room = width - 8
+        words, used = [], 0
+        for w in (7, 5, 6, 4, 7) * 3:
+            need = w + (2 if words else 0)
+            if used + need > room:
+                w = room - used - (2 if words else 0)
+                if w >= 3:
+                    words.append(w)
+                break
+            words.append(w)
+            used += need
+        x = 4 + (room - (sum(words) + 2 * (len(words) - 1))) // 2
+        for w in words:
+            for xx in range(x, x + w):
+                for yy in (4, 5):
+                    im.putpixel((xx, yy), SIGN["text"])
+            x += w + 2
+    return im
+
+
+def short_sign_models():
+    """A standing pale oak sign (a block high) as HeartGold's sign, built round Minecraft's own (its board, 16 by 8
+    from 9.3 to 17.3 up and 1.3 thick in the middle, and its stick, are inside it, so they never show): the board
+    from 8.5 to 18.5 up, the stand under it and its foot. Its ends, middles and one-block signs as the shelves'."""
+    tex = lambda n: "retromon:block/area/" + n
+    full = [0, 0, 16, 16]
+    for facing, turns in {"north": 0, "east": 1, "south": 2, "west": 3}.items():
+        for part in ("l", "r", "m", "s"):
+            outer_left, outer_right = part in ("l", "s"), part in ("r", "s")
+            bx0, bx1 = (-0.25 if outer_right else 0), (16.25 if outer_left else 16)
+            uvx = lambda a, b: [16 - b, 0, 16 - a, 0]
+            faces = {"north": {"texture": tex("sign_short_front_" + part), "uv": [0, 0, 16, 10]},
+                     "south": {"texture": tex("sign_short_back_" + part), "uv": [0, 0, 16, 10]},
+                     "up": {"texture": tex("sign_edge_h"), "uv": [0, 5, 16, 11]}, "down": {"texture": tex("sign_edge_h"), "uv": [0, 5, 16, 11]}}
+            if outer_left:
+                faces["east"] = {"texture": tex("sign_edge_v"), "uv": [5, 3, 11, 13]}
+            if outer_right:
+                faces["west"] = {"texture": tex("sign_edge_v"), "uv": [5, 3, 11, 13]}
+            els = [element_uv((bx0, 8.5, 5, bx1, 18.5, 11), faces, turns)]
+            sx0, sx1 = (2 if outer_right else 0), (14 if outer_left else 16)
+            sf = {"north": {"texture": tex("sign_stand"), "uv": [16 - sx1, 7.5, 16 - sx0, 14]}, "south": {"texture": tex("sign_stand"), "uv": [sx0, 7.5, sx1, 14]}}
+            if outer_left:
+                sf["east"] = {"texture": tex("sign_stand"), "uv": [6, 7.5, 10, 14]}
+            if outer_right:
+                sf["west"] = {"texture": tex("sign_stand"), "uv": [6, 7.5, 10, 14]}
+            els.append(element_uv((sx0, 2, 6, sx1, 8.5, 10), sf, turns))
+            fx0, fx1 = (1 if outer_right else 0), (15 if outer_left else 16)
+            ff = {f: {"texture": tex("sign_foot")} for f in ("north", "south", "up", "down")}
+            if outer_left:
+                ff["east"] = {"texture": tex("sign_foot")}
+            if outer_right:
+                ff["west"] = {"texture": tex("sign_foot")}
+            els.append(element_uv((fx0, 0, 5, fx1, 2, 11), ff, turns))
+            write_json(os.path.join(MODELS, "sign_short_%s_%s.json" % (part, facing)), slotted({
+                "parent": "minecraft:block/block", "ambientocclusion": False, "textures": {"particle": tex("sign_edge_h")}, "elements": els}))
+
+
+def element_uv(box, faces, turns):
+    """As element(), for faces that carry their own uv."""
+    x0, y0, z0, x1, y1, z1 = box
+    a, b = rot_point(x0, z0, turns), rot_point(x1, z1, turns)
+    fr = [min(a[0], b[0]), y0, min(a[1], b[1])]
+    to = [max(a[0], b[0]), y1, max(a[1], b[1])]
+    return {"from": fr, "to": to, "faces": {rot_face(f, turns): dict(v) for f, v in faces.items()}}
+
+
+# ---------- the wooden sign (HeartGold's) over a standing spruce sign ----------
+WOOD = {"face": hexc("#C8945A"), "face_hi": hexc("#D9AA70"), "grain": hexc("#B07C46"), "frame": hexc("#8A5A32"), "frame_hi": hexc("#A06C3E"),
+        "dark": hexc("#6E4526"), "post": hexc("#7A4D2A"), "post_hi": hexc("#946039")}
+
+
+def wood_face(back=False):
+    """A wooden board, a frame of darker wood round planks running across, two lines of carved writing (front)."""
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            if x == 0 or y == 0 or x == 15 or y == 15:
+                c = WOOD["dark"]
+            elif x == 1 or y == 1 or x == 14 or y == 14:
+                c = WOOD["frame_hi"] if (x == 1 or y == 1) else WOOD["frame"]
+            else:
+                c = WOOD["face_hi"] if y in (2, 7, 12) else WOOD["grain"] if y in (6, 11) else WOOD["face"]
+            im.putpixel((x, y), c)
+    if not back:
+        for row, words in ((4, (4, 3, 3)), (9, (3, 5))):
+            x = 3
+            for w in words:
+                for xx in range(x, min(13, x + w)):
+                    im.putpixel((xx, row), WOOD["dark"])
+                x += w + 1
+    return im
+
+
+def wood_sign_models():
+    """A standing spruce sign as HeartGold's wooden sign, taller: a board (17 wide, 16 high, from 9 up) on a thick
+    post, round Minecraft's own sign (its board and stick inside, so they never show)."""
+    tex = lambda n: "retromon:block/area/" + n
+    for facing, turns in {"north": 0, "east": 1, "south": 2, "west": 3}.items():
+        bf = {"north": {"texture": tex("wood_sign_front"), "uv": [0, 0, 16, 16]}, "south": {"texture": tex("wood_sign_back"), "uv": [0, 0, 16, 16]},
+              "east": {"texture": tex("wood_sign_edge"), "uv": [6, 0, 9, 16]}, "west": {"texture": tex("wood_sign_edge"), "uv": [6, 0, 9, 16]},
+              "up": {"texture": tex("wood_sign_edge"), "uv": [0, 6, 16, 9]}, "down": {"texture": tex("wood_sign_edge"), "uv": [0, 6, 16, 9]}}
+        pf = {f: {"texture": tex("wood_post"), "uv": [6, 7, 9, 16]} for f in ("north", "south", "east", "west")}
+        pf["down"] = {"texture": tex("wood_post"), "uv": [6, 6, 9, 9]}
+        cap = {f: {"texture": tex("wood_post"), "uv": [5, 0, 11, 1]} for f in ("north", "south", "east", "west")}
+        cap["up"] = {"texture": tex("wood_post"), "uv": [5, 6, 11, 10]}
+        els = [element_uv((-0.5, 9, 6.5, 16.5, 25, 9.5), bf, turns), element_uv((6.5, 0, 6.5, 9.5, 9, 9.5), pf, turns),
+               element_uv((5, 25, 6, 11, 26, 10), cap, turns)]
+        write_json(os.path.join(MODELS, "wood_sign_%s.json" % facing), slotted({
+            "parent": "minecraft:block/block", "textures": {"particle": tex("wood_sign_edge")}, "elements": els}))
+
+
+def wood_textures():
+    save("wood_sign_front", wood_face())
+    save("wood_sign_back", wood_face(back=True))
+    edge = Image.new("RGBA", (16, 16), WOOD["frame"])
+    for i in range(16):
+        edge.putpixel((i, 6), WOOD["frame_hi"])
+    save("wood_sign_edge", edge)
+    post = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            post.putpixel((x, y), WOOD["post_hi"] if x in (6, 7) else WOOD["post"])
+    save("wood_post", post)
+
+
+# ---------- Viridian City's path: three patterns of the same white, a grey kerb, the grass rounded onto it ----------
+PATH = {"base": hexc("#E4E5E0"), "lo": hexc("#D9DAD4"), "bump": hexc("#D3D5CF"), "bump_hi": hexc("#F4F5F2"), "bump_lo": hexc("#BFC2BB")}
+# Where each block's bumps are (a block of each pattern): calcite four, diorite five, polished diorite three bigger.
+BUMPS = {"calcite": [(3, 3, 2), (10, 4, 2), (5, 10, 2), (12, 11, 2)],
+         "diorite": [(2, 6, 2), (7, 2, 2), (12, 5, 2), (5, 12, 2), (11, 11, 2)],
+         "polished_diorite": [(4, 4, 3), (10, 9, 3), (3, 11, 2)]}
+
+
+def path_tile(name):
+    """The path's white (one colour for all three, a little soft variation), with this block's bumps: each lit on
+    its top left, shaded on its bottom right, so the three patterns differ while the path reads as one."""
+    r = random.Random("path" + name)
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            c = mix(PATH["base"], PATH["lo"], r.random() * 0.45)
+            im.putpixel((x, y), c)
+    for bx, by, size in BUMPS[name]:
+        for j in range(size):
+            for i in range(size):
+                im.putpixel((bx + i, by + j), PATH["bump"])
+        for i in range(size):
+            im.putpixel((bx + i, by - 1), PATH["bump_hi"])
+            im.putpixel((bx - 1, by + i), PATH["bump_hi"])
+            im.putpixel((bx + i, by + size), PATH["bump_lo"])
+            im.putpixel((bx + size, by + i), PATH["bump_lo"])
+    return im
+
+
+def coverage_at(tile, depth, amp, round_):
+    """Distance in from the grass's side of a tile (lookground's 17), its corners rounded: (16 x 16 of distances)."""
+    edges, corners = lookground.TILES[tile]
+    out = [[99.0] * 16 for _ in range(16)]
+    for y in range(16):
+        for x in range(16):
+            cx, cy = x + 0.5, y + 0.5
+            ds = []
+            for e in edges:
+                t, d = {"top": (cx, cy), "bottom": (cx, 16 - cy), "left": (cy, cx), "right": (cy, 16 - cx)}[e]
+                ds.append(d - amp * lookground.tufts(t))
+            for c in corners:
+                px, py = {"tl": (0, 0), "tr": (16, 0), "bl": (0, 16), "br": (16, 16)}[c]
+                ds.append(math.hypot(cx - px, cy - py))
+            if not ds:
+                continue
+            f = ds[0]
+            for d in ds[1:]:
+                f = lookground.smin(f, d, round_)
+            out[y][x] = f
+    return out
+
+
+KERB = {"outer": hexc("#B7BCC3"), "kerb": hexc("#C6CAD0"), "lip": hexc("#DCDFE3"), "shadow": hexc("#C4C6C2")}
+KERB_W = 3.8
+
+
+def kerb_tile(tile):
+    """The kerb along the grass: light grey, a lighter lip along the path, a soft line where it meets the white;
+    its corners rounded (where the path turns the corner it's round, as the grass follows it)."""
+    d = coverage_at(tile, KERB_W, 0.0, 10.0)
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y in range(16):
+        for x in range(16):
+            v = d[y][x]
+            if v < 1.4:
+                c = KERB["outer"]
+            elif v < KERB_W - 0.9:
+                c = KERB["kerb"]
+            elif v < KERB_W:
+                c = KERB["lip"]
+            elif v < KERB_W + 0.8:
+                c = KERB["shadow"]
+            else:
+                continue
+            im.putpixel((x, y), c)
+    return im
+
+
+def kerb_grass_tile(tile, g16):
+    """The grass's own edge onto the kerb: a little way in, small tufts, following the kerb round its corners."""
+    d = coverage_at(tile, 1.2, 0.9, 10.0)
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    gp = g16.load()
+    for y in range(16):
+        for x in range(16):
+            if d[y][x] < 1.2:
+                r, g, b, _a = gp[x, y]
+                im.putpixel((x, y), (r, g, b, 255))
+    return im
+
+
+# ---------- recoloured, in their own patterns: the lamps' posts, the Centers' reds, the Marts' blues ----------
+VANILLA = lookground.VANILLA
+LAMP = [hexc(c) for c in ("#0D0F12", "#191C20", "#262A30", "#373C44", "#535A64")]
+CENTER_RED = [hexc(c) for c in ("#7A1A1F", "#A6282F", "#C6363D", "#DC4F55", "#EE7A7E")]
+MART_BLUE = [hexc(c) for c in ("#163468", "#234F98", "#3066B7", "#4882D1", "#72A5E5")]
+
+
+def recolour_soft(src, ramp, spread=70.0):
+    """A texture's own pattern on a new ramp, keeping how much it varies (a flat one, as concrete, stays flat):
+    each pixel's brightness against the texture's middle, over `spread`, from the ramp's middle."""
+    im = Image.open(src).convert("RGBA")
+    p = im.load()
+    w, h = im.size
+    lum = [0.3 * p[x, y][0] + 0.59 * p[x, y][1] + 0.11 * p[x, y][2] for y in range(h) for x in range(w) if p[x, y][3]]
+    mid = sum(lum) / len(lum)
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = p[x, y]
+            if not a:
+                continue
+            t = max(0.0, min(1.0, 0.5 + (0.3 * r + 0.59 * g + 0.11 * b - mid) / spread))
+            seg = t * (len(ramp) - 1)
+            i = min(len(ramp) - 2, int(seg))
+            p[x, y] = mix(ramp[i], ramp[i + 1], seg - i)[:3] + (a,)
+    return im
+
+
+def recolours():
+    v = lambda n: os.path.join(VANILLA, "textures", "block", n + ".png")
+    for n in ("tuff", "polished_tuff", "chiseled_tuff_bricks", "chiseled_tuff_bricks_top"):
+        save("lamp_" + n, lookground.recolour(v(n), LAMP))
+    save("lamp_gray_wool", recolour_soft(v("gray_wool"), LAMP))
+    for n in ("stripped_mangrove_log", "stripped_mangrove_log_top", "mangrove_planks"):
+        save("center_" + n, lookground.recolour(v(n), CENTER_RED))
+    for n in ("blue_concrete", "blue_wool"):
+        save("mart_" + n, recolour_soft(v(n), MART_BLUE))
+
+
 def build():
     save("white_fence", fence())
     save("roof_tiles", roof_tiles())
@@ -333,6 +608,34 @@ def build():
     sign_models()
     mailbox_textures()
     mailbox_model()
+    for part, w0 in (("l", 0), ("r", 16)):
+        save("sign_short_front_" + part, short_board(32).crop((w0, 0, w0 + 16, 16)))
+        save("sign_short_back_" + part, short_board(32, back=True).crop((16 - w0, 0, 32 - w0, 16)))
+    save("sign_short_front_m", short_board(48).crop((16, 0, 32, 16)))
+    save("sign_short_back_m", short_board(48, back=True).crop((16, 0, 32, 16)))
+    save("sign_short_front_s", short_board(16))
+    save("sign_short_back_s", short_board(16, back=True))
+    short_sign_models()
+    wood_textures()
+    wood_sign_models()
+    for n in BUMPS:
+        save("path_" + n, path_tile(n))
+    g16 = lookground.grass(16, 31)
+    for t in range(1, 18):
+        save("kerb_%d" % t, kerb_tile(t))
+        save("kerb_grass_%d" % t, kerb_grass_tile(t, g16))
+    recolours()
+    # Route 22's floor: the dirt paths' own picture (64 by 64, laid over four blocks by four), and its border a
+    # shade deeper, so it reads as the path's worn edge.
+    p64 = lookground.path(64, 42)
+    save("route_path", p64)
+    edge = p64.copy()
+    ep = edge.load()
+    for y in range(64):
+        for x in range(64):
+            r, g, b, a = ep[x, y]
+            ep[x, y] = (int(r * 0.84), int(g * 0.8), int(b * 0.78), a)
+    save("route_path_edge", edge)
 
 
 def preview(out, scale=8):
