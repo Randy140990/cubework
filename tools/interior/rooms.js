@@ -220,6 +220,10 @@ function drawScoreboard(P, f) {
   reg("gateCheck", 32, 32, (P, r) => mcCheck(P, r, hx("#EED690"), hx("#DDB662")), { per: 2 });
   reg("houseBoards", 32, 32, (P, r) => planks(P, r, hx("#9A6438"), hx("#B27A4A"), hx("#7C4E2A"), hx("#4E2E16"), 8, 32), { per: 2 });
   reg("beam", 16, 16, (P, r) => { P.fill(hx("#8A5A34"), 0.05, r); P.rect(0, 0, 2, 16, hx("#A8744A")); P.rect(14, 0, 2, 16, hx("#6A4224")); });
+  reg("rugBlue", 32, 32, (P, r) => { P.fill(hx("#4A6FA8"), 0.04, r); P.rect(0, 0, 32, 2, hx("#2E4A7A")); P.rect(0, 30, 32, 2, hx("#2E4A7A")); P.rect(0, 0, 2, 32, hx("#2E4A7A")); P.rect(30, 0, 2, 32, hx("#2E4A7A"));
+    P.rect(4, 4, 24, 1, hx("#8FB0DE")); P.rect(4, 27, 24, 1, hx("#8FB0DE")); P.rect(4, 4, 1, 24, hx("#8FB0DE")); P.rect(27, 4, 1, 24, hx("#8FB0DE")); }, { fit: true });
+  reg("rugSalmon", 32, 32, (P, r) => { P.fill(hx("#F4A08E"), 0.04, r); P.rect(0, 0, 32, 2, hx("#E07A6A")); P.rect(0, 30, 32, 2, hx("#E07A6A")); P.rect(0, 0, 2, 32, hx("#E07A6A")); P.rect(30, 0, 2, 32, hx("#E07A6A"));
+    P.rect(4, 4, 24, 1, hx("#FBD0C4")); P.rect(4, 27, 24, 1, hx("#FBD0C4")); P.rect(4, 4, 1, 24, hx("#FBD0C4")); P.rect(27, 4, 1, 24, hx("#FBD0C4")); }, { fit: true });
   reg("rugGreen", 32, 32, (P, r) => { P.fill(hx("#6FB55A"), 0.04, r); P.rect(0, 0, 32, 2, hx("#4E8E40")); P.rect(0, 30, 32, 2, hx("#4E8E40")); P.rect(0, 0, 2, 32, hx("#4E8E40")); P.rect(30, 0, 2, 32, hx("#4E8E40"));
     P.rect(4, 4, 24, 1, hx("#A8D88E")); P.rect(4, 27, 24, 1, hx("#A8D88E")); P.rect(4, 4, 1, 24, hx("#A8D88E")); P.rect(27, 4, 1, 24, hx("#A8D88E")); }, { fit: true });
   reg("paperGateLG", 16, 16, (P, r) => mcStone(P, r, hx("#F7F1E2"), 0.03, 2));
@@ -1805,7 +1809,7 @@ const BUILD = {
   fuchsia_house2() {
     // The MOVE DELETER's house (FireRed's, beside the POKéMON CENTER).
     const R = new Room("fuchsia_house2", { name: "Move Deleter's house", floor: "Fuchsia City", W: 12, D: 11, outsideSize: "10 by 9" });
-    fuchsiaHouse(R, { rug: "salmon", cupboard: ["A cupboard. Inside: notebooks full of moves, each one crossed out."] });
+    fuchsiaHouse(R, { rug: "rugSalmon", cupboard: ["A cupboard. Inside: notebooks full of moves, each one crossed out."] });
     R.npcs.push({ name: "Move Deleter", key: "fuchsia_move_deleter_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "middle_aged_man" },
       talk: () => [{ text: "Uh... Oh, yes, I'm the MOVE DELETER. I can make POKéMON forget their moves." }, { text: "(In the game: choose a POKéMON, then the move it should forget.)" }] });
     return R;
@@ -1826,7 +1830,7 @@ const BUILD = {
   fuchsia_house4() {
     // The FISHING GURU's older brother's house (FireRed's): the GOOD ROD, if you like to fish.
     const R = new Room("fuchsia_house4", { name: "Fishing Guru's brother's house", floor: "Fuchsia City", W: 12, D: 11, outsideSize: "10 by 9" });
-    fuchsiaHouse(R, { rug: "kitchenBlue", cupboard: ["A cupboard. Inside: fishing line, floats and a tin of bait."] });
+    fuchsiaHouse(R, { rug: "rugBlue", cupboard: ["A cupboard. Inside: fishing line, floats and a tin of bait."] });
     R.npcs.push({ name: "Fishing Guru", key: "fuchsia_good_rod_house_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "fishing_guru" },
       talk: () => [{ text: "I'm the FISHING GURU's older brother! I simply Looove fishing! Do you like to fish?" }, { text: "(In the game: yes, and he gives you a GOOD ROD.)" }] });
     return R;

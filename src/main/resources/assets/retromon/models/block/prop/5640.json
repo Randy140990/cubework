@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gym_sand","gym_sand":"retromon:block/interior/gym_sand"},"elements":[{"from":[0.0,0,0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[0.0,0.0,16.0,16.0],"texture":"#gym_sand"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/lab","lab":"retromon:block/interior/lab"},"elements":[{"from":[0.8,16,0.0],"to":[14.4,16,5.6],"faces":{"down":{"uv":[0.8,10.4,14.4,16.0],"texture":"#lab"}}}]}
