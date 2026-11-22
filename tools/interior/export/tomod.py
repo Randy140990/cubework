@@ -17,10 +17,12 @@ EPS = 1e-6
 SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob"}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
           "mart": (384, 64, 0), "school": (448, 64, 0), "trainer2": (512, 64, 0), "gate_s": (576, 64, 0), "nickhouse": (640, 64, 0), "gate_n": (704, 64, 0),
-          "gate_league": (768, 64, 0), "gate_johto": (832, 64, 0), "route2_gate": (896, 64, 0), "route2_house": (960, 64, 0)}
+          "gate_league": (768, 64, 0), "gate_johto": (832, 64, 0), "route2_gate": (896, 64, 0), "route2_house": (960, 64, 0),
+          "pewter_gym": (1024, 64, 0), "museum_1f": (1088, 64, 0), "museum_2f": (1152, 64, 0), "pewter_house1": (1216, 64, 0), "pewter_house2": (1280, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
-         "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house"}
+         "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
+         "pewter_gym": "pewter_gym", "museum_1f": "museum_1f", "museum_2f": "museum_2f", "pewter_house1": "pewter_nidoran_house", "pewter_house2": "pewter_speech_house"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -56,6 +58,13 @@ DOORS = {
     "route2_gate_n": {"room": "route2_gate", "door": [[-777, 30, 431], [-776, 30, 431]], "out": [-776.5, 29.0, 426.6], "face": "n", "yaw": 180.0,
                       "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
     "route2_house": {"room": "route2_house", "door": [[-783, 31, 387], [-782, 31, 387]], "out": [-782.0, 30.0, 390.4]},
+    # Pewter City: the Gym (its glass doors, 3 wide), the Museum (its main doorway between the spruce shelves, into the
+    # fossils' side, and its side door, a mangrove door, into the OLD AMBER's side), and its two houses (bamboo doors).
+    "pewter_gym": {"room": "pewter_gym", "door": [[x, 31, 295] for x in range(-809, -806)], "out": [-807.5, 31.0, 298.0]},
+    "pewter_museum": {"room": "museum_1f", "door": [[-803, 31, 278], [-802, 31, 278]], "out": [-802.0, 31.0, 280.4], "in": {"x": 14.5, "z": 9.4, "yaw": 180.0}},
+    "pewter_museum_side": {"room": "museum_1f", "door": [[-785, 32, 273], [-784, 32, 273]], "out": [-784.0, 32.0, 275.4], "in": {"x": 22.5, "z": 9.4, "yaw": 180.0}},
+    "pewter_house1": {"room": "pewter_house1", "door": [[-769, 31, 286], [-768, 31, 286]], "out": [-768.0, 31.0, 288.4]},
+    "pewter_house2": {"room": "pewter_house2", "door": [[-818, 31, 324], [-817, 31, 324]], "out": [-817.0, 31.0, 326.4]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -69,7 +78,13 @@ for _line in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "shop
     DOORS["%s_%s" % (_place, _kind)] = {"room": _kind, "door": [[_bx + i, _by - 5, _bz - 3] for i in (-1, 0, 1)], "out": [_bx + 0.5, float(_by - 5), _bz - 1.4],
                                         "place": _place, "group": _kind}
 MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart", "school": "viridian_school", "nickhouse": "viridian_house", "gate_s": "forest_south",
-            "gate_league": "league_s", "route2_gate": "route2_gate_s", "route2_house": "route2_house"}
+            "gate_league": "league_s", "route2_gate": "route2_gate_s", "route2_house": "route2_house", "pewter_gym": "pewter_gym",
+            "pewter_house1": "pewter_house1", "pewter_house2": "pewter_house2"}
+# Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
+MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
+# Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
+# so its trainers see straight ahead as many steps as theirs.
+TILE = {"pewter_gym": [1.0, 1.0]}
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n"}
 # Ways out through the side walls (a sideways gate's), by room and wall.
@@ -80,7 +95,9 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "center": {"x": 9.0, "z": 12.5, "yaw": 180.0}, "mart": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "school": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "nickhouse": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "gate_s": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_n": {"x": 7.0, "z": 1.4, "yaw": 0.0},
          "gate_league": {"x": 7.0, "z": 14.5, "yaw": 180.0}, "gate_johto": {"x": 14.4, "z": 5.0, "yaw": 90.0},
-         "route2_gate": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "route2_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
+         "route2_gate": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "route2_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "pewter_gym": {"x": 7.0, "z": 16.5, "yaw": 180.0}, "museum_1f": {"x": 14.5, "z": 9.4, "yaw": 180.0}, "museum_2f": {"x": 12.5, "z": 9.9, "yaw": 0.0},
+         "pewter_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "pewter_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -378,7 +395,7 @@ def main():
         for m in room["mats"]:
             # Out to the world (a mat by the front door), or through to another room (the forest and its gates).
             if m.get("to") in (None, "town"):
-                warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 1.0, "door": MAT_DOOR.get(rid), "to": None})
+                warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 1.0, "door": MAT_DOOR_X.get((rid, round(m["x0"])), MAT_DOOR.get(rid)), "to": None})
             else:
                 warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 1.0, "door": None, "to": m["to"], "spawn": spawn_of(m["spawn"])})
         for m in room.get("passes", []):
@@ -412,7 +429,8 @@ def main():
         rooms_out[rid] = {"origin": list(o), "W": room["W"], "D": room["D"], "H": room["H"], "name": room["name"], "floor": room["floor"],
                           "place": PLACE[rid], "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360},
                           "entry": ENTRY.get(rid), "cam": fit_camera(room["W"], room["D"], room["H"]), "cells": placed, "warps": warps, "people": people, "acts": acts,
-                          "grass": room.get("grass", []), "pools": room.get("pools", []), "panes": panes_of(room), "clocks": room.get("clocks", [])}
+                          "grass": room.get("grass", []), "pools": room.get("pools", []), "panes": panes_of(room), "clocks": room.get("clocks", []),
+                          **({"tile": TILE[rid]} if rid in TILE else {})}
     # Models and the block's states.
     mdir = os.path.join(res, "assets/retromon/models/block/prop")
     os.makedirs(mdir, exist_ok=True)

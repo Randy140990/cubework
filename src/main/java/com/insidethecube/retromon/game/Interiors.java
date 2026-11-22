@@ -363,6 +363,20 @@ public final class Interiors {
 		return r == null ? null : r.tile();
 	}
 
+	/** Whether the room someone's in has trainers who watch for you (the Pewter Gym's CAMPER): their eyes apply in there. */
+	public static boolean watched(Entity e) {
+		Room r = roomOf(e);
+		if (r == null) return false;
+		for (Person p : r.people()) if ("trainer".equals(p.role())) return true;
+		return false;
+	}
+
+	/** Where someone is in the room they're in (room coordinates: x, height above its floor, z), or null outside. */
+	public static Vec3 local(Entity e) {
+		Room r = roomOf(e);
+		return r == null ? null : new Vec3(e.getX() - r.ox(), e.getY() - r.oy(), e.getZ() - r.oz());
+	}
+
 	/** Whether someone's in a room that's always night (the forest). */
 	public static boolean alwaysNight(Entity e) {
 		Room r = roomOf(e);
@@ -605,7 +619,8 @@ public final class Interiors {
 	/** Puts someone in a room in their spot. */
 	private static void put(ServerLevel level, Room r, Person p) {
 		// The nurse heals and the clerk sells, as the games' nurse and clerk do (their own ways of talking).
-		int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : "trainer".equals(p.role()) ? Npc.TRAINER : Npc.PERSON;
+		int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : "trainer".equals(p.role()) ? Npc.TRAINER
+				: "leader".equals(p.role()) ? Npc.LEADER : Npc.PERSON;
 		try {
 			Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
 			if (n != null) {

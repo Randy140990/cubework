@@ -67,6 +67,15 @@ def areatex():
     out["dripstone"] = {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
     return out
 
+def boulders():
+    """The mod's boulder models (tools/lookarea.py), their boxes, for the Diglett's Cave rooms."""
+    root = os.path.join(HERE, "..", "src", "main", "resources", "assets", "retromon", "models", "block", "area")
+    out = {}
+    for n in ("boulder_a", "boulder_b", "boulder_small"):
+        m = json.load(open(os.path.join(root, n + ".json")))
+        out[n] = [e["from"] + e["to"] for e in m["elements"]]
+    return out
+
 def engine():
     s = open(os.path.join(HERE, "monviewer.html")).read()
     a = s.index("// ---------- Molang")
@@ -80,7 +89,7 @@ def main():
     js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "figure.js", "creature.js", "forest_data.js", "cave_data.js", "rooms.js", "app.js"))
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
-            + "const DATA = " + data + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst AREATEX = " + json.dumps(areatex(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
+            + "const DATA = " + data + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst AREATEX = " + json.dumps(areatex(), separators=(",", ":")) + ";\nconst BOULDERS = " + json.dumps(boulders(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
             + engine() + "\n" + js + "\n</script>\n")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     open(out, "w").write(html)

@@ -99,6 +99,10 @@ public final class AreaLooks {
 							row.equals("short") ? "block/area/sign_short_" + part + "_" + d.getSerializedName() : "block/area/sign_" + row + "_" + part + "_" + d.getSerializedName());
 				}
 				part(ctx, "wood_" + d.getSerializedName(), "block/area/wood_sign_" + d.getSerializedName());
+				// The same signs in wood (wood_board: Pewter's oak shelf sign, as our wooden sign).
+				for (String part : new String[] {"l", "r", "m", "s"}) {
+					for (String row : new String[] {"board", "stand"}) part(ctx, "w" + row + "_" + part + "_" + d.getSerializedName(), "block/area/wsign_" + row + "_" + part + "_" + d.getSerializedName());
+				}
 			}
 			for (String b : new String[] {"boulder_a", "boulder_b", "boulder_small"}) part(ctx, b, "block/area/" + b);
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
@@ -160,8 +164,9 @@ public final class AreaLooks {
 	private static Look make(Rule rule, ModelBaker baker) {
 		return switch (rule.look()) {
 			case "swap" -> swap(baker, rule.swaps());
-			case "roof", "roof_green", "roof_gym" -> new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"));
+			case "roof", "roof_green", "roof_gym", "roof_museum" -> new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"));
 			case "sign" -> AreaLooks::sign;
+			case "wood_board" -> AreaLooks::woodBoard;
 			case "wood_sign" -> AreaLooks::woodSign;
 			case "boulder" -> AreaLooks::boulder;
 			case "grass_edge", "kerb" -> {
@@ -339,6 +344,19 @@ public final class AreaLooks {
 	 * or the whole of it when the sign is one block wide.
 	 */
 	private static void sign(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
+		board("", base, e, view, pos, state, random, cull);
+	}
+
+	/** Shelves as the sign in wood (our wooden sign's look): Pewter City's TRAINER TIPS. */
+	private static void woodBoard(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
+		if (state.hasProperty(BlockStateProperties.ROTATION_16)) {
+			base.emitQuads(e, view, pos, state, random, cull);
+			return;
+		}
+		board("w", base, e, view, pos, state, random, cull);
+	}
+
+	private static void board(String kind, BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
 		Direction facing = facingOf(state);
 		if (facing == null) {
 			base.emitQuads(e, view, pos, state, random, cull);
@@ -349,7 +367,7 @@ public final class AreaLooks {
 		boolean onLeft = sameSign(view, pos.relative(left), state, facing), onRight = sameSign(view, pos.relative(left.getOpposite()), state, facing);
 		String part = onLeft && onRight ? "m" : onRight ? "l" : onLeft ? "r" : "s";
 		String row = state.hasProperty(BlockStateProperties.ROTATION_16) ? "short" : sameSign(view, pos.above(), state, facing) ? "stand" : "board";
-		BlockStateModel m = extra(row + "_" + part + "_" + facing.getSerializedName());
+		BlockStateModel m = extra(kind + row + "_" + part + "_" + facing.getSerializedName());
 		if (m == null) base.emitQuads(e, view, pos, state, random, cull);
 		else m.emitQuads(e, view, pos, state, random, cull);
 	}

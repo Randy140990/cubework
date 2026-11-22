@@ -2,6 +2,11 @@
 pallet_town	kanto	PALLET TOWN	pallet_town	-
 viridian_city	kanto	VIRIDIAN CITY	cities1	-
 pewter_city	kanto	PEWTER CITY	cities1	-
+pewter_gym	kanto	PEWTER GYM	gym	-
+museum_1f	kanto	PEWTER MUSEUM OF SCIENCE	cities1	-
+museum_2f	kanto	PEWTER MUSEUM OF SCIENCE	cities1	-
+pewter_nidoran_house	kanto	PEWTER CITY	cities1	-
+pewter_speech_house	kanto	PEWTER CITY	cities1	-
 cerulean_city	kanto	CERULEAN CITY	cities2	-
 lavender_town	kanto	LAVENDER TOWN	lavender	-
 vermilion_city	kanto	VERMILION CITY	vermilion	-

@@ -23,9 +23,16 @@ const PLACES = [
   { id: "pallet_looks", name: "Pallet Town looks", floor: "Outside (the mod's blocks)", group: "Outside" },
   { id: "viridian_looks", name: "Viridian City and Route 22 looks", floor: "Outside (the mod's blocks)", group: "Outside" },
   { id: "league_looks", name: "POKéMON LEAGUE gate looks", floor: "Outside (the mod's blocks)", group: "Outside" },
+  { id: "pewter_looks", name: "Pewter City looks", floor: "Outside (the mod's blocks)", group: "Outside" },
   { id: "viridian_forest", name: "Viridian Forest", floor: "Always night", group: "Route 2" },
   { id: "route2_gate", name: "Route 2 gate", floor: "East lane", group: "Route 2" },
   { id: "route2_house", name: "Route 2 trade house", floor: "Ground floor", group: "Route 2" },
+  { id: "pewter_gym", name: "Pewter Gym", floor: "Pewter City", group: "Pewter City" },
+  { id: "arena_pewter_gym", name: "Pewter Gym battle", floor: "Battle arena", group: "Battle arenas" },
+  { id: "museum_1f", name: "Pewter Museum of Science", floor: "1F", group: "Pewter City" },
+  { id: "museum_2f", name: "Pewter Museum of Science", floor: "2F", group: "Pewter City" },
+  { id: "pewter_house1", name: "Pewter house", floor: "By the museum", group: "Pewter City" },
+  { id: "pewter_house2", name: "Pewter house", floor: "By the Center", group: "Pewter City" },
   { id: "digletts_n", name: "Diglett's Cave", floor: "North entrance (Route 2)", group: "Diglett's Cave" },
   { id: "digletts_b1f", name: "Diglett's Cave", floor: "B1F", group: "Diglett's Cave" },
   { id: "digletts_s", name: "Diglett's Cave", floor: "South entrance (Route 11)", group: "Diglett's Cave" },
@@ -259,8 +266,8 @@ function drawScoreboard(P, f) {
     P.rect(4, 4, w - 8, 1, cream); P.rect(4, h - 5, w - 8, 1, cream); P.rect(4, 4, 1, h - 8, cream); P.rect(w - 5, 4, 1, h - 8, cream);
     for (const x0 of [8, 16]) for (let k = 0; k < 7; k++) { const x = east ? x0 + k : w - (x0 + k) - 2; P.rect(x, cy - 8 + k, 2, 2, cream); P.rect(x, cy + 6 - k, 2, 2, cream); }
   };
-  reg("matGateE", 32, 64, matSide("#3A63B8", "#25418A", true), { fit: true });
-  reg("matGateW", 32, 64, matSide("#3A63B8", "#25418A", false), { fit: true });
+  reg("matGateEast", 32, 64, matSide("#3A63B8", "#25418A", true), { fit: true });
+  reg("matGateWest", 32, 64, matSide("#3A63B8", "#25418A", false), { fit: true });
   reg("seedDish", 8, 8, (P, r) => { P.fill(hx("#B98A4E"), 0.12, r); for (let k = 0; k < 9; k++) P.set(Math.floor(r() * 8), Math.floor(r() * 8), hx("#7A5428")); });
   reg("plateSpeary", 16, 8, (P, r) => { P.fill(hx("#F1E6C8"), 0.02, r); P.rect(0, 0, 16, 1, hx("#8A6A3A")); P.rect(0, 7, 16, 1, hx("#8A6A3A")); P.rect(3, 3, 10, 2, hx("#6A4A2A")); }, { fit: true });
   reg("ballStone", 16, 16, (P, r) => { P.fill(hx("#C4C9CF"), 0.05, r); for (let x = 0; x < 16; x++) { P.set(x, 7, hx("#5E646C")); P.set(x, 8, hx("#5E646C")); } for (let y = 9; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#AEB4BB"), (r() - 0.5) * 0.06)); P.rect(6, 6, 4, 4, hx("#5E646C")); P.rect(7, 7, 2, 2, hx("#E4E7EA")); }, { fit: true });
@@ -900,11 +907,10 @@ function caveRoom(id, floor) {
       if (c.k === "w") { G.box(x, -1, z, x1, Math.min(c.h, 6), z + 1, { top: "area_cave_wall_top", all: "area_cave_wall_side", bottom: null }); R.solid(x, z, x1, z + 1); }
       else if (c.k === "r") {
         G.box(x, -1, z, x1, 0, z + 1, { top: "area_cave_floor", all: "soil" });
-        // A boulder: a round mound of stone stepped in (the mod's boulder models), one in each block.
+        // A boulder: a round dome of stone (the mod's own boulder models, BOULDERS), one in each block.
         for (let bx = x; bx < x1; bx++) {
-          const P = 1 / 16, b = (bx * 31 + z * 17) % 2 === 0;
-          const steps = b ? [[2, 0, 2, 14, 7, 14], [3, 7, 3, 13, 10, 13], [5, 10, 5, 11, 12, 11]] : [[1, 0, 3, 14, 6, 14], [3, 6, 4, 12, 9, 13], [5, 9, 6, 10, 11, 11], [10, 0, 1, 15, 4, 6]];
-          for (const q of steps) G.box(bx + q[0] * P, q[1] * P, z + q[2] * P, bx + q[3] * P, q[4] * P, z + q[5] * P, "area_cave_boulder");
+          const P = 1 / 16, b = ((bx * 31 + z * 17 + 2 * 7) % 2 + 2) % 2 === 0, m = BOULDERS[c.h <= 1 ? "boulder_small" : b ? "boulder_a" : "boulder_b"];
+          for (const q of m.slice(1)) G.box(bx + q[0] * P, q[1] * P, z + q[2] * P, bx + q[3] * P, q[4] * P, z + q[5] * P, "area_cave_boulder");
         }
         R.solid(x, z, x1, z + 1);
       }
@@ -927,6 +933,172 @@ function caveRoom(id, floor) {
     "A cave mouth's room: the ladder down into the tunnel by the east wall, the way out at the south.");
   return R;
 }
+
+// ---------- Pewter City (13:18): the Gym as FireRed's laid out, as Let's Go's to look at; the Museum of Science ----------
+// The Gym's rock: a blue grey cave wall of big rounded slabs, as Let's Go's; its sand; the blue water-pattern tiles by
+// the door; tan, angular rocks; grey stone statues on pedestals with gold plaques.
+TEXDEF.gymSand = [16, 16, (P, r) => { P.fill(hx("#D9C08D"), 0.07, r); for (let i = 0; i < 7; i++) P.set(r() * 16, r() * 16, hx("#B99E6C")); }];
+TEXDEF.gymRock = [32, 32, (P, r) => {
+  P.fill(hx("#5E6F82"), 0.05, r);
+  for (const [cx, cy, rad] of [[7, 8, 7.5], [22, 6, 7], [14, 22, 8], [29, 22, 6.5], [2, 26, 5]]) {
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+      for (const ox of [-32, 0, 32]) for (const oy of [-32, 0, 32]) {
+        const dx = x - cx - ox, dy = y - cy - oy, d = Math.hypot(dx, dy) / rad;
+        if (d < 1) P.set(x, y, shadec(hx("#6A7C90"), -(dx + dy) / rad * 0.12 + (d > 0.86 ? -0.22 : 0) + (d < 0.5 && dx + dy < -2 ? 0.06 : 0) + (r() - 0.5) * 0.04));
+      }
+    }
+  }
+  // (13:36) Fine cracks across the slabs, and grit.
+  for (const [x0, y0, n] of [[4, 5, 7], [20, 3, 6], [11, 19, 8], [26, 18, 6]]) { let y = y0; for (let x = x0; x < x0 + n; x++) { P.set(x, y, hx("#46525F")); if (r() < 0.4) y += r() < 0.5 ? -1 : 1; } }
+  for (let i = 0; i < 30; i++) P.set(r() * 32, r() * 32, shadec(hx("#6A7C90"), r() < 0.5 ? -0.2 : 0.14));
+}];
+TEXDEF.gymRockDark = [16, 16, (P, r) => P.fill(hx("#46525F"), 0.05, r)];
+TEXDEF.gymWater = [16, 16, (P, r) => {
+  P.fill(hx("#3B92D6"), 0.03, r);
+  for (let x = 0; x < 16; x++) { P.set(x, 4 + Math.round(Math.sin(x * 0.8) * 1.2), hx("#79BDF0")); P.set(x, 11 + Math.round(Math.sin(x * 0.8 + 2) * 1.2), hx("#79BDF0")); }
+  P.rect(0, 0, 16, 1, hx("#D6ECFA")); P.rect(0, 0, 1, 16, hx("#D6ECFA"));
+}];
+// The tan rock (13:36, more detail): layers of sandstone, each a shade of its own with a lit top edge and a dark
+// underside, the joins between them wavy; cracks running down through them; grit. Its tops lighter, mottled, cracked.
+const tanSide = dark => (P, r) => {
+  const tones = ["#C6A262", "#D1B072", "#BA9658", "#CBA867", "#B48F52"].map(c => shadec(hx(c), dark ? -0.16 : 0));
+  const edge = [];
+  for (let x = 0; x < 32; x++) edge.push([0, 7, 13, 20, 26].map((y, i) => y + Math.round(Math.sin(x * 0.4 + i * 1.7) * 1.1)));
+  for (let x = 0; x < 32; x++) for (let y = 0; y < 32; y++) {
+    let band = 4; for (let i = 0; i < 5; i++) if (y >= edge[x][i]) band = i;
+    const top = edge[x][band], next = band < 4 ? edge[x][band + 1] : 32;
+    let c = shadec(tones[band], (r() - 0.5) * 0.08);
+    if (y === top) c = shadec(c, 0.16);
+    else if (y === next - 1) c = shadec(c, -0.2);
+    P.set(x, y, c);
+  }
+  // Cracks: jagged dark lines down through two or three layers.
+  for (const [x0, y0, n] of [[6, 2, 14], [19, 9, 16], [27, 1, 10], [12, 20, 11]]) {
+    let x = x0;
+    for (let y = y0; y < Math.min(32, y0 + n); y++) { P.set(x, y, shadec(tones[2], -0.42)); P.set(x + 1, y, shadec(tones[0], 0.1), 0.5); if (r() < 0.4) x += r() < 0.5 ? -1 : 1; }
+  }
+  for (let i = 0; i < 26; i++) P.set(r() * 32, r() * 32, shadec(tones[0], r() < 0.5 ? -0.3 : 0.22));
+};
+TEXDEF.gymTan = [32, 32, tanSide(false)];
+TEXDEF.gymTanLow = [32, 32, tanSide(true)];
+TEXDEF.gymTanTop = [32, 32, (P, r) => {
+  P.fill(hx("#DDBE82"), 0.05, r);
+  for (let i = 0; i < 9; i++) P.disc(r() * 32, r() * 32, 1.5 + r() * 3, shadec(hx("#DDBE82"), (r() - 0.5) * 0.16));
+  let x = 4, y = 6; for (let k = 0; k < 22; k++) { P.set(x, y, hx("#A9864C")); x += 1; if (r() < 0.45) y += r() < 0.5 ? -1 : 1; }
+  for (let i = 0; i < 20; i++) P.set(r() * 32, r() * 32, shadec(hx("#DDBE82"), r() < 0.5 ? -0.25 : 0.15));
+}];
+TEXDEF.statueStone = [16, 16, (P, r) => P.fill(hx("#B3B3AE"), 0.08, r)];
+TEXDEF.plaqueGold = [16, 16, (P, r) => { P.fill(hx("#CDA746"), 0.04, r); for (const y of [4, 7, 10]) P.rect(3, y, 10, 1, hx("#8C6E22")); P.rect(0, 0, 16, 1, hx("#E8C868")); }];
+for (const k of ["gymSand", "gymRock", "gymRockDark", "gymWater", "gymTan", "gymTanLow", "gymTanTop", "statueStone", "plaqueGold"]) MATDEF[k] = { tex: k, per: /^gym(Rock|Tan)/.test(k) && k !== "gymRockDark" ? 2 : 1 };
+// The Museum: FireRed's brown tiled floor, cream walls with a tan band low down, cream pillars with gold caps, its
+// yellow counter, the fossils in glass, the amber, the space shuttle and the moon stone.
+TEXDEF.museumFloor = [16, 16, (P, r) => {
+  for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) {
+    const x0 = tx * 8, y0 = ty * 8;
+    P.rect(x0, y0, 8, 8, hx("#9B8665")); P.noise(x0 + 2, y0 + 2, 4, 4, hx("#A9946F"), 0.04, r);
+    P.rect(x0, y0, 8, 1, hx("#6F5E45")); P.rect(x0, y0, 1, 8, hx("#6F5E45"));
+    P.rect(x0 + 1, y0 + 1, 6, 1, hx("#B5A07C")); P.rect(x0 + 1, y0 + 1, 1, 6, hx("#B5A07C"));
+  }
+}];
+TEXDEF.museumWall = [16, 16, (P, r) => { P.fill(hx("#EEE3C4"), 0.02, r); for (let x = 2; x < 16; x += 4) P.rect(x, 0, 1, 16, hx("#E5D8B4")); }];
+TEXDEF.museumBand = [16, 16, (P, r) => { P.fill(hx("#C7A56C"), 0.03, r); P.rect(0, 0, 16, 2, hx("#D9BC86")); P.rect(0, 14, 16, 2, hx("#A9884F")); }];
+TEXDEF.museumPillar = [16, 16, (P, r) => { P.fill(hx("#F5ECD4"), 0.02, r); P.rect(0, 0, 2, 16, hx("#E2D4AE")); P.rect(14, 0, 2, 16, hx("#E2D4AE")); P.rect(7, 0, 2, 16, hx("#FBF6E8")); }];
+TEXDEF.museumGold = [16, 16, (P, r) => { P.fill(hx("#D6B04C"), 0.04, r); P.rect(0, 0, 16, 2, hx("#EED27A")); }];
+TEXDEF.counterYellow = [16, 16, (P, r) => { P.fill(hx("#E7BE45"), 0.03, r); P.rect(0, 0, 16, 2, hx("#F4D774")); P.rect(0, 13, 16, 3, hx("#C49A2C")); }];
+TEXDEF.fossilSlab = [32, 16, (P, r) => {
+  P.fill(hx("#5B544A"), 0.06, r);
+  const b = hx("#E9DFC2");
+  P.line(4, 9, 26, 8, b); P.disc(27, 7, 2.2, b); P.line(28, 7, 30, 9, b);
+  for (let x = 8; x < 24; x += 3) { P.line(x, 9, x - 1, 13, b); P.line(x, 8, x + 1, 4, b); }
+  P.line(4, 9, 1, 12, b); P.line(14, 8, 18, 2, b); P.line(18, 2, 24, 3, b);
+}];
+TEXDEF.amberGlow = [16, 16, (P, r) => { P.fill(hx("#E79A2C"), 0.06, r); P.disc(6, 6, 3, hx("#F6C060")); P.disc(9, 10, 1.6, hx("#9A5A16")); }];
+TEXDEF.shuttleWhite = [16, 16, (P, r) => { P.fill(hx("#F2F1EC"), 0.02, r); P.rect(0, 7, 16, 1, hx("#CFCFC8")); P.rect(7, 0, 1, 16, hx("#CFCFC8")); }];
+TEXDEF.shuttleBlack = [16, 16, (P, r) => P.fill(hx("#2A2B30"), 0.03, r)];
+TEXDEF.moonRock = [16, 16, (P, r) => { P.fill(hx("#8D8993"), 0.08, r); for (let i = 0; i < 6; i++) P.disc(r() * 16, r() * 16, 1.2, hx("#6C6873")); }];
+for (const k of ["museumFloor", "museumWall", "museumBand", "museumPillar", "museumGold", "counterYellow", "amberGlow", "shuttleWhite", "shuttleBlack", "moonRock"]) MATDEF[k] = { tex: k, per: 1 };
+MATDEF.fossilSlab = { tex: "fossilSlab", fit: true };
+
+// The Pewter looks' flowers (its beds' poppies and red tulips).
+TEXDEF.pewterPoppy = [16, 16, (P, r) => { P.fill(hx("#D8322E"), 0.06, r); P.disc(8, 8, 2, hx("#2B1A12")); }];
+TEXDEF.pewterTulip = [16, 16, (P, r) => { P.fill(hx("#E8503A"), 0.05, r); P.rect(0, 0, 16, 3, hx("#F07A5C")); }];
+MATDEF.pewterPoppy = { tex: "pewterPoppy", per: 1 }; MATDEF.pewterTulip = { tex: "pewterTulip", per: 1 };
+// A tan rock as Let's Go's Pewter Gym has them: angular, stepped in towards its top.
+function tanRock(R, x, z, s = 1) {
+  // (13:36, more detail.) Two chunks of layered rock leaning together, each in uneven steps that wander off-centre as
+  // they go up, the bottom layer in shadow; a crag on the big one's top; a few pebbles at its foot. Solid over the same
+  // ground as before, so the ways round them are as they were.
+  const G = R.geo, r = rng(hashStr("tanRock" + x.toFixed(2) + "," + z.toFixed(2)));
+  const chunk = (cx, cz, w, d, h, n) => {
+    let y = 0, ox = 0, oz = 0;
+    for (let i = 0; i < n; i++) {
+      const k = 1 - (i / n) * 0.72, hh = (h / n) * (0.75 + r() * 0.5);
+      ox += (r() - 0.5) * 0.14 * s; oz += (r() - 0.5) * 0.12 * s;
+      G.box(cx - (w * k) / 2 + ox, y, cz - (d * k) / 2 + oz, cx + (w * k) / 2 + ox, y + hh, cz + (d * k) / 2 + oz, { all: i === 0 ? "gymTanLow" : "gymTan", top: "gymTanTop" });
+      y += hh;
+    }
+    return [y, cx + ox, cz + oz, w * (1 - 0.72 * (n - 1) / n), d * (1 - 0.72 * (n - 1) / n)];
+  };
+  const side = r() < 0.5 ? -1 : 1;
+  const [y, tx, tz, tw, td] = chunk(x - 0.12 * s * side, z - 0.04 * s, 1.36 * s, 1.24 * s, 1.75 * s, 5);
+  chunk(x + 0.42 * s * side, z + 0.22 * s, 0.7 * s, 0.7 * s, 0.85 * s, 3);
+  // The crag: a narrow point on top, off to one side.
+  G.box(tx - tw * 0.3, y, tz - td * 0.25, tx + tw * 0.15, y + 0.22 * s, tz + td * 0.2, { all: "gymTan", top: "gymTanTop" });
+  // Pebbles round its foot.
+  for (let i = 0; i < 4; i++) {
+    const a = r() * Math.PI * 2, dd = 0.86 + r() * 0.16, px = x + Math.cos(a) * 0.8 * s * dd, pz = z + Math.sin(a) * 0.7 * s * dd, q = (0.07 + r() * 0.07) * s;
+    G.box(px - q, 0, pz - q * 0.8, px + q, q * 1.1, pz + q * 0.8, { all: "gymTan", top: "gymTanTop" });
+  }
+  R.solid(x - 0.8 * s, z - 0.7 * s, x + 0.8 * s, z + 0.7 * s);
+}
+// A stone RHYHORN on a pedestal with a gold plaque (the Gym's statues).
+function gymStatue(R, x, z, lines) {
+  const G = R.geo;
+  G.box(x - 0.6, 0, z - 0.6, x + 0.6, 1.3, z + 0.6, { all: "statueStone", top: "statueStone" });
+  G.box(x - 0.35, 0.35, z + 0.6, x + 0.35, 1.0, z + 0.62, { s: "plaqueGold", all: null });
+  G.box(x - 0.38, 1.3, z - 0.5, x + 0.38, 1.85, z + 0.35, "statueStone");
+  G.box(x - 0.24, 1.45, z + 0.35, x + 0.24, 1.85, z + 0.7, "statueStone");
+  G.box(x - 0.06, 1.85, z + 0.5, x + 0.06, 2.1, z + 0.62, "statueStone");
+  for (const [dx, dz] of [[-0.3, -0.4], [0.18, -0.4], [-0.3, 0.2], [0.18, 0.2]]) G.box(x + dx, 1.3, z + dz, x + dx + 0.12, 1.45, z + dz + 0.14, "statueStone");
+  R.solid(x - 0.6, z - 0.6, x + 0.6, z + 0.6);
+  R.act([x - 0.8, z - 0.8, x + 0.8, z + 1.0], { label: "Read", lines });
+  R.item("Statues", "Stone RHYHORN on pedestals, a gold plaque on each: the Gym's winners.");
+}
+// A glass case on a wooden base, what's in it on a slab inside (the Museum's).
+function glassCase(R, x0, z0, x1, z1, inside, lines) {
+  const G = R.geo;
+  G.box(x0, 0, z0, x1, 0.75, z1, { all: "walnut", top: "darkTop" });
+  inside(G, x0, z0, x1, z1);
+  G.box(x0, 0.75, z0, x1, 1.55, z0 + 0.04, "glass"); G.box(x0, 0.75, z1 - 0.04, x1, 1.55, z1, "glass");
+  G.box(x0, 0.75, z0, x0 + 0.04, 1.55, z1, "glass"); G.box(x1 - 0.04, 0.75, z0, x1, 1.55, z1, "glass");
+  G.box(x0, 1.55, z0, x1, 1.6, z1, { all: "steel", top: "glass" });
+  R.solid(x0, z0, x1, z1);
+  R.act([x0 - 0.2, z0 - 0.2, x1 + 0.2, z1 + 0.3], { label: "Look", lines });
+}
+// A cream pillar against the north wall, gold at its top and foot.
+function museumPillar(R, x, H) {
+  const G = R.geo;
+  G.box(x, 0, 0, x + 0.6, H, 0.35, { all: "museumPillar", top: "cap" });
+  G.box(x - 0.05, 0, 0, x + 0.65, 0.25, 0.42, "museumGold"); G.box(x - 0.05, H - 0.3, 0, x + 0.65, H - 0.1, 0.42, "museumGold");
+}
+// A plain house as Viridian's (the Pewter houses): pale boards, a kitchen, a table on a rug, a TV, a sideboard.
+function plainHouse(R, o = {}) {
+  shell(R, { paper: o.paper || "paperSchool", floor: "midBoards", door: VHOUSE_DOOR, entry: true, skirt: "beam", ledge: "walnut" });
+  band(R, 1.0, "beam", 0.12);
+  const G = R.geo;
+  kitchen(R, 0, "e", { z: 6.6 });
+  sideboard(R, 1.5, 0, "s", 1.6, { lines: o.cupboard || ["A cupboard. Inside: plates and a tin of biscuits."] });
+  tvUnit(R, 3.5, 3.0, R.screen("tv" + R.id, 40, 24, drawFilm, 0.9), { lines: o.tv || ["A show about the MT. MOON fossils."] });
+  clock(R, 8.1, 2.3);
+  G.box(3.6, 0, 2.4, 8.4, 0.03, 6.4, { top: o.rug || "rugGreen", all: "cap", bottom: null });
+  table(R, 4.8, 3.4, 7.2, 5.4, { top: "lab", leg: "walnut", h: 0.86, name: "Table", note: "A white top in a walnut trim." });
+  for (const z of [3.95, 4.85]) { chair(R, 4.15, z, "e", { seat: "cushion" }); chair(R, 7.85, z, "w", { seat: "cushion" }); }
+  plant(R, 10.8, 7.7, 0.85, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+  crossWindow(R, "e", 2.6, 1.6, 1.8, 1.2, o.window || ["Outside: PEWTER CITY's grey stone paths."]);
+  doormat(R, VHOUSE_DOOR[0], VHOUSE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHouseV" });
+  R.spawn = VHOUSE_IN;
+}
+
 const BUILD = {
   house1() {
     // Downstairs, as Let's Go's: the kitchen down the left-hand wall on its green mat, the dresser of plates, a plant and
@@ -1371,8 +1543,8 @@ const BUILD = {
     const R = new Room("gate_johto", { name: "Route 28 Gate", floor: "Route 22", W: 16, D: 10, outsideSize: "9 by 12" });
     shell(R, { paper: "paperGateLG", floor: "gateCheck", skirt: "gateWhite", westNook: [3, 7], eastNook: [3, 7], ledge: "gateBlue", ledgeTop: "gateWhite" });
     band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
-    passageSide(R, "e", 3, 7, { to: "town", mat: "matGateE", frame: "paint" });
-    passageSide(R, "w", 3, 7, { to: "town", mat: "matGateW", frame: "paint", choice: "johto" });
+    passageSide(R, "e", 3, 7, { to: "town", mat: "matGateEast", frame: "paint" });
+    passageSide(R, "w", 3, 7, { to: "town", mat: "matGateWest", frame: "paint", choice: "johto" });
     rug(R, 2, 3, 14, 7, "gateRunX");
     // Two windows behind the guard (the light falls across his desk), the map of the way west beside them, a notice.
     crossWindowN(R, 4.3, 1.5, 1.8, 1.4, ["Outside: the mountain's foot, and ROUTE 22's grass."]);
@@ -1400,6 +1572,181 @@ const BUILD = {
   digletts_n() { return caveRoom("digletts_n", "North entrance (Route 2)"); },
   digletts_b1f() { return caveRoom("digletts_b1f", "B1F"); },
   digletts_s() { return caveRoom("digletts_s", "South entrance (Route 11)"); },
+
+  pewter_gym() {
+    // PEWTER GYM, laid out as FireRed's (13 by 15 of its steps, a step a block here) and drawn as Let's Go's: the blue
+    // grey rock of a cave all round, sand underfoot, the blue water-pattern tiles at the door, tan angular rocks either
+    // side of the way up the middle, a stone RHYHORN on a pedestal each side of the door, and BROCK on his stone stage
+    // at the top. CAMPER LIAM waits on the left, looking across the way up (he sees 4 steps); the GYM GUIDE by the door.
+    const R = new Room("pewter_gym", { name: "Pewter Gym", floor: "Pewter City", W: 14, D: 18, H: 6 });
+    shell(R, { paper: "gymRock", floor: "gymSand", door: [6, 8], entry: true, skirt: "gymRockDark", ledge: "gymRockDark", ledgeTop: "gymRockDark" });
+    const G = R.geo, Dm = R.Dm;
+    // The water tiles by the door, the way up the middle a shade darker.
+    G.box(0, 0, 12, R.W, 0.012, Dm, { top: "gymWater", all: null });
+    G.box(5, 0, 2, 9, 0.008, 12, { top: "gymSand", all: null });
+    // The rock slabs against the back wall, and BROCK's stage: two steps of stone up to it.
+    for (const [x0, x1, h] of [[0, 2.6, 5.2], [2.6, 4.6, 4.2], [9.4, 11.4, 4.4], [11.4, 14, 5.5]]) { G.box(x0, 0, 0, x1, h, 1.2, { all: "gymRock", top: "gymRockDark" }); R.solid(x0, 0, x1, 1.2); }
+    G.box(4.0, 0, 0.4, 10.0, 0.25, 4.2, { all: "gymRockDark", top: "statueStone" });
+    G.box(4.6, 0.25, 0.4, 9.4, 0.5, 3.2, { all: "gymRockDark", top: "statueStone" });
+    R.ramps.push({ rect: [4.0, 0.4, 10.0, 4.2], h: (x, z) => (x > 4.6 && x < 9.4 && z < 3.2 ? 0.5 : 0.25) });
+    // The tan rocks either side of the way up (a gap on the left where LIAM stands).
+    for (const [x, z, k] of [[1.6, 3.4, 1.1], [3.4, 4.2, 0.9], [1.4, 5.8, 1.0], [1.6, 10.6, 1.0], [3.6, 11.0, 0.8],
+      [10.6, 3.6, 1.0], [12.4, 4.6, 1.1], [10.8, 6.6, 0.9], [12.6, 8.2, 1.0], [10.6, 9.6, 1.0], [12.4, 11.0, 0.8]]) tanRock(R, x, z, k);
+    gymStatue(R, 3.4, 14.0, ["PEWTER CITY POKéMON GYM", "LEADER: BROCK", "WINNING TRAINERS: {rival}"]);
+    gymStatue(R, 10.6, 14.0, ["PEWTER CITY POKéMON GYM", "LEADER: BROCK", "WINNING TRAINERS: {rival}"]);
+    R.npcs.push({ name: "Leader Brock", key: "pewter_gym_0", role: "leader", x: 7.0, z: 2.2, yaw: FACE.s, look: { skin: "leader_brock" },
+      talk: () => [{ text: "I'm BROCK! I'm PEWTER's GYM LEADER!" }, { text: "(In the game: you battle him in his rocky arena, and win the BOULDERBADGE.)" }] });
+    R.npcs.push({ name: "Camper Liam", key: "pewter_gym_1", role: "trainer", x: 3.0, z: 8.2, yaw: FACE.e, look: { skin: "camper" },
+      talk: () => [{ text: "Stop right there, kid! You're still light-years from facing BROCK!" }] });
+    R.npcs.push({ name: "Gym guide", key: "pewter_gym_p0", x: 9.4, z: 14.6, yaw: FACE.w, look: { skin: "gym_guide" },
+      talk: () => [{ text: "Hiya! I can tell you have what it takes to become a POKéMON champ!" }, { text: "BROCK's ROCK-type POKéMON hate WATER and GRASS moves!" }] });
+    doormat(R, 6, 8, { to: "town", mat: "matGate" });
+    R.spawn = { x: 7.0, z: 16.5, yaw: FACE.n };
+    R.item("The way up", "Sand up the middle, between tan rocks, to BROCK's stone stage at the top. CAMPER LIAM looks across it from the left: walk in front of him and he'll battle you.");
+    return R;
+  },
+
+  arena_pewter_gym() {
+    // PEWTER GYM's battle, as Let's Go's: a round hall of blue grey cave rock, big rounded slabs of it standing all
+    // round, sand underfoot, tan angular rocks in clumps at the edge, BROCK's stone stage and its steps at the back, a
+    // stone RHYHORN on its pedestal to one side. You battle across the middle, facing the back.
+    const R = new Room("arena_pewter_gym", { name: "Pewter Gym battle", floor: "Battle arena", W: 24, D: 24, H: 8 });
+    const G = R.geo, c = 12, rad = 11.5;
+    for (let j = 0; j < R.D; j++) {
+      const zc = j + 0.5 - c; if (Math.abs(zc) >= rad + 1) continue;
+      const half = Math.sqrt(Math.max(0, (rad + 1) ** 2 - zc * zc)), x0 = Math.max(0, Math.floor(c - half)), x1 = Math.min(R.W, Math.ceil(c + half));
+      G.box(x0, -0.35, j, x1, 0, j + 1, { top: "gymSand", all: null });
+    }
+    for (let i = 0; i < R.W; i++) for (let j = 0; j < R.D; j++) {
+      const d = Math.hypot(i + 0.5 - c, j + 0.5 - c);
+      if (d < rad || d >= rad + 1) continue;
+      const h = 6.5 + ((i * 7 + j * 13) % 5) * 0.4;
+      G.box(i, 0, j, i + 1, h, j + 1, { all: "gymRock", top: "gymRockDark", bottom: null });
+      R.solid(i, j, i + 1, j + 1);
+    }
+    // Rounded slabs standing in front of the wall (not on the camera's side, the south).
+    for (let a = -150; a <= -30; a += 15) {
+      const t = a * D2R, x = c + Math.cos(t) * 10.2, z = c + Math.sin(t) * 10.2, w = 1.4 + ((a + 150) % 30) / 30, h = 3.4 + ((a + 150) % 45) / 15;
+      G.box(x - w / 2, 0, z - 0.5, x + w / 2, h, z + 0.5, { all: "gymRock", top: "gymRockDark" });
+    }
+    // BROCK's stage at the back, its steps down to the floor.
+    G.box(8.5, 0, 1.6, 15.5, 1.2, 4.0, { all: "gymRockDark", top: "statueStone" });
+    for (let k = 0; k < 3; k++) G.box(10.2, 0, 4.0 + k * 0.5, 13.8, 1.2 - (k + 1) * 0.4, 4.5 + k * 0.5, { all: "gymRockDark", top: "statueStone" });
+    // Tan rocks in clumps at the edge, and a statue.
+    for (const [x, z, k] of [[4.2, 6.2, 1.3], [3.4, 8.6, 1.0], [5.6, 4.6, 0.9], [19.8, 6.0, 1.3], [20.6, 8.6, 1.0], [18.4, 4.4, 0.9], [3.0, 12.6, 1.1], [21.0, 12.4, 1.1]]) tanRock(R, x, z, k);
+    gymStatue(R, 6.6, 3.0, ["A stone RHYHORN."]);
+    G.box(0, R.H, 0, R.W, R.H + 0.2, R.D, { bottom: "gymRockDark", all: null });
+    R.spawn = { x: 12, z: 14.2, yaw: FACE.n };
+    return R;
+  },
+
+  museum_1f() {
+    // PEWTER MUSEUM OF SCIENCE, 1F, as FireRed's (its 30 by 10 steps, a step a block): a brown tiled floor; cream walls,
+    // a tan band low down, cream pillars between the windows (on the left, not behind the counter, 13:36). In at the main door (the left), past the desk where you
+    // pay for your ticket: the two fossils in their glass cases (AERODACTYL and KABUTOPS) and the stairs up. The yellow
+    // counter runs down the middle and round to the front: past it, in at the side door (the right), the OLD AMBER on
+    // its stand with the scientist who studies it, bookshelves, and two scientists at their desks.
+    const R = new Room("museum_1f", { name: "Pewter Museum of Science", floor: "1F", W: 30, D: 11, H: 4 });
+    shell(R, { paper: "museumWall", floor: "museumFloor", skirt: "museumBand", skirtH: 0.7 });
+    const G = R.geo;
+    for (const x of [1.0, 6.2, 11.4, 16.6]) museumPillar(R, x, R.H);
+    for (const x of [3.0, 8.2, 13.4]) windowN(R, x, 1.6, 1.8, 1.6);
+    // The counter: down from the back, round, and down to the front.
+    const counter = (x0, z0, x1, z1) => { G.box(x0, 0, z0, x1, 1.0, z1, { all: "counterYellow", top: "museumGold" }); R.solid(x0, z0, x1, z1); };
+    counter(16.6, 1.2, 17.4, 7.4); counter(16.6, 6.6, 19.4, 7.4); counter(18.6, 7.4, 19.4, R.D);
+    // The fossils.
+    const bones = (G2, x0, z0, x1, z1) => G2.box(x0 + 0.2, 0.75, z0 + 0.25, x1 - 0.2, 0.95, z1 - 0.25, { all: "darkTop", top: "fossilSlab" });
+    glassCase(R, 2.8, 2.8, 6.2, 4.6, bones, ["AERODACTYL Fossil", "A primitive and rare POKéMON."]);
+    glassCase(R, 2.8, 6.0, 6.2, 7.8, bones, ["KABUTOPS Fossil", "A primitive and rare POKéMON."]);
+    stairsUp(R, 8, 7, 2, { to: "museum_2f", spawn: { x: 12.5, z: 9.9, yaw: FACE.s } });
+    // The OLD AMBER on its stand, a glass dome over it.
+    G.box(21.9, 0, 2.5, 23.1, 0.9, 3.7, { all: "museumGold", top: "darkTop" });
+    G.box(22.25, 0.9, 2.85, 22.75, 1.3, 3.35, "amberGlow");
+    G.box(22.05, 0.9, 2.65, 22.95, 1.6, 3.55, "glass");
+    R.solid(21.9, 2.5, 23.1, 3.7);
+    R.act([21.7, 2.3, 23.3, 4.0], { label: "Look", lines: ["The AMBER is clear and gold!"] });
+    // Behind the counter (13:36): two double bookshelves along the back wall, no window or pillar there; two chairs
+    // by the receptionist; desks by the east wall.
+    for (const x of [19.9, 22.0, 25.2, 27.3]) bookshelf(R, x, 0, "s", 2.1, 2.6, { wood: "walnut" });
+    R.act([19.9, 0, 24.1, 1.2], { label: "Read", lines: ["Books about fossils, and about the POKéMON of long ago."] });
+    R.act([25.2, 0, 29.4, 1.2], { label: "Read", lines: ["POKéMON JOURNAL", "Special Feature: PEWTER GYM LEADER BROCK!", "BROCK rarely laughs, but they say he can't stop once he starts!"] });
+    chair(R, 18.1, 2.3, "w", { seat: "blueFabric" }); chair(R, 18.1, 3.3, "w", { seat: "blueFabric" });
+    for (const z of [3.2, 6.4]) { table(R, 28.4, z, 29.7, z + 1.6, { top: "lab", leg: "steel", h: 0.85, name: "Desk", note: "A white desk with papers on fossils." }); }
+    for (const [x, z] of [[0.8, 9.6], [12.2, 9.6], [17.6, 9.6], [29.2, 9.6], [15.8, 0.9]]) plant(R, x, z, 0.85, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+    doormat(R, 13, 16, { to: "town", mat: "matGate" });
+    doormat(R, 21, 24, { to: "town", mat: "matGate" });
+    R.npcs.push({ name: "Receptionist", key: "museum_1f_desk", x: 18.4, z: 4.6, yaw: FACE.w, look: { skin: "scientist" },
+      talk: () => [{ text: "It's ¥50 for a child's ticket. Would you like to come in?" }, { text: "(In the game: yes, and you pay ¥50 the first time you go in.)" }] });
+    R.npcs.push({ name: "Old man", key: "museum_1f_oldman", x: 1.8, z: 3.9, yaw: FACE.e, look: { skin: "old_man" },
+      talk: () => [{ text: "That is one magnificent fossil!" }] });
+    R.npcs.push({ name: "Scientist", key: "museum_1f_amber", x: 21.4, z: 4.3, yaw: FACE.s, look: { skin: "scientist" },
+      talk: () => [{ text: "Ssh! I think that this chunk of AMBER contains POKéMON DNA!" }, { text: "Take it to a POKéMON LAB and get it examined!" }, { text: "(In the game: he gives you the OLD AMBER.)" }] });
+    R.npcs.push({ name: "Scientist", key: "museum_1f_sci", x: 26.6, z: 4.4, yaw: FACE.e, look: { skin: "scientist" },
+      talk: () => [{ text: "We are proud of two fossils of very rare, prehistoric POKéMON!" }] });
+    R.npcs.push({ name: "Scientist", key: "museum_1f_sci2", x: 26.6, z: 7.4, yaw: FACE.e, look: { skin: "scientist_f" },
+      talk: () => [{ text: "We found these fossils at MT. MOON. Who knows what else is buried there?" }] });
+    R.spawn = { x: 14.5, z: 9.4, yaw: FACE.n };
+    R.item("Two ways in", "The main door (left of the counter) to the fossils and the stairs; the side door (right of it) to the OLD AMBER.");
+    return R;
+  },
+
+  museum_2f() {
+    // The Museum's 2F, as FireRed's: the space exhibit. The SPACE SHUTTLE on a gold stand, the meteorite from MT.
+    // MOON in two glass cases side by side (as big as 1F's, 13:36), the windows between cream pillars; the stairs down; a scientist, a man looking about, an old
+    // man remembering the moon landing, a little girl who wants a PIKACHU and her father.
+    const R = new Room("museum_2f", { name: "Pewter Museum of Science", floor: "2F", W: 20, D: 11, H: 4 });
+    shell(R, { paper: "museumWall", floor: "museumFloor", skirt: "museumBand", skirtH: 0.7 });
+    const G = R.geo;
+    for (const x of [1.0, 6.2, 11.4, 16.6]) museumPillar(R, x, R.H);
+    for (const x of [3.0, 8.2, 13.4]) windowN(R, x, 1.6, 1.8, 1.6);
+    stairsDown(R, 9, 7, 2, { to: "museum_1f", spawn: { x: 7.1, z: 8.1, yaw: FACE.s }, paper: "museumWall" });
+    // The shuttle on its stand.
+    G.box(13.2, 0, 3.4, 17.8, 0.5, 6.0, { all: "museumGold", top: "darkTop" });
+    G.box(13.8, 0.5, 4.3, 17.4, 1.2, 5.1, "shuttleWhite");
+    G.box(17.4, 0.6, 4.4, 17.9, 1.1, 5.0, "shuttleBlack");
+    G.box(14.2, 0.55, 3.6, 16.4, 0.7, 5.8, "shuttleWhite");
+    G.box(13.8, 1.2, 4.55, 14.6, 1.8, 4.85, "shuttleWhite");
+    G.box(13.5, 0.6, 4.4, 13.8, 1.1, 5.0, "shuttleBlack");
+    R.solid(13.2, 3.4, 17.8, 6.0);
+    R.act([13.0, 3.2, 18.0, 6.3], { label: "Look", lines: ["SPACE SHUTTLE COLUMBIA"] });
+    // The meteorite from MT. MOON: in two glass cases side by side, each as big as the fossils' downstairs.
+    const rock = (G2, x0, z0, x1, z1) => {
+      const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+      G2.box(x0 + 0.3, 0.75, z0 + 0.3, x1 - 0.3, 0.8, z1 - 0.3, { all: "darkTop", top: "statueStone" });
+      G2.box(cx - 0.45, 0.8, cz - 0.32, cx + 0.4, 1.12, cz + 0.3, "moonRock"); G2.box(cx - 0.28, 1.12, cz - 0.2, cx + 0.22, 1.3, cz + 0.16, "moonRock");
+    };
+    glassCase(R, 1.2, 3.4, 4.6, 5.2, rock, ["Meteorite that fell on MT. MOON.", "(MOON STONE?)"]);
+    glassCase(R, 5.0, 3.4, 8.4, 5.2, rock, ["Meteorite that fell on MT. MOON.", "(MOON STONE?)"]);
+    for (const [x, z] of [[0.8, 9.6], [19.2, 9.6], [19.2, 1.0]]) plant(R, x, z, 0.85, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+    R.npcs.push({ name: "Scientist", key: "museum_2f_p2", x: 10.5, z: 5.5, yaw: FACE.s, look: { skin: "scientist" }, talk: () => [{ text: "We have a space exhibit now." }] });
+    R.npcs.push({ name: "Man", key: "museum_2f_p0", x: 4.5, z: 9.3, yaw: FACE.n, look: { skin: "youngster" }, talk: () => [{ text: "MOON STONE? What's so special about it?" }] });
+    R.npcs.push({ name: "Old man", key: "museum_2f_p1", x: 2.4, z: 6.4, yaw: FACE.n, look: { skin: "gramps" }, talk: () => [{ text: "July 20, 1969! The 1st lunar landing!" }] });
+    R.npcs.push({ name: "Little girl", key: "museum_2f_p3", x: 15.5, z: 8.5, yaw: FACE.e, look: { skin: "brunette_girl" }, talk: () => [{ text: "I want a PIKACHU! It's so cute!" }] });
+    R.npcs.push({ name: "Father", key: "museum_2f_p4", x: 16.5, z: 8.5, yaw: FACE.s, look: { skin: "hiker" }, talk: () => [{ text: "Yeah, a PIKACHU soon, I promise!" }] });
+    R.spawn = { x: 12.5, z: 9.9, yaw: FACE.s };
+    return R;
+  },
+
+  pewter_house1() {
+    // The house by the Museum (FireRed's PEWTER house 1): the boy whose NIDORAN won't sit, and his father.
+    const R = new Room("pewter_house1", { name: "Pewter house", floor: "By the museum", W: 12, D: 11, outsideSize: "11 by 9" });
+    plainHouse(R, { rug: "rugGreen", cupboard: ["A cupboard. Inside: a bag of POKéMON food and a squeaky toy."] });
+    R.npcs.push({ name: "Little boy", key: "pewter_nidoran_house_p1", x: 9.2, z: 6.2, yaw: FACE.w, look: { skin: "little_boy" }, talk: () => [{ text: "NIDORAN sit!" }] });
+    R.npcs.push({ name: "Man", key: "pewter_nidoran_house_p2", x: 2.4, z: 3.4, yaw: FACE.e, look: { skin: "middle_aged_man" },
+      talk: () => [{ text: "Our POKéMON's an outsider, so it's hard to handle." }, { text: "An outsider is a POKéMON that you get in a trade." }] });
+    return R;
+  },
+
+  pewter_house2() {
+    // The house by the Center (FireRed's PEWTER house 2): two people with advice about moves and catching.
+    const R = new Room("pewter_house2", { name: "Pewter house", floor: "By the Center", W: 12, D: 11, outsideSize: "11 by 9" });
+    plainHouse(R, { rug: "rugGreen" });
+    R.npcs.push({ name: "Man", key: "pewter_speech_house_p0", x: 2.4, z: 3.4, yaw: FACE.e, look: { skin: "gambler" },
+      talk: () => [{ text: "POKéMON learn new techniques as they grow!" }, { text: "But some moves must be taught by the trainer!" }] });
+    R.npcs.push({ name: "Youngster", key: "pewter_speech_house_p1", x: 9.4, z: 6.4, yaw: FACE.w, look: { skin: "youngster" },
+      talk: () => [{ text: "POKéMON become easier to catch when they are hurt or asleep!" }, { text: "But it's not a sure thing!" }] });
+    return R;
+  },
 
   route2_gate() {
     // The gate across Route 2's east lane (the one past the CUT trees, by Diglett's Cave), the same design as the
@@ -1790,6 +2137,94 @@ const BUILD = {
     R.item("Front", "The deepslate brick pillars metal, the oak over the door a lime green canopy, the steps the gates' stone.");
     R.item("Trees", "Spruce fence trunks as wood, acacia leaves as a round fresh green bush (its own green, not the biome's).");
     R.spawn = { x: 11, z: 13, yaw: FACE.n };
+    return R;
+  },
+
+  pewter_looks() {
+    // The looks the mod gives Pewter City (13:18), on John's blocks: his paving (white concrete, smooth quartz, white
+    // terracotta, chiselled quartz, light grey concrete, in his own pattern) each block a paving stone of its own
+    // colour; a house front as his (Pewter's two and Route 2's trade house): the pale oak walls solid, the deepslate
+    // tile roof metal, the window's stairs white frames, the trapdoors painted panels, the mud brick chimney solid; a
+    // flower bed in a white planter (its pale oak trapdoors); the white fence; the town sign (pale oak shelves) as
+    // HeartGold's and the TRAINER TIPS sign (oak shelves) as our wooden sign; a corner of the Museum: its purpur roof
+    // FireRed's purple tiles, the crimson bands darker, its white terracotta walls cream. Everything faces you (south).
+    const R = new Room("pewter_looks", { name: "Pewter City looks", floor: "Outside (the mod's blocks)", W: 28, D: 24, H: 9, outside: true });
+    const G = R.geo, P16 = 1 / 16;
+    // The paving, as John laid it: his four by four pattern, a border of smooth quartz.
+    const MOTIF = ["tgtW", "WtWc", "cWcW", "WtWc"], PAVE = { t: "terracotta", g: "gray", W: "white", c: "chiseled", q: "quartz" };
+    const px0 = 1, px1 = 15, pz0 = 11, pz1 = 23;
+    for (let x = 0; x < R.W; x++) for (let z = 0; z < R.D; z++) {
+      const inPave = x >= px0 && x < px1 && z >= pz0 && z < pz1;
+      if (!inPave) { G.box(x, -1, z, x + 1, 0, z + 1, { top: "grass", all: "soil" }); continue; }
+      const border = x === px0 || x === px1 - 1 || z === pz0 || z === pz1 - 1;
+      const k = border ? "q" : MOTIF[(z - pz0 - 1) % 4][(x - px0 - 1) % 4];
+      G.box(x, -1, z, x + 1, 0, z + 1, { top: "area_pave_" + PAVE[k], all: k === "c" ? "area_pave_chiseled_side" : "area_pave_" + PAVE[k] });
+    }
+    // The house front (x 2 to 12): pale walls three high, a door, two windows in white frames with a painted panel
+    // under each, the roof's layers of metal slabs stepping back, the chimney.
+    const hx0 = 2, hx1 = 13, hz = 7;
+    G.box(hx0, 0, hz - 4, hx1, 3, hz, { all: "area_pewter_wall", top: null });
+    G.box(7, 0, hz, 8.95, 2.1, hz + 0.02, { s: "doorDark", all: null });
+    for (const wx of [3.5, 10]) {
+      G.box(wx, 1.0, hz, wx + 1.6, 2.2, hz + 0.02, { s: "window", all: null });
+      G.box(wx - 0.15, 0.85, hz, wx + 1.75, 1.0, hz + 0.25, "area_window_frame"); G.box(wx - 0.15, 2.2, hz, wx + 1.75, 2.35, hz + 0.12, "area_window_frame");
+      G.box(wx - 0.15, 1.0, hz, wx, 2.2, hz + 0.12, "area_window_frame"); G.box(wx + 1.6, 1.0, hz, wx + 1.75, 2.2, hz + 0.12, "area_window_frame");
+      G.box(wx, 0.15, hz, wx + 1.6, 0.8, hz + 3 * P16, "area_pewter_shutter");
+    }
+    for (let i = 0; i < 4; i++) G.box(hx0 - 0.5 + i * 0.5, 3 + i * 0.5, hz - 4 + i * 0.6, hx1 + 0.5 - i * 0.5, 3.5 + i * 0.5, hz + 0.5 - i * 0.6, "area_pewter_roof");
+    G.box(10.5, 4.5, 4.2, 11.5, 6.0, 5.2, { all: "area_pewter_chimney" }); G.box(10.4, 6.0, 4.1, 11.6, 6.3, 5.3, "area_pewter_chimney");
+    R.solid(hx0, hz - 4, hx1, hz);
+    R.act([7, hz, 9, hz + 1], { label: "Look", lines: ["A Pewter house as the mod draws John's: solid pale walls, a metal roof, white window frames, painted panels, a solid chimney."] });
+    // The flower bed: a white planter (the pale oak trapdoors round it), flowers in it.
+    const fx0 = 17, fx1 = 21, fz0 = 12, fz1 = 14;
+    G.box(fx0, 0, fz0, fx1, 0.35, fz1, { all: "area_planter_white", top: "soil" });
+    for (let x = fx0; x < fx1; x++) for (let z = fz0; z < fz1; z++) {
+      const red = (x + z) % 2 === 0;
+      G.box(x + 0.4, 0.35, z + 0.4, x + 0.6, 0.75, z + 0.6, "leafSolid");
+      G.box(x + 0.32, 0.75, z + 0.32, x + 0.68, 0.95, z + 0.68, red ? "pewterPoppy" : "pewterTulip");
+    }
+    R.solid(fx0, fz0, fx1, fz1);
+    // The white fence (pale oak fence) along the garden.
+    const fz = 10.5;
+    for (let x = 16; x <= 26; x++) {
+      G.box(x + 6 * P16, 0, fz - 2 * P16, x + 10 * P16, 1, fz + 2 * P16, "area_white_fence");
+      if (x < 26) for (const [y0, y1] of [[6, 9], [12, 15]]) G.box(x + 10 * P16, y0 * P16, fz - P16, x + 22 * P16, y1 * P16, fz + P16, "area_white_fence");
+    }
+    R.solid(16, fz - 0.2, 27, fz + 0.2);
+    // The two signs, two shelves by two facing south: the town sign (pale oak) as HeartGold's, TRAINER TIPS (oak) in wood.
+    const sign = (sx, sz, pre, lines) => {
+      for (const [bx, part] of [[sx, "l"], [sx + 1, "r"]]) {
+        const outerW = part === "l", outerE = part === "r";
+        G.box(bx, 1, sz + 5 * P16, bx + 1, 2, sz + 11 * P16, { s: "area_" + pre + "_front_" + part, n: "area_" + pre + "_back_" + part, top: "area_" + pre + "_edge_h", bottom: "area_" + pre + "_edge_h",
+          w: outerW ? "area_" + pre + "_edge_v" : null, e: outerE ? "area_" + pre + "_edge_v" : null });
+        G.box(bx + (outerW ? 2 * P16 : 0), 2 * P16, sz + 6 * P16, bx + 1 - (outerE ? 2 * P16 : 0), 1, sz + 10 * P16, { all: "area_" + pre + "_stand", top: null, bottom: null,
+          w: outerW ? "area_" + pre + "_stand" : null, e: outerE ? "area_" + pre + "_stand" : null });
+        G.box(bx + (outerW ? P16 : 0), 0, sz + 5 * P16, bx + 1 - (outerE ? P16 : 0), 2 * P16, sz + 11 * P16, { all: "area_" + pre + "_foot",
+          w: outerW ? "area_" + pre + "_foot" : null, e: outerE ? "area_" + pre + "_foot" : null });
+      }
+      R.solid(sx, sz + 0.3, sx + 2, sz + 0.7);
+      R.act([sx, sz, sx + 2, sz + 1], { label: "Read", lines });
+    };
+    sign(17, 17, "sign", ["PEWTER CITY", "A Stone Gray City"]);
+    sign(22, 17, "wsign", ["TRAINER TIPS", "Any POKéMON that takes part in battle, however short, earns EXP!"]);
+    // A corner of the Museum (x 16 to 27): cream walls, the crimson band, the purple tiled roof stepping up to its
+    // ridge (running east to west here), the purple flats.
+    const mx0 = 16, mx1 = 27, mz0 = 1, mz1 = 6;
+    G.box(mx0, 0, mz0, mx1, 3, mz1, { all: "area_museum_wall", top: null });
+    G.box(mx0 - 0.3, 3, mz0 - 0.3, mx1 + 0.3, 3.5, mz1 + 0.3, { all: "area_museum_roof_dark", top: "area_museum_roof_flat" });
+    for (let i = 0; i < 3; i++) {
+      const z0 = mz1 - i, y = 3.5 + i * 0.5;
+      G.box(mx0, y, z0 - 1, mx1, y + 0.5, z0, { top: "area_roof_museum_tiles", s: "area_roof_museum_tiles", e: "area_roof_museum_edge", w: "area_roof_museum_edge", bottom: "area_roof_museum_under" });
+    }
+    G.box(mx0, 5.0, mz0, mx1, 5.5, mz0 + 2, { all: "area_museum_roof_dark", top: "area_museum_roof_flat" });
+    G.box(19, 0, mz1, 21, 2.2, mz1 + 0.02, { s: "doorDark", all: null });
+    R.solid(mx0, mz0, mx1, mz1);
+    R.act([19, mz1, 21, mz1 + 1], { label: "Look", lines: ["The Museum as the mod draws John's: FireRed's purple tiles on its roof, the crimson bands darker, cream walls."] });
+    R.item("Paving", "John's paving, each block a paving stone of its own colour, one a block, in his pattern.");
+    R.item("Houses", "Pale oak walls solid, the deepslate tile roof metal, white window frames, painted panels, a solid chimney.");
+    R.item("Signs", "The town sign (pale oak shelves) as HeartGold's sign; TRAINER TIPS (oak shelves) as our wooden sign.");
+    R.item("Museum", "Its purpur roof FireRed's purple tiles, the crimson slabs darker bands, the white terracotta cream.");
+    R.spawn = { x: 8, z: 16, yaw: FACE.n };
     return R;
   },
 

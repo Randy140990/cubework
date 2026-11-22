@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/walnut","walnut":"retromon:block/interior/walnut"},"elements":[{"from":[0.0,16,13.8],"to":[2.2,16,16.0],"faces":{"down":{"uv":[0.0,8.0,1.1,9.1],"texture":"#walnut"}}}]}

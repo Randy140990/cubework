@@ -1,0 +1,42 @@
+{
+ "parent": "minecraft:block/block",
+ "ambientocclusion": false,
+ "textures": {
+  "particle": "retromon:block/area/wsign_edge_h",
+  "t0": "retromon:block/area/wsign_front_r",
+  "t1": "retromon:block/area/wsign_back_r",
+  "t2": "retromon:block/area/wsign_edge_h",
+  "t3": "retromon:block/area/wsign_edge_v"
+ },
+ "elements": [
+  {
+   "from": [
+    0,
+    0,
+    5
+   ],
+   "to": [
+    16,
+    16,
+    11
+   ],
+   "faces": {
+    "south": {
+     "texture": "#t0"
+    },
+    "north": {
+     "texture": "#t1"
+    },
+    "up": {
+     "texture": "#t2"
+    },
+    "down": {
+     "texture": "#t2"
+    },
+    "east": {
+     "texture": "#t3"
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gym_tan_low","gym_tan_low":"retromon:block/interior/gym_tan_low"},"elements":[{"from":[13.309,16,15.298],"to":[16.0,16,16.0],"faces":{"down":{"uv":[14.6545,0.0,16.0,0.3508],"texture":"#gym_tan_low"}}}]}

@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/museum_gold","museum_gold":"retromon:block/interior/museum_gold"},"elements":[{"from":[0.0,0,10.6],"to":[10.6,0,16.0],"faces":{"up":{"uv":[0.0,10.6,10.6,16.0],"texture":"#museum_gold"}}},{"from":[10.6,0,10.6],"to":[16.0,0,16.0],"faces":{"up":{"uv":[10.6,10.6,16.0,16.0],"texture":"#museum_gold"}}}]}

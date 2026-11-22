@@ -220,10 +220,11 @@ def element(box, faces, turns):
     return {"from": fr, "to": to, "faces": {rot_face(f, turns): {"texture": t} for f, t in faces.items()}}
 
 
-def sign_models():
+def sign_models(prefix="sign"):
     """The sign's parts, for each way it can face, as models the mod puts where the shelves are: the board (the top
     row of shelves) and the stand (the row under it), each as its left end (as you look at its front), right end,
-    a middle block or a sign one block wide. Facing north: you look south at it, so its left is east (x = 16)."""
+    a middle block or a sign one block wide. Facing north: you look south at it, so its left is east (x = 16).
+    prefix "wsign": the same in wood (the oak shelf signs, as our wooden sign)."""
     turns_of = {"north": 0, "east": 1, "south": 2, "west": 3}
     for facing, turns in turns_of.items():
         for part in ("l", "r", "m", "s"):
@@ -231,33 +232,33 @@ def sign_models():
             outer_right = part in ("r", "s")   # the end at x = 0
             tex = lambda n: "retromon:block/area/" + n
             # The board: the whole block across, 6 thick.
-            faces = {"north": tex("sign_front_" + part), "south": tex("sign_back_" + part),
-                     "up": tex("sign_edge_h"), "down": tex("sign_edge_h")}
+            faces = {"north": tex(prefix + "_front_" + part), "south": tex(prefix + "_back_" + part),
+                     "up": tex(prefix + "_edge_h"), "down": tex(prefix + "_edge_h")}
             if outer_left:
-                faces["east"] = tex("sign_edge_v")
+                faces["east"] = tex(prefix + "_edge_v")
             if outer_right:
-                faces["west"] = tex("sign_edge_v")
+                faces["west"] = tex(prefix + "_edge_v")
             board_el = [element((0, 0, 5, 16, 16, 11), faces, turns)]
             # The stand: set in from the sign's ends, a little thinner than the board, on a foot.
             sx0 = 2 if outer_right else 0
             sx1 = 14 if outer_left else 16
-            sfaces = {"north": tex("sign_stand"), "south": tex("sign_stand")}
+            sfaces = {"north": tex(prefix + "_stand"), "south": tex(prefix + "_stand")}
             if outer_left:
-                sfaces["east"] = tex("sign_stand")
+                sfaces["east"] = tex(prefix + "_stand")
             if outer_right:
-                sfaces["west"] = tex("sign_stand")
+                sfaces["west"] = tex(prefix + "_stand")
             fx0 = 1 if outer_right else 0
             fx1 = 15 if outer_left else 16
-            ffaces = {"north": tex("sign_foot"), "south": tex("sign_foot"), "up": tex("sign_foot"), "down": tex("sign_foot")}
+            ffaces = {"north": tex(prefix + "_foot"), "south": tex(prefix + "_foot"), "up": tex(prefix + "_foot"), "down": tex(prefix + "_foot")}
             if outer_left:
-                ffaces["east"] = tex("sign_foot")
+                ffaces["east"] = tex(prefix + "_foot")
             if outer_right:
-                ffaces["west"] = tex("sign_foot")
+                ffaces["west"] = tex(prefix + "_foot")
             stand_el = [element((sx0, 2, 6, sx1, 16, 10), sfaces, turns), element((fx0, 0, 5, fx1, 2, 11), ffaces, turns)]
             for row, els in (("board", board_el), ("stand", stand_el)):
-                write_json(os.path.join(MODELS, "sign_%s_%s_%s.json" % (row, part, facing)), slotted({
+                write_json(os.path.join(MODELS, "%s_%s_%s_%s.json" % (prefix, row, part, facing)), slotted({
                     "parent": "minecraft:block/block", "ambientocclusion": False,
-                    "textures": {"particle": tex("sign_edge_h")}, "elements": els}))
+                    "textures": {"particle": tex(prefix + "_edge_h")}, "elements": els}))
 
 
 def sign_textures():
@@ -864,25 +865,16 @@ def cave_ground(base, light, dark, seed, size=64, speck=0.04, patches=0.45):
 
 
 def cave_boulder():
-    """A boulder's stone (FireRed's cave rocks): grey olive lumps, each lit at its upper left and darker round its
-    rim, the gaps between them dark."""
-    base, light, dark = hexc("#8E8B6E"), hexc("#BAB698"), hexc("#55523F")
-    im = Image.new("RGBA", (16, 16), mix(base, dark, 0.5))
-    lumps = [(4.5, 4.5, 4.6), (11.5, 5.0, 4.2), (7.5, 11.5, 4.8), (14.5, 13.0, 3.4), (0.5, 12.5, 3.2)]
+    """A boulder's stone (FireRed's cave rocks, 13:19: rocks, never bricks): one smooth grey olive stone, softly mottled
+    with no lines in it and no light or dark band (the light falling on the rounded mound shades it), so each mound reads
+    as one rock."""
+    base, light, dark = hexc("#938F72"), hexc("#B3AF90"), hexc("#6E6B54")
+    n1, n2 = _noise(16, 16, "bd1", 2), _noise(16, 16, "bd2", 4)
+    im = Image.new("RGBA", (16, 16))
     for y in range(16):
         for x in range(16):
-            best = None
-            for (cx, cy, rad) in lumps:
-                for ox in (-16, 0, 16):
-                    for oy in (-16, 0, 16):
-                        dx, dy = x + 0.5 - cx - ox, y + 0.5 - cy - oy
-                        d = (dx * dx + dy * dy) ** 0.5 / rad
-                        if d < 1 and (best is None or d < best[0]): best = (d, dx / rad, dy / rad)
-            if best is None: continue
-            d, dx, dy = best
-            k = -(dx + dy) * 0.45
-            c = mix(base, light, k) if k > 0 else mix(base, dark, -k * 0.8)
-            if d > 0.82: c = mix(c, dark, 0.55)
+            k = (n1[y][x] - 0.5) * 0.9 + (n2[y][x] - 0.5) * 0.4
+            c = mix(base, light, k) if k > 0 else mix(base, dark, -k)
             im.putpixel((x, y), c)
     return im
 
@@ -890,10 +882,23 @@ def cave_boulder():
 def boulder_models():
     """Boulders (the cave's rocks: John's tuff, cobblestone and slabs), round mounds of stone stepped in, two shapes
     for the full blocks and a low one for the slabs (the look picks one by where it is)."""
+    # Each a round dome of stone: at each height a cross of two boxes (so its corners are cut, round from above), each
+    # level smaller, low steps so its sides read as a curve, not stacked slabs.
+    def dome(cx, cz, r, h, levels):
+        out = []
+        for i in range(levels):
+            t0, t1 = i / levels, (i + 1) / levels
+            rr = r * (1 - t0 * t0) ** 0.5 if i else r
+            rr = max(1.0, r * (1 - (t0 + 0.5 / levels) ** 2) ** 0.5)
+            cut = rr * 0.42
+            y0, y1 = round(h * t0, 2), round(h * t1, 2)
+            out.append([round(cx - rr, 2), y0, round(cz - rr + cut, 2), round(cx + rr, 2), y1, round(cz + rr - cut, 2)])
+            out.append([round(cx - rr + cut, 2), y0, round(cz - rr, 2), round(cx + rr - cut, 2), y1, round(cz + rr, 2)])
+        return out
     shapes = {
-        "boulder_a": [[2, 0, 2, 14, 7, 14], [3, 7, 3, 13, 10, 13], [5, 10, 5, 11, 12, 11]],
-        "boulder_b": [[1, 0, 3, 14, 6, 14], [3, 6, 4, 12, 9, 13], [5, 9, 6, 10, 11, 11], [10, 0, 1, 15, 4, 6]],
-        "boulder_small": [[2, 0, 2, 14, 4, 14], [4, 4, 4, 12, 6, 12], [9, 0, 10, 15, 3, 15]],
+        "boulder_a": dome(8, 8, 7.2, 11, 6),
+        "boulder_b": dome(7, 8.5, 6.2, 9, 5) + dome(12, 4, 3.4, 5, 3),
+        "boulder_small": dome(8, 8, 6.5, 6, 4),
     }
     for name, boxes in shapes.items():
         # (A floor under it, all the cell: the floor's own top is hidden under the block John put there.)
@@ -938,6 +943,9 @@ def build():
     short_sign_models()
     wood_textures()
     wood_sign_models()
+    wsign_textures()
+    sign_models("wsign")
+    pewter_textures()
     for n in BUMPS:
         save("path_" + n, path_tile(n))
     g16 = lookground.grass(16, 31)
@@ -956,6 +964,152 @@ def build():
             r, g, b, a = ep[x, y]
             ep[x, y] = (int(r * 0.84), int(g * 0.8), int(b * 0.78), a)
     save("route_path_edge", edge)
+
+
+# ---------- Pewter City (13:18) ----------
+
+def _vanilla_avg(name):
+    im = Image.open(os.path.join(VANILLA, "textures", "block", name + ".png")).convert("RGBA")
+    px = [im.getpixel((x, y)) for y in range(im.height) for x in range(im.width)]
+    return tuple(sum(p[i] for p in px) // len(px) for i in range(3)) + (255,)
+
+
+def _shade(c, k):
+    return mix(c, (255, 255, 255), k) if k >= 0 else mix(c, (0, 0, 0), -k)
+
+
+def pave(base, seed, kind="plain"):
+    """A paving stone as Let's Go's, one a block (the size of John's), in his block's own colour: lit along its top
+    and left, a shadow along its bottom and right (the joins between them), the faintest grain. "inset": a square
+    set in a little (the chiselled quartz); "dome": rounded, lighter in its middle (the grey in the middle of his
+    pattern)."""
+    r = random.Random(seed)
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            k = (r.random() - 0.5) * 0.035
+            if kind == "dome":
+                k += 0.07 * (1 - min(1.0, math.hypot(x - 7.5, y - 7.5) / 8.5))
+            if kind == "inset" and (x in (3, 12) and 3 <= y <= 12 or y in (3, 12) and 3 <= x <= 12):
+                k -= 0.07 if (x == 12 or y == 12) else -0.06
+            if x == 0 or y == 0:
+                k += 0.09
+            if x == 15 or y == 15:
+                k -= 0.13
+            im.putpixel((x, y), _shade(base, k))
+    return im
+
+
+def planter():
+    """The flower beds' sides (pale oak trapdoors): a white stone planter, a bright lip along the top with a soft
+    shadow under it, a band a shade greyer at its foot."""
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            c = hexc("#F1F0EB")
+            if y <= 1:
+                c = hexc("#FFFFFF")
+            elif y == 2:
+                c = hexc("#D9D8D2")
+            elif y >= 13:
+                c = hexc("#D3D2CB") if y > 13 else hexc("#C8C7C0")
+            im.putpixel((x, y), c)
+    return im
+
+
+def shutter(base):
+    """A painted wooden panel (the houses' pale oak trapdoors): solid, a fine frame round it, a rail across the
+    middle."""
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            k = 0.03 - 0.06 * (y / 15)
+            if x in (0, 15) or y in (0, 15):
+                k = -0.12
+            elif x in (1, 14) or y in (1, 14):
+                k = 0.06
+            elif y in (7, 8):
+                k = -0.07 if y == 8 else 0.04
+            im.putpixel((x, y), _shade(base, k))
+    return im
+
+
+ROOF_MUSEUM = {"hi": hexc("#C88CC2"), "base": hexc("#A9679F"), "mid": hexc("#9E5E95"), "low": hexc("#93558A"), "shadow": hexc("#723F6B"),
+               "seam": hexc("#874F7F"), "edge_top": hexc("#8E4E73"), "edge_bottom": hexc("#743C5D"), "under": hexc("#62334F")}
+
+
+def wood_board(width, back=False):
+    """The shelf sign's board in wood (our wooden sign's look): a dark rim, a darker frame lit along its top and left,
+    planks running across, and on the front two lines of carved writing."""
+    im = Image.new("RGBA", (width, 16))
+    for y in range(16):
+        for x in range(width):
+            if x == 0 or y == 0 or x == width - 1 or y == 15:
+                c = WOOD["dark"]
+            elif x == 1 or y == 1 or x == width - 2 or y == 14:
+                c = WOOD["frame_hi"] if (x == 1 or y == 1) else WOOD["frame"]
+            else:
+                c = WOOD["face_hi"] if y in (2, 7, 12) else WOOD["grain"] if y in (6, 11) else WOOD["face"]
+            im.putpixel((x, y), c)
+    if not back:
+        for row, pattern in ((4, (6, 5, 7, 4)), (9, (4, 6, 5, 3))):
+            x = 4
+            for w in pattern * 4:
+                if x + w > width - 4:
+                    break
+                for xx in range(x, x + w):
+                    im.putpixel((xx, row), WOOD["dark"])
+                x += w + 2
+    return im
+
+
+def wsign_textures():
+    whole, back = wood_board(32), wood_board(32, back=True)
+    save("wsign_front_l", whole.crop((0, 0, 16, 16)))
+    save("wsign_front_r", whole.crop((16, 0, 32, 16)))
+    save("wsign_back_l", back.crop((16, 0, 32, 16)))
+    save("wsign_back_r", back.crop((0, 0, 16, 16)))
+    save("wsign_front_m", wood_board(48).crop((16, 0, 32, 16)))
+    save("wsign_back_m", wood_board(48, back=True).crop((16, 0, 32, 16)))
+    save("wsign_front_s", wood_board(16))
+    save("wsign_back_s", wood_board(16, back=True))
+    for n, rows in (("wsign_edge_h", True), ("wsign_edge_v", False)):
+        im = Image.new("RGBA", (16, 16), WOOD["frame"])
+        for i in range(16):
+            for k in (5, 10):
+                im.putpixel((i, k) if rows else (k, i), WOOD["dark"])
+        save(n, im)
+    post = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            post.putpixel((x, y), WOOD["post_hi"] if x in (6, 7) else mix(WOOD["post"], WOOD["dark"], y / 30))
+    save("wsign_stand", post)
+    foot = Image.new("RGBA", (16, 16), WOOD["dark"])
+    for x in range(16):
+        foot.putpixel((x, 13), WOOD["frame"])
+    save("wsign_foot", foot)
+
+
+def pewter_textures():
+    # The houses (Pewter's two and Route 2's trade house): the deepslate tile roof metal, the pale oak walls solid,
+    # the pale oak stairs at their windows the white frames, the trapdoors painted panels, the mud brick chimney solid.
+    save("pewter_roof", metal(hexc("#59606C")))
+    save("pewter_wall", solid_shaded(hexc("#ECE3DD"), 0.04, -0.05))
+    save("pewter_shutter", shutter(hexc("#E6DCD6")))
+    save("pewter_chimney", solid_shaded(hexc("#8E6C53"), 0.05, -0.08, 0.02, "pc"))
+    save("planter_white", planter())
+    # The paving: each of John's blocks a paving stone of its own colour, one a block, as he laid them.
+    for name, block, kind in (("pave_white", "white_concrete", "plain"), ("pave_quartz", "quartz_block_bottom", "plain"),
+                              ("pave_terracotta", "white_terracotta", "plain"), ("pave_chiseled", "chiseled_quartz_block_top", "inset"),
+                              ("pave_chiseled_side", "chiseled_quartz_block", "plain"), ("pave_gray", "light_gray_concrete", "dome")):
+        save(name, pave(_vanilla_avg(block), name, kind))
+    # The Museum (as FireRed's): its purpur roof FireRed's purple tiles (the roof look), the purpur slabs the same
+    # purple flat, the crimson slabs the darker crimson-purple bands, the white terracotta walls cream.
+    for suffix, im in (("_tiles", roof_tiles(ROOF_MUSEUM)), ("_edge", roof_edge(ROOF_MUSEUM)), ("_under", solid(ROOF_MUSEUM["under"]))):
+        save("roof_museum" + suffix, im)
+    save("museum_roof_flat", flat(hexc("#A56A9F")))
+    save("museum_roof_dark", flat(hexc("#7E3E62")))
+    save("museum_wall", solid_shaded(hexc("#EEDFC3"), 0.04, -0.06))
 
 
 def preview(out, scale=8):

@@ -344,7 +344,12 @@ public final class Adventure {
 				mc.setScreen(new PcScreen());
 				return;
 			}
-			mc.setScreen(new DialogueScreen(ahead.lines(), "sign", -1, new CompoundTag()));
+			// (Names in it, the Gym statues' "WINNING TRAINERS: {rival}", as yours.)
+			var cd = ClientState.data;
+			String rv = cd == null || cd.rival.isEmpty() ? "BLUE" : cd.rival, nm = cd == null || cd.name.isEmpty() ? "RED" : cd.name;
+			java.util.List<String> said = new java.util.ArrayList<>();
+			for (String l : ahead.lines()) said.add(l.replace("{rival}", rv).replace("{player}", nm));
+			mc.setScreen(new DialogueScreen(said, "sign", -1, new CompoundTag()));
 			return;
 		}
 		if (best == null) {

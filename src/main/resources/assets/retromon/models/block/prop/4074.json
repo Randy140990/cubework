@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/museum_pillar","museum_pillar":"retromon:block/interior/museum_pillar"},"elements":[{"from":[3.2,0.0,16],"to":[12.8,16.0,16],"faces":{"north":{"uv":[3.2,0.0,12.8,16.0],"texture":"#museum_pillar"}}}]}

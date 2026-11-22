@@ -3,23 +3,26 @@
 # swap: textures for others (old=new, the new ones the mod's own, in textures/block/area; @4: laid from where the face
 # is, a picture four blocks across). roof, roof_green, roof_gym: rows of tiles along the eaves (HeartGold's red, the
 # green houses' green, the Gyms' tan). sign: shelves and standing pale oak
-# signs as HeartGold's signs. wood_sign: standing spruce signs as its wooden sign, taller. grass_edge: the grass's tufts
+# signs as HeartGold's signs. wood_sign: standing spruce signs as its wooden sign, taller. wood_board: shelves as
+# the sign in wood (our wooden sign). roof_museum: the Museum's purple tiles. grass_edge: the grass's tufts
 # onto the dripstone round the water. kerb: a grey kerb with the grass rounded onto it, on a path's blocks.
 # rooms: interiors for a look in the interiors (the forest), not John's world.
 #look	blocks	x0	z0	x1	z1	y0	y1	swaps	where	rooms
 swap	pale_oak_fence	-845	590	-745	735	-	-	block/pale_oak_planks=white_fence	Pallet Town and Route 1
 swap	pale_oak_fence	-830	495	-745	589	-	-	block/pale_oak_planks=white_fence	Viridian City
 swap	pale_oak_fence	-1000	495	-831	600	-	-	block/pale_oak_planks=white_fence	Route 22
+swap	pale_oak_fence	-850	255	-741	339	-	-	block/pale_oak_planks=white_fence	Pewter City
 roof	acacia_stairs	-806	673	-795	682	-	-	-	your house
 roof	acacia_stairs	-788	673	-777	682	-	-	-	Blue's house
 sign	pale_oak_shelf,pale_oak_sign	-845	590	-745	735	-	-	-	Pallet Town and Route 1
-wood_sign	spruce_sign	-845	590	-745	735	-	-	-	Pallet Town and Route 1
 sign	pale_oak_shelf,pale_oak_sign	-830	495	-745	589	-	-	-	Viridian City
-wood_sign	spruce_sign	-830	495	-745	589	-	-	-	Viridian City
 sign	pale_oak_shelf,pale_oak_sign	-830	340	-745	494	-	-	-	Route 2
-wood_sign	spruce_sign	-830	340	-745	494	-	-	-	Route 2
 sign	pale_oak_shelf,pale_oak_sign	-1000	495	-831	600	-	-	-	Route 22
+wood_sign	spruce_sign	-845	590	-745	735	-	-	-	Pallet Town and Route 1
+wood_sign	spruce_sign	-830	495	-745	589	-	-	-	Viridian City
+wood_sign	spruce_sign	-830	340	-745	494	-	-	-	Route 2
 wood_sign	spruce_sign	-1000	495	-831	600	-	-	-	Route 22
+wood_sign	spruce_sign	-850	255	-741	339	-	-	-	Pewter City
 grass_edge	dripstone_block	-845	655	-745	735	-	-	-	Pallet Town
 roof_green	warped_stairs	-830	495	-745	589	-	-	-	Viridian City
 swap	pale_oak_stairs,pale_oak_slab	-830	495	-745	589	-	-	block/pale_oak_planks=window_frame	Viridian City
@@ -27,6 +30,27 @@ swap	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	block/calcite=path
 kerb	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	-	Viridian City
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-830	495	-745	589	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Viridian City
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-1000	495	-831	600	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Route 22
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-850	255	-741	339	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Pewter City
+sign	pale_oak_shelf,pale_oak_sign	-850	255	-741	339	29	32	-	Pewter City
+wood_board	oak_shelf	-850	255	-741	339	29	32	-	Pewter City
+swap	pale_oak_trapdoor	-850	255	-741	339	31	31	block/pale_oak_trapdoor=planter_white	Pewter City
+swap	white_concrete,smooth_quartz,white_terracotta,chiseled_quartz_block,light_gray_concrete	-850	255	-741	339	29	29	block/white_concrete=pave_white,block/quartz_block_bottom=pave_quartz,block/white_terracotta=pave_terracotta,block/chiseled_quartz_block_top=pave_chiseled,block/chiseled_quartz_block=pave_chiseled_side,block/light_gray_concrete=pave_gray	Pewter City
+swap	deepslate_tile_slab,pale_oak_planks	-778	278	-763	291	30	38	block/deepslate_tiles=pewter_roof,block/pale_oak_planks=pewter_wall	Pewter's house by the Museum
+swap	pale_oak_stairs,pale_oak_slab	-778	278	-763	291	30	38	block/pale_oak_planks=window_frame	Pewter's house by the Museum
+swap	pale_oak_trapdoor	-778	278	-763	291	33	38	block/pale_oak_trapdoor=pewter_shutter	Pewter's house by the Museum
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-778	278	-763	291	33	38	block/mud_bricks=pewter_chimney	Pewter's house by the Museum
+swap	deepslate_tile_slab,pale_oak_planks	-827	316	-812	329	30	38	block/deepslate_tiles=pewter_roof,block/pale_oak_planks=pewter_wall	Pewter's house by the Center
+swap	pale_oak_stairs,pale_oak_slab	-827	316	-812	329	30	38	block/pale_oak_planks=window_frame	Pewter's house by the Center
+swap	pale_oak_trapdoor	-827	316	-812	329	33	38	block/pale_oak_trapdoor=pewter_shutter	Pewter's house by the Center
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-827	316	-812	329	33	38	block/mud_bricks=pewter_chimney	Pewter's house by the Center
+swap	deepslate_tile_slab,pale_oak_planks	-791	379	-777	392	30	38	block/deepslate_tiles=pewter_roof,block/pale_oak_planks=pewter_wall	Route 2's trade house
+swap	pale_oak_stairs,pale_oak_slab	-791	379	-777	392	30	38	block/pale_oak_planks=window_frame	Route 2's trade house
+swap	pale_oak_trapdoor	-791	379	-777	392	33	38	block/pale_oak_trapdoor=pewter_shutter	Route 2's trade house
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-791	379	-777	392	33	38	block/mud_bricks=pewter_chimney	Route 2's trade house
+roof_museum	purpur_stairs	-820	265	-777	282	31	47	-	Pewter Museum of Science
+swap	purpur_slab	-820	265	-777	282	31	47	block/purpur_block=museum_roof_flat	Pewter Museum of Science
+swap	crimson_slab	-820	265	-777	282	31	47	block/crimson_planks=museum_roof_dark	Pewter Museum of Science
+swap	white_terracotta	-820	265	-777	282	31	47	block/white_terracotta=museum_wall	Pewter Museum of Science
 swap	polished_andesite,polished_andesite_slab	-807	671	-794	684	17	26	block/polished_andesite=house_stone	your house
 swap	polished_deepslate,polished_deepslate_slab	-807	671	-794	684	17	26	block/polished_deepslate=house_dark	your house
 swap	polished_deepslate_wall	-807	671	-794	684	17	26	block/polished_deepslate=drainpipe	your house

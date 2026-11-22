@@ -844,7 +844,8 @@ public final class Game {
 
 	/** Pallet Town to Route 2 on Insid3 Th3 Cub3's Kanto map, to begin with (mark the rest with /retromon zone). */
 	private static final Zone[] DEFAULT_ZONES = {new Zone("pallet_town", -845, 655, -745, 735), new Zone("route_1", -845, 590, -745, 654),
-			new Zone("viridian_city", -830, 495, -745, 589), new Zone("route_22", -900, 495, -831, 565), new Zone("route_22", -1000, 512, -901, 600), new Zone("route_2", -830, 340, -745, 494)};
+			new Zone("viridian_city", -830, 495, -745, 589), new Zone("route_22", -900, 495, -831, 565), new Zone("route_22", -1000, 512, -901, 600), new Zone("route_2", -830, 340, -745, 494),
+			new Zone("pewter_city", -850, 255, -741, 339)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -858,13 +859,18 @@ public final class Game {
 				zones.add(0, ROUTE_22_WEST);
 				saveMarker();
 			}
+			// Pewter City, in saves from before it was marked.
+			if (!"pewter_city".equals(placeAt(-800.5, 300.5))) {
+				zones.add(PEWTER);
+				saveMarker();
+			}
 		} else {
 			zones.addAll(List.of(DEFAULT_ZONES));
 			saveMarker();
 		}
 	}
 
-	private static final Zone ROUTE_22_WEST = new Zone("route_22", -1000, 512, -901, 600);
+	private static final Zone ROUTE_22_WEST = new Zone("route_22", -1000, 512, -901, 600), PEWTER = new Zone("pewter_city", -850, 255, -741, 339);
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -1037,6 +1043,12 @@ public final class Game {
 			if (!build && s.getTickCount() % 20 == 0 && p.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) p.setGameMode(GameType.ADVENTURE);
 			Vec3 was = WAS_AT.put(id, p.position());
 			if (was != null && was.distanceToSqr(p.position().x, was.y, p.position().z) > 0.0004) WALKING.put(id, s.getTickCount());
+			// A room with trainers in it (the Pewter Gym's CAMPER LIAM): they watch for you there too.
+			if (inside && !walkabout && s.getTickCount() % 4 == 0 && !Battles.in(p) && !BUSY.containsKey(id) && !AFTER_BATTLE.containsKey(id) && Interiors.watched(p)) watch(p);
+			// The Museum's desk: your ticket, the first time you go in by the main door.
+			if (inside && !Battles.in(p) && !BUSY.containsKey(id)) museumDesk(p);
+			// Pewter City's east way out before you've beaten BROCK: the boy takes you to the GYM.
+			if (!inside && !build && !Battles.in(p) && !BUSY.containsKey(id)) pewterGuide(p);
 			if (Battles.in(p) || BUSY.containsKey(id) || inside && !walkabout || AFTER_BATTLE.containsKey(id)) {
 				LAST.put(id, p.blockPosition());
 				continue;
@@ -2307,6 +2319,10 @@ public final class Game {
 				}
 				// Route 1's MART clerk: a free POTION, once. PROF. OAK's AIDE in Route 2's east gate: HM05 for 10 kinds caught.
 				// Route 2's TRADER: his MR. MIME for your ABRA.
+				if (n.key().equals("museum_1f_desk") || n.key().equals("museum_1f_amber")) {
+					museumTalk(p, n, d);
+					return;
+				}
 				if (n.key().equals("route_1_clerk") || n.key().equals("route_2_gate_p0") || n.key().equals("route_2_trader")) {
 					personGift(p, n, d);
 					return;
@@ -2380,6 +2396,107 @@ public final class Game {
 		s.putString("sound", "item");
 		Net.send(p, "sound", s);
 		message(p, List.of(player(p) + " found " + name + "!"));
+	}
+
+	// ---------- Pewter City ----------
+
+	/** Who's been asked at the Museum's desk on this way in (so it isn't asked again until they've stepped back). */
+	private static final java.util.Set<UUID> MUSEUM_ASKED = new java.util.HashSet<>();
+
+	/**
+	 * The Museum of Science's desk, as FireRed's: going in by the main door, past the desk (the line in front of it), you're
+	 * asked for ¥50 for a child's ticket, once (after that you come and go as you like). No, or not enough money: back a
+	 * step towards the door.
+	 */
+	private static void museumDesk(ServerPlayer p) {
+		Interiors.Room r = Interiors.roomOf(p);
+		if (r == null || !r.id().equals("museum_1f")) return;
+		PlayerData d = data(p);
+		Vec3 l = Interiors.local(p);
+		boolean past = l.x > 10.5 && l.x < 16.4 && l.z < 6.2;
+		if (!past) {
+			if (l.z > 7.2) MUSEUM_ASKED.remove(p.getUUID());
+			return;
+		}
+		if (d.story.contains("museum_paid") || MUSEUM_ASKED.contains(p.getUUID())) {
+			if (!d.story.contains("museum_paid")) museumBack(p, r);
+			return;
+		}
+		MUSEUM_ASKED.add(p.getUUID());
+		museumBack(p, r);
+		Npc desk = null;
+		for (Npc n : ((ServerLevel) p.level()).getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(12), n -> n.key().equals("museum_1f_desk"))) desk = n;
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
+		t.put("choices", ch);
+		dialogue(p, desk, "museum_fee", List.of("It's ¥50 for a child's ticket. Would you like to come in?"), t, desk == null ? -1 : desk.getId());
+	}
+
+	/** Back from the desk, a step towards the door. */
+	private static void museumBack(ServerPlayer p, Interiors.Room r) {
+		p.teleportTo(p.getX(), p.getY(), r.oz() + 6.9);
+		p.setDeltaMovement(Vec3.ZERO);
+	}
+
+	private static void museumFee(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (!yes) {
+			dialogue(p, n, "talk", List.of("Come again!"));
+			return;
+		}
+		if (d.money < 50) {
+			dialogue(p, n, "talk", List.of("You don't have enough money.", "Come again!"));
+			return;
+		}
+		d.money -= 50;
+		d.story.add("museum_paid");
+		sync(p);
+		dialogue(p, n, "talk", List.of("Right, ¥50! Thank you!", "Take plenty of time to look!"));
+	}
+
+	/** The Museum's desk (in person) and the scientist with the OLD AMBER. */
+	private static void museumTalk(ServerPlayer p, Npc n, PlayerData d) {
+		if (n.key().equals("museum_1f_desk")) {
+			if (d.story.contains("museum_paid")) dialogue(p, n, "talk", List.of("Take plenty of time to look!"));
+			else {
+				CompoundTag t = new CompoundTag();
+				ListTag ch = new ListTag();
+				for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
+				t.put("choices", ch);
+				dialogue(p, n, "museum_fee", List.of("It's ¥50 for a child's ticket. Would you like to come in?"), t, n.getId());
+			}
+			return;
+		}
+		if (d.statics.add("gift:old_amber")) {
+			d.give("old_amber", 1);
+			sync(p);
+			dialogue(p, n, "talk", fill(p, List.of("Ssh! I think that this chunk of AMBER contains POKéMON DNA!",
+					"It would be great if POKéMON could be resurrected from it!", "But, my colleagues just ignore me!",
+					"So I have a favor to ask!", "Take this to a POKéMON LAB and get it examined!", "{player} received OLD AMBER!")));
+		} else dialogue(p, n, "talk", List.of("Ssh! Get the OLD AMBER checked!"));
+	}
+
+	/**
+	 * Pewter City's way east (to ROUTE 3), as FireRed's: before you've beaten BROCK, the boy there stops you ("BROCK's
+	 * looking for new challengers! Follow me!") and takes you to the GYM's door. The way east's box: x0 x1 z0 z1.
+	 */
+	private static final double[] PEWTER_EAST = {-752.0, -740.0, 299.0, 314.0};
+	private static final Vec3 PEWTER_GYM_FRONT = new Vec3(-807.5, 31.0, 299.5);
+
+	private static void pewterGuide(ServerPlayer p) {
+		PlayerData d = data(p);
+		if (!ourSave || !d.started || d.badges.contains("BOULDERBADGE")) return;
+		double x = p.getX(), z = p.getZ();
+		if (x < PEWTER_EAST[0] || x > PEWTER_EAST[1] || z < PEWTER_EAST[2] || z > PEWTER_EAST[3]) return;
+		Npc boy = null;
+		for (Npc n : ((ServerLevel) p.level()).getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(24), n -> n.key().equals("pewter_city_p4"))) boy = n;
+		p.teleportTo(PEWTER_GYM_FRONT.x, PEWTER_GYM_FRONT.y, PEWTER_GYM_FRONT.z);
+		p.setYRot(180F);
+		p.setDeltaMovement(Vec3.ZERO);
+		if (boy != null) boy.teleportTo(PEWTER_GYM_FRONT.x + 1.4, PEWTER_GYM_FRONT.y, PEWTER_GYM_FRONT.z + 0.6);
+		dialogue(p, boy, "talk", List.of("You're a trainer, right? BROCK's looking for new challengers!", "Follow me!",
+				"If you have the right stuff, go take on BROCK!"));
 	}
 
 	/** Route 1's clerk, Route 2's AIDE and Route 2's TRADER (see talk). */
@@ -2587,6 +2704,7 @@ public final class Game {
 				Net.send(p, "mart", m);
 			}
 			case "parcel" -> rivalAfterParcel(p);
+			case "museum_fee" -> museumFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "gate_choice" -> {
 				int c = t.getIntOr("choice", -1);
 				if (c == 0) Interiors.outThrough(p, "route28");
@@ -3180,8 +3298,13 @@ public final class Game {
 			{"viridian_city_p0", -772, 557}, {"viridian_city_tutor", -822, 557},
 			// Route 1's: the POKéMON MART's clerk with a free POTION (low down, by the flowers above the sign), and the boy
 			// who tells you about the ledges (up in the grass on the right).
-			{"route_1_clerk", -802, 641}, {"route_1_p0", -776, 617}};
-	private static final String SPOTS_DONE = "spot5:";
+			{"route_1_clerk", -802, 641}, {"route_1_p0", -776, 617},
+			// Pewter City's (13:18), FireRed's map over John's at two blocks a step (x = 2c - 836, z = 2r + 265, from its
+			// doors): the girl who says CLEFAIRY came from the moon, the man by the museum, the man below the Center, the
+			// boy in the rose garden, the boy at the way east who takes you to the GYM.
+			{"pewter_city_p0", -824, 295}, {"pewter_city_p2", -770, 299}, {"pewter_city_p1", -794, 321}, {"pewter_city_p3", -770, 320},
+			{"pewter_city_p4", -752, 306}};
+	private static final String SPOTS_DONE = "spot6:";
 	/**
 	 * Item balls that lie somewhere on John's map other than where the games' grid puts them (FireRed's, on routes Red
 	 * and Blue had nothing there), each put down once per save. Route 2's PARLYZ HEAL: in the east lane, past the
@@ -3195,7 +3318,10 @@ public final class Game {
 	 * Signs on John's map whose words aren't the place's own (the games' grid would read out another of its signs):
 	 * the west block of each (x, z), and its words. Diglett's Cave's, by its mouth on Route 2 and by its mouth on Route 11.
 	 */
-	private static final Object[][] SIGN_SPOTS = {{-788, 369, List.of("DIGLETT's CAVE")}, {-297, 581, List.of("DIGLETT's CAVE")}};
+	private static final Object[][] SIGN_SPOTS = {{-788, 369, List.of("DIGLETT's CAVE")}, {-297, 581, List.of("DIGLETT's CAVE")},
+			// Pewter City's: its own sign on the rose garden's fence, and the TRAINER TIPS by the Center.
+			{-777, 317, List.of("PEWTER CITY", "A Stone Gray City")},
+			{-798, 326, List.of("TRAINER TIPS", "Any POKéMON that takes part in battle, however short, earns EXP!")}};
 
 	/** Where someone in SPOTS stands (x, z), or null. */
 	private static int[] spotOf(String key) {

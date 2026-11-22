@@ -14,6 +14,14 @@ PALLET = (-845, 655, -745, 735, "Pallet Town")
 VIRIDIAN = (-830, 495, -745, 589, "Viridian City")
 ROUTE2 = (-830, 340, -745, 494, "Route 2")
 ROUTE22 = (-1000, 495, -831, 600, "Route 22")
+PEWTER = (-850, 255, -741, 339, "Pewter City")
+# Pewter's two houses and Route 2's trade house (13:18): John's one design.
+PEWTER_HOUSES = [(-778, 278, -763, 291, "Pewter's house by the Museum"), (-827, 316, -812, 329, "Pewter's house by the Center"),
+                 (-791, 379, -777, 392, "Route 2's trade house")]
+HOUSE_P = ("block/deepslate_tiles=pewter_roof,block/pale_oak_planks=pewter_wall")
+MUSEUM = (-820, 265, -777, 282, "Pewter Museum of Science")
+PAVE = ("block/white_concrete=pewter_pave_white,block/quartz_block_bottom=pave_quartz,block/white_terracotta=pave_terracotta,"
+        "block/chiseled_quartz_block_top=pave_chiseled,block/chiseled_quartz_block=pave_chiseled_side,block/light_gray_concrete=pave_gray").replace("pewter_pave_white", "pave_white")
 
 FENCE = "block/pale_oak_planks=white_fence"
 PATH = "block/calcite=path_calcite,block/diorite=path_diorite,block/polished_diorite=path_polished_diorite"
@@ -47,12 +55,13 @@ GYM = ("block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/strip
 def main():
     rows = []
     add = lambda look, blocks, area, swaps="-", ys=("-", "-"): rows.append((look, blocks, area[0], area[1], area[2], area[3], ys[0], ys[1], swaps, area[4]))
-    for a in (PALLET_R1, VIRIDIAN, ROUTE22):
+    for a in (PALLET_R1, VIRIDIAN, ROUTE22, PEWTER):
         add("swap", "pale_oak_fence", a, FENCE)
     add("roof", "acacia_stairs", (-806, 673, -795, 682, "your house"))
     add("roof", "acacia_stairs", (-788, 673, -777, 682, "Blue's house"))
     for a in (PALLET_R1, VIRIDIAN, ROUTE2, ROUTE22):
         add("sign", "pale_oak_shelf,pale_oak_sign", a)
+    for a in (PALLET_R1, VIRIDIAN, ROUTE2, ROUTE22, PEWTER):
         add("wood_sign", "spruce_sign", a)
     add("grass_edge", "dripstone_block", PALLET)
     # Viridian City's two green houses: their roofs (warped stairs) in green tiles, their windows' frames (pale oak
@@ -61,8 +70,28 @@ def main():
     add("swap", "pale_oak_stairs,pale_oak_slab", VIRIDIAN, "block/pale_oak_planks=window_frame")
     add("swap", "calcite,diorite,polished_diorite", VIRIDIAN, PATH, ("24", "25"))
     add("kerb", "calcite,diorite,polished_diorite", VIRIDIAN, "-", ("24", "25"))
-    for a in (VIRIDIAN, ROUTE22):
+    for a in (VIRIDIAN, ROUTE22, PEWTER):
         add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet", a, LAMP)
+    # Pewter City (13:18). Its town sign (the standing pale oak shelves: not the Museum's, higher up) as HeartGold's
+    # sign; its oak shelf sign (TRAINER TIPS) as our wooden sign; the flower beds' sides (pale oak trapdoors, y 31) a
+    # white planter; the paving (y 29) each block a paving stone of its own colour, as laid.
+    add("sign", "pale_oak_shelf,pale_oak_sign", PEWTER, "-", ("29", "32"))
+    add("wood_board", "oak_shelf", PEWTER, "-", ("29", "32"))
+    add("swap", "pale_oak_trapdoor", PEWTER, "block/pale_oak_trapdoor=planter_white", ("31", "31"))
+    add("swap", "white_concrete,smooth_quartz,white_terracotta,chiseled_quartz_block,light_gray_concrete", PEWTER, PAVE, ("29", "29"))
+    # The houses: the roof metal, the walls solid, the stairs at the windows white frames, the trapdoors (y 33)
+    # painted panels, the chimney solid.
+    for h in PEWTER_HOUSES:
+        add("swap", "deepslate_tile_slab,pale_oak_planks", h, HOUSE_P, ("30", "38"))
+        add("swap", "pale_oak_stairs,pale_oak_slab", h, "block/pale_oak_planks=window_frame", ("30", "38"))
+        add("swap", "pale_oak_trapdoor", h, "block/pale_oak_trapdoor=pewter_shutter", ("33", "38"))
+        add("swap", "mud_bricks,mud_brick_stairs,mud_brick_slab", h, "block/mud_bricks=pewter_chimney", ("33", "38"))
+    # The Museum, as FireRed's: the purpur stairs its purple tiled roof, the purpur slabs purple, the crimson slabs the
+    # darker bands, the white terracotta walls cream.
+    add("roof_museum", "purpur_stairs", MUSEUM, "-", ("31", "47"))
+    add("swap", "purpur_slab", MUSEUM, "block/purpur_block=museum_roof_flat", ("31", "47"))
+    add("swap", "crimson_slab", MUSEUM, "block/crimson_planks=museum_roof_dark", ("31", "47"))
+    add("swap", "white_terracotta", MUSEUM, "block/white_terracotta=museum_wall", ("31", "47"))
     # Pallet Town's houses: pillars and steps, the dark parts round the underside, the trim across the front, the
     # drainpipe.
     for h in HOUSES:
@@ -140,7 +169,7 @@ def main():
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
                 "# swap: textures for others (old=new, the new ones the mod's own, in textures/block/area; @4: laid from where the face\n"
                 "# is, a picture four blocks across). roof, roof_green, roof_gym: rows of tiles along the eaves (HeartGold's red, the\n# green houses' green, the Gyms' tan). sign: shelves and standing pale oak\n"
-                "# signs as HeartGold's signs. wood_sign: standing spruce signs as its wooden sign, taller. grass_edge: the grass's tufts\n"
+                "# signs as HeartGold's signs. wood_sign: standing spruce signs as its wooden sign, taller. wood_board: shelves as\n# the sign in wood (our wooden sign). roof_museum: the Museum's purple tiles. grass_edge: the grass's tufts\n"
                 "# onto the dripstone round the water. kerb: a grey kerb with the grass rounded onto it, on a path's blocks.\n"
                 "# rooms: interiors for a look in the interiors (the forest), not John's world.\n"
                 "#look\tblocks\tx0\tz0\tx1\tz1\ty0\ty1\tswaps\twhere\trooms\n")

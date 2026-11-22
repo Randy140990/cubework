@@ -916,7 +916,7 @@ if (typeof AREATEX !== "undefined") {
   // The roof's tiles on the tops of its steps, their rows along the eaves (here the roof's ridge runs north to
   // south): the picture turned a quarter, its rows' tops uphill (towards the ridge, east or west).
   const turned = (name, flip) => [16, 16, P => { const Q = new Pix(16, 16); Q.area(name); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(flip ? 15 - x : x, y, Q.get(y, x), 1); }];
-  for (const set of ["roof", "roof_green", "roof_gym"]) {
+  for (const set of ["roof", "roof_green", "roof_gym", "roof_museum"]) {
     TEXDEF["area_" + set + "_top_e"] = turned(set + "_tiles", false); MATDEF["area_" + set + "_top_e"] = { tex: "area_" + set + "_top_e", per: 1 };
     TEXDEF["area_" + set + "_top_w"] = turned(set + "_tiles", true); MATDEF["area_" + set + "_top_w"] = { tex: "area_" + set + "_top_w", per: 1 };
   }
