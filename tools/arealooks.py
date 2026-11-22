@@ -119,6 +119,20 @@ def main():
     forest = lambda x0, z0, x1, z1, note: (fx + x0, z0, fx + x1, z1, note)
     room = lambda look, blocks, area, swaps="-", ys=("-", "-"): rows.append((look, blocks, area[0], area[1], area[2], area[3], ys[0], ys[1], swaps, area[4], "interiors"))
     room("sign", "pale_oak_shelf,pale_oak_sign", forest(0, 0, 119, 171, "Viridian Forest"))
+    # Diglett's Cave (John's three rooms, built in the interiors: tools/caves.py), as FireRed's (13:07): its rock (the
+    # dripstone, and the brown mushroom blocks over it) olive scales on top and darker olive brown faces; its floor
+    # (coarse dirt, packed mud for the paler patches, dirt) FireRed's brown, patchy, laid over four blocks so it doesn't
+    # repeat; the entrances' sand (and the sandstone at their doorways) a pale sandy floor; the rocks (tuff,
+    # cobblestone, their slabs, andesite slabs) round boulders.
+    CAVE = ("block/dripstone_block=cave_wall_top|cave_wall_side,block/brown_mushroom_block=cave_wall_top|cave_wall_side,"
+            "block/mushroom_block_inside=cave_wall_top|cave_wall_side")
+    CAVE_FLOOR = ("block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor_patch@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,"
+                  "block/smooth_sandstone=cave_sand@4,block/sandstone_top=cave_sand@4,block/mud=cave_floor@4")
+    for ox, w, d, note in ((4352, 20, 16, "Diglett's Cave north entrance"), (4608, 170, 160, "Diglett's Cave B1F"), (4864, 20, 16, "Diglett's Cave south entrance")):
+        box = (ox - 1, -1, ox + w, d, note)
+        room("swap", "dripstone_block,brown_mushroom_block", box, CAVE)
+        room("swap", "coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud", box, CAVE_FLOOR)
+        room("boulder", "tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab", box)
     for x0, z0, x1, z1, note in ((22, 23, 41, 42, "Viridian Forest's north gatehouse"), (54, 138, 73, 157, "Viridian Forest's south gatehouse")):
         room("swap", GATE_BLOCKS, forest(x0, z0, x1, z1, note), GATE, (str(fy - 2), str(fy + 16)))
     with open(OUT, "w") as f:

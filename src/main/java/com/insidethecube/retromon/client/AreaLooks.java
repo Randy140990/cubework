@@ -100,6 +100,7 @@ public final class AreaLooks {
 				}
 				part(ctx, "wood_" + d.getSerializedName(), "block/area/wood_sign_" + d.getSerializedName());
 			}
+			for (String b : new String[] {"boulder_a", "boulder_b", "boulder_small"}) part(ctx, b, "block/area/" + b);
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
@@ -162,6 +163,7 @@ public final class AreaLooks {
 			case "roof", "roof_green", "roof_gym" -> new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"));
 			case "sign" -> AreaLooks::sign;
 			case "wood_sign" -> AreaLooks::woodSign;
+			case "boulder" -> AreaLooks::boulder;
 			case "grass_edge", "kerb" -> {
 				boolean kerb = rule.look().equals("kerb");
 				TextureAtlasSprite[] over = new TextureAtlasSprite[18], under = new TextureAtlasSprite[18];
@@ -178,7 +180,7 @@ public final class AreaLooks {
 	// ---------- textures swapped for others, same shapes (the white fences, the lamps, the roofs' colours, paths) ----------
 	/** A sprite to put in place of another, laid as the old one was (period 0) or from where it is, over `period` blocks. */
 	/** A texture swapped in: laid every period blocks (0: as the old one was), and drawn without the biome's tint (noTint). */
-	private record Swap(TextureAtlasSprite to, int period, boolean noTint) {}
+	private record Swap(TextureAtlasSprite to, int period, boolean noTint, TextureAtlasSprite side) {}
 
 	/**
 	 * Each face with one of the swapped textures gets its new one: in the old one's place on it (so a fence's posts and
@@ -201,14 +203,18 @@ public final class AreaLooks {
 				to = to.substring(0, at);
 			}
 			Identifier fromId = from.contains(":") ? Identifier.parse(from) : Identifier.withDefaultNamespace(from);
-			swaps.put(fromId, new Swap(sprite(baker, to), period, noTint));
+			// ("top|side": one texture for the tops and bottoms, another for the sides: Diglett's Cave's rock.)
+			int bar = to.indexOf('|');
+			TextureAtlasSprite side = bar < 0 ? null : sprite(baker, to.substring(bar + 1).trim());
+			if (bar >= 0) to = to.substring(0, bar).trim();
+			swaps.put(fromId, new Swap(sprite(baker, to), period, noTint, side));
 		}
 		return (base, e, view, pos, state, random, cull) -> {
 			e.pushTransform(q -> {
 				TextureAtlasSprite from = finder.find(q);
 				Swap sw = from == null ? null : swaps.get(from.contents().name());
 				if (sw == null) return true;
-				TextureAtlasSprite to = sw.to();
+				TextureAtlasSprite to = sw.side() != null && q.lightFace().getAxis().isHorizontal() ? sw.side() : sw.to();
 				if (sw.noTint()) q.tintIndex(-1);
 				if (sw.period() > 0) {
 					float[] s = new float[4], t = new float[4];
@@ -352,6 +358,18 @@ public final class AreaLooks {
 	private static void woodSign(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
 		Direction facing = facingOf(state);
 		BlockStateModel m = facing == null ? null : extra("wood_" + facing.getSerializedName());
+		if (m == null) base.emitQuads(e, view, pos, state, random, cull);
+		else m.emitQuads(e, view, pos, state, random, cull);
+	}
+
+	/**
+	 * A boulder (Diglett's Cave's rocks, John's tuff and cobblestone): a round mound of stone in place of the block, one
+	 * of two shapes by where it is, and a low one for a slab.
+	 */
+	private static void boulder(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
+		boolean slab = state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE);
+		String name = slab ? "boulder_small" : Math.floorMod(pos.getX() * 31 + pos.getZ() * 17 + pos.getY() * 7, 2) == 0 ? "boulder_a" : "boulder_b";
+		BlockStateModel m = extra(name);
 		if (m == null) base.emitQuads(e, view, pos, state, random, cull);
 		else m.emitQuads(e, view, pos, state, random, cull);
 	}

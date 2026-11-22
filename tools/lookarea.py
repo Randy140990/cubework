@@ -786,7 +786,139 @@ def recolours():
     save("league_bush", bush())
 
 
+# ---------- Diglett's Cave, as FireRed's (13:07) ----------
+
+def _noise(w, h, seed, cells):
+    """A smooth value noise over w by h that wraps at its edges (so a picture laid over blocks has no seams): cells
+    across, bilinear between random corners, 0 to 1."""
+    r = random.Random(seed)
+    g = [[r.random() for _ in range(cells)] for _ in range(cells)]
+    out = [[0.0] * w for _ in range(h)]
+    for y in range(h):
+        for x in range(w):
+            fx, fy = x / w * cells, y / h * cells
+            ix, iy = int(fx), int(fy)
+            tx, ty = fx - ix, fy - iy
+            tx, ty = tx * tx * (3 - 2 * tx), ty * ty * (3 - 2 * ty)
+            a, b = g[iy % cells][ix % cells], g[iy % cells][(ix + 1) % cells]
+            c, d = g[(iy + 1) % cells][ix % cells], g[(iy + 1) % cells][(ix + 1) % cells]
+            out[y][x] = (a + (b - a) * tx) * (1 - ty) + (c + (d - c) * tx) * ty
+    return out
+
+
+def cave_wall_top():
+    """The cave's rock seen from above (FireRed's olive cave top): an olive khaki in rows of little scales, each lit on
+    its upper edge and shaded under, a few darker flecks."""
+    base, light, dark = hexc("#B5AE6C"), hexc("#CBC488"), hexc("#958E54")
+    im = Image.new("RGBA", (16, 16), base)
+    for y in range(16):
+        for x in range(16):
+            row = y // 4
+            cx = (x + (2 if row % 2 else 0)) % 4
+            cy = y % 4
+            c = base
+            if cy == 0 and cx in (1, 2): c = light
+            elif cy == 3 or (cy == 2 and cx in (0, 3)): c = dark
+            im.putpixel((x, y), c)
+    r = random.Random("cw")
+    for _ in range(6):
+        im.putpixel((r.randrange(16), r.randrange(16)), mix(dark, (0, 0, 0), 0.25))
+    return im
+
+
+def cave_wall_side():
+    """The cave's rock faces (FireRed's cliffs inside the cave): a darker olive brown in rough upright strata, lit along
+    the top edge and darker towards the foot."""
+    base, light, dark = hexc("#8F7E52"), hexc("#A8966A"), hexc("#6F6040")
+    r = random.Random("cs")
+    im = Image.new("RGBA", (16, 16))
+    cols = [r.choice((0, 0, 1, -1)) for _ in range(16)]
+    for y in range(16):
+        for x in range(16):
+            k = cols[x] * 0.5 + (r.random() - 0.5) * 0.35
+            c = mix(base, light, k) if k > 0 else mix(base, dark, -k)
+            c = mix(c, dark, y / 15 * 0.35)
+            if y == 0: c = mix(light, (255, 255, 255), 0.1)
+            if x % 5 == 4 and y > 2: c = mix(c, dark, 0.4)
+            im.putpixel((x, y), c)
+    return im
+
+
+def cave_ground(base, light, dark, seed, size=64, speck=0.04, patches=0.45):
+    """A cave floor laid over four blocks by four (no repeat you'd see): its colour with soft, patchy lighter and darker
+    areas (FireRed's floor: brown with paler patches), a fine grain, and a few small stones."""
+    n1, n2 = _noise(size, size, seed + "a", 4), _noise(size, size, seed + "b", 8)
+    r = random.Random(seed)
+    im = Image.new("RGBA", (size, size))
+    for y in range(size):
+        for x in range(size):
+            v = n1[y][x] * 0.7 + n2[y][x] * 0.3
+            k = (v - 0.5) * 2 * patches + (r.random() - 0.5) * speck * 2
+            c = mix(base, light, k) if k > 0 else mix(base, dark, -k)
+            im.putpixel((x, y), c)
+    for _ in range(size // 3):
+        x, y = r.randrange(size), r.randrange(size)
+        im.putpixel((x, y), dark)
+        if x + 1 < size: im.putpixel((x + 1, y), mix(dark, light, 0.5))
+    return im
+
+
+def cave_boulder():
+    """A boulder's stone (FireRed's cave rocks): grey olive lumps, each lit at its upper left and darker round its
+    rim, the gaps between them dark."""
+    base, light, dark = hexc("#8E8B6E"), hexc("#BAB698"), hexc("#55523F")
+    im = Image.new("RGBA", (16, 16), mix(base, dark, 0.5))
+    lumps = [(4.5, 4.5, 4.6), (11.5, 5.0, 4.2), (7.5, 11.5, 4.8), (14.5, 13.0, 3.4), (0.5, 12.5, 3.2)]
+    for y in range(16):
+        for x in range(16):
+            best = None
+            for (cx, cy, rad) in lumps:
+                for ox in (-16, 0, 16):
+                    for oy in (-16, 0, 16):
+                        dx, dy = x + 0.5 - cx - ox, y + 0.5 - cy - oy
+                        d = (dx * dx + dy * dy) ** 0.5 / rad
+                        if d < 1 and (best is None or d < best[0]): best = (d, dx / rad, dy / rad)
+            if best is None: continue
+            d, dx, dy = best
+            k = -(dx + dy) * 0.45
+            c = mix(base, light, k) if k > 0 else mix(base, dark, -k * 0.8)
+            if d > 0.82: c = mix(c, dark, 0.55)
+            im.putpixel((x, y), c)
+    return im
+
+
+def boulder_models():
+    """Boulders (the cave's rocks: John's tuff, cobblestone and slabs), round mounds of stone stepped in, two shapes
+    for the full blocks and a low one for the slabs (the look picks one by where it is)."""
+    shapes = {
+        "boulder_a": [[2, 0, 2, 14, 7, 14], [3, 7, 3, 13, 10, 13], [5, 10, 5, 11, 12, 11]],
+        "boulder_b": [[1, 0, 3, 14, 6, 14], [3, 6, 4, 12, 9, 13], [5, 9, 6, 10, 11, 11], [10, 0, 1, 15, 4, 6]],
+        "boulder_small": [[2, 0, 2, 14, 4, 14], [4, 4, 4, 12, 6, 12], [9, 0, 10, 15, 3, 15]],
+    }
+    for name, boxes in shapes.items():
+        # (A floor under it, all the cell: the floor's own top is hidden under the block John put there.)
+        els = [{"from": [0, 0, 0], "to": [16, 0.5, 16], "faces": {"up": {"texture": "#floor"}}}]
+        for b in boxes:
+            els.append({"from": b[:3], "to": b[3:], "faces": {f: {"texture": "#rock"} for f in ("north", "south", "east", "west", "up", "down")}})
+        write_json(os.path.join(MODELS, name + ".json"), {"parent": "block/block", "ambientocclusion": True,
+                                                           "textures": {"rock": "retromon:block/area/cave_boulder", "floor": "retromon:block/area/cave_floor_small",
+                                                                        "particle": "retromon:block/area/cave_boulder"},
+                                                           "elements": els})
+
+
+def cave_textures():
+    save("cave_wall_top", cave_wall_top())
+    save("cave_wall_side", cave_wall_side())
+    save("cave_floor", cave_ground(hexc("#9C6B3D"), hexc("#BC8C5A"), hexc("#7C5330"), "cf", patches=0.75))
+    save("cave_floor_patch", cave_ground(hexc("#B88957"), hexc("#CFA472"), hexc("#987044"), "cp", patches=0.35))
+    save("cave_sand", cave_ground(hexc("#D8BE86"), hexc("#E8D3A2"), hexc("#B99E68"), "cs", speck=0.06, patches=0.3))
+    save("cave_boulder", cave_boulder())
+    save("cave_floor_small", Image.open(os.path.join(TEX, "cave_floor.png")).crop((16, 16, 32, 32)))
+    boulder_models()
+
+
 def build():
+    cave_textures()
     save("white_fence", fence())
     for prefix, pal in (("roof", ROOF), ("roof_green", ROOF_GREEN), ("roof_gym", ROOF_GYM)):
         save(prefix + "_tiles", roof_tiles(pal))

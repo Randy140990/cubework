@@ -22,6 +22,7 @@ const PLACES = [
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
   { id: "pallet_looks", name: "Pallet Town looks", floor: "Outside (the mod's blocks)", group: "Outside" },
   { id: "viridian_looks", name: "Viridian City and Route 22 looks", floor: "Outside (the mod's blocks)", group: "Outside" },
+  { id: "league_looks", name: "POKéMON LEAGUE gate looks", floor: "Outside (the mod's blocks)", group: "Outside" },
   { id: "viridian_forest", name: "Viridian Forest", floor: "Always night", group: "Route 2" },
   { id: "route2_gate", name: "Route 2 gate", floor: "East lane", group: "Route 2" },
   { id: "route2_house", name: "Route 2 trade house", floor: "Ground floor", group: "Route 2" },
@@ -884,9 +885,10 @@ function arenaShell(R, o) {
 function bunting(room, x0, x1, y) { room.geo.box(x0, y, 0.04, x1, y + 0.45, 0.05, { s: "bunting", all: null }); room.item("Bunting", "Pennants strung along the wall."); }
 
 
-// Diglett's Cave as the mod builds it (tools/caves.py, from John's schematics): its rock (the Look pack's dripstone)
-// as high as it goes, its floor of sand and earth, its boulders, the ladders and the hole each goes down. Dark and
-// dusty, as Let's Go's cave: a brown haze in the air.
+// Diglett's Cave as the mod builds it (tools/caves.py, from John's schematics) and draws it (13:07, as FireRed's): its
+// rock olive scales on top and darker olive brown faces, as high as it goes; its floor FireRed's patchy brown (paler
+// patches where John has packed mud), the entrances' sand a pale sandy floor; its rocks round boulders; the ladders
+// and the hole each goes down. Dark and dusty, as Let's Go's cave: a brown haze in the air.
 function caveRoom(id, floor) {
   const C = CAVES[id], R = new Room(id, { name: "Diglett's Cave", floor, W: C.W, D: C.D, H: 8, outside: true, night: true, haze: 0x6e5236 });
   const G = R.geo;
@@ -895,11 +897,20 @@ function caveRoom(id, floor) {
     for (let x = 0; x < C.W;) {
       const c = at(x, z); let x1 = x + 1;
       while (x1 < C.W && at(x1, z).k === c.k && at(x1, z).h === c.h) x1++;
-      if (c.k === "w") { G.box(x, -1, z, x1, Math.min(c.h, 6), z + 1, "area_dripstone"); R.solid(x, z, x1, z + 1); }
-      else if (c.k === "r") { G.box(x, -1, z, x1, 0, z + 1, { top: "soil", all: "soil" }); G.box(x + 0.1, 0, z + 0.1, x1 - 0.1, Math.min(c.h, 1.2), z + 0.9, "stone"); R.solid(x, z, x1, z + 1); }
+      if (c.k === "w") { G.box(x, -1, z, x1, Math.min(c.h, 6), z + 1, { top: "area_cave_wall_top", all: "area_cave_wall_side", bottom: null }); R.solid(x, z, x1, z + 1); }
+      else if (c.k === "r") {
+        G.box(x, -1, z, x1, 0, z + 1, { top: "area_cave_floor", all: "soil" });
+        // A boulder: a round mound of stone stepped in (the mod's boulder models), one in each block.
+        for (let bx = x; bx < x1; bx++) {
+          const P = 1 / 16, b = (bx * 31 + z * 17) % 2 === 0;
+          const steps = b ? [[2, 0, 2, 14, 7, 14], [3, 7, 3, 13, 10, 13], [5, 10, 5, 11, 12, 11]] : [[1, 0, 3, 14, 6, 14], [3, 6, 4, 12, 9, 13], [5, 9, 6, 10, 11, 11], [10, 0, 1, 15, 4, 6]];
+          for (const q of steps) G.box(bx + q[0] * P, q[1] * P, z + q[2] * P, bx + q[3] * P, q[4] * P, z + q[5] * P, "area_cave_boulder");
+        }
+        R.solid(x, z, x1, z + 1);
+      }
       else if (c.k === "K") G.box(x, -2.2, z, x1, -2, z + 1, { top: "darkTop", all: null });
       else if (c.k === "L") { G.box(x, -2.2, z, x1, -2, z + 1, { top: "darkTop", all: null }); G.box(x, -2, z + 0.02, x1, 0.4, z + 0.08, "walnut"); }
-      else G.box(x, -1, z, x1, 0, z + 1, { top: c.k === "s" || c.k === "S" ? "path" : "soil", all: "soil" });
+      else G.box(x, -1, z, x1, 0, z + 1, { top: c.k === "s" || c.k === "S" ? "area_cave_sand" : c.k === "m" ? "area_cave_floor_patch" : "area_cave_floor", all: "soil" });
       x = x1;
     }
   }
@@ -1734,6 +1745,51 @@ const BUILD = {
     R.item("Mailbox", "The mod's own block, by each house: a red box with its slot, on a silver post.");
     R.item("Roof", "Acacia stairs in HeartGold's roof red: rows of tiles along the eaves, a darker trim at the ends (your house and Blue's).");
     R.spawn = { x: 12, z: 16.6, yaw: FACE.n };
+    return R;
+  },
+
+  league_looks() {
+    // The looks the mod gives the POKéMON LEAGUE's gate at Route 22's west end (12:44), on John's blocks: its roof
+    // (polished deepslate) lime green metal, its rim a shade deeper; its walls (resin bricks) Let's Go's warm brick with
+    // lighter and darker ones mixed in; the deepslate brick pillars either side of its door metal; the oak planks and
+    // stairs over the door a lime green canopy; its steps the gates' stone; its little trees out front (spruce fence
+    // trunks, acacia leaves) a wooden trunk and a round fresh green bush; Route 22's path (mud bricks, and their stairs
+    // and slabs) up to it. Everything faces you (south).
+    const R = new Room("league_looks", { name: "POKéMON LEAGUE gate looks", floor: "Outside (the mod's blocks)", W: 22, D: 16, H: 9, outside: true });
+    const G = R.geo, P16 = 1 / 16;
+    G.box(0, -1, 0, 22, 0, 16, { top: "grass", all: "soil" });
+    // The path up to the door: mud bricks laid as Route 22's path (the picture over four blocks), a step of its slabs.
+    G.box(8, -0.98, 9, 14, 0.01, 16, { top: "area_route_path", all: null });
+    G.box(8, 0, 8.5, 14, 0.5, 9, { all: "area_route_path", top: "area_route_path" });
+    // The building's front: brick from x 2 to 20, 6 high, a door 4 wide in the middle.
+    const x0 = 2, x1 = 20, zf = 4;
+    G.box(x0, 0, 0, 9, 6, zf, { s: "area_league_brick", top: null, all: "area_league_brick" });
+    G.box(13, 0, 0, x1, 6, zf, { s: "area_league_brick", top: null, all: "area_league_brick" });
+    G.box(9, 3.2, 0, 13, 6, zf, { s: "area_league_brick", all: "area_league_brick", top: null });
+    G.box(9, 0, zf - 0.6, 13, 3.2, zf - 0.55, { s: "doorDark", all: null });
+    R.solid(x0, 0, x1, zf);
+    // The metal pillars either side of the door (deepslate brick walls), up to the roof.
+    for (const px of [8, 13]) G.box(px + 4 * P16, 0, zf, px + 12 * P16, 6, zf + 0.5, "area_league_pillar");
+    // The lime canopy over the door (oak planks and stairs), and the stone steps under it.
+    G.box(8, 3.4, zf, 14, 3.9, zf + 1.4, "area_league_arch");
+    G.box(8.5, 3.9, zf, 13.5, 4.3, zf + 0.9, "area_league_arch");
+    G.box(8.5, 0, zf, 13.5, 0.5, zf + 1.4, "area_gate_stone");
+    // The roof: lime green metal, its rim a shade deeper.
+    G.box(x0 - 0.5, 6, -0.5, x1 + 0.5, 6.5, zf + 0.6, { all: "area_league_roof_rim", top: "area_league_roof" });
+    G.box(x0, 6.5, -0.5, x1, 7.2, zf, { all: "area_league_roof", top: "area_league_roof" });
+    // The four little trees out front: a wooden trunk, a round bush on top.
+    for (const tx of [3.5, 5.8, 15.2, 17.5]) {
+      G.box(tx + 6 * P16, 0, zf + 2.4, tx + 10 * P16, 1.2, zf + 2.4 + 4 * P16, "area_league_trunk");
+      G.box(tx - 0.4, 1.2, zf + 1.7, tx + 1.4, 2.8, zf + 3.5, "area_league_bush");
+      G.box(tx - 0.1, 2.8, zf + 2.0, tx + 1.1, 3.3, zf + 3.2, "area_league_bush");
+      R.solid(tx - 0.4, zf + 1.7, tx + 1.4, zf + 3.5);
+    }
+    R.act([8, 3.6, 14, 5.6], { label: "Look", lines: ["The POKéMON LEAGUE's gate, as the mod draws John's: a lime green metal roof, warm mixed brick, metal pillars and a lime canopy over the door."] });
+    R.item("Roof", "Polished deepslate as lime green metal sheets (FireRed's roof is pale green), the rim a shade deeper.");
+    R.item("Walls", "Resin bricks as Let's Go's warm red-orange brick, a lighter and a darker one here and there.");
+    R.item("Front", "The deepslate brick pillars metal, the oak over the door a lime green canopy, the steps the gates' stone.");
+    R.item("Trees", "Spruce fence trunks as wood, acacia leaves as a round fresh green bush (its own green, not the biome's).");
+    R.spawn = { x: 11, z: 13, yaw: FACE.n };
     return R;
   },
 
