@@ -644,6 +644,38 @@ def window_frame():
     return im
 
 
+def solid_shaded(base, top=0.06, bottom=-0.08, speckle=0.0, seed="s"):
+    """One solid colour, a touch lighter at the top and darker at the bottom (and, for stone, the faintest speckle),
+    so a face reads as one painted or cast surface, not a pattern."""
+    r = random.Random(seed)
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        k = top + (bottom - top) * (y / 15)
+        for x in range(16):
+            kk = k + (r.random() - 0.5) * speckle
+            c = mix(base, (255, 255, 255), kk) if kk >= 0 else mix(base, (0, 0, 0), -kk)
+            im.putpixel((x, y), c)
+    return im
+
+
+def bricks(base, mortar, course=4, length=8, shade=0.05):
+    """Clean, even bricks (HeartGold's lab and its chimney, painted): courses `course` high, `length` long,
+    staggered, a fine mortar line under each course and at each joint, each brick lit a touch along its top."""
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        row, k = divmod(y, course)
+        for x in range(16):
+            off = (length // 2) * (row % 2)
+            if k == course - 1 or (x + off) % length == 0:
+                c = mortar
+            elif k == 0:
+                c = mix(base, (255, 255, 255), shade)
+            else:
+                c = base
+            im.putpixel((x, y), c)
+    return im
+
+
 def recolours():
     v = lambda n: os.path.join(VANILLA, "textures", "block", n + ".png")
     for n in ("tuff", "polished_tuff", "chiseled_tuff_bricks", "chiseled_tuff_bricks_top"):
@@ -662,6 +694,36 @@ def recolours():
     save("gym_beam", flat(hexc("#A57A40"), lines=False))
     save("gym_beam_top", flat(hexc("#B3884A"), lines=False))
     save("window_frame", window_frame())
+    # The lamps (11:16): the posts a solid off-black, the cap metal, the chiselled blocks kept in their pattern.
+    save("lamp_post", solid_shaded(hexc("#2B2D31"), 0.05, -0.06))
+    save("lamp_cap", metal(hexc("#3E434A"), seam=False))
+    # Pallet Town's houses: their pillars and steps a solid light grey, the dark parts round their underside solid,
+    # the trim across the front a solid off-white, the drainpipe metal.
+    save("house_stone", solid_shaded(hexc("#B9C0C7"), 0.05, -0.07, 0.015, "hs"))
+    save("house_dark", solid_shaded(hexc("#59616C"), 0.04, -0.06, 0.0))
+    save("house_trim", solid_shaded(hexc("#E8E7E1"), 0.03, -0.05))
+    save("drainpipe", metal(hexc("#8C949C"), seam=False))
+    # Prof. Oak's lab (as HeartGold's): its base and steps solid stone, the band under its roof lighter, its walls
+    # clean pale yellow brick, its pillars a light brown, the awnings metal (red over the windows, teal-green over the
+    # door), the chimney painted brick.
+    save("lab_stone", solid_shaded(hexc("#A6ABB1"), 0.05, -0.07, 0.02, "ls"))
+    save("lab_trim", solid_shaded(hexc("#CACED3"), 0.04, -0.05))
+    save("lab_brick", bricks(hexc("#F2E6B2"), hexc("#D8C98C")))
+    save("lab_pillar", solid_shaded(hexc("#C9A47A"), 0.06, -0.07))
+    save("lab_awning_red", metal(hexc("#C9524F"), seam=False))
+    save("lab_awning_door", metal(hexc("#1FA27A"), seam=False))
+    save("lab_chimney", bricks(hexc("#B9473A"), hexc("#A23E33"), shade=0.06))
+    # The route gates (every one on the map): the roof and the overhang over the way in gunmetal metal (the roof's
+    # rim a shade darker), the pillars a solid grey, the steps solid stone, the walls each their own solid shade.
+    save("gate_roof", metal(hexc("#5E656F")))
+    save("gate_roof_rim", metal(hexc("#4D535C"), seam=False))
+    save("gate_pillar", solid_shaded(hexc("#ADB2B8"), 0.05, -0.07))
+    save("gate_stone", solid_shaded(hexc("#9CA1A7"), 0.04, -0.06, 0.02, "gs"))
+    save("gate_wall_birch", solid_shaded(hexc("#E5D9AD"), 0.04, -0.05))
+    save("gate_wall_oak", solid_shaded(hexc("#CBAF7F"), 0.04, -0.06))
+    save("gate_wall_oak_top", solid_shaded(hexc("#D6BC8E"), 0.0, 0.0))
+    save("gate_beam", solid_shaded(hexc("#B08757"), 0.04, -0.06))
+    save("gate_beam_top", solid_shaded(hexc("#BC9563"), 0.0, 0.0))
 
 
 def build():

@@ -26,8 +26,8 @@ public class Mailbox extends Block {
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	private static final VoxelShape ALONG_Z = Block.box(4, 0, 2, 12, 16, 14), ALONG_X = Block.box(2, 0, 4, 14, 16, 12);
 
-	/** Where the mailboxes go, and the way each one's slot faces. */
-	public record Spot(BlockPos pos, Direction facing) {}
+	/** Where the mailboxes go, the way each one's slot faces, and whose house it is ("player", "rival" or words). */
+	public record Spot(BlockPos pos, Direction facing, String owner) {}
 
 	public static final List<Spot> SPOTS = new ArrayList<>();
 
@@ -36,7 +36,7 @@ public class Mailbox extends Block {
 			if (r.length < 4) continue;
 			Direction d = Direction.byName(r[3].trim());
 			SPOTS.add(new Spot(new BlockPos(Integer.parseInt(r[0].trim()), Integer.parseInt(r[1].trim()), Integer.parseInt(r[2].trim())),
-					d == null || d.getAxis().isVertical() ? Direction.SOUTH : d));
+					d == null || d.getAxis().isVertical() ? Direction.SOUTH : d, r.length > 4 ? r[4].trim() : ""));
 		}
 	}
 
@@ -58,6 +58,14 @@ public class Mailbox extends Block {
 	@Override
 	protected VoxelShape getCollisionShape(BlockState s, BlockGetter level, BlockPos pos, CollisionContext c) {
 		return getShape(s, level, pos, c);
+	}
+
+	/** The mailbox at a spot (within a block of it), or null. */
+	public static Spot at(int x, int y, int z) {
+		for (Spot sp : SPOTS) {
+			if (Math.abs(sp.pos().getX() - x) <= 1 && Math.abs(sp.pos().getY() - y) <= 2 && Math.abs(sp.pos().getZ() - z) <= 1) return sp;
+		}
+		return null;
 	}
 
 	/**

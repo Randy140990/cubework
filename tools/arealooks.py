@@ -17,8 +17,16 @@ ROUTE22 = (-960, 495, -831, 600, "Route 22")
 
 FENCE = "block/pale_oak_planks=white_fence"
 PATH = "block/calcite=path_calcite,block/diorite=path_diorite,block/polished_diorite=path_polished_diorite"
-LAMP = ("block/tuff=lamp_tuff,block/polished_tuff=lamp_polished_tuff,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,"
-        "block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_gray_wool")
+LAMP = ("block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,"
+        "block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap")
+HOUSES = [(-807, 671, -794, 684, "your house"), (-789, 671, -776, 684, "Blue's house")]
+LAB = (-791, 687, -774, 698, "Prof. Oak's lab")
+GATE_BLOCKS = ("polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,"
+               "deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,"
+               "stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood")
+GATE = ("block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,"
+        "block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,"
+        "block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top")
 CENTER = ("block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,"
           "block/mangrove_planks=center_mangrove_planks")
 MART = "block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool"
@@ -45,6 +53,29 @@ def main():
     add("kerb", "calcite,diorite,polished_diorite", VIRIDIAN, "-", ("24", "25"))
     for a in (VIRIDIAN, ROUTE22):
         add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet", a, LAMP)
+    # Pallet Town's houses: pillars and steps, the dark parts round the underside, the trim across the front, the
+    # drainpipe.
+    for h in HOUSES:
+        add("swap", "polished_andesite,polished_andesite_slab", h, "block/polished_andesite=house_stone", ("17", "26"))
+        add("swap", "polished_deepslate,polished_deepslate_slab", h, "block/polished_deepslate=house_dark", ("17", "26"))
+        add("swap", "polished_deepslate_wall", h, "block/polished_deepslate=drainpipe", ("17", "26"))
+        add("swap", "polished_diorite_stairs", h, "block/polished_diorite=house_trim", ("17", "26"))
+    # Prof. Oak's lab: the base and the steps in (y 18), the band under the roof (y 24), the walls, the pillars, the
+    # awnings, the chimney. (The roof stays as it is.)
+    add("swap", "polished_andesite,polished_andesite_slab", LAB, "block/polished_andesite=lab_stone", ("17", "18"))
+    add("swap", "polished_andesite_slab", LAB, "block/polished_andesite=lab_trim", ("24", "24"))
+    add("swap", "end_stone_bricks,end_stone_brick_stairs", LAB, "block/end_stone_bricks=lab_brick")
+    add("swap", "brown_mushroom_block,mud_brick_stairs", LAB, "block/brown_mushroom_block=lab_pillar,block/mud_bricks=lab_pillar")
+    add("swap", "waxed_cut_copper_slab,cut_copper_slab", LAB, "block/cut_copper=lab_awning_red")
+    add("swap", "oxidized_cut_copper_slab,waxed_oxidized_cut_copper_slab", LAB, "block/oxidized_cut_copper=lab_awning_door")
+    add("swap", "bricks,brick_wall,brick_stairs", LAB, "block/bricks=lab_chimney")
+    # Every route gate on the map (the buildings with polished deepslate roofs, tools/area_gates.tsv).
+    for line in open(os.path.join(HERE, "area_gates.tsv")):
+        if not line.strip() or line.startswith("#"):
+            continue
+        x0, x1, z0, z1, ry, where = line.rstrip("\n").split("\t")
+        ry = int(ry)
+        add("swap", GATE_BLOCKS, (int(x0) - 2, int(z0) - 4, int(x1) + 2, int(z1) + 4, where), GATE, (str(ry - 18), str(ry + 2)))
     add("swap", "mud_bricks", ROUTE22, "block/mud_bricks=route_path@4")
     add("swap", "brown_concrete_powder", ROUTE22, "block/brown_concrete_powder=route_path_edge@4")
     for line in open(os.path.join(HERE, "interior", "export", "shops.tsv")):

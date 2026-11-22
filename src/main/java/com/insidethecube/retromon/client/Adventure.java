@@ -385,7 +385,7 @@ public final class Adventure {
 			java.util.Map.entry("SAFFRON CITY", "Shining, Golden Land of Commerce"), java.util.Map.entry("CINNABAR ISLAND", "The Fiery Town of Burning Desire"),
 			java.util.Map.entry("INDIGO PLATEAU", "The Ultimate Goal of Trainers!"));
 
-	/** A: read the sign in front of you (its words), or a shelf standing in for one (the place's sign). */
+	/** A: read the sign in front of you (its words), a shelf standing in for one (the place's sign) or a mailbox. */
 	private static void readSign(Minecraft mc) {
 		Vec3 look = Vec3.directionFromRotation(0, mc.player.getYRot());
 		for (double d = 0.5; d <= 2.1; d += 0.4) {
@@ -393,6 +393,17 @@ public final class Adventure {
 				net.minecraft.core.BlockPos at = net.minecraft.core.BlockPos.containing(mc.player.getX() + look.x * d, mc.player.getY() + dy + 0.2,
 						mc.player.getZ() + look.z * d);
 				var state = mc.level.getBlockState(at);
+				if (state.is(com.insidethecube.retromon.Retromon.MAILBOX)) {
+					// A house's mailbox: whose house it is.
+					Sounds.press();
+					CompoundTag t = new CompoundTag();
+					t.putInt("x", at.getX());
+					t.putInt("y", at.getY());
+					t.putInt("z", at.getZ());
+					t.putBoolean("mailbox", true);
+					ClientPlayNetworking.send(new Net.Act("read", t));
+					return;
+				}
 				java.util.List<String> lines = new java.util.ArrayList<>();
 				if (mc.level.getBlockEntity(at) instanceof net.minecraft.world.level.block.entity.SignBlockEntity sign) {
 					StringBuilder b = new StringBuilder();

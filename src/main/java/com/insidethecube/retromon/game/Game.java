@@ -1080,8 +1080,16 @@ public final class Game {
 		}
 		boolean edge = false;
 		if (!wet && p.onGround() && "pallet_town".equals(data(p).place)) {
-			BlockPos under = BlockPos.containing(p.getX(), p.getY() - 0.2, p.getZ());
-			edge = lv.getBlockState(under).is(net.minecraft.world.level.block.Blocks.DRIPSTONE_BLOCK);
+			// Pallet's dripstone round the water (its pond and its shore): not walked on, and no squeezing round a
+			// fence's end post over the corner of it (a side of you over it counts, not only your middle).
+			for (double[] o : new double[][] {{0, 0}, {-0.2, -0.2}, {0.2, -0.2}, {-0.2, 0.2}, {0.2, 0.2}}) {
+				BlockPos under = BlockPos.containing(p.getX() + o[0], p.getY() - 0.2, p.getZ() + o[1]);
+				if (lv.getBlockState(under).is(net.minecraft.world.level.block.Blocks.DRIPSTONE_BLOCK)
+						&& lv.getBlockState(under.above()).getCollisionShape(lv, under.above()).isEmpty()) {
+					edge = true;
+					break;
+				}
+			}
 		}
 		UUID id = p.getUUID();
 		Vec3 dry = ASHORE.get(id);
@@ -1361,6 +1369,13 @@ public final class Game {
 	/** A: reading a sign (or a shelf standing in for one): the words of the games' sign nearest that spot. */
 	public static void read(ServerPlayer p, CompoundTag t) {
 		int bx = t.getIntOr("x", p.getBlockX()), bz = t.getIntOr("z", p.getBlockZ());
+		if (t.getBooleanOr("mailbox", false)) {
+			// A house's mailbox, as FireRed's and HeartGold's: whose house it is.
+			Mailbox.Spot sp = Mailbox.at(bx, t.getIntOr("y", p.getBlockY()), bz);
+			String line = sp == null ? "It's a mailbox." : sp.owner().equals("rival") ? "{rival}'s house" : sp.owner().equals("player") ? "{player}'s house" : sp.owner();
+			dialogue(p, null, "talk", fill(p, List.of(line)));
+			return;
+		}
 		String place = placeAt(bx + 0.5, bz + 0.5);
 		if (place == null) return;
 		Zone z = null;

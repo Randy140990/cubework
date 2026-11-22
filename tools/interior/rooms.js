@@ -1440,7 +1440,7 @@ const BUILD = {
     // has them, from the mod's own textures: the pond's dripstone with the grass's rounded tufts on it and its steps
     // in the water in the dripstone's pattern; a white fence; a shelf sign (two by two) as HeartGold's sign; a
     // mailbox; a little roof of stairs in HeartGold's red tiles. Everything faces you (south).
-    const R = new Room("pallet_looks", { name: "Pallet Town looks", floor: "Outside (the mod's blocks)", W: 24, D: 18, H: 6, outside: true });
+    const R = new Room("pallet_looks", { name: "Pallet Town looks", floor: "Outside (the mod's blocks)", W: 31, D: 18, H: 6, outside: true });
     const G = R.geo, P16 = 1 / 16;
     // The pond: water in a ring of dripstone (rim x 2 to 10, z 3 to 14), sunk a block into the ground.
     const rx0 = 2, rx1 = 10, rz0 = 3, rz1 = 14;
@@ -1518,6 +1518,34 @@ const BUILD = {
       }
     }
     R.solid(base, z0, base + 6, z1);
+    // A corner of Prof. Oak's lab: its base of solid stone, its pale yellow brick walls, a light brown pillar at the
+    // corner, a window with a red metal awning, the door's teal-green awning, the band under the roof, the painted
+    // brick chimney.
+    const lx = 25, lz = 3;
+    G.box(lx, 0, lz, lx + 5, 1, lz + 1, "area_lab_stone");
+    G.box(lx, 1, lz, lx + 5, 4, lz + 1, "area_lab_brick");
+    G.box(lx - 1, 0, lz + 0.0, lx, 1, lz + 1, "area_lab_pillar"); G.box(lx - 1 + 0.15, 1, lz + 0.15, lx - 0.15, 2, lz + 0.85, "area_lab_pillar");
+    G.box(lx - 1, 2, lz, lx, 3, lz + 1, "area_lab_pillar"); G.box(lx - 1 + 0.15, 3, lz + 0.15, lx - 0.15, 4, lz + 0.85, "area_lab_pillar");
+    G.box(lx + 0.5, 1.6, lz + 1, lx + 2.5, 2.6, lz + 1.02, "window");
+    G.box(lx + 0.3, 2.75, lz + 1, lx + 2.7, 3.0, lz + 1.5, "area_lab_awning_red");
+    G.box(lx + 3.2, 0, lz + 1, lx + 4.6, 2.2, lz + 1.02, "glass");
+    G.box(lx + 3.0, 2.3, lz + 1, lx + 4.8, 2.55, lz + 1.5, "area_lab_awning_door");
+    G.box(lx + 3.3, 0, lz + 1, lx + 4.5, 0.5, lz + 1.5, "area_lab_stone");
+    G.box(lx - 1, 4, lz - 0.5, lx + 5, 4.5, lz + 1.5, "area_lab_trim");
+    G.box(lx + 3, 4.5, lz, lx + 4, 6, lz + 1, "area_lab_chimney");
+    R.solid(lx - 1, lz, lx + 5, lz + 1.5);
+    // A corner of your house: its pillar and steps solid light grey, the dark band at its underside, the trim across
+    // its front, the drainpipe in metal.
+    const hx = 24, hz = 12;
+    G.box(hx, 0, hz, hx + 6, 3, hz + 1, "siding");
+    G.box(hx, 0, hz, hx + 1, 3, hz + 1.01, "area_house_stone");
+    G.box(hx + 1, 0.5, hz + 1, hx + 6, 1, hz + 1.2, "area_house_dark");
+    G.box(hx + 1, 2.5, hz + 1, hx + 6, 3, hz + 1.5, "area_house_trim");
+    G.box(hx + 2, 0, hz + 1, hx + 4, 0.5, hz + 2, "area_house_stone");
+    G.box(hx + 6 + 4 * P16, 0, hz + 1 + 4 * P16, hx + 6 + 12 * P16, 2.5, hz + 1 + 12 * P16, "area_drainpipe");
+    R.solid(hx, hz, hx + 7, hz + 2);
+    R.item("Lab", "Prof. Oak's lab as HeartGold's: solid stone base and steps, clean pale yellow brick, light brown pillars, metal awnings (red over the windows, teal-green over the door), a lighter band under the roof, a painted brick chimney. The roof as it is.");
+    R.item("Houses", "Your house and Blue's: pillars, steps and the dark band at the underside in solid colours, the trim across the front off-white, the drainpipe metal.");
     R.item("Pond", "Dripstone round the water; the grass's rounded tufts onto the dripstone where they meet (as round the dirt paths); the steps in the water in the dripstone's own pattern.");
     R.item("Fence", "Pale oak fence, solid white with a slight gradient (Pallet Town and Route 1).");
     R.item("Sign", "Four pale oak shelves: the top two HeartGold's white board with its grey panel and writing, the bottom two its grey stand.");
@@ -1534,15 +1562,15 @@ const BUILD = {
     // sea lantern kept); his two standing pale oak signs as HeartGold's sign and his spruce sign as its wooden sign,
     // taller; a Pokémon Center's reds and a Mart's blues as Let's Go's; Route 22's floor (mud bricks) as a dirt path
     // with its border (brown concrete powder) a shade deeper. Everything faces you (south).
-    const R = new Room("viridian_looks", { name: "Viridian City and Route 22 looks", floor: "Outside (the mod's blocks)", W: 28, D: 22, H: 8, outside: true });
+    const R = new Room("viridian_looks", { name: "Viridian City and Route 22 looks", floor: "Outside (the mod's blocks)", W: 28, D: 30, H: 8, outside: true });
     const G = R.geo, P16 = 1 / 16;
     const ROWS = ["cdcdcd", "cpcpdc", "cdcdcd", "cpcpdc", "cdcddd", "pdpdcc", "cccccd", "cdcdcd"];
     const isPath = (x, z) => (x >= 3 && x < 9 && z >= 2 && z < 20) || (x >= 9 && x < 21 && z >= 8 && z < 13);
     const kind = (x, z) => ({ c: "calcite", d: "diorite", p: "polished_diorite" })[ROWS[((z % 8) + 8) % 8][((x - 3) % 6 + 6) % 6]];
-    const grassAt = (x, z) => x >= 0 && z >= 0 && x < R.W && z < R.D && !isPath(x, z) && !(x >= 21 && z >= 15);
+    const grassAt = (x, z) => x >= 0 && z >= 0 && x < R.W && z < R.D && !isPath(x, z) && !(x >= 21 && z >= 15 && z < 22);
     for (let x = 0; x < R.W; x++) for (let z = 0; z < R.D; z++) {
       if (isPath(x, z)) G.box(x, -1, z, x + 1, 0, z + 1, "area_path_" + kind(x, z));
-      else if (!(x >= 21 && z >= 15)) G.box(x, -1, z, x + 1, 0, z + 1, { top: "grass", all: "soil" });
+      else if (!(x >= 21 && z >= 15 && z < 22)) G.box(x, -1, z, x + 1, 0, z + 1, { top: "grass", all: "soil" });
     }
     for (let x = 0; x < R.W; x++) for (let z = 0; z < R.D; z++) {
       if (!isPath(x, z)) continue;
@@ -1558,21 +1586,20 @@ const BUILD = {
       for (const t of tiles) G.box(x, 0.004, z, x + 1, 0.004, z + 1, { top: "area_kerb_grass_" + t, all: null });
     }
     // Route 22's floor in the corner: mud bricks as the dirt path, ringed by its brown concrete border.
-    for (let x = 21; x < R.W; x++) for (let z = 15; z < R.D; z++) {
-      const rim = x === 21 || z === 15 || x === R.W - 1 || z === R.D - 1;
+    for (let x = 21; x < R.W; x++) for (let z = 15; z < 22; z++) {
+      const rim = x === 21 || z === 15 || x === R.W - 1 || z === 21;
       G.box(x, -1, z, x + 1, 0, z + 1, rim ? "area_route_path_edge" : "area_route_path");
     }
     // A lamp: chiseled tuff bricks at its foot and under its head, polished tuff wall and tuff walls between (in
     // black), the sea lantern in black glass, the grey carpet cap (black) and the daylight sensor on top.
     const lx = 11, lz = 5;
     G.box(lx, 0, lz, lx + 1, 1, lz + 1, { all: "area_lamp_chiseled_tuff_bricks", top: "area_lamp_chiseled_tuff_bricks_top", bottom: null });
-    G.box(lx + 4 * P16, 1, lz + 4 * P16, lx + 12 * P16, 2, lz + 12 * P16, { all: "area_lamp_polished_tuff", top: null, bottom: null });
-    G.box(lx + 4 * P16, 2, lz + 4 * P16, lx + 12 * P16, 6, lz + 12 * P16, { all: "area_lamp_tuff", top: null, bottom: null });
+    G.box(lx + 4 * P16, 1, lz + 4 * P16, lx + 12 * P16, 6, lz + 12 * P16, { all: "area_lamp_post", top: null, bottom: null });
     G.box(lx, 6, lz, lx + 1, 7, lz + 1, { all: "area_lamp_chiseled_tuff_bricks", top: null, bottom: "area_lamp_chiseled_tuff_bricks_top" });
     G.box(lx, 7, lz, lx + 1, 8, lz + 1, "seaLantern");
     G.box(lx - 1, 7, lz - 1, lx + 2, 8, lz + 2, { all: "blackGlass", top: null, bottom: null });
-    G.box(lx - 1, 8, lz - 1, lx + 2, 8 + P16, lz + 2, "area_lamp_gray_wool");
-    G.box(lx, 8 + P16, lz, lx + 1, 8 + 6 * P16, lz + 1, { all: "blackGlass", top: "area_lamp_gray_wool" });
+    G.box(lx - 1, 8, lz - 1, lx + 2, 8 + P16, lz + 2, "area_lamp_cap");
+    G.box(lx, 8 + P16, lz, lx + 1, 8 + 6 * P16, lz + 1, { all: "blackGlass", top: "area_lamp_cap" });
     R.solid(lx, lz, lx + 1, lz + 1);
     // John's two standing pale oak signs, side by side, as HeartGold's sign a block high.
     const sz = 14;
@@ -1620,8 +1647,24 @@ const BUILD = {
     G.box(6.5, 0.8, 0.1, 6.8, 2.0, 0.2, "area_window_frame"); G.box(6.5, 0.8, 1.2, 6.8, 2.0, 1.3, "area_window_frame");
     gable(21.5, 8, 11.5, "roof_gym", "siding");
     G.box(24, 2.5, 8, 25, 3, 11.5, { all: "area_gym_beam", top: "area_gym_beam_top" });
+    // A route gate (every one on the map): its pillars (andesite, two high, polished andesite stairs on them) a
+    // solid grey, its walls (birch, stripped oak, a stripped jungle beam) solid shades, its roof and the overhang
+    // over the way in gunmetal metal, the steps up solid stone.
+    const gx = 12, gz = 23;
+    G.box(gx, 0, gz, gx + 1, 2, gz + 1, "area_gate_pillar"); G.box(gx + 7, 0, gz, gx + 8, 2, gz + 1, "area_gate_pillar");
+    G.box(gx, 2, gz, gx + 1, 2.5, gz + 1, "area_gate_stone"); G.box(gx + 7, 2, gz, gx + 8, 2.5, gz + 1, "area_gate_stone");
+    G.box(gx + 1, 0, gz + 0.2, gx + 7, 3.5, gz + 0.8, "area_gate_wall_birch");
+    G.box(gx + 1, 1.0, gz + 0.1, gx + 7, 1.4, gz + 0.9, "area_gate_beam");
+    for (const x of [gx + 2, gx + 5]) G.box(x, 0, gz + 0.1, x + 1, 3.5, gz + 0.9, { all: "area_gate_wall_oak", top: "area_gate_wall_oak_top" });
+    G.box(gx + 3, 0, gz + 0.8, gx + 5, 2.4, gz + 0.82, "blackGlass");
+    G.box(gx + 2.5, 2.4, gz + 0.8, gx + 5.5, 2.9, gz + 1.8, "area_gate_roof");
+    G.box(gx - 0.5, 3.5, gz - 0.5, gx + 8.5, 4.0, gz + 1.5, "area_gate_roof");
+    G.box(gx - 0.5, 4.0, gz - 0.5, gx + 8.5, 4.4, gz - 0.2, "area_gate_roof_rim"); G.box(gx - 0.5, 4.0, gz + 1.2, gx + 8.5, 4.4, gz + 1.5, "area_gate_roof_rim");
+    G.box(gx + 3, 0, gz + 1, gx + 5, 0.5, gz + 2, "area_gate_stone");
+    R.solid(gx, gz, gx + 8, gz + 1);
+    R.item("Gates", "Every route gate on the map: its pillars a solid grey, its walls solid shades (birch, stripped oak, the jungle beams), the roof and the overhang over the way in gunmetal metal, the steps solid stone.");
     R.item("Path", "John's calcite, diorite and polished diorite: one white, each its own pattern of bumps (four, five, three bigger), a light grey kerb along the grass, the grass rounded onto it at the corners.");
-    R.item("Lamp", "His tuff lamp in black (Let's Go's Viridian lampposts), its chiselled pattern kept, the sea lantern as it is.");
+    R.item("Lamp", "His tuff lamp as Let's Go's black lampposts: the post solid off-black, the chiselled blocks keeping their pattern, the cap metal, the sea lantern as it is.");
     R.item("Signs", "His standing pale oak signs as HeartGold's sign; his spruce sign as its wooden sign, taller (Minecraft's own sign inside, so it never shows).");
     R.item("Roofs", "Every Pokémon Center's reds and every Mart's blues on the map in Let's Go's red and blue as solid metal sheets, each of John's blocks its own shade (the Center's emblem too); the green houses' roofs in green tiles, their window frames solid white; every Gym's roof in tan tiles, its flats and beams solid tan.");
     R.item("Route 22", "The mud brick floor as the dirt paths, its brown border a shade deeper (the mud brick steps stay as the ledges).");
