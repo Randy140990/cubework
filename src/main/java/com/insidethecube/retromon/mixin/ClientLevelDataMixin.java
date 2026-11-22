@@ -15,10 +15,4 @@ public abstract class ClientLevelDataMixin {
 		if (BattleScene.staged() && BattleScene.heldDay >= 0) cir.setReturnValue(BattleScene.heldDay);
 	}
 
-	/** (19:06) Lavender Town is always night: as you come in, the sky turns to the middle of the night. */
-	@Inject(method = "getDayTime", at = @At("RETURN"), cancellable = true, require = 0)
-	private void retromon$lavender(CallbackInfoReturnable<Long> cir) {
-		float k = com.insidethecube.retromon.client.Adventure.lavender;
-		if (k > 0) cir.setReturnValue(com.insidethecube.retromon.client.Adventure.nightOver(cir.getReturnValue(), k));
-	}
 }

@@ -246,6 +246,7 @@ def main():
     round48(add, room)
     round48b(add, room)
     round49(add, room)
+    round50(add, room)
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -293,7 +294,7 @@ def round46(add, room):
     add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet", K, LAMP46)
     add("swap", "pale_oak_fence", K, FENCE)
     add("swap", "dripstone_block", K, "block/dripstone_block=drip_rock_top|drip_rock@4")
-    add("swap", "jungle_stairs,jungle_slab", K, "block/jungle_planks=drip_rock_top|drip_rock@4")
+    add("swap", "jungle_stairs,jungle_slab", K, "block/jungle_planks=drip_rock_top|drip_rock@4,block/dripstone_block=drip_rock_top|drip_rock@4")
     add("swap", "mud_brick_stairs", K, "block/mud_bricks=step_boards_d")
     add("swap", "mud_brick_slab", K, "block/mud_bricks=mud_rock@4")
     add("swap", "mud_brick_wall", K, "block/mud_bricks=wall_tan")
@@ -414,7 +415,7 @@ def round47(add, room):
         if not line.strip() or line.startswith("#"):
             continue
         x0, z0, x1, z1, y0, y1, note = line.rstrip("\n").split("\t")
-        add("hedge", looks47.HEDGE_BLOCKS, (int(x0), int(z0), int(x1), int(z1), note), looks47.hedge_spec(), (y0, y1))
+        pass  # (0.50: all the hedges are found on the map now, round50.)
     # The signs out front (16:20): each Underground Path hut's, and the Rock Tunnel Center's (only these: pale oak
     # shelves are planters elsewhere, Saffron's).
     for x0, z0, x1, z1, y0, y1, note in ((-336, 370, -333, 372, 33, 34, "Route 5's Underground Path sign"), (-332, 493, -329, 495, 31, 32, "Route 6's Underground Path sign"),
@@ -535,7 +536,6 @@ def round48b(add, room):
     add("swap", "oak_shelf,dark_oak_shelf", VE, "block/oak_shelf=planter_rim,block/dark_oak_shelf=planter_rim", ("31", "31"))
     add("swap", "blackstone_wall", VE, "block/blackstone=dock_post")
     add("swap", "pale_oak_fence", VE, "block/pale_oak_planks=fence_grey")
-    add("hedge", hedge_blocks, (-340, 578, -316, 581, "Vermilion's hedge by the field"), hedge_spec, ("31", "32"))
     gym = (-382, 584, -360, 597, "Vermilion Gym")
     add("roof_vgym", "jungle_stairs", gym, "-", ("38", "42"))
     add("swap", "jungle_planks,jungle_slab,stripped_jungle_log", gym, "block/jungle_planks=roof_vgym_tiles,block/stripped_jungle_log=roof_vgym_edge", ("38", "42"))
@@ -546,13 +546,7 @@ def round48b(add, room):
     # The small trees: their fence posts a little trunk, their leaves a rounded, tufted crown.
     for x0, z0, x1, z1, y0, y1, note in SMALL_TREES:
         add("boulder", "spruce_fence,oak_fence,dark_oak_fence", (x0, z0, x1, z1, note), "prefix:ttrunk", (str(y0), str(y1)))
-        add("hedge", hedge_blocks, (x0, z0, x1, z1, note), hedge_spec, (str(y0), str(y1)))
     # The hedges (17:42 to 17:53): Pewter Gym's bushes, Fuchsia's flowering azalea round its ponds.
-    add("hedge", hedge_blocks, (-819, 297, -797, 300, "Pewter Gym's bushes"), hedge_spec, ("30", "31"))
-    add("hedge", "flowering_azalea_leaves", FUCHSIA, hedge_spec, ("28", "33"))
-    # The steps at the water (the jungle stairs standing in it) as the shore's wet stones: Cerulean's, Fuchsia's.
-    add("swap", "jungle_stairs,jungle_slab", (-401, 220, -311, 305, "Cerulean's water's edge"), "block/jungle_planks=shore_step", ("30", "34"))
-    add("swap", "jungle_stairs,jungle_slab", FUCHSIA, "block/jungle_planks=shore_step", ("27", "31"))
     # Fuchsia: the dry grass, the pink petals (laid over four blocks, so each patch differs), the slab steps up from
     # the red path in its border's red.
     add("swap", "short_dry_grass,tall_dry_grass", FUCHSIA, "block/short_dry_grass=dry_grass_short!,block/tall_dry_grass=dry_grass_tall_bottom!")
@@ -571,12 +565,12 @@ def round48b(add, room):
     add("swap", "cobblestone_stairs,mossy_cobblestone_stairs,cobblestone_slab,mossy_cobblestone_slab", (-625, 245, -590, 275, "Route 4's steps by the Center"),
         "block/cobblestone=step_boards_d,block/mossy_cobblestone=step_boards_d")
     # Route 5: the bushes by the Day Care.
-    add("swap", "bush", (-372, 306, -330, 376, "Route 5's bushes"), "block/bush=bush_round!")
     # The four Underground Path huts, as the bigger buildings: a slate blue tiled roof, clean walls, dressed stone at
     # the foot, white posts, dark metal rails, the steps.
     for x, y, z, note in UG_HUTS:
         h = (x - 8, z - 10, x + 8, z + 4, note + " Underground Path hut")
-        add("roof_ug", "birch_stairs", h, "-", (str(y + 2), str(y + 10)))
+        add("roof_ug", "birch_stairs", h, "-", (str(y + 1), str(y + 10)))
+        add("swap", "birch_stairs", h, "block/birch_planks=pillar_cer", (str(y), str(y)))
         add("swap", "birch_slab,birch_planks", h, "block/birch_planks=roof_ug_tiles", (str(y + 2), str(y + 10)))
         add("swap", "polished_deepslate,polished_deepslate_stairs", h, "block/polished_deepslate=wall_ug", (str(y), str(y + 8)))
         add("swap", "andesite,polished_andesite_stairs,polished_andesite_slab,polished_andesite", h,
@@ -610,8 +604,6 @@ def round49(add, room):
         "block/deepslate_bricks=lav_flag_dark@2,block/cracked_deepslate_bricks=lav_flag_dark@2,block/deepslate_tiles=lav_flag_dark@2", ("32", "32"))
     add("swap", "stone", LV, "block/stone=lav_kerb", ("33", "33"))
     add("grass_onto", "gray_concrete,deepslate_bricks,cracked_deepslate_bricks,deepslate_tiles,stone,smooth_stone", LV, "-", ("32", "33"))
-    add("mist", "grass_block,gray_concrete,deepslate_bricks,cracked_deepslate_bricks,deepslate_tiles,dirt_path,moss_block,smooth_stone,smooth_stone_slab,"
-        "coarse_dirt,stone,stone_bricks,cracked_stone_bricks", LV, "-", ("31", "34"))
     # The houses: purple brick, deep plum tiled roofs, dark timber, pale stone feet, dark planters and sills, their
     # windows lit warm (the town's at night).
     add("swap", "purple_terracotta", LV, "block/purple_terracotta=lav_brick")
@@ -652,6 +644,135 @@ def round49(add, room):
         "block/smooth_stone=lav_court@2,block/smooth_stone_slab_side=lav_kerb,block/stone_bricks=lav_court@2,block/cracked_stone_bricks=lav_court@2", ("32", "34"))
     add("swap", "stone_brick_wall", T, "block/stone_bricks=lav_wall", ("33", "36"))
 
+
+
+# ---------- 0.50.0 (20:07, 20:12, 20:20) ----------
+LEAVES_ALL = "oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves"
+HEDGE_LG = ",".join("block/%s=hedge_lg" % b for b in LEAVES_ALL.split(","))
+HEDGE_LGF = ",".join("block/%s=hedge_lgf" % b for b in LEAVES_ALL.split(","))
+ROUTE11 = (-299, 556, -142, 612, "Route 11")
+ROUTE12 = (-142, 448, -100, 720, "Route 12")
+ROUTE13 = (-300, 688, -130, 728, "Route 13")
+ROUTE14 = (-305, 729, -250, 805, "Route 14")
+ROUTE15 = (-440, 758, -306, 805, "Route 15")
+ROUTE16 = (-680, 388, -560, 444, "Route 16")
+ROUTE17 = (-665, 445, -615, 757, "Route 17")
+ROUTE18 = (-665, 758, -561, 805, "Route 18")
+SOUTH_ROUTES = [ROUTE11, ROUTE12, ROUTE13, ROUTE14, ROUTE15, ROUTE16, ROUTE17, ROUTE18]
+BENCHES = [(-261, 758), (-621, 483), (-638, 544), (-638, 642), (-658, 753)]
+R17_LAMPS = [(x, z) for z in range(468, 739, 30) for x in (-658, -621)] + [(-542, 788), (-558, 429)]
+ROUTE_SIGNS = [(-351, -350, 789, 30, 31), (-117, -116, 473, 31, 32), (-341, -340, 560, 31, 32), (-123, -122, 585, 31, 32), (-265, -264, 711, 31, 32),
+               (-209, -208, 715, 31, 32), (-630, -629, 496, 33, 34), (-633, -632, 547, 33, 33), (-633, -632, 639, 33, 33), (-650, -649, 690, 33, 34)]
+# Routes 12 and 16's house (the same building on both: John's 20:20), its roof, walls, posts, steps, door.
+ROAD_HOUSES = [(-648, 408, -635, 419, 33, 41, "Route 16's house"), (-133, 611, -120, 622, 31, 39, "Route 12's house")]
+SS_ANNE = (-450, 600, -230, 670, "the S.S. ANNE")
+SEA_ROCK = ",".join("block/%s=sea_rock_top|sea_rock@2" % b for b in ("tuff", "andesite", "cobblestone", "diorite", "granite", "polished_andesite", "mossy_cobblestone", "stone"))
+SEA_ROCK_BLOCKS = ("tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,"
+                   "cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone")
+
+
+def round50(add, room):
+    """0.50.0's looks (20:07 to 20:20): see tools/looks50.py for the pictures."""
+    import json as _json
+    K_ = KANTO
+    # Trees leafy and rounded (Shards' extra leaves on the leaves that show), in the world and in the forest and the
+    # SAFARI ZONE (their own rooms).
+    add("leafy", LEAVES_ALL, K_)
+    room("leafy", LEAVES_ALL, (4095, -1, 4500, 400, "Viridian Forest"))
+    room("leafy", LEAVES_ALL, (6143, -1, 6144 + 352, 214, "the SAFARI ZONE"))
+    # Every hedge and bush on the map (found: leaves standing on the ground, 1 to 4 high, nothing leafy over them), in
+    # Let's Go's style, one picture for all its leaves (no checker), flowering where it has flowers.
+    for x0, z0, x1, z1, y0, y1, fl in _json.load(open(os.path.join(HERE, "area_hedges50.json"))):
+        add("hedge", LEAVES_ALL, (x0, z0, x1, z1, "a hedge"), HEDGE_LGF if fl else HEDGE_LG, (str(y0), str(y1)))
+    # The benches under their flowering arches (Routes 14 and 17): the arch all hedge, its frame a white pergola, the
+    # swing's seat yellow slats, its bars dark metal, its lanterns garden lights.
+    for x, z in BENCHES:
+        b = (x - 4, z - 4, x + 4, z + 4, "a bench under its arch")
+        add("hedge", LEAVES_ALL, b, HEDGE_LGF, ("32", "40"))
+        add("swap", "oak_log", b, "block/oak_log=pergola,block/oak_log_top=pergola_top", ("32", "40"))
+        add("swap", "spruce_trapdoor", b, "block/spruce_trapdoor=bench_slat", ("32", "40"))
+        add("swap", "spruce_fence,spruce_fence_gate", b, "block/spruce_planks=bench_frame", ("32", "40"))
+        add("swap", "waxed_copper_lantern,copper_lantern", b, "block/copper_lantern=garden_light", ("32", "40"))
+    # The cliffs' brown mushroom tops, all over the map: rough flagstones of the ledges' earth (laid over four blocks),
+    # their sides the cliffs' rock.
+    add("swap", "brown_mushroom_block", K_, "block/brown_mushroom_block=hill_top@4|drip_rock@4,block/mushroom_block_inside=hill_top@4|drip_rock@4")
+    # The rocks in the water (the blockers): wet grey rock, only those standing in the water (found on the map).
+    for x0, z0, x1, z1, y0, y1 in _json.load(open(os.path.join(HERE, "area_rocks50.json"))):
+        add("swap", SEA_ROCK_BLOCKS, (x0, z0, x1, z1, "a rock in the water"), SEA_ROCK, (str(y0), str(y1)))
+    # Routes 11 to 18: the trees' trunks bark, the white fences, the signs as HeartGold's.
+    for r in SOUTH_ROUTES:
+        add("swap", "oak_wood,oak_log", r, "block/oak_log=tree_bark,block/oak_log_top=tree_bark")
+        add("swap", "pale_oak_fence", r, FENCE)
+    for x0, x1, z, y0, y1 in ROUTE_SIGNS:
+        add("sign", "pale_oak_shelf,pale_oak_sign", (x0 - 1, z - 1, x1 + 1, z + 1, "a route sign"), "-", (str(y0), str(y1)))
+    # Route 17 (the CYCLING ROAD), the full treatment: its lamps in orange metal (their glass warm frosted, their lights
+    # lit globes), its tarmac dark with a scuff or two (Routes 16 and 18's too).
+    for x, z in R17_LAMPS:
+        b = (x - 3, z - 2, x + 2, z + 2, "a Cycling Road lamp")
+        add("swap", "red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern", b,
+            "block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,"
+            "block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!", ("32", "42"))
+        add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ("32", "42"))
+    for r in (ROUTE16, ROUTE17, ROUTE18):
+        add("swap", "gray_concrete", r, "block/gray_concrete=tarmac@4")
+    # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
+    add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
+        "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
+    # Routes 12 and 16's house, the same: a red tiled roof, cream walls, timber posts, a brick foot, stone steps, a
+    # red door, the chimney's stone.
+    for x0, z0, x1, z1, y0, y1, note in ROAD_HOUSES:
+        h = (x0, z0, x1, z1, note)
+        add("roof_h16", "mangrove_stairs", h, "-", (str(y0), str(y1)))
+        add("swap", "mangrove_slab,mangrove_planks", h, "block/mangrove_planks=roof_h16_tiles", (str(y0), str(y1)))
+        add("swap", "white_concrete", h, "block/white_concrete=wall_h16", (str(y0), str(y1)))
+        add("swap", "bricks", h, "block/bricks=base_ver", (str(y0), str(y1)))
+        add("swap", "stripped_spruce_wood,stripped_spruce_log,oak_wood", h, "block/stripped_spruce_log=post_h16,block/stripped_spruce_log_top=post_h16,block/oak_log=post_h16", (str(y0), str(y1)))
+        add("swap", "polished_andesite_slab,polished_andesite_stairs,polished_andesite", h, "block/polished_andesite=step_cer", (str(y0), str(y1)))
+        add("swap", "cyan_terracotta,prismarine_brick_slab,prismarine_brick_stairs", h, "block/cyan_terracotta=chimney_stone,block/prismarine_bricks=chimney_stone", (str(y0), str(y1)))
+        add("swap", "mangrove_door", h, "block/mangrove_door_top=door_red_top,block/mangrove_door_bottom=door_red_bottom", (str(y0), str(y1)))
+    # The Power Plant (20:20): the gold band, the roof, the red frames, the iron in solid colours; its grey stair
+    # pillars steel, its grates, its doors.
+    P = POWER_PLANT
+    add("swap", "polished_tuff_stairs,polished_tuff", P, "block/polished_tuff=pp_steel")
+    add("swap", "dark_oak_trapdoor", P, "block/dark_oak_trapdoor=pp_grate")
+    add("swap", "black_concrete", P, "block/black_concrete=pp_dark", ("35", "39"))
+    # Vermilion City (20:20): the doors as Let's Go's (green, the Fan Club's red), the steps up to them, their stone
+    # frames cream; the Fan Club's bow (pink, a POKe BALL in its middle) and its arch board.
+    VE = VERMILION
+    add("swap", "warped_door", VE, "block/warped_door_top=door_green_top,block/warped_door_bottom=door_green_bottom")
+    add("swap", "mangrove_door", VE, "block/mangrove_door_top=door_red_top,block/mangrove_door_bottom=door_red_bottom")
+    add("swap", "smooth_stone_slab", VE, "block/smooth_stone_slab_side=step_ver,block/smooth_stone=step_ver", ("31", "31"))
+    add("swap", "light_gray_concrete", VE, "block/light_gray_concrete=trim_ver", ("31", "33"))
+    add("swap", "birch_shelf", (-378, 578, -371, 580, "the Fan Club's arch"), "block/birch_shelf=fan_arch", ("35", "40"))
+    add("swap", "cherry_shelf", (-378, 579, -371, 581, "the Fan Club's bow"), "block/cherry_shelf=fan_bow", ("34", "38"))
+    add("swap", "cherry_shelf", (-375, 580, -374, 580, "the Fan Club's bow's ball"), "block/cherry_shelf=fan_bow_ball", ("36", "36"))
+    # The S.S. ANNE: the stone stand under it a smooth slate plinth, the legs under its gangway navy steel, the
+    # gangway's towers white and navy, its doorway dark.
+    add("swap", "stone_brick_slab,stone_brick_stairs,stone_bricks,polished_andesite,polished_andesite_stairs,andesite_wall,andesite", SS_ANNE,
+        "block/stone_bricks=ss_plinth,block/polished_andesite=ss_plinth,block/andesite=ss_plinth", ("20", "37"))
+    add("swap", "andesite", (-410, 605, -335, 645, "the S.S. ANNE's legs"), "block/andesite=ss_leg", ("20", "30"))
+    gang = (-364, 612, -341, 617, "the S.S. ANNE's gangway")
+    add("swap", "resin_bricks,resin_brick_stairs,polished_andesite_stairs,birch_planks", gang,
+        "block/resin_bricks=ss_tower_dark,block/polished_andesite=ss_tower,block/birch_planks=ss_tower", ("24", "36"))
+    add("swap", "black_concrete", (-360, 617, -347, 617, "the S.S. ANNE's doorway"), "block/black_concrete=cave_dark", ("29", "36"))
+    # Bill's Sea Cottage (20:12): its stripped oak and oak timbers too, "nothing left unturned".
+    add("swap", "stripped_oak_log,stripped_oak_wood,oak_wood,oak_log", (-226, 141, -209, 158, "Bill's Sea Cottage's timbers"),
+        "block/stripped_oak_log=bill_timber,block/stripped_oak_log_top=bill_timber,block/oak_log=bill_timber,block/oak_log_top=bill_timber", ("33", "41"))
+    # The Day Care's front steps (20:12) as Cerulean's.
+    add("swap", "polished_andesite_slab,stone_bricks", (-361, 317, -342, 340, "the Day Care's steps"), "block/polished_andesite=step_cer,block/stone_bricks=step_cer", ("37", "37"))
+    # Nugget Bridge's south end (its steps and the crossing), gold as the bridge.
+    add("swap", "andesite_slab,stripped_oak_wood,oak_shelf,pale_oak_fence,light_gray_concrete", (-360, 232, -346, 242, "Nugget Bridge's south end"),
+        "block/andesite=step_cer,block/stripped_oak_log=bridge_gold_beam,block/oak_shelf=bridge_gold_rail,block/pale_oak_planks=white_fence,block/light_gray_concrete=pillar_cer", ("33", "36"))
+    # Diglett's Cave's two mouths (20:20: "redo the doors"): a hole in the cliff, its frame the cliff's rock, dark within.
+    for x0, z0, x1, z1, y0, y1 in ((-781, 365, -778, 369, 30, 34), (-292, 579, -289, 583, 31, 35)):
+        add("swap", "stone_bricks,stone_brick_slab,stone_brick_stairs,stone_brick_wall,black_concrete", (x0, z0, x1, z1, "Diglett's Cave's mouth"),
+            "block/stone_bricks=drip_rock@4,block/black_concrete=cave_dark", (str(y0 - 1), str(y1 + 1)))
+    # Lavender's sign (20:12) as every other town's.
+    add("sign", "pale_oak_shelf", (-126, 425, -123, 427, "Lavender Town's sign"), "-", ("33", "35"))
+    # The SAFARI ZONE (its room): its warped doors plain wood, its fences as the routes'.
+    SZ = (6143, -1, 6144 + 352, 214, "the SAFARI ZONE")
+    room("swap", "warped_door", SZ, "block/warped_door_top=door_wood_top,block/warped_door_bottom=door_wood_bottom")
+    room("swap", "spruce_log,spruce_fence", SZ, FENCE_WOOD)
 
 LAMP46 = ("block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chisel,"
           "block/chiseled_tuff_bricks_top=lamp_chisel_top,block/gray_wool=lamp_cap")

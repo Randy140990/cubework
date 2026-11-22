@@ -843,6 +843,8 @@ public final class Interiors {
 			build(level, r);
 		}
 		COOL.put(p.getUUID(), fadeTicks(p) + 20);
+		// (0.50, 20:07: a house took a long time to load) The room's chunks loaded while the screen fades, not after.
+		preload(level, r.ox() - 2, r.oz() - 2, r.ox() + r.w() + 2, r.oz() + r.d() + 2);
 		Runnable move = () -> {
 			boolean fromOutside = p.level() != level;
 			if (fromOutside) Game.leavingLevel(p);
@@ -861,11 +863,36 @@ public final class Interiors {
 		return true;
 	}
 
+	/** The rooms' chunks kept loaded (once you've been in one): going in again is quick. At most this many. */
+	private static final java.util.LinkedHashSet<Long> HELD = new java.util.LinkedHashSet<>();
+
+	/** Loads (and keeps loaded) the chunks over a part of a level, so a room's there before you arrive. */
+	private static void preload(ServerLevel level, double x0, double z0, double x1, double z1) {
+		try {
+			for (int cx = (int) Math.floor(x0) >> 4; cx <= (int) Math.floor(x1) >> 4; cx++)
+				for (int cz = (int) Math.floor(z0) >> 4; cz <= (int) Math.floor(z1) >> 4; cz++) {
+					long k = net.minecraft.world.level.ChunkPos.asLong(cx, cz);
+					if (level == level.getServer().overworld() || HELD.contains(k)) continue;
+					level.setChunkForced(cx, cz, true);
+					HELD.add(k);
+					if (HELD.size() > 96) {
+						long old = HELD.iterator().next();
+						HELD.remove(old);
+						level.setChunkForced(net.minecraft.world.level.ChunkPos.getX(old), net.minecraft.world.level.ChunkPos.getZ(old), false);
+					}
+				}
+		} catch (RuntimeException e) {
+			Retromon.LOG.warn("Retromon: couldn't hold a room's chunks", e);
+		}
+	}
+
 	/** Out through a building's door: standing just outside it in the world, facing away. */
 	public static void out(ServerPlayer p, Door d) {
 		MinecraftServer s = p.level().getServer();
 		ServerLevel world = s.overworld();
 		COOL.put(p.getUUID(), fadeTicks(p) + 20);
+		// (The world outside the door loaded while the screen fades.)
+		world.getChunk(BlockPos.containing(d.x(), d.y(), d.z()));
 		Net.send(p, "fade", new CompoundTag());
 		PENDING_T.put(p.getUUID(), fadeTicks(p));
 		PENDING.put(p.getUUID(), () -> {
@@ -940,8 +967,10 @@ public final class Interiors {
 			Room r = roomAt(p.getX());
 			if (r == null) return false;
 			double lx = p.getX() - r.ox(), ly = p.getY() - r.oy(), lz = p.getZ() - r.oz();
-			// Fallen out of a room somehow (under a floor): back to where you come in.
-			if (ly < -3 && r.warps().stream().noneMatch(w -> w.kind().equals("down"))) {
+			// Fallen out of a room somehow (under a floor, or off its edge: 20:20, at the Underground Path's far stairs):
+			// back to where you come in.
+			boolean off = lx < -1.5 || lz < -1.5 || lx > r.w() + 1.5 || lz > r.d() + 1.5 || ly < -7;
+			if (off && r.schem() == null || ly < -3 && r.warps().stream().noneMatch(w -> w.kind().equals("down"))) {
 				go(p, r, r.ex(), r.ez(), r.eyaw(), false);
 				return true;
 			}
@@ -1011,7 +1040,7 @@ public final class Interiors {
 						// (A cave's ladder: walk up to it and you're at the top, no climbing; 14:15.)
 						boolean cave = r.schem() != null;
 						double m = cave ? 0.45 : 0;
-						if ((ly >= 1.45 || cave && ly > -0.6) && lx > w.x0() - m && lx < w.x1() + m && lz > w.z0() - 0.5 && lz < w.z1() + 0.5) {
+						if ((ly >= 1.2 || cave && ly > -0.6) && lx > w.x0() - m - 0.3 && lx < w.x1() + m + 0.6 && lz > w.z0() - 0.6 && lz < w.z1() + 0.6) {
 							if (w.to() == null) {
 								// Up and out of the cave (Mt. Moon's way out onto Route 4).
 								Door d = doorOut(p, w.door());

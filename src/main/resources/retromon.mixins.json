@@ -13,6 +13,7 @@
     "GameRendererMixin",
     "MusicManagerMixin",
     "ClientLevelDataMixin",
+    "EnvironmentTimeMixin",
     "LevelWeatherMixin",
     "PlayerSkinMixin",
     "AvatarLayersMixin",

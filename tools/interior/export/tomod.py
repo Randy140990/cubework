@@ -34,7 +34,11 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "vermilion_gym": (3200, 64, 0), "pokemon_fan_club": (3264, 64, 0), "vermilion_old_rod_house": (3328, 64, 0),
           "vermilion_trade_house": (3392, 64, 0), "vermilion_pidgey_house": (3456, 64, 0),
           # Lavender Town (19:06).
-          "lavender_volunteer_house": (3520, 64, 0), "lavender_cubone_house": (3584, 64, 0), "lavender_name_rater": (3648, 64, 0)}
+          "lavender_volunteer_house": (3520, 64, 0), "lavender_cubone_house": (3584, 64, 0), "lavender_name_rater": (3648, 64, 0),
+          # (0.50) Every route gate a way through, and Routes 12 and 16's house.
+          "gate_r5": (3712, 64, 0), "gate_r6": (3776, 64, 0), "gate_r7": (3840, 64, 0), "gate_r8": (3904, 64, 0), "gate_r11": (3968, 64, 0),
+          "gate_r12": (4032, 64, 0), "gate_r15": (4416, 64, 0), "gate_r16n": (4480, 64, 0), "gate_r16s": (4544, 64, 0), "gate_r18": (4928, 64, 0),
+          "route12_house": (4992, 64, 0), "route16_house": (5056, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -49,7 +53,10 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "cerulean_house4": "cerulean_berry_house", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant",
          "vermilion_gym": "vermilion_gym", "pokemon_fan_club": "pokemon_fan_club", "vermilion_old_rod_house": "vermilion_old_rod_house",
          "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house",
-         "lavender_volunteer_house": "mr_fujis_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "name_raters_house"}
+         "lavender_volunteer_house": "mr_fujis_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "name_raters_house",
+         "gate_r5": "route_5_gate", "gate_r6": "route_6_gate", "gate_r7": "route_7_gate", "gate_r8": "route_8_gate", "gate_r11": "route_11_gate_1f",
+         "gate_r12": "route_12_gate_1f", "gate_r15": "route_15_gate_1f", "gate_r16n": "route_16_gate_1f", "gate_r16s": "route_16_gate_1f",
+         "gate_r18": "route_18_gate_1f", "route12_house": "route_12_super_rod_house", "route16_house": "route_16_fly_house"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -136,6 +143,29 @@ DOORS = {
     "lavender_volunteer_house": {"room": "lavender_volunteer_house", "door": [[-140, 34, 427], [-139, 34, 427]], "out": [-139.0, 34.0, 429.4]},
     "lavender_cubone_house": {"room": "lavender_cubone_house", "door": [[-147, 34, 437], [-146, 34, 437]], "out": [-146.0, 34.0, 439.4]},
     "lavender_name_rater": {"room": "lavender_name_rater", "door": [[-136, 34, 437], [-135, 34, 437]], "out": [-135.0, 34.0, 439.4]},
+    # (0.50) The route gates, each a way through (20:12, 20:20): side A its room's door, side B its way on (in at the room's north).
+    "gate_r5_a": {"room": "gate_r5", "door": [[-352, 35, 378], [-351, 35, 378]], "out": [-351.0, 35.0, 375.6], "face": "n", "yaw": 180.0},
+    "gate_r5_b": {"room": "gate_r5", "door": [[-352, 35, 381], [-351, 35, 381]], "out": [-351.0, 35.0, 383.4], "face": "s", "yaw": 0.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r6_a": {"room": "gate_r6", "door": [[-348, 35, 471], [-347, 35, 471]], "out": [-347.0, 35.0, 473.4], "face": "s", "yaw": 0.0},
+    "gate_r6_b": {"room": "gate_r6", "door": [[-348, 35, 468], [-347, 35, 468]], "out": [-347.0, 35.0, 465.6], "face": "n", "yaw": 180.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r7_a": {"room": "gate_r7", "door": [[-406, 35, 424], [-406, 35, 425]], "out": [-408.4, 35.0, 425.0], "face": "w", "yaw": 90.0},
+    "gate_r7_b": {"room": "gate_r7", "door": [[-403, 35, 424], [-403, 35, 425]], "out": [-400.6, 35.0, 425.0], "face": "e", "yaw": -90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r8_a": {"room": "gate_r8", "door": [[-293, 35, 424], [-293, 35, 425]], "out": [-290.6, 35.0, 425.0], "face": "e", "yaw": -90.0},
+    "gate_r8_b": {"room": "gate_r8", "door": [[-296, 35, 424], [-296, 35, 425]], "out": [-298.4, 35.0, 425.0], "face": "w", "yaw": 90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r11_a": {"room": "gate_r11", "door": [[-176, 33, 586], [-176, 33, 587]], "out": [-178.4, 33.0, 587.0], "face": "w", "yaw": 90.0},
+    "gate_r11_b": {"room": "gate_r11", "door": [[-173, 33, 586], [-173, 33, 587]], "out": [-170.6, 33.0, 587.0], "face": "e", "yaw": -90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r12_a": {"room": "gate_r12", "door": [[-124, 33, 483], [-123, 33, 483]], "out": [-123.0, 33.0, 485.4], "face": "s", "yaw": 0.0},
+    "gate_r12_b": {"room": "gate_r12", "door": [[-124, 33, 483], [-123, 33, 483]], "out": [-123.0, 33.0, 480.6], "face": "n", "yaw": 180.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r15_a": {"room": "gate_r15", "door": [[-428, 32, 788], [-428, 32, 789]], "out": [-430.4, 32.0, 789.0], "face": "w", "yaw": 90.0},
+    "gate_r15_b": {"room": "gate_r15", "door": [[-426, 32, 788], [-426, 32, 789]], "out": [-423.6, 32.0, 789.0], "face": "e", "yaw": -90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r16n_a": {"room": "gate_r16n", "door": [[-616, 35, 418], [-616, 35, 419]], "out": [-613.6, 35.0, 419.0], "face": "e", "yaw": -90.0},
+    "gate_r16n_b": {"room": "gate_r16n", "door": [[-618, 35, 418], [-618, 35, 419]], "out": [-620.4, 35.0, 419.0], "face": "w", "yaw": 90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r16s_a": {"room": "gate_r16s", "door": [[-616, 35, 431], [-616, 35, 432]], "out": [-613.6, 35.0, 432.0], "face": "e", "yaw": -90.0},
+    "gate_r16s_b": {"room": "gate_r16s", "door": [[-618, 35, 431], [-618, 35, 432]], "out": [-620.4, 35.0, 432.0], "face": "w", "yaw": 90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r18_a": {"room": "gate_r18", "door": [[-577, 34, 783], [-577, 34, 784]], "out": [-574.6, 34.0, 784.0], "face": "e", "yaw": -90.0},
+    "gate_r18_b": {"room": "gate_r18", "door": [[-579, 34, 783], [-579, 34, 784]], "out": [-581.4, 34.0, 784.0], "face": "w", "yaw": 90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "route12_house": {"room": "route12_house", "door": [[-127, 32, 618], [-126, 32, 618]], "out": [-126.0, 32.0, 620.4]},
+    "route16_house": {"room": "route16_house", "door": [[-642, 34, 415], [-641, 34, 415]], "out": [-641.0, 34.0, 417.4]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -157,7 +187,8 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "cerulean_house3": "cerulean_house3", "cerulean_house4": "cerulean_house4", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant",
             "vermilion_gym": "vermilion_gym", "pokemon_fan_club": "pokemon_fan_club", "vermilion_old_rod_house": "vermilion_old_rod_house",
             "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house",
-            "lavender_volunteer_house": "lavender_volunteer_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "lavender_name_rater"}
+            "lavender_volunteer_house": "lavender_volunteer_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "lavender_name_rater",
+            "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r7": "gate_r7_a", "gate_r8": "gate_r8_a", "gate_r11": "gate_r11_a", "gate_r12": "gate_r12_a", "gate_r15": "gate_r15_a", "gate_r16n": "gate_r16n_a", "gate_r16s": "gate_r16s_a", "gate_r18": "gate_r18_a", "route12_house": "route12_house", "route16_house": "route16_house"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
@@ -188,11 +219,12 @@ MONS["pokemon_fan_club"] = [{"key": "pet:pokemon_fan_club_p2", "species": "clefa
 MONS["lavender_volunteer_house"] = [{"key": "pet:mr_fujis_house_p2", "species": "psyduck", "x": 9.0, "z": 2.0, "yaw": 180.0},
                                     {"key": "pet:mr_fujis_house_p3", "species": "nidorino", "x": 11.6, "z": 4.6, "yaw": 90.0}]
 MONS["lavender_cubone_house"] = [{"key": "pet:lavender_cubone_house_p0", "species": "cubone", "x": 8.0, "z": 5.6, "yaw": 270.0}]
+MONS["route16_house"] = [{"key": "pet:route_16_fly_house_p1", "species": "fearow", "x": 8.0, "z": 6.4, "yaw": 270.0}]
 MONS["vermilion_pidgey_house"] = [{"key": "pet:vermilion_pidgey_house_p1", "species": "pidgey", "x": 8.2, "z": 5.6, "yaw": 270.0}]
 BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n", "cerulean_house1": "cerulean_house1_back",
-              "cerulean_house2": "cerulean_house2_back"}
+              "cerulean_house2": "cerulean_house2_back", "gate_r5": "gate_r5_b", "gate_r6": "gate_r6_b", "gate_r7": "gate_r7_b", "gate_r8": "gate_r8_b", "gate_r11": "gate_r11_b", "gate_r12": "gate_r12_b", "gate_r15": "gate_r15_b", "gate_r16n": "gate_r16n_b", "gate_r16s": "gate_r16s_b", "gate_r18": "gate_r18_b"}
 # Ways out through the side walls (a sideways gate's), by room and wall.
 SIDE_DOOR = {("gate_johto", "e"): "johto_e"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).
@@ -216,7 +248,8 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "vermilion_old_rod_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "vermilion_trade_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "vermilion_pidgey_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "lavender_volunteer_house": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "lavender_cubone_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
-         "lavender_name_rater": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
+         "lavender_name_rater": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "gate_r5": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r6": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r7": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r8": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r11": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r12": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r15": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r16n": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r16s": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r18": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "route12_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "route16_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {

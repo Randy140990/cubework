@@ -1,0 +1,142 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "extra": "retromon:block/area/leafy_acacia",
+  "particle": "retromon:block/area/leafy_acacia"
+ },
+ "elements": [
+  {
+   "from": [
+    8,
+    -4,
+    -5
+   ],
+   "to": [
+    8,
+    22,
+    23
+   ],
+   "shade": false,
+   "rotation": {
+    "angle": -45,
+    "axis": "y",
+    "origin": [
+     8,
+     9,
+     8
+    ]
+   },
+   "faces": {
+    "east": {
+     "uv": [
+      16,
+      0,
+      0,
+      16
+     ],
+     "texture": "#extra",
+     "tintindex": 0
+    },
+    "west": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#extra",
+     "tintindex": 0
+    }
+   }
+  },
+  {
+   "from": [
+    -6,
+    12,
+    -9
+   ],
+   "to": [
+    20,
+    12,
+    17
+   ],
+   "shade": false,
+   "rotation": {
+    "angle": -45,
+    "axis": "x",
+    "origin": [
+     7,
+     12,
+     4
+    ]
+   },
+   "faces": {
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "rotation": 180,
+     "texture": "#extra",
+     "tintindex": 0
+    },
+    "down": {
+     "uv": [
+      16,
+      0,
+      0,
+      16
+     ],
+     "texture": "#extra",
+     "tintindex": 0
+    }
+   }
+  },
+  {
+   "from": [
+    -4,
+    -7,
+    8
+   ],
+   "to": [
+    22,
+    19,
+    8
+   ],
+   "shade": false,
+   "rotation": {
+    "angle": -45,
+    "axis": "x",
+    "origin": [
+     9,
+     6,
+     8
+    ]
+   },
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#extra",
+     "tintindex": 0
+    },
+    "south": {
+     "uv": [
+      16,
+      0,
+      0,
+      16
+     ],
+     "texture": "#extra",
+     "tintindex": 0
+    }
+   }
+  }
+ ]
+}

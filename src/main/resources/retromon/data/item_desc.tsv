@@ -61,7 +61,7 @@ max_ether	Fully restores PP of one move.
 elixer	Restores PP of all moves by 10.
 red_scale	A scale from the red GYARADOS.
 secretpotion	Fully heals any POKéMON.
-s_s_ticket	A ticket for the S.S.AQUA.
+s_s_ticket	A ticket for the S.S.ANNE, the luxury liner in VERMILION CITY.
 mystery_egg	An EGG obtained from MR.POKéMON.
 clear_bell	Makes a gentle ringing.
 silver_wing	A strange, silvercolored feather.
@@ -177,3 +177,4 @@ gold_teeth	Gold dentures lost by the SAFARI ZONE's WARDEN. When you return them,
 hm_strength	HM04 teaches STRENGTH: a powerful punch, and outside of battle it lets a POKéMON move big boulders.
 hm_surf	HM03 teaches SURF: a big wave that crashes down on the foe, and outside of battle it carries you across water.
 bike_voucher	A ticket for a BICYCLE: exchange it at CERULEAN CITY's BIKE SHOP.
+poke_flute	A flute that wakes sleeping POKéMON. Its tune is soothing.

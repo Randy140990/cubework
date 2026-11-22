@@ -39,6 +39,28 @@ public final class Adventure {
 	/** How far into Lavender Town's night you are (0 elsewhere, 1 there; it comes on and goes off over a few seconds). */
 	public static float lavender;
 
+	/** (0.50) The time of day the sky's drawn at: the real one, or Lavender's night as you come to it. */
+	public static long shownDay(long real) {
+		float k = lavender;
+		return k > 0.001F ? nightOver(real, k) : real;
+	}
+
+	/**
+	 * (20:20) How near Lavender Town you are: its night all through the town, fading out over the 24 blocks round
+	 * it, so it gets dark as you get to it (out in the world; not inside its houses).
+	 */
+	private static float lavenderNear(Minecraft mc) {
+		if (!inSave || mc.player == null || mc.level == null || mc.level.dimension() != net.minecraft.world.level.Level.OVERWORLD) return 0;
+		for (ClientState.Zone z : ClientState.zones) {
+			if (!z.place().equals("lavender_town")) continue;
+			double x = mc.player.getX(), zz = mc.player.getZ();
+			double dx = Math.max(0, Math.max(z.x1() - x, x - (z.x2() + 1))), dz = Math.max(0, Math.max(z.z1() - zz, zz - (z.z2() + 1)));
+			float k = (float) Math.max(0, Math.min(1, 1 - Math.sqrt(dx * dx + dz * dz) / 24.0));
+			return k * k * (3 - 2 * k);
+		}
+		return ClientState.data != null && "lavender_town".equals(ClientState.data.place) ? 1 : 0;
+	}
+
 	/** The time of day shown: the real one, turned towards the middle of the night by k (0 to 1). */
 	public static long nightOver(long real, float k) {
 		long day = Math.floorDiv(real, 24000L) * 24000L, t = real - day;
@@ -127,10 +149,9 @@ public final class Adventure {
 		if (mc.options.getCameraType() != CameraType.THIRD_PERSON_BACK) mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
 		if (frozen > 0 && --frozen == 0 && mc.screen == null) focus(-1);
 		if (followTicks > 0) followTicks--;
-		// Lavender Town: night comes on as you walk in (out in the world; not inside its houses).
-		boolean inLavender = inSave && ClientState.data != null && "lavender_town".equals(ClientState.data.place) && mc.level != null
-				&& mc.level.dimension() == net.minecraft.world.level.Level.OVERWORLD;
-		lavender = Math.max(0F, Math.min(1F, lavender + (inLavender ? 0.02F : -0.04F)));
+		// Lavender Town: night comes on as you walk towards it, and goes as you walk away.
+		float want = lavenderNear(mc);
+		lavender = Math.max(0F, Math.min(1F, lavender + Math.max(-0.04F, Math.min(0.03F, want - lavender))));
 		distance += (distanceTarget - distance) * 0.2;
 		while (SPEED.consumeClick()) cycleSpeed();
 		hidden = !BattleScene.active() && behind(mc);

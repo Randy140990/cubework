@@ -882,7 +882,11 @@ public final class Game {
 			new Zone("fuchsia_city", -560, 733, -441, 860), new Zone("cerulean_city", -401, 220, -311, 305), new Zone("route_24", -372, 140, -332, 219),
 			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
 			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345),
-			new Zone("vermilion_city", -402, 546, -300, 614), new Zone("lavender_town", -158, 398, -104, 447)};
+			new Zone("vermilion_city", -402, 546, -300, 614), new Zone("lavender_town", -158, 398, -104, 447),
+			// (0.50) Routes 11 to 18: Vermilion east to Lavender's south, round to Fuchsia, and the CYCLING ROAD.
+			new Zone("route_11", -299, 556, -142, 612), new Zone("route_12", -142, 448, -100, 720), new Zone("route_13", -300, 688, -143, 728),
+			new Zone("route_14", -305, 729, -250, 805), new Zone("route_15", -440, 758, -306, 805), new Zone("route_16", -680, 388, -560, 444),
+			new Zone("route_17", -665, 445, -615, 757), new Zone("route_18", -665, 758, -561, 805)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -937,7 +941,11 @@ public final class Game {
 			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
 			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345),
 			// (17:51) Vermilion City.
-			new Zone("vermilion_city", -402, 546, -300, 614), new Zone("lavender_town", -158, 398, -104, 447)};
+			new Zone("vermilion_city", -402, 546, -300, 614), new Zone("lavender_town", -158, 398, -104, 447),
+			// (0.50) Routes 11 to 18: Vermilion east to Lavender's south, round to Fuchsia, and the CYCLING ROAD.
+			new Zone("route_11", -299, 556, -142, 612), new Zone("route_12", -142, 448, -100, 720), new Zone("route_13", -300, 688, -143, 728),
+			new Zone("route_14", -305, 729, -250, 805), new Zone("route_15", -440, 758, -306, 805), new Zone("route_16", -680, 388, -560, 444),
+			new Zone("route_17", -665, 445, -615, 757), new Zone("route_18", -665, 758, -561, 805)};
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -1100,6 +1108,8 @@ public final class Game {
 			if (!inside && !build && !Battles.in(p)) keepAshore(p);
 			// Route 2's CUT trees: no way past them until they're cut.
 			if (!inside && !build && !Battles.in(p)) CutTrees.keepOff(p);
+			// (0.50) The sleeping SNORLAX (Routes 12 and 16) and the S.S. ANNE's sailor: no way past.
+			if (!inside && !build && !Battles.in(p)) blockers(p);
 			// (The forest's a room you walk about in as outside: its grass and its trainers' eyes apply.)
 			boolean walkabout = inside && Interiors.walkabout(p);
 			if (s.getTickCount() % 5 == 0) story(p);
@@ -2113,6 +2123,9 @@ public final class Game {
 		PlayerData d = data(p);
 		if (needs.equals("safari")) return SAFARI.containsKey(p.getUUID());
 		if (needs.equals("CHAMPION")) return d.story.contains("champion");
+		// (0.50) The CYCLING ROAD's gates: on a BICYCLE only. SAFFRON's: the guards are thirsty (a drink gets you by).
+		if (needs.equals("bicycle")) return d.count("bicycle") > 0;
+		if (needs.equals("tea")) return d.count("tea") > 0 || d.count("fresh_water") > 0 || d.count("soda_pop") > 0 || d.count("lemonade") > 0;
 		return d.badges.contains(needs);
 	}
 
@@ -2120,6 +2133,15 @@ public final class Game {
 	public static void gateBlocked(ServerPlayer p, String needs) {
 		if (needs.equals("safari")) {
 			safariAsk(p);
+			return;
+		}
+		if (needs.equals("bicycle")) {
+			dialogue(p, null, "talk", List.of("GUARD: Excuse me! Wait up, please!", "GUARD: No pedestrians are allowed on CYCLING ROAD!", "GUARD: Come back on a BICYCLE."),
+					whoTag("GUARD"));
+			return;
+		}
+		if (needs.equals("tea")) {
+			dialogue(p, null, "talk", List.of("GUARD: I'm on guard duty. Gee, I'm thirsty, though!", "GUARD: Oh, wait there, the road's closed."), whoTag("GUARD"));
 			return;
 		}
 		String b = needs.equals("CHAMPION") ? "the POKéMON LEAGUE's title" : "the " + needs;
@@ -3548,7 +3570,13 @@ public final class Game {
 			// (One posing as an item ball, the Power Plant's ELECTRODE: its own name, not the ball's.)
 			Species real = Species.ALL.get(st.species());
 			String wild = real == null ? name : real.name();
-			dialogue(p, null, "static", List.of(st.species().equals("snorlax") ? "A sleeping POKéMON blocks the way!" : "The wild " + wild + " attacked!"), t,
+			if (st.species().equals("snorlax") && d.count("poke_flute") <= 0) {
+				// (0.50) Asleep: no battle till it's woken (Mr. Fuji's POKe FLUTE).
+				dialogue(p, null, "talk", List.of("A sleeping POKéMON blocks the way!", "It's fast asleep. Maybe something would wake it..."), t, w.getId());
+				return;
+			}
+			dialogue(p, null, "static", st.species().equals("snorlax")
+					? List.of(player(p) + " played the POKé FLUTE!", "SNORLAX woke up!", "It attacked in a grumpy rage!") : List.of("The wild " + wild + " attacked!"), t,
 					w.getId());
 		}
 	}
@@ -4323,6 +4351,52 @@ public final class Game {
 	 * northern CUT tree, between its flowers (FireRed's spot, a step right of the top flower), clear of them. Key (its
 	 * row in field_items.tsv), then x, y and z.
 	 */
+	/**
+	 * (0.50) The POKeMON that wait in one spot out in the world: Route 12's SNORLAX asleep on the pier south of Route
+	 * 11's gate, Route 16's outside its gate's west way. Key, x, y, z, facing.
+	 */
+	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -123.5, 31.0, 599.5, 0.0}, {"snorlax_route_16", -623.5, 34.0, 418.5, 90.0}};
+
+	/** How near a sleeping SNORLAX you can come (blocks from its middle). */
+	private static final double SNORLAX_REACH = 2.7;
+	private static final Map<UUID, Integer> BLOCKED_SAID = new HashMap<>();
+
+	/**
+	 * (0.50) What won't let you by: a sleeping SNORLAX (till you've woken it with the POKe FLUTE and battled it), and the
+	 * S.S. ANNE's sailor at the foot of its gangway (Vermilion's harbour: the ship isn't boarding yet). You're put back
+	 * where you can stand, and told why once in a while.
+	 */
+	private static void blockers(ServerPlayer p) {
+		PlayerData d = data(p);
+		BLOCKED_SAID.computeIfPresent(p.getUUID(), (k, v) -> v > 1 ? v - 1 : null);
+		for (Object[] o : STATIC_SPOTS) {
+			String key = (String) o[0];
+			if (d.statics.contains(key)) continue;
+			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
+			double dx = p.getX() - x, dz = p.getZ() - z, dist = Math.sqrt(dx * dx + dz * dz);
+			if (dist >= SNORLAX_REACH || Math.abs(p.getY() - y) > 3) continue;
+			if (dist < 1e-3) {
+				dx = 0;
+				dz = -1;
+				dist = 1;
+			}
+			p.teleportTo(x + dx / dist * SNORLAX_REACH, p.getY(), z + dz / dist * SNORLAX_REACH);
+			if (!BLOCKED_SAID.containsKey(p.getUUID())) {
+				BLOCKED_SAID.put(p.getUUID(), 100);
+				message(p, List.of("A sleeping POKéMON blocks the way!"));
+			}
+		}
+		// The S.S. ANNE: the sailor at the foot of the gangway (z 612 on): no further.
+		if (p.getX() > -366 && p.getX() < -340 && p.getZ() > 612.2 && p.getZ() < 620 && p.getY() > 28 && p.getY() < 36) {
+			p.teleportTo(p.getX(), p.getY(), 611.6);
+			if (!BLOCKED_SAID.containsKey(p.getUUID())) {
+				BLOCKED_SAID.put(p.getUUID(), 100);
+				message(p, d.count("s_s_ticket") > 0 ? List.of("SAILOR: Welcome aboard! ...Oh, sorry. The S.S.ANNE isn't boarding yet.", "SAILOR: Come back a little later!")
+						: List.of("SAILOR: Welcome to the S.S.ANNE!", "SAILOR: May I see your S.S.TICKET?", "SAILOR: ...Sorry! You need a ticket to come aboard."));
+			}
+		}
+	}
+
 	private static final Object[][] ITEM_SPOTS = {{"route_2_parlyz_heal", -779.0, 26.0, 472.0},
 			// Viridian City's POTION: in the fenced corner at the top left, where FireRed has it behind its CUT tree; on the
 			// path between the white fences, where you can get to it (14:15).
@@ -4448,6 +4522,18 @@ public final class Game {
 			changed = true;
 		}
 		// Those in ITEM_SPOTS: put down once per save, where their part of the map is loaded (unless picked up already).
+		for (Object[] o : STATIC_SPOTS) {
+			String key = (String) o[0], doneKey = "staticspot1:" + key;
+			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
+			Trainers.Static st = Trainers.STATICS.get(key);
+			if (done.contains(doneKey) || st == null || takenByAnyone(key)) continue;
+			if (!level.hasChunkAt(BlockPos.containing(x, y, z))) continue;
+			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 4, y - 3, z - 4, x + 4, y + 3, z + 4);
+			if (level.getEntitiesOfClass(WorldMon.class, box, w -> key.equals(w.key())).isEmpty()) placeMon(level, st.species(), key, x, y, z, ((Double) o[4]).floatValue());
+			placed.add(doneKey);
+			done.add(doneKey);
+			changed = true;
+		}
 		for (Object[] o : ITEM_SPOTS) {
 			String key = (String) o[0], doneKey = "itemspot2:" + key;
 			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];

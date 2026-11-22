@@ -150,6 +150,8 @@ public final class AreaLooks {
 			for (String b : new String[] {"boulder_a", "boulder_b", "boulder_small", "mboulder_a", "mboulder_b", "mboulder_small", "iboulder_a", "iboulder_b",
 					"iboulder_small", "rboulder_a", "rboulder_b", "rboulder_small", "sboulder_a", "sboulder_b", "sboulder_small", "ttrunk_a", "ttrunk_b", "ttrunk_small"})
 				part(ctx, b, "block/area/" + b);
+			// (0.50) The leafy trees (20:07): Shards' extra leaves, two ways round, for each kind of leaves.
+			for (String t : LEAFY) for (String v : new String[] {"a", "b"}) part(ctx, "leafy_" + t + "_" + v, "block/area/leafy_" + t + "_" + v);
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
@@ -157,7 +159,7 @@ public final class AreaLooks {
 				// (15:21) Texture swaps don't pile up: where two of a block's swaps cover a spot (all Kanto's dripstone, and
 				// Pallet's), the one for the smaller area is drawn there, the other not.
 				List<Rule> swaps = new ArrayList<>();
-				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("glass") || rule.look().equals("hedge")) swaps.add(rule);
+				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy")) swaps.add(rule);
 				for (Rule rule : looks.values()) {
 					Look look = make(rule, c.baker());
 					List<Rule> rivals = new ArrayList<>();
@@ -168,6 +170,9 @@ public final class AreaLooks {
 			});
 		});
 	}
+
+	/** The leaves with Shards' extra leaves (0.50): their names without "_leaves". */
+	private static final String[] LEAFY = {"oak", "acacia", "birch", "azalea", "flowering_azalea", "dark_oak", "jungle", "mangrove", "cherry"};
 
 	private static void part(ModelLoadingPlugin.Context ctx, String name, String model) {
 		ExtraModelKey<BlockStateModel> key = ExtraModelKey.create(() -> "retromon sign " + name);
@@ -231,6 +236,8 @@ public final class AreaLooks {
 			// (16:17) Leaves as a trimmed hedge: one solid hedge along a row, its edges rounded where it ends.
 			case "hedge" -> glass(baker, rule.swaps(), true);
 			case "chain" -> AreaLooks::chain;
+			// (0.50, 20:07) Trees leafy and rounded, not blocky: Shards' extra leaves standing out of the leaves that show.
+			case "leafy" -> AreaLooks::leafy;
 			// (19:06) Lavender Town's low mist: two thin lilac layers of haze over the ground, laid over four blocks.
 			case "mist" -> mist(sprite(baker, rule.swaps().equals("-") ? "mist_lav" : rule.swaps()));
 			case "grass_onto" -> {
@@ -576,7 +583,7 @@ public final class AreaLooks {
 				TextureAtlasSprite to = v[mask];
 				for (int i = 0; i < 4; i++) q.uv(i, to.getU0() + nu[i] * (to.getU1() - to.getU0()), to.getV0() + nv[i] * (to.getV1() - to.getV0()));
 				if (hedge) {
-					q.renderLayer(ChunkSectionLayer.SOLID);
+					q.renderLayer(ChunkSectionLayer.CUTOUT);
 					q.tintIndex(-1);
 				} else q.renderLayer(ChunkSectionLayer.TRANSLUCENT);
 				return true;
@@ -632,30 +639,53 @@ public final class AreaLooks {
 	 * pixels each, so it isn't one flat face; drawn in its own leaves' picture.
 	 */
 	private static void tufts(QuadEmitter e, BlockAndTintGetter view, BlockPos pos, TextureAtlasSprite sprite) {
+		// (0.50, 20:12) In line: two low clipped tufts along the top of each block, in a row with the next block's,
+		// a little lower or higher by where they are; now and then one out of an open side, low and close.
 		long h = net.minecraft.util.Mth.getSeed(pos.getX(), pos.getY(), pos.getZ());
 		boolean top = !view.getBlockState(pos.above()).is(net.minecraft.tags.BlockTags.LEAVES) && !view.getBlockState(pos.above()).isSolidRender();
-		int n = 2 + (int) ((h >>> 3) & 1);
-		for (int i = 0; i < n && top; i++) {
-			float w = (3 + ((h >>> (6 + i * 7)) & 3)) / 16F, hh = (1 + ((h >>> (9 + i * 7)) & 1)) / 16F;
-			float x0 = (1 + ((h >>> (11 + i * 7)) & 7)) / 16F, z0 = (1 + ((h >>> (14 + i * 7)) & 7)) / 16F;
-			x0 = Math.min(x0, 1 - w - 1 / 16F);
-			z0 = Math.min(z0, 1 - w - 1 / 16F);
-			cube(e, sprite, x0, 1, z0, x0 + w, 1 + hh, z0 + w);
+		boolean alongX = view.getBlockState(pos.east()).is(net.minecraft.tags.BlockTags.LEAVES) || view.getBlockState(pos.west()).is(net.minecraft.tags.BlockTags.LEAVES);
+		for (int i = 0; i < 2 && top; i++) {
+			float a0 = (i == 0 ? 1.5F : 9.0F) / 16F, w = 5.5F / 16F, hh = (1 + ((h >>> (9 + i * 7)) & 1)) / 16F;
+			float b0 = 4.5F / 16F, d = 7F / 16F;
+			if (alongX) cube(e, sprite, a0, 1, b0, a0 + w, 1 + hh, b0 + d);
+			else cube(e, sprite, b0, 1, a0, b0 + d, 1 + hh, a0 + w);
 		}
-		for (Direction d : Direction.Plane.HORIZONTAL) {
-			BlockState o = view.getBlockState(pos.relative(d));
+		for (Direction dd : Direction.Plane.HORIZONTAL) {
+			BlockState o = view.getBlockState(pos.relative(dd));
 			if (o.is(net.minecraft.tags.BlockTags.LEAVES) || o.isSolidRender()) continue;
-			if (((h >>> (40 + d.get2DDataValue() * 3)) & 3) == 0) continue;
-			float a = (2 + ((h >>> (48 + d.get2DDataValue() * 3)) & 7)) / 16F, w = 4 / 16F, y0 = (5 + ((h >>> (30 + d.get2DDataValue())) & 3)) / 16F;
-			a = Math.min(a, 1 - w - 1 / 16F);
-			float t = 1 / 16F;
-			switch (d) {
+			if (((h >>> (40 + dd.get2DDataValue() * 3)) & 3) != 0) continue;
+			float a = (4 + ((h >>> (48 + dd.get2DDataValue() * 3)) & 3)) / 16F, w = 5 / 16F, y0 = 6 / 16F;
+			float t = 0.75F / 16F;
+			switch (dd) {
 				case NORTH -> cube(e, sprite, a, y0, -t, a + w, y0 + w, 0);
 				case SOUTH -> cube(e, sprite, a, y0, 1, a + w, y0 + w, 1 + t);
 				case WEST -> cube(e, sprite, -t, y0, a, 0, y0 + w, a + w);
 				default -> cube(e, sprite, 1, y0, a, 1 + t, y0 + w, a + w);
 			}
 		}
+	}
+
+	/**
+	 * (0.50, 20:07) Leaves with Shards of Arcadia's extra leaves: three soft planes of leaves standing out of the block,
+	 * so a tree's crown is rounded and leafy rather than cubes. Only on leaves that show (with open air or a plant
+	 * beside them), so a forest's insides cost nothing; two ways round, by where it is, so no two look the same.
+	 */
+	private static void leafy(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
+		base.emitQuads(e, view, pos, state, random, cull);
+		boolean open = false;
+		for (Direction d : Direction.values()) {
+			BlockState o = view.getBlockState(pos.relative(d));
+			if (!o.is(net.minecraft.tags.BlockTags.LEAVES) && !o.isSolidRender()) {
+				open = true;
+				break;
+			}
+		}
+		if (!open) return;
+		String name = BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath();
+		if (!name.endsWith("_leaves")) return;
+		long h = net.minecraft.util.Mth.getSeed(pos.getX(), pos.getY(), pos.getZ());
+		BlockStateModel m = extra("leafy_" + name.substring(0, name.length() - 7) + ((h >>> 5 & 1) == 0 ? "_a" : "_b"));
+		if (m != null) m.emitQuads(e, view, pos, state, random, d -> false);
 	}
 
 	/** A little box (block units), every face in one picture. */
@@ -784,7 +814,14 @@ public final class AreaLooks {
 			if (sw && !s && !w) tiles.add(3);
 			if (se && !s && !ea) tiles.add(1);
 			if (shade != null) for (int t : tiles) top(e, shade[t], -1);
-			for (int t : tiles) top(e, tufts[t], tint ? 0 : -1);
+			// (0.50, 20:07) The grass's green worked out here, so the tufts are green on any block (the sand, the red path,
+			// Lavender's flagstones), not only those that take the grass's tint (white dots, before).
+			int green = -1;
+			if (tint) {
+				int c = net.minecraft.client.renderer.BiomeColors.getAverageGrassColor(view, pos);
+				green = Adventure.inSave ? Colours.brighten(c) : 0xFF000000 | c;
+			}
+			for (int t : tiles) top(e, tufts[t], green);
 		}
 
 		/** Whether what's beside it runs onto it: grass (onto the dripstone, the kerb), or the sand (onto a cave's floor). */
@@ -792,11 +829,11 @@ public final class AreaLooks {
 			return onto == null ? grass(view, p) : onto.contains(view.getBlockState(p).getBlock()) && view.getBlockState(p.above()).isAir();
 		}
 
-		private static void top(QuadEmitter e, TextureAtlasSprite sprite, int tint) {
+		private static void top(QuadEmitter e, TextureAtlasSprite sprite, int colour) {
 			e.square(Direction.UP, 0, 0, 1, 1, 0);
 			e.spriteBake(sprite, MutableQuadView.BAKE_LOCK_UV);
-			e.color(-1, -1, -1, -1);
-			e.tintIndex(tint);
+			e.color(colour, colour, colour, colour);
+			e.tintIndex(-1);
 			e.renderLayer(ChunkSectionLayer.CUTOUT);
 			e.emit();
 		}

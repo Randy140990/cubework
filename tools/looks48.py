@@ -203,4 +203,5 @@ def build():
 
 import looks48b
 import looks49
-EXTRA = [looks48b.build, looks49.build]
+import looks50
+EXTRA = [looks48b.build, looks49.build, looks50.build]
