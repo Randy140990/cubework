@@ -245,6 +245,7 @@ def main():
     round47(add, room)
     round48(add, room)
     round48b(add, room)
+    round49(add, room)
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -590,6 +591,66 @@ def round48b(add, room):
          "block/quartz_block_bottom=pool_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_tile")
     room("swap", "dark_prismarine", (2559, -1, 2582, 26, "Cerulean Gym's pool"), "block/dark_prismarine=pool_floor")
     room("swap", "light_blue_stained_glass", (3199, -1, 3215, 23, "LT. SURGE's electric door"), "block/light_blue_stained_glass=surge_barrier!")
+
+
+LAVENDER = (-158, 398, -104, 447, "Lavender Town")
+LAV_TOWER = (-128, 401, -108, 420, "the Pokemon Tower")
+LAV_HOUSES = [(-147, 420, -132, 431, "Lavender's Volunteer House"), (-155, 431, -128, 442, "Lavender's two houses")]
+LAV_SHOPS = [(-150, 405, -134, 420, "Lavender's Pokemon Center"), (-125, 429, -110, 442, "Lavender's Mart")]
+LAV_LAMPS = [(-151, 421), (-135, 404), (-127, 425), (-127, 443)]
+
+
+def round49(add, room):
+    """0.49.0's looks (19:06): Lavender Town at night (tools/looks49.py)."""
+    LV = LAVENDER
+    # Its streets: purple-grey flagstones, darker ones where John laid deepslate, a lilac kerb, the grass running
+    # onto them all; a low lilac mist over the ground.
+    add("swap", "gray_concrete", LV, "block/gray_concrete=lav_flag@2", ("32", "32"))
+    add("swap", "deepslate_bricks,cracked_deepslate_bricks,deepslate_tiles", LV,
+        "block/deepslate_bricks=lav_flag_dark@2,block/cracked_deepslate_bricks=lav_flag_dark@2,block/deepslate_tiles=lav_flag_dark@2", ("32", "32"))
+    add("swap", "stone", LV, "block/stone=lav_kerb", ("33", "33"))
+    add("grass_onto", "gray_concrete,deepslate_bricks,cracked_deepslate_bricks,deepslate_tiles,stone,smooth_stone", LV, "-", ("32", "33"))
+    add("mist", "grass_block,gray_concrete,deepslate_bricks,cracked_deepslate_bricks,deepslate_tiles,dirt_path,moss_block,smooth_stone,smooth_stone_slab,"
+        "coarse_dirt,stone,stone_bricks,cracked_stone_bricks", LV, "-", ("31", "34"))
+    # The houses: purple brick, deep plum tiled roofs, dark timber, pale stone feet, dark planters and sills, their
+    # windows lit warm (the town's at night).
+    add("swap", "purple_terracotta", LV, "block/purple_terracotta=lav_brick")
+    add("roof_lav", "crimson_stairs", LV, "-", ("35", "42"))
+    add("swap", "crimson_slab,crimson_planks", LV, "block/crimson_planks=roof_lav_tiles", ("35", "42"))
+    add("swap", "stripped_dark_oak_wood,stripped_dark_oak_log,stripped_jungle_wood,stripped_jungle_log,stripped_spruce_wood,stripped_spruce_log,dark_oak_slab", LV,
+        "block/stripped_dark_oak_log=lav_timber,block/stripped_dark_oak_log_top=lav_timber,block/stripped_jungle_log=lav_timber,"
+        "block/stripped_jungle_log_top=lav_timber,block/stripped_spruce_log=lav_timber,block/stripped_spruce_log_top=lav_timber,block/dark_oak_planks=lav_timber")
+    add("swap", "white_concrete,light_gray_concrete", LV, "block/white_concrete=lav_base,block/light_gray_concrete=lav_base_dark", ("33", "33"))
+    add("swap", "dark_oak_shelf,pale_oak_shelf", LV, "block/dark_oak_shelf=lav_planter,block/pale_oak_shelf=lav_planter")
+    add("swap", "white_carpet", LV, "block/white_wool=lav_sill")
+    add("swap", "dirt,coarse_dirt", LV, "block/dirt=planter_soil,block/coarse_dirt=planter_soil", ("33", "34"))
+    add("swap", "glowstone", LV, "block/glowstone=lav_glow!")
+    for h in LAV_HOUSES:
+        add("glass", "light_blue_stained_glass,light_blue_stained_glass_pane", h, "block/light_blue_stained_glass=glass_lamp")
+    # The Center and the Mart: their white walls clean panels, the grey pillars smooth stone.
+    for b in LAV_SHOPS:
+        add("swap", "white_concrete,light_gray_concrete", b, "block/white_concrete=shop_wall,block/light_gray_concrete=pillar_cer", ("34", "41"))
+    # Its lamps, its own: plum metal posts, ornate violet chiselled feet and heads, a lilac cap, a violet globe and glass.
+    for x, z in LAV_LAMPS:
+        b = (x - 2, z - 2, x + 2, z + 2, "a Lavender lamp")
+        add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern", b,
+            "block/tuff=lamp_lav_post,block/polished_tuff=lamp_lav_post,block/chiseled_tuff_bricks=lamp_lav_chisel,"
+            "block/chiseled_tuff_bricks_top=lamp_lav_chisel_top,block/gray_wool=lamp_lav_top,block/sea_lantern=lamp_globe_violet!", ("32", "42"))
+        add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lav_lamp", ("32", "42"))
+    # The POKeMON TOWER in solid colours: deep lavender stone walls, a pale lilac band, dark plum ledges and core,
+    # slate columns, a deep purple metal roof, a silver spire, violet glass; its forecourt pale flagstones.
+    T = LAV_TOWER
+    add("swap", "blue_terracotta,light_blue_terracotta", T, "block/blue_terracotta=tower_wall,block/light_blue_terracotta=tower_trim", ("34", "72"))
+    add("swap", "nether_brick_slab,nether_bricks,nether_brick_stairs", T, "block/nether_bricks=tower_ledge", ("34", "72"))
+    add("swap", "deepslate_brick_wall", T, "block/deepslate_bricks=tower_column", ("34", "72"))
+    add("swap", "iron_block", T, "block/iron_block=tower_roof", ("55", "72"))
+    add("swap", "stone", T, "block/stone=tower_ledge", ("34", "72"))
+    add("swap", "tuff_bricks,tuff_brick_stairs,tuff_brick_slab", T, "block/tuff_bricks=tower_plinth", ("32", "36"))
+    add("swap", "polished_diorite,diorite_wall,diorite", T, "block/polished_diorite=tower_spire,block/diorite=tower_spire", ("58", "75"))
+    add("glass", "light_blue_stained_glass,light_blue_stained_glass_pane", T, "block/light_blue_stained_glass=glass_tower")
+    add("swap", "smooth_stone,smooth_stone_slab,stone_bricks,cracked_stone_bricks", T,
+        "block/smooth_stone=lav_court@2,block/smooth_stone_slab_side=lav_kerb,block/stone_bricks=lav_court@2,block/cracked_stone_bricks=lav_court@2", ("32", "34"))
+    add("swap", "stone_brick_wall", T, "block/stone_bricks=lav_wall", ("33", "36"))
 
 
 LAMP46 = ("block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chisel,"

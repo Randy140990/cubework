@@ -629,15 +629,44 @@ function leafyBall(G, x, y, z, a, h, cut, solid) {
 
 // ---------- stairs ----------
 const STEP = 0.5;
+// (19:06) A banister that runs diagonally with the stairs: its handrail in fine pieces along the slope (so it reads as
+// one straight rail), newel posts at the foot and the top, spindles (or tinted glass, o.glass) under it from each step.
+// yAt(x): the nosing line's height at x; stepAt(x): the tread's top at x.
+function slopeRail(room, xa, xb, yAt, stepAt, z, o = {}) {
+  const G = room.geo, mat = o.mat || "walnut", sp = o.spindle || "paint", N = Math.max(8, Math.round(Math.abs(xb - xa) * 8));
+  for (let i = 0; i < N; i++) {
+    const a = xa + (xb - xa) * i / N, b = xa + (xb - xa) * (i + 1) / N, y = yAt((a + b) / 2);
+    G.box(Math.min(a, b), y + 0.92, z - 0.06, Math.max(a, b), y + 1.04, z + 0.06, mat);
+    if (o.glass) G.box(Math.min(a, b), y + 0.12, z - 0.015, Math.max(a, b), y + 0.88, z + 0.015, { all: "glass" });
+  }
+  if (!o.glass && !o.wall) for (let x = Math.min(xa, xb) + 0.2; x < Math.max(xa, xb) - 0.1; x += 0.25) {
+    const y0 = stepAt(x), y1 = yAt(x) + 0.94;
+    G.box(x - 0.025, y0, z - 0.025, x + 0.025, y1, z + 0.025, sp);
+  }
+  if (o.wall) for (let x = Math.min(xa, xb) + 0.3; x < Math.max(xa, xb); x += 1.0) {
+    const y = yAt(x) + 0.92; G.box(x - 0.04, y - 0.18, z - (o.wall === "n" ? 0.1 : -0.02), x + 0.04, y, z + (o.wall === "n" ? 0.02 : 0.1), mat);
+  }
+  if (!o.wall) for (const x of [xa, xb]) {
+    const y = Math.max(0, stepAt(x + (xb > xa ? (x === xa ? 0.05 : -0.05) : 0)));
+    G.box(x - 0.08, y, z - 0.08, x + 0.08, yAt(x) + 1.2, z + 0.08, mat);
+  }
+}
 function stairsUp(room, x0, z0 = 0, depth = 2, o = {}) {
   const G = room.geo, n = Math.round(room.H / STEP), run = n * STEP / 2;
   // Climbing east along the north wall: each step half a block high and a quarter of a block deep... (8 steps over 4 blocks).
   const sw = 4 / n;
-  for (let i = 0; i < n; i++) G.box(x0 + i * sw, 0, z0, x0 + (i + 1) * sw, (i + 1) * STEP, z0 + depth, { top: "tread", s: "paint", w: "paint", n: null, e: null, bottom: null });
-  // The banister: a newel post at the foot, spindles, and a rail climbing with the steps.
-  const bz = z0 + depth;
-  G.box(x0 - 0.05, 0, bz - 0.02, x0 + 0.15, 1.35, bz + 0.18, "walnut");
-  for (let i = 0; i < n; i++) { const x = x0 + i * sw + sw * 0.5, y = (i + 1) * STEP; G.box(x - 0.03, y, bz + 0.04, x + 0.03, y + 0.95, bz + 0.1, "paint"); G.box(x0 + i * sw, y + 0.9, bz + 0.02, x0 + (i + 1) * sw, y + 1.02, bz + 0.12, "walnut"); }
+  for (let i = 0; i < n; i++) G.box(x0 + i * sw, 0, z0, x0 + (i + 1) * sw, (i + 1) * STEP, z0 + depth, { top: "tread", s: "paint", w: "paint", n: o.open || z0 > 0.05 ? "paint" : null, e: null, bottom: null });
+  // (19:06) The banisters run diagonally up with the steps, on the open side and (where the stairs stand out in the
+  // room, the Museum's) on the other side too; against a wall, a handrail on the wall. The flight goes up to a wall,
+  // so there's no top to drop off.
+  const bz = z0 + depth, yAt = (x) => Math.max(0, Math.min(n * STEP, (x - x0) / sw * STEP)), stepAt = (x) => Math.max(0, Math.min(n * STEP, Math.ceil((x - x0) / sw - 1e-3) * STEP));
+  slopeRail(room, x0, x0 + 4, yAt, stepAt, bz + 0.07);
+  if (z0 > 0.05) { slopeRail(room, x0, x0 + 4, yAt, stepAt, z0 - 0.07); room.solid(x0 + 0.1, z0 - 0.3, x0 + 4.5, z0 + 0.02); }
+  else slopeRail(room, x0 + 0.2, x0 + 4, yAt, stepAt, z0 + 0.08, { wall: "n" });
+  if (x0 + 4 < room.W - 0.05) {
+    G.box(x0 + 4, 0, z0 - 0.1, x0 + 4.25, room.H, bz + 0.1, o.wall || "paint");
+    room.solid(x0 + 4, z0 - 0.1, x0 + 4.3, bz + 0.1);
+  }
   G.box(x0, 0, bz - 0.01, x0 + 4, 0.3, bz + 0.01, { s: "paint", all: null });
   room.solid(x0 + 0.1, bz - 0.02, x0 + 4.5, bz + 0.3);
   room.ramps.push({ rect: [x0, z0, x0 + 4, z0 + depth], h: (x) => Math.max(0, Math.min(room.H, Math.ceil((x - x0) / sw - 0.35) * STEP)) });
@@ -655,8 +684,12 @@ function stairsDown(room, x0, z0 = 0, depth = 2, o = {}) {
   G.box(x0, -4.6, z0 - 0.05, x0 + 4, 0, z0, { s: wall, all: null });
   G.box(x0 - 0.05, -4.6, z0, x0, 0, z0 + depth, { e: wall, all: null });
   G.box(x0 + 4, -4.6, z0, x0 + 4.05, 0, z0 + depth, { w: wall, all: null });
-  // (show: the top steps in sight going down, the dark lower; the Museum's, 13:56. Else the dark just under the floor.)
-  G.box(x0, o.show ? -2.6 : -0.36, z0, x0 + 4, o.show ? -2.6 : -0.36, z0 + depth, { top: "deep", all: null });
+  // (The top steps in sight going down, the dark lower: every stairwell now, 19:06, so you see the stairs go down.)
+  G.box(x0, -2.6, z0, x0 + 4, -2.6, z0 + depth, { top: "deep", all: null });
+  // (19:06) Handrails down both walls of the well, running diagonally with the steps.
+  const dAt = (x) => Math.min(0, (x - x0) / sw * STEP - 4), dStep = (x) => Math.min(0, Math.ceil((x - x0) / sw - 1e-3) * STEP - 4);
+  slopeRail(room, x0 + 1.2, x0 + 4, dAt, dStep, z0 + 0.08, { wall: "n", mat: "walnut" });
+  slopeRail(room, x0 + 1.2, x0 + 4, dAt, dStep, z0 + depth - 0.08, { wall: "s", mat: "walnut" });
   // A railing round the opening, open at the top step to the east.
   const gap = x0 + 4 - 0.95, bz = z0 + depth;
   G.box(x0 - 0.12, 0, bz - 0.02, x0 + 0.08, 1.3, bz + 0.16, "walnut"); G.box(gap - 0.18, 0, bz - 0.02, gap + 0.02, 1.3, bz + 0.16, "walnut");

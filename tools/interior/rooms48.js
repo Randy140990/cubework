@@ -220,3 +220,96 @@ MATDEF.surgeBarrierView = { tex: "surgeBarrierView", emissive: true };
     },
   });
 })();
+
+// ---------- Lavender Town (19:06): FireRed's three houses, in the town's own colours (lilac walls, dark boards) ----------
+TEXDEF.paperLavender = [16, 16, (P, r) => wallpaper(P, r, hx("#E4DAEE"), hx("#CDBFDD"), hx("#9C84C2"))];
+MATDEF.paperLavender = { tex: "paperLavender" };
+TEXDEF.lavBoards = [16, 16, (P, r) => { P.fill(hx("#6E5266"), 0.05, r); for (let y = 0; y < 16; y += 4) { P.rect(0, y, 16, 1, hx("#86687C")); P.rect(0, y + 3, 16, 1, hx("#4E3A4A")); } }];
+MATDEF.lavBoards = { tex: "lavBoards" };
+TEXDEF.lavRug = [16, 16, (P, r) => { P.fill(hx("#6A4E8E"), 0.03, r); P.rect(0, 0, 16, 1, hx("#C9B6E6")); P.rect(0, 15, 16, 1, hx("#C9B6E6")); P.rect(0, 0, 1, 16, hx("#C9B6E6")); P.rect(15, 0, 1, 16, hx("#C9B6E6"));
+  for (let i = 4; i < 13; i += 4) P.rect(i, i, 1, 1, hx("#E2D4F5")); }];
+MATDEF.lavRug = { tex: "lavRug" };
+TEXDEF.petBed = [16, 16, (P, r) => { P.fill(hx("#C9B6E6"), 0.03, r); P.rect(0, 0, 16, 2, hx("#E8DDF5")); P.rect(0, 14, 16, 2, hx("#9C84C2")); }];
+MATDEF.petBed = { tex: "petBed" };
+
+(() => {
+  const place = (id, name, floor) => PLACES.push({ id, name, floor, group: "Lavender Town" });
+  place("lavender_volunteer_house", "Volunteer Pokémon House", "Lavender Town");
+  place("lavender_cubone_house", "Lavender house", "Cubone's house");
+  place("lavender_name_rater", "Name Rater's house", "Lavender Town");
+  const WINDOW = ["Outside: LAVENDER TOWN at night, the POKéMON TOWER's lights through the mist."];
+
+  Object.assign(BUILD, {
+    lavender_volunteer_house() {
+      // MR. FUJI's VOLUNTEER POKéMON HOUSE: soft beds for the POKéMON he looks after, his books, the children
+      // waiting for him (he's at the POKéMON TOWER).
+      const R = new Room("lavender_volunteer_house", { name: "Volunteer Pokémon House", floor: "Lavender Town", W: 14, D: 11 });
+      shell(R, { paper: "paperLavender", floor: "lavBoards", door: [6, 8], entry: true, skirt: "beam", ledge: "walnut" });
+      band(R, 1.0, "beam", 0.12);
+      const G = R.geo;
+      bookshelf(R, 0.6, 0, "s", 2, 3, { lines: ["MR. FUJI's books: caring for POKéMON, from eggs to old age."] });
+      bookshelf(R, 2.8, 0, "s", 2, 3, { lines: ["Letters from people whose POKéMON he took in."] });
+      G.box(3.0, 0, 3.0, 11.0, 0.03, 7.4, { top: "lavRug", all: "cap", bottom: null });
+      for (const [x, z] of [[9.0, 2.0], [11.6, 2.0], [11.6, 4.6]]) { G.box(x - 0.8, 0, z - 0.6, x + 0.8, 0.28, z + 0.6, { all: "petBed", top: "petBed" }); }
+      R.act([8.0, 1.2, 12.6, 5.4], { label: "Look", lines: ["Soft beds for the POKéMON MR. FUJI looks after."] });
+      table(R, 4.4, 4.2, 6.6, 5.8, { top: "walnut", leg: "walnut", h: 0.86, name: "Table", note: "A walnut table with a bowl of POKéMON food." });
+      plant(R, 0.8, 9.4, 0.9, { pot: "potWhite", lines: ["A lavender plant in a white pot."] });
+      crossWindow(R, "e", 6.6, 1.6, 1.8, 1.2, WINDOW);
+      R.npcs.push({ name: "Boy", key: "mr_fujis_house_p0", x: 3.6, z: 6.6, yaw: FACE.e, look: { skin: "super_nerd" },
+        talk: () => [{ text: "That's odd, MR.FUJI isn't here. Where'd he go?" }] });
+      R.npcs.push({ name: "Little girl", key: "mr_fujis_house_p1", x: 8.0, z: 6.2, yaw: FACE.s, look: { skin: "little_girl" },
+        talk: () => [{ text: "This is really MR.FUJI's house. He's really kind! He looks after abandoned and orphaned POKéMON!" }] });
+      R.pets = [{ sid: "psyduck", x: 9.0, z: 2.0, yaw: 180 }, { sid: "nidorino", x: 11.6, z: 4.6, yaw: 90 }];
+      doormat(R, 6, 8, { to: "town", mat: "matHouseV" });
+      R.spawn = { x: 7.0, z: R.D - 1.5, yaw: FACE.n };
+      return R;
+    },
+    lavender_cubone_house() {
+      const R = new Room("lavender_cubone_house", { name: "Lavender house", floor: "Cubone's house", W: 12, D: 11 });
+      plainHouse(R, { paper: "paperLavender", floor: "lavBoards", rug: "lavRug", window: WINDOW, cupboard: ["A cupboard. Inside: candles and a framed photo of a MAROWAK."] });
+      R.npcs.push({ name: "Girl", key: "lavender_cubone_house_p1", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "brunette_girl" },
+        talk: () => [{ text: "I hate those horrible ROCKETs! That poor CUBONE's mother... It was killed trying to escape from TEAM ROCKET!" }] });
+      R.pets = [{ sid: "cubone", x: 8.0, z: 5.6, yaw: 270 }];
+      R.act([7.0, 4.6, 9.0, 6.6], { label: "Look", lines: ["CUBONE: Kyarugoo!"] });
+      return R;
+    },
+    lavender_name_rater() {
+      const R = new Room("lavender_name_rater", { name: "Name Rater's house", floor: "Lavender Town", W: 12, D: 11 });
+      plainHouse(R, { paper: "paperLavender", floor: "lavBoards", rug: "lavRug", window: WINDOW, cupboard: ["A cupboard. Inside: name books, thick with notes."] });
+      R.npcs.push({ name: "Name Rater", key: "name_raters_house_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "silph_president" },
+        talk: () => [{ text: "Hello, hello! I am the official NAME RATER! Want me to rate the nicknames of your POKéMON?" }, { text: "(In the game: YES, pick one, and you can give it a new name.)" }] });
+      return R;
+    },
+  });
+})();
+
+// ---------- (19:06) the Museum's inside, restyled first in the interiors pass: as its stone outside ----------
+// Polished marble underfoot in two warm tones with fine veins; cream plaster walls in panels; dark walnut wainscot in
+// raised panels; fluted stone pillars; the counter in honey wood with an inset panel and a brass kick; brushed brass.
+TEXDEF.museumFloor = [32, 32, (P, r) => {
+  for (let ty = 0; ty < 4; ty++) for (let tx = 0; tx < 4; tx++) {
+    const x0 = tx * 8, y0 = ty * 8, base = (tx + ty) % 2 ? hx("#D9CDB3") : hx("#BFAF91");
+    P.rect(x0, y0, 8, 8, base); P.noise(x0 + 1, y0 + 1, 6, 6, base, 0.035, r);
+    for (let i = 0; i < 3; i++) { const vx = x0 + 1 + Math.floor(r() * 6), vy = y0 + 1 + Math.floor(r() * 6); P.rect(vx, vy, 2, 1, hx("#A8977A")); }
+    P.rect(x0, y0, 8, 1, hx("#8F7F65")); P.rect(x0, y0, 1, 8, hx("#8F7F65"));
+    P.rect(x0 + 1, y0 + 1, 7, 1, hx("#EDE3CC"));
+  }
+}];
+MATDEF.museumFloor = { tex: "museumFloor", per: 2 };
+TEXDEF.museumWall = [16, 16, (P, r) => { P.fill(hx("#F1E7CD"), 0.015, r); P.rect(2, 2, 12, 1, hx("#E3D5B1")); P.rect(2, 13, 12, 1, hx("#FBF5E5")); P.rect(2, 2, 1, 12, hx("#E3D5B1")); P.rect(13, 2, 1, 12, hx("#FBF5E5")); }];
+TEXDEF.museumBand = [16, 16, (P, r) => {
+  P.fill(hx("#6A4529"), 0.03, r);
+  P.rect(0, 0, 16, 1, hx("#8E6440")); P.rect(0, 15, 16, 1, hx("#432A18"));
+  P.rect(2, 3, 12, 1, hx("#4E321D")); P.rect(2, 12, 12, 1, hx("#8A6140")); P.rect(2, 3, 1, 10, hx("#4E321D")); P.rect(13, 3, 1, 10, hx("#8A6140"));
+  P.rect(3, 4, 10, 8, hx("#74502F"));
+}];
+TEXDEF.museumPillar = [16, 16, (P, r) => {
+  P.fill(hx("#EDE4CF"), 0.015, r);
+  for (let x = 1; x < 16; x += 3) { P.rect(x, 0, 1, 16, hx("#D3C5A3")); P.rect(x + 1, 0, 1, 16, hx("#FAF4E4")); }
+}];
+TEXDEF.museumGold = [16, 16, (P, r) => { P.fill(hx("#C9A54C"), 0.03, r); for (let y = 0; y < 16; y += 2) P.rect(0, y, 16, 1, hx("#D7B65E")); P.rect(0, 0, 16, 1, hx("#F0D88E")); P.rect(0, 15, 16, 1, hx("#9C7C30")); }];
+TEXDEF.counterYellow = [16, 16, (P, r) => {
+  P.fill(hx("#D9A85C"), 0.025, r);
+  P.rect(0, 0, 16, 2, hx("#EAC27E")); P.rect(0, 13, 16, 3, hx("#B98A3A")); P.rect(0, 14, 16, 1, hx("#D2B060"));
+  P.rect(2, 4, 12, 1, hx("#B88A48")); P.rect(2, 10, 12, 1, hx("#EAC88C")); P.rect(2, 4, 1, 7, hx("#B88A48")); P.rect(13, 4, 1, 7, hx("#EAC88C"));
+}];

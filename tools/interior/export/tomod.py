@@ -32,7 +32,9 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "power_plant": (3072, 64, 0),
           # Vermilion City (17:51).
           "vermilion_gym": (3200, 64, 0), "pokemon_fan_club": (3264, 64, 0), "vermilion_old_rod_house": (3328, 64, 0),
-          "vermilion_trade_house": (3392, 64, 0), "vermilion_pidgey_house": (3456, 64, 0)}
+          "vermilion_trade_house": (3392, 64, 0), "vermilion_pidgey_house": (3456, 64, 0),
+          # Lavender Town (19:06).
+          "lavender_volunteer_house": (3520, 64, 0), "lavender_cubone_house": (3584, 64, 0), "lavender_name_rater": (3648, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -46,7 +48,8 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "cerulean_house1": "cerulean_badge_house", "cerulean_house2": "cerulean_trashed_house", "cerulean_house3": "cerulean_trade_house",
          "cerulean_house4": "cerulean_berry_house", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant",
          "vermilion_gym": "vermilion_gym", "pokemon_fan_club": "pokemon_fan_club", "vermilion_old_rod_house": "vermilion_old_rod_house",
-         "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house"}
+         "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house",
+         "lavender_volunteer_house": "mr_fujis_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "name_raters_house"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -129,6 +132,10 @@ DOORS = {
     "vermilion_old_rod_house": {"room": "vermilion_old_rod_house", "door": [[-382, 32, 556], [-381, 32, 556]], "out": [-381.0, 32.0, 558.4]},
     "vermilion_trade_house": {"room": "vermilion_trade_house", "door": [[-361, 32, 578], [-360, 32, 578]], "out": [-360.0, 32.0, 580.4]},
     "vermilion_pidgey_house": {"room": "vermilion_pidgey_house", "door": [[-344, 32, 590], [-343, 32, 590]], "out": [-343.0, 32.0, 592.4]},
+    # Lavender Town (19:06): MR. FUJI's house in the middle, the two below it (crimson doors).
+    "lavender_volunteer_house": {"room": "lavender_volunteer_house", "door": [[-140, 34, 427], [-139, 34, 427]], "out": [-139.0, 34.0, 429.4]},
+    "lavender_cubone_house": {"room": "lavender_cubone_house", "door": [[-147, 34, 437], [-146, 34, 437]], "out": [-146.0, 34.0, 439.4]},
+    "lavender_name_rater": {"room": "lavender_name_rater", "door": [[-136, 34, 437], [-135, 34, 437]], "out": [-135.0, 34.0, 439.4]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -149,7 +156,8 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "cerulean_gym": "cerulean_gym", "bike_shop": "bike_shop", "cerulean_house1": "cerulean_house1", "cerulean_house2": "cerulean_house2",
             "cerulean_house3": "cerulean_house3", "cerulean_house4": "cerulean_house4", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant",
             "vermilion_gym": "vermilion_gym", "pokemon_fan_club": "pokemon_fan_club", "vermilion_old_rod_house": "vermilion_old_rod_house",
-            "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house"}
+            "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house",
+            "lavender_volunteer_house": "lavender_volunteer_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "lavender_name_rater"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
@@ -177,6 +185,9 @@ MONS = {"power_plant": [{"key": "zapdos", "species": "zapdos", "x": 5.6, "z": 4.
 MONS["daycare"] = MONS_DAYCARE
 MONS["pokemon_fan_club"] = [{"key": "pet:pokemon_fan_club_p2", "species": "clefairy", "x": 10.4, "z": 8.6, "yaw": 90.0},
                             {"key": "pet:pokemon_fan_club_p3", "species": "seel", "x": 3.6, "z": 8.6, "yaw": 270.0}]
+MONS["lavender_volunteer_house"] = [{"key": "pet:mr_fujis_house_p2", "species": "psyduck", "x": 9.0, "z": 2.0, "yaw": 180.0},
+                                    {"key": "pet:mr_fujis_house_p3", "species": "nidorino", "x": 11.6, "z": 4.6, "yaw": 90.0}]
+MONS["lavender_cubone_house"] = [{"key": "pet:lavender_cubone_house_p0", "species": "cubone", "x": 8.0, "z": 5.6, "yaw": 270.0}]
 MONS["vermilion_pidgey_house"] = [{"key": "pet:vermilion_pidgey_house_p1", "species": "pidgey", "x": 8.2, "z": 5.6, "yaw": 270.0}]
 BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
@@ -203,7 +214,9 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "power_plant": {"x": 5.0, "z": 34.5, "yaw": 180.0},
          "vermilion_gym": {"x": 7.0, "z": 20.5, "yaw": 180.0}, "pokemon_fan_club": {"x": 7.0, "z": 10.5, "yaw": 180.0},
          "vermilion_old_rod_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "vermilion_trade_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
-         "vermilion_pidgey_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
+         "vermilion_pidgey_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "lavender_volunteer_house": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "lavender_cubone_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "lavender_name_rater": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {

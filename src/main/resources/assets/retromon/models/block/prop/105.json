@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/mc_cream","mc_cream":"retromon:block/interior/mc_cream"},"elements":[{"from":[16,0.0,0.0],"to":[16,16.0,16.0],"faces":{"west":{"uv":[0.0,0.0,16.0,16.0],"texture":"#mc_cream"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pot","pot":"retromon:block/interior/pot"},"elements":[{"from":[0.0,16,0.0],"to":[3.48,16,3.48],"faces":{"down":{"uv":[5.0,1.3393,8.8839,6.0],"texture":"#pot"}}}]}

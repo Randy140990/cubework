@@ -36,6 +36,19 @@ public final class Adventure {
 	public static final float YAW = 180F;
 	/** Held still (a trainer has spotted you, or a text box is up). */
 	public static int frozen;
+	/** How far into Lavender Town's night you are (0 elsewhere, 1 there; it comes on and goes off over a few seconds). */
+	public static float lavender;
+
+	/** The time of day shown: the real one, turned towards the middle of the night by k (0 to 1). */
+	public static long nightOver(long real, float k) {
+		long day = Math.floorDiv(real, 24000L) * 24000L, t = real - day;
+		// The shorter way round the clock to midnight (18000).
+		long d = 18000 - t;
+		if (d > 12000) d -= 24000;
+		if (d < -12000) d += 24000;
+		return day + t + Math.round(d * k);
+	}
+
 	/** Walking after someone for a few ticks more: where to (x, z). */
 	public static int followTicks;
 	public static double followX, followZ;
@@ -114,6 +127,10 @@ public final class Adventure {
 		if (mc.options.getCameraType() != CameraType.THIRD_PERSON_BACK) mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
 		if (frozen > 0 && --frozen == 0 && mc.screen == null) focus(-1);
 		if (followTicks > 0) followTicks--;
+		// Lavender Town: night comes on as you walk in (out in the world; not inside its houses).
+		boolean inLavender = inSave && ClientState.data != null && "lavender_town".equals(ClientState.data.place) && mc.level != null
+				&& mc.level.dimension() == net.minecraft.world.level.Level.OVERWORLD;
+		lavender = Math.max(0F, Math.min(1F, lavender + (inLavender ? 0.02F : -0.04F)));
 		distance += (distanceTarget - distance) * 0.2;
 		while (SPEED.consumeClick()) cycleSpeed();
 		hidden = !BattleScene.active() && behind(mc);

@@ -1184,7 +1184,7 @@ function museumPillar(R, x, H) {
 }
 // A plain house as Viridian's (the Pewter houses): pale boards, a kitchen, a table on a rug, a TV, a sideboard.
 function plainHouse(R, o = {}) {
-  shell(R, { paper: o.paper || "paperSchool", floor: "midBoards", door: VHOUSE_DOOR, entry: true, skirt: "beam", ledge: "walnut" });
+  shell(R, { paper: o.paper || "paperSchool", floor: o.floor || "midBoards", door: VHOUSE_DOOR, entry: true, skirt: "beam", ledge: "walnut" });
   band(R, 1.0, "beam", 0.12);
   const G = R.geo;
   kitchen(R, 0, "e", { z: 6.6 });
@@ -2022,8 +2022,7 @@ const BUILD = {
     const bones = (G2, x0, z0, x1, z1) => G2.box(x0 + 0.2, 0.75, z0 + 0.25, x1 - 0.2, 0.95, z1 - 0.25, { all: "darkTop", top: "fossilSlab" });
     glassCase(R, 2.8, 2.8, 6.2, 4.6, bones, ["AERODACTYL Fossil", "A primitive and rare POKéMON."]);
     glassCase(R, 2.8, 6.0, 6.2, 7.8, bones, ["KABUTOPS Fossil", "A primitive and rare POKéMON."]);
-    stairsUp(R, 8, 7, 2, { to: "museum_2f", spawn: { x: 12.5, z: 9.9, yaw: FACE.s } });
-    sideRail(R, 8, 12.2, 7, "n");
+    stairsUp(R, 8, 7, 2, { to: "museum_2f", spawn: { x: 12.5, z: 9.9, yaw: FACE.s }, wall: "museumWall" });
     R.rail(8.0, 9.0, 12.4, 9.25, 3.2); R.rail(8.0, 6.75, 12.4, 7.0, 3.2);
     // The OLD AMBER on its stand, a glass dome over it.
     G.box(21.9, 0, 2.5, 23.1, 0.9, 3.7, { all: "museumGold", top: "darkTop" });

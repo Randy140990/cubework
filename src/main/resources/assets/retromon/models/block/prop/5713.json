@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ug_top","ug_top":"retromon:block/interior/ug_top"},"elements":[{"from":[0.0,0,10.6],"to":[2.2,0,16.0],"faces":{"up":{"uv":[0.0,10.6,2.2,16.0],"texture":"#ug_top"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cerulean_trim","cerulean_trim":"retromon:block/interior/cerulean_trim"},"elements":[{"from":[0.0,7.2,16],"to":[0.96,8.8,16],"faces":{"north":{"uv":[15.04,7.2,16.0,8.8],"texture":"#cerulean_trim"}}}]}

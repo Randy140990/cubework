@@ -44,17 +44,13 @@
       G.box(xa, h - 0.06, z0, xb, h, z0 + 0.08, "steel");
     }
     const rz = railSide === "n" ? z0 : z0 + depth, sgn = railSide === "n" ? 1 : -1;
-    const hAt = (x) => { const k = climb === "e" ? x - x0 : x0 + 4 - x; return Math.max(0.5, Math.min(4, Math.ceil(k / sw - 0.01) * 0.5)); };
-    for (let i = 0; i <= n; i += 2) {
-      const x = Math.min(x0 + 4 - 0.12, x0 + i * sw), y = hAt(x + 0.06);
-      G.box(x, 0, rz - 0.07, x + 0.12, y + 1.05, rz + 0.07, "steel");
-    }
-    for (let i = 0; i < n; i++) {
-      const xa = x0 + i * sw, y = hAt(xa + sw / 2);
-      G.box(xa, y + 0.98, rz - 0.08, xa + sw, y + 1.08, rz + 0.08, "steel");
-      G.box(xa, y + 0.45, rz - 0.04, xa + sw, y + 0.5, rz + 0.04, "steel");
-      G.box(xa, y + 0.08, rz - 0.015, xa + sw, y + 0.95, rz + 0.015, { all: "glass" });
-    }
+    // (19:06) Its banisters run diagonally with the steps: steel and tinted glass on the open side, a steel handrail on
+    // the wall the other side.
+    const kOf = (x) => climb === "e" ? x - x0 : x0 + 4 - x;
+    const yAt = (x) => Math.max(0, Math.min(4, kOf(x) / sw * 0.5)), stepAt = (x) => Math.max(0, Math.min(4, Math.ceil(kOf(x) / sw - 1e-3) * 0.5));
+    slopeRail(R, x0, x0 + 4, yAt, stepAt, rz, { mat: "steel", glass: true });
+    const wz = railSide === "n" ? z0 + depth - 0.08 : z0 + 0.08;
+    slopeRail(R, x0 + 0.2, x0 + 3.8, yAt, stepAt, wz, { mat: "steel", wall: railSide === "n" ? "s" : "n" });
     R.rail(x0, rz - 0.15, x0 + 4, rz + 0.15, R.H + 1);
     R.ramps.push({ rect: [x0, z0, x0 + 4, z0 + depth], h: (x) => {
       const k = climb === "e" ? x - x0 : x0 + 4 - x;

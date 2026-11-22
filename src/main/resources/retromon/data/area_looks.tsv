@@ -769,3 +769,39 @@ swap	polished_deepslate_slab	-280	401	-264	415	32	34	block/polished_deepslate=st
 swap	smooth_quartz,quartz_block,smooth_quartz_slab,smooth_quartz_stairs,quartz_slab,quartz_stairs	2559	-1	2582	26	-	-	block/quartz_block_bottom=pool_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_tile	Cerulean Gym's pool	interiors
 swap	dark_prismarine	2559	-1	2582	26	-	-	block/dark_prismarine=pool_floor	Cerulean Gym's pool	interiors
 swap	light_blue_stained_glass	3199	-1	3215	23	-	-	block/light_blue_stained_glass=surge_barrier!	LT. SURGE's electric door	interiors
+swap	gray_concrete	-158	398	-104	447	32	32	block/gray_concrete=lav_flag@2	Lavender Town
+swap	deepslate_bricks,cracked_deepslate_bricks,deepslate_tiles	-158	398	-104	447	32	32	block/deepslate_bricks=lav_flag_dark@2,block/cracked_deepslate_bricks=lav_flag_dark@2,block/deepslate_tiles=lav_flag_dark@2	Lavender Town
+swap	stone	-158	398	-104	447	33	33	block/stone=lav_kerb	Lavender Town
+grass_onto	gray_concrete,deepslate_bricks,cracked_deepslate_bricks,deepslate_tiles,stone,smooth_stone	-158	398	-104	447	32	33	-	Lavender Town
+mist	grass_block,gray_concrete,deepslate_bricks,cracked_deepslate_bricks,deepslate_tiles,dirt_path,moss_block,smooth_stone,smooth_stone_slab,coarse_dirt,stone,stone_bricks,cracked_stone_bricks	-158	398	-104	447	31	34	-	Lavender Town
+swap	purple_terracotta	-158	398	-104	447	-	-	block/purple_terracotta=lav_brick	Lavender Town
+roof_lav	crimson_stairs	-158	398	-104	447	35	42	-	Lavender Town
+swap	crimson_slab,crimson_planks	-158	398	-104	447	35	42	block/crimson_planks=roof_lav_tiles	Lavender Town
+swap	stripped_dark_oak_wood,stripped_dark_oak_log,stripped_jungle_wood,stripped_jungle_log,stripped_spruce_wood,stripped_spruce_log,dark_oak_slab	-158	398	-104	447	-	-	block/stripped_dark_oak_log=lav_timber,block/stripped_dark_oak_log_top=lav_timber,block/stripped_jungle_log=lav_timber,block/stripped_jungle_log_top=lav_timber,block/stripped_spruce_log=lav_timber,block/stripped_spruce_log_top=lav_timber,block/dark_oak_planks=lav_timber	Lavender Town
+swap	white_concrete,light_gray_concrete	-158	398	-104	447	33	33	block/white_concrete=lav_base,block/light_gray_concrete=lav_base_dark	Lavender Town
+swap	dark_oak_shelf,pale_oak_shelf	-158	398	-104	447	-	-	block/dark_oak_shelf=lav_planter,block/pale_oak_shelf=lav_planter	Lavender Town
+swap	white_carpet	-158	398	-104	447	-	-	block/white_wool=lav_sill	Lavender Town
+swap	dirt,coarse_dirt	-158	398	-104	447	33	34	block/dirt=planter_soil,block/coarse_dirt=planter_soil	Lavender Town
+swap	glowstone	-158	398	-104	447	-	-	block/glowstone=lav_glow!	Lavender Town
+glass	light_blue_stained_glass,light_blue_stained_glass_pane	-147	420	-132	431	-	-	block/light_blue_stained_glass=glass_lamp	Lavender's Volunteer House
+glass	light_blue_stained_glass,light_blue_stained_glass_pane	-155	431	-128	442	-	-	block/light_blue_stained_glass=glass_lamp	Lavender's two houses
+swap	white_concrete,light_gray_concrete	-150	405	-134	420	34	41	block/white_concrete=shop_wall,block/light_gray_concrete=pillar_cer	Lavender's Pokemon Center
+swap	white_concrete,light_gray_concrete	-125	429	-110	442	34	41	block/white_concrete=shop_wall,block/light_gray_concrete=pillar_cer	Lavender's Mart
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-153	419	-149	423	32	42	block/tuff=lamp_lav_post,block/polished_tuff=lamp_lav_post,block/chiseled_tuff_bricks=lamp_lav_chisel,block/chiseled_tuff_bricks_top=lamp_lav_chisel_top,block/gray_wool=lamp_lav_top,block/sea_lantern=lamp_globe_violet!	a Lavender lamp
+glass	black_stained_glass_pane	-153	419	-149	423	32	42	block/black_stained_glass=glass_lav_lamp	a Lavender lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-137	402	-133	406	32	42	block/tuff=lamp_lav_post,block/polished_tuff=lamp_lav_post,block/chiseled_tuff_bricks=lamp_lav_chisel,block/chiseled_tuff_bricks_top=lamp_lav_chisel_top,block/gray_wool=lamp_lav_top,block/sea_lantern=lamp_globe_violet!	a Lavender lamp
+glass	black_stained_glass_pane	-137	402	-133	406	32	42	block/black_stained_glass=glass_lav_lamp	a Lavender lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-129	423	-125	427	32	42	block/tuff=lamp_lav_post,block/polished_tuff=lamp_lav_post,block/chiseled_tuff_bricks=lamp_lav_chisel,block/chiseled_tuff_bricks_top=lamp_lav_chisel_top,block/gray_wool=lamp_lav_top,block/sea_lantern=lamp_globe_violet!	a Lavender lamp
+glass	black_stained_glass_pane	-129	423	-125	427	32	42	block/black_stained_glass=glass_lav_lamp	a Lavender lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-129	441	-125	445	32	42	block/tuff=lamp_lav_post,block/polished_tuff=lamp_lav_post,block/chiseled_tuff_bricks=lamp_lav_chisel,block/chiseled_tuff_bricks_top=lamp_lav_chisel_top,block/gray_wool=lamp_lav_top,block/sea_lantern=lamp_globe_violet!	a Lavender lamp
+glass	black_stained_glass_pane	-129	441	-125	445	32	42	block/black_stained_glass=glass_lav_lamp	a Lavender lamp
+swap	blue_terracotta,light_blue_terracotta	-128	401	-108	420	34	72	block/blue_terracotta=tower_wall,block/light_blue_terracotta=tower_trim	the Pokemon Tower
+swap	nether_brick_slab,nether_bricks,nether_brick_stairs	-128	401	-108	420	34	72	block/nether_bricks=tower_ledge	the Pokemon Tower
+swap	deepslate_brick_wall	-128	401	-108	420	34	72	block/deepslate_bricks=tower_column	the Pokemon Tower
+swap	iron_block	-128	401	-108	420	55	72	block/iron_block=tower_roof	the Pokemon Tower
+swap	stone	-128	401	-108	420	34	72	block/stone=tower_ledge	the Pokemon Tower
+swap	tuff_bricks,tuff_brick_stairs,tuff_brick_slab	-128	401	-108	420	32	36	block/tuff_bricks=tower_plinth	the Pokemon Tower
+swap	polished_diorite,diorite_wall,diorite	-128	401	-108	420	58	75	block/polished_diorite=tower_spire,block/diorite=tower_spire	the Pokemon Tower
+glass	light_blue_stained_glass,light_blue_stained_glass_pane	-128	401	-108	420	-	-	block/light_blue_stained_glass=glass_tower	the Pokemon Tower
+swap	smooth_stone,smooth_stone_slab,stone_bricks,cracked_stone_bricks	-128	401	-108	420	32	34	block/smooth_stone=lav_court@2,block/smooth_stone_slab_side=lav_kerb,block/stone_bricks=lav_court@2,block/cracked_stone_bricks=lav_court@2	the Pokemon Tower
+swap	stone_brick_wall	-128	401	-108	420	33	36	block/stone_bricks=lav_wall	the Pokemon Tower

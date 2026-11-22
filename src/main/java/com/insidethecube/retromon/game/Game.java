@@ -882,7 +882,7 @@ public final class Game {
 			new Zone("fuchsia_city", -560, 733, -441, 860), new Zone("cerulean_city", -401, 220, -311, 305), new Zone("route_24", -372, 140, -332, 219),
 			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
 			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345),
-			new Zone("vermilion_city", -402, 546, -300, 614)};
+			new Zone("vermilion_city", -402, 546, -300, 614), new Zone("lavender_town", -158, 398, -104, 447)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -937,7 +937,7 @@ public final class Game {
 			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
 			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345),
 			// (17:51) Vermilion City.
-			new Zone("vermilion_city", -402, 546, -300, 614)};
+			new Zone("vermilion_city", -402, 546, -300, 614), new Zone("lavender_town", -158, 398, -104, 447)};
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -2446,6 +2446,11 @@ public final class Game {
 					chairman(p, n, d);
 					return;
 				}
+				// Lavender Town (19:06): the NAME RATER.
+				if (n.key().equals("name_raters_house_p0")) {
+					dialogue(p, n, "rater", List.of("Hello, hello! I am the official NAME RATER!", "Want me to rate the nicknames of your POKéMON?"), yesNo(), n.getId());
+					return;
+				}
 				if (n.key().equals("fuchsia_move_deleter_p0")) {
 					deleter(p, n);
 					return;
@@ -3649,6 +3654,37 @@ public final class Game {
 			case "bike" -> bikeBuy(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "old_rod" -> oldRod(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "chairman" -> chairmanStory(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "rater" -> {
+				if (!(t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false)) || d.party.isEmpty()) {
+					dialogue(p, n, "talk", List.of("Fine! Come any time you like!"));
+					return;
+				}
+				CompoundTag c = new CompoundTag();
+				ListTag ch = new ListTag();
+				for (Mon m : d.party) ch.add(StringTag.valueOf(m.name()));
+				ch.add(StringTag.valueOf("CANCEL"));
+				c.put("choices", ch);
+				dialogue(p, n, "rater_pick", List.of("Which POKéMON should I look at?"), c, n.getId());
+			}
+			case "rater_pick" -> {
+				int i = t.getIntOr("choice", -1);
+				if (!t.getBooleanOr("answered", false) || i < 0 || i >= d.party.size()) {
+					dialogue(p, n, "talk", List.of("Fine! Come any time you like!"));
+					return;
+				}
+				Mon m = d.party.get(i);
+				CompoundTag c = yesNo();
+				c.putInt("slot", i);
+				dialogue(p, n, "rater_yes", List.of(m.name() + ", is it? That is a decent nickname!", "But, would you like me to give it a nicer name?", "How about it?"), c, n.getId());
+			}
+			case "rater_yes" -> {
+				int i = t.getIntOr("slot", -1);
+				if (!(t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false)) || i < 0 || i >= d.party.size()) {
+					dialogue(p, n, "talk", List.of("Fine! Come any time you like!"));
+					return;
+				}
+				askNickname(p, "party", i);
+			}
 			case "daycare_ask" -> daycareAsk(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "daycare_pick" -> daycarePick(p, n, t);
 			case "daycare_back" -> daycareBack(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
@@ -4271,7 +4307,7 @@ public final class Game {
 			// Pewter City's (13:18), FireRed's map over John's at two blocks a step (x = 2c - 836, z = 2r + 265, from its
 			// doors): the girl who says CLEFAIRY came from the moon, the man by the museum, the man below the Center, the
 			// boy in the rose garden, the boy at the way east who takes you to the GYM.
-			{"pewter_city_p0", -824, 295}, {"pewter_city_p2", -770, 299}, {"pewter_city_p1", -794, 321}, {"pewter_city_p3", -776, 320}, {"cerulean_city_p7", -396, 251}, {"vermilion_city_p0", -356, 566}, {"vermilion_city_p1", -366, 562}, {"vermilion_city_p3", -328, 564}, {"vermilion_city_p4", -330, 566}, {"vermilion_city_p5", -338, 603}, {"vermilion_city_p2", -352, 607},
+			{"pewter_city_p0", -824, 295}, {"pewter_city_p2", -770, 299}, {"pewter_city_p1", -794, 321}, {"pewter_city_p3", -776, 320}, {"cerulean_city_p7", -396, 251}, {"vermilion_city_p0", -356, 566}, {"vermilion_city_p1", -366, 562}, {"vermilion_city_p3", -328, 564}, {"vermilion_city_p4", -330, 566}, {"vermilion_city_p5", -338, 603}, {"vermilion_city_p2", -352, 607}, {"lavender_town_p0", -116, 420}, {"lavender_town_p1", -131, 429}, {"lavender_town_p2", -136, 419},
 			{"pewter_city_p4", -752, 306},
 			// Routes 3 and 4 (13:56), where FireRed has them (x = 2c - 748, z = 2r + 285 on Route 3; x = 2c - 628, z = 2r + 246
 			// on Route 4): the youngster resting by the way up to MT. MOON; the woman by the POKéMON CENTER, the boy below it,
@@ -4462,7 +4498,7 @@ public final class Game {
 	 * good ground. Anyone already there stays (or, with redo, is put back where the games had them).
 	 */
 	/** Places marked only round one spot so far (16:58: Route 10 round the Power Plant): only people with their own spots. */
-	private static final java.util.Set<String> OWN_SPOTS_ONLY = java.util.Set.of("route_10", "vermilion_city");
+	private static final java.util.Set<String> OWN_SPOTS_ONLY = java.util.Set.of("route_10", "vermilion_city", "lavender_town");
 
 	public static int populate(ServerLevel level, String place, boolean redo) {
 		Zone z = null;

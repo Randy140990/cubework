@@ -231,6 +231,8 @@ public final class AreaLooks {
 			// (16:17) Leaves as a trimmed hedge: one solid hedge along a row, its edges rounded where it ends.
 			case "hedge" -> glass(baker, rule.swaps(), true);
 			case "chain" -> AreaLooks::chain;
+			// (19:06) Lavender Town's low mist: two thin lilac layers of haze over the ground, laid over four blocks.
+			case "mist" -> mist(sprite(baker, rule.swaps().equals("-") ? "mist_lav" : rule.swaps()));
 			case "grass_onto" -> {
 				// (15:29) The grass's soft tufted edge onto what's beside it (Fuchsia's beach sand, its moss, the red path's edge).
 				TextureAtlasSprite[] over = new TextureAtlasSprite[18];
@@ -338,6 +340,29 @@ public final class AreaLooks {
 	}
 
 	/** Sets a quad's corners to `sprite` at (s, t) in blocks (one block = the whole texture), from where they are. */
+	/** Mist over the ground: the block as it is, then haze at knee and waist height above it, where it's open. */
+	private static Look mist(TextureAtlasSprite haze) {
+		return (base, e, view, pos, state, random, cull) -> {
+			base.emitQuads(e, view, pos, state, random, cull);
+			BlockPos up = pos.above();
+			if (!view.getBlockState(up).getCollisionShape(view, up).isEmpty()) return;
+			for (float h : new float[] {1.35F, 1.85F}) {
+				e.square(Direction.UP, 0, 0, 1, 1, 1 - h);
+				float shift = h > 1.5F ? 0.5F : 0F;
+				float[] ss = new float[4], tt = new float[4];
+				for (int i = 0; i < 4; i++) {
+					ss[i] = (pos.getX() + e.x(i) + shift * 4) / 4F;
+					tt[i] = (pos.getZ() + e.z(i) + shift * 4) / 4F;
+				}
+				lay(e, haze, ss, tt);
+				e.color(-1, -1, -1, -1);
+				e.tintIndex(-1);
+				e.renderLayer(ChunkSectionLayer.TRANSLUCENT);
+				e.emit();
+			}
+		};
+	}
+
 	private static void lay(MutableQuadView q, TextureAtlasSprite sprite, float[] s, float[] t) {
 		float s0 = (float) Math.floor(Math.min(Math.min(s[0], s[1]), Math.min(s[2], s[3])) + 1e-3F);
 		float t0 = (float) Math.floor(Math.min(Math.min(t[0], t[1]), Math.min(t[2], t[3])) + 1e-3F);

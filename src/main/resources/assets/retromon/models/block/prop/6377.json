@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pp_coil","pp_coil":"retromon:block/interior/pp_coil"},"elements":[{"from":[0,0.0,0.0],"to":[0,2.2,2.2],"faces":{"east":{"uv":[13.8,13.8,16.0,16.0],"texture":"#pp_coil"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pp_coil","pp_coil":"retromon:block/interior/pp_coil"},"elements":[{"from":[1.0,0.0,16],"to":[15.0,2.2,16],"faces":{"north":{"uv":[1.0,13.8,15.0,16.0],"texture":"#pp_coil"}}}]}
