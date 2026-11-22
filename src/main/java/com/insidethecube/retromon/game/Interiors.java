@@ -478,7 +478,9 @@ public final class Interiors {
 
 	/** Whether a room isn't there (its first, middle and last pieces aren't the room's blocks). */
 	private static boolean missing(ServerLevel level, Room r) {
-		if (r.schem() != null) {
+		// (A room wholly of blocks, the forest and the caves; one with props and a few blocks of its own, Cerulean Gym's
+		// pool, is checked by its props.)
+		if (r.schem() != null && r.cells().length == 0) {
 			// The forest: its ground (the schematic's second layer, under the floor, is ground all over).
 			int y = r.oy() - 1;
 			for (int[] xz : new int[][] {{1, 1}, {(int) r.w() / 2, (int) r.d() / 2}, {(int) r.w() - 2, (int) r.d() - 2}}) {
@@ -494,7 +496,8 @@ public final class Interiors {
 		BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
 		for (int i : new int[] {0, n / 2, n - 1}) {
 			at.set(r.ox() + c[i * 4], r.oy() + c[i * 4 + 1], r.oz() + c[i * 4 + 2]);
-			if (!level.getBlockState(at).is(Retromon.PROP)) return true;
+			// (Where a room's own blocks are laid over its props, Cerulean Gym's pool, any block there will do.)
+			if (!level.getBlockState(at).is(Retromon.PROP) && (r.schem() == null || level.getBlockState(at).isAir())) return true;
 		}
 		return false;
 	}
