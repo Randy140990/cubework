@@ -160,12 +160,37 @@ def board(width, back=False):
                 used += need
             x = 6 + (room - (sum(words) + 2 * (len(words) - 1))) // 2
             for w in words:
-                for xx in range(x, x + w):
-                    for yy in (row, row + 1):
-                        im.putpixel((xx, yy), SIGN["text"])
+                scribble(im, x, row, w, SIGN["text"], row)
                 x += w + 2
     return im
 
+
+
+def scribble(im, x, y, w, c, seed=0):
+    """A word of handwriting w pixels wide on rows y and y+1 (14:15: a little squiggle on the signs, not a bar): its
+    letters a pixel or two wide, some reaching up a row, some down, joined along the bottom, a gap between letters."""
+    r = random.Random("%d,%d,%d" % (x, y, seed))
+    xx, end = x, x + w
+    while xx < end:
+        lw = min(end - xx, r.choice((2, 2, 3)))
+        kind = r.random()
+        for i in range(lw):
+            px = xx + i
+            if kind < 0.3:                      # a tall letter: up a row on its first stroke
+                rows = (y - 1, y, y + 1) if i == 0 else (y + 1,) if i == lw - 1 else (y, y + 1)
+            elif kind < 0.55:                   # a round letter: top and bottom, open in the middle
+                rows = (y, y + 1) if i in (0, lw - 1) else (y,)
+            elif kind < 0.75:                   # a low one with a tail
+                rows = (y + 1,) if i < lw - 1 else (y, y + 1)
+            else:
+                rows = (y, y + 1) if i % 2 == 0 else (y + 1,)
+            for py in rows:
+                if 0 <= px < im.width and 0 <= py < im.height:
+                    im.putpixel((px, py), c)
+        xx += lw
+        if xx < end and r.random() < 0.6 and xx + 1 < end:
+            im.putpixel((xx, y + 1), c)         # joined on to the next letter
+        xx += 1
 
 def edge(lines_on_rows):
     """The board's top, bottom and ends: white, with the outline along its front and back (rows or columns 5 and
@@ -367,9 +392,7 @@ def short_board(width, back=False):
             used += need
         x = 4 + (room - (sum(words) + 2 * (len(words) - 1))) // 2
         for w in words:
-            for xx in range(x, x + w):
-                for yy in (4, 5):
-                    im.putpixel((xx, yy), SIGN["text"])
+            scribble(im, x, 4, w, SIGN["text"], 4)
             x += w + 2
     return im
 
@@ -441,8 +464,7 @@ def wood_face(back=False):
         for row, words in ((4, (4, 3, 3)), (9, (3, 5))):
             x = 3
             for w in words:
-                for xx in range(x, min(13, x + w)):
-                    im.putpixel((xx, row), WOOD["dark"])
+                scribble(im, x, row, min(13, x + w) - x, WOOD["dark"], row)
                 x += w + 1
     return im
 
@@ -879,6 +901,19 @@ def cave_boulder():
     return im
 
 
+def cave_boulder_tone(base, seed):
+    """As cave_boulder, in another stone (Mt. Moon's grey)."""
+    light, dark = mix(base, (255, 255, 255), 0.22), mix(base, (0, 0, 0), 0.25)
+    n1, n2 = _noise(16, 16, seed + "1", 2), _noise(16, 16, seed + "2", 4)
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            k = (n1[y][x] - 0.5) * 0.9 + (n2[y][x] - 0.5) * 0.4
+            c = mix(base, light, k) if k > 0 else mix(base, dark, -k)
+            im.putpixel((x, y), c[:3] + (255,))
+    return im
+
+
 def boulder_models():
     """Boulders (the cave's rocks: John's tuff, cobblestone and slabs), round mounds of stone stepped in, two shapes
     for the full blocks and a low one for the slabs (the look picks one by where it is)."""
@@ -900,25 +935,135 @@ def boulder_models():
         "boulder_b": dome(7, 8.5, 6.2, 9, 5) + dome(12, 4, 3.4, 5, 3),
         "boulder_small": dome(8, 8, 6.5, 6, 4),
     }
-    for name, boxes in shapes.items():
-        # (A floor under it, all the cell: the floor's own top is hidden under the block John put there.)
-        els = [{"from": [0, 0, 0], "to": [16, 0.5, 16], "faces": {"up": {"texture": "#floor"}}}]
+    for prefix, rock in (("boulder", "cave_boulder"), ("mboulder", "moon_boulder")):
+      for name, boxes in shapes.items():
+        name = name.replace("boulder", prefix, 1)
+        # (No floor of its own: the mod draws the floor under it, laid as the floor round it is, so no square shows; 14:15.)
+        els = []
         for b in boxes:
             els.append({"from": b[:3], "to": b[3:], "faces": {f: {"texture": "#rock"} for f in ("north", "south", "east", "west", "up", "down")}})
         write_json(os.path.join(MODELS, name + ".json"), {"parent": "block/block", "ambientocclusion": True,
-                                                           "textures": {"rock": "retromon:block/area/cave_boulder", "floor": "retromon:block/area/cave_floor_small",
-                                                                        "particle": "retromon:block/area/cave_boulder"},
+                                                           "textures": {"rock": "retromon:block/area/" + rock, "particle": "retromon:block/area/" + rock},
                                                            "elements": els})
+
+
+def _cells(size, n, seed):
+    """Points for a pattern of cells over size by size that wraps at its edges (so it runs on across blocks)."""
+    r = random.Random(seed)
+    return [(r.random() * size, r.random() * size, r.random()) for _ in range(n)]
+
+
+def rock_face(base, light, dark, seed, size=64, cells=26, strata=0.0):
+    """A rock face laid over four blocks by four (14:15: rock, not stripes): big angular facets of stone, each its own
+    shade, lit on its upper left, a dark crack between them; fine grit; faint layers across if strata."""
+    pts = _cells(size, cells, seed)
+    n = _noise(size, size, seed + "n", 8)
+    r = random.Random(seed + "g")
+    im = Image.new("RGBA", (size, size))
+    for y in range(size):
+        for x in range(size):
+            best, second, shade, bx, by = 1e9, 1e9, 0, 0, 0
+            for (px, py, k) in pts:
+                for ox in (-size, 0, size):
+                    for oy in (-size, 0, size):
+                        d = (x - px - ox) ** 2 + (y - py - oy) ** 2
+                        if d < best:
+                            second, best, shade, bx, by = best, d, k, px + ox, py + oy
+                        elif d < second:
+                            second = d
+            edge = second ** 0.5 - best ** 0.5
+            # Each facet lit from its upper left (a slope away from its middle), its own shade.
+            k = (shade - 0.5) * 0.16 + ((bx - x) + (by - y)) / 40.0 * 0.5 + (n[y][x] - 0.5) * 0.08 + (r.random() - 0.5) * 0.05
+            if strata:
+                k += math_sin(y * 0.55 + n[y][x] * 3) * strata
+            c = mix(base, light, min(1, k * 2.2)) if k > 0 else mix(base, dark, min(1, -k * 2.2))
+            if edge < 1.1:
+                c = mix(c, dark, 0.55)
+            elif edge < 2.0:
+                c = mix(c, light, 0.18)
+            im.putpixel((x, y), c[:3] + (255,))
+    return im
+
+
+def math_sin(v):
+    return math.sin(v)
+
+
+def cave_floor_one(base, light, dark, seed, size=64):
+    """One cave floor over four blocks by four (14:15: no squares where one of John's blocks meets another): its
+    colour with soft broad patches, grit and a few pebbles."""
+    n1, n2 = _noise(size, size, seed + "a", 3), _noise(size, size, seed + "b", 9)
+    r = random.Random(seed)
+    im = Image.new("RGBA", (size, size))
+    for y in range(size):
+        for x in range(size):
+            k = (n1[y][x] - 0.5) * 0.34 + (n2[y][x] - 0.5) * 0.14 + (r.random() - 0.5) * 0.06
+            c = mix(base, light, k * 1.6) if k > 0 else mix(base, dark, -k * 1.6)
+            im.putpixel((x, y), c[:3] + (255,))
+    for _ in range(size // 3):
+        px, py = r.randrange(size), r.randrange(size)
+        im.putpixel((px, py), mix(base, dark, 0.55)[:3] + (255,))
+        im.putpixel(((px + 1) % size, py), mix(base, light, 0.35)[:3] + (255,))
+    return im
+
+
+def cave_mat():
+    """The way out of a cave (14:15: still a mat there): the cave's sand, a worn mat of it two blocks by two, its rim a
+    shade darker, two chevrons pointing out (south), and the light from outside on it."""
+    im = cave_floor_one(hexc("#E2CC98"), hexc("#F4E6C2"), hexc("#C2A872"), "cm", 32)
+    rim, mark = hexc("#B79A63"), hexc("#FFF6E0")
+    for i in range(32):
+        for (x, y) in ((i, 0), (i, 1), (i, 30), (i, 31), (0, i), (1, i), (30, i), (31, i)):
+            im.putpixel((x, y), rim[:3] + (255,))
+    for y0 in (8, 16):
+        for k in range(7):
+            for (x, y) in ((8 + k, y0 + k), (22 - k, y0 + k)):
+                for dx in (0, 1):
+                    for dy in (0, 1):
+                        im.putpixel((x + dx, y + dy), mark[:3] + (255,))
+    return im
+
+
+def cave_daylight():
+    """Daylight in a cave's mouth: a warm white glow, brightest in the middle and low down, softly to the edges."""
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            k = 1 - (abs(x - 7.5) / 9.0) ** 2 * 0.25 - (1 - y / 15) * 0.12
+            c = mix(hexc("#E8DDC4"), hexc("#FFFDF6"), max(0, min(1, k)))
+            im.putpixel((x, y), c[:3] + (255,))
+    return im
+
+
+def sand_edges():
+    """The sand's soft edge onto the cave floor next to it (14:15: no squares): as the grass's onto the dripstone,
+    from lookground's tiles, in the sand's colours."""
+    sand16 = Image.open(os.path.join(TEX, "cave_sand.png")).crop((0, 0, 16, 16))
+    for t in range(1, 18):
+        save("sand_on_floor_%d" % t, lookground.fringe(t, sand16))
 
 
 def cave_textures():
     save("cave_wall_top", cave_wall_top())
     save("cave_wall_side", cave_wall_side())
-    save("cave_floor", cave_ground(hexc("#9C6B3D"), hexc("#BC8C5A"), hexc("#7C5330"), "cf", patches=0.75))
-    save("cave_floor_patch", cave_ground(hexc("#B88957"), hexc("#CFA472"), hexc("#987044"), "cp", patches=0.35))
-    save("cave_sand", cave_ground(hexc("#D8BE86"), hexc("#E8D3A2"), hexc("#B99E68"), "cs", speck=0.06, patches=0.3))
+    # (14:15) One floor for all John's floor blocks, so there are no squares where they meet; the sand its own, its edges soft.
+    save("cave_floor", cave_floor_one(hexc("#A2733F"), hexc("#C0915C"), hexc("#7E5632"), "cf"))
+    save("cave_floor_patch", Image.open(os.path.join(TEX, "cave_floor.png")))
+    save("cave_sand", cave_floor_one(hexc("#D8BE86"), hexc("#ECD9AC"), hexc("#B99E68"), "cs"))
+    save("cave_rock", rock_face(hexc("#8E6A44"), hexc("#B08A5E"), hexc("#5A4128"), "dr", cells=15, strata=0.04))
+    save("cave_rock_top", rock_face(hexc("#7A5E3C"), hexc("#97784F"), hexc("#52402A"), "dt", cells=34))
+    save("cave_mat", cave_mat())
+    save("cave_daylight", cave_daylight())
+    # Mt. Moon (13:56), as FireRed's: grey brown rock, a pale grey floor, its rocks grey stone.
+    save("moon_rock", rock_face(hexc("#86786A"), hexc("#A59686"), hexc("#554A40"), "mr", cells=15, strata=0.04))
+    save("moon_rock_top", rock_face(hexc("#9A8C7C"), hexc("#B5A796"), hexc("#6C6052"), "mt", cells=34))
+    save("moon_floor", cave_floor_one(hexc("#B9B0A0"), hexc("#D1C9BA"), hexc("#958C7C"), "mf"))
+    save("moon_gravel", cave_floor_one(hexc("#8F887E"), hexc("#A8A196"), hexc("#6E675E"), "mg"))
+    save("moon_boulder", cave_boulder_tone(hexc("#9A958C"), "mb"))
+    save("moon_steps", solid_shaded(hexc("#9A7A52"), 0.06, -0.08, 0.03, "ms"))
     save("cave_boulder", cave_boulder())
     save("cave_floor_small", Image.open(os.path.join(TEX, "cave_floor.png")).crop((16, 16, 32, 32)))
+    sand_edges()
     boulder_models()
 
 
@@ -946,6 +1091,7 @@ def build():
     wsign_textures()
     sign_models("wsign")
     pewter_textures()
+    town_textures()
     for n in BUMPS:
         save("path_" + n, path_tile(n))
     g16 = lookground.grass(16, 31)
@@ -1057,8 +1203,7 @@ def wood_board(width, back=False):
             for w in pattern * 4:
                 if x + w > width - 4:
                     break
-                for xx in range(x, x + w):
-                    im.putpixel((xx, row), WOOD["dark"])
+                scribble(im, x, row, w, WOOD["dark"], row)
                 x += w + 2
     return im
 
@@ -1110,6 +1255,159 @@ def pewter_textures():
     save("museum_roof_flat", flat(hexc("#A56A9F")))
     save("museum_roof_dark", flat(hexc("#7E3E62")))
     save("museum_wall", solid_shaded(hexc("#EEDFC3"), 0.04, -0.06))
+
+
+# ---------- 14:15: the towns' second pass ----------
+
+def solar_top():
+    """A lamp's sun catcher (the daylight detector on top, 14:15: still solar): a solar panel, dark blue cells in a
+    silver frame, a fine grid between them, a sheen across."""
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            if x in (0, 15) or y in (0, 15):
+                c = hexc("#C3C8CE") if (x == 0 or y == 0) else hexc("#8E959C")
+            elif x in (5, 10) or y in (5, 10):
+                c = hexc("#9AA3AD")
+            else:
+                k = 0.18 if 3 <= (x + y) % 11 <= 4 else 0
+                c = mix(hexc("#1D3A6B"), hexc("#5D86C2"), k + 0.08 * (1 - y / 15))
+            im.putpixel((x, y), c[:3] + (255,))
+    return im
+
+
+def solar_side():
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            c = hexc("#A9B0B7") if y <= 1 else mix(hexc("#5B6168"), hexc("#3E4349"), y / 15)
+            im.putpixel((x, y), c[:3] + (255,))
+    return im
+
+
+def fence_post(top=False):
+    """The fence's posts (John's spruce logs between fence panels, 14:15: a fence, not trees): solid painted wood, a
+    fine grain down it, a lighter edge; its top end a plain square with a bevel."""
+    base = hexc("#8A5E3A")
+    r = random.Random("fp" + str(top))
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            if top:
+                k = 0.10 if (x in (0, 1) or y in (0, 1)) else -0.14 if (x in (14, 15) or y in (14, 15)) else 0.02
+            else:
+                k = 0.07 if x in (0, 1) else -0.10 if x in (14, 15) else 0.0
+                if x in (5, 10) and r.random() < 0.85:
+                    k -= 0.06
+                k += 0.04 - 0.08 * (y / 15)
+            k += (r.random() - 0.5) * 0.025
+            c = mix(base, (255, 255, 255), k) if k > 0 else mix(base, (0, 0, 0), -k)
+            im.putpixel((x, y), c[:3] + (255,))
+    return im
+
+
+def fence_rail():
+    """The fence's rails (spruce fence: its planks' texture): the same painted wood, a line along each board."""
+    base = hexc("#93653F")
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            k = 0.08 if y % 4 == 0 else -0.08 if y % 4 == 3 else 0.0
+            c = mix(base, (255, 255, 255), k) if k > 0 else mix(base, (0, 0, 0), -k)
+            im.putpixel((x, y), c[:3] + (255,))
+    return im
+
+
+def recolour_flat(src, base, keep=0.35):
+    """A vanilla texture (a shelf's: its shape kept) in one solid colour: its own light and dark kept only a little
+    (keep), so it reads as painted, transparent pixels left as they are."""
+    im = Image.open(src).convert("RGBA")
+    px = im.load()
+    lum = [0.299 * px[x, y][0] + 0.587 * px[x, y][1] + 0.114 * px[x, y][2] for y in range(im.height) for x in range(im.width) if px[x, y][3] > 0]
+    mean = sum(lum) / max(1, len(lum))
+    for y in range(im.height):
+        for x in range(im.width):
+            r_, g_, b_, a = px[x, y]
+            if a == 0: continue
+            k = (0.299 * r_ + 0.587 * g_ + 0.114 * b_ - mean) / 255.0 * keep * 2
+            c = mix(base, (255, 255, 255), k) if k > 0 else mix(base, (0, 0, 0), -k)
+            px[x, y] = c[:3] + (a,)
+    return im
+
+
+def garden_light():
+    """John's lanterns on the fences and over the paths (14:18), as a garden light: a dark metal frame round a warm
+    white glass, a metal cap and ring (laid out as the lantern's own picture, one frame)."""
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    metal, metal_hi, glass, glass_hi = hexc("#33383E"), hexc("#5A6169"), hexc("#FFE9B8"), hexc("#FFF8E6")
+    for y in range(16):
+        for x in range(16):
+            c = None
+            if 0 <= x <= 5 and 2 <= y <= 8:      # the body's sides: frame round a glass
+                c = metal if x in (0, 5) or y in (2, 8) else (glass_hi if x in (1, 2) and y in (3, 4) else glass)
+            elif 0 <= x <= 5 and 9 <= y <= 14:   # its top and bottom
+                c = metal_hi if x in (0, 5) or y in (9, 14) else metal
+            elif 1 <= x <= 4 and 0 <= y <= 1:    # the cap's sides
+                c = metal_hi if y == 0 else metal
+            elif 11 <= x <= 13 and 1 <= y <= 2:  # the ring
+                c = metal_hi
+            if c is not None:
+                im.putpixel((x, y), c[:3] + (255,))
+    return im
+
+
+def flower_bush():
+    """The Museum's six little flowering trees (14:15: still flowery): round leaves in two greens, light on their tops,
+    pink and white blossoms among them, a few gaps (as leaves are)."""
+    r = random.Random("fb")
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    g1, g2, g3 = hexc("#4E9A3E"), hexc("#6DB850"), hexc("#356E2C")
+    for y in range(16):
+        for x in range(16):
+            if r.random() < 0.06: continue
+            k = r.random()
+            c = g2 if k < 0.35 else g1 if k < 0.8 else g3
+            im.putpixel((x, y), c[:3] + (255,))
+    for (cx, cy, col) in ((3, 3, "#F6A8C8"), (11, 2, "#FFFFFF"), (7, 7, "#F48DB8"), (13, 9, "#F6A8C8"), (2, 11, "#FFFFFF"), (9, 13, "#F48DB8"), (5, 14, "#F6A8C8")):
+        for dx, dy in ((0, 0), (1, 0), (0, 1), (-1, 0), (0, -1)):
+            x, y = (cx + dx) % 16, (cy + dy) % 16
+            im.putpixel((x, y), (hexc(col) if (dx, dy) != (0, 0) else hexc("#FFE27A"))[:3] + (255,))
+    return im
+
+
+def town_textures():
+    v = lambda n: os.path.join(VANILLA, "textures", "block", n + ".png")
+    save("lamp_solar", solar_top())
+    save("lamp_solar_side", solar_side())
+    # Pewter's own lamps (14:15): grey metal, not black; their globe frosted warm white.
+    GREY = [hexc(c) for c in ("#4A5058", "#5E656E", "#737B85", "#8C949E", "#A8B0B9")]
+    for n in ("chiseled_tuff_bricks", "chiseled_tuff_bricks_top"):
+        save("plamp_" + n, lookground.recolour(v(n), GREY))
+    save("plamp_post", solid_shaded(hexc("#7A828C"), 0.06, -0.07))
+    save("plamp_cap", metal(hexc("#8C949E"), seam=False))
+    save("plamp_globe", solid_shaded(hexc("#FFF3D6"), 0.04, -0.04))
+    save("fence_post", fence_post())
+    save("fence_post_top", fence_post(top=True))
+    save("fence_rail", fence_rail())
+    save("garden_light", garden_light())
+    save("flower_bush", flower_bush())
+    # Viridian's green houses: the chimney clean painted brick, the warped shelf on the ridge and the top of the chimney
+    # a solid green, the birch shelves round the foot one solid wood (their shelf kept).
+    save("chimney_brick", bricks(hexc("#B65A3E"), hexc("#94452F"), shade=0.06))
+    save("green_shelf", recolour_flat(v("warped_shelf"), hexc("#5EA14C")))
+    save("green_solid", solid_shaded(hexc("#5EA14C"), 0.05, -0.07))
+    save("green_solid_top", solid_shaded(hexc("#6AAE55"), 0.0, 0.0))
+    save("wood_shelf", recolour_flat(v("birch_shelf"), hexc("#B98A57")))
+    # The Centers' and Marts' bottoms (diorite) solid, each its own; the Gyms' and houses' trim as Pallet's.
+    save("center_base", solid_shaded(hexc("#E9E4DE"), 0.04, -0.06))
+    save("mart_base", solid_shaded(hexc("#D9DEE6"), 0.04, -0.06))
+    # Prof. Oak's lab roof (14:15): light grey metal panels, a darker rim.
+    save("lab_roof", metal(hexc("#A2AAB3")))
+    save("lab_roof_rim", metal(hexc("#6E7680"), seam=False))
+    # Glowstone (John's hidden lights, under carpets inside, 14:15): as the white carpet it's under, so you can't see it.
+    save("glow_hidden", solid_shaded(hexc("#E8EAEA"), 0.02, -0.03, 0.01, "gh"))
+    # The Museum's slabs (stone, diorite): solid light grey trim.
+    save("museum_trim", solid_shaded(hexc("#C9CCD0"), 0.04, -0.06))
 
 
 def preview(out, scale=8):

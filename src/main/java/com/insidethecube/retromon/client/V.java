@@ -885,6 +885,7 @@ public final class V {
 			String b = n.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z]+", "_").replaceAll("^_|_$", "");
 			return BALLS.contains(b) ? "ball_" + b : "ball_pok_ball";
 		}
+		if (n.contains("BERRY")) return "item_berry";
 		if (n.contains("POTION") || n.contains("HEAL") || n.contains("ANTIDOTE") || n.contains("AWAKENING") || n.contains("REVIVE")) return "icon_potion";
 		if (n.startsWith("TM") || n.startsWith("HM")) return "icon_disc";
 		if (n.contains("MAP")) return "icon_map";

@@ -349,3 +349,8 @@ viridian_school_house_p0	viridian_school_house	brunette_girl	up	stay	Whew! I'm t
 viridian_school_house_p1	viridian_school_house	cooltrainer_f	down	stay	Okay! | Be sure to read the blackboard carefully!	4	1
 viridian_school_house_p2	viridian_school_house	little_girl	up	stay	Sis says POKéMON will become tame if you treat them nicely.	4	5
 wardens_house_p0	wardens_house	warden	none	stay	WARDEN: Hif fuff hefifoo! | Ha lof ha feef ee hafahi ho. Heff hee fwee!	2	3
+mt_moon_pokecenter_salesman	mt_moon_pokecenter	businessman	left	stay	MAN: Hello, there! Have I got a deal just for you!	-1	-1
+route_4_boy	route_4	boy	left_right	walk	I came through MT. MOON from PEWTER. | Watch out for the men in black down there!	-1	-1
+route_4_tutor_punch	route_4	black_belt	right	stay	Hiyah! My MEGA PUNCH is the stuff of legend!	-1	-1
+route_4_tutor_kick	route_4	black_belt_2	left	stay	Hiyah! My MEGA KICK is the stuff of legend!	-1	-1
+pewter_city_aide	pewter_aide	scientist	right	stay	I'd better get back to PROF. OAK.	-1	-1

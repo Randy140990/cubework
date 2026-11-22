@@ -845,7 +845,7 @@ public final class Game {
 	/** Pallet Town to Route 2 on Insid3 Th3 Cub3's Kanto map, to begin with (mark the rest with /retromon zone). */
 	private static final Zone[] DEFAULT_ZONES = {new Zone("pallet_town", -845, 655, -745, 735), new Zone("route_1", -845, 590, -745, 654),
 			new Zone("viridian_city", -830, 495, -745, 589), new Zone("route_22", -900, 495, -831, 565), new Zone("route_22", -1000, 512, -901, 600), new Zone("route_2", -830, 340, -745, 494),
-			new Zone("pewter_city", -850, 255, -741, 339)};
+			new Zone("pewter_city", -850, 255, -741, 339), new Zone("route_3", -740, 285, -580, 332), new Zone("route_4", -628, 238, -410, 284)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -864,13 +864,23 @@ public final class Game {
 				zones.add(PEWTER);
 				saveMarker();
 			}
+			// Routes 3 and 4 (13:56).
+			if (!"route_3".equals(placeAt(-690.5, 300.5))) {
+				zones.add(ROUTE_3);
+				saveMarker();
+			}
+			if (!"route_4".equals(placeAt(-600.5, 262.5))) {
+				zones.add(ROUTE_4);
+				saveMarker();
+			}
 		} else {
 			zones.addAll(List.of(DEFAULT_ZONES));
 			saveMarker();
 		}
 	}
 
-	private static final Zone ROUTE_22_WEST = new Zone("route_22", -1000, 512, -901, 600), PEWTER = new Zone("pewter_city", -850, 255, -741, 339);
+	private static final Zone ROUTE_22_WEST = new Zone("route_22", -1000, 512, -901, 600), PEWTER = new Zone("pewter_city", -850, 255, -741, 339),
+			ROUTE_3 = new Zone("route_3", -740, 285, -580, 332), ROUTE_4 = new Zone("route_4", -628, 238, -410, 284);
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -1044,7 +1054,7 @@ public final class Game {
 			Vec3 was = WAS_AT.put(id, p.position());
 			if (was != null && was.distanceToSqr(p.position().x, was.y, p.position().z) > 0.0004) WALKING.put(id, s.getTickCount());
 			// A room with trainers in it (the Pewter Gym's CAMPER LIAM): they watch for you there too.
-			if (inside && !walkabout && s.getTickCount() % 4 == 0 && !Battles.in(p) && !BUSY.containsKey(id) && !AFTER_BATTLE.containsKey(id) && Interiors.watched(p)) watch(p);
+			if (inside && !walkabout && !Battles.in(p) && !BUSY.containsKey(id) && !AFTER_BATTLE.containsKey(id) && Interiors.watched(p)) watch(p);
 			// The Museum's desk: your ticket, the first time you go in by the main door.
 			if (inside && !Battles.in(p) && !BUSY.containsKey(id)) museumDesk(p);
 			// Pewter City's east way out before you've beaten BROCK: the boy takes you to the GYM.
@@ -1057,9 +1067,10 @@ public final class Game {
 			BlockPos last = LAST.put(id, pos);
 			if (last != null && (last.getX() != pos.getX() || last.getZ() != pos.getZ())) step(p, pos);
 			if (touchWild(p)) continue;
-			if (s.getTickCount() % 4 == 0) watch(p);
+			if (inside || s.getTickCount() % 2 == 0) watch(p);
 		}
 		approach(s);
+		escorts();
 		mumsGoHome();
 		rivalsLeave(s);
 		rocketsLeave(s);
@@ -2140,14 +2151,18 @@ public final class Game {
 	 * (further for the ones who watched further in the games), or right beside them whichever way they face,
 	 * with nothing in between.
 	 */
+	/** Where each player was when trainers last looked (so walking fast past one, you're still seen; 14:15). */
+	private static final Map<UUID, Vec3> SIGHT_PREV = new HashMap<>();
+
 	private static void watch(ServerPlayer p) {
 		PlayerData d = data(p);
+		Vec3 prev = SIGHT_PREV.put(p.getUUID(), p.position());
 		if (!d.started || !d.anyHealthy() || WALKS.containsKey(p.getUUID())) return;
 		ServerLevel level = (ServerLevel) p.level();
-		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(11))) {
+		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(14))) {
 			if (n.role() != Npc.TRAINER && n.role() != Npc.LEADER || n.approaching > 0 || n.talker != null) continue;
 			Trainers.Trainer t = Trainers.get(n.key());
-			if (t == null || t.sight() <= 0 || d.beaten.contains(t.key()) || (battlesOff(p) && !storyBattle(t)) || !spots(n, p, t)) continue;
+			if (t == null || t.sight() <= 0 || d.beaten.contains(t.key()) || (battlesOff(p) && !storyBattle(t)) || !spots(n, p, t, prev)) continue;
 			walkUp(p, n, t, spottedMusic(t), null);
 			return;
 		}
@@ -2155,19 +2170,31 @@ public final class Game {
 
 	/** Whether a trainer sees you (see watch). */
 	static boolean spots(Npc n, ServerPlayer p, Trainers.Trainer t) {
+		return spots(n, p, t, null);
+	}
+
+	static boolean spots(Npc n, ServerPlayer p, Trainers.Trainer t, Vec3 prev) {
 		double dx = p.getX() - n.getX(), dz = p.getZ() - n.getZ(), dy = p.getY() - n.getY();
 		if (Math.abs(dy) > 2.5) return false;
-		// In the forest (laid out step for step on FireRed's), as FireRed has it: they see straight ahead, as many of
-		// its steps as their sight, in a line as wide as a step, and nothing to the side or behind.
+		// In the forest, the Gym and Mt. Moon (laid out step for step on FireRed's), as FireRed has it: they see straight
+		// ahead, as many of its steps as their sight, in a line as wide as a step, and nothing to the side or behind; and
+		// anywhere along the way you've come since they last looked (you can't run past them unseen).
 		double[] tile = Interiors.tileOf(n);
 		if (tile != null) {
 			double yaw = Math.toRadians(n.facing());
 			double fx = -Math.sin(yaw), fz = Math.cos(yaw);
-			double ahead = dx * fx + dz * fz, side = Math.abs(dx * fz - dz * fx);
 			boolean alongX = Math.abs(fx) > Math.abs(fz);
 			double step = alongX ? tile[0] : tile[1], width = alongX ? tile[1] : tile[0];
-			if (ahead < 0.3 || ahead > t.sight() * step + 0.6 || side > width / 2 + 0.45) return false;
-			return n.hasLineOfSight(p);
+			boolean seen = false;
+			int samples = prev != null && prev.distanceToSqr(p.position()) < 64 ? 6 : 0;
+			for (int k = 0; k <= samples && !seen; k++) {
+				double f = samples == 0 ? 1 : k / (double) samples;
+				double px = prev == null || samples == 0 ? p.getX() : prev.x + (p.getX() - prev.x) * f, pz = prev == null || samples == 0 ? p.getZ() : prev.z + (p.getZ() - prev.z) * f;
+				double ddx = px - n.getX(), ddz = pz - n.getZ();
+				double ahead = ddx * fx + ddz * fz, side = Math.abs(ddx * fz - ddz * fx);
+				seen = !(ahead < 0.3 || ahead > t.sight() * step + 0.6 || side > width / 2 + 0.45);
+			}
+			return seen && n.hasLineOfSight(p);
 		}
 		double dist = Math.sqrt(dx * dx + dz * dz), reach = Math.max(5, Math.min(10, 3 + t.sight() * 1.5));
 		if (dist > reach) return false;
@@ -2327,6 +2354,14 @@ public final class Game {
 					personGift(p, n, d);
 					return;
 				}
+				if (n.key().equals("mt_moon_pokecenter_salesman")) {
+					magikarpMan(p, n, d);
+					return;
+				}
+				if (n.key().startsWith("route_4_tutor_")) {
+					tutor(p, n, d);
+					return;
+				}
 				if (n.key().equals(OLD_MAN) && !d.hasDex()) {
 					dialogue(p, n, "talk", OLD_MAN_GRUMPY);
 					return;
@@ -2387,6 +2422,8 @@ public final class Game {
 			return;
 		}
 		d.statics.add("item:" + key);
+		// (Mt. Moon's mushrooms grow back: the day it was picked, so it's there again the next day.)
+		if (fi.item().contains("mushroom")) d.statics.add("picked:" + key + "=" + p.level().getServer().overworld().getDayTime() / 24000L);
 		Item it = Item.find(fi.item());
 		String name = it != null ? it.name() : fi.item().replace("tm_", "TM ").replace('_', ' ').toUpperCase();
 		if (it != null) d.give(fi.item(), 1);
@@ -2486,17 +2523,253 @@ public final class Game {
 
 	private static void pewterGuide(ServerPlayer p) {
 		PlayerData d = data(p);
-		if (!ourSave || !d.started || d.badges.contains("BOULDERBADGE")) return;
+		if (!ourSave || !d.started || ESCORTS.containsKey(p.getUUID()) || WALKS.containsKey(p.getUUID())) return;
 		double x = p.getX(), z = p.getZ();
 		if (x < PEWTER_EAST[0] || x > PEWTER_EAST[1] || z < PEWTER_EAST[2] || z > PEWTER_EAST[3]) return;
+		boolean badge = d.badges.contains("BOULDERBADGE");
+		if (badge && d.story.contains("running_shoes")) return;
+		// You stop where you are (a step back, out of the way east).
+		Vec3 last = lastWhere(p, v -> v.x < PEWTER_EAST[0] - 0.4);
+		stopAt(p, last != null ? last : new Vec3(PEWTER_EAST[0] - 1.2, p.getY(), p.getZ()));
+		ServerLevel level = (ServerLevel) p.level();
+		if (badge) {
+			// PROF. OAK's AIDE comes running with the RUNNING SHOES (FireRed's, on the way to ROUTE 3).
+			BlockPos at = spot(level, p.getBlockX() - 4, p.getBlockZ(), 3);
+			Npc aide = place(level, Npc.PERSON, "pewter_city_aide", at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yawOf("right", 0F));
+			if (aide == null) return;
+			aide.setCustomName(net.minecraft.network.chat.Component.literal("AIDE"));
+			walkUp(p, aide, null, "", () -> {
+				d.story.add("running_shoes");
+				d.give("running_shoes", 1);
+				sync(p);
+				CompoundTag s = new CompoundTag();
+				s.putString("sound", "item");
+				Net.send(p, "sound", s);
+				dialogue(p, aide, "aide_shoes", fill(p, List.of("Oh, {player}! I've been looking for you!", "It's me, one of the ever-present AIDES to PROF. OAK.",
+						"PROF. OAK asked me to give you these. Here you go!", "{player} received the RUNNING SHOES!", "{player} switched shoes with the RUNNING SHOES.",
+						"Now you can run anywhere, faster than before! (TAB changes your speed.)", "Well, I'd better get back. PROF. OAK will be waiting.")));
+			});
+			return;
+		}
 		Npc boy = null;
-		for (Npc n : ((ServerLevel) p.level()).getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(24), n -> n.key().equals("pewter_city_p4"))) boy = n;
-		p.teleportTo(PEWTER_GYM_FRONT.x, PEWTER_GYM_FRONT.y, PEWTER_GYM_FRONT.z);
-		p.setYRot(180F);
-		p.setDeltaMovement(Vec3.ZERO);
-		if (boy != null) boy.teleportTo(PEWTER_GYM_FRONT.x + 1.4, PEWTER_GYM_FRONT.y, PEWTER_GYM_FRONT.z + 0.6);
-		dialogue(p, boy, "talk", List.of("You're a trainer, right? BROCK's looking for new challengers!", "Follow me!",
-				"If you have the right stuff, go take on BROCK!"));
+		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(24), n -> n.key().equals("pewter_city_p4"))) boy = n;
+		if (boy == null) {
+			p.teleportTo(PEWTER_GYM_FRONT.x, PEWTER_GYM_FRONT.y, PEWTER_GYM_FRONT.z);
+			dialogue(p, null, "talk", List.of("BROCK's looking for new challengers! Go and take him on at the GYM!"));
+			return;
+		}
+		Npc b = boy;
+		walkUp(p, boy, null, "", () -> dialogue(p, b, "guide", List.of("You're a trainer, right? BROCK's looking for new challengers!", "Follow me!")));
+	}
+
+	/**
+	 * The way from Pewter's east way out to the GYM's door, round the town's beds and lamps (found on John's map): the
+	 * boy walks it, you behind him.
+	 */
+	private static final double[][] PEWTER_TO_GYM = {{-751.5, 30, 306.5}, {-792.5, 30, 306.5}, {-792.5, 30, 290.5}, {-793.5, 30, 290.5}, {-793.5, 30, 289.5},
+			{-799.5, 30, 289.5}, {-799.5, 30, 296.5}, {-802.5, 30, 296.5}, {-802.5, 30, 297.5}, {-803.5, 30, 297.5}, {-803.5, 30, 299.5}, {-807.5, 30, 299.5}};
+
+	/** Someone walking you somewhere (Pewter's boy to the GYM): how far along the way they are. */
+	private static final class Escort {
+		final Npc npc;
+		final ServerPlayer player;
+		final double[][] path;
+		double along;
+		int ticks;
+
+		Escort(Npc npc, ServerPlayer player, double[][] path) {
+			this.npc = npc;
+			this.player = player;
+			this.path = path;
+		}
+	}
+
+	private static final Map<UUID, Escort> ESCORTS = new HashMap<>();
+	/** The boy's way home after (his home spot, and when). */
+	private static final Map<Npc, Integer> GOING_HOME = new HashMap<>();
+
+	/** A point the way along a path (and the way it heads there, as a yaw). */
+	private static double[] along(double[][] path, double s) {
+		double left = Math.max(0, s);
+		for (int i = 0; i + 1 < path.length; i++) {
+			double[] a = path[i], b = path[i + 1];
+			double len = Math.hypot(b[0] - a[0], b[2] - a[2]);
+			if (left <= len || i + 2 == path.length) {
+				double f = len == 0 ? 1 : Math.min(1, left / len);
+				return new double[] {a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, Math.toDegrees(Math.atan2(-(b[0] - a[0]), b[2] - a[2]))};
+			}
+			left -= len;
+		}
+		double[] e = path[path.length - 1];
+		return new double[] {e[0], e[1], e[2], 0};
+	}
+
+	private static double pathLength(double[][] path) {
+		double l = 0;
+		for (int i = 0; i + 1 < path.length; i++) l += Math.hypot(path[i + 1][0] - path[i][0], path[i + 1][2] - path[i][2]);
+		return l;
+	}
+
+	/** Each tick: the boy walks on along the way, you a step and a half behind him; at the GYM's door, his last word. */
+	private static void escorts() {
+		ESCORTS.entrySet().removeIf(en -> {
+			Escort e = en.getValue();
+			ServerPlayer p = e.player;
+			if (e.npc.isRemoved() || p.isRemoved() || p.hasDisconnected() || e.npc.level() != p.level()) {
+				BUSY.remove(p.getUUID());
+				return true;
+			}
+			double total = pathLength(e.path);
+			e.along = Math.min(total, e.along + 0.2);
+			e.ticks++;
+			double[] at = along(e.path, e.along), me = along(e.path, e.along - 1.5);
+			e.npc.getNavigation().stop();
+			e.npc.teleportTo(at[0], at[1], at[2]);
+			e.npc.setFacing((float) at[3]);
+			p.teleportTo(me[0], me[1], me[2]);
+			p.setYRot((float) me[3]);
+			p.setDeltaMovement(Vec3.ZERO);
+			BUSY.put(p.getUUID(), 40);
+			CompoundTag hold = new CompoundTag();
+			hold.putInt("ticks", 8);
+			Net.send(p, "hold", hold);
+			if (e.along < total && e.ticks < 900) return false;
+			e.npc.setFacing(e.npc.yawTo(p));
+			BUSY.remove(p.getUUID());
+			dialogue(p, e.npc, "talk", List.of("If you have the right stuff, go take on BROCK!"));
+			GOING_HOME.put(e.npc, 160);
+			return true;
+		});
+		GOING_HOME.entrySet().removeIf(en -> {
+			Npc n = en.getKey();
+			if (n.isRemoved()) return true;
+			if (n.talker != null) return false;
+			int t = en.getValue() - 1;
+			en.setValue(t);
+			if (t > 0) return false;
+			int[] home = spotOf(n.key());
+			if (home != null && n.level() instanceof ServerLevel lv) {
+				BlockPos at = spot(lv, home[0], home[1], 6);
+				n.teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+				n.rehome(at);
+			}
+			return true;
+		});
+	}
+
+	/** Mt. Moon's POKéMON CENTER (Route 4): the man selling a MAGIKARP for ¥500, once (FireRed's). */
+	private static void magikarpMan(ServerPlayer p, Npc n, PlayerData d) {
+		if (d.statics.contains("magikarp_gift")) {
+			dialogue(p, n, "talk", List.of("MAN: Well, I don't give refunds!"));
+			return;
+		}
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
+		t.put("choices", ch);
+		dialogue(p, n, "magikarp", List.of("MAN: Hello, there! Have I got a deal just for you!", "I'll let you have a secret POKéMON - a MAGIKARP - for just ¥500!",
+				"So, you'll buy it, am I right?"), t, n.getId());
+	}
+
+	private static void magikarpSale(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (d.statics.contains("magikarp_gift")) return;
+		if (!yes) {
+			dialogue(p, n, "talk", List.of("MAN: No? I'm only doing this as a favor to you!"));
+			return;
+		}
+		if (d.money < 500) {
+			dialogue(p, n, "talk", List.of("MAN: You'll need more money than that!"));
+			return;
+		}
+		Trainers.Static st = Trainers.STATICS.get("magikarp_gift");
+		d.money -= 500;
+		Mon m = new Mon(Species.get("magikarp"), st != null ? st.level() : 5, RNG);
+		boolean toBox = d.party.size() >= 6;
+		d.add(m);
+		d.statics.add("magikarp_gift");
+		d.seen.add("magikarp");
+		d.caught.add("magikarp");
+		sync(p);
+		CompoundTag s = new CompoundTag();
+		s.putString("sound", "caught");
+		Net.send(p, "sound", s);
+		List<String> lines = new ArrayList<>(List.of(player(p) + " paid an outrageous ¥500 and bought the MAGIKARP!"));
+		if (toBox) lines.add("MAGIKARP was sent to BILL's PC.");
+		message(p, lines);
+		askNickname(p, toBox ? "box" : "party", toBox ? d.box.size() - 1 : d.party.size() - 1);
+	}
+
+	/** Route 4's two BLACK BELTs (FireRed's move tutors): MEGA PUNCH and MEGA KICK, each taught once. */
+	private static void tutor(ServerPlayer p, Npc n, PlayerData d) {
+		String move = n.key().endsWith("punch") ? "mega_punch" : "mega_kick", name = move.equals("mega_punch") ? "MEGA PUNCH" : "MEGA KICK";
+		if (d.statics.contains("tutor:" + move)) {
+			dialogue(p, n, "talk", List.of("Hah! You've learned " + name + "! Use it well!"));
+			return;
+		}
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (Mon m : d.party) ch.add(StringTag.valueOf(m.name()));
+		ch.add(StringTag.valueOf("CANCEL"));
+		t.put("choices", ch);
+		t.putString("move", move);
+		dialogue(p, n, "tutor", List.of("Hiyah! My " + name + " is the stuff of legend! I'll teach it to one POKéMON, just once!", "Which POKéMON should learn " + name + "?"), t,
+				n.getId());
+	}
+
+	private static void tutorChoice(ServerPlayer p, Npc n, CompoundTag t) {
+		PlayerData d = data(p);
+		String move = t.getStringOr("move", "");
+		int i = t.getIntOr("choice", -1);
+		if (!t.getBooleanOr("answered", false) || Move.find(move) == null || i < 0 || i >= d.party.size() || d.statics.contains("tutor:" + move)) return;
+		Mon m = d.party.get(i);
+		if (!m.species.canLearnByMachine(move)) {
+			dialogue(p, n, "talk", List.of(m.name() + " can't learn " + Move.get(move).name() + "."));
+			return;
+		}
+		if (m.moves.contains(move)) {
+			dialogue(p, n, "talk", List.of(m.name() + " already knows " + Move.get(move).name() + "!"));
+			return;
+		}
+		d.statics.add("tutor:" + move);
+		sync(p);
+		offerMove(p, i, move);
+	}
+
+	/**
+	 * Mt. Moon's two fossils (B2F, FireRed's): SUPER NERD MIGUEL won't let you near them until you've beaten him; then you
+	 * choose one and he keeps the other.
+	 */
+	private static void fossil(ServerPlayer p, WorldMon w, String key) {
+		PlayerData d = data(p);
+		if (!d.beaten.contains("mt_moon_b2f_0")) {
+			dialogue(p, null, "talk", List.of("SUPER NERD: Hey, stop! I found these fossils! They're both mine!"), new CompoundTag(), w.getId());
+			return;
+		}
+		String name = key.contains("dome") ? "DOME FOSSIL" : "HELIX FOSSIL";
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
+		t.put("choices", ch);
+		t.putString("key", key);
+		dialogue(p, null, "fossil", List.of("You want the " + name + "?"), t, w.getId());
+	}
+
+	private static void fossilChoice(ServerPlayer p, CompoundTag t, boolean yes) {
+		PlayerData d = data(p);
+		String key = t.getStringOr("key", "");
+		if (!yes || !key.contains("fossil") || d.statics.contains("item:mt_moon_b2f_dome_fossil") || d.statics.contains("item:mt_moon_b2f_helix_fossil")) return;
+		String item = key.contains("dome") ? "dome_fossil" : "helix_fossil", other = key.contains("dome") ? "mt_moon_b2f_helix_fossil" : "mt_moon_b2f_dome_fossil";
+		d.statics.add("item:" + key);
+		d.statics.add("item:" + other);
+		d.give(item, 1);
+		sync(p);
+		for (WorldMon w : ((ServerLevel) p.level()).getEntitiesOfClass(WorldMon.class, p.getBoundingBox().inflate(16),
+				w -> w.key().equals("item:" + key) || w.key().equals("item:" + other))) w.discard();
+		CompoundTag s = new CompoundTag();
+		s.putString("sound", "item");
+		Net.send(p, "sound", s);
+		message(p, List.of(player(p) + " got the " + (item.startsWith("dome") ? "DOME FOSSIL" : "HELIX FOSSIL") + "!", "SUPER NERD: All right. Then this one is mine!"));
 	}
 
 	/** Route 1's clerk, Route 2's AIDE and Route 2's TRADER (see talk). */
@@ -2570,7 +2843,8 @@ public final class Game {
 		CompoundTag t = new CompoundTag();
 		t.putString("cry", w.species());
 		if (key.startsWith("item:")) {
-			pickUp(p, w, key.substring(5));
+			if (key.contains("_fossil")) fossil(p, w, key.substring(5));
+			else pickUp(p, w, key.substring(5));
 			return;
 		}
 		if (key.startsWith("follow:")) {
@@ -2705,6 +2979,19 @@ public final class Game {
 			}
 			case "parcel" -> rivalAfterParcel(p);
 			case "museum_fee" -> museumFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "guide" -> {
+				// "Follow me!": he walks you to the GYM (14:18).
+				if (n != null && !ESCORTS.containsKey(p.getUUID())) {
+					ESCORTS.put(p.getUUID(), new Escort(n, p, PEWTER_TO_GYM));
+					BUSY.put(p.getUUID(), 40);
+				}
+			}
+			case "aide_shoes" -> {
+				if (n != null && n.key().equals("pewter_city_aide")) n.discard();
+			}
+			case "magikarp" -> magikarpSale(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "tutor" -> tutorChoice(p, n, t);
+			case "fossil" -> fossilChoice(p, t, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "gate_choice" -> {
 				int c = t.getIntOr("choice", -1);
 				if (c == 0) Interiors.outThrough(p, "route28");
@@ -3303,7 +3590,14 @@ public final class Game {
 			// doors): the girl who says CLEFAIRY came from the moon, the man by the museum, the man below the Center, the
 			// boy in the rose garden, the boy at the way east who takes you to the GYM.
 			{"pewter_city_p0", -824, 295}, {"pewter_city_p2", -770, 299}, {"pewter_city_p1", -794, 321}, {"pewter_city_p3", -770, 320},
-			{"pewter_city_p4", -752, 306}};
+			{"pewter_city_p4", -752, 306},
+			// Routes 3 and 4 (13:56), where FireRed has them (x = 2c - 748, z = 2r + 285 on Route 3; x = 2c - 628, z = 2r + 246
+			// on Route 4): the youngster resting by the way up to MT. MOON; the woman by the POKéMON CENTER, the boy below it,
+			// the two BLACK BELTs who teach MEGA PUNCH and MEGA KICK.
+			{"route_3_p0", -608, 311}, {"route_4_p0", -610, 263}, {"route_4_boy", -598, 275}, {"route_4_tutor_punch", -534, 252}, {"route_4_tutor_kick", -528, 252}};
+	/** Trainers who stand somewhere on John's map other than where the games' grid puts them (Routes 3 and 4, FireRed's). */
+	private static final Object[][] TRAINER_SPOTS = {{"route_3_0", -722, 299}, {"route_3_1", -714, 293}, {"route_3_2", -710, 303}, {"route_3_3", -698, 293},
+			{"route_3_4", -688, 291}, {"route_3_5", -690, 305}, {"route_3_6", -684, 297}, {"route_3_7", -668, 307}, {"route_4_0", -478, 252}};
 	private static final String SPOTS_DONE = "spot6:";
 	/**
 	 * Item balls that lie somewhere on John's map other than where the games' grid puts them (FireRed's, on routes Red
@@ -3312,8 +3606,17 @@ public final class Game {
 	 * row in field_items.tsv), then x, y and z.
 	 */
 	private static final Object[][] ITEM_SPOTS = {{"route_2_parlyz_heal", -779.0, 26.0, 472.0},
-			// Viridian City's POTION: in the fenced corner at the top left, where FireRed has it behind its CUT tree.
-			{"viridian_city_potion", -802.5, 25.0, 516.5}};
+			// Viridian City's POTION: in the fenced corner at the top left, where FireRed has it behind its CUT tree; on the
+			// path between the white fences, where you can get to it (14:15).
+			{"viridian_city_potion", -804.5, 25.0, 514.5},
+			// Route 2's ETHER (14:18): on the east lane below its gate, as FireRed has it (not on the posts and wall by the gate).
+			{"route_2_i0", -779.5, 27.0, 452.5},
+			// Routes 3 and 4 (13:56): FireRed's ORAN BERRY; its GREAT BALL by the tutors, PERSIM BERRY by the CENTER, RAZZ
+			// BERRY and TM05 (ROAR) further east.
+			{"route_3_oran_berry", -695.5, 30.0, 303.5}, {"route_4_great_ball", -536.5, 34.0, 252.5}, {"route_4_persim_berry", -617.5, 35.0, 254.5},
+			{"route_4_razz_berry", -493.5, 32.0, 280.5}, {"route_4_i0", -493.5, 34.0, 256.5}};
+	/** Item balls the games' grid put down that aren't there in FireRed (taken away again where they lie). */
+	private static final String[] GONE_ITEMS = {"route_2_i1"};
 	/**
 	 * Signs on John's map whose words aren't the place's own (the games' grid would read out another of its signs):
 	 * the west block of each (x, z), and its words. Diglett's Cave's, by its mouth on Route 2 and by its mouth on Route 11.
@@ -3321,7 +3624,22 @@ public final class Game {
 	private static final Object[][] SIGN_SPOTS = {{-788, 369, List.of("DIGLETT's CAVE")}, {-297, 581, List.of("DIGLETT's CAVE")},
 			// Pewter City's: its own sign on the rose garden's fence, and the TRAINER TIPS by the Center.
 			{-777, 317, List.of("PEWTER CITY", "A Stone Gray City")},
-			{-798, 326, List.of("TRAINER TIPS", "Any POKéMON that takes part in battle, however short, earns EXP!")}};
+			{-798, 326, List.of("TRAINER TIPS", "Any POKéMON that takes part in battle, however short, earns EXP!")},
+			// Route 3's and Route 4's (13:56).
+			{-604, 308, List.of("ROUTE 3", "MT. MOON AHEAD")}, {-593, 260, List.of("MT. MOON", "Tunnel Entrance")},
+			{-550, 260, List.of("ROUTE 4", "MT. MOON - CERULEAN CITY")}};
+
+	/** Where a trainer in TRAINER_SPOTS stands (x, z), or null. */
+	private static int[] trainerSpot(String key) {
+		for (Object[] o : TRAINER_SPOTS) if (o[0].equals(key)) return new int[] {(Integer) o[1], (Integer) o[2]};
+		return null;
+	}
+
+	/** Whether an item ball lies at a spot of its own (ITEM_SPOTS). */
+	private static boolean itemSpot(String key) {
+		for (Object[] o : ITEM_SPOTS) if (o[0].equals(key)) return true;
+		return false;
+	}
 
 	/** Where someone in SPOTS stands (x, z), or null. */
 	private static int[] spotOf(String key) {
@@ -3413,13 +3731,29 @@ public final class Game {
 		}
 		// Those in ITEM_SPOTS: put down once per save, where their part of the map is loaded (unless picked up already).
 		for (Object[] o : ITEM_SPOTS) {
-			String key = (String) o[0], doneKey = "itemspot1:" + key;
+			String key = (String) o[0], doneKey = "itemspot2:" + key;
 			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
 			if (done.contains(doneKey) || !Trainers.FIELD_ITEMS.containsKey(key)) continue;
 			if (!level.hasChunkAt(BlockPos.containing(x, y, z))) continue;
-			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 8, y - 8, z - 8, x + 8, y + 8, z + 8);
+			// (A copy the grid put down somewhere else, as on Route 2 by its gate: taken away; 14:18.)
+			net.minecraft.world.phys.AABB wide = new net.minecraft.world.phys.AABB(x - 120, level.getMinY(), z - 120, x + 120, level.getMaxY(), z + 120);
+			for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, wide, w -> ("item:" + key).equals(w.key()) && w.distanceToSqr(x, y, z) > 9)) w.discard();
+			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 3, y - 3, z - 3, x + 3, y + 3, z + 3);
 			boolean there = !level.getEntitiesOfClass(WorldMon.class, box, w -> ("item:" + key).equals(w.key())).isEmpty();
 			if (!there && !takenByAnyone("item:" + key)) placeMon(level, "poke_ball", "item:" + key, x, y, z, 0F);
+			placed.add(doneKey);
+			done.add(doneKey);
+			changed = true;
+		}
+		for (String key : GONE_ITEMS) {
+			String doneKey = "itemgone1:" + key;
+			Trainers.FieldItem fi = Trainers.FIELD_ITEMS.get(key);
+			Zone gz = null;
+			if (fi != null) for (Zone zz : zones) if (zz.place().equals(fi.place())) gz = zz;
+			if (done.contains(doneKey) || gz == null) continue;
+			if (!level.hasChunkAt(new BlockPos(gz.x1(), START_Y, gz.z1())) || !level.hasChunkAt(new BlockPos(gz.x2(), START_Y, gz.z2()))) continue;
+			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(gz.x1() - 4, level.getMinY(), gz.z1() - 4, gz.x2() + 4, level.getMaxY(), gz.z2() + 4);
+			for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> ("item:" + key).equals(w.key()))) w.discard();
 			placed.add(doneKey);
 			done.add(doneKey);
 			changed = true;
@@ -3465,7 +3799,9 @@ public final class Game {
 		}
 		int count = 0;
 		for (Trainers.Trainer t : Trainers.in(place)) {
-			BlockPos at = gameSpot(level, z, size, Trainers.POS.get(t.key()));
+			int[] own = trainerSpot(t.key());
+			BlockPos at = own != null ? (level.hasChunkAt(new BlockPos(own[0], START_Y, own[1])) ? spot(level, own[0], own[1], 4) : null)
+					: gameSpot(level, z, size, Trainers.POS.get(t.key()));
 			if (at == null || present.contains(t.key())) continue;
 			place(level, t.leader() ? Npc.LEADER : Npc.TRAINER, t.key(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yawOf(t.facing(), 0F));
 			count++;
@@ -3487,7 +3823,7 @@ public final class Game {
 			count++;
 		}
 		for (Trainers.FieldItem fi : Trainers.itemsIn(place)) {
-			if (present.contains("item:" + fi.key()) || takenByAnyone("item:" + fi.key())) continue;
+			if (present.contains("item:" + fi.key()) || takenByAnyone("item:" + fi.key()) || itemSpot(fi.key()) || java.util.Arrays.asList(GONE_ITEMS).contains(fi.key())) continue;
 			BlockPos at = gameSpot(level, z, size, new int[] {fi.x(), fi.y()});
 			if (at == null) continue;
 			placeMon(level, "poke_ball", "item:" + fi.key(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
@@ -3530,10 +3866,26 @@ public final class Game {
 		n.setPos(x, y, z);
 		n.setFacing(facing);
 		Trainers.Trainer t = Trainers.get(key);
-		n.setCustomName(net.minecraft.network.chat.Component.literal(t != null ? t.title() : Npc.ROLES[role].toUpperCase()));
+		Trainers.Person who = t == null ? Trainers.PEOPLE.get(key) : null;
+		n.setCustomName(net.minecraft.network.chat.Component.literal(t != null ? t.title() : who != null ? title(who.sprite()) : Npc.ROLES[role].toUpperCase()));
 		n.setCustomNameVisible(false);
 		level.addFreshEntity(n);
 		return n;
+	}
+
+	/** What someone's called from what they look like (a youngster: YOUNGSTER; a cooltrainer_f: LASS), as the games label them. */
+	static String title(String sprite) {
+		String s = sprite == null ? "" : sprite.replaceAll("_\\d+$", "").replaceAll("_[fm]2?$", "");
+		return switch (s) {
+			case "cooltrainer" -> sprite.contains("_f") ? "LASS" : "COOLTRAINER";
+			case "little_boy" -> "BOY";
+			case "little_girl" -> "GIRL";
+			case "middle_aged_man", "balding_guy", "gentleman" -> "MAN";
+			case "middle_aged_woman", "lady" -> "WOMAN";
+			case "old_man", "gramps", "grandad" -> "OLD MAN";
+			case "" -> "PERSON";
+			default -> s.replace('_', ' ').toUpperCase();
+		};
 	}
 
 	public static WorldMon placeMon(ServerLevel level, String species, String key, double x, double y, double z, float facing) {

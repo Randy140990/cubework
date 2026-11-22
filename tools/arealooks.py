@@ -14,12 +14,24 @@ PALLET = (-845, 655, -745, 735, "Pallet Town")
 VIRIDIAN = (-830, 495, -745, 589, "Viridian City")
 ROUTE2 = (-830, 340, -745, 494, "Route 2")
 ROUTE22 = (-1000, 495, -831, 600, "Route 22")
+ROUTE3 = (-740, 285, -580, 332, "Route 3")
+ROUTE4 = (-628, 238, -410, 284, "Route 4")
 PEWTER = (-850, 255, -741, 339, "Pewter City")
 # Pewter's two houses and Route 2's trade house (13:18): John's one design.
 PEWTER_HOUSES = [(-778, 278, -763, 291, "Pewter's house by the Museum"), (-827, 316, -812, 329, "Pewter's house by the Center"),
                  (-791, 379, -777, 392, "Route 2's trade house")]
 HOUSE_P = ("block/deepslate_tiles=pewter_roof,block/pale_oak_planks=pewter_wall")
 MUSEUM = (-820, 265, -777, 282, "Pewter Museum of Science")
+# (14:15) All of Kanto (John's map east of the Route 28 Gate): the fences' log posts, the lanterns, the hidden glowstone,
+# the lamps' sun catchers.
+KANTO = (-1010, 100, 60, 1060, "Kanto")
+VIRIDIAN_HOUSES = (-792, 521, -779, 546, "Viridian's green houses")
+FENCE_WOOD = "block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail"
+PLAMP = ("block/tuff=plamp_post,block/polished_tuff=plamp_post,block/chiseled_tuff_bricks=plamp_chiseled_tuff_bricks,"
+         "block/chiseled_tuff_bricks_top=plamp_chiseled_tuff_bricks_top,block/gray_wool=plamp_cap,block/redstone_lamp=plamp_globe,"
+         "block/redstone_lamp_on=plamp_globe")
+TRIM = "block/polished_diorite=house_trim"
+STEPS = "block/polished_andesite=house_stone,block/cobblestone=house_stone,block/andesite=house_stone"
 PAVE = ("block/white_concrete=pewter_pave_white,block/quartz_block_bottom=pave_quartz,block/white_terracotta=pave_terracotta,"
         "block/chiseled_quartz_block_top=pave_chiseled,block/chiseled_quartz_block=pave_chiseled_side,block/light_gray_concrete=pave_gray").replace("pewter_pave_white", "pave_white")
 
@@ -59,7 +71,7 @@ def main():
         add("swap", "pale_oak_fence", a, FENCE)
     add("roof", "acacia_stairs", (-806, 673, -795, 682, "your house"))
     add("roof", "acacia_stairs", (-788, 673, -777, 682, "Blue's house"))
-    for a in (PALLET_R1, VIRIDIAN, ROUTE2, ROUTE22):
+    for a in (PALLET_R1, VIRIDIAN, ROUTE2, ROUTE22, ROUTE3, ROUTE4):
         add("sign", "pale_oak_shelf,pale_oak_sign", a)
     for a in (PALLET_R1, VIRIDIAN, ROUTE2, ROUTE22, PEWTER):
         add("wood_sign", "spruce_sign", a)
@@ -70,8 +82,28 @@ def main():
     add("swap", "pale_oak_stairs,pale_oak_slab", VIRIDIAN, "block/pale_oak_planks=window_frame")
     add("swap", "calcite,diorite,polished_diorite", VIRIDIAN, PATH, ("24", "25"))
     add("kerb", "calcite,diorite,polished_diorite", VIRIDIAN, "-", ("24", "25"))
-    for a in (VIRIDIAN, ROUTE22, PEWTER):
+    for a in (VIRIDIAN, ROUTE22, ROUTE2):
         add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet", a, LAMP)
+    # Pewter's own lamps (14:15): grey metal, a frosted globe.
+    add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,redstone_lamp", PEWTER, PLAMP)
+    # All Kanto (14:15, 14:18): the lamps' sun catchers solar panels; the fences' log posts and rails solid wood (a fence,
+    # not trees); John's lanterns on the fences and over the paths garden lights; the glowstone he hid under carpets as
+    # the carpet, so it doesn't show through the windows.
+    add("swap", "daylight_detector", KANTO, "block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side")
+    add("swap", "spruce_log,spruce_fence", KANTO, FENCE_WOOD)
+    add("swap", "lantern", KANTO, "block/lantern=garden_light")
+    add("swap", "glowstone", KANTO, "block/glowstone=glow_hidden")
+    # Pallet's little wooden sign by the flower garden (an oak sign) as the wooden sign (14:18).
+    add("wood_sign", "oak_sign", PALLET)
+    # Viridian's green houses (14:15): the chimney painted brick, the warped shelf on the ridge and the chimney's top solid
+    # green, the birch shelves round the foot one solid wood (their shelf kept), the steps in as Pallet's, the trim too.
+    add("swap", "mud_bricks,mud_brick_stairs,mud_brick_slab", VIRIDIAN_HOUSES, "block/mud_bricks=chimney_brick")
+    add("swap", "warped_shelf", VIRIDIAN_HOUSES, "block/warped_shelf=green_shelf")
+    add("swap", "stripped_warped_hyphae,stripped_warped_stem", VIRIDIAN_HOUSES, "block/stripped_warped_stem=green_solid,block/stripped_warped_stem_top=green_solid_top")
+    add("swap", "birch_shelf", VIRIDIAN_HOUSES, "block/birch_shelf=wood_shelf")
+    add("swap", "polished_andesite_slab,polished_andesite_stairs,polished_andesite", VIRIDIAN_HOUSES, STEPS)
+    add("swap", "polished_diorite_stairs,polished_diorite_slab", VIRIDIAN_HOUSES, TRIM)
+    add("swap", "polished_deepslate_wall", VIRIDIAN_HOUSES, "block/polished_deepslate=drainpipe")
     # Pewter City (13:18). Its town sign (the standing pale oak shelves: not the Museum's, higher up) as HeartGold's
     # sign; its oak shelf sign (TRAINER TIPS) as our wooden sign; the flower beds' sides (pale oak trapdoors, y 31) a
     # white planter; the paving (y 29) each block a paving stone of its own colour, as laid.
@@ -82,6 +114,10 @@ def main():
     # The houses: the roof metal, the walls solid, the stairs at the windows white frames, the trapdoors (y 33)
     # painted panels, the chimney solid.
     for h in PEWTER_HOUSES:
+        # (14:15) The steps in and the stone round the foot as Viridian's (Pallet's), the trim, the drainpipe.
+        add("swap", "cobblestone,polished_andesite_slab", h, STEPS, ("29", "31"))
+        add("swap", "polished_diorite_slab,polished_diorite_stairs", h, TRIM, ("30", "38"))
+        add("swap", "polished_deepslate_wall", h, "block/polished_deepslate=drainpipe", ("29", "38"))
         add("swap", "deepslate_tile_slab,pale_oak_planks", h, HOUSE_P, ("30", "38"))
         add("swap", "pale_oak_stairs,pale_oak_slab", h, "block/pale_oak_planks=window_frame", ("30", "38"))
         add("swap", "pale_oak_trapdoor", h, "block/pale_oak_trapdoor=pewter_shutter", ("33", "38"))
@@ -92,6 +128,11 @@ def main():
     add("swap", "purpur_slab", MUSEUM, "block/purpur_block=museum_roof_flat", ("31", "47"))
     add("swap", "crimson_slab", MUSEUM, "block/crimson_planks=museum_roof_dark", ("31", "47"))
     add("swap", "white_terracotta", MUSEUM, "block/white_terracotta=museum_wall", ("31", "47"))
+    # (14:15) Its stone and diorite slabs and its trim a solid light grey; the six little flowering trees out front kept
+    # flowery, as the mod's own.
+    add("swap", "polished_andesite_slab,smooth_stone,polished_diorite_slab,polished_diorite_stairs", MUSEUM,
+        "block/polished_andesite=museum_trim,block/smooth_stone=museum_trim,block/polished_diorite=museum_trim", ("31", "47"))
+    add("swap", "flowering_azalea_leaves", (-818, 277, -787, 281, "the Museum's six little trees"), "block/flowering_azalea_leaves=flower_bush!", ("31", "34"))
     # Pallet Town's houses: pillars and steps, the dark parts round the underside, the trim across the front, the
     # drainpipe.
     for h in HOUSES:
@@ -108,6 +149,9 @@ def main():
     add("swap", "waxed_cut_copper_slab,cut_copper_slab", LAB, "block/cut_copper=lab_awning_red")
     add("swap", "oxidized_cut_copper_slab,waxed_oxidized_cut_copper_slab", LAB, "block/oxidized_cut_copper=lab_awning_door")
     add("swap", "bricks,brick_wall,brick_stairs", LAB, "block/bricks=lab_chimney")
+    # Its roof (14:15): light grey metal panels, the rim along its edge darker.
+    add("swap", "polished_andesite_slab,polished_andesite_stairs", LAB, "block/polished_andesite=lab_roof", ("25", "26"))
+    add("swap", "polished_blackstone_wall", LAB, "block/polished_blackstone=lab_roof_rim", ("25", "26"))
     # Every route gate on the map (the buildings with polished deepslate roofs, tools/area_gates.tsv).
     for line in open(os.path.join(HERE, "area_gates.tsv")):
         if not line.strip() or line.startswith("#"):
@@ -132,6 +176,10 @@ def main():
                 (x - 6, z - 10, x + 6, z, place + " Pokemon Center"), CENTER, (str(y - 1), str(y + 2)))
         else:
             add("swap", "blue_concrete,blue_wool,blue_carpet", (x - 6, z - 10, x + 6, z - 2, place + " Mart"), MART, (str(y - 5), str(y + 2)))
+        # (14:15) Its trim (diorite stairs and slabs) as Pallet's houses', its foot (polished diorite) solid, its own shade.
+        box = (x - 7, z - 11, x + 7, z + 1, place + (" Pokemon Center" if kind == "center" else " Mart"))
+        add("swap", "polished_diorite_stairs,polished_diorite_slab", box, TRIM, (str(y - 5), str(y + 3)))
+        add("swap", "polished_diorite", box, "block/polished_diorite=" + ("center_base" if kind == "center" else "mart_base"), (str(y - 5), str(y + 3)))
     # Every Gym's roof: its stairs in tan tiles, its planks and beams solid tan shades.
     for line in open(os.path.join(HERE, "area_gyms.tsv")):
         if not line.strip() or line.startswith("#"):
@@ -140,6 +188,8 @@ def main():
         box = (int(x0) - 1, int(z0) - 1, int(x1) + 1, int(z1) + 1, place + " Gym")
         add("roof_gym", "jungle_stairs,oak_stairs", box, "-", (y0, str(int(y1) + 1)))
         add("swap", "jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab", box, GYM, (y0, str(int(y1) + 1)))
+        # (14:15) Its diorite trim as the houses'.
+        add("swap", "polished_diorite_stairs,polished_diorite_slab,polished_diorite", (box[0] - 1, box[1] - 1, box[2] + 1, box[3] + 1, box[4]), TRIM)
     # Diglett's Cave's sign by its mouth on Route 11 (east of Vermilion City), as HeartGold's (Route 2's is in Route 2's).
     add("sign", "pale_oak_shelf,pale_oak_sign", (-300, 578, -293, 584, "Diglett's Cave's sign on Route 11"))
     # Viridian Forest (John's, built in the interiors at x 4096, the floor at y 64: tools/forest.py): its shelf signs
@@ -153,15 +203,32 @@ def main():
     # (coarse dirt, packed mud for the paler patches, dirt) FireRed's brown, patchy, laid over four blocks so it doesn't
     # repeat; the entrances' sand (and the sandstone at their doorways) a pale sandy floor; the rocks (tuff,
     # cobblestone, their slabs, andesite slabs) round boulders.
-    CAVE = ("block/dripstone_block=cave_wall_top|cave_wall_side,block/brown_mushroom_block=cave_wall_top|cave_wall_side,"
-            "block/mushroom_block_inside=cave_wall_top|cave_wall_side")
-    CAVE_FLOOR = ("block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor_patch@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,"
-                  "block/smooth_sandstone=cave_sand@4,block/sandstone_top=cave_sand@4,block/mud=cave_floor@4")
+    CAVE = ("block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,"
+            "block/mushroom_block_inside=cave_rock_top|cave_rock@4")
+    CAVE_FLOOR = ("block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,"
+                  "block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4")
+    UNDER = "coarse_dirt=cave_floor@4,packed_mud=cave_floor@4,dirt=cave_floor@4,mud=cave_floor@4,sand=cave_sand@4,smooth_sandstone=cave_sand@4"
     for ox, w, d, note in ((4352, 20, 16, "Diglett's Cave north entrance"), (4608, 170, 160, "Diglett's Cave B1F"), (4864, 20, 16, "Diglett's Cave south entrance")):
         box = (ox - 1, -1, ox + w, d, note)
         room("swap", "dripstone_block,brown_mushroom_block", box, CAVE)
         room("swap", "coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud", box, CAVE_FLOOR)
-        room("boulder", "tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab", box)
+        room("sand_edge", "coarse_dirt,packed_mud,dirt,mud", box)
+        room("swap", "white_concrete", box, "block/white_concrete=cave_daylight!")
+        room("boulder", "tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab", box, "prefix:boulder," + UNDER)
+    # Mt. Moon (13:56, tools/mtmoon.py), as FireRed's: grey brown rock (the dripstone, its tops the white terracotta John
+    # capped it with), a pale grey floor (andesite; tuff and gravel its darker patches), the sand soft at its edges, its
+    # rocks (granite) grey boulders, a mat at the way out with daylight beyond, the sign as HeartGold's.
+    MOON = "block/dripstone_block=moon_rock_top|moon_rock@4,block/white_terracotta=moon_rock_top|moon_rock@4"
+    MOON_FLOOR = ("block/andesite=moon_floor@4,block/tuff=moon_gravel@4,block/gravel=moon_gravel@4,block/sand=cave_sand@4,"
+                  "block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2")
+    for ox, w, d, note in ((5120, 104, 90, "Mt. Moon 1F"), (5376, 106, 86, "Mt. Moon B1F"), (5632, 106, 90, "Mt. Moon B2F")):
+        box = (ox - 1, -1, ox + w, d, note)
+        room("swap", "dripstone_block,white_terracotta", box, MOON)
+        room("swap", "andesite,tuff,gravel,sand,smooth_sandstone", box, MOON_FLOOR)
+        room("sand_edge", "andesite,tuff,gravel", box)
+        room("swap", "white_concrete", box, "block/white_concrete=cave_daylight!")
+        room("boulder", "granite,polished_granite,granite_slab,polished_granite_slab", box, "prefix:mboulder,andesite=moon_floor@4,tuff=moon_gravel@4,gravel=moon_gravel@4,sand=cave_sand@4")
+        room("sign", "pale_oak_shelf", box)
     for x0, z0, x1, z1, note in ((22, 23, 41, 42, "Viridian Forest's north gatehouse"), (54, 138, 73, 157, "Viridian Forest's south gatehouse")):
         room("swap", GATE_BLOCKS, forest(x0, z0, x1, z1, note), GATE, (str(fy - 2), str(fy + 16)))
     with open(OUT, "w") as f:

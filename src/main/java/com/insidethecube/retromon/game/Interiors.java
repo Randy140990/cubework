@@ -52,7 +52,8 @@ public final class Interiors {
 	 * A way out of a room. choice: the game asks you where to there (the Route 28 Gate's west way: ROUTE 28, or ROUTE
 	 * 26 and JOHTO); needs: what you must have to go through (a badge: the League gate's guard).
 	 */
-	public record Warp(String kind, double x0, double x1, double z0, double z1, String door, String to, double sx, double sz, float syaw, String choice, String needs) {}
+	public record Warp(String kind, double x0, double x1, double z0, double z1, String door, String to, double sx, double sz, float syaw, String choice, String needs,
+			double sy) {}
 
 	/** Someone in a room; role: "nurse" (heals), "clerk" (sells) or null (just talks). */
 	/**
@@ -60,13 +61,13 @@ public final class Interiors {
 	 * come in); from and to: the hours they're about (the Trainer School's, by day), or -1.
 	 */
 	public record Person(String key, String name, String skin, double x, double z, float yaw, List<String> lines, String role, boolean seated, String group,
-			int from, int to) {}
+			int from, int to, double y) {}
 
 	/** Something to look at in a room; map, a wall map that opens the Town Map. */
 	public record Act(double x0, double z0, double x1, double z1, List<String> lines, boolean map, boolean pc) {}
 
 	/** An item ball lying in a room (the forest's): its key in field_items.tsv, and where it lies. */
-	public record Ball(String key, double x, double z) {}
+	public record Ball(String key, double x, double z, double y) {}
 
 	/**
 	 * A room. A big one built in Minecraft's own blocks (the forest, from John's schematic) has schem (its blocks, a
@@ -116,7 +117,8 @@ public final class Interiors {
 	 * The rooms built in Minecraft's own blocks, each a file of its own beside rooms.json (tools/forest.py). (Before DATA:
 	 * the rooms are read as it's loaded.)
 	 */
-	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json", "/retromon/interiors/digletts_cave.json"};
+	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json", "/retromon/interiors/digletts_cave.json",
+			"/retromon/interiors/mt_moon.json"};
 
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */
@@ -230,7 +232,7 @@ public final class Interiors {
 				warps.add(new Warp(kind, x0, x1, z0, z1, w.has("door") && !w.get("door").isJsonNull() ? w.get("door").getAsString() : null,
 						w.has("to") && !w.get("to").isJsonNull() ? w.get("to").getAsString() : null, num(ws, "x", 0), num(ws, "z", 0), (float) num(ws, "yaw", 0),
 						w.has("choice") && !w.get("choice").isJsonNull() ? w.get("choice").getAsString() : null,
-						w.has("needs") && !w.get("needs").isJsonNull() ? w.get("needs").getAsString() : null));
+						w.has("needs") && !w.get("needs").isJsonNull() ? w.get("needs").getAsString() : null, num(ws, "y", 0)));
 			}
 			List<Person> people = new ArrayList<>();
 			for (JsonElement pe : r.getAsJsonArray("people")) {
@@ -238,7 +240,8 @@ public final class Interiors {
 				people.add(new Person(p.get("key").getAsString(), p.get("name").getAsString(), p.get("skin").getAsString(), num(p, "x", 0), num(p, "z", 0),
 						(float) num(p, "yaw", 0), strings(p.get("lines")), p.has("role") && !p.get("role").isJsonNull() ? p.get("role").getAsString() : null,
 						p.has("seated") && p.get("seated").getAsBoolean(), p.has("group") && !p.get("group").isJsonNull() ? p.get("group").getAsString() : null,
-						p.has("hours") ? p.getAsJsonArray("hours").get(0).getAsInt() : -1, p.has("hours") ? p.getAsJsonArray("hours").get(1).getAsInt() : -1));
+						p.has("hours") ? p.getAsJsonArray("hours").get(0).getAsInt() : -1, p.has("hours") ? p.getAsJsonArray("hours").get(1).getAsInt() : -1,
+						num(p, "y", 0)));
 			}
 			List<Act> acts = new ArrayList<>();
 			for (JsonElement ae : r.getAsJsonArray("acts")) {
@@ -255,7 +258,7 @@ public final class Interiors {
 			List<Ball> balls = new ArrayList<>();
 			if (r.has("items")) for (JsonElement be : r.getAsJsonArray("items")) {
 				JsonObject b = be.getAsJsonObject();
-				balls.add(new Ball(b.get("key").getAsString(), num(b, "x", 0), num(b, "z", 0)));
+				balls.add(new Ball(b.get("key").getAsString(), num(b, "x", 0), num(b, "z", 0), num(b, "y", 0)));
 			}
 			double[] tile = null;
 			if (r.has("tile") && r.get("tile").isJsonArray()) tile = new double[] {r.getAsJsonArray("tile").get(0).getAsDouble(), r.getAsJsonArray("tile").get(1).getAsDouble()};
@@ -518,8 +521,9 @@ public final class Interiors {
 			// Always night in there: no lamps, only faint unseen ones over the open ground (moonlight you can see by).
 			BlockState moon = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, MOONLIGHT);
 			for (double[] l : r.lights()) {
-				at.set(r.ox() + (int) l[0], r.oy() + 1, r.oz() + (int) l[1]);
-				if (level.getBlockState(at).isAir()) level.setBlock(at, moon, Block.UPDATE_CLIENTS);
+				at.set(r.ox() + (int) l[0], r.oy() + 1 + (l.length > 3 ? (int) l[3] : 0), r.oz() + (int) l[1]);
+				BlockState lamp = l.length > 2 ? Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, (int) l[2]) : moon;
+				if (level.getBlockState(at).isAir()) level.setBlock(at, lamp, Block.UPDATE_CLIENTS);
 			}
 		} else {
 			// Light: unseen lamps over the room, so it's bright inside by day and night.
@@ -542,7 +546,7 @@ public final class Interiors {
 	private static final int MOONLIGHT = 6;
 
 	private static void ball(ServerLevel level, Room r, Ball b) {
-		Game.placeMon(level, "poke_ball", "item:" + b.key(), r.ox() + b.x(), r.oy(), r.oz() + b.z(), 0F);
+		Game.placeMon(level, "poke_ball", "item:" + b.key(), r.ox() + b.x(), r.oy() + b.y(), r.oz() + b.z(), 0F);
 	}
 
 	/**
@@ -622,13 +626,41 @@ public final class Interiors {
 		int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : "trainer".equals(p.role()) ? Npc.TRAINER
 				: "leader".equals(p.role()) ? Npc.LEADER : Npc.PERSON;
 		try {
-			Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
+			Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy() + p.y(), r.oz() + p.z(), p.yaw());
 			if (n != null) {
 				n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));
 				if (p.seated()) n.setSeated(true);
 			}
 		} catch (Exception e) {
 			Retromon.LOG.error("Retromon: couldn't place {} in {}", p.key(), r.id(), e);
+		}
+	}
+
+	/** Where the Center's visitors stand: the room's own two, and one more by the tables (Mt. Moon's MAGIKARP man). */
+	private static final double[][] CENTER_EXTRA = {{11.6, 6.2, 270}};
+	/** The Centers whose people go by another name than their town's (Mt. Moon's is on Route 4, Rock Tunnel's on Route 10). */
+	private static final Map<String, String> CENTER_OF = Map.of("route_4", "mt_moon", "route_10", "rock_tunnel");
+
+	private static void centerVisitors(ServerLevel level, Room r, ServerPlayer comer) {
+		String place = placeFor(comer, r);
+		if (place == null) place = r.place();
+		String town = CENTER_OF.getOrDefault(place, place.replaceAll("_(city|town|island)$", ""));
+		List<Trainers.Person> visitors = Trainers.peopleIn(town + "_pokecenter");
+		List<double[]> slots = new ArrayList<>();
+		for (Person p : r.people()) if (p.role() == null) slots.add(new double[] {p.x(), p.z(), p.yaw()});
+		slots.addAll(List.of(CENTER_EXTRA));
+		AABB box = around(r);
+		for (Npc n : level.getEntitiesOfClass(Npc.class, box, n -> n.role() == Npc.PERSON)) n.discard();
+		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> w.key().startsWith("pet:"))) w.discard();
+		if (visitors.isEmpty()) {
+			for (Person p : r.people()) if (p.role() == null) put(level, r, p);
+			return;
+		}
+		for (int i = 0; i < visitors.size() && i < slots.size(); i++) {
+			Trainers.Person v = visitors.get(i);
+			double[] at = slots.get(i);
+			if (v.species() != null) Game.placeMon(level, v.species(), "pet:" + v.key(), r.ox() + at[0], r.oy(), r.oz() + at[1], (float) at[2]);
+			else Game.place(level, Npc.PERSON, v.key(), r.ox() + at[0], r.oy(), r.oz() + at[1], (float) at[2]);
 		}
 	}
 
@@ -661,6 +693,22 @@ public final class Interiors {
 	public static void people(ServerLevel level, Room r, ServerPlayer comer) {
 		if (r == null) return;
 		boolean alone = level.players().stream().noneMatch(o -> o != comer && r.equals(roomOf(o)));
+		// The POKéMON CENTER every town shares: that town's own people in it (14:18), the nurse the same.
+		if (alone && r.id().equals("center")) centerVisitors(level, r, comer);
+		// Mt. Moon's mushrooms (B1F) grow back: one you picked on an earlier day is there again (13:56).
+		if (!r.balls().isEmpty()) {
+			PlayerData d = Game.data(comer);
+			long today = level.getServer().overworld().getDayTime() / 24000L;
+			for (Ball b : r.balls()) {
+				if (!b.key().contains("mushroom") || !d.statics.contains("item:" + b.key())) continue;
+				String picked = null;
+				for (String st : d.statics) if (st.startsWith("picked:" + b.key() + "=")) picked = st;
+				if (picked == null || !picked.endsWith("=" + today)) {
+					d.statics.remove("item:" + b.key());
+					if (picked != null) d.statics.remove(picked);
+				}
+			}
+		}
 		if (alone) {
 			Map<String, List<Person>> groups = new LinkedHashMap<>();
 			for (Person p : r.people()) if (p.group() != null) groups.computeIfAbsent(p.group(), g -> new ArrayList<>()).add(p);
@@ -735,6 +783,11 @@ public final class Interiors {
 
 	/** Into a room at a spot in it (room coordinates), facing yaw. With a fade, after the screen's gone black. */
 	public static boolean go(ServerPlayer p, Room r, double x, double z, float yaw, boolean fade) {
+		return go(p, r, x, 0, z, yaw, fade);
+	}
+
+	/** As go, standing that high above the room's floor (Mt. Moon's B2F has its upper level). */
+	public static boolean go(ServerPlayer p, Room r, double x, double y, double z, float yaw, boolean fade) {
 		MinecraftServer s = p.level().getServer();
 		ServerLevel level = ensure(s);
 		if (level == null || r == null) return false;
@@ -746,7 +799,7 @@ public final class Interiors {
 		Runnable move = () -> {
 			boolean fromOutside = p.level() != level;
 			if (fromOutside) Game.leavingLevel(p);
-			p.teleportTo(level, r.ox() + x, r.oy(), r.oz() + z, java.util.Set.of(), yaw, 30F, true);
+			p.teleportTo(level, r.ox() + x, r.oy() + y, r.oz() + z, java.util.Set.of(), yaw, 30F, true);
 			p.setDeltaMovement(Vec3.ZERO);
 			LAST.remove(p.getUUID());
 			Game.roomEntered(p, r, fromOutside);
@@ -908,14 +961,26 @@ public final class Interiors {
 						}
 					}
 					case "up" -> {
-						if (ly >= 1.45 && lx > w.x0() && lx < w.x1() && lz > w.z0() - 0.5 && lz < w.z1() + 0.5) {
-							go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
+						// (A cave's ladder: walk up to it and you're at the top, no climbing; 14:15.)
+						boolean cave = r.schem() != null;
+						double m = cave ? 0.45 : 0;
+						if ((ly >= 1.45 || cave && ly > -0.6) && lx > w.x0() - m && lx < w.x1() + m && lz > w.z0() - 0.5 && lz < w.z1() + 0.5) {
+							if (w.to() == null) {
+								// Up and out of the cave (Mt. Moon's way out onto Route 4).
+								Door d = doorOut(p, w.door());
+								if (d == null) continue;
+								out(p, d);
+								return true;
+							}
+							go(p, ROOMS.get(w.to()), w.sx(), w.sy(), w.sz(), w.syaw(), true);
 							return true;
 						}
 					}
 					case "down" -> {
-						if (ly <= -1.45) {
-							go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
+						// A hole with its own box (Mt. Moon's three on 1F): stepping into it, there; else (stairs) at the foot.
+						boolean box = w.z1() > w.z0();
+						if (box ? ly <= -0.4 && lx > w.x0() - 0.3 && lx < w.x1() + 0.3 && lz > w.z0() - 0.3 && lz < w.z1() + 0.3 : ly <= -1.45) {
+							go(p, ROOMS.get(w.to()), w.sx(), w.sy(), w.sz(), w.syaw(), true);
 							return true;
 						}
 					}

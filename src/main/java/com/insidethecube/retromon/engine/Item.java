@@ -37,7 +37,7 @@ public record Item(String id, String name, int price, String pocket) {
 	public int heal() {
 		return switch (id) {
 			case "potion", "berry_juice", "ragecandybar" -> 20;
-			case "berry" -> 10;
+			case "berry", "oran_berry" -> 10;
 			case "gold_berry" -> 30;
 			case "super_potion", "fresh_water", "energypowder" -> 50;
 			case "soda_pop" -> 60;
@@ -63,7 +63,8 @@ public record Item(String id, String name, int price, String pocket) {
 	}
 
 	public boolean curesConfusion() {
-		return id.equals("full_heal") || id.equals("full_restore") || id.equals("heal_powder") || id.equals("miracleberry") || id.equals("bitter_berry");
+		return id.equals("full_heal") || id.equals("full_restore") || id.equals("heal_powder") || id.equals("miracleberry") || id.equals("bitter_berry")
+				|| id.equals("persim_berry");
 	}
 
 	/** Revives a fainted Pokémon: the share of its HP it comes back with (0 for none). */
@@ -120,13 +121,13 @@ public record Item(String id, String name, int price, String pocket) {
 	/** Whether it can be used in battle (from the PACK). */
 	public boolean battleUse() {
 		return ball() || heal() > 0 || cures() != null || revives() > 0 || statBoost() >= 0 || id.equals("dire_hit") || id.equals("guard_spec")
-				|| id.equals("bitter_berry");
+				|| id.equals("bitter_berry") || id.equals("persim_berry");
 	}
 
 	/** Whether it's used on one of your Pokémon (out of battle). */
 	public boolean onPokemon() {
 		return teaches() || heal() > 0 || cures() != null || revives() > 0 || evolves() || id.equals("rare_candy") || vitamin() >= 0 || id.startsWith("ether")
-				|| id.startsWith("max_ether") || id.startsWith("elixer") || id.equals("max_elixer") || id.equals("pp_up") || id.equals("bitter_berry");
+				|| id.startsWith("max_ether") || id.startsWith("elixer") || id.equals("max_elixer") || id.equals("pp_up") || id.equals("bitter_berry") || id.equals("persim_berry");
 	}
 
 	/**

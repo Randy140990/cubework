@@ -3,27 +3,9 @@
  "ambientocclusion": true,
  "textures": {
   "rock": "retromon:block/area/cave_boulder",
-  "floor": "retromon:block/area/cave_floor_small",
   "particle": "retromon:block/area/cave_boulder"
  },
  "elements": [
-  {
-   "from": [
-    0,
-    0,
-    0
-   ],
-   "to": [
-    16,
-    0.5,
-    16
-   ],
-   "faces": {
-    "up": {
-     "texture": "#floor"
-    }
-   }
-  },
   {
    "from": [
     1.55,

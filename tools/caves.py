@@ -24,7 +24,7 @@ import schem  # noqa: E402
 
 RES = os.path.join(HERE, "..", "src", "main", "resources", "retromon", "interiors")
 VIEWER = os.path.join(HERE, "interior", "cave_data.js")
-SOFT = {"air", "ladder", "light"}
+SOFT = {"air", "ladder", "light"}  # (light: the daylight in the doorway)
 
 # The cave mouths in John's world: the doorway's blocks at its back (you walk north into it), and where you come out
 # (on the grass in front, facing south). Route 2's: stone brick pillars x -781 and -778, the dark back at z 365.
@@ -92,6 +92,14 @@ def main():
     rooms, viewer = {}, {}
     for rid, src, origin, floor, name, place, people in ROOMS:
         W, H, L, names = load(src)
+        if rid != "digletts_b1f":
+            # (The way out at the south, 14:15: daylight at the end of the doorway, so you don't walk off into the dark,
+            # and its light coming in.)
+            for x in (8, 9):
+                for y in (3, 4, 5):
+                    names[(y * L + 15) * W + x] = "minecraft:white_concrete"
+                names[(3 * L + 14) * W + x] = "minecraft:light[level=15,waterlogged=false]"
+                names[(4 * L + 12) * W + x] = "minecraft:light[level=11,waterlogged=false]"
 
         def base(x, y, z):
             if not (0 <= x < W and 0 <= y < H and 0 <= z < L): return "air"

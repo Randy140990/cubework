@@ -132,7 +132,7 @@ function prepareRoom(r) {
   for (const g of Object.values(groups)) { const keep = g[Math.floor(Math.random() * g.length)]; for (const n of g) if (n !== keep) out.add(n); }
   r.npcs = r.npcs.filter(n => !out.has(n));
   r.npcFigs = r.npcs.map(n => {
-    const f = makeFigure(n.look); f.root.position.set(n.x, 0, n.z); f.root.rotation.y = n.yaw; r.group.add(f.root);
+    const f = makeFigure(n.look); f.root.position.set(n.x, n.y || 0, n.z); f.root.rotation.y = n.yaw; r.group.add(f.root);
     poseFigure(f, { seated: n.seated });
     r.solid(n.x - 0.3, n.z - 0.3, n.x + 0.3, n.z + 0.3);
     r.act([n.x - 0.45, n.z - 0.45, n.x + 0.45, n.z + 0.45], { label: "Talk", npc: n });
@@ -191,6 +191,7 @@ function fitRoom(r) {
 let focus = null;
 function camGoal() {
   if (focus) return { x: (me.x + focus.x) / 2, y: 0.9, z: (me.z + focus.z) / 2, d: 13, p: TALK_PITCH };
+  if (scene.fog) { const far = cam.mode === "room" && cam.fit ? cam.fit.d * 2.2 : 34; scene.fog.near = cam.mode === "room" ? far * 0.6 : 6; scene.fog.far = far; }
   if (cam.mode === "room" && cam.fit) return { x: room.W / 2, y: room.outside ? 0 : 0.9, z: cam.fit.tz, d: cam.fit.d, p: PITCH };
   // The game's, inside: closer in than the whole room (seven tenths as far back, 15 at least), following you up and
   // down the room and across it when it's wider than the view, held in from the walls so the room fills the screen.

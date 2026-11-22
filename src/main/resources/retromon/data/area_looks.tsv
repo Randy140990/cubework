@@ -18,6 +18,8 @@ sign	pale_oak_shelf,pale_oak_sign	-845	590	-745	735	-	-	-	Pallet Town and Route 
 sign	pale_oak_shelf,pale_oak_sign	-830	495	-745	589	-	-	-	Viridian City
 sign	pale_oak_shelf,pale_oak_sign	-830	340	-745	494	-	-	-	Route 2
 sign	pale_oak_shelf,pale_oak_sign	-1000	495	-831	600	-	-	-	Route 22
+sign	pale_oak_shelf,pale_oak_sign	-740	285	-580	332	-	-	-	Route 3
+sign	pale_oak_shelf,pale_oak_sign	-628	238	-410	284	-	-	-	Route 4
 wood_sign	spruce_sign	-845	590	-745	735	-	-	-	Pallet Town and Route 1
 wood_sign	spruce_sign	-830	495	-745	589	-	-	-	Viridian City
 wood_sign	spruce_sign	-830	340	-745	494	-	-	-	Route 2
@@ -30,19 +32,41 @@ swap	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	block/calcite=path
 kerb	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	-	Viridian City
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-830	495	-745	589	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Viridian City
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-1000	495	-831	600	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Route 22
-swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-850	255	-741	339	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Pewter City
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-830	340	-745	494	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Route 2
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,redstone_lamp	-850	255	-741	339	-	-	block/tuff=plamp_post,block/polished_tuff=plamp_post,block/chiseled_tuff_bricks=plamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=plamp_chiseled_tuff_bricks_top,block/gray_wool=plamp_cap,block/redstone_lamp=plamp_globe,block/redstone_lamp_on=plamp_globe	Pewter City
+swap	daylight_detector	-1010	100	60	1060	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Kanto
+swap	spruce_log,spruce_fence	-1010	100	60	1060	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	Kanto
+swap	lantern	-1010	100	60	1060	-	-	block/lantern=garden_light	Kanto
+swap	glowstone	-1010	100	60	1060	-	-	block/glowstone=glow_hidden	Kanto
+wood_sign	oak_sign	-845	655	-745	735	-	-	-	Pallet Town
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-792	521	-779	546	-	-	block/mud_bricks=chimney_brick	Viridian's green houses
+swap	warped_shelf	-792	521	-779	546	-	-	block/warped_shelf=green_shelf	Viridian's green houses
+swap	stripped_warped_hyphae,stripped_warped_stem	-792	521	-779	546	-	-	block/stripped_warped_stem=green_solid,block/stripped_warped_stem_top=green_solid_top	Viridian's green houses
+swap	birch_shelf	-792	521	-779	546	-	-	block/birch_shelf=wood_shelf	Viridian's green houses
+swap	polished_andesite_slab,polished_andesite_stairs,polished_andesite	-792	521	-779	546	-	-	block/polished_andesite=house_stone,block/cobblestone=house_stone,block/andesite=house_stone	Viridian's green houses
+swap	polished_diorite_stairs,polished_diorite_slab	-792	521	-779	546	-	-	block/polished_diorite=house_trim	Viridian's green houses
+swap	polished_deepslate_wall	-792	521	-779	546	-	-	block/polished_deepslate=drainpipe	Viridian's green houses
 sign	pale_oak_shelf,pale_oak_sign	-850	255	-741	339	29	32	-	Pewter City
 wood_board	oak_shelf	-850	255	-741	339	29	32	-	Pewter City
 swap	pale_oak_trapdoor	-850	255	-741	339	31	31	block/pale_oak_trapdoor=planter_white	Pewter City
 swap	white_concrete,smooth_quartz,white_terracotta,chiseled_quartz_block,light_gray_concrete	-850	255	-741	339	29	29	block/white_concrete=pave_white,block/quartz_block_bottom=pave_quartz,block/white_terracotta=pave_terracotta,block/chiseled_quartz_block_top=pave_chiseled,block/chiseled_quartz_block=pave_chiseled_side,block/light_gray_concrete=pave_gray	Pewter City
+swap	cobblestone,polished_andesite_slab	-778	278	-763	291	29	31	block/polished_andesite=house_stone,block/cobblestone=house_stone,block/andesite=house_stone	Pewter's house by the Museum
+swap	polished_diorite_slab,polished_diorite_stairs	-778	278	-763	291	30	38	block/polished_diorite=house_trim	Pewter's house by the Museum
+swap	polished_deepslate_wall	-778	278	-763	291	29	38	block/polished_deepslate=drainpipe	Pewter's house by the Museum
 swap	deepslate_tile_slab,pale_oak_planks	-778	278	-763	291	30	38	block/deepslate_tiles=pewter_roof,block/pale_oak_planks=pewter_wall	Pewter's house by the Museum
 swap	pale_oak_stairs,pale_oak_slab	-778	278	-763	291	30	38	block/pale_oak_planks=window_frame	Pewter's house by the Museum
 swap	pale_oak_trapdoor	-778	278	-763	291	33	38	block/pale_oak_trapdoor=pewter_shutter	Pewter's house by the Museum
 swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-778	278	-763	291	33	38	block/mud_bricks=pewter_chimney	Pewter's house by the Museum
+swap	cobblestone,polished_andesite_slab	-827	316	-812	329	29	31	block/polished_andesite=house_stone,block/cobblestone=house_stone,block/andesite=house_stone	Pewter's house by the Center
+swap	polished_diorite_slab,polished_diorite_stairs	-827	316	-812	329	30	38	block/polished_diorite=house_trim	Pewter's house by the Center
+swap	polished_deepslate_wall	-827	316	-812	329	29	38	block/polished_deepslate=drainpipe	Pewter's house by the Center
 swap	deepslate_tile_slab,pale_oak_planks	-827	316	-812	329	30	38	block/deepslate_tiles=pewter_roof,block/pale_oak_planks=pewter_wall	Pewter's house by the Center
 swap	pale_oak_stairs,pale_oak_slab	-827	316	-812	329	30	38	block/pale_oak_planks=window_frame	Pewter's house by the Center
 swap	pale_oak_trapdoor	-827	316	-812	329	33	38	block/pale_oak_trapdoor=pewter_shutter	Pewter's house by the Center
 swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-827	316	-812	329	33	38	block/mud_bricks=pewter_chimney	Pewter's house by the Center
+swap	cobblestone,polished_andesite_slab	-791	379	-777	392	29	31	block/polished_andesite=house_stone,block/cobblestone=house_stone,block/andesite=house_stone	Route 2's trade house
+swap	polished_diorite_slab,polished_diorite_stairs	-791	379	-777	392	30	38	block/polished_diorite=house_trim	Route 2's trade house
+swap	polished_deepslate_wall	-791	379	-777	392	29	38	block/polished_deepslate=drainpipe	Route 2's trade house
 swap	deepslate_tile_slab,pale_oak_planks	-791	379	-777	392	30	38	block/deepslate_tiles=pewter_roof,block/pale_oak_planks=pewter_wall	Route 2's trade house
 swap	pale_oak_stairs,pale_oak_slab	-791	379	-777	392	30	38	block/pale_oak_planks=window_frame	Route 2's trade house
 swap	pale_oak_trapdoor	-791	379	-777	392	33	38	block/pale_oak_trapdoor=pewter_shutter	Route 2's trade house
@@ -51,6 +75,8 @@ roof_museum	purpur_stairs	-820	265	-777	282	31	47	-	Pewter Museum of Science
 swap	purpur_slab	-820	265	-777	282	31	47	block/purpur_block=museum_roof_flat	Pewter Museum of Science
 swap	crimson_slab	-820	265	-777	282	31	47	block/crimson_planks=museum_roof_dark	Pewter Museum of Science
 swap	white_terracotta	-820	265	-777	282	31	47	block/white_terracotta=museum_wall	Pewter Museum of Science
+swap	polished_andesite_slab,smooth_stone,polished_diorite_slab,polished_diorite_stairs	-820	265	-777	282	31	47	block/polished_andesite=museum_trim,block/smooth_stone=museum_trim,block/polished_diorite=museum_trim	Pewter Museum of Science
+swap	flowering_azalea_leaves	-818	277	-787	281	31	34	block/flowering_azalea_leaves=flower_bush!	the Museum's six little trees
 swap	polished_andesite,polished_andesite_slab	-807	671	-794	684	17	26	block/polished_andesite=house_stone	your house
 swap	polished_deepslate,polished_deepslate_slab	-807	671	-794	684	17	26	block/polished_deepslate=house_dark	your house
 swap	polished_deepslate_wall	-807	671	-794	684	17	26	block/polished_deepslate=drainpipe	your house
@@ -66,6 +92,8 @@ swap	brown_mushroom_block,mud_brick_stairs	-791	687	-774	698	-	-	block/brown_mus
 swap	waxed_cut_copper_slab,cut_copper_slab	-791	687	-774	698	-	-	block/cut_copper=lab_awning_red	Prof. Oak's lab
 swap	oxidized_cut_copper_slab,waxed_oxidized_cut_copper_slab	-791	687	-774	698	-	-	block/oxidized_cut_copper=lab_awning_door	Prof. Oak's lab
 swap	bricks,brick_wall,brick_stairs	-791	687	-774	698	-	-	block/bricks=lab_chimney	Prof. Oak's lab
+swap	polished_andesite_slab,polished_andesite_stairs	-791	687	-774	698	25	26	block/polished_andesite=lab_roof	Prof. Oak's lab
+swap	polished_blackstone_wall	-791	687	-774	698	25	26	block/polished_blackstone=lab_roof_rim	Prof. Oak's lab
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood	-812	366	-793	390	26	46	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top	Route 2 forest north gate
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood	-812	430	-793	454	23	43	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top	Route 2 forest south gate
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood	-785	420	-768	445	20	40	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top	by Diglett's Cave on Route 2
@@ -103,83 +131,195 @@ swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepsl
 swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1000	495	-831	600	-	-	block/mud_bricks=route_path@4	Route 22
 swap	brown_concrete_powder	-1000	495	-831	600	-	-	block/brown_concrete_powder=route_path_edge@4	Route 22
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2012	853	-2000	863	25	28	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	azalea_town Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-2013	852	-1999	864	21	29	block/polished_diorite=house_trim	azalea_town Pokemon Center
+swap	polished_diorite	-2013	852	-1999	864	21	29	block/polished_diorite=center_base	azalea_town Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1470	373	-1458	383	36	39	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	blackthorn_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-1471	372	-1457	384	32	40	block/polished_diorite=house_trim	blackthorn_city Pokemon Center
+swap	polished_diorite	-1471	372	-1457	384	32	40	block/polished_diorite=center_base	blackthorn_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-478	400	-466	410	38	41	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	celadon_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-479	399	-465	411	34	42	block/polished_diorite=house_trim	celadon_city Pokemon Center
+swap	polished_diorite	-479	399	-465	411	34	42	block/polished_diorite=center_base	celadon_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-365	255	-353	265	39	42	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	cerulean_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-366	254	-352	266	35	43	block/polished_diorite=house_trim	cerulean_city Pokemon Center
+swap	polished_diorite	-366	254	-352	266	35	43	block/polished_diorite=center_base	cerulean_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1702	750	-1690	760	24	27	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	cherrygrove_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-1703	749	-1689	761	20	28	block/polished_diorite=house_trim	cherrygrove_city Pokemon Center
+swap	polished_diorite	-1703	749	-1689	761	20	28	block/polished_diorite=center_base	cherrygrove_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2517	773	-2505	783	23	26	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	cianwood_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-2518	772	-2504	784	19	27	block/polished_diorite=house_trim	cianwood_city Pokemon Center
+swap	polished_diorite	-2518	772	-2504	784	19	27	block/polished_diorite=center_base	cianwood_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-796	920	-784	930	23	26	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	cinnabar_island Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-797	919	-783	931	19	27	block/polished_diorite=house_trim	cinnabar_island Pokemon Center
+swap	polished_diorite	-797	919	-783	931	19	27	block/polished_diorite=center_base	cinnabar_island Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2028	410	-2016	420	26	29	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	ecruteak_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-2029	409	-2015	421	22	30	block/polished_diorite=house_trim	ecruteak_city Pokemon Center
+swap	polished_diorite	-2029	409	-2015	421	22	30	block/polished_diorite=center_base	ecruteak_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-501	803	-489	813	36	39	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	fuchsia_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-502	802	-488	814	32	40	block/polished_diorite=house_trim	fuchsia_city Pokemon Center
+swap	polished_diorite	-502	802	-488	814	32	40	block/polished_diorite=center_base	fuchsia_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2122	717	-2110	727	25	28	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	goldenrod_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-2123	716	-2109	728	21	29	block/polished_diorite=house_trim	goldenrod_city Pokemon Center
+swap	polished_diorite	-2123	716	-2109	728	21	29	block/polished_diorite=center_base	goldenrod_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-148	408	-136	418	38	41	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	lavender_town Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-149	407	-135	419	34	42	block/polished_diorite=house_trim	lavender_town Pokemon Center
+swap	polished_diorite	-149	407	-135	419	34	42	block/polished_diorite=center_base	lavender_town Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1763	410	-1751	420	27	30	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	mahogany_town Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-1764	409	-1750	421	23	31	block/polished_diorite=house_trim	mahogany_town Pokemon Center
+swap	polished_diorite	-1764	409	-1750	421	23	31	block/polished_diorite=center_base	mahogany_town Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2299	561	-2287	571	24	27	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	olivine_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-2300	560	-2286	572	20	28	block/polished_diorite=house_trim	olivine_city Pokemon Center
+swap	polished_diorite	-2300	560	-2286	572	20	28	block/polished_diorite=center_base	olivine_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-811	308	-799	318	35	38	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	pewter_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-812	307	-798	319	31	39	block/polished_diorite=house_trim	pewter_city Pokemon Center
+swap	polished_diorite	-812	307	-798	319	31	39	block/polished_diorite=center_base	pewter_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-133	278	-121	288	38	41	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	route_10 Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-134	277	-120	289	34	42	block/polished_diorite=house_trim	route_10 Pokemon Center
+swap	polished_diorite	-134	277	-120	289	34	42	block/polished_diorite=center_base	route_10 Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1892	792	-1880	802	24	27	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	route_32 Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-1893	791	-1879	803	20	28	block/polished_diorite=house_trim	route_32 Pokemon Center
+swap	polished_diorite	-1893	791	-1879	803	20	28	block/polished_diorite=center_base	route_32 Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-613	249	-601	259	40	43	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	route_4 Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-614	248	-600	260	36	44	block/polished_diorite=house_trim	route_4 Pokemon Center
+swap	polished_diorite	-614	248	-600	260	36	44	block/polished_diorite=center_base	route_4 Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-370	435	-358	445	38	41	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	saffron_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-371	434	-357	446	34	42	block/polished_diorite=house_trim	saffron_city Pokemon Center
+swap	polished_diorite	-371	434	-357	446	34	42	block/polished_diorite=center_base	saffron_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1159	534	-1147	544	32	35	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	silver_cave_outside Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-1160	533	-1146	545	28	36	block/polished_diorite=house_trim	silver_cave_outside Pokemon Center
+swap	polished_diorite	-1160	533	-1146	545	28	36	block/polished_diorite=center_base	silver_cave_outside Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-375	550	-363	560	36	39	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	vermilion_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-376	549	-362	561	32	40	block/polished_diorite=house_trim	vermilion_city Pokemon Center
+swap	polished_diorite	-376	549	-362	561	32	40	block/polished_diorite=center_base	vermilion_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1834	559	-1822	569	27	30	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	violet_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-1835	558	-1821	570	23	31	block/polished_diorite=house_trim	violet_city Pokemon Center
+swap	polished_diorite	-1835	558	-1821	570	23	31	block/polished_diorite=center_base	violet_city Pokemon Center
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-792	550	-780	560	30	33	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	viridian_city Pokemon Center
+swap	polished_diorite_stairs,polished_diorite_slab	-793	549	-779	561	26	34	block/polished_diorite=house_trim	viridian_city Pokemon Center
+swap	polished_diorite	-793	549	-779	561	26	34	block/polished_diorite=center_base	viridian_city Pokemon Center
 swap	blue_concrete,blue_wool,blue_carpet	-1991	848	-1979	856	21	28	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	azalea_town Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-1992	847	-1978	859	21	29	block/polished_diorite=house_trim	azalea_town Mart
+swap	polished_diorite	-1992	847	-1978	859	21	29	block/polished_diorite=mart_base	azalea_town Mart
 swap	blue_concrete,blue_wool,blue_carpet	-1486	372	-1474	380	32	39	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	blackthorn_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-1487	371	-1473	383	32	40	block/polished_diorite=house_trim	blackthorn_city Mart
+swap	polished_diorite	-1487	371	-1473	383	32	40	block/polished_diorite=mart_base	blackthorn_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-349	273	-337	281	35	42	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	cerulean_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-350	272	-336	284	35	43	block/polished_diorite=house_trim	cerulean_city Mart
+swap	polished_diorite	-350	272	-336	284	35	43	block/polished_diorite=mart_base	cerulean_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-1719	750	-1707	758	20	27	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	cherrygrove_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-1720	749	-1706	761	20	28	block/polished_diorite=house_trim	cherrygrove_city Mart
+swap	polished_diorite	-1720	749	-1706	761	20	28	block/polished_diorite=mart_base	cherrygrove_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-782	920	-770	928	19	26	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	cinnabar_island Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-783	919	-769	931	19	27	block/polished_diorite=house_trim	cinnabar_island Mart
+swap	polished_diorite	-783	919	-769	931	19	27	block/polished_diorite=mart_base	cinnabar_island Mart
 swap	blue_concrete,blue_wool,blue_carpet	-2011	395	-1999	403	21	28	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	ecruteak_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-2012	394	-1998	406	21	29	block/polished_diorite=house_trim	ecruteak_city Mart
+swap	polished_diorite	-2012	394	-1998	406	21	29	block/polished_diorite=mart_base	ecruteak_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-509	781	-497	789	31	38	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	fuchsia_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-510	780	-496	792	31	39	block/polished_diorite=house_trim	fuchsia_city Mart
+swap	polished_diorite	-510	780	-496	792	31	39	block/polished_diorite=mart_base	fuchsia_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-123	431	-111	439	34	41	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	lavender_town Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-124	430	-110	442	34	42	block/polished_diorite=house_trim	lavender_town Mart
+swap	polished_diorite	-124	430	-110	442	34	42	block/polished_diorite=mart_base	lavender_town Mart
 swap	blue_concrete,blue_wool,blue_carpet	-2266	561	-2254	569	20	27	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	olivine_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-2267	560	-2253	572	20	28	block/polished_diorite=house_trim	olivine_city Mart
+swap	polished_diorite	-2267	560	-2253	572	20	28	block/polished_diorite=mart_base	olivine_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-789	294	-777	302	31	38	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	pewter_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-790	293	-776	305	31	39	block/polished_diorite=house_trim	pewter_city Mart
+swap	polished_diorite	-790	293	-776	305	31	39	block/polished_diorite=mart_base	pewter_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-341	405	-329	413	34	41	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	saffron_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-342	404	-328	416	34	42	block/polished_diorite=house_trim	saffron_city Mart
+swap	polished_diorite	-342	404	-328	416	34	42	block/polished_diorite=mart_base	saffron_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-349	572	-337	580	32	39	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	vermilion_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-350	571	-336	583	32	40	block/polished_diorite=house_trim	vermilion_city Mart
+swap	polished_diorite	-350	571	-336	583	32	40	block/polished_diorite=mart_base	vermilion_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-1885	534	-1873	542	23	30	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	violet_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-1886	533	-1872	545	23	31	block/polished_diorite=house_trim	violet_city Mart
+swap	polished_diorite	-1886	533	-1872	545	23	31	block/polished_diorite=mart_base	violet_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-772	536	-760	544	26	33	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	viridian_city Mart
+swap	polished_diorite_stairs,polished_diorite_slab	-773	535	-759	547	26	34	block/polished_diorite=house_trim	viridian_city Mart
+swap	polished_diorite	-773	535	-759	547	26	34	block/polished_diorite=mart_base	viridian_city Mart
 roof_gym	jungle_stairs,oak_stairs	-2023	870	-2005	882	24	30	-	azalea_town Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2023	870	-2005	882	24	30	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	azalea_town Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2024	869	-2004	883	-	-	block/polished_diorite=house_trim	azalea_town Gym
 roof_gym	jungle_stairs,oak_stairs	-552	436	-536	448	37	43	-	celadon_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-552	436	-536	448	37	43	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	celadon_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-553	435	-535	449	-	-	block/polished_diorite=house_trim	celadon_city Gym
 roof_gym	jungle_stairs,oak_stairs	-346	257	-328	269	38	44	-	cerulean_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-346	257	-328	269	38	44	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	cerulean_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-347	256	-327	270	-	-	block/polished_diorite=house_trim	cerulean_city Gym
 roof_gym	jungle_stairs,oak_stairs	-2553	754	-2536	766	22	28	-	cianwood_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2553	754	-2536	766	22	28	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	cianwood_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2554	753	-2535	767	-	-	block/polished_diorite=house_trim	cianwood_city Gym
 roof_gym	jungle_stairs,oak_stairs	-786	900	-768	912	22	28	-	cinnabar_island Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-786	900	-768	912	22	28	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	cinnabar_island Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-787	899	-767	913	-	-	block/polished_diorite=house_trim	cinnabar_island Gym
 roof_gym	jungle_stairs,oak_stairs	-1485	332	-1467	344	35	41	-	blackthorn_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1485	332	-1467	344	35	41	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	blackthorn_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-1486	331	-1466	345	-	-	block/polished_diorite=house_trim	blackthorn_city Gym
 roof_gym	jungle_stairs,oak_stairs	-2072	409	-2055	421	25	31	-	ecruteak_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2072	409	-2055	421	25	31	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	ecruteak_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2073	408	-2054	422	-	-	block/polished_diorite=house_trim	ecruteak_city Gym
 roof_gym	jungle_stairs,oak_stairs	-538	801	-521	813	35	41	-	fuchsia_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-538	801	-521	813	35	41	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	fuchsia_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-539	800	-520	814	-	-	block/polished_diorite=house_trim	fuchsia_city Gym
 roof_gym	jungle_stairs,oak_stairs	-1782	409	-1765	421	26	32	-	mahogany_town Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1782	409	-1765	421	26	32	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	mahogany_town Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-1783	408	-1764	422	-	-	block/polished_diorite=house_trim	mahogany_town Gym
 roof_gym	jungle_stairs,oak_stairs	-2319	520	-2288	532	23	29	-	olivine_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2319	520	-2288	532	23	29	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	olivine_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2320	519	-2287	533	-	-	block/polished_diorite=house_trim	olivine_city Gym
 roof_gym	jungle_stairs,oak_stairs	-817	287	-799	299	34	40	-	pewter_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-817	287	-799	299	34	40	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	pewter_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-818	286	-798	300	-	-	block/polished_diorite=house_trim	pewter_city Gym
 roof_gym	jungle_stairs,oak_stairs	-2097	655	-2066	667	24	30	-	goldenrod_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2097	655	-2066	667	24	30	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	goldenrod_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2098	654	-2065	668	-	-	block/polished_diorite=house_trim	goldenrod_city Gym
 roof_gym	jungle_stairs,oak_stairs	-344	388	-313	400	37	43	-	saffron_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-344	388	-313	400	37	43	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	saffron_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-345	387	-312	401	-	-	block/polished_diorite=house_trim	saffron_city Gym
 roof_gym	jungle_stairs,oak_stairs	-380	585	-362	597	35	41	-	vermilion_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-380	585	-362	597	35	41	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	vermilion_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-381	584	-361	598	-	-	block/polished_diorite=house_trim	vermilion_city Gym
 roof_gym	jungle_stairs,oak_stairs	-1868	533	-1850	545	26	32	-	violet_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1868	533	-1850	545	26	32	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	violet_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-1869	532	-1849	546	-	-	block/polished_diorite=house_trim	violet_city Gym
 roof_gym	jungle_stairs,oak_stairs	-776	516	-758	528	30	36	-	viridian_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-776	516	-758	528	30	36	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	viridian_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-777	515	-757	529	-	-	block/polished_diorite=house_trim	viridian_city Gym
 sign	pale_oak_shelf,pale_oak_sign	-300	578	-293	584	-	-	-	Diglett's Cave's sign on Route 11
 sign	pale_oak_shelf,pale_oak_sign	4096	0	4215	171	-	-	-	Viridian Forest	interiors
-swap	dripstone_block,brown_mushroom_block	4351	-1	4372	16	-	-	block/dripstone_block=cave_wall_top|cave_wall_side,block/brown_mushroom_block=cave_wall_top|cave_wall_side,block/mushroom_block_inside=cave_wall_top|cave_wall_side	Diglett's Cave north entrance	interiors
-swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4351	-1	4372	16	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor_patch@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_sand@4,block/sandstone_top=cave_sand@4,block/mud=cave_floor@4	Diglett's Cave north entrance	interiors
-boulder	tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab	4351	-1	4372	16	-	-	-	Diglett's Cave north entrance	interiors
-swap	dripstone_block,brown_mushroom_block	4607	-1	4778	160	-	-	block/dripstone_block=cave_wall_top|cave_wall_side,block/brown_mushroom_block=cave_wall_top|cave_wall_side,block/mushroom_block_inside=cave_wall_top|cave_wall_side	Diglett's Cave B1F	interiors
-swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4607	-1	4778	160	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor_patch@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_sand@4,block/sandstone_top=cave_sand@4,block/mud=cave_floor@4	Diglett's Cave B1F	interiors
-boulder	tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab	4607	-1	4778	160	-	-	-	Diglett's Cave B1F	interiors
-swap	dripstone_block,brown_mushroom_block	4863	-1	4884	16	-	-	block/dripstone_block=cave_wall_top|cave_wall_side,block/brown_mushroom_block=cave_wall_top|cave_wall_side,block/mushroom_block_inside=cave_wall_top|cave_wall_side	Diglett's Cave south entrance	interiors
-swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4863	-1	4884	16	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor_patch@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_sand@4,block/sandstone_top=cave_sand@4,block/mud=cave_floor@4	Diglett's Cave south entrance	interiors
-boulder	tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab	4863	-1	4884	16	-	-	-	Diglett's Cave south entrance	interiors
+swap	dripstone_block,brown_mushroom_block	4351	-1	4372	16	-	-	block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,block/mushroom_block_inside=cave_rock_top|cave_rock@4	Diglett's Cave north entrance	interiors
+swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4351	-1	4372	16	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4	Diglett's Cave north entrance	interiors
+sand_edge	coarse_dirt,packed_mud,dirt,mud	4351	-1	4372	16	-	-	-	Diglett's Cave north entrance	interiors
+swap	white_concrete	4351	-1	4372	16	-	-	block/white_concrete=cave_daylight!	Diglett's Cave north entrance	interiors
+boulder	tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab	4351	-1	4372	16	-	-	prefix:boulder,coarse_dirt=cave_floor@4,packed_mud=cave_floor@4,dirt=cave_floor@4,mud=cave_floor@4,sand=cave_sand@4,smooth_sandstone=cave_sand@4	Diglett's Cave north entrance	interiors
+swap	dripstone_block,brown_mushroom_block	4607	-1	4778	160	-	-	block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,block/mushroom_block_inside=cave_rock_top|cave_rock@4	Diglett's Cave B1F	interiors
+swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4607	-1	4778	160	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4	Diglett's Cave B1F	interiors
+sand_edge	coarse_dirt,packed_mud,dirt,mud	4607	-1	4778	160	-	-	-	Diglett's Cave B1F	interiors
+swap	white_concrete	4607	-1	4778	160	-	-	block/white_concrete=cave_daylight!	Diglett's Cave B1F	interiors
+boulder	tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab	4607	-1	4778	160	-	-	prefix:boulder,coarse_dirt=cave_floor@4,packed_mud=cave_floor@4,dirt=cave_floor@4,mud=cave_floor@4,sand=cave_sand@4,smooth_sandstone=cave_sand@4	Diglett's Cave B1F	interiors
+swap	dripstone_block,brown_mushroom_block	4863	-1	4884	16	-	-	block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,block/mushroom_block_inside=cave_rock_top|cave_rock@4	Diglett's Cave south entrance	interiors
+swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4863	-1	4884	16	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4	Diglett's Cave south entrance	interiors
+sand_edge	coarse_dirt,packed_mud,dirt,mud	4863	-1	4884	16	-	-	-	Diglett's Cave south entrance	interiors
+swap	white_concrete	4863	-1	4884	16	-	-	block/white_concrete=cave_daylight!	Diglett's Cave south entrance	interiors
+boulder	tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab	4863	-1	4884	16	-	-	prefix:boulder,coarse_dirt=cave_floor@4,packed_mud=cave_floor@4,dirt=cave_floor@4,mud=cave_floor@4,sand=cave_sand@4,smooth_sandstone=cave_sand@4	Diglett's Cave south entrance	interiors
+swap	dripstone_block,white_terracotta	5119	-1	5224	90	-	-	block/dripstone_block=moon_rock_top|moon_rock@4,block/white_terracotta=moon_rock_top|moon_rock@4	Mt. Moon 1F	interiors
+swap	andesite,tuff,gravel,sand,smooth_sandstone	5119	-1	5224	90	-	-	block/andesite=moon_floor@4,block/tuff=moon_gravel@4,block/gravel=moon_gravel@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Mt. Moon 1F	interiors
+sand_edge	andesite,tuff,gravel	5119	-1	5224	90	-	-	-	Mt. Moon 1F	interiors
+swap	white_concrete	5119	-1	5224	90	-	-	block/white_concrete=cave_daylight!	Mt. Moon 1F	interiors
+boulder	granite,polished_granite,granite_slab,polished_granite_slab	5119	-1	5224	90	-	-	prefix:mboulder,andesite=moon_floor@4,tuff=moon_gravel@4,gravel=moon_gravel@4,sand=cave_sand@4	Mt. Moon 1F	interiors
+sign	pale_oak_shelf	5119	-1	5224	90	-	-	-	Mt. Moon 1F	interiors
+swap	dripstone_block,white_terracotta	5375	-1	5482	86	-	-	block/dripstone_block=moon_rock_top|moon_rock@4,block/white_terracotta=moon_rock_top|moon_rock@4	Mt. Moon B1F	interiors
+swap	andesite,tuff,gravel,sand,smooth_sandstone	5375	-1	5482	86	-	-	block/andesite=moon_floor@4,block/tuff=moon_gravel@4,block/gravel=moon_gravel@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Mt. Moon B1F	interiors
+sand_edge	andesite,tuff,gravel	5375	-1	5482	86	-	-	-	Mt. Moon B1F	interiors
+swap	white_concrete	5375	-1	5482	86	-	-	block/white_concrete=cave_daylight!	Mt. Moon B1F	interiors
+boulder	granite,polished_granite,granite_slab,polished_granite_slab	5375	-1	5482	86	-	-	prefix:mboulder,andesite=moon_floor@4,tuff=moon_gravel@4,gravel=moon_gravel@4,sand=cave_sand@4	Mt. Moon B1F	interiors
+sign	pale_oak_shelf	5375	-1	5482	86	-	-	-	Mt. Moon B1F	interiors
+swap	dripstone_block,white_terracotta	5631	-1	5738	90	-	-	block/dripstone_block=moon_rock_top|moon_rock@4,block/white_terracotta=moon_rock_top|moon_rock@4	Mt. Moon B2F	interiors
+swap	andesite,tuff,gravel,sand,smooth_sandstone	5631	-1	5738	90	-	-	block/andesite=moon_floor@4,block/tuff=moon_gravel@4,block/gravel=moon_gravel@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Mt. Moon B2F	interiors
+sand_edge	andesite,tuff,gravel	5631	-1	5738	90	-	-	-	Mt. Moon B2F	interiors
+swap	white_concrete	5631	-1	5738	90	-	-	block/white_concrete=cave_daylight!	Mt. Moon B2F	interiors
+boulder	granite,polished_granite,granite_slab,polished_granite_slab	5631	-1	5738	90	-	-	prefix:mboulder,andesite=moon_floor@4,tuff=moon_gravel@4,gravel=moon_gravel@4,sand=cave_sand@4	Mt. Moon B2F	interiors
+sign	pale_oak_shelf	5631	-1	5738	90	-	-	-	Mt. Moon B2F	interiors
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood	4118	23	4137	42	62	80	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top	Viridian Forest's north gatehouse	interiors
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood	4150	138	4169	157	62	80	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top	Viridian Forest's south gatehouse	interiors

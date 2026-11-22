@@ -104,7 +104,7 @@ public final class AreaLooks {
 					for (String row : new String[] {"board", "stand"}) part(ctx, "w" + row + "_" + part + "_" + d.getSerializedName(), "block/area/wsign_" + row + "_" + part + "_" + d.getSerializedName());
 				}
 			}
-			for (String b : new String[] {"boulder_a", "boulder_b", "boulder_small"}) part(ctx, b, "block/area/" + b);
+			for (String b : new String[] {"boulder_a", "boulder_b", "boulder_small", "mboulder_a", "mboulder_b", "mboulder_small"}) part(ctx, b, "block/area/" + b);
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
@@ -168,7 +168,13 @@ public final class AreaLooks {
 			case "sign" -> AreaLooks::sign;
 			case "wood_board" -> AreaLooks::woodBoard;
 			case "wood_sign" -> AreaLooks::woodSign;
-			case "boulder" -> AreaLooks::boulder;
+			case "boulder" -> boulder(baker, rule.swaps());
+			case "sand_edge" -> {
+				// (The cave's sand running softly onto the floor beside it, as the grass onto the dripstone; 14:15.)
+				TextureAtlasSprite[] over = new TextureAtlasSprite[18];
+				for (int t = 1; t <= 17; t++) over[t] = sprite(baker, "sand_on_floor_" + t);
+				yield new GrassEdge(over, null, false, java.util.Set.of(Blocks.SAND, Blocks.SMOOTH_SANDSTONE));
+			}
 			case "grass_edge", "kerb" -> {
 				boolean kerb = rule.look().equals("kerb");
 				TextureAtlasSprite[] over = new TextureAtlasSprite[18], under = new TextureAtlasSprite[18];
@@ -176,7 +182,7 @@ public final class AreaLooks {
 					over[t] = sprite(baker, (kerb ? "kerb_grass_" : "grass_on_drip_") + t);
 					under[t] = sprite(baker, (kerb ? "kerb_" : "drip_shade_") + t);
 				}
-				yield new GrassEdge(over, under, !kerb);
+				yield new GrassEdge(over, under, !kerb, null);
 			}
 			default -> null;
 		};
@@ -381,15 +387,63 @@ public final class AreaLooks {
 	}
 
 	/**
-	 * A boulder (Diglett's Cave's rocks, John's tuff and cobblestone): a round mound of stone in place of the block, one
-	 * of two shapes by where it is, and a low one for a slab.
+	 * A boulder (Diglett's Cave's rocks, John's tuff and cobblestone; Mt. Moon's granite): a round mound of stone in place
+	 * of the block, one of two shapes by where it is, and a low one for a slab; the floor under it drawn as the floor
+	 * round it is laid (its block below's texture, over four blocks), so no square shows (14:15). spec: "prefix:mboulder"
+	 * (which stone's models) and block=texture@N for the floor under it by what's below.
 	 */
-	private static void boulder(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
-		boolean slab = state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE);
-		String name = slab ? "boulder_small" : Math.floorMod(pos.getX() * 31 + pos.getZ() * 17 + pos.getY() * 7, 2) == 0 ? "boulder_a" : "boulder_b";
-		BlockStateModel m = extra(name);
-		if (m == null) base.emitQuads(e, view, pos, state, random, cull);
-		else m.emitQuads(e, view, pos, state, random, cull);
+	private static Look boulder(ModelBaker baker, String spec) {
+		String prefix = "boulder";
+		Map<Block, Swap> floors = new HashMap<>();
+		for (String one : spec.split(",")) {
+			one = one.trim();
+			if (one.startsWith("prefix:")) {
+				prefix = one.substring(7).trim();
+				continue;
+			}
+			int eq = one.indexOf('=');
+			if (eq < 0) continue;
+			String to = one.substring(eq + 1).trim();
+			int period = 1, at = to.indexOf('@');
+			if (at >= 0) {
+				period = Integer.parseInt(to.substring(at + 1).trim());
+				to = to.substring(0, at);
+			}
+			Block b = BuiltInRegistries.BLOCK.getOptional(Identifier.withDefaultNamespace(one.substring(0, eq).trim())).orElse(null);
+			if (b != null && b != Blocks.AIR) floors.put(b, new Swap(sprite(baker, to), period, true, null));
+		}
+		String pre = prefix;
+		return (base, e, view, pos, state, random, cull) -> {
+			// (On another rock, a slab on Mt. Moon's granite: one boulder there, the one below.)
+			if (rock(view.getBlockState(pos.below()).getBlock())) return;
+			boolean slab = state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE);
+			String name = pre + (slab ? "_small" : Math.floorMod(pos.getX() * 31 + pos.getZ() * 17 + pos.getY() * 7, 2) == 0 ? "_a" : "_b");
+			Swap fl = floors.get(view.getBlockState(pos.below()).getBlock());
+			if (fl != null) {
+				e.square(Direction.UP, 0, 0, 1, 1, 0.998F);
+				float per = fl.period();
+				float[] ss = new float[4], tt = new float[4];
+				for (int i = 0; i < 4; i++) {
+					ss[i] = (pos.getX() + e.x(i)) / per;
+					tt[i] = (pos.getZ() + e.z(i)) / per;
+				}
+				lay(e, fl.to(), ss, tt);
+				e.color(-1, -1, -1, -1);
+				e.tintIndex(-1);
+				e.emit();
+			}
+			BlockStateModel m = extra(name);
+			if (m == null) base.emitQuads(e, view, pos, state, random, cull);
+			else m.emitQuads(e, view, pos, state, random, cull);
+		};
+	}
+
+	/** Whether a block's a boulder somewhere (a rock look's on it). */
+	private static boolean rock(Block b) {
+		Map<String, Rule> looks = RULES.get(b);
+		if (looks == null) return false;
+		for (String k : looks.keySet()) if (k.startsWith("boulder|")) return true;
+		return false;
 	}
 
 	private static boolean sameSign(BlockAndTintGetter view, BlockPos p, BlockState as, Direction facing) {
@@ -406,13 +460,13 @@ public final class AreaLooks {
 	 * meets it, as the dirt paths do (the same 17 tiles: an edge, two, three or all four, or a corner), with their
 	 * soft shadow on the dripstone. The tufts take the grass's green (Colours tints them).
 	 */
-	private record GrassEdge(TextureAtlasSprite[] tufts, TextureAtlasSprite[] shade, boolean byWater) implements Look {
+	private record GrassEdge(TextureAtlasSprite[] tufts, TextureAtlasSprite[] shade, boolean byWater, java.util.Set<Block> onto) implements Look {
 		@Override
 		public void emit(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
 			base.emitQuads(e, view, pos, state, random, cull);
 			if (cull.test(Direction.UP)) return;
-			boolean n = grass(view, pos.north()), s = grass(view, pos.south()), w = grass(view, pos.west()), ea = grass(view, pos.east());
-			boolean nw = grass(view, pos.north().west()), ne = grass(view, pos.north().east()), sw = grass(view, pos.south().west()), se = grass(view, pos.south().east());
+			boolean n = by(view, pos.north()), s = by(view, pos.south()), w = by(view, pos.west()), ea = by(view, pos.east());
+			boolean nw = by(view, pos.north().west()), ne = by(view, pos.north().east()), sw = by(view, pos.south().west()), se = by(view, pos.south().east());
 			if (!(n || s || w || ea || nw || ne || sw || se) || byWater && !nearWater(view, pos)) return;
 			List<Integer> tiles = new ArrayList<>(4);
 			int edges = (n ? 1 : 0) | (ea ? 2 : 0) | (s ? 4 : 0) | (w ? 8 : 0);
@@ -446,8 +500,13 @@ public final class AreaLooks {
 			if (ne && !n && !ea) tiles.add(15);
 			if (sw && !s && !w) tiles.add(3);
 			if (se && !s && !ea) tiles.add(1);
-			for (int t : tiles) top(e, shade[t], -1);
-			for (int t : tiles) top(e, tufts[t], 0);
+			if (shade != null) for (int t : tiles) top(e, shade[t], -1);
+			for (int t : tiles) top(e, tufts[t], onto == null ? 0 : -1);
+		}
+
+		/** Whether what's beside it runs onto it: grass (onto the dripstone, the kerb), or the sand (onto a cave's floor). */
+		private boolean by(BlockAndTintGetter view, BlockPos p) {
+			return onto == null ? grass(view, p) : onto.contains(view.getBlockState(p).getBlock()) && view.getBlockState(p.above()).isAir();
 		}
 
 		private static void top(QuadEmitter e, TextureAtlasSprite sprite, int tint) {

@@ -650,7 +650,8 @@ function stairsDown(room, x0, z0 = 0, depth = 2, o = {}) {
   G.box(x0, -4.6, z0 - 0.05, x0 + 4, 0, z0, { s: wall, all: null });
   G.box(x0 - 0.05, -4.6, z0, x0, 0, z0 + depth, { e: wall, all: null });
   G.box(x0 + 4, -4.6, z0, x0 + 4.05, 0, z0 + depth, { w: wall, all: null });
-  G.box(x0, -0.36, z0, x0 + 4, -0.36, z0 + depth, { top: "deep", all: null });
+  // (show: the top steps in sight going down, the dark lower; the Museum's, 13:56. Else the dark just under the floor.)
+  G.box(x0, o.show ? -2.6 : -0.36, z0, x0 + 4, o.show ? -2.6 : -0.36, z0 + depth, { top: "deep", all: null });
   // A railing round the opening, open at the top step to the east.
   const gap = x0 + 4 - 0.95, bz = z0 + depth;
   G.box(x0 - 0.12, 0, bz - 0.02, x0 + 0.08, 1.3, bz + 0.16, "walnut"); G.box(gap - 0.18, 0, bz - 0.02, gap + 0.02, 1.3, bz + 0.16, "walnut");

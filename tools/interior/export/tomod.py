@@ -37,8 +37,9 @@ DOORS = {
     "viridian_house": {"room": "nickhouse", "door": [[-788, 26, 528], [-787, 26, 528]], "out": [-787.0, 26.0, 529.8]},
     # Route 2's gates into Viridian Forest: the south one's way in (its south side), the north one's (its north side,
     # so you come out facing north).
-    "forest_south": {"room": "gate_s", "door": [[x, 27, 446] for x in range(-805, -799)], "out": [-802.5, 27.0, 449.8]},
-    "forest_north": {"room": "gate_n", "door": [[x, 30, 374] for x in range(-805, -799)], "out": [-802.5, 30.0, 370.2], "face": "n", "yaw": 180.0},
+    # (The dark backs of the forest gatehouses' doorways, at the top of their steps: south at z 443, north at z 377.)
+    "forest_south": {"room": "gate_s", "door": [[x, 29, 443] for x in range(-804, -800)], "out": [-802.5, 27.0, 449.8]},
+    "forest_north": {"room": "gate_n", "door": [[x, 32, 377] for x in range(-804, -800)], "out": [-802.5, 30.0, 370.2], "face": "n", "yaw": 180.0},
     # Route 22's POKéMON LEAGUE gate (its glass doors, 4 wide): in from ROUTE 22 at the south, on to ROUTE 23 at
     # the north (the guard lets only BOULDERBADGE holders through), coming back from there into the north nook.
     "league_s": {"room": "gate_league", "door": [[x, 27, 534] for x in range(-919, -915)], "out": [-917.5, 27.0, 536.6]},
@@ -420,7 +421,7 @@ def main():
             if not key: key = "in_%s_%d" % (rid, i)
             x, z, yaw = n["x"], n["z"], n["yaw"]
             # Someone seated sits on their chair, as the Interior Viewer has them.
-            people.append({"key": key, "name": n["name"].upper(), "skin": n["skin"] or "youngster", "x": round(x, 3), "z": round(z, 3),
+            people.append({"key": key, "name": n["name"].upper(), "skin": n["skin"] or "youngster", "x": round(x, 3), "z": round(z, 3), "y": n.get("y", 0) or 0,
                            "yaw": round((180 - math.degrees(yaw)) % 360, 1), "lines": n["lines"], "role": n.get("role"), "seated": bool(n["seated"]),
                            **({"group": n["group"]} if n.get("group") else {}), **({"hours": n["hours"]} if n.get("hours") else {})})
         acts = [dict({"rect": a["rect"], "label": a["label"], "lines": a["lines"]}, **({"map": True} if a.get("map") else {}), **({"pc": True} if a.get("pc") else {}))

@@ -36,6 +36,9 @@ const PLACES = [
   { id: "digletts_n", name: "Diglett's Cave", floor: "North entrance (Route 2)", group: "Diglett's Cave" },
   { id: "digletts_b1f", name: "Diglett's Cave", floor: "B1F", group: "Diglett's Cave" },
   { id: "digletts_s", name: "Diglett's Cave", floor: "South entrance (Route 11)", group: "Diglett's Cave" },
+  { id: "mt_moon_1f", name: "Mt. Moon", floor: "1F", group: "Mt. Moon" },
+  { id: "mt_moon_b1f", name: "Mt. Moon", floor: "B1F", group: "Mt. Moon" },
+  { id: "mt_moon_b2f", name: "Mt. Moon", floor: "B2F", group: "Mt. Moon" },
 ];
 // Your house and the rival's (14 by 13, the mat in a nook at the door), the stairs at the back on the right.
 const FROM_TOWN = { x: 7.0, z: 11.5, yaw: FACE.n };
@@ -904,7 +907,7 @@ function caveRoom(id, floor) {
     for (let x = 0; x < C.W;) {
       const c = at(x, z); let x1 = x + 1;
       while (x1 < C.W && at(x1, z).k === c.k && at(x1, z).h === c.h) x1++;
-      if (c.k === "w") { G.box(x, -1, z, x1, Math.min(c.h, 6), z + 1, { top: "area_cave_wall_top", all: "area_cave_wall_side", bottom: null }); R.solid(x, z, x1, z + 1); }
+      if (c.k === "w") { G.box(x, -1, z, x1, Math.min(c.h, 6), z + 1, { top: "area_cave_rock_top", all: "area_cave_rock", bottom: null }); R.solid(x, z, x1, z + 1); }
       else if (c.k === "r") {
         G.box(x, -1, z, x1, 0, z + 1, { top: "area_cave_floor", all: "soil" });
         // A boulder: a round dome of stone (the mod's own boulder models, BOULDERS), one in each block.
@@ -916,7 +919,7 @@ function caveRoom(id, floor) {
       }
       else if (c.k === "K") G.box(x, -2.2, z, x1, -2, z + 1, { top: "darkTop", all: null });
       else if (c.k === "L") { G.box(x, -2.2, z, x1, -2, z + 1, { top: "darkTop", all: null }); G.box(x, -2, z + 0.02, x1, 0.4, z + 0.08, "walnut"); }
-      else G.box(x, -1, z, x1, 0, z + 1, { top: c.k === "s" || c.k === "S" ? "area_cave_sand" : c.k === "m" ? "area_cave_floor_patch" : "area_cave_floor", all: "soil" });
+      else G.box(x, -1, z, x1, 0, z + 1, { top: c.k === "S" ? "area_cave_mat" : c.k === "s" ? "area_cave_sand" : "area_cave_floor", all: "soil" });
       x = x1;
     }
   }
@@ -931,6 +934,60 @@ function caveRoom(id, floor) {
   R.spawn = { x: C.spawn.x, z: C.spawn.z, yaw: C.spawn.yaw === 180 ? FACE.n : FACE.s };
   R.item("Diglett's Cave", id === "digletts_b1f" ? "The long tunnel DIGLETT dug, from Route 2 to Route 11 by Vermilion City. DIGLETT and DUGTRIO come up anywhere along it." :
     "A cave mouth's room: the ladder down into the tunnel by the east wall, the way out at the south.");
+  return R;
+}
+
+// Mt. Moon as the mod builds it (tools/mtmoon.py, from John's schematics, 13:56) and draws it: grey brown rock, a pale
+// grey floor with darker patches, its sand, the granite rocks as grey boulders, the holes and ladders between its floors,
+// B2F's upper level and its wooden steps; FireRed's trainers, people and items where it has them; the way out with
+// daylight beyond. Dim, a faint cool haze.
+function moonRoom(id, floor) {
+  const C = MTMOON[id], R = new Room(id, { name: "Mt. Moon", floor, W: C.W, D: C.D, H: 9, outside: true, night: true, haze: 0x5c6080 });
+  const G = R.geo, P = 1 / 16;
+  const at = (x, z) => { const r = C.rows[z]; return { k: r[2 * x], h: r.charCodeAt(2 * x + 1) - 48 }; };
+  const FLOOR = { f: "area_moon_floor", s: "area_cave_sand", v: "area_moon_gravel", t: "area_moon_gravel", L: "area_moon_floor", "^": "area_moon_steps", S: "area_cave_mat" };
+  for (let z = 0; z < C.D; z++) {
+    for (let x = 0; x < C.W;) {
+      const c = at(x, z); let x1 = x + 1;
+      while (x1 < C.W && at(x1, z).k === c.k && at(x1, z).h === c.h) x1++;
+      if (c.k === "w") { G.box(x, -1, z, x1, Math.min(c.h, 7), z + 1, { top: "area_moon_rock_top", all: "area_moon_rock", bottom: null }); R.solid(x, z, x1, z + 1); }
+      else if (c.k === "G" || c.k === "g") {
+        const base = c.h / 2;
+        G.box(x, -1, z, x1, base, z + 1, { top: "area_moon_floor", all: "soil" });
+        for (let bx = x; bx < x1; bx++) {
+          const m = BOULDERS[c.k === "g" ? "boulder_small" : ((bx * 31 + z * 17 + 3 * 7) % 2 + 2) % 2 === 0 ? "boulder_a" : "boulder_b"];
+          for (const q of m.slice(1)) G.box(bx + q[0] * P, base + q[1] * P, z + q[2] * P, bx + q[3] * P, base + q[4] * P, z + q[5] * P, "area_moon_boulder");
+        }
+        R.solid(x, z, x1, z + 1);
+      }
+      else if (c.k === "K") G.box(x, -2.2, z, x1, -2, z + 1, { top: "darkTop", all: null });
+      else if (c.k === "q") G.box(x, -1, z, x1, -0.15, z + 1, { top: "water", all: "soil" });
+      else if (c.k === "L" && c.h === 0) { G.box(x, -2.2, z, x1, -2, z + 1, { top: "darkTop", all: null }); G.box(x, -2, z + 0.02, x1, 0.4, z + 0.08, "walnut"); }
+      else {
+        const h = c.h / 2;
+        G.box(x, -1, z, x1, h, z + 1, { top: FLOOR[c.k] || "area_moon_floor", all: h > 0.6 ? "area_moon_rock" : "soil" });
+        if (c.k === "L") G.box(x + 0.1, h, z + 0.02, x1 - 0.1, h + 2.4, z + 0.1, "walnut");
+      }
+      x = x1;
+    }
+  }
+  for (const w of C.warps) {
+    if (w.kind === "mat") R.warps.push({ test: (p, input) => input.down && p.z > w.z && p.x > w.x0 && p.x < w.x1, to: "town", fx: "fadeOut" });
+    if (w.kind === "down") R.warps.push({ test: p => p.x > w.x0 && p.x < w.x1 && p.z > w.z0 && p.z < w.z1, to: w.to, spawn: { x: w.spawn.x, z: w.spawn.z, yaw: FACE.s }, fx: "fade" });
+    if (w.kind === "up") R.warps.push({ test: p => p.x > w.x0 - 0.4 && p.x < w.x1 + 0.4 && p.z > w.z0 - 0.5 && p.z < w.z1 + 0.6, to: w.to || "town", spawn: w.spawn ? { x: w.spawn.x, z: w.spawn.z, yaw: FACE.s } : null, fx: "fade" });
+  }
+  for (const it of C.items) {
+    const y = it.y || 0;
+    G.box(it.x - 0.2, y, it.z - 0.2, it.x + 0.2, y + 0.4, it.z + 0.2, { all: "ball", top: "ballTop" });
+    R.act([it.x - 0.6, it.z - 0.6, it.x + 0.6, it.z + 0.6], { label: "Look", lines: [it.key.replace(id + "_", "").replace(/_/g, " ").toUpperCase()] });
+  }
+  for (const a of C.acts) R.act(a.rect, { label: a.label, lines: a.lines });
+  for (const p of C.people) R.npcs.push({ name: p.name.split(" ").map(w => w[0] + w.slice(1).toLowerCase()).join(" "), key: p.key, x: p.x, z: p.z, y: p.y || 0,
+    yaw: (180 - p.yaw) * Math.PI / 180, look: { skin: p.skin }, role: p.role || null, talk: () => (p.lines.length ? p.lines : ["(A trainer: walk into their sight and they'll battle you.)"]).map(text => ({ text })) });
+  R.spawn = { x: C.spawn.x, z: C.spawn.z, yaw: C.spawn.yaw === 180 ? FACE.n : FACE.s };
+  R.item("Mt. Moon", { "mt_moon_1f": "In from the mouth by the POKéMON CENTER on Route 4. Three holes down to B1F; FireRed's trainers, the MOON STONE at the top left.",
+    "mt_moon_b1f": "Four parts that don't join: each a ladder up or a hole down. Its mushrooms grow back each day. The north-east part's ladder is the way out, onto Route 4.",
+    "mt_moon_b2f": "TEAM ROCKET digging for fossils, SUPER NERD MIGUEL with the DOME and HELIX FOSSILs (beat him, choose one), and the ladder up to the way out." }[id]);
   return R;
 }
 
@@ -1018,35 +1075,45 @@ TEXDEF.shuttleBlack = [16, 16, (P, r) => P.fill(hx("#2A2B30"), 0.03, r)];
 TEXDEF.moonRock = [16, 16, (P, r) => { P.fill(hx("#8D8993"), 0.08, r); for (let i = 0; i < 6; i++) P.disc(r() * 16, r() * 16, 1.2, hx("#6C6873")); }];
 for (const k of ["museumFloor", "museumWall", "museumBand", "museumPillar", "museumGold", "counterYellow", "amberGlow", "shuttleWhite", "shuttleBlack", "moonRock"]) MATDEF[k] = { tex: k, per: 1 };
 MATDEF.fossilSlab = { tex: "fossilSlab", fit: true };
+// The cases' glass (14:15: cleaner): nearly clear, a faint cool tint, one soft streak of light.
+TEXDEF.caseGlass = [16, 16, (P, r) => { P.fill(hx("#E8F4F8"), 0.0, r); for (let k = 0; k < 16; k++) { P.set(3 + k * 0.4, k, hx("#FFFFFF")); } }];
+MATDEF.caseGlass = { tex: "caseGlass", per: 1, alpha: 0.16 };
 
 // The Pewter looks' flowers (its beds' poppies and red tulips).
 TEXDEF.pewterPoppy = [16, 16, (P, r) => { P.fill(hx("#D8322E"), 0.06, r); P.disc(8, 8, 2, hx("#2B1A12")); }];
 TEXDEF.pewterTulip = [16, 16, (P, r) => { P.fill(hx("#E8503A"), 0.05, r); P.rect(0, 0, 16, 3, hx("#F07A5C")); }];
 MATDEF.pewterPoppy = { tex: "pewterPoppy", per: 1 }; MATDEF.pewterTulip = { tex: "pewterTulip", per: 1 };
 // A tan rock as Let's Go's Pewter Gym has them: angular, stepped in towards its top.
+// A round mound of rock, as the cave's boulders are: at each height a cross of two boxes (its corners cut, round from
+// above), each level smaller, so its sides read as a curve.
+function rockDome(G, cx, cz, r, h, levels, y0, mats, lean = [0, 0]) {
+  for (let i = 0; i < levels; i++) {
+    const t0 = i / levels, t1 = (i + 1) / levels;
+    const rr = Math.max(0.12, r * Math.sqrt(Math.max(0, 1 - (t0 + 0.5 / levels) ** 2)));
+    const cut = rr * 0.42, ox = cx + lean[0] * t0, oz = cz + lean[1] * t0;
+    const m = i === 0 ? mats.low : mats.mid;
+    G.box(ox - rr, y0 + h * t0, oz - rr + cut, ox + rr, y0 + h * t1, oz + rr - cut, { all: m, top: mats.top });
+    G.box(ox - rr + cut, y0 + h * t0, oz - rr, ox + rr - cut, y0 + h * t1, oz + rr, { all: m, top: mats.top });
+  }
+}
 function tanRock(R, x, z, s = 1) {
-  // (13:36, more detail.) Two chunks of layered rock leaning together, each in uneven steps that wander off-centre as
-  // they go up, the bottom layer in shadow; a crag on the big one's top; a few pebbles at its foot. Solid over the same
-  // ground as before, so the ways round them are as they were.
+  // (14:15, better again) A craggy outcrop of tan rock, as Let's Go's: a big rounded mound leaning a little, two or three
+  // smaller ones against it, a sharp crag up out of the big one, stones at its foot. Solid over the same ground as before.
   const G = R.geo, r = rng(hashStr("tanRock" + x.toFixed(2) + "," + z.toFixed(2)));
-  const chunk = (cx, cz, w, d, h, n) => {
-    let y = 0, ox = 0, oz = 0;
-    for (let i = 0; i < n; i++) {
-      const k = 1 - (i / n) * 0.72, hh = (h / n) * (0.75 + r() * 0.5);
-      ox += (r() - 0.5) * 0.14 * s; oz += (r() - 0.5) * 0.12 * s;
-      G.box(cx - (w * k) / 2 + ox, y, cz - (d * k) / 2 + oz, cx + (w * k) / 2 + ox, y + hh, cz + (d * k) / 2 + oz, { all: i === 0 ? "gymTanLow" : "gymTan", top: "gymTanTop" });
-      y += hh;
-    }
-    return [y, cx + ox, cz + oz, w * (1 - 0.72 * (n - 1) / n), d * (1 - 0.72 * (n - 1) / n)];
-  };
-  const side = r() < 0.5 ? -1 : 1;
-  const [y, tx, tz, tw, td] = chunk(x - 0.12 * s * side, z - 0.04 * s, 1.36 * s, 1.24 * s, 1.75 * s, 5);
-  chunk(x + 0.42 * s * side, z + 0.22 * s, 0.7 * s, 0.7 * s, 0.85 * s, 3);
-  // The crag: a narrow point on top, off to one side.
-  G.box(tx - tw * 0.3, y, tz - td * 0.25, tx + tw * 0.15, y + 0.22 * s, tz + td * 0.2, { all: "gymTan", top: "gymTanTop" });
-  // Pebbles round its foot.
-  for (let i = 0; i < 4; i++) {
-    const a = r() * Math.PI * 2, dd = 0.86 + r() * 0.16, px = x + Math.cos(a) * 0.8 * s * dd, pz = z + Math.sin(a) * 0.7 * s * dd, q = (0.07 + r() * 0.07) * s;
+  const mats = { low: "gymTanLow", mid: "gymTan", top: "gymTanTop" };
+  const lean = [(r() - 0.5) * 0.3 * s, (r() - 0.5) * 0.3 * s];
+  rockDome(G, x - 0.1 * s, z - 0.05 * s, 0.72 * s, 1.35 * s, 7, 0, mats, lean);
+  const n = 2 + (r() < 0.5 ? 1 : 0);
+  for (let i = 0; i < n; i++) {
+    const a = r() * Math.PI * 2, d = 0.5 + r() * 0.2;
+    rockDome(G, x + Math.cos(a) * d * s, z + Math.sin(a) * d * 0.85 * s, (0.3 + r() * 0.16) * s, (0.45 + r() * 0.35) * s, 4, 0, mats);
+  }
+  // The crag: a narrow spire up out of the big mound, off its middle.
+  const cx = x + lean[0] * 0.6 + (r() - 0.5) * 0.2 * s, cz = z + lean[1] * 0.6 + (r() - 0.5) * 0.2 * s;
+  rockDome(G, cx, cz, 0.24 * s, 0.75 * s, 4, 1.05 * s, mats);
+  for (let i = 0; i < 5; i++) {
+    const a = r() * Math.PI * 2, d = 0.9 + r() * 0.15, q = (0.06 + r() * 0.07) * s;
+    const px = x + Math.cos(a) * 0.8 * s * d, pz = z + Math.sin(a) * 0.7 * s * d;
     G.box(px - q, 0, pz - q * 0.8, px + q, q * 1.1, pz + q * 0.8, { all: "gymTan", top: "gymTanTop" });
   }
   R.solid(x - 0.8 * s, z - 0.7 * s, x + 0.8 * s, z + 0.7 * s);
@@ -1069,9 +1136,11 @@ function glassCase(R, x0, z0, x1, z1, inside, lines) {
   const G = R.geo;
   G.box(x0, 0, z0, x1, 0.75, z1, { all: "walnut", top: "darkTop" });
   inside(G, x0, z0, x1, z1);
-  G.box(x0, 0.75, z0, x1, 1.55, z0 + 0.04, "glass"); G.box(x0, 0.75, z1 - 0.04, x1, 1.55, z1, "glass");
-  G.box(x0, 0.75, z0, x0 + 0.04, 1.55, z1, "glass"); G.box(x1 - 0.04, 0.75, z0, x1, 1.55, z1, "glass");
-  G.box(x0, 1.55, z0, x1, 1.6, z1, { all: "steel", top: "glass" });
+  // (14:15: clean glass, a thin bright steel edge at each corner and along the top, nothing else.)
+  G.box(x0, 0.75, z0, x1, 1.55, z0 + 0.02, "caseGlass"); G.box(x0, 0.75, z1 - 0.02, x1, 1.55, z1, "caseGlass");
+  G.box(x0, 0.75, z0, x0 + 0.02, 1.55, z1, "caseGlass"); G.box(x1 - 0.02, 0.75, z0, x1, 1.55, z1, "caseGlass");
+  for (const [px, pz] of [[x0, z0], [x1 - 0.04, z0], [x0, z1 - 0.04], [x1 - 0.04, z1 - 0.04]]) G.box(px, 0.75, pz, px + 0.04, 1.6, pz + 0.04, "steel");
+  G.box(x0, 1.55, z0, x1, 1.58, z1, { all: "steel", top: "caseGlass", bottom: "caseGlass" });
   R.solid(x0, z0, x1, z1);
   R.act([x0 - 0.2, z0 - 0.2, x1 + 0.2, z1 + 0.3], { label: "Look", lines });
 }
@@ -1572,6 +1641,9 @@ const BUILD = {
   digletts_n() { return caveRoom("digletts_n", "North entrance (Route 2)"); },
   digletts_b1f() { return caveRoom("digletts_b1f", "B1F"); },
   digletts_s() { return caveRoom("digletts_s", "South entrance (Route 11)"); },
+  mt_moon_1f() { return moonRoom("mt_moon_1f", "1F"); },
+  mt_moon_b1f() { return moonRoom("mt_moon_b1f", "B1F"); },
+  mt_moon_b2f() { return moonRoom("mt_moon_b2f", "B2F"); },
 
   pewter_gym() {
     // PEWTER GYM, laid out as FireRed's (13 by 15 of its steps, a step a block here) and drawn as Let's Go's: the blue
@@ -1594,7 +1666,7 @@ const BUILD = {
       [10.6, 3.6, 1.0], [12.4, 4.6, 1.1], [10.8, 6.6, 0.9], [12.6, 8.2, 1.0], [10.6, 9.6, 1.0], [12.4, 11.0, 0.8]]) tanRock(R, x, z, k);
     gymStatue(R, 3.4, 14.0, ["PEWTER CITY POKéMON GYM", "LEADER: BROCK", "WINNING TRAINERS: {rival}"]);
     gymStatue(R, 10.6, 14.0, ["PEWTER CITY POKéMON GYM", "LEADER: BROCK", "WINNING TRAINERS: {rival}"]);
-    R.npcs.push({ name: "Leader Brock", key: "pewter_gym_0", role: "leader", x: 7.0, z: 2.2, yaw: FACE.s, look: { skin: "leader_brock" },
+    R.npcs.push({ name: "Leader Brock", key: "pewter_gym_0", role: "leader", x: 7.0, z: 2.2, y: 0.5, yaw: FACE.s, look: { skin: "leader_brock" },
       talk: () => [{ text: "I'm BROCK! I'm PEWTER's GYM LEADER!" }, { text: "(In the game: you battle him in his rocky arena, and win the BOULDERBADGE.)" }] });
     R.npcs.push({ name: "Camper Liam", key: "pewter_gym_1", role: "trainer", x: 3.0, z: 8.2, yaw: FACE.e, look: { skin: "camper" },
       talk: () => [{ text: "Stop right there, kid! You're still light-years from facing BROCK!" }] });
@@ -1695,11 +1767,12 @@ const BUILD = {
     // MOON in two glass cases side by side (as big as 1F's, 13:36), the windows between cream pillars; the stairs down; a scientist, a man looking about, an old
     // man remembering the moon landing, a little girl who wants a PIKACHU and her father.
     const R = new Room("museum_2f", { name: "Pewter Museum of Science", floor: "2F", W: 20, D: 11, H: 4 });
-    shell(R, { paper: "museumWall", floor: "museumFloor", skirt: "museumBand", skirtH: 0.7 });
+    // (13:56: the floor left open over the stairwell, so you see the stairs going down, not floor over them.)
+    shell(R, { paper: "museumWall", floor: "museumFloor", skirt: "museumBand", skirtH: 0.7, floorRects: [[0, 0, 20, 7], [0, 9, 20, 11], [0, 7, 9, 9], [13, 7, 20, 9]] });
     const G = R.geo;
     for (const x of [1.0, 6.2, 11.4, 16.6]) museumPillar(R, x, R.H);
     for (const x of [3.0, 8.2, 13.4]) windowN(R, x, 1.6, 1.8, 1.6);
-    stairsDown(R, 9, 7, 2, { to: "museum_1f", spawn: { x: 7.1, z: 8.1, yaw: FACE.s }, paper: "museumWall" });
+    stairsDown(R, 9, 7, 2, { to: "museum_1f", spawn: { x: 7.1, z: 8.1, yaw: FACE.s }, paper: "museumWall", show: true });
     // The shuttle on its stand.
     G.box(13.2, 0, 3.4, 17.8, 0.5, 6.0, { all: "museumGold", top: "darkTop" });
     G.box(13.8, 0.5, 4.3, 17.4, 1.2, 5.1, "shuttleWhite");
@@ -1717,7 +1790,9 @@ const BUILD = {
     };
     glassCase(R, 1.2, 3.4, 4.6, 5.2, rock, ["Meteorite that fell on MT. MOON.", "(MOON STONE?)"]);
     glassCase(R, 5.0, 3.4, 8.4, 5.2, rock, ["Meteorite that fell on MT. MOON.", "(MOON STONE?)"]);
-    for (const [x, z] of [[0.8, 9.6], [19.2, 9.6], [19.2, 1.0]]) plant(R, x, z, 0.85, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+    // (13:56: more greenery up here, by the pillars and either side of the stairs.)
+    for (const [x, z] of [[0.8, 9.6], [19.2, 9.6], [19.2, 1.0], [0.6, 1.0], [5.6, 0.9], [10.8, 0.9], [16.0, 0.9], [8.2, 9.7], [13.7, 9.7]])
+      plant(R, x, z, 0.85, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
     R.npcs.push({ name: "Scientist", key: "museum_2f_p2", x: 10.5, z: 5.5, yaw: FACE.s, look: { skin: "scientist" }, talk: () => [{ text: "We have a space exhibit now." }] });
     R.npcs.push({ name: "Man", key: "museum_2f_p0", x: 4.5, z: 9.3, yaw: FACE.n, look: { skin: "youngster" }, talk: () => [{ text: "MOON STONE? What's so special about it?" }] });
     R.npcs.push({ name: "Old man", key: "museum_2f_p1", x: 2.4, z: 6.4, yaw: FACE.n, look: { skin: "gramps" }, talk: () => [{ text: "July 20, 1969! The 1st lunar landing!" }] });

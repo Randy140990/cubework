@@ -36,20 +36,16 @@ fuchsia_gym_6	fuchsia_gym	JUGGLER	rocker	left	3	35	drowzee:34,hypno:34	-	-	-	-	2
 game_corner_0	game_corner	ROCKET	rocket	up	3	30	raticate:20,zubat:20	-	-	-	-	9	5
 lances_room_0	lances_room	ELITE FOUR LANCE	lance	down	0	99	gyarados:58,dragonair:56,dragonair:56,aerodactyl:60,dragonite:62	-	-	That's it! | I hate to admit it, but you are a POKéMON master!	...	6	1
 loreleis_room_0	loreleis_room	ELITE FOUR LORELEI	lorelei	down	0	99	dewgong:54,cloyster:53,slowbro:54,jynx:56,lapras:56	-	-	How dare you!	...	5	2
-mt_moon_1f_0	mt_moon_1f	HIKER	hiker	down	2	35	geodude:10,geodude:10,onix:10	-	WHOA! You shocked me! Oh, you're just a kid!	Wow! Shocked again!	Kids like you shouldn't be here!	5	6
-mt_moon_1f_1	mt_moon_1f	YOUNGSTER	youngster	right	3	15	rattata:10,rattata:10,zubat:10	-	Did you come to explore too?	Losing stinks!	I came down here to show off to girls.	12	16
-mt_moon_1f_2	mt_moon_1f	LASS	cooltrainer_f	down	3	15	oddish:11,bellsprout:11	-	Wow! It's way bigger in here than I thought!	Oh! I lost it!	How do you get out of here?	30	4
-mt_moon_1f_3	mt_moon_1f	SUPER NERD	super_nerd	up	3	25	magnemite:11,voltorb:11	-	What! Don't sneak up on me!	My POKéMON won't do!	I have to find stronger POKéMON.	24	31
-mt_moon_1f_4	mt_moon_1f	LASS	cooltrainer_f	down	3	15	clefairy:14	-	What? I'm waiting for my friends to find me here.	I lost?	I heard there are some very rare fossils here.	16	23
-mt_moon_1f_5	mt_moon_1f	BUG CATCHER	youngster	down	3	10	weedle:11,kakuna:11	-	Suspicious men are in the cave. What about you?	You got me!	I saw them! I'm sure they're from TEAM ROCKET!	7	22
-mt_moon_1f_6	mt_moon_1f	BUG CATCHER	youngster	right	3	10	caterpie:10,metapod:10,caterpie:10	-	Go through this cave to get to CERULEAN CITY!	I lost.	ZUBAT is tough! But, it can be useful if you catch one.	30	27
-mt_moon_b2f_0	mt_moon_b2f	SUPER NERD	super_nerd	right	4	25	grimer:12,voltorb:12,koffing:12	-	We, TEAM ROCKET, are POKéMON gangsters!	I blew it!	Darn it all! My associates won't stand for this!	12	8
-mt_moon_b2f_1	mt_moon_b2f	ROCKET	rocket	down	4	30	sandshrew:11,rattata:11,zubat:11	-	We're pulling a big job here! Get lost, kid!	So, you are good.	If you find a fossil, give it to me and scram!	15	22
-mt_moon_b2f_2	mt_moon_b2f	ROCKET	rocket	up	4	30	zubat:12,ekans:12	-	Little kids should leave grown-ups alone!	I'm steamed!	POKéMON lived here long before people came.	29	11
-mt_moon_b2f_3	mt_moon_b2f	ROCKET	rocket	left	3	30	rattata:13,zubat:13	-	-	-	-	29	17
+mt_moon_1f_0	mt_moon_1f	HIKER MARCOS	hiker	down	2	35	geodude:10,geodude:10,onix:10	-	WHOA! You shocked me! Oh, you're just a kid!	Wow! Shocked again!	Kids like you shouldn't be here!	5	6
+mt_moon_1f_1	mt_moon_1f	YOUNGSTER JOSH	youngster	right	3	15	rattata:10,rattata:10,zubat:10	-	Did you come to explore too?	Losing stinks!	I came down here to show off to girls.	12	16
+mt_moon_1f_2	mt_moon_1f	LASS MIRIAM	lass	down	3	15	oddish:11,bellsprout:11	-	Wow! It's way bigger in here than I thought!	Oh! I lost it!	How do you get out of here?	30	4
+mt_moon_1f_3	mt_moon_1f	SUPER NERD JOVAN	super_nerd	up	3	25	magnemite:11,voltorb:11	-	What! Don't sneak up on me!	My POKéMON won't do!	I have to find stronger POKéMON.	24	31
+mt_moon_1f_4	mt_moon_1f	LASS IRIS	lass_2	down	3	15	clefairy:14	-	What? I'm waiting for my friends to find me here.	I lost?	I heard there are some very rare fossils here.	16	23
+mt_moon_1f_5	mt_moon_1f	BUG CATCHER KENT	bug_catcher	down	3	10	weedle:11,kakuna:11	-	Suspicious men are in the cave. What about you?	You got me!	I saw them! I'm sure they're from TEAM ROCKET!	7	22
+mt_moon_1f_6	mt_moon_1f	BUG CATCHER ROBBY	bug_catcher_2	right	3	10	caterpie:10,metapod:10,caterpie:10	-	Go through this cave to get to CERULEAN CITY!	I lost.	ZUBAT is tough! But, it can be useful if you catch one.	30	27
 oaks_lab_0	oaks_lab	RIVAL1	blue	none	3	35	eevee:5	-	-	-	-	4	3
 pewter_gym_0	pewter_gym	LEADER BROCK	leader_brock	down	0	99	geodude:12,onix:14	BOULDERBADGE	I'm BROCK! I'm PEWTER's GYM LEADER! | I believe in rock hard defense and determination! | That's why my POKéMON are all the rock-type! | Do you still want to challenge me? Fine then! Show me your best!	I took you for granted. | As proof of your victory, here's the BOULDERBADGE! | {player} received the BOULDERBADGE!	There are all kinds of trainers in the world! | Some raise POKéMON for fights. Some see them as pets. | I'm in training to become a POKéMON breeder. | If you take your POKéMON training seriously, go visit the GYM in CERULEAN and test your abilities!	4	1
-pewter_gym_1	pewter_gym	CAMPER LIAM	camper	right	4	20	geodude:10,sandshrew:11	-	Stop right there, kid! | You're still light-years from facing BROCK!	Darn! | Light-years isn't time... It measures distance!	You're pretty hot. | ...But not as hot as BROCK!	3	6
+pewter_gym_1	pewter_gym	CAMPER LIAM	camper	right	6	20	geodude:10,sandshrew:11	-	Stop right there, kid! | You're still light-years from facing BROCK!	Darn! | Light-years isn't time... It measures distance!	You're pretty hot. | ...But not as hot as BROCK!	3	6
 pokemon_mansion_1f_0	pokemon_mansion_1f	SCIENTIST	scientist	left	3	50	electrode:29,weezing:29	-	Who are you? There shouldn't be anyone here.	Ouch!	A key? I don't know what you're talking about.	17	17
 pokemon_mansion_2f_0	pokemon_mansion_2f	BURGLAR	super_nerd	left_right	0	90	charmander:34,charmeleon:34	-	I can't get out! This old place is one big puzzle!	Oh no! My bag of loot!	Switches open and close alternating sets of doors!	3	17
 pokemon_mansion_3f_0	pokemon_mansion_3f	BURGLAR	super_nerd	left_right	0	90	ninetales:38	-	This place is like, huge!	Ayah!	I wonder where my partner went.	5	11
@@ -211,15 +207,15 @@ route_25_5	route_25	LASS	cooltrainer_f	down	4	15	oddish:13,pidgey:13,oddish:13	-
 route_25_6	route_25	HIKER	hiker	right	3	35	machop:15,geodude:15	-	I just got down from MT.MOON, but I'm ready!	You worked hard!	Drat! A ZUBAT bit me back in there.	8	4
 route_25_7	route_25	HIKER	hiker	up	2	35	geodude:13,geodude:13,machop:13,geodude:13	-	I'm off to see a POKéMON collector at the cape!	You got me.	The collector has many rare kinds of POKéMON.	23	9
 route_25_8	route_25	HIKER	hiker	right	2	35	onix:17	-	You're going to see BILL? First, let's fight!	You're something.	The trail below is a shortcut to CERULEAN CITY.	13	7
-route_3_0	route_3	BUG CATCHER	youngster	right	2	10	caterpie:10,weedle:10,caterpie:10	-	Hey! I met you in VIRIDIAN FOREST!	You beat me again!	There are other kinds of POKéMON than those found in the forest!	10	6
-route_3_1	route_3	YOUNGSTER	youngster	down	3	15	rattata:11,ekans:11	-	Hi! I like shorts! They're comfy and easy to wear!	I don't believe it!	Are you storing your POKéMON on PC? Each BOX can hold 20 POKéMON!	14	4
-route_3_2	route_3	LASS	cooltrainer_f	left	2	15	pidgey:9,pidgey:9	-	You looked at me, didn't you?	You're mean!	Quit staring if you don't want to fight!	16	9
-route_3_3	route_3	BUG CATCHER	youngster	down	1	10	weedle:9,kakuna:9,caterpie:9,metapod:9	-	Are you a trainer? Let's fight!	If I had new POKéMON, I would've won!	If a POKéMON BOX on the PC gets full, just switch to another BOX!	19	5
-route_3_4	route_3	LASS	cooltrainer_f	left	4	15	rattata:10,nidoran_m:10	-	That look you gave me, it's so intriguing!	Be nice!	Avoid fights by not letting people see you!	23	4
-route_3_5	route_3	YOUNGSTER	youngster	left	3	15	spearow:14	-	Hey! You're not wearing shorts!	Lost! Lost! Lost!	I always wear shorts, even in winter!	22	9
-route_3_6	route_3	BUG CATCHER	youngster	right	3	10	caterpie:11,metapod:11	-	You can fight my new POKéMON!	Done like dinner!	Trained POKéMON are stronger than the wild ones!	24	6
-route_3_7	route_3	LASS	cooltrainer_f	up	2	15	jigglypuff:14	-	Eek! Did you touch me?	That's it?	ROUTE 4 is at the foot of MT.MOON.	33	10
-route_4_0	route_4	LASS	cooltrainer_f	right	3	15	paras:31,paras:31,parasect:31	-	I came to get my mushroom POKéMON!	Oh! My cute mushroom POKéMON!	There might not be any more mushrooms here. | I think I got them all.	63	3
+route_3_0	route_3	BUG CATCHER COLTON	bug_catcher	right	3	10	caterpie:10,weedle:10,caterpie:10	-	Hey! I met you in VIRIDIAN FOREST!	You beat me again!	There are other kinds of POKéMON than those found in the forest!	10	6
+route_3_1	route_3	YOUNGSTER BEN	youngster	down	2	15	rattata:11,ekans:11	-	Hi! I like shorts! They're comfy and easy to wear!	I don't believe it!	Are you storing your POKéMON on PC? Each BOX can hold 20 POKéMON!	14	4
+route_3_2	route_3	LASS JANICE	lass	left	5	15	pidgey:9,pidgey:9	-	You looked at me, didn't you?	You're mean!	Quit staring if you don't want to fight!	16	9
+route_3_3	route_3	BUG CATCHER GREG	bug_catcher_2	down	2	10	weedle:9,kakuna:9,caterpie:9,metapod:9	-	Are you a trainer? Let's fight!	If I had new POKéMON, I would've won!	If a POKéMON BOX on the PC gets full, just switch to another BOX!	19	5
+route_3_4	route_3	LASS SALLY	lass_2	left	5	15	rattata:10,nidoran_m:10	-	That look you gave me, it's so intriguing!	Be nice!	Avoid fights by not letting people see you!	23	4
+route_3_5	route_3	YOUNGSTER CALVIN	youngster_2	left	5	15	spearow:14	-	Hey! You're not wearing shorts!	Lost! Lost! Lost!	I always wear shorts, even in winter!	22	9
+route_3_6	route_3	BUG CATCHER JAMES	bug_catcher_3	right	4	10	caterpie:11,metapod:11	-	You can fight my new POKéMON!	Done like dinner!	Trained POKéMON are stronger than the wild ones!	24	6
+route_3_7	route_3	LASS ROBIN	lass_3	up	3	15	jigglypuff:14	-	Eek! Did you touch me?	That's it?	ROUTE 4 is at the foot of MT.MOON.	33	10
+route_4_0	route_4	LASS CRISSY	lass	right	4	15	paras:31,paras:31,parasect:31	-	I came to get my mushroom POKéMON!	Oh! My cute mushroom POKéMON!	There might not be any more mushrooms here. | I think I got them all.	63	3
 route_6_0	route_6	JR.TRAINER♂	cooltrainer_m	right	0	20	weepinbell:16	-	I'm doing this out of love. Leave me alone!	No, this can't be...	My love will leave me in disgust.	10	21
 route_6_1	route_6	JR.TRAINER♀	cooltrainer_f	left	0	20	cubone:20	-	I'm training for my love. Don't bother me!	My textbook never...	Now I understand, POKéMON isn't about calculated numbers.	11	21
 route_6_2	route_6	BUG CATCHER	youngster	right	4	10	weedle:16,caterpie:16,weedle:16	-	There aren't many bugs out here.	No! You're kidding!	I like bugs, so I'm going back to VIRIDIAN FOREST.	0	15
@@ -328,3 +324,8 @@ viridian_gym_5	viridian_gym	COOLTRAINER♂	cooltrainer_m	right	4	35	rhyhorn:43	-
 viridian_gym_6	viridian_gym	BLACKBELT	hiker	down	3	25	machoke:38,machop:38,machoke:38	-	Your POKéMON will cower at the crack of my whip!	Yowch! Whiplash!	Wait! I was just careless!	10	1
 viridian_gym_7	viridian_gym	TAMER	rocker	right	4	40	arbok:39,tauros:39	-	VIRIDIAN GYM was closed for a long time, but now our LEADER is back!	I was beaten?	You can go on to POKéMON LEAGUE only by defeating our GYM LEADER!	2	16
 viridian_gym_8	viridian_gym	COOLTRAINER♂	cooltrainer_m	down	3	35	nidorino:39,nidoking:39	-	-	-	-	6	5
+mt_moon_b2f_0	mt_moon_b2f	SUPER NERD MIGUEL	super_nerd_2	down	4	25	grimer:12,voltorb:12,koffing:12	-	Hey, stop! | I found these fossils! They're both mine!	Okay! I'll share!	We'll each take one! | No being greedy!	-1	-1
+mt_moon_b2f_1	mt_moon_b2f	TEAM ROCKET GRUNT	rocket	up	4	30	sandshrew:11,rattata:11,zubat:11	-	We're pulling a big job here! | Get lost, kid!	So, you are good.	If you find a fossil, give it to me and scram!	-1	-1
+mt_moon_b2f_2	mt_moon_b2f	TEAM ROCKET GRUNT	rocket_2	left	3	30	zubat:11,ekans:11	-	Little kids should leave grown-ups alone!	I'm steamed!	POKéMON lived here long before people came.	-1	-1
+mt_moon_b2f_3	mt_moon_b2f	TEAM ROCKET GRUNT	rocket_3	up	3	30	rattata:13,sandshrew:13	-	TEAM ROCKET will find the fossils, revive them, and sell them for cash!	Urgh! Now I'm mad!	You made me mad! | TEAM ROCKET will blacklist you!	-1	-1
+mt_moon_b2f_4	mt_moon_b2f	TEAM ROCKET GRUNT	rocket_4	down	3	30	rattata:13,zubat:13	-	We, TEAM ROCKET, are POKéMON gangsters!	I blew it!	Darn it all! | My associates won't stand for this!	-1	-1
