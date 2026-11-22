@@ -153,11 +153,14 @@ BALLS["power_plant"] = [{"key": k, "x": x, "z": z, "y": 0} for k, x, z in (
     ("power_plant_i8", 7.5, 25.5), ("power_plant_i9", 28.5, 3.5), ("power_plant_i10", 34.5, 3.5), ("power_plant_i11", 26.5, 32.5),
     ("power_plant_i12", 20.5, 32.5), ("power_plant_thunderstone", 12.5, 3.5), ("power_plant_elixer", 36.5, 11.5))]
 # POKéMON standing in rooms (statics.tsv's): ZAPDOS by the big machine; VOLTORB and ELECTRODE posing as item balls.
+MONS_DAYCARE = [{"key": "pet:daycare_clefairy", "species": "clefairy", "x": 8.0, "z": 4.0, "yaw": 210.0},
+                {"key": "pet:daycare_psyduck", "species": "psyduck", "x": 11.6, "z": 4.6, "yaw": 150.0}]
 MONS = {"power_plant": [{"key": "zapdos", "species": "zapdos", "x": 5.6, "z": 4.2, "yaw": 0.0}] + [
     {"key": k, "species": "poke_ball", "x": x, "z": z, "yaw": 0.0} for k, x, z in (
         ("power_plant_voltorb_1", 9.5, 20.5), ("power_plant_voltorb_2", 32.5, 18.5), ("power_plant_voltorb_3", 21.5, 25.5),
         ("electrode_power_plant_1", 25.5, 18.5), ("power_plant_voltorb_4", 23.5, 32.5), ("power_plant_voltorb_5", 26.5, 26.0),
         ("electrode_power_plant_2", 21.5, 12.0), ("power_plant_voltorb_6", 37.5, 32.5))]}
+MONS["daycare"] = MONS_DAYCARE
 BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n", "cerulean_house1": "cerulean_house1_back",

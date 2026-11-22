@@ -36,6 +36,9 @@ public final class Adventure {
 	public static final float YAW = 180F;
 	/** Held still (a trainer has spotted you, or a text box is up). */
 	public static int frozen;
+	/** Walking after someone for a few ticks more: where to (x, z). */
+	public static int followTicks;
+	public static double followX, followZ;
 	/** The game's speed (1, 2 or 3 times). */
 	public static int speed = 1;
 	private static CameraType before;
@@ -110,6 +113,7 @@ public final class Adventure {
 		if (!active()) return;
 		if (mc.options.getCameraType() != CameraType.THIRD_PERSON_BACK) mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
 		if (frozen > 0 && --frozen == 0 && mc.screen == null) focus(-1);
+		if (followTicks > 0) followTicks--;
 		distance += (distanceTarget - distance) * 0.2;
 		while (SPEED.consumeClick()) cycleSpeed();
 		hidden = !BattleScene.active() && behind(mc);

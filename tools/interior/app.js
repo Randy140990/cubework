@@ -138,6 +138,16 @@ function prepareRoom(r) {
     r.act([n.x - 0.45, n.z - 0.45, n.x + 0.45, n.z + 0.45], { label: "Talk", npc: n });
     n.fig = f; return f;
   });
+  // POKéMON in a room (the DAY CARE's pen): the creatures themselves, as the Creature Viewer draws them.
+  for (const pt of r.pets || []) (async () => {
+    try { await loadSpecies(pt.sid); } catch (e) { return; }
+    const d = DATA.species[pt.sid]; if (!d) return;
+    const m = buildModel(d.ours);
+    m.holder.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
+    m.holder.position.set(pt.x, r.groundAt ? r.groundAt(pt.x, pt.z) + 0.04 : 0.04, pt.z); m.holder.rotation.y = (180 - (pt.yaw || 0)) * D2R;
+    r.group.add(m.holder);
+  })();
+  for (const pt of r.pets || []) r.solid(pt.x - 0.4, pt.z - 0.4, pt.x + 0.4, pt.z + 0.4);
   if (r.exitArrow) {
     const a = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.7), new THREE.MeshBasicMaterial({ map: pixTex("exitArrow"), transparent: true, depthWrite: false }));
     a.rotation.x = -Math.PI / 2; a.position.set(r.exitArrow.x, 0.06, r.exitArrow.z); a.renderOrder = 4; r.group.add(a); r.arrowMesh = a;

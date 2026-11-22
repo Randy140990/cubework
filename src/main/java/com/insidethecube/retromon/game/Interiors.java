@@ -724,6 +724,8 @@ public final class Interiors {
 		boolean alone = level.players().stream().noneMatch(o -> o != comer && r.equals(roomOf(o)));
 		// The POKéMON CENTER every town shares: that town's own people in it (14:18), the nurse the same.
 		if (alone && r.id().equals("center")) centerVisitors(level, r, comer);
+		// The DAY CARE: yours (if you've left one) in the pen with the others.
+		if (r.id().equals("daycare")) Game.daycarePen(comer);
 		// Mt. Moon's mushrooms (B1F) grow back: one you picked on an earlier day is there again (13:56).
 		if (!r.balls().isEmpty()) {
 			PlayerData d = Game.data(comer);

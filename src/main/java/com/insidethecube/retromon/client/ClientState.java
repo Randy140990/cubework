@@ -131,6 +131,12 @@ public final class ClientState {
 				}
 				show(() -> new DialogueScreen(lines, mode, npc, t));
 			}
+			case "follow" -> {
+				// Walking after someone (the GYM's guide in PEWTER): your feet take you to the spot behind him.
+				Adventure.followX = t.getDoubleOr("x", 0);
+				Adventure.followZ = t.getDoubleOr("z", 0);
+				Adventure.followTicks = t.getIntOr("ticks", 8);
+			}
 			case "hold" -> {
 				// Still a cutscene (someone walking off): the black bars stay, and you stand still.
 				Adventure.frozen = Math.max(Adventure.frozen, t.getIntOr("ticks", 10));

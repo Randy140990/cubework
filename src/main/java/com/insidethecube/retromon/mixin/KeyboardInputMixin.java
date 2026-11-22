@@ -28,6 +28,22 @@ public abstract class KeyboardInputMixin extends ClientInput {
 		if (!Adventure.active()) return;
 		LocalPlayer player = Minecraft.getInstance().player;
 		Input k = this.keyPresses;
+		if (player != null && Adventure.followTicks > 0) {
+			// Walking after someone: to the spot behind them, at a walk, then still.
+			double dx = Adventure.followX - player.getX(), dz = Adventure.followZ - player.getZ();
+			if (dx * dx + dz * dz < 0.12) {
+				this.keyPresses = Input.EMPTY;
+				this.moveVector = Vec2.ZERO;
+				return;
+			}
+			float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+			player.setYRot(yaw);
+			player.setYHeadRot(yaw);
+			player.setXRot(10F);
+			this.keyPresses = new Input(true, false, false, false, false, false, false);
+			this.moveVector = new Vec2(0, 1);
+			return;
+		}
 		if (player == null || Adventure.frozen > 0 || com.insidethecube.retromon.client.Device.busy()) {
 			this.keyPresses = Input.EMPTY;
 			this.moveVector = Vec2.ZERO;

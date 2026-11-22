@@ -721,8 +721,23 @@ public final class Game {
 		if (!level.getFluidState(below).isEmpty() || b.is(net.minecraft.tags.BlockTags.LEAVES) || b.is(net.minecraft.tags.BlockTags.FENCES)
 				|| b.is(net.minecraft.tags.BlockTags.WALLS) || b.is(net.minecraft.tags.BlockTags.FENCE_GATES)) return false;
 		if (!b.isFaceSturdy(level, below, net.minecraft.core.Direction.UP)) return false;
+		// (17:51) Not up on a cliff (the map's cliffs and ledges are dripstone, mushroom block and jungle stairs, the
+		// garden beds mud), and not in a flower bed (PEWTER's man in the roses).
+		if (offGround(level, at)) return false;
 		// Not a roof: real ground has more under it (a roof has the room beneath it).
 		return !level.getBlockState(at.below(2)).isAir() && !level.getBlockState(at.below(3)).isAir() && level.canSeeSky(at);
+	}
+
+	/** Standing on a cliff top or a ledge (rock the map's cliffs are made of), a garden bed, or among flowers. */
+	private static boolean offGround(ServerLevel level, BlockPos at) {
+		BlockState b = level.getBlockState(at.below());
+		if (b.is(net.minecraft.world.level.block.Blocks.DRIPSTONE_BLOCK) || b.is(net.minecraft.world.level.block.Blocks.BROWN_MUSHROOM_BLOCK)
+				|| b.is(net.minecraft.world.level.block.Blocks.MUD) || b.is(net.minecraft.world.level.block.Blocks.POINTED_DRIPSTONE)
+				|| b.is(net.minecraft.world.level.block.Blocks.JUNGLE_STAIRS) || b.is(net.minecraft.world.level.block.Blocks.JUNGLE_SLAB)
+				|| b.is(net.minecraft.world.level.block.Blocks.MUD_BRICKS)) return true;
+		BlockState feet = level.getBlockState(at);
+		return feet.is(net.minecraft.tags.BlockTags.FLOWERS) || feet.is(net.minecraft.world.level.block.Blocks.ROSE_BUSH)
+				|| feet.is(net.minecraft.world.level.block.Blocks.PEONY) || feet.is(net.minecraft.world.level.block.Blocks.LILAC);
 	}
 
 	/**
@@ -801,6 +816,8 @@ public final class Game {
 	 * Someone standing where they shouldn't from an older placing (the nurse on the Pokémon Center's arch, a man
 	 * in a pond): moved to good ground nearby, which becomes their spot. Checked once each time they're loaded.
 	 */
+	private static final java.util.Set<String> RESPOT = java.util.Set.of("pewter_city_p3", "cerulean_city_p7");
+
 	static boolean settle(Npc n) {
 		if (!ourSave || n.role() == Npc.LEADER || n.key().startsWith("rival") || !(n.level() instanceof ServerLevel level)) return true;
 		BlockPos at = n.blockPosition();
@@ -814,7 +831,17 @@ public final class Game {
 		if (!town && !pl.startsWith("route_")) return true;
 		boolean wet = n.isInWater() || !level.getFluidState(at).isEmpty() || !level.getFluidState(at.below()).isEmpty();
 		boolean high = (town || n.role() == Npc.NURSE || n.role() == Npc.CLERK) && at.getY() > streetY(level, zone) + 1;
-		if (!wet && !high) return true;
+		// (17:51) Moved to their own spot since (PEWTER's man out of the roses, CERULEAN CAVE's guard in front of it).
+		int[] own = RESPOT.contains(n.key()) ? spotOf(n.key()) : null;
+		if (own != null && Math.hypot(own[0] - at.getX(), own[1] - at.getZ()) > 3) {
+			BlockPos to = spot(level, own[0], own[1], 6);
+			n.teleportTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5);
+			n.rehome(to);
+			return true;
+		}
+		// (17:51) Up on a cliff (ROUTE 3, PEWTER) or in a flower bed: down to the ground nearby.
+		boolean off = offGround(level, at);
+		if (!wet && !high && !off) return true;
 		BlockPos to = spot(level, at.getX(), at.getZ(), 8);
 		if (!to.equals(at)) n.rehome(to);
 		return true;
@@ -826,7 +853,7 @@ public final class Game {
 				for (int dz = -r; dz <= r; dz++) {
 					if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
 					int top = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x + dx, z + dz);
-					for (int y = top; y >= top - 6; y--) {
+					for (int y = top; y >= top - 12; y--) {
 						BlockPos at = new BlockPos(x + dx, y, z + dz);
 						if (goodGround(level, at)) return at;
 					}
@@ -1617,6 +1644,7 @@ public final class Game {
 			}
 		}
 		if (d.repel > 0 && --d.repel == 0) message(p, List.of("REPEL's effect wore off."));
+		if (d.daycare != null) daycareStep(d.daycare);
 		if (!d.started || !d.anyHealthy() || COOLDOWN.containsKey(p.getUUID()) || d.place.isEmpty() || battlesOff(p)) return;
 		// Seen in the grass (as Let's Go): you meet them by walking into them, not at random.
 		if (seenMode(p)) return;
@@ -2428,6 +2456,10 @@ public final class Game {
 					bikeShop(p, n, d);
 					return;
 				}
+				if (n.key().equals("daycare_p0")) {
+					daycare(p, n, d);
+					return;
+				}
 				if (n.key().startsWith("route_4_tutor_")) {
 					tutor(p, n, d);
 					return;
@@ -2925,16 +2957,21 @@ public final class Game {
 			e.along = Math.min(total, e.along + 0.2);
 			e.ticks++;
 			double[] at = along(e.path, e.along), me = along(e.path, e.along - 1.5);
+			// (17:51) He walks ahead (moved a step at a time, so he's seen walking) and you walk after him on your own
+			// feet (your game walks you to the spot behind him), not pulled along.
 			e.npc.getNavigation().stop();
-			e.npc.teleportTo(at[0], at[1], at[2]);
+			e.npc.setPos(at[0], at[1], at[2]);
 			e.npc.setFacing((float) at[3]);
-			p.teleportTo(me[0], me[1], me[2]);
-			p.setYRot((float) me[3]);
-			p.setDeltaMovement(Vec3.ZERO);
+			if (p.position().distanceTo(new Vec3(me[0], me[1], me[2])) > 4.5) p.teleportTo(me[0], me[1], me[2]);
 			BUSY.put(p.getUUID(), 40);
 			CompoundTag hold = new CompoundTag();
 			hold.putInt("ticks", 8);
 			Net.send(p, "hold", hold);
+			CompoundTag follow = new CompoundTag();
+			follow.putDouble("x", me[0]);
+			follow.putDouble("z", me[2]);
+			follow.putInt("ticks", 8);
+			Net.send(p, "follow", follow);
 			if (e.along < total && e.ticks < 900) return false;
 			e.npc.setFacing(e.npc.yawTo(p));
 			BUSY.remove(p.getUUID());
@@ -3150,6 +3187,125 @@ public final class Game {
 		dialogue(p, n, "bike", List.of("Hi! Welcome to our BIKE SHOP.", "Have we got just the BIKE for you!", "It's a cool BIKE! Do you want it? It's ¥1,000,000."), t, n.getId());
 	}
 
+	// ---------- the POKéMON DAY CARE (ROUTE 5, Red and Blue's) ----------
+
+	/** A step while it's at the DAY CARE: a point of experience a step (as in Red and Blue), growing and learning as it goes. */
+	private static void daycareStep(Mon m) {
+		if (m.level >= 100) return;
+		m.exp++;
+		while (m.level < 100 && m.exp >= m.species.growth().expAt(m.level + 1)) {
+			int hp0 = m.maxHp();
+			m.level++;
+			m.hp = Math.min(m.maxHp(), m.hp + m.maxHp() - hp0);
+			for (String mv : m.species.learnsAt(m.level)) if (Move.find(mv) != null) m.learn(mv);
+		}
+	}
+
+	private static int daycareFee(PlayerData d) {
+		return 100 + 100 * Math.max(0, d.daycare.level - d.daycareLevel);
+	}
+
+	private static CompoundTag yesNo() {
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
+		t.put("choices", ch);
+		return t;
+	}
+
+	private static void daycare(ServerPlayer p, Npc n, PlayerData d) {
+		if (d.daycare != null) {
+			int grown = d.daycare.level - d.daycareLevel;
+			List<String> lines = new ArrayList<>();
+			if (grown <= 0) lines.add("Back already? Your " + d.daycare.name() + " needs some more time with me.");
+			else lines.add("Your " + d.daycare.name() + " has grown a lot! By level, it's grown by " + grown + "! Aren't I great?");
+			lines.add("You owe me ¥" + String.format("%,d", daycareFee(d)) + " for the return of this POKéMON.");
+			lines.add("Do you want your POKéMON back?");
+			dialogue(p, n, "daycare_back", lines, yesNo(), n.getId());
+			return;
+		}
+		dialogue(p, n, "daycare_ask", List.of("I run a DAY CARE. Would you like me to raise one of your POKéMON?"), yesNo(), n.getId());
+	}
+
+	private static void daycareAsk(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (!yes || d.daycare != null) {
+			dialogue(p, n, "talk", List.of("All right then, come again."));
+			return;
+		}
+		if (d.party.size() < 2) {
+			dialogue(p, n, "talk", List.of("You only have one POKéMON with you.", "All right then, come again."));
+			return;
+		}
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (Mon m : d.party) ch.add(StringTag.valueOf(m.name() + "  Lv" + m.level));
+		ch.add(StringTag.valueOf("CANCEL"));
+		t.put("choices", ch);
+		dialogue(p, n, "daycare_pick", List.of("Which POKéMON should I raise?"), t, n.getId());
+	}
+
+	private static void daycarePick(ServerPlayer p, Npc n, CompoundTag t) {
+		PlayerData d = data(p);
+		int i = t.getIntOr("choice", -1);
+		if (!t.getBooleanOr("answered", false) || i < 0 || i >= d.party.size() || d.daycare != null) {
+			dialogue(p, n, "talk", List.of("All right then, come again."));
+			return;
+		}
+		if (d.party.size() < 2) return;
+		boolean healthy = false;
+		for (int k = 0; k < d.party.size(); k++) if (k != i && !d.party.get(k).fainted()) healthy = true;
+		if (!healthy) {
+			dialogue(p, n, "talk", List.of("You'd have no POKéMON able to battle!", "All right then, come again."));
+			return;
+		}
+		Mon m = d.party.remove(i);
+		d.daycare = m;
+		d.daycareLevel = m.level;
+		if (d.follow >= d.party.size()) d.follow = 0;
+		sync(p);
+		daycarePen(p);
+		dialogue(p, n, "talk", List.of("Fine, I'll look after " + m.name() + " for a while.", "Come see me in a while."));
+	}
+
+	private static void daycareBack(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (d.daycare == null) return;
+		if (!yes) {
+			dialogue(p, n, "talk", List.of("All right then, come again."));
+			return;
+		}
+		if (d.party.size() >= 6) {
+			dialogue(p, n, "talk", List.of("You have no room for this POKéMON!"));
+			return;
+		}
+		int fee = daycareFee(d);
+		if (d.money < fee) {
+			dialogue(p, n, "talk", List.of("Hey, you don't have enough money!"));
+			return;
+		}
+		d.money -= fee;
+		Mon m = d.daycare;
+		d.daycare = null;
+		m.heal();
+		d.party.add(m);
+		sync(p);
+		daycarePen(p);
+		dialogue(p, n, "talk", fill(p, List.of("Thank you! Here's your POKéMON!", "{player} got " + m.name() + " back!")));
+	}
+
+	/** Yours in the DAY CARE's pen while it's there (each time you come in, and when you leave or take it back). */
+	public static void daycarePen(ServerPlayer p) {
+		if (!(p.level() instanceof ServerLevel level) || level.dimension() != Interiors.LEVEL) return;
+		Interiors.Room r = Interiors.ROOMS.get("daycare");
+		if (r == null) return;
+		String key = "daycare:" + p.getUUID();
+		net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(r.ox() - 2, r.oy() - 4, r.oz() - 2, r.ox() + r.w() + 2, r.oy() + 8, r.oz() + r.d() + 2);
+		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> w.key().equals(key))) w.discard();
+		PlayerData d = data(p);
+		if (d.daycare != null) placeMon(level, d.daycare.species.id(), key, r.ox() + 9.9, r.oy(), r.oz() + 6.2, 200F);
+	}
+
 	private static void bikeBuy(ServerPlayer p, Npc n, boolean yes) {
 		PlayerData d = data(p);
 		if (!yes) {
@@ -3208,6 +3364,11 @@ public final class Game {
 			return;
 		}
 		if (key.startsWith("wild:")) return;
+		if (key.startsWith("daycare:")) {
+			String who = d.daycare != null ? d.daycare.name() : name;
+			dialogue(p, null, "talk", List.of(who + " is playing happily in the pen."), t, w.getId());
+			return;
+		}
 		if (key.startsWith("pet:")) {
 			Trainers.Person person = Trainers.PEOPLE.get(key.substring(4));
 			dialogue(p, null, "talk", person == null ? List.of(name + ": ...") : fill(p, person.lines()), t, w.getId());
@@ -3336,6 +3497,9 @@ public final class Game {
 			case "safari_fee" -> safariFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "good_rod" -> goodRod(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "bike" -> bikeBuy(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "daycare_ask" -> daycareAsk(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "daycare_pick" -> daycarePick(p, n, t);
+			case "daycare_back" -> daycareBack(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "deleter" -> deleterAsk(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "deleter_mon" -> deleterMon(p, n, t);
 			case "deleter_move" -> deleterMove(p, n, t);
@@ -3541,6 +3705,12 @@ public final class Game {
 		ServerLevel world = p.level().getServer().overworld();
 		// A town (or a route with one): in front of its POKéMON CENTER, as FLY lands you.
 		String pin = t.getStringOr("place", "");
+		// (17:51) ROUTE 4's own pin: Route 4 proper, past MT. MOON (its POKéMON CENTER is at the ROUTE 3 end).
+		if ("route_4".equals(pin)) {
+			t.putInt("x", -520);
+			t.putInt("z", 262);
+			pin = "";
+		}
 		for (Interiors.Door d : Interiors.DOORS.values()) {
 			if (!"center".equals(d.group()) || !pin.equals(d.place())) continue;
 			world.getChunk(BlockPos.containing(d.x(), d.y(), d.z()));
@@ -3949,7 +4119,7 @@ public final class Game {
 			// Pewter City's (13:18), FireRed's map over John's at two blocks a step (x = 2c - 836, z = 2r + 265, from its
 			// doors): the girl who says CLEFAIRY came from the moon, the man by the museum, the man below the Center, the
 			// boy in the rose garden, the boy at the way east who takes you to the GYM.
-			{"pewter_city_p0", -824, 295}, {"pewter_city_p2", -770, 299}, {"pewter_city_p1", -794, 321}, {"pewter_city_p3", -770, 320},
+			{"pewter_city_p0", -824, 295}, {"pewter_city_p2", -770, 299}, {"pewter_city_p1", -794, 321}, {"pewter_city_p3", -776, 320}, {"cerulean_city_p7", -396, 251},
 			{"pewter_city_p4", -752, 306},
 			// Routes 3 and 4 (13:56), where FireRed has them (x = 2c - 748, z = 2r + 285 on Route 3; x = 2c - 628, z = 2r + 246
 			// on Route 4): the youngster resting by the way up to MT. MOON; the woman by the POKéMON CENTER, the boy below it,

@@ -358,3 +358,5 @@ fuchsia_move_deleter_p0	fuchsia_move_deleter_house	middle_aged_man	down	stay	Uh.
 cerulean_berry_man	cerulean_berry_house	old_man	left	stay	I love hearing news! | And I love berries even more! | Here, have one of mine!	-1	-1
 underground_path_trader	underground_path_route_5	middle_aged_man	down	stay	I'm looking for NIDORAN♂! Wanna trade one for NIDORAN♀?	-1	-1
 cerulean_trader	cerulean_trade_house	old_man	left	stay	I'm looking for POLIWHIRL! Wanna trade one for JYNX?	-1	-1
+daycare_clefairy	daycare_pen	clefairy	down	stay	CLEFAIRY: Pippii! | (It's being looked after at the DAY CARE.)	0	0
+daycare_psyduck	daycare_pen	psyduck	down	stay	PSYDUCK: Kwaa? | (It's being looked after at the DAY CARE.)	0	0

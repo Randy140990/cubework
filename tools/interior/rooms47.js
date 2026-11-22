@@ -387,14 +387,20 @@
       band(R, 1.0, "beam", 0.12);
       const G = R.geo;
       G.box(0.6, 0, 2.6, 4.6, 1.0, 3.5, { all: "counterOrange", top: "lab", bottom: null }); R.solid(0.6, 2.6, 4.6, 3.5);
-      G.box(6.0, 0, 3.0, 12.0, 0.03, 7.0, { top: "playMat", all: "cap", bottom: null });
+      // (0.48) The pen: a patch of lawn with white pickets round it, where the POKéMON he's raising play (CLEFAIRY and
+      // PSYDUCK, and yours when you leave one with him), their toys about.
+      G.box(6.4, 0, 2.3, 14.0, 0.04, 7.6, { top: "grassMown", all: "cap", bottom: null });
+      picket(R, 6.4, 2.3, 14.0, 2.3); picket(R, 6.4, 7.6, 14.0, 7.6); picket(R, 6.4, 2.3, 6.4, 7.6);
       toyBox(R, 11.8, 0.6, 13.4, 1.6); R.solid(11.8, 0.6, 13.4, 1.6);
-      for (const [x, z, c] of [[7.2, 4.0, "standSeat"], [10.6, 5.6, "standSeatBlue"], [8.8, 6.2, "ceruleanTrim"]]) roundBall(G, x, 0.03, z, 0.36, { all: c, top: c });
+      for (const [x, z, c] of [[7.4, 5.8, "standSeat"], [10.2, 3.2, "standSeatBlue"], [12.8, 6.6, "ceruleanTrim"]]) roundBall(G, x, 0.04, z, 0.36, { all: c, top: c });
+      R.pets = [{ sid: "clefairy", x: 8.0, z: 4.0, yaw: 210 }, { sid: "psyduck", x: 11.6, z: 4.6, yaw: 150 }];
+      for (const pt of R.pets) R.act([pt.x - 1.1, pt.z - 1.1, pt.x + 1.1, pt.z + 1.1], { label: "Look", lines: [pt.sid.toUpperCase() + " is playing in the pen.", "(It's being looked after at the DAY CARE.)"] });
+      R.act([8.9, 5.3, 10.9, 7.2], { label: "Look", lines: ["Your POKéMON plays here while you leave it with him."] });
       sofa(R, 1.0, 6.2, "e", 2.4);
       crossWindow(R, "e", 2.6, 1.6, 1.8, 1.2, ["Outside: the DAY CARE's yard. POKéMON are playing in the grass."]);
       plant(R, 0.8, 8.2, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
       R.npcs.push({ name: "Day Care man", key: "daycare_p0", x: 2.4, z: 1.8, yaw: FACE.s, look: { skin: "gentleman" },
-        talk: () => [{ text: "I run a DAY CARE. Would you like me to raise one of your POKéMON?" }, { text: "(In the game: not yet.)" }] });
+        talk: () => [{ text: "I run a DAY CARE. Would you like me to raise one of your POKéMON?" }, { text: "(In the game: YES, pick one, and it grows a point a step. Back for ¥100, and ¥100 more for each level it's grown.)" }] });
       doormat(R, 6, 8, { to: "town", mat: "matHouseV" });
       R.spawn = { x: 7.0, z: R.D - 1.5, yaw: FACE.n };
       return R;

@@ -33,6 +33,9 @@ public class PlayerData {
 	public boolean healInside;
 	/** Steps of REPEL left. */
 	public int repel;
+	/** The POKéMON the DAY CARE man (ROUTE 5) is raising for you, or null, and its level when you left it. */
+	public Mon daycare;
+	public int daycareLevel;
 	/** The place you're in (or were last in). */
 	public String place = "";
 	/** The door in the world you last went in by (a shared room's way back out: every Center's, every Mart's), and the healing one's. */
@@ -127,6 +130,10 @@ public class PlayerData {
 		t.putDouble("hy", healY);
 		t.putDouble("hz", healZ);
 		t.putInt("repel", repel);
+		if (daycare != null) {
+			t.put("daycare", MonTag.save(daycare));
+			t.putInt("daycareLevel", daycareLevel);
+		}
 		t.putString("place", place);
 		t.putString("door", door);
 		t.putString("hdoor", healDoor);
@@ -171,6 +178,10 @@ public class PlayerData {
 		d.healY = t.getDoubleOr("hy", 0);
 		d.healZ = t.getDoubleOr("hz", 0);
 		d.repel = t.getIntOr("repel", 0);
+		if (t.get("daycare") instanceof CompoundTag dc) {
+			d.daycare = MonTag.load(dc);
+			d.daycareLevel = t.getIntOr("daycareLevel", d.daycare.level);
+		}
 		d.place = t.getStringOr("place", "");
 		d.door = t.getStringOr("door", "");
 		d.healDoor = t.getStringOr("hdoor", "");
