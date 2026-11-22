@@ -55,7 +55,12 @@ public final class Interiors {
 	public record Warp(String kind, double x0, double x1, double z0, double z1, String door, String to, double sx, double sz, float syaw, String choice, String needs) {}
 
 	/** Someone in a room; role: "nurse" (heals), "clerk" (sells) or null (just talks). */
-	public record Person(String key, String name, String skin, double x, double z, float yaw, List<String> lines, String role, boolean seated) {}
+	/**
+	 * Someone in a room. group: one of a group's people is in at a time (a Mart's shopper, a different one each time you
+	 * come in); from and to: the hours they're about (the Trainer School's, by day), or -1.
+	 */
+	public record Person(String key, String name, String skin, double x, double z, float yaw, List<String> lines, String role, boolean seated, String group,
+			int from, int to) {}
 
 	/** Something to look at in a room; map, a wall map that opens the Town Map. */
 	public record Act(double x0, double z0, double x1, double z1, List<String> lines, boolean map, boolean pc) {}
@@ -81,7 +86,8 @@ public final class Interiors {
 	 * A door in the world into a room: its blocks, where you come out (and facing), which way it faces (s, n, e or w:
 	 * the side you walk up to it from) and, for a room with more than one way in, where you arrive (x, z, yaw), else null.
 	 */
-	public record Door(String key, String room, List<BlockPos> blocks, double x, double y, double z, boolean north, float yaw, String face, double[] in) {}
+	public record Door(String key, String room, List<BlockPos> blocks, double x, double y, double z, boolean north, float yaw, String face, double[] in,
+			String place, String group) {}
 
 	/**
 	 * A room's battle arena (Let's Go's: a battle indoors is fought in a round hall built from that room's own
@@ -186,7 +192,8 @@ public final class Interiors {
 				JsonObject p = pe.getAsJsonObject();
 				people.add(new Person(p.get("key").getAsString(), p.get("name").getAsString(), p.get("skin").getAsString(), num(p, "x", 0), num(p, "z", 0),
 						(float) num(p, "yaw", 0), strings(p.get("lines")), p.has("role") && !p.get("role").isJsonNull() ? p.get("role").getAsString() : null,
-						p.has("seated") && p.get("seated").getAsBoolean()));
+						p.has("seated") && p.get("seated").getAsBoolean(), p.has("group") && !p.get("group").isJsonNull() ? p.get("group").getAsString() : null,
+						p.has("hours") ? p.getAsJsonArray("hours").get(0).getAsInt() : -1, p.has("hours") ? p.getAsJsonArray("hours").get(1).getAsInt() : -1));
 			}
 			List<Act> acts = new ArrayList<>();
 			for (JsonElement ae : r.getAsJsonArray("acts")) {
@@ -226,7 +233,8 @@ public final class Interiors {
 			JsonObject in = d.has("in") && d.get("in").isJsonObject() ? d.getAsJsonObject("in") : null;
 			DOORS.put(e.getKey(), new Door(e.getKey(), d.get("room").getAsString(), blocks, out.get(0).getAsDouble(), out.get(1).getAsDouble(),
 					out.get(2).getAsDouble(), north, (float) num(d, "yaw", north ? 180 : face.equals("e") ? -90 : face.equals("w") ? 90 : 0), face,
-					in == null ? null : new double[] {num(in, "x", 0), num(in, "z", 0), num(in, "yaw", 0)}));
+					in == null ? null : new double[] {num(in, "x", 0), num(in, "z", 0), num(in, "yaw", 0)}, d.has("place") ? d.get("place").getAsString() : null,
+					d.has("group") ? d.get("group").getAsString() : null));
 		}
 		JsonObject st = DATA.getAsJsonObject("start");
 		if (st != null) {
@@ -390,18 +398,77 @@ public final class Interiors {
 		// The people inside.
 		AABB box = new AABB(r.ox() - 8, r.oy() - 8, r.oz() - 8, r.ox() + 40, r.oy() + 8, r.oz() + 40);
 		for (Npc n : level.getEntitiesOfClass(Npc.class, box, n -> true)) n.discard();
-		for (Person p : r.people()) {
-			// The nurse heals and the clerk sells, as the games' nurse and clerk do (their own ways of talking).
-			int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : "trainer".equals(p.role()) ? Npc.TRAINER : Npc.PERSON;
-			try {
-				Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
-				if (n != null) {
-					n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));
-					if (p.seated()) n.setSeated(true);
-				}
-			} catch (Exception e) {
-				Retromon.LOG.error("Retromon: couldn't place {} in {}", p.key(), r.id(), e);
+		for (Person p : r.people()) if (wanted(level, r, p)) put(level, r, p);
+	}
+
+	/** Puts someone in a room in their spot. */
+	private static void put(ServerLevel level, Room r, Person p) {
+		// The nurse heals and the clerk sells, as the games' nurse and clerk do (their own ways of talking).
+		int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : "trainer".equals(p.role()) ? Npc.TRAINER : Npc.PERSON;
+		try {
+			Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy(), r.oz() + p.z(), p.yaw());
+			if (n != null) {
+				n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));
+				if (p.seated()) n.setSeated(true);
 			}
+		} catch (Exception e) {
+			Retromon.LOG.error("Retromon: couldn't place {} in {}", p.key(), r.id(), e);
+		}
+	}
+
+	/** Which of each room's groups is in (by room and group): the key of the one about. */
+	private static final Map<String, String> CHOSEN = new HashMap<>();
+
+	/** Whether someone's about in a room now: in their hours, and the one of their group who's in. */
+	private static boolean wanted(ServerLevel level, Room r, Person p) {
+		if (p.from() >= 0) {
+			int h = (int) Math.floorMod(level.getServer().overworld().getDayTime() / 1000L + 6, 24L);
+			boolean open = p.from() <= p.to() ? h >= p.from() && h < p.to() : h >= p.from() || h < p.to();
+			if (!open) return false;
+		}
+		if (p.group() == null) return true;
+		String k = CHOSEN.get(r.id() + "/" + p.group());
+		if (k == null) {
+			for (Person o : r.people()) if (p.group().equals(o.group())) {
+				k = o.key();
+				break;
+			}
+			CHOSEN.put(r.id() + "/" + p.group(), k);
+		}
+		return p.key().equals(k);
+	}
+
+	/**
+	 * Someone's come into a room: who's about is settled again (the hours), and, with nobody else in there, a group
+	 * (a Mart's shopper) sends in a different one of its people.
+	 */
+	public static void people(ServerLevel level, Room r, ServerPlayer comer) {
+		if (r == null) return;
+		boolean alone = level.players().stream().noneMatch(o -> o != comer && r.equals(roomOf(o)));
+		if (alone) {
+			Map<String, List<Person>> groups = new LinkedHashMap<>();
+			for (Person p : r.people()) if (p.group() != null) groups.computeIfAbsent(p.group(), g -> new ArrayList<>()).add(p);
+			for (Map.Entry<String, List<Person>> g : groups.entrySet()) {
+				List<Person> ps = g.getValue();
+				if (ps.size() < 2) continue;
+				String was = CHOSEN.get(r.id() + "/" + g.getKey());
+				Person next;
+				do next = ps.get(level.getRandom().nextInt(ps.size()));
+				while (next.key().equals(was));
+				CHOSEN.put(r.id() + "/" + g.getKey(), next.key());
+			}
+		}
+		AABB box = new AABB(r.ox() - 8, r.oy() - 8, r.oz() - 8, r.ox() + 40, r.oy() + 8, r.oz() + 40);
+		List<Npc> here = level.getEntitiesOfClass(Npc.class, box, n -> true);
+		for (Person p : r.people()) {
+			if (p.group() == null && p.from() < 0) continue;
+			boolean want = wanted(level, r, p);
+			boolean in = false;
+			for (Npc n : here) if (p.key().equals(n.key())) {
+				if (want && !in) in = true;
+				else if (in || n.talker == null) n.discard();
+			}
+			if (want && !in) put(level, r, p);
 		}
 	}
 
@@ -412,8 +479,22 @@ public final class Interiors {
 	/** Who's on their way somewhere (after the fade to black): ticks left, and where to. */
 	private static final Map<UUID, Integer> PENDING_T = new HashMap<>();
 	private static final Map<UUID, Runnable> PENDING = new HashMap<>();
-	/** (After the client's iris has shut right down: it closes over 17 ticks.) */
+	/**
+	 * (After the client's iris has shut right down: it closes over 17 ticks, and says when it's shut, "dark". This is
+	 * how long to wait if it never says.)
+	 */
 	private static final int FADE_TICKS = 21;
+
+	/** How many ticks to wait for the iris at the game's speed now (TAB's x4 runs four times the ticks a second). */
+	private static int fadeTicks(ServerPlayer p) {
+		float rate = p.level().getServer().tickRateManager().tickrate();
+		return Math.round(FADE_TICKS * Math.max(1F, rate / 20F)) + 30;
+	}
+
+	/** Your screen's iris has shut: you're moved now (stairs, doors), so you never see the next room before it shuts. */
+	public static void dark(ServerPlayer p) {
+		if (PENDING_T.containsKey(p.getUUID())) PENDING_T.put(p.getUUID(), 1);
+	}
 	private static final Map<UUID, Vec3> LAST = new HashMap<>();
 
 	/** A new game: you wake up in your room. */
@@ -431,7 +512,7 @@ public final class Interiors {
 			Retromon.LOG.warn("Retromon: {} wasn't there; building it now", r.id());
 			build(level, r);
 		}
-		COOL.put(p.getUUID(), FADE_TICKS + 20);
+		COOL.put(p.getUUID(), fadeTicks(p) + 20);
 		Runnable move = () -> {
 			boolean fromOutside = p.level() != level;
 			if (fromOutside) Game.leavingLevel(p);
@@ -445,7 +526,7 @@ public final class Interiors {
 			return true;
 		}
 		Net.send(p, "fade", new CompoundTag());
-		PENDING_T.put(p.getUUID(), FADE_TICKS);
+		PENDING_T.put(p.getUUID(), fadeTicks(p));
 		PENDING.put(p.getUUID(), move);
 		return true;
 	}
@@ -454,9 +535,9 @@ public final class Interiors {
 	public static void out(ServerPlayer p, Door d) {
 		MinecraftServer s = p.level().getServer();
 		ServerLevel world = s.overworld();
-		COOL.put(p.getUUID(), FADE_TICKS + 20);
+		COOL.put(p.getUUID(), fadeTicks(p) + 20);
 		Net.send(p, "fade", new CompoundTag());
-		PENDING_T.put(p.getUUID(), FADE_TICKS);
+		PENDING_T.put(p.getUUID(), fadeTicks(p));
 		PENDING.put(p.getUUID(), () -> {
 			if (p.level() != world) Game.leavingLevel(p);
 			p.teleportTo(world, d.x(), d.y(), d.z(), java.util.Set.of(), d.yaw(), 30F, true);
@@ -473,6 +554,23 @@ public final class Interiors {
 		p.setDeltaMovement(Vec3.ZERO);
 		LAST.remove(p.getUUID());
 		Game.roomLeft(p);
+	}
+
+	/**
+	 * The door a room's way out takes you through: its own, or, for a room every Center (or every Mart) shares, the one
+	 * you came in by, so you come out of the Pewter Center in Pewter.
+	 */
+	public static Door doorOut(ServerPlayer p, String own) {
+		Door d = own == null ? null : DOORS.get(own);
+		Door came = DOORS.get(Game.data(p).door);
+		if (d != null && came != null && d.group() != null && d.group().equals(came.group())) return came;
+		return d;
+	}
+
+	/** The place a shared room is in for you (the town of the Center you went into), or null for the room's own. */
+	public static String placeFor(ServerPlayer p, Room r) {
+		Door came = DOORS.get(Game.data(p).door);
+		return came != null && came.place() != null && came.room().equals(r.id()) ? came.place() : null;
 	}
 
 	/** Out through one of the doors by its key (the Route 28 Gate's choice: ROUTE 28's door, or ROUTE 26's). */
@@ -526,7 +624,7 @@ public final class Interiors {
 								go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
 								return true;
 							}
-							Door d = w.door() == null ? null : DOORS.get(w.door());
+							Door d = doorOut(p, w.door());
 							if (d == null) continue;
 							if (r.id().equals("lab") && !Game.data(p).started) {
 								// The games' way: Oak won't let you go without a Pokémon of your own.
@@ -553,7 +651,7 @@ public final class Interiors {
 								go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
 								return true;
 							}
-							Door d = w.door() == null ? null : DOORS.get(w.door());
+							Door d = doorOut(p, w.door());
 							if (d == null) continue;
 							out(p, d);
 							return true;
@@ -573,7 +671,7 @@ public final class Interiors {
 								go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
 								return true;
 							}
-							Door d = w.door() == null ? null : DOORS.get(w.door());
+							Door d = doorOut(p, w.door());
 							if (d == null) continue;
 							out(p, d);
 							return true;
@@ -620,6 +718,7 @@ public final class Interiors {
 			if (at && Math.abs(p.getY() - y) < 1.2) {
 				Room r = ROOMS.get(d.room());
 				if (r != null) {
+					Game.data(p).door = d.key();
 					if (d.in() != null) go(p, r, d.in()[0], d.in()[1], (float) d.in()[2], true);
 					else go(p, r, r.ex(), r.ez(), r.eyaw(), true);
 				}

@@ -9,3 +9,9 @@ fuchsia_city	fuchsia_city	ultra_ball,great_ball,hyper_potion,revive,full_heal,su
 cinnabar_island	cinnabar_island	ultra_ball,great_ball,hyper_potion,max_repel,escape_rope,full_heal,revive
 saffron_city	saffron_city	great_ball,hyper_potion,max_repel,escape_rope,full_heal,revive
 indigo_plateau	indigo_plateau	ultra_ball,great_ball,full_restore,max_potion,full_heal,revive,max_repel
+cherrygrove_city	cherrygrove_city	poke_ball,potion,antidote,parlyz_heal,awakening
+violet_city	violet_city	poke_ball,potion,escape_rope,antidote,parlyz_heal,awakening,x_defend,x_attack,x_speed,flower_mail
+azalea_town	azalea_town	charcoal,poke_ball,potion,super_potion,escape_rope,repel,antidote,parlyz_heal,flower_mail
+ecruteak_city	ecruteak_city	poke_ball,great_ball,potion,super_potion,antidote,parlyz_heal,awakening,burn_heal,ice_heal,revive
+olivine_city	olivine_city	great_ball,super_potion,hyper_potion,antidote,parlyz_heal,awakening,ice_heal,super_repel,surf_mail
+blackthorn_city	blackthorn_city	great_ball,ultra_ball,hyper_potion,max_potion,full_heal,revive,max_repel,x_defend,x_attack

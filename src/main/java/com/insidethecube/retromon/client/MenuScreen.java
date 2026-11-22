@@ -625,6 +625,26 @@ public class MenuScreen extends DeviceScreen {
 		V.titleTracked(g, t, x, y, size, ink, 1);
 	}
 
+	/** How far each tile's line has grown (0 to 1), and when it was last drawn. */
+	private final float[] lines = new float[32];
+	private long lineNs;
+
+	/** A tile's line: grows out from the middle over a second while it's picked (eased), gone when it isn't. */
+	private float lineGrow(int i, boolean on) {
+		long now = System.nanoTime();
+		if (i == MAIN_ROW[0]) {
+			float dt = lineNs == 0 ? 0 : Math.min(0.1F, (now - lineNs) / 1e9F);
+			lineNs = now;
+			for (int c = 0; c < MAIN_ROW.length; c++) {
+				int k = MAIN_ROW[c];
+				if (k < lines.length) lines[k] = k == menuAt && menuRow == 1 && view == View.MENU ? Math.min(1, lines[k] + dt) : 0;
+			}
+		}
+		if (i >= lines.length || !on) return 0;
+		float t = lines[i];
+		return 1 - (1 - t) * (1 - t) * (1 - t);
+	}
+
 	/**
 	 * The menu, as the UI Viewer's (Let's Go's player menu, signed off 20 Nov): the world behind washed pale; your
 	 * partner's emblem at the top (the shape of its head in its own colour); a row of five rounded tiles, each its own
@@ -676,7 +696,7 @@ public class MenuScreen extends DeviceScreen {
 			int[] col = MAIN_COLS[c];
 			float cx = 640 + (c - 2) * 172, tx = cx - 70, ty = 352, sq = 124;
 			boolean off = ITEMS[i].equals("POKéDEX") && !d.hasDex() || ITEMS[i].equals("POKéMON") && d.party.isEmpty();
-			if (menu && vover(tx, ty, 140, sq + 10 + 32)) {
+			if (menu && vover(tx, ty, 140, sq + 10 + 42)) {
 				menuRow = 1;
 				menuAt = i;
 			}
@@ -705,8 +725,13 @@ public class MenuScreen extends DeviceScreen {
 			// Its name with a thick white edge, lifted when on, and a line in its colour under it.
 			float ny = ty + sq + 10 + (on ? -4 : 0);
 			stroked(g, Lang.t(SHOWN[i]), cx, ny + 4, 21, off ? V.DIM : V.INK);
-			if (on) V.pill(g, cx - 48, ny + 31.5F - 6 + 2, 96, 6, 0x1F000000);
-			if (on) V.pill(g, cx - 48, ny + 31.5F - 6, 96, 6, col[1]);
+			// (It grows out from the middle to both sides over a second, 10 px clear of the name.)
+			float grow = lineGrow(i, on);
+			if (grow > 0.02F) {
+				float lw = Math.max(6, 96 * grow), ly = ny + 31.5F - 6 + 10;
+				V.pill(g, cx - lw / 2, ly + 2, lw, 6, Ui.alpha(0x1F000000, Math.min(1, grow * 3)));
+				V.pill(g, cx - lw / 2, ly, lw, 6, col[1]);
+			}
 			// The big white arrow pointing at it from the side.
 			if (on) {
 				float ax = tx - 26 + 20, ay = ty + 28 + 24;
@@ -715,7 +740,7 @@ public class MenuScreen extends DeviceScreen {
 				V.tri(g, ax - 1, ay, 24, 0, 0xFFDDE3EE);
 			}
 			int idx = i;
-			if (menu) vhit(tx, ty, 140, sq + 10 + 32, () -> pickMenu(idx));
+			if (menu) vhit(tx, ty, 140, sq + 10 + 42, () -> pickMenu(idx));
 		}
 		// The five pills.
 		for (int c = 0; c < SIDE_ROW.length; c++) {

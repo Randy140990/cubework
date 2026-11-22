@@ -35,6 +35,8 @@ public class PlayerData {
 	public int repel;
 	/** The place you're in (or were last in). */
 	public String place = "";
+	/** The door in the world you last went in by (a shared room's way back out: every Center's, every Mart's), and the healing one's. */
+	public String door = "", healDoor = "";
 	/** Text speed: 0 slow, 1 mid, 2 fast. */
 	public int textSpeed = 2;
 	/** Which of your party walks with you (its place in the party). */
@@ -126,6 +128,8 @@ public class PlayerData {
 		t.putDouble("hz", healZ);
 		t.putInt("repel", repel);
 		t.putString("place", place);
+		t.putString("door", door);
+		t.putString("hdoor", healDoor);
 		t.putInt("textSpeed", textSpeed);
 		t.putInt("follow", follow);
 		t.putString("name", name);
@@ -168,6 +172,8 @@ public class PlayerData {
 		d.healZ = t.getDoubleOr("hz", 0);
 		d.repel = t.getIntOr("repel", 0);
 		d.place = t.getStringOr("place", "");
+		d.door = t.getStringOr("door", "");
+		d.healDoor = t.getStringOr("hdoor", "");
 		d.textSpeed = t.getIntOr("textSpeed", 2);
 		d.follow = t.getIntOr("follow", 0);
 		d.name = t.getStringOr("name", "");

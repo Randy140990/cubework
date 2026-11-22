@@ -18,6 +18,7 @@ const PLACES = [
   { id: "gate_league", name: "Pokémon League Gate", floor: "Route 22", group: "Route 22" },
   { id: "gate_johto", name: "Route 28 Gate", floor: "Route 22", group: "Route 22" },
   { id: "arena_lab", name: "Lab battle", floor: "Battle arena", group: "Battle arenas" },
+  { id: "arena_route", name: "Route battle", floor: "Battle arena (outside)", group: "Battle arenas" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
 ];
 // Your house and the rival's (14 by 13, the mat in a nook at the door), the stairs at the back on the right.
@@ -327,7 +328,7 @@ function martShelf(room, X, Z, f, w = 4, h = 2.2, o = {}) {
 }
 function cooler(room, X, Z, f, w = 2) {
   const F = room.F(X, Z, f), d = 0.9;
-  F.box(0, 0, 0, w, 2.5, d, { all: "cupboardWhite", front: null });
+  F.box(0, 0, 0, w, 2.5, d, { all: "cupboardWhite" });
   for (let i = 0; i < Math.round(w); i++) F.box(i + 0.05, 0.15, d - 0.02, i + 0.95, 2.35, d, { front: "cooler", all: null });
   F.box(0, 2.5, 0, w, 2.7, d, { all: "blueTrim" });
   F.solid(0, 0, w, d);
@@ -692,7 +693,7 @@ function drawMartAd(P, f) {
 function dresser(R, X, w = 2.4, o = {}) {
   const F = R.F(X, 0, "s"), body = o.body || "paint", top = o.top || "honey";
   F.box(0, 0, 0, w, 0.1, 0.6, "cap");
-  F.box(0, 0.1, 0, w, 1.0, 0.66, { all: body, front: null, back: null, bottom: null });
+  F.box(0, 0.1, 0, w, 1.0, 0.66, { all: body, back: null, bottom: null });
   const n = Math.max(2, Math.round(w / 1.1));
   for (let i = 0; i < n; i++) F.box(i * w / n + 0.03, 0.14, 0.66, (i + 1) * w / n - 0.03, 0.96, 0.67, { front: "cupboardWhite", all: null });
   F.box(-0.04, 1.0, -0.02, w + 0.04, 1.07, 0.71, top);
@@ -711,8 +712,8 @@ function dresser(R, X, w = 2.4, o = {}) {
 // A chest of four drawers (beside your desk).
 function drawerUnit(R, X, Z, f, w = 0.9, h = 1.1, wood = "pale") {
   const F = R.F(X, Z, f);
-  F.box(0, 0, 0, w, h, 0.62, { all: wood, front: null });
-  for (const [y0, y1] of [[0.06, h / 2 - 0.02], [h / 2 + 0.02, h - 0.06]]) F.box(0.05, y0, 0.62, w - 0.05, y1, 0.63, { front: "drawers", all: null });
+  F.box(0, 0, 0, w, h, 0.62, { all: wood });
+  for (const [y0, y1] of [[0.06, h / 2 - 0.02], [h / 2 + 0.02, h - 0.06]]) F.box(0.05, y0, 0.62, w - 0.05, y1, 0.63, { front: drawersOf(wood), all: null });
   F.solid(0, 0, w, 0.63);
   R.item("Chest of drawers", "Four drawers, pale wood, beside the desk.");
 }
@@ -1135,10 +1136,15 @@ const BUILD = {
     doormat(R, MART_DOOR[0], MART_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matMart" });
     R.npcs.push({ name: "Clerk", role: "clerk", key: "viridian_city", x: 1.4, z: 6.4, yaw: FACE.e, look: { skin: "clerk" },
       talk: () => [{ text: "Hi there! May I help you?" }] });
-    R.npcs.push({ name: "Youngster", x: 7.6, z: 1.8, yaw: FACE.n, look: { skin: "youngster" },
+    // One shopper at a time, a different one each time you come in (the room's shared by every Mart).
+    R.npcs.push({ name: "Youngster", group: "shopper", x: 7.6, z: 1.8, yaw: FACE.n, look: { skin: "youngster" },
       talk: () => [{ text: "No! POTIONs are all sold out." }] });
-    R.npcs.push({ name: "Lady", x: 12.0, z: 5.0, yaw: FACE.e, look: { skin: "middle_aged_woman" },
+    R.npcs.push({ name: "Lady", group: "shopper", x: 12.0, z: 5.0, yaw: FACE.e, look: { skin: "middle_aged_woman" },
       talk: () => [{ text: "This shop sells many ANTIDOTEs." }] });
+    R.npcs.push({ name: "Hiker", group: "shopper", x: 12.4, z: 2.0, yaw: FACE.n, look: { skin: "hiker" },
+      talk: () => [{ text: "ESCAPE ROPEs! You can never have too many when you're off into a cave." }] });
+    R.npcs.push({ name: "Lass", group: "shopper", x: 4.4, z: 6.2, yaw: FACE.n, look: { skin: "lass" },
+      talk: () => [{ text: "A REPEL keeps weak wild POKéMON away for a while." }, { text: "Handy when you just want to get somewhere!" }] });
     R.spawn = MART_IN;
     return R;
   },
@@ -1184,13 +1190,13 @@ const BUILD = {
     schoolDesk(R, 7.65, 5.8, { book: true }); schoolDesk(R, 8.75, 5.8);
     palm(R, 0.9, 7.2, 0.9); palm(R, 11.1, 7.2, 0.9);
     doormat(R, SCHOOL_DOOR[0], SCHOOL_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matSchool" });
-    R.npcs.push({ name: "Teacher", key: "viridian_school_teacher", x: 2.4, z: 1.6, yaw: FACE.s, look: { skin: "school_teacher" },
+    R.npcs.push({ name: "Teacher", key: "viridian_school_teacher", hours: [7, 18], x: 2.4, z: 1.6, yaw: FACE.s, look: { skin: "school_teacher" },
       talk: () => [{ text: "Welcome to the TRAINER SCHOOL! Shall I ask you a question?" }] });
-    R.npcs.push({ name: "Pupil", key: "viridian_school_kid", x: 3.25, z: 4.18, yaw: FACE.n, seated: true, look: { skin: "school_kid" },
+    R.npcs.push({ name: "Pupil", key: "viridian_school_kid", hours: [7, 18], x: 3.25, z: 4.18, yaw: FACE.n, seated: true, look: { skin: "school_kid" },
       talk: () => [{ text: "Whew! I'm trying to learn all my notes by heart." }, { text: "The test is about STATUS problems. Look at the board!" }] });
-    R.npcs.push({ name: "Pupil", key: "viridian_school_girl", x: 8.75, z: 4.18, yaw: FACE.n, seated: true, look: { skin: "school_kid_f" },
+    R.npcs.push({ name: "Pupil", key: "viridian_school_girl", hours: [7, 18], x: 8.75, z: 4.18, yaw: FACE.n, seated: true, look: { skin: "school_kid_f" },
       talk: () => [{ text: "The notebook on the desk up front has TRAINER TIPS in it." }, { text: "Have a read! It's really useful." }] });
-    R.npcs.push({ name: "Pupil", key: "viridian_school_kid2", x: 7.65, z: 6.58, yaw: FACE.n, seated: true, look: { skin: "schoolboy" },
+    R.npcs.push({ name: "Pupil", key: "viridian_school_kid2", hours: [7, 18], x: 7.65, z: 6.58, yaw: FACE.n, seated: true, look: { skin: "schoolboy" },
       talk: () => [{ text: "A burnt POKéMON's attacks are weaker? I never knew that!" }, { text: "I'd better write it down." }] });
     R.spawn = SCHOOL_IN;
     return R;
@@ -1213,8 +1219,8 @@ const BUILD = {
     tvUnit(R, 3.5, 3.0, R.screen("tvHouseV", 40, 24, drawFilm, 0.9), { lines: ["A nature programme: a flock of SPEAROW over the sea."] });
     { const F = R.F(7.2, 0, "s"), w = 2.6;
       F.box(0, 0, 0, w, 0.1, 0.62, "cap");
-      F.box(0, 0.1, 0, w, 0.92, 0.66, { all: "walnut", front: null });
-      for (let i = 0; i < 2; i++) F.box(i * w / 2 + 0.03, 0.12, 0.66, (i + 1) * w / 2 - 0.03, 0.9, 0.67, { front: "drawers", all: null });
+      F.box(0, 0.1, 0, w, 0.92, 0.66, { all: "walnut" });
+      for (let i = 0; i < 2; i++) F.box(i * w / 2 + 0.03, 0.12, 0.66, (i + 1) * w / 2 - 0.03, 0.9, 0.67, { front: "drawersWalnut", all: null });
       F.box(-0.04, 0.92, -0.02, w + 0.04, 0.99, 0.7, "walnut");
       F.box(0.2, 0.99, 0.1, 1.5, 1.44, 0.55, { front: "books", all: "linen", top: "linen" });
       F.box(1.8, 0.99, 0.2, 2.1, 1.3, 0.5, "potWhite"); F.box(1.7, 1.3, 0.1, 2.2, 1.65, 0.6, "leafSolid");
@@ -1390,6 +1396,40 @@ const BUILD = {
     deskPC(R, 1.0, 14.4, "e", R.screen("pcArena2", 40, 26, drawLab, 0.9), { top: "lab" });
     boxes(R, 20.6, 14.0); plant(R, 19.6, 17.8, 1.0);
     R.spawn = { x: 12, z: 14.2, yaw: FACE.n };
+    return R;
+  },
+
+  arena_route() {
+    // A route's battle (a wild one in the grass, or a trainer on the path), as the mod builds it out of Minecraft's own
+    // blocks in Retromon Look (client/BattleScene.arena): a mown pitch in stripes of the grass's two greens, a worn
+    // line round it, across its middle and round a circle at its centre; beds of flowers either side and a lantern
+    // post at each corner; a clipped azalea hedge all round (open where the camera stands, at the bottom); tall grass
+    // beyond; two rings of Kanto's trees. (Here for looking at: the mod's is blocks, so it has the Look's grass and
+    // flowers, swaying.) Your POKéMON stands just below the middle line, theirs above it.
+    const R = new Room("arena_route", { name: "Route battle", floor: "Battle arena (outside)", W: 40, D: 40, H: 8, outside: true });
+    ground(R, "grass");
+    const cx = 20, cz = 20;
+    const pitch = (dx, dz, i) => { const hx2 = 6 - i, z0 = -8 + i, z1 = 7 - i, r = Math.max(0.5, 2.5 - i); if (Math.abs(dx) > hx2 || dz < z0 || dz > z1) return false;
+      const ex = Math.max(0, Math.abs(dx) - (hx2 - r)), ez = Math.max(0, Math.max(z0 + r - dz, dz - (z1 - r))); return Math.hypot(ex, ez) <= r + 0.25; };
+    for (let dx = -7; dx <= 7; dx++) for (let dz = -9; dz <= 8; dz++) {
+      if (!pitch(dx, dz, 0)) continue;
+      const line = !pitch(dx, dz, 1) || dz === -1 || Math.abs(Math.hypot(dx, dz + 1) - 2.6) < 0.55;
+      patch(R, cx + dx, cz + dz, cx + dx + 1, cz + dz + 1, line ? "path" : ((dz % 4) + 4) % 4 < 2 ? "grass" : "grassMown");
+    }
+    for (const side of [-1, 1]) {
+      flowers(R, side < 0 ? cx - 9 : cx + 8, cz - 7, side < 0 ? cx - 7 : cx + 10, cz + 6);
+      for (const dz of [-10, 6]) { const x = cx + side * 8 + 0.5, z = cz + dz + 0.5; R.geo.box(x - 0.12, 0, z - 0.12, x + 0.12, 2.0, z + 0.12, "pale"); R.geo.box(x - 0.22, 2.0, z - 0.22, x + 0.22, 2.5, z + 0.22, { all: "glass", top: "steel" }); }
+    }
+    // The hedge, round (block by block), open at the bottom where the camera stands.
+    for (let dx = -13; dx <= 13; dx++) for (let dz = -13; dz <= 13; dz++) {
+      const d = Math.hypot(dx, dz); if (d < 10.6 || d > 11.7 || Math.hypot(dx + 1.4, dz - 9.8) < 4.5) continue;
+      R.geo.box(cx + dx, 0, cz + dz, cx + dx + 1, 2, cz + dz + 1, "treeLeaf");
+    }
+    for (let i = 0; i < 22; i++) { const a = i / 22 * Math.PI * 2, x = cx + Math.sin(a) * 14.2, z = cz + Math.cos(a) * 14.2; if (Math.hypot(x - cx + 1.4, z - cz - 9.8) > 6.5) tree(R, x, z, 1.3); }
+    for (let i = 0; i < 28; i++) { const a = (i + 0.5) / 28 * Math.PI * 2, x = cx + Math.sin(a) * 17.4, z = cz + Math.cos(a) * 17.4; if (Math.hypot(x - cx + 1.4, z - cz - 9.8) > 6.5) tree(R, x, z, 1.6); }
+    R.item("Pitch", "13 by 16 blocks: stripes of grass and moss, a dirt path line round it, across the middle and round a circle at the centre.");
+    R.item("Round it", "Flower beds and lantern posts either side; an azalea hedge two high (some of it in flower); tall grass; birch and azalea trees in two rings.");
+    R.spawn = { x: cx - 0.6, z: cz + 2.2, yaw: FACE.n };
     return R;
   },
 

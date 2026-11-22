@@ -35,7 +35,7 @@ kanto	route_17	-640	590	route	ROUTE 17	-	Grass|Fishing	doduo,fearow,ponyta,dodri
 kanto	route_19	-500	870	route	ROUTE 19	-	Surfing|Fishing	tentacool,staryu,tentacruel	-
 kanto	route_20	-575	920	route	ROUTE 20	-	Surfing|Fishing	tentacool,tentacruel,staryu	-
 kanto	seafoam_islands	-630	925	town	SEAFOAM ISLANDS	-	Grass|Surfing|Fishing	zubat,krabby,golbat,slowpoke,kingler,seel,slowbro,dewgong,tentacool,staryu	-
-kanto	cinnabar_island	-825	912	town	CINNABAR ISLAND	-	Fishing	staryu,tentacool	-
+kanto	cinnabar_island	-783	922	town	CINNABAR ISLAND	-	Fishing	staryu,tentacool	-
 kanto	route_21	-795	805	route	ROUTE 21	-	Grass|Surfing|Fishing	pidgey,rattata,raticate,pidgeotto,tentacool,staryu,tentacruel	-
 kanto	route_23	-910	440	route	ROUTE 23	-	Grass|Fishing	nidorino,nidorina,mankey,fearow,primeape,arbok,ekans,poliwag,poliwhirl	-
 kanto	victory_road	-910	300	spot	VICTORY ROAD	-	Grass	geodude,zubat,onix,graveler,golbat,machoke	-

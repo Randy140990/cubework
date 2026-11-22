@@ -105,6 +105,8 @@ function applyTime() {
   const dm = matCache.doorLight;
   if (dm) { const tx = pixTex(t.m > 0.5 ? "doorNight" : t.k > 0.5 ? "doorDusk" : "doorLight"); dm.map = tx; dm.emissiveMap = tx; dm.color.setHex(0x1a1a1a); dm.needsUpdate = true; }
   if (room) setClocks(room, t.clock);
+  // Those who keep hours (the Trainer School's teacher and pupils, by day): away at other times.
+  if (room) for (const n of room.npcs) if (n.hours && n.fig) { const h = t.clock, [a, b] = n.hours; n.away = !(h >= a && h < b); n.fig.root.visible = !n.away; }
   if (!room || !room.poolMeshes) return;
   const col = poolLight(t.k, t.m);
   for (const mesh of room.poolMeshes) setWash(mesh, mesh.userData.pool, t, col);
@@ -123,6 +125,12 @@ function setClocks(r, hours) {
 function prepareRoom(r) {
   makePools(r);
   makeClocks(r);
+  // A group's people (the Mart's shoppers): one of them about, picked each time you come in, as in game.
+  const groups = {};
+  for (const n of r.npcs) if (n.group) (groups[n.group] = groups[n.group] || []).push(n);
+  const out = new Set();
+  for (const g of Object.values(groups)) { const keep = g[Math.floor(Math.random() * g.length)]; for (const n of g) if (n !== keep) out.add(n); }
+  r.npcs = r.npcs.filter(n => !out.has(n));
   r.npcFigs = r.npcs.map(n => {
     const f = makeFigure(n.look); f.root.position.set(n.x, 0, n.z); f.root.rotation.y = n.yaw; r.group.add(f.root);
     poseFigure(f, { seated: n.seated });
@@ -378,7 +386,7 @@ function probe() {
     if (sc < bs) { bs = sc; best = a; }
   };
   if (fol.model && fol.ride === "walk") consider(fol.x, fol.z, { label: "Talk", follower: true, at: [fol.x, fol.y + fol.size.h + 0.3, fol.z] });
-  for (const a of room.acts) if (a.npc) consider(a.npc.x, a.npc.z, a);
+  for (const a of room.acts) if (a.npc && !a.npc.away) consider(a.npc.x, a.npc.z, a);
   if (best) return best;
   for (let d = 0.5; d <= 2.1 + 1e-6; d += 0.4) {
     const px = me.x + lx * d, pz = me.z + lz * d;

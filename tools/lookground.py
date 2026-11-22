@@ -383,7 +383,24 @@ def build(save):
             sp[x, y] = pp[x, (y + 5) % 16]
     save("dirt_path_side", side)
     # Minecraft's own patterns, recoloured: the cliffs' dripstone, the azalea trees (their flowers kept).
-    save("dripstone_block", recolour(os.path.join(VANILLA, "textures/block/dripstone_block.png"), DRIP))
+    drip = recolour(os.path.join(VANILLA, "textures/block/dripstone_block.png"), DRIP)
+    save("dripstone_block", drip)
+    # The steps on the dripstone in the water (jungle stairs, always waterlogged there: Pallet's channel, the sea walls
+    # all over the map): one solid colour, the ledges' own earth, not planks. Only the ones in the water; jungle stairs
+    # anywhere else keep their planks.
+    dp = [drip.getpixel((x, y)) for y in range(drip.height) for x in range(drip.width)]
+    mean = tuple(int(sum(c[k] for c in dp) / len(dp)) for k in range(3))
+    step = Image.new("RGBA", (16, 16), mean + (255,))
+    save("retromon_water_step", step)
+    for kind, parent in (("", "stairs"), ("_inner", "inner_stairs"), ("_outer", "outer_stairs")):
+        write_json("models/block/retromon_water_step%s.json" % kind, {"parent": "minecraft:block/" + parent, "textures": {
+            "bottom": "minecraft:block/retromon_water_step", "top": "minecraft:block/retromon_water_step", "side": "minecraft:block/retromon_water_step"}})
+    stairs = json.load(open(os.path.join(VANILLA, "blockstates/jungle_stairs.json")))["variants"]
+    variants = {}
+    for k, v in stairs.items():
+        variants[k + ",waterlogged=false"] = v
+        variants[k + ",waterlogged=true"] = dict(v, model=v["model"].replace("jungle_stairs", "retromon_water_step"))
+    write_json("blockstates/jungle_stairs.json", {"variants": variants})
     # The mud brick steps up the ledges (their stairs and slabs): the same light earth as the ledges they're cut into,
     # in their own brick pattern (mortar the darkest), so they match.
     save("mud_bricks", recolour(os.path.join(VANILLA, "textures/block/mud_bricks.png"), DRIP))

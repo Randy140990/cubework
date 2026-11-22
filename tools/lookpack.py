@@ -148,8 +148,7 @@ def main():
         if os.path.exists(f):
             os.remove(f)
     # (The poppy is John's now, with the other red flowers: lookplants.py.)
-    save("dandelion", flower((250, 215, 60, 255), (240, 140, 40, 255)))
-    save("azure_bluet", flower((245, 245, 250, 255), (250, 220, 90, 255)))
+    # (The dandelion and azure bluet are John's now too, with the other flowers: lookplants.py.)
     save("sand", speckled((240, 226, 172), (214, 196, 140), (250, 242, 205), 4))
     print("look pack written")
 

@@ -169,11 +169,16 @@ public class TownMapScreen extends DeviceScreen {
 
 	/** FAST TRAVEL (on in OPTIONS): straight to a point in the world (a pin's, or one picked on the map). */
 	private void travel(double x, double z) {
+		travel(x, z, null);
+	}
+
+	private void travel(double x, double z, String place) {
 		if (!Settings.fastTravel() || minecraft == null) return;
 		Sounds.press();
 		CompoundTag t = new CompoundTag();
 		t.putInt("x", (int) Math.floor(x));
 		t.putInt("z", (int) Math.floor(z));
+		if (place != null) t.putString("place", place);
 		ClientPlayNetworking.send(new Net.Act("travel", t));
 		minecraft.setScreen(null);
 	}
@@ -182,7 +187,7 @@ public class TownMapScreen extends DeviceScreen {
 		if (P.isEmpty()) return;
 		Pin p = P.get(sel);
 		if (Settings.fastTravel()) {
-			travel(p.x() + 0.5, p.z() + 0.5);
+			travel(p.x() + 0.5, p.z() + 0.5, p.key());
 			return;
 		}
 		String place = p.kind().equals("town") ? flyPlace(p.key()) : null;
@@ -410,7 +415,11 @@ public class TownMapScreen extends DeviceScreen {
 	public boolean mouseReleased(MouseButtonEvent event) {
 		if (dragging) {
 			dragging = false;
-			if (!dragMoved) pick(nearest(event.x(), event.y()), true);
+			if (!dragMoved) {
+				int n = nearest(event.x(), event.y());
+				if (n >= 0 && n == sel && Settings.fastTravel()) fly();
+				else pick(n, true);
+			}
 			return true;
 		}
 		return super.mouseReleased(event);
@@ -757,6 +766,8 @@ public class TownMapScreen extends DeviceScreen {
 			default -> "Place";
 		};
 		boolean mineHere = p.key().equals(mine());
+		boolean button = Settings.fastTravel() || town;
+		float bottom = y + h - 22 - (button ? 43 + 8 : 0) - 17 - 12;
 		V.label(g, mineHere ? Lang.t("You are here") : Lang.t(kind) + " · " + (region.equals("johto") ? "JOHTO" : "KANTO"), px, cy);
 		cy += 18 + 6;
 		float ts = p.name().length() > 14 ? 27 : 32;
@@ -780,8 +791,9 @@ public class TownMapScreen extends DeviceScreen {
 			cy += 18 + 7;
 			cy = chips(g, here, px, cy, cw, 14.5F, 11, 4, 6, null, true);
 		}
-		// Its gym.
+		// Its gym (when there's room for its card).
 		String[] gym = GYMS.get(p.key());
+		if (gym != null && cy + 16 + 26 + 84 > bottom) gym = null;
 		if (gym != null) {
 			cy += 16;
 			V.label(g, Lang.t("Gym"), px, cy);
@@ -796,14 +808,13 @@ public class TownMapScreen extends DeviceScreen {
 			V.text(g, Lang.t("Team from level {0}", gym[3]), tx0, cy + 10 + 26 + 19, 14, V.TEXT, false);
 			cy += gh2;
 		}
-		// How its POKéMON are found, and which.
-		if (!p.how().isEmpty()) {
+		// How its POKéMON are found, and which (when there's room).
+		if (!p.how().isEmpty() && cy + 14 + 24 <= bottom) {
 			cy += 14;
 			cy = chips(g, p.how(), px, cy, cw, 12, 9, 3, 5, HOW_COLS, false);
 		}
 		List<String> wl = p.wild().subList(0, Math.min(p.wild().size(), gym != null ? 4 : 8));
-		float bottom = y + h - 22 - (town ? 43 + 8 + 17 : 17) - 12;
-		if (!wl.isEmpty()) {
+		if (!wl.isEmpty() && cy + 10 + 26 + (cw - 18) / 4 <= bottom) {
 			cy += 10;
 			String lab = Lang.t("Wild POKéMON");
 			V.label(g, lab, px, cy);
@@ -826,7 +837,7 @@ public class TownMapScreen extends DeviceScreen {
 			V.softShadow(g, px, fy + 3, cw, bh, 8, 0x4DE8961E);
 			V.pill(g, px, fy, cw, bh, 0xFFFFFFFF);
 			V.rrv(g, px + 2, fy + 2, cw - 4, bh - 4, (bh - 4) / 2, V.SEL_TOP, V.SEL_BOTTOM);
-			V.centred(g, Lang.t("A: GO HERE"), px + cw / 2, V.capsTop(fy + bh / 2, 17), 17, V.INK, false);
+			footLabel(g, "GO HERE", px, fy, cw, bh);
 			vhit(px, fy, cw, bh, this::fly);
 			fy += bh + 8;
 		} else if (town) {
@@ -836,7 +847,7 @@ public class TownMapScreen extends DeviceScreen {
 				V.softShadow(g, px, fy + 3, cw, bh, 8, 0x4DE8961E);
 				V.pill(g, px, fy, cw, bh, 0xFFFFFFFF);
 				V.rrv(g, px + 2, fy + 2, cw - 4, bh - 4, (bh - 4) / 2, V.SEL_TOP, V.SEL_BOTTOM);
-				V.centred(g, Lang.t("A: FLY HERE"), px + cw / 2, V.capsTop(fy + bh / 2, 17), 17, V.INK, false);
+				footLabel(g, "FLY HERE", px, fy, cw, bh);
 				vhit(px, fy, cw, bh, this::fly);
 			} else {
 				V.pill(g, px, fy, cw, bh, Ui.alpha(0xFFDDE3F0, 0.7F));
@@ -848,6 +859,14 @@ public class TownMapScreen extends DeviceScreen {
 		int[] zn = zoneOf(p);
 		String where = zn != null ? Lang.t("Zone in the mod: {0}, {1} to {2}, {3}", zn[0], zn[1], zn[2], zn[3]) : Lang.t("About {0}, {1} on your map", p.x(), p.z());
 		V.text(g, where, px, fy, 12.5F, V.MUTED, true);
+	}
+
+	/** The foot button's words with the SPACE key before them, centred together. */
+	private static void footLabel(GuiGraphics g, String words, float px, float fy, float cw, float bh) {
+		String l = Lang.t(words);
+		float kw = V.keyWidth("SPACE", 27), lw = V.width(l, 17, false), x0 = px + (cw - kw - 9 - lw) / 2;
+		V.key(g, "SPACE", x0, fy + (bh - 27) / 2, 27);
+		V.text(g, l, x0 + kw + 9, V.capsTop(fy + bh / 2, 17), 17, V.INK, false);
 	}
 
 	/** A name in Fredoka, wrapped to a width. */

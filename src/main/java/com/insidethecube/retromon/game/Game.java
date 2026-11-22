@@ -871,6 +871,42 @@ public final class Game {
 		return null;
 	}
 
+	/** The Town Map's places (data/map_pins.tsv): key, x, z, and how much nearer a town counts (spots count further). */
+	private static List<Object[]> pins;
+
+	/**
+	 * Where a spot is for the place pill: its marked place, else the Town Map's place nearest it (a town's pin counts
+	 * as a little nearer, a cave's or a tower's a little further, as they cover less), within 300 blocks. A pin with no
+	 * place of its own (MT.MOON) is its landmark's first place (MT.MOON 1F).
+	 */
+	public static String placeNear(double x, double z) {
+		String marked = placeAt(x, z);
+		if (marked != null) return marked;
+		if (pins == null) {
+			java.util.Map<String, String> byLandmark = new java.util.HashMap<>();
+			for (String[] r : Species.table("place_landmarks.tsv")) if (r.length > 1) byLandmark.putIfAbsent(r[1], r[0]);
+			List<Object[]> ps = new ArrayList<>();
+			for (String[] r : Species.table("map_pins.tsv")) {
+				if (r.length < 5) continue;
+				String key = r[1];
+				if (Places.get(key) == null) key = byLandmark.getOrDefault(key, key);
+				double k = r[4].equals("town") ? 0.8 : r[4].equals("spot") ? 1.35 : 1.0;
+				ps.add(new Object[] {key, Double.parseDouble(r[2].trim()), Double.parseDouble(r[3].trim()), k});
+			}
+			pins = ps;
+		}
+		String best = null;
+		double bd = 300;
+		for (Object[] o : pins) {
+			double d = Math.hypot((Double) o[1] - x, (Double) o[2] - z) * (Double) o[3];
+			if (d < bd) {
+				bd = d;
+				best = (String) o[0];
+			}
+		}
+		return best;
+	}
+
 	public static List<Zone> zones() {
 		return zones;
 	}
@@ -904,6 +940,7 @@ public final class Game {
 	 */
 	public static void roomEntered(ServerPlayer p, Interiors.Room r, boolean banner) {
 		PlayerData dd = data(p);
+		if (p.level() instanceof ServerLevel lv0) Interiors.people(lv0, r, p);
 		if (r.id().equals("lab") && dd.started && (dd.story.contains("parcel") || dd.hasDex()) && !dd.beaten.contains("rival_lab") && !dd.party.isEmpty()
 				&& !RIVALS.containsKey(p.getUUID()) && p.level() instanceof ServerLevel lv) {
 			Npc rv = rivalNpc(p, "rival_lab", BlockPos.containing(r.ox() + 10.2, r.oy(), r.oz() + 4.6));
@@ -913,8 +950,11 @@ public final class Game {
 			}
 		}
 		// A room that's a place of its own (Viridian Forest, Route 2's gates): you're there now (its wild POKéMON, its name).
-		if (!r.place().isEmpty() && !r.place().equals(data(p).place)) enter(p, r.place());
-		Places.Place pl = Places.get(r.place());
+		// A Center or Mart is in the town whose door you came in by.
+		String rp = Interiors.placeFor(p, r);
+		if (rp == null) rp = r.place();
+		if (!rp.isEmpty() && !rp.equals(data(p).place)) enter(p, rp);
+		Places.Place pl = Places.get(rp);
 		CompoundTag t = new CompoundTag();
 		String name = fill(p, List.of(r.name().replace("Rival's", "{rival}'s"))).get(0).toUpperCase().replace("POKÉ", "POKé");
 		t.putString("name", banner ? name : "");
@@ -979,9 +1019,10 @@ public final class Game {
 			if (Interiors.tick(p)) continue;
 			// Inside a building, the outside's checks (its places, Oak at the town's edge, grass, trainers' sight) don't apply.
 			boolean inside = Interiors.in(p);
-			if (!inside && s.getTickCount() % 2 == 0) enter(p, placeAt(p.getX(), p.getZ()));
+			if (!inside && s.getTickCount() % 2 == 0) enter(p, placeNear(p.getX(), p.getZ()));
 			if (!inside && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
 			if (!inside && s.getTickCount() % 2 == 0 && !BUSY.containsKey(id)) gymShut(p);
+			if (!inside && !build && !Battles.in(p)) keepAshore(p);
 			if (s.getTickCount() % 5 == 0) story(p);
 			if (s.getTickCount() % 40 == 0) moonlight(p);
 			follower(p);
@@ -1006,6 +1047,55 @@ public final class Game {
 		rocketsLeave(s);
 		if (s.getTickCount() % 40 == 0) placeTouchPoints(s);
 		holdTime(s);
+	}
+
+	/** Where each player last stood on dry ground (outside), to be put back to if they step into the water. */
+	private static final Map<UUID, Vec3> ASHORE = new HashMap<>();
+
+	/**
+	 * As in the games, there's no walking into the water (no SURF here): a step into it (off a pier, down the steps
+	 * into the sea, even onto the steps standing in it) puts you back where you last stood on dry ground, so the
+	 * water's edge is a wall. In Pallet Town, the dripstone round its pond and along its shore is the town's edge too
+	 * (its fences stop short of it, for looks): no walking on it, so nobody goes past the fences and down to the sea.
+	 */
+	private static void keepAshore(ServerPlayer p) {
+		ServerLevel lv = (ServerLevel) p.level();
+		BlockPos feet = BlockPos.containing(p.getX(), p.getY() + 0.1, p.getZ());
+		// (The water itself, and the steps standing in it: jungle stairs in the water on the dripstone, all over the
+		// map. Not a waterlogged slab or step on land, a fountain's say.)
+		java.util.function.Predicate<BlockPos> sea = b -> {
+			net.minecraft.world.level.block.state.BlockState st = lv.getBlockState(b);
+			return st.is(net.minecraft.world.level.block.Blocks.WATER) || st.is(net.minecraft.world.level.block.Blocks.JUNGLE_STAIRS) && !lv.getFluidState(b).isEmpty();
+		};
+		boolean wet = sea.test(feet) || sea.test(feet.above());
+		if (!wet && !p.onGround() && p.getDeltaMovement().y < 0) {
+			// Dropping off something over the water: back before the splash.
+			for (int d = 1; d <= 3 && !wet; d++) {
+				BlockPos b = feet.below(d);
+				wet = sea.test(b);
+				if (!lv.getBlockState(b).getCollisionShape(lv, b).isEmpty()) break;
+			}
+		}
+		boolean edge = false;
+		if (!wet && p.onGround() && "pallet_town".equals(data(p).place)) {
+			BlockPos under = BlockPos.containing(p.getX(), p.getY() - 0.2, p.getZ());
+			edge = lv.getBlockState(under).is(net.minecraft.world.level.block.Blocks.DRIPSTONE_BLOCK);
+		}
+		UUID id = p.getUUID();
+		Vec3 dry = ASHORE.get(id);
+		if (dry != null && dry.distanceToSqr(p.position()) > 8 * 8) {
+			// Moved a long way (FAST TRAVEL, a door, a blackout): not a step into the water.
+			ASHORE.remove(id);
+			dry = null;
+		}
+		if (wet || edge) {
+			if (dry != null) {
+				p.teleportTo(dry.x, dry.y, dry.z);
+				p.setDeltaMovement(Vec3.ZERO);
+			}
+			return;
+		}
+		if (p.onGround()) ASHORE.put(id, p.position());
 	}
 
 	/** Each player's NIGHTS setting (0 dark, 1 soft, 2 bright), sent from their OPTION. */
@@ -1464,6 +1554,12 @@ public final class Game {
 		}
 		// Back to where you were last healed, in the world or inside (out of the other first, if that's where you are).
 		ServerLevel to = d.healInside ? Interiors.ensure(p.level().getServer()) : p.level().getServer().overworld();
+		// (Behind the counter of the Center you were healed at: its door's the way back out, its town where you are.)
+		if (d.healInside && !d.healDoor.isEmpty()) {
+			d.door = d.healDoor;
+			Interiors.Door hd = Interiors.DOORS.get(d.healDoor);
+			if (hd != null && hd.place() != null) enter(p, hd.place());
+		}
 		if (to == null || to == p.level()) p.teleportTo(d.healX, d.healY, d.healZ);
 		else {
 			leavingLevel(p);
@@ -1497,7 +1593,7 @@ public final class Game {
 		if (engaged(p) || WALKS.containsKey(p.getUUID()) || Battles.in(p)) return;
 		if ("viridian_city".equals(d.place) && p.onGround() && goodGround(level, p.blockPosition())) VIRIDIAN_SAFE.put(p.getUUID(), p.blockPosition());
 		// "Hey! You came from PALLET TOWN?"
-		if (!d.hasDex() && !d.story.contains("parcel")) {
+		if (!d.hasDex() && !d.story.contains("parcel") && "viridian_city".equals(d.place)) {
 			for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(9), Game::viridianMart)) {
 				if (n.distanceTo(p) > 9 || !n.hasLineOfSight(p)) continue;
 				walkUp(p, n, null, "", () -> giveParcel(p, n));
@@ -2130,13 +2226,14 @@ public final class Game {
 					"NURSE: We heal tired POKéMON back to full health. Shall we heal yours?"));
 			case Npc.CLERK -> {
 				// Viridian's Mart before the errand: OAK's PARCEL, and no shopping until it's delivered.
-				if (viridianMart(n) && d.started && !d.hasDex()) {
+				if (viridianMart(n) && "viridian_city".equals(d.place) && d.started && !d.hasDex()) {
 					if (d.story.contains("parcel")) dialogue(p, n, "talk", List.of("Okay! Say hi to PROF.OAK for me!"));
 					else giveParcel(p, n);
 					return;
 				}
 				CompoundTag t = new CompoundTag();
-				t.putString("mart", n.key().isEmpty() ? d.place : n.key());
+				// (The clerk in the room every Mart shares sells the stock of the town you're in.)
+				t.putString("mart", n.key().isEmpty() || Interiors.in(p) ? d.place : n.key());
 				dialogue(p, n, "mart", List.of("Hi there! May I help you?"), t);
 			}
 			case Npc.PERSON -> {
@@ -2366,6 +2463,7 @@ public final class Game {
 				d.healAll();
 				d.hasHeal = true;
 				d.healInside = Interiors.in(p);
+				d.healDoor = d.healInside ? d.door : "";
 				d.healX = p.getX();
 				d.healY = p.getY();
 				d.healZ = p.getZ();
@@ -2569,6 +2667,18 @@ public final class Game {
 	public static void travel(ServerPlayer p, CompoundTag t) {
 		if (!FAST_TRAVEL.contains(p.getUUID()) || Battles.in(p) || !data(p).started) return;
 		ServerLevel world = p.level().getServer().overworld();
+		// A town (or a route with one): in front of its POKéMON CENTER, as FLY lands you.
+		String pin = t.getStringOr("place", "");
+		for (Interiors.Door d : Interiors.DOORS.values()) {
+			if (!"center".equals(d.group()) || !pin.equals(d.place())) continue;
+			world.getChunk(BlockPos.containing(d.x(), d.y(), d.z()));
+			if (p.level() != world) Interiors.jumpOut(p, world, d.x(), d.y(), d.z());
+			else p.teleportTo(d.x(), d.y(), d.z());
+			p.setYRot(d.yaw());
+			p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+			enter(p, placeNear(d.x(), d.z()));
+			return;
+		}
 		BlockPos at = spot(world, t.getIntOr("x", 0), t.getIntOr("z", 0), 24);
 		if (at == null) {
 			message(p, List.of("There's nowhere to land there."));
@@ -2579,7 +2689,7 @@ public final class Game {
 			p.teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
 			p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
 		}
-		enter(p, placeAt(at.getX() + 0.5, at.getZ() + 0.5));
+		enter(p, placeNear(at.getX() + 0.5, at.getZ() + 0.5));
 	}
 
 	/** Your clothes, from the wardrobe. */
@@ -2948,11 +3058,13 @@ public final class Game {
 	private static final Object[][] DEFAULTS = {{"joey", Npc.TRAINER, "youngster_joey", -790, 600, 0F}};
 	private static final int[][] OLD_OUTSIDE = {{-785, 561}, {-766, 549}};
 	/**
-	 * People who stand somewhere on John's map other than where the games' grid puts them: Pallet's girl ("I'm
-	 * raising POKéMON too!") by the flower beds and roses in the middle of town, as Let's Go has her, rather than
-	 * out at the west edge. Key, then x and z.
+	 * People who stand somewhere on John's map other than where the games' grid puts them, each moved there once per
+	 * save (SPOTS_DONE says which time: bumped, everyone's moved again). Pallet's: the girl ("I'm raising POKéMON
+	 * too!") by the flowers in the lab's garden, well away from the pond; the man who says technology is incredible
+	 * by the sign at the pond; PROF.OAK's AIDE by the lab's own sign. Key, then x and z.
 	 */
-	private static final Object[][] SPOTS = {{"pallet_town_p1", -801, 698}, {"pallet_town_p2", -798, 689}, {"pallet_town_p3", -807, 692}};
+	private static final Object[][] SPOTS = {{"pallet_town_p1", -784, 708}, {"pallet_town_p2", -798, 689}, {"pallet_town_p3", -780, 701}};
+	private static final String SPOTS_DONE = "spot3:";
 
 	/** Where someone in SPOTS stands (x, z), or null. */
 	private static int[] spotOf(String key) {
@@ -3028,7 +3140,7 @@ public final class Game {
 		}
 		// Those in SPOTS: moved there (or put there, if they're missing), once per save.
 		for (Object[] o : SPOTS) {
-			String key = (String) o[0], doneKey = "spot:" + key;
+			String key = (String) o[0], doneKey = SPOTS_DONE + key;
 			int x = (Integer) o[1], z = (Integer) o[2];
 			Trainers.Person who = Trainers.PEOPLE.get(key);
 			if (done.contains(doneKey) || who == null || !done.contains("place:" + who.place())) continue;

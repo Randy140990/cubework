@@ -1,0 +1,8 @@
+{
+ "parent": "minecraft:block/stairs",
+ "textures": {
+  "bottom": "minecraft:block/retromon_water_step",
+  "top": "minecraft:block/retromon_water_step",
+  "side": "minecraft:block/retromon_water_step"
+ }
+}

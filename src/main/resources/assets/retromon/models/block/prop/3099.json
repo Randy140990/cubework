@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/flower_leaf","flower_leaf":"retromon:block/interior/flower_leaf"},"elements":[{"from":[0.0,16,4.224],"to":[3.776,16,14.976],"faces":{"down":{"uv":[0.0,1.024,3.776,11.776],"texture":"#flower_leaf"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/paper_league","paper_league":"retromon:block/interior/paper_league"},"elements":[{"from":[0.0,0.0,0],"to":[6.4,16,0],"faces":{"south":{"uv":[0.0,0.0,6.4,16.0],"texture":"#paper_league"}}}]}

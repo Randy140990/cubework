@@ -36,6 +36,34 @@ class Pix {
   }
   canvas() { const cv = document.createElement("canvas"); cv.width = this.w; cv.height = this.h; cv.getContext("2d").putImageData(new ImageData(this.d, this.w, this.h), 0, 0); return cv; }
 }
+// A pack's leaves cut round: only what's inside a ragged circle is kept (so a leafy face reads as a round tuft, not
+// a square); dense, its gaps in the middle filled with the leaves' own deep shade.
+function leafBlob(P, name, dense) {
+  const Q = new Pix(16, 16); Q.pack(name);
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    const n = ((x * 37 + y * 91) % 13) / 13, d = Math.hypot(x - 7.5, y - 7.5) / 8;
+    if (d > 0.98 - 0.16 * n) continue;
+    if (Q.alpha(x, y)) P.set(x, y, Q.get(x, y), 1);
+    else if (dense && d < 0.72) P.set(x, y, mixc(hx("#22491F"), hx("#2F6A24"), n), 1);
+  }
+}
+// The pack's big leaf cut to a leaf's shape: its tip at the top, widest two thirds of the way down, narrowing to the
+// stalk at the bottom, a paler vein down its middle.
+function leafShape() {
+  const Q = new Pix(16, 16), L = new Pix(16, 16); Q.pack("big_leaf");
+  for (let y = 0; y < 16; y++) {
+    const t = (y + 0.5) / 16, half = 7.2 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 1.08)), 0.75) * (t > 0.85 ? (1 - t) / 0.15 * 0.6 + 0.4 : 1);
+    for (let x = 0; x < 16; x++) {
+      if (Math.abs(x - 7.5) > half) continue;
+      const c = Q.alpha(x, y) ? Q.get(x, y) : hx("#4C9330");
+      L.set(x, y, x === 7 || x === 8 ? mixc(c, hx("#BCE56C"), 0.2) : c, 1);
+    }
+  }
+  return L;
+}
+function drawerFronts(P, r, c) {
+  for (let i = 0; i < 2; i++) { P.bevel(0, i * 8, 16, 8, c, 0.1, 0.012, r); P.rect(6, i * 8 + 3, 4, 1, shadec(c, -0.45)); P.rect(6, i * 8 + 4, 4, 1, C.goldL); }
+}
 function textWidth(s) { let n = 0; for (const ch of s) n += ch === " " ? 3 : 4; return n - 1; }
 // A 3 by 5 pixel font for signs, boards and screens.
 const FONT3 = {};
@@ -202,24 +230,26 @@ const TEXDEF = {
     const cols = [hx("#3F5F9E"), hx("#2E3F66"), hx("#C9524E"), hx("#E8E2D2")];
     for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = cols[(tx * 3 + ty) % 4]; for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) P.set(tx * 8 + x, ty * 8 + y, shadec(c, ((x + y) % 2 ? 0.03 : -0.03) + (x === 0 || y === 0 ? -0.12 : 0))); }
   }],
-  // Leaves from John's asset pack: the azalea's sprigs (cut out), solid over a deep green for a bush's inside.
-  leaf: [64, 64, P => P.pack("azalea_leaves")],
-  leafSolid: [64, 64, P => P.pack("azalea_leaves_solid")],
-  flowerLeaf: [64, 64, P => P.pack("flowering_azalea_leaves")],
-  flowerLeafSolid: [64, 64, P => P.pack("flowering_azalea_leaves_solid")],
-  azaleaPlant: [64, 64, P => P.pack("azalea_plant")],
-  fern: [64, 64, P => P.pack("fern")],
-  fernTall: [64, 64, P => P.pack("large_fern_top")],
+  // Leaves from John's asset pack, at the rooms' 16 pixels a block: the azalea's sprigs cut round (so a bush's every
+  // side is a round tuft of leaves, never a square), the denser one fuller in the middle. No solid inside anywhere.
+  leaf: [16, 16, P => leafBlob(P, "azalea_leaves", false)],
+  leafSolid: [16, 16, P => leafBlob(P, "azalea_leaves", true)],
+  flowerLeaf: [16, 16, P => leafBlob(P, "flowering_azalea_leaves", false)],
+  flowerLeafSolid: [16, 16, P => leafBlob(P, "flowering_azalea_leaves", true)],
+  azaleaPlant: [16, 16, P => P.pack("azalea_plant")],
+  fern: [16, 16, P => P.pack("fern")],
+  fernTall: [16, 16, P => P.pack("large_fern_top")],
   // The big leaf turned four ways (its tip north, east, south, west), so a plant's leaves point out from its middle.
-  bigLeaf0: [64, 64, P => P.pack("big_leaf")],
-  bigLeaf1: [64, 64, P => { const Q = new Pix(64, 64); Q.pack("big_leaf"); for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) if (Q.alpha(x, y)) P.set(63 - y, x, Q.get(x, y), Q.alpha(x, y)); }],
-  bigLeaf2: [64, 64, P => { const Q = new Pix(64, 64); Q.pack("big_leaf"); for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) if (Q.alpha(x, y)) P.set(63 - x, 63 - y, Q.get(x, y), Q.alpha(x, y)); }],
-  bigLeaf3: [64, 64, P => { const Q = new Pix(64, 64); Q.pack("big_leaf"); for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) if (Q.alpha(x, y)) P.set(y, 63 - x, Q.get(x, y), Q.alpha(x, y)); }],
+  // (Each cut to a leaf's shape, pointed at the tip and narrowing to its stalk, so none is a green square.)
+  bigLeaf0: [16, 16, P => { const Q = leafShape(); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) if (Q.alpha(x, y)) P.set(x, y, Q.get(x, y), 1); }],
+  bigLeaf1: [16, 16, P => { const Q = leafShape(); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) if (Q.alpha(x, y)) P.set(15 - y, x, Q.get(x, y), 1); }],
+  bigLeaf2: [16, 16, P => { const Q = leafShape(); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) if (Q.alpha(x, y)) P.set(15 - x, 15 - y, Q.get(x, y), 1); }],
+  bigLeaf3: [16, 16, P => { const Q = leafShape(); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) if (Q.alpha(x, y)) P.set(y, 15 - x, Q.get(x, y), 1); }],
   stem: [16, 16, (P, r) => P.fill(hx("#4F8A34"), 0.12, r)],
   treeLeaf: [16, 16, (P, r) => leaves(P, r, hx("#3F8A44"), hx("#6DBA5A"), hx("#255C2D"), 0)],
   // Pots from John's asset pack's flower pot: its smooth terracotta, and the same shading glazed white (a blue band).
-  pot: [20, 64, P => P.pack("pot")],
-  potWhite: [20, 64, P => { P.pack("pot_white"); for (let x = 0; x < 20; x++) for (const y of [18, 19, 20]) P.set(x, y, mixc(P.get(x, y), hx("#6FAED3"), 0.75)); }],
+  pot: [10, 12, P => P.pack("pot")],
+  potWhite: [10, 12, P => { P.pack("pot_white"); for (let x = 0; x < 10; x++) P.set(x, 3, mixc(P.get(x, 3), hx("#6FAED3"), 0.75)); }],
   soil: [16, 16, (P, r) => P.fill(hx("#5A3D27"), 0.2, r)],
   gold: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, mixc(C.goldL, C.gold, (Math.sin(x * 0.7 + y * 0.3) + 1) / 2 * 0.8 + r() * 0.2)); }],
   silver: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, mixc(hx("#F2F4F6"), hx("#A9B2BA"), (Math.sin(x * 0.7 + y * 0.3) + 1) / 2 * 0.8 + r() * 0.2)); }],
@@ -231,6 +261,11 @@ const TEXDEF = {
     P.fill(hx("#6DB257"), 0.06, r);
     for (let i = 0; i < 10; i++) { const x = (r() * 16) | 0, y = (r() * 16) | 0; P.set(x, y, hx("#86C66A")); P.set(x, y + 1, hx("#5A9A48")); }
     for (let i = 0; i < 3; i++) P.set(r() * 16, r() * 16, hx("#52913F"));
+  }],
+  // The mown stripes of a route's battle pitch: the grass a shade deeper (as Retromon Look's moss is).
+  grassMown: [16, 16, (P, r) => {
+    P.fill(hx("#5C9E48"), 0.06, r);
+    for (let i = 0; i < 10; i++) { const x = (r() * 16) | 0, y = (r() * 16) | 0; P.set(x, y, hx("#74B25A")); P.set(x, y + 1, hx("#4C8A3C")); }
   }],
   path: [16, 16, (P, r) => { P.fill(hx("#D6BC84"), 0.07, r); for (let i = 0; i < 9; i++) { const x = r() * 16, y = r() * 16; P.set(x, y, hx("#B89E66")); P.set(x + 1, y, hx("#E8D3A2")); } }],
   stone: [16, 16, (P, r) => { P.fill(hx("#B9B6AE"), 0.08, r); P.rect(0, 7, 16, 1, hx("#8F8C85")); P.rect(7, 0, 1, 7, hx("#8F8C85")); P.rect(12, 8, 1, 8, hx("#8F8C85")); }],
@@ -333,10 +368,14 @@ const TEXDEF = {
     P.bevel(0, 4, 16, 12, c, 0.1, 0.02, r); P.bevel(2, 6, 12, 8, shadec(c, -0.05), 0.07, 0, r); P.rect(12, 8, 1, 3, C.steelD);
   }],
   wallCupboard: [16, 16, (P, r) => { const c = hx("#7CC4AE"); P.bevel(0, 0, 16, 16, c, 0.14, 0.02, r); P.bevel(2, 2, 12, 12, shadec(c, -0.04), 0.08, 0, r); P.rect(12, 10, 1, 3, C.steelD); }],
-  drawers: [16, 16, (P, r) => {
-    const c = hx("#C48A52");
-    for (let i = 0; i < 4; i++) { P.bevel(0, i * 4, 16, 4, c, 0.16, 0.03, r); P.rect(6, i * 4 + 1, 4, 1, hx("#6E4524")); P.rect(6, i * 4 + 2, 4, 1, C.goldL); }
-  }],
+  // Drawer fronts in each furniture wood (two to a front, a handle in the middle of each), so a front's the same
+  // solid colour as its body: no stripes.
+  drawers: [16, 16, (P, r) => drawerFronts(P, r, hx("#C48A52"))],
+  drawersHoney: [16, 16, (P, r) => drawerFronts(P, r, hx("#DDB37A"))],
+  drawersPale: [16, 16, (P, r) => drawerFronts(P, r, hx("#E6CDA4"))],
+  drawersWalnut: [16, 16, (P, r) => drawerFronts(P, r, C.walnut)],
+  drawersOak: [16, 16, (P, r) => drawerFronts(P, r, C.oak)],
+  drawersDark: [16, 16, (P, r) => drawerFronts(P, r, hx("#4E3524"))],
   fridge: [16, 48, (P, r) => {
     const c = hx("#F4F6F5");
     P.bevel(0, 0, 16, 16, c, 0.06, 0.015, r); P.bevel(0, 16, 16, 32, c, 0.06, 0.015, r);

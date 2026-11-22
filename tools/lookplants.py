@@ -9,6 +9,7 @@ ferns. His models (several crossed planes at angles, for a full clump) and his v
 the tall ones top and bottom together) come over as they are, so no two clumps look alike. They sway in the wind and
 part round you as you walk through them: Retromon Light does that (lib/wave.glsl).
 """
+import json
 import os
 import shutil
 
@@ -93,6 +94,47 @@ def flower(src, dst):
     im.save(dst)
 
 
+# The other flowers on John's map (the pink tulips and blue orchids by Pallet's houses, and the rest along the routes):
+# his pictures and random variants too, on the same crossed planes. Their leaves and stems go on the same fresh greens;
+# their petals keep his colours, a touch cleaner and brighter. (By the name of their picture, and their variants' folder.)
+OTHERS = {"pink_tulip": "tulip/pink", "orange_tulip": "tulip/orange", "white_tulip": "tulip/white", "blue_orchid": "blue_orchid", "allium": "allium",
+          "azure_bluet": "azure_bluet", "oxeye_daisy": "oxeye_daisy", "cornflower": "cornflower", "dandelion": "dandelion",
+          "lily_of_the_valley": "lily_of_the_valley"}
+# The tall ones (two blocks, as the rose bush is).
+DOUBLES = ("peony", "lilac")
+
+
+def flower_kept(src, dst):
+    """His flower picture: its leaves and stems on Retromon's greens by how light they are, its petals in his own
+    colours, a little more saturated and brighter (as the red flowers are put on a clean bright red)."""
+    import colorsys
+    im = Image.open(src).convert("RGBA")
+    p = im.load()
+    w, h = im.size
+    leaves = []
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = p[x, y]
+            if a <= 8:
+                continue
+            hh, ss, vv = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+            if 0.16 < hh < 0.47 and ss > 0.18 and g >= r:
+                leaves.append((x, y))
+            else:
+                ss2, vv2 = min(1.0, ss * 1.12), min(1.0, vv * 1.1 + 0.03)
+                rr, gg, bb = colorsys.hsv_to_rgb(hh, ss2, vv2)
+                p[x, y] = (int(rr * 255), int(gg * 255), int(bb * 255), a)
+    if leaves:
+        lum = sorted(0.3 * p[xy][0] + 0.59 * p[xy][1] + 0.11 * p[xy][2] for xy in leaves)
+        lo, hi = lum[len(lum) // 40], lum[-1 - len(lum) // 40]
+        for xy in leaves:
+            r, g, b, a = p[xy]
+            t = (0.3 * r + 0.59 * g + 0.11 * b - lo) / max(1.0, hi - lo)
+            p[xy] = ramp(LEAF, t) + (a,)
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    im.save(dst)
+
+
 def build():
     if os.path.isdir(CTM):
         shutil.rmtree(CTM)
@@ -101,6 +143,14 @@ def build():
     for name in FLOWERS:
         flower(os.path.join(SRC, "textures", "block", name + ".png"), os.path.join(tex, name + ".png"))
         shutil.copy(os.path.join(SRC, "models", "block", name + ".json"), os.path.join(models, name + ".json"))
+    for name in OTHERS:
+        flower_kept(os.path.join(SRC, "textures", "block", name + ".png"), os.path.join(tex, name + ".png"))
+        json.dump({"parent": "minecraft:block/cross4", "textures": {"cross": "minecraft:block/" + name}}, open(os.path.join(models, name + ".json"), "w"), indent=1)
+    for name in DOUBLES:
+        for half, shape in (("bottom", "flower_bottom"), ("top", "flower_top")):
+            flower_kept(os.path.join(SRC, "textures", "block", "%s_%s.png" % (name, half)), os.path.join(tex, "%s_%s.png" % (name, half)))
+            json.dump({"parent": "minecraft:block/" + shape, "textures": {"cross": "minecraft:block/%s_%s" % (name, half)}},
+                      open(os.path.join(models, "%s_%s.json" % (name, half)), "w"), indent=1)
     # The shapes his flower models are made on (several crossed planes for a fuller plant).
     for name in ("cross2", "cross4", "flower_bottom", "flower_top"):
         shutil.copy(os.path.join(SRC, "models", "block", name + ".json"), os.path.join(models, name + ".json"))
@@ -108,9 +158,11 @@ def build():
     for dirpath, _dirs, files in os.walk(root):
         out = os.path.join(CTM, "flower", os.path.relpath(dirpath, root))
         os.makedirs(out, exist_ok=True)
+        rel = os.path.relpath(dirpath, root).replace(os.sep, "/")
+        red = rel.split("/")[0] in ("poppy", "rose_bush") or rel == "tulip/red"
         for f in files:
             if f.endswith(".png"):
-                flower(os.path.join(dirpath, f), os.path.join(out, f))
+                (flower if red else flower_kept)(os.path.join(dirpath, f), os.path.join(out, f))
             elif f.endswith(".properties"):
                 shutil.copy(os.path.join(dirpath, f), os.path.join(out, f))
     grasses()

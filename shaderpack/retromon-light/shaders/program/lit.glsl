@@ -144,7 +144,8 @@ void main() {
     skyPart *= 1.0 - 0.16 * cover;
     // Night vision: Retromon lifts it a little as night falls (OPTION's NIGHTS says how much), so here it brings
     // in more of the night's blue light rather than turning everything grey. Rooms are lit as they are.
-    skyPart += vec3(0.14, 0.22, 0.46) * nightVision * (0.35 + 0.65 * lm.y);
+    // (Night vision's lift is half in the moon's light, so it doesn't fill in the moon's shadows.)
+    skyPart += vec3(0.14, 0.22, 0.46) * nightVision * (0.35 + 0.65 * lm.y) * (0.6 + 0.4 * clamp(sunlit / max(NdotL, 0.05), 0.0, 1.0));
     // By moonlight colours fade towards blue-grey (as our eyes see them at night); lamplight keeps them warm.
     float nightK = nightAmount() * NIGHT_BLUE;
     vec3 moonAlbedo = mix(albedo, vec3(dot(albedo, vec3(0.2126, 0.7152, 0.0722))), clamp(nightK * 0.55, 0.0, 0.9));

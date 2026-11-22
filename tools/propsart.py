@@ -63,18 +63,20 @@ def main():
     get = lambda n: Image.open(io.BytesIO(z.read("textures/block/" + n + ".png"))).convert("RGBA")
     os.makedirs(OUT, exist_ok=True)
     save = lambda n, im: im.save(os.path.join(OUT, n + ".png"))
-    # Leafy bushes: the azalea's leaves (sprigs, gaps between), and a solid copy over a deep green for their insides.
-    save("azalea_leaves", shrink(get("azalea_leaves"), 64, cut=True))
-    save("azalea_leaves_solid", over(shrink(get("azalea_leaves"), 64, cut=True), (34, 74, 30)))
-    save("flowering_azalea_leaves", shrink(get("flowering_azalea_leaves"), 64, cut=True))
-    save("flowering_azalea_leaves_solid", over(shrink(get("flowering_azalea_leaves"), 64, cut=True), (34, 74, 30)))
+    # (All at the rooms' own size, 16 pixels to a block, as the furniture's are: the pack's 128 pixel pictures shrunk,
+    # so a plant's leaves aren't drawn finer than the table it stands by.)
+    # Leafy bushes: the azalea's leaves (sprigs, gaps between); the rooms cut them round (tex.js), no solid inside.
+    save("azalea_leaves", shrink(get("azalea_leaves"), 16, cut=True))
+    save("flowering_azalea_leaves", shrink(get("flowering_azalea_leaves"), 16, cut=True))
+    for old in ("azalea_leaves_solid", "flowering_azalea_leaves_solid"):
+        if os.path.exists(os.path.join(OUT, old + ".png")): os.remove(os.path.join(OUT, old + ".png"))
     # A potted azalea's crossed sprigs, a fern (grey in the pack, the leaves' green here) and a big leaf.
-    save("azalea_plant", shrink(get("azalea_plant"), 64, cut=True))
-    save("fern", tint(shrink(get("fern"), 64, cut=True), (92, 168, 60)))
-    save("large_fern_top", tint(shrink(get("large_fern_top"), 64, cut=True), (92, 168, 60)))
-    save("big_leaf", shrink(get("big_dripleaf_top"), 64))
+    save("azalea_plant", shrink(get("azalea_plant"), 16, cut=True))
+    save("fern", tint(shrink(get("fern"), 16, cut=True), (92, 168, 60)))
+    save("large_fern_top", tint(shrink(get("large_fern_top"), 16, cut=True), (92, 168, 60)))
+    save("big_leaf", shrink(get("big_dripleaf_top"), 16))
     # The flower pot's side (its smooth terracotta), and a white glazed one in the same shading.
-    pot = get("flower_pot").crop((88, 0, 128, 128)).resize((20, 64), Image.LANCZOS)
+    pot = get("flower_pot").crop((88, 0, 128, 128)).resize((10, 12), Image.LANCZOS)
     save("pot", pot)
     save("pot_white", ramp(pot.copy(), [(176, 186, 192), (214, 222, 226), (236, 241, 243), (250, 252, 252)]))
     # The Look pack's: the cobbles and the leaf litter, kept at the pack's size (recoloured in lookground.py).

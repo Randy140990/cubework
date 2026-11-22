@@ -1,13 +1,13 @@
 # Retromon Light
 
 Retromon's own shader pack (for Iris). The source is in `retromon-light/shaders`; the mod carries it zipped as
-`src/main/resources/retromon/shaders/Retromon-Light-1.2.5.zip` and puts it in the shaderpacks folder when you play.
+`src/main/resources/retromon/shaders/Retromon-Light-1.2.6.zip` and puts it in the shaderpacks folder when you play.
 
 Rebuild the zip after changing the pack (and give it a new version number in the name, Shaders.java and
 `shaders.properties` / `lang` when it's a release):
 
-    cd shaderpack/retromon-light && rm -f ../../src/main/resources/retromon/shaders/Retromon-Light-1.2.5.zip && \
-      zip -qr -X ../../src/main/resources/retromon/shaders/Retromon-Light-1.2.5.zip shaders
+    cd shaderpack/retromon-light && rm -f ../../src/main/resources/retromon/shaders/Retromon-Light-1.2.6.zip && \
+      zip -qr -X ../../src/main/resources/retromon/shaders/Retromon-Light-1.2.6.zip shaders
 
 What it does:
 - One pass, lit as it's drawn (no deferred passes, no blur, no changing exposure), so it's quick.

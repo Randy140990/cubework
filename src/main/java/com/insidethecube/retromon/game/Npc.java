@@ -211,6 +211,10 @@ public class Npc extends PathfinderMob {
 			if (dx == 0 && dz == 0) return;
 			BlockPos to = home.offset(dx, 0, dz);
 			if (!level().getEntitiesOfClass(Npc.class, new net.minecraft.world.phys.AABB(to.getX(), to.getY(), to.getZ(), to.getX() + 1, to.getY() + 2, to.getZ() + 1).inflate(2.5), o -> o != this).isEmpty()) return;
+			// Never onto a ledge's rim (the dripstone round ponds and the sea) or to the water's edge.
+			if (!level().getBlockState(to.below()).isAir() && level().getBlockState(to.below()).is(net.minecraft.world.level.block.Blocks.DRIPSTONE_BLOCK)) return;
+			for (BlockPos w : BlockPos.betweenClosed(to.offset(-1, -1, -1), to.offset(1, 0, 1)))
+				if (!level().getFluidState(w).isEmpty()) return;
 			walkTo(to, Float.NaN);
 		} else if (facing.equals("any_dir") || facing.equals("none")) {
 			// Stands still, but looks about now and then.

@@ -1,0 +1,40 @@
+# Every Pokémon Center and Poké Mart on John's map: the button over each one's doorway (its sign), found by a scan of
+# the map (a mangrove button over a Center's, a pale oak one over a Mart's, each checked against Viridian's). The doorway is
+# 3 wide, 5 below and 3 in from the button. All of them go into the one Center and the one Mart (tools/interior/export/tomod.py).
+# kind	place	x	y	z
+center	azalea_town	-2006	26	863
+center	blackthorn_city	-1464	37	383
+center	celadon_city	-472	39	410
+center	cerulean_city	-359	40	265
+center	cherrygrove_city	-1696	25	760
+center	cianwood_city	-2511	24	783
+center	cinnabar_island	-790	24	930
+center	ecruteak_city	-2022	27	420
+center	fuchsia_city	-495	37	813
+center	goldenrod_city	-2116	26	727
+center	lavender_town	-142	39	418
+center	mahogany_town	-1757	28	420
+center	olivine_city	-2293	25	571
+center	pewter_city	-805	36	318
+center	route_10	-127	39	288
+center	route_32	-1886	25	802
+center	route_4	-607	41	259
+center	saffron_city	-364	39	445
+center	silver_cave_outside	-1153	33	544
+center	vermilion_city	-369	37	560
+center	violet_city	-1828	28	569
+center	viridian_city	-786	31	560
+mart	azalea_town	-1985	26	858
+mart	blackthorn_city	-1480	37	382
+mart	cerulean_city	-343	40	283
+mart	cherrygrove_city	-1713	25	760
+mart	cinnabar_island	-776	24	930
+mart	ecruteak_city	-2005	26	405
+mart	fuchsia_city	-503	36	791
+mart	lavender_town	-117	39	441
+mart	olivine_city	-2260	25	571
+mart	pewter_city	-783	36	304
+mart	saffron_city	-335	39	415
+mart	vermilion_city	-343	37	582
+mart	violet_city	-1879	28	544
+mart	viridian_city	-766	31	546

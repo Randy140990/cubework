@@ -14,14 +14,15 @@ const MATDEF = {
   cap: { tex: "cap", per: 1 }, paint: { tex: "paint", per: 1 }, mintPaint: { tex: "mintPaint", per: 1 }, counter: { tex: "counter", per: 1 }, darkTop: { tex: "darkTop", per: 1 },
   steel: { tex: "steel", per: 1 }, plastic: { tex: "plastic", per: 1 }, greyPlastic: { tex: "greyPlastic", per: 1 }, sofa: { tex: "sofa", per: 1 }, sofaL: { tex: "sofaL", per: 1 },
   redFabric: { tex: "redFabric", per: 1 }, blueFabric: { tex: "blueFabric", per: 1 }, cushion: { tex: "cushion", per: 1 }, linen: { tex: "linen", per: 1 },
-  quilt: { tex: "quilt", per: 1 }, quiltBlue: { tex: "quiltBlue", per: 1 }, leaf: { tex: "leaf", per: 1, cut: true }, leafSolid: { tex: "leafSolid", per: 1 }, treeLeaf: { tex: "treeLeaf", per: 2 },
+  quilt: { tex: "quilt", per: 1 }, quiltBlue: { tex: "quiltBlue", per: 1 }, leaf: { tex: "leaf", fit: true, cut: true }, leafSolid: { tex: "leafSolid", fit: true, cut: true }, treeLeaf: { tex: "treeLeaf", per: 2 },
   pot: { tex: "pot", fit: true }, potWhite: { tex: "potWhite", fit: true }, soil: { tex: "soil", per: 1 }, gold: { tex: "gold", per: 1, shine: true }, silver: { tex: "silver", per: 1, shine: true },
-  curtain: { tex: "curtain", per: 1 }, curtainBlue: { tex: "curtainBlue", per: 1 }, leather: { tex: "leather", per: 1 }, bark: { tex: "bark", per: 1 }, grass: { tex: "grass", per: 1 },
+  curtain: { tex: "curtain", per: 1 }, curtainBlue: { tex: "curtainBlue", per: 1 }, leather: { tex: "leather", per: 1 }, bark: { tex: "bark", per: 1 }, grass: { tex: "grass", per: 1 }, grassMown: { tex: "grassMown", per: 1 },
   path: { tex: "path", per: 1 }, stone: { tex: "stone", per: 1 }, siding: { tex: "siding", per: 1 }, labWall: { tex: "labWall", per: 1 }, roofRed: { tex: "roofRed", per: 1 },
   roofBlue: { tex: "roofBlue", per: 1 }, roofGrey: { tex: "roofGrey", per: 1 }, fence: { tex: "fence", per: 1 }, water: { tex: "water", per: 2 }, rubber: { tex: "rubber", per: 1 },
   books: { tex: "books", per: [2, 0.5] }, lampShade: { tex: "lampShade", per: 1, glow: 0.7 }, glass: { tex: "glass", per: 1, alpha: 0.3 },
   rugMum: { tex: "rugMum", fit: true }, rugRoom: { tex: "rugRoom", fit: true }, rugRival: { tex: "rugRival", fit: true }, doormat: { tex: "doormat", fit: true },
-  cupboard: { tex: "cupboard", fit: true }, cupboardWhite: { tex: "cupboardWhite", fit: true }, wallCupboard: { tex: "wallCupboard", fit: true }, drawers: { tex: "drawers", fit: true },
+  cupboard: { tex: "cupboard", fit: true }, cupboardWhite: { tex: "cupboardWhite", fit: true }, wallCupboard: { tex: "wallCupboard", fit: true }, drawers: { tex: "drawers", fit: true }, drawersHoney: { tex: "drawersHoney", fit: true }, drawersPale: { tex: "drawersPale", fit: true },
+  drawersWalnut: { tex: "drawersWalnut", fit: true }, drawersOak: { tex: "drawersOak", fit: true }, drawersDark: { tex: "drawersDark", fit: true },
   fridge: { tex: "fridge", fit: true }, oven: { tex: "oven", fit: true }, hob: { tex: "hob", fit: true }, sink: { tex: "sink", fit: true }, wardrobe: { tex: "wardrobe", fit: true },
   whiteboard: { tex: "whiteboard", fit: true }, boardRival: { tex: "boardRival", fit: true }, window: { tex: "window", fit: true, glow: 1 }, windowExt: { tex: "windowExt", fit: true, glow: 0.35 },
   doorExt: { tex: "doorExt", fit: true }, doorLab: { tex: "doorLab", fit: true }, painting: { tex: "painting", fit: true }, paintingHills: { tex: "paintingHills", fit: true },
@@ -32,7 +33,7 @@ const MATDEF = {
   trophyPlate: { tex: "trophyPlate", fit: true },
   // From John's asset pack: the azalea's leaves (sprigs with gaps, and solid for a bush's inside), flowering too, a
   // potted azalea's sprigs, a fern, a big leaf (turned four ways), the pot.
-  flowerLeaf: { tex: "flowerLeaf", per: 1, cut: true }, flowerLeafSolid: { tex: "flowerLeafSolid", per: 1 },
+  flowerLeaf: { tex: "flowerLeaf", fit: true, cut: true }, flowerLeafSolid: { tex: "flowerLeafSolid", fit: true, cut: true },
   azaleaPlant: { tex: "azaleaPlant", fit: true, cut: true, double: true }, fern: { tex: "fern", fit: true, cut: true, double: true },
   fernTall: { tex: "fernTall", fit: true, cut: true, double: true },
   bigLeaf0: { tex: "bigLeaf0", fit: true, cut: true, double: true }, bigLeaf1: { tex: "bigLeaf1", fit: true, cut: true, double: true },
@@ -504,10 +505,14 @@ function rug(room, x0, z0, x1, z1, mat) {
   for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) room.geo.box(x0 + i, 0, z0 + j, x0 + i + 1, 1 / 16, z0 + j + 1, { top: wool(pat(i, j, w, d)), all: wool(pat(i, j, w, d)), bottom: null });
   room.item("Carpet", "Wool carpet, a block at a time, as it would be laid in Minecraft.");
 }
+// The drawer fronts that go with a furniture wood (the same colour as the body).
+function drawersOf(wood) {
+  return { honey: "drawersHoney", pale: "drawersPale", walnut: "drawersWalnut", oak: "drawersOak", darkWood: "drawersDark" }[wood] || "drawers";
+}
 function tvSet(room, X, Z, f, screenKey, o = {}) {
   const F = room.F(X, Z, f), w = o.w || 2.8;
-  F.box(0, 0, 0, w, 0.62, 0.8, { all: "walnut", front: null, bottom: null });
-  for (let i = 0; i < Math.floor(w); i++) F.box(i * w / Math.floor(w), 0.04, 0.8, (i + 1) * w / Math.floor(w), 0.6, 0.81, { front: "drawers", all: null });
+  F.box(0, 0, 0, w, 0.62, 0.8, { all: "walnut", bottom: null });
+  for (let i = 0; i < Math.floor(w); i++) F.box(i * w / Math.floor(w), 0.04, 0.8, (i + 1) * w / Math.floor(w), 0.6, 0.81, { front: "drawersWalnut", all: null });
   const tw = o.tw || 1.9, th = o.th || 1.15, tx = (w - tw) / 2;
   F.box(w / 2 - 0.3, 0.62, 0.2, w / 2 + 0.3, 0.7, 0.55, "plastic"); F.box(w / 2 - 0.08, 0.7, 0.3, w / 2 + 0.08, 0.85, 0.42, "plastic");
   F.box(tx, 0.85, 0.25, tx + tw, 0.85 + th, 0.42, "plastic");
@@ -535,7 +540,7 @@ function bookshelf(room, X, Z, f, w = 2, h = 3, o = {}) {
     const y = 0.18 + i * 0.72;
     F.box(0.1, y, 0.05, w - 0.1, y + 0.06, d, wood);
     const skip = (o.trinkets || {})[i];
-    if (o.drawers && i === 0) F.box(0.12, y + 0.06, 0.05, w - 0.12, y + 0.66, d - 0.02, { front: "drawers", all: wood });
+    if (o.drawers && i === 0) F.box(0.12, y + 0.06, 0.05, w - 0.12, y + 0.66, d - 0.02, { front: drawersOf(wood), all: wood });
     else if (skip === "ball") { F.box(0.15, y + 0.06, 0.05, w * 0.55, y + 0.56, d - 0.12, { front: "books", all: "linen" }); F.box(w * 0.62, y + 0.06, 0.25, w * 0.62 + 0.36, y + 0.42, 0.61, { front: "ball", all: "ball" }); }
     else if (skip === "plant") { F.box(0.15, y + 0.06, 0.05, w * 0.6, y + 0.56, d - 0.12, { front: "books", all: "linen" }); F.box(w * 0.68, y + 0.06, 0.25, w * 0.68 + 0.34, y + 0.32, 0.55, "potWhite"); F.box(w * 0.66, y + 0.32, 0.22, w * 0.66 + 0.4, y + 0.62, 0.58, "leafSolid"); }
     else if (skip === "trophy") { F.box(0.15, y + 0.06, 0.05, w * 0.5, y + 0.56, d - 0.12, { front: "books", all: "linen" }); trophy(F, w * 0.66, y + 0.06, 0.35, 0.6); }
@@ -555,9 +560,9 @@ function trophy(F, lx, y, lz, s = 0.5) {
 function sideboard(room, X, Z, f, w = 2.4, o = {}) {
   const F = room.F(X, Z, f);
   F.box(0, 0, 0, w, 0.1, 0.7, "cap");
-  F.box(0, 0.1, 0, w, 0.95, 0.75, { all: "honey", front: null });
+  F.box(0, 0.1, 0, w, 0.95, 0.75, { all: "honey" });
   const n = Math.round(w / 1.2);
-  for (let i = 0; i < n; i++) F.box(i * w / n, 0.12, 0.75, (i + 1) * w / n, 0.93, 0.76, { front: "drawers", all: null });
+  for (let i = 0; i < n; i++) F.box(i * w / n, 0.12, 0.75, (i + 1) * w / n, 0.93, 0.76, { front: "drawersHoney", all: null });
   F.box(-0.04, 0.95, -0.02, w + 0.04, 1.02, 0.79, "walnut");
   // Photo frames and a vase of flowers.
   F.box(0.25, 1.02, 0.25, 0.75, 1.5, 0.3, { front: "photos", all: "walnut" }); F.box(0.9, 1.02, 0.3, 1.25, 1.36, 0.34, { front: "photos", all: "gold" });
@@ -598,12 +603,23 @@ function cross(G, x, z, w, d, h, mat, y0 = 0) {
   G.box(x - w, y, z - t, x + w, y + h, z + t, { s: mat, n: mat, all: null });
   G.box(x - t, y, z - d, x + t, y + h, z + d, { e: mat, w: mat, all: null });
 }
-// A leafy ball (a bush, a tree's crown): a solid core of leaves, sprigs standing out of it all round, a smaller cap.
+// A leafy ball (a bush, a tree's crown), with nothing solid in it and no square edge anywhere: round tufts of leaves
+// (cut out, gaps between) crossing through its middle both ways and either side of it, and round tufts laid flat at
+// four heights, widest a little below the middle, smallest at the top, so from any side and from above it's a round
+// heap of leaves. cut: the leaves for the tufts round the outside; solid: the fuller ones through the middle.
 function leafyBall(G, x, y, z, a, h, cut, solid) {
-  G.box(x - a * 0.8, y + 0.04, z - a * 0.8, x + a * 0.8, y + h * 0.92, z + a * 0.8, solid);
-  G.box(x - a, y, z - a, x + a, y + h, z + a, cut);
-  G.box(x - a * 0.62, y + h - 0.04, z - a * 0.62, x + a * 0.62, y + h + a * 0.4, z + a * 0.62, cut);
-  G.box(x - a * 0.5, y + h - 0.02, z - a * 0.5, x + a * 0.5, y + h + a * 0.3, z + a * 0.5, solid);
+  const t = 0.004;
+  const upright = (w, hh, y0, off, mat) => {
+    G.box(x - w, y0, z + off - t, x + w, y0 + hh, z + off + t, { s: mat, n: mat, all: null });
+    G.box(x + off - t, y0, z - w, x + off + t, y0 + hh, z + w, { e: mat, w: mat, all: null });
+  };
+  upright(a, h, y, 0, solid);
+  upright(a * 0.78, h * 0.8, y + h * 0.12, a * 0.48, cut);
+  upright(a * 0.78, h * 0.8, y + h * 0.12, -a * 0.48, cut);
+  for (const [k, f] of [[0.22, 0.82], [0.45, 1.0], [0.7, 0.88], [0.93, 0.55]]) {
+    const r = a * f, yy = y + h * k;
+    G.box(x - r, yy, z - r, x + r, yy + t, z + r, { top: k > 0.4 ? cut : solid, bottom: cut, all: null });
+  }
 }
 
 // ---------- stairs ----------
@@ -711,7 +727,7 @@ function bed(room, X, Z, f, o = {}) {
 }
 function nightstand(room, X, Z, f) {
   const F = room.F(X, Z, f);
-  F.box(0, 0, 0, 0.8, 0.7, 0.7, { all: "pale", front: "drawers" });
+  F.box(0, 0, 0, 0.8, 0.7, 0.7, { all: "pale", front: "drawersPale" });
   F.box(0.15, 0.7, 0.2, 0.35, 0.95, 0.45, "greyPlastic"); F.box(0.16, 0.78, 0.45, 0.34, 0.92, 0.46, { front: "clock", all: null });
   F.box(0.5, 0.7, 0.25, 0.7, 0.75, 0.45, "walnut"); F.box(0.57, 0.75, 0.32, 0.63, 1.05, 0.38, "walnut"); F.box(0.42, 1.05, 0.17, 0.78, 1.3, 0.53, "lampShade");
   F.solid(0, 0, 0.8, 0.7);
@@ -720,7 +736,7 @@ function nightstand(room, X, Z, f) {
 function deskPC(room, X, Z, f, screenKey, o = {}) {
   const F = room.F(X, Z, f), top = o.top || "pale";
   F.box(0, 0.8, 0, 2.3, 0.88, 0.95, { all: top });
-  F.box(0.05, 0, 0.05, 0.65, 0.8, 0.9, { all: top, front: "drawers" }); F.box(2.15, 0, 0.1, 2.25, 0.8, 0.85, top);
+  F.box(0.05, 0, 0.05, 0.65, 0.8, 0.9, { all: top, front: drawersOf(top) }); F.box(2.15, 0, 0.1, 2.25, 0.8, 0.85, top);
   F.box(1.05, 0.88, 0.2, 1.5, 0.92, 0.45, "greyPlastic"); F.box(1.22, 0.92, 0.25, 1.33, 1.1, 0.35, "greyPlastic");
   F.box(0.78, 1.1, 0.18, 1.78, 1.78, 0.32, "greyPlastic");
   F.box(0.84, 1.16, 0.32, 1.72, 1.72, 0.33, { front: screenKey, all: null });

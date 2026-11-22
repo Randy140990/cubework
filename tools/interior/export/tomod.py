@@ -51,6 +51,17 @@ DOORS = {
     "route26": {"room": "gate_johto", "door": [[x, 27, 586] for x in range(-993, -987)], "out": [-990.5, 26.0, 589.6], "yaw": 0.0,
                 "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
 }
+# Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
+# door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
+DOORS["viridian_center"].update({"place": "viridian_city", "group": "center"})
+DOORS["viridian_mart"].update({"place": "viridian_city", "group": "mart"})
+for _line in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "shops.tsv")):
+    if _line.startswith("#") or not _line.strip(): continue
+    _kind, _place, _bx, _by, _bz = _line.rstrip("\n").split("\t")
+    _bx, _by, _bz = int(_bx), int(_by), int(_bz)
+    if _place == "viridian_city": continue
+    DOORS["%s_%s" % (_place, _kind)] = {"room": _kind, "door": [[_bx + i, _by - 5, _bz - 3] for i in (-1, 0, 1)], "out": [_bx + 0.5, float(_by - 5), _bz - 1.4],
+                                        "place": _place, "group": _kind}
 MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart", "school": "viridian_school", "nickhouse": "viridian_house", "gate_s": "forest_south",
             "gate_league": "league_s"}
 # Ways out through the north wall to the world (the north gate's).
@@ -386,7 +397,8 @@ def main():
             x, z, yaw = n["x"], n["z"], n["yaw"]
             # Someone seated sits on their chair, as the Interior Viewer has them.
             people.append({"key": key, "name": n["name"].upper(), "skin": n["skin"] or "youngster", "x": round(x, 3), "z": round(z, 3),
-                           "yaw": round((180 - math.degrees(yaw)) % 360, 1), "lines": n["lines"], "role": n.get("role"), "seated": bool(n["seated"])})
+                           "yaw": round((180 - math.degrees(yaw)) % 360, 1), "lines": n["lines"], "role": n.get("role"), "seated": bool(n["seated"]),
+                           **({"group": n["group"]} if n.get("group") else {}), **({"hours": n["hours"]} if n.get("hours") else {})})
         acts = [dict({"rect": a["rect"], "label": a["label"], "lines": a["lines"]}, **({"map": True} if a.get("map") else {}), **({"pc": True} if a.get("pc") else {}))
                 for a in room["acts"] if a["lines"]]
         sp = room["spawn"]

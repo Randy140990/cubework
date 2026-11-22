@@ -108,6 +108,7 @@ public final class Hud {
 		fadeWords = words == null ? "" : words;
 		fadeLen = fadeWords.isEmpty() ? DOOR_FADE : WAIT_FADE;
 		fade = fadeLen;
+		darkSaid = false;
 		atDark = then;
 		afterFade = after;
 		doorLevel = Minecraft.getInstance().level;
@@ -120,6 +121,8 @@ public final class Hud {
 	/** Where you were when the iris shut (a door within the same level: a room to the next, up the stairs): it stays shut till you've been moved. */
 	private static net.minecraft.world.phys.Vec3 darkAt;
 	private static int darkWait;
+	/** Whether this door's iris has told the server it's shut. */
+	private static boolean darkSaid;
 
 	public static void tick(Minecraft mc) {
 		cineOld = cine;
@@ -154,6 +157,15 @@ public final class Hud {
 				hold = true;
 				if (!loading) doorHold--;
 			}
+		}
+		// Shut: tell the server (it moves you now), and stay shut till you've been moved.
+		if (fade > 0 && fadeWords.isEmpty() && atDark == null && !darkSaid && fadeLen - fade >= CLOSED) {
+			darkSaid = true;
+			if (mc.player != null && mc.level == doorLevel) {
+				darkAt = mc.player.position();
+				darkWait = 120;
+			}
+			net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.insidethecube.retromon.game.Net.Act("dark", new net.minecraft.nbt.CompoundTag()));
 		}
 		if (fade > 0 && !hold) {
 			fade--;

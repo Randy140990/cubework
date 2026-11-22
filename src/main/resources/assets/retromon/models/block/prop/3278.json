@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/steel","steel":"retromon:block/interior/steel"},"elements":[{"from":[10.88,16,1.28],"to":[16.0,16,8.32],"faces":{"down":{"uv":[10.88,7.68,16.0,14.72],"texture":"#steel"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pot_white","pot_white":"retromon:block/interior/pot_white"},"elements":[{"from":[0.0,16,13.8],"to":[7.0,16,16.0],"faces":{"down":{"uv":[1.6667,8.0,8.9583,10.75],"texture":"#pot_white"}}}]}

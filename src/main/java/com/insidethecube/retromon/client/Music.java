@@ -61,8 +61,9 @@ public final class Music {
 		else current = song;
 	}
 
+	/** (A touch under the level's share: the songs sat a little loud over the game.) */
 	private static float volume() {
-		return level() / 4F;
+		return level() / 4F * 0.82F;
 	}
 
 	/** Whether Retromon's music is playing (Minecraft's own music stays quiet then). */

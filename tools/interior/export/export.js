@@ -31,7 +31,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
       rooms[id] = {
         id, name: R.name, floor: R.floor, W: R.W, D: R.D, H: R.H, faces, solids: R.solids, ramps,
         acts: R.acts.map(a => ({ rect: a.rect, label: a.label || "Look", lines: a.lines || null, ask: !!a.ask, pc: !!a.pc, hit: !!a.hit, map: !!a.map })),
-        npcs: R.npcs.map(n => ({ name: n.name, x: n.x, z: n.z, yaw: n.yaw, seated: !!n.seated, skin: n.look && n.look.skin, role: n.role || null, key: n.key || null, lines: n.talk ? n.talk(null).map(l => l.text) : [] })),
+        npcs: R.npcs.map(n => ({ name: n.name, x: n.x, z: n.z, yaw: n.yaw, seated: !!n.seated, skin: n.look && n.look.skin, role: n.role || null, key: n.key || null, group: n.group || null, hours: n.hours || null, lines: n.talk ? n.talk(null).map(l => l.text) : [] })),
         spawn: R.spawn, floors: R._floors, door: R._door, pools: R.pools || [], Dm: R.Dm || R.D, mats: R._mats || [], passes: R._passes || [], sides: R._sides || [], grass: R.grass || [], stairs: R._stairs || [], screens: R._screens || [], clocks: R.clocks || [],
       };
     }

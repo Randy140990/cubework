@@ -177,7 +177,7 @@ const MENU_MAIN = [0, 2, 1, 3, 7], MENU_SIDE = [4, 5, 6, 8, 9];
 const MENU_COLS = [["#FF8C8C", "#E5484F", "#B92F3A"], ["#FFC566", "#F59A2A", "#D2731A"], ["#7FE3A6", "#3DB873", "#228A52"], ["#7CC2FA", "#3C8DE4", "#2763B8"], ["#C9A8F7", "#8F60DE", "#6740B6"]];
 screen("menu", "In the world", "The menu", {
   scene: "town", sceneOpts: () => ({}),
-  what: "The menu as Let's Go's player menu: your partner's emblem at the top (the shape of its head in its own colour, as Let's Go draws its Pikachu there), on its own; a row of five rounded tiles, each its own colour with a white picture. The one you're on lifts and glows in its colour, a big white arrow points at it from the side, and a line in its colour runs under its name. The smaller things are white pills underneath.",
+  what: "The menu as Let's Go's player menu: your partner's emblem at the top (the shape of its head in its own colour, as Let's Go draws its Pikachu there), on its own; a row of five rounded tiles, each its own colour with a white picture. The one you're on lifts and glows in its colour, a big white arrow points at it from the side, and a line in its colour grows out from the middle under its name over a second, 10 px clear of it. The smaller things are white pills underneath.",
   mod: "MenuScreen: POKéDEX, BAG, PARTY, MAP and SAVE as the five tiles (POKéMON becomes PARTY, as Let's Go has it); CLOTHES, CARD, WAIT, OPTION and EXIT as pills; the partner's emblem opens its summary.",
   tags: ["New look: Let's Go's player menu"], try: ["Left and right along a row; up to your partner, down to the small ones; A to open, B to close."],
   make(arg) {
@@ -209,11 +209,11 @@ screen("menu", "In the world", "The menu", {
       .m-tile .sq svg{width:74px;height:74px;position:relative;filter:drop-shadow(0 3px 0 rgba(0,0,0,.14))}
       .m-tile .gloss{position:absolute;left:8%;right:8%;top:5%;height:40%;border-radius:26px 26px 50% 50%;background:linear-gradient(180deg,rgba(255,255,255,.45),rgba(255,255,255,0))}
       .m-tile .nm{font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:1px;color:#26304A;-webkit-text-stroke:5px #fff;paint-order:stroke fill;transition:transform .14s}
-      .m-tile .ul{width:0;height:6px;border-radius:999px;background:var(--c);margin-top:-6px;transition:width .14s;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+      .m-tile .ul{width:0;height:6px;border-radius:999px;background:var(--c);margin-top:4px;transition:none;box-shadow:0 2px 0 rgba(0,0,0,.12)}
       .m-tile .arr{position:absolute;z-index:3;left:-26px;top:28px;width:40px;height:48px;opacity:0;transform:translateX(-8px);transition:opacity .12s,transform .14s;filter:drop-shadow(0 3px 4px rgba(30,40,84,.35))}
       .m-tile .arr svg{width:100%;height:100%;display:block}
       .m-tile.on .sq{transform:translateY(-10px) scale(1.08);box-shadow:0 0 0 4px rgba(255,255,255,.9),0 0 30px 10px var(--glow),0 12px 24px rgba(30,40,84,.25)}
-      .m-tile.on .nm{transform:translateY(-4px)} .m-tile.on .ul{width:96px} .m-tile.on .arr{opacity:1;transform:translateX(0)}
+      .m-tile.on .nm{transform:translateY(-4px)} .m-tile.on .ul{width:96px;transition:width 1s cubic-bezier(.33,1,.68,1)} .m-tile.on .arr{opacity:1;transform:translateX(0)}
       .m-tile:not(.on) .sq{opacity:.92}
       .m-pill{position:absolute;width:190px;height:54px;border-radius:999px;display:flex;align-items:center;gap:12px;padding-left:7px;cursor:pointer;background:#fff;color:#26304A;font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:19px;
         box-shadow:0 0 0 2px rgba(255,255,255,.7),0 5px 14px rgba(30,40,84,.22);transition:transform .12s}
@@ -524,7 +524,7 @@ const PIN_DB = (() => { let pr = null; return () => pr || (pr = (window.claude &
 screen("map", "Menus", "Town Map", {
   what: "The real Town Map: Kanto, and Johto beside it (the arrow at the side, or left past the westmost place), as they are in your world, drawn from above in soft colours from the blocks themselves. The place you're on is framed in a bright box. Its panel says how its POKéMON are found (grass, surfing, fishing, headbutting trees, smashing rocks) and shows them. Every town, route and place is a square with its name beside it, at every zoom (a name is only left out where it would sit on another). Point at one to see what's there, with a picture of it at the top of the panel (the pictures are to come: until then it's the map, close in).",
   mod: "TownMapScreen and TownMap: the same baked map (townmap/r.*.bin), the same colours and shading. Q and E zoom, C comes back to you, a town you've been to can be flown to. In game the places come from the zones you mark.",
-  try: ["MOVE PLACES (viewer only): every place's name shows; drag its square onto where it really is. Each move saves straight away where Claude can read it (moved ones ring green). COPY THE LIST is there too.", "Arrows to move between places; left again from the westmost one (or the JOHTO arrow) goes to Johto.", "+ and - (or the mouse wheel) to zoom, drag to look around.", "C to come back to you. A on a town you've been to: FLY HERE.", "With FAST TRAVEL on (OPTIONS): A: GO HERE on every place, and right-click any spot on the map to go there."],
+  try: ["MOVE PLACES (viewer only): every place's name shows; drag its square onto where it really is. Each move saves straight away where Claude can read it (moved ones ring green). COPY THE LIST is there too.", "Arrows to move between places; left again from the westmost one (or the JOHTO arrow) goes to Johto.", "+ and - (or the mouse wheel) to zoom, drag to look around.", "C to come back to you. SPACE on a town you've been to: FLY HERE.", "With FAST TRAVEL on (OPTIONS): GO HERE on every place (SPACE, a click on it, or a click on the place that's already picked). A town lands you in front of its POKéMON CENTER. Right-click any spot on the map to go there."],
   make(arg) {
     backdrop("#348CCE");
     const YOU = { x: -797, z: 702, yaw: 0 };
@@ -621,7 +621,7 @@ screen("map", "Menus", "Town Map", {
           ? `<div title="${esc(DATA.species[sid].pname)}" style="aspect-ratio:1;border-radius:12px;background:#F1F4FB;display:grid;place-items:center">${pic(sid, 56)}</div>`
           : `<div title="${esc(sid)}" style="aspect-ratio:1;border-radius:12px;background:#F1F4FB;display:grid;place-items:center;font-size:26px;font-weight:900;color:var(--g-dim)">?</div>`).join("")}</div>` : ""}
         <div style="margin-top:auto;padding-top:12px;display:grid;gap:8px">
-          ${G.opts.travel ? `<div class="g-chip on" style="justify-content:center;font-size:17px;padding:8px">A: GO HERE</div>` : p.kind === "town" ? (been ? `<div class="g-chip on" style="justify-content:center;font-size:17px;padding:8px">A: FLY HERE</div>` : `<div class="g-chip" style="justify-content:center;font-size:15px;padding:8px;opacity:.7">Not been here yet</div>`) : ""}
+          ${G.opts.travel ? `<div class="g-chip on" style="justify-content:center;gap:9px;font-size:17px;padding:8px"><span class="g-key" style="height:27px;font-size:11.7px">SPACE</span>GO HERE</div>` : p.kind === "town" ? (been ? `<div class="g-chip on" style="justify-content:center;gap:9px;font-size:17px;padding:8px"><span class="g-key" style="height:27px;font-size:11.7px">SPACE</span>FLY HERE</div>` : `<div class="g-chip" style="justify-content:center;font-size:15px;padding:8px;opacity:.7">Not been here yet</div>`) : ""}
           <div style="font-size:12.5px;font-weight:800;color:var(--g-muted);line-height:1.35">${p.zone ? `Zone in the mod: ${p.zone[0]}, ${p.zone[1]} to ${p.zone[2]}, ${p.zone[3]}` : `About ${p.x}, ${p.z} on your map`}</div></div>`;
       const pc = $("#mapPic"), img = mapImage(region);
       const paintPic = () => { if (!pc || !img.complete) return; const g = pc.getContext("2d"), k = 5, w = pc.width / k, hh = pc.height / k; g.imageSmoothingEnabled = false;

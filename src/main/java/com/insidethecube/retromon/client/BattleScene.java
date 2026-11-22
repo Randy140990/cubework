@@ -947,18 +947,85 @@ public final class BattleScene {
 					set(lx, y + 3, lz, Blocks.LANTERN.defaultBlockState());
 				}
 			}
-			default -> {
-				// Let's Go's fields: open grass in the middle, long grass and hedges at its edge, then a deep wall of
-				// round trees all the way round (no sky or edge showing between them).
-				hedges(cx, y, cz, 8.8, 10.2, false);
-				ring(cx, y, cz, 10.8, 16, 7, false);
-				ring(cx, y, cz, 13.6, 22, 10, false);
-				ring(cx, y, cz, 16.8, 28, 12, false);
-				plants(cx, y, cz, 6.2, 9.6, 0.5, Blocks.TALL_GRASS.defaultBlockState(), Blocks.TALL_GRASS.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(),
-						Blocks.DANDELION.defaultBlockState(), Blocks.POPPY.defaultBlockState(), Blocks.AZURE_BLUET.defaultBlockState());
-			}
+			default -> arena(cx, y, cz);
 		}
 		lights(cx, y, cz);
+	}
+
+	/**
+	 * A route's battle (a wild one in the grass, a trainer on the path), as an arena of its own: a mown pitch in the
+	 * middle, in stripes of the grass's two greens (Retromon Look's grass and moss), a worn line round it, across its
+	 * middle and round a circle at its centre; your POKéMON and theirs either side of that line, you and their trainer
+	 * at the pitch's ends. Beds of John's flowers either side of it; a lantern post at each corner. A clipped hedge
+	 * of Kanto's azalea all round (open only where the camera stands), tall grass beyond it, and two deep rings of
+	 * Kanto's trees (birch, and azalea on dark trunks) closing it in.
+	 */
+	private static void arena(int cx, int y, int cz) {
+		BlockState grass = Blocks.GRASS_BLOCK.defaultBlockState(), moss = Blocks.MOSS_BLOCK.defaultBlockState(), line = Blocks.DIRT_PATH.defaultBlockState();
+		// The pitch: from 6 to the left to 6 to the right, 8 back to 7 forward (their trainer to you), corners rounded.
+		for (int dx = -7; dx <= 7; dx++) {
+			for (int dz = -9; dz <= 8; dz++) {
+				if (!pitch(dx, dz, 0)) continue;
+				boolean edge = !pitch(dx, dz, 1), mid = dz == -1, ring = Math.abs(Math.hypot(dx, dz + 1) - 2.6) < 0.55;
+				BlockState top = edge || mid || ring ? line : Math.floorMod(dz, 4) < 2 ? grass : moss;
+				set(cx + dx, y, cz + dz, top);
+			}
+		}
+		// Flower beds either side (out of the camera's way), a lantern post at each corner.
+		BlockState[] flowers = {Blocks.POPPY.defaultBlockState(), Blocks.RED_TULIP.defaultBlockState(), Blocks.PINK_TULIP.defaultBlockState(),
+				Blocks.DANDELION.defaultBlockState(), Blocks.CORNFLOWER.defaultBlockState(), Blocks.OXEYE_DAISY.defaultBlockState(), Blocks.AZURE_BLUET.defaultBlockState()};
+		for (int side = -1; side <= 1; side += 2) {
+			for (int dz = -7; dz <= 5; dz++) {
+				for (int k = 8; k <= 9; k++) {
+					if (RNG.nextInt(10) < 3) continue;
+					set(cx + side * k, y + 1, cz + dz, flowers[RNG.nextInt(flowers.length)]);
+				}
+			}
+			for (int dz : new int[] {-10, 6}) {
+				set(cx + side * 8, y + 1, cz + dz, Blocks.BIRCH_FENCE.defaultBlockState());
+				set(cx + side * 8, y + 2, cz + dz, Blocks.BIRCH_FENCE.defaultBlockState());
+				set(cx + side * 8, y + 3, cz + dz, Blocks.LANTERN.defaultBlockState());
+			}
+		}
+		// The hedge, clipped and unbroken (some of it in flower), all round but where the camera stands.
+		double[] cam = camSpot(cx, cz);
+		BlockState hedge = Blocks.AZALEA_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+		BlockState bloom = Blocks.FLOWERING_AZALEA_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+		for (int dx = -13; dx <= 13; dx++) {
+			for (int dz = -13; dz <= 13; dz++) {
+				double d = Math.hypot(dx, dz);
+				if (d < 10.6 || d > 11.7 || Math.hypot(cx + dx - cam[0], cz + dz - cam[1]) < 4.5) continue;
+				BlockState h = RNG.nextInt(6) == 0 ? bloom : hedge;
+				set(cx + dx, y + 1, cz + dz, h);
+				set(cx + dx, y + 2, cz + dz, h);
+			}
+		}
+		plants(cx, y, cz, 11.8, 13.2, 0.55, Blocks.TALL_GRASS.defaultBlockState(), Blocks.TALL_GRASS.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(),
+				Blocks.FERN.defaultBlockState());
+		kantoTrees(cx, y, cz, 14.2, 22, 8);
+		kantoTrees(cx, y, cz, 17.4, 28, 11);
+	}
+
+	/** Whether a spot's on the route arena's pitch (rounded at its corners), shrunk in by `in` from its edge. */
+	private static boolean pitch(int dx, int dz, int in) {
+		double hx = 6 - in, z0 = -8 + in, z1 = 7 - in, r = Math.max(0.5, 2.5 - in);
+		if (Math.abs(dx) > hx || dz < z0 || dz > z1) return false;
+		double ex = Math.max(0, Math.abs(dx) - (hx - r)), ez = Math.max(0, Math.max(z0 + r - dz, dz - (z1 - r)));
+		return Math.hypot(ex, ez) <= r + 0.25;
+	}
+
+	/** A ring of Kanto's trees (birch, and azalea on dark trunks, by turns), clear of the camera. */
+	private static void kantoTrees(int cx, int y, int cz, double radius, int n, int h) {
+		double[] cam = camSpot(cx, cz);
+		for (int i = 0; i < n; i++) {
+			double a = Math.toRadians(i * 360.0 / n + RNG.nextInt(8));
+			int tx = cx + (int) Math.round(Math.sin(a) * radius), tz = cz + (int) Math.round(Math.cos(a) * radius);
+			if (Math.hypot(tx - cam[0], tz - cam[1]) < 6.5) continue;
+			boolean birch = i % 2 == 0;
+			BlockState log = (birch ? Blocks.BIRCH_LOG : Blocks.DARK_OAK_LOG).defaultBlockState();
+			BlockState leaves = (birch ? Blocks.BIRCH_LEAVES : Blocks.AZALEA_LEAVES).defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+			tree(tx, y + 1, tz, h - 2 + RNG.nextInt(4), log, leaves);
+		}
 	}
 
 	/** Unseen lights over the stage, so a battle at night is moonlit and clear rather than dark. */
