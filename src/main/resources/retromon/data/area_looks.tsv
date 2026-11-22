@@ -549,3 +549,77 @@ swap	ladder	5375	-1	5482	86	-	-	block/ladder=metal_ladder	Mt. Moon B1F	interiors
 swap	ladder	5631	-1	5738	90	-	-	block/ladder=metal_ladder	Mt. Moon B2F	interiors
 swap	white_concrete	4118	23	4137	42	60	80	block/white_concrete=cave_daylight!	Viridian Forest's north gatehouse	interiors
 swap	white_concrete	4150	138	4169	157	60	80	block/white_concrete=cave_daylight!	Viridian Forest's south gatehouse	interiors
+roof_cer	prismarine_brick_stairs	-401	220	-311	305	36	42	-	Cerulean City
+swap	prismarine_brick_slab,prismarine_bricks	-401	220	-311	305	34	42	block/prismarine_bricks=roof_cer_tiles	Cerulean City
+swap	bricks	-401	220	-311	305	34	34	block/bricks=base_cer	Cerulean City
+swap	light_gray_concrete	-401	220	-311	305	34	41	block/light_gray_concrete=pillar_cer	Cerulean City
+swap	polished_diorite_stairs,polished_diorite_slab	-401	220	-311	305	36	41	block/polished_diorite=trim_cer	Cerulean City
+swap	polished_andesite_slab	-401	220	-311	305	34	34	block/polished_andesite=step_cer	Cerulean City
+swap	white_concrete,light_blue_concrete,light_blue_terracotta,white_terracotta	-401	220	-311	305	33	33	block/white_concrete=pave_cer_1,block/light_blue_concrete=pave_cer_2,block/light_blue_terracotta=pave_cer_3,block/white_terracotta=pave_cer_4	Cerulean City
+swap	smooth_stone_slab	-401	220	-311	305	33	33	block/smooth_stone=kerb_cer,block/smooth_stone_slab_side=kerb_cer	Cerulean City
+kerb	smooth_stone_slab	-401	220	-311	305	33	33	-	Cerulean City
+swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-386	268	-382	272	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
+swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-369	269	-365	273	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
+swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-361	287	-357	291	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
+swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-355	269	-351	273	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
+swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-351	242	-347	246	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
+swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-325	254	-321	258	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
+swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-325	287	-321	291	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
+sign	pale_oak_shelf	-381	279	-366	284	34	35	-	the Bike Shop's front
+swap	acacia_shelf,acacia_stairs,pale_oak_stairs	-381	279	-366	284	38	40	block/acacia_shelf=awning_orange,block/acacia_planks=awning_orange,block/pale_oak_planks=awning_white	the Bike Shop's front
+swap	stripped_oak_wood,oak_stairs,oak_shelf,stone_button,oak_slab,oak_planks	-357	176	-348	235	33	36	block/stripped_oak_log=bridge_gold_beam,block/oak_planks=bridge_gold_boards,block/oak_shelf=bridge_gold_rail,block/stone=gold_bolt	Nugget Bridge
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-385	289	-365	290	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (42)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-357	236	-356	248	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (26)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-349	153	-241	176	34	36	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (290)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-349	235	-348	240	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (12)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-344	289	-324	290	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (42)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-331	249	-330	260	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (24)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-305	155	-302	156	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (8)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-296	155	-293	156	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (8)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-292	147	-291	150	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (8)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-292	157	-289	160	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (11)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-290	153	-289	154	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (4)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-286	153	-285	154	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (4)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-280	147	-279	150	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (8)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-278	155	-275	156	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (8)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-272	147	-267	158	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (32)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-264	151	-263	154	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (8)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-260	147	-259	150	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (8)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-252	153	-251	156	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (8)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-201	153	-200	158	34	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	hedge (12)
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-134	291	-133	292	33	33	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	bush by the Rock Tunnel Center
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-134	295	-133	296	33	33	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	bush by the Rock Tunnel Center
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-134	299	-133	300	33	33	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	bush by the Rock Tunnel Center
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves	-135	288	-134	289	33	33	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok	bush by the Rock Tunnel Center
+sign	pale_oak_shelf	-336	370	-333	372	33	34	-	Route 5's Underground Path sign
+sign	pale_oak_shelf	-332	493	-329	495	31	32	-	Route 6's Underground Path sign
+sign	pale_oak_shelf	-431	434	-428	436	32	33	-	Route 7's Underground Path sign
+sign	pale_oak_shelf	-268	414	-265	416	33	34	-	Route 8's Underground Path sign
+sign	pale_oak_shelf	-141	287	-139	289	33	34	-	the Rock Tunnel Center's sign
+roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care
+swap	mangrove_slab,mangrove_planks	-361	317	-342	337	38	45	block/mangrove_planks=roof_tiles	the Day Care
+swap	bricks	-361	317	-342	337	36	38	block/bricks=base_cer	the Day Care
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,mossy_cobblestone_slab	-349	259	-344	263	34	36	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	Cerulean's rocks by the Gym
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,mossy_cobblestone_slab	-287	146	-282	150	34	36	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	Route 25's rocks
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,mossy_cobblestone_slab	-269	159	-265	163	34	36	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	Route 25's rocks
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,mossy_cobblestone_slab	-243	164	-240	167	34	36	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	Route 25's rocks
+swap	bamboo_stairs,bamboo_planks,bamboo_slab	-226	141	-209	158	36	45	block/bamboo_planks=bill_roof	Bill's Sea Cottage
+swap	pale_oak_stairs,pale_oak_slab,polished_diorite_stairs	-226	141	-209	158	36	45	block/pale_oak_planks=trim_white,block/polished_diorite=trim_white	Bill's Sea Cottage
+swap	cyan_terracotta	-226	141	-209	158	40	45	block/cyan_terracotta=chimney_stone	Bill's Sea Cottage
+swap	bamboo_shelf	-226	141	-209	158	43	45	block/bamboo_shelf=bill_shelf	Bill's Sea Cottage
+swap	spruce_slab,spruce_shelf	-226	141	-209	158	33	41	block/spruce_planks=deck_boards,block/spruce_shelf=deck_shelf	Bill's Sea Cottage
+swap	end_stone_bricks	-224	152	-210	178	33	35	block/end_stone_bricks=path_cream	the path to Bill's
+swap	iron_block	-160	305	-120	333	-	-	block/iron_block=pp_iron	the Power Plant
+swap	iron_trapdoor	-160	305	-120	333	-	-	block/iron_trapdoor=pp_grate	the Power Plant
+swap	yellow_terracotta	-160	305	-120	333	-	-	block/yellow_terracotta=pp_yellow	the Power Plant
+swap	red_terracotta	-160	305	-120	333	-	-	block/red_terracotta=pp_red	the Power Plant
+swap	smooth_quartz_slab,smooth_quartz,quartz_block	-160	305	-120	333	-	-	block/quartz_block_bottom=pp_white,block/quartz_block_top=pp_white,block/quartz_block_side=pp_white	the Power Plant
+swap	crimson_stairs,crimson_planks,crimson_slab,mangrove_planks,mangrove_fence,mangrove_stairs	-160	305	-120	333	-	-	block/crimson_planks=pp_roof,block/mangrove_planks=pp_roof	the Power Plant
+swap	red_nether_brick_wall,red_nether_bricks	-160	305	-120	333	-	-	block/red_nether_bricks=pp_red_frame	the Power Plant
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-160	305	-120	333	-	-	block/polished_diorite=pp_front	the Power Plant
+swap	light_gray_concrete	-160	305	-120	333	-	-	block/light_gray_concrete=pp_wall_grey	the Power Plant
+swap	polished_andesite	-160	305	-120	333	-	-	block/polished_andesite=pp_steel	the Power Plant
+swap	white_concrete	-160	305	-120	333	34	50	block/white_concrete=pp_white	the Power Plant
+swap	deepslate_brick_wall	-160	305	-120	333	-	-	block/deepslate_bricks=pp_post	the Power Plant
+swap	smooth_stone_slab,smooth_stone	-160	305	-120	333	-	-	block/smooth_stone_slab_side=house_trim,block/smooth_stone=house_stone	the Power Plant
+sign	pale_oak_shelf	-146	330	-143	332	34	35	-	the Power Plant's sign

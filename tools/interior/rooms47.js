@@ -486,3 +486,56 @@
     return R;
   };
 })();
+
+// ---------- the 0.47.0 looks on show (16:17, 16:58): Cerulean City, Nugget Bridge, the hedges, Bill's, the Power Plant ----------
+(function () {
+  PLACES.push({ id: "cerulean_looks", name: "Cerulean and Power Plant looks", floor: "Outside (the mod's blocks)", group: "Outside" });
+  BUILD.cerulean_looks = function () {
+    // On John's blocks as the mod draws them: Cerulean's paving (his checker) with its kerb; a hedge (three) and a bush;
+    // a house corner (brick foot, pillar, white trim, the teal roof); a Cerulean lamp in off-white; a stretch of Nugget
+    // Bridge in gold; Bill's chimney on his bamboo roof; a corner of the Power Plant (its iron, yellow and red metal, a
+    // stack, its red tower).
+    const R = new Room("cerulean_looks", { name: "Cerulean and Power Plant looks", floor: "Outside (the mod's blocks)", W: 30, D: 22, H: 9, outside: true });
+    ground(R, "grass");
+    const G = R.geo, B = (x, y, z, m, o = {}) => G.box(x, y, z, x + 1, y + 1, z + 1, Object.assign({ all: m }, o));
+    // The paving (4 by 6) inside its kerb.
+    const pave = ["area_pave_cer_1", "area_pave_cer_2", "area_pave_cer_3", "area_pave_cer_4"];
+    for (let x = 2; x < 10; x++) for (let z = 13; z < 20; z++) {
+      const edge = x === 2 || x === 9 || z === 13 || z === 19;
+      G.box(x, -0.4, z, x + 1, 0.01, z + 1, { top: edge ? "area_kerb_cer" : pave[(x + z) % 4], all: null });
+    }
+    R.item("Paving", "Cerulean's checker as paving stones in grey-blue tones, inside a light kerb (the smooth stone border), the grass rounded onto it.");
+    // A hedge three long and a bush on its own: trimmed, its ends rounded.
+    const hedge = (x, z, mask, kind = "az") => B(x, 0, z, "area_hedge_" + kind + "_" + mask);
+    hedge(12, 17, 13); hedge(13, 17, 5); hedge(14, 17, 7); hedge(16, 17, 15, "do");
+    R.solid(12, 17, 15, 18); R.solid(16, 17, 17, 18);
+    R.item("Hedges", "Leaves on the ground as a trimmed hedge: one green along a row, rounded off where it ends; a bush on its own rounded all round.");
+    // A house corner.
+    for (let x = 2; x < 7; x++) B(x, 0, 6, "area_base_cer");
+    for (let y = 1; y < 4; y++) { B(2, y, 6, "area_pillar_cer"); for (let x = 3; x < 7; x++) B(x, y, 6, x === 4 && y === 2 ? "area_trim_cer" : "mcCream"); }
+    for (let x = 1; x < 8; x++) G.box(x, 4, 5.5, x + 1, 4.5, 7.2, { top: "area_roof_cer_tiles", all: "area_roof_cer_edge" });
+    G.box(3, 0, 7, 5, 0.5, 8, { all: "area_step_cer" });
+    R.solid(1, 5.5, 8, 7.2); R.solid(3, 7, 5, 8);
+    // A lamp.
+    for (let y = 0; y < 5; y++) G.box(9.25, y, 7.25, 9.75, y + 1, 7.75, "area_lamp_white_post");
+    G.box(8.5, 5, 6.5, 10.5, 5.5, 8.5, { all: "area_lamp_white_cap" }); G.box(8.9, 5.5, 6.9, 9.4, 5.6, 8.1, { top: "area_lamp_solar", all: "area_lamp_white_cap" });
+    R.solid(9.2, 7.2, 9.8, 7.8);
+    // Nugget Bridge, in gold.
+    for (let z = 1; z < 12; z++) { G.box(19, 0, z, 23, 0.5, z + 1, { top: "area_bridge_gold_boards", all: "area_bridge_gold_beam" }); }
+    for (const x of [18.8, 23]) { G.box(x, 0.5, 1, x + 0.2, 1.4, 12, { all: "area_bridge_gold_rail" }); R.solid(x, 1, x + 0.2, 12); }
+    // Bill's chimney on his roof.
+    for (let x = 12; x < 17; x++) G.box(x, 0, 2, x + 1, 1, 4, { top: "area_bill_roof", all: "area_bill_roof" });
+    for (let y = 1; y < 3; y++) B(14, y, 2.5, "area_chimney_stone");
+    G.box(13.6, 3, 2.1, 15.4, 3.3, 3.9, { all: "area_bill_shelf" }); R.solid(12, 2, 17, 4);
+    // The Power Plant's corner.
+    for (let y = 0; y < 3; y++) for (let x = 25; x < 29; x++) B(x, y, 8, y === 0 ? "area_pp_front" : "area_pp_iron");
+    for (let x = 25; x < 29; x++) B(x, 3, 8, "area_pp_yellow");
+    for (let y = 4; y < 8; y++) B(26, y, 8.2, y % 2 ? "area_pp_white" : "area_pp_red");
+    G.box(26, 8, 8.2, 27, 8.1, 9.2, { top: "area_pp_grate", all: "area_pp_white" });
+    for (let y = 0; y < 3; y++) B(24, y, 11, "area_pp_red_frame");
+    for (let x = 25; x < 29; x++) G.box(x, 4, 9, x + 1, 4.4, 10, { all: "area_pp_roof" });
+    R.solid(24, 8, 29, 12);
+    R.spawn = { x: 15, z: 20.5, yaw: FACE.n };
+    return R;
+  };
+})();

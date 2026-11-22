@@ -241,6 +241,7 @@ def main():
     for x0, z0, x1, z1, note in ((22, 23, 41, 42, "Viridian Forest's north gatehouse"), (54, 138, 73, 157, "Viridian Forest's south gatehouse")):
         room("swap", GATE_BLOCKS, forest(x0, z0, x1, z1, note), GATE, (str(fy - 2), str(fy + 16)))
     round46(add, room)
+    round47(add, room)
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -370,6 +371,88 @@ def round46(add, room):
     fx = 4096
     for x0, z0, x1, z1, note in ((22, 23, 41, 42, "Viridian Forest's north gatehouse"), (54, 138, 73, 157, "Viridian Forest's south gatehouse")):
         room("swap", "white_concrete", (fx + x0, z0, fx + x1, z1, note), "block/white_concrete=cave_daylight!", ("60", "80"))
+
+
+
+CERULEAN = (-401, 220, -311, 305, "Cerulean City")
+CERULEAN_LAMPS = [(-384, 270), (-367, 271), (-359, 289), (-353, 271), (-349, 244), (-323, 256), (-323, 289)]
+POWER_PLANT = (-160, 305, -120, 333, "the Power Plant")
+
+
+def round47(add, room):
+    """0.47.0's looks (16:17, 16:58): see tools/looks47.py for the pictures."""
+    import looks47
+    C = CERULEAN
+    # Cerulean City's houses: their roofs (prismarine brick) a new style in their teal, their brick feet, their grey
+    # pillars, the white trim round their windows, the steps at their doors; the checkered paving as grey-blue
+    # paving stones, its smooth stone border a kerb, the grass rounded onto it.
+    add("roof_cer", "prismarine_brick_stairs", C, "-", ("36", "42"))
+    add("swap", "prismarine_brick_slab,prismarine_bricks", C, "block/prismarine_bricks=roof_cer_tiles", ("34", "42"))
+    add("swap", "bricks", C, "block/bricks=base_cer", ("34", "34"))
+    add("swap", "light_gray_concrete", C, "block/light_gray_concrete=pillar_cer", ("34", "41"))
+    add("swap", "polished_diorite_stairs,polished_diorite_slab", C, "block/polished_diorite=trim_cer", ("36", "41"))
+    add("swap", "polished_andesite_slab", C, "block/polished_andesite=step_cer", ("34", "34"))
+    add("swap", "white_concrete,light_blue_concrete,light_blue_terracotta,white_terracotta", C,
+        "block/white_concrete=pave_cer_1,block/light_blue_concrete=pave_cer_2,block/light_blue_terracotta=pave_cer_3,block/white_terracotta=pave_cer_4", ("33", "33"))
+    add("swap", "smooth_stone_slab", C, "block/smooth_stone=kerb_cer,block/smooth_stone_slab_side=kerb_cer", ("33", "33"))
+    add("kerb", "smooth_stone_slab", C, "-", ("33", "33"))
+    # Its double lamps: the diorite posts and polished diorite tops off-white metal.
+    for x, z in CERULEAN_LAMPS:
+        add("swap", "diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs", (x - 2, z - 2, x + 2, z + 2, "a Cerulean lamp"),
+            "block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap", ("35", "42"))
+    # The Bike Shop: its sign (the white shelves out front), its awning in fabric.
+    bike = (-381, 279, -366, 284, "the Bike Shop's front")
+    add("sign", "pale_oak_shelf", bike, "-", ("34", "35"))
+    add("swap", "acacia_shelf,acacia_stairs,pale_oak_stairs", bike, "block/acacia_shelf=awning_orange,block/acacia_planks=awning_orange,block/pale_oak_planks=awning_white", ("38", "40"))
+    # Nugget Bridge in gold (HeartGold's).
+    add("swap", "stripped_oak_wood,oak_stairs,oak_shelf,stone_button,oak_slab,oak_planks", (-357, 176, -348, 235, "Nugget Bridge"),
+        "block/stripped_oak_log=bridge_gold_beam,block/oak_planks=bridge_gold_boards,block/oak_shelf=bridge_gold_rail,block/stone=gold_bolt", ("33", "36"))
+    # The hedges and bushes (Cerulean's, Route 24's and 25's, the maze to Bill's, the four by the Rock Tunnel Center).
+    for line in open(os.path.join(HERE, "area_hedges.tsv")):
+        if not line.strip() or line.startswith("#"):
+            continue
+        x0, z0, x1, z1, y0, y1, note = line.rstrip("\n").split("\t")
+        add("hedge", looks47.HEDGE_BLOCKS, (int(x0), int(z0), int(x1), int(z1), note), looks47.hedge_spec(), (y0, y1))
+    # The signs out front (16:20): each Underground Path hut's, and the Rock Tunnel Center's (only these: pale oak
+    # shelves are planters elsewhere, Saffron's).
+    for x0, z0, x1, z1, y0, y1, note in ((-336, 370, -333, 372, 33, 34, "Route 5's Underground Path sign"), (-332, 493, -329, 495, 31, 32, "Route 6's Underground Path sign"),
+                                         (-431, 434, -428, 436, 32, 33, "Route 7's Underground Path sign"), (-268, 414, -265, 416, 33, 34, "Route 8's Underground Path sign"),
+                                         (-141, 287, -139, 289, 33, 34, "the Rock Tunnel Center's sign")):
+        add("sign", "pale_oak_shelf", (x0, z0, x1, z1, note), "-", (str(y0), str(y1)))
+    # Route 5's Day Care (16:17): HeartGold's red tiles on its mangrove roof, its brick foot as Cerulean's.
+    care = (-361, 317, -342, 337, "the Day Care")
+    add("roof", "mangrove_stairs", care, "-", ("39", "45"))
+    add("swap", "mangrove_slab,mangrove_planks", care, "block/mangrove_planks=roof_tiles", ("38", "45"))
+    add("swap", "bricks", care, "block/bricks=base_cer", ("36", "38"))
+    # The rock piles (by the Gym, and in the maze to Bill's): stones, as Pewter's and Fuchsia's.
+    for b in ((-349, 259, -344, 263, "Cerulean's rocks by the Gym"), (-287, 146, -282, 150, "Route 25's rocks"), (-269, 159, -265, 163, "Route 25's rocks"),
+              (-243, 164, -240, 167, "Route 25's rocks")):
+        add("swap", BOULDER_BLOCKS + ",mossy_cobblestone_slab", b, BOULDER, ("34", "36"))
+    # Bill's Sea Cottage: its bamboo, its white trim, the chimney and the shelves round it, the decking, the cream path.
+    bill = (-226, 141, -209, 158, "Bill's Sea Cottage")
+    add("swap", "bamboo_stairs,bamboo_planks,bamboo_slab", bill, "block/bamboo_planks=bill_roof", ("36", "45"))
+    add("swap", "pale_oak_stairs,pale_oak_slab,polished_diorite_stairs", bill, "block/pale_oak_planks=trim_white,block/polished_diorite=trim_white", ("36", "45"))
+    add("swap", "cyan_terracotta", bill, "block/cyan_terracotta=chimney_stone", ("40", "45"))
+    add("swap", "bamboo_shelf", bill, "block/bamboo_shelf=bill_shelf", ("43", "45"))
+    add("swap", "spruce_slab,spruce_shelf", bill, "block/spruce_planks=deck_boards,block/spruce_shelf=deck_shelf", ("33", "41"))
+    add("swap", "end_stone_bricks", (-224, 152, -210, 178, "the path to Bill's"), "block/end_stone_bricks=path_cream", ("33", "35"))
+    # The Power Plant (16:58): its iron very metallic, its yellow, red and white painted metal, its roof, its red towers,
+    # its fronts and grey walls, its steel; the smooth slab pillars as the houses'; its sign.
+    P = POWER_PLANT
+    add("swap", "iron_block", P, "block/iron_block=pp_iron")
+    add("swap", "iron_trapdoor", P, "block/iron_trapdoor=pp_grate")
+    add("swap", "yellow_terracotta", P, "block/yellow_terracotta=pp_yellow")
+    add("swap", "red_terracotta", P, "block/red_terracotta=pp_red")
+    add("swap", "smooth_quartz_slab,smooth_quartz,quartz_block", P, "block/quartz_block_bottom=pp_white,block/quartz_block_top=pp_white,block/quartz_block_side=pp_white")
+    add("swap", "crimson_stairs,crimson_planks,crimson_slab,mangrove_planks,mangrove_fence,mangrove_stairs", P, "block/crimson_planks=pp_roof,block/mangrove_planks=pp_roof")
+    add("swap", "red_nether_brick_wall,red_nether_bricks", P, "block/red_nether_bricks=pp_red_frame")
+    add("swap", "polished_diorite,polished_diorite_stairs,polished_diorite_slab", P, "block/polished_diorite=pp_front")
+    add("swap", "light_gray_concrete", P, "block/light_gray_concrete=pp_wall_grey")
+    add("swap", "polished_andesite", P, "block/polished_andesite=pp_steel")
+    add("swap", "white_concrete", P, "block/white_concrete=pp_white", ("34", "50"))
+    add("swap", "deepslate_brick_wall", P, "block/deepslate_bricks=pp_post")
+    add("swap", "smooth_stone_slab,smooth_stone", P, "block/smooth_stone_slab_side=house_trim,block/smooth_stone=house_stone")
+    add("sign", "pale_oak_shelf", (-146, 330, -143, 332, "the Power Plant's sign"), "-", ("34", "35"))
 
 
 LAMP46 = ("block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chisel,"

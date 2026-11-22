@@ -1113,6 +1113,9 @@ def build():
     # 0.46.0's (15:21, 15:29): tools/looks46.py.
     import looks46
     looks46.build()
+    # 0.47.0's (16:17, 16:58): tools/looks47.py.
+    import looks47
+    looks47.build()
 
 
 # ---------- Pewter City (13:18) ----------
