@@ -1,8 +1,6 @@
-grep getDayTime|getTimeOfDay|getSkyDarken|skyDarken|DayTime|dayTime|getSunAngle|class ClientLevelData|ClientLevelData net/minecraft/client/multiplayer/ClientLevel.java
-grep getDayTime|getTimeOfDay|getSkyDarken|skyDarken|dayTime|DayTime net/minecraft/world/level/Level.java
-grep getDayTime|getTimeOfDay|getSkyDarken|skyDarken|dayTime|environmentAttributes|EnvironmentAttribute net/minecraft/client/renderer/LightTexture.java
-grep getDayTime|getTimeOfDay|getSunAngle|sunAngle|environmentAttributes|EnvironmentAttribute|starBrightness|timeOfDay net/minecraft/client/renderer/SkyRenderer.java
-grep getDayTime|getTimeOfDay|sunAngle|environmentAttributes|EnvironmentAttribute|timeOfDay|DayTime net/minecraft/client/renderer/LevelRenderer.java
-grep getDayTime|getTimeOfDay|DayTime|dayTime net/minecraft/world/level/storage/LevelData.java
-grep getDayTime|getTimeOfDay|DayTime|dayTime|getSunAngle net/minecraft/world/level/LevelReader.java
-grep getDayTime|getTimeOfDay|DayTime|dayTime|getSunAngle|timeOfDay net/minecraft/world/level/dimension/DimensionType.java
+net/minecraft/world/attribute/EnvironmentAttributeSystem.java
+net/minecraft/world/attribute/EnvironmentAttributeLayer.java
+net/minecraft/world/attribute/EnvironmentAttributeProbe.java
+net/minecraft/world/timeline/Timeline.java
+grep DayTime|dayTime|environmentAttributes|ClientLevelData|getGameTime net/minecraft/client/multiplayer/ClientLevel.java
+grep attributeProbe|EnvironmentAttributeProbe net/minecraft/client/Camera.java
