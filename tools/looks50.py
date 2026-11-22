@@ -387,7 +387,39 @@ def build():
     sea_rocks()
     houses()
     plants()
+    bike()
 
 
 if __name__ == "__main__":
     build()
+
+
+# ---------- the bikes outside the Bike Shop (20:12) ----------
+def bike():
+    """A bike standing side on (along x), a block long, above the block it's put on: two round wheels (pixel rings,
+    a hub), a red frame, a black seat and handlebars."""
+    save("bike_red", panel(hexc("#D8382E"), "bkr", 0.1))
+    save("bike_black", panel(hexc("#26282C"), "bkb", 0.06))
+    save("bike_steel", L.metal(hexc("#B8C0C8"), seam=False))
+    els = []
+    def box(a, b, tex):
+        els.append({"from": a, "to": b, "faces": {f: {"texture": "#" + tex} for f in ("north", "south", "east", "west", "up", "down")}})
+    for cx in (4.0, 12.0):
+        for px in range(16):
+            for py in range(16):
+                x, y = px + 0.5, py + 0.5
+                d = math.hypot(x - cx, y - 19.5 + 16)
+                if 2.3 <= d <= 3.3:
+                    box([px, 16 + py, 7.4], [px + 1, 17 + py, 8.6], "tyre")
+        box([cx - 0.5, 19.0, 7.2], [cx + 0.5, 20.0, 8.8], "steel")
+    box([4.0, 19.2, 7.6], [12.0, 20.0, 8.4], "frame")      # the chain stay to the front fork
+    box([5.0, 20.0, 7.6], [10.8, 21.0, 8.4], "frame")      # the top tube
+    box([5.0, 19.0, 7.6], [6.0, 23.5, 8.4], "frame")       # the seat post
+    box([3.6, 23.5, 7.1], [7.0, 24.3, 8.9], "tyre")       # the seat
+    box([11.0, 19.0, 7.6], [11.8, 24.5, 8.4], "frame")    # the head tube and fork
+    box([10.6, 24.5, 5.4], [12.2, 25.2, 10.6], "tyre")    # the handlebars
+    box([7.4, 18.6, 7.3], [8.6, 19.8, 8.7], "steel")       # the chain wheel
+    models = os.path.join(ASSETS, "models", "block", "area")
+    json.dump({"ambientocclusion": False, "textures": {"tyre": "retromon:block/area/bike_black", "frame": "retromon:block/area/bike_red",
+                                                       "steel": "retromon:block/area/bike_steel", "particle": "retromon:block/area/bike_red"}, "elements": els},
+              open(os.path.join(models, "prop_bike.json"), "w"), indent=1)

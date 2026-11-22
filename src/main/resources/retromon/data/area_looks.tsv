@@ -1913,6 +1913,8 @@ swap	polished_andesite_slab,stone_bricks	-361	317	-342	340	37	37	block/polished_
 swap	andesite_slab,stripped_oak_wood,oak_shelf,pale_oak_fence,light_gray_concrete	-360	232	-346	242	33	36	block/andesite=step_cer,block/stripped_oak_log=bridge_gold_beam,block/oak_shelf=bridge_gold_rail,block/pale_oak_planks=white_fence,block/light_gray_concrete=pillar_cer	Nugget Bridge's south end
 swap	stone_bricks,stone_brick_slab,stone_brick_stairs,stone_brick_wall,black_concrete	-781	365	-778	369	29	35	block/stone_bricks=drip_rock@4,block/black_concrete=cave_dark	Diglett's Cave's mouth
 swap	stone_bricks,stone_brick_slab,stone_brick_stairs,stone_brick_wall,black_concrete	-292	579	-289	583	30	36	block/stone_bricks=drip_rock@4,block/black_concrete=cave_dark	Diglett's Cave's mouth
+prop	light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta	-380	284	-380	284	33	33	bike	a bike outside the Bike Shop
+prop	light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta	-372	284	-372	284	33	33	bike	a bike outside the Bike Shop
 sign	pale_oak_shelf	-126	425	-123	427	33	35	-	Lavender Town's sign
 swap	warped_door	6143	-1	6496	214	-	-	block/warped_door_top=door_wood_top,block/warped_door_bottom=door_wood_bottom	the SAFARI ZONE	interiors
 swap	spruce_log,spruce_fence	6143	-1	6496	214	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	the SAFARI ZONE	interiors

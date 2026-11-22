@@ -767,6 +767,9 @@ def round50(add, room):
     for x0, z0, x1, z1, y0, y1 in ((-781, 365, -778, 369, 30, 34), (-292, 579, -289, 583, 31, 35)):
         add("swap", "stone_bricks,stone_brick_slab,stone_brick_stairs,stone_brick_wall,black_concrete", (x0, z0, x1, z1, "Diglett's Cave's mouth"),
             "block/stone_bricks=drip_rock@4,block/black_concrete=cave_dark", (str(y0 - 1), str(y1 + 1)))
+    # The bikes outside the Bike Shop (20:12), either side of its door.
+    for x in (-380, -372):
+        add("prop", "light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta", (x, 284, x, 284, "a bike outside the Bike Shop"), "bike", ("33", "33"))
     # Lavender's sign (20:12) as every other town's.
     add("sign", "pale_oak_shelf", (-126, 425, -123, 427, "Lavender Town's sign"), "-", ("33", "35"))
     # The SAFARI ZONE (its room): its warped doors plain wood, its fences as the routes'.

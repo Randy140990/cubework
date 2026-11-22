@@ -152,6 +152,7 @@ public final class AreaLooks {
 				part(ctx, b, "block/area/" + b);
 			// (0.50) The leafy trees (20:07): Shards' extra leaves, two ways round, for each kind of leaves.
 			for (String t : LEAFY) for (String v : new String[] {"a", "b"}) part(ctx, "leafy_" + t + "_" + v, "block/area/leafy_" + t + "_" + v);
+			part(ctx, "prop_bike", "block/area/prop_bike");
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
@@ -238,6 +239,15 @@ public final class AreaLooks {
 			case "chain" -> AreaLooks::chain;
 			// (0.50, 20:07) Trees leafy and rounded, not blocky: Shards' extra leaves standing out of the leaves that show.
 			case "leafy" -> AreaLooks::leafy;
+			// (0.50, 20:12) Something stood on a block (the bikes outside the Bike Shop): its own model over it.
+			case "prop" -> {
+				String name = "prop_" + rule.swaps();
+				yield (base, e, view, pos, state, random, cull) -> {
+					base.emitQuads(e, view, pos, state, random, cull);
+					BlockStateModel m = extra(name);
+					if (m != null) m.emitQuads(e, view, pos, state, random, d -> false);
+				};
+			}
 			// (19:06) Lavender Town's low mist: two thin lilac layers of haze over the ground, laid over four blocks.
 			case "mist" -> mist(sprite(baker, rule.swaps().equals("-") ? "mist_lav" : rule.swaps()));
 			case "grass_onto" -> {
