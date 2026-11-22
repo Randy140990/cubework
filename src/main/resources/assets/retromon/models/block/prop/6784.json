@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/steel","steel":"retromon:block/interior/steel"},"elements":[{"from":[0.0,16,5.8],"to":[8.6,16,16.0],"faces":{"down":{"uv":[0.0,0.0,8.6,10.2],"texture":"#steel"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/trash_can","trash_can":"retromon:block/interior/trash_can"},"elements":[{"from":[0.68,16,0.0],"to":[12.12,16,5.72],"faces":{"down":{"uv":[0.68,10.28,12.12,16.0],"texture":"#trash_can"}}}]}

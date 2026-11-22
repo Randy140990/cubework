@@ -364,6 +364,8 @@ def houses():
     save("wall_h16", N9.panels(hexc("#F2E8D6"), "wh16", joint=False))
     save("post_h16", K.boards(hexc("#7A5236"), "ph16", lines=False, vertical=True))
     save("bill_timber", K.boards(hexc("#6E4A30"), "btm", vertical=True))
+    # The Underground Path huts' warm cream brick (21:58, as Let's Go's entrances).
+    save("ug_brick", L.bricks(hexc("#E4CF8E"), hexc("#BFA868")))
 
 
 # ---------- the pack's plants (Shards' models) ----------

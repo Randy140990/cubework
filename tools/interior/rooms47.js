@@ -3,32 +3,39 @@
 (function () {
   const reg = (k, w, h, draw, m) => { TEXDEF[k] = [w, h, draw]; MATDEF[k] = Object.assign({ tex: k, per: 1 }, m || {}); };
 
-  // ----- the Underground Path's entrances (FireRed's: warm gold tiles, cream walls, a bracket of counter either side) -----
-  reg("ugFloor", 16, 16, (P, r) => {
-    P.fill(hx("#E2BE72"), 0.035, r);
-    P.rect(0, 0, 16, 1, hx("#C9A158")); P.rect(0, 0, 1, 16, hx("#C9A158"));
-    for (let i = 0; i < 4; i++) { P.set(7 - i, 4 + i, hx("#F0D594")); P.set(8 + i, 4 + i, hx("#F0D594")); P.set(7 - i, 11 - i, hx("#F0D594")); P.set(8 + i, 11 - i, hx("#F0D594")); }
+  // ----- the Underground Path's entrances, as Let's Go's (21:58): the tunnel's own pale grey tiles on the walls with
+  // their orange check band, its brown tiled floor, a grey stone counter, slate at the foot -----
+  const tiles = (base, grout, lt) => (P, r) => {
+    for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) {
+      const x0 = tx * 8, y0 = ty * 8, c = shadec(hx(base), (r() - 0.5) * 0.06);
+      P.rect(x0, y0, 8, 8, c); P.noise(x0 + 1, y0 + 1, 7, 7, c, 0.03, r);
+      P.rect(x0, y0, 8, 1, hx(grout)); P.rect(x0, y0, 1, 8, hx(grout)); P.rect(x0 + 1, y0 + 1, 7, 1, hx(lt));
+    }
+  };
+  reg("ugFloor", 16, 16, tiles("#86694E", "#5E4834", "#9C7F62"));
+  reg("ugWall", 16, 16, tiles("#D6D4CD", "#ABA9A2", "#E6E4DE"));
+  reg("ugPanel", 16, 16, (P, r) => {
+    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, ((x >> 2) + (y >> 3)) % 2 ? hx("#E8956A") : hx("#E3DED4"));
+    P.rect(0, 0, 16, 1, hx("#B9B4AA")); P.rect(0, 15, 16, 1, hx("#B9B4AA"));
   });
-  reg("ugWall", 16, 16, (P, r) => { P.fill(hx("#F3EAD3"), 0.02, r); P.rect(0, 0, 1, 16, hx("#E4D8BA")); P.rect(8, 0, 1, 16, hx("#EADFC3")); });
-  reg("ugPanel", 16, 16, (P, r) => { P.fill(hx("#5C7694"), 0.03, r); P.rect(0, 0, 16, 1, hx("#86A0BC")); P.rect(0, 15, 16, 1, hx("#43586F")); P.rect(7, 1, 1, 14, hx("#506985")); });
-  reg("ugTrim", 16, 16, (P, r) => { P.fill(hx("#3E4C5E"), 0.03, r); P.rect(0, 0, 16, 2, hx("#5D6E84")); });
-  reg("ugCounter", 16, 16, (P, r) => { P.fill(hx("#EFE1BC"), 0.025, r); P.rect(0, 0, 16, 2, hx("#FBF3DC")); P.rect(0, 13, 16, 3, hx("#9C8A62")); });
+  reg("ugTrim", 16, 16, (P, r) => { P.fill(hx("#7E807C"), 0.03, r); P.rect(0, 0, 16, 2, hx("#9A9C97")); });
+  reg("ugCounter", 16, 16, (P, r) => { P.fill(hx("#B9BBB7"), 0.025, r); P.rect(0, 0, 16, 2, hx("#D6D8D4")); P.rect(0, 13, 16, 3, hx("#7E807C")); });
   reg("ugTop", 16, 16, (P, r) => { P.fill(hx("#D7DADF"), 0.03, r); P.rect(0, 0, 16, 1, hx("#F0F2F5")); P.rect(0, 15, 16, 1, hx("#AEB3BA")); });
   reg("ugSign", 64, 16, (P, r) => {
     P.fill(hx("#2F4A6E"), 0.02, r); P.rect(0, 0, 64, 1, hx("#6E8DB4")); P.rect(0, 15, 64, 1, hx("#1E3048"));
     P.text("UNDERGROUND PATH", 1, 5, hx("#F6F1E2"));
   }, { fit: true });
-  // ----- the tunnels: a long floor in bands (FireRed's: tan, then blue, then red, then tan again), grey tiled walls, lamps -----
-  const lane = (base, lt, dk) => (P, r) => { P.fill(hx(base), 0.03, r); for (let y = 0; y < 16; y += 4) { P.rect(0, y, 16, 1, hx(lt)); P.rect(0, y + 3, 16, 1, hx(dk)); } };
-  reg("ugLane", 16, 16, lane("#B7A274", "#CBB98A", "#9C8960"));
-  reg("ugLaneBlue", 16, 16, lane("#7FA3C6", "#9DBCDA", "#62849F"));
-  reg("ugLaneRed", 16, 16, lane("#C7826E", "#DB9C88", "#A6685A"));
-  const laneX = (base, lt, dk) => (P, r) => { P.fill(hx(base), 0.03, r); for (let x = 0; x < 16; x += 4) { P.rect(x, 0, 1, 16, hx(lt)); P.rect(x + 3, 0, 1, 16, hx(dk)); } };
-  reg("ugLaneX", 16, 16, laneX("#B7A274", "#CBB98A", "#9C8960"));
-  reg("ugLaneBlueX", 16, 16, laneX("#7FA3C6", "#9DBCDA", "#62849F"));
-  reg("ugLaneRedX", 16, 16, laneX("#C7826E", "#DB9C88", "#A6685A"));
-  reg("ugCorWall", 16, 16, (P, r) => { P.fill(hx("#B9BBB6"), 0.04, r); P.rect(0, 0, 16, 1, hx("#9EA09B")); P.rect(0, 8, 16, 1, hx("#9EA09B")); P.rect(0, 0, 1, 8, hx("#9EA09B")); P.rect(8, 8, 1, 8, hx("#9EA09B")); });
+  // ----- the tunnels, as Let's Go's (21:58): a brown tiled floor with a blue lane and a red lane running its length,
+  // pale grey tiled walls with an orange check band, lamps on the walls lighting them -----
+  reg("ugLane", 16, 16, tiles("#86694E", "#5E4834", "#9C7F62"));
+  reg("ugLaneBlue", 16, 16, tiles("#4F86BE", "#3A6896", "#6A9DD0"));
+  reg("ugLaneRed", 16, 16, tiles("#D9473D", "#AE3129", "#E8695E"));
+  reg("ugLaneX", 16, 16, tiles("#86694E", "#5E4834", "#9C7F62"));
+  reg("ugLaneBlueX", 16, 16, tiles("#4F86BE", "#3A6896", "#6A9DD0"));
+  reg("ugLaneRedX", 16, 16, tiles("#D9473D", "#AE3129", "#E8695E"));
+  reg("ugCorWall", 16, 16, tiles("#D6D4CD", "#ABA9A2", "#E6E4DE"));
   reg("ugLamp", 16, 16, (P, r) => { P.fill(hx("#FFF4D2"), 0.02, r); P.rect(0, 0, 16, 1, hx("#FFFFFF")); }, { glow: 0.95 });
+  reg("ugLampCase", 16, 16, (P, r) => { P.fill(hx("#3A3E44"), 0.03, r); P.rect(0, 0, 16, 1, hx("#5A5F66")); });
   reg("ugTread", 16, 16, (P, r) => { P.fill(hx("#8E98A4"), 0.03, r); for (let y = 2; y < 16; y += 4) P.rect(0, y, 16, 1, hx("#6E7782")); P.rect(0, 0, 16, 1, hx("#C4CBD3")); });
 
   // A flight of stairs up along x (8 steps of half a block over 4 blocks), climbing east or west, its banister along
@@ -77,7 +84,7 @@
     // (17:51) The floor left open over the stairwell (x 5 to 9, z 2.2 to 4.4), so the stairs show going down.
     shell(R, { paper: "ugWall", floor: "ugFloor", door: [6, 8], entry: true, skirt: "ugTrim", ledge: "ugPanel", ledgeTop: "ugTop",
       floorRects: [[0, 0, 14, 2.2], [0, 4.4, 14, 10], [0, 2.2, 5, 4.4], [9, 2.2, 14, 4.4], [5, 10, 9, 12]] });
-    band(R, 0.24, "ugPanel", 1.0); band(R, 1.24, "ugTrim", 0.08);
+    band(R, 0.24, "ugTrim", 0.2); band(R, 1.0, "ugPanel", 0.5);
     ugBracket(R, 1.2, 2.4, 3.6, 6.8, "e");
     ugBracket(R, 10.4, 2.4, 12.8, 6.8, "w");
     stairsDown(R, 5.0, 2.2, 2.2, { to: o.down, spawn: o.downSpawn, paper: "ugCorWall", show: true });
@@ -90,7 +97,7 @@
     doormat(R, 6, 8, { to: "town", mat: "matGate" });
     R.spawn = { x: 7.0, z: R.D - 1.5, yaw: FACE.n };
     if (o.person) R.npcs.push(o.person);
-    R.item("Underground Path entrance", "FireRed's: gold tiles, cream walls on slate-blue panels, a bracket of counter either side, the stairs down between them.");
+    R.item("Underground Path entrance", "As the tunnel below (Let's Go's): brown tiles, pale grey tiled walls with an orange check band, a grey stone counter either side, the stairs down between them.");
   }
 
   // A tunnel: its floor in FireRed's bands, lamps along both walls, the stairs up at each end.
@@ -100,13 +107,17 @@
     const L = ns ? D : W, k = L / 4;
     const bands = ns ? [[0, k, "ugLane"], [k, 2 * k, "ugLaneBlue"], [2 * k, 3 * k, "ugLaneRed"], [3 * k, L, "ugLane"]]
       : [[0, k, "ugLaneX"], [k, 2 * k, "ugLaneBlueX"], [2 * k, 3 * k, "ugLaneRedX"], [3 * k, L, "ugLaneX"]];
-    const zones = bands.map(([a, b, m]) => ns ? [0, a, W, b, m] : [a, 0, b, D, m]);
+    // (21:58) Let's Go's: the blue lane and the red lane run the tunnel's length, brown tiles either side.
+    const across = ns ? W : D, lanes = [[0, 1.5, "ugLane"], [1.5, 2.5, "ugLaneBlue"], [2.5, across - 2.5, "ugLane"], [across - 2.5, across - 1.5, "ugLaneRed"], [across - 1.5, across, "ugLane"]];
+    const zones = lanes.map(([a, b, m]) => ns ? [a, 0, b, D, m] : [0, a, W, b, m]);
     shell(R, { paper: "ugCorWall", floor: "ugLane", zones, skirt: "ugTrim", rail: false });
-    band(R, 0.24, "ugTrim", 0.5);
+    band(R, 0.24, "ugTrim", 0.2); band(R, 1.0, "ugPanel", 0.5);
     const G = R.geo;
-    if (ns) for (let z = 4; z < D - 2; z += 8) { G.box(0, 2.6, z, 0.08, 3.0, z + 1.2, { e: "ugLamp", all: "ugTrim" }); G.box(W - 0.08, 2.6, z + 4, W, 3.0, z + 5.2, { w: "ugLamp", all: "ugTrim" }); }
-    else for (let x = 4; x < W - 2; x += 8) G.box(x, 2.6, 0, x + 1.2, 3.0, 0.08, { s: "ugLamp", all: "ugTrim" });
-    R.item("Tunnel", "FireRed's long floor in bands (tan, blue, red, tan), grey tiled walls, a lamp every few steps.");
+    // Lamps on the walls: a dark case, angled down, its light on the wall under it.
+    const lamp = (x0, z0, x1, z1, face) => { G.box(x0, 2.45, z0, x1, 2.85, z1, { all: "ugLampCase", bottom: "ugLamp", [face]: "ugLamp" }); };
+    if (ns) for (let z = 4; z < D - 2; z += 8) { lamp(0, z, 0.32, z + 1.0, "e"); lamp(W - 0.32, z + 4, W, z + 5.0, "w"); }
+    else for (let x = 4; x < W - 2; x += 8) lamp(x, 0, x + 1.0, 0.32, "s");
+    R.item("Tunnel", "Let's Go's: a brown tiled floor with a blue lane and a red lane down its length, pale grey tiled walls with an orange check band, lamps in dark cases on the walls.");
   }
 
   const place = (id, name, floor, group) => PLACES.push({ id, name, floor, group });

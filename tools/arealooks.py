@@ -568,18 +568,22 @@ def round48b(add, room):
     # The four Underground Path huts, as the bigger buildings: a slate blue tiled roof, clean walls, dressed stone at
     # the foot, white posts, dark metal rails, the steps.
     for x, y, z, note in UG_HUTS:
+        # (21:58) As Let's Go's entrances and in line with the gatehouses: the gatehouses' grey slab roof and its darker
+        # rim, a grey stone frame round the dark doorway, warm cream brick either side, stone steps.
         h = (x - 8, z - 10, x + 8, z + 4, note + " Underground Path hut")
-        add("roof_ug", "birch_stairs", h, "-", (str(y + 1), str(y + 10)))
-        add("swap", "birch_stairs", h, "block/birch_planks=pillar_cer", (str(y), str(y)))
-        add("swap", "birch_slab,birch_planks", h, "block/birch_planks=roof_ug_tiles", (str(y + 2), str(y + 10)))
-        add("swap", "polished_deepslate,polished_deepslate_stairs", h, "block/polished_deepslate=wall_ug", (str(y), str(y + 8)))
-        add("swap", "andesite,polished_andesite_stairs,polished_andesite_slab,polished_andesite", h,
-            "block/andesite=base_ug,block/polished_andesite=pillar_cer", (str(y - 1), str(y + 8)))
-        add("swap", "stripped_oak_log,stripped_jungle_log,light_gray_concrete", h,
-            "block/stripped_oak_log=post_ug,block/stripped_oak_log_top=post_ug,block/stripped_jungle_log=post_ug,block/stripped_jungle_log_top=post_ug,"
-            "block/light_gray_concrete=pillar_cer", (str(y), str(y + 8)))
-        add("swap", "deepslate_tile_wall", h, "block/deepslate_tiles=rail_ug", (str(y), str(y + 8)))
+        add("swap", "polished_deepslate,polished_deepslate_stairs", h, "block/polished_deepslate=gate_roof", (str(y), str(y + 10)))
+        add("swap", "deepslate_tile_wall", h, "block/deepslate_tiles=gate_roof_rim", (str(y), str(y + 10)))
         add("swap", "polished_deepslate_slab", h, "block/polished_deepslate=step_cer", (str(y - 1), str(y + 1)))
+        add("swap", "polished_deepslate_slab", h, "block/polished_deepslate=gate_roof_rim", (str(y + 2), str(y + 10)))
+        add("swap", "birch_stairs,birch_slab,birch_planks", h, "block/birch_planks=gate_pillar", (str(y), str(y + 10)))
+        add("swap", "stripped_oak_log,stripped_jungle_log", h,
+            "block/stripped_oak_log=gate_pillar,block/stripped_oak_log_top=gate_pillar,block/stripped_jungle_log=gate_pillar,block/stripped_jungle_log_top=gate_pillar",
+            (str(y), str(y + 10)))
+        add("swap", "andesite", h, "block/andesite=ug_brick", (str(y), str(y + 10)))
+        add("swap", "andesite", h, "block/andesite=gate_stone", (str(y - 1), str(y - 1)))
+        add("swap", "light_gray_concrete,polished_andesite_stairs,polished_andesite_slab,polished_andesite", h,
+            "block/light_gray_concrete=gate_stone,block/polished_andesite=gate_stone", (str(y - 1), str(y + 10)))
+        add("swap", "black_concrete", h, "block/black_concrete=cave_dark", (str(y), str(y + 6)))
     # Inside: Cerulean Gym's pool in tiles (white walkways, blue floor, a blue-edged rim); LT. SURGE's electric door.
     room("swap", "smooth_quartz,quartz_block,smooth_quartz_slab,smooth_quartz_stairs,quartz_slab,quartz_stairs", (2559, -1, 2582, 26, "Cerulean Gym's pool"),
          "block/quartz_block_bottom=pool_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_tile")
