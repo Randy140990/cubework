@@ -7,6 +7,7 @@ import json
 import os
 import random
 
+import lookarea
 import lookground
 import lookplants
 
@@ -138,6 +139,8 @@ def main():
               open(os.path.join(PACK, "pack.mcmeta"), "w"), indent=1, ensure_ascii=False)
     # The ground (grass, dirt paths, moss, dirt) and its rounded edges (CTM, for Continuity): lookground.py.
     lookground.build(save)
+    # The looks the mod gives some places only (Pallet Town's fences, roofs, signs) and the mailboxes: lookarea.py.
+    lookarea.build()
     # The plants (short and tall grass, fern, large fern, the red flowers): John's Shards of Arcadia set, recoloured:
     # lookplants.py.
     lookplants.build()

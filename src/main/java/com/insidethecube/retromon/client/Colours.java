@@ -21,7 +21,10 @@ public final class Colours {
 		}, Blocks.GRASS_BLOCK, Blocks.SHORT_GRASS, Blocks.TALL_GRASS, Blocks.FERN, Blocks.LARGE_FERN, Blocks.BUSH, Blocks.SUGAR_CANE,
 				// The map's moss (its fields and the borders of its paths) and green concrete powder (its lumps of grass):
 				// the Retromon Look pack draws them as the grass, so they take the grass's green.
-				Blocks.MOSS_BLOCK, Blocks.MOSS_CARPET, Blocks.GREEN_CONCRETE_POWDER);
+				Blocks.MOSS_BLOCK, Blocks.MOSS_CARPET, Blocks.GREEN_CONCRETE_POWDER,
+				// The grass's tufts drawn onto the dripstone round the water (AreaLooks): the grass's green. (The dripstone's
+				// own faces aren't tinted.)
+				Blocks.DRIPSTONE_BLOCK);
 		ColorProviderRegistry.BLOCK.register((state, level, pos, tint) -> {
 			int c = level != null && pos != null ? BiomeColors.getAverageFoliageColor(level, pos) : FoliageColor.FOLIAGE_DEFAULT;
 			return Adventure.inSave ? brighten(c) : c;

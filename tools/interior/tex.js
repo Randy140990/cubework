@@ -34,6 +34,15 @@ class Pix {
       if (c[3]) this.set(x + i, y + j, c, c[3] / 255);
     }
   }
+  // One of the mod's own textures for the looks only some places have (AREATEX: tools/lookarea.py), at x, y.
+  area(name, f) {
+    const t = AREATEX[name], d = atob(t.d);
+    for (let j = 0; j < t.h; j++) for (let i = 0; i < t.w; i++) {
+      const o = (j * t.w + i) * 4; let c = [d.charCodeAt(o), d.charCodeAt(o + 1), d.charCodeAt(o + 2), d.charCodeAt(o + 3)];
+      if (f) c = f(c, i, j);
+      if (c[3]) this.set(i, j, c, c[3] / 255);
+    }
+  }
   canvas() { const cv = document.createElement("canvas"); cv.width = this.w; cv.height = this.h; cv.getContext("2d").putImageData(new ImageData(this.d, this.w, this.h), 0, 0); return cv; }
 }
 // A pack's leaves cut round: only what's inside a ragged circle is kept (so a leafy face reads as a round tuft, not

@@ -30,6 +30,9 @@ public class RetromonClient implements ClientModInitializer {
 		// The insides of buildings: cut-out (glass, leaves and the clock face show what's behind them).
 		net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(Retromon.PROP, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
 		Colours.register();
+		// Looks only some places have (Pallet Town's white fences, red tiled roofs, HeartGold signs, the grass's edge on
+		// the dripstone round the water): drawn by where the block is.
+		AreaLooks.register();
 		// 3D figures on screens (Oak, you, the starters, the Pokédex), drawn without a world.
 		net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(ctx -> new Figures.Renderer(ctx.vertexConsumers()));
 		net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(ctx -> new Figures.ShadowRenderer(ctx.vertexConsumers()));

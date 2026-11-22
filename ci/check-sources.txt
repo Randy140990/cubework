@@ -1,18 +1,8 @@
-net/minecraft/world/level/dimension/DimensionType.java
-data data/minecraft/dimension_type/overworld.json
-grep keyPress net/minecraft/client/KeyboardHandler.java
-grep submitCustomGeometry net/minecraft/client/renderer/SubmitNodeCollector.java
-grep interface net/minecraft/client/renderer/SubmitNodeCollector.java
-net/minecraft/client/gui/render/GuiRenderer.java
-net/minecraft/client/gui/render/state/GuiRenderState.java
-net/minecraft/client/gui/GuiGraphics.java
-net/minecraft/client/gui/render/state/GuiElementRenderState.java
-net/minecraft/client/gui/render/state/ColoredRectangleRenderState.java
-net/minecraft/client/gui/render/state/BlitRenderState.java
-net/minecraft/client/gui/render/TextureSetup.java
-net/minecraft/client/gui/navigation/ScreenRectangle.java
-net/minecraft/client/gui/render/state/ScreenArea.java
-net/minecraft/client/gui/render/pip/PictureInPictureRenderer.java
-net/minecraft/client/gui/screens/LevelLoadingScreen.java
-net/minecraft/client/gui/screens/GenericMessageScreen.java
-grep reloading|preparing|Preparing net/minecraft/client/Minecraft.java
+net/minecraft/client/renderer/blockentity/AbstractSignRenderer.java
+net/minecraft/client/renderer/blockentity/SignRenderer.java
+net/minecraft/client/renderer/blockentity/BlockEntityRenderer.java
+net/minecraft/client/renderer/blockentity/state/SignRenderState.java
+net/minecraft/client/renderer/blockentity/state/BlockEntityRenderState.java
+net/minecraft/client/resources/model/ModelDebugName.java
+net/minecraft/client/resources/model/SpriteGetter.java
+net/minecraft/client/renderer/blockentity/BlockEntityRenderers.java

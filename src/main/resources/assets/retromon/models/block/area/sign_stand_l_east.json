@@ -1,0 +1,63 @@
+{
+ "parent": "minecraft:block/block",
+ "ambientocclusion": false,
+ "textures": {
+  "particle": "retromon:block/area/sign_edge_h",
+  "t0": "retromon:block/area/sign_stand",
+  "t1": "retromon:block/area/sign_foot"
+ },
+ "elements": [
+  {
+   "from": [
+    6,
+    2,
+    0
+   ],
+   "to": [
+    10,
+    16,
+    14
+   ],
+   "faces": {
+    "east": {
+     "texture": "#t0"
+    },
+    "west": {
+     "texture": "#t0"
+    },
+    "south": {
+     "texture": "#t0"
+    }
+   }
+  },
+  {
+   "from": [
+    5,
+    0,
+    0
+   ],
+   "to": [
+    11,
+    2,
+    15
+   ],
+   "faces": {
+    "east": {
+     "texture": "#t1"
+    },
+    "west": {
+     "texture": "#t1"
+    },
+    "up": {
+     "texture": "#t1"
+    },
+    "down": {
+     "texture": "#t1"
+    },
+    "south": {
+     "texture": "#t1"
+    }
+   }
+  }
+ ]
+}

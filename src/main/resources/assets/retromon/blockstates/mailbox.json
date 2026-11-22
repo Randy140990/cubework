@@ -1,0 +1,19 @@
+{
+ "variants": {
+  "facing=north": {
+   "model": "retromon:block/mailbox"
+  },
+  "facing=east": {
+   "model": "retromon:block/mailbox",
+   "y": 90
+  },
+  "facing=south": {
+   "model": "retromon:block/mailbox",
+   "y": 180
+  },
+  "facing=west": {
+   "model": "retromon:block/mailbox",
+   "y": 270
+  }
+ }
+}

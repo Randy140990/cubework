@@ -55,6 +55,9 @@ public class Retromon implements ModInitializer {
 	public static final ResourceKey<net.minecraft.world.level.block.Block> PROP_KEY = ResourceKey.create(Registries.BLOCK, id("prop"));
 	/** The insides of buildings, block by block (see Interiors). */
 	public static net.minecraft.world.level.block.Block PROP;
+	public static final ResourceKey<net.minecraft.world.level.block.Block> MAILBOX_KEY = ResourceKey.create(Registries.BLOCK, id("mailbox"));
+	/** HeartGold's mailboxes by the houses (see Mailbox). */
+	public static net.minecraft.world.level.block.Block MAILBOX;
 
 	public static Identifier id(String path) {
 		return Identifier.fromNamespaceAndPath(ID, path);
@@ -76,6 +79,10 @@ public class Retromon implements ModInitializer {
 				net.minecraft.world.level.block.state.BlockBehaviour.Properties.of().setId(PROP_KEY).noOcclusion().strength(-1F, 3600000F).noLootTable()
 						.isViewBlocking((st, g, pos) -> false).isSuffocating((st, g, pos) -> false)
 						.pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+		MAILBOX = Registry.register(BuiltInRegistries.BLOCK, MAILBOX_KEY, new com.insidethecube.retromon.game.Mailbox(
+				net.minecraft.world.level.block.state.BlockBehaviour.Properties.of().setId(MAILBOX_KEY).noOcclusion().strength(-1F, 3600000F).noLootTable()
+						.isViewBlocking((st, g, pos) -> false).isSuffocating((st, g, pos) -> false)
+						.pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK).sound(net.minecraft.world.level.block.SoundType.METAL)));
 		FabricDefaultAttributeRegistry.register(NPC, Npc.createAttributes());
 		FabricDefaultAttributeRegistry.register(WORLD_MON, WorldMon.createAttributes());
 		// Read the games' data now, so a mistake in it shows at once.

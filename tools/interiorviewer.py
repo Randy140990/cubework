@@ -52,6 +52,21 @@ def packtex():
         out[n] = {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
     return out
 
+def areatex():
+    """The mod's textures for the looks only some places have (client/AreaLooks, tools/lookarea.py), and the Look
+    pack's dripstone, as raw RGBA, for the "Pallet Town looks" view."""
+    import base64, glob
+    from PIL import Image
+    out = {}
+    root = os.path.join(HERE, "..", "src", "main", "resources")
+    for f in sorted(glob.glob(os.path.join(root, "assets", "retromon", "textures", "block", "area", "*.png"))):
+        n = os.path.splitext(os.path.basename(f))[0]
+        im = Image.open(f).convert("RGBA")
+        out[n] = {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
+    im = Image.open(os.path.join(root, "resourcepacks", "retromon_look", "assets", "minecraft", "textures", "block", "dripstone_block.png")).convert("RGBA")
+    out["dripstone"] = {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
+    return out
+
 def engine():
     s = open(os.path.join(HERE, "monviewer.html")).read()
     a = s.index("// ---------- Molang")
@@ -65,7 +80,7 @@ def main():
     js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "figure.js", "creature.js", "rooms.js", "app.js"))
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
-            + "const DATA = " + data + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
+            + "const DATA = " + data + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst AREATEX = " + json.dumps(areatex(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
             + engine() + "\n" + js + "\n</script>\n")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     open(out, "w").write(html)

@@ -895,3 +895,20 @@ function tallGrass(room, x0, z0, x1, z1) {
   const G = room.geo;
   for (let x = x0; x < x1 - 0.1; x += 1) for (let z = z0; z < z1 - 0.1; z += 1) { G.box(x, 0, z + 0.5, x + 1, 0.8, z + 0.5, { s: "tallGrass", all: null }); G.box(x + 0.5, 0, z, x + 0.5, 0.8, z + 1, { e: "tallGrass", all: null }); }
 }
+
+// ---------- the mod's looks for some places only (client/AreaLooks), from its own textures (AREATEX) ----------
+// Each as Minecraft lays a block's textures (a block to the picture, from where the face is); the grass's tufts on
+// the dripstone round the water in the viewer's grass green (in game, the biome's, as the grass takes it).
+if (typeof AREATEX !== "undefined") {
+  const TUFT = [134, 217, 104];
+  for (const k of Object.keys(AREATEX)) {
+    const tuft = /^grass_on_drip_/.test(k), shade = /^drip_shade_/.test(k);
+    TEXDEF["area_" + k] = [AREATEX[k].w, AREATEX[k].h, P => P.area(k, tuft ? c => [c[0] * TUFT[0] / 255, c[1] * TUFT[1] / 255, c[2] * TUFT[2] / 255, c[3]] : null)];
+    MATDEF["area_" + k] = tuft || shade ? { tex: "area_" + k, per: 1, cut: true } : { tex: "area_" + k, per: 1 };
+  }
+  // The roof's tiles on the tops of its steps, their rows along the eaves (here the roof's ridge runs north to
+  // south): the picture turned a quarter, its rows' tops uphill (towards the ridge, east or west).
+  const turned = (flip) => [16, 16, P => { const Q = new Pix(16, 16); Q.area("roof_tiles"); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(flip ? 15 - x : x, y, Q.get(y, x), 1); }];
+  TEXDEF.area_roof_top_e = turned(false); MATDEF.area_roof_top_e = { tex: "area_roof_top_e", per: 1 };
+  TEXDEF.area_roof_top_w = turned(true); MATDEF.area_roof_top_w = { tex: "area_roof_top_w", per: 1 };
+}

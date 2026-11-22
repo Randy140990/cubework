@@ -991,6 +991,8 @@ public final class Game {
 	// ---------- every tick ----------
 
 	public static void tick(MinecraftServer s) {
+		// HeartGold's mailboxes by Pallet Town's houses, put in place once that part of the map is loaded.
+		if (ourSave && s.getTickCount() % 40 == 0) Mailbox.place(s.overworld());
 		for (ServerPlayer p : s.getPlayerList().getPlayers()) {
 			if (!adventure(p)) continue;
 			UUID id = p.getUUID();
@@ -3059,12 +3061,13 @@ public final class Game {
 	private static final int[][] OLD_OUTSIDE = {{-785, 561}, {-766, 549}};
 	/**
 	 * People who stand somewhere on John's map other than where the games' grid puts them, each moved there once per
-	 * save (SPOTS_DONE says which time: bumped, everyone's moved again). Pallet's: the girl ("I'm raising POKéMON
-	 * too!") by the flowers in the lab's garden, well away from the pond; the man who says technology is incredible
-	 * by the sign at the pond; PROF.OAK's AIDE by the lab's own sign. Key, then x and z.
+	 * save (SPOTS_DONE says which time: bumped, everyone's moved again). Pallet's, where FireRed and LeafGreen have
+	 * them: the girl ("I'm raising POKéMON too!") on the west lawn, left of the flower garden; the man who says
+	 * technology is incredible below the lab's fence, by its left end; PROF.OAK's AIDE (not in FireRed) by the lab's
+	 * sign, as John asked. Key, then x and z.
 	 */
-	private static final Object[][] SPOTS = {{"pallet_town_p1", -784, 708}, {"pallet_town_p2", -798, 689}, {"pallet_town_p3", -780, 701}};
-	private static final String SPOTS_DONE = "spot3:";
+	private static final Object[][] SPOTS = {{"pallet_town_p1", -809, 686}, {"pallet_town_p2", -785, 704}, {"pallet_town_p3", -780, 701}};
+	private static final String SPOTS_DONE = "spot4:";
 
 	/** Where someone in SPOTS stands (x, z), or null. */
 	private static int[] spotOf(String key) {

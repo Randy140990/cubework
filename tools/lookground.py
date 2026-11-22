@@ -23,6 +23,8 @@ PACK = os.path.join(HERE, "..", "src", "main", "resources", "resourcepacks", "re
 ASSETS = os.path.join(PACK, "assets", "minecraft")
 TEX = os.path.join(ASSETS, "textures", "block")
 CTM = os.path.join(ASSETS, "optifine", "ctm", "retromon")
+# The mod's own textures for the looks it gives some places only (see client/AreaLooks).
+AREA = os.path.join(HERE, "..", "src", "main", "resources", "assets", "retromon", "textures", "block", "area")
 # Minecraft's own textures (for the ones kept in their pattern, recoloured): the dripstone, the azalea leaves.
 VANILLA = os.environ.get("MC_ASSETS", "/tmp/claude-0/-home-claude/f360dc45-4134-5784-9221-f3f5b66e9ae3/scratchpad/ext/mcassets/assets/minecraft")
 
@@ -307,7 +309,7 @@ def fringe(tile, grey):
 SHADE = rgb(*mix(PATH_DARK, (96, 60, 34), 0.4))
 
 
-def shade(tile):
+def shade(tile, colour=None):
     """The tufts' soft shadow on the path (not tinted): just past them on their bottom right, as the light falls from
     the top left; none round the far sides, so it reads as depth, not an outline."""
     cov = coverage(tile)
@@ -317,7 +319,7 @@ def shade(tile):
     for y in range(16):
         for x in range(16):
             if not cov[y][x] and (at(x, y - 1) or at(x - 1, y) or at(x - 1, y - 1) and (x + y) % 2 == 0):
-                p[x, y] = SHADE
+                p[x, y] = colour or SHADE
     return im
 
 
@@ -386,15 +388,15 @@ def build(save):
     drip = recolour(os.path.join(VANILLA, "textures/block/dripstone_block.png"), DRIP)
     save("dripstone_block", drip)
     # The steps on the dripstone in the water (jungle stairs, always waterlogged there: Pallet's channel, the sea walls
-    # all over the map): one solid colour, the ledges' own earth, not planks. Only the ones in the water; jungle stairs
+    # all over the map): the dripstone's own pattern, not planks, lined up with the ledges beside them (the stairs
+    # take their faces' pattern from where they are, as the blocks do). Only the ones in the water; jungle stairs
     # anywhere else keep their planks.
-    dp = [drip.getpixel((x, y)) for y in range(drip.height) for x in range(drip.width)]
-    mean = tuple(int(sum(c[k] for c in dp) / len(dp)) for k in range(3))
-    step = Image.new("RGBA", (16, 16), mean + (255,))
-    save("retromon_water_step", step)
+    old = os.path.join(TEX, "retromon_water_step.png")
+    if os.path.exists(old):
+        os.remove(old)
     for kind, parent in (("", "stairs"), ("_inner", "inner_stairs"), ("_outer", "outer_stairs")):
         write_json("models/block/retromon_water_step%s.json" % kind, {"parent": "minecraft:block/" + parent, "textures": {
-            "bottom": "minecraft:block/retromon_water_step", "top": "minecraft:block/retromon_water_step", "side": "minecraft:block/retromon_water_step"}})
+            "bottom": "minecraft:block/dripstone_block", "top": "minecraft:block/dripstone_block", "side": "minecraft:block/dripstone_block"}})
     stairs = json.load(open(os.path.join(VANILLA, "blockstates/jungle_stairs.json")))["variants"]
     variants = {}
     for k, v in stairs.items():
@@ -442,6 +444,14 @@ def build(save):
     write_overlay("moss_on_path", paths, "moss_block", lambda t: fringe(t, m16))
     write_overlay("grass_on_path", paths, grassy, lambda t: fringe(t, g16))
     write_overlay("grass_on_moss", "moss_block", grassy, lambda t: fringe(t, g16))
+    # The same tufts onto the dripstone where it borders water (Pallet Town's pond and shore), with their shadow on
+    # the dripstone: drawn by the mod (client/AreaLooks), as only some of the dripstone has them, so they're the
+    # mod's own textures.
+    os.makedirs(AREA, exist_ok=True)
+    drip_shade = rgb(*mix(DRIP[1], (96, 60, 34), 0.45))
+    for t in range(1, 18):
+        fringe(t, g16).save(os.path.join(AREA, "grass_on_drip_%d.png" % t))
+        shade(t, drip_shade).save(os.path.join(AREA, "drip_shade_%d.png" % t))
     return {"g64": g64, "m64": m64, "c64": c64, "p64": p64}
 
 

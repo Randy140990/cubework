@@ -1,0 +1,11 @@
+# Looks the mod gives some places only (client/AreaLooks): which look, on which block, over which part of the map
+# (x0 z0 to x1 z1, every height). Several rows with the same look and block add their areas together.
+# white_fence: solid white with a slight gradient. roof: HeartGold's roof red in rows of tiles along the eaves.
+# sign: the shelves stacked as signs become HeartGold's sign (the top row the board, the rows under it the stand).
+# grass_edge: the grass's rounded tufts onto the dripstone where it borders water.
+#look	block	x0	z0	x1	z1	where
+white_fence	pale_oak_fence	-845	590	-745	735	Pallet Town and Route 1
+roof	acacia_stairs	-806	673	-795	682	your house
+roof	acacia_stairs	-788	673	-777	682	Blue's house
+sign	pale_oak_shelf	-845	590	-745	735	Pallet Town and Route 1
+grass_edge	dripstone_block	-845	655	-745	735	Pallet Town

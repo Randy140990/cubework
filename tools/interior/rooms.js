@@ -20,6 +20,7 @@ const PLACES = [
   { id: "arena_lab", name: "Lab battle", floor: "Battle arena", group: "Battle arenas" },
   { id: "arena_route", name: "Route battle", floor: "Battle arena (outside)", group: "Battle arenas" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
+  { id: "pallet_looks", name: "Pallet Town looks", floor: "Outside (the mod's blocks)", group: "Outside" },
 ];
 // Your house and the rival's (14 by 13, the mat in a nook at the door), the stairs at the back on the right.
 const FROM_TOWN = { x: 7.0, z: 11.5, yaw: FACE.n };
@@ -1430,6 +1431,98 @@ const BUILD = {
     R.item("Pitch", "13 by 16 blocks: stripes of grass and moss, a dirt path line round it, across the middle and round a circle at the centre.");
     R.item("Round it", "Flower beds and lantern posts either side; an azalea hedge two high (some of it in flower); tall grass; birch and azalea trees in two rings.");
     R.spawn = { x: cx - 0.6, z: cz + 2.2, yaw: FACE.n };
+    return R;
+  },
+
+  pallet_looks() {
+    // The looks the mod gives Pallet Town (client/AreaLooks, tools/lookarea.py), on Minecraft's blocks as John's map
+    // has them, from the mod's own textures: the pond's dripstone with the grass's rounded tufts on it and its steps
+    // in the water in the dripstone's pattern; a white fence; a shelf sign (two by two) as HeartGold's sign; a
+    // mailbox; a little roof of stairs in HeartGold's red tiles. Everything faces you (south).
+    const R = new Room("pallet_looks", { name: "Pallet Town looks", floor: "Outside (the mod's blocks)", W: 24, D: 18, H: 6, outside: true });
+    const G = R.geo, P16 = 1 / 16;
+    // The pond: water in a ring of dripstone (rim x 2 to 10, z 3 to 14), sunk a block into the ground.
+    const rx0 = 2, rx1 = 10, rz0 = 3, rz1 = 14;
+    const rim = (x, z) => x >= rx0 && x <= rx1 && z >= rz0 && z <= rz1 && (x === rx0 || x === rx1 || z === rz0 || z === rz1);
+    const wet = (x, z) => x > rx0 && x < rx1 && z > rz0 && z < rz1;
+    const grassAt = (x, z) => x >= 0 && z >= 0 && x < R.W && z < R.D && !rim(x, z) && !wet(x, z);
+    G.box(0, -1, 0, rx0, 0, R.D, { top: "grass", all: "soil" });
+    G.box(rx1 + 1, -1, 0, R.W, 0, R.D, { top: "grass", all: "soil" });
+    G.box(rx0, -1, 0, rx1 + 1, 0, rz0, { top: "grass", all: "soil" });
+    G.box(rx0, -1, rz1 + 1, rx1 + 1, 0, R.D, { top: "grass", all: "soil" });
+    for (let x = rx0; x <= rx1; x++) for (let z = rz0; z <= rz1; z++) if (rim(x, z)) G.box(x, -1, z, x + 1, 0, z + 1, "area_dripstone");
+    G.box(rx0 + 1, -1, rz0 + 1, rx1, -0.125, rz1, { top: "water", all: null });
+    // The steps in the water (jungle stairs, in the dripstone's pattern now): their backs against the rim.
+    const step = (x, z, back) => {
+      G.box(x, -1, z, x + 1, -0.5, z + 1, "area_dripstone");
+      if (back === "w") G.box(x, -0.5, z, x + 0.5, 0, z + 1, "area_dripstone");
+      if (back === "e") G.box(x + 0.5, -0.5, z, x + 1, 0, z + 1, "area_dripstone");
+      if (back === "n") G.box(x, -0.5, z, x + 1, 0, z + 0.5, "area_dripstone");
+    };
+    step(rx0 + 1, 5, "w"); step(rx0 + 1, 9, "w"); step(rx1 - 1, 7, "e"); step(rx1 - 1, 11, "e"); step(5, rz0 + 1, "n");
+    R.solid(rx0, rz0, rx1 + 1, rz1 + 1);
+    // The grass's tufts onto the rim (the mod's 17 tiles, chosen as AreaLooks chooses them), their shadow under them.
+    for (let x = rx0; x <= rx1; x++) for (let z = rz0; z <= rz1; z++) {
+      if (!rim(x, z)) continue;
+      const n = grassAt(x, z - 1), so = grassAt(x, z + 1), w = grassAt(x - 1, z), e = grassAt(x + 1, z);
+      const nw = grassAt(x - 1, z - 1), ne = grassAt(x + 1, z - 1), sw = grassAt(x - 1, z + 1), se = grassAt(x + 1, z + 1);
+      const edges = (n ? 1 : 0) | (e ? 2 : 0) | (so ? 4 : 0) | (w ? 8 : 0);
+      const tiles = ({ 1: [16], 2: [8], 4: [2], 8: [10], 3: [11], 6: [4], 12: [5], 9: [12], 5: [16, 2], 10: [8, 10], 14: [6], 13: [7], 7: [13], 11: [14], 15: [9] })[edges] || [];
+      if (nw && !n && !w) tiles.push(17);
+      if (ne && !n && !e) tiles.push(15);
+      if (sw && !so && !w) tiles.push(3);
+      if (se && !so && !e) tiles.push(1);
+      for (const t of tiles) G.box(x, 0.002, z, x + 1, 0.002, z + 1, { top: "area_drip_shade_" + t, all: null });
+      for (const t of tiles) G.box(x, 0.004, z, x + 1, 0.004, z + 1, { top: "area_grass_on_drip_" + t, all: null });
+    }
+    // The white fence (pale oak fence): posts a block apart, two rails between them.
+    const fz = 9.5;
+    for (let x = 12; x <= 22; x++) {
+      G.box(x + 6 * P16, 0, fz - 2 * P16, x + 10 * P16, 1, fz + 2 * P16, "area_white_fence");
+      if (x < 22) for (const [y0, y1] of [[6, 9], [12, 15]]) G.box(x + 10 * P16, y0 * P16, fz - P16, x + 22 * P16, y1 * P16, fz + P16, "area_white_fence");
+    }
+    R.solid(12, fz - 0.2, 23, fz + 0.2);
+    // The sign: four pale oak shelves (two by two) facing south. The top two are the board, the bottom two the stand.
+    const sx = 13, sz = 12;
+    for (const [bx, part] of [[sx, "l"], [sx + 1, "r"]]) {
+      const outerW = part === "l", outerE = part === "r";
+      G.box(bx, 1, sz + 5 * P16, bx + 1, 2, sz + 11 * P16, { s: "area_sign_front_" + part, n: "area_sign_back_" + part, top: "area_sign_edge_h", bottom: "area_sign_edge_h",
+        w: outerW ? "area_sign_edge_v" : null, e: outerE ? "area_sign_edge_v" : null });
+      G.box(bx + (outerW ? 2 * P16 : 0), 2 * P16, sz + 6 * P16, bx + 1 - (outerE ? 2 * P16 : 0), 1, sz + 10 * P16, { all: "area_sign_stand", top: null, bottom: null,
+        w: outerW ? "area_sign_stand" : null, e: outerE ? "area_sign_stand" : null });
+      G.box(bx + (outerW ? P16 : 0), 0, sz + 5 * P16, bx + 1 - (outerE ? P16 : 0), 2 * P16, sz + 11 * P16, { all: "area_sign_foot",
+        w: outerW ? "area_sign_foot" : null, e: outerE ? "area_sign_foot" : null });
+    }
+    R.solid(sx, sz + 0.3, sx + 2, sz + 0.7);
+    R.act([sx, sz, sx + 2, sz + 1], { label: "Read", lines: ["PALLET TOWN", "Shades of your journey await!"] });
+    // The mailbox (the mod's own block), its slot towards you: a red box on a silver post.
+    const mx = 17, mz = 12;
+    G.box(mx + 6 * P16, 0, mz + 6 * P16, mx + 10 * P16, 0.5 * P16, mz + 10 * P16, { all: "area_mailbox_plate", bottom: null });
+    G.box(mx + 7 * P16, 0.5 * P16, mz + 7 * P16, mx + 9 * P16, 8 * P16, mz + 9 * P16, { all: "area_mailbox_post", top: null, bottom: null });
+    G.box(mx + 4.5 * P16, 8 * P16, mz + 2 * P16, mx + 11.5 * P16, 14 * P16, mz + 14 * P16, { all: "area_mailbox_side", s: "area_mailbox_front", top: "area_mailbox_top", bottom: "area_mailbox_under" });
+    G.box(mx + 5.5 * P16, 14 * P16, mz + 2 * P16, mx + 10.5 * P16, 15.5 * P16, mz + 14 * P16, { all: "area_mailbox_top", bottom: null });
+    R.solid(mx + 0.25, mz + 0.1, mx + 0.75, mz + 0.9);
+    R.act([mx, mz, mx + 1, mz + 1], { label: "Look", lines: ["A mailbox: a red box on a silver post, as HeartGold's by each house."] });
+    // A little roof of acacia stairs (its ridge running north to south), in HeartGold's red tiles: the rows of tiles
+    // along the eaves, the trim at its ends, white wall under it.
+    const z0 = 2, z1 = 6, base = 13;
+    for (let i = 0; i < 3; i++) {
+      for (const side of ["w", "e"]) {
+        const x = side === "w" ? base + i : base + 5 - i, y = i;
+        const top = side === "w" ? "area_roof_top_w" : "area_roof_top_e";
+        G.box(x, y, z0, x + 1, y + 0.5, z1, { top, n: "area_roof_edge", s: "area_roof_edge", w: "area_roof_tiles", e: "area_roof_tiles", bottom: "area_roof_under" });
+        const hx0 = side === "w" ? x + 0.5 : x, hx1 = side === "w" ? x + 1 : x + 0.5;
+        G.box(hx0, y + 0.5, z0, hx1, y + 1, z1, { top, n: "area_roof_edge", s: "area_roof_edge", w: "area_roof_tiles", e: "area_roof_tiles", bottom: null });
+        if (y > 0) G.box(x, 0, z0 + 0.5, x + 1, y, z1 - 0.5, "siding");
+      }
+    }
+    R.solid(base, z0, base + 6, z1);
+    R.item("Pond", "Dripstone round the water; the grass's rounded tufts onto the dripstone where they meet (as round the dirt paths); the steps in the water in the dripstone's own pattern.");
+    R.item("Fence", "Pale oak fence, solid white with a slight gradient (Pallet Town and Route 1).");
+    R.item("Sign", "Four pale oak shelves: the top two HeartGold's white board with its grey panel and writing, the bottom two its grey stand.");
+    R.item("Mailbox", "The mod's own block, by each house: a red box with its slot, on a silver post.");
+    R.item("Roof", "Acacia stairs in HeartGold's roof red: rows of tiles along the eaves, a darker trim at the ends (your house and Blue's).");
+    R.spawn = { x: 12, z: 16.6, yaw: FACE.n };
     return R;
   },
 
