@@ -221,12 +221,14 @@ def main():
         room("swap", "coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud", box, CAVE_FLOOR)
         room("sand_edge", "coarse_dirt,packed_mud,dirt,mud", box)
         room("swap", "white_concrete", box, "block/white_concrete=cave_daylight!")
-        room("boulder", "tuff,tuff_slab,cobblestone,cobblestone_slab,andesite_slab", box, "prefix:boulder," + UNDER)
+        # (15:21) The rocks are copper grates in the room now (tools/caves.py), hiding nothing round them: no floor drawn under.
+        room("boulder", "waxed_copper_grate,waxed_exposed_copper_grate", box, "prefix:boulder")
     # Mt. Moon (13:56, tools/mtmoon.py), as FireRed's: grey brown rock (the dripstone, its tops the white terracotta John
     # capped it with), a pale grey floor (andesite; tuff and gravel its darker patches), the sand soft at its edges, its
     # rocks (granite) grey boulders, a mat at the way out with daylight beyond, the sign as HeartGold's.
     MOON = "block/dripstone_block=moon_rock_top|moon_rock@4,block/white_terracotta=moon_rock_top|moon_rock@4"
-    MOON_FLOOR = ("block/andesite=moon_floor@4,block/tuff=moon_gravel@4,block/gravel=moon_gravel@4,block/sand=cave_sand@4,"
+    # (15:21) Its darker patches (tuff, gravel) the same floor, so no square shows where they are.
+    MOON_FLOOR = ("block/andesite=moon_floor@4,block/tuff=moon_floor@4,block/gravel=moon_floor@4,block/sand=cave_sand@4,"
                   "block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2")
     for ox, w, d, note in ((5120, 104, 90, "Mt. Moon 1F"), (5376, 106, 86, "Mt. Moon B1F"), (5632, 106, 90, "Mt. Moon B2F")):
         box = (ox - 1, -1, ox + w, d, note)
@@ -234,7 +236,7 @@ def main():
         room("swap", "andesite,tuff,gravel,sand,smooth_sandstone", box, MOON_FLOOR)
         room("sand_edge", "andesite,tuff,gravel", box)
         room("swap", "white_concrete", box, "block/white_concrete=cave_daylight!")
-        room("boulder", "granite,polished_granite,granite_slab,polished_granite_slab", box, "prefix:mboulder,andesite=moon_floor@4,tuff=moon_gravel@4,gravel=moon_gravel@4,sand=cave_sand@4")
+        room("boulder", "waxed_copper_grate,waxed_exposed_copper_grate", box, "prefix:mboulder")
         room("sign", "pale_oak_shelf", box)
     for x0, z0, x1, z1, note in ((22, 23, 41, 42, "Viridian Forest's north gatehouse"), (54, 138, 73, 157, "Viridian Forest's south gatehouse")):
         room("swap", GATE_BLOCKS, forest(x0, z0, x1, z1, note), GATE, (str(fy - 2), str(fy + 16)))

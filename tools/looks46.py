@@ -525,6 +525,9 @@ def plants():
     tex = os.path.join(LOOK, "block")
     for n in ("torchflower", "sunflower_front", "sunflower_back", "sunflower_top", "sunflower_bottom"):
         lookplants.flower_kept(V("block/" + n), os.path.join(tex, n + ".png"))
+        if os.path.exists(V("block/" + n) + ".mcmeta"):
+            import shutil
+            shutil.copy(V("block/" + n) + ".mcmeta", os.path.join(tex, n + ".png.mcmeta"))
     dry_grass(True).save(os.path.join(tex, "tall_dry_grass.png"))
     dry_grass(False).save(os.path.join(tex, "short_dry_grass.png"))
     # The spruce wall signs round the Museum (15:21): clean wood (their board and post).

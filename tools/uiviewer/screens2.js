@@ -74,6 +74,26 @@ screen("hud", "In the world", "The HUD", {
     return { raw: e => { if (e.code === "KeyE" || e.code === "Enter" || e.code === "NumpadEnter") { go("menu"); return true; } return false; }, key: k => { if (k === "a") { banner(); later(800, () => toast(ICON.potion, "You found a POTION!")); later(300, emote); return true; } if (k === "tab") { spd = spd % 3 + 1; keys(); return true; } if (k === "b") { go("menu"); return true; } return false; } };
   }
 });
+screen("safari_hud", "In the world", "The Safari Zone, and picking things up", {
+  scene: "town", sceneOpts: () => ({}),
+  what: "In the SAFARI ZONE (FireRed's game: ¥500 at the gate, 30 SAFARI BALLs, 600 steps): the pill shows the steps and SAFARI BALLs you've left in place of the time. By an item ball, the A key says Pick up, not Talk (15:21), over the ball and along the bottom.",
+  mod: "Hud: the place pill's tab (STEPS 512/600 · BALLS 30 on a SAFARI GAME); the prompt over a ball and the A key's word (Talk, Pick up, Look) from what's in front of you.",
+  tags: ["New: the Safari's steps and balls", "New: Pick up"],
+  try: ["A takes a step (one fewer left).", "B opens the menu."],
+  make() {
+    const saveP = G.place; G.place = "SAFARI ZONE";
+    let steps = 512;
+    const pill = () => { const o = $("#szpill"); if (o) o.remove(); const e = placePill(`STEPS ${steps}/600 &nbsp;·&nbsp; BALLS 30`); e.id = "szpill"; };
+    pill();
+    G.place = saveP;
+    const k = hints([["SPACE", "Pick up"], ["E", "Menu"], ["TAB", "Speed x1"]]);
+    // The prompt over a ball on the ground (the key and its word in a white pill, bobbing).
+    const p = V(8.1, 0.9, 11.4).project(cam3), px = (p.x + 1) / 2 * 1280, py = (1 - p.y) / 2 * 720;
+    const pr = box(px - 70, py - 64, null, null, "", `<div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px 0 5px;border-radius:999px;background:rgba(255,255,255,.95);box-shadow:0 0 0 2px rgba(255,255,255,.6),0 4px 12px rgba(30,40,84,.22)"><span class="g-key k-a">SPACE</span><span style="font-weight:800;font-size:17px;color:#26304A">${esc(T("Pick up"))}</span></div>`);
+    pr.style.animation = "tpulse 2s ease-in-out infinite";
+    return { key: kk => { if (kk === "a") { steps = Math.max(0, steps - 1); pill(); return true; } if (kk === "b") { go("menu"); return true; } return false; } };
+  }
+});
 screen("door", "In the world", "Going through a door", {
   scene: "town", sceneOpts: () => ({}),
   what: "Going in or out of a door: a circle closes in on you until it's black, the place changes, and the circle opens out again round you (the games' iris).",

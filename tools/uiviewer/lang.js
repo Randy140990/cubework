@@ -15,6 +15,7 @@ L("Close", "Cerrar", "Fermer", "Schließen", "Chiudi", "とじる", "닫기", "�
 L("Next", "Siguiente", "Suivant", "Weiter", "Avanti", "つぎへ", "다음", "下一步", "下一步");
 L("Continue", "Continuar", "Continuer", "Weiter", "Continua", "すすむ", "계속", "继续", "繼續");
 L("Talk", "Hablar", "Parler", "Reden", "Parla", "はなす", "말걸기", "交谈", "交談");
+L("Pick up", "Recoger", "Ramasser", "Aufheben", "Raccogli", "ひろう", "줍기", "捡起", "撿起");
 L("Look", "Mirar", "Regarder", "Ansehen", "Guarda", "しらべる", "조사", "调查", "調查");
 L("Menu", "Menú", "Menu", "Menü", "Menu", "メニュー", "메뉴", "菜单", "選單");
 L("Speed x1", "Velocidad x1", "Vitesse x1", "Tempo x1", "Velocità x1", "はやさ x1", "속도 x1", "速度 x1", "速度 x1");
