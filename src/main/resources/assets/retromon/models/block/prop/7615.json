@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ss_carpet","ss_carpet":"retromon:block/interior/ss_carpet"},"elements":[{"from":[0.0,0,0.0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[8.0,0.0,16.0,8.0],"texture":"#ss_carpet"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/window","window":"retromon:block/interior/window"},"elements":[{"from":[0.0,0.0,0],"to":[16,16.0,0],"faces":{"south":{"uv":[0.0,2.6667,16.0,16.0],"texture":"#window"}}}]}

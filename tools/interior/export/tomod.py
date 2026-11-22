@@ -39,11 +39,7 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "gate_r5": (3712, 64, 0), "gate_r6": (3776, 64, 0), "gate_r7": (3840, 64, 0), "gate_r8": (3904, 64, 0), "gate_r11": (3968, 64, 0),
           "gate_r12": (4032, 64, 0), "gate_r15": (4416, 64, 0), "gate_r16n": (4480, 64, 0), "gate_r16s": (4544, 64, 0), "gate_r18": (4928, 64, 0),
           "route12_house": (4992, 64, 0), "route16_house": (5056, 64, 0),
-          "gate_r11_2f": (5248, 64, 0), "gate_r12_2f": (5312, 64, 0), "gate_r15_2f": (5504, 64, 0), "gate_r16_2f": (5568, 64, 0),
-          # (0.51) The S.S. ANNE and the POKeMON TOWER.
-          "ss_anne_1f": (5760, 64, 0), "ss_anne_2f": (5824, 64, 0), "ss_anne_captain": (5888, 64, 0), "pokemon_tower_1f": (5952, 64, 0),
-          "pokemon_tower_2f": (6016, 64, 0), "pokemon_tower_3f": (6080, 64, 0), "pokemon_tower_4f": (7616, 64, 0), "pokemon_tower_5f": (7680, 64, 0),
-          "pokemon_tower_6f": (7744, 64, 0), "pokemon_tower_7f": (7808, 64, 0)}
+          "gate_r11_2f": (5248, 64, 0), "gate_r12_2f": (5312, 64, 0), "gate_r15_2f": (5504, 64, 0), "gate_r16_2f": (5568, 64, 0),}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -62,9 +58,7 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "gate_r5": "route_5_gate", "gate_r6": "route_6_gate", "gate_r7": "route_7_gate", "gate_r8": "route_8_gate", "gate_r11": "route_11_gate_1f",
          "gate_r12": "route_12_gate_1f", "gate_r15": "route_15_gate_1f", "gate_r16n": "route_16_gate_1f", "gate_r16s": "route_16_gate_1f",
          "gate_r18": "route_18_gate_1f", "route12_house": "route_12_super_rod_house", "route16_house": "route_16_fly_house",
-         "gate_r11_2f": "route_11_gate_2f", "gate_r12_2f": "route_12_gate_2f", "gate_r15_2f": "route_15_gate_2f", "gate_r16_2f": "route_16_gate_2f",
-         "ss_anne_1f": "ss_anne_1f", "ss_anne_2f": "ss_anne_2f", "ss_anne_captain": "ss_anne_captains_room",
-         **{"pokemon_tower_%df" % i: "pokemon_tower_%df" % i for i in range(1, 8)}}
+         "gate_r11_2f": "route_11_gate_2f", "gate_r12_2f": "route_12_gate_2f", "gate_r15_2f": "route_15_gate_2f", "gate_r16_2f": "route_16_gate_2f",}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -174,9 +168,6 @@ DOORS = {
     "gate_r18_b": {"room": "gate_r18", "door": [[-579, 34, 783], [-579, 34, 784]], "out": [-581.4, 34.0, 784.0], "face": "w", "yaw": 90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
     "route12_house": {"room": "route12_house", "door": [[-127, 32, 618], [-126, 32, 618]], "out": [-126.0, 32.0, 620.4]},
     "route16_house": {"room": "route16_house", "door": [[-642, 34, 415], [-641, 34, 415]], "out": [-641.0, 34.0, 417.4]},
-    # (0.51) The S.S. ANNE (up its gangway from Vermilion's harbour, past the sailor with your ticket) and the POKeMON TOWER.
-    "ss_anne": {"room": "ss_anne_1f", "door": [[x, 31, 617] for x in range(-355, -349)], "out": [-352.5, 31.0, 614.6], "face": "n", "yaw": 180.0},
-    "pokemon_tower": {"room": "pokemon_tower_1f", "door": [[x, 35, 412] for x in range(-120, -116)], "out": [-118.5, 35.0, 414.4]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -199,8 +190,7 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "vermilion_gym": "vermilion_gym", "pokemon_fan_club": "pokemon_fan_club", "vermilion_old_rod_house": "vermilion_old_rod_house",
             "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house",
             "lavender_volunteer_house": "lavender_volunteer_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "lavender_name_rater",
-            "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r7": "gate_r7_a", "gate_r8": "gate_r8_a", "gate_r11": "gate_r11_a", "gate_r12": "gate_r12_a", "gate_r15": "gate_r15_a", "gate_r16n": "gate_r16n_a", "gate_r16s": "gate_r16s_a", "gate_r18": "gate_r18_a", "route12_house": "route12_house", "route16_house": "route16_house",
-            "ss_anne_1f": "ss_anne", "pokemon_tower_1f": "pokemon_tower"}
+            "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r7": "gate_r7_a", "gate_r8": "gate_r8_a", "gate_r11": "gate_r11_a", "gate_r12": "gate_r12_a", "gate_r15": "gate_r15_a", "gate_r16n": "gate_r16n_a", "gate_r16s": "gate_r16s_a", "gate_r18": "gate_r18_a", "route12_house": "route12_house", "route16_house": "route16_house"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
@@ -261,8 +251,7 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "vermilion_pidgey_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "lavender_volunteer_house": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "lavender_cubone_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "lavender_name_rater": {"x": 6.0, "z": 9.5, "yaw": 180.0},
-         "gate_r5": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r6": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r7": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r8": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r11": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r12": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r15": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r16n": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r16s": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r18": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "route12_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "route16_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
-         "ss_anne_1f": {"x": 15.0, "z": 12.5, "yaw": 180.0}, "pokemon_tower_1f": {"x": 10.0, "z": 14.5, "yaw": 180.0}}
+         "gate_r5": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r6": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r7": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r8": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r11": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r12": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r15": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r16n": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r16s": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r18": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "route12_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "route16_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
