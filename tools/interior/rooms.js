@@ -23,6 +23,11 @@ const PLACES = [
   { id: "pallet_looks", name: "Pallet Town looks", floor: "Outside (the mod's blocks)", group: "Outside" },
   { id: "viridian_looks", name: "Viridian City and Route 22 looks", floor: "Outside (the mod's blocks)", group: "Outside" },
   { id: "viridian_forest", name: "Viridian Forest", floor: "Always night", group: "Route 2" },
+  { id: "route2_gate", name: "Route 2 gate", floor: "East lane", group: "Route 2" },
+  { id: "route2_house", name: "Route 2 trade house", floor: "Ground floor", group: "Route 2" },
+  { id: "digletts_n", name: "Diglett's Cave", floor: "North entrance (Route 2)", group: "Diglett's Cave" },
+  { id: "digletts_b1f", name: "Diglett's Cave", floor: "B1F", group: "Diglett's Cave" },
+  { id: "digletts_s", name: "Diglett's Cave", floor: "South entrance (Route 11)", group: "Diglett's Cave" },
 ];
 // Your house and the rival's (14 by 13, the mat in a nook at the door), the stairs at the back on the right.
 const FROM_TOWN = { x: 7.0, z: 11.5, yaw: FACE.n };
@@ -878,6 +883,39 @@ function arenaShell(R, o) {
 
 function bunting(room, x0, x1, y) { room.geo.box(x0, y, 0.04, x1, y + 0.45, 0.05, { s: "bunting", all: null }); room.item("Bunting", "Pennants strung along the wall."); }
 
+
+// Diglett's Cave as the mod builds it (tools/caves.py, from John's schematics): its rock (the Look pack's dripstone)
+// as high as it goes, its floor of sand and earth, its boulders, the ladders and the hole each goes down. Dark and
+// dusty, as Let's Go's cave: a brown haze in the air.
+function caveRoom(id, floor) {
+  const C = CAVES[id], R = new Room(id, { name: "Diglett's Cave", floor, W: C.W, D: C.D, H: 8, outside: true, night: true, haze: 0x6e5236 });
+  const G = R.geo;
+  const at = (x, z) => { const r = C.rows[z]; return { k: r[2 * x], h: r.charCodeAt(2 * x + 1) - 48 }; };
+  for (let z = 0; z < C.D; z++) {
+    for (let x = 0; x < C.W;) {
+      const c = at(x, z); let x1 = x + 1;
+      while (x1 < C.W && at(x1, z).k === c.k && at(x1, z).h === c.h) x1++;
+      if (c.k === "w") { G.box(x, -1, z, x1, Math.min(c.h, 6), z + 1, "area_dripstone"); R.solid(x, z, x1, z + 1); }
+      else if (c.k === "r") { G.box(x, -1, z, x1, 0, z + 1, { top: "soil", all: "soil" }); G.box(x + 0.1, 0, z + 0.1, x1 - 0.1, Math.min(c.h, 1.2), z + 0.9, "stone"); R.solid(x, z, x1, z + 1); }
+      else if (c.k === "K") G.box(x, -2.2, z, x1, -2, z + 1, { top: "darkTop", all: null });
+      else if (c.k === "L") { G.box(x, -2.2, z, x1, -2, z + 1, { top: "darkTop", all: null }); G.box(x, -2, z + 0.02, x1, 0.4, z + 0.08, "walnut"); }
+      else G.box(x, -1, z, x1, 0, z + 1, { top: c.k === "s" || c.k === "S" ? "path" : "soil", all: "soil" });
+      x = x1;
+    }
+  }
+  for (const w of C.warps) {
+    if (w.kind === "mat") R.warps.push({ test: (p, input) => input.down && p.z > w.z && p.x > w.x0 && p.x < w.x1, to: "town", fx: "fadeOut" });
+    if (w.kind === "down") R.warps.push({ test: p => p.x > 11.6 && p.x < 14.4 && p.z > 7.6 && p.z < 10.0, to: w.to, spawn: { x: w.spawn.x, z: w.spawn.z, yaw: FACE.s }, fx: "fade" });
+    if (w.kind === "up") R.warps.push({ test: (p, input) => input.up && p.x > w.x0 && p.x < w.x1 && p.z < w.z1 + 0.9, to: w.to, spawn: { x: w.spawn.x, z: w.spawn.z, yaw: FACE.s }, fx: "fade" });
+  }
+  // (The hole's no wall: in the game you drop down the ladder into it.)
+  for (const p of C.people) R.npcs.push({ name: p.name[0] + p.name.slice(1).toLowerCase(), key: p.key, x: p.x, z: p.z, yaw: (180 - p.yaw) * Math.PI / 180, look: { skin: p.skin },
+    talk: () => p.lines.map(text => ({ text })) });
+  R.spawn = { x: C.spawn.x, z: C.spawn.z, yaw: C.spawn.yaw === 180 ? FACE.n : FACE.s };
+  R.item("Diglett's Cave", id === "digletts_b1f" ? "The long tunnel DIGLETT dug, from Route 2 to Route 11 by Vermilion City. DIGLETT and DUGTRIO come up anywhere along it." :
+    "A cave mouth's room: the ladder down into the tunnel by the east wall, the way out at the south.");
+  return R;
+}
 const BUILD = {
   house1() {
     // Downstairs, as Let's Go's: the kitchen down the left-hand wall on its green mat, the dresser of plates, a plant and
@@ -1345,6 +1383,50 @@ const BUILD = {
     R.npcs.push({ name: "Guard", key: "johto_gate_guard", x: 8.0, z: 0.8, yaw: FACE.s, look: { skin: "officer_m" },
       talk: () => [{ text: "West of here, under the mountain, is ROUTE 28." }, { text: "ROUTE 26 and the JOHTO region are that way too, but only the CHAMPION may go to JOHTO." }] });
     R.spawn = { x: 14.4, z: 5.0, yaw: FACE.w };
+    return R;
+  },
+
+  digletts_n() { return caveRoom("digletts_n", "North entrance (Route 2)"); },
+  digletts_b1f() { return caveRoom("digletts_b1f", "B1F"); },
+  digletts_s() { return caveRoom("digletts_s", "South entrance (Route 11)"); },
+
+  route2_gate() {
+    // The gate across Route 2's east lane (the one past the CUT trees, by Diglett's Cave), the same design as the
+    // other route gates: in from the south at its door, out to the north through the way at the north. PROF. OAK's
+    // AIDE, who gives HM05 FLASH once you've caught 10 kinds of POKéMON, and a boy.
+    const R = new Room("route2_gate", { name: "Route 2 gate", floor: "East lane", W: 14, D: 14, outsideSize: "12 by 10" });
+    lgGate(R, { south: { to: "town" }, north: { to: "town" } });
+    R.npcs.push({ name: "Aide", key: "route_2_gate_p0", x: 12.6, z: 6.4, yaw: FACE.w, look: { skin: "scientist" },
+      talk: () => [{ text: "Hi! Remember me? I'm one of PROF. OAK's AIDES." }, { text: "If you've caught 10 kinds of POKéMON, I'm supposed to give you HM05." },
+        { text: "(In the game: he counts your POKéDEX. With 10, it's yours.)" }] });
+    R.npcs.push({ name: "Youngster", key: "route_2_gate_p1", x: 3.0, z: 8.2, yaw: FACE.e, look: { skin: "youngster" },
+      talk: () => [{ text: "Once a POKéMON learns FLASH, you can get through ROCK TUNNEL." }] });
+    R.spawn = LG_GATE_IN;
+    return R;
+  },
+
+  route2_house() {
+    // The house in Route 2's east lane, as Let's Go's houses: pale boards, a kitchen along the left wall, a table on a
+    // rug, a TV and a sideboard. The TRADER, who'd give his MR. MIME for an ABRA, and a scientist.
+    const R = new Room("route2_house", { name: "Route 2 trade house", floor: "Ground floor", W: 12, D: 11, outsideSize: "11 by 7" });
+    shell(R, { paper: "paperSchool", floor: "midBoards", door: VHOUSE_DOOR, entry: true, skirt: "beam", ledge: "walnut" });
+    band(R, 1.0, "beam", 0.12);
+    const G = R.geo;
+    kitchen(R, 0, "e", { z: 6.6 });
+    sideboard(R, 1.5, 0, "s", 1.6, { lines: ["A cupboard. Inside: a POKé DOLL and a box of trading cards."] });
+    tvUnit(R, 3.5, 3.0, R.screen("tvTradeHouse", 40, 24, drawFilm, 0.9), { lines: ["A show about trading POKéMON with friends far away."] });
+    clock(R, 8.1, 2.3);
+    G.box(3.6, 0, 2.4, 8.4, 0.03, 6.4, { top: "rugGreen", all: "cap", bottom: null });
+    table(R, 4.8, 3.4, 7.2, 5.4, { top: "lab", leg: "walnut", h: 0.86, name: "Table", note: "A white top in a walnut trim." });
+    for (const z of [3.95, 4.85]) { chair(R, 4.15, z, "e", { seat: "cushion" }); chair(R, 7.85, z, "w", { seat: "cushion" }); }
+    plant(R, 10.8, 7.7, 0.85, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+    crossWindow(R, "e", 2.6, 1.6, 1.8, 1.2, ["Outside: the trees along ROUTE 2."]);
+    doormat(R, VHOUSE_DOOR[0], VHOUSE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHouseV" });
+    R.npcs.push({ name: "Trader", key: "route_2_trader", x: 9.6, z: 4.4, yaw: FACE.w, look: { skin: "gentleman" },
+      talk: () => [{ text: "I'm looking for an ABRA. Will you trade one for my MR. MIME?" }, { text: "(In the game: yes, and you trade.)" }] });
+    R.npcs.push({ name: "Scientist", key: "route_2_trade_house_p0", x: 2.4, z: 3.4, yaw: FACE.e, look: { skin: "scientist" },
+      talk: () => [{ text: "A fainted POKéMON can't fight. But it can still use moves like CUT!" }] });
+    R.spawn = VHOUSE_IN;
     return R;
   },
 

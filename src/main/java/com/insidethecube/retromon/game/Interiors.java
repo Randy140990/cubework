@@ -77,7 +77,7 @@ public final class Interiors {
 	public record Room(String id, int ox, int oy, int oz, double w, double d, double h, String name, String floor, String place, double sx, double sz,
 			float syaw, double ex, double ez, float eyaw, double camX, double camZ, double camDist, int[] cells, List<Warp> warps, List<Person> people,
 			List<Act> acts, List<double[]> grass, List<double[]> pools, List<double[]> panes, List<double[]> clocks, String schem, int base, boolean dark,
-			double[] tile, List<Ball> balls, List<double[]> lights) {
+			double[] tile, List<Ball> balls, List<double[]> lights, double[] haze) {
 		/** Big enough to walk about in (the forest): the camera follows you, as it does outside. */
 		public boolean big() {
 			return w > 26 || d > 26;
@@ -116,7 +116,7 @@ public final class Interiors {
 	 * The rooms built in Minecraft's own blocks, each a file of its own beside rooms.json (tools/forest.py). (Before DATA:
 	 * the rooms are read as it's loaded.)
 	 */
-	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json"};
+	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json", "/retromon/interiors/digletts_cave.json"};
 
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */
@@ -194,6 +194,13 @@ public final class Interiors {
 		readRest(more.toString());
 	}
 
+	/** A room's dust in the air (the cave's): its colour, 0 to 255, and how thick, 0 to 1; or null. */
+	private static double[] haze(JsonObject r) {
+		if (!r.has("haze") || !r.get("haze").isJsonArray()) return null;
+		JsonArray a = r.getAsJsonArray("haze");
+		return new double[] {a.get(0).getAsDouble(), a.get(1).getAsDouble(), a.get(2).getAsDouble(), a.get(3).getAsDouble()};
+	}
+
 	/** One room from its JSON (rooms.json's, or a file of its own). */
 	private static void room(String id, JsonObject r) {
 		{
@@ -209,7 +216,8 @@ public final class Interiors {
 				JsonObject ws = w.has("spawn") && w.get("spawn").isJsonObject() ? w.getAsJsonObject("spawn") : null;
 				String kind = w.get("kind").getAsString();
 				boolean north = kind.equals("north");
-				double x0 = num(w, "x0", 0), x1 = kind.equals("mat") || north ? num(w, "x1", 0) : x0 + 4;
+				// (A ladder or stairs up: across x from x0, to x1 where the room gives one; the cave has two ladders.)
+				double x0 = num(w, "x0", 0), x1 = kind.equals("mat") || north ? num(w, "x1", 0) : num(w, "x1", 999);
 				double z0 = kind.equals("mat") ? num(w, "z", 0) : north ? -999 : num(w, "z0", 0), z1 = kind.equals("mat") ? 999 : north ? num(w, "z", 1) : num(w, "z1", 0);
 				// Through the east wall (past x, heading east) or the west (short of x, heading west).
 				if (kind.equals("east")) {
@@ -256,7 +264,7 @@ public final class Interiors {
 					(float) num(sp, "yaw", 0), num(en, "x", 0), num(en, "z", 0), (float) num(en, "yaw", 180), num(cam, "x", 8), num(cam, "z", 7),
 					num(cam, "dist", 30), cells, warps, people, acts, grass, rows(r, "pools"), rows(r, "panes"), rows(r, "clocks"),
 					r.has("schem") && !r.get("schem").isJsonNull() ? r.get("schem").getAsString() : null, (int) num(r, "base", 0),
-					r.has("dark") && r.get("dark").getAsBoolean(), tile, balls, rows(r, "lights"));
+					r.has("dark") && r.get("dark").getAsBoolean(), tile, balls, rows(r, "lights"), haze(r));
 			ROOMS.put(room.id(), room);
 		}
 	}
@@ -269,8 +277,18 @@ public final class Interiors {
 			for (int i = 0; i < cells.length; i++) cells[i] = c.get(i).getAsInt();
 			ARENAS.put(e.getKey(), new Arena(num(a, "W", 24), num(a, "D", 24), num(a, "H", 7), cells, rows(a, "panes")));
 		}
-		for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("doors").entrySet()) {
-			JsonObject d = e.getValue().getAsJsonObject();
+		for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("doors").entrySet()) door(e.getKey(), e.getValue().getAsJsonObject());
+		for (String path : BLOCK_ROOMS) {
+			JsonObject extra = json(path);
+			if (extra != null && extra.has("doors")) for (Map.Entry<String, JsonElement> e : extra.getAsJsonObject("doors").entrySet())
+				door(e.getKey(), e.getValue().getAsJsonObject());
+		}
+		readStart(more);
+	}
+
+	/** A door in John's world into a room (rooms.json's, or a block room's file's). */
+	private static void door(String key, JsonObject d) {
+		{
 			List<BlockPos> blocks = new ArrayList<>();
 			for (JsonElement b : d.getAsJsonArray("door")) {
 				JsonArray a = b.getAsJsonArray();
@@ -280,11 +298,14 @@ public final class Interiors {
 			String face = d.has("face") ? d.get("face").getAsString() : "s";
 			boolean north = face.equals("n");
 			JsonObject in = d.has("in") && d.get("in").isJsonObject() ? d.getAsJsonObject("in") : null;
-			DOORS.put(e.getKey(), new Door(e.getKey(), d.get("room").getAsString(), blocks, out.get(0).getAsDouble(), out.get(1).getAsDouble(),
+			DOORS.put(key, new Door(key, d.get("room").getAsString(), blocks, out.get(0).getAsDouble(), out.get(1).getAsDouble(),
 					out.get(2).getAsDouble(), north, (float) num(d, "yaw", north ? 180 : face.equals("e") ? -90 : face.equals("w") ? 90 : 0), face,
 					in == null ? null : new double[] {num(in, "x", 0), num(in, "z", 0), num(in, "yaw", 0)}, d.has("place") ? d.get("place").getAsString() : null,
 					d.has("group") ? d.get("group").getAsString() : null));
 		}
+	}
+
+	private static void readStart(String more) {
 		JsonObject st = DATA.getAsJsonObject("start");
 		if (st != null) {
 			startRoom = st.get("room").getAsString();
@@ -328,6 +349,12 @@ public final class Interiors {
 	public static boolean walkabout(Entity e) {
 		Room r = roomOf(e);
 		return r != null && r.big();
+	}
+
+	/** The dust in the air in the room someone's in (Diglett's Cave): colour and thickness, or null. */
+	public static double[] hazeOf(Entity e) {
+		Room r = roomOf(e);
+		return r == null ? null : r.haze();
 	}
 
 	/** How many blocks one of the games' steps is in the room someone's in, across (x) and down (z); or null. */
@@ -866,7 +893,7 @@ public final class Interiors {
 						}
 					}
 					case "up" -> {
-						if (ly >= 1.45 && lx > w.x0() && lz > w.z0() - 0.5 && lz < w.z1() + 0.5) {
+						if (ly >= 1.45 && lx > w.x0() && lx < w.x1() && lz > w.z0() - 0.5 && lz < w.z1() + 0.5) {
 							go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
 							return true;
 						}

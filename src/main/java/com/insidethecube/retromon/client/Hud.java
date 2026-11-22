@@ -22,6 +22,8 @@ public final class Hud {
 				if (!Adventure.active()) old.render(g, delta);
 			});
 		}
+		// (Under everything else: the dust in a cave's air over the world.)
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("haze"), Hud::haze);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("cinema"), Hud::cinema);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("exclaim"), Hud::exclaim);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("hints"), Hud::hints);
@@ -125,6 +127,7 @@ public final class Hud {
 	private static boolean darkSaid;
 
 	public static void tick(Minecraft mc) {
+		dust(mc);
 		cineOld = cine;
 		boolean want = Adventure.active() && !BattleScene.active()
 				&& (mc.screen instanceof DialogueScreen || mc.screen instanceof StarterScreen || mc.screen instanceof NicknameScreen && cine > 0
@@ -286,6 +289,41 @@ public final class Hud {
 		g.pose().popMatrix();
 	}
 
+
+	// ---------- a cave's dusty air (Diglett's Cave, as Let's Go's: misty and brown) ----------
+
+	/** How far into the haze you are (it eases in and out going through a door), last tick and now. */
+	private static float hazeK, hazeOld;
+	private static int hazeColour;
+	private static float hazeThick;
+
+	/** Every tick: the haze eases towards the room's, and motes of dust drift about you. */
+	private static void dust(Minecraft mc) {
+		hazeOld = hazeK;
+		double[] h = mc.player == null || !Adventure.inSave ? null : com.insidethecube.retromon.game.Interiors.hazeOf(mc.player);
+		if (h != null) {
+			hazeColour = ((int) h[0] << 16) | ((int) h[1] << 8) | (int) h[2];
+			hazeThick = (float) h[3];
+		}
+		hazeK += ((h != null ? 1 : 0) - hazeK) * 0.08F;
+		if (h == null || mc.level == null || mc.isPaused()) return;
+		var r = mc.level.getRandom();
+		for (int i = 0; i < 3; i++) {
+			double x = mc.player.getX() + (r.nextDouble() - 0.5) * 18, y = mc.player.getY() + r.nextDouble() * 4, z = mc.player.getZ() + (r.nextDouble() - 0.5) * 14;
+			mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.WHITE_ASH, x, y, z, (r.nextDouble() - 0.5) * 0.01, -0.002, (r.nextDouble() - 0.5) * 0.01);
+		}
+	}
+
+	/** The haze: the dust's colour over the whole picture, thicker towards the edges (as the cave's far end fades). */
+	private static void haze(GuiGraphics g, DeltaTracker delta) {
+		float k = hazeOld + (hazeK - hazeOld) * delta.getGameTimeDeltaPartialTick(true);
+		if (k < 0.01F || BattleScene.active()) return;
+		int w = g.guiWidth(), h = g.guiHeight();
+		int base = (int) (255 * hazeThick * k) << 24 | hazeColour, edge = (int) (255 * Math.min(0.85F, hazeThick * 2.2F) * k) << 24 | hazeColour, clear = hazeColour;
+		g.fill(0, 0, w, h, base);
+		g.fillGradient(0, 0, w, h / 3, edge, clear);
+		g.fillGradient(0, h - h / 4, w, h, clear, edge);
+	}
 
 	private static void cinema(GuiGraphics g, DeltaTracker delta) {
 		float k = cineOld + (cine - cineOld) * delta.getGameTimeDeltaPartialTick(true);

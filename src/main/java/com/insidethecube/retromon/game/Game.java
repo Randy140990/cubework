@@ -1387,6 +1387,15 @@ public final class Game {
 			dialogue(p, null, "talk", fill(p, List.of(line)));
 			return;
 		}
+		// A sign of its own on John's map (Diglett's Cave's, by each of its mouths): its words.
+		for (Object[] sg : SIGN_SPOTS) {
+			if (Math.abs(bx - (Integer) sg[0]) <= 1 && Math.abs(bz - (Integer) sg[1]) <= 1) {
+				@SuppressWarnings("unchecked")
+				List<String> words = (List<String>) sg[2];
+				dialogue(p, null, "talk", words);
+				return;
+			}
+		}
 		String place = placeAt(bx + 0.5, bz + 0.5);
 		if (place == null) return;
 		Zone z = null;
@@ -1650,10 +1659,12 @@ public final class Game {
 				return;
 			}
 		}
-		// Your rival, from the League's way, once you have the POKéDEX.
-		if (d.hasDex() && d.anyHealthy() && !d.beaten.contains("rival_22") && "route_22".equals(d.place) && !RIVALS.containsKey(p.getUUID())) {
-			BlockPos from = alongRoute(level, p, -1, 0, 12, 6);
-			if (from == null) from = spot(level, p.getBlockX() - 9, p.getBlockZ(), 5);
+		// Your rival, from the League's way, once you have the POKéDEX: as in FireRed, when you walk the top path (the
+		// one along to the League's gate) past where it narrows, he comes along it from the gate's end, where he's been
+		// standing on it, and you battle. (Never from up the hill: always along the path, and back along it after.)
+		if (d.hasDex() && d.anyHealthy() && !d.beaten.contains("rival_22") && "route_22".equals(d.place) && !RIVALS.containsKey(p.getUUID())
+				&& p.getX() > RIVAL_22_TRIGGER[0] && p.getX() < RIVAL_22_TRIGGER[1] && p.getZ() > RIVAL_22_TRIGGER[2] && p.getZ() < RIVAL_22_TRIGGER[3]) {
+			BlockPos from = spot(level, RIVAL_22_SPOT[0], RIVAL_22_SPOT[1], 3);
 			Npc n = rivalNpc(p, "rival_22", from);
 			if (n != null) {
 				RIVAL_FROM.put(p.getUUID(), Vec3.atBottomCenterOf(from));
@@ -1661,6 +1672,14 @@ public final class Game {
 			}
 		}
 	}
+
+	/**
+	 * Route 22's top path (John's mud brick path, z 533 to 538, from the League gate east): FireRed's triggers for your
+	 * rival's battle (its step 33, rows 4 to 6) laid over it at two blocks a step from the gate's door, x0 x1 z0 z1; and
+	 * where he stands waiting on it (FireRed's step 25, row 4), x and z.
+	 */
+	private static final double[] RIVAL_22_TRIGGER = {-871.5, -865.0, 531.5, 539.5};
+	private static final int[] RIVAL_22_SPOT = {-885, 535};
 
 	/** Walked up to the Viridian GYM's door: it's locked (its LEADER's away), said once each time. */
 	private static final Map<UUID, Boolean> GYM_SHUT = new HashMap<>();
@@ -2286,6 +2305,12 @@ public final class Game {
 					schoolQuestion(p, n);
 					return;
 				}
+				// Route 1's MART clerk: a free POTION, once. PROF. OAK's AIDE in Route 2's east gate: HM05 for 10 kinds caught.
+				// Route 2's TRADER: his MR. MIME for your ABRA.
+				if (n.key().equals("route_1_clerk") || n.key().equals("route_2_gate_p0") || n.key().equals("route_2_trader")) {
+					personGift(p, n, d);
+					return;
+				}
 				if (n.key().equals(OLD_MAN) && !d.hasDex()) {
 					dialogue(p, n, "talk", OLD_MAN_GRUMPY);
 					return;
@@ -2355,6 +2380,47 @@ public final class Game {
 		s.putString("sound", "item");
 		Net.send(p, "sound", s);
 		message(p, List.of(player(p) + " found " + name + "!"));
+	}
+
+	/** Route 1's clerk, Route 2's AIDE and Route 2's TRADER (see talk). */
+	private static void personGift(ServerPlayer p, Npc n, PlayerData d) {
+		switch (n.key()) {
+			case "route_1_clerk" -> {
+				if (d.statics.add("gift:route_1_clerk")) {
+					d.give("potion", 1);
+					sync(p);
+					dialogue(p, n, "talk", fill(p, List.of("Hi! I work at a POKéMON MART.", "It's a convenient shop, so please visit us in VIRIDIAN CITY.",
+							"I know, I'll give you a sample. Here you go!", "{player} received a POTION!")));
+				} else dialogue(p, n, "talk", List.of("We also carry POKé BALLs for catching POKéMON!", "Please come and see us in VIRIDIAN CITY."));
+			}
+			case "route_2_gate_p0" -> {
+				int kinds = d.caught.size();
+				if (d.statics.contains("gift:route_2_gate:hm_flash")) {
+					dialogue(p, n, "talk", List.of("The HM FLASH lights even the darkest dungeons."));
+					return;
+				}
+				List<String> lines = new ArrayList<>(List.of("Hi! Remember me? I'm one of PROF. OAK's AIDES.",
+						"If you've caught 10 kinds of POKéMON, I'm supposed to give you an HM.", "Let's see... You've caught " + kinds + " kind" + (kinds == 1 ? "" : "s") + "."));
+				if (kinds >= 10) {
+					lines.add("That's enough! PROF. OAK left this for you.");
+					String got = giveGift(p, "route_2_gate");
+					if (got != null) lines.add(got);
+					lines.add("The HM FLASH lights even the darkest dungeons.");
+				} else lines.add("You need 10 kinds for the HM. Come back when you've caught more!");
+				dialogue(p, n, "talk", fill(p, lines));
+			}
+			default -> {
+				// The TRADER: as the trade with a creature (the trade screen), his MR. MIME for an ABRA.
+				if (d.statics.contains("mr_mime_trade")) {
+					dialogue(p, n, "talk", List.of("TRADER: How is my old MR. MIME doing?", "I love the ABRA you gave me!"));
+					return;
+				}
+				CompoundTag t = new CompoundTag();
+				t.putString("static", "mr_mime_trade");
+				t.putString("want", "abra");
+				dialogue(p, n, "trade", List.of("TRADER: I'm looking for an ABRA. Will you trade one for my MR. MIME?"), t, n.getId());
+			}
+		}
 	}
 
 	/** The in-game trades: what each trader wants for theirs (as Red and Blue have them). */
@@ -3105,15 +3171,31 @@ public final class Game {
 	 * technology is incredible below the lab's fence, by its left end; PROF.OAK's AIDE (not in FireRed) by the lab's
 	 * sign, as John asked. Key, then x and z.
 	 */
-	private static final Object[][] SPOTS = {{"pallet_town_p1", -809, 686}, {"pallet_town_p2", -785, 704}, {"pallet_town_p3", -780, 701}};
-	private static final String SPOTS_DONE = "spot4:";
+	private static final Object[][] SPOTS = {{"pallet_town_p1", -809, 686}, {"pallet_town_p2", -785, 704}, {"pallet_town_p3", -780, 701},
+			// Viridian City's people where FireRed has them (12:44; its map laid over John's at two blocks a step, from its
+			// doors): the old man (lying in the road, then his catching lesson and the TEACHY TV) by the way north, his
+			// granddaughter below him, the old man by the GYM, the boy with the caterpillars down the west side, the
+			// youngster by the POKéMON CENTER, the man who knows DREAM EATER by the pond.
+			{"viridian_city_p1", -796, 517}, {"viridian_city_woman", -798, 529}, {"viridian_city_gym_man", -770, 527}, {"viridian_city_boy", -806, 549},
+			{"viridian_city_p0", -772, 557}, {"viridian_city_tutor", -822, 557},
+			// Route 1's: the POKéMON MART's clerk with a free POTION (low down, by the flowers above the sign), and the boy
+			// who tells you about the ledges (up in the grass on the right).
+			{"route_1_clerk", -802, 641}, {"route_1_p0", -776, 617}};
+	private static final String SPOTS_DONE = "spot5:";
 	/**
 	 * Item balls that lie somewhere on John's map other than where the games' grid puts them (FireRed's, on routes Red
 	 * and Blue had nothing there), each put down once per save. Route 2's PARLYZ HEAL: in the east lane, past the
 	 * northern CUT tree, between its flowers (FireRed's spot, a step right of the top flower), clear of them. Key (its
 	 * row in field_items.tsv), then x, y and z.
 	 */
-	private static final Object[][] ITEM_SPOTS = {{"route_2_parlyz_heal", -779.0, 26.0, 472.0}};
+	private static final Object[][] ITEM_SPOTS = {{"route_2_parlyz_heal", -779.0, 26.0, 472.0},
+			// Viridian City's POTION: in the fenced corner at the top left, where FireRed has it behind its CUT tree.
+			{"viridian_city_potion", -802.5, 25.0, 516.5}};
+	/**
+	 * Signs on John's map whose words aren't the place's own (the games' grid would read out another of its signs):
+	 * the west block of each (x, z), and its words. Diglett's Cave's, by its mouth on Route 2 and by its mouth on Route 11.
+	 */
+	private static final Object[][] SIGN_SPOTS = {{-788, 369, List.of("DIGLETT's CAVE")}, {-297, 581, List.of("DIGLETT's CAVE")}};
 
 	/** Where someone in SPOTS stands (x, z), or null. */
 	private static int[] spotOf(String key) {
@@ -3197,7 +3279,7 @@ public final class Game {
 			BlockPos at = spot(level, x, z, 6);
 			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 120, level.getMinY(), z - 120, x + 120, level.getMaxY(), z + 120);
 			List<Npc> found = level.getEntitiesOfClass(Npc.class, box, n -> key.equals(n.key()));
-			if (found.isEmpty()) place(level, Npc.PERSON, key, at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
+			if (found.isEmpty()) place(level, Npc.PERSON, key, at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yawOf(who.facing(), 0F));
 			else for (Npc n : found) n.rehome(at);
 			placed.add(doneKey);
 			done.add(doneKey);

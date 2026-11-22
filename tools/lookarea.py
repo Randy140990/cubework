@@ -676,6 +676,55 @@ def bricks(base, mortar, course=4, length=8, shade=0.05):
     return im
 
 
+def mixed_bricks(base, light, dark, mortar, seed="lb", course=4, length=8):
+    """Let's Go's League gate brick: courses of warm red-orange brick, staggered, with here and there a lighter or a
+    darker one, a fine mortar line under each course and at each joint, each brick lit a touch along its top."""
+    r = random.Random(seed)
+    im = Image.new("RGBA", (16, 16))
+    pick = {}
+    for row in range(16 // course):
+        for b in range(-1, 16 // length + 1):
+            pick[(row, b)] = base
+    # (A lighter brick, a darker one and a half-light one in each block, in different places, so it reads as a mixed
+    # wall rather than stripes.)
+    for (row, b), c in (((0, 1), light), ((2, 0), dark), ((3, 1), mix(base, light, 0.4))):
+        pick[(row, b)] = c
+        if b == 0: pick[(row, 2)] = c
+    for y in range(16):
+        row, k = divmod(y, course)
+        off = (length // 2) * (row % 2)
+        for x in range(16):
+            c = pick[(row, (x + off) // length)]
+            if k == course - 1 or (x + off) % length == 0:
+                c = mortar
+            elif k == 0:
+                c = mix(c, (255, 255, 255), 0.07)
+            im.putpixel((x, y), c)
+    return im
+
+
+def bush(seed="bush"):
+    """A round bush's leaves, as Let's Go's (the League gate's four little trees): soft clumps of a fresh green, lit
+    on their tops and shaded under, with no holes (they're drawn without the biome's tint)."""
+    r = random.Random(seed)
+    base, lit, shade = hexc("#4E9E3C")[:3], hexc("#79C25A")[:3], hexc("#2F6E2C")[:3]
+    im = Image.new("RGBA", (16, 16), base + (255,))
+    for _ in range(9):
+        cx, cy, rad = r.uniform(0, 16), r.uniform(0, 16), r.uniform(2.5, 4.2)
+        for y in range(16):
+            for x in range(16):
+                for ox in (-16, 0, 16):
+                    for oy in (-16, 0, 16):
+                        dx, dy = x + 0.5 - cx - ox, y + 0.5 - cy - oy
+                        d = (dx * dx + dy * dy) ** 0.5
+                        if d < rad:
+                            k = -dy / rad
+                            c = mix(base, lit, max(0.0, k) * 0.8) if k > 0 else mix(base, shade, -k * 0.6)
+                            if d > rad - 0.8: c = mix(c, shade, 0.45)
+                            im.putpixel((x, y), tuple(c[:3]) + (255,))
+    return im
+
+
 def recolours():
     v = lambda n: os.path.join(VANILLA, "textures", "block", n + ".png")
     for n in ("tuff", "polished_tuff", "chiseled_tuff_bricks", "chiseled_tuff_bricks_top"):
@@ -724,6 +773,17 @@ def recolours():
     save("gate_wall_oak_top", solid_shaded(hexc("#D6BC8E"), 0.0, 0.0))
     save("gate_beam", solid_shaded(hexc("#B08757"), 0.04, -0.06))
     save("gate_beam_top", solid_shaded(hexc("#BC9563"), 0.0, 0.0))
+    # The POKéMON LEAGUE's gate on Route 22 (12:44): its roof the gates' metal but a lime green (FireRed's is pale
+    # green), the deepslate brick pillars at its doors metal, the oak over its doors a lime green as Let's Go's arch,
+    # its walls Let's Go's warm brick with lighter and darker ones mixed in, its four little trees a wooden trunk and
+    # a round bush of fresh green leaves.
+    save("league_roof", metal(hexc("#9CBF5C")))
+    save("league_roof_rim", metal(hexc("#86A84C"), seam=False))
+    save("league_pillar", metal(hexc("#8A929B"), seam=False))
+    save("league_arch", metal(hexc("#ADB664"), seam=False))
+    save("league_brick", mixed_bricks(hexc("#C8673C"), hexc("#E6B06C"), hexc("#A54C2C"), hexc("#8D4A30")))
+    save("league_trunk", solid_shaded(hexc("#72502F"), 0.05, -0.08, 0.04, "lt"))
+    save("league_bush", bush())
 
 
 def build():

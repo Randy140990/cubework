@@ -68,6 +68,7 @@ route_15_i0	route_15	tm_rage	18	5
 route_2_i0	route_2	moon_stone	13	54
 route_2_i1	route_2	hp_up	13	45
 route_2_parlyz_heal	route_2	parlyz_heal	-1	-1
+viridian_city_potion	viridian_city	potion	-1	-1
 route_24_i0	route_24	tm_thunder_wave	10	5
 route_25_i0	route_25	tm_seismic_toss	22	2
 route_4_i0	route_4	tm_whirlwind	57	3

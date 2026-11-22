@@ -177,7 +177,8 @@ public final class AreaLooks {
 
 	// ---------- textures swapped for others, same shapes (the white fences, the lamps, the roofs' colours, paths) ----------
 	/** A sprite to put in place of another, laid as the old one was (period 0) or from where it is, over `period` blocks. */
-	private record Swap(TextureAtlasSprite to, int period) {}
+	/** A texture swapped in: laid every period blocks (0: as the old one was), and drawn without the biome's tint (noTint). */
+	private record Swap(TextureAtlasSprite to, int period, boolean noTint) {}
 
 	/**
 	 * Each face with one of the swapped textures gets its new one: in the old one's place on it (so a fence's posts and
@@ -191,13 +192,16 @@ public final class AreaLooks {
 			int eq = one.indexOf('=');
 			if (eq < 0) continue;
 			String from = one.substring(0, eq).trim(), to = one.substring(eq + 1).trim();
+			// ("name!": drawn without the biome's tint, the texture's own colours: the League gate's bushes.)
+			boolean noTint = to.endsWith("!");
+			if (noTint) to = to.substring(0, to.length() - 1);
 			int period = 0, at = to.indexOf('@');
 			if (at >= 0) {
 				period = Integer.parseInt(to.substring(at + 1).trim());
 				to = to.substring(0, at);
 			}
 			Identifier fromId = from.contains(":") ? Identifier.parse(from) : Identifier.withDefaultNamespace(from);
-			swaps.put(fromId, new Swap(sprite(baker, to), period));
+			swaps.put(fromId, new Swap(sprite(baker, to), period, noTint));
 		}
 		return (base, e, view, pos, state, random, cull) -> {
 			e.pushTransform(q -> {
@@ -205,6 +209,7 @@ public final class AreaLooks {
 				Swap sw = from == null ? null : swaps.get(from.contents().name());
 				if (sw == null) return true;
 				TextureAtlasSprite to = sw.to();
+				if (sw.noTint()) q.tintIndex(-1);
 				if (sw.period() > 0) {
 					float[] s = new float[4], t = new float[4];
 					Direction f = q.lightFace();

@@ -194,6 +194,7 @@ pokemon_tower_7f_p0	pokemon_tower_7f	mr_fuji	down	stay	MR.FUJI: Heh? You came to
 rock_tunnel_pokecenter_p0	rock_tunnel_pokecenter	gentleman	down	stay	The element types of POKéMON make them stronger than some types and weaker than others!	7	3
 rock_tunnel_pokecenter_p1	rock_tunnel_pokecenter	fisher	none	stay	I sold a useless NUGGET for ₽5000!	2	5
 route_1_p0	route_1	youngster	left_right	walk	See those ledges along the road? | It's a bit scary, but you can jump from them. | You can get back to PALLET TOWN quicker that way.	15	13
+route_1_clerk	route_1	clerk	up_down	walk	We also carry POKé BALLs for catching POKéMON!	-1	-1
 route_11_gate_1f_p0	route_11_gate_1f	guard	none	stay	When you catch lots of POKéMON, isn't it hard to think up names? | In LAVENDER TOWN, there's a man who rates POKéMON nicknames. | He'll help you rename them too!	4	1
 route_11_gate_2f_p0	route_11_gate_2f	scientist	none	stay	There are items on the ground that can't be seen. | ITEMFINDER will detect an item close to you. | It can't pinpoint it, so you have to look yourself!	2	6
 route_12_gate_1f_p0	route_12_gate_1f	guard	none	stay	There's a lookout spot upstairs.	1	3
@@ -326,6 +327,10 @@ vermilion_pokecenter_p0	vermilion_pokecenter	fishing_guru	none	stay	Even if they
 vermilion_pokecenter_p1	vermilion_pokecenter	sailor	none	stay	My POKéMON was poisoned! It fainted while we were walking!	5	4
 viridian_city_p0	viridian_city	youngster	any_dir	walk	Those POKé BALLs at your waist! You have POKéMON! | It's great that you can carry and use POKéMON any-time, anywhere!	13	20
 viridian_city_p1	viridian_city	gambler	none	stay	Ahh, I've had my coffee now and I feel great! | Sure, you can go through! | I'm sorry I was so rude to you! | I see you're using a POKéDEX. | I'll show you how to catch POKéMON as my apology. | First, you need to weaken the target POKéMON. | Then throw a POKé BALL!	18	9
+viridian_city_woman	viridian_city	brunette_girl	up	stay	Oh, Grandpa! Don't be so mean! | He hasn't had his coffee yet.	-1	-1
+viridian_city_gym_man	viridian_city	old_man	up	stay	This POKéMON GYM is always closed. | I wonder who the LEADER is?	-1	-1
+viridian_city_boy	viridian_city	boy	any_dir	walk	You want to know about the two kinds of caterpillar POKéMON? | CATERPIE has no poison, but WEEDLE does. | Watch out for its POISON STING!	-1	-1
+viridian_city_tutor	viridian_city	balding_guy	down	stay	Dreams... I know a move that feeds on them: DREAM EATER. | Bring me a POKéMON that can learn it some day, and I'll teach it.	-1	-1
 viridian_forest_p0	viridian_forest	youngster	up	stay	I came here with some friends! | They're out for POKéMON fights!	16	43
 viridian_forest_p1	viridian_forest	boy	left	stay	I ran out of POKé BALLs to catch POKéMON with! | You should carry extras!	27	40
 viridian_forest_north_gate_p0	viridian_forest_north_gate	super_nerd	none	stay	Many POKéMON live only in forests and caves. | You need to look everywhere to get different kinds!	3	2

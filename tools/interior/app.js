@@ -222,6 +222,9 @@ function switchRoom(id, spawn) {
   hemi.color.set(room.outside ? 0xe8f4ff : 0xfff6e8); hemi.groundColor.set(room.outside ? 0x6f8a5a : 0x8a7f74);
   // Always night (Viridian Forest, under its trees): a dim blue moonlight, as the mod's night has it.
   if (room.night) { sun.intensity = 0.32; hemi.intensity = 0.5; hemi.color.set(0x9fb4e6); hemi.groundColor.set(0x2c3a5a); }
+  // A cave's dusty air (Diglett's Cave): a warm brown haze that thickens into the distance, the light warmer too.
+  scene.fog = room.haze ? new THREE.Fog(room.haze, 6, 34) : null;
+  if (room.haze) { hemi.color.set(0xc9a27a); hemi.groundColor.set(0x3a2a1c); hemi.intensity = 0.55; }
   cam.fit = fitRoom(room); snapCam();
   applyTime();
   $("#roomPick").value = id;

@@ -17,10 +17,10 @@ EPS = 1e-6
 SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob"}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
           "mart": (384, 64, 0), "school": (448, 64, 0), "trainer2": (512, 64, 0), "gate_s": (576, 64, 0), "nickhouse": (640, 64, 0), "gate_n": (704, 64, 0),
-          "gate_league": (768, 64, 0), "gate_johto": (832, 64, 0)}
+          "gate_league": (768, 64, 0), "gate_johto": (832, 64, 0), "route2_gate": (896, 64, 0), "route2_house": (960, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
-         "gate_league": "route_22", "gate_johto": "route_22"}
+         "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -50,6 +50,12 @@ DOORS = {
                 "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
     "route26": {"room": "gate_johto", "door": [[x, 27, 586] for x in range(-993, -987)], "out": [-990.5, 26.0, 589.6], "yaw": 0.0,
                 "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
+    # Route 2's east lane (past the CUT trees): its gate (in at its south door, the dark back of its doorway at z 434;
+    # out at the north, back of that doorway at z 431), and the trade house north of it (a bamboo door, 2 wide).
+    "route2_gate_s": {"room": "route2_gate", "door": [[-777, 30, 434], [-776, 30, 434]], "out": [-776.5, 29.0, 439.4]},
+    "route2_gate_n": {"room": "route2_gate", "door": [[-777, 30, 431], [-776, 30, 431]], "out": [-776.5, 29.0, 426.6], "face": "n", "yaw": 180.0,
+                      "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "route2_house": {"room": "route2_house", "door": [[-783, 31, 387], [-782, 31, 387]], "out": [-782.0, 30.0, 390.4]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -63,9 +69,9 @@ for _line in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "shop
     DOORS["%s_%s" % (_place, _kind)] = {"room": _kind, "door": [[_bx + i, _by - 5, _bz - 3] for i in (-1, 0, 1)], "out": [_bx + 0.5, float(_by - 5), _bz - 1.4],
                                         "place": _place, "group": _kind}
 MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart", "school": "viridian_school", "nickhouse": "viridian_house", "gate_s": "forest_south",
-            "gate_league": "league_s"}
+            "gate_league": "league_s", "route2_gate": "route2_gate_s", "route2_house": "route2_house"}
 # Ways out through the north wall to the world (the north gate's).
-NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n"}
+NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n"}
 # Ways out through the side walls (a sideways gate's), by room and wall.
 SIDE_DOOR = {("gate_johto", "e"): "johto_e"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).
@@ -73,7 +79,8 @@ SIDE_DOOR = {("gate_johto", "e"): "johto_e"}
 ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "lab": {"x": 8.0, "z": 14.5, "yaw": 180.0},
          "center": {"x": 9.0, "z": 12.5, "yaw": 180.0}, "mart": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "school": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "nickhouse": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "gate_s": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_n": {"x": 7.0, "z": 1.4, "yaw": 0.0},
-         "gate_league": {"x": 7.0, "z": 14.5, "yaw": 180.0}, "gate_johto": {"x": 14.4, "z": 5.0, "yaw": 90.0}}
+         "gate_league": {"x": 7.0, "z": 14.5, "yaw": 180.0}, "gate_johto": {"x": 14.4, "z": 5.0, "yaw": 90.0},
+         "route2_gate": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "route2_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {

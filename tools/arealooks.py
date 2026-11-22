@@ -13,7 +13,7 @@ PALLET_R1 = (-845, 590, -745, 735, "Pallet Town and Route 1")
 PALLET = (-845, 655, -745, 735, "Pallet Town")
 VIRIDIAN = (-830, 495, -745, 589, "Viridian City")
 ROUTE2 = (-830, 340, -745, 494, "Route 2")
-ROUTE22 = (-960, 495, -831, 600, "Route 22")
+ROUTE22 = (-1000, 495, -831, 600, "Route 22")
 
 FENCE = "block/pale_oak_planks=white_fence"
 PATH = "block/calcite=path_calcite,block/diorite=path_diorite,block/polished_diorite=path_polished_diorite"
@@ -30,6 +30,16 @@ GATE = ("block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,
 CENTER = ("block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,"
           "block/mangrove_planks=center_mangrove_planks")
 MART = "block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool"
+# The POKéMON LEAGUE gate (Route 22's west end): the gates' looks, but its roof lime green metal, its deepslate brick
+# pillars metal, the oak over its doors lime green, its resin brick walls Let's Go's mixed brick.
+LEAGUE_BLOCKS = GATE_BLOCKS + (",deepslate_brick_wall,deepslate_bricks,deepslate_brick_stairs,deepslate_brick_slab,oak_planks,oak_stairs,oak_slab,"
+                               "resin_bricks,resin_brick_stairs,resin_brick_slab,resin_brick_wall")
+LEAGUE = (GATE.replace("block/polished_deepslate=gate_roof", "block/polished_deepslate=league_roof")
+          .replace("block/deepslate_tiles=gate_roof_rim", "block/deepslate_tiles=league_roof_rim")
+          + ",block/deepslate_bricks=league_pillar,block/oak_planks=league_arch,block/resin_bricks=league_brick")
+# Its four little trees out front: spruce fence trunks as wood, acacia leaves as a round bush (! : without the
+# biome's tint, the bush's own green).
+LEAGUE_TREES = "block/spruce_planks=league_trunk,block/acacia_leaves=league_bush!"
 GYM = ("block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,"
        "block/stripped_jungle_log_top=gym_beam_top")
 
@@ -75,8 +85,13 @@ def main():
             continue
         x0, x1, z0, z1, ry, where = line.rstrip("\n").split("\t")
         ry = int(ry)
-        add("swap", GATE_BLOCKS, (int(x0) - 2, int(z0) - 4, int(x1) + 2, int(z1) + 4, where), GATE, (str(ry - 18), str(ry + 2)))
-    add("swap", "mud_bricks", ROUTE22, "block/mud_bricks=route_path@4")
+        league = where == "League gate"
+        add("swap", LEAGUE_BLOCKS if league else GATE_BLOCKS, (int(x0) - 2, int(z0) - 4, int(x1) + 2, int(z1) + 4, where), LEAGUE if league else GATE,
+            (str(ry - 18), str(ry + 2)))
+        if league:
+            add("swap", "spruce_fence,acacia_leaves", (int(x0) - 4, int(z0) - 6, int(x1) + 4, int(z1) + 6, "the League gate's trees"), LEAGUE_TREES,
+                (str(ry - 12), str(ry - 1)))
+    add("swap", "mud_bricks,mud_brick_stairs,mud_brick_slab", ROUTE22, "block/mud_bricks=route_path@4")
     add("swap", "brown_concrete_powder", ROUTE22, "block/brown_concrete_powder=route_path_edge@4")
     for line in open(os.path.join(HERE, "interior", "export", "shops.tsv")):
         if not line.strip() or line.startswith("#"):
@@ -96,6 +111,8 @@ def main():
         box = (int(x0) - 1, int(z0) - 1, int(x1) + 1, int(z1) + 1, place + " Gym")
         add("roof_gym", "jungle_stairs,oak_stairs", box, "-", (y0, str(int(y1) + 1)))
         add("swap", "jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab", box, GYM, (y0, str(int(y1) + 1)))
+    # Diglett's Cave's sign by its mouth on Route 11 (east of Vermilion City), as HeartGold's (Route 2's is in Route 2's).
+    add("sign", "pale_oak_shelf,pale_oak_sign", (-300, 578, -293, 584, "Diglett's Cave's sign on Route 11"))
     # Viridian Forest (John's, built in the interiors at x 4096, the floor at y 64: tools/forest.py): its shelf signs
     # as HeartGold's, and its two gatehouses (Route 2's gate, outside) in the gates' colours.
     fx, fy = 4096, 64
