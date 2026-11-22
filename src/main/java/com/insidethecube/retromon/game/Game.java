@@ -1453,7 +1453,7 @@ public final class Game {
 	private static void moonlight(ServerPlayer p) {
 		long t = Math.floorMod(p.level().getDayTime(), 24000L);
 		// (Viridian Forest is always night under its trees.)
-		boolean night = (t >= 12300 && t < 23700 || Interiors.dark(p)) && NIGHTS.getOrDefault(p.getUUID(), 1) > 0;
+		boolean night = (t >= 12300 && t < 23700 || Interiors.alwaysNight(p)) && NIGHTS.getOrDefault(p.getUUID(), 1) > 0;
 		var nv = p.getEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
 		boolean ours = nv != null && nv.getAmplifier() == 7;
 		if (night && (nv == null || ours && nv.getDuration() < 400)) {

@@ -337,7 +337,7 @@ public final class Interiors {
 	}
 
 	/** Whether someone's in a room that's always night (the forest). */
-	public static boolean dark(Entity e) {
+	public static boolean alwaysNight(Entity e) {
 		Room r = roomOf(e);
 		return r != null && r.dark();
 	}

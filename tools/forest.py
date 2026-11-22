@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Viridian Forest as John built it (tools/forest/viridian_forest.schem, 88 x 18 x 140, x east and z south), made into
+Viridian Forest as John built it (tools/forest/viridian_forest.schem, 120 x 18 x 172, x east and z south: FireRed's
+forest in the middle, 88 by 140, with 16 blocks of his trees all round it), made into
 the mod's forest: a room of its own in the interiors (as the buildings' insides are), between Route 2's two gates.
 
 Writes:
@@ -9,11 +10,12 @@ Writes:
   tools/interior/forest_data.js                               the same forest for the Interior Viewer (a block a cell)
 
 What's changed from the schematic, as John asked (22 Nov 2026):
-  - the light blue wool round the bottom of both gatehouses is gone (grass under it);
-  - the first sign you come to out of the south gatehouse (FireRed's fifth TRAINER TIPS, by the door) is gone.
+  - the first sign you come to out of the south gatehouse (FireRed's fifth TRAINER TIPS, by the door) is gone;
+  - (any light blue wool left round the bottom of the gatehouses goes too: his second version has none).
 
 Where things are: FireRed's forest (pret/pokefirered, 54 x 69 tiles) was laid out by John at x = 8 + 4c/3 and
-z = 2r + 2 for tile column c and row r, so a tile's middle is x = 8 + (4c + 2)/3, z = 2r + 3. The trainers, people
+z = 2r + 2 for tile column c and row r (in the forest's middle: 16 more each way here), so a tile's middle is
+x = 24 + (4c + 2)/3, z = 2r + 19. The trainers, people
 and item balls stand where FireRed has them (its map.json), each moved to the nearest open ground if a tree's there.
 
     python3 -I tools/forest.py
@@ -37,8 +39,17 @@ SOFT = {"air", "tall_grass", "large_fern", "short_grass", "fern", "poppy", "red_
 GRASS = {"tall_grass", "large_fern"}
 
 
+# The border of trees John put round FireRed's forest (his second version): everything below is in FireRed's forest's
+# own blocks, and moved in by this much.
+SHIFT = 16
+
+
 def tile(c, r):
-    return 8 + (4 * c + 2) / 3.0, 2 * r + 3.0
+    return SHIFT + 8 + (4 * c + 2) / 3.0, SHIFT + 2 * r + 3.0
+
+
+def at_(xz):
+    return xz[0] + SHIFT, xz[1] + SHIFT
 
 
 # FireRed's people and trainers (map.json's object events), its item balls and its signs (bg events).
@@ -72,15 +83,16 @@ SIGNS = {
     (16, 26): ["LEAVING VIRIDIAN FOREST", "PEWTER CITY AHEAD"],
 }
 # The sign by the south gatehouse's door (FireRed's TRAINER TIPS 5): taken away.
-GONE_SIGN = (49, 122)
+GONE_SIGN = at_((49, 122))
+SIGNS = {at_(k): v for k, v in SIGNS.items()}
 YAW = {"down": 0.0, "left": 90.0, "up": 180.0, "right": 270.0}
 
 # The gatehouses' doors: the south one faces north (you walk south up its steps into it), the north one faces south.
-SOUTH_DOOR = dict(x0=45.0, x1=51.0, z=126.3)  # its steps: x 45 to 50, z 125 to 126
-NORTH_DOOR = dict(x0=13.0, x1=19.0, z=22.3)   # its steps: x 13 to 18, z 22 to 23
+SOUTH_DOOR = dict(x0=45.0 + SHIFT, x1=51.0 + SHIFT, z=126.3 + SHIFT, s0=125 + SHIFT, s1=126 + SHIFT)  # its steps: x 45 to 50, z 125 to 126
+NORTH_DOOR = dict(x0=13.0 + SHIFT, x1=19.0 + SHIFT, z=22.3 + SHIFT, s0=22 + SHIFT, s1=23 + SHIFT)   # its steps: x 13 to 18, z 22 to 23
 # Where you come out of each: on the path in front of the steps, facing away from the door.
-FROM_SOUTH = {"x": 48.0, "z": 123.6, "yaw": 180.0}
-FROM_NORTH = {"x": 15.5, "z": 24.8, "yaw": 0.0}
+FROM_SOUTH = {"x": 48.0 + SHIFT, "z": 123.6 + SHIFT, "yaw": 180.0}
+FROM_NORTH = {"x": 15.5 + SHIFT, "z": 24.8 + SHIFT, "yaw": 0.0}
 # ...and where the gates (Route 2's two gate rooms) put you: by their way through to the forest.
 GATE_S_FROM_FOREST = {"x": 7.0, "z": 1.4, "yaw": 0.0}
 GATE_N_FROM_FOREST = {"x": 7.0, "z": 12.5, "yaw": 180.0}

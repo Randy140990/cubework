@@ -101,8 +101,8 @@ def main():
     fx, fy = 4096, 64
     forest = lambda x0, z0, x1, z1, note: (fx + x0, z0, fx + x1, z1, note)
     room = lambda look, blocks, area, swaps="-", ys=("-", "-"): rows.append((look, blocks, area[0], area[1], area[2], area[3], ys[0], ys[1], swaps, area[4], "interiors"))
-    room("sign", "pale_oak_shelf,pale_oak_sign", forest(0, 0, 87, 139, "Viridian Forest"))
-    for x0, z0, x1, z1, note in ((6, 7, 25, 26, "Viridian Forest's north gatehouse"), (38, 122, 57, 139, "Viridian Forest's south gatehouse")):
+    room("sign", "pale_oak_shelf,pale_oak_sign", forest(0, 0, 119, 171, "Viridian Forest"))
+    for x0, z0, x1, z1, note in ((22, 23, 41, 42, "Viridian Forest's north gatehouse"), (54, 138, 73, 157, "Viridian Forest's south gatehouse")):
         room("swap", GATE_BLOCKS, forest(x0, z0, x1, z1, note), GATE, (str(fy - 2), str(fy + 16)))
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"

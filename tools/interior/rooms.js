@@ -1387,7 +1387,7 @@ const BUILD = {
     const G = R.geo;
     const at = (x, z) => { const r = F.rows[z]; return { g: r[3 * x], w: r[3 * x + 1], h: r.charCodeAt(3 * x + 2) - 48 }; };
     const sd = F.southDoor, nd = F.northDoor;
-    const doorStep = (x, z) => (x >= sd.x0 && x < sd.x1 && z >= 125 && z <= 126) || (x >= nd.x0 && x < nd.x1 && z >= 22 && z <= 23);
+    const doorStep = (x, z) => (x >= sd.x0 && x < sd.x1 && z >= sd.s0 && z <= sd.s1) || (x >= nd.x0 && x < nd.x1 && z >= nd.s0 && z <= nd.s1);
     for (let z = 0; z < F.D; z++) {
       // The ground, in runs along the row: grass (the moss along the paths is drawn as the grass, as the Look pack has
       // it), or a dirt path.
@@ -1417,7 +1417,7 @@ const BUILD = {
       }
     }
     // The gatehouses' doors: their steps up, a dark doorway, the roof over them.
-    for (const [d, z0, z1, face] of [[sd, 125, 127, "n"], [nd, 22, 24, "s"]]) {
+    for (const [d, z0, z1, face] of [[sd, sd.s0, sd.s1 + 1, "n"], [nd, nd.s0, nd.s1 + 1, "s"]]) {
       G.box(d.x0, 0, z0, d.x1, 0.5, z1, "area_gate_stone");
       const zf = face === "n" ? z1 : z0;
       G.box(d.x0, 0.5, zf - 0.02, d.x1, 2.8, zf + 0.02, { [face]: "doorDark", all: null });
@@ -1468,7 +1468,7 @@ const BUILD = {
       }
     }
     R.spawn = { x: F.fromSouth.x, z: F.fromSouth.z, yaw: FACE.n };
-    R.item("Viridian Forest", "John's forest (88 by 140 blocks), FireRed's maze laid out at 4 blocks to 3 of its steps across and 2 down. Always night in the game.");
+    R.item("Viridian Forest", "John's forest (120 by 172 blocks: FireRed's maze, 88 by 140, laid out at 4 blocks to 3 of its steps across and 2 down, with 16 blocks of trees all round). Always night in the game.");
     R.item("BUG CATCHERs", "RICK and DOUG on the east side, SAMMY on the west, ANTHONY at the top right, CHARLIE at the top by the north gatehouse. The faint strip in front of each is how far they see.");
     R.item("Items", "A POKé BALL and two POTIONs up the west side, an ANTIDOTE at the top right, a POTION at the bottom right, an ANTIDOTE by the way in.");
     return R;
