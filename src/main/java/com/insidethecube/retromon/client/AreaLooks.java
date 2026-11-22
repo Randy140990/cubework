@@ -116,7 +116,8 @@ public final class AreaLooks {
 					for (String row : new String[] {"board", "stand"}) part(ctx, "w" + row + "_" + part + "_" + d.getSerializedName(), "block/area/wsign_" + row + "_" + part + "_" + d.getSerializedName());
 				}
 			}
-			for (String b : new String[] {"boulder_a", "boulder_b", "boulder_small", "mboulder_a", "mboulder_b", "mboulder_small"}) part(ctx, b, "block/area/" + b);
+			for (String b : new String[] {"boulder_a", "boulder_b", "boulder_small", "mboulder_a", "mboulder_b", "mboulder_small", "iboulder_a", "iboulder_b",
+					"iboulder_small", "rboulder_a", "rboulder_b", "rboulder_small", "sboulder_a", "sboulder_b", "sboulder_small"}) part(ctx, b, "block/area/" + b);
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;

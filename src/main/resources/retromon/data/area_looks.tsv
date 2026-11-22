@@ -623,3 +623,28 @@ swap	white_concrete	-160	305	-120	333	34	50	block/white_concrete=pp_white	the Po
 swap	deepslate_brick_wall	-160	305	-120	333	-	-	block/deepslate_bricks=pp_post	the Power Plant
 swap	smooth_stone_slab,smooth_stone	-160	305	-120	333	-	-	block/smooth_stone_slab_side=house_trim,block/smooth_stone=house_stone	the Power Plant
 sign	pale_oak_shelf	-146	330	-143	332	34	35	-	the Power Plant's sign
+swap	packed_ice,snow_block,calcite,end_stone,polished_diorite,polished_diorite_stairs,jungle_stairs,smooth_sandstone	6655	-1	6740	64	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow=sf_snow_top|sf_snow@2,block/calcite=sf_floor@4,block/end_stone=sf_sand@4,block/polished_diorite=sf_step,block/jungle_planks=sf_edge,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Seafoam Islands 1F	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	6655	-1	6740	64	-	-	prefix:iboulder	Seafoam Islands 1F	interiors
+sign	pale_oak_shelf	6655	-1	6740	64	-	-	-	Seafoam Islands 1F	interiors
+swap	packed_ice,snow_block,calcite,end_stone,polished_diorite,polished_diorite_stairs,jungle_stairs,smooth_sandstone	6783	-1	6868	64	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow=sf_snow_top|sf_snow@2,block/calcite=sf_floor@4,block/end_stone=sf_sand@4,block/polished_diorite=sf_step,block/jungle_planks=sf_edge,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Seafoam Islands B1F	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	6783	-1	6868	64	-	-	prefix:iboulder	Seafoam Islands B1F	interiors
+sign	pale_oak_shelf	6783	-1	6868	64	-	-	-	Seafoam Islands B1F	interiors
+swap	packed_ice,snow_block,calcite,end_stone,polished_diorite,polished_diorite_stairs,jungle_stairs,smooth_sandstone	6911	-1	6996	64	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow=sf_snow_top|sf_snow@2,block/calcite=sf_floor@4,block/end_stone=sf_sand@4,block/polished_diorite=sf_step,block/jungle_planks=sf_edge,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Seafoam Islands B2F	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	6911	-1	6996	64	-	-	prefix:iboulder	Seafoam Islands B2F	interiors
+sign	pale_oak_shelf	6911	-1	6996	64	-	-	-	Seafoam Islands B2F	interiors
+swap	packed_ice,snow_block,calcite,end_stone,polished_diorite,polished_diorite_stairs,jungle_stairs,smooth_sandstone	7039	-1	7124	64	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow=sf_snow_top|sf_snow@2,block/calcite=sf_floor@4,block/end_stone=sf_sand@4,block/polished_diorite=sf_step,block/jungle_planks=sf_edge,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Seafoam Islands B3F	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	7039	-1	7124	64	-	-	prefix:iboulder	Seafoam Islands B3F	interiors
+sign	pale_oak_shelf	7039	-1	7124	64	-	-	-	Seafoam Islands B3F	interiors
+swap	packed_ice,snow_block,calcite,end_stone,polished_diorite,polished_diorite_stairs,jungle_stairs,smooth_sandstone	7167	-1	7252	64	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow=sf_snow_top|sf_snow@2,block/calcite=sf_floor@4,block/end_stone=sf_sand@4,block/polished_diorite=sf_step,block/jungle_planks=sf_edge,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Seafoam Islands B4F	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	7167	-1	7252	64	-	-	prefix:iboulder	Seafoam Islands B4F	interiors
+sign	pale_oak_shelf	7167	-1	7252	64	-	-	-	Seafoam Islands B4F	interiors
+swap	andesite,diorite,coarse_dirt,rooted_dirt,dirt,smooth_sandstone,andesite_slab	7295	-1	7408	94	-	-	block/andesite=rt_rock_top|rt_rock@2,block/diorite=rt_rock_top|rt_rock@2,block/coarse_dirt=rt_floor@4,block/rooted_dirt=rt_floor@4,block/dirt=rt_floor@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Rock Tunnel 1F	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	7295	-1	7408	94	-	-	prefix:rboulder	Rock Tunnel 1F	interiors
+boulder	waxed_weathered_copper_grate	7295	-1	7408	94	-	-	prefix:sboulder	Rock Tunnel 1F	interiors
+sign	pale_oak_shelf	7295	-1	7408	94	-	-	-	Rock Tunnel 1F	interiors
+swap	white_concrete	7295	-1	7408	94	-	-	block/white_concrete=cave_daylight!	Rock Tunnel 1F	interiors
+swap	andesite,diorite,coarse_dirt,rooted_dirt,dirt,smooth_sandstone,andesite_slab	7423	-1	7534	96	-	-	block/andesite=rt_rock_top|rt_rock@2,block/diorite=rt_rock_top|rt_rock@2,block/coarse_dirt=rt_floor@4,block/rooted_dirt=rt_floor@4,block/dirt=rt_floor@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Rock Tunnel B1F	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	7423	-1	7534	96	-	-	prefix:rboulder	Rock Tunnel B1F	interiors
+boulder	waxed_weathered_copper_grate	7423	-1	7534	96	-	-	prefix:sboulder	Rock Tunnel B1F	interiors
+sign	pale_oak_shelf	7423	-1	7534	96	-	-	-	Rock Tunnel B1F	interiors
+swap	white_concrete	7423	-1	7534	96	-	-	block/white_concrete=cave_daylight!	Rock Tunnel B1F	interiors

@@ -165,3 +165,15 @@ underground_path_we_antidote	underground_path_we	antidote	-1	-1
 underground_path_we_ice_heal	underground_path_we	ice_heal	-1	-1
 power_plant_thunderstone	power_plant	thunderstone	-1	-1
 power_plant_elixer	power_plant	elixer	-1	-1
+seafoam_islands_1f_ice_heal	seafoam_islands_1f	ice_heal	-1	-1
+seafoam_islands_b1f_water_stone	seafoam_islands_b1f	water_stone	-1	-1
+seafoam_islands_b1f_revive	seafoam_islands_b1f	revive	-1	-1
+seafoam_islands_b2f_big_pearl	seafoam_islands_b2f	big_pearl	-1	-1
+seafoam_islands_b3f_nugget	seafoam_islands_b3f	nugget	-1	-1
+seafoam_islands_b4f_ultra_ball	seafoam_islands_b4f	ultra_ball	-1	-1
+seafoam_islands_b4f_water_stone	seafoam_islands_b4f	water_stone	-1	-1
+rock_tunnel_1f_repel	rock_tunnel_1f	repel	-1	-1
+rock_tunnel_1f_pearl	rock_tunnel_1f	pearl	-1	-1
+rock_tunnel_1f_escape_rope	rock_tunnel_1f	escape_rope	-1	-1
+rock_tunnel_b1f_revive	rock_tunnel_b1f	revive	-1	-1
+rock_tunnel_b1f_max_ether	rock_tunnel_b1f	max_ether	-1	-1

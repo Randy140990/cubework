@@ -1,0 +1,205 @@
+{
+ "parent": "block/block",
+ "ambientocclusion": false,
+ "textures": {
+  "rock": "retromon:block/area/ice_shard",
+  "particle": "retromon:block/area/ice_shard"
+ },
+ "elements": [
+  {
+   "from": [
+    6.2,
+    0,
+    6.2
+   ],
+   "to": [
+    9.8,
+    8,
+    9.8
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      8,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      8,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      8,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      8,
+      16,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#rock",
+     "uv": [
+      6,
+      0,
+      10,
+      4
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    3.7,
+    0,
+    7.7
+   ],
+   "to": [
+    6.3,
+    6,
+    10.3
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      10,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      10,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      10,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      10,
+      16,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#rock",
+     "uv": [
+      6,
+      0,
+      10,
+      4
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     5,
+     0,
+     9
+    ],
+    "axis": "z",
+    "angle": 22.5
+   }
+  },
+  {
+   "from": [
+    9.7,
+    0,
+    5.7
+   ],
+   "to": [
+    12.3,
+    5,
+    8.3
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      11,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      11,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      11,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#rock",
+     "uv": [
+      0,
+      11,
+      16,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#rock",
+     "uv": [
+      6,
+      0,
+      10,
+      4
+     ]
+    }
+   },
+   "rotation": {
+    "origin": [
+     11,
+     0,
+     7
+    ],
+    "axis": "z",
+    "angle": -22.5
+   }
+  }
+ ]
+}

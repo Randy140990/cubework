@@ -65,21 +65,21 @@ pokemon_tower_5f_3	pokemon_tower_5f	CHANNELER	channeler	right	2	30	haunter:22	-	
 pokemon_tower_6f_0	pokemon_tower_6f	CHANNELER	channeler	right	3	30	gastly:22,gastly:22,gastly:22	-	Give...me... blood...	Groan!	I feel anemic and weak...	12	10
 pokemon_tower_6f_1	pokemon_tower_6f	CHANNELER	channeler	down	3	30	gastly:24	-	Urff... Kwaah!	Some-thing fell out!	Hair didn't fall out! It was an evil spirit!	9	5
 pokemon_tower_6f_2	pokemon_tower_6f	CHANNELER	channeler	left	2	30	gastly:24	-	Ke..ke...ke... ke..ke...ke!!	Keee!	What's going on here?	16	5
-rock_tunnel_1f_0	rock_tunnel_1f	HIKER	hiker	down	4	35	geodude:19,machop:19,geodude:19,geodude:19	-	This tunnel goes a long way, kid!	Doh! You win!	Watch for ONIX! It can put the squeeze on you!	7	5
-rock_tunnel_1f_1	rock_tunnel_1f	HIKER	hiker	down	4	35	onix:20,onix:20,geodude:20	-	Hmm. Maybe I'm lost in here...	Ease up! What am I doing? Which way is out?	That sleeping POKéMON on ROUTE 12 forced me to take this detour.	5	16
-rock_tunnel_1f_2	rock_tunnel_1f	HIKER	hiker	left	3	35	geodude:21,graveler:21	-	Outsiders like you need to show me some respect!	I give!	You're talented enough to hike!	17	15
-rock_tunnel_1f_3	rock_tunnel_1f	POKéMANIAC	super_nerd	left	3	50	cubone:23,slowpoke:23	-	POKéMON fight! Ready, go!	Game over!	Oh well, I'll get a ZUBAT as I go!	23	8
-rock_tunnel_1f_4	rock_tunnel_1f	JR.TRAINER♀	cooltrainer_f	left	4	20	bellsprout:22,clefairy:22	-	Eek! Don't try anything funny in the dark!	It was too dark!	I saw a MACHOP in this tunnel!	37	21
-rock_tunnel_1f_5	rock_tunnel_1f	JR.TRAINER♀	cooltrainer_f	down	4	20	meowth:20,oddish:20,pidgey:20	-	I came this far for POKéMON!	I'm out of POKéMON!	You looked cute and harmless!	22	24
-rock_tunnel_1f_6	rock_tunnel_1f	JR.TRAINER♀	cooltrainer_f	right	4	20	pidgey:19,rattata:19,rattata:19,bellsprout:19	-	You have POKéMON! Let's start!	You play hard!	Whew! I'm all sweaty now!	32	24
-rock_tunnel_b1f_0	rock_tunnel_b1f	JR.TRAINER♀	cooltrainer_f	down	4	20	jigglypuff:21,pidgey:21,meowth:21	-	Hikers leave twigs as trail markers.	Ohhh! I did my best!	I want to go home!	11	13
-rock_tunnel_b1f_1	rock_tunnel_b1f	HIKER	hiker	down	3	35	geodude:21,geodude:21,graveler:21	-	Hahaha! Can you beat my power?	Oops! Out-muscled!	I go for power because I hate thinking!	6	10
-rock_tunnel_b1f_2	rock_tunnel_b1f	POKéMANIAC	super_nerd	down	3	50	slowpoke:20,slowpoke:20,slowpoke:20	-	You have a POKéDEX? I want one too!	Shoot! I'm so jealous!	When you finish your POKéDEX, can I have it?	3	5
-rock_tunnel_b1f_3	rock_tunnel_b1f	POKéMANIAC	super_nerd	right	4	50	charmander:22,cubone:22	-	Do you know about costume players?	Well, that's that.	Costume players dress up as POKéMON for fun.	20	21
-rock_tunnel_b1f_4	rock_tunnel_b1f	HIKER	hiker	down	3	35	geodude:25	-	My POKéMON techniques will leave you crying!	I give! You're a better technician!	In mountains, you'll often find rock-type POKéMON.	30	10
-rock_tunnel_b1f_5	rock_tunnel_b1f	JR.TRAINER♀	cooltrainer_f	right	4	20	oddish:22,bulbasaur:22	-	I don't often come here, but I will fight you.	Oh! I lost!	I like tiny POKéMON, big ones are too scary!	14	28
-rock_tunnel_b1f_6	rock_tunnel_b1f	HIKER	hiker	right	3	35	machop:20,onix:20	-	Hit me with your best shot!	Fired away!	I'll raise my POKéMON to beat yours, kid!	33	5
-rock_tunnel_b1f_7	rock_tunnel_b1f	POKéMANIAC	super_nerd	down	3	50	slowpoke:25	-	I draw POKéMON when I'm home.	Whew! I'm exhausted!	I'm an artist, not a fighter.	26	30
+rock_tunnel_1f_0	rock_tunnel_1f	HIKER LUCAS	hiker	down	4	35	geodude:19,machop:19,geodude:19,geodude:19	-	This tunnel goes a long way, kid!	Doh! You win!	Watch for ONIX! It can put the squeeze on you!	7	5
+rock_tunnel_1f_1	rock_tunnel_1f	HIKER OLIVER	hiker	down	4	35	onix:20,onix:20,geodude:20	-	Hmm. Maybe I'm lost in here...	Ease up! What am I doing? Which way is out?	That sleeping POKéMON on ROUTE 12 forced me to take this detour.	5	16
+rock_tunnel_1f_2	rock_tunnel_1f	HIKER LENNY	hiker	left	3	35	geodude:21,graveler:21	-	Outsiders like you need to show me some respect!	I give!	You're talented enough to hike!	17	15
+rock_tunnel_1f_3	rock_tunnel_1f	POKéMANIAC ASHTON	super_nerd	left	3	50	cubone:23,slowpoke:23	-	POKéMON fight! Ready, go!	Game over!	Oh well, I'll get a ZUBAT as I go!	23	8
+rock_tunnel_1f_4	rock_tunnel_1f	PICNICKER DANA	picnicker	left	4	20	bellsprout:22,clefairy:22	-	Eek! Don't try anything funny in the dark!	It was too dark!	I saw a MACHOP in this tunnel!	37	21
+rock_tunnel_1f_5	rock_tunnel_1f	PICNICKER ARIANA	picnicker	down	4	20	meowth:20,oddish:20,pidgey:20	-	I came this far for POKéMON!	I'm out of POKéMON!	You looked cute and harmless!	22	24
+rock_tunnel_1f_6	rock_tunnel_1f	PICNICKER LEAH	picnicker	right	4	20	pidgey:19,rattata:19,rattata:19,bellsprout:19	-	You have POKéMON! Let's start!	You play hard!	Whew! I'm all sweaty now!	32	24
+rock_tunnel_b1f_0	rock_tunnel_b1f	PICNICKER SOFIA	picnicker	down	4	20	jigglypuff:21,pidgey:21,meowth:21	-	Hikers leave twigs as trail markers.	Ohhh! I did my best!	I want to go home!	11	13
+rock_tunnel_b1f_1	rock_tunnel_b1f	HIKER DUDLEY	hiker	down	3	35	geodude:21,geodude:21,graveler:21	-	Hahaha! Can you beat my power?	Oops! Out-muscled!	I go for power because I hate thinking!	6	10
+rock_tunnel_b1f_2	rock_tunnel_b1f	POKéMANIAC COOPER	super_nerd	down	3	50	slowpoke:20,slowpoke:20,slowpoke:20	-	You have a POKéDEX? I want one too!	Shoot! I'm so jealous!	When you finish your POKéDEX, can I have it?	3	5
+rock_tunnel_b1f_3	rock_tunnel_b1f	POKéMANIAC STEVE	super_nerd	right	4	50	charmander:22,cubone:22	-	Do you know about costume players?	Well, that's that.	Costume players dress up as POKéMON for fun.	20	21
+rock_tunnel_b1f_4	rock_tunnel_b1f	HIKER ALLEN	hiker	down	3	35	geodude:25	-	My POKéMON techniques will leave you crying!	I give! You're a better technician!	In mountains, you'll often find rock-type POKéMON.	30	10
+rock_tunnel_b1f_5	rock_tunnel_b1f	PICNICKER MARTHA	picnicker	right	4	20	oddish:22,bulbasaur:22	-	I don't often come here, but I will fight you.	Oh! I lost!	I like tiny POKéMON, big ones are too scary!	14	28
+rock_tunnel_b1f_6	rock_tunnel_b1f	HIKER ERIC	hiker	right	3	35	machop:20,onix:20	-	Hit me with your best shot!	Fired away!	I'll raise my POKéMON to beat yours, kid!	33	5
+rock_tunnel_b1f_7	rock_tunnel_b1f	POKéMANIAC WINSTON	super_nerd	down	3	50	slowpoke:25	-	I draw POKéMON when I'm home.	Whew! I'm exhausted!	I'm an artist, not a fighter.	26	30
 rocket_hideout_b1f_0	rocket_hideout_b1f	ROCKET	rocket	left	3	30	drowzee:21,machop:21	-	Who are you? How did you get here?	Oww! Beaten!	Are you dissing TEAM ROCKET?	26	8
 rocket_hideout_b1f_1	rocket_hideout_b1f	ROCKET	rocket	right	2	30	raticate:21,raticate:21	-	You broke into our operation?	Burnt!	You're not going to get away with this, brat!	12	6
 rocket_hideout_b1f_2	rocket_hideout_b1f	ROCKET	rocket	down	2	30	grimer:20,koffing:20,koffing:20	-	Intruder alert!	I can't do it!	SILPH SCOPE? I don't know where it is!	18	17

@@ -242,6 +242,7 @@ def main():
         room("swap", GATE_BLOCKS, forest(x0, z0, x1, z1, note), GATE, (str(fy - 2), str(fy + 16)))
     round46(add, room)
     round47(add, room)
+    round48(add, room)
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -453,6 +454,34 @@ def round47(add, room):
     add("swap", "deepslate_brick_wall", P, "block/deepslate_bricks=pp_post")
     add("swap", "smooth_stone_slab,smooth_stone", P, "block/smooth_stone_slab_side=house_trim,block/smooth_stone=house_stone")
     add("sign", "pale_oak_shelf", (-146, 330, -143, 332, "the Power Plant's sign"), "-", ("34", "35"))
+
+
+
+def round48(add, room):
+    """0.48.0's looks (17:42 to 17:53): see tools/looks48.py for the pictures."""
+    # Seafoam Islands (tools/caves48.py: its five floors at x 6656 on, 128 apart, 84 by 64): its rock ice, its walls
+    # packed snow, its floor frosted stone, its sand, its steps glassy ice, its edges at the water icy rock, its boulders
+    # ice shards, its signs as HeartGold's.
+    SEA = ("block/packed_ice=sf_ice_top|sf_ice@2,block/snow=sf_snow_top|sf_snow@2,block/calcite=sf_floor@4,block/end_stone=sf_sand@4,"
+           "block/polished_diorite=sf_step,block/jungle_planks=sf_edge,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,"
+           "block/sandstone_top=cave_mat@2")
+    for k, fl in enumerate(("1F", "B1F", "B2F", "B3F", "B4F")):
+        ox = 6656 + 128 * k
+        box = (ox - 1, -1, ox + 84, 64, "Seafoam Islands " + fl)
+        room("swap", "packed_ice,snow_block,calcite,end_stone,polished_diorite,polished_diorite_stairs,jungle_stairs,smooth_sandstone", box, SEA)
+        room("boulder", "waxed_copper_grate,waxed_exposed_copper_grate", box, "prefix:iboulder")
+        room("sign", "pale_oak_shelf", box)
+    # Rock Tunnel (two floors at x 7296 and 7424): its rock warm grey brown in rough slabs (the andesite, its tops the
+    # diorite), its floor brown earth, its rocks craggy boulders, the cracked ones (ROCK SMASH) darker and split.
+    RT = ("block/andesite=rt_rock_top|rt_rock@2,block/diorite=rt_rock_top|rt_rock@2,block/coarse_dirt=rt_floor@4,block/rooted_dirt=rt_floor@4,"
+          "block/dirt=rt_floor@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2")
+    for ox, w, d, fl in ((7296, 112, 94, "1F"), (7424, 110, 96, "B1F")):
+        box = (ox - 1, -1, ox + w, d, "Rock Tunnel " + fl)
+        room("swap", "andesite,diorite,coarse_dirt,rooted_dirt,dirt,smooth_sandstone,andesite_slab", box, RT)
+        room("boulder", "waxed_copper_grate,waxed_exposed_copper_grate", box, "prefix:rboulder")
+        room("boulder", "waxed_weathered_copper_grate", box, "prefix:sboulder")
+        room("sign", "pale_oak_shelf", box)
+        room("swap", "white_concrete", box, "block/white_concrete=cave_daylight!")
 
 
 LAMP46 = ("block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chisel,"

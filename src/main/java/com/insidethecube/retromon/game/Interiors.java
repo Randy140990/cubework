@@ -118,7 +118,8 @@ public final class Interiors {
 	 * the rooms are read as it's loaded.)
 	 */
 	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json", "/retromon/interiors/digletts_cave.json",
-			"/retromon/interiors/mt_moon.json", "/retromon/interiors/safari_zone.json"};
+			"/retromon/interiors/mt_moon.json", "/retromon/interiors/safari_zone.json", "/retromon/interiors/seafoam_islands.json",
+			"/retromon/interiors/rock_tunnel.json"};
 
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */

@@ -1,0 +1,74 @@
+{
+ "parent": "block/block",
+ "ambientocclusion": true,
+ "textures": {
+  "rock": "retromon:block/area/rt_smash",
+  "particle": "retromon:block/area/rt_smash"
+ },
+ "elements": [
+  {
+   "from": [
+    2,
+    0,
+    2
+   ],
+   "to": [
+    14,
+    4,
+    14
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rock"
+    },
+    "south": {
+     "texture": "#rock"
+    },
+    "east": {
+     "texture": "#rock"
+    },
+    "west": {
+     "texture": "#rock"
+    },
+    "up": {
+     "texture": "#rock"
+    },
+    "down": {
+     "texture": "#rock"
+    }
+   }
+  },
+  {
+   "from": [
+    4,
+    4,
+    4
+   ],
+   "to": [
+    11,
+    6,
+    11
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rock"
+    },
+    "south": {
+     "texture": "#rock"
+    },
+    "east": {
+     "texture": "#rock"
+    },
+    "west": {
+     "texture": "#rock"
+    },
+    "up": {
+     "texture": "#rock"
+    },
+    "down": {
+     "texture": "#rock"
+    }
+   }
+  }
+ ]
+}

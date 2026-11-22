@@ -105,6 +105,12 @@ DOORS = {
     "bike_shop": {"room": "bike_shop", "door": [[-374, 35, 279], [-373, 35, 279]], "out": [-373.0, 35.0, 281.4]},
     "cerulean_house1": {"room": "cerulean_house1", "door": [[-381, 35, 246], [-380, 35, 246]], "out": [-380.0, 35.0, 248.4]},
     "cerulean_house2": {"room": "cerulean_house2", "door": [[-338, 35, 246], [-337, 35, 246]], "out": [-337.0, 35.0, 248.4]},
+    # (17:42) The two top houses' back ways (FireRed's): in from the path behind (walking south into the back wall),
+    # out onto it (facing north).
+    "cerulean_house1_back": {"room": "cerulean_house1", "door": [[-381, 34, 242], [-380, 34, 242]], "out": [-380.0, 34.0, 240.2], "face": "n", "yaw": 180.0,
+                             "in": {"x": 10.3, "z": 1.6, "yaw": 0.0}},
+    "cerulean_house2_back": {"room": "cerulean_house2", "door": [[-334, 34, 242], [-333, 34, 242]], "out": [-333.0, 34.0, 240.2], "face": "n", "yaw": 180.0,
+                             "in": {"x": 10.3, "z": 1.6, "yaw": 0.0}},
     "cerulean_house3": {"room": "cerulean_house3", "door": [[-375, 35, 261], [-374, 35, 261]], "out": [-374.0, 35.0, 263.4]},
     "cerulean_house4": {"room": "cerulean_house4", "door": [[-358, 35, 279], [-357, 35, 279]], "out": [-357.0, 35.0, 281.4]},
     "daycare": {"room": "daycare", "door": [[-354, 38, 331], [-353, 38, 331]], "out": [-353.0, 38.0, 333.4]},
@@ -154,7 +160,8 @@ MONS = {"power_plant": [{"key": "zapdos", "species": "zapdos", "x": 5.6, "z": 4.
         ("electrode_power_plant_2", 21.5, 12.0), ("power_plant_voltorb_6", 37.5, 32.5))]}
 BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
-NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n"}
+NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n", "cerulean_house1": "cerulean_house1_back",
+              "cerulean_house2": "cerulean_house2_back"}
 # Ways out through the side walls (a sideways gate's), by room and wall.
 SIDE_DOOR = {("gate_johto", "e"): "johto_e"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).

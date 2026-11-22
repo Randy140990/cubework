@@ -16,7 +16,7 @@
   reg("ugTop", 16, 16, (P, r) => { P.fill(hx("#D7DADF"), 0.03, r); P.rect(0, 0, 16, 1, hx("#F0F2F5")); P.rect(0, 15, 16, 1, hx("#AEB3BA")); });
   reg("ugSign", 64, 16, (P, r) => {
     P.fill(hx("#2F4A6E"), 0.02, r); P.rect(0, 0, 64, 1, hx("#6E8DB4")); P.rect(0, 15, 64, 1, hx("#1E3048"));
-    P.text("UNDERGROUND PATH", 2, 5, hx("#F6F1E2"));
+    P.text("UNDERGROUND PATH", 1, 5, hx("#F6F1E2"));
   }, { fit: true });
   // ----- the tunnels: a long floor in bands (FireRed's: tan, then blue, then red, then tan again), grey tiled walls, lamps -----
   const lane = (base, lt, dk) => (P, r) => { P.fill(hx(base), 0.03, r); for (let y = 0; y < 16; y += 4) { P.rect(0, y, 16, 1, hx(lt)); P.rect(0, y + 3, 16, 1, hx(dk)); } };
@@ -34,25 +34,35 @@
   // A flight of stairs up along x (8 steps of half a block over 4 blocks), climbing east or west, its banister along
   // one side (north or south; the other side against a wall), taking you up to o.to. (The mod's stairs run along x.)
   function ugFlight(R, x0, z0, depth, climb, railSide, o) {
+    // (17:51) The flight runs right up to the end wall (its top step against it, so there's nothing to drop off), its
+    // banister along the open side: steel posts at every other step, a steel handrail and a mid rail, tinted glass
+    // between, the rail as high as you can't jump over.
     const G = R.geo, n = 8, sw = 0.5;
     for (let i = 0; i < n; i++) {
       const xa = climb === "e" ? x0 + i * sw : x0 + 4 - (i + 1) * sw, xb = xa + sw, h = (i + 1) * 0.5;
       G.box(xa, 0, z0, xb, h, z0 + depth, { top: "ugTread", all: "ugTrim", bottom: null });
+      G.box(xa, h - 0.06, z0, xb, h, z0 + 0.08, "steel");
     }
-    const rz = railSide === "n" ? z0 : z0 + depth;
+    const rz = railSide === "n" ? z0 : z0 + depth, sgn = railSide === "n" ? 1 : -1;
+    const hAt = (x) => { const k = climb === "e" ? x - x0 : x0 + 4 - x; return Math.max(0.5, Math.min(4, Math.ceil(k / sw - 0.01) * 0.5)); };
+    for (let i = 0; i <= n; i += 2) {
+      const x = Math.min(x0 + 4 - 0.12, x0 + i * sw), y = hAt(x + 0.06);
+      G.box(x, 0, rz - 0.07, x + 0.12, y + 1.05, rz + 0.07, "steel");
+    }
     for (let i = 0; i < n; i++) {
-      const xa = climb === "e" ? x0 + i * sw : x0 + 4 - (i + 1) * sw, y = (i + 1) * 0.5;
-      G.box(xa + 0.2, y, rz - 0.04, xa + 0.28, y + 0.95, rz + 0.04, "steel");
-      G.box(xa, y + 0.9, rz - 0.06, xa + sw, y + 1.02, rz + 0.06, "steel");
+      const xa = x0 + i * sw, y = hAt(xa + sw / 2);
+      G.box(xa, y + 0.98, rz - 0.08, xa + sw, y + 1.08, rz + 0.08, "steel");
+      G.box(xa, y + 0.45, rz - 0.04, xa + sw, y + 0.5, rz + 0.04, "steel");
+      G.box(xa, y + 0.08, rz - 0.015, xa + sw, y + 0.95, rz + 0.015, { all: "glass" });
     }
-    R.rail(x0 + 0.1, rz - 0.15, x0 + 4, rz + 0.15, R.H + 1);
+    R.rail(x0, rz - 0.15, x0 + 4, rz + 0.15, R.H + 1);
     R.ramps.push({ rect: [x0, z0, x0 + 4, z0 + depth], h: (x) => {
       const k = climb === "e" ? x - x0 : x0 + 4 - x;
       return Math.max(0, Math.min(4, Math.ceil(k / sw - 0.35) * 0.5));
     } });
     R.warps.push({ test: p => p.y >= 1.45 && p.x > x0 - 0.2 && p.x < x0 + 4.2 && p.z > z0 - 0.5 && p.z < z0 + depth + 0.5, to: o.to, spawn: o.spawn, fx: "fade", why: "up" });
     (R._stairs || (R._stairs = [])).push({ dir: "up", x0, z0, depth, to: o.to, spawn: o.spawn });
-    R.item("Stairs up", "Steel treads up to the entrance, a steel rail along the open side.");
+    R.item("Stairs up", "Steel-edged treads up to the end wall, a banister along the open side: steel posts, a handrail and a mid rail, tinted glass between.");
   }
 
   // A low counter in a bracket, as FireRed's (a back and two arms), open toward the middle of the room.
@@ -66,13 +76,17 @@
 
   // An Underground Path entrance (all four the same): the mat at the south, a bracket of counter either side, the
   // stairs down in the middle, a plant in every corner, the sign over the stairs, someone waiting.
-  const UG_UP = { x: 9.6, z: 3.8, yaw: FACE.s };
+  const UG_UP = { x: 9.8, z: 3.3, yaw: FACE.e };
   function ugEntrance(R, o) {
-    shell(R, { paper: "ugWall", floor: "ugFloor", door: [6, 8], entry: true, skirt: "ugTrim", ledge: "ugPanel", ledgeTop: "ugTop" });
+    // (17:51) The floor left open over the stairwell (x 5 to 9, z 2.2 to 4.4), so the stairs show going down.
+    shell(R, { paper: "ugWall", floor: "ugFloor", door: [6, 8], entry: true, skirt: "ugTrim", ledge: "ugPanel", ledgeTop: "ugTop",
+      floorRects: [[0, 0, 14, 2.2], [0, 4.4, 14, 10], [0, 2.2, 5, 4.4], [9, 2.2, 14, 4.4], [5, 10, 9, 12]] });
     band(R, 0.24, "ugPanel", 1.0); band(R, 1.24, "ugTrim", 0.08);
     ugBracket(R, 1.2, 2.4, 3.6, 6.8, "e");
     ugBracket(R, 10.4, 2.4, 12.8, 6.8, "w");
-    stairsDown(R, 5.0, 2.2, 2.2, { to: o.down, spawn: o.downSpawn, paper: "ugCorWall" });
+    stairsDown(R, 5.0, 2.2, 2.2, { to: o.down, spawn: o.downSpawn, paper: "ugCorWall", show: true });
+    sideRail(R, 5.0, 9.0, 2.2, "n");
+    R.rail(5.0, 2.0, 9.0, 2.35, 3.2);
     framed(R, 5.0, 2.3, 4.0, 1.0, "ugSign", "n", { act: { label: "Read", lines: ["UNDERGROUND PATH", o.sign] } });
     for (const [x, z] of [[0.8, 0.8], [13.2, 0.8], [0.8, 9.2], [13.2, 9.2]]) plant(R, x, z, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
     const G = R.geo;
@@ -112,28 +126,28 @@
     ug_r5() {
       // Route 5's (north of SAFFRON): FireRed's TRADER waits by the stairs, after a NIDORAN♂.
       const R = new Room("ug_r5", { name: "Underground Path", floor: "Route 5 entrance", W: 14, D: 12 });
-      ugEntrance(R, { down: "ug_ns", downSpawn: { x: 0.8, z: 3.0, yaw: FACE.s }, sign: "This way to ROUTE 6 (VERMILION CITY).",
+      ugEntrance(R, { down: "ug_ns", downSpawn: { x: 1.6, z: 2.8, yaw: FACE.s }, sign: "This way to ROUTE 6 (VERMILION CITY).",
         person: { name: "Trader", key: "underground_path_trader", x: 7.0, z: 6.2, yaw: FACE.s, look: { skin: "middle_aged_man" },
           talk: () => [{ text: "I'm looking for NIDORAN♂! Wanna trade one for NIDORAN♀?" }, { text: "(In the game: trade him a NIDORAN♂ and you get MS. NIDO.)" }] } });
       return R;
     },
     ug_r6() {
       const R = new Room("ug_r6", { name: "Underground Path", floor: "Route 6 entrance", W: 14, D: 12 });
-      ugEntrance(R, { down: "ug_ns", downSpawn: { x: 0.8, z: NS_D - 3.0, yaw: FACE.n }, sign: "This way to ROUTE 5 (CERULEAN CITY).",
+      ugEntrance(R, { down: "ug_ns", downSpawn: { x: 1.6, z: NS_D - 2.8, yaw: FACE.n }, sign: "This way to ROUTE 5 (CERULEAN CITY).",
         person: { name: "Girl", key: "underground_path_route_6_p0", x: 4.6, z: 8.0, yaw: FACE.e, look: { skin: "girl" },
           talk: () => [{ text: "People often lose things in that UNDERGROUND PATH." }] } });
       return R;
     },
     ug_r7() {
       const R = new Room("ug_r7", { name: "Underground Path", floor: "Route 7 entrance", W: 14, D: 12 });
-      ugEntrance(R, { down: "ug_ew", downSpawn: { x: 6.0, z: 1.0, yaw: FACE.e }, sign: "This way to ROUTE 8 (LAVENDER TOWN).",
+      ugEntrance(R, { down: "ug_ew", downSpawn: { x: 5.2, z: 1.0, yaw: FACE.e }, sign: "This way to ROUTE 8 (LAVENDER TOWN).",
         person: { name: "Man", key: "underground_path_route_7_p0", x: 9.4, z: 8.0, yaw: FACE.w, look: { skin: "middle_aged_man" },
           talk: () => [{ text: "I heard a sleepy POKéMON appeared near CELADON CITY." }] } });
       return R;
     },
     ug_r8() {
       const R = new Room("ug_r8", { name: "Underground Path", floor: "Route 8 entrance", W: 14, D: 12 });
-      ugEntrance(R, { down: "ug_ew", downSpawn: { x: EW_W - 6.0, z: 1.0, yaw: FACE.w }, sign: "This way to ROUTE 7 (CELADON CITY).",
+      ugEntrance(R, { down: "ug_ew", downSpawn: { x: EW_W - 5.2, z: 1.0, yaw: FACE.w }, sign: "This way to ROUTE 7 (CELADON CITY).",
         person: { name: "Girl", key: "underground_path_route_8_p0", x: 4.6, z: 8.0, yaw: FACE.e, look: { skin: "girl" },
           talk: () => [{ text: "The dept. store in CELADON has a great selection!" }] } });
       return R;
@@ -142,18 +156,18 @@
       // ROUTE 5 to ROUTE 6, under SAFFRON CITY: stairs up at the north (to Route 5's entrance) and the south (Route 6's).
       const R = new Room("ug_ns", { name: "Underground Path", floor: "North to south", W: 7, D: NS_D, H: 4 });
       ugTunnel(R, "z");
-      ugFlight(R, 1.6, 0, 2, "e", "s", { to: "ug_r5", spawn: UG_UP });
-      ugFlight(R, 1.6, NS_D - 2, 2, "e", "n", { to: "ug_r6", spawn: UG_UP });
-      R.spawn = { x: 0.8, z: 3.0, yaw: FACE.s };
+      ugFlight(R, 3, 0, 2, "e", "s", { to: "ug_r5", spawn: UG_UP });
+      ugFlight(R, 3, NS_D - 2, 2, "e", "n", { to: "ug_r6", spawn: UG_UP });
+      R.spawn = { x: 1.6, z: 2.8, yaw: FACE.s };
       return R;
     },
     ug_ew() {
       // ROUTE 7 to ROUTE 8: stairs up at the west (to Route 7's entrance) and the east (Route 8's), along the north wall.
       const R = new Room("ug_ew", { name: "Underground Path", floor: "West to east", W: EW_W, D: 7, H: 4 });
       ugTunnel(R, "x");
-      ugFlight(R, 1, 0, 2, "w", "s", { to: "ug_r7", spawn: UG_UP });
-      ugFlight(R, EW_W - 5, 0, 2, "e", "s", { to: "ug_r8", spawn: UG_UP });
-      R.spawn = { x: 6.0, z: 1.0, yaw: FACE.e };
+      ugFlight(R, 0, 0, 2, "w", "s", { to: "ug_r7", spawn: UG_UP });
+      ugFlight(R, EW_W - 4, 0, 2, "e", "s", { to: "ug_r8", spawn: UG_UP });
+      R.spawn = { x: 5.2, z: 1.0, yaw: FACE.e };
       return R;
     },
   });
@@ -325,7 +339,9 @@
       // The badge house (FireRed's top-left house): the man who knows what every badge does, his badge case on the wall.
       const R = new Room("cerulean_house1", { name: "Cerulean house", floor: "The badge house", W: 12, D: 11 });
       plainHouse(R, { paper: "paperCerulean", rug: "rugBlue", window: CERULEAN_WINDOW, cupboard: ["A cupboard. Inside: a polishing cloth and a little tin of badge polish."] });
-      framed(R, 8.4, 1.8, 3.0, 0.75, "badgeCase", "n", { act: { label: "Look", lines: ["A badge case: eight places, each badge drawn in its colour."] } });
+      framed(R, 2.4, 1.8, 3.0, 0.75, "badgeCase", "w", { act: { label: "Look", lines: ["A badge case: eight places, each badge drawn in its colour."] } });
+      // (17:42) FireRed's back door, out to the path behind.
+      passageN(R, 9.4, 11.2, { to: "town", mat: "matHouseV" });
       R.npcs.push({ name: "Man", key: "cerulean_badge_house_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "middle_aged_man" },
         talk: () => [{ text: "POKéMON BADGEs are owned only by skilled trainers." }, { text: "I see you have at least one. Those BADGEs have amazing secrets!" }] });
       return R;
@@ -336,10 +352,11 @@
       const R = new Room("cerulean_house2", { name: "Cerulean house", floor: "The robbed house", W: 12, D: 11 });
       plainHouse(R, { paper: "paperCerulean", rug: "rugSalmon", window: CERULEAN_WINDOW, cupboard: ["A cupboard, its doors hanging open. Whatever was inside is gone."] });
       const G = R.geo;
-      G.box(9.4, 0, -0.02, 11.2, 1.9, 0.02, { s: "deep", all: null });
-      G.box(9.6, 0, 0.0, 11.0, 1.7, 0.03, { s: "windowExt", all: null });
-      for (const [x, z, w] of [[2.4, 7.6, 0.5], [5.2, 8.2, 0.4], [9.2, 6.8, 0.6], [7.6, 2.0, 0.45]]) G.box(x, 0, z, x + w, 0.02, z + w * 0.7, { top: "paperSchool", all: null });
-      R.act([9.2, 0, 11.4, 1.2], { label: "Look", lines: ["TEAM ROCKET left through here. There's a hole in the wall!"] });
+      // (17:42) The hole TEAM ROCKET made: a way out the back (FireRed's), broken bricks round it.
+      passageN(R, 9.4, 11.2, { to: "town", mat: "matHouseV", frame: "cap", opening: "deep" });
+      for (const [x, z, w] of [[8.9, 0.3, 0.4], [11.4, 0.4, 0.35], [9.0, 2.2, 0.3], [11.0, 2.4, 0.25]]) G.box(x, 0, z, x + w, w * 0.6, z + w * 0.8, "stone");
+      for (const [x, z, w] of [[2.4, 7.6, 0.5], [5.2, 8.2, 0.4], [8.2, 6.8, 0.6], [7.6, 3.0, 0.45]]) G.box(x, 0, z, x + w, 0.02, z + w * 0.7, { top: "paperSchool", all: null });
+      R.act([8.4, 0, 9.4, 1.2], { label: "Look", lines: ["TEAM ROCKET left through here. There's a hole in the wall!"] });
       R.npcs.push({ name: "Fishing guru", key: "cerulean_trashed_house_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "fishing_guru" },
         talk: () => [{ text: "Those miserable ROCKETs! Look what they did here!" }, { text: "They stole a TM for teaching POKéMON how to DIG holes! That cost me a bundle, it did!" }] });
       R.npcs.push({ name: "Girl", key: "cerulean_trashed_house_p1", x: 2.6, z: 7.6, yaw: FACE.e, look: { skin: "girl" }, talk: () => [{ text: "TEAM ROCKET must be trying to DIG their way into no good!" }] });
