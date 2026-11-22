@@ -71,3 +71,152 @@
     BUILD[id] = () => caveRoom48(id);
   }
 })();
+
+// ---------- Vermilion City (17:51): FireRed's insides, HeartGold's colours ----------
+// The FISHING GURU's house (the OLD ROD), the POKéMON FAN CLUB (its CHAIRMAN and the BIKE VOUCHER), the trade house
+// (ELYSSA: a SPEAROW for her FARFETCH'D, CH'DING), the PIDGEY letter house, and LT. SURGE's GYM: fifteen trash cans,
+// two switches under them (the second next to the first), and the electric door to him.
+TEXDEF.vermWall = [16, 16, (P, r) => { P.fill(hx("#F1E4CC"), 0.025, r); for (let x = 0; x < 16; x += 8) P.rect(x, 0, 1, 16, hx("#E2D0B0")); }];
+MATDEF.vermWall = { tex: "vermWall" };
+TEXDEF.vermBoards = [16, 16, (P, r) => { P.fill(hx("#C98F5A"), 0.05, r); for (let y = 0; y < 16; y += 4) { P.rect(0, y, 16, 1, hx("#DDA672")); P.rect(0, y + 3, 16, 1, hx("#9C6A3E")); } }];
+MATDEF.vermBoards = { tex: "vermBoards" };
+TEXDEF.clubCarpet = [16, 16, (P, r) => { P.fill(hx("#B4384A"), 0.03, r); P.rect(0, 0, 16, 1, hx("#D8B04A")); P.rect(0, 15, 16, 1, hx("#D8B04A")); P.rect(0, 0, 1, 16, hx("#D8B04A")); P.rect(15, 0, 1, 16, hx("#D8B04A"));
+  for (let i = 3; i < 13; i += 4) for (let j = 3; j < 13; j += 4) P.rect(i, j, 2, 2, hx("#C8566A")); }];
+MATDEF.clubCarpet = { tex: "clubCarpet" };
+TEXDEF.clubWall = [16, 16, (P, r) => { P.fill(hx("#E9D9B4"), 0.02, r); for (let x = 0; x < 16; x += 4) P.rect(x, 0, 1, 16, hx("#D9C394")); }];
+MATDEF.clubWall = { tex: "clubWall" };
+TEXDEF.monPortrait = [16, 16, (P, r) => { P.fill(hx("#8E6A2E"), 0, r); P.rect(1, 1, 14, 14, hx("#BFE0F2")); P.rect(1, 10, 14, 5, hx("#7DBF5A"));
+  P.rect(5, 5, 6, 6, hx("#F2A6B8")); P.rect(6, 3, 1, 2, hx("#F2A6B8")); P.rect(9, 3, 1, 2, hx("#F2A6B8")); P.rect(6, 7, 1, 1, hx("#2A2A2A")); P.rect(9, 7, 1, 1, hx("#2A2A2A")); }];
+MATDEF.monPortrait = { tex: "monPortrait" };
+// LT. SURGE's GYM: dark blue steel plates with yellow hazard lines, grey steel walls, the cans in brushed metal.
+TEXDEF.surgeFloor = [16, 16, (P, r) => { P.fill(hx("#3C4C6A"), 0.04, r); P.rect(0, 0, 16, 1, hx("#56698C")); P.rect(0, 0, 1, 16, hx("#56698C")); P.rect(15, 0, 1, 16, hx("#28344A")); P.rect(0, 15, 16, 1, hx("#28344A"));
+  for (const [x, y] of [[2, 2], [13, 2], [2, 13], [13, 13]]) P.rect(x, y, 1, 1, hx("#8A9CC0")); }];
+MATDEF.surgeFloor = { tex: "surgeFloor" };
+TEXDEF.surgeHazard = [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, ((x + y) >> 2) % 2 ? hx("#2A2A2E") : hx("#F2C230")); }];
+MATDEF.surgeHazard = { tex: "surgeHazard" };
+TEXDEF.surgeWall = [16, 16, (P, r) => { P.fill(hx("#8F99A6"), 0.03, r); P.rect(0, 7, 16, 1, hx("#6C7582")); P.rect(0, 8, 16, 1, hx("#B4BDC8")); for (const x of [3, 12]) { P.rect(x, 2, 1, 1, hx("#D5DCE4")); P.rect(x, 12, 1, 1, hx("#D5DCE4")); } }];
+MATDEF.surgeWall = { tex: "surgeWall" };
+TEXDEF.trashCan = [16, 16, (P, r) => { P.fill(hx("#A7B1B8"), 0.03, r); for (let x = 1; x < 16; x += 3) P.rect(x, 0, 1, 16, hx("#7E878E")); P.rect(0, 0, 16, 2, hx("#C9D1D6")); }];
+MATDEF.trashCan = { tex: "trashCan" };
+TEXDEF.trashLid = [16, 16, (P, r) => { P.fill(hx("#8C969D"), 0.03, r); P.rect(6, 6, 4, 4, hx("#C9D1D6")); P.rect(0, 0, 16, 1, hx("#B4BDC4")); P.rect(0, 15, 16, 1, hx("#636B71")); }];
+MATDEF.trashLid = { tex: "trashLid" };
+// (The electric door is real blocks in the game, put there or taken away for you: in the viewer, its bolts.)
+TEXDEF.surgeBarrierView = [16, 16, (P, r) => { P.fill(hx("#223A5A"), 0, r); const zz = [3, 6, 4, 8, 6, 10, 8, 12, 10, 13];
+  for (let i = 0; i < 10; i++) { P.rect(zz[i] - 1, i + 3, 3, 1, hx("#FFE36A")); } for (let y = 0; y < 16; y += 5) P.rect(0, y, 16, 1, hx("#6FD8FF")); }];
+MATDEF.surgeBarrierView = { tex: "surgeBarrierView", emissive: true };
+
+(() => {
+  const place = (id, name, floor) => PLACES.push({ id, name, floor, group: "Vermilion City" });
+  place("vermilion_gym", "Vermilion Gym", "Vermilion City");
+  place("pokemon_fan_club", "Pokémon Fan Club", "Vermilion City");
+  place("vermilion_old_rod_house", "Vermilion house", "The Fishing Guru");
+  place("vermilion_trade_house", "Vermilion house", "The trade house");
+  place("vermilion_pidgey_house", "Vermilion house", "The Pidgey letter");
+  const WINDOW = ["Outside: VERMILION CITY's harbor, gulls over the water."];
+
+  Object.assign(BUILD, {
+    vermilion_old_rod_house() {
+      const R = new Room("vermilion_old_rod_house", { name: "Vermilion house", floor: "The Fishing Guru", W: 12, D: 11 });
+      plainHouse(R, { paper: "vermWall", rug: "rugBlue", window: WINDOW, cupboard: ["A cupboard. Inside: fishing line, floats and a box of lures."] });
+      const G = R.geo;
+      // His rods on the wall, a fish in a case.
+      for (const x of [1.0, 1.5, 2.0]) G.box(x, 0.2, 0.12, x + 0.06, 2.4, 0.2, "walnut");
+      R.act([0.6, 0, 2.6, 1.0], { label: "Look", lines: ["Fishing rods, from his first to his best."] });
+      G.box(9.4, 1.4, 0.1, 11.4, 2.2, 0.3, { all: "walnut", s: "tankGlass" });
+      R.act([9.2, 0, 11.6, 1.0], { label: "Look", lines: ["A MAGIKARP in a case: \"My first catch!\""] });
+      R.npcs.push({ name: "Fishing Guru", key: "vermilion_old_rod_house_p0", x: 2.6, z: 4.4, yaw: FACE.e, look: { skin: "fishing_guru" },
+        talk: () => [{ text: "I'm the FISHING GURU! I simply Looove fishing! Do you like to fish?" }, { text: "(In the game: YES, and he gives you the OLD ROD.)" }] });
+      return R;
+    },
+    vermilion_trade_house() {
+      const R = new Room("vermilion_trade_house", { name: "Vermilion house", floor: "The trade house", W: 12, D: 11 });
+      plainHouse(R, { paper: "vermWall", rug: "rugSalmon", window: WINDOW, cupboard: ["A cupboard. Inside: a bundle of leeks, for FARFETCH'D."] });
+      R.npcs.push({ name: "Elyssa", key: "vermilion_trader", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "cooltrainer_f" },
+        talk: () => [{ text: "Hi! Do you have a SPEAROW? Want to trade it for my FARFETCH'D?" }, { text: "(In the game: trade a SPEAROW and her FARFETCH'D comes named CH'DING.)" }] });
+      return R;
+    },
+    vermilion_pidgey_house() {
+      const R = new Room("vermilion_pidgey_house", { name: "Vermilion house", floor: "The Pidgey letter", W: 12, D: 11 });
+      plainHouse(R, { paper: "vermWall", rug: "rugGreen", window: WINDOW, cupboard: ["A cupboard. Inside: writing paper and envelopes."] });
+      const G = R.geo;
+      G.box(5.6, 0.86, 4.0, 6.2, 0.88, 4.5, { top: "paperSchool", all: null });
+      R.act([5.0, 3.6, 6.8, 4.9], { label: "Read", lines: ["Dear PIPPI, I hope to see you soon.", "I heard SAFFRON has problems with TEAM ROCKET.", "VERMILION appears to be safe."] });
+      R.npcs.push({ name: "Boy", key: "vermilion_pidgey_house_p0", x: 9.4, z: 3.6, yaw: FACE.w, look: { skin: "youngster" },
+        talk: () => [{ text: "I'm getting my PIDGEY to fly a letter to SAFFRON in the north!" }] });
+      R.pets = [{ sid: "pidgey", x: 8.2, z: 5.6, yaw: 270 }];
+      R.act([7.2, 4.6, 9.2, 6.6], { label: "Look", lines: ["PIDGEY: Kurukkoo!"] });
+      return R;
+    },
+    pokemon_fan_club() {
+      // The POKéMON FAN CLUB: a warm club room, a red carpet with a gold border, portraits of the members' POKéMON,
+      // armchairs, the CHAIRMAN at the top and his receptionist, CLEFAIRY and SEEL with their trainers.
+      const R = new Room("pokemon_fan_club", { name: "Pokémon Fan Club", floor: "Vermilion City", W: 14, D: 12 });
+      shell(R, { paper: "clubWall", floor: "vermBoards", door: [6, 8], entry: true, skirt: "walnut", ledge: "walnut" });
+      band(R, 1.0, "walnut", 0.12);
+      const G = R.geo;
+      G.box(2.0, 0, 2.6, 12.0, 0.03, 9.4, { top: "clubCarpet", all: "cap", bottom: null });
+      for (const x of [1.4, 4.4, 9.0, 12.0]) { G.box(x, 1.5, 0.1, x + 0.9, 2.4, 0.16, "monPortrait"); }
+      R.act([1.0, 0, 13.0, 0.9], { label: "Look", lines: ["Portraits of the club's POKéMON: CLEFAIRY, SEEL, PIKACHU, a RAPIDASH..."] });
+      for (const [x, z, f] of [[3.0, 4.6, "e"], [3.0, 6.8, "e"], [11.0, 4.6, "w"], [11.0, 6.8, "w"]]) armchair(R, x, z, f, "redFabric");
+      table(R, 6.0, 5.0, 8.0, 6.6, { top: "walnut", leg: "walnut", h: 0.6, name: "Table", note: "A low walnut table with a club newsletter on it." });
+      plant(R, 0.8, 10.6, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+      plant(R, 13.2, 10.6, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+      R.npcs.push({ name: "Chairman", key: "pokemon_fan_club_p4", x: 7.0, z: 1.8, yaw: FACE.s, look: { skin: "gentleman" },
+        talk: () => [{ text: "I chair the POKéMON FAN CLUB! ... Did you come visit to hear about my POKéMON?" }, { text: "(In the game: YES, hear him out, and he gives you the BIKE VOUCHER.)" }] });
+      R.npcs.push({ name: "Receptionist", key: "pokemon_fan_club_p5", x: 10.4, z: 1.8, yaw: FACE.s, look: { skin: "link_receptionist" },
+        talk: () => [{ text: "Our CHAIRMAN is very vocal about POKéMON." }] });
+      R.npcs.push({ name: "Fan", key: "pokemon_fan_club_p0", x: 11.6, z: 8.6, yaw: FACE.w, look: { skin: "fisher" },
+        talk: () => [{ text: "Won't you admire my CLEFAIRY's adorable tail?" }] });
+      R.npcs.push({ name: "Girl", key: "pokemon_fan_club_p1", x: 2.4, z: 8.6, yaw: FACE.e, look: { skin: "girl" },
+        talk: () => [{ text: "I just love my SEEL! It squeals when I hug it!" }] });
+      R.pets = [{ sid: "clefairy", x: 10.4, z: 8.6, yaw: 90 }, { sid: "seel", x: 3.6, z: 8.6, yaw: 270 }];
+      doormat(R, 6, 8, { to: "town", mat: "matHouseV" });
+      R.spawn = { x: 7.0, z: R.D - 1.5, yaw: FACE.n };
+      return R;
+    },
+    vermilion_gym() {
+      // LT. SURGE's GYM (FireRed's): his stage at the top behind a steel wall, its electric door shut till you've
+      // found both switches; fifteen trash cans in three rows, the trainers about them.
+      const W = 14, D = 22;
+      const R = new Room("vermilion_gym", { name: "Vermilion Gym", floor: "Vermilion City", W, D, H: 5 });
+      shell(R, { paper: "surgeWall", floor: "surgeFloor", door: [6, 8], entry: true, skirt: "surgeHazard", ledge: "steel" });
+      band(R, 0.3, "surgeHazard", 0.2); band(R, 1.4, "steel", 0.08);
+      const G = R.geo;
+      // The wall across, its electric door in the middle (x 6 to 8).
+      for (const [x0, x1] of [[0, 6], [8, W]]) { G.box(x0, 0, 6.0, x1, 2.4, 6.8, { all: "surgeWall", top: "steel" }); R.solid(x0, 6.0, x1, 6.8); }
+      G.box(5.7, 0, 5.9, 6.0, 2.6, 6.9, "surgeHazard"); G.box(8.0, 0, 5.9, 8.3, 2.6, 6.9, "surgeHazard");
+      G.box(6.0, 0, 6.3, 8.0, 2.0, 6.5, { all: "surgeBarrierView", top: null, bottom: null });
+      R.act([5.6, 6.6, 8.4, 7.6], { label: "Look", lines: ["An electric door. It's locked: two switches open it."] });
+      // His stage.
+      G.box(5.0, 0, 1.4, 9.0, 0.12, 3.6, { top: "surgeHazard", all: "steel", bottom: null });
+      // Generators along the top wall.
+      for (const x of [0.6, 11.4]) { G.box(x, 0, 0.3, x + 2.0, 2.2, 1.6, { all: "steel", s: "surgeHazard" }); R.solid(x, 0.3, x + 2.0, 1.6); }
+      R.act([0.4, 0.2, 2.8, 2.0], { label: "Look", lines: ["A generator, humming."] }); R.act([11.2, 0.2, 13.6, 2.0], { label: "Look", lines: ["A generator, humming."] });
+      // The cans: 5 across, 3 rows (in the game, each one's looked in; the switches are under two of them).
+      let i = 0;
+      for (const z of [9.0, 12.0, 15.0]) for (const x of [1.6, 4.3, 7.0, 9.7, 12.4]) {
+        G.box(x - 0.42, 0, z - 0.42, x + 0.42, 0.95, z + 0.42, { all: "trashCan", top: "trashLid" });
+        G.box(x - 0.46, 0.95, z - 0.46, x + 0.46, 1.05, z + 0.46, { all: "trashLid" });
+        R.solid(x - 0.45, z - 0.45, x + 0.45, z + 0.45);
+        R.act([x - 0.8, z - 0.8, x + 0.8, z + 0.8], { label: "Look", use: "can:" + i, lines: ["Nope! There's only trash here.", "(In the game: two of the cans hide LT.SURGE's switches, the second right next to the first.)"] });
+        i++;
+      }
+      gymStatue(R, 3.6, 19.4, ["VERMILION CITY POKéMON GYM", "LEADER: LT.SURGE", "WINNING TRAINERS: {rival}"]);
+      gymStatue(R, 10.4, 19.4, ["VERMILION CITY POKéMON GYM", "LEADER: LT.SURGE", "WINNING TRAINERS: {rival}"]);
+      R.npcs.push({ name: "Leader Lt. Surge", key: "vermilion_gym_0", role: "leader", x: 7.0, z: 2.4, y: 0.12, yaw: FACE.s, look: { skin: "leader_lt_surge" },
+        talk: () => [{ text: "Hey, kid! What do you think you're doing here?" }] });
+      R.npcs.push({ name: "Gentleman Tucker", key: "vermilion_gym_1", role: "trainer", x: 12.6, z: 10.5, yaw: FACE.w, look: { skin: "gentleman" },
+        talk: () => [{ text: "I'm a lightweight, but I'm good with electricity!" }] });
+      R.npcs.push({ name: "Engineer Baily", key: "vermilion_gym_2", role: "trainer", x: 1.4, z: 13.5, yaw: FACE.e, look: { skin: "super_nerd" },
+        talk: () => [{ text: "This is no place for kids!" }] });
+      R.npcs.push({ name: "Sailor Dwayne", key: "vermilion_gym_3", role: "trainer", x: 7.0, z: 8.0, yaw: FACE.s, look: { skin: "sailor" },
+        talk: () => [{ text: "This is no place for kids!" }] });
+      R.npcs.push({ name: "Gym Guide", key: "vermilion_gym_p0", x: 9.6, z: 19.6, yaw: FACE.s, look: { skin: "gym_guide" },
+        talk: () => [{ text: "Yo! Champ in making! LT.SURGE has a nickname. People refer to him as the Lightning American!" }] });
+      doormat(R, 6, 8, { to: "town", mat: "matHouseV" });
+      R.spawn = { x: 7.0, z: D - 1.5, yaw: FACE.n };
+      R.item("Electric door", "In the game it's real blocks, put there or taken away for you: look in the cans for the two switches and it opens.");
+      return R;
+    },
+  });
+})();

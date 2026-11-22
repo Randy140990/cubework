@@ -14,7 +14,7 @@ import base64, io, json, math, os, re, sys
 from PIL import Image
 
 EPS = 1e-6
-SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob", "poolWaterView", "poolBottomView", "poolQuartzView"}
+SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob", "poolWaterView", "poolBottomView", "poolQuartzView", "surgeBarrierView"}
 # Rooms with real blocks of their own laid after their props (Cerulean Gym's pool: tools/cerulean_pool.py), and from how far down.
 SCHEM = {"cerulean_gym": ("cerulean_gym_pool.bin", -6)}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
@@ -29,7 +29,10 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "ug_r5": (2112, 64, 0), "ug_r6": (2176, 64, 0), "ug_r7": (2240, 64, 0), "ug_r8": (2304, 64, 0), "ug_ns": (2368, 64, 0), "ug_ew": (2432, 64, 0),
           "cerulean_gym": (2560, 64, 0), "bike_shop": (2624, 64, 0), "cerulean_house1": (2688, 64, 0), "cerulean_house2": (2752, 64, 0),
           "cerulean_house3": (2816, 64, 0), "cerulean_house4": (2880, 64, 0), "daycare": (2944, 64, 0), "bills_house": (3008, 64, 0),
-          "power_plant": (3072, 64, 0)}
+          "power_plant": (3072, 64, 0),
+          # Vermilion City (17:51).
+          "vermilion_gym": (3200, 64, 0), "pokemon_fan_club": (3264, 64, 0), "vermilion_old_rod_house": (3328, 64, 0),
+          "vermilion_trade_house": (3392, 64, 0), "vermilion_pidgey_house": (3456, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -41,7 +44,9 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "ug_r5": "underground_path_route_5", "ug_r6": "underground_path_route_6", "ug_r7": "underground_path_route_7", "ug_r8": "underground_path_route_8",
          "ug_ns": "underground_path_ns", "ug_ew": "underground_path_we", "cerulean_gym": "cerulean_gym", "bike_shop": "bike_shop",
          "cerulean_house1": "cerulean_badge_house", "cerulean_house2": "cerulean_trashed_house", "cerulean_house3": "cerulean_trade_house",
-         "cerulean_house4": "cerulean_berry_house", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant"}
+         "cerulean_house4": "cerulean_berry_house", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant",
+         "vermilion_gym": "vermilion_gym", "pokemon_fan_club": "pokemon_fan_club", "vermilion_old_rod_house": "vermilion_old_rod_house",
+         "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -117,6 +122,13 @@ DOORS = {
     "bills_house": {"room": "bills_house", "door": [[-218, 36, 151], [-217, 36, 151]], "out": [-217.0, 36.0, 153.4]},
     # The POWER PLANT on Route 10 (16:58): its dark doorway, 3 wide, at the top of its smooth stone steps.
     "power_plant": {"room": "power_plant", "door": [[-142, 35, 325], [-141, 35, 325], [-140, 35, 325]], "out": [-140.5, 35.0, 328.5]},
+    # Vermilion City (17:51): the Gym (its glass doors either side of a post), the FAN CLUB (a mangrove door), and its
+    # three houses (warped doors): the FISHING GURU's top left, the trade house, the PIDGEY letter house by the harbor.
+    "vermilion_gym": {"room": "vermilion_gym", "door": [[x, 32, 593] for x in range(-372, -369)], "out": [-370.5, 32.0, 595.6]},
+    "pokemon_fan_club": {"room": "pokemon_fan_club", "door": [[-375, 32, 578], [-374, 32, 578]], "out": [-374.0, 32.0, 580.4]},
+    "vermilion_old_rod_house": {"room": "vermilion_old_rod_house", "door": [[-382, 32, 556], [-381, 32, 556]], "out": [-381.0, 32.0, 558.4]},
+    "vermilion_trade_house": {"room": "vermilion_trade_house", "door": [[-361, 32, 578], [-360, 32, 578]], "out": [-360.0, 32.0, 580.4]},
+    "vermilion_pidgey_house": {"room": "vermilion_pidgey_house", "door": [[-344, 32, 590], [-343, 32, 590]], "out": [-343.0, 32.0, 592.4]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -135,7 +147,9 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "fuchsia_office": "fuchsia_office", "fuchsia_house1": "fuchsia_house1", "fuchsia_house2": "fuchsia_house2", "fuchsia_house3": "fuchsia_house3",
             "fuchsia_house4": "fuchsia_house4", "ug_r5": "ug_route5", "ug_r6": "ug_route6", "ug_r7": "ug_route7", "ug_r8": "ug_route8",
             "cerulean_gym": "cerulean_gym", "bike_shop": "bike_shop", "cerulean_house1": "cerulean_house1", "cerulean_house2": "cerulean_house2",
-            "cerulean_house3": "cerulean_house3", "cerulean_house4": "cerulean_house4", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant"}
+            "cerulean_house3": "cerulean_house3", "cerulean_house4": "cerulean_house4", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant",
+            "vermilion_gym": "vermilion_gym", "pokemon_fan_club": "pokemon_fan_club", "vermilion_old_rod_house": "vermilion_old_rod_house",
+            "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
@@ -161,6 +175,9 @@ MONS = {"power_plant": [{"key": "zapdos", "species": "zapdos", "x": 5.6, "z": 4.
         ("electrode_power_plant_1", 25.5, 18.5), ("power_plant_voltorb_4", 23.5, 32.5), ("power_plant_voltorb_5", 26.5, 26.0),
         ("electrode_power_plant_2", 21.5, 12.0), ("power_plant_voltorb_6", 37.5, 32.5))]}
 MONS["daycare"] = MONS_DAYCARE
+MONS["pokemon_fan_club"] = [{"key": "pet:pokemon_fan_club_p2", "species": "clefairy", "x": 10.4, "z": 8.6, "yaw": 90.0},
+                            {"key": "pet:pokemon_fan_club_p3", "species": "seel", "x": 3.6, "z": 8.6, "yaw": 270.0}]
+MONS["vermilion_pidgey_house"] = [{"key": "pet:vermilion_pidgey_house_p1", "species": "pidgey", "x": 8.2, "z": 5.6, "yaw": 270.0}]
 BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n", "cerulean_house1": "cerulean_house1_back",
@@ -183,7 +200,10 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "ug_r8": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "cerulean_gym": {"x": 7.0, "z": 17.5, "yaw": 180.0}, "bike_shop": {"x": 7.0, "z": 9.5, "yaw": 180.0},
          "cerulean_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "cerulean_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "cerulean_house3": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "cerulean_house4": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "daycare": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "bills_house": {"x": 7.0, "z": 9.5, "yaw": 180.0},
-         "power_plant": {"x": 5.0, "z": 34.5, "yaw": 180.0}}
+         "power_plant": {"x": 5.0, "z": 34.5, "yaw": 180.0},
+         "vermilion_gym": {"x": 7.0, "z": 20.5, "yaw": 180.0}, "pokemon_fan_club": {"x": 7.0, "z": 10.5, "yaw": 180.0},
+         "vermilion_old_rod_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "vermilion_trade_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "vermilion_pidgey_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -515,7 +535,8 @@ def main():
             people.append({"key": key, "name": n["name"].upper(), "skin": n["skin"] or "youngster", "x": round(x, 3), "z": round(z, 3), "y": n.get("y", 0) or 0,
                            "yaw": round((180 - math.degrees(yaw)) % 360, 1), "lines": n["lines"], "role": n.get("role"), "seated": bool(n["seated"]),
                            **({"group": n["group"]} if n.get("group") else {}), **({"hours": n["hours"]} if n.get("hours") else {})})
-        acts = [dict({"rect": a["rect"], "label": a["label"], "lines": a["lines"]}, **({"map": True} if a.get("map") else {}), **({"pc": True} if a.get("pc") else {}))
+        acts = [dict({"rect": a["rect"], "label": a["label"], "lines": a["lines"]}, **({"map": True} if a.get("map") else {}), **({"pc": True} if a.get("pc") else {}),
+                     **({"use": a["use"]} if a.get("use") else {}))
                 for a in room["acts"] if a["lines"]]
         sp = room["spawn"]
         rooms_out[rid] = {"origin": list(o), "W": room["W"], "D": room["D"], "H": room["H"], "name": room["name"], "floor": room["floor"],

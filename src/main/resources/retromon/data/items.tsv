@@ -52,6 +52,7 @@ coin_case	COIN CASE	0	KEY_ITEM
 itemfinder	ITEMFINDER	0	KEY_ITEM
 exp_share	EXP.SHARE	3000	ITEM
 old_rod	OLD ROD	0	KEY_ITEM
+bike_voucher	BIKE VOUCHER	0	KEY_ITEM
 good_rod	GOOD ROD	0	KEY_ITEM
 silver_leaf	SILVER LEAF	1000	ITEM
 super_rod	SUPER ROD	0	KEY_ITEM

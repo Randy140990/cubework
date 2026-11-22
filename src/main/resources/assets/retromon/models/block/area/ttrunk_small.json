@@ -1,0 +1,106 @@
+{
+ "parent": "block/block",
+ "ambientocclusion": true,
+ "textures": {
+  "bark": "retromon:block/area/tree_bark",
+  "particle": "retromon:block/area/tree_bark"
+ },
+ "elements": [
+  {
+   "from": [
+    6,
+    0,
+    6
+   ],
+   "to": [
+    10,
+    16,
+    10
+   ],
+   "faces": {
+    "north": {
+     "texture": "#bark"
+    },
+    "south": {
+     "texture": "#bark"
+    },
+    "east": {
+     "texture": "#bark"
+    },
+    "west": {
+     "texture": "#bark"
+    },
+    "up": {
+     "texture": "#bark"
+    },
+    "down": {
+     "texture": "#bark"
+    }
+   }
+  },
+  {
+   "from": [
+    10,
+    9,
+    7
+   ],
+   "to": [
+    14,
+    11,
+    9
+   ],
+   "faces": {
+    "north": {
+     "texture": "#bark"
+    },
+    "south": {
+     "texture": "#bark"
+    },
+    "east": {
+     "texture": "#bark"
+    },
+    "west": {
+     "texture": "#bark"
+    },
+    "up": {
+     "texture": "#bark"
+    },
+    "down": {
+     "texture": "#bark"
+    }
+   }
+  },
+  {
+   "from": [
+    2.5,
+    4,
+    7
+   ],
+   "to": [
+    6,
+    6,
+    9
+   ],
+   "faces": {
+    "north": {
+     "texture": "#bark"
+    },
+    "south": {
+     "texture": "#bark"
+    },
+    "east": {
+     "texture": "#bark"
+    },
+    "west": {
+     "texture": "#bark"
+    },
+    "up": {
+     "texture": "#bark"
+    },
+    "down": {
+     "texture": "#bark"
+    }
+   }
+  }
+ ]
+}

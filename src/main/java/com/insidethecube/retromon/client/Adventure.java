@@ -345,6 +345,13 @@ public final class Adventure {
 				mc.setScreen(new TownMapScreen(null));
 				return;
 			}
+			// Something the game itself answers (LT.SURGE's trash cans): it says what you find.
+			if (ahead.use() != null) {
+				CompoundTag u = new CompoundTag();
+				u.putString("use", ahead.use());
+				ClientPlayNetworking.send(new Net.Act("use", u));
+				return;
+			}
 			// The storage PC in a POKéMON CENTER: BILL's PC.
 			if (ahead.pc()) {
 				mc.setScreen(new PcScreen());

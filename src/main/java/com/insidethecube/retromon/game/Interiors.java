@@ -64,7 +64,7 @@ public final class Interiors {
 			int from, int to, double y) {}
 
 	/** Something to look at in a room; map, a wall map that opens the Town Map. */
-	public record Act(double x0, double z0, double x1, double z1, List<String> lines, boolean map, boolean pc) {}
+	public record Act(double x0, double z0, double x1, double z1, List<String> lines, boolean map, boolean pc, String use) {}
 
 	/** An item ball lying in a room (the forest's): its key in field_items.tsv, and where it lies. */
 	public record Ball(String key, double x, double z, double y) {}
@@ -254,7 +254,7 @@ public final class Interiors {
 				JsonObject a = ae.getAsJsonObject();
 				JsonArray rc = a.getAsJsonArray("rect");
 				acts.add(new Act(rc.get(0).getAsDouble(), rc.get(1).getAsDouble(), rc.get(2).getAsDouble(), rc.get(3).getAsDouble(), strings(a.get("lines")),
-						a.has("map") && a.get("map").getAsBoolean(), a.has("pc") && a.get("pc").getAsBoolean()));
+						a.has("map") && a.get("map").getAsBoolean(), a.has("pc") && a.get("pc").getAsBoolean(), a.has("use") ? a.get("use").getAsString() : null));
 			}
 			List<double[]> grass = new ArrayList<>();
 			if (r.has("grass")) for (JsonElement ge : r.getAsJsonArray("grass")) {
@@ -726,6 +726,8 @@ public final class Interiors {
 		if (alone && r.id().equals("center")) centerVisitors(level, r, comer);
 		// The DAY CARE: yours (if you've left one) in the pen with the others.
 		if (r.id().equals("daycare")) Game.daycarePen(comer);
+		// LT.SURGE's GYM: its electric door, shut or open for you.
+		if (r.id().equals("vermilion_gym")) Game.surgeEntered(comer);
 		// Mt. Moon's mushrooms (B1F) grow back: one you picked on an earlier day is there again (13:56).
 		if (!r.balls().isEmpty()) {
 			PlayerData d = Game.data(comer);
@@ -1115,7 +1117,7 @@ public final class Interiors {
 	}
 
 	/** Something in a room you're facing: what it says, how far ahead it is, and whether it's a map (the Town Map). */
-	public record Ahead(List<String> lines, double distance, Vec3 at, boolean map, boolean pc) {
+	public record Ahead(List<String> lines, double distance, Vec3 at, boolean map, boolean pc, String use) {
 	}
 
 	/** The thing straight ahead of you in a room (0.5 to 2.1 blocks on), or null. */
@@ -1138,7 +1140,7 @@ public final class Interiors {
 				}
 			}
 			if (best != null && !best.lines().isEmpty())
-				return new Ahead(best.lines(), d, new Vec3(r.ox() + (best.x0() + best.x1()) / 2, r.oy() + 1.6, r.oz() + (best.z0() + best.z1()) / 2), best.map(), best.pc());
+				return new Ahead(best.lines(), d, new Vec3(r.ox() + (best.x0() + best.x1()) / 2, r.oy() + 1.6, r.oz() + (best.z0() + best.z1()) / 2), best.map(), best.pc(), best.use());
 		}
 		return null;
 	}

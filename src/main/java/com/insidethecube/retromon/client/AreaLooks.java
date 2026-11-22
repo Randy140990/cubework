@@ -53,9 +53,8 @@ public final class AreaLooks {
 	 * forest, built there) rather than John's world.
 	 */
 	private record Box(int x0, int z0, int x1, int z1, int y0, int y1, boolean rooms) {
-		boolean has(BlockPos p) {
-			return p.getX() >= x0 && p.getX() <= x1 && p.getZ() >= z0 && p.getZ() <= z1 && (y0 > y1 || p.getY() >= y0 && p.getY() <= y1)
-					&& rooms == inRooms();
+		boolean has(BlockPos p, boolean inside) {
+			return rooms == inside && p.getX() >= x0 && p.getX() <= x1 && p.getZ() >= z0 && p.getZ() <= z1 && (y0 > y1 || p.getY() >= y0 && p.getY() <= y1);
 		}
 
 		/** How big it is (blocks): where two swaps' areas overlap, the smaller one's (the more particular place's) is drawn. */
@@ -71,14 +70,44 @@ public final class AreaLooks {
 	}
 
 	/** One look somewhere: its name, its texture swaps ("block/tuff=lamp_tuff", "@4" for laid over 4 blocks), its areas. */
-	private record Rule(String look, String swaps, List<Box> boxes) {
-		/** The smallest of its areas a spot's in (Long.MAX_VALUE: none). */
+	private record Rule(String look, String swaps, List<Box> boxes, Map<Long, Box[]> cells, List<Box> wide) {
+		Rule(String look, String swaps, List<Box> boxes) {
+			this(look, swaps, boxes, new java.util.concurrent.ConcurrentHashMap<>(), new ArrayList<>());
+		}
+
+		/**
+		 * The smallest of its areas a spot's in (Long.MAX_VALUE: none). (0.48: looked up by the 64-block square the spot's
+		 * in, not through every area of the look; the chunks are drawn much quicker, so coming out of a door is.)
+		 */
 		long area(BlockPos p) {
+			boolean inside = inRooms();
 			long best = Long.MAX_VALUE;
-			for (Box b : boxes) if (b.has(p)) best = Math.min(best, b.size());
+			Box[] here = cells.get(cell(p.getX() >> 6, p.getZ() >> 6));
+			if (here != null) for (Box b : here) if (b.has(p, inside)) best = Math.min(best, b.size());
+			for (Box b : wide) if (b.has(p, inside)) best = Math.min(best, b.size());
 			return best;
 		}
+
+		private static long cell(int cx, int cz) {
+			return ((long) cx << 32) ^ (cz & 0xFFFFFFFFL);
+		}
+
+		void index() {
+			{
+				Map<Long, List<Box>> m = new HashMap<>();
+				for (Box b : boxes) {
+					int cx0 = b.x0() >> 6, cx1 = b.x1() >> 6, cz0 = b.z0() >> 6, cz1 = b.z1() >> 6;
+					if ((long) (cx1 - cx0 + 1) * (cz1 - cz0 + 1) > 64) {
+						wide.add(b);
+						continue;
+					}
+					for (int cx = cx0; cx <= cx1; cx++) for (int cz = cz0; cz <= cz1; cz++) m.computeIfAbsent(cell(cx, cz), k -> new ArrayList<>()).add(b);
+				}
+				for (Map.Entry<Long, List<Box>> e : m.entrySet()) cells.put(e.getKey(), e.getValue().toArray(new Box[0]));
+			}
+		}
 	}
+
 
 	/** For each block with a look somewhere: its looks (by look and swaps). */
 	private static final Map<Block, Map<String, Rule>> RULES = new HashMap<>();
@@ -101,6 +130,8 @@ public final class AreaLooks {
 				RULES.computeIfAbsent(b, k -> new HashMap<>()).computeIfAbsent(look + "|" + swaps, k -> new Rule(look, swaps, new ArrayList<>())).boxes().add(box);
 			}
 		}
+		// Each look's areas filed by the 64-block square they're in (all read in now, before the map's drawn).
+		for (Map<String, Rule> m : RULES.values()) for (Rule r : m.values()) r.index();
 	}
 
 	public static void register() {
@@ -117,7 +148,8 @@ public final class AreaLooks {
 				}
 			}
 			for (String b : new String[] {"boulder_a", "boulder_b", "boulder_small", "mboulder_a", "mboulder_b", "mboulder_small", "iboulder_a", "iboulder_b",
-					"iboulder_small", "rboulder_a", "rboulder_b", "rboulder_small", "sboulder_a", "sboulder_b", "sboulder_small"}) part(ctx, b, "block/area/" + b);
+					"iboulder_small", "rboulder_a", "rboulder_b", "rboulder_small", "sboulder_a", "sboulder_b", "sboulder_small", "ttrunk_a", "ttrunk_b", "ttrunk_small"})
+				part(ctx, b, "block/area/" + b);
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
@@ -298,6 +330,10 @@ public final class AreaLooks {
 			});
 			base.emitQuads(e, view, pos, state, random, cull);
 			e.popTransform();
+			if (hedge) {
+				TextureAtlasSprite[] v = kinds.get(BuiltInRegistries.BLOCK.getKey(self).withPrefix("block/"));
+				if (v != null) tufts(e, view, pos, v[0]);
+			}
 		};
 	}
 
@@ -452,11 +488,14 @@ public final class AreaLooks {
 		}
 		String pre = prefix;
 		return (base, e, view, pos, state, random, cull) -> {
-			// (On another rock, a slab on Mt. Moon's granite: one boulder there, the one below.)
-			if (rock(view.getBlockState(pos.below()).getBlock())) return;
+			// (On another rock, a slab on Mt. Moon's granite: one boulder there, the one below. A small tree's trunk goes
+			// on up, 17:51.)
+			boolean trunk = pre.startsWith("ttrunk");
+			if (!trunk && rock(view.getBlockState(pos.below()).getBlock())) return;
 			// (A slab's a low one; so is the room's paler grate, 15:21: the rocks are grates in the caves now, hiding nothing.)
 			boolean slab = state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE) || state.is(Blocks.WAXED_EXPOSED_COPPER_GRATE);
-			String name = pre + (slab ? "_small" : Math.floorMod(pos.getX() * 31 + pos.getZ() * 17 + pos.getY() * 7, 2) == 0 ? "_a" : "_b");
+			String name = pre + (slab ? "_small" : trunk ? (view.getBlockState(pos.below()).is(state.getBlock()) ? "_b" : "_a")
+					: Math.floorMod(pos.getX() * 31 + pos.getZ() * 17 + pos.getY() * 7, 2) == 0 ? "_a" : "_b");
 			Swap fl = floors.get(view.getBlockState(pos.below()).getBlock());
 			if (fl != null) {
 				e.square(Direction.UP, 0, 0, 1, 1, 0.998F);
@@ -523,6 +562,10 @@ public final class AreaLooks {
 			});
 			base.emitQuads(e, view, pos, state, random, cull);
 			e.popTransform();
+			if (hedge) {
+				TextureAtlasSprite[] v = kinds.get(BuiltInRegistries.BLOCK.getKey(self).withPrefix("block/"));
+				if (v != null) tufts(e, view, pos, v[0]);
+			}
 		};
 	}
 
@@ -544,7 +587,73 @@ public final class AreaLooks {
 	/** Whether a face runs on into its neighbour: glass into the same glass, a hedge into any leaves. */
 	private static boolean joins(BlockAndTintGetter view, BlockPos pos, Direction d, Block self, boolean hedge) {
 		if (!hedge) return same(view, pos, d, self);
+		// (17:42) A long hedge is a row of clipped bushes, not one flat block: now and then a seam between two, each
+		// rounded off there (the same seam seen from both sides).
+		if (d.getAxis().isHorizontal() && seam(pos, d)) return false;
 		return view.getBlockState(pos.relative(d)).is(net.minecraft.tags.BlockTags.LEAVES);
+	}
+
+	/** Whether there's a seam in a hedge between this block and the next one along (every three or four blocks). */
+	private static boolean seam(BlockPos pos, Direction d) {
+		int x = pos.getX(), z = pos.getZ();
+		if (d == Direction.WEST) x--;
+		if (d == Direction.NORTH) z--;
+		boolean alongX = d.getAxis() == Direction.Axis.X;
+		int along = alongX ? x : z, across = alongX ? z : x;
+		int h = (across * 73856093) ^ (Math.floorDiv(along, 7) * 19349663);
+		int at = Math.floorMod(h, 7);
+		// One or two seams in each seven blocks along, at places that differ row to row.
+		return Math.floorMod(along, 7) == at || Math.floorMod(along, 7) == Math.floorMod(at + 3 + (h >>> 8 & 1), 7);
+	}
+
+	/**
+	 * (17:42) A hedge's leafy depth: little clipped tufts standing up off its top (and out of its open sides), a few
+	 * pixels each, so it isn't one flat face; drawn in its own leaves' picture.
+	 */
+	private static void tufts(QuadEmitter e, BlockAndTintGetter view, BlockPos pos, TextureAtlasSprite sprite) {
+		long h = net.minecraft.util.Mth.getSeed(pos.getX(), pos.getY(), pos.getZ());
+		boolean top = !view.getBlockState(pos.above()).is(net.minecraft.tags.BlockTags.LEAVES) && !view.getBlockState(pos.above()).isSolidRender();
+		int n = 2 + (int) ((h >>> 3) & 1);
+		for (int i = 0; i < n && top; i++) {
+			float w = (3 + ((h >>> (6 + i * 7)) & 3)) / 16F, hh = (1 + ((h >>> (9 + i * 7)) & 1)) / 16F;
+			float x0 = (1 + ((h >>> (11 + i * 7)) & 7)) / 16F, z0 = (1 + ((h >>> (14 + i * 7)) & 7)) / 16F;
+			x0 = Math.min(x0, 1 - w - 1 / 16F);
+			z0 = Math.min(z0, 1 - w - 1 / 16F);
+			cube(e, sprite, x0, 1, z0, x0 + w, 1 + hh, z0 + w);
+		}
+		for (Direction d : Direction.Plane.HORIZONTAL) {
+			BlockState o = view.getBlockState(pos.relative(d));
+			if (o.is(net.minecraft.tags.BlockTags.LEAVES) || o.isSolidRender()) continue;
+			if (((h >>> (40 + d.get2DDataValue() * 3)) & 3) == 0) continue;
+			float a = (2 + ((h >>> (48 + d.get2DDataValue() * 3)) & 7)) / 16F, w = 4 / 16F, y0 = (5 + ((h >>> (30 + d.get2DDataValue())) & 3)) / 16F;
+			a = Math.min(a, 1 - w - 1 / 16F);
+			float t = 1 / 16F;
+			switch (d) {
+				case NORTH -> cube(e, sprite, a, y0, -t, a + w, y0 + w, 0);
+				case SOUTH -> cube(e, sprite, a, y0, 1, a + w, y0 + w, 1 + t);
+				case WEST -> cube(e, sprite, -t, y0, a, 0, y0 + w, a + w);
+				default -> cube(e, sprite, 1, y0, a, 1 + t, y0 + w, a + w);
+			}
+		}
+	}
+
+	/** A little box (block units), every face in one picture. */
+	private static void cube(QuadEmitter e, TextureAtlasSprite sprite, float x0, float y0, float z0, float x1, float y1, float z1) {
+		for (Direction d : Direction.values()) {
+			switch (d) {
+				case UP -> e.square(d, x0, 1 - z1, x1, 1 - z0, 1 - y1);
+				case DOWN -> e.square(d, x0, z0, x1, z1, y0);
+				case NORTH -> e.square(d, 1 - x1, y0, 1 - x0, y1, z0);
+				case SOUTH -> e.square(d, x0, y0, x1, y1, 1 - z1);
+				case WEST -> e.square(d, z0, y0, z1, y1, x0);
+				default -> e.square(d, 1 - z1, y0, 1 - z0, y1, 1 - x1);
+			}
+			e.spriteBake(sprite, MutableQuadView.BAKE_LOCK_UV);
+			e.color(-1, -1, -1, -1);
+			e.tintIndex(-1);
+			e.renderLayer(ChunkSectionLayer.SOLID);
+			e.emit();
+		}
 	}
 
 	private static boolean same(BlockAndTintGetter view, BlockPos pos, Direction d, Block self) {

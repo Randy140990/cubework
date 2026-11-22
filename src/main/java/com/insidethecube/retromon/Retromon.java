@@ -106,6 +106,7 @@ public class Retromon implements ModInitializer {
 		CompoundTag t = a.data();
 		switch (a.kind()) {
 			case "adventure" -> Game.setAdventure(p, t.getBooleanOr("on", false));
+			case "use" -> Game.use(p, t.getStringOr("use", ""));
 			case "talk" -> Game.talk(p, t.getIntOr("npc", -1));
 			case "dialogue_done" -> Game.dialogueDone(p, t);
 			case "battle" -> Battles.choose(p, t);

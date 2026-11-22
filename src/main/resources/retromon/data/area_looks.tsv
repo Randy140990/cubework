@@ -33,7 +33,7 @@ kerb	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	-	Viridian City
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-830	495	-745	589	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Viridian City
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-1000	495	-831	600	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Route 22
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-830	340	-745	494	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Route 2
-swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,redstone_lamp	-850	255	-741	339	-	-	block/tuff=plamp_post,block/polished_tuff=plamp_post,block/chiseled_tuff_bricks=plamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=plamp_chiseled_tuff_bricks_top,block/gray_wool=plamp_cap,block/redstone_lamp=plamp_globe,block/redstone_lamp_on=plamp_globe	Pewter City
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,redstone_lamp	-850	255	-741	339	-	-	block/tuff=plamp_post,block/polished_tuff=plamp_post,block/chiseled_tuff_bricks=plamp_foot,block/chiseled_tuff_bricks_top=plamp_foot,block/gray_wool=plamp_cap,block/redstone_lamp=plamp_globe,block/redstone_lamp_on=plamp_globe	Pewter City
 swap	daylight_detector	-1010	100	60	1060	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Kanto
 swap	spruce_log,spruce_fence	-1010	100	60	1060	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	Kanto
 swap	lantern	-1010	100	60	1060	-	-	block/lantern=garden_light	Kanto
@@ -334,7 +334,7 @@ swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-1010	100	60	
 swap	pale_oak_fence	-1010	100	60	1060	-	-	block/pale_oak_planks=white_fence	Kanto
 swap	dripstone_block	-1010	100	60	1060	-	-	block/dripstone_block=drip_rock_top|drip_rock@4	Kanto
 swap	jungle_stairs,jungle_slab	-1010	100	60	1060	-	-	block/jungle_planks=drip_rock_top|drip_rock@4	Kanto
-swap	mud_brick_stairs	-1010	100	60	1060	-	-	block/mud_bricks=step_boards	Kanto
+swap	mud_brick_stairs	-1010	100	60	1060	-	-	block/mud_bricks=step_boards_d	Kanto
 swap	mud_brick_slab	-1010	100	60	1060	-	-	block/mud_bricks=mud_rock@4	Kanto
 swap	mud_brick_wall	-1010	100	60	1060	-	-	block/mud_bricks=wall_tan	Kanto
 chain	iron_chain	-1010	100	60	1060	-	-	-	Kanto
@@ -558,13 +558,6 @@ swap	polished_andesite_slab	-401	220	-311	305	34	34	block/polished_andesite=step
 swap	white_concrete,light_blue_concrete,light_blue_terracotta,white_terracotta	-401	220	-311	305	33	33	block/white_concrete=pave_cer_1,block/light_blue_concrete=pave_cer_2,block/light_blue_terracotta=pave_cer_3,block/white_terracotta=pave_cer_4	Cerulean City
 swap	smooth_stone_slab	-401	220	-311	305	33	33	block/smooth_stone=kerb_cer,block/smooth_stone_slab_side=kerb_cer	Cerulean City
 kerb	smooth_stone_slab	-401	220	-311	305	33	33	-	Cerulean City
-swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-386	268	-382	272	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
-swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-369	269	-365	273	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
-swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-361	287	-357	291	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
-swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-355	269	-351	273	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
-swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-351	242	-347	246	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
-swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-325	254	-321	258	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
-swap	diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs	-325	287	-321	291	35	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap	a Cerulean lamp
 sign	pale_oak_shelf	-381	279	-366	284	34	35	-	the Bike Shop's front
 swap	acacia_shelf,acacia_stairs,pale_oak_stairs	-381	279	-366	284	38	40	block/acacia_shelf=awning_orange,block/acacia_planks=awning_orange,block/pale_oak_planks=awning_white	the Bike Shop's front
 swap	stripped_oak_wood,oak_stairs,oak_shelf,stone_button,oak_slab,oak_planks	-357	176	-348	235	33	36	block/stripped_oak_log=bridge_gold_beam,block/oak_planks=bridge_gold_boards,block/oak_shelf=bridge_gold_rail,block/stone=gold_bolt	Nugget Bridge
@@ -648,3 +641,131 @@ boulder	waxed_copper_grate,waxed_exposed_copper_grate	7423	-1	7534	96	-	-	prefix
 boulder	waxed_weathered_copper_grate	7423	-1	7534	96	-	-	prefix:sboulder	Rock Tunnel B1F	interiors
 sign	pale_oak_shelf	7423	-1	7534	96	-	-	-	Rock Tunnel B1F	interiors
 swap	white_concrete	7423	-1	7534	96	-	-	block/white_concrete=cave_daylight!	Rock Tunnel B1F	interiors
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-387	267	-381	273	30	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap,block/light_gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a Cerulean lamp
+glass	black_stained_glass_pane	-387	267	-381	273	30	42	block/black_stained_glass=glass_lamp	a Cerulean lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-370	268	-364	274	30	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap,block/light_gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a Cerulean lamp
+glass	black_stained_glass_pane	-370	268	-364	274	30	42	block/black_stained_glass=glass_lamp	a Cerulean lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-362	286	-356	292	30	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap,block/light_gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a Cerulean lamp
+glass	black_stained_glass_pane	-362	286	-356	292	30	42	block/black_stained_glass=glass_lamp	a Cerulean lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-356	268	-350	274	30	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap,block/light_gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a Cerulean lamp
+glass	black_stained_glass_pane	-356	268	-350	274	30	42	block/black_stained_glass=glass_lamp	a Cerulean lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-352	241	-346	247	30	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap,block/light_gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a Cerulean lamp
+glass	black_stained_glass_pane	-352	241	-346	247	30	42	block/black_stained_glass=glass_lamp	a Cerulean lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-326	253	-320	259	30	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap,block/light_gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a Cerulean lamp
+glass	black_stained_glass_pane	-326	253	-320	259	30	42	block/black_stained_glass=glass_lamp	a Cerulean lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-326	286	-320	292	30	42	block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap,block/light_gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a Cerulean lamp
+glass	black_stained_glass_pane	-326	286	-320	292	30	42	block/black_stained_glass=glass_lamp	a Cerulean lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-389	559	-383	565	30	42	block/diorite=lamp_ver_post,block/polished_diorite=lamp_ver_cap,block/light_gray_wool=lamp_ver_top,block/sea_lantern=lamp_globe_warm!	a Vermilion lamp
+glass	black_stained_glass_pane	-389	559	-383	565	30	42	block/black_stained_glass=glass_lamp	a Vermilion lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-361	566	-355	572	30	42	block/diorite=lamp_ver_post,block/polished_diorite=lamp_ver_cap,block/light_gray_wool=lamp_ver_top,block/sea_lantern=lamp_globe_warm!	a Vermilion lamp
+glass	black_stained_glass_pane	-361	566	-355	572	30	42	block/black_stained_glass=glass_lamp	a Vermilion lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-360	584	-354	590	30	42	block/diorite=lamp_ver_post,block/polished_diorite=lamp_ver_cap,block/light_gray_wool=lamp_ver_top,block/sea_lantern=lamp_globe_warm!	a Vermilion lamp
+glass	black_stained_glass_pane	-360	584	-354	590	30	42	block/black_stained_glass=glass_lamp	a Vermilion lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-341	562	-335	568	30	42	block/diorite=lamp_ver_post,block/polished_diorite=lamp_ver_cap,block/light_gray_wool=lamp_ver_top,block/sea_lantern=lamp_globe_warm!	a Vermilion lamp
+glass	black_stained_glass_pane	-341	562	-335	568	30	42	block/black_stained_glass=glass_lamp	a Vermilion lamp
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-333	584	-327	590	30	42	block/diorite=lamp_ver_post,block/polished_diorite=lamp_ver_cap,block/light_gray_wool=lamp_ver_top,block/sea_lantern=lamp_globe_warm!	a Vermilion lamp
+glass	black_stained_glass_pane	-333	584	-327	590	30	42	block/black_stained_glass=glass_lamp	a Vermilion lamp
+roof_ver	acacia_stairs	-402	546	-300	614	33	50	-	Vermilion City
+swap	acacia_slab,acacia_planks	-402	546	-300	614	33	50	block/acacia_planks=roof_ver_tiles	Vermilion City
+swap	white_terracotta	-402	546	-300	614	31	46	block/white_terracotta=wall_ver	Vermilion City
+swap	bricks,brick_stairs,brick_slab	-402	546	-300	614	-	-	block/bricks=base_ver	Vermilion City
+swap	polished_diorite_stairs	-402	546	-300	614	31	46	block/polished_diorite=trim_ver	Vermilion City
+swap	white_concrete,yellow_terracotta,light_gray_concrete,white_terracotta	-402	546	-300	614	30	30	block/white_concrete=pave_ver_1,block/yellow_terracotta=pave_ver_2,block/light_gray_concrete=pave_ver_3,block/white_terracotta=pave_ver_4	Vermilion City
+glass	terracotta	-402	546	-300	614	30	30	block/terracotta=border_ver	Vermilion City
+swap	light_gray_terracotta	-402	546	-300	614	29	30	block/light_gray_terracotta=ground_ver	Vermilion City
+grass_onto	terracotta,light_gray_terracotta	-402	546	-300	614	30	30	-	Vermilion City
+swap	smooth_stone	-402	546	-300	614	30	30	block/smooth_stone=kerb_ver	Vermilion City
+swap	stone	-402	546	-300	614	22	29	block/stone=canal_ver	Vermilion City
+swap	barrel	-402	546	-300	614	-	-	block/barrel_side=barrel_ver_side,block/barrel_top=barrel_ver_top,block/barrel_top_open=barrel_ver_top,block/barrel_bottom=barrel_ver_top	Vermilion City
+swap	oak_trapdoor,spruce_trapdoor	-402	546	-300	614	-	-	block/oak_trapdoor=planter_ver,block/spruce_trapdoor=planter_ver	Vermilion City
+swap	oak_shelf,dark_oak_shelf	-402	546	-300	614	31	31	block/oak_shelf=planter_rim,block/dark_oak_shelf=planter_rim	Vermilion City
+swap	blackstone_wall	-402	546	-300	614	-	-	block/blackstone=dock_post	Vermilion City
+swap	pale_oak_fence	-402	546	-300	614	-	-	block/pale_oak_planks=fence_grey	Vermilion City
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-340	578	-316	581	31	32	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Vermilion's hedge by the field
+roof_vgym	jungle_stairs	-382	584	-360	597	38	42	-	Vermilion Gym
+swap	jungle_planks,jungle_slab,stripped_jungle_log	-382	584	-360	597	38	42	block/jungle_planks=roof_vgym_tiles,block/stripped_jungle_log=roof_vgym_edge	Vermilion Gym
+swap	light_gray_concrete	-382	584	-360	597	32	38	block/light_gray_concrete=vgym_wall	Vermilion Gym
+swap	oak_planks	-382	584	-360	597	35	40	block/oak_planks=planter_ver	Vermilion Gym
+swap	quartz_block	-382	584	-360	597	31	34	block/quartz_block_side=kerb_ver,block/quartz_block_top=kerb_ver,block/quartz_block_bottom=kerb_ver	Vermilion Gym
+swap	pink_terracotta	-382	584	-360	597	-	-	block/pink_terracotta=base_ver	Vermilion Gym
+boulder	spruce_fence,oak_fence,dark_oak_fence	-823	271	-819	276	33	38	prefix:ttrunk	Pewter's tree by the Museum
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-823	271	-819	276	33	38	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Pewter's tree by the Museum
+boulder	spruce_fence,oak_fence,dark_oak_fence	-818	277	-787	281	31	34	prefix:ttrunk	Pewter's little trees along the north
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-818	277	-787	281	31	34	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Pewter's little trees along the north
+boulder	spruce_fence,oak_fence,dark_oak_fence	-788	285	-783	289	30	35	prefix:ttrunk	Pewter's tree by the Museum's side
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-788	285	-783	289	30	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Pewter's tree by the Museum's side
+boulder	spruce_fence,oak_fence,dark_oak_fence	-770	294	-765	298	30	35	prefix:ttrunk	Pewter's tree by the house
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-770	294	-765	298	30	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Pewter's tree by the house
+boulder	spruce_fence,oak_fence,dark_oak_fence	-352	257	-347	261	35	40	prefix:ttrunk	Cerulean's tree by the Gym
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-352	257	-347	261	35	40	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Cerulean's tree by the Gym
+boulder	spruce_fence,oak_fence,dark_oak_fence	-318	575	-311	582	33	39	prefix:ttrunk	Vermilion's trees by the field
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-318	575	-311	582	33	39	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Vermilion's trees by the field
+boulder	spruce_fence,oak_fence,dark_oak_fence	-363	590	-359	594	33	38	prefix:ttrunk	Vermilion's tree by the Gym
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-363	590	-359	594	33	38	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Vermilion's tree by the Gym
+boulder	spruce_fence,oak_fence,dark_oak_fence	-496	756	-492	761	32	37	prefix:ttrunk	Fuchsia's tree
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-496	756	-492	761	32	37	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Fuchsia's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-480	756	-475	761	32	37	prefix:ttrunk	Fuchsia's tree
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-480	756	-475	761	32	37	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Fuchsia's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-519	767	-467	772	30	35	prefix:ttrunk	Fuchsia's row of trees
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-519	767	-467	772	30	35	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Fuchsia's row of trees
+boulder	spruce_fence,oak_fence,dark_oak_fence	-496	783	-488	790	32	38	prefix:ttrunk	Fuchsia's trees by the pond
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-496	783	-488	790	32	38	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Fuchsia's trees by the pond
+boulder	spruce_fence,oak_fence,dark_oak_fence	-481	794	-477	798	31	36	prefix:ttrunk	Fuchsia's tree
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-481	794	-477	798	31	36	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Fuchsia's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-520	815	-516	819	33	38	prefix:ttrunk	Fuchsia's tree
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-520	815	-516	819	33	38	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Fuchsia's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-489	816	-485	832	32	37	prefix:ttrunk	Fuchsia's trees on the beach
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-489	816	-485	832	32	37	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Fuchsia's trees on the beach
+boulder	spruce_fence,oak_fence,dark_oak_fence	-510	823	-506	827	32	37	prefix:ttrunk	Fuchsia's tree
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-510	823	-506	827	32	37	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Fuchsia's tree
+hedge	azalea_leaves,acacia_leaves,jungle_leaves,dark_oak_leaves,birch_leaves,oak_leaves,flowering_azalea_leaves	-819	297	-797	300	30	31	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Pewter Gym's bushes
+hedge	flowering_azalea_leaves	-560	733	-441	860	28	33	block/azalea_leaves=hedge_az,block/acacia_leaves=hedge_ac,block/jungle_leaves=hedge_jg,block/dark_oak_leaves=hedge_do,block/birch_leaves=hedge_bi,block/oak_leaves=hedge_ok,block/flowering_azalea_leaves=hedge_fa	Fuchsia City
+swap	jungle_stairs,jungle_slab	-401	220	-311	305	30	34	block/jungle_planks=shore_step	Cerulean's water's edge
+swap	jungle_stairs,jungle_slab	-560	733	-441	860	27	31	block/jungle_planks=shore_step	Fuchsia City
+swap	short_dry_grass,tall_dry_grass	-560	733	-441	860	-	-	block/short_dry_grass=dry_grass_short!,block/tall_dry_grass=dry_grass_tall_bottom!	Fuchsia City
+swap	pink_petals	-560	733	-441	860	-	-	block/pink_petals=petals_big@4!	Fuchsia City
+swap	mangrove_slab	-560	733	-441	860	29	31	block/mangrove_planks=red_kerb	Fuchsia City
+swap	smooth_stone,smooth_stone_slab,polished_blackstone_bricks,polished_blackstone_brick_slab,polished_blackstone_brick_stairs	-226	141	-209	158	-	-	block/smooth_stone=bill_pillar,block/smooth_stone_slab_side=bill_step,block/polished_blackstone_bricks=bill_plinth	Bill's Sea Cottage
+swap	stripped_oak_wood,stripped_oak_log	-377	280	-366	282	35	37	block/stripped_oak_log=bike_post,block/stripped_oak_log_top=bike_post	the Bike Shop's posts
+swap	acacia_stairs,pale_oak_stairs	-377	282	-366	282	38	38	block/acacia_planks=awning_val_o,block/pale_oak_planks=awning_val_w	the Bike Shop's valance
+swap	acacia_shelf	-375	281	-375	281	39	39	block/acacia_shelf=awning_l0	the Bike Shop's lettering
+swap	acacia_shelf	-374	281	-374	281	39	39	block/acacia_shelf=awning_l1	the Bike Shop's lettering
+swap	acacia_shelf	-373	281	-373	281	39	39	block/acacia_shelf=awning_l2	the Bike Shop's lettering
+swap	acacia_shelf	-372	281	-372	281	39	39	block/acacia_shelf=awning_l3	the Bike Shop's lettering
+swap	acacia_shelf	-371	281	-371	281	39	39	block/acacia_shelf=awning_l4	the Bike Shop's lettering
+swap	acacia_shelf	-370	281	-370	281	39	39	block/acacia_shelf=awning_l5	the Bike Shop's lettering
+swap	acacia_shelf	-369	281	-369	281	39	39	block/acacia_shelf=awning_l6	the Bike Shop's lettering
+swap	acacia_shelf	-368	281	-368	281	39	39	block/acacia_shelf=awning_l7	the Bike Shop's lettering
+swap	cobblestone_stairs,mossy_cobblestone_stairs,cobblestone_slab,mossy_cobblestone_slab	-625	245	-590	275	-	-	block/cobblestone=step_boards_d,block/mossy_cobblestone=step_boards_d	Route 4's steps by the Center
+swap	bush	-372	306	-330	376	-	-	block/bush=bush_round!	Route 5's bushes
+roof_ug	birch_stairs	-345	356	-329	370	35	43	-	Route 5's Underground Path hut
+swap	birch_slab,birch_planks	-345	356	-329	370	35	43	block/birch_planks=roof_ug_tiles	Route 5's Underground Path hut
+swap	polished_deepslate,polished_deepslate_stairs	-345	356	-329	370	33	41	block/polished_deepslate=wall_ug	Route 5's Underground Path hut
+swap	andesite,polished_andesite_stairs,polished_andesite_slab,polished_andesite	-345	356	-329	370	32	41	block/andesite=base_ug,block/polished_andesite=pillar_cer	Route 5's Underground Path hut
+swap	stripped_oak_log,stripped_jungle_log,light_gray_concrete	-345	356	-329	370	33	41	block/stripped_oak_log=post_ug,block/stripped_oak_log_top=post_ug,block/stripped_jungle_log=post_ug,block/stripped_jungle_log_top=post_ug,block/light_gray_concrete=pillar_cer	Route 5's Underground Path hut
+swap	deepslate_tile_wall	-345	356	-329	370	33	41	block/deepslate_tiles=rail_ug	Route 5's Underground Path hut
+swap	polished_deepslate_slab	-345	356	-329	370	32	34	block/polished_deepslate=step_cer	Route 5's Underground Path hut
+roof_ug	birch_stairs	-340	480	-324	494	33	41	-	Route 6's Underground Path hut
+swap	birch_slab,birch_planks	-340	480	-324	494	33	41	block/birch_planks=roof_ug_tiles	Route 6's Underground Path hut
+swap	polished_deepslate,polished_deepslate_stairs	-340	480	-324	494	31	39	block/polished_deepslate=wall_ug	Route 6's Underground Path hut
+swap	andesite,polished_andesite_stairs,polished_andesite_slab,polished_andesite	-340	480	-324	494	30	39	block/andesite=base_ug,block/polished_andesite=pillar_cer	Route 6's Underground Path hut
+swap	stripped_oak_log,stripped_jungle_log,light_gray_concrete	-340	480	-324	494	31	39	block/stripped_oak_log=post_ug,block/stripped_oak_log_top=post_ug,block/stripped_jungle_log=post_ug,block/stripped_jungle_log_top=post_ug,block/light_gray_concrete=pillar_cer	Route 6's Underground Path hut
+swap	deepslate_tile_wall	-340	480	-324	494	31	39	block/deepslate_tiles=rail_ug	Route 6's Underground Path hut
+swap	polished_deepslate_slab	-340	480	-324	494	30	32	block/polished_deepslate=step_cer	Route 6's Underground Path hut
+roof_ug	birch_stairs	-440	420	-424	434	34	42	-	Route 7's Underground Path hut
+swap	birch_slab,birch_planks	-440	420	-424	434	34	42	block/birch_planks=roof_ug_tiles	Route 7's Underground Path hut
+swap	polished_deepslate,polished_deepslate_stairs	-440	420	-424	434	32	40	block/polished_deepslate=wall_ug	Route 7's Underground Path hut
+swap	andesite,polished_andesite_stairs,polished_andesite_slab,polished_andesite	-440	420	-424	434	31	40	block/andesite=base_ug,block/polished_andesite=pillar_cer	Route 7's Underground Path hut
+swap	stripped_oak_log,stripped_jungle_log,light_gray_concrete	-440	420	-424	434	32	40	block/stripped_oak_log=post_ug,block/stripped_oak_log_top=post_ug,block/stripped_jungle_log=post_ug,block/stripped_jungle_log_top=post_ug,block/light_gray_concrete=pillar_cer	Route 7's Underground Path hut
+swap	deepslate_tile_wall	-440	420	-424	434	32	40	block/deepslate_tiles=rail_ug	Route 7's Underground Path hut
+swap	polished_deepslate_slab	-440	420	-424	434	31	33	block/polished_deepslate=step_cer	Route 7's Underground Path hut
+roof_ug	birch_stairs	-280	401	-264	415	35	43	-	Route 8's Underground Path hut
+swap	birch_slab,birch_planks	-280	401	-264	415	35	43	block/birch_planks=roof_ug_tiles	Route 8's Underground Path hut
+swap	polished_deepslate,polished_deepslate_stairs	-280	401	-264	415	33	41	block/polished_deepslate=wall_ug	Route 8's Underground Path hut
+swap	andesite,polished_andesite_stairs,polished_andesite_slab,polished_andesite	-280	401	-264	415	32	41	block/andesite=base_ug,block/polished_andesite=pillar_cer	Route 8's Underground Path hut
+swap	stripped_oak_log,stripped_jungle_log,light_gray_concrete	-280	401	-264	415	33	41	block/stripped_oak_log=post_ug,block/stripped_oak_log_top=post_ug,block/stripped_jungle_log=post_ug,block/stripped_jungle_log_top=post_ug,block/light_gray_concrete=pillar_cer	Route 8's Underground Path hut
+swap	deepslate_tile_wall	-280	401	-264	415	33	41	block/deepslate_tiles=rail_ug	Route 8's Underground Path hut
+swap	polished_deepslate_slab	-280	401	-264	415	32	34	block/polished_deepslate=step_cer	Route 8's Underground Path hut
+swap	smooth_quartz,quartz_block,smooth_quartz_slab,smooth_quartz_stairs,quartz_slab,quartz_stairs	2559	-1	2582	26	-	-	block/quartz_block_bottom=pool_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_tile	Cerulean Gym's pool	interiors
+swap	black_concrete	2559	-1	2582	26	-	-	block/black_concrete=pool_floor	Cerulean Gym's pool	interiors
+swap	light_blue_stained_glass	3199	-1	3215	23	-	-	block/light_blue_stained_glass=surge_barrier!	LT. SURGE's electric door	interiors

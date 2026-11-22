@@ -27,8 +27,8 @@ MUSEUM = (-820, 265, -777, 282, "Pewter Museum of Science")
 KANTO = (-1010, 100, 60, 1060, "Kanto")
 VIRIDIAN_HOUSES = (-792, 521, -779, 546, "Viridian's green houses")
 FENCE_WOOD = "block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail"
-PLAMP = ("block/tuff=plamp_post,block/polished_tuff=plamp_post,block/chiseled_tuff_bricks=plamp_chiseled_tuff_bricks,"
-         "block/chiseled_tuff_bricks_top=plamp_chiseled_tuff_bricks_top,block/gray_wool=plamp_cap,block/redstone_lamp=plamp_globe,"
+PLAMP = ("block/tuff=plamp_post,block/polished_tuff=plamp_post,block/chiseled_tuff_bricks=plamp_foot,"
+         "block/chiseled_tuff_bricks_top=plamp_foot,block/gray_wool=plamp_cap,block/redstone_lamp=plamp_globe,"
          "block/redstone_lamp_on=plamp_globe")
 TRIM = "block/polished_diorite=house_trim"
 STEPS = "block/polished_andesite=house_stone,block/cobblestone=house_stone,block/andesite=house_stone"
@@ -243,6 +243,7 @@ def main():
     round46(add, room)
     round47(add, room)
     round48(add, room)
+    round48b(add, room)
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -291,7 +292,7 @@ def round46(add, room):
     add("swap", "pale_oak_fence", K, FENCE)
     add("swap", "dripstone_block", K, "block/dripstone_block=drip_rock_top|drip_rock@4")
     add("swap", "jungle_stairs,jungle_slab", K, "block/jungle_planks=drip_rock_top|drip_rock@4")
-    add("swap", "mud_brick_stairs", K, "block/mud_bricks=step_boards")
+    add("swap", "mud_brick_stairs", K, "block/mud_bricks=step_boards_d")
     add("swap", "mud_brick_slab", K, "block/mud_bricks=mud_rock@4")
     add("swap", "mud_brick_wall", K, "block/mud_bricks=wall_tan")
     add("chain", "iron_chain", K)
@@ -398,9 +399,7 @@ def round47(add, room):
     add("swap", "smooth_stone_slab", C, "block/smooth_stone=kerb_cer,block/smooth_stone_slab_side=kerb_cer", ("33", "33"))
     add("kerb", "smooth_stone_slab", C, "-", ("33", "33"))
     # Its double lamps: the diorite posts and polished diorite tops off-white metal.
-    for x, z in CERULEAN_LAMPS:
-        add("swap", "diorite_wall,polished_diorite,polished_diorite_slab,polished_diorite_stairs", (x - 2, z - 2, x + 2, z + 2, "a Cerulean lamp"),
-            "block/diorite=lamp_white_post,block/polished_diorite=lamp_white_cap", ("35", "42"))
+    # (0.48: the whole lamp, its carpet top a cap, its glass, its lights; round48.)
     # The Bike Shop: its sign (the white shelves out front), its awning in fabric.
     bike = (-381, 279, -366, 284, "the Bike Shop's front")
     add("sign", "pale_oak_shelf", bike, "-", ("34", "35"))
@@ -482,6 +481,114 @@ def round48(add, room):
         room("boulder", "waxed_weathered_copper_grate", box, "prefix:sboulder")
         room("sign", "pale_oak_shelf", box)
         room("swap", "white_concrete", box, "block/white_concrete=cave_daylight!")
+
+
+VERMILION = (-402, 546, -300, 614, "Vermilion City")
+VERMILION_LAMPS = [(-386, 562), (-358, 569), (-357, 587), (-338, 565), (-330, 587)]
+# The small trees (17:51): a fence post for a trunk, a few leaves (not the big 4x4 trees). Their boxes, from the map
+# (tools: the fence posts with leaves on them, the clumps 4 by 4 or smaller).
+SMALL_TREES = [
+    (-823, 271, -819, 276, 33, 38, "Pewter's tree by the Museum"), (-818, 277, -787, 281, 31, 34, "Pewter's little trees along the north"),
+    (-788, 285, -783, 289, 30, 35, "Pewter's tree by the Museum's side"), (-770, 294, -765, 298, 30, 35, "Pewter's tree by the house"),
+    (-352, 257, -347, 261, 35, 40, "Cerulean's tree by the Gym"),
+    (-318, 575, -311, 582, 33, 39, "Vermilion's trees by the field"), (-363, 590, -359, 594, 33, 38, "Vermilion's tree by the Gym"),
+    (-496, 756, -492, 761, 32, 37, "Fuchsia's tree"), (-480, 756, -475, 761, 32, 37, "Fuchsia's tree"),
+    (-519, 767, -467, 772, 30, 35, "Fuchsia's row of trees"), (-496, 783, -488, 790, 32, 38, "Fuchsia's trees by the pond"),
+    (-481, 794, -477, 798, 31, 36, "Fuchsia's tree"), (-520, 815, -516, 819, 33, 38, "Fuchsia's tree"),
+    (-489, 816, -485, 832, 32, 37, "Fuchsia's trees on the beach"), (-510, 823, -506, 827, 32, 37, "Fuchsia's tree"),
+]
+UG_HUTS = [(-337, 33, 366, "Route 5's"), (-332, 31, 490, "Route 6's"), (-432, 32, 430, "Route 7's"), (-272, 33, 411, "Route 8's")]
+
+
+def round48b(add, room):
+    """0.48.0's town looks (17:42 to 17:53): see tools/looks48b.py for the pictures."""
+    import looks47
+    hedge_spec = looks47.hedge_spec() + ",block/flowering_azalea_leaves=hedge_fa"
+    hedge_blocks = looks47.HEDGE_BLOCKS + ",flowering_azalea_leaves"
+    # The double lamps, whole (Cerulean's off-white, Vermilion's off-grey): the diorite posts and caps metal, the carpet
+    # tops a cap, the black glass round the lights warm frosted glass running on seamless, the sea lanterns lit globes.
+    for lamps, nm, post, cap in ((CERULEAN_LAMPS, "Cerulean", "lamp_white_post", "lamp_white_cap"), (VERMILION_LAMPS, "Vermilion", "lamp_ver_post", "lamp_ver_cap")):
+        top = "lamp_cer_top" if nm == "Cerulean" else "lamp_ver_top"
+        for x, z in lamps:
+            b = (x - 3, z - 3, x + 3, z + 3, "a %s lamp" % nm)
+            add("swap", "diorite_wall,polished_diorite,light_gray_carpet,sea_lantern", b,
+                "block/diorite=%s,block/polished_diorite=%s,block/light_gray_wool=%s,block/sea_lantern=lamp_globe_warm!" % (post, cap, top), ("30", "42"))
+            add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ("30", "42"))
+    # Vermilion City in HeartGold's colours (17:51).
+    VE = VERMILION
+    add("roof_ver", "acacia_stairs", VE, "-", ("33", "50"))
+    add("swap", "acacia_slab,acacia_planks", VE, "block/acacia_planks=roof_ver_tiles", ("33", "50"))
+    add("swap", "white_terracotta", VE, "block/white_terracotta=wall_ver", ("31", "46"))
+    add("swap", "bricks,brick_stairs,brick_slab", VE, "block/bricks=base_ver")
+    add("swap", "polished_diorite_stairs", VE, "block/polished_diorite=trim_ver", ("31", "46"))
+    add("swap", "white_concrete,yellow_terracotta,light_gray_concrete,white_terracotta", VE,
+        "block/white_concrete=pave_ver_1,block/yellow_terracotta=pave_ver_2,block/light_gray_concrete=pave_ver_3,block/white_terracotta=pave_ver_4", ("30", "30"))
+    add("glass", "terracotta", VE, "block/terracotta=border_ver", ("30", "30"))
+    add("swap", "light_gray_terracotta", VE, "block/light_gray_terracotta=ground_ver", ("29", "30"))
+    add("grass_onto", "terracotta,light_gray_terracotta", VE, "-", ("30", "30"))
+    add("swap", "smooth_stone", VE, "block/smooth_stone=kerb_ver", ("30", "30"))
+    add("swap", "stone", VE, "block/stone=canal_ver", ("22", "29"))
+    add("swap", "barrel", VE, "block/barrel_side=barrel_ver_side,block/barrel_top=barrel_ver_top,block/barrel_top_open=barrel_ver_top,block/barrel_bottom=barrel_ver_top")
+    add("swap", "oak_trapdoor,spruce_trapdoor", VE, "block/oak_trapdoor=planter_ver,block/spruce_trapdoor=planter_ver")
+    add("swap", "oak_shelf,dark_oak_shelf", VE, "block/oak_shelf=planter_rim,block/dark_oak_shelf=planter_rim", ("31", "31"))
+    add("swap", "blackstone_wall", VE, "block/blackstone=dock_post")
+    add("swap", "pale_oak_fence", VE, "block/pale_oak_planks=fence_grey")
+    add("hedge", hedge_blocks, (-340, 578, -316, 581, "Vermilion's hedge by the field"), hedge_spec, ("31", "32"))
+    gym = (-382, 584, -360, 597, "Vermilion Gym")
+    add("roof_vgym", "jungle_stairs", gym, "-", ("38", "42"))
+    add("swap", "jungle_planks,jungle_slab,stripped_jungle_log", gym, "block/jungle_planks=roof_vgym_tiles,block/stripped_jungle_log=roof_vgym_edge", ("38", "42"))
+    add("swap", "light_gray_concrete", gym, "block/light_gray_concrete=vgym_wall", ("32", "38"))
+    add("swap", "oak_planks", gym, "block/oak_planks=planter_ver", ("35", "40"))
+    add("swap", "quartz_block", gym, "block/quartz_block_side=kerb_ver,block/quartz_block_top=kerb_ver,block/quartz_block_bottom=kerb_ver", ("31", "34"))
+    add("swap", "pink_terracotta", gym, "block/pink_terracotta=base_ver")
+    # The small trees: their fence posts a little trunk, their leaves a rounded, tufted crown.
+    for x0, z0, x1, z1, y0, y1, note in SMALL_TREES:
+        add("boulder", "spruce_fence,oak_fence,dark_oak_fence", (x0, z0, x1, z1, note), "prefix:ttrunk", (str(y0), str(y1)))
+        add("hedge", hedge_blocks, (x0, z0, x1, z1, note), hedge_spec, (str(y0), str(y1)))
+    # The hedges (17:42 to 17:53): Pewter Gym's bushes, Fuchsia's flowering azalea round its ponds.
+    add("hedge", hedge_blocks, (-819, 297, -797, 300, "Pewter Gym's bushes"), hedge_spec, ("30", "31"))
+    add("hedge", "flowering_azalea_leaves", FUCHSIA, hedge_spec, ("28", "33"))
+    # The steps at the water (the jungle stairs standing in it) as the shore's wet stones: Cerulean's, Fuchsia's.
+    add("swap", "jungle_stairs,jungle_slab", (-401, 220, -311, 305, "Cerulean's water's edge"), "block/jungle_planks=shore_step", ("30", "34"))
+    add("swap", "jungle_stairs,jungle_slab", FUCHSIA, "block/jungle_planks=shore_step", ("27", "31"))
+    # Fuchsia: the dry grass, the pink petals (laid over four blocks, so each patch differs), the slab steps up from
+    # the red path in its border's red.
+    add("swap", "short_dry_grass,tall_dry_grass", FUCHSIA, "block/short_dry_grass=dry_grass_short!,block/tall_dry_grass=dry_grass_tall_bottom!")
+    add("swap", "pink_petals", FUCHSIA, "block/pink_petals=petals_big@4!")
+    add("swap", "mangrove_slab", FUCHSIA, "block/mangrove_planks=red_kerb", ("29", "31"))
+    # Bill's Sea Cottage: the slabs to its door, its pillars (smooth stone) on their dark plinths (polished blackstone bricks).
+    bill = (-226, 141, -209, 158, "Bill's Sea Cottage")
+    add("swap", "smooth_stone,smooth_stone_slab,polished_blackstone_bricks,polished_blackstone_brick_slab,polished_blackstone_brick_stairs", bill,
+        "block/smooth_stone=bill_pillar,block/smooth_stone_slab_side=bill_step,block/polished_blackstone_bricks=bill_plinth")
+    # The Bike Shop: its oak posts, the awning's bottom row a scalloped valance, BIKE SHOP across its front.
+    add("swap", "stripped_oak_wood,stripped_oak_log", (-377, 280, -366, 282, "the Bike Shop's posts"), "block/stripped_oak_log=bike_post,block/stripped_oak_log_top=bike_post", ("35", "37"))
+    add("swap", "acacia_stairs,pale_oak_stairs", (-377, 282, -366, 282, "the Bike Shop's valance"), "block/acacia_planks=awning_val_o,block/pale_oak_planks=awning_val_w", ("38", "38"))
+    for i in range(8):
+        add("swap", "acacia_shelf", (-375 + i, 281, -375 + i, 281, "the Bike Shop's lettering"), "block/acacia_shelf=awning_l%d" % i, ("39", "39"))
+    # Route 4's steps by the POKéMON CENTER (cobblestone and mossy cobblestone) as the boarded steps.
+    add("swap", "cobblestone_stairs,mossy_cobblestone_stairs,cobblestone_slab,mossy_cobblestone_slab", (-625, 245, -590, 275, "Route 4's steps by the Center"),
+        "block/cobblestone=step_boards_d,block/mossy_cobblestone=step_boards_d")
+    # Route 5: the bushes by the Day Care.
+    add("swap", "bush", (-372, 306, -330, 376, "Route 5's bushes"), "block/bush=bush_round!")
+    # The four Underground Path huts, as the bigger buildings: a slate blue tiled roof, clean walls, dressed stone at
+    # the foot, white posts, dark metal rails, the steps.
+    for x, y, z, note in UG_HUTS:
+        h = (x - 8, z - 10, x + 8, z + 4, note + " Underground Path hut")
+        add("roof_ug", "birch_stairs", h, "-", (str(y + 2), str(y + 10)))
+        add("swap", "birch_slab,birch_planks", h, "block/birch_planks=roof_ug_tiles", (str(y + 2), str(y + 10)))
+        add("swap", "polished_deepslate,polished_deepslate_stairs", h, "block/polished_deepslate=wall_ug", (str(y), str(y + 8)))
+        add("swap", "andesite,polished_andesite_stairs,polished_andesite_slab,polished_andesite", h,
+            "block/andesite=base_ug,block/polished_andesite=pillar_cer", (str(y - 1), str(y + 8)))
+        add("swap", "stripped_oak_log,stripped_jungle_log,light_gray_concrete", h,
+            "block/stripped_oak_log=post_ug,block/stripped_oak_log_top=post_ug,block/stripped_jungle_log=post_ug,block/stripped_jungle_log_top=post_ug,"
+            "block/light_gray_concrete=pillar_cer", (str(y), str(y + 8)))
+        add("swap", "deepslate_tile_wall", h, "block/deepslate_tiles=rail_ug", (str(y), str(y + 8)))
+        add("swap", "polished_deepslate_slab", h, "block/polished_deepslate=step_cer", (str(y - 1), str(y + 1)))
+    # Inside: Cerulean Gym's pool in tiles (white walkways, blue floor, a blue-edged rim); LT. SURGE's electric door.
+    room("swap", "smooth_quartz,quartz_block,smooth_quartz_slab,smooth_quartz_stairs,quartz_slab,quartz_stairs", (2559, -1, 2582, 26, "Cerulean Gym's pool"),
+         "block/quartz_block_bottom=pool_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_tile")
+    room("swap", "black_concrete", (2559, -1, 2582, 26, "Cerulean Gym's pool"), "block/black_concrete=pool_floor")
+    room("swap", "light_blue_stained_glass", (3199, -1, 3215, 23, "LT. SURGE's electric door"), "block/light_blue_stained_glass=surge_barrier!")
 
 
 LAMP46 = ("block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chisel,"

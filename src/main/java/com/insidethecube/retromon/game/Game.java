@@ -881,7 +881,8 @@ public final class Game {
 			new Zone("pewter_city", -850, 255, -741, 339), new Zone("route_3", -740, 285, -580, 332), new Zone("route_4", -628, 238, -410, 284),
 			new Zone("fuchsia_city", -560, 733, -441, 860), new Zone("cerulean_city", -401, 220, -311, 305), new Zone("route_24", -372, 140, -332, 219),
 			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
-			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345)};
+			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345),
+			new Zone("vermilion_city", -402, 546, -300, 614)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -934,7 +935,9 @@ public final class Game {
 	/** Cerulean City and the routes round it (16:17), and the routes the Underground Paths come out on (16:20). */
 	private static final Zone[] CERULEAN_ZONES = {new Zone("cerulean_city", -401, 220, -311, 305), new Zone("route_24", -372, 140, -332, 219),
 			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
-			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345)};
+			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345),
+			// (17:51) Vermilion City.
+			new Zone("vermilion_city", -402, 546, -300, 614)};
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -2434,6 +2437,15 @@ public final class Game {
 					goodRodTalk(p, n, d);
 					return;
 				}
+				// Vermilion City (17:51): the FISHING GURU (the OLD ROD), the POKéMON FAN CLUB's CHAIRMAN (the BIKE VOUCHER).
+				if (n.key().equals("vermilion_old_rod_house_p0")) {
+					oldRodTalk(p, n, d);
+					return;
+				}
+				if (n.key().equals("pokemon_fan_club_p4")) {
+					chairman(p, n, d);
+					return;
+				}
 				if (n.key().equals("fuchsia_move_deleter_p0")) {
 					deleter(p, n);
 					return;
@@ -2700,6 +2712,53 @@ public final class Game {
 		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
 		t.put("choices", ch);
 		dialogue(p, n, "good_rod", List.of("I'm the FISHING GURU's older brother!", "I simply Looove fishing!", "Do you like to fish?"), t, n.getId());
+	}
+
+	private static void oldRodTalk(ServerPlayer p, Npc n, PlayerData d) {
+		if (d.count("old_rod") > 0) {
+			dialogue(p, n, "talk", fill(p, List.of("Hello there, {player}!", "How are the fish biting?")));
+			return;
+		}
+		dialogue(p, n, "old_rod", List.of("I'm the FISHING GURU!", "I simply Looove fishing!", "Do you like to fish?"), yesNo(), n.getId());
+	}
+
+	private static void oldRod(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (!yes) {
+			dialogue(p, n, "talk", List.of("Oh... That's so disappointing..."));
+			return;
+		}
+		if (d.count("old_rod") > 0) return;
+		d.give("old_rod", 1);
+		sync(p);
+		dialogue(p, n, "talk", fill(p, List.of("Grand! I like your style!", "Take this and fish, young one!", "{player} received an OLD ROD!",
+				"Fishing is a way of life! From the seas to rivers, go out and land the big one, young one!")));
+	}
+
+	/** The POKéMON FAN CLUB's CHAIRMAN (Vermilion, FireRed's): hear him out, and he gives you the BIKE VOUCHER. */
+	private static void chairman(ServerPlayer p, Npc n, PlayerData d) {
+		if (d.count("bike_voucher") > 0 || d.statics.contains("bike_voucher")) {
+			dialogue(p, n, "talk", fill(p, List.of("Hello, {player}!", "Did you come see me about my POKéMON again?", "No? Too bad!")));
+			return;
+		}
+		dialogue(p, n, "chairman", List.of("I chair the POKéMON FAN CLUB!", "I have collected over 100 POKéMON!", "I'm very fussy when it comes to POKéMON!",
+				"So...", "Did you come visit to hear about my POKéMON?"), yesNo(), n.getId());
+	}
+
+	private static void chairmanStory(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (!yes) {
+			dialogue(p, n, "talk", List.of("Oh. Come back when you want to hear my story!"));
+			return;
+		}
+		if (d.statics.contains("bike_voucher")) return;
+		d.statics.add("bike_voucher");
+		d.give("bike_voucher", 1);
+		sync(p);
+		dialogue(p, n, "talk", fill(p, List.of("Good!", "Then listen up!", "My favorite RAPIDASH...", "It... cute... lovely... smart... plus... amazing... you think so?... oh yes... it... stunning... kindly... love it!",
+				"Hug it... when... sleeping... warm and cuddly... spectacular... ravishing... ...Oops! Look at the time! I kept you too long!",
+				"Thanks for hearing me out!", "I want you to have this!", "{player} received a BIKE VOUCHER!", "Exchange that for a BICYCLE!",
+				"Don't worry, my FEAROW will FLY me anywhere!", "So, I don't need a BICYCLE!", "I hope you like cycling!")));
 	}
 
 	private static void goodRod(ServerPlayer p, Npc n, boolean yes) {
@@ -3156,11 +3215,12 @@ public final class Game {
 	private static final Map<String, String> TRADE_WANTS = Map.of("mr_mime_trade", "abra", "jynx_trade", "poliwhirl", "farfetch_d_trade", "spearow",
 			"lickitung_trade", "slowbro", "nidoran_f_trade", "nidoran_m");
 	/** The names the traded POKéMON come with (FireRed's). */
-	private static final Map<String, String> TRADE_NICKS = Map.of("nidoran_f_trade", "MS. NIDO", "jynx_trade", "ZYNX");
+	private static final Map<String, String> TRADE_NICKS = Map.of("nidoran_f_trade", "MS. NIDO", "jynx_trade", "ZYNX", "farfetch_d_trade", "CH'DING");
 	/** Traders who stand in a room (by their key): the trade they offer, and what they say. */
 	private static final Map<String, String[]> TRADERS = Map.of(
 			"underground_path_trader", new String[] {"nidoran_f_trade", "I'm looking for NIDORAN♂! Wanna trade one for NIDORAN♀?", "How is my old NIDORAN♀? My NIDORAN♂ is doing great!"},
-			"cerulean_trader", new String[] {"jynx_trade", "I'm looking for POLIWHIRL! Wanna trade one for JYNX?", "Hi! How is ZYNX doing? I'm taking good care of the POLIWHIRL!"});
+			"cerulean_trader", new String[] {"jynx_trade", "I'm looking for POLIWHIRL! Wanna trade one for JYNX?", "Hi! How is ZYNX doing? I'm taking good care of the POLIWHIRL!"},
+			"vermilion_trader", new String[] {"farfetch_d_trade", "Hi! Do you have a SPEAROW? Want to trade it for my FARFETCH'D?", "How is my old CH'DING? My SPEAROW is doing great!"});
 
 	private static void trader(ServerPlayer p, Npc n, PlayerData d) {
 		String[] tr = TRADERS.get(n.key());
@@ -3180,11 +3240,101 @@ public final class Game {
 			dialogue(p, n, "talk", List.of("How do you like your new BICYCLE?", "You can take it on CYCLING ROAD and in caves!"));
 			return;
 		}
+		if (d.count("bike_voucher") > 0) {
+			// (17:51) The FAN CLUB CHAIRMAN's BIKE VOUCHER: a BICYCLE for it (FireRed's).
+			d.take("bike_voucher");
+			d.give("bicycle", 1);
+			sync(p);
+			dialogue(p, n, "talk", fill(p, List.of("Oh, that's...", "A BIKE VOUCHER!", "OK! Here you go!", "{player} exchanged the BIKE VOUCHER for a BICYCLE.",
+					"Thank you! Come back again sometime!")));
+			return;
+		}
 		CompoundTag t = new CompoundTag();
 		ListTag ch = new ListTag();
 		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
 		t.put("choices", ch);
 		dialogue(p, n, "bike", List.of("Hi! Welcome to our BIKE SHOP.", "Have we got just the BIKE for you!", "It's a cool BIKE! Do you want it? It's ¥1,000,000."), t, n.getId());
+	}
+
+	// ---------- LT.SURGE's GYM (Vermilion, FireRed's): the trash cans and the electric door ----------
+
+	/** Your locks in LT.SURGE's GYM this visit: the can with the first switch, the one with the second, how many found. */
+	private static final Map<UUID, int[]> SURGE_LOCKS = new HashMap<>();
+
+	/** Something in a room the game answers (the client says which): LT.SURGE's trash cans. */
+	public static void use(ServerPlayer p, String use) {
+		Interiors.Room r = Interiors.roomOf(p);
+		if (r == null || Battles.in(p) || BUSY.containsKey(p.getUUID())) return;
+		if (use.startsWith("can:") && r.id().equals("vermilion_gym")) {
+			try {
+				trashCan(p, Integer.parseInt(use.substring(4)));
+			} catch (NumberFormatException ignored) {
+				// Not a can.
+			}
+		}
+	}
+
+	/** Two switches: the first under any can, the second under one right next to it (FireRed's). */
+	private static int[] newLocks() {
+		int first = RNG.nextInt(15), col = first % 5, row = first / 5;
+		List<Integer> next = new ArrayList<>();
+		if (col > 0) next.add(first - 1);
+		if (col < 4) next.add(first + 1);
+		if (row > 0) next.add(first - 5);
+		if (row < 2) next.add(first + 5);
+		return new int[] {first, next.get(RNG.nextInt(next.size())), 0};
+	}
+
+	private static void trashCan(ServerPlayer p, int i) {
+		PlayerData d = data(p);
+		if (i < 0 || i >= 15) return;
+		if (d.statics.contains("vermilion_gym_open")) {
+			message(p, List.of("Nope! There's only trash here."));
+			return;
+		}
+		int[] s = SURGE_LOCKS.computeIfAbsent(p.getUUID(), k -> newLocks());
+		if (s[2] == 0) {
+			if (i == s[0]) {
+				s[2] = 1;
+				message(p, List.of("Hey! There's a switch under the trash!", "Turn it on!", "The 1st electric lock opened!"));
+			} else message(p, List.of("Nope! There's only trash here."));
+			return;
+		}
+		if (i == s[0]) {
+			message(p, List.of("The 1st electric lock is open."));
+			return;
+		}
+		if (i == s[1]) {
+			d.statics.add("vermilion_gym_open");
+			SURGE_LOCKS.remove(p.getUUID());
+			sync(p);
+			surgeDoor(p);
+			message(p, List.of("Hey! There's another switch under the trash!", "Turn it on!", "The 2nd electric lock opened!", "The motorized door opened!"));
+			return;
+		}
+		SURGE_LOCKS.put(p.getUUID(), newLocks());
+		message(p, List.of("Nope! There's only trash here.", "Hey! The electric locks were reset!"));
+	}
+
+	/**
+	 * The electric door in LT.SURGE's GYM: shut (real blocks, drawn as the barrier) till you've found both switches, open
+	 * after. Set for you as you come in (a new visit's locks are new, as in FireRed).
+	 */
+	public static void surgeDoor(ServerPlayer p) {
+		if (!(p.level() instanceof ServerLevel level) || level.dimension() != Interiors.LEVEL) return;
+		Interiors.Room r = Interiors.ROOMS.get("vermilion_gym");
+		if (r == null) return;
+		PlayerData d = data(p);
+		boolean open = d.statics.contains("vermilion_gym_open") || d.beaten.contains("vermilion_gym_0");
+		net.minecraft.world.level.block.state.BlockState b = open ? net.minecraft.world.level.block.Blocks.AIR.defaultBlockState()
+				: net.minecraft.world.level.block.Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState();
+		for (int x = 6; x <= 7; x++) for (int y = 0; y <= 1; y++) level.setBlock(new BlockPos(r.ox() + x, r.oy() + y, r.oz() + 6), b, 3);
+	}
+
+	/** Coming into LT.SURGE's GYM: new locks this visit, and the door as it is for you. */
+	public static void surgeEntered(ServerPlayer p) {
+		SURGE_LOCKS.remove(p.getUUID());
+		surgeDoor(p);
 	}
 
 	// ---------- the POKéMON DAY CARE (ROUTE 5, Red and Blue's) ----------
@@ -3497,6 +3647,8 @@ public final class Game {
 			case "safari_fee" -> safariFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "good_rod" -> goodRod(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "bike" -> bikeBuy(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "old_rod" -> oldRod(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "chairman" -> chairmanStory(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "daycare_ask" -> daycareAsk(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "daycare_pick" -> daycarePick(p, n, t);
 			case "daycare_back" -> daycareBack(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
@@ -4119,7 +4271,7 @@ public final class Game {
 			// Pewter City's (13:18), FireRed's map over John's at two blocks a step (x = 2c - 836, z = 2r + 265, from its
 			// doors): the girl who says CLEFAIRY came from the moon, the man by the museum, the man below the Center, the
 			// boy in the rose garden, the boy at the way east who takes you to the GYM.
-			{"pewter_city_p0", -824, 295}, {"pewter_city_p2", -770, 299}, {"pewter_city_p1", -794, 321}, {"pewter_city_p3", -776, 320}, {"cerulean_city_p7", -396, 251},
+			{"pewter_city_p0", -824, 295}, {"pewter_city_p2", -770, 299}, {"pewter_city_p1", -794, 321}, {"pewter_city_p3", -776, 320}, {"cerulean_city_p7", -396, 251}, {"vermilion_city_p0", -356, 566}, {"vermilion_city_p1", -366, 562}, {"vermilion_city_p3", -328, 564}, {"vermilion_city_p4", -330, 566}, {"vermilion_city_p5", -338, 603}, {"vermilion_city_p2", -352, 607},
 			{"pewter_city_p4", -752, 306},
 			// Routes 3 and 4 (13:56), where FireRed has them (x = 2c - 748, z = 2r + 285 on Route 3; x = 2c - 628, z = 2r + 246
 			// on Route 4): the youngster resting by the way up to MT. MOON; the woman by the POKéMON CENTER, the boy below it,
@@ -4310,7 +4462,7 @@ public final class Game {
 	 * good ground. Anyone already there stays (or, with redo, is put back where the games had them).
 	 */
 	/** Places marked only round one spot so far (16:58: Route 10 round the Power Plant): only people with their own spots. */
-	private static final java.util.Set<String> OWN_SPOTS_ONLY = java.util.Set.of("route_10");
+	private static final java.util.Set<String> OWN_SPOTS_ONLY = java.util.Set.of("route_10", "vermilion_city");
 
 	public static int populate(ServerLevel level, String place, boolean redo) {
 		Zone z = null;

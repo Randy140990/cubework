@@ -201,4 +201,5 @@ def build():
         f()
 
 
-EXTRA = []
+import looks48b
+EXTRA = [looks48b.build]
