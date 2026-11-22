@@ -138,7 +138,8 @@
       const R = new Room("ug_r7", { name: "Underground Path", floor: "Route 7 entrance", W: 14, D: 12 });
       ugEntrance(R, { down: "ug_ew", downSpawn: { x: 5.2, z: 1.0, yaw: FACE.e }, sign: "This way to ROUTE 8 (LAVENDER TOWN).",
         person: { name: "Man", key: "underground_path_route_7_p0", x: 9.4, z: 8.0, yaw: FACE.w, look: { skin: "middle_aged_man" },
-          talk: () => [{ text: "I heard a sleepy POKéMON appeared near CELADON CITY." }] } });
+          talk: () => [{ text: "I heard a sleepy POKéMON appeared near CELADON CITY." }, { text: "The guards on SAFFRON's gates look awfully thirsty." },
+            { text: "My gran in CELADON makes TEA. Here, take some!" }] } });
       return R;
     },
     ug_r8() {

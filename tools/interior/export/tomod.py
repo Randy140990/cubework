@@ -38,7 +38,8 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           # (0.50) Every route gate a way through, and Routes 12 and 16's house.
           "gate_r5": (3712, 64, 0), "gate_r6": (3776, 64, 0), "gate_r7": (3840, 64, 0), "gate_r8": (3904, 64, 0), "gate_r11": (3968, 64, 0),
           "gate_r12": (4032, 64, 0), "gate_r15": (4416, 64, 0), "gate_r16n": (4480, 64, 0), "gate_r16s": (4544, 64, 0), "gate_r18": (4928, 64, 0),
-          "route12_house": (4992, 64, 0), "route16_house": (5056, 64, 0)}
+          "route12_house": (4992, 64, 0), "route16_house": (5056, 64, 0),
+          "gate_r11_2f": (5248, 64, 0), "gate_r12_2f": (5312, 64, 0), "gate_r15_2f": (5504, 64, 0), "gate_r16_2f": (5568, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -56,7 +57,8 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "lavender_volunteer_house": "mr_fujis_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "name_raters_house",
          "gate_r5": "route_5_gate", "gate_r6": "route_6_gate", "gate_r7": "route_7_gate", "gate_r8": "route_8_gate", "gate_r11": "route_11_gate_1f",
          "gate_r12": "route_12_gate_1f", "gate_r15": "route_15_gate_1f", "gate_r16n": "route_16_gate_1f", "gate_r16s": "route_16_gate_1f",
-         "gate_r18": "route_18_gate_1f", "route12_house": "route_12_super_rod_house", "route16_house": "route_16_fly_house"}
+         "gate_r18": "route_18_gate_1f", "route12_house": "route_12_super_rod_house", "route16_house": "route_16_fly_house",
+         "gate_r11_2f": "route_11_gate_2f", "gate_r12_2f": "route_12_gate_2f", "gate_r15_2f": "route_15_gate_2f", "gate_r16_2f": "route_16_gate_2f"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},

@@ -307,7 +307,7 @@ summer_beach_house_p0	summer_beach_house	fishing_guru	down	stay	Whoa! | Your PIK
 summer_beach_house_p1	summer_beach_house	pikachu	1	walk	PIKACHU: Pikaa	5	3
 trade_center_p0	trade_center	red	any_dir	stay	!	2	2
 underground_path_route_6_p0	underground_path_route_6	girl	none	stay	People often lose things in that UNDERGROUND PATH.	2	3
-underground_path_route_7_p0	underground_path_route_7	middle_aged_man	none	stay	I heard a sleepy POKéMON appeared near CELADON CITY.	2	4
+underground_path_route_7_p0	underground_path_route_7	middle_aged_man	none	stay	I heard a sleepy POKéMON appeared near CELADON CITY. | The guards on SAFFRON's gates look awfully thirsty. | My gran in CELADON makes TEA. Here, take some!	2	4
 underground_path_route_7_copy_p0	underground_path_route_7_copy	girl	none	stay	I want to shop at the dept. store in CELADON but... | There are so many rough looking people there.	3	2
 underground_path_route_7_copy_p1	underground_path_route_7_copy	middle_aged_man	none	stay	You're here to shop in CELADON? | Just step outside and head west!	2	4
 underground_path_route_8_p0	underground_path_route_8	girl	none	stay	The dept. store in CELADON has a great selection!	3	4

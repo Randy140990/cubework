@@ -637,7 +637,7 @@ function lgGate(R, o) {
   // The blue lower walls, a white rail over them.
   band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
   // Windows down both sides.
-  for (const z of [2.6 + N, 6.2 + N]) for (const wall of ["w", "e"]) crossWindow(R, wall, z, 1.6, 2.0, 1.4, ["Outside: the trees along ROUTE 2."]);
+  for (const z of [2.6 + N, 6.2 + N]) for (const wall of ["w", "e"]) if (!(o.stairs && wall === "e" && z < 4 + N)) crossWindow(R, wall, z, 1.6, 2.0, 1.4, [o.view || "Outside: the trees along ROUTE 2."]);
   // The way on at the north: a nook as deep as the one at the door (4 by 2), dark at its back (the forest's green
   // beyond), its mat its whole width with the arrows pointing out; palms either side.
   const north = o.north || {};
@@ -648,13 +648,18 @@ function lgGate(R, o) {
   // The runner, from the way on at the north to the door at the south.
   rug(R, 5, N, 9, R.Dm, "gateRun");
   // Stools round two glass tables on the east side, a few along the west wall; plants; a bin.
-  glassTable(R, 10.4, 3.0 + N, 11.9, 4.4 + N, { lines: ["A glass table. There's a leaflet: VIRIDIAN FOREST, A WALK FOR ALL AGES!"] });
-  stool(R, 12.6, 3.7 + N); stool(R, 11.15, 2.3 + N); stool(R, 9.7, 3.7 + N);
-  glassTable(R, 10.4, 6.2 + N, 11.9, 7.6 + N, { lines: ["A glass table. Someone's left a map of ROUTE 2 on it."] });
-  stool(R, 12.6, 6.9 + N); stool(R, 11.15, 8.3 + N); stool(R, 9.7, 6.9 + N);
+  // (0.50) A gate with an upstairs: the stairs up along the north wall on the east side, the tables a little further down.
+  const up = o.stairs, S = up ? 1.3 : 0;
+  if (up) stairsUp(R, 10, N, 2, { to: up.to, spawn: up.spawn, wall: "gateWhite" });
+  glassTable(R, 10.4, 3.0 + N + S, 11.9, 4.4 + N + S, { lines: [o.leaflet || "A glass table. There's a leaflet: VIRIDIAN FOREST, A WALK FOR ALL AGES!"] });
+  stool(R, 12.6, 3.7 + N + S); stool(R, 11.15, 2.3 + N + S); stool(R, 9.7, 3.7 + N + S);
+  if (!up) {
+    glassTable(R, 10.4, 6.2 + N, 11.9, 7.6 + N, { lines: [o.map || "A glass table. Someone's left a map of ROUTE 2 on it."] });
+    stool(R, 12.6, 6.9 + N); stool(R, 11.15, 8.3 + N); stool(R, 9.7, 6.9 + N);
+  }
   stool(R, 1.0, 6.6 + N); stool(R, 1.0, 7.8 + N);
   slimPlant(R, 0.8, 3.4 + N, 1.0); plant(R, 1.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); slimPlant(R, 13.2, R.Dm - 1.0, 1.0);
-  bin(R, 13.3, 1.0 + N);
+  if (!up) bin(R, 13.3, 1.0 + N);
   const south = o.south || {};
   doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], south.none ? { none: true, mat: "matGate" } : { to: south.to, spawn: south.spawn || { x: 6.9, z: D - 2.0, yaw: FACE.s }, mat: "matGate" });
   if (south.none) R.act([LG_GATE_DOOR[0], D - 1.4, LG_GATE_DOOR[1], D], { label: "Look", lines: south.lines });
