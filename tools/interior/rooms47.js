@@ -193,8 +193,9 @@
     for (let i = 0; i < 16; i++) { const x = Math.floor(r() * 28), y = Math.floor(r() * 30); P.rect(x, y, 3 + Math.floor(r() * 4), 1, hx("#6E9BE8")); }
     for (let i = 0; i < 10; i++) { const x = Math.floor(r() * 30), y = Math.floor(r() * 30); P.rect(x, y, 2, 1, hx("#264E9E")); }
   }, { per: 2, alpha: 0.72 });
-  reg("poolBottomView", 16, 16, (P, r) => { P.fill(hx("#335B52"), 0.06, r); P.rect(0, 0, 16, 1, hx("#264640")); P.rect(0, 0, 1, 16, hx("#264640")); });
-  reg("poolQuartzView", 16, 16, (P, r) => { P.fill(hx("#F1EFEA"), 0.015, r); P.rect(0, 15, 16, 1, hx("#DCD8D0")); });
+  // (0.48: tiled, as the game's look now has it: blue tiles at the bottom, white tiles on the walkways, 17:51.)
+  reg("poolBottomView", 16, 16, (P, r) => { P.fill(hx("#3D86C6"), 0.03, r); for (let i = 3; i < 16; i += 4) { P.rect(0, i, 16, 1, hx("#2C6599")); P.rect(i, 0, 1, 16, hx("#2C6599")); } });
+  reg("poolQuartzView", 16, 16, (P, r) => { P.fill(hx("#F4F7F8"), 0.015, r); for (let i = 3; i < 16; i += 4) { P.rect(0, i, 16, 1, hx("#B9CCD6")); P.rect(i, 0, 1, 16, hx("#B9CCD6")); } });
   reg("poolEdge", 16, 16, (P, r) => { P.fill(hx("#F5F8FB"), 0.02, r); P.rect(0, 15, 16, 1, hx("#C9D6E2")); });
   reg("standSeat", 16, 16, (P, r) => { P.fill(hx("#E35B66"), 0.03, r); P.rect(0, 0, 16, 2, hx("#F08A93")); });
   reg("standSeatBlue", 16, 16, (P, r) => { P.fill(hx("#4C8FDB"), 0.03, r); P.rect(0, 0, 16, 2, hx("#82B5EE")); });

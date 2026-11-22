@@ -25,7 +25,7 @@ wood_sign	spruce_sign	-830	495	-745	589	-	-	-	Viridian City
 wood_sign	spruce_sign	-830	340	-745	494	-	-	-	Route 2
 wood_sign	spruce_sign	-1000	495	-831	600	-	-	-	Route 22
 wood_sign	spruce_sign	-850	255	-741	339	-	-	-	Pewter City
-grass_edge	dripstone_block	-845	655	-745	735	-	-	-	Pallet Town
+grass_edge	dripstone_block	-1010	100	60	1060	-	-	-	Kanto
 roof_green	warped_stairs	-830	495	-745	589	-	-	-	Viridian City
 swap	pale_oak_stairs,pale_oak_slab	-830	495	-745	589	-	-	block/pale_oak_planks=window_frame	Viridian City
 swap	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	block/calcite=path_calcite,block/diorite=path_diorite,block/polished_diorite=path_polished_diorite	Viridian City
@@ -767,5 +767,5 @@ swap	stripped_oak_log,stripped_jungle_log,light_gray_concrete	-280	401	-264	415	
 swap	deepslate_tile_wall	-280	401	-264	415	33	41	block/deepslate_tiles=rail_ug	Route 8's Underground Path hut
 swap	polished_deepslate_slab	-280	401	-264	415	32	34	block/polished_deepslate=step_cer	Route 8's Underground Path hut
 swap	smooth_quartz,quartz_block,smooth_quartz_slab,smooth_quartz_stairs,quartz_slab,quartz_stairs	2559	-1	2582	26	-	-	block/quartz_block_bottom=pool_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_tile	Cerulean Gym's pool	interiors
-swap	black_concrete	2559	-1	2582	26	-	-	block/black_concrete=pool_floor	Cerulean Gym's pool	interiors
+swap	dark_prismarine	2559	-1	2582	26	-	-	block/dark_prismarine=pool_floor	Cerulean Gym's pool	interiors
 swap	light_blue_stained_glass	3199	-1	3215	23	-	-	block/light_blue_stained_glass=surge_barrier!	LT. SURGE's electric door	interiors

@@ -78,7 +78,8 @@ def main():
         add("sign", "pale_oak_shelf,pale_oak_sign", a)
     for a in (PALLET_R1, VIRIDIAN, ROUTE2, ROUTE22, PEWTER):
         add("wood_sign", "spruce_sign", a)
-    add("grass_edge", "dripstone_block", PALLET)
+    # (17:42: every route, all of Kanto, not only Pallet.)
+    add("grass_edge", "dripstone_block", KANTO)
     # Viridian City's two green houses: their roofs (warped stairs) in green tiles, their windows' frames (pale oak
     # stairs and slabs) solid white.
     add("roof_green", "warped_stairs", VIRIDIAN)
@@ -587,7 +588,7 @@ def round48b(add, room):
     # Inside: Cerulean Gym's pool in tiles (white walkways, blue floor, a blue-edged rim); LT. SURGE's electric door.
     room("swap", "smooth_quartz,quartz_block,smooth_quartz_slab,smooth_quartz_stairs,quartz_slab,quartz_stairs", (2559, -1, 2582, 26, "Cerulean Gym's pool"),
          "block/quartz_block_bottom=pool_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_tile")
-    room("swap", "black_concrete", (2559, -1, 2582, 26, "Cerulean Gym's pool"), "block/black_concrete=pool_floor")
+    room("swap", "dark_prismarine", (2559, -1, 2582, 26, "Cerulean Gym's pool"), "block/dark_prismarine=pool_floor")
     room("swap", "light_blue_stained_glass", (3199, -1, 3215, 23, "LT. SURGE's electric door"), "block/light_blue_stained_glass=surge_barrier!")
 
 
