@@ -166,6 +166,40 @@ def build():
             elif f.endswith(".properties"):
                 shutil.copy(os.path.join(dirpath, f), os.path.join(out, f))
     grasses()
+    petals()
+
+
+def petals():
+    """Pink petals (Viridian City's, and wherever else they are) as little pink flowers standing up, swaying as the
+    other flowers do, not petals lying flat: in each of the four corners of the block they fill (one to four, as
+    Minecraft's), a small tuft of three blossoms on green stems on two crossed planes."""
+    from PIL import Image
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    stem, leaf = (63, 138, 46, 255), (92, 168, 60, 255)
+    petal, petal_dark, centre = (244, 158, 194, 255), (226, 122, 168, 255), (255, 231, 160, 255)
+    for x, y0 in ((5, 12), (8, 11), (10, 13)):
+        for y in range(y0, 16):
+            im.putpixel((x, y), stem)
+    for x, y in ((6, 14), (9, 14), (4, 15), (11, 15)):
+        im.putpixel((x, y), leaf)
+    for cx, cy in ((5, 11), (8, 10), (10, 12)):
+        for dx, dy in ((0, -1), (0, 1), (-1, 0), (1, 0)):
+            im.putpixel((cx + dx, cy + dy), petal)
+        for dx, dy in ((-1, -1), (1, 1)):
+            if 0 <= cx + dx < 16 and 0 <= cy + dy < 16 and im.getpixel((cx + dx, cy + dy))[3] == 0:
+                im.putpixel((cx + dx, cy + dy), petal_dark)
+        im.putpixel((cx, cy), centre)
+    im.save(os.path.join(ASSETS, "textures", "block", "pink_petals.png"))
+    models = os.path.join(ASSETS, "models", "block")
+    for n, (x0, z0) in enumerate(((0, 0), (0, 8), (8, 8), (8, 0)), start=1):
+        cx, cz = x0 + 4, z0 + 4
+        face = {"uv": [4, 8, 12, 16], "texture": "#cross"}
+        back = {"uv": [12, 8, 4, 16], "texture": "#cross"}
+        rot = {"angle": 45, "axis": "y", "origin": [cx, 4, cz]}
+        els = [{"from": [cx - 3.5, 0, cz], "to": [cx + 3.5, 7, cz], "shade": False, "rotation": rot, "faces": {"north": face, "south": back}},
+               {"from": [cx, 0, cz - 3.5], "to": [cx, 7, cz + 3.5], "shade": False, "rotation": rot, "faces": {"east": face, "west": back}}]
+        json.dump({"ambientocclusion": False, "textures": {"particle": "minecraft:block/pink_petals", "cross": "minecraft:block/pink_petals"}, "elements": els},
+                  open(os.path.join(models, "pink_petals_%d.json" % n), "w"), indent=1)
 
 
 def grasses():

@@ -902,13 +902,27 @@ function tallGrass(room, x0, z0, x1, z1) {
 if (typeof AREATEX !== "undefined") {
   const TUFT = [134, 217, 104];
   for (const k of Object.keys(AREATEX)) {
-    const tuft = /^grass_on_drip_/.test(k), shade = /^drip_shade_/.test(k);
+    const tuft = /^(grass_on_drip|kerb_grass)_/.test(k), shade = /^drip_shade_/.test(k);
     TEXDEF["area_" + k] = [AREATEX[k].w, AREATEX[k].h, P => P.area(k, tuft ? c => [c[0] * TUFT[0] / 255, c[1] * TUFT[1] / 255, c[2] * TUFT[2] / 255, c[3]] : null)];
-    MATDEF["area_" + k] = tuft || shade ? { tex: "area_" + k, per: 1, cut: true } : { tex: "area_" + k, per: 1 };
+    const kerb = /^kerb_/.test(k), per = AREATEX[k].w >= 64 ? 4 : 1;
+    MATDEF["area_" + k] = tuft || shade || kerb ? { tex: "area_" + k, per: 1, cut: true } : { tex: "area_" + k, per };
+  }
+  // The short sign's board (10 high) and the wooden sign's faces: their pictures fitted to the faces, as the
+  // mod's models give them (their faces run past the block, so a picture laid by the block would wrap).
+  for (const k of Object.keys(AREATEX)) {
+    if (/^sign_short_(front|back)_/.test(k)) { TEXDEF["area_" + k] = [16, 10, P => P.area(k)]; MATDEF["area_" + k] = { tex: "area_" + k, fit: true }; }
+    if (/^wood_sign_(front|back)$/.test(k)) MATDEF["area_" + k] = { tex: "area_" + k, fit: true };
   }
   // The roof's tiles on the tops of its steps, their rows along the eaves (here the roof's ridge runs north to
   // south): the picture turned a quarter, its rows' tops uphill (towards the ridge, east or west).
-  const turned = (flip) => [16, 16, P => { const Q = new Pix(16, 16); Q.area("roof_tiles"); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(flip ? 15 - x : x, y, Q.get(y, x), 1); }];
-  TEXDEF.area_roof_top_e = turned(false); MATDEF.area_roof_top_e = { tex: "area_roof_top_e", per: 1 };
-  TEXDEF.area_roof_top_w = turned(true); MATDEF.area_roof_top_w = { tex: "area_roof_top_w", per: 1 };
+  const turned = (name, flip) => [16, 16, P => { const Q = new Pix(16, 16); Q.area(name); for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(flip ? 15 - x : x, y, Q.get(y, x), 1); }];
+  for (const set of ["roof", "roof_green", "roof_gym"]) {
+    TEXDEF["area_" + set + "_top_e"] = turned(set + "_tiles", false); MATDEF["area_" + set + "_top_e"] = { tex: "area_" + set + "_top_e", per: 1 };
+    TEXDEF["area_" + set + "_top_w"] = turned(set + "_tiles", true); MATDEF["area_" + set + "_top_w"] = { tex: "area_" + set + "_top_w", per: 1 };
+  }
 }
+// The sea lantern in a lamp's head, lit.
+TEXDEF.seaLantern = [16, 16, (P, r) => { P.fill(hx("#DDEFF2"), 0.05, r); P.rect(0, 0, 16, 1, hx("#B9D6DC")); P.rect(0, 15, 16, 1, hx("#B9D6DC")); P.rect(0, 0, 1, 16, hx("#B9D6DC")); P.rect(15, 0, 1, 16, hx("#B9D6DC")); P.rect(5, 5, 6, 6, hx("#F6FCFD")); }];
+MATDEF.seaLantern = { tex: "seaLantern", per: 1, glow: 0.9 };
+TEXDEF.blackGlass = [16, 16, (P, r) => { P.fill(hx("#1A1D22"), 0.04, r); P.rect(0, 0, 16, 1, hx("#2C3138")); P.rect(0, 0, 1, 16, hx("#2C3138")); }];
+MATDEF.blackGlass = { tex: "blackGlass", per: 1, alpha: 0.55 };

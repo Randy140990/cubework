@@ -21,6 +21,7 @@ const PLACES = [
   { id: "arena_route", name: "Route battle", floor: "Battle arena (outside)", group: "Battle arenas" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
   { id: "pallet_looks", name: "Pallet Town looks", floor: "Outside (the mod's blocks)", group: "Outside" },
+  { id: "viridian_looks", name: "Viridian City and Route 22 looks", floor: "Outside (the mod's blocks)", group: "Outside" },
 ];
 // Your house and the rival's (14 by 13, the mat in a nook at the door), the stairs at the back on the right.
 const FROM_TOWN = { x: 7.0, z: 11.5, yaw: FACE.n };
@@ -1523,6 +1524,108 @@ const BUILD = {
     R.item("Mailbox", "The mod's own block, by each house: a red box with its slot, on a silver post.");
     R.item("Roof", "Acacia stairs in HeartGold's roof red: rows of tiles along the eaves, a darker trim at the ends (your house and Blue's).");
     R.spawn = { x: 12, z: 16.6, yaw: FACE.n };
+    return R;
+  },
+
+  viridian_looks() {
+    // The looks the mod gives Viridian City and Route 22 (client/AreaLooks, tools/lookarea.py), on John's blocks:
+    // his path of calcite, diorite and polished diorite (here in his own pattern) as one white path in three
+    // patterns, a light grey kerb along the grass with the grass rounded onto it; a lamp (his tuff, in black, the
+    // sea lantern kept); his two standing pale oak signs as HeartGold's sign and his spruce sign as its wooden sign,
+    // taller; a Pokémon Center's reds and a Mart's blues as Let's Go's; Route 22's floor (mud bricks) as a dirt path
+    // with its border (brown concrete powder) a shade deeper. Everything faces you (south).
+    const R = new Room("viridian_looks", { name: "Viridian City and Route 22 looks", floor: "Outside (the mod's blocks)", W: 28, D: 22, H: 8, outside: true });
+    const G = R.geo, P16 = 1 / 16;
+    const ROWS = ["cdcdcd", "cpcpdc", "cdcdcd", "cpcpdc", "cdcddd", "pdpdcc", "cccccd", "cdcdcd"];
+    const isPath = (x, z) => (x >= 3 && x < 9 && z >= 2 && z < 20) || (x >= 9 && x < 21 && z >= 8 && z < 13);
+    const kind = (x, z) => ({ c: "calcite", d: "diorite", p: "polished_diorite" })[ROWS[((z % 8) + 8) % 8][((x - 3) % 6 + 6) % 6]];
+    const grassAt = (x, z) => x >= 0 && z >= 0 && x < R.W && z < R.D && !isPath(x, z) && !(x >= 21 && z >= 15);
+    for (let x = 0; x < R.W; x++) for (let z = 0; z < R.D; z++) {
+      if (isPath(x, z)) G.box(x, -1, z, x + 1, 0, z + 1, "area_path_" + kind(x, z));
+      else if (!(x >= 21 && z >= 15)) G.box(x, -1, z, x + 1, 0, z + 1, { top: "grass", all: "soil" });
+    }
+    for (let x = 0; x < R.W; x++) for (let z = 0; z < R.D; z++) {
+      if (!isPath(x, z)) continue;
+      const n = grassAt(x, z - 1), so = grassAt(x, z + 1), w = grassAt(x - 1, z), e = grassAt(x + 1, z);
+      const nw = grassAt(x - 1, z - 1), ne = grassAt(x + 1, z - 1), sw = grassAt(x - 1, z + 1), se = grassAt(x + 1, z + 1);
+      const edges = (n ? 1 : 0) | (e ? 2 : 0) | (so ? 4 : 0) | (w ? 8 : 0);
+      const tiles = ({ 1: [16], 2: [8], 4: [2], 8: [10], 3: [11], 6: [4], 12: [5], 9: [12], 5: [16, 2], 10: [8, 10], 14: [6], 13: [7], 7: [13], 11: [14], 15: [9] })[edges] || [];
+      if (nw && !n && !w) tiles.push(17);
+      if (ne && !n && !e) tiles.push(15);
+      if (sw && !so && !w) tiles.push(3);
+      if (se && !so && !e) tiles.push(1);
+      for (const t of tiles) G.box(x, 0.002, z, x + 1, 0.002, z + 1, { top: "area_kerb_" + t, all: null });
+      for (const t of tiles) G.box(x, 0.004, z, x + 1, 0.004, z + 1, { top: "area_kerb_grass_" + t, all: null });
+    }
+    // Route 22's floor in the corner: mud bricks as the dirt path, ringed by its brown concrete border.
+    for (let x = 21; x < R.W; x++) for (let z = 15; z < R.D; z++) {
+      const rim = x === 21 || z === 15 || x === R.W - 1 || z === R.D - 1;
+      G.box(x, -1, z, x + 1, 0, z + 1, rim ? "area_route_path_edge" : "area_route_path");
+    }
+    // A lamp: chiseled tuff bricks at its foot and under its head, polished tuff wall and tuff walls between (in
+    // black), the sea lantern in black glass, the grey carpet cap (black) and the daylight sensor on top.
+    const lx = 11, lz = 5;
+    G.box(lx, 0, lz, lx + 1, 1, lz + 1, { all: "area_lamp_chiseled_tuff_bricks", top: "area_lamp_chiseled_tuff_bricks_top", bottom: null });
+    G.box(lx + 4 * P16, 1, lz + 4 * P16, lx + 12 * P16, 2, lz + 12 * P16, { all: "area_lamp_polished_tuff", top: null, bottom: null });
+    G.box(lx + 4 * P16, 2, lz + 4 * P16, lx + 12 * P16, 6, lz + 12 * P16, { all: "area_lamp_tuff", top: null, bottom: null });
+    G.box(lx, 6, lz, lx + 1, 7, lz + 1, { all: "area_lamp_chiseled_tuff_bricks", top: null, bottom: "area_lamp_chiseled_tuff_bricks_top" });
+    G.box(lx, 7, lz, lx + 1, 8, lz + 1, "seaLantern");
+    G.box(lx - 1, 7, lz - 1, lx + 2, 8, lz + 2, { all: "blackGlass", top: null, bottom: null });
+    G.box(lx - 1, 8, lz - 1, lx + 2, 8 + P16, lz + 2, "area_lamp_gray_wool");
+    G.box(lx, 8 + P16, lz, lx + 1, 8 + 6 * P16, lz + 1, { all: "blackGlass", top: "area_lamp_gray_wool" });
+    R.solid(lx, lz, lx + 1, lz + 1);
+    // John's two standing pale oak signs, side by side, as HeartGold's sign a block high.
+    const sz = 14;
+    for (const [bx, part] of [[13, "l"], [14, "r"]]) {
+      const outerW = part === "l", outerE = part === "r";
+      G.box(bx - (outerW ? 0.25 * P16 : 0), 8.5 * P16, sz + 5 * P16, bx + 1 + (outerE ? 0.25 * P16 : 0), 18.5 * P16, sz + 11 * P16, { s: "area_sign_short_front_" + part, n: "area_sign_short_back_" + part,
+        top: "area_sign_edge_h", bottom: "area_sign_edge_h", w: outerW ? "area_sign_edge_v" : null, e: outerE ? "area_sign_edge_v" : null });
+      G.box(bx + (outerW ? 2 * P16 : 0), 2 * P16, sz + 6 * P16, bx + 1 - (outerE ? 2 * P16 : 0), 8.5 * P16, sz + 10 * P16, { all: "area_sign_stand", top: null, bottom: null,
+        w: outerW ? "area_sign_stand" : null, e: outerE ? "area_sign_stand" : null });
+      G.box(bx + (outerW ? P16 : 0), 0, sz + 5 * P16, bx + 1 - (outerE ? P16 : 0), 2 * P16, sz + 11 * P16, { all: "area_sign_foot", w: outerW ? "area_sign_foot" : null, e: outerE ? "area_sign_foot" : null });
+    }
+    R.solid(13, sz + 0.3, 15, sz + 0.7);
+    // The spruce sign as HeartGold's wooden sign, taller: a board on a thick post.
+    const wx = 17, wz = 14;
+    G.box(wx - 0.5 * P16, 9 * P16, wz + 6.5 * P16, wx + 16.5 * P16, 25 * P16, wz + 9.5 * P16, { s: "area_wood_sign_front", n: "area_wood_sign_back", all: "area_wood_sign_edge" });
+    G.box(wx + 6.5 * P16, 0, wz + 6.5 * P16, wx + 9.5 * P16, 9 * P16, wz + 9.5 * P16, { all: "area_wood_post", top: null });
+    G.box(wx + 5 * P16, 25 * P16, wz + 6 * P16, wx + 11 * P16, 26 * P16, wz + 10 * P16, "area_wood_post");
+    R.solid(wx, wz + 0.3, wx + 1, wz + 0.7);
+    // A Pokémon Center's roof (stripped mangrove wood with mangrove stairs along its edge) and a Mart's (blue
+    // concrete and wool, a blue carpet on top), on white walls: Let's Go's red and blue.
+    G.box(13, 0, 2, 18, 2, 5, "siding");
+    G.box(13, 2, 2, 18, 3, 5, "area_center_stripped_mangrove_log");
+    G.box(12.5, 2, 5, 18.5, 2.5, 5.5, "area_center_mangrove_planks");
+    G.box(13.5, 3, 2.5, 17.5, 3.5, 4.5, "area_center_mangrove_planks");
+    G.box(20, 0, 2, 25, 2, 5, "siding");
+    G.box(20, 2, 2, 25, 3, 5, { all: "area_mart_blue_concrete", top: "area_mart_blue_wool" });
+    G.box(20, 3, 2, 25, 3 + P16, 5, "area_mart_blue_wool");
+    G.box(19.5, 1.5, 5, 25.5, 2, 5.5, "area_mart_blue_wool");
+    R.solid(13, 2, 18, 5); R.solid(20, 2, 25, 5);
+    // One of the green houses' roofs (warped stairs) in green tiles, its side window's frame (pale oak stairs) solid
+    // white; and a Gym's roof (jungle stairs, its planks and beams) in tan.
+    const gable = (base, z0, z1, set, wall) => {
+      for (let i = 0; i < 3; i++) for (const side of ["w", "e"]) {
+        const x = side === "w" ? base + i : base + 5 - i, y = i, top = "area_" + set + "_top_" + side;
+        G.box(x, y, z0, x + 1, y + 0.5, z1, { top, n: "area_" + set + "_edge", s: "area_" + set + "_edge", w: "area_" + set + "_tiles", e: "area_" + set + "_tiles", bottom: "area_" + set + "_under" });
+        const hx0 = side === "w" ? x + 0.5 : x, hx1 = side === "w" ? x + 1 : x + 0.5;
+        G.box(hx0, y + 0.5, z0, hx1, y + 1, z1, { top, n: "area_" + set + "_edge", s: "area_" + set + "_edge", w: "area_" + set + "_tiles", e: "area_" + set + "_tiles", bottom: null });
+        if (y > 0) G.box(x, 0, z0 + 0.5, x + 1, y, z1 - 0.5, wall);
+      }
+      R.solid(base, z0, base + 6, z1);
+    };
+    gable(0.5, -0.2, 1.6, "roof_green", "siding");
+    G.box(6.6, 0.9, 0.2, 6.7, 1.9, 1.2, "window");
+    G.box(6.5, 0.8, 0.1, 6.8, 0.9, 1.3, "area_window_frame"); G.box(6.5, 1.9, 0.1, 6.8, 2.0, 1.3, "area_window_frame");
+    G.box(6.5, 0.8, 0.1, 6.8, 2.0, 0.2, "area_window_frame"); G.box(6.5, 0.8, 1.2, 6.8, 2.0, 1.3, "area_window_frame");
+    gable(21.5, 8, 11.5, "roof_gym", "siding");
+    G.box(24, 2.5, 8, 25, 3, 11.5, { all: "area_gym_beam", top: "area_gym_beam_top" });
+    R.item("Path", "John's calcite, diorite and polished diorite: one white, each its own pattern of bumps (four, five, three bigger), a light grey kerb along the grass, the grass rounded onto it at the corners.");
+    R.item("Lamp", "His tuff lamp in black (Let's Go's Viridian lampposts), its chiselled pattern kept, the sea lantern as it is.");
+    R.item("Signs", "His standing pale oak signs as HeartGold's sign; his spruce sign as its wooden sign, taller (Minecraft's own sign inside, so it never shows).");
+    R.item("Roofs", "Every Pokémon Center's reds and every Mart's blues on the map in Let's Go's red and blue as solid metal sheets, each of John's blocks its own shade (the Center's emblem too); the green houses' roofs in green tiles, their window frames solid white; every Gym's roof in tan tiles, its flats and beams solid tan.");
+    R.item("Route 22", "The mud brick floor as the dirt paths, its brown border a shade deeper (the mud brick steps stay as the ledges).");
+    R.spawn = { x: 10, z: 19.5, yaw: FACE.n };
     return R;
   },
 

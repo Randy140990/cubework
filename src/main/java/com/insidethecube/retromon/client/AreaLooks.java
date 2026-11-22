@@ -148,7 +148,7 @@ public final class AreaLooks {
 	private static Look make(Rule rule, ModelBaker baker) {
 		return switch (rule.look()) {
 			case "swap" -> swap(baker, rule.swaps());
-			case "roof" -> new Roof(sprite(baker, "roof_tiles"), sprite(baker, "roof_edge"), sprite(baker, "roof_under"));
+			case "roof", "roof_green", "roof_gym" -> new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"));
 			case "sign" -> AreaLooks::sign;
 			case "wood_sign" -> AreaLooks::woodSign;
 			case "grass_edge", "kerb" -> {

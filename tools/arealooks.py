@@ -22,6 +22,8 @@ LAMP = ("block/tuff=lamp_tuff,block/polished_tuff=lamp_polished_tuff,block/chise
 CENTER = ("block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,"
           "block/mangrove_planks=center_mangrove_planks")
 MART = "block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool"
+GYM = ("block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,"
+       "block/stripped_jungle_log_top=gym_beam_top")
 
 
 def main():
@@ -35,6 +37,10 @@ def main():
         add("sign", "pale_oak_shelf,pale_oak_sign", a)
         add("wood_sign", "spruce_sign", a)
     add("grass_edge", "dripstone_block", PALLET)
+    # Viridian City's two green houses: their roofs (warped stairs) in green tiles, their windows' frames (pale oak
+    # stairs and slabs) solid white.
+    add("roof_green", "warped_stairs", VIRIDIAN)
+    add("swap", "pale_oak_stairs,pale_oak_slab", VIRIDIAN, "block/pale_oak_planks=window_frame")
     add("swap", "calcite,diorite,polished_diorite", VIRIDIAN, PATH, ("24", "25"))
     add("kerb", "calcite,diorite,polished_diorite", VIRIDIAN, "-", ("24", "25"))
     for a in (VIRIDIAN, ROUTE22):
@@ -51,11 +57,19 @@ def main():
                 (x - 6, z - 10, x + 6, z, place + " Pokemon Center"), CENTER, (str(y - 1), str(y + 2)))
         else:
             add("swap", "blue_concrete,blue_wool,blue_carpet", (x - 6, z - 10, x + 6, z - 2, place + " Mart"), MART, (str(y - 5), str(y + 2)))
+    # Every Gym's roof: its stairs in tan tiles, its planks and beams solid tan shades.
+    for line in open(os.path.join(HERE, "area_gyms.tsv")):
+        if not line.strip() or line.startswith("#"):
+            continue
+        place, x0, x1, y0, y1, z0, z1 = line.rstrip("\n").split("\t")
+        box = (int(x0) - 1, int(z0) - 1, int(x1) + 1, int(z1) + 1, place + " Gym")
+        add("roof_gym", "jungle_stairs,oak_stairs", box, "-", (y0, str(int(y1) + 1)))
+        add("swap", "jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab", box, GYM, (y0, str(int(y1) + 1)))
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
                 "# swap: textures for others (old=new, the new ones the mod's own, in textures/block/area; @4: laid from where the face\n"
-                "# is, a picture four blocks across). roof: HeartGold's red tiles along the eaves. sign: shelves and standing pale oak\n"
+                "# is, a picture four blocks across). roof, roof_green, roof_gym: rows of tiles along the eaves (HeartGold's red, the\n# green houses' green, the Gyms' tan). sign: shelves and standing pale oak\n"
                 "# signs as HeartGold's signs. wood_sign: standing spruce signs as its wooden sign, taller. grass_edge: the grass's tufts\n"
                 "# onto the dripstone round the water. kerb: a grey kerb with the grass rounded onto it, on a path's blocks.\n"
                 "#look\tblocks\tx0\tz0\tx1\tz1\ty0\ty1\tswaps\twhere\n")

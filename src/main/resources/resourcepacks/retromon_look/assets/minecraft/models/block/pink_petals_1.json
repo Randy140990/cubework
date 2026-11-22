@@ -1,0 +1,93 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "particle": "minecraft:block/pink_petals",
+  "cross": "minecraft:block/pink_petals"
+ },
+ "elements": [
+  {
+   "from": [
+    0.5,
+    0,
+    4
+   ],
+   "to": [
+    7.5,
+    7,
+    4
+   ],
+   "shade": false,
+   "rotation": {
+    "angle": 45,
+    "axis": "y",
+    "origin": [
+     4,
+     4,
+     4
+    ]
+   },
+   "faces": {
+    "north": {
+     "uv": [
+      4,
+      8,
+      12,
+      16
+     ],
+     "texture": "#cross"
+    },
+    "south": {
+     "uv": [
+      12,
+      8,
+      4,
+      16
+     ],
+     "texture": "#cross"
+    }
+   }
+  },
+  {
+   "from": [
+    4,
+    0,
+    0.5
+   ],
+   "to": [
+    4,
+    7,
+    7.5
+   ],
+   "shade": false,
+   "rotation": {
+    "angle": 45,
+    "axis": "y",
+    "origin": [
+     4,
+     4,
+     4
+    ]
+   },
+   "faces": {
+    "east": {
+     "uv": [
+      4,
+      8,
+      12,
+      16
+     ],
+     "texture": "#cross"
+    },
+    "west": {
+     "uv": [
+      12,
+      8,
+      4,
+      16
+     ],
+     "texture": "#cross"
+    }
+   }
+  }
+ ]
+}

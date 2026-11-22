@@ -1,7 +1,8 @@
 # Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,
 # over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.
 # swap: textures for others (old=new, the new ones the mod's own, in textures/block/area; @4: laid from where the face
-# is, a picture four blocks across). roof: HeartGold's red tiles along the eaves. sign: shelves and standing pale oak
+# is, a picture four blocks across). roof, roof_green, roof_gym: rows of tiles along the eaves (HeartGold's red, the
+# green houses' green, the Gyms' tan). sign: shelves and standing pale oak
 # signs as HeartGold's signs. wood_sign: standing spruce signs as its wooden sign, taller. grass_edge: the grass's tufts
 # onto the dripstone round the water. kerb: a grey kerb with the grass rounded onto it, on a path's blocks.
 #look	blocks	x0	z0	x1	z1	y0	y1	swaps	where
@@ -19,6 +20,8 @@ wood_sign	spruce_sign	-830	340	-745	494	-	-	-	Route 2
 sign	pale_oak_shelf,pale_oak_sign	-960	495	-831	600	-	-	-	Route 22
 wood_sign	spruce_sign	-960	495	-831	600	-	-	-	Route 22
 grass_edge	dripstone_block	-845	655	-745	735	-	-	-	Pallet Town
+roof_green	warped_stairs	-830	495	-745	589	-	-	-	Viridian City
+swap	pale_oak_stairs,pale_oak_slab	-830	495	-745	589	-	-	block/pale_oak_planks=window_frame	Viridian City
 swap	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	block/calcite=path_calcite,block/diorite=path_diorite,block/polished_diorite=path_polished_diorite	Viridian City
 kerb	calcite,diorite,polished_diorite	-830	495	-745	589	24	25	-	Viridian City
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-830	495	-745	589	-	-	block/tuff=lamp_tuff,block/polished_tuff=lamp_polished_tuff,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_gray_wool	Viridian City
@@ -61,3 +64,35 @@ swap	blue_concrete,blue_wool,blue_carpet	-341	405	-329	413	34	41	block/blue_conc
 swap	blue_concrete,blue_wool,blue_carpet	-349	572	-337	580	32	39	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	vermilion_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-1885	534	-1873	542	23	30	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	violet_city Mart
 swap	blue_concrete,blue_wool,blue_carpet	-772	536	-760	544	26	33	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	viridian_city Mart
+roof_gym	jungle_stairs,oak_stairs	-2023	870	-2005	882	24	30	-	azalea_town Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2023	870	-2005	882	24	30	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	azalea_town Gym
+roof_gym	jungle_stairs,oak_stairs	-552	436	-536	448	37	43	-	celadon_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-552	436	-536	448	37	43	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	celadon_city Gym
+roof_gym	jungle_stairs,oak_stairs	-346	257	-328	269	38	44	-	cerulean_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-346	257	-328	269	38	44	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	cerulean_city Gym
+roof_gym	jungle_stairs,oak_stairs	-2553	754	-2536	766	22	28	-	cianwood_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2553	754	-2536	766	22	28	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	cianwood_city Gym
+roof_gym	jungle_stairs,oak_stairs	-786	900	-768	912	22	28	-	cinnabar_island Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-786	900	-768	912	22	28	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	cinnabar_island Gym
+roof_gym	jungle_stairs,oak_stairs	-1485	332	-1467	344	35	41	-	blackthorn_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1485	332	-1467	344	35	41	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	blackthorn_city Gym
+roof_gym	jungle_stairs,oak_stairs	-2072	409	-2055	421	25	31	-	ecruteak_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2072	409	-2055	421	25	31	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	ecruteak_city Gym
+roof_gym	jungle_stairs,oak_stairs	-538	801	-521	813	35	41	-	fuchsia_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-538	801	-521	813	35	41	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	fuchsia_city Gym
+roof_gym	jungle_stairs,oak_stairs	-1782	409	-1765	421	26	32	-	mahogany_town Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1782	409	-1765	421	26	32	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	mahogany_town Gym
+roof_gym	jungle_stairs,oak_stairs	-2319	520	-2288	532	23	29	-	olivine_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2319	520	-2288	532	23	29	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	olivine_city Gym
+roof_gym	jungle_stairs,oak_stairs	-817	287	-799	299	34	40	-	pewter_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-817	287	-799	299	34	40	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	pewter_city Gym
+roof_gym	jungle_stairs,oak_stairs	-2097	655	-2066	667	24	30	-	goldenrod_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2097	655	-2066	667	24	30	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	goldenrod_city Gym
+roof_gym	jungle_stairs,oak_stairs	-344	388	-313	400	37	43	-	saffron_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-344	388	-313	400	37	43	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	saffron_city Gym
+roof_gym	jungle_stairs,oak_stairs	-380	585	-362	597	35	41	-	vermilion_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-380	585	-362	597	35	41	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	vermilion_city Gym
+roof_gym	jungle_stairs,oak_stairs	-1868	533	-1850	545	26	32	-	violet_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1868	533	-1850	545	26	32	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	violet_city Gym
+roof_gym	jungle_stairs,oak_stairs	-776	516	-758	528	30	36	-	viridian_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-776	516	-758	528	30	36	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	viridian_city Gym

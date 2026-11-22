@@ -1,0 +1,18 @@
+# Every Gym on John's map (his one design: a roof of jungle stairs and planks, oak planks and stairs, stripped jungle logs),
+# found by a scan of the map for those blocks together: place, x0 x1 y0 y1 z0 z1 of the roof (tools/arealooks.py).
+azalea_town	-2022	-2006	24	29	871	881
+celadon_city	-551	-537	37	42	437	447
+cerulean_city	-345	-329	38	43	258	268
+cianwood_city	-2552	-2537	22	27	755	765
+cinnabar_island	-785	-769	22	27	901	911
+blackthorn_city	-1484	-1468	35	40	333	343
+ecruteak_city	-2071	-2056	25	30	410	420
+fuchsia_city	-537	-522	35	40	802	812
+mahogany_town	-1781	-1766	26	31	410	420
+olivine_city	-2318	-2289	23	28	521	531
+pewter_city	-816	-800	34	39	288	298
+goldenrod_city	-2096	-2067	24	29	656	666
+saffron_city	-343	-314	37	42	389	399
+vermilion_city	-379	-363	35	40	586	596
+violet_city	-1867	-1851	26	31	534	544
+viridian_city	-775	-759	30	35	517	527

@@ -81,7 +81,15 @@ ROOF = {"hi": hexc("#FF9F87"), "base": hexc("#FF8B73"), "mid": hexc("#F68362"), 
         "under": hexc("#AC4A2E")}
 
 
-def roof_tiles():
+# The green houses' roofs (Viridian City's: Let's Go's and HeartGold's greens) and the Gyms' (their jungle and oak
+# turned to a warm tan roof, as FireRed's and HeartGold's Gyms), in the same rows of tiles.
+ROOF_GREEN = {"hi": hexc("#86C46A"), "base": hexc("#6AAE55"), "mid": hexc("#5EA14C"), "low": hexc("#559546"), "shadow": hexc("#3F7836"),
+              "seam": hexc("#4E8C42"), "edge_top": hexc("#4F8C43"), "edge_bottom": hexc("#3D7033"), "under": hexc("#33602C")}
+ROOF_GYM = {"hi": hexc("#F0D592"), "base": hexc("#DDBB72"), "mid": hexc("#D2AE66"), "low": hexc("#C7A25C"), "shadow": hexc("#A47F40"),
+            "seam": hexc("#BC9754"), "edge_top": hexc("#B48C4A"), "edge_bottom": hexc("#93703A"), "under": hexc("#7C5E31")}
+
+
+def roof_tiles(ROOF=ROOF):
     """Two rows of tiles a block, running across the texture (the mod lays the rows along the eaves, the top of
     each row uphill): a light lip, the tile, its shadow on the row below; the joins between tiles staggered."""
     im = Image.new("RGBA", (16, 16))
@@ -99,7 +107,7 @@ def roof_tiles():
     return im
 
 
-def roof_edge():
+def roof_edge(ROOF=ROOF):
     """The roof's ends (where the rows of tiles are cut): a darker trim, a touch darker towards the bottom."""
     im = Image.new("RGBA", (16, 16))
     for y in range(16):
@@ -471,7 +479,7 @@ def wood_textures():
 
 
 # ---------- Viridian City's path: three patterns of the same white, a grey kerb, the grass rounded onto it ----------
-PATH = {"base": hexc("#E4E5E0"), "lo": hexc("#D9DAD4"), "bump": hexc("#D3D5CF"), "bump_hi": hexc("#F4F5F2"), "bump_lo": hexc("#BFC2BB")}
+PATH = {"base": hexc("#DDDED9"), "lo": hexc("#D2D3CD"), "bump": hexc("#C6C8C1"), "bump_hi": hexc("#EFF0EC"), "bump_lo": hexc("#ACAFA8")}
 # Where each block's bumps are (a block of each pattern): calcite four, diorite five, polished diorite three bigger.
 BUMPS = {"calcite": [(3, 3, 2), (10, 4, 2), (5, 10, 2), (12, 11, 2)],
          "diorite": [(2, 6, 2), (7, 2, 2), (12, 5, 2), (5, 12, 2), (11, 11, 2)],
@@ -488,14 +496,16 @@ def path_tile(name):
             c = mix(PATH["base"], PATH["lo"], r.random() * 0.45)
             im.putpixel((x, y), c)
     for bx, by, size in BUMPS[name]:
+        # A round pebble: its body, lit at its top left, its shadow just past its bottom right.
         for j in range(size):
             for i in range(size):
+                if size == 3 and (i, j) in ((0, 0), (2, 0), (0, 2), (2, 2)):
+                    continue
                 im.putpixel((bx + i, by + j), PATH["bump"])
-        for i in range(size):
-            im.putpixel((bx + i, by - 1), PATH["bump_hi"])
-            im.putpixel((bx - 1, by + i), PATH["bump_hi"])
-            im.putpixel((bx + i, by + size), PATH["bump_lo"])
-            im.putpixel((bx + size, by + i), PATH["bump_lo"])
+        im.putpixel((bx + (1 if size == 3 else 0), by), PATH["bump_hi"])
+        im.putpixel((bx, by + (1 if size == 3 else 0)), PATH["bump_hi"])
+        im.putpixel((bx + size, by + size - 1), PATH["bump_lo"])
+        im.putpixel((bx + size - 1, by + size), PATH["bump_lo"])
     return im
 
 
@@ -522,8 +532,8 @@ def coverage_at(tile, depth, amp, round_):
     return out
 
 
-KERB = {"outer": hexc("#B7BCC3"), "kerb": hexc("#C6CAD0"), "lip": hexc("#DCDFE3"), "shadow": hexc("#C4C6C2")}
-KERB_W = 3.8
+KERB = {"outer": hexc("#8F959D"), "kerb": hexc("#A2A8AF"), "lip": hexc("#BCC1C6"), "shadow": hexc("#B9BCB6")}
+KERB_W = 4.6
 
 
 def kerb_tile(tile):
@@ -563,7 +573,7 @@ def kerb_grass_tile(tile, g16):
 
 # ---------- recoloured, in their own patterns: the lamps' posts, the Centers' reds, the Marts' blues ----------
 VANILLA = lookground.VANILLA
-LAMP = [hexc(c) for c in ("#0D0F12", "#191C20", "#262A30", "#373C44", "#535A64")]
+LAMP = [hexc(c) for c in ("#111316", "#1A1D21", "#23272C", "#2F343A", "#424850")]
 CENTER_RED = [hexc(c) for c in ("#7A1A1F", "#A6282F", "#C6363D", "#DC4F55", "#EE7A7E")]
 MART_BLUE = [hexc(c) for c in ("#163468", "#234F98", "#3066B7", "#4882D1", "#72A5E5")]
 
@@ -588,22 +598,78 @@ def recolour_soft(src, ramp, spread=70.0):
     return im
 
 
+def metal(base, seam=True):
+    """A solid colour as a metal sheet: lit along its top, a soft sheen across it, a touch darker towards the
+    bottom, a fine line at its left edge where the sheets meet (none for a plain one)."""
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            k = 0.10 - 0.16 * (y / 15)
+            if y == 0:
+                k = 0.2
+            band = (x + y) % 16
+            if 5 <= band <= 7:
+                k += 0.05
+            c = mix(base, (255, 255, 255), k) if k >= 0 else mix(base, (0, 0, 0), -k)
+            if seam and x == 0 and y > 0:
+                c = mix(c, (0, 0, 0), 0.12)
+            im.putpixel((x, y), c)
+    return im
+
+
+def flat(base, lines=True):
+    """A roof's flat (planks in John's builds): one solid colour, a fine line across every eight pixels (the joins of
+    its sheets), lit on their upper side."""
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            c = base
+            if lines and y % 8 == 7:
+                c = mix(base, (0, 0, 0), 0.14)
+            elif lines and y % 8 == 0:
+                c = mix(base, (255, 255, 255), 0.1)
+            im.putpixel((x, y), c)
+    return im
+
+
+def window_frame():
+    """A window's frame (pale oak stairs and slabs by the green houses' windows): solid white, its edges a touch
+    greyer, so it reads as a painted frame."""
+    im = Image.new("RGBA", (16, 16), hexc("#F1F0EA"))
+    for i in range(16):
+        for (x, y) in ((i, 0), (0, i)):
+            im.putpixel((x, y), hexc("#FBFBF8"))
+        for (x, y) in ((i, 15), (15, i)):
+            im.putpixel((x, y), hexc("#D9D8D1"))
+    return im
+
+
 def recolours():
     v = lambda n: os.path.join(VANILLA, "textures", "block", n + ".png")
     for n in ("tuff", "polished_tuff", "chiseled_tuff_bricks", "chiseled_tuff_bricks_top"):
         save("lamp_" + n, lookground.recolour(v(n), LAMP))
     save("lamp_gray_wool", recolour_soft(v("gray_wool"), LAMP))
-    for n in ("stripped_mangrove_log", "stripped_mangrove_log_top", "mangrove_planks"):
-        save("center_" + n, lookground.recolour(v(n), CENTER_RED))
-    for n in ("blue_concrete", "blue_wool"):
-        save("mart_" + n, recolour_soft(v(n), MART_BLUE))
+    # The Pokémon Centers' reds and the Marts' blues: Let's Go's, as solid metal sheets, each of John's blocks its own
+    # shade (the roof's sheets, the trim and the emblem, the wool and carpets that lift parts of it).
+    save("center_stripped_mangrove_log", metal(hexc("#C8363D")))
+    save("center_stripped_mangrove_log_top", metal(hexc("#C8363D"), seam=False))
+    save("center_mangrove_planks", metal(hexc("#DB4A50"), seam=False))
+    save("mart_blue_concrete", metal(hexc("#3268B8")))
+    save("mart_blue_wool", metal(hexc("#2A5AA6"), seam=False))
+    # The Gyms' roofs: the stairs get the tan tiles (the roof look), their flats and beams solid tan shades.
+    save("gym_flat", flat(hexc("#D8B46A")))
+    save("gym_flat_light", flat(hexc("#E6C783")))
+    save("gym_beam", flat(hexc("#A57A40"), lines=False))
+    save("gym_beam_top", flat(hexc("#B3884A"), lines=False))
+    save("window_frame", window_frame())
 
 
 def build():
     save("white_fence", fence())
-    save("roof_tiles", roof_tiles())
-    save("roof_edge", roof_edge())
-    save("roof_under", solid(ROOF["under"]))
+    for prefix, pal in (("roof", ROOF), ("roof_green", ROOF_GREEN), ("roof_gym", ROOF_GYM)):
+        save(prefix + "_tiles", roof_tiles(pal))
+        save(prefix + "_edge", roof_edge(pal))
+        save(prefix + "_under", solid(pal["under"]))
     sign_textures()
     sign_models()
     mailbox_textures()
