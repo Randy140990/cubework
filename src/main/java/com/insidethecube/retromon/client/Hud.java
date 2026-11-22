@@ -409,7 +409,11 @@ public final class Hud {
 		int hour = (int) ((t / 1000 + 6) % 24), minute = (int) ((t % 1000) * 60 / 1000);
 		boolean night = Night.nightness() > 0.5F;
 		String clock = "DAY " + day() + "  \u00B7  " + String.format("%d:%02d %s", hour % 12 == 0 ? 12 : hour % 12, minute, hour < 12 ? "AM" : "PM");
-		V.hints(g, "SPACE".equals(key(mc.options.keyJump)) ? "SPACE" : key(mc.options.keyJump), "Talk", key(Adventure.START), "Menu", key(Adventure.SPEED),
+		// (On a SAFARI GAME, 15:29: the steps and SAFARI BALLs left, in place of the time.)
+		if (ClientState.safariSteps >= 0) clock = "STEPS " + ClientState.safariSteps + "/600  \u00B7  BALLS " + ClientState.safariBalls;
+		// (The A key's word is what it'd do now: Talk, Pick up, Look.)
+		String aWord = Adventure.prompt() != null ? Adventure.prompt().word() : "Talk";
+		V.hints(g, "SPACE".equals(key(mc.options.keyJump)) ? "SPACE" : key(mc.options.keyJump), aWord, key(Adventure.START), "Menu", key(Adventure.SPEED),
 				Lang.t("Speed x1").replace("1", String.valueOf(Adventure.speed)));
 		V.HINTS.clear();
 		prompt(g, mc, delta);

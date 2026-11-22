@@ -88,8 +88,8 @@ SIGNS = {at_(k): v for k, v in SIGNS.items()}
 YAW = {"down": 0.0, "left": 90.0, "up": 180.0, "right": 270.0}
 
 # The gatehouses' doors: the south one faces north (you walk south up its steps into it), the north one faces south.
-SOUTH_DOOR = dict(x0=45.0 + SHIFT, x1=51.0 + SHIFT, z=126.3 + SHIFT, s0=125 + SHIFT, s1=126 + SHIFT)  # its steps: x 45 to 50, z 125 to 126
-NORTH_DOOR = dict(x0=13.0 + SHIFT, x1=19.0 + SHIFT, z=22.3 + SHIFT, s0=22 + SHIFT, s1=23 + SHIFT)   # its steps: x 13 to 18, z 22 to 23
+SOUTH_DOOR = dict(x0=45.0 + SHIFT, x1=51.0 + SHIFT, z=129.0 + SHIFT, s0=125 + SHIFT, s1=126 + SHIFT)  # its steps: x 45 to 50, z 125 to 126
+NORTH_DOOR = dict(x0=13.0 + SHIFT, x1=19.0 + SHIFT, z=19.6 + SHIFT, s0=22 + SHIFT, s1=23 + SHIFT)   # its steps: x 13 to 18, z 22 to 23
 # Where you come out of each: on the path in front of the steps, facing away from the door.
 FROM_SOUTH = {"x": 48.0 + SHIFT, "z": 123.6 + SHIFT, "yaw": 180.0}
 FROM_NORTH = {"x": 15.5 + SHIFT, "z": 24.8 + SHIFT, "yaw": 0.0}
@@ -124,6 +124,19 @@ def main():
             if base(x, y, GONE_SIGN[1]) == "pale_oak_shelf":
                 names[idx(x, y, GONE_SIGN[1])] = "minecraft:air"; gone += 1
     print("light blue wool taken away:", wool, " sign blocks taken away:", gone)
+    # (15:21) The gatehouses' doorways from inside the forest: a dark way in with daylight at its end (the black at the
+    # back of each daylight, lit), and the way out at the back of it, so you walk into the dark towards the light.
+    lit = 0
+    for zb, zin in ((146, (145, 144)), (34, (35, 36))):
+        for x in range(W):
+            for y in range(FLOOR + 1, FLOOR + 5):
+                if base(x, y, zb) == "black_wool":
+                    names[idx(x, y, zb)] = "minecraft:white_concrete"; lit += 1
+        for x in range(W):
+            if base(x, FLOOR + 2, zb) == "white_concrete" and base(x, FLOOR + 2, zin[0]) == "air":
+                names[idx(x, FLOOR + 2, zin[0])] = "minecraft:light[level=15,waterlogged=false]"
+                if base(x, FLOOR + 3, zin[1]) == "air": names[idx(x, FLOOR + 3, zin[1])] = "minecraft:light[level=10,waterlogged=false]"
+    print("doorway daylight blocks:", lit)
 
     # Where you can stand: ground under you, room for you (y 2 and 3).
     def open_(x, z):

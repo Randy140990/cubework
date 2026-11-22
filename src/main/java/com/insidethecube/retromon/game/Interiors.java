@@ -118,7 +118,7 @@ public final class Interiors {
 	 * the rooms are read as it's loaded.)
 	 */
 	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json", "/retromon/interiors/digletts_cave.json",
-			"/retromon/interiors/mt_moon.json"};
+			"/retromon/interiors/mt_moon.json", "/retromon/interiors/safari_zone.json"};
 
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */
@@ -220,7 +220,9 @@ public final class Interiors {
 				boolean north = kind.equals("north");
 				// (A ladder or stairs up: across x from x0, to x1 where the room gives one; the cave has two ladders.)
 				double x0 = num(w, "x0", 0), x1 = kind.equals("mat") || north ? num(w, "x1", 0) : num(w, "x1", 999);
-				double z0 = kind.equals("mat") ? num(w, "z", 0) : north ? -999 : num(w, "z0", 0), z1 = kind.equals("mat") ? 999 : north ? num(w, "z", 1) : num(w, "z1", 0);
+				// (A way north in a room you walk about in, the SAFARI ZONE's houses: only from just in front of it, its z0.)
+				double z0 = kind.equals("mat") ? num(w, "z", 0) : north ? (w.has("z0") ? num(w, "z0", 0) : -999) : num(w, "z0", 0),
+						z1 = kind.equals("mat") ? 999 : north ? num(w, "z", 1) : num(w, "z1", 0);
 				// Through the east wall (past x, heading east) or the west (short of x, heading west).
 				if (kind.equals("east")) {
 					x0 = num(w, "x", 0);
@@ -349,6 +351,11 @@ public final class Interiors {
 	}
 
 	/** Whether someone's in a room big enough to walk about in (the forest): its grass, its trainers' eyes, as outside. */
+	/** A room by its id (the SAFARI ZONE's gate, to be put back in when the game's over). */
+	public static Room room(String id) {
+		return ROOMS.get(id);
+	}
+
 	public static boolean walkabout(Entity e) {
 		Room r = roomOf(e);
 		return r != null && r.big();
@@ -942,7 +949,7 @@ public final class Interiors {
 					}
 					case "north" -> {
 						// Through a way in the north wall: to the next room, or out to the world (the north gate).
-						if (lz < w.z1() && lx > w.x0() && lx < w.x1() && (dz < -0.01 || facingNorth)) {
+						if (lz < w.z1() && lz > w.z0() && lx > w.x0() && lx < w.x1() && (dz < -0.01 || facingNorth)) {
 							// A guard's way (the League gate's): only with what it needs (a badge); else you're turned back.
 							if (w.needs() != null && !Game.meets(p, w.needs())) {
 								p.teleportTo(p.getX(), p.getY(), p.getZ() + 1.4);

@@ -300,7 +300,9 @@ public final class Adventure {
 			prompt = new Prompt(ahead.at(), "Look");
 			return;
 		}
-		if (best != null) prompt = new Prompt(best.position().add(0, best.getBbHeight() + 0.35, 0), "Talk");
+		// (15:21) An item ball's "Pick up", not "Talk"; over a person, high enough to clear their name.
+		if (best instanceof WorldMon w && w.key().startsWith("item:")) prompt = new Prompt(best.position().add(0, best.getBbHeight() + 0.35, 0), "Pick up");
+		else if (best != null) prompt = new Prompt(best.position().add(0, best.getBbHeight() + (best instanceof Npc ? 0.75 : 0.35), 0), "Talk");
 	}
 
 	/** Where a point in the world falls on the screen (GUI pixels, w by h), or null behind the camera. */

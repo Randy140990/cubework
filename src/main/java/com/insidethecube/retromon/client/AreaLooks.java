@@ -57,6 +57,11 @@ public final class AreaLooks {
 			return p.getX() >= x0 && p.getX() <= x1 && p.getZ() >= z0 && p.getZ() <= z1 && (y0 > y1 || p.getY() >= y0 && p.getY() <= y1)
 					&& rooms == inRooms();
 		}
+
+		/** How big it is (blocks): where two swaps' areas overlap, the smaller one's (the more particular place's) is drawn. */
+		long size() {
+			return (long) (x1 - x0 + 1) * (z1 - z0 + 1) * (y0 > y1 ? 400 : y1 - y0 + 1);
+		}
 	}
 
 	/** Whether the world you're in now is the interiors (the buildings' insides and the forest). */
@@ -66,7 +71,14 @@ public final class AreaLooks {
 	}
 
 	/** One look somewhere: its name, its texture swaps ("block/tuff=lamp_tuff", "@4" for laid over 4 blocks), its areas. */
-	private record Rule(String look, String swaps, List<Box> boxes) {}
+	private record Rule(String look, String swaps, List<Box> boxes) {
+		/** The smallest of its areas a spot's in (Long.MAX_VALUE: none). */
+		long area(BlockPos p) {
+			long best = Long.MAX_VALUE;
+			for (Box b : boxes) if (b.has(p)) best = Math.min(best, b.size());
+			return best;
+		}
+	}
 
 	/** For each block with a look somewhere: its looks (by look and swaps). */
 	private static final Map<Block, Map<String, Rule>> RULES = new HashMap<>();
@@ -108,10 +120,16 @@ public final class AreaLooks {
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
-				BlockStateModel out = model;
+					BlockStateModel out = model;
+				// (15:21) Texture swaps don't pile up: where two of a block's swaps cover a spot (all Kanto's dripstone, and
+				// Pallet's), the one for the smaller area is drawn there, the other not.
+				List<Rule> swaps = new ArrayList<>();
+				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("glass")) swaps.add(rule);
 				for (Rule rule : looks.values()) {
 					Look look = make(rule, c.baker());
-					if (look != null) out = new Wrapped(out, look, List.copyOf(rule.boxes()));
+					List<Rule> rivals = new ArrayList<>();
+					if (swaps.contains(rule)) for (Rule o : swaps) if (o != rule) rivals.add(o);
+					if (look != null) out = new Wrapped(out, look, rule, List.copyOf(rivals));
 				}
 				return out;
 			});
@@ -131,18 +149,25 @@ public final class AreaLooks {
 
 	private static final class Wrapped extends WrapperBlockStateModel {
 		private final Look look;
-		private final List<Box> boxes;
+		private final Rule rule;
+		private final List<Rule> rivals;
 
-		Wrapped(BlockStateModel wrapped, Look look, List<Box> boxes) {
+		Wrapped(BlockStateModel wrapped, Look look, Rule rule, List<Rule> rivals) {
 			super(wrapped);
 			this.look = look;
-			this.boxes = boxes;
+			this.rule = rule;
+			this.rivals = rivals;
 		}
 
 		private boolean here(BlockPos pos) {
 			if (!Adventure.inSave || pos == null) return false;
-			for (Box b : boxes) if (b.has(pos)) return true;
-			return false;
+			long mine = rule.area(pos);
+			if (mine == Long.MAX_VALUE) return false;
+			for (Rule o : rivals) {
+				long a = o.area(pos);
+				if (a < mine || a == mine && o.swaps().compareTo(rule.swaps()) < 0) return false;
+			}
+			return true;
 		}
 
 		@Override
@@ -169,11 +194,20 @@ public final class AreaLooks {
 			case "wood_board" -> AreaLooks::woodBoard;
 			case "wood_sign" -> AreaLooks::woodSign;
 			case "boulder" -> boulder(baker, rule.swaps());
+			case "glass" -> glass(baker, rule.swaps());
+			case "chain" -> AreaLooks::chain;
+			case "grass_onto" -> {
+				// (15:29) The grass's soft tufted edge onto what's beside it (Fuchsia's beach sand, its moss, the red path's edge).
+				TextureAtlasSprite[] over = new TextureAtlasSprite[18];
+				for (int t = 1; t <= 17; t++) over[t] = sprite(baker, "grass_on_drip_" + t);
+				java.util.Set<Block> from = rule.swaps().equals("grass") ? java.util.Set.of(Blocks.GRASS_BLOCK) : null;
+				yield new GrassEdge(over, null, false, from, true);
+			}
 			case "sand_edge" -> {
 				// (The cave's sand running softly onto the floor beside it, as the grass onto the dripstone; 14:15.)
 				TextureAtlasSprite[] over = new TextureAtlasSprite[18];
 				for (int t = 1; t <= 17; t++) over[t] = sprite(baker, "sand_on_floor_" + t);
-				yield new GrassEdge(over, null, false, java.util.Set.of(Blocks.SAND, Blocks.SMOOTH_SANDSTONE));
+				yield new GrassEdge(over, null, false, java.util.Set.of(Blocks.SAND, Blocks.SMOOTH_SANDSTONE), false);
 			}
 			case "grass_edge", "kerb" -> {
 				boolean kerb = rule.look().equals("kerb");
@@ -182,9 +216,10 @@ public final class AreaLooks {
 					over[t] = sprite(baker, (kerb ? "kerb_grass_" : "grass_on_drip_") + t);
 					under[t] = sprite(baker, (kerb ? "kerb_" : "drip_shade_") + t);
 				}
-				yield new GrassEdge(over, under, !kerb, null);
+				yield new GrassEdge(over, under, !kerb, null, true);
 			}
-			default -> null;
+			// (Any other roof_ look, Fuchsia's four houses' and the Safari Zone's, 15:29: its own three pictures.)
+			default -> rule.look().startsWith("roof_") ? new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under")) : null;
 		};
 	}
 
@@ -416,7 +451,8 @@ public final class AreaLooks {
 		return (base, e, view, pos, state, random, cull) -> {
 			// (On another rock, a slab on Mt. Moon's granite: one boulder there, the one below.)
 			if (rock(view.getBlockState(pos.below()).getBlock())) return;
-			boolean slab = state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE);
+			// (A slab's a low one; so is the room's paler grate, 15:21: the rocks are grates in the caves now, hiding nothing.)
+			boolean slab = state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE) || state.is(Blocks.WAXED_EXPOSED_COPPER_GRATE);
 			String name = pre + (slab ? "_small" : Math.floorMod(pos.getX() * 31 + pos.getZ() * 17 + pos.getY() * 7, 2) == 0 ? "_a" : "_b");
 			Swap fl = floors.get(view.getBlockState(pos.below()).getBlock());
 			if (fl != null) {
@@ -436,6 +472,111 @@ public final class AreaLooks {
 			if (m == null) base.emitQuads(e, view, pos, state, random, cull);
 			else m.emitQuads(e, view, pos, state, random, cull);
 		};
+	}
+
+	/**
+	 * Glass as one pane (15:21): the window's glass tinted, framed only round its outside, so the panes of a window run
+	 * into one another. Each face gets one of sixteen pictures ("name_0" to "name_15", by which of its four edges have no
+	 * more of the same glass beyond them: 1 its top, 2 its right, 4 its bottom, 8 its left as the picture lies), drawn see-through.
+	 * spec: "block/glass=glass_clear" (old=the pictures' name).
+	 */
+	private static Look glass(ModelBaker baker, String spec) {
+		SpriteFinder finder = baker.sprites().spriteFinder(TextureAtlas.LOCATION_BLOCKS);
+		Map<Identifier, TextureAtlasSprite[]> kinds = new HashMap<>();
+		for (String one : spec.split(",")) {
+			int eq = one.indexOf('=');
+			if (eq < 0) continue;
+			String from = one.substring(0, eq).trim(), to = one.substring(eq + 1).trim();
+			TextureAtlasSprite[] v = new TextureAtlasSprite[16];
+			for (int m = 0; m < 16; m++) v[m] = sprite(baker, to + "_" + m);
+			kinds.put(from.contains(":") ? Identifier.parse(from) : Identifier.withDefaultNamespace(from), v);
+		}
+		return (base, e, view, pos, state, random, cull) -> {
+			Block self = state.getBlock();
+			e.pushTransform(q -> {
+				TextureAtlasSprite from = finder.find(q);
+				TextureAtlasSprite[] v = from == null ? null : kinds.get(from.contents().name());
+				if (v == null) return true;
+				float fu = from.getU1() - from.getU0(), fv = from.getV1() - from.getV0();
+				float[] nu = new float[4], nv = new float[4];
+				for (int i = 0; i < 4; i++) {
+					nu[i] = fu == 0 ? 0 : clamp01((q.u(i) - from.getU0()) / fu);
+					nv[i] = fv == 0 ? 0 : clamp01((q.v(i) - from.getV0()) / fv);
+				}
+				// Which way across the world the picture's u and v run on this face (from its corners).
+				Direction du = along(q, nu), dv = along(q, nv);
+				int mask = 0;
+				if (dv != null && !same(view, pos, dv.getOpposite(), self)) mask |= 1;
+				if (du != null && !same(view, pos, du, self)) mask |= 2;
+				if (dv != null && !same(view, pos, dv, self)) mask |= 4;
+				if (du != null && !same(view, pos, du.getOpposite(), self)) mask |= 8;
+				TextureAtlasSprite to = v[mask];
+				for (int i = 0; i < 4; i++) q.uv(i, to.getU0() + nu[i] * (to.getU1() - to.getU0()), to.getV0() + nv[i] * (to.getV1() - to.getV0()));
+				q.renderLayer(ChunkSectionLayer.TRANSLUCENT);
+				return true;
+			});
+			base.emitQuads(e, view, pos, state, random, cull);
+			e.popTransform();
+		};
+	}
+
+	/** The way across the world a quad's picture coordinate (t, at its corners) grows, or null if it doesn't. */
+	private static Direction along(MutableQuadView q, float[] t) {
+		int a = 0, b = 0;
+		for (int i = 0; i < 4; i++) {
+			if (t[i] < t[a]) a = i;
+			if (t[i] > t[b]) b = i;
+		}
+		if (t[b] - t[a] < 1e-4F) return null;
+		float dx = q.x(b) - q.x(a), dy = q.y(b) - q.y(a), dz = q.z(b) - q.z(a);
+		float ax = Math.abs(dx), ay = Math.abs(dy), az = Math.abs(dz);
+		if (ax >= ay && ax >= az) return dx > 0 ? Direction.EAST : Direction.WEST;
+		if (ay >= az) return dy > 0 ? Direction.UP : Direction.DOWN;
+		return dz > 0 ? Direction.SOUTH : Direction.NORTH;
+	}
+
+	private static boolean same(BlockAndTintGetter view, BlockPos pos, Direction d, Block self) {
+		return view.getBlockState(pos.relative(d)).is(self);
+	}
+
+	/**
+	 * A chain hung between two walls (Fuchsia's fences, 15:29): kept a chain, but reaching into the posts either side, so
+	 * it hangs from them rather than stopping short in the air.
+	 */
+	private static void chain(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
+		Direction.Axis axis = state.hasProperty(BlockStateProperties.AXIS) ? state.getValue(BlockStateProperties.AXIS) : Direction.Axis.Y;
+		if (axis == Direction.Axis.Y) {
+			base.emitQuads(e, view, pos, state, random, cull);
+			return;
+		}
+		Direction lo = axis == Direction.Axis.X ? Direction.WEST : Direction.NORTH;
+		boolean a = post(view, pos.relative(lo)), b = post(view, pos.relative(lo.getOpposite()));
+		if (!a && !b) {
+			base.emitQuads(e, view, pos, state, random, cull);
+			return;
+		}
+		final float reach = 0.3F;
+		e.pushTransform(q -> {
+			for (int i = 0; i < 4; i++) {
+				float x = q.x(i), y = q.y(i), z = q.z(i);
+				if (axis == Direction.Axis.X) {
+					if (a && x < 0.01F) x = -reach;
+					else if (b && x > 0.99F) x = 1 + reach;
+				} else {
+					if (a && z < 0.01F) z = -reach;
+					else if (b && z > 0.99F) z = 1 + reach;
+				}
+				q.pos(i, x, y, z);
+			}
+			return true;
+		});
+		base.emitQuads(e, view, pos, state, random, cull);
+		e.popTransform();
+	}
+
+	private static boolean post(BlockAndTintGetter view, BlockPos p) {
+		BlockState s = view.getBlockState(p);
+		return s.is(net.minecraft.tags.BlockTags.WALLS) || s.is(net.minecraft.tags.BlockTags.FENCES);
 	}
 
 	/** Whether a block's a boulder somewhere (a rock look's on it). */
@@ -460,7 +601,7 @@ public final class AreaLooks {
 	 * meets it, as the dirt paths do (the same 17 tiles: an edge, two, three or all four, or a corner), with their
 	 * soft shadow on the dripstone. The tufts take the grass's green (Colours tints them).
 	 */
-	private record GrassEdge(TextureAtlasSprite[] tufts, TextureAtlasSprite[] shade, boolean byWater, java.util.Set<Block> onto) implements Look {
+	private record GrassEdge(TextureAtlasSprite[] tufts, TextureAtlasSprite[] shade, boolean byWater, java.util.Set<Block> onto, boolean tint) implements Look {
 		@Override
 		public void emit(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
 			base.emitQuads(e, view, pos, state, random, cull);
@@ -501,7 +642,7 @@ public final class AreaLooks {
 			if (sw && !s && !w) tiles.add(3);
 			if (se && !s && !ea) tiles.add(1);
 			if (shade != null) for (int t : tiles) top(e, shade[t], -1);
-			for (int t : tiles) top(e, tufts[t], onto == null ? 0 : -1);
+			for (int t : tiles) top(e, tufts[t], tint ? 0 : -1);
 		}
 
 		/** Whether what's beside it runs onto it: grass (onto the dripstone, the kerb), or the sand (onto a cave's floor). */

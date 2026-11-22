@@ -39,6 +39,19 @@ const PLACES = [
   { id: "mt_moon_1f", name: "Mt. Moon", floor: "1F", group: "Mt. Moon" },
   { id: "mt_moon_b1f", name: "Mt. Moon", floor: "B1F", group: "Mt. Moon" },
   { id: "mt_moon_b2f", name: "Mt. Moon", floor: "B2F", group: "Mt. Moon" },
+  { id: "fuchsia_gym", name: "Fuchsia Gym", floor: "Fuchsia City", group: "Fuchsia City" },
+  { id: "safari_gate", name: "Safari Zone gate", floor: "Fuchsia City", group: "Fuchsia City" },
+  { id: "fuchsia_office", name: "Safari Zone office", floor: "Fuchsia City", group: "Fuchsia City" },
+  { id: "fuchsia_house1", name: "Bill's grandpa's house", floor: "Fuchsia City", group: "Fuchsia City" },
+  { id: "fuchsia_house2", name: "Move Deleter's house", floor: "Fuchsia City", group: "Fuchsia City" },
+  { id: "fuchsia_house3", name: "Safari Zone Warden's home", floor: "Fuchsia City", group: "Fuchsia City" },
+  { id: "fuchsia_house4", name: "Fishing Guru's brother's house", floor: "Fuchsia City", group: "Fuchsia City" },
+  { id: "safari_zone", name: "Safari Zone", floor: "The park", group: "Safari Zone" },
+  { id: "safari_rest_center", name: "Rest house", floor: "Center area", group: "Safari Zone" },
+  { id: "safari_rest_east", name: "Rest house", floor: "East (area 1)", group: "Safari Zone" },
+  { id: "safari_rest_north", name: "Rest house", floor: "North (area 2)", group: "Safari Zone" },
+  { id: "safari_rest_west", name: "Rest house", floor: "West (area 3)", group: "Safari Zone" },
+  { id: "safari_secret_house", name: "Secret House", floor: "West (area 3)", group: "Safari Zone" },
 ];
 // Your house and the rival's (14 by 13, the mat in a nook at the door), the stairs at the back on the right.
 const FROM_TOWN = { x: 7.0, z: 11.5, yaw: FACE.n };
@@ -585,12 +598,23 @@ function schoolDesk(room, x, z, o = {}) {
 // A window on a side wall ("w" or "e"), its panes crossed (a white bar each way), a sill under it. z: where it starts
 // along the wall, w its width; y its foot, h its height.
 function crossWindow(R, wall, z, y, w, h, lines) {
-  framed(R, z, y, w, h, "window", wall, { frameMat: "paint", act: { label: "Look", lines } });
-  const G = R.geo, x0 = wall === "w" ? 0.09 : R.W - 0.15, x1 = x0 + 0.06, zc = z + w / 2, yc = y + h / 2;
-  G.box(x0, y, zc - 0.05, x1, y + h, zc + 0.05, "paint");
-  G.box(x0, yc - 0.05, z, x1, yc + 0.05, z + w, "paint");
-  const sx0 = wall === "w" ? 0 : R.W - 0.26, sx1 = sx0 + 0.26;
-  G.box(sx0, y - 0.2, z - 0.15, sx1, y - 0.1, z + w + 0.15, "paint");
+  // (15:21) Set into the wall, as the back wall's are: the glass at the back of a deep painted reveal, the cross bars
+  // halfway in, a deep sill.
+  const G = R.geo, W = R.W, e = wall === "e", t = 0.12, dp = 0.36;
+  const X = (a, b) => e ? [W - b, W - a] : [a, b];
+  let [a0, a1] = X(0, 0.02);
+  G.box(a0, y, z, a1, y + h, z + w, e ? { w: "window", all: null } : { e: "window", all: null });
+  [a0, a1] = X(0, dp);
+  G.box(a0, y - t, z - t, a1, y, z + w + t, "paint"); G.box(a0, y + h, z - t, a1, y + h + t, z + w + t, "paint");
+  G.box(a0, y, z - t, a1, y + h, z, "paint"); G.box(a0, y, z + w, a1, y + h, z + w + t, "paint");
+  R.act(e ? [W - 0.6, z, W, z + w] : [0, z, 0.6, z + w], { label: "Look", lines });
+  const zc = z + w / 2, yc = y + h / 2;
+  [a0, a1] = X(0.16, 0.22);
+  G.box(a0, y, zc - 0.05, a1, y + h, zc + 0.05, "paint");
+  G.box(a0, yc - 0.05, z, a1, yc + 0.05, z + w, "paint");
+  [a0, a1] = X(0, 0.48);
+  G.box(a0, y - 0.2 - t, z - 0.15, a1, y - t, z + w + 0.15, "paint");
+  R.item("Window", "Set into the wall: the glass at the back of a deep reveal, its light on the floor by the time of day.");
   // Its light on the floor, in from the wall.
   if (wall === "w") sunPool(R, 1.2, z - 0.2, 1.2 + h * 1.4, z + w + 0.2, 2, null, [0.1, z, z + w, y, y + h]);
   else sunPool(R, R.W - 1.2 - h * 1.4, z - 0.2, R.W - 1.2, z + w + 0.2, 1, null, [R.W - 0.1, z, z + w, y, y + h]);
@@ -613,7 +637,8 @@ function lgGate(R, o) {
   // The way on at the north: a nook as deep as the one at the door (4 by 2), dark at its back (the forest's green
   // beyond), its mat its whole width with the arrows pointing out; palms either side.
   const north = o.north || {};
-  passageN(R, LG_GATE_NOOK[0], LG_GATE_NOOK[1], north.none ? { none: true, mat: "matGateN", frame: "paint" } : { to: north.to, spawn: north.spawn, mat: "matGateN", frame: "paint" });
+  passageN(R, LG_GATE_NOOK[0], LG_GATE_NOOK[1], north.none ? { none: true, mat: "matGateN", frame: "paint" } : { to: north.to, spawn: north.spawn, mat: "matGateN", frame: "paint", needs: north.needs,
+    lines: north.needs === "safari" ? ["The way into the SAFARI ZONE. (In the game: once you've paid at the counter.)"] : undefined });
   if (north.none) R.act([LG_GATE_NOOK[0], 0, LG_GATE_NOOK[1], 1.2], { label: "Look", lines: north.lines });
   palm(R, 3.9, N + 0.8, 1.0); palm(R, 10.1, N + 0.8, 1.0);
   // The runner, from the way on at the north to the door at the south.
@@ -1076,7 +1101,7 @@ TEXDEF.moonRock = [16, 16, (P, r) => { P.fill(hx("#8D8993"), 0.08, r); for (let 
 for (const k of ["museumFloor", "museumWall", "museumBand", "museumPillar", "museumGold", "counterYellow", "amberGlow", "shuttleWhite", "shuttleBlack", "moonRock"]) MATDEF[k] = { tex: k, per: 1 };
 MATDEF.fossilSlab = { tex: "fossilSlab", fit: true };
 // The cases' glass (14:15: cleaner): nearly clear, a faint cool tint, one soft streak of light.
-TEXDEF.caseGlass = [16, 16, (P, r) => { P.fill(hx("#E8F4F8"), 0.0, r); for (let k = 0; k < 16; k++) { P.set(3 + k * 0.4, k, hx("#FFFFFF")); } }];
+TEXDEF.caseGlass = [16, 16, (P, r) => { P.fill(hx("#E8F4F8"), 0.0, r); }];
 MATDEF.caseGlass = { tex: "caseGlass", per: 1, alpha: 0.16 };
 
 // The Pewter looks' flowers (its beds' poppies and red tulips).
@@ -1167,6 +1192,52 @@ function plainHouse(R, o = {}) {
   doormat(R, VHOUSE_DOOR[0], VHOUSE_DOOR[1], { to: "town", spawn: { x: 6.9, z: 10.0, yaw: FACE.s }, mat: "matHouseV" });
   R.spawn = VHOUSE_IN;
 }
+
+
+// ---------- 0.46.0 (15:21 to 15:33): railings that stop you, the Museum's plaque, Fuchsia City and the Safari Zone ----------
+// A railing along one side of a staircase or stairwell (x0 to x1 along z), its posts and rail in walnut.
+function sideRail(R, x0, x1, z, side) {
+  const G = R.geo, t = side === "n" ? -0.14 : 0;
+  G.box(x0, 0, z + t, x0 + 0.16, 1.35, z + t + 0.16, "walnut"); G.box(x1 - 0.16, 0, z + t, x1, 1.35, z + t + 0.16, "walnut");
+  G.box(x0, 1.0, z + t + 0.02, x1, 1.12, z + t + 0.14, "walnut");
+  for (let x = x0 + 0.35; x < x1 - 0.2; x += 0.4) G.box(x - 0.03, 0, z + t + 0.05, x + 0.03, 1.0, z + t + 0.11, "paint");
+}
+TEXDEF.shuttlePlaque = [64, 8, (P, r) => { P.fill(hx("#C9A548"), 0.03, r); P.rect(0, 0, 64, 1, hx("#E6C86E")); P.rect(0, 7, 64, 1, hx("#8E7230"));
+  P.text("SPACE SHUTTLE", 6, 2, hx("#4A3A16")); }];
+MATDEF.shuttlePlaque = { tex: "shuttlePlaque", fit: true };
+// Fuchsia Gym's wood (Let's Go's: a warm wooden hall), its tatami and its paper screens.
+TEXDEF.gymBoards = [16, 16, (P, r) => { P.fill(hx("#9C6A3C"), 0.05, r); for (let y = 0; y < 16; y += 4) { P.rect(0, y, 16, 1, hx("#B98552")); P.rect(0, y + 3, 16, 1, hx("#734B29")); }
+  P.rect(5, 0, 1, 4, hx("#734B29")); P.rect(12, 4, 1, 4, hx("#734B29")); P.rect(3, 8, 1, 4, hx("#734B29")); P.rect(10, 12, 1, 4, hx("#734B29")); }];
+TEXDEF.gymBoardsDark = [16, 16, (P, r) => { P.fill(hx("#5E3F25"), 0.05, r); for (let y = 0; y < 16; y += 4) P.rect(0, y + 3, 16, 1, hx("#3F2A18")); }];
+TEXDEF.tatami = [16, 16, (P, r) => { P.fill(hx("#A9BC62"), 0.04, r); for (let x = 0; x < 16; x += 2) P.rect(x, 0, 1, 16, hx("#9AAD55")); }];
+TEXDEF.tatamiEdge = [16, 16, (P, r) => { P.fill(hx("#B0303E"), 0.03, r); for (let x = 0; x < 16; x += 4) P.line(x, 2, x + 3, 13, hx("#E05A68")); }];
+TEXDEF.shoji = [16, 16, (P, r) => { P.fill(hx("#F2EAD6"), 0.02, r); P.rect(0, 0, 16, 1, hx("#6B4A2C")); P.rect(0, 8, 16, 1, hx("#6B4A2C")); P.rect(0, 0, 1, 16, hx("#6B4A2C")); P.rect(8, 0, 1, 16, hx("#6B4A2C")); }];
+TEXDEF.safariCounter = [16, 16, (P, r) => { P.fill(hx("#5FA24E"), 0.03, r); P.rect(0, 0, 16, 2, hx("#86C46A")); P.rect(0, 13, 16, 3, hx("#3F7836")); }];
+TEXDEF.safariSign = [64, 32, (P, r) => { P.fill(hx("#F2EAD6"), 0.02, r); P.rect(0, 0, 64, 3, hx("#5FA24E")); P.rect(0, 29, 64, 3, hx("#5FA24E"));
+  P.text("SAFARI ZONE", 11, 8, hx("#3F5C2E")); P.text("POKEMON-U-CATCH", 3, 17, hx("#7A5A2A")); }];
+for (const k of ["gymBoards", "gymBoardsDark", "tatami", "tatamiEdge", "shoji", "safariCounter"]) MATDEF[k] = { tex: k, per: 1 };
+MATDEF.safariSign = { tex: "safariSign", fit: true };
+
+// A plain house as Fuchsia's (dark wood, its own wall colour): the plain house's rooms with their people.
+function fuchsiaHouse(R, o = {}) {
+  plainHouse(R, { paper: o.paper || "paperSchool", rug: o.rug || "rugGreen", cupboard: o.cupboard, tv: o.tv,
+    window: ["Outside: FUCHSIA CITY's red paths and flower beds."] });
+}
+// A small rest house in the Safari Zone: a bench, a table, a map on the wall; its mat back out into the park.
+function restHouse(R, spawn, lines) {
+  shell(R, { paper: "paperSchool", floor: "midBoards", door: VHOUSE_DOOR, entry: true, skirt: "beam", ledge: "walnut" });
+  band(R, 1.0, "beam", 0.12);
+  table(R, 4.6, 3.4, 7.4, 5.4, { top: "lab", leg: "walnut", h: 0.86, name: "Table", note: "A table, a jug of water and cups on it." });
+  for (const z of [3.95, 4.85]) { chair(R, 3.95, z, "e", { seat: "greenFabric" }); chair(R, 8.05, z, "w", { seat: "greenFabric" }); }
+  framed(R, 4.4, 1.7, 3.2, 1.3, "safariSign", "n", { act: { label: "Read", lines } });
+  crossWindow(R, "e", 2.6, 1.6, 1.8, 1.2, ["Outside: the SAFARI ZONE's tall grass, and something moving in it."]);
+  plant(R, 1.0, 7.8, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+  doormat(R, VHOUSE_DOOR[0], VHOUSE_DOOR[1], { to: "safari_zone", spawn, mat: "matHouseV" });
+  R.spawn = VHOUSE_IN;
+}
+// The Safari Zone's houses' doors (tools/safari.py): where you come out in front of each, facing away from it.
+const SZ_OUT = { safari_rest_center: [177, 179], safari_rest_west: [49, 148], safari_rest_north: [195, 27], safari_rest_east: [319, 135], safari_secret_house: [34, 125] };
+const szOut = id => ({ x: SZ_OUT[id][0], z: SZ_OUT[id][1], yaw: FACE.s });
 
 const BUILD = {
   house1() {
@@ -1638,6 +1709,218 @@ const BUILD = {
     return R;
   },
 
+
+  fuchsia_gym() {
+    // FUCHSIA GYM, laid out as FireRed's (10 by 14 of its steps, a step a block) and drawn as Let's Go's: a warm wooden
+    // hall, paper screens on the walls, KOGA on a raised tatami stage in the middle, two stone statues at the door.
+    // FireRed's invisible walls: you can't see them, you find the gaps; KOGA looks close but he's shut in, the way to
+    // him from the north. His six JUGGLERs and TAMERs each watch their own way (their sight, as FireRed's).
+    const R = new Room("fuchsia_gym", { name: "Fuchsia Gym", floor: "Fuchsia City", W: 12, D: 17, H: 5 });
+    shell(R, { paper: "shoji", floor: "gymBoards", door: [5, 7], entry: true, skirt: "gymBoardsDark", ledge: "gymBoardsDark", ledgeTop: "gymBoardsDark" });
+    band(R, 0.5, "gymBoardsDark", 0.5);
+    const G = R.geo;
+    // KOGA's stage: tatami on a low wooden step, its edges red.
+    G.box(3.8, 0, 7.4, 8.2, 0.25, 11.2, { all: "gymBoardsDark", top: "tatamiEdge" });
+    G.box(4.1, 0.25, 7.7, 7.9, 0.27, 10.9, { top: "tatami", all: null });
+    R.ramps.push({ rect: [3.8, 7.4, 8.2, 11.2], h: () => 0.25 });
+    // The invisible walls (FireRed's), as thin walls you can't see: KOGA's stage shut in but for a gap at its north; the
+    // west side shut off below LIAM's... below PHIL's corner but for a gap by the wall; the east side shut off but for a gap
+    // at the far east; a wall down the middle of the north.
+    const wall = (x0, z0, x1, z1) => R.solid(x0, z0, x1, z1);
+    wall(3.6, 11.2, 8.4, 11.4);           // south of the stage
+    wall(3.6, 7.2, 3.8, 11.4);            // its west
+    wall(8.2, 7.2, 8.4, 11.4);            // its east
+    wall(3.6, 7.2, 6.6, 7.4);             // its north, a gap at 6.6 to 8.2
+    wall(0, 8.8, 3.6, 9.0);               // the west: shut off below...
+    wall(0, 8.8, 0.0, 9.0);
+    wall(8.4, 6.0, 10.8, 6.2);            // the east, a gap at the far east (10.8 to 12)
+    wall(6.0, 1.0, 6.2, 5.2);             // down the middle of the north
+    wall(1.2, 12.4, 3.0, 12.6); wall(9.0, 12.4, 10.8, 12.6);  // either side of the way in
+    R.item("Invisible walls", "FireRed's: walls you can't see. KOGA's stage is shut in but for a gap at its north; find the gaps.");
+    gymStatue(R, 4.0, 13.8, ["FUCHSIA CITY POKéMON GYM", "LEADER: KOGA", "WINNING TRAINERS: {rival}"]);
+    gymStatue(R, 8.0, 13.8, ["FUCHSIA CITY POKéMON GYM", "LEADER: KOGA", "WINNING TRAINERS: {rival}"]);
+    for (const [x, z] of [[0.8, 1.0], [11.2, 1.0], [0.8, 15.0], [11.2, 15.0]]) plant(R, x, z, 0.9, { pot: "potWhite", lines: ["A bonsai in a white pot."] });
+    R.npcs.push({ name: "Leader Koga", key: "fuchsia_gym_0", role: "leader", x: 6.0, z: 9.2, y: 0.25, yaw: FACE.s, look: { skin: "leader_koga" },
+      talk: () => [{ text: "KOGA: Fwahahaha! A mere child like you dares to challenge me?" }, { text: "(In the game: you battle him on his stage, and win the SOULBADGE.)" }] });
+    const T = (name, key, x, z, f, skin, line) => R.npcs.push({ name, key, role: "trainer", x, z, yaw: FACE[f], look: { skin }, talk: () => [{ text: line }] });
+    T("Juggler Kayden", "fuchsia_gym_1", 9.3, 10.9, "s", "juggler", "I wanted to become a ninja, so I joined this GYM!");
+    T("Juggler Kirk", "fuchsia_gym_2", 2.6, 6.3, "e", "juggler", "Let's see you beat my special techniques!");
+    T("Juggler Nate", "fuchsia_gym_3", 10.0, 2.9, "s", "juggler", "Stop right there! Our invisible walls have you frustrated?");
+    T("Tamer Phil", "fuchsia_gym_4", 2.6, 10.9, "n", "tamer", "I also study the way of the ninja with master KOGA!");
+    T("Tamer Edgar", "fuchsia_gym_5", 4.0, 4.2, "s", "tamer", "Master KOGA comes from a long line of ninjas!");
+    T("Juggler Shawn", "fuchsia_gym_6", 8.6, 7.6, "w", "juggler", "Wait! You can't get past the invisible walls without battling me!");
+    R.npcs.push({ name: "Gym guide", key: "fuchsia_gym_p0", x: 9.0, z: 15.0, yaw: FACE.w, look: { skin: "gym_guide" },
+      talk: () => [{ text: "Yo! Champ in making!" }, { text: "FUCHSIA GYM is riddled with invisible walls! KOGA might appear close, but he's blocked off!" },
+        { text: "You have to find gaps in the walls to reach him!" }] });
+    doormat(R, 5, 7, { to: "town", mat: "matGate" });
+    R.spawn = { x: 6.0, z: 15.5, yaw: FACE.n };
+    return R;
+  },
+
+  safari_gate() {
+    // The SAFARI ZONE's gate (FireRed's entrance building): in from FUCHSIA CITY at the south, through to the park at
+    // the north. Its attendant at her green counter: ¥500 for 30 SAFARI BALLs and 600 steps, asked as you go through.
+    const R = new Room("safari_gate", { name: "Safari Zone gate", floor: "Fuchsia City", W: 14, D: 14, outsideSize: "14 by 13" });
+    lgGate(R, { south: { to: "town" }, north: { to: "safari_zone", spawn: { x: 168.0, z: 182.4, yaw: FACE.n }, needs: "safari" } });
+    const G = R.geo, N = R.Nm;
+    G.box(9.6, 0, 4.4 + N, 13.4, 1.05, 5.2 + N, { all: "safariCounter", top: "lab" }); R.solid(9.6, 4.4 + N, 13.4, 5.2 + N);
+    framed(R, 10.0, 1.7, 3.0, 1.4, "safariSign", "e", { act: { label: "Read", lines: ["SAFARI ZONE", "POKéMON-U-CATCH!", "¥500 for 30 SAFARI BALLs and 600 steps."] } });
+    R.npcs.push({ name: "Attendant", key: "safari_zone_gate_p0", x: 11.6, z: 3.6 + N, yaw: FACE.s, look: { skin: "safari_zone_worker" },
+      talk: () => [{ text: "Welcome to the SAFARI ZONE!" }, { text: "For just ¥500, you can catch all the POKéMON you want in the park! Would you like to join the hunt?" },
+        { text: "(In the game: yes, and you pay ¥500 for 30 SAFARI BALLs. The way north takes you into the park.)" }] });
+    R.npcs.push({ name: "Attendant", key: "safari_zone_gate_p1", x: 2.2, z: 4.4 + N, yaw: FACE.e, look: { skin: "safari_zone_worker" },
+      talk: () => [{ text: "Hi! Is it your first time here?" }, { text: "SAFARI ZONE has 4 zones in it. Each zone has different kinds of POKéMON. Use SAFARI BALLs to catch them!" },
+        { text: "When you run out of time or SAFARI BALLs, it's game over for you!" }] });
+    R.spawn = LG_GATE_IN;
+    return R;
+  },
+
+  fuchsia_office() {
+    // The SAFARI ZONE's office (FireRed's meeting room, at the top of FUCHSIA CITY): three of its workers.
+    const R = new Room("fuchsia_office", { name: "Safari Zone office", floor: "Fuchsia City", W: 14, D: 11, outsideSize: "16 by 15" });
+    shell(R, { paper: "paperSchool", floor: "midBoards", door: [6, 8], entry: true, skirt: "beam", ledge: "walnut" });
+    band(R, 1.0, "beam", 0.12);
+    table(R, 3.6, 3.6, 10.4, 5.6, { top: "lab", leg: "walnut", h: 0.86, name: "Meeting table", note: "Papers on it: the SAFARI ZONE's new campaign, THE SEARCH FOR THE SECRET HOUSE." });
+    for (const x of [4.4, 6.0, 7.6, 9.2]) { chair(R, x + 0.4, 3.05, "s", { seat: "greenFabric" }); chair(R, x + 0.4, 6.15, "n", { seat: "greenFabric" }); }
+    framed(R, 5.4, 1.7, 3.2, 1.3, "safariSign", "n", { act: { label: "Read", lines: ["SAFARI ZONE", "Staff only beyond this point."] } });
+    plant(R, 1.0, 1.0, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); plant(R, 13.0, 1.0, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+    R.npcs.push({ name: "Worker", key: "fuchsia_meeting_room_p0", x: 6.0, z: 2.2, yaw: FACE.s, look: { skin: "safari_zone_worker" }, talk: () => [{ text: "We nicknamed the WARDEN SLOWPOKE." }] });
+    R.npcs.push({ name: "Worker", key: "fuchsia_meeting_room_p1", x: 2.4, z: 4.6, yaw: FACE.e, look: { skin: "safari_zone_worker" }, talk: () => [{ text: "SLOWPOKE is very knowledgeable about POKéMON!" }] });
+    R.npcs.push({ name: "Worker", key: "fuchsia_meeting_room_p2", x: 11.6, z: 4.6, yaw: FACE.w, look: { skin: "safari_zone_worker" }, talk: () => [{ text: "SLOWPOKE came in, but I couldn't understand him." }] });
+    doormat(R, 6, 8, { to: "town", mat: "matHouseV" });
+    R.spawn = { x: 7.0, z: 9.5, yaw: FACE.n };
+    return R;
+  },
+
+  fuchsia_house1() {
+    // BILL's grandpa's house (FireRed's, by the GYM): BILL's grandpa, a woman and a boy.
+    const R = new Room("fuchsia_house1", { name: "Bill's grandpa's house", floor: "Fuchsia City", W: 12, D: 11, outsideSize: "10 by 9" });
+    fuchsiaHouse(R, { rug: "rugGreen", cupboard: ["A cupboard. Inside: a jar of sweets and a POKéMON picture book."] });
+    R.npcs.push({ name: "Bill's grandpa", key: "fuchsia_bills_grandpas_house_p1", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "gambler" }, talk: () => [{ text: "Hmm? You've met BILL? He's my grandson!" }] });
+    R.npcs.push({ name: "Woman", key: "fuchsia_bills_grandpas_house_p0", x: 2.4, z: 3.4, yaw: FACE.e, look: { skin: "middle_aged_woman" }, talk: () => [{ text: "SAFARI ZONE's WARDEN is old, but still active! All his teeth are false, though." }] });
+    R.npcs.push({ name: "Youngster", key: "fuchsia_bills_grandpas_house_p2", x: 6.0, z: 7.4, yaw: FACE.n, look: { skin: "youngster" }, talk: () => [{ text: "BILL files his own POKéMON data on his PC!" }] });
+    return R;
+  },
+
+  fuchsia_house2() {
+    // The MOVE DELETER's house (FireRed's, beside the POKéMON CENTER).
+    const R = new Room("fuchsia_house2", { name: "Move Deleter's house", floor: "Fuchsia City", W: 12, D: 11, outsideSize: "10 by 9" });
+    fuchsiaHouse(R, { rug: "salmon", cupboard: ["A cupboard. Inside: notebooks full of moves, each one crossed out."] });
+    R.npcs.push({ name: "Move Deleter", key: "fuchsia_move_deleter_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "middle_aged_man" },
+      talk: () => [{ text: "Uh... Oh, yes, I'm the MOVE DELETER. I can make POKéMON forget their moves." }, { text: "(In the game: choose a POKéMON, then the move it should forget.)" }] });
+    return R;
+  },
+
+  fuchsia_house3() {
+    // The SAFARI ZONE WARDEN's home (FireRed's): the WARDEN, who can't speak without his GOLD TEETH (bring them, and
+    // he gives you HM04 STRENGTH), and a RARE CANDY behind his boulders (STRENGTH and the SOULBADGE move them).
+    const R = new Room("fuchsia_house3", { name: "Safari Zone Warden's home", floor: "Fuchsia City", W: 12, D: 11, outsideSize: "10 by 9" });
+    fuchsiaHouse(R, { rug: "rugGreen", cupboard: ["A cupboard. Inside: old photos of the SAFARI ZONE, and a box for false teeth (empty)."] });
+    for (const [x, z] of [[1.9, 8.4], [0.8, 7.2]]) { tanRock(R, x, z, 0.8); R.solid(x - 0.5, z - 0.5, x + 0.5, z + 0.5); }
+    R.npcs.push({ name: "Warden", key: "wardens_house_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "warden" },
+      talk: () => [{ text: "WARDEN: Hif fuff hefifoo! Ha lof ha feef ee hafahi ho. Heff hee fwee!" }, { text: "(In the game: bring him his GOLD TEETH from the SAFARI ZONE, and he gives you HM04.)" }] });
+    R.item("The RARE CANDY", "Behind the boulders in the corner: STRENGTH (HM04, with the SOULBADGE) moves them.");
+    return R;
+  },
+
+  fuchsia_house4() {
+    // The FISHING GURU's older brother's house (FireRed's): the GOOD ROD, if you like to fish.
+    const R = new Room("fuchsia_house4", { name: "Fishing Guru's brother's house", floor: "Fuchsia City", W: 12, D: 11, outsideSize: "10 by 9" });
+    fuchsiaHouse(R, { rug: "kitchenBlue", cupboard: ["A cupboard. Inside: fishing line, floats and a tin of bait."] });
+    R.npcs.push({ name: "Fishing Guru", key: "fuchsia_good_rod_house_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "fishing_guru" },
+      talk: () => [{ text: "I'm the FISHING GURU's older brother! I simply Looove fishing! Do you like to fish?" }, { text: "(In the game: yes, and he gives you a GOOD ROD.)" }] });
+    return R;
+  },
+
+
+  safari_zone() {
+    // The SAFARI ZONE as the mod builds it (tools/safari.py, from John's schematic): FireRed's four areas at two blocks a
+    // step, West, Center and East side by side and North above, joined by paths through the trees. His trees, grass,
+    // ponds and raised ground; the entrance building at the bottom (out through its glass doors, back to the gate); the
+    // five little houses; FireRed's items and signs. (The viewer's: what stands where, from the mod's own data.)
+    const F = SAFARI;
+    const R = new Room("safari_zone", { name: "Safari Zone", floor: "The park", W: F.W, D: F.D, H: 10, outside: true });
+    const G = R.geo;
+    const at = (x, z) => { const r = F.rows[z]; return { g: r[3 * x], w: r[3 * x + 1], h: r.charCodeAt(3 * x + 2) - 48 }; };
+    const GROUND = { g: "grass", m: "grass", p: "path", s: "path", d: "lab", r: "soil", w: "water" };
+    for (let z = 0; z < F.D; z++) {
+      for (let x = 0; x < F.W;) {
+        const g = at(x, z).g; let x1 = x + 1;
+        while (x1 < F.W && at(x1, z).g === g) x1++;
+        G.box(x, g === "w" ? -1.2 : -1, z, x1, g === "w" ? -0.2 : 0, z + 1, { top: GROUND[g] || "grass", all: "soil" });
+        if (g === "w") R.solid(x, z, x1, z + 1);
+        x = x1;
+      }
+      for (let x = 0; x < F.W;) {
+        const c = at(x, z);
+        if (!"TWURF".includes(c.w) || c.h <= 0) { x++; continue; }
+        let x1 = x + 1;
+        while (x1 < F.W && at(x1, z).w === c.w && at(x1, z).h === c.h) x1++;
+        if (c.w === "W") { G.box(x, 0, z, x1, Math.min(2, c.h), z + 1, "bark"); if (c.h > 2) G.box(x, 2, z, x1, c.h, z + 1, "treeLeaf"); }
+        else if (c.w === "T") G.box(x, 0, z, x1, c.h, z + 1, "treeLeaf");
+        else if (c.w === "R") G.box(x, 0, z, x1, c.h, z + 1, { top: "grass", all: "area_drip_rock" });
+        else if (c.w === "F") G.box(x + 0.35, 0, z + 0.35, x1 - 0.35, c.h, z + 0.65, "bark");
+        else G.box(x, 0, z, x1, c.h, z + 1, { top: "area_gate_roof", all: "area_gate_wall_birch" });
+        if (c.h >= 1) R.solid(x, z, x1, z + 1);
+        x = x1;
+      }
+      for (let x = 0; x < F.W; x++) if (at(x, z).w === "t") { G.box(x, 0, z + 0.5, x + 1, 1.4, z + 0.5, { s: "tallGrass", all: null }); G.box(x + 0.5, 0, z, x + 0.5, 1.4, z + 1, { e: "tallGrass", all: null }); }
+    }
+    R.grass = F.rows.length ? [] : [];
+    for (const a of F.acts) R.act(a.rect, { label: a.label, lines: a.lines });
+    for (const it of F.items) {
+      G.box(it.x - 0.2, it.y, it.z - 0.2, it.x + 0.2, it.y + 0.4, it.z + 0.2, { all: "ball", top: "ballTop" });
+      R.act([it.x - 0.7, it.z - 0.7, it.x + 0.7, it.z + 0.7], { label: "Pick up", lines: ["You found " + it.key.replace(/^safari_zone_[a-z]+_/, "").toUpperCase().replace(/_/g, " ") + "!"] });
+    }
+    for (const w of F.warps) {
+      if (w.kind === "mat") R.warps.push({ test: (p, input) => input.down && p.z > w.z && p.x > w.x0 && p.x < w.x1, to: w.to, spawn: { x: w.spawn.x, z: w.spawn.z, yaw: FACE.s }, fx: "fade" });
+      else R.warps.push({ test: (p, input) => input.up && p.z < w.z && p.z > w.z - 1.5 && p.x > w.x0 && p.x < w.x1, to: w.to, spawn: { x: 6.0, z: 9.5, yaw: FACE.n }, fx: "fade" });
+    }
+    R.item("The park", "FireRed's SAFARI ZONE: CENTER, EAST (area 1), NORTH (area 2) and WEST (area 3). In the game: ¥500 at the gate, 30 SAFARI BALLs and 600 steps.");
+    R.spawn = { x: F.spawn.x, z: F.spawn.z, yaw: FACE.n };
+    return R;
+  },
+
+  safari_rest_center() {
+    const R = new Room("safari_rest_center", { name: "Rest house", floor: "Center area", W: 12, D: 11, outsideSize: "8 by 6" });
+    restHouse(R, szOut("safari_rest_center"), ["SAFARI ZONE", "CENTER AREA REST HOUSE"]);
+    R.npcs.push({ name: "Sara", key: "safari_zone_center_rest_house_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "girl" }, talk: () => [{ text: "SARA: Where did my boy friend, ERIK, go?" }] });
+    R.npcs.push({ name: "Scientist", key: "safari_zone_center_rest_house_p1", x: 2.4, z: 6.4, yaw: FACE.e, look: { skin: "scientist" }, talk: () => [{ text: "I'm catching POKéMON to take home as gifts!" }] });
+    return R;
+  },
+  safari_rest_east() {
+    const R = new Room("safari_rest_east", { name: "Rest house", floor: "East (area 1)", W: 12, D: 11, outsideSize: "8 by 6" });
+    restHouse(R, szOut("safari_rest_east"), ["SAFARI ZONE", "AREA 1 REST HOUSE"]);
+    R.npcs.push({ name: "Scientist", key: "safari_zone_east_rest_house_p0", x: 2.4, z: 6.4, yaw: FACE.e, look: { skin: "scientist" }, talk: () => [{ text: "How many did you catch? I'm bushed from the work!" }] });
+    R.npcs.push({ name: "Rocker", key: "safari_zone_east_rest_house_p1", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "rocker" }, talk: () => [{ text: "I caught a CHANSEY! That makes this all worthwhile!" }] });
+    R.npcs.push({ name: "Worker", key: "safari_zone_east_rest_house_p2", x: 9.2, z: 7.4, yaw: FACE.w, look: { skin: "silph_worker_m" }, talk: () => [{ text: "Whew! I'm tired from all the fun!" }] });
+    return R;
+  },
+  safari_rest_north() {
+    const R = new Room("safari_rest_north", { name: "Rest house", floor: "North (area 2)", W: 12, D: 11, outsideSize: "8 by 6" });
+    restHouse(R, szOut("safari_rest_north"), ["SAFARI ZONE", "AREA 2 REST HOUSE"]);
+    R.npcs.push({ name: "Scientist", key: "safari_zone_north_rest_house_p0", x: 2.4, z: 6.4, yaw: FACE.e, look: { skin: "scientist" }, talk: () => [{ text: "You can keep any item you find on the ground here." }] });
+    R.npcs.push({ name: "Worker", key: "safari_zone_north_rest_house_p1", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "safari_zone_worker" }, talk: () => [{ text: "Go to the deepest part of the SAFARI ZONE. You will win a prize!" }] });
+    R.npcs.push({ name: "Gentleman", key: "safari_zone_north_rest_house_p2", x: 9.2, z: 7.4, yaw: FACE.w, look: { skin: "gentleman" }, talk: () => [{ text: "My EEVEE evolved into FLAREON! But, a friend's EEVEE turned into a VAPOREON! I wonder why?" }] });
+    return R;
+  },
+  safari_rest_west() {
+    const R = new Room("safari_rest_west", { name: "Rest house", floor: "West (area 3)", W: 12, D: 11, outsideSize: "8 by 6" });
+    restHouse(R, szOut("safari_rest_west"), ["SAFARI ZONE", "AREA 3 REST HOUSE"]);
+    R.npcs.push({ name: "Scientist", key: "safari_zone_west_rest_house_p0", x: 2.4, z: 6.4, yaw: FACE.e, look: { skin: "scientist" }, talk: () => [{ text: "Tossing ROCKs at POKéMON might make them run, but they'll be easier to catch." }] });
+    R.npcs.push({ name: "Cooltrainer", key: "safari_zone_west_rest_house_p1", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "cooltrainer_m" }, talk: () => [{ text: "Using BAIT will make POKéMON easier to catch." }] });
+    R.npcs.push({ name: "Worker", key: "safari_zone_west_rest_house_p2", x: 9.2, z: 7.4, yaw: FACE.w, look: { skin: "silph_worker_f" }, talk: () => [{ text: "I hiked a lot, but I didn't see any POKéMON I wanted." }] });
+    return R;
+  },
+  safari_secret_house() {
+    // The SECRET HOUSE (FireRed's, deep in the West area): the first to find it wins HM03 SURF.
+    const R = new Room("safari_secret_house", { name: "Secret House", floor: "West (area 3)", W: 12, D: 11, outsideSize: "8 by 6" });
+    restHouse(R, szOut("safari_secret_house"), ["SAFARI ZONE", "THE SECRET HOUSE"]);
+    R.npcs.push({ name: "Fishing Guru", key: "safari_zone_secret_house_p0", x: 6.0, z: 2.4, yaw: FACE.s, look: { skin: "fishing_guru" },
+      talk: () => [{ text: "Ah! Finally! You're the first person to reach the SECRET HOUSE!" }, { text: "Congratulations! You have won! (In the game: HM03, SURF.)" }] });
+    return R;
+  },
+
   digletts_n() { return caveRoom("digletts_n", "North entrance (Route 2)"); },
   digletts_b1f() { return caveRoom("digletts_b1f", "B1F"); },
   digletts_s() { return caveRoom("digletts_s", "South entrance (Route 11)"); },
@@ -1731,6 +2014,8 @@ const BUILD = {
     glassCase(R, 2.8, 2.8, 6.2, 4.6, bones, ["AERODACTYL Fossil", "A primitive and rare POKéMON."]);
     glassCase(R, 2.8, 6.0, 6.2, 7.8, bones, ["KABUTOPS Fossil", "A primitive and rare POKéMON."]);
     stairsUp(R, 8, 7, 2, { to: "museum_2f", spawn: { x: 12.5, z: 9.9, yaw: FACE.s } });
+    sideRail(R, 8, 12.2, 7, "n");
+    R.rail(8.0, 9.0, 12.4, 9.25, 3.2); R.rail(8.0, 6.75, 12.4, 7.0, 3.2);
     // The OLD AMBER on its stand, a glass dome over it.
     G.box(21.9, 0, 2.5, 23.1, 0.9, 3.7, { all: "museumGold", top: "darkTop" });
     G.box(22.25, 0.9, 2.85, 22.75, 1.3, 3.35, "amberGlow");
@@ -1773,6 +2058,9 @@ const BUILD = {
     for (const x of [1.0, 6.2, 11.4, 16.6]) museumPillar(R, x, R.H);
     for (const x of [3.0, 8.2, 13.4]) windowN(R, x, 1.6, 1.8, 1.6);
     stairsDown(R, 9, 7, 2, { to: "museum_1f", spawn: { x: 7.1, z: 8.1, yaw: FACE.s }, paper: "museumWall", show: true });
+    // (15:21) Its railing both sides of the opening, not only the front: the back as well.
+    sideRail(R, 9, 13, 7, "n");
+    R.rail(8.7, 6.7, 13.0, 7.05, 1.6);
     // The shuttle on its stand.
     G.box(13.2, 0, 3.4, 17.8, 0.5, 6.0, { all: "museumGold", top: "darkTop" });
     G.box(13.8, 0.5, 4.3, 17.4, 1.2, 5.1, "shuttleWhite");
@@ -1781,7 +2069,8 @@ const BUILD = {
     G.box(13.8, 1.2, 4.55, 14.6, 1.8, 4.85, "shuttleWhite");
     G.box(13.5, 0.6, 4.4, 13.8, 1.1, 5.0, "shuttleBlack");
     R.solid(13.2, 3.4, 17.8, 6.0);
-    R.act([13.0, 3.2, 18.0, 6.3], { label: "Look", lines: ["SPACE SHUTTLE COLUMBIA"] });
+    G.box(14.3, 0.08, 6.0, 16.7, 0.42, 6.03, { s: "shuttlePlaque", all: null });
+    R.act([13.0, 3.2, 18.0, 6.3], { label: "Look", lines: ["SPACE SHUTTLE COLUMBIA", "Flew into space in 1981, the first of its kind. A model at one twenty-fifth of its size."] });
     // The meteorite from MT. MOON: in two glass cases side by side, each as big as the fossils' downstairs.
     const rock = (G2, x0, z0, x1, z1) => {
       const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;

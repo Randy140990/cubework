@@ -18,11 +18,19 @@ SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob"}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
           "mart": (384, 64, 0), "school": (448, 64, 0), "trainer2": (512, 64, 0), "gate_s": (576, 64, 0), "nickhouse": (640, 64, 0), "gate_n": (704, 64, 0),
           "gate_league": (768, 64, 0), "gate_johto": (832, 64, 0), "route2_gate": (896, 64, 0), "route2_house": (960, 64, 0),
-          "pewter_gym": (1024, 64, 0), "museum_1f": (1088, 64, 0), "museum_2f": (1152, 64, 0), "pewter_house1": (1216, 64, 0), "pewter_house2": (1280, 64, 0)}
+          "pewter_gym": (1024, 64, 0), "museum_1f": (1088, 64, 0), "museum_2f": (1152, 64, 0), "pewter_house1": (1216, 64, 0), "pewter_house2": (1280, 64, 0),
+          # Fuchsia City and the SAFARI ZONE's houses (15:29 to 15:33).
+          "fuchsia_gym": (1344, 64, 0), "safari_gate": (1408, 64, 0), "fuchsia_office": (1472, 64, 0), "fuchsia_house1": (1536, 64, 0),
+          "fuchsia_house2": (1600, 64, 0), "fuchsia_house3": (1664, 64, 0), "fuchsia_house4": (1728, 64, 0), "safari_rest_center": (1792, 64, 0),
+          "safari_rest_east": (1856, 64, 0), "safari_rest_north": (1920, 64, 0), "safari_rest_west": (1984, 64, 0), "safari_secret_house": (2048, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
-         "pewter_gym": "pewter_gym", "museum_1f": "museum_1f", "museum_2f": "museum_2f", "pewter_house1": "pewter_nidoran_house", "pewter_house2": "pewter_speech_house"}
+         "pewter_gym": "pewter_gym", "museum_1f": "museum_1f", "museum_2f": "museum_2f", "pewter_house1": "pewter_nidoran_house", "pewter_house2": "pewter_speech_house",
+         "fuchsia_gym": "fuchsia_gym", "safari_gate": "safari_zone_gate", "fuchsia_office": "fuchsia_meeting_room", "fuchsia_house1": "fuchsia_bills_grandpas_house",
+         "fuchsia_house2": "fuchsia_move_deleter_house", "fuchsia_house3": "wardens_house", "fuchsia_house4": "fuchsia_good_rod_house",
+         "safari_rest_center": "safari_zone_center_rest_house", "safari_rest_east": "safari_zone_east_rest_house", "safari_rest_north": "safari_zone_north_rest_house",
+         "safari_rest_west": "safari_zone_west_rest_house", "safari_secret_house": "safari_zone_secret_house"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -66,6 +74,15 @@ DOORS = {
     "pewter_museum_side": {"room": "museum_1f", "door": [[-785, 32, 273], [-784, 32, 273]], "out": [-784.0, 32.0, 275.4], "in": {"x": 22.5, "z": 9.4, "yaw": 180.0}},
     "pewter_house1": {"room": "pewter_house1", "door": [[-769, 31, 286], [-768, 31, 286]], "out": [-768.0, 31.0, 288.4]},
     "pewter_house2": {"room": "pewter_house2", "door": [[-818, 31, 324], [-817, 31, 324]], "out": [-817.0, 31.0, 326.4]},
+    # Fuchsia City (15:29 to 15:33): the Gym (its two glass doors either side of a post), the SAFARI ZONE's gate (its
+    # glass doors, 4 wide) and office (a warped door), and its four houses (dark oak doors).
+    "fuchsia_gym": {"room": "fuchsia_gym", "door": [[x, 32, 809] for x in range(-531, -528)], "out": [-528.5, 31.0, 812.6]},
+    "fuchsia_safari": {"room": "safari_gate", "door": [[x, 31, 754] for x in range(-488, -484)], "out": [-486.0, 31.0, 757.4]},
+    "fuchsia_office": {"room": "fuchsia_office", "door": [[-463, 31, 761], [-462, 31, 761]], "out": [-462.0, 31.0, 763.4]},
+    "fuchsia_house1": {"room": "fuchsia_house1", "door": [[-519, 32, 809], [-518, 32, 809]], "out": [-518.0, 32.0, 811.4]},
+    "fuchsia_house2": {"room": "fuchsia_house2", "door": [[-508, 32, 809], [-507, 32, 809]], "out": [-507.0, 32.0, 811.4]},
+    "fuchsia_house3": {"room": "fuchsia_house3", "door": [[-478, 31, 808], [-477, 31, 808]], "out": [-477.0, 31.0, 810.4]},
+    "fuchsia_house4": {"room": "fuchsia_house4", "door": [[-468, 31, 808], [-467, 31, 808]], "out": [-467.0, 31.0, 810.4]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -80,12 +97,16 @@ for _line in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "shop
                                         "place": _place, "group": _kind}
 MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridian_center", "mart": "viridian_mart", "school": "viridian_school", "nickhouse": "viridian_house", "gate_s": "forest_south",
             "gate_league": "league_s", "route2_gate": "route2_gate_s", "route2_house": "route2_house", "pewter_gym": "pewter_gym",
-            "pewter_house1": "pewter_house1", "pewter_house2": "pewter_house2"}
+            "pewter_house1": "pewter_house1", "pewter_house2": "pewter_house2", "fuchsia_gym": "fuchsia_gym", "safari_gate": "fuchsia_safari",
+            "fuchsia_office": "fuchsia_office", "fuchsia_house1": "fuchsia_house1", "fuchsia_house2": "fuchsia_house2", "fuchsia_house3": "fuchsia_house3",
+            "fuchsia_house4": "fuchsia_house4"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
 # so its trainers see straight ahead as many steps as theirs.
-TILE = {"pewter_gym": [1.0, 1.0]}
+TILE = {"pewter_gym": [1.0, 1.0], "fuchsia_gym": [1.0, 1.0]}
+# Item balls in a room of the viewer's (the WARDEN's RARE CANDY, behind his boulders: 15:33).
+BALLS = {"fuchsia_house3": [{"key": "wardens_house_rare_candy", "x": 0.8, "z": 8.4, "y": 0}]}
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n"}
 # Ways out through the side walls (a sideways gate's), by room and wall.
@@ -98,7 +119,10 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "gate_league": {"x": 7.0, "z": 14.5, "yaw": 180.0}, "gate_johto": {"x": 14.4, "z": 5.0, "yaw": 90.0},
          "route2_gate": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "route2_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "pewter_gym": {"x": 7.0, "z": 16.5, "yaw": 180.0}, "museum_1f": {"x": 14.5, "z": 9.4, "yaw": 180.0}, "museum_2f": {"x": 12.5, "z": 9.9, "yaw": 0.0},
-         "pewter_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "pewter_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
+         "pewter_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "pewter_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "fuchsia_gym": {"x": 6.0, "z": 15.5, "yaw": 180.0}, "safari_gate": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "fuchsia_office": {"x": 7.0, "z": 9.5, "yaw": 180.0},
+         "fuchsia_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "fuchsia_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "fuchsia_house3": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "fuchsia_house4": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -263,7 +287,9 @@ def collision(room):
     # Furniture and walls: their rects, clipped to just round the room, 1.5 blocks high on the floor.
     rects = [list(s) for s in room["solids"]]
     rects.append([-5, D, W + 5, D + 5])  # the open front: the door mat is the only way out
-    for (x0, z0, x1, z1) in rects:
+    for rect in rects:
+        # (A solid with a height of its own, a banister by stairs: as high as that, so you can't get over it from the steps.)
+        (x0, z0, x1, z1), hh = rect[:4], (rect[4] if len(rect) > 4 else 1.5)
         x0, z0, x1, z1 = max(x0, -1), max(z0, -1), min(x1, W + 1), min(z1, D + 1)
         if x1 <= x0 or z1 <= z0: continue
         for ix in range(math.floor(x0), math.ceil(x1)):
@@ -271,7 +297,11 @@ def collision(room):
                 a0, a1 = max(x0, ix) - ix, min(x1, ix + 1) - ix
                 b0, b1 = max(z0, iz) - iz, min(z1, iz + 1) - iz
                 if a1 - a0 < 1e-3 or b1 - b0 < 1e-3: continue
-                add((ix, 0, iz), [a0 * 16, 0, b0 * 16, a1 * 16, 24, b1 * 16])
+                if hh <= 1.5:
+                    add((ix, 0, iz), [a0 * 16, 0, b0 * 16, a1 * 16, 24, b1 * 16])
+                else:
+                    for iy in range(0, math.ceil(hh - EPS)):
+                        add((ix, iy, iz), [a0 * 16, 0, b0 * 16, a1 * 16, min(16, (hh - iy) * 16), b1 * 16])
     # Stairs: columns an eighth of a block wide, as high as the steps.
     for rp in ramps:
         x0, z0, x1, z1 = rp["rect"]
@@ -403,7 +433,7 @@ def main():
             if m.get("to") in (None, "town"):
                 warps.append({"kind": "north", "x0": m["x0"], "x1": m["x1"], "z": 1.0, "door": NORTH_DOOR.get(rid), "to": None, "needs": m.get("needs")})
             else:
-                warps.append({"kind": "north", "x0": m["x0"], "x1": m["x1"], "z": 1.0, "door": None, "to": m["to"], "spawn": spawn_of(m["spawn"])})
+                warps.append({"kind": "north", "x0": m["x0"], "x1": m["x1"], "z": 1.0, "door": None, "to": m["to"], "spawn": spawn_of(m["spawn"]), "needs": m.get("needs")})
         for m in room.get("sides", []):
             # Through a side wall: out to the world (or asked where to: the Route 28 Gate's west way).
             east = m["wall"] == "e"
@@ -431,7 +461,7 @@ def main():
                           "place": PLACE[rid], "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360},
                           "entry": ENTRY.get(rid), "cam": fit_camera(room["W"], room["D"], room["H"]), "cells": placed, "warps": warps, "people": people, "acts": acts,
                           "grass": room.get("grass", []), "pools": room.get("pools", []), "panes": panes_of(room), "clocks": room.get("clocks", []),
-                          **({"tile": TILE[rid]} if rid in TILE else {})}
+                          **({"tile": TILE[rid]} if rid in TILE else {}), **({"items": BALLS[rid]} if rid in BALLS else {})}
     # Models and the block's states.
     mdir = os.path.join(res, "assets/retromon/models/block/prop")
     os.makedirs(mdir, exist_ok=True)

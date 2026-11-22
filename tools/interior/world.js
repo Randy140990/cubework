@@ -19,6 +19,7 @@ const MATDEF = {
   curtain: { tex: "curtain", per: 1 }, curtainBlue: { tex: "curtainBlue", per: 1 }, leather: { tex: "leather", per: 1 }, bark: { tex: "bark", per: 1 }, grass: { tex: "grass", per: 1 }, grassMown: { tex: "grassMown", per: 1 },
   path: { tex: "path", per: 1 }, stone: { tex: "stone", per: 1 }, siding: { tex: "siding", per: 1 }, labWall: { tex: "labWall", per: 1 }, roofRed: { tex: "roofRed", per: 1 },
   roofBlue: { tex: "roofBlue", per: 1 }, roofGrey: { tex: "roofGrey", per: 1 }, fence: { tex: "fence", per: 1 }, water: { tex: "water", per: 2 }, rubber: { tex: "rubber", per: 1 },
+  windowReveal: { tex: "windowReveal", per: 1 },
   books: { tex: "books", per: [2, 0.5] }, lampShade: { tex: "lampShade", per: 1, glow: 0.7 }, glass: { tex: "glass", per: 1, alpha: 0.3 },
   rugMum: { tex: "rugMum", fit: true }, rugRoom: { tex: "rugRoom", fit: true }, rugRival: { tex: "rugRival", fit: true }, doormat: { tex: "doormat", fit: true },
   cupboard: { tex: "cupboard", fit: true }, cupboardWhite: { tex: "cupboardWhite", fit: true }, wallCupboard: { tex: "wallCupboard", fit: true }, drawers: { tex: "drawers", fit: true }, drawersHoney: { tex: "drawersHoney", fit: true }, drawersPale: { tex: "drawersPale", fit: true },
@@ -197,6 +198,8 @@ class Room {
     this.group = new THREE.Group(); this.parts = []; this.doors = [];
   }
   solid(x0, z0, x1, z1) { this.solids.push([x0, z0, x1, z1]); }
+  // A solid as high as h (a banister by stairs, that you can't step or jump over from the steps).
+  rail(x0, z0, x1, z1, h) { this.solids.push([x0, z0, x1, z1, h]); }
   act(rect, a) { this.acts.push(Object.assign({ rect }, a)); }
   item(name, note) { if (!this.items.some(i => i.name === name)) this.items.push({ name, note }); }
   F(X, Z, f = "s") { return frame(this, X, Z, f); }
@@ -370,10 +373,12 @@ const floorAt = (p, a, d) => p[4] === 0 ? [a, p[9] + d] : p[4] === 1 ? [p[9] - d
 function windowN(room, x, y, w = 2.2, h = 2, o = {}) {
   const G = room.geo;
   G.box(x, y, 0.0, x + w, y + h, 0.02, { s: "window", all: null });
-  const fr = "paint", t = 0.14;
-  G.box(x - t, y - t, 0, x + w + t, y, 0.16, fr); G.box(x - t, y + h, 0, x + w + t, y + h + t, 0.16, fr);
-  G.box(x - t, y, 0, x, y + h, 0.16, fr); G.box(x + w, y, 0, x + w + t, y + h, 0.16, fr);
-  G.box(x - 0.25, y - t - 0.1, 0, x + w + 0.25, y - t, 0.3, fr);
+  // (15:21) Set into the wall: its frame a deep reveal round the glass (the glass at the back of it), a deep sill.
+  const fr = "paint", t = 0.14, dp = 0.36;
+  G.box(x - t, y - t, 0, x + w + t, y, dp, fr); G.box(x - t, y + h, 0, x + w + t, y + h + t, dp, fr);
+  G.box(x - t, y, 0, x, y + h, dp, fr); G.box(x + w, y, 0, x + w + t, y + h, dp, fr);
+  G.box(x, y, 0.02, x + w, y + 0.02, dp, "windowReveal"); G.box(x, y + h - 0.02, 0.02, x + w, y + h, dp, "windowReveal");
+  G.box(x - 0.25, y - t - 0.1, 0, x + w + 0.25, y - t, 0.48, fr);
   if (o.curtains) {
     const c = o.curtains;
     G.box(x - 0.45, y + h + 0.3, 0.12, x + w + 0.45, y + h + 0.38, 0.2, "steel");

@@ -40,7 +40,7 @@
      "kind": "mat",
      "x0": 61.0,
      "x1": 67.0,
-     "z": 142.3,
+     "z": 145.0,
      "door": null,
      "to": "gate_s",
      "spawn": {
@@ -53,7 +53,7 @@
      "kind": "north",
      "x0": 29.0,
      "x1": 35.0,
-     "z": 38.3,
+     "z": 35.6,
      "door": null,
      "to": "gate_n",
      "spawn": {

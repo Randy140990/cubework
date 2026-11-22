@@ -329,7 +329,18 @@ def main():
                     st = S.get((x + dx, z + dz))
                     if st is not None:
                         lights.append([x + dx, z + dz, LIGHT, math.ceil(st) - floor]); break
-        size = write_bin(os.path.join(RES, rid + ".bin"), W, H, L, names)
+        # (15:21) The rocks as copper grates (the mod draws the boulders on them), so the floor and walls round them show.
+        BIG, SMALL = "minecraft:waxed_copper_grate[waterlogged=false]", "minecraft:waxed_exposed_copper_grate[waterlogged=false]"
+        out = []
+        for n in names:
+            k = n.replace("minecraft:", "").split("[")[0]
+            out.append(BIG if k in ("granite", "polished_granite") else SMALL if k in ("granite_slab", "polished_granite_slab") else n)
+        if rid == "mt_moon_b1f":
+            # (15:21) B1F's walls low (four blocks over the floor, not six and twelve), so you can see yourself behind them.
+            for y in range(floor + 4, H):
+                for i in range(y * L * W, (y + 1) * L * W):
+                    if out[i] != "minecraft:air": out[i] = "minecraft:air"
+        size = write_bin(os.path.join(RES, rid + ".bin"), W, H, L, out)
         spawn = entry_1f if rid == "mt_moon_1f" else exit_foot if rid == "mt_moon_b1f" else warps[rid][0]["spawn"] if warps[rid] else {"x": W / 2, "z": L / 2, "yaw": 0.0}
         if rid == "mt_moon_b2f":
             l = ladder_at("mt_moon_b2f", 15, 24)
@@ -368,7 +379,7 @@ def main():
                 top = 0
                 for y in range(H - 1, floor - 1, -1):
                     if base(x, y, z) not in FREE: top = y - floor + 1; break
-                row.append("w" + chr(48 + min(top, 40)))
+                row.append("w" + chr(48 + min(top if rid != "mt_moon_b1f" else min(top, 4), 40)))
             cells.append("".join(row))
         viewer[rid] = {"W": W, "D": L, "rows": cells, "people": people, "items": items, "spawn": spawn, "warps": warps[rid], "acts": acts,
                        "name": "Mt. Moon", "floor": rooms[rid]["floor"]}

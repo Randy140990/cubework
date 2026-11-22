@@ -104,6 +104,11 @@ public class WorldMon extends PathfinderMob {
 	@Override
 	public void tick() {
 		super.tick();
+		// (15:21) An item ball inside, put in twice (one left from the save): the second goes, so one you take is gone.
+		if (!level().isClientSide() && tickCount % 20 == 1 && key().startsWith("item:") && level().dimension() == Interiors.LEVEL && Game.twin(this, key())) {
+			discard();
+			return;
+		}
 		if (roams()) {
 			// One the game doesn't know any more (left over in a save): gone.
 			if (!level().isClientSide() && !Game.roamerKnown(this)) discard();

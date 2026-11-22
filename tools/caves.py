@@ -108,7 +108,12 @@ def main():
         def open_(x, z):
             return base(x, floor - 1, z) not in SOFT and base(x, floor, z) in SOFT and base(x, floor + 1, z) in SOFT
 
-        size = write_bin(os.path.join(RES, rid + ".bin"), W, H, L, names)
+        # (15:21) The rocks as copper grates in the room (the mod draws a boulder on each): a grate hides nothing round it,
+        # so the floor under a rock and the wall behind it are drawn as they are (no square, no black).
+        BIG, SMALL = "minecraft:waxed_copper_grate[waterlogged=false]", "minecraft:waxed_exposed_copper_grate[waterlogged=false]"
+        rocks = [BIG if n.replace("minecraft:", "").split("[")[0] in ("tuff", "cobblestone") else
+                 SMALL if n.replace("minecraft:", "").split("[")[0] in ("tuff_slab", "cobblestone_slab", "andesite_slab") else n for n in names]
+        size = write_bin(os.path.join(RES, rid + ".bin"), W, H, L, rocks)
         # The cave's floor, as boxes (where its wild POKéMON come up): each row's runs, joined down where they line up.
         rects = []
         if rid == "digletts_b1f":

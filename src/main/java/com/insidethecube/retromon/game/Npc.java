@@ -150,6 +150,12 @@ public class Npc extends PathfinderMob {
 			discard();
 			return;
 		}
+		// (15:21) Inside, only ever one of each: a room's people put in again while the old ones were still on their way
+		// in from the save (Viridian Forest, Diglett's Cave) stood twice. The one that came second goes.
+		if (tickCount % 20 == 1 && level().dimension() == Interiors.LEVEL && Game.twin(this, key())) {
+			discard();
+			return;
+		}
 		if (!settled) settled = Game.settle(this);
 		if (home == null) {
 			home = blockPosition();

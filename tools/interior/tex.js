@@ -584,6 +584,7 @@ const TEXDEF = {
   lampShade: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#FCE9B8"), (x % 4 === 0 ? -0.05 : 0) + (r() - 0.5) * 0.03)); }],
   bunting: [32, 8, (P, r) => { const cols = [C.red, C.yellow, C.blue, C.green]; for (let i = 0; i < 8; i++) for (let j = 0; j < 6; j++) for (let k = j >> 1; k < 4 - (j >> 1); k++) P.set(i * 4 + k, j + 1, cols[i % 4]); P.rect(0, 0, 32, 1, hx("#5A4A3E")); }],
   trophyPlate: [16, 8, (P, r) => { P.bevel(0, 0, 16, 8, hx("#3B2A1C"), 0.12, 0.03, r); P.rect(3, 3, 10, 2, C.goldL); }],
+  windowReveal: [16, 16, (P, r) => { P.fill(hx("#D9D6CE"), 0.02, r); }],
   glass: [16, 16, (P, r) => { P.fill(hx("#CFE9F2"), 0.02, r); P.line(3, 12, 12, 3, hx("#FFFFFF"), 0.7); }],
   lab: [16, 16, (P, r) => { P.fill(hx("#E9EDEC"), 0.03, r); P.rect(0, 0, 16, 1, hx("#FFFFFF")); }],
   shadowBlob: [32, 32, (P, r) => { for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const d = Math.hypot(x - 15.5, y - 15.5) / 16; P.set(x, y, [0, 0, 0], Math.max(0, 0.55 * (1 - d * d)) ); } }],

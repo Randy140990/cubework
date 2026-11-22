@@ -733,6 +733,12 @@ public final class Game {
 		if (level.dimension() == Interiors.LEVEL) return Interiors.spot(level, x, z, radius);
 		Zone zone = null;
 		for (int i = zones.size() - 1; i >= 0 && zone == null; i--) if (zones.get(i).contains(x, z)) zone = zones.get(i);
+		// (15:21) On a route the ground where they stand: a route's ground rises and falls (Route 4 up to MT. MOON), so its
+		// commonest height put the woman by the POKéMON CENTER on its roof.
+		if (zone != null && zone.place().startsWith("route_")) {
+			BlockPos own = spotAny(level, x, z, radius);
+			if (own != null) return own;
+		}
 		if (zone != null) {
 			// Near the place's street level (so not on a roof, however solid the building is).
 			int street = streetY(level, zone);
@@ -845,7 +851,8 @@ public final class Game {
 	/** Pallet Town to Route 2 on Insid3 Th3 Cub3's Kanto map, to begin with (mark the rest with /retromon zone). */
 	private static final Zone[] DEFAULT_ZONES = {new Zone("pallet_town", -845, 655, -745, 735), new Zone("route_1", -845, 590, -745, 654),
 			new Zone("viridian_city", -830, 495, -745, 589), new Zone("route_22", -900, 495, -831, 565), new Zone("route_22", -1000, 512, -901, 600), new Zone("route_2", -830, 340, -745, 494),
-			new Zone("pewter_city", -850, 255, -741, 339), new Zone("route_3", -740, 285, -580, 332), new Zone("route_4", -628, 238, -410, 284)};
+			new Zone("pewter_city", -850, 255, -741, 339), new Zone("route_3", -740, 285, -580, 332), new Zone("route_4", -628, 238, -410, 284),
+			new Zone("fuchsia_city", -560, 733, -441, 860)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -873,6 +880,11 @@ public final class Game {
 				zones.add(ROUTE_4);
 				saveMarker();
 			}
+			// Fuchsia City (15:29).
+			if (!"fuchsia_city".equals(placeAt(-500.5, 800.5))) {
+				zones.add(FUCHSIA);
+				saveMarker();
+			}
 		} else {
 			zones.addAll(List.of(DEFAULT_ZONES));
 			saveMarker();
@@ -880,7 +892,8 @@ public final class Game {
 	}
 
 	private static final Zone ROUTE_22_WEST = new Zone("route_22", -1000, 512, -901, 600), PEWTER = new Zone("pewter_city", -850, 255, -741, 339),
-			ROUTE_3 = new Zone("route_3", -740, 285, -580, 332), ROUTE_4 = new Zone("route_4", -628, 238, -410, 284);
+			ROUTE_3 = new Zone("route_3", -740, 285, -580, 332), ROUTE_4 = new Zone("route_4", -628, 238, -410, 284),
+			FUCHSIA = new Zone("fuchsia_city", -560, 733, -441, 860);
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -1057,6 +1070,8 @@ public final class Game {
 			if (inside && !walkabout && !Battles.in(p) && !BUSY.containsKey(id) && !AFTER_BATTLE.containsKey(id) && Interiors.watched(p)) watch(p);
 			// The Museum's desk: your ticket, the first time you go in by the main door.
 			if (inside && !Battles.in(p) && !BUSY.containsKey(id)) museumDesk(p);
+			// The SAFARI ZONE (15:29): which of its areas you're in; out of SAFARI BALLs, the game's over.
+			if (inside && s.getTickCount() % 10 == 0 && !Battles.in(p)) safariTick(p);
 			// Pewter City's east way out before you've beaten BROCK: the boy takes you to the GYM.
 			if (!inside && !build && !Battles.in(p) && !BUSY.containsKey(id)) pewterGuide(p);
 			if (Battles.in(p) || BUSY.containsKey(id) || inside && !walkabout || AFTER_BATTLE.containsKey(id)) {
@@ -1276,7 +1291,12 @@ public final class Game {
 		if (walked == null || p.level().getServer().getTickCount() - walked > 6) return false;
 		String tag = "wild:" + p.getUUID();
 		ServerLevel level = (ServerLevel) p.level();
+		Vec3 ahead = Vec3.directionFromRotation(0, p.getYRot());
 		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, p.getBoundingBox().inflate(0.9, 1.5, 0.9), w -> tag.equals(w.key()) && !w.airborne())) {
+			// (15:21) Only one you've walked into: right by you, at your height, and ahead of you (not one just behind or
+			// across a ledge, which started a battle with nothing near).
+			double dx = w.getX() - p.getX(), dz = w.getZ() - p.getZ(), dh = Math.hypot(dx, dz);
+			if (dh > 1.25 || Math.abs(w.getY() - p.getY()) > 0.9 || dh > 0.3 && (dx * ahead.x + dz * ahead.z) / dh < 0.2) continue;
 			Mon foe = WILD_MONS.remove(w.getId());
 			w.discard();
 			if (foe == null) continue;
@@ -1550,8 +1570,9 @@ public final class Game {
 		level.setDayTime(to);
 	}
 
+	/** The tall grass wild POKéMON live in: the big tufts only (tall grass, large ferns), never the little ones (15:21). */
 	private static boolean grass(BlockState s) {
-		return s.is(Blocks.SHORT_GRASS) || s.is(Blocks.TALL_GRASS) || s.is(Blocks.FERN) || s.is(Blocks.LARGE_FERN);
+		return s.is(Blocks.TALL_GRASS) || s.is(Blocks.LARGE_FERN);
 	}
 
 	/** Caves, towers and the like: wild Pokémon on any step, not just in grass. */
@@ -1569,6 +1590,7 @@ public final class Game {
 
 	/** A step: friendship, REPEL, and in the grass (or a cave) a wild Pokémon may jump out, as often as in the games. */
 	private static void step(ServerPlayer p, BlockPos pos) {
+		safariStep(p);
 		int walked = WALKED.merge(p.getUUID(), 1, Integer::sum);
 		if (walked < BLOCKS_PER_GAME_STEP) return;
 		WALKED.put(p.getUUID(), 0);
@@ -1601,6 +1623,7 @@ public final class Game {
 	}
 
 	public static void afterBattle(ServerPlayer p) {
+		safariAfterBattle(p);
 		COOLDOWN.put(p.getUUID(), 60);
 		GRACE.put(p.getUUID(), 4);
 		// Till the battle screen closes (the cheering, the EXP, Continue): 5 minutes at most, in case it never says.
@@ -2043,12 +2066,17 @@ public final class Game {
 	/** Whether you have what a guarded way needs (a badge by its name, or "CHAMPION"). */
 	public static boolean meets(ServerPlayer p, String needs) {
 		PlayerData d = data(p);
+		if (needs.equals("safari")) return SAFARI.containsKey(p.getUUID());
 		if (needs.equals("CHAMPION")) return d.story.contains("champion");
 		return d.badges.contains(needs);
 	}
 
 	/** Turned back at a guarded way: the guard says why. */
 	public static void gateBlocked(ServerPlayer p, String needs) {
+		if (needs.equals("safari")) {
+			safariAsk(p);
+			return;
+		}
 		String b = needs.equals("CHAMPION") ? "the POKéMON LEAGUE's title" : "the " + needs;
 		dialogue(p, null, "talk", List.of("GUARD: Hold it right there!", "GUARD: Only TRAINERS who have " + b + " may go on from here.",
 				"GUARD: Come back when you've earned it!"), whoTag("GUARD"));
@@ -2354,6 +2382,25 @@ public final class Game {
 					personGift(p, n, d);
 					return;
 				}
+				// Fuchsia City (15:33): the SAFARI ZONE WARDEN (his GOLD TEETH, HM04), the FISHING GURU's brother (the GOOD
+				// ROD), the MOVE DELETER, the SAFARI ZONE's gate.
+				if (n.key().equals("wardens_house_p0")) {
+					warden(p, n, d);
+					return;
+				}
+				if (n.key().equals("fuchsia_good_rod_house_p0")) {
+					goodRodTalk(p, n, d);
+					return;
+				}
+				if (n.key().equals("fuchsia_move_deleter_p0")) {
+					deleter(p, n);
+					return;
+				}
+				if (n.key().equals("safari_zone_gate_p0")) {
+					if (SAFARI.containsKey(p.getUUID())) dialogue(p, n, "talk", List.of("Good luck! Catch plenty of POKéMON!"));
+					else safariAsk(p);
+					return;
+				}
 				if (n.key().equals("mt_moon_pokecenter_salesman")) {
 					magikarpMan(p, n, d);
 					return;
@@ -2414,11 +2461,29 @@ public final class Game {
 	}
 
 	/** An item ball: the item goes in your bag (once), and the ball's gone. */
+	/**
+	 * Whether there's another of the same one (the same key) nearby that came first (a lower id): two of one person or
+	 * item ball inside, from a room put in again while the save's were still loading.
+	 */
+	static boolean twin(net.minecraft.world.entity.Entity e, String key) {
+		if (key == null || key.isEmpty()) return false;
+		net.minecraft.world.phys.AABB box = e.getBoundingBox().inflate(96, 24, 96);
+		for (net.minecraft.world.entity.Entity o : e.level().getEntities(e, box, o -> o.getClass() == e.getClass())) {
+			String k = o instanceof Npc n ? n.key() : o instanceof WorldMon m ? m.key() : null;
+			if (key.equals(k) && o.getId() < e.getId() && !o.isRemoved()) return true;
+		}
+		return false;
+	}
+
 	private static void pickUp(ServerPlayer p, WorldMon w, String key) {
 		PlayerData d = data(p);
 		Trainers.FieldItem fi = Trainers.FIELD_ITEMS.get(key);
 		if (fi == null || d.statics.contains("item:" + key)) {
 			w.discard();
+			return;
+		}
+		if (key.equals("wardens_house_rare_candy") && !(d.count("hm_strength") > 0 && d.badges.contains("SOULBADGE"))) {
+			message(p, List.of("A big boulder's in the way.", "A POKéMON may be able to move it with STRENGTH."));
 			return;
 		}
 		d.statics.add("item:" + key);
@@ -2428,11 +2493,225 @@ public final class Game {
 		String name = it != null ? it.name() : fi.item().replace("tm_", "TM ").replace('_', ' ').toUpperCase();
 		if (it != null) d.give(fi.item(), 1);
 		w.discard();
+		// (15:21) And any other of the same ball about (one put in twice), so none is left where it was.
+		for (WorldMon o : p.level().getEntitiesOfClass(WorldMon.class, w.getBoundingBox().inflate(96, 24, 96), o -> ("item:" + key).equals(o.key()))) o.discard();
 		sync(p);
 		CompoundTag s = new CompoundTag();
 		s.putString("sound", "item");
 		Net.send(p, "sound", s);
 		message(p, List.of(player(p) + " found " + name + "!"));
+	}
+
+
+	// ---------- the SAFARI ZONE (15:29, 15:32), as FireRed's ----------
+
+	/** Who's on a SAFARI GAME, and how many steps they've left (FireRed's 600, a step every two blocks). */
+	private static final Map<UUID, int[]> SAFARI = new HashMap<>();
+	private static final int SAFARI_STEPS = 600, SAFARI_BALLS = 30, SAFARI_FEE = 500;
+	/** The areas of the SAFARI ZONE's room (tools/safari.py): place, x0 z0 x1 z1 in the room. */
+	private static final Object[][] SAFARI_AREAS = {{"safari_zone_center", 116, 126, 218, 198}, {"safari_zone_west", 8, 108, 104, 180},
+			{"safari_zone_north", 106, 8, 220, 88}, {"safari_zone_east", 236, 104, 344, 174}};
+
+	/** At the gate's counter, on the way in: the attendant asks (FireRed's words). */
+	private static void safariAsk(ServerPlayer p) {
+		Npc n = null;
+		for (Npc o : ((ServerLevel) p.level()).getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(16), o -> o.key().equals("safari_zone_gate_p0"))) n = o;
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
+		t.put("choices", ch);
+		dialogue(p, n, "safari_fee", List.of("Welcome to the SAFARI ZONE!", "For just ¥500, you can catch all the POKéMON you want in the park!",
+				"Would you like to join the hunt?"), t, n == null ? -1 : n.getId());
+	}
+
+	private static void safariFee(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (!yes) {
+			dialogue(p, n, "talk", List.of("OK! Please come again!"));
+			return;
+		}
+		if (d.money < SAFARI_FEE) {
+			dialogue(p, n, "talk", List.of("Oops! Not enough money!"));
+			return;
+		}
+		d.money -= SAFARI_FEE;
+		d.give("safari_ball", SAFARI_BALLS);
+		SAFARI.put(p.getUUID(), new int[] {SAFARI_STEPS, 0});
+		sync(p);
+		safariHud(p);
+		dialogue(p, n, "talk", fill(p, List.of("That'll be ¥500, please!", "We only use a special POKé BALL here.", "{player} received 30 SAFARI BALLs!",
+				"We'll call you on the PA when you run out of time or SAFARI BALLs!", "Go on through, and good luck!")));
+	}
+
+	/** A step in the SAFARI ZONE: one off the steps left every two blocks; none left, the game's over. */
+	private static void safariStep(ServerPlayer p) {
+		int[] s = SAFARI.get(p.getUUID());
+		Interiors.Room r = Interiors.roomOf(p);
+		if (s == null || r == null || !r.id().equals("safari_zone")) return;
+		if (++s[1] < 2) return;
+		s[1] = 0;
+		s[0]--;
+		if (s[0] % 25 == 0 || s[0] <= 10) safariHud(p);
+		if (s[0] <= 0) safariOver(p, "Time's up!");
+	}
+
+	/** Every half second in the SAFARI ZONE: the area you're in (its POKéMON, its name), and whether you've balls left. */
+	private static void safariTick(ServerPlayer p) {
+		Interiors.Room r = Interiors.roomOf(p);
+		if (r == null) return;
+		if (r.id().equals("safari_gate") && SAFARI.containsKey(p.getUUID()) && Interiors.local(p).z > 5.5) {
+			// Back out past the counter (out of the park, or never gone in): the game's over, the balls handed back.
+			safariEnd(p);
+			dialogue(p, null, "talk", List.of("Did you get a good haul?", "Come again!"), whoTag("ATTENDANT"));
+			return;
+		}
+		if (!r.id().equals("safari_zone")) return;
+		Vec3 l = Interiors.local(p);
+		String place = null;
+		double best = 1e9;
+		for (Object[] a : SAFARI_AREAS) {
+			int x0 = (Integer) a[1], z0 = (Integer) a[2], x1 = (Integer) a[3], z1 = (Integer) a[4];
+			double dx = Math.max(Math.max(x0 - l.x, 0), l.x - x1), dz = Math.max(Math.max(z0 - l.z, 0), l.z - z1), dd = dx * dx + dz * dz;
+			if (dd < best) {
+				best = dd;
+				place = (String) a[0];
+			}
+		}
+		if (place != null) enter(p, place);
+		if (SAFARI.containsKey(p.getUUID()) && data(p).count("safari_ball") <= 0 && !AFTER_BATTLE.containsKey(p.getUUID())) safariOver(p, "You have no SAFARI BALLs left!");
+	}
+
+	/** The PA calls time: back to the gate, the game over. */
+	private static void safariOver(ServerPlayer p, String why) {
+		safariEnd(p);
+		Interiors.Room gate = Interiors.room("safari_gate");
+		if (gate != null) Interiors.go(p, gate, 7.0, 2.6, 0F, true);
+		dialogue(p, null, "talk", List.of("PA: Ding-dong!", "PA: " + why, "PA: Your SAFARI GAME is over!", "Did you get a good haul?", "Come again!"), whoTag("PA"));
+	}
+
+	private static void safariEnd(ServerPlayer p) {
+		if (SAFARI.remove(p.getUUID()) == null) return;
+		PlayerData d = data(p);
+		int left = d.count("safari_ball");
+		if (left > 0) d.give("safari_ball", -left);
+		sync(p);
+		CompoundTag t = new CompoundTag();
+		t.putInt("steps", -1);
+		Net.send(p, "safari", t);
+	}
+
+	/** The steps and balls left, on your screen (the HUD shows them while you're in the park). */
+	private static void safariHud(ServerPlayer p) {
+		int[] s = SAFARI.get(p.getUUID());
+		CompoundTag t = new CompoundTag();
+		t.putInt("steps", s == null ? -1 : s[0]);
+		t.putInt("balls", data(p).count("safari_ball"));
+		Net.send(p, "safari", t);
+	}
+
+	/** After a battle in the park: the balls left on your screen. */
+	public static void safariAfterBattle(ServerPlayer p) {
+		if (SAFARI.containsKey(p.getUUID())) safariHud(p);
+	}
+
+	// ---------- Fuchsia City's houses (15:33) ----------
+
+	/** The SAFARI ZONE WARDEN: without his GOLD TEETH, you can't make him out; bring them, and he gives you HM04. */
+	private static void warden(ServerPlayer p, Npc n, PlayerData d) {
+		if (d.count("hm_strength") > 0) {
+			dialogue(p, n, "talk", List.of("WARDEN: HM04 teaches STRENGTH!", "It lets POKéMON move boulders when you're outside of battle.",
+					"Oh yes, did you find any POKéMON you liked in the SAFARI ZONE?"));
+			return;
+		}
+		if (d.count("gold_teeth") <= 0) {
+			dialogue(p, n, "talk", List.of("WARDEN: Hif fuff hefifoo!", "Ha lof ha feef ee hafahi ho. Heff hee fwee!"));
+			return;
+		}
+		d.take("gold_teeth");
+		d.give("hm_strength", 1);
+		sync(p);
+		dialogue(p, n, "talk", fill(p, List.of("WARDEN: Ah! Oh! My GOLD TEETH! Thanks, kid!", "No one could understand a word that I said.",
+				"I couldn't work that way.", "Let me give you something for your trouble.", "{player} received HM04 from the WARDEN!",
+				"HM04 teaches STRENGTH! It lets POKéMON move boulders when you're outside of battle.")));
+	}
+
+	private static void goodRodTalk(ServerPlayer p, Npc n, PlayerData d) {
+		if (d.count("good_rod") > 0) {
+			dialogue(p, n, "talk", fill(p, List.of("Hello there, {player}!", "How are the fish biting?")));
+			return;
+		}
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
+		t.put("choices", ch);
+		dialogue(p, n, "good_rod", List.of("I'm the FISHING GURU's older brother!", "I simply Looove fishing!", "Do you like to fish?"), t, n.getId());
+	}
+
+	private static void goodRod(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (!yes) {
+			dialogue(p, n, "talk", List.of("Oh... That's so disappointing..."));
+			return;
+		}
+		if (d.count("good_rod") > 0) return;
+		d.give("good_rod", 1);
+		sync(p);
+		dialogue(p, n, "talk", fill(p, List.of("Grand! I like your style!", "Take this and fish, young one!", "{player} received a GOOD ROD!",
+				"Fishing is a way of life! From the seas to rivers, go out and land the big one!")));
+	}
+
+	/** The MOVE DELETER (FireRed's, in Fuchsia): a POKéMON of yours forgets a move of its choosing. */
+	private static void deleter(ServerPlayer p, Npc n) {
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
+		t.put("choices", ch);
+		dialogue(p, n, "deleter", List.of("Uh... Oh, yes, I'm the MOVE DELETER.", "I can make POKéMON forget their moves.", "Would you like me to do that?"), t, n.getId());
+	}
+
+	private static void deleterAsk(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (!yes || d.party.isEmpty()) {
+			dialogue(p, n, "talk", List.of("Come again if there are moves to be forgotten."));
+			return;
+		}
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (Mon m : d.party) ch.add(StringTag.valueOf(m.name()));
+		ch.add(StringTag.valueOf("CANCEL"));
+		t.put("choices", ch);
+		dialogue(p, n, "deleter_mon", List.of("Which POKéMON should forget a move?"), t, n == null ? -1 : n.getId());
+	}
+
+	private static void deleterMon(ServerPlayer p, Npc n, CompoundTag in) {
+		PlayerData d = data(p);
+		int i = in.getIntOr("choice", -1);
+		if (!in.getBooleanOr("answered", false) || i < 0 || i >= d.party.size()) return;
+		Mon m = d.party.get(i);
+		if (m.moves.size() <= 1) {
+			dialogue(p, n, "talk", List.of(m.name() + " seems to know only one move..."));
+			return;
+		}
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (String mv : m.moves) ch.add(StringTag.valueOf(Move.get(mv).name()));
+		ch.add(StringTag.valueOf("CANCEL"));
+		t.put("choices", ch);
+		t.putInt("mon", i);
+		dialogue(p, n, "deleter_move", List.of("Which move should be forgotten?"), t, n == null ? -1 : n.getId());
+	}
+
+	private static void deleterMove(ServerPlayer p, Npc n, CompoundTag in) {
+		PlayerData d = data(p);
+		int i = in.getIntOr("mon", -1), k = in.getIntOr("choice", -1);
+		if (!in.getBooleanOr("answered", false) || i < 0 || i >= d.party.size()) return;
+		Mon m = d.party.get(i);
+		if (k < 0 || k >= m.moves.size() || m.moves.size() <= 1) return;
+		String name = Move.get(m.moves.get(k)).name();
+		m.moves.remove(k);
+		m.pp.remove(k);
+		sync(p);
+		dialogue(p, n, "talk", List.of("Hm! Hm! Hm!", m.name() + " forgot " + name + "!", "Come again if there are other moves to be forgotten."));
 	}
 
 	// ---------- Pewter City ----------
@@ -2979,6 +3258,11 @@ public final class Game {
 			}
 			case "parcel" -> rivalAfterParcel(p);
 			case "museum_fee" -> museumFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "safari_fee" -> safariFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "good_rod" -> goodRod(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "deleter" -> deleterAsk(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "deleter_mon" -> deleterMon(p, n, t);
+			case "deleter_move" -> deleterMove(p, n, t);
 			case "guide" -> {
 				// "Follow me!": he walks you to the GYM (14:18).
 				if (n != null && !ESCORTS.containsKey(p.getUUID())) {
@@ -3598,7 +3882,7 @@ public final class Game {
 	/** Trainers who stand somewhere on John's map other than where the games' grid puts them (Routes 3 and 4, FireRed's). */
 	private static final Object[][] TRAINER_SPOTS = {{"route_3_0", -722, 299}, {"route_3_1", -714, 293}, {"route_3_2", -710, 303}, {"route_3_3", -698, 293},
 			{"route_3_4", -688, 291}, {"route_3_5", -690, 305}, {"route_3_6", -684, 297}, {"route_3_7", -668, 307}, {"route_4_0", -478, 252}};
-	private static final String SPOTS_DONE = "spot6:";
+	private static final String SPOTS_DONE = "spot7:";
 	/**
 	 * Item balls that lie somewhere on John's map other than where the games' grid puts them (FireRed's, on routes Red
 	 * and Blue had nothing there), each put down once per save. Route 2's PARLYZ HEAL: in the east lane, past the

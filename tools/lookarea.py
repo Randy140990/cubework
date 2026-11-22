@@ -1110,6 +1110,9 @@ def build():
             r, g, b, a = ep[x, y]
             ep[x, y] = (int(r * 0.84), int(g * 0.8), int(b * 0.78), a)
     save("route_path_edge", edge)
+    # 0.46.0's (15:21, 15:29): tools/looks46.py.
+    import looks46
+    looks46.build()
 
 
 # ---------- Pewter City (13:18) ----------

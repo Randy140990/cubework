@@ -32,6 +32,8 @@ public final class ClientState {
 	private static int battleNpc = -1;
 	/** The place you're in: its name for the banner, and how long the banner's been up. */
 	public static String placeName = "";
+	/** On a SAFARI GAME (15:29): steps and SAFARI BALLs left (steps -1: not on one). */
+	public static int safariSteps = -1, safariBalls = 0;
 	public static int placeTicks = -1;
 	private static final Deque<Supplier<Screen>> QUEUE = new ArrayDeque<>();
 	/** The places marked on the map (towns, routes): where each is, for the Town Map. */
@@ -76,6 +78,10 @@ public final class ClientState {
 				introStopped = t.getBooleanOr("stop", false);
 				introLab = t.getBooleanOr("lab", false);
 				introDelay = introStopped || introLab ? 2 : 30;
+			}
+			case "safari" -> {
+				safariSteps = t.getIntOr("steps", -1);
+				safariBalls = t.getIntOr("balls", 0);
 			}
 			case "room" -> {
 				// A building's room (or back outside): its music; its name in the banner, coming in from outside.
