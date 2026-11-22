@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cardboard","cardboard":"retromon:block/interior/cardboard"},"elements":[{"from":[12.8,16,4.0],"to":[16.0,16,15.2],"faces":{"down":{"uv":[12.8,0.8,16.0,12.0],"texture":"#cardboard"}}}]}

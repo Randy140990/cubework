@@ -23,6 +23,7 @@ mr_mime_trade	mr_mime	14	route_2	trade	In-game trade (stands in for the trade)
 jynx_trade	jynx	22	cerulean_city	trade	In-game trade
 farfetch_d_trade	farfetch_d	12	vermilion_city	trade	In-game trade
 lickitung_trade	lickitung	15	route_18	trade	In-game trade
+nidoran_f_trade	nidoran_f	10	underground_path_route_5	trade	In-game trade (FireRed's MS. NIDO)
 mew	mew	5	-	event	Event only: place it anywhere you like
 lugia	lugia	40	whirl_island_lugia_chamber	static	Silver's mascot, in the Whirl Islands
 ho_oh	ho_oh	40	tin_tower_roof	static	On top of Tin Tower (Rainbow Wing)

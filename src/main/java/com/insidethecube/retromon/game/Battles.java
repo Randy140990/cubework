@@ -158,6 +158,12 @@ public final class Battles {
 							after.add(name(p) + " received the " + s.trainer.badge() + "!");
 						String tm = Game.giveGift(p, s.trainer.place());
 						if (tm != null) after.add(tm);
+					} else if (s.trainer.key().equals("cerulean_city_0")) {
+						// The ROCKET behind Cerulean's robbed house gives back the TM he stole (TM28, DIG).
+						after.addAll(Game.fill(p, s.trainer.defeat()));
+						after.addAll(said);
+						String tm = Game.giveGift(p, "cerulean_city");
+						if (tm != null) after.add(tm);
 					}
 				}
 				if (s.staticKey != null) staticDone(p, s.staticKey);

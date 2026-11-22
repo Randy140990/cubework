@@ -149,3 +149,17 @@ safari_zone_north_protein	safari_zone_north	protein	-1	-1
 safari_zone_north_tm47	safari_zone_north	tm_steel_wing	-1	-1
 safari_zone_north_quick_claw	safari_zone_north	quick_claw	-1	-1
 wardens_house_rare_candy	wardens_house	rare_candy	-1	-1
+underground_path_ns_antidote_again	underground_path_ns	antidote	-1	-1
+underground_path_ns_parlyz_heal_again	underground_path_ns	parlyz_heal	-1	-1
+underground_path_ns_awakening_again	underground_path_ns	awakening	-1	-1
+underground_path_ns_potion_again	underground_path_ns	potion	-1	-1
+underground_path_ns_ether	underground_path_ns	ether	-1	-1
+underground_path_ns_ice_heal	underground_path_ns	ice_heal	-1	-1
+underground_path_ns_burn_heal	underground_path_ns	burn_heal	-1	-1
+underground_path_we_potion	underground_path_we	potion	-1	-1
+underground_path_we_parlyz_heal	underground_path_we	parlyz_heal	-1	-1
+underground_path_we_awakening	underground_path_we	awakening	-1	-1
+underground_path_we_burn_heal	underground_path_we	burn_heal	-1	-1
+underground_path_we_ether	underground_path_we	ether	-1	-1
+underground_path_we_antidote	underground_path_we	antidote	-1	-1
+underground_path_we_ice_heal	underground_path_we	ice_heal	-1	-1

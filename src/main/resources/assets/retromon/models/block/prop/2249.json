@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/school_trim","school_trim":"retromon:block/interior/school_trim"},"elements":[{"from":[0.0,16,8.0],"to":[16,16,8.96],"faces":{"down":{"uv":[0.0,7.04,16.0,8.0],"texture":"#school_trim"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pot_white","pot_white":"retromon:block/interior/pot_white"},"elements":[{"from":[14.28,16,0.0],"to":[16.0,16,6.52],"faces":{"down":{"uv":[1.1574,1.3889,3.1481,10.4444],"texture":"#pot_white"}}}]}

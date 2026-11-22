@@ -707,7 +707,7 @@ public final class Interiors {
 			PlayerData d = Game.data(comer);
 			long today = level.getServer().overworld().getDayTime() / 24000L;
 			for (Ball b : r.balls()) {
-				if (!b.key().contains("mushroom") || !d.statics.contains("item:" + b.key())) continue;
+				if (!(b.key().contains("mushroom") || b.key().endsWith("_again")) || !d.statics.contains("item:" + b.key())) continue;
 				String picked = null;
 				for (String st : d.statics) if (st.startsWith("picked:" + b.key() + "=")) picked = st;
 				if (picked == null || !picked.endsWith("=" + today)) {

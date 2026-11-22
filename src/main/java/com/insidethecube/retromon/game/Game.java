@@ -852,7 +852,9 @@ public final class Game {
 	private static final Zone[] DEFAULT_ZONES = {new Zone("pallet_town", -845, 655, -745, 735), new Zone("route_1", -845, 590, -745, 654),
 			new Zone("viridian_city", -830, 495, -745, 589), new Zone("route_22", -900, 495, -831, 565), new Zone("route_22", -1000, 512, -901, 600), new Zone("route_2", -830, 340, -745, 494),
 			new Zone("pewter_city", -850, 255, -741, 339), new Zone("route_3", -740, 285, -580, 332), new Zone("route_4", -628, 238, -410, 284),
-			new Zone("fuchsia_city", -560, 733, -441, 860)};
+			new Zone("fuchsia_city", -560, 733, -441, 860), new Zone("cerulean_city", -401, 220, -311, 305), new Zone("route_24", -372, 140, -332, 219),
+			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
+			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -885,6 +887,14 @@ public final class Game {
 				zones.add(FUCHSIA);
 				saveMarker();
 			}
+			// Cerulean City, Routes 24, 25 and 5, and Routes 6, 7 and 8 (16:17 and 16:20).
+			for (Zone cz : CERULEAN_ZONES) {
+				double mx = (cz.x1() + cz.x2()) / 2.0 + 0.5, mz = (cz.z1() + cz.z2()) / 2.0 + 0.5;
+				if (!cz.place().equals(placeAt(mx, mz))) {
+					zones.add(cz);
+					saveMarker();
+				}
+			}
 		} else {
 			zones.addAll(List.of(DEFAULT_ZONES));
 			saveMarker();
@@ -894,6 +904,10 @@ public final class Game {
 	private static final Zone ROUTE_22_WEST = new Zone("route_22", -1000, 512, -901, 600), PEWTER = new Zone("pewter_city", -850, 255, -741, 339),
 			ROUTE_3 = new Zone("route_3", -740, 285, -580, 332), ROUTE_4 = new Zone("route_4", -628, 238, -410, 284),
 			FUCHSIA = new Zone("fuchsia_city", -560, 733, -441, 860);
+	/** Cerulean City and the routes round it (16:17), and the routes the Underground Paths come out on (16:20). */
+	private static final Zone[] CERULEAN_ZONES = {new Zone("cerulean_city", -401, 220, -311, 305), new Zone("route_24", -372, 140, -332, 219),
+			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
+			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455)};
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -2405,6 +2419,15 @@ public final class Game {
 					magikarpMan(p, n, d);
 					return;
 				}
+				// The Underground Path's TRADER and Cerulean's (16:17, 16:20), and the BIKE SHOP's clerk.
+				if (TRADERS.containsKey(n.key())) {
+					trader(p, n, d);
+					return;
+				}
+				if (n.key().equals("bike_shop_p0")) {
+					bikeShop(p, n, d);
+					return;
+				}
 				if (n.key().startsWith("route_4_tutor_")) {
 					tutor(p, n, d);
 					return;
@@ -2488,7 +2511,7 @@ public final class Game {
 		}
 		d.statics.add("item:" + key);
 		// (Mt. Moon's mushrooms grow back: the day it was picked, so it's there again the next day.)
-		if (fi.item().contains("mushroom")) d.statics.add("picked:" + key + "=" + p.level().getServer().overworld().getDayTime() / 24000L);
+		if (fi.item().contains("mushroom") || key.endsWith("_again")) d.statics.add("picked:" + key + "=" + p.level().getServer().overworld().getDayTime() / 24000L);
 		Item it = Item.find(fi.item());
 		String name = it != null ? it.name() : fi.item().replace("tm_", "TM ").replace('_', ' ').toUpperCase();
 		if (it != null) d.give(fi.item(), 1);
@@ -3094,7 +3117,55 @@ public final class Game {
 
 	/** The in-game trades: what each trader wants for theirs (as Red and Blue have them). */
 	private static final Map<String, String> TRADE_WANTS = Map.of("mr_mime_trade", "abra", "jynx_trade", "poliwhirl", "farfetch_d_trade", "spearow",
-			"lickitung_trade", "slowbro");
+			"lickitung_trade", "slowbro", "nidoran_f_trade", "nidoran_m");
+	/** The names the traded POKéMON come with (FireRed's). */
+	private static final Map<String, String> TRADE_NICKS = Map.of("nidoran_f_trade", "MS. NIDO", "jynx_trade", "ZYNX");
+	/** Traders who stand in a room (by their key): the trade they offer, and what they say. */
+	private static final Map<String, String[]> TRADERS = Map.of(
+			"underground_path_trader", new String[] {"nidoran_f_trade", "I'm looking for NIDORAN♂! Wanna trade one for NIDORAN♀?", "How is my old NIDORAN♀? My NIDORAN♂ is doing great!"},
+			"cerulean_trader", new String[] {"jynx_trade", "I'm looking for POLIWHIRL! Wanna trade one for JYNX?", "Hi! How is ZYNX doing? I'm taking good care of the POLIWHIRL!"});
+
+	private static void trader(ServerPlayer p, Npc n, PlayerData d) {
+		String[] tr = TRADERS.get(n.key());
+		if (d.statics.contains(tr[0])) {
+			dialogue(p, n, "talk", List.of(tr[2]));
+			return;
+		}
+		CompoundTag t = new CompoundTag();
+		t.putString("static", tr[0]);
+		t.putString("want", TRADE_WANTS.get(tr[0]));
+		dialogue(p, n, "trade", List.of(tr[1]), t, n.getId());
+	}
+
+	/** The BIKE SHOP (Cerulean, 16:17): the BICYCLE for ¥1,000,000 (the BIKE VOUCHER comes later). */
+	private static void bikeShop(ServerPlayer p, Npc n, PlayerData d) {
+		if (d.count("bicycle") > 0) {
+			dialogue(p, n, "talk", List.of("How do you like your new BICYCLE?", "You can take it on CYCLING ROAD and in caves!"));
+			return;
+		}
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag();
+		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
+		t.put("choices", ch);
+		dialogue(p, n, "bike", List.of("Hi! Welcome to our BIKE SHOP.", "Have we got just the BIKE for you!", "It's a cool BIKE! Do you want it? It's ¥1,000,000."), t, n.getId());
+	}
+
+	private static void bikeBuy(ServerPlayer p, Npc n, boolean yes) {
+		PlayerData d = data(p);
+		if (!yes) {
+			dialogue(p, n, "talk", List.of("Come back anytime!"));
+			return;
+		}
+		if (d.money < 1000000) {
+			dialogue(p, n, "talk", List.of("Sorry! You can't afford it!"));
+			return;
+		}
+		if (d.count("bicycle") > 0) return;
+		d.money -= 1000000;
+		d.give("bicycle", 1);
+		sync(p);
+		dialogue(p, n, "talk", fill(p, List.of("Thank you! Here's your BICYCLE!", "{player} got a BICYCLE!", "How do you like your new BICYCLE?")));
+	}
 
 	/** A trade agreed on the trade screen: yours (party slot i, the species they want) goes, theirs comes. */
 	public static void tradeDone(ServerPlayer p, CompoundTag t) {
@@ -3105,6 +3176,7 @@ public final class Game {
 		String want = TRADE_WANTS.get(key);
 		if (st == null || want == null || d.statics.contains(key) || i < 0 || i >= d.party.size() || !d.party.get(i).species.id().equals(want)) return;
 		Mon got = new Mon(Species.get(st.species()), st.level(), RNG);
+		if (TRADE_NICKS.containsKey(key)) got.nickname = TRADE_NICKS.get(key);
 		d.party.set(i, got);
 		d.seen.add(got.species.id());
 		d.caught.add(got.species.id());
@@ -3260,6 +3332,7 @@ public final class Game {
 			case "museum_fee" -> museumFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "safari_fee" -> safariFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "good_rod" -> goodRod(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "bike" -> bikeBuy(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "deleter" -> deleterAsk(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "deleter_mon" -> deleterMon(p, n, t);
 			case "deleter_move" -> deleterMove(p, n, t);
@@ -4093,6 +4166,8 @@ public final class Game {
 		for (Trainers.Person ps : Trainers.peopleIn(place)) {
 			// Oak at the edge of Pallet Town is the one who stops you (he comes to you); he doesn't stand there.
 			if (ps.key().equals("pallet_town_p0")) continue;
+			// (Cerulean's rival comes himself, at the bridge; its second OFFICER JENNY is the first one again.)
+			if (ps.key().equals("cerulean_city_p0") || ps.key().equals("cerulean_city_p8")) continue;
 			int[] own = spotOf(ps.key());
 			BlockPos at = own != null ? (level.hasChunkAt(new BlockPos(own[0], START_Y, own[1])) ? spot(level, own[0], own[1], 6) : null) : gameSpot(level, z, size, Trainers.POS.get(ps.key()));
 			if (at == null) continue;

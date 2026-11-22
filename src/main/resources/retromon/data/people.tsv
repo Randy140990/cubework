@@ -355,3 +355,6 @@ route_4_tutor_punch	route_4	black_belt	right	stay	Hiyah! My MEGA PUNCH is the st
 route_4_tutor_kick	route_4	black_belt_2	left	stay	Hiyah! My MEGA KICK is the stuff of legend!	-1	-1
 pewter_city_aide	pewter_aide	scientist	right	stay	I'd better get back to PROF. OAK.	-1	-1
 fuchsia_move_deleter_p0	fuchsia_move_deleter_house	middle_aged_man	down	stay	Uh... Oh, yes, I'm the MOVE DELETER.	-1	-1
+cerulean_berry_man	cerulean_berry_house	old_man	left	stay	I love hearing news! | And I love berries even more! | Here, have one of mine!	-1	-1
+underground_path_trader	underground_path_route_5	middle_aged_man	down	stay	I'm looking for NIDORAN♂! Wanna trade one for NIDORAN♀?	-1	-1
+cerulean_trader	cerulean_trade_house	old_man	left	stay	I'm looking for POLIWHIRL! Wanna trade one for JYNX?	-1	-1

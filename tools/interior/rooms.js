@@ -825,6 +825,9 @@ function curvedCounter(R, cx, o = {}) {
   for (const [a, b, z0, z1] of segs) {
     G.box(cx + a, 0, z0, cx + b, h, z1, { all: front, top: null, bottom: null });
     G.box(cx + a, h, z0, cx + b, h + 0.1, z1, top);
+    // (16:17) Metal: a brushed steel kick plate at the foot, a chrome edge under the top.
+    G.box(cx + a - 0.01, 0, z0 - 0.01, cx + b + 0.01, 0.12, z1 + 0.01, { all: "brushedSteel", top: null, bottom: null });
+    G.box(cx + a - 0.01, h - 0.05, z0 - 0.01, cx + b + 0.01, h, z1 + 0.01, { all: "chromeTrim", top: null, bottom: null });
     R.solid(cx + a, z0, cx + b, z1);
   }
   R.item("The counter", "Curving round the nurse, orange and white, stepped round as a Minecraft build would round it; a big ball at each end.");
@@ -1436,11 +1439,11 @@ const BUILD = {
     // ring in the floor at the door, the mat in its nook.
     const R = new Room("center", { name: "Pokémon Center", floor: "Viridian City", W: 18, D: 14, outsideSize: "13 by 9" });
     shell(R, { paper: "paperCenter", floor: "mcPeachCheck", door: CENTER_DOOR, entry: true, entryFloor: "mcCenterCheck", skirt: "redPlastic", ledge: "paint", ledgeTop: "lab" });
-    band(R, 1.05, "orangeTrim");
+    band(R, 1.05, "orangeTrim"); band(R, 1.31, "brushedSteel", 0.05);
     chamfer(R, 2, { paper: "paperCenter", skirt: "redPlastic", band: [1.05, "orangeTrim"] });
     frontChamfer(R, 2);
-    for (const west of [true, false]) { wallPost(R, west, 2.0, 2.5, "postBlue"); wallPost(R, west, R.Dm - 2.5, R.Dm - 2.0, "postBlue"); }
-    R.item("Blue posts", "Blue posts where the slanted corners meet the walls, front and back.");
+    for (const west of [true, false]) { wallPost(R, west, 2.0, 2.5, "postBlueMetal"); wallPost(R, west, R.Dm - 2.5, R.Dm - 2.0, "postBlueMetal"); }
+    R.item("Blue posts", "Anodised blue metal posts where the slanted corners meet the walls, front and back.");
     const G = R.geo, cx = 9.0;
     curvedCounter(R, cx);
     statueBall(R, cx - 4.1, 3.7, 1.15); statueBall(R, cx + 4.1, 3.7, 1.15);
@@ -1481,12 +1484,14 @@ const BUILD = {
     // on the right; a blue and white diamond floor; a plant by the door. The mat in its nook.
     const R = new Room("mart", { name: "Poké Mart", floor: "Viridian City", W: 14, D: 12, outsideSize: "13 by 9" });
     shell(R, { paper: "paperMart", floor: "mcDiamondBlue", door: MART_DOOR, entry: true, entryFloor: "mcMintCheck", skirt: "blueTrim", ledge: "paint", ledgeTop: "lab" });
-    band(R, 1.05, "blueTrim");
+    band(R, 1.05, "blueTrim"); band(R, 1.31, "brushedSteel", 0.05);
     chamfer(R, 2, { paper: "paperMart", skirt: "blueTrim", band: [1.05, "blueTrim"] });
     const G = R.geo, h = 1.05;
     for (const [x0, x1, z0, z1] of [[0, 3.6, 4.0, 4.6], [2.6, 3.6, 4.6, 8.4], [0, 2.6, 7.9, 8.4], [2.7, 3.5, 8.4, 8.65], [2.9, 3.3, 8.65, 8.8]]) {
       G.box(x0, 0, z0, x1, h, z1, { all: "counterBlue", top: null, bottom: null });
       G.box(x0, h, z0, x1, h + 0.1, z1, "lab");
+      G.box(x0 - 0.01, 0, z0 - 0.01, x1 + 0.01, 0.12, z1 + 0.01, { all: "brushedSteel", top: null, bottom: null });
+      G.box(x0 - 0.01, h - 0.05, z0 - 0.01, x1 + 0.01, h, z1 + 0.01, { all: "chromeTrim", top: null, bottom: null });
       R.solid(x0, z0, x1, z1);
     }
     till(R, 3.1, 6.4, 1.15, "e");

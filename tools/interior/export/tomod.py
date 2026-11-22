@@ -22,7 +22,11 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           # Fuchsia City and the SAFARI ZONE's houses (15:29 to 15:33).
           "fuchsia_gym": (1344, 64, 0), "safari_gate": (1408, 64, 0), "fuchsia_office": (1472, 64, 0), "fuchsia_house1": (1536, 64, 0),
           "fuchsia_house2": (1600, 64, 0), "fuchsia_house3": (1664, 64, 0), "fuchsia_house4": (1728, 64, 0), "safari_rest_center": (1792, 64, 0),
-          "safari_rest_east": (1856, 64, 0), "safari_rest_north": (1920, 64, 0), "safari_rest_west": (1984, 64, 0), "safari_secret_house": (2048, 64, 0)}
+          "safari_rest_east": (1856, 64, 0), "safari_rest_north": (1920, 64, 0), "safari_rest_west": (1984, 64, 0), "safari_secret_house": (2048, 64, 0),
+          # The Underground Paths, Cerulean City's insides, the Day Care and Bill's Sea Cottage (16:17 and 16:20).
+          "ug_r5": (2112, 64, 0), "ug_r6": (2176, 64, 0), "ug_r7": (2240, 64, 0), "ug_r8": (2304, 64, 0), "ug_ns": (2368, 64, 0), "ug_ew": (2432, 64, 0),
+          "cerulean_gym": (2560, 64, 0), "bike_shop": (2624, 64, 0), "cerulean_house1": (2688, 64, 0), "cerulean_house2": (2752, 64, 0),
+          "cerulean_house3": (2816, 64, 0), "cerulean_house4": (2880, 64, 0), "daycare": (2944, 64, 0), "bills_house": (3008, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -30,7 +34,11 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "fuchsia_gym": "fuchsia_gym", "safari_gate": "safari_zone_gate", "fuchsia_office": "fuchsia_meeting_room", "fuchsia_house1": "fuchsia_bills_grandpas_house",
          "fuchsia_house2": "fuchsia_move_deleter_house", "fuchsia_house3": "wardens_house", "fuchsia_house4": "fuchsia_good_rod_house",
          "safari_rest_center": "safari_zone_center_rest_house", "safari_rest_east": "safari_zone_east_rest_house", "safari_rest_north": "safari_zone_north_rest_house",
-         "safari_rest_west": "safari_zone_west_rest_house", "safari_secret_house": "safari_zone_secret_house"}
+         "safari_rest_west": "safari_zone_west_rest_house", "safari_secret_house": "safari_zone_secret_house",
+         "ug_r5": "underground_path_route_5", "ug_r6": "underground_path_route_6", "ug_r7": "underground_path_route_7", "ug_r8": "underground_path_route_8",
+         "ug_ns": "underground_path_ns", "ug_ew": "underground_path_we", "cerulean_gym": "cerulean_gym", "bike_shop": "bike_shop",
+         "cerulean_house1": "cerulean_badge_house", "cerulean_house2": "cerulean_trashed_house", "cerulean_house3": "cerulean_trade_house",
+         "cerulean_house4": "cerulean_berry_house", "daycare": "daycare", "bills_house": "bills_house"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -83,6 +91,21 @@ DOORS = {
     "fuchsia_house2": {"room": "fuchsia_house2", "door": [[-508, 32, 809], [-507, 32, 809]], "out": [-507.0, 32.0, 811.4]},
     "fuchsia_house3": {"room": "fuchsia_house3", "door": [[-478, 31, 808], [-477, 31, 808]], "out": [-477.0, 31.0, 810.4]},
     "fuchsia_house4": {"room": "fuchsia_house4", "door": [[-468, 31, 808], [-467, 31, 808]], "out": [-467.0, 31.0, 810.4]},
+    # The Underground Paths (16:20): John's four huts, each a dark doorway 4 wide facing south (the black at its front).
+    "ug_route5": {"room": "ug_r5", "door": [[x, 33, 366] for x in range(-339, -335)], "out": [-337.5, 33.0, 368.4]},
+    "ug_route6": {"room": "ug_r6", "door": [[x, 31, 490] for x in range(-334, -330)], "out": [-332.5, 31.0, 492.4]},
+    "ug_route7": {"room": "ug_r7", "door": [[x, 32, 430] for x in range(-434, -430)], "out": [-432.5, 32.0, 432.4]},
+    "ug_route8": {"room": "ug_r8", "door": [[x, 33, 411] for x in range(-274, -270)], "out": [-272.5, 33.0, 413.4]},
+    # Cerulean City (16:17): the Gym (its glass doors either side of a post, up its quartz steps), the Bike Shop (a
+    # warped door), its four houses (copper doors), and Route 5's Day Care (mangrove) and Route 25's Sea Cottage (birch).
+    "cerulean_gym": {"room": "cerulean_gym", "door": [[x, 35, 265] for x in range(-338, -335)], "out": [-338.5, 35.0, 267.5]},
+    "bike_shop": {"room": "bike_shop", "door": [[-374, 35, 279], [-373, 35, 279]], "out": [-373.0, 35.0, 281.4]},
+    "cerulean_house1": {"room": "cerulean_house1", "door": [[-381, 35, 246], [-380, 35, 246]], "out": [-380.0, 35.0, 248.4]},
+    "cerulean_house2": {"room": "cerulean_house2", "door": [[-338, 35, 246], [-337, 35, 246]], "out": [-337.0, 35.0, 248.4]},
+    "cerulean_house3": {"room": "cerulean_house3", "door": [[-375, 35, 261], [-374, 35, 261]], "out": [-374.0, 35.0, 263.4]},
+    "cerulean_house4": {"room": "cerulean_house4", "door": [[-358, 35, 279], [-357, 35, 279]], "out": [-357.0, 35.0, 281.4]},
+    "daycare": {"room": "daycare", "door": [[-354, 38, 331], [-353, 38, 331]], "out": [-353.0, 38.0, 333.4]},
+    "bills_house": {"room": "bills_house", "door": [[-218, 36, 151], [-217, 36, 151]], "out": [-217.0, 36.0, 153.4]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -99,14 +122,22 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "gate_league": "league_s", "route2_gate": "route2_gate_s", "route2_house": "route2_house", "pewter_gym": "pewter_gym",
             "pewter_house1": "pewter_house1", "pewter_house2": "pewter_house2", "fuchsia_gym": "fuchsia_gym", "safari_gate": "fuchsia_safari",
             "fuchsia_office": "fuchsia_office", "fuchsia_house1": "fuchsia_house1", "fuchsia_house2": "fuchsia_house2", "fuchsia_house3": "fuchsia_house3",
-            "fuchsia_house4": "fuchsia_house4"}
+            "fuchsia_house4": "fuchsia_house4", "ug_r5": "ug_route5", "ug_r6": "ug_route6", "ug_r7": "ug_route7", "ug_r8": "ug_route8",
+            "cerulean_gym": "cerulean_gym", "bike_shop": "bike_shop", "cerulean_house1": "cerulean_house1", "cerulean_house2": "cerulean_house2",
+            "cerulean_house3": "cerulean_house3", "cerulean_house4": "cerulean_house4", "daycare": "daycare", "bills_house": "bills_house"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
 # so its trainers see straight ahead as many steps as theirs.
-TILE = {"pewter_gym": [1.0, 1.0], "fuchsia_gym": [1.0, 1.0]}
+TILE = {"pewter_gym": [1.0, 1.0], "fuchsia_gym": [1.0, 1.0], "cerulean_gym": [1.0, 1.0]}
 # Item balls in a room of the viewer's (the WARDEN's RARE CANDY, behind his boulders: 15:33).
 BALLS = {"fuchsia_house3": [{"key": "wardens_house_rare_candy", "x": 0.8, "z": 8.4, "y": 0}]}
+# The Underground Paths' items (16:20), as John listed them: north to south (the first four come back each day), and
+# west to east, each by a wall.
+_NS = ["antidote_again", "parlyz_heal_again", "awakening_again", "potion_again", "ether", "ice_heal", "burn_heal"]
+_WE = ["potion", "parlyz_heal", "awakening", "burn_heal", "ether", "antidote", "ice_heal"]
+BALLS["ug_ns"] = [{"key": "underground_path_ns_" + k, "x": 0.9 if i % 2 == 0 else 6.1, "z": 7.0 + 7.0 * i, "y": 0} for i, k in enumerate(_NS)]
+BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n"}
 # Ways out through the side walls (a sideways gate's), by room and wall.
@@ -122,7 +153,11 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "pewter_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "pewter_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "fuchsia_gym": {"x": 6.0, "z": 15.5, "yaw": 180.0}, "safari_gate": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "fuchsia_office": {"x": 7.0, "z": 9.5, "yaw": 180.0},
          "fuchsia_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "fuchsia_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "fuchsia_house3": {"x": 6.0, "z": 9.5, "yaw": 180.0},
-         "fuchsia_house4": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
+         "fuchsia_house4": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "ug_r5": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "ug_r6": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "ug_r7": {"x": 7.0, "z": 10.5, "yaw": 180.0},
+         "ug_r8": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "cerulean_gym": {"x": 7.0, "z": 16.5, "yaw": 180.0}, "bike_shop": {"x": 7.0, "z": 9.5, "yaw": 180.0},
+         "cerulean_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "cerulean_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "cerulean_house3": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "cerulean_house4": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "daycare": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "bills_house": {"x": 7.0, "z": 9.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -441,7 +476,7 @@ def main():
                           "door": SIDE_DOOR.get((rid, m["wall"])), "to": None, "choice": m.get("choice")})
         for s in room["stairs"]:
             to = s["to"]; sp = s["spawn"]
-            warps.append({"kind": s["dir"], "x0": s["x0"], "z0": s["z0"], "z1": s["z0"] + s["depth"], "to": to,
+            warps.append({"kind": s["dir"], "x0": s["x0"], "x1": s["x0"] + 4, "z0": s["z0"], "z1": s["z0"] + s["depth"], "to": to,
                           "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360}})
         people, aides = [], list(AIDES_FROM_GAMES)
         for i, n in enumerate(room["npcs"]):
