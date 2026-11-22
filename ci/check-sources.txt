@@ -1,8 +1,8 @@
-net/minecraft/client/renderer/blockentity/AbstractSignRenderer.java
-net/minecraft/client/renderer/blockentity/SignRenderer.java
-net/minecraft/client/renderer/blockentity/BlockEntityRenderer.java
-net/minecraft/client/renderer/blockentity/state/SignRenderState.java
-net/minecraft/client/renderer/blockentity/state/BlockEntityRenderState.java
-net/minecraft/client/resources/model/ModelDebugName.java
-net/minecraft/client/resources/model/SpriteGetter.java
-net/minecraft/client/renderer/blockentity/BlockEntityRenderers.java
+grep getDayTime|getTimeOfDay|getSkyDarken|skyDarken|DayTime|dayTime|getSunAngle|class ClientLevelData|ClientLevelData net/minecraft/client/multiplayer/ClientLevel.java
+grep getDayTime|getTimeOfDay|getSkyDarken|skyDarken|dayTime|DayTime net/minecraft/world/level/Level.java
+grep getDayTime|getTimeOfDay|getSkyDarken|skyDarken|dayTime|environmentAttributes|EnvironmentAttribute net/minecraft/client/renderer/LightTexture.java
+grep getDayTime|getTimeOfDay|getSunAngle|sunAngle|environmentAttributes|EnvironmentAttribute|starBrightness|timeOfDay net/minecraft/client/renderer/SkyRenderer.java
+grep getDayTime|getTimeOfDay|sunAngle|environmentAttributes|EnvironmentAttribute|timeOfDay|DayTime net/minecraft/client/renderer/LevelRenderer.java
+grep getDayTime|getTimeOfDay|DayTime|dayTime net/minecraft/world/level/storage/LevelData.java
+grep getDayTime|getTimeOfDay|DayTime|dayTime|getSunAngle net/minecraft/world/level/LevelReader.java
+grep getDayTime|getTimeOfDay|DayTime|dayTime|getSunAngle|timeOfDay net/minecraft/world/level/dimension/DimensionType.java
