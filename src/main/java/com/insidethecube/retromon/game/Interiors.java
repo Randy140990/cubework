@@ -126,6 +126,9 @@ public final class Interiors {
 	private static final VoxelShape[] SHAPES = new VoxelShape[STATES];
 	public static final Map<String, Room> ROOMS = new LinkedHashMap<>();
 	public static final Map<String, Door> DOORS = new LinkedHashMap<>();
+	/** POKéMON standing in a room (the Power Plant's ZAPDOS, its ELECTRODE posing as items): a static's key, its look. */
+	public record MonSpot(String key, String species, double x, double z, float yaw) {}
+	public static final Map<String, List<MonSpot>> MONS = new HashMap<>();
 	private static String startRoom = "house2";
 	private static double startX = 3.6, startZ = 6.4;
 	private static float startYaw;
@@ -271,6 +274,14 @@ public final class Interiors {
 					r.has("schem") && !r.get("schem").isJsonNull() ? r.get("schem").getAsString() : null, (int) num(r, "base", 0),
 					r.has("dark") && r.get("dark").getAsBoolean(), tile, balls, rows(r, "lights"), haze(r));
 			ROOMS.put(room.id(), room);
+			if (r.has("mons")) {
+				List<MonSpot> ms = new ArrayList<>();
+				for (JsonElement me : r.getAsJsonArray("mons")) {
+					JsonObject m = me.getAsJsonObject();
+					ms.add(new MonSpot(m.get("key").getAsString(), m.get("species").getAsString(), num(m, "x", 0), num(m, "z", 0), (float) num(m, "yaw", 0)));
+				}
+				MONS.put(room.id(), ms);
+			}
 		}
 	}
 
@@ -547,6 +558,13 @@ public final class Interiors {
 		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> w.key().startsWith("item:"))) w.discard();
 		for (Person p : r.people()) if (wanted(level, r, p)) put(level, r, p);
 		for (Ball b : r.balls()) if (!Game.takenByAnyone("item:" + b.key())) ball(level, r, b);
+		List<MonSpot> mons = MONS.getOrDefault(r.id(), List.of());
+		if (!mons.isEmpty()) {
+			java.util.Set<String> keys = new java.util.HashSet<>();
+			for (MonSpot m : mons) keys.add(m.key());
+			for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> keys.contains(w.key()))) w.discard();
+			for (MonSpot m : mons) if (!Game.takenByAnyone(m.key())) Game.placeMon(level, m.species(), m.key(), r.ox() + m.x(), r.oy(), r.oz() + m.z(), m.yaw());
+		}
 	}
 
 	/** How bright the forest's moonlight is (a light level). */
@@ -742,6 +760,20 @@ public final class Interiors {
 					else there = true;
 				}
 				if (!mine && !there && (alone || !Game.takenByAnyone(k))) ball(level, r, b);
+			}
+		}
+		// The POKéMON standing in here: gone once you've battled them, there (once) while you haven't.
+		List<MonSpot> mons = MONS.getOrDefault(r.id(), List.of());
+		if (!mons.isEmpty()) {
+			PlayerData d = Game.data(comer);
+			for (MonSpot m : mons) {
+				boolean there = false, mine = d.statics.contains(m.key());
+				for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> m.key().equals(w.key()))) {
+					if (mine || there) w.discard();
+					else there = true;
+				}
+				if (!mine && !there && (alone || !Game.takenByAnyone(m.key())))
+					Game.placeMon(level, m.species(), m.key(), r.ox() + m.x(), r.oy(), r.oz() + m.z(), m.yaw());
 			}
 		}
 		List<Npc> here = level.getEntitiesOfClass(Npc.class, box, n -> true);

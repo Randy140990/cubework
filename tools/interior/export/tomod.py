@@ -14,7 +14,9 @@ import base64, io, json, math, os, re, sys
 from PIL import Image
 
 EPS = 1e-6
-SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob"}
+SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob", "poolWaterView", "poolBottomView", "poolQuartzView"}
+# Rooms with real blocks of their own laid after their props (Cerulean Gym's pool: tools/cerulean_pool.py), and from how far down.
+SCHEM = {"cerulean_gym": ("cerulean_gym_pool.bin", -6)}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
           "mart": (384, 64, 0), "school": (448, 64, 0), "trainer2": (512, 64, 0), "gate_s": (576, 64, 0), "nickhouse": (640, 64, 0), "gate_n": (704, 64, 0),
           "gate_league": (768, 64, 0), "gate_johto": (832, 64, 0), "route2_gate": (896, 64, 0), "route2_house": (960, 64, 0),
@@ -26,7 +28,8 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           # The Underground Paths, Cerulean City's insides, the Day Care and Bill's Sea Cottage (16:17 and 16:20).
           "ug_r5": (2112, 64, 0), "ug_r6": (2176, 64, 0), "ug_r7": (2240, 64, 0), "ug_r8": (2304, 64, 0), "ug_ns": (2368, 64, 0), "ug_ew": (2432, 64, 0),
           "cerulean_gym": (2560, 64, 0), "bike_shop": (2624, 64, 0), "cerulean_house1": (2688, 64, 0), "cerulean_house2": (2752, 64, 0),
-          "cerulean_house3": (2816, 64, 0), "cerulean_house4": (2880, 64, 0), "daycare": (2944, 64, 0), "bills_house": (3008, 64, 0)}
+          "cerulean_house3": (2816, 64, 0), "cerulean_house4": (2880, 64, 0), "daycare": (2944, 64, 0), "bills_house": (3008, 64, 0),
+          "power_plant": (3072, 64, 0)}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -38,7 +41,7 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "ug_r5": "underground_path_route_5", "ug_r6": "underground_path_route_6", "ug_r7": "underground_path_route_7", "ug_r8": "underground_path_route_8",
          "ug_ns": "underground_path_ns", "ug_ew": "underground_path_we", "cerulean_gym": "cerulean_gym", "bike_shop": "bike_shop",
          "cerulean_house1": "cerulean_badge_house", "cerulean_house2": "cerulean_trashed_house", "cerulean_house3": "cerulean_trade_house",
-         "cerulean_house4": "cerulean_berry_house", "daycare": "daycare", "bills_house": "bills_house"}
+         "cerulean_house4": "cerulean_berry_house", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant"}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -106,6 +109,8 @@ DOORS = {
     "cerulean_house4": {"room": "cerulean_house4", "door": [[-358, 35, 279], [-357, 35, 279]], "out": [-357.0, 35.0, 281.4]},
     "daycare": {"room": "daycare", "door": [[-354, 38, 331], [-353, 38, 331]], "out": [-353.0, 38.0, 333.4]},
     "bills_house": {"room": "bills_house", "door": [[-218, 36, 151], [-217, 36, 151]], "out": [-217.0, 36.0, 153.4]},
+    # The POWER PLANT on Route 10 (16:58): its dark doorway, 3 wide, at the top of its smooth stone steps.
+    "power_plant": {"room": "power_plant", "door": [[-142, 35, 325], [-141, 35, 325], [-140, 35, 325]], "out": [-140.5, 35.0, 328.5]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -124,7 +129,7 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "fuchsia_office": "fuchsia_office", "fuchsia_house1": "fuchsia_house1", "fuchsia_house2": "fuchsia_house2", "fuchsia_house3": "fuchsia_house3",
             "fuchsia_house4": "fuchsia_house4", "ug_r5": "ug_route5", "ug_r6": "ug_route6", "ug_r7": "ug_route7", "ug_r8": "ug_route8",
             "cerulean_gym": "cerulean_gym", "bike_shop": "bike_shop", "cerulean_house1": "cerulean_house1", "cerulean_house2": "cerulean_house2",
-            "cerulean_house3": "cerulean_house3", "cerulean_house4": "cerulean_house4", "daycare": "daycare", "bills_house": "bills_house"}
+            "cerulean_house3": "cerulean_house3", "cerulean_house4": "cerulean_house4", "daycare": "daycare", "bills_house": "bills_house", "power_plant": "power_plant"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
@@ -137,6 +142,16 @@ BALLS = {"fuchsia_house3": [{"key": "wardens_house_rare_candy", "x": 0.8, "z": 8
 _NS = ["antidote_again", "parlyz_heal_again", "awakening_again", "potion_again", "ether", "ice_heal", "burn_heal"]
 _WE = ["potion", "parlyz_heal", "awakening", "burn_heal", "ether", "antidote", "ice_heal"]
 BALLS["ug_ns"] = [{"key": "underground_path_ns_" + k, "x": 0.9 if i % 2 == 0 else 6.1, "z": 7.0 + 7.0 * i, "y": 0} for i, k in enumerate(_NS)]
+# The Power Plant's items (Red and Blue's, a step a block), and FireRed's THUNDER STONE and ELIXIR.
+BALLS["power_plant"] = [{"key": k, "x": x, "z": z, "y": 0} for k, x, z in (
+    ("power_plant_i8", 7.5, 25.5), ("power_plant_i9", 28.5, 3.5), ("power_plant_i10", 34.5, 3.5), ("power_plant_i11", 26.5, 32.5),
+    ("power_plant_i12", 20.5, 32.5), ("power_plant_thunderstone", 12.5, 3.5), ("power_plant_elixer", 36.5, 11.5))]
+# POKéMON standing in rooms (statics.tsv's): ZAPDOS by the big machine; VOLTORB and ELECTRODE posing as item balls.
+MONS = {"power_plant": [{"key": "zapdos", "species": "zapdos", "x": 5.6, "z": 4.2, "yaw": 0.0}] + [
+    {"key": k, "species": "poke_ball", "x": x, "z": z, "yaw": 0.0} for k, x, z in (
+        ("power_plant_voltorb_1", 9.5, 20.5), ("power_plant_voltorb_2", 32.5, 18.5), ("power_plant_voltorb_3", 21.5, 25.5),
+        ("electrode_power_plant_1", 25.5, 18.5), ("power_plant_voltorb_4", 23.5, 32.5), ("power_plant_voltorb_5", 26.5, 26.0),
+        ("electrode_power_plant_2", 21.5, 12.0), ("power_plant_voltorb_6", 37.5, 32.5))]}
 BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n"}
@@ -155,9 +170,10 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "fuchsia_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "fuchsia_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "fuchsia_house3": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "fuchsia_house4": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "ug_r5": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "ug_r6": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "ug_r7": {"x": 7.0, "z": 10.5, "yaw": 180.0},
-         "ug_r8": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "cerulean_gym": {"x": 7.0, "z": 16.5, "yaw": 180.0}, "bike_shop": {"x": 7.0, "z": 9.5, "yaw": 180.0},
+         "ug_r8": {"x": 7.0, "z": 10.5, "yaw": 180.0}, "cerulean_gym": {"x": 7.0, "z": 17.5, "yaw": 180.0}, "bike_shop": {"x": 7.0, "z": 9.5, "yaw": 180.0},
          "cerulean_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "cerulean_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "cerulean_house3": {"x": 6.0, "z": 9.5, "yaw": 180.0},
-         "cerulean_house4": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "daycare": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "bills_house": {"x": 7.0, "z": 9.5, "yaw": 180.0}}
+         "cerulean_house4": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "daycare": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "bills_house": {"x": 7.0, "z": 9.5, "yaw": 180.0},
+         "power_plant": {"x": 5.0, "z": 34.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -496,7 +512,9 @@ def main():
                           "place": PLACE[rid], "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360},
                           "entry": ENTRY.get(rid), "cam": fit_camera(room["W"], room["D"], room["H"]), "cells": placed, "warps": warps, "people": people, "acts": acts,
                           "grass": room.get("grass", []), "pools": room.get("pools", []), "panes": panes_of(room), "clocks": room.get("clocks", []),
-                          **({"tile": TILE[rid]} if rid in TILE else {}), **({"items": BALLS[rid]} if rid in BALLS else {})}
+                          **({"tile": TILE[rid]} if rid in TILE else {}), **({"items": BALLS[rid]} if rid in BALLS else {}),
+                          **({"schem": SCHEM[rid][0], "base": SCHEM[rid][1]} if rid in SCHEM else {}),
+                          **({"mons": MONS[rid]} if rid in MONS else {})}
     # Models and the block's states.
     mdir = os.path.join(res, "assets/retromon/models/block/prop")
     os.makedirs(mdir, exist_ok=True)

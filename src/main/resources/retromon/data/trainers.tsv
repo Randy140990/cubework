@@ -90,7 +90,7 @@ rocket_hideout_b3f_0	rocket_hideout_b3f	ROCKET	rocket	right	2	30	rattata:20,rati
 rocket_hideout_b3f_1	rocket_hideout_b3f	ROCKET	rocket	up	4	30	machop:21,machop:21	-	We got word from upstairs that you were coming!	What? I lost? No!	Go ahead and go! But, you need the LIFT KEY to run the elevator!	26	12
 rocket_hideout_b4f_0	rocket_hideout_b4f	ROCKET BOSS GIOVANNI	leader_giovanni	down	0	99	onix:25,rhyhorn:24,persian:29	-	I see that you raise POKéMON with utmost care. | A child like you would never understand what I hope to achieve. | I shall step aside this time! | I hope we meet again...	No!	...	25	3
 rocket_hideout_b4f_1	rocket_hideout_b4f	ROCKET	rocket	down	3	30	koffing:21,zubat:21	-	-	-	-	11	2
-route_10_0	route_10	POKéMANIAC	super_nerd	left	4	50	rhyhorn:30,lickitung:30	-	Wow, are you a POKéMANIAC too? Want to see my collection?	Humph. I'm not angry!	I have more rare POKéMON at home!	10	44
+route_10_0	route_10	POKéMANIAC MARK	super_nerd	left	4	50	rhyhorn:30,lickitung:30	-	Wow, are you a POKéMANIAC too? Want to see my collection?	Humph. I'm not angry!	I have more rare POKéMON at home!	10	44
 route_10_1	route_10	HIKER	hiker	up	3	35	geodude:21,onix:21	-	Ha-hahah-ah-ha!	Ha-haha! Not laughing! Ha-hay fever! Haha-ha-choo!	Haha-ha-choo! Ha-choo! Snort! Snivel!	3	57
 route_10_2	route_10	POKéMANIAC	super_nerd	left	4	50	cubone:20,slowpoke:20	-	Hi, kid, want to see my POKéMON?	Oh no! My POKéMON!	I don't like you for beating me!	14	64
 route_10_3	route_10	JR.TRAINER♀	cooltrainer_f	left	3	20	jigglypuff:20,clefairy:20	-	I've been to a POKéMON GYM a few times. But, I lost each time.	Ohh! Blew it again!	I noticed some POKéMANIACs prowling around.	7	25

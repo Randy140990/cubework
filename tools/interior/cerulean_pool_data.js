@@ -1,0 +1,2 @@
+// Cerulean Gym's pool (tools/cerulean_pool.py writes this): its layout on whole blocks, as the mod lays it.
+const CERULEAN_POOL = {"W": 14, "D": 19, "pool": [1, 3, 13, 14], "depth": 5, "walks": [[6, 4, 12, 6], [2, 5, 6, 6], [10, 6, 12, 10], [2, 8, 12, 10], [2, 10, 3, 12], [2, 11, 9, 12], [7, 10, 9, 14]], "float": [11, 11, 12, 12], "edges": [[0, 2, 14, 3], [0, 3, 1, 14], [13, 3, 14, 14], [0, 14, 14, 15]], "base": -6};

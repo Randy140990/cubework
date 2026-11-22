@@ -854,7 +854,7 @@ public final class Game {
 			new Zone("pewter_city", -850, 255, -741, 339), new Zone("route_3", -740, 285, -580, 332), new Zone("route_4", -628, 238, -410, 284),
 			new Zone("fuchsia_city", -560, 733, -441, 860), new Zone("cerulean_city", -401, 220, -311, 305), new Zone("route_24", -372, 140, -332, 219),
 			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
-			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455)};
+			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345)};
 
 	private static void loadZones() {
 		zones.clear();
@@ -907,7 +907,7 @@ public final class Game {
 	/** Cerulean City and the routes round it (16:17), and the routes the Underground Paths come out on (16:20). */
 	private static final Zone[] CERULEAN_ZONES = {new Zone("cerulean_city", -401, 220, -311, 305), new Zone("route_24", -372, 140, -332, 219),
 			new Zone("route_25", -331, 125, -160, 175), new Zone("route_5", -372, 306, -330, 376), new Zone("route_6", -385, 472, -310, 545),
-			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455)};
+			new Zone("route_7", -455, 400, -410, 450), new Zone("route_8", -300, 395, -215, 455), new Zone("route_10", -165, 296, -110, 345)};
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -3229,7 +3229,10 @@ public final class Game {
 		} else if (!d.started || !d.anyHealthy()) {
 			dialogue(p, null, "talk", List.of("A wild " + name + "!", "You'd better have a POKéMON that can battle first."), t, w.getId());
 		} else {
-			dialogue(p, null, "static", List.of(st.species().equals("snorlax") ? "A sleeping POKéMON blocks the way!" : "The wild " + name + " attacked!"), t,
+			// (One posing as an item ball, the Power Plant's ELECTRODE: its own name, not the ball's.)
+			Species real = Species.ALL.get(st.species());
+			String wild = real == null ? name : real.name();
+			dialogue(p, null, "static", List.of(st.species().equals("snorlax") ? "A sleeping POKéMON blocks the way!" : "The wild " + wild + " attacked!"), t,
 					w.getId());
 		}
 	}
@@ -3953,7 +3956,7 @@ public final class Game {
 			// the two BLACK BELTs who teach MEGA PUNCH and MEGA KICK.
 			{"route_3_p0", -608, 311}, {"route_4_p0", -610, 263}, {"route_4_boy", -598, 275}, {"route_4_tutor_punch", -534, 252}, {"route_4_tutor_kick", -528, 252}};
 	/** Trainers who stand somewhere on John's map other than where the games' grid puts them (Routes 3 and 4, FireRed's). */
-	private static final Object[][] TRAINER_SPOTS = {{"route_3_0", -722, 299}, {"route_3_1", -714, 293}, {"route_3_2", -710, 303}, {"route_3_3", -698, 293},
+	private static final Object[][] TRAINER_SPOTS = {{"route_10_0", -125, 334},{"route_3_0", -722, 299}, {"route_3_1", -714, 293}, {"route_3_2", -710, 303}, {"route_3_3", -698, 293},
 			{"route_3_4", -688, 291}, {"route_3_5", -690, 305}, {"route_3_6", -684, 297}, {"route_3_7", -668, 307}, {"route_4_0", -478, 252}};
 	private static final String SPOTS_DONE = "spot7:";
 	/**
@@ -4136,6 +4139,9 @@ public final class Game {
 	 * map is laid over the place's marked box (so mark the box to the place's edges), then moved to the nearest
 	 * good ground. Anyone already there stays (or, with redo, is put back where the games had them).
 	 */
+	/** Places marked only round one spot so far (16:58: Route 10 round the Power Plant): only people with their own spots. */
+	private static final java.util.Set<String> OWN_SPOTS_ONLY = java.util.Set.of("route_10");
+
 	public static int populate(ServerLevel level, String place, boolean redo) {
 		Zone z = null;
 		for (Zone x : zones) if (x.place().equals(place)) {
@@ -4155,8 +4161,11 @@ public final class Game {
 			else present.add(w.key());
 		}
 		int count = 0;
+		// (A place only partly marked so far, Route 10 round the Power Plant: only those with their own spots.)
+		boolean ownOnly = OWN_SPOTS_ONLY.contains(place);
 		for (Trainers.Trainer t : Trainers.in(place)) {
 			int[] own = trainerSpot(t.key());
+			if (ownOnly && own == null) continue;
 			BlockPos at = own != null ? (level.hasChunkAt(new BlockPos(own[0], START_Y, own[1])) ? spot(level, own[0], own[1], 4) : null)
 					: gameSpot(level, z, size, Trainers.POS.get(t.key()));
 			if (at == null || present.contains(t.key())) continue;
@@ -4169,6 +4178,7 @@ public final class Game {
 			// (Cerulean's rival comes himself, at the bridge; its second OFFICER JENNY is the first one again.)
 			if (ps.key().equals("cerulean_city_p0") || ps.key().equals("cerulean_city_p8")) continue;
 			int[] own = spotOf(ps.key());
+			if (ownOnly && own == null) continue;
 			BlockPos at = own != null ? (level.hasChunkAt(new BlockPos(own[0], START_Y, own[1])) ? spot(level, own[0], own[1], 6) : null) : gameSpot(level, z, size, Trainers.POS.get(ps.key()));
 			if (at == null) continue;
 			String sp = ps.species();
@@ -4182,6 +4192,7 @@ public final class Game {
 			count++;
 		}
 		for (Trainers.FieldItem fi : Trainers.itemsIn(place)) {
+			if (ownOnly) break;
 			if (present.contains("item:" + fi.key()) || takenByAnyone("item:" + fi.key()) || itemSpot(fi.key()) || java.util.Arrays.asList(GONE_ITEMS).contains(fi.key())) continue;
 			BlockPos at = gameSpot(level, z, size, new int[] {fi.x(), fi.y()});
 			if (at == null) continue;

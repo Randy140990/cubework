@@ -172,6 +172,15 @@
     for (let i = 0; i < 14; i++) { const x = Math.floor(r() * 28), y = Math.floor(r() * 30); P.rect(x, y, 3 + Math.floor(r() * 3), 1, hx("#7DBDF0")); }
     for (let i = 0; i < 8; i++) { const x = Math.floor(r() * 30), y = Math.floor(r() * 30); P.rect(x, y, 2, 1, hx("#2C74B8")); }
   }, { per: 2 });
+  // (Viewer-only: in the mod the pool is real water and quartz, tools/cerulean_pool.py.) The water as outside's: deep blue,
+  // ripples of light, seen into; its dark prismarine bottom; the white quartz.
+  reg("poolWaterView", 32, 32, (P, r) => {
+    P.fill(hx("#3567C8"), 0.03, r);
+    for (let i = 0; i < 16; i++) { const x = Math.floor(r() * 28), y = Math.floor(r() * 30); P.rect(x, y, 3 + Math.floor(r() * 4), 1, hx("#6E9BE8")); }
+    for (let i = 0; i < 10; i++) { const x = Math.floor(r() * 30), y = Math.floor(r() * 30); P.rect(x, y, 2, 1, hx("#264E9E")); }
+  }, { per: 2, alpha: 0.72 });
+  reg("poolBottomView", 16, 16, (P, r) => { P.fill(hx("#335B52"), 0.06, r); P.rect(0, 0, 16, 1, hx("#264640")); P.rect(0, 0, 1, 16, hx("#264640")); });
+  reg("poolQuartzView", 16, 16, (P, r) => { P.fill(hx("#F1EFEA"), 0.015, r); P.rect(0, 15, 16, 1, hx("#DCD8D0")); });
   reg("poolEdge", 16, 16, (P, r) => { P.fill(hx("#F5F8FB"), 0.02, r); P.rect(0, 15, 16, 1, hx("#C9D6E2")); });
   reg("standSeat", 16, 16, (P, r) => { P.fill(hx("#E35B66"), 0.03, r); P.rect(0, 0, 16, 2, hx("#F08A93")); });
   reg("standSeatBlue", 16, 16, (P, r) => { P.fill(hx("#4C8FDB"), 0.03, r); P.rect(0, 0, 16, 2, hx("#82B5EE")); });
@@ -241,44 +250,49 @@
 
   Object.assign(BUILD, {
     cerulean_gym() {
-      // CERULEAN GYM, laid out as FireRed's (14 by 18 of its steps, a step a block): stands at the back, the pool
-      // filling the hall, a white-edged walkway winding through it from the door to MISTY at the top. You can't swim
-      // (not yet), so the water's where you can't go. PICNICKER DIANA on the left arm, SWIMMER LUIS in the water.
-      const W = 14, D = 18;
+      // CERULEAN GYM, laid out as FireRed's (a step a block): stands at the back, a deep pool filling the hall (real
+      // water in the mod, five deep, as the water outside: tools/cerulean_pool.py), the white walkways its edges
+      // winding from the deck at the door to MISTY at the top. You can't swim (not yet): the water stops you.
+      // PICNICKER DIANA on the left arm, SWIMMER LUIS on his float.
+      const L = CERULEAN_POOL, W = L.W, D = L.D, base = L.base;
       const R = new Room("cerulean_gym", { name: "Cerulean Gym", floor: "Cerulean City", W, D, H: 5 });
-      const walks = [[5.9, 4.6, 11.6, 6.4], [2.8, 5.6, 5.9, 6.6], [9.8, 4.6, 11.6, 10.4], [2.8, 9.0, 11.6, 10.4], [2.8, 9.0, 4.0, 12.8], [2.8, 11.8, 8.6, 12.8], [6.4, 9.0, 8.6, 14.6]];
-      const stands = [0, 0, W, 2.2], deck = [0, 14.6, W, D - 2], float = [8.7, 11.7, 9.7, 12.7];
+      const stands = [0, 0, W, 2], deck = [0, 14, W, D - 2];
       shell(R, { paper: "ceruleanWall", floor: "ceruleanTile", door: [6, 8], entry: true, skirt: "ceruleanTrim", ledge: "ceruleanTrim", ledgeTop: "poolEdge",
-        floorRects: [stands, deck, [5, D - 2, 9, D], float, ...walks] });
+        floorRects: [stands, deck, [5, D - 2, 9, D]] });
       band(R, 0.3, "ceruleanTrim", 0.9); band(R, 1.2, "poolEdge", 0.1);
       const G = R.geo;
-      // The pool: its water a little below the walkways, a white lip round every walkway and the deck.
-      let water = [[0, 2.2, W, 14.6]];
-      for (const w of [...walks, float]) water = cut(water, w);
-      G.box(0, -1.2, 2.2, W, -0.12, 14.6, { top: "poolWater", all: null });
-      for (const [x0, z0, x1, z1] of water) R.solid(x0, z0, x1, z1);
-      for (const [x0, z0, x1, z1] of walks) G.box(x0, -0.12, z0, x1, 0.02, z1, { all: "poolEdge", top: null, bottom: null });
-      G.box(float[0], -0.12, float[1], float[2], 0.08, float[3], { all: "standSeat", top: "poolEdge", bottom: null });
-      G.box(0, -0.12, 14.6, W, 0.02, 14.7, { n: "poolEdge", all: null }); G.box(0, -0.12, 2.1, W, 0.02, 2.2, { s: "poolEdge", all: null });
-      R.item("Pool", "The pool fills the hall; a white-edged walkway winds through it. No swimming (no SURF yet): the water stops you.");
+      // The pool: the water's surface (just under the walkways' tops, as outside), its dark bottom five down; the
+      // walkways and the edges white quartz all the way down (in the mod these are real blocks: viewer-only here).
+      const P0 = L.pool, walks = [...L.walks, L.float];
+      let water = [[P0[0], P0[1], P0[2], P0[3]]];
+      for (const w of walks) water = cut(water, w);
+      for (const [x0, z0, x1, z1] of water) {
+        G.box(x0, base + 1, z0, x1, -0.11, z1, { top: "poolWaterView", all: null });
+        G.box(x0, base, z0, x1, base + 1, z1, { top: "poolBottomView", all: null });
+        R.solid(x0, z0, x1, z1);
+      }
+      for (const [x0, z0, x1, z1] of [...walks, ...L.edges.filter(e => e[1] < 14)]) G.box(x0, base, z0, x1, 0, z1, { all: "poolQuartzView", bottom: null });
+      G.box(0, base, 14, W, 0, 15, { all: "poolQuartzView", top: null, bottom: null });
+      // The edges along the stands and down both sides: you can't walk round on them.
+      for (const e of L.edges) if (e[1] < 14) R.solid(e[0], e[1], e[2], e[3]);
+      R.item("Pool", "A deep pool filling the hall (real water in the game, five deep, as the water outside); the white walkways are its edges. No swimming yet: the water stops you.");
       // The stands at the back: two tiers, red and blue seats.
-      G.box(0.6, 0, 0, W - 0.6, 0.5, 2.1, { all: "ceruleanTrim", top: "poolEdge" }); G.box(0.6, 0.5, 0, W - 0.6, 1.0, 1.0, { all: "ceruleanTrim", top: "poolEdge" });
-      for (let x = 1.4, i = 0; x < W - 1; x += 1.6, i++) { G.box(x, 0.5, 1.3, x + 0.8, 0.75, 1.9, i % 2 ? "standSeatBlue" : "standSeat"); G.box(x, 1.0, 0.2, x + 0.8, 1.25, 0.8, i % 2 ? "standSeat" : "standSeatBlue"); }
-      R.solid(0, 0, W, 2.1);
-      // MISTY's spot at the top: a stage tile on the walkway.
-      G.box(6.2, 0, 4.8, 7.8, 0.06, 6.2, { top: "gymStage", all: "poolEdge", bottom: null });
-      // Pool ladders at the corners.
-      for (const [x, z] of [[1.2, 14.4], [12.8, 14.4], [1.2, 2.4], [12.8, 2.4]]) { G.box(x - 0.3, -0.12, z - 0.04, x - 0.24, 0.9, z + 0.04, "steel"); G.box(x + 0.24, -0.12, z - 0.04, x + 0.3, 0.9, z + 0.04, "steel"); G.box(x - 0.3, 0.84, z - 0.04, x + 0.3, 0.9, z + 0.04, "steel"); }
+      G.box(0.6, 0, 0, W - 0.6, 0.5, 1.9, { all: "ceruleanTrim", top: "poolEdge" }); G.box(0.6, 0.5, 0, W - 0.6, 1.0, 0.9, { all: "ceruleanTrim", top: "poolEdge" });
+      for (let x = 1.4, i = 0; x < W - 1; x += 1.6, i++) { G.box(x, 0.5, 1.2, x + 0.8, 0.75, 1.8, i % 2 ? "standSeatBlue" : "standSeat"); G.box(x, 1.0, 0.15, x + 0.8, 1.25, 0.75, i % 2 ? "standSeat" : "standSeatBlue"); }
+      R.solid(0, 0, W, 2);
+      // MISTY's spot at the top: a stage tile on the walkway; LUIS's float, a ring on it.
+      G.box(6.2, 0, 4.15, 7.8, 0.06, 5.85, { top: "gymStage", all: "poolEdge", bottom: null });
+      G.box(L.float[0] + 0.08, 0, L.float[1] + 0.08, L.float[2] - 0.08, 0.1, L.float[3] - 0.08, { top: "standSeat", all: "standSeat", bottom: null });
       gymStatue(R, 4.4, 15.6, ["CERULEAN CITY POKéMON GYM", "LEADER: MISTY", "WINNING TRAINERS: {rival}"]);
       gymStatue(R, 9.6, 15.6, ["CERULEAN CITY POKéMON GYM", "LEADER: MISTY", "WINNING TRAINERS: {rival}"]);
-      for (const [x, z] of [[0.8, 15.2], [13.2, 15.2]]) plant(R, x, z, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
-      R.npcs.push({ name: "Leader Misty", key: "cerulean_gym_0", role: "leader", x: 7.0, z: 5.5, y: 0.06, yaw: FACE.s, look: { skin: "leader_misty" },
+      for (const [x, z] of [[0.8, 16.2], [13.2, 16.2]]) plant(R, x, z, 0.9, { pot: "potWhite", lines: ["A leafy plant in a white pot."] });
+      R.npcs.push({ name: "Leader Misty", key: "cerulean_gym_0", role: "leader", x: 7.0, z: 5.0, y: 0.06, yaw: FACE.s, look: { skin: "leader_misty" },
         talk: () => [{ text: "MISTY: Hi, you're a new face! My policy is an all-out offensive with WATER-type POKéMON!" }, { text: "(In the game: you battle her and win the CASCADEBADGE.)" }] });
-      R.npcs.push({ name: "Picnicker Diana", key: "cerulean_gym_1", role: "trainer", x: 3.4, z: 6.1, yaw: FACE.e, look: { skin: "cooltrainer_f" },
+      R.npcs.push({ name: "Picnicker Diana", key: "cerulean_gym_1", role: "trainer", x: 2.5, z: 5.5, yaw: FACE.e, look: { skin: "cooltrainer_f" },
         talk: () => [{ text: "I'm more than good enough for you! MISTY can wait!" }] });
-      R.npcs.push({ name: "Swimmer Luis", key: "cerulean_gym_2", role: "trainer", x: 9.2, z: 12.2, y: 0.08, yaw: FACE.w, look: { skin: "swimmer" },
+      R.npcs.push({ name: "Swimmer Luis", key: "cerulean_gym_2", role: "trainer", x: 11.5, z: 11.5, y: 0.1, yaw: FACE.w, look: { skin: "swimmer" },
         talk: () => [{ text: "Splash! I'm first up! Let's do it!" }] });
-      R.npcs.push({ name: "Gym guide", key: "cerulean_gym_p0", x: 10.8, z: 15.4, yaw: FACE.w, look: { skin: "gym_guide" },
+      R.npcs.push({ name: "Gym guide", key: "cerulean_gym_p0", x: 11.6, z: 15.8, yaw: FACE.w, look: { skin: "gym_guide" },
         talk: () => [{ text: "Yo! Champ in making!" }, { text: "MISTY is a trainer who's going to keep improving." }, { text: "She won't lose to someone like you!" }] });
       doormat(R, 6, 8, { to: "town", mat: "matGate" });
       R.spawn = { x: 7.0, z: D - 1.5, yaw: FACE.n };
@@ -413,4 +427,62 @@
     P.fill(hx("#3E7FCF"), 0.02, r);
     P.rect(2, 0, 2, 16, hx("#7DB0EC")); P.rect(4, 0, 1, 16, hx("#5D98E0")); P.rect(12, 0, 2, 16, hx("#2D62A8")); P.rect(15, 0, 1, 16, hx("#244F88"));
   });
+})();
+
+// ---------- the Power Plant on Route 10 (16:58): FireRed's hall of generators, ZAPDOS, ELECTRODE posing as items ----------
+(function () {
+  const reg = (k, w, h, draw, m) => { TEXDEF[k] = [w, h, draw]; MATDEF[k] = Object.assign({ tex: k, per: 1 }, m || {}); };
+  reg("ppFloor", 16, 16, (P, r) => { P.fill(hx("#E7DCC2"), 0.03, r); P.rect(0, 0, 16, 1, hx("#CDBF9F")); P.rect(0, 0, 1, 16, hx("#CDBF9F")); P.rect(7, 7, 2, 2, hx("#D8CBAD")); });
+  reg("ppLane", 16, 16, (P, r) => { P.fill(hx("#B9BDC2"), 0.03, r); P.rect(0, 0, 16, 1, hx("#D2D6DA")); P.rect(0, 15, 16, 1, hx("#9A9FA5")); });
+  reg("ppWall", 16, 16, (P, r) => { P.fill(hx("#C9CFD6"), 0.02, r); P.rect(0, 0, 16, 1, hx("#E2E6EA")); P.rect(0, 0, 1, 16, hx("#AEB5BE")); for (const y of [5, 11]) P.rect(2, y, 12, 1, hx("#B7BEC7")); });
+  reg("ppMachine", 16, 16, (P, r) => {
+    P.fill(hx("#5D7895"), 0.03, r); P.rect(0, 0, 16, 2, hx("#8FA8C2")); P.rect(0, 14, 16, 2, hx("#3E5268"));
+    for (const y of [4, 6, 8, 10]) P.rect(3, y, 10, 1, hx("#45596F"));
+    P.set(13, 3, hx("#F5D76E")); P.set(13, 5, hx("#7CF5B0"));
+  });
+  reg("ppMachineTop", 16, 16, (P, r) => { P.fill(hx("#7891AB"), 0.03, r); P.rect(0, 0, 16, 1, hx("#A9BED3")); P.rect(2, 2, 12, 12, hx("#6A829C")); P.rect(4, 4, 8, 8, hx("#5D7590")); });
+  reg("ppStripe", 16, 16, (P, r) => { P.fill(hx("#2E3136"), 0, r); for (let x = -16; x < 16; x += 6) for (let i = 0; i < 3; i++) P.line(x + i, 15, x + i + 15, 0, hx("#F2C230")); });
+  reg("ppCoil", 16, 16, (P, r) => { P.fill(hx("#B87333"), 0.03, r); for (let y = 0; y < 16; y += 2) P.rect(0, y, 16, 1, hx("#D9964F")); });
+  reg("ppPanel", 32, 16, (P, r) => { P.fill(hx("#2E3A50"), 0.02, r); for (let i = 0; i < 6; i++) P.rect(3 + i * 5, 4, 3, 2, hx(i % 3 ? "#F5D76E" : "#E2665A")); P.rect(3, 10, 26, 2, hx("#4F6A8E")); }, { fit: true, glow: 0.5 });
+
+  // A row of generators along x (from x0 to x1, at z0 to z1): blue-grey cabinets, a hazard stripe at the foot, copper
+  // coils and a pipe along the top, a lit panel on each.
+  function generators(R, x0, z0, x1, z1) {
+    const G = R.geo, h = 1.7;
+    G.box(x0, 0, z0, x1, 0.22, z1, { all: "ppStripe", top: null, bottom: null });
+    G.box(x0, 0.22, z0, x1, h, z1, { all: "ppMachine", top: "ppMachineTop", bottom: null });
+    for (let x = x0 + 1; x < x1 - 0.5; x += 3) {
+      G.box(x, h, z0 + 0.2, x + 1.0, h + 0.5, z1 - 0.2, { all: "ppCoil", top: "steel" });
+      G.box(x + 0.15, 0.6, z1, x + 0.85, 1.1, z1 + 0.02, { s: "ppPanel", all: null });
+    }
+    G.box(x0, h + 0.55, (z0 + z1) / 2 - 0.12, x1, h + 0.8, (z0 + z1) / 2 + 0.12, "steel");
+    R.solid(x0, z0, x1, z1);
+  }
+  PLACES.push({ id: "power_plant", name: "Power Plant", floor: "Route 10", group: "Route 10" });
+  BUILD.power_plant = function () {
+    // The POWER PLANT (Red and Blue's 40 by 36 steps, a step a block, so everything's where the games have it): its
+    // hall of generators in rows, ZAPDOS by the big machine at the back on the left, ELECTRODE and VOLTORB posing as
+    // item balls, and its items. The way in at the bottom left.
+    const W = 40, D = 36;
+    const R = new Room("power_plant", { name: "Power Plant", floor: "Route 10", W, D, H: 5 });
+    shell(R, { paper: "ppWall", floor: "ppFloor", door: [4, 6], entry: true, skirt: "ppStripe", ledge: "ppMachine", ledgeTop: "steel" });
+    band(R, 0.3, "ppMachine", 0.9); band(R, 1.2, "steel", 0.08);
+    const G = R.geo;
+    // Lanes of grey floor between the rows.
+    for (const [z0, z1] of [[10, 13], [17, 20], [24, 27], [30, 33]]) G.box(0, 0, z0, W, 0.012, z1, { top: "ppLane", all: null });
+    // The machines along the back wall, and the rows (their gaps the way through, as FireRed's maze).
+    generators(R, 0.4, 0.2, 39.6, 1.4);
+    generators(R, 0, 7, 14, 8.6); generators(R, 18, 7, 30, 8.6); generators(R, 34, 7, 40, 8.6);
+    generators(R, 4, 14, 22, 15.6); generators(R, 26, 14, 40, 15.6);
+    generators(R, 0, 21, 10, 22.6); generators(R, 14, 21, 34, 22.6);
+    generators(R, 8, 27.8, 28, 29.4); generators(R, 32, 27.8, 40, 29.4);
+    // ZAPDOS's big machine: a tall generator, coils round it.
+    G.box(1.0, 0, 2.2, 3.4, 3.2, 4.6, { all: "ppMachine", top: "ppMachineTop" }); G.box(1.3, 3.2, 2.5, 3.1, 3.8, 4.3, "ppCoil"); R.solid(1.0, 2.2, 3.4, 4.6);
+    R.act([0.8, 2.0, 3.6, 5.0], { label: "Look", lines: ["A huge generator, humming. The air round it crackles."] });
+    for (const [x, z] of [[38.8, 33.0], [9.0, 33.0]]) plant(R, x, z, 0.9, { pot: "potWhite", lines: ["A dusty plant in a white pot."] });
+    R.item("Generators", "FireRed's Power Plant: rows of blue-grey generators, hazard stripes at their feet, copper coils and a pipe along the top, lit panels.");
+    doormat(R, 4, 6, { to: "town", mat: "matGate" });
+    R.spawn = { x: 5.0, z: D - 1.5, yaw: FACE.n };
+    return R;
+  };
 })();

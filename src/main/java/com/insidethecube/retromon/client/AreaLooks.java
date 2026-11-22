@@ -124,7 +124,7 @@ public final class AreaLooks {
 				// (15:21) Texture swaps don't pile up: where two of a block's swaps cover a spot (all Kanto's dripstone, and
 				// Pallet's), the one for the smaller area is drawn there, the other not.
 				List<Rule> swaps = new ArrayList<>();
-				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("glass")) swaps.add(rule);
+				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("glass") || rule.look().equals("hedge")) swaps.add(rule);
 				for (Rule rule : looks.values()) {
 					Look look = make(rule, c.baker());
 					List<Rule> rivals = new ArrayList<>();
@@ -194,7 +194,9 @@ public final class AreaLooks {
 			case "wood_board" -> AreaLooks::woodBoard;
 			case "wood_sign" -> AreaLooks::woodSign;
 			case "boulder" -> boulder(baker, rule.swaps());
-			case "glass" -> glass(baker, rule.swaps());
+			case "glass" -> glass(baker, rule.swaps(), false);
+			// (16:17) Leaves as a trimmed hedge: one solid hedge along a row, its edges rounded where it ends.
+			case "hedge" -> glass(baker, rule.swaps(), true);
 			case "chain" -> AreaLooks::chain;
 			case "grass_onto" -> {
 				// (15:29) The grass's soft tufted edge onto what's beside it (Fuchsia's beach sand, its moss, the red path's edge).
@@ -480,7 +482,7 @@ public final class AreaLooks {
 	 * more of the same glass beyond them: 1 its top, 2 its right, 4 its bottom, 8 its left as the picture lies), drawn see-through.
 	 * spec: "block/glass=glass_clear" (old=the pictures' name).
 	 */
-	private static Look glass(ModelBaker baker, String spec) {
+	private static Look glass(ModelBaker baker, String spec, boolean hedge) {
 		SpriteFinder finder = baker.sprites().spriteFinder(TextureAtlas.LOCATION_BLOCKS);
 		Map<Identifier, TextureAtlasSprite[]> kinds = new HashMap<>();
 		for (String one : spec.split(",")) {
@@ -506,13 +508,16 @@ public final class AreaLooks {
 				// Which way across the world the picture's u and v run on this face (from its corners).
 				Direction du = along(q, nu), dv = along(q, nv);
 				int mask = 0;
-				if (dv != null && !same(view, pos, dv.getOpposite(), self)) mask |= 1;
-				if (du != null && !same(view, pos, du, self)) mask |= 2;
-				if (dv != null && !same(view, pos, dv, self)) mask |= 4;
-				if (du != null && !same(view, pos, du.getOpposite(), self)) mask |= 8;
+				if (dv != null && !joins(view, pos, dv.getOpposite(), self, hedge)) mask |= 1;
+				if (du != null && !joins(view, pos, du, self, hedge)) mask |= 2;
+				if (dv != null && !joins(view, pos, dv, self, hedge)) mask |= 4;
+				if (du != null && !joins(view, pos, du.getOpposite(), self, hedge)) mask |= 8;
 				TextureAtlasSprite to = v[mask];
 				for (int i = 0; i < 4; i++) q.uv(i, to.getU0() + nu[i] * (to.getU1() - to.getU0()), to.getV0() + nv[i] * (to.getV1() - to.getV0()));
-				q.renderLayer(ChunkSectionLayer.TRANSLUCENT);
+				if (hedge) {
+					q.renderLayer(ChunkSectionLayer.SOLID);
+					q.tintIndex(-1);
+				} else q.renderLayer(ChunkSectionLayer.TRANSLUCENT);
 				return true;
 			});
 			base.emitQuads(e, view, pos, state, random, cull);
@@ -533,6 +538,12 @@ public final class AreaLooks {
 		if (ax >= ay && ax >= az) return dx > 0 ? Direction.EAST : Direction.WEST;
 		if (ay >= az) return dy > 0 ? Direction.UP : Direction.DOWN;
 		return dz > 0 ? Direction.SOUTH : Direction.NORTH;
+	}
+
+	/** Whether a face runs on into its neighbour: glass into the same glass, a hedge into any leaves. */
+	private static boolean joins(BlockAndTintGetter view, BlockPos pos, Direction d, Block self, boolean hedge) {
+		if (!hedge) return same(view, pos, d, self);
+		return view.getBlockState(pos.relative(d)).is(net.minecraft.tags.BlockTags.LEAVES);
 	}
 
 	private static boolean same(BlockAndTintGetter view, BlockPos pos, Direction d, Block self) {
