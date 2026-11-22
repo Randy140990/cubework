@@ -32,7 +32,7 @@ fuchsia_gym_2	fuchsia_gym	JUGGLER KIRK	juggler	right	4	35	drowzee:31,drowzee:31,
 fuchsia_gym_3	fuchsia_gym	JUGGLER NATE	juggler	down	2	35	drowzee:34,kadabra:34	-	Stop right there! | Our invisible walls have you frustrated?	Whoa! He's got it!	You impressed me! Here's a hint! | Look very closely for gaps in the invisible walls!	1	12
 fuchsia_gym_4	fuchsia_gym	TAMER PHIL	tamer	up	2	40	sandslash:34,arbok:34	-	I also study the way of the ninja with master KOGA! | Ninja have a long history of using animals!	Awoo!	I still have much to learn!	3	5
 fuchsia_gym_5	fuchsia_gym	TAMER EDGAR	tamer	down	2	40	arbok:33,sandslash:33,arbok:33	-	Master KOGA comes from a long line of ninjas! | What did you descend from?	Dropped my balls!	Where there is light, there is shadow! | Light and shadow! Which do you choose?	8	2
-fuchsia_gym_6	fuchsia_gym	JUGGLER SHAWN	juggler	left	3	35	drowzee:34,hypno:34	-	-	-	-	2	7
+fuchsia_gym_6	fuchsia_gym	JUGGLER SHAWN	juggler	left	3	35	drowzee:34,hypno:34	-	Strength isn't the key for POKéMON! | It's strategy! | I'll show you how strategy can beat brute strength!	What? Extraordinary!	So, you mix brawn with brains? | Good strategy!	2	7
 game_corner_0	game_corner	ROCKET	rocket	up	3	30	raticate:20,zubat:20	-	-	-	-	9	5
 lances_room_0	lances_room	ELITE FOUR LANCE	lance	down	0	99	gyarados:58,dragonair:56,dragonair:56,aerodactyl:60,dragonite:62	-	-	That's it! | I hate to admit it, but you are a POKéMON master!	...	6	1
 loreleis_room_0	loreleis_room	ELITE FOUR LORELEI	lorelei	down	0	99	dewgong:54,cloyster:53,slowbro:54,jynx:56,lapras:56	-	-	How dare you!	...	5	2
