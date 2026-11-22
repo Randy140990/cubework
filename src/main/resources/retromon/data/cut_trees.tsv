@@ -1,0 +1,6 @@
+# The little trees a POKéMON can CUT down (game/CutTrees): each one's way, blocks x0 to x1 and z0 to z1, kept clear where
+# you'd stand at y0 to y1, and its two sides, a and b (x, z), you come out at after CUT. Route 2's are John's two cherry
+# trees, where FireRed has its two, in the gaps in the trees between the route and its east lane.
+# key	x0	z0	x1	z1	y0	y1	ax	az	bx	bz	note
+route_2_cut_north	-786	467	-780	471	25	28	-787.5	469.5	-777.5	469.5	the north one (the PARLYZ HEAL's side)
+route_2_cut_south	-787	482	-781	487	25	28	-788.5	484.5	-778.5	484.5	the south one, by the ledge

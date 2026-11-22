@@ -22,6 +22,7 @@ const PLACES = [
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
   { id: "pallet_looks", name: "Pallet Town looks", floor: "Outside (the mod's blocks)", group: "Outside" },
   { id: "viridian_looks", name: "Viridian City and Route 22 looks", floor: "Outside (the mod's blocks)", group: "Outside" },
+  { id: "viridian_forest", name: "Viridian Forest", floor: "Always night", group: "Route 2" },
 ];
 // Your house and the rival's (14 by 13, the mat in a nook at the door), the stairs at the back on the right.
 const FROM_TOWN = { x: 7.0, z: 11.5, yaw: FACE.n };
@@ -610,7 +611,7 @@ function lgGate(R, o) {
   slimPlant(R, 0.8, 3.4 + N, 1.0); plant(R, 1.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); slimPlant(R, 13.2, R.Dm - 1.0, 1.0);
   bin(R, 13.3, 1.0 + N);
   const south = o.south || {};
-  doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], south.none ? { none: true, mat: "matGate" } : { to: south.to, spawn: { x: 6.9, z: D - 2.0, yaw: FACE.s }, mat: "matGate" });
+  doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], south.none ? { none: true, mat: "matGate" } : { to: south.to, spawn: south.spawn || { x: 6.9, z: D - 2.0, yaw: FACE.s }, mat: "matGate" });
   if (south.none) R.act([LG_GATE_DOOR[0], D - 1.4, LG_GATE_DOOR[1], D], { label: "Look", lines: south.lines });
 }
 // A soft armchair (as the Centers' waiting seats): x, z its middle, face the way you'd look sitting in it.
@@ -1350,9 +1351,10 @@ const BUILD = {
   gate_s() {
     // Route 2's gate south of Viridian Forest, as Let's Go's gates are (one design for every gate; who's in it is its
     // own): a cream and yellow check, blue lower walls, a long blue runner from the door to the way on at the north,
-    // palms by the way on, stools round glass tables, people waiting. The way on to the forest goes nowhere yet.
+    // palms by the way on, stools round glass tables, people waiting. The way on at the north goes into VIRIDIAN
+    // FOREST, out in front of its south gatehouse.
     const R = new Room("gate_s", { name: "Route 2 gate", floor: "South", W: 14, D: 14, outsideSize: "15 by 12" });
-    lgGate(R, { south: { to: "town" }, north: { none: true, lines: ["The way on to VIRIDIAN FOREST."] } });
+    lgGate(R, { south: { to: "town" }, north: { to: "viridian_forest", spawn: { x: FOREST.fromSouth.x, z: FOREST.fromSouth.z, yaw: FACE.n } } });
     R.npcs.push({ name: "Girl", key: "gate_s_girl", x: 3.0, z: 7.6, yaw: FACE.e, look: { skin: "girl" },
       talk: () => [{ text: "Some POKéMON only live in forests and caves." }, { text: "Look everywhere if you want to find them all!" }] });
     R.npcs.push({ name: "Lady", key: "gate_s_lady", x: 12.6, z: 8.9, yaw: FACE.w, seated: true, look: { skin: "lady" },
@@ -1362,15 +1364,113 @@ const BUILD = {
   },
 
   gate_n() {
-    // The gate on the forest's north side, the same design: in from Route 2 through the way at the north, the forest
-    // to the south (that way goes nowhere yet).
+    // The gate on the forest's north side, the same design: in from Route 2 through the way at the north; the door
+    // at the south goes back into VIRIDIAN FOREST, out in front of its north gatehouse.
     const R = new Room("gate_n", { name: "Route 2 gate", floor: "North", W: 14, D: 14, outsideSize: "15 by 16" });
-    lgGate(R, { north: { to: "town" }, south: { none: true, lines: ["The way back into VIRIDIAN FOREST."] } });
+    lgGate(R, { north: { to: "town" }, south: { to: "viridian_forest", spawn: { x: FOREST.fromNorth.x, z: FOREST.fromNorth.z, yaw: FACE.s } } });
     R.npcs.push({ name: "Youngster", key: "gate_n_kid", x: 3.0, z: 9.0, yaw: FACE.e, look: { skin: "youngster" },
       talk: () => [{ text: "Off to PEWTER CITY? Its GYM LEADER, BROCK, uses ROCK-type POKéMON." }, { text: "WATER and GRASS moves work well on ROCK!" }] });
     R.npcs.push({ name: "Hiker", key: "gate_n_hiker", x: 12.6, z: 5.7, yaw: FACE.w, seated: true, look: { skin: "hiker" },
       talk: () => [{ text: "Phew! That forest goes on and on." }, { text: "It's easy to lose your way among all those trees." }] });
     R.spawn = LG_GATE_FROM_N;
+    return R;
+  },
+
+  viridian_forest() {
+    // Viridian Forest as the mod builds it (tools/forest.py, from John's schematic: FireRed's forest laid out at 4
+    // blocks to 3 of its steps across and 2 down), always night under its trees. His trees, paths and grass; the two
+    // gatehouses (Route 2's gate, outside); the five BUG CATCHERs where FireRed has them, who see that many of its
+    // steps straight ahead (the ring on the ground); two people; the item balls; the signs, as HeartGold's. In from
+    // Route 2's south gate at the bottom; out through the north gatehouse at the top left.
+    const F = FOREST, P16 = 1 / 16;
+    const R = new Room("viridian_forest", { name: "Viridian Forest", floor: "Always night", W: F.W, D: F.D, H: 9, outside: true, night: true });
+    const G = R.geo;
+    const at = (x, z) => { const r = F.rows[z]; return { g: r[3 * x], w: r[3 * x + 1], h: r.charCodeAt(3 * x + 2) - 48 }; };
+    const sd = F.southDoor, nd = F.northDoor;
+    const doorStep = (x, z) => (x >= sd.x0 && x < sd.x1 && z >= 125 && z <= 126) || (x >= nd.x0 && x < nd.x1 && z >= 22 && z <= 23);
+    for (let z = 0; z < F.D; z++) {
+      // The ground, in runs along the row: grass (the moss along the paths is drawn as the grass, as the Look pack has
+      // it), or a dirt path.
+      for (let x = 0; x < F.W;) {
+        const g = at(x, z).g; let x1 = x + 1;
+        while (x1 < F.W && at(x1, z).g === g) x1++;
+        G.box(x, -1, z, x1, 0, z + 1, { top: g === "p" ? "path" : "grass", all: "soil" });
+        x = x1;
+      }
+      // The trees (trunks low down, leaves above) and the gatehouses, in runs of the same height.
+      for (let x = 0; x < F.W;) {
+        const c = at(x, z);
+        if (!"TWU".includes(c.w) || doorStep(x, z)) { x++; continue; }
+        let x1 = x + 1;
+        while (x1 < F.W && at(x1, z).w === c.w && at(x1, z).h === c.h && !doorStep(x1, z)) x1++;
+        if (c.w === "W") { G.box(x, 0, z, x1, 2, z + 1, "bark"); G.box(x, 2, z, x1, c.h, z + 1, "treeLeaf"); }
+        else if (c.w === "T") G.box(x, 0, z, x1, c.h, z + 1, "treeLeaf");
+        else G.box(x, 0, z, x1, c.h, z + 1, { top: "area_gate_roof", all: "area_gate_wall_birch" });
+        R.solid(x, z, x1, z + 1);
+        x = x1;
+      }
+      // Tall grass and flowers, as crossed cut-outs.
+      for (let x = 0; x < F.W; x++) {
+        const c = at(x, z);
+        if (c.w === '"') { G.box(x, 0, z + 0.5, x + 1, 1.6, z + 0.5, { s: "tallGrass", all: null }); G.box(x + 0.5, 0, z, x + 0.5, 1.6, z + 1, { e: "tallGrass", all: null }); }
+        if (c.w === "*") { G.box(x + 0.1, 0, z + 0.5, x + 0.9, 0.7, z + 0.5, { s: "flower", all: null }); G.box(x + 0.5, 0, z + 0.1, x + 0.5, 0.7, z + 0.9, { e: "flower", all: null }); }
+      }
+    }
+    // The gatehouses' doors: their steps up, a dark doorway, the roof over them.
+    for (const [d, z0, z1, face] of [[sd, 125, 127, "n"], [nd, 22, 24, "s"]]) {
+      G.box(d.x0, 0, z0, d.x1, 0.5, z1, "area_gate_stone");
+      const zf = face === "n" ? z1 : z0;
+      G.box(d.x0, 0.5, zf - 0.02, d.x1, 2.8, zf + 0.02, { [face]: "doorDark", all: null });
+      G.box(d.x0 - 1, 3, z0, d.x1 + 1, 16, z1, { top: "area_gate_roof", all: "area_gate_wall_birch" });
+      if (face === "n") R.solid(d.x0, z1 - 0.3, d.x1, z1); else R.solid(d.x0, z0, d.x1, z0 + 0.3);
+    }
+    // Out: up the south gatehouse's steps to Route 2's south gate; up the north one's to the north gate.
+    R.warps.push({ test: (p, input) => input.down && p.z > sd.z && p.x > sd.x0 && p.x < sd.x1, to: "gate_s", spawn: { x: 7.0, z: 1.4, yaw: FACE.s }, fx: "fade" });
+    R.warps.push({ test: (p, input) => input.up && p.z < nd.z && p.x > nd.x0 && p.x < nd.x1, to: "gate_n", spawn: { x: 7.0, z: 12.5, yaw: FACE.n }, fx: "fade" });
+    // The signs: two shelves wide, the board over the stand, as HeartGold's.
+    for (const [sx, sz, lines] of F.signs) {
+      for (const [bx, part] of [[sx, "l"], [sx + 1, "r"]]) {
+        const outerW = part === "l", outerE = part === "r";
+        G.box(bx, 1, sz + 5 * P16, bx + 1, 2, sz + 11 * P16, { s: "area_sign_front_" + part, n: "area_sign_back_" + part, top: "area_sign_edge_h", bottom: "area_sign_edge_h",
+          w: outerW ? "area_sign_edge_v" : null, e: outerE ? "area_sign_edge_v" : null });
+        G.box(bx + (outerW ? 2 * P16 : 0), 2 * P16, sz + 6 * P16, bx + 1 - (outerE ? 2 * P16 : 0), 1, sz + 10 * P16, { all: "area_sign_stand", top: null, bottom: null,
+          w: outerW ? "area_sign_stand" : null, e: outerE ? "area_sign_stand" : null });
+        G.box(bx + (outerW ? P16 : 0), 0, sz + 5 * P16, bx + 1 - (outerE ? P16 : 0), 2 * P16, sz + 11 * P16, { all: "area_sign_foot", w: outerW ? "area_sign_foot" : null, e: outerE ? "area_sign_foot" : null });
+      }
+      R.solid(sx, sz + 0.3, sx + 2, sz + 0.7);
+      R.act([sx - 0.1, sz - 0.4, sx + 2.1, sz + 1.4], { label: "Read", lines });
+    }
+    // The item balls.
+    for (const it of F.items) {
+      G.box(it.x - 0.2, 0, it.z - 0.2, it.x + 0.2, 0.4, it.z + 0.2, { all: "ball", top: "ballTop" });
+      R.act([it.x - 0.7, it.z - 0.7, it.x + 0.7, it.z + 0.7], { label: "Pick up", lines: ["You found " + it.item + "!", "(In the game it goes in your BAG, once.)"] });
+    }
+    // The people and the trainers: FireRed's, each where it has them, facing its way. A trainer's sight: as many of
+    // FireRed's steps straight ahead as theirs (a step here 4/3 of a block across, 2 down), marked on the ground.
+    const SIGHT = { viridian_forest_rick: 5, viridian_forest_doug: 4, viridian_forest_sammy: 4, viridian_forest_anthony: 1, viridian_forest_charlie: 1 };
+    const TALK = {
+      viridian_forest_rick: ["BUG CATCHER RICK: Hey! You have POKéMON! Come on! Let's battle 'em!"],
+      viridian_forest_doug: ["BUG CATCHER DOUG: Yo! You can't jam out if you're a POKéMON TRAINER!"],
+      viridian_forest_sammy: ["BUG CATCHER SAMMY: Hey, wait up! What's the hurry?"],
+      viridian_forest_anthony: ["BUG CATCHER ANTHONY: I'm only little, but don't you go easy on me!"],
+      viridian_forest_charlie: ["BUG CATCHER CHARLIE: Did you know that POKéMON evolve?"],
+    };
+    for (const p of F.people) {
+      const yaw = (180 - p.yaw) * Math.PI / 180, lines = p.role === "trainer" ? TALK[p.key] : p.lines;
+      R.npcs.push({ name: p.name.split(" ").map(w => w[0] + w.slice(1).toLowerCase()).join(" "), key: p.key, x: p.x, z: p.z, yaw, look: { skin: p.skin },
+        talk: () => lines.map(text => ({ text })) });
+      if (p.role === "trainer") {
+        const fx = -Math.sin(p.yaw * Math.PI / 180), fz = Math.cos(p.yaw * Math.PI / 180), alongX = Math.abs(fx) > Math.abs(fz);
+        const len = SIGHT[p.key] * (alongX ? 4 / 3 : 2), half = (alongX ? 2 : 4 / 3) / 2;
+        const ax = p.x + fx * 0.5, az = p.z + fz * 0.5, bx = p.x + fx * (len + 0.5), bz = p.z + fz * (len + 0.5);
+        const x0 = Math.min(ax, bx) - (alongX ? 0 : half), x1 = Math.max(ax, bx) + (alongX ? 0 : half), z0 = Math.min(az, bz) - (alongX ? half : 0), z1 = Math.max(az, bz) + (alongX ? half : 0);
+        G.box(x0, 0.01, z0, x1, 0.02, z1, { top: "sightMark", all: null });
+      }
+    }
+    R.spawn = { x: F.fromSouth.x, z: F.fromSouth.z, yaw: FACE.n };
+    R.item("Viridian Forest", "John's forest (88 by 140 blocks), FireRed's maze laid out at 4 blocks to 3 of its steps across and 2 down. Always night in the game.");
+    R.item("BUG CATCHERs", "RICK and DOUG on the east side, SAMMY on the west, ANTHONY at the top right, CHARLIE at the top by the north gatehouse. The faint strip in front of each is how far they see.");
+    R.item("Items", "A POKé BALL and two POTIONs up the west side, an ANTIDOTE at the top right, a POTION at the bottom right, an ANTIDOTE by the way in.");
     return R;
   },
 

@@ -220,6 +220,8 @@ function switchRoom(id, spawn) {
   // Inside, bright and airy (as the newer games' rooms are; the mod's light inside matches).
   sun.intensity = room.outside ? 0.78 : 0.68; hemi.intensity = room.outside ? 0.7 : 0.78;
   hemi.color.set(room.outside ? 0xe8f4ff : 0xfff6e8); hemi.groundColor.set(room.outside ? 0x6f8a5a : 0x8a7f74);
+  // Always night (Viridian Forest, under its trees): a dim blue moonlight, as the mod's night has it.
+  if (room.night) { sun.intensity = 0.32; hemi.intensity = 0.5; hemi.color.set(0x9fb4e6); hemi.groundColor.set(0x2c3a5a); }
   cam.fit = fitRoom(room); snapCam();
   applyTime();
   $("#roomPick").value = id;

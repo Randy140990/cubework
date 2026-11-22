@@ -67,6 +67,7 @@ route_12_i1	route_12	iron	5	89
 route_15_i0	route_15	tm_rage	18	5
 route_2_i0	route_2	moon_stone	13	54
 route_2_i1	route_2	hp_up	13	45
+route_2_parlyz_heal	route_2	parlyz_heal	-1	-1
 route_24_i0	route_24	tm_thunder_wave	10	5
 route_25_i0	route_25	tm_seismic_toss	22	2
 route_4_i0	route_4	tm_whirlwind	57	3
@@ -110,8 +111,11 @@ victory_road_2f_i2	victory_road_2f	tm_mega_kick	9	11
 victory_road_2f_i3	victory_road_2f	guard_spec	11	0
 victory_road_3f_i0	victory_road_3f	max_revive	26	5
 victory_road_3f_i1	victory_road_3f	tm_explosion	7	7
-viridian_forest_i0	viridian_forest	potion	25	11
-viridian_forest_i1	viridian_forest	potion	12	29
-viridian_forest_i2	viridian_forest	poke_ball	1	31
+viridian_forest_poke_ball	viridian_forest	poke_ball	-1	-1
+viridian_forest_antidote	viridian_forest	antidote	-1	-1
+viridian_forest_potion	viridian_forest	potion	-1	-1
+viridian_forest_potion_2	viridian_forest	potion	-1	-1
+viridian_forest_hidden_potion	viridian_forest	potion	-1	-1
+viridian_forest_hidden_antidote	viridian_forest	antidote	-1	-1
 viridian_gym_i0	viridian_gym	revive	16	9
 wardens_house_i0	wardens_house	rare_candy	8	3

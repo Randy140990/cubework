@@ -22,6 +22,8 @@ public final class Night {
 	public static float nightness() {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.level == null) return 0;
+		// Viridian Forest: always night under its trees.
+		if (mc.player != null && com.insidethecube.retromon.game.Interiors.dark(mc.player)) return 1;
 		long t = Math.floorMod(mc.level.getDayTime(), 24000L);
 		// Dusk from 12300 to 13800, dawn from 22300 to 23700.
 		float k;

@@ -48,11 +48,21 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 public final class AreaLooks {
 	private AreaLooks() {}
 
-	/** Part of the map: x and z, and the heights it covers (every height when y0 > y1). */
-	private record Box(int x0, int z0, int x1, int z1, int y0, int y1) {
+	/**
+	 * Part of the map: x and z, and the heights it covers (every height when y0 > y1); rooms: in the interiors (the
+	 * forest, built there) rather than John's world.
+	 */
+	private record Box(int x0, int z0, int x1, int z1, int y0, int y1, boolean rooms) {
 		boolean has(BlockPos p) {
-			return p.getX() >= x0 && p.getX() <= x1 && p.getZ() >= z0 && p.getZ() <= z1 && (y0 > y1 || p.getY() >= y0 && p.getY() <= y1);
+			return p.getX() >= x0 && p.getX() <= x1 && p.getZ() >= z0 && p.getZ() <= z1 && (y0 > y1 || p.getY() >= y0 && p.getY() <= y1)
+					&& rooms == inRooms();
 		}
+	}
+
+	/** Whether the world you're in now is the interiors (the buildings' insides and the forest). */
+	private static boolean inRooms() {
+		var level = net.minecraft.client.Minecraft.getInstance().level;
+		return level != null && level.dimension() == com.insidethecube.retromon.game.Interiors.LEVEL;
 	}
 
 	/** One look somewhere: its name, its texture swaps ("block/tuff=lamp_tuff", "@4" for laid over 4 blocks), its areas. */
@@ -70,7 +80,8 @@ public final class AreaLooks {
 			int x0 = Integer.parseInt(r[2].trim()), z0 = Integer.parseInt(r[3].trim()), x1 = Integer.parseInt(r[4].trim()), z1 = Integer.parseInt(r[5].trim());
 			boolean every = r[6].trim().equals("-") || r[7].trim().equals("-");
 			int ya = every ? 1 : Integer.parseInt(r[6].trim()), yb = every ? 0 : Integer.parseInt(r[7].trim());
-			Box box = new Box(Math.min(x0, x1), Math.min(z0, z1), Math.max(x0, x1), Math.max(z0, z1), every ? 1 : Math.min(ya, yb), every ? 0 : Math.max(ya, yb));
+			Box box = new Box(Math.min(x0, x1), Math.min(z0, z1), Math.max(x0, x1), Math.max(z0, z1), every ? 1 : Math.min(ya, yb), every ? 0 : Math.max(ya, yb),
+					r.length > 10 && r[10].trim().equals("interiors"));
 			String look = r[0].trim(), swaps = r[8].trim();
 			for (String name : r[1].split(",")) {
 				Block b = BuiltInRegistries.BLOCK.getOptional(Identifier.withDefaultNamespace(name.trim())).orElse(null);

@@ -65,12 +65,27 @@ public final class Interiors {
 	/** Something to look at in a room; map, a wall map that opens the Town Map. */
 	public record Act(double x0, double z0, double x1, double z1, List<String> lines, boolean map, boolean pc) {}
 
+	/** An item ball lying in a room (the forest's): its key in field_items.tsv, and where it lies. */
+	public record Ball(String key, double x, double z) {}
+
+	/**
+	 * A room. A big one built in Minecraft's own blocks (the forest, from John's schematic) has schem (its blocks, a
+	 * resource beside rooms.json), base (how far below the floor the schematic's bottom goes), lights (faint unseen
+	 * lamps, for a dark one), tile (how many blocks one of the games' steps is, across and down: its trainers see
+	 * that many steps straight ahead) and balls.
+	 */
 	public record Room(String id, int ox, int oy, int oz, double w, double d, double h, String name, String floor, String place, double sx, double sz,
 			float syaw, double ex, double ez, float eyaw, double camX, double camZ, double camDist, int[] cells, List<Warp> warps, List<Person> people,
-			List<Act> acts, List<double[]> grass, List<double[]> pools, List<double[]> panes, List<double[]> clocks) {
+			List<Act> acts, List<double[]> grass, List<double[]> pools, List<double[]> panes, List<double[]> clocks, String schem, int base, boolean dark,
+			double[] tile, List<Ball> balls, List<double[]> lights) {
 		/** Big enough to walk about in (the forest): the camera follows you, as it does outside. */
 		public boolean big() {
 			return w > 26 || d > 26;
+		}
+
+		/** How far along x it reaches from its origin (64 blocks for a building's, more for the forest). */
+		public double reach() {
+			return Math.max(48, w + 16);
 		}
 
 		public double cx() {
@@ -97,6 +112,12 @@ public final class Interiors {
 
 	public static final Map<String, Arena> ARENAS = new LinkedHashMap<>();
 
+	/**
+	 * The rooms built in Minecraft's own blocks, each a file of its own beside rooms.json (tools/forest.py). (Before DATA:
+	 * the rooms are read as it's loaded.)
+	 */
+	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json"};
+
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */
 	public static final int STATES = DATA == null ? 1 : DATA.get("states").getAsInt();
@@ -113,11 +134,15 @@ public final class Interiors {
 	}
 
 	private static JsonObject load() {
-		try (InputStream in = Interiors.class.getResourceAsStream("/retromon/interiors/rooms.json")) {
+		return json("/retromon/interiors/rooms.json");
+	}
+
+	private static JsonObject json(String path) {
+		try (InputStream in = Interiors.class.getResourceAsStream(path)) {
 			if (in == null) return null;
 			return JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
 		} catch (Exception e) {
-			Retromon.LOG.warn("Couldn't read the interiors", e);
+			Retromon.LOG.warn("Couldn't read the interiors ({})", path, e);
 			return null;
 		}
 	}
@@ -158,8 +183,20 @@ public final class Interiors {
 			}
 			SHAPES[i] = s.optimize();
 		}
-		for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("rooms").entrySet()) {
-			JsonObject r = e.getValue().getAsJsonObject();
+		for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("rooms").entrySet()) room(e.getKey(), e.getValue().getAsJsonObject());
+		StringBuilder more = new StringBuilder();
+		for (String path : BLOCK_ROOMS) {
+			JsonObject extra = json(path);
+			if (extra == null) continue;
+			for (Map.Entry<String, JsonElement> e : extra.getAsJsonObject("rooms").entrySet()) room(e.getKey(), e.getValue().getAsJsonObject());
+			more.append('-').append(extra.toString().length());
+		}
+		readRest(more.toString());
+	}
+
+	/** One room from its JSON (rooms.json's, or a file of its own). */
+	private static void room(String id, JsonObject r) {
+		{
 			JsonArray o = r.getAsJsonArray("origin");
 			JsonObject sp = r.getAsJsonObject("spawn"), en = r.has("entry") && r.get("entry").isJsonObject() ? r.getAsJsonObject("entry") : sp,
 					cam = r.getAsJsonObject("cam");
@@ -207,12 +244,24 @@ public final class Interiors {
 				JsonArray g = ge.getAsJsonArray();
 				grass.add(new double[] {g.get(0).getAsDouble(), g.get(1).getAsDouble(), g.get(2).getAsDouble(), g.get(3).getAsDouble()});
 			}
-			Room room = new Room(e.getKey(), o.get(0).getAsInt(), o.get(1).getAsInt(), o.get(2).getAsInt(), num(r, "W", 16), num(r, "D", 14), num(r, "H", 4),
+			List<Ball> balls = new ArrayList<>();
+			if (r.has("items")) for (JsonElement be : r.getAsJsonArray("items")) {
+				JsonObject b = be.getAsJsonObject();
+				balls.add(new Ball(b.get("key").getAsString(), num(b, "x", 0), num(b, "z", 0)));
+			}
+			double[] tile = null;
+			if (r.has("tile") && r.get("tile").isJsonArray()) tile = new double[] {r.getAsJsonArray("tile").get(0).getAsDouble(), r.getAsJsonArray("tile").get(1).getAsDouble()};
+			Room room = new Room(id, o.get(0).getAsInt(), o.get(1).getAsInt(), o.get(2).getAsInt(), num(r, "W", 16), num(r, "D", 14), num(r, "H", 4),
 					r.get("name").getAsString(), r.get("floor").getAsString(), r.get("place").getAsString(), num(sp, "x", 0), num(sp, "z", 0),
 					(float) num(sp, "yaw", 0), num(en, "x", 0), num(en, "z", 0), (float) num(en, "yaw", 180), num(cam, "x", 8), num(cam, "z", 7),
-					num(cam, "dist", 30), cells, warps, people, acts, grass, rows(r, "pools"), rows(r, "panes"), rows(r, "clocks"));
+					num(cam, "dist", 30), cells, warps, people, acts, grass, rows(r, "pools"), rows(r, "panes"), rows(r, "clocks"),
+					r.has("schem") && !r.get("schem").isJsonNull() ? r.get("schem").getAsString() : null, (int) num(r, "base", 0),
+					r.has("dark") && r.get("dark").getAsBoolean(), tile, balls, rows(r, "lights"));
 			ROOMS.put(room.id(), room);
 		}
+	}
+
+	private static void readRest(String more) {
 		if (DATA.has("arenas")) for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("arenas").entrySet()) {
 			JsonObject a = e.getValue().getAsJsonObject();
 			JsonArray c = a.getAsJsonArray("cells");
@@ -243,7 +292,7 @@ public final class Interiors {
 			startZ = num(st, "z", startZ);
 			startYaw = (float) num(st, "yaw", 0);
 		}
-		version = DATA.get("version").getAsString() + "-" + STATES + "-" + DATA.toString().length();
+		version = DATA.get("version").getAsString() + "-" + STATES + "-" + DATA.toString().length() + more;
 		// The people inside, as the game's people (their skin and what they say), unless the games had them already.
 		for (Room r : ROOMS.values())
 			for (Person p : r.people()) {
@@ -271,8 +320,31 @@ public final class Interiors {
 
 	/** The room at a spot in the interiors (each has 64 blocks of its own along x). */
 	public static Room roomAt(double x) {
-		for (Room r : ROOMS.values()) if (x >= r.ox() - 16 && x < r.ox() + 48) return r;
+		for (Room r : ROOMS.values()) if (x >= r.ox() - 16 && x < r.ox() + r.reach()) return r;
 		return null;
+	}
+
+	/** Whether someone's in a room big enough to walk about in (the forest): its grass, its trainers' eyes, as outside. */
+	public static boolean walkabout(Entity e) {
+		Room r = roomOf(e);
+		return r != null && r.big();
+	}
+
+	/** How many blocks one of the games' steps is in the room someone's in, across (x) and down (z); or null. */
+	public static double[] tileOf(Entity e) {
+		Room r = roomOf(e);
+		return r == null ? null : r.tile();
+	}
+
+	/** Whether someone's in a room that's always night (the forest). */
+	public static boolean dark(Entity e) {
+		Room r = roomOf(e);
+		return r != null && r.dark();
+	}
+
+	/** The box round a room, its black ground and all (everyone in it, and what's built). */
+	private static AABB around(Room r) {
+		return new AABB(r.ox() - 8, r.oy() - 8, r.oz() - 8, r.ox() + Math.max(40, r.w() + 8), r.oy() + Math.max(8, r.h() + 2), r.oz() + Math.max(40, r.d() + 8));
 	}
 
 	public static Room roomOf(Entity e) {
@@ -344,6 +416,16 @@ public final class Interiors {
 
 	/** Whether a room isn't there (its first, middle and last pieces aren't the room's blocks). */
 	private static boolean missing(ServerLevel level, Room r) {
+		if (r.schem() != null) {
+			// The forest: its ground (the schematic's second layer, under the floor, is ground all over).
+			int y = r.oy() - 1;
+			for (int[] xz : new int[][] {{1, 1}, {(int) r.w() / 2, (int) r.d() / 2}, {(int) r.w() - 2, (int) r.d() - 2}}) {
+				BlockPos at = new BlockPos(r.ox() + xz[0], y, r.oz() + xz[1]);
+				if (!level.hasChunkAt(at)) level.getChunk(at);
+				if (level.getBlockState(at).isAir()) return true;
+			}
+			return false;
+		}
 		int[] c = r.cells();
 		int n = c.length / 4;
 		if (n == 0) return false;
@@ -374,11 +456,12 @@ public final class Interiors {
 		BlockState air = Blocks.AIR.defaultBlockState();
 		BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
 		// (Cleared well past the room, so a bigger room it was before leaves nothing behind.)
-		for (int x = r.ox() - 8; x <= r.ox() + 40; x++)
-			for (int y = r.oy() - 7; y <= r.oy() + 8; y++)
-				for (int z = r.oz() - 8; z <= r.oz() + 40; z++) {
+		int xEnd = r.ox() + Math.max(40, W + 8), zEnd = r.oz() + Math.max(40, D + 8), yEnd = r.oy() + Math.max(8, (int) Math.ceil(r.h()) + 2);
+		for (int x = r.ox() - 8; x <= xEnd; x++)
+			for (int y = r.oy() - 7; y <= yEnd; y++)
+				for (int z = r.oz() - 8; z <= zEnd; z++) {
 					at.set(x, y, z);
-					if (!level.getBlockState(at).isAir()) level.setBlock(at, air, Block.UPDATE_CLIENTS);
+					if (!level.getBlockState(at).isAir()) level.setBlock(at, air, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
 				}
 		// Black ground far below, so all round the room is black (whatever the sky or the shaders do).
 		BlockState black = Blocks.BLACK_CONCRETE.defaultBlockState();
@@ -388,17 +471,108 @@ public final class Interiors {
 		int[] c = r.cells();
 		for (int i = 0; i + 3 < c.length; i += 4)
 			level.setBlock(at.set(r.ox() + c[i], r.oy() + c[i + 1], r.oz() + c[i + 2]), prop.setValue(Prop.M, Math.min(STATES - 1, c[i + 3])), Block.UPDATE_CLIENTS);
-		// Light: unseen lamps over the room, so it's bright inside by day and night.
-		BlockState light = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 15);
-		for (int x = r.ox() + 2; x < r.ox() + W; x += 4)
-			for (int z = r.oz() + 2; z < r.oz() + D; z += 4) {
-				at.set(x, r.oy() + 3, z);
-				if (level.getBlockState(at).isAir()) level.setBlock(at, light, Block.UPDATE_CLIENTS);
+		// The forest: John's own blocks, as he built them (tools/forest.py), the floor where you stand.
+		if (r.schem() != null) placeBlocks(level, r);
+		if (r.dark()) {
+			// Always night in there: no lamps, only faint unseen ones over the open ground (moonlight you can see by).
+			BlockState moon = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, MOONLIGHT);
+			for (double[] l : r.lights()) {
+				at.set(r.ox() + (int) l[0], r.oy() + 1, r.oz() + (int) l[1]);
+				if (level.getBlockState(at).isAir()) level.setBlock(at, moon, Block.UPDATE_CLIENTS);
 			}
-		// The people inside.
-		AABB box = new AABB(r.ox() - 8, r.oy() - 8, r.oz() - 8, r.ox() + 40, r.oy() + 8, r.oz() + 40);
+		} else {
+			// Light: unseen lamps over the room, so it's bright inside by day and night.
+			BlockState light = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 15);
+			for (int x = r.ox() + 2; x < r.ox() + W; x += 4)
+				for (int z = r.oz() + 2; z < r.oz() + D; z += 4) {
+					at.set(x, r.oy() + 3, z);
+					if (level.getBlockState(at).isAir()) level.setBlock(at, light, Block.UPDATE_CLIENTS);
+				}
+		}
+		// The people inside, and the item balls nobody's picked up.
+		AABB box = around(r);
 		for (Npc n : level.getEntitiesOfClass(Npc.class, box, n -> true)) n.discard();
+		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> w.key().startsWith("item:"))) w.discard();
 		for (Person p : r.people()) if (wanted(level, r, p)) put(level, r, p);
+		for (Ball b : r.balls()) if (!Game.takenByAnyone("item:" + b.key())) ball(level, r, b);
+	}
+
+	/** How bright the forest's moonlight is (a light level). */
+	private static final int MOONLIGHT = 6;
+
+	private static void ball(ServerLevel level, Room r, Ball b) {
+		Game.placeMon(level, "poke_ball", "item:" + b.key(), r.ox() + b.x(), r.oy(), r.oz() + b.z(), 0F);
+	}
+
+	/**
+	 * Puts a room's own blocks in place (the forest's, from its .bin: "RMF1", the size, the palette of block states,
+	 * then runs of (how many, which) over y, then z, then x), the schematic's bottom base blocks below the floor.
+	 */
+	private static void placeBlocks(ServerLevel level, Room r) {
+		try (InputStream raw = Interiors.class.getResourceAsStream("/retromon/interiors/" + r.schem())) {
+			if (raw == null) {
+				Retromon.LOG.warn("Retromon: {} has no blocks ({})", r.id(), r.schem());
+				return;
+			}
+			java.io.DataInputStream in = new java.io.DataInputStream(new java.io.BufferedInputStream(new java.util.zip.GZIPInputStream(raw)));
+			byte[] magic = new byte[4];
+			in.readFully(magic);
+			if (!new String(magic, StandardCharsets.US_ASCII).equals("RMF1")) throw new IllegalStateException("not a room's blocks: " + r.schem());
+			int w = in.readShort(), h = in.readShort(), l = in.readShort(), n = in.readShort();
+			BlockState[] palette = new BlockState[n];
+			for (int i = 0; i < n; i++) {
+				byte[] b = new byte[in.readShort()];
+				in.readFully(b);
+				palette[i] = state(new String(b, StandardCharsets.UTF_8));
+			}
+			BlockPos.MutableBlockPos at = new BlockPos.MutableBlockPos();
+			long total = (long) w * h * l, i = 0;
+			int placed = 0;
+			while (i < total) {
+				int count = varint(in), which = varint(in);
+				BlockState s = palette[which];
+				for (int k = 0; k < count; k++, i++) {
+					if (s == null || s.isAir()) continue;
+					int x = (int) (i % w), z = (int) ((i / w) % l), y = (int) (i / ((long) w * l));
+					level.setBlock(at.set(r.ox() + x, r.oy() + r.base() + y, r.oz() + z), s, Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+					placed++;
+				}
+			}
+			Retromon.LOG.info("Retromon: {} built ({} blocks)", r.id(), placed);
+		} catch (Exception e) {
+			Retromon.LOG.error("Retromon: couldn't put {}'s blocks in place", r.id(), e);
+		}
+	}
+
+	private static int varint(java.io.DataInputStream in) throws java.io.IOException {
+		int v = 0, s = 0;
+		while (true) {
+			int b = in.readUnsignedByte();
+			v |= (b & 0x7F) << s;
+			if ((b & 0x80) == 0) return v;
+			s += 7;
+		}
+	}
+
+	/** A block state from its name ("minecraft:birch_leaves[distance=1,persistent=true]"); air for one that doesn't exist. */
+	private static BlockState state(String text) {
+		int br = text.indexOf('[');
+		String name = br < 0 ? text : text.substring(0, br);
+		Block block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(net.minecraft.resources.Identifier.parse(name)).orElse(Blocks.AIR);
+		BlockState s = block.defaultBlockState();
+		if (br >= 0 && text.endsWith("]")) {
+			for (String kv : text.substring(br + 1, text.length() - 1).split(",")) {
+				int eq = kv.indexOf('=');
+				if (eq < 0) continue;
+				net.minecraft.world.level.block.state.properties.Property<?> prop = block.getStateDefinition().getProperty(kv.substring(0, eq).trim());
+				if (prop != null) s = with(s, prop, kv.substring(eq + 1).trim());
+			}
+		}
+		return s;
+	}
+
+	private static <T extends Comparable<T>> BlockState with(BlockState s, net.minecraft.world.level.block.state.properties.Property<T> prop, String value) {
+		return prop.getValue(value).map(v -> s.setValue(prop, v)).orElse(s);
 	}
 
 	/** Puts someone in a room in their spot. */
@@ -458,7 +632,21 @@ public final class Interiors {
 				CHOSEN.put(r.id() + "/" + g.getKey(), next.key());
 			}
 		}
-		AABB box = new AABB(r.ox() - 8, r.oy() - 8, r.oz() - 8, r.ox() + 40, r.oy() + 8, r.oz() + 40);
+		AABB box = around(r);
+		// The item balls: one you've picked up stays gone; one nobody's picked up is there (a new game in the same world).
+		if (!r.balls().isEmpty()) {
+			PlayerData d = Game.data(comer);
+			List<WorldMon> balls = level.getEntitiesOfClass(WorldMon.class, box, w -> w.key().startsWith("item:"));
+			for (Ball b : r.balls()) {
+				String k = "item:" + b.key();
+				boolean mine = d.statics.contains(k), there = false;
+				for (WorldMon w : balls) if (k.equals(w.key())) {
+					if (mine || there) w.discard();
+					else there = true;
+				}
+				if (!mine && !there && (alone || !Game.takenByAnyone(k))) ball(level, r, b);
+			}
+		}
 		List<Npc> here = level.getEntitiesOfClass(Npc.class, box, n -> true);
 		for (Person p : r.people()) {
 			if (p.group() == null && p.from() < 0) continue;

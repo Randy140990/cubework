@@ -393,6 +393,16 @@ public final class Adventure {
 				net.minecraft.core.BlockPos at = net.minecraft.core.BlockPos.containing(mc.player.getX() + look.x * d, mc.player.getY() + dy + 0.2,
 						mc.player.getZ() + look.z * d);
 				var state = mc.level.getBlockState(at);
+				if (state.is(net.minecraft.world.level.block.Blocks.CHERRY_LEAVES) || state.is(net.minecraft.world.level.block.Blocks.DARK_OAK_FENCE)) {
+					// A little tree (Route 2's cherry trees): the server says whether it can be CUT down.
+					CompoundTag t = new CompoundTag();
+					t.putInt("x", at.getX());
+					t.putInt("y", at.getY());
+					t.putInt("z", at.getZ());
+					t.putBoolean("tree", true);
+					ClientPlayNetworking.send(new Net.Act("read", t));
+					return;
+				}
 				if (state.is(com.insidethecube.retromon.Retromon.MAILBOX)) {
 					// A house's mailbox: whose house it is.
 					Sounds.press();

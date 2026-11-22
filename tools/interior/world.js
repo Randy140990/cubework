@@ -921,6 +921,9 @@ if (typeof AREATEX !== "undefined") {
     TEXDEF["area_" + set + "_top_w"] = turned(set + "_tiles", true); MATDEF["area_" + set + "_top_w"] = { tex: "area_" + set + "_top_w", per: 1 };
   }
 }
+// A trainer's sight in the forest, marked on the ground: a faint yellow strip.
+TEXDEF.sightMark = [16, 16, (P, r) => { P.fill(hx("#F2D04A"), 0.03, r); }];
+MATDEF.sightMark = { tex: "sightMark", per: 1, alpha: 0.32 };
 // The sea lantern in a lamp's head, lit.
 TEXDEF.seaLantern = [16, 16, (P, r) => { P.fill(hx("#DDEFF2"), 0.05, r); P.rect(0, 0, 16, 1, hx("#B9D6DC")); P.rect(0, 15, 16, 1, hx("#B9D6DC")); P.rect(0, 0, 1, 16, hx("#B9D6DC")); P.rect(15, 0, 1, 16, hx("#B9D6DC")); P.rect(5, 5, 6, 6, hx("#F6FCFD")); }];
 MATDEF.seaLantern = { tex: "seaLantern", per: 1, glow: 0.9 };

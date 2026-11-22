@@ -1025,6 +1025,10 @@ public final class Game {
 			if (!inside && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
 			if (!inside && s.getTickCount() % 2 == 0 && !BUSY.containsKey(id)) gymShut(p);
 			if (!inside && !build && !Battles.in(p)) keepAshore(p);
+			// Route 2's CUT trees: no way past them until they're cut.
+			if (!inside && !build && !Battles.in(p)) CutTrees.keepOff(p);
+			// (The forest's a room you walk about in as outside: its grass and its trainers' eyes apply.)
+			boolean walkabout = inside && Interiors.walkabout(p);
 			if (s.getTickCount() % 5 == 0) story(p);
 			if (s.getTickCount() % 40 == 0) moonlight(p);
 			follower(p);
@@ -1033,7 +1037,7 @@ public final class Game {
 			if (!build && s.getTickCount() % 20 == 0 && p.gameMode.getGameModeForPlayer() != GameType.ADVENTURE) p.setGameMode(GameType.ADVENTURE);
 			Vec3 was = WAS_AT.put(id, p.position());
 			if (was != null && was.distanceToSqr(p.position().x, was.y, p.position().z) > 0.0004) WALKING.put(id, s.getTickCount());
-			if (Battles.in(p) || BUSY.containsKey(id) || inside || AFTER_BATTLE.containsKey(id)) {
+			if (Battles.in(p) || BUSY.containsKey(id) || inside && !walkabout || AFTER_BATTLE.containsKey(id)) {
 				LAST.put(id, p.blockPosition());
 				continue;
 			}
@@ -1369,6 +1373,13 @@ public final class Game {
 	/** A: reading a sign (or a shelf standing in for one): the words of the games' sign nearest that spot. */
 	public static void read(ServerPlayer p, CompoundTag t) {
 		int bx = t.getIntOr("x", p.getBlockX()), bz = t.getIntOr("z", p.getBlockZ());
+		if (t.getBooleanOr("tree", false)) {
+			// A little tree (Route 2's cherry trees): one that can be CUT down says so; any other tree says nothing.
+			if (Interiors.in(p)) return;
+			CutTrees.Tree tree = CutTrees.at(bx, t.getIntOr("y", p.getBlockY()), bz);
+			if (tree != null) CutTrees.use(p, tree);
+			return;
+		}
 		if (t.getBooleanOr("mailbox", false)) {
 			// A house's mailbox, as FireRed's and HeartGold's: whose house it is.
 			Mailbox.Spot sp = Mailbox.at(bx, t.getIntOr("y", p.getBlockY()), bz);
@@ -1441,7 +1452,8 @@ public final class Game {
 	/** At night, an unseen night vision (no icon, no swirls) so the screen can lift the dark to a moonlit blue. */
 	private static void moonlight(ServerPlayer p) {
 		long t = Math.floorMod(p.level().getDayTime(), 24000L);
-		boolean night = t >= 12300 && t < 23700 && NIGHTS.getOrDefault(p.getUUID(), 1) > 0;
+		// (Viridian Forest is always night under its trees.)
+		boolean night = (t >= 12300 && t < 23700 || Interiors.dark(p)) && NIGHTS.getOrDefault(p.getUUID(), 1) > 0;
 		var nv = p.getEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
 		boolean ours = nv != null && nv.getAmplifier() == 7;
 		if (night && (nv == null || ours && nv.getDuration() < 400)) {
@@ -2114,6 +2126,18 @@ public final class Game {
 	static boolean spots(Npc n, ServerPlayer p, Trainers.Trainer t) {
 		double dx = p.getX() - n.getX(), dz = p.getZ() - n.getZ(), dy = p.getY() - n.getY();
 		if (Math.abs(dy) > 2.5) return false;
+		// In the forest (laid out step for step on FireRed's), as FireRed has it: they see straight ahead, as many of
+		// its steps as their sight, in a line as wide as a step, and nothing to the side or behind.
+		double[] tile = Interiors.tileOf(n);
+		if (tile != null) {
+			double yaw = Math.toRadians(n.facing());
+			double fx = -Math.sin(yaw), fz = Math.cos(yaw);
+			double ahead = dx * fx + dz * fz, side = Math.abs(dx * fz - dz * fx);
+			boolean alongX = Math.abs(fx) > Math.abs(fz);
+			double step = alongX ? tile[0] : tile[1], width = alongX ? tile[1] : tile[0];
+			if (ahead < 0.3 || ahead > t.sight() * step + 0.6 || side > width / 2 + 0.45) return false;
+			return n.hasLineOfSight(p);
+		}
 		double dist = Math.sqrt(dx * dx + dz * dz), reach = Math.max(5, Math.min(10, 3 + t.sight() * 1.5));
 		if (dist > reach) return false;
 		if (dist > 2.2) {
@@ -2408,7 +2432,7 @@ public final class Game {
 		dialogue(p, n, "battle", fill(p, t.before().isEmpty() ? List.of(t.title() + " wants to battle!") : t.before()), extra);
 	}
 
-	private static void dialogue(ServerPlayer p, Npc n, String mode, List<String> lines) {
+	static void dialogue(ServerPlayer p, Npc n, String mode, List<String> lines) {
 		dialogue(p, n, mode, lines, new CompoundTag());
 	}
 
@@ -3083,6 +3107,13 @@ public final class Game {
 	 */
 	private static final Object[][] SPOTS = {{"pallet_town_p1", -809, 686}, {"pallet_town_p2", -785, 704}, {"pallet_town_p3", -780, 701}};
 	private static final String SPOTS_DONE = "spot4:";
+	/**
+	 * Item balls that lie somewhere on John's map other than where the games' grid puts them (FireRed's, on routes Red
+	 * and Blue had nothing there), each put down once per save. Route 2's PARLYZ HEAL: in the east lane, past the
+	 * northern CUT tree, between its flowers (FireRed's spot, a step right of the top flower), clear of them. Key (its
+	 * row in field_items.tsv), then x, y and z.
+	 */
+	private static final Object[][] ITEM_SPOTS = {{"route_2_parlyz_heal", -779.0, 26.0, 472.0}};
 
 	/** Where someone in SPOTS stands (x, z), or null. */
 	private static int[] spotOf(String key) {
@@ -3172,6 +3203,19 @@ public final class Game {
 			done.add(doneKey);
 			changed = true;
 		}
+		// Those in ITEM_SPOTS: put down once per save, where their part of the map is loaded (unless picked up already).
+		for (Object[] o : ITEM_SPOTS) {
+			String key = (String) o[0], doneKey = "itemspot1:" + key;
+			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
+			if (done.contains(doneKey) || !Trainers.FIELD_ITEMS.containsKey(key)) continue;
+			if (!level.hasChunkAt(BlockPos.containing(x, y, z))) continue;
+			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 8, y - 8, z - 8, x + 8, y + 8, z + 8);
+			boolean there = !level.getEntitiesOfClass(WorldMon.class, box, w -> ("item:" + key).equals(w.key())).isEmpty();
+			if (!there && !takenByAnyone("item:" + key)) placeMon(level, "poke_ball", "item:" + key, x, y, z, 0F);
+			placed.add(doneKey);
+			done.add(doneKey);
+			changed = true;
+		}
 		for (Object[] d : DEFAULTS) {
 			String key = (String) d[0];
 			if (done.contains(key)) continue;
@@ -3244,7 +3288,7 @@ public final class Game {
 		return count;
 	}
 
-	private static boolean takenByAnyone(String key) {
+	static boolean takenByAnyone(String key) {
 		if (server == null) return false;
 		for (ServerPlayer p : server.getPlayerList().getPlayers()) if (data(p).statics.contains(key)) return true;
 		return false;

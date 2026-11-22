@@ -96,6 +96,14 @@ def main():
         box = (int(x0) - 1, int(z0) - 1, int(x1) + 1, int(z1) + 1, place + " Gym")
         add("roof_gym", "jungle_stairs,oak_stairs", box, "-", (y0, str(int(y1) + 1)))
         add("swap", "jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab", box, GYM, (y0, str(int(y1) + 1)))
+    # Viridian Forest (John's, built in the interiors at x 4096, the floor at y 64: tools/forest.py): its shelf signs
+    # as HeartGold's, and its two gatehouses (Route 2's gate, outside) in the gates' colours.
+    fx, fy = 4096, 64
+    forest = lambda x0, z0, x1, z1, note: (fx + x0, z0, fx + x1, z1, note)
+    room = lambda look, blocks, area, swaps="-", ys=("-", "-"): rows.append((look, blocks, area[0], area[1], area[2], area[3], ys[0], ys[1], swaps, area[4], "interiors"))
+    room("sign", "pale_oak_shelf,pale_oak_sign", forest(0, 0, 87, 139, "Viridian Forest"))
+    for x0, z0, x1, z1, note in ((6, 7, 25, 26, "Viridian Forest's north gatehouse"), (38, 122, 57, 139, "Viridian Forest's south gatehouse")):
+        room("swap", GATE_BLOCKS, forest(x0, z0, x1, z1, note), GATE, (str(fy - 2), str(fy + 16)))
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -103,7 +111,8 @@ def main():
                 "# is, a picture four blocks across). roof, roof_green, roof_gym: rows of tiles along the eaves (HeartGold's red, the\n# green houses' green, the Gyms' tan). sign: shelves and standing pale oak\n"
                 "# signs as HeartGold's signs. wood_sign: standing spruce signs as its wooden sign, taller. grass_edge: the grass's tufts\n"
                 "# onto the dripstone round the water. kerb: a grey kerb with the grass rounded onto it, on a path's blocks.\n"
-                "#look\tblocks\tx0\tz0\tx1\tz1\ty0\ty1\tswaps\twhere\n")
+                "# rooms: interiors for a look in the interiors (the forest), not John's world.\n"
+                "#look\tblocks\tx0\tz0\tx1\tz1\ty0\ty1\tswaps\twhere\trooms\n")
         for r in rows:
             f.write("\t".join(str(v) for v in r) + "\n")
     print(len(rows), "rows")
