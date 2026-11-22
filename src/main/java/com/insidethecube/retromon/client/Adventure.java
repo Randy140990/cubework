@@ -349,7 +349,7 @@ public final class Adventure {
 			if (ahead.use() != null) {
 				CompoundTag u = new CompoundTag();
 				u.putString("use", ahead.use());
-				ClientPlayNetworking.send(new Net.Act("use", u));
+				ClientPlayNetworking.send(new Net.Act("room_use", u));
 				return;
 			}
 			// The storage PC in a POKéMON CENTER: BILL's PC.

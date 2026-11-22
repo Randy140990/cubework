@@ -330,10 +330,6 @@ public final class AreaLooks {
 			});
 			base.emitQuads(e, view, pos, state, random, cull);
 			e.popTransform();
-			if (hedge) {
-				TextureAtlasSprite[] v = kinds.get(BuiltInRegistries.BLOCK.getKey(self).withPrefix("block/"));
-				if (v != null) tufts(e, view, pos, v[0]);
-			}
 		};
 	}
 

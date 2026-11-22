@@ -3262,7 +3262,7 @@ public final class Game {
 	private static final Map<UUID, int[]> SURGE_LOCKS = new HashMap<>();
 
 	/** Something in a room the game answers (the client says which): LT.SURGE's trash cans. */
-	public static void use(ServerPlayer p, String use) {
+	public static void roomUse(ServerPlayer p, String use) {
 		Interiors.Room r = Interiors.roomOf(p);
 		if (r == null || Battles.in(p) || BUSY.containsKey(p.getUUID())) return;
 		if (use.startsWith("can:") && r.id().equals("vermilion_gym")) {
