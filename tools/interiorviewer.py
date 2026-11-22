@@ -86,7 +86,7 @@ def main():
     page, out = sys.argv[1], sys.argv[2]
     d = os.path.join(HERE, "interior")
     head = open(os.path.join(d, "head.html")).read()
-    js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "figure.js", "creature.js", "forest_data.js", "cave_data.js", "mtmoon_data.js", "safari_data.js", "cerulean_pool_data.js", "caves48_data.js", "rooms.js", "rooms47.js", "rooms48.js", "rooms50.js", "app.js"))
+    js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "figure.js", "creature.js", "forest_data.js", "cave_data.js", "mtmoon_data.js", "safari_data.js", "cerulean_pool_data.js", "caves48_data.js", "rooms.js", "rooms47.js", "rooms48.js", "rooms50.js", "rooms51.js", "app.js"))
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
             + "const DATA = " + data + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst AREATEX = " + json.dumps(areatex(), separators=(",", ":")) + ";\nconst BOULDERS = " + json.dumps(boulders(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"

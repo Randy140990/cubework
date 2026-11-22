@@ -4387,12 +4387,11 @@ public final class Game {
 			}
 		}
 		// The S.S. ANNE: the sailor at the foot of the gangway (z 612 on): no further.
-		if (p.getX() > -366 && p.getX() < -340 && p.getZ() > 612.2 && p.getZ() < 620 && p.getY() > 28 && p.getY() < 36) {
+		if (d.count("s_s_ticket") <= 0 && p.getX() > -366 && p.getX() < -340 && p.getZ() > 612.2 && p.getZ() < 620 && p.getY() > 28 && p.getY() < 36) {
 			p.teleportTo(p.getX(), p.getY(), 611.6);
 			if (!BLOCKED_SAID.containsKey(p.getUUID())) {
 				BLOCKED_SAID.put(p.getUUID(), 100);
-				message(p, d.count("s_s_ticket") > 0 ? List.of("SAILOR: Welcome aboard! ...Oh, sorry. The S.S.ANNE isn't boarding yet.", "SAILOR: Come back a little later!")
-						: List.of("SAILOR: Welcome to the S.S.ANNE!", "SAILOR: May I see your S.S.TICKET?", "SAILOR: ...Sorry! You need a ticket to come aboard."));
+				message(p, List.of("SAILOR: Welcome to the S.S.ANNE!", "SAILOR: May I see your S.S.TICKET?", "SAILOR: ...Sorry! You need a ticket to come aboard."));
 			}
 		}
 	}
