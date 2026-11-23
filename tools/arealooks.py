@@ -250,8 +250,19 @@ def main():
     round49(add, room)
     round50(add, room)
     # (0.52) Every look all Kanto has, on Route 28 and SILVER CAVE's outside too (west of the Johto Gate, 09:01).
-    for r in [r for r in rows if len(r) == 10 and tuple(r[2:6]) == KANTO[:4]]:
+    kanto_rows = [r for r in rows if len(r) == 10 and tuple(r[2:6]) == KANTO[:4]]
+    for r in kanto_rows:
         rows.append((r[0], r[1]) + ROUTE28[:4] + (r[6], r[7], r[8], ROUTE28[4]))
+    # (0.53) GOLDENROD CITY (Johto, 11:16: "we use the exact same buildings"): every look all Kanto has; and Celadon's
+    # own, its buildings being Celadon's, thirteen blocks lower (its ground's 19, Celadon's 32), but for its RADIO
+    # TOWER (its own, for later; the MAGNET TRAIN station west over the water isn't in the boxes either).
+    for r in kanto_rows:
+        rows.append((r[0], r[1]) + GOLDENROD[:4] + (r[6], r[7], r[8], GOLDENROD[4]))
+    lower = lambda y: y if y in ("-", None) else str(int(y) - 13)
+    for r in [r for r in rows if len(r) == 10 and tuple(r[2:6]) == CELADON[:4]]:
+        blocks = ",".join(b for b in r[1].split(",") if b != "quartz_pillar")
+        for b in GOLD_BOXES:
+            rows.append((r[0], blocks) + b + (lower(r[6]), lower(r[7]), r[8], "Goldenrod City"))
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -730,6 +741,7 @@ def round50(add, room):
     round52b(add, room)
     round52c(add, room)
     round52d(add, room)
+    round53(add, room)
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -964,7 +976,7 @@ def round52b(add, room):
         add("boulder", "dark_oak_fence", b, "prefix:ttrunk", ("25", "29"))
         add("leafy_hedge", "cherry_leaves", b, "azalea", ("25", "31"))
 
-CELADON = (-562, 385, -452, 462, "Celadon City")
+CELADON = (-565, 385, -452, 462, "Celadon City")
 CEL_LAMPS = [(-524, 416), (-483, 417), (-558, 429), (-524, 432), (-483, 432), (-465, 432), (-519, 438), (-508, 438), (-508, 446)]
 
 
@@ -1054,9 +1066,17 @@ def round52d(add, room):
         add("swap", "stone_bricks,smooth_stone_slab,black_concrete", b,
             "block/stone_bricks=drip_rock@4,block/smooth_stone=drip_rock_top|drip_rock@4,block/smooth_stone_slab_side=drip_rock@4,block/black_concrete=cave_dark", ("25", "31"))
     # The statues (10:41): Let's Go's, a stone POKe BALL on a grey pedestal with a gold trim, in place of John's.
+    # (0.53, 11:16) The statues: John's own blocks (his are as Let's Go's), in statue stone, a polished gold trim on
+    # top; the model laid over them before didn't read.
     for x, z in R23_STATUES:
-        add("prop_only", "hopper", (x, z, x, z, "a statue"), "statue", ("27", "27"))
-        add("hide", "cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall", (x - 1, z, x + 1, z, "a statue"), "-", ("26", "28"))
+        b = (x - 1, z, x + 1, z, "a statue")
+        add("swap", "cauldron,hopper,blackstone_wall", b,
+            "block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,"
+            "block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,"
+            "block/blackstone_top=statue_stone_top", ("24", "32"))
+        add("swap", "chiseled_nether_bricks", b, "block/chiseled_nether_bricks=statue_crown", ("24", "32"))
+        add("swap", "anvil,chipped_anvil,damaged_anvil", b,
+            "block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold", ("24", "32"))
     # The INDIGO PLATEAU: its brick clean red brick, its stone base and eaves cream, every copper part polished metal
     # (bronze, and the weathered teal as teal), shining; its doorway dark.
     P = PLATEAU
@@ -1071,6 +1091,84 @@ def round52d(add, room):
     add("swap", "waxed_weathered_copper_trapdoor,weathered_copper_trapdoor", P, "block/weathered_copper_trapdoor=metal_teal_trapdoor", ("24", "46"))
     add("swap", "smooth_quartz_slab,polished_diorite_slab", P, "block/quartz_block_bottom=white_step,block/polished_diorite=white_step", ("25", "35"))
     add("swap", "black_concrete", (-916, 163, -909, 166, "the INDIGO PLATEAU's doorway"), "block/black_concrete=gate_dark", ("33", "40"))
+
+
+# (0.53) The INDIGO PLATEAU's copper golem statues (on their pedestals).
+PLATEAU_GOLEMS = [(-919, 32, 204), (-919, 32, 207), (-919, 36, 194), (-919, 36, 197), (-919, 40, 184), (-919, 40, 187), (-917, 36, 178), (-917, 36, 180),
+                  (-916, 32, 204), (-916, 32, 207), (-916, 36, 194), (-916, 36, 197), (-916, 40, 184), (-916, 40, 187), (-909, 32, 204), (-909, 32, 207),
+                  (-909, 36, 178), (-909, 36, 180), (-909, 36, 194), (-909, 36, 197), (-909, 40, 184), (-909, 40, 187), (-906, 32, 204), (-906, 32, 207),
+                  (-906, 36, 194), (-906, 36, 197), (-906, 40, 184), (-906, 40, 187)]
+CEL_FOUNTAIN = (-546, 420, -536, 430, "Celadon's fountain")
+CEL_POND = (-521, 425, -507, 432, "the pond by the house")
+CEL_BENCHES = [(-548, 422, -545, 428, "a bench by the fountain"), (-537, 422, -534, 428, "a bench by the fountain")]
+
+
+GOLDENROD = (-2215, 615, -2040, 775, "Goldenrod City")
+GOLD_IN = (-2214, 616, -2041, 774, "Goldenrod City")
+# Goldenrod's Celadon buildings: the city east of the water, but for its RADIO TOWER.
+GOLD_BOXES = [(-2165, 630, -2045, 677), (-2165, 695, -2045, 760), (-2165, 678, -2149, 694), (-2129, 678, -2045, 694)]
+GOLD_LAMPS = [(-2152, 695), (-2152, 703), (-2131, 673), (-2109, 670), (-2109, 696), (-2109, 727), (-2109, 733), (-2098, 670), (-2098, 696), (-2098, 727),
+              (-2098, 733), (-2072, 699), (-2072, 730), (-2071, 673), (-2207, 712), (-2178, 712), (-2167, 695), (-2167, 703)]
+GOLD_SIGNS = [(-2188, 694), (-2146, 696), (-2117, 696)]
+
+
+def round53(add, room):
+    """0.53.0 (John's 11:16): see tools/looks53.py."""
+    # The INDIGO PLATEAU: the stone walls along its roof its cream stone; its orange corner pillars a deeper red brick;
+    # on each golem's pedestal a POKé BALL on a gold stand (the golem itself isn't drawn: the look pack).
+    add("swap", "diorite_wall", PLATEAU, "block/diorite=plateau_stone", ("40", "48"))
+    add("swap", "resin_bricks,resin_brick_stairs,resin_brick_slab", (-926, 150, -899, 171, "the INDIGO PLATEAU's corner pillars"),
+        "block/resin_bricks=plateau_brick_dark", ("26", "46"))
+    for x, y, z in PLATEAU_GOLEMS:
+        add("prop", "waxed_weathered_cut_copper_stairs,waxed_cut_copper", (x, z, x, z, "a statue's pedestal"), "trophy", (str(y - 1), str(y - 1)))
+    # The cliffs' stripped jungle wood (Route 22's "brown"), all over the map: the cliffs' rock and earthy tops, as their
+    # mushroom blocks. (Where a place has its own look for it, a gate's, Lavender's timber, that's drawn instead.)
+    add("swap", "stripped_jungle_wood", KANTO, "block/stripped_jungle_log=hill_top@4|drip_rock@4")
+    # Saffron and Celadon: the oak stairs under the windows stone sills; the doors new glass doors.
+    add("swap", "oak_stairs", SAFFRON, "block/oak_planks=sill_saf", ("34", "34"))
+    add("swap", "oak_stairs", CELADON, "block/oak_planks=sill_cel", ("34", "34"))
+    for a in (SAFFRON, CELADON):
+        add("swap", "dark_oak_door", a, "block/dark_oak_door_top=door_glass_top,block/dark_oak_door_bottom=door_glass_bottom", ("33", "40"))
+    # Celadon: the GAME CORNER's sign glossy enamel (its colour kept); the lamps one seamless post; the fountain pale
+    # dressed stone; the benches wooden slats on dark green iron ends; the trims flat; the pond quartz all through.
+    C = CELADON
+    add("swap", "smooth_red_sandstone,smooth_red_sandstone_stairs,smooth_red_sandstone_slab,red_sandstone,red_sandstone_stairs,red_sandstone_slab,"
+        "cut_red_sandstone,cut_red_sandstone_slab", C, "block/red_sandstone_top=gc_symbol,block/red_sandstone=gc_symbol,block/red_sandstone_bottom=gc_symbol,"
+        "block/cut_red_sandstone=gc_symbol", ("33", "60"))
+    import looks52
+    for i, (x, z) in enumerate(CEL_LAMPS):
+        b = (x - 1, z - 1, x + 1, z + 1, "a Celadon lamp")
+        add("swap", "chiseled_tuff_bricks", b, "block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post", ("33", "42"))
+    add("swap", "stone_bricks,stone_brick_stairs,stone_brick_slab,stone_brick_wall", CEL_FOUNTAIN, "block/stone_bricks=cel_fountain_stone", ("33", "43"))
+    for b in CEL_BENCHES:
+        add("swap", "polished_deepslate_slab", b, "block/polished_deepslate=bench_seat_cel", ("33", "34"))
+        add("swap", "spruce_trapdoor", b, "block/spruce_trapdoor=bench_end_cel", ("33", "34"))
+    add("swap", "warped_shelf", C, "block/warped_shelf=cel_trim", ("33", "60"))
+    add("swap", "quartz_bricks,quartz_stairs,dripstone_block", CEL_POND,
+        "block/quartz_bricks=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_side=quartz_clean,block/dripstone_block=quartz_clean", ("27", "33"))
+    # GOLDENROD CITY's own (11:16): its streets red-brown brick paving, its pavements golden tiles, its kerbs pale
+    # stone; its lamps its own (dark bronze posts, seamless, gold caps, amber globes); its fences crisp white with gold
+    # caps, its white columns fluted with gold rings, the gold on its arch polished; its signs as Kanto's; its benches
+    # as Celadon's new ones. (Its buildings are Celadon's: main() gives them Celadon's looks.)
+    G = GOLD_IN
+    g = ("18", "19")
+    add("swap", "terracotta", G, "block/terracotta=gold_road", g)
+    add("swap", "brown_glazed_terracotta", G, "block/brown_glazed_terracotta=gold_pave", g)
+    add("swap", "white_terracotta", G, "block/white_terracotta=gold_kerb", g)
+    add("swap", "pale_oak_fence", G, "block/pale_oak_planks=gold_fence", ("19", "40"))
+    add("swap", "quartz_pillar", G, "block/quartz_pillar=gold_pillar,block/quartz_pillar_top=gold_pillar_top", ("19", "40"))
+    add("swap", "end_rod", G, "block/end_rod=gold_rod", ("19", "40"))
+    add("swap", "gold_block", G, "block/gold_block=gold_trim", ("19", "40"))
+    add("swap", "polished_deepslate_slab", G, "block/polished_deepslate=bench_seat_cel", ("20", "20"))
+    add("swap", "spruce_trapdoor", G, "block/spruce_trapdoor=bench_end_cel", ("20", "21"))
+    for x, z in GOLD_SIGNS:
+        add("sign", "pale_oak_shelf", (x - 1, z - 1, x + 2, z + 1, "a Goldenrod sign"), "-", ("21", "21"))
+    for x, z in GOLD_LAMPS:
+        b = (x - 1, z - 1, x + 1, z + 1, "a Goldenrod lamp")
+        add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern", b,
+            "block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,"
+            "block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!", ("20", "29"))
+        add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ("20", "29"))
 
 
 if __name__ == "__main__":

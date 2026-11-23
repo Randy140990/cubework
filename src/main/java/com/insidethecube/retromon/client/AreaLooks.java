@@ -154,6 +154,7 @@ public final class AreaLooks {
 			for (String t : LEAFY) for (String v : new String[] {"a", "b"}) part(ctx, "leafy_" + t + "_" + v, "block/area/leafy_" + t + "_" + v);
 			part(ctx, "prop_bike", "block/area/prop_bike");
 			part(ctx, "prop_statue", "block/area/prop_statue");
+			part(ctx, "prop_trophy", "block/area/prop_trophy");
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;

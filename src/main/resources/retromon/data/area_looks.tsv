@@ -2006,40 +2006,40 @@ boulder	dark_oak_fence	-786	467	-780	471	25	29	prefix:ttrunk	a tree to CUT
 leafy_hedge	cherry_leaves	-786	467	-780	471	25	31	azalea	a tree to CUT
 boulder	dark_oak_fence	-787	482	-781	487	25	29	prefix:ttrunk	a tree to CUT
 leafy_hedge	cherry_leaves	-787	482	-781	487	25	31	azalea	a tree to CUT
-swap	cyan_terracotta	-562	385	-452	462	31	32	block/cyan_terracotta=tarmac@4	Celadon City
-swap	mud_bricks	-562	385	-452	462	31	32	block/mud_bricks=pave_cel@2	Celadon City
-swap	polished_diorite	-562	385	-452	462	31	32	block/polished_diorite=cel_kerb	Celadon City
-swap	lime_terracotta,green_glazed_terracotta	-562	385	-452	462	32	32	block/lime_terracotta=cel_lime,block/green_glazed_terracotta=cel_tile_band	Celadon City
+swap	cyan_terracotta	-565	385	-452	462	31	32	block/cyan_terracotta=tarmac@4	Celadon City
+swap	mud_bricks	-565	385	-452	462	31	32	block/mud_bricks=pave_cel@2	Celadon City
+swap	polished_diorite	-565	385	-452	462	31	32	block/polished_diorite=cel_kerb	Celadon City
+swap	lime_terracotta,green_glazed_terracotta	-565	385	-452	462	32	32	block/lime_terracotta=cel_lime,block/green_glazed_terracotta=cel_tile_band	Celadon City
 swap	cobblestone	-545	421	-537	429	32	32	block/cobblestone=pool_floor	the fountain's basin
 swap	quartz_bricks,quartz_stairs	-521	425	-507	432	29	33	block/quartz_bricks=pool_edge_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_edge_tile	the pond's rim
-swap	green_terracotta	-562	385	-452	462	33	60	block/green_terracotta=cel_green	Celadon City
-swap	lime_terracotta	-562	385	-452	462	33	60	block/lime_terracotta=cel_lime	Celadon City
-swap	green_concrete	-562	385	-452	462	33	60	block/green_concrete=cel_green_dark	Celadon City
-swap	lime_concrete	-562	385	-452	462	33	60	block/lime_concrete=cel_lime_bright	Celadon City
-swap	white_concrete	-562	385	-452	462	33	60	block/white_concrete=cel_white	Celadon City
-swap	yellow_terracotta	-562	385	-452	462	33	60	block/yellow_terracotta=cel_cream	Celadon City
-swap	light_blue_terracotta	-562	385	-452	462	33	41	block/light_blue_terracotta=cel_floor	Celadon City
-swap	light_blue_terracotta	-562	385	-452	462	42	60	block/light_blue_terracotta=cel_deck	Celadon City
-swap	light_blue_glazed_terracotta	-562	385	-452	462	33	60	block/light_blue_glazed_terracotta=cel_tile_band	Celadon City
-swap	warped_slab,warped_stairs	-562	385	-452	462	33	60	block/warped_planks=cel_roof	Celadon City
-swap	prismarine_brick_slab,prismarine_brick_stairs	-562	385	-452	462	33	60	block/prismarine_bricks=cel_roof_teal	Celadon City
-swap	polished_blackstone_stairs	-562	385	-452	462	33	60	block/polished_blackstone=cel_roof_dark	Celadon City
-swap	stripped_warped_hyphae	-562	385	-452	462	33	60	block/stripped_warped_stem=cel_gc_roof	Celadon City
-swap	cyan_carpet	-562	385	-452	462	33	60	block/cyan_wool=cel_gc_lights	Celadon City
-swap	acacia_planks,acacia_stairs,acacia_slab	-562	385	-452	462	33	60	block/acacia_planks=cel_pilaster	Celadon City
-swap	bamboo_shelf	-562	385	-452	462	33	60	block/bamboo_shelf=cel_store_glass	Celadon City
-swap	stone_bricks,bricks	-562	385	-452	462	33	33	block/stone_bricks=cel_base,block/bricks=cel_base	Celadon City
-swap	smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_block,quartz_slab,quartz_stairs,quartz_pillar	-562	385	-452	462	33	60	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Celadon City
-swap	iron_block	-562	385	-452	462	33	60	block/iron_block=saf_unit	Celadon City
-swap	deepslate_brick_wall	-562	385	-452	462	33	60	block/deepslate_bricks=saf_blind	Celadon City
-swap	bone_block	-562	385	-452	462	33	60	block/bone_block_side=saf_post,block/bone_block_top=saf_post_top	Celadon City
-swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-562	385	-452	462	33	60	block/polished_diorite=house_trim	Celadon City
-swap	smooth_stone_slab	-562	385	-452	462	33	33	block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer	Celadon City
-swap	deepslate_tiles	-562	385	-452	462	33	37	block/deepslate_tiles=gate_dark	Celadon City
-swap	pale_oak_shelf	-562	385	-452	462	33	33	block/pale_oak_shelf=planter_saf_cream	Celadon City
-swap	oak_shelf	-562	385	-452	462	33	33	block/oak_shelf=planter_saf_wood	Celadon City
-swap	warped_shelf	-562	385	-452	462	33	60	block/warped_shelf=green_shelf	Celadon City
-swap	spruce_trapdoor	-562	385	-452	462	33	34	block/spruce_trapdoor=bench_slat	Celadon City
+swap	green_terracotta	-565	385	-452	462	33	60	block/green_terracotta=cel_green	Celadon City
+swap	lime_terracotta	-565	385	-452	462	33	60	block/lime_terracotta=cel_lime	Celadon City
+swap	green_concrete	-565	385	-452	462	33	60	block/green_concrete=cel_green_dark	Celadon City
+swap	lime_concrete	-565	385	-452	462	33	60	block/lime_concrete=cel_lime_bright	Celadon City
+swap	white_concrete	-565	385	-452	462	33	60	block/white_concrete=cel_white	Celadon City
+swap	yellow_terracotta	-565	385	-452	462	33	60	block/yellow_terracotta=cel_cream	Celadon City
+swap	light_blue_terracotta	-565	385	-452	462	33	41	block/light_blue_terracotta=cel_floor	Celadon City
+swap	light_blue_terracotta	-565	385	-452	462	42	60	block/light_blue_terracotta=cel_deck	Celadon City
+swap	light_blue_glazed_terracotta	-565	385	-452	462	33	60	block/light_blue_glazed_terracotta=cel_tile_band	Celadon City
+swap	warped_slab,warped_stairs	-565	385	-452	462	33	60	block/warped_planks=cel_roof	Celadon City
+swap	prismarine_brick_slab,prismarine_brick_stairs	-565	385	-452	462	33	60	block/prismarine_bricks=cel_roof_teal	Celadon City
+swap	polished_blackstone_stairs	-565	385	-452	462	33	60	block/polished_blackstone=cel_roof_dark	Celadon City
+swap	stripped_warped_hyphae	-565	385	-452	462	33	60	block/stripped_warped_stem=cel_gc_roof	Celadon City
+swap	cyan_carpet	-565	385	-452	462	33	60	block/cyan_wool=cel_gc_lights	Celadon City
+swap	acacia_planks,acacia_stairs,acacia_slab	-565	385	-452	462	33	60	block/acacia_planks=cel_pilaster	Celadon City
+swap	bamboo_shelf	-565	385	-452	462	33	60	block/bamboo_shelf=cel_store_glass	Celadon City
+swap	stone_bricks,bricks	-565	385	-452	462	33	33	block/stone_bricks=cel_base,block/bricks=cel_base	Celadon City
+swap	smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_block,quartz_slab,quartz_stairs,quartz_pillar	-565	385	-452	462	33	60	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Celadon City
+swap	iron_block	-565	385	-452	462	33	60	block/iron_block=saf_unit	Celadon City
+swap	deepslate_brick_wall	-565	385	-452	462	33	60	block/deepslate_bricks=saf_blind	Celadon City
+swap	bone_block	-565	385	-452	462	33	60	block/bone_block_side=saf_post,block/bone_block_top=saf_post_top	Celadon City
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-565	385	-452	462	33	60	block/polished_diorite=house_trim	Celadon City
+swap	smooth_stone_slab	-565	385	-452	462	33	33	block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer	Celadon City
+swap	deepslate_tiles	-565	385	-452	462	33	37	block/deepslate_tiles=gate_dark	Celadon City
+swap	pale_oak_shelf	-565	385	-452	462	33	33	block/pale_oak_shelf=planter_saf_cream	Celadon City
+swap	oak_shelf	-565	385	-452	462	33	33	block/oak_shelf=planter_saf_wood	Celadon City
+swap	warped_shelf	-565	385	-452	462	33	60	block/warped_shelf=green_shelf	Celadon City
+swap	spruce_trapdoor	-565	385	-452	462	33	34	block/spruce_trapdoor=bench_slat	Celadon City
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-525	415	-523	417	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_red!	a Celadon lamp
 glass	black_stained_glass_pane	-525	415	-523	417	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-484	416	-482	418	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_orange!	a Celadon lamp
@@ -2067,58 +2067,84 @@ swap	white_concrete,smooth_quartz,white_terracotta,chiseled_quartz_block,light_g
 swap	pink_terracotta	-962	172	-865	507	24	30	block/pink_terracotta=hill_top@4|drip_rock@4	Route 23
 swap	stone_bricks,smooth_stone_slab,black_concrete	-929	258	-922	265	25	31	block/stone_bricks=drip_rock@4,block/smooth_stone=drip_rock_top|drip_rock@4,block/smooth_stone_slab_side=drip_rock@4,block/black_concrete=cave_dark	VICTORY ROAD's mouth
 swap	stone_bricks,smooth_stone_slab,black_concrete	-905	258	-897	265	25	31	block/stone_bricks=drip_rock@4,block/smooth_stone=drip_rock_top|drip_rock@4,block/smooth_stone_slab_side=drip_rock@4,block/black_concrete=cave_dark	VICTORY ROAD's other mouth
-prop_only	hopper	-931	238	-931	238	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-932	238	-930	238	26	28	-	a statue
-prop_only	hopper	-926	238	-926	238	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-927	238	-925	238	26	28	-	a statue
-prop_only	hopper	-899	238	-899	238	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-900	238	-898	238	26	28	-	a statue
-prop_only	hopper	-894	238	-894	238	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-895	238	-893	238	26	28	-	a statue
-prop_only	hopper	-930	265	-930	265	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-931	265	-929	265	26	28	-	a statue
-prop_only	hopper	-921	265	-921	265	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-922	265	-920	265	26	28	-	a statue
-prop_only	hopper	-930	273	-930	273	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-931	273	-929	273	26	28	-	a statue
-prop_only	hopper	-921	273	-921	273	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-922	273	-920	273	26	28	-	a statue
-prop_only	hopper	-930	281	-930	281	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-931	281	-929	281	26	28	-	a statue
-prop_only	hopper	-921	281	-921	281	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-922	281	-920	281	26	28	-	a statue
-prop_only	hopper	-931	308	-931	308	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-932	308	-930	308	26	28	-	a statue
-prop_only	hopper	-920	308	-920	308	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-921	308	-919	308	26	28	-	a statue
-prop_only	hopper	-914	327	-914	327	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-915	327	-913	327	26	28	-	a statue
-prop_only	hopper	-905	327	-905	327	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-906	327	-904	327	26	28	-	a statue
-prop_only	hopper	-898	352	-898	352	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-899	352	-897	352	26	28	-	a statue
-prop_only	hopper	-901	363	-901	363	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-902	363	-900	363	26	28	-	a statue
-prop_only	hopper	-924	392	-924	392	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-925	392	-923	392	26	28	-	a statue
-prop_only	hopper	-912	430	-912	430	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-913	430	-911	430	26	28	-	a statue
-prop_only	hopper	-914	452	-914	452	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-915	452	-913	452	26	28	-	a statue
-prop_only	hopper	-905	452	-905	452	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-906	452	-904	452	26	28	-	a statue
-prop_only	hopper	-920	468	-920	468	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-921	468	-919	468	26	28	-	a statue
-prop_only	hopper	-911	468	-911	468	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-912	468	-910	468	26	28	-	a statue
-prop_only	hopper	-926	488	-926	488	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-927	488	-925	488	26	28	-	a statue
-prop_only	hopper	-917	488	-917	488	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-918	488	-916	488	26	28	-	a statue
-prop_only	hopper	-912	504	-912	504	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-913	504	-911	504	26	28	-	a statue
-prop_only	hopper	-903	504	-903	504	27	27	statue	a statue
-hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-904	504	-902	504	26	28	-	a statue
+swap	cauldron,hopper,blackstone_wall	-932	238	-930	238	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-932	238	-930	238	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-932	238	-930	238	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-927	238	-925	238	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-927	238	-925	238	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-927	238	-925	238	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-900	238	-898	238	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-900	238	-898	238	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-900	238	-898	238	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-895	238	-893	238	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-895	238	-893	238	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-895	238	-893	238	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-931	265	-929	265	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-931	265	-929	265	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-931	265	-929	265	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-922	265	-920	265	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-922	265	-920	265	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-922	265	-920	265	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-931	273	-929	273	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-931	273	-929	273	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-931	273	-929	273	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-922	273	-920	273	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-922	273	-920	273	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-922	273	-920	273	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-931	281	-929	281	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-931	281	-929	281	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-931	281	-929	281	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-922	281	-920	281	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-922	281	-920	281	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-922	281	-920	281	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-932	308	-930	308	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-932	308	-930	308	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-932	308	-930	308	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-921	308	-919	308	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-921	308	-919	308	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-921	308	-919	308	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-915	327	-913	327	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-915	327	-913	327	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-915	327	-913	327	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-906	327	-904	327	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-906	327	-904	327	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-906	327	-904	327	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-899	352	-897	352	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-899	352	-897	352	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-899	352	-897	352	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-902	363	-900	363	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-902	363	-900	363	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-902	363	-900	363	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-925	392	-923	392	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-925	392	-923	392	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-925	392	-923	392	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-913	430	-911	430	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-913	430	-911	430	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-913	430	-911	430	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-915	452	-913	452	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-915	452	-913	452	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-915	452	-913	452	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-906	452	-904	452	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-906	452	-904	452	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-906	452	-904	452	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-921	468	-919	468	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-921	468	-919	468	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-921	468	-919	468	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-912	468	-910	468	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-912	468	-910	468	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-912	468	-910	468	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-927	488	-925	488	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-927	488	-925	488	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-927	488	-925	488	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-918	488	-916	488	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-918	488	-916	488	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-918	488	-916	488	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-913	504	-911	504	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-913	504	-911	504	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-913	504	-911	504	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
+swap	cauldron,hopper,blackstone_wall	-904	504	-902	504	24	32	block/cauldron_side=statue_stone,block/cauldron_top=statue_stone_top,block/cauldron_bottom=statue_stone,block/cauldron_inner=statue_stone,block/hopper_outside=statue_stone,block/hopper_inside=statue_stone,block/hopper_top=statue_stone_top,block/blackstone=statue_stone,block/blackstone_top=statue_stone_top	a statue
+swap	chiseled_nether_bricks	-904	504	-902	504	24	32	block/chiseled_nether_bricks=statue_crown	a statue
+swap	anvil,chipped_anvil,damaged_anvil	-904	504	-902	504	24	32	block/anvil=statue_gold,block/anvil_top=statue_gold,block/chipped_anvil_top=statue_gold,block/damaged_anvil_top=statue_gold	a statue
 swap	bricks,brick_stairs,brick_slab	-927	148	-898	240	30	46	block/bricks=plateau_brick	the INDIGO PLATEAU
 swap	andesite,polished_andesite_stairs,polished_andesite_slab	-926	150	-899	171	30	46	block/andesite=plateau_stone,block/polished_andesite=plateau_stone	the INDIGO PLATEAU's base
 swap	waxed_cut_copper,waxed_cut_copper_stairs,waxed_cut_copper_slab,waxed_copper_block,cut_copper,cut_copper_stairs,copper_block	-927	148	-898	240	24	46	block/cut_copper=metal_bronze,block/copper_block=metal_bronze	the INDIGO PLATEAU
@@ -2127,6 +2153,106 @@ swap	waxed_weathered_copper,waxed_weathered_cut_copper,waxed_weathered_cut_coppe
 swap	waxed_weathered_copper_trapdoor,weathered_copper_trapdoor	-927	148	-898	240	24	46	block/weathered_copper_trapdoor=metal_teal_trapdoor	the INDIGO PLATEAU
 swap	smooth_quartz_slab,polished_diorite_slab	-927	148	-898	240	25	35	block/quartz_block_bottom=white_step,block/polished_diorite=white_step	the INDIGO PLATEAU
 swap	black_concrete	-916	163	-909	166	33	40	block/black_concrete=gate_dark	the INDIGO PLATEAU's doorway
+swap	diorite_wall	-927	148	-898	240	40	48	block/diorite=plateau_stone	the INDIGO PLATEAU
+swap	resin_bricks,resin_brick_stairs,resin_brick_slab	-926	150	-899	171	26	46	block/resin_bricks=plateau_brick_dark	the INDIGO PLATEAU's corner pillars
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	204	-919	204	31	31	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	207	-919	207	31	31	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	194	-919	194	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	197	-919	197	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	184	-919	184	39	39	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	187	-919	187	39	39	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-917	178	-917	178	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-917	180	-917	180	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	204	-916	204	31	31	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	207	-916	207	31	31	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	194	-916	194	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	197	-916	197	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	184	-916	184	39	39	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	187	-916	187	39	39	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	204	-909	204	31	31	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	207	-909	207	31	31	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	178	-909	178	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	180	-909	180	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	194	-909	194	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	197	-909	197	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	184	-909	184	39	39	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	187	-909	187	39	39	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	204	-906	204	31	31	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	207	-906	207	31	31	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	194	-906	194	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	197	-906	197	35	35	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	184	-906	184	39	39	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	187	-906	187	39	39	trophy	a statue's pedestal
+swap	stripped_jungle_wood	-1010	100	60	1060	-	-	block/stripped_jungle_log=hill_top@4|drip_rock@4	Kanto
+swap	oak_stairs	-395	389	-305	459	34	34	block/oak_planks=sill_saf	Saffron City
+swap	oak_stairs	-565	385	-452	462	34	34	block/oak_planks=sill_cel	Celadon City
+swap	dark_oak_door	-395	389	-305	459	33	40	block/dark_oak_door_top=door_glass_top,block/dark_oak_door_bottom=door_glass_bottom	Saffron City
+swap	dark_oak_door	-565	385	-452	462	33	40	block/dark_oak_door_top=door_glass_top,block/dark_oak_door_bottom=door_glass_bottom	Celadon City
+swap	smooth_red_sandstone,smooth_red_sandstone_stairs,smooth_red_sandstone_slab,red_sandstone,red_sandstone_stairs,red_sandstone_slab,cut_red_sandstone,cut_red_sandstone_slab	-565	385	-452	462	33	60	block/red_sandstone_top=gc_symbol,block/red_sandstone=gc_symbol,block/red_sandstone_bottom=gc_symbol,block/cut_red_sandstone=gc_symbol	Celadon City
+swap	chiseled_tuff_bricks	-525	415	-523	417	33	42	block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post	a Celadon lamp
+swap	chiseled_tuff_bricks	-484	416	-482	418	33	42	block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post	a Celadon lamp
+swap	chiseled_tuff_bricks	-559	428	-557	430	33	42	block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post	a Celadon lamp
+swap	chiseled_tuff_bricks	-525	431	-523	433	33	42	block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post	a Celadon lamp
+swap	chiseled_tuff_bricks	-484	431	-482	433	33	42	block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post	a Celadon lamp
+swap	chiseled_tuff_bricks	-466	431	-464	433	33	42	block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post	a Celadon lamp
+swap	chiseled_tuff_bricks	-520	437	-518	439	33	42	block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post	a Celadon lamp
+swap	chiseled_tuff_bricks	-509	437	-507	439	33	42	block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post	a Celadon lamp
+swap	chiseled_tuff_bricks	-509	445	-507	447	33	42	block/chiseled_tuff_bricks=lamp_cel_post,block/chiseled_tuff_bricks_top=lamp_cel_post	a Celadon lamp
+swap	stone_bricks,stone_brick_stairs,stone_brick_slab,stone_brick_wall	-546	420	-536	430	33	43	block/stone_bricks=cel_fountain_stone	Celadon's fountain
+swap	polished_deepslate_slab	-548	422	-545	428	33	34	block/polished_deepslate=bench_seat_cel	a bench by the fountain
+swap	spruce_trapdoor	-548	422	-545	428	33	34	block/spruce_trapdoor=bench_end_cel	a bench by the fountain
+swap	polished_deepslate_slab	-537	422	-534	428	33	34	block/polished_deepslate=bench_seat_cel	a bench by the fountain
+swap	spruce_trapdoor	-537	422	-534	428	33	34	block/spruce_trapdoor=bench_end_cel	a bench by the fountain
+swap	warped_shelf	-565	385	-452	462	33	60	block/warped_shelf=cel_trim	Celadon City
+swap	quartz_bricks,quartz_stairs,dripstone_block	-521	425	-507	432	27	33	block/quartz_bricks=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_side=quartz_clean,block/dripstone_block=quartz_clean	the pond by the house
+swap	terracotta	-2214	616	-2041	774	18	19	block/terracotta=gold_road	Goldenrod City
+swap	brown_glazed_terracotta	-2214	616	-2041	774	18	19	block/brown_glazed_terracotta=gold_pave	Goldenrod City
+swap	white_terracotta	-2214	616	-2041	774	18	19	block/white_terracotta=gold_kerb	Goldenrod City
+swap	pale_oak_fence	-2214	616	-2041	774	19	40	block/pale_oak_planks=gold_fence	Goldenrod City
+swap	quartz_pillar	-2214	616	-2041	774	19	40	block/quartz_pillar=gold_pillar,block/quartz_pillar_top=gold_pillar_top	Goldenrod City
+swap	end_rod	-2214	616	-2041	774	19	40	block/end_rod=gold_rod	Goldenrod City
+swap	gold_block	-2214	616	-2041	774	19	40	block/gold_block=gold_trim	Goldenrod City
+swap	polished_deepslate_slab	-2214	616	-2041	774	20	20	block/polished_deepslate=bench_seat_cel	Goldenrod City
+swap	spruce_trapdoor	-2214	616	-2041	774	20	21	block/spruce_trapdoor=bench_end_cel	Goldenrod City
+sign	pale_oak_shelf	-2189	693	-2186	695	21	21	-	a Goldenrod sign
+sign	pale_oak_shelf	-2147	695	-2144	697	21	21	-	a Goldenrod sign
+sign	pale_oak_shelf	-2118	695	-2115	697	21	21	-	a Goldenrod sign
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2153	694	-2151	696	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2153	694	-2151	696	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2153	702	-2151	704	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2153	702	-2151	704	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2132	672	-2130	674	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2132	672	-2130	674	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2110	669	-2108	671	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2110	669	-2108	671	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2110	695	-2108	697	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2110	695	-2108	697	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2110	726	-2108	728	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2110	726	-2108	728	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2110	732	-2108	734	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2110	732	-2108	734	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2099	669	-2097	671	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2099	669	-2097	671	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2099	695	-2097	697	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2099	695	-2097	697	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2099	726	-2097	728	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2099	726	-2097	728	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2099	732	-2097	734	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2099	732	-2097	734	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2073	698	-2071	700	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2073	698	-2071	700	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2073	729	-2071	731	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2073	729	-2071	731	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2072	672	-2070	674	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2072	672	-2070	674	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2208	711	-2206	713	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2208	711	-2206	713	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2179	711	-2177	713	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2179	711	-2177	713	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2168	694	-2166	696	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2168	694	-2166	696	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2168	702	-2166	704	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
+glass	black_stained_glass_pane	-2168	702	-2166	704	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
 swap	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 swap	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care
@@ -2197,3 +2323,174 @@ leafy	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leave
 swap	brown_mushroom_block	-1210	505	-1011	590	-	-	block/brown_mushroom_block=hill_top@4|drip_rock@4,block/mushroom_block_inside=hill_top@4|drip_rock@4	Route 28
 swap	oak_wood,oak_log	-1210	505	-1011	590	-	-	block/oak_log=tree_bark,block/oak_log_top=tree_bark	Route 28
 swap	lily_pad	-1210	505	-1011	590	-	-	block/lily_pad=lily_lg!	Route 28
+swap	stripped_jungle_wood	-1210	505	-1011	590	-	-	block/stripped_jungle_log=hill_top@4|drip_rock@4	Route 28
+grass_edge	dripstone_block	-2215	615	-2040	775	-	-	-	Goldenrod City
+swap	daylight_detector	-2215	615	-2040	775	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Goldenrod City
+swap	spruce_log,spruce_fence	-2215	615	-2040	775	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	Goldenrod City
+swap	lantern	-2215	615	-2040	775	-	-	block/lantern=garden_light	Goldenrod City
+swap	glowstone	-2215	615	-2040	775	-	-	block/glowstone=glow_hidden	Goldenrod City
+swap	acacia_door,bamboo_door,birch_door,cherry_door,crimson_door,dark_oak_door,jungle_door,mangrove_door,oak_door,pale_oak_door,spruce_door,warped_door,iron_door,copper_door,waxed_copper_door,exposed_copper_door,waxed_exposed_copper_door,weathered_copper_door,waxed_weathered_copper_door,oxidized_copper_door,waxed_oxidized_copper_door	-2215	615	-2040	775	-	-	block/acacia_door_top=door_acacia_top,block/acacia_door_bottom=door_acacia_bottom,block/bamboo_door_top=door_bamboo_top,block/bamboo_door_bottom=door_bamboo_bottom,block/birch_door_top=door_birch_top,block/birch_door_bottom=door_birch_bottom,block/cherry_door_top=door_cherry_top,block/cherry_door_bottom=door_cherry_bottom,block/crimson_door_top=door_crimson_top,block/crimson_door_bottom=door_crimson_bottom,block/dark_oak_door_top=door_dark_oak_top,block/dark_oak_door_bottom=door_dark_oak_bottom,block/jungle_door_top=door_jungle_top,block/jungle_door_bottom=door_jungle_bottom,block/mangrove_door_top=door_mangrove_top,block/mangrove_door_bottom=door_mangrove_bottom,block/oak_door_top=door_oak_top,block/oak_door_bottom=door_oak_bottom,block/pale_oak_door_top=door_pale_oak_top,block/pale_oak_door_bottom=door_pale_oak_bottom,block/spruce_door_top=door_spruce_top,block/spruce_door_bottom=door_spruce_bottom,block/warped_door_top=door_warped_top,block/warped_door_bottom=door_warped_bottom,block/iron_door_top=door_iron_top,block/iron_door_bottom=door_iron_bottom,block/copper_door_top=door_copper_top,block/copper_door_bottom=door_copper_bottom,block/exposed_copper_door_top=door_exposed_copper_top,block/exposed_copper_door_bottom=door_exposed_copper_bottom,block/weathered_copper_door_top=door_weathered_copper_top,block/weathered_copper_door_bottom=door_weathered_copper_bottom,block/oxidized_copper_door_top=door_oxidized_copper_top,block/oxidized_copper_door_bottom=door_oxidized_copper_bottom	Goldenrod City
+swap	stone_button	-2215	615	-2040	775	-	-	block/stone=doorbell	Goldenrod City
+glass	glass,glass_pane,light_blue_stained_glass,light_blue_stained_glass_pane,cyan_stained_glass,cyan_stained_glass_pane,white_stained_glass,white_stained_glass_pane,blue_stained_glass,blue_stained_glass_pane,black_stained_glass,black_stained_glass_pane	-2215	615	-2040	775	-	-	block/glass=glass_clear,block/light_blue_stained_glass=glass_blue,block/cyan_stained_glass=glass_cyan,block/white_stained_glass=glass_white,block/blue_stained_glass=glass_deep,block/black_stained_glass=glass_smoke	Goldenrod City
+swap	ladder	-2215	615	-2040	775	-	-	block/ladder=metal_ladder	Goldenrod City
+swap	daylight_detector	-2215	615	-2040	775	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_inverted_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Goldenrod City
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-2215	615	-2040	775	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chisel,block/chiseled_tuff_bricks_top=lamp_chisel_top,block/gray_wool=lamp_cap	Goldenrod City
+swap	pale_oak_fence	-2215	615	-2040	775	-	-	block/pale_oak_planks=white_fence	Goldenrod City
+swap	dripstone_block	-2215	615	-2040	775	-	-	block/dripstone_block=drip_rock_top|drip_rock@4	Goldenrod City
+swap	jungle_stairs,jungle_slab	-2215	615	-2040	775	-	-	block/jungle_planks=drip_rock_top|drip_rock@4,block/dripstone_block=drip_rock_top|drip_rock@4	Goldenrod City
+swap	mud_brick_stairs	-2215	615	-2040	775	-	-	block/mud_bricks=step_boards_d	Goldenrod City
+swap	mud_brick_slab	-2215	615	-2040	775	-	-	block/mud_bricks=mud_rock@4	Goldenrod City
+swap	mud_brick_wall	-2215	615	-2040	775	-	-	block/mud_bricks=wall_tan	Goldenrod City
+chain	iron_chain	-2215	615	-2040	775	-	-	-	Goldenrod City
+swap	sand	-2215	615	-2040	775	-	-	block/sand=beach_sand@4	Goldenrod City
+grass_onto	sand	-2215	615	-2040	775	-	-	-	Goldenrod City
+grass_onto	moss_block	-2215	615	-2040	775	-	-	grass	Goldenrod City
+leafy	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-2215	615	-2040	775	-	-	-	Goldenrod City
+swap	brown_mushroom_block	-2215	615	-2040	775	-	-	block/brown_mushroom_block=hill_top@4|drip_rock@4,block/mushroom_block_inside=hill_top@4|drip_rock@4	Goldenrod City
+swap	oak_wood,oak_log	-2215	615	-2040	775	-	-	block/oak_log=tree_bark,block/oak_log_top=tree_bark	Goldenrod City
+swap	lily_pad	-2215	615	-2040	775	-	-	block/lily_pad=lily_lg!	Goldenrod City
+swap	stripped_jungle_wood	-2215	615	-2040	775	-	-	block/stripped_jungle_log=hill_top@4|drip_rock@4	Goldenrod City
+swap	cyan_terracotta	-2165	630	-2045	677	18	19	block/cyan_terracotta=tarmac@4	Goldenrod City
+swap	cyan_terracotta	-2165	695	-2045	760	18	19	block/cyan_terracotta=tarmac@4	Goldenrod City
+swap	cyan_terracotta	-2165	678	-2149	694	18	19	block/cyan_terracotta=tarmac@4	Goldenrod City
+swap	cyan_terracotta	-2129	678	-2045	694	18	19	block/cyan_terracotta=tarmac@4	Goldenrod City
+swap	mud_bricks	-2165	630	-2045	677	18	19	block/mud_bricks=pave_cel@2	Goldenrod City
+swap	mud_bricks	-2165	695	-2045	760	18	19	block/mud_bricks=pave_cel@2	Goldenrod City
+swap	mud_bricks	-2165	678	-2149	694	18	19	block/mud_bricks=pave_cel@2	Goldenrod City
+swap	mud_bricks	-2129	678	-2045	694	18	19	block/mud_bricks=pave_cel@2	Goldenrod City
+swap	polished_diorite	-2165	630	-2045	677	18	19	block/polished_diorite=cel_kerb	Goldenrod City
+swap	polished_diorite	-2165	695	-2045	760	18	19	block/polished_diorite=cel_kerb	Goldenrod City
+swap	polished_diorite	-2165	678	-2149	694	18	19	block/polished_diorite=cel_kerb	Goldenrod City
+swap	polished_diorite	-2129	678	-2045	694	18	19	block/polished_diorite=cel_kerb	Goldenrod City
+swap	lime_terracotta,green_glazed_terracotta	-2165	630	-2045	677	19	19	block/lime_terracotta=cel_lime,block/green_glazed_terracotta=cel_tile_band	Goldenrod City
+swap	lime_terracotta,green_glazed_terracotta	-2165	695	-2045	760	19	19	block/lime_terracotta=cel_lime,block/green_glazed_terracotta=cel_tile_band	Goldenrod City
+swap	lime_terracotta,green_glazed_terracotta	-2165	678	-2149	694	19	19	block/lime_terracotta=cel_lime,block/green_glazed_terracotta=cel_tile_band	Goldenrod City
+swap	lime_terracotta,green_glazed_terracotta	-2129	678	-2045	694	19	19	block/lime_terracotta=cel_lime,block/green_glazed_terracotta=cel_tile_band	Goldenrod City
+swap	green_terracotta	-2165	630	-2045	677	20	47	block/green_terracotta=cel_green	Goldenrod City
+swap	green_terracotta	-2165	695	-2045	760	20	47	block/green_terracotta=cel_green	Goldenrod City
+swap	green_terracotta	-2165	678	-2149	694	20	47	block/green_terracotta=cel_green	Goldenrod City
+swap	green_terracotta	-2129	678	-2045	694	20	47	block/green_terracotta=cel_green	Goldenrod City
+swap	lime_terracotta	-2165	630	-2045	677	20	47	block/lime_terracotta=cel_lime	Goldenrod City
+swap	lime_terracotta	-2165	695	-2045	760	20	47	block/lime_terracotta=cel_lime	Goldenrod City
+swap	lime_terracotta	-2165	678	-2149	694	20	47	block/lime_terracotta=cel_lime	Goldenrod City
+swap	lime_terracotta	-2129	678	-2045	694	20	47	block/lime_terracotta=cel_lime	Goldenrod City
+swap	green_concrete	-2165	630	-2045	677	20	47	block/green_concrete=cel_green_dark	Goldenrod City
+swap	green_concrete	-2165	695	-2045	760	20	47	block/green_concrete=cel_green_dark	Goldenrod City
+swap	green_concrete	-2165	678	-2149	694	20	47	block/green_concrete=cel_green_dark	Goldenrod City
+swap	green_concrete	-2129	678	-2045	694	20	47	block/green_concrete=cel_green_dark	Goldenrod City
+swap	lime_concrete	-2165	630	-2045	677	20	47	block/lime_concrete=cel_lime_bright	Goldenrod City
+swap	lime_concrete	-2165	695	-2045	760	20	47	block/lime_concrete=cel_lime_bright	Goldenrod City
+swap	lime_concrete	-2165	678	-2149	694	20	47	block/lime_concrete=cel_lime_bright	Goldenrod City
+swap	lime_concrete	-2129	678	-2045	694	20	47	block/lime_concrete=cel_lime_bright	Goldenrod City
+swap	white_concrete	-2165	630	-2045	677	20	47	block/white_concrete=cel_white	Goldenrod City
+swap	white_concrete	-2165	695	-2045	760	20	47	block/white_concrete=cel_white	Goldenrod City
+swap	white_concrete	-2165	678	-2149	694	20	47	block/white_concrete=cel_white	Goldenrod City
+swap	white_concrete	-2129	678	-2045	694	20	47	block/white_concrete=cel_white	Goldenrod City
+swap	yellow_terracotta	-2165	630	-2045	677	20	47	block/yellow_terracotta=cel_cream	Goldenrod City
+swap	yellow_terracotta	-2165	695	-2045	760	20	47	block/yellow_terracotta=cel_cream	Goldenrod City
+swap	yellow_terracotta	-2165	678	-2149	694	20	47	block/yellow_terracotta=cel_cream	Goldenrod City
+swap	yellow_terracotta	-2129	678	-2045	694	20	47	block/yellow_terracotta=cel_cream	Goldenrod City
+swap	light_blue_terracotta	-2165	630	-2045	677	20	28	block/light_blue_terracotta=cel_floor	Goldenrod City
+swap	light_blue_terracotta	-2165	695	-2045	760	20	28	block/light_blue_terracotta=cel_floor	Goldenrod City
+swap	light_blue_terracotta	-2165	678	-2149	694	20	28	block/light_blue_terracotta=cel_floor	Goldenrod City
+swap	light_blue_terracotta	-2129	678	-2045	694	20	28	block/light_blue_terracotta=cel_floor	Goldenrod City
+swap	light_blue_terracotta	-2165	630	-2045	677	29	47	block/light_blue_terracotta=cel_deck	Goldenrod City
+swap	light_blue_terracotta	-2165	695	-2045	760	29	47	block/light_blue_terracotta=cel_deck	Goldenrod City
+swap	light_blue_terracotta	-2165	678	-2149	694	29	47	block/light_blue_terracotta=cel_deck	Goldenrod City
+swap	light_blue_terracotta	-2129	678	-2045	694	29	47	block/light_blue_terracotta=cel_deck	Goldenrod City
+swap	light_blue_glazed_terracotta	-2165	630	-2045	677	20	47	block/light_blue_glazed_terracotta=cel_tile_band	Goldenrod City
+swap	light_blue_glazed_terracotta	-2165	695	-2045	760	20	47	block/light_blue_glazed_terracotta=cel_tile_band	Goldenrod City
+swap	light_blue_glazed_terracotta	-2165	678	-2149	694	20	47	block/light_blue_glazed_terracotta=cel_tile_band	Goldenrod City
+swap	light_blue_glazed_terracotta	-2129	678	-2045	694	20	47	block/light_blue_glazed_terracotta=cel_tile_band	Goldenrod City
+swap	warped_slab,warped_stairs	-2165	630	-2045	677	20	47	block/warped_planks=cel_roof	Goldenrod City
+swap	warped_slab,warped_stairs	-2165	695	-2045	760	20	47	block/warped_planks=cel_roof	Goldenrod City
+swap	warped_slab,warped_stairs	-2165	678	-2149	694	20	47	block/warped_planks=cel_roof	Goldenrod City
+swap	warped_slab,warped_stairs	-2129	678	-2045	694	20	47	block/warped_planks=cel_roof	Goldenrod City
+swap	prismarine_brick_slab,prismarine_brick_stairs	-2165	630	-2045	677	20	47	block/prismarine_bricks=cel_roof_teal	Goldenrod City
+swap	prismarine_brick_slab,prismarine_brick_stairs	-2165	695	-2045	760	20	47	block/prismarine_bricks=cel_roof_teal	Goldenrod City
+swap	prismarine_brick_slab,prismarine_brick_stairs	-2165	678	-2149	694	20	47	block/prismarine_bricks=cel_roof_teal	Goldenrod City
+swap	prismarine_brick_slab,prismarine_brick_stairs	-2129	678	-2045	694	20	47	block/prismarine_bricks=cel_roof_teal	Goldenrod City
+swap	polished_blackstone_stairs	-2165	630	-2045	677	20	47	block/polished_blackstone=cel_roof_dark	Goldenrod City
+swap	polished_blackstone_stairs	-2165	695	-2045	760	20	47	block/polished_blackstone=cel_roof_dark	Goldenrod City
+swap	polished_blackstone_stairs	-2165	678	-2149	694	20	47	block/polished_blackstone=cel_roof_dark	Goldenrod City
+swap	polished_blackstone_stairs	-2129	678	-2045	694	20	47	block/polished_blackstone=cel_roof_dark	Goldenrod City
+swap	stripped_warped_hyphae	-2165	630	-2045	677	20	47	block/stripped_warped_stem=cel_gc_roof	Goldenrod City
+swap	stripped_warped_hyphae	-2165	695	-2045	760	20	47	block/stripped_warped_stem=cel_gc_roof	Goldenrod City
+swap	stripped_warped_hyphae	-2165	678	-2149	694	20	47	block/stripped_warped_stem=cel_gc_roof	Goldenrod City
+swap	stripped_warped_hyphae	-2129	678	-2045	694	20	47	block/stripped_warped_stem=cel_gc_roof	Goldenrod City
+swap	cyan_carpet	-2165	630	-2045	677	20	47	block/cyan_wool=cel_gc_lights	Goldenrod City
+swap	cyan_carpet	-2165	695	-2045	760	20	47	block/cyan_wool=cel_gc_lights	Goldenrod City
+swap	cyan_carpet	-2165	678	-2149	694	20	47	block/cyan_wool=cel_gc_lights	Goldenrod City
+swap	cyan_carpet	-2129	678	-2045	694	20	47	block/cyan_wool=cel_gc_lights	Goldenrod City
+swap	acacia_planks,acacia_stairs,acacia_slab	-2165	630	-2045	677	20	47	block/acacia_planks=cel_pilaster	Goldenrod City
+swap	acacia_planks,acacia_stairs,acacia_slab	-2165	695	-2045	760	20	47	block/acacia_planks=cel_pilaster	Goldenrod City
+swap	acacia_planks,acacia_stairs,acacia_slab	-2165	678	-2149	694	20	47	block/acacia_planks=cel_pilaster	Goldenrod City
+swap	acacia_planks,acacia_stairs,acacia_slab	-2129	678	-2045	694	20	47	block/acacia_planks=cel_pilaster	Goldenrod City
+swap	bamboo_shelf	-2165	630	-2045	677	20	47	block/bamboo_shelf=cel_store_glass	Goldenrod City
+swap	bamboo_shelf	-2165	695	-2045	760	20	47	block/bamboo_shelf=cel_store_glass	Goldenrod City
+swap	bamboo_shelf	-2165	678	-2149	694	20	47	block/bamboo_shelf=cel_store_glass	Goldenrod City
+swap	bamboo_shelf	-2129	678	-2045	694	20	47	block/bamboo_shelf=cel_store_glass	Goldenrod City
+swap	stone_bricks,bricks	-2165	630	-2045	677	20	20	block/stone_bricks=cel_base,block/bricks=cel_base	Goldenrod City
+swap	stone_bricks,bricks	-2165	695	-2045	760	20	20	block/stone_bricks=cel_base,block/bricks=cel_base	Goldenrod City
+swap	stone_bricks,bricks	-2165	678	-2149	694	20	20	block/stone_bricks=cel_base,block/bricks=cel_base	Goldenrod City
+swap	stone_bricks,bricks	-2129	678	-2045	694	20	20	block/stone_bricks=cel_base,block/bricks=cel_base	Goldenrod City
+swap	smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_block,quartz_slab,quartz_stairs	-2165	630	-2045	677	20	47	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Goldenrod City
+swap	smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_block,quartz_slab,quartz_stairs	-2165	695	-2045	760	20	47	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Goldenrod City
+swap	smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_block,quartz_slab,quartz_stairs	-2165	678	-2149	694	20	47	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Goldenrod City
+swap	smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_block,quartz_slab,quartz_stairs	-2129	678	-2045	694	20	47	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Goldenrod City
+swap	iron_block	-2165	630	-2045	677	20	47	block/iron_block=saf_unit	Goldenrod City
+swap	iron_block	-2165	695	-2045	760	20	47	block/iron_block=saf_unit	Goldenrod City
+swap	iron_block	-2165	678	-2149	694	20	47	block/iron_block=saf_unit	Goldenrod City
+swap	iron_block	-2129	678	-2045	694	20	47	block/iron_block=saf_unit	Goldenrod City
+swap	deepslate_brick_wall	-2165	630	-2045	677	20	47	block/deepslate_bricks=saf_blind	Goldenrod City
+swap	deepslate_brick_wall	-2165	695	-2045	760	20	47	block/deepslate_bricks=saf_blind	Goldenrod City
+swap	deepslate_brick_wall	-2165	678	-2149	694	20	47	block/deepslate_bricks=saf_blind	Goldenrod City
+swap	deepslate_brick_wall	-2129	678	-2045	694	20	47	block/deepslate_bricks=saf_blind	Goldenrod City
+swap	bone_block	-2165	630	-2045	677	20	47	block/bone_block_side=saf_post,block/bone_block_top=saf_post_top	Goldenrod City
+swap	bone_block	-2165	695	-2045	760	20	47	block/bone_block_side=saf_post,block/bone_block_top=saf_post_top	Goldenrod City
+swap	bone_block	-2165	678	-2149	694	20	47	block/bone_block_side=saf_post,block/bone_block_top=saf_post_top	Goldenrod City
+swap	bone_block	-2129	678	-2045	694	20	47	block/bone_block_side=saf_post,block/bone_block_top=saf_post_top	Goldenrod City
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2165	630	-2045	677	20	47	block/polished_diorite=house_trim	Goldenrod City
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2165	695	-2045	760	20	47	block/polished_diorite=house_trim	Goldenrod City
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2165	678	-2149	694	20	47	block/polished_diorite=house_trim	Goldenrod City
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2129	678	-2045	694	20	47	block/polished_diorite=house_trim	Goldenrod City
+swap	smooth_stone_slab	-2165	630	-2045	677	20	20	block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer	Goldenrod City
+swap	smooth_stone_slab	-2165	695	-2045	760	20	20	block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer	Goldenrod City
+swap	smooth_stone_slab	-2165	678	-2149	694	20	20	block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer	Goldenrod City
+swap	smooth_stone_slab	-2129	678	-2045	694	20	20	block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer	Goldenrod City
+swap	deepslate_tiles	-2165	630	-2045	677	20	24	block/deepslate_tiles=gate_dark	Goldenrod City
+swap	deepslate_tiles	-2165	695	-2045	760	20	24	block/deepslate_tiles=gate_dark	Goldenrod City
+swap	deepslate_tiles	-2165	678	-2149	694	20	24	block/deepslate_tiles=gate_dark	Goldenrod City
+swap	deepslate_tiles	-2129	678	-2045	694	20	24	block/deepslate_tiles=gate_dark	Goldenrod City
+swap	pale_oak_shelf	-2165	630	-2045	677	20	20	block/pale_oak_shelf=planter_saf_cream	Goldenrod City
+swap	pale_oak_shelf	-2165	695	-2045	760	20	20	block/pale_oak_shelf=planter_saf_cream	Goldenrod City
+swap	pale_oak_shelf	-2165	678	-2149	694	20	20	block/pale_oak_shelf=planter_saf_cream	Goldenrod City
+swap	pale_oak_shelf	-2129	678	-2045	694	20	20	block/pale_oak_shelf=planter_saf_cream	Goldenrod City
+swap	oak_shelf	-2165	630	-2045	677	20	20	block/oak_shelf=planter_saf_wood	Goldenrod City
+swap	oak_shelf	-2165	695	-2045	760	20	20	block/oak_shelf=planter_saf_wood	Goldenrod City
+swap	oak_shelf	-2165	678	-2149	694	20	20	block/oak_shelf=planter_saf_wood	Goldenrod City
+swap	oak_shelf	-2129	678	-2045	694	20	20	block/oak_shelf=planter_saf_wood	Goldenrod City
+swap	warped_shelf	-2165	630	-2045	677	20	47	block/warped_shelf=green_shelf	Goldenrod City
+swap	warped_shelf	-2165	695	-2045	760	20	47	block/warped_shelf=green_shelf	Goldenrod City
+swap	warped_shelf	-2165	678	-2149	694	20	47	block/warped_shelf=green_shelf	Goldenrod City
+swap	warped_shelf	-2129	678	-2045	694	20	47	block/warped_shelf=green_shelf	Goldenrod City
+swap	spruce_trapdoor	-2165	630	-2045	677	20	21	block/spruce_trapdoor=bench_slat	Goldenrod City
+swap	spruce_trapdoor	-2165	695	-2045	760	20	21	block/spruce_trapdoor=bench_slat	Goldenrod City
+swap	spruce_trapdoor	-2165	678	-2149	694	20	21	block/spruce_trapdoor=bench_slat	Goldenrod City
+swap	spruce_trapdoor	-2129	678	-2045	694	20	21	block/spruce_trapdoor=bench_slat	Goldenrod City
+swap	oak_stairs	-2165	630	-2045	677	21	21	block/oak_planks=sill_cel	Goldenrod City
+swap	oak_stairs	-2165	695	-2045	760	21	21	block/oak_planks=sill_cel	Goldenrod City
+swap	oak_stairs	-2165	678	-2149	694	21	21	block/oak_planks=sill_cel	Goldenrod City
+swap	oak_stairs	-2129	678	-2045	694	21	21	block/oak_planks=sill_cel	Goldenrod City
+swap	dark_oak_door	-2165	630	-2045	677	20	27	block/dark_oak_door_top=door_glass_top,block/dark_oak_door_bottom=door_glass_bottom	Goldenrod City
+swap	dark_oak_door	-2165	695	-2045	760	20	27	block/dark_oak_door_top=door_glass_top,block/dark_oak_door_bottom=door_glass_bottom	Goldenrod City
+swap	dark_oak_door	-2165	678	-2149	694	20	27	block/dark_oak_door_top=door_glass_top,block/dark_oak_door_bottom=door_glass_bottom	Goldenrod City
+swap	dark_oak_door	-2129	678	-2045	694	20	27	block/dark_oak_door_top=door_glass_top,block/dark_oak_door_bottom=door_glass_bottom	Goldenrod City
+swap	smooth_red_sandstone,smooth_red_sandstone_stairs,smooth_red_sandstone_slab,red_sandstone,red_sandstone_stairs,red_sandstone_slab,cut_red_sandstone,cut_red_sandstone_slab	-2165	630	-2045	677	20	47	block/red_sandstone_top=gc_symbol,block/red_sandstone=gc_symbol,block/red_sandstone_bottom=gc_symbol,block/cut_red_sandstone=gc_symbol	Goldenrod City
+swap	smooth_red_sandstone,smooth_red_sandstone_stairs,smooth_red_sandstone_slab,red_sandstone,red_sandstone_stairs,red_sandstone_slab,cut_red_sandstone,cut_red_sandstone_slab	-2165	695	-2045	760	20	47	block/red_sandstone_top=gc_symbol,block/red_sandstone=gc_symbol,block/red_sandstone_bottom=gc_symbol,block/cut_red_sandstone=gc_symbol	Goldenrod City
+swap	smooth_red_sandstone,smooth_red_sandstone_stairs,smooth_red_sandstone_slab,red_sandstone,red_sandstone_stairs,red_sandstone_slab,cut_red_sandstone,cut_red_sandstone_slab	-2165	678	-2149	694	20	47	block/red_sandstone_top=gc_symbol,block/red_sandstone=gc_symbol,block/red_sandstone_bottom=gc_symbol,block/cut_red_sandstone=gc_symbol	Goldenrod City
+swap	smooth_red_sandstone,smooth_red_sandstone_stairs,smooth_red_sandstone_slab,red_sandstone,red_sandstone_stairs,red_sandstone_slab,cut_red_sandstone,cut_red_sandstone_slab	-2129	678	-2045	694	20	47	block/red_sandstone_top=gc_symbol,block/red_sandstone=gc_symbol,block/red_sandstone_bottom=gc_symbol,block/cut_red_sandstone=gc_symbol	Goldenrod City
+swap	warped_shelf	-2165	630	-2045	677	20	47	block/warped_shelf=cel_trim	Goldenrod City
+swap	warped_shelf	-2165	695	-2045	760	20	47	block/warped_shelf=cel_trim	Goldenrod City
+swap	warped_shelf	-2165	678	-2149	694	20	47	block/warped_shelf=cel_trim	Goldenrod City
+swap	warped_shelf	-2129	678	-2045	694	20	47	block/warped_shelf=cel_trim	Goldenrod City
