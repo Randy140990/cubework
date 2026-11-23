@@ -107,6 +107,10 @@ public final class ClientState {
 				Adventure.focus(-1);
 			}
 			case "place" -> {
+				// ((15:17) Where you are now, kept here too: a save's loading page names it, not the last place the
+				// game sent over in full.)
+				String id = t.getStringOr("id", "");
+				if (!id.isEmpty() && data != null) data.place = id;
 				placeName = t.getStringOr("name", "");
 				placeTicks = 0;
 				Postcards.entered(t.getStringOr("id", ""));

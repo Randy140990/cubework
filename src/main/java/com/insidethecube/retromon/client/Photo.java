@@ -15,9 +15,9 @@ import org.lwjgl.glfw.GLFW;
 /**
  * (0.53, for John's thumbnails and adverts: to be taken out later.) PHOTO MODE: the camera leaves you and goes where
  * you send it, with every look of the map as it is in the game, for high shots down a route or a town side on.
- * F6 (or OPTIONS, PHOTO MODE) goes in and out. WASD or the arrows move it across the map, SPACE and CTRL up and
- * down, Q and E turn it round, R and F tilt it, the wheel takes it in and out, Z and X narrow and widen the lens,
- * SHIFT for faster; H hides these words. You stay where you were; everything on screen but the world is put away
+ * F6 (or OPTIONS, PHOTO MODE) goes in and out. WASD or the arrows move it across the map, SPACE and SHIFT up and
+ * down (as Minecraft's flying; 15:17), Q and E turn it round, R and F tilt it, the wheel takes it in and out, Z and X narrow
+ * and widen the lens, CTRL for faster; H hides these words. You stay where you were; everything on screen but the world is put away
  * (F2 takes the picture, as ever). (0.54) You're kept under the camera on the server (unseen), so the map is drawn
  * round where it looks, as far as Minecraft's render distance reaches; on leaving you're back where you were.
  */
@@ -117,14 +117,14 @@ public final class Photo {
 		double dt = last == 0 ? 0.016 : Math.max(0, Math.min(0.1, (now - last) / 1e9));
 		last = now;
 		if (Minecraft.getInstance().screen != null) DOWN.clear();
-		double fast = down(GLFW.GLFW_KEY_LEFT_SHIFT, GLFW.GLFW_KEY_RIGHT_SHIFT) ? 3 : 1;
+		double fast = down(GLFW.GLFW_KEY_LEFT_CONTROL, GLFW.GLFW_KEY_RIGHT_CONTROL) ? 3 : 1;
 		double step = Math.max(6, dist) * 0.7 * dt * fast;
 		double r = Math.toRadians(yaw), fx = -Math.sin(r), fz = Math.cos(r), rx = -Math.sin(r + Math.PI / 2), rz = Math.cos(r + Math.PI / 2);
 		double mf = (down(GLFW.GLFW_KEY_W, GLFW.GLFW_KEY_UP) ? 1 : 0) - (down(GLFW.GLFW_KEY_S, GLFW.GLFW_KEY_DOWN) ? 1 : 0);
 		double ms = (down(GLFW.GLFW_KEY_D, GLFW.GLFW_KEY_RIGHT) ? 1 : 0) - (down(GLFW.GLFW_KEY_A, GLFW.GLFW_KEY_LEFT) ? 1 : 0);
 		tx += (fx * mf + rx * ms) * step;
 		tz += (fz * mf + rz * ms) * step;
-		ty += ((down(GLFW.GLFW_KEY_SPACE, GLFW.GLFW_KEY_PAGE_UP) ? 1 : 0) - (down(GLFW.GLFW_KEY_LEFT_CONTROL, GLFW.GLFW_KEY_RIGHT_CONTROL, GLFW.GLFW_KEY_PAGE_DOWN) ? 1 : 0))
+		ty += ((down(GLFW.GLFW_KEY_SPACE, GLFW.GLFW_KEY_PAGE_UP) ? 1 : 0) - (down(GLFW.GLFW_KEY_LEFT_SHIFT, GLFW.GLFW_KEY_RIGHT_SHIFT, GLFW.GLFW_KEY_PAGE_DOWN) ? 1 : 0))
 				* step * 0.6;
 		yaw += ((down(GLFW.GLFW_KEY_E) ? 1 : 0) - (down(GLFW.GLFW_KEY_Q) ? 1 : 0)) * 55 * dt * fast;
 		pitch = Math.max(2, Math.min(89, pitch + ((down(GLFW.GLFW_KEY_R) ? 1 : 0) - (down(GLFW.GLFW_KEY_F) ? 1 : 0)) * 30 * dt * fast));
@@ -141,7 +141,7 @@ public final class Photo {
 		V.fit(g.guiWidth(), g.guiHeight());
 		V.panel(g, 22, 22, 720, 118);
 		V.text(g, "PHOTO MODE", 44, 34, 22, V.INK, false);
-		V.text(g, "WASD move   SPACE / CTRL up and down   Q / E turn   R / F tilt", 44, 66, 17, V.INK, false);
-		V.text(g, "Wheel in and out   Z / X lens   SHIFT faster   H hide this   F6 leave", 44, 92, 17, V.INK, false);
+		V.text(g, "WASD move   SPACE / SHIFT up and down   Q / E turn   R / F tilt", 44, 66, 17, V.INK, false);
+		V.text(g, "Wheel in and out   Z / X lens   CTRL faster   H hide this   F6 leave", 44, 92, 17, V.INK, false);
 	}
 }
