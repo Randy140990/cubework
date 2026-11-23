@@ -3,3 +3,5 @@ assets/minecraft/models/block/
 assets/minecraft/blockstates/
 assets/minecraft/textures/entity/signs/
 assets/minecraft/textures/entity/chest/
+assets/minecraft/textures/entity/copper_golem/
+assets/minecraft/textures/entity/iron_golem/
