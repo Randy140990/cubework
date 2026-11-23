@@ -15,3 +15,7 @@ azalea_town	azalea_town	charcoal,poke_ball,potion,super_potion,escape_rope,repel
 ecruteak_city	ecruteak_city	poke_ball,great_ball,potion,super_potion,antidote,parlyz_heal,awakening,burn_heal,ice_heal,revive
 olivine_city	olivine_city	great_ball,super_potion,hyper_potion,antidote,parlyz_heal,awakening,ice_heal,super_repel,surf_mail
 blackthorn_city	blackthorn_city	great_ball,ultra_ball,hyper_potion,max_potion,full_heal,revive,max_repel,x_defend,x_attack
+celadon_city_2f_items	celadon_city	great_ball,super_potion,revive,super_repel,antidote,burn_heal,ice_heal,awakening,parlyz_heal
+celadon_city_2f_tms	celadon_city	tm_double_team,tm_reflect,tm_razor_wind,tm_horn_drill,tm_egg_bomb,tm_mega_punch,tm_mega_kick,tm_take_down,tm_submission
+celadon_city_5f_x	celadon_city	x_accuracy,guard_spec,dire_hit,x_attack,x_defend,x_speed,x_special
+celadon_city_5f_vitamins	celadon_city	hp_up,protein,iron,carbos,calcium

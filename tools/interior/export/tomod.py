@@ -43,7 +43,10 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "fighting_dojo": (5760, 64, 0), "saffron_gym": (5824, 64, 0),
           "copycats_house_1f": (5888, 64, 0), "copycats_house_2f": (5952, 64, 0), "mr_psychics_house": (6016, 64, 0),
           # (0.53) SILPH CO.'s eleven floors and its elevator.
-          "silph_co_1f": (7616, 64, 0), "silph_co_2f": (7680, 64, 0), "silph_co_3f": (7744, 64, 0), "silph_co_4f": (7808, 64, 0), "silph_co_5f": (7872, 64, 0), "silph_co_6f": (7936, 64, 0), "silph_co_7f": (8000, 64, 0), "silph_co_8f": (8064, 64, 0), "silph_co_9f": (8128, 64, 0), "silph_co_10f": (8192, 64, 0), "silph_co_11f": (8256, 64, 0), "silph_co_elevator": (6080, 64, 0),}
+          "silph_co_1f": (7616, 64, 0), "silph_co_2f": (7680, 64, 0), "silph_co_3f": (7744, 64, 0), "silph_co_4f": (7808, 64, 0), "silph_co_5f": (7872, 64, 0), "silph_co_6f": (7936, 64, 0), "silph_co_7f": (8000, 64, 0), "silph_co_8f": (8064, 64, 0), "silph_co_9f": (8128, 64, 0), "silph_co_10f": (8192, 64, 0), "silph_co_11f": (8256, 64, 0), "silph_co_elevator": (6080, 64, 0),
+          "game_corner": (8320, 64, 0), "game_corner_prize_room": (8384, 64, 0), "celadon_mart_1f": (8448, 64, 0), "celadon_mart_2f": (8512, 64, 0),
+          "celadon_mart_3f": (8576, 64, 0), "celadon_mart_4f": (8640, 64, 0), "celadon_mart_5f": (8704, 64, 0), "celadon_mart_roof": (8768, 64, 0),
+          "celadon_mart_elevator": (8832, 64, 0),}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -65,7 +68,9 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "gate_r11_2f": "route_11_gate_2f", "gate_r12_2f": "route_12_gate_2f", "gate_r15_2f": "route_15_gate_2f", "gate_r16_2f": "route_16_gate_2f",
          "fighting_dojo": "fighting_dojo", "saffron_gym": "saffron_gym",
          "copycats_house_1f": "copycats_house_1f", "copycats_house_2f": "copycats_house_2f", "mr_psychics_house": "mr_psychics_house",
-         "silph_co_1f": "silph_co_1f", "silph_co_2f": "silph_co_2f", "silph_co_3f": "silph_co_3f", "silph_co_4f": "silph_co_4f", "silph_co_5f": "silph_co_5f", "silph_co_6f": "silph_co_6f", "silph_co_7f": "silph_co_7f", "silph_co_8f": "silph_co_8f", "silph_co_9f": "silph_co_9f", "silph_co_10f": "silph_co_10f", "silph_co_11f": "silph_co_11f", "silph_co_elevator": "silph_co_elevator",}
+         "silph_co_1f": "silph_co_1f", "silph_co_2f": "silph_co_2f", "silph_co_3f": "silph_co_3f", "silph_co_4f": "silph_co_4f", "silph_co_5f": "silph_co_5f", "silph_co_6f": "silph_co_6f", "silph_co_7f": "silph_co_7f", "silph_co_8f": "silph_co_8f", "silph_co_9f": "silph_co_9f", "silph_co_10f": "silph_co_10f", "silph_co_11f": "silph_co_11f", "silph_co_elevator": "silph_co_elevator",
+         **{r: "celadon_city" for r in ("game_corner", "game_corner_prize_room", "celadon_mart_1f", "celadon_mart_2f", "celadon_mart_3f", "celadon_mart_4f",
+                                         "celadon_mart_5f", "celadon_mart_roof", "celadon_mart_elevator")},}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -184,6 +189,11 @@ DOORS = {
     "mr_psychics_house": {"room": "mr_psychics_house", "door": [[-332, 34, 442], [-331, 34, 442]], "out": [-331.0, 34.0, 444.6]},
     # (0.53) SILPH CO.: in through the middle of its glass front, between the two dark posts.
     "silph_co": {"room": "silph_co_1f", "door": [[-352, 34, 427], [-351, 34, 427]], "out": [-351.0, 34.0, 429.6]},
+    # (0.54) CELADON's GAME CORNER (in through its glass front, between the porch's pillars) and the DEPT. STORE's two
+    # glass doors.
+    "celadon_game_corner": {"room": "game_corner", "door": [[-499, 34, 428], [-498, 34, 428], [-497, 34, 428]], "out": [-497.5, 34.0, 430.6]},
+    "celadon_dept_w": {"room": "celadon_mart_1f", "door": [[-549, 34, 410], [-548, 34, 410]], "out": [-548.0, 34.0, 412.6], "in": {"x": 2.5, "z": 14.4, "yaw": 180.0}},
+    "celadon_dept_e": {"room": "celadon_mart_1f", "door": [[-540, 34, 410], [-539, 34, 410]], "out": [-539.0, 34.0, 412.6], "in": {"x": 10.5, "z": 14.4, "yaw": 180.0}},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -207,13 +217,16 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house",
             "lavender_volunteer_house": "lavender_volunteer_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "lavender_name_rater",
             "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r12": "gate_r12_a", "route12_house": "route12_house", "route16_house": "route16_house",
-            "fighting_dojo": "saffron_dojo", "saffron_gym": "saffron_gym", "copycats_house_1f": "copycats_house", "mr_psychics_house": "mr_psychics_house", "silph_co_1f": "silph_co"}
+            "fighting_dojo": "saffron_dojo", "saffron_gym": "saffron_gym", "copycats_house_1f": "copycats_house", "mr_psychics_house": "mr_psychics_house", "silph_co_1f": "silph_co",
+            "game_corner": "celadon_game_corner"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
-MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
+MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side", ("celadon_mart_1f", 1): "celadon_dept_w", ("celadon_mart_1f", 9): "celadon_dept_e"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
 # so its trainers see straight ahead as many steps as theirs.
 TILE = {"pewter_gym": [1.0, 1.0], "fuchsia_gym": [1.0, 1.0], "cerulean_gym": [1.0, 1.0], "saffron_gym": [1.0, 1.0], "fighting_dojo": [1.0, 1.0]}
 TILE.update({"silph_co_%df" % i: [1.0, 1.0] for i in range(1, 12)})
+TILE.update({r: [1.0, 1.0] for r in ("game_corner", "game_corner_prize_room", "celadon_mart_1f", "celadon_mart_2f", "celadon_mart_3f", "celadon_mart_4f", "celadon_mart_5f",
+                                      "celadon_mart_roof")})
 # Item balls in a room of the viewer's (the WARDEN's RARE CANDY, behind his boulders: 15:33).
 BALLS = {"fuchsia_house3": [{"key": "wardens_house_rare_candy", "x": 0.8, "z": 8.4, "y": 0}]}
 # The Underground Paths' items (16:20), as John listed them: north to south (the first four come back each day), and

@@ -2516,8 +2516,10 @@ public final class Game {
 					return;
 				}
 				CompoundTag t = new CompoundTag();
-				// (The clerk in the room every Mart shares sells the stock of the town you're in.)
-				t.putString("mart", n.key().isEmpty() || Interiors.in(p) ? d.place : n.key());
+				// (The clerk in the room every Mart shares sells the stock of the town you're in; (0.54) a clerk with a
+				// counter of its own, the CELADON DEPT. STORE's, sells its stock.)
+				t.putString("mart", com.insidethecube.retromon.engine.Places.MARTS.containsKey(n.key()) ? n.key()
+						: n.key().isEmpty() || Interiors.in(p) ? d.place : n.key());
 				dialogue(p, n, "mart", List.of("Hi there! May I help you?"), t);
 			}
 			case Npc.PERSON -> {
@@ -2602,6 +2604,16 @@ public final class Game {
 									"You have to have it to get to the POKéMON LEAGUE!"));
 					return;
 				}
+				// (0.54) The CELADON DEPT. STORE: the girl on the ROOFTOP SQUARE is thirsty (a drink for a TM); the
+				// clerk on 3F teaches COUNTER (FireRed's tutor).
+				if (n.key().equals("celadon_mart_roof_p1")) {
+					thirstyGirl(p, n, d);
+					return;
+				}
+				if (n.key().equals("celadon_mart_3f_fr_counter_tutor")) {
+					tutor(p, n, d);
+					return;
+				}
 				// (0.53) SILPH CO.: the worker on 7F gives you LAPRAS; the woman on 9F lets you rest (your POKéMON healed); the
 				// PRESIDENT gives you the MASTER BALL once you've beaten GIOVANNI.
 				if (n.key().equals("silph_co_7f_p0")) {
@@ -2681,7 +2693,7 @@ public final class Game {
 				String pl = person == null ? "" : person.place();
 				boolean outdoors = pl.endsWith("_city") || pl.endsWith("_town") || pl.startsWith("route_") && !pl.contains("gate") && !pl.contains("house")
 						|| pl.endsWith("_island");
-				if (person != null && !pl.endsWith("_gym") && !outdoors) {
+				if (person != null && !pl.endsWith("_gym") && !outdoors && !pl.equals("celadon_mart_roof")) {
 					String got = giveGift(p, person.place());
 					if (got != null) lines.add(got);
 				}
@@ -3295,9 +3307,22 @@ public final class Game {
 
 	/** Route 4's two BLACK BELTs (FireRed's move tutors): MEGA PUNCH and MEGA KICK, each taught once. */
 	private static void tutor(ServerPlayer p, Npc n, PlayerData d) {
-		String move = n.key().endsWith("punch") ? "mega_punch" : "mega_kick", name = move.equals("mega_punch") ? "MEGA PUNCH" : "MEGA KICK";
+		boolean counter = n.key().endsWith("counter_tutor");
+		String move = counter ? "counter" : n.key().endsWith("punch") ? "mega_punch" : "mega_kick",
+				name = counter ? "COUNTER" : move.equals("mega_punch") ? "MEGA PUNCH" : "MEGA KICK";
 		if (d.statics.contains("tutor:" + move)) {
-			dialogue(p, n, "talk", List.of("Hah! You've learned " + name + "! Use it well!"));
+			dialogue(p, n, "talk", List.of(counter ? "Are you using that COUNTER move I taught your POKéMON?" : "Hah! You've learned " + name + "! Use it well!"));
+			return;
+		}
+		if (counter) {
+			CompoundTag t = new CompoundTag();
+			ListTag ch = new ListTag();
+			for (Mon m : d.party) ch.add(StringTag.valueOf(m.name()));
+			ch.add(StringTag.valueOf("CANCEL"));
+			t.put("choices", ch);
+			t.putString("move", move);
+			dialogue(p, n, "tutor", List.of("Oh, hi! I finally finished POKéMON.", "Not done yet? How about I teach you a good move?", "The move I have in mind is COUNTER.",
+					"Not like the one I'm leaning on, mind you!", "I can teach it only once, though.", "Which POKéMON should I teach COUNTER to?"), t, n.getId());
 			return;
 		}
 		CompoundTag t = new CompoundTag();
@@ -3480,6 +3505,16 @@ public final class Game {
 			liftAsk(p, r, 0);
 			return;
 		}
+		// (0.54) The DEPT. STORE's ROOFTOP SQUARE: its vending machines.
+		if (use.equals("vending")) {
+			CompoundTag t = new CompoundTag();
+			ListTag ch = new ListTag();
+			for (String[] k : DRINKS) ch.add(StringTag.valueOf(k[2] + " ¥" + k[3]));
+			ch.add(StringTag.valueOf("CANCEL"));
+			t.put("choices", ch);
+			dialogue(p, null, "vending", List.of("A vending machine!", "What does it have?"), t);
+			return;
+		}
 		if (use.startsWith("can:") && r.id().equals("vermilion_gym")) {
 			try {
 				trashCan(p, Integer.parseInt(use.substring(4)));
@@ -3487,6 +3522,30 @@ public final class Game {
 				// Not a can.
 			}
 		}
+	}
+
+	/** The vending machines' drinks (FireRed's): the item, the TM the thirsty girl gives for it (the first games'), its name, its price. */
+	private static final String[][] DRINKS = {{"fresh_water", "tm_ice_beam", "FRESH WATER", "200"}, {"soda_pop", "tm_rock_slide", "SODA POP", "300"},
+			{"lemonade", "tm_tri_attack", "LEMONADE", "350"}};
+
+	/** The ROOFTOP SQUARE's girl: she's thirsty; give her a drink you've got and she gives you a TM for it (once each). */
+	private static void thirstyGirl(ServerPlayer p, Npc n, PlayerData d) {
+		ListTag ch = new ListTag(), ids = new ListTag();
+		for (String[] k : DRINKS)
+			if (d.count(k[0]) > 0) {
+				ch.add(StringTag.valueOf(k[2]));
+				ids.add(StringTag.valueOf(k[0]));
+			}
+		if (ch.isEmpty()) {
+			dialogue(p, n, "talk", List.of("I'm thirsty!", "I want something to drink!"));
+			return;
+		}
+		ch.add(StringTag.valueOf("NO"));
+		ids.add(StringTag.valueOf(""));
+		CompoundTag t = new CompoundTag();
+		t.put("choices", ch);
+		t.put("drinks", ids);
+		dialogue(p, n, "drink", List.of("I'm thirsty!", "I want something to drink!", "Give her a drink? Which one?"), t, n.getId());
 	}
 
 	/** Two switches: the first under any can, the second under one right next to it (FireRed's). */
@@ -3940,6 +3999,46 @@ public final class Game {
 					else dialogue(p, null, "talk", List.of("GUARD: ROUTE 26 leads to the JOHTO region, and the POKéMON LEAGUE's back way.",
 							"GUARD: Only the CHAMPION may go that way. Come back once you've beaten the ELITE FOUR!"), whoTag("GUARD"));
 				}
+			}
+			case "vending" -> {
+				// (0.54) A drink from the ROOFTOP SQUARE's vending machine, if you can pay for it.
+				int c = t.getIntOr("choice", -1);
+				if (!t.getBooleanOr("answered", false) || c < 0 || c >= DRINKS.length) return;
+				String[] k = DRINKS[c];
+				int price = Integer.parseInt(k[3]);
+				if (d.money < price) {
+					message(p, List.of("Oops, not enough money!"));
+					return;
+				}
+				d.money -= price;
+				d.give(k[0], 1);
+				sync(p);
+				message(p, List.of("A can of " + k[2] + " popped out!"));
+			}
+			case "drink" -> {
+				// (0.54) The drink given to the ROOFTOP SQUARE's girl, and the TM she gives for it.
+				int c = t.getIntOr("choice", -1);
+				var ids = t.getListOrEmpty("drinks");
+				if (!t.getBooleanOr("answered", false) || c < 0 || c >= ids.size()) return;
+				String dr = ids.get(c).asString().orElse("");
+				String[] k = null;
+				for (String[] x : DRINKS) if (x[0].equals(dr)) k = x;
+				if (k == null || d.count(dr) <= 0) return;
+				String had = "gift:celadon_mart_roof:" + k[1];
+				if (d.statics.contains(had)) {
+					dialogue(p, n, "talk", List.of("No, thank you!", "I'm not thirsty after all!"));
+					return;
+				}
+				Item tm = Item.find(k[1]);
+				if (tm == null) return;
+				d.take(dr);
+				d.statics.add(had);
+				d.give(k[1], 1);
+				sync(p);
+				CompoundTag s = new CompoundTag();
+				s.putString("sound", "key");
+				Net.send(p, "sound", s);
+				dialogue(p, n, "talk", List.of("Yay!", k[2] + "!", "Thank you!", "You can have this from me!", player(p) + " received " + tm.name() + " from the little girl."));
 			}
 			case "lift" -> {
 				// (0.53) The floor picked on an elevator's buttons (or the next page of them).

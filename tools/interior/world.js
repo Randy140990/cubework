@@ -997,6 +997,8 @@ if (typeof AREATEX !== "undefined") {
   for (const k of Object.keys(AREATEX)) {
     if (/^sign_short_(front|back)_/.test(k)) { TEXDEF["area_" + k] = [16, 10, P => P.area(k)]; MATDEF["area_" + k] = { tex: "area_" + k, fit: true }; }
     if (/^wood_sign_(front|back)$/.test(k)) MATDEF["area_" + k] = { tex: "area_" + k, fit: true };
+    // (0.54) The little flowers: their pictures cut out, as Minecraft's crossed planes.
+    if (/^flower_/.test(k)) MATDEF["area_" + k] = { tex: "area_" + k, fit: true, cut: true };
   }
   // The roof's tiles on the tops of its steps, their rows along the eaves (here the roof's ridge runs north to
   // south): the picture turned a quarter, its rows' tops uphill (towards the ridge, east or west).
