@@ -2585,6 +2585,11 @@ public final class Game {
 					magikarpMan(p, n, d);
 					return;
 				}
+				// (0.58) CINNABAR LAB's fossil scientist.
+				if (n.key().equals("cinnabar_lab_fossil_room_p0")) {
+					fossilScientist(p, n, d);
+					return;
+				}
 				// The Underground Path's TRADER and Cerulean's (16:17, 16:20), and the BIKE SHOP's clerk.
 				if (TRADERS.containsKey(n.key())) {
 					trader(p, n, d);
@@ -3440,14 +3445,18 @@ public final class Game {
 
 	/** The in-game trades: what each trader wants for theirs (as Red and Blue have them). */
 	private static final Map<String, String> TRADE_WANTS = Map.of("mr_mime_trade", "abra", "jynx_trade", "poliwhirl", "farfetch_d_trade", "spearow",
-			"lickitung_trade", "slowbro", "nidoran_f_trade", "nidoran_m");
+			"lickitung_trade", "slowbro", "nidoran_f_trade", "nidoran_m", "electrode_trade", "raichu", "tangela_trade", "venonat", "seel_trade", "ponyta");
 	/** The names the traded POKéMON come with (FireRed's). */
-	private static final Map<String, String> TRADE_NICKS = Map.of("nidoran_f_trade", "MS. NIDO", "jynx_trade", "ZYNX", "farfetch_d_trade", "CH'DING");
+	private static final Map<String, String> TRADE_NICKS = Map.of("nidoran_f_trade", "MS. NIDO", "jynx_trade", "ZYNX", "farfetch_d_trade", "CH'DING",
+			"electrode_trade", "ESPHERE", "tangela_trade", "TANGENY", "seel_trade", "SEELOR");
 	/** Traders who stand in a room (by their key): the trade they offer, and what they say. */
 	private static final Map<String, String[]> TRADERS = Map.of(
 			"underground_path_trader", new String[] {"nidoran_f_trade", "I'm looking for NIDORAN♂! Wanna trade one for NIDORAN♀?", "How is my old NIDORAN♀? My NIDORAN♂ is doing great!"},
 			"cerulean_trader", new String[] {"jynx_trade", "I'm looking for POLIWHIRL! Wanna trade one for JYNX?", "Hi! How is ZYNX doing? I'm taking good care of the POLIWHIRL!"},
-			"vermilion_trader", new String[] {"farfetch_d_trade", "Hi! Do you have a SPEAROW? Want to trade it for my FARFETCH'D?", "How is my old CH'DING? My SPEAROW is doing great!"});
+			"vermilion_trader", new String[] {"farfetch_d_trade", "Hi! Do you have a SPEAROW? Want to trade it for my FARFETCH'D?", "How is my old CH'DING? My SPEAROW is doing great!"},
+			"cinnabar_lab_trade_room_fr_clifton", new String[] {"electrode_trade", "Hi! Do you have a RAICHU? Want to trade it for my ELECTRODE?", "How is my old ESPHERE? My RAICHU is doing great!"},
+			"cinnabar_lab_trade_room_fr_norma", new String[] {"tangela_trade", "Hello there! Do you have a VENONAT? Want to trade it for my TANGELA?", "How is my old TANGENY? My VENONAT is doing great!"},
+			"cinnabar_lab_fossil_room_fr_garett", new String[] {"seel_trade", "Hi! Do you have a PONYTA? Want to trade it for my SEEL?", "How is my old SEELOR? My PONYTA is doing great!"});
 
 	private static void trader(ServerPlayer p, Npc n, PlayerData d) {
 		String[] tr = TRADERS.get(n.key());
@@ -3520,6 +3529,19 @@ public final class Game {
 			ch.add(StringTag.valueOf("CANCEL"));
 			t.put("choices", ch);
 			dialogue(p, null, "vending", List.of("A vending machine!", "What does it have?"), t);
+			return;
+		}
+		// (0.58) BLAINE's GYM's quiz machines, and the POKeMON MANSION's statues (the secret switch).
+		if (use.startsWith("quiz:") && r.id().equals("cinnabar_gym")) {
+			try {
+				gymQuiz(p, Integer.parseInt(use.substring(5)));
+			} catch (NumberFormatException ignored) {
+				// Not a machine.
+			}
+			return;
+		}
+		if (use.equals("mansion_switch") && r.id().startsWith("pokemon_mansion")) {
+			dialogue(p, null, "mansion_switch", List.of("A POKéMON statue...", "Oh, what's this? A secret switch!", "Press it?"), yesNo());
 			return;
 		}
 		if (use.startsWith("can:") && r.id().equals("vermilion_gym")) {
@@ -3610,6 +3632,83 @@ public final class Game {
 		net.minecraft.world.level.block.state.BlockState b = open ? net.minecraft.world.level.block.Blocks.AIR.defaultBlockState()
 				: net.minecraft.world.level.block.Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState();
 		for (int x = 6; x <= 7; x++) for (int y = 0; y <= 1; y++) level.setBlock(new BlockPos(r.ox() + x, r.oy() + y, r.oz() + 6), b, 3);
+	}
+
+	// ---------- (0.58) CINNABAR: BLAINE's quiz gates, the POKeMON MANSION's barred gates, the LAB's fossils ----------
+
+	/** BLAINE's six questions (FireRed's), their answers, and the trainer each machine's room has. */
+	private static final String[] QUIZ = {"CATERPIE evolves into METAPOD?", "There are nine certified POKéMON LEAGUE BADGES?", "POLIWAG evolves three times?",
+			"Are electric moves effective against GROUND-type POKéMON?", "POKéMON of the same kind and level are not identical?", "TM28 contains TOMBSTONY?"};
+	private static final boolean[] QUIZ_YES = {true, false, false, false, true, false};
+	private static final String[] QUIZ_TRAINER = {"cinnabar_gym_2", "cinnabar_gym_3", "cinnabar_gym_4", "cinnabar_gym_5", "cinnabar_gym_6", "cinnabar_gym_7"};
+	/** Each quiz gate's cells (x, z in the GYM, FireRed's tiles). */
+	private static final int[][][] QUIZ_GATES = {{{26, 9}, {27, 9}}, {{17, 9}, {18, 9}}, {{17, 16}, {18, 16}}, {{11, 22}, {11, 23}}, {{5, 17}, {6, 17}}, {{5, 9}, {6, 9}}};
+	/** The MANSION's gates, floor by floor: x0, x1, z0, z1, and 1 if it's shut while the switch is on (0: while it's off). */
+	private static final Map<String, int[][]> MANSION_GATES = Map.of(
+			"pokemon_mansion_1f", new int[][] {{22, 24, 10, 11, 0}, {27, 29, 25, 26, 0}, {32, 34, 25, 26, 0}, {31, 33, 18, 19, 1}},
+			"pokemon_mansion_2f", new int[][] {{24, 26, 14, 15, 0}, {10, 10, 30, 32, 0}, {12, 12, 6, 8, 1}},
+			"pokemon_mansion_3f", new int[][] {{17, 19, 11, 12, 0}, {21, 21, 6, 8, 1}},
+			"pokemon_mansion_b1f", new int[][] {{33, 35, 20, 21, 1}, {16, 16, 28, 30, 1}, {12, 12, 10, 12, 0}, {20, 22, 22, 23, 0}});
+
+	private static void gymQuiz(ServerPlayer p, int q) {
+		if (q < 1 || q > 6) return;
+		CompoundTag t = yesNo();
+		t.putInt("q", q);
+		dialogue(p, null, "gymquiz", List.of("POKéMON Quiz!", "Get it right, and the door opens to the next room.", "Get it wrong, and face a TRAINER!",
+				"If you want to conserve your POKéMON for the GYM LEADER...", "Then get it right! Here we go!", QUIZ[q - 1]), t);
+	}
+
+	/** The gates in the room you're in (BLAINE's, the MANSION's), as they are for you: real blocks, put in or taken out. */
+	public static void roomGates(ServerPlayer p) {
+		if (!(p.level() instanceof ServerLevel level) || level.dimension() != Interiors.LEVEL) return;
+		Interiors.Room r = Interiors.roomOf(p);
+		if (r == null) return;
+		PlayerData d = data(p);
+		if (r.id().equals("cinnabar_gym")) {
+			boolean all = d.beaten.contains("cinnabar_gym_0");
+			for (int g = 0; g < 6; g++) {
+				boolean open = all || d.statics.contains("cinnabar_quiz_" + (g + 1)) || d.beaten.contains(QUIZ_TRAINER[g]);
+				for (int[] c : QUIZ_GATES[g]) gateCell(level, r, c[0], c[1], open ? net.minecraft.world.level.block.Blocks.AIR.defaultBlockState()
+						: net.minecraft.world.level.block.Blocks.ORANGE_STAINED_GLASS.defaultBlockState());
+			}
+		}
+		int[][] gs = MANSION_GATES.get(r.id());
+		if (gs != null) {
+			boolean on = d.statics.contains("mansion_switch_on");
+			for (int[] g : gs) {
+				boolean shut = (g[4] == 1) == on;
+				for (int x = g[0]; x <= g[1]; x++) for (int z = g[2]; z <= g[3]; z++)
+					gateCell(level, r, x, z, shut ? net.minecraft.world.level.block.Blocks.IRON_BARS.defaultBlockState() : net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+			}
+		}
+	}
+
+	private static void gateCell(ServerLevel level, Interiors.Room r, int x, int z, net.minecraft.world.level.block.state.BlockState b) {
+		for (int y = 0; y <= 1; y++) level.setBlock(new BlockPos(r.ox() + x, r.oy() + y, r.oz() + z), b, 3);
+	}
+
+	/** A fossil the scientist can bring back: its name, the gift (statics.tsv) and the species, or null. */
+	private static String[] fossilOf(String item) {
+		return switch (item) {
+			case "helix_fossil" -> new String[] {"HELIX FOSSIL", "omanyte_gift", "omanyte"};
+			case "dome_fossil" -> new String[] {"DOME FOSSIL", "kabuto_gift", "kabuto"};
+			case "old_amber" -> new String[] {"OLD AMBER", "aerodactyl_gift", "aerodactyl"};
+			default -> null;
+		};
+	}
+
+	private static void fossilScientist(ServerPlayer p, Npc n, PlayerData d) {
+		for (String f : List.of("helix_fossil", "dome_fossil", "old_amber")) {
+			if (d.count(f) <= 0) continue;
+			String[] k = fossilOf(f);
+			CompoundTag t = yesNo();
+			t.putString("fossil", f);
+			dialogue(p, n, "revive", List.of("Hiya! I am important doctor!", "I study here rare POKéMON fossils!", "You! Have you a fossil for me?",
+					"Oh! That is " + k[0] + "!", "It is fossil of " + k[2].toUpperCase() + ", a POKéMON that is already extinct!",
+					"My Resurrection Machine will make that POKéMON live again!", "So! You hurry and give me that!"), t, n.getId());
+			return;
+		}
+		dialogue(p, n, "talk", List.of("Hiya! I am important doctor!", "I study here rare POKéMON fossils!", "You! Have you a fossil for me?", "No! Is too bad!"));
 	}
 
 	/** Coming into LT.SURGE's GYM: new locks this visit, and the door as it is for you. */
@@ -4075,6 +4174,62 @@ public final class Game {
 			case "mum_map" -> mumHeadsHome(p);
 			case "rival" -> {
 				if (!d.beaten.contains("rival_lab") && !d.party.isEmpty()) Battles.trainer(p, rivalLab(p));
+			}
+			case "gymquiz" -> {
+				// (0.58) BLAINE's quiz: right, and the gate opens; wrong, and the room's trainer comes for you (FireRed's).
+				int q = t.getIntOr("q", -1);
+				if (q < 1 || q > 6 || !t.getBooleanOr("answered", false)) return;
+				if (yes == QUIZ_YES[q - 1]) {
+					boolean was = d.statics.contains("cinnabar_quiz_" + q) || d.beaten.contains(QUIZ_TRAINER[q - 1]);
+					d.statics.add("cinnabar_quiz_" + q);
+					sync(p);
+					roomGates(p);
+					message(p, was ? List.of("You're absolutely correct!", "Go on through!") : List.of("You're absolutely correct!", "Go on through!", "The door opened!"));
+				} else {
+					Trainers.Trainer tr = trainerFor(p, QUIZ_TRAINER[q - 1]);
+					if (tr != null && !d.beaten.contains(tr.key()) && d.anyHealthy() && !battlesOff(p)) {
+						CompoundTag extra = new CompoundTag();
+						extra.putString("trainer", tr.key());
+						List<String> lines = new ArrayList<>(List.of("Sorry! Bad call!"));
+						lines.addAll(fill(p, tr.before().isEmpty() ? List.of(tr.title() + " wants to battle!") : tr.before()));
+						dialogue(p, null, "battle", lines, extra);
+					} else message(p, List.of("Sorry! Bad call!"));
+				}
+			}
+			case "mansion_switch" -> {
+				if (!t.getBooleanOr("answered", false)) return;
+				if (!yes) {
+					message(p, List.of("Not quite yet!"));
+					return;
+				}
+				if (!d.statics.remove("mansion_switch_on")) d.statics.add("mansion_switch_on");
+				sync(p);
+				roomGates(p);
+				message(p, List.of("Who wouldn't?", "The barred gates moved!"));
+			}
+			case "revive" -> {
+				// (0.58) The TESTING ROOM's scientist brings your fossil back to life.
+				String fossil = t.getStringOr("fossil", "");
+				if (!yes || !t.getBooleanOr("answered", false)) {
+					dialogue(p, n, "talk", List.of("Aw, you no want? Come back when you change mind!"));
+					return;
+				}
+				String[] f = fossilOf(fossil);
+				if (f == null || !d.take(fossil)) return;
+				Trainers.Static st = Trainers.STATICS.get(f[1]);
+				Mon m = new Mon(Species.get(st != null ? st.species() : f[2]), st != null ? st.level() : 30, RNG);
+				boolean toBox = d.party.size() >= 6;
+				d.add(m);
+				d.statics.add("revived:" + fossil);
+				sync(p);
+				CompoundTag snd = new CompoundTag();
+				snd.putString("sound", "caught");
+				Net.send(p, "sound", snd);
+				List<String> lines = new ArrayList<>(List.of(player(p) + " handed over the " + f[0] + "!", "I take a little time!", "...", "Where were you? Your fossil is back to life!",
+						"It was " + m.name() + " like I think!", player(p) + " got " + m.name() + "!"));
+				if (toBox) lines.add(m.name() + " was sent to BILL's PC.");
+				message(p, lines);
+				askNickname(p, toBox ? "box" : "party", toBox ? d.box.size() - 1 : d.party.size() - 1);
 			}
 			case "battle" -> {
 				Trainers.Trainer tr = trainerFor(p, t.getStringOr("trainer", ""));

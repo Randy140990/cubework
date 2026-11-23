@@ -248,3 +248,11 @@ silph_co_elevator	kanto	SILPH CO.	silph_co	-
 route_26	kanto	ROUTE 26	route_26	-
 route_27	kanto	ROUTE 27	route_26	-
 tohjo_falls	kanto	TOHJO FALLS	union_cave	-
+cinnabar_gym	kanto	CINNABAR GYM	gym	-
+cinnabar_lab	kanto	POKéMON LAB	cinnabar	-
+cinnabar_lab_trade_room	kanto	POKéMON LAB	cinnabar	-
+cinnabar_lab_metronome_room	kanto	POKéMON LAB	cinnabar	-
+cinnabar_lab_fossil_room	kanto	POKéMON LAB	cinnabar	-
+earls_pokemon_academy	johto	POKéMON ACADEMY	violet_city	-
+route_35_national_park_gate	johto	NATIONAL PARK GATE	goldenrod_city	-
+route_36_national_park_gate	johto	NATIONAL PARK GATE	goldenrod_city	-

@@ -151,6 +151,8 @@ public final class Battles {
 					after.addAll(Game.trainerHouseWon(p));
 				} else if (s.trainer != null) {
 					d.beaten.add(s.trainer.key());
+					// (0.58) A CINNABAR GYM trainer beaten opens their room's gate.
+					if (s.trainer.key().startsWith("cinnabar_gym_")) p.level().getServer().execute(() -> Game.roomGates(p));
 					List<String> said = Game.fill(p, s.trainer.leader() ? s.trainer.defeat() : s.trainer.after());
 					if (s.trainer.leader()) {
 						after.addAll(said);

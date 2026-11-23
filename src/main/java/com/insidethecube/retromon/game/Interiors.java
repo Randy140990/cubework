@@ -119,7 +119,7 @@ public final class Interiors {
 	 */
 	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json", "/retromon/interiors/digletts_cave.json",
 			"/retromon/interiors/mt_moon.json", "/retromon/interiors/safari_zone.json", "/retromon/interiors/seafoam_islands.json",
-			"/retromon/interiors/rock_tunnel.json"};
+			"/retromon/interiors/rock_tunnel.json", "/retromon/interiors/ilex_forest.json"};
 
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */
@@ -778,6 +778,8 @@ public final class Interiors {
 		if (r.id().equals("daycare")) Game.daycarePen(comer);
 		// LT.SURGE's GYM: its electric door, shut or open for you.
 		if (r.id().equals("vermilion_gym")) Game.surgeEntered(comer);
+		// (0.58) BLAINE's quiz gates and the POKeMON MANSION's barred gates, as they are for you.
+		if (r.id().equals("cinnabar_gym") || r.id().startsWith("pokemon_mansion")) Game.roomGates(comer);
 		// Mt. Moon's mushrooms (B1F) grow back: one you picked on an earlier day is there again (13:56).
 		if (!r.balls().isEmpty()) {
 			PlayerData d = Game.data(comer);

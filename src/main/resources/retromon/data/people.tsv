@@ -374,3 +374,8 @@ game_corner_prize_room_fr_prize_clerk_mons	game_corner_prize_room	clerk	down	sta
 game_corner_prize_room_fr_prize_clerk_tms	game_corner_prize_room	clerk	down	stay	We exchange your COINS for prizes. | A COIN CASE is required...	-1	-1
 game_corner_prize_room_fr_prize_clerk_items	game_corner_prize_room	clerk	down	stay	We exchange your COINS for prizes. | A COIN CASE is required...	-1	-1
 celadon_mart_3f_fr_counter_tutor	celadon_mart_3f	clerk	down	stay	Oh, hi! I finally finished POKéMON. | Not done yet? How about I teach you a good move? | The move I have in mind is COUNTER. | Not like the one I'm leaning on, mind you!	-1	-1
+ilex_forest_farfetchd	ilex_forest	monster	right	stay	FARFETCH'D: Kwaa!	-1	-1
+cinnabar_gym_fr_gym_guy	cinnabar_gym	gym_guide	down	stay	Yo! Champ in the making! | The hotheaded BLAINE is a FIRE POKéMON pro. | Douse his spirits with water! | You'd better take some BURN HEALS, too.	-1	-1
+cinnabar_lab_trade_room_fr_clifton	cinnabar_lab_trade_room	gramps	down	stay	Hi! Do you have a RAICHU? Want to trade it for my ELECTRODE?	-1	-1
+cinnabar_lab_trade_room_fr_norma	cinnabar_lab_trade_room	beauty	down	stay	Hello there! Do you have a VENONAT? Want to trade it for my TANGELA?	-1	-1
+cinnabar_lab_fossil_room_fr_garett	cinnabar_lab_fossil_room	boy	down	stay	Hi! Do you have a PONYTA? Want to trade it for my SEEL?	-1	-1

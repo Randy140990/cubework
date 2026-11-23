@@ -5066,6 +5066,36 @@ swap	white_concrete	-2336	371	-2299	396	21	23	block/white_concrete=barn_trim	the
 panel	dark_oak_shelf	-2336	371	-2299	396	21	31	block/dark_oak_shelf=panel_planter_dark	the MOOMOO FARM
 swap	black_concrete	-2336	371	-2299	396	21	27	block/black_concrete=mansion_dark	the MOOMOO FARM
 swap	polished_andesite,polished_andesite_slab	-2336	371	-2299	396	21	23	block/polished_andesite=house_stone	the MOOMOO FARM
+leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1748	764	-1738	774	16	28	flowering_azalea	Cherrygrove City's swing
+swap	oak_log	-1748	764	-1738	774	16	28	block/oak_log=pergola,block/oak_log_top=pergola_top	Cherrygrove City's swing
+swap	spruce_trapdoor	-1748	764	-1738	774	16	28	block/spruce_trapdoor=bench_slat	Cherrygrove City's swing
+swap	spruce_fence,spruce_fence_gate	-1748	764	-1738	774	16	28	block/spruce_planks=bench_frame	Cherrygrove City's swing
+swap	waxed_copper_lantern,copper_lantern	-1748	764	-1738	774	16	28	block/copper_lantern=garden_light	Cherrygrove City's swing
+leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-2342	566	-2332	576	15	27	flowering_azalea	the swing west of Olivine, before the beach
+swap	oak_log	-2342	566	-2332	576	15	27	block/oak_log=pergola,block/oak_log_top=pergola_top	the swing west of Olivine, before the beach
+swap	spruce_trapdoor	-2342	566	-2332	576	15	27	block/spruce_trapdoor=bench_slat	the swing west of Olivine, before the beach
+swap	spruce_fence,spruce_fence_gate	-2342	566	-2332	576	15	27	block/spruce_planks=bench_frame	the swing west of Olivine, before the beach
+swap	waxed_copper_lantern,copper_lantern	-2342	566	-2332	576	15	27	block/copper_lantern=garden_light	the swing west of Olivine, before the beach
+leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1721	623	-1711	633	19	31	flowering_azalea	Route 30's swing
+swap	oak_log	-1721	623	-1711	633	19	31	block/oak_log=pergola,block/oak_log_top=pergola_top	Route 30's swing
+swap	spruce_trapdoor	-1721	623	-1711	633	19	31	block/spruce_trapdoor=bench_slat	Route 30's swing
+swap	spruce_fence,spruce_fence_gate	-1721	623	-1711	633	19	31	block/spruce_planks=bench_frame	Route 30's swing
+swap	waxed_copper_lantern,copper_lantern	-1721	623	-1711	633	19	31	block/copper_lantern=garden_light	Route 30's swing
+leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-2101	763	-2091	773	17	29	flowering_azalea	Route 34's swing
+swap	oak_log	-2101	763	-2091	773	17	29	block/oak_log=pergola,block/oak_log_top=pergola_top	Route 34's swing
+swap	spruce_trapdoor	-2101	763	-2091	773	17	29	block/spruce_trapdoor=bench_slat	Route 34's swing
+swap	spruce_fence,spruce_fence_gate	-2101	763	-2091	773	17	29	block/spruce_planks=bench_frame	Route 34's swing
+swap	waxed_copper_lantern,copper_lantern	-2101	763	-2091	773	17	29	block/copper_lantern=garden_light	Route 34's swing
+leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-2531	711	-2521	721	15	27	flowering_azalea	the swing by Route 41
+swap	oak_log	-2531	711	-2521	721	15	27	block/oak_log=pergola,block/oak_log_top=pergola_top	the swing by Route 41
+swap	spruce_trapdoor	-2531	711	-2521	721	15	27	block/spruce_trapdoor=bench_slat	the swing by Route 41
+swap	spruce_fence,spruce_fence_gate	-2531	711	-2521	721	15	27	block/spruce_planks=bench_frame	the swing by Route 41
+swap	waxed_copper_lantern,copper_lantern	-2531	711	-2521	721	15	27	block/copper_lantern=garden_light	the swing by Route 41
+leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1606	416	-1596	426	19	31	flowering_azalea	the swing by Route 44
+swap	oak_log	-1606	416	-1596	426	19	31	block/oak_log=pergola,block/oak_log_top=pergola_top	the swing by Route 44
+swap	spruce_trapdoor	-1606	416	-1596	426	19	31	block/spruce_trapdoor=bench_slat	the swing by Route 44
+swap	spruce_fence,spruce_fence_gate	-1606	416	-1596	426	19	31	block/spruce_planks=bench_frame	the swing by Route 44
+swap	waxed_copper_lantern,copper_lantern	-1606	416	-1596	426	19	31	block/copper_lantern=garden_light	the swing by Route 44
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care

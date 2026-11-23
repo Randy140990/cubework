@@ -14,7 +14,7 @@ import base64, io, json, math, os, re, sys
 from PIL import Image
 
 EPS = 1e-6
-SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob", "poolWaterView", "poolBottomView", "poolQuartzView", "surgeBarrierView"}
+SKIP = {"aoN", "aoW", "aoE", "deep", "shadowBlob", "poolWaterView", "poolBottomView", "poolQuartzView", "surgeBarrierView", "cinGateView", "manGateView"}
 # Rooms with real blocks of their own laid after their props (Cerulean Gym's pool: tools/cerulean_pool.py), and from how far down.
 SCHEM = {"cerulean_gym": ("cerulean_gym_pool.bin", -6)}
 ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "rival2": (192, 64, 0), "lab": (256, 64, 0), "center": (320, 64, 0),
@@ -46,7 +46,9 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "silph_co_1f": (7616, 64, 0), "silph_co_2f": (7680, 64, 0), "silph_co_3f": (7744, 64, 0), "silph_co_4f": (7808, 64, 0), "silph_co_5f": (7872, 64, 0), "silph_co_6f": (7936, 64, 0), "silph_co_7f": (8000, 64, 0), "silph_co_8f": (8064, 64, 0), "silph_co_9f": (8128, 64, 0), "silph_co_10f": (8192, 64, 0), "silph_co_11f": (8256, 64, 0), "silph_co_elevator": (6080, 64, 0),
           "game_corner": (8320, 64, 0), "game_corner_prize_room": (8384, 64, 0), "celadon_mart_1f": (8448, 64, 0), "celadon_mart_2f": (8512, 64, 0),
           "celadon_mart_3f": (8576, 64, 0), "celadon_mart_4f": (8640, 64, 0), "celadon_mart_5f": (8704, 64, 0), "celadon_mart_roof": (8768, 64, 0),
-          "celadon_mart_elevator": (8832, 64, 0),}
+          "celadon_mart_elevator": (8832, 64, 0),
+          # (0.58) CINNABAR's GYM, LAB and MANSION (FireRed's), the SPROUT TOWER, EARL's ACADEMY and the NATIONAL PARK's gates (Crystal's).
+          "cinnabar_gym": (8896, 64, 0), "cinnabar_lab": (8960, 64, 0), "cinnabar_lab_trade_room": (9024, 64, 0), "cinnabar_lab_metronome_room": (9088, 64, 0), "cinnabar_lab_fossil_room": (9152, 64, 0), "pokemon_mansion_1f": (9216, 64, 0), "pokemon_mansion_2f": (9280, 64, 0), "pokemon_mansion_3f": (9344, 64, 0), "pokemon_mansion_b1f": (9408, 64, 0), "sprout_tower_1f": (9472, 64, 0), "sprout_tower_2f": (9536, 64, 0), "sprout_tower_3f": (9600, 64, 0), "earls_pokemon_academy": (9664, 64, 0), "route_35_national_park_gate": (9728, 64, 0), "route_36_national_park_gate": (9792, 64, 0),}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -70,7 +72,8 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "copycats_house_1f": "copycats_house_1f", "copycats_house_2f": "copycats_house_2f", "mr_psychics_house": "mr_psychics_house",
          "silph_co_1f": "silph_co_1f", "silph_co_2f": "silph_co_2f", "silph_co_3f": "silph_co_3f", "silph_co_4f": "silph_co_4f", "silph_co_5f": "silph_co_5f", "silph_co_6f": "silph_co_6f", "silph_co_7f": "silph_co_7f", "silph_co_8f": "silph_co_8f", "silph_co_9f": "silph_co_9f", "silph_co_10f": "silph_co_10f", "silph_co_11f": "silph_co_11f", "silph_co_elevator": "silph_co_elevator",
          **{r: "celadon_city" for r in ("game_corner", "game_corner_prize_room", "celadon_mart_1f", "celadon_mart_2f", "celadon_mart_3f", "celadon_mart_4f",
-                                         "celadon_mart_5f", "celadon_mart_roof", "celadon_mart_elevator")},}
+                                         "celadon_mart_5f", "celadon_mart_roof", "celadon_mart_elevator")},
+         **{r: r for r in ('cinnabar_gym', 'cinnabar_lab', 'cinnabar_lab_trade_room', 'cinnabar_lab_metronome_room', 'cinnabar_lab_fossil_room', 'pokemon_mansion_1f', 'pokemon_mansion_2f', 'pokemon_mansion_3f', 'pokemon_mansion_b1f', 'sprout_tower_1f', 'sprout_tower_2f', 'sprout_tower_3f', 'earls_pokemon_academy', 'route_35_national_park_gate', 'route_36_national_park_gate')},}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -194,6 +197,26 @@ DOORS = {
     "celadon_game_corner": {"room": "game_corner", "door": [[-499, 34, 428], [-498, 34, 428], [-497, 34, 428]], "out": [-497.5, 34.0, 430.6]},
     "celadon_dept_w": {"room": "celadon_mart_1f", "door": [[-549, 34, 410], [-548, 34, 410]], "out": [-548.0, 34.0, 412.6], "in": {"x": 2.5, "z": 14.4, "yaw": 180.0}},
     "celadon_dept_e": {"room": "celadon_mart_1f", "door": [[-540, 34, 410], [-539, 34, 410]], "out": [-539.0, 34.0, 412.6], "in": {"x": 10.5, "z": 14.4, "yaw": 180.0}},
+    # (0.58) CINNABAR: the GYM (its glass doors either side of the dark middle column), the POKeMON LAB (its door, set back a
+    # block in its front), the POKeMON MANSION (the dark doorway under its porch).
+    "cinnabar_gym": {"room": "cinnabar_gym", "door": [[-778, 19, 908], [-777, 19, 908], [-776, 19, 908]], "out": [-776.5, 19.0, 910.6]},
+    "cinnabar_lab": {"room": "cinnabar_lab", "door": [[-805, 19, 923], [-804, 19, 923]], "out": [-804.0, 19.0, 926.0]},
+    "cinnabar_mansion": {"room": "pokemon_mansion_1f", "door": [[-801, 19, 908], [-800, 19, 908], [-799, 19, 908]], "out": [-799.5, 19.0, 910.4]},
+    # VIOLET CITY: the SPROUT TOWER (its doorway at the end of the bridge) and EARL's ACADEMY (the house with the chimney,
+    # its bamboo doors).
+    "sprout_tower": {"room": "sprout_tower_1f", "door": [[-1847, 25, 487]], "out": [-1846.5, 25.0, 489.4]},
+    "earls_academy": {"room": "earls_pokemon_academy", "door": [[-1834, 23, 541], [-1833, 23, 541]], "out": [-1833.0, 22.0, 544.4]},
+    # The NATIONAL PARK's gates (John's forest gatehouse): ROUTE 35's, in from the route at its south (the east part's
+    # doorway), out at the north to the PARK (the west part's doorway; the east part's north doorway comes in too, and
+    # back out the way you came); ROUTE 36's, in from the route at its east, out at its west to the PARK.
+    "np_gate_r35_s": {"room": "route_35_national_park_gate", "door": [[x, 22, 550] for x in range(-2095, -2091)], "out": [-2093.0, 20.5, 555.2]},
+    "np_gate_r35_n": {"room": "route_35_national_park_gate", "door": [[x, 22, 548] for x in range(-2123, -2119)], "out": [-2121.0, 20.5, 543.0], "face": "n", "yaw": 180.0,
+                      "in": {"x": 4.0, "z": 1.6, "yaw": 0.0}, "group": "np_gate_r35_north"},
+    "np_gate_r35_n2": {"room": "route_35_national_park_gate", "door": [[x, 22, 547] for x in range(-2095, -2091)], "out": [-2093.0, 20.5, 543.0], "face": "n", "yaw": 180.0,
+                       "in": {"x": 4.0, "z": 1.6, "yaw": 0.0}, "group": "np_gate_r35_north"},
+    "np_gate_r36_e": {"room": "route_36_national_park_gate", "door": [[-2078, 22, 505], [-2078, 22, 506]], "out": [-2073.6, 20.5, 506.0], "face": "e", "yaw": -90.0},
+    "np_gate_r36_w": {"room": "route_36_national_park_gate", "door": [[-2080, 22, 505], [-2080, 22, 506]], "out": [-2083.4, 20.5, 506.0], "face": "w", "yaw": 90.0,
+                      "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -218,7 +241,8 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "lavender_volunteer_house": "lavender_volunteer_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "lavender_name_rater",
             "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r12": "gate_r12_a", "route12_house": "route12_house", "route16_house": "route16_house",
             "fighting_dojo": "saffron_dojo", "saffron_gym": "saffron_gym", "copycats_house_1f": "copycats_house", "mr_psychics_house": "mr_psychics_house", "silph_co_1f": "silph_co",
-            "game_corner": "celadon_game_corner"}
+            "game_corner": "celadon_game_corner", "cinnabar_gym": "cinnabar_gym", "cinnabar_lab": "cinnabar_lab", "pokemon_mansion_1f": "cinnabar_mansion",
+            "sprout_tower_1f": "sprout_tower", "earls_pokemon_academy": "earls_academy", "route_35_national_park_gate": "np_gate_r35_s"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side", ("celadon_mart_1f", 1): "celadon_dept_w", ("celadon_mart_1f", 9): "celadon_dept_e"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
@@ -227,6 +251,7 @@ TILE = {"pewter_gym": [1.0, 1.0], "fuchsia_gym": [1.0, 1.0], "cerulean_gym": [1.
 TILE.update({"silph_co_%df" % i: [1.0, 1.0] for i in range(1, 12)})
 TILE.update({r: [1.0, 1.0] for r in ("game_corner", "game_corner_prize_room", "celadon_mart_1f", "celadon_mart_2f", "celadon_mart_3f", "celadon_mart_4f", "celadon_mart_5f",
                                       "celadon_mart_roof")})
+TILE.update({r: [1.0, 1.0] for r in ('cinnabar_gym', 'cinnabar_lab', 'cinnabar_lab_trade_room', 'cinnabar_lab_metronome_room', 'cinnabar_lab_fossil_room', 'pokemon_mansion_1f', 'pokemon_mansion_2f', 'pokemon_mansion_3f', 'pokemon_mansion_b1f', 'sprout_tower_1f', 'sprout_tower_2f', 'sprout_tower_3f', 'earls_pokemon_academy', 'route_35_national_park_gate', 'route_36_national_park_gate')})
 # Item balls in a room of the viewer's (the WARDEN's RARE CANDY, behind his boulders: 15:33).
 BALLS = {"fuchsia_house3": [{"key": "wardens_house_rare_candy", "x": 0.8, "z": 8.4, "y": 0}]}
 # The Underground Paths' items (16:20), as John listed them: north to south (the first four come back each day), and
@@ -262,14 +287,16 @@ MONS["vermilion_pidgey_house"] = [{"key": "pet:vermilion_pidgey_house_p1", "spec
 BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n", "cerulean_house1": "cerulean_house1_back",
-              "cerulean_house2": "cerulean_house2_back", "gate_r5": "gate_r5_b", "gate_r6": "gate_r6_b", "gate_r12": "gate_r12_b"}
+              "cerulean_house2": "cerulean_house2_back", "gate_r5": "gate_r5_b", "gate_r6": "gate_r6_b", "gate_r12": "gate_r12_b",
+              "route_35_national_park_gate": "np_gate_r35_n"}
 # Ways out through the side walls (a sideways gate's), by room and wall.
 SIDE_DOOR = {("gate_johto", "e"): "johto_e",
              # The sideways route gates: each side's way to the world's door on that side.
              ("gate_r7", "w"): "gate_r7_a", ("gate_r7", "e"): "gate_r7_b", ("gate_r8", "e"): "gate_r8_a", ("gate_r8", "w"): "gate_r8_b",
              ("gate_r11", "w"): "gate_r11_a", ("gate_r11", "e"): "gate_r11_b", ("gate_r15", "w"): "gate_r15_a", ("gate_r15", "e"): "gate_r15_b",
              ("gate_r16n", "e"): "gate_r16n_a", ("gate_r16n", "w"): "gate_r16n_b", ("gate_r16s", "e"): "gate_r16s_a", ("gate_r16s", "w"): "gate_r16s_b",
-             ("gate_r18", "e"): "gate_r18_a", ("gate_r18", "w"): "gate_r18_b"}
+             ("gate_r18", "e"): "gate_r18_a", ("gate_r18", "w"): "gate_r18_b",
+             ("route_36_national_park_gate", "e"): "np_gate_r36_e", ("route_36_national_park_gate", "w"): "np_gate_r36_w"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).
 # (On the mat's inner half: the mats are two deep, and you're out once you're past their middle.)
 ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "lab": {"x": 8.0, "z": 14.5, "yaw": 180.0},
@@ -292,7 +319,11 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "vermilion_pidgey_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "lavender_volunteer_house": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "lavender_cubone_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "lavender_name_rater": {"x": 6.0, "z": 9.5, "yaw": 180.0},
-         "gate_r5": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r6": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r7": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r8": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r11": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r12": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r15": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r16n": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r16s": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r18": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "route12_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "route16_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
+         "gate_r5": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r6": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r7": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r8": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r11": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r12": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r15": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r16n": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r16s": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r18": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "route12_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "route16_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
+         "cinnabar_gym": {"x": 25.5, "z": 23.4, "yaw": 180.0}, "cinnabar_lab": {"x": 4.5, "z": 9.4, "yaw": 180.0},
+         "pokemon_mansion_1f": {"x": 8.5, "z": 33.4, "yaw": 180.0}, "sprout_tower_1f": {"x": 10.0, "z": 14.4, "yaw": 180.0},
+         "earls_pokemon_academy": {"x": 4.0, "z": 14.4, "yaw": 180.0}, "route_35_national_park_gate": {"x": 4.0, "z": 6.4, "yaw": 180.0},
+         "route_36_national_park_gate": {"x": 8.4, "z": 5.0, "yaw": 90.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {

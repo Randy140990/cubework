@@ -45,3 +45,6 @@ electrode_rocket_2	electrode	23	team_rocket_base_b2f	static	Powering the Rocket 
 electrode_rocket_3	electrode	23	team_rocket_base_b2f	static	Powering the Rocket base generator
 togepi_egg	togepi	5	violet_city	gift	The egg from Prof. Elm's aide
 celebi_ilex	celebi	30	ilex_forest	static	At the shrine in Ilex Forest (the old games' event, here for everyone)
+electrode_trade	electrode	30	cinnabar_lab_trade_room	trade	In-game trade (FireRed's ESPHERE, for a RAICHU)
+tangela_trade	tangela	30	cinnabar_lab_trade_room	trade	In-game trade (FireRed's TANGENY, for a VENONAT)
+seel_trade	seel	30	cinnabar_lab_fossil_room	trade	In-game trade (FireRed's SEELOR, for a PONYTA)
