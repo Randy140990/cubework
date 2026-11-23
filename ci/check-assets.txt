@@ -1,1 +1,4 @@
-assets/minecraft/lang/en_us.json
+assets/minecraft/textures/block/
+assets/minecraft/models/block/
+assets/minecraft/blockstates/
+assets/minecraft/textures/entity/chest/
