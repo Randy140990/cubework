@@ -153,6 +153,7 @@ public final class AreaLooks {
 			// (0.50) The leafy trees (20:07): Shards' extra leaves, two ways round, for each kind of leaves.
 			for (String t : LEAFY) for (String v : new String[] {"a", "b"}) part(ctx, "leafy_" + t + "_" + v, "block/area/leafy_" + t + "_" + v);
 			part(ctx, "prop_bike", "block/area/prop_bike");
+			part(ctx, "prop_statue", "block/area/prop_statue");
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
@@ -256,6 +257,18 @@ public final class AreaLooks {
 					if (m != null) m.emitQuads(e, view, pos, state, random, d -> false);
 				};
 			}
+			// (0.52, 10:41) A model of the mod's in place of the block (ROUTE 23's statues: John's middle block of each),
+			// and the rest of what it stands for not drawn at all.
+			case "prop_only" -> {
+				String name = "prop_" + rule.swaps();
+				yield (base, e, view, pos, state, random, cull) -> {
+					BlockStateModel m = extra(name);
+					if (m != null) m.emitQuads(e, view, pos, state, random, d -> false);
+					else base.emitQuads(e, view, pos, state, random, cull);
+				};
+			}
+			case "hide" -> (base, e, view, pos, state, random, cull) -> {
+			};
 			// (19:06) Lavender Town's low mist: two thin lilac layers of haze over the ground, laid over four blocks.
 			case "mist" -> mist(sprite(baker, rule.swaps().equals("-") ? "mist_lav" : rule.swaps()));
 			case "grass_onto" -> {

@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/surge_wall","surge_wall":"retromon:block/interior/surge_wall"},"elements":[{"from":[16,0.0,0.0],"to":[16,16.0,12.8],"faces":{"west":{"uv":[0.0,0.0,12.8,16.0],"texture":"#surge_wall"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/trash_can","trash_can":"retromon:block/interior/trash_can"},"elements":[{"from":[3.88,16,10.28],"to":[15.32,16,16.0],"faces":{"down":{"uv":[3.88,0.0,15.32,5.72],"texture":"#trash_can"}}}]}

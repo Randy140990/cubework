@@ -1681,7 +1681,8 @@ const BUILD = {
     R.geo.box(LG_GATE_NOOK[0] - 0.3, R.H - 1.2, N - 0.12, LG_GATE_NOOK[1] + 0.3, R.H - 0.9, N + 0.06, "leagueGold");
     sunPool(R, LG_GATE_NOOK[0] + 0.1, 0.3, LG_GATE_NOOK[1] - 0.1, 4.6, 0, [0.3, 0.15, R.W - 0.3, R.Dm - 0.3], [0.12, LG_GATE_NOOK[0], LG_GATE_NOOK[1], 0.02, 2.4]);
     palm(R, 3.9, N + 0.8, 1.0); palm(R, 10.1, N + 0.8, 1.0);
-    rug(R, 5, N, 9, R.Dm, "leagueRed");
+    // (0.52, 10:41: "carpets and stuff... the same as the outside") A flat crimson runner, not wool.
+    runner(R, 5, N, 9, R.Dm, "leagueRun");
     for (const x of [2.5, 11.5]) for (const z of [N + 2.6, N + 5.8, N + 9.0]) leagueStatue(R, x, z);
     for (const x of [2.5, 11.5]) for (const z of [N + 4.2, N + 7.4]) flowerBush(R, x, z);
     for (const x of [0.9, 13.1]) for (const z of [N + 2.6, N + 5.8, N + 9.0]) flowerBush(R, x, z, 0.8);

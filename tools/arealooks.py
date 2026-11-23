@@ -729,6 +729,7 @@ def round50(add, room):
     round52(add, room)
     round52b(add, room)
     round52c(add, room)
+    round52d(add, room)
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -1026,6 +1027,50 @@ def round52c(add, room):
             "block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,"
             "block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_%s!" % globe, ("33", "42"))
         add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ("33", "42"))
+
+ROUTE23 = (-962, 172, -865, 507, "Route 23")
+PLATEAU = (-927, 148, -898, 240, "the INDIGO PLATEAU")
+R23_STATUES = [(-931, 238), (-926, 238), (-899, 238), (-894, 238), (-930, 265), (-921, 265), (-930, 273), (-921, 273), (-930, 281), (-921, 281),
+               (-931, 308), (-920, 308), (-914, 327), (-905, 327), (-898, 352), (-901, 363), (-924, 392), (-912, 430), (-914, 452), (-905, 452),
+               (-920, 468), (-911, 468), (-926, 488), (-917, 488), (-912, 504), (-903, 504)]
+
+
+def round52d(add, room):
+    """0.52.0's Route 23 and INDIGO PLATEAU (10:41): see tools/looks52.py's victory()."""
+    R = ROUTE23
+    up = ("26", "45")
+    # The walls as Let's Go's: warm brown brick, darker brick posts (John's orange), wooden caps, the lighter wood.
+    add("swap", "andesite", R, "block/andesite=vr_brick", up)
+    add("swap", "polished_andesite_stairs,polished_andesite_slab,polished_andesite", R, "block/polished_andesite=vr_cap", up)
+    add("swap", "resin_bricks,resin_brick_stairs,resin_brick_slab", R, "block/resin_bricks=vr_brick_dark", up)
+    add("swap", "birch_planks,birch_stairs,birch_slab", R, "block/birch_planks=vr_wood", up)
+    # The paving (John's copy of another town's), as Pewter's Let's Go paving.
+    for b in (R, PLATEAU):
+        add("swap", "white_concrete,smooth_quartz,white_terracotta,chiseled_quartz_block,light_gray_concrete", b, PAVE, ("25", "33"))
+    # The mountain over VICTORY ROAD (John's pink terracotta on top of the cliffs): the cliffs' earthy tops.
+    add("swap", "pink_terracotta", R, "block/pink_terracotta=hill_top@4|drip_rock@4", ("24", "30"))
+    # VICTORY ROAD's two mouths: a hole in the rock, framed in it, dark within (the cave itself is to come).
+    for b in ((-929, 258, -922, 265, "VICTORY ROAD's mouth"), (-905, 258, -897, 265, "VICTORY ROAD's other mouth")):
+        add("swap", "stone_bricks,smooth_stone_slab,black_concrete", b,
+            "block/stone_bricks=drip_rock@4,block/smooth_stone=drip_rock_top|drip_rock@4,block/smooth_stone_slab_side=drip_rock@4,block/black_concrete=cave_dark", ("25", "31"))
+    # The statues (10:41): Let's Go's, a stone POKe BALL on a grey pedestal with a gold trim, in place of John's.
+    for x, z in R23_STATUES:
+        add("prop_only", "hopper", (x, z, x, z, "a statue"), "statue", ("27", "27"))
+        add("hide", "cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall", (x - 1, z, x + 1, z, "a statue"), "-", ("26", "28"))
+    # The INDIGO PLATEAU: its brick clean red brick, its stone base and eaves cream, every copper part polished metal
+    # (bronze, and the weathered teal as teal), shining; its doorway dark.
+    P = PLATEAU
+    add("swap", "bricks,brick_stairs,brick_slab", P, "block/bricks=plateau_brick", ("30", "46"))
+    add("swap", "andesite,polished_andesite_stairs,polished_andesite_slab", (-926, 150, -899, 171, "the INDIGO PLATEAU's base"),
+        "block/andesite=plateau_stone,block/polished_andesite=plateau_stone", ("30", "46"))
+    add("swap", "waxed_cut_copper,waxed_cut_copper_stairs,waxed_cut_copper_slab,waxed_copper_block,cut_copper,cut_copper_stairs,copper_block", P,
+        "block/cut_copper=metal_bronze,block/copper_block=metal_bronze", ("24", "46"))
+    add("swap", "waxed_copper_trapdoor,copper_trapdoor", P, "block/copper_trapdoor=metal_bronze_trapdoor", ("24", "46"))
+    add("swap", "waxed_weathered_copper,waxed_weathered_cut_copper,waxed_weathered_cut_copper_stairs,weathered_copper,weathered_cut_copper,weathered_cut_copper_stairs", P,
+        "block/weathered_copper=metal_teal,block/weathered_cut_copper=metal_teal", ("24", "46"))
+    add("swap", "waxed_weathered_copper_trapdoor,weathered_copper_trapdoor", P, "block/weathered_copper_trapdoor=metal_teal_trapdoor", ("24", "46"))
+    add("swap", "smooth_quartz_slab,polished_diorite_slab", P, "block/quartz_block_bottom=white_step,block/polished_diorite=white_step", ("25", "35"))
+    add("swap", "black_concrete", (-916, 163, -909, 166, "the INDIGO PLATEAU's doorway"), "block/black_concrete=gate_dark", ("33", "40"))
 
 
 if __name__ == "__main__":

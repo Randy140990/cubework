@@ -2058,6 +2058,75 @@ swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-
 glass	black_stained_glass_pane	-509	437	-507	439	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-509	445	-507	447	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_yellow!	a Celadon lamp
 glass	black_stained_glass_pane	-509	445	-507	447	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
+swap	andesite	-962	172	-865	507	26	45	block/andesite=vr_brick	Route 23
+swap	polished_andesite_stairs,polished_andesite_slab,polished_andesite	-962	172	-865	507	26	45	block/polished_andesite=vr_cap	Route 23
+swap	resin_bricks,resin_brick_stairs,resin_brick_slab	-962	172	-865	507	26	45	block/resin_bricks=vr_brick_dark	Route 23
+swap	birch_planks,birch_stairs,birch_slab	-962	172	-865	507	26	45	block/birch_planks=vr_wood	Route 23
+swap	white_concrete,smooth_quartz,white_terracotta,chiseled_quartz_block,light_gray_concrete	-962	172	-865	507	25	33	block/white_concrete=pave_white,block/quartz_block_bottom=pave_quartz,block/white_terracotta=pave_terracotta,block/chiseled_quartz_block_top=pave_chiseled,block/chiseled_quartz_block=pave_chiseled_side,block/light_gray_concrete=pave_gray	Route 23
+swap	white_concrete,smooth_quartz,white_terracotta,chiseled_quartz_block,light_gray_concrete	-927	148	-898	240	25	33	block/white_concrete=pave_white,block/quartz_block_bottom=pave_quartz,block/white_terracotta=pave_terracotta,block/chiseled_quartz_block_top=pave_chiseled,block/chiseled_quartz_block=pave_chiseled_side,block/light_gray_concrete=pave_gray	the INDIGO PLATEAU
+swap	pink_terracotta	-962	172	-865	507	24	30	block/pink_terracotta=hill_top@4|drip_rock@4	Route 23
+swap	stone_bricks,smooth_stone_slab,black_concrete	-929	258	-922	265	25	31	block/stone_bricks=drip_rock@4,block/smooth_stone=drip_rock_top|drip_rock@4,block/smooth_stone_slab_side=drip_rock@4,block/black_concrete=cave_dark	VICTORY ROAD's mouth
+swap	stone_bricks,smooth_stone_slab,black_concrete	-905	258	-897	265	25	31	block/stone_bricks=drip_rock@4,block/smooth_stone=drip_rock_top|drip_rock@4,block/smooth_stone_slab_side=drip_rock@4,block/black_concrete=cave_dark	VICTORY ROAD's other mouth
+prop_only	hopper	-931	238	-931	238	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-932	238	-930	238	26	28	-	a statue
+prop_only	hopper	-926	238	-926	238	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-927	238	-925	238	26	28	-	a statue
+prop_only	hopper	-899	238	-899	238	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-900	238	-898	238	26	28	-	a statue
+prop_only	hopper	-894	238	-894	238	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-895	238	-893	238	26	28	-	a statue
+prop_only	hopper	-930	265	-930	265	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-931	265	-929	265	26	28	-	a statue
+prop_only	hopper	-921	265	-921	265	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-922	265	-920	265	26	28	-	a statue
+prop_only	hopper	-930	273	-930	273	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-931	273	-929	273	26	28	-	a statue
+prop_only	hopper	-921	273	-921	273	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-922	273	-920	273	26	28	-	a statue
+prop_only	hopper	-930	281	-930	281	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-931	281	-929	281	26	28	-	a statue
+prop_only	hopper	-921	281	-921	281	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-922	281	-920	281	26	28	-	a statue
+prop_only	hopper	-931	308	-931	308	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-932	308	-930	308	26	28	-	a statue
+prop_only	hopper	-920	308	-920	308	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-921	308	-919	308	26	28	-	a statue
+prop_only	hopper	-914	327	-914	327	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-915	327	-913	327	26	28	-	a statue
+prop_only	hopper	-905	327	-905	327	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-906	327	-904	327	26	28	-	a statue
+prop_only	hopper	-898	352	-898	352	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-899	352	-897	352	26	28	-	a statue
+prop_only	hopper	-901	363	-901	363	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-902	363	-900	363	26	28	-	a statue
+prop_only	hopper	-924	392	-924	392	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-925	392	-923	392	26	28	-	a statue
+prop_only	hopper	-912	430	-912	430	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-913	430	-911	430	26	28	-	a statue
+prop_only	hopper	-914	452	-914	452	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-915	452	-913	452	26	28	-	a statue
+prop_only	hopper	-905	452	-905	452	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-906	452	-904	452	26	28	-	a statue
+prop_only	hopper	-920	468	-920	468	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-921	468	-919	468	26	28	-	a statue
+prop_only	hopper	-911	468	-911	468	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-912	468	-910	468	26	28	-	a statue
+prop_only	hopper	-926	488	-926	488	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-927	488	-925	488	26	28	-	a statue
+prop_only	hopper	-917	488	-917	488	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-918	488	-916	488	26	28	-	a statue
+prop_only	hopper	-912	504	-912	504	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-913	504	-911	504	26	28	-	a statue
+prop_only	hopper	-903	504	-903	504	27	27	statue	a statue
+hide	cauldron,chiseled_nether_bricks,anvil,chipped_anvil,damaged_anvil,blackstone_wall	-904	504	-902	504	26	28	-	a statue
+swap	bricks,brick_stairs,brick_slab	-927	148	-898	240	30	46	block/bricks=plateau_brick	the INDIGO PLATEAU
+swap	andesite,polished_andesite_stairs,polished_andesite_slab	-926	150	-899	171	30	46	block/andesite=plateau_stone,block/polished_andesite=plateau_stone	the INDIGO PLATEAU's base
+swap	waxed_cut_copper,waxed_cut_copper_stairs,waxed_cut_copper_slab,waxed_copper_block,cut_copper,cut_copper_stairs,copper_block	-927	148	-898	240	24	46	block/cut_copper=metal_bronze,block/copper_block=metal_bronze	the INDIGO PLATEAU
+swap	waxed_copper_trapdoor,copper_trapdoor	-927	148	-898	240	24	46	block/copper_trapdoor=metal_bronze_trapdoor	the INDIGO PLATEAU
+swap	waxed_weathered_copper,waxed_weathered_cut_copper,waxed_weathered_cut_copper_stairs,weathered_copper,weathered_cut_copper,weathered_cut_copper_stairs	-927	148	-898	240	24	46	block/weathered_copper=metal_teal,block/weathered_cut_copper=metal_teal	the INDIGO PLATEAU
+swap	waxed_weathered_copper_trapdoor,weathered_copper_trapdoor	-927	148	-898	240	24	46	block/weathered_copper_trapdoor=metal_teal_trapdoor	the INDIGO PLATEAU
+swap	smooth_quartz_slab,polished_diorite_slab	-927	148	-898	240	25	35	block/quartz_block_bottom=white_step,block/polished_diorite=white_step	the INDIGO PLATEAU
+swap	black_concrete	-916	163	-909	166	33	40	block/black_concrete=gate_dark	the INDIGO PLATEAU's doorway
 swap	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 swap	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care

@@ -2503,6 +2503,15 @@ public final class Game {
 					tutor(p, n, d);
 					return;
 				}
+				// (0.52) ROUTE 23's guards: whether you've the badge they check.
+				String gb = guardBadge(n.key());
+				if (gb != null) {
+					dialogue(p, n, "talk", d.badges.contains(gb)
+							? List.of("You can pass here only if you have the " + gb + ".", "Oh! That is the " + gb + "!", "OK then! Please, go right ahead!")
+							: List.of("You can pass here only if you have the " + gb + ".", "You don't have the " + gb + " yet!",
+									"You have to have it to get to the POKéMON LEAGUE!"));
+					return;
+				}
 				// (0.52) The COPYCAT (FireRed's): bring her a POKé DOLL and she teaches you MIMIC (TM31); till then she
 				// only mimics you, and after, she thanks you (still mimicking).
 				if (n.key().equals("copycats_house_2f_p0")) {
@@ -4372,6 +4381,9 @@ public final class Game {
 	 * sign, as John asked. Key, then x and z.
 	 */
 	private static final Object[][] SPOTS = {{"pallet_town_p1", -809, 686}, {"pallet_town_p2", -785, 704}, {"pallet_town_p3", -780, 701},
+			// (0.52) ROUTE 23's seven guards, each at the east side of the gap he guards.
+			{"route_23_guard_1", -906, 505}, {"route_23_guard_2", -920, 489}, {"route_23_guard_3", -914, 469}, {"route_23_guard_4", -908, 453},
+			{"route_23_guard_5", -908, 328}, {"route_23_guard_6", -924, 282}, {"route_23_guard_7", -924, 266},
 			// Viridian City's people where FireRed has them (12:44; its map laid over John's at two blocks a step, from its
 			// doors): the old man (lying in the road, then his catching lesson and the TEACHY TV) by the way north, his
 			// granddaughter below him, the old man by the GYM, the boy with the caterpillars down the west side, the
@@ -4438,6 +4450,22 @@ public final class Game {
 				message(p, List.of("A sleeping POKéMON blocks the way!"));
 			}
 		}
+		// (0.52, 10:41) ROUTE 23's badge checks (FireRed's seven guards, Let's Go's gates between the statues): without
+		// that guard's badge, no further north through the gap than its line.
+		for (Object[] g : BADGE_GATES) {
+			String badge = (String) g[1];
+			int gz = (Integer) g[2], x0 = (Integer) g[3], x1 = (Integer) g[4];
+			if (d.badges.contains(badge)) continue;
+			if (p.getX() < x0 - 0.3 || p.getX() > x1 + 0.3 || p.getZ() > gz + 0.9 || p.getZ() < gz - 3 || Math.abs(p.getY() - 27) > 4) continue;
+			p.teleportTo(p.getX(), p.getY(), gz + 1.6);
+			p.setDeltaMovement(Vec3.ZERO);
+			if (!BLOCKED_SAID.containsKey(p.getUUID())) {
+				BLOCKED_SAID.put(p.getUUID(), 100);
+				dialogue(p, null, "talk", List.of("GUARD: You can pass here only if you have the " + badge + ".", "GUARD: You don't have the " + badge + " yet!",
+						"GUARD: You have to have it to get to the POKéMON LEAGUE!"), whoTag("GUARD"));
+			}
+			return;
+		}
 		// The S.S. ANNE: the sailor at the foot of the gangway (z 612 on): no further.
 		if (p.getX() > -366 && p.getX() < -340 && p.getZ() > 612.2 && p.getZ() < 620 && p.getY() > 28 && p.getY() < 36) {
 			p.teleportTo(p.getX(), p.getY(), 611.6);
@@ -4447,6 +4475,22 @@ public final class Game {
 						: List.of("SAILOR: Welcome to the S.S.ANNE!", "SAILOR: May I see your S.S.TICKET?", "SAILOR: ...Sorry! You need a ticket to come aboard."));
 			}
 		}
+	}
+
+	/**
+	 * (0.52, 10:41) ROUTE 23's badge checks, FireRed's seven, at the gaps between John's statues, south to north: the
+	 * guard's key, the badge, the gap's line (z) and its width (x0 to x1, the blocks between the two statues). The four
+	 * gates up from the LEAGUE gate, the first gate past the water, and the two on the way up to VICTORY ROAD's mouth.
+	 */
+	private static final Object[][] BADGE_GATES = {{"route_23_guard_1", "CASCADEBADGE", 504, -910, -905}, {"route_23_guard_2", "THUNDERBADGE", 488, -924, -919},
+			{"route_23_guard_3", "RAINBOWBADGE", 468, -918, -913}, {"route_23_guard_4", "SOULBADGE", 452, -912, -907},
+			{"route_23_guard_5", "MARSHBADGE", 327, -912, -907}, {"route_23_guard_6", "VOLCANOBADGE", 281, -928, -923},
+			{"route_23_guard_7", "EARTHBADGE", 265, -928, -923}};
+
+	/** A ROUTE 23 guard's badge (null: not one). */
+	private static String guardBadge(String key) {
+		for (Object[] g : BADGE_GATES) if (g[0].equals(key)) return (String) g[1];
+		return null;
 	}
 
 	private static final Object[][] ITEM_SPOTS = {{"route_2_parlyz_heal", -779.0, 26.0, 472.0},

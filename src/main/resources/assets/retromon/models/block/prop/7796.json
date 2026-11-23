@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cap","cap":"retromon:block/interior/cap"},"elements":[{"from":[9.6,6.4,9.6],"to":[16.0,6.4,16.0],"faces":{"up":{"uv":[9.6,9.6,16.0,16.0],"texture":"#cap"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/dojo_pillar_top","dojo_pillar_top":"retromon:block/interior/dojo_pillar_top"},"elements":[{"from":[2.6,0,0.0],"to":[13.4,0,13.4],"faces":{"up":{"uv":[2.6,0.0,13.4,13.4],"texture":"#dojo_pillar_top"}}}]}

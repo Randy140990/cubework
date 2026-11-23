@@ -349,6 +349,7 @@ def build():
     save("dojo_door", shoji())
     others()
     celadon()
+    victory()
 
 
 # ---------- 0.52.0: the other places (09:01, 09:05, 09:11) ----------
@@ -489,6 +490,99 @@ def celadon():
     save("lamp_cel_cap_top", B.cap_top(hexc("#E7C35A")))
     for name, col in RAINBOW:
         save("lamp_globe_" + name, B.globe(hexc(col)))
+
+
+# ---------- Route 23, Indigo Plateau (10:41) ----------
+def shiny(base, seed):
+    """Polished metal (John's copper, 10:41: "metal, shiny"): a bright sheen across it, a crisp highlight streak, a
+    darker foot, the faintest brushing."""
+    r = random.Random(seed)
+    im = _img()
+    for y in range(16):
+        for x in range(16):
+            k = 0.14 - 0.26 * (y / 15) + (r.random() - 0.5) * 0.02
+            d = (x + y) % 16
+            if 3 <= d <= 4: k += 0.32
+            elif d == 5 or d == 2: k += 0.14
+            if y == 0: k += 0.18
+            if y == 15: k -= 0.12
+            _put(im, x, y, shade(base, k))
+    return im
+
+
+def shiny_from(src, base, seed):
+    """A copper trapdoor (holes kept) as polished metal."""
+    ramp = [shade(base, -0.45), shade(base, -0.15), base, shade(base, 0.35), shade(base, 0.7)]
+    return L.recolour_soft(os.path.join(L.VANILLA, "textures", "block", src + ".png"), ramp, 80.0)
+
+
+def statue_textures():
+    save("statue_stone", V.panels(hexc("#C9CCCC"), "sts"))
+    save("statue_stone_top", B.cap_top(hexc("#D4D7D7")))
+    save("statue_gold", shiny(hexc("#E0B040"), "stg"))
+    save("statue_ball", B.grain(hexc("#C4C8CA"), "stb", 0.04))
+    save("statue_ball_top", B.grain(hexc("#D6D9DB"), "stt", 0.03))
+    save("statue_band", L.solid_shaded(hexc("#5C6168"), 0.05, -0.05, 0.0, "stbd"))
+
+
+def statue_model():
+    """Let's Go's statue on ROUTE 23 (10:41): a grey stone pedestal on a plinth, a gold trim round its top, a stone
+    POKé BALL on it (its dark band, a gold button), laid over John's statue's middle block (the hopper; the rest of
+    his statue is hidden), from the ground (16 below it) to just under three blocks up."""
+    els = []
+    def box(a, b, tex, top=None):
+        faces = {f: {"texture": "#" + tex} for f in ("north", "south", "east", "west", "down")}
+        faces["up"] = {"texture": "#" + (top or tex)}
+        els.append({"from": a, "to": b, "faces": faces})
+    box([-6, -16, -6], [22, -12, 22], "stone", "stone_top")
+    box([-3, -12, -3], [19, 9, 19], "stone", "stone_top")
+    box([-4.5, 9, -4.5], [20.5, 11, 20.5], "gold")
+    box([-5, 11, -5], [21, 13.5, 21], "stone", "stone_top")
+    box([-0.5, 13.5, -0.5], [16.5, 21, 16.5], "ball")
+    box([-0.8, 21, -0.8], [16.8, 22.5, 16.8], "band")
+    box([-0.5, 22.5, -0.5], [16.5, 30, 16.5], "ball", "ball_top")
+    for f, a, b in (("s", [6, 19.5, 16.6], [10, 24, 17.4]), ("n", [6, 19.5, -1.4], [10, 24, -0.6]),
+                    ("e", [16.6, 19.5, 6], [17.4, 24, 10]), ("w", [-1.4, 19.5, 6], [-0.6, 24, 10])):
+        box(a, b, "gold")
+    model = {"ambientocclusion": False,
+             "textures": {"stone": "retromon:block/area/statue_stone", "stone_top": "retromon:block/area/statue_stone_top",
+                          "gold": "retromon:block/area/statue_gold", "ball": "retromon:block/area/statue_ball",
+                          "ball_top": "retromon:block/area/statue_ball_top", "band": "retromon:block/area/statue_band",
+                          "particle": "retromon:block/area/statue_stone"},
+             "elements": els}
+    L.write_json(os.path.join(L.MODELS, "prop_statue.json"), model)
+
+
+def golems():
+    """The plateau's copper golem statues (10:41: "retouch as you see fit"): polished bronze statues, the look pack's
+    weathered copper golem (John's are all weathered), its pattern kept."""
+    src = os.path.join(L.VANILLA, "textures", "entity", "copper_golem")
+    out = os.path.join(L.HERE, "..", "src", "main", "resources", "resourcepacks", "retromon_look", "assets", "minecraft", "textures", "entity",
+                       "copper_golem")
+    if not os.path.isdir(src):
+        return
+    ramp = [hexc("#5A3A1C"), hexc("#9C6A34"), hexc("#D9A458"), hexc("#F6D9A0"), hexc("#FFF4DA")]
+    os.makedirs(out, exist_ok=True)
+    for f in os.listdir(src):
+        if f == "weathered_copper_golem.png":
+            im = L.recolour_soft(os.path.join(src, f), ramp, 110.0)
+            im.save(os.path.join(out, f))
+
+
+def victory():
+    save("vr_brick", L.bricks(hexc("#B8784C"), hexc("#7E4E30")))
+    save("vr_brick_dark", L.bricks(hexc("#9C5236"), hexc("#6A3424")))
+    save("vr_cap", K.boards(hexc("#9C6B3A"), "vrc"))
+    save("vr_wood", K.boards(hexc("#C9A16A"), "vrw", vertical=True))
+    save("plateau_brick", L.bricks(hexc("#B85440"), hexc("#E6D2BE")))
+    save("plateau_stone", V.panels(hexc("#E6DCC8"), "pls"))
+    save("metal_bronze", shiny(hexc("#C98A4E"), "mbz"))
+    save("metal_teal", shiny(hexc("#3F9C90"), "mtl"))
+    save("metal_bronze_trapdoor", shiny_from("copper_trapdoor", hexc("#C98A4E"), "mbt"))
+    save("metal_teal_trapdoor", shiny_from("weathered_copper_trapdoor", hexc("#3F9C90"), "mtt"))
+    statue_textures()
+    statue_model()
+    golems()
 
 
 if __name__ == "__main__":

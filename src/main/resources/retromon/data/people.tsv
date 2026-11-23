@@ -360,3 +360,10 @@ underground_path_trader	underground_path_route_5	middle_aged_man	down	stay	I'm l
 cerulean_trader	cerulean_trade_house	old_man	left	stay	I'm looking for POLIWHIRL! Wanna trade one for JYNX?	-1	-1
 daycare_clefairy	daycare_pen	clefairy	down	stay	CLEFAIRY: Pippii! | (It's being looked after at the DAY CARE.)	0	0
 daycare_psyduck	daycare_pen	psyduck	down	stay	PSYDUCK: Kwaa? | (It's being looked after at the DAY CARE.)	0	0
+route_23_guard_1	route_23	guard	down	stay	You can pass here only if you have the CASCADEBADGE.	-1	-1
+route_23_guard_2	route_23	guard	down	stay	You can pass here only if you have the THUNDERBADGE.	-1	-1
+route_23_guard_3	route_23	guard	down	stay	You can pass here only if you have the RAINBOWBADGE.	-1	-1
+route_23_guard_4	route_23	guard	down	stay	You can pass here only if you have the SOULBADGE.	-1	-1
+route_23_guard_5	route_23	guard	down	stay	You can pass here only if you have the MARSHBADGE.	-1	-1
+route_23_guard_6	route_23	guard	down	stay	You can pass here only if you have the VOLCANOBADGE.	-1	-1
+route_23_guard_7	route_23	guard	down	stay	You can pass here only if you have the EARTHBADGE.	-1	-1

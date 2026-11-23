@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/counter_yellow","counter_yellow":"retromon:block/interior/counter_yellow"},"elements":[{"from":[0.0,16,4.2],"to":[5.4,16,16.0],"faces":{"down":{"uv":[0.0,0.0,5.4,11.8],"texture":"#counter_yellow"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/museum_wall","museum_wall":"retromon:block/interior/museum_wall"},"elements":[{"from":[16,0.0,0.0],"to":[16,16.0,16],"faces":{"west":{"uv":[0.0,0.0,16.0,16.0],"texture":"#museum_wall"}}}]}

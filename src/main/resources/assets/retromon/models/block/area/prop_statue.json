@@ -1,0 +1,366 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "stone": "retromon:block/area/statue_stone",
+  "stone_top": "retromon:block/area/statue_stone_top",
+  "gold": "retromon:block/area/statue_gold",
+  "ball": "retromon:block/area/statue_ball",
+  "ball_top": "retromon:block/area/statue_ball_top",
+  "band": "retromon:block/area/statue_band",
+  "particle": "retromon:block/area/statue_stone"
+ },
+ "elements": [
+  {
+   "from": [
+    -6,
+    -16,
+    -6
+   ],
+   "to": [
+    22,
+    -12,
+    22
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone_top"
+    }
+   }
+  },
+  {
+   "from": [
+    -3,
+    -12,
+    -3
+   ],
+   "to": [
+    19,
+    9,
+    19
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone_top"
+    }
+   }
+  },
+  {
+   "from": [
+    -4.5,
+    9,
+    -4.5
+   ],
+   "to": [
+    20.5,
+    11,
+    20.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#gold"
+    },
+    "south": {
+     "texture": "#gold"
+    },
+    "east": {
+     "texture": "#gold"
+    },
+    "west": {
+     "texture": "#gold"
+    },
+    "down": {
+     "texture": "#gold"
+    },
+    "up": {
+     "texture": "#gold"
+    }
+   }
+  },
+  {
+   "from": [
+    -5,
+    11,
+    -5
+   ],
+   "to": [
+    21,
+    13.5,
+    21
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone"
+    },
+    "south": {
+     "texture": "#stone"
+    },
+    "east": {
+     "texture": "#stone"
+    },
+    "west": {
+     "texture": "#stone"
+    },
+    "down": {
+     "texture": "#stone"
+    },
+    "up": {
+     "texture": "#stone_top"
+    }
+   }
+  },
+  {
+   "from": [
+    -0.5,
+    13.5,
+    -0.5
+   ],
+   "to": [
+    16.5,
+    21,
+    16.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#ball"
+    },
+    "south": {
+     "texture": "#ball"
+    },
+    "east": {
+     "texture": "#ball"
+    },
+    "west": {
+     "texture": "#ball"
+    },
+    "down": {
+     "texture": "#ball"
+    },
+    "up": {
+     "texture": "#ball"
+    }
+   }
+  },
+  {
+   "from": [
+    -0.8,
+    21,
+    -0.8
+   ],
+   "to": [
+    16.8,
+    22.5,
+    16.8
+   ],
+   "faces": {
+    "north": {
+     "texture": "#band"
+    },
+    "south": {
+     "texture": "#band"
+    },
+    "east": {
+     "texture": "#band"
+    },
+    "west": {
+     "texture": "#band"
+    },
+    "down": {
+     "texture": "#band"
+    },
+    "up": {
+     "texture": "#band"
+    }
+   }
+  },
+  {
+   "from": [
+    -0.5,
+    22.5,
+    -0.5
+   ],
+   "to": [
+    16.5,
+    30,
+    16.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#ball"
+    },
+    "south": {
+     "texture": "#ball"
+    },
+    "east": {
+     "texture": "#ball"
+    },
+    "west": {
+     "texture": "#ball"
+    },
+    "down": {
+     "texture": "#ball"
+    },
+    "up": {
+     "texture": "#ball_top"
+    }
+   }
+  },
+  {
+   "from": [
+    6,
+    19.5,
+    16.6
+   ],
+   "to": [
+    10,
+    24,
+    17.4
+   ],
+   "faces": {
+    "north": {
+     "texture": "#gold"
+    },
+    "south": {
+     "texture": "#gold"
+    },
+    "east": {
+     "texture": "#gold"
+    },
+    "west": {
+     "texture": "#gold"
+    },
+    "down": {
+     "texture": "#gold"
+    },
+    "up": {
+     "texture": "#gold"
+    }
+   }
+  },
+  {
+   "from": [
+    6,
+    19.5,
+    -1.4
+   ],
+   "to": [
+    10,
+    24,
+    -0.6
+   ],
+   "faces": {
+    "north": {
+     "texture": "#gold"
+    },
+    "south": {
+     "texture": "#gold"
+    },
+    "east": {
+     "texture": "#gold"
+    },
+    "west": {
+     "texture": "#gold"
+    },
+    "down": {
+     "texture": "#gold"
+    },
+    "up": {
+     "texture": "#gold"
+    }
+   }
+  },
+  {
+   "from": [
+    16.6,
+    19.5,
+    6
+   ],
+   "to": [
+    17.4,
+    24,
+    10
+   ],
+   "faces": {
+    "north": {
+     "texture": "#gold"
+    },
+    "south": {
+     "texture": "#gold"
+    },
+    "east": {
+     "texture": "#gold"
+    },
+    "west": {
+     "texture": "#gold"
+    },
+    "down": {
+     "texture": "#gold"
+    },
+    "up": {
+     "texture": "#gold"
+    }
+   }
+  },
+  {
+   "from": [
+    -1.4,
+    19.5,
+    6
+   ],
+   "to": [
+    -0.6,
+    24,
+    10
+   ],
+   "faces": {
+    "north": {
+     "texture": "#gold"
+    },
+    "south": {
+     "texture": "#gold"
+    },
+    "east": {
+     "texture": "#gold"
+    },
+    "west": {
+     "texture": "#gold"
+    },
+    "down": {
+     "texture": "#gold"
+    },
+    "up": {
+     "texture": "#gold"
+    }
+   }
+  }
+ ]
+}
