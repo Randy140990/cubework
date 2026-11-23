@@ -3562,6 +3562,18 @@ public final class Game {
 			// An in-game trade (the viewer's "Trading"): what they're after, for theirs.
 			t.putString("want", want.id());
 			dialogue(p, null, "trade", List.of("TRADER: I'm looking for a " + want.name() + ". Will you trade one for my " + name + "?"), t, w.getId());
+		} else if (DOJO_PRIZE.containsKey(st.id())) {
+			// (0.51) The FIGHTING DOJO's prize: one of the two, once you've beaten the KARATE MASTER.
+			if (!d.beaten.contains("fighting_dojo_0")) {
+				dialogue(p, null, "talk", List.of("It's " + name + "!", "The KARATE MASTER is watching. Beat him first!"), t, w.getId());
+				return;
+			}
+			if (d.statics.contains(DOJO_PRIZE.get(st.id()))) {
+				dialogue(p, null, "talk", List.of("Better not get greedy..."), t, w.getId());
+				return;
+			}
+			dialogue(p, null, "gift", List.of(st.id().startsWith("hitmonlee") ? "It's HITMONLEE, the kicking fiend!" : "It's HITMONCHAN, the piercing puncher!",
+					"Do you want " + name + "?"), t, w.getId());
 		} else if (st.kind().equals("gift") || st.kind().equals("trade")) {
 			dialogue(p, null, "gift", List.of(st.note() + ".", "Do you want " + name + "?"), t, w.getId());
 		} else if (!d.started || !d.anyHealthy()) {
@@ -3790,6 +3802,8 @@ public final class Game {
 				d.add(m);
 				d.statics.add(st.id());
 				if (e instanceof WorldMon w) w.discard();
+				// (The DOJO's other POKe BALL stays where it is; it's no longer yours to take.)
+				if (DOJO_PRIZE.containsKey(st.id())) d.statics.add(DOJO_PRIZE.get(st.id()));
 				sync(p);
 				CompoundTag s = new CompoundTag();
 				s.putString("sound", "caught");
@@ -4355,6 +4369,8 @@ public final class Game {
 	 * (0.50) The POKeMON that wait in one spot out in the world: Route 12's SNORLAX asleep on the pier south of Route
 	 * 11's gate, Route 16's outside its gate's west way. Key, x, y, z, facing.
 	 */
+	/** (0.51) The FIGHTING DOJO's two prizes, each with the other: take one and the other stays. */
+	private static final Map<String, String> DOJO_PRIZE = Map.of("hitmonlee_gift", "hitmonchan_gift", "hitmonchan_gift", "hitmonlee_gift");
 	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -123.0, 31.0, 599.5, 90.0}, {"snorlax_route_16", -623.5, 34.0, 418.5, 0.0}};
 
 	/** How near a sleeping SNORLAX you can come (blocks from its middle). */

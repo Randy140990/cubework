@@ -39,7 +39,8 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "gate_r5": (3712, 64, 0), "gate_r6": (3776, 64, 0), "gate_r7": (3840, 64, 0), "gate_r8": (3904, 64, 0), "gate_r11": (3968, 64, 0),
           "gate_r12": (4032, 64, 0), "gate_r15": (4416, 64, 0), "gate_r16n": (4480, 64, 0), "gate_r16s": (4544, 64, 0), "gate_r18": (4928, 64, 0),
           "route12_house": (4992, 64, 0), "route16_house": (5056, 64, 0),
-          "gate_r11_2f": (5248, 64, 0), "gate_r12_2f": (5312, 64, 0), "gate_r15_2f": (5504, 64, 0), "gate_r16_2f": (5568, 64, 0),}
+          "gate_r11_2f": (5248, 64, 0), "gate_r12_2f": (5312, 64, 0), "gate_r15_2f": (5504, 64, 0), "gate_r16_2f": (5568, 64, 0),
+          "fighting_dojo": (5760, 64, 0), "saffron_gym": (5824, 64, 0),}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -58,7 +59,8 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "gate_r5": "route_5_gate", "gate_r6": "route_6_gate", "gate_r7": "route_7_gate", "gate_r8": "route_8_gate", "gate_r11": "route_11_gate_1f",
          "gate_r12": "route_12_gate_1f", "gate_r15": "route_15_gate_1f", "gate_r16n": "route_16_gate_1f", "gate_r16s": "route_16_gate_1f",
          "gate_r18": "route_18_gate_1f", "route12_house": "route_12_super_rod_house", "route16_house": "route_16_fly_house",
-         "gate_r11_2f": "route_11_gate_2f", "gate_r12_2f": "route_12_gate_2f", "gate_r15_2f": "route_15_gate_2f", "gate_r16_2f": "route_16_gate_2f",}
+         "gate_r11_2f": "route_11_gate_2f", "gate_r12_2f": "route_12_gate_2f", "gate_r15_2f": "route_15_gate_2f", "gate_r16_2f": "route_16_gate_2f",
+         "fighting_dojo": "fighting_dojo", "saffron_gym": "saffron_gym",}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -216,6 +218,9 @@ MONS = {"power_plant": [{"key": "zapdos", "species": "zapdos", "x": 5.6, "z": 4.
         ("electrode_power_plant_1", 25.5, 18.5), ("power_plant_voltorb_4", 23.5, 32.5), ("power_plant_voltorb_5", 26.5, 26.0),
         ("electrode_power_plant_2", 21.5, 12.0), ("power_plant_voltorb_6", 37.5, 32.5))]}
 MONS["daycare"] = MONS_DAYCARE
+# The FIGHTING DOJO's prize: HITMONLEE and HITMONCHAN in their POKe BALLs behind the KARATE MASTER (take one).
+MONS["fighting_dojo"] = [{"key": "hitmonlee_gift", "species": "poke_ball", "x": 5.5, "z": 3.5, "yaw": 0.0},
+                         {"key": "hitmonchan_gift", "species": "poke_ball", "x": 7.5, "z": 3.5, "yaw": 0.0}]
 MONS["pokemon_fan_club"] = [{"key": "pet:pokemon_fan_club_p2", "species": "clefairy", "x": 10.4, "z": 8.6, "yaw": 90.0},
                             {"key": "pet:pokemon_fan_club_p3", "species": "seel", "x": 3.6, "z": 8.6, "yaw": 270.0}]
 MONS["lavender_volunteer_house"] = [{"key": "pet:mr_fujis_house_p2", "species": "psyduck", "x": 9.0, "z": 2.0, "yaw": 180.0},
@@ -576,6 +581,10 @@ def main():
             east = m["wall"] == "e"
             warps.append({"kind": "east" if east else "west", "x": room["W"] - 1.0 if east else 1.0, "z0": m["z0"], "z1": m["z1"],
                           "door": SIDE_DOOR.get((rid, m["wall"])), "to": None, "choice": m.get("choice"), "needs": m.get("needs")})
+        # (0.51) Warp pads (the SAFFRON GYM's): step on one and you're on its partner, in the same room.
+        for pd in room.get("pads", []):
+            warps.append({"kind": "pad", "x0": pd["x0"], "x1": pd["x1"], "z0": pd["z0"], "z1": pd["z1"], "to": rid,
+                          "spawn": {"x": pd["to"]["x"], "z": pd["to"]["z"], "yaw": 0.0}})
         for s in room["stairs"]:
             to = s["to"]; sp = s["spawn"]
             warps.append({"kind": s["dir"], "x0": s["x0"], "x1": s["x0"] + 4, "z0": s["z0"], "z1": s["z0"] + s["depth"], "to": to,

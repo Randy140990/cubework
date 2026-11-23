@@ -178,6 +178,8 @@ public final class ClientState {
 					case "caught" -> Sounds.caught();
 					case "item" -> Music.jingle("get_item");
 					case "key" -> Music.jingle("get_key_item");
+					// (0.51) A warp pad (the SAFFRON GYM's).
+					case "warp" -> Sounds.sfx("psychic", 1.6F, 0.6F);
 					default -> {
 					}
 				}

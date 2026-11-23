@@ -801,6 +801,8 @@ public final class Interiors {
 
 	/** Ticks before each player can go through another door or mat (so you don't bounce straight back). */
 	private static final Map<UUID, Integer> COOL = new HashMap<>();
+	/** (0.51) The warp pad each player last landed on (room coordinates): quiet till they've stepped off it. */
+	private static final Map<UUID, double[]> PAD_LOCK = new HashMap<>();
 	/** Who's on their way somewhere (after the fade to black): ticks left, and where to. */
 	private static final Map<UUID, Integer> PENDING_T = new HashMap<>();
 	private static final Map<UUID, Runnable> PENDING = new HashMap<>();
@@ -1000,6 +1002,24 @@ public final class Interiors {
 								return false;
 							}
 							out(p, d);
+							return true;
+						}
+					}
+					case "pad" -> {
+						// (0.51) A warp pad (the SAFFRON GYM's): onto its partner, in a blink. The pad you land on stays quiet
+						// till you've stepped off it.
+						double[] lock = PAD_LOCK.get(id);
+						if (lock != null && Math.hypot(lx - lock[0], lz - lock[1]) < 0.75) continue;
+						if (lock != null) PAD_LOCK.remove(id);
+						if (lx > w.x0() && lx < w.x1() && lz > w.z0() && lz < w.z1()) {
+							PAD_LOCK.put(id, new double[] {w.sx(), w.sz()});
+							p.teleportTo(r.ox() + w.sx(), p.getY(), r.oz() + w.sz());
+							p.setDeltaMovement(Vec3.ZERO);
+							LAST.remove(id);
+							COOL.put(id, 6);
+							CompoundTag s = new CompoundTag();
+							s.putString("sound", "warp");
+							Net.send(p, "sound", s);
 							return true;
 						}
 					}
