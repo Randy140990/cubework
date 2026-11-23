@@ -861,7 +861,7 @@ public final class Interiors {
 	 * (After the client's iris has shut right down: it closes over 17 ticks, and says when it's shut, "dark". This is
 	 * how long to wait if it never says.)
 	 */
-	private static final int FADE_TICKS = 21;
+	private static final int FADE_TICKS = 15;
 
 	/** How many ticks to wait for the iris at the game's speed now (TAB's x4 runs four times the ticks a second). */
 	private static int fadeTicks(ServerPlayer p) {
@@ -945,8 +945,11 @@ public final class Interiors {
 		MinecraftServer s = p.level().getServer();
 		ServerLevel world = s.overworld();
 		COOL.put(p.getUUID(), fadeTicks(p) + 20);
-		// (The world outside the door loaded while the screen fades.)
-		world.getChunk(BlockPos.containing(d.x(), d.y(), d.z()));
+		// (The world outside the door loaded while the screen fades: (0.55) the chunks all round it, not just its own, so
+		// you're not kept waiting on them once you're out.)
+		int dcx = BlockPos.containing(d.x(), d.y(), d.z()).getX() >> 4, dcz = BlockPos.containing(d.x(), d.y(), d.z()).getZ() >> 4;
+		for (int cx = dcx - 2; cx <= dcx + 2; cx++)
+			for (int cz = dcz - 2; cz <= dcz + 2; cz++) world.getChunk(cx, cz);
 		Net.send(p, "fade", new CompoundTag());
 		PENDING_T.put(p.getUUID(), fadeTicks(p));
 		PENDING.put(p.getUUID(), () -> {

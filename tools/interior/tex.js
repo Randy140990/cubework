@@ -5,18 +5,21 @@ function shadec(a, k) { return k >= 0 ? mixc(a, [255, 255, 255], Math.min(1, k))
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return h >>> 0; }
 function rng(seed) { let s = (seed >>> 0) || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return (s % 100003) / 100003; }; }
 
+// (0.55, John's 13:12: "the styles of the interiors need to feel the same as the exteriors") Every picture crisp, as
+// the outside's are: a few solid shades with clean lines. The old speckle (noise) is kept only as a trace.
+const RETRO_NOISE = 0.2;
 class Pix {
   constructor(w, h) { this.w = w; this.h = h; this.d = new Uint8ClampedArray(w * h * 4); }
   set(x, y, c, a = 1) { x |= 0; y |= 0; if (x < 0 || y < 0 || x >= this.w || y >= this.h) return; const i = (y * this.w + x) * 4; this.d[i] = c[0]; this.d[i + 1] = c[1]; this.d[i + 2] = c[2]; this.d[i + 3] = a * 255; }
   get(x, y) { x = Math.max(0, Math.min(this.w - 1, x | 0)); y = Math.max(0, Math.min(this.h - 1, y | 0)); const i = (y * this.w + x) * 4; return [this.d[i], this.d[i + 1], this.d[i + 2]]; }
   alpha(x, y) { const i = ((y | 0) * this.w + (x | 0)) * 4; return this.d[i + 3] / 255; }
   rect(x, y, w, h, c, a = 1) { for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) this.set(i, j, c, a); }
-  noise(x, y, w, h, c, n, r) { for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) this.set(i, j, shadec(c, (r() - 0.5) * n)); }
+  noise(x, y, w, h, c, n, r) { n *= RETRO_NOISE; for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) this.set(i, j, shadec(c, (r() - 0.5) * n)); }
   fill(c, n = 0, r = Math.random) { this.noise(0, 0, this.w, this.h, c, n, r); }
   // A raised panel: lit along the top and left, shaded along the bottom and right (light from the upper left, as everywhere here).
   bevel(x, y, w, h, c, k = 0.16, n = 0, r = Math.random) {
     for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) {
-      let v = n ? shadec(c, (r() - 0.5) * n) : c;
+      let v = n ? shadec(c, (r() - 0.5) * n * RETRO_NOISE) : c;
       if (j === y || i === x) v = shadec(v, k); else if (j === y + h - 1 || i === x + w - 1) v = shadec(v, -k * 1.3);
       this.set(i, j, v);
     }
@@ -96,27 +99,46 @@ const C = {
 const BOOKS = ["#C2483F", "#3F6FB0", "#E2B13C", "#4E9A55", "#8A5AB8", "#E07A3A", "#2F7F86", "#D9D0BD", "#5A4A3E", "#B8476E"].map(hx);
 
 function planks(P, r, base, lt, dk, gap, rows = 4, run = 16) {
-  const n = P.h / rows;
+  // (0.55) Crisp boards, as the outside's: each board one solid tone, lit along its top edge, a dark gap at its foot,
+  // its end joints clean, a knot here and there.
+  const n = P.h / rows, SEAMS = [0.3, 0.78, 0.12, 0.56, 0.92, 0.4, 0.2, 0.66], TONES = [0.03, -0.03, 0.05, -0.01];
   for (let row = 0; row < n; row++) {
-    const y0 = row * rows, tone = (r() - 0.5) * 0.14, seam = (r() * P.w) | 0, phase = r() * 9;
+    const y0 = row * rows, tone = TONES[row % 4], seam = Math.floor(SEAMS[row % 8] * P.w);
     for (let y = y0; y < y0 + rows; y++) for (let x = 0; x < P.w; x++) {
-      let c = shadec(base, tone + (r() - 0.5) * 0.05);
-      const g = Math.sin(x * 0.55 + phase + Math.sin(x * 0.21 + row * 1.7) * 2.2 + y * 0.9);
-      if (g > 0.86 && y !== y0) c = mixc(c, dk, 0.4);
-      if (y === y0) c = mixc(c, lt, 0.55);
-      if (y === y0 + rows - 1) c = mixc(c, gap, 0.45);
+      let c = shadec(base, tone);
+      if (y === y0) c = mixc(c, lt, 0.6);
+      else if (y === y0 + rows - 1) c = mixc(c, gap, 0.62);
+      else if (rows > 4 && y === y0 + rows - 2) c = mixc(c, dk, 0.22);
+      if (rows > 4 && y === y0 + 2 && x === (seam + 11) % P.w) c = mixc(c, dk, 0.55);
       if (x === seam || (run < P.w && x === (seam + run) % P.w)) c = gap;
       P.set(x, y, c);
     }
   }
 }
 function fabric(P, r, base, k = 0.07) {
-  for (let y = 0; y < P.h; y++) for (let x = 0; x < P.w; x++) P.set(x, y, shadec(base, ((x + y) % 2 ? k : -k) * 0.6 + (r() - 0.5) * k));
+  // (0.55) A tidy weave, solid: a soft darker thread every fourth row and column, a lit fleck in each square of it.
+  const row = shadec(base, -0.075), col = shadec(base, -0.035), fleck = shadec(base, 0.07);
+  for (let y = 0; y < P.h; y++) for (let x = 0; x < P.w; x++) {
+    let c = base;
+    if (y % 4 === 3) c = row; else if (x % 4 === 3) c = col; else if (x % 4 === 1 && y % 4 === 1) c = fleck;
+    P.set(x, y, c);
+  }
 }
 function wallpaper(P, r, base, stripe, motif) {
-  P.fill(base, 0.03, r);
-  for (let y = 0; y < P.h; y++) { for (const sx of [0, 8]) { P.set(sx, y, mixc(P.get(sx, y), stripe, 0.55)); P.set(sx + 1, y, mixc(P.get(sx + 1, y), stripe, 0.3)); } }
-  if (motif) { for (const [mx, my] of [[4, 3], [12, 11]]) { P.set(mx, my, motif); P.set(mx - 1, my + 1, motif, 0.6); P.set(mx + 1, my + 1, motif, 0.6); P.set(mx, my + 2, motif, 0.6); } }
+  // (0.55) Crisp: the paper one colour, its stripes clean, its little motif solid.
+  P.rect(0, 0, P.w, P.h, base);
+  for (let y = 0; y < P.h; y++) for (const sx of [0, 8]) { P.set(sx, y, mixc(base, stripe, 0.8)); P.set(sx + 1, y, mixc(base, stripe, 0.4)); }
+  if (motif) for (const [mx, my] of [[4, 3], [12, 11]]) { P.set(mx, my, motif); P.set(mx - 1, my + 1, motif); P.set(mx + 1, my + 1, motif); P.set(mx, my + 2, motif); P.set(mx, my + 1, mixc(motif, base, 0.5)); }
+}
+// (0.55) A wall as the outside's are: one solid colour, each block's course lit along its top and shaded at its foot;
+// a wallpaper's clean stripes if it has them.
+function wallCrisp(P, base, o = {}) {
+  for (let y = 0; y < P.h; y++) for (let x = 0; x < P.w; x++) {
+    let c = base;
+    if (o.stripes) { if (x % 8 === 0) c = shadec(base, o.stripes); else if (x % 8 === 1) c = shadec(base, o.stripes * 0.45); }
+    if (y === 0) c = shadec(c, 0.05); else if (y === P.h - 1) c = shadec(c, -0.06);
+    P.set(x, y, c);
+  }
 }
 function leaves(P, r, base, lt, dk, hole = 0.16) {
   for (let y = 0; y < P.h; y++) for (let x = 0; x < P.w; x++) {
@@ -148,35 +170,49 @@ function mcPlanks(P, r, base) {
 // Our own floor for the houses: wood in squares, as the newer games' houses have it. Each block is one square tile of four
 // boards, the grain turning a quarter between neighbours, with a thin dark seam round each square.
 function woodSquares(P, r, base) {
-  const lt = shadec(base, 0.12), dk = shadec(base, -0.16), seam = shadec(base, -0.4);
+  // (0.55) Crisp, as the outside's paving: each square four boards, each one solid tone, lit along one edge, a dark
+  // gap along the other, one clean end joint each; a dark seam round the square.
+  const lt = shadec(base, 0.12), dk = shadec(base, -0.13), seam = shadec(base, -0.26), TONES = [0.03, -0.015, 0.045, 0], JOINT = [10, 4, 13, 7];
   for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) {
     const across = (tx + ty) % 2 === 0;
     for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
-      const u = across ? x : y, v = across ? y : x, board = v >> 2, tone = [0.03, -0.03, 0.02, -0.04][board];
-      let c = shadec(base, tone + (r() - 0.5) * 0.04);
-      if (((u * 5 + board * 7) % 13) === 0) c = mixc(c, dk, 0.4);
-      if ((v & 3) === 0) c = mixc(c, lt, 0.3);
-      if ((v & 3) === 3) c = mixc(c, dk, 0.45);
-      if (x === 0 || y === 0) c = mixc(c, seam, 0.75);
-      if (x === 15 || y === 15) c = mixc(c, lt, 0.25);
+      const u = across ? x : y, v = across ? y : x, board = v >> 2;
+      let c = shadec(base, TONES[board]);
+      if ((v & 3) === 0) c = mixc(c, lt, 0.5);
+      else if ((v & 3) === 3) c = mixc(c, dk, 0.5);
+      if (u === JOINT[board]) c = mixc(c, dk, 0.55);
+      if (x === 0 || y === 0) c = seam;
       P.set(tx * 16 + x, ty * 16 + y, c);
     }
   }
 }
-function mcStone(P, r, base, n = 0.07, spots = 0) { P.fill(base, n, r); for (let i = 0; i < spots; i++) { const x = r() * 16, y = r() * 16; P.set(x, y, shadec(base, (r() - 0.5) * 0.4)); P.set(x + 1, y, shadec(base, (r() - 0.5) * 0.25)); } }
-function mcWool(P, r, base) { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(base, (((x >> 1) + (y >> 1)) % 2 ? 0.035 : -0.035) + (r() - 0.5) * 0.06)); for (let i = 0; i < 10; i++) P.set(r() * 16, r() * 16, shadec(base, 0.1)); }
-function mcCheck(P, r, a, b) { for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = (tx + ty) % 2 ? b : a; mcStone({ fill: (col, n, rr) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(tx * 16 + x, ty * 16 + y, shadec(col, (rr() - 0.5) * n)); }, set: (x, y, col) => P.set(tx * 16 + (x | 0) % 16, ty * 16 + (y | 0) % 16, col) }, r, c, 0.05, 6); } }
+function mcStone(P, r, base, n = 0.07, spots = 0) { P.fill(base, n, r); for (let i = 0; i < spots; i++) { const x = r() * 16, y = r() * 16; P.set(x, y, shadec(base, (r() - 0.5) * 0.08)); } }
+function mcWool(P, r, base) {
+  // (0.55, 13:12: "very solid") One solid colour, a faint tidy tuft every fourth pixel.
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, x % 4 === 1 && y % 4 === 1 ? shadec(base, 0.04) : x % 4 === 3 && y % 4 === 3 ? shadec(base, -0.04) : base);
+}
+function mcCheck(P, r, a, b) {
+  // (0.55) Crisp tiles, as the outside's: each one solid, lit along its top and left, shaded along its foot and right.
+  for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) {
+    const c = (tx + ty) % 2 ? b : a;
+    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+      let v = c;
+      if (x === 0 || y === 0) v = shadec(c, 0.09); else if (x === 15 || y === 15) v = shadec(c, -0.1);
+      P.set(tx * 16 + x, ty * 16 + y, v);
+    }
+  }
+}
 const TEXDEF = {
   sqHoney: [32, 32, (P, r) => woodSquares(P, r, hx("#C9A06A"))], sqLight: [32, 32, (P, r) => woodSquares(P, r, hx("#D9B983"))],
   sqPale: [32, 32, (P, r) => woodSquares(P, r, hx("#E2D0B0"))], sqDark: [32, 32, (P, r) => woodSquares(P, r, hx("#94704A"))],
   mcOak: [16, 16, (P, r) => mcPlanks(P, r, hx("#B8945F"))], mcSpruce: [16, 16, (P, r) => mcPlanks(P, r, hx("#7A5A38"))], mcBirch: [16, 16, (P, r) => mcPlanks(P, r, hx("#D9C48C"))],
   mcPale: [16, 16, (P, r) => mcPlanks(P, r, hx("#E6DAD2"))], mcDarkOak: [16, 16, (P, r) => mcPlanks(P, r, hx("#4E3622"))], mcAcacia: [16, 16, (P, r) => mcPlanks(P, r, hx("#B4623A"))],
-  mcCream: [16, 16, (P, r) => mcStone(P, r, hx("#EFE6D2"), 0.05, 5)], mcSky: [16, 16, (P, r) => mcStone(P, r, hx("#CFE2EE"), 0.05, 5)], mcSage: [16, 16, (P, r) => mcStone(P, r, hx("#DDE3D2"), 0.05, 5)],
-  mcNavy: [16, 16, (P, r) => mcStone(P, r, hx("#33506F"), 0.06, 6)],
+  mcCream: [16, 16, P => wallCrisp(P, hx("#F2E4C6"), { stripes: 0.05 })], mcSky: [16, 16, P => wallCrisp(P, hx("#C3DFF1"), { stripes: 0.07 })],
+  mcSage: [16, 16, P => wallCrisp(P, hx("#D6E3C6"), { stripes: 0.05 })], mcNavy: [16, 16, P => wallCrisp(P, hx("#35567A"), { stripes: 0.06 })],
   mcQuartzCheck: [32, 32, (P, r) => mcCheck(P, r, hx("#EEEAE2"), hx("#BFD8CC"))], mcBlueCheck: [32, 32, (P, r) => mcCheck(P, r, hx("#EEF2F4"), hx("#9CC4E0"))],
-  mcStripped: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#C9A877"), (x % 5 === 0 ? -0.08 : 0) + (r() - 0.5) * 0.05)); }],
+  mcStripped: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#CDA673"), x % 4 === 0 ? -0.1 : x % 4 === 1 ? 0.06 : y === 0 ? 0.08 : 0)); }],
   mcLabTile: [32, 32, (P, r) => mcCheck(P, r, hx("#EEF0EF"), hx("#DCE2E1"))],
-  mcLabWall: [16, 16, (P, r) => mcStone(P, r, hx("#F2F4F3"), 0.035, 3)],
+  mcLabWall: [16, 16, P => wallCrisp(P, hx("#F3F6F5"))],
   mcCyan: [16, 16, (P, r) => mcStone(P, r, hx("#6FA9B0"), 0.05, 4)],
   labPanel: [16, 16, (P, r) => { P.fill(hx("#D9DEDD"), 0.03, r); P.rect(0, 0, 16, 1, hx("#F4F6F5")); P.rect(0, 15, 16, 1, hx("#A9B2B0")); P.rect(2, 3, 5, 4, hx("#2B3A44")); P.rect(3, 4, 3, 2, hx("#58D3A0"));
     P.rect(9, 3, 2, 2, hx("#E5525C")); P.rect(12, 3, 2, 2, hx("#F2C12E")); P.rect(9, 6, 2, 2, hx("#5AA9E6")); P.rect(12, 6, 2, 2, hx("#58D3A0"));
@@ -223,6 +259,33 @@ const TEXDEF = {
   tileBlue: [16, 16, (P, r) => {
     for (let ty = 0; ty < 4; ty++) for (let tx = 0; tx < 4; tx++) { const c = (tx + ty) % 3 === 0 ? hx("#9CC8E6") : hx("#E8F2F8"); P.bevel(tx * 4, ty * 4, 4, 4, c, 0.06, 0.03, r); P.rect(tx * 4, ty * 4 + 3, 4, 1, hx("#B8CAD6")); P.rect(tx * 4 + 3, ty * 4, 1, 4, hx("#B8CAD6")); }
   }],
+  // (0.55) Pictures for your room's side walls, our own, crisp: the beach at sunset, the hills under the stars, a
+  // snapshot of you and Mom in front of the house.
+  picSunset: [32, 24, P => {
+    const sky = ["#F6C86A", "#F4A65E", "#EE8A5C", "#D96C6A"];
+    for (let y = 0; y < 13; y++) P.rect(0, y, 32, 1, hx(sky[Math.min(3, y >> 2)]));
+    P.disc(16, 12, 4.4, hx("#FFE59A")); P.rect(0, 13, 32, 6, hx("#3E7CC4"));
+    for (const [x, y, w] of [[6, 14, 6], [18, 15, 8], [10, 17, 5], [22, 17, 4]]) P.rect(x, y, w, 1, hx("#7FB2E6"));
+    P.rect(12, 13, 9, 1, hx("#F6C86A")); P.rect(14, 14, 5, 1, hx("#F4A65E"));
+    P.rect(0, 19, 32, 5, hx("#F1D79A")); P.rect(0, 19, 32, 1, hx("#FFF1C4"));
+    P.rect(25, 9, 1, 4, hx("#5A3A2A")); P.line(26, 9, 29, 11, hx("#FFFFFF")); P.rect(23, 13, 6, 1, hx("#5A3A2A"));
+  }],
+  picStars: [32, 24, P => {
+    P.rect(0, 0, 32, 24, hx("#1E2E5A")); P.rect(0, 0, 32, 6, hx("#18244A"));
+    for (const [x, y] of [[3, 2], [9, 5], [14, 1], [20, 4], [27, 2], [6, 9], [24, 8], [17, 7], [30, 6], [11, 10]]) P.set(x, y, hx("#FFFFFF"));
+    for (const [x, y] of [[14, 1], [27, 2]]) { P.set(x - 1, y, hx("#BFD3FF")); P.set(x + 1, y, hx("#BFD3FF")); P.set(x, y - 1, hx("#BFD3FF")); P.set(x, y + 1, hx("#BFD3FF")); }
+    P.disc(25, 5, 2.4, hx("#FFF4C2")); P.disc(26, 4, 2, hx("#1E2E5A"));
+    for (let x = 0; x < 32; x++) { const h = 15 - Math.round(Math.sin(x / 5) * 2 + Math.sin(x / 2.3) * 0.8); P.rect(x, h, 1, 24 - h, hx("#2F5A3A")); P.set(x, h, hx("#4B7E50")); }
+    for (let x = 0; x < 32; x++) { const h = 19 - Math.round(Math.sin(x / 4 + 2) * 1.5); P.rect(x, h, 1, 24 - h, hx("#244A2E")); }
+    P.rect(7, 17, 3, 2, hx("#E8D9B0")); P.rect(7, 16, 3, 1, hx("#C9433F")); P.set(8, 17, hx("#FFD86A"));
+  }],
+  picSnap: [24, 20, P => {
+    P.rect(0, 0, 24, 20, hx("#FFFFFF")); P.rect(2, 2, 20, 14, hx("#9CD3F2"));
+    P.rect(2, 11, 20, 5, hx("#6DBA5C")); P.rect(12, 5, 8, 6, hx("#F2EEE4")); P.rect(11, 3, 10, 2, hx("#C9433F")); P.rect(15, 8, 2, 3, hx("#8A5A3A"));
+    P.rect(5, 6, 3, 3, hx("#F1C6A0")); P.rect(5, 5, 3, 1, hx("#6A3E2A")); P.rect(4, 9, 5, 4, hx("#E2484A"));
+    P.rect(9, 8, 2, 2, hx("#F1C6A0")); P.rect(9, 7, 2, 1, hx("#C9433F")); P.rect(9, 10, 2, 3, hx("#3F6FB0"));
+    P.rect(2, 17, 9, 1, hx("#C9C2B4"));
+  }],
   paperMum: [16, 16, (P, r) => wallpaper(P, r, hx("#F3E7CF"), hx("#C9DDB5"), hx("#E3A9A0"))],
   paperRoom: [16, 16, (P, r) => wallpaper(P, r, hx("#DCEBF3"), hx("#B9D3E6"), hx("#F2D17A"))],
   paperRival: [16, 16, (P, r) => wallpaper(P, r, hx("#E6E8DD"), hx("#C6CDB8"), hx("#8DB0C9"))],
@@ -251,7 +314,7 @@ const TEXDEF = {
   }],
   quiltBlue: [16, 16, (P, r) => {
     const cols = [hx("#3F5F9E"), hx("#2E3F66"), hx("#C9524E"), hx("#E8E2D2")];
-    for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = cols[(tx * 3 + ty) % 4]; for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) P.set(tx * 8 + x, ty * 8 + y, shadec(c, ((x + y) % 2 ? 0.03 : -0.03) + (x === 0 || y === 0 ? -0.12 : 0))); }
+    for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = cols[(tx * 3 + ty) % 4]; for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) P.set(tx * 8 + x, ty * 8 + y, shadec(c, x === 0 || y === 0 ? -0.14 : x === 1 || y === 1 ? 0.07 : 0)); }
   }],
   // Leaves from John's asset pack, at the rooms' 16 pixels a block: the azalea's sprigs cut round (so a bush's every
   // side is a round tuft of leaves, never a square), the denser one fuller in the middle. No solid inside anywhere.
@@ -276,8 +339,8 @@ const TEXDEF = {
   soil: [16, 16, (P, r) => P.fill(hx("#5A3D27"), 0.2, r)],
   gold: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, mixc(C.goldL, C.gold, (Math.sin(x * 0.7 + y * 0.3) + 1) / 2 * 0.8 + r() * 0.2)); }],
   silver: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, mixc(hx("#F2F4F6"), hx("#A9B2BA"), (Math.sin(x * 0.7 + y * 0.3) + 1) / 2 * 0.8 + r() * 0.2)); }],
-  curtain: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#E77D6E"), Math.sin(x / 16 * 6.283 * 2) * 0.1 + (r() - 0.5) * 0.04)); }],
-  curtainBlue: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#5B8FD0"), Math.sin(x / 16 * 6.283 * 2) * 0.1 + (r() - 0.5) * 0.04)); }],
+  curtain: [16, 16, P => { const F = [0.1, 0.06, 0, 0, -0.04, -0.09, -0.12, -0.04]; for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#E77D6E"), F[x % 8])); }],
+  curtainBlue: [16, 16, P => { const F = [0.1, 0.06, 0, 0, -0.04, -0.09, -0.12, -0.04]; for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#5B8FD0"), F[x % 8])); }],
   leather: [16, 16, (P, r) => { P.fill(hx("#B8433F"), 0.1, r); P.rect(0, 0, 16, 1, hx("#D86A60")); }],
   bark: [16, 16, (P, r) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, shadec(hx("#7A5435"), ((x % 4 === 0) ? -0.18 : 0) + (r() - 0.5) * 0.14)); }],
   grass: [16, 16, (P, r) => {

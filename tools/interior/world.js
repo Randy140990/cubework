@@ -26,7 +26,7 @@ const MATDEF = {
   drawersWalnut: { tex: "drawersWalnut", fit: true }, drawersOak: { tex: "drawersOak", fit: true }, drawersDark: { tex: "drawersDark", fit: true },
   fridge: { tex: "fridge", fit: true }, oven: { tex: "oven", fit: true }, hob: { tex: "hob", fit: true }, sink: { tex: "sink", fit: true }, wardrobe: { tex: "wardrobe", fit: true },
   whiteboard: { tex: "whiteboard", fit: true }, boardRival: { tex: "boardRival", fit: true }, window: { tex: "window", fit: true, glow: 1 }, windowExt: { tex: "windowExt", fit: true, glow: 0.35 },
-  doorExt: { tex: "doorExt", fit: true }, doorLab: { tex: "doorLab", fit: true }, painting: { tex: "painting", fit: true }, paintingHills: { tex: "paintingHills", fit: true },
+  doorExt: { tex: "doorExt", fit: true }, doorLab: { tex: "doorLab", fit: true }, painting: { tex: "painting", fit: true }, paintingHills: { tex: "paintingHills", fit: true }, picSunset: { tex: "picSunset", fit: true }, picStars: { tex: "picStars", fit: true }, picSnap: { tex: "picSnap", fit: true },
   poster: { tex: "poster", fit: true }, posterRival: { tex: "posterRival", fit: true }, posterDragon: { tex: "posterDragon", fit: true }, clock: { tex: "clock", fit: true, cut: true },
   photos: { tex: "photos", fit: true }, map: { tex: "map", fit: true }, sign: { tex: "sign", fit: true }, dartboard: { tex: "dartboard", fit: true, cut: true }, bag: { tex: "bag", per: 1 },
   ball: { tex: "ball", fit: true }, ballTop: { tex: "ballTop", fit: true }, flowerTop: { tex: "flowerTop", per: 1 }, flower: { tex: "flower", fit: true, cut: true, double: true }, tallGrass: { tex: "tallGrass", fit: true, cut: true, double: true },
@@ -689,8 +689,10 @@ function stairsDown(room, x0, z0 = 0, depth = 2, o = {}) {
   G.box(x0, -2.6, z0, x0 + 4, -2.6, z0 + depth, { top: "deep", all: null });
   // (19:06) Handrails down both walls of the well, running diagonally with the steps.
   const dAt = (x) => Math.min(0, (x - x0) / sw * STEP - 4), dStep = (x) => Math.min(0, Math.ceil((x - x0) / sw - 1e-3) * STEP - 4);
-  slopeRail(room, x0 + 1.2, x0 + 4, dAt, dStep, z0 + 0.08, { wall: "n", mat: "walnut" });
-  slopeRail(room, x0 + 1.2, x0 + 4, dAt, dStep, z0 + depth - 0.08, { wall: "s", mat: "walnut" });
+  // ((0.55, 13:12) They end where they reach the floor, not on up into the room.)
+  const railEnd = x0 + (4 - 1.06) / STEP * sw;
+  slopeRail(room, x0 + 1.2, railEnd, dAt, dStep, z0 + 0.08, { wall: "n", mat: "walnut" });
+  slopeRail(room, x0 + 1.2, railEnd, dAt, dStep, z0 + depth - 0.08, { wall: "s", mat: "walnut" });
   // A railing round the opening, open at the top step to the east.
   const gap = x0 + 4 - 0.95, bz = z0 + depth;
   G.box(x0 - 0.12, 0, bz - 0.02, x0 + 0.08, 1.3, bz + 0.16, "walnut"); G.box(gap - 0.18, 0, bz - 0.02, gap + 0.02, 1.3, bz + 0.16, "walnut");

@@ -64,10 +64,11 @@ public final class Hud {
 	private static int fadeLen = FADE;
 	private static final int WAIT_FADE = 56;
 	/**
-	 * A door's iris (the viewer's): closing on you over 0.85 s right down to nothing, black while the server moves you,
-	 * opening round you over 0.7 s. CLOSED: the tick it's fully shut.
+	 * A door's iris (the viewer's): closing on you over 0.55 s right down to nothing, black while the server moves you,
+	 * opening round you over 0.85 s. CLOSED: the tick it's fully shut. ((0.55, 13:12: "The loading is very slow ... the
+	 * transitions between locations") Quicker: it closed over 0.85 s and opened over 1.25 s.)
 	 */
-	private static final int DOOR_FADE = 42, CLOSED = 17;
+	private static final int DOOR_FADE = 30, CLOSED = 11;
 	/** What to do once it's faded back (WAIT: "It's morning now."). */
 	private static Runnable afterFade;
 
@@ -157,7 +158,7 @@ public final class Hud {
 			// after it began to open, it shuts again first.
 			if (mc.level != doorLevel) {
 				if (doorLevel != null && fadeLen - fade > CLOSED) fade = Math.max(fade, fadeLen - CLOSED - 2);
-				doorHold = 6;
+				doorHold = 3;
 				doorLevel = mc.level;
 				darkAt = null;
 			}

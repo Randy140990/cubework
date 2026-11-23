@@ -101,8 +101,8 @@ function drawScoreboard(P, f) {
   // (The sign font has no accents: POKéMON's é is drawn as an E.)
   if (!FONT3["É"]) FONT3["É"] = FONT3["E"];
   reg("mcCenterCheck", 32, 32, (P, r) => mcCheck(P, r, hx("#F7F2EA"), hx("#F2D6CF")), { per: 2 });
-  reg("paperCenter", 16, 16, (P, r) => mcStone(P, r, hx("#F8F5F1"), 0.03, 2));
-  reg("paperMart", 16, 16, (P, r) => mcStone(P, r, hx("#F2F6FA"), 0.03, 2));
+  reg("paperCenter", 16, 16, P => wallCrisp(P, hx("#F8F5F1"), { stripes: 0.035 }));
+  reg("paperMart", 16, 16, P => wallCrisp(P, hx("#F2F6FA"), { stripes: 0.035 }));
   reg("blueTrim", 16, 16, (P, r) => { P.fill(hx("#3A6FD0"), 0.04, r); P.rect(0, 0, 16, 2, hx("#6E9AE8")); });
   // A counter's front: its colour, a white stripe near the top, a darker kick at the foot.
   const front = c => (P, r) => { P.fill(hx(c), 0.035, r); P.rect(0, 2, 16, 2, hx("#F6F4EE")); P.rect(0, 14, 16, 2, shadec(hx(c), -0.25)); };
@@ -192,13 +192,13 @@ function drawScoreboard(P, f) {
   reg("forestGround", 16, 16, (P, r) => { P.fill(hx("#7DB65A"), 0.08, r); for (let i = 0; i < 10; i++) P.set(r() * 16, r() * 16, hx("#6AA24C")); });
   reg("forestPath", 16, 16, (P, r) => mcStone(P, r, hx("#D8BE88"), 0.05, 4));
   reg("leafWall", 16, 16, (P, r) => leaves(P, r, hx("#3F8A44"), hx("#6DBA5A"), hx("#255C2D"), 0));
-  reg("paperGate", 16, 16, (P, r) => mcStone(P, r, hx("#EEF1E6"), 0.03, 2));
+  reg("paperGate", 16, 16, P => wallCrisp(P, hx("#EEF1E6"), { stripes: 0.035 }));
   reg("gateBoards", 16, 16, (P, r) => { P.fill(hx("#C9A36B"), 0.05, r); for (let y = 0; y < 16; y += 4) P.rect(0, y, 16, 1, hx("#B08A55")); });
   reg("greenTrim", 16, 16, (P, r) => { P.fill(hx("#4E9A4A"), 0.04, r); P.rect(0, 0, 16, 2, hx("#78C06E")); });
   // The Trainer House's own: warm cream walls (and cool grey downstairs), an orange trim, a peach check floor,
   // its counter, the battle room's wooden court floor.
-  reg("paperTrainer", 16, 16, (P, r) => mcStone(P, r, hx("#FBF3E8"), 0.03, 2));
-  reg("paperTrainerB", 16, 16, (P, r) => mcStone(P, r, hx("#E8EDF5"), 0.03, 2));
+  reg("paperTrainer", 16, 16, P => wallCrisp(P, hx("#FBF3E8"), { stripes: 0.035 }));
+  reg("paperTrainerB", 16, 16, P => wallCrisp(P, hx("#E8EDF5"), { stripes: 0.035 }));
   reg("orangeTrim", 16, 16, (P, r) => { P.fill(hx("#E8823A"), 0.04, r); P.rect(0, 0, 16, 2, hx("#F4A866")); });
   reg("counterOrange", 16, 16, front("#E8823A"));
   reg("mcPeachCheck", 32, 32, (P, r) => mcCheck(P, r, hx("#FBF1E4"), hx("#F2D4B8")), { per: 2 });
@@ -215,7 +215,7 @@ function drawScoreboard(P, f) {
   reg("bookOpen", 16, 16, (P, r) => { P.fill(hx("#F8F4EA"), 0.02, r); P.rect(7, 0, 2, 16, hx("#C9BFA8")); for (let y = 3; y < 14; y += 3) { P.rect(1, y, 5, 1, hx("#8A8F9E")); P.rect(10, y, 5, 1, hx("#8A8F9E")); } });
   reg("schoolWood", 16, 16, (P, r) => { P.fill(hx("#C98F55"), 0.05, r); for (let y = 0; y < 16; y += 4) P.rect(0, y, 16, 1, hx("#B37B45")); });
   reg("deskYellow", 16, 16, (P, r) => { P.fill(hx("#F2C14E"), 0.04, r); P.rect(0, 0, 16, 1, hx("#F8D77E")); });
-  reg("paperSchool", 16, 16, (P, r) => mcStone(P, r, hx("#F6EEDC"), 0.03, 2));
+  reg("paperSchool", 16, 16, P => wallCrisp(P, hx("#F6EEDC"), { stripes: 0.035 }));
   reg("schoolTrim", 16, 16, (P, r) => { P.fill(hx("#9C6A3C"), 0.04, r); P.rect(0, 0, 16, 2, hx("#BE8A57")); });
   reg("gateCheck", 32, 32, (P, r) => mcCheck(P, r, hx("#EED690"), hx("#DDB662")), { per: 2 });
   reg("houseBoards", 32, 32, (P, r) => planks(P, r, hx("#9A6438"), hx("#B27A4A"), hx("#7C4E2A"), hx("#4E2E16"), 8, 32), { per: 2 });
@@ -236,13 +236,15 @@ function drawScoreboard(P, f) {
   // white diamonds; dark wide boards (the school and the Viridian house); blush pink and blue corner posts; green
   // cushions and quilt, a green felt top, a white lamp shade, cardboard, a DVD player's front.
   matReg("matLabPurple", "#8F60DE", "#5E3AA6");
-  reg("oakDiagonal", 32, 32, (P, r) => {
-    const base = hx("#F3E8D3"), gap = hx("#CDBB9C"), tones = [];
-    for (let k = 0; k < 4; k++) tones.push((r() - 0.5) * 0.1);
+  // (0.55) The lab's floor: pale oak boards laid on the slant, crisp: each board one solid tone, lit along one edge,
+  // a clean gap along the other, one end joint each.
+  reg("oakDiagonal", 32, 32, P => {
+    const base = hx("#F0DDB8"), gap = hx("#C4A77A"), lt = hx("#FAEDD2"), tones = [0.03, -0.03, 0.05, -0.01];
     for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
       const d = (x + y) % 32, row = Math.floor(d / 8), along = (x - y + 64) % 32;
-      let c = shadec(base, tones[row] + (r() - 0.5) * 0.04 + Math.sin(along * 0.6 + row * 2) * 0.02);
-      if (d % 8 === 0) c = gap; else if ((along + row * 11) % 32 === 0) c = shadec(base, -0.2);
+      let c = shadec(base, tones[row]);
+      if (d % 8 === 0) c = gap; else if (d % 8 === 1) c = mixc(c, lt, 0.7);
+      else if (along === (row * 11 + 5) % 32) c = mixc(c, gap, 0.8);
       P.set(x, y, c);
     }
   }, { per: 2 });
@@ -250,7 +252,7 @@ function drawScoreboard(P, f) {
     const a = hx("#F4F8FB"), b = hx("#8EC0E6"), line = hx("#C8DCEA");
     for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
       const u = (x + y) % 32, v = (x - y + 32) % 32;
-      let c = shadec((u < 16) === (v < 16) ? a : b, (r() - 0.5) * 0.04);
+      let c = (u < 16) === (v < 16) ? a : b;
       if (u === 0 || u === 16 || v === 0 || v === 16) c = mixc(c, line, 0.6);
       P.set(x, y, c);
     }
@@ -263,7 +265,7 @@ function drawScoreboard(P, f) {
   reg("greenFabric", 16, 16, (P, r) => fabric(P, r, hx("#6FB55A")));
   reg("quiltGreen", 16, 16, (P, r) => {
     const cols = [hx("#5DAE52"), hx("#8ACB6E"), hx("#3F8A44"), hx("#F4EEE2")];
-    for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = cols[(tx * 3 + ty) % 4]; for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) P.set(tx * 8 + x, ty * 8 + y, shadec(c, ((x + y) % 2 ? 0.03 : -0.03) + (x === 0 || y === 0 ? -0.12 : 0))); }
+    for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) { const c = cols[(tx * 3 + ty) % 4]; for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) P.set(tx * 8 + x, ty * 8 + y, shadec(c, x === 0 || y === 0 ? -0.14 : x === 1 || y === 1 ? 0.07 : 0)); }
   });
   reg("feltGreen", 16, 16, (P, r) => fabric(P, r, hx("#86B86E"), 0.04));
   reg("lampWhite", 16, 16, (P, r) => P.fill(hx("#F7F5EE"), 0.02, r), { glow: 0.6 });
@@ -273,7 +275,12 @@ function drawScoreboard(P, f) {
   RUGS.salmon = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#E07A6A" : ((i + j) % 2 ? "#F4A08E" : "#F6AE9C");
   RUGS.kitchenGreen = (i, j, w, d) => (i + j) % 2 ? "#3F8A44" : "#7CC56B";
   RUGS.kitchenBlue = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#2E4A7A" : "#4A6FA8";
-  RUGS.redRoom = (i, j, w, d) => (i === 0 || j === 0 || i === w - 1 || j === d - 1) ? "#9A2C34" : ((i + j) % 2 ? "#D9424A" : "#CF3A42");
+  // (0.55, 13:12: "maybe like 4 or 5 different shades of red there, but just have them very solid") A ring at a time,
+  // each one solid red, deepest at the edge, brightest in the middle; the corners of each ring a shade deeper.
+  RUGS.redRoom = (i, j, w, d) => {
+    const e = Math.min(i, j, w - 1 - i, d - 1 - j), corner = (i === e || i === w - 1 - e) && (j === e || j === d - 1 - e);
+    return e === 0 ? (corner ? "#7C1F2A" : "#8E2530") : e === 1 ? (corner ? "#AE2F39" : "#BC343E") : "#DB464E";
+  };
   RUGS.centerRing = (i, j, w, d) => { const t = Math.hypot((i + 0.5 - w / 2) / (w / 2), (j + 0.5 - d / 2) / (d / 2)); return t > 1.05 ? "#F4A866" : (t > 0.66 && t < 0.92) || t < 0.22 ? "#F6F1EA" : "#E8823A"; };
   matReg("matHouseV", "#3E8A6E", "#2A5E4B");
   matReg("matGate", "#3A63B8", "#25418A");
@@ -300,7 +307,7 @@ function drawScoreboard(P, f) {
     const base = hx("#A8433B"), mid = hx("#B5544A"), gold = hx("#D8A64C");
     for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
       const u = (x + y) % 16, v = (x - y + 32) % 16;
-      let c = shadec(Math.min(u, 16 - u) + Math.min(v, 16 - v) > 9 ? mid : base, (r() - 0.5) * 0.05);
+      let c = Math.min(u, 16 - u) + Math.min(v, 16 - v) > 9 ? mid : base;
       if (u === 0 || v === 0) c = gold; else if (u === 1 || v === 1) c = shadec(base, -0.12);
       P.set(x, y, c);
     }
@@ -1309,6 +1316,11 @@ const BUILD = {
     framed(R, 7.4, 1.6, 1.1, 1.5, "poster", "n", { frameMat: "honey", act: { label: "Look", lines: ["A poster of a famous trainer mid-throw. GO!"] } });
     R.item("Poster", "A trainer mid-throw, drawn in silhouette on a sunburst.");
     clock(R, 8.9, 2.6);
+    // (0.55) The side walls: Pallet's beach at sunset and a snapshot by the bed (west); the hills under the stars (east).
+    framed(R, 2.2, 1.55, 1.3, 1.0, "picSunset", "w", { frameMat: "honey", act: { label: "Look", lines: ["A painting of the beach south of PALLET TOWN at sunset."] } });
+    framed(R, 9.3, 1.7, 0.8, 0.65, "picSnap", "w", { frameMat: "walnut", act: { label: "Look", lines: ["A snapshot of you and MOM on your birthday, in front of the house."] } });
+    framed(R, 8.3, 1.55, 1.3, 1.0, "picStars", "e", { frameMat: "honey", act: { label: "Look", lines: ["A picture of the hills north of town, under a sky full of stars."] } });
+    R.item("Pictures", "Our own: the beach at sunset, the hills under the stars, a snapshot of you and Mom.");
     bed(R, 0, 5.4, "e", { w: 1.8, l: 2.9, quilt: "quiltGreen" });
     nightstand(R, 0, 6.3, "e");
     toyBox(R, 3.0, 3.75, 3.7, 5.25);
