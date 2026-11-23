@@ -43,10 +43,15 @@ HOUSES = [(-807, 671, -794, 684, "your house"), (-789, 671, -776, 684, "Blue's h
 LAB = (-791, 687, -774, 698, "Prof. Oak's lab")
 GATE_BLOCKS = ("polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,"
                "deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,"
-               "stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood,black_concrete")
+               "stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood,black_concrete,"
+               # ((0.54, 12:24: "just under the top near the door ... still some old textures") the walls by the door, the
+               # stone at its foot, the spruce corners, the dark wool and the beams of the Johto Gate's doorway.)
+               "andesite_wall,stone,stripped_spruce_wood,stripped_spruce_log,black_wool,stripped_warped_stem")
 GATE = ("block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,"
         "block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,"
-        "block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top,block/black_concrete=gate_dark")
+        "block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top,block/black_concrete=gate_dark,"
+        "block/stone=gate_stone,block/stripped_spruce_log=gate_wall_oak,block/stripped_spruce_log_top=gate_wall_oak_top,block/black_wool=gate_dark,"
+        "block/stripped_warped_stem=gate_beam,block/stripped_warped_stem_top=gate_beam_top")
 CENTER = ("block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,"
           "block/mangrove_planks=center_mangrove_planks")
 MART = "block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool"
@@ -60,6 +65,16 @@ LEAGUE = (GATE.replace("block/polished_deepslate=gate_roof", "block/polished_dee
 # Its four little trees out front: spruce fence trunks as wood, acacia leaves as a round bush (! : without the
 # biome's tint, the bush's own green).
 LEAGUE_TREES = "block/spruce_planks=league_trunk,block/acacia_leaves=league_bush!"
+# (0.54, 12:19 and 12:26) Every Gym's coloured band (the second row up), each its own colour (tools/looks54.py), and
+# the height and blocks of each one's (a scan of the map).
+GYM_BANDS = {"viridian_city": (27, "terracotta"), "pewter_city": (31, "gray_concrete"), "cerulean_city": (35, "yellow_concrete"),
+             "vermilion_city": (32, "pink_terracotta"), "celadon_city": (34, "magenta_concrete"), "fuchsia_city": (32, "magenta_terracotta"),
+             "saffron_city": (34, "blue_terracotta"), "cinnabar_island": (19, "red_concrete_powder"), "azalea_town": (21, "stripped_mangrove_log"),
+             "cianwood_city": (19, "blue_terracotta"), "blackthorn_city": (32, "stripped_mangrove_log"), "ecruteak_city": (22, "blue_terracotta"),
+             "mahogany_town": (23, "blue_terracotta"), "olivine_city": (20, "stripped_mangrove_log,blue_terracotta"),
+             "goldenrod_city": (21, "stripped_mangrove_log,blue_terracotta"), "violet_city": (23, "stripped_mangrove_log")}
+GYM_GREY = ("block/jungle_planks=gym_flat_grey,block/oak_planks=gym_flat_light_grey,block/stripped_jungle_log=gym_beam_grey,"
+            "block/stripped_jungle_log_top=gym_beam_top_grey")
 GYM = ("block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,"
        "block/stripped_jungle_log_top=gym_beam_top")
 
@@ -195,8 +210,14 @@ def main():
             continue
         place, x0, x1, y0, y1, z0, z1 = line.rstrip("\n").split("\t")
         box = (int(x0) - 1, int(z0) - 1, int(x1) + 1, int(z1) + 1, place + " Gym")
-        add("roof_gym", "jungle_stairs,oak_stairs", box, "-", (y0, str(int(y1) + 1)))
-        add("swap", "jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab", box, GYM, (y0, str(int(y1) + 1)))
+        # ((0.54, 12:26) Johto's Gyms: their roofs and beams grey, Kanto's tan as they are.)
+        johto = int(x0) < -1010
+        add("roof_gymg" if johto else "roof_gym", "jungle_stairs,oak_stairs", box, "-", (y0, str(int(y1) + 1)))
+        add("swap", "jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab", box, GYM_GREY if johto else GYM, (y0, str(int(y1) + 1)))
+        if place in GYM_BANDS:
+            by, blocks = GYM_BANDS[place]
+            tex = ",".join("block/%s=gym_band_%s" % (b, place) + (",block/%s_top=gym_band_%s" % (b, place) if b.endswith("_log") else "") for b in blocks.split(","))
+            add("swap", blocks, (int(x0) - 3, int(z0) - 3, int(x1) + 3, int(z1) + 3, place + " Gym's band"), tex, (str(by), str(by)))
         # (14:15) Its diorite trim as the houses'.
         add("swap", "polished_diorite_stairs,polished_diorite_slab,polished_diorite", (box[0] - 1, box[1] - 1, box[2] + 1, box[3] + 1, box[4]), TRIM)
         GYMS.append((box[0] - 1, box[1] - 1, box[2] + 1, box[3] + 1, box[4]))
@@ -258,6 +279,21 @@ def main():
     # TOWER (its own, for later; the MAGNET TRAIN station west over the water isn't in the boxes either).
     for r in kanto_rows:
         rows.append((r[0], r[1]) + GOLDENROD[:4] + (r[6], r[7], r[8], GOLDENROD[4]))
+    # (0.54, 12:24) All JOHTO: every look all Kanto has (its cliffs, the grass round its water, its trees' bark and
+    # leaves, its glass, its fences, its lamps).
+    for r in kanto_rows:
+        rows.append((r[0], r[1]) + JOHTO[:4] + (r[6], r[7], r[8], JOHTO[4]))
+    # Johto's towns built as Kanto's (12:24, 12:26): each Kanto town's own looks over the Johto town, the heights moved
+    # to its ground (the lamps', signs' and other one-offs' left out).
+    def inside(r, a): return a[0] <= r[2] and r[4] <= a[2] and a[1] <= r[3] and r[5] <= a[3]
+    one_off = ("lamp", "sign", "bike", "statue", "mailbox", "boulder", "cut tree", "rock", "Snorlax", "mouth", "bench", "pond", "fountain", "bridge")
+    town_rows = [r for r in rows if len(r) == 10]
+    for src, dsts in TOWN_COPIES:
+        for r in town_rows:
+            if not inside(r, src) or any(w in r[9] for w in one_off) or r[0] in ("sign", "wood_sign", "wood_board", "prop", "prop_only", "hide"): continue
+            for dst, dy, note in dsts:
+                mv = lambda y: y if y in ("-", None) else str(int(y) + dy)
+                rows.append((r[0], r[1]) + dst[:4] + (mv(r[6]), mv(r[7]), r[8], note))
     lower = lambda y: y if y in ("-", None) else str(int(y) - 13)
     for r in [r for r in rows if len(r) == 10 and tuple(r[2:6]) == CELADON[:4]]:
         blocks = ",".join(b for b in r[1].split(",") if b != "quartz_pillar")
@@ -742,6 +778,7 @@ def round50(add, room):
     round52c(add, room)
     round52d(add, room)
     round53(add, room)
+    round54(add, room)
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -799,9 +836,10 @@ def round50(add, room):
     for x0, z0, x1, z1, y0, y1 in ((-781, 365, -778, 369, 30, 34), (-292, 579, -289, 583, 31, 35)):
         add("swap", "stone_bricks,stone_brick_slab,stone_brick_stairs,stone_brick_wall,black_concrete", (x0, z0, x1, z1, "Diglett's Cave's mouth"),
             "block/stone_bricks=drip_rock@4,block/black_concrete=cave_dark", (str(y0 - 1), str(y1 + 1)))
-    # The bikes outside the Bike Shop (20:12), either side of its door.
-    for x in (-380, -372):
-        add("prop", "light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta", (x, 284, x, 284, "a bike outside the Bike Shop"), "bike", ("33", "33"))
+    # The bikes outside the Bike Shop (20:12; 12:19: "stacking a couple at the side"): three side by side on the pavement
+    # by the shop's west side, by its sign.
+    for z in (278, 279, 280):
+        add("prop", "light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta", (-381, z, -381, z, "a bike by the Bike Shop"), "bike", ("33", "33"))
     # Lavender's sign (20:12) as every other town's.
     add("sign", "pale_oak_shelf", (-126, 425, -123, 427, "Lavender Town's sign"), "-", ("33", "35"))
     # The SAFARI ZONE (its room): its warped doors plain wood, its fences as the routes'.
@@ -991,8 +1029,7 @@ def round52c(add, room):
     add("swap", "polished_diorite", C, "block/polished_diorite=cel_kerb", g)
     add("swap", "lime_terracotta,green_glazed_terracotta", C, "block/lime_terracotta=cel_lime,block/green_glazed_terracotta=cel_tile_band", ("32", "32"))
     add("swap", "cobblestone", (-545, 421, -537, 429, "the fountain's basin"), "block/cobblestone=pool_floor", ("32", "32"))
-    add("swap", "quartz_bricks,quartz_stairs", (-521, 425, -507, 432, "the pond's rim"),
-        "block/quartz_bricks=pool_edge_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_edge_tile", ("29", "33"))
+    # (The pond's rim: 0.53's round53 lays it in clean quartz; its blue and white tiles taken out at 12:19.)
     up = ("33", "60")
     # The buildings: soft green walls, lime bands, deep green columns, white walls, cream corners; the floors inside
     # tiled, the roof terraces green; the bands of tiles.
@@ -1170,6 +1207,130 @@ def round53(add, room):
             "block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,"
             "block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!", ("20", "29"))
         add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ("20", "29"))
+
+
+# (0.54) Johto (12:24 and 12:26): the whole region, and the places done now.
+JOHTO = (-2720, 260, -1011, 1080, "Johto")
+R26_HOUSES = (-1000, 655, -960, 712, "Route 26's houses")
+ROUTE2627 = (-1310, 600, -940, 800, "Routes 26 and 27, Tohjo Falls")
+NEW_BARK = (-1510, 715, -1395, 830, "New Bark Town")
+CHERRYGROVE = (-1770, 705, -1650, 835, "Cherrygrove City")
+BLACKTHORN = (-1580, 300, -1405, 445, "Blackthorn City, the Ice Path's mouth, Dragon's Den")
+ROUTE45 = (-1560, 440, -1440, 700, "Route 45")
+# Which Kanto town's looks go on which Johto place, and how far its ground is above or below.
+TOWN_COPIES = [(PALLET, [(R26_HOUSES, 1, "Route 26's houses (as Pallet's)"), (CHERRYGROVE, 1, "Cherrygrove City (as Pallet)")]),
+               (VIRIDIAN, [(CHERRYGROVE, -6, "Cherrygrove City (as Viridian)"), (BLACKTHORN, 6, "Blackthorn City (as Viridian)")]),
+               (CERULEAN, [(NEW_BARK, -15, "New Bark Town (as Cerulean)"), (BLACKTHORN, -3, "Blackthorn City (as Cerulean)")])]
+
+
+def round54(add, room):
+    """0.54.0 (John's 12:19, 12:24, 12:26): see tools/looks54.py."""
+    import json as _json
+    D = _json.load(open(os.path.join(HERE, "area_johto54.json")))
+    # Every Mart's front (12:19: "a universal update"): its door pillars, its step, its sign over the door.
+    for kind, place, x, y, z in SHOPS:
+        if kind != "mart": continue
+        add("swap", "quartz_block,quartz_stairs", (x - 2, z - 2, x + 2, z - 2, place + " Mart's pillars"),
+            "block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar", (str(y - 6), str(y - 2)))
+        add("swap", "quartz_slab", (x - 1, z - 2, x + 1, z - 2, place + " Mart's step"),
+            "block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step", (str(y - 6), str(y - 6)))
+        add("swap", "polished_diorite,polished_diorite_stairs,polished_diorite_slab", (x - 2, z - 1, x + 2, z - 1, place + " Mart's sign"),
+            "block/polished_diorite=mart_sign_ring", (str(y - 2), str(y + 2)))
+        add("swap", "quartz_block,quartz_stairs,quartz_slab", (x - 1, z, x + 1, z, place + " Mart's sign"),
+            "block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring", (str(y - 1), str(y + 1)))
+    # The little flowers, crisper, everywhere (12:19).
+    for a in (KANTO, JOHTO, ROUTE28):
+        add("swap", "wildflowers", a, "block/wildflowers=flower_wild,block/wildflowers_stem=flower_wild_stem")
+        add("swap", "dandelion,oxeye_daisy,azure_bluet,poppy,red_tulip", a,
+            "block/dandelion=flower_dandelion,block/oxeye_daisy=flower_daisy,block/azure_bluet=flower_bluet,block/poppy=flower_poppy,block/red_tulip=flower_tulip")
+    # ---------- Johto ----------
+    J = JOHTO
+    # Its rocks in the water (as Kanto's), its fences (12:19: darker than Kanto's whites), its paths (12:26: "the
+    # ground and the paths and connected textures"), the snow at the ICE PATH (clean, laid over two).
+    for x0, z0, x1, z1, y0, y1 in D["rocks"]:
+        add("swap", SEA_ROCK_BLOCKS, (x0, z0, x1, z1, "a rock in the water"), SEA_ROCK, (str(y0), str(y1)))
+    add("swap", "oak_fence,oak_fence_gate", J, "block/oak_planks=fence_johto")
+    add("swap", "dirt_path", J, "block/dirt_path_top=route_path@4,block/dirt_path_side=route_path@4")
+    add("swap", "brown_concrete_powder", BLACKTHORN, "block/brown_concrete_powder=route_path_edge@4")
+    add("grass_onto", "dirt_path,brown_concrete_powder", J, "grass")
+    add("swap", "snow_block,snow", J, "block/snow=snow_clean@2")
+    # Its lamps: the Cycling Road's (Routes 26 and 27, Blackthorn's), Cerulean's in New Bark, Cherrygrove's own.
+    for x, y0, z, y1 in D["r17_posts"]:
+        b = (x - 3, z - 3, x + 3, z + 3, "a Cycling Road lamp")
+        add("swap", "red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern", b,
+            "block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,"
+            "block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!", (str(y0 - 2), str(y1 + 3)))
+        add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", (str(y0 - 2), str(y1 + 3)))
+    inb = lambda p, a: a[0] <= p[0] <= a[2] and a[1] <= p[2] <= a[3]
+    for x, y, z in D["lamps"].get("tuff", []):
+        if not inb((x, y, z), NEW_BARK): continue
+        b = (x - 1, z - 1, x + 1, z + 1, "a New Bark lamp")
+        add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern", b,
+            "block/tuff=lamp_white_post,block/polished_tuff=lamp_white_post,block/chiseled_tuff_bricks=lamp_white_post,block/chiseled_tuff_bricks_top=lamp_white_post,"
+            "block/gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!", (str(y - 8), str(y + 2)))
+        add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", (str(y - 8), str(y + 2)))
+    for x, y, z in D["lamps"].get("nether", []):
+        b = (x - 1, z - 1, x + 1, z + 1, "a Cherrygrove lamp")
+        add("swap", "nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern", b,
+            "block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!", (str(y - 8), str(y + 2)))
+        add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", (str(y - 8), str(y + 2)))
+    # Its bridges (Routes 26, 27, 45 and the rest), as Fuchsia's.
+    BR = ("oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,"
+          "spruce_planks,stripped_spruce_wood,stripped_spruce_log")
+    for x0, z0, x1, z1, y0, y1 in D["bridges"]:
+        add("swap", BR, (x0 - 1, z0 - 1, x1 + 1, z1 + 1, "a bridge"),
+            "block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,"
+            "block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,"
+            "block/stone=bolt", (str(y0), str(y1)))
+    # Its signs as Kanto's (the orange one with the white beside it on Route 27, one sign in both their colours).
+    for x0, z0, x1, z1, y0, y1 in D["signs"]:
+        add("sign", "pale_oak_shelf", (x0, z0, x1, z1, "a Johto sign"), "-", (str(y0), str(y1)))
+        add("sign_o", "acacia_shelf", (x0, z0, x1, z1, "a Johto sign"), "-", (str(y0), str(y1)))
+    # New Bark: its chimneys as Viridian's (the rest is Cerulean's, main()).
+    add("swap", "mud_bricks,mud_brick_stairs,mud_brick_slab", NEW_BARK, "block/mud_bricks=chimney_brick", ("19", "40"))
+    # Cherrygrove: its white path its own (pale flags, a blossom-pink joint), its bench as Celadon's new ones.
+    add("swap", "calcite,diorite,polished_diorite", CHERRYGROVE, "block/calcite=pave_cg_a@2,block/diorite=pave_cg_b@2,block/polished_diorite=pave_cg_a@2", ("18", "18"))
+    add("swap", "polished_deepslate_slab", CHERRYGROVE, "block/polished_deepslate=bench_seat_cel", ("19", "19"))
+    add("swap", "spruce_trapdoor", CHERRYGROVE, "block/spruce_trapdoor=bench_end_cel", ("19", "20"))
+    # ---------- Goldenrod (12:19) ----------
+    G = GOLD_IN
+    add("swap", "cobblestone,cracked_stone_bricks,stone_bricks,coarse_dirt", G,
+        "block/cobblestone=gold_alley@2,block/cracked_stone_bricks=gold_alley@2,block/stone_bricks=gold_alley@2,block/coarse_dirt=gold_alley@2", ("19", "19"))
+    add("swap", "barrel", G, "block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_bottom=crate_barrel_top", ("19", "24"))
+    add("swap", "composter", G, "block/composter_side=bin_side,block/composter_top=bin_top,block/composter_bottom=bin_top", ("19", "24"))
+    add("swap", "waxed_cut_copper,waxed_cut_copper_stairs,waxed_cut_copper_slab", G, "block/cut_copper=gold_emblem", ("19", "40"))
+    add("swap", "iron_bars", G, "block/iron_bars=railing_dark")
+    add("swap", "quartz_pillar", G, "block/quartz_pillar=rail_base,block/quartz_pillar_top=gold_carpet_cap", ("20", "20"))
+    add("swap", "white_carpet", G, "block/white_wool=gold_carpet_cap", ("21", "23"))
+    add("swap", "smooth_quartz_slab,smooth_quartz,smooth_quartz_stairs", G, "block/quartz_block_bottom=quartz_clean", ("19", "23"))
+    add("swap", "smooth_quartz_slab", (G[0], G[1], G[2], G[3], "the fence's caps"), "block/quartz_block_bottom=gold_carpet_cap", ("22", "22"))
+    # The Magnet Train's line: its track (two steel rails down the middle of its five rows).
+    for z in range(684, 689):
+        add("swap", "gray_concrete", (-2146, z, -2050, z, "the Magnet Train's line"), "block/gray_concrete=" + ("track_rail" if z in (685, 687) else "track_bed"), ("27", "27"))
+    # The station (west, over the water): its teal panels and white, its lights, its dark mullions and glass, its sign;
+    # its fountains as Celadon's (12:19: "the way you've done the water fountain here").
+    ST = (-2207, 672, -2178, 712, "the Magnet Train station")
+    add("swap", "cyan_concrete", ST, "block/cyan_concrete=station_teal")
+    add("swap", "white_concrete,light_blue_terracotta", ST, "block/white_concrete=station_white,block/light_blue_terracotta=cel_floor")
+    add("swap", "pearlescent_froglight,verdant_froglight,ochre_froglight", ST,
+        "block/pearlescent_froglight_side=station_light!,block/pearlescent_froglight_top=station_light!,block/verdant_froglight_side=station_light_green!,"
+        "block/verdant_froglight_top=station_light_green!,block/ochre_froglight_side=station_light_amber!,block/ochre_froglight_top=station_light_amber!")
+    add("swap", "deepslate_brick_wall", ST, "block/deepslate_bricks=station_mullion")
+    add("swap", "black_stained_glass,black_stained_glass_pane", (-2215, 615, -2040, 775, "Goldenrod's dark glass"), "block/black_stained_glass=glass_dark")
+    add("swap", "smooth_quartz,smooth_quartz_stairs,smooth_quartz_slab,quartz_slab,quartz_block", ST, "block/quartz_block_bottom=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_side=quartz_clean")
+    FT = (-2206, 697, -2178, 711, "the station's fountains")
+    add("swap", "stone_bricks,stone_brick_stairs,stone_brick_slab,stone_brick_wall", FT, "block/stone_bricks=cel_fountain_stone", ("19", "30"))
+    add("swap", "cobblestone,gravel", FT, "block/cobblestone=pool_floor,block/gravel=pool_floor", ("15", "19"))
+    add("swap", "green_glazed_terracotta", FT, "block/green_glazed_terracotta=gold_lawn", ("19", "19"))
+    # The RADIO TOWER (12:19: "the radio building, which obviously is black"): dark navy metal panels, white panels,
+    # steel grey, dark glass; the steps up into it stone; its aerials steel.
+    RT = (-2148, 678, -2130, 694, "the Radio Tower")
+    add("swap", "polished_deepslate,polished_deepslate_stairs,polished_deepslate_slab", RT, "block/polished_deepslate=radio_panel")
+    add("swap", "white_terracotta", RT, "block/white_terracotta=radio_white", ("20", "70"))
+    add("swap", "gray_concrete,smooth_stone,smooth_stone_slab", RT, "block/gray_concrete=radio_grey,block/smooth_stone=radio_white,block/smooth_stone_slab_side=radio_white")
+    add("swap", "deepslate_tile_stairs", RT, "block/deepslate_tiles=step_cer", ("19", "21"))
+    add("swap", "deepslate_tile_stairs", RT, "block/deepslate_tiles=radio_panel", ("22", "70"))
+    add("swap", "waxed_exposed_copper_bars", (-2215, 615, -2040, 775, "Goldenrod's aerials"), "block/exposed_copper_bars=railing_dark", ("40", "80"))
 
 
 if __name__ == "__main__":

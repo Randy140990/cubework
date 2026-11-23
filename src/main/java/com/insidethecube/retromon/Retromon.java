@@ -107,6 +107,8 @@ public class Retromon implements ModInitializer {
 		switch (a.kind()) {
 			case "adventure" -> Game.setAdventure(p, t.getBooleanOr("on", false));
 			case "room_use" -> Game.roomUse(p, t.getStringOr("use", ""));
+			case "photo" -> Game.photo(p, t.getBooleanOr("on", false), t.getDoubleOr("x", Double.NaN), t.getDoubleOr("y", Double.NaN),
+					t.getDoubleOr("z", Double.NaN));
 			case "talk" -> Game.talk(p, t.getIntOr("npc", -1));
 			case "dialogue_done" -> Game.dialogueDone(p, t);
 			case "battle" -> Battles.choose(p, t);

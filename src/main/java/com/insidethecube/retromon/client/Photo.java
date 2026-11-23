@@ -3,7 +3,10 @@ package com.insidethecube.retromon.client;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.insidethecube.retromon.game.Net;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.world.phys.Vec3;
@@ -15,7 +18,8 @@ import org.lwjgl.glfw.GLFW;
  * F6 (or OPTIONS, PHOTO MODE) goes in and out. WASD or the arrows move it across the map, SPACE and CTRL up and
  * down, Q and E turn it round, R and F tilt it, the wheel takes it in and out, Z and X narrow and widen the lens,
  * SHIFT for faster; H hides these words. You stay where you were; everything on screen but the world is put away
- * (F2 takes the picture, as ever). The map is drawn as far round you as Minecraft's render distance reaches.
+ * (F2 takes the picture, as ever). (0.54) You're kept under the camera on the server (unseen), so the map is drawn
+ * round where it looks, as far as Minecraft's render distance reaches; on leaving you're back where you were.
  */
 public final class Photo {
 	public static boolean on;
@@ -25,6 +29,9 @@ public final class Photo {
 	private static long last;
 	private static boolean help = true;
 	private static final Set<Integer> DOWN = new HashSet<>();
+	/** Where the server last put you (under the camera), and when (nanoseconds). */
+	private static double sentX = Double.NaN, sentZ = Double.NaN;
+	private static long sentAt;
 	private static final int[] KEYS = {GLFW.GLFW_KEY_W, GLFW.GLFW_KEY_A, GLFW.GLFW_KEY_S, GLFW.GLFW_KEY_D, GLFW.GLFW_KEY_UP, GLFW.GLFW_KEY_DOWN, GLFW.GLFW_KEY_LEFT,
 			GLFW.GLFW_KEY_RIGHT, GLFW.GLFW_KEY_Q, GLFW.GLFW_KEY_E, GLFW.GLFW_KEY_R, GLFW.GLFW_KEY_F, GLFW.GLFW_KEY_Z, GLFW.GLFW_KEY_X, GLFW.GLFW_KEY_H, GLFW.GLFW_KEY_SPACE,
 			GLFW.GLFW_KEY_LEFT_CONTROL, GLFW.GLFW_KEY_RIGHT_CONTROL, GLFW.GLFW_KEY_LEFT_SHIFT, GLFW.GLFW_KEY_RIGHT_SHIFT, GLFW.GLFW_KEY_PAGE_UP, GLFW.GLFW_KEY_PAGE_DOWN,
@@ -49,7 +56,25 @@ public final class Photo {
 			dist = 70;
 			fov = 30;
 			help = true;
+			sentX = sentZ = Double.NaN;
+			send(true);
+		} else send(false);
+	}
+
+	/** Tells the server: on (and where the camera looks), or off. */
+	private static void send(boolean value) {
+		if (Minecraft.getInstance().getConnection() == null) return;
+		CompoundTag t = new CompoundTag();
+		t.putBoolean("on", value);
+		if (value) {
+			t.putDouble("x", tx);
+			t.putDouble("y", ty + 2);
+			t.putDouble("z", tz);
+			sentX = tx;
+			sentZ = tz;
+			sentAt = System.nanoTime();
 		}
+		ClientPlayNetworking.send(new Net.Act("photo", t));
 	}
 
 	/** A key out in the world while it's on: kept for the camera (true), so you don't walk or open anything. */
@@ -104,6 +129,8 @@ public final class Photo {
 		yaw += ((down(GLFW.GLFW_KEY_E) ? 1 : 0) - (down(GLFW.GLFW_KEY_Q) ? 1 : 0)) * 55 * dt * fast;
 		pitch = Math.max(2, Math.min(89, pitch + ((down(GLFW.GLFW_KEY_R) ? 1 : 0) - (down(GLFW.GLFW_KEY_F) ? 1 : 0)) * 30 * dt * fast));
 		fov = Math.max(5, Math.min(90, fov + ((down(GLFW.GLFW_KEY_X) ? 1 : 0) - (down(GLFW.GLFW_KEY_Z) ? 1 : 0)) * 18 * dt * fast));
+		// Moved on a way (or a while since): the server puts you under the camera again, so the map's drawn there.
+		if (Double.isNaN(sentX) || Math.hypot(tx - sentX, tz - sentZ) > 12 && now - sentAt > 250_000_000L) send(true);
 		double p = Math.toRadians(pitch), back = dist * Math.cos(p), up = dist * Math.sin(p);
 		return new double[] {tx - fx * back, ty + up, tz - fz * back, yaw, pitch};
 	}

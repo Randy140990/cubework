@@ -591,6 +591,7 @@ public final class Game {
 
 
 	public static void leave(ServerPlayer p) {
+		photo(p, false, 0, 0, 0);
 		DEVICES.remove(p.getUUID());
 		Battles.drop(p);
 		LAST.remove(p.getUUID());
@@ -1098,6 +1099,9 @@ public final class Game {
 				continue;
 			}
 			recent(p);
+			// (0.54) In PHOTO MODE: you're kept under the camera (as a spectator, so the map's drawn round it), and nothing
+			// about where you are applies until you're back.
+			if (PHOTO.containsKey(id)) continue;
 			// Taken through a door this tick: nothing else about where you were applies until next tick.
 			if (Interiors.tick(p)) continue;
 			// Inside a building, the outside's checks (its places, Oak at the town's edge, grass, trainers' sight) don't apply.
@@ -2116,6 +2120,46 @@ public final class Game {
 		List<String> ch = fill(p, List.of("{rival}: Wait, {player}! Gramps gave us POKéMON, so let's check them out!", "{rival}: Come on, I'll take you on!"));
 		if (rv != null && !rv.isRemoved()) dialogue(p, rv, "rival", ch, new CompoundTag());
 		else rivalChallenge(p);
+	}
+
+	// ---------- (0.54) PHOTO MODE: you follow the camera unseen, so the map's drawn round where it looks ----------
+
+	/** Who's in PHOTO MODE: where they were (level, x, y, z, yaw, pitch) and their game mode, to put them back. */
+	private record PhotoWas(ServerLevel level, double x, double y, double z, float yaw, float pitch, GameType mode) {}
+
+	private static final Map<UUID, PhotoWas> PHOTO = new HashMap<>();
+
+	/**
+	 * PHOTO MODE on, the camera moved, or off. On: you're a spectator (unseen, nothing touches you) kept under the
+	 * camera, out in the world only (in a room the camera's in the room already). Off: back where you were, as you were.
+	 */
+	public static void photo(ServerPlayer p, boolean on, double x, double y, double z) {
+		UUID id = p.getUUID();
+		PhotoWas was = PHOTO.get(id);
+		if (!on) {
+			if (was == null) return;
+			PHOTO.remove(id);
+			p.setGameMode(was.mode());
+			p.teleportTo(was.level(), was.x(), was.y(), was.z(), java.util.Set.of(), was.yaw(), was.pitch(), true);
+			p.setDeltaMovement(Vec3.ZERO);
+			return;
+		}
+		if (Interiors.in(p) || Battles.in(p) || !(p.level() instanceof ServerLevel level)) return;
+		if (was == null) {
+			was = new PhotoWas(level, p.getX(), p.getY(), p.getZ(), p.getYRot(), p.getXRot(), p.gameMode.getGameModeForPlayer());
+			PHOTO.put(id, was);
+			p.setGameMode(GameType.SPECTATOR);
+		}
+		if (!Double.isFinite(x) || !Double.isFinite(y) || !Double.isFinite(z)) return;
+		// Kept on the map (and not too far below or above it).
+		double cy = Math.max(level.getMinY() + 2, Math.min(level.getMaxY() - 2, y));
+		p.teleportTo(was.level(), x, cy, z, java.util.Set.of(), p.getYRot(), p.getXRot(), true);
+		p.setDeltaMovement(Vec3.ZERO);
+	}
+
+	/** Whether you're in PHOTO MODE (the server's game mode check leaves you a spectator then). */
+	public static boolean inPhoto(ServerPlayer p) {
+		return PHOTO.containsKey(p.getUUID());
 	}
 
 	/** Whether you have what a guarded way needs (a badge by its name, or "CHAMPION"). */

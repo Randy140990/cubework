@@ -42,7 +42,7 @@ PACK = os.path.join(HERE, "..", "src", "main", "resources", "resourcepacks", "re
 
 
 # ---------- the leafy trees ----------
-LEAFY = ["oak", "acacia", "birch", "azalea", "flowering_azalea", "dark_oak", "jungle", "mangrove", "cherry"]
+LEAFY = ["oak", "acacia", "birch", "azalea", "flowering_azalea", "dark_oak", "jungle", "mangrove", "cherry", "spruce"]
 # Tinted leaves' extra leaves on clean greys (the biome's green, made brighter, colours them as it does the leaves).
 GREYS = [(96, 100, 92), (150, 156, 144), (204, 210, 194), (240, 244, 230)]
 AZALEA = [hexc(c) for c in ("#2F6A24", "#4C9330", "#6FB63C", "#94D14C", "#BCE56C")]
@@ -59,7 +59,9 @@ def leaf_extra(kind):
     """His extra leaves for a kind, brought down to 32 by 32 (Retromon's texel size on a plane a block and a half
     across), their colours on Retromon's: the tinted kinds on greys, the azaleas on Let's Go's tree greens (the
     flowering one's blossoms kept pink)."""
-    im = Image.open(os.path.join(SHARDS, "textures", "block", "extra", kind + "_leaves_extra.png")).convert("RGBA")
+    # ((0.54) Johto's spruce leaves: Shards has none of its own, so the dark oak's shape, tinted as spruce's.)
+    src = kind if os.path.exists(os.path.join(SHARDS, "textures", "block", "extra", kind + "_leaves_extra.png")) else "dark_oak"
+    im = Image.open(os.path.join(SHARDS, "textures", "block", "extra", src + "_leaves_extra.png")).convert("RGBA")
     im = im.resize((32, 32), Image.BOX)
     p = im.load()
     lum = sorted(0.3 * p[x, y][0] + 0.59 * p[x, y][1] + 0.11 * p[x, y][2] for y in range(32) for x in range(32) if p[x, y][3] > 100)

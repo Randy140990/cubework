@@ -142,6 +142,9 @@ public final class AreaLooks {
 							row.equals("short") ? "block/area/sign_short_" + part + "_" + d.getSerializedName() : "block/area/sign_" + row + "_" + part + "_" + d.getSerializedName());
 				}
 				part(ctx, "wood_" + d.getSerializedName(), "block/area/wood_sign_" + d.getSerializedName());
+				// (0.54) The coloured signs (Johto's Route 27: Kanto's orange beside the white): the sign, its board orange.
+				for (String part : new String[] {"l", "r", "m", "s"})
+					for (String row : new String[] {"board", "stand"}) part(ctx, "o" + row + "_" + part + "_" + d.getSerializedName(), "block/area/osign_" + row + "_" + part + "_" + d.getSerializedName());
 				// The same signs in wood (wood_board: Pewter's oak shelf sign, as our wooden sign).
 				for (String part : new String[] {"l", "r", "m", "s"}) {
 					for (String row : new String[] {"board", "stand"}) part(ctx, "w" + row + "_" + part + "_" + d.getSerializedName(), "block/area/wsign_" + row + "_" + part + "_" + d.getSerializedName());
@@ -176,7 +179,7 @@ public final class AreaLooks {
 	}
 
 	/** The leaves with Shards' extra leaves (0.50): their names without "_leaves". */
-	private static final String[] LEAFY = {"oak", "acacia", "birch", "azalea", "flowering_azalea", "dark_oak", "jungle", "mangrove", "cherry"};
+	private static final String[] LEAFY = {"oak", "acacia", "birch", "azalea", "flowering_azalea", "dark_oak", "jungle", "mangrove", "cherry", "spruce"};
 
 	private static void part(ModelLoadingPlugin.Context ctx, String name, String model) {
 		ExtraModelKey<BlockStateModel> key = ExtraModelKey.create(() -> "retromon sign " + name);
@@ -233,6 +236,7 @@ public final class AreaLooks {
 			case "swap" -> swap(baker, rule.swaps());
 			case "roof", "roof_green", "roof_gym", "roof_museum" -> new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"));
 			case "sign" -> AreaLooks::sign;
+			case "sign_o" -> (base, e, view, pos, state, random, cull) -> board("o", base, e, view, pos, state, random, cull);
 			case "wood_board" -> AreaLooks::woodBoard;
 			case "wood_sign" -> AreaLooks::woodSign;
 			case "boulder" -> boulder(baker, rule.swaps());
@@ -818,7 +822,9 @@ public final class AreaLooks {
 
 	private static boolean sameSign(BlockAndTintGetter view, BlockPos p, BlockState as, Direction facing) {
 		BlockState s = view.getBlockState(p);
-		return s.is(as.getBlock()) && facingOf(s) == facing;
+		// ((0.54) A white sign beside an orange one (pale oak and acacia shelves) is one sign.)
+		boolean family = (s.is(Blocks.PALE_OAK_SHELF) || s.is(Blocks.ACACIA_SHELF)) && (as.is(Blocks.PALE_OAK_SHELF) || as.is(Blocks.ACACIA_SHELF));
+		return (s.is(as.getBlock()) || family) && facingOf(s) == facing;
 	}
 
 	// ---------- the grass's tufts onto the dripstone round the water, and Viridian's kerbs ----------

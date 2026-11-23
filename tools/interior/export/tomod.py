@@ -92,7 +92,8 @@ DOORS = {
     # on the far side of the mountain, at ROUTE 28 (facing west), or (for the CHAMPION) at ROUTE 26's gate (facing
     # south). Coming back in either of those, you're at its west side.
     "johto_e": {"room": "gate_johto", "door": [[-951, 28, z] for z in range(540, 544)], "out": [-946.6, 26.0, 541.5], "face": "e", "yaw": -90.0},
-    "route28": {"room": "gate_johto", "door": [[-1039, 28, z] for z in range(540, 544)], "out": [-1042.6, 26.0, 541.5], "face": "w", "yaw": 90.0,
+    # ((0.54, 12:24: "puts you outside Route 28 instead of actually on it") Out on ROUTE 28's path, clear of the gate's porch.)
+    "route28": {"room": "gate_johto", "door": [[-1039, 28, z] for z in range(540, 544)], "out": [-1047.5, 26.0, 541.5], "face": "w", "yaw": 90.0,
                 "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
     "route26": {"room": "gate_johto", "door": [[x, 27, 586] for x in range(-993, -987)], "out": [-990.5, 26.0, 589.6], "yaw": 0.0,
                 "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
