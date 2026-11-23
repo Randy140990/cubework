@@ -30,6 +30,8 @@ public class Npc extends PathfinderMob {
 	private static final EntityDataAccessor<Float> FACING = SynchedEntityData.defineId(Npc.class, EntityDataSerializers.FLOAT);
 	/** Sitting on a chair (an aide at his desk): stays put, legs forward. */
 	private static final EntityDataAccessor<Boolean> SEATED = SynchedEntityData.defineId(Npc.class, EntityDataSerializers.BOOLEAN);
+	/** (0.57) Out in the sea (the SWIMMERs on Routes 19 to 21): treading water where they are. */
+	private static final EntityDataAccessor<Boolean> SWIMMING = SynchedEntityData.defineId(Npc.class, EntityDataSerializers.BOOLEAN);
 	/** Walking up to someone they've spotted (server only): ticks left, or 0. */
 	public int approaching;
 	/** On the battle stage (your screen only): cheering a win, ticks left, and how (see NpcRenderer.Figure). */
@@ -65,6 +67,18 @@ public class Npc extends PathfinderMob {
 		b.define(KEY, "");
 		b.define(FACING, 0F);
 		b.define(SEATED, false);
+		b.define(SWIMMING, false);
+	}
+
+	public boolean swimming() {
+		return entityData.get(SWIMMING);
+	}
+
+	/** Treading water: they don't sink, drift or get pushed, and stay where they are (turning to look about). */
+	public void setSwimming(boolean on) {
+		entityData.set(SWIMMING, on);
+		setNoGravity(on);
+		noPhysics = on;
 	}
 
 	public boolean seated() {
@@ -181,7 +195,7 @@ public class Npc extends PathfinderMob {
 			if (!Float.isNaN(faceAfter)) entityData.set(FACING, faceAfter);
 			faceAfter = Float.NaN;
 		}
-		if (seated()) {
+		if (seated() || swimming()) {
 			getNavigation().stop();
 			setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
 			if (home != null && tickCount >= nextWander) {
@@ -305,6 +319,7 @@ public class Npc extends PathfinderMob {
 		out.putString("Key", key());
 		out.putFloat("Facing", facing());
 		if (seated()) out.putBoolean("Seated", true);
+		if (swimming()) out.putBoolean("Swimming", true);
 		if (home != null) {
 			out.putInt("HomeX", home.getX());
 			out.putInt("HomeY", home.getY());
@@ -320,6 +335,7 @@ public class Npc extends PathfinderMob {
 		setKey(in.getStringOr("Key", ""));
 		setFacing(in.getFloatOr("Facing", 0F));
 		if (in.getBooleanOr("Seated", false)) setSeated(true);
+		if (in.getBooleanOr("Swimming", false)) setSwimming(true);
 		int hy = in.getIntOr("HomeY", Integer.MIN_VALUE);
 		if (hy != Integer.MIN_VALUE) {
 			home = new BlockPos(in.getIntOr("HomeX", 0), hy, in.getIntOr("HomeZ", 0));

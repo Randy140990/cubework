@@ -34,6 +34,10 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		float danceT;
 		/** Sitting on a chair. */
 		boolean seated;
+		/** (0.57) A BIKER or a CUE BALL: on their motorbike (BikeLayer). */
+		boolean bike;
+		/** (0.57) Out in the sea: treading water, in it to the shoulders. */
+		boolean swimming;
 	}
 
 	/** The figure: the usual walk and stand, with a proper overarm throw and your celebrations on top. */
@@ -55,6 +59,27 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 				leftLeg.yRot = -0.08F;
 				rightLeg.zRot = leftLeg.zRot = 0;
 				rightArm.xRot = leftArm.xRot = -0.5F;
+			}
+			if (s.bike) {
+				// Sat astride the bike: the legs forward and out round the tank, the hands on the bars.
+				rightLeg.xRot = leftLeg.xRot = -0.9F;
+				rightLeg.yRot = leftLeg.yRot = 0;
+				rightLeg.zRot = 0.22F;
+				leftLeg.zRot = -0.22F;
+				rightArm.xRot = leftArm.xRot = -0.75F;
+				rightArm.yRot = leftArm.yRot = 0;
+				rightArm.zRot = 0.05F;
+				leftArm.zRot = -0.05F;
+			}
+			if (s.swimming) {
+				// Treading water: the arms out and sweeping slowly, the legs kicking under the water.
+				float sw = net.minecraft.util.Mth.sin(s.ageInTicks * 0.12F);
+				rightArm.xRot = leftArm.xRot = -1.25F + 0.2F * sw;
+				rightArm.yRot = leftArm.yRot = 0;
+				rightArm.zRot = 0.55F + 0.25F * sw;
+				leftArm.zRot = -0.55F - 0.25F * sw;
+				rightLeg.xRot = 0.35F * sw;
+				leftLeg.xRot = -0.35F * sw;
 			}
 			if (s.throwK > 0) throwing(s.throwK);
 			switch (s.dance) {
@@ -161,12 +186,13 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		super(ctx, new Figure(ctx.bakeLayer(ModelLayers.PLAYER)), 0.5F);
 		// Your cap and bag, when it's you on the battle stage.
 		addLayer(new GearLayer<>(this));
+		addLayer(new BikeLayer(this));
 	}
 
 	@Override
 	public net.minecraft.world.phys.Vec3 getRenderOffset(State s) {
 		// Sat down: the hips at the chair's seat (0.56 up, as the Interior Viewer has it) instead of 0.75.
-		return super.getRenderOffset(s).add(0, s.hop - (s.seated ? 0.19 : 0), 0);
+		return super.getRenderOffset(s).add(0, s.hop - (s.seated ? 0.19 : 0) - (s.swimming ? 1.25 : 0), 0);
 	}
 
 	/** You as you look in the world: your clothes if you've chosen some, else the boy or the girl. */
@@ -194,6 +220,8 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		super.extractRenderState(npc, s, partial);
 		s.sprite = sprite(npc);
 		s.seated = npc.seated();
+		s.swimming = npc.swimming();
+		s.bike = !s.seated && (s.sprite.startsWith("biker") || s.sprite.startsWith("cue_ball"));
 		float in = Npc.CHEER - npc.cheer + partial;
 		s.dance = npc.cheer > 0 ? npc.dance : -1;
 		s.danceT = in;

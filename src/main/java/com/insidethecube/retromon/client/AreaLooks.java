@@ -159,6 +159,9 @@ public final class AreaLooks {
 			part(ctx, "prop_statue", "block/area/prop_statue");
 			part(ctx, "prop_trophy", "block/area/prop_trophy");
 			part(ctx, "prop_mon_statue", "block/area/prop_mon_statue");
+			// (0.57) The INDIGO PLATEAU's statues as Victory Road's (a stone POKe BALL), the Cinnabar Lab's solar panels.
+			part(ctx, "prop_ball_statue", "block/area/prop_ball_statue");
+			part(ctx, "prop_solar", "block/area/prop_solar");
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
@@ -166,7 +169,7 @@ public final class AreaLooks {
 				// (15:21) Texture swaps don't pile up: where two of a block's swaps cover a spot (all Kanto's dripstone, and
 				// Pallet's), the one for the smaller area is drawn there, the other not.
 				List<Rule> swaps = new ArrayList<>();
-				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy") || rule.look().equals("leafy_hedge")) swaps.add(rule);
+				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("panel") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy") || rule.look().equals("leafy_hedge")) swaps.add(rule);
 				for (Rule rule : looks.values()) {
 					Look look = make(rule, c.baker());
 					List<Rule> rivals = new ArrayList<>();
@@ -234,6 +237,21 @@ public final class AreaLooks {
 	private static Look make(Rule rule, ModelBaker baker) {
 		return switch (rule.look()) {
 			case "swap" -> swap(baker, rule.swaps());
+			// (0.57, 15:46: "the chimneys still have the shelf style ... tailor them to be a different style instead of looking
+			// too shelfy") John's shelves used as trims, caps, bands and planters: a plain flat board where the shelf's back
+			// is (no lip, no recess), in the swapped picture; anything else in the look swapped as usual.
+			case "panel" -> panel(baker, rule.swaps());
+			// (0.57, 15:46: "the cobblestone and mossy cobblestone ... blend together") The moss's soft edge onto the
+			// cobblestone beside it, as the grass's onto the paths.
+			case "moss_onto" -> {
+				TextureAtlasSprite[] over = new TextureAtlasSprite[18];
+				for (int t = 1; t <= 17; t++) over[t] = sprite(baker, "moss_on_cobble_" + t);
+				yield new GrassEdge(over, null, false, java.util.Set.of(Blocks.MOSSY_COBBLESTONE, Blocks.MOSSY_COBBLESTONE_SLAB, Blocks.MOSSY_COBBLESTONE_STAIRS,
+						Blocks.MOSS_BLOCK), false);
+			}
+			// (0.57, 15:57: "the bone, which is supposed to be steam ... opacity 30% and kind of make them a mist") Cinnabar's
+			// volcano's steam: John's bone blocks as soft see-through steam, no faces between two of them.
+			case "steam" -> steam(sprite(baker, rule.swaps().equals("-") ? "steam" : rule.swaps()));
 			case "roof", "roof_green", "roof_gym", "roof_museum" -> new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"));
 			case "sign" -> AreaLooks::sign;
 			case "sign_o" -> (base, e, view, pos, state, random, cull) -> board("o", base, e, view, pos, state, random, cull);
@@ -747,6 +765,72 @@ public final class AreaLooks {
 		long h = net.minecraft.util.Mth.getSeed(pos.getX(), pos.getY(), pos.getZ());
 		BlockStateModel m = extra("leafy_" + kind + ((h >>> 5 & 1) == 0 ? "_a" : "_b"));
 		if (m != null) m.emitQuads(e, view, pos, state, random, d -> false);
+	}
+
+	/**
+	 * A shelf as a flat board (0.57): the shelf's back (5 pixels deep, against what it's on) as one box in its swapped
+	 * picture, so a band of John's shelves round a chimney or a planter reads as a solid trim; other blocks of the look
+	 * are swapped as a swap look swaps them.
+	 */
+	private static Look panel(ModelBaker baker, String spec) {
+		Look other = swap(baker, spec);
+		Map<Identifier, TextureAtlasSprite> pics = new HashMap<>();
+		for (String one : spec.split(",")) {
+			int eq = one.indexOf('=');
+			if (eq < 0) continue;
+			String from = one.substring(0, eq).trim(), to = one.substring(eq + 1).trim();
+			int cut = to.length();
+			for (char c : new char[] {'@', '|', '!'}) if (to.indexOf(c) >= 0) cut = Math.min(cut, to.indexOf(c));
+			pics.put(from.contains(":") ? Identifier.parse(from) : Identifier.withDefaultNamespace(from), sprite(baker, to.substring(0, cut).trim()));
+		}
+		return (base, e, view, pos, state, random, cull) -> {
+			Identifier key = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+			TextureAtlasSprite pic = key.getPath().endsWith("_shelf") ? pics.get(Identifier.fromNamespaceAndPath(key.getNamespace(), "block/" + key.getPath())) : null;
+			if (pic == null || !state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+				other.emit(base, e, view, pos, state, random, cull);
+				return;
+			}
+			final float d = 5 / 16F;
+			switch (state.getValue(BlockStateProperties.HORIZONTAL_FACING)) {
+				case NORTH -> cube(e, pic, 0, 0, 1 - d, 1, 1, 1);
+				case SOUTH -> cube(e, pic, 0, 0, 0, 1, 1, d);
+				case EAST -> cube(e, pic, 0, 0, 0, d, 1, 1);
+				default -> cube(e, pic, 1 - d, 0, 0, 1, 1, 1);
+			}
+		};
+	}
+
+	/** Steam (0.57): each face of the block that isn't against another of the same, see-through, its picture laid over 4 blocks. */
+	private static Look steam(TextureAtlasSprite pic) {
+		return (base, e, view, pos, state, random, cull) -> {
+			for (Direction d : Direction.values()) {
+				if (view.getBlockState(pos.relative(d)).is(state.getBlock())) continue;
+				e.square(d, 0, 0, 1, 1, 0);
+				float[] ss = new float[4], tt = new float[4];
+				for (int i = 0; i < 4; i++) {
+					float wx = pos.getX() + e.x(i), wy = pos.getY() + e.y(i), wz = pos.getZ() + e.z(i);
+					switch (d.getAxis()) {
+						case Y -> {
+							ss[i] = wx / 4F;
+							tt[i] = wz / 4F;
+						}
+						case Z -> {
+							ss[i] = wx / 4F;
+							tt[i] = -wy / 4F;
+						}
+						default -> {
+							ss[i] = wz / 4F;
+							tt[i] = -wy / 4F;
+						}
+					}
+				}
+				lay(e, pic, ss, tt);
+				e.color(-1, -1, -1, -1);
+				e.tintIndex(-1);
+				e.renderLayer(ChunkSectionLayer.TRANSLUCENT);
+				e.emit();
+			}
+		};
 	}
 
 	/** A little box (block units), every face in one picture. */

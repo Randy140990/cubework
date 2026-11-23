@@ -455,26 +455,76 @@ public final class Interiors {
 		}
 		if (builtFor == s) return level;
 		builtFor = s;
-		Path mark = s.getWorldPath(LevelResource.ROOT).resolve("retromon_interiors.txt");
-		boolean current = false;
+		// ((0.57, 15:46: "probably a 30-second delay" at the lab's door) Each room notes what it was built as, and only
+		// the one you're going into is built again when it's changed: the first door after an update had every room
+		// rebuilt at once (the forest, the caves, every house), all while you waited.)
+		BUILT.clear();
+		TRIED.clear();
+		markFile = s.getWorldPath(LevelResource.ROOT).resolve("retromon_interiors.txt");
 		try {
-			current = Files.exists(mark) && Files.readString(mark).trim().equals(version);
+			if (Files.exists(markFile))
+				for (String line : Files.readAllLines(markFile, StandardCharsets.UTF_8)) {
+					int eq = line.indexOf('=');
+					if (eq > 0) BUILT.put(line.substring(0, eq).trim(), line.substring(eq + 1).trim());
+				}
 		} catch (Exception ignored) {
-			// Built again.
+			// Each room built again as it's gone into.
 		}
-		int made = 0;
-		for (Room r : ROOMS.values()) {
-			// Up to date by the note, but a room with nothing where it should be is built anyway.
-			if (current && !missing(level, r)) continue;
-			if (build(level, r)) made++;
-		}
+		Retromon.LOG.info("Retromon: interiors {} ({} rooms, {} noted as built)", version, ROOMS.size(), BUILT.size());
+		return level;
+	}
+
+	/** What each room was last built as (its id: its signature), and the file that's kept in. */
+	private static final Map<String, String> BUILT = new HashMap<>();
+	private static Path markFile;
+
+	private static final Map<String, String> SIGS = new HashMap<>();
+	/** The rooms made ready this game from where you stood (each tried once, so a room that won't build isn't tried every tick). */
+	private static final java.util.Set<String> TRIED = new java.util.HashSet<>();
+
+	/** A room's signature: what goes into building it (its blocks, its people and balls, its lights), so a change shows. */
+	private static String signature(Room r) {
+		return SIGS.computeIfAbsent(r.id(), k -> makeSignature(r));
+	}
+
+	private static String makeSignature(Room r) {
+		StringBuilder b = new StringBuilder();
+		b.append(STATES).append('|').append(java.util.Arrays.hashCode(r.cells())).append('|').append(r.schem()).append('|').append(r.base()).append('|')
+				.append(r.dark()).append('|').append(r.people()).append('|').append(r.balls()).append('|').append(MONS.getOrDefault(r.id(), List.of())).append('|');
+		for (double[] l : r.lights()) b.append(java.util.Arrays.toString(l));
+		return Integer.toHexString(b.toString().hashCode()) + "-" + Math.round(r.w()) + "x" + Math.round(r.d());
+	}
+
+	/** Whether a room's been built as it is now (by the note: nothing's looked at in the world). */
+	private static boolean upToDate(Room r) {
+		return signature(r).equals(BUILT.get(r.id()));
+	}
+
+	/**
+	 * The room at a spot in the interiors made ready (built again if it's changed): blacking out into a Center, or a
+	 * game saved inside a room and loaded after an update.
+	 */
+	public static void readyAt(ServerLevel level, double x) {
+		Room r = roomAt(x);
+		if (r != null && !upToDate(r)) ready(level, r);
+	}
+
+	/** Builds a room if it's changed since it was built (or isn't there), and notes it. */
+	private static void ready(ServerLevel level, Room r) {
+		String sig = signature(r);
+		if (sig.equals(BUILT.get(r.id())) && !missing(level, r)) return;
+		long t0 = System.nanoTime();
+		if (!build(level, r)) return;
+		BUILT.put(r.id(), sig);
+		Retromon.LOG.info("Retromon: {} built ({} ms)", r.id(), (System.nanoTime() - t0) / 1_000_000);
+		if (markFile == null) return;
+		StringBuilder out = new StringBuilder();
+		for (Map.Entry<String, String> e : new java.util.TreeMap<>(BUILT).entrySet()) out.append(e.getKey()).append('=').append(e.getValue()).append('\n');
 		try {
-			Files.writeString(mark, version);
+			Files.writeString(markFile, out.toString(), StandardCharsets.UTF_8);
 		} catch (Exception e) {
 			Retromon.LOG.warn("Couldn't note the interiors as built", e);
 		}
-		Retromon.LOG.info("Retromon: interiors {} ({} built, {} rooms)", version, made, ROOMS.size());
-		return level;
 	}
 
 	/** Whether a room isn't there (its first, middle and last pieces aren't the room's blocks). */
@@ -891,10 +941,7 @@ public final class Interiors {
 		MinecraftServer s = p.level().getServer();
 		ServerLevel level = ensure(s);
 		if (level == null || r == null) return false;
-		if (missing(level, r)) {
-			Retromon.LOG.warn("Retromon: {} wasn't there; building it now", r.id());
-			build(level, r);
-		}
+		ready(level, r);
 		COOL.put(p.getUUID(), fadeTicks(p) + 20);
 		// (0.50, 20:07: a house took a long time to load) The room's chunks loaded while the screen fades, not after.
 		preload(level, r.ox() - 2, r.oz() - 2, r.ox() + r.w() + 2, r.oz() + r.d() + 2);
@@ -1033,6 +1080,11 @@ public final class Interiors {
 		if (in(p)) {
 			Room r = roomAt(p.getX());
 			if (r == null) return false;
+			// (A game saved in here and loaded after an update: the room made as it is now.)
+			if (!upToDate(r) && p.level() instanceof ServerLevel lv && TRIED.add(r.id())) {
+				ensure(lv.getServer());
+				if (!upToDate(r)) ready(lv, r);
+			}
 			double lx = p.getX() - r.ox(), ly = p.getY() - r.oy(), lz = p.getZ() - r.oz();
 			// Fallen out of a room somehow (under a floor, or off its edge: 20:20, at the Underground Path's far stairs):
 			// back to where you come in.

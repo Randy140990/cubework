@@ -25,6 +25,8 @@ public class RetromonClient implements ClientModInitializer {
 		EntityRendererRegistry.register(Retromon.MON_DISPLAY, MonRenderer::new);
 		EntityRendererRegistry.register(Retromon.WORLD_MON, WorldMonRenderer::new);
 		EntityRendererRegistry.register(Retromon.ROOM_LIGHT, RoomLightRenderer::new);
+		// (0.57) Two banners one above the other drawn as one long one (Ecruteak's posts, the NATIONAL PARK's).
+		net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(net.minecraft.world.level.block.entity.BlockEntityType.BANNER, LongBanners::new);
 		Adventure.register();
 		Hud.register();
 		// The insides of buildings: cut-out (glass, leaves and the clock face show what's behind them).

@@ -820,7 +820,7 @@ public final class Game {
 	private static final java.util.Set<String> RESPOT = java.util.Set.of("pewter_city_p3", "cerulean_city_p7");
 
 	static boolean settle(Npc n) {
-		if (!ourSave || n.role() == Npc.LEADER || n.key().startsWith("rival") || !(n.level() instanceof ServerLevel level)) return true;
+		if (!ourSave || n.role() == Npc.LEADER || n.key().startsWith("rival") || n.swimming() || !(n.level() instanceof ServerLevel level)) return true;
 		BlockPos at = n.blockPosition();
 		Zone zone = zoneAt(at.getX(), at.getZ());
 		if (zone == null) return true;
@@ -946,7 +946,11 @@ public final class Game {
 			// (0.50) Routes 11 to 18: Vermilion east to Lavender's south, round to Fuchsia, and the CYCLING ROAD.
 			new Zone("route_11", -299, 556, -142, 612), new Zone("route_12", -142, 448, -100, 720), new Zone("route_13", -300, 688, -143, 728),
 			new Zone("route_14", -305, 729, -250, 805), new Zone("route_15", -440, 758, -306, 805), new Zone("route_16", -680, 388, -560, 444),
-			new Zone("route_17", -665, 445, -615, 757), new Zone("route_18", -665, 758, -561, 805)};
+			new Zone("route_17", -665, 445, -615, 757), new Zone("route_18", -665, 758, -561, 805),
+			// (0.57, 15:57: "lots of swimmers ... island hopping") The sea: Route 21 south from Pallet, CINNABAR ISLAND, Route 20
+			// east past the SEAFOAM ISLANDS, Route 19 up to Fuchsia.
+			new Zone("route_21", -830, 736, -755, 884), new Zone("cinnabar_island", -895, 885, -756, 958), new Zone("route_20", -755, 892, -470, 945),
+			new Zone("route_19", -525, 861, -470, 891)};
 
 	public static String placeAt(double x, double z) {
 		for (int i = zones.size() - 1; i >= 0; i--) if (zones.get(i).contains(x, z)) return zones.get(i).place();
@@ -1075,6 +1079,8 @@ public final class Game {
 	public static void tick(MinecraftServer s) {
 		// HeartGold's mailboxes by Pallet Town's houses, put in place once that part of the map is loaded.
 		if (ourSave && s.getTickCount() % 40 == 0) Mailbox.place(s.overworld());
+		// (0.57) John's small fixes to his map (the DARK CAVE's Route 46 way in a block higher).
+		if (ourSave && s.getTickCount() % 40 == 20) MapFixes.tick(s);
 		for (ServerPlayer p : s.getPlayerList().getPlayers()) {
 			if (!adventure(p)) continue;
 			UUID id = p.getUUID();
@@ -1703,6 +1709,7 @@ public final class Game {
 			Interiors.Door hd = Interiors.DOORS.get(d.healDoor);
 			if (hd != null && hd.place() != null) enter(p, hd.place());
 		}
+		if (to != null && d.healInside) Interiors.readyAt(to, d.healX);
 		if (to == null || to == p.level()) p.teleportTo(d.healX, d.healY, d.healZ);
 		else {
 			leavingLevel(p);
@@ -3829,6 +3836,16 @@ public final class Game {
 			// (One posing as an item ball, the Power Plant's ELECTRODE: its own name, not the ball's.)
 			Species real = Species.ALL.get(st.species());
 			String wild = real == null ? name : real.name();
+			if (st.species().equals("sudowoodo")) {
+				// (0.57) The odd tree on Route 36: only the SQUIRTBOTTLE (Goldenrod's flower shop) makes it move.
+				if (d.count("squirtbottle") <= 0) {
+					dialogue(p, null, "talk", List.of("A strange tree blocks the way!", "It's a weird tree. It doesn't look quite like the others..."), t, w.getId());
+					return;
+				}
+				dialogue(p, null, "static", List.of(player(p) + " used the SQUIRTBOTTLE!", "The weird tree doesn't like the SQUIRTBOTTLE!", "The weird tree attacked!"), t,
+						w.getId());
+				return;
+			}
 			if (st.species().equals("snorlax") && d.count("poke_flute") <= 0) {
 				// (0.50) Asleep: no battle till it's woken (Mr. Fuji's POKe FLUTE).
 				dialogue(p, null, "talk", List.of("A sleeping POKéMON blocks the way!", "It's fast asleep. Maybe something would wake it..."), t, w.getId());
@@ -4678,7 +4695,11 @@ public final class Game {
 	 */
 	/** (0.51) The FIGHTING DOJO's two prizes, each with the other: take one and the other stays. */
 	private static final Map<String, String> DOJO_PRIZE = Map.of("hitmonlee_gift", "hitmonchan_gift", "hitmonchan_gift", "hitmonlee_gift");
-	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -123.0, 31.0, 599.5, 90.0}, {"snorlax_route_16", -600.5, 33.0, 432.0, 0.0}};
+	// (0.57, 15:51: "a bit too far south. He's supposed to block it ... where he's near the sign") Route 12's SNORLAX at the
+	// junction by the sign (FireRed's, a step south-west of it), across the boardwalk. (16:15) Route 36's SUDOWOODO, the odd
+	// tree, in the long grass between its east and west halves (HeartGold's), till it's watered with the SQUIRTBOTTLE.
+	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -124.5, 31.0, 586.5, 90.0}, {"snorlax_route_16", -600.5, 33.0, 432.0, 0.0},
+			{"sudowoodo", -1980.5, 21.0, 516.5, 270.0}};
 
 	/** How near a sleeping SNORLAX you can come (blocks from its middle). */
 	private static final double SNORLAX_REACH = 2.7;
@@ -4706,7 +4727,7 @@ public final class Game {
 			p.teleportTo(x + dx / dist * SNORLAX_REACH, p.getY(), z + dz / dist * SNORLAX_REACH);
 			if (!BLOCKED_SAID.containsKey(p.getUUID())) {
 				BLOCKED_SAID.put(p.getUUID(), 100);
-				message(p, List.of("A sleeping POKéMON blocks the way!"));
+				message(p, List.of(key.startsWith("sudowoodo") ? "A strange tree blocks the way!" : "A sleeping POKéMON blocks the way!"));
 			}
 		}
 		// (0.52, 10:41) ROUTE 23's badge checks (FireRed's seven guards, Let's Go's gates between the statues): without
@@ -4882,7 +4903,7 @@ public final class Game {
 		for (Object[] o : STATIC_SPOTS) {
 			// (0.52: "staticspot3", so Route 16's, moved to the Celadon side of its gate, goes there in a save that had it
 			// on the other side; one put down before anywhere near is moved, not doubled.)
-			String key = (String) o[0], doneKey = "staticspot3:" + key;
+			String key = (String) o[0], doneKey = "staticspot4:" + key;
 			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
 			Trainers.Static st = Trainers.STATICS.get(key);
 			if (done.contains(doneKey) || st == null || takenByAnyone(key)) continue;
@@ -4977,10 +4998,14 @@ public final class Game {
 		for (Trainers.Trainer t : Trainers.in(place)) {
 			int[] own = trainerSpot(t.key());
 			if (ownOnly && own == null) continue;
-			BlockPos at = own != null ? (level.hasChunkAt(new BlockPos(own[0], START_Y, own[1])) ? spot(level, own[0], own[1], 4) : null)
+			boolean swims = swimmer(t);
+			BlockPos at = swims ? seaSpot(level, z, size, Trainers.POS.get(t.key()))
+					: own != null ? (level.hasChunkAt(new BlockPos(own[0], START_Y, own[1])) ? spot(level, own[0], own[1], 4) : null)
 					: gameSpot(level, z, size, Trainers.POS.get(t.key()));
 			if (at == null || present.contains(t.key())) continue;
-			place(level, t.leader() ? Npc.LEADER : Npc.TRAINER, t.key(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yawOf(t.facing(), 0F));
+			Npc placed = place(level, t.leader() ? Npc.LEADER : Npc.TRAINER, t.key(), at.getX() + 0.5, swims ? at.getY() + 0.9 : at.getY(), at.getZ() + 0.5,
+					yawOf(t.facing(), 0F));
+			if (swims && placed != null) placed.setSwimming(true);
 			count++;
 		}
 		for (Trainers.Person ps : Trainers.peopleIn(place)) {
@@ -5017,6 +5042,34 @@ public final class Game {
 		if (server == null) return false;
 		for (ServerPlayer p : server.getPlayerList().getPlayers()) if (data(p).statics.contains(key)) return true;
 		return false;
+	}
+
+	/** (0.57) Out in the sea in the games: a SWIMMER (and a BEAUTY or a CUE BALL in a swimsuit). */
+	static boolean swimmer(Trainers.Trainer t) {
+		return t.title().contains("SWIMMER") || t.sprite().startsWith("swimmer");
+	}
+
+	/**
+	 * (0.57) A SWIMMER's spot: where the games have them, on the sea nearby (open water, two deep, nothing over it), the
+	 * top water block; null if there's none near.
+	 */
+	private static BlockPos seaSpot(ServerLevel level, Zone z, int[] size, int[] xy) {
+		if (xy == null || xy[0] < 0 || xy[1] < 0) return null;
+		double fx = (xy[0] + 0.5) / size[0], fz = (xy[1] + 0.5) / size[1];
+		int x = z.x1() + (int) Math.floor(fx * (z.x2() - z.x1() + 1)), zz = z.z1() + (int) Math.floor(fz * (z.z2() - z.z1() + 1));
+		if (!level.hasChunkAt(new BlockPos(x, START_Y, zz))) return null;
+		for (int r = 0; r <= 14; r++) {
+			for (int dx = -r; dx <= r; dx++) {
+				for (int dz = -r; dz <= r; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
+					int top = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, x + dx, zz + dz) - 1;
+					BlockPos at = new BlockPos(x + dx, top, zz + dz);
+					if (level.getBlockState(at).is(Blocks.WATER) && level.getBlockState(at.below()).is(Blocks.WATER) && level.getBlockState(at.above()).isAir()
+							&& level.getBlockState(at.above(2)).isAir()) return at;
+				}
+			}
+		}
+		return null;
 	}
 
 	/** A spot on the games' map (x, y in steps) laid over a marked place, moved to good ground nearby. */
