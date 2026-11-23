@@ -209,7 +209,54 @@ def outsides():
     save("well_bucket", im)
 
 
+# ---------- all Johto's outsides (19:17: "anywhere there's an old texture, we've retextured in our style") ----------
+def johto_sweep():
+    # The plain white and grey of the Centers, Marts, houses and gates: a clean render, the faintest grain.
+    save("jw_white", J.render_wall(hexc("#F3F2EE"), "jww"))
+    save("jw_grey", J.render_wall(hexc("#C9CBCB"), "jwg"))
+    # The lights in the doorways' floors: a warm cream panel that glows.
+    im = _img()
+    for y in range(16):
+        for x in range(16):
+            c = hexc("#FFF3D6")
+            if x in (0, 15) or y in (0, 15): c = hexc("#D9C9A6")
+            elif x in (1, 14) or y in (1, 14): c = hexc("#F5E3BC")
+            _put(im, x, y, c)
+    save("door_light", im)
+    # The S.S. AQUA: white painted steel with its seams, a navy hull, grey steel decks, teak boards, a yellow funnel
+    # with its red band, dark steel, portholes lit warm, its teal stripe.
+    def plates(base, seed, seam=0.1, rivets=True):
+        r = random.Random(seed)
+        im = _img()
+        for y in range(16):
+            for x in range(16):
+                k = (r.random() - 0.5) * 0.025
+                if y == 0 or x == 0: k -= seam
+                if rivets and (x in (2, 13)) and (y in (2, 13)): k -= seam * 0.6
+                _put(im, x, y, shade(base, k))
+        return im
+    save("aqua_white", plates(hexc("#F1F3F4"), "aqw", 0.06))
+    save("aqua_blue", plates(hexc("#264A7E"), "aqb", 0.12))
+    save("aqua_deck", plates(hexc("#8E9499"), "aqd", 0.1))
+    save("aqua_boards", K.boards(hexc("#A87A4E"), "aqbo"))
+    save("aqua_yellow", plates(hexc("#E8B93A"), "aqy", 0.08, rivets=False))
+    save("aqua_red", plates(hexc("#C23A30"), "aqr", 0.08, rivets=False))
+    save("aqua_dark", plates(hexc("#2B2E33"), "aqk", 0.06, rivets=False))
+    save("aqua_steel", plates(hexc("#B7BCC1"), "aqs", 0.08))
+    save("aqua_teal", plates(hexc("#2E8D97"), "aqt", 0.08, rivets=False))
+    im = _img()
+    for y in range(16):
+        for x in range(16):
+            d = math.hypot(x - 7.5, y - 7.5)
+            c = hexc("#F1F3F4")
+            if d < 6.2: c = hexc("#9AA2AA")
+            if d < 5.0: c = mix(hexc("#FFF0C8"), hexc("#F2C66A"), d / 5.0)
+            _put(im, x, y, c)
+    save("aqua_porthole", im)
+
+
 def build():
+    johto_sweep()
     outsides()
     volcano()
     lamps()
