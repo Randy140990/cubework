@@ -205,4 +205,5 @@ import looks48b
 import looks49
 import looks50
 import looks51
-EXTRA = [looks48b.build, looks49.build, looks50.build, looks51.build]
+import looks52
+EXTRA = [looks48b.build, looks49.build, looks50.build, looks51.build, looks52.build]

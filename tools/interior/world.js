@@ -702,6 +702,31 @@ function stairsDown(room, x0, z0 = 0, depth = 2, o = {}) {
   room.warps.push({ test: p => p.y <= -1.45, to: o.to, spawn: o.spawn, fx: "fade", why: "down" });
   room.item("Stairs down", "The stairwell, with a railing round it; open at the top step.");
 }
+// (0.52, 09:05: "at the bottom edge of the screen, the wall should be open, as in interiors, or at least only one
+// block high") A cave cut away on the camera's side, as the rooms are: rock within 8 blocks south of a floor (the
+// caves' outside walls are 8 thick; tools/cavecut.py, the mod's) stands only a block over that floor. Returns the
+// most each spot's rock may stand (Infinity: as high as it is).
+function southCut(W, D, isFloor, floorH) {
+  const cap = new Float32Array(W * D).fill(Infinity);
+  for (let x = 0; x < W; x++) {
+    let last = -1, lh = 0;
+    for (let z = 0; z < D; z++) {
+      if (isFloor(x, z)) { last = z; lh = floorH(x, z); }
+      else if (last >= 0 && z - last <= 8) cap[z * W + x] = Math.max(1, lh + 1);
+    }
+  }
+  return (x, z) => cap[z * W + x];
+}
+// A row of rock x0 to x1 (as high as h, or as the cut lets it), in as few boxes as the cut allows.
+function cutRock(G, x0, x1, z, y0, h, cut, mats) {
+  let x = x0;
+  while (x < x1) {
+    const hh = Math.min(h, cut(x, z)); let e = x + 1;
+    while (e < x1 && Math.min(h, cut(e, z)) === hh) e++;
+    G.box(x, y0, z, e, hh, z + 1, mats);
+    x = e;
+  }
+}
 function doormat(room, x0, x1, o = {}) {
   const D = room.D, G = room.geo;
   if (room.entry) [x0, x1] = room.entry;

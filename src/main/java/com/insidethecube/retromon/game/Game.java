@@ -2503,6 +2503,25 @@ public final class Game {
 					tutor(p, n, d);
 					return;
 				}
+				// (0.52) The COPYCAT (FireRed's): bring her a POKé DOLL and she teaches you MIMIC (TM31); till then she
+				// only mimics you, and after, she thanks you (still mimicking).
+				if (n.key().equals("copycats_house_2f_p0")) {
+					String had = "gift:copycats_house_2f:tm_mimic";
+					if (d.statics.contains(had)) {
+						dialogue(p, n, "talk", List.of(player(p) + ": Hi! Thanks for earlier!", player(p) + ": Pardon?",
+								player(p) + ": Is it that fun to mimic my every move?", "COPYCAT: You bet! It's a scream!"));
+					} else if (d.count("poke_doll") > 0) {
+						d.take("poke_doll");
+						List<String> lines = new ArrayList<>(List.of("Oh wow! A POKé DOLL!", "For me? Thank you!", "You know what? I can teach the move MIMIC."));
+						String got = giveGift(p, "copycats_house_2f");
+						if (got != null) lines.add(got);
+						dialogue(p, n, "talk", lines);
+					} else {
+						Trainers.Person person = Trainers.PEOPLE.get(n.key());
+						dialogue(p, n, "talk", person == null ? List.of("COPYCAT: Hmm? Quit mimicking?") : fill(p, person.lines()));
+					}
+					return;
+				}
 				if (n.key().equals(OLD_MAN) && !d.hasDex()) {
 					dialogue(p, n, "talk", OLD_MAN_GRUMPY);
 					return;
@@ -3292,6 +3311,22 @@ public final class Game {
 	public static void roomUse(ServerPlayer p, String use) {
 		Interiors.Room r = Interiors.roomOf(p);
 		if (r == null || Battles.in(p) || BUSY.containsKey(p.getUUID())) return;
+		// (0.52) An item FireRed hides in a room ("hidden:item:key": the COPYCAT's NUGGET by her PC): found once.
+		if (use.startsWith("hidden:")) {
+			String[] a = use.split(":");
+			if (a.length < 3) return;
+			PlayerData d = data(p);
+			Item it = Item.find(a[1]);
+			if (it == null) return;
+			if (!d.statics.add("hidden:" + a[2])) {
+				message(p, List.of("There's nothing else here."));
+				return;
+			}
+			d.give(it.id(), 1);
+			sync(p);
+			message(p, List.of(player(p) + " found " + it.name() + "!"));
+			return;
+		}
 		if (use.startsWith("can:") && r.id().equals("vermilion_gym")) {
 			try {
 				trashCan(p, Integer.parseInt(use.substring(4)));
@@ -4367,11 +4402,12 @@ public final class Game {
 	 */
 	/**
 	 * (0.50) The POKeMON that wait in one spot out in the world: Route 12's SNORLAX asleep on the pier south of Route
-	 * 11's gate, Route 16's outside its gate's west way. Key, x, y, z, facing.
+	 * 11's gate, Route 16's on the Celadon side of its gate (east), between the bushes, across the way to its south door
+	 * (FireRed's; 10:26). Key, x, y, z, facing.
 	 */
 	/** (0.51) The FIGHTING DOJO's two prizes, each with the other: take one and the other stays. */
 	private static final Map<String, String> DOJO_PRIZE = Map.of("hitmonlee_gift", "hitmonchan_gift", "hitmonchan_gift", "hitmonlee_gift");
-	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -123.0, 31.0, 599.5, 90.0}, {"snorlax_route_16", -623.5, 34.0, 418.5, 0.0}};
+	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -123.0, 31.0, 599.5, 90.0}, {"snorlax_route_16", -600.5, 33.0, 432.0, 0.0}};
 
 	/** How near a sleeping SNORLAX you can come (blocks from its middle). */
 	private static final double SNORLAX_REACH = 2.7;
@@ -4435,7 +4471,9 @@ public final class Game {
 			{-798, 326, List.of("TRAINER TIPS", "Any POKéMON that takes part in battle, however short, earns EXP!")},
 			// Route 3's and Route 4's (13:56).
 			{-604, 308, List.of("ROUTE 3", "MT. MOON AHEAD")}, {-593, 260, List.of("MT. MOON", "Tunnel Entrance")},
-			{-550, 260, List.of("ROUTE 4", "MT. MOON - CERULEAN CITY")}};
+			{-550, 260, List.of("ROUTE 4", "MT. MOON - CERULEAN CITY")},
+			// (0.52, 09:11) Route 13's (John's acacia sign by the way to Route 12).
+			{-176, 699, List.of("ROUTE 13", "North to SILENCE BRIDGE")}};
 
 	/** Where a trainer in TRAINER_SPOTS stands (x, z), or null. */
 	private static int[] trainerSpot(String key) {
@@ -4539,12 +4577,16 @@ public final class Game {
 		}
 		// Those in ITEM_SPOTS: put down once per save, where their part of the map is loaded (unless picked up already).
 		for (Object[] o : STATIC_SPOTS) {
-			String key = (String) o[0], doneKey = "staticspot2:" + key;
+			// (0.52: "staticspot3", so Route 16's, moved to the Celadon side of its gate, goes there in a save that had it
+			// on the other side; one put down before anywhere near is moved, not doubled.)
+			String key = (String) o[0], doneKey = "staticspot3:" + key;
 			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
 			Trainers.Static st = Trainers.STATICS.get(key);
 			if (done.contains(doneKey) || st == null || takenByAnyone(key)) continue;
 			if (!level.hasChunkAt(BlockPos.containing(x, y, z))) continue;
-			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 4, y - 3, z - 4, x + 4, y + 3, z + 4);
+			// (Where Route 16's lay before 0.52, west of its gate: loaded too, so the one there is found and moved.)
+			if (key.equals("snorlax_route_16") && !level.hasChunkAt(BlockPos.containing(-623.5, 34.0, 418.5))) continue;
+			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 48, y - 8, z - 48, x + 48, y + 8, z + 48);
 			List<WorldMon> there = level.getEntitiesOfClass(WorldMon.class, box, w -> key.equals(w.key()));
 			// (0.50.3) Lying down now: one put down before turns to lie across the way.
 			if (there.isEmpty()) placeMon(level, st.species(), key, x, y, z, ((Double) o[4]).floatValue());

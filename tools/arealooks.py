@@ -156,7 +156,9 @@ def main():
     add("swap", "oxidized_cut_copper_slab,waxed_oxidized_cut_copper_slab", LAB, "block/oxidized_cut_copper=lab_awning_door")
     add("swap", "bricks,brick_wall,brick_stairs", LAB, "block/bricks=lab_chimney")
     # Its roof (14:15): light grey metal panels, the rim along its edge darker.
-    add("swap", "polished_andesite_slab,polished_andesite_stairs", LAB, "block/polished_andesite=lab_roof", ("25", "26"))
+    # (0.52, 09:01: "all of it should align") Its stairs face two ways and John set stone among them: laid from where
+    # each block is, so every one's roof runs on from the next.
+    add("swap", "polished_andesite_slab,polished_andesite_stairs,stone", LAB, "block/polished_andesite=lab_roof@1,block/stone=lab_roof@1", ("25", "26"))
     add("swap", "polished_blackstone_wall", LAB, "block/polished_blackstone=lab_roof_rim", ("25", "26"))
     # Every route gate on the map (the buildings with polished deepslate roofs, tools/area_gates.tsv).
     for line in open(os.path.join(HERE, "area_gates.tsv")):
@@ -247,6 +249,9 @@ def main():
     round48b(add, room)
     round49(add, room)
     round50(add, room)
+    # (0.52) Every look all Kanto has, on Route 28 and SILVER CAVE's outside too (west of the Johto Gate, 09:01).
+    for r in [r for r in rows if len(r) == 10 and tuple(r[2:6]) == KANTO[:4]]:
+        rows.append((r[0], r[1]) + ROUTE28[:4] + (r[6], r[7], r[8], ROUTE28[4]))
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -721,6 +726,9 @@ def round50(add, room):
     for r in (ROUTE16, ROUTE17, ROUTE18):
         add("swap", "gray_concrete", r, "block/gray_concrete=tarmac@4")
     round51(add, room)
+    round52(add, room)
+    round52b(add, room)
+    round52c(add, room)
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -812,6 +820,213 @@ def round51(add, room):
     add("swap", "bamboo_door", PEWTER, "block/bamboo_door_top=door_yellow_top,block/bamboo_door_bottom=door_yellow_bottom")
     # Lily pads, Let's Go's, everywhere.
     add("swap", "lily_pad", K_, "block/lily_pad=lily_lg!")
+
+SAF_GROUND = (-405, 384, -298, 466, "Saffron City's streets")
+SAFFRON = (-395, 389, -305, 459, "Saffron City")
+SILPH = (-362, 417, -341, 432, "SILPH CO.")
+DOJO = (-343, 388, -330, 400, "the FIGHTING DOJO")
+SAF_GYM = (-329, 388, -313, 400, "Saffron Gym")
+SAF_LAMPS = [(-357, 399), (-346, 399), (-314, 417), (-385, 421), (-385, 428), (-314, 432), (-353, 450), (-342, 450), (-318, 450)]
+
+
+def round52(add, room):
+    """0.52.0's looks: Saffron City in Let's Go's colours (09:13, 09:26; tools/looks52.py for the pictures)."""
+    G, S = SAF_GROUND, SAFFRON
+    g32 = ("32", "32")
+    # The streets: the roads tarmac (as Route 17's), the kerbs pale stone, John's four-colour paving as pavers, the
+    # plaza strip in front of the south building cream slabs.
+    add("swap", "gray_concrete", G, "block/gray_concrete=tarmac@4", g32)
+    add("swap", "light_gray_concrete", G, "block/light_gray_concrete=saf_kerb", g32)
+    add("swap", "white_concrete,yellow_concrete,yellow_terracotta,orange_terracotta", G,
+        "block/white_concrete=pave_saf_w@2,block/yellow_concrete=pave_saf_y@2,block/yellow_terracotta=pave_saf_o2@2,block/orange_terracotta=pave_saf_o@2", g32)
+    add("swap", "white_terracotta", G, "block/white_terracotta=saf_plaza", g32)
+    up = ("33", "50")
+    # The buildings: yellow walls, white walls, cream bands, the stone and cream buildings, the pale grey ones.
+    add("swap", "yellow_concrete", S, "block/yellow_concrete=saf_wall", up)
+    add("swap", "white_concrete", S, "block/white_concrete=saf_white", up)
+    add("swap", "yellow_terracotta", S, "block/yellow_terracotta=saf_band", up)
+    add("swap", "end_stone_bricks,end_stone_brick_stairs", S, "block/end_stone_bricks=saf_band", up)
+    add("swap", "light_gray_terracotta", S, "block/light_gray_terracotta=saf_stone", up)
+    add("swap", "white_terracotta", S, "block/white_terracotta=saf_cream", ("33", "42"))
+    add("swap", "light_gray_concrete", S, "block/light_gray_concrete=saf_grey", ("33", "46"))
+    # The roofs green (Let's Go's), a cream coping round their edges, their terraces lighter; the floors inside tiled.
+    add("swap", "cut_red_sandstone_slab", S, "block/red_sandstone_top=saf_roof,block/cut_red_sandstone=saf_rim", up)
+    add("swap", "light_blue_terracotta", S, "block/light_blue_terracotta=saf_deck", ("42", "50"))
+    add("swap", "light_blue_terracotta", S, "block/light_blue_terracotta=saf_floor", ("33", "41"))
+    # On the roofs: the units' metal casings, the vent grilles, the pale pads.
+    add("swap", "iron_block", S, "block/iron_block=saf_unit", up)
+    add("swap", "smooth_sandstone_slab", S, "block/sandstone_top=saf_vent", up)
+    add("swap", "pale_oak_slab", S, "block/pale_oak_planks=saf_pad", ("43", "50"))
+    add("swap", "white_terracotta", S, "block/white_terracotta=saf_pad", ("43", "50"))
+    # The windows' dark backs pale blinds; the awnings striped; the canopies teal; the door columns white; the steps.
+    add("swap", "deepslate_brick_wall", S, "block/deepslate_bricks=saf_blind", up)
+    add("swap", "prismarine_brick_stairs,prismarine_bricks", S, "block/prismarine_bricks=saf_canopy", up)
+    add("swap", "crimson_stairs", S, "block/crimson_planks=saf_awning_red", up)
+    add("swap", "warped_stairs", S, "block/warped_planks=saf_awning_green", up)
+    add("swap", "bone_block", S, "block/bone_block_side=saf_post,block/bone_block_top=saf_post_top", up)
+    add("swap", "smooth_stone_slab", S, "block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer", ("33", "33"))
+    # The planters (John's shelves round the beds) each a colour of their own; the boards over the doors; the rails.
+    add("swap", "pale_oak_shelf", S, "block/pale_oak_shelf=planter_saf_cream", ("33", "33"))
+    add("swap", "pale_oak_shelf", S, "block/pale_oak_shelf=saf_board", ("35", "40"))
+    add("swap", "mangrove_shelf", S, "block/mangrove_shelf=planter_saf_terra", ("33", "33"))
+    add("swap", "oak_shelf", S, "block/oak_shelf=planter_saf_wood", ("33", "33"))
+    add("swap", "nether_brick_fence", S, "block/nether_bricks=saf_rail", ("33", "34"))
+    # The street lamps (not black any more): warm white posts, green caps, warm frosted glass, lit globes.
+    for x, z in SAF_LAMPS:
+        b = (x - 1, z - 1, x + 1, z + 1, "a Saffron lamp")
+        add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern", b,
+            "block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,"
+            "block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!", ("33", "42"))
+        add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ("33", "42"))
+    # SILPH CO.: white cladding panels, metal, blue-grey blinds behind its glass, pale bands, its plaza.
+    add("swap", "white_concrete", SILPH, "block/white_concrete=silph_panel@2", ("33", "70"))
+    add("swap", "quartz_block,quartz_stairs,quartz_slab,quartz_pillar,smooth_quartz_slab", SILPH, QUARTZ, ("33", "70"))
+    add("swap", "smooth_quartz", SILPH, "block/quartz_block_bottom=silph_plaza@2", ("33", "33"))
+    add("swap", "deepslate_brick_wall", SILPH, "block/deepslate_bricks=silph_blind", ("33", "70"))
+    add("swap", "iron_block", SILPH, "block/iron_block=silph_metal", ("33", "70"))
+    add("swap", "yellow_terracotta", SILPH, "block/yellow_terracotta=silph_band", ("33", "70"))
+    add("swap", "light_blue_terracotta", SILPH, "block/light_blue_terracotta=silph_floor", ("33", "70"))
+    # The FIGHTING DOJO (the shaped roof, left of the Gym): slate tiles, a dark ridge, dark timber, white plaster
+    # between, wooden floors and posts, its sliding door.
+    D = DOJO
+    add("roof_dojo", "jungle_stairs,oak_stairs", D, "-", ("37", "44"))
+    add("swap", "jungle_stairs", D, "block/jungle_planks=dojo_ridge", ("37", "44"))
+    add("swap", "jungle_planks,oak_slab,jungle_slab", D, "block/jungle_planks=dojo_ridge,block/oak_planks=dojo_ridge", ("37", "44"))
+    add("swap", "oak_planks", D, "block/oak_planks=dojo_beam", ("37", "44"))
+    add("swap", "light_gray_concrete", D, "block/light_gray_concrete=dojo_wall@2", ("33", "42"))
+    add("swap", "quartz_block,quartz_slab", D, "block/quartz_block_top=dojo_floor,block/quartz_block_side=dojo_beam,block/quartz_block_bottom=dojo_floor", ("33", "33"))
+    add("swap", "quartz_block", D, "block/quartz_block_top=dojo_post,block/quartz_block_side=dojo_post,block/quartz_block_bottom=dojo_post", ("34", "38"))
+    add("swap", "quartz_block", D, "block/quartz_block_top=dojo_beam,block/quartz_block_side=dojo_wall@2,block/quartz_block_bottom=dojo_beam", ("39", "44"))
+    add("swap", "quartz_stairs", D, "block/quartz_block_top=dojo_beam,block/quartz_block_side=dojo_beam", ("33", "44"))
+    add("swap", "calcite", D, "block/calcite=dojo_floor", ("33", "33"))
+    add("swap", "polished_diorite_stairs,polished_diorite_slab", D, "block/polished_diorite=dojo_beam")
+    add("swap", "deepslate_tiles", D, "block/deepslate_tiles=dojo_door", ("33", "37"))
+    # The Saffron Gym's doorway (its dark tiles): one solid dark, as the gates'.
+    add("swap", "deepslate_tiles", SAF_GYM, "block/deepslate_tiles=gate_dark", ("33", "37"))
+
+ROUTE28 = (-1210, 505, -1011, 590, "Route 28")
+LAV_STEPS = [(-141, 427, -138, 430, "the Volunteer House's step"), (-148, 437, -145, 440, "Lavender's house's step"),
+             (-137, 437, -134, 440, "Lavender's house's step"), (-120, 415, -117, 420, "Lavender's Center's step")]
+FU_LAMPS = [(-490, 768), (-539, 777), (-464, 781), (-542, 788), (-512, 788), (-454, 793), (-483, 811), (-502, 819)]
+
+
+def round52b(add, room):
+    """0.52.0's other looks (09:01 to 09:11, now the map's back): see tools/looks52.py's others()."""
+    # Route 28 and Silver Cave's outside (09:01): all Kanto's looks too (main() copies them; west of the Johto Gate
+    # they stopped short).
+    add("swap", "oak_wood,oak_log", ROUTE28, "block/oak_log=tree_bark,block/oak_log_top=tree_bark")
+    add("swap", "pale_oak_fence", ROUTE28, FENCE)
+    # Its one house (Viridian's green house, the same build): the green tiled roof, white frames, the chimney, the
+    # shelves, the steps and trim.
+    h = (-1115, 531, -1100, 544, "Route 28's house")
+    add("roof_green", "warped_stairs", h)
+    add("swap", "pale_oak_stairs,pale_oak_slab", h, "block/pale_oak_planks=window_frame")
+    add("swap", "mud_bricks,mud_brick_stairs,mud_brick_slab", h, "block/mud_bricks=chimney_brick")
+    add("swap", "warped_shelf", h, "block/warped_shelf=green_shelf")
+    add("swap", "stripped_warped_hyphae,stripped_warped_stem", h, "block/stripped_warped_stem=green_solid,block/stripped_warped_stem_top=green_solid_top")
+    add("swap", "birch_shelf", h, "block/birch_shelf=wood_shelf")
+    add("swap", "polished_andesite_slab,polished_andesite_stairs,polished_andesite", h, STEPS)
+    add("swap", "polished_diorite_stairs,polished_diorite_slab", h, TRIM)
+    add("swap", "warped_door", h, "block/warped_door_top=door_wood_top,block/warped_door_bottom=door_wood_bottom")
+    # SILVER CAVE's mouth: a hole in the cliff, framed in its rock, dark within.
+    add("swap", "stone_bricks,smooth_stone_slab,black_concrete", (-1176, 525, -1167, 535, "SILVER CAVE's mouth"),
+        "block/stone_bricks=drip_rock@4,block/smooth_stone=drip_rock_top|drip_rock@4,block/smooth_stone_slab_side=drip_rock@4,block/black_concrete=cave_dark", ("25", "33"))
+    # Lavender's houses' steps (09:01: "still slabs"): stone steps, a lit nosing, in Lavender's lilac grey.
+    for b in LAV_STEPS:
+        add("swap", "smooth_stone_slab", b, "block/smooth_stone=lav_step,block/smooth_stone_slab_side=lav_step_side", ("33", "35"))
+    # The POKeMON LEAGUE gate (09:01): its wooden walls (acacia) cream panels, the polished diorite at its doors
+    # stone steps, the paving out front as Pewter's.
+    lg = (-930, 505, -905, 542, "the POKeMON LEAGUE gate")
+    add("swap", "acacia_planks", lg, "block/acacia_planks=league_wall", ("24", "36"))
+    add("swap", "polished_diorite_slab,polished_diorite", lg, "block/polished_diorite=step_cer", ("24", "28"))
+    add("swap", "white_terracotta,smooth_quartz,chiseled_quartz_block", lg,
+        "block/white_terracotta=pave_terracotta,block/quartz_block_bottom=pave_quartz,block/chiseled_quartz_block_top=pave_chiseled,block/chiseled_quartz_block=pave_chiseled_side", ("25", "25"))
+    # The Museum's way in (09:05): John's spruce shelves in its porch a walnut and glass doorway, the steps upside
+    # down over it its trim.
+    me = (-805, 274, -800, 279, "the Museum's way in")
+    add("swap", "spruce_shelf", me, "block/spruce_shelf=museum_entry", ("30", "34"))
+    add("swap", "spruce_stairs", me, "block/spruce_planks=museum_trim", ("33", "35"))
+    # Route 13's sign (09:11): the wooden sign, read as FireRed's.
+    add("wood_sign", "acacia_sign", (-177, 698, -175, 700, "Route 13's sign"))
+    # The benches' chains (09:11): the bench's yellow (the hanging boards are too, in the look pack).
+    for x, z in BENCHES:
+        add("swap", "iron_chain", (x - 4, z - 4, x + 4, z + 4, "a bench's chains"), "block/iron_chain=bench_chain", ("32", "40"))
+    # Fuchsia's lamps (09:11: one's glass didn't match the next's): all the same warm frosted glass and lit globes.
+    for x, z in FU_LAMPS:
+        b = (x - 1, z - 1, x + 1, z + 1, "a Fuchsia lamp")
+        add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ("33", "40"))
+        add("swap", "sea_lantern", b, "block/sea_lantern=lamp_globe_warm!", ("33", "40"))
+    # Route 2's two CUT trees (09:05): as the little trees John likes, a trunk and a round green crown, so they read
+    # as Let's Go's trees to CUT.
+    for x0, z0, x1, z1 in ((-786, 467, -780, 471), (-787, 482, -781, 487)):
+        b = (x0, z0, x1, z1, "a tree to CUT")
+        add("boulder", "dark_oak_fence", b, "prefix:ttrunk", ("25", "29"))
+        add("leafy_hedge", "cherry_leaves", b, "azalea", ("25", "31"))
+
+CELADON = (-562, 385, -452, 462, "Celadon City")
+CEL_LAMPS = [(-524, 416), (-483, 417), (-558, 429), (-524, 432), (-483, 432), (-465, 432), (-519, 438), (-508, 438), (-508, 446)]
+
+
+def round52c(add, room):
+    """0.52.0's Celadon City (09:30), as Let's Go's: see tools/looks52.py's celadon()."""
+    C = CELADON
+    g = ("31", "32")
+    # The streets: the roads tarmac, the pavements warm basket-weave, the kerbs white; the fountain's rim its greens,
+    # its basin blue tiles.
+    add("swap", "cyan_terracotta", C, "block/cyan_terracotta=tarmac@4", g)
+    add("swap", "mud_bricks", C, "block/mud_bricks=pave_cel@2", g)
+    add("swap", "polished_diorite", C, "block/polished_diorite=cel_kerb", g)
+    add("swap", "lime_terracotta,green_glazed_terracotta", C, "block/lime_terracotta=cel_lime,block/green_glazed_terracotta=cel_tile_band", ("32", "32"))
+    add("swap", "cobblestone", (-545, 421, -537, 429, "the fountain's basin"), "block/cobblestone=pool_floor", ("32", "32"))
+    add("swap", "quartz_bricks,quartz_stairs", (-521, 425, -507, 432, "the pond's rim"),
+        "block/quartz_bricks=pool_edge_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_edge_tile", ("29", "33"))
+    up = ("33", "60")
+    # The buildings: soft green walls, lime bands, deep green columns, white walls, cream corners; the floors inside
+    # tiled, the roof terraces green; the bands of tiles.
+    add("swap", "green_terracotta", C, "block/green_terracotta=cel_green", up)
+    add("swap", "lime_terracotta", C, "block/lime_terracotta=cel_lime", up)
+    add("swap", "green_concrete", C, "block/green_concrete=cel_green_dark", up)
+    add("swap", "lime_concrete", C, "block/lime_concrete=cel_lime_bright", up)
+    add("swap", "white_concrete", C, "block/white_concrete=cel_white", up)
+    add("swap", "yellow_terracotta", C, "block/yellow_terracotta=cel_cream", up)
+    add("swap", "light_blue_terracotta", C, "block/light_blue_terracotta=cel_floor", ("33", "41"))
+    add("swap", "light_blue_terracotta", C, "block/light_blue_terracotta=cel_deck", ("42", "60"))
+    add("swap", "light_blue_glazed_terracotta", C, "block/light_blue_glazed_terracotta=cel_tile_band", up)
+    # The roofs: green and teal, the small one by the pond slate; the GAME CORNER's violet with gold seams under a
+    # marquee of bulbs.
+    add("swap", "warped_slab,warped_stairs", C, "block/warped_planks=cel_roof", up)
+    add("swap", "prismarine_brick_slab,prismarine_brick_stairs", C, "block/prismarine_bricks=cel_roof_teal", up)
+    add("swap", "polished_blackstone_stairs", C, "block/polished_blackstone=cel_roof_dark", up)
+    add("swap", "stripped_warped_hyphae", C, "block/stripped_warped_stem=cel_gc_roof", up)
+    add("swap", "cyan_carpet", C, "block/cyan_wool=cel_gc_lights", up)
+    # The DEPT. STORE: cream columns, blue window strips between, its canopy; stone plinths; quartz clean.
+    add("swap", "acacia_planks,acacia_stairs,acacia_slab", C, "block/acacia_planks=cel_pilaster", up)
+    add("swap", "bamboo_shelf", C, "block/bamboo_shelf=cel_store_glass", up)
+    add("swap", "stone_bricks,bricks", C, "block/stone_bricks=cel_base,block/bricks=cel_base", ("33", "33"))
+    add("swap", "smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_block,quartz_slab,quartz_stairs,quartz_pillar", C, QUARTZ, up)
+    # The roofs' units, the windows' blinds, the door columns, the trim, the steps, the doorways.
+    add("swap", "iron_block", C, "block/iron_block=saf_unit", up)
+    add("swap", "deepslate_brick_wall", C, "block/deepslate_bricks=saf_blind", up)
+    add("swap", "bone_block", C, "block/bone_block_side=saf_post,block/bone_block_top=saf_post_top", up)
+    add("swap", "polished_diorite_stairs,polished_diorite_slab,polished_diorite", C, TRIM, up)
+    add("swap", "smooth_stone_slab", C, "block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer", ("33", "33"))
+    add("swap", "deepslate_tiles", C, "block/deepslate_tiles=gate_dark", ("33", "37"))
+    # The planters (shelves round the beds), the green shelves, the benches by the fountain.
+    add("swap", "pale_oak_shelf", C, "block/pale_oak_shelf=planter_saf_cream", ("33", "33"))
+    add("swap", "oak_shelf", C, "block/oak_shelf=planter_saf_wood", ("33", "33"))
+    add("swap", "warped_shelf", C, "block/warped_shelf=green_shelf", up)
+    add("swap", "spruce_trapdoor", C, "block/spruce_trapdoor=bench_slat", ("33", "34"))
+    # Its lamps, its own (09:30: "something unique"): dark green posts, gold, warm frosted glass, and each globe a
+    # colour of the rainbow (the City of Rainbow Dreams).
+    import looks52
+    for i, (x, z) in enumerate(CEL_LAMPS):
+        b = (x - 1, z - 1, x + 1, z + 1, "a Celadon lamp")
+        globe = looks52.RAINBOW[i % len(looks52.RAINBOW)][0]
+        add("swap", "tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern", b,
+            "block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,"
+            "block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_%s!" % globe, ("33", "42"))
+        add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ("33", "42"))
+
 
 if __name__ == "__main__":
     main()

@@ -11,6 +11,7 @@
     const R = new Room(id, { name: C.name, floor: C.floor, W: C.W, D: C.D, H: 9, outside: true, night: K.night, haze: K.haze });
     const G = R.geo, P = 1 / 16;
     const at = (x, z) => { const r = C.rows[z]; return { k: r[2 * x], h: r.charCodeAt(2 * x + 1) - 56 }; };
+    const cut = southCut(C.W, C.D, (x, z) => at(x, z).k !== "w" && at(x, z).k !== "i", (x, z) => { const c = at(x, z); return c.k === "q" ? 0 : Math.max(0, c.h / 2); });
     for (let z = 0; z < C.D; z++) {
       for (let x = 0; x < C.W;) {
         const c = at(x, z); let x1 = x + 1;
@@ -18,7 +19,7 @@
         const h = c.h / 2;
         if (c.k === "w" || c.k === "i") {
           const top = Math.min(h, 6);
-          G.box(x, -1, z, x1, top, z + 1, { top: c.k === "i" ? K.iceTop : K.wallTop, all: c.k === "i" ? K.ice : K.wall, bottom: null });
+          cutRock(G, x, x1, z, -1, top, cut, { top: c.k === "i" ? K.iceTop : K.wallTop, all: c.k === "i" ? K.ice : K.wall, bottom: null });
           R.solid(x, z, x1, z + 1);
         } else if (c.k === "G" || c.k === "g") {
           G.box(x, -1, z, x1, h, z + 1, { top: K.floor, all: "soil" });

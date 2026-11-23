@@ -94,7 +94,7 @@ swap	brown_mushroom_block,mud_brick_stairs	-791	687	-774	698	-	-	block/brown_mus
 swap	waxed_cut_copper_slab,cut_copper_slab	-791	687	-774	698	-	-	block/cut_copper=lab_awning_red	Prof. Oak's lab
 swap	oxidized_cut_copper_slab,waxed_oxidized_cut_copper_slab	-791	687	-774	698	-	-	block/oxidized_cut_copper=lab_awning_door	Prof. Oak's lab
 swap	bricks,brick_wall,brick_stairs	-791	687	-774	698	-	-	block/bricks=lab_chimney	Prof. Oak's lab
-swap	polished_andesite_slab,polished_andesite_stairs	-791	687	-774	698	25	26	block/polished_andesite=lab_roof	Prof. Oak's lab
+swap	polished_andesite_slab,polished_andesite_stairs,stone	-791	687	-774	698	25	26	block/polished_andesite=lab_roof@1,block/stone=lab_roof@1	Prof. Oak's lab
 swap	polished_blackstone_wall	-791	687	-774	698	25	26	block/polished_blackstone=lab_roof_rim	Prof. Oak's lab
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood,black_concrete	-812	366	-793	390	26	46	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top,block/black_concrete=gate_dark	Route 2 forest north gate
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood,black_concrete	-812	430	-793	454	23	43	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top,block/black_concrete=gate_dark	Route 2 forest south gate
@@ -130,6 +130,7 @@ swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepsl
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood,black_concrete	-2111	630	-2096	653	12	32	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top,block/black_concrete=gate_dark	Johto gate
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood,black_concrete	-2116	381	-2097	400	14	34	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top,block/black_concrete=gate_dark	Johto gate
 swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood,black_concrete	-2400	567	-2381	591	14	34	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top,block/black_concrete=gate_dark	Battle Tower gate?
+swap	polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood,black_concrete	-1046	531	-1026	554	23	43	block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top,block/black_concrete=gate_dark	the Johto Gate (Route 28)
 swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1000	495	-831	600	-	-	block/mud_bricks=route_path@4	Route 22
 swap	brown_concrete_powder	-1000	495	-831	600	-	-	block/brown_concrete_powder=route_path_edge@4	Route 22
 swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-2012	853	-2000	863	25	28	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	azalea_town Pokemon Center
@@ -276,9 +277,9 @@ swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-818	286	-79
 roof_gym	jungle_stairs,oak_stairs	-2097	655	-2066	667	24	30	-	goldenrod_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-2097	655	-2066	667	24	30	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	goldenrod_city Gym
 swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2098	654	-2065	668	-	-	block/polished_diorite=house_trim	goldenrod_city Gym
-roof_gym	jungle_stairs,oak_stairs	-344	388	-313	400	37	43	-	saffron_city Gym
-swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-344	388	-313	400	37	43	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	saffron_city Gym
-swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-345	387	-312	401	-	-	block/polished_diorite=house_trim	saffron_city Gym
+roof_gym	jungle_stairs,oak_stairs	-329	388	-313	400	37	43	-	saffron_city Gym
+swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-329	388	-313	400	37	43	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	saffron_city Gym
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-330	387	-312	401	-	-	block/polished_diorite=house_trim	saffron_city Gym
 roof_gym	jungle_stairs,oak_stairs	-380	585	-362	597	35	41	-	vermilion_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-380	585	-362	597	35	41	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	vermilion_city Gym
 swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-381	584	-361	598	-	-	block/polished_diorite=house_trim	vermilion_city Gym
@@ -475,8 +476,8 @@ swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	
 swap	calcite,diorite	-818	286	-798	300	-	-	block/calcite=marble_gym@2,block/diorite=marble_gym@2	pewter_city Gym
 swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	-2098	654	-2065	668	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	goldenrod_city Gym
 swap	calcite,diorite	-2098	654	-2065	668	-	-	block/calcite=marble_gym@2,block/diorite=marble_gym@2	goldenrod_city Gym
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	-345	387	-312	401	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	saffron_city Gym
-swap	calcite,diorite	-345	387	-312	401	-	-	block/calcite=marble_gym@2,block/diorite=marble_gym@2	saffron_city Gym
+swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	-330	387	-312	401	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	saffron_city Gym
+swap	calcite,diorite	-330	387	-312	401	-	-	block/calcite=marble_gym@2,block/diorite=marble_gym@2	saffron_city Gym
 swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	-381	584	-361	598	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	vermilion_city Gym
 swap	calcite,diorite	-381	584	-361	598	-	-	block/calcite=marble_gym@2,block/diorite=marble_gym@2	vermilion_city Gym
 swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	-1869	532	-1849	546	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	violet_city Gym
@@ -1891,6 +1892,172 @@ swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_l
 glass	black_stained_glass_pane	-440	758	-306	805	30	42	block/black_stained_glass=glass_lamp	Route 15
 swap	bamboo_door	-850	255	-741	339	-	-	block/bamboo_door_top=door_yellow_top,block/bamboo_door_bottom=door_yellow_bottom	Pewter City
 swap	lily_pad	-1010	100	60	1060	-	-	block/lily_pad=lily_lg!	Kanto
+swap	gray_concrete	-405	384	-298	466	32	32	block/gray_concrete=tarmac@4	Saffron City's streets
+swap	light_gray_concrete	-405	384	-298	466	32	32	block/light_gray_concrete=saf_kerb	Saffron City's streets
+swap	white_concrete,yellow_concrete,yellow_terracotta,orange_terracotta	-405	384	-298	466	32	32	block/white_concrete=pave_saf_w@2,block/yellow_concrete=pave_saf_y@2,block/yellow_terracotta=pave_saf_o2@2,block/orange_terracotta=pave_saf_o@2	Saffron City's streets
+swap	white_terracotta	-405	384	-298	466	32	32	block/white_terracotta=saf_plaza	Saffron City's streets
+swap	yellow_concrete	-395	389	-305	459	33	50	block/yellow_concrete=saf_wall	Saffron City
+swap	white_concrete	-395	389	-305	459	33	50	block/white_concrete=saf_white	Saffron City
+swap	yellow_terracotta	-395	389	-305	459	33	50	block/yellow_terracotta=saf_band	Saffron City
+swap	end_stone_bricks,end_stone_brick_stairs	-395	389	-305	459	33	50	block/end_stone_bricks=saf_band	Saffron City
+swap	light_gray_terracotta	-395	389	-305	459	33	50	block/light_gray_terracotta=saf_stone	Saffron City
+swap	white_terracotta	-395	389	-305	459	33	42	block/white_terracotta=saf_cream	Saffron City
+swap	light_gray_concrete	-395	389	-305	459	33	46	block/light_gray_concrete=saf_grey	Saffron City
+swap	cut_red_sandstone_slab	-395	389	-305	459	33	50	block/red_sandstone_top=saf_roof,block/cut_red_sandstone=saf_rim	Saffron City
+swap	light_blue_terracotta	-395	389	-305	459	42	50	block/light_blue_terracotta=saf_deck	Saffron City
+swap	light_blue_terracotta	-395	389	-305	459	33	41	block/light_blue_terracotta=saf_floor	Saffron City
+swap	iron_block	-395	389	-305	459	33	50	block/iron_block=saf_unit	Saffron City
+swap	smooth_sandstone_slab	-395	389	-305	459	33	50	block/sandstone_top=saf_vent	Saffron City
+swap	pale_oak_slab	-395	389	-305	459	43	50	block/pale_oak_planks=saf_pad	Saffron City
+swap	white_terracotta	-395	389	-305	459	43	50	block/white_terracotta=saf_pad	Saffron City
+swap	deepslate_brick_wall	-395	389	-305	459	33	50	block/deepslate_bricks=saf_blind	Saffron City
+swap	prismarine_brick_stairs,prismarine_bricks	-395	389	-305	459	33	50	block/prismarine_bricks=saf_canopy	Saffron City
+swap	crimson_stairs	-395	389	-305	459	33	50	block/crimson_planks=saf_awning_red	Saffron City
+swap	warped_stairs	-395	389	-305	459	33	50	block/warped_planks=saf_awning_green	Saffron City
+swap	bone_block	-395	389	-305	459	33	50	block/bone_block_side=saf_post,block/bone_block_top=saf_post_top	Saffron City
+swap	smooth_stone_slab	-395	389	-305	459	33	33	block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer	Saffron City
+swap	pale_oak_shelf	-395	389	-305	459	33	33	block/pale_oak_shelf=planter_saf_cream	Saffron City
+swap	pale_oak_shelf	-395	389	-305	459	35	40	block/pale_oak_shelf=saf_board	Saffron City
+swap	mangrove_shelf	-395	389	-305	459	33	33	block/mangrove_shelf=planter_saf_terra	Saffron City
+swap	oak_shelf	-395	389	-305	459	33	33	block/oak_shelf=planter_saf_wood	Saffron City
+swap	nether_brick_fence	-395	389	-305	459	33	34	block/nether_bricks=saf_rail	Saffron City
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-358	398	-356	400	33	42	block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!	a Saffron lamp
+glass	black_stained_glass_pane	-358	398	-356	400	33	42	block/black_stained_glass=glass_lamp	a Saffron lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-347	398	-345	400	33	42	block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!	a Saffron lamp
+glass	black_stained_glass_pane	-347	398	-345	400	33	42	block/black_stained_glass=glass_lamp	a Saffron lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-315	416	-313	418	33	42	block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!	a Saffron lamp
+glass	black_stained_glass_pane	-315	416	-313	418	33	42	block/black_stained_glass=glass_lamp	a Saffron lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-386	420	-384	422	33	42	block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!	a Saffron lamp
+glass	black_stained_glass_pane	-386	420	-384	422	33	42	block/black_stained_glass=glass_lamp	a Saffron lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-386	427	-384	429	33	42	block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!	a Saffron lamp
+glass	black_stained_glass_pane	-386	427	-384	429	33	42	block/black_stained_glass=glass_lamp	a Saffron lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-315	431	-313	433	33	42	block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!	a Saffron lamp
+glass	black_stained_glass_pane	-315	431	-313	433	33	42	block/black_stained_glass=glass_lamp	a Saffron lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-354	449	-352	451	33	42	block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!	a Saffron lamp
+glass	black_stained_glass_pane	-354	449	-352	451	33	42	block/black_stained_glass=glass_lamp	a Saffron lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-343	449	-341	451	33	42	block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!	a Saffron lamp
+glass	black_stained_glass_pane	-343	449	-341	451	33	42	block/black_stained_glass=glass_lamp	a Saffron lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-319	449	-317	451	33	42	block/tuff=lamp_saf_post,block/polished_tuff=lamp_saf_post,block/chiseled_tuff_bricks=lamp_saf_chisel,block/chiseled_tuff_bricks_top=lamp_saf_chisel_top,block/gray_wool=lamp_saf_cap_top,block/sea_lantern=lamp_globe_warm!	a Saffron lamp
+glass	black_stained_glass_pane	-319	449	-317	451	33	42	block/black_stained_glass=glass_lamp	a Saffron lamp
+swap	white_concrete	-362	417	-341	432	33	70	block/white_concrete=silph_panel@2	SILPH CO.
+swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,smooth_quartz_slab	-362	417	-341	432	33	70	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	SILPH CO.
+swap	smooth_quartz	-362	417	-341	432	33	33	block/quartz_block_bottom=silph_plaza@2	SILPH CO.
+swap	deepslate_brick_wall	-362	417	-341	432	33	70	block/deepslate_bricks=silph_blind	SILPH CO.
+swap	iron_block	-362	417	-341	432	33	70	block/iron_block=silph_metal	SILPH CO.
+swap	yellow_terracotta	-362	417	-341	432	33	70	block/yellow_terracotta=silph_band	SILPH CO.
+swap	light_blue_terracotta	-362	417	-341	432	33	70	block/light_blue_terracotta=silph_floor	SILPH CO.
+roof_dojo	jungle_stairs,oak_stairs	-343	388	-330	400	37	44	-	the FIGHTING DOJO
+swap	jungle_stairs	-343	388	-330	400	37	44	block/jungle_planks=dojo_ridge	the FIGHTING DOJO
+swap	jungle_planks,oak_slab,jungle_slab	-343	388	-330	400	37	44	block/jungle_planks=dojo_ridge,block/oak_planks=dojo_ridge	the FIGHTING DOJO
+swap	oak_planks	-343	388	-330	400	37	44	block/oak_planks=dojo_beam	the FIGHTING DOJO
+swap	light_gray_concrete	-343	388	-330	400	33	42	block/light_gray_concrete=dojo_wall@2	the FIGHTING DOJO
+swap	quartz_block,quartz_slab	-343	388	-330	400	33	33	block/quartz_block_top=dojo_floor,block/quartz_block_side=dojo_beam,block/quartz_block_bottom=dojo_floor	the FIGHTING DOJO
+swap	quartz_block	-343	388	-330	400	34	38	block/quartz_block_top=dojo_post,block/quartz_block_side=dojo_post,block/quartz_block_bottom=dojo_post	the FIGHTING DOJO
+swap	quartz_block	-343	388	-330	400	39	44	block/quartz_block_top=dojo_beam,block/quartz_block_side=dojo_wall@2,block/quartz_block_bottom=dojo_beam	the FIGHTING DOJO
+swap	quartz_stairs	-343	388	-330	400	33	44	block/quartz_block_top=dojo_beam,block/quartz_block_side=dojo_beam	the FIGHTING DOJO
+swap	calcite	-343	388	-330	400	33	33	block/calcite=dojo_floor	the FIGHTING DOJO
+swap	polished_diorite_stairs,polished_diorite_slab	-343	388	-330	400	-	-	block/polished_diorite=dojo_beam	the FIGHTING DOJO
+swap	deepslate_tiles	-343	388	-330	400	33	37	block/deepslate_tiles=dojo_door	the FIGHTING DOJO
+swap	deepslate_tiles	-329	388	-313	400	33	37	block/deepslate_tiles=gate_dark	Saffron Gym
+swap	oak_wood,oak_log	-1210	505	-1011	590	-	-	block/oak_log=tree_bark,block/oak_log_top=tree_bark	Route 28
+swap	pale_oak_fence	-1210	505	-1011	590	-	-	block/pale_oak_planks=white_fence	Route 28
+roof_green	warped_stairs	-1115	531	-1100	544	-	-	-	Route 28's house
+swap	pale_oak_stairs,pale_oak_slab	-1115	531	-1100	544	-	-	block/pale_oak_planks=window_frame	Route 28's house
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1115	531	-1100	544	-	-	block/mud_bricks=chimney_brick	Route 28's house
+swap	warped_shelf	-1115	531	-1100	544	-	-	block/warped_shelf=green_shelf	Route 28's house
+swap	stripped_warped_hyphae,stripped_warped_stem	-1115	531	-1100	544	-	-	block/stripped_warped_stem=green_solid,block/stripped_warped_stem_top=green_solid_top	Route 28's house
+swap	birch_shelf	-1115	531	-1100	544	-	-	block/birch_shelf=wood_shelf	Route 28's house
+swap	polished_andesite_slab,polished_andesite_stairs,polished_andesite	-1115	531	-1100	544	-	-	block/polished_andesite=house_stone,block/cobblestone=house_stone,block/andesite=house_stone	Route 28's house
+swap	polished_diorite_stairs,polished_diorite_slab	-1115	531	-1100	544	-	-	block/polished_diorite=house_trim	Route 28's house
+swap	warped_door	-1115	531	-1100	544	-	-	block/warped_door_top=door_wood_top,block/warped_door_bottom=door_wood_bottom	Route 28's house
+swap	stone_bricks,smooth_stone_slab,black_concrete	-1176	525	-1167	535	25	33	block/stone_bricks=drip_rock@4,block/smooth_stone=drip_rock_top|drip_rock@4,block/smooth_stone_slab_side=drip_rock@4,block/black_concrete=cave_dark	SILVER CAVE's mouth
+swap	smooth_stone_slab	-141	427	-138	430	33	35	block/smooth_stone=lav_step,block/smooth_stone_slab_side=lav_step_side	the Volunteer House's step
+swap	smooth_stone_slab	-148	437	-145	440	33	35	block/smooth_stone=lav_step,block/smooth_stone_slab_side=lav_step_side	Lavender's house's step
+swap	smooth_stone_slab	-137	437	-134	440	33	35	block/smooth_stone=lav_step,block/smooth_stone_slab_side=lav_step_side	Lavender's house's step
+swap	smooth_stone_slab	-120	415	-117	420	33	35	block/smooth_stone=lav_step,block/smooth_stone_slab_side=lav_step_side	Lavender's Center's step
+swap	acacia_planks	-930	505	-905	542	24	36	block/acacia_planks=league_wall	the POKeMON LEAGUE gate
+swap	polished_diorite_slab,polished_diorite	-930	505	-905	542	24	28	block/polished_diorite=step_cer	the POKeMON LEAGUE gate
+swap	white_terracotta,smooth_quartz,chiseled_quartz_block	-930	505	-905	542	25	25	block/white_terracotta=pave_terracotta,block/quartz_block_bottom=pave_quartz,block/chiseled_quartz_block_top=pave_chiseled,block/chiseled_quartz_block=pave_chiseled_side	the POKeMON LEAGUE gate
+swap	spruce_shelf	-805	274	-800	279	30	34	block/spruce_shelf=museum_entry	the Museum's way in
+swap	spruce_stairs	-805	274	-800	279	33	35	block/spruce_planks=museum_trim	the Museum's way in
+wood_sign	acacia_sign	-177	698	-175	700	-	-	-	Route 13's sign
+swap	iron_chain	-265	754	-257	762	32	40	block/iron_chain=bench_chain	a bench's chains
+swap	iron_chain	-625	479	-617	487	32	40	block/iron_chain=bench_chain	a bench's chains
+swap	iron_chain	-642	540	-634	548	32	40	block/iron_chain=bench_chain	a bench's chains
+swap	iron_chain	-642	638	-634	646	32	40	block/iron_chain=bench_chain	a bench's chains
+swap	iron_chain	-662	749	-654	757	32	40	block/iron_chain=bench_chain	a bench's chains
+glass	black_stained_glass_pane	-491	767	-489	769	33	40	block/black_stained_glass=glass_lamp	a Fuchsia lamp
+swap	sea_lantern	-491	767	-489	769	33	40	block/sea_lantern=lamp_globe_warm!	a Fuchsia lamp
+glass	black_stained_glass_pane	-540	776	-538	778	33	40	block/black_stained_glass=glass_lamp	a Fuchsia lamp
+swap	sea_lantern	-540	776	-538	778	33	40	block/sea_lantern=lamp_globe_warm!	a Fuchsia lamp
+glass	black_stained_glass_pane	-465	780	-463	782	33	40	block/black_stained_glass=glass_lamp	a Fuchsia lamp
+swap	sea_lantern	-465	780	-463	782	33	40	block/sea_lantern=lamp_globe_warm!	a Fuchsia lamp
+glass	black_stained_glass_pane	-543	787	-541	789	33	40	block/black_stained_glass=glass_lamp	a Fuchsia lamp
+swap	sea_lantern	-543	787	-541	789	33	40	block/sea_lantern=lamp_globe_warm!	a Fuchsia lamp
+glass	black_stained_glass_pane	-513	787	-511	789	33	40	block/black_stained_glass=glass_lamp	a Fuchsia lamp
+swap	sea_lantern	-513	787	-511	789	33	40	block/sea_lantern=lamp_globe_warm!	a Fuchsia lamp
+glass	black_stained_glass_pane	-455	792	-453	794	33	40	block/black_stained_glass=glass_lamp	a Fuchsia lamp
+swap	sea_lantern	-455	792	-453	794	33	40	block/sea_lantern=lamp_globe_warm!	a Fuchsia lamp
+glass	black_stained_glass_pane	-484	810	-482	812	33	40	block/black_stained_glass=glass_lamp	a Fuchsia lamp
+swap	sea_lantern	-484	810	-482	812	33	40	block/sea_lantern=lamp_globe_warm!	a Fuchsia lamp
+glass	black_stained_glass_pane	-503	818	-501	820	33	40	block/black_stained_glass=glass_lamp	a Fuchsia lamp
+swap	sea_lantern	-503	818	-501	820	33	40	block/sea_lantern=lamp_globe_warm!	a Fuchsia lamp
+boulder	dark_oak_fence	-786	467	-780	471	25	29	prefix:ttrunk	a tree to CUT
+leafy_hedge	cherry_leaves	-786	467	-780	471	25	31	azalea	a tree to CUT
+boulder	dark_oak_fence	-787	482	-781	487	25	29	prefix:ttrunk	a tree to CUT
+leafy_hedge	cherry_leaves	-787	482	-781	487	25	31	azalea	a tree to CUT
+swap	cyan_terracotta	-562	385	-452	462	31	32	block/cyan_terracotta=tarmac@4	Celadon City
+swap	mud_bricks	-562	385	-452	462	31	32	block/mud_bricks=pave_cel@2	Celadon City
+swap	polished_diorite	-562	385	-452	462	31	32	block/polished_diorite=cel_kerb	Celadon City
+swap	lime_terracotta,green_glazed_terracotta	-562	385	-452	462	32	32	block/lime_terracotta=cel_lime,block/green_glazed_terracotta=cel_tile_band	Celadon City
+swap	cobblestone	-545	421	-537	429	32	32	block/cobblestone=pool_floor	the fountain's basin
+swap	quartz_bricks,quartz_stairs	-521	425	-507	432	29	33	block/quartz_bricks=pool_edge_tile,block/quartz_block_top=pool_edge_tile,block/quartz_block_side=pool_edge_tile	the pond's rim
+swap	green_terracotta	-562	385	-452	462	33	60	block/green_terracotta=cel_green	Celadon City
+swap	lime_terracotta	-562	385	-452	462	33	60	block/lime_terracotta=cel_lime	Celadon City
+swap	green_concrete	-562	385	-452	462	33	60	block/green_concrete=cel_green_dark	Celadon City
+swap	lime_concrete	-562	385	-452	462	33	60	block/lime_concrete=cel_lime_bright	Celadon City
+swap	white_concrete	-562	385	-452	462	33	60	block/white_concrete=cel_white	Celadon City
+swap	yellow_terracotta	-562	385	-452	462	33	60	block/yellow_terracotta=cel_cream	Celadon City
+swap	light_blue_terracotta	-562	385	-452	462	33	41	block/light_blue_terracotta=cel_floor	Celadon City
+swap	light_blue_terracotta	-562	385	-452	462	42	60	block/light_blue_terracotta=cel_deck	Celadon City
+swap	light_blue_glazed_terracotta	-562	385	-452	462	33	60	block/light_blue_glazed_terracotta=cel_tile_band	Celadon City
+swap	warped_slab,warped_stairs	-562	385	-452	462	33	60	block/warped_planks=cel_roof	Celadon City
+swap	prismarine_brick_slab,prismarine_brick_stairs	-562	385	-452	462	33	60	block/prismarine_bricks=cel_roof_teal	Celadon City
+swap	polished_blackstone_stairs	-562	385	-452	462	33	60	block/polished_blackstone=cel_roof_dark	Celadon City
+swap	stripped_warped_hyphae	-562	385	-452	462	33	60	block/stripped_warped_stem=cel_gc_roof	Celadon City
+swap	cyan_carpet	-562	385	-452	462	33	60	block/cyan_wool=cel_gc_lights	Celadon City
+swap	acacia_planks,acacia_stairs,acacia_slab	-562	385	-452	462	33	60	block/acacia_planks=cel_pilaster	Celadon City
+swap	bamboo_shelf	-562	385	-452	462	33	60	block/bamboo_shelf=cel_store_glass	Celadon City
+swap	stone_bricks,bricks	-562	385	-452	462	33	33	block/stone_bricks=cel_base,block/bricks=cel_base	Celadon City
+swap	smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_block,quartz_slab,quartz_stairs,quartz_pillar	-562	385	-452	462	33	60	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Celadon City
+swap	iron_block	-562	385	-452	462	33	60	block/iron_block=saf_unit	Celadon City
+swap	deepslate_brick_wall	-562	385	-452	462	33	60	block/deepslate_bricks=saf_blind	Celadon City
+swap	bone_block	-562	385	-452	462	33	60	block/bone_block_side=saf_post,block/bone_block_top=saf_post_top	Celadon City
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-562	385	-452	462	33	60	block/polished_diorite=house_trim	Celadon City
+swap	smooth_stone_slab	-562	385	-452	462	33	33	block/smooth_stone=step_cer,block/smooth_stone_slab_side=step_cer	Celadon City
+swap	deepslate_tiles	-562	385	-452	462	33	37	block/deepslate_tiles=gate_dark	Celadon City
+swap	pale_oak_shelf	-562	385	-452	462	33	33	block/pale_oak_shelf=planter_saf_cream	Celadon City
+swap	oak_shelf	-562	385	-452	462	33	33	block/oak_shelf=planter_saf_wood	Celadon City
+swap	warped_shelf	-562	385	-452	462	33	60	block/warped_shelf=green_shelf	Celadon City
+swap	spruce_trapdoor	-562	385	-452	462	33	34	block/spruce_trapdoor=bench_slat	Celadon City
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-525	415	-523	417	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_red!	a Celadon lamp
+glass	black_stained_glass_pane	-525	415	-523	417	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-484	416	-482	418	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_orange!	a Celadon lamp
+glass	black_stained_glass_pane	-484	416	-482	418	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-559	428	-557	430	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_yellow!	a Celadon lamp
+glass	black_stained_glass_pane	-559	428	-557	430	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-525	431	-523	433	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_green!	a Celadon lamp
+glass	black_stained_glass_pane	-525	431	-523	433	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-484	431	-482	433	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_blue!	a Celadon lamp
+glass	black_stained_glass_pane	-484	431	-482	433	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-466	431	-464	433	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_violet!	a Celadon lamp
+glass	black_stained_glass_pane	-466	431	-464	433	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-520	437	-518	439	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_red!	a Celadon lamp
+glass	black_stained_glass_pane	-520	437	-518	439	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-509	437	-507	439	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_orange!	a Celadon lamp
+glass	black_stained_glass_pane	-509	437	-507	439	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-509	445	-507	447	33	42	block/tuff=lamp_cel_post,block/polished_tuff=lamp_cel_post,block/chiseled_tuff_bricks=lamp_cel_chisel,block/chiseled_tuff_bricks_top=lamp_cel_chisel_top,block/gray_wool=lamp_cel_cap_top,block/sea_lantern=lamp_globe_yellow!	a Celadon lamp
+glass	black_stained_glass_pane	-509	445	-507	447	33	42	block/black_stained_glass=glass_lamp	a Celadon lamp
 swap	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 swap	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care
@@ -1936,3 +2103,28 @@ prop	light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta	-
 sign	pale_oak_shelf	-126	425	-123	427	33	35	-	Lavender Town's sign
 swap	warped_door	6143	-1	6496	214	-	-	block/warped_door_top=door_wood_top,block/warped_door_bottom=door_wood_bottom	the SAFARI ZONE	interiors
 swap	spruce_log,spruce_fence	6143	-1	6496	214	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	the SAFARI ZONE	interiors
+grass_edge	dripstone_block	-1210	505	-1011	590	-	-	-	Route 28
+swap	daylight_detector	-1210	505	-1011	590	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Route 28
+swap	spruce_log,spruce_fence	-1210	505	-1011	590	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	Route 28
+swap	lantern	-1210	505	-1011	590	-	-	block/lantern=garden_light	Route 28
+swap	glowstone	-1210	505	-1011	590	-	-	block/glowstone=glow_hidden	Route 28
+swap	acacia_door,bamboo_door,birch_door,cherry_door,crimson_door,dark_oak_door,jungle_door,mangrove_door,oak_door,pale_oak_door,spruce_door,warped_door,iron_door,copper_door,waxed_copper_door,exposed_copper_door,waxed_exposed_copper_door,weathered_copper_door,waxed_weathered_copper_door,oxidized_copper_door,waxed_oxidized_copper_door	-1210	505	-1011	590	-	-	block/acacia_door_top=door_acacia_top,block/acacia_door_bottom=door_acacia_bottom,block/bamboo_door_top=door_bamboo_top,block/bamboo_door_bottom=door_bamboo_bottom,block/birch_door_top=door_birch_top,block/birch_door_bottom=door_birch_bottom,block/cherry_door_top=door_cherry_top,block/cherry_door_bottom=door_cherry_bottom,block/crimson_door_top=door_crimson_top,block/crimson_door_bottom=door_crimson_bottom,block/dark_oak_door_top=door_dark_oak_top,block/dark_oak_door_bottom=door_dark_oak_bottom,block/jungle_door_top=door_jungle_top,block/jungle_door_bottom=door_jungle_bottom,block/mangrove_door_top=door_mangrove_top,block/mangrove_door_bottom=door_mangrove_bottom,block/oak_door_top=door_oak_top,block/oak_door_bottom=door_oak_bottom,block/pale_oak_door_top=door_pale_oak_top,block/pale_oak_door_bottom=door_pale_oak_bottom,block/spruce_door_top=door_spruce_top,block/spruce_door_bottom=door_spruce_bottom,block/warped_door_top=door_warped_top,block/warped_door_bottom=door_warped_bottom,block/iron_door_top=door_iron_top,block/iron_door_bottom=door_iron_bottom,block/copper_door_top=door_copper_top,block/copper_door_bottom=door_copper_bottom,block/exposed_copper_door_top=door_exposed_copper_top,block/exposed_copper_door_bottom=door_exposed_copper_bottom,block/weathered_copper_door_top=door_weathered_copper_top,block/weathered_copper_door_bottom=door_weathered_copper_bottom,block/oxidized_copper_door_top=door_oxidized_copper_top,block/oxidized_copper_door_bottom=door_oxidized_copper_bottom	Route 28
+swap	stone_button	-1210	505	-1011	590	-	-	block/stone=doorbell	Route 28
+glass	glass,glass_pane,light_blue_stained_glass,light_blue_stained_glass_pane,cyan_stained_glass,cyan_stained_glass_pane,white_stained_glass,white_stained_glass_pane,blue_stained_glass,blue_stained_glass_pane,black_stained_glass,black_stained_glass_pane	-1210	505	-1011	590	-	-	block/glass=glass_clear,block/light_blue_stained_glass=glass_blue,block/cyan_stained_glass=glass_cyan,block/white_stained_glass=glass_white,block/blue_stained_glass=glass_deep,block/black_stained_glass=glass_smoke	Route 28
+swap	ladder	-1210	505	-1011	590	-	-	block/ladder=metal_ladder	Route 28
+swap	daylight_detector	-1210	505	-1011	590	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_inverted_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Route 28
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-1210	505	-1011	590	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chisel,block/chiseled_tuff_bricks_top=lamp_chisel_top,block/gray_wool=lamp_cap	Route 28
+swap	pale_oak_fence	-1210	505	-1011	590	-	-	block/pale_oak_planks=white_fence	Route 28
+swap	dripstone_block	-1210	505	-1011	590	-	-	block/dripstone_block=drip_rock_top|drip_rock@4	Route 28
+swap	jungle_stairs,jungle_slab	-1210	505	-1011	590	-	-	block/jungle_planks=drip_rock_top|drip_rock@4,block/dripstone_block=drip_rock_top|drip_rock@4	Route 28
+swap	mud_brick_stairs	-1210	505	-1011	590	-	-	block/mud_bricks=step_boards_d	Route 28
+swap	mud_brick_slab	-1210	505	-1011	590	-	-	block/mud_bricks=mud_rock@4	Route 28
+swap	mud_brick_wall	-1210	505	-1011	590	-	-	block/mud_bricks=wall_tan	Route 28
+chain	iron_chain	-1210	505	-1011	590	-	-	-	Route 28
+swap	sand	-1210	505	-1011	590	-	-	block/sand=beach_sand@4	Route 28
+grass_onto	sand	-1210	505	-1011	590	-	-	-	Route 28
+grass_onto	moss_block	-1210	505	-1011	590	-	-	grass	Route 28
+leafy	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1210	505	-1011	590	-	-	-	Route 28
+swap	brown_mushroom_block	-1210	505	-1011	590	-	-	block/brown_mushroom_block=hill_top@4|drip_rock@4,block/mushroom_block_inside=hill_top@4|drip_rock@4	Route 28
+swap	oak_wood,oak_log	-1210	505	-1011	590	-	-	block/oak_log=tree_bark,block/oak_log_top=tree_bark	Route 28
+swap	lily_pad	-1210	505	-1011	590	-	-	block/lily_pad=lily_lg!	Route 28

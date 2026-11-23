@@ -25,6 +25,7 @@ import gzip, io, json, math, os, struct, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import schem  # noqa: E402
+import cavecut  # noqa: E402
 
 RES = os.path.join(HERE, "..", "src", "main", "resources", "retromon", "interiors")
 VIEWER = os.path.join(HERE, "interior", "caves48_data.js")
@@ -360,6 +361,8 @@ def build(key):
             kk = n.replace("minecraft:", "").split("[")[0]
             out.append(cfg["boulders"].get(kk, n))
         # The rocks drawn by the mod over the grates: a rock under a rock is the same boulder (only the lowest is drawn).
+        # (0.52) Cut away on the camera's side, as the rooms are (tools/cavecut.py).
+        out, _n = cavecut.cut(out, W, H, L)
         size = write_bin(os.path.join(RES, rid + ".bin"), W, H, L, out)
         # (Where you are on a floor you come down to: where the first way down to it lands you.)
         arrive = [w["spawn"] for ws in warps.values() for w in ws if w.get("to") == rid and w["kind"] == "down"]

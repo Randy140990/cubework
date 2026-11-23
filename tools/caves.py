@@ -21,6 +21,7 @@ import gzip, io, json, os, struct, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import schem  # noqa: E402
+import cavecut  # noqa: E402
 
 RES = os.path.join(HERE, "..", "src", "main", "resources", "retromon", "interiors")
 VIEWER = os.path.join(HERE, "interior", "cave_data.js")
@@ -113,6 +114,8 @@ def main():
         BIG, SMALL = "minecraft:waxed_copper_grate[waterlogged=false]", "minecraft:waxed_exposed_copper_grate[waterlogged=false]"
         rocks = [BIG if n.replace("minecraft:", "").split("[")[0] in ("tuff", "cobblestone") else
                  SMALL if n.replace("minecraft:", "").split("[")[0] in ("tuff_slab", "cobblestone_slab", "andesite_slab") else n for n in names]
+        # (0.52) Cut away on the camera's side, as the rooms are (tools/cavecut.py).
+        rocks, _n = cavecut.cut(rocks, W, H, L)
         size = write_bin(os.path.join(RES, rid + ".bin"), W, H, L, rocks)
         # The cave's floor, as boxes (where its wild POKéMON come up): each row's runs, joined down where they line up.
         rects = []

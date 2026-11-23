@@ -942,11 +942,12 @@ function caveRoom(id, floor) {
   const C = CAVES[id], R = new Room(id, { name: "Diglett's Cave", floor, W: C.W, D: C.D, H: 8, outside: true, night: true, haze: 0x6e5236 });
   const G = R.geo;
   const at = (x, z) => { const r = C.rows[z]; return { k: r[2 * x], h: r.charCodeAt(2 * x + 1) - 48 }; };
+  const cut = southCut(C.W, C.D, (x, z) => at(x, z).k !== "w", () => 0);
   for (let z = 0; z < C.D; z++) {
     for (let x = 0; x < C.W;) {
       const c = at(x, z); let x1 = x + 1;
       while (x1 < C.W && at(x1, z).k === c.k && at(x1, z).h === c.h) x1++;
-      if (c.k === "w") { G.box(x, -1, z, x1, Math.min(c.h, 6), z + 1, { top: "area_cave_rock_top", all: "area_cave_rock", bottom: null }); R.solid(x, z, x1, z + 1); }
+      if (c.k === "w") { cutRock(G, x, x1, z, -1, Math.min(c.h, 6), cut, { top: "area_cave_rock_top", all: "area_cave_rock", bottom: null }); R.solid(x, z, x1, z + 1); }
       else if (c.k === "r") {
         G.box(x, -1, z, x1, 0, z + 1, { top: "area_cave_floor", all: "soil" });
         // A boulder: a round dome of stone (the mod's own boulder models, BOULDERS), one in each block.
@@ -985,11 +986,12 @@ function moonRoom(id, floor) {
   const G = R.geo, P = 1 / 16;
   const at = (x, z) => { const r = C.rows[z]; return { k: r[2 * x], h: r.charCodeAt(2 * x + 1) - 48 }; };
   const FLOOR = { f: "area_moon_floor", s: "area_cave_sand", v: "area_moon_gravel", t: "area_moon_gravel", L: "area_moon_floor", "^": "area_moon_steps", S: "area_cave_mat" };
+  const cut = southCut(C.W, C.D, (x, z) => at(x, z).k !== "w", (x, z) => { const c = at(x, z); return c.k === "K" || c.k === "q" || (c.k === "L" && c.h === 0) ? 0 : c.h / 2; });
   for (let z = 0; z < C.D; z++) {
     for (let x = 0; x < C.W;) {
       const c = at(x, z); let x1 = x + 1;
       while (x1 < C.W && at(x1, z).k === c.k && at(x1, z).h === c.h) x1++;
-      if (c.k === "w") { G.box(x, -1, z, x1, Math.min(c.h, 7), z + 1, { top: "area_moon_rock_top", all: "area_moon_rock", bottom: null }); R.solid(x, z, x1, z + 1); }
+      if (c.k === "w") { cutRock(G, x, x1, z, -1, Math.min(c.h, 7), cut, { top: "area_moon_rock_top", all: "area_moon_rock", bottom: null }); R.solid(x, z, x1, z + 1); }
       else if (c.k === "G" || c.k === "g") {
         const base = c.h / 2;
         G.box(x, -1, z, x1, base, z + 1, { top: "area_moon_floor", all: "soil" });

@@ -40,7 +40,8 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "gate_r12": (4032, 64, 0), "gate_r15": (4416, 64, 0), "gate_r16n": (4480, 64, 0), "gate_r16s": (4544, 64, 0), "gate_r18": (4928, 64, 0),
           "route12_house": (4992, 64, 0), "route16_house": (5056, 64, 0),
           "gate_r11_2f": (5248, 64, 0), "gate_r12_2f": (5312, 64, 0), "gate_r15_2f": (5504, 64, 0), "gate_r16_2f": (5568, 64, 0),
-          "fighting_dojo": (5760, 64, 0), "saffron_gym": (5824, 64, 0),}
+          "fighting_dojo": (5760, 64, 0), "saffron_gym": (5824, 64, 0),
+          "copycats_house_1f": (5888, 64, 0), "copycats_house_2f": (5952, 64, 0), "mr_psychics_house": (6016, 64, 0),}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -60,7 +61,8 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "gate_r12": "route_12_gate_1f", "gate_r15": "route_15_gate_1f", "gate_r16n": "route_16_gate_1f", "gate_r16s": "route_16_gate_1f",
          "gate_r18": "route_18_gate_1f", "route12_house": "route_12_super_rod_house", "route16_house": "route_16_fly_house",
          "gate_r11_2f": "route_11_gate_2f", "gate_r12_2f": "route_12_gate_2f", "gate_r15_2f": "route_15_gate_2f", "gate_r16_2f": "route_16_gate_2f",
-         "fighting_dojo": "fighting_dojo", "saffron_gym": "saffron_gym",}
+         "fighting_dojo": "fighting_dojo", "saffron_gym": "saffron_gym",
+         "copycats_house_1f": "copycats_house_1f", "copycats_house_2f": "copycats_house_2f", "mr_psychics_house": "mr_psychics_house",}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -170,6 +172,12 @@ DOORS = {
     "gate_r18_b": {"room": "gate_r18", "door": [[-579, 34, 783], [-579, 34, 784]], "out": [-581.4, 34.0, 784.0], "face": "w", "yaw": 90.0, "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
     "route12_house": {"room": "route12_house", "door": [[-127, 32, 618], [-126, 32, 618]], "out": [-126.0, 32.0, 620.4]},
     "route16_house": {"room": "route16_house", "door": [[-642, 34, 415], [-641, 34, 415]], "out": [-641.0, 34.0, 417.4]},
+    # (0.52) Saffron City: the FIGHTING DOJO and the GYM (their dark doorways between the porch posts, the porch
+    # either side counted too), the COPYCAT's house and MR. PSYCHIC's (their double doors up a stone step).
+    "saffron_dojo": {"room": "fighting_dojo", "door": [[-337, 33, 398], [-336, 33, 398], [-335, 33, 398]], "out": [-335.5, 33.0, 400.2]},
+    "saffron_gym": {"room": "saffron_gym", "door": [[-323, 33, 398], [-322, 33, 398], [-321, 33, 398]], "out": [-321.5, 33.0, 400.2]},
+    "copycats_house": {"room": "copycats_house_1f", "door": [[-375, 34, 397], [-374, 34, 397]], "out": [-374.0, 34.0, 399.6]},
+    "mr_psychics_house": {"room": "mr_psychics_house", "door": [[-332, 34, 442], [-331, 34, 442]], "out": [-331.0, 34.0, 444.6]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -192,7 +200,8 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "vermilion_gym": "vermilion_gym", "pokemon_fan_club": "pokemon_fan_club", "vermilion_old_rod_house": "vermilion_old_rod_house",
             "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house",
             "lavender_volunteer_house": "lavender_volunteer_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "lavender_name_rater",
-            "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r12": "gate_r12_a", "route12_house": "route12_house", "route16_house": "route16_house"}
+            "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r12": "gate_r12_a", "route12_house": "route12_house", "route16_house": "route16_house",
+            "fighting_dojo": "saffron_dojo", "saffron_gym": "saffron_gym", "copycats_house_1f": "copycats_house", "mr_psychics_house": "mr_psychics_house"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
@@ -227,6 +236,8 @@ MONS["lavender_volunteer_house"] = [{"key": "pet:mr_fujis_house_p2", "species": 
                                     {"key": "pet:mr_fujis_house_p3", "species": "nidorino", "x": 11.6, "z": 4.6, "yaw": 90.0}]
 MONS["lavender_cubone_house"] = [{"key": "pet:lavender_cubone_house_p0", "species": "cubone", "x": 8.0, "z": 5.6, "yaw": 270.0}]
 MONS["route16_house"] = [{"key": "pet:route_16_fly_house_p1", "species": "fearow", "x": 8.0, "z": 6.4, "yaw": 270.0}]
+MONS["copycats_house_1f"] = [{"key": "pet:copycats_house_1f_p2", "species": "chansey", "x": 4.0, "z": 7.4, "yaw": 200.0}]
+MONS["copycats_house_2f"] = [{"key": "pet:copycats_house_2f_p1", "species": "doduo", "x": 6.6, "z": 8.8, "yaw": 90.0}]
 MONS["vermilion_pidgey_house"] = [{"key": "pet:vermilion_pidgey_house_p1", "species": "pidgey", "x": 8.2, "z": 5.6, "yaw": 270.0}]
 BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
