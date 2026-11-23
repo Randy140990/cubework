@@ -150,6 +150,27 @@ public class IntroScreen extends GameScreen {
 	 * The loading page on its own (drawn over Minecraft's own loading screens while the world comes up): the ball
 	 * spinning, PALLET TOWN, a full bar and "Arriving...", as the page before it left off (not Minecraft's words).
 	 */
+	/** When the arriving page went up, and how full its bar is (it never goes back). */
+	private static long arriveStart;
+	private static float arriveShown;
+
+	private static float arrivingFraction() {
+		long now = System.currentTimeMillis();
+		float page = Hud.pageProgress();
+		// A new arrival (the last ended more than a few seconds ago): from empty.
+		if (arriveStart == 0 || now - arriveLast > 3000) {
+			arriveStart = now;
+			arriveShown = 0;
+		}
+		arriveLast = now;
+		float t = (now - arriveStart) / 1000F;
+		float target = page >= 0 ? 0.65F + 0.35F * page : 0.65F * (1F - (float) Math.exp(-t / 18F));
+		arriveShown = Math.max(arriveShown, arriveShown + (target - arriveShown) * 0.12F);
+		return page >= 1 ? 1F : Math.min(1F, arriveShown);
+	}
+
+	private static long arriveLast;
+
 	public static void drawArriving(GuiGraphics g) {
 		V.fit(g.guiWidth(), g.guiHeight());
 		float secs = (System.currentTimeMillis() % 100000) / 1000F;
@@ -166,7 +187,10 @@ public class IntroScreen extends GameScreen {
 		V.titleTracked(g, place, cx - pw0 / 2, V.capsTop(top + 110 + 22 + 30, 40), 40, 0xFFFFFFFF, 4);
 		float by = top + 110 + 22 + 60 + 22;
 		V.pill(g, cx - 260, by, 520, 18, V.TRACK);
-		V.rrh(g, cx - 258, by + 2, 516, 14, 7, new float[] {0, 1}, new int[] {0xFF4FB896, 0xFF8FF5C0});
+		// (0.59, 18:14: "the green bar should only be full once it's 100%") How far it's got: the world loading (an
+		// estimate, as it creeps up, Minecraft's own loading telling us nothing), then the world settling once it's in.
+		float w = 516 * arrivingFraction();
+		if (w >= 14) V.rrh(g, cx - 258, by + 2, w, 14, 7, new float[] {0, 1}, new int[] {0xFF4FB896, 0xFF8FF5C0});
 		V.centred(g, Lang.t("Arriving in {0}...", place), cx, by + 30, 15, 0xCCFFFFFF, false);
 	}
 

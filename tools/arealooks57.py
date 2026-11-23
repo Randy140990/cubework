@@ -147,7 +147,6 @@ def round57(add, room, G):
         add("swap", "spruce_trapdoor", b, "block/spruce_trapdoor=cin_edge", ys(15, 18))
         add("swap", "blackstone_wall", b, "block/blackstone=cin_post,block/blackstone_top=cin_post_top", ys(15, 20))
         add("swap", "iron_chain", b, "block/iron_chain=rope_tan", ys(15, 20))
-    add("swap", "brown_terracotta", C, "block/brown_terracotta=cin_path_edge", ys(16, 18))
     add("swap", "brown_concrete_powder", C, "block/brown_concrete_powder=path_kanto@4", ys(16, 18))
     for x0, z0, x1, z1 in ((-798, 932, -796, 934), (-769, 932, -767, 934)):
         add("swap", "red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern", (x0 - 1, z0 - 1, x1 + 1, z1 + 1, "a Cinnabar lamp"),
@@ -174,7 +173,7 @@ def round57(add, room, G):
     add("swap", "waxed_cut_copper_stairs", LB, "block/cut_copper=lab_cin_trim", ys(21, 23))
     add("swap", "deepslate_tile_wall,stripped_mangrove_wood", LB, "block/deepslate_tiles=lab_cin_post,block/stripped_mangrove_log=lab_cin_trim", ys(23, 26))
     add("swap", "tuff_bricks,tuff_brick_stairs,stone_bricks,stone_brick_wall", LB, "block/tuff_bricks=mansion_base,block/stone_bricks=mansion_base", ys(17, 21))
-    add("sign", "pale_oak_shelf,mangrove_shelf", LB, "-", ys(17, 20))
+    add("sign", "pale_oak_shelf", LB, "-", ys(17, 20))
     for x in range(-809, -798, 3):
         for z in range(917, 929, 4):
             add("prop", "polished_deepslate", (x, z, x, z, "a solar panel on the LAB's roof"), "solar", ys(24, 24))
@@ -242,6 +241,7 @@ def round57(add, room, G):
                "red_nether_brick_stairs": ("roof_daycare", "red_nether_brick_slab,red_nether_bricks", "block/red_nether_bricks=roof_daycare_tiles"),
                "jungle_stairs": ("roof_azalea1", "jungle_slab,jungle_planks", "block/jungle_planks=roof_azalea1_tiles")}
     done = set()
+    VC59 = (-1912, 500, -1760, 600)
     NOT_HOUSES = [(-1861, 466, -1833, 494), (-1992, 337, -1964, 366), (-2079, 344, -2051, 372), (-2090, 336, -1966, 432), (-2215, 615, -2040, 775),
                   (-2233, 570, -2205, 590), (-2310, 675, -2260, 850)]
     for h in SCAN["houses_johto"] + SCAN["houses_north"]:
@@ -261,6 +261,12 @@ def round57(add, room, G):
         # Kurt's blue.
         if roof == "jungle_stairs" and x0 > -2000: look = ("roof_azalea2", "jungle_slab,jungle_planks", "block/jungle_planks=roof_azalea2_tiles")
         else: look = ROOF_OF[roof]
+        # (0.59, 18:40: "variations of the purple in Violet City ... a tiny bit of character breakup") Violet's houses
+        # one of four purples each.
+        vio = VC59[0] <= x0 <= VC59[2] and VC59[1] <= z0 <= VC59[3]
+        if look[0] == "roof_vio":
+            v = ("vio", "vio2", "vio3", "vio4")[len([1 for d_ in done if VC59[0] <= d_[0] <= VC59[2] and VC59[1] <= d_[1] <= VC59[3]]) % 4]
+            look = ("roof_" + v, look[1], "block/crimson_planks=roof_%s_tiles" % v)
         for lk, blocks, swaps in PALLET_KIT:
             if lk == "swap" and blocks.startswith("jungle_stairs") and roof == "jungle_stairs": continue
             add(lk, blocks, b, swaps, yr)
@@ -276,6 +282,10 @@ def round57(add, room, G):
             "block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,"
             "block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top", yr)
         add("swap", "smooth_stone_slab", b, "block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone", ys(y0 - 1, y0 + 1))
+        # (0.59, 18:25: "they've all still got the terracotta wall") Their walls white render, as Pallet's; (Earl's
+        # Academy: "the trim around the sides for the curb are like a brick") Violet's kerbs at their feet its kerb.
+        add("swap", "white_terracotta", b, "block/white_terracotta=jhouse_wall", yr)
+        if vio: add("swap", "mud_bricks", b, "block/mud_bricks=violet_kerb", ys(y0 - 2, y0 - 1))
         add("swap", "nether_bricks,nether_brick_stairs,nether_brick_slab", b, "block/nether_bricks=chimney_dark", ys(y0 + 3, y1 + 2))
         add("swap", "gold_block", b, "block/gold_block=gold_trim", ys(y0 + 3, y1 + 2))
         add("swap", "dark_oak_shelf", b, "block/dark_oak_shelf=panel_cap_dark", ys(y0 + 4, y1 + 2))
@@ -292,6 +302,7 @@ def round57(add, room, G):
         add(k, "jungle_stairs", b, "-", ys(21, 31))
         add("swap", "jungle_slab,jungle_planks", b, "block/jungle_planks=%s_tiles" % k, ys(21, 31))
         add("swap", "gray_terracotta", b, "block/gray_terracotta=farm_wall", ys(19, 28))
+        add("swap", "white_terracotta", b, "block/white_terracotta=jhouse_wall", ys(19, 31))
     # Mr. Berry's house (16:15: "the black roof, darker chimneys and wood and bricks ... lean into that"): its
     # terracotta a warm render, its bricks clean, its dark timbers.
     BR = (-1691, 595, -1677, 608, "Mr. Berry's house")
@@ -339,14 +350,15 @@ def round57(add, room, G):
         add("swap", "nether_bricks,nether_brick_slab,nether_brick_stairs", bx, "block/nether_bricks=%s_ridge" % k, ys(ylo, yhi))
         add("swap", "dark_oak_fence,dark_oak_fence_gate", bx, "block/dark_oak_planks=%s_rail" % k, ys(ylo, yhi))
         add("swap", "spruce_planks,spruce_slab", bx, "block/spruce_planks=%s_floor" % k, ys(ylo, yhi))
-        add("swap", "smooth_stone,smooth_stone_slab,cobblestone,stone_bricks,stone_brick_stairs,stone_stairs,polished_andesite_stairs,polished_andesite", bx,
+        add("swap", "smooth_stone,smooth_stone_slab,cobblestone,stone_bricks,stone_brick_stairs,stone_brick_slab,stone_stairs,polished_andesite_stairs,polished_andesite,"
+            "polished_andesite_slab", bx,
             "block/smooth_stone=%s_stone,block/smooth_stone_slab_side=%s_stone,block/cobblestone=%s_stone,block/stone_bricks=%s_stone,block/stone=%s_stone,"
             "block/polished_andesite=%s_stone" % ((k,) * 6), ys(ylo - 3, yhi))
         add("swap", "polished_diorite_stairs,polished_diorite", bx, "block/polished_diorite=%s_trim" % k, ys(ylo, yhi))
         add("swap", "brown_terracotta", bx, "block/brown_terracotta=%s_beam" % k, ys(ylo, yhi))
         add("swap", "oak_trapdoor,bamboo_trapdoor", bx, "block/oak_trapdoor=%s_screen,block/bamboo_trapdoor=%s_screen" % (k, k), ys(ylo, yhi))
-    tower((-1861, 466, -1833, 494, "the SPROUT TOWER"), "sprout", 22, 62)
-    tower((-1992, 337, -1964, 366, "the TIN TOWER"), "tin", 20, 64)
+    tower((-1861, 466, -1833, 494, "the SPROUT TOWER"), "sprout", 22, 76)
+    tower((-1992, 337, -1964, 366, "the TIN TOWER"), "tin", 20, 84)
     tower((-2079, 344, -2051, 372, "the BURNED TOWER"), "burned", 20, 50)
     BT = (-2079, 344, -2051, 372, "the BURNED TOWER")
     add("swap", "warped_planks,warped_slab,warped_stairs", BT, "block/warped_planks=burned_teal", ys(28, 50))
@@ -359,10 +371,12 @@ def round57(add, room, G):
     add("swap", "gray_glazed_terracotta", EC, "block/gray_glazed_terracotta=ecru_flag@2", ys(19, 22))
     add("swap", "light_gray_terracotta", EC, "block/light_gray_terracotta=ecru_plot@2", ys(19, 21))
     add("grass_onto", "gray_glazed_terracotta,light_gray_terracotta", EC, "-", ys(19, 22))
-    for h in ((-2069, 395, -2056, 405), (-2069, 380, -2056, 390), (-2053, 380, -2040, 390), (-2049, 410, -2036, 420), (-2008, 410, -1995, 420)):
+    for i, h in enumerate(((-2069, 395, -2056, 405), (-2069, 380, -2056, 390), (-2053, 380, -2040, 390), (-2049, 410, -2036, 420), (-2008, 410, -1995, 420))):
         b = (h[0], h[1], h[2], h[3], "an Ecruteak house")
-        add("roof_ecru", "mangrove_stairs", b, "-", ys(22, 30))
-        add("swap", "mangrove_slab,mangrove_planks", b, "block/mangrove_planks=roof_ecru_tiles", ys(22, 30))
+        # (0.59, 18:40: "variations ... the red in Ecruteak City") one of four reds each.
+        k = ("ecru", "ecru2", "ecru3", "ecru4")[i % 4]
+        add("roof_" + k, "mangrove_stairs", b, "-", ys(22, 30))
+        add("swap", "mangrove_slab,mangrove_planks", b, "block/mangrove_planks=roof_%s_tiles" % k, ys(22, 30))
         add("swap", "white_concrete", b, "block/white_concrete=ecru_plaster", ys(22, 28))
         add("swap", "light_gray_concrete", b, "block/light_gray_concrete=ecru_base", ys(21, 23))
         add("swap", "stripped_dark_oak_wood,stripped_dark_oak_log", b, "block/stripped_dark_oak_log=ecru_timber,block/stripped_dark_oak_log_top=ecru_timber", ys(21, 30))

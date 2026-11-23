@@ -69,7 +69,7 @@ LEAGUE_TREES = "block/spruce_planks=league_trunk,block/acacia_leaves=league_bush
 # the height and blocks of each one's (a scan of the map).
 GYM_BANDS = {"viridian_city": (27, "terracotta"), "pewter_city": (31, "gray_concrete"), "cerulean_city": (35, "yellow_concrete"),
              "vermilion_city": (32, "pink_terracotta"), "celadon_city": (34, "magenta_concrete"), "fuchsia_city": (32, "magenta_terracotta"),
-             "saffron_city": (34, "blue_terracotta"), "cinnabar_island": (19, "red_concrete_powder"), "azalea_town": (21, "stripped_mangrove_log"),
+             "saffron_city": (34, "blue_terracotta"), "cinnabar_island": (19, "red_concrete_powder,stripped_mangrove_log"), "azalea_town": (21, "stripped_mangrove_log"),
              "cianwood_city": (19, "blue_terracotta"), "blackthorn_city": (32, "stripped_mangrove_log"), "ecruteak_city": (22, "blue_terracotta"),
              "mahogany_town": (23, "blue_terracotta"), "olivine_city": (20, "stripped_mangrove_log,blue_terracotta"),
              "goldenrod_city": (21, "stripped_mangrove_log,blue_terracotta"), "violet_city": (23, "stripped_mangrove_log")}
@@ -796,6 +796,8 @@ def round50(add, room):
     arealooks57.round57(add, room, globals())
     import arealooks58
     arealooks58.round58(add, room, globals())
+    import arealooks59
+    arealooks59.round59(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -855,8 +857,9 @@ def round50(add, room):
             "block/stone_bricks=tunnel_stone,block/black_concrete=cave_dark", (str(y0 - 1), str(y1 + 1)))
     # The bikes outside the Bike Shop (20:12; 12:19: "stacking a couple at the side"): three side by side on the pavement
     # by the shop's west side, by its sign.
+    # ((0.59, 18:19: "the bikes in the road ... move them to the right 3 blocks") On the paving three blocks east.)
     for z in (278, 279, 280):
-        add("prop", "light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta", (-381, z, -381, z, "a bike by the Bike Shop"), "bike", ("33", "33"))
+        add("prop", "light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta,smooth_stone", (-378, z, -378, z, "a bike by the Bike Shop"), "bike", ("33", "33"))
     # Lavender's sign (20:12) as every other town's.
     add("sign", "pale_oak_shelf", (-126, 425, -123, 427, "Lavender Town's sign"), "-", ("33", "35"))
     # The SAFARI ZONE (its room): its warped doors plain wood, its fences as the routes'.
@@ -1438,6 +1441,8 @@ def round56(add, room):
         b, ys = (x0, z0, x1, z1, name), (str(g), str(top))
         for look, blocks, swaps in PALLET_KIT + roof:
             add(look, blocks, b, swaps, ys)
+        # ((0.59, 18:25) Their pink terracotta walls white render, as Pallet's.)
+        add("swap", "white_terracotta", b, "block/white_terracotta=jhouse_wall", ys)
     # Blackthorn's houses.
     for x0, z0, x1, z1, g, name in BT_HOUSES:
         b, band = (x0, z0, x1, z1, name), g + 4

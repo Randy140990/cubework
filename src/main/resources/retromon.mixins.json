@@ -27,7 +27,8 @@
     "ModelPartAccessor",
     "CubeAccessor",
     "KeyboardHandlerMixin",
-    "HandMixin"
+    "HandMixin",
+    "ChatQuietMixin"
   ],
   "injectors": {
     "defaultRequire": 1

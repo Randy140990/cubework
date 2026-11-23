@@ -169,7 +169,10 @@ public final class AreaLooks {
 				// (15:21) Texture swaps don't pile up: where two of a block's swaps cover a spot (all Kanto's dripstone, and
 				// Pallet's), the one for the smaller area is drawn there, the other not.
 				List<Rule> swaps = new ArrayList<>();
-				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("panel") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy") || rule.look().equals("leafy_hedge")) swaps.add(rule);
+				// ((0.59) The signs too: a shelf that's a sign in a small box is drawn as one even where a planter's or a
+				// band's look covers the whole town, and a planter in a small box isn't a sign because the town's are.)
+				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("panel") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy") || rule.look().equals("leafy_hedge")
+						|| rule.look().equals("sign") || rule.look().equals("sign_o")) swaps.add(rule);
 				for (Rule rule : looks.values()) {
 					Look look = make(rule, c.baker());
 					List<Rule> rivals = new ArrayList<>();

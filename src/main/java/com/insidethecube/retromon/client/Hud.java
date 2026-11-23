@@ -101,6 +101,13 @@ public final class Hud {
 		if (page == 2) g.fill(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xFF000000, Math.min(1, pageOut / 10F)));
 	}
 
+	/** How far the arriving page has got (0 to 1: built, then running smoothly), or -1 when it isn't up. */
+	public static float pageProgress() {
+		if (page == 0) return -1;
+		if (page == 2) return 1;
+		return Math.min(1F, (Math.min(1F, pageTicks / 30F) + Math.min(1F, smoothFrames / 40F)) / 2F);
+	}
+
 	private static void arrivingTick(Minecraft mc) {
 		if (page == 0) return;
 		pageTicks++;
@@ -204,6 +211,7 @@ public final class Hud {
 			}
 		}
 		arrivingTick(mc);
+		AxiomQuiet.tick(mc);
 		if (page == 0 && (arrive > 0 && mc.level != null && mc.screen == null || arrive > 0 && mc.screen instanceof DialogueScreen)) arrive--;
 		moneyTick(mc);
 		if (badgeShown >= 0 && mc.screen == null) badgeTicks++;

@@ -259,7 +259,7 @@ swap	blue_terracotta	-2555	752	-2534	768	19	19	block/blue_terracotta=gym_band_ci
 swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2554	753	-2535	767	-	-	block/polished_diorite=house_trim	cianwood_city Gym
 roof_gym	jungle_stairs,oak_stairs	-786	900	-768	912	22	28	-	cinnabar_island Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-786	900	-768	912	22	28	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	cinnabar_island Gym
-swap	red_concrete_powder	-788	898	-766	914	19	19	block/red_concrete_powder=gym_band_cinnabar_island	cinnabar_island Gym's band
+swap	red_concrete_powder,stripped_mangrove_log	-788	898	-766	914	19	19	block/red_concrete_powder=gym_band_cinnabar_island,block/stripped_mangrove_log=gym_band_cinnabar_island,block/stripped_mangrove_log_top=gym_band_cinnabar_island	cinnabar_island Gym's band
 swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-787	899	-767	913	-	-	block/polished_diorite=house_trim	cinnabar_island Gym
 roof_gymg	jungle_stairs,oak_stairs	-1485	332	-1467	344	35	41	-	blackthorn_city Gym
 swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1485	332	-1467	344	35	41	block/jungle_planks=gym_flat_grey,block/oak_planks=gym_flat_light_grey,block/stripped_jungle_log=gym_beam_grey,block/stripped_jungle_log_top=gym_beam_top_grey	blackthorn_city Gym
@@ -2839,6 +2839,7 @@ swap	bricks	-1739	764	-1724	777	18	29	block/bricks=base_cer	a Cherrygrove house
 swap	oak_slab	-1739	764	-1724	777	18	29	block/oak_planks=step_boards_d	a Cherrygrove house
 roof	acacia_stairs	-1739	764	-1724	777	18	29	-	a Cherrygrove house
 swap	acacia_slab,acacia_planks	-1739	764	-1724	777	18	29	block/acacia_planks=roof_tiles	a Cherrygrove house
+swap	white_terracotta	-1739	764	-1724	777	18	29	block/white_terracotta=jhouse_wall	a Cherrygrove house
 swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1719	767	-1704	780	18	29	block/polished_andesite=house_stone	a Cherrygrove house
 swap	polished_deepslate	-1719	767	-1704	780	18	29	block/polished_deepslate=house_dark	a Cherrygrove house
 swap	polished_deepslate_slab	-1719	767	-1704	780	18	29	block/polished_deepslate=window_low	a Cherrygrove house
@@ -2853,6 +2854,7 @@ swap	bricks	-1719	767	-1704	780	18	29	block/bricks=base_cer	a Cherrygrove house
 swap	oak_slab	-1719	767	-1704	780	18	29	block/oak_planks=step_boards_d	a Cherrygrove house
 roof	acacia_stairs	-1719	767	-1704	780	18	29	-	a Cherrygrove house
 swap	acacia_slab,acacia_planks	-1719	767	-1704	780	18	29	block/acacia_planks=roof_tiles	a Cherrygrove house
+swap	white_terracotta	-1719	767	-1704	780	18	29	block/white_terracotta=jhouse_wall	a Cherrygrove house
 swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1698	775	-1683	788	18	29	block/polished_andesite=house_stone	a Cherrygrove house
 swap	polished_deepslate	-1698	775	-1683	788	18	29	block/polished_deepslate=house_dark	a Cherrygrove house
 swap	polished_deepslate_slab	-1698	775	-1683	788	18	29	block/polished_deepslate=window_low	a Cherrygrove house
@@ -2867,6 +2869,7 @@ swap	bricks	-1698	775	-1683	788	18	29	block/bricks=base_cer	a Cherrygrove house
 swap	oak_slab	-1698	775	-1683	788	18	29	block/oak_planks=step_boards_d	a Cherrygrove house
 roof	acacia_stairs	-1698	775	-1683	788	18	29	-	a Cherrygrove house
 swap	acacia_slab,acacia_planks	-1698	775	-1683	788	18	29	block/acacia_planks=roof_tiles	a Cherrygrove house
+swap	white_terracotta	-1698	775	-1683	788	18	29	block/white_terracotta=jhouse_wall	a Cherrygrove house
 swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1460	741	-1440	757	18	31	block/polished_andesite=house_stone	Prof. Elm's lab
 swap	polished_deepslate	-1460	741	-1440	757	18	31	block/polished_deepslate=house_dark	Prof. Elm's lab
 swap	polished_deepslate_slab	-1460	741	-1440	757	18	31	block/polished_deepslate=window_low	Prof. Elm's lab
@@ -2881,6 +2884,7 @@ swap	bricks	-1460	741	-1440	757	18	31	block/bricks=base_cer	Prof. Elm's lab
 swap	oak_slab	-1460	741	-1440	757	18	31	block/oak_planks=step_boards_d	Prof. Elm's lab
 roof_cer	prismarine_stairs	-1460	741	-1440	757	18	31	-	Prof. Elm's lab
 swap	prismarine_slab,prismarine	-1460	741	-1440	757	18	31	block/prismarine=roof_cer_tiles	Prof. Elm's lab
+swap	white_terracotta	-1460	741	-1440	757	18	31	block/white_terracotta=jhouse_wall	Prof. Elm's lab
 swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1435	750	-1420	763	18	28	block/polished_andesite=house_stone	a New Bark house
 swap	polished_deepslate	-1435	750	-1420	763	18	28	block/polished_deepslate=house_dark	a New Bark house
 swap	polished_deepslate_slab	-1435	750	-1420	763	18	28	block/polished_deepslate=window_low	a New Bark house
@@ -2895,6 +2899,7 @@ swap	bricks	-1435	750	-1420	763	18	28	block/bricks=base_cer	a New Bark house
 swap	oak_slab	-1435	750	-1420	763	18	28	block/oak_planks=step_boards_d	a New Bark house
 roof_cer	prismarine_stairs	-1435	750	-1420	763	18	28	-	a New Bark house
 swap	prismarine_slab,prismarine	-1435	750	-1420	763	18	28	block/prismarine=roof_cer_tiles	a New Bark house
+swap	white_terracotta	-1435	750	-1420	763	18	28	block/white_terracotta=jhouse_wall	a New Bark house
 roof_bt	jungle_stairs	-1497	354	-1482	366	35	40	-	a Blackthorn house
 swap	jungle_planks,jungle_slab	-1497	354	-1482	366	35	40	block/jungle_planks=roof_bt_tiles	a Blackthorn house
 swap	jungle_slab,jungle_planks	-1497	354	-1482	366	34	34	block/jungle_planks=trim_jungle	a Blackthorn house
@@ -4126,7 +4131,6 @@ swap	gray_concrete	-765	914	-757	923	15	18	block/gray_concrete=cin_deck	Cinnabar
 swap	spruce_trapdoor	-765	914	-757	923	15	18	block/spruce_trapdoor=cin_edge	Cinnabar's east pier
 swap	blackstone_wall	-765	914	-757	923	15	20	block/blackstone=cin_post,block/blackstone_top=cin_post_top	Cinnabar's east pier
 swap	iron_chain	-765	914	-757	923	15	20	block/iron_chain=rope_tan	Cinnabar's east pier
-swap	brown_terracotta	-895	885	-756	958	16	18	block/brown_terracotta=cin_path_edge	Cinnabar Island
 swap	brown_concrete_powder	-895	885	-756	958	16	18	block/brown_concrete_powder=path_kanto@4	Cinnabar Island
 swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-799	931	-795	935	16	26	block/red_sandstone=lamp_cin_post,block/chiseled_red_sandstone=lamp_cin_foot,block/red_sandstone_top=lamp_cin_cap,block/orange_wool=lamp_cin_cap,block/sea_lantern=lamp_globe_warm!	a Cinnabar lamp
 swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-770	931	-766	935	16	26	block/red_sandstone=lamp_cin_post,block/chiseled_red_sandstone=lamp_cin_foot,block/red_sandstone_top=lamp_cin_cap,block/orange_wool=lamp_cin_cap,block/sea_lantern=lamp_globe_warm!	a Cinnabar lamp
@@ -4144,7 +4148,7 @@ swap	polished_deepslate	-812	915	-796	930	22	25	block/polished_deepslate=lab_cin
 swap	waxed_cut_copper_stairs	-812	915	-796	930	21	23	block/cut_copper=lab_cin_trim	the POKeMON LAB
 swap	deepslate_tile_wall,stripped_mangrove_wood	-812	915	-796	930	23	26	block/deepslate_tiles=lab_cin_post,block/stripped_mangrove_log=lab_cin_trim	the POKeMON LAB
 swap	tuff_bricks,tuff_brick_stairs,stone_bricks,stone_brick_wall	-812	915	-796	930	17	21	block/tuff_bricks=mansion_base,block/stone_bricks=mansion_base	the POKeMON LAB
-sign	pale_oak_shelf,mangrove_shelf	-812	915	-796	930	17	20	-	the POKeMON LAB
+sign	pale_oak_shelf	-812	915	-796	930	17	20	-	the POKeMON LAB
 prop	polished_deepslate	-809	917	-809	917	24	24	solar	a solar panel on the LAB's roof
 prop	polished_deepslate	-809	921	-809	921	24	24	solar	a solar panel on the LAB's roof
 prop	polished_deepslate	-809	925	-809	925	24	24	solar	a solar panel on the LAB's roof
@@ -4312,6 +4316,7 @@ swap	pale_oak_slab,pale_oak_planks	-2563	715	-2550	726	21	27	block/pale_oak_plan
 panel	dark_oak_shelf	-2563	715	-2550	726	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2563	715	-2550	726	17	27	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2563	715	-2550	726	17	19	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2563	715	-2550	726	17	27	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2563	715	-2550	726	21	27	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2563	715	-2550	726	21	27	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2563	715	-2550	726	22	27	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4334,6 +4339,7 @@ swap	pale_oak_slab,pale_oak_planks	-2524	755	-2511	766	21	28	block/pale_oak_plan
 panel	dark_oak_shelf	-2524	755	-2511	766	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2524	755	-2511	766	17	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2524	755	-2511	766	17	19	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2524	755	-2511	766	17	28	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2524	755	-2511	766	21	28	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2524	755	-2511	766	21	28	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2524	755	-2511	766	22	28	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4356,6 +4362,7 @@ swap	pale_oak_slab,pale_oak_planks	-2553	772	-2540	783	21	27	block/pale_oak_plan
 panel	dark_oak_shelf	-2553	772	-2540	783	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2553	772	-2540	783	17	27	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2553	772	-2540	783	17	19	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2553	772	-2540	783	17	27	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2553	772	-2540	783	21	27	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2553	772	-2540	783	21	27	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2553	772	-2540	783	22	27	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4378,6 +4385,7 @@ swap	pale_oak_slab,pale_oak_planks	-2534	772	-2521	783	21	28	block/pale_oak_plan
 panel	dark_oak_shelf	-2534	772	-2521	783	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2534	772	-2521	783	17	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2534	772	-2521	783	17	19	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2534	772	-2521	783	17	28	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2534	772	-2521	783	21	28	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2534	772	-2521	783	21	28	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2534	772	-2521	783	22	28	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4400,6 +4408,7 @@ swap	mangrove_slab,mangrove_planks	-2291	462	-2278	473	22	29	block/mangrove_plan
 panel	dark_oak_shelf	-2291	462	-2278	473	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2291	462	-2278	473	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2291	462	-2278	473	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2291	462	-2278	473	18	29	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2291	462	-2278	473	22	29	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2291	462	-2278	473	22	29	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2291	462	-2278	473	23	29	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4421,6 +4430,7 @@ swap	warped_slab,warped_planks	-2297	542	-2284	553	22	28	block/warped_planks=roo
 panel	dark_oak_shelf	-2297	542	-2284	553	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2297	542	-2284	553	18	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2297	542	-2284	553	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2297	542	-2284	553	18	28	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2297	542	-2284	553	22	28	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2297	542	-2284	553	22	28	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2297	542	-2284	553	23	28	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4442,6 +4452,7 @@ swap	mangrove_slab,mangrove_planks	-2316	560	-2303	571	22	29	block/mangrove_plan
 panel	dark_oak_shelf	-2316	560	-2303	571	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2316	560	-2303	571	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2316	560	-2303	571	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2316	560	-2303	571	18	29	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2316	560	-2303	571	22	29	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2316	560	-2303	571	22	29	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2316	560	-2303	571	23	29	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4463,6 +4474,7 @@ swap	prismarine_slab,prismarine	-1458	742	-1442	755	22	30	block/prismarine=roof_
 panel	dark_oak_shelf	-1458	742	-1442	755	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1458	742	-1442	755	18	30	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1458	742	-1442	755	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1458	742	-1442	755	18	30	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1458	742	-1442	755	22	30	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1458	742	-1442	755	22	30	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1458	742	-1442	755	23	30	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4484,6 +4496,7 @@ swap	prismarine_slab,prismarine	-1434	751	-1421	762	22	28	block/prismarine=roof_
 panel	dark_oak_shelf	-1434	751	-1421	762	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1434	751	-1421	762	18	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1434	751	-1421	762	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1434	751	-1421	762	18	28	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1434	751	-1421	762	22	28	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1434	751	-1421	762	22	28	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1434	751	-1421	762	23	28	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4505,6 +4518,7 @@ swap	acacia_slab,acacia_planks	-1316	762	-1303	773	22	28	block/acacia_planks=roo
 panel	dark_oak_shelf	-1316	762	-1303	773	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1316	762	-1303	773	18	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1316	762	-1303	773	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1316	762	-1303	773	18	28	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1316	762	-1303	773	22	28	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1316	762	-1303	773	22	28	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1316	762	-1303	773	23	28	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4526,6 +4540,7 @@ swap	acacia_slab,acacia_planks	-1738	765	-1725	776	22	29	block/acacia_planks=roo
 panel	dark_oak_shelf	-1738	765	-1725	776	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1738	765	-1725	776	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1738	765	-1725	776	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1738	765	-1725	776	18	29	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1738	765	-1725	776	22	29	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1738	765	-1725	776	22	29	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1738	765	-1725	776	23	29	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4547,6 +4562,7 @@ swap	acacia_slab,acacia_planks	-1718	768	-1705	779	22	29	block/acacia_planks=roo
 panel	dark_oak_shelf	-1718	768	-1705	779	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1718	768	-1705	779	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1718	768	-1705	779	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1718	768	-1705	779	18	29	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1718	768	-1705	779	22	29	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1718	768	-1705	779	22	29	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1718	768	-1705	779	23	29	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4568,6 +4584,7 @@ swap	acacia_slab,acacia_planks	-1697	776	-1684	787	22	29	block/acacia_planks=roo
 panel	dark_oak_shelf	-1697	776	-1684	787	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1697	776	-1684	787	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1697	776	-1684	787	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1697	776	-1684	787	18	29	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1697	776	-1684	787	22	29	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1697	776	-1684	787	22	29	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1697	776	-1684	787	23	29	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4589,6 +4606,7 @@ swap	cobbled_deepslate_slab,cobbled_deepslate	-1691	595	-1677	608	23	31	block/co
 panel	dark_oak_shelf	-1691	595	-1677	608	19	21	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1691	595	-1677	608	19	31	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1691	595	-1677	608	19	21	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1691	595	-1677	608	19	31	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1691	595	-1677	608	23	31	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1691	595	-1677	608	23	31	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1691	595	-1677	608	24	31	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4610,6 +4628,7 @@ swap	acacia_slab,acacia_planks	-1721	690	-1708	701	23	30	block/acacia_planks=roo
 panel	dark_oak_shelf	-1721	690	-1708	701	19	21	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1721	690	-1708	701	19	30	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1721	690	-1708	701	19	21	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1721	690	-1708	701	19	30	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1721	690	-1708	701	23	30	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1721	690	-1708	701	23	30	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1721	690	-1708	701	24	30	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4632,6 +4651,7 @@ panel	dark_oak_shelf	-2091	777	-2072	791	19	21	block/dark_oak_shelf=panel_plante
 panel	pale_oak_shelf	-2090	778	-2073	790	19	21	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2091	777	-2072	791	19	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2091	777	-2072	791	19	21	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2091	777	-2072	791	19	29	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2091	777	-2072	791	23	29	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2091	777	-2072	791	23	29	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2091	777	-2072	791	24	29	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4653,6 +4673,7 @@ swap	mangrove_slab,mangrove_planks	-2328	378	-2305	390	25	33	block/mangrove_plan
 panel	dark_oak_shelf	-2328	378	-2305	390	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2328	378	-2305	390	21	33	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2328	378	-2305	390	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2328	378	-2305	390	21	33	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2328	378	-2305	390	25	33	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2328	378	-2305	390	25	33	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2328	378	-2305	390	26	33	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4675,6 +4696,7 @@ panel	dark_oak_shelf	-1753	388	-1737	401	21	23	block/dark_oak_shelf=panel_plante
 panel	pale_oak_shelf	-1752	389	-1738	400	21	23	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1753	388	-1737	401	21	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1753	388	-1737	401	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1753	388	-1737	401	21	32	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1753	388	-1737	401	25	32	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1753	388	-1737	401	25	32	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1753	388	-1737	401	26	32	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4697,6 +4719,7 @@ panel	dark_oak_shelf	-1770	395	-1757	405	21	23	block/dark_oak_shelf=panel_plante
 panel	pale_oak_shelf	-1769	396	-1758	404	21	23	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1770	395	-1757	405	21	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1770	395	-1757	405	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1770	395	-1757	405	21	32	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1770	395	-1757	405	25	32	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1770	395	-1757	405	25	32	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1770	395	-1757	405	26	32	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4712,12 +4735,14 @@ panel	jungle_shelf,birch_shelf	-1906	526	-1893	536	21	32	block/jungle_shelf=cap_
 panel	warped_shelf	-1906	526	-1893	536	21	32	block/warped_shelf=green_shelf	a Johto house
 swap	bricks	-1906	526	-1893	536	21	32	block/bricks=base_cer	a Johto house
 swap	oak_slab	-1906	526	-1893	536	21	32	block/oak_planks=step_boards_d	a Johto house
-roof_vio	crimson_stairs	-1906	526	-1893	536	21	32	-	a Johto house
+roof_vio2	crimson_stairs	-1906	526	-1893	536	21	32	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1906	526	-1893	536	21	27	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
-swap	crimson_slab,crimson_planks	-1906	526	-1893	536	25	32	block/crimson_planks=roof_vio_tiles	a Johto house
+swap	crimson_slab,crimson_planks	-1906	526	-1893	536	25	32	block/crimson_planks=roof_vio2_tiles	a Johto house
 panel	dark_oak_shelf	-1906	526	-1893	536	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1906	526	-1893	536	21	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1906	526	-1893	536	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1906	526	-1893	536	21	32	block/white_terracotta=jhouse_wall	a Johto house
+swap	mud_bricks	-1906	526	-1893	536	20	21	block/mud_bricks=violet_kerb	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1906	526	-1893	536	25	32	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1906	526	-1893	536	25	32	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1906	526	-1893	536	26	32	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4733,12 +4758,14 @@ panel	jungle_shelf,birch_shelf	-1838	534	-1825	545	21	33	block/jungle_shelf=cap_
 panel	warped_shelf	-1838	534	-1825	545	21	33	block/warped_shelf=green_shelf	a Johto house
 swap	bricks	-1838	534	-1825	545	21	33	block/bricks=base_cer	a Johto house
 swap	oak_slab	-1838	534	-1825	545	21	33	block/oak_planks=step_boards_d	a Johto house
-roof_vio	crimson_stairs	-1838	534	-1825	545	21	33	-	a Johto house
+roof_vio3	crimson_stairs	-1838	534	-1825	545	21	33	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1838	534	-1825	545	21	27	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
-swap	crimson_slab,crimson_planks	-1838	534	-1825	545	25	33	block/crimson_planks=roof_vio_tiles	a Johto house
+swap	crimson_slab,crimson_planks	-1838	534	-1825	545	25	33	block/crimson_planks=roof_vio3_tiles	a Johto house
 panel	dark_oak_shelf	-1838	534	-1825	545	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1838	534	-1825	545	21	33	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1838	534	-1825	545	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1838	534	-1825	545	21	33	block/white_terracotta=jhouse_wall	a Johto house
+swap	mud_bricks	-1838	534	-1825	545	20	21	block/mud_bricks=violet_kerb	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1838	534	-1825	545	25	33	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1838	534	-1825	545	25	33	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1838	534	-1825	545	26	33	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4754,12 +4781,14 @@ panel	jungle_shelf,birch_shelf	-1858	566	-1845	576	21	32	block/jungle_shelf=cap_
 panel	warped_shelf	-1858	566	-1845	576	21	32	block/warped_shelf=green_shelf	a Johto house
 swap	bricks	-1858	566	-1845	576	21	32	block/bricks=base_cer	a Johto house
 swap	oak_slab	-1858	566	-1845	576	21	32	block/oak_planks=step_boards_d	a Johto house
-roof_vio	crimson_stairs	-1858	566	-1845	576	21	32	-	a Johto house
+roof_vio4	crimson_stairs	-1858	566	-1845	576	21	32	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1858	566	-1845	576	21	27	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
-swap	crimson_slab,crimson_planks	-1858	566	-1845	576	25	32	block/crimson_planks=roof_vio_tiles	a Johto house
+swap	crimson_slab,crimson_planks	-1858	566	-1845	576	25	32	block/crimson_planks=roof_vio4_tiles	a Johto house
 panel	dark_oak_shelf	-1858	566	-1845	576	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1858	566	-1845	576	21	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1858	566	-1845	576	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1858	566	-1845	576	21	32	block/white_terracotta=jhouse_wall	a Johto house
+swap	mud_bricks	-1858	566	-1845	576	20	21	block/mud_bricks=violet_kerb	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1858	566	-1845	576	25	32	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1858	566	-1845	576	25	32	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1858	566	-1845	576	26	32	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4781,6 +4810,7 @@ swap	warped_slab,warped_planks	-2263	527	-2250	538	26	32	block/warped_planks=roo
 panel	dark_oak_shelf	-2263	527	-2250	538	22	24	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2263	527	-2250	538	22	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2263	527	-2250	538	22	24	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2263	527	-2250	538	22	32	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2263	527	-2250	538	26	32	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2263	527	-2250	538	26	32	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2263	527	-2250	538	27	32	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4802,6 +4832,7 @@ swap	warped_slab,warped_planks	-2249	527	-2236	538	26	32	block/warped_planks=roo
 panel	dark_oak_shelf	-2249	527	-2236	538	22	24	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2249	527	-2236	538	22	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2249	527	-2236	538	22	24	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-2249	527	-2236	538	22	32	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2249	527	-2236	538	26	32	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-2249	527	-2236	538	26	32	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-2249	527	-2236	538	27	32	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4824,6 +4855,7 @@ panel	dark_oak_shelf	-1758	259	-1745	264	23	25	block/dark_oak_shelf=panel_plante
 panel	pale_oak_shelf	-1757	260	-1746	263	23	25	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1758	259	-1745	264	23	34	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1758	259	-1745	264	23	25	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1758	259	-1745	264	23	34	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1758	259	-1745	264	27	34	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1758	259	-1745	264	27	34	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1758	259	-1745	264	28	34	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4846,6 +4878,7 @@ panel	dark_oak_shelf	-1830	186	-1817	196	23	25	block/dark_oak_shelf=panel_plante
 panel	pale_oak_shelf	-1829	187	-1818	195	23	25	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1830	186	-1817	196	23	34	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1830	186	-1817	196	23	25	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1830	186	-1817	196	23	34	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1830	186	-1817	196	27	34	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1830	186	-1817	196	27	34	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1830	186	-1817	196	28	34	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4868,6 +4901,7 @@ panel	dark_oak_shelf	-1758	254	-1745	264	23	25	block/dark_oak_shelf=panel_plante
 panel	pale_oak_shelf	-1757	255	-1746	263	23	25	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1758	254	-1745	264	23	34	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1758	254	-1745	264	23	25	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
+swap	white_terracotta	-1758	254	-1745	264	23	34	block/white_terracotta=jhouse_wall	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1758	254	-1745	264	27	34	block/nether_bricks=chimney_dark	a Johto house
 swap	gold_block	-1758	254	-1745	264	27	34	block/gold_block=gold_trim	a Johto house
 panel	dark_oak_shelf	-1758	254	-1745	264	28	34	block/dark_oak_shelf=panel_cap_dark	a Johto house
@@ -4885,6 +4919,7 @@ swap	oak_slab	-2034	848	-2020	860	19	31	block/oak_planks=step_boards_d	an Azalea
 roof_azalea1	jungle_stairs	-2034	848	-2020	860	21	31	-	an Azalea house
 swap	jungle_slab,jungle_planks	-2034	848	-2020	860	21	31	block/jungle_planks=roof_azalea1_tiles	an Azalea house
 swap	gray_terracotta	-2034	848	-2020	860	19	28	block/gray_terracotta=farm_wall	an Azalea house
+swap	white_terracotta	-2034	848	-2020	860	19	31	block/white_terracotta=jhouse_wall	an Azalea house
 swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1998	869	-1984	881	19	31	block/polished_andesite=house_stone	an Azalea house
 swap	polished_deepslate	-1998	869	-1984	881	19	31	block/polished_deepslate=house_dark	an Azalea house
 swap	polished_deepslate_slab	-1998	869	-1984	881	19	31	block/polished_deepslate=window_low	an Azalea house
@@ -4899,6 +4934,7 @@ swap	oak_slab	-1998	869	-1984	881	19	31	block/oak_planks=step_boards_d	an Azalea
 roof_azalea2	jungle_stairs	-1998	869	-1984	881	21	31	-	an Azalea house
 swap	jungle_slab,jungle_planks	-1998	869	-1984	881	21	31	block/jungle_planks=roof_azalea2_tiles	an Azalea house
 swap	gray_terracotta	-1998	869	-1984	881	19	28	block/gray_terracotta=farm_wall	an Azalea house
+swap	white_terracotta	-1998	869	-1984	881	19	31	block/white_terracotta=jhouse_wall	an Azalea house
 swap	terracotta	-1691	595	-1677	608	20	30	block/terracotta=berry_wall	Mr. Berry's house
 swap	bricks,brick_stairs,brick_slab	-1691	595	-1677	608	20	30	block/bricks=berry_brick	Mr. Berry's house
 swap	stripped_spruce_wood,stripped_spruce_log	-1691	595	-1677	608	20	30	block/stripped_spruce_log=berry_post,block/stripped_spruce_log_top=post_bt_top	Mr. Berry's house
@@ -4926,28 +4962,28 @@ swap	cauldron,hopper,blackstone_wall,anvil,chipped_anvil,damaged_anvil	-1853	529
 swap	chiseled_nether_bricks	-1853	529	-1847	533	21	26	block/chiseled_nether_bricks=lantern_stone_window	a stone lantern
 swap	cauldron,hopper,blackstone_wall,anvil,chipped_anvil,damaged_anvil	-1846	529	-1840	533	21	26	block/cauldron_side=lantern_stone,block/cauldron_top=lantern_stone_top,block/cauldron_bottom=lantern_stone,block/cauldron_inner=lantern_stone,block/hopper_outside=lantern_stone,block/hopper_inside=lantern_stone,block/hopper_top=lantern_stone_top,block/blackstone=lantern_stone,block/blackstone_top=lantern_stone_top,block/anvil=lantern_stone_top,block/anvil_top=lantern_stone_top	a stone lantern
 swap	chiseled_nether_bricks	-1846	529	-1840	533	21	26	block/chiseled_nether_bricks=lantern_stone_window	a stone lantern
-swap	dark_oak_slab,dark_oak_stairs,dark_oak_planks,dark_oak_trapdoor	-1861	466	-1833	494	22	62	block/dark_oak_planks=sprout_timber,block/dark_oak_trapdoor=sprout_timber	the SPROUT TOWER
-swap	spruce_log	-1861	466	-1833	494	22	62	block/spruce_log=sprout_pillar,block/spruce_log_top=sprout_pillar	the SPROUT TOWER
-swap	calcite	-1861	466	-1833	494	22	62	block/calcite=sprout_plaster	the SPROUT TOWER
-swap	crimson_planks,crimson_slab,crimson_stairs	-1861	466	-1833	494	22	62	block/crimson_planks=sprout_roof	the SPROUT TOWER
-swap	nether_bricks,nether_brick_slab,nether_brick_stairs	-1861	466	-1833	494	22	62	block/nether_bricks=sprout_ridge	the SPROUT TOWER
-swap	dark_oak_fence,dark_oak_fence_gate	-1861	466	-1833	494	22	62	block/dark_oak_planks=sprout_rail	the SPROUT TOWER
-swap	spruce_planks,spruce_slab	-1861	466	-1833	494	22	62	block/spruce_planks=sprout_floor	the SPROUT TOWER
-swap	smooth_stone,smooth_stone_slab,cobblestone,stone_bricks,stone_brick_stairs,stone_stairs,polished_andesite_stairs,polished_andesite	-1861	466	-1833	494	19	62	block/smooth_stone=sprout_stone,block/smooth_stone_slab_side=sprout_stone,block/cobblestone=sprout_stone,block/stone_bricks=sprout_stone,block/stone=sprout_stone,block/polished_andesite=sprout_stone	the SPROUT TOWER
-swap	polished_diorite_stairs,polished_diorite	-1861	466	-1833	494	22	62	block/polished_diorite=sprout_trim	the SPROUT TOWER
-swap	brown_terracotta	-1861	466	-1833	494	22	62	block/brown_terracotta=sprout_beam	the SPROUT TOWER
-swap	oak_trapdoor,bamboo_trapdoor	-1861	466	-1833	494	22	62	block/oak_trapdoor=sprout_screen,block/bamboo_trapdoor=sprout_screen	the SPROUT TOWER
-swap	dark_oak_slab,dark_oak_stairs,dark_oak_planks,dark_oak_trapdoor	-1992	337	-1964	366	20	64	block/dark_oak_planks=tin_timber,block/dark_oak_trapdoor=tin_timber	the TIN TOWER
-swap	spruce_log	-1992	337	-1964	366	20	64	block/spruce_log=tin_pillar,block/spruce_log_top=tin_pillar	the TIN TOWER
-swap	calcite	-1992	337	-1964	366	20	64	block/calcite=tin_plaster	the TIN TOWER
-swap	crimson_planks,crimson_slab,crimson_stairs	-1992	337	-1964	366	20	64	block/crimson_planks=tin_roof	the TIN TOWER
-swap	nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	337	-1964	366	20	64	block/nether_bricks=tin_ridge	the TIN TOWER
-swap	dark_oak_fence,dark_oak_fence_gate	-1992	337	-1964	366	20	64	block/dark_oak_planks=tin_rail	the TIN TOWER
-swap	spruce_planks,spruce_slab	-1992	337	-1964	366	20	64	block/spruce_planks=tin_floor	the TIN TOWER
-swap	smooth_stone,smooth_stone_slab,cobblestone,stone_bricks,stone_brick_stairs,stone_stairs,polished_andesite_stairs,polished_andesite	-1992	337	-1964	366	17	64	block/smooth_stone=tin_stone,block/smooth_stone_slab_side=tin_stone,block/cobblestone=tin_stone,block/stone_bricks=tin_stone,block/stone=tin_stone,block/polished_andesite=tin_stone	the TIN TOWER
-swap	polished_diorite_stairs,polished_diorite	-1992	337	-1964	366	20	64	block/polished_diorite=tin_trim	the TIN TOWER
-swap	brown_terracotta	-1992	337	-1964	366	20	64	block/brown_terracotta=tin_beam	the TIN TOWER
-swap	oak_trapdoor,bamboo_trapdoor	-1992	337	-1964	366	20	64	block/oak_trapdoor=tin_screen,block/bamboo_trapdoor=tin_screen	the TIN TOWER
+swap	dark_oak_slab,dark_oak_stairs,dark_oak_planks,dark_oak_trapdoor	-1861	466	-1833	494	22	76	block/dark_oak_planks=sprout_timber,block/dark_oak_trapdoor=sprout_timber	the SPROUT TOWER
+swap	spruce_log	-1861	466	-1833	494	22	76	block/spruce_log=sprout_pillar,block/spruce_log_top=sprout_pillar	the SPROUT TOWER
+swap	calcite	-1861	466	-1833	494	22	76	block/calcite=sprout_plaster	the SPROUT TOWER
+swap	crimson_planks,crimson_slab,crimson_stairs	-1861	466	-1833	494	22	76	block/crimson_planks=sprout_roof	the SPROUT TOWER
+swap	nether_bricks,nether_brick_slab,nether_brick_stairs	-1861	466	-1833	494	22	76	block/nether_bricks=sprout_ridge	the SPROUT TOWER
+swap	dark_oak_fence,dark_oak_fence_gate	-1861	466	-1833	494	22	76	block/dark_oak_planks=sprout_rail	the SPROUT TOWER
+swap	spruce_planks,spruce_slab	-1861	466	-1833	494	22	76	block/spruce_planks=sprout_floor	the SPROUT TOWER
+swap	smooth_stone,smooth_stone_slab,cobblestone,stone_bricks,stone_brick_stairs,stone_brick_slab,stone_stairs,polished_andesite_stairs,polished_andesite,polished_andesite_slab	-1861	466	-1833	494	19	76	block/smooth_stone=sprout_stone,block/smooth_stone_slab_side=sprout_stone,block/cobblestone=sprout_stone,block/stone_bricks=sprout_stone,block/stone=sprout_stone,block/polished_andesite=sprout_stone	the SPROUT TOWER
+swap	polished_diorite_stairs,polished_diorite	-1861	466	-1833	494	22	76	block/polished_diorite=sprout_trim	the SPROUT TOWER
+swap	brown_terracotta	-1861	466	-1833	494	22	76	block/brown_terracotta=sprout_beam	the SPROUT TOWER
+swap	oak_trapdoor,bamboo_trapdoor	-1861	466	-1833	494	22	76	block/oak_trapdoor=sprout_screen,block/bamboo_trapdoor=sprout_screen	the SPROUT TOWER
+swap	dark_oak_slab,dark_oak_stairs,dark_oak_planks,dark_oak_trapdoor	-1992	337	-1964	366	20	84	block/dark_oak_planks=tin_timber,block/dark_oak_trapdoor=tin_timber	the TIN TOWER
+swap	spruce_log	-1992	337	-1964	366	20	84	block/spruce_log=tin_pillar,block/spruce_log_top=tin_pillar	the TIN TOWER
+swap	calcite	-1992	337	-1964	366	20	84	block/calcite=tin_plaster	the TIN TOWER
+swap	crimson_planks,crimson_slab,crimson_stairs	-1992	337	-1964	366	20	84	block/crimson_planks=tin_roof	the TIN TOWER
+swap	nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	337	-1964	366	20	84	block/nether_bricks=tin_ridge	the TIN TOWER
+swap	dark_oak_fence,dark_oak_fence_gate	-1992	337	-1964	366	20	84	block/dark_oak_planks=tin_rail	the TIN TOWER
+swap	spruce_planks,spruce_slab	-1992	337	-1964	366	20	84	block/spruce_planks=tin_floor	the TIN TOWER
+swap	smooth_stone,smooth_stone_slab,cobblestone,stone_bricks,stone_brick_stairs,stone_brick_slab,stone_stairs,polished_andesite_stairs,polished_andesite,polished_andesite_slab	-1992	337	-1964	366	17	84	block/smooth_stone=tin_stone,block/smooth_stone_slab_side=tin_stone,block/cobblestone=tin_stone,block/stone_bricks=tin_stone,block/stone=tin_stone,block/polished_andesite=tin_stone	the TIN TOWER
+swap	polished_diorite_stairs,polished_diorite	-1992	337	-1964	366	20	84	block/polished_diorite=tin_trim	the TIN TOWER
+swap	brown_terracotta	-1992	337	-1964	366	20	84	block/brown_terracotta=tin_beam	the TIN TOWER
+swap	oak_trapdoor,bamboo_trapdoor	-1992	337	-1964	366	20	84	block/oak_trapdoor=tin_screen,block/bamboo_trapdoor=tin_screen	the TIN TOWER
 swap	dark_oak_slab,dark_oak_stairs,dark_oak_planks,dark_oak_trapdoor	-2079	344	-2051	372	20	50	block/dark_oak_planks=burned_timber,block/dark_oak_trapdoor=burned_timber	the BURNED TOWER
 swap	spruce_log	-2079	344	-2051	372	20	50	block/spruce_log=burned_pillar,block/spruce_log_top=burned_pillar	the BURNED TOWER
 swap	calcite	-2079	344	-2051	372	20	50	block/calcite=burned_plaster	the BURNED TOWER
@@ -4955,7 +4991,7 @@ swap	crimson_planks,crimson_slab,crimson_stairs	-2079	344	-2051	372	20	50	block/
 swap	nether_bricks,nether_brick_slab,nether_brick_stairs	-2079	344	-2051	372	20	50	block/nether_bricks=burned_ridge	the BURNED TOWER
 swap	dark_oak_fence,dark_oak_fence_gate	-2079	344	-2051	372	20	50	block/dark_oak_planks=burned_rail	the BURNED TOWER
 swap	spruce_planks,spruce_slab	-2079	344	-2051	372	20	50	block/spruce_planks=burned_floor	the BURNED TOWER
-swap	smooth_stone,smooth_stone_slab,cobblestone,stone_bricks,stone_brick_stairs,stone_stairs,polished_andesite_stairs,polished_andesite	-2079	344	-2051	372	17	50	block/smooth_stone=burned_stone,block/smooth_stone_slab_side=burned_stone,block/cobblestone=burned_stone,block/stone_bricks=burned_stone,block/stone=burned_stone,block/polished_andesite=burned_stone	the BURNED TOWER
+swap	smooth_stone,smooth_stone_slab,cobblestone,stone_bricks,stone_brick_stairs,stone_brick_slab,stone_stairs,polished_andesite_stairs,polished_andesite,polished_andesite_slab	-2079	344	-2051	372	17	50	block/smooth_stone=burned_stone,block/smooth_stone_slab_side=burned_stone,block/cobblestone=burned_stone,block/stone_bricks=burned_stone,block/stone=burned_stone,block/polished_andesite=burned_stone	the BURNED TOWER
 swap	polished_diorite_stairs,polished_diorite	-2079	344	-2051	372	20	50	block/polished_diorite=burned_trim	the BURNED TOWER
 swap	brown_terracotta	-2079	344	-2051	372	20	50	block/brown_terracotta=burned_beam	the BURNED TOWER
 swap	oak_trapdoor,bamboo_trapdoor	-2079	344	-2051	372	20	50	block/oak_trapdoor=burned_screen,block/bamboo_trapdoor=burned_screen	the BURNED TOWER
@@ -4974,24 +5010,24 @@ swap	stripped_dark_oak_wood,stripped_dark_oak_log	-2069	395	-2056	405	21	30	bloc
 panel	dark_oak_shelf	-2069	395	-2056	405	21	30	block/dark_oak_shelf=panel_planter_dark	an Ecruteak house
 swap	smooth_stone_slab	-2069	395	-2056	405	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	an Ecruteak house
 swap	composter	-2069	395	-2056	405	21	24	block/composter_side=bin_side,block/composter_top=bin_top,block/composter_bottom=bin_top	an Ecruteak house
-roof_ecru	mangrove_stairs	-2069	380	-2056	390	22	30	-	an Ecruteak house
-swap	mangrove_slab,mangrove_planks	-2069	380	-2056	390	22	30	block/mangrove_planks=roof_ecru_tiles	an Ecruteak house
+roof_ecru2	mangrove_stairs	-2069	380	-2056	390	22	30	-	an Ecruteak house
+swap	mangrove_slab,mangrove_planks	-2069	380	-2056	390	22	30	block/mangrove_planks=roof_ecru2_tiles	an Ecruteak house
 swap	white_concrete	-2069	380	-2056	390	22	28	block/white_concrete=ecru_plaster	an Ecruteak house
 swap	light_gray_concrete	-2069	380	-2056	390	21	23	block/light_gray_concrete=ecru_base	an Ecruteak house
 swap	stripped_dark_oak_wood,stripped_dark_oak_log	-2069	380	-2056	390	21	30	block/stripped_dark_oak_log=ecru_timber,block/stripped_dark_oak_log_top=ecru_timber	an Ecruteak house
 panel	dark_oak_shelf	-2069	380	-2056	390	21	30	block/dark_oak_shelf=panel_planter_dark	an Ecruteak house
 swap	smooth_stone_slab	-2069	380	-2056	390	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	an Ecruteak house
 swap	composter	-2069	380	-2056	390	21	24	block/composter_side=bin_side,block/composter_top=bin_top,block/composter_bottom=bin_top	an Ecruteak house
-roof_ecru	mangrove_stairs	-2053	380	-2040	390	22	30	-	an Ecruteak house
-swap	mangrove_slab,mangrove_planks	-2053	380	-2040	390	22	30	block/mangrove_planks=roof_ecru_tiles	an Ecruteak house
+roof_ecru3	mangrove_stairs	-2053	380	-2040	390	22	30	-	an Ecruteak house
+swap	mangrove_slab,mangrove_planks	-2053	380	-2040	390	22	30	block/mangrove_planks=roof_ecru3_tiles	an Ecruteak house
 swap	white_concrete	-2053	380	-2040	390	22	28	block/white_concrete=ecru_plaster	an Ecruteak house
 swap	light_gray_concrete	-2053	380	-2040	390	21	23	block/light_gray_concrete=ecru_base	an Ecruteak house
 swap	stripped_dark_oak_wood,stripped_dark_oak_log	-2053	380	-2040	390	21	30	block/stripped_dark_oak_log=ecru_timber,block/stripped_dark_oak_log_top=ecru_timber	an Ecruteak house
 panel	dark_oak_shelf	-2053	380	-2040	390	21	30	block/dark_oak_shelf=panel_planter_dark	an Ecruteak house
 swap	smooth_stone_slab	-2053	380	-2040	390	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	an Ecruteak house
 swap	composter	-2053	380	-2040	390	21	24	block/composter_side=bin_side,block/composter_top=bin_top,block/composter_bottom=bin_top	an Ecruteak house
-roof_ecru	mangrove_stairs	-2049	410	-2036	420	22	30	-	an Ecruteak house
-swap	mangrove_slab,mangrove_planks	-2049	410	-2036	420	22	30	block/mangrove_planks=roof_ecru_tiles	an Ecruteak house
+roof_ecru4	mangrove_stairs	-2049	410	-2036	420	22	30	-	an Ecruteak house
+swap	mangrove_slab,mangrove_planks	-2049	410	-2036	420	22	30	block/mangrove_planks=roof_ecru4_tiles	an Ecruteak house
 swap	white_concrete	-2049	410	-2036	420	22	28	block/white_concrete=ecru_plaster	an Ecruteak house
 swap	light_gray_concrete	-2049	410	-2036	420	21	23	block/light_gray_concrete=ecru_base	an Ecruteak house
 swap	stripped_dark_oak_wood,stripped_dark_oak_log	-2049	410	-2036	420	21	30	block/stripped_dark_oak_log=ecru_timber,block/stripped_dark_oak_log_top=ecru_timber	an Ecruteak house
@@ -5096,6 +5132,442 @@ swap	oak_log	-1606	416	-1596	426	19	31	block/oak_log=pergola,block/oak_log_top=p
 swap	spruce_trapdoor	-1606	416	-1596	426	19	31	block/spruce_trapdoor=bench_slat	the swing by Route 44
 swap	spruce_fence,spruce_fence_gate	-1606	416	-1596	426	19	31	block/spruce_planks=bench_frame	the swing by Route 44
 swap	waxed_copper_lantern,copper_lantern	-1606	416	-1596	426	19	31	block/copper_lantern=garden_light	the swing by Route 44
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-2125	799	-2115	818	14	18	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-2124	807	-2121	810	16	18	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-2122	800	-2119	803	16	18	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-2122	814	-2119	817	16	18	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-2121	803	-2118	806	16	18	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-2121	811	-2118	814	16	18	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-2119	807	-2116	810	16	18	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1871	732	-1865	740	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1871	732	-1862	743	14	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1871	751	-1856	774	14	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1871	764	-1865	770	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1869	760	-1858	767	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1868	769	-1863	774	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1867	738	-1862	743	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1867	742	-1858	751	14	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1867	743	-1862	748	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1865	751	-1858	763	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1864	742	-1858	751	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1861	754	-1856	759	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1396	792	-1384	809	14	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1339	782	-1319	795	14	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1225	779	-1192	798	14	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1208	790	-1200	795	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1203	790	-1192	798	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1078	779	-1059	791	14	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1078	785	-1064	791	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1066	779	-1059	787	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1051	784	-1002	796	14	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1044	784	-1027	793	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-1029	785	-1002	795	16	19	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-673	780	-658	802	28	33	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-668	767	-659	781	28	32	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-658	797	-622	805	28	32	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-622	796	-596	806	28	32	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-613	495	-605	512	28	33	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-611	744	-600	762	28	33	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-184	721	-166	731	25	30	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-122	455	-117	460	25	30	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-118	459	-106	465	25	30	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-112	544	-105	556	25	30	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-111	555	-103	566	25	30	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,granite_slab,granite_stairs,granite_wall	-111	567	-103	594	25	30	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	polished_diorite_slab,polished_diorite_stairs,polished_diorite,calcite	-810	917	-799	925	18	18	block/polished_diorite=white_step,block/calcite=white_step	the LAB's doorstep
+panel	mangrove_shelf	-810	924	-799	927	18	19	block/mangrove_shelf=panel_white	the LAB's planters
+sign	pale_oak_shelf,mangrove_shelf	-787	911	-784	913	17	20	-	the Gym's sign
+sign	pale_oak_shelf,mangrove_shelf	-774	911	-772	913	17	20	-	the Gym's sign
+sign	pale_oak_shelf,mangrove_shelf	-802	928	-799	930	17	20	-	the LAB's sign
+swap	brown_terracotta	-895	885	-756	958	16	18	block/brown_terracotta=path_kanto@4	Cinnabar Island
+steam	bone_block	-866	893	-815	955	-	-	steam	Cinnabar's volcano's steam
+swap	cobbled_deepslate,cobbled_deepslate_slab,cobbled_deepslate_stairs,cobbled_deepslate_wall	-884	888	-811	953	-	-	block/cobbled_deepslate=volc_rock@2	Cinnabar's volcano
+swap	deepslate	-884	888	-811	953	-	-	block/deepslate=volc_rock_dark@2,block/deepslate_top=volc_rock_dark_top@2	Cinnabar's volcano
+swap	basalt,polished_basalt	-884	888	-811	953	-	-	block/basalt_side=volc_basalt@2,block/basalt_top=volc_basalt_top@2,block/polished_basalt_side=volc_basalt@2,block/polished_basalt_top=volc_basalt_top@2	Cinnabar's volcano
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall	-884	888	-811	953	-	-	block/tuff=volc_tuff@2	Cinnabar's volcano
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-260	748	-255	752	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-260	748	-255	752	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-260	763	-255	767	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-260	763	-255	767	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-260	778	-255	782	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-260	778	-255	782	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-260	793	-255	797	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-260	793	-255	797	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-409	794	-405	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-409	794	-405	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-394	794	-390	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-394	794	-390	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-379	794	-375	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-379	794	-375	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-364	794	-360	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-364	794	-360	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-349	794	-345	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-349	794	-345	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-334	794	-330	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-334	794	-330	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-319	794	-315	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-319	794	-315	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-304	794	-300	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-304	794	-300	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-289	794	-285	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-289	794	-285	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-274	794	-270	799	29	38	block/red_sandstone=lamp_route_post,block/chiseled_red_sandstone=lamp_route_foot,block/red_sandstone_top=lamp_route_cap,block/orange_wool=lamp_route_cap,block/sea_lantern=lamp_globe_white!	a lamp on Routes 14 and 15
+glass	black_stained_glass_pane	-274	794	-270	799	29	38	block/black_stained_glass=glass_lamp	a lamp on Routes 14 and 15
+swap	lantern	-297	781	-295	783	30	32	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-265	702	-263	704	31	33	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-227	702	-225	704	31	33	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-202	702	-200	704	31	33	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-283	706	-281	708	31	33	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-241	706	-239	708	31	33	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-214	706	-212	708	31	33	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-273	710	-271	712	31	33	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-252	710	-250	712	31	33	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-235	710	-233	712	31	33	block/lantern=lantern_white	a lantern on Route 13
+swap	lantern	-186	710	-184	712	31	33	block/lantern=lantern_white	a lantern on Route 13
+sign	pale_oak_shelf	-247	259	-244	261	33	36	-	Route 9's sign
+sign	pale_oak_shelf	-136	361	-133	363	34	36	-	Route 10's sign
+swap	andesite_slab,stripped_oak_wood,oak_shelf,pale_oak_fence	-360	174	-346	179	33	36	block/andesite=step_cer,block/stripped_oak_log=bridge_gold_beam,block/oak_shelf=bridge_gold_rail,block/pale_oak_planks=white_fence	Nugget Bridge's north end
+swap	quartz_bricks,calcite,diorite,polished_diorite,chiseled_quartz_block,white_concrete,white_terracotta,light_gray_concrete,smooth_quartz,quartz_block,quartz_slab,smooth_quartz_slab,smooth_quartz_stairs	-806	274	-797	280	29	30	block/quartz_bricks=museum_trim,block/calcite=museum_trim,block/diorite=museum_trim,block/polished_diorite=museum_trim,block/chiseled_quartz_block=museum_trim,block/chiseled_quartz_block_top=museum_trim,block/white_concrete=museum_trim,block/white_terracotta=museum_trim,block/light_gray_concrete=museum_trim,block/quartz_block_bottom=museum_trim,block/quartz_block_top=museum_trim,block/quartz_block_side=museum_trim	the Museum's way in
+panel	spruce_shelf	-804	276	-801	278	31	33	block/spruce_shelf=museum_trim	the Museum's porch
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,granite,granite_stairs,granite_slab,mud_brick_slab,dripstone_block,cobblestone_stairs,andesite_wall	-923	267	-918	271	25	30	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2,block/granite=boulder_stone_top|boulder_stone@2,block/mud_bricks=boulder_stone_top|boulder_stone@2,block/dripstone_block=boulder_stone_top|boulder_stone@2	a rock by Victory Road
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,granite,granite_stairs,granite_slab,mud_brick_slab,dripstone_block,cobblestone_stairs,andesite_wall	-933	275	-928	280	25	30	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2,block/granite=boulder_stone_top|boulder_stone@2,block/mud_bricks=boulder_stone_top|boulder_stone@2,block/dripstone_block=boulder_stone_top|boulder_stone@2	a rock by Victory Road
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,granite,granite_stairs,granite_slab,mud_brick_slab,dripstone_block,cobblestone_stairs,andesite_wall	-919	283	-909	294	25	30	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2,block/granite=boulder_stone_top|boulder_stone@2,block/mud_bricks=boulder_stone_top|boulder_stone@2,block/dripstone_block=boulder_stone_top|boulder_stone@2	a rock by Victory Road
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,granite,granite_stairs,granite_slab,mud_brick_slab,dripstone_block,cobblestone_stairs,andesite_wall	-898	284	-891	290	25	30	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2,block/granite=boulder_stone_top|boulder_stone@2,block/mud_bricks=boulder_stone_top|boulder_stone@2,block/dripstone_block=boulder_stone_top|boulder_stone@2	a rock by Victory Road
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,granite,granite_stairs,granite_slab,mud_brick_slab,dripstone_block,cobblestone_stairs,andesite_wall	-905	298	-894	306	25	30	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2,block/granite=boulder_stone_top|boulder_stone@2,block/mud_bricks=boulder_stone_top|boulder_stone@2,block/dripstone_block=boulder_stone_top|boulder_stone@2	a rock by Victory Road
+sign	mangrove_shelf,pale_oak_shelf	-931	267	-928	269	25	28	-	Victory Road's sign
+swap	waxed_weathered_copper_trapdoor,weathered_copper_trapdoor	-920	183	-905	208	26	35	block/weathered_copper_trapdoor=metal_teal_flat	the PLATEAU's stairs' pillars
+swap	waxed_copper_trapdoor,copper_trapdoor	-922	165	-903	170	36	41	block/copper_trapdoor=plateau_sill	the PLATEAU's window sills
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1496	392	-1481	410	32	34	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1523	434	-1511	449	32	34	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1522	476	-1508	491	30	32	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1518	511	-1504	526	28	30	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1517	551	-1503	566	27	29	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1515	610	-1501	625	25	27	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1519	661	-1501	676	23	25	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-1519	661	-1517	663	22	32	block/tuff=lamp_white_post,block/polished_tuff=lamp_white_post,block/chiseled_tuff_bricks=lamp_white_post,block/chiseled_tuff_bricks_top=lamp_white_post,block/gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a lamp up Route 45
+glass	black_stained_glass_pane	-1519	661	-1517	663	22	32	block/black_stained_glass=glass_lamp	a lamp up Route 45
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-1506	579	-1504	581	26	36	block/tuff=lamp_white_post,block/polished_tuff=lamp_white_post,block/chiseled_tuff_bricks=lamp_white_post,block/chiseled_tuff_bricks_top=lamp_white_post,block/gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a lamp up Route 45
+glass	black_stained_glass_pane	-1506	579	-1504	581	26	36	block/black_stained_glass=glass_lamp	a lamp up Route 45
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-1507	513	-1505	515	27	37	block/tuff=lamp_white_post,block/polished_tuff=lamp_white_post,block/chiseled_tuff_bricks=lamp_white_post,block/chiseled_tuff_bricks_top=lamp_white_post,block/gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a lamp up Route 45
+glass	black_stained_glass_pane	-1507	513	-1505	515	27	37	block/black_stained_glass=glass_lamp	a lamp up Route 45
+swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-1522	428	-1520	430	31	41	block/tuff=lamp_white_post,block/polished_tuff=lamp_white_post,block/chiseled_tuff_bricks=lamp_white_post,block/chiseled_tuff_bricks_top=lamp_white_post,block/gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a lamp up Route 45
+glass	black_stained_glass_pane	-1522	428	-1520	430	31	41	block/black_stained_glass=glass_lamp	a lamp up Route 45
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-1472	355	-1468	359	30	39	block/red_sandstone=lamp_bt_post,block/chiseled_red_sandstone=lamp_bt_foot,block/red_sandstone_top=lamp_bt_cap,block/orange_wool=lamp_bt_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-1472	355	-1468	359	30	39	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-1496	380	-1492	384	30	39	block/red_sandstone=lamp_bt_post,block/chiseled_red_sandstone=lamp_bt_foot,block/red_sandstone_top=lamp_bt_cap,block/orange_wool=lamp_bt_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-1496	380	-1492	384	30	39	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-1428	380	-1424	384	30	39	block/red_sandstone=lamp_bt_post,block/chiseled_red_sandstone=lamp_bt_foot,block/red_sandstone_top=lamp_bt_cap,block/orange_wool=lamp_bt_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-1428	380	-1424	384	30	39	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2135	451	-2131	455	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2135	451	-2131	455	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2113	451	-2109	455	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2113	451	-2109	455	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2153	469	-2149	473	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2153	469	-2149	473	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2095	469	-2091	473	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2095	469	-2091	473	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2153	491	-2149	495	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2153	491	-2149	495	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2095	491	-2091	495	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2095	491	-2091	495	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2135	509	-2131	513	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2135	509	-2131	513	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2113	509	-2109	513	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2113	509	-2109	513	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,cobblestone_stairs,andesite_wall	-1427	338	-1420	346	28	36	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	the rocks by the Ice Path
+swap	bamboo_trapdoor	-1835	540	-1832	542	22	25	block/bamboo_trapdoor=sprout_screen	Earl's Academy's doors
+swap	cauldron,hopper,blackstone_wall,anvil,chipped_anvil,damaged_anvil	-1856	494	-1852	496	21	26	block/cauldron_side=lantern_stone,block/cauldron_top=lantern_stone_top,block/cauldron_bottom=lantern_stone,block/cauldron_inner=lantern_stone,block/hopper_outside=lantern_stone,block/hopper_inside=lantern_stone,block/hopper_top=lantern_stone_top,block/blackstone=lantern_stone,block/blackstone_top=lantern_stone_top,block/anvil=lantern_stone_top,block/anvil_top=lantern_stone_top	a stone lantern by the SPROUT TOWER
+swap	chiseled_nether_bricks	-1856	494	-1852	496	21	26	block/chiseled_nether_bricks=lantern_stone_window	a stone lantern by the SPROUT TOWER
+swap	cauldron,hopper,blackstone_wall,anvil,chipped_anvil,damaged_anvil	-1842	494	-1838	496	21	26	block/cauldron_side=lantern_stone,block/cauldron_top=lantern_stone_top,block/cauldron_bottom=lantern_stone,block/cauldron_inner=lantern_stone,block/hopper_outside=lantern_stone,block/hopper_inside=lantern_stone,block/hopper_top=lantern_stone_top,block/blackstone=lantern_stone,block/blackstone_top=lantern_stone_top,block/anvil=lantern_stone_top,block/anvil_top=lantern_stone_top	a stone lantern by the SPROUT TOWER
+swap	chiseled_nether_bricks	-1842	494	-1838	496	21	26	block/chiseled_nether_bricks=lantern_stone_window	a stone lantern by the SPROUT TOWER
+swap	polished_deepslate_wall	-1861	466	-1833	494	30	76	block/polished_deepslate=spire_metal	the SPROUT TOWER
+swap	gold_block	-1861	466	-1833	494	52	76	block/gold_block=spire_gold	the SPROUT TOWER
+swap	lightning_rod,exposed_lightning_rod,weathered_lightning_rod,oxidized_lightning_rod,waxed_lightning_rod,waxed_oxidized_lightning_rod	-1861	466	-1833	494	52	76	block/lightning_rod=spire_gold,block/oxidized_lightning_rod=spire_gold,block/exposed_lightning_rod=spire_gold,block/weathered_lightning_rod=spire_gold	the SPROUT TOWER
+swap	dark_oak_button	-1861	466	-1833	494	22	76	block/dark_oak_planks=sprout_timber	the SPROUT TOWER
+swap	polished_deepslate_wall	-1992	337	-1964	366	28	84	block/polished_deepslate=spire_metal	the TIN TOWER
+swap	gold_block	-1992	337	-1964	366	50	84	block/gold_block=spire_gold	the TIN TOWER
+swap	lightning_rod,exposed_lightning_rod,weathered_lightning_rod,oxidized_lightning_rod,waxed_lightning_rod,waxed_oxidized_lightning_rod	-1992	337	-1964	366	50	84	block/lightning_rod=spire_gold,block/oxidized_lightning_rod=spire_gold,block/exposed_lightning_rod=spire_gold,block/weathered_lightning_rod=spire_gold	the TIN TOWER
+swap	dark_oak_button	-1992	337	-1964	366	20	84	block/dark_oak_planks=tin_timber	the TIN TOWER
+swap	sea_lantern	-1775	228	-1773	230	28	30	block/sea_lantern=gy_teeth	the GYARADOS's tooth
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-1805	245	-1801	249	22	32	block/diorite=lamp_north_post,block/polished_diorite=lamp_north_foot,block/light_gray_wool=lamp_north_cap,block/sea_lantern=lamp_globe_warm!	a lamp by the Lake of Rage
+glass	black_stained_glass_pane	-1805	245	-1801	249	22	32	block/black_stained_glass=glass_lamp	a lamp by the Lake of Rage
+swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-1750	248	-1746	252	22	32	block/diorite=lamp_north_post,block/polished_diorite=lamp_north_foot,block/light_gray_wool=lamp_north_cap,block/sea_lantern=lamp_globe_warm!	a lamp by the Lake of Rage
+glass	black_stained_glass_pane	-1750	248	-1746	252	22	32	block/black_stained_glass=glass_lamp	a lamp by the Lake of Rage
+swap	light_gray_concrete	-2090	336	-1966	432	20	20	block/light_gray_concrete=ecru_kerb	Ecruteak City
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2090	336	-1966	432	20	23	block/polished_diorite=ecru_trim	Ecruteak City
+swap	stone,stone_stairs,stone_slab	-2046	419	-2017	440	21	24	block/stone=ecru_base	Ecruteak's way in from Route 37
+swap	mossy_stone_brick_wall,mossy_stone_bricks,mossy_stone_brick_slab,stone_brick_wall	-2046	419	-2017	440	21	25	block/mossy_stone_bricks=ecru_wall_stone,block/stone_bricks=ecru_wall_stone	Ecruteak's way in from Route 37
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2031	393	-2014	405	21	30	block/polished_diorite=dance_trim	the DANCE THEATRE
+swap	quartz_block,quartz_stairs,quartz_slab	-2031	393	-2014	405	21	30	block/quartz_block_side=dance_wall,block/quartz_block_top=dance_trim,block/quartz_block_bottom=dance_trim	the DANCE THEATRE
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2550	734	-2550	734	17	25	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2540	753	-2540	753	17	25	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2531	734	-2531	734	17	25	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2521	753	-2521	753	17	25	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2320	543	-2320	543	18	26	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2301	543	-2301	543	18	26	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2287	522	-2287	522	18	26	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2286	561	-2286	561	18	26	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2268	522	-2268	522	18	26	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2267	561	-2267	561	18	26	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2127	512	-2127	512	19	27	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2117	512	-2117	512	19	27	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2037	404	-2037	404	20	28	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	diorite_wall,polished_tuff_wall,polished_diorite	-2029	404	-2029	404	20	28	block/diorite=banner_pole,block/polished_tuff=banner_pole,block/polished_diorite=banner_foot	a banner's pole
+swap	resin_bricks,resin_brick_slab,resin_brick_stairs	-2130	541	-2085	557	19	33	block/resin_bricks=npg_roof@2	the NATIONAL PARK's gate
+swap	resin_brick_wall	-2130	541	-2085	557	19	33	block/resin_bricks=npg_ridge	the NATIONAL PARK's gate
+swap	light_gray_concrete	-2130	541	-2085	557	19	33	block/light_gray_concrete=npg_wall	the NATIONAL PARK's gate
+swap	stripped_oak_log,stripped_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_jungle_log,stripped_jungle_wood	-2130	541	-2085	557	19	33	block/stripped_oak_log=npg_timber,block/stripped_oak_log_top=npg_timber,block/stripped_spruce_log=npg_timber,block/stripped_spruce_log_top=npg_timber,block/stripped_jungle_log=npg_timber,block/stripped_jungle_log_top=npg_timber	the NATIONAL PARK's gate
+swap	birch_stairs,birch_slab,birch_planks	-2130	541	-2085	557	19	33	block/birch_planks=npg_siding	the NATIONAL PARK's gate
+swap	andesite,andesite_wall,andesite_slab,andesite_stairs,polished_andesite,polished_andesite_slab,polished_andesite_stairs,stone	-2130	541	-2085	557	19	33	block/andesite=npg_stone,block/polished_andesite=npg_stone,block/stone=npg_stone	the NATIONAL PARK's gate
+swap	black_wool	-2130	541	-2085	557	19	33	block/black_wool=npg_dark	the NATIONAL PARK's gate
+swap	deepslate_brick_wall	-2130	541	-2085	557	19	33	block/deepslate_bricks=station_mullion	the NATIONAL PARK's gate
+swap	cyan_terracotta,stripped_warped_stem,stripped_warped_hyphae	-2130	541	-2085	557	19	33	block/cyan_terracotta=npg_trim,block/stripped_warped_stem=npg_trim,block/stripped_warped_stem_top=npg_trim	the NATIONAL PARK's gate
+swap	polished_deepslate_slab	-2130	541	-2085	557	19	33	block/polished_deepslate=npg_ridge	the NATIONAL PARK's gate
+swap	end_rod	-2130	541	-2085	557	19	33	block/end_rod=rod_clean	the NATIONAL PARK's gate
+swap	potted_jungle_sapling	-262	785	-262	785	31	31	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_mangrove_propagule	-261	785	-261	785	31	31	block/flower_pot=pot_slate	a plant pot
+swap	potted_torchflower	-260	785	-260	785	31	31	block/flower_pot=pot_sage	a plant pot
+swap	potted_flowering_azalea_bush	-262	786	-262	786	31	31	block/flower_pot=pot_cream	a plant pot
+swap	potted_cherry_sapling	-260	786	-260	786	31	31	block/flower_pot=pot_slate	a plant pot
+swap	potted_oak_sapling	-262	787	-262	787	31	31	block/flower_pot=pot_sage	a plant pot
+swap	potted_birch_sapling	-260	787	-260	787	31	31	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_cherry_sapling	-262	788	-262	788	31	31	block/flower_pot=pot_slate	a plant pot
+swap	potted_spruce_sapling	-260	788	-260	788	31	31	block/flower_pot=pot_cream	a plant pot
+swap	potted_torchflower	-262	789	-262	789	31	31	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_jungle_sapling	-260	789	-260	789	31	31	block/flower_pot=pot_sage	a plant pot
+swap	potted_birch_sapling	-262	790	-262	790	31	31	block/flower_pot=pot_cream	a plant pot
+swap	potted_mangrove_propagule	-260	790	-260	790	31	31	block/flower_pot=pot_slate	a plant pot
+swap	potted_oak_sapling	-261	791	-261	791	31	31	block/flower_pot=pot_cream	a plant pot
+swap	potted_azure_bluet	-260	791	-260	791	31	31	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_birch_sapling	-261	786	-261	786	32	32	block/flower_pot=pot_slate	a plant pot
+swap	potted_jungle_sapling	-261	788	-261	788	32	32	block/flower_pot=pot_cream	a plant pot
+swap	potted_spruce_sapling	-261	789	-261	789	32	32	block/flower_pot=pot_sage	a plant pot
+swap	potted_flowering_azalea_bush	-261	790	-261	790	32	32	block/flower_pot=pot_slate	a plant pot
+swap	potted_cherry_sapling	-542	421	-542	421	34	34	block/flower_pot=pot_cream	a plant pot
+swap	potted_azalea_bush	-538	423	-538	423	34	34	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-545	424	-545	424	34	34	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-544	427	-544	427	34	34	block/flower_pot=pot_cream	a plant pot
+swap	potted_cherry_sapling	-538	427	-538	427	34	34	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-540	429	-540	429	34	34	block/flower_pot=pot_slate	a plant pot
+swap	potted_dead_bush	-421	631	-421	631	47	47	block/flower_pot=pot_cream	a plant pot
+swap	potted_dead_bush	-421	649	-421	649	47	47	block/flower_pot=pot_slate	a plant pot
+swap	potted_azure_bluet	-2539	736	-2539	736	19	19	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_oak_sapling	-2538	736	-2538	736	19	19	block/flower_pot=pot_slate	a plant pot
+swap	potted_mangrove_propagule	-2539	737	-2539	737	19	19	block/flower_pot=pot_cream	a plant pot
+swap	potted_birch_sapling	-2537	737	-2537	737	19	19	block/flower_pot=pot_slate	a plant pot
+swap	potted_jungle_sapling	-2539	738	-2539	738	19	19	block/flower_pot=pot_sage	a plant pot
+swap	potted_torchflower	-2537	738	-2537	738	19	19	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_spruce_sapling	-2539	739	-2539	739	19	19	block/flower_pot=pot_slate	a plant pot
+swap	potted_cherry_sapling	-2537	739	-2537	739	19	19	block/flower_pot=pot_cream	a plant pot
+swap	potted_birch_sapling	-2539	740	-2539	740	19	19	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_oak_sapling	-2537	740	-2537	740	19	19	block/flower_pot=pot_sage	a plant pot
+swap	potted_cherry_sapling	-2539	741	-2539	741	19	19	block/flower_pot=pot_cream	a plant pot
+swap	potted_flowering_azalea_bush	-2537	741	-2537	741	19	19	block/flower_pot=pot_slate	a plant pot
+swap	potted_torchflower	-2539	742	-2539	742	19	19	block/flower_pot=pot_sage	a plant pot
+swap	potted_mangrove_propagule	-2538	742	-2538	742	19	19	block/flower_pot=pot_cream	a plant pot
+swap	potted_jungle_sapling	-2537	742	-2537	742	19	19	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_azure_bluet	-2278	439	-2278	439	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_oak_sapling	-2277	439	-2277	439	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_mangrove_propagule	-2278	440	-2278	440	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_birch_sapling	-2276	440	-2276	440	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_jungle_sapling	-2278	441	-2278	441	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_torchflower	-2276	441	-2276	441	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_spruce_sapling	-2278	442	-2278	442	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_cherry_sapling	-2276	442	-2276	442	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_birch_sapling	-2278	443	-2278	443	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_oak_sapling	-2276	443	-2276	443	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_cherry_sapling	-2278	444	-2278	444	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_flowering_azalea_bush	-2276	444	-2276	444	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_torchflower	-2278	445	-2278	445	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_mangrove_propagule	-2277	445	-2277	445	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_jungle_sapling	-2276	445	-2276	445	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_birch_sapling	-2280	546	-2280	546	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_torchflower	-2279	546	-2279	546	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_cherry_sapling	-2278	546	-2278	546	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_oak_sapling	-2277	546	-2277	546	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-2276	546	-2276	546	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_jungle_sapling	-2275	546	-2275	546	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_oak_sapling	-2281	547	-2281	547	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_mangrove_propagule	-2275	547	-2275	547	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_azure_bluet	-2281	548	-2281	548	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_mangrove_propagule	-2280	548	-2280	548	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_jungle_sapling	-2279	548	-2279	548	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_spruce_sapling	-2278	548	-2278	548	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_birch_sapling	-2277	548	-2277	548	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_cherry_sapling	-2276	548	-2276	548	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_torchflower	-2275	548	-2275	548	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_jungle_sapling	-2319	586	-2319	586	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_mangrove_propagule	-2318	586	-2318	586	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_torchflower	-2317	586	-2317	586	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-2319	587	-2319	587	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_cherry_sapling	-2317	587	-2317	587	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_oak_sapling	-2319	588	-2319	588	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_birch_sapling	-2317	588	-2317	588	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_cherry_sapling	-2319	589	-2319	589	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_spruce_sapling	-2317	589	-2317	589	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_torchflower	-2319	590	-2319	590	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_jungle_sapling	-2317	590	-2317	590	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_birch_sapling	-2319	591	-2319	591	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_mangrove_propagule	-2317	591	-2317	591	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_oak_sapling	-2318	592	-2318	592	20	20	block/flower_pot=pot_sage	a plant pot
+swap	potted_azure_bluet	-2317	592	-2317	592	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_flowering_azalea_bush	-2538	737	-2538	737	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_spruce_sapling	-2538	738	-2538	738	20	20	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_jungle_sapling	-2538	739	-2538	739	20	20	block/flower_pot=pot_cream	a plant pot
+swap	potted_birch_sapling	-2538	741	-2538	741	20	20	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-2277	440	-2277	440	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_spruce_sapling	-2277	441	-2277	441	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_jungle_sapling	-2277	442	-2277	442	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_birch_sapling	-2277	444	-2277	444	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_azure_bluet	-2095	513	-2095	513	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_oak_sapling	-2094	513	-2094	513	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_mangrove_propagule	-2095	514	-2095	514	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_birch_sapling	-2093	514	-2093	514	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_jungle_sapling	-2095	515	-2095	515	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_torchflower	-2093	515	-2093	515	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_spruce_sapling	-2095	516	-2095	516	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_cherry_sapling	-2093	516	-2093	516	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_birch_sapling	-2095	517	-2095	517	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_oak_sapling	-2093	517	-2093	517	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_cherry_sapling	-2095	518	-2095	518	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_flowering_azalea_bush	-2093	518	-2093	518	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_torchflower	-2095	519	-2095	519	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_mangrove_propagule	-2094	519	-2094	519	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_jungle_sapling	-2093	519	-2093	519	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-2280	547	-2280	547	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_spruce_sapling	-2279	547	-2279	547	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_jungle_sapling	-2278	547	-2278	547	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_birch_sapling	-2276	547	-2276	547	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_birch_sapling	-2318	587	-2318	587	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_jungle_sapling	-2318	589	-2318	589	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_spruce_sapling	-2318	590	-2318	590	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-2318	591	-2318	591	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_cherry_sapling	-2201	700	-2201	700	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_cherry_sapling	-2186	700	-2186	700	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_azalea_bush	-2197	702	-2197	702	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_azalea_bush	-2182	702	-2182	702	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-2204	703	-2204	703	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_flowering_azalea_bush	-2189	703	-2189	703	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-2203	706	-2203	706	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_cherry_sapling	-2197	706	-2197	706	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_flowering_azalea_bush	-2188	706	-2188	706	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_cherry_sapling	-2182	706	-2182	706	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-2199	708	-2199	708	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_flowering_azalea_bush	-2184	708	-2184	708	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_jungle_sapling	-2036	875	-2036	875	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_mangrove_propagule	-2035	875	-2035	875	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_torchflower	-2034	875	-2034	875	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_flowering_azalea_bush	-2036	876	-2036	876	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_cherry_sapling	-2034	876	-2034	876	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_oak_sapling	-2036	877	-2036	877	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_birch_sapling	-2034	877	-2034	877	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_cherry_sapling	-2036	878	-2036	878	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_spruce_sapling	-2034	878	-2034	878	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_torchflower	-2036	879	-2036	879	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_jungle_sapling	-2034	879	-2034	879	21	21	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_birch_sapling	-2036	880	-2036	880	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_mangrove_propagule	-2034	880	-2034	880	21	21	block/flower_pot=pot_cream	a plant pot
+swap	potted_oak_sapling	-2035	881	-2035	881	21	21	block/flower_pot=pot_slate	a plant pot
+swap	potted_azure_bluet	-2034	881	-2034	881	21	21	block/flower_pot=pot_sage	a plant pot
+swap	potted_torchflower	-2046	398	-2046	398	22	22	block/flower_pot=pot_sage	a plant pot
+swap	potted_cherry_sapling	-2045	398	-2045	398	22	22	block/flower_pot=pot_cream	a plant pot
+swap	potted_birch_sapling	-2044	398	-2044	398	22	22	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_spruce_sapling	-2043	398	-2043	398	22	22	block/flower_pot=pot_slate	a plant pot
+swap	potted_jungle_sapling	-2042	398	-2042	398	22	22	block/flower_pot=pot_sage	a plant pot
+swap	potted_mangrove_propagule	-2041	398	-2041	398	22	22	block/flower_pot=pot_cream	a plant pot
+swap	potted_azure_bluet	-2040	398	-2040	398	22	22	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_mangrove_propagule	-2046	399	-2046	399	22	22	block/flower_pot=pot_slate	a plant pot
+swap	potted_oak_sapling	-2040	399	-2040	399	22	22	block/flower_pot=pot_cream	a plant pot
+swap	potted_jungle_sapling	-2046	400	-2046	400	22	22	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_flowering_azalea_bush	-2045	400	-2045	400	22	22	block/flower_pot=pot_slate	a plant pot
+swap	potted_oak_sapling	-2044	400	-2044	400	22	22	block/flower_pot=pot_sage	a plant pot
+swap	potted_cherry_sapling	-2043	400	-2043	400	22	22	block/flower_pot=pot_cream	a plant pot
+swap	potted_torchflower	-2042	400	-2042	400	22	22	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_birch_sapling	-2041	400	-2041	400	22	22	block/flower_pot=pot_slate	a plant pot
+swap	potted_flowering_azalea_bush	-2094	514	-2094	514	22	22	block/flower_pot=pot_sage	a plant pot
+swap	potted_spruce_sapling	-2094	515	-2094	515	22	22	block/flower_pot=pot_slate	a plant pot
+swap	potted_jungle_sapling	-2094	516	-2094	516	22	22	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_birch_sapling	-2094	518	-2094	518	22	22	block/flower_pot=pot_sage	a plant pot
+swap	potted_birch_sapling	-2035	876	-2035	876	22	22	block/flower_pot=pot_cream	a plant pot
+swap	potted_jungle_sapling	-2035	878	-2035	878	22	22	block/flower_pot=pot_slate	a plant pot
+swap	potted_spruce_sapling	-2035	879	-2035	879	22	22	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_flowering_azalea_bush	-2035	880	-2035	880	22	22	block/flower_pot=pot_cream	a plant pot
+swap	potted_birch_sapling	-2045	399	-2045	399	23	23	block/flower_pot=pot_cream	a plant pot
+swap	potted_jungle_sapling	-2043	399	-2043	399	23	23	block/flower_pot=pot_slate	a plant pot
+swap	potted_spruce_sapling	-2042	399	-2042	399	23	23	block/flower_pot=pot_sage	a plant pot
+swap	potted_flowering_azalea_bush	-2041	399	-2041	399	23	23	block/flower_pot=pot_cream	a plant pot
+swap	potted_birch_sapling	-1689	414	-1689	414	23	23	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_torchflower	-1688	414	-1688	414	23	23	block/flower_pot=pot_slate	a plant pot
+swap	potted_cherry_sapling	-1687	414	-1687	414	23	23	block/flower_pot=pot_sage	a plant pot
+swap	potted_oak_sapling	-1686	414	-1686	414	23	23	block/flower_pot=pot_cream	a plant pot
+swap	potted_flowering_azalea_bush	-1685	414	-1685	414	23	23	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_jungle_sapling	-1684	414	-1684	414	23	23	block/flower_pot=pot_slate	a plant pot
+swap	potted_oak_sapling	-1690	415	-1690	415	23	23	block/flower_pot=pot_sage	a plant pot
+swap	potted_mangrove_propagule	-1684	415	-1684	415	23	23	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_azure_bluet	-1690	416	-1690	416	23	23	block/flower_pot=pot_slate	a plant pot
+swap	potted_mangrove_propagule	-1689	416	-1689	416	23	23	block/flower_pot=pot_sage	a plant pot
+swap	potted_jungle_sapling	-1688	416	-1688	416	23	23	block/flower_pot=pot_cream	a plant pot
+swap	potted_spruce_sapling	-1687	416	-1687	416	23	23	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_birch_sapling	-1686	416	-1686	416	23	23	block/flower_pot=pot_slate	a plant pot
+swap	potted_cherry_sapling	-1685	416	-1685	416	23	23	block/flower_pot=pot_sage	a plant pot
+swap	potted_torchflower	-1684	416	-1684	416	23	23	block/flower_pot=pot_cream	a plant pot
+swap	potted_flowering_azalea_bush	-1689	415	-1689	415	24	24	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_spruce_sapling	-1688	415	-1688	415	24	24	block/flower_pot=pot_slate	a plant pot
+swap	potted_jungle_sapling	-1687	415	-1687	415	24	24	block/flower_pot=pot_sage	a plant pot
+swap	potted_birch_sapling	-1685	415	-1685	415	24	24	block/flower_pot=pot_terracotta	a plant pot
+swap	potted_dead_bush	-2293	700	-2293	700	35	35	block/flower_pot=pot_sage	a plant pot
+swap	potted_dead_bush	-2275	700	-2275	700	35	35	block/flower_pot=pot_terracotta	a plant pot
+swap	white_terracotta	-2214	616	-2041	774	20	45	block/white_terracotta=gold_wall	Goldenrod City
+panel	oak_shelf	-2130	677	-2112	695	22	27	block/oak_shelf=band_shelf	the station's band under its top windows
+swap	cobblestone,cracked_stone_bricks,stone_bricks,stone,dirt_path,coarse_dirt,gravel,andesite,mossy_cobblestone	-2146	655	-2113	666	19	19	block/cobblestone=alley_floor@2,block/cracked_stone_bricks=alley_floor@2,block/stone_bricks=alley_floor@2,block/stone=alley_floor@2,block/dirt_path_top=alley_floor@2,block/dirt_path_side=alley_floor@2,block/coarse_dirt=alley_floor@2,block/gravel=alley_floor@2,block/andesite=alley_floor@2,block/mossy_cobblestone=alley_floor@2	a Goldenrod alley
+swap	barrel	-2146	655	-2113	666	20	26	block/barrel_side=alley_drum,block/barrel_top=alley_drum_top,block/barrel_top_open=alley_drum_top,block/barrel_bottom=alley_drum_top	a Goldenrod alley
+swap	composter	-2146	655	-2113	666	20	26	block/composter_side=alley_bin,block/composter_top=alley_bin_top,block/composter_bottom=alley_bin_top	a Goldenrod alley
+swap	end_rod	-2146	655	-2113	666	20	30	block/end_rod=alley_pipe	a Goldenrod alley
+swap	pale_oak_fence,oak_fence,spruce_fence,dark_oak_fence	-2146	655	-2113	666	20	26	block/pale_oak_planks=alley_fence,block/oak_planks=alley_fence,block/spruce_planks=alley_fence,block/dark_oak_planks=alley_fence	a Goldenrod alley
+swap	iron_chain	-2146	655	-2113	666	20	30	block/iron_chain=chain_steel	a Goldenrod alley
+swap	stone_button	-2146	655	-2113	666	20	26	block/stone=bolt	a Goldenrod alley
+swap	cobblestone,cracked_stone_bricks,stone_bricks,stone,dirt_path,coarse_dirt,gravel,andesite,mossy_cobblestone	-2096	655	-2069	658	19	19	block/cobblestone=alley_floor@2,block/cracked_stone_bricks=alley_floor@2,block/stone_bricks=alley_floor@2,block/stone=alley_floor@2,block/dirt_path_top=alley_floor@2,block/dirt_path_side=alley_floor@2,block/coarse_dirt=alley_floor@2,block/gravel=alley_floor@2,block/andesite=alley_floor@2,block/mossy_cobblestone=alley_floor@2	a Goldenrod alley
+swap	barrel	-2096	655	-2069	658	20	26	block/barrel_side=alley_drum,block/barrel_top=alley_drum_top,block/barrel_top_open=alley_drum_top,block/barrel_bottom=alley_drum_top	a Goldenrod alley
+swap	composter	-2096	655	-2069	658	20	26	block/composter_side=alley_bin,block/composter_top=alley_bin_top,block/composter_bottom=alley_bin_top	a Goldenrod alley
+swap	end_rod	-2096	655	-2069	658	20	30	block/end_rod=alley_pipe	a Goldenrod alley
+swap	pale_oak_fence,oak_fence,spruce_fence,dark_oak_fence	-2096	655	-2069	658	20	26	block/pale_oak_planks=alley_fence,block/oak_planks=alley_fence,block/spruce_planks=alley_fence,block/dark_oak_planks=alley_fence	a Goldenrod alley
+swap	iron_chain	-2096	655	-2069	658	20	30	block/iron_chain=chain_steel	a Goldenrod alley
+swap	stone_button	-2096	655	-2069	658	20	26	block/stone=bolt	a Goldenrod alley
+swap	cobblestone,cracked_stone_bricks,stone_bricks,stone,dirt_path,coarse_dirt,gravel,andesite,mossy_cobblestone	-2065	690	-2055	696	19	19	block/cobblestone=alley_floor@2,block/cracked_stone_bricks=alley_floor@2,block/stone_bricks=alley_floor@2,block/stone=alley_floor@2,block/dirt_path_top=alley_floor@2,block/dirt_path_side=alley_floor@2,block/coarse_dirt=alley_floor@2,block/gravel=alley_floor@2,block/andesite=alley_floor@2,block/mossy_cobblestone=alley_floor@2	a Goldenrod alley
+swap	barrel	-2065	690	-2055	696	20	26	block/barrel_side=alley_drum,block/barrel_top=alley_drum_top,block/barrel_top_open=alley_drum_top,block/barrel_bottom=alley_drum_top	a Goldenrod alley
+swap	composter	-2065	690	-2055	696	20	26	block/composter_side=alley_bin,block/composter_top=alley_bin_top,block/composter_bottom=alley_bin_top	a Goldenrod alley
+swap	end_rod	-2065	690	-2055	696	20	30	block/end_rod=alley_pipe	a Goldenrod alley
+swap	pale_oak_fence,oak_fence,spruce_fence,dark_oak_fence	-2065	690	-2055	696	20	26	block/pale_oak_planks=alley_fence,block/oak_planks=alley_fence,block/spruce_planks=alley_fence,block/dark_oak_planks=alley_fence	a Goldenrod alley
+swap	iron_chain	-2065	690	-2055	696	20	30	block/iron_chain=chain_steel	a Goldenrod alley
+swap	stone_button	-2065	690	-2055	696	20	26	block/stone=bolt	a Goldenrod alley
+swap	cobblestone,cracked_stone_bricks,stone_bricks,stone,dirt_path,coarse_dirt,gravel,andesite,mossy_cobblestone	-2065	707	-2055	715	19	19	block/cobblestone=alley_floor@2,block/cracked_stone_bricks=alley_floor@2,block/stone_bricks=alley_floor@2,block/stone=alley_floor@2,block/dirt_path_top=alley_floor@2,block/dirt_path_side=alley_floor@2,block/coarse_dirt=alley_floor@2,block/gravel=alley_floor@2,block/andesite=alley_floor@2,block/mossy_cobblestone=alley_floor@2	a Goldenrod alley
+swap	barrel	-2065	707	-2055	715	20	26	block/barrel_side=alley_drum,block/barrel_top=alley_drum_top,block/barrel_top_open=alley_drum_top,block/barrel_bottom=alley_drum_top	a Goldenrod alley
+swap	composter	-2065	707	-2055	715	20	26	block/composter_side=alley_bin,block/composter_top=alley_bin_top,block/composter_bottom=alley_bin_top	a Goldenrod alley
+swap	end_rod	-2065	707	-2055	715	20	30	block/end_rod=alley_pipe	a Goldenrod alley
+swap	pale_oak_fence,oak_fence,spruce_fence,dark_oak_fence	-2065	707	-2055	715	20	26	block/pale_oak_planks=alley_fence,block/oak_planks=alley_fence,block/spruce_planks=alley_fence,block/dark_oak_planks=alley_fence	a Goldenrod alley
+swap	iron_chain	-2065	707	-2055	715	20	30	block/iron_chain=chain_steel	a Goldenrod alley
+swap	stone_button	-2065	707	-2055	715	20	26	block/stone=bolt	a Goldenrod alley
+swap	cobblestone,cracked_stone_bricks,stone_bricks,stone,dirt_path,coarse_dirt,gravel,andesite,mossy_cobblestone	-2152	712	-2110	726	19	19	block/cobblestone=alley_floor@2,block/cracked_stone_bricks=alley_floor@2,block/stone_bricks=alley_floor@2,block/stone=alley_floor@2,block/dirt_path_top=alley_floor@2,block/dirt_path_side=alley_floor@2,block/coarse_dirt=alley_floor@2,block/gravel=alley_floor@2,block/andesite=alley_floor@2,block/mossy_cobblestone=alley_floor@2	a Goldenrod alley
+swap	barrel	-2152	712	-2110	726	20	26	block/barrel_side=alley_drum,block/barrel_top=alley_drum_top,block/barrel_top_open=alley_drum_top,block/barrel_bottom=alley_drum_top	a Goldenrod alley
+swap	composter	-2152	712	-2110	726	20	26	block/composter_side=alley_bin,block/composter_top=alley_bin_top,block/composter_bottom=alley_bin_top	a Goldenrod alley
+swap	end_rod	-2152	712	-2110	726	20	30	block/end_rod=alley_pipe	a Goldenrod alley
+swap	pale_oak_fence,oak_fence,spruce_fence,dark_oak_fence	-2152	712	-2110	726	20	26	block/pale_oak_planks=alley_fence,block/oak_planks=alley_fence,block/spruce_planks=alley_fence,block/dark_oak_planks=alley_fence	a Goldenrod alley
+swap	iron_chain	-2152	712	-2110	726	20	30	block/iron_chain=chain_steel	a Goldenrod alley
+swap	stone_button	-2152	712	-2110	726	20	26	block/stone=bolt	a Goldenrod alley
+swap	cobblestone,cracked_stone_bricks,stone_bricks,stone,dirt_path,coarse_dirt,gravel,andesite,mossy_cobblestone	-2071	735	-2064	745	19	19	block/cobblestone=alley_floor@2,block/cracked_stone_bricks=alley_floor@2,block/stone_bricks=alley_floor@2,block/stone=alley_floor@2,block/dirt_path_top=alley_floor@2,block/dirt_path_side=alley_floor@2,block/coarse_dirt=alley_floor@2,block/gravel=alley_floor@2,block/andesite=alley_floor@2,block/mossy_cobblestone=alley_floor@2	a Goldenrod alley
+swap	barrel	-2071	735	-2064	745	20	26	block/barrel_side=alley_drum,block/barrel_top=alley_drum_top,block/barrel_top_open=alley_drum_top,block/barrel_bottom=alley_drum_top	a Goldenrod alley
+swap	composter	-2071	735	-2064	745	20	26	block/composter_side=alley_bin,block/composter_top=alley_bin_top,block/composter_bottom=alley_bin_top	a Goldenrod alley
+swap	end_rod	-2071	735	-2064	745	20	30	block/end_rod=alley_pipe	a Goldenrod alley
+swap	pale_oak_fence,oak_fence,spruce_fence,dark_oak_fence	-2071	735	-2064	745	20	26	block/pale_oak_planks=alley_fence,block/oak_planks=alley_fence,block/spruce_planks=alley_fence,block/dark_oak_planks=alley_fence	a Goldenrod alley
+swap	iron_chain	-2071	735	-2064	745	20	30	block/iron_chain=chain_steel	a Goldenrod alley
+swap	stone_button	-2071	735	-2064	745	20	26	block/stone=bolt	a Goldenrod alley
+swap	cyan_terracotta,light_gray_concrete	-2108	750	-2099	765	19	19	block/cyan_terracotta=path_kanto@4,block/light_gray_concrete=path_kanto@4	Goldenrod's way out south
+grass_onto	cyan_terracotta,light_gray_concrete	-2108	750	-2099	765	19	19	-	Goldenrod's way out south
+swap	terracotta	-2109	746	-2098	747	19	19	block/terracotta=gold_pave	under Goldenrod's south arch
+swap	sea_lantern	-2093	775	-2070	793	21	26	block/sea_lantern=glass_dark	the Day Care's windows
+swap	oak_stairs,oak_slab,oak_planks	-1963	849	-1951	859	19	25	block/oak_planks=well_roof	the Slowpoke Well
+swap	andesite,andesite_stairs,andesite_slab,andesite_wall,stone_bricks,stone_brick_wall,stone_brick_slab,stone_brick_stairs,cobblestone,cobblestone_wall	-1963	849	-1951	859	14	25	block/andesite=well_stone,block/stone_bricks=well_stone,block/cobblestone=well_stone	the Slowpoke Well
+swap	spruce_trapdoor	-1963	849	-1951	859	14	18	block/spruce_trapdoor=well_cover	the Slowpoke Well
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care
@@ -5136,9 +5608,9 @@ swap	polished_andesite_slab,stone_bricks	-361	317	-342	340	37	37	block/polished_
 swap	andesite_slab,stripped_oak_wood,oak_shelf,pale_oak_fence,light_gray_concrete	-360	232	-346	242	33	36	block/andesite=step_cer,block/stripped_oak_log=bridge_gold_beam,block/oak_shelf=bridge_gold_rail,block/pale_oak_planks=white_fence,block/light_gray_concrete=pillar_cer	Nugget Bridge's south end
 swap	stone_bricks,stone_brick_slab,stone_brick_stairs,stone_brick_wall,black_concrete	-781	365	-778	369	29	35	block/stone_bricks=tunnel_stone,block/black_concrete=cave_dark	Diglett's Cave's mouth
 swap	stone_bricks,stone_brick_slab,stone_brick_stairs,stone_brick_wall,black_concrete	-292	579	-289	583	30	36	block/stone_bricks=tunnel_stone,block/black_concrete=cave_dark	Diglett's Cave's mouth
-prop	light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta	-381	278	-381	278	33	33	bike	a bike by the Bike Shop
-prop	light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta	-381	279	-381	279	33	33	bike	a bike by the Bike Shop
-prop	light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta	-381	280	-381	280	33	33	bike	a bike by the Bike Shop
+prop	light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta,smooth_stone	-378	278	-378	278	33	33	bike	a bike by the Bike Shop
+prop	light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta,smooth_stone	-378	279	-378	279	33	33	bike	a bike by the Bike Shop
+prop	light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta,smooth_stone	-378	280	-378	280	33	33	bike	a bike by the Bike Shop
 sign	pale_oak_shelf	-126	425	-123	427	33	35	-	Lavender Town's sign
 swap	warped_door	6143	-1	6496	214	-	-	block/warped_door_top=door_wood_top,block/warped_door_bottom=door_wood_bottom	the SAFARI ZONE	interiors
 swap	spruce_log,spruce_fence	6143	-1	6496	214	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	the SAFARI ZONE	interiors

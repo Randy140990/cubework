@@ -5037,12 +5037,22 @@ public final class Game {
 				changed = true;
 			}
 		}
+		// (18:19) Those outside past Viridian: taken away (looked for every couple of seconds, so a save that has them
+		// loses them as each part of the map loads).
+		{
+			List<Entity> gone = new ArrayList<>();
+			for (Entity e : level.getAllEntities()) {
+				String k = e instanceof Npc n ? n.key() : e instanceof WorldMon w && w.key() != null && w.key().startsWith("pet:") ? w.key() : null;
+				if (k != null && notOutsideYet(k)) gone.add(e);
+			}
+			for (Entity e : gone) e.discard();
+		}
 		// Those in SPOTS: moved there (or put there, if they're missing), once per save.
 		for (Object[] o : SPOTS) {
 			String key = (String) o[0], doneKey = SPOTS_DONE + key;
 			int x = (Integer) o[1], z = (Integer) o[2];
 			Trainers.Person who = Trainers.PEOPLE.get(key);
-			if (done.contains(doneKey) || who == null || !done.contains("place:" + who.place())) continue;
+			if (done.contains(doneKey) || who == null || !done.contains("place:" + who.place()) || !PEOPLE_OUTSIDE.contains(who.place())) continue;
 			if (!level.hasChunkAt(new BlockPos(x, START_Y, z))) continue;
 			BlockPos at = spot(level, x, z, 6);
 			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 120, level.getMinY(), z - 120, x + 120, level.getMaxY(), z + 120);
@@ -5128,6 +5138,25 @@ public final class Game {
 	/** Places marked only round one spot so far (16:58: Route 10 round the Power Plant): only people with their own spots. */
 	private static final java.util.Set<String> OWN_SPOTS_ONLY = java.util.Set.of("route_10", "vermilion_city", "lavender_town");
 
+	/**
+	 * (18:19) Outside, only Pallet Town's, Route 1's and Viridian's people and trainers for now ("we'll talk about each of
+	 * their placements"): everyone else outside is taken away and not put down. Everyone indoors stays, and so do the
+	 * item balls, the POKéMON lying in the way, and the story's own (the rivals, TEAM ROCKET, the AIDE).
+	 */
+	static final java.util.Set<String> PEOPLE_OUTSIDE = java.util.Set.of("pallet_town", "route_1", "viridian_city");
+
+	/** Whether someone of the games' (a trainer, a person, or a person's POKéMON, "pet:") stands outside where nobody's wanted yet. */
+	static boolean notOutsideYet(String key) {
+		if (key == null || key.startsWith("rival") || key.startsWith("rocket") || key.equals("pewter_city_aide")) return false;
+		if (key.startsWith("pet:")) key = key.substring(4);
+		Trainers.Trainer t = Trainers.get(key);
+		Trainers.Person ps = t == null ? Trainers.PEOPLE.get(key) : null;
+		String pl = t != null ? t.place() : ps != null ? ps.place() : null;
+		if (pl == null || PEOPLE_OUTSIDE.contains(pl)) return false;
+		for (Zone z : zones) if (z.place().equals(pl)) return true;
+		return false;
+	}
+
 	public static int populate(ServerLevel level, String place, boolean redo) {
 		Zone z = null;
 		for (Zone x : zones) if (x.place().equals(place)) {
@@ -5149,7 +5178,9 @@ public final class Game {
 		int count = 0;
 		// (A place only partly marked so far, Route 10 round the Power Plant: only those with their own spots.)
 		boolean ownOnly = OWN_SPOTS_ONLY.contains(place);
-		for (Trainers.Trainer t : Trainers.in(place)) {
+		// (18:19: nobody outside past Viridian for now.)
+		boolean people = PEOPLE_OUTSIDE.contains(place);
+		for (Trainers.Trainer t : people ? Trainers.in(place) : List.<Trainers.Trainer>of()) {
 			int[] own = trainerSpot(t.key());
 			if (ownOnly && own == null) continue;
 			boolean swims = swimmer(t);
@@ -5162,7 +5193,7 @@ public final class Game {
 			if (swims && placed != null) placed.setSwimming(true);
 			count++;
 		}
-		for (Trainers.Person ps : Trainers.peopleIn(place)) {
+		for (Trainers.Person ps : people ? Trainers.peopleIn(place) : List.<Trainers.Person>of()) {
 			// Oak at the edge of Pallet Town is the one who stops you (he comes to you); he doesn't stand there.
 			if (ps.key().equals("pallet_town_p0")) continue;
 			// (Cerulean's rival comes himself, at the bridge; its second OFFICER JENNY is the first one again.)
