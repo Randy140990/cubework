@@ -242,6 +242,7 @@ def round57(add, room, G):
                "jungle_stairs": ("roof_azalea1", "jungle_slab,jungle_planks", "block/jungle_planks=roof_azalea1_tiles")}
     done = set()
     VC59 = (-1912, 500, -1760, 600)
+    OLG59 = []
     NOT_HOUSES = [(-1861, 466, -1833, 494), (-1992, 337, -1964, 366), (-2079, 344, -2051, 372), (-2090, 336, -1966, 432), (-2215, 615, -2040, 775),
                   (-2233, 570, -2205, 590), (-2310, 675, -2260, 850)]
     for h in SCAN["houses_johto"] + SCAN["houses_north"]:
@@ -264,6 +265,10 @@ def round57(add, room, G):
         # (0.59, 18:40: "variations of the purple in Violet City ... a tiny bit of character breakup") Violet's houses
         # one of four purples each.
         vio = VC59[0] <= x0 <= VC59[2] and VC59[1] <= z0 <= VC59[3]
+        if look[0] == "roof_green" and -2335 <= x0 <= -2170 and 495 <= z0 <= 625:
+            OLG59.append(1)
+            g = ("green", "green2", "green3")[(len(OLG59) - 1) % 3]
+            look = ("roof_" + g, look[1], "block/warped_planks=roof_%s_tiles" % g)
         if look[0] == "roof_vio":
             v = ("vio", "vio2", "vio3", "vio4")[len([1 for d_ in done if VC59[0] <= d_[0] <= VC59[2] and VC59[1] <= d_[1] <= VC59[3]]) % 4]
             look = ("roof_" + v, look[1], "block/crimson_planks=roof_%s_tiles" % v)
@@ -438,8 +443,10 @@ def round57(add, room, G):
 
     # ---------- Olivine, its lighthouse, Cianwood, the Day Care, the farm, Azalea (16:23, 16:35) ----------
     OL = (-2335, 495, -2170, 625, "Olivine City")
-    add("swap", "light_gray_glazed_terracotta", OL, "block/light_gray_glazed_terracotta=gold_alley@2", ys(17, 19))
-    add("swap", "pale_oak_planks", OL, "block/pale_oak_planks=pier_ol", ys(17, 19))
+    # ((0.59.3, 20:35: "you've replaced terracotta with like a brick ... the floor isn't even") Its paving square-cut
+    # flagstones that tile across every block; its boardwalk long boards.)
+    add("swap", "light_gray_glazed_terracotta", OL, "block/light_gray_glazed_terracotta=ol_pave@2", ys(17, 19))
+    add("swap", "pale_oak_planks", OL, "block/pale_oak_planks=ol_boardwalk@4", ys(17, 19))
     add("grass_onto", "light_gray_glazed_terracotta,pale_oak_planks", OL, "-", ys(17, 19))
     LH = (-2233, 570, -2205, 590, "the lighthouse")
     add("swap", "white_concrete", LH, "block/white_concrete=lh_white", ys(20, 62))

@@ -10,6 +10,11 @@ Two layers:
   - Each place's own leftovers: the S.S. AQUA, Olivine's pier, Ecruteak, the BURNED TOWER, Goldenrod, the rocks.
 """
 
+import json
+import os
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+
 
 def ys(a, b):
     return (str(a), str(b))
@@ -38,8 +43,9 @@ FALLBACK = [
     ("swap", "light_blue_wool", "block/light_blue_wool=ds_blue_light"),
     # The lights in the Centers' and Marts' doorway floors.
     ("swap", "ochre_froglight,sea_lantern", "block/ochre_froglight_side=door_light!,block/ochre_froglight_top=door_light!,block/sea_lantern=door_light!"),
-    # Every trunk of the trees (stripped spruce): bark, as Kanto's.
-    ("swap", "stripped_spruce_wood,stripped_spruce_log", "block/stripped_spruce_log=tree_bark,block/stripped_spruce_log_top=tree_bark"),
+    # (20:47: "on the cliffside you'll see there's still stripped logs ... blend in a little bit better") The timbers set
+    # in the cliffs: the cliffs' rock, a shade darker with roots through it, the ledges' earth on top.
+    ("swap", "stripped_spruce_wood,stripped_spruce_log", "block/stripped_spruce_log=hill_top@4|cliff_root@4,block/stripped_spruce_log_top=hill_top@4|cliff_root@4"),
     ("swap", "polished_diorite_stairs,polished_diorite_slab,polished_diorite", "block/polished_diorite=house_trim"),
     ("swap", "iron_bars", "block/iron_bars=railing_dark"),
     ("swap", "barrel", "block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_bottom=crate_barrel_top"),
@@ -60,60 +66,24 @@ FALLBACK = [
     ("panel", "crimson_shelf", "block/crimson_shelf=vio_bridge_beam"),
 ]
 
-# The S.S. AQUA at Olivine's harbour: (blocks, swaps).
-SA = (-2306, 666, -2262, 854, "the S.S. AQUA")
-AQUA = [
-    ("white_concrete,quartz_block,smooth_quartz,smooth_quartz_stairs,smooth_quartz_slab,quartz_bricks,quartz_slab,quartz_stairs,quartz_pillar,white_concrete_powder,"
-     "white_wool,white_carpet,white_terracotta,calcite,bone_block,chiseled_quartz_block",
-     "block/white_concrete=aqua_white,block/quartz_block_side=aqua_white,block/quartz_block_top=aqua_white,block/quartz_block_bottom=aqua_white,"
-     "block/quartz_bricks=aqua_white,block/quartz_pillar=aqua_white,block/quartz_pillar_top=aqua_white,block/white_concrete_powder=aqua_white,"
-     "block/white_wool=aqua_white,block/white_terracotta=aqua_white,block/calcite=aqua_white,block/bone_block_side=aqua_white,block/bone_block_top=aqua_white,"
-     "block/chiseled_quartz_block=aqua_white,block/chiseled_quartz_block_top=aqua_white"),
-    ("blue_concrete,blue_terracotta,blue_wool,blue_glazed_terracotta,blue_concrete_powder,blue_carpet",
-     "block/blue_concrete=aqua_blue,block/blue_terracotta=aqua_blue,block/blue_wool=aqua_blue,block/blue_glazed_terracotta=aqua_blue,block/blue_concrete_powder=aqua_blue"),
-    ("gray_concrete,gray_wool,gray_carpet,light_gray_concrete_powder,light_gray_wool,light_gray_carpet,light_gray_concrete,stone,stone_slab,stone_stairs,smooth_stone,"
-     "smooth_stone_slab",
-     "block/gray_concrete=aqua_deck,block/gray_wool=aqua_deck,block/light_gray_concrete_powder=aqua_deck,block/light_gray_wool=aqua_deck,"
-     "block/light_gray_concrete=aqua_deck,block/stone=aqua_deck,block/smooth_stone=aqua_deck,block/smooth_stone_slab_side=aqua_deck"),
-    ("spruce_planks,oak_planks,spruce_slab,oak_slab,spruce_stairs,oak_stairs,acacia_wood,acacia_log,stripped_dark_oak_wood,stripped_dark_oak_log,dark_oak_planks",
-     "block/spruce_planks=aqua_boards,block/oak_planks=aqua_boards,block/acacia_log=aqua_boards,block/acacia_log_top=aqua_boards,"
-     "block/stripped_dark_oak_log=aqua_boards,block/stripped_dark_oak_log_top=aqua_boards,block/dark_oak_planks=aqua_boards"),
-    ("yellow_concrete,yellow_wool,yellow_terracotta", "block/yellow_concrete=aqua_yellow,block/yellow_wool=aqua_yellow,block/yellow_terracotta=aqua_yellow"),
-    ("orange_concrete,red_concrete,orange_wool,red_wool", "block/orange_concrete=aqua_red,block/red_concrete=aqua_red,block/orange_wool=aqua_red,block/red_wool=aqua_red"),
-    ("obsidian,black_terracotta,black_concrete,black_wool,blackstone_slab,blackstone,blackstone_stairs,polished_blackstone_brick_stairs,polished_blackstone_brick_slab,"
-     "polished_blackstone_bricks,polished_blackstone,gray_glazed_terracotta,black_glazed_terracotta,polished_basalt",
-     "block/obsidian=aqua_dark,block/black_terracotta=aqua_dark,block/black_concrete=aqua_dark,block/black_wool=aqua_dark,block/blackstone=aqua_dark,"
-     "block/blackstone_top=aqua_dark,block/polished_blackstone_bricks=aqua_dark,block/polished_blackstone=aqua_dark,block/gray_glazed_terracotta=aqua_dark,"
-     "block/black_glazed_terracotta=aqua_dark,block/polished_basalt_side=aqua_dark,block/polished_basalt_top=aqua_dark"),
-    ("polished_andesite,polished_andesite_stairs,polished_andesite_slab,stone_bricks,stone_brick_stairs,stone_brick_slab,andesite",
-     "block/polished_andesite=aqua_steel,block/stone_bricks=aqua_steel,block/andesite=aqua_steel"),
-    ("cyan_terracotta,cyan_concrete", "block/cyan_terracotta=aqua_teal,block/cyan_concrete=aqua_teal"),
-    ("sea_lantern", "block/sea_lantern=aqua_porthole!"),
-    # Its decks' own: the cabins' walls (clay), the pool (packed ice), the sun deck's boards and its court, the red
-    # stripes.
-    ("clay", "block/clay=aqua_white"),
-    ("packed_ice", "block/packed_ice=lh_teal_light"),
-    ("sandstone,cracked_stone_bricks,stripped_birch_log,stripped_birch_wood,dark_oak_slab,dark_oak_stairs",
-     "block/sandstone=aqua_boards,block/sandstone_top=aqua_boards,block/sandstone_bottom=aqua_boards,block/cracked_stone_bricks=aqua_steel,"
-     "block/stripped_birch_log=aqua_boards,block/stripped_birch_log_top=aqua_boards,block/dark_oak_planks=aqua_boards"),
-    ("green_terracotta,green_wool", "block/green_terracotta=gold_lawn,block/green_wool=gold_lawn"),
-    ("red_glazed_terracotta,smooth_red_sandstone_slab,smooth_red_sandstone", "block/red_glazed_terracotta=aqua_red,block/red_sandstone_top=aqua_red"),
-    ("dark_prismarine_slab,dark_prismarine", "block/dark_prismarine=aqua_dark"),
-    ("end_rod", "block/end_rod=rod_clean"),
-    ("iron_trapdoor", "block/iron_trapdoor=aqua_steel"),
-]
+# (0.59.3, 20:47: "do not texture those, there's no need right now") The S.S. AQUA as John built it: its blocks keep
+# their own look, in slices small enough to win over every place's look round it.
+SHIP = (-2306, 662, -2262, 856)
 
 
 def round59b(add, room, G):
     SEA_ROCK, SEA_ROCK_BLOCKS = G["SEA_ROCK"], G["SEA_ROCK_BLOCKS"]
     for look, blocks, swaps in FALLBACK:
         add(look, blocks, JM, swaps)
-    # The trees on Route 26's side of the falls too (on Kanto's map).
-    add("swap", "stripped_spruce_wood,stripped_spruce_log", (-1040, 540, -995, 770, "Routes 26 and 27's trees"),
-        "block/stripped_spruce_log=tree_bark,block/stripped_spruce_log_top=tree_bark")
-    # The S.S. AQUA.
-    for blocks, swaps in AQUA:
-        add("swap", blocks, SA, swaps, ys(12, 60))
+    # The cliffs' timbers on Johto's routes on Kanto's map too (Routes 26 and 27, Tohjo Falls; Kanto's own wait for
+    # the Kanto pass: John, 20:47, "in Johto specifically").
+    for b in ((-1310, 600, -940, 800, "Routes 26 and 27's cliffs"), (-1040, 540, -995, 770, "Routes 26 and 27's cliffs")):
+        add("swap", "stripped_spruce_wood,stripped_spruce_log", b,
+            "block/stripped_spruce_log=hill_top@4|cliff_root@4,block/stripped_spruce_log_top=hill_top@4|cliff_root@4")
+    # The S.S. AQUA, John's own.
+    ship = ",".join(json.load(open(os.path.join(HERE, "area_ship59.json"))))
+    for z in range(SHIP[1], SHIP[3] + 1, 16):
+        add("keep", ship, (SHIP[0], z, SHIP[2], min(SHIP[3], z + 15), "the S.S. AQUA, as John built it"), "-", ys(12, 60))
     # Olivine's pier: its stone head, its posts and bollards, its rails, its deck's edges.
     OP = (-2290, 598, -2263, 625, "Olivine's pier")
     add("swap", "andesite,polished_andesite,polished_andesite_slab,polished_andesite_stairs,diorite,diorite_wall,diorite_slab", OP,

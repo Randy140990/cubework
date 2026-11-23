@@ -284,6 +284,9 @@ def main():
     for r in kanto_rows:
         # ((0.56, 13:53) Johto's mud brick slabs are John's steps, not Kanto's ponds' rocks: round56's steps.)
         if r[1] == "mud_brick_slab": continue
+        # ((0.59.3, 20:35: "we've got moss around the end, and it's being impacted and turning into grass") Johto's
+        # moss rings round the grass stay moss: the grass's tufts aren't laid on them.)
+        if r[0] == "grass_onto" and r[1] == "moss_block": continue
         rows.append((r[0], r[1]) + JOHTO[:4] + (r[6], r[7], r[8], JOHTO[4]))
     # Johto's towns built as Kanto's (12:24, 12:26): each Kanto town's own looks over the Johto town, the heights moved
     # to its ground (the lamps', signs' and other one-offs' left out).
@@ -800,6 +803,8 @@ def round50(add, room):
     arealooks59.round59(add, room, globals())
     import arealooks59b
     arealooks59b.round59b(add, room, globals())
+    import arealooks59c
+    arealooks59c.round59c(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")

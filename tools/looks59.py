@@ -9,6 +9,7 @@ Slowpoke Well; the towers' spires; Violet's and Ecruteak's roofs in shades of th
 Run: called from tools/lookpack.py (looks48.EXTRA, after looks57).
 """
 
+import json
 import math
 import os
 import random
@@ -255,7 +256,235 @@ def johto_sweep():
     save("aqua_porthole", im)
 
 
+# ---------- 0.59.3 (20:35, 20:47) ----------
+def seamless_flags(base, seed, joint, size=32):
+    """Square-cut flagstones that tile (the glazed terracotta paths, 20:47: "it's not tiling properly"): slabs of 8 and
+    16 pixels on an 8-pixel grid, so they meet across every block edge; each its own shade, a fine joint."""
+    r = random.Random(seed)
+    im = _img(size)
+    cells = {}
+    grid = size // 8
+    used = [[False] * grid for _ in range(grid)]
+    slabs = []
+    for gy in range(grid):
+        for gx in range(grid):
+            if used[gy][gx]: continue
+            w = 2 if gx + 1 < grid and not used[gy][gx + 1] and r.random() < 0.35 else 1
+            h = 2 if gy + 1 < grid and r.random() < 0.3 and all(not used[gy + 1][gx + i] for i in range(w)) else 1
+            for yy in range(h):
+                for xx in range(w): used[gy + yy][gx + xx] = True
+            slabs.append((gx * 8, gy * 8, w * 8, h * 8, (r.random() - 0.5) * 0.12))
+    for x0, y0, w, h, k0 in slabs:
+        for y in range(y0, y0 + h):
+            for x in range(x0, x0 + w):
+                if x == x0 or y == y0: c = joint
+                else:
+                    k = k0 + (r.random() - 0.5) * 0.035 + (0.05 if y == y0 + 1 else 0) - (0.05 if y == y0 + h - 1 else 0)
+                    c = shade(base, k)
+                _put(im, x, y, c)
+    return im
+
+
+def boardwalk(base, seed, size=64):
+    """Olivine's boardwalk (20:35: "the planks ... the walkway ... hasn't been done"): long boards running along it,
+    each its own shade, staggered butt joints, a dark gap between boards, nail heads; laid over four blocks."""
+    r = random.Random(seed)
+    im = _img(size)
+    bh = 8
+    for row in range(size // bh):
+        cut = r.randrange(0, size)
+        k0s = {}
+        for y in range(row * bh, row * bh + bh):
+            for x in range(size):
+                seg = ((x - cut) % size) // 32
+                if seg not in k0s: k0s[seg] = (r.random() - 0.5) * 0.12
+                gx = (x - cut) % 32
+                if y == row * bh: c = shade(base, -0.42)
+                elif gx == 0: c = shade(base, -0.3)
+                else:
+                    k = k0s[seg] + 0.025 * math.sin((x + row * 13) * 0.45) + (r.random() - 0.5) * 0.03 + (0.06 if y == row * bh + 1 else 0)
+                    if gx in (2, 29) and y == row * bh + 4: k -= 0.35
+                    c = shade(base, k)
+                _put(im, x, y, c)
+    return im
+
+
+def metal_tiles(base, seed, rows=4):
+    """A tower's roof as metal (20:47: "more like a metallic colour"): standing-seam sheet in rows, each row lit along its
+    top and shaded at its foot, a sheen across it, a fine seam."""
+    r = random.Random(seed)
+    im = _img()
+    h = 16 // rows
+    for y in range(16):
+        for x in range(16):
+            yy = y % h
+            k = 0.16 - 0.3 * (yy / (h - 1)) + 0.07 * math.sin((x + y) * 0.5) + (r.random() - 0.5) * 0.02
+            if yy == h - 1: k -= 0.18
+            if x % 8 == 7: k -= 0.1
+            if (x + 2 * y) % 16 in (3, 4): k += 0.12
+            _put(im, x, y, shade(base, k))
+    return im
+
+
+def gold_column(base, seed):
+    """Polished gold that runs on from block to block (20:47: "anything that's gold needs doing"): no frame at its ends,
+    upright highlights, a soft sheen."""
+    r = random.Random(seed)
+    im = _img()
+    for y in range(16):
+        for x in range(16):
+            k = 0.32 * math.cos((x - 4.5) / 16 * math.pi * 2) * 0.5 + (r.random() - 0.5) * 0.02
+            if x in (4, 5): k += 0.22
+            if x in (12, 13): k -= 0.12
+            _put(im, x, y, shade(base, k))
+    return im
+
+
+def whirlpool():
+    """The WHIRL ISLANDS' whirlpools (20:35: "add those whirlpools ... in their locations"): a spiral of white foam over
+    darker water, turning (16 frames), over five blocks; see-through between the arms."""
+    size, frames = 80, 16
+    im = Image.new("RGBA", (size, size * frames))
+    for f in range(frames):
+        rot = f / frames * math.pi * 2
+        for y in range(size):
+            for x in range(size):
+                dx, dy = (x + 0.5 - size / 2) / (size / 2), (y + 0.5 - size / 2) / (size / 2)
+                rr = math.hypot(dx, dy)
+                if rr > 1: continue
+                a = math.atan2(dy, dx)
+                arm = math.cos(3 * (a + rot) + 10.0 * rr)
+                edge = min(1.0, (1 - rr) * 3)
+                foam = max(0.0, arm) ** 6 * edge
+                if foam > 0.3:
+                    c = mix(hexc("#CFEAF8"), hexc("#FFFFFF"), min(1, foam))
+                    al = int(170 + 85 * min(1, foam))
+                else:
+                    c = mix(hexc("#2C78B6"), hexc("#123A66"), 1 - rr)
+                    al = int(min(1.0, (1 - rr) * 2.2) * 190)
+                if rr < 0.08: c, al = hexc("#0E2A48"), 220
+                im.putpixel((x, y + f * size), c[:3] + (max(0, min(255, al)),))
+    save("whirlpool", im)
+    with open(os.path.join(P.AREA_TEX, "whirlpool.png.mcmeta"), "w") as fh:
+        json.dump({"animation": {"frametime": 2, "interpolate": True}}, fh)
+
+
+def signs59():
+    """(20:35: "each of the signs ... does some squiggles") Every sign's back has writing too (some face the way you
+    come), and the blue sign on the beaches (20:35: "the top of a normal sign, but just in the blue colour")."""
+    for part, w, c0 in (("l", 32, 16), ("r", 32, 0), ("m", 48, 16), ("s", 16, 0)):
+        save("sign_back_" + part, L.board(w).crop((c0, 0, c0 + 16, 16)))
+        save("sign_short_back_" + part, L.short_board(w).crop((c0, 0, c0 + 16, 16)))
+    def tint(src, out, a, b):
+        im = Image.open(os.path.join(P.AREA_TEX, src + ".png")).convert("RGBA")
+        p = im.load()
+        for y in range(im.height):
+            for x in range(im.width):
+                r_, g_, b_, al = p[x, y]
+                if al and abs(r_ - g_) < 18 and abs(g_ - b_) < 22 and 120 < r_ < 215:
+                    t = (r_ - 120) / 95.0
+                    p[x, y] = tuple(int(v) for v in mix(hexc(a), hexc(b), t)[:3]) + (al,)
+        save(out, im)
+    for part in ("s", "l", "r", "m"):
+        tint("sign_back_" + part, "sign_back_%s_o" % part, "#D9651E", "#F59A4A")
+        tint("sign_front_" + part, "sign_front_%s_b" % part, "#2F6DB5", "#5C95D6")
+        tint("sign_back_" + part, "sign_back_%s_b" % part, "#2F6DB5", "#5C95D6")
+    models = L.MODELS
+    for f in sorted(os.listdir(models)):
+        if f.startswith("osign_board_"):
+            m = json.load(open(os.path.join(models, f)))
+            for k_, v in list(m["textures"].items()):
+                if v.startswith("retromon:block/area/sign_back_") and not v.endswith("_o"): m["textures"][k_] = v + "_o"
+            json.dump(m, open(os.path.join(models, f), "w"))
+        if f.startswith("sign_board_") or f.startswith("sign_stand_"):
+            m = json.load(open(os.path.join(models, f)))
+            if f.startswith("sign_board_"):
+                for k_, v in list(m["textures"].items()):
+                    if v.startswith("retromon:block/area/sign_front_") or v.startswith("retromon:block/area/sign_back_"): m["textures"][k_] = v + "_b"
+            json.dump(m, open(os.path.join(models, "b" + f), "w"))
+
+
+def beach59():
+    """Route 40's beach and the seafronts (20:35)."""
+    im = _img()
+    for y in range(16):
+        for x in range(16):
+            c = hexc("#F4F1EA") if (x // 3) % 2 == 0 else hexc("#3E86C8")
+            if x in (0, 15): c = shade(hexc("#E9E4D8"), -0.05)
+            _put(im, x, y, shade(c, (random.Random(x * 31 + y).random() - 0.5) * 0.03))
+    save("beach_towel", im)
+    save("umbrella_blue", flat(hexc("#2F78C8"), "umbb", 0.02))
+    save("umbrella_white", flat(hexc("#F4F3EE"), "umbw", 0.02))
+    save("umbrella_pole", L.metal(hexc("#E6E8EA"), seam=False))
+    save("ol_boardwalk", boardwalk(hexc("#C6A57A"), "olbw"))
+    save("ol_pave", seamless_flags(hexc("#B9B7B1"), "olpave", hexc("#8E8C87")))
+    save("ol_kerb", board(hexc("#D9D7D1"), "olkerb", 0.05))
+    save("ol_planter", K.ashlar(hexc("#C8C6C0"), "olpl"))
+    save("ol_wall_cap", board(hexc("#E3E1DB"), "olcap", 0.06))
+    save("ol_post", lamp_plain(hexc("#ECECE8"), False))
+    save("ol_step", board(hexc("#BDBAB3"), "olstep", 0.1))
+    save("planter_wood", K.boards(hexc("#9A6A44"), "plwood"))
+    save("cliff_root", recolour_png(os.path.join(P.AREA_TEX, "drip_rock.png"), -0.12, "croot"))
+    for k_, c in (("green2", "#4F8A3C"), ("green3", "#2F6B4A")):
+        for part in ("tiles", "edge", "under"):
+            N.tint_of("roof_green_" + part, "roof_%s_%s" % (k_, part), hexc(c))
+
+
+def recolour_png(path, k, seed):
+    """A texture a shade darker, with a few fine root lines through it (the cliffs' timbers, 20:47: "blend in ... a unique
+    pattern that sticks out a little")."""
+    im = Image.open(path).convert("RGBA")
+    p = im.load()
+    r = random.Random(seed)
+    for y in range(im.height):
+        for x in range(im.width):
+            c = p[x, y]
+            if c[3] == 0: continue
+            p[x, y] = shade(c, k)[:3] + (c[3],)
+    for _ in range(im.width // 8):
+        x, y = r.randrange(im.width), r.randrange(im.height)
+        for i in range(r.randrange(6, 14)):
+            c = p[x % im.width, y % im.height]
+            p[x % im.width, y % im.height] = shade(c, -0.18)[:3] + (255,)
+            x += r.choice((-1, 0, 1)); y += 1
+    return im
+
+
+def ecruteak59():
+    save("sprout_roof", metal_tiles(hexc("#6A5578"), "sprm"))
+    save("sprout_ridge", metal_tiles(hexc("#4A3E55"), "sprg"))
+    save("burned_teal", metal_tiles(hexc("#4E8A82"), "brm"))
+    save("tin_roof", metal_tiles(hexc("#9A5236"), "tinm"))
+    save("tin_ridge", metal_tiles(hexc("#B48A3A"), "tinr"))
+    save("spire_gold", gold_column(hexc("#D9AE45"), "spg"))
+    save("redb_front", F.panel(hexc("#A9372C"), "redbf", 0.05))
+    save("redb_roof", metal_tiles(hexc("#9E3A30"), "redbr"))
+    save("ecru_flag", seamless_flags(hexc("#B4AEA6"), "ecfl", hexc("#8E8780")))
+
+
+def cinnabar59():
+    save("lab_cin_wall", flat(hexc("#F2EFE6"), "labw", 0.015))
+    save("lab_sill", board(hexc("#F7F5EE"), "labsill", 0.07))
+    cells = _img()
+    for y in range(16):
+        for x in range(16):
+            c = hexc("#D9DDE1") if x in (0, 15) or y in (0, 15) else hexc("#BAC2CA") if x % 5 == 0 or y % 5 == 0 else hexc("#3F74C2")
+            if c == hexc("#3F74C2") and (x + y) % 5 == 0: c = hexc("#6A9BE0")
+            _put(cells, x, y, c)
+    save("solar_cells", cells)
+
+
+def round59c():
+    seamless = None
+    whirlpool()
+    signs59()
+    beach59()
+    ecruteak59()
+    cinnabar59()
+
+
 def build():
+    round59c()
     johto_sweep()
     outsides()
     volcano()

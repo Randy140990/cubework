@@ -145,6 +145,9 @@ public final class AreaLooks {
 				// (0.54) The coloured signs (Johto's Route 27: Kanto's orange beside the white): the sign, its board orange.
 				for (String part : new String[] {"l", "r", "m", "s"})
 					for (String row : new String[] {"board", "stand"}) part(ctx, "o" + row + "_" + part + "_" + d.getSerializedName(), "block/area/osign_" + row + "_" + part + "_" + d.getSerializedName());
+				// (0.59.3, 20:35) The blue signs on the beaches: the board blue, on a pale stand.
+				for (String part : new String[] {"l", "r", "m", "s"})
+					for (String row : new String[] {"board", "stand"}) part(ctx, "b" + row + "_" + part + "_" + d.getSerializedName(), "block/area/bsign_" + row + "_" + part + "_" + d.getSerializedName());
 				// The same signs in wood (wood_board: Pewter's oak shelf sign, as our wooden sign).
 				for (String part : new String[] {"l", "r", "m", "s"}) {
 					for (String row : new String[] {"board", "stand"}) part(ctx, "w" + row + "_" + part + "_" + d.getSerializedName(), "block/area/wsign_" + row + "_" + part + "_" + d.getSerializedName());
@@ -172,7 +175,7 @@ public final class AreaLooks {
 				// ((0.59) The signs too: a shelf that's a sign in a small box is drawn as one even where a planter's or a
 				// band's look covers the whole town, and a planter in a small box isn't a sign because the town's are.)
 				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("panel") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy") || rule.look().equals("leafy_hedge")
-						|| rule.look().equals("sign") || rule.look().equals("sign_o")) swaps.add(rule);
+						|| rule.look().equals("sign") || rule.look().equals("sign_o") || rule.look().equals("sign_b") || rule.look().equals("keep")) swaps.add(rule);
 				for (Rule rule : looks.values()) {
 					Look look = make(rule, c.baker());
 					List<Rule> rivals = new ArrayList<>();
@@ -250,7 +253,7 @@ public final class AreaLooks {
 				TextureAtlasSprite[] over = new TextureAtlasSprite[18];
 				for (int t = 1; t <= 17; t++) over[t] = sprite(baker, "moss_on_cobble_" + t);
 				yield new GrassEdge(over, null, false, java.util.Set.of(Blocks.MOSSY_COBBLESTONE, Blocks.MOSSY_COBBLESTONE_SLAB, Blocks.MOSSY_COBBLESTONE_STAIRS,
-						Blocks.MOSS_BLOCK), false);
+						Blocks.MOSS_BLOCK), false, null);
 			}
 			// (0.57, 15:57: "the bone, which is supposed to be steam ... opacity 30% and kind of make them a mist") Cinnabar's
 			// volcano's steam: John's bone blocks as soft see-through steam, no faces between two of them.
@@ -258,6 +261,29 @@ public final class AreaLooks {
 			case "roof", "roof_green", "roof_gym", "roof_museum" -> new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"));
 			case "sign" -> AreaLooks::sign;
 			case "sign_o" -> (base, e, view, pos, state, random, cull) -> board("o", base, e, view, pos, state, random, cull);
+			case "sign_b" -> (base, e, view, pos, state, random, cull) -> board("b", base, e, view, pos, state, random, cull);
+			// (0.59.3, 20:47: the ships, "do not texture those") The block as it is, here, whatever the place's looks.
+			case "keep" -> (base, e, view, pos, state, random, cull) -> base.emitQuads(e, view, pos, state, random, cull);
+			// (0.59.3, 20:35) The WHIRL ISLANDS' whirlpools: a turning whirlpool on the water's surface over five blocks,
+			// drawn by a rock beside it ("dx,dz,size": where its middle is from the rock).
+			case "whirlpool" -> {
+				String[] p = rule.swaps().split(",");
+				float dx = Float.parseFloat(p[0].trim()), dz = Float.parseFloat(p[1].trim()), size = p.length > 2 ? Float.parseFloat(p[2].trim()) : 5F;
+				TextureAtlasSprite sp = sprite(baker, "whirlpool");
+				yield (base, e, view, pos, state, random, cull) -> {
+					base.emitQuads(e, view, pos, state, random, cull);
+					e.square(Direction.UP, 0, 0, 1, 1, 0.07F);
+					for (int i = 0; i < 4; i++) {
+						float cx = e.x(i), cz = e.z(i);
+						e.pos(i, dx + 0.5F + (cx - 0.5F) * size, e.y(i), dz + 0.5F + (cz - 0.5F) * size);
+						e.uv(i, sp.getU0() + cx * (sp.getU1() - sp.getU0()), sp.getV0() + cz * (sp.getV1() - sp.getV0()));
+					}
+					e.color(-1, -1, -1, -1);
+					e.tintIndex(-1);
+					e.renderLayer(ChunkSectionLayer.TRANSLUCENT);
+					e.emit();
+				};
+			}
 			case "wood_board" -> AreaLooks::woodBoard;
 			case "wood_sign" -> AreaLooks::woodSign;
 			case "boulder" -> boulder(baker, rule.swaps());
@@ -303,13 +329,17 @@ public final class AreaLooks {
 				TextureAtlasSprite[] over = new TextureAtlasSprite[18];
 				for (int t = 1; t <= 17; t++) over[t] = sprite(baker, "grass_on_drip_" + t);
 				java.util.Set<Block> from = rule.swaps().equals("grass") ? java.util.Set.of(Blocks.GRASS_BLOCK) : null;
-				yield new GrassEdge(over, null, false, from, true);
+				// ((0.59.3, 20:35: "That connected texture onto the sand actually should be the moss block") Where the moss
+				// meets it, the moss's own soft edge, not the grass's.)
+				TextureAtlasSprite[] moss = new TextureAtlasSprite[18];
+				for (int t = 1; t <= 17; t++) moss[t] = sprite(baker, "moss_on_cobble_" + t);
+				yield new GrassEdge(over, null, false, from, true, from == null ? moss : null);
 			}
 			case "sand_edge" -> {
 				// (The cave's sand running softly onto the floor beside it, as the grass onto the dripstone; 14:15.)
 				TextureAtlasSprite[] over = new TextureAtlasSprite[18];
 				for (int t = 1; t <= 17; t++) over[t] = sprite(baker, "sand_on_floor_" + t);
-				yield new GrassEdge(over, null, false, java.util.Set.of(Blocks.SAND, Blocks.SMOOTH_SANDSTONE), false);
+				yield new GrassEdge(over, null, false, java.util.Set.of(Blocks.SAND, Blocks.SMOOTH_SANDSTONE), false, null);
 			}
 			case "grass_edge", "kerb" -> {
 				boolean kerb = rule.look().equals("kerb");
@@ -318,7 +348,7 @@ public final class AreaLooks {
 					over[t] = sprite(baker, (kerb ? "kerb_grass_" : "grass_on_drip_") + t);
 					under[t] = sprite(baker, (kerb ? "kerb_" : "drip_shade_") + t);
 				}
-				yield new GrassEdge(over, under, !kerb, null, true);
+				yield new GrassEdge(over, under, !kerb, null, true, null);
 			}
 			// (Any other roof_ look, Fuchsia's four houses' and the Safari Zone's, 15:29: its own three pictures.)
 			default -> rule.look().startsWith("roof_") ? new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under")) : null;
@@ -532,7 +562,10 @@ public final class AreaLooks {
 		Direction left = facing.getClockWise();
 		boolean onLeft = sameSign(view, pos.relative(left), state, facing), onRight = sameSign(view, pos.relative(left.getOpposite()), state, facing);
 		String part = onLeft && onRight ? "m" : onRight ? "l" : onLeft ? "r" : "s";
-		String row = state.hasProperty(BlockStateProperties.ROTATION_16) ? "short" : sameSign(view, pos.above(), state, facing) ? "stand" : "board";
+		// ((0.59.3) A pale oak shelf under a warped one is the blue sign's stand.)
+		BlockState up = view.getBlockState(pos.above());
+		boolean blueOver = state.is(Blocks.PALE_OAK_SHELF) && up.is(Blocks.WARPED_SHELF) && facingOf(up) == facing;
+		String row = state.hasProperty(BlockStateProperties.ROTATION_16) ? "short" : sameSign(view, pos.above(), state, facing) || blueOver ? "stand" : "board";
 		BlockStateModel m = extra(kind + row + "_" + part + "_" + facing.getSerializedName());
 		if (m == null) base.emitQuads(e, view, pos, state, random, cull);
 		else m.emitQuads(e, view, pos, state, random, cull);
@@ -923,14 +956,30 @@ public final class AreaLooks {
 	 * meets it, as the dirt paths do (the same 17 tiles: an edge, two, three or all four, or a corner), with their
 	 * soft shadow on the dripstone. The tufts take the grass's green (Colours tints them).
 	 */
-	private record GrassEdge(TextureAtlasSprite[] tufts, TextureAtlasSprite[] shade, boolean byWater, java.util.Set<Block> onto, boolean tint) implements Look {
+	private record GrassEdge(TextureAtlasSprite[] tufts, TextureAtlasSprite[] shade, boolean byWater, java.util.Set<Block> onto, boolean tint, TextureAtlasSprite[] moss) implements Look {
 		@Override
 		public void emit(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
 			base.emitQuads(e, view, pos, state, random, cull);
 			if (cull.test(Direction.UP)) return;
-			boolean n = by(view, pos.north()), s = by(view, pos.south()), w = by(view, pos.west()), ea = by(view, pos.east());
-			boolean nw = by(view, pos.north().west()), ne = by(view, pos.north().east()), sw = by(view, pos.south().west()), se = by(view, pos.south().east());
-			if (!(n || s || w || ea || nw || ne || sw || se) || byWater && !nearWater(view, pos)) return;
+			if (byWater && !nearWater(view, pos)) return;
+			if (moss != null) {
+				// The grass's tufts where the grass meets it, the moss's where the moss does.
+				edges(e, view, pos, p -> grassOnly(view, p), tufts, true);
+				edges(e, view, pos, p -> view.getBlockState(p).is(Blocks.MOSS_BLOCK), moss, false);
+				return;
+			}
+			edges(e, view, pos, p -> by(view, p), tufts, tint);
+		}
+
+		private static boolean grassOnly(BlockAndTintGetter view, BlockPos p) {
+			BlockState s = view.getBlockState(p);
+			return s.is(Blocks.GRASS_BLOCK) || s.is(Blocks.GREEN_CONCRETE_POWDER);
+		}
+
+		private void edges(QuadEmitter e, BlockAndTintGetter view, BlockPos pos, java.util.function.Predicate<BlockPos> by, TextureAtlasSprite[] tufts, boolean tint) {
+			boolean n = by.test(pos.north()), s = by.test(pos.south()), w = by.test(pos.west()), ea = by.test(pos.east());
+			boolean nw = by.test(pos.north().west()), ne = by.test(pos.north().east()), sw = by.test(pos.south().west()), se = by.test(pos.south().east());
+			if (!(n || s || w || ea || nw || ne || sw || se)) return;
 			List<Integer> tiles = new ArrayList<>(4);
 			int edges = (n ? 1 : 0) | (ea ? 2 : 0) | (s ? 4 : 0) | (w ? 8 : 0);
 			switch (edges) {

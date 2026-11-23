@@ -66,11 +66,6 @@ public class LongBanners extends BannerRenderer {
 					new ResourceKey[][] {{BannerPatterns.STRIPE_TOP, BannerPatterns.CIRCLE_MIDDLE, BannerPatterns.TRIANGLES_BOTTOM},
 							{BannerPatterns.CROSS, BannerPatterns.BORDER, BannerPatterns.BORDER},
 							{BannerPatterns.STRAIGHT_CROSS, BannerPatterns.STRIPE_BOTTOM, BannerPatterns.BORDER}}),
-			// The S.S. AQUA: dressed overall, signal flags in navy, white and red.
-			new Theme("aqua", -2306, 662, -2262, 856, new DyeColor[] {DyeColor.RED, DyeColor.WHITE, DyeColor.BLUE}, DyeColor.WHITE, DyeColor.RED,
-					new ResourceKey[][] {{BannerPatterns.STRIPE_CENTER, BannerPatterns.STRIPE_MIDDLE, BannerPatterns.BORDER},
-							{BannerPatterns.HALF_HORIZONTAL, BannerPatterns.CIRCLE_MIDDLE, BannerPatterns.BORDER},
-							{BannerPatterns.CROSS, BannerPatterns.RHOMBUS_MIDDLE, BannerPatterns.BORDER}}),
 			// Cianwood: the beach's, sunset orange and sea cyan, the sun, the surf.
 			new Theme("cianwood", -2600, 690, -2480, 820, new DyeColor[] {DyeColor.ORANGE, DyeColor.WHITE, DyeColor.CYAN}, DyeColor.YELLOW, DyeColor.WHITE,
 					new ResourceKey[][] {{BannerPatterns.GRADIENT_UP, BannerPatterns.CIRCLE_MIDDLE, BannerPatterns.TRIANGLES_BOTTOM},
@@ -139,6 +134,11 @@ public class LongBanners extends BannerRenderer {
 			return;
 		}
 		BlockPos at = s.blockPos;
+		// ((0.59.3, 20:47: the ships, "do not texture those") The S.S. AQUA's flags as John made them.)
+		if (at.getX() >= -2306 && at.getX() <= -2262 && at.getZ() >= 662 && at.getZ() <= 856) {
+			super.submit(s, pose, out, camera);
+			return;
+		}
 		Theme t = themeAt(at);
 		if (t != null) {
 			DyeColor base = t.palette()[slot(s.baseColor) % t.palette().length];
