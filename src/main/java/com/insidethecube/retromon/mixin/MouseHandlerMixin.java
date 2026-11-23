@@ -19,7 +19,8 @@ public abstract class MouseHandlerMixin {
 	@Inject(method = "onScroll", at = @At("HEAD"), cancellable = true)
 	private void retromon$zoom(long window, double x, double y, CallbackInfo ci) {
 		if (!Adventure.active() || Minecraft.getInstance().screen != null) return;
-		Adventure.zoom(y);
+		if (com.insidethecube.retromon.client.Photo.on) com.insidethecube.retromon.client.Photo.scroll(y);
+		else Adventure.zoom(y);
 		ci.cancel();
 	}
 }

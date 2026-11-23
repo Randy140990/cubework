@@ -803,6 +803,57 @@ public final class Interiors {
 	private static final Map<UUID, Integer> COOL = new HashMap<>();
 	/** (0.51) The warp pad each player last landed on (room coordinates): quiet till they've stepped off it. */
 	private static final Map<UUID, double[]> PAD_LOCK = new HashMap<>();
+	/** (0.53) An elevator (SILPH CO.'s): the floor each player got in from, and the floor they picked inside. */
+	private static final Map<UUID, String> LIFT_FROM = new HashMap<>(), LIFT_TO = new HashMap<>();
+
+	/** Whether a room's an elevator: its way out is to the floor you pick. */
+	public static boolean isLift(Room r) {
+		for (Warp w : r.warps()) if ("box".equals(w.kind()) && "lift".equals(w.choice())) return true;
+		return false;
+	}
+
+	/** A floor's doors into an elevator (its way in there), or null. */
+	public static Warp liftDoor(Room floor, String lift) {
+		for (Warp w : floor.warps()) if ("box".equals(w.kind()) && lift.equals(w.to())) return w;
+		return null;
+	}
+
+	/** An elevator's floors, top first: the rooms with doors into it, by their floor's name (B4F to 11F, the roof). */
+	public static List<Room> liftFloors(String lift) {
+		List<Room> out = new ArrayList<>();
+		for (Room r : ROOMS.values()) if (liftDoor(r, lift) != null) out.add(r);
+		out.sort((a, b) -> Integer.compare(floorNumber(b.floor()), floorNumber(a.floor())));
+		return out;
+	}
+
+	private static int floorNumber(String f) {
+		String u = f == null ? "" : f.toUpperCase(java.util.Locale.ROOT).trim();
+		if (u.startsWith("ROOF")) return 1000;
+		java.util.regex.Matcher m = java.util.regex.Pattern.compile("^(B?)(\\d+)F").matcher(u);
+		if (!m.find()) return 0;
+		int n = Integer.parseInt(m.group(2));
+		return m.group(1).isEmpty() ? n : -n;
+	}
+
+	/** Where you get out: the floor you picked, else the one you got in from, else the lowest. */
+	private static Room liftFloor(ServerPlayer p, Room lift) {
+		UUID id = p.getUUID();
+		Room r = ROOMS.get(LIFT_TO.getOrDefault(id, LIFT_FROM.getOrDefault(id, "")));
+		if (r != null && liftDoor(r, lift.id()) != null) return r;
+		List<Room> fl = liftFloors(lift.id());
+		return fl.isEmpty() ? null : fl.get(fl.size() - 1);
+	}
+
+	/** The floor picked on an elevator's buttons. */
+	public static void liftPick(ServerPlayer p, String floor) {
+		if (ROOMS.containsKey(floor)) LIFT_TO.put(p.getUUID(), floor);
+	}
+
+	/** The floor you'd get out on now (the buttons show it lit). */
+	public static String liftAt(ServerPlayer p, Room lift) {
+		Room r = liftFloor(p, lift);
+		return r == null ? null : r.id();
+	}
 	/** Who's on their way somewhere (after the fade to black): ticks left, and where to. */
 	private static final Map<UUID, Integer> PENDING_T = new HashMap<>();
 	private static final Map<UUID, Runnable> PENDING = new HashMap<>();
@@ -853,6 +904,7 @@ public final class Interiors {
 			p.teleportTo(level, r.ox() + x, r.oy() + y, r.oz() + z, java.util.Set.of(), yaw, 30F, true);
 			p.setDeltaMovement(Vec3.ZERO);
 			LAST.remove(p.getUUID());
+			settle(p);
 			Game.roomEntered(p, r, fromOutside);
 		};
 		if (!fade) {
@@ -902,8 +954,18 @@ public final class Interiors {
 			p.teleportTo(world, d.x(), d.y(), d.z(), java.util.Set.of(), d.yaw(), 30F, true);
 			p.setDeltaMovement(Vec3.ZERO);
 			LAST.remove(p.getUUID());
+			settle(p);
 			Game.roomLeft(p);
 		});
+	}
+
+	/**
+	 * (0.53, 11:16: "There seems to be a delay going into stuff.") Once you're through a door, only a moment (half a
+	 * second) before the next one works; it held you for nearly three seconds more after the screen opened.
+	 */
+	private static void settle(ServerPlayer p) {
+		float rate = p.level().getServer().tickRateManager().tickrate();
+		COOL.put(p.getUUID(), Math.round(10 * Math.max(1F, rate / 20F)));
 	}
 
 	/** Straight out of a room to a point in the world (FAST TRAVEL), no door or fade. */
@@ -1013,6 +1075,14 @@ public final class Interiors {
 						if (lock != null) PAD_LOCK.remove(id);
 						if (lx > w.x0() && lx < w.x1() && lz > w.z0() && lz < w.z1()) {
 							PAD_LOCK.put(id, new double[] {w.sx(), w.sz()});
+							// (0.53) SILPH CO.'s: a pad whose partner is on another floor.
+							if (w.to() != null && !w.to().equals(r.id()) && ROOMS.containsKey(w.to())) {
+								CompoundTag s = new CompoundTag();
+								s.putString("sound", "warp");
+								Net.send(p, "sound", s);
+								go(p, ROOMS.get(w.to()), w.sx(), w.sz(), 0F, true);
+								return true;
+							}
 							p.teleportTo(r.ox() + w.sx(), p.getY(), r.oz() + w.sz());
 							p.setDeltaMovement(Vec3.ZERO);
 							LAST.remove(id);
@@ -1020,6 +1090,56 @@ public final class Interiors {
 							CompoundTag s = new CompoundTag();
 							s.putString("sound", "warp");
 							Net.send(p, "sound", s);
+							return true;
+						}
+					}
+					case "box" -> {
+						// (0.53) Walking into it (SILPH CO.'s stairs, its elevator's doors): to the room it leads to. Out
+						// of an elevator ("lift"): onto the floor you picked there, or back where you got in.
+						if (lx > w.x0() && lx < w.x1() && lz > w.z0() && lz < w.z1()) {
+							if ("lift".equals(w.choice())) {
+								Room fl = liftFloor(p, r);
+								Warp door = fl == null ? null : liftDoor(fl, r.id());
+								if (door == null) continue;
+								LIFT_TO.remove(id);
+								LIFT_FROM.put(id, fl.id());
+								go(p, fl, (door.x0() + door.x1()) / 2, door.z1() + 0.65, 0F, true);
+								return true;
+							}
+							Room to = w.to() == null ? null : ROOMS.get(w.to());
+							if (to == null) continue;
+							if (isLift(to)) {
+								LIFT_FROM.put(id, r.id());
+								LIFT_TO.remove(id);
+							}
+							go(p, to, w.sx(), w.sz(), w.syaw(), true);
+							return true;
+						}
+					}
+					case "key_n", "key_s", "key_e", "key_w" -> {
+						// (0.53) SILPH CO.'s card-key shutters: walking into one, through to its other side with the CARD KEY;
+						// without it you're turned back ("It needs a CARD KEY!").
+						char dir = w.kind().charAt(4);
+						boolean heading = switch (dir) {
+							case 'n' -> dz < -0.01 || facingNorth;
+							case 's' -> dz > 0.01 || facingSouth;
+							case 'e' -> dx > 0.01 || facingEast;
+							default -> dx < -0.01 || facingWest;
+						};
+						if (heading && lx > w.x0() && lx < w.x1() && lz > w.z0() && lz < w.z1()) {
+							if (w.needs() != null && !Game.meets(p, w.needs())) {
+								double bx = dir == 'e' ? -0.5 : dir == 'w' ? 0.5 : 0, bz = dir == 's' ? -0.5 : dir == 'n' ? 0.5 : 0;
+								p.teleportTo(p.getX() + bx, p.getY(), p.getZ() + bz);
+								COOL.put(id, 30);
+								Game.gateBlocked(p, w.needs());
+								return true;
+							}
+							Game.shutterOpened(p, w.door());
+							p.teleportTo(r.ox() + w.sx(), p.getY(), r.oz() + w.sz());
+							p.setYRot(w.syaw());
+							p.setDeltaMovement(Vec3.ZERO);
+							LAST.remove(id);
+							COOL.put(id, 12);
 							return true;
 						}
 					}

@@ -321,6 +321,8 @@ async function doAct(a) {
   } else if (a.pc) {
     const pick = await say([{ text: "You booted up the PC.", ask: ["Item storage", "Log off"] }]);
     if (pick === 0) await say([{ text: "Item storage: one POTION, kept for you." }, { text: "In game, your boxes and stored items open from here." }]);
+  } else if (a.run) {
+    await a.run(say);
   } else {
     if (a.hit && room.bag) room.bag.swing = 1;
     await say((a.lines || ["Nothing special."]).map(t => ({ text: t })));

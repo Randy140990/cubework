@@ -2125,6 +2125,8 @@ public final class Game {
 		if (needs.equals("CHAMPION")) return d.story.contains("champion");
 		// (0.50) The CYCLING ROAD's gates: on a BICYCLE only. SAFFRON's: the guards are thirsty (a drink gets you by).
 		if (needs.equals("bicycle")) return d.count("bicycle") > 0;
+		// (0.53) SILPH CO.'s shutters: the CARD KEY (on 5F).
+		if (needs.equals("card_key")) return d.count("card_key") > 0;
 		if (needs.equals("tea")) return d.count("tea") > 0 || d.count("fresh_water") > 0 || d.count("soda_pop") > 0 || d.count("lemonade") > 0;
 		return d.badges.contains(needs);
 	}
@@ -2133,6 +2135,10 @@ public final class Game {
 	public static void gateBlocked(ServerPlayer p, String needs) {
 		if (needs.equals("safari")) {
 			safariAsk(p);
+			return;
+		}
+		if (needs.equals("card_key")) {
+			message(p, List.of("It needs a CARD KEY!"));
 			return;
 		}
 		if (needs.equals("bicycle")) {
@@ -2147,6 +2153,46 @@ public final class Game {
 		String b = needs.equals("CHAMPION") ? "the POKéMON LEAGUE's title" : "the " + needs;
 		dialogue(p, null, "talk", List.of("GUARD: Hold it right there!", "GUARD: Only TRAINERS who have " + b + " may go on from here.",
 				"GUARD: Come back when you've earned it!"), whoTag("GUARD"));
+	}
+
+	/** (0.53) Through a SILPH CO. shutter with the CARD KEY: the first time, FireRed's words (and its fanfare). */
+	public static void shutterOpened(ServerPlayer p, String key) {
+		PlayerData d = data(p);
+		if (key == null || !d.statics.add("shutter:" + key)) return;
+		CompoundTag s = new CompoundTag();
+		s.putString("sound", "item");
+		Net.send(p, "sound", s);
+		message(p, List.of("Bingo! The CARD KEY opened the door!"));
+	}
+
+	/**
+	 * (0.53) An elevator's buttons (SILPH CO.'s): which floor? Its floors top first, a page at a time (a list of nine
+	 * at most fits the screen), the one you'd get out on now first in the words.
+	 */
+	public static void liftAsk(ServerPlayer p, Interiors.Room lift, int page) {
+		List<Interiors.Room> fl = Interiors.liftFloors(lift.id());
+		if (fl.isEmpty()) return;
+		int per = fl.size() > 9 ? 6 : fl.size(), pages = (fl.size() + per - 1) / per;
+		page = Math.floorMod(page, pages);
+		CompoundTag t = new CompoundTag();
+		ListTag ch = new ListTag(), ids = new ListTag();
+		for (int i = page * per; i < Math.min(fl.size(), (page + 1) * per); i++) {
+			ch.add(StringTag.valueOf(fl.get(i).floor()));
+			ids.add(StringTag.valueOf(fl.get(i).id()));
+		}
+		if (pages > 1) {
+			int nx = (page + 1) % pages, a = nx * per, b = Math.min(fl.size(), a + per) - 1;
+			ch.add(StringTag.valueOf(fl.get(a).floor() + " TO " + fl.get(b).floor()));
+			ids.add(StringTag.valueOf("#" + nx));
+		}
+		ch.add(StringTag.valueOf("CANCEL"));
+		ids.add(StringTag.valueOf(""));
+		t.put("choices", ch);
+		t.put("floors", ids);
+		t.putString("lift", lift.id());
+		String at = Interiors.liftAt(p, lift);
+		Interiors.Room now = at == null ? null : Interiors.ROOMS.get(at);
+		dialogue(p, null, "lift", List.of(now == null ? "Which floor?" : "It's at " + now.floor() + ". Which floor?"), t);
 	}
 
 	private static CompoundTag whoTag(String who) {
@@ -2510,6 +2556,56 @@ public final class Game {
 							? List.of("You can pass here only if you have the " + gb + ".", "Oh! That is the " + gb + "!", "OK then! Please, go right ahead!")
 							: List.of("You can pass here only if you have the " + gb + ".", "You don't have the " + gb + " yet!",
 									"You have to have it to get to the POKéMON LEAGUE!"));
+					return;
+				}
+				// (0.53) SILPH CO.: the worker on 7F gives you LAPRAS; the woman on 9F lets you rest (your POKéMON healed); the
+				// PRESIDENT gives you the MASTER BALL once you've beaten GIOVANNI.
+				if (n.key().equals("silph_co_7f_p0")) {
+					if (d.statics.contains("lapras_gift")) {
+						dialogue(p, n, "talk", List.of("It's a LAPRAS. It's a very intelligent POKéMON.", "We kept it in our lab, but it will be much better off with you.",
+								"I think you will be a good TRAINER for LAPRAS!", "It's a good swimmer. It'll give you a lift across water!"));
+						return;
+					}
+					CompoundTag g = new CompoundTag();
+					g.putString("static", "lapras_gift");
+					g.putString("cry", "lapras");
+					dialogue(p, n, "gift", List.of("Oh! Hi! You're not a ROCKET! You came to save us? Why, thank you!", "I want you to have this POKéMON for saving us.",
+							"Do you want LAPRAS?"), g, n.getId());
+					return;
+				}
+				if (n.key().equals("silph_co_9f_fr_heal_woman")) {
+					if (d.beaten.contains("silph_co_11f_0")) {
+						dialogue(p, n, "talk", List.of("Thank you so much."));
+						return;
+					}
+					d.healAll();
+					sync(p);
+					CompoundTag s = new CompoundTag();
+					s.putString("sound", "heal");
+					Net.send(p, "sound", s);
+					dialogue(p, n, "talk", List.of("You look tired. You should take a quick nap.", "(Your POKéMON are fully healed.)", "Don't give up!"));
+					return;
+				}
+				if (n.key().equals("silph_co_11f_p0")) {
+					String had = "gift:silph_co_11f:master_ball";
+					if (!d.beaten.contains("silph_co_11f_0")) {
+						dialogue(p, n, "talk", List.of("PRESIDENT: ..."));
+					} else if (d.statics.contains(had)) {
+						dialogue(p, n, "talk", List.of("PRESIDENT: You can't buy that anywhere.", "It's our secret prototype MASTER BALL.",
+								"It will catch any POKéMON without fail!", "You should be quiet about using it, though."));
+					} else {
+						d.statics.add(had);
+						d.give("master_ball", 1);
+						sync(p);
+						CompoundTag s = new CompoundTag();
+						s.putString("sound", "key");
+						Net.send(p, "sound", s);
+						dialogue(p, n, "talk", List.of("PRESIDENT: Oh, dear " + ("girl".equals(d.gender) ? "girl" : "boy") + "! Thank you for saving SILPH.",
+								"I will never forget you saved us in our moment of peril.", "I have to thank you in some way.",
+								"Because I am rich, I can give you anything.", "Here, maybe this will do.", player(p) + " obtained a MASTER BALL from the PRESIDENT!",
+								"PRESIDENT: You can't buy that anywhere.", "It's our secret prototype MASTER BALL.", "It will catch any POKéMON without fail!",
+								"You should be quiet about using it, though."));
+					}
 					return;
 				}
 				// (0.52) The COPYCAT (FireRed's): bring her a POKé DOLL and she teaches you MIMIC (TM31); till then she
@@ -3336,6 +3432,10 @@ public final class Game {
 			message(p, List.of(player(p) + " found " + it.name() + "!"));
 			return;
 		}
+		if (use.equals("lift")) {
+			liftAsk(p, r, 0);
+			return;
+		}
 		if (use.startsWith("can:") && r.id().equals("vermilion_gym")) {
 			try {
 				trashCan(p, Integer.parseInt(use.substring(4)));
@@ -3796,6 +3896,22 @@ public final class Game {
 					else dialogue(p, null, "talk", List.of("GUARD: ROUTE 26 leads to the JOHTO region, and the POKéMON LEAGUE's back way.",
 							"GUARD: Only the CHAMPION may go that way. Come back once you've beaten the ELITE FOUR!"), whoTag("GUARD"));
 				}
+			}
+			case "lift" -> {
+				// (0.53) The floor picked on an elevator's buttons (or the next page of them).
+				int c = t.getIntOr("choice", -1);
+				var ids = t.getListOrEmpty("floors");
+				if (!t.getBooleanOr("answered", false) || c < 0 || c >= ids.size()) return;
+				String f = ids.get(c).asString().orElse("");
+				Interiors.Room lift = Interiors.ROOMS.get(t.getStringOr("lift", ""));
+				if (f.isEmpty() || lift == null) return;
+				if (f.startsWith("#")) {
+					liftAsk(p, lift, Integer.parseInt(f.substring(1)));
+					return;
+				}
+				Interiors.liftPick(p, f);
+				Interiors.Room fl = Interiors.ROOMS.get(f);
+				message(p, List.of("The elevator hums...", "It's stopped at " + (fl == null ? f : fl.floor()) + "."));
 			}
 			case "mum_map" -> mumHeadsHome(p);
 			case "rival" -> {

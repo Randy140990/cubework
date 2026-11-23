@@ -18,7 +18,8 @@ import net.minecraft.nbt.CompoundTag;
  */
 public final class OptionsPage {
 	public static final String[] LABELS = {"TEXT SPEED", "MUSIC", "SOUND", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "BATTLE EFFECTS", "BATTLE STYLE", "WALK WITH YOU",
-			"POKéMON LOOK", "SHADERS", "DAY AND NIGHT", "BATTLES", "FAST TRAVEL", "CONTROLS"};
+			"POKéMON LOOK", "SHADERS", "DAY AND NIGHT", "BATTLES", "FAST TRAVEL", "PHOTO MODE",
+			"CONTROLS"};
 	private static final String[] LINES = {"How quickly words appear in text boxes.", "How loud the music plays.", "How loud cries, steps and menu sounds are.",
 			"Whether the POKéDEX reads its entries out loud.", "How dark nights get outside.", "Whether wild POKéMON show in the grass, or jump out at you.",
 			"Whether moves play their animations in battle.", "SWITCH asks if you want to change POKéMON when a trainer's sends out the next one.",
@@ -27,9 +28,10 @@ public final class OptionsPage {
 			"ON lets the day go by, morning to night. OFF holds it at half past ten in the morning (the day count waits too).",
 			"OFF: no wild POKéMON jump out and trainers let you by, to look round quickly. Your rival's and TEAM ROCKET's battles still happen.",
 			"ON: the TOWN MAP takes you anywhere. A on any place goes there, or right-click any spot on the map.",
+			"ON: the camera leaves you, for high shots of the map (F6 too). WASD move, SPACE/CTRL up and down, Q/E turn, R/F tilt, the wheel zooms, Z/X the lens.",
 			"See every key: what it does in game, and what's turned off."};
 	private static final String[][] VALUES = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"},
-			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"ON", "OFF"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {"ON", "OFF"}, {"ON", "OFF"}, {"OFF", "ON"}, {}};
+			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"ON", "OFF"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {"ON", "OFF"}, {"ON", "OFF"}, {"OFF", "ON"}, {"OFF", "ON"}, {}};
 	public int row;
 	/** Opens the key map (from CONTROLS). */
 	private final Runnable keymap;
@@ -41,7 +43,7 @@ public final class OptionsPage {
 	private static int[] now() {
 		return new int[] {ClientState.data.textSpeed, Music.level(), Settings.sound(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0,
 				Settings.effects() ? 0 : 1, Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), Settings.shaderMode(), Settings.cycle() ? 0 : 1,
-				Settings.battles() ? 0 : 1, Settings.fastTravel() ? 1 : 0, 0};
+				Settings.battles() ? 0 : 1, Settings.fastTravel() ? 1 : 0, Photo.on ? 1 : 0, 0};
 	}
 
 	private static boolean online() {
@@ -95,6 +97,7 @@ public final class OptionsPage {
 				Settings.set("travel", Settings.fastTravel() ? 0 : 1);
 				if (online()) Settings.sendPrefs();
 			}
+			case 14 -> Photo.set(!Photo.on);
 			default -> {
 				Sounds.press();
 				keymap.run();

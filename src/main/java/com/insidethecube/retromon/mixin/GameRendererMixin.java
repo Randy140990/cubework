@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class GameRendererMixin {
 	@Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
 	private void retromon$fov(Camera camera, float partial, boolean useSetting, CallbackInfoReturnable<Float> cir) {
-		if (Adventure.active()) cir.setReturnValue(BattleScene.active() ? BattleScene.fov() : (float) Adventure.FOV);
+		if (Adventure.active()) cir.setReturnValue(BattleScene.active() ? BattleScene.fov() : (float) (com.insidethecube.retromon.client.Photo.on ? com.insidethecube.retromon.client.Photo.fov : Adventure.FOV));
 	}
 
 	@Inject(method = "bobView", at = @At("HEAD"), cancellable = true, require = 0)

@@ -367,3 +367,6 @@ route_23_guard_4	route_23	guard	down	stay	You can pass here only if you have the
 route_23_guard_5	route_23	guard	down	stay	You can pass here only if you have the MARSHBADGE.	-1	-1
 route_23_guard_6	route_23	guard	down	stay	You can pass here only if you have the VOLCANOBADGE.	-1	-1
 route_23_guard_7	route_23	guard	down	stay	You can pass here only if you have the EARTHBADGE.	-1	-1
+silph_co_5f_fr_scientist	silph_co_5f	scientist	down	stay	Those thugs that took over our building... | Their BOSS said he was looking for strong POKéMON. | I hope our PRESIDENT managed to avoid trouble...	-1	-1
+silph_co_8f_fr_scientist	silph_co_8f	scientist	down	stay	TEAM ROCKET's BOSS is terribly cruel! | To him, POKéMON are just tools to be used. | What will happen if that tyrant takes over our company...	-1	-1
+silph_co_9f_fr_heal_woman	silph_co_9f	lady	down	stay	You look tired. You should take a quick nap.	-1	-1

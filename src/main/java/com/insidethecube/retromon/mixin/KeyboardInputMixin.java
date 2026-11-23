@@ -44,7 +44,7 @@ public abstract class KeyboardInputMixin extends ClientInput {
 			this.moveVector = new Vec2(0, 1);
 			return;
 		}
-		if (player == null || Adventure.frozen > 0 || com.insidethecube.retromon.client.Device.busy()) {
+		if (player == null || Adventure.frozen > 0 || com.insidethecube.retromon.client.Device.busy() || com.insidethecube.retromon.client.Photo.on) {
 			this.keyPresses = Input.EMPTY;
 			this.moveVector = Vec2.ZERO;
 			return;

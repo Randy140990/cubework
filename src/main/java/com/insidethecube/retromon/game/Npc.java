@@ -240,6 +240,15 @@ public class Npc extends PathfinderMob {
 		}
 		if (trainer == null || trainer.sight() <= 0 || tickCount < nextWander) return;
 		String f = trainer.facing();
+		// (0.53, 11:16: the FIGHTING DOJO's "shouldn't walk around, they should just be in the static place") Indoors,
+		// trainers stand where the games have them: the ones who look about turn on the spot, the rest watch their way.
+		if (level().dimension() == Interiors.LEVEL) {
+			nextWander = tickCount + 30 + random.nextInt(50);
+			if (blockPosition().distManhattan(home) > 1) walkTo(home, homeFacing);
+			else if (f.equals("none")) setFacing(random.nextInt(4) * 90F);
+			else if (Math.abs(net.minecraft.util.Mth.wrapDegrees(facing() - homeFacing)) > 1) setFacing(homeFacing);
+			return;
+		}
 		if (f.equals("none")) {
 			nextWander = tickCount + 24 + random.nextInt(40);
 			setFacing(random.nextInt(4) * 90F);

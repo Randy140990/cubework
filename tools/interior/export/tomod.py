@@ -41,7 +41,9 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "route12_house": (4992, 64, 0), "route16_house": (5056, 64, 0),
           "gate_r11_2f": (5248, 64, 0), "gate_r12_2f": (5312, 64, 0), "gate_r15_2f": (5504, 64, 0), "gate_r16_2f": (5568, 64, 0),
           "fighting_dojo": (5760, 64, 0), "saffron_gym": (5824, 64, 0),
-          "copycats_house_1f": (5888, 64, 0), "copycats_house_2f": (5952, 64, 0), "mr_psychics_house": (6016, 64, 0),}
+          "copycats_house_1f": (5888, 64, 0), "copycats_house_2f": (5952, 64, 0), "mr_psychics_house": (6016, 64, 0),
+          # (0.53) SILPH CO.'s eleven floors and its elevator.
+          "silph_co_1f": (7616, 64, 0), "silph_co_2f": (7680, 64, 0), "silph_co_3f": (7744, 64, 0), "silph_co_4f": (7808, 64, 0), "silph_co_5f": (7872, 64, 0), "silph_co_6f": (7936, 64, 0), "silph_co_7f": (8000, 64, 0), "silph_co_8f": (8064, 64, 0), "silph_co_9f": (8128, 64, 0), "silph_co_10f": (8192, 64, 0), "silph_co_11f": (8256, 64, 0), "silph_co_elevator": (6080, 64, 0),}
 PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_town", "rival2": "pallet_town", "lab": "pallet_town", "center": "viridian_city",
          "mart": "viridian_city", "school": "viridian_city", "trainer2": "viridian_city", "nickhouse": "viridian_city", "gate_s": "route_2", "gate_n": "route_2",
          "gate_league": "route_22", "gate_johto": "route_22", "route2_gate": "route_2_gate", "route2_house": "route_2_trade_house",
@@ -62,7 +64,8 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "gate_r18": "route_18_gate_1f", "route12_house": "route_12_super_rod_house", "route16_house": "route_16_fly_house",
          "gate_r11_2f": "route_11_gate_2f", "gate_r12_2f": "route_12_gate_2f", "gate_r15_2f": "route_15_gate_2f", "gate_r16_2f": "route_16_gate_2f",
          "fighting_dojo": "fighting_dojo", "saffron_gym": "saffron_gym",
-         "copycats_house_1f": "copycats_house_1f", "copycats_house_2f": "copycats_house_2f", "mr_psychics_house": "mr_psychics_house",}
+         "copycats_house_1f": "copycats_house_1f", "copycats_house_2f": "copycats_house_2f", "mr_psychics_house": "mr_psychics_house",
+         "silph_co_1f": "silph_co_1f", "silph_co_2f": "silph_co_2f", "silph_co_3f": "silph_co_3f", "silph_co_4f": "silph_co_4f", "silph_co_5f": "silph_co_5f", "silph_co_6f": "silph_co_6f", "silph_co_7f": "silph_co_7f", "silph_co_8f": "silph_co_8f", "silph_co_9f": "silph_co_9f", "silph_co_10f": "silph_co_10f", "silph_co_11f": "silph_co_11f", "silph_co_elevator": "silph_co_elevator",}
 # The doors in John's world (Pallet Town: the lower halves of each double door; outside is to the south).
 DOORS = {
     "home": {"room": "house1", "door": [[-803, 19, 679], [-802, 19, 679]], "out": [-802.0, 19.0, 680.6]},
@@ -178,6 +181,8 @@ DOORS = {
     "saffron_gym": {"room": "saffron_gym", "door": [[-323, 33, 398], [-322, 33, 398], [-321, 33, 398]], "out": [-321.5, 33.0, 400.2]},
     "copycats_house": {"room": "copycats_house_1f", "door": [[-375, 34, 397], [-374, 34, 397]], "out": [-374.0, 34.0, 399.6]},
     "mr_psychics_house": {"room": "mr_psychics_house", "door": [[-332, 34, 442], [-331, 34, 442]], "out": [-331.0, 34.0, 444.6]},
+    # (0.53) SILPH CO.: in through the middle of its glass front, between the two dark posts.
+    "silph_co": {"room": "silph_co_1f", "door": [[-352, 34, 427], [-351, 34, 427]], "out": [-351.0, 34.0, 429.6]},
 }
 # Every other Pokémon Center and Poké Mart on the map (shops.tsv): the same insides, each its own way back out. A shared
 # door's "group" says which: going out of the room, you come out of the door you went in by (Interiors.doorOut).
@@ -201,12 +206,13 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house",
             "lavender_volunteer_house": "lavender_volunteer_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "lavender_name_rater",
             "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r12": "gate_r12_a", "route12_house": "route12_house", "route16_house": "route16_house",
-            "fighting_dojo": "saffron_dojo", "saffron_gym": "saffron_gym", "copycats_house_1f": "copycats_house", "mr_psychics_house": "mr_psychics_house"}
+            "fighting_dojo": "saffron_dojo", "saffron_gym": "saffron_gym", "copycats_house_1f": "copycats_house", "mr_psychics_house": "mr_psychics_house", "silph_co_1f": "silph_co"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
 # so its trainers see straight ahead as many steps as theirs.
-TILE = {"pewter_gym": [1.0, 1.0], "fuchsia_gym": [1.0, 1.0], "cerulean_gym": [1.0, 1.0]}
+TILE = {"pewter_gym": [1.0, 1.0], "fuchsia_gym": [1.0, 1.0], "cerulean_gym": [1.0, 1.0], "saffron_gym": [1.0, 1.0], "fighting_dojo": [1.0, 1.0]}
+TILE.update({"silph_co_%df" % i: [1.0, 1.0] for i in range(1, 12)})
 # Item balls in a room of the viewer's (the WARDEN's RARE CANDY, behind his boulders: 15:33).
 BALLS = {"fuchsia_house3": [{"key": "wardens_house_rare_candy", "x": 0.8, "z": 8.4, "y": 0}]}
 # The Underground Paths' items (16:20), as John listed them: north to south (the first four come back each day), and
@@ -594,8 +600,19 @@ def main():
                           "door": SIDE_DOOR.get((rid, m["wall"])), "to": None, "choice": m.get("choice"), "needs": m.get("needs")})
         # (0.51) Warp pads (the SAFFRON GYM's): step on one and you're on its partner, in the same room.
         for pd in room.get("pads", []):
-            warps.append({"kind": "pad", "x0": pd["x0"], "x1": pd["x1"], "z0": pd["z0"], "z1": pd["z1"], "to": rid,
+            # ((0.53) SILPH CO.'s: a pad's partner may be on another floor.)
+            warps.append({"kind": "pad", "x0": pd["x0"], "x1": pd["x1"], "z0": pd["z0"], "z1": pd["z1"], "to": pd.get("room") or rid,
                           "spawn": {"x": pd["to"]["x"], "z": pd["to"]["z"], "yaw": 0.0}})
+        # (0.53) A way you walk into (SILPH CO.'s stairs, its elevator's doors): to another room; or out of the
+        # elevator onto the floor you picked ("lift").
+        for bx in room.get("boxes", []):
+            w = {"kind": "box", "x0": bx["x0"], "x1": bx["x1"], "z0": bx["z0"], "z1": bx["z1"], "to": bx.get("to"), "choice": "lift" if bx.get("lift") else None}
+            if bx.get("spawn"): w["spawn"] = spawn_of(bx["spawn"])
+            warps.append(w)
+        # (0.53) SILPH CO.'s card-key shutters: walking into one from a side, through to the other (with the CARD KEY).
+        for k in room.get("keys", []):
+            warps.append({"kind": "key_" + k["dir"], "x0": k["x0"], "x1": k["x1"], "z0": k["z0"], "z1": k["z1"], "to": rid, "door": k["id"],
+                          "needs": k.get("needs"), "spawn": spawn_of(k["spawn"])})
         for s in room["stairs"]:
             to = s["to"]; sp = s["spawn"]
             warps.append({"kind": s["dir"], "x0": s["x0"], "x1": s["x0"] + 4, "z0": s["z0"], "z1": s["z0"] + s["depth"], "to": to,
@@ -619,7 +636,7 @@ def main():
                           "place": PLACE[rid], "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360},
                           "entry": ENTRY.get(rid), "cam": fit_camera(room["W"], room["D"], room["H"]), "cells": placed, "warps": warps, "people": people, "acts": acts,
                           "grass": room.get("grass", []), "pools": room.get("pools", []), "panes": panes_of(room), "clocks": room.get("clocks", []),
-                          **({"tile": TILE[rid]} if rid in TILE else {}), **({"items": BALLS[rid]} if rid in BALLS else {}),
+                          **({"tile": TILE[rid]} if rid in TILE else {}), **({"items": BALLS.get(rid, []) + room.get("balls", [])} if rid in BALLS or room.get("balls") else {}),
                           **({"schem": SCHEM[rid][0], "base": SCHEM[rid][1]} if rid in SCHEM else {}),
                           **({"mons": MONS[rid]} if rid in MONS else {})}
     # Models and the block's states.

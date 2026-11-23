@@ -154,9 +154,14 @@ public final class Adventure {
 		lavender = Math.max(0F, Math.min(1F, lavender + Math.max(-0.04F, Math.min(0.03F, want - lavender))));
 		distance += (distanceTarget - distance) * 0.2;
 		while (SPEED.consumeClick()) cycleSpeed();
-		hidden = !BattleScene.active() && behind(mc);
+		hidden = !BattleScene.active() && !Photo.on && behind(mc);
 		updatePrompt(mc);
-		if (mc.screen == null && !Device.busy()) {
+		if (Photo.on) {
+			while (mc.options.keyJump.consumeClick()) {
+			}
+			while (START.consumeClick()) {
+			}
+		} else if (mc.screen == null && !Device.busy()) {
 			while (mc.options.keyJump.consumeClick()) talk(mc);
 			// START: you take your Pokédex out, and the menu comes up on it.
 			while (START.consumeClick()) Device.open(MenuScreen::new);
@@ -179,6 +184,7 @@ public final class Adventure {
 		if (mc.screen != null) return false;
 		int k = e.key();
 		if (k == GLFW.GLFW_KEY_ESCAPE || k == GLFW.GLFW_KEY_F1 || k == GLFW.GLFW_KEY_F2 || k == GLFW.GLFW_KEY_F11) return false;
+		if (k == GLFW.GLFW_KEY_F6) return true;
 		// Lightlens (recording and photos: F10, F12 and its GIF key) works in the game too, as do F10 and F12 for any
 		// recording mod: Minecraft has nothing on them.
 		if (k == GLFW.GLFW_KEY_F10 || k == GLFW.GLFW_KEY_F12) return false;
@@ -199,6 +205,7 @@ public final class Adventure {
 	public static boolean menuKey(net.minecraft.client.input.KeyEvent e, int action) {
 		Minecraft mc = Minecraft.getInstance();
 		if (!active() || mc.player == null || mc.screen != null) return false;
+		if (Photo.on && e.key() != GLFW.GLFW_KEY_ENTER && e.key() != GLFW.GLFW_KEY_KP_ENTER) return false;
 		boolean menu = (START != null && START.matches(e)) || e.key() == GLFW.GLFW_KEY_ENTER || e.key() == GLFW.GLFW_KEY_KP_ENTER;
 		if (!menu) return false;
 		if (action == GLFW.GLFW_PRESS && !Device.busy()) Device.open(MenuScreen::new);
@@ -220,6 +227,8 @@ public final class Adventure {
 	/** Where the camera is and how it's turned: x, y, z, yaw, pitch. */
 	public static double[] pose(Entity e, float partial) {
 		if (BattleScene.active()) return lastPose = BattleScene.cameraPose(partial);
+		// (0.53) PHOTO MODE: wherever you send it.
+		if (Photo.on) return lastPose = Photo.pose();
 		Vec3 p = e.getPosition(partial);
 		// Across the ground it follows you exactly; up and down (steps, slabs) it eases, so it doesn't bob.
 		if (Double.isNaN(smoothY) || Math.abs(smoothY - p.y) > 6) smoothY = p.y;

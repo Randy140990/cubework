@@ -24,14 +24,30 @@ public final class Hud {
 		}
 		// (Under everything else: the dust in a cave's air over the world.)
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("haze"), Hud::haze);
-		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("cinema"), Hud::cinema);
-		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("exclaim"), Hud::exclaim);
-		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("hints"), Hud::hints);
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("cinema"), (g, delta) -> {
+			if (!Photo.on) Hud.cinema(g, delta);
+		});
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("exclaim"), (g, delta) -> {
+			if (!Photo.on) Hud.exclaim(g, delta);
+		});
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("hints"), (g, delta) -> {
+			if (!Photo.on) Hud.hints(g, delta);
+		});
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("fade"), Hud::fade);
-		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("place"), Hud::place);
-		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("speed"), Hud::speed);
-		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("badge"), Hud::badgeNotice);
-		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("money"), Hud::money);
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("place"), (g, delta) -> {
+			if (!Photo.on) Hud.place(g, delta);
+		});
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("speed"), (g, delta) -> {
+			if (!Photo.on) Hud.speed(g, delta);
+		});
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("badge"), (g, delta) -> {
+			if (!Photo.on) Hud.badgeNotice(g, delta);
+		});
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("money"), (g, delta) -> {
+			if (!Photo.on) Hud.money(g, delta);
+		});
+		// (0.53) PHOTO MODE's few words.
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("photo"), (g, delta) -> Photo.draw(g));
 	}
 
 	// ---------- the cinema frame (talking to someone, or a trainer walking up to you), fading in and out ----------
