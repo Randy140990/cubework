@@ -18,7 +18,8 @@ out vec2 uv;
 out float alpha;
 void main() {
     uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
-    alpha = gl_Color.a;
+    // (1.2.8) Lily pads cast no shadow: under clear water it read as a second pad beside each.
+    alpha = int(mc_Entity.x + 0.5) == 10007 ? 0.0 : gl_Color.a;
     vec4 vp = gl_ModelViewMatrix * gl_Vertex;
     vec3 pp = (shadowModelViewInverse * vp).xyz;
     pp += wave(pp, mc_Entity.x, at_midBlock);

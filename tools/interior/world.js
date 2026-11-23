@@ -477,10 +477,17 @@ function centred(room, x, z, f, w, d) {
 }
 function chair(room, x, z, face, o = {}) {
   // x, z: the seat's middle. face: the way the person sitting looks (the back is behind them).
-  const w = 0.62, F = centred(room, x, z, face, w, w), wood = o.wood || "walnut";
-  F.box(0, 0.48, 0, w, 0.56, w, { all: wood, top: o.seat || wood });
-  for (const [lx, lz] of [[0.04, 0.04], [w - 0.12, 0.04], [0.04, w - 0.12], [w - 0.12, w - 0.12]]) F.box(lx, 0, lz, lx + 0.08, 0.48, lz + 0.08, wood);
-  F.box(0, 0.56, 0, w, 1.18, 0.08, wood); F.box(0.12, 0.7, 0.08, w - 0.12, 1.08, 0.1, o.back || wood);
+  // (0.57, 15:46: "the chairs need probably updating") A proper dining chair: a slim seat frame with a plump cushion on
+  // it (its own colour, a little in from the edge), four slim legs, two back posts with a curved-looking top rail and
+  // three slats between, a rail low down between the legs.
+  const w = 0.6, F = centred(room, x, z, face, w, w), wood = o.wood || "walnut", seat = o.seat || wood;
+  F.box(0.02, 0.44, 0.02, w - 0.02, 0.5, w - 0.02, wood);
+  if (seat !== wood) F.box(0.05, 0.5, 0.1, w - 0.05, 0.58, w - 0.04, { all: seat, top: seat });
+  for (const [lx, lz] of [[0.04, 0.04], [w - 0.1, 0.04], [0.04, w - 0.1], [w - 0.1, w - 0.1]]) F.box(lx, 0, lz, lx + 0.06, 0.44, lz + 0.06, wood);
+  F.box(0.07, 0.14, 0.06, w - 0.07, 0.18, 0.09, wood); F.box(0.07, 0.14, w - 0.09, w - 0.07, 0.18, w - 0.06, wood);
+  for (const px of [0.03, w - 0.1]) F.box(px, 0.5, 0.02, px + 0.07, 1.2, 0.09, wood);
+  F.box(0.03, 1.08, 0.015, w - 0.03, 1.2, 0.095, wood); F.box(0.08, 1.2, 0.025, w - 0.08, 1.24, 0.085, wood);
+  for (let i = 0; i < 3; i++) { const sx = 0.17 + i * 0.105; F.box(sx, 0.58, 0.04, sx + 0.055, 1.08, 0.075, o.back || wood); }
   F.solid(0, 0, w, w);
 }
 function sofa(room, X, Z, f, w = 3, o = {}) {

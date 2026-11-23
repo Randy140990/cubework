@@ -308,6 +308,8 @@ def main():
         blocks = ",".join(b for b in r[1].split(",") if b != "quartz_pillar")
         for b in GOLD_BOXES:
             rows.append((r[0], blocks) + b + (lower(r[6]), lower(r[7]), r[8], "Goldenrod City"))
+    import arealooks57
+    rows[:] = arealooks57.finish(rows, globals())
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -789,6 +791,9 @@ def round50(add, room):
     round53(add, room)
     round54(add, room)
     round56(add, room)
+    # (0.57) John's review, 15:17 to 16:35.
+    import arealooks57
+    arealooks57.round57(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -845,7 +850,7 @@ def round50(add, room):
     # Diglett's Cave's two mouths (20:20: "redo the doors"): a hole in the cliff, its frame the cliff's rock, dark within.
     for x0, z0, x1, z1, y0, y1 in ((-781, 365, -778, 369, 30, 34), (-292, 579, -289, 583, 31, 35)):
         add("swap", "stone_bricks,stone_brick_slab,stone_brick_stairs,stone_brick_wall,black_concrete", (x0, z0, x1, z1, "Diglett's Cave's mouth"),
-            "block/stone_bricks=drip_rock@4,block/black_concrete=cave_dark", (str(y0 - 1), str(y1 + 1)))
+            "block/stone_bricks=tunnel_stone,block/black_concrete=cave_dark", (str(y0 - 1), str(y1 + 1)))
     # The bikes outside the Bike Shop (20:12; 12:19: "stacking a couple at the side"): three side by side on the pavement
     # by the shop's west side, by its sign.
     for z in (278, 279, 280):
@@ -1167,8 +1172,8 @@ def round53(add, room):
     add("swap", "diorite_wall", PLATEAU, "block/diorite=plateau_stone", ("40", "48"))
     add("swap", "resin_bricks,resin_brick_stairs,resin_brick_slab", (-926, 150, -899, 171, "the INDIGO PLATEAU's corner pillars"),
         "block/resin_bricks=plateau_brick_dark", ("26", "46"))
-    for x, y, z in PLATEAU_GOLEMS:
-        add("prop", "waxed_weathered_cut_copper_stairs,waxed_cut_copper", (x, z, x, z, "a statue's pedestal"), "mon_statue", (str(y - 1), str(y - 1)))
+    # ((0.57, 15:46: "the statues look funny ... go with the statues like inside the Victory Road house ... the
+    # Pokeball") Stone POKe BALLs on the pedestals now: tools/arealooks57.py.)
     # The cliffs' stripped jungle wood (Route 22's "brown"), all over the map: the cliffs' rock and earthy tops, as their
     # mushroom blocks. (Where a place has its own look for it, a gate's, Lavender's timber, that's drawn instead.)
     add("swap", "stripped_jungle_wood", KANTO, "block/stripped_jungle_log=hill_top@4|drip_rock@4")
@@ -1220,7 +1225,7 @@ def round53(add, room):
 
 
 # (0.54) Johto (12:24 and 12:26): the whole region, and the places done now.
-JOHTO = (-2720, 260, -1011, 1080, "Johto")
+JOHTO = (-2720, 60, -1011, 1080, "Johto")
 R26_HOUSES = (-1000, 655, -960, 712, "Route 26's houses")
 ROUTE2627 = (-1310, 600, -940, 800, "Routes 26 and 27, Tohjo Falls")
 NEW_BARK = (-1510, 715, -1395, 830, "New Bark Town")

@@ -1,0 +1,179 @@
+{
+ "ambientocclusion": false,
+ "textures": {
+  "cells": "retromon:block/area/solar_cells",
+  "frame": "retromon:block/area/solar_frame",
+  "particle": "retromon:block/area/solar_frame"
+ },
+ "elements": [
+  {
+   "from": [
+    1,
+    16,
+    2
+   ],
+   "to": [
+    15,
+    17,
+    14
+   ],
+   "faces": {
+    "north": {
+     "texture": "#cells"
+    },
+    "south": {
+     "texture": "#cells"
+    },
+    "east": {
+     "texture": "#cells"
+    },
+    "west": {
+     "texture": "#cells"
+    },
+    "up": {
+     "texture": "#cells"
+    },
+    "down": {
+     "texture": "#cells"
+    }
+   },
+   "rotation": {
+    "origin": [
+     8,
+     16,
+     8
+    ],
+    "axis": "x",
+    "angle": 22.5
+   }
+  },
+  {
+   "from": [
+    2,
+    16,
+    3
+   ],
+   "to": [
+    3,
+    19,
+    4
+   ],
+   "faces": {
+    "north": {
+     "texture": "#frame"
+    },
+    "south": {
+     "texture": "#frame"
+    },
+    "east": {
+     "texture": "#frame"
+    },
+    "west": {
+     "texture": "#frame"
+    },
+    "up": {
+     "texture": "#frame"
+    },
+    "down": {
+     "texture": "#frame"
+    }
+   }
+  },
+  {
+   "from": [
+    2,
+    16,
+    12
+   ],
+   "to": [
+    3,
+    17,
+    13
+   ],
+   "faces": {
+    "north": {
+     "texture": "#frame"
+    },
+    "south": {
+     "texture": "#frame"
+    },
+    "east": {
+     "texture": "#frame"
+    },
+    "west": {
+     "texture": "#frame"
+    },
+    "up": {
+     "texture": "#frame"
+    },
+    "down": {
+     "texture": "#frame"
+    }
+   }
+  },
+  {
+   "from": [
+    13,
+    16,
+    3
+   ],
+   "to": [
+    14,
+    19,
+    4
+   ],
+   "faces": {
+    "north": {
+     "texture": "#frame"
+    },
+    "south": {
+     "texture": "#frame"
+    },
+    "east": {
+     "texture": "#frame"
+    },
+    "west": {
+     "texture": "#frame"
+    },
+    "up": {
+     "texture": "#frame"
+    },
+    "down": {
+     "texture": "#frame"
+    }
+   }
+  },
+  {
+   "from": [
+    13,
+    16,
+    12
+   ],
+   "to": [
+    14,
+    17,
+    13
+   ],
+   "faces": {
+    "north": {
+     "texture": "#frame"
+    },
+    "south": {
+     "texture": "#frame"
+    },
+    "east": {
+     "texture": "#frame"
+    },
+    "west": {
+     "texture": "#frame"
+    },
+    "up": {
+     "texture": "#frame"
+    },
+    "down": {
+     "texture": "#frame"
+    }
+   }
+  }
+ ]
+}

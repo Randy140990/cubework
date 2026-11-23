@@ -236,18 +236,45 @@ function drawScoreboard(P, f) {
   // white diamonds; dark wide boards (the school and the Viridian house); blush pink and blue corner posts; green
   // cushions and quilt, a green felt top, a white lamp shade, cardboard, a DVD player's front.
   matReg("matLabPurple", "#8F60DE", "#5E3AA6");
-  // (0.55) The lab's floor: pale oak boards laid on the slant, crisp: each board one solid tone, lit along one edge,
-  // a clean gap along the other, one end joint each.
-  reg("oakDiagonal", 32, 32, P => {
-    const base = hx("#F0DDB8"), gap = hx("#C4A77A"), lt = hx("#FAEDD2"), tones = [0.03, -0.03, 0.05, -0.01];
-    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
-      const d = (x + y) % 32, row = Math.floor(d / 8), along = (x - y + 64) % 32;
-      let c = shadec(base, tones[row]);
-      if (d % 8 === 0) c = gap; else if (d % 8 === 1) c = mixc(c, lt, 0.7);
-      else if (along === (row * 11 + 5) % 32) c = mixc(c, gap, 0.8);
+  // (0.57, 15:46: "the floor's a bit off ... the slanted oak ... might just need an update") The lab's floor: wide pale
+  // oak boards on the slant, laid over four blocks, each board one soft tone, a fine gap between them and few end
+  // joints, so it reads as one calm floor rather than stripes.
+  reg("oakDiagonal", 64, 64, P => {
+    const base = hx("#E6CFA3"), gap = hx("#C4A577"), tones = [0.03, -0.03, 0.05, 0.0, -0.045, 0.02, 0.04, -0.015];
+    for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) {
+      const d = (x + y) % 64, row = Math.floor(d / 16) + 4 * Math.floor(((x - y + 128) % 128) / 64), along = (x - y + 128) % 64;
+      let c = shadec(base, tones[row % 8]);
+      if (d % 16 === 0) c = gap;
+      else if (along === (row * 23 + 9) % 64) c = mixc(c, gap, 0.7);
       P.set(x, y, c);
     }
-  }, { per: 2 });
+  }, { per: 4 });
+  reg("marbleFloor", 64, 64, P => {
+    // Big white marble tiles (two blocks each), crisp: a soft grey vein drifting across each, a fine grey joint.
+    P._raw = true;
+    const base = hx("#EFEEEA"), vein = hx("#B4BBC4"), joint = hx("#BFC4C9");
+    for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) {
+      const a = 0.9 + 0.5 * ((tx * 3 + ty * 5) % 4), off = (tx * 11 + ty * 7) % 32, tone = [0.0, -0.02, 0.015, -0.01][tx + ty * 2];
+      for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+        let c = shadec(base, tone);
+        const v = Math.abs((y - off) - (x * 0.55 * a) % 32 + Math.sin((x + off) * 0.21) * 3);
+        if (v < 0.9) c = mixc(c, vein, 0.7); else if (v < 1.8) c = mixc(c, vein, 0.3);
+        const w = Math.abs((x + off * 0.5) % 32 - 6 - Math.sin(y * 0.17 + tx) * 4);
+        if (w < 0.7) c = mixc(c, vein, 0.3);
+        if (x === 0 || y === 0) c = joint; else if (x === 1 || y === 1) c = shadec(c, 0.04); else if (x === 31 || y === 31) c = shadec(c, -0.05);
+        P.set(tx * 32 + x, ty * 32 + y, c);
+      }
+    }
+  }, { per: 4 });
+  reg("rivalWall", 16, 16, P => {
+    // A soft blue-grey wall, plain, each block's course faint (as the outside's walls).
+    const base = hx("#DCE5EC");
+    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+      let c = base;
+      if (y === 0) c = shadec(base, 0.04); else if (y === 15) c = shadec(base, -0.05);
+      P.set(x, y, c);
+    }
+  });
   reg("mcDiamondBlue", 32, 32, (P, r) => {
     const a = hx("#F4F8FB"), b = hx("#8EC0E6"), line = hx("#C8DCEA");
     for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
@@ -1340,7 +1367,9 @@ const BUILD = {
     // the TV along the back, the stairs at the back on the right, the table on his rug with the Town Map on it and Daisy
     // at it, the blue sofa down the right. The mat in its nook at the door.
     const R = new Room("rival1", { name: "Rival's house", floor: "Downstairs", paper: "paperRival", W: 14, D: 13, outsideSize: "8 by 6" });
-    shell(R, { paper: "mcSage", floor: "sqPale", door: DOOR, entry: true, entryFloor: "mcBlueCheck", skirt: "mcStripped", ledge: "walnut" });
+    // ((0.57, 15:46) "the wall downstairs and the floor. Maybe have more like a marble based floor": white marble tiles,
+    // a soft blue-grey wall.)
+    shell(R, { paper: "rivalWall", floor: "marbleFloor", door: DOOR, entry: true, entryFloor: "mcBlueCheck", skirt: "mcStripped", ledge: "walnut" });
     kitchen(R, 0, "e", { z: 7.4 });
     rug(R, 1, 2, 3, 7, "kitchenBlue");
     bin(R, 0.55, 8.0);

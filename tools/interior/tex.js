@@ -232,19 +232,15 @@ const TEXDEF = {
   honeyFloor: [32, 32, (P, r) => planks(P, r, hx("#D9AA68"), hx("#EDC88B"), hx("#B9894F"), hx("#86592F"), 8, 32)],
   paleFloor: [32, 32, (P, r) => planks(P, r, hx("#E2C899"), hx("#F1DDB8"), hx("#C9AB79"), hx("#A08256"), 8, 32)],
   walnutFloor: [32, 32, (P, r) => planks(P, r, hx("#8A5C3B"), hx("#A5734E"), hx("#6A4429"), hx("#4A2E1A"), 8, 32)],
-  // The stairs' treads (13:29): one piece of varnished wood each, no planks: a warm honey brown with a soft, long grain
-  // along it, a gloss catching the light across it and a lighter rounded nosing at its front edge.
+  // The stairs' treads (13:29; 0.57, 15:46: "like the laminate where it's loads of little lines ... a little bit more
+  // seamless"): one smooth piece of honey varnished wood each, no grain lines, only a soft gloss and a lighter nosing.
   tread: [16, 16, (P, r) => {
-    const base = hx("#B27C45");
-    for (let y = 0; y < 16; y++) {
-      const g = Math.sin(y * 1.7 + 0.6) * 0.035 + Math.sin(y * 0.55) * 0.03;
-      for (let x = 0; x < 16; x++) {
-        let k = g + Math.sin(x * 0.35 + y * 2.1) * 0.012 + (r() - 0.5) * 0.02;
-        if (y >= 5 && y <= 7) k += 0.07 - Math.abs(y - 6) * 0.025;
-        if (y >= 14) k += 0.1;
-        if (y === 0) k -= 0.08;
-        P.set(x, y, shadec(base, k));
-      }
+    const base = hx("#B98249");
+    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+      let k = 0;
+      if (y >= 5 && y <= 8) k = 0.035;
+      if (y >= 14) k = 0.08;
+      P.set(x, y, shadec(base, k));
     }
   }],
   checker: [16, 16, (P, r) => {
