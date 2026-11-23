@@ -503,11 +503,23 @@ const RUGS = {
   rival: (i, j, w, d) => (j === 0 || j === d - 1) ? "#C9343A" : ((i + j) % 2 ? "#2A2A30" : "#F2F2F2"),
 };
 function wool(c) { const k = "wool" + c.slice(1); if (!MATDEF[k]) { TEXDEF[k] = [16, 16, (P, r) => mcWool(P, r, hx(c))]; MATDEF[k] = { tex: k, per: 1 }; } return k; }
+// (0.55.1, 13:30: "like the grass outside where it's sort of semi ... gradient based depending on areas") A rug's
+// blocks each one solid colour, its own pattern's, drifting a shade lighter or darker in soft patches across it.
+function rugDrift(seed, i, j) {
+  const h = (a, b) => (hashStr(seed + ":" + a + "," + b) % 1000) / 500 - 1, S = 3, a = Math.floor(i / S), b = Math.floor(j / S);
+  const u = i / S - a, v = j / S - b, su = u * u * (3 - 2 * u), sv = v * v * (3 - 2 * v);
+  const top = h(a, b) * (1 - su) + h(a + 1, b) * su, bot = h(a, b + 1) * (1 - su) + h(a + 1, b + 1) * su;
+  return Math.max(-2, Math.min(2, Math.round((top * (1 - sv) + bot * sv) * 2.2)));
+}
+function hexOf(c) { return "#" + c.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, "0")).join("").toUpperCase(); }
 function rug(room, x0, z0, x1, z1, mat) {
   const pat = RUGS[{ rugMum: "mum", rugRoom: "room", rugRival: "rival" }[mat] || mat];
   x0 = Math.round(x0); z0 = Math.round(z0); x1 = Math.round(x1); z1 = Math.round(z1);
-  const w = x1 - x0, d = z1 - z0;
-  for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) room.geo.box(x0 + i, 0, z0 + j, x0 + i + 1, 1 / 16, z0 + j + 1, { top: wool(pat(i, j, w, d)), all: wool(pat(i, j, w, d)), bottom: null });
+  const w = x1 - x0, d = z1 - z0, seed = room.id + ":" + x0 + "," + z0;
+  for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) {
+    const k = wool(hexOf(shadec(hx(pat(i, j, w, d)), rugDrift(seed, i, j) * 0.028)));
+    room.geo.box(x0 + i, 0, z0 + j, x0 + i + 1, 1 / 16, z0 + j + 1, { top: k, all: k, bottom: null });
+  }
   room.item("Carpet", "Wool carpet, a block at a time, as it would be laid in Minecraft.");
 }
 // The drawer fronts that go with a furniture wood (the same colour as the body).

@@ -30,6 +30,7 @@ class Pix {
   text(s, x, y, c, a = 1) { let cx = x; for (const ch of s.toUpperCase()) { const g = FONT3[ch]; if (g) for (let j = 0; j < 5; j++) for (let i = 0; i < 3; i++) if (g[j * 3 + i] === "1") this.set(cx + i, y + j, c, a); cx += ch === " " ? 3 : 4; } return cx; }
   // A picture from John's asset pack (PACKTEX), at x, y; f(r, g, b, a) may change each pixel.
   pack(name, x = 0, y = 0, f) {
+    this._raw = true;
     const t = PACKTEX[name], d = atob(t.d);
     for (let j = 0; j < t.h; j++) for (let i = 0; i < t.w; i++) {
       const o = (j * t.w + i) * 4; let c = [d.charCodeAt(o), d.charCodeAt(o + 1), d.charCodeAt(o + 2), d.charCodeAt(o + 3)];
@@ -39,6 +40,7 @@ class Pix {
   }
   // One of the mod's own textures for the looks only some places have (AREATEX: tools/lookarea.py), at x, y.
   area(name, f) {
+    this._raw = true;
     const t = AREATEX[name], d = atob(t.d);
     for (let j = 0; j < t.h; j++) for (let i = 0; i < t.w; i++) {
       const o = (j * t.w + i) * 4; let c = [d.charCodeAt(o), d.charCodeAt(o + 1), d.charCodeAt(o + 2), d.charCodeAt(o + 3)];
@@ -188,8 +190,8 @@ function woodSquares(P, r, base) {
 }
 function mcStone(P, r, base, n = 0.07, spots = 0) { P.fill(base, n, r); for (let i = 0; i < spots; i++) { const x = r() * 16, y = r() * 16; P.set(x, y, shadec(base, (r() - 0.5) * 0.08)); } }
 function mcWool(P, r, base) {
-  // (0.55, 13:12: "very solid") One solid colour, a faint tidy tuft every fourth pixel.
-  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) P.set(x, y, x % 4 === 1 && y % 4 === 1 ? shadec(base, 0.04) : x % 4 === 3 && y % 4 === 3 ? shadec(base, -0.04) : base);
+  // (0.55, 13:12: "very solid"; 13:30: no speckles) One solid colour; a rug's depth is in its blocks' shades (rug()).
+  P.rect(0, 0, 16, 16, base);
 }
 function mcCheck(P, r, a, b) {
   // (0.55) Crisp tiles, as the outside's: each one solid, lit along its top and left, shaded along its foot and right.
@@ -691,11 +693,31 @@ function shadeMat(fab, s) {
   MATDEF[k] = { tex: k, per: 1 };
   return k;
 }
+// (0.55.1, John's 13:12 and 13:30) The speckle left in any picture taken out, as the outside's pictures have none:
+// each colour that's only a stray pixel or a few, near one of the picture's own colours, becomes that colour. The
+// designed shades (any colour with enough pixels), the lines and the specks of another colour stay as they are.
+function crisp(P) {
+  const n = P.w * P.h, d = P.d, count = new Map();
+  for (let i = 0; i < n; i++) { if (!d[i * 4 + 3]) continue; const k = (d[i * 4] << 16) | (d[i * 4 + 1] << 8) | d[i * 4 + 2]; count.set(k, (count.get(k) || 0) + 1); }
+  const cols = [...count.entries()].sort((a, b) => b[1] - a[1]), pal = [], map = new Map(), many = Math.max(6, n * 0.02);
+  const dist = (a, b) => Math.max(Math.abs((a >> 16) - (b >> 16)), Math.abs(((a >> 8) & 255) - ((b >> 8) & 255)), Math.abs((a & 255) - (b & 255)));
+  for (const [k, c] of cols) {
+    let best = -1, bd = 1e9;
+    for (const q of pal) { const e = dist(k, q); if (e < bd) { bd = e; best = q; } }
+    if (best < 0 || bd > 24 || (c >= many && bd > 3)) { pal.push(k); map.set(k, k); } else map.set(k, best);
+  }
+  for (let i = 0; i < n; i++) {
+    if (!d[i * 4 + 3]) continue;
+    const m = map.get((d[i * 4] << 16) | (d[i * 4 + 1] << 8) | d[i * 4 + 2]);
+    d[i * 4] = m >> 16; d[i * 4 + 1] = (m >> 8) & 255; d[i * 4 + 2] = m & 255;
+  }
+}
 function pixTex(name) {
   if (texCache[name]) return texCache[name];
   const [w, h, draw] = TEXDEF[name];
   const P = new Pix(w, h);
   draw(P, rng(hashStr(name)));
+  if (!P._raw) crisp(P);
   const t = new THREE.CanvasTexture(P.canvas());
   t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; t.generateMipmaps = false;
   t.wrapS = t.wrapT = THREE.RepeatWrapping;

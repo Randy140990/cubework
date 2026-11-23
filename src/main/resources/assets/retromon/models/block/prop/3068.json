@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/league_gold","league_gold":"retromon:block/interior/league_gold"},"elements":[{"from":[15.04,7.2,0],"to":[16.0,8.8,0],"faces":{"south":{"uv":[15.04,7.2,16.0,8.8],"texture":"#league_gold"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/silver","silver":"retromon:block/interior/silver"},"elements":[{"from":[0.72,16,2.32],"to":[15.28,16,16.0],"faces":{"down":{"uv":[0.72,0.0,15.28,13.68],"texture":"#silver"}}}]}

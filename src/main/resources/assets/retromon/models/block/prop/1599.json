@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/mc_peach_check","mc_peach_check":"retromon:block/interior/mc_peach_check"},"elements":[{"from":[0.0,0,0.0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[8.0,0.0,16.0,8.0],"texture":"#mc_peach_check"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/steel","steel":"retromon:block/interior/steel"},"elements":[{"from":[14.24,16,1.44],"to":[14.88,16,2.08],"faces":{"down":{"uv":[14.24,13.92,14.88,14.56],"texture":"#steel"}}}]}
