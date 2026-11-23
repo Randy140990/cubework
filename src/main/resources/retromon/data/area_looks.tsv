@@ -2268,62 +2268,70 @@ swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-
 glass	black_stained_glass_pane	-2168	694	-2166	696	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-2168	702	-2166	704	20	29	block/tuff=lamp_gold_post,block/polished_tuff=lamp_gold_post,block/chiseled_tuff_bricks=lamp_gold_post,block/chiseled_tuff_bricks_top=lamp_gold_post,block/gray_wool=lamp_gold_cap_top,block/sea_lantern=lamp_globe_amber!	a Goldenrod lamp
 glass	black_stained_glass_pane	-2168	702	-2166	704	20	29	block/black_stained_glass=glass_lamp	a Goldenrod lamp
-swap	quartz_block,quartz_stairs	-1987	856	-1983	856	20	24	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	azalea_town Mart's pillars
-swap	quartz_slab	-1986	856	-1984	856	20	20	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	azalea_town Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-1987	857	-1983	857	24	28	block/polished_diorite=mart_sign_ring	azalea_town Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-1986	858	-1984	858	25	27	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	azalea_town Mart's sign
-swap	quartz_block,quartz_stairs	-1482	380	-1478	380	31	35	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	blackthorn_city Mart's pillars
-swap	quartz_slab	-1481	380	-1479	380	31	31	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	blackthorn_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-1482	381	-1478	381	35	39	block/polished_diorite=mart_sign_ring	blackthorn_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-1481	382	-1479	382	36	38	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	blackthorn_city Mart's sign
-swap	quartz_block,quartz_stairs	-345	281	-341	281	34	38	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	cerulean_city Mart's pillars
-swap	quartz_slab	-344	281	-342	281	34	34	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	cerulean_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-345	282	-341	282	38	42	block/polished_diorite=mart_sign_ring	cerulean_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-344	283	-342	283	39	41	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	cerulean_city Mart's sign
-swap	quartz_block,quartz_stairs	-1715	758	-1711	758	19	23	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	cherrygrove_city Mart's pillars
-swap	quartz_slab	-1714	758	-1712	758	19	19	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	cherrygrove_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-1715	759	-1711	759	23	27	block/polished_diorite=mart_sign_ring	cherrygrove_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-1714	760	-1712	760	24	26	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	cherrygrove_city Mart's sign
-swap	quartz_block,quartz_stairs	-778	928	-774	928	18	22	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	cinnabar_island Mart's pillars
-swap	quartz_slab	-777	928	-775	928	18	18	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	cinnabar_island Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-778	929	-774	929	22	26	block/polished_diorite=mart_sign_ring	cinnabar_island Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-777	930	-775	930	23	25	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	cinnabar_island Mart's sign
-swap	quartz_block,quartz_stairs	-2007	403	-2003	403	20	24	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	ecruteak_city Mart's pillars
-swap	quartz_slab	-2006	403	-2004	403	20	20	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	ecruteak_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-2007	404	-2003	404	24	28	block/polished_diorite=mart_sign_ring	ecruteak_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-2006	405	-2004	405	25	27	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	ecruteak_city Mart's sign
-swap	quartz_block,quartz_stairs	-505	789	-501	789	30	34	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	fuchsia_city Mart's pillars
-swap	quartz_slab	-504	789	-502	789	30	30	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	fuchsia_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-505	790	-501	790	34	38	block/polished_diorite=mart_sign_ring	fuchsia_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-504	791	-502	791	35	37	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	fuchsia_city Mart's sign
-swap	quartz_block,quartz_stairs	-119	439	-115	439	33	37	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	lavender_town Mart's pillars
-swap	quartz_slab	-118	439	-116	439	33	33	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	lavender_town Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-119	440	-115	440	37	41	block/polished_diorite=mart_sign_ring	lavender_town Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-118	441	-116	441	38	40	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	lavender_town Mart's sign
-swap	quartz_block,quartz_stairs	-2262	569	-2258	569	19	23	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	olivine_city Mart's pillars
-swap	quartz_slab	-2261	569	-2259	569	19	19	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	olivine_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-2262	570	-2258	570	23	27	block/polished_diorite=mart_sign_ring	olivine_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-2261	571	-2259	571	24	26	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	olivine_city Mart's sign
-swap	quartz_block,quartz_stairs	-785	302	-781	302	30	34	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	pewter_city Mart's pillars
-swap	quartz_slab	-784	302	-782	302	30	30	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	pewter_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-785	303	-781	303	34	38	block/polished_diorite=mart_sign_ring	pewter_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-784	304	-782	304	35	37	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	pewter_city Mart's sign
-swap	quartz_block,quartz_stairs	-337	413	-333	413	33	37	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	saffron_city Mart's pillars
-swap	quartz_slab	-336	413	-334	413	33	33	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	saffron_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-337	414	-333	414	37	41	block/polished_diorite=mart_sign_ring	saffron_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-336	415	-334	415	38	40	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	saffron_city Mart's sign
-swap	quartz_block,quartz_stairs	-345	580	-341	580	31	35	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	vermilion_city Mart's pillars
-swap	quartz_slab	-344	580	-342	580	31	31	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	vermilion_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-345	581	-341	581	35	39	block/polished_diorite=mart_sign_ring	vermilion_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-344	582	-342	582	36	38	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	vermilion_city Mart's sign
-swap	quartz_block,quartz_stairs	-1881	542	-1877	542	22	26	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	violet_city Mart's pillars
-swap	quartz_slab	-1880	542	-1878	542	22	22	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	violet_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-1881	543	-1877	543	26	30	block/polished_diorite=mart_sign_ring	violet_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-1880	544	-1878	544	27	29	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	violet_city Mart's sign
-swap	quartz_block,quartz_stairs	-768	544	-764	544	25	29	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	viridian_city Mart's pillars
-swap	quartz_slab	-767	544	-765	544	25	25	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	viridian_city Mart's step
-swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-768	545	-764	545	29	33	block/polished_diorite=mart_sign_ring	viridian_city Mart's sign
-swap	quartz_block,quartz_stairs,quartz_slab	-767	546	-765	546	30	32	block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring	viridian_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-2008	861	-2004	861	20	24	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	azalea_town Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-1466	381	-1462	381	31	35	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	blackthorn_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-474	408	-470	408	33	37	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	celadon_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-361	263	-357	263	34	38	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	cerulean_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-1698	758	-1694	758	19	23	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	cherrygrove_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-2513	781	-2509	781	18	22	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	cianwood_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-792	928	-788	928	18	22	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	cinnabar_island Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-2024	418	-2020	418	21	25	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	ecruteak_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-497	811	-493	811	31	35	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	fuchsia_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-2118	725	-2114	725	20	24	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	goldenrod_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-144	416	-140	416	33	37	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	lavender_town Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-1759	418	-1755	418	22	26	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	mahogany_town Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-2295	569	-2291	569	19	23	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	olivine_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-807	316	-803	316	30	34	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	pewter_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-129	286	-125	286	33	37	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	route_10 Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-1888	800	-1884	800	19	23	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	route_32 Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-609	257	-605	257	35	39	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	route_4 Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-366	443	-362	443	33	37	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	saffron_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-1155	542	-1151	542	27	31	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	silver_cave_outside Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-371	558	-367	558	31	35	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	vermilion_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-1830	567	-1826	567	22	26	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	violet_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-788	558	-784	558	25	29	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	viridian_city Pokemon Center's pillars and step
+swap	quartz_block,quartz_stairs,quartz_slab	-1987	856	-1983	856	20	24	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	azalea_town Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-1987	857	-1983	857	24	28	block/polished_diorite=quartz_clean	azalea_town Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-1986	858	-1984	858	25	27	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	azalea_town Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-1482	380	-1478	380	31	35	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	blackthorn_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-1482	381	-1478	381	35	39	block/polished_diorite=quartz_clean	blackthorn_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-1481	382	-1479	382	36	38	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	blackthorn_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-345	281	-341	281	34	38	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	cerulean_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-345	282	-341	282	38	42	block/polished_diorite=quartz_clean	cerulean_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-344	283	-342	283	39	41	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	cerulean_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-1715	758	-1711	758	19	23	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	cherrygrove_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-1715	759	-1711	759	23	27	block/polished_diorite=quartz_clean	cherrygrove_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-1714	760	-1712	760	24	26	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	cherrygrove_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-778	928	-774	928	18	22	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	cinnabar_island Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-778	929	-774	929	22	26	block/polished_diorite=quartz_clean	cinnabar_island Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-777	930	-775	930	23	25	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	cinnabar_island Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-2007	403	-2003	403	20	24	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	ecruteak_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-2007	404	-2003	404	24	28	block/polished_diorite=quartz_clean	ecruteak_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-2006	405	-2004	405	25	27	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	ecruteak_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-505	789	-501	789	30	34	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	fuchsia_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-505	790	-501	790	34	38	block/polished_diorite=quartz_clean	fuchsia_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-504	791	-502	791	35	37	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	fuchsia_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-119	439	-115	439	33	37	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	lavender_town Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-119	440	-115	440	37	41	block/polished_diorite=quartz_clean	lavender_town Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-118	441	-116	441	38	40	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	lavender_town Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-2262	569	-2258	569	19	23	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	olivine_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-2262	570	-2258	570	23	27	block/polished_diorite=quartz_clean	olivine_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-2261	571	-2259	571	24	26	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	olivine_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-785	302	-781	302	30	34	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	pewter_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-785	303	-781	303	34	38	block/polished_diorite=quartz_clean	pewter_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-784	304	-782	304	35	37	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	pewter_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-337	413	-333	413	33	37	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	saffron_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-337	414	-333	414	37	41	block/polished_diorite=quartz_clean	saffron_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-336	415	-334	415	38	40	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	saffron_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-345	580	-341	580	31	35	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	vermilion_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-345	581	-341	581	35	39	block/polished_diorite=quartz_clean	vermilion_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-344	582	-342	582	36	38	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	vermilion_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-1881	542	-1877	542	22	26	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	violet_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-1881	543	-1877	543	26	30	block/polished_diorite=quartz_clean	violet_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-1880	544	-1878	544	27	29	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	violet_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-768	544	-764	544	25	29	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	viridian_city Mart's pillars and step
+swap	polished_diorite,polished_diorite_stairs,polished_diorite_slab	-768	545	-764	545	29	33	block/polished_diorite=quartz_clean	viridian_city Mart's sign
+swap	quartz_block,quartz_stairs,quartz_slab	-767	546	-765	546	30	32	block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face	viridian_city Mart's sign
 swap	wildflowers	-1010	100	60	1060	-	-	block/wildflowers=flower_wild,block/wildflowers_stem=flower_wild_stem	Kanto
 swap	dandelion,oxeye_daisy,azure_bluet,poppy,red_tulip	-1010	100	60	1060	-	-	block/dandelion=flower_dandelion,block/oxeye_daisy=flower_daisy,block/azure_bluet=flower_bluet,block/poppy=flower_poppy,block/red_tulip=flower_tulip	Kanto
 swap	wildflowers	-2720	260	-1011	1080	-	-	block/wildflowers=flower_wild,block/wildflowers_stem=flower_wild_stem	Johto
@@ -2593,9 +2601,7 @@ swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs
 swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone	-2123	485	-2122	485	25	25	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
 swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone	-2626	754	-2618	758	30	34	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
 swap	oak_fence,oak_fence_gate	-2720	260	-1011	1080	-	-	block/oak_planks=fence_johto	Johto
-swap	dirt_path	-2720	260	-1011	1080	-	-	block/dirt_path_top=route_path@4,block/dirt_path_side=route_path@4	Johto
-swap	brown_concrete_powder	-1580	300	-1405	445	-	-	block/brown_concrete_powder=route_path_edge@4	Blackthorn City, the Ice Path's mouth, Dragon's Den
-grass_onto	dirt_path,brown_concrete_powder	-2720	260	-1011	1080	-	-	grass	Johto
+swap	brown_concrete_powder	-2720	260	-1011	1080	-	-	block/brown_concrete_powder=path_kanto@4	Johto
 swap	snow_block,snow	-2720	260	-1011	1080	-	-	block/snow=snow_clean@2	Johto
 swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-1473	354	-1467	360	30	39	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
 glass	black_stained_glass_pane	-1473	354	-1467	360	30	39	block/black_stained_glass=glass_lamp	a Cycling Road lamp
@@ -2649,44 +2655,37 @@ swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-
 glass	black_stained_glass_pane	-1423	764	-1421	766	18	28	block/black_stained_glass=glass_lamp	a New Bark lamp
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-1454	778	-1452	780	18	28	block/tuff=lamp_white_post,block/polished_tuff=lamp_white_post,block/chiseled_tuff_bricks=lamp_white_post,block/chiseled_tuff_bricks_top=lamp_white_post,block/gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a New Bark lamp
 glass	black_stained_glass_pane	-1454	778	-1452	780	18	28	block/black_stained_glass=glass_lamp	a New Bark lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1726	759	-1724	761	18	28	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1726	759	-1724	761	18	28	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1726	759	-1724	761	18	28	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1696	766	-1694	768	18	28	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1696	766	-1694	768	18	28	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1696	766	-1694	768	18	28	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1743	784	-1741	786	18	28	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1743	784	-1741	786	18	28	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1743	784	-1741	786	18	28	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1704	785	-1702	787	18	28	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1704	785	-1702	787	18	28	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1704	785	-1702	787	18	28	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1726	718	-1724	720	19	29	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1726	718	-1724	720	19	29	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1726	718	-1724	720	19	29	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1894	522	-1892	524	21	31	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1894	522	-1892	524	21	31	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1894	522	-1892	524	21	31	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1869	542	-1867	544	21	31	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1869	542	-1867	544	21	31	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1869	542	-1867	544	21	31	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1843	542	-1841	544	21	31	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1843	542	-1841	544	21	31	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1843	542	-1841	544	21	31	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1878	552	-1876	554	21	31	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1878	552	-1876	554	21	31	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1878	552	-1876	554	21	31	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1836	553	-1834	555	21	31	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1836	553	-1834	555	21	31	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1836	553	-1834	555	21	31	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1772	557	-1770	559	21	31	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1772	557	-1770	559	21	31	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1772	557	-1770	559	21	31	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1809	566	-1807	568	21	31	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1809	566	-1807	568	21	31	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1809	566	-1807	568	21	31	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1710	565	-1708	567	24	34	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1710	565	-1708	567	24	34	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1710	565	-1708	567	24	34	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern	-1722	590	-1720	592	24	34	block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
+swap	nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern	-1722	590	-1720	592	24	34	block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!	a Cherrygrove lamp
 glass	black_stained_glass_pane	-1722	590	-1720	592	24	34	block/black_stained_glass=glass_lamp	a Cherrygrove lamp
-swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1493	395	-1484	407	30	34	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
 swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-2324	415	-2321	422	21	25	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
 swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-2321	415	-2318	422	21	24	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
 swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1683	418	-1660	427	15	25	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
-swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1520	437	-1514	446	30	34	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
-swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1519	479	-1511	488	28	32	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
-swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1515	514	-1507	523	26	30	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
-swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1514	554	-1506	563	25	29	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
-swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1512	613	-1504	622	23	27	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
-swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1516	664	-1504	673	21	25	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
 swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1899	713	-1876	759	17	21	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
 swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-1227	761	-1179	772	17	21	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
 swap	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-2663	767	-2652	774	33	37	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
@@ -2824,6 +2823,152 @@ swap	gray_concrete,smooth_stone,smooth_stone_slab	-2148	678	-2130	694	-	-	block/
 swap	deepslate_tile_stairs	-2148	678	-2130	694	19	21	block/deepslate_tiles=step_cer	the Radio Tower
 swap	deepslate_tile_stairs	-2148	678	-2130	694	22	70	block/deepslate_tiles=radio_panel	the Radio Tower
 swap	waxed_exposed_copper_bars	-2215	615	-2040	775	40	80	block/exposed_copper_bars=railing_dark	Goldenrod's aerials
+swap	mud_brick_slab,mud_brick_stairs	-2720	260	-1011	1080	-	-	block/mud_bricks=step_boards_d	Johto
+swap	mud_brick_slab,mud_brick_stairs	-1310	600	-940	800	-	-	block/mud_bricks=step_boards_d	Routes 26 and 27, Tohjo Falls
+swap	spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log,andesite_slab,andesite_stairs,andesite,oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log	-1496	392	-1481	410	31	31	block/spruce_planks=bridge_boards,block/stripped_spruce_log=bridge_boards,block/stripped_spruce_log_top=bridge_boards,block/andesite=bridge_boards,block/oak_planks=bridge_boards,block/stripped_oak_log=bridge_boards,block/stripped_oak_log_top=bridge_boards	a bridge on Route 45
+swap	spruce_shelf,oak_shelf,stone_button	-1496	392	-1481	410	31	32	block/spruce_shelf=bridge_beam,block/oak_shelf=bridge_beam,block/stone=bolt	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1496	392	-1481	410	17	30	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log,andesite_slab,andesite_stairs,andesite,oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log	-1523	434	-1511	449	31	31	block/spruce_planks=bridge_boards,block/stripped_spruce_log=bridge_boards,block/stripped_spruce_log_top=bridge_boards,block/andesite=bridge_boards,block/oak_planks=bridge_boards,block/stripped_oak_log=bridge_boards,block/stripped_oak_log_top=bridge_boards	a bridge on Route 45
+swap	spruce_shelf,oak_shelf,stone_button	-1523	434	-1511	449	31	32	block/spruce_shelf=bridge_beam,block/oak_shelf=bridge_beam,block/stone=bolt	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1523	434	-1511	449	17	30	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log,andesite_slab,andesite_stairs,andesite,oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log	-1522	476	-1508	491	29	29	block/spruce_planks=bridge_boards,block/stripped_spruce_log=bridge_boards,block/stripped_spruce_log_top=bridge_boards,block/andesite=bridge_boards,block/oak_planks=bridge_boards,block/stripped_oak_log=bridge_boards,block/stripped_oak_log_top=bridge_boards	a bridge on Route 45
+swap	spruce_shelf,oak_shelf,stone_button	-1522	476	-1508	491	29	30	block/spruce_shelf=bridge_beam,block/oak_shelf=bridge_beam,block/stone=bolt	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1522	476	-1508	491	15	28	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log,andesite_slab,andesite_stairs,andesite,oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log	-1518	511	-1504	526	27	27	block/spruce_planks=bridge_boards,block/stripped_spruce_log=bridge_boards,block/stripped_spruce_log_top=bridge_boards,block/andesite=bridge_boards,block/oak_planks=bridge_boards,block/stripped_oak_log=bridge_boards,block/stripped_oak_log_top=bridge_boards	a bridge on Route 45
+swap	spruce_shelf,oak_shelf,stone_button	-1518	511	-1504	526	27	28	block/spruce_shelf=bridge_beam,block/oak_shelf=bridge_beam,block/stone=bolt	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1518	511	-1504	526	13	26	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log,andesite_slab,andesite_stairs,andesite,oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log	-1517	551	-1503	566	26	26	block/spruce_planks=bridge_boards,block/stripped_spruce_log=bridge_boards,block/stripped_spruce_log_top=bridge_boards,block/andesite=bridge_boards,block/oak_planks=bridge_boards,block/stripped_oak_log=bridge_boards,block/stripped_oak_log_top=bridge_boards	a bridge on Route 45
+swap	spruce_shelf,oak_shelf,stone_button	-1517	551	-1503	566	26	27	block/spruce_shelf=bridge_beam,block/oak_shelf=bridge_beam,block/stone=bolt	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1517	551	-1503	566	12	25	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log,andesite_slab,andesite_stairs,andesite,oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log	-1515	610	-1501	625	24	24	block/spruce_planks=bridge_boards,block/stripped_spruce_log=bridge_boards,block/stripped_spruce_log_top=bridge_boards,block/andesite=bridge_boards,block/oak_planks=bridge_boards,block/stripped_oak_log=bridge_boards,block/stripped_oak_log_top=bridge_boards	a bridge on Route 45
+swap	spruce_shelf,oak_shelf,stone_button	-1515	610	-1501	625	24	25	block/spruce_shelf=bridge_beam,block/oak_shelf=bridge_beam,block/stone=bolt	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1515	610	-1501	625	10	23	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+swap	spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log,andesite_slab,andesite_stairs,andesite,oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log	-1519	661	-1501	676	22	22	block/spruce_planks=bridge_boards,block/stripped_spruce_log=bridge_boards,block/stripped_spruce_log_top=bridge_boards,block/andesite=bridge_boards,block/oak_planks=bridge_boards,block/stripped_oak_log=bridge_boards,block/stripped_oak_log_top=bridge_boards	a bridge on Route 45
+swap	spruce_shelf,oak_shelf,stone_button	-1519	661	-1501	676	22	23	block/spruce_shelf=bridge_beam,block/oak_shelf=bridge_beam,block/stone=bolt	a bridge on Route 45
+swap	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1519	661	-1501	676	8	21	block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam	a bridge on Route 45
+sign	pale_oak_shelf	-985	663	-982	665	19	20	-	Route 26's sign
+sign	pale_oak_shelf	-1000	597	-997	599	26	27	-	Route 26's sign by Victory Road
+chain	copper_chain,exposed_copper_chain,weathered_copper_chain,oxidized_copper_chain,waxed_copper_chain,waxed_exposed_copper_chain,waxed_weathered_copper_chain,waxed_oxidized_copper_chain	-2720	260	-1011	1080	-	-	-	Johto
+swap	copper_chain,exposed_copper_chain,weathered_copper_chain,oxidized_copper_chain,waxed_copper_chain,waxed_exposed_copper_chain,waxed_weathered_copper_chain,waxed_oxidized_copper_chain	-2720	260	-1011	1080	-	-	block/copper_chain=chain_steel,block/exposed_copper_chain=chain_steel,block/weathered_copper_chain=chain_steel,block/oxidized_copper_chain=chain_steel	Johto
+chain	copper_chain,exposed_copper_chain,weathered_copper_chain,oxidized_copper_chain,waxed_copper_chain,waxed_exposed_copper_chain,waxed_weathered_copper_chain,waxed_oxidized_copper_chain	-1310	600	-940	800	-	-	-	Routes 26 and 27, Tohjo Falls
+swap	copper_chain,exposed_copper_chain,weathered_copper_chain,oxidized_copper_chain,waxed_copper_chain,waxed_exposed_copper_chain,waxed_weathered_copper_chain,waxed_oxidized_copper_chain	-1310	600	-940	800	-	-	block/copper_chain=chain_steel,block/exposed_copper_chain=chain_steel,block/weathered_copper_chain=chain_steel,block/oxidized_copper_chain=chain_steel	Routes 26 and 27, Tohjo Falls
+swap	oak_fence	-1154	748	-1111	750	26	26	block/oak_planks=post_steel	Route 27's posts along the cliff
+swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1739	764	-1724	777	18	29	block/polished_andesite=house_stone	a Cherrygrove house
+swap	polished_deepslate	-1739	764	-1724	777	18	29	block/polished_deepslate=house_dark	a Cherrygrove house
+swap	polished_deepslate_slab	-1739	764	-1724	777	18	29	block/polished_deepslate=window_low	a Cherrygrove house
+swap	polished_deepslate_wall	-1739	764	-1724	777	18	29	block/polished_deepslate=drainpipe	a Cherrygrove house
+swap	polished_diorite_stairs,polished_diorite_slab	-1739	764	-1724	777	18	29	block/polished_diorite=house_trim	a Cherrygrove house
+swap	jungle_stairs,jungle_slab,jungle_planks	-1739	764	-1724	777	18	29	block/jungle_planks=trim_jungle	a Cherrygrove house
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1739	764	-1724	777	18	29	block/mud_bricks=chimney_brick	a Cherrygrove house
+swap	stripped_oak_wood,stripped_oak_log	-1739	764	-1724	777	18	29	block/stripped_oak_log=chimney_stone,block/stripped_oak_log_top=chimney_stone	a Cherrygrove house
+swap	jungle_shelf,birch_shelf	-1739	764	-1724	777	18	29	block/jungle_shelf=cap_shelf,block/birch_shelf=cap_shelf	a Cherrygrove house
+swap	warped_shelf	-1739	764	-1724	777	18	29	block/warped_shelf=green_shelf	a Cherrygrove house
+swap	bricks	-1739	764	-1724	777	18	29	block/bricks=base_cer	a Cherrygrove house
+swap	oak_slab	-1739	764	-1724	777	18	29	block/oak_planks=step_boards_d	a Cherrygrove house
+roof	acacia_stairs	-1739	764	-1724	777	18	29	-	a Cherrygrove house
+swap	acacia_slab,acacia_planks	-1739	764	-1724	777	18	29	block/acacia_planks=roof_tiles	a Cherrygrove house
+swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1719	767	-1704	780	18	29	block/polished_andesite=house_stone	a Cherrygrove house
+swap	polished_deepslate	-1719	767	-1704	780	18	29	block/polished_deepslate=house_dark	a Cherrygrove house
+swap	polished_deepslate_slab	-1719	767	-1704	780	18	29	block/polished_deepslate=window_low	a Cherrygrove house
+swap	polished_deepslate_wall	-1719	767	-1704	780	18	29	block/polished_deepslate=drainpipe	a Cherrygrove house
+swap	polished_diorite_stairs,polished_diorite_slab	-1719	767	-1704	780	18	29	block/polished_diorite=house_trim	a Cherrygrove house
+swap	jungle_stairs,jungle_slab,jungle_planks	-1719	767	-1704	780	18	29	block/jungle_planks=trim_jungle	a Cherrygrove house
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1719	767	-1704	780	18	29	block/mud_bricks=chimney_brick	a Cherrygrove house
+swap	stripped_oak_wood,stripped_oak_log	-1719	767	-1704	780	18	29	block/stripped_oak_log=chimney_stone,block/stripped_oak_log_top=chimney_stone	a Cherrygrove house
+swap	jungle_shelf,birch_shelf	-1719	767	-1704	780	18	29	block/jungle_shelf=cap_shelf,block/birch_shelf=cap_shelf	a Cherrygrove house
+swap	warped_shelf	-1719	767	-1704	780	18	29	block/warped_shelf=green_shelf	a Cherrygrove house
+swap	bricks	-1719	767	-1704	780	18	29	block/bricks=base_cer	a Cherrygrove house
+swap	oak_slab	-1719	767	-1704	780	18	29	block/oak_planks=step_boards_d	a Cherrygrove house
+roof	acacia_stairs	-1719	767	-1704	780	18	29	-	a Cherrygrove house
+swap	acacia_slab,acacia_planks	-1719	767	-1704	780	18	29	block/acacia_planks=roof_tiles	a Cherrygrove house
+swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1698	775	-1683	788	18	29	block/polished_andesite=house_stone	a Cherrygrove house
+swap	polished_deepslate	-1698	775	-1683	788	18	29	block/polished_deepslate=house_dark	a Cherrygrove house
+swap	polished_deepslate_slab	-1698	775	-1683	788	18	29	block/polished_deepslate=window_low	a Cherrygrove house
+swap	polished_deepslate_wall	-1698	775	-1683	788	18	29	block/polished_deepslate=drainpipe	a Cherrygrove house
+swap	polished_diorite_stairs,polished_diorite_slab	-1698	775	-1683	788	18	29	block/polished_diorite=house_trim	a Cherrygrove house
+swap	jungle_stairs,jungle_slab,jungle_planks	-1698	775	-1683	788	18	29	block/jungle_planks=trim_jungle	a Cherrygrove house
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1698	775	-1683	788	18	29	block/mud_bricks=chimney_brick	a Cherrygrove house
+swap	stripped_oak_wood,stripped_oak_log	-1698	775	-1683	788	18	29	block/stripped_oak_log=chimney_stone,block/stripped_oak_log_top=chimney_stone	a Cherrygrove house
+swap	jungle_shelf,birch_shelf	-1698	775	-1683	788	18	29	block/jungle_shelf=cap_shelf,block/birch_shelf=cap_shelf	a Cherrygrove house
+swap	warped_shelf	-1698	775	-1683	788	18	29	block/warped_shelf=green_shelf	a Cherrygrove house
+swap	bricks	-1698	775	-1683	788	18	29	block/bricks=base_cer	a Cherrygrove house
+swap	oak_slab	-1698	775	-1683	788	18	29	block/oak_planks=step_boards_d	a Cherrygrove house
+roof	acacia_stairs	-1698	775	-1683	788	18	29	-	a Cherrygrove house
+swap	acacia_slab,acacia_planks	-1698	775	-1683	788	18	29	block/acacia_planks=roof_tiles	a Cherrygrove house
+swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1460	741	-1440	757	18	31	block/polished_andesite=house_stone	Prof. Elm's lab
+swap	polished_deepslate	-1460	741	-1440	757	18	31	block/polished_deepslate=house_dark	Prof. Elm's lab
+swap	polished_deepslate_slab	-1460	741	-1440	757	18	31	block/polished_deepslate=window_low	Prof. Elm's lab
+swap	polished_deepslate_wall	-1460	741	-1440	757	18	31	block/polished_deepslate=drainpipe	Prof. Elm's lab
+swap	polished_diorite_stairs,polished_diorite_slab	-1460	741	-1440	757	18	31	block/polished_diorite=house_trim	Prof. Elm's lab
+swap	jungle_stairs,jungle_slab,jungle_planks	-1460	741	-1440	757	18	31	block/jungle_planks=trim_jungle	Prof. Elm's lab
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1460	741	-1440	757	18	31	block/mud_bricks=chimney_brick	Prof. Elm's lab
+swap	stripped_oak_wood,stripped_oak_log	-1460	741	-1440	757	18	31	block/stripped_oak_log=chimney_stone,block/stripped_oak_log_top=chimney_stone	Prof. Elm's lab
+swap	jungle_shelf,birch_shelf	-1460	741	-1440	757	18	31	block/jungle_shelf=cap_shelf,block/birch_shelf=cap_shelf	Prof. Elm's lab
+swap	warped_shelf	-1460	741	-1440	757	18	31	block/warped_shelf=green_shelf	Prof. Elm's lab
+swap	bricks	-1460	741	-1440	757	18	31	block/bricks=base_cer	Prof. Elm's lab
+swap	oak_slab	-1460	741	-1440	757	18	31	block/oak_planks=step_boards_d	Prof. Elm's lab
+roof_cer	prismarine_stairs	-1460	741	-1440	757	18	31	-	Prof. Elm's lab
+swap	prismarine_slab,prismarine	-1460	741	-1440	757	18	31	block/prismarine=roof_cer_tiles	Prof. Elm's lab
+swap	polished_andesite,polished_andesite_slab,polished_andesite_stairs	-1435	750	-1420	763	18	28	block/polished_andesite=house_stone	a New Bark house
+swap	polished_deepslate	-1435	750	-1420	763	18	28	block/polished_deepslate=house_dark	a New Bark house
+swap	polished_deepslate_slab	-1435	750	-1420	763	18	28	block/polished_deepslate=window_low	a New Bark house
+swap	polished_deepslate_wall	-1435	750	-1420	763	18	28	block/polished_deepslate=drainpipe	a New Bark house
+swap	polished_diorite_stairs,polished_diorite_slab	-1435	750	-1420	763	18	28	block/polished_diorite=house_trim	a New Bark house
+swap	jungle_stairs,jungle_slab,jungle_planks	-1435	750	-1420	763	18	28	block/jungle_planks=trim_jungle	a New Bark house
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1435	750	-1420	763	18	28	block/mud_bricks=chimney_brick	a New Bark house
+swap	stripped_oak_wood,stripped_oak_log	-1435	750	-1420	763	18	28	block/stripped_oak_log=chimney_stone,block/stripped_oak_log_top=chimney_stone	a New Bark house
+swap	jungle_shelf,birch_shelf	-1435	750	-1420	763	18	28	block/jungle_shelf=cap_shelf,block/birch_shelf=cap_shelf	a New Bark house
+swap	warped_shelf	-1435	750	-1420	763	18	28	block/warped_shelf=green_shelf	a New Bark house
+swap	bricks	-1435	750	-1420	763	18	28	block/bricks=base_cer	a New Bark house
+swap	oak_slab	-1435	750	-1420	763	18	28	block/oak_planks=step_boards_d	a New Bark house
+roof_cer	prismarine_stairs	-1435	750	-1420	763	18	28	-	a New Bark house
+swap	prismarine_slab,prismarine	-1435	750	-1420	763	18	28	block/prismarine=roof_cer_tiles	a New Bark house
+roof_bt	jungle_stairs	-1497	354	-1482	366	35	40	-	a Blackthorn house
+swap	jungle_planks,jungle_slab	-1497	354	-1482	366	35	40	block/jungle_planks=roof_bt_tiles	a Blackthorn house
+swap	jungle_slab,jungle_planks	-1497	354	-1482	366	34	34	block/jungle_planks=trim_jungle	a Blackthorn house
+swap	jungle_shelf	-1497	354	-1482	366	34	34	block/jungle_shelf=band_shelf	a Blackthorn house
+swap	stripped_dark_oak_wood,stripped_dark_oak_log	-1497	354	-1482	366	31	34	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top	a Blackthorn house
+swap	dark_oak_shelf	-1497	354	-1482	366	31	31	block/dark_oak_shelf=shelf_wood	a Blackthorn house
+swap	warped_door	-1497	354	-1482	366	31	33	block/warped_door_top=door_bt_top,block/warped_door_bottom=door_bt_bottom	a Blackthorn house
+swap	polished_deepslate_slab	-1497	354	-1482	366	31	40	block/polished_deepslate=window_low	a Blackthorn house
+swap	smooth_stone_slab	-1497	354	-1482	366	31	31	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Blackthorn house
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1497	354	-1482	366	35	41	block/mud_bricks=chimney_brick	a Blackthorn house
+swap	stripped_oak_wood,stripped_oak_log	-1497	354	-1482	366	35	41	block/stripped_oak_log=chimney_stone,block/stripped_oak_log_top=chimney_stone	a Blackthorn house
+swap	birch_shelf	-1497	354	-1482	366	35	41	block/birch_shelf=cap_shelf	a Blackthorn house
+roof_bt	jungle_stairs	-1448	368	-1433	380	35	40	-	a Blackthorn house
+swap	jungle_planks,jungle_slab	-1448	368	-1433	380	35	40	block/jungle_planks=roof_bt_tiles	a Blackthorn house
+swap	jungle_slab,jungle_planks	-1448	368	-1433	380	34	34	block/jungle_planks=trim_jungle	a Blackthorn house
+swap	jungle_shelf	-1448	368	-1433	380	34	34	block/jungle_shelf=band_shelf	a Blackthorn house
+swap	stripped_dark_oak_wood,stripped_dark_oak_log	-1448	368	-1433	380	31	34	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top	a Blackthorn house
+swap	dark_oak_shelf	-1448	368	-1433	380	31	31	block/dark_oak_shelf=shelf_wood	a Blackthorn house
+swap	warped_door	-1448	368	-1433	380	31	33	block/warped_door_top=door_bt_top,block/warped_door_bottom=door_bt_bottom	a Blackthorn house
+swap	polished_deepslate_slab	-1448	368	-1433	380	31	40	block/polished_deepslate=window_low	a Blackthorn house
+swap	smooth_stone_slab	-1448	368	-1433	380	31	31	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Blackthorn house
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1448	368	-1433	380	35	41	block/mud_bricks=chimney_brick	a Blackthorn house
+swap	stripped_oak_wood,stripped_oak_log	-1448	368	-1433	380	35	41	block/stripped_oak_log=chimney_stone,block/stripped_oak_log_top=chimney_stone	a Blackthorn house
+swap	birch_shelf	-1448	368	-1433	380	35	41	block/birch_shelf=cap_shelf	a Blackthorn house
+roof_bt	jungle_stairs	-1511	373	-1496	385	35	40	-	a Blackthorn house
+swap	jungle_planks,jungle_slab	-1511	373	-1496	385	35	40	block/jungle_planks=roof_bt_tiles	a Blackthorn house
+swap	jungle_slab,jungle_planks	-1511	373	-1496	385	34	34	block/jungle_planks=trim_jungle	a Blackthorn house
+swap	jungle_shelf	-1511	373	-1496	385	34	34	block/jungle_shelf=band_shelf	a Blackthorn house
+swap	stripped_dark_oak_wood,stripped_dark_oak_log	-1511	373	-1496	385	31	34	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top	a Blackthorn house
+swap	dark_oak_shelf	-1511	373	-1496	385	31	31	block/dark_oak_shelf=shelf_wood	a Blackthorn house
+swap	warped_door	-1511	373	-1496	385	31	33	block/warped_door_top=door_bt_top,block/warped_door_bottom=door_bt_bottom	a Blackthorn house
+swap	polished_deepslate_slab	-1511	373	-1496	385	31	40	block/polished_deepslate=window_low	a Blackthorn house
+swap	smooth_stone_slab	-1511	373	-1496	385	31	31	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Blackthorn house
+swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1511	373	-1496	385	35	41	block/mud_bricks=chimney_brick	a Blackthorn house
+swap	stripped_oak_wood,stripped_oak_log	-1511	373	-1496	385	35	41	block/stripped_oak_log=chimney_stone,block/stripped_oak_log_top=chimney_stone	a Blackthorn house
+swap	birch_shelf	-1511	373	-1496	385	35	41	block/birch_shelf=cap_shelf	a Blackthorn house
+swap	light_blue_concrete	-2098	713	-2073	726	20	58	block/light_blue_concrete=ds_blue	the Goldenrod DEPT. STORE
+swap	light_blue_terracotta	-2098	713	-2073	726	21	58	block/light_blue_terracotta=ds_blue_light	the Goldenrod DEPT. STORE
+swap	red_terracotta	-2098	713	-2073	726	20	58	block/red_terracotta=ds_red	the Goldenrod DEPT. STORE
+swap	red_nether_bricks,red_nether_brick_stairs,red_nether_brick_slab,red_nether_brick_wall	-2098	713	-2073	726	20	58	block/red_nether_bricks=ds_roof	the Goldenrod DEPT. STORE
+swap	quartz_stairs,quartz_block,quartz_slab,smooth_quartz_slab,smooth_quartz_stairs	-2098	713	-2073	726	21	58	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean	the Goldenrod DEPT. STORE
+swap	deepslate_brick_wall	-2098	713	-2073	726	20	58	block/deepslate_bricks=station_mullion	the Goldenrod DEPT. STORE
+swap	iron_block	-2098	713	-2073	726	20	58	block/iron_block=ds_steel	the Goldenrod DEPT. STORE
+swap	birch_stairs,birch_slab	-2098	713	-2073	726	20	58	block/birch_planks=trim_white	the Goldenrod DEPT. STORE
+sign	pale_oak_shelf	-2189	694	-2186	695	20	21	-	the station's sign
+swap	pale_oak_shelf	-2205	690	-2180	693	20	20	block/pale_oak_shelf=planter_saf_cream	the station's planters
 swap	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 swap	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care
@@ -2941,7 +3086,6 @@ swap	pale_oak_fence	-2720	260	-1011	1080	-	-	block/pale_oak_planks=white_fence	J
 swap	dripstone_block	-2720	260	-1011	1080	-	-	block/dripstone_block=drip_rock_top|drip_rock@4	Johto
 swap	jungle_stairs,jungle_slab	-2720	260	-1011	1080	-	-	block/jungle_planks=drip_rock_top|drip_rock@4,block/dripstone_block=drip_rock_top|drip_rock@4	Johto
 swap	mud_brick_stairs	-2720	260	-1011	1080	-	-	block/mud_bricks=step_boards_d	Johto
-swap	mud_brick_slab	-2720	260	-1011	1080	-	-	block/mud_bricks=mud_rock@4	Johto
 swap	mud_brick_wall	-2720	260	-1011	1080	-	-	block/mud_bricks=wall_tan	Johto
 chain	iron_chain	-2720	260	-1011	1080	-	-	-	Johto
 swap	sand	-2720	260	-1011	1080	-	-	block/sand=beach_sand@4	Johto
@@ -2955,229 +3099,34 @@ swap	stripped_jungle_wood	-2720	260	-1011	1080	-	-	block/stripped_jungle_log=hil
 swap	wildflowers	-2720	260	-1011	1080	-	-	block/wildflowers=flower_wild,block/wildflowers_stem=flower_wild_stem	Johto
 swap	dandelion,oxeye_daisy,azure_bluet,poppy,red_tulip	-2720	260	-1011	1080	-	-	block/dandelion=flower_dandelion,block/oxeye_daisy=flower_daisy,block/azure_bluet=flower_bluet,block/poppy=flower_poppy,block/red_tulip=flower_tulip	Johto
 roof	acacia_stairs	-1000	655	-960	712	-	-	-	Route 26's houses (as Pallet's)
-roof	acacia_stairs	-1770	705	-1650	835	-	-	-	Cherrygrove City (as Pallet)
 roof	acacia_stairs	-1000	655	-960	712	-	-	-	Route 26's houses (as Pallet's)
-roof	acacia_stairs	-1770	705	-1650	835	-	-	-	Cherrygrove City (as Pallet)
 swap	polished_andesite,polished_andesite_slab	-1000	655	-960	712	18	27	block/polished_andesite=house_stone	Route 26's houses (as Pallet's)
-swap	polished_andesite,polished_andesite_slab	-1770	705	-1650	835	18	27	block/polished_andesite=house_stone	Cherrygrove City (as Pallet)
 swap	polished_deepslate	-1000	655	-960	712	18	27	block/polished_deepslate=house_dark	Route 26's houses (as Pallet's)
-swap	polished_deepslate	-1770	705	-1650	835	18	27	block/polished_deepslate=house_dark	Cherrygrove City (as Pallet)
 swap	polished_deepslate_slab	-1000	655	-960	712	18	27	block/polished_deepslate=window_low	Route 26's houses (as Pallet's)
-swap	polished_deepslate_slab	-1770	705	-1650	835	18	27	block/polished_deepslate=window_low	Cherrygrove City (as Pallet)
 swap	polished_deepslate_wall	-1000	655	-960	712	18	27	block/polished_deepslate=drainpipe	Route 26's houses (as Pallet's)
-swap	polished_deepslate_wall	-1770	705	-1650	835	18	27	block/polished_deepslate=drainpipe	Cherrygrove City (as Pallet)
 swap	polished_diorite_stairs	-1000	655	-960	712	18	27	block/polished_diorite=house_trim	Route 26's houses (as Pallet's)
-swap	polished_diorite_stairs	-1770	705	-1650	835	18	27	block/polished_diorite=house_trim	Cherrygrove City (as Pallet)
 swap	polished_andesite,polished_andesite_slab	-1000	655	-960	712	18	27	block/polished_andesite=house_stone	Route 26's houses (as Pallet's)
-swap	polished_andesite,polished_andesite_slab	-1770	705	-1650	835	18	27	block/polished_andesite=house_stone	Cherrygrove City (as Pallet)
 swap	polished_deepslate	-1000	655	-960	712	18	27	block/polished_deepslate=house_dark	Route 26's houses (as Pallet's)
-swap	polished_deepslate	-1770	705	-1650	835	18	27	block/polished_deepslate=house_dark	Cherrygrove City (as Pallet)
 swap	polished_deepslate_slab	-1000	655	-960	712	18	27	block/polished_deepslate=window_low	Route 26's houses (as Pallet's)
-swap	polished_deepslate_slab	-1770	705	-1650	835	18	27	block/polished_deepslate=window_low	Cherrygrove City (as Pallet)
 swap	polished_deepslate_wall	-1000	655	-960	712	18	27	block/polished_deepslate=drainpipe	Route 26's houses (as Pallet's)
-swap	polished_deepslate_wall	-1770	705	-1650	835	18	27	block/polished_deepslate=drainpipe	Cherrygrove City (as Pallet)
 swap	polished_diorite_stairs	-1000	655	-960	712	18	27	block/polished_diorite=house_trim	Route 26's houses (as Pallet's)
-swap	polished_diorite_stairs	-1770	705	-1650	835	18	27	block/polished_diorite=house_trim	Cherrygrove City (as Pallet)
-swap	polished_andesite,polished_andesite_slab	-1000	655	-960	712	18	19	block/polished_andesite=lab_stone	Route 26's houses (as Pallet's)
-swap	polished_andesite,polished_andesite_slab	-1770	705	-1650	835	18	19	block/polished_andesite=lab_stone	Cherrygrove City (as Pallet)
-swap	polished_andesite_slab	-1000	655	-960	712	25	25	block/polished_andesite=lab_trim	Route 26's houses (as Pallet's)
-swap	polished_andesite_slab	-1770	705	-1650	835	25	25	block/polished_andesite=lab_trim	Cherrygrove City (as Pallet)
-swap	end_stone_bricks,end_stone_brick_stairs	-1000	655	-960	712	-	-	block/end_stone_bricks=lab_brick	Route 26's houses (as Pallet's)
-swap	end_stone_bricks,end_stone_brick_stairs	-1770	705	-1650	835	-	-	block/end_stone_bricks=lab_brick	Cherrygrove City (as Pallet)
-swap	brown_mushroom_block,mud_brick_stairs	-1000	655	-960	712	-	-	block/brown_mushroom_block=lab_pillar,block/mud_bricks=lab_pillar	Route 26's houses (as Pallet's)
-swap	brown_mushroom_block,mud_brick_stairs	-1770	705	-1650	835	-	-	block/brown_mushroom_block=lab_pillar,block/mud_bricks=lab_pillar	Cherrygrove City (as Pallet)
-swap	waxed_cut_copper_slab,cut_copper_slab	-1000	655	-960	712	-	-	block/cut_copper=lab_awning_red	Route 26's houses (as Pallet's)
-swap	waxed_cut_copper_slab,cut_copper_slab	-1770	705	-1650	835	-	-	block/cut_copper=lab_awning_red	Cherrygrove City (as Pallet)
-swap	oxidized_cut_copper_slab,waxed_oxidized_cut_copper_slab	-1000	655	-960	712	-	-	block/oxidized_cut_copper=lab_awning_door	Route 26's houses (as Pallet's)
-swap	oxidized_cut_copper_slab,waxed_oxidized_cut_copper_slab	-1770	705	-1650	835	-	-	block/oxidized_cut_copper=lab_awning_door	Cherrygrove City (as Pallet)
-swap	bricks,brick_wall,brick_stairs	-1000	655	-960	712	-	-	block/bricks=lab_chimney	Route 26's houses (as Pallet's)
-swap	bricks,brick_wall,brick_stairs	-1770	705	-1650	835	-	-	block/bricks=lab_chimney	Cherrygrove City (as Pallet)
-swap	polished_andesite_slab,polished_andesite_stairs,stone	-1000	655	-960	712	26	27	block/polished_andesite=lab_roof@1,block/stone=lab_roof@1	Route 26's houses (as Pallet's)
-swap	polished_andesite_slab,polished_andesite_stairs,stone	-1770	705	-1650	835	26	27	block/polished_andesite=lab_roof@1,block/stone=lab_roof@1	Cherrygrove City (as Pallet)
-swap	polished_blackstone_wall	-1000	655	-960	712	26	27	block/polished_blackstone=lab_roof_rim	Route 26's houses (as Pallet's)
-swap	polished_blackstone_wall	-1770	705	-1650	835	26	27	block/polished_blackstone=lab_roof_rim	Cherrygrove City (as Pallet)
-swap	polished_deepslate_slab	-1000	655	-960	712	18	27	block/polished_deepslate=window_low	Route 26's houses (as Pallet's)
-swap	polished_deepslate_slab	-1770	705	-1650	835	18	27	block/polished_deepslate=window_low	Cherrygrove City (as Pallet)
 swap	pale_oak_fence	-1770	705	-1650	835	-	-	block/pale_oak_planks=white_fence	Cherrygrove City (as Viridian)
-swap	pale_oak_fence	-1580	300	-1405	445	-	-	block/pale_oak_planks=white_fence	Blackthorn City (as Viridian)
 roof_green	warped_stairs	-1770	705	-1650	835	-	-	-	Cherrygrove City (as Viridian)
-roof_green	warped_stairs	-1580	300	-1405	445	-	-	-	Blackthorn City (as Viridian)
 swap	pale_oak_stairs,pale_oak_slab	-1770	705	-1650	835	-	-	block/pale_oak_planks=window_frame	Cherrygrove City (as Viridian)
-swap	pale_oak_stairs,pale_oak_slab	-1580	300	-1405	445	-	-	block/pale_oak_planks=window_frame	Blackthorn City (as Viridian)
 swap	calcite,diorite,polished_diorite	-1770	705	-1650	835	18	19	block/calcite=path_calcite,block/diorite=path_diorite,block/polished_diorite=path_polished_diorite	Cherrygrove City (as Viridian)
-swap	calcite,diorite,polished_diorite	-1580	300	-1405	445	30	31	block/calcite=path_calcite,block/diorite=path_diorite,block/polished_diorite=path_polished_diorite	Blackthorn City (as Viridian)
 kerb	calcite,diorite,polished_diorite	-1770	705	-1650	835	18	19	-	Cherrygrove City (as Viridian)
-kerb	calcite,diorite,polished_diorite	-1580	300	-1405	445	30	31	-	Blackthorn City (as Viridian)
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-1770	705	-1650	835	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Cherrygrove City (as Viridian)
-swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-1580	300	-1405	445	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chiseled_tuff_bricks,block/chiseled_tuff_bricks_top=lamp_chiseled_tuff_bricks_top,block/gray_wool=lamp_cap	Blackthorn City (as Viridian)
-swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1770	705	-1650	835	-	-	block/mud_bricks=chimney_brick	Cherrygrove City (as Viridian)
-swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1580	300	-1405	445	-	-	block/mud_bricks=chimney_brick	Blackthorn City (as Viridian)
-swap	warped_shelf	-1770	705	-1650	835	-	-	block/warped_shelf=green_shelf	Cherrygrove City (as Viridian)
-swap	warped_shelf	-1580	300	-1405	445	-	-	block/warped_shelf=green_shelf	Blackthorn City (as Viridian)
-swap	stripped_warped_hyphae,stripped_warped_stem	-1770	705	-1650	835	-	-	block/stripped_warped_stem=green_solid,block/stripped_warped_stem_top=green_solid_top	Cherrygrove City (as Viridian)
-swap	stripped_warped_hyphae,stripped_warped_stem	-1580	300	-1405	445	-	-	block/stripped_warped_stem=green_solid,block/stripped_warped_stem_top=green_solid_top	Blackthorn City (as Viridian)
-swap	birch_shelf	-1770	705	-1650	835	-	-	block/birch_shelf=wood_shelf	Cherrygrove City (as Viridian)
-swap	birch_shelf	-1580	300	-1405	445	-	-	block/birch_shelf=wood_shelf	Blackthorn City (as Viridian)
-swap	polished_andesite_slab,polished_andesite_stairs,polished_andesite	-1770	705	-1650	835	-	-	block/polished_andesite=house_stone,block/cobblestone=house_stone,block/andesite=house_stone	Cherrygrove City (as Viridian)
-swap	polished_andesite_slab,polished_andesite_stairs,polished_andesite	-1580	300	-1405	445	-	-	block/polished_andesite=house_stone,block/cobblestone=house_stone,block/andesite=house_stone	Blackthorn City (as Viridian)
-swap	polished_diorite_stairs,polished_diorite_slab	-1770	705	-1650	835	-	-	block/polished_diorite=house_trim	Cherrygrove City (as Viridian)
-swap	polished_diorite_stairs,polished_diorite_slab	-1580	300	-1405	445	-	-	block/polished_diorite=house_trim	Blackthorn City (as Viridian)
-swap	polished_deepslate_wall	-1770	705	-1650	835	-	-	block/polished_deepslate=drainpipe	Cherrygrove City (as Viridian)
-swap	polished_deepslate_wall	-1580	300	-1405	445	-	-	block/polished_deepslate=drainpipe	Blackthorn City (as Viridian)
-swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1770	705	-1650	835	24	27	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	Cherrygrove City (as Viridian)
-swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1580	300	-1405	445	36	39	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	Blackthorn City (as Viridian)
-swap	polished_diorite_stairs,polished_diorite_slab	-1770	705	-1650	835	20	28	block/polished_diorite=house_trim	Cherrygrove City (as Viridian)
-swap	polished_diorite_stairs,polished_diorite_slab	-1580	300	-1405	445	32	40	block/polished_diorite=house_trim	Blackthorn City (as Viridian)
-swap	polished_diorite	-1770	705	-1650	835	20	28	block/polished_diorite=center_base	Cherrygrove City (as Viridian)
-swap	polished_diorite	-1580	300	-1405	445	32	40	block/polished_diorite=center_base	Blackthorn City (as Viridian)
-swap	blue_concrete,blue_wool,blue_carpet	-1770	705	-1650	835	20	27	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	Cherrygrove City (as Viridian)
-swap	blue_concrete,blue_wool,blue_carpet	-1580	300	-1405	445	32	39	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	Blackthorn City (as Viridian)
-swap	polished_diorite_stairs,polished_diorite_slab	-1770	705	-1650	835	20	28	block/polished_diorite=house_trim	Cherrygrove City (as Viridian)
-swap	polished_diorite_stairs,polished_diorite_slab	-1580	300	-1405	445	32	40	block/polished_diorite=house_trim	Blackthorn City (as Viridian)
-swap	polished_diorite	-1770	705	-1650	835	20	28	block/polished_diorite=mart_base	Cherrygrove City (as Viridian)
-swap	polished_diorite	-1580	300	-1405	445	32	40	block/polished_diorite=mart_base	Blackthorn City (as Viridian)
-roof_gym	jungle_stairs,oak_stairs	-1770	705	-1650	835	24	30	-	Cherrygrove City (as Viridian)
-roof_gym	jungle_stairs,oak_stairs	-1580	300	-1405	445	36	42	-	Blackthorn City (as Viridian)
-swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1770	705	-1650	835	24	30	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	Cherrygrove City (as Viridian)
-swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1580	300	-1405	445	36	42	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	Blackthorn City (as Viridian)
-swap	terracotta	-1770	705	-1650	835	21	21	block/terracotta=gym_band_viridian_city	Cherrygrove City (as Viridian)
-swap	terracotta	-1580	300	-1405	445	33	33	block/terracotta=gym_band_viridian_city	Blackthorn City (as Viridian)
-swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-1770	705	-1650	835	-	-	block/polished_diorite=house_trim	Cherrygrove City (as Viridian)
-swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-1580	300	-1405	445	-	-	block/polished_diorite=house_trim	Blackthorn City (as Viridian)
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-1770	705	-1650	835	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chisel,block/chiseled_tuff_bricks_top=lamp_chisel_top,block/gray_wool=lamp_cap	Cherrygrove City (as Viridian)
-swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet	-1580	300	-1405	445	-	-	block/tuff=lamp_post,block/polished_tuff=lamp_post,block/chiseled_tuff_bricks=lamp_chisel,block/chiseled_tuff_bricks_top=lamp_chisel_top,block/gray_wool=lamp_cap	Blackthorn City (as Viridian)
 swap	dark_prismarine,dark_prismarine_slab,dark_prismarine_stairs	-1770	705	-1650	835	-	-	block/dark_prismarine=window_low	Cherrygrove City (as Viridian)
-swap	dark_prismarine,dark_prismarine_slab,dark_prismarine_stairs	-1580	300	-1405	445	-	-	block/dark_prismarine=window_low	Blackthorn City (as Viridian)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block,quartz_bricks	-1770	705	-1650	835	19	28	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Cherrygrove City (as Viridian)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block,quartz_bricks	-1580	300	-1405	445	31	40	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Blackthorn City (as Viridian)
-swap	calcite,diorite,polished_diorite	-1770	705	-1650	835	19	20	block/calcite=marble_center@2,block/diorite=marble_center@2,block/polished_diorite=marble_center@2	Cherrygrove City (as Viridian)
-swap	calcite,diorite,polished_diorite	-1580	300	-1405	445	31	32	block/calcite=marble_center@2,block/diorite=marble_center@2,block/polished_diorite=marble_center@2	Blackthorn City (as Viridian)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block,quartz_bricks	-1770	705	-1650	835	19	28	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Cherrygrove City (as Viridian)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block,quartz_bricks	-1580	300	-1405	445	31	40	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Blackthorn City (as Viridian)
-swap	calcite,diorite,polished_diorite	-1770	705	-1650	835	19	20	block/calcite=marble_mart@2,block/diorite=marble_mart@2,block/polished_diorite=marble_mart@2	Cherrygrove City (as Viridian)
-swap	calcite,diorite,polished_diorite	-1580	300	-1405	445	31	32	block/calcite=marble_mart@2,block/diorite=marble_mart@2,block/polished_diorite=marble_mart@2	Blackthorn City (as Viridian)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	-1770	705	-1650	835	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Cherrygrove City (as Viridian)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	-1580	300	-1405	445	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Blackthorn City (as Viridian)
-swap	calcite,diorite	-1770	705	-1650	835	-	-	block/calcite=marble_gym@2,block/diorite=marble_gym@2	Cherrygrove City (as Viridian)
-swap	calcite,diorite	-1580	300	-1405	445	-	-	block/calcite=marble_gym@2,block/diorite=marble_gym@2	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1770	705	-1650	835	19	20	flowering_azalea	Cherrygrove City (as Viridian)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	flowering_azalea	Blackthorn City (as Viridian)
-swap	quartz_block,quartz_stairs	-1770	705	-1650	835	19	23	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	Cherrygrove City (as Viridian)
-swap	quartz_block,quartz_stairs	-1580	300	-1405	445	31	35	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	Blackthorn City (as Viridian)
-swap	quartz_slab	-1770	705	-1650	835	19	19	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	Cherrygrove City (as Viridian)
-swap	quartz_slab	-1580	300	-1405	445	31	31	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	Blackthorn City (as Viridian)
-swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1510	715	-1395	830	24	27	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	New Bark Town (as Cerulean)
-swap	stripped_mangrove_wood,stripped_mangrove_log,mangrove_stairs,mangrove_planks,mangrove_slab	-1580	300	-1405	445	36	39	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	Blackthorn City (as Cerulean)
-swap	polished_diorite_stairs,polished_diorite_slab	-1510	715	-1395	830	20	28	block/polished_diorite=house_trim	New Bark Town (as Cerulean)
-swap	polished_diorite_stairs,polished_diorite_slab	-1580	300	-1405	445	32	40	block/polished_diorite=house_trim	Blackthorn City (as Cerulean)
-swap	polished_diorite	-1510	715	-1395	830	20	28	block/polished_diorite=center_base	New Bark Town (as Cerulean)
-swap	polished_diorite	-1580	300	-1405	445	32	40	block/polished_diorite=center_base	Blackthorn City (as Cerulean)
-swap	blue_concrete,blue_wool,blue_carpet	-1510	715	-1395	830	20	27	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	New Bark Town (as Cerulean)
-swap	blue_concrete,blue_wool,blue_carpet	-1580	300	-1405	445	32	39	block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool	Blackthorn City (as Cerulean)
-swap	polished_diorite_stairs,polished_diorite_slab	-1510	715	-1395	830	20	28	block/polished_diorite=house_trim	New Bark Town (as Cerulean)
-swap	polished_diorite_stairs,polished_diorite_slab	-1580	300	-1405	445	32	40	block/polished_diorite=house_trim	Blackthorn City (as Cerulean)
-swap	polished_diorite	-1510	715	-1395	830	20	28	block/polished_diorite=mart_base	New Bark Town (as Cerulean)
-swap	polished_diorite	-1580	300	-1405	445	32	40	block/polished_diorite=mart_base	Blackthorn City (as Cerulean)
-roof_gym	jungle_stairs,oak_stairs	-1510	715	-1395	830	23	29	-	New Bark Town (as Cerulean)
-roof_gym	jungle_stairs,oak_stairs	-1580	300	-1405	445	35	41	-	Blackthorn City (as Cerulean)
-swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1510	715	-1395	830	23	29	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	New Bark Town (as Cerulean)
-swap	jungle_planks,oak_planks,stripped_jungle_log,jungle_slab,oak_slab	-1580	300	-1405	445	35	41	block/jungle_planks=gym_flat,block/oak_planks=gym_flat_light,block/stripped_jungle_log=gym_beam,block/stripped_jungle_log_top=gym_beam_top	Blackthorn City (as Cerulean)
-swap	yellow_concrete	-1510	715	-1395	830	20	20	block/yellow_concrete=gym_band_cerulean_city	New Bark Town (as Cerulean)
-swap	yellow_concrete	-1580	300	-1405	445	32	32	block/yellow_concrete=gym_band_cerulean_city	Blackthorn City (as Cerulean)
-swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-1510	715	-1395	830	-	-	block/polished_diorite=house_trim	New Bark Town (as Cerulean)
-swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-1580	300	-1405	445	-	-	block/polished_diorite=house_trim	Blackthorn City (as Cerulean)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block,quartz_bricks	-1510	715	-1395	830	19	28	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	New Bark Town (as Cerulean)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block,quartz_bricks	-1580	300	-1405	445	31	40	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Blackthorn City (as Cerulean)
-swap	calcite,diorite,polished_diorite	-1510	715	-1395	830	19	20	block/calcite=marble_center@2,block/diorite=marble_center@2,block/polished_diorite=marble_center@2	New Bark Town (as Cerulean)
-swap	calcite,diorite,polished_diorite	-1580	300	-1405	445	31	32	block/calcite=marble_center@2,block/diorite=marble_center@2,block/polished_diorite=marble_center@2	Blackthorn City (as Cerulean)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block,quartz_bricks	-1510	715	-1395	830	19	28	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	New Bark Town (as Cerulean)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block,quartz_bricks	-1580	300	-1405	445	31	40	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Blackthorn City (as Cerulean)
-swap	calcite,diorite,polished_diorite	-1510	715	-1395	830	19	20	block/calcite=marble_mart@2,block/diorite=marble_mart@2,block/polished_diorite=marble_mart@2	New Bark Town (as Cerulean)
-swap	calcite,diorite,polished_diorite	-1580	300	-1405	445	31	32	block/calcite=marble_mart@2,block/diorite=marble_mart@2,block/polished_diorite=marble_mart@2	Blackthorn City (as Cerulean)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	-1510	715	-1395	830	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	New Bark Town (as Cerulean)
-swap	quartz_block,quartz_stairs,quartz_slab,quartz_pillar,chiseled_quartz_block	-1580	300	-1405	445	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean	Blackthorn City (as Cerulean)
-swap	calcite,diorite	-1510	715	-1395	830	-	-	block/calcite=marble_gym@2,block/diorite=marble_gym@2	New Bark Town (as Cerulean)
-swap	calcite,diorite	-1580	300	-1405	445	-	-	block/calcite=marble_gym@2,block/diorite=marble_gym@2	Blackthorn City (as Cerulean)
 roof_cer	prismarine_brick_stairs	-1510	715	-1395	830	21	27	-	New Bark Town (as Cerulean)
-roof_cer	prismarine_brick_stairs	-1580	300	-1405	445	33	39	-	Blackthorn City (as Cerulean)
 swap	prismarine_brick_slab,prismarine_bricks	-1510	715	-1395	830	19	27	block/prismarine_bricks=roof_cer_tiles	New Bark Town (as Cerulean)
-swap	prismarine_brick_slab,prismarine_bricks	-1580	300	-1405	445	31	39	block/prismarine_bricks=roof_cer_tiles	Blackthorn City (as Cerulean)
 swap	bricks	-1510	715	-1395	830	19	19	block/bricks=base_cer	New Bark Town (as Cerulean)
-swap	bricks	-1580	300	-1405	445	31	31	block/bricks=base_cer	Blackthorn City (as Cerulean)
 swap	light_gray_concrete	-1510	715	-1395	830	19	26	block/light_gray_concrete=pillar_cer	New Bark Town (as Cerulean)
-swap	light_gray_concrete	-1580	300	-1405	445	31	38	block/light_gray_concrete=pillar_cer	Blackthorn City (as Cerulean)
 swap	polished_diorite_stairs,polished_diorite_slab	-1510	715	-1395	830	21	26	block/polished_diorite=trim_cer	New Bark Town (as Cerulean)
-swap	polished_diorite_stairs,polished_diorite_slab	-1580	300	-1405	445	33	38	block/polished_diorite=trim_cer	Blackthorn City (as Cerulean)
 swap	polished_andesite_slab	-1510	715	-1395	830	19	19	block/polished_andesite=step_cer	New Bark Town (as Cerulean)
-swap	polished_andesite_slab	-1580	300	-1405	445	31	31	block/polished_andesite=step_cer	Blackthorn City (as Cerulean)
 swap	white_concrete,light_blue_concrete,light_blue_terracotta,white_terracotta	-1510	715	-1395	830	18	18	block/white_concrete=pave_cer_1,block/light_blue_concrete=pave_cer_2,block/light_blue_terracotta=pave_cer_3,block/white_terracotta=pave_cer_4	New Bark Town (as Cerulean)
-swap	white_concrete,light_blue_concrete,light_blue_terracotta,white_terracotta	-1580	300	-1405	445	30	30	block/white_concrete=pave_cer_1,block/light_blue_concrete=pave_cer_2,block/light_blue_terracotta=pave_cer_3,block/white_terracotta=pave_cer_4	Blackthorn City (as Cerulean)
 swap	smooth_stone_slab	-1510	715	-1395	830	18	18	block/smooth_stone=kerb_cer,block/smooth_stone_slab_side=kerb_cer	New Bark Town (as Cerulean)
-swap	smooth_stone_slab	-1580	300	-1405	445	30	30	block/smooth_stone=kerb_cer,block/smooth_stone_slab_side=kerb_cer	Blackthorn City (as Cerulean)
 kerb	smooth_stone_slab	-1510	715	-1395	830	18	18	-	New Bark Town (as Cerulean)
-kerb	smooth_stone_slab	-1580	300	-1405	445	30	30	-	Blackthorn City (as Cerulean)
-swap	acacia_shelf,acacia_stairs,pale_oak_stairs	-1510	715	-1395	830	23	25	block/acacia_shelf=awning_orange,block/acacia_planks=awning_orange,block/pale_oak_planks=awning_white	New Bark Town (as Cerulean)
-swap	acacia_shelf,acacia_stairs,pale_oak_stairs	-1580	300	-1405	445	35	37	block/acacia_shelf=awning_orange,block/acacia_planks=awning_orange,block/pale_oak_planks=awning_white	Blackthorn City (as Cerulean)
-boulder	spruce_fence,oak_fence,dark_oak_fence	-1510	715	-1395	830	20	25	prefix:ttrunk	New Bark Town (as Cerulean)
-boulder	spruce_fence,oak_fence,dark_oak_fence	-1580	300	-1405	445	32	37	prefix:ttrunk	Blackthorn City (as Cerulean)
-swap	stripped_oak_wood,stripped_oak_log	-1510	715	-1395	830	20	22	block/stripped_oak_log=bike_post,block/stripped_oak_log_top=bike_post	New Bark Town (as Cerulean)
-swap	stripped_oak_wood,stripped_oak_log	-1580	300	-1405	445	32	34	block/stripped_oak_log=bike_post,block/stripped_oak_log_top=bike_post	Blackthorn City (as Cerulean)
-swap	acacia_stairs,pale_oak_stairs	-1510	715	-1395	830	23	23	block/acacia_planks=awning_val_o,block/pale_oak_planks=awning_val_w	New Bark Town (as Cerulean)
-swap	acacia_stairs,pale_oak_stairs	-1580	300	-1405	445	35	35	block/acacia_planks=awning_val_o,block/pale_oak_planks=awning_val_w	Blackthorn City (as Cerulean)
-swap	acacia_shelf	-1510	715	-1395	830	24	24	block/acacia_shelf=awning_l0	New Bark Town (as Cerulean)
-swap	acacia_shelf	-1580	300	-1405	445	36	36	block/acacia_shelf=awning_l0	Blackthorn City (as Cerulean)
-swap	acacia_shelf	-1510	715	-1395	830	24	24	block/acacia_shelf=awning_l1	New Bark Town (as Cerulean)
-swap	acacia_shelf	-1580	300	-1405	445	36	36	block/acacia_shelf=awning_l1	Blackthorn City (as Cerulean)
-swap	acacia_shelf	-1510	715	-1395	830	24	24	block/acacia_shelf=awning_l2	New Bark Town (as Cerulean)
-swap	acacia_shelf	-1580	300	-1405	445	36	36	block/acacia_shelf=awning_l2	Blackthorn City (as Cerulean)
-swap	acacia_shelf	-1510	715	-1395	830	24	24	block/acacia_shelf=awning_l3	New Bark Town (as Cerulean)
-swap	acacia_shelf	-1580	300	-1405	445	36	36	block/acacia_shelf=awning_l3	Blackthorn City (as Cerulean)
-swap	acacia_shelf	-1510	715	-1395	830	24	24	block/acacia_shelf=awning_l4	New Bark Town (as Cerulean)
-swap	acacia_shelf	-1580	300	-1405	445	36	36	block/acacia_shelf=awning_l4	Blackthorn City (as Cerulean)
-swap	acacia_shelf	-1510	715	-1395	830	24	24	block/acacia_shelf=awning_l5	New Bark Town (as Cerulean)
-swap	acacia_shelf	-1580	300	-1405	445	36	36	block/acacia_shelf=awning_l5	Blackthorn City (as Cerulean)
-swap	acacia_shelf	-1510	715	-1395	830	24	24	block/acacia_shelf=awning_l6	New Bark Town (as Cerulean)
-swap	acacia_shelf	-1580	300	-1405	445	36	36	block/acacia_shelf=awning_l6	Blackthorn City (as Cerulean)
-swap	acacia_shelf	-1510	715	-1395	830	24	24	block/acacia_shelf=awning_l7	New Bark Town (as Cerulean)
-swap	acacia_shelf	-1580	300	-1405	445	36	36	block/acacia_shelf=awning_l7	Blackthorn City (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1510	715	-1395	830	19	20	azalea	New Bark Town (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	azalea	Blackthorn City (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1510	715	-1395	830	19	20	azalea	New Bark Town (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	azalea	Blackthorn City (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1510	715	-1395	830	20	22	azalea	New Bark Town (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	32	34	azalea	Blackthorn City (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1510	715	-1395	830	19	20	azalea	New Bark Town (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	azalea	Blackthorn City (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1510	715	-1395	830	19	20	azalea	New Bark Town (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	azalea	Blackthorn City (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1510	715	-1395	830	19	20	azalea	New Bark Town (as Cerulean)
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-1580	300	-1405	445	31	32	azalea	Blackthorn City (as Cerulean)
-swap	quartz_block,quartz_stairs	-1510	715	-1395	830	19	23	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	New Bark Town (as Cerulean)
-swap	quartz_block,quartz_stairs	-1580	300	-1405	445	31	35	block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar	Blackthorn City (as Cerulean)
-swap	quartz_slab	-1510	715	-1395	830	19	19	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	New Bark Town (as Cerulean)
-swap	quartz_slab	-1580	300	-1405	445	31	31	block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step	Blackthorn City (as Cerulean)
-swap	andesite_slab,stripped_oak_wood,oak_shelf,pale_oak_fence,light_gray_concrete	-1510	715	-1395	830	18	21	block/andesite=step_cer,block/stripped_oak_log=bridge_gold_beam,block/oak_shelf=bridge_gold_rail,block/pale_oak_planks=white_fence,block/light_gray_concrete=pillar_cer	New Bark Town (as Cerulean)
-swap	andesite_slab,stripped_oak_wood,oak_shelf,pale_oak_fence,light_gray_concrete	-1580	300	-1405	445	30	33	block/andesite=step_cer,block/stripped_oak_log=bridge_gold_beam,block/oak_shelf=bridge_gold_rail,block/pale_oak_planks=white_fence,block/light_gray_concrete=pillar_cer	Blackthorn City (as Cerulean)
 swap	cyan_terracotta	-2165	630	-2045	677	18	19	block/cyan_terracotta=tarmac@4	Goldenrod City
 swap	cyan_terracotta	-2165	695	-2045	760	18	19	block/cyan_terracotta=tarmac@4	Goldenrod City
 swap	cyan_terracotta	-2165	678	-2149	694	18	19	block/cyan_terracotta=tarmac@4	Goldenrod City

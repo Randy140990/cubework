@@ -167,7 +167,10 @@ public final class Music {
 		play(place);
 	}
 
-	/** Johto's own music isn't rendered yet: the nearest Kanto tune stands in. */
+	/**
+	 * A place's song without a file (0.56: Johto's own are Crystal's now, tools/music_gsc.py): the nearest tune we have
+	 * stands in.
+	 */
 	private static String fallback(String music) {
 		if (music == null || music.isEmpty() || exists(music)) return music;
 		if (music.startsWith("route_") || music.startsWith("routes")) return "routes3";

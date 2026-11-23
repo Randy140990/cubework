@@ -5069,5 +5069,365 @@
     "volume": 0.8
    }
   ]
+ },
+ "music.azalea_town": {
+  "sounds": [
+   {
+    "name": "retromon:music/azalea_town",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.azalea_town_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/azalea_town_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.bug_catching_contest": {
+  "sounds": [
+   {
+    "name": "retromon:music/bug_catching_contest",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.bug_catching_contest_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/bug_catching_contest_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.burned_tower": {
+  "sounds": [
+   {
+    "name": "retromon:music/burned_tower",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.burned_tower_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/burned_tower_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.cherrygrove_city": {
+  "sounds": [
+   {
+    "name": "retromon:music/cherrygrove_city",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.cherrygrove_city_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/cherrygrove_city_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.dark_cave": {
+  "sounds": [
+   {
+    "name": "retromon:music/dark_cave",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.dark_cave_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/dark_cave_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.dragons_den": {
+  "sounds": [
+   {
+    "name": "retromon:music/dragons_den",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.dragons_den_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/dragons_den_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.ecruteak_city": {
+  "sounds": [
+   {
+    "name": "retromon:music/ecruteak_city",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.goldenrod_city": {
+  "sounds": [
+   {
+    "name": "retromon:music/goldenrod_city",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.goldenrod_city_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/goldenrod_city_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.lake_of_rage": {
+  "sounds": [
+   {
+    "name": "retromon:music/lake_of_rage",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.lake_of_rage_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/lake_of_rage_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.lighthouse": {
+  "sounds": [
+   {
+    "name": "retromon:music/lighthouse",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.national_park": {
+  "sounds": [
+   {
+    "name": "retromon:music/national_park",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.national_park_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/national_park_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.new_bark_town": {
+  "sounds": [
+   {
+    "name": "retromon:music/new_bark_town",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.new_bark_town_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/new_bark_town_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.rocket_hideout": {
+  "sounds": [
+   {
+    "name": "retromon:music/rocket_hideout",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.rocket_hideout_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/rocket_hideout_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.route_26": {
+  "sounds": [
+   {
+    "name": "retromon:music/route_26",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.route_26_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/route_26_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.route_29": {
+  "sounds": [
+   {
+    "name": "retromon:music/route_29",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.route_30": {
+  "sounds": [
+   {
+    "name": "retromon:music/route_30",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.route_30_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/route_30_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.route_36": {
+  "sounds": [
+   {
+    "name": "retromon:music/route_36",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.route_36_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/route_36_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.route_37": {
+  "sounds": [
+   {
+    "name": "retromon:music/route_37",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.route_37_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/route_37_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.ruins_of_alph_interior": {
+  "sounds": [
+   {
+    "name": "retromon:music/ruins_of_alph_interior",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.sprout_tower": {
+  "sounds": [
+   {
+    "name": "retromon:music/sprout_tower",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.sprout_tower_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/sprout_tower_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.tin_tower": {
+  "sounds": [
+   {
+    "name": "retromon:music/tin_tower",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.union_cave": {
+  "sounds": [
+   {
+    "name": "retromon:music/union_cave",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.violet_city": {
+  "sounds": [
+   {
+    "name": "retromon:music/violet_city",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.violet_city_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/violet_city_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
  }
 }

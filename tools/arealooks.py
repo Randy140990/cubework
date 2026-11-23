@@ -282,6 +282,8 @@ def main():
     # (0.54, 12:24) All JOHTO: every look all Kanto has (its cliffs, the grass round its water, its trees' bark and
     # leaves, its glass, its fences, its lamps).
     for r in kanto_rows:
+        # ((0.56, 13:53) Johto's mud brick slabs are John's steps, not Kanto's ponds' rocks: round56's steps.)
+        if r[1] == "mud_brick_slab": continue
         rows.append((r[0], r[1]) + JOHTO[:4] + (r[6], r[7], r[8], JOHTO[4]))
     # Johto's towns built as Kanto's (12:24, 12:26): each Kanto town's own looks over the Johto town, the heights moved
     # to its ground (the lamps', signs' and other one-offs' left out).
@@ -292,6 +294,13 @@ def main():
         for r in town_rows:
             if not inside(r, src) or any(w in r[9] for w in one_off) or r[0] in ("sign", "wood_sign", "wood_board", "prop", "prop_only", "hide"): continue
             for dst, dy, note in dsts:
+                # ((0.56, 13:53) A building's own looks (a Mart's pillars, the lab's, Viridian's chimneys) stay on their
+                # buildings: copied over a whole Johto town they went on everything there of the same block. The Johto
+                # buildings have their own (round56); Route 26's two houses are Pallet's two.)
+                if dst is R26_HOUSES:
+                    # (Pallet's houses' own looks only: the lab's pillars went on Route 26's cliffs.)
+                    if not any(inside(r, h) for h in HOUSES): continue
+                elif tuple(r[2:6]) != src[:4]: continue
                 mv = lambda y: y if y in ("-", None) else str(int(y) + dy)
                 rows.append((r[0], r[1]) + dst[:4] + (mv(r[6]), mv(r[7]), r[8], note))
     lower = lambda y: y if y in ("-", None) else str(int(y) - 13)
@@ -779,6 +788,7 @@ def round50(add, room):
     round52d(add, room)
     round53(add, room)
     round54(add, room)
+    round56(add, room)
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -1218,9 +1228,11 @@ CHERRYGROVE = (-1770, 705, -1650, 835, "Cherrygrove City")
 BLACKTHORN = (-1580, 300, -1405, 445, "Blackthorn City, the Ice Path's mouth, Dragon's Den")
 ROUTE45 = (-1560, 440, -1440, 700, "Route 45")
 # Which Kanto town's looks go on which Johto place, and how far its ground is above or below.
+# ((0.56, 13:53) Blackthorn's houses are its own, not Viridian's or Cerulean's: Cerulean's grey pillars went on its grey
+# walls, the Gyms' tan on its Gym. round56 dresses them.)
 TOWN_COPIES = [(PALLET, [(R26_HOUSES, 1, "Route 26's houses (as Pallet's)"), (CHERRYGROVE, 1, "Cherrygrove City (as Pallet)")]),
-               (VIRIDIAN, [(CHERRYGROVE, -6, "Cherrygrove City (as Viridian)"), (BLACKTHORN, 6, "Blackthorn City (as Viridian)")]),
-               (CERULEAN, [(NEW_BARK, -15, "New Bark Town (as Cerulean)"), (BLACKTHORN, -3, "Blackthorn City (as Cerulean)")])]
+               (VIRIDIAN, [(CHERRYGROVE, -6, "Cherrygrove City (as Viridian)")]),
+               (CERULEAN, [(NEW_BARK, -15, "New Bark Town (as Cerulean)")])]
 
 
 def round54(add, room):
@@ -1229,15 +1241,15 @@ def round54(add, room):
     D = _json.load(open(os.path.join(HERE, "area_johto54.json")))
     # Every Mart's front (12:19: "a universal update"): its door pillars, its step, its sign over the door.
     for kind, place, x, y, z in SHOPS:
+        # ((0.56, 13:53) Every Center's and Mart's door pillars and step "just pure white", and a Mart's sign as a
+        # Center's: "the white background and then the red symbol", the Mart's in its blue.)
+        name = place + (" Pokemon Center" if kind == "center" else " Mart")
+        add("swap", "quartz_block,quartz_stairs,quartz_slab", (x - 2, z - 2, x + 2, z - 2, name + "'s pillars and step"), QUARTZ, (str(y - 6), str(y - 2)))
         if kind != "mart": continue
-        add("swap", "quartz_block,quartz_stairs", (x - 2, z - 2, x + 2, z - 2, place + " Mart's pillars"),
-            "block/quartz_block_side=mart_pillar,block/quartz_block_top=mart_pillar,block/quartz_block_bottom=mart_pillar", (str(y - 6), str(y - 2)))
-        add("swap", "quartz_slab", (x - 1, z - 2, x + 1, z - 2, place + " Mart's step"),
-            "block/quartz_block_side=mart_step,block/quartz_block_top=mart_step,block/quartz_block_bottom=mart_step", (str(y - 6), str(y - 6)))
         add("swap", "polished_diorite,polished_diorite_stairs,polished_diorite_slab", (x - 2, z - 1, x + 2, z - 1, place + " Mart's sign"),
-            "block/polished_diorite=mart_sign_ring", (str(y - 2), str(y + 2)))
+            "block/polished_diorite=quartz_clean", (str(y - 2), str(y + 2)))
         add("swap", "quartz_block,quartz_stairs,quartz_slab", (x - 1, z, x + 1, z, place + " Mart's sign"),
-            "block/quartz_block_side=mart_sign_face@3,block/quartz_block_top=mart_sign_ring,block/quartz_block_bottom=mart_sign_ring", (str(y - 1), str(y + 1)))
+            "block/quartz_block_side=mart_sign_face,block/quartz_block_top=mart_sign_face,block/quartz_block_bottom=mart_sign_face", (str(y - 1), str(y + 1)))
     # The little flowers, crisper, everywhere (12:19).
     for a in (KANTO, JOHTO, ROUTE28):
         add("swap", "wildflowers", a, "block/wildflowers=flower_wild,block/wildflowers_stem=flower_wild_stem")
@@ -1250,9 +1262,10 @@ def round54(add, room):
     for x0, z0, x1, z1, y0, y1 in D["rocks"]:
         add("swap", SEA_ROCK_BLOCKS, (x0, z0, x1, z1, "a rock in the water"), SEA_ROCK, (str(y0), str(y1)))
     add("swap", "oak_fence,oak_fence_gate", J, "block/oak_planks=fence_johto")
-    add("swap", "dirt_path", J, "block/dirt_path_top=route_path@4,block/dirt_path_side=route_path@4")
-    add("swap", "brown_concrete_powder", BLACKTHORN, "block/brown_concrete_powder=route_path_edge@4")
-    add("grass_onto", "dirt_path,brown_concrete_powder", J, "grass")
+    # ((0.56, 13:53: "the dirt path you've now created like squares ... it needs to follow the same for Kanto") Its dirt
+    # paths the look pack's, as Kanto's (its path laid four blocks across, the grass and moss onto it); the brown
+    # powder John edges them with the same path, laid where it is, so they run on.)
+    add("swap", "brown_concrete_powder", J, "block/brown_concrete_powder=path_kanto@4")
     add("swap", "snow_block,snow", J, "block/snow=snow_clean@2")
     # Its lamps: the Cycling Road's (Routes 26 and 27, Blackthorn's), Cerulean's in New Bark, Cherrygrove's own.
     for x, y0, z, y1 in D["r17_posts"]:
@@ -1271,13 +1284,15 @@ def round54(add, room):
         add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", (str(y - 8), str(y + 2)))
     for x, y, z in D["lamps"].get("nether", []):
         b = (x - 1, z - 1, x + 1, z + 1, "a Cherrygrove lamp")
-        add("swap", "nether_brick_fence,nether_brick_wall,black_carpet,sea_lantern", b,
-            "block/nether_bricks=lamp_cg_post,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!", (str(y - 8), str(y + 2)))
+        add("swap", "nether_brick_fence,nether_brick_wall,chiseled_nether_bricks,black_carpet,sea_lantern", b,
+            "block/nether_bricks=lamp_cg_post,block/chiseled_nether_bricks=lamp_cg_chisel,block/black_wool=lamp_cg_cap,block/sea_lantern=lamp_globe_warm!",
+            (str(y - 8), str(y + 2)))
         add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", (str(y - 8), str(y + 2)))
     # Its bridges (Routes 26, 27, 45 and the rest), as Fuchsia's.
     BR = ("oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,"
           "spruce_planks,stripped_spruce_wood,stripped_spruce_log")
     for x0, z0, x1, z1, y0, y1 in D["bridges"]:
+        if bridge45(x0, z0): continue
         add("swap", BR, (x0 - 1, z0 - 1, x1 + 1, z1 + 1, "a bridge"),
             "block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,"
             "block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,"
@@ -1331,6 +1346,125 @@ def round54(add, room):
     add("swap", "deepslate_tile_stairs", RT, "block/deepslate_tiles=step_cer", ("19", "21"))
     add("swap", "deepslate_tile_stairs", RT, "block/deepslate_tiles=radio_panel", ("22", "70"))
     add("swap", "waxed_exposed_copper_bars", (-2215, 615, -2040, 775, "Goldenrod's aerials"), "block/exposed_copper_bars=railing_dark", ("40", "80"))
+
+
+# ---------- 0.56.0 (John's 13:53 and 13:55: "before we move on, we need to clean all those up") ----------
+def bridge45(x0, z0):
+    """Route 45's bridges and Blackthorn's (spruce, andesite slabs where the path steps on): round56's."""
+    return -1530 <= x0 <= -1480 and 380 <= z0 <= 700
+
+
+BRIDGE_DECK = ("spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log,andesite_slab,andesite_stairs,andesite,"
+               "oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log")
+DECK = ("block/spruce_planks=bridge_boards,block/stripped_spruce_log=bridge_boards,block/stripped_spruce_log_top=bridge_boards,block/andesite=bridge_boards,"
+        "block/oak_planks=bridge_boards,block/stripped_oak_log=bridge_boards,block/stripped_oak_log_top=bridge_boards")
+RAILS = "block/spruce_shelf=bridge_beam,block/oak_shelf=bridge_beam,block/stone=bolt"
+PIERS = ("block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/stripped_oak_log=bridge_beam,"
+         "block/stripped_oak_log_top=bridge_beam")
+COPPER_CHAINS = ",".join(w + c + "copper_chain" for w in ("", "waxed_") for c in ("", "exposed_", "weathered_", "oxidized_"))
+CHAIN_STEEL = ",".join("block/%scopper_chain=chain_steel" % c for c in ("", "exposed_", "weathered_", "oxidized_"))
+CHIMNEY_CAP = ("block/stripped_oak_log=chimney_stone,block/stripped_oak_log_top=chimney_stone")
+# John's Pallet houses in Johto (Cherrygrove's, New Bark's): Pallet's looks; his jungle wood round their windows a clean
+# wooden trim (not the cliffs' rock); the chimneys Viridian's brick, their caps stone; New Bark's lab's shelving
+# Viridian's green, its brick foot Cerulean's, its oak slab steps as Kanto's steps.
+PALLET_KIT = [
+    ("swap", "polished_andesite,polished_andesite_slab,polished_andesite_stairs", "block/polished_andesite=house_stone"),
+    ("swap", "polished_deepslate", "block/polished_deepslate=house_dark"),
+    ("swap", "polished_deepslate_slab", "block/polished_deepslate=window_low"),
+    ("swap", "polished_deepslate_wall", "block/polished_deepslate=drainpipe"),
+    ("swap", "polished_diorite_stairs,polished_diorite_slab", TRIM),
+    ("swap", "jungle_stairs,jungle_slab,jungle_planks", "block/jungle_planks=trim_jungle"),
+    ("swap", "mud_bricks,mud_brick_stairs,mud_brick_slab", "block/mud_bricks=chimney_brick"),
+    ("swap", "stripped_oak_wood,stripped_oak_log", CHIMNEY_CAP),
+    ("swap", "jungle_shelf,birch_shelf", "block/jungle_shelf=cap_shelf,block/birch_shelf=cap_shelf"),
+    ("swap", "warped_shelf", "block/warped_shelf=green_shelf"),
+    ("swap", "bricks", "block/bricks=base_cer"),
+    ("swap", "oak_slab", "block/oak_planks=step_boards_d"),
+]
+# (look, blocks, swaps) for its roof: Pallet's red tiles on acacia, Cerulean's teal on prismarine.
+ROOF_ACACIA = [("roof", "acacia_stairs", "-"), ("swap", "acacia_slab,acacia_planks", "block/acacia_planks=roof_tiles")]
+ROOF_PRISMARINE = [("roof_cer", "prismarine_stairs", "-"), ("swap", "prismarine_slab,prismarine", "block/prismarine=roof_cer_tiles")]
+# Each Johto house: (x0, z0, x1, z1, ground, top, name, roof).
+JOHTO_HOUSES = [
+    (-1739, 764, -1724, 777, 18, 29, "a Cherrygrove house", ROOF_ACACIA), (-1719, 767, -1704, 780, 18, 29, "a Cherrygrove house", ROOF_ACACIA),
+    (-1698, 775, -1683, 788, 18, 29, "a Cherrygrove house", ROOF_ACACIA),
+    (-1460, 741, -1440, 757, 18, 31, "Prof. Elm's lab", ROOF_PRISMARINE), (-1435, 750, -1420, 763, 18, 28, "a New Bark house", ROOF_PRISMARINE),
+]
+# Blackthorn's houses (13:53): "the roof has dripstone on the slabs ... The entrance, the doors, the trim under the
+# windows and between the top and the bottom and the pillars either side". Their roofs in tiles of John's warm brown,
+# the band between the floors (his jungle shelves and slabs) clean wood, the dark windows Pallet's, the posts either
+# side dark timber, the planters at the foot clean wood, the step stone, the chimney Viridian's with a stone cap.
+BT_HOUSES = [(-1497, 354, -1482, 366, 30, "a Blackthorn house"), (-1448, 368, -1433, 380, 30, "a Blackthorn house"),
+             (-1511, 373, -1496, 385, 30, "a Blackthorn house")]
+
+
+def round56(add, room):
+    """0.56.0 (John's 13:53 and 13:55): see tools/looks56.py."""
+    import json as _json
+    D = _json.load(open(os.path.join(HERE, "area_johto54.json")))
+    J = JOHTO
+    # The steps (13:53: "The steps in nature ... do not follow the same premise as in Kanto, and should"; 13:55: "the
+    # steps going up should be properly texturized"): John's mud brick slabs and stairs up Johto's ledges and paths
+    # Kanto's steps (Route 26's too, on Kanto's side of the map).
+    for a in (J, ROUTE2627):
+        add("swap", "mud_brick_slab,mud_brick_stairs", a, "block/mud_bricks=step_boards_d")
+    # Route 45's bridges and Blackthorn's (13:55: "the steps coming onto them, and also it should be the same colours
+    # throughout ... the shelves on the end"): the deck one run of boards (its stairs, its slabs, its beams and the
+    # andesite slabs stepping on at either end), the rails (shelves) to their ends and the posts under it beams, the
+    # bolts.
+    for x0, z0, x1, z1, y0, y1 in D["bridges"]:
+        if not bridge45(x0, z0): continue
+        box, d = (x0 - 4, z0 - 4, x1 + 4, z1 + 4, "a bridge on Route 45"), y0 + 1
+        add("swap", BRIDGE_DECK, box, DECK, (str(d), str(d)))
+        add("swap", "spruce_shelf,oak_shelf,stone_button", box, RAILS, (str(d), str(d + 1)))
+        add("swap", "stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log", box, PIERS, (str(d - 14), str(d - 1)))
+    # Route 26's signs (13:53: "I'm still seeing the double signs ... where the white shelves are"): as Kanto's.
+    add("sign", "pale_oak_shelf", (-985, 663, -982, 665, "Route 26's sign"), "-", ("19", "20"))
+    add("sign", "pale_oak_shelf", (-1000, 597, -997, 599, "Route 26's sign by Victory Road"), "-", ("26", "27"))
+    # Route 27's posts and chains along the cliff top (13:53): one steel barrier, the chain hung from the posts.
+    for a in (J, ROUTE2627):
+        add("chain", COPPER_CHAINS, a)
+        add("swap", COPPER_CHAINS, a, CHAIN_STEEL)
+    add("swap", "oak_fence", (-1154, 748, -1111, 750, "Route 27's posts along the cliff"), "block/oak_planks=post_steel", ("26", "26"))
+    # Johto's Pallet houses and Elm's lab.
+    for x0, z0, x1, z1, g, top, name, roof in JOHTO_HOUSES:
+        b, ys = (x0, z0, x1, z1, name), (str(g), str(top))
+        for look, blocks, swaps in PALLET_KIT + roof:
+            add(look, blocks, b, swaps, ys)
+    # Blackthorn's houses.
+    for x0, z0, x1, z1, g, name in BT_HOUSES:
+        b, band = (x0, z0, x1, z1, name), g + 4
+        add("roof_bt", "jungle_stairs", b, "-", (str(band + 1), str(band + 6)))
+        add("swap", "jungle_planks,jungle_slab", b, "block/jungle_planks=roof_bt_tiles", (str(band + 1), str(band + 6)))
+        add("swap", "jungle_slab,jungle_planks", b, "block/jungle_planks=trim_jungle", (str(band), str(band)))
+        add("swap", "jungle_shelf", b, "block/jungle_shelf=band_shelf", (str(band), str(band)))
+        add("swap", "stripped_dark_oak_wood,stripped_dark_oak_log", b, "block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top",
+            (str(g + 1), str(band)))
+        add("swap", "dark_oak_shelf", b, "block/dark_oak_shelf=shelf_wood", (str(g + 1), str(g + 1)))
+        add("swap", "warped_door", b, "block/warped_door_top=door_bt_top,block/warped_door_bottom=door_bt_bottom", (str(g + 1), str(g + 3)))
+        add("swap", "polished_deepslate_slab", b, "block/polished_deepslate=window_low", (str(g + 1), str(band + 6)))
+        add("swap", "smooth_stone_slab", b, "block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone", (str(g + 1), str(g + 1)))
+        add("swap", "mud_bricks,mud_brick_stairs,mud_brick_slab", b, "block/mud_bricks=chimney_brick", (str(band + 1), str(band + 7)))
+        add("swap", "stripped_oak_wood,stripped_oak_log", b, CHIMNEY_CAP, (str(band + 1), str(band + 7)))
+        add("swap", "birch_shelf", b, "block/birch_shelf=cap_shelf", (str(band + 1), str(band + 7)))
+    # Goldenrod's DEPT. STORE (13:55: "That's definitely the old blue. You can see the old slabs"): its blue facing
+    # and the paler blue band a crisp blue panel each, its red corners and roof crisp red, the ledges round every floor
+    # (quartz stairs and blocks) clean white stone, the mullions the station's, the steel on its top clean.
+    DS = (-2098, 713, -2073, 726, "the Goldenrod DEPT. STORE")
+    up = ("20", "58")
+    add("swap", "light_blue_concrete", DS, "block/light_blue_concrete=ds_blue", up)
+    add("swap", "light_blue_terracotta", DS, "block/light_blue_terracotta=ds_blue_light", ("21", "58"))
+    add("swap", "red_terracotta", DS, "block/red_terracotta=ds_red", up)
+    add("swap", "red_nether_bricks,red_nether_brick_stairs,red_nether_brick_slab,red_nether_brick_wall", DS, "block/red_nether_bricks=ds_roof", up)
+    add("swap", "quartz_stairs,quartz_block,quartz_slab,smooth_quartz_slab,smooth_quartz_stairs", DS,
+        "block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean", ("21", "58"))
+    add("swap", "deepslate_brick_wall", DS, "block/deepslate_bricks=station_mullion", up)
+    add("swap", "iron_block", DS, "block/iron_block=ds_steel", up)
+    add("swap", "birch_stairs,birch_slab", DS, "block/birch_planks=trim_white", up)
+    # The station's planters (13:55: "the shelves around the plants at the base"): Saffron's cream planters; and the
+    # sign beside them as Kanto's.
+    add("sign", "pale_oak_shelf", (-2189, 694, -2186, 695, "the station's sign"), "-", ("20", "21"))
+    add("swap", "pale_oak_shelf", (-2205, 690, -2180, 693, "the station's planters"), "block/pale_oak_shelf=planter_saf_cream", ("20", "20"))
 
 
 if __name__ == "__main__":

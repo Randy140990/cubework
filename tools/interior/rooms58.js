@@ -156,6 +156,14 @@
     P.fill(hx("#ACCDEE"), 0.006, r); P.rect(0, 8, 16, 5, hx("#FFA473")); P.rect(0, 8, 16, 1, hx("#FFDEBD")); P.rect(0, 13, 16, 3, hx("#838383"));
   });
   reg("gcCap", 16, 16, (P, r) => { P.fill(hx("#5B6F86"), 0.006, r); P.rect(0, 0, 16, 1, hx("#7D93AB")); });
+  // (0.56) The mat at the doorway to the PRIZE ROOM: the homes' red mat, its chevrons pointing east (through it).
+  reg("matHomeE", 32, 32, (P, r) => {
+    const cream = hx("#F6F1EA"), edge = hx("#8E2A2A");
+    P.fill(hx("#C9433F"), 0.04, r);
+    P.rect(0, 0, 32, 2, edge); P.rect(0, 30, 32, 2, edge); P.rect(0, 0, 2, 32, edge); P.rect(30, 0, 2, 32, edge);
+    P.rect(4, 4, 24, 1, cream); P.rect(4, 27, 24, 1, cream); P.rect(4, 4, 1, 24, cream); P.rect(27, 4, 1, 24, cream);
+    for (const x0 of [8, 16]) for (let k = 0; k < 7; k++) { P.rect(x0 + k, 8 + k, 2, 2, cream); P.rect(x0 + k, 22 - k, 2, 2, cream); }
+  }, { fit: true });
   reg("gcSlot", 16, 16, (P, r) => { P.fill(hx("#D57339"), 0.012, r); P.rect(0, 0, 16, 1, hx("#FFBD62")); P.rect(0, 15, 16, 1, hx("#A44A20")); P.rect(0, 0, 1, 16, hx("#E88A4C")); });
   reg("gcSlotFace", 16, 32, (P, r) => {
     P.fill(hx("#D57339"), 0.01, r); P.rect(0, 0, 16, 5, hx("#A44A20"));
@@ -454,6 +462,30 @@
     }
     if (roof) R.item("Vending machines", "The ROOFTOP SQUARE's: FRESH WATER, SODA POP and LEMONADE.");
 
+    // ((0.56, 13:53: "Maybe there needs to be a door on the right hand side") The GAME CORNER's east wall, and in it
+    // the way through to the PRIZE ROOM (John built no room of its own for it): a doorway by the last row of
+    // machines, its mat inside, and you're on the PRIZE ROOM's mat.
+    if (id === "game_corner") {
+      const z0 = 11, z1 = 13;
+      for (const [a, b] of [[0, z0], [z1, D - 1]]) {
+        G.box(W, 0, a, W + 0.25, 0.9, b, { all: "gcWallLow", top: null, bottom: null });
+        G.box(W, 0.9, a, W + 0.25, TALL, b, { all: "gcWall", top: "gcCap", bottom: null });
+      }
+      // Over the doorway the wall, its frame the walls' slate blue, the dark of the way through, the mat inside.
+      const DH = 1.7;
+      G.box(W, DH, z0, W + 0.25, TALL, z1, { all: "gcWall", top: "gcCap", bottom: "gcCap" });
+      G.box(W - 0.06, 0, z0, W + 0.25, DH + 0.08, z0 + 0.1, { all: "gcCap" });
+      G.box(W - 0.06, 0, z1 - 0.1, W + 0.25, DH + 0.08, z1, { all: "gcCap" });
+      G.box(W - 0.06, DH, z0, W + 0.25, DH + 0.1, z1, { all: "gcCap" });
+      G.box(W + 0.24, 0, z0 + 0.1, W + 0.25, DH, z1 - 0.1, { w: "doorDark", all: null });
+      G.box(W - 2, 0, z0 + 0.1, W, 0.03, z1 - 0.1, { top: "matHomeE", s: "cap", all: "cap", bottom: null });
+      const PR = CELADON.game_corner_prize_room;
+      const spawn = { x: (PR.W) / 2, z: PR.D - 2.4, yaw: FACE.n };
+      R._boxes.push({ x0: W - 0.7, z0: z0 + 0.1, x1: W, z1: z1 - 0.1, to: "game_corner_prize_room", spawn });
+      R.warps.push({ test: (p, input) => p.x > W - 0.7 && p.z > z0 + 0.1 && p.z < z1 - 0.1 && input.right, to: "game_corner_prize_room", spawn, fx: "fade" });
+      R.item("Prize Room", "Through the doorway in the east wall: the PRIZE ROOM, its clerks and their counter. Walk east through it.");
+    }
+
     // The stairs between floors, up or down from their warp (FireRed's run sideways, by the hall's wall).
     for (const { w, s, down } of stairs) {
       const [dx, dz] = s.dir;
@@ -536,7 +568,10 @@
       // (FireRed's exits are its doormat's row; the mat runs the width of the doorway below.)
       const mats = [];
       for (let x = 0; x < W; x++) if (at(x, D - 1) === "X") { const r = mats[mats.length - 1]; if (r && x === r[1] + 1) r[1] = x; else mats.push([x, x]); }
-      for (const [a, b] of mats.length ? mats : runs) doormat(R, a, b + 1, { to: "town", mat: "matHome" });
+      // ((0.56, 13:53) The PRIZE ROOM isn't a building of its own on John's map: its mat leads back into the GAME
+      // CORNER, by the doorway in its east wall.)
+      const back = id === "game_corner_prize_room" ? { to: "game_corner", spawn: { x: CELADON.game_corner.W - 2.2, z: 12.0, yaw: FACE.w } } : { to: "town" };
+      for (const [a, b] of mats.length ? mats : runs) doormat(R, a, b + 1, Object.assign({ mat: "matHome" }, back));
       const m0 = (mats.length ? mats : runs)[0];
       R.spawn = { x: (m0[0] + m0[1] + 1) / 2, z: D - 1.6, yaw: FACE.n };
     } else {

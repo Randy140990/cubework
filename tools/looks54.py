@@ -232,7 +232,7 @@ def setts(base, seed):
             c = shade(base, -0.32) if cx == 5 or y % 6 == 5 else None
             if c is None:
                 cell = ((x + off) // 6, row)
-                rr = random.Random(hash((seed, cell)))
+                rr = random.Random("%s|%d|%d" % (seed, cell[0], cell[1]))
                 k = (rr.random() - 0.5) * 0.14 + (0.06 if cx == 0 or y % 6 == 0 else 0)
                 c = shade(base, k + (r.random() - 0.5) * 0.02)
             _put(im, x, y, c)

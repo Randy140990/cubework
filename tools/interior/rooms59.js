@@ -25,10 +25,11 @@
     R.item("The Gyms", "Each Gym's band (the second row from the bottom) a colour of its own: Kanto's eight on their tan walls, Johto's eight on grey ones (their roofs and beams grey too).");
     // A Mart's front: the blue wall, the pillars by the door, the step in, the sign above.
     for (let x = 19; x < 27; x++) for (let y = 0; y < 4; y++) if (!(x >= 22 && x < 24 && y < 2)) B(x, y, 3, "area_mart_blue_concrete");
-    for (const x of [21, 24]) for (let y = 0; y < 3; y++) G.box(x + 0.1, y, 3.6, x + 0.9, y + 1, 4.4, { all: "area_mart_pillar" });
+    // ((0.56, 13:53) Its pillars and step pure white, its sign as a Center's: the white disc, the blue symbol.)
+    for (const x of [21, 24]) for (let y = 0; y < 3; y++) G.box(x + 0.1, y, 3.6, x + 0.9, y + 1, 4.4, { all: "area_quartz_clean" });
     G.box(22, 0, 3.4, 24, 2, 3.6, { all: "area_door_glass_bottom" });
-    G.box(21.6, 0, 4, 24.4, 0.25, 5, { all: "area_mart_step" });
-    G.box(21.5, 2.2, 3.7, 24.5, 3.8, 4, { all: "area_mart_sign_ring" }); G.box(21.8, 2.4, 3.65, 24.2, 3.6, 3.7, { all: "area_mart_sign_face" });
+    G.box(21.6, 0, 4, 24.4, 0.25, 5, { all: "area_quartz_clean" });
+    G.box(21.5, 2.15, 4.0, 24.5, 3.95, 4.3, { all: "area_quartz_clean" }); G.box(22.3, 2.45, 4.3, 23.7, 3.65, 4.5, { all: "area_mart_sign_face" });
     R.solid(19, 3, 27, 4.4);
     R.item("Every Mart", "Its pillars by the door, the step going in and the sign over the door, the same at every Mart.");
     // Saffron's walls: the cream render and its band (no yellow concrete left).
