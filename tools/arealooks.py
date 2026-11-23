@@ -423,10 +423,7 @@ def round47(add, room):
                                          (-141, 287, -139, 289, 33, 34, "the Rock Tunnel Center's sign")):
         add("sign", "pale_oak_shelf", (x0, z0, x1, z1, note), "-", (str(y0), str(y1)))
     # Route 5's Day Care (16:17): HeartGold's red tiles on its mangrove roof, its brick foot as Cerulean's.
-    care = (-361, 317, -342, 337, "the Day Care")
-    add("roof", "mangrove_stairs", care, "-", ("39", "45"))
-    add("swap", "mangrove_slab,mangrove_planks", care, "block/mangrove_planks=roof_tiles", ("38", "45"))
-    add("swap", "bricks", care, "block/bricks=base_cer", ("36", "38"))
+    # (0.50.3: its rows are round50's CARE_HOUSES, shared with Routes 12 and 16's house, the same build.)
     # The rock piles (by the Gym, and in the maze to Bill's): stones, as Pewter's and Fuchsia's.
     for b in ((-349, 259, -344, 263, "Cerulean's rocks by the Gym"), (-287, 146, -282, 150, "Route 25's rocks"), (-269, 159, -265, 163, "Route 25's rocks"),
               (-243, 164, -240, 167, "Route 25's rocks")):
@@ -667,8 +664,9 @@ BENCHES = [(-261, 758), (-621, 483), (-638, 544), (-638, 642), (-658, 753)]
 R17_LAMPS = [(x, z) for z in range(468, 739, 30) for x in (-658, -621)] + [(-542, 788), (-558, 429)]
 ROUTE_SIGNS = [(-351, -350, 789, 30, 31), (-117, -116, 473, 31, 32), (-341, -340, 560, 31, 32), (-123, -122, 585, 31, 32), (-265, -264, 711, 31, 32),
                (-209, -208, 715, 31, 32), (-630, -629, 496, 33, 34), (-633, -632, 547, 33, 33), (-633, -632, 639, 33, 33), (-650, -649, 690, 33, 34)]
-# Routes 12 and 16's house (the same building on both: John's 20:20), its roof, walls, posts, steps, door.
-ROAD_HOUSES = [(-648, 408, -635, 419, 33, 41, "Route 16's house"), (-133, 611, -120, 622, 31, 39, "Route 12's house")]
+# The Day Care's build (Route 5), which John also put on Routes 12 and 16: its box and its floor's height. All three
+# take the Day Care's look (07:38: "copy that over").
+CARE_HOUSES = [(-361, 317, -342, 337, 37, "the Day Care"), (-648, 408, -635, 419, 33, "Route 16's house"), (-133, 611, -120, 622, 31, "Route 12's house")]
 SS_ANNE = (-450, 600, -230, 670, "the S.S. ANNE")
 SEA_ROCK = ",".join("block/%s=sea_rock_top|sea_rock@2" % b for b in ("tuff", "andesite", "cobblestone", "diorite", "granite", "polished_andesite", "mossy_cobblestone", "stone"))
 SEA_ROCK_BLOCKS = ("tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,"
@@ -684,15 +682,16 @@ def round50(add, room):
     add("leafy", LEAVES_ALL, K_)
     room("leafy", LEAVES_ALL, (4095, -1, 4500, 400, "Viridian Forest"))
     room("leafy", LEAVES_ALL, (6143, -1, 6144 + 352, 214, "the SAFARI ZONE"))
-    # Every hedge and bush on the map (found: leaves standing on the ground, 1 to 4 high, nothing leafy over them), in
-    # Let's Go's style, one picture for all its leaves (no checker), flowering where it has flowers.
+    # Every hedge and bush on the map (found: leaves standing on the ground, 1 to 4 high, nothing leafy over them), as
+    # the little trees are (07:38: John liked theirs): the azalea's leaves with Shards' extra leaves standing out of
+    # them, one kind for all a hedge's leaves (no checker), the flowering azalea's where it has flowers.
     for x0, z0, x1, z1, y0, y1, fl in _json.load(open(os.path.join(HERE, "area_hedges50.json"))):
-        add("hedge", LEAVES_ALL, (x0, z0, x1, z1, "a hedge"), HEDGE_LGF if fl else HEDGE_LG, (str(y0), str(y1)))
+        add("leafy_hedge", LEAVES_ALL, (x0, z0, x1, z1, "a hedge"), "flowering_azalea" if fl else "azalea", (str(y0), str(y1)))
     # The benches under their flowering arches (Routes 14 and 17): the arch all hedge, its frame a white pergola, the
     # swing's seat yellow slats, its bars dark metal, its lanterns garden lights.
     for x, z in BENCHES:
         b = (x - 4, z - 4, x + 4, z + 4, "a bench under its arch")
-        add("hedge", LEAVES_ALL, b, HEDGE_LGF, ("32", "40"))
+        add("leafy_hedge", LEAVES_ALL, b, "flowering_azalea", ("32", "40"))
         add("swap", "oak_log", b, "block/oak_log=pergola,block/oak_log_top=pergola_top", ("32", "40"))
         add("swap", "spruce_trapdoor", b, "block/spruce_trapdoor=bench_slat", ("32", "40"))
         add("swap", "spruce_fence,spruce_fence_gate", b, "block/spruce_planks=bench_frame", ("32", "40"))
@@ -722,18 +721,23 @@ def round50(add, room):
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
-    # Routes 12 and 16's house, the same: a red tiled roof, cream walls, timber posts, a brick foot, stone steps, a
-    # red door, the chimney's stone.
-    for x0, z0, x1, z1, y0, y1, note in ROAD_HOUSES:
+    # Route 13's end of the same pier (07:38: "the bit where you enter Route 13").
+    add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", (-160, 708, -143, 715, "Route 13's end of the pier"),
+        "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
+    # The Day Care and Routes 12 and 16's house (the same build, 07:38): HeartGold's red tiles on the mangrove roof,
+    # the brick foot as Cerulean's, the corner posts Cerulean's pale stone pillars (no dark timber), stone steps, the
+    # chimney's stone.
+    for x0, z0, x1, z1, f, note in CARE_HOUSES:
         h = (x0, z0, x1, z1, note)
-        add("roof_h16", "mangrove_stairs", h, "-", (str(y0), str(y1)))
-        add("swap", "mangrove_slab,mangrove_planks", h, "block/mangrove_planks=roof_h16_tiles", (str(y0), str(y1)))
-        add("swap", "white_concrete", h, "block/white_concrete=wall_h16", (str(y0), str(y1)))
-        add("swap", "bricks", h, "block/bricks=base_ver", (str(y0), str(y1)))
-        add("swap", "stripped_spruce_wood,stripped_spruce_log,oak_wood", h, "block/stripped_spruce_log=post_h16,block/stripped_spruce_log_top=post_h16,block/oak_log=post_h16", (str(y0), str(y1)))
-        add("swap", "polished_andesite_slab,polished_andesite_stairs,polished_andesite", h, "block/polished_andesite=step_cer", (str(y0), str(y1)))
-        add("swap", "cyan_terracotta,prismarine_brick_slab,prismarine_brick_stairs", h, "block/cyan_terracotta=chimney_stone,block/prismarine_bricks=chimney_stone", (str(y0), str(y1)))
-        add("swap", "mangrove_door", h, "block/mangrove_door_top=door_red_top,block/mangrove_door_bottom=door_red_bottom", (str(y0), str(y1)))
+        add("roof", "mangrove_stairs", h, "-", (str(f + 2), str(f + 8)))
+        add("swap", "mangrove_slab,mangrove_planks", h, "block/mangrove_planks=roof_tiles", (str(f + 1), str(f + 8)))
+        add("swap", "bricks", h, "block/bricks=base_cer", (str(f - 1), str(f + 1)))
+        add("swap", "stripped_spruce_wood,stripped_spruce_log", h, "block/stripped_spruce_log=pillar_cer,block/stripped_spruce_log_top=pillar_cer", (str(f), str(f + 3)))
+        add("swap", "polished_andesite_slab,polished_andesite_stairs,polished_andesite,stone_bricks", h, "block/polished_andesite=step_cer,block/stone_bricks=step_cer", (str(f), str(f)))
+        add("swap", "prismarine_brick_slab,prismarine_brick_stairs", h, "block/prismarine_bricks=chimney_stone", (str(f + 2), str(f + 10)))
+    # The Day Care's ledge: the timber set in its sides is the cliff's rock (07:38: "stripped oak beams on the sides").
+    add("swap", "stripped_spruce_wood,stripped_jungle_wood", (-362, 316, -341, 339, "the Day Care's ledge"),
+        "block/stripped_spruce_log=drip_rock@4,block/stripped_jungle_log=drip_rock@4", ("33", "36"))
     # The Power Plant (20:20): the gold band, the roof, the red frames, the iron in solid colours; its grey stair
     # pillars steel, its grates, its doors.
     P = POWER_PLANT

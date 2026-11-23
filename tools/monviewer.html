@@ -291,7 +291,15 @@ function buildModel(entry) {
   }
   const anims = {};
   for (const [k, a] of Object.entries(entry.anims || {})) anims[k] = compileAnim(a);
-  return { holder, bones, byName, anims, info, glowLayers, mat };
+  // How it lies down asleep out in the world (as the mod lays it: on its back, its middle on its spot): how far its
+  // back reaches behind it, and how tall it stands, in its own units.
+  let topY = 0, backZ = 0;
+  for (const b of geo.bones) for (const c of b.cubes || []) { topY = Math.max(topY, c.origin[1] + c.size[1]); backZ = Math.max(backZ, c.origin[2] + c.size[2]); }
+  return { holder, root, bones, byName, anims, info, glowLayers, mat, lie: { y: topY, z: backZ } };
+}
+function lieDown(model, on) {
+  if (on) { model.root.rotation.x = Math.PI / 2; model.root.position.set(0, model.lie.z, -model.lie.y / 2); }
+  else { model.root.rotation.x = 0; model.root.position.set(0, 0, 0); }
 }
 const ACTIONS = ["cry", "recoil", "attack", "special", "critical", "recall", "sendout"];
 function animFor(model, key) {
@@ -449,7 +457,7 @@ function placeNow() {
 }
 function setAnims() {
   const move = (cur.ours.info.move || "Special").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-  const poses = [["idle", "Idle"], ["walk", "Walk"], ["fly", "Fly"], ["hover", "Hover"], ["confused", "Confused"], ["faint", "Faint"]];
+  const poses = [["idle", "Idle"], ["walk", "Walk"], ["fly", "Fly"], ["hover", "Hover"], ["confused", "Confused"], ["faint", "Faint"], ["sleep", "Asleep"]];
   const atk = (cur.ours.info.attack_move || "Attack").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
   const acts = [["cry", "Call"], ["recoil", "Hit"], ["attack", atk], ["special", move], ["selfhit", "Hurt itself"], ["critical", "Critical"], ["recall", "Recall"]];
   const pe = $("#poses"), ae = $("#anims"); pe.innerHTML = ""; ae.innerHTML = "";
@@ -981,7 +989,9 @@ function frame(now) {
       const out = recall && tA >= R5;
       const sp = (STATUS_BODY[state.status] || {}).pose;
       const key = out ? "idle" : (sp && state.anim === "idle" && animFor(model, sp) ? sp : state.anim);
-      const baseAnim = animFor(model, key) || animFor(model, "idle");
+      // Asleep: the mod lays every sleeper down; one without its own sleeping pose keeps its calm standing idle.
+      const baseAnim = animFor(model, key) || (key === "sleep" && model.anims[model.info.ground]) || animFor(model, "idle");
+      lieDown(model, key === "sleep");
       setParts(model, key === "idle" ? null : key);
       const list = [[baseAnim, out ? tA - R5 : statusTime(t)]];
       let selfAt = null;

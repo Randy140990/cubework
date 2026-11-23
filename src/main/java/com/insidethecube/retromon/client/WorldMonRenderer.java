@@ -23,6 +23,7 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		BedrockModel model;
 		float yaw, lift;
 		String pose;
+		boolean asleep;
 	}
 
 	public WorldMonRenderer(EntityRendererProvider.Context ctx) {
@@ -51,6 +52,8 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		s.yaw = e.facing();
 		s.pose = null;
 		s.lift = 0;
+		s.asleep = e.asleep() && s.model != null;
+		if (s.asleep) s.pose = s.model.def.hasPose("sleep") ? "sleep" : s.model.def.hasPose("ground") ? "ground" : null;
 		if (e.roams() && s.model != null) {
 			// Out in the grass or walking with you: walks when it moves, and a bird takes to the air.
 			// Walking when it's been moving these last few ticks (not just this one: the world's updates come in
@@ -94,6 +97,12 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		pose.pushPose();
 		pose.translate(0, s.lift, 0);
 		pose.mulPose(Axis.YP.rotationDegrees(180F - s.yaw));
+		if (s.asleep) {
+			// (0.50.3) Lying on its back (its front turned up, its head the way its back was), raised so its back rests
+			// on the ground, and moved along so its middle, not its feet, is on its spot.
+			pose.translate(0F, scale * m.def.backZ / 16F, -scale * m.def.topY / 32F);
+			pose.mulPose(Axis.XP.rotationDegrees(90F));
+		}
 		pose.scale(-1F, -1F, 1F);
 		pose.scale(scale, scale, scale);
 		pose.translate(0F, -1.501F, 0F);

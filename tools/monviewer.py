@@ -30,7 +30,7 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Acorns", ["exeggcute", "exeggutor"]), ("Skull jackals", ["cubone", "marowak"]), ("Kangaroo", ["hitmonlee"]), ("Mantis shrimp", ["hitmonchan"]),
             ("Chameleon", ["lickitung"]), ("Puffballs", ["koffing", "weezing"]), ("Ankylosaurs", ["rhyhorn", "rhydon"]), ("Mother hen", ["chansey"]),
             ("Vine ball", ["tangela"]), ("Anteater", ["kangaskhan"]), ("Sea dragons", ["horsea", "seadra"]), ("Fighting fish", ["goldeen", "seaking"]),
-            ("Sea urchins", ["staryu", "starmie"]), ("Mime lemur", ["mr_mime"])]
+            ("Sea urchins", ["staryu", "starmie"]), ("Mime lemur", ["mr_mime"]), ("Giant sloth", ["snorlax"])]
 KEEP = ("idle", "ground")
 
 

@@ -160,7 +160,7 @@ public final class AreaLooks {
 				// (15:21) Texture swaps don't pile up: where two of a block's swaps cover a spot (all Kanto's dripstone, and
 				// Pallet's), the one for the smaller area is drawn there, the other not.
 				List<Rule> swaps = new ArrayList<>();
-				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy")) swaps.add(rule);
+				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy") || rule.look().equals("leafy_hedge")) swaps.add(rule);
 				for (Rule rule : looks.values()) {
 					Look look = make(rule, c.baker());
 					List<Rule> rivals = new ArrayList<>();
@@ -239,6 +239,14 @@ public final class AreaLooks {
 			case "chain" -> AreaLooks::chain;
 			// (0.50, 20:07) Trees leafy and rounded, not blocky: Shards' extra leaves standing out of the leaves that show.
 			case "leafy" -> AreaLooks::leafy;
+			// (0.50.3, 07:38) The hedges as the little trees are (John liked them): all a hedge's leaves the one kind's
+			// picture (the azalea's, or the flowering azalea's where it has flowers), with that kind's extra leaves.
+			case "leafy_hedge" -> {
+				String kind = rule.swaps();
+				TextureAtlasSprite leaf = baker.sprites().get(new Material(TextureAtlas.LOCATION_BLOCKS, Identifier.withDefaultNamespace("block/" + kind + "_leaves")),
+						() -> "retromon hedges");
+				yield (base, e, view, pos, state, random, cull) -> leafyHedge(base, leaf, kind, e, view, pos, state, random, cull);
+			}
 			// (0.50, 20:12) Something stood on a block (the bikes outside the Bike Shop): its own model over it.
 			case "prop" -> {
 				String name = "prop_" + rule.swaps();
@@ -695,6 +703,30 @@ public final class AreaLooks {
 		if (!name.endsWith("_leaves")) return;
 		long h = net.minecraft.util.Mth.getSeed(pos.getX(), pos.getY(), pos.getZ());
 		BlockStateModel m = extra("leafy_" + name.substring(0, name.length() - 7) + ((h >>> 5 & 1) == 0 ? "_a" : "_b"));
+		if (m != null) m.emitQuads(e, view, pos, state, random, d -> false);
+	}
+
+	/** (0.50.3) A hedge's leaves: drawn in one kind's picture, untinted (as the azaleas are), with its extra leaves. */
+	private static void leafyHedge(BlockStateModel base, TextureAtlasSprite leaf, String kind, QuadEmitter e, BlockAndTintGetter view, BlockPos pos,
+			BlockState state, RandomSource random, Predicate<Direction> cull) {
+		e.pushTransform(q -> {
+			q.spriteBake(leaf, MutableQuadView.BAKE_LOCK_UV);
+			q.tintIndex(-1);
+			return true;
+		});
+		base.emitQuads(e, view, pos, state, random, cull);
+		e.popTransform();
+		boolean open = false;
+		for (Direction d : Direction.values()) {
+			BlockState o = view.getBlockState(pos.relative(d));
+			if (!o.is(net.minecraft.tags.BlockTags.LEAVES) && !o.isSolidRender()) {
+				open = true;
+				break;
+			}
+		}
+		if (!open) return;
+		long h = net.minecraft.util.Mth.getSeed(pos.getX(), pos.getY(), pos.getZ());
+		BlockStateModel m = extra("leafy_" + kind + ((h >>> 5 & 1) == 0 ? "_a" : "_b"));
 		if (m != null) m.emitQuads(e, view, pos, state, random, d -> false);
 	}
 

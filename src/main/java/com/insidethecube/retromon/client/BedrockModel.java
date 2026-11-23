@@ -36,6 +36,8 @@ public final class BedrockModel {
 		final JsonArray bones;
 		final int texW, texH;
 		public final float scale, height;
+		/** (0.50.3) Its cubes' top and their furthest back (model units, unturned): how it lies down asleep. */
+		public final float topY, backZ;
 		public final Identifier texture;
 		public final List<Layer> layers = new ArrayList<>();
 		final Anim idle;
@@ -53,6 +55,20 @@ public final class BedrockModel {
 			texW = d.has("texture_width") ? d.get("texture_width").getAsInt() : 64;
 			texH = d.has("texture_height") ? d.get("texture_height").getAsInt() : 64;
 			bones = g.has("bones") ? g.getAsJsonArray("bones") : new JsonArray();
+			float ty = 0, bz = 0;
+			for (JsonElement be : bones) {
+				JsonObject bo = be.getAsJsonObject();
+				if (!bo.has("cubes")) continue;
+				for (JsonElement ce : bo.getAsJsonArray("cubes")) {
+					JsonObject c = ce.getAsJsonObject();
+					if (!c.has("origin") || !c.has("size")) continue;
+					JsonArray o = c.getAsJsonArray("origin"), sz = c.getAsJsonArray("size");
+					ty = Math.max(ty, o.get(1).getAsFloat() + sz.get(1).getAsFloat());
+					bz = Math.max(bz, o.get(2).getAsFloat() + sz.get(2).getAsFloat());
+				}
+			}
+			topY = ty;
+			backZ = bz;
 			scale = info.has("scale") ? info.get("scale").getAsFloat() : 1F;
 			height = info.has("height") ? info.get("height").getAsFloat() : 1F;
 			texture = Identifier.parse(info.has("texture") ? info.get("texture").getAsString() : Retromon.ID + ":textures/pokemon/" + species + ".png");
@@ -91,6 +107,9 @@ public final class BedrockModel {
 					poses.put(e.getKey(), new PoseDef(Anim.read(all.getAsJsonObject(anim)), parts));
 				}
 			}
+			// (0.50.3) Its calm standing idle as a pose of its own ("ground"), for one lying asleep without a sleeping pose.
+			if (!poses.containsKey("ground") && info.has("ground") && !info.get("ground").isJsonNull() && all.has(info.get("ground").getAsString()))
+				poses.put("ground", new PoseDef(Anim.read(all.getAsJsonObject(info.get("ground").getAsString())), poseParts));
 		}
 
 		/** Whether it has a pose by this name (walk, fly, hover). */

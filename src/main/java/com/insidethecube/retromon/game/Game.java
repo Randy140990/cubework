@@ -4355,7 +4355,7 @@ public final class Game {
 	 * (0.50) The POKeMON that wait in one spot out in the world: Route 12's SNORLAX asleep on the pier south of Route
 	 * 11's gate, Route 16's outside its gate's west way. Key, x, y, z, facing.
 	 */
-	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -123.5, 31.0, 599.5, 0.0}, {"snorlax_route_16", -623.5, 34.0, 418.5, 90.0}};
+	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -123.5, 31.0, 599.5, 90.0}, {"snorlax_route_16", -623.5, 34.0, 418.5, 0.0}};
 
 	/** How near a sleeping SNORLAX you can come (blocks from its middle). */
 	private static final double SNORLAX_REACH = 2.7;
@@ -4523,13 +4523,19 @@ public final class Game {
 		}
 		// Those in ITEM_SPOTS: put down once per save, where their part of the map is loaded (unless picked up already).
 		for (Object[] o : STATIC_SPOTS) {
-			String key = (String) o[0], doneKey = "staticspot1:" + key;
+			String key = (String) o[0], doneKey = "staticspot2:" + key;
 			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
 			Trainers.Static st = Trainers.STATICS.get(key);
 			if (done.contains(doneKey) || st == null || takenByAnyone(key)) continue;
 			if (!level.hasChunkAt(BlockPos.containing(x, y, z))) continue;
 			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 4, y - 3, z - 4, x + 4, y + 3, z + 4);
-			if (level.getEntitiesOfClass(WorldMon.class, box, w -> key.equals(w.key())).isEmpty()) placeMon(level, st.species(), key, x, y, z, ((Double) o[4]).floatValue());
+			List<WorldMon> there = level.getEntitiesOfClass(WorldMon.class, box, w -> key.equals(w.key()));
+			// (0.50.3) Lying down now: one put down before turns to lie across the way.
+			if (there.isEmpty()) placeMon(level, st.species(), key, x, y, z, ((Double) o[4]).floatValue());
+			else for (WorldMon w : there) {
+				w.teleportTo(x, y, z);
+				w.setFacing(((Double) o[4]).floatValue());
+			}
 			placed.add(doneKey);
 			done.add(doneKey);
 			changed = true;

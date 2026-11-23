@@ -54,6 +54,11 @@ public class WorldMon extends PathfinderMob {
 		return k.startsWith("wild:") || k.startsWith("follow:");
 	}
 
+	/** (0.50.3) Asleep out in the world, lying down: Routes 12 and 16's SNORLAX (statics.tsv), till it's woken. */
+	public boolean asleep() {
+		return key().startsWith("snorlax_");
+	}
+
 	public boolean wild() {
 		return key().startsWith("wild:");
 	}
