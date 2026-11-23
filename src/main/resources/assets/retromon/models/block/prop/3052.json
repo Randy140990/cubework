@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/league_floor","league_floor":"retromon:block/interior/league_floor"},"elements":[{"from":[0.0,0,0.0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[0.0,0.0,8.0,8.0],"texture":"#league_floor"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/steel","steel":"retromon:block/interior/steel"},"elements":[{"from":[7.68,16,7.68],"to":[14.72,16,14.72],"faces":{"down":{"uv":[7.68,1.28,14.72,8.32],"texture":"#steel"}}}]}

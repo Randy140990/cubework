@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/shoji","shoji":"retromon:block/interior/shoji"},"elements":[{"from":[16,0.0,0.0],"to":[16,6.4,16],"faces":{"west":{"uv":[0.0,9.6,16.0,16.0],"texture":"#shoji"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/statue_stone","statue_stone":"retromon:block/interior/statue_stone"},"elements":[{"from":[0.0,16,15.4],"to":[0.6,16,16.0],"faces":{"down":{"uv":[0.0,0.0,0.6,0.6],"texture":"#statue_stone"}}}]}

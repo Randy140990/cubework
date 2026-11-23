@@ -268,7 +268,10 @@ def round57(add, room, G):
         # (16:04, 16:15) The shelves under and between the windows a wooden band (their caps on the chimneys stone).
         add("swap", "jungle_shelf,birch_shelf", b, "block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf", ys(y0 - 1, y0 + 5))
         add("swap", look[1], b, look[2], ys(y0 + 3, y1 + 2))
-        add("swap", "dark_oak_shelf,pale_oak_shelf", b, "block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white", ys(y0 - 1, y0 + 1))
+        add("swap", "dark_oak_shelf", b, "block/dark_oak_shelf=panel_planter_dark", ys(y0 - 1, y0 + 1))
+        # (Mahogany's and the Lake's planters are John's pale oak shelves; elsewhere a pale oak shelf is a sign.)
+        if comp.get("pale_oak_shelf", 0) >= 8:
+            add("swap", "pale_oak_shelf", (x0, z0, x1, z1, "a Johto house's planters"), "block/pale_oak_shelf=panel_white", ys(y0 - 1, y0 + 1))
         add("swap", "stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood", b,
             "block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,"
             "block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top", yr)

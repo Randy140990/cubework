@@ -3837,13 +3837,12 @@ public final class Game {
 			Species real = Species.ALL.get(st.species());
 			String wild = real == null ? name : real.name();
 			if (st.species().equals("sudowoodo")) {
-				// (0.57) The odd tree on Route 36: only the SQUIRTBOTTLE (Goldenrod's flower shop) makes it move.
-				if (d.count("squirtbottle") <= 0) {
-					dialogue(p, null, "talk", List.of("A strange tree blocks the way!", "It's a weird tree. It doesn't look quite like the others..."), t, w.getId());
-					return;
-				}
-				dialogue(p, null, "static", List.of(player(p) + " used the SQUIRTBOTTLE!", "The weird tree doesn't like the SQUIRTBOTTLE!", "The weird tree attacked!"), t,
-						w.getId());
+				// (0.57) The odd tree on Route 36: the SQUIRTBOTTLE makes it move (HeartGold's). Till Goldenrod's flower shop
+				// gives it out, a good shake does too, so the way west isn't shut for good.
+				if (d.count("squirtbottle") > 0) dialogue(p, null, "static", List.of(player(p) + " used the SQUIRTBOTTLE!", "The weird tree doesn't like the SQUIRTBOTTLE!",
+						"The weird tree attacked!"), t, w.getId());
+				else dialogue(p, null, "static", List.of("It's a weird tree. It doesn't look quite like the others...", player(p) + " gave it a good shake!",
+						"The weird tree attacked!"), t, w.getId());
 				return;
 			}
 			if (st.species().equals("snorlax") && d.count("poke_flute") <= 0) {

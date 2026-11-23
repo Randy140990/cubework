@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pot_white","pot_white":"retromon:block/interior/pot_white"},"elements":[{"from":[4.68,16,1.48],"to":[8.12,16,4.92],"faces":{"down":{"uv":[1.8382,2.2059,8.1618,9.7941],"texture":"#pot_white"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/paper_gate_l_g","paper_gate_l_g":"retromon:block/interior/paper_gate_l_g"},"elements":[{"from":[16,0.0,0.0],"to":[16,16,4.8],"faces":{"west":{"uv":[0.0,0.0,4.8,16.0],"texture":"#paper_gate_l_g"}}}]}

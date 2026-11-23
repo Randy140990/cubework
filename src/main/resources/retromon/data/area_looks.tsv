@@ -4309,7 +4309,7 @@ swap	oak_slab	-2563	715	-2550	726	17	27	block/oak_planks=step_boards_d	a Johto h
 roof_white	pale_oak_stairs	-2563	715	-2550	726	17	27	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2563	715	-2550	726	17	23	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	pale_oak_slab,pale_oak_planks	-2563	715	-2550	726	21	27	block/pale_oak_planks=roof_white_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2563	715	-2550	726	17	19	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2563	715	-2550	726	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2563	715	-2550	726	17	27	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2563	715	-2550	726	17	19	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2563	715	-2550	726	21	27	block/nether_bricks=chimney_dark	a Johto house
@@ -4331,7 +4331,7 @@ swap	oak_slab	-2524	755	-2511	766	17	28	block/oak_planks=step_boards_d	a Johto h
 roof_white	pale_oak_stairs	-2524	755	-2511	766	17	28	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2524	755	-2511	766	17	23	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	pale_oak_slab,pale_oak_planks	-2524	755	-2511	766	21	28	block/pale_oak_planks=roof_white_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2524	755	-2511	766	17	19	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2524	755	-2511	766	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2524	755	-2511	766	17	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2524	755	-2511	766	17	19	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2524	755	-2511	766	21	28	block/nether_bricks=chimney_dark	a Johto house
@@ -4353,7 +4353,7 @@ swap	oak_slab	-2553	772	-2540	783	17	27	block/oak_planks=step_boards_d	a Johto h
 roof_white	pale_oak_stairs	-2553	772	-2540	783	17	27	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2553	772	-2540	783	17	23	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	pale_oak_slab,pale_oak_planks	-2553	772	-2540	783	21	27	block/pale_oak_planks=roof_white_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2553	772	-2540	783	17	19	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2553	772	-2540	783	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2553	772	-2540	783	17	27	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2553	772	-2540	783	17	19	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2553	772	-2540	783	21	27	block/nether_bricks=chimney_dark	a Johto house
@@ -4375,7 +4375,7 @@ swap	oak_slab	-2534	772	-2521	783	17	28	block/oak_planks=step_boards_d	a Johto h
 roof_white	pale_oak_stairs	-2534	772	-2521	783	17	28	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2534	772	-2521	783	17	23	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	pale_oak_slab,pale_oak_planks	-2534	772	-2521	783	21	28	block/pale_oak_planks=roof_white_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2534	772	-2521	783	17	19	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2534	772	-2521	783	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2534	772	-2521	783	17	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2534	772	-2521	783	17	19	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2534	772	-2521	783	21	28	block/nether_bricks=chimney_dark	a Johto house
@@ -4397,7 +4397,7 @@ swap	oak_slab	-2291	462	-2278	473	18	29	block/oak_planks=step_boards_d	a Johto h
 roof_mangrove	mangrove_stairs	-2291	462	-2278	473	18	29	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2291	462	-2278	473	18	24	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	mangrove_slab,mangrove_planks	-2291	462	-2278	473	22	29	block/mangrove_planks=roof_mangrove_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2291	462	-2278	473	18	20	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2291	462	-2278	473	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2291	462	-2278	473	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2291	462	-2278	473	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2291	462	-2278	473	22	29	block/nether_bricks=chimney_dark	a Johto house
@@ -4418,7 +4418,7 @@ swap	oak_slab	-2297	542	-2284	553	18	28	block/oak_planks=step_boards_d	a Johto h
 roof_green	warped_stairs	-2297	542	-2284	553	18	28	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2297	542	-2284	553	18	24	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	warped_slab,warped_planks	-2297	542	-2284	553	22	28	block/warped_planks=roof_green_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2297	542	-2284	553	18	20	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2297	542	-2284	553	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2297	542	-2284	553	18	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2297	542	-2284	553	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2297	542	-2284	553	22	28	block/nether_bricks=chimney_dark	a Johto house
@@ -4439,7 +4439,7 @@ swap	oak_slab	-2316	560	-2303	571	18	29	block/oak_planks=step_boards_d	a Johto h
 roof_mangrove	mangrove_stairs	-2316	560	-2303	571	18	29	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2316	560	-2303	571	18	24	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	mangrove_slab,mangrove_planks	-2316	560	-2303	571	22	29	block/mangrove_planks=roof_mangrove_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2316	560	-2303	571	18	20	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2316	560	-2303	571	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2316	560	-2303	571	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2316	560	-2303	571	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2316	560	-2303	571	22	29	block/nether_bricks=chimney_dark	a Johto house
@@ -4460,7 +4460,7 @@ swap	oak_slab	-1458	742	-1442	755	18	30	block/oak_planks=step_boards_d	a Johto h
 roof_cer	prismarine_stairs	-1458	742	-1442	755	18	30	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1458	742	-1442	755	18	24	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	prismarine_slab,prismarine	-1458	742	-1442	755	22	30	block/prismarine=roof_cer_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1458	742	-1442	755	18	20	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1458	742	-1442	755	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1458	742	-1442	755	18	30	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1458	742	-1442	755	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1458	742	-1442	755	22	30	block/nether_bricks=chimney_dark	a Johto house
@@ -4481,7 +4481,7 @@ swap	oak_slab	-1434	751	-1421	762	18	28	block/oak_planks=step_boards_d	a Johto h
 roof_cer	prismarine_stairs	-1434	751	-1421	762	18	28	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1434	751	-1421	762	18	24	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	prismarine_slab,prismarine	-1434	751	-1421	762	22	28	block/prismarine=roof_cer_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1434	751	-1421	762	18	20	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1434	751	-1421	762	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1434	751	-1421	762	18	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1434	751	-1421	762	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1434	751	-1421	762	22	28	block/nether_bricks=chimney_dark	a Johto house
@@ -4502,7 +4502,7 @@ swap	oak_slab	-1316	762	-1303	773	18	28	block/oak_planks=step_boards_d	a Johto h
 roof	acacia_stairs	-1316	762	-1303	773	18	28	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1316	762	-1303	773	18	24	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	acacia_slab,acacia_planks	-1316	762	-1303	773	22	28	block/acacia_planks=roof_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1316	762	-1303	773	18	20	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1316	762	-1303	773	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1316	762	-1303	773	18	28	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1316	762	-1303	773	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1316	762	-1303	773	22	28	block/nether_bricks=chimney_dark	a Johto house
@@ -4523,7 +4523,7 @@ swap	oak_slab	-1738	765	-1725	776	18	29	block/oak_planks=step_boards_d	a Johto h
 roof	acacia_stairs	-1738	765	-1725	776	18	29	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1738	765	-1725	776	18	24	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	acacia_slab,acacia_planks	-1738	765	-1725	776	22	29	block/acacia_planks=roof_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1738	765	-1725	776	18	20	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1738	765	-1725	776	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1738	765	-1725	776	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1738	765	-1725	776	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1738	765	-1725	776	22	29	block/nether_bricks=chimney_dark	a Johto house
@@ -4544,7 +4544,7 @@ swap	oak_slab	-1718	768	-1705	779	18	29	block/oak_planks=step_boards_d	a Johto h
 roof	acacia_stairs	-1718	768	-1705	779	18	29	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1718	768	-1705	779	18	24	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	acacia_slab,acacia_planks	-1718	768	-1705	779	22	29	block/acacia_planks=roof_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1718	768	-1705	779	18	20	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1718	768	-1705	779	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1718	768	-1705	779	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1718	768	-1705	779	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1718	768	-1705	779	22	29	block/nether_bricks=chimney_dark	a Johto house
@@ -4565,7 +4565,7 @@ swap	oak_slab	-1697	776	-1684	787	18	29	block/oak_planks=step_boards_d	a Johto h
 roof	acacia_stairs	-1697	776	-1684	787	18	29	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1697	776	-1684	787	18	24	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	acacia_slab,acacia_planks	-1697	776	-1684	787	22	29	block/acacia_planks=roof_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1697	776	-1684	787	18	20	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1697	776	-1684	787	18	20	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1697	776	-1684	787	18	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1697	776	-1684	787	18	20	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1697	776	-1684	787	22	29	block/nether_bricks=chimney_dark	a Johto house
@@ -4586,7 +4586,7 @@ swap	oak_slab	-1691	595	-1677	608	19	31	block/oak_planks=step_boards_d	a Johto h
 roof_black	cobbled_deepslate_stairs	-1691	595	-1677	608	19	31	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1691	595	-1677	608	19	25	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	cobbled_deepslate_slab,cobbled_deepslate	-1691	595	-1677	608	23	31	block/cobbled_deepslate=roof_black_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1691	595	-1677	608	19	21	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1691	595	-1677	608	19	21	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1691	595	-1677	608	19	31	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1691	595	-1677	608	19	21	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1691	595	-1677	608	23	31	block/nether_bricks=chimney_dark	a Johto house
@@ -4607,7 +4607,7 @@ swap	oak_slab	-1721	690	-1708	701	19	30	block/oak_planks=step_boards_d	a Johto h
 roof	acacia_stairs	-1721	690	-1708	701	19	30	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1721	690	-1708	701	19	25	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	acacia_slab,acacia_planks	-1721	690	-1708	701	23	30	block/acacia_planks=roof_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1721	690	-1708	701	19	21	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1721	690	-1708	701	19	21	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1721	690	-1708	701	19	30	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1721	690	-1708	701	19	21	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1721	690	-1708	701	23	30	block/nether_bricks=chimney_dark	a Johto house
@@ -4628,7 +4628,8 @@ swap	oak_slab	-2091	777	-2072	791	19	29	block/oak_planks=step_boards_d	a Johto h
 roof_daycare	red_nether_brick_stairs	-2091	777	-2072	791	19	29	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2091	777	-2072	791	19	25	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	red_nether_brick_slab,red_nether_bricks	-2091	777	-2072	791	23	29	block/red_nether_bricks=roof_daycare_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2091	777	-2072	791	19	21	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2091	777	-2072	791	19	21	block/dark_oak_shelf=panel_planter_dark	a Johto house
+panel	pale_oak_shelf	-2090	778	-2073	790	19	21	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2091	777	-2072	791	19	29	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2091	777	-2072	791	19	21	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2091	777	-2072	791	23	29	block/nether_bricks=chimney_dark	a Johto house
@@ -4649,7 +4650,7 @@ swap	oak_slab	-2328	378	-2305	390	21	33	block/oak_planks=step_boards_d	a Johto h
 roof_mangrove	mangrove_stairs	-2328	378	-2305	390	21	33	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2328	378	-2305	390	21	27	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	mangrove_slab,mangrove_planks	-2328	378	-2305	390	25	33	block/mangrove_planks=roof_mangrove_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2328	378	-2305	390	21	23	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2328	378	-2305	390	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2328	378	-2305	390	21	33	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2328	378	-2305	390	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2328	378	-2305	390	25	33	block/nether_bricks=chimney_dark	a Johto house
@@ -4670,7 +4671,8 @@ swap	oak_slab	-1753	388	-1737	401	21	32	block/oak_planks=step_boards_d	a Johto h
 roof_mangrove	mangrove_stairs	-1753	388	-1737	401	21	32	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1753	388	-1737	401	21	27	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	mangrove_slab,mangrove_planks	-1753	388	-1737	401	25	32	block/mangrove_planks=roof_mangrove_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1753	388	-1737	401	21	23	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1753	388	-1737	401	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
+panel	pale_oak_shelf	-1752	389	-1738	400	21	23	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1753	388	-1737	401	21	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1753	388	-1737	401	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1753	388	-1737	401	25	32	block/nether_bricks=chimney_dark	a Johto house
@@ -4691,7 +4693,8 @@ swap	oak_slab	-1770	395	-1757	405	21	32	block/oak_planks=step_boards_d	a Johto h
 roof_mangrove	mangrove_stairs	-1770	395	-1757	405	21	32	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1770	395	-1757	405	21	27	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	mangrove_slab,mangrove_planks	-1770	395	-1757	405	25	32	block/mangrove_planks=roof_mangrove_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1770	395	-1757	405	21	23	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1770	395	-1757	405	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
+panel	pale_oak_shelf	-1769	396	-1758	404	21	23	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1770	395	-1757	405	21	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1770	395	-1757	405	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1770	395	-1757	405	25	32	block/nether_bricks=chimney_dark	a Johto house
@@ -4712,7 +4715,7 @@ swap	oak_slab	-1906	526	-1893	536	21	32	block/oak_planks=step_boards_d	a Johto h
 roof_vio	crimson_stairs	-1906	526	-1893	536	21	32	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1906	526	-1893	536	21	27	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	crimson_slab,crimson_planks	-1906	526	-1893	536	25	32	block/crimson_planks=roof_vio_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1906	526	-1893	536	21	23	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1906	526	-1893	536	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1906	526	-1893	536	21	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1906	526	-1893	536	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1906	526	-1893	536	25	32	block/nether_bricks=chimney_dark	a Johto house
@@ -4733,7 +4736,7 @@ swap	oak_slab	-1838	534	-1825	545	21	33	block/oak_planks=step_boards_d	a Johto h
 roof_vio	crimson_stairs	-1838	534	-1825	545	21	33	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1838	534	-1825	545	21	27	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	crimson_slab,crimson_planks	-1838	534	-1825	545	25	33	block/crimson_planks=roof_vio_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1838	534	-1825	545	21	23	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1838	534	-1825	545	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1838	534	-1825	545	21	33	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1838	534	-1825	545	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1838	534	-1825	545	25	33	block/nether_bricks=chimney_dark	a Johto house
@@ -4754,7 +4757,7 @@ swap	oak_slab	-1858	566	-1845	576	21	32	block/oak_planks=step_boards_d	a Johto h
 roof_vio	crimson_stairs	-1858	566	-1845	576	21	32	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1858	566	-1845	576	21	27	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	crimson_slab,crimson_planks	-1858	566	-1845	576	25	32	block/crimson_planks=roof_vio_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1858	566	-1845	576	21	23	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1858	566	-1845	576	21	23	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1858	566	-1845	576	21	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1858	566	-1845	576	21	23	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1858	566	-1845	576	25	32	block/nether_bricks=chimney_dark	a Johto house
@@ -4775,7 +4778,7 @@ swap	oak_slab	-2263	527	-2250	538	22	32	block/oak_planks=step_boards_d	a Johto h
 roof_green	warped_stairs	-2263	527	-2250	538	22	32	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2263	527	-2250	538	22	28	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	warped_slab,warped_planks	-2263	527	-2250	538	26	32	block/warped_planks=roof_green_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2263	527	-2250	538	22	24	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2263	527	-2250	538	22	24	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2263	527	-2250	538	22	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2263	527	-2250	538	22	24	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2263	527	-2250	538	26	32	block/nether_bricks=chimney_dark	a Johto house
@@ -4796,7 +4799,7 @@ swap	oak_slab	-2249	527	-2236	538	22	32	block/oak_planks=step_boards_d	a Johto h
 roof_green	warped_stairs	-2249	527	-2236	538	22	32	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2249	527	-2236	538	22	28	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	warped_slab,warped_planks	-2249	527	-2236	538	26	32	block/warped_planks=roof_green_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-2249	527	-2236	538	22	24	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-2249	527	-2236	538	22	24	block/dark_oak_shelf=panel_planter_dark	a Johto house
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-2249	527	-2236	538	22	32	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-2249	527	-2236	538	22	24	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-2249	527	-2236	538	26	32	block/nether_bricks=chimney_dark	a Johto house
@@ -4817,7 +4820,8 @@ swap	oak_slab	-1758	259	-1745	264	23	34	block/oak_planks=step_boards_d	a Johto h
 roof_mangrove	mangrove_stairs	-1758	259	-1745	264	23	34	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1758	259	-1745	264	23	29	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	mangrove_slab,mangrove_planks	-1758	259	-1745	264	27	34	block/mangrove_planks=roof_mangrove_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1758	259	-1745	264	23	25	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1758	259	-1745	264	23	25	block/dark_oak_shelf=panel_planter_dark	a Johto house
+panel	pale_oak_shelf	-1757	260	-1746	263	23	25	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1758	259	-1745	264	23	34	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1758	259	-1745	264	23	25	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1758	259	-1745	264	27	34	block/nether_bricks=chimney_dark	a Johto house
@@ -4838,7 +4842,8 @@ swap	oak_slab	-1830	186	-1817	196	23	34	block/oak_planks=step_boards_d	a Johto h
 roof_mangrove	mangrove_stairs	-1830	186	-1817	196	23	34	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1830	186	-1817	196	23	29	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	mangrove_slab,mangrove_planks	-1830	186	-1817	196	27	34	block/mangrove_planks=roof_mangrove_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1830	186	-1817	196	23	25	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1830	186	-1817	196	23	25	block/dark_oak_shelf=panel_planter_dark	a Johto house
+panel	pale_oak_shelf	-1829	187	-1818	195	23	25	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1830	186	-1817	196	23	34	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1830	186	-1817	196	23	25	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1830	186	-1817	196	27	34	block/nether_bricks=chimney_dark	a Johto house
@@ -4859,7 +4864,8 @@ swap	oak_slab	-1758	254	-1745	264	23	34	block/oak_planks=step_boards_d	a Johto h
 roof_mangrove	mangrove_stairs	-1758	254	-1745	264	23	34	-	a Johto house
 panel	jungle_shelf,birch_shelf	-1758	254	-1745	264	23	29	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
 swap	mangrove_slab,mangrove_planks	-1758	254	-1745	264	27	34	block/mangrove_planks=roof_mangrove_tiles	a Johto house
-panel	dark_oak_shelf,pale_oak_shelf	-1758	254	-1745	264	23	25	block/dark_oak_shelf=panel_planter_dark,block/pale_oak_shelf=panel_white	a Johto house
+panel	dark_oak_shelf	-1758	254	-1745	264	23	25	block/dark_oak_shelf=panel_planter_dark	a Johto house
+panel	pale_oak_shelf	-1757	255	-1746	263	23	25	block/pale_oak_shelf=panel_white	a Johto house's planters
 swap	stripped_dark_oak_wood,stripped_spruce_wood,stripped_spruce_log,stripped_mangrove_wood	-1758	254	-1745	264	23	34	block/stripped_dark_oak_log=post_bt,block/stripped_dark_oak_log_top=post_bt_top,block/stripped_spruce_log=post_bt,block/stripped_spruce_log_top=post_bt_top,block/stripped_mangrove_log=mah_post,block/stripped_mangrove_log_top=post_bt_top	a Johto house
 swap	smooth_stone_slab	-1758	254	-1745	264	23	25	block/smooth_stone=house_stone,block/smooth_stone_slab_side=house_stone	a Johto house
 swap	nether_bricks,nether_brick_stairs,nether_brick_slab	-1758	254	-1745	264	27	34	block/nether_bricks=chimney_dark	a Johto house

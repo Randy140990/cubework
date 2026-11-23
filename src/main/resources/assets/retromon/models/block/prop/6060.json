@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/paper_cerulean","paper_cerulean":"retromon:block/interior/paper_cerulean"},"elements":[{"from":[16,0.0,0.0],"to":[16,16.0,16.0],"faces":{"west":{"uv":[0.0,0.0,16.0,16.0],"texture":"#paper_cerulean"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/bike_paper","bike_paper":"retromon:block/interior/bike_paper"},"elements":[{"from":[16,0.0,0.0],"to":[16,16.0,16],"faces":{"west":{"uv":[0.0,0.0,16.0,16.0],"texture":"#bike_paper"}}}]}
