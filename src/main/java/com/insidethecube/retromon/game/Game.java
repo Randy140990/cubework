@@ -4355,7 +4355,7 @@ public final class Game {
 	 * (0.50) The POKeMON that wait in one spot out in the world: Route 12's SNORLAX asleep on the pier south of Route
 	 * 11's gate, Route 16's outside its gate's west way. Key, x, y, z, facing.
 	 */
-	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -123.5, 31.0, 599.5, 90.0}, {"snorlax_route_16", -623.5, 34.0, 418.5, 0.0}};
+	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -123.0, 31.0, 599.5, 90.0}, {"snorlax_route_16", -623.5, 34.0, 418.5, 0.0}};
 
 	/** How near a sleeping SNORLAX you can come (blocks from its middle). */
 	private static final double SNORLAX_REACH = 2.7;

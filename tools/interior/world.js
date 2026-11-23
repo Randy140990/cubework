@@ -661,14 +661,15 @@ function stairsUp(room, x0, z0 = 0, depth = 2, o = {}) {
   // so there's no top to drop off.
   const bz = z0 + depth, yAt = (x) => Math.max(0, Math.min(n * STEP, (x - x0) / sw * STEP)), stepAt = (x) => Math.max(0, Math.min(n * STEP, Math.ceil((x - x0) / sw - 1e-3) * STEP));
   slopeRail(room, x0, x0 + 4, yAt, stepAt, bz + 0.07);
-  if (z0 > 0.05) { slopeRail(room, x0, x0 + 4, yAt, stepAt, z0 - 0.07); room.solid(x0 + 0.1, z0 - 0.3, x0 + 4.5, z0 + 0.02); }
+  if (z0 > 0.05) { slopeRail(room, x0, x0 + 4, yAt, stepAt, z0 - 0.07); room.solids.push([x0 + 0.1, z0 - 0.3, x0 + 4.5, z0 + 0.02, room.H + 1]); }
   else slopeRail(room, x0 + 0.2, x0 + 4, yAt, stepAt, z0 + 0.08, { wall: "n" });
   if (x0 + 4 < room.W - 0.05) {
     G.box(x0 + 4, 0, z0 - 0.1, x0 + 4.25, room.H, bz + 0.1, o.wall || "paint");
     room.solid(x0 + 4, z0 - 0.1, x0 + 4.3, bz + 0.1);
   }
   G.box(x0, 0, bz - 0.01, x0 + 4, 0.3, bz + 0.01, { s: "paint", all: null });
-  room.solid(x0 + 0.1, bz - 0.02, x0 + 4.5, bz + 0.3);
+  // (09:11: John stepped off the side going up.) The banister stops you all the way up, not only at its foot.
+  room.solids.push([x0 + 0.1, bz - 0.02, x0 + 4.5, bz + 0.3, room.H + 1]);
   room.ramps.push({ rect: [x0, z0, x0 + 4, z0 + depth], h: (x) => Math.max(0, Math.min(room.H, Math.ceil((x - x0) / sw - 0.35) * STEP)) });
   room.warps.push({ test: p => p.y >= 1.45 && p.x > x0, to: o.to, spawn: o.spawn, fx: "fade", why: "up" });
   room.item("Stairs up", "Oak treads, white risers and spindles, a walnut rail and newel post.");
@@ -712,7 +713,8 @@ function doormat(room, x0, x1, o = {}) {
     else sunPool(room, x0 - 0.6, D - 3.6, x1 + 0.6, D, 3);
   }
   room.exitArrow = { x: (x0 + x1) / 2, z: D - 0.55 };
-  if (!o.none) room.warps.push({ test: (p, input) => p.z > D - 1.0 && p.x > x0 && p.x < x1 && input.down, to: o.to, spawn: o.spawn, fx: "fadeOut", why: "out" });
+  if (o.needs) room.act([x0, D - 1.4, x1, D], { label: "Look", lines: o.lines || ["You can't go this way yet."] });
+  else if (!o.none) room.warps.push({ test: (p, input) => p.z > D - 1.0 && p.x > x0 && p.x < x1 && input.down, to: o.to, spawn: o.spawn, fx: "fadeOut", why: "out" });
   room.item("Door mat", o.mat ? "This place's own mat, in its colours. Walk off it, south, to go out." : "Coir mat with a stitched border. Walk off it, south, to go out.");
 }
 
@@ -723,11 +725,27 @@ function passageN(room, x0, x1, o = {}) {
   G.box(x0 - 0.15, 0, 0, x1 + 0.15, 2.6, 0.1, { s: o.frame || "walnut", all: null });
   G.box(x0, 0, 0.1, x1, 2.4, 0.11, { s: o.opening || "doorDark", all: null });
   G.box(x0, 0, 0.11, x1, 0.03, 2, { top: mk, s: "cap", all: "cap", bottom: null });
+  if (o.tunnel) tunnelSides(room, "n", x0, x1);
   // (A way the viewer can't let you through, a guard's, is only something to look at here.)
   if (o.needs) room.act([x0, 0, x1, 1.4], { label: "Look", lines: o.lines || ["You can't go this way yet."] });
   else if (!o.none) room.warps.push({ test: (p, input) => p.z < 1.0 && p.x > x0 && p.x < x1 && input.up, to: o.to, spawn: o.spawn, fx: "fade", why: "north" });
   room.item("Way through", room.northNook ? "A nook in the north wall as deep as the one at the door, its mat its whole width, the arrows pointing on. Walk north through it."
     : "An open doorway in the north wall, a mat at its foot. Walk north through it.");
+}
+// (09:05) A gate's way through as a tunnel: the passage's walls lining the nook either side, darker towards the
+// back, and a lintel over it, so it reads as a way into something with daylight at its end (the opening's picture).
+function tunnelSides(room, wall, a, b) {
+  const G = room.geo, h = 2.4, d = 1.9;
+  if (wall === "n") {
+    G.box(a, 0, 0.11, a + 0.12, h, d, { e: "tunnelWall", all: null });
+    G.box(b - 0.12, 0, 0.11, b, h, d, { w: "tunnelWall", all: null });
+    G.box(a, h - 0.22, 0.11, b, h, d, { bottom: "tunnelRoof", s: "tunnelLintel", all: null });
+  } else {
+    const W = room.W, e = wall === "e", x0 = e ? W - d : 0.11, x1 = e ? W - 0.11 : d;
+    G.box(x0, 0, a, x1, h, a + 0.12, { s: "tunnelWall", all: null });
+    G.box(x0, 0, b - 0.12, x1, h, b, { n: "tunnelWall", all: null });
+    G.box(x0, h - 0.22, a, x1, h, b, { bottom: "tunnelRoof", [e ? "w" : "e"]: "tunnelLintel", all: null });
+  }
 }
 // A way through the east or west wall (a sideways gate's): a dark doorway, a mat in front of it (2 deep, its
 // arrows pointing out). wall "e" or "w"; z0 to z1 along the wall. choice: what the mod asks you there (where to).
@@ -735,14 +753,17 @@ function passageSide(room, wall, z0, z1, o = {}) {
   const G = room.geo, W = room.W, e = wall === "e", fr = o.frame || "walnut";
   if (e) {
     G.box(W - 0.1, 0, z0 - 0.15, W, 2.6, z1 + 0.15, { w: fr, all: null });
-    G.box(W - 0.11, 0, z0, W - 0.1, 2.4, z1, { w: "doorDark", all: null });
+    G.box(W - 0.11, 0, z0, W - 0.1, 2.4, z1, { w: o.opening || "doorDark", all: null });
     G.box(W - 2, 0, z0, W - 0.11, 0.03, z1, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
+    if (o.tunnel) tunnelSides(room, "e", z0, z1);
   } else {
     G.box(0, 0, z0 - 0.15, 0.1, 2.6, z1 + 0.15, { e: fr, all: null });
-    G.box(0.1, 0, z0, 0.11, 2.4, z1, { e: "doorDark", all: null });
+    G.box(0.1, 0, z0, 0.11, 2.4, z1, { e: o.opening || "doorDark", all: null });
     G.box(0.11, 0, z0, 2, 0.03, z1, { top: o.mat || "doormat", s: "cap", all: "cap", bottom: null });
+    if (o.tunnel) tunnelSides(room, "w", z0, z1);
   }
-  if (!o.none) room.warps.push({ test: (p, input) => (e ? p.x > W - 1.0 && input.right : p.x < 1.0 && input.left) && p.z > z0 && p.z < z1, to: o.to, spawn: o.spawn, fx: "fade", why: e ? "east" : "west" });
+  if (o.needs) room.act(e ? [W - 2, z0, W, z1] : [0, z0, 2, z1], { label: "Look", lines: o.lines || ["You can't go this way yet."] });
+  else if (!o.none) room.warps.push({ test: (p, input) => (e ? p.x > W - 1.0 && input.right : p.x < 1.0 && input.left) && p.z > z0 && p.z < z1, to: o.to, spawn: o.spawn, fx: "fade", why: e ? "east" : "west" });
   room.item("Way through", "An open doorway in the " + (e ? "east" : "west") + " wall, a mat at its foot, its arrows pointing out. Walk " + (e ? "east" : "west") + " through it." + (o.choice ? " (In the game you're asked where to: ROUTE 28, or ROUTE 26 and JOHTO.)" : ""));
 }
 function wildGrass(room, x0, z0, x1, z1) {

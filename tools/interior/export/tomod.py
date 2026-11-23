@@ -146,26 +146,26 @@ DOORS = {
     "lavender_cubone_house": {"room": "lavender_cubone_house", "door": [[-147, 34, 437], [-146, 34, 437]], "out": [-146.0, 34.0, 439.4]},
     "lavender_name_rater": {"room": "lavender_name_rater", "door": [[-136, 34, 437], [-135, 34, 437]], "out": [-135.0, 34.0, 439.4]},
     # (0.50) The route gates, each a way through (20:12, 20:20): side A its room's door, side B its way on (in at the room's north).
-    "gate_r5_a": {"room": "gate_r5", "door": [[-352, 35, 378], [-351, 35, 378]], "out": [-351.0, 35.0, 375.6], "face": "n", "yaw": 180.0},
-    "gate_r5_b": {"room": "gate_r5", "door": [[-352, 35, 381], [-351, 35, 381]], "out": [-351.0, 35.0, 383.4], "face": "s", "yaw": 0.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r5_a": {"room": "gate_r5", "door": [[-352, 35, 381], [-351, 35, 381]], "out": [-351.0, 35.0, 383.4], "face": "s", "yaw": 0.0},
+    "gate_r5_b": {"room": "gate_r5", "door": [[-352, 35, 378], [-351, 35, 378]], "out": [-351.0, 35.0, 375.6], "face": "n", "yaw": 180.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
     "gate_r6_a": {"room": "gate_r6", "door": [[-348, 35, 471], [-347, 35, 471]], "out": [-347.0, 35.0, 473.4], "face": "s", "yaw": 0.0},
     "gate_r6_b": {"room": "gate_r6", "door": [[-348, 35, 468], [-347, 35, 468]], "out": [-347.0, 35.0, 465.6], "face": "n", "yaw": 180.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
-    "gate_r7_a": {"room": "gate_r7", "door": [[-406, 35, 424], [-406, 35, 425]], "out": [-408.4, 35.0, 425.0], "face": "w", "yaw": 90.0},
-    "gate_r7_b": {"room": "gate_r7", "door": [[-403, 35, 424], [-403, 35, 425]], "out": [-400.6, 35.0, 425.0], "face": "e", "yaw": -90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
-    "gate_r8_a": {"room": "gate_r8", "door": [[-293, 35, 424], [-293, 35, 425]], "out": [-290.6, 35.0, 425.0], "face": "e", "yaw": -90.0},
-    "gate_r8_b": {"room": "gate_r8", "door": [[-296, 35, 424], [-296, 35, 425]], "out": [-298.4, 35.0, 425.0], "face": "w", "yaw": 90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
-    "gate_r11_a": {"room": "gate_r11", "door": [[-176, 33, 586], [-176, 33, 587]], "out": [-178.4, 33.0, 587.0], "face": "w", "yaw": 90.0},
-    "gate_r11_b": {"room": "gate_r11", "door": [[-173, 33, 586], [-173, 33, 587]], "out": [-170.6, 33.0, 587.0], "face": "e", "yaw": -90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r7_a": {"room": "gate_r7", "door": [[-406, 35, 424], [-406, 35, 425]], "out": [-408.4, 35.0, 425.0], "face": "w", "yaw": 90.0, "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
+    "gate_r7_b": {"room": "gate_r7", "door": [[-403, 35, 424], [-403, 35, 425]], "out": [-400.6, 35.0, 425.0], "face": "e", "yaw": -90.0, "in": {"x": 14.4, "z": 5.0, "yaw": 90.0}},
+    "gate_r8_a": {"room": "gate_r8", "door": [[-293, 35, 424], [-293, 35, 425]], "out": [-290.6, 35.0, 425.0], "face": "e", "yaw": -90.0, "in": {"x": 14.4, "z": 5.0, "yaw": 90.0}},
+    "gate_r8_b": {"room": "gate_r8", "door": [[-296, 35, 424], [-296, 35, 425]], "out": [-298.4, 35.0, 425.0], "face": "w", "yaw": 90.0, "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
+    "gate_r11_a": {"room": "gate_r11", "door": [[-176, 33, 586], [-176, 33, 587]], "out": [-178.4, 33.0, 587.0], "face": "w", "yaw": 90.0, "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
+    "gate_r11_b": {"room": "gate_r11", "door": [[-173, 33, 586], [-173, 33, 587]], "out": [-170.6, 33.0, 587.0], "face": "e", "yaw": -90.0, "in": {"x": 14.4, "z": 5.0, "yaw": 90.0}},
     "gate_r12_a": {"room": "gate_r12", "door": [[-124, 33, 483], [-123, 33, 483]], "out": [-123.0, 33.0, 485.4], "face": "s", "yaw": 0.0},
     "gate_r12_b": {"room": "gate_r12", "door": [[-124, 33, 483], [-123, 33, 483]], "out": [-123.0, 33.0, 480.6], "face": "n", "yaw": 180.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
-    "gate_r15_a": {"room": "gate_r15", "door": [[-428, 32, 788], [-428, 32, 789]], "out": [-430.4, 32.0, 789.0], "face": "w", "yaw": 90.0},
-    "gate_r15_b": {"room": "gate_r15", "door": [[-426, 32, 788], [-426, 32, 789]], "out": [-423.6, 32.0, 789.0], "face": "e", "yaw": -90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
-    "gate_r16n_a": {"room": "gate_r16n", "door": [[-616, 35, 418], [-616, 35, 419]], "out": [-613.6, 35.0, 419.0], "face": "e", "yaw": -90.0},
-    "gate_r16n_b": {"room": "gate_r16n", "door": [[-618, 35, 418], [-618, 35, 419]], "out": [-620.4, 35.0, 419.0], "face": "w", "yaw": 90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
-    "gate_r16s_a": {"room": "gate_r16s", "door": [[-616, 35, 431], [-616, 35, 432]], "out": [-613.6, 35.0, 432.0], "face": "e", "yaw": -90.0},
-    "gate_r16s_b": {"room": "gate_r16s", "door": [[-618, 35, 431], [-618, 35, 432]], "out": [-620.4, 35.0, 432.0], "face": "w", "yaw": 90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
-    "gate_r18_a": {"room": "gate_r18", "door": [[-577, 34, 783], [-577, 34, 784]], "out": [-574.6, 34.0, 784.0], "face": "e", "yaw": -90.0},
-    "gate_r18_b": {"room": "gate_r18", "door": [[-579, 34, 783], [-579, 34, 784]], "out": [-581.4, 34.0, 784.0], "face": "w", "yaw": 90.0, "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}},
+    "gate_r15_a": {"room": "gate_r15", "door": [[-428, 32, 788], [-428, 32, 789]], "out": [-430.4, 32.0, 789.0], "face": "w", "yaw": 90.0, "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
+    "gate_r15_b": {"room": "gate_r15", "door": [[-426, 32, 788], [-426, 32, 789]], "out": [-423.6, 32.0, 789.0], "face": "e", "yaw": -90.0, "in": {"x": 14.4, "z": 5.0, "yaw": 90.0}},
+    "gate_r16n_a": {"room": "gate_r16n", "door": [[-616, 35, 418], [-616, 35, 419]], "out": [-613.6, 35.0, 419.0], "face": "e", "yaw": -90.0, "in": {"x": 14.4, "z": 5.0, "yaw": 90.0}},
+    "gate_r16n_b": {"room": "gate_r16n", "door": [[-618, 35, 418], [-618, 35, 419]], "out": [-620.4, 35.0, 419.0], "face": "w", "yaw": 90.0, "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
+    "gate_r16s_a": {"room": "gate_r16s", "door": [[-616, 35, 431], [-616, 35, 432]], "out": [-613.6, 35.0, 432.0], "face": "e", "yaw": -90.0, "in": {"x": 14.4, "z": 5.0, "yaw": 90.0}},
+    "gate_r16s_b": {"room": "gate_r16s", "door": [[-618, 35, 431], [-618, 35, 432]], "out": [-620.4, 35.0, 432.0], "face": "w", "yaw": 90.0, "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
+    "gate_r18_a": {"room": "gate_r18", "door": [[-577, 34, 783], [-577, 34, 784]], "out": [-574.6, 34.0, 784.0], "face": "e", "yaw": -90.0, "in": {"x": 14.4, "z": 5.0, "yaw": 90.0}},
+    "gate_r18_b": {"room": "gate_r18", "door": [[-579, 34, 783], [-579, 34, 784]], "out": [-581.4, 34.0, 784.0], "face": "w", "yaw": 90.0, "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
     "route12_house": {"room": "route12_house", "door": [[-127, 32, 618], [-126, 32, 618]], "out": [-126.0, 32.0, 620.4]},
     "route16_house": {"room": "route16_house", "door": [[-642, 34, 415], [-641, 34, 415]], "out": [-641.0, 34.0, 417.4]},
 }
@@ -190,7 +190,7 @@ MAT_DOOR = {"house1": "home", "rival1": "rival", "lab": "lab", "center": "viridi
             "vermilion_gym": "vermilion_gym", "pokemon_fan_club": "pokemon_fan_club", "vermilion_old_rod_house": "vermilion_old_rod_house",
             "vermilion_trade_house": "vermilion_trade_house", "vermilion_pidgey_house": "vermilion_pidgey_house",
             "lavender_volunteer_house": "lavender_volunteer_house", "lavender_cubone_house": "lavender_cubone_house", "lavender_name_rater": "lavender_name_rater",
-            "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r7": "gate_r7_a", "gate_r8": "gate_r8_a", "gate_r11": "gate_r11_a", "gate_r12": "gate_r12_a", "gate_r15": "gate_r15_a", "gate_r16n": "gate_r16n_a", "gate_r16s": "gate_r16s_a", "gate_r18": "gate_r18_a", "route12_house": "route12_house", "route16_house": "route16_house"}
+            "gate_r5": "gate_r5_a", "gate_r6": "gate_r6_a", "gate_r12": "gate_r12_a", "route12_house": "route12_house", "route16_house": "route16_house"}
 # Rooms with two doors out (the Museum): which door each mat is, by the mat's west edge.
 MAT_DOOR_X = {("museum_1f", 13): "pewter_museum", ("museum_1f", 21): "pewter_museum_side"}
 # Rooms laid out step for step on the games' (the Pewter Gym): how many blocks one of its steps is, across and down,
@@ -226,9 +226,14 @@ MONS["vermilion_pidgey_house"] = [{"key": "pet:vermilion_pidgey_house_p1", "spec
 BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6.1 if i % 2 == 0 else 0.9, "y": 0} for i, k in enumerate(_WE)]
 # Ways out through the north wall to the world (the north gate's).
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n", "cerulean_house1": "cerulean_house1_back",
-              "cerulean_house2": "cerulean_house2_back", "gate_r5": "gate_r5_b", "gate_r6": "gate_r6_b", "gate_r7": "gate_r7_b", "gate_r8": "gate_r8_b", "gate_r11": "gate_r11_b", "gate_r12": "gate_r12_b", "gate_r15": "gate_r15_b", "gate_r16n": "gate_r16n_b", "gate_r16s": "gate_r16s_b", "gate_r18": "gate_r18_b"}
+              "cerulean_house2": "cerulean_house2_back", "gate_r5": "gate_r5_b", "gate_r6": "gate_r6_b", "gate_r12": "gate_r12_b"}
 # Ways out through the side walls (a sideways gate's), by room and wall.
-SIDE_DOOR = {("gate_johto", "e"): "johto_e"}
+SIDE_DOOR = {("gate_johto", "e"): "johto_e",
+             # The sideways route gates: each side's way to the world's door on that side.
+             ("gate_r7", "w"): "gate_r7_a", ("gate_r7", "e"): "gate_r7_b", ("gate_r8", "e"): "gate_r8_a", ("gate_r8", "w"): "gate_r8_b",
+             ("gate_r11", "w"): "gate_r11_a", ("gate_r11", "e"): "gate_r11_b", ("gate_r15", "w"): "gate_r15_a", ("gate_r15", "e"): "gate_r15_b",
+             ("gate_r16n", "e"): "gate_r16n_a", ("gate_r16n", "w"): "gate_r16n_b", ("gate_r16s", "e"): "gate_r16s_a", ("gate_r16s", "w"): "gate_r16s_b",
+             ("gate_r18", "e"): "gate_r18_a", ("gate_r18", "w"): "gate_r18_b"}
 # Where you come in from outside, and where a new game starts (your room, by the bed).
 # (On the mat's inner half: the mats are two deep, and you're out once you're past their middle.)
 ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "lab": {"x": 8.0, "z": 14.5, "yaw": 180.0},
@@ -251,7 +256,7 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "vermilion_pidgey_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "lavender_volunteer_house": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "lavender_cubone_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "lavender_name_rater": {"x": 6.0, "z": 9.5, "yaw": 180.0},
-         "gate_r5": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r6": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r7": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r8": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r11": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r12": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r15": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r16n": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r16s": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r18": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "route12_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "route16_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
+         "gate_r5": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r6": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r7": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r8": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r11": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r12": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r15": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r16n": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r16s": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r18": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "route12_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "route16_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -415,10 +420,12 @@ def collision(room):
                 if not in_ramp(ix + 0.5, iz + 0.5): add((ix, -1, iz), [0, 0, 0, 16, 16, 16])
     # Furniture and walls: their rects, clipped to just round the room, 1.5 blocks high on the floor.
     rects = [list(s) for s in room["solids"]]
+    up = max([h for rp in ramps for (_, h) in rp["h"] if h > 0] or [0])
+    tall = max(1.5, up + 2) if up > 0 else 1.5
     rects.append([-5, D, W + 5, D + 5])  # the open front: the door mat is the only way out
     for rect in rects:
         # (A solid with a height of its own, a banister by stairs: as high as that, so you can't get over it from the steps.)
-        (x0, z0, x1, z1), hh = rect[:4], (rect[4] if len(rect) > 4 else 1.5)
+        (x0, z0, x1, z1), hh = rect[:4], (rect[4] if len(rect) > 4 else tall)
         x0, z0, x1, z1 = max(x0, -1), max(z0, -1), min(x1, W + 1), min(z1, D + 1)
         if x1 <= x0 or z1 <= z0: continue
         for ix in range(math.floor(x0), math.ceil(x1)):
@@ -555,7 +562,8 @@ def main():
         for m in room["mats"]:
             # Out to the world (a mat by the front door), or through to another room (the forest and its gates).
             if m.get("to") in (None, "town"):
-                warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 1.0, "door": MAT_DOOR_X.get((rid, round(m["x0"])), MAT_DOOR.get(rid)), "to": None})
+                warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 1.0, "door": MAT_DOOR_X.get((rid, round(m["x0"])), MAT_DOOR.get(rid)), "to": None,
+                              "needs": m.get("needs")})
             else:
                 warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 1.0, "door": None, "to": m["to"], "spawn": spawn_of(m["spawn"])})
         for m in room.get("passes", []):
@@ -567,7 +575,7 @@ def main():
             # Through a side wall: out to the world (or asked where to: the Route 28 Gate's west way).
             east = m["wall"] == "e"
             warps.append({"kind": "east" if east else "west", "x": room["W"] - 1.0 if east else 1.0, "z0": m["z0"], "z1": m["z1"],
-                          "door": SIDE_DOOR.get((rid, m["wall"])), "to": None, "choice": m.get("choice")})
+                          "door": SIDE_DOOR.get((rid, m["wall"])), "to": None, "choice": m.get("choice"), "needs": m.get("needs")})
         for s in room["stairs"]:
             to = s["to"]; sp = s["spawn"]
             warps.append({"kind": s["dir"], "x0": s["x0"], "x1": s["x0"] + 4, "z0": s["z0"], "z1": s["z0"] + s["depth"], "to": to,

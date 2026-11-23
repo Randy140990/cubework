@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/mc_cream","mc_cream":"retromon:block/interior/mc_cream"},"elements":[{"from":[16,0.0,0.0],"to":[16,16.0,16],"faces":{"west":{"uv":[0.0,0.0,16.0,16.0],"texture":"#mc_cream"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/walnut","walnut":"retromon:block/interior/walnut"},"elements":[{"from":[0.0,16,0.48],"to":[0.64,16,1.76],"faces":{"down":{"uv":[0.0,15.12,0.32,15.76],"texture":"#walnut"}}}]}

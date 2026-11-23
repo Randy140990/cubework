@@ -978,6 +978,13 @@ public final class Interiors {
 				switch (w.kind()) {
 					case "mat" -> {
 						if (lz > w.z0() && lx > w.x0() && lx < w.x1() && (dz > 0.01 || facingSouth)) {
+							// (0.51) A guard's way out by the mat (Route 5's gate, south into SAFFRON): only with what it needs.
+							if (w.needs() != null && !Game.meets(p, w.needs())) {
+								p.teleportTo(p.getX(), p.getY(), p.getZ() - 1.4);
+								COOL.put(id, 30);
+								Game.gateBlocked(p, w.needs());
+								return true;
+							}
 							// Through to another room (the forest and its gates).
 							if (w.to() != null && ROOMS.containsKey(w.to())) {
 								go(p, ROOMS.get(w.to()), w.sx(), w.sz(), w.syaw(), true);
@@ -1000,6 +1007,13 @@ public final class Interiors {
 						// Through a way in a side wall (a sideways gate's): out to the world, to the next room, or asked where to.
 						boolean east = w.kind().equals("east");
 						if ((east ? lx > w.x0() : lx < w.x1()) && lz > w.z0() && lz < w.z1() && (east ? dx > 0.01 || facingEast : dx < -0.01 || facingWest)) {
+							// (0.51) A sideways gate's guarded way (into SAFFRON, onto the CYCLING ROAD): only with what it needs.
+							if (w.needs() != null && !Game.meets(p, w.needs())) {
+								p.teleportTo(p.getX() + (east ? -1.4 : 1.4), p.getY(), p.getZ());
+								COOL.put(id, 30);
+								Game.gateBlocked(p, w.needs());
+								return true;
+							}
 							if (w.choice() != null) {
 								p.teleportTo(p.getX() + (east ? -1.3 : 1.3), p.getY(), p.getZ());
 								COOL.put(id, 30);

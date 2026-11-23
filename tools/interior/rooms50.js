@@ -1,29 +1,53 @@
+// (09:11) A route gate that runs west to east in the world: Let's Go's gate turned that way (as the Route 28 Gate),
+// its ways through in its west and east walls (each a tunnel with daylight at its end), the guard at his desk on the
+// north wall, the stairs up (where it has an upstairs) along the north wall on the east side, tables along the front.
+function lgGateSide(R, o) {
+  shell(R, { paper: "paperGateLG", floor: "gateCheck", skirt: "gateWhite", westNook: [3, 7], eastNook: [3, 7], ledge: "gateBlue", ledgeTop: "gateWhite" });
+  band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
+  passageSide(R, "e", 3, 7, Object.assign({ to: "town", mat: "matGateEast", frame: "paint", opening: "gateTunnel", tunnel: true }, o.east || {}));
+  passageSide(R, "w", 3, 7, Object.assign({ to: "town", mat: "matGateWest", frame: "paint", opening: "gateTunnel", tunnel: true }, o.west || {}));
+  runner(R, 2, 3, 14, 7, "gateRunE");
+  const up = o.stairs;
+  if (up) stairsUp(R, 10, 0, 2, { to: up.to, spawn: up.spawn, wall: "gateWhite" });
+  crossWindowN(R, 2.4, 1.5, 1.8, 1.4, [o.view]);
+  if (!up) crossWindowN(R, 11.8, 1.5, 1.8, 1.4, [o.view]);
+  table(R, 5.4, 1.3, 8.6, 2.0, { top: "lab", leg: "steel", h: 0.95, name: "Guard's desk", note: "A white-topped desk on steel legs, a logbook open on it." });
+  R.geo.box(6.6, 0.95, 1.45, 7.4, 0.99, 1.85, { all: "linen", top: "bookOpen" });
+  R.act([5.2, 1.1, 8.8, 2.3], { label: "Read", lines: ["The guard's logbook: who's gone through, and which way."] });
+  slimPlant(R, 4.6, 0.8, 1.0); if (!up) slimPlant(R, 13.4, 1.2, 1.0);
+  glassTable(R, 4.0, 7.6, 5.4, 9.0, { lines: [o.leaflet || "A glass table, a leaflet on it."] });
+  stool(R, 3.3, 8.3); stool(R, 6.1, 8.3);
+  glassTable(R, 10.6, 7.6, 12.0, 9.0, { lines: [o.map || "A glass table. Someone's left a map of the routes round here on it."] });
+  stool(R, 9.9, 8.3); stool(R, 12.7, 8.3);
+  palm(R, 2.8, 9.1, 1.0); palm(R, 13.2, 9.1, 1.0);
+}
+
 // ---------- 0.50.0 (20:07 to 20:20): every route gate a way through, Routes 12 and 16's house ----------
 (function () {
   // The route gates (John's one gatehouse design, all over the map): Let's Go's gate inside (one design for every gate,
   // who's in it its own), in at one side and out at the other. A gate that runs west to east in the world is the same
   // room: its door at the room's south, its way on at the north, each joined to one of its two sides.
   const GATES = [
-    { id: "gate_r5", name: "Route 5 gate", floor: "Saffron City's north gate", group: "Saffron City", needs: "tea",
+    { id: "gate_r5", name: "Route 5 gate", floor: "Saffron City's north gate", group: "Saffron City", needs: "tea", needsAt: "s",
       people: [["Guard", "route_5_gate_p0", 12.6, 6.0, "w", "guard"]] },
-    { id: "gate_r6", name: "Route 6 gate", floor: "Saffron City's south gate", group: "Saffron City", needs: "tea",
+    { id: "gate_r6", name: "Route 6 gate", floor: "Saffron City's south gate", group: "Saffron City", needs: "tea", needsAt: "n",
       people: [["Guard", "route_6_gate_p0", 12.6, 6.0, "w", "guard"]] },
-    { id: "gate_r7", name: "Route 7 gate", floor: "Saffron City's west gate", group: "Saffron City", needs: "tea",
-      people: [["Guard", "route_7_gate_p0", 12.6, 6.0, "w", "guard"]] },
-    { id: "gate_r8", name: "Route 8 gate", floor: "Saffron City's east gate", group: "Saffron City", needs: "tea",
-      people: [["Guard", "route_8_gate_p0", 12.6, 6.0, "w", "guard"]] },
-    { id: "gate_r11", name: "Route 11 gate", floor: "Route 11 to Route 12", group: "Routes 11 to 18", up: "gate_r11_2f",
-      people: [["Guard", "route_11_gate_1f_p0", 12.6, 7.6, "w", "guard"]] },
+    { id: "gate_r7", name: "Route 7 gate", floor: "Saffron City's west gate", group: "Saffron City", needs: "tea", needsAt: "e", side: true,
+      people: [["Guard", "route_7_gate_p0", 7.0, 0.8, "s", "guard"]] },
+    { id: "gate_r8", name: "Route 8 gate", floor: "Saffron City's east gate", group: "Saffron City", needs: "tea", needsAt: "w", side: true,
+      people: [["Guard", "route_8_gate_p0", 7.0, 0.8, "s", "guard"]] },
+    { id: "gate_r11", name: "Route 11 gate", floor: "Route 11 to Route 12", group: "Routes 11 to 18", up: "gate_r11_2f", side: true,
+      people: [["Guard", "route_11_gate_1f_p0", 7.0, 0.8, "s", "guard"]] },
     { id: "gate_r12", name: "Route 12 gate", floor: "Lavender Town to Route 12", group: "Routes 11 to 18", up: "gate_r12_2f",
       people: [["Guard", "route_12_gate_1f_p0", 12.6, 7.6, "w", "guard"]] },
-    { id: "gate_r15", name: "Route 15 gate", floor: "Fuchsia City to Route 15", group: "Routes 11 to 18", up: "gate_r15_2f",
-      people: [["Guard", "route_15_gate_1f_p0", 12.6, 7.6, "w", "guard"]] },
-    { id: "gate_r16n", name: "Route 16 gate", floor: "North way (to the house)", group: "Routes 11 to 18", up: "gate_r16_2f",
-      people: [["Gambler", "route_16_gate_1f_p1", 2.4, 7.4, "e", "gambler"]] },
-    { id: "gate_r16s", name: "Route 16 gate", floor: "South way (the Cycling Road)", group: "Routes 11 to 18", needs: "bicycle",
-      people: [["Guard", "route_16_gate_1f_p0", 12.6, 6.0, "w", "guard"]] },
-    { id: "gate_r18", name: "Route 18 gate", floor: "Fuchsia City to the Cycling Road", group: "Routes 11 to 18", needs: "bicycle",
-      people: [["Guard", "route_18_gate_1f_p0", 12.6, 6.0, "w", "guard"]] },
+    { id: "gate_r15", name: "Route 15 gate", floor: "Fuchsia City to Route 15", group: "Routes 11 to 18", up: "gate_r15_2f", side: true,
+      people: [["Guard", "route_15_gate_1f_p0", 7.0, 0.8, "s", "guard"]] },
+    { id: "gate_r16n", name: "Route 16 gate", floor: "North way (to the house)", group: "Routes 11 to 18", up: "gate_r16_2f", side: true,
+      people: [["Gambler", "route_16_gate_1f_p1", 8.0, 8.4, "n", "gambler"]] },
+    { id: "gate_r16s", name: "Route 16 gate", floor: "South way (the Cycling Road)", group: "Routes 11 to 18", needs: "bicycle", needsAt: "w", side: true,
+      people: [["Guard", "route_16_gate_1f_p0", 7.0, 0.8, "s", "guard"]] },
+    { id: "gate_r18", name: "Route 18 gate", floor: "Fuchsia City to the Cycling Road", group: "Routes 11 to 18", needs: "bicycle", needsAt: "w", side: true,
+      people: [["Guard", "route_18_gate_1f_p0", 7.0, 0.8, "s", "guard"]] },
   ];
   for (const g of GATES) PLACES.push({ id: g.id, name: g.name, floor: g.floor, group: g.group });
   PLACES.push({ id: "route12_house", name: "Route 12 house", floor: "The Fishing Guru's brother", group: "Routes 11 to 18" });
@@ -31,18 +55,24 @@
   const facing = { n: FACE.n, s: FACE.s, e: FACE.e, w: FACE.w };
   for (const g of GATES) {
     BUILD[g.id] = function () {
-      const R = new Room(g.id, { name: g.name, floor: g.floor, W: 14, D: 14, outsideSize: "16 by 12" });
-      lgGate(R, { south: { to: "town" }, north: { to: "town", needs: g.needs }, stairs: g.up ? { to: g.up, spawn: STAIRS_TOP } : null,
-        view: "Outside: " + g.floor.toUpperCase().replace(/ TO /, " and ") + ".", leaflet: "A glass table. There's a leaflet: CYCLING ROAD, KANTO'S FASTEST WAY SOUTH!" });
+      const view = "Outside: " + g.floor.toUpperCase().replace(/ TO /, " and ") + ".", leaflet = "A glass table. There's a leaflet: CYCLING ROAD, KANTO'S FASTEST WAY SOUTH!";
+      const blocked = g.needs === "tea" ? ["The guard won't let you into SAFFRON CITY: he's too thirsty to think about anything else."]
+        : ["No one on foot is allowed on CYCLING ROAD. (You need a BICYCLE.)"];
+      const at = k => g.needs && g.needsAt === k ? { needs: g.needs, lines: blocked } : {};
+      const R = g.side ? new Room(g.id, { name: g.name, floor: g.floor, W: 16, D: 10, outsideSize: "9 by 12" })
+        : new Room(g.id, { name: g.name, floor: g.floor, W: 14, D: 14, outsideSize: "16 by 12" });
+      if (g.side) lgGateSide(R, { west: at("w"), east: at("e"), stairs: g.up ? { to: g.up, spawn: STAIRS_TOP } : null, view, leaflet });
+      else lgGate(R, { south: Object.assign({ to: "town" }, at("s")), north: Object.assign({ to: "town" }, at("n")), stairs: g.up ? { to: g.up, spawn: STAIRS_TOP } : null, view, leaflet });
       for (const [name, key, x, z, f, skin] of g.people) {
         R.npcs.push({ name, key, x, z, yaw: facing[f], look: { skin },
           talk: () => [{ text: name === "Guard" && g.needs === "tea" ? "I'm on guard duty. Gee, I'm thirsty, though!" : name === "Guard" && g.needs === "bicycle"
             ? "No pedestrians are allowed on CYCLING ROAD!" : "Welcome! Mind how you go." }] });
       }
-      R.spawn = LG_GATE_IN;
+      R.spawn = g.side ? { x: 14.4, z: 5.0, yaw: FACE.w } : LG_GATE_IN;
       return R;
     };
   }
+  const SIDE_GATE = new Set(GATES.filter(g => g.side).map(g => g.id));
 
   // The gates' upstairs (FireRed's): binoculars at the windows north and south, the stairs down in the corner, and
   // who's there (Route 11's AIDE with the ITEMFINDER, Route 12's girl with a TM, Route 15's AIDE with the EXP.SHARE,
@@ -63,7 +93,8 @@
       const R = new Room(u.id, { name: u.name, floor: "Upstairs", W: 14, D: 10 });
       shell(R, { paper: "paperGateLG", floor: "gateCheck", floorRects: [[0, 0, 10, 10], [10, 2, 14, 10]], skirt: "gateWhite" });
       band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
-      stairsDown(R, 10, 0, 2, { to: u.down, spawn: { x: 9.2, z: 3.0, yaw: FACE.w }, paper: "paperGateLG" });
+      // (Down at the foot of the stairs: a sideways gate's are against its north wall.)
+      stairsDown(R, 10, 0, 2, { to: u.down, spawn: { x: 9.2, z: SIDE_GATE.has(u.down) ? 1.0 : 3.0, yaw: FACE.w }, paper: "paperGateLG" });
       const G = R.geo;
       // The binoculars on stands at the windows.
       windowN(R, 3.0, 1.4, 3.0, 1.6);

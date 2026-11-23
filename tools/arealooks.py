@@ -43,10 +43,10 @@ HOUSES = [(-807, 671, -794, 684, "your house"), (-789, 671, -776, 684, "Blue's h
 LAB = (-791, 687, -774, 698, "Prof. Oak's lab")
 GATE_BLOCKS = ("polished_deepslate,polished_deepslate_slab,polished_deepslate_stairs,deepslate_tile_wall,deepslate_tiles,deepslate_tile_slab,"
                "deepslate_tile_stairs,andesite,polished_andesite,polished_andesite_stairs,polished_andesite_slab,birch_stairs,birch_planks,birch_slab,"
-               "stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood")
+               "stripped_oak_log,stripped_oak_wood,stripped_jungle_log,stripped_jungle_wood,black_concrete")
 GATE = ("block/polished_deepslate=gate_roof,block/deepslate_tiles=gate_roof_rim,block/andesite=gate_pillar,block/polished_andesite=gate_stone,"
         "block/birch_planks=gate_wall_birch,block/stripped_oak_log=gate_wall_oak,block/stripped_oak_log_top=gate_wall_oak_top,"
-        "block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top")
+        "block/stripped_jungle_log=gate_beam,block/stripped_jungle_log_top=gate_beam_top,block/black_concrete=gate_dark")
 CENTER = ("block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,"
           "block/mangrove_planks=center_mangrove_planks")
 MART = "block/blue_concrete=mart_blue_concrete,block/blue_wool=mart_blue_wool"
@@ -610,9 +610,11 @@ def round49(add, room):
     add("swap", "purple_terracotta", LV, "block/purple_terracotta=lav_brick")
     add("roof_lav", "crimson_stairs", LV, "-", ("35", "42"))
     add("swap", "crimson_slab,crimson_planks", LV, "block/crimson_planks=roof_lav_tiles", ("35", "42"))
-    add("swap", "stripped_dark_oak_wood,stripped_dark_oak_log,stripped_jungle_wood,stripped_jungle_log,stripped_spruce_wood,stripped_spruce_log,dark_oak_slab", LV,
-        "block/stripped_dark_oak_log=lav_timber,block/stripped_dark_oak_log_top=lav_timber,block/stripped_jungle_log=lav_timber,"
-        "block/stripped_jungle_log_top=lav_timber,block/stripped_spruce_log=lav_timber,block/stripped_spruce_log_top=lav_timber,block/dark_oak_planks=lav_timber")
+    for b in LAV_HOUSES + LAV_SHOPS + [LAV_TOWER]:
+        add("swap", "stripped_dark_oak_wood,stripped_dark_oak_log,stripped_jungle_wood,stripped_jungle_log,stripped_spruce_wood,stripped_spruce_log,dark_oak_slab", b,
+            "block/stripped_dark_oak_log=lav_timber,block/stripped_dark_oak_log_top=lav_timber,block/stripped_jungle_log=lav_timber,"
+            "block/stripped_jungle_log_top=lav_timber,block/stripped_spruce_log=lav_timber,block/stripped_spruce_log_top=lav_timber,block/dark_oak_planks=lav_timber",
+            ("33", "45"))
     add("swap", "white_concrete,light_gray_concrete", LV, "block/white_concrete=lav_base,block/light_gray_concrete=lav_base_dark", ("33", "33"))
     add("swap", "dark_oak_shelf,pale_oak_shelf", LV, "block/dark_oak_shelf=lav_planter,block/pale_oak_shelf=lav_planter")
     add("swap", "white_carpet", LV, "block/white_wool=lav_sill")
@@ -661,7 +663,7 @@ ROUTE17 = (-665, 445, -615, 757, "Route 17")
 ROUTE18 = (-665, 758, -561, 805, "Route 18")
 SOUTH_ROUTES = [ROUTE11, ROUTE12, ROUTE13, ROUTE14, ROUTE15, ROUTE16, ROUTE17, ROUTE18]
 BENCHES = [(-261, 758), (-621, 483), (-638, 544), (-638, 642), (-658, 753)]
-R17_LAMPS = [(x, z) for z in range(468, 739, 30) for x in (-658, -621)] + [(-542, 788), (-558, 429)]
+R17_LAMPS = [(x, z) for z in range(468, 739, 30) for x in (-658, -621)] + [(-558, 429)]
 ROUTE_SIGNS = [(-351, -350, 789, 30, 31), (-117, -116, 473, 31, 32), (-341, -340, 560, 31, 32), (-123, -122, 585, 31, 32), (-265, -264, 711, 31, 32),
                (-209, -208, 715, 31, 32), (-630, -629, 496, 33, 34), (-633, -632, 547, 33, 33), (-633, -632, 639, 33, 33), (-650, -649, 690, 33, 34)]
 # The Day Care's build (Route 5), which John also put on Routes 12 and 16: its box and its floor's height. All three
@@ -718,6 +720,7 @@ def round50(add, room):
         add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ("32", "42"))
     for r in (ROUTE16, ROUTE17, ROUTE18):
         add("swap", "gray_concrete", r, "block/gray_concrete=tarmac@4")
+    round51(add, room)
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -791,6 +794,24 @@ QUARTZ = ("block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_cl
           "block/quartz_pillar=quartz_clean_pillar,block/quartz_pillar_top=quartz_clean,block/chiseled_quartz_block=quartz_clean,"
           "block/chiseled_quartz_block_top=quartz_clean,block/quartz_bricks=quartz_clean")
 
+
+
+def round51(add, room):
+    """0.51.0's looks (09:01 to 09:30): see tools/looks51.py for the pictures."""
+    K_ = KANTO
+    # The big trees' trunks bark everywhere (09:11: Route 14's "across the board"), in the forest and the Safari Zone too.
+    add("swap", "oak_wood,oak_log", K_, "block/oak_log=tree_bark,block/oak_log_top=tree_bark")
+    room("swap", "oak_wood,oak_log", (4095, -1, 4500, 400, "Viridian Forest"), "block/oak_log=tree_bark,block/oak_log_top=tree_bark")
+    room("swap", "oak_wood,oak_log", (6143, -1, 6144 + 352, 214, "the SAFARI ZONE"), "block/oak_log=tree_bark,block/oak_log_top=tree_bark")
+    # Route 15's lamps as the Cycling Road's (the same lamp: orange metal, warm frosted glass, lit globes).
+    add("swap", "red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern", ROUTE15,
+        "block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,"
+        "block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!", ("30", "42"))
+    add("glass", "black_stained_glass_pane", ROUTE15, "block/black_stained_glass=glass_lamp", ("30", "42"))
+    # Pewter's yellow doors (John's bamboo doors), a style of their own.
+    add("swap", "bamboo_door", PEWTER, "block/bamboo_door_top=door_yellow_top,block/bamboo_door_bottom=door_yellow_bottom")
+    # Lily pads, Let's Go's, everywhere.
+    add("swap", "lily_pad", K_, "block/lily_pad=lily_lg!")
 
 if __name__ == "__main__":
     main()

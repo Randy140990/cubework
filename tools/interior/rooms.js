@@ -16,7 +16,7 @@ const PLACES = [
   { id: "gate_s", name: "Route 2 gate", floor: "South", group: "Route 2" },
   { id: "gate_n", name: "Route 2 gate", floor: "North", group: "Route 2" },
   { id: "gate_league", name: "Pokémon League Gate", floor: "Route 22", group: "Route 22" },
-  { id: "gate_johto", name: "Route 28 Gate", floor: "Route 22", group: "Route 22" },
+  { id: "gate_johto", name: "Johto Gate", floor: "Route 22", group: "Route 22" },
   { id: "arena_lab", name: "Lab battle", floor: "Battle arena", group: "Battle arenas" },
   { id: "arena_route", name: "Route battle", floor: "Battle arena (outside)", group: "Battle arenas" },
   { id: "town", name: "Pallet Town", floor: "Outside", group: "Outside" },
@@ -642,11 +642,12 @@ function lgGate(R, o) {
   // beyond), its mat its whole width with the arrows pointing out; palms either side.
   const north = o.north || {};
   passageN(R, LG_GATE_NOOK[0], LG_GATE_NOOK[1], north.none ? { none: true, mat: "matGateN", frame: "paint" } : { to: north.to, spawn: north.spawn, mat: "matGateN", frame: "paint", needs: north.needs,
-    lines: north.needs === "safari" ? ["The way into the SAFARI ZONE. (In the game: once you've paid at the counter.)"] : undefined });
+    opening: north.opening || "gateTunnel", tunnel: !north.opening,
+    lines: north.lines || (north.needs === "safari" ? ["The way into the SAFARI ZONE. (In the game: once you've paid at the counter.)"] : undefined) });
   if (north.none) R.act([LG_GATE_NOOK[0], 0, LG_GATE_NOOK[1], 1.2], { label: "Look", lines: north.lines });
   palm(R, 3.9, N + 0.8, 1.0); palm(R, 10.1, N + 0.8, 1.0);
   // The runner, from the way on at the north to the door at the south.
-  rug(R, 5, N, 9, R.Dm, "gateRun");
+  runner(R, 5, N, 9, R.Dm, "gateRunN");
   // Stools round two glass tables on the east side, a few along the west wall; plants; a bin.
   // (0.50) A gate with an upstairs: the stairs up along the north wall on the east side, the tables a little further down.
   const up = o.stairs, S = up ? 1.3 : 0;
@@ -661,7 +662,8 @@ function lgGate(R, o) {
   slimPlant(R, 0.8, 3.4 + N, 1.0); plant(R, 1.0, R.Dm - 1.0, 1.0, { pot: "potWhite", lines: ["A leafy plant in a white pot."] }); slimPlant(R, 13.2, R.Dm - 1.0, 1.0);
   if (!up) bin(R, 13.3, 1.0 + N);
   const south = o.south || {};
-  doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], south.none ? { none: true, mat: "matGate" } : { to: south.to, spawn: south.spawn || { x: 6.9, z: D - 2.0, yaw: FACE.s }, mat: "matGate" });
+  doormat(R, LG_GATE_DOOR[0], LG_GATE_DOOR[1], south.none ? { none: true, mat: "matGate" } : { to: south.to, spawn: south.spawn || { x: 6.9, z: D - 2.0, yaw: FACE.s }, mat: "matGate",
+    needs: south.needs, lines: south.lines });
   if (south.none) R.act([LG_GATE_DOOR[0], D - 1.4, LG_GATE_DOOR[1], D], { label: "Look", lines: south.lines });
 }
 // A soft armchair (as the Centers' waiting seats): x, z its middle, face the way you'd look sitting in it.
@@ -1694,12 +1696,12 @@ const BUILD = {
     // ROUTE 22 at the east; at the west the way on under the mountain, to ROUTE 28 (or, for the CHAMPION, round to
     // ROUTE 26 and JOHTO; the game asks which). A guard at his desk on the north wall, a blue runner between the
     // ways through, glass tables and stools along the front.
-    const R = new Room("gate_johto", { name: "Route 28 Gate", floor: "Route 22", W: 16, D: 10, outsideSize: "9 by 12" });
+    const R = new Room("gate_johto", { name: "Johto Gate", floor: "Route 22", W: 16, D: 10, outsideSize: "9 by 12" });
     shell(R, { paper: "paperGateLG", floor: "gateCheck", skirt: "gateWhite", westNook: [3, 7], eastNook: [3, 7], ledge: "gateBlue", ledgeTop: "gateWhite" });
     band(R, 0.24, "gateBlue", 1.1); band(R, 1.34, "gateWhite", 0.1);
-    passageSide(R, "e", 3, 7, { to: "town", mat: "matGateEast", frame: "paint" });
-    passageSide(R, "w", 3, 7, { to: "town", mat: "matGateWest", frame: "paint", choice: "johto" });
-    rug(R, 2, 3, 14, 7, "gateRunX");
+    passageSide(R, "e", 3, 7, { to: "town", mat: "matGateEast", frame: "paint", opening: "gateTunnel", tunnel: true });
+    passageSide(R, "w", 3, 7, { to: "town", mat: "matGateWest", frame: "paint", choice: "johto", opening: "gateTunnel", tunnel: true });
+    runner(R, 2, 3, 14, 7, "gateRunE");
     // Two windows behind the guard (the light falls across his desk), the map of the way west beside them, a notice.
     crossWindowN(R, 4.3, 1.5, 1.8, 1.4, ["Outside: the mountain's foot, and ROUTE 22's grass."]);
     crossWindowN(R, 9.9, 1.5, 1.8, 1.4, ["Outside: the mountain going up and up into the clouds."]);

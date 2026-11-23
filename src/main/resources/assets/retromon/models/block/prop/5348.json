@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ug_trim","ug_trim":"retromon:block/interior/ug_trim"},"elements":[{"from":[0.0,0.0,16],"to":[1.12,3.84,16],"faces":{"north":{"uv":[14.88,12.16,16.0,16.0],"texture":"#ug_trim"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pot_white","pot_white":"retromon:block/interior/pot_white"},"elements":[{"from":[9.768,16,9.768],"to":[15.832,16,15.832],"faces":{"down":{"uv":[1.2401,1.4881,8.7599,10.5119],"texture":"#pot_white"}}}]}
