@@ -5568,6 +5568,13 @@ swap	sea_lantern	-2093	775	-2070	793	21	26	block/sea_lantern=glass_dark	the Day 
 swap	oak_stairs,oak_slab,oak_planks	-1963	849	-1951	859	19	25	block/oak_planks=well_roof	the Slowpoke Well
 swap	andesite,andesite_stairs,andesite_slab,andesite_wall,stone_bricks,stone_brick_wall,stone_brick_slab,stone_brick_stairs,cobblestone,cobblestone_wall	-1963	849	-1951	859	14	25	block/andesite=well_stone,block/stone_bricks=well_stone,block/cobblestone=well_stone	the Slowpoke Well
 swap	spruce_trapdoor	-1963	849	-1951	859	14	18	block/spruce_trapdoor=well_cover	the Slowpoke Well
+swap	stripped_spruce_log,stripped_spruce_wood	-1963	849	-1951	859	18	20	block/stripped_spruce_log=well_beam,block/stripped_spruce_log_top=well_beam	the Slowpoke Well
+swap	barrel	-1963	849	-1951	859	18	20	block/barrel_side=well_bucket,block/barrel_top=well_bucket,block/barrel_bottom=well_bucket	the Slowpoke Well
+swap	black_concrete	-1963	849	-1951	859	12	15	block/black_concrete=cave_dark	the Slowpoke Well
+swap	end_rod	-2123	702	-2109	714	24	26	block/end_rod=gc_bulbs!	Goldenrod's GAME CORNER
+swap	sea_lantern	-2123	702	-2109	714	19	21	block/sea_lantern=gc_floor_lights!	Goldenrod's GAME CORNER
+swap	acacia_button	-2123	702	-2109	714	24	26	block/acacia_planks=gold_trim	Goldenrod's GAME CORNER
+glass	light_blue_stained_glass,light_blue_stained_glass_pane	-2123	702	-2109	714	20	29	block/light_blue_stained_glass=glass_lamp	Goldenrod's GAME CORNER
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care

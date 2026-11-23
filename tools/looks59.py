@@ -178,7 +178,39 @@ def goldenrod():
     save("alley_fence", L.metal(hexc("#2F4A3A"), seam=False))
 
 
+# ---------- the Game Corner's and the Slowpoke Well's outsides (19:08: "I want all exteriors squared away") ----------
+def outsides():
+    # The Game Corner: marquee bulbs along its front, the gold lights in its doorway's floor.
+    im = _img()
+    for y in range(16):
+        for x in range(16):
+            c = hexc("#3A2A4A")
+            d = math.hypot((x % 8) - 3.5, (y % 8) - 3.5)
+            if d < 2.6: c = mix(hexc("#FFF6D8"), hexc("#FFC94A"), d / 2.6)
+            _put(im, x, y, c)
+    save("gc_bulbs", im)
+    im = _img()
+    for y in range(16):
+        for x in range(16):
+            c = hexc("#E9B640")
+            if x in (0, 15) or y in (0, 15): c = shade(c, -0.25)
+            elif (x // 4 + y // 4) % 2 == 0: c = mix(c, hexc("#FFF1C2"), 0.45)
+            _put(im, x, y, c)
+    save("gc_floor_lights", im)
+    # The well: its windlass beam dark wood, its bucket staves with iron bands.
+    save("well_beam", S.dojo_wood(hexc("#4A3326"), "wellb", vertical=False))
+    im = _img()
+    r = random.Random("bucket59")
+    for y in range(16):
+        for x in range(16):
+            c = shade(hexc("#8A6242"), (r.random() - 0.5) * 0.06 - (0.12 if x % 4 == 0 else 0))
+            if y in (2, 3, 12, 13): c = shade(hexc("#5E6266"), 0.05 if y in (2, 12) else -0.08)
+            _put(im, x, y, c)
+    save("well_bucket", im)
+
+
 def build():
+    outsides()
     volcano()
     lamps()
     plateau()

@@ -229,3 +229,15 @@ def round59(add, room, G):
     add("swap", "andesite,andesite_stairs,andesite_slab,andesite_wall,stone_bricks,stone_brick_wall,stone_brick_slab,stone_brick_stairs,cobblestone,cobblestone_wall", WB,
         "block/andesite=well_stone,block/stone_bricks=well_stone,block/cobblestone=well_stone", ys(14, 25))
     add("swap", "spruce_trapdoor", WB, "block/spruce_trapdoor=well_cover", ys(14, 18))
+    # (19:08: "you don't need the insides right now ... I want all exteriors squared away") Its windlass, its bucket,
+    # the dark of the shaft.
+    add("swap", "stripped_spruce_log,stripped_spruce_wood", WB, "block/stripped_spruce_log=well_beam,block/stripped_spruce_log_top=well_beam", ys(18, 20))
+    add("swap", "barrel", WB, "block/barrel_side=well_bucket,block/barrel_top=well_bucket,block/barrel_bottom=well_bucket", ys(18, 20))
+    add("swap", "black_concrete", WB, "block/black_concrete=cave_dark", ys(12, 15))
+    # Goldenrod's GAME CORNER (19:08), its outside its own: marquee bulbs along its front, gold lights in its doorway's
+    # floor, its windows lit warm, the gold stud on its sign.
+    GC = (-2123, 702, -2109, 714, "Goldenrod's GAME CORNER")
+    add("swap", "end_rod", GC, "block/end_rod=gc_bulbs!", ys(24, 26))
+    add("swap", "sea_lantern", GC, "block/sea_lantern=gc_floor_lights!", ys(19, 21))
+    add("swap", "acacia_button", GC, "block/acacia_planks=gold_trim", ys(24, 26))
+    add("glass", "light_blue_stained_glass,light_blue_stained_glass_pane", GC, "block/light_blue_stained_glass=glass_lamp", ys(20, 29))
