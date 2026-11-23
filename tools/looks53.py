@@ -150,6 +150,14 @@ def trophy_model():
     L.write_json(os.path.join(L.MODELS, "prop_trophy.json"), model)
 
 
+def mon_statue_model():
+    """(11:57: "make it like one of our retro ones... just a conversion") The plateau's golem statues as statues of
+    one of our own creatures: our RHYDON (the Gyms' statue in the first games), in polished bronze, facing the way in,
+    on each golem's own pedestal (the golem itself not drawn)."""
+    import mon_statue
+    mon_statue.model("rhydon", "retromon:block/area/metal_bronze", 15.5, os.path.join(L.MODELS, "prop_mon_statue.json"))
+
+
 def golems_away():
     """The copper golems themselves not drawn (their pedestals carry the POKé BALLs): the look pack's weathered
     copper golem left clear."""
@@ -242,6 +250,7 @@ def build():
     save("trophy_white", S.shiny(hexc("#EEF0F2"), "trw"))
     save("trophy_red", S.shiny(hexc("#D8393A"), "trr"))
     trophy_model()
+    mon_statue_model()
     golems_away()
     build_goldenrod()
 

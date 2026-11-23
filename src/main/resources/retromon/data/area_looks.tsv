@@ -2155,34 +2155,34 @@ swap	smooth_quartz_slab,polished_diorite_slab	-927	148	-898	240	25	35	block/quar
 swap	black_concrete	-916	163	-909	166	33	40	block/black_concrete=gate_dark	the INDIGO PLATEAU's doorway
 swap	diorite_wall	-927	148	-898	240	40	48	block/diorite=plateau_stone	the INDIGO PLATEAU
 swap	resin_bricks,resin_brick_stairs,resin_brick_slab	-926	150	-899	171	26	46	block/resin_bricks=plateau_brick_dark	the INDIGO PLATEAU's corner pillars
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	204	-919	204	31	31	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	207	-919	207	31	31	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	194	-919	194	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	197	-919	197	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	184	-919	184	39	39	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	187	-919	187	39	39	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-917	178	-917	178	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-917	180	-917	180	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	204	-916	204	31	31	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	207	-916	207	31	31	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	194	-916	194	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	197	-916	197	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	184	-916	184	39	39	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	187	-916	187	39	39	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	204	-909	204	31	31	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	207	-909	207	31	31	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	178	-909	178	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	180	-909	180	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	194	-909	194	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	197	-909	197	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	184	-909	184	39	39	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	187	-909	187	39	39	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	204	-906	204	31	31	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	207	-906	207	31	31	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	194	-906	194	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	197	-906	197	35	35	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	184	-906	184	39	39	trophy	a statue's pedestal
-prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	187	-906	187	39	39	trophy	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	204	-919	204	31	31	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	207	-919	207	31	31	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	194	-919	194	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	197	-919	197	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	184	-919	184	39	39	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-919	187	-919	187	39	39	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-917	178	-917	178	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-917	180	-917	180	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	204	-916	204	31	31	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	207	-916	207	31	31	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	194	-916	194	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	197	-916	197	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	184	-916	184	39	39	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-916	187	-916	187	39	39	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	204	-909	204	31	31	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	207	-909	207	31	31	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	178	-909	178	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	180	-909	180	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	194	-909	194	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	197	-909	197	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	184	-909	184	39	39	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-909	187	-909	187	39	39	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	204	-906	204	31	31	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	207	-906	207	31	31	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	194	-906	194	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	197	-906	197	35	35	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	184	-906	184	39	39	mon_statue	a statue's pedestal
+prop	waxed_weathered_cut_copper_stairs,waxed_cut_copper	-906	187	-906	187	39	39	mon_statue	a statue's pedestal
 swap	stripped_jungle_wood	-1010	100	60	1060	-	-	block/stripped_jungle_log=hill_top@4|drip_rock@4	Kanto
 swap	oak_stairs	-395	389	-305	459	34	34	block/oak_planks=sill_saf	Saffron City
 swap	oak_stairs	-565	385	-452	462	34	34	block/oak_planks=sill_cel	Celadon City

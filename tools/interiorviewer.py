@@ -74,6 +74,10 @@ def boulders():
     for n in ("boulder_a", "boulder_b", "boulder_small", "iboulder_a", "iboulder_b", "iboulder_small", "rboulder_a", "rboulder_b", "rboulder_small"):
         m = json.load(open(os.path.join(root, n + ".json")))
         out[n] = [e["from"] + e["to"] for e in m["elements"]]
+    # (0.53) The plateau's statues of our RHYDON (tools/mon_statue.py): each box, and its turn (axis, angle, origin).
+    m = json.load(open(os.path.join(root, "prop_mon_statue.json")))
+    out["prop_mon_statue"] = [e["from"] + e["to"] + ([e["rotation"]["axis"], e["rotation"]["angle"]] + e["rotation"]["origin"] if "rotation" in e else [])
+                              for e in m["elements"]]
     return out
 
 def engine():

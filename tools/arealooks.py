@@ -1115,12 +1115,13 @@ GOLD_SIGNS = [(-2188, 694), (-2146, 696), (-2117, 696)]
 def round53(add, room):
     """0.53.0 (John's 11:16): see tools/looks53.py."""
     # The INDIGO PLATEAU: the stone walls along its roof its cream stone; its orange corner pillars a deeper red brick;
-    # on each golem's pedestal a POKé BALL on a gold stand (the golem itself isn't drawn: the look pack).
+    # (11:57) each golem a statue of one of our own creatures instead: our RHYDON in polished bronze, on its pedestal
+    # (the golem itself isn't drawn: the look pack).
     add("swap", "diorite_wall", PLATEAU, "block/diorite=plateau_stone", ("40", "48"))
     add("swap", "resin_bricks,resin_brick_stairs,resin_brick_slab", (-926, 150, -899, 171, "the INDIGO PLATEAU's corner pillars"),
         "block/resin_bricks=plateau_brick_dark", ("26", "46"))
     for x, y, z in PLATEAU_GOLEMS:
-        add("prop", "waxed_weathered_cut_copper_stairs,waxed_cut_copper", (x, z, x, z, "a statue's pedestal"), "trophy", (str(y - 1), str(y - 1)))
+        add("prop", "waxed_weathered_cut_copper_stairs,waxed_cut_copper", (x, z, x, z, "a statue's pedestal"), "mon_statue", (str(y - 1), str(y - 1)))
     # The cliffs' stripped jungle wood (Route 22's "brown"), all over the map: the cliffs' rock and earthy tops, as their
     # mushroom blocks. (Where a place has its own look for it, a gate's, Lavender's timber, that's drawn instead.)
     add("swap", "stripped_jungle_wood", KANTO, "block/stripped_jungle_log=hill_top@4|drip_rock@4")

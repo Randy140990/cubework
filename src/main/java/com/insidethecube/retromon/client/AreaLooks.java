@@ -155,6 +155,7 @@ public final class AreaLooks {
 			part(ctx, "prop_bike", "block/area/prop_bike");
 			part(ctx, "prop_statue", "block/area/prop_statue");
 			part(ctx, "prop_trophy", "block/area/prop_trophy");
+			part(ctx, "prop_mon_statue", "block/area/prop_mon_statue");
 			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;

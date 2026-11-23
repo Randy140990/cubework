@@ -1,9 +1,9 @@
-// ---------- 0.53.0's looks on show (John's 11:16): the Plateau, Route 23's statues, Saffron and Celadon, Goldenrod ----------
+// ---------- 0.53.0's looks on show (John's 11:16, 11:57): the Plateau, Route 23's statues, Saffron and Celadon, Goldenrod ----------
 (function () {
   PLACES.push({ id: "looks53", name: "Plateau, Celadon and Goldenrod looks", floor: "Outside (the mod's blocks)", group: "Outside" });
   BUILD.looks53 = function () {
     // On John's blocks as the mod draws them now: the INDIGO PLATEAU's corner pillar and roof walls, a statue's
-    // pedestal with its POKé BALL; one of ROUTE 23's statues (John's blocks); a Saffron shop front (a sill under the
+    // pedestal with its statue of our RHYDON; one of ROUTE 23's statues (John's blocks); a Saffron shop front (a sill under the
     // window, the new glass doors); Celadon's bench, fountain stone, flat trim, the pond in quartz, the GAME CORNER's
     // sign; Goldenrod's street (brick road, golden tiles, kerb), its lamp, its fence and column.
     const R = new Room("looks53", { name: "Plateau, Celadon and Goldenrod looks", floor: "Outside (the mod's blocks)", W: 34, D: 22, H: 9, outside: true });
@@ -17,16 +17,17 @@
     R.item("INDIGO PLATEAU", "Its corner pillars (John's resin bricks) a deeper red brick; the stone walls along its roof (his diorite walls) its cream stone.");
     // A golem's pedestal (polished teal metal) and the POKé BALL on its gold stand in place of the golem.
     G.box(10, 0, 4, 11, 1, 5, { all: "area_metal_teal" });
-    const px = 10.5, pz = 4.5, s = 1 / 16;
-    G.box(px - 4 * s, 1, pz - 4 * s, px + 4 * s, 1 + 1.5 * s, pz + 4 * s, "area_statue_gold");
-    for (const [lo, hi, m] of [[2.5, 7.5, "area_trophy_white"], [8.5, 13.5, "area_trophy_red"]]) {
-      G.box(px - 4.5 * s, 1 + (lo + 1) * s, pz - 3.5 * s, px + 4.5 * s, 1 + (hi - 1) * s, pz + 3.5 * s, m);
-      G.box(px - 3.5 * s, 1 + lo * s, pz - 3.5 * s, px + 3.5 * s, 1 + hi * s, pz + 3.5 * s, m);
+    // Our RHYDON in polished bronze (the mod's model of it, tools/mon_statue.py), on the pedestal's top.
+    for (const e of BOULDERS.prop_mon_statue) {
+      const [x0, y0, z0, x1, y1, z1, axis, angle, ox, oy, oz] = e, k = 1 / 16;
+      if (axis) {
+        const p = R.part(10 + ox * k, oy * k, 4 + oz * k);
+        p.geo.box(10 + x0 * k, y0 * k, 4 + z0 * k, 10 + x1 * k, y1 * k, 4 + z1 * k, "area_metal_bronze");
+        p.grp.rotation[axis] = angle * Math.PI / 180;
+      } else G.box(10 + x0 * k, y0 * k, 4 + z0 * k, 10 + x1 * k, y1 * k, 4 + z1 * k, "area_metal_bronze");
     }
-    G.box(px - 4.7 * s, 1 + 7.5 * s, pz - 4.7 * s, px + 4.7 * s, 1 + 8.5 * s, pz + 4.7 * s, "area_statue_band");
-    G.box(px - 1.5 * s, 1 + 6.6 * s, pz + 4.4 * s, px + 1.5 * s, 1 + 9.4 * s, pz + 5.2 * s, "area_statue_gold");
     R.solid(10, 4, 11, 5);
-    R.item("The plateau's statues", "The copper golems not drawn: on each pedestal a POKé BALL (red over white, polished) on a gold stand.");
+    R.item("The plateau's statues", "John's copper golems as statues of one of our own creatures: our RHYDON in polished bronze, on each pedestal, facing the way in.");
     // ROUTE 23's statue: John's cauldron, hopper and walls, the anvils and the middle top, in statue stone and gold.
     const sx = 14;
     G.box(sx + 1, 0, 4, sx + 2, 1, 5, { all: "area_statue_stone", top: "area_statue_stone_top" });
@@ -72,7 +73,7 @@
     G.box(31.4, 3, 18.4, 31.6, 3.7, 18.6, "area_gold_rod");
     R.solid(31, 18, 32, 19);
     R.item("GOLDENROD CITY", "Its streets red-brown brick, its pavements golden tiles, its kerbs pale stone; its lamps dark bronze with gold caps and amber globes; its fences crisp white with gold caps; its columns fluted white with gold rings.");
-    R.spawn = { x: 17, z: 13.5, yaw: FACE.n };
+    R.spawn = { x: 11.5, z: 7.0, yaw: FACE.n };
     return R;
   };
 })();
