@@ -179,9 +179,11 @@
     const walkable = (x, z) => WALK.includes(cellKind(x, z)) || doorCells.has(x + "," + z) || (cellKind(x, z) === "F");
 
     // ----- the floor -----
+    const downAt = new Set(F.warps.filter(w => w.kind === "stairs" && w.to && !(floorNo(w.to) > floorNo(id) || /roof/.test(w.to) && !/roof/.test(id))).map(w => w.x + "," + w.z));
     for (let z = 0; z < D; z++) for (let x = 0; x < W; x++) {
       if (at(x, z) === "v") continue;
       R._floors.push([x, z, x + 1, z + 1]);
+      if (FIT && downAt.has(x + "," + z)) continue;
       const s = spinAt[x + "," + z];
       const top = s ? SPIN[s] : (L.floor[flAt(x, z)] || L.floor.a);
       G.box(x, -1.2, z, x + 1, 0, z + 1, { top, all: "dsFloorEdge", bottom: null });
@@ -203,8 +205,37 @@
     }
 
     // ----- the walls -----
-    const H = L.H, TALL = kind === "roof" ? 1.1 : Math.min(H, 2.6);
-    for (let z = 0; z < D; z++) {
+    const H = L.H, TALL = kind === "roof" ? 1.1 : FIT ? 3 : Math.min(H, 2.6);
+    // (0.61 fit-out, John's 17:53: "shouldn't they have like a left and right wall? Obviously not having the bottom one
+    // makes sense") Walls a block thick wherever the room meets what's past it, on the left, the right and at the back
+    // (FireRed's void too), three blocks tall; the front left low, as a house's ledge; a wall's top drawn as a section,
+    // and nothing drawn behind a wall's face (the dark past it, as in the houses).
+    if (FIT) {
+      const floorish = (x, z) => x >= 0 && z >= 0 && x < W && z < D && at(x, z) !== "v" && (!tall(x, z) || doorCells.has(x + "," + z));
+      const role = (x, z) => {
+        if (floorish(x, z)) return null;
+        // A wall where the room is in front of it or beside it (and not past it: a cell with floor just north of it is
+        // the room's front, kept low).
+        let back = false, side = false, front = false;
+        for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) { if ((dx || dz) && floorish(x + dx, z + dz)) { if (dz > 0) back = true; else if (dz === 0) side = true; else front = true; } }
+        return back || (side && !floorish(x, z - 1)) ? "wall" : front || side ? "front" : null;
+      };
+      const wallMat = L.fitWall || L.wall, low = L.low;
+      for (let z = -1; z <= D; z++) {
+        let x = -1;
+        while (x <= W) {
+          const r0 = role(x, z);
+          if (!r0 || (L.lowWalls && lowWall(x, z))) { x++; continue; }
+          let x1 = x; while (x1 <= W && role(x1, z) === r0 && !(L.lowWalls && lowWall(x1, z))) x1++;
+          if (r0 === "front") G.box(x, 0, z, x1, 0.7, z + 1, { all: L.fitLedge || "walnut", top: L.fitLedge || "honey", bottom: null, n: null });
+          else if (low) { G.box(x, 0, z, x1, 1, z + 1, { all: low, top: null, bottom: null }); G.box(x, 1, z, x1, TALL, z + 1, { all: wallMat, top: "cap", bottom: null }); }
+          else { G.box(x, 0, z, x1, 1 / 16 * 4, z + 1, { all: L.skirt || wallMat, top: null, bottom: null }); G.box(x, 0.25, z, x1, TALL, z + 1, { all: wallMat, top: "cap", bottom: null }); }
+          x = x1;
+        }
+      }
+      R.solid(-1, -1, 0, D + 1); R.solid(W, -1, W + 1, D + 1); R.solid(-1, -1, W + 1, 0);
+    }
+    for (let z = 0; z < D && !FIT; z++) {
       let x = 0;
       while (x < W) {
         const c = tall(x, z) && !lowWall(x, z) && !doorCells.has(x + "," + z);
@@ -239,7 +270,7 @@
       if (z >= D || !tall(x, z)) continue;
       const zf = faceBelow(x, z);
       if (zf >= D || !walkable(x, zf)) continue;
-      if (kind === "tower" && x % 3 === 1) G.box(x - 0.1, 0.1, zf - 0.03, x + 1.1, 2.4, zf, { s: "twArch", all: null });
+      if (kind === "tower" && x % 3 === 1) { if (FIT) G.box(x, 0.25, zf - 0.03, x + 1, 2.5, zf, { s: "fitTowerArch", all: null }); else G.box(x - 0.1, 0.1, zf - 0.03, x + 1.1, 2.4, zf, { s: "twArch", all: null }); }
       if ((kind === "ship") && x % 4 === 2) G.box(x + 0.15, 1.2, zf - 0.03, x + 0.85, 1.9, zf, { s: "ssPort", all: null });
       if (kind === "cgym" && x % 2 === 1 && x > 1 && x < W - 2) G.box(x + 0.1, 0.9, zf - 0.03, x + 0.9, 2.4, zf, { s: "cgPane", all: null });
     }
@@ -252,6 +283,21 @@
         const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
         if (kind === "vgym" || kind === "cgym") gymStatue(R, cx, cz, [F.name.toUpperCase() + "'s statue.", "WINNING TRAINERS: {rival}"]);
         else { G.box(x0 + 0.2, 0, z0 + 0.4, x1 - 0.2, 1.4, z1 - 0.3, { all: "walnut", s: "sign", top: "walnut" }); R.act(near, { label: "Read", lines: ["A sign."] }); }
+      } else if (c === "G" && FIT) {
+        // (0.61) A gravestone a block: a low plinth, the stone standing at its back (its top stepped round), a POKé
+        // BALL carved in its face, a little vase of flowers before it.
+        for (const [a, b] of cells) {
+          G.box(a + 0.06, 0, b + 0.08, a + 0.94, 0.14, b + 0.92, { all: "fitGraveStone", top: "fitGraveTop" });
+          G.box(a + 0.16, 0.14, b + 0.2, a + 0.84, 0.95, b + 0.46, { all: "fitGraveStone", s: "fitGraveFace", top: "fitGraveTop" });
+          G.box(a + 0.24, 0.95, b + 0.22, a + 0.76, 1.08, b + 0.44, { all: "fitGraveStone", top: "fitGraveTop" });
+          G.box(a + 0.36, 1.08, b + 0.24, a + 0.64, 1.15, b + 0.42, { all: "fitGraveStone", top: "fitGraveTop" });
+          if ((a * 7 + b * 3) % 3 !== 0) {
+            G.box(a + 0.42, 0.14, b + 0.6, a + 0.58, 0.32, b + 0.76, { all: "potWhite" });
+            for (const [fx, fz, col] of [[0.44, 0.64, "redFabric"], [0.52, 0.7, "gold"], [0.5, 0.62, "cushion"]]) { G.box(a + fx, 0.32, b + fz, a + fx + 0.02, 0.46, b + fz + 0.02, "stem"); G.box(a + fx - 0.04, 0.44, b + fz - 0.04, a + fx + 0.06, 0.52, b + fz + 0.06, col); }
+          }
+        }
+        R.act(near, { label: "Look", lines: ["A gravestone. Someone has left fresh flowers."] });
+        R.item("Gravestones", "A stone a block: a plinth, the stone stepped at its top, a POKé BALL carved in its face, flowers before it.");
       } else if (c === "G") {
         // The TOWER's gravestones: a dark stone each, a POKé BALL mark, flowers at its foot.
         for (const [a, b] of cells) {
@@ -272,7 +318,11 @@
         }
         R.act(near, { label: "Look", lines: [kind === "hideout" ? "A computer. Its screen is full of TEAM ROCKET's plans." : "A computer."] });
       } else if (c === "k") {
-        if (kind === "lobby" || kind === "hotel") for (const [a, b] of cells) { G.box(a, 0, b, a + 1, 1.0, b + 1, { all: kind === "lobby" ? "counterRed" : "walnut", top: "lab" }); }
+        if (FIT && cells.length < (x1 - x0) * (z1 - z0) || FIT && kind === "tower") {
+          // (0.61) A counter that turns a corner (the TOWER's desk): a counter a block at a time, round what's behind it.
+          for (const [a, b] of cells) G.box(a, 0, b, a + 1, 1.0, b + 1, { all: "fitDeskFront", top: "counter" });
+          R.act(near, { label: "Look", lines: ["A desk."] });
+        } else if (kind === "lobby" || kind === "hotel") for (const [a, b] of cells) { G.box(a, 0, b, a + 1, 1.0, b + 1, { all: kind === "lobby" ? "counterRed" : "walnut", top: "lab" }); }
         else table(R, x0 + 0.08, z0 + 0.08, x1 - 0.08, z1 - 0.08, { top: kind === "hideout" ? "silphDesk" : "oak", side: "walnut", leg: kind === "hideout" ? "steel" : "walnut", h: 0.85, name: "Table" });
       } else if (c === "K") {
         for (const [a, b] of cells) G.box(a + 0.02, 0, b + 0.05, a + 0.98, 0.95, b + 0.95, { all: "steel", top: "ssStove" });
@@ -328,7 +378,7 @@
         table(R, x0 + 0.08, z0 + 0.08, x1 - 0.08, z1 - 0.08, { top: kind === "hideout" ? "silphDesk" : "oak", side: "walnut", leg: kind === "hideout" ? "steel" : "walnut", h: 0.85, name: "Table" });
       }
     }
-    if (L.mist) {
+    if (L.mist && !FIT) {
       // Let's Go's purple mist, low over the floor.
       G.box(0.5, 0.3, 0.5, W - 0.5, 0.302, D - 0.5, { top: "twMist", bottom: "twMist", all: null });
       R.item("Mist", "Let's Go's: a lilac haze lying low over the floor.");
@@ -418,6 +468,36 @@
     function stairBlock(w) {
       const up = floorNo(w.to) > floorNo(id) || /roof/.test(w.to) && !/roof/.test(id);
       const a = w.x, b = w.z;
+      if (FIT) {
+        // (0.61, John's 18:02: "the stairs don't look like proper stairs like what we've got") A flight of four
+        // steps, as the houses' are, in its block: up towards the wall beside it, into an arched way through; or down
+        // into a stairwell, the same four steps going down towards the wall.
+        const solidAt = (x, z) => !walkable(x, z);
+        const dir = solidAt(a + 1, b) ? "e" : solidAt(a - 1, b) ? "w" : "n";
+        const step = (i, y0, y1) => {
+          const t0 = i * 0.25, t1 = 1;
+          const r = dir === "e" ? [a + t0, b, a + t1, b + 1] : dir === "w" ? [a, b, a + 1 - t0, b + 1] : [a, b, a + 1, b + 1 - t0];
+          G.box(r[0], y0, r[1], r[2], y1, r[3], { top: "fitTread", all: "fitStepSide", bottom: null });
+        };
+        if (up) {
+          for (let i = 0; i < 4; i++) step(i, 0, (i + 1) * 0.25);
+          // The way through above the top step: a dark arch in the wall's face.
+          const arch = { e: [a + 1, 0.95, b + 0.1, a + 1.03, 2.9, b + 0.9, "w"], w: [a - 0.03, 0.95, b + 0.1, a, 2.9, b + 0.9, "e"], n: [a + 0.1, 0.95, b - 0.03, a + 0.9, 2.9, b, "s"] }[dir];
+          G.box(arch[0], arch[1], arch[2], arch[3], arch[4], arch[5], { [arch[6]]: "fitArchDark", all: null });
+        } else {
+          // The well: its sides, then the steps down.
+          G.box(a, -1.0, b, a + 1, -0.98, b + 1, { top: "fitTread", all: null });
+          for (const [x0, z0, x1, z1, f] of [[a, b, a + 0.05, b + 1, "e"], [a + 0.95, b, a + 1, b + 1, "w"], [a, b, a + 1, b + 0.05, "s"]]) G.box(x0, -1.0, z0, x1, 0, z1, { [f]: "fitStepSide", top: "cap", all: null });
+          for (let i = 0; i < 3; i++) {
+            const t0 = i * 0.25, t1 = t0 + 0.25, top = -(i + 1) * 0.25;
+            const r = dir === "e" ? [a + t0, b + 0.05, a + t1, b + 1] : dir === "w" ? [a + 1 - t1, b + 0.05, a + 1 - t0, b + 1] : [a + 0.05, b + 1 - t1, a + 0.95, b + 1 - t0];
+            G.box(r[0], -1.0, r[1], r[2], top, r[3], { top: "fitTread", all: "fitStepSide", bottom: null });
+          }
+          G.box(a, -1.2, b + 0.95, a + 1, 0, b + 1, { s: "fitStepSide", all: null });
+        }
+        R.item(up ? "Stairs up" : "Stairs down", "Four steps a block, as the houses' stairs: walk onto them to go " + (up ? "up." : "down."));
+        return;
+      }
       if (up) for (let i = 0; i < 3; i++) G.box(a + i * 0.33, 0, b, a + 1, 0.3 + i * 0.3, b + 1, { top: "dsStep", all: "dsStepSide", bottom: null });
       else { G.box(a, -1.2, b, a + 1, -0.5, b + 1, { top: "dsStep", all: "dsWell", bottom: null }); }
       R.item(up ? "Stairs up" : "Stairs down", "Walk onto them to go " + (up ? "up." : "down."));

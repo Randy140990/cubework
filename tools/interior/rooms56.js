@@ -157,6 +157,14 @@
     R._keys = [];
     R.balls = [];
 
+    // (0.61 fit-out, John's 17:53: "when it comes to water on the inside ... give the water the same effect as the
+    // outside") A fountain's water a block down, as the outside's water lies: its basin's floor below, the water's
+    // surface just under the floor's, seen into.
+    const fountainWater = (a, b) => {
+      if (at(a, b) !== "f") return false;
+      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]) if (at(a + dx, b + dz) !== "f") return false;
+      return true;
+    };
     // The floor (a slab, so a stairwell going down shows its sides), and where it's solid.
     const downCells = new Set();
     for (const w of F.warps) if (w.kind === "stairs" && floorNo(w.to) < floorNo(id)) {
@@ -168,7 +176,7 @@
         if (at(x, z) === "v") { x++; continue; }
         let x1 = x; while (x1 < W && at(x1, z) !== "v") x1++;
         R._floors.push([x, z, x1, z + 1]);
-        for (let a = x; a < x1; a++) if (!downCells.has(a + "," + z)) G.box(a, -1.2, z, a + 1, 0, z + 1, { top: lift ? "silphLiftFloor" : "silphFloor", all: "silphFloorEdge", bottom: null });
+        for (let a = x; a < x1; a++) if (!downCells.has(a + "," + z) && !(FIT && fountainWater(a, z))) G.box(a, -1.2, z, a + 1, 0, z + 1, { top: lift ? "silphLiftFloor" : "silphFloor", all: "silphFloorEdge", bottom: null });
         x = x1;
       }
       // Solids: everything you can't walk on, in runs.
@@ -290,6 +298,7 @@
           let d = 0; while (d < 6 && [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]].every(([dx, dz]) => inF(a + dx * (d + 1), b + dz * (d + 1)))) d++;
           dist[a + "," + b] = d;
           if (d === 0) G.box(a, 0, b, a + 1, 0.42, b + 1, { all: "silphRim", top: "silphRimTop" });
+          else if (FIT) { G.box(a, -1.2, b, a + 1, -1.0, b + 1, { top: "poolBottomView", all: null }); G.box(a, -0.13, b, a + 1, -0.12, b + 1, { top: "fitWater", all: null }); }
           else G.box(a, 0, b, a + 1, 0.26, b + 1, { top: "silphWater", all: "silphRim" });
         }
         const best = Math.max(...Object.values(dist));

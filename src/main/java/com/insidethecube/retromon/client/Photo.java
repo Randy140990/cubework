@@ -22,8 +22,9 @@ import org.lwjgl.glfw.GLFW;
  * round where it looks, as far as Minecraft's render distance reaches; on leaving you're back where you were.
  * (0.59.7, John 15:35: "the ability in f6 to get an image too and also do a 2k output ... location photos for the map")
  * P takes a picture at 2560 by 1440 whatever the window's size: for a moment the game draws at that size (as
- * Minecraft's own panorama pictures do), then it's back. It's saved in the game's folder (retromon_photos/, by
- * place and time), and becomes that place's picture on the TOWN MAP.
+ * Minecraft's own panorama pictures do), then it's back. (0.61, John 18:06: "I would assume it would just go to my
+ * download") It's saved in your Downloads folder (retromon_&lt;place&gt;_&lt;time&gt;.png; the game's folder, retromon_photos/,
+ * if there's no Downloads), and that's all: it's not put on the TOWN MAP (John: "I don't want it on the town map").
  */
 public final class Photo {
 	public static boolean on;
@@ -174,17 +175,15 @@ public final class Photo {
 		shooting = 0;
 		String place = placeUnder();
 		String when = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-		java.nio.file.Path dir = mc.gameDirectory.toPath().resolve("retromon_photos");
+		java.nio.file.Path dir = photoFolder(mc);
 		try {
 			net.minecraft.client.Screenshot.takeScreenshot(mc.getMainRenderTarget(), shot -> java.util.concurrent.CompletableFuture.runAsync(() -> {
 				int sw = shot.getWidth(), sh = shot.getHeight();
 				try (shot; com.mojang.blaze3d.platform.NativeImage out = sw == SHOT_W && sh == SHOT_H ? null : SlotSnapshot.fit(shot, SHOT_W, SHOT_H)) {
 					java.nio.file.Files.createDirectories(dir);
-					java.nio.file.Path file = dir.resolve(place + "_" + when + ".png");
+					java.nio.file.Path file = dir.resolve("retromon_" + place + "_" + when + ".png");
 					(out == null ? shot : out).writeToFile(file);
-					Postcards.keep(place, out == null ? shot : out);
-					String msg = "Saved " + SHOT_W + " x " + SHOT_H + (out == null ? "" : " (drawn at " + sw + " x " + sh + ")") + ": " + file.getFileName()
-							+ ", and on the TOWN MAP for " + place.replace('_', ' ').toUpperCase();
+					String msg = "Saved " + SHOT_W + " x " + SHOT_H + (out == null ? "" : " (drawn at " + sw + " x " + sh + ")") + " to " + file;
 					mc.execute(() -> {
 						said = msg;
 						saidAt = System.currentTimeMillis();
@@ -201,7 +200,18 @@ public final class Photo {
 	}
 
 	private static String file(java.nio.file.Path dir, String place, String when) {
-		return dir.resolve(place + "_" + when + ".png").toString();
+		return dir.resolve("retromon_" + place + "_" + when + ".png").toString();
+	}
+
+	/** Where the pictures go: your Downloads folder, or the game's folder (retromon_photos/) if there isn't one. */
+	private static java.nio.file.Path photoFolder(Minecraft mc) {
+		try {
+			java.nio.file.Path dl = java.nio.file.Paths.get(System.getProperty("user.home"), "Downloads");
+			if (java.nio.file.Files.isDirectory(dl) && java.nio.file.Files.isWritable(dl)) return dl;
+		} catch (Exception e) {
+			com.insidethecube.retromon.Retromon.LOG.warn("Retromon photo: no Downloads folder", e);
+		}
+		return mc.gameDirectory.toPath().resolve("retromon_photos");
 	}
 
 	public static void scroll(double y) {

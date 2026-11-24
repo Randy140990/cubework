@@ -87,6 +87,21 @@ public final class CutTrees {
 			Game.dialogue(p, null, "talk", List.of("This tree looks like it can be CUT down!"));
 			return;
 		}
+		// (0.61, John's 18:04) As FireRed asks: "Would you like to CUT it?"
+		net.minecraft.nbt.CompoundTag c = new net.minecraft.nbt.CompoundTag();
+		net.minecraft.nbt.ListTag ch = new net.minecraft.nbt.ListTag();
+		for (String s : List.of("YES", "NO")) ch.add(net.minecraft.nbt.StringTag.valueOf(s));
+		c.put("choices", ch);
+		c.putInt("tree", TREES.indexOf(t));
+		Game.dialogue(p, null, "cut", List.of("This tree looks like it can be CUT down!", "Would you like to CUT it?"), c);
+	}
+
+	/** YES to CUT: the tree's cut and you're through to its other side. */
+	public static void cut(ServerPlayer p, boolean yes, int i) {
+		if (!yes || i < 0 || i >= TREES.size()) return;
+		Tree t = TREES.get(i);
+		Mon m = cutter(p);
+		if (m == null) return;
 		Vec3 at = p.position();
 		boolean fromA = (at.x - t.ax()) * (at.x - t.ax()) + (at.z - t.az()) * (at.z - t.az()) <= (at.x - t.bx()) * (at.x - t.bx()) + (at.z - t.bz()) * (at.z - t.bz());
 		double x = fromA ? t.bx() : t.ax(), z = fromA ? t.bz() : t.az();

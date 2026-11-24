@@ -106,6 +106,13 @@ public final class ClientState {
 				exclaimNpc = -1;
 				Adventure.focus(-1);
 			}
+			case "surf" -> {
+				// (0.61) On a POKéMON's back over the water, or off it.
+				com.insidethecube.retromon.game.Surf.client = t.getBooleanOr("on", false);
+				com.insidethecube.retromon.game.Surf.clientSpecies = t.getStringOr("species", "");
+				var me = net.minecraft.client.Minecraft.getInstance().player;
+				if (me != null) com.insidethecube.retromon.game.Surf.clientId = me.getUUID();
+			}
 			case "place" -> {
 				// ((15:17) Where you are now, kept here too: a save's loading page names it, not the last place the
 				// game sent over in full.)

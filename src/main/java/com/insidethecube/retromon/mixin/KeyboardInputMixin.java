@@ -59,7 +59,7 @@ public abstract class KeyboardInputMixin extends ClientInput {
 			return;
 		}
 		// ((0.60) Not in Cerulean Cave, whose water is the way through: FireRed's SURF, swum.)
-		if (!swimming && waterAhead(player, yaw) && !com.insidethecube.retromon.game.Interiors.swims(player)) {
+		if (!swimming && waterAhead(player, yaw) && !com.insidethecube.retromon.game.Interiors.swims(player) && !com.insidethecube.retromon.game.Surf.client) {
 			this.keyPresses = new Input(false, false, false, false, false, false, false);
 			this.moveVector = Vec2.ZERO;
 			player.setYRot(yaw);

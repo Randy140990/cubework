@@ -4,7 +4,8 @@
   "package": "com.insidethecube.retromon.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "SignCollisionMixin"
+    "SignCollisionMixin",
+    "SurfWaterMixin"
   ],
   "client": [
     "CameraMixin",

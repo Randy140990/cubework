@@ -271,6 +271,22 @@ public final class Figures {
 		return new Batch(x0, y0, x1, y1);
 	}
 
+	/**
+	 * (0.61, John's 18:04: the party's creatures "zoom in like incredibly big" when picked) How tall to draw a creature
+	 * (a mon()'s tall) so all of it fits a box w by h, turned to facing: by its height and by how far it reaches across
+	 * (a long one, AZURIBBON, by its length), whichever is the tighter.
+	 */
+	public static float fitTall(String species, float w, float h, float facing) {
+		BedrockModel.Def d = BedrockModel.def(species);
+		if (d == null) return h * 0.8F;
+		float hb = Math.max(0.3F, d.height), u = d.scale / 16F;
+		double a = Math.toRadians(facing);
+		float across = (float) (Math.abs(Math.cos(a)) * d.spanX + Math.abs(Math.sin(a)) * d.spanZ) * u;
+		float up = Math.max(hb, d.spanY * u);
+		float k = Math.min(h / up, w / Math.max(0.3F, across));
+		return k * hb;
+	}
+
 	// ---------- drawing ----------
 
 	/** Draws a frame's figures into its picture (registered with Fabric as a special GUI element). */

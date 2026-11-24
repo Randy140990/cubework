@@ -50,6 +50,18 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		if (!(e.model instanceof BedrockModel m) || m.def != BedrockModel.def(e.species())) e.model = BedrockModel.create(e.species());
 		s.model = e.model instanceof BedrockModel m ? m : null;
 		s.yaw = e.facing();
+		// (0.61) Your SURF POKéMON: under you, where you are this frame (not a tick behind), its back at your feet,
+		// facing the way you face.
+		var me = net.minecraft.client.Minecraft.getInstance().player;
+		if (me != null && e.key().equals("surf:" + me.getUUID()) && s.model != null) {
+			float back = Math.max(0.35F, Math.min(1.2F, s.model.def.height)) * 0.85F;
+			s.x = Mth.lerp(partial, me.xo, me.getX());
+			s.y = Mth.lerp(partial, me.yo, me.getY()) - back;
+			s.z = Mth.lerp(partial, me.zo, me.getZ());
+			s.yaw = Mth.rotLerp(partial, me.yBodyRotO, me.yBodyRot);
+			s.pose = s.model.def.hasPose("swim") ? "swim" : null;
+			return;
+		}
 		s.pose = null;
 		s.lift = 0;
 		s.asleep = e.asleep() && s.model != null;

@@ -451,9 +451,31 @@ public final class Adventure {
 			java.util.Map.entry("SAFFRON CITY", "Shining, Golden Land of Commerce"), java.util.Map.entry("CINNABAR ISLAND", "The Fiery Town of Burning Desire"),
 			java.util.Map.entry("INDIGO PLATEAU", "The Ultimate Goal of Trainers!"));
 
+	/** (0.61) Water just ahead of you, at your feet or where you'd step down to (as the walking keeps you off it). */
+	static boolean waterAhead(net.minecraft.client.player.LocalPlayer p, float yaw) {
+		var level = p.level();
+		double r = Math.toRadians(yaw);
+		double x = p.getX() - Math.sin(r) * 0.75, z = p.getZ() + Math.cos(r) * 0.75;
+		net.minecraft.core.BlockPos feet = net.minecraft.core.BlockPos.containing(x, p.getY() + 0.1, z);
+		for (net.minecraft.core.BlockPos at : new net.minecraft.core.BlockPos[] {feet, feet.below(), feet.below(2)}) {
+			if (level.getFluidState(at).is(net.minecraft.tags.FluidTags.WATER)) return true;
+			if (!level.getBlockState(at).getCollisionShape(level, at).isEmpty()) return false;
+		}
+		return false;
+	}
+
 	/** A: read the sign in front of you (its words), a shelf standing in for one (the place's sign) or a mailbox. */
 	private static void readSign(Minecraft mc) {
 		Vec3 look = Vec3.directionFromRotation(0, mc.player.getYRot());
+		// (0.61) Facing the water (not swimming, not already on a POKéMON's back): the server asks about SURF.
+		if (!com.insidethecube.retromon.game.Surf.client && !mc.player.isInWater()
+				&& waterAhead(mc.player, mc.player.getYRot())) {
+			Sounds.press();
+			CompoundTag t = new CompoundTag();
+			t.putBoolean("water", true);
+			ClientPlayNetworking.send(new Net.Act("read", t));
+			return;
+		}
 		for (double d = 0.5; d <= 2.1; d += 0.4) {
 			for (int dy = 0; dy <= 1; dy++) {
 				net.minecraft.core.BlockPos at = net.minecraft.core.BlockPos.containing(mc.player.getX() + look.x * d, mc.player.getY() + dy + 0.2,

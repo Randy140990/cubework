@@ -29,9 +29,27 @@ public final class Postcards {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.getSingleplayerServer() == null) return null;
 		try {
-			return mc.getSingleplayerServer().getWorldPath(LevelResource.ROOT).resolve("retromon_places");
+			Path f = mc.getSingleplayerServer().getWorldPath(LevelResource.ROOT).resolve("retromon_places");
+			clearPhotos(f);
+			return f;
 		} catch (Exception e) {
 			return null;
+		}
+	}
+
+	/**
+	 * (0.61, John 18:06: "I don't want it on the town map ... I will provide those ... to bake them into the solution")
+	 * The places' pictures that PHOTO MODE put on the TOWN MAP (0.59.7 to 0.60) taken off it, once a save: nothing else
+	 * has put any there since the map's own pictures stopped being taken.
+	 */
+	private static void clearPhotos(Path f) {
+		Path done = f.resolve(".photos_cleared");
+		if (!Files.isDirectory(f) || Files.exists(done)) return;
+		try (var all = Files.list(f)) {
+			for (Path p : all.toList()) if (p.getFileName().toString().endsWith(".png")) Files.deleteIfExists(p);
+			Files.writeString(done, "0.61");
+		} catch (Exception e) {
+			Retromon.LOG.warn("Couldn't take the photos off the TOWN MAP", e);
 		}
 	}
 
@@ -94,7 +112,7 @@ public final class Postcards {
 		return id;
 	}
 
-	/** (0.59.7, 15:35) A PHOTO MODE picture made the place's Town Map picture (the whole frame, 384 by 216). */
+	/** (0.59.7, 15:35) A PHOTO MODE picture made the place's Town Map picture (the whole frame, 384 by 216). (0.61: not used.) */
 	public static void keep(String place, NativeImage full) {
 		Path f = folder();
 		if (!safe(place) || f == null) return;

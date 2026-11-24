@@ -10,6 +10,8 @@ const { chromium } = require('playwright'); const fs = require('fs');
   await p.route('https://fonts.googleapis.com/**', r => r.fulfill({ body: '', contentType: 'text/css' }));
   await p.goto(url); await p.waitForTimeout(2500);
   const data = await p.evaluate(() => {
+    // (0.61) The game gets the insides as they are; the new fit-out only for the rooms John has said yes to (FIT_GAME).
+    if (typeof fitOn === 'function') fitOn(false);
     const v = o => [o.x, o.y, o.z];
     const oface = Geo.prototype.face;
     Geo.prototype.face = function (k, BL, R, U, w, h, n, sub) { if (k && w > 0 && h > 0) (this._faces || (this._faces = [])).push({ k, bl: v(BL), r: v(R), u: v(U), w, h, n: n ? v(n) : null, sub: sub || null }); return oface.call(this, k, BL, R, U, w, h, n, sub); };

@@ -38,6 +38,8 @@ public final class BedrockModel {
 		public final float scale, height;
 		/** (0.50.3) Its cubes' top and their furthest back (model units, unturned): how it lies down asleep. */
 		public final float topY, backZ;
+		/** (0.61) How far its cubes reach, side to side, up and down, and nose to tail (model units, unturned). */
+		public final float spanX, spanY, spanZ;
 		public final Identifier texture;
 		public final List<Layer> layers = new ArrayList<>();
 		final Anim idle;
@@ -56,6 +58,7 @@ public final class BedrockModel {
 			texH = d.has("texture_height") ? d.get("texture_height").getAsInt() : 64;
 			bones = g.has("bones") ? g.getAsJsonArray("bones") : new JsonArray();
 			float ty = 0, bz = 0;
+			float x0 = Float.MAX_VALUE, x1 = -Float.MAX_VALUE, y0 = Float.MAX_VALUE, y1 = -Float.MAX_VALUE, z0 = Float.MAX_VALUE, z1 = -Float.MAX_VALUE;
 			for (JsonElement be : bones) {
 				JsonObject bo = be.getAsJsonObject();
 				if (!bo.has("cubes")) continue;
@@ -65,10 +68,20 @@ public final class BedrockModel {
 					JsonArray o = c.getAsJsonArray("origin"), sz = c.getAsJsonArray("size");
 					ty = Math.max(ty, o.get(1).getAsFloat() + sz.get(1).getAsFloat());
 					bz = Math.max(bz, o.get(2).getAsFloat() + sz.get(2).getAsFloat());
+					x0 = Math.min(x0, o.get(0).getAsFloat());
+					x1 = Math.max(x1, o.get(0).getAsFloat() + sz.get(0).getAsFloat());
+					y0 = Math.min(y0, o.get(1).getAsFloat());
+					y1 = Math.max(y1, o.get(1).getAsFloat() + sz.get(1).getAsFloat());
+					z0 = Math.min(z0, o.get(2).getAsFloat());
+					z1 = Math.max(z1, o.get(2).getAsFloat() + sz.get(2).getAsFloat());
 				}
 			}
 			topY = ty;
 			backZ = bz;
+			boolean any = x1 >= x0;
+			spanX = any ? x1 - x0 : 16;
+			spanY = any ? y1 - Math.min(0, y0) : 16;
+			spanZ = any ? z1 - z0 : 16;
 			scale = info.has("scale") ? info.get("scale").getAsFloat() : 1F;
 			height = info.has("height") ? info.get("height").getAsFloat() : 1F;
 			texture = Identifier.parse(info.has("texture") ? info.get("texture").getAsString() : Retromon.ID + ":textures/pokemon/" + species + ".png");

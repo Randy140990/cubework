@@ -19,5 +19,10 @@ public abstract class SignCollisionMixin {
 	@Inject(method = "getCollisionShape", at = @At("HEAD"), cancellable = true, require = 0)
 	private void retromon$solidSigns(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx, CallbackInfoReturnable<VoxelShape> cir) {
 		if (Flags.solidSigns && (Object) this instanceof SignBlock) cir.setReturnValue(state.getShape(level, pos));
+		// (0.61) SURF over seagrass and the like (water with a plant in it): its top holds you up too.
+		else if (!state.getFluidState().isEmpty() && !state.blocksMotion()) {
+			VoxelShape s = com.insidethecube.retromon.game.Surf.shape(state, level, pos, ctx);
+			if (s != null) cir.setReturnValue(s);
+		}
 	}
 }

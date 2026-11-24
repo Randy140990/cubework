@@ -63,7 +63,7 @@ function renderMe() { const el = $("#meSeg"); if (el) setSeg(el, me.as); }
 // ---------- places ----------
 const built = {};
 let room = null;
-function getRoom(id) { if (!built[id]) { const r = BUILD[id](); r.finish(); prepareRoom(r); built[id] = r; } return built[id]; }
+function getRoom(id) { if (!built[id]) { const r = BUILD[id](); fitPeople(r); r.finish(); prepareRoom(r); built[id] = r; } return built[id]; }
 // The light through the windows: from each, the daylight spread in over the floor (over the carpets), strongest by
 // the window and fading with no edge, by the time of day; the windows' glass a sunset or a night sky.
 function makePools(r) {
@@ -161,7 +161,8 @@ function prepareRoom(r) {
 
 // ---------- the camera: always facing north, looking down; the whole room, or following you ----------
 const PITCH = 52 * D2R, TALK_PITCH = 40 * D2R;
-const cam = { mode: "close", tx: 8, tz: 7, ty: 0, dist: 30, fit: null, pitch: PITCH };
+// (0.61, John's 17:53: "as if I could see the entire thing ... whole room") The whole room to start with.
+const cam = { mode: "room", tx: 8, tz: 7, ty: 0, dist: 30, fit: null, pitch: PITCH };
 const scratch = new THREE.PerspectiveCamera(34, 1.6, 0.1, 400), ndc = new THREE.Vector3();
 function placeCam(c, tx, ty, tz, d, pitch = PITCH) { c.position.set(tx, ty + Math.sin(pitch) * d, tz + Math.cos(pitch) * d); c.lookAt(tx, ty, tz); c.updateMatrixWorld(true); }
 // As the mod frames a room (tools/interior/export/tomod.py, fit_camera): every corner inside 90% of a 16:9 screen.
@@ -231,6 +232,9 @@ function switchRoom(id, spawn) {
   // Inside, bright and airy (as the newer games' rooms are; the mod's light inside matches).
   sun.intensity = room.outside ? 0.78 : 0.68; hemi.intensity = room.outside ? 0.7 : 0.78;
   hemi.color.set(room.outside ? 0xe8f4ff : 0xfff6e8); hemi.groundColor.set(room.outside ? 0x6f8a5a : 0x8a7f74);
+  // (0.61 fit-out) Inside, lit as the outside is in the daytime: brighter and even, the shadows soft.
+  if (FIT && !room.outside && !room.night && !room.haze && !room.dark) { sun.intensity = 0.58; hemi.intensity = 0.8; ambient.intensity = 0.1; hemi.color.set(0xfffaf2); hemi.groundColor.set(0xa89e92); sun.shadow.radius = 6; }
+  else { ambient.intensity = 0.12; sun.shadow.radius = 3; }
   // Always night (Viridian Forest, under its trees): a dim blue moonlight, as the mod's night has it.
   if (room.night) { sun.intensity = 0.32; hemi.intensity = 0.5; hemi.color.set(0x9fb4e6); hemi.groundColor.set(0x2c3a5a); }
   // A cave's dusty air (Diglett's Cave): a warm brown haze that thickens into the distance, the light warmer too.
@@ -534,6 +538,8 @@ function tickFrame(now) {
     viewerEl.classList.toggle("cine", !!talk);
     updateTags();
   }
+  // (0.61) The fit-out's water moves, as the outside's does.
+  if (matCache.fitWater && matCache.fitWater.map) { const m = matCache.fitWater.map; m.offset.x = (performance.now() / 9000) % 1; m.offset.y = (performance.now() / 14000) % 1; }
   renderer.render(scene, camera);
   requestAnimationFrame(tickFrame);
 }
@@ -546,10 +552,101 @@ function renderRide() {
   sh.title = fol.size ? (canRide() ? "It's " + fol.size.h.toFixed(2) + " blocks tall: small enough to ride" : "Too big to ride: " + fol.size.h.toFixed(2) + " blocks tall (1 block or less can)") : "For creatures 1 block tall or less";
 }
 function setRide(v) { fol.ride = v; if (v === "walk" && fol.model) placeFollowerBehind(); renderRide(); renderPanel(); }
+// (0.61, John's 17:53: "have everything in order ... Pallet Town, Route 1, so on and so forth, so it follows more
+// sequentially ... eventually it'll get to ... Route 26 ... Johto") The places as you come to them in the game, each
+// under where it is; anything not listed here goes at the end under its own heading.
+const MENU_ORDER = [
+  ["Pallet Town", ["house2", "house1", "rival1", "rival2", "lab"]],
+  ["Viridian City", ["center", "mart", "school", "nickhouse", "viridian_gym"]],
+  ["Route 22", ["gate_league", "gate_johto"]],
+  ["Route 2 and Viridian Forest", ["gate_s", "viridian_forest", "gate_n", "route2_gate", "route2_house"]],
+  ["Pewter City", ["pewter_gym", "museum_1f", "museum_2f", "pewter_house1", "pewter_house2"]],
+  ["Routes 3 and 4: Mt. Moon", ["mt_moon_1f", "mt_moon_b1f", "mt_moon_b2f"]],
+  ["Cerulean City", ["cerulean_gym", "bike_shop", "cerulean_house1", "cerulean_house2", "cerulean_house3", "cerulean_house4"]],
+  ["Routes 24 and 25", ["bills_house"]],
+  ["Routes 5 and 6", ["daycare", "gate_r5", "ug_r5", "ug_ns", "ug_r6", "gate_r6"]],
+  ["Vermilion City", ["vermilion_gym", "pokemon_fan_club", "vermilion_old_rod_house", "vermilion_trade_house", "vermilion_pidgey_house"]],
+  ["Vermilion City: the S.S. Anne", ["ss_anne_1f", "ss_anne_1f_room1", "ss_anne_1f_room2", "ss_anne_1f_room3", "ss_anne_1f_room4", "ss_anne_1f_room5", "ss_anne_1f_room6",
+    "ss_anne_1f_room7", "ss_anne_2f", "ss_anne_2f_room1", "ss_anne_2f_room2", "ss_anne_2f_room3", "ss_anne_2f_room4", "ss_anne_2f_room5", "ss_anne_2f_room6", "ss_anne_3f",
+    "ss_anne_captains_room", "ss_anne_b1f", "ss_anne_b1f_room1", "ss_anne_b1f_room2", "ss_anne_b1f_room3", "ss_anne_b1f_room4", "ss_anne_b1f_room5", "ss_anne_kitchen"]],
+  ["Route 11 and Diglett's Cave", ["gate_r11", "gate_r11_2f", "digletts_s", "digletts_b1f", "digletts_n"]],
+  ["Route 10: Rock Tunnel and the Power Plant", ["rock_tunnel_1f", "rock_tunnel_b1f", "power_plant"]],
+  ["Lavender Town", ["lavender_volunteer_house", "lavender_cubone_house", "lavender_name_rater", "pokemon_tower_1f", "pokemon_tower_2f", "pokemon_tower_3f",
+    "pokemon_tower_4f", "pokemon_tower_5f", "pokemon_tower_6f", "pokemon_tower_7f"]],
+  ["Routes 7 and 8", ["gate_r8", "ug_r8", "ug_ew", "ug_r7", "gate_r7"]],
+  ["Celadon City", ["celadon_mart_1f", "celadon_mart_2f", "celadon_mart_3f", "celadon_mart_4f", "celadon_mart_5f", "celadon_mart_roof", "celadon_mart_elevator",
+    "celadon_mansion_1f", "celadon_mansion_2f", "celadon_mansion_3f", "celadon_mansion_roof", "celadon_mansion_roof_house", "celadon_hotel", "celadon_diner",
+    "celadon_chief_house", "game_corner", "game_corner_prize_room", "rocket_hideout_b1f", "rocket_hideout_b2f", "rocket_hideout_b3f", "rocket_hideout_b4f",
+    "rocket_hideout_elevator", "celadon_gym"]],
+  ["Routes 16 to 18: the Cycling Road", ["gate_r16n", "gate_r16_2f", "route16_house", "gate_r16s", "gate_r18", "gate_r18_2f"]],
+  ["Fuchsia City", ["fuchsia_gym", "fuchsia_house1", "fuchsia_house2", "fuchsia_house3", "fuchsia_house4", "safari_gate", "fuchsia_office"]],
+  ["Safari Zone", ["safari_zone", "safari_rest_center", "safari_rest_east", "safari_rest_north", "safari_rest_west", "safari_secret_house"]],
+  ["Routes 12 to 15", ["gate_r12", "gate_r12_2f", "route12_house", "gate_r15", "gate_r15_2f"]],
+  ["Saffron City", ["fighting_dojo", "saffron_gym", "silph_co_1f", "silph_co_2f", "silph_co_3f", "silph_co_4f", "silph_co_5f", "silph_co_6f", "silph_co_7f",
+    "silph_co_8f", "silph_co_9f", "silph_co_10f", "silph_co_11f", "silph_co_elevator", "copycats_house_1f", "copycats_house_2f", "mr_psychics_house",
+    "saffron_pidgey_house", "saffron_fan_club"]],
+  ["Route 20: Seafoam Islands", ["seafoam_islands_1f", "seafoam_islands_b1f", "seafoam_islands_b2f", "seafoam_islands_b3f", "seafoam_islands_b4f"]],
+  ["Cinnabar Island", ["cinnabar_gym", "cinnabar_lab", "cinnabar_lab_trade_room", "cinnabar_lab_metronome_room", "cinnabar_lab_fossil_room", "pokemon_mansion_1f",
+    "pokemon_mansion_2f", "pokemon_mansion_3f", "pokemon_mansion_b1f"]],
+  ["Route 23: Victory Road", ["victory_road_1f", "victory_road_2f", "victory_road_3f"]],
+  ["Indigo Plateau", ["indigo_plateau_lobby", "loreleis_room", "brunos_room", "agathas_room", "lances_room", "champions_room", "hall_of_fame"]],
+  ["Cerulean Cave", ["cerulean_cave_1f", "cerulean_cave_2f", "cerulean_cave_b1f"]],
+  ["Johto: Route 29", ["jgate_r29"]],
+  ["Johto: Violet City", ["jgate_r31", "sprout_tower_1f", "sprout_tower_2f", "sprout_tower_3f", "earls_pokemon_academy", "jgate_r32", "jgate_r36"]],
+  ["Johto: the Ruins of Alph", ["jgate_alph"]],
+  ["Johto: Azalea Town", ["ilex_forest"]],
+  ["Johto: Goldenrod City", ["jgate_r35"]],
+  ["Johto: the National Park", ["route_35_national_park_gate", "route_36_national_park_gate"]],
+  ["Johto: Ecruteak City", ["jgate_ecruteak", "jgate_r38", "jgate_r42"]],
+  ["Johto: Mahogany Town and the Lake of Rage", ["jgate_r43s", "jgate_r43n"]],
+];
+// (Words a place is known by that aren't in its name: the tower John called Kanto's Radio Tower.)
+const MENU_ALSO = { pokemon_tower: "radio tower ghost marowak channeler graves", rocket_hideout: "team rocket giovanni", ss_anne: "ship boat cruise",
+  indigo_plateau: "elite four league champion", loreleis_room: "elite four", brunos_room: "elite four", agathas_room: "elite four", lances_room: "elite four",
+  champions_room: "elite four rival", silph_co: "office company", game_corner: "slots casino", celadon_mart: "dept store department shop", arena: "battle",
+  jgate: "gatehouse gate", gate_: "gatehouse", bills_house: "bill sea cottage", lab: "oak professor", house1: "home mum mom", house2: "home bedroom" };
+function menuPlaces() {
+  const byId = new Map(PLACES.map(p => [p.id, p])), used = new Set(), out = [];
+  for (const [label, ids] of MENU_ORDER) for (const id of ids) { const p = byId.get(id); if (p && !used.has(id)) { used.add(id); out.push([label, p]); } }
+  // The rest: battle arenas, then the outside looks, then anything else, under their own headings.
+  const rest = PLACES.filter(p => !used.has(p.id));
+  const rank = p => p.group === "Battle arenas" ? 0 : p.group === "Outside" ? 1 : 2;
+  rest.sort((a, b) => rank(a) - rank(b));
+  for (const p of rest) out.push([p.group === "Outside" ? "Outside (the mod's looks)" : p.group, p]);
+  return out;
+}
+function menuText(label, p) {
+  let extra = "";
+  for (const [k, v] of Object.entries(MENU_ALSO)) if (p.id.startsWith(k)) extra += " " + v;
+  return (label + " " + p.group + " " + p.name + " " + p.floor + " " + p.id.replace(/_/g, " ") + extra).toLowerCase();
+}
+function fillRoomPick(query) {
+  const rp = $("#roomPick"), keep = rp.value || (room && room.id);
+  rp.innerHTML = "";
+  const words = String(query || "").toLowerCase().split(/\s+/).filter(Boolean);
+  let og = null, gname = null, n = 0, first = null;
+  for (const [label, p] of menuPlaces()) {
+    if (words.length) { const t = menuText(label, p); if (!words.every(w => t.includes(w))) continue; }
+    if (label !== gname) { og = document.createElement("optgroup"); og.label = label; rp.appendChild(og); gname = label; }
+    const o = document.createElement("option"); o.value = p.id; o.textContent = `${p.name} (${p.floor.toLowerCase()})`; og.appendChild(o);
+    n++; if (!first) first = p.id;
+  }
+  if (keep && [...rp.options].some(o => o.value === keep)) rp.value = keep;
+  $("#roomHits").textContent = words.length ? (n === 1 ? "1 place" : n + " places") : "";
+  return first;
+}
 function renderPickers() {
-  const rp = $("#roomPick"); rp.innerHTML = "";
-  let og = null, gname = null;
-  for (const p of PLACES) { if (p.group !== gname) { og = document.createElement("optgroup"); og.label = p.group; rp.appendChild(og); gname = p.group; } const o = document.createElement("option"); o.value = p.id; o.textContent = `${p.name} (${p.floor.toLowerCase()})`; og.appendChild(o); }
+  const rp = $("#roomPick");
+  fillRoomPick("");
+  // (0.61, John's 17:58: "a search functionality") Type to narrow the list; Enter goes to the first place found.
+  const rs = $("#roomSearch");
+  rs.oninput = () => { const first = fillRoomPick(rs.value); if (first && rp.value !== first && ![...rp.options].some(o => o.value === (room && room.id))) rp.value = first; };
+  rs.onkeydown = e => {
+    if (e.key === "Enter") { e.preventDefault(); const first = fillRoomPick(rs.value); const go = [...rp.options].some(o => o.value === rp.value) ? rp.value : first; if (go) { rs.blur(); viewerEl.focus({ preventScroll: true }); viewerActive = true; goTo(go, null, "fade"); } }
+    else if (e.key === "Escape") { rs.value = ""; fillRoomPick(""); }
+    e.stopPropagation();
+  };
+  rs.onkeyup = e => e.stopPropagation();
   rp.onchange = () => { rp.blur(); viewerEl.focus({ preventScroll: true }); viewerActive = true; goTo(rp.value, null, "fade"); };
   const fp = $("#followPick"); fp.innerHTML = "";
   const none = document.createElement("option"); none.value = ""; none.textContent = "No follower"; fp.appendChild(none);
@@ -563,6 +660,12 @@ function renderPickers() {
   for (const b of $("#rideSeg").querySelectorAll("button")) b.onclick = () => { if (!b.disabled) setRide(b.dataset.v); };
   for (const b of $("#meSeg").querySelectorAll("button")) b.onclick = () => { setMe(b.dataset.v); renderMe(); };
   for (const b of $("#lookSeg").querySelectorAll("button")) b.onclick = () => { fol.look = b.dataset.v; setSeg($("#lookSeg"), fol.look); if (fol.want) setFollower(fol.want); };
+  for (const b of $("#fitSeg").querySelectorAll("button")) b.onclick = () => {
+    const on = b.dataset.v === "new"; if (on === FIT) return;
+    setSeg($("#fitSeg"), b.dataset.v); fitOn(on);
+    for (const k of Object.keys(built)) delete built[k];
+    if (room) switchRoom(room.id);
+  };
   for (const b of $("#camSeg").querySelectorAll("button")) b.onclick = () => { cam.mode = b.dataset.v; setSeg($("#camSeg"), cam.mode); };
   for (const b of $("#timeSeg").querySelectorAll("button")) b.onclick = () => { TOD = b.dataset.v; setSeg($("#timeSeg"), TOD); applyTime(); renderPanel(); };
 }

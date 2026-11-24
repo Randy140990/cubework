@@ -1182,7 +1182,9 @@ public final class Game {
 			if (!inside && s.getTickCount() % 2 == 0) enter(p, placeNear(p.getX(), p.getZ()));
 			if (!inside && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
 			if (!inside && s.getTickCount() % 2 == 0 && !BUSY.containsKey(id)) gymShut(p);
-			if (!inside && !build && !Battles.in(p)) keepAshore(p);
+			// (0.61) SURF: on its back over the water (off it on land); the water's edge isn't a wall then.
+			if (Surf.on(p)) Surf.tick(p);
+			if (!inside && !build && !Battles.in(p) && !Surf.on(p)) keepAshore(p);
 			// Route 2's CUT trees: no way past them until they're cut.
 			if (!inside && !build && !Battles.in(p)) CutTrees.keepOff(p);
 			// (0.50) The sleeping SNORLAX (Routes 12 and 16) and the S.S. ANNE's sailor: no way past.
@@ -1466,7 +1468,7 @@ public final class Game {
 		Integer id = FOLLOWERS.get(uid);
 		WorldMon w = id != null && level.getEntity(id) instanceof WorldMon wm && wm.isAlive() ? wm : null;
 		Mon lead = followMon(d);
-		boolean want = d.started && lead != null && !Battles.in(p) && FOLLOW_ON.getOrDefault(uid, true);
+		boolean want = d.started && lead != null && !Battles.in(p) && FOLLOW_ON.getOrDefault(uid, true) && !Surf.on(p);
 		java.util.ArrayDeque<Vec3> trail = TRAIL.computeIfAbsent(uid, k -> new java.util.ArrayDeque<>());
 		Vec3 here = p.position();
 		if (trail.isEmpty() || trail.peekFirst().distanceToSqr(here) > 0.04) {
@@ -1547,6 +1549,11 @@ public final class Game {
 	/** A: reading a sign (or a shelf standing in for one): the words of the games' sign nearest that spot. */
 	public static void read(ServerPlayer p, CompoundTag t) {
 		int bx = t.getIntOr("x", p.getBlockX()), bz = t.getIntOr("z", p.getBlockZ());
+		if (t.getBooleanOr("water", false)) {
+			// (0.61) Facing the water: SURF, if one of your team can.
+			Surf.ask(p);
+			return;
+		}
 		if (t.getBooleanOr("tree", false)) {
 			// A little tree (Route 2's cherry trees): one that can be CUT down says so; any other tree says nothing.
 			if (Interiors.in(p)) return;
@@ -4076,7 +4083,7 @@ public final class Game {
 		dialogue(p, n, mode, lines, new CompoundTag());
 	}
 
-	private static void dialogue(ServerPlayer p, Npc n, String mode, List<String> lines, CompoundTag t) {
+	static void dialogue(ServerPlayer p, Npc n, String mode, List<String> lines, CompoundTag t) {
 		dialogue(p, n, mode, lines, t, n == null ? -1 : n.getId());
 	}
 
@@ -4161,6 +4168,8 @@ public final class Game {
 				Net.send(p, "mart", m);
 			}
 			case "parcel" -> rivalAfterParcel(p);
+			case "surf" -> Surf.start(p, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
+			case "cut" -> CutTrees.cut(p, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false), t.getIntOr("tree", -1));
 			case "museum_fee" -> museumFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "safari_fee" -> safariFee(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
 			case "good_rod" -> goodRod(p, n, t.getIntOr("choice", 1) == 0 && t.getBooleanOr("answered", false));
@@ -4507,6 +4516,7 @@ public final class Game {
 		}
 		ServerLevel level = (ServerLevel) p.level();
 		BlockPos at = spot(level, (z.x1() + z.x2()) / 2, (z.z1() + z.z2()) / 2, 16);
+		Surf.stop(p);
 		p.teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
 		enter(p, place);
 	}

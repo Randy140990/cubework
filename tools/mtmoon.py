@@ -343,6 +343,7 @@ def main():
                     if out[i] != "minecraft:air": out[i] = "minecraft:air"
         # (0.52) Cut away on the camera's side, as the rooms are (tools/cavecut.py).
         out, _n = cavecut.cut(out, W, H, L)
+        out = cavecut.fill(out, W, H, L, rid)
         size = write_bin(os.path.join(RES, rid + ".bin"), W, H, L, out)
         spawn = entry_1f if rid == "mt_moon_1f" else exit_foot if rid == "mt_moon_b1f" else warps[rid][0]["spawn"] if warps[rid] else {"x": W / 2, "z": L / 2, "yaw": 0.0}
         if rid == "mt_moon_b2f":

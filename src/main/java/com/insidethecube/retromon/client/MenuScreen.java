@@ -833,7 +833,8 @@ public class MenuScreen extends DeviceScreen {
 			// Its picture, gently moving; the one you're on walks on the spot, in 3D.
 			if (on && !fnt) {
 				Figures.Batch fb = Figures.batch(Math.round(V.x(x + 4)), Math.round(V.y(y + 4)), Math.round(V.x(x + 8 + 170)), Math.round(V.y(y + 4 + 176)));
-				fb.mon(mon.species.id(), V.x(x + 8 + 85), V.y(y + 4 + 158), V.s(118)).pose("walk").at(secs).facing(-32).pitch(6);
+				// ((0.61, 18:04) Sized to fit the picture's box, as its still picture does, so none spills out or shrinks.)
+				fb.mon(mon.species.id(), V.x(x + 8 + 85), V.y(y + 4 + 158), V.s(Figures.fitTall(mon.species.id(), 150, 138, -32))).pose("walk").at(secs).facing(-32).pitch(6);
 				fb.draw(g);
 			} else {
 				float bob = -1.5F + 1.5F * (float) Math.cos(secs * Math.PI * 2 / (2.4F + i * 0.3F));
