@@ -94,6 +94,19 @@ public final class Postcards {
 		return id;
 	}
 
+	/** (0.59.7, 15:35) A PHOTO MODE picture made the place's Town Map picture (the whole frame, 384 by 216). */
+	public static void keep(String place, NativeImage full) {
+		Path f = folder();
+		if (!safe(place) || f == null) return;
+		try (NativeImage out = SlotSnapshot.fit(full, 384, 216)) {
+			Files.createDirectories(f);
+			out.writeToFile(f.resolve(place + ".png"));
+			Minecraft.getInstance().execute(() -> forget(place));
+		} catch (Exception e) {
+			Retromon.LOG.warn("Couldn't keep the photo of {} for the map", place, e);
+		}
+	}
+
 	private static void forget(String place) {
 		Identifier id = LOADED.remove(place);
 		if (id != null) Minecraft.getInstance().getTextureManager().release(id);

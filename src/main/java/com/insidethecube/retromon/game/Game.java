@@ -4618,6 +4618,81 @@ public final class Game {
 	}
 
 	/** Moves a party Pokémon to another slot (the menu's SWITCH). */
+	/**
+	 * The PARTY PICKER (OPTION, for videos: John, 15:28). "point": a party you could have had at that point in KANTO
+	 * (worked out from the point, your starter and the roll, exactly as the picker showed it); "custom": the species and
+	 * levels you chose; "own": your own party (and badges) back. Your own party is kept aside the first time, and any
+	 * POKéMON you catch meanwhile are kept with it. Only for whoever runs the game (single player, or an operator).
+	 */
+	public static void pickParty(ServerPlayer p, CompoundTag t) {
+		if (!adventure(p) || Battles.in(p)) return;
+		net.minecraft.server.MinecraftServer server = p.level().getServer();
+		if (server == null || !(server.isSingleplayer() || p.createCommandSourceStack().permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER))) {
+			message(p, List.of("The PARTY PICKER is only for whoever runs the game."));
+			return;
+		}
+		PlayerData d = data(p);
+		String mode = t.getStringOr("mode", "");
+		if (mode.equals("own")) {
+			if (!d.picking) return;
+			// Anything caught meanwhile comes too; the picker's own are let go.
+			List<Mon> caught = new ArrayList<>();
+			for (Mon m : d.party) if (!m.picked) caught.add(m);
+			d.party.clear();
+			d.party.addAll(d.ownParty);
+			for (Mon m : caught) {
+				if (d.party.size() < 6) d.party.add(m);
+				else d.box.add(m);
+			}
+			d.box.removeIf(m -> m.picked);
+			d.badges.clear();
+			d.badges.addAll(d.ownBadges);
+			d.ownParty.clear();
+			d.ownBadges.clear();
+			d.picking = false;
+			d.pickedAs = "";
+			d.follow = 0;
+			sync(p);
+			return;
+		}
+		int stage = Math.max(0, Math.min(com.insidethecube.retromon.engine.Campaign.STAGES.size() - 1, t.getIntOr("stage", 0)));
+		long seed = t.getLongOr("seed", 0L);
+		List<com.insidethecube.retromon.engine.Campaign.Entry> entries = new ArrayList<>();
+		if (mode.equals("custom")) {
+			for (net.minecraft.nbt.Tag x : t.getListOrEmpty("party")) {
+				if (!(x instanceof CompoundTag c) || entries.size() >= 6) continue;
+				String sp = c.getStringOr("sp", "");
+				if (com.insidethecube.retromon.engine.Species.ALL.containsKey(sp))
+					entries.add(new com.insidethecube.retromon.engine.Campaign.Entry(sp, Math.max(2, Math.min(100, c.getIntOr("lv", 5)))));
+			}
+		} else entries.addAll(com.insidethecube.retromon.engine.Campaign.pick(stage, t.getStringOr("starter", "bulbasaur"), seed));
+		if (entries.isEmpty()) return;
+		List<Mon> team = com.insidethecube.retromon.engine.Campaign.make(entries, stage, seed);
+		if (!d.picking) {
+			d.ownParty.clear();
+			d.ownParty.addAll(d.party);
+			d.ownBadges.clear();
+			d.ownBadges.addAll(d.badges);
+			d.picking = true;
+		} else {
+			for (Mon m : d.party) {
+				if (m.picked) continue;
+				if (d.ownParty.size() < 6) d.ownParty.add(m);
+				else d.box.add(m);
+			}
+		}
+		d.box.removeIf(m -> m.picked);
+		d.party.clear();
+		d.party.addAll(team);
+		d.follow = 0;
+		d.badges.clear();
+		if (t.getBooleanOr("badges", true)) d.badges.addAll(com.insidethecube.retromon.engine.Campaign.badges(stage));
+		else d.badges.addAll(d.ownBadges);
+		d.pickedAs = mode.equals("custom") ? "CUSTOM" : com.insidethecube.retromon.engine.Campaign.STAGES.get(stage).title();
+		for (Mon m : team) d.seen.add(m.species.id());
+		sync(p);
+	}
+
 	public static void order(ServerPlayer p, CompoundTag t) {
 		PlayerData d = data(p);
 		int a = t.getIntOr("a", -1), b = t.getIntOr("b", -1);

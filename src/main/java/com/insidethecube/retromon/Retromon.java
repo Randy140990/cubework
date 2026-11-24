@@ -143,6 +143,7 @@ public class Retromon implements ModInitializer {
 			case "pc" -> Game.pc(p, t);
 			case "read" -> Game.read(p, t);
 			case "device" -> Game.device(p, t.getBooleanOr("on", false));
+			case "pick_party" -> Game.pickParty(p, t);
 			default -> {
 			}
 		}

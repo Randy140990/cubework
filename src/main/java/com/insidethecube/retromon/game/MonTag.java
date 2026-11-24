@@ -32,6 +32,7 @@ public final class MonTag {
 		t.putInt("max", m.maxHp());
 		t.putInt("fr", m.friendship);
 		t.putInt("steps", m.steps);
+		if (m.picked) t.putBoolean("pk", true);
 		return t;
 	}
 
@@ -76,6 +77,7 @@ public final class MonTag {
 		m.hp = Math.max(0, Math.min(m.maxHp(), t.getIntOr("hp", m.maxHp())));
 		m.friendship = t.getIntOr("fr", 70);
 		m.steps = t.getIntOr("steps", 0);
+		m.picked = t.getBooleanOr("pk", false);
 		return m;
 	}
 

@@ -149,8 +149,9 @@ public final class Adventure {
 		if (mc.options.getCameraType() != CameraType.THIRD_PERSON_BACK) mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
 		if (frozen > 0 && --frozen == 0 && mc.screen == null) focus(-1);
 		if (followTicks > 0) followTicks--;
-		// Lavender Town: night comes on as you walk towards it, and goes as you walk away.
-		float want = lavenderNear(mc);
+		// Lavender Town: night comes on as you walk towards it, and goes as you walk away. ((0.59.7, 15:33) Not in PHOTO
+		// MODE: the camera's pictures are taken by the real time of day, Lavender's too.)
+		float want = Photo.on ? 0 : lavenderNear(mc);
 		lavender = Math.max(0F, Math.min(1F, lavender + Math.max(-0.04F, Math.min(0.03F, want - lavender))));
 		distance += (distanceTarget - distance) * 0.2;
 		while (SPEED.consumeClick()) cycleSpeed();

@@ -50,6 +50,14 @@ public class PlayerData {
 	public String outfit = "";
 	/** The places you've been (for the Town Map, and where you can fly). */
 	public final Set<String> visited = new LinkedHashSet<>();
+	/**
+	 * The PARTY PICKER (for videos, 15:28): while a picked party's in use, your own party and badges are kept here, to
+	 * come back with MY OWN PARTY; and which point the picked one's from.
+	 */
+	public final List<Mon> ownParty = new ArrayList<>();
+	public final Set<String> ownBadges = new LinkedHashSet<>();
+	public boolean picking;
+	public String pickedAs = "";
 	/** How far the story's come: "parcel" (carrying OAK's PARCEL), "pokedex" (Oak gave you the POKéDEX). */
 	public final Set<String> story = new LinkedHashSet<>();
 
@@ -148,6 +156,12 @@ public class PlayerData {
 		t.putDouble("played", played);
 		t.putLong("since", since);
 		t.putLong("day0", day0);
+		if (picking) {
+			t.putBoolean("picking", true);
+			t.put("own", MonTag.saveAll(ownParty));
+			t.putString("ownBadges", join(ownBadges));
+			t.putString("pickedAs", pickedAs);
+		}
 		return t;
 	}
 
@@ -198,6 +212,12 @@ public class PlayerData {
 		// A save from before the errand (0.8 and older): you already had the POKéDEX.
 		else if (d.started) d.story.add("pokedex");
 		split(t.getStringOr("visited", ""), d.visited);
+		d.picking = t.getBooleanOr("picking", false);
+		if (d.picking) {
+			d.ownParty.addAll(MonTag.loadAll(t.getListOrEmpty("own")));
+			split(t.getStringOr("ownBadges", ""), d.ownBadges);
+			d.pickedAs = t.getStringOr("pickedAs", "");
+		}
 		return d;
 	}
 }

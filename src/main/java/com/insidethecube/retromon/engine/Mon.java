@@ -35,6 +35,8 @@ public class Mon {
 	public int friendship = 70;
 	/** Steps walked with you, towards the next bit of friendship. */
 	public int steps;
+	/** One of the PARTY PICKER's (for videos): let go when you put your own party back. */
+	public boolean picked;
 
 	public Mon(Species species, int level, Random rng) {
 		this.species = species;

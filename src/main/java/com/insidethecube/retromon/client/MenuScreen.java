@@ -41,6 +41,8 @@ public class MenuScreen extends DeviceScreen {
 	private View view = View.MENU, afterMessage = View.MENU;
 	private final OptionsPage options = new OptionsPage(() -> {
 		if (minecraft != null) minecraft.setScreen(new KeyMapScreen(this));
+	}, () -> {
+		if (minecraft != null) minecraft.setScreen(new PartyPickerScreen(this));
 	});
 	/** The menu's rows: 0 your partner's emblem, 1 the five tiles, 2 the five pills. */
 	private int menuRow = 1;

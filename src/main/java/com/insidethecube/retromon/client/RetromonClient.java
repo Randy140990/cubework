@@ -61,6 +61,7 @@ public class RetromonClient implements ClientModInitializer {
 			Hud.tick(mc);
 			SlotSnapshot.tick(mc);
 			Postcards.tick(mc);
+			Photo.tick(mc);
 			TownMap.tick(mc);
 		});
 		// The Town Map keeps up with the world: chunks coming in are looked at for what's changed.
