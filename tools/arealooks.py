@@ -313,6 +313,8 @@ def main():
             rows.append((r[0], blocks) + b + (lower(r[6]), lower(r[7]), r[8], "Goldenrod City"))
     import arealooks57
     rows[:] = arealooks57.finish(rows, globals())
+    import arealooks596
+    rows[:] = arealooks596.post(rows, globals())
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -808,6 +810,9 @@ def round50(add, room):
     # (0.59.4) John's Kanto fly-round, 07:31 and 07:36.
     import arealooks594
     arealooks594.round594(add, room, globals())
+    # (0.59.6) John's 13:17 round: every cut-through, Kanto's cliffs, the Bike Shop's back posts.
+    import arealooks596
+    arealooks596.round596(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -868,8 +873,11 @@ def round50(add, room):
     # The bikes outside the Bike Shop (20:12; 12:19: "stacking a couple at the side"): three side by side on the pavement
     # by the shop's west side, by its sign.
     # ((0.59, 18:19: "the bikes in the road ... move them to the right 3 blocks") On the paving three blocks east.)
+    # ((0.59.6, 13:17: "the bikes ... aren't there") The paving there is smooth stone SLABS, which the rows didn't name:
+    # the bikes were never drawn. On the slabs, half a block lower.)
     for z in (278, 279, 280):
         add("prop", "light_blue_terracotta,white_concrete,light_blue_concrete,white_terracotta,smooth_stone", (-378, z, -378, z, "a bike by the Bike Shop"), "bike", ("33", "33"))
+        add("prop", "smooth_stone_slab", (-378, z, -378, z, "a bike by the Bike Shop"), "bike_low", ("33", "33"))
     # Lavender's sign (20:12) as every other town's.
     add("sign", "pale_oak_shelf", (-126, 425, -123, 427, "Lavender Town's sign"), "-", ("33", "35"))
     # The SAFARI ZONE (its room): its warped doors plain wood, its fences as the routes'.

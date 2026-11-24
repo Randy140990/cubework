@@ -23,8 +23,12 @@ import net.minecraft.world.phys.AABB;
 public final class Scenery {
 	private Scenery() {}
 
-	/** One: its key ("scene:" + id), its species, whether it swims, its patch (blocks, both ends in) and the surface's height there. */
-	public record Def(String key, String species, boolean swims, int x0, int z0, int x1, int z1, int y) {
+	/**
+	 * One: its key ("scene:" + id), its species, whether it swims, its patch (blocks, both ends in) and the surface's
+	 * height there; (0.59.6, 13:17: "they probably don't need to be at the top, they can be underneath") whether it
+	 * swims under the surface (the fish) rather than on it.
+	 */
+	public record Def(String key, String species, boolean swims, int x0, int z0, int x1, int z1, int y, boolean dives) {
 		double midX() {
 			return (x0 + x1) / 2.0 + 0.5;
 		}
@@ -52,8 +56,9 @@ public final class Scenery {
 		for (String[] r : com.insidethecube.retromon.engine.Species.table("scenery.tsv")) {
 			if (r.length < 8) continue;
 			try {
-				DEFS.add(new Def("scene:" + r[0].trim(), r[1].trim(), r[2].trim().equals("swim"), Integer.parseInt(r[3].trim()), Integer.parseInt(r[4].trim()),
-						Integer.parseInt(r[5].trim()), Integer.parseInt(r[6].trim()), Integer.parseInt(r[7].trim())));
+				String mode = r[2].trim();
+				DEFS.add(new Def("scene:" + r[0].trim(), r[1].trim(), mode.equals("swim") || mode.equals("dive"), Integer.parseInt(r[3].trim()), Integer.parseInt(r[4].trim()),
+						Integer.parseInt(r[5].trim()), Integer.parseInt(r[6].trim()), Integer.parseInt(r[7].trim()), mode.equals("dive")));
 			} catch (NumberFormatException ignored) {
 				// A row that isn't one.
 			}
@@ -113,13 +118,34 @@ public final class Scenery {
 		}
 	}
 
+	/** How high a swimmer is: on the surface, bobbing; a diver well under it, drifting up and down a little. */
+	private static double swimY(Def d, int tick) {
+		return d.dives() ? d.y() - 1.1 + Math.sin(tick * 0.05) * 0.15 : d.y() + 0.4 + Math.sin(tick * 0.1) * 0.04;
+	}
+
+	/** (0.59.6, 13:17: "there are 2 stacked") Another of the place's POKéMON within this of a spot: not there. */
+	private static final double APART = 2.2;
+
+	private static boolean crowded(ServerLevel level, Def d, double x, double z, WorldMon self) {
+		AABB near = new AABB(x - APART, d.y() - 4, z - APART, x + APART, d.y() + 4, z + APART);
+		for (WorldMon o : level.getEntitiesOfClass(WorldMon.class, near, w -> is(w.key()) && w != self))
+			if (Math.hypot(o.getX() - x, o.getZ() - z) < APART) return true;
+		return false;
+	}
+
 	/** A random good spot in its patch: on the water (a swimmer) or on open ground (a walker), or null. */
 	private static double[] spot(ServerLevel level, Def d) {
+		return spot(level, d, null);
+	}
+
+	private static double[] spot(ServerLevel level, Def d, WorldMon self) {
 		for (int tries = 0; tries < 12; tries++) {
 			int x = d.x0() + RNG.nextInt(d.x1() - d.x0() + 1), z = d.z0() + RNG.nextInt(d.z1() - d.z0() + 1);
+			if (crowded(level, d, x + 0.5, z + 0.5, self)) continue;
 			if (d.swims()) {
 				BlockPos at = new BlockPos(x, d.y(), z);
-				if (level.getBlockState(at).is(Blocks.WATER) && level.getBlockState(at.above()).isAir()) return new double[] {x + 0.5, d.y() + 0.4, z + 0.5};
+				if (level.getBlockState(at).is(Blocks.WATER) && level.getBlockState(at.above()).isAir() && (!d.dives() || level.getBlockState(at.below()).is(Blocks.WATER)))
+					return new double[] {x + 0.5, swimY(d, 0), z + 0.5};
 			} else {
 				Double y = ground(level, x + 0.5, z + 0.5, d.y());
 				if (y != null) return new double[] {x + 0.5, y, z + 0.5};
@@ -153,10 +179,10 @@ public final class Scenery {
 		if (dist < 0.08) {
 			if (--plan.rest > 0) {
 				// (A swimmer bobs as it rests.)
-				if (d.swims()) w.setPos(w.getX(), d.y() + 0.4 + Math.sin(w.tickCount * 0.1) * 0.04, w.getZ());
+				if (d.swims()) w.setPos(w.getX(), swimY(d, w.tickCount), w.getZ());
 				return;
 			}
-			double[] next = spot(level, d);
+			double[] next = spot(level, d, w);
 			if (next == null) return;
 			plan.tx = next[0] + (RNG.nextDouble() - 0.5) * 0.6;
 			plan.tz = next[2] + (RNG.nextDouble() - 0.5) * 0.6;
@@ -173,7 +199,13 @@ public final class Scenery {
 				plan.tz = w.getZ();
 				return;
 			}
-			ny = d.y() + 0.4 + Math.sin(w.tickCount * 0.1) * 0.04;
+			// (Nor through another of the place's: it waits.)
+			if (crowded(level, d, nx, nz, w) && !crowded(level, d, w.getX(), w.getZ(), w)) {
+				plan.tx = w.getX();
+				plan.tz = w.getZ();
+				return;
+			}
+			ny = swimY(d, w.tickCount);
 		} else {
 			Double g = ground(level, nx, nz, (int) Math.floor(w.getY() + 0.5));
 			if (g == null) {

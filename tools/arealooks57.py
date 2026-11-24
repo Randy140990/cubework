@@ -179,9 +179,11 @@ def round57(add, room, G):
     add("swap", "deepslate_tile_wall,stripped_mangrove_wood", LB, "block/deepslate_tiles=lab_cin_post,block/stripped_mangrove_log=lab_cin_trim", ys(23, 26))
     add("swap", "tuff_bricks,tuff_brick_stairs,stone_bricks,stone_brick_wall", LB, "block/tuff_bricks=mansion_base,block/stone_bricks=mansion_base", ys(17, 21))
     add("sign", "pale_oak_shelf", LB, "-", ys(17, 20))
-    for x in range(-809, -798, 3):
-        for z in range(917, 929, 4):
-            add("prop", "polished_deepslate", (x, z, x, z, "a solar panel on the LAB's roof"), "solar", ys(24, 24))
+    # ((0.59.6, 13:17: "make the solar panels flat on top ... a 3x2, maybe a 2 gap, a 3x2, a 2 gap, and then a 3x2")
+    # Three flat arrays, each three blocks across and two deep, two blocks apart, down the roof (its ten blocks
+    # deep exactly); each drawn from its front middle block.)
+    for z in (917, 921, 925):
+        add("prop", "polished_deepslate", (-805, z, -805, z, "a solar array on the LAB's roof"), "solar", ys(24, 24))
     # The volcano (15:57: "the bone, which is supposed to be steam ... opacity 30%"; "retexturize the lava ... flowing").
     V = (-870, 899, -826, 937, "Cinnabar's volcano")
     add("steam", "bone_block", V, "steam")

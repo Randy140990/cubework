@@ -142,12 +142,19 @@ public final class AreaLooks {
 	private record Made(Look look, Rule rule, List<Rule> rivals) {}
 
 	private static final Map<BlockState, List<Made>> MADE = new java.util.concurrent.ConcurrentHashMap<>();
+	/** Looks that couldn't be made at the last bake (each logged once). */
+	private static final java.util.Set<String> BAD = java.util.concurrent.ConcurrentHashMap.newKeySet();
+	/** Put back on top once since the last bake (never again until the next: a mod that wraps every time can't make us redraw the map over and over). */
+	private static boolean rewrapped;
 	/** Our own phase, after everyone's wrapping (WRAP_LAST_PHASE): ours is the outermost model when the game bakes. */
 	private static final Identifier ON_TOP = Retromon.id("area_looks_on_top");
 
 	public static void register() {
 		ModelLoadingPlugin.register(ctx -> {
 			MADE.clear();
+			BAD.clear();
+			rewrapped = false;
+			reported = false;
 			ctx.modifyBlockModelAfterBake().addPhaseOrdering(ModelModifier.WRAP_LAST_PHASE, ON_TOP);
 			for (Direction d : Direction.Plane.HORIZONTAL) {
 				for (String part : new String[] {"l", "r", "m", "s"}) {
@@ -172,6 +179,8 @@ public final class AreaLooks {
 			// (0.50) The leafy trees (20:07): Shards' extra leaves, two ways round, for each kind of leaves.
 			for (String t : LEAFY) for (String v : new String[] {"a", "b"}) part(ctx, "leafy_" + t + "_" + v, "block/area/leafy_" + t + "_" + v);
 			part(ctx, "prop_bike", "block/area/prop_bike");
+			// (0.59.6) The bike on a slab (the paving by the Bike Shop), half a block lower.
+			part(ctx, "prop_bike_low", "block/area/prop_bike_low");
 			part(ctx, "prop_statue", "block/area/prop_statue");
 			part(ctx, "prop_trophy", "block/area/prop_trophy");
 			part(ctx, "prop_mon_statue", "block/area/prop_mon_statue");
@@ -191,7 +200,17 @@ public final class AreaLooks {
 						|| rule.look().equals("sign") || rule.look().equals("sign_o") || rule.look().equals("sign_b") || rule.look().equals("keep") || rule.look().equals("hide") || rule.look().equals("cube")) swaps.add(rule);
 				List<Made> made = new ArrayList<>();
 				for (Rule rule : looks.values()) {
-					Look look = make(rule, c.baker());
+					// ((0.59.6) The real reason 13:17's pillars, cliffs and mushrooms kept their old pictures: one row of
+					// their block's ("hill_top@4|drip_rock@4") couldn't be read, and the error lost every look of that block,
+					// all over the map. A row that can't be made is now left out on its own, and the log says which.)
+					Look look;
+					try {
+						look = make(rule, c.baker());
+					} catch (RuntimeException ex) {
+						if (BAD.add(rule.look() + "|" + rule.swaps()))
+							Retromon.LOG.warn("Retromon looks: a {} look ({}) couldn't be made, left out: {}", rule.look(), rule.swaps(), ex.toString());
+						look = null;
+					}
 					List<Rule> rivals = new ArrayList<>();
 					if (swaps.contains(rule)) for (Rule o : swaps) if (o != rule) rivals.add(o);
 					if (look != null) {
@@ -220,11 +239,12 @@ public final class AreaLooks {
 		net.minecraft.client.renderer.block.BlockModelShaper shaper = mc.getModelManager().getBlockModelShaper();
 		List<BlockState> under = new ArrayList<>();
 		for (BlockState s : MADE.keySet()) if (!(shaper.getBlockModel(s) instanceof Wrapped)) under.add(s);
-		if (under.isEmpty()) {
-			if (!reported) Retromon.LOG.info("Retromon looks: ours are drawn for all {} block states with a look", MADE.size());
+		if (under.isEmpty() || rewrapped) {
+			if (!reported) Retromon.LOG.info("Retromon looks: ours are drawn for all {} block states with a look ({} looks left out)", MADE.size(), BAD.size());
 			reported = true;
 			return;
 		}
+		rewrapped = true;
 		Map<BlockState, BlockStateModel> all = new HashMap<>();
 		for (BlockState s : Block.BLOCK_STATE_REGISTRY) all.put(s, shaper.getBlockModel(s));
 		List<String> which = new ArrayList<>();
@@ -323,9 +343,10 @@ public final class AreaLooks {
 			case "cube" -> {
 				// ("top|side@4": laid over four blocks, as a swap's can be, for a cliff's rock.)
 				String spec = rule.swaps();
-				int at = spec.indexOf('@');
-				int period = at < 0 ? 0 : Integer.parseInt(spec.substring(at + 1).trim());
-				if (at >= 0) spec = spec.substring(0, at);
+				int period = 0;
+				java.util.regex.Matcher every = java.util.regex.Pattern.compile("@(\\d+)").matcher(spec);
+				while (every.find()) period = Math.max(period, Integer.parseInt(every.group(1)));
+				spec = spec.replaceAll("@\\d+", "").replace("!", "");
 				String[] p = spec.split("\\|");
 				TextureAtlasSprite top = sprite(baker, p[0].trim()), side = p.length > 1 ? sprite(baker, p[1].trim()) : top;
 				yield (base, e, view, pos, state, random, cull) -> {
@@ -497,13 +518,14 @@ public final class AreaLooks {
 			if (eq < 0) continue;
 			String from = one.substring(0, eq).trim(), to = one.substring(eq + 1).trim();
 			// ("name!": drawn without the biome's tint, the texture's own colours: the League gate's bushes.)
-			boolean noTint = to.endsWith("!");
-			if (noTint) to = to.substring(0, to.length() - 1);
-			int period = 0, at = to.indexOf('@');
-			if (at >= 0) {
-				period = Integer.parseInt(to.substring(at + 1).trim());
-				to = to.substring(0, at);
-			}
+			boolean noTint = to.contains("!");
+			to = to.replace("!", "");
+			// ((0.59.6) "hill_top@4|drip_rock@4" as well as "hill_top|drip_rock@4": the first was read as the number
+			// "4|drip_rock@4" and stopped every look of the block from being made.)
+			int period = 0;
+			java.util.regex.Matcher every = java.util.regex.Pattern.compile("@(\\d+)").matcher(to);
+			while (every.find()) period = Math.max(period, Integer.parseInt(every.group(1)));
+			to = to.replaceAll("@\\d+", "").trim();
 			Identifier fromId = from.contains(":") ? Identifier.parse(from) : Identifier.withDefaultNamespace(from);
 			// ("top|side": one texture for the tops and bottoms, another for the sides: Diglett's Cave's rock.)
 			int bar = to.indexOf('|');
