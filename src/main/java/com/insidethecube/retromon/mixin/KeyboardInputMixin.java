@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Walking in the adventure: the keys move you in the camera's directions (up the screen is north, and the
  * diagonals), turning you to face the way you walk. Shift runs. No jumping (Space is the A button), and no
- * walking into water (until there's SURF); if you're ever in it, you swim out.
+ * walking into water (until there's SURF; but in a cave whose water is the way on, Cerulean Cave's, you swim it); if
+ * you're ever in it, you swim out.
  */
 @Mixin(KeyboardInput.class)
 public abstract class KeyboardInputMixin extends ClientInput {
@@ -57,7 +58,8 @@ public abstract class KeyboardInputMixin extends ClientInput {
 			this.moveVector = Vec2.ZERO;
 			return;
 		}
-		if (!swimming && waterAhead(player, yaw)) {
+		// ((0.60) Not in Cerulean Cave, whose water is the way through: FireRed's SURF, swum.)
+		if (!swimming && waterAhead(player, yaw) && !com.insidethecube.retromon.game.Interiors.swims(player)) {
 			this.keyPresses = new Input(false, false, false, false, false, false, false);
 			this.moveVector = Vec2.ZERO;
 			player.setYRot(yaw);

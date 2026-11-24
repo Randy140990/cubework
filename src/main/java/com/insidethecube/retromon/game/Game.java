@@ -2816,7 +2816,8 @@ public final class Game {
 					talkBattle(p, n, trainerHouse(p));
 					return;
 				}
-				Trainers.Trainer t = Trainers.get(n.key());
+				// ((0.60) Your rival later on, standing in a room: his team made up for you, as the lab's and Route 22's.)
+				Trainers.Trainer t = trainerFor(p, n.key());
 				if (t == null) {
 					dialogue(p, n, "talk", List.of("..."));
 					return;
@@ -3538,7 +3539,7 @@ public final class Game {
 			"lickitung_trade", "slowbro", "nidoran_f_trade", "nidoran_m", "electrode_trade", "raichu", "tangela_trade", "venonat", "seel_trade", "ponyta");
 	/** The names the traded POKéMON come with (FireRed's). */
 	private static final Map<String, String> TRADE_NICKS = Map.of("nidoran_f_trade", "MS. NIDO", "jynx_trade", "ZYNX", "farfetch_d_trade", "CH'DING",
-			"electrode_trade", "ESPHERE", "tangela_trade", "TANGENY", "seel_trade", "SEELOR");
+			"electrode_trade", "ESPHERE", "tangela_trade", "TANGENY", "seel_trade", "SEELOR", "lickitung_trade", "MARC");
 	/** Traders who stand in a room (by their key): the trade they offer, and what they say. */
 	private static final Map<String, String[]> TRADERS = Map.of(
 			"underground_path_trader", new String[] {"nidoran_f_trade", "I'm looking for NIDORAN♂! Wanna trade one for NIDORAN♀?", "How is my old NIDORAN♀? My NIDORAN♂ is doing great!"},
@@ -3546,7 +3547,9 @@ public final class Game {
 			"vermilion_trader", new String[] {"farfetch_d_trade", "Hi! Do you have a SPEAROW? Want to trade it for my FARFETCH'D?", "How is my old CH'DING? My SPEAROW is doing great!"},
 			"cinnabar_lab_trade_room_fr_clifton", new String[] {"electrode_trade", "Hi! Do you have a RAICHU? Want to trade it for my ELECTRODE?", "How is my old ESPHERE? My RAICHU is doing great!"},
 			"cinnabar_lab_trade_room_fr_norma", new String[] {"tangela_trade", "Hello there! Do you have a VENONAT? Want to trade it for my TANGELA?", "How is my old TANGENY? My VENONAT is doing great!"},
-			"cinnabar_lab_fossil_room_fr_garett", new String[] {"seel_trade", "Hi! Do you have a PONYTA? Want to trade it for my SEEL?", "How is my old SEELOR? My PONYTA is doing great!"});
+			"cinnabar_lab_fossil_room_fr_garett", new String[] {"seel_trade", "Hi! Do you have a PONYTA? Want to trade it for my SEEL?", "How is my old SEELOR? My PONYTA is doing great!"},
+			// (0.60) Route 18's gate, upstairs (FireRed's boy there; Red and Blue's trade, a SLOWBRO for MARC).
+			"route_18_gate_2f_p0", new String[] {"lickitung_trade", "Hi! Do you have a SLOWBRO? Want to trade it for my LICKITUNG?", "How is my old MARC? My SLOWBRO is doing great!"});
 
 	private static void trader(ServerPlayer p, Npc n, PlayerData d) {
 		String[] tr = TRADERS.get(n.key());

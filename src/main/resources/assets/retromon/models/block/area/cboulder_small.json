@@ -1,0 +1,74 @@
+{
+ "parent": "block/block",
+ "ambientocclusion": true,
+ "textures": {
+  "rock": "retromon:block/area/cc_boulder",
+  "particle": "retromon:block/area/cc_boulder"
+ },
+ "elements": [
+  {
+   "from": [
+    3,
+    0,
+    3
+   ],
+   "to": [
+    13,
+    4,
+    13
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rock"
+    },
+    "south": {
+     "texture": "#rock"
+    },
+    "east": {
+     "texture": "#rock"
+    },
+    "west": {
+     "texture": "#rock"
+    },
+    "up": {
+     "texture": "#rock"
+    },
+    "down": {
+     "texture": "#rock"
+    }
+   }
+  },
+  {
+   "from": [
+    4.5,
+    4,
+    4.5
+   ],
+   "to": [
+    11.5,
+    6.5,
+    11.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#rock"
+    },
+    "south": {
+     "texture": "#rock"
+    },
+    "east": {
+     "texture": "#rock"
+    },
+    "west": {
+     "texture": "#rock"
+    },
+    "up": {
+     "texture": "#rock"
+    },
+    "down": {
+     "texture": "#rock"
+    }
+   }
+  }
+ ]
+}

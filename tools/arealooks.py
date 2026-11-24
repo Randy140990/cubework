@@ -813,6 +813,9 @@ def round50(add, room):
     # (0.59.6) John's 13:17 round: every cut-through, Kanto's cliffs, the Bike Shop's back posts.
     import arealooks596
     arealooks596.round596(add, room, globals())
+    # (0.60) John's 16:36: Cerulean Cave and Victory Road.
+    import arealooks60
+    arealooks60.round60(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")

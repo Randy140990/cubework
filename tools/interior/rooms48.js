@@ -5,6 +5,17 @@
       boulder: "area_ice_shard", pre: "iboulder", haze: 0x9ec8ea, night: false },
     rock_tunnel: { floor: "area_rt_floor", sand: "area_rt_floor", step: "area_rt_floor", wall: "area_rt_rock", wallTop: "area_rt_rock_top", ice: "area_rt_rock", iceTop: "area_rt_rock_top",
       boulder: "area_rt_boulder", pre: "rboulder", haze: 0x463a30, night: true },
+    // (0.60) Cerulean Cave and Victory Road (John's 16:36; tools/looks60.py's textures).
+    cerulean_cave: { floor: "area_cc_floor", sand: "area_cc_floor", step: "area_cc_step", wall: "area_cc_cliff", wallTop: "area_cc_moss_top", ice: "area_cc_cliff", iceTop: "area_cc_moss_top",
+      boulder: "area_cc_boulder", pre: "cboulder", haze: 0x76909a, night: false },
+    victory_road: { floor: "area_vr_floor", sand: "area_vr_sand", step: "area_vr_step", wall: "area_vr_cliff", wallTop: "area_vr_top", ice: "area_vr_cliff", iceTop: "area_vr_top",
+      boulder: "area_vr_boulder", pre: "vboulder", haze: 0xb08c68, night: false },
+  };
+  const ABOUT = {
+    seafoam: "John's floors stitched as FireRed's: ladders and holes down to B4F and ARTICUNO; its rock ice, its boulders ice shards; the deep water you can swim (SURF comes later).",
+    rock_tunnel: "John's two floors stitched as FireRed's: in by the north mouth at 1F's ladder, four ladders between 1F and B1F, out at 1F's south doorway. Dark; craggy rocks; FireRed's trainers.",
+    cerulean_cave: "John's three floors stitched as FireRed's: in from the river's north bank onto 1F, its water swum (SURF comes later), ladders up to 2F's maze of boulders and down to B1F and MEWTWO.",
+    victory_road: "John's three floors stitched as FireRed's: in by Route 23's west mouth onto 1F, up to 2F and 3F and back down to 2F's way out by the east mouth. FireRed's trainers; MOLTRES on 2F, where Red and Blue had it; the rock barriers cleared.",
   };
   function caveRoom48(id) {
     const C = CAVES48[id], K = PAL[C.cave];
@@ -25,7 +36,7 @@
           G.box(x, -1, z, x1, h, z + 1, { top: K.floor, all: "soil" });
           for (let bx = x; bx < x1; bx++) {
             const m = BOULDERS[(c.k === "g" ? K.pre + "_small" : ((bx * 31 + z * 17 + 3 * 7) % 2 + 2) % 2 === 0 ? K.pre + "_a" : K.pre + "_b")] || BOULDERS[c.k === "g" ? "boulder_small" : "boulder_a"];
-            for (const q of m.slice(1)) G.box(bx + q[0] * P, h + q[1] * P, z + q[2] * P, bx + q[3] * P, h + q[4] * P, z + q[5] * P, K.boulder);
+            for (const q of m) G.box(bx + q[0] * P, h + q[1] * P, z + q[2] * P, bx + q[3] * P, h + q[4] * P, z + q[5] * P, K.boulder);
           }
           R.solid(x, z, x1, z + 1);
         } else if (c.k === "K" || c.k === "L") {
@@ -50,7 +61,7 @@
       G.box(it.x - 0.2, y, it.z - 0.2, it.x + 0.2, y + 0.4, it.z + 0.2, { all: "ball", top: "ballTop" });
       R.act([it.x - 0.6, it.z - 0.6, it.x + 0.6, it.z + 0.6], { label: "Look", lines: [it.item.replace(/_/g, " ").toUpperCase()] });
     }
-    // (The POKéMON standing here, ARTICUNO: the game has the creature; the viewer marks its spot.)
+    // (The POKéMON standing here, ARTICUNO, MEWTWO, MOLTRES: the game has the creature; the viewer marks its spot.)
     for (const m of C.mons) {
       const y = m.y || 0;
       G.box(m.x - 0.5, y, m.z - 0.5, m.x + 0.5, y + 0.15, m.z + 0.5, { all: K.iceTop });
@@ -62,8 +73,7 @@
     for (const p of C.people) R.npcs.push({ name: p.name.split(" ").map(w => w[0] + w.slice(1).toLowerCase()).join(" "), key: p.key, x: p.x, z: p.z, y: p.y || 0,
       yaw: (180 - p.yaw) * Math.PI / 180, look: { skin: p.skin }, role: p.role || null, talk: () => [{ text: "(A trainer: walk into their sight and they'll battle you.)" }] });
     R.spawn = { x: C.spawn.x, z: C.spawn.z, yaw: C.spawn.yaw === 180 ? FACE.n : FACE.s };
-    R.item(C.name, C.cave === "seafoam" ? "John's floors stitched as FireRed's: ladders and holes down to B4F and ARTICUNO; its rock ice, its boulders ice shards; the deep water you can swim (SURF comes later)."
-      : "John's two floors stitched as FireRed's: in by the north mouth at 1F's ladder, four ladders between 1F and B1F, out at 1F's south doorway. Dark; craggy rocks; FireRed's trainers.");
+    R.item(C.name, ABOUT[C.cave]);
     return R;
   }
   for (const id of Object.keys(CAVES48)) {

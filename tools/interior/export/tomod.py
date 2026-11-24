@@ -40,6 +40,8 @@ ORIGIN = {"house1": (0, 64, 0), "house2": (64, 64, 0), "rival1": (128, 64, 0), "
           "gate_r12": (4032, 64, 0), "gate_r15": (4416, 64, 0), "gate_r16n": (4480, 64, 0), "gate_r16s": (4544, 64, 0), "gate_r18": (4928, 64, 0),
           "route12_house": (4992, 64, 0), "route16_house": (5056, 64, 0),
           "gate_r11_2f": (5248, 64, 0), "gate_r12_2f": (5312, 64, 0), "gate_r15_2f": (5504, 64, 0), "gate_r16_2f": (5568, 64, 0),
+          # (0.60) Route 18's upstairs: past the 0.60 rooms (12288 on), short of the caves (16384 on).
+          "gate_r18_2f": (16128, 64, 0),
           "fighting_dojo": (5760, 64, 0), "saffron_gym": (5824, 64, 0),
           "copycats_house_1f": (5888, 64, 0), "copycats_house_2f": (5952, 64, 0), "mr_psychics_house": (6016, 64, 0),
           # (0.53) SILPH CO.'s eleven floors and its elevator.
@@ -68,6 +70,7 @@ PLACE = {"house1": "pallet_town", "house2": "pallet_town", "rival1": "pallet_tow
          "gate_r12": "route_12_gate_1f", "gate_r15": "route_15_gate_1f", "gate_r16n": "route_16_gate_1f", "gate_r16s": "route_16_gate_1f",
          "gate_r18": "route_18_gate_1f", "route12_house": "route_12_super_rod_house", "route16_house": "route_16_fly_house",
          "gate_r11_2f": "route_11_gate_2f", "gate_r12_2f": "route_12_gate_2f", "gate_r15_2f": "route_15_gate_2f", "gate_r16_2f": "route_16_gate_2f",
+         "gate_r18_2f": "route_18_gate_2f",
          "fighting_dojo": "fighting_dojo", "saffron_gym": "saffron_gym",
          "copycats_house_1f": "copycats_house_1f", "copycats_house_2f": "copycats_house_2f", "mr_psychics_house": "mr_psychics_house",
          "silph_co_1f": "silph_co_1f", "silph_co_2f": "silph_co_2f", "silph_co_3f": "silph_co_3f", "silph_co_4f": "silph_co_4f", "silph_co_5f": "silph_co_5f", "silph_co_6f": "silph_co_6f", "silph_co_7f": "silph_co_7f", "silph_co_8f": "silph_co_8f", "silph_co_9f": "silph_co_9f", "silph_co_10f": "silph_co_10f", "silph_co_11f": "silph_co_11f", "silph_co_elevator": "silph_co_elevator",
@@ -275,6 +278,8 @@ MONS["daycare"] = MONS_DAYCARE
 # The FIGHTING DOJO's prize: HITMONLEE and HITMONCHAN in their POKe BALLs behind the KARATE MASTER (take one).
 MONS["fighting_dojo"] = [{"key": "hitmonlee_gift", "species": "poke_ball", "x": 5.5, "z": 3.5, "yaw": 0.0},
                          {"key": "hitmonchan_gift", "species": "poke_ball", "x": 7.5, "z": 3.5, "yaw": 0.0}]
+# (0.60) The CELADON MANSION's roof room: the EEVEE in its POKe BALL (FireRed's, on the table; here in front of it).
+MONS["celadon_mansion_roof_house"] = [{"key": "eevee_gift", "species": "poke_ball", "x": 7.5, "z": 4.5, "yaw": 0.0}]
 MONS["pokemon_fan_club"] = [{"key": "pet:pokemon_fan_club_p2", "species": "clefairy", "x": 10.4, "z": 8.6, "yaw": 90.0},
                             {"key": "pet:pokemon_fan_club_p3", "species": "seel", "x": 3.6, "z": 8.6, "yaw": 270.0}]
 MONS["lavender_volunteer_house"] = [{"key": "pet:mr_fujis_house_p2", "species": "psyduck", "x": 9.0, "z": 2.0, "yaw": 180.0},

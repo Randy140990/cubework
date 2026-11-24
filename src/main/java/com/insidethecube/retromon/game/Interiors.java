@@ -119,8 +119,11 @@ public final class Interiors {
 	 */
 	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json", "/retromon/interiors/digletts_cave.json",
 			"/retromon/interiors/mt_moon.json", "/retromon/interiors/safari_zone.json", "/retromon/interiors/seafoam_islands.json",
-			"/retromon/interiors/rock_tunnel.json", "/retromon/interiors/ilex_forest.json"};
+			"/retromon/interiors/rock_tunnel.json", "/retromon/interiors/ilex_forest.json", "/retromon/interiors/cerulean_cave.json",
+			"/retromon/interiors/victory_road.json"};
 
+	/** (0.60) The rooms whose water you can walk into and swim (Cerulean Cave's: FireRed's SURF, which there isn't yet). (Before the rooms are read.) */
+	private static final java.util.Set<String> SWIM = new java.util.HashSet<>();
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */
 	public static final int STATES = DATA == null ? 1 : DATA.get("states").getAsInt();
@@ -296,6 +299,7 @@ public final class Interiors {
 				}
 				SPINS.put(room.id(), sp2);
 			}
+			if (r.has("swim") && r.get("swim").getAsBoolean()) SWIM.add(room.id());
 			if (r.has("mons")) {
 				List<MonSpot> ms = new ArrayList<>();
 				for (JsonElement me : r.getAsJsonArray("mons")) {
@@ -433,6 +437,12 @@ public final class Interiors {
 
 	public static Room roomOf(Entity e) {
 		return in(e) ? roomAt(e.getX()) : null;
+	}
+
+	/** Whether someone's in a room whose water they can swim. */
+	public static boolean swims(Entity e) {
+		Room r = roomOf(e);
+		return r != null && SWIM.contains(r.id());
 	}
 
 	/** Just inside the way in of the room someone's in (where you stand coming through the door), or null outside. */

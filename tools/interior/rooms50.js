@@ -46,7 +46,7 @@ function lgGateSide(R, o) {
       people: [["Gambler", "route_16_gate_1f_p1", 8.0, 8.4, "n", "gambler"]] },
     { id: "gate_r16s", name: "Route 16 gate", floor: "South way (the Cycling Road)", group: "Routes 11 to 18", needs: "bicycle", needsAt: "w", side: true,
       people: [["Guard", "route_16_gate_1f_p0", 7.0, 0.8, "s", "guard"]] },
-    { id: "gate_r18", name: "Route 18 gate", floor: "Fuchsia City to the Cycling Road", group: "Routes 11 to 18", needs: "bicycle", needsAt: "w", side: true,
+    { id: "gate_r18", name: "Route 18 gate", floor: "Fuchsia City to the Cycling Road", group: "Routes 11 to 18", needs: "bicycle", needsAt: "w", side: true, up: "gate_r18_2f",
       people: [["Guard", "route_18_gate_1f_p0", 7.0, 0.8, "s", "guard"]] },
   ];
   for (const g of GATES) PLACES.push({ id: g.id, name: g.name, floor: g.floor, group: g.group });
@@ -86,6 +86,10 @@ function lgGateSide(R, o) {
       people: [["Aide", "route_15_gate_2f_p0", 4.0, 5.2, "s", "scientist"]] },
     { id: "gate_r16_2f", down: "gate_r16n", name: "Route 16 gate", north: "CELADON CITY's rooftops", south: "CYCLING ROAD, running all the way down to FUCHSIA",
       people: [["Boy", "route_16_gate_2f_p0", 4.4, 5.0, "e", "youngster"], ["Girl", "route_16_gate_2f_p1", 5.6, 5.0, "w", "girl"]] },
+    // (0.60, John's 16:25) Route 18's, as FireRed's: its binoculars (PALLET TOWN far off west, people swimming), and the
+    // boy who'd trade his LICKITUNG (Red and Blue's trade: for a SLOWBRO).
+    { id: "gate_r18_2f", down: "gate_r18", name: "Route 18 gate", north: "PALLET TOWN, a long way off in the west", south: "people swimming in the sea",
+      people: [["Boy", "route_18_gate_2f_p0", 5.0, 5.6, "e", "boy"]] },
   ];
   for (const u of UPSTAIRS) {
     PLACES.push({ id: u.id, name: u.name, floor: "Upstairs", group: "Routes 11 to 18" });

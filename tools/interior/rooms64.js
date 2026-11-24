@@ -398,7 +398,9 @@
       if (o.kind === "notebook") { G.box(x - 0.2, 0.86, z - 0.15, x + 0.2, 0.88, z + 0.15, { all: "linen", top: "bookOpen" }); R.act([x - 0.6, z - 0.6, x + 0.6, z + 0.6], { label: "Read", lines: o.lines }); continue; }
       const f = FACEOF[o.face] || "s";
       if (o.kind === "mon") { R._mons.push({ key: "pet:" + id + "_" + o.species + "_" + o.x + "_" + o.z, species: o.species, x, z, yaw: FACE[f] }); continue; }
-      if (o.kind === "rival") { R.npcs.push({ name: "Blue", key: o.key, role: "rival", x, z, yaw: FACE[f], look: { skin: "blue" }, talk: () => [{ text: "{rival}: Hey, {player}!" }] }); continue; }
+      // (Your rival: a trainer whose team the game makes up for you, Game.trainerFor; talk to him to battle. Not
+      // "Blue", whom tools/interior/export/tomod.py leaves out: the lab's rival comes in himself.)
+      if (o.kind === "rival") { R.npcs.push({ name: "Rival", key: o.key, role: "trainer", x, z, yaw: FACE[f], look: { skin: "blue" }, talk: () => [{ text: "{rival}: Hey, {player}!" }] }); continue; }
       if (o.kind === "trainer") { R.npcs.push({ name: o.name, key: o.key, role: "trainer", x, z, yaw: FACE[f], look: { skin: o.skin }, talk: () => [{ text: o.name + " wants to battle!" }] }); continue; }
       const ro = ROLE[o.key] || {};
       R.npcs.push({ name: ro.name || o.name, key: ro.key || o.key, role: ro.role || null, x, z, yaw: FACE[f], look: { skin: ro.skin || o.skin }, talk: () => (ro.lines || o.lines).map(text => ({ text })) });
