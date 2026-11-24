@@ -1,0 +1,72 @@
+{
+ "idle": "animation.tidesiren.battle_idle",
+ "ground": "animation.tidesiren.ground_idle",
+ "actions": {
+  "cry": "animation.tidesiren.cry",
+  "recoil": "animation.tidesiren.recoil",
+  "attack": "animation.tidesiren.attack",
+  "critical": "animation.tidesiren.critical",
+  "special": "animation.tidesiren.special",
+  "recall": "animation.tidesiren.recall",
+  "sendout": "animation.tidesiren.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.tidesiren.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.tidesiren.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.tidesiren.faint",
+   "parts": []
+  }
+ },
+ "move": "ICE BEAM",
+ "attack_move": "BODY SLAM",
+ "scale": 2.5,
+ "height": 1.0,
+ "texture": "retromon:textures/mons/lapras.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/lapras_glow_0.png",
+    "retromon:textures/mons/lapras_glow_1.png",
+    "retromon:textures/mons/lapras_glow_2.png",
+    "retromon:textures/mons/lapras_glow_3.png",
+    "retromon:textures/mons/lapras_glow_4.png",
+    "retromon:textures/mons/lapras_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TIDESIREN",
+ "anchors": {
+  "mouth": [
+   0,
+   9.6,
+   -20.5
+  ],
+  "back": [
+   0,
+   17.0,
+   0.0
+  ],
+  "body": [
+   0,
+   10.0,
+   0.0
+  ],
+  "size": [
+   20.0,
+   16.0,
+   57.2
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

@@ -415,9 +415,8 @@ def terrahippo():
 # ======================================================================================================
 
 def creasecrane():
-    """A paper crane folded so perfectly it came alive: crisp flat facets of pastel paper, rose on one side and sky blue
-    on the other, crease lines running across them, a long pointed neck and tail, its wide wings beating with a papery
-    rustle as it hovers."""
+    """A paper crane folded so perfectly it came alive: crisp flat facets of red washi paper, white on the back, crease
+    lines running across them, a long pointed neck and tail, its wide wings beating with a papery rustle as it hovers."""
     m = Model()
     s = 1.4
     S = S_(s)
@@ -430,9 +429,9 @@ def creasecrane():
                 return mix(c, "#000000", 0.18)
             return mix(c, "#FFFFFF", 0.1 * v)
         return Mat(c1, f, noise=0.005, edge=0.04)
-    pa = paper("#F4A8B8", "#9AC8F0")
-    wing = Mat("#F4A8B8", lambda a: CLEAR if a.lz > 1 - (abs(a.x) / (9 * s)) * 0.9 else (mix("#9AC8F0", "#FFFFFF", 0.1) if a.face == "bottom" else
-                                                                                       (mix("#F4A8B8", "#000000", 0.15) if abs(a.lz - 0.5) < 0.03 else rgb("#F4A8B8"))),
+    pa = paper("#D8443A", "#F4ECD8")
+    wing = Mat("#D8443A", lambda a: CLEAR if a.lz > 1 - (abs(a.x) / (9 * s)) * 0.9 else (mix("#F4ECD8", "#FFFFFF", 0.1) if a.face == "bottom" else
+                                                                                       (mix("#D8443A", "#000000", 0.15) if abs(a.lz - 0.5) < 0.03 else rgb("#D8443A"))),
                noise=0.005, edge=0, flat=True)
     m.bone("root", None, [0, 0, 0])
     y0 = 7
@@ -441,7 +440,7 @@ def creasecrane():
     m.bone("head", "neck", S([0, y0 + 5.4, -2.2]), [Cube(S([-0.9, y0 + 5.0, -3.4]), [n(1.8 * s), n(1.6 * s), n(2.4 * s)], pa),
                                                    Cube(S([-0.5, y0 + 5.2, -5.2]), [1, 1, n(1.8 * s)], pa)], rotation=[34, 0, 0])
     m.bone("jaw", "head", S([0, y0 + 5.2, -3.4]), [])
-    m.eyes("head", 0.9 * s, (y0 + 5.6) * s, -3.2 * s, w=1, h=1, side=True, iris="#2A2A4A", pupil="#0A0A1A", skin="#F4A8B8", grid=["P"])
+    m.eyes("head", 0.9 * s, (y0 + 5.6) * s, -3.2 * s, w=1, h=1, side=True, iris="#2A2A4A", pupil="#0A0A1A", skin="#D8443A", grid=["P"])
     m.bone("tail", "body", S([0, y0, 2]), [Cube(S([-0.5, y0, 1.6]), [1, n(5.6 * s), n(1.2 * s)], pa)], rotation=[40, 0, 0])
     m.pair("wing_right", "body", S([-1.6, y0 + 1, 0]), [Cube(S([-10.6, y0 + 1, -2.4]), [n(9 * s), 0, n(5 * s)], wing)], rotation=[0, 0, 20])
     fx_for(m, 0.6 * s)
@@ -578,26 +577,27 @@ def frostlet():
 
 
 def numbolt():
-    """A numbat joey that crackles: sunny yellow-orange fur banded across its back and rump with black stripes, a cream
+    """A numbat joey that crackles: rust-red fur darkening over its rump, banded across its back with white, a cream
     chest, a long pointed snout, a dark stripe through each eye, and a bushy tail that bristles with static."""
     def coat(at, base):
-        if at.face in ("top", "back", "nx", "px") and at.z > -0.6 and (at.y % 1.8) < 0.7 and at.y > 4: return rgb("#1A1410")
+        if at.face in ("top", "back", "nx", "px") and at.z > -0.6 and (at.y % 1.8) < 0.7 and at.y > 4: return rgb("#F4ECDC")
+        if at.face in ("top", "back", "nx", "px") and at.y < 6: return mix("#2A1E18", "#8A3A20", min(1, max(0, (at.y - 2.6) / 3.4)))
         return None
 
     def face_coat(a):
         if a.face == "front" and 0.5 < a.ly < 0.62: return rgb("#1A1410")
         return None
-    tailm = Mat("#F0C040", brush("#F0C040", "#FFE888", "#B88A20", tip="#FFF8C0"), glow=lambda a: rgb("#FFF8A0") if a.lz > 0.85 else None, noise=0, edge=0)
+    tailm = Mat("#5A3A2A", brush("#3A2A20", "#8A6A5A", "#1A1410", tip="#E8F4FF"), glow=lambda a: rgb("#E8F4FF") if a.lz > 0.85 else None, noise=0, edge=0)
 
     def extra(p):
         m, S, s = p["m"], p["S"], p["s"]
         tb = bone_of(m, p["tail"][-1])
         tb.cubes += [Cube([-1.8 * s, tb.pivot[1], tb.pivot[2] - 0.4], [n(3.6 * s), 0, n(2.4 * s)], tailm), Cube([0, tb.pivot[1] - 1.8 * s, tb.pivot[2] - 0.4], [0, n(3.6 * s), n(2.4 * s)], tailm)]
     upright("elekid", "NUMBOLT", 0.6, dict(
-        s=1.1, hip=3, body=(4.6, 5.4, 4.4), FUR="#F0B83A", FUR_L="#FFDC7A", FUR_D="#B8801A", BELLY="#FFF0C8", coat=coat, belly_size=(2.8, 3.6), FACE="#FFE8B0",
-        face_coat=face_coat, face_line=0.4, head=(4.4, 3.8, 4), head_y=-0.4, snout=(2.2, 1.6, 1.4), NOSE="#1A1410", MUZZLE="#FFE8B0", ears=("round", 1.6, 1.8),
-        EAR_IN="#E8A060", IRIS="#2A1A0A", IRIS_L="#7A5A2A", eye_in=0.6, eye_y=0.58, eye_grid=["PW", "PP"], arms=(1.8, 1.8, 1.4), HAND="#B8801A", claws=2,
-        leg_w=1.6, foot=2.8, toes=3, FOOT="#B8801A", thigh=2.4, tail={"segs": [(1.2, 1.2, 2), (1.2, 1.2, 2)], "rests": [40, 30], "y": 0.8}, extra=extra,
+        s=1.1, hip=3, body=(4.6, 5.4, 4.4), FUR="#B04A2A", FUR_L="#D8784A", FUR_D="#6A2A18", BELLY="#F4E4C8", coat=coat, belly_size=(2.8, 3.6), FACE="#C86A40",
+        face_coat=face_coat, face_line=0.4, head=(4.4, 3.8, 4), head_y=-0.4, snout=(2.2, 1.6, 1.4), NOSE="#1A1410", MUZZLE="#F4E4C8", ears=("round", 1.6, 1.8),
+        EAR_IN="#E8A080", IRIS="#2A1A0A", IRIS_L="#7A5A2A", eye_in=0.6, eye_y=0.58, eye_grid=["PW", "PP"], arms=(1.8, 1.8, 1.4), HAND="#5A2A18", claws=2,
+        leg_w=1.6, foot=2.8, toes=3, FOOT="#5A2A18", thigh=2.4, tail={"segs": [(1.2, 1.2, 2), (1.2, 1.2, 2)], "rests": [40, 30], "y": 0.8}, extra=extra,
         moves=("QUICK ATTACK", "THUNDERPUNCH"), guard=40))
 
 

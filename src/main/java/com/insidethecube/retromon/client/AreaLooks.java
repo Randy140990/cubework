@@ -343,9 +343,10 @@ public final class AreaLooks {
 			case "cube" -> {
 				// ("top|side@4": laid over four blocks, as a swap's can be, for a cliff's rock.)
 				String spec = rule.swaps();
-				int period = 0;
+				int most = 0;
 				java.util.regex.Matcher every = java.util.regex.Pattern.compile("@(\\d+)").matcher(spec);
-				while (every.find()) period = Math.max(period, Integer.parseInt(every.group(1)));
+				while (every.find()) most = Math.max(most, Integer.parseInt(every.group(1)));
+				final int period = most;
 				spec = spec.replaceAll("@\\d+", "").replace("!", "");
 				String[] p = spec.split("\\|");
 				TextureAtlasSprite top = sprite(baker, p[0].trim()), side = p.length > 1 ? sprite(baker, p[1].trim()) : top;

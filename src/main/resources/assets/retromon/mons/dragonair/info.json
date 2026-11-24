@@ -1,0 +1,72 @@
+{
+ "idle": "animation.azuribbon.battle_idle",
+ "ground": "animation.azuribbon.ground_idle",
+ "actions": {
+  "cry": "animation.azuribbon.cry",
+  "recoil": "animation.azuribbon.recoil",
+  "attack": "animation.azuribbon.attack",
+  "critical": "animation.azuribbon.critical",
+  "special": "animation.azuribbon.special",
+  "recall": "animation.azuribbon.recall",
+  "sendout": "animation.azuribbon.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.azuribbon.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.azuribbon.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.azuribbon.faint",
+   "parts": []
+  }
+ },
+ "move": "DRAGON RAGE",
+ "attack_move": "TWISTER",
+ "scale": 3.399,
+ "height": 0.353,
+ "texture": "retromon:textures/mons/dragonair.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/dragonair_glow_0.png",
+    "retromon:textures/mons/dragonair_glow_1.png",
+    "retromon:textures/mons/dragonair_glow_2.png",
+    "retromon:textures/mons/dragonair_glow_3.png",
+    "retromon:textures/mons/dragonair_glow_4.png",
+    "retromon:textures/mons/dragonair_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "AZURIBBON",
+ "anchors": {
+  "mouth": [
+   0,
+   1.28,
+   -18.1
+  ],
+  "back": [
+   0,
+   5.16,
+   -0.34
+  ],
+  "body": [
+   0,
+   2.0,
+   -0.34
+  ],
+  "size": [
+   18.56,
+   5.64,
+   61.35
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

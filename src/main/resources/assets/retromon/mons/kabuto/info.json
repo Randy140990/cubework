@@ -1,0 +1,72 @@
+{
+ "idle": "animation.triloblet.battle_idle",
+ "ground": "animation.triloblet.ground_idle",
+ "actions": {
+  "cry": "animation.triloblet.cry",
+  "recoil": "animation.triloblet.recoil",
+  "attack": "animation.triloblet.attack",
+  "critical": "animation.triloblet.critical",
+  "special": "animation.triloblet.special",
+  "recall": "animation.triloblet.recall",
+  "sendout": "animation.triloblet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.triloblet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.triloblet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.triloblet.faint",
+   "parts": []
+  }
+ },
+ "move": "HARDEN",
+ "attack_move": "SCRATCH",
+ "scale": 1.645,
+ "height": 0.304,
+ "texture": "retromon:textures/mons/kabuto.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/kabuto_glow_0.png",
+    "retromon:textures/mons/kabuto_glow_1.png",
+    "retromon:textures/mons/kabuto_glow_2.png",
+    "retromon:textures/mons/kabuto_glow_3.png",
+    "retromon:textures/mons/kabuto_glow_4.png",
+    "retromon:textures/mons/kabuto_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TRILOBLET",
+ "anchors": {
+  "mouth": [
+   0,
+   0.88,
+   -7.54
+  ],
+  "back": [
+   0,
+   5.86,
+   -0.7
+  ],
+  "body": [
+   0,
+   1.93,
+   -0.7
+  ],
+  "size": [
+   10.36,
+   4.86,
+   23.44
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

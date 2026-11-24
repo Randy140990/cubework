@@ -1,0 +1,72 @@
+{
+ "idle": "animation.bushlet.ground_idle",
+ "ground": "animation.bushlet.ground_idle",
+ "actions": {
+  "cry": "animation.bushlet.cry",
+  "recoil": "animation.bushlet.recoil",
+  "attack": "animation.bushlet.attack",
+  "critical": "animation.bushlet.critical",
+  "special": "animation.bushlet.special",
+  "recall": "animation.bushlet.recall",
+  "sendout": "animation.bushlet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.bushlet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.bushlet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.bushlet.faint",
+   "parts": []
+  }
+ },
+ "move": "PSYCHIC",
+ "attack_move": "POUND",
+ "scale": 0.464,
+ "height": 0.862,
+ "texture": "retromon:textures/mons/mew.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/mew_glow_0.png",
+    "retromon:textures/mons/mew_glow_1.png",
+    "retromon:textures/mons/mew_glow_2.png",
+    "retromon:textures/mons/mew_glow_3.png",
+    "retromon:textures/mons/mew_glow_4.png",
+    "retromon:textures/mons/mew_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BUSHLET",
+ "anchors": {
+  "mouth": [
+   0,
+   6.2,
+   -4.0
+  ],
+  "back": [
+   0,
+   14.8,
+   -0.2
+  ],
+  "body": [
+   0,
+   4.6,
+   -0.2
+  ],
+  "size": [
+   9.12,
+   13.8,
+   18.1
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

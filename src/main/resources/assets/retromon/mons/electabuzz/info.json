@@ -1,0 +1,72 @@
+{
+ "idle": "animation.stripevolt.battle_idle",
+ "ground": "animation.stripevolt.ground_idle",
+ "actions": {
+  "cry": "animation.stripevolt.cry",
+  "recoil": "animation.stripevolt.recoil",
+  "attack": "animation.stripevolt.attack",
+  "critical": "animation.stripevolt.critical",
+  "special": "animation.stripevolt.special",
+  "recall": "animation.stripevolt.recall",
+  "sendout": "animation.stripevolt.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.stripevolt.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.stripevolt.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.stripevolt.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDERBOLT",
+ "attack_move": "THUNDERPUNCH",
+ "scale": 0.752,
+ "height": 1.462,
+ "texture": "retromon:textures/mons/electabuzz.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/electabuzz_glow_0.png",
+    "retromon:textures/mons/electabuzz_glow_1.png",
+    "retromon:textures/mons/electabuzz_glow_2.png",
+    "retromon:textures/mons/electabuzz_glow_3.png",
+    "retromon:textures/mons/electabuzz_glow_4.png",
+    "retromon:textures/mons/electabuzz_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "STRIPEVOLT",
+ "anchors": {
+  "mouth": [
+   0,
+   16.2,
+   -9.2
+  ],
+  "back": [
+   0,
+   24.4,
+   -0.05
+  ],
+  "body": [
+   0,
+   11.35,
+   -0.05
+  ],
+  "size": [
+   15.1,
+   23.4,
+   23.05
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

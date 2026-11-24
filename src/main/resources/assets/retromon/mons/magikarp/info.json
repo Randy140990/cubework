@@ -1,0 +1,72 @@
+{
+ "idle": "animation.splashling.battle_idle",
+ "ground": "animation.splashling.ground_idle",
+ "actions": {
+  "cry": "animation.splashling.cry",
+  "recoil": "animation.splashling.recoil",
+  "attack": "animation.splashling.attack",
+  "critical": "animation.splashling.critical",
+  "special": "animation.splashling.special",
+  "recall": "animation.splashling.recall",
+  "sendout": "animation.splashling.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.splashling.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.splashling.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.splashling.faint",
+   "parts": []
+  }
+ },
+ "move": "SPLASH",
+ "attack_move": "SPLASH",
+ "scale": 1.398,
+ "height": 0.644,
+ "texture": "retromon:textures/mons/magikarp.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/magikarp_glow_0.png",
+    "retromon:textures/mons/magikarp_glow_1.png",
+    "retromon:textures/mons/magikarp_glow_2.png",
+    "retromon:textures/mons/magikarp_glow_3.png",
+    "retromon:textures/mons/magikarp_glow_4.png",
+    "retromon:textures/mons/magikarp_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SPLASHLING",
+ "anchors": {
+  "mouth": [
+   0,
+   4.8,
+   -7.4
+  ],
+  "back": [
+   0,
+   11.3,
+   0.0
+  ],
+  "body": [
+   0,
+   6.8,
+   0.0
+  ],
+  "size": [
+   2.27,
+   10.3,
+   19.8
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.tidegenet.battle_idle",
+ "ground": "animation.tidegenet.ground_idle",
+ "actions": {
+  "cry": "animation.tidegenet.cry",
+  "recoil": "animation.tidegenet.recoil",
+  "attack": "animation.tidegenet.attack",
+  "critical": "animation.tidegenet.critical",
+  "special": "animation.tidegenet.special",
+  "recall": "animation.tidegenet.recall",
+  "sendout": "animation.tidegenet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.tidegenet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.tidegenet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.tidegenet.faint",
+   "parts": []
+  }
+ },
+ "move": "WATER GUN",
+ "attack_move": "BITE",
+ "scale": 0.887,
+ "height": 1.127,
+ "texture": "retromon:textures/mons/vaporeon.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/vaporeon_glow_0.png",
+    "retromon:textures/mons/vaporeon_glow_1.png",
+    "retromon:textures/mons/vaporeon_glow_2.png",
+    "retromon:textures/mons/vaporeon_glow_3.png",
+    "retromon:textures/mons/vaporeon_glow_4.png",
+    "retromon:textures/mons/vaporeon_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TIDEGENET",
+ "anchors": {
+  "mouth": [
+   0,
+   10.92,
+   -18.05
+  ],
+  "back": [
+   0,
+   13.67,
+   -0.15
+  ],
+  "body": [
+   0,
+   8.22,
+   -0.15
+  ],
+  "size": [
+   11.44,
+   18.04,
+   44.8
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

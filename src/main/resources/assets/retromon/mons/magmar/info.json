@@ -1,0 +1,72 @@
+{
+ "idle": "animation.pyronewt.battle_idle",
+ "ground": "animation.pyronewt.ground_idle",
+ "actions": {
+  "cry": "animation.pyronewt.cry",
+  "recoil": "animation.pyronewt.recoil",
+  "attack": "animation.pyronewt.attack",
+  "critical": "animation.pyronewt.critical",
+  "special": "animation.pyronewt.special",
+  "recall": "animation.pyronewt.recall",
+  "sendout": "animation.pyronewt.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.pyronewt.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.pyronewt.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.pyronewt.faint",
+   "parts": []
+  }
+ },
+ "move": "FLAMETHROWER",
+ "attack_move": "FIRE PUNCH",
+ "scale": 0.972,
+ "height": 1.337,
+ "texture": "retromon:textures/mons/magmar.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/magmar_glow_0.png",
+    "retromon:textures/mons/magmar_glow_1.png",
+    "retromon:textures/mons/magmar_glow_2.png",
+    "retromon:textures/mons/magmar_glow_3.png",
+    "retromon:textures/mons/magmar_glow_4.png",
+    "retromon:textures/mons/magmar_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PYRONEWT",
+ "anchors": {
+  "mouth": [
+   0,
+   17.4,
+   -5.15
+  ],
+  "back": [
+   0,
+   22.4,
+   -0.2
+  ],
+  "body": [
+   0,
+   12.72,
+   -0.2
+  ],
+  "size": [
+   16.6,
+   21.4,
+   23.8
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

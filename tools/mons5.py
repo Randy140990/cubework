@@ -455,8 +455,17 @@ def avian(sid, name, stands, o):
     cov = Mat(WING, lambda a: mix(WING_D, WING, 0.4 + 0.6 * a.ly), noise=0.02)
     feat = Mat(WING_L, lambda a: CLEAR if (a.lz > 0.86 and (a.col % 2 == 1)) else mix(WING_D, WING_L, a.ly), noise=0.02, edge=0, flat=True)
     wl = o.get("wing", bl * 0.9)
-    folded_wing(m, bw / 2 * s, (leg + bh - 0.6) * s, -bl / 2 * 0.6 * s, n(wl * 0.7 * s), n(bh * 0.55 * s), 1,
-                [(0, n(wl * 0.5 * s), n(bh * 0.5 * s))], [(n(wl * 0.3 * s), n(wl * 0.6 * s), n(bh * 0.5 * s))], cov, feat, feat)
+    if o.get("jointed"):
+        # ((0.59.6, John's 13:18: "about wingspans") The great birds' wings in five joints, shoulder to fingertips, as
+        # the quails' and Pyribex's: neat along the flank at rest, opening out huge to fly.)
+        from mons import jointed_wing, feather_plane
+        sec = Mat(WING, feather_plane(WING_D, WING, WING_L, bars=o.get("WING_BARS")), noise=0.015, edge=0)
+        pri = Mat(WING_D, feather_plane(WING_D, WING, WING_L, edge=o.get("WING_EDGE", WING_L)), noise=0.015, edge=0)
+        jointed_wing(m, bw / 2 * s, (leg + bh - 0.4) * s, -bl / 2 * 0.7 * s, n(bl * 0.8 * s), tuple(n(wl * f * s) for f in (0.2, 0.22, 0.2, 0.34)), sec, sec, pri,
+                     arm=cov, thick=max(1, round(s)), under=o.get("WING_UNDER", "#EEE8DC"))
+    else:
+        folded_wing(m, bw / 2 * s, (leg + bh - 0.6) * s, -bl / 2 * 0.6 * s, n(wl * 0.7 * s), n(bh * 0.55 * s), 1,
+                    [(0, n(wl * 0.5 * s), n(bh * 0.5 * s))], [(n(wl * 0.3 * s), n(wl * 0.6 * s), n(bh * 0.5 * s))], cov, feat, feat)
     tl = o.get("tail", 4)
     TAIL = o.get("TAIL", WING)
     tailm = Mat(TAIL, lambda a: CLEAR if a.lz > 0.9 and a.col % 2 else mix(o.get("TAIL_D", WING_D), TAIL, a.lz), noise=0.02, edge=0, flat=True)

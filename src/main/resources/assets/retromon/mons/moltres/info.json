@@ -1,0 +1,80 @@
+{
+ "idle": "animation.cinderkite.ground_idle",
+ "ground": "animation.cinderkite.ground_idle",
+ "actions": {
+  "cry": "animation.cinderkite.cry",
+  "recoil": "animation.cinderkite.recoil",
+  "attack": "animation.cinderkite.attack",
+  "critical": "animation.cinderkite.critical",
+  "special": "animation.cinderkite.special",
+  "recall": "animation.cinderkite.recall",
+  "sendout": "animation.cinderkite.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.cinderkite.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.cinderkite.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.cinderkite.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.cinderkite.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.cinderkite.faint",
+   "parts": []
+  }
+ },
+ "move": "FIRE SPIN",
+ "attack_move": "PECK",
+ "scale": 1.321,
+ "height": 1.514,
+ "texture": "retromon:textures/mons/moltres.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/moltres_glow_0.png",
+    "retromon:textures/mons/moltres_glow_1.png",
+    "retromon:textures/mons/moltres_glow_2.png",
+    "retromon:textures/mons/moltres_glow_3.png",
+    "retromon:textures/mons/moltres_glow_4.png",
+    "retromon:textures/mons/moltres_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "CINDERKITE",
+ "anchors": {
+  "mouth": [
+   0,
+   19.37,
+   -18.35
+  ],
+  "back": [
+   0,
+   21.02,
+   -0.03
+  ],
+  "body": [
+   0,
+   12.3,
+   -0.03
+  ],
+  "size": [
+   15.34,
+   24.22,
+   46.19
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

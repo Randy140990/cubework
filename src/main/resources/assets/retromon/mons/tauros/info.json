@@ -1,0 +1,72 @@
+{
+ "idle": "animation.lyrehorn.battle_idle",
+ "ground": "animation.lyrehorn.ground_idle",
+ "actions": {
+  "cry": "animation.lyrehorn.cry",
+  "recoil": "animation.lyrehorn.recoil",
+  "attack": "animation.lyrehorn.attack",
+  "critical": "animation.lyrehorn.critical",
+  "special": "animation.lyrehorn.special",
+  "recall": "animation.lyrehorn.recall",
+  "sendout": "animation.lyrehorn.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.lyrehorn.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.lyrehorn.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.lyrehorn.faint",
+   "parts": []
+  }
+ },
+ "move": "TAKE DOWN",
+ "attack_move": "HORN ATTACK",
+ "scale": 0.635,
+ "height": 2.204,
+ "texture": "retromon:textures/mons/tauros.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/tauros_glow_0.png",
+    "retromon:textures/mons/tauros_glow_1.png",
+    "retromon:textures/mons/tauros_glow_2.png",
+    "retromon:textures/mons/tauros_glow_3.png",
+    "retromon:textures/mons/tauros_glow_4.png",
+    "retromon:textures/mons/tauros_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LYREHORN",
+ "anchors": {
+  "mouth": [
+   0,
+   14.72,
+   -21.78
+  ],
+  "back": [
+   0,
+   19.4,
+   0.2
+  ],
+  "body": [
+   0,
+   12.72,
+   0.2
+  ],
+  "size": [
+   26.16,
+   35.26,
+   41.68
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

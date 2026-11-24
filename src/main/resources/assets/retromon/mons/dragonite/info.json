@@ -1,0 +1,72 @@
+{
+ "idle": "animation.azurdrake.battle_idle",
+ "ground": "animation.azurdrake.ground_idle",
+ "actions": {
+  "cry": "animation.azurdrake.cry",
+  "recoil": "animation.azurdrake.recoil",
+  "attack": "animation.azurdrake.attack",
+  "critical": "animation.azurdrake.critical",
+  "special": "animation.azurdrake.special",
+  "recall": "animation.azurdrake.recall",
+  "sendout": "animation.azurdrake.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.azurdrake.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.azurdrake.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.azurdrake.faint",
+   "parts": []
+  }
+ },
+ "move": "HYPER BEAM",
+ "attack_move": "WING ATTACK",
+ "scale": 1.093,
+ "height": 2.013,
+ "texture": "retromon:textures/mons/dragonite.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/dragonite_glow_0.png",
+    "retromon:textures/mons/dragonite_glow_1.png",
+    "retromon:textures/mons/dragonite_glow_2.png",
+    "retromon:textures/mons/dragonite_glow_3.png",
+    "retromon:textures/mons/dragonite_glow_4.png",
+    "retromon:textures/mons/dragonite_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "AZURDRAKE",
+ "anchors": {
+  "mouth": [
+   0,
+   23.6,
+   -9.5
+  ],
+  "back": [
+   0,
+   33.2,
+   -0.3
+  ],
+  "body": [
+   0,
+   16.0,
+   -0.3
+  ],
+  "size": [
+   80.0,
+   32.2,
+   38.5
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.voltgenet.battle_idle",
+ "ground": "animation.voltgenet.ground_idle",
+ "actions": {
+  "cry": "animation.voltgenet.cry",
+  "recoil": "animation.voltgenet.recoil",
+  "attack": "animation.voltgenet.attack",
+  "critical": "animation.voltgenet.critical",
+  "special": "animation.voltgenet.special",
+  "recall": "animation.voltgenet.recall",
+  "sendout": "animation.voltgenet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.voltgenet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.voltgenet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.voltgenet.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDERSHOCK",
+ "attack_move": "DOUBLE KICK",
+ "scale": 0.755,
+ "height": 1.06,
+ "texture": "retromon:textures/mons/jolteon.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/jolteon_glow_0.png",
+    "retromon:textures/mons/jolteon_glow_1.png",
+    "retromon:textures/mons/jolteon_glow_2.png",
+    "retromon:textures/mons/jolteon_glow_3.png",
+    "retromon:textures/mons/jolteon_glow_4.png",
+    "retromon:textures/mons/jolteon_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "VOLTGENET",
+ "anchors": {
+  "mouth": [
+   0,
+   10.08,
+   -16.7
+  ],
+  "back": [
+   0,
+   13.08,
+   0.28
+  ],
+  "body": [
+   0,
+   7.78,
+   0.28
+  ],
+  "size": [
+   10.56,
+   16.96,
+   39.4
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

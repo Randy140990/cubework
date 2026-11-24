@@ -1,0 +1,72 @@
+{
+ "idle": "animation.genkit.battle_idle",
+ "ground": "animation.genkit.ground_idle",
+ "actions": {
+  "cry": "animation.genkit.cry",
+  "recoil": "animation.genkit.recoil",
+  "attack": "animation.genkit.attack",
+  "critical": "animation.genkit.critical",
+  "special": "animation.genkit.special",
+  "recall": "animation.genkit.recall",
+  "sendout": "animation.genkit.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.genkit.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.genkit.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.genkit.faint",
+   "parts": []
+  }
+ },
+ "move": "SAND-ATTACK",
+ "attack_move": "TACKLE",
+ "scale": 0.364,
+ "height": 0.825,
+ "texture": "retromon:textures/mons/eevee.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/eevee_glow_0.png",
+    "retromon:textures/mons/eevee_glow_1.png",
+    "retromon:textures/mons/eevee_glow_2.png",
+    "retromon:textures/mons/eevee_glow_3.png",
+    "retromon:textures/mons/eevee_glow_4.png",
+    "retromon:textures/mons/eevee_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "GENKIT",
+ "anchors": {
+  "mouth": [
+   0,
+   7.4,
+   -12.3
+  ],
+  "back": [
+   0,
+   14.2,
+   -0.2
+  ],
+  "body": [
+   0,
+   5.6,
+   -0.2
+  ],
+  "size": [
+   8.8,
+   13.2,
+   25.0
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

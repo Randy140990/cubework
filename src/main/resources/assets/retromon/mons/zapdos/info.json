@@ -1,0 +1,80 @@
+{
+ "idle": "animation.volteagle.ground_idle",
+ "ground": "animation.volteagle.ground_idle",
+ "actions": {
+  "cry": "animation.volteagle.cry",
+  "recoil": "animation.volteagle.recoil",
+  "attack": "animation.volteagle.attack",
+  "critical": "animation.volteagle.critical",
+  "special": "animation.volteagle.special",
+  "recall": "animation.volteagle.recall",
+  "sendout": "animation.volteagle.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.volteagle.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.volteagle.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.volteagle.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.volteagle.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.volteagle.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDER",
+ "attack_move": "DRILL PECK",
+ "scale": 1.008,
+ "height": 1.588,
+ "texture": "retromon:textures/mons/zapdos.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/zapdos_glow_0.png",
+    "retromon:textures/mons/zapdos_glow_1.png",
+    "retromon:textures/mons/zapdos_glow_2.png",
+    "retromon:textures/mons/zapdos_glow_3.png",
+    "retromon:textures/mons/zapdos_glow_4.png",
+    "retromon:textures/mons/zapdos_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "VOLTEAGLE",
+ "anchors": {
+  "mouth": [
+   0,
+   20.7,
+   -17.7
+  ],
+  "back": [
+   0,
+   24.2,
+   0.1
+  ],
+  "body": [
+   0,
+   12.5,
+   0.1
+  ],
+  "size": [
+   16.0,
+   25.4,
+   40.4
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

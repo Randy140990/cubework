@@ -1,0 +1,80 @@
+{
+ "idle": "animation.rimefalcon.ground_idle",
+ "ground": "animation.rimefalcon.ground_idle",
+ "actions": {
+  "cry": "animation.rimefalcon.cry",
+  "recoil": "animation.rimefalcon.recoil",
+  "attack": "animation.rimefalcon.attack",
+  "critical": "animation.rimefalcon.critical",
+  "special": "animation.rimefalcon.special",
+  "recall": "animation.rimefalcon.recall",
+  "sendout": "animation.rimefalcon.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.rimefalcon.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.rimefalcon.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.rimefalcon.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.rimefalcon.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.rimefalcon.faint",
+   "parts": []
+  }
+ },
+ "move": "BLIZZARD",
+ "attack_move": "PECK",
+ "scale": 1.124,
+ "height": 1.512,
+ "texture": "retromon:textures/mons/articuno.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/articuno_glow_0.png",
+    "retromon:textures/mons/articuno_glow_1.png",
+    "retromon:textures/mons/articuno_glow_2.png",
+    "retromon:textures/mons/articuno_glow_3.png",
+    "retromon:textures/mons/articuno_glow_4.png",
+    "retromon:textures/mons/articuno_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "RIMEFALCON",
+ "anchors": {
+  "mouth": [
+   0,
+   19.38,
+   -17.3
+  ],
+  "back": [
+   0,
+   20.2,
+   0.1
+  ],
+  "body": [
+   0,
+   12.0,
+   0.1
+  ],
+  "size": [
+   15.2,
+   24.2,
+   41.4
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

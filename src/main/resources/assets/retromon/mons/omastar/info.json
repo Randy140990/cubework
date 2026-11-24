@@ -1,0 +1,72 @@
+{
+ "idle": "animation.spiremonite.battle_idle",
+ "ground": "animation.spiremonite.ground_idle",
+ "actions": {
+  "cry": "animation.spiremonite.cry",
+  "recoil": "animation.spiremonite.recoil",
+  "attack": "animation.spiremonite.attack",
+  "critical": "animation.spiremonite.critical",
+  "special": "animation.spiremonite.special",
+  "recall": "animation.spiremonite.recall",
+  "sendout": "animation.spiremonite.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.spiremonite.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.spiremonite.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.spiremonite.faint",
+   "parts": []
+  }
+ },
+ "move": "HYDRO PUMP",
+ "attack_move": "SPIKE CANNON",
+ "scale": 0.535,
+ "height": 1.87,
+ "texture": "retromon:textures/mons/omastar.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/omastar_glow_0.png",
+    "retromon:textures/mons/omastar_glow_1.png",
+    "retromon:textures/mons/omastar_glow_2.png",
+    "retromon:textures/mons/omastar_glow_3.png",
+    "retromon:textures/mons/omastar_glow_4.png",
+    "retromon:textures/mons/omastar_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SPIREMONITE",
+ "anchors": {
+  "mouth": [
+   0,
+   5.76,
+   -7.86
+  ],
+  "back": [
+   0,
+   30.92,
+   3.42
+  ],
+  "body": [
+   0,
+   16.24,
+   3.42
+  ],
+  "size": [
+   8.32,
+   29.92,
+   24.12
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

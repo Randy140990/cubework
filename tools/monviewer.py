@@ -38,14 +38,14 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Doves", ["togepi", "togetic"]), ("Hoopoes", ["natu", "xatu"]), ("Storm alpacas", ["mareep", "flaaffy", "ampharos"]),
             ("Water voles", ["marill", "azumarill"]), ("Stump tortoise", ["sudowoodo"]), ("Maple keys", ["hoppip", "skiploom", "jumpluff"]),
             ("Kinkajou", ["aipom"]), ("Sunchokes", ["sunkern", "sunflora"]), ("Emperor darner", ["yanma"]), ("Mudskippers", ["wooper", "quagsire"]),
-            ("Genets", ["espeon", "umbreon"]), ("Magpie", ["murkrow"]), ("Ghost bellflower", ["misdreavus"]), ("Rune pebbles", ["unown"]),
+            ("Genets", ["eevee", "vaporeon", "jolteon", "flareon", "espeon", "umbreon"]), ("Magpie", ["murkrow"]), ("Ghost bellflower", ["misdreavus"]), ("Rune pebbles", ["unown"]),
             ("Blobfish", ["wobbuffet"]), ("Okapi", ["girafarig"]), ("Pill bugs", ["pineco", "forretress"]), ("Slow worm", ["dunsparce"]),
-            ("Flying lizard", ["gligar"]), ("Warthogs", ["snubbull", "granbull"]), ("Lionfish", ["qwilfish"]), ("Pincer beetle", ["scizor"]),
+            ("Flying lizard", ["gligar"]), ("Warthogs", ["snubbull", "granbull"]), ("Lionfish", ["qwilfish"]), ("Tiger beetle", ["scyther", "scizor"]),
             ("Caddis grub", ["shuckle"]), ("Stag beetle", ["heracross"]), ("Wolverine", ["sneasel"]), ("Spectacled bears", ["teddiursa", "ursaring"]),
             ("Fire sea slugs", ["slugma", "magcargo"]), ("Musk oxen", ["swinub", "piloswine"]), ("Decorator crab", ["corsola"]),
             ("Archerfish to cuttlefish", ["remoraid", "octillery"]), ("Puffin", ["delibird"]), ("Flying fish", ["mantine"]), ("Blade heron", ["skarmory"]),
-            ("Ember hyenas", ["houndour", "houndoom"]), ("Hippos", ["phanpy", "donphan"]), ("Paper crane", ["porygon2"]), ("Kudu", ["stantler"]),
-            ("Coati", ["smeargle"]), ("Wallabies", ["tyrogue", "hitmontop"]), ("Ermine", ["smoochum"]), ("Numbat", ["elekid"]), ("Fire salamander", ["magby"]),
+            ("Ember hyenas", ["houndour", "houndoom"]), ("Hippos", ["phanpy", "donphan"]), ("Paper birds", ["porygon", "porygon2"]), ("Kudu", ["stantler"]),
+            ("Coati", ["smeargle"]), ("Wallabies", ["tyrogue", "hitmontop"]), ("Ermine", ["smoochum", "jynx"]), ("Numbat", ["elekid", "electabuzz"]), ("Fire salamander", ["magby", "magmar"]), ("Antlion", ["pinsir"]), ("Ankole bull", ["tauros"]), ("Oarfish", ["magikarp", "gyarados"]), ("Sea cow", ["lapras"]), ("Mimic octopus", ["ditto"]), ("Nautilus and ammonite", ["omanyte", "omastar"]), ("Trilobite and sea scorpion", ["kabuto", "kabutops"]), ("Pterosaur", ["aerodactyl"]), ("Gyrfalcon", ["articuno"]), ("Storm eagle", ["zapdos"]), ("Fire kite", ["moltres"]), ("Blue sea dragons", ["dratini", "dragonair", "dragonite"]), ("Galagos", ["mew", "mewtwo"]),
             ("Dairy yak", ["miltank"]), ("Clouded leopard", ["raikou"]), ("Volcano bison", ["entei"]), ("Crystal stag", ["suicune"]),
             ("Thorny lizards", ["larvitar", "pupitar", "tyranitar"]), ("Albatross", ["lugia"]), ("Rainbow pheasant", ["ho_oh"]), ("Moth of time", ["celebi"])]
 KEEP = ("idle", "ground")
