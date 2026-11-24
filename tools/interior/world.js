@@ -719,6 +719,15 @@ function stairsDown(room, x0, z0 = 0, depth = 2, o = {}) {
   for (let x = x0 + 0.35; x < gap - 0.2; x += 0.4) G.box(x - 0.03, 0, bz + 0.03, x + 0.03, 1.0, bz + 0.09, "paint");
   G.box(x0 - 0.12, 0, z0, x0 + 0.04, 1.12, bz, { all: "walnut" });
   room.solid(x0 - 0.3, z0, x0 + 0.06, bz + 0.2); room.solid(x0, bz - 0.04, gap, bz + 0.25);
+  // (0.61 fit-out pass 2, 19:22: "Just double check all banisters") Floor north of the well too (the UNDERGROUND
+  // PATH's ways in): the railing along that side as well, its whole length.
+  if (typeof FIT !== "undefined" && FIT && z0 > 0.3) {
+    const nz = z0;
+    G.box(x0 - 0.12, 0, nz - 0.16, x0 + 0.08, 1.3, nz + 0.02, "walnut"); G.box(x0 + 3.92, 0, nz - 0.16, x0 + 4.12, 1.3, nz + 0.02, "walnut");
+    G.box(x0, 1.0, nz - 0.12, x0 + 4, 1.12, nz, "walnut");
+    for (let x = x0 + 0.35; x < x0 + 3.9; x += 0.4) G.box(x - 0.03, 0, nz - 0.09, x + 0.03, 1.0, nz - 0.03, "paint");
+    room.solid(x0 - 0.12, nz - 0.25, x0 + 4.12, nz + 0.04);
+  }
   room.ramps.push({ rect: [x0, z0, x0 + 4, z0 + depth], h: (x) => Math.min(0, Math.ceil((x - x0) / sw - 0.35) * STEP - 4) });
   room.warps.push({ test: p => p.y <= -1.45, to: o.to, spawn: o.spawn, fx: "fade", why: "down" });
   room.item("Stairs down", "The stairwell, with a railing round it; open at the top step.");

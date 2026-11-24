@@ -267,8 +267,10 @@ BALLS["power_plant"] = [{"key": k, "x": x, "z": z, "y": 0} for k, x, z in (
     ("power_plant_i8", 7.5, 25.5), ("power_plant_i9", 28.5, 3.5), ("power_plant_i10", 34.5, 3.5), ("power_plant_i11", 26.5, 32.5),
     ("power_plant_i12", 20.5, 32.5), ("power_plant_thunderstone", 12.5, 3.5), ("power_plant_elixer", 36.5, 11.5))]
 # POKéMON standing in rooms (statics.tsv's): ZAPDOS by the big machine; VOLTORB and ELECTRODE posing as item balls.
-MONS_DAYCARE = [{"key": "pet:daycare_clefairy", "species": "clefairy", "x": 8.0, "z": 4.0, "yaw": 210.0},
-                {"key": "pet:daycare_psyduck", "species": "psyduck", "x": 11.6, "z": 4.6, "yaw": 150.0}]
+# (0.61, John's 19:22: "in game they should [move around]") Each wanders about the pen (the lawn inside its pickets).
+DAYCARE_PEN = [6.6, 2.5, 13.8, 7.4]
+MONS_DAYCARE = [{"key": "pet:daycare_clefairy", "species": "clefairy", "x": 8.0, "z": 4.0, "yaw": 210.0, "pen": DAYCARE_PEN},
+                {"key": "pet:daycare_psyduck", "species": "psyduck", "x": 11.6, "z": 4.6, "yaw": 150.0, "pen": DAYCARE_PEN}]
 MONS = {"power_plant": [{"key": "zapdos", "species": "zapdos", "x": 5.6, "z": 4.2, "yaw": 0.0}] + [
     {"key": k, "species": "poke_ball", "x": x, "z": z, "yaw": 0.0} for k, x, z in (
         ("power_plant_voltorb_1", 9.5, 20.5), ("power_plant_voltorb_2", 32.5, 18.5), ("power_plant_voltorb_3", 21.5, 25.5),

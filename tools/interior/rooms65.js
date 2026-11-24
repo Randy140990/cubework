@@ -33,26 +33,21 @@ function softField(seed, w, h, cx, cy) {
 // tone with a gentle light along it, its ends butted (a soft joint), a lit edge along its top and a soft shadow at
 // its foot; a little grain; light and shade drifting over the whole floor. 64 pixels: four blocks before it repeats.
 function fitBoards(P, r, base, o = {}) {
-  const W = P.w, H = P.h, seam = o.seam ?? -0.1, field = softField(hashStr("fb" + base.join()), W, H, 4, 4), lt = o.lit ?? 0.035;
-  for (let row = 0; row < H / 4; row++) {
-    let x = Math.floor(r() * 24), joints = [];
-    while (joints.length < 6) { joints.push(x % W); x += 20 + Math.floor(r() * 26); if (x > W + joints[0]) break; }
-    const segTone = joints.map(() => (r() - 0.5) * (o.tone ?? 0.07));
-    for (let x = 0; x < W; x++) {
-      // Which length of board this pixel's on, and how far along it.
-      let k = 0; for (let i = 0; i < joints.length; i++) if (((x - joints[i]) % W + W) % W < ((x - joints[k]) % W + W) % W) k = i;
-      const from = joints[k], to = joints[(k + 1) % joints.length], len = ((to - from) % W + W) % W || W, along = (((x - from) % W + W) % W) / len;
-      for (let y = row * 4; y < row * 4 + 4; y++) {
-        let s = segTone[k] + 0.02 * Math.sin(Math.PI * along) + field[y * W + x] * 0.035;
-        const v = y - row * 4;
-        if (v === 0) s += lt; else if (v === 3) s += seam;
-        if (x === from) s += seam * 0.8;
-        if (v === 1 && ((x * 13 + row * 7) % 23) < 3) s -= 0.025;
-        P.set(x, y, shadec(base, s));
-      }
-    }
+  // (Pass 2, 19:22: "if we're going to do things like laminate and that, it's just really tough") Planks a block at a
+  // time, as Minecraft's: each block four boards across, every board its own soft tone, the joints where the block
+  // ends and one more along each board (staggered board to board), the seams soft; a gentle drift of light over a
+  // few blocks; no grain lines.
+  const W = P.w, H = P.h, B = 16, field = softField(hashStr("fb" + base.join()), W, H, 4, 4);
+  const tone = {}, at = k => tone[k] ?? (tone[k] = (r() - 0.5) * (o.tone ?? 0.09));
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const bx = Math.floor(x / B), by = Math.floor(y / B), row = Math.floor((y % B) / 4), v = y % 4, lx = x % B;
+    const j = [10, 4, 13, 7][(row + bx * 3 + by * 2) % 4], seg = lx < j ? 0 : 1;
+    let s = at(bx + "," + by + "," + row + "," + seg) + field[y * W + x] * 0.03;
+    if (v === 0) s += 0.025; else if (v === 3) s -= 0.06;
+    if (lx === 0 || lx === j) s -= 0.055; else if (lx === 1 || lx === j + 1) s += 0.015;
+    P.set(x, y, shadec(base, s));
   }
-  for (let i = 0; i < W * H / 90; i++) { const x = (r() * W) | 0, y = (r() * H) | 0; if ((y & 3) === 1 || (y & 3) === 2) P.set(x, y, shadec(P.get(x, y), (r() - 0.6) * 0.07)); }
+  for (let i = 0; i < W * H / 60; i++) { const x = (r() * W) | 0, y = (r() * H) | 0; if ((y & 3) === 1 || (y & 3) === 2) P.set(x, y, shadec(P.get(x, y), (r() - 0.55) * 0.05)); }
 }
 // Paint on a wall, as the outside's walls: one colour, a soft drift of light over a few blocks, a few faint specks.
 function fitPaint(P, r, base, o = {}) {

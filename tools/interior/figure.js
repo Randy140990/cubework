@@ -114,7 +114,7 @@ function makeFigure(spec) {
   const base = ghost ? ghostMat : new THREE.MeshLambertMaterial({ map: tex });
   const over = ghost ? null : new THREE.MeshLambertMaterial({ map: tex, transparent: true, alphaTest: 0.1, depthWrite: true, side: THREE.DoubleSide });
   const part = (parent, w, h, d, uvx, uvy, ox, oy, oz, ovx, ovy, inf = 0.5) => {
-    const m = new THREE.Mesh(mcBox(w, h, d, uvx, uvy, R), base); m.position.set(ox * k, oy * k, oz * k); m.castShadow = !ghost; parent.add(m);
+    const m = new THREE.Mesh(mcBox(w, h, d, uvx, uvy, R), base); m.position.set(ox * k, oy * k, oz * k); m.castShadow = !ghost || (typeof FIT !== "undefined" && FIT); parent.add(m);
     if (over && ovx != null) { const o = new THREE.Mesh(mcBox(w, h, d, ovx, ovy, R, 64, 64, inf), over); o.position.copy(m.position); o.castShadow = true; parent.add(o); }
     return m;
   };

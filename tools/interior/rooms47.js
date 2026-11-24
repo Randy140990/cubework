@@ -402,8 +402,10 @@
       picket(R, 6.4, 2.3, 14.0, 2.3); picket(R, 6.4, 7.6, 14.0, 7.6); picket(R, 6.4, 2.3, 6.4, 7.6);
       toyBox(R, 11.8, 0.6, 13.4, 1.6); R.solid(11.8, 0.6, 13.4, 1.6);
       for (const [x, z, c] of [[7.4, 5.8, "standSeat"], [10.2, 3.2, "standSeatBlue"], [12.8, 6.6, "ceruleanTrim"]]) roundBall(G, x, 0.04, z, 0.36, { all: c, top: c });
-      R.pets = [{ sid: "clefairy", x: 8.0, z: 4.0, yaw: 210 }, { sid: "psyduck", x: 11.6, z: 4.6, yaw: 150 }];
-      for (const pt of R.pets) R.act([pt.x - 1.1, pt.z - 1.1, pt.x + 1.1, pt.z + 1.1], { label: "Look", lines: [pt.sid.toUpperCase() + " is playing in the pen.", "(It's being looked after at the DAY CARE.)"] });
+      // (0.61, 19:22) They wander about the pen (the lawn inside its pickets), in the viewer as in the game.
+      const PEN = [6.6, 2.5, 13.8, 7.4];
+      R.pets = [{ sid: "clefairy", x: 8.0, z: 4.0, yaw: 210, pen: PEN }, { sid: "psyduck", x: 11.6, z: 4.6, yaw: 150, pen: PEN }];
+      R.act([PEN[0] - 0.4, PEN[1] - 0.4, PEN[2] + 0.4, PEN[3] + 0.4], { label: "Look", lines: ["CLEFAIRY and PSYDUCK are playing in the pen.", "(They're being looked after at the DAY CARE.)"] });
       R.act([8.9, 5.3, 10.9, 7.2], { label: "Look", lines: ["Your POKéMON plays here while you leave it with him."] });
       sofa(R, 1.0, 6.2, "e", 2.4);
       crossWindow(R, "e", 2.6, 1.6, 1.8, 1.2, ["Outside: the DAY CARE's yard. POKéMON are playing in the grass."]);

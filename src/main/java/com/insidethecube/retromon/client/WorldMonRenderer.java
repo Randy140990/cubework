@@ -66,7 +66,7 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		s.lift = 0;
 		s.asleep = e.asleep() && s.model != null;
 		if (s.asleep) s.pose = s.model.def.hasPose("sleep") ? "sleep" : s.model.def.hasPose("ground") ? "ground" : null;
-		if ((e.roams() || e.scenery()) && s.model != null) {
+		if ((e.roams() || e.scenery() || e.wanders()) && s.model != null) {
 			// Out in the grass or walking with you: walks when it moves, and a bird takes to the air.
 			// Walking when it's been moving these last few ticks (not just this one: the world's updates come in
 			// steps, and a tick without one left it gliding along in its standing pose).

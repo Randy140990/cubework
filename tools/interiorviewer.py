@@ -65,6 +65,11 @@ def areatex():
         out[n] = {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
     im = Image.open(os.path.join(root, "resourcepacks", "retromon_look", "assets", "minecraft", "textures", "block", "dripstone_block.png")).convert("RGBA")
     out["dripstone"] = {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
+    # (0.61 fit-out, 19:22) The hedges' leaves as the game draws them (the look pack's azalea and flowering azalea),
+    # for the insides' greenery.
+    for n in ("azalea_leaves", "flowering_azalea_leaves"):
+        im = Image.open(os.path.join(root, "resourcepacks", "retromon_look", "assets", "minecraft", "textures", "block", n + ".png")).convert("RGBA")
+        out["look_" + n] = {"w": im.width, "h": im.height, "d": base64.b64encode(im.tobytes()).decode()}
     return out
 
 def boulders():
@@ -92,7 +97,7 @@ def main():
     page, out = sys.argv[1], sys.argv[2]
     d = os.path.join(HERE, "interior")
     head = open(os.path.join(d, "head.html")).read()
-    js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "figure.js", "creature.js", "forest_data.js", "cave_data.js", "mtmoon_data.js", "safari_data.js", "cerulean_pool_data.js", "caves48_data.js", "rooms.js", "rooms47.js", "rooms48.js", "rooms50.js", "rooms52.js", "rooms53.js", "rooms54.js", "rooms55.js", "silph_data.js", "rooms56.js", "rooms57.js", "celadon_data.js", "rooms58.js", "rooms59.js", "rooms60.js", "rooms61.js", "cinnabar_data.js", "johto_data.js", "ilex_data.js", "rooms62.js", "johto_gates_data.js", "rooms63.js", "kanto60_data.js", "rooms64.js", "rooms65.js", "app.js"))
+    js = "\n".join(open(os.path.join(d, n)).read() for n in ("tex.js", "world.js", "figure.js", "creature.js", "forest_data.js", "cave_data.js", "mtmoon_data.js", "safari_data.js", "cerulean_pool_data.js", "caves48_data.js", "rooms.js", "rooms47.js", "rooms48.js", "rooms50.js", "rooms52.js", "rooms53.js", "rooms54.js", "rooms55.js", "silph_data.js", "rooms56.js", "rooms57.js", "celadon_data.js", "rooms58.js", "rooms59.js", "rooms60.js", "rooms61.js", "cinnabar_data.js", "johto_data.js", "ilex_data.js", "rooms62.js", "johto_gates_data.js", "rooms63.js", "kanto60_data.js", "rooms64.js", "rooms65.js", "rooms66.js", "app.js"))
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
             + "const DATA = " + data + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst AREATEX = " + json.dumps(areatex(), separators=(",", ":")) + ";\nconst BOULDERS = " + json.dumps(boulders(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"

@@ -1148,6 +1148,8 @@ public final class Game {
 		if (ourSave && s.getTickCount() % 40 == 20) MapFixes.tick(s);
 		// (0.59.4) The POKéMON that are part of the scenery (Fuchsia's ponds, the SAFARI ZONE's way in).
 		if (ourSave) Scenery.tick(s);
+		// (0.61) The DAY CARE's POKéMON wandering about their pen.
+		if (ourSave) Interiors.pens(s);
 		for (ServerPlayer p : s.getPlayerList().getPlayers()) {
 			if (!adventure(p)) continue;
 			UUID id = p.getUUID();

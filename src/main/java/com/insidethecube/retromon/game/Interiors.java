@@ -131,7 +131,11 @@ public final class Interiors {
 	public static final Map<String, Room> ROOMS = new LinkedHashMap<>();
 	public static final Map<String, Door> DOORS = new LinkedHashMap<>();
 	/** POKéMON standing in a room (the Power Plant's ZAPDOS, its ELECTRODE posing as items): a static's key, its look. */
-	public record MonSpot(String key, String species, double x, double z, float yaw) {}
+	/**
+	 * A room's own POKéMON: where it stands; (0.61, John's 19:22: "in game they should [move around]") pen, if it has
+	 * one, the patch (room x0, z0, x1, z1) it wanders about in (the DAY CARE's).
+	 */
+	public record MonSpot(String key, String species, double x, double z, float yaw, double[] pen) {}
 	public static final Map<String, List<MonSpot>> MONS = new HashMap<>();
 	/**
 	 * (0.60) The spinner tiles in a room (GIOVANNI's GYM, the ROCKET HIDEOUT's mazes): each tile's arrow ('e', 'w', 'n',
@@ -306,7 +310,12 @@ public final class Interiors {
 				List<MonSpot> ms = new ArrayList<>();
 				for (JsonElement me : r.getAsJsonArray("mons")) {
 					JsonObject m = me.getAsJsonObject();
-					ms.add(new MonSpot(m.get("key").getAsString(), m.get("species").getAsString(), num(m, "x", 0), num(m, "z", 0), (float) num(m, "yaw", 0)));
+					double[] pen = null;
+					if (m.has("pen")) {
+						JsonArray a = m.getAsJsonArray("pen");
+						pen = new double[] {a.get(0).getAsDouble(), a.get(1).getAsDouble(), a.get(2).getAsDouble(), a.get(3).getAsDouble()};
+					}
+					ms.add(new MonSpot(m.get("key").getAsString(), m.get("species").getAsString(), num(m, "x", 0), num(m, "z", 0), (float) num(m, "yaw", 0), pen));
 				}
 				MONS.put(room.id(), ms);
 			}
@@ -650,8 +659,71 @@ public final class Interiors {
 			java.util.Set<String> keys = new java.util.HashSet<>();
 			for (MonSpot m : mons) keys.add(m.key());
 			for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> keys.contains(w.key()))) w.discard();
-			for (MonSpot m : mons) if (!Game.takenByAnyone(m.key())) Game.placeMon(level, m.species(), m.key(), r.ox() + m.x(), r.oy(), r.oz() + m.z(), m.yaw());
+			for (MonSpot m : mons) if (!Game.takenByAnyone(m.key())) {
+				WorldMon w = Game.placeMon(level, m.species(), m.key(), r.ox() + m.x(), r.oy(), r.oz() + m.z(), m.yaw());
+				if (w != null && m.pen() != null) w.setWanders(true);
+			}
 		}
+	}
+
+	// ---------- (0.61, 19:22) the DAY CARE's POKéMON, wandering about their pen ----------
+
+	/** Where one's headed and how long it rests there (by entity). */
+	private static final class PenPlan {
+		double tx, tz;
+		int rest;
+	}
+
+	private static final Map<Integer, PenPlan> PEN_PLANS = new HashMap<>();
+	private static final java.util.Random PEN_RNG = new java.util.Random();
+
+	/** Every tick: each room POKéMON with a pen, while its room's loaded, ambles to a spot in the pen, rests, ambles on. */
+	public static void pens(MinecraftServer s) {
+		ServerLevel level = s.getLevel(LEVEL);
+		if (level == null) return;
+		for (Map.Entry<String, List<MonSpot>> e : MONS.entrySet()) {
+			Room r = ROOMS.get(e.getKey());
+			if (r == null) continue;
+			for (MonSpot m : e.getValue()) {
+				if (m.pen() == null || !level.hasChunkAt(BlockPos.containing(r.ox() + m.x(), r.oy(), r.oz() + m.z()))) continue;
+				for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, around(r), w -> m.key().equals(w.key()))) penMove(level, r, m, w);
+			}
+		}
+	}
+
+	private static void penMove(ServerLevel level, Room r, MonSpot m, WorldMon w) {
+		w.setNoGravity(true);
+		w.noPhysics = true;
+		w.setWanders(true);
+		double[] pen = m.pen();
+		PenPlan plan = PEN_PLANS.computeIfAbsent(w.getId(), k -> {
+			PenPlan p = new PenPlan();
+			p.tx = w.getX();
+			p.tz = w.getZ();
+			p.rest = 40 + PEN_RNG.nextInt(80);
+			return p;
+		});
+		double dx = plan.tx - w.getX(), dz = plan.tz - w.getZ(), dist = Math.hypot(dx, dz);
+		if (dist < 0.08) {
+			if (--plan.rest > 0) return;
+			// The next spot: anywhere in the pen, half a block in from its fence, not on top of another.
+			for (int tries = 0; tries < 8; tries++) {
+				double x = r.ox() + pen[0] + 0.6 + PEN_RNG.nextDouble() * Math.max(0.1, pen[2] - pen[0] - 1.2);
+				double z = r.oz() + pen[1] + 0.6 + PEN_RNG.nextDouble() * Math.max(0.1, pen[3] - pen[1] - 1.2);
+				boolean crowded = false;
+				for (WorldMon o : level.getEntitiesOfClass(WorldMon.class, new AABB(x - 1.5, w.getY() - 2, z - 1.5, x + 1.5, w.getY() + 2, z + 1.5), o -> o != w && o.wanders()))
+					crowded |= Math.hypot(o.getX() - x, o.getZ() - z) < 1.4;
+				if (crowded) continue;
+				plan.tx = x;
+				plan.tz = z;
+				break;
+			}
+			plan.rest = 50 + PEN_RNG.nextInt(150);
+			return;
+		}
+		double step = Math.min(dist, 0.04);
+		w.setFacing((float) Math.toDegrees(Math.atan2(-dx, dz)));
+		w.setPos(w.getX() + dx / dist * step, r.oy(), w.getZ() + dz / dist * step);
 	}
 
 	/** How bright the forest's moonlight is (a light level). */

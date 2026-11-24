@@ -382,7 +382,10 @@
       } else if (p.c === "h") {
         // Racks of goods (the TRAINER'S MARKET's, the WISEMAN GIFTS'), shelves of bottles (the DRUG STORE's).
         const bottles = id === "celadon_mart_5f" && idAt(x0, z0) >= 0x31f && idAt(x0, z0) <= 0x327;
-        G.box(x0 + 0.06, 0, z0 + 0.06, x1 - 0.06, 1.7, z1 - 0.06, { all: bottles ? "dsBottles" : "dsRack", e: "dsRackSide", w: "dsRackSide", top: "dsRackTop" });
+        // (0.61 fit-out pass 2, 19:22: "if they could actually feel like shelves ... real items on those shelves ... not
+        // just a friggin' box") Open shelves, both sides, the goods on them.
+        if (FIT && typeof fitRack === "function") fitRack(R, x0, z0, x1, z1, hashStr(id + ":" + x0 + "," + z0), bottles);
+        else G.box(x0 + 0.06, 0, z0 + 0.06, x1 - 0.06, 1.7, z1 - 0.06, { all: bottles ? "dsBottles" : "dsRack", e: "dsRackSide", w: "dsRackSide", top: "dsRackTop" });
         R.act(near, { label: "Look", lines: [bottles ? "Shelves of POKéMON medicine, bottle after bottle." : "A rack of goods, every shelf full."] });
       } else if (p.c === "g") {
         G.box(x0 + 0.06, 0, z0 + 0.1, x1 - 0.06, 0.25, z1 - 0.1, { all: "dsCounter", top: null });

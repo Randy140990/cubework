@@ -23,6 +23,8 @@ public class WorldMon extends PathfinderMob {
 	private static final EntityDataAccessor<String> KEY = SynchedEntityData.defineId(WorldMon.class, EntityDataSerializers.STRING);
 	private static final EntityDataAccessor<Float> FACING = SynchedEntityData.defineId(WorldMon.class, EntityDataSerializers.FLOAT);
 	private static final EntityDataAccessor<Boolean> AIRBORNE = SynchedEntityData.defineId(WorldMon.class, EntityDataSerializers.BOOLEAN);
+	/** (0.61) A room's POKéMON that wanders about its pen (the DAY CARE's): drawn walking when it moves. */
+	private static final EntityDataAccessor<Boolean> WANDERS = SynchedEntityData.defineId(WorldMon.class, EntityDataSerializers.BOOLEAN);
 	/** Its model on your screen (a client object), and how high it's flying there (eased). */
 	public Object model;
 	public float liftNow, liftOld;
@@ -46,6 +48,7 @@ public class WorldMon extends PathfinderMob {
 		b.define(KEY, "");
 		b.define(FACING, 0F);
 		b.define(AIRBORNE, false);
+		b.define(WANDERS, false);
 	}
 
 	/** Out in the grass (a wild one you can see) or walking with you (your Pokémon): these move about. */
@@ -62,6 +65,14 @@ public class WorldMon extends PathfinderMob {
 	/** (0.59.4) Part of a place's scenery (Fuchsia's ponds): moves about by itself, never battled. */
 	public boolean scenery() {
 		return key().startsWith("scene:");
+	}
+
+	public boolean wanders() {
+		return entityData.get(WANDERS);
+	}
+
+	public void setWanders(boolean on) {
+		entityData.set(WANDERS, on);
 	}
 
 	public boolean wild() {

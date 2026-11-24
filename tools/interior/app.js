@@ -107,6 +107,7 @@ function applyTime() {
   if (room) setClocks(room, t.clock);
   // Those who keep hours (the Trainer School's teacher and pupils, by day): away at other times.
   if (room) for (const n of room.npcs) if (n.hours && n.fig) { const h = t.clock, [a, b] = n.hours; n.away = !(h >= a && h < b); n.fig.root.visible = !n.away; }
+  if (typeof fitTimeLight === "function") fitTimeLight(room, TOD);
   if (!room || !room.poolMeshes) return;
   const col = poolLight(t.k, t.m);
   for (const mesh of room.poolMeshes) setWash(mesh, mesh.userData.pool, t, col);
@@ -146,8 +147,10 @@ function prepareRoom(r) {
     m.holder.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
     m.holder.position.set(pt.x, r.groundAt ? r.groundAt(pt.x, pt.z) + 0.04 : 0.04, pt.z); m.holder.rotation.y = (180 - (pt.yaw || 0)) * D2R;
     r.group.add(m.holder);
+    // (0.61, 19:22) One with a pen (the DAY CARE's) wanders about it, as in the game (Interiors.pens).
+    if (pt.pen) Object.assign(pt, { model: m, cx: pt.x, cz: pt.z, tx: pt.x, tz: pt.z, rest: 1 + Math.random() * 2, yawNow: (180 - (pt.yaw || 0)) * D2R, t: 0 });
   })();
-  for (const pt of r.pets || []) r.solid(pt.x - 0.4, pt.z - 0.4, pt.x + 0.4, pt.z + 0.4);
+  for (const pt of r.pets || []) { r.solid(pt.x - 0.4, pt.z - 0.4, pt.x + 0.4, pt.z + 0.4); pt.solid = r.solids[r.solids.length - 1]; }
   if (r.exitArrow) {
     const a = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.7), new THREE.MeshBasicMaterial({ map: pixTex("exitArrow"), transparent: true, depthWrite: false }));
     a.rotation.x = -Math.PI / 2; a.position.set(r.exitArrow.x, 0.06, r.exitArrow.z); a.renderOrder = 4; r.group.add(a); r.arrowMesh = a;
@@ -504,6 +507,35 @@ function updateFollower(dt, now) {
   const sw = Math.max(0.6, Math.min(6, Math.max(sz.w, sz.l) * 0.9)); fol.shadow.scale.set(sw, sw, 1);
 }
 
+// A pen's POKéMON: ambles (as the game's, 0.04 a tick: 0.8 a second) to a spot in its pen, rests, ambles on.
+function tickPet(r, pt, dt) {
+  const m = pt.model, dx = pt.tx - pt.cx, dz = pt.tz - pt.cz, dist = Math.hypot(dx, dz);
+  let moving = false;
+  if (dist < 0.05) {
+    pt.rest -= dt;
+    if (pt.rest <= 0) {
+      const [x0, z0, x1, z1] = pt.pen;
+      for (let i = 0; i < 8; i++) {
+        const x = x0 + 0.6 + Math.random() * Math.max(0.1, x1 - x0 - 1.2), z = z0 + 0.6 + Math.random() * Math.max(0.1, z1 - z0 - 1.2);
+        if ((r.pets || []).some(o => o !== pt && Math.hypot((o.cx ?? o.x) - x, (o.cz ?? o.z) - z) < 1.4)) continue;
+        pt.tx = x; pt.tz = z; break;
+      }
+      pt.rest = 2.5 + Math.random() * 7.5;
+    }
+  } else {
+    const step = Math.min(dist, 0.8 * dt);
+    pt.cx += dx / dist * step; pt.cz += dz / dist * step; moving = true;
+    const want = Math.atan2(-dx, -dz); let d = want - pt.yawNow; d = Math.atan2(Math.sin(d), Math.cos(d)); pt.yawNow += d * Math.min(1, dt * 6);
+  }
+  m.holder.position.set(pt.cx, (r.groundAt ? r.groundAt(pt.cx, pt.cz) : 0) + 0.04, pt.cz); m.holder.rotation.y = pt.yawNow;
+  const mv = moving ? moveAnim(m) : null;
+  setParts(m, mv ? mv.key : null);
+  pt.t += dt;
+  pose(m, [[mv ? mv.an : groundIdle(m), pt.t]]);
+  // (Its solid moves with it: you can't walk through it.)
+  if (pt.solid) { pt.solid[0] = pt.cx - 0.4; pt.solid[1] = pt.cz - 0.4; pt.solid[2] = pt.cx + 0.4; pt.solid[3] = pt.cz + 0.4; }
+}
+
 // ---------- each frame ----------
 const tagsEl = $("#tags");
 function updateTags() {
@@ -529,6 +561,7 @@ function tickFrame(now) {
     if (room.arrowMesh) { room.arrowMesh.material.opacity = 0.35 + 0.35 * (0.5 + 0.5 * Math.sin(now / 300)); room.arrowMesh.position.y = 0.06; }
     if (room.puffs) for (const p of room.puffs) { const k = ((now / 2600) + p.k) % 1; p.s.position.set(room.steam.x + Math.sin(k * 7 + p.k * 9) * 0.08, room.steam.y + k * 1.1, room.steam.z); p.s.material.opacity = Math.sin(k * Math.PI) * 0.55; p.s.scale.setScalar(0.18 + k * 0.32); }
     if (room.bag) { room.bag.t += dt; room.bag.swing *= Math.exp(-dt * 1.4); room.bag.grp.rotation.x = -Math.sin(room.bag.t * 5.2) * 0.42 * room.bag.swing; }
+    for (const pt of room.pets || []) if (pt.pen && pt.model) tickPet(room, pt, dt);
     for (const n of room.npcs) { if (!n.fig) continue; const want = n.talking ? Math.atan2(-(me.x - n.x), -(me.z - n.z)) - n.yaw : 0; let d = Math.atan2(Math.sin(want), Math.cos(want)); d = Math.max(-1.1, Math.min(1.1, d)); n.headYaw = (n.headYaw || 0) + (d - (n.headYaw || 0)) * Math.min(1, dt * 6); poseFigure(n.fig, { seated: n.seated, headYaw: n.headYaw, talk: n.talking }); }
     const g = camGoal(), k = Math.min(1, dt * 5);
     const kk = focus || cam.pitch !== PITCH ? Math.min(1, dt * 3) : k;
@@ -667,6 +700,7 @@ function renderPickers() {
     const on = b.dataset.v === "new"; if (on === FIT) return;
     setSeg($("#fitSeg"), b.dataset.v); fitOn(on);
     for (const k of Object.keys(built)) delete built[k];
+    setMe(me.as);
     if (room) switchRoom(room.id);
   };
   for (const b of $("#camSeg").querySelectorAll("button")) b.onclick = () => { cam.mode = b.dataset.v; setSeg($("#camSeg"), cam.mode); };
