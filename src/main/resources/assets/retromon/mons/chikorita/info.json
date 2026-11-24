@@ -1,0 +1,72 @@
+{
+ "idle": "animation.spriglet.battle_idle",
+ "ground": "animation.spriglet.ground_idle",
+ "actions": {
+  "cry": "animation.spriglet.cry",
+  "recoil": "animation.spriglet.recoil",
+  "attack": "animation.spriglet.attack",
+  "critical": "animation.spriglet.critical",
+  "special": "animation.spriglet.special",
+  "recall": "animation.spriglet.recall",
+  "sendout": "animation.spriglet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.spriglet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.spriglet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.spriglet.faint",
+   "parts": []
+  }
+ },
+ "move": "RAZOR LEAF",
+ "attack_move": "TACKLE",
+ "scale": 0.818,
+ "height": 1.1,
+ "texture": "retromon:textures/mons/chikorita.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/chikorita_glow_0.png",
+    "retromon:textures/mons/chikorita_glow_1.png",
+    "retromon:textures/mons/chikorita_glow_2.png",
+    "retromon:textures/mons/chikorita_glow_3.png",
+    "retromon:textures/mons/chikorita_glow_4.png",
+    "retromon:textures/mons/chikorita_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SPRIGLET",
+ "anchors": {
+  "mouth": [
+   0,
+   11.0,
+   -13.4
+  ],
+  "back": [
+   0,
+   14.6,
+   0.0
+  ],
+  "body": [
+   0,
+   8.5,
+   0.0
+  ],
+  "size": [
+   9.02,
+   17.6,
+   20.0
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

@@ -17,10 +17,10 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Quill porcupines ♂", ["nidoran_m", "nidorino", "nidoking"]), ("Mongooses", ["mankey", "primeape"]), ("Shrikes", ["spearow", "fearow"]),
             ("Gliders", ["pichu", "pikachu", "raichu"]), ("Leaf grubs", ["caterpie", "metapod", "butterfree"]),
             ("Lance wasps", ["weedle", "kakuna", "beedrill"]), ("Vipers", ["ekans", "arbok"]), ("Pangolins", ["sandshrew", "sandslash"]),
-            ("Moon rabbits", ["clefairy", "clefable"]), ("Fire fennecs", ["vulpix", "ninetales"]), ("Singing chinchillas", ["jigglypuff", "wigglytuff"]),
-            ("Bats", ["zubat", "golbat"]), ("Tubers", ["oddish", "gloom", "vileplume"]), ("Mushroom crabs", ["paras", "parasect"]),
+            ("Moon rabbits", ["cleffa", "clefairy", "clefable"]), ("Fire fennecs", ["vulpix", "ninetales"]), ("Singing chinchillas", ["igglybuff", "jigglypuff", "wigglytuff"]),
+            ("Bats", ["zubat", "golbat", "crobat"]), ("Tubers", ["oddish", "gloom", "vileplume", "bellossom"]), ("Mushroom crabs", ["paras", "parasect"]),
             ("Gnats", ["venonat", "venomoth"]), ("Star-nosed moles", ["diglett", "dugtrio"]), ("Lynxes", ["meowth", "persian"]),
-            ("Platypuses", ["psyduck", "golduck"]), ("Maned wolves", ["growlithe", "arcanine"]), ("Frogs", ["poliwag", "poliwhirl", "poliwrath"]),
+            ("Platypuses", ["psyduck", "golduck"]), ("Maned wolves", ["growlithe", "arcanine"]), ("Frogs", ["poliwag", "poliwhirl", "poliwrath", "politoed"]),
             ("Tarsiers", ["abra", "kadabra", "alakazam"]), ("Gorillas", ["machop", "machoke", "machamp"]),
             ("Flytraps", ["bellsprout", "weepinbell", "victreebel"]), ("Sail jellies", ["tentacool", "tentacruel"]), ("Geodes", ["geodude", "graveler", "golem"]),
             ("Fire deer", ["ponyta", "rapidash"]), ("Salamanders", ["slowpoke", "slowbro"]),
@@ -30,7 +30,14 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Acorns", ["exeggcute", "exeggutor"]), ("Skull jackals", ["cubone", "marowak"]), ("Kangaroo", ["hitmonlee"]), ("Mantis shrimp", ["hitmonchan"]),
             ("Chameleon", ["lickitung"]), ("Puffballs", ["koffing", "weezing"]), ("Ankylosaurs", ["rhyhorn", "rhydon"]), ("Mother hen", ["chansey"]),
             ("Vine ball", ["tangela"]), ("Anteater", ["kangaskhan"]), ("Sea dragons", ["horsea", "seadra"]), ("Fighting fish", ["goldeen", "seaking"]),
-            ("Sea urchins", ["staryu", "starmie"]), ("Mime lemur", ["mr_mime"]), ("Giant sloth", ["snorlax"])]
+            ("Sea urchins", ["staryu", "starmie"]), ("Mime lemur", ["mr_mime"]), ("Giant sloth", ["snorlax"]),
+            # Johto's (2026-11-24)
+            ("Mouse-deer", ["chikorita", "bayleef", "meganium"]), ("Ember badgers", ["cyndaquil", "quilava", "typhlosion"]),
+            ("River otters", ["totodile", "croconaw", "feraligatr"]), ("Marmots", ["sentret", "furret"]), ("Nightjars", ["hoothoot", "noctowl"]),
+            ("Fireflies", ["ledyba", "ledian"]), ("Net-casting spiders", ["spinarak", "ariados"]), ("Torpedo rays", ["chinchou", "lanturn"]),
+            ("Doves", ["togepi", "togetic"]), ("Hoopoes", ["natu", "xatu"]), ("Storm alpacas", ["mareep", "flaaffy", "ampharos"]),
+            ("Water voles", ["marill", "azumarill"]), ("Stump tortoise", ["sudowoodo"]), ("Maple keys", ["hoppip", "skiploom", "jumpluff"]),
+            ("Kinkajou", ["aipom"]), ("Sunchokes", ["sunkern", "sunflora"]), ("Emperor darner", ["yanma"]), ("Mudskippers", ["wooper", "quagsire"])]
 KEEP = ("idle", "ground")
 
 

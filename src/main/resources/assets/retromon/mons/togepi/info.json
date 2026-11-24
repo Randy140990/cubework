@@ -1,0 +1,80 @@
+{
+ "idle": "animation.downlet.ground_idle",
+ "ground": "animation.downlet.ground_idle",
+ "actions": {
+  "cry": "animation.downlet.cry",
+  "recoil": "animation.downlet.recoil",
+  "attack": "animation.downlet.attack",
+  "critical": "animation.downlet.critical",
+  "special": "animation.downlet.special",
+  "recall": "animation.downlet.recall",
+  "sendout": "animation.downlet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.downlet.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.downlet.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.downlet.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.downlet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.downlet.faint",
+   "parts": []
+  }
+ },
+ "move": "SWEET KISS",
+ "attack_move": "POUND",
+ "scale": 0.393,
+ "height": 0.763,
+ "texture": "retromon:textures/mons/togepi.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/togepi_glow_0.png",
+    "retromon:textures/mons/togepi_glow_1.png",
+    "retromon:textures/mons/togepi_glow_2.png",
+    "retromon:textures/mons/togepi_glow_3.png",
+    "retromon:textures/mons/togepi_glow_4.png",
+    "retromon:textures/mons/togepi_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "DOWNLET",
+ "anchors": {
+  "mouth": [
+   0,
+   7.0,
+   -9.3
+  ],
+  "back": [
+   0,
+   13.2,
+   -0.2
+  ],
+  "body": [
+   0,
+   4.4,
+   -0.2
+  ],
+  "size": [
+   8.4,
+   12.2,
+   14.4
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

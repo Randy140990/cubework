@@ -1,0 +1,80 @@
+{
+ "idle": "animation.gracedove.ground_idle",
+ "ground": "animation.gracedove.ground_idle",
+ "actions": {
+  "cry": "animation.gracedove.cry",
+  "recoil": "animation.gracedove.recoil",
+  "attack": "animation.gracedove.attack",
+  "critical": "animation.gracedove.critical",
+  "special": "animation.gracedove.special",
+  "recall": "animation.gracedove.recall",
+  "sendout": "animation.gracedove.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.gracedove.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.gracedove.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.gracedove.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.gracedove.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.gracedove.faint",
+   "parts": []
+  }
+ },
+ "move": "SWEET KISS",
+ "attack_move": "PECK",
+ "scale": 0.456,
+ "height": 1.315,
+ "texture": "retromon:textures/mons/togetic.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/togetic_glow_0.png",
+    "retromon:textures/mons/togetic_glow_1.png",
+    "retromon:textures/mons/togetic_glow_2.png",
+    "retromon:textures/mons/togetic_glow_3.png",
+    "retromon:textures/mons/togetic_glow_4.png",
+    "retromon:textures/mons/togetic_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "GRACEDOVE",
+ "anchors": {
+  "mouth": [
+   0,
+   15.09,
+   -12.46
+  ],
+  "back": [
+   0,
+   22.05,
+   -0.2
+  ],
+  "body": [
+   0,
+   8.4,
+   -0.2
+  ],
+  "size": [
+   9.8,
+   21.05,
+   29.16
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

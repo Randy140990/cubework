@@ -1,0 +1,72 @@
+{
+ "idle": "animation.whirlkey.battle_idle",
+ "ground": "animation.whirlkey.ground_idle",
+ "actions": {
+  "cry": "animation.whirlkey.cry",
+  "recoil": "animation.whirlkey.recoil",
+  "attack": "animation.whirlkey.attack",
+  "critical": "animation.whirlkey.critical",
+  "special": "animation.whirlkey.special",
+  "recall": "animation.whirlkey.recall",
+  "sendout": "animation.whirlkey.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.whirlkey.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.whirlkey.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.whirlkey.faint",
+   "parts": []
+  }
+ },
+ "move": "POISONPOWDER",
+ "attack_move": "TACKLE",
+ "scale": 0.41,
+ "height": 0.975,
+ "texture": "retromon:textures/mons/hoppip.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/hoppip_glow_0.png",
+    "retromon:textures/mons/hoppip_glow_1.png",
+    "retromon:textures/mons/hoppip_glow_2.png",
+    "retromon:textures/mons/hoppip_glow_3.png",
+    "retromon:textures/mons/hoppip_glow_4.png",
+    "retromon:textures/mons/hoppip_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "WHIRLKEY",
+ "anchors": {
+  "mouth": [
+   0,
+   4.4,
+   -3.5
+  ],
+  "back": [
+   0,
+   16.6,
+   0.1
+  ],
+  "body": [
+   0,
+   1.6,
+   0.1
+  ],
+  "size": [
+   6.2,
+   15.6,
+   6.4
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

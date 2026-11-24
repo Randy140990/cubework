@@ -1,0 +1,72 @@
+{
+ "idle": "animation.dewvole.ground_idle",
+ "ground": "animation.dewvole.ground_idle",
+ "actions": {
+  "cry": "animation.dewvole.cry",
+  "recoil": "animation.dewvole.recoil",
+  "attack": "animation.dewvole.attack",
+  "critical": "animation.dewvole.critical",
+  "special": "animation.dewvole.special",
+  "recall": "animation.dewvole.recall",
+  "sendout": "animation.dewvole.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.dewvole.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.dewvole.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.dewvole.faint",
+   "parts": []
+  }
+ },
+ "move": "BUBBLE",
+ "attack_move": "TACKLE",
+ "scale": 0.493,
+ "height": 0.812,
+ "texture": "retromon:textures/mons/marill.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/marill_glow_0.png",
+    "retromon:textures/mons/marill_glow_1.png",
+    "retromon:textures/mons/marill_glow_2.png",
+    "retromon:textures/mons/marill_glow_3.png",
+    "retromon:textures/mons/marill_glow_4.png",
+    "retromon:textures/mons/marill_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "DEWVOLE",
+ "anchors": {
+  "mouth": [
+   0,
+   7.2,
+   -4.8
+  ],
+  "back": [
+   0,
+   14.0,
+   -0.4
+  ],
+  "body": [
+   0,
+   4.5,
+   -0.4
+  ],
+  "size": [
+   11.2,
+   13.0,
+   12.5
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

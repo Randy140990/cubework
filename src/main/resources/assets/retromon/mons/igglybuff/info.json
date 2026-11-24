@@ -1,0 +1,72 @@
+{
+ "idle": "animation.humchin.ground_idle",
+ "ground": "animation.humchin.ground_idle",
+ "actions": {
+  "cry": "animation.humchin.cry",
+  "recoil": "animation.humchin.recoil",
+  "attack": "animation.humchin.attack",
+  "critical": "animation.humchin.critical",
+  "special": "animation.humchin.special",
+  "recall": "animation.humchin.recall",
+  "sendout": "animation.humchin.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.humchin.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.humchin.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.humchin.faint",
+   "parts": []
+  }
+ },
+ "move": "SING",
+ "attack_move": "POUND",
+ "scale": 0.343,
+ "height": 0.875,
+ "texture": "retromon:textures/mons/igglybuff.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/igglybuff_glow_0.png",
+    "retromon:textures/mons/igglybuff_glow_1.png",
+    "retromon:textures/mons/igglybuff_glow_2.png",
+    "retromon:textures/mons/igglybuff_glow_3.png",
+    "retromon:textures/mons/igglybuff_glow_4.png",
+    "retromon:textures/mons/igglybuff_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "HUMCHIN",
+ "anchors": {
+  "mouth": [
+   0,
+   4.78,
+   -4.6
+  ],
+  "back": [
+   0,
+   15.0,
+   0.2
+  ],
+  "body": [
+   0,
+   2.4,
+   0.2
+  ],
+  "size": [
+   12.0,
+   14.0,
+   11.2
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

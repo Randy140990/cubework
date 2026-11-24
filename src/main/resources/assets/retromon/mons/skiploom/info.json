@@ -1,0 +1,72 @@
+{
+ "idle": "animation.twirlkey.battle_idle",
+ "ground": "animation.twirlkey.ground_idle",
+ "actions": {
+  "cry": "animation.twirlkey.cry",
+  "recoil": "animation.twirlkey.recoil",
+  "attack": "animation.twirlkey.attack",
+  "critical": "animation.twirlkey.critical",
+  "special": "animation.twirlkey.special",
+  "recall": "animation.twirlkey.recall",
+  "sendout": "animation.twirlkey.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.twirlkey.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.twirlkey.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.twirlkey.faint",
+   "parts": []
+  }
+ },
+ "move": "STUN SPORE",
+ "attack_move": "SPLASH",
+ "scale": 0.468,
+ "height": 1.281,
+ "texture": "retromon:textures/mons/skiploom.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/skiploom_glow_0.png",
+    "retromon:textures/mons/skiploom_glow_1.png",
+    "retromon:textures/mons/skiploom_glow_2.png",
+    "retromon:textures/mons/skiploom_glow_3.png",
+    "retromon:textures/mons/skiploom_glow_4.png",
+    "retromon:textures/mons/skiploom_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TWIRLKEY",
+ "anchors": {
+  "mouth": [
+   0,
+   5.5,
+   -4.25
+  ],
+  "back": [
+   0,
+   21.5,
+   0.0
+  ],
+  "body": [
+   0,
+   1.75,
+   0.0
+  ],
+  "size": [
+   8.0,
+   20.5,
+   8.5
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.bogskipper.ground_idle",
+ "ground": "animation.bogskipper.ground_idle",
+ "actions": {
+  "cry": "animation.bogskipper.cry",
+  "recoil": "animation.bogskipper.recoil",
+  "attack": "animation.bogskipper.attack",
+  "critical": "animation.bogskipper.critical",
+  "special": "animation.bogskipper.special",
+  "recall": "animation.bogskipper.recall",
+  "sendout": "animation.bogskipper.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.bogskipper.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.bogskipper.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.bogskipper.faint",
+   "parts": []
+  }
+ },
+ "move": "SURF",
+ "attack_move": "EARTHQUAKE",
+ "scale": 1.458,
+ "height": 0.96,
+ "texture": "retromon:textures/mons/quagsire.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/quagsire_glow_0.png",
+    "retromon:textures/mons/quagsire_glow_1.png",
+    "retromon:textures/mons/quagsire_glow_2.png",
+    "retromon:textures/mons/quagsire_glow_3.png",
+    "retromon:textures/mons/quagsire_glow_4.png",
+    "retromon:textures/mons/quagsire_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BOGSKIPPER",
+ "anchors": {
+  "mouth": [
+   0,
+   4.32,
+   -12.11
+  ],
+  "back": [
+   0,
+   16.36,
+   2.64
+  ],
+  "body": [
+   0,
+   8.58,
+   2.64
+  ],
+  "size": [
+   12.24,
+   15.36,
+   37.34
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

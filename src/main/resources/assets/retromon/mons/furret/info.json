@@ -1,0 +1,72 @@
+{
+ "idle": "animation.longmot.battle_idle",
+ "ground": "animation.longmot.ground_idle",
+ "actions": {
+  "cry": "animation.longmot.cry",
+  "recoil": "animation.longmot.recoil",
+  "attack": "animation.longmot.attack",
+  "critical": "animation.longmot.critical",
+  "special": "animation.longmot.special",
+  "recall": "animation.longmot.recall",
+  "sendout": "animation.longmot.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.longmot.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.longmot.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.longmot.faint",
+   "parts": []
+  }
+ },
+ "move": "QUICK ATTACK",
+ "attack_move": "FURY SWIPES",
+ "scale": 1.768,
+ "height": 1.018,
+ "texture": "retromon:textures/mons/furret.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/furret_glow_0.png",
+    "retromon:textures/mons/furret_glow_1.png",
+    "retromon:textures/mons/furret_glow_2.png",
+    "retromon:textures/mons/furret_glow_3.png",
+    "retromon:textures/mons/furret_glow_4.png",
+    "retromon:textures/mons/furret_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LONGMOT",
+ "anchors": {
+  "mouth": [
+   0,
+   9.52,
+   -19.4
+  ],
+  "back": [
+   0,
+   11.2,
+   0.0
+  ],
+  "body": [
+   0,
+   7.2,
+   0.0
+  ],
+  "size": [
+   9.14,
+   16.28,
+   45.24
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.embersett.battle_idle",
+ "ground": "animation.embersett.ground_idle",
+ "actions": {
+  "cry": "animation.embersett.cry",
+  "recoil": "animation.embersett.recoil",
+  "attack": "animation.embersett.attack",
+  "critical": "animation.embersett.critical",
+  "special": "animation.embersett.special",
+  "recall": "animation.embersett.recall",
+  "sendout": "animation.embersett.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.embersett.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.embersett.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.embersett.faint",
+   "parts": []
+  }
+ },
+ "move": "EMBER",
+ "attack_move": "TACKLE",
+ "scale": 0.774,
+ "height": 0.775,
+ "texture": "retromon:textures/mons/cyndaquil.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/cyndaquil_glow_0.png",
+    "retromon:textures/mons/cyndaquil_glow_1.png",
+    "retromon:textures/mons/cyndaquil_glow_2.png",
+    "retromon:textures/mons/cyndaquil_glow_3.png",
+    "retromon:textures/mons/cyndaquil_glow_4.png",
+    "retromon:textures/mons/cyndaquil_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "EMBERSETT",
+ "anchors": {
+  "mouth": [
+   0,
+   7.4,
+   -13.7
+  ],
+  "back": [
+   0,
+   11.0,
+   0.0
+  ],
+  "body": [
+   0,
+   6.2,
+   0.0
+  ],
+  "size": [
+   8.73,
+   12.4,
+   20.4
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

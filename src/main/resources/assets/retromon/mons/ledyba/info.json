@@ -1,0 +1,76 @@
+{
+ "idle": "animation.glimmet.battle_idle",
+ "ground": "animation.glimmet.ground_idle",
+ "actions": {
+  "cry": "animation.glimmet.cry",
+  "recoil": "animation.glimmet.recoil",
+  "attack": "animation.glimmet.attack",
+  "critical": "animation.glimmet.critical",
+  "special": "animation.glimmet.special",
+  "recall": "animation.glimmet.recall",
+  "sendout": "animation.glimmet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.glimmet.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.glimmet.air_fly",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.glimmet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.glimmet.faint",
+   "parts": []
+  }
+ },
+ "move": "SUPERSONIC",
+ "attack_move": "TACKLE",
+ "scale": 1.22,
+ "height": 0.656,
+ "texture": "retromon:textures/mons/ledyba.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/ledyba_glow_0.png",
+    "retromon:textures/mons/ledyba_glow_1.png",
+    "retromon:textures/mons/ledyba_glow_2.png",
+    "retromon:textures/mons/ledyba_glow_3.png",
+    "retromon:textures/mons/ledyba_glow_4.png",
+    "retromon:textures/mons/ledyba_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "GLIMMET",
+ "anchors": {
+  "mouth": [
+   0,
+   4.0,
+   -5.3
+  ],
+  "back": [
+   0,
+   11.5,
+   -0.2
+  ],
+  "body": [
+   0,
+   4.8,
+   -0.2
+  ],
+  "size": [
+   17.0,
+   10.5,
+   17.8
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

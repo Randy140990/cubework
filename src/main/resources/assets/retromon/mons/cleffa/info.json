@@ -1,0 +1,72 @@
+{
+ "idle": "animation.lunakit.ground_idle",
+ "ground": "animation.lunakit.ground_idle",
+ "actions": {
+  "cry": "animation.lunakit.cry",
+  "recoil": "animation.lunakit.recoil",
+  "attack": "animation.lunakit.attack",
+  "critical": "animation.lunakit.critical",
+  "special": "animation.lunakit.special",
+  "recall": "animation.lunakit.recall",
+  "sendout": "animation.lunakit.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.lunakit.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.lunakit.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.lunakit.faint",
+   "parts": []
+  }
+ },
+ "move": "SWEET KISS",
+ "attack_move": "POUND",
+ "scale": 0.333,
+ "height": 0.9,
+ "texture": "retromon:textures/mons/cleffa.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/cleffa_glow_0.png",
+    "retromon:textures/mons/cleffa_glow_1.png",
+    "retromon:textures/mons/cleffa_glow_2.png",
+    "retromon:textures/mons/cleffa_glow_3.png",
+    "retromon:textures/mons/cleffa_glow_4.png",
+    "retromon:textures/mons/cleffa_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LUNAKIT",
+ "anchors": {
+  "mouth": [
+   0,
+   6.55,
+   -4.2
+  ],
+  "back": [
+   0,
+   15.4,
+   -0.2
+  ],
+  "body": [
+   0,
+   3.1,
+   -0.2
+  ],
+  "size": [
+   8.92,
+   14.4,
+   8.4
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

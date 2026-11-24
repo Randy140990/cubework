@@ -1,0 +1,72 @@
+{
+ "idle": "animation.tempestlama.battle_idle",
+ "ground": "animation.tempestlama.ground_idle",
+ "actions": {
+  "cry": "animation.tempestlama.cry",
+  "recoil": "animation.tempestlama.recoil",
+  "attack": "animation.tempestlama.attack",
+  "critical": "animation.tempestlama.critical",
+  "special": "animation.tempestlama.special",
+  "recall": "animation.tempestlama.recall",
+  "sendout": "animation.tempestlama.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.tempestlama.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.tempestlama.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.tempestlama.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDER",
+ "attack_move": "THUNDERPUNCH",
+ "scale": 0.52,
+ "height": 2.694,
+ "texture": "retromon:textures/mons/ampharos.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/ampharos_glow_0.png",
+    "retromon:textures/mons/ampharos_glow_1.png",
+    "retromon:textures/mons/ampharos_glow_2.png",
+    "retromon:textures/mons/ampharos_glow_3.png",
+    "retromon:textures/mons/ampharos_glow_4.png",
+    "retromon:textures/mons/ampharos_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TEMPESTLAMA",
+ "anchors": {
+  "mouth": [
+   0,
+   31.85,
+   -21.85
+  ],
+  "back": [
+   0,
+   22.25,
+   0.0
+  ],
+  "body": [
+   0,
+   16.75,
+   0.0
+  ],
+  "size": [
+   13.6,
+   43.1,
+   39.35
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

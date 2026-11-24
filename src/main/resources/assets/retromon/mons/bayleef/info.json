@@ -1,0 +1,72 @@
+{
+ "idle": "animation.cloverbuck.battle_idle",
+ "ground": "animation.cloverbuck.ground_idle",
+ "actions": {
+  "cry": "animation.cloverbuck.cry",
+  "recoil": "animation.cloverbuck.recoil",
+  "attack": "animation.cloverbuck.attack",
+  "critical": "animation.cloverbuck.critical",
+  "special": "animation.cloverbuck.special",
+  "recall": "animation.cloverbuck.recall",
+  "sendout": "animation.cloverbuck.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.cloverbuck.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.cloverbuck.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.cloverbuck.faint",
+   "parts": []
+  }
+ },
+ "move": "SYNTHESIS",
+ "attack_move": "RAZOR LEAF",
+ "scale": 0.564,
+ "height": 2.126,
+ "texture": "retromon:textures/mons/bayleef.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/bayleef_glow_0.png",
+    "retromon:textures/mons/bayleef_glow_1.png",
+    "retromon:textures/mons/bayleef_glow_2.png",
+    "retromon:textures/mons/bayleef_glow_3.png",
+    "retromon:textures/mons/bayleef_glow_4.png",
+    "retromon:textures/mons/bayleef_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "CLOVERBUCK",
+ "anchors": {
+  "mouth": [
+   0,
+   18.2,
+   -19.68
+  ],
+  "back": [
+   0,
+   16.8,
+   0.2
+  ],
+  "body": [
+   0,
+   12.8,
+   0.2
+  ],
+  "size": [
+   12.82,
+   34.02,
+   28.72
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

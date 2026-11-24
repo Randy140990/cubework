@@ -1,0 +1,72 @@
+{
+ "idle": "animation.volticuna.battle_idle",
+ "ground": "animation.volticuna.ground_idle",
+ "actions": {
+  "cry": "animation.volticuna.cry",
+  "recoil": "animation.volticuna.recoil",
+  "attack": "animation.volticuna.attack",
+  "critical": "animation.volticuna.critical",
+  "special": "animation.volticuna.special",
+  "recall": "animation.volticuna.recall",
+  "sendout": "animation.volticuna.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.volticuna.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.volticuna.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.volticuna.faint",
+   "parts": []
+  }
+ },
+ "move": "COTTON SPORE",
+ "attack_move": "THUNDERSHOCK",
+ "scale": 0.457,
+ "height": 1.752,
+ "texture": "retromon:textures/mons/flaaffy.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/flaaffy_glow_0.png",
+    "retromon:textures/mons/flaaffy_glow_1.png",
+    "retromon:textures/mons/flaaffy_glow_2.png",
+    "retromon:textures/mons/flaaffy_glow_3.png",
+    "retromon:textures/mons/flaaffy_glow_4.png",
+    "retromon:textures/mons/flaaffy_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "VOLTICUNA",
+ "anchors": {
+  "mouth": [
+   0,
+   19.98,
+   -16.16
+  ],
+  "back": [
+   0,
+   23.48,
+   0.1
+  ],
+  "body": [
+   0,
+   11.6,
+   0.1
+  ],
+  "size": [
+   10.5,
+   28.03,
+   23.26
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

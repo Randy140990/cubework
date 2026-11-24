@@ -1,0 +1,72 @@
+{
+ "idle": "animation.staticray.battle_idle",
+ "ground": "animation.staticray.ground_idle",
+ "actions": {
+  "cry": "animation.staticray.cry",
+  "recoil": "animation.staticray.recoil",
+  "attack": "animation.staticray.attack",
+  "critical": "animation.staticray.critical",
+  "special": "animation.staticray.special",
+  "recall": "animation.staticray.recall",
+  "sendout": "animation.staticray.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.staticray.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.staticray.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.staticray.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDER WAVE",
+ "attack_move": "SPARK",
+ "scale": 1.066,
+ "height": 0.469,
+ "texture": "retromon:textures/mons/chinchou.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/chinchou_glow_0.png",
+    "retromon:textures/mons/chinchou_glow_1.png",
+    "retromon:textures/mons/chinchou_glow_2.png",
+    "retromon:textures/mons/chinchou_glow_3.png",
+    "retromon:textures/mons/chinchou_glow_4.png",
+    "retromon:textures/mons/chinchou_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "STATICRAY",
+ "anchors": {
+  "mouth": [
+   0,
+   3.4,
+   -6.1
+  ],
+  "back": [
+   0,
+   8.5,
+   0.0
+  ],
+  "body": [
+   0,
+   4.1,
+   0.0
+  ],
+  "size": [
+   18.0,
+   7.5,
+   17.87
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

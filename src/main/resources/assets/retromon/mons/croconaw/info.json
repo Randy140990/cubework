@@ -1,0 +1,72 @@
+{
+ "idle": "animation.surgotter.battle_idle",
+ "ground": "animation.surgotter.ground_idle",
+ "actions": {
+  "cry": "animation.surgotter.cry",
+  "recoil": "animation.surgotter.recoil",
+  "attack": "animation.surgotter.attack",
+  "critical": "animation.surgotter.critical",
+  "special": "animation.surgotter.special",
+  "recall": "animation.surgotter.recall",
+  "sendout": "animation.surgotter.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.surgotter.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.surgotter.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.surgotter.faint",
+   "parts": []
+  }
+ },
+ "move": "WATER GUN",
+ "attack_move": "BITE",
+ "scale": 1.007,
+ "height": 1.092,
+ "texture": "retromon:textures/mons/croconaw.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/croconaw_glow_0.png",
+    "retromon:textures/mons/croconaw_glow_1.png",
+    "retromon:textures/mons/croconaw_glow_2.png",
+    "retromon:textures/mons/croconaw_glow_3.png",
+    "retromon:textures/mons/croconaw_glow_4.png",
+    "retromon:textures/mons/croconaw_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SURGOTTER",
+ "anchors": {
+  "mouth": [
+   0,
+   11.2,
+   -20.1
+  ],
+  "back": [
+   0,
+   18.48,
+   0.1
+  ],
+  "body": [
+   0,
+   11.54,
+   0.1
+  ],
+  "size": [
+   12.32,
+   17.48,
+   43.44
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

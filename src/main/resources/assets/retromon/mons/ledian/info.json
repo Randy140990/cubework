@@ -1,0 +1,76 @@
+{
+ "idle": "animation.lanternwing.battle_idle",
+ "ground": "animation.lanternwing.ground_idle",
+ "actions": {
+  "cry": "animation.lanternwing.cry",
+  "recoil": "animation.lanternwing.recoil",
+  "attack": "animation.lanternwing.attack",
+  "critical": "animation.lanternwing.critical",
+  "special": "animation.lanternwing.special",
+  "recall": "animation.lanternwing.recall",
+  "sendout": "animation.lanternwing.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.lanternwing.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.lanternwing.air_fly",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.lanternwing.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.lanternwing.faint",
+   "parts": []
+  }
+ },
+ "move": "LIGHT SCREEN",
+ "attack_move": "COMET PUNCH",
+ "scale": 0.975,
+ "height": 1.334,
+ "texture": "retromon:textures/mons/ledian.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/ledian_glow_0.png",
+    "retromon:textures/mons/ledian_glow_1.png",
+    "retromon:textures/mons/ledian_glow_2.png",
+    "retromon:textures/mons/ledian_glow_3.png",
+    "retromon:textures/mons/ledian_glow_4.png",
+    "retromon:textures/mons/ledian_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LANTERNWING",
+ "anchors": {
+  "mouth": [
+   0,
+   10.5,
+   -7.7
+  ],
+  "back": [
+   0,
+   21.25,
+   0.2
+  ],
+  "body": [
+   0,
+   11.95,
+   0.2
+  ],
+  "size": [
+   34.5,
+   21.35,
+   29.55
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

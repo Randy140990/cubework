@@ -1,0 +1,72 @@
+{
+ "idle": "animation.stumpshell.battle_idle",
+ "ground": "animation.stumpshell.ground_idle",
+ "actions": {
+  "cry": "animation.stumpshell.cry",
+  "recoil": "animation.stumpshell.recoil",
+  "attack": "animation.stumpshell.attack",
+  "critical": "animation.stumpshell.critical",
+  "special": "animation.stumpshell.special",
+  "recall": "animation.stumpshell.recall",
+  "sendout": "animation.stumpshell.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.stumpshell.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.stumpshell.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.stumpshell.faint",
+   "parts": []
+  }
+ },
+ "move": "MIMIC",
+ "attack_move": "ROCK THROW",
+ "scale": 1.018,
+ "height": 1.179,
+ "texture": "retromon:textures/mons/sudowoodo.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/sudowoodo_glow_0.png",
+    "retromon:textures/mons/sudowoodo_glow_1.png",
+    "retromon:textures/mons/sudowoodo_glow_2.png",
+    "retromon:textures/mons/sudowoodo_glow_3.png",
+    "retromon:textures/mons/sudowoodo_glow_4.png",
+    "retromon:textures/mons/sudowoodo_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "STUMPSHELL",
+ "anchors": {
+  "mouth": [
+   0,
+   6.21,
+   -12.92
+  ],
+  "back": [
+   0,
+   19.87,
+   -0.17
+  ],
+  "body": [
+   0,
+   11.39,
+   -0.17
+  ],
+  "size": [
+   10.15,
+   18.87,
+   18.22
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

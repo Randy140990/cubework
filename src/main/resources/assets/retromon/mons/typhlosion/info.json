@@ -1,0 +1,72 @@
+{
+ "idle": "animation.pyrobrock.battle_idle",
+ "ground": "animation.pyrobrock.ground_idle",
+ "actions": {
+  "cry": "animation.pyrobrock.cry",
+  "recoil": "animation.pyrobrock.recoil",
+  "attack": "animation.pyrobrock.attack",
+  "critical": "animation.pyrobrock.critical",
+  "special": "animation.pyrobrock.special",
+  "recall": "animation.pyrobrock.recall",
+  "sendout": "animation.pyrobrock.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.pyrobrock.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.pyrobrock.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.pyrobrock.faint",
+   "parts": []
+  }
+ },
+ "move": "FLAMETHROWER",
+ "attack_move": "SWIFT",
+ "scale": 1.049,
+ "height": 1.62,
+ "texture": "retromon:textures/mons/typhlosion.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/typhlosion_glow_0.png",
+    "retromon:textures/mons/typhlosion_glow_1.png",
+    "retromon:textures/mons/typhlosion_glow_2.png",
+    "retromon:textures/mons/typhlosion_glow_3.png",
+    "retromon:textures/mons/typhlosion_glow_4.png",
+    "retromon:textures/mons/typhlosion_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PYROBROCK",
+ "anchors": {
+  "mouth": [
+   0,
+   16.92,
+   -24.26
+  ],
+  "back": [
+   0,
+   19.0,
+   -0.18
+  ],
+  "body": [
+   0,
+   17.46,
+   -0.18
+  ],
+  "size": [
+   16.2,
+   25.32,
+   36.96
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

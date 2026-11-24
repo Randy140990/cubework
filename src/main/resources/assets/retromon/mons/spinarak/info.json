@@ -1,0 +1,76 @@
+{
+ "idle": "animation.gazeweb.battle_idle",
+ "ground": "animation.gazeweb.ground_idle",
+ "actions": {
+  "cry": "animation.gazeweb.cry",
+  "recoil": "animation.gazeweb.recoil",
+  "attack": "animation.gazeweb.attack",
+  "critical": "animation.gazeweb.critical",
+  "special": "animation.gazeweb.special",
+  "recall": "animation.gazeweb.recall",
+  "sendout": "animation.gazeweb.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.gazeweb.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.gazeweb.air_fly",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.gazeweb.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.gazeweb.faint",
+   "parts": []
+  }
+ },
+ "move": "STRING SHOT",
+ "attack_move": "POISON STING",
+ "scale": 1.247,
+ "height": 0.481,
+ "texture": "retromon:textures/mons/spinarak.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/spinarak_glow_0.png",
+    "retromon:textures/mons/spinarak_glow_1.png",
+    "retromon:textures/mons/spinarak_glow_2.png",
+    "retromon:textures/mons/spinarak_glow_3.png",
+    "retromon:textures/mons/spinarak_glow_4.png",
+    "retromon:textures/mons/spinarak_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "GAZEWEB",
+ "anchors": {
+  "mouth": [
+   0,
+   4.0,
+   -4.9
+  ],
+  "back": [
+   0,
+   8.7,
+   0.0
+  ],
+  "body": [
+   0,
+   5.0,
+   0.0
+  ],
+  "size": [
+   17.4,
+   7.7,
+   14.4
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}
