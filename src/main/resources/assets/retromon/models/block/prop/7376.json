@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pet_bed","pet_bed":"retromon:block/interior/pet_bed"},"elements":[{"from":[0.0,16,7.4],"to":[5.4,16,16.0],"faces":{"down":{"uv":[0.0,0.0,5.4,8.6],"texture":"#pet_bed"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cerulean_trim","cerulean_trim":"retromon:block/interior/cerulean_trim"},"elements":[{"from":[15.04,7.2,0],"to":[16.0,8.8,0],"faces":{"south":{"uv":[7.76,13.8,8.0,14.2],"texture":"#cerulean_trim"}}}]}

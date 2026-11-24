@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/stone","stone":"retromon:block/interior/stone"},"elements":[{"from":[0.0,16,5.76],"to":[3.84,16,8.96],"faces":{"down":{"uv":[0.0,7.04,3.84,10.24],"texture":"#stone"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/walnut","walnut":"retromon:block/interior/walnut"},"elements":[{"from":[1.76,16,13.28],"to":[2.72,16,14.24],"faces":{"down":{"uv":[8.22,4.22,8.34,4.34],"texture":"#walnut"}}}]}

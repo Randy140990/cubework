@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/surge_wall","surge_wall":"retromon:block/interior/surge_wall"},"elements":[{"from":[16,0.0,0.0],"to":[16,6.4,12.8],"faces":{"west":{"uv":[0.0,9.6,12.8,16.0],"texture":"#surge_wall"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/steel","steel":"retromon:block/interior/steel"},"elements":[{"from":[0,0.2,15.52],"to":[0,1.16,16.0],"faces":{"east":{"uv":[8.0,7.71,8.12,7.95],"texture":"#steel"}}}]}

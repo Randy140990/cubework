@@ -684,18 +684,24 @@ public final class Interiors {
 		for (Map.Entry<String, List<MonSpot>> e : MONS.entrySet()) {
 			Room r = ROOMS.get(e.getKey());
 			if (r == null) continue;
+			double[] pen = null;
 			for (MonSpot m : e.getValue()) {
 				if (m.pen() == null || !level.hasChunkAt(BlockPos.containing(r.ox() + m.x(), r.oy(), r.oz() + m.z()))) continue;
-				for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, around(r), w -> m.key().equals(w.key()))) penMove(level, r, m, w);
+				pen = m.pen();
+				for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, around(r), w -> m.key().equals(w.key()))) penMove(level, r, m.pen(), w);
+			}
+			// (Yours, left at the DAY CARE: in the pen with them, wandering too.)
+			if (pen != null && r.id().equals("daycare")) {
+				final double[] p = pen;
+				for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, around(r), w -> w.key().startsWith("daycare:"))) penMove(level, r, p, w);
 			}
 		}
 	}
 
-	private static void penMove(ServerLevel level, Room r, MonSpot m, WorldMon w) {
+	private static void penMove(ServerLevel level, Room r, double[] pen, WorldMon w) {
 		w.setNoGravity(true);
 		w.noPhysics = true;
 		w.setWanders(true);
-		double[] pen = m.pen();
 		PenPlan plan = PEN_PLANS.computeIfAbsent(w.getId(), k -> {
 			PenPlan p = new PenPlan();
 			p.tx = w.getX();

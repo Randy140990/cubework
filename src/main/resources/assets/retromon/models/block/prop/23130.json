@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cm_paper","cm_paper":"retromon:block/interior/cm_paper"},"elements":[{"from":[0,0.0,16],"to":[16.0,16.0,16],"faces":{"north":{"uv":[0.0,4.0,4.0,8.0],"texture":"#cm_paper"}}}]}

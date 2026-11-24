@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/museum_gold","museum_gold":"retromon:block/interior/museum_gold"},"elements":[{"from":[15.4,16,9.0],"to":[16.0,16,16.0],"faces":{"down":{"uv":[15.4,0.0,16.0,7.0],"texture":"#museum_gold"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gym_rock","gym_rock":"retromon:block/interior/gym_rock"},"elements":[{"from":[16,0.0,0.0],"to":[16,3.2,3.2],"faces":{"west":{"uv":[2.0,5.6,2.4,6.0],"texture":"#gym_rock"}}}]}

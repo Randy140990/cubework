@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gym_rock","gym_rock":"retromon:block/interior/gym_rock"},"elements":[{"from":[3.2,0.0,10.665],"to":[16.0,16.0,10.665],"faces":{"south":{"uv":[12.4,6.0,14.0,8.0],"texture":"#gym_rock"}}},{"from":[3.2,0.0,0.0],"to":[3.2,16.0,10.665],"faces":{"west":{"uv":[6.0,6.0,7.3331,8.0],"texture":"#gym_rock"}}}]}

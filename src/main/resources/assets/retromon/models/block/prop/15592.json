@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ds_wall_light","ds_wall_light":"retromon:block/interior/ds_wall_light"},"elements":[{"from":[0,0.0,0],"to":[0,2.4,16.0],"faces":{"east":{"uv":[12.0,11.4,16.0,12.0],"texture":"#ds_wall_light"}}}]}

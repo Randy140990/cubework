@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pot_white","pot_white":"retromon:block/interior/pot_white"},"elements":[{"from":[0.168,16,0.0],"to":[6.232,16,3.032],"faces":{"down":{"uv":[1.2401,1.4881,8.7599,6.0],"texture":"#pot_white"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gym_rock","gym_rock":"retromon:block/interior/gym_rock"},"elements":[{"from":[6.4,0.0,16],"to":[16.0,16.0,16],"faces":{"north":{"uv":[12.0,10.0,13.2,12.0],"texture":"#gym_rock"}}}]}

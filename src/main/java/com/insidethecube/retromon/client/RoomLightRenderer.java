@@ -137,8 +137,14 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 		float dusk = s.k * (1 - s.m), night = s.m;
 		if (!s.panes.isEmpty()) {
 			// Windows' glass, and open ways out's daylight (the League gate's), each with their own skies.
-			List<double[]> glass = new java.util.ArrayList<>(), doors = new java.util.ArrayList<>();
-			for (double[] g : s.panes) (g.length > 12 && g[12] == 1 ? doors : glass).add(g);
+			List<double[]> glass = new java.util.ArrayList<>(), doors = new java.util.ArrayList<>(), lamps = new java.util.ArrayList<>();
+			for (double[] g : s.panes) (g.length > 12 && g[12] == 2 ? lamps : g.length > 12 && g[12] == 1 ? doors : glass).add(g);
+			// (0.62, John's 19:22: "during like the daytime, would you have the lights off?") The lamps: off by day (morning
+			// and day), on in the evening and at night, and on all the time in a room with no windows.
+			if (!lamps.isEmpty()) {
+				float on = glass.isEmpty() && s.pools.isEmpty() ? 1 : Math.max(night, s.side > 0 ? s.k : 0);
+				if (on > 0.01F) lamps(out, pose, lamps, on, cx, cz);
+			}
 			if (dusk > 0.01F) {
 				if (!glass.isEmpty()) panes(out, pose, glass, DUSK, dusk, cx, cz);
 				if (!doors.isEmpty()) panes(out, pose, doors, DOOR_DUSK, dusk, cx, cz);
@@ -148,6 +154,21 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 				if (!doors.isEmpty()) panes(out, pose, doors, DOOR_NIGHT, night, cx, cz);
 			}
 		}
+	}
+
+	/** The lamps' shades and panels lit: a warm glow laid over each face, as strong as on is (0 to 1). */
+	private static void lamps(SubmitNodeCollector out, PoseStack pose, List<double[]> lamps, float on, double cx, double cz) {
+		int col = ((int) (Math.min(1, on) * 0.6F * 255) << 24) | 0xFFE6B4;
+		out.submitCustomGeometry(pose, RenderTypes.entityTranslucentEmissive(WASH), (pp, vc) -> {
+			for (double[] g : lamps) {
+				double ox = g[0] + g[9] * 0.006 - cx, oy = g[1] + g[10] * 0.006, oz = g[2] + g[11] * 0.006 - cz;
+				float nx = (float) g[9], ny = (float) g[10], nz = (float) g[11];
+				vert(vc, pp, ox, oy, oz, 0.5F, 0.5F, col, nx, ny, nz);
+				vert(vc, pp, ox + g[3], oy + g[4], oz + g[5], 0.5F, 0.5F, col, nx, ny, nz);
+				vert(vc, pp, ox + g[3] + g[6], oy + g[4] + g[7], oz + g[5] + g[8], 0.5F, 0.5F, col, nx, ny, nz);
+				vert(vc, pp, ox + g[6], oy + g[7], oz + g[8], 0.5F, 0.5F, col, nx, ny, nz);
+			}
+		});
 	}
 
 	private static void panes(SubmitNodeCollector out, PoseStack pose, List<double[]> panes, Identifier tex, float a, double cx, double cz) {

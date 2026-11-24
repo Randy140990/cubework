@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cerulean_wall","cerulean_wall":"retromon:block/interior/cerulean_wall"},"elements":[{"from":[0.0,0.0,0],"to":[6.4,16.0,0],"faces":{"south":{"uv":[0.0,0.0,6.4,16.0],"texture":"#cerulean_wall"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/museum_gold","museum_gold":"retromon:block/interior/museum_gold"},"elements":[{"from":[4.2,16,7.4],"to":[16.0,16,16.0],"faces":{"down":{"uv":[5.05,0.0,8.0,2.15],"texture":"#museum_gold"}}}]}

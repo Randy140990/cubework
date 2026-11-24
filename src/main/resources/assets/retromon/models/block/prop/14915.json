@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/silph_lift_door","silph_lift_door":"retromon:block/interior/silph_lift_door"},"elements":[{"from":[0.0,0.0,9.6],"to":[16.0,16,9.6],"faces":{"north":{"uv":[0.0,0.0,5.3333,8.0],"texture":"#silph_lift_door"}}}]}

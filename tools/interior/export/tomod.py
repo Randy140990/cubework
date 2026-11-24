@@ -321,7 +321,7 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "cerulean_house1": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "cerulean_house2": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "cerulean_house3": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "cerulean_house4": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "daycare": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "bills_house": {"x": 7.0, "z": 9.5, "yaw": 180.0},
          "power_plant": {"x": 5.0, "z": 34.5, "yaw": 180.0},
-         "vermilion_gym": {"x": 7.0, "z": 20.5, "yaw": 180.0}, "pokemon_fan_club": {"x": 7.0, "z": 10.5, "yaw": 180.0},
+         "vermilion_gym": {"x": 5.5, "z": 17.5, "yaw": 180.0}, "pokemon_fan_club": {"x": 7.0, "z": 10.5, "yaw": 180.0},
          "vermilion_old_rod_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "vermilion_trade_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "vermilion_pidgey_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "lavender_volunteer_house": {"x": 7.0, "z": 9.5, "yaw": 180.0}, "lavender_cubone_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
@@ -630,12 +630,21 @@ def write_light(light, res):
         if k in light: img_of(light[k]).save(os.path.join(out, name + ".png"))
 
 
+LAMPS = {"lampShade", "lampWhite", "ugLamp", "seaLantern"}
+
+
 def panes_of(room):
     """A room's windows' glass, facing in: [corner x y z, along it x y z, up it x y z, facing x y z] each (the mod lays
     the dusk and night skies over them)."""
     W, D = room["W"], room["D"]
     out = []
     for f in room["faces"]:
+        if f["k"] in LAMPS and f.get("n"):
+            # (0.62, John's 19:22) A lamp's shade or panel: the mod lights it in the evening and at night (and all the
+            # time in a room with no windows), off by day, as the Interior Viewer's fit-out has it.
+            bl, r, u, n, w, h = f["bl"], f["r"], f["u"], f["n"], f["w"], f["h"]
+            out.append([round(v, 4) for v in bl + [r[i] * w for i in range(3)] + [u[i] * h for i in range(3)] + n] + [2])
+            continue
         if f["k"] not in ("window", "doorLight") or not f.get("n"): continue
         bl, r, u, n, w, h = f["bl"], f["r"], f["u"], f["n"], f["w"], f["h"]
         c = [bl[i] + r[i] * w / 2 + u[i] * h / 2 for i in range(3)]

@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/man_brick","man_brick":"retromon:block/interior/man_brick"},"elements":[{"from":[0,0.0,16],"to":[16.0,16,16],"faces":{"north":{"uv":[0.0,0.0,16.0,16.0],"texture":"#man_brick"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/psy_wall","psy_wall":"retromon:block/interior/psy_wall"},"elements":[{"from":[0.0,0.0,16],"to":[16.0,6.4,16],"faces":{"north":{"uv":[4.0,6.4,8.0,8.0],"texture":"#psy_wall"}}}]}

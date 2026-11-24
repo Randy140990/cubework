@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/vg_wall","vg_wall":"retromon:block/interior/vg_wall"},"elements":[{"from":[0.0,0.0,16],"to":[16.0,16,16],"faces":{"north":{"uv":[0.0,0.0,4.0,4.0],"texture":"#vg_wall"}}}]}

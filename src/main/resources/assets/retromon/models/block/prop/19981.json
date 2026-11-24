@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/oak","oak":"retromon:block/interior/oak"},"elements":[{"from":[0.8,0,1.6],"to":[15.2,0,14.4],"faces":{"up":{"uv":[6.1,4.2,7.9,5.8],"texture":"#oak"}}}]}

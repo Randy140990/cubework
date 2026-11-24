@@ -186,19 +186,80 @@ Object.assign(FIT_TEX, {
   add("goodRed", "#D9534F", { label: "#F6E8E4" }); add("goodBlue", "#3E7CC9", { label: "#E6EEF8" }); add("goodYellow", "#E8B83A", { label: "#FFF6D8" });
   add("goodGreen", "#4FA65A", { label: "#EAF6EA" }); add("goodPurple", "#8A5AB8", { label: "#F0E8F8" }); add("goodOrange", "#E58A3A", { label: "#FFF0E0" });
   add("goodBottle", "#B8DDF0", { top: "#E8F4FA" }); add("goodCap", "#F4F4F0");
-  add("shelfBoard", "#F2F0EA", { top: "#FFFFFF" }); add("shelfBack", "#DDE4EA");
+  add("shelfBoard", "#F2F0EA", { top: "#FFFFFF" });
+  TEXDEF.shelfBack = [16, 16, (P, r) => { fitPaint(P, r, hx("#D2E0EE"), { drift: 0.03 }); for (let y = 2; y < 16; y += 4) for (let x = 2; x < 16; x += 4) P.set(x, y, hx("#B8CADC")); }];
+  MATDEF.shelfBack = { tex: "shelfBack", per: 1 };
 }
 const GOODS = ["goodRed", "goodBlue", "goodYellow", "goodGreen", "goodPurple", "goodOrange"];
-// One shelf's row of goods along a frame's x from a to b at height y, depth 0.1 to d: boxes, bottles and balls by turns.
-function goodsRow(G, F, a, b, y, d, seed, bottles) {
-  const r = rng(seed);
-  let x = a + 0.04;
-  while (x < b - 0.18) {
-    const k = bottles ? 0.5 + r() * 0.3 : r(), m = GOODS[Math.floor(r() * GOODS.length)];
-    if (k < 0.45) { const w = 0.22 + r() * 0.12, h = 0.24 + r() * 0.16; F.box(x, y, 0.14, Math.min(b - 0.04, x + w), y + h, d - 0.06, { all: m, top: m }); x += w + 0.05; }
-    else if (k < 0.8) { const h = 0.26 + r() * 0.1; F.box(x + 0.02, y, 0.2, x + 0.14, y + h, 0.32, { all: k < 0.62 ? "goodBottle" : m }); F.box(x + 0.05, y + h, 0.23, x + 0.11, y + h + 0.06, 0.29, "goodCap"); x += 0.18; }
-    else { const [cx, cz] = F.pt(x + 0.13, 0.3); roundBall(G, cx, y, cz, 0.24); x += 0.28; }
+// (20:37: "Same with the shelves, just improve or increase what you've already started") Goods as a Mart has them:
+// boxes with their labels, two stacked, POTION sprays (a tall body, a white nozzle), bottles with caps, short tins,
+// jars, and POKé BALLS three to a tray; packed close, each shelf's edge a price strip.
+{
+  const add = (k, w, h, draw, m) => { TEXDEF[k] = [w, h, draw]; MATDEF[k] = Object.assign({ tex: k, per: 1 }, m || {}); };
+  add("goodSpray", 8, 16, (P, r) => { fitPaint(P, r, hx("#9A6CD0"), { drift: 0.03 }); P.rect(0, 5, 8, 5, hx("#F4F0FA")); P.rect(2, 6, 4, 1, hx("#9A6CD0")); P.rect(0, 0, 8, 1, hx("#B48CE4")); }, { fit: true });
+  add("goodSpray2", 8, 16, (P, r) => { fitPaint(P, r, hx("#E2686E"), { drift: 0.03 }); P.rect(0, 5, 8, 5, hx("#FFF2F0")); P.rect(2, 6, 4, 1, hx("#E2686E")); }, { fit: true });
+  add("goodSpray3", 8, 16, (P, r) => { fitPaint(P, r, hx("#4C9AD8"), { drift: 0.03 }); P.rect(0, 5, 8, 5, hx("#EEF6FC")); P.rect(2, 6, 4, 1, hx("#4C9AD8")); }, { fit: true });
+  add("goodNozzle", 8, 8, (P, r) => fitPaint(P, r, hx("#F6F6F2"), { drift: 0.01 }));
+  add("goodTin", 8, 8, (P, r) => { fitPaint(P, r, hx("#C8CED6"), { drift: 0.02 }); P.rect(0, 3, 8, 3, hx("#E8B43C")); });
+  add("goodJar", 8, 8, (P, r) => { fitPaint(P, r, hx("#F2D6A0"), { drift: 0.02 }); P.rect(0, 0, 8, 2, hx("#C8503C")); P.rect(1, 4, 6, 2, hx("#FFFFFF")); });
+  add("goodTray", 16, 8, (P, r) => fitPaint(P, r, hx("#5A6A82"), { drift: 0.02 }));
+  add("goodBall", 8, 8, P => { P.rect(0, 0, 8, 8, hx("#F4F4F0")); P.rect(0, 0, 8, 3, hx("#E04848")); P.rect(0, 3, 8, 1, hx("#303038")); P.rect(3, 3, 2, 2, hx("#F4F4F0")); P.set(3, 3, hx("#303038")); P.set(4, 4, hx("#303038")); P.set(0, 0, hx("#B83A3A")); P.set(7, 0, hx("#B83A3A")); P.set(0, 7, hx("#D8D8D2")); P.set(7, 7, hx("#D8D8D2")); }, { fit: true });
+  add("goodBallTop", 8, 8, P => { P.rect(0, 0, 8, 8, hx("#E04848")); P.rect(2, 2, 4, 4, hx("#EE6A6A")); P.set(0, 0, hx("#B83A3A")); P.set(7, 0, hx("#B83A3A")); P.set(0, 7, hx("#B83A3A")); P.set(7, 7, hx("#B83A3A")); }, { fit: true });
+  add("priceStrip", 16, 4, (P, r) => { P.rect(0, 0, 16, 4, hx("#F6E27A")); for (let x = 2; x < 16; x += 5) P.rect(x, 1, 2, 2, hx("#D84848")); }, { fit: true });
+  // Box fronts with a label: the box's colour, a white panel, a stripe.
+  for (const [k, c] of [["goodRed", "#D9534F"], ["goodBlue", "#3E7CC9"], ["goodYellow", "#E8B83A"], ["goodGreen", "#4FA65A"], ["goodPurple", "#8A5AB8"], ["goodOrange", "#E58A3A"]])
+    add(k + "Front", 16, 16, (P, r) => { fitPaint(P, r, hx(c), { drift: 0.03 }); P.rect(2, 4, 12, 7, hx("#F8F6F0")); P.rect(4, 6, 8, 1, hx(c)); P.rect(4, 8, 6, 1, hx(c)); P.rect(0, 0, 16, 2, shadec(hx(c), 0.08)); }, { fit: true });
+}
+const SPRAYS = ["goodSpray", "goodSpray2", "goodSpray3"];
+// One shelf's row of goods along a frame's x from a to b at height y (under the next shelf, room h), depth to d.
+function goodsRow(G, F, a, b, y, d, seed, bottles, room = 0.44, strip = true) {
+  const r = rng(seed), front = d - 0.05;
+  let x = a + 0.03;
+  while (x < b - 0.12) {
+    const k = bottles ? 0.35 + r() * 0.3 : r(), m = GOODS[Math.floor(r() * GOODS.length)];
+    if (k < 0.3) {
+      // A box (or two stacked), its label to the front.
+      const w = Math.min(b - 0.03 - x, 0.2 + r() * 0.12), h = Math.min(room - 0.04, 0.18 + r() * 0.12);
+      F.box(x, y, front - 0.32, x + w, y + h, front, { all: m, front: m + "Front", top: m });
+      if (r() < 0.45 && h * 2 < room - 0.04) F.box(x + 0.01, y + h, front - 0.31, x + w - 0.01, y + h * 2, front - 0.01, { all: m, front: m + "Front", top: m });
+      x += w + 0.03;
+    } else if (k < 0.5) {
+      // POTION sprays, two or three side by side.
+      const n = 2 + (r() < 0.5 ? 1 : 0), sp = SPRAYS[Math.floor(r() * 3)], h = Math.min(room - 0.1, 0.26 + r() * 0.06);
+      for (let i = 0; i < n && x + 0.12 < b; i++, x += 0.12) {
+        F.box(x + 0.01, y, front - 0.12, x + 0.1, y + h, front - 0.02, { all: sp, top: "goodNozzle" });
+        F.box(x + 0.035, y + h, front - 0.09, x + 0.075, y + h + 0.06, front - 0.05, "goodNozzle");
+      }
+      x += 0.04;
+    } else if (k < 0.66) {
+      // Bottles with caps.
+      const h = Math.min(room - 0.1, 0.24 + r() * 0.08), bc = r() < 0.6 ? "goodBottle" : m;
+      for (let i = 0; i < 3 && x + 0.11 < b; i++, x += 0.11) {
+        F.box(x + 0.015, y, front - 0.11, x + 0.095, y + h, front - 0.03, { all: bc });
+        F.box(x + 0.035, y + h, front - 0.09, x + 0.075, y + h + 0.05, front - 0.05, "goodCap");
+      }
+      x += 0.04;
+    } else if (k < 0.78) {
+      // Short tins, or jars, in a little stack.
+      const t = r() < 0.5 ? "goodTin" : "goodJar";
+      for (let i = 0; i < 3 && x + 0.14 < b; i++, x += 0.14) F.box(x + 0.01, y, front - 0.14, x + 0.13, y + 0.12, front - 0.02, { all: t });
+      if (x - 0.42 > a) F.box(x - 0.35, y + 0.12, front - 0.13, x - 0.23, y + 0.24, front - 0.03, { all: t });
+      x += 0.04;
+    } else if (!bottles && x + 0.62 < b) {
+      // POKé BALLS, three to a tray.
+      F.box(x, y, front - 0.26, x + 0.6, y + 0.03, front, "goodTray");
+      // (Each ball a single block, its picture a POKé BALL's, so a shelf of them stays light in the game.)
+      for (let i = 0; i < 3; i++) F.box(x + 0.02 + i * 0.2, y + 0.03, front - 0.21, x + 0.18 + i * 0.2, y + 0.19, front - 0.05, { all: "goodBall", top: "goodBallTop" });
+      x += 0.64;
+    } else x += 0.05;
   }
+  // The shelf's edge: a price strip.
+  if (strip) F.box(a - 0.01, y - 0.05, d - 0.01, b + 0.01, y, d + 0.005, { front: "priceStrip", all: null });
+}
+// Stock stood all over a top (seen from above): rows of goods from its front to its back.
+function topGoods(G, F, a, b, y, d, seed, bottles) {
+  let i = 0;
+  for (let z = d; z > 0.3; z -= 0.34, i++) goodsRow(G, F, a, b, y, z, seed + i * 31, bottles, 0.44, false);
 }
 {
   const ms = martShelf;
@@ -209,14 +270,15 @@ function goodsRow(G, F, a, b, y, d, seed, bottles) {
     F.box(0, 0, 0, 0.08, h, d, "shelfBoard"); F.box(w - 0.08, 0, 0, w, h, d, "shelfBoard");
     F.box(0.08, 0, 0, w - 0.08, 0.16, d, { all: "shelfBoard", front: o.kick || "blueTrim" });
     if (!o.open) F.box(0.08, 0.16, 0, w - 0.08, h, 0.06, "shelfBack");
+    const gap = (h - 0.16) / levels;
     for (let i = 0; i < levels; i++) {
-      const y = 0.16 + i * (h - 0.16) / levels;
+      const y = 0.16 + i * gap;
       F.box(0.08, y, 0.06, w - 0.08, y + 0.04, d, "shelfBoard");
-      goodsRow(G, F, 0.1, w - 0.1, y + 0.04, d, hashStr(room.id + X + "," + Z + ":" + i));
+      goodsRow(G, F, 0.1, w - 0.1, y + 0.04, d, hashStr(room.id + X + "," + Z + ":" + i), false, gap - 0.06);
     }
     F.box(0.08, h - 0.04, 0.06, w - 0.08, h, d, "shelfBoard");
     // More stock stood on the top, so from above it's a shelf of goods, not a box.
-    if (!o.noTop) goodsRow(G, F, 0.1, w - 0.1, h, d, hashStr(room.id + X + "," + Z + ":top"));
+    if (!o.noTop) topGoods(G, F, 0.1, w - 0.1, h, d, hashStr(room.id + X + "," + Z + ":top"));
     F.solid(0, 0, w, d);
     room.act(F.rect(0, 0.2, w, d + 0.6), { label: "Look", lines: o.lines || ["Shelves of POTIONS, ANTIDOTES and POKé BALLS. The clerk at the counter sells them."] });
     room.item("Mart shelves", "Open white shelving, three or four shelves high, real goods on every one: boxes, bottles with caps, POKé BALLS.");
@@ -255,7 +317,7 @@ function fitRack(R, x0, z0, x1, z1, seed, bottles) {
     G.box((x0 + x1) / 2 - 0.03, 0, z0 + 0.06, (x0 + x1) / 2 + 0.03, h, (z1 - z0 >= 2 ? z1 - 0.45 : z1) - 0.06, "shelfBack");
   }
   // Stock on top (seen from above), and at a long rack's south end its own end shelves.
-  { const F = R.F(x0, z0, "s"); goodsRow(G, F, 0.1, x1 - x0 - 0.1, h, z1 - z0 - 0.05, seed + 555, bottles); }
+  { const F = R.F(x0, z0, "s"); topGoods(G, F, 0.1, x1 - x0 - 0.1, h, z1 - z0 - 0.05, seed + 555, bottles); }
   if (!alongX && z1 - z0 >= 2) endDisplay(R, x0, x1, z1, h, seed + 777, bottles);
 }
 // The mart's island shelves on the grid: two blocks across (a block of shelf each side of its spine), flush ends.
@@ -438,7 +500,9 @@ function fitGrave(R, G, a, b, id) {
 }
 const CABIN_BEDS = [["qRose", "walnut", 0], ["qSage", "pale", 1], ["qNavy", "honey", 2], ["qGold", "walnut", 1], ["qCream", "oak", 0], ["qSky", "pale", 2]];
 function fitCabinBed(R, p, id) {
-  const G = R.geo, { x0, x1, z0, z1 } = p, h = hashStr(id + ":" + x0 + "," + z0), [q, wood, style] = CABIN_BEDS[h % CABIN_BEDS.length];
+  // (Each cabin on a deck its own bed: the cabin's number picks it, each deck starting further along.)
+  const m = /_(1f|2f|b1f)_room(\d)/.exec(id), pick = m ? (+m[2] + { "1f": 0, "2f": 2, "b1f": 4 }[m[1]]) % CABIN_BEDS.length : hashStr(id) % CABIN_BEDS.length;
+  const G = R.geo, { x0, x1, z0, z1 } = p, h = hashStr(id + ":" + x0 + "," + z0), [q, wood, style] = CABIN_BEDS[pick];
   const F = FIT_CUR && FIT_CUR.id === id ? FIT_CUR.F : null;
   const at = (x, z) => !F || x < 0 || z < 0 || x >= F.W || z >= F.D ? "v" : F.rows[z][x];
   // The head at the end with the wall (else the north).
@@ -656,8 +720,8 @@ MATDEF.ssTop = { tex: "ssTop", per: 1 };
     // The wall across (FireRed's rows 6 and 7), the electric door in it (x 4 to 7) between its two machines.
     for (const [x0, x1] of [[0, 3], [8, W]]) { G.box(x0, 0, 4, x1, 3, 6, { all: "surgeWall", top: "steel" }); R.solid(x0, 4, x1, 6); }
     for (const x of [3, 7]) { G.box(x, 0, 4, x + 1, 3, 6, { all: "steel", s: "surgeHazard", top: "steel" }); R.solid(x, 4, x + 1, 6); }
-    G.box(4, 0, 4.9, 7, 2.0, 5.1, { all: "surgeBarrierView", top: null, bottom: null });
-    R.solid(4, 4.9, 7, 5.1);
+    // (In the game the door is real blocks at row 4, put there or taken away for you: Game.surgeDoor.)
+    G.box(4, 0, 4.4, 7, 2.0, 4.6, { all: "surgeBarrierView", top: null, bottom: null });
     R.act([3.6, 5.6, 7.4, 6.6], { label: "Look", lines: ["An electric door. It's locked: two switches open it."] });
     // His stage (FireRed's x 4 to 6, rows 2 and 3) between the two poles.
     G.box(4, 0, 0, 7, 0.12, 2, { top: "surgeHazard", all: "steel", bottom: null });
@@ -693,5 +757,90 @@ MATDEF.ssTop = { tex: "ssTop", per: 1 };
     R.item("FireRed's grid", "A tile a block, as FireRed's VermilionCity_Gym: everyone, the cans, the statues and the door where FireRed has them.");
     R.item("Electric door", "In the game it's real blocks, put there or taken away for you: look in the cans for the two switches and it opens.");
     return R;
+  };
+}
+
+// ---------- (20:37) The MART's drinks coolers and chest freezers: glass you can see into ----------
+// ("where you've got the freezers again, I think that could be a glass texture door and actually feel like there's a
+// little bit of depth to it") A cooler a block deep: white cabinet, a lit back, four shelves of drinks (bottles and
+// cans in their colours) set back inside, the glass doors at the front a block each in steel frames with a handle, a
+// blue band and sign along its top. A chest freezer: a white tub, its stock (tubs, boxes, lollies) down inside, a
+// glass lid over it in a steel frame.
+{
+  const add = (k, w, h, draw, m) => { TEXDEF[k] = [w, h, draw]; MATDEF[k] = Object.assign({ tex: k, per: 1 }, m || {}); };
+  add("coolBack", 16, 16, (P, r) => { fitPaint(P, r, hx("#EEF6FA"), { drift: 0.02 }); for (let y = 0; y < 16; y += 4) P.rect(0, y, 16, 1, hx("#DCEAF2")); }, { glow: 0.45 });
+  add("coolGlass", 16, 16, P => { P.rect(0, 0, 16, 16, hx("#CFEAF6")); for (let i = 0; i < 16; i++) if ((i % 8) < 2) { P.set(i, 15 - i, hx("#FFFFFF")); if (i + 1 < 16) P.set(i + 1, 15 - i, hx("#F2FAFE")); } P.rect(0, 0, 16, 1, hx("#E6F4FA")); }, { fit: true, alpha: 0.22, double: true });
+  add("coolFrame", 16, 16, (P, r) => { fitPaint(P, r, hx("#B8C2CC"), { drift: 0.02 }); P.rect(0, 0, 16, 1, hx("#D6DEE6")); });
+  add("coolSign", 32, 8, P => { P.rect(0, 0, 32, 8, hx("#2F6FB8")); P.text("DRINKS", 4, 2, hx("#FFFFFF")); }, { fit: true });
+  for (const [k, c, lab] of [["canRed", "#D84040", "#F4F4F4"], ["canBlue", "#3C7CD0", "#F4F4F4"], ["canYellow", "#F0C43C", "#3A8A3A"], ["canGreen", "#3FA060", "#F8F0C0"], ["canWater", "#9AD0F0", "#FFFFFF"]])
+    add(k, 8, 16, (P, r) => { fitPaint(P, r, hx(c), { drift: 0.03 }); P.rect(0, 6, 8, 4, hx(lab)); P.rect(0, 0, 8, 1, shadec(hx(c), 0.1)); });
+  add("iceTub", 16, 16, (P, r) => { fitPaint(P, r, hx("#F4E6C8"), { drift: 0.02 }); P.rect(0, 0, 16, 3, hx("#E88AA8")); });
+  add("iceTub2", 16, 16, (P, r) => { fitPaint(P, r, hx("#C8E6F4"), { drift: 0.02 }); P.rect(0, 0, 16, 3, hx("#5AA0D8")); });
+  add("iceLolly", 8, 8, (P, r) => fitPaint(P, r, hx("#F08A6A"), { drift: 0.03 }));
+  add("iceLolly2", 8, 8, (P, r) => fitPaint(P, r, hx("#9AD86A"), { drift: 0.03 }));
+  add("frostIn", 16, 16, (P, r) => { fitPaint(P, r, hx("#E4F2FA"), { drift: 0.03 }); for (let i = 0; i < 10; i++) P.set((i * 7) % 16, (i * 11) % 16, hx("#FFFFFF")); });
+}
+const CANS = ["canRed", "canBlue", "canYellow", "canGreen", "canWater"];
+{
+  const co = cooler;
+  cooler = function (room, X, Z, f, w = 2) {
+    if (!FIT) return co(room, X, Z, f, w);
+    X = gridE(X); Z = gridE(Z); w = gridW(w);
+    const F = room.F(X, Z, f), G = room.geo, d = 1, h = 2.6, r = rng(hashStr(room.id + X + "," + Z));
+    // The cabinet: sides, top, kick, the lit back set in.
+    F.box(0, 0, 0, w, 0.18, d, { all: "cupboardWhite", front: "blueTrim" });
+    F.box(0, 0, 0, 0.06, h, d, "cupboardWhite"); F.box(w - 0.06, 0, 0, w, h, d, "cupboardWhite");
+    F.box(0, h - 0.3, 0, w, h, d, { all: "cupboardWhite", front: "coolSign" });
+    F.box(0.06, 0.18, 0, w - 0.06, h - 0.3, 0.06, "coolBack");
+    // Four shelves, drinks on each, set back from the glass.
+    const top = h - 0.3, n = 4, gap = (top - 0.18) / n;
+    for (let i = 0; i < n; i++) {
+      const y = 0.18 + i * gap;
+      F.box(0.06, y, 0.06, w - 0.06, y + 0.03, d - 0.14, "coolFrame");
+      let x = 0.1;
+      const can = CANS[Math.floor(r() * CANS.length)], tall = r() < 0.5;
+      while (x < w - 0.16) {
+        const c = r() < 0.75 ? can : CANS[Math.floor(r() * CANS.length)], bh = tall ? 0.34 : 0.22;
+        for (const z0 of [0.18, 0.5]) F.box(x, y + 0.03, z0, x + 0.12, y + 0.03 + bh, z0 + 0.12, { all: c, top: tall ? "goodCap" : c });
+        if (tall) F.box(x + 0.035, y + 0.03 + bh, 0.53, x + 0.085, y + 0.08 + bh, 0.59, "goodCap");
+        x += 0.16;
+      }
+    }
+    // The doors: a block each, a steel frame round the glass, a handle.
+    for (let i = 0; i < w; i++) {
+      F.box(i + 0.04, 0.18, d - 0.08, i + 0.1, top, d - 0.02, "coolFrame"); F.box(i + 0.9, 0.18, d - 0.08, i + 0.96, top, d - 0.02, "coolFrame");
+      F.box(i + 0.1, 0.18, d - 0.08, i + 0.9, 0.24, d - 0.02, "coolFrame"); F.box(i + 0.1, top - 0.06, d - 0.08, i + 0.9, top, d - 0.02, "coolFrame");
+      F.box(i + 0.1, 0.24, d - 0.06, i + 0.9, top - 0.06, d - 0.05, { front: "coolGlass", back: "coolGlass", all: null });
+      F.box(i + 0.8, 0.9, d - 0.02, i + 0.84, 1.7, d + 0.04, "steel");
+    }
+    F.solid(0, 0, w, d);
+    room.act(F.rect(0, 0, w, d + 0.6), { label: "Look", lines: ["A cooler of drinks: FRESH WATER, SODA POP and LEMONADE, all nicely cold."] });
+    room.item("Drinks cooler", "A block deep: glass doors in steel frames, the lit inside behind them, four shelves of bottles and cans set back from the glass.");
+  };
+  const cf = chestFreezer;
+  chestFreezer = function (room, X, Z, f, w = 2) {
+    if (!FIT) return cf(room, X, Z, f, w);
+    X = gridE(X); Z = gridE(Z); w = gridW(w);
+    const F = room.F(X, Z, f), G = room.geo, d = 1, h = 0.95, r = rng(hashStr(room.id + "cf" + X + "," + Z));
+    // The tub: white walls, the frosty inside sunk well down, the blue rim.
+    F.box(0, 0, 0, w, 0.12, d, { all: "blueTrim" });
+    F.box(0, 0.12, 0, w, h - 0.08, 0.08, "cupboardWhite"); F.box(0, 0.12, d - 0.08, w, h - 0.08, d, "cupboardWhite");
+    F.box(0, 0.12, 0, 0.08, h - 0.08, d, "cupboardWhite"); F.box(w - 0.08, 0.12, 0, w, h - 0.08, d, "cupboardWhite");
+    F.box(0.08, 0.12, 0.08, w - 0.08, 0.4, d - 0.08, { top: "frostIn", all: null });
+    F.box(0.08, 0.4, 0.08, 0.09, h - 0.08, d - 0.08, { e: "frostIn", all: null });
+    // The stock: tubs and lollies, in rows.
+    for (let x = 0.14; x < w - 0.2; x += 0.24) for (const z0 of [0.16, 0.42, 0.68]) {
+      const k = r();
+      if (k < 0.6) F.box(x, 0.4, z0, x + 0.2, 0.52 + r() * 0.06, z0 + 0.2, { all: k < 0.3 ? "iceTub" : "iceTub2" });
+      else for (let j = 0; j < 3; j++) F.box(x + j * 0.06, 0.4, z0 + 0.02, x + j * 0.06 + 0.04, 0.44, z0 + 0.18, k < 0.8 ? "iceLolly" : "iceLolly2");
+    }
+    // The rim and the glass lid in its steel frame (two panes, sliding).
+    F.box(0, h - 0.08, 0, w, h, 0.08, "blueTrim"); F.box(0, h - 0.08, d - 0.08, w, h, d, "blueTrim");
+    F.box(0, h - 0.08, 0, 0.08, h, d, "blueTrim"); F.box(w - 0.08, h - 0.08, 0, w, h, d, "blueTrim");
+    F.box(w / 2 - 0.03, h - 0.06, 0.08, w / 2 + 0.03, h - 0.01, d - 0.08, "steel");
+    F.box(0.08, h - 0.04, 0.08, w - 0.08, h - 0.03, d - 0.08, { top: "coolGlass", bottom: "coolGlass", all: null });
+    F.solid(0, 0, w, d);
+    room.act(F.rect(0, 0, w, d + 0.6), { label: "Look", lines: ["A chest freezer: ice creams, lollies, and a tub of something called FROZEN BERRIES."] });
+    room.item("Chest freezer", "White, a blue rim, a glass lid in a steel frame over tubs and lollies down inside.");
   };
 }

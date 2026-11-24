@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/roof_house","roof_house":"retromon:block/interior/roof_house"},"elements":[{"from":[0.0,0.0,0],"to":[16,16.0,0],"faces":{"south":{"uv":[0.0,0.0,16.0,16.0],"texture":"#roof_house"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gate_check","gate_check":"retromon:block/interior/gate_check"},"elements":[{"from":[0.0,0,0.0],"to":[16,0,16.0],"faces":{"up":{"uv":[2.0,6.0,4.0,8.0],"texture":"#gate_check"}}}]}

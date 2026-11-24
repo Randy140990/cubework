@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/paint","paint":"retromon:block/interior/paint"},"elements":[{"from":[0.0,0.56,16],"to":[1.68,1.68,16],"faces":{"north":{"uv":[14.32,14.32,16.0,15.44],"texture":"#paint"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/mc_diamond_blue","mc_diamond_blue":"retromon:block/interior/mc_diamond_blue"},"elements":[{"from":[0.0,0,0.0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[2.0,0.0,4.0,2.0],"texture":"#mc_diamond_blue"}}}]}

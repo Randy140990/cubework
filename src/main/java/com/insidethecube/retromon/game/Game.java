@@ -3771,7 +3771,8 @@ public final class Game {
 		boolean open = d.statics.contains("vermilion_gym_open") || d.beaten.contains("vermilion_gym_0");
 		net.minecraft.world.level.block.state.BlockState b = open ? net.minecraft.world.level.block.Blocks.AIR.defaultBlockState()
 				: net.minecraft.world.level.block.Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState();
-		for (int x = 6; x <= 7; x++) for (int y = 0; y <= 1; y++) level.setBlock(new BlockPos(r.ox() + x, r.oy() + y, r.oz() + 6), b, 3);
+		// (0.62: the GYM on FireRed's own grid) The door's three blocks across, two high, in the wall across (FireRed's row 6).
+		for (int x = 4; x <= 6; x++) for (int y = 0; y <= 1; y++) level.setBlock(new BlockPos(r.ox() + x, r.oy() + y, r.oz() + 4), b, 3);
 	}
 
 	// ---------- (0.58) CINNABAR: BLAINE's quiz gates, the POKeMON MANSION's barred gates, the LAB's fossils ----------
@@ -3973,7 +3974,11 @@ public final class Game {
 		net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(r.ox() - 2, r.oy() - 4, r.oz() - 2, r.ox() + r.w() + 2, r.oy() + 8, r.oz() + r.d() + 2);
 		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> w.key().equals(key))) w.discard();
 		PlayerData d = data(p);
-		if (d.daycare != null) placeMon(level, d.daycare.species.id(), key, r.ox() + 9.9, r.oy(), r.oz() + 6.2, 200F);
+		if (d.daycare != null) {
+			WorldMon w = placeMon(level, d.daycare.species.id(), key, r.ox() + 9.9, r.oy(), r.oz() + 6.2, 200F);
+			// (0.61.1) It wanders the pen with the others (Interiors.pens).
+			if (w != null) w.setWanders(true);
+		}
 	}
 
 	private static void bikeBuy(ServerPlayer p, Npc n, boolean yes) {

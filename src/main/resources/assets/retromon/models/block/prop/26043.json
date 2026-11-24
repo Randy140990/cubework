@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ds_floor_edge","ds_floor_edge":"retromon:block/interior/ds_floor_edge"},"elements":[{"from":[16,12.8,0.0],"to":[16,16.0,16],"faces":{"west":{"uv":[8.0,4.0,12.0,4.8],"texture":"#ds_floor_edge"}}},{"from":[0,12.8,16],"to":[16.0,16.0,16],"faces":{"north":{"uv":[4.0,4.0,8.0,4.8],"texture":"#ds_floor_edge"}}}]}

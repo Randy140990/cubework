@@ -10,8 +10,8 @@ const { chromium } = require('playwright'); const fs = require('fs');
   await p.route('https://fonts.googleapis.com/**', r => r.fulfill({ body: '', contentType: 'text/css' }));
   await p.goto(url); await p.waitForTimeout(2500);
   const data = await p.evaluate(() => {
-    // (0.61) The game gets the insides as they are; the new fit-out only for the rooms John has said yes to (FIT_GAME).
-    if (typeof fitOn === 'function') fitOn(false);
+    // (0.62, John's 20:37: "Please implement") The game gets the fit-out, as the viewer shows it.
+    if (typeof fitOn === 'function') fitOn(true);
     const v = o => [o.x, o.y, o.z];
     const oface = Geo.prototype.face;
     Geo.prototype.face = function (k, BL, R, U, w, h, n, sub) { if (k && w > 0 && h > 0) (this._faces || (this._faces = [])).push({ k, bl: v(BL), r: v(R), u: v(U), w, h, n: n ? v(n) : null, sub: sub || null }); return oface.call(this, k, BL, R, U, w, h, n, sub); };
@@ -41,7 +41,9 @@ const { chromium } = require('playwright'); const fs = require('fs');
     const mats = {};
     for (const k of Object.keys(used)) {
       const d = MATDEF[k]; if (!d) continue;
-      const m = { fit: !!d.fit, per: d.per || 1, alpha: d.alpha || 0, cut: !!d.cut, overlay: !!d.overlay, glow: d.glow || 0 };
+      // (Laid over the faces in the fit-out's own sizes: fitPer. Its water's surface opaque in the game, over the dark.)
+      const per = typeof fitPer === 'function' && FIT ? fitPer(k, d) : d.per;
+      const m = { fit: !!d.fit, per: per || 1, alpha: k === 'fitWater' ? 0 : d.alpha || 0, cut: !!d.cut, overlay: !!d.overlay, glow: d.glow || 0 };
       if (d.dyn) {
         let sc = null; for (const r of Object.values(rooms)) for (const s of r.screens) if (s.key === k) sc = s;
         const fn = window[sc.draw], frames = [];

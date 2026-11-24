@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/shelf_board","shelf_board":"retromon:block/interior/shelf_board"},"elements":[{"from":[16,0.0,0.64],"to":[16,11.2,16.0],"faces":{"west":{"uv":[0.16,9.2,4.0,12.0],"texture":"#shelf_board"}}}]}

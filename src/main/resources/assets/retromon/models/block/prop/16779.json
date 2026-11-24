@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cg_wall_top","cg_wall_top":"retromon:block/interior/cg_wall_top"},"elements":[{"from":[0.0,6.4,0],"to":[16.0,6.4,16.0],"faces":{"up":{"uv":[4.0,0.0,8.0,4.0],"texture":"#cg_wall_top"}}}]}
