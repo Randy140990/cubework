@@ -379,3 +379,21 @@ cinnabar_gym_fr_gym_guy	cinnabar_gym	gym_guide	down	stay	Yo! Champ in the making
 cinnabar_lab_trade_room_fr_clifton	cinnabar_lab_trade_room	gramps	down	stay	Hi! Do you have a RAICHU? Want to trade it for my ELECTRODE?	-1	-1
 cinnabar_lab_trade_room_fr_norma	cinnabar_lab_trade_room	beauty	down	stay	Hello there! Do you have a VENONAT? Want to trade it for my TANGELA?	-1	-1
 cinnabar_lab_fossil_room_fr_garett	cinnabar_lab_fossil_room	boy	down	stay	Hi! Do you have a PONYTA? Want to trade it for my SEEL?	-1	-1
+indigo_plateau_lobby_fr_clerk	indigo_plateau_lobby	clerk	down	stay	...	-1	-1
+indigo_plateau_lobby_fr_nurse	indigo_plateau_lobby	nurse	down	stay	...	-1	-1
+indigo_plateau_lobby_fr_black_belt	indigo_plateau_lobby	hiker	down	stay	...	-1	-1
+indigo_plateau_lobby_fr_cooltrainer_m	indigo_plateau_lobby	cooltrainer_m	down	stay	...	-1	-1
+bills_house_fr_bill	bills_house	bill	down	stay	...	-1	-1
+celadon_mansion_1f_fr_tea_woman	celadon_mansion_1f	old_woman	down	stay	You shouldn't spend all your money on drinks. | Try this instead.	-1	-1
+celadon_hotel_fr_beauty_brother	celadon_hotel	little_boy	down	stay	Yippee! I'm on vacation! My sis brought me along! Awesome!	-1	-1
+celadon_diner_fr_coin_case_man	celadon_diner	balding_guy	down	stay	Go ahead! Laugh! I'm flat-out busted! | No more slots for me! I'm going straight! | Here! I won't be needing this anymore!	-1	-1
+saffron_pidgey_house_fr_0x0	saffron_pidgey_house	clipboard	down	stay	...	-1	-1
+saffron_fan_club_fr_crush_girl	saffron_fan_club	crush_girl	down	stay	I'm sorry. I was your fan before. | But now, you seem to have lost the drive you had before. | Lately, I think LANCE has been a lot cooler.	-1	-1
+saffron_fan_club_fr_little_girl	saffron_fan_club	little_girl	down	stay	Do you know what? I want to be like SABRINA! | I want to be a psychic girl just like her!	-1	-1
+saffron_fan_club_fr_youngster	saffron_fan_club	youngster	down	stay	BROCK's my hero! He's a man among men! | Heheh, I got my mom to do something for me. | I got her to embroider “BROCK” on my shorts!	-1	-1
+saffron_fan_club_fr_gentleman	saffron_fan_club	gentleman	down	stay	Hmm... And you are? | Were you hoping to sign up for a membership in our FAN CLUB?	-1	-1
+saffron_fan_club_fr_woman	saffron_fan_club	middle_aged_woman	down	stay	Recently, LANCE has been on fire. | The way he battles... It's just the way that I like it!	-1	-1
+saffron_fan_club_fr_rocker	saffron_fan_club	rocker	down	stay	LANCE's cool, huh? I love the way he talks. | I'd really relish a chance to meet him in person once.	-1	-1
+saffron_fan_club_fr_beauty	saffron_fan_club	beauty	down	stay	Master LANCE is so dignified... He is so my type. | Why can't the others see the dignity he simply oozes?	-1	-1
+saffron_fan_club_fr_black_belt	saffron_fan_club	hiker	down	stay	Hiyah! There is but one TRAINER who has my respect. | And that is none other than my MASTER at the FIGHTING DOJO. | You should become a fan of my MASTER like me! Hiyah!	-1	-1
+ss_anne_1f_room6_fr_woman	ss_anne_1f_room6	beauty	down	stay	You look tired. Would you like to take a short rest?	-1	-1

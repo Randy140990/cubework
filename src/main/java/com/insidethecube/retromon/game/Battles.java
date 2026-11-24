@@ -152,6 +152,8 @@ public final class Battles {
 				d.money = Math.min(999999, d.money + b.prize);
 				if (s.trainer != null && s.trainer.key().startsWith("rival_")) {
 					d.beaten.add(s.trainer.key());
+					// (0.60) Your rival beaten as the CHAMPION: the title's yours (the HALL OF FAME's door opens).
+					if (s.trainer.key().equals("rival_champion")) d.story.add("champion");
 					// The first one, in the lab: Oak sees to your Pokémon after.
 					if (s.trainer.key().equals("rival_lab")) d.healAll();
 					after.addAll(Game.fill(p, s.trainer.defeat()));
@@ -162,6 +164,16 @@ public final class Battles {
 					after.addAll(Game.trainerHouseWon(p));
 				} else if (s.trainer != null) {
 					d.beaten.add(s.trainer.key());
+					// (0.60) The ROCKET HIDEOUT: the ROCKET on B4F drops the LIFT KEY; GIOVANNI leaves the SILPH SCOPE.
+					if (s.trainer.key().equals("rocket_hideout_b4f_1") && d.count("lift_key") <= 0) {
+						d.give("lift_key", 1);
+						after.add("Oh no! I dropped the LIFT KEY!");
+						after.add(name(p) + " found the LIFT KEY!");
+					}
+					if (s.trainer.key().equals("rocket_hideout_b4f_0") && d.count("silph_scope") <= 0) {
+						d.give("silph_scope", 1);
+						after.add(name(p) + " found the SILPH SCOPE!");
+					}
 					// (0.58) A CINNABAR GYM trainer beaten opens their room's gate.
 					if (s.trainer.key().startsWith("cinnabar_gym_")) p.level().getServer().execute(() -> Game.roomGates(p));
 					List<String> said = Game.fill(p, s.trainer.leader() ? s.trainer.defeat() : s.trainer.after());

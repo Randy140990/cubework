@@ -330,7 +330,8 @@ _JG = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".
 _IN = {"n": {"x": 7.0, "z": 1.4, "yaw": 0.0}, "w": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "e": {"x": 14.4, "z": 5.0, "yaw": 90.0}}
 for _i, _g in enumerate(_JG):
     _id = _g["id"]
-    ORIGIN[_id] = (9856 + 64 * _i, 64, 0)
+    # ((0.60) Out past the ILEX FOREST, which reaches from 10240 to 10392: 0.59.7 had three of them inside it.)
+    ORIGIN[_id] = (11008 + 64 * _i, 64, 0)
     PLACE[_id] = _g["place"]
     for _f, _d in _g["doors"].items():
         _k = "%s_%s" % (_id, _f)
@@ -341,6 +342,43 @@ for _i, _g in enumerate(_JG):
         else: SIDE_DOOR[(_id, _f)] = _k
     if _g["axis"] == "ns": ENTRY[_id] = {"x": 7.0, "z": 12.5, "yaw": 180.0} if "s" in _g["sides"] else {"x": 7.0, "z": 1.4, "yaw": 0.0}
     else: ENTRY[_id] = {"x": 14.4, "z": 5.0, "yaw": 90.0} if "e" in _g["sides"] else {"x": 1.6, "z": 5.0, "yaw": -90.0}
+# (0.60, John 16:14 to 16:28) The rest of KANTO's insides (tools/kanto60.py, FireRed's maps, a tile a block): each its
+# own room out past the others, its place, a tile a block for its trainers' eyes.
+_K60S = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "kanto60_data.js")).read()
+_K60 = json.loads(_K60S[_K60S.index("{"):_K60S.rindex("}") + 1])
+for _i, _id in enumerate(_K60):
+    if _id not in ORIGIN: ORIGIN[_id] = (12288 + 64 * _i, 64, 0)
+    PLACE[_id] = _id
+    TILE[_id] = [1.0, 1.0]
+    _F = _K60[_id]
+    _south = [w for w in _F["warps"] if w["kind"] == "exit" and w["side"] == "s"]
+    if _south:
+        _xs = [w["x"] for w in _south]
+        ENTRY[_id] = {"x": (min(_xs) + max(_xs) + 1) / 2, "z": _F["D"] - 1.5, "yaw": 180.0}
+ENTRY["ss_anne_1f"] = {"x": 20.0, "z": 2.5, "yaw": 0.0}
+# Their doors in John's world: the VIRIDIAN GYM (its glass doors either side of the dark middle column); CELADON's
+# GYM (the same), the MANSION, the hotel, the restaurant and the house (their dark oak doors); SAFFRON's TRAINER FAN
+# CLUB and the house with the PIDGEY (its door in its west wall); the POKeMON TOWER (the dark doorway at the back of its
+# porch); the POKeMON LEAGUE (the glass at the front of its entrance); the S.S.ANNE (the dark doorway at the end of the
+# gangway: with your S.S.TICKET).
+DOORS.update({
+    "viridian_gym": {"room": "viridian_gym", "door": [[x, 27, 524] for x in range(-768, -765)], "out": [-766.5, 26.0, 527.6]},
+    "celadon_gym": {"room": "celadon_gym", "door": [[x, 34, 444] for x in range(-545, -542)], "out": [-543.5, 33.0, 447.6]},
+    "celadon_mansion": {"room": "celadon_mansion_1f", "door": [[-510, 34, 406], [-509, 34, 406]], "out": [-509.0, 33.5, 408.6]},
+    "celadon_hotel": {"room": "celadon_hotel", "door": [[-502, 34, 407], [-501, 34, 407]], "out": [-501.0, 33.5, 409.4]},
+    "celadon_diner": {"room": "celadon_diner", "door": [[-496, 34, 445], [-495, 34, 445]], "out": [-495.0, 33.5, 447.4]},
+    "celadon_chief_house": {"room": "celadon_chief_house", "door": [[-488, 34, 445], [-487, 34, 445]], "out": [-487.0, 33.5, 447.4]},
+    "saffron_fan_club": {"room": "saffron_fan_club", "door": [[-327, 34, 411], [-326, 34, 411]], "out": [-326.0, 33.5, 413.4]},
+    "saffron_pidgey_house": {"room": "saffron_pidgey_house", "door": [[-312, 34, 451], [-312, 34, 452]], "out": [-314.4, 33.0, 452.0], "face": "w", "yaw": 90.0},
+    "pokemon_tower": {"room": "pokemon_tower_1f", "door": [[x, 35, 412] for x in range(-120, -116)], "out": [-118.0, 34.5, 416.0]},
+    "indigo_plateau": {"room": "indigo_plateau_lobby", "door": [[x, 35, 168] for x in range(-914, -910)], "out": [-912.5, 34.5, 170.6]},
+    "ss_anne_gangway": {"room": "ss_anne_1f", "door": [[x, 31, 617] for x in range(-359, -347)], "out": [-353.0, 31.0, 611.0], "face": "n", "yaw": 180.0,
+                        "in": {"x": 20.0, "z": 2.5, "yaw": 0.0}},
+})
+MAT_DOOR.update({"viridian_gym": "viridian_gym", "celadon_gym": "celadon_gym", "celadon_mansion_1f": "celadon_mansion", "celadon_hotel": "celadon_hotel",
+                 "celadon_diner": "celadon_diner", "celadon_chief_house": "celadon_chief_house", "saffron_fan_club": "saffron_fan_club",
+                 "saffron_pidgey_house": "saffron_pidgey_house", "pokemon_tower_1f": "pokemon_tower", "indigo_plateau_lobby": "indigo_plateau"})
+NORTH_DOOR["ss_anne_1f"] = "ss_anne_gangway"
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {
@@ -668,7 +706,8 @@ def main():
         # (0.53) A way you walk into (SILPH CO.'s stairs, its elevator's doors): to another room; or out of the
         # elevator onto the floor you picked ("lift").
         for bx in room.get("boxes", []):
-            w = {"kind": "box", "x0": bx["x0"], "x1": bx["x1"], "z0": bx["z0"], "z1": bx["z1"], "to": bx.get("to"), "choice": "lift" if bx.get("lift") else None}
+            w = {"kind": "box", "x0": bx["x0"], "x1": bx["x1"], "z0": bx["z0"], "z1": bx["z1"], "to": bx.get("to"), "choice": "lift" if bx.get("lift") else None,
+                 "needs": bx.get("needs")}
             if bx.get("spawn"): w["spawn"] = spawn_of(bx["spawn"])
             warps.append(w)
         # (0.53) SILPH CO.'s card-key shutters: walking into one from a side, through to the other (with the CARD KEY).
@@ -700,7 +739,9 @@ def main():
                           "grass": room.get("grass", []), "pools": room.get("pools", []), "panes": panes_of(room), "clocks": room.get("clocks", []),
                           **({"tile": TILE[rid]} if rid in TILE else {}), **({"items": BALLS.get(rid, []) + room.get("balls", [])} if rid in BALLS or room.get("balls") else {}),
                           **({"schem": SCHEM[rid][0], "base": SCHEM[rid][1]} if rid in SCHEM else {}),
-                          **({"mons": MONS[rid]} if rid in MONS else {})}
+                          **({"mons": MONS.get(rid, []) + [{"key": m["key"], "species": m["species"], "x": m["x"], "z": m["z"], "yaw": round((180 - math.degrees(m["yaw"])) % 360, 1)} for m in room.get("mons", [])]}
+                             if rid in MONS or room.get("mons") else {}),
+                          **({"spin": room["spin"]} if room.get("spin") else {})}
     # Models and the block's states.
     mdir = os.path.join(res, "assets/retromon/models/block/prop")
     os.makedirs(mdir, exist_ok=True)

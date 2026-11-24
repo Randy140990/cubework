@@ -354,11 +354,76 @@ public final class Game {
 						"You should quit dawdling and get a move on!"));
 	}
 
+	/**
+	 * (0.60) Your rival later on, FireRed's teams for him by his first POKéMON: on the S.S.ANNE (2F), in the POKéMON
+	 * TOWER (2F), and as the CHAMPION.
+	 */
+	private static Trainers.Trainer rivalLater(ServerPlayer p, String key) {
+		String sp = rivalStarter(p);
+		String[] line = switch (sp) {
+			case "bulbasaur" -> new String[] {"ivysaur", "venusaur"};
+			case "charmander" -> new String[] {"charmeleon", "charizard"};
+			case "eevee" -> new String[] {"eevee", "jolteon"};
+			default -> new String[] {"wartortle", "blastoise"};
+		};
+		List<Trainers.Member> team = new ArrayList<>();
+		java.util.function.BiConsumer<String, Integer> m = (s2, lv) -> team.add(new Trainers.Member(s2, lv));
+		String place;
+		List<String> before, defeat, after;
+		int prize;
+		switch (key) {
+			case "rival_ssanne" -> {
+				m.accept("pidgeotto", 19); m.accept("raticate", 16); m.accept("kadabra", 18); m.accept(line[0], 20);
+				place = "ss_anne_2f"; prize = 35;
+				before = List.of("{rival}: Bonjour! {player}! Imagine seeing you here!", "{player}, were you really invited?", "So how's your POKéDEX coming?",
+						"I already caught 40 kinds, pal!", "Different kinds are everywhere! Crawl around in grassy areas!");
+				defeat = List.of("Humph! At least you're raising your POKéMON!");
+				after = List.of("{rival}: I heard there was a CUT master on board.", "But he was just a seasick, old man!", "But, CUT itself is really useful!",
+						"You should go see him!", "Smell ya later!");
+			}
+			case "rival_tower" -> {
+				m.accept("pidgeotto", 25);
+				switch (sp) {
+					case "bulbasaur" -> { m.accept("gyarados", 23); m.accept("growlithe", 22); }
+					case "charmander" -> { m.accept("exeggcute", 23); m.accept("gyarados", 22); }
+					default -> { m.accept("growlithe", 23); m.accept("exeggcute", 22); }
+				}
+				m.accept("kadabra", 20); m.accept(line[0], 25);
+				place = "pokemon_tower_2f"; prize = 35;
+				before = List.of("{rival}: Hey, {player}! What brings you here?", "Your POKéMON don't look dead!", "I can at least make them faint!",
+						"Let's go, pal!");
+				defeat = List.of("What? You stinker!", "I took it easy on you, too!");
+				after = List.of("{rival}: How's your POKéDEX coming, pal?", "I just caught a CUBONE!", "I can't find the grown-up MAROWAK yet!",
+						"I doubt there are any left!", "Well, I better get going. I've got a lot to accomplish, pal.", "Smell ya later!");
+			}
+			default -> {
+				m.accept("pidgeot", 59); m.accept("alakazam", 57); m.accept("rhydon", 59);
+				switch (sp) {
+					case "bulbasaur" -> { m.accept("gyarados", 59); m.accept("arcanine", 61); }
+					case "charmander" -> { m.accept("exeggutor", 59); m.accept("gyarados", 61); }
+					default -> { m.accept("arcanine", 59); m.accept("exeggutor", 61); }
+				}
+				m.accept(line[1], 63);
+				place = "champions_room"; prize = 99;
+				before = List.of("{rival}: Hey! I was looking forward to seeing you, {player}!", "My rival should be strong to keep me sharp!",
+						"While working on my POKéDEX, I looked all over for powerful POKéMON!", "Not only that, I assembled teams that would beat any POKéMON type!",
+						"And now! I'm the POKéMON LEAGUE champion!", "{player}! Do you know what that means?", "I'll tell you!",
+						"I am the most powerful trainer in the world!");
+				defeat = List.of("NO!", "That can't be!", "You beat my best!", "After all that work to become LEAGUE champ?", "My reign is over already?",
+						"It's not fair!");
+				after = List.of("{rival}: Why? Why did I lose?", "I never made any mistakes raising my POKéMON...",
+						"Darn it! You're the new POKéMON LEAGUE champion!", "Although I don't like to admit it.");
+			}
+		}
+		return new Trainers.Trainer(key, place, rival(p), "blue", "none", 0, prize, team, null, before, defeat, after);
+	}
+
 	/** A trainer by key: the games' trainers, or your rival (made up for you, with his Pokémon). */
 	static Trainers.Trainer trainerFor(ServerPlayer p, String key) {
 		return switch (key) {
 			case "rival_lab" -> rivalLab(p);
 			case "rival_22" -> rival22(p);
+			case "rival_ssanne", "rival_tower", "rival_champion" -> rivalLater(p, key);
 			case "trainer_house" -> trainerHouse(p);
 			default -> Trainers.get(key);
 		};
@@ -2176,6 +2241,9 @@ public final class Game {
 		PlayerData d = data(p);
 		if (needs.equals("safari")) return SAFARI.containsKey(p.getUUID());
 		if (needs.equals("CHAMPION")) return d.story.contains("champion");
+		// (0.60) The ELITE FOUR's doors (the one in the room beaten), the GAME CORNER's hidden stairs (the switch pushed).
+		if (needs.startsWith("beat:")) return d.beaten.contains(needs.substring(5));
+		if (needs.equals("hideout_open")) return d.statics.contains("hideout_open");
 		// (0.50) The CYCLING ROAD's gates: on a BICYCLE only. SAFFRON's: the guards are thirsty (a drink gets you by).
 		if (needs.equals("bicycle")) return d.count("bicycle") > 0;
 		// (0.53) SILPH CO.'s shutters: the CARD KEY (on 5F).
@@ -2192,6 +2260,14 @@ public final class Game {
 		}
 		if (needs.equals("card_key")) {
 			message(p, List.of("It needs a CARD KEY!"));
+			return;
+		}
+		if (needs.startsWith("beat:")) {
+			message(p, List.of("The door won't open.", "You'll have to win here first!"));
+			return;
+		}
+		if (needs.equals("hideout_open")) {
+			message(p, List.of("A cold draft is blowing up through the floor here..."));
 			return;
 		}
 		if (needs.equals("bicycle")) {
@@ -3532,7 +3608,21 @@ public final class Game {
 			return;
 		}
 		if (use.equals("lift")) {
+			// (0.60) The ROCKET HIDEOUT's lift: it needs the LIFT KEY (a ROCKET on B4F drops it).
+			if (r.id().equals("rocket_hideout_elevator") && data(p).count("lift_key") <= 0) {
+				message(p, List.of("It appears to need a key."));
+				return;
+			}
 			liftAsk(p, r, 0);
+			return;
+		}
+		// (0.60) The GAME CORNER's poster: a switch behind it opens the stairs down to the ROCKET HIDEOUT.
+		if (use.equals("hideout_switch")) {
+			PlayerData d = data(p);
+			if (d.statics.add("hideout_open")) {
+				sync(p);
+				message(p, List.of("Hey! A switch behind the poster!?", "Let's push it!", "A secret staircase opened up!"));
+			} else message(p, List.of("The switch behind the poster has been pushed. The stairs are open."));
 			return;
 		}
 		// (0.54) The DEPT. STORE's ROOFTOP SQUARE: its vending machines.
@@ -4994,12 +5084,12 @@ public final class Game {
 			return;
 		}
 		// The S.S. ANNE: the sailor at the foot of the gangway (z 612 on): no further.
-		if (p.getX() > -366 && p.getX() < -340 && p.getZ() > 612.2 && p.getZ() < 620 && p.getY() > 28 && p.getY() < 36) {
+		// ((0.60) With the S.S.TICKET you're let by, up the gangway to the ship's door, and aboard.)
+		if (p.getX() > -366 && p.getX() < -340 && p.getZ() > 612.2 && p.getZ() < 620 && p.getY() > 28 && p.getY() < 36 && d.count("s_s_ticket") <= 0) {
 			p.teleportTo(p.getX(), p.getY(), 611.6);
 			if (!BLOCKED_SAID.containsKey(p.getUUID())) {
 				BLOCKED_SAID.put(p.getUUID(), 100);
-				message(p, d.count("s_s_ticket") > 0 ? List.of("SAILOR: Welcome aboard! ...Oh, sorry. The S.S.ANNE isn't boarding yet.", "SAILOR: Come back a little later!")
-						: List.of("SAILOR: Welcome to the S.S.ANNE!", "SAILOR: May I see your S.S.TICKET?", "SAILOR: ...Sorry! You need a ticket to come aboard."));
+				message(p, List.of("SAILOR: Welcome to the S.S.ANNE!", "SAILOR: May I see your S.S.TICKET?", "SAILOR: ...Sorry! You need a ticket to come aboard."));
 			}
 		}
 	}

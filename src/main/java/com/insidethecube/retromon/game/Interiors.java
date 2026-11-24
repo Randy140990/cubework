@@ -130,6 +130,18 @@ public final class Interiors {
 	/** POKéMON standing in a room (the Power Plant's ZAPDOS, its ELECTRODE posing as items): a static's key, its look. */
 	public record MonSpot(String key, String species, double x, double z, float yaw) {}
 	public static final Map<String, List<MonSpot>> MONS = new HashMap<>();
+	/**
+	 * (0.60) The spinner tiles in a room (GIOVANNI's GYM, the ROCKET HIDEOUT's mazes): each tile's arrow ('e', 'w', 'n',
+	 * 's') or a stop square ('x'), by tile. Step on an arrow and you slide that way till a stop square or a wall.
+	 */
+	public static final Map<String, Map<Long, Character>> SPINS = new HashMap<>();
+	/** Who's sliding on the spinners now, and which way; the tile a slide stopped on (no sliding again till you're off it). */
+	private static final Map<UUID, Character> SLIDE = new HashMap<>();
+	private static final Map<UUID, Long> SLID_TO = new HashMap<>();
+
+	private static long tileKey(int x, int z) {
+		return ((long) x << 32) ^ (z & 0xFFFFFFFFL);
+	}
 	private static String startRoom = "house2";
 	private static double startX = 3.6, startZ = 6.4;
 	private static float startYaw;
@@ -275,6 +287,15 @@ public final class Interiors {
 					r.has("schem") && !r.get("schem").isJsonNull() ? r.get("schem").getAsString() : null, (int) num(r, "base", 0),
 					r.has("dark") && r.get("dark").getAsBoolean(), tile, balls, rows(r, "lights"), haze(r));
 			ROOMS.put(room.id(), room);
+			if (r.has("spin")) {
+				Map<Long, Character> sp2 = new HashMap<>();
+				for (JsonElement se : r.getAsJsonArray("spin")) {
+					JsonArray a = se.getAsJsonArray();
+					String k = a.get(2).getAsString();
+					sp2.put(tileKey(a.get(0).getAsInt(), a.get(1).getAsInt()), k.equals("stop") ? 'x' : k.charAt(0));
+				}
+				SPINS.put(room.id(), sp2);
+			}
 			if (r.has("mons")) {
 				List<MonSpot> ms = new ArrayList<>();
 				for (JsonElement me : r.getAsJsonArray("mons")) {
@@ -1095,6 +1116,7 @@ public final class Interiors {
 				go(p, r, r.ex(), r.ez(), r.eyaw(), false);
 				return true;
 			}
+			if (spin(p, r, lx, ly, lz)) return false;
 			for (Warp w : r.warps()) {
 				switch (w.kind()) {
 					case "mat" -> {
@@ -1154,6 +1176,16 @@ public final class Interiors {
 						// (0.53) Walking into it (SILPH CO.'s stairs, its elevator's doors): to the room it leads to. Out
 						// of an elevator ("lift"): onto the floor you picked there, or back where you got in.
 						if (lx > w.x0() && lx < w.x1() && lz > w.z0() && lz < w.z1()) {
+							// (0.60) A way that needs something first (the ELITE FOUR's doors: the one in the room beaten; the
+							// GAME CORNER's hidden stairs: the switch pushed): turned back.
+							if (w.needs() != null && !Game.meets(p, w.needs())) {
+								double cx = (w.x0() + w.x1()) / 2, cz = (w.z0() + w.z1()) / 2;
+								double ax = lx - cx, az = lz - cz, n = Math.max(0.05, Math.hypot(ax, az));
+								p.teleportTo(p.getX() + ax / n * 0.7, p.getY(), p.getZ() + az / n * 0.7);
+								COOL.put(id, 30);
+								Game.gateBlocked(p, w.needs());
+								return true;
+							}
 							if ("lift".equals(w.choice())) {
 								Room fl = liftFloor(p, r);
 								Warp door = fl == null ? null : liftDoor(fl, r.id());
@@ -1308,6 +1340,63 @@ public final class Interiors {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * (0.60) The spinners: on an arrow you slide its way, a block every few ticks, till you reach a stop square or a wall
+	 * is in the way (another arrow on the way turns you). True while it's moving you.
+	 */
+	private static boolean spin(ServerPlayer p, Room r, double lx, double ly, double lz) {
+		Map<Long, Character> sp = SPINS.get(r.id());
+		UUID id = p.getUUID();
+		if (sp == null) {
+			SLIDE.remove(id);
+			return false;
+		}
+		int tx = (int) Math.floor(lx), tz = (int) Math.floor(lz);
+		long here = tileKey(tx, tz);
+		Character on = sp.get(here), dir = SLIDE.get(id);
+		Long stopped = SLID_TO.get(id);
+		if (stopped != null && stopped != here) SLID_TO.remove(id);
+		if (on != null && on == 'x') {
+			if (dir != null) {
+				SLIDE.remove(id);
+				p.teleportTo(r.ox() + tx + 0.5, p.getY(), r.oz() + tz + 0.5);
+				p.setDeltaMovement(Vec3.ZERO);
+			}
+			return false;
+		}
+		if (on != null && (dir == null || dir != on) && !Long.valueOf(here).equals(SLID_TO.get(id))) {
+			dir = on;
+			SLIDE.put(id, dir);
+		}
+		if (dir == null) return false;
+		int sx = dir == 'e' ? 1 : dir == 'w' ? -1 : 0, sz = dir == 's' ? 1 : dir == 'n' ? -1 : 0;
+		// The next spot along: blocked (a wall, a statue, a person's not counted) and you stop where you are.
+		double step = 0.34, nx = lx + sx * step, nz = lz + sz * step;
+		// Keep to the middle of the row or column you're sliding along.
+		if (sx != 0) nz = tz + 0.5;
+		if (sz != 0) nx = tx + 0.5;
+		int ax = (int) Math.floor(nx + sx * 0.32), az = (int) Math.floor(nz + sz * 0.32);
+		BlockPos feet = BlockPos.containing(r.ox() + ax + 0.5, p.getY() + 0.2, r.oz() + az + 0.5);
+		boolean blocked = !p.level().getBlockState(feet).getCollisionShape(p.level(), feet).isEmpty()
+				|| !p.level().getBlockState(feet.above()).getCollisionShape(p.level(), feet.above()).isEmpty()
+				|| ax < 0 || az < 0 || ax >= r.w() || az >= r.d();
+		if (blocked) {
+			SLIDE.remove(id);
+			SLID_TO.put(id, here);
+			p.teleportTo(r.ox() + tx + 0.5, p.getY(), r.oz() + tz + 0.5);
+			p.setDeltaMovement(Vec3.ZERO);
+			return false;
+		}
+		p.teleportTo(r.ox() + nx, p.getY(), r.oz() + nz);
+		p.setDeltaMovement(Vec3.ZERO);
+		return true;
+	}
+
+	/** Whether you're sliding on a spinner now (your own walking waits). */
+	public static boolean sliding(ServerPlayer p) {
+		return SLIDE.containsKey(p.getUUID());
 	}
 
 	/** Whether you're standing in a room's wild grass (the forest's). */
