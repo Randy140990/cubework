@@ -1,0 +1,80 @@
+{
+ "idle": "animation.parcelpuff.ground_idle",
+ "ground": "animation.parcelpuff.ground_idle",
+ "actions": {
+  "cry": "animation.parcelpuff.cry",
+  "recoil": "animation.parcelpuff.recoil",
+  "attack": "animation.parcelpuff.attack",
+  "critical": "animation.parcelpuff.critical",
+  "special": "animation.parcelpuff.special",
+  "recall": "animation.parcelpuff.recall",
+  "sendout": "animation.parcelpuff.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.parcelpuff.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.parcelpuff.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.parcelpuff.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.parcelpuff.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.parcelpuff.faint",
+   "parts": []
+  }
+ },
+ "move": "PRESENT",
+ "attack_move": "PRESENT",
+ "scale": 0.851,
+ "height": 1.058,
+ "texture": "retromon:textures/mons/delibird.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/delibird_glow_0.png",
+    "retromon:textures/mons/delibird_glow_1.png",
+    "retromon:textures/mons/delibird_glow_2.png",
+    "retromon:textures/mons/delibird_glow_3.png",
+    "retromon:textures/mons/delibird_glow_4.png",
+    "retromon:textures/mons/delibird_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PARCELPUFF",
+ "anchors": {
+  "mouth": [
+   0,
+   11.98,
+   -11.7
+  ],
+  "back": [
+   0,
+   16.92,
+   0.02
+  ],
+  "body": [
+   0,
+   7.3,
+   0.02
+  ],
+  "size": [
+   11.14,
+   16.92,
+   23.17
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

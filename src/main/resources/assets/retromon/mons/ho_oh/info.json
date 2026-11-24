@@ -1,0 +1,80 @@
+{
+ "idle": "animation.sunplume.ground_idle",
+ "ground": "animation.sunplume.ground_idle",
+ "actions": {
+  "cry": "animation.sunplume.cry",
+  "recoil": "animation.sunplume.recoil",
+  "attack": "animation.sunplume.attack",
+  "critical": "animation.sunplume.critical",
+  "special": "animation.sunplume.special",
+  "recall": "animation.sunplume.recall",
+  "sendout": "animation.sunplume.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.sunplume.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.sunplume.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.sunplume.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.sunplume.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.sunplume.faint",
+   "parts": []
+  }
+ },
+ "move": "SUNNY DAY",
+ "attack_move": "SACRED FIRE",
+ "scale": 1.095,
+ "height": 3.47,
+ "texture": "retromon:textures/mons/ho_oh.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/ho_oh_glow_0.png",
+    "retromon:textures/mons/ho_oh_glow_1.png",
+    "retromon:textures/mons/ho_oh_glow_2.png",
+    "retromon:textures/mons/ho_oh_glow_3.png",
+    "retromon:textures/mons/ho_oh_glow_4.png",
+    "retromon:textures/mons/ho_oh_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SUNPLUME",
+ "anchors": {
+  "mouth": [
+   0,
+   34.56,
+   -27.66
+  ],
+  "back": [
+   0,
+   30.2,
+   -0.1
+  ],
+  "body": [
+   0,
+   20.2,
+   -0.1
+  ],
+  "size": [
+   19.92,
+   55.52,
+   73.63
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

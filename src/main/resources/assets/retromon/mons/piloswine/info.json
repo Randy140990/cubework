@@ -1,0 +1,72 @@
+{
+ "idle": "animation.tundramusk.battle_idle",
+ "ground": "animation.tundramusk.ground_idle",
+ "actions": {
+  "cry": "animation.tundramusk.cry",
+  "recoil": "animation.tundramusk.recoil",
+  "attack": "animation.tundramusk.attack",
+  "critical": "animation.tundramusk.critical",
+  "special": "animation.tundramusk.special",
+  "recall": "animation.tundramusk.recall",
+  "sendout": "animation.tundramusk.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.tundramusk.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.tundramusk.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.tundramusk.faint",
+   "parts": []
+  }
+ },
+ "move": "BLIZZARD",
+ "attack_move": "TAKE DOWN",
+ "scale": 0.714,
+ "height": 1.541,
+ "texture": "retromon:textures/mons/piloswine.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/piloswine_glow_0.png",
+    "retromon:textures/mons/piloswine_glow_1.png",
+    "retromon:textures/mons/piloswine_glow_2.png",
+    "retromon:textures/mons/piloswine_glow_3.png",
+    "retromon:textures/mons/piloswine_glow_4.png",
+    "retromon:textures/mons/piloswine_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TUNDRAMUSK",
+ "anchors": {
+  "mouth": [
+   0,
+   15.58,
+   -22.92
+  ],
+  "back": [
+   0,
+   19.84,
+   0.19
+  ],
+  "body": [
+   0,
+   11.32,
+   0.19
+  ],
+  "size": [
+   17.36,
+   24.66,
+   34.12
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

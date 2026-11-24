@@ -1,0 +1,72 @@
+{
+ "idle": "animation.ashcub.battle_idle",
+ "ground": "animation.ashcub.ground_idle",
+ "actions": {
+  "cry": "animation.ashcub.cry",
+  "recoil": "animation.ashcub.recoil",
+  "attack": "animation.ashcub.attack",
+  "critical": "animation.ashcub.critical",
+  "special": "animation.ashcub.special",
+  "recall": "animation.ashcub.recall",
+  "sendout": "animation.ashcub.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.ashcub.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.ashcub.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.ashcub.faint",
+   "parts": []
+  }
+ },
+ "move": "EMBER",
+ "attack_move": "BITE",
+ "scale": 0.592,
+ "height": 1.013,
+ "texture": "retromon:textures/mons/houndour.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/houndour_glow_0.png",
+    "retromon:textures/mons/houndour_glow_1.png",
+    "retromon:textures/mons/houndour_glow_2.png",
+    "retromon:textures/mons/houndour_glow_3.png",
+    "retromon:textures/mons/houndour_glow_4.png",
+    "retromon:textures/mons/houndour_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "ASHCUB",
+ "anchors": {
+  "mouth": [
+   0,
+   9.2,
+   -13.0
+  ],
+  "back": [
+   0,
+   17.2,
+   0.0
+  ],
+  "body": [
+   0,
+   7.7,
+   0.0
+  ],
+  "size": [
+   8.02,
+   16.2,
+   21.6
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

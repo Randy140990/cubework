@@ -1,0 +1,72 @@
+{
+ "idle": "animation.hippet.battle_idle",
+ "ground": "animation.hippet.ground_idle",
+ "actions": {
+  "cry": "animation.hippet.cry",
+  "recoil": "animation.hippet.recoil",
+  "attack": "animation.hippet.attack",
+  "critical": "animation.hippet.critical",
+  "special": "animation.hippet.special",
+  "recall": "animation.hippet.recall",
+  "sendout": "animation.hippet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.hippet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.hippet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.hippet.faint",
+   "parts": []
+  }
+ },
+ "move": "DEFENSE CURL",
+ "attack_move": "TACKLE",
+ "scale": 0.644,
+ "height": 0.777,
+ "texture": "retromon:textures/mons/phanpy.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/phanpy_glow_0.png",
+    "retromon:textures/mons/phanpy_glow_1.png",
+    "retromon:textures/mons/phanpy_glow_2.png",
+    "retromon:textures/mons/phanpy_glow_3.png",
+    "retromon:textures/mons/phanpy_glow_4.png",
+    "retromon:textures/mons/phanpy_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "HIPPET",
+ "anchors": {
+  "mouth": [
+   0,
+   7.4,
+   -13.15
+  ],
+  "back": [
+   0,
+   12.6,
+   0.0
+  ],
+  "body": [
+   0,
+   5.6,
+   0.0
+  ],
+  "size": [
+   8.73,
+   12.44,
+   18.85
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

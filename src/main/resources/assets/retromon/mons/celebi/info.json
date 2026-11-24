@@ -1,0 +1,76 @@
+{
+ "idle": "animation.chronomoth.battle_idle",
+ "ground": "animation.chronomoth.ground_idle",
+ "actions": {
+  "cry": "animation.chronomoth.cry",
+  "recoil": "animation.chronomoth.recoil",
+  "attack": "animation.chronomoth.attack",
+  "critical": "animation.chronomoth.critical",
+  "special": "animation.chronomoth.special",
+  "recall": "animation.chronomoth.recall",
+  "sendout": "animation.chronomoth.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.chronomoth.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.chronomoth.air_fly",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.chronomoth.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.chronomoth.faint",
+   "parts": []
+  }
+ },
+ "move": "ANCIENTPOWER",
+ "attack_move": "HEAL BELL",
+ "scale": 0.659,
+ "height": 0.91,
+ "texture": "retromon:textures/mons/celebi.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/celebi_glow_0.png",
+    "retromon:textures/mons/celebi_glow_1.png",
+    "retromon:textures/mons/celebi_glow_2.png",
+    "retromon:textures/mons/celebi_glow_3.png",
+    "retromon:textures/mons/celebi_glow_4.png",
+    "retromon:textures/mons/celebi_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "CHRONOMOTH",
+ "anchors": {
+  "mouth": [
+   0,
+   7.59,
+   -5.56
+  ],
+  "back": [
+   0,
+   15.56,
+   -0.2
+  ],
+  "body": [
+   0,
+   8.82,
+   -0.2
+  ],
+  "size": [
+   26.4,
+   14.56,
+   17.07
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

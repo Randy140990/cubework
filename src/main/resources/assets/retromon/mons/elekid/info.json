@@ -1,0 +1,72 @@
+{
+ "idle": "animation.numbolt.battle_idle",
+ "ground": "animation.numbolt.ground_idle",
+ "actions": {
+  "cry": "animation.numbolt.cry",
+  "recoil": "animation.numbolt.recoil",
+  "attack": "animation.numbolt.attack",
+  "critical": "animation.numbolt.critical",
+  "special": "animation.numbolt.special",
+  "recall": "animation.numbolt.recall",
+  "sendout": "animation.numbolt.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.numbolt.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.numbolt.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.numbolt.faint",
+   "parts": []
+  }
+ },
+ "move": "THUNDERPUNCH",
+ "attack_move": "QUICK ATTACK",
+ "scale": 0.726,
+ "height": 0.826,
+ "texture": "retromon:textures/mons/elekid.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/elekid_glow_0.png",
+    "retromon:textures/mons/elekid_glow_1.png",
+    "retromon:textures/mons/elekid_glow_2.png",
+    "retromon:textures/mons/elekid_glow_3.png",
+    "retromon:textures/mons/elekid_glow_4.png",
+    "retromon:textures/mons/elekid_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "NUMBOLT",
+ "anchors": {
+  "mouth": [
+   0,
+   8.14,
+   -5.56
+  ],
+  "back": [
+   0,
+   14.22,
+   -0.14
+  ],
+  "body": [
+   0,
+   5.75,
+   -0.14
+  ],
+  "size": [
+   7.94,
+   13.22,
+   11.62
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

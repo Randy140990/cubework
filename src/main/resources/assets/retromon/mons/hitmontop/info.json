@@ -1,0 +1,72 @@
+{
+ "idle": "animation.twirlroo.battle_idle",
+ "ground": "animation.twirlroo.ground_idle",
+ "actions": {
+  "cry": "animation.twirlroo.cry",
+  "recoil": "animation.twirlroo.recoil",
+  "attack": "animation.twirlroo.attack",
+  "critical": "animation.twirlroo.critical",
+  "special": "animation.twirlroo.special",
+  "recall": "animation.twirlroo.recall",
+  "sendout": "animation.twirlroo.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.twirlroo.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.twirlroo.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.twirlroo.faint",
+   "parts": []
+  }
+ },
+ "move": "TRIPLE KICK",
+ "attack_move": "ROLLING KICK",
+ "scale": 0.949,
+ "height": 1.475,
+ "texture": "retromon:textures/mons/hitmontop.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/hitmontop_glow_0.png",
+    "retromon:textures/mons/hitmontop_glow_1.png",
+    "retromon:textures/mons/hitmontop_glow_2.png",
+    "retromon:textures/mons/hitmontop_glow_3.png",
+    "retromon:textures/mons/hitmontop_glow_4.png",
+    "retromon:textures/mons/hitmontop_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TWIRLROO",
+ "anchors": {
+  "mouth": [
+   0,
+   14.1,
+   -6.8
+  ],
+  "back": [
+   0,
+   24.6,
+   -0.05
+  ],
+  "body": [
+   0,
+   10.25,
+   -0.05
+  ],
+  "size": [
+   12.6,
+   23.6,
+   23.7
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

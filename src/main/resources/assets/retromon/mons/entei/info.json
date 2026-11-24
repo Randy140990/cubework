@@ -1,0 +1,72 @@
+{
+ "idle": "animation.magmabison.battle_idle",
+ "ground": "animation.magmabison.ground_idle",
+ "actions": {
+  "cry": "animation.magmabison.cry",
+  "recoil": "animation.magmabison.recoil",
+  "attack": "animation.magmabison.attack",
+  "critical": "animation.magmabison.critical",
+  "special": "animation.magmabison.special",
+  "recall": "animation.magmabison.recall",
+  "sendout": "animation.magmabison.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.magmabison.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.magmabison.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.magmabison.faint",
+   "parts": []
+  }
+ },
+ "move": "FIRE BLAST",
+ "attack_move": "STOMP",
+ "scale": 0.826,
+ "height": 2.541,
+ "texture": "retromon:textures/mons/entei.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/entei_glow_0.png",
+    "retromon:textures/mons/entei_glow_1.png",
+    "retromon:textures/mons/entei_glow_2.png",
+    "retromon:textures/mons/entei_glow_3.png",
+    "retromon:textures/mons/entei_glow_4.png",
+    "retromon:textures/mons/entei_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "MAGMABISON",
+ "anchors": {
+  "mouth": [
+   0,
+   17.22,
+   -25.91
+  ],
+  "back": [
+   0,
+   32.46,
+   -0.68
+  ],
+  "body": [
+   0,
+   24.32,
+   -0.68
+  ],
+  "size": [
+   16.94,
+   31.46,
+   49.46
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

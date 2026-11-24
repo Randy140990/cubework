@@ -1,0 +1,80 @@
+{
+ "idle": "animation.blisshen.ground_idle",
+ "ground": "animation.blisshen.ground_idle",
+ "actions": {
+  "cry": "animation.blisshen.cry",
+  "recoil": "animation.blisshen.recoil",
+  "attack": "animation.blisshen.attack",
+  "critical": "animation.blisshen.critical",
+  "special": "animation.blisshen.special",
+  "recall": "animation.blisshen.recall",
+  "sendout": "animation.blisshen.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.blisshen.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.blisshen.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.blisshen.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.blisshen.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.blisshen.faint",
+   "parts": []
+  }
+ },
+ "move": "SOFTBOILED",
+ "attack_move": "EGG BOMB",
+ "scale": 0.844,
+ "height": 1.777,
+ "texture": "retromon:textures/mons/blissey.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/blissey_glow_0.png",
+    "retromon:textures/mons/blissey_glow_1.png",
+    "retromon:textures/mons/blissey_glow_2.png",
+    "retromon:textures/mons/blissey_glow_3.png",
+    "retromon:textures/mons/blissey_glow_4.png",
+    "retromon:textures/mons/blissey_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BLISSHEN",
+ "anchors": {
+  "mouth": [
+   0,
+   17.68,
+   -11.38
+  ],
+  "back": [
+   0,
+   29.44,
+   -2.2
+  ],
+  "body": [
+   0,
+   10.05,
+   -2.2
+  ],
+  "size": [
+   18.36,
+   28.44,
+   25.38
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

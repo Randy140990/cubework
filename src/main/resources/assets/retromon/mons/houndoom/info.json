@@ -1,0 +1,72 @@
+{
+ "idle": "animation.scorchyena.battle_idle",
+ "ground": "animation.scorchyena.ground_idle",
+ "actions": {
+  "cry": "animation.scorchyena.cry",
+  "recoil": "animation.scorchyena.recoil",
+  "attack": "animation.scorchyena.attack",
+  "critical": "animation.scorchyena.critical",
+  "special": "animation.scorchyena.special",
+  "recall": "animation.scorchyena.recall",
+  "sendout": "animation.scorchyena.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.scorchyena.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.scorchyena.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.scorchyena.faint",
+   "parts": []
+  }
+ },
+ "move": "FLAMETHROWER",
+ "attack_move": "CRUNCH",
+ "scale": 0.878,
+ "height": 1.595,
+ "texture": "retromon:textures/mons/houndoom.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/houndoom_glow_0.png",
+    "retromon:textures/mons/houndoom_glow_1.png",
+    "retromon:textures/mons/houndoom_glow_2.png",
+    "retromon:textures/mons/houndoom_glow_3.png",
+    "retromon:textures/mons/houndoom_glow_4.png",
+    "retromon:textures/mons/houndoom_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SCORCHYENA",
+ "anchors": {
+  "mouth": [
+   0,
+   14.72,
+   -20.5
+  ],
+  "back": [
+   0,
+   22.32,
+   -0.2
+  ],
+  "body": [
+   0,
+   14.18,
+   -0.2
+  ],
+  "size": [
+   12.83,
+   25.52,
+   34.24
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

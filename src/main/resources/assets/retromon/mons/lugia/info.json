@@ -1,0 +1,80 @@
+{
+ "idle": "animation.abyssalba.ground_idle",
+ "ground": "animation.abyssalba.ground_idle",
+ "actions": {
+  "cry": "animation.abyssalba.cry",
+  "recoil": "animation.abyssalba.recoil",
+  "attack": "animation.abyssalba.attack",
+  "critical": "animation.abyssalba.critical",
+  "special": "animation.abyssalba.special",
+  "recall": "animation.abyssalba.recall",
+  "sendout": "animation.abyssalba.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.abyssalba.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.abyssalba.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.abyssalba.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.abyssalba.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.abyssalba.faint",
+   "parts": []
+  }
+ },
+ "move": "AEROBLAST",
+ "attack_move": "AEROBLAST",
+ "scale": 1.935,
+ "height": 2.688,
+ "texture": "retromon:textures/mons/lugia.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/lugia_glow_0.png",
+    "retromon:textures/mons/lugia_glow_1.png",
+    "retromon:textures/mons/lugia_glow_2.png",
+    "retromon:textures/mons/lugia_glow_3.png",
+    "retromon:textures/mons/lugia_glow_4.png",
+    "retromon:textures/mons/lugia_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "ABYSSALBA",
+ "anchors": {
+  "mouth": [
+   0,
+   34.22,
+   -32.3
+  ],
+  "back": [
+   0,
+   36.0,
+   0.2
+  ],
+  "body": [
+   0,
+   22.0,
+   0.2
+  ],
+  "size": [
+   20.0,
+   43.0,
+   97.1
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.musklet.battle_idle",
+ "ground": "animation.musklet.ground_idle",
+ "actions": {
+  "cry": "animation.musklet.cry",
+  "recoil": "animation.musklet.recoil",
+  "attack": "animation.musklet.attack",
+  "critical": "animation.musklet.critical",
+  "special": "animation.musklet.special",
+  "recall": "animation.musklet.recall",
+  "sendout": "animation.musklet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.musklet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.musklet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.musklet.faint",
+   "parts": []
+  }
+ },
+ "move": "MUD-SLAP",
+ "attack_move": "POWDER SNOW",
+ "scale": 0.552,
+ "height": 0.725,
+ "texture": "retromon:textures/mons/swinub.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/swinub_glow_0.png",
+    "retromon:textures/mons/swinub_glow_1.png",
+    "retromon:textures/mons/swinub_glow_2.png",
+    "retromon:textures/mons/swinub_glow_3.png",
+    "retromon:textures/mons/swinub_glow_4.png",
+    "retromon:textures/mons/swinub_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "MUSKLET",
+ "anchors": {
+  "mouth": [
+   0,
+   7.4,
+   -11.2
+  ],
+  "back": [
+   0,
+   12.6,
+   0.1
+  ],
+  "body": [
+   0,
+   5.2,
+   0.1
+  ],
+  "size": [
+   8.8,
+   11.6,
+   16.4
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

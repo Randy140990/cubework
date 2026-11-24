@@ -1,0 +1,72 @@
+{
+ "idle": "animation.dabblecoat.battle_idle",
+ "ground": "animation.dabblecoat.ground_idle",
+ "actions": {
+  "cry": "animation.dabblecoat.cry",
+  "recoil": "animation.dabblecoat.recoil",
+  "attack": "animation.dabblecoat.attack",
+  "critical": "animation.dabblecoat.critical",
+  "special": "animation.dabblecoat.special",
+  "recall": "animation.dabblecoat.recall",
+  "sendout": "animation.dabblecoat.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.dabblecoat.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.dabblecoat.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.dabblecoat.faint",
+   "parts": []
+  }
+ },
+ "move": "SKETCH",
+ "attack_move": "SKETCH",
+ "scale": 1.348,
+ "height": 0.89,
+ "texture": "retromon:textures/mons/smeargle.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/smeargle_glow_0.png",
+    "retromon:textures/mons/smeargle_glow_1.png",
+    "retromon:textures/mons/smeargle_glow_2.png",
+    "retromon:textures/mons/smeargle_glow_3.png",
+    "retromon:textures/mons/smeargle_glow_4.png",
+    "retromon:textures/mons/smeargle_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "DABBLECOAT",
+ "anchors": {
+  "mouth": [
+   0,
+   9.36,
+   -15.5
+  ],
+  "back": [
+   0,
+   12.88,
+   0.1
+  ],
+  "body": [
+   0,
+   6.82,
+   0.1
+  ],
+  "size": [
+   8.21,
+   14.24,
+   36.28
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

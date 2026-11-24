@@ -1,0 +1,72 @@
+{
+ "idle": "animation.frondking.battle_idle",
+ "ground": "animation.frondking.ground_idle",
+ "actions": {
+  "cry": "animation.frondking.cry",
+  "recoil": "animation.frondking.recoil",
+  "attack": "animation.frondking.attack",
+  "critical": "animation.frondking.critical",
+  "special": "animation.frondking.special",
+  "recall": "animation.frondking.recall",
+  "sendout": "animation.frondking.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.frondking.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.frondking.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.frondking.faint",
+   "parts": []
+  }
+ },
+ "move": "DRAGONBREATH",
+ "attack_move": "WATERFALL",
+ "scale": 0.727,
+ "height": 2.475,
+ "texture": "retromon:textures/mons/kingdra.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/kingdra_glow_0.png",
+    "retromon:textures/mons/kingdra_glow_1.png",
+    "retromon:textures/mons/kingdra_glow_2.png",
+    "retromon:textures/mons/kingdra_glow_3.png",
+    "retromon:textures/mons/kingdra_glow_4.png",
+    "retromon:textures/mons/kingdra_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "FRONDKING",
+ "anchors": {
+  "mouth": [
+   0,
+   29.2,
+   -15.7
+  ],
+  "back": [
+   0,
+   40.6,
+   2.2
+  ],
+  "body": [
+   0,
+   23.5,
+   2.2
+  ],
+  "size": [
+   12.2,
+   39.6,
+   24.8
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

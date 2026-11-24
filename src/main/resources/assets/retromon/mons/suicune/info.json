@@ -1,0 +1,72 @@
+{
+ "idle": "animation.ripplestag.battle_idle",
+ "ground": "animation.ripplestag.ground_idle",
+ "actions": {
+  "cry": "animation.ripplestag.cry",
+  "recoil": "animation.ripplestag.recoil",
+  "attack": "animation.ripplestag.attack",
+  "critical": "animation.ripplestag.critical",
+  "special": "animation.ripplestag.special",
+  "recall": "animation.ripplestag.recall",
+  "sendout": "animation.ripplestag.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.ripplestag.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.ripplestag.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.ripplestag.faint",
+   "parts": []
+  }
+ },
+ "move": "AURORA BEAM",
+ "attack_move": "WATER GUN",
+ "scale": 0.721,
+ "height": 2.775,
+ "texture": "retromon:textures/mons/suicune.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/suicune_glow_0.png",
+    "retromon:textures/mons/suicune_glow_1.png",
+    "retromon:textures/mons/suicune_glow_2.png",
+    "retromon:textures/mons/suicune_glow_3.png",
+    "retromon:textures/mons/suicune_glow_4.png",
+    "retromon:textures/mons/suicune_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "RIPPLESTAG",
+ "anchors": {
+  "mouth": [
+   0,
+   26.64,
+   -26.06
+  ],
+  "back": [
+   0,
+   33.0,
+   0.0
+  ],
+  "body": [
+   0,
+   17.1,
+   0.0
+  ],
+  "size": [
+   11.1,
+   44.4,
+   48.16
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

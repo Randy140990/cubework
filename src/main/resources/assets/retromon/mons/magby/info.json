@@ -1,0 +1,72 @@
+{
+ "idle": "animation.embernewt.battle_idle",
+ "ground": "animation.embernewt.ground_idle",
+ "actions": {
+  "cry": "animation.embernewt.cry",
+  "recoil": "animation.embernewt.recoil",
+  "attack": "animation.embernewt.attack",
+  "critical": "animation.embernewt.critical",
+  "special": "animation.embernewt.special",
+  "recall": "animation.embernewt.recall",
+  "sendout": "animation.embernewt.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.embernewt.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.embernewt.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.embernewt.faint",
+   "parts": []
+  }
+ },
+ "move": "SMOG",
+ "attack_move": "EMBER",
+ "scale": 0.903,
+ "height": 0.775,
+ "texture": "retromon:textures/mons/magby.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/magby_glow_0.png",
+    "retromon:textures/mons/magby_glow_1.png",
+    "retromon:textures/mons/magby_glow_2.png",
+    "retromon:textures/mons/magby_glow_3.png",
+    "retromon:textures/mons/magby_glow_4.png",
+    "retromon:textures/mons/magby_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "EMBERNEWT",
+ "anchors": {
+  "mouth": [
+   0,
+   8.8,
+   -3.69
+  ],
+  "back": [
+   0,
+   13.4,
+   -0.03
+  ],
+  "body": [
+   0,
+   5.31,
+   -0.03
+  ],
+  "size": [
+   8.71,
+   12.4,
+   11.71
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

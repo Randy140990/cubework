@@ -435,7 +435,9 @@ def avian(sid, name, stands, o):
     y0 = leg + bh / 2
     m.bone("body", "root", S([0, y0, 0]), blob(S([-bw / 2, leg, -bl / 2]), S([bw, bh, bl]), plume), rotation=[o.get("pitch", -8), 0, 0])
     hy = leg + bh - 1 + o.get("neck_up", 0.5)
-    m.bone("neck", "body", S([0, hy, -bl / 2 + 1]), [Cube(S([-hw * 0.35, hy - 1.4, -bl / 2 - 0.4]), [n(hw * 0.7 * s), n((2.6 + o.get("neck_up", 0.5)) * s), n(2.4 * s)], plume)])
+    # (The neck runs from the body's top up to the head, however long it is.)
+    m.bone("neck", "body", S([0, hy, -bl / 2 + 1]), [Cube(S([-hw * 0.35, min(hy - 1.4, leg + bh - 2.4), -bl / 2 - 0.4]),
+                                                          [n(hw * 0.7 * s), n((hy + 1.2 - min(hy - 1.4, leg + bh - 2.4)) * s), n(2.4 * s)], plume)])
     hz = -bl / 2 - 0.6
     m.bone("head", "neck", S([0, hy + 1, hz]), face_blob(S([-hw / 2, hy, hz - hl]), S([hw, hh, hl]), face))
     by = hy + hh * o.get("beak_y", 0.32)

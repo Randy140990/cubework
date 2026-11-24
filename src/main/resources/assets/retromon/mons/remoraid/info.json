@@ -1,0 +1,72 @@
+{
+ "idle": "animation.archerfin.battle_idle",
+ "ground": "animation.archerfin.ground_idle",
+ "actions": {
+  "cry": "animation.archerfin.cry",
+  "recoil": "animation.archerfin.recoil",
+  "attack": "animation.archerfin.attack",
+  "critical": "animation.archerfin.critical",
+  "special": "animation.archerfin.special",
+  "recall": "animation.archerfin.recall",
+  "sendout": "animation.archerfin.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.archerfin.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.archerfin.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.archerfin.faint",
+   "parts": []
+  }
+ },
+ "move": "LOCK-ON",
+ "attack_move": "WATER GUN",
+ "scale": 0.951,
+ "height": 0.631,
+ "texture": "retromon:textures/mons/remoraid.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/remoraid_glow_0.png",
+    "retromon:textures/mons/remoraid_glow_1.png",
+    "retromon:textures/mons/remoraid_glow_2.png",
+    "retromon:textures/mons/remoraid_glow_3.png",
+    "retromon:textures/mons/remoraid_glow_4.png",
+    "retromon:textures/mons/remoraid_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "ARCHERFIN",
+ "anchors": {
+  "mouth": [
+   0,
+   5.0,
+   -8.0
+  ],
+  "back": [
+   0,
+   11.1,
+   0.0
+  ],
+  "body": [
+   0,
+   6.8,
+   0.0
+  ],
+  "size": [
+   3.17,
+   10.1,
+   17.3
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

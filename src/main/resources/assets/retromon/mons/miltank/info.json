@@ -1,0 +1,72 @@
+{
+ "idle": "animation.dairyak.battle_idle",
+ "ground": "animation.dairyak.ground_idle",
+ "actions": {
+  "cry": "animation.dairyak.cry",
+  "recoil": "animation.dairyak.recoil",
+  "attack": "animation.dairyak.attack",
+  "critical": "animation.dairyak.critical",
+  "special": "animation.dairyak.special",
+  "recall": "animation.dairyak.recall",
+  "sendout": "animation.dairyak.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.dairyak.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.dairyak.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.dairyak.faint",
+   "parts": []
+  }
+ },
+ "move": "MILK DRINK",
+ "attack_move": "ROLLOUT",
+ "scale": 0.889,
+ "height": 1.35,
+ "texture": "retromon:textures/mons/miltank.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/miltank_glow_0.png",
+    "retromon:textures/mons/miltank_glow_1.png",
+    "retromon:textures/mons/miltank_glow_2.png",
+    "retromon:textures/mons/miltank_glow_3.png",
+    "retromon:textures/mons/miltank_glow_4.png",
+    "retromon:textures/mons/miltank_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "DAIRYAK",
+ "anchors": {
+  "mouth": [
+   0,
+   12.9,
+   -18.95
+  ],
+  "back": [
+   0,
+   15.9,
+   -0.05
+  ],
+  "body": [
+   0,
+   9.3,
+   -0.05
+  ],
+  "size": [
+   12.2,
+   21.6,
+   34.0
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}
