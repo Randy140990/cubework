@@ -264,8 +264,6 @@ public final class AreaLooks {
 			case "sign_b" -> (base, e, view, pos, state, random, cull) -> board("b", base, e, view, pos, state, random, cull);
 			// (0.59.3, 20:47: the ships, "do not texture those") The block as it is, here, whatever the place's looks.
 			case "keep" -> (base, e, view, pos, state, random, cull) -> base.emitQuads(e, view, pos, state, random, cull);
-			// (0.59.4, 07:31: Nugget Bridge's "buttons on the far steps. Those buttons need removing") Not drawn at all.
-			case "hide" -> (base, e, view, pos, state, random, cull) -> {};
 			// (0.59.4, 07:31: Route 12's and Route 16's pillars "still using a stripped", their swap set) A full block drawn
 			// in our own texture whatever picture it had ("top|side" or one for all): nothing of its old one can show.
 			case "cube" -> {
@@ -360,6 +358,7 @@ public final class AreaLooks {
 					else base.emitQuads(e, view, pos, state, random, cull);
 				};
 			}
+			// (Not drawn at all: a button in Route 28's water; (0.59.4, 07:31) Nugget Bridge's "buttons on the far steps".)
 			case "hide" -> (base, e, view, pos, state, random, cull) -> {
 			};
 			// (19:06) Lavender Town's low mist: two thin lilac layers of haze over the ground, laid over four blocks.
