@@ -310,6 +310,8 @@ function drawScoreboard(P, f) {
   };
   RUGS.centerRing = (i, j, w, d) => { const t = Math.hypot((i + 0.5 - w / 2) / (w / 2), (j + 0.5 - d / 2) / (d / 2)); return t > 1.05 ? "#F4A866" : (t > 0.66 && t < 0.92) || t < 0.22 ? "#F6F1EA" : "#E8823A"; };
   matReg("matHouseV", "#3E8A6E", "#2A5E4B");
+  // ((0.59.7, 15:33) Its arrows pointing north, for a way out through a north wall: "the mats ... aiming inwards".)
+  matReg("matHouseVN", "#3E8A6E", "#2A5E4B", true);
   matReg("matGate", "#3A63B8", "#25418A");
   matReg("matGateN", "#3A63B8", "#25418A", true);
   // Mats for ways through the side walls: their arrows pointing east or west (2 across, 4 along the wall).
@@ -679,7 +681,8 @@ function lgGate(R, o) {
     opening: north.opening || "gateTunnel", tunnel: !north.opening,
     lines: north.lines || (north.needs === "safari" ? ["The way into the SAFARI ZONE. (In the game: once you've paid at the counter.)"] : undefined) });
   if (north.none) R.act([LG_GATE_NOOK[0], 0, LG_GATE_NOOK[1], 1.2], { label: "Look", lines: north.lines });
-  palm(R, 3.9, N + 0.8, 1.0); palm(R, 10.1, N + 0.8, 1.0);
+  // ((0.59.7, 15:33) Not the east one where the stairs come down: "there's a plant in the way".)
+  palm(R, 3.9, N + 0.8, 1.0); if (!o.stairs) palm(R, 10.1, N + 0.8, 1.0);
   // The runner, from the way on at the north to the door at the south.
   runner(R, 5, N, 9, R.Dm, "gateRunN");
   // Stools round two glass tables on the east side, a few along the west wall; plants; a bin.

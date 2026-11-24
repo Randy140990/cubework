@@ -211,9 +211,9 @@ DOORS = {
     # back out the way you came); ROUTE 36's, in from the route at its east, out at its west to the PARK.
     "np_gate_r35_s": {"room": "route_35_national_park_gate", "door": [[x, 22, 550] for x in range(-2095, -2091)], "out": [-2093.0, 20.5, 555.2]},
     "np_gate_r35_n": {"room": "route_35_national_park_gate", "door": [[x, 22, 548] for x in range(-2123, -2119)], "out": [-2121.0, 20.5, 543.0], "face": "n", "yaw": 180.0,
-                      "in": {"x": 4.0, "z": 1.6, "yaw": 0.0}, "group": "np_gate_r35_north"},
+                      "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}, "group": "np_gate_r35_north"},
     "np_gate_r35_n2": {"room": "route_35_national_park_gate", "door": [[x, 22, 547] for x in range(-2095, -2091)], "out": [-2093.0, 20.5, 543.0], "face": "n", "yaw": 180.0,
-                       "in": {"x": 4.0, "z": 1.6, "yaw": 0.0}, "group": "np_gate_r35_north"},
+                       "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}, "group": "np_gate_r35_north"},
     "np_gate_r36_e": {"room": "route_36_national_park_gate", "door": [[-2078, 22, 505], [-2078, 22, 506]], "out": [-2073.6, 20.5, 506.0], "face": "e", "yaw": -90.0},
     "np_gate_r36_w": {"room": "route_36_national_park_gate", "door": [[-2080, 22, 505], [-2080, 22, 506]], "out": [-2083.4, 20.5, 506.0], "face": "w", "yaw": 90.0,
                       "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
@@ -251,7 +251,7 @@ TILE = {"pewter_gym": [1.0, 1.0], "fuchsia_gym": [1.0, 1.0], "cerulean_gym": [1.
 TILE.update({"silph_co_%df" % i: [1.0, 1.0] for i in range(1, 12)})
 TILE.update({r: [1.0, 1.0] for r in ("game_corner", "game_corner_prize_room", "celadon_mart_1f", "celadon_mart_2f", "celadon_mart_3f", "celadon_mart_4f", "celadon_mart_5f",
                                       "celadon_mart_roof")})
-TILE.update({r: [1.0, 1.0] for r in ('cinnabar_gym', 'cinnabar_lab', 'cinnabar_lab_trade_room', 'cinnabar_lab_metronome_room', 'cinnabar_lab_fossil_room', 'pokemon_mansion_1f', 'pokemon_mansion_2f', 'pokemon_mansion_3f', 'pokemon_mansion_b1f', 'sprout_tower_1f', 'sprout_tower_2f', 'sprout_tower_3f', 'earls_pokemon_academy', 'route_35_national_park_gate', 'route_36_national_park_gate')})
+TILE.update({r: [1.0, 1.0] for r in ('cinnabar_gym', 'cinnabar_lab', 'cinnabar_lab_trade_room', 'cinnabar_lab_metronome_room', 'cinnabar_lab_fossil_room', 'pokemon_mansion_1f', 'pokemon_mansion_2f', 'pokemon_mansion_3f', 'pokemon_mansion_b1f', 'sprout_tower_1f', 'sprout_tower_2f', 'sprout_tower_3f', 'earls_pokemon_academy')})
 # Item balls in a room of the viewer's (the WARDEN's RARE CANDY, behind his boulders: 15:33).
 BALLS = {"fuchsia_house3": [{"key": "wardens_house_rare_candy", "x": 0.8, "z": 8.4, "y": 0}]}
 # The Underground Paths' items (16:20), as John listed them: north to south (the first four come back each day), and
@@ -322,8 +322,25 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "gate_r5": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r6": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r7": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r8": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r11": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r12": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r15": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r16n": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r16s": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r18": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "route12_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "route16_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "cinnabar_gym": {"x": 25.5, "z": 23.4, "yaw": 180.0}, "cinnabar_lab": {"x": 4.5, "z": 9.4, "yaw": 180.0},
          "pokemon_mansion_1f": {"x": 8.5, "z": 33.4, "yaw": 180.0}, "sprout_tower_1f": {"x": 10.0, "z": 14.4, "yaw": 180.0},
-         "earls_pokemon_academy": {"x": 4.0, "z": 14.4, "yaw": 180.0}, "route_35_national_park_gate": {"x": 4.0, "z": 6.4, "yaw": 180.0},
-         "route_36_national_park_gate": {"x": 8.4, "z": 5.0, "yaw": 90.0}}
+         "earls_pokemon_academy": {"x": 4.0, "z": 14.4, "yaw": 180.0}, "route_35_national_park_gate": {"x": 7.0, "z": 12.5, "yaw": 180.0},
+         "route_36_national_park_gate": {"x": 14.4, "z": 5.0, "yaw": 90.0}}
+# (0.59.7, John 15:33) Every Johto gatehouse a way through (tools/interior/johto_gates.json, from a scan of the map):
+# its room, a door each side in the world (the dark doorway's faces), and where you come in and go out.
+_JG = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "johto_gates.json")))
+_IN = {"n": {"x": 7.0, "z": 1.4, "yaw": 0.0}, "w": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "e": {"x": 14.4, "z": 5.0, "yaw": 90.0}}
+for _i, _g in enumerate(_JG):
+    _id = _g["id"]
+    ORIGIN[_id] = (9856 + 64 * _i, 64, 0)
+    PLACE[_id] = _g["place"]
+    for _f, _d in _g["doors"].items():
+        _k = "%s_%s" % (_id, _f)
+        DOORS[_k] = {"room": _id, "door": _d["door"], "out": _d["out"], "face": _f, "yaw": _d["yaw"]}
+        if _f in _IN: DOORS[_k]["in"] = _IN[_f]
+        if _f == "s": MAT_DOOR[_id] = _k
+        elif _f == "n": NORTH_DOOR[_id] = _k
+        else: SIDE_DOOR[(_id, _f)] = _k
+    if _g["axis"] == "ns": ENTRY[_id] = {"x": 7.0, "z": 12.5, "yaw": 180.0} if "s" in _g["sides"] else {"x": 7.0, "z": 1.4, "yaw": 0.0}
+    else: ENTRY[_id] = {"x": 14.4, "z": 5.0, "yaw": 90.0} if "e" in _g["sides"] else {"x": 1.6, "z": 5.0, "yaw": -90.0}
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {

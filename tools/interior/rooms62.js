@@ -368,7 +368,7 @@
     const south = exits.filter(w => w.side === "s" || (!w.side && w.z >= D - 2)), north = exits.filter(w => w.side === "n"), west = exits.filter(w => w.side === "w"), east = exits.filter(w => w.side === "e");
     const runs = list => { const xs = [...new Set(list.map(w => w.x))].sort((a, b) => a - b), out = []; for (const x of xs) { const r = out[out.length - 1]; if (r && x <= r[1] + 1) r[1] = x; else out.push([x, x]); } return out; };
     for (const [a, b] of runs(south)) doormat(R, a, b + 1, { to: "town", mat: kind === "gate" ? "matGate" : "matHome" });
-    for (const [a, b] of runs(north)) passageN(R, a, b + 1, { to: "town", mat: "matGate" });
+    for (const [a, b] of runs(north)) passageN(R, a, b + 1, { to: "town", mat: "matGateN" });
     if (west.length) passageSide(R, "w", Math.min(...west.map(w => w.z)), Math.max(...west.map(w => w.z)) + 1, { to: "town", mat: "matGateWest" });
     if (east.length) passageSide(R, "e", Math.min(...east.map(w => w.z)), Math.max(...east.map(w => w.z)) + 1, { to: "town", mat: "matGateEast" });
     if (!R.spawn) {

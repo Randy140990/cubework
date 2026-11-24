@@ -350,7 +350,7 @@
       plainHouse(R, { paper: "paperCerulean", rug: "rugBlue", window: CERULEAN_WINDOW, cupboard: ["A cupboard. Inside: a polishing cloth and a little tin of badge polish."] });
       framed(R, 2.4, 1.8, 3.0, 0.75, "badgeCase", "w", { act: { label: "Look", lines: ["A badge case: eight places, each badge drawn in its colour."] } });
       // (17:42) FireRed's back door, out to the path behind.
-      passageN(R, 9.4, 11.2, { to: "town", mat: "matHouseV" });
+      passageN(R, 9.4, 11.2, { to: "town", mat: "matHouseVN" });
       R.npcs.push({ name: "Man", key: "cerulean_badge_house_p0", x: 9.2, z: 4.4, yaw: FACE.w, look: { skin: "middle_aged_man" },
         talk: () => [{ text: "POKéMON BADGEs are owned only by skilled trainers." }, { text: "I see you have at least one. Those BADGEs have amazing secrets!" }] });
       return R;
@@ -362,7 +362,7 @@
       plainHouse(R, { paper: "paperCerulean", rug: "rugSalmon", window: CERULEAN_WINDOW, cupboard: ["A cupboard, its doors hanging open. Whatever was inside is gone."] });
       const G = R.geo;
       // (17:42) The hole TEAM ROCKET made: a way out the back (FireRed's), broken bricks round it.
-      passageN(R, 9.4, 11.2, { to: "town", mat: "matHouseV", frame: "cap", opening: "deep" });
+      passageN(R, 9.4, 11.2, { to: "town", mat: "matHouseVN", frame: "cap", opening: "deep" });
       for (const [x, z, w] of [[8.9, 0.3, 0.4], [11.4, 0.4, 0.35], [9.0, 2.2, 0.3], [11.0, 2.4, 0.25]]) G.box(x, 0, z, x + w, w * 0.6, z + w * 0.8, "stone");
       for (const [x, z, w] of [[2.4, 7.6, 0.5], [5.2, 8.2, 0.4], [8.2, 6.8, 0.6], [7.6, 3.0, 0.45]]) G.box(x, 0, z, x + w, 0.02, z + w * 0.7, { top: "paperSchool", all: null });
       R.act([8.4, 0, 9.4, 1.2], { label: "Look", lines: ["TEAM ROCKET left through here. There's a hole in the wall!"] });
