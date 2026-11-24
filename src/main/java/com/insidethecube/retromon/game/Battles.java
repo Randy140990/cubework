@@ -11,6 +11,7 @@ import com.insidethecube.retromon.engine.Battle;
 import com.insidethecube.retromon.engine.Event;
 import com.insidethecube.retromon.engine.Item;
 import com.insidethecube.retromon.engine.Mon;
+import com.insidethecube.retromon.engine.Places;
 import com.insidethecube.retromon.engine.Species;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
