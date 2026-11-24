@@ -137,6 +137,7 @@ def write_bin(path, W, H, L, names):
 def main():
     rooms, viewer = {}, {}
     holes_of, ladders_of, stand_of = {}, {}, {}
+    floor_of = {rid: fl for rid, _src, _o, fl, _p in ROOMS}
     data = {}
     for rid, src, origin, floor, place in ROOMS:
         W, H, L, names = load(src)
@@ -240,9 +241,13 @@ def main():
         fx, fz = l["foot"]
         assert stand_of[lr].get((int(math.floor(fx)), int(math.floor(fz)))) is not None, (lr, l)
         warps[hr].append({"kind": "down", "x0": hx0 - 0.2, "x1": hx1 + 0.2, "z0": hz0 - 0.2, "z1": hz1 + 0.2, "to": lr,
-                          "spawn": {"x": round(fx, 2), "z": round(fz, 2), "yaw": {"south": 0.0, "north": 180.0, "east": 270.0, "west": 90.0}[l["facing"]]}})
+                          # (0.61) How high you land over the floor (B2F's upper level: else you'd land in its rock).
+                          "spawn": {"x": round(fx, 2), "z": round(fz, 2), "y": stand_of[lr][(int(math.floor(fx)), int(math.floor(fz)))] - floor_of[lr],
+                                    "yaw": {"south": 0.0, "north": 180.0, "east": 270.0, "west": 90.0}[l["facing"]]}})
         warps[lr].append({"kind": "up", "x0": l["x0"], "x1": l["x1"], "z0": l["z0"], "z1": l["z1"] - 1, "to": hr,
-                          "spawn": {"x": round(up_spot[0], 2), "z": round(up_spot[1], 2), "yaw": 0.0 if up_spot[1] > hz1 else 180.0}})
+                          "spawn": {"x": round(up_spot[0], 2), "z": round(up_spot[1], 2),
+                                    "y": stand_of[hr][(int(math.floor(up_spot[0])), int(math.floor(up_spot[1])))] - floor_of[hr],
+                                    "yaw": 0.0 if up_spot[1] > hz1 else 180.0}})
     # B1F's way out: its north-east ladder up, out of the mouth on Route 4.
     ex = ladder_at("mt_moon_b1f", 94, 12)
     warps["mt_moon_b1f"].append({"kind": "up", "x0": ex["x0"], "x1": ex["x1"], "z0": ex["z0"], "z1": ex["z1"] - 1, "door": "mt_moon_route_4", "to": None})

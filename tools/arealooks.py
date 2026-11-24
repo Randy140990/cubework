@@ -239,7 +239,7 @@ def main():
     CAVE_FLOOR = ("block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,"
                   "block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4")
     UNDER = "coarse_dirt=cave_floor@4,packed_mud=cave_floor@4,dirt=cave_floor@4,mud=cave_floor@4,sand=cave_sand@4,smooth_sandstone=cave_sand@4"
-    for ox, w, d, note in ((4352, 20, 16, "Diglett's Cave north entrance"), (4608, 170, 160, "Diglett's Cave B1F"), (4864, 20, 16, "Diglett's Cave south entrance")):
+    for ox, w, d, note in ((4352, 28, 28, "Diglett's Cave north entrance"), (4608, 178, 164, "Diglett's Cave B1F"), (4864, 28, 28, "Diglett's Cave south entrance")):
         box = (ox - 1, -1, ox + w, d, note)
         room("swap", "dripstone_block,brown_mushroom_block", box, CAVE)
         room("swap", "coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud", box, CAVE_FLOOR)
@@ -437,7 +437,7 @@ def round46(add, room):
         add("swap", "deepslate_brick_wall", h, "block/deepslate_bricks=sz_post", ("29", "45"))
         add("swap", "polished_diorite,polished_diorite_slab", h, "block/polished_diorite=sz_floor", ("29", "33"))
     # The caves (the interiors): metal ladders.
-    for ox, w, d, note in ((4352, 20, 16, "Diglett's Cave north entrance"), (4608, 170, 160, "Diglett's Cave B1F"), (4864, 20, 16, "Diglett's Cave south entrance"),
+    for ox, w, d, note in ((4352, 28, 28, "Diglett's Cave north entrance"), (4608, 178, 164, "Diglett's Cave B1F"), (4864, 28, 28, "Diglett's Cave south entrance"),
                            (5120, 104, 90, "Mt. Moon 1F"), (5376, 106, 86, "Mt. Moon B1F"), (5632, 106, 90, "Mt. Moon B2F")):
         room("swap", "ladder", (ox - 1, -1, ox + w, d, note), "block/ladder=metal_ladder")
     # Viridian Forest's gatehouses seen from inside the forest (15:21): their doorways' daylight at the end of the dark.
@@ -816,6 +816,8 @@ def round50(add, room):
     # (0.60) John's 16:36: Cerulean Cave and Victory Road.
     import arealooks60
     arealooks60.round60(add, room, globals())
+    import arealooks61
+    arealooks61.round61(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")

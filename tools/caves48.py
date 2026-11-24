@@ -172,6 +172,36 @@ CAVES = {
         "mons": {1: [("moltres", "moltres", 18, 5, "down")]},
         "signs": {},
     },
+    # (0.61, John's 18:19: "mount silver attached as well to be stitched in") MT. SILVER (Crystal's SILVER CAVE): Room
+    # 1, Room 2, Room 3 and the Item Rooms (tools/mtsilver/*.schem). John marks each of Crystal's ways through with a
+    # smooth sandstone square in the floor (two blocks a tile); the four floors' grids sit at their own offsets (offs),
+    # and Room 2 climbs in levels to its top (ups). Crystal's ways through are passages, not ladders: walk onto the
+    # square and you come out on the other one, a step off it (passes). In from the mouth on the mountain's south face
+    # onto Room 1's square at its foot. RED at the top of Room 3, facing away, as Crystal has him.
+    "mt_silver": {
+        "json": "mt_silver.json", "name": "Mt. Silver",
+        "src": [("mtsilver", "mt_silver_room_1.schem"), ("mtsilver", "mt_silver_room_2.schem"), ("mtsilver", "mt_silver_room_3.schem"),
+                ("mtsilver", "mt_silver_item_rooms.schem")],
+        "floors": [("silver_cave_room_1", "Room 1", 0), ("silver_cave_room_2", "Room 2", 0), ("silver_cave_room_3", "Room 3", 0),
+                   ("silver_cave_item_rooms", "Item Rooms", 0)],
+        "W": None, "floor": 7, "up": 9, "ups": [9, 18, 12, 6], "origin0": 17920, "step": 256, "off": (10, 12),
+        "offs": [(10, 12), (10, 14), (4, -2), (6, 10)],
+        "rocks": {"cobblestone"}, "rockmax": 2, "rockify": set(), "halve": {0: {"andesite"}},
+        "boulders": {"cobblestone": BIG}, "haze": [150, 160, 182, 0.10], "light": 11,
+        "links": [], "falls": [],
+        "passes": [((0, 15, 1), (1, 17, 31)), ((1, 11, 5), (2, 9, 33)), ((1, 13, 21), (3, 13, 3)), ((1, 23, 3), (3, 7, 15))],
+        "doors": {
+            "mt_silver": {"door": [[-1172, 27, 530], [-1171, 27, 530]], "out": [-1171.0, 27.0, 533.4], "mat": (27, 31, 79.6), "in": (29.0, 76.5)},
+        },
+        "trainers": {2: [("silver_cave_room_3_red", "PKMN TRAINER RED", "red", 9, 10, "up")]},
+        # Crystal's items (its hidden ones left out, as the other caves').
+        "items": {0: [("silver_cave_room_1_i0", "max_elixer", 4, 9), ("silver_cave_room_1_i1", "protein", 15, 29),
+                      ("silver_cave_room_1_i2", "escape_rope", 5, 30), ("silver_cave_room_1_i3", "ultra_ball", 7, 18)],
+                  1: [("silver_cave_room_2_i0", "calcium", 24, 10), ("silver_cave_room_2_i1", "ultra_ball", 22, 24), ("silver_cave_room_2_i2", "pp_up", 4, 20)],
+                  3: [("silver_cave_item_rooms_i0", "max_revive", 6, 3), ("silver_cave_item_rooms_i1", "full_restore", 15, 11)]},
+        "mons": {},
+        "signs": {},
+    },
 }
 
 
@@ -236,6 +266,19 @@ def build(key):
         if isinstance(opened, dict): opened = opened.get(k)
         if opened:
             names = ["minecraft:air" if nm.replace("minecraft:", "").split("[")[0] in opened else nm for nm in names]
+        # (0.61) Ledges a block high across the floor (MT. SILVER Room 1's andesite rows: Crystal's hop-down ledges): with
+        # no jumping in the mod they'd wall you in on one side, so each is a half block, a step you walk over either way.
+        halve = cfg.get("halve", {}).get(k)
+        if halve:
+            names = list(names)
+            nb = lambda x, y, z: names[(y * L + z) * W + x].replace("minecraft:", "").split("[")[0] if 0 <= x < W and 0 <= y < H and 0 <= z < L else "air"
+            flv = cfg["floor"]
+            for z in range(1, L - 1):
+                for x in range(W):
+                    b0 = nb(x, flv, z)
+                    if b0 in halve and nb(x, flv + 1, z) == "air" and nb(x, flv, z - 1) == "air" and nb(x, flv, z + 1) == "air" \
+                            and nb(x, flv - 1, z - 1) != "air" and nb(x, flv - 1, z + 1) != "air":
+                        names[(flv * L + z) * W + x] = "minecraft:" + b0 + "_slab[type=bottom,waterlogged=false]"
         full = lambda x, y, z, names=names, W=W, H=H, L=L: names[(y * L + z) * W + x] if 0 <= x < W and 0 <= y < H and 0 <= z < L else "minecraft:air"
         base = lambda x, y, z, full=full: full(x, y, z).replace("minecraft:", "").split("[")[0]
         # Where you stand on this floor: the coarse dirt's (Rock Tunnel), the calcite's (Seafoam, two levels).
@@ -393,6 +436,22 @@ def build(key):
         doors[dk] = door
         entry.setdefault(info[dk0]["rid"], door["in"])
 
+    # (0.61) Passages (MT. SILVER's): onto the square on one floor and you're a step off the square on the other, facing
+    # away from it; both ways. The square's on its own level (box "y"), so you can't take it from the level under it.
+    for (ak, atx, atz), (bk, btx, btz) in cfg.get("passes", []):
+        for (k1, t1), (k2, t2) in (((ak, (atx, atz)), (bk, (btx, btz))), ((bk, (btx, btz)), (ak, (atx, atz)))):
+            cx, cz = at(k1, t1)
+            y1 = standy(k1, cx - 0.5, cz - 0.5)
+            lx, lz = at(k2, t2)
+            y2 = standy(k2, lx - 0.5, lz - 0.5)
+            land = None
+            for dx, dz, yaw in ((0, 2.0, 0.0), (0, -2.0, 180.0), (2.0, 0, 270.0), (-2.0, 0, 90.0)):
+                sy = standy(k2, lx + dx, lz + dz)
+                if sy is not None and (y2 is None or abs(sy - y2) <= 0.6):
+                    land = (lx + dx, lz + dz, sy, yaw); break
+            assert land, (info[k2]["rid"], t2)
+            warps[info[k1]["rid"]].append({"kind": "box", "x0": cx - 1.0, "x1": cx + 1.0, "z0": cz - 1.0, "z1": cz + 1.0, "y": 0.0 if y1 is None else y1,
+                                           "to": info[k2]["rid"], "spawn": {"x": round(land[0], 2), "z": round(land[1], 2), "y": land[2], "yaw": land[3]}})
     rooms, viewer = {}, {}
     for k, I in enumerate(info):
         rid, W, H, L, names, base, floor, S = I["rid"], I["W"], I["H"], I["L"], I["names"], I["base"], I["floor"], I["S"]

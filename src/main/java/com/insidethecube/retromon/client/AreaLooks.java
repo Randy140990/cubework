@@ -176,7 +176,7 @@ public final class AreaLooks {
 			for (String b : new String[] {"boulder_a", "boulder_b", "boulder_small", "mboulder_a", "mboulder_b", "mboulder_small", "iboulder_a", "iboulder_b",
 					"iboulder_small", "rboulder_a", "rboulder_b", "rboulder_small", "sboulder_a", "sboulder_b", "sboulder_small", "ttrunk_a", "ttrunk_b", "ttrunk_small",
 					// (0.60) Cerulean Cave's grey boulders and Victory Road's granite ones (tools/looks60.py).
-					"cboulder_a", "cboulder_b", "cboulder_small", "vboulder_a", "vboulder_b", "vboulder_small"})
+					"cboulder_a", "cboulder_b", "cboulder_small", "vboulder_a", "vboulder_b", "vboulder_small", "xboulder_a", "xboulder_b", "xboulder_small"})
 				part(ctx, b, "block/area/" + b);
 			// (0.50) The leafy trees (20:07): Shards' extra leaves, two ways round, for each kind of leaves.
 			for (String t : LEAFY) for (String v : new String[] {"a", "b"}) part(ctx, "leafy_" + t + "_" + v, "block/area/leafy_" + t + "_" + v);

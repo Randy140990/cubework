@@ -195,6 +195,14 @@ def walk(cave):
     for g in sorted(groups, key=len, reverse=True)[:25]:
         rid = g[0][0]; xs = [n[1] for n in g]; zs = [n[2] for n in g]; ss = [n[3] for n in g]
         print("  %-22s %4d spots  x %d..%d  z %d..%d  at %.1f..%.1f" % (rid, len(g), min(xs), max(xs), min(zs), max(zs), min(ss), max(ss)))
+    # The things to get to: items, people (trainers), POKéMON: within a step of somewhere you can reach.
+    miss = []
+    for rid, R in rooms.items():
+        for t in R.get("items", []) + R.get("people", []) + R.get("mons", []):
+            x, z = int(t["x"]), int(t["z"])
+            ok = any((rid, x + dx, z + dz, s2) in seen for dx in (-1, 0, 1) for dz in (-1, 0, 1) for s2, _k in info[rid][4].get((x + dx, z + dz), []))
+            if not ok: miss.append((rid, t.get("key"), x, z))
+    print("  can't get to:", miss)
     bad_lands = [(r, w["kind"], w.get("to"), t) for r, w, t in lands if t in seen and t not in good]
     for r, k, to, t in bad_lands: print("  a %s in %s lands you stuck in %s at %d,%d" % (k, r, to, t[1], t[2]))
     return seen, good, groups, info, edges

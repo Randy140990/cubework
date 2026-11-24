@@ -98,6 +98,13 @@ public class Battle {
 	public final String trainer;
 	/** What the other trainer pays per level of their last Pokémon. */
 	public final int prizeBase;
+	/**
+	 * (0.61) The POKéMON TOWER's ghosts, as FireRed's: without the SILPH SCOPE, a GHOST you can't make out (it can't be
+	 * hit, caught or fought, only run from); MAROWAK's (unveiled) can't be caught.
+	 */
+	public boolean ghost, noCatch;
+	/** A line before the wild one appears ("SILPH SCOPE unveiled the GHOST's identity!"), or null. */
+	public String intro;
 	public final String playerName;
 	public int active, enemy;
 	public State state = State.CHOOSE;
@@ -161,6 +168,7 @@ public class Battle {
 
 	private String who(int s) {
 		if (s == 0) return me().name();
+		if (ghost) return "GHOST";
 		return (kind == Kind.WILD ? "Wild " : "Enemy ") + them().name();
 	}
 
@@ -196,7 +204,12 @@ public class Battle {
 		List<Event> out = new ArrayList<>();
 		active = Math.max(0, firstHealthy(mine));
 		enemy = Math.max(0, firstHealthy(theirs));
-		if (kind == Kind.WILD) {
+		if (kind == Kind.WILD && ghost) {
+			out.add(Event.sendOut(1, enemy, them().hp));
+			out.add(Event.text("The GHOST appeared!"));
+			out.add(Event.text("Darn! The GHOST can't be ID'd!"));
+		} else if (kind == Kind.WILD) {
+			if (intro != null) out.add(Event.text(intro));
 			out.add(Event.sendOut(1, enemy, them().hp));
 			out.add(Event.text("Wild " + them().name() + " appeared!"));
 		} else {
@@ -257,7 +270,7 @@ public class Battle {
 					return out;
 				}
 				runAttempts++;
-				if (canEscape()) {
+				if (ghost || canEscape()) {
 					out.add(Event.of(Event.Kind.ESCAPE, 0));
 					out.add(Event.text("Got away safely!"));
 					end(Result.RAN, out);
@@ -274,6 +287,14 @@ public class Battle {
 				}
 				Item ball = Item.find(c.item() == null ? "poke_ball" : c.item());
 				out.add(Event.text(playerName + " used " + (ball == null ? "POKé BALL" : ball.name()) + "!"));
+				if (ghost || noCatch) {
+					// (0.61) The TOWER's ghosts: no catching them (FireRed's words).
+					out.add(Event.text("It dodged the thrown BALL!"));
+					out.add(Event.text("This POKéMON can't be caught!"));
+					if (ghost) out.add(Event.text("GHOST: Get out... Get out..."));
+					else act(1, enemyMove, out);
+					return out;
+				}
 				if (throwBall(ball, out)) return out;
 				act(1, enemyMove, out);
 			}
@@ -317,6 +338,12 @@ public class Battle {
 			case MOVE -> {
 				int mi = index;
 				Mon m = me();
+				if (ghost) {
+					// (0.61) Without the SILPH SCOPE: too scared to move, and the GHOST only tells you to go.
+					out.add(Event.text(m.name() + " is too scared to move!"));
+					out.add(Event.text("GHOST: Get out... Get out..."));
+					return out;
+				}
 				if (mi >= 0 && (mi >= m.moves.size() || (m.pp.get(mi) <= 0 && anyPp(m)) || mi == field[0].disabledSlot)) return out;
 				Move mine = chosenMove(0, mi);
 				Move theirs = chosenMove(1, enemyMove);

@@ -343,3 +343,4 @@ pokemon_tower_7f_fr_team_rocket_grunt_20	pokemon_tower_7f	GRUNT	rocket	left	4	30
 pokemon_tower_7f_fr_team_rocket_grunt_21	pokemon_tower_7f	GRUNT	rocket	right	4	30	zubat:23,rattata:23,raticate:23,zubat:23	-	You're not saving anyone, kid!	Don't fight us ROCKETS!	You're not getting away with this!	-1	-1
 victory_road_3f_4	victory_road_3f	COOLTRAINER RAY	cooltrainer_m	down	1	35	nidoking:45	-	Together, the two of us are destined for greatness!	Ludicrous! This can't be!	You've beaten us. Greatness remains elusive...	-1	-1
 victory_road_3f_5	victory_road_3f	COOLTRAINER TYRA	cooltrainer_f	down	1	35	nidoqueen:45	-	We're trying to become champions together.	Oh, but...	You've taught me that power can be infinite in shape and form.	-1	-1
+silver_cave_room_3_red	silver_cave_room_3	PKMN TRAINER RED	red	up	0	120	pikachu:81,espeon:73,snorlax:75,venusaur:77,charizard:77,blastoise:77	-	...	...	...	-1	-1

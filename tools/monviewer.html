@@ -106,6 +106,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; max-width: 80
   </header>
   <div class="top">
     <div class="seg" id="mode" role="group" aria-label="View"><button data-v="creatures" aria-pressed="true">Creatures</button><button data-v="moves" aria-pressed="false">Moves</button></div>
+    <label class="pick"><span>Search</span><input id="monSearch" type="search" placeholder="Name, type, number" aria-label="Search creatures" style="font:inherit;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-width:0;width:170px;background:var(--surface);color:var(--ink)"></label>
     <label class="pick" id="pickWrap"><span>Creature</span><select id="pick" aria-label="Creature"></select></label>
     <div class="seg" id="car" role="group" aria-label="Go through them all">
       <button id="prev" title="Previous (left arrow)">&#9664; Previous</button><button id="play" aria-pressed="false" title="Play all, or pause (space)">Play all</button><button id="next" title="Next (right arrow)">Next &#9654;</button>
@@ -555,21 +556,45 @@ function renderPanel() {
 
 // ---------- pickers ----------
 function famOf(sid) { return Math.max(0, DATA.families.findIndex(f => f.members.includes(sid))); }
+// (0.61, John's 17:58: "a search functionality within the RetroMon interior viewers and everything else") The list,
+// narrowed to what matches the search (the original's name, ours, its types, its number).
+let monQuery = "";
+function monText(sid) {
+  const d = DATA.species[sid];
+  return [sid, d.stats.name, d.ours.info.name, (d.stats.types || []).join(" "), d.stats.type1 || "", d.stats.type2 || "", d.stats.dex || d.stats.num || ""].join(" ").toLowerCase();
+}
+function fillMonPick() {
+  const sel = $("#pick"), q = monQuery.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  sel.innerHTML = "";
+  let n = 0;
+  for (const f of DATA.families) {
+    const og = document.createElement("optgroup"); og.label = f.name;
+    for (const sid of f.members) {
+      const t = monText(sid) + " " + f.name.toLowerCase();
+      if (q.length && !q.every(w => t.includes(w))) continue;
+      const d = DATA.species[sid], o = document.createElement("option");
+      o.value = sid; o.textContent = `${title(d.stats.name)} · ${title(d.ours.info.name)}`; og.appendChild(o); n++;
+    }
+    if (og.children.length) sel.appendChild(og);
+  }
+  return n;
+}
 function renderPickers() {
   // One pick list (the original's name, then ours); picking one shows its evolution line underneath.
   const sel = $("#pick");
-  if (!sel.options.length) {
-    for (const f of DATA.families) {
-      const og = document.createElement("optgroup"); og.label = f.name;
-      for (const sid of f.members) {
-        const d = DATA.species[sid], o = document.createElement("option");
-        o.value = sid; o.textContent = `${title(d.stats.name)} · ${title(d.ours.info.name)}`; og.appendChild(o);
-      }
-      sel.appendChild(og);
-    }
+  if (!sel.options.length && !monQuery) {
+    fillMonPick();
     sel.onchange = () => { state.sid = sel.value; state.fam = famOf(sel.value); renderPickers(); place(); };
+    const box = $("#monSearch");
+    if (box) {
+      box.oninput = () => { monQuery = box.value; fillMonPick(); if ([...sel.options].some(o => o.value === state.sid)) sel.value = state.sid; };
+      box.onkeydown = e => {
+        if (e.key === "Enter" && sel.options.length) { state.sid = sel.options[0].value; state.fam = famOf(state.sid); renderPickers(); place(); }
+        if (e.key === "Escape") { box.value = ""; monQuery = ""; fillMonPick(); sel.value = state.sid; }
+      };
+    }
   }
-  sel.value = state.sid;
+  if ([...sel.options].some(o => o.value === state.sid)) sel.value = state.sid;
   const se = $("#stages"); se.innerHTML = "";
   DATA.families[state.fam].members.forEach(sid => {
     const d = DATA.species[sid];

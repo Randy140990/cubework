@@ -947,9 +947,148 @@ public final class BattleScene {
 					set(lx, y + 3, lz, Blocks.LANTERN.defaultBlockState());
 				}
 			}
+			case "rocky" -> rocky(cx, y, cz, false);
+			case "river" -> rocky(cx, y, cz, true);
+			case "bridge" -> bridge(cx, y, cz);
+			case "cycling", "cycling_sea" -> cycling(cx, y, cz, kind.equals("cycling_sea"));
 			default -> arena(cx, y, cz);
 		}
 		lights(cx, y, cz);
+	}
+
+	/**
+	 * (0.61, John's 17:58) Routes 3, 4 and 9 ("built up and rocky around"): a pitch of packed earth with a worn line
+	 * round it and across, grit and stones on it; outcrops of rock all round (stacked a few high, in the stone of
+	 * Kanto's hills), dry grass and dead bushes between them, a ring of trees beyond. Route 10 (river): the same, with
+	 * the river running across behind it (water on sand, reeds at its banks).
+	 */
+	private static void rocky(int cx, int y, int cz, boolean river) {
+		BlockState earth = Blocks.COARSE_DIRT.defaultBlockState(), line = Blocks.DIRT_PATH.defaultBlockState(), grit = Blocks.GRAVEL.defaultBlockState();
+		for (int dx = -7; dx <= 7; dx++) {
+			for (int dz = -9; dz <= 8; dz++) {
+				if (!pitch(dx, dz, 0)) continue;
+				boolean edge = !pitch(dx, dz, 1), mid = dz == -1;
+				set(cx + dx, y, cz + dz, edge || mid ? line : RNG.nextInt(7) == 0 ? grit : earth);
+			}
+		}
+		BlockState[] stone = {Blocks.STONE.defaultBlockState(), Blocks.ANDESITE.defaultBlockState(), Blocks.COBBLESTONE.defaultBlockState(),
+				Blocks.POLISHED_ANDESITE.defaultBlockState()};
+		double[] cam = camSpot(cx, cz);
+		// The outcrops: mounds of rock in a ring, higher at the back, open where the camera stands.
+		for (int dx = -16; dx <= 16; dx++) {
+			for (int dz = -16; dz <= 16; dz++) {
+				double d = Math.hypot(dx, dz);
+				if (d < 9.5 || d > 15.5 || Math.hypot(cx + dx - cam[0], cz + dz - cam[1]) < 6) continue;
+				if (river && dz <= -10 && dz >= -14) continue;
+				double bump = Math.sin(dx * 0.55 + 1.3) + Math.cos(dz * 0.5) + Math.sin((dx + dz) * 0.3);
+				if (bump < -0.2) continue;
+				int h = 1 + (int) Math.round(bump * 1.5) + (dz < -6 ? 2 : 0) + RNG.nextInt(2);
+				for (int i = 1; i <= h; i++) set(cx + dx, y + i, cz + dz, stone[RNG.nextInt(stone.length)]);
+			}
+		}
+		// Stones about the pitch's sides, dry grass and dead bushes in the gaps.
+		for (int i = 0; i < 8; i++) {
+			int bx = cx + (RNG.nextBoolean() ? 1 : -1) * (8 + RNG.nextInt(2)), bz = cz + RNG.nextInt(14) - 9;
+			set(bx, y + 1, bz, stone[RNG.nextInt(stone.length)]);
+		}
+		plants(cx, y, cz, 8, 15, 0.25, Blocks.SHORT_DRY_GRASS.defaultBlockState(), Blocks.DEAD_BUSH.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState());
+		if (river) {
+			// The river across the back: water a block deep on sand, its banks sand, reeds along them.
+			for (int dx = -19; dx <= 19; dx++) {
+				for (int dz = -15; dz <= -9; dz++) {
+					if (Math.hypot(dx, dz) > 19.5) continue;
+					boolean bank = dz == -9 || dz == -15;
+					set(cx + dx, y, cz + dz, bank ? Blocks.SAND.defaultBlockState() : Blocks.WATER.defaultBlockState());
+					set(cx + dx, y - 1, cz + dz, Blocks.SAND.defaultBlockState());
+					if (bank && RNG.nextInt(4) == 0) set(cx + dx, y + 1, cz + dz, Blocks.SUGAR_CANE.defaultBlockState());
+				}
+			}
+		}
+		kantoTrees(cx, y, cz, 17.4, 24, 9);
+	}
+
+	/**
+	 * (0.61) Routes 24 and 25 (NUGGET BRIDGE, and the bridges north of CERULEAN): the battle on the bridge's deck,
+	 * spruce boards running across it with a darker board at each edge, rails along both sides; the water all round,
+	 * lily pads on it; the bridge running on north and south out of the picture; grassy banks far off at the sides.
+	 */
+	private static void bridge(int cx, int y, int cz) {
+		BlockState water = Blocks.WATER.defaultBlockState(), deck = Blocks.SPRUCE_PLANKS.defaultBlockState(), edge = Blocks.DARK_OAK_PLANKS.defaultBlockState();
+		for (int dx = -19; dx <= 19; dx++) {
+			for (int dz = -19; dz <= 19; dz++) {
+				double d = Math.hypot(dx, dz);
+				if (d > 19.5) continue;
+				boolean onDeck = Math.abs(dx) <= 7 && (Math.abs(dz) <= 9 || Math.abs(dx) <= 3);
+				if (onDeck) {
+					set(cx + dx, y, cz + dz, Math.abs(dx) == 7 || Math.abs(dx) == 3 && Math.abs(dz) > 9 ? edge : deck);
+					set(cx + dx, y - 1, cz + dz, Blocks.SPRUCE_LOG.defaultBlockState());
+				} else {
+					boolean bank = Math.abs(dx) >= 16;
+					set(cx + dx, y, cz + dz, bank ? Blocks.GRASS_BLOCK.defaultBlockState() : water);
+					set(cx + dx, y - 1, cz + dz, bank ? Blocks.DIRT.defaultBlockState() : water);
+					set(cx + dx, y - 2, cz + dz, Blocks.SAND.defaultBlockState());
+					if (!bank && RNG.nextInt(30) == 0) set(cx + dx, y + 1, cz + dz, Blocks.LILY_PAD.defaultBlockState());
+				}
+			}
+		}
+		// The rails: a fence along both sides of the deck (gaps where the camera looks in), posts with lanterns.
+		double[] cam = camSpot(cx, cz);
+		for (int dz = -19; dz <= 19; dz++) {
+			for (int side = -1; side <= 1; side += 2) {
+				int rx = cx + side * (Math.abs(dz) <= 9 ? 8 : 4);
+				if (Math.hypot(rx - cam[0], cz + dz - cam[1]) < 4.5) continue;
+				set(rx, y, cz + dz, edge);
+				set(rx, y + 1, cz + dz, Blocks.SPRUCE_FENCE.defaultBlockState());
+				if (Math.floorMod(dz, 6) == 0) {
+					set(rx, y + 2, cz + dz, Blocks.SPRUCE_FENCE.defaultBlockState());
+					set(rx, y + 3, cz + dz, Blocks.LANTERN.defaultBlockState());
+				}
+			}
+		}
+		for (int dz = -9; dz <= 9; dz++) for (int side = -1; side <= 1; side += 2) set(cx + side * 8, y - 1, cz + dz, Blocks.SPRUCE_LOG.defaultBlockState());
+		plants(cx, y, cz, 16, 19, 0.4, Blocks.TALL_GRASS.defaultBlockState(), Blocks.SHORT_GRASS.defaultBlockState(), Blocks.POPPY.defaultBlockState());
+	}
+
+	/**
+	 * (0.61) The CYCLING ROAD (Routes 16 and 18): the battle on the road, grey tarmac with white lines down its edges
+	 * and dashes down its middle, kerbs either side, white rails, grass verges with bushes beyond. Route 17 by the sea:
+	 * the same, with a sandy shore and the sea along its far side.
+	 */
+	private static void cycling(int cx, int y, int cz, boolean sea) {
+		BlockState tar = Blocks.GRAY_CONCRETE.defaultBlockState(), white = Blocks.WHITE_CONCRETE.defaultBlockState(), kerb = Blocks.SMOOTH_STONE.defaultBlockState();
+		for (int dx = -19; dx <= 19; dx++) {
+			for (int dz = -19; dz <= 19; dz++) {
+				if (Math.hypot(dx, dz) > 19.5) continue;
+				int ax = Math.abs(dx);
+				BlockState top;
+				if (ax <= 7) top = ax == 6 || ax == 0 && Math.floorMod(dz, 4) < 2 ? white : tar;
+				else if (ax == 8) top = kerb;
+				else if (sea && dx < -11) top = dx < -13 ? Blocks.WATER.defaultBlockState() : Blocks.SAND.defaultBlockState();
+				else top = Blocks.GRASS_BLOCK.defaultBlockState();
+				set(cx + dx, y, cz + dz, top);
+				set(cx + dx, y - 1, cz + dz, top.is(Blocks.WATER) ? Blocks.SAND.defaultBlockState() : Blocks.DIRT.defaultBlockState());
+			}
+		}
+		double[] cam = camSpot(cx, cz);
+		for (int dz = -19; dz <= 19; dz++) {
+			for (int side = -1; side <= 1; side += 2) {
+				int rx = cx + side * 9;
+				if (Math.hypot(rx - cam[0], cz + dz - cam[1]) < 4.5) continue;
+				set(rx, y + 1, cz + dz, Blocks.BIRCH_FENCE.defaultBlockState());
+			}
+		}
+		if (!sea) {
+			hedges(cx, y, cz, 11, 13, false);
+			kantoTrees(cx, y, cz, 16, 20, 8);
+		} else {
+			// The verge on the land side only (the sea on the other).
+			for (int dz = -18; dz <= 18; dz++) if (RNG.nextInt(3) > 0) set(cx + 10 + RNG.nextInt(4), y + 1, cz + dz, Blocks.SHORT_GRASS.defaultBlockState());
+			for (int dz = -16; dz <= 4; dz += 2) {
+				BlockState leaves = Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+				set(cx + 12, y + 1, cz + dz, leaves);
+				if (RNG.nextBoolean()) set(cx + 12, y + 2, cz + dz, leaves);
+			}
+		}
 	}
 
 	/**

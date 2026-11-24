@@ -357,3 +357,110 @@ function fitPeople(room) {
   if (!FIT) return;
   for (const n of room.npcs || []) { if (typeof n.x === "number") n.x = gridC(n.x); if (typeof n.z === "number") n.z = gridC(n.z); }
 }
+
+// ---------- (0.61, John's 17:58) Kanto's battle arenas by area, as the mod builds them (client/BattleScene) ----------
+// "If I'm going to battle somebody on Route 17, there'll need to be a setup for that. Things like Route 1, Route 2 are
+// pretty similar. Viridian Forest will need its own. Route 3 ... built up and rocky around ... Route 4 would be the
+// same ... Route 24 and 25 ... the bridges ... Route 9 might be the same as Route 3 and Route 4. Same with Route 10 in
+// some capacity, but with some water." Which routes get which (game/Battles.KANTO_ARENAS):
+//   Routes 1, 2, 5 to 8, 11 to 15, 22: the meadow (Route battle); Viridian Forest: the forest; Routes 3, 4, 9: rocky;
+//   Route 10: rocky by the river; Routes 24, 25: the bridge; Routes 16, 18: the Cycling Road; Route 17: the Cycling
+//   Road by the sea; Routes 19 to 21: on the water; towns and cities: the town square; caves: the cave; gyms: the gym.
+{
+  const add = (k, w, h, draw, m) => { TEXDEF[k] = [w, h, draw]; MATDEF[k] = Object.assign({ tex: k, per: 1 }, m || {}); };
+  add("arTar", 16, 16, (P, r) => fitPaint(P, r, hx("#6E7278"), { drift: 0.03 }));
+  add("arWhite", 16, 16, (P, r) => fitPaint(P, r, hx("#F2F2EE"), { drift: 0.01 }));
+  add("arKerb", 16, 16, (P, r) => { fitPaint(P, r, hx("#B8B8B2"), { drift: 0.02 }); P.rect(0, 0, 16, 1, hx("#D2D2CC")); });
+  add("arEarth", 32, 32, (P, r) => fitPaint(P, r, hx("#8E6B48"), { drift: 0.05 }), { per: 2 });
+  add("arGrit", 16, 16, (P, r) => { fitPaint(P, r, hx("#8C8880"), { drift: 0.04 }); for (let i = 0; i < 14; i++) P.set(r() * 16, r() * 16, hx(i % 2 ? "#6C6860" : "#A8A49C")); });
+  add("arRock", 16, 16, (P, r) => { fitPaint(P, r, hx("#9A968E"), { drift: 0.06 }); P.rect(0, 0, 16, 1, hx("#B6B2AA")); });
+  add("arRock2", 16, 16, (P, r) => { fitPaint(P, r, hx("#84807A"), { drift: 0.06 }); P.rect(0, 0, 16, 1, hx("#A09C94")); });
+  add("arDeck", 16, 16, (P, r) => fitBoards(P, r, hx("#8E6A44")));
+  add("arDeckEdge", 16, 16, (P, r) => fitPaint(P, r, hx("#4E3826"), { drift: 0.03 }));
+  add("arSand", 32, 32, (P, r) => fitPaint(P, r, hx("#E2CF96"), { drift: 0.04 }), { per: 2 });
+  add("arWater", 32, 32, (P, r) => {
+    const f = softField(55, 32, 32, 4, 4);
+    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) P.set(x, y, f[y * 32 + x] > 0.35 ? hx("#6FA2E8") : f[y * 32 + x] > 0 ? hx("#4A80D4") : hx("#3C6CC4"));
+  }, { per: 2 });
+
+  const stage = (id, name, build) => {
+    PLACES.push({ id, name, floor: "Battle arena (outside)", group: "Battle arenas" });
+    BUILD[id] = function () {
+      const R = new Room(id, { name, floor: "Battle arena (outside)", W: 40, D: 40, H: 8, outside: true });
+      ground(R, "grass");
+      const r = rng(hashStr(id)), cx = 20, cz = 20;
+      const pitch = (dx, dz, i) => { const hx2 = 6 - i, z0 = -8 + i, z1 = 7 - i, rr = Math.max(0.5, 2.5 - i); if (Math.abs(dx) > hx2 || dz < z0 || dz > z1) return false;
+        const ex = Math.max(0, Math.abs(dx) - (hx2 - rr)), ez = Math.max(0, Math.max(z0 + rr - dz, dz - (z1 - rr))); return Math.hypot(ex, ez) <= rr + 0.25; };
+      const cam = [cx - 1.4, cz + 9.8];
+      const camNear = (x, z, d) => Math.hypot(x - cam[0], z - cam[1]) < d;
+      const top = (x, z, mat, h = 0) => R.geo.box(cx + x, -0.4, cz + z, cx + x + 1, h + 0.02, cz + z + 1, { top: mat, all: h > 0 ? mat : null, bottom: null });
+      const block = (x, z, y, mat) => R.geo.box(cx + x, y, cz + z, cx + x + 1, y + 1, cz + z + 1, mat);
+      const post = (x, z, h, mat) => R.geo.box(cx + x + 0.38, 0, cz + z + 0.38, cx + x + 0.62, h, cz + z + 0.62, mat);
+      build(R, { r, cx, cz, pitch, camNear, top, block, post });
+      R.spawn = { x: cx - 0.6, z: cz + 2.2, yaw: FACE.n };
+      return R;
+    };
+  };
+  const trees = (R, n, rad, s, o) => { for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, x = o.cx + Math.sin(a) * rad, z = o.cz + Math.cos(a) * rad; if (!o.camNear(x, z, 6.5)) tree(R, x, z, s); } };
+  const rocky = river => (R, o) => {
+    for (let dx = -7; dx <= 7; dx++) for (let dz = -9; dz <= 8; dz++) {
+      if (!o.pitch(dx, dz, 0)) continue;
+      o.top(dx, dz, !o.pitch(dx, dz, 1) || dz === -1 ? "path" : o.r() < 0.14 ? "arGrit" : "arEarth");
+    }
+    for (let dx = -16; dx <= 16; dx++) for (let dz = -16; dz <= 16; dz++) {
+      const d = Math.hypot(dx, dz);
+      if (d < 9.5 || d > 15.5 || o.camNear(o.cx + dx, o.cz + dz, 6)) continue;
+      if (river && dz <= -10 && dz >= -14) continue;
+      const bump = Math.sin(dx * 0.55 + 1.3) + Math.cos(dz * 0.5) + Math.sin((dx + dz) * 0.3);
+      if (bump < -0.2) continue;
+      const h = 1 + Math.round(bump * 1.5) + (dz < -6 ? 2 : 0) + (o.r() < 0.5 ? 1 : 0);
+      for (let i = 0; i < h; i++) o.block(dx, dz, i, o.r() < 0.5 ? "arRock" : "arRock2");
+    }
+    for (let i = 0; i < 8; i++) o.block((o.r() < 0.5 ? 1 : -1) * (8 + Math.floor(o.r() * 2)), Math.floor(o.r() * 14) - 9, 0, "arRock");
+    if (river) for (let dx = -19; dx <= 19; dx++) for (let dz = -15; dz <= -9; dz++) {
+      if (Math.hypot(dx, dz) > 19.5) continue;
+      const bank = dz === -9 || dz === -15;
+      o.top(dx, dz, bank ? "arSand" : "arWater");
+      if (bank && o.r() < 0.25) R.geo.box(o.cx + dx + 0.3, 0, o.cz + dz + 0.3, o.cx + dx + 0.7, 1.8, o.cz + dz + 0.7, "stem");
+    }
+    trees(R, 24, 17.4, 1.4, o);
+    R.item("The ground", river ? "Route 10: packed earth and grit, rocks all round, the river across the back (sand banks, reeds)." : "Routes 3, 4 and 9: packed earth and grit, a worn line round and across, outcrops of rock all round, higher at the back.");
+  };
+  stage("arena_rocky", "Rocky route battle (Routes 3, 4, 9)", rocky(false));
+  stage("arena_river", "Riverside battle (Route 10)", rocky(true));
+  stage("arena_bridge", "Bridge battle (Routes 24, 25)", (R, o) => {
+    for (let dx = -19; dx <= 19; dx++) for (let dz = -19; dz <= 19; dz++) {
+      if (Math.hypot(dx, dz) > 19.5) continue;
+      const deck = Math.abs(dx) <= 7 && (Math.abs(dz) <= 9 || Math.abs(dx) <= 3);
+      if (deck) o.top(dx, dz, Math.abs(dx) === 7 || (Math.abs(dx) === 3 && Math.abs(dz) > 9) ? "arDeckEdge" : "arDeck");
+      else o.top(dx, dz, Math.abs(dx) >= 16 ? "grass" : "arWater");
+    }
+    for (let dz = -19; dz <= 19; dz++) for (const side of [-1, 1]) {
+      const x = side * (Math.abs(dz) <= 9 ? 8 : 4);
+      if (o.camNear(o.cx + x, o.cz + dz, 4.5)) continue;
+      R.geo.box(o.cx + x, 0, o.cz + dz + 0.4, o.cx + x + 1, 0.9, o.cz + dz + 0.6, "arDeckEdge");
+      if (((dz % 6) + 6) % 6 === 0) { o.post(x, dz, 2.0, "arDeckEdge"); R.geo.box(o.cx + x + 0.3, 2.0, o.cz + dz + 0.3, o.cx + x + 0.7, 2.5, o.cz + dz + 0.7, { all: "glass", top: "steel" }); }
+    }
+    R.item("The bridge", "Routes 24 and 25: the battle on the bridge's deck (boards across it, a dark board at each edge), rails with lanterns along both sides, the water all round, the bridge running on north and south.");
+  });
+  const cycling = sea => (R, o) => {
+    for (let dx = -19; dx <= 19; dx++) for (let dz = -19; dz <= 19; dz++) {
+      if (Math.hypot(dx, dz) > 19.5) continue;
+      const ax = Math.abs(dx);
+      let m = "grass";
+      if (ax <= 7) m = ax === 6 || (ax === 0 && ((dz % 4) + 4) % 4 < 2) ? "arWhite" : "arTar";
+      else if (ax === 8) m = "arKerb";
+      else if (sea && dx < -11) m = dx < -13 ? "arWater" : "arSand";
+      o.top(dx, dz, m);
+    }
+    for (let dz = -19; dz <= 19; dz++) for (const side of [-1, 1]) {
+      const x = side * 9; if (o.camNear(o.cx + x, o.cz + dz, 4.5)) continue;
+      o.post(x, dz, 1.0, "arWhite"); R.geo.box(o.cx + x, 0.75, o.cz + dz + 0.45, o.cx + x + 1, 0.9, o.cz + dz + 0.55, "arWhite");
+    }
+    if (!sea) trees(R, 20, 16, 1.3, o);
+    else for (let dz = -16; dz <= 4; dz += 2) o.block(12, dz, 0, "treeLeaf");
+    R.item("The road", sea ? "Route 17: the CYCLING ROAD by the sea: grey tarmac, white lines, kerbs and white rails, the sand and the sea along its far side." : "Routes 16 and 18: the CYCLING ROAD: grey tarmac with white lines down its edges and dashes down its middle, kerbs, white rails, grass verges, trees.");
+  };
+  stage("arena_cycling", "Cycling Road battle (Routes 16, 18)", cycling(false));
+  stage("arena_cycling_sea", "Cycling Road by the sea (Route 17)", cycling(true));
+}

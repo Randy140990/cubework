@@ -10,11 +10,15 @@
       boulder: "area_cc_boulder", pre: "cboulder", haze: 0x76909a, night: false },
     victory_road: { floor: "area_vr_floor", sand: "area_vr_sand", step: "area_vr_step", wall: "area_vr_cliff", wallTop: "area_vr_top", ice: "area_vr_cliff", iceTop: "area_vr_top",
       boulder: "area_vr_boulder", pre: "vboulder", haze: 0xb08c68, night: false },
+    // (0.61) MT. SILVER (John's 18:19; tools/looks61.py's textures).
+    mt_silver: { floor: "area_ms_floor", sand: "area_ms_ground", step: "area_ms_step", wall: "area_ms_cliff", wallTop: "area_ms_top", ice: "area_ms_cliff", iceTop: "area_ms_top",
+      boulder: "area_ms_boulder", pre: "xboulder", haze: 0x96a0b6, night: false },
   };
   const ABOUT = {
     seafoam: "John's floors stitched as FireRed's: ladders and holes down to B4F and ARTICUNO; its rock ice, its boulders ice shards; the deep water you can swim (SURF comes later).",
     rock_tunnel: "John's two floors stitched as FireRed's: in by the north mouth at 1F's ladder, four ladders between 1F and B1F, out at 1F's south doorway. Dark; craggy rocks; FireRed's trainers.",
     cerulean_cave: "John's three floors stitched as FireRed's: in from the river's north bank onto 1F, its water swum (SURF comes later), ladders up to 2F's maze of boulders and down to B1F and MEWTWO.",
+    mt_silver: "John's four rooms stitched as Crystal's SILVER CAVE: in by the mouth on the mountain's south face onto Room 1, its ways through (the sandstone squares) on to Room 2, up to Room 3 and RED at the top, and to the two Item Rooms. Room 1's hop-down ledges are half-block steps (no jumping here).",
     victory_road: "John's three floors stitched as FireRed's: in by Route 23's west mouth onto 1F, up to 2F and 3F and back down to 2F's way out by the east mouth. FireRed's trainers; MOLTRES on 2F, where Red and Blue had it; the rock barriers cleared.",
   };
   function caveRoom48(id) {

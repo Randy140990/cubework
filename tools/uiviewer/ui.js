@@ -439,13 +439,23 @@ window.addEventListener("keydown", e => {
 });
 
 // ---------- the list of screens beside the stage, and the notes for each ----------
+// (0.61, John's 17:58) The screens narrowed to what matches the search (its name, its group, its notes).
+let flowQuery = "";
 function renderFlows() {
   const nav = $("#flows"); nav.innerHTML = "";
   let g = null, n = 0;
   const sel = $("#flowSel"); sel.innerHTML = "";
   let og = null;
+  const box = $("#flowSearch");
+  if (box && !box.oninput) {
+    box.oninput = () => { flowQuery = box.value; renderFlows(); };
+    box.onkeydown = e => { if (e.key === "Escape") { box.value = ""; flowQuery = ""; renderFlows(); } if (e.key === "Enter") { const b = nav.querySelector("button"); if (b) b.click(); } };
+  }
+  const q = flowQuery.trim().toLowerCase().split(/\s+/).filter(Boolean);
   for (const s of SCREENS) {
     n++;
+    const text = (s.name + " " + s.group + " " + s.id + " " + (s.note || "") + " " + (s.notes || "")).toLowerCase();
+    if (q.length && !q.every(w => text.includes(w)) && s !== curDef) continue;
     if (s.group !== g) { g = s.group; nav.appendChild(h("h2", "", esc(g))); og = document.createElement("optgroup"); og.label = g; sel.appendChild(og); }
     const b = h("button", "", `<small>${n}</small><span>${esc(s.name)}</span>`); b.setAttribute("aria-current", String(s === curDef));
     b.onclick = () => { go(s.id); stageEl.focus({ preventScroll: true }); stageActive = true; };

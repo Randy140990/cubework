@@ -428,7 +428,9 @@
         if (wallN) G.box(w.x, 0, w.z + 0.02, w.x + 1, 2.3, w.z + 0.08, { s: kind.match(/lorelei|bruno|agatha|lance|champion|lobby/) ? (BEAT[id] ? "lgDoor" : "lgDoorOpen") : kind === "hideout" ? "silphLiftDoor" : "labDoor", all: null });
       } else if (w.kind === "lift") G.box(w.x, 0, w.z + 0.85, w.x + 1, 2.2, w.z + 0.95, { s: "silphLiftDoor", all: "silphLiftWall" });
       if (back) { if (!seen.has(key)) R.act([w.x - 0.3, w.z - 0.3, w.x + 1.3, w.z + 1.3], { label: "Look", lines: ["The door's shut behind you."] }); seen.add(key); continue; }
-      const needs = BEAT[id] && !(w.kind === "mat") ? "beat:" + BEAT[id] : (id === "rocket_hideout_b4f" || w.kind !== "lift") ? null : null;
+      // (0.61) The POKéMON TOWER's 6F: MAROWAK's ghost bars the stairs up (Game.gateBlocked: the GHOST without the
+      // SILPH SCOPE, MAROWAK unveiled with it) till it's laid to rest.
+      const needs = BEAT[id] && !(w.kind === "mat") ? "beat:" + BEAT[id] : id === "pokemon_tower_6f" && w.to === "pokemon_tower_7f" ? "marowak_calmed" : null;
       R._boxes.push({ x0: bx0, z0: bz0, x1: bx1, z1: bz1, to: w.to, spawn: sp, needs });
       R.warps.push({ test: p => p.x > bx0 && p.x < bx1 && p.z > bz0 && p.z < bz1, to: w.to, spawn: sp, fx: "fade" });
     }

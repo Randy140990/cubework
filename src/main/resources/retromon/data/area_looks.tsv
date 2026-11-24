@@ -508,24 +508,24 @@ swap	terracotta	-778	514	-756	530	27	27	block/terracotta=gym_band_viridian_city	
 swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-777	515	-757	529	-	-	block/polished_diorite=house_trim	viridian_city Gym
 sign	pale_oak_shelf,pale_oak_sign	-300	578	-293	584	-	-	-	Diglett's Cave's sign on Route 11
 sign	pale_oak_shelf,pale_oak_sign	4096	0	4215	171	-	-	-	Viridian Forest	interiors
-swap	dripstone_block	4351	-1	4372	16	-	-	block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,block/mushroom_block_inside=cave_rock_top|cave_rock@4	Diglett's Cave north entrance	interiors
-cube	brown_mushroom_block	4351	-1	4372	16	-	-	cave_rock_top|cave_rock@4	Diglett's Cave north entrance	interiors
-swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4351	-1	4372	16	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4	Diglett's Cave north entrance	interiors
-sand_edge	coarse_dirt,packed_mud,dirt,mud	4351	-1	4372	16	-	-	-	Diglett's Cave north entrance	interiors
-swap	white_concrete	4351	-1	4372	16	-	-	block/white_concrete=cave_daylight!	Diglett's Cave north entrance	interiors
-boulder	waxed_copper_grate,waxed_exposed_copper_grate	4351	-1	4372	16	-	-	prefix:boulder	Diglett's Cave north entrance	interiors
-swap	dripstone_block	4607	-1	4778	160	-	-	block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,block/mushroom_block_inside=cave_rock_top|cave_rock@4	Diglett's Cave B1F	interiors
-cube	brown_mushroom_block	4607	-1	4778	160	-	-	cave_rock_top|cave_rock@4	Diglett's Cave B1F	interiors
-swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4607	-1	4778	160	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4	Diglett's Cave B1F	interiors
-sand_edge	coarse_dirt,packed_mud,dirt,mud	4607	-1	4778	160	-	-	-	Diglett's Cave B1F	interiors
-swap	white_concrete	4607	-1	4778	160	-	-	block/white_concrete=cave_daylight!	Diglett's Cave B1F	interiors
-boulder	waxed_copper_grate,waxed_exposed_copper_grate	4607	-1	4778	160	-	-	prefix:boulder	Diglett's Cave B1F	interiors
-swap	dripstone_block	4863	-1	4884	16	-	-	block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,block/mushroom_block_inside=cave_rock_top|cave_rock@4	Diglett's Cave south entrance	interiors
-cube	brown_mushroom_block	4863	-1	4884	16	-	-	cave_rock_top|cave_rock@4	Diglett's Cave south entrance	interiors
-swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4863	-1	4884	16	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4	Diglett's Cave south entrance	interiors
-sand_edge	coarse_dirt,packed_mud,dirt,mud	4863	-1	4884	16	-	-	-	Diglett's Cave south entrance	interiors
-swap	white_concrete	4863	-1	4884	16	-	-	block/white_concrete=cave_daylight!	Diglett's Cave south entrance	interiors
-boulder	waxed_copper_grate,waxed_exposed_copper_grate	4863	-1	4884	16	-	-	prefix:boulder	Diglett's Cave south entrance	interiors
+swap	dripstone_block	4351	-1	4380	28	-	-	block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,block/mushroom_block_inside=cave_rock_top|cave_rock@4	Diglett's Cave north entrance	interiors
+cube	brown_mushroom_block	4351	-1	4380	28	-	-	cave_rock_top|cave_rock@4	Diglett's Cave north entrance	interiors
+swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4351	-1	4380	28	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4	Diglett's Cave north entrance	interiors
+sand_edge	coarse_dirt,packed_mud,dirt,mud	4351	-1	4380	28	-	-	-	Diglett's Cave north entrance	interiors
+swap	white_concrete	4351	-1	4380	28	-	-	block/white_concrete=cave_daylight!	Diglett's Cave north entrance	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	4351	-1	4380	28	-	-	prefix:boulder	Diglett's Cave north entrance	interiors
+swap	dripstone_block	4607	-1	4786	164	-	-	block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,block/mushroom_block_inside=cave_rock_top|cave_rock@4	Diglett's Cave B1F	interiors
+cube	brown_mushroom_block	4607	-1	4786	164	-	-	cave_rock_top|cave_rock@4	Diglett's Cave B1F	interiors
+swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4607	-1	4786	164	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4	Diglett's Cave B1F	interiors
+sand_edge	coarse_dirt,packed_mud,dirt,mud	4607	-1	4786	164	-	-	-	Diglett's Cave B1F	interiors
+swap	white_concrete	4607	-1	4786	164	-	-	block/white_concrete=cave_daylight!	Diglett's Cave B1F	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	4607	-1	4786	164	-	-	prefix:boulder	Diglett's Cave B1F	interiors
+swap	dripstone_block	4863	-1	4892	28	-	-	block/dripstone_block=cave_rock_top|cave_rock@4,block/brown_mushroom_block=cave_rock_top|cave_rock@4,block/mushroom_block_inside=cave_rock_top|cave_rock@4	Diglett's Cave south entrance	interiors
+cube	brown_mushroom_block	4863	-1	4892	28	-	-	cave_rock_top|cave_rock@4	Diglett's Cave south entrance	interiors
+swap	coarse_dirt,packed_mud,dirt,sand,smooth_sandstone,mud	4863	-1	4892	28	-	-	block/coarse_dirt=cave_floor@4,block/packed_mud=cave_floor@4,block/dirt=cave_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2,block/mud=cave_floor@4	Diglett's Cave south entrance	interiors
+sand_edge	coarse_dirt,packed_mud,dirt,mud	4863	-1	4892	28	-	-	-	Diglett's Cave south entrance	interiors
+swap	white_concrete	4863	-1	4892	28	-	-	block/white_concrete=cave_daylight!	Diglett's Cave south entrance	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	4863	-1	4892	28	-	-	prefix:boulder	Diglett's Cave south entrance	interiors
 swap	dripstone_block,white_terracotta	5119	-1	5224	90	-	-	block/dripstone_block=moon_rock_top|moon_rock@4,block/white_terracotta=moon_rock_top|moon_rock@4	Mt. Moon 1F	interiors
 swap	andesite,tuff,gravel,sand,smooth_sandstone	5119	-1	5224	90	-	-	block/andesite=moon_floor@4,block/tuff=moon_floor@4,block/gravel=moon_floor@4,block/sand=cave_sand@4,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Mt. Moon 1F	interiors
 sand_edge	andesite,tuff,gravel	5119	-1	5224	90	-	-	-	Mt. Moon 1F	interiors
@@ -778,9 +778,9 @@ swap	warped_slab,warped_planks,warped_stairs	-472	750	-454	767	29	45	block/warpe
 swap	oak_planks,oak_stairs,oak_slab	-472	750	-454	767	29	45	block/oak_planks=sz_wood	the SAFARI ZONE's office
 swap	deepslate_brick_wall	-472	750	-454	767	29	45	block/deepslate_bricks=sz_post	the SAFARI ZONE's office
 swap	polished_diorite,polished_diorite_slab	-472	750	-454	767	29	33	block/polished_diorite=sz_floor	the SAFARI ZONE's office
-swap	ladder	4351	-1	4372	16	-	-	block/ladder=metal_ladder	Diglett's Cave north entrance	interiors
-swap	ladder	4607	-1	4778	160	-	-	block/ladder=metal_ladder	Diglett's Cave B1F	interiors
-swap	ladder	4863	-1	4884	16	-	-	block/ladder=metal_ladder	Diglett's Cave south entrance	interiors
+swap	ladder	4351	-1	4380	28	-	-	block/ladder=metal_ladder	Diglett's Cave north entrance	interiors
+swap	ladder	4607	-1	4786	164	-	-	block/ladder=metal_ladder	Diglett's Cave B1F	interiors
+swap	ladder	4863	-1	4892	28	-	-	block/ladder=metal_ladder	Diglett's Cave south entrance	interiors
 swap	ladder	5119	-1	5224	90	-	-	block/ladder=metal_ladder	Mt. Moon 1F	interiors
 swap	ladder	5375	-1	5482	86	-	-	block/ladder=metal_ladder	Mt. Moon B1F	interiors
 swap	ladder	5631	-1	5738	90	-	-	block/ladder=metal_ladder	Mt. Moon B2F	interiors
@@ -6277,6 +6277,31 @@ swap	andesite,sand,dripstone_block,white_terracotta,spruce_planks,spruce_stairs,
 boulder	waxed_copper_grate,waxed_exposed_copper_grate	17407	-1	17534	68	-	-	prefix:vboulder	Victory Road 2F	interiors
 swap	andesite,sand,dripstone_block,white_terracotta,spruce_planks,spruce_stairs,smooth_quartz,smooth_sandstone	17663	-1	17776	68	-	-	block/andesite=vr_floor|vr_cliff@4,block/sand=vr_sand@2,block/dripstone_block=vr_top|vr_cliff@4,block/white_terracotta=vr_top@2,block/spruce_planks=vr_step,block/quartz_block_bottom=vr_switch@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Victory Road 3F	interiors
 boulder	waxed_copper_grate,waxed_exposed_copper_grate	17663	-1	17776	68	-	-	prefix:vboulder	Victory Road 3F	interiors
+swap	ladder	6655	-1	6740	64	-	-	block/ladder=metal_ladder	Seafoam Islands 1F	interiors
+swap	ladder	6783	-1	6868	64	-	-	block/ladder=metal_ladder	Seafoam Islands B1F	interiors
+swap	ladder	6911	-1	6996	64	-	-	block/ladder=metal_ladder	Seafoam Islands B2F	interiors
+swap	ladder	7039	-1	7124	64	-	-	block/ladder=metal_ladder	Seafoam Islands B3F	interiors
+swap	ladder	7167	-1	7252	64	-	-	block/ladder=metal_ladder	Seafoam Islands B4F	interiors
+swap	ladder	7295	-1	7408	94	-	-	block/ladder=metal_ladder	Rock Tunnel 1F	interiors
+swap	ladder	7423	-1	7534	96	-	-	block/ladder=metal_ladder	Rock Tunnel B1F	interiors
+swap	ladder	16383	-1	16488	72	-	-	block/ladder=metal_ladder	Cerulean Cave 1F	interiors
+swap	ladder	16639	-1	16732	68	-	-	block/ladder=metal_ladder	Cerulean Cave 2F	interiors
+swap	ladder	16895	-1	17000	70	-	-	block/ladder=metal_ladder	Cerulean Cave B1F	interiors
+swap	ladder	17151	-1	17224	70	-	-	block/ladder=metal_ladder	Victory Road 1F	interiors
+swap	ladder	17407	-1	17534	68	-	-	block/ladder=metal_ladder	Victory Road 2F	interiors
+swap	ladder	17663	-1	17776	68	-	-	block/ladder=metal_ladder	Victory Road 3F	interiors
+swap	ladder	17919	-1	17980	94	-	-	block/ladder=metal_ladder	Mt. Silver Room 1	interiors
+swap	ladder	18175	-1	18260	92	-	-	block/ladder=metal_ladder	Mt. Silver Room 2	interiors
+swap	ladder	18431	-1	18480	80	-	-	block/ladder=metal_ladder	Mt. Silver Room 3	interiors
+swap	ladder	18687	-1	18744	56	-	-	block/ladder=metal_ladder	Mt. Silver Item Rooms	interiors
+swap	deepslate,cobbled_deepslate,tuff,calcite,andesite,andesite_slab,polished_tuff,polished_tuff_stairs,dripstone_block,jungle_stairs,stone,stone_stairs,snow_block,smooth_sandstone	17919	-1	17980	94	-	-	block/deepslate=ms_floor|ms_cliff@4,block/deepslate_top=ms_floor@4,block/cobbled_deepslate=ms_patch@4,block/tuff=ms_ground|ms_cliff@4,block/calcite=ms_top|ms_cliff@4,block/andesite=ms_step,block/polished_tuff=ms_step,block/dripstone_block=ms_edge@2,block/jungle_planks=ms_edge,block/stone=ms_top|ms_cliff_ice@4,block/snow=sf_snow_top|sf_snow@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Mt. Silver Room 1	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	17919	-1	17980	94	-	-	prefix:xboulder	Mt. Silver Room 1	interiors
+swap	deepslate,cobbled_deepslate,tuff,calcite,andesite,andesite_slab,polished_tuff,polished_tuff_stairs,dripstone_block,jungle_stairs,stone,stone_stairs,snow_block,smooth_sandstone	18175	-1	18260	92	-	-	block/deepslate=ms_floor|ms_cliff@4,block/deepslate_top=ms_floor@4,block/cobbled_deepslate=ms_patch@4,block/tuff=ms_ground|ms_cliff@4,block/calcite=ms_top|ms_cliff@4,block/andesite=ms_step,block/polished_tuff=ms_step,block/dripstone_block=ms_edge@2,block/jungle_planks=ms_edge,block/stone=ms_top|ms_cliff_ice@4,block/snow=sf_snow_top|sf_snow@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Mt. Silver Room 2	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	18175	-1	18260	92	-	-	prefix:xboulder	Mt. Silver Room 2	interiors
+swap	deepslate,cobbled_deepslate,tuff,calcite,andesite,andesite_slab,polished_tuff,polished_tuff_stairs,dripstone_block,jungle_stairs,stone,stone_stairs,snow_block,smooth_sandstone	18431	-1	18480	80	-	-	block/deepslate=ms_floor|ms_cliff@4,block/deepslate_top=ms_floor@4,block/cobbled_deepslate=ms_patch@4,block/tuff=ms_ground|ms_cliff@4,block/calcite=ms_top|ms_cliff@4,block/andesite=ms_step,block/polished_tuff=ms_step,block/dripstone_block=ms_edge@2,block/jungle_planks=ms_edge,block/stone=ms_top|ms_cliff_ice@4,block/snow=sf_snow_top|sf_snow@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Mt. Silver Room 3	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	18431	-1	18480	80	-	-	prefix:xboulder	Mt. Silver Room 3	interiors
+swap	deepslate,cobbled_deepslate,tuff,calcite,andesite,andesite_slab,polished_tuff,polished_tuff_stairs,dripstone_block,jungle_stairs,stone,stone_stairs,snow_block,smooth_sandstone	18687	-1	18744	56	-	-	block/deepslate=ms_floor|ms_cliff@4,block/deepslate_top=ms_floor@4,block/cobbled_deepslate=ms_patch@4,block/tuff=ms_ground|ms_cliff@4,block/calcite=ms_top|ms_cliff@4,block/andesite=ms_step,block/polished_tuff=ms_step,block/dripstone_block=ms_edge@2,block/jungle_planks=ms_edge,block/stone=ms_top|ms_cliff_ice@4,block/snow=sf_snow_top|sf_snow@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Mt. Silver Item Rooms	interiors
+boulder	waxed_copper_grate,waxed_exposed_copper_grate	18687	-1	18744	56	-	-	prefix:xboulder	Mt. Silver Item Rooms	interiors
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care

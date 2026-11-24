@@ -40,12 +40,22 @@ public final class Battles {
 	}
 
 	/** Which set piece the battle is fought on: a route's field, a forest, a cave, the water's edge, a gym or a town square. */
+	private static final java.util.Map<String, String> KANTO_ARENAS = java.util.Map.ofEntries(java.util.Map.entry("route_3", "rocky"),
+			java.util.Map.entry("route_4", "rocky"), java.util.Map.entry("route_9", "rocky"), java.util.Map.entry("route_10", "river"),
+			java.util.Map.entry("route_24", "bridge"), java.util.Map.entry("route_25", "bridge"), java.util.Map.entry("route_16", "cycling"),
+			java.util.Map.entry("route_18", "cycling"), java.util.Map.entry("route_17", "cycling_sea"));
+
 	private static String arena(ServerPlayer p, Session s) {
 		// Inside a building (your rival in the lab): fought in the room itself.
 		// (The forest, a room you walk about in, has the forest's set piece, as outside.)
 		if (p.level().dimension() == Interiors.LEVEL && !Interiors.walkabout(p)) return "inside";
 		String place = Game.data(p).place;
 		if (s.trainer != null && s.trainer.boss() && !s.trainer.title().contains("ROCKET")) return "gym";
+		// (0.61, John's 17:58: "a battle arena for each specific Kanto area") Kanto's routes by what they are: Routes 3, 4
+		// and 9 rocky and built up; Route 10 rocky by the river; Routes 24 and 25 on NUGGET BRIDGE and the bridges north
+		// of CERULEAN; the CYCLING ROAD (16, 18) on its road, Route 17 by the sea; Routes 1, 2 and the rest the meadow.
+		String kanto = KANTO_ARENAS.get(place);
+		if (kanto != null) return kanto;
 		if (place.contains("gym") || place.contains("plateau") || place.contains("room") || place.contains("lance") || place.contains("champion")) return "gym";
 		if (place.contains("forest") || place.contains("ilex") || place.contains("park")) return "forest";
 		for (String k : new String[] {"cave", "mt_moon", "tunnel", "seafoam", "victory_road", "rock", "mortar", "ice_path", "whirl", "ruins", "dragons_den",
@@ -61,9 +71,24 @@ public final class Battles {
 
 	/** A wild battle (staticKey: the one-off encounter it is, or null). */
 	public static void wild(ServerPlayer p, Mon foe, String staticKey) {
+		wild(p, foe, staticKey, false, false);
+	}
+
+	/**
+	 * (0.61) The POKéMON TOWER's: a GHOST you can't make out (ghost: without the SILPH SCOPE; not seen in the POKéDEX,
+	 * only run from), or one that can't be caught (noCatch: MAROWAK's, unveiled).
+	 */
+	public static void wild(ServerPlayer p, Mon foe, String staticKey, boolean ghost, boolean noCatch) {
+		wild(p, foe, staticKey, ghost, noCatch, null);
+	}
+
+	public static void wild(ServerPlayer p, Mon foe, String staticKey, boolean ghost, boolean noCatch, String intro) {
 		PlayerData d = Game.data(p);
-		d.seen.add(foe.species.id());
+		if (!ghost) d.seen.add(foe.species.id());
 		Battle b = new Battle(RNG, name(p), d.party, new ArrayList<>(List.of(foe)), Battle.Kind.WILD, null, 0);
+		b.ghost = ghost;
+		b.noCatch = noCatch;
+		b.intro = intro;
 		// ((0.59.5) In Johto a legendary's is Crystal's legendary battle.)
 		begin(p, new Session(b, null, staticKey), staticKey != null && legendary(foe.species) ? (johto(p) ? "johto_legend_battle" : "gym_leader_battle") : "wild_battle");
 	}
@@ -192,6 +217,8 @@ public final class Battles {
 					}
 				}
 				if (s.staticKey != null) staticDone(p, s.staticKey);
+				if ("marowak_calmed".equals(s.staticKey))
+					after.addAll(List.of("The GHOST was the restless soul of CUBONE's mother!", "The mother's soul was calmed.", "It departed to the afterlife!"));
 			}
 			case CAUGHT -> {
 				Mon m = b.caught;

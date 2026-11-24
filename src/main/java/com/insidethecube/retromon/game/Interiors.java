@@ -53,7 +53,7 @@ public final class Interiors {
 	 * 26 and JOHTO); needs: what you must have to go through (a badge: the League gate's guard).
 	 */
 	public record Warp(String kind, double x0, double x1, double z0, double z1, String door, String to, double sx, double sz, float syaw, String choice, String needs,
-			double sy) {}
+			double sy, double by) {}
 
 	/** Someone in a room; role: "nurse" (heals), "clerk" (sells) or null (just talks). */
 	/**
@@ -120,7 +120,7 @@ public final class Interiors {
 	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json", "/retromon/interiors/digletts_cave.json",
 			"/retromon/interiors/mt_moon.json", "/retromon/interiors/safari_zone.json", "/retromon/interiors/seafoam_islands.json",
 			"/retromon/interiors/rock_tunnel.json", "/retromon/interiors/ilex_forest.json", "/retromon/interiors/cerulean_cave.json",
-			"/retromon/interiors/victory_road.json"};
+			"/retromon/interiors/victory_road.json", "/retromon/interiors/mt_silver.json"};
 
 	/** (0.60) The rooms whose water you can walk into and swim (Cerulean Cave's: FireRed's SURF, which there isn't yet). (Before the rooms are read.) */
 	private static final java.util.Set<String> SWIM = new java.util.HashSet<>();
@@ -253,7 +253,9 @@ public final class Interiors {
 				warps.add(new Warp(kind, x0, x1, z0, z1, w.has("door") && !w.get("door").isJsonNull() ? w.get("door").getAsString() : null,
 						w.has("to") && !w.get("to").isJsonNull() ? w.get("to").getAsString() : null, num(ws, "x", 0), num(ws, "z", 0), (float) num(ws, "yaw", 0),
 						w.has("choice") && !w.get("choice").isJsonNull() ? w.get("choice").getAsString() : null,
-						w.has("needs") && !w.get("needs").isJsonNull() ? w.get("needs").getAsString() : null, num(ws, "y", 0)));
+						w.has("needs") && !w.get("needs").isJsonNull() ? w.get("needs").getAsString() : null, num(ws, "y", 0),
+						// (0.61) How high over the room's floor a box is (MT. SILVER's ways through, on its upper levels): only there.
+						w.has("y") ? num(w, "y", 0) : Double.NaN));
 			}
 			List<Person> people = new ArrayList<>();
 			for (JsonElement pe : r.getAsJsonArray("people")) {
@@ -1185,7 +1187,7 @@ public final class Interiors {
 					case "box" -> {
 						// (0.53) Walking into it (SILPH CO.'s stairs, its elevator's doors): to the room it leads to. Out
 						// of an elevator ("lift"): onto the floor you picked there, or back where you got in.
-						if (lx > w.x0() && lx < w.x1() && lz > w.z0() && lz < w.z1()) {
+						if (lx > w.x0() && lx < w.x1() && lz > w.z0() && lz < w.z1() && (Double.isNaN(w.by()) || Math.abs(ly - w.by()) < 1.6)) {
 							// (0.60) A way that needs something first (the ELITE FOUR's doors: the one in the room beaten; the
 							// GAME CORNER's hidden stairs: the switch pushed): turned back.
 							if (w.needs() != null && !Game.meets(p, w.needs())) {
@@ -1211,7 +1213,7 @@ public final class Interiors {
 								LIFT_FROM.put(id, r.id());
 								LIFT_TO.remove(id);
 							}
-							go(p, to, w.sx(), w.sz(), w.syaw(), true);
+							go(p, to, w.sx(), w.sy(), w.sz(), w.syaw(), true);
 							return true;
 						}
 					}

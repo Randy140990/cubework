@@ -72,7 +72,8 @@ def boulders():
     root = os.path.join(HERE, "..", "src", "main", "resources", "assets", "retromon", "models", "block", "area")
     out = {}
     for n in ("boulder_a", "boulder_b", "boulder_small", "iboulder_a", "iboulder_b", "iboulder_small", "rboulder_a", "rboulder_b", "rboulder_small",
-              "sboulder_a", "sboulder_b", "sboulder_small", "cboulder_a", "cboulder_b", "cboulder_small", "vboulder_a", "vboulder_b", "vboulder_small"):
+              "sboulder_a", "sboulder_b", "sboulder_small", "cboulder_a", "cboulder_b", "cboulder_small", "vboulder_a", "vboulder_b", "vboulder_small",
+              "xboulder_a", "xboulder_b", "xboulder_small"):
         m = json.load(open(os.path.join(root, n + ".json")))
         out[n] = [e["from"] + e["to"] for e in m["elements"]]
     # (0.53) The plateau's statues of our RHYDON (tools/mon_statue.py): each box, and its turn (axis, angle, origin).

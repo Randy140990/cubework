@@ -201,3 +201,12 @@ ss_anne_b1f_room5_fr_super_potion	ss_anne_b1f_room5	super_potion	-1	-1
 cerulean_cave_1f_fr_nugget	cerulean_cave_1f	nugget	-1	-1
 cerulean_cave_1f_fr_full_restore	cerulean_cave_1f	full_restore	-1	-1
 cerulean_cave_2f_fr_pp_up	cerulean_cave_2f	pp_up	-1	-1
+silver_cave_room_1_i0	silver_cave_room_1	max_elixer	4	9
+silver_cave_room_1_i1	silver_cave_room_1	protein	15	29
+silver_cave_room_1_i2	silver_cave_room_1	escape_rope	5	30
+silver_cave_room_1_i3	silver_cave_room_1	ultra_ball	7	18
+silver_cave_room_2_i0	silver_cave_room_2	calcium	24	10
+silver_cave_room_2_i1	silver_cave_room_2	ultra_ball	22	24
+silver_cave_room_2_i2	silver_cave_room_2	pp_up	4	20
+silver_cave_item_rooms_i0	silver_cave_item_rooms	max_revive	6	3
+silver_cave_item_rooms_i1	silver_cave_item_rooms	full_restore	15	11

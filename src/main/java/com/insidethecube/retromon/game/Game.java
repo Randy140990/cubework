@@ -2251,6 +2251,8 @@ public final class Game {
 		// (0.60) The ELITE FOUR's doors (the one in the room beaten), the GAME CORNER's hidden stairs (the switch pushed).
 		if (needs.startsWith("beat:")) return d.beaten.contains(needs.substring(5));
 		if (needs.equals("hideout_open")) return d.statics.contains("hideout_open");
+		// (0.61) The POKéMON TOWER's 6F: MAROWAK's ghost bars the stairs up till it's laid to rest.
+		if (needs.equals("marowak_calmed")) return d.statics.contains("marowak_calmed");
 		// (0.50) The CYCLING ROAD's gates: on a BICYCLE only. SAFFRON's: the guards are thirsty (a drink gets you by).
 		if (needs.equals("bicycle")) return d.count("bicycle") > 0;
 		// (0.53) SILPH CO.'s shutters: the CARD KEY (on 5F).
@@ -2275,6 +2277,28 @@ public final class Game {
 		}
 		if (needs.equals("hideout_open")) {
 			message(p, List.of("A cold draft is blowing up through the floor here..."));
+			return;
+		}
+		if (needs.equals("marowak_calmed")) {
+			// (0.61) FireRed's 6F: "Be gone... Intruders..." Without the SILPH SCOPE, a GHOST you can't make out (only run
+			// from); with it, MAROWAK, unveiled, to battle (no catching it). Beaten, it's laid to rest and the way's open.
+			if (Battles.in(p)) return;
+			PlayerData d = data(p);
+			Species sp = Species.get("marowak");
+			if (sp == null) {
+				message(p, List.of("Be gone... Intruders..."));
+				return;
+			}
+			Mon m = new Mon(sp, 30, RNG);
+			if (d.count("silph_scope") <= 0) {
+				// (Its shape can't be made out: drawn as a shadowy ghost, called GHOST.)
+				Species shade = Species.get("gastly");
+				Mon g = shade == null ? m : new Mon(shade, 30, RNG);
+				g.nickname = "GHOST";
+				Battles.wild(p, g, null, true, false);
+			} else {
+				Battles.wild(p, m, "marowak_calmed", false, true, "SILPH SCOPE unveiled the GHOST's identity!");
+			}
 			return;
 		}
 		if (needs.equals("bicycle")) {

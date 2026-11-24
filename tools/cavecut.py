@@ -26,11 +26,13 @@ def cut(names, W, H, L, reach=REACH):
     at = lambda x, y, z: (y * L + z) * W + x
     top = [[-1] * W for _ in range(L)]
     ladder = [[False] * W for _ in range(L)]
+    pit = [[False] * W for _ in range(L)]
     for z in range(L):
         for x in range(W):
             for y in range(H - 1, -1, -1):
                 b = base[at(x, y, z)]
                 if b == "ladder": ladder[z][x] = True
+                if b == "black_concrete": pit[z][x] = True
                 if b not in SOFT and top[z][x] < 0: top[z][x] = y
     n_cut = 0
     for x in range(W):
@@ -43,6 +45,9 @@ def cut(names, W, H, L, reach=REACH):
             for d in range(1, reach + 1):
                 if z - d < 0: break
                 f = top[z - d][x]
+                # (0.61, John's 18:16: stuck "near ladder areas") Not a hole's bottom or a ladder's well: the floor south
+                # of a hole is floor, not a wall to cut down (cut, it left a trench a block deep you couldn't climb out of).
+                if pit[z - d][x] or ladder[z - d][x]: continue
                 # (0.61, John's 18:16: "only lower them down to the 3 ... we're 2 blocks tall, lower them down to the 3
                 # blocks, so we'll still be able to see beyond it and still see ourselves") Three blocks over the
                 # floor, everywhere, not one.

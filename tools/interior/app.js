@@ -599,12 +599,15 @@ const MENU_ORDER = [
   ["Johto: the National Park", ["route_35_national_park_gate", "route_36_national_park_gate"]],
   ["Johto: Ecruteak City", ["jgate_ecruteak", "jgate_r38", "jgate_r42"]],
   ["Johto: Mahogany Town and the Lake of Rage", ["jgate_r43s", "jgate_r43n"]],
+  ["Johto: Mt. Silver", ["silver_cave_room_1", "silver_cave_room_2", "silver_cave_room_3", "silver_cave_item_rooms"]],
 ];
 // (Words a place is known by that aren't in its name: the tower John called Kanto's Radio Tower.)
 const MENU_ALSO = { pokemon_tower: "radio tower ghost marowak channeler graves", rocket_hideout: "team rocket giovanni", ss_anne: "ship boat cruise",
   indigo_plateau: "elite four league champion", loreleis_room: "elite four", brunos_room: "elite four", agathas_room: "elite four", lances_room: "elite four",
+  arena_rocky: "route 3 route 4 route 9 mt moon", arena_river: "route 10 rock tunnel water", arena_bridge: "route 24 route 25 nugget bridge cerulean",
+  arena_cycling: "route 16 route 18 bike bicycle", arena_cycling_sea: "route 17 bike bicycle beach", arena_route: "route 1 route 2 route 22 meadow",
   champions_room: "elite four rival", silph_co: "office company", game_corner: "slots casino", celadon_mart: "dept store department shop", arena: "battle",
-  jgate: "gatehouse gate", gate_: "gatehouse", bills_house: "bill sea cottage", lab: "oak professor", house1: "home mum mom", house2: "home bedroom" };
+  jgate: "gatehouse gate", gate_: "gatehouse", silver_cave: "mt mount silver red summit", bills_house: "bill sea cottage", lab: "oak professor", house1: "home mum mom", house2: "home bedroom" };
 function menuPlaces() {
   const byId = new Map(PLACES.map(p => [p.id, p])), used = new Set(), out = [];
   for (const [label, ids] of MENU_ORDER) for (const id of ids) { const p = byId.get(id); if (p && !used.has(id)) { used.add(id); out.push([label, p]); } }
@@ -628,7 +631,7 @@ function fillRoomPick(query) {
   for (const [label, p] of menuPlaces()) {
     if (words.length) { const t = menuText(label, p); if (!words.every(w => t.includes(w))) continue; }
     if (label !== gname) { og = document.createElement("optgroup"); og.label = label; rp.appendChild(og); gname = label; }
-    const o = document.createElement("option"); o.value = p.id; o.textContent = `${p.name} (${p.floor.toLowerCase()})`; og.appendChild(o);
+    const o = document.createElement("option"); o.value = p.id; o.textContent = `${p.name} (${String(p.floor || "").toLowerCase()})`; og.appendChild(o);
     n++; if (!first) first = p.id;
   }
   if (keep && [...rp.options].some(o => o.value === keep)) rp.value = keep;

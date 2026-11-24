@@ -35,23 +35,26 @@ DOORS = {
     "digletts_cave_s": {"room": "digletts_s", "door": [[-291, 31, 580], [-290, 31, 580]], "out": [-290.0, 31.0, 583.6]},
 }
 # Where the cave's ladders are (B1F), and where you come out at the foot of each.
-B1F_LADDER_NW = dict(x0=6, x1=8, z0=6, z1=7)
-B1F_LADDER_SE = dict(x0=164, x1=166, z0=142, z1=143)
-B1F_FROM_N = {"x": 6.9, "z": 7.8, "yaw": 0.0}
-B1F_FROM_S = {"x": 164.9, "z": 143.8, "yaw": 0.0}
+# (0.61, John's 18:10) His new copies are the same cave with a border of rock round it, four blocks deep on the west and
+# north (and the east, and the entrances' south): every spot placed by hand here moves four east and four south (P).
+P = 4
+B1F_LADDER_NW = dict(x0=6 + P, x1=8 + P, z0=6 + P, z1=7 + P)
+B1F_LADDER_SE = dict(x0=164 + P, x1=166 + P, z0=142 + P, z1=143 + P)
+B1F_FROM_N = {"x": 6.9 + P, "z": 7.8 + P, "yaw": 0.0}
+B1F_FROM_S = {"x": 164.9 + P, "z": 143.8 + P, "yaw": 0.0}
 # In an entrance room: in from the doorway (facing north), and up from the ladder (beside the hole, facing south).
-ENTRANCE_IN = {"x": 9.0, "z": 12.6, "yaw": 180.0}
-ENTRANCE_UP = {"x": 12.9, "z": 11.0, "yaw": 0.0}
-ENTRANCE_DOOR = dict(x0=8.0, x1=10.0, z=14.3)
+ENTRANCE_IN = {"x": 9.0 + P, "z": 12.6 + P, "yaw": 180.0}
+ENTRANCE_UP = {"x": 12.9 + P, "z": 11.0 + P, "yaw": 0.0}
+ENTRANCE_DOOR = dict(x0=8.0 + P, x1=10.0 + P, z=14.3 + P)
 
 ROOMS = [
     # id, schematic, origin, floor (the schematic's y you stand at), name, place, people
     ("digletts_n", "digletts_cave_north_entrance.schem", (4352, 64, 0), 3, "Diglett's Cave", "digletts_cave_route_2",
-     [{"key": "digletts_cave_route_2_p0", "name": "FISHING GURU", "skin": "fishing_guru", "x": 6.5, "z": 9.5, "yaw": 270.0,
+     [{"key": "digletts_cave_route_2_p0", "name": "FISHING GURU", "skin": "fishing_guru", "x": 6.5 + P, "z": 9.5 + P, "yaw": 270.0,
        "lines": ["I went to ROCK TUNNEL, but it's dark and scary.", "If a POKéMON's FLASH could light it up..."]}]),
     ("digletts_b1f", "digletts_cave_b1f.schem", (4608, 64, 0), 2, "Diglett's Cave", "digletts_cave", []),
     ("digletts_s", "digletts_cave_south_entrance.schem", (4864, 64, 0), 3, "Diglett's Cave", "digletts_cave_route_11",
-     [{"key": "digletts_cave_route_11_p0", "name": "GAMBLER", "skin": "gambler", "x": 6.5, "z": 10.5, "yaw": 270.0,
+     [{"key": "digletts_cave_route_11_p0", "name": "GAMBLER", "skin": "gambler", "x": 6.5 + P, "z": 10.5 + P, "yaw": 270.0,
        "lines": ["What a surprise! DIGLETTs dug this long tunnel!", "It goes right to VIRIDIAN CITY!"]}]),
 ]
 # The cave's dust in the air (the client's haze over the screen, and motes drifting about): its colour and how thick.
@@ -96,11 +99,11 @@ def main():
         if rid != "digletts_b1f":
             # (The way out at the south, 14:15: daylight at the end of the doorway, so you don't walk off into the dark,
             # and its light coming in.)
-            for x in (8, 9):
+            for x in (8 + P, 9 + P):
                 for y in (3, 4, 5):
-                    names[(y * L + 15) * W + x] = "minecraft:white_concrete"
-                names[(3 * L + 14) * W + x] = "minecraft:light[level=15,waterlogged=false]"
-                names[(4 * L + 12) * W + x] = "minecraft:light[level=11,waterlogged=false]"
+                    names[(y * L + 15 + P) * W + x] = "minecraft:white_concrete"
+                names[(3 * L + 14 + P) * W + x] = "minecraft:light[level=15,waterlogged=false]"
+                names[(4 * L + 12 + P) * W + x] = "minecraft:light[level=11,waterlogged=false]"
 
         def base(x, y, z):
             if not (0 <= x < W and 0 <= y < H and 0 <= z < L): return "air"
@@ -152,14 +155,14 @@ def main():
         else:
             door = "digletts_cave_n" if rid == "digletts_n" else "digletts_cave_s"
             warps = [{"kind": "mat", "x0": ENTRANCE_DOOR["x0"], "x1": ENTRANCE_DOOR["x1"], "z": ENTRANCE_DOOR["z"], "door": door, "to": None},
-                     {"kind": "down", "x0": 11.0, "z0": 7.0, "z1": 10.0, "to": "digletts_b1f", "spawn": B1F_FROM_N if rid == "digletts_n" else B1F_FROM_S}]
+                     {"kind": "down", "x0": 11.0 + P, "z0": 7.0 + P, "z1": 10.0 + P, "to": "digletts_b1f", "spawn": B1F_FROM_N if rid == "digletts_n" else B1F_FROM_S}]
             spawn = ENTRANCE_IN
         for p in people: assert open_(int(p["x"]), int(p["z"])), (rid, p["key"])
         for s in (spawn, ENTRANCE_UP if rid != "digletts_b1f" else B1F_FROM_S):
             assert open_(int(s["x"]), int(s["z"])), (rid, s)
         acts = []
         if rid != "digletts_b1f":
-            acts.append({"rect": [11.6, 7.6, 14.4, 10.2], "label": "Look", "lines": ["A ladder going down into DIGLETT's CAVE."]})
+            acts.append({"rect": [11.6 + P, 7.6 + P, 14.4 + P, 10.2 + P], "label": "Look", "lines": ["A ladder going down into DIGLETT's CAVE."]})
         rooms[rid] = {
             "origin": list(origin), "W": W, "D": L, "H": H - floor, "name": name, "floor": "", "place": place,
             "schem": rid + ".bin", "base": -floor, "dark": True, "haze": HAZE,
