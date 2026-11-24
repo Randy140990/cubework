@@ -1,0 +1,72 @@
+{
+ "idle": "animation.rimeclaw.battle_idle",
+ "ground": "animation.rimeclaw.ground_idle",
+ "actions": {
+  "cry": "animation.rimeclaw.cry",
+  "recoil": "animation.rimeclaw.recoil",
+  "attack": "animation.rimeclaw.attack",
+  "critical": "animation.rimeclaw.critical",
+  "special": "animation.rimeclaw.special",
+  "recall": "animation.rimeclaw.recall",
+  "sendout": "animation.rimeclaw.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.rimeclaw.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.rimeclaw.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.rimeclaw.faint",
+   "parts": []
+  }
+ },
+ "move": "ICY WIND",
+ "attack_move": "QUICK ATTACK",
+ "scale": 1.011,
+ "height": 0.89,
+ "texture": "retromon:textures/mons/sneasel.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/sneasel_glow_0.png",
+    "retromon:textures/mons/sneasel_glow_1.png",
+    "retromon:textures/mons/sneasel_glow_2.png",
+    "retromon:textures/mons/sneasel_glow_3.png",
+    "retromon:textures/mons/sneasel_glow_4.png",
+    "retromon:textures/mons/sneasel_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "RIMECLAW",
+ "anchors": {
+  "mouth": [
+   0,
+   8.88,
+   -14.3
+  ],
+  "back": [
+   0,
+   13.4,
+   0.1
+  ],
+  "body": [
+   0,
+   6.82,
+   0.1
+  ],
+  "size": [
+   9.25,
+   14.24,
+   27.16
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

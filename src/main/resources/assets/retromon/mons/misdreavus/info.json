@@ -1,0 +1,72 @@
+{
+ "idle": "animation.keenbell.battle_idle",
+ "ground": "animation.keenbell.ground_idle",
+ "actions": {
+  "cry": "animation.keenbell.cry",
+  "recoil": "animation.keenbell.recoil",
+  "attack": "animation.keenbell.attack",
+  "critical": "animation.keenbell.critical",
+  "special": "animation.keenbell.special",
+  "recall": "animation.keenbell.recall",
+  "sendout": "animation.keenbell.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.keenbell.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.keenbell.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.keenbell.faint",
+   "parts": []
+  }
+ },
+ "move": "CONFUSE RAY",
+ "attack_move": "ASTONISH",
+ "scale": 0.644,
+ "height": 1.087,
+ "texture": "retromon:textures/mons/misdreavus.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/misdreavus_glow_0.png",
+    "retromon:textures/mons/misdreavus_glow_1.png",
+    "retromon:textures/mons/misdreavus_glow_2.png",
+    "retromon:textures/mons/misdreavus_glow_3.png",
+    "retromon:textures/mons/misdreavus_glow_4.png",
+    "retromon:textures/mons/misdreavus_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "KEENBELL",
+ "anchors": {
+  "mouth": [
+   0,
+   7.6,
+   -4.5
+  ],
+  "back": [
+   0,
+   18.4,
+   0.0
+  ],
+  "body": [
+   0,
+   14.2,
+   0.0
+  ],
+  "size": [
+   8.0,
+   17.4,
+   8.3
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

@@ -56,7 +56,7 @@ def quad(sid, name, stands, o):
     below = o.get("below", top + 1.6)
     base = fur(FUR, FUR_L, FUR_D, belly=BELLY, below=below * s, speck=o.get("speck", 0.35))
     coat = o.get("coat")
-    furm = Mat(FUR, (lambda a: first(coat(a, base), base, a)) if coat else base, noise=0.02)
+    furm = Mat(FUR, (lambda a: first(coat(a, base), base, a)) if coat else base, glow=o.get("glow"), noise=0.02)
     hw, hh, hl = o.get("head", (5, 4.4, 4.6))
     snout = o.get("snout", 1.6)
     FACE = o.get("FACE", BELLY)

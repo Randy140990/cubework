@@ -1,0 +1,72 @@
+{
+ "idle": "animation.spectacub.battle_idle",
+ "ground": "animation.spectacub.ground_idle",
+ "actions": {
+  "cry": "animation.spectacub.cry",
+  "recoil": "animation.spectacub.recoil",
+  "attack": "animation.spectacub.attack",
+  "critical": "animation.spectacub.critical",
+  "special": "animation.spectacub.special",
+  "recall": "animation.spectacub.recall",
+  "sendout": "animation.spectacub.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.spectacub.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.spectacub.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.spectacub.faint",
+   "parts": []
+  }
+ },
+ "move": "SWEET SCENT",
+ "attack_move": "SCRATCH",
+ "scale": 0.624,
+ "height": 0.962,
+ "texture": "retromon:textures/mons/teddiursa.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/teddiursa_glow_0.png",
+    "retromon:textures/mons/teddiursa_glow_1.png",
+    "retromon:textures/mons/teddiursa_glow_2.png",
+    "retromon:textures/mons/teddiursa_glow_3.png",
+    "retromon:textures/mons/teddiursa_glow_4.png",
+    "retromon:textures/mons/teddiursa_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SPECTACUB",
+ "anchors": {
+  "mouth": [
+   0,
+   9.0,
+   -5.2
+  ],
+  "back": [
+   0,
+   16.4,
+   -0.2
+  ],
+  "body": [
+   0,
+   6.0,
+   -0.2
+  ],
+  "size": [
+   12.0,
+   15.4,
+   7.7
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

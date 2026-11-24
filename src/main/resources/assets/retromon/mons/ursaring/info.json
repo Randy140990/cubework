@@ -1,0 +1,72 @@
+{
+ "idle": "animation.spectabear.battle_idle",
+ "ground": "animation.spectabear.ground_idle",
+ "actions": {
+  "cry": "animation.spectabear.cry",
+  "recoil": "animation.spectabear.recoil",
+  "attack": "animation.spectabear.attack",
+  "critical": "animation.spectabear.critical",
+  "special": "animation.spectabear.special",
+  "recall": "animation.spectabear.recall",
+  "sendout": "animation.spectabear.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.spectabear.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.spectabear.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.spectabear.faint",
+   "parts": []
+  }
+ },
+ "move": "SCARY FACE",
+ "attack_move": "SLASH",
+ "scale": 0.735,
+ "height": 2.45,
+ "texture": "retromon:textures/mons/ursaring.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/ursaring_glow_0.png",
+    "retromon:textures/mons/ursaring_glow_1.png",
+    "retromon:textures/mons/ursaring_glow_2.png",
+    "retromon:textures/mons/ursaring_glow_3.png",
+    "retromon:textures/mons/ursaring_glow_4.png",
+    "retromon:textures/mons/ursaring_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SPECTABEAR",
+ "anchors": {
+  "mouth": [
+   0,
+   25.2,
+   -10.9
+  ],
+  "back": [
+   0,
+   40.2,
+   -0.4
+  ],
+  "body": [
+   0,
+   16.9,
+   -0.4
+  ],
+  "size": [
+   29.8,
+   39.2,
+   17.4
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

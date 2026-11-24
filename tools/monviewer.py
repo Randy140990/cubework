@@ -23,10 +23,10 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Platypuses", ["psyduck", "golduck"]), ("Maned wolves", ["growlithe", "arcanine"]), ("Frogs", ["poliwag", "poliwhirl", "poliwrath", "politoed"]),
             ("Tarsiers", ["abra", "kadabra", "alakazam"]), ("Gorillas", ["machop", "machoke", "machamp"]),
             ("Flytraps", ["bellsprout", "weepinbell", "victreebel"]), ("Sail jellies", ["tentacool", "tentacruel"]), ("Geodes", ["geodude", "graveler", "golem"]),
-            ("Fire deer", ["ponyta", "rapidash"]), ("Salamanders", ["slowpoke", "slowbro"]),
+            ("Fire deer", ["ponyta", "rapidash"]), ("Salamanders", ["slowpoke", "slowbro", "slowking"]),
             ("Bolt nuts", ["magnemite", "magneton"]), ("Kingfisher", ["farfetch_d"]), ("Cassowaries", ["doduo", "dodrio"]), ("Ice seals", ["seel", "dewgong"]),
             ("Bog slimes", ["grimer", "muk"]), ("Shells", ["shellder", "cloyster"]), ("Shadow lanterns", ["gastly", "haunter", "gengar"]),
-            ("Basalt wyrm", ["onix"]), ("Koalas", ["drowzee", "hypno"]), ("Fiddler crabs", ["krabby", "kingler"]), ("Bulbs", ["voltorb", "electrode"]),
+            ("Basalt wyrms", ["onix", "steelix"]), ("Koalas", ["drowzee", "hypno"]), ("Fiddler crabs", ["krabby", "kingler"]), ("Bulbs", ["voltorb", "electrode"]),
             ("Acorns", ["exeggcute", "exeggutor"]), ("Skull jackals", ["cubone", "marowak"]), ("Kangaroo", ["hitmonlee"]), ("Mantis shrimp", ["hitmonchan"]),
             ("Chameleon", ["lickitung"]), ("Puffballs", ["koffing", "weezing"]), ("Ankylosaurs", ["rhyhorn", "rhydon"]), ("Mother hen", ["chansey"]),
             ("Vine ball", ["tangela"]), ("Anteater", ["kangaskhan"]), ("Sea dragons", ["horsea", "seadra"]), ("Fighting fish", ["goldeen", "seaking"]),
@@ -37,7 +37,12 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
             ("Fireflies", ["ledyba", "ledian"]), ("Net-casting spiders", ["spinarak", "ariados"]), ("Torpedo rays", ["chinchou", "lanturn"]),
             ("Doves", ["togepi", "togetic"]), ("Hoopoes", ["natu", "xatu"]), ("Storm alpacas", ["mareep", "flaaffy", "ampharos"]),
             ("Water voles", ["marill", "azumarill"]), ("Stump tortoise", ["sudowoodo"]), ("Maple keys", ["hoppip", "skiploom", "jumpluff"]),
-            ("Kinkajou", ["aipom"]), ("Sunchokes", ["sunkern", "sunflora"]), ("Emperor darner", ["yanma"]), ("Mudskippers", ["wooper", "quagsire"])]
+            ("Kinkajou", ["aipom"]), ("Sunchokes", ["sunkern", "sunflora"]), ("Emperor darner", ["yanma"]), ("Mudskippers", ["wooper", "quagsire"]),
+            ("Genets", ["espeon", "umbreon"]), ("Magpie", ["murkrow"]), ("Ghost bellflower", ["misdreavus"]), ("Rune pebbles", ["unown"]),
+            ("Blobfish", ["wobbuffet"]), ("Okapi", ["girafarig"]), ("Pill bugs", ["pineco", "forretress"]), ("Slow worm", ["dunsparce"]),
+            ("Flying lizard", ["gligar"]), ("Warthogs", ["snubbull", "granbull"]), ("Lionfish", ["qwilfish"]), ("Pincer beetle", ["scizor"]),
+            ("Caddis grub", ["shuckle"]), ("Stag beetle", ["heracross"]), ("Wolverine", ["sneasel"]), ("Spectacled bears", ["teddiursa", "ursaring"]),
+            ("Fire sea slugs", ["slugma", "magcargo"])]
 KEEP = ("idle", "ground")
 
 

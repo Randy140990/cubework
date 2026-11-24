@@ -1,0 +1,72 @@
+{
+ "idle": "animation.burrball.battle_idle",
+ "ground": "animation.burrball.ground_idle",
+ "actions": {
+  "cry": "animation.burrball.cry",
+  "recoil": "animation.burrball.recoil",
+  "attack": "animation.burrball.attack",
+  "critical": "animation.burrball.critical",
+  "special": "animation.burrball.special",
+  "recall": "animation.burrball.recall",
+  "sendout": "animation.burrball.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.burrball.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.burrball.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.burrball.faint",
+   "parts": []
+  }
+ },
+ "move": "SELFDESTRUCT",
+ "attack_move": "TACKLE",
+ "scale": 2.0,
+ "height": 0.3,
+ "texture": "retromon:textures/mons/pineco.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/pineco_glow_0.png",
+    "retromon:textures/mons/pineco_glow_1.png",
+    "retromon:textures/mons/pineco_glow_2.png",
+    "retromon:textures/mons/pineco_glow_3.png",
+    "retromon:textures/mons/pineco_glow_4.png",
+    "retromon:textures/mons/pineco_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BURRBALL",
+ "anchors": {
+  "mouth": [
+   0,
+   1.0,
+   -4.7
+  ],
+  "back": [
+   0,
+   5.8,
+   -0.9
+  ],
+  "body": [
+   0,
+   2.8,
+   -0.9
+  ],
+  "size": [
+   7.0,
+   4.8,
+   29.0
+  ]
+ },
+ "stage": 1,
+ "parts": []
+}

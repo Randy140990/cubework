@@ -1,0 +1,72 @@
+{
+ "idle": "animation.ironburr.battle_idle",
+ "ground": "animation.ironburr.ground_idle",
+ "actions": {
+  "cry": "animation.ironburr.cry",
+  "recoil": "animation.ironburr.recoil",
+  "attack": "animation.ironburr.attack",
+  "critical": "animation.ironburr.critical",
+  "special": "animation.ironburr.special",
+  "recall": "animation.ironburr.recall",
+  "sendout": "animation.ironburr.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.ironburr.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.ironburr.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.ironburr.faint",
+   "parts": []
+  }
+ },
+ "move": "SPIKES",
+ "attack_move": "RAPID SPIN",
+ "scale": 2.609,
+ "height": 0.46,
+ "texture": "retromon:textures/mons/forretress.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/forretress_glow_0.png",
+    "retromon:textures/mons/forretress_glow_1.png",
+    "retromon:textures/mons/forretress_glow_2.png",
+    "retromon:textures/mons/forretress_glow_3.png",
+    "retromon:textures/mons/forretress_glow_4.png",
+    "retromon:textures/mons/forretress_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "IRONBURR",
+ "anchors": {
+  "mouth": [
+   0,
+   1.7,
+   -7.64
+  ],
+  "back": [
+   0,
+   8.36,
+   -1.08
+  ],
+  "body": [
+   0,
+   4.36,
+   -1.08
+  ],
+  "size": [
+   12.0,
+   7.36,
+   27.1
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

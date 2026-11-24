@@ -1,0 +1,72 @@
+{
+ "idle": "animation.slowwyrm.battle_idle",
+ "ground": "animation.slowwyrm.ground_idle",
+ "actions": {
+  "cry": "animation.slowwyrm.cry",
+  "recoil": "animation.slowwyrm.recoil",
+  "attack": "animation.slowwyrm.attack",
+  "critical": "animation.slowwyrm.critical",
+  "special": "animation.slowwyrm.special",
+  "recall": "animation.slowwyrm.recall",
+  "sendout": "animation.slowwyrm.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.slowwyrm.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.slowwyrm.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.slowwyrm.faint",
+   "parts": []
+  }
+ },
+ "move": "DEFENSE CURL",
+ "attack_move": "GLARE",
+ "scale": 5.814,
+ "height": 0.258,
+ "texture": "retromon:textures/mons/dunsparce.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/dunsparce_glow_0.png",
+    "retromon:textures/mons/dunsparce_glow_1.png",
+    "retromon:textures/mons/dunsparce_glow_2.png",
+    "retromon:textures/mons/dunsparce_glow_3.png",
+    "retromon:textures/mons/dunsparce_glow_4.png",
+    "retromon:textures/mons/dunsparce_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SLOWWYRM",
+ "anchors": {
+  "mouth": [
+   0,
+   1.04,
+   -14.54
+  ],
+  "back": [
+   0,
+   5.13,
+   -0.62
+  ],
+  "body": [
+   0,
+   2.0,
+   -0.62
+  ],
+  "size": [
+   4.56,
+   4.13,
+   46.38
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

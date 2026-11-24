@@ -1,0 +1,72 @@
+{
+ "idle": "animation.bristlehog.battle_idle",
+ "ground": "animation.bristlehog.ground_idle",
+ "actions": {
+  "cry": "animation.bristlehog.cry",
+  "recoil": "animation.bristlehog.recoil",
+  "attack": "animation.bristlehog.attack",
+  "critical": "animation.bristlehog.critical",
+  "special": "animation.bristlehog.special",
+  "recall": "animation.bristlehog.recall",
+  "sendout": "animation.bristlehog.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.bristlehog.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.bristlehog.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.bristlehog.faint",
+   "parts": []
+  }
+ },
+ "move": "ROAR",
+ "attack_move": "BITE",
+ "scale": 1.022,
+ "height": 1.37,
+ "texture": "retromon:textures/mons/granbull.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/granbull_glow_0.png",
+    "retromon:textures/mons/granbull_glow_1.png",
+    "retromon:textures/mons/granbull_glow_2.png",
+    "retromon:textures/mons/granbull_glow_3.png",
+    "retromon:textures/mons/granbull_glow_4.png",
+    "retromon:textures/mons/granbull_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "BRISTLEHOG",
+ "anchors": {
+  "mouth": [
+   0,
+   12.48,
+   -21.14
+  ],
+  "back": [
+   0,
+   19.76,
+   -0.2
+  ],
+  "body": [
+   0,
+   12.26,
+   -0.2
+  ],
+  "size": [
+   12.34,
+   21.92,
+   35.84
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

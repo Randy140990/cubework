@@ -1,0 +1,80 @@
+{
+ "idle": "animation.pilferpie.ground_idle",
+ "ground": "animation.pilferpie.ground_idle",
+ "actions": {
+  "cry": "animation.pilferpie.cry",
+  "recoil": "animation.pilferpie.recoil",
+  "attack": "animation.pilferpie.attack",
+  "critical": "animation.pilferpie.critical",
+  "special": "animation.pilferpie.special",
+  "recall": "animation.pilferpie.recall",
+  "sendout": "animation.pilferpie.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.pilferpie.ground_walk",
+   "parts": []
+  },
+  "fly": {
+   "anim": "animation.pilferpie.air_fly",
+   "parts": []
+  },
+  "hover": {
+   "anim": "animation.pilferpie.air_hover",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.pilferpie.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.pilferpie.faint",
+   "parts": []
+  }
+ },
+ "move": "FAINT ATTACK",
+ "attack_move": "PECK",
+ "scale": 0.633,
+ "height": 0.79,
+ "texture": "retromon:textures/mons/murkrow.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/murkrow_glow_0.png",
+    "retromon:textures/mons/murkrow_glow_1.png",
+    "retromon:textures/mons/murkrow_glow_2.png",
+    "retromon:textures/mons/murkrow_glow_3.png",
+    "retromon:textures/mons/murkrow_glow_4.png",
+    "retromon:textures/mons/murkrow_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "PILFERPIE",
+ "anchors": {
+  "mouth": [
+   0,
+   9.54,
+   -9.5
+  ],
+  "back": [
+   0,
+   13.64,
+   0.0
+  ],
+  "body": [
+   0,
+   6.0,
+   0.0
+  ],
+  "size": [
+   7.4,
+   12.64,
+   24.0
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

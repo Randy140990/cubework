@@ -1,0 +1,72 @@
+{
+ "idle": "animation.sagemander.battle_idle",
+ "ground": "animation.sagemander.ground_idle",
+ "actions": {
+  "cry": "animation.sagemander.cry",
+  "recoil": "animation.sagemander.recoil",
+  "attack": "animation.sagemander.attack",
+  "critical": "animation.sagemander.critical",
+  "special": "animation.sagemander.special",
+  "recall": "animation.sagemander.recall",
+  "sendout": "animation.sagemander.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.sagemander.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.sagemander.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.sagemander.faint",
+   "parts": []
+  }
+ },
+ "move": "PSYCHIC",
+ "attack_move": "HEADBUTT",
+ "scale": 1.025,
+ "height": 1.951,
+ "texture": "retromon:textures/mons/slowking.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/slowking_glow_0.png",
+    "retromon:textures/mons/slowking_glow_1.png",
+    "retromon:textures/mons/slowking_glow_2.png",
+    "retromon:textures/mons/slowking_glow_3.png",
+    "retromon:textures/mons/slowking_glow_4.png",
+    "retromon:textures/mons/slowking_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "SAGEMANDER",
+ "anchors": {
+  "mouth": [
+   0,
+   18.66,
+   -4.98
+  ],
+  "back": [
+   0,
+   32.21,
+   -0.25
+  ],
+  "body": [
+   0,
+   12.32,
+   -0.25
+  ],
+  "size": [
+   16.11,
+   31.21,
+   23.69
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}

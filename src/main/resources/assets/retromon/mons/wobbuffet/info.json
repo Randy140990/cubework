@@ -1,0 +1,72 @@
+{
+ "idle": "animation.glumfish.battle_idle",
+ "ground": "animation.glumfish.ground_idle",
+ "actions": {
+  "cry": "animation.glumfish.cry",
+  "recoil": "animation.glumfish.recoil",
+  "attack": "animation.glumfish.attack",
+  "critical": "animation.glumfish.critical",
+  "special": "animation.glumfish.special",
+  "recall": "animation.glumfish.recall",
+  "sendout": "animation.glumfish.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.glumfish.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.glumfish.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.glumfish.faint",
+   "parts": []
+  }
+ },
+ "move": "MIRROR COAT",
+ "attack_move": "COUNTER",
+ "scale": 1.486,
+ "height": 0.875,
+ "texture": "retromon:textures/mons/wobbuffet.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/wobbuffet_glow_0.png",
+    "retromon:textures/mons/wobbuffet_glow_1.png",
+    "retromon:textures/mons/wobbuffet_glow_2.png",
+    "retromon:textures/mons/wobbuffet_glow_3.png",
+    "retromon:textures/mons/wobbuffet_glow_4.png",
+    "retromon:textures/mons/wobbuffet_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "GLUMFISH",
+ "anchors": {
+  "mouth": [
+   0,
+   3.52,
+   -8.82
+  ],
+  "back": [
+   0,
+   15.0,
+   -0.22
+  ],
+  "body": [
+   0,
+   7.0,
+   -0.22
+  ],
+  "size": [
+   17.0,
+   14.0,
+   19.08
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

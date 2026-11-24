@@ -1,0 +1,72 @@
+{
+ "idle": "animation.ironwyrm.battle_idle",
+ "ground": "animation.ironwyrm.ground_idle",
+ "actions": {
+  "cry": "animation.ironwyrm.cry",
+  "recoil": "animation.ironwyrm.recoil",
+  "attack": "animation.ironwyrm.attack",
+  "critical": "animation.ironwyrm.critical",
+  "special": "animation.ironwyrm.special",
+  "recall": "animation.ironwyrm.recall",
+  "sendout": "animation.ironwyrm.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.ironwyrm.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.ironwyrm.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.ironwyrm.faint",
+   "parts": []
+  }
+ },
+ "move": "ROCK SLIDE",
+ "attack_move": "IRON TAIL",
+ "scale": 2.671,
+ "height": 1.123,
+ "texture": "retromon:textures/mons/steelix.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/steelix_glow_0.png",
+    "retromon:textures/mons/steelix_glow_1.png",
+    "retromon:textures/mons/steelix_glow_2.png",
+    "retromon:textures/mons/steelix_glow_3.png",
+    "retromon:textures/mons/steelix_glow_4.png",
+    "retromon:textures/mons/steelix_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "IRONWYRM",
+ "anchors": {
+  "mouth": [
+   0,
+   3.84,
+   -48.5
+  ],
+  "back": [
+   0,
+   13.53,
+   -2.2
+  ],
+  "body": [
+   0,
+   6.97,
+   -2.2
+  ],
+  "size": [
+   18.44,
+   17.96,
+   140.64
+  ]
+ },
+ "stage": 3,
+ "parts": []
+}
