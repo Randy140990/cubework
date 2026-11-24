@@ -134,8 +134,21 @@ public final class AreaLooks {
 		for (Map<String, Rule> m : RULES.values()) for (Rule r : m.values()) r.index();
 	}
 
+	/**
+	 * (0.59.6, 13:17: "I keep providing the same updates and they're not being done") The looks made for each block state
+	 * at the last bake, in the order they were put on, so they can be put back on top when another mod's model ends up
+	 * drawing over ours (the pillars and cliffs that kept showing their stripped logs, whatever their rows said).
+	 */
+	private record Made(Look look, Rule rule, List<Rule> rivals) {}
+
+	private static final Map<BlockState, List<Made>> MADE = new java.util.concurrent.ConcurrentHashMap<>();
+	/** Our own phase, after everyone's wrapping (WRAP_LAST_PHASE): ours is the outermost model when the game bakes. */
+	private static final Identifier ON_TOP = Retromon.id("area_looks_on_top");
+
 	public static void register() {
 		ModelLoadingPlugin.register(ctx -> {
+			MADE.clear();
+			ctx.modifyBlockModelAfterBake().addPhaseOrdering(ModelModifier.WRAP_LAST_PHASE, ON_TOP);
 			for (Direction d : Direction.Plane.HORIZONTAL) {
 				for (String part : new String[] {"l", "r", "m", "s"}) {
 					for (String row : new String[] {"board", "stand", "short"}) part(ctx, row + "_" + part + "_" + d.getSerializedName(),
@@ -165,7 +178,7 @@ public final class AreaLooks {
 			// (0.57) The INDIGO PLATEAU's statues as Victory Road's (a stone POKe BALL), the Cinnabar Lab's solar panels.
 			part(ctx, "prop_ball_statue", "block/area/prop_ball_statue");
 			part(ctx, "prop_solar", "block/area/prop_solar");
-			ctx.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, c) -> {
+			ctx.modifyBlockModelAfterBake().register(ON_TOP, (model, c) -> {
 				Map<String, Rule> looks = RULES.get(c.state().getBlock());
 				if (looks == null) return model;
 					BlockStateModel out = model;
@@ -176,15 +189,56 @@ public final class AreaLooks {
 				// band's look covers the whole town, and a planter in a small box isn't a sign because the town's are.)
 				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("panel") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy") || rule.look().equals("leafy_hedge")
 						|| rule.look().equals("sign") || rule.look().equals("sign_o") || rule.look().equals("sign_b") || rule.look().equals("keep") || rule.look().equals("hide") || rule.look().equals("cube")) swaps.add(rule);
+				List<Made> made = new ArrayList<>();
 				for (Rule rule : looks.values()) {
 					Look look = make(rule, c.baker());
 					List<Rule> rivals = new ArrayList<>();
 					if (swaps.contains(rule)) for (Rule o : swaps) if (o != rule) rivals.add(o);
-					if (look != null) out = new Wrapped(out, look, rule, List.copyOf(rivals));
+					if (look != null) {
+						out = new Wrapped(out, look, rule, List.copyOf(rivals));
+						made.add(new Made(look, rule, List.copyOf(rivals)));
+					}
 				}
+				if (!made.isEmpty()) MADE.put(c.state(), List.copyOf(made));
 				return out;
 			});
 		});
+	}
+
+	private static int checkTicks;
+	private static boolean reported;
+
+	/**
+	 * (0.59.6) Every two seconds: is our model still the one the game draws for each block state with a look? A mod that
+	 * swaps models in after the bake (connected textures and the like) can put its own over ours, and then the block is
+	 * drawn as it always was wherever its rows say otherwise. Any state where that's happened gets ours put back on top
+	 * (around whatever's there now, so that mod's own drawing still shows everywhere else), and the map's redrawn. The
+	 * log says which mod's model it was ("Retromon looks: ...").
+	 */
+	public static void keepOnTop(Minecraft mc) {
+		if (mc.level == null || MADE.isEmpty() || ++checkTicks % 40 != 0) return;
+		net.minecraft.client.renderer.block.BlockModelShaper shaper = mc.getModelManager().getBlockModelShaper();
+		List<BlockState> under = new ArrayList<>();
+		for (BlockState s : MADE.keySet()) if (!(shaper.getBlockModel(s) instanceof Wrapped)) under.add(s);
+		if (under.isEmpty()) {
+			if (!reported) Retromon.LOG.info("Retromon looks: ours are drawn for all {} block states with a look", MADE.size());
+			reported = true;
+			return;
+		}
+		Map<BlockState, BlockStateModel> all = new HashMap<>();
+		for (BlockState s : Block.BLOCK_STATE_REGISTRY) all.put(s, shaper.getBlockModel(s));
+		List<String> which = new ArrayList<>();
+		for (BlockState s : under) {
+			BlockStateModel out = all.get(s);
+			if (which.size() < 8) which.add(s + " (" + (out == null ? "none" : out.getClass().getName()) + ")");
+			if (out == null) continue;
+			for (Made m : MADE.get(s)) out = new Wrapped(out, m.look(), m.rule(), m.rivals());
+			all.put(s, out);
+		}
+		shaper.replaceCache(all);
+		mc.levelRenderer.allChanged();
+		reported = false;
+		Retromon.LOG.info("Retromon looks: {} block states were drawn by another mod's model over ours; ours are back on top: {}", under.size(), which);
 	}
 
 	/** The leaves with Shards' extra leaves (0.50): their names without "_leaves". */
@@ -267,7 +321,12 @@ public final class AreaLooks {
 			// (0.59.4, 07:31: Route 12's and Route 16's pillars "still using a stripped", their swap set) A full block drawn
 			// in our own texture whatever picture it had ("top|side" or one for all): nothing of its old one can show.
 			case "cube" -> {
-				String[] p = rule.swaps().split("\\|");
+				// ("top|side@4": laid over four blocks, as a swap's can be, for a cliff's rock.)
+				String spec = rule.swaps();
+				int at = spec.indexOf('@');
+				int period = at < 0 ? 0 : Integer.parseInt(spec.substring(at + 1).trim());
+				if (at >= 0) spec = spec.substring(0, at);
+				String[] p = spec.split("\\|");
 				TextureAtlasSprite top = sprite(baker, p[0].trim()), side = p.length > 1 ? sprite(baker, p[1].trim()) : top;
 				yield (base, e, view, pos, state, random, cull) -> {
 					for (Direction d : Direction.values()) {
@@ -275,6 +334,24 @@ public final class AreaLooks {
 						e.square(d, 0, 0, 1, 1, 0);
 						float[] ss = new float[4], tt = new float[4];
 						for (int i = 0; i < 4; i++) {
+							if (period > 0) {
+								float wx = pos.getX() + e.x(i), wy = pos.getY() + e.y(i), wz = pos.getZ() + e.z(i);
+								switch (d.getAxis()) {
+									case Y -> {
+										ss[i] = wx / period;
+										tt[i] = wz / period;
+									}
+									case Z -> {
+										ss[i] = wx / period;
+										tt[i] = -wy / period;
+									}
+									default -> {
+										ss[i] = wz / period;
+										tt[i] = -wy / period;
+									}
+								}
+								continue;
+							}
 							switch (d.getAxis()) {
 								case Y -> {
 									ss[i] = e.x(i);
@@ -291,6 +368,14 @@ public final class AreaLooks {
 							}
 						}
 						TextureAtlasSprite t = d.getAxis() == Direction.Axis.Y ? top : side;
+						if (period > 0) {
+							float s0 = (float) Math.floor(Math.min(Math.min(ss[0], ss[1]), Math.min(ss[2], ss[3])) + 1e-3F);
+							float t0 = (float) Math.floor(Math.min(Math.min(tt[0], tt[1]), Math.min(tt[2], tt[3])) + 1e-3F);
+							for (int i = 0; i < 4; i++) {
+								ss[i] -= s0;
+								tt[i] -= t0;
+							}
+						}
 						for (int i = 0; i < 4; i++)
 							e.uv(i, t.getU0() + clamp01(ss[i]) * (t.getU1() - t.getU0()), t.getV0() + clamp01(tt[i]) * (t.getV1() - t.getV0()));
 						e.color(-1, -1, -1, -1);

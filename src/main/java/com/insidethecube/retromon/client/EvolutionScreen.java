@@ -55,7 +55,9 @@ public class EvolutionScreen extends GameScreen {
 		Species f = Species.get(from);
 		this.name = tag.getStringOr("name", f == null ? from.toUpperCase() : f.name());
 		box = new TextBox(List.of("What? " + name + " is evolving!"));
-		Music.jingle("level_up");
+		// (0.59.6) In Johto, Crystal's evolution song plays while it evolves; in Kanto, the jingle as before.
+		if (Music.johto()) Music.play("evolution");
+		else Music.jingle("level_up");
 	}
 
 	private String newName() {
@@ -83,6 +85,7 @@ public class EvolutionScreen extends GameScreen {
 			} else if (phase == Phase.NEW && at >= NEW) {
 				phase = Phase.DONE;
 				calloutAt = ticks;
+				if (Music.johto()) Music.resumePlace();
 				Music.jingle("caught_mon");
 				box.set(List.of(name + " evolved into " + newName() + "!"));
 				send(true);
@@ -111,6 +114,7 @@ public class EvolutionScreen extends GameScreen {
 		phase = Phase.STOPPED;
 		stoppedAt = ticks;
 		Sounds.press();
+		if (Music.johto()) Music.resumePlace();
 		box.set(List.of("Huh? " + name + " stopped evolving!"));
 		send(false);
 	}

@@ -130,6 +130,11 @@ public final class Music {
 		region = r == null || r.isEmpty() ? "kanto" : r;
 	}
 
+	/** Whether you're in Johto (where some scenes have a song of their own: evolving). */
+	public static boolean johto() {
+		return region.equals("johto");
+	}
+
 	/** In Johto, Crystal's own version of a song (its file "johto_" + the song: johto_wild_battle, johto_pokecenter, ...). */
 	private static String local(String id) {
 		if (id == null || id.isEmpty() || id.startsWith("johto_") || !region.equals("johto")) return id;
