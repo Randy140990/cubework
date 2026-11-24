@@ -123,7 +123,21 @@ public final class Music {
 	}
 
 	/** Plays a song (from its intro, if it has one), replacing what's playing. */
+	/** (0.59.5) The region you're in ("kanto", "johto"): Johto plays Crystal's version of a song where there's one. */
+	private static String region = "kanto";
+
+	public static void setRegion(String r) {
+		region = r == null || r.isEmpty() ? "kanto" : r;
+	}
+
+	/** In Johto, Crystal's own version of a song (its file "johto_" + the song: johto_wild_battle, johto_pokecenter, ...). */
+	private static String local(String id) {
+		if (id == null || id.isEmpty() || id.startsWith("johto_") || !region.equals("johto")) return id;
+		return exists("johto_" + id) ? "johto_" + id : id;
+	}
+
 	public static void play(String id) {
+		id = local(id);
 		if (id == null || id.isEmpty() || !exists(id)) {
 			if (id != null && !id.isEmpty()) Retromon.LOG.warn("Retromon music: no file for {}", id);
 			stop();
@@ -147,6 +161,7 @@ public final class Music {
 
 	/** A song played once through (a jingle that pauses the music). */
 	public static void jingle(String id) {
+		id = local(id);
 		if (!exists(id) || level() == 0) return;
 		Minecraft mc = Minecraft.getInstance();
 		if (jinglePlaying != null) mc.getSoundManager().stop(jinglePlaying);

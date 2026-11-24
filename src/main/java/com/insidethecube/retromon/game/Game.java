@@ -2357,7 +2357,7 @@ public final class Game {
 			if (n.role() != Npc.TRAINER && n.role() != Npc.LEADER || n.approaching > 0 || n.talker != null) continue;
 			Trainers.Trainer t = Trainers.get(n.key());
 			if (t == null || t.sight() <= 0 || d.beaten.contains(t.key()) || (battlesOff(p) && !storyBattle(t)) || !spots(n, p, t, prev)) continue;
-			walkUp(p, n, t, spottedMusic(t), null);
+			walkUp(p, n, t, spottedMusic(t, Battles.johto(p)), null);
 			return;
 		}
 	}
@@ -2402,6 +2402,18 @@ public final class Game {
 
 	/** The "eyes meet" tune: the girls', the boys' or Team Rocket's. */
 	static String spottedMusic(Trainers.Trainer t) {
+		return spottedMusic(t, false);
+	}
+
+	/** ((0.59.5) In Johto, Crystal's own for its trainers that have one: hikers, beauties, sages, ...; the rest swap themselves.) */
+	static String spottedMusic(Trainers.Trainer t, boolean johto) {
+		if (johto) {
+			String s = t.sprite() + " " + t.title().toLowerCase(java.util.Locale.ROOT);
+			for (String[] k : new String[][] {{"hiker", "johto_meet_hiker"}, {"beauty", "johto_meet_beauty"}, {"sage", "johto_meet_sage"},
+					{"pokemaniac", "johto_meet_pokemaniac"}, {"poké maniac", "johto_meet_pokemaniac"}, {"officer", "johto_meet_officer"},
+					{"kimono", "johto_meet_kimono_girl"}, {"mystic", "johto_meet_mystical_man"}, {"eusine", "johto_meet_mystical_man"}})
+				if (s.contains(k[0])) return k[1];
+		}
 		if (t.key().startsWith("rival")) return "meet_rival";
 		String s = t.sprite();
 		if (s.contains("rocket") || s.contains("giovanni") || s.contains("jessie") || s.contains("james")) return "meet_evil_trainer";

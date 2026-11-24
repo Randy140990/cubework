@@ -114,6 +114,7 @@ public final class ClientState {
 				placeName = t.getStringOr("name", "");
 				placeTicks = 0;
 				Postcards.entered(t.getStringOr("id", ""));
+				Music.setRegion(t.getStringOr("region", "kanto"));
 				Music.setPlace(t.getStringOr("music", ""));
 			}
 			case "dialogue" -> {

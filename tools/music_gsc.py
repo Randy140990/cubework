@@ -255,6 +255,9 @@ def main():
         loops, total = M.measure(song, labels, pitches, None)
         if loops:
             start, length = M.common_loop(loops)
+            # (0.59.5) A song that loops from its very start (Crystal's Surf, its capture tune) measures a start just
+            # before nothing: it's 0.
+            start = max(0, start)
             frames = start + length
         else:
             frames = total

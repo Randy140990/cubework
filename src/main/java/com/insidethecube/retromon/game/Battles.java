@@ -63,7 +63,14 @@ public final class Battles {
 		PlayerData d = Game.data(p);
 		d.seen.add(foe.species.id());
 		Battle b = new Battle(RNG, name(p), d.party, new ArrayList<>(List.of(foe)), Battle.Kind.WILD, null, 0);
-		begin(p, new Session(b, null, staticKey), staticKey != null && legendary(foe.species) ? "gym_leader_battle" : "wild_battle");
+		// ((0.59.5) In Johto a legendary's is Crystal's legendary battle.)
+		begin(p, new Session(b, null, staticKey), staticKey != null && legendary(foe.species) ? (johto(p) ? "johto_legend_battle" : "gym_leader_battle") : "wild_battle");
+	}
+
+	/** Whether you're in Johto (for Crystal's songs). */
+	static boolean johto(ServerPlayer p) {
+		Places.Place pl = Places.get(Game.data(p).place);
+		return pl != null && "johto".equals(pl.region());
 	}
 
 	private static boolean legendary(Species s) {
@@ -83,6 +90,9 @@ public final class Battles {
 		}
 		Battle b = new Battle(RNG, name(p), d.party, team, Battle.Kind.TRAINER, t.title(), t.prizeBase());
 		String music = t.title().startsWith("ELITE FOUR") || t.title().contains("CHAMPION") ? "final_battle" : t.boss() ? "gym_leader_battle" : "trainer_battle";
+		// ((0.59.5) In Johto, Crystal's rival and Team Rocket battles; the rest swap themselves on the client.)
+		if (johto(p) && !t.boss() && t.key().startsWith("rival")) music = "johto_rival_battle";
+		else if (johto(p) && t.title().contains("ROCKET")) music = "johto_rocket_battle";
 		begin(p, new Session(b, t, null), music);
 	}
 

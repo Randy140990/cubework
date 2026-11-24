@@ -5429,5 +5429,527 @@
     "volume": 0.7
    }
   ]
+ },
+ "music.johto_wild_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_wild_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_wild_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_wild_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_trainer_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_trainer_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_trainer_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_trainer_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_gym_leader_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_gym_leader_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_gym_leader_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_gym_leader_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_final_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_final_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_final_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_final_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_rival_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_rival_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_rival_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_rival_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_rocket_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_rocket_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_rocket_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_rocket_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_legend_battle": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_legend_battle",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_legend_battle_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_legend_battle_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_defeated_trainer": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_defeated_trainer",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_defeated_trainer_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_defeated_trainer_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_defeated_wild_mon": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_defeated_wild_mon",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_defeated_wild_mon_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_defeated_wild_mon_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_defeated_gym_leader": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_defeated_gym_leader",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_defeated_gym_leader_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_defeated_gym_leader_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_male_trainer": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_male_trainer",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_male_trainer_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_male_trainer_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_female_trainer": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_female_trainer",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_female_trainer_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_female_trainer_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_evil_trainer": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_evil_trainer",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_evil_trainer_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_evil_trainer_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_rival": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_rival",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_rival_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_rival_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_hiker": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_hiker",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_hiker_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_hiker_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_beauty": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_beauty",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_beauty_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_beauty_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_sage": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_sage",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_sage_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_sage_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_pokemaniac": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_pokemaniac",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_pokemaniac_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_pokemaniac_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_officer": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_officer",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_officer_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_officer_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_kimono_girl": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_kimono_girl",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_kimono_girl_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_kimono_girl_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_mystical_man": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_mystical_man",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_meet_mystical_man_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_meet_mystical_man_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_pokecenter": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_pokecenter",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_gym": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_gym",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_oaks_lab": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_oaks_lab",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_oaks_lab_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_oaks_lab_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_pkmn_healed": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_pkmn_healed",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_caught_mon": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_caught_mon",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_bike_riding": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_bike_riding",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_bike_riding_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_bike_riding_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_surfing": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_surfing",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_game_corner": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_game_corner",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_game_corner_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_game_corner_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.magnet_train": {
+  "sounds": [
+   {
+    "name": "retromon:music/magnet_train",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.ss_aqua": {
+  "sounds": [
+   {
+    "name": "retromon:music/ss_aqua",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.dancing_hall": {
+  "sounds": [
+   {
+    "name": "retromon:music/dancing_hall",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_evolution": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_evolution",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
+ },
+ "music.johto_evolution_intro": {
+  "sounds": [
+   {
+    "name": "retromon:music/johto_evolution_intro",
+    "stream": true,
+    "volume": 0.7
+   }
+  ]
  }
 }
