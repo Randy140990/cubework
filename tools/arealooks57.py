@@ -75,15 +75,20 @@ def round57(add, room, G):
     # Every route's rocks (15:46, 15:51: "the individual stones need updating ... across the board"; "rocks at route
     # transitions ... clear line where sections divide"): each rock the scans found, in the sea as the sea's rocks, on
     # land as the boulders.
+    # ((0.59.4, 07:31) Not the lamps' posts, nor Victory Road's walls, which the scans took for rocks: Cerulean's lamps
+    # "a stone design", Route 23's tops "this weird rock".)
+    skip = {tuple(b) for b in json.load(open(os.path.join(HERE, "area_rocks_skip594.json")))}
     for mp in ("rocks_kanto", "rocks_johto"):
         for r in SCAN[mp]:
             x0, z0, x1, z1, y0, y1 = r["box"]
+            if r["kind"] != "sea" and (x0, z0, x1, z1, y0, y1) in skip: continue
             b = (x0 - 1, z0 - 1, x1 + 1, z1 + 1, "a rock in the water" if r["kind"] == "sea" else "a rock")
             if r["kind"] == "sea": add("swap", SEA_ROCK_BLOCKS, b, SEA_ROCK, ys(y0 - 1, y1 + 1))
             else: add("swap", BOULDER_BLOCKS, b, BOULDER, ys(y0 - 1, y1 + 1))
     for kind, boxes in (("sea", json.load(open(os.path.join(HERE, "area_rocks57.json")))["sea"]),
                         ("land", json.load(open(os.path.join(HERE, "area_rocks57.json")))["land"])):
         for x0, z0, x1, z1, y0, y1 in boxes:
+            if kind == "land" and (x0, z0, x1, z1, y0, y1) in skip: continue
             b = (x0 - 1, z0 - 1, x1 + 1, z1 + 1, "a rock in the water" if kind == "sea" else "a rock")
             add("swap", SEA_ROCK_BLOCKS if kind == "sea" else BOULDER_BLOCKS, b, SEA_ROCK if kind == "sea" else BOULDER, ys(y0 - 1, y1 + 1))
     # The open sea's rocks all over (the Whirl Islands' chains, Routes 40 and 41, Cherrygrove's bay, Olivine's harbour,

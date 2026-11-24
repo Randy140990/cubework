@@ -59,6 +59,11 @@ public class WorldMon extends PathfinderMob {
 		return key().startsWith("snorlax_");
 	}
 
+	/** (0.59.4) Part of a place's scenery (Fuchsia's ponds): moves about by itself, never battled. */
+	public boolean scenery() {
+		return key().startsWith("scene:");
+	}
+
 	public boolean wild() {
 		return key().startsWith("wild:");
 	}

@@ -1081,6 +1081,8 @@ public final class Game {
 		if (ourSave && s.getTickCount() % 40 == 0) Mailbox.place(s.overworld());
 		// (0.57) John's small fixes to his map (the DARK CAVE's Route 46 way in a block higher).
 		if (ourSave && s.getTickCount() % 40 == 20) MapFixes.tick(s);
+		// (0.59.4) The POKéMON that are part of the scenery (Fuchsia's ponds, the SAFARI ZONE's way in).
+		if (ourSave) Scenery.tick(s);
 		for (ServerPlayer p : s.getPlayerList().getPlayers()) {
 			if (!adventure(p)) continue;
 			UUID id = p.getUUID();
@@ -3894,6 +3896,10 @@ public final class Game {
 			return;
 		}
 		if (key.startsWith("wild:")) return;
+		if (Scenery.is(key)) {
+			dialogue(p, null, "talk", List.of(Scenery.line(name, key)), t, w.getId());
+			return;
+		}
 		if (key.startsWith("daycare:")) {
 			String who = d.daycare != null ? d.daycare.name() : name;
 			dialogue(p, null, "talk", List.of(who + " is playing happily in the pen."), t, w.getId());

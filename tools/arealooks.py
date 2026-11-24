@@ -805,6 +805,9 @@ def round50(add, room):
     arealooks59b.round59b(add, room, globals())
     import arealooks59c
     arealooks59c.round59c(add, room, globals())
+    # (0.59.4) John's Kanto fly-round, 07:31 and 07:36.
+    import arealooks594
+    arealooks594.round594(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")

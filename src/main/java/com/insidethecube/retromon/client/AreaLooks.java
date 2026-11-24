@@ -175,7 +175,7 @@ public final class AreaLooks {
 				// ((0.59) The signs too: a shelf that's a sign in a small box is drawn as one even where a planter's or a
 				// band's look covers the whole town, and a planter in a small box isn't a sign because the town's are.)
 				for (Rule rule : looks.values()) if (rule.look().equals("swap") || rule.look().equals("panel") || rule.look().equals("glass") || rule.look().equals("hedge") || rule.look().equals("leafy") || rule.look().equals("leafy_hedge")
-						|| rule.look().equals("sign") || rule.look().equals("sign_o") || rule.look().equals("sign_b") || rule.look().equals("keep")) swaps.add(rule);
+						|| rule.look().equals("sign") || rule.look().equals("sign_o") || rule.look().equals("sign_b") || rule.look().equals("keep") || rule.look().equals("hide") || rule.look().equals("cube")) swaps.add(rule);
 				for (Rule rule : looks.values()) {
 					Look look = make(rule, c.baker());
 					List<Rule> rivals = new ArrayList<>();
@@ -264,6 +264,46 @@ public final class AreaLooks {
 			case "sign_b" -> (base, e, view, pos, state, random, cull) -> board("b", base, e, view, pos, state, random, cull);
 			// (0.59.3, 20:47: the ships, "do not texture those") The block as it is, here, whatever the place's looks.
 			case "keep" -> (base, e, view, pos, state, random, cull) -> base.emitQuads(e, view, pos, state, random, cull);
+			// (0.59.4, 07:31: Nugget Bridge's "buttons on the far steps. Those buttons need removing") Not drawn at all.
+			case "hide" -> (base, e, view, pos, state, random, cull) -> {};
+			// (0.59.4, 07:31: Route 12's and Route 16's pillars "still using a stripped", their swap set) A full block drawn
+			// in our own texture whatever picture it had ("top|side" or one for all): nothing of its old one can show.
+			case "cube" -> {
+				String[] p = rule.swaps().split("\\|");
+				TextureAtlasSprite top = sprite(baker, p[0].trim()), side = p.length > 1 ? sprite(baker, p[1].trim()) : top;
+				yield (base, e, view, pos, state, random, cull) -> {
+					for (Direction d : Direction.values()) {
+						if (cull.test(d)) continue;
+						e.square(d, 0, 0, 1, 1, 0);
+						float[] ss = new float[4], tt = new float[4];
+						for (int i = 0; i < 4; i++) {
+							switch (d.getAxis()) {
+								case Y -> {
+									ss[i] = e.x(i);
+									tt[i] = e.z(i);
+								}
+								case Z -> {
+									ss[i] = d == Direction.NORTH ? 1 - e.x(i) : e.x(i);
+									tt[i] = 1 - e.y(i);
+								}
+								default -> {
+									ss[i] = d == Direction.EAST ? 1 - e.z(i) : e.z(i);
+									tt[i] = 1 - e.y(i);
+								}
+							}
+						}
+						TextureAtlasSprite t = d.getAxis() == Direction.Axis.Y ? top : side;
+						for (int i = 0; i < 4; i++)
+							e.uv(i, t.getU0() + clamp01(ss[i]) * (t.getU1() - t.getU0()), t.getV0() + clamp01(tt[i]) * (t.getV1() - t.getV0()));
+						e.color(-1, -1, -1, -1);
+						e.tintIndex(-1);
+						e.emit();
+					}
+				};
+			}
+			// (0.59.4, 07:31: the Museum's "brown band ... behind the sign") A wall sign used as a band: a board in the
+			// texture just round the one the game draws (so that never shows), flat against the wall. spec: the texture.
+			case "wallboard" -> wallboard(sprite(baker, rule.swaps()));
 			// (0.59.3, 20:35) The WHIRL ISLANDS' whirlpools: a turning whirlpool on the water's surface over five blocks,
 			// drawn by a rock beside it ("dx,dz,size": where its middle is from the rock).
 			case "whirlpool" -> {
@@ -387,11 +427,19 @@ public final class AreaLooks {
 			if (bar >= 0) to = to.substring(0, bar).trim();
 			swaps.put(fromId, new Swap(sprite(baker, to), period, noTint, side));
 		}
+		// (0.59.4, 07:31: Route 12's and Route 16's pillars still drawn as stripped logs, their look set) A picture a
+		// resource pack draws in place of the block's own (connected or random textures: "block/ctm/stripped_spruce_log/3",
+		// "stripped_spruce_log_2") is the same block's, so it's swapped as the block's own is.
+		Map<Identifier, Swap> seen = new java.util.concurrent.ConcurrentHashMap<>();
+		Swap none = new Swap(null, 0, false, null);
 		return (base, e, view, pos, state, random, cull) -> {
 			e.pushTransform(q -> {
 				TextureAtlasSprite from = finder.find(q);
-				Swap sw = from == null ? null : swaps.get(from.contents().name());
-				if (sw == null) return true;
+				Swap sw = from == null ? null : seen.computeIfAbsent(from.contents().name(), id -> {
+					Swap own = swaps.get(id);
+					return own != null ? own : likeOf(swaps, id, none);
+				});
+				if (sw == null || sw == none) return true;
 				TextureAtlasSprite to = sw.side() != null && q.lightFace().getAxis().isHorizontal() ? sw.side() : sw.to();
 				if (sw.noTint()) q.tintIndex(-1);
 				if (sw.period() > 0) {
@@ -428,6 +476,92 @@ public final class AreaLooks {
 			base.emitQuads(e, view, pos, state, random, cull);
 			e.popTransform();
 		};
+	}
+
+	/** A wall sign as a plain board against the wall, just round the game's own board (that never shows). */
+	private static Look wallboard(TextureAtlasSprite tex) {
+		return (base, e, view, pos, state, random, cull) -> {
+			Direction facing = state.hasProperty(BlockStateProperties.HORIZONTAL_FACING) ? state.getValue(BlockStateProperties.HORIZONTAL_FACING) : null;
+			if (facing == null) {
+				base.emitQuads(e, view, pos, state, random, cull);
+				return;
+			}
+			// The board in the block's own frame facing north (against the south side), turned round to its facing.
+			float y0 = 4.3F / 16F, y1 = 12.7F / 16F, z0 = 13.75F / 16F, z1 = 1F, x0 = -0.004F, x1 = 1.004F;
+			float[][] box = {{x0, y0, z0}, {x1, y1, z1}};
+			for (Direction face : Direction.values()) {
+				if (face == Direction.SOUTH) continue;
+				// Corners of this face (in the north-facing frame), then turned.
+				float[][] c = corners(face, box);
+				for (int i = 0; i < 4; i++) {
+					float[] p = turn(c[i], facing);
+					e.pos(i, p[0], p[1], p[2]);
+				}
+				for (int i = 0; i < 4; i++) {
+					float u = face.getAxis() == Direction.Axis.Y ? c[i][0] : face.getAxis() == Direction.Axis.Z ? c[i][0] : c[i][2];
+					float v = face.getAxis() == Direction.Axis.Y ? c[i][2] : 1F - c[i][1];
+					e.uv(i, tex.getU0() + clamp01(u) * (tex.getU1() - tex.getU0()), tex.getV0() + clamp01(v) * (tex.getV1() - tex.getV0()));
+				}
+				e.color(-1, -1, -1, -1);
+				e.tintIndex(-1);
+				e.nominalFace(turnDir(face, facing));
+				e.cullFace(null);
+				e.emit();
+			}
+		};
+	}
+
+	/** A box's face's four corners (counter-clockwise looking at it from outside). */
+	private static float[][] corners(Direction f, float[][] b) {
+		float ax = b[0][0], ay = b[0][1], az = b[0][2], bx = b[1][0], by = b[1][1], bz = b[1][2];
+		return switch (f) {
+			case NORTH -> new float[][] {{bx, by, az}, {bx, ay, az}, {ax, ay, az}, {ax, by, az}};
+			case SOUTH -> new float[][] {{ax, by, bz}, {ax, ay, bz}, {bx, ay, bz}, {bx, by, bz}};
+			case WEST -> new float[][] {{ax, by, az}, {ax, ay, az}, {ax, ay, bz}, {ax, by, bz}};
+			case EAST -> new float[][] {{bx, by, bz}, {bx, ay, bz}, {bx, ay, az}, {bx, by, az}};
+			case UP -> new float[][] {{ax, by, az}, {ax, by, bz}, {bx, by, bz}, {bx, by, az}};
+			case DOWN -> new float[][] {{ax, ay, bz}, {ax, ay, az}, {bx, ay, az}, {bx, ay, bz}};
+		};
+	}
+
+	/** A point in a north-facing block turned to face `to` (about the block's middle). */
+	private static float[] turn(float[] p, Direction to) {
+		float x = p[0] - 0.5F, z = p[2] - 0.5F;
+		return switch (to) {
+			case SOUTH -> new float[] {0.5F - x, p[1], 0.5F - z};
+			case WEST -> new float[] {0.5F + z, p[1], 0.5F - x};
+			case EAST -> new float[] {0.5F - z, p[1], 0.5F + x};
+			default -> new float[] {p[0], p[1], p[2]};
+		};
+	}
+
+	private static Direction turnDir(Direction d, Direction to) {
+		if (d.getAxis() == Direction.Axis.Y) return d;
+		return switch (to) {
+			case SOUTH -> d.getOpposite();
+			case WEST -> d.getCounterClockWise();
+			case EAST -> d.getClockWise();
+			default -> d;
+		};
+	}
+
+	/**
+	 * The swap for a picture a resource pack put in place of one of the swapped ones (`none` when there's none): one
+	 * whose name has the swapped picture's name as one of its parts ("block/ctm/stripped_spruce_log/3") or as its last
+	 * part with a number after it ("stripped_spruce_log_2").
+	 */
+	private static Swap likeOf(Map<Identifier, Swap> swaps, Identifier id, Swap none) {
+		String[] parts = id.getPath().split("/");
+		String last = parts[parts.length - 1];
+		for (Map.Entry<Identifier, Swap> s : swaps.entrySet()) {
+			String p = s.getKey().getPath();
+			String name = p.substring(p.lastIndexOf('/') + 1);
+			if (id.getPath().equals(p)) return s.getValue();
+			for (int i = 0; i < parts.length - 1; i++) if (parts[i].equals(name)) return s.getValue();
+			if (last.startsWith(name + "_") && last.substring(name.length() + 1).chars().allMatch(Character::isDigit) && last.length() > name.length() + 1)
+				return s.getValue();
+		}
+		return none;
 	}
 
 	private static float clamp01(float v) {
@@ -566,7 +700,17 @@ public final class AreaLooks {
 		BlockState up = view.getBlockState(pos.above());
 		boolean blueOver = state.is(Blocks.PALE_OAK_SHELF) && up.is(Blocks.WARPED_SHELF) && facingOf(up) == facing;
 		String row = state.hasProperty(BlockStateProperties.ROTATION_16) ? "short" : sameSign(view, pos.above(), state, facing) || blueOver ? "stand" : "board";
-		BlockStateModel m = extra(kind + row + "_" + part + "_" + facing.getSerializedName());
+		// ((0.59.4, 07:36: "wherever I had these single ones, the bottom can be made of a wood ... and then the top one is
+		// the sign as normal") A sign one block wide stands on a wooden post: the shelf under its board, whichever shelf
+		// the board is (Cinnabar's Gym's is a mangrove one on a pale oak one).)
+		String kindNow = kind;
+		boolean shelfOver = !state.hasProperty(BlockStateProperties.ROTATION_16) && !up.is(Blocks.WARPED_SHELF) && facingOf(up) == facing
+				&& BuiltInRegistries.BLOCK.getKey(up.getBlock()).getPath().endsWith("_shelf");
+		if (kind.isEmpty() && part.equals("s") && !blueOver && (row.equals("stand") || shelfOver)) {
+			kindNow = "w";
+			row = "stand";
+		}
+		BlockStateModel m = extra(kindNow + row + "_" + part + "_" + facing.getSerializedName());
 		if (m == null) base.emitQuads(e, view, pos, state, random, cull);
 		else m.emitQuads(e, view, pos, state, random, cull);
 	}

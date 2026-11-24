@@ -1,0 +1,8 @@
+# id	species	mode	x0	z0	x1	z1	y	note
+fuchsia_pond_nw	goldeen	swim	-536	762	-528	765	29	Fuchsia's top-left pond (07:36)
+fuchsia_pond_ne_1	magikarp	swim	-516	758	-509	761	29	Fuchsia's top-right pond, past the little bridge
+fuchsia_pond_ne_2	goldeen	swim	-516	758	-509	761	29	Fuchsia's top-right pond
+fuchsia_pond_s_1	psyduck	swim	-525	779	-518	786	29	Fuchsia's big pond by the Center
+fuchsia_pond_s_2	poliwag	swim	-525	779	-518	786	29	Fuchsia's big pond by the Center
+safari_gate_w	doduo	walk	-503	758	-492	763	30	the grass west of the SAFARI ZONE's way in
+safari_gate_e	nidoran_f	walk	-482	760	-472	763	30	the grass east of the SAFARI ZONE's way in
