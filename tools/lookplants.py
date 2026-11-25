@@ -135,6 +135,40 @@ def flower_kept(src, dst):
     im.save(dst)
 
 
+def torch(src, dst):
+    """(0.67, John's 16:28: "torch flowers, if you can pull the textures from the asset pack where we got the grass
+    and ferns from, and again for the variety") His torchflower (a red-hot poker: a spike of orange and yellow
+    flowers over a rosette of long leaves) and his three variants: the flowers in his own colours, a touch cleaner and
+    brighter; the leaves, stem and their purple tips on Retromon's fresh greens by how light they are, as the other
+    flowers' leaves."""
+    import colorsys
+    im = Image.open(src).convert("RGBA")
+    p = im.load()
+    w, h = im.size
+    leaves = []
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = p[x, y]
+            if a <= 8:
+                continue
+            hh, ss, vv = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+            if (hh < 0.17 or hh > 0.94) and ss > 0.35 and vv > 0.35:
+                ss2, vv2 = min(1.0, ss * 1.08), min(1.0, vv * 1.08 + 0.02)
+                rr, gg, bb = colorsys.hsv_to_rgb(hh, ss2, vv2)
+                p[x, y] = (int(rr * 255), int(gg * 255), int(bb * 255), a)
+            else:
+                leaves.append((x, y))
+    if leaves:
+        lum = sorted(0.3 * p[xy][0] + 0.59 * p[xy][1] + 0.11 * p[xy][2] for xy in leaves)
+        lo, hi = lum[len(lum) // 40], lum[-1 - len(lum) // 40]
+        for xy in leaves:
+            r, g, b, a = p[xy]
+            t = (0.3 * r + 0.59 * g + 0.11 * b - lo) / max(1.0, hi - lo)
+            p[xy] = ramp(LEAF, 0.08 + 0.92 * t) + (a,)
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    im.save(dst)
+
+
 def build():
     if os.path.isdir(CTM):
         shutil.rmtree(CTM)
@@ -162,7 +196,7 @@ def build():
         red = rel.split("/")[0] in ("poppy", "rose_bush") or rel == "tulip/red"
         for f in files:
             if f.endswith(".png"):
-                (flower if red else flower_kept)(os.path.join(dirpath, f), os.path.join(out, f))
+                (torch if rel == "torch_flower" else flower if red else flower_kept)(os.path.join(dirpath, f), os.path.join(out, f))
             elif f.endswith(".properties"):
                 shutil.copy(os.path.join(dirpath, f), os.path.join(out, f))
     grasses()

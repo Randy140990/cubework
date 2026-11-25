@@ -78,7 +78,7 @@ def round594(add, room, G):
     # ---------- Victory Road's buildings (07:36: "the tops are supposed to be the orange, not the white") ----------
     # (Their rock-looking tops were the scans' rocks, now not; 0.59.4 arealooks57.) The slabs filling their tops the
     # orange brick too.
-    add("swap", "polished_andesite_slab", (-935, 150, -890, 505, "Victory Road's buildings' tops"), "block/polished_andesite=vr_brick", ys(33, 33))
+    # ((0.67, 16:28) Dark gold now, with the band under them and the caps at their ends: arealooks67.)
 
     # ---------- iron bars and end rods, everywhere (07:36) ----------
     # Iron bars a proper iron fence: bars going up, a rail top and bottom, no bits across (railing_dark itself is drawn

@@ -929,7 +929,6 @@ swap	acacia_shelf	-371	281	-371	281	39	39	block/acacia_shelf=awning_l4	the Bike 
 swap	acacia_shelf	-370	281	-370	281	39	39	block/acacia_shelf=awning_l5	the Bike Shop's lettering
 swap	acacia_shelf	-369	281	-369	281	39	39	block/acacia_shelf=awning_l6	the Bike Shop's lettering
 swap	acacia_shelf	-368	281	-368	281	39	39	block/acacia_shelf=awning_l7	the Bike Shop's lettering
-swap	cobblestone_stairs,mossy_cobblestone_stairs,cobblestone_slab,mossy_cobblestone_slab	-625	245	-590	275	-	-	block/cobblestone=step_boards_d,block/mossy_cobblestone=step_boards_d	Route 4's steps by the Center
 swap	polished_deepslate,polished_deepslate_stairs	-345	356	-329	370	33	43	block/polished_deepslate=gate_roof	Route 5's Underground Path hut
 swap	deepslate_tile_wall	-345	356	-329	370	33	43	block/deepslate_tiles=gate_roof_rim	Route 5's Underground Path hut
 swap	polished_deepslate_slab	-345	356	-329	370	32	34	block/polished_deepslate=step_cer	Route 5's Underground Path hut
@@ -4250,9 +4249,12 @@ swap	deepslate_tile_wall	-812	915	-796	930	23	26	block/deepslate_tiles=lab_cin_p
 cube	stripped_mangrove_wood	-812	915	-796	930	23	26	lab_cin_trim	the POKeMON LAB
 swap	tuff_bricks,tuff_brick_stairs,stone_bricks,stone_brick_wall	-812	915	-796	930	17	21	block/tuff_bricks=mansion_base,block/stone_bricks=mansion_base	the POKeMON LAB
 sign	pale_oak_shelf	-812	915	-796	930	17	20	-	the POKeMON LAB
-prop	polished_deepslate	-805	917	-805	917	24	24	solar	a solar array on the LAB's roof
-prop	polished_deepslate	-805	921	-805	921	24	24	solar	a solar array on the LAB's roof
-prop	polished_deepslate	-805	925	-805	925	24	24	solar	a solar array on the LAB's roof
+prop	polished_deepslate	-808	917	-808	917	24	24	solar	a solar array on the LAB's roof
+prop	polished_deepslate	-801	917	-801	917	24	24	solar	a solar array on the LAB's roof
+prop	polished_deepslate	-808	921	-808	921	24	24	solar	a solar array on the LAB's roof
+prop	polished_deepslate	-801	921	-801	921	24	24	solar	a solar array on the LAB's roof
+prop	polished_deepslate	-808	925	-808	925	24	24	solar	a solar array on the LAB's roof
+prop	polished_deepslate	-801	925	-801	925	24	24	solar	a solar array on the LAB's roof
 steam	bone_block	-870	899	-826	937	-	-	steam	Cinnabar's volcano
 swap	magma_block	-870	899	-826	937	-	-	block/magma=lava_flow57@2	Cinnabar's volcano
 swap	diorite_wall,polished_diorite,light_gray_carpet,sea_lantern	-2528	726	-2526	728	16	26	block/diorite=lamp_sea_post,block/polished_diorite=lamp_sea_foot,block/light_gray_wool=lamp_sea_cap,block/sea_lantern=lamp_globe_warm!	a lamp
@@ -5920,7 +5922,6 @@ swap	deepslate_bricks,cracked_deepslate_bricks,deepslate_tiles	-158	398	-104	447
 swap	oak_log	-265	754	-257	762	29	38	block/oak_log=pergola,block/oak_log_top=pergola_top	Route 14's bench under its arch
 swap	spruce_trapdoor	-265	754	-257	762	29	38	block/spruce_trapdoor=bench_slat	Route 14's bench under its arch
 swap	spruce_fence,spruce_fence_gate	-265	754	-257	762	29	38	block/spruce_planks=bench_frame	Route 14's bench under its arch
-swap	polished_andesite_slab	-935	150	-890	505	33	33	block/polished_andesite=vr_brick	Victory Road's buildings' tops
 swap	iron_bars	-1010	100	60	1060	-	-	block/iron_bars=railing_dark	iron bars as an iron fence
 swap	end_rod	-1010	100	60	1060	-	-	block/end_rod=rod_light	end rods as lights
 swap	end_rod	-532	405	-530	407	35	37	block/end_rod=rod_light	Celadon's alley's lamps
@@ -6303,6 +6304,17 @@ boulder	waxed_copper_grate,waxed_exposed_copper_grate	18431	-1	18480	80	-	-	pref
 swap	deepslate,cobbled_deepslate,tuff,calcite,andesite,andesite_slab,polished_tuff,polished_tuff_stairs,dripstone_block,jungle_stairs,stone,stone_stairs,snow_block,smooth_sandstone	18687	-1	18744	56	-	-	block/deepslate=ms_floor|ms_cliff@4,block/deepslate_top=ms_floor@4,block/cobbled_deepslate=ms_patch@4,block/tuff=ms_ground|ms_cliff@4,block/calcite=ms_top|ms_cliff@4,block/andesite=ms_step,block/polished_tuff=ms_step,block/dripstone_block=ms_edge@2,block/jungle_planks=ms_edge,block/stone=ms_top|ms_cliff_ice@4,block/snow=sf_snow_top|sf_snow@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Mt. Silver Item Rooms	interiors
 boulder	waxed_copper_grate,waxed_exposed_copper_grate	18687	-1	18744	56	-	-	prefix:xboulder	Mt. Silver Item Rooms	interiors
 swap	diorite_slab,polished_diorite_slab,diorite_stairs,polished_diorite_stairs	-783	515	-779	524	25	26	block/calcite=path_calcite,block/diorite=path_diorite,block/polished_diorite=path_polished_diorite	the steps up to Viridian's Gym
+swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone	-119	483	-114	488	24	31	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	a rock in the water
+swap	yellow_terracotta	-160	305	-120	333	43	44	block/yellow_terracotta=pp_yellow_s@4	the Power Plant's top trim
+swap	smooth_quartz_slab,smooth_quartz,quartz_block	-160	305	-120	333	43	45	block/quartz_block_bottom=pp_white_s@4,block/quartz_block_top=pp_white_s@4,block/quartz_block_side=pp_white_s@4	the Power Plant's top trim
+swap	packed_mud	-340	199	-340	225	34	34	block/packed_mud=drip_rock_top|drip_rock@4	the strip by Nugget Bridge
+grass_edge	packed_mud	-340	199	-340	225	34	34	-	the strip by Nugget Bridge
+swap	andesite	-935	150	-890	505	32	32	block/andesite=vr_gold@4	Victory Road's buildings' tops
+swap	polished_andesite_slab,polished_andesite_stairs	-935	150	-890	505	33	33	block/polished_andesite=vr_gold@4	Victory Road's buildings' tops
+swap	jungle_button,stone_button,oak_button,spruce_button,birch_button,dark_oak_button,acacia_button,mangrove_button,cherry_button,bamboo_button,crimson_button,warped_button,pale_oak_button,polished_blackstone_button	-919	269	-919	269	27	27	block/jungle_planks=boulder_stone_top|boulder_stone@2	a button on a rock
+swap	jungle_button,stone_button,oak_button,spruce_button,birch_button,dark_oak_button,acacia_button,mangrove_button,cherry_button,bamboo_button,crimson_button,warped_button,pale_oak_button,polished_blackstone_button	-915	285	-915	285	27	27	block/jungle_planks=boulder_stone_top|boulder_stone@2	a button on a rock
+swap	jungle_button,stone_button,oak_button,spruce_button,birch_button,dark_oak_button,acacia_button,mangrove_button,cherry_button,bamboo_button,crimson_button,warped_button,pale_oak_button,polished_blackstone_button	-917	287	-917	287	27	27	block/jungle_planks=boulder_stone_top|boulder_stone@2	a button on a rock
+swap	jungle_button,stone_button,oak_button,spruce_button,birch_button,dark_oak_button,acacia_button,mangrove_button,cherry_button,bamboo_button,crimson_button,warped_button,pale_oak_button,polished_blackstone_button	-913	289	-913	289	27	27	block/jungle_planks=boulder_stone_top|boulder_stone@2	a button on a rock
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care

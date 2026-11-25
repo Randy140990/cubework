@@ -334,7 +334,8 @@ public final class AreaLooks {
 			// (0.57, 15:57: "the bone, which is supposed to be steam ... opacity 30% and kind of make them a mist") Cinnabar's
 			// volcano's steam: John's bone blocks as soft see-through steam, no faces between two of them.
 			case "steam" -> steam(sprite(baker, rule.swaps().equals("-") ? "steam" : rule.swaps()));
-			case "roof", "roof_green", "roof_gym", "roof_museum" -> new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"));
+			case "roof", "roof_green", "roof_gym", "roof_museum" -> new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"),
+					rule.look().equals("roof_museum"));
 			case "sign" -> AreaLooks::sign;
 			case "sign_o" -> (base, e, view, pos, state, random, cull) -> board("o", base, e, view, pos, state, random, cull);
 			case "sign_b" -> (base, e, view, pos, state, random, cull) -> board("b", base, e, view, pos, state, random, cull);
@@ -499,7 +500,7 @@ public final class AreaLooks {
 				yield new GrassEdge(over, under, !kerb, null, true, null);
 			}
 			// (Any other roof_ look, Fuchsia's four houses' and the Safari Zone's, 15:29: its own three pictures.)
-			default -> rule.look().startsWith("roof_") ? new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under")) : null;
+			default -> rule.look().startsWith("roof_") ? new Roof(sprite(baker, rule.look() + "_tiles"), sprite(baker, rule.look() + "_edge"), sprite(baker, rule.look() + "_under"), false) : null;
 		};
 	}
 
@@ -717,16 +718,33 @@ public final class AreaLooks {
 	 * one run, so the tops and the fronts of the steps read as rows of tiles. The roof's ends (the faces across the
 	 * rows) get its darker trim, the undersides its shadow.
 	 */
-	private record Roof(TextureAtlasSprite tiles, TextureAtlasSprite edge, TextureAtlasSprite under) implements Look {
+	/**
+	 * (0.67, John's 16:28, the MUSEUM's top roof: "the bottom left and right corner of where you've got the bricks, it
+	 * seems to be like the solid purple colour instead ... those two just need updating to be brick") With corners: a
+	 * corner stair's (outer or inner) every upright face gets the rows too, run on from the straight stairs either side
+	 * of it (each face's rows as a straight stair facing out that way would have them), not the trim on one of its sides.
+	 */
+	private record Roof(TextureAtlasSprite tiles, TextureAtlasSprite edge, TextureAtlasSprite under, boolean corners) implements Look {
 		@Override
 		public void emit(BlockStateModel base, QuadEmitter e, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cull) {
 			Direction facing = state.hasProperty(BlockStateProperties.HORIZONTAL_FACING) ? state.getValue(BlockStateProperties.HORIZONTAL_FACING) : Direction.NORTH;
 			Direction down = facing.getOpposite();
 			Direction.Axis along = facing.getAxis() == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
+			boolean corner = corners && state.hasProperty(BlockStateProperties.STAIRS_SHAPE)
+					&& state.getValue(BlockStateProperties.STAIRS_SHAPE) != net.minecraft.world.level.block.state.properties.StairsShape.STRAIGHT;
 			e.pushTransform(q -> {
 				float[] s = new float[4], t = new float[4];
 				Direction f = q.lightFace();
 				TextureAtlasSprite sp = tiles;
+				if (corner && f.getAxis().isHorizontal()) {
+					for (int i = 0; i < 4; i++) {
+						float wx = pos.getX() + q.x(i), wy = pos.getY() + q.y(i), wz = pos.getZ() + q.z(i);
+						s[i] = f.getAxis() == Direction.Axis.X ? wz : wx;
+						t[i] = f.getStepX() * wx + f.getStepZ() * wz - wy;
+					}
+					lay(q, sp, s, t);
+					return true;
+				}
 				for (int i = 0; i < 4; i++) {
 					float wx = pos.getX() + q.x(i), wy = pos.getY() + q.y(i), wz = pos.getZ() + q.z(i);
 					float a = along == Direction.Axis.X ? wx : wz, d = down.getStepX() * wx + down.getStepZ() * wz;

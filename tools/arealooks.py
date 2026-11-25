@@ -626,9 +626,9 @@ def round48b(add, room):
     add("swap", "acacia_stairs,pale_oak_stairs", (-377, 282, -366, 282, "the Bike Shop's valance"), "block/acacia_planks=awning_val_o,block/pale_oak_planks=awning_val_w", ("38", "38"))
     for i in range(8):
         add("swap", "acacia_shelf", (-375 + i, 281, -375 + i, 281, "the Bike Shop's lettering"), "block/acacia_shelf=awning_l%d" % i, ("39", "39"))
-    # Route 4's steps by the POKéMON CENTER (cobblestone and mossy cobblestone) as the boarded steps.
-    add("swap", "cobblestone_stairs,mossy_cobblestone_stairs,cobblestone_slab,mossy_cobblestone_slab", (-625, 245, -590, 275, "Route 4's steps by the Center"),
-        "block/cobblestone=step_boards_d,block/mossy_cobblestone=step_boards_d")
+    # (Route 4's steps by the POKéMON CENTER were the boarded steps till 0.67: John's 16:28, "they were supposed to be
+    # cobblestone, and then mossy cobblestone and blended. Same as what I had on Route 1": the look pack's cobblestone
+    # and mossy cobblestone now, the moss's soft edge onto the cobble (moss_onto, all Kanto), as Route 1's.)
     # Route 5: the bushes by the Day Care.
     # The four Underground Path huts, as the bigger buildings: a slate blue tiled roof, clean walls, dressed stone at
     # the foot, white posts, dark metal rails, the steps.
@@ -820,6 +820,9 @@ def round50(add, room):
     arealooks61.round61(add, room, globals())
     import arealooks66
     arealooks66.round66(add, room, globals())
+    # (0.67) John's 16:28 walk round Kanto.
+    import arealooks67
+    arealooks67.round67(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")

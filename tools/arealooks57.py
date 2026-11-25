@@ -182,8 +182,13 @@ def round57(add, room, G):
     # ((0.59.6, 13:17: "make the solar panels flat on top ... a 3x2, maybe a 2 gap, a 3x2, a 2 gap, and then a 3x2")
     # Three flat arrays, each three blocks across and two deep, two blocks apart, down the roof (its ten blocks
     # deep exactly); each drawn from its front middle block.)
+    # ((0.67, John's 16:28: "they should be left and right instead of the centre ... those sets to move left, and then
+    # you duplicate it and have it on the right side") The three down the roof's left side, between its edge and the
+    # dark rail (x -809 to -807), and the same three down its right side (x -802 to -800), each the mirror of the other
+    # about the roof's middle.)
     for z in (917, 921, 925):
-        add("prop", "polished_deepslate", (-805, z, -805, z, "a solar array on the LAB's roof"), "solar", ys(24, 24))
+        for x in (-808, -801):
+            add("prop", "polished_deepslate", (x, z, x, z, "a solar array on the LAB's roof"), "solar", ys(24, 24))
     # The volcano (15:57: "the bone, which is supposed to be steam ... opacity 30%"; "retexturize the lava ... flowing").
     V = (-870, 899, -826, 937, "Cinnabar's volcano")
     add("steam", "bone_block", V, "steam")

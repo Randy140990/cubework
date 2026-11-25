@@ -524,6 +524,10 @@ def plants():
     import lookplants
     tex = os.path.join(LOOK, "block")
     for n in ("torchflower", "sunflower_front", "sunflower_back", "sunflower_top", "sunflower_bottom"):
+        if n == "torchflower":
+            # ((0.67, 16:28) Shards' own torchflower now, as the grass and ferns: lookplants.torch.)
+            lookplants.torch(os.path.join(lookplants.SRC, "textures", "block", n + ".png"), os.path.join(tex, n + ".png"))
+            continue
         lookplants.flower_kept(V("block/" + n), os.path.join(tex, n + ".png"))
         if os.path.exists(V("block/" + n) + ".mcmeta"):
             import shutil
