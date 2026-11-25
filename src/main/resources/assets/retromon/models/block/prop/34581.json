@@ -1,1 +1,0 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/area_moon_rock","area_moon_rock":"retromon:block/interior/area_moon_rock"},"elements":[{"from":[6.422,16,15.683],"to":[12.903,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#area_moon_rock","tintindex":144064064}}}]}

@@ -145,7 +145,7 @@ function prepareRoom(r) {
     const d = DATA.species[pt.sid]; if (!d) return;
     const m = buildModel(d.ours);
     m.holder.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
-    m.holder.position.set(pt.x, r.groundAt ? r.groundAt(pt.x, pt.z) + 0.04 : 0.04, pt.z); m.holder.rotation.y = (180 - (pt.yaw || 0)) * D2R;
+    m.holder.position.set(pt.x, pt.y != null ? pt.y + 0.04 : r.groundAt ? r.groundAt(pt.x, pt.z) + 0.04 : 0.04, pt.z); m.holder.rotation.y = (180 - (pt.yaw || 0)) * D2R;
     r.group.add(m.holder);
     // (0.61, 19:22) One with a pen (the DAY CARE's) wanders about it, as in the game (Interiors.pens).
     if (pt.pen) Object.assign(pt, { model: m, cx: pt.x, cz: pt.z, tx: pt.x, tz: pt.z, rest: 1 + Math.random() * 2, yawNow: (180 - (pt.yaw || 0)) * D2R, t: 0 });
@@ -243,13 +243,32 @@ function switchRoom(id, spawn) {
   // A cave's dusty air (Diglett's Cave): a warm brown haze that thickens into the distance, the light warmer too.
   scene.fog = room.haze ? new THREE.Fog(room.haze, 6, 34) : null;
   if (room.haze) { hemi.color.set(0xc9a27a); hemi.groundColor.set(0x3a2a1c); hemi.intensity = 0.55; }
+  // (0.64) A battle on the spot opens on the battle's camera; anywhere else, not.
+  if (room.battleCam && cam.mode !== "battle") cam.mode = "battle";
+  else if (!room.battleCam && cam.mode === "battle") cam.mode = "room";
+  if ($("#camSeg")) { setSeg($("#camSeg"), cam.mode); const bb = $("#camSeg").querySelector('[data-v="battle"]'); if (bb) bb.hidden = !room.battleCam; }
   cam.fit = fitRoom(room); snapCam();
   applyTime();
   $("#roomPick").value = id;
   $("#placeName").textContent = room.name; $("#placeFloor").textContent = room.floor;
   closeTalk(); renderPanel();
 }
-function snapCam() { const g = camGoal(); cam.tx = g.x; cam.ty = g.y; cam.tz = g.z; cam.dist = g.d; cam.pitch = g.p; placeCam(camera, cam.tx, cam.ty, cam.tz, cam.dist, cam.pitch); }
+function snapCam() { const g = camGoal(); cam.tx = g.x; cam.ty = g.y; cam.tz = g.z; cam.dist = g.d; cam.pitch = g.p; placeCam(camera, cam.tx, cam.ty, cam.tz, cam.dist, cam.pitch); battleCam(); }
+// (0.64) A battle on the spot: the game's battle camera (behind yours, a little above, looking across; its 52 degrees),
+// the sky behind and the blocks fading into it, as the world goes on to the horizon in the game.
+function battleCam() {
+  const on = cam.mode === "battle" && room && room.battleCam;
+  if (on) {
+    const b = room.battleCam;
+    camera.position.set(b.pos.x, b.pos.y, b.pos.z); camera.lookAt(b.look.x, b.look.y, b.look.z); camera.updateMatrixWorld(true);
+    if (camera.fov !== 52) { camera.fov = 52; camera.updateProjectionMatrix(); }
+  } else if (camera.fov !== 34) { camera.fov = 34; camera.updateProjectionMatrix(); }
+  if (room && room.battleCam) {
+    scene.background.set(0xbfe0f4);
+    if (!scene.fog) scene.fog = new THREE.Fog(0xbfe0f4, 26, 58);
+    scene.fog.near = on ? 26 : 60; scene.fog.far = on ? 58 : 140;
+  } else scene.background.set(0x000000);
+}
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function tween(ms, fn) { return new Promise(res => { const t0 = performance.now(); const step = now => { const k = Math.min(1, (now - t0) / ms); fn(k); if (k < 1) requestAnimationFrame(step); else res(); }; requestAnimationFrame(step); }); }
 const fadeEl = $("#fade"), irisEl = $("#iris");
@@ -568,6 +587,7 @@ function tickFrame(now) {
     cam.tx += (g.x - cam.tx) * kk; cam.ty += (g.y - cam.ty) * kk; cam.tz += (g.z - cam.tz) * kk; cam.dist += (g.d - cam.dist) * kk; cam.pitch += (g.p - cam.pitch) * kk;
     if (Math.abs(cam.pitch - g.p) < 1e-4) cam.pitch = g.p;
     placeCam(camera, cam.tx, cam.ty, cam.tz, cam.dist, cam.pitch);
+    battleCam();
     viewerEl.classList.toggle("cine", !!talk);
     updateTags();
   }

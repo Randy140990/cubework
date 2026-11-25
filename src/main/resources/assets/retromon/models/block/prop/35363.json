@@ -1,1 +1,0 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/area_ice_shard","area_ice_shard":"retromon:block/interior/area_ice_shard"},"elements":[{"from":[0.0,16,11.2],"to":[3.651,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#area_ice_shard","tintindex":144064064}}}]}

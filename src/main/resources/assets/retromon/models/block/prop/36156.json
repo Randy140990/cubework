@@ -1,1 +1,0 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/tree_leaf","tree_leaf":"retromon:block/interior/tree_leaf"},"elements":[{"from":[0,0.0,16],"to":[16.0,16.0,16],"faces":{"north":{"uv":[0.0,0.0,16.0,16.0],"texture":"#tree_leaf"}}}]}

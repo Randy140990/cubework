@@ -1,1 +1,0 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/area_cc_cliff","area_cc_cliff":"retromon:block/interior/area_cc_cliff"},"elements":[{"from":[0.0,16,11.382],"to":[3.703,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#area_cc_cliff","tintindex":144064064}}}]}

@@ -77,7 +77,10 @@ public final class BattleScene {
 		if (e.getId() == hiddenNpc) return true;
 		// Inside (no stage: the room itself), the room's people and POKéMON step out of the picture too, so no one
 		// stands in the way (the stage's own you and them have ids below 0).
-		return kind.equals("inside") && e.getId() >= 0 && !(e instanceof net.minecraft.world.entity.player.Player);
+		if (e.getId() < 0 || e instanceof net.minecraft.world.entity.player.Player) return false;
+		// ((0.64) On the spot, everyone near the field steps out of the picture too.)
+		if (onSpot && e.position().distanceToSqr(centre) < 20 * 20) return true;
+		return kind.equals("inside");
 	}
 
 	/** 0: yours, 1: theirs (or the one evolving). */
@@ -300,24 +303,72 @@ public final class BattleScene {
 			}
 			kind = "route";
 		}
-		build(stageAt);
-		double far = 6.0 + Math.max(0, h - 1.5) * 1.3;
-		mineAt = centre.add(-0.6, 0, 2.2);
-		enemyAt = centre.add(1.8, 0, 2.2 - far);
-		if (kind.equals("water")) enemyAt = new Vec3(enemyAt.x, centre.y - 0.1, enemyAt.z);
+		// (0.64, John's 07:10) Anywhere else (outside, the caves, the forests, the SAFARI ZONE, MT. SILVER): on the spot,
+		// in John's own build.
+		setUpSpot();
+	}
+
+	/** Whether the battle's fought on the spot (in the world itself, cleared round it), and where its middle is. */
+	private static boolean onSpot;
+
+	/**
+	 * (0.64, John's 07:10: "take a portion of the actual schematic ... it always looks like my schematic, but you've
+	 * maybe cleared the grass area ... camera angles not being obscured ... a distant horizon") The battle's fought
+	 * where you are, in the world as it is: laid out by BattleSpot (the way to them, or the nearest open spot, the
+	 * camera brought in if it must), the grass, flowers, leaves and fences in its corridor taken away on your screen
+	 * only (put back after), everyone else near it out of the picture, a few unseen lamps in the air over it for the
+	 * night. You stand where you are (the trainer the battle shows is you); theirs and their trainer across the field.
+	 */
+	private static void setUpSpot() {
+		float h = stageH;
+		Minecraft mc = Minecraft.getInstance();
+		BEFORE.clear();
+		onSpot = true;
+		Vec3 you = mc.player.position();
+		Entity t = hiddenNpc >= 0 ? level.getEntity(hiddenNpc) : null;
+		Vec3 way = t != null ? t.position().subtract(you) : Vec3.directionFromRotation(0, mc.player.getYRot());
+		int prefer = BattleSpot.nearest(way.x, way.z);
+		boolean inRoom = level.dimension() == com.insidethecube.retromon.game.Interiors.LEVEL;
+		boolean trainer = foeKey != null && !foeKey.isEmpty();
+		BattleSpot.Result r = BattleSpot.find(level, you.x, you.y, you.z, prefer, h, inRoom ? 10 : 6, kind.equals("water"), trainer);
+		if (r == null) {
+			// (Nowhere at all, not even where you stand: the battle where you are, as it is.)
+			double[] d = BattleSpot.DIRS[prefer];
+			r = new BattleSpot.Result(prefer, d[0], d[1], -d[1], d[0], you, you, you.add(d[0] * 1.5, 0, d[1] * 1.5), you.add(d[0] * 7, 0, d[1] * 7),
+					trainer ? you.add(d[0] * 9, 0, d[1] * 9) : null, false, false, false, false, you.add(-d[0] * 5, 2.4, -d[1] * 5), you.add(d[0] * 4, 0.8, d[1] * 4),
+					java.util.List.of(), 0, 5);
+		}
+		net.minecraft.world.level.block.state.BlockState air = Blocks.AIR.defaultBlockState();
+		for (BlockPos p : r.clears()) set(p.getX(), p.getY(), p.getZ(), air);
+		axBack = new Vec3(-r.fx(), 0, -r.fz());
+		axRight = new Vec3(r.rx(), 0, r.rz());
+		centre = r.centre();
+		mineAt = r.mine().add(0, r.mineWet() ? -0.1 : 0, 0);
+		enemyAt = r.enemy().add(0, r.enemyWet() ? -0.1 : 0, 0);
 		mine = spawn(mineAt, face(mineAt, enemyAt));
 		theirs = spawn(enemyAt, face(enemyAt, mineAt));
-		// Behind your Pokémon and a little above, looking across to theirs (the newer games' view): yours low and
-		// left of the middle, clear of your card, theirs further off to the right.
-		cam = centre.add(-1.4, 2.2 + Math.max(0, h - 2) * 0.4, 9.8 + Math.max(0, h - 2) * 0.9);
-		aim(mineAt.lerp(enemyAt, 0.5).add(0, 0.8 + Math.max(0, h - 1) * 0.15, 0));
+		Vec3 target = r.look();
+		cam = clear(target, r.cam());
+		aim(target);
 		introTicks = INTRO;
-		// You stand behind yours, off to the left (the newer games' view); their trainer behind theirs.
-		Vec3 heroAt = mineAt.add(-2.0, 0, 1.5);
+		Vec3 heroAt = r.hero();
 		hero = person("hero", com.insidethecube.retromon.game.Npc.PERSON, heroAt, face(heroAt, enemyAt));
-		if (foeKey != null && !foeKey.isEmpty()) {
-			Vec3 foeAt = enemyAt.add(2.1, 0, -1.8 - Math.max(0, h - 1.5) * 0.4);
+		if (trainer && r.foe() != null) {
+			Vec3 foeAt = r.foe();
 			foe = person(foeKey, foeRole, foeAt, face(foeAt, mineAt));
+			if (r.foeWet()) foe.setSwimming(true);
+		}
+		spotLights(r);
+	}
+
+	/** Unseen lamps in the air over the field (only where there's nothing), so a battle at night is clear. */
+	private static void spotLights(BattleSpot.Result r) {
+		BlockState light = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 13);
+		int y = (int) Math.floor(r.centre().y - 0.01) + 4;
+		for (double[] o : new double[][] {{0, 0}, {-2.5, 2.5}, {2.5, 2.5}, {-2.5, -3.5}, {2.5, -3.5}, {0, 7}}) {
+			Vec3 p = local(r.centre(), o[0], 0, o[1]);
+			BlockPos at = BlockPos.containing(p.x, y, p.z);
+			if (level.getBlockState(at).isAir()) set(at.getX(), at.getY(), at.getZ(), light);
 		}
 	}
 
@@ -346,7 +397,16 @@ public final class BattleScene {
 			end();
 			level = mc.level;
 			kind = "route";
-			build(mc.player.blockPosition());
+			foeKey = null;
+			hiddenNpc = -1;
+			stageH = 1;
+			axRight = new Vec3(1, 0, 0);
+			axBack = new Vec3(0, 0, 1);
+			setUpSpot();
+			for (MonDisplay d : new MonDisplay[] {mine, theirs}) if (d != null) level.removeEntity(d.getId(), Entity.RemovalReason.DISCARDED);
+			mine = theirs = null;
+			if (hero != null) level.removeEntity(hero.getId(), Entity.RemovalReason.DISCARDED);
+			hero = null;
 			built = true;
 			active = true;
 		}
@@ -359,7 +419,7 @@ public final class BattleScene {
 		if (level == null) return;
 		for (MonDisplay d : new MonDisplay[] {mine, ball, sendBall}) if (d != null) level.removeEntity(d.getId(), Entity.RemovalReason.DISCARDED);
 		mine = ball = sendBall = null;
-		Vec3 at = centre.add(0, 0, -0.5);
+		Vec3 at = local(centre, 0, 0, -0.5);
 		if (theirs == null) theirs = spawn(at, 0);
 		theirs.snapTo(at.x, at.y, at.z, 0, 0);
 		theirs.facing = 0;
@@ -369,7 +429,7 @@ public final class BattleScene {
 		enemyAt = at;
 		BedrockModel.Def def = BedrockModel.def(species);
 		float h = def == null ? 1 : def.height;
-		cam = at.add(0, 0.9 + h * 0.45, 2.6 + h * 1.1);
+		cam = local(at, 0, 0.9 + h * 0.45, 2.6 + h * 1.1);
 		aim(at.add(0, h * 0.5, 0));
 	}
 
@@ -391,7 +451,7 @@ public final class BattleScene {
 		if (!active || level == null) return;
 		if (ball != null) level.removeEntity(ball.getId(), Entity.RemovalReason.DISCARDED);
 		// From your hand (you throw it), or from in front of the camera if you're not on the stage.
-		ball = ballAt(hand(hero, cam.add(-0.4, -0.7, -0.8)), item);
+		ball = ballAt(hand(hero, local(cam, -0.4, -0.7, -0.8)), item);
 		if (hero != null) hero.throwing = com.insidethecube.retromon.game.Npc.THROW;
 		BedrockModel.Def def = BedrockModel.def(theirs == null ? "pidgey" : theirs.species);
 		double top = def == null ? 0.8 : Math.min(2.5, def.height * 0.6);
@@ -499,7 +559,7 @@ public final class BattleScene {
 		if (sendBall != null) level.removeEntity(sendBall.getId(), Entity.RemovalReason.DISCARDED);
 		Vec3 to = spot(side);
 		com.insidethecube.retromon.game.Npc who = side == 0 ? hero : foe;
-		Vec3 from = hand(who, side == 0 ? cam.add(0.6, -0.8, -0.6) : to.add(0.8, 1.6, -3.5));
+		Vec3 from = hand(who, side == 0 ? local(cam, 0.6, -0.8, -0.6) : local(to, 0.8, 1.6, -3.5));
 		if (who != null) who.throwing = com.insidethecube.retromon.game.Npc.THROW;
 		sendBall = ballAt(from, "poke_ball");
 		sendBall.fly(to.x, to.y + 0.2, to.z, 1.1, 9);
@@ -1373,6 +1433,7 @@ public final class BattleScene {
 		mine = theirs = ball = sendBall = recallBall = null;
 		hiddenNpc = -1;
 		active = revealed = false;
+		onSpot = false;
 		level = null;
 		shake = 0;
 	}

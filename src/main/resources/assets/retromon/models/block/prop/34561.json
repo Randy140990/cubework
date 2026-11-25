@@ -1,1 +1,0 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_moon_glow","ar_moon_glow":"retromon:block/interior/ar_moon_glow"},"elements":[{"from":[0.0,16,12.0],"to":[0.777,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#ar_moon_glow","tintindex":144064064}}}]}
