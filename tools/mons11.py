@@ -30,9 +30,11 @@ monlib.OUT_MODELS = os.path.join(FARM, "mons")
 monlib.OUT_TEX = os.path.join(FARM, "textures")
 
 # Big bright eyes, drawn in fine texels (two to each unit): dark ovals with a shine, the young ones' taller.
-EYE_YOUNG = [".PP.", "PPWP", "PPPP", ".PP."]   # a round eye two by two
-EYE_ADULT = [".PP.", ".PW.", ".PP.", "...."]   # a smaller oval, one by one and a half
-EYE_LASH = [".PP.", ".PW.", ".PP.", "...."]    # (hers the same: her bell, bow or flower says she is)
+# (14:44: "the eyes look huge compared to the faces") A small dark eye a unit across, a glint at its top outer corner
+# (drawn in fine texels: two to a unit).
+EYE_YOUNG = ["PW", "PP"]
+EYE_ADULT = ["PW", "PP"]
+EYE_LASH = ["PW", "PP"]    # (hers the same: her bell, bow or flower says she is)
 
 
 def patches(colour, size=3.2, chance=0.34, faces=("top", "nx", "px", "back", "front")):
@@ -137,7 +139,7 @@ def cattle(sid, name, stands, kind):
         FACE=FUR if kind != "bull" else "#34302E", face_coat=(lambda a: rgb("#F2EEE6") if a.face == "front" and abs(a.lx - 0.5) < 0.18 and a.ly > 0.45 else None) if kind == "bull" else None,
         head=head, snout=1.8 if kind != "bull" else 2.2, snout_w=1.3, snout_h=2.4, MUZZLE="#F6B8C4" if kind != "bull" else "#C89A8A", NOSE="#E07A92" if kind != "bull" else "#5A3A3A",
         neck=1.6, neck_up=-0.2, neck_tilt=-4, head_tilt=8, ears=("round", 2.6 if kind == "calf" else 2.2, 1.8), EAR=FUR, EAR_IN="#F6C0C8", ear_rot=[-4, 30, -75],
-        IRIS="#2A1A14", IRIS_L="#7A5A44", eye_w=2, eye_h=2, eye_grid=EYE_YOUNG if kind == "calf" else (EYE_LASH if kind == "cow" else EYE_ADULT),
+        IRIS="#2A1A14", IRIS_L="#7A5A44", eye_w=1, eye_h=1, eye_grid=EYE_YOUNG if kind == "calf" else (EYE_LASH if kind == "cow" else EYE_ADULT),
         eye_y=0.5, eye_in=1.0, PUPIL="#16100C",
         leg_w=2.2 if kind != "bull" else 2.6, toes=2, foot=Mat("#4A3A30", noise=0.01), LEG=FUR,
         tail={"segs": [(0.8, 0.8, 2.4), (0.8, 0.8, 2.4)], "rests": [-70, -5], "y": 0.85, "tip": PATCH}, extra=extra,
@@ -210,7 +212,7 @@ def sheep(sid, name, stands, kind):
         s=s, body=(bw, bh, bl), top=top, FUR=WOOL, FUR_L=mix(WOOL, "#FFFFFF", 0.4), FUR_D=mix(WOOL, "#8A8070", 0.3), BELLY=WOOL, speck=0.0,
         FACE=FACE, head=(4.4, 4.2, 4.0), snout=1.4, snout_w=1.1, snout_h=2.0, MUZZLE=FACE, NOSE="#C87A8A" if kind != "ram" else "#2A2422",
         neck=1.4, neck_up=0.2, neck_tilt=-4, head_tilt=8, ears=("round", 2.4, 1.4), EAR=FACE, EAR_IN="#F4B8C4", ear_rot=[0, 20, -85],
-        IRIS="#2A1E16", IRIS_L="#6A5040", eye_w=2, eye_h=2, eye_grid=EYE_YOUNG if kind == "lamb" else (EYE_LASH if kind == "ewe" else EYE_ADULT),
+        IRIS="#2A1E16", IRIS_L="#6A5040", eye_w=1, eye_h=1, eye_grid=EYE_YOUNG if kind == "lamb" else (EYE_LASH if kind == "ewe" else EYE_ADULT),
         eye_y=0.46, eye_in=0.7, PUPIL="#16100C",
         legm=legm, leg_w=1.6, toes=2, foot=Mat("#3A302A", noise=0.01),
         tail={"segs": [(1.6, 1.4, 1.6)], "rests": [-40], "y": 0.7}, extra=extra,
@@ -270,7 +272,7 @@ def pig(sid, name, stands, kind):
         FACE=SKIN, head=head, snout=1.4, snout_w=1.3, snout_h=2.2, MUZZLE=mix(SKIN, "#E07A8A", 0.3), NOSE=mix(SKIN, "#E07A8A", 0.4),
         neck=1.0, neck_up=-0.6, neck_tilt=0, head_tilt=4, ears=("fennec" if kind != "sow" else "round", 2.4, 2.4 if kind != "sow" else 2.2), EAR=SKIN, EAR_IN="#F08A9A",
         ear_rot=[30, 10, -30] if kind == "sow" else [-6, 10, -24],
-        IRIS="#2A1A16", IRIS_L="#6A4A40", eye_w=2, eye_h=2, eye_grid=EYE_YOUNG if kind == "piglet" else (EYE_LASH if kind == "sow" else EYE_ADULT),
+        IRIS="#2A1A16", IRIS_L="#6A4A40", eye_w=1, eye_h=1, eye_grid=EYE_YOUNG if kind == "piglet" else (EYE_LASH if kind == "sow" else EYE_ADULT),
         eye_y=0.56, eye_in=0.9, PUPIL="#16100C",
         leg_w=1.8, toes=2, foot=Mat("#8A5A5A", noise=0.01) if kind != "sow" else Mat("#8A6448", noise=0.02), extra=extra,
         moves=("TACKLE", "DIG") if kind == "sow" else (("TAKE DOWN", "HORN ATTACK") if kind == "boar" else ("TACKLE", "TAIL WHIP")), walk=0.8, stride=26, k=0.8))
@@ -302,15 +304,15 @@ def chicken(sid, name, stands, kind):
     and a great arching tail of dark green-black sickle feathers."""
     if kind == "chick":
         o = dict(s=0.6, body=(6, 6, 6), leg=1.6, B="#F8D84A", B_L="#FFF0A0", B_D="#E0B020", BELLY="#FFF0A0", head=(5, 5, 4.6), beak=1.0, BEAK="#F0A030", WING="#F0C83A",
-                 WING_D="#D8A820", WING_L="#FFE680", wing=3, tail=1.2, TAIL="#F0C83A", LEG="#F0A030", eye_w=2, eye_h=2, eye_grid=EYE_YOUNG, side_eyes=False, eye_in=0.7,
+                 WING_D="#D8A820", WING_L="#FFE680", wing=3, tail=1.2, TAIL="#F0C83A", LEG="#F0A030", eye_w=1, eye_h=1, eye_grid=EYE_YOUNG, side_eyes=False, eye_in=0.7,
                  eye_back=0, neck_up=-1.4, pitch=0, moves=("PECK", "GROWL"))
     elif kind == "hen":
         o = dict(s=1.0, body=(6.4, 6.4, 8.0), leg=2.4, B="#FAF7F0", B_L="#FFFFFF", B_D="#D8D0C2", BELLY="#FFFFFF", head=(4.0, 4.4, 4.0), beak=1.4, BEAK="#F2B43A",
-                 WING="#F4EEE2", WING_D="#D8CCB4", WING_L="#FFFFFF", wing=6, tail=3, TAIL="#F4EEE2", tail_tilt=40, LEG="#F2B43A", eye_w=2, eye_h=2, eye_grid=["PW", "PP"],
+                 WING="#F4EEE2", WING_D="#D8CCB4", WING_L="#FFFFFF", wing=6, tail=3, TAIL="#F4EEE2", tail_tilt=40, LEG="#F2B43A", eye_w=1, eye_h=1, eye_grid=["PW", "PP"],
                  pitch=-4, neck_up=0.4, moves=("PECK", "SAND ATTACK"))
     else:
         o = dict(s=1.15, body=(6.0, 6.4, 8.2), leg=3.4, B="#C8782E", B_L="#E8A24A", B_D="#8A4A1E", BELLY="#3A2A22", head=(3.8, 4.4, 4.0), beak=1.5, BEAK="#E8B040",
-                 WING="#8A4A1E", WING_D="#2A3A2E", WING_L="#C8782E", wing=6.5, tail=1, TAIL="#1E2A24", LEG="#E8B040", eye_w=2, eye_h=2, eye_grid=["LL", "IP"],
+                 WING="#8A4A1E", WING_D="#2A3A2E", WING_L="#C8782E", wing=6.5, tail=1, TAIL="#1E2A24", LEG="#E8B040", eye_w=1, eye_h=1, eye_grid=["IW", "PI"],
                  IRIS="#C87A2A", pitch=-10, neck_up=1.4, moves=("PECK", "GROWL"))
 
     def extra(p):
@@ -412,7 +414,7 @@ def horse(sid, name, stands, kind):
            [Cube(S([-1.3, hhy, hz - hl - ml]), [n(2.6 * s), n(2.4 * s), n(ml * s)], muzzle)], rotation=[34, 0, 0])
     m.bone("jaw", "head", S([0, hhy + 0.4, hz - hl]), [Cube(S([-1.1, hhy - 0.6, hz - hl - ml + 0.2]), [n(2.2 * s), 1, n(ml * s)], jaw_m)])
     grid = EYE_YOUNG if kind == "foal" else (EYE_LASH if kind == "mare" else EYE_ADULT)
-    m.eyes("head", x_inner=1.0 * s, y=(hhy + 1.4) * s, z=(hz - hl) * s, w=2, h=2, iris="#2A1A12", pupil="#120A08", skin=FUR, grid=grid)
+    m.eyes("head", x_inner=1.1 * s, y=(hhy + 1.8) * s, z=(hz - hl) * s, w=1, h=1, iris="#2A1A12", pupil="#120A08", skin=FUR, grid=grid)
     m.pair("ear_right", "head", S([-1.2, hhy + 3.2, hz - 1.2]), [Cube(S([-2.2, hhy + 3.0, hz - 1.2]), [n(1.4 * s), n(2.2 * s), 0], ear_mat(FUR, "#C89A8A", "fennec"))],
            rotation=[-8, 10, -10])
     stout_legs(m, (W / 2 - 0.9) * s, (-(L / 2 - 1.6) * s, (L / 2 - 1.6) * s), round(top * s), max(2, round((1.6 if kind == "foal" else 1.8) * s)), legm, hoof, 1, foot=hoof)
@@ -501,7 +503,7 @@ def dog(sid, coat_name, C):
         s=1.0, body=(4.6, 4.4, 9.0), top=4.4, FUR=FUR, FUR_L=FUR_L, FUR_D=FUR_D, BELLY=BELLY, coat=coat, speck=0.1, FACE=LOW or FUR, face_coat=face_coat,
         head=(4.4, 3.8, 3.8), snout=2.4, snout_w=0.9, snout_h=1.8, MUZZLE=C.get("MUZZLE", LOW or FUR), NOSE=C.get("NOSE", "#1A1614"), neck=2.4, neck_up=1.0,
         neck_tilt=-14, head_tilt=12, ears=("fennec", 1.8, 2.4), EAR=EAR, EAR_IN=C.get("EAR_IN", "#C8A090"), ear_rot=[-6, 10, -12],
-        IRIS=C.get("IRIS", "#7A4A1A"), IRIS_L=C.get("IRIS_L", "#C88A3A"), eye_w=2, eye_h=2, eye_grid=["LL", "IP"], eye_y=0.58,
+        IRIS=C.get("IRIS", "#7A4A1A"), IRIS_L=C.get("IRIS_L", "#C88A3A"), eye_w=1, eye_h=1, eye_grid=["IW", "PI"], eye_y=0.62, eye_in=1.0,
         LEG=LEG, leg_w=1.6, toes=2, foot=Mat(C.get("FOOT", LEG), noise=0.02),
         tail={"segs": [(1.4, 1.4, 2.6), (1.6, 1.6, 2.6), (1.8, 1.8, 2.4)], "rests": [-30, 10, 10], "y": 0.75}, extra=extra,
         moves=("BITE", "ROAR"), walk=0.9, stride=30, k=0.8))
@@ -562,8 +564,8 @@ def cat(sid, coat_name, C):
         s=0.75, body=(4.0, 3.8, 7.6), top=3.6, FUR=FUR, FUR_L=FUR_L, FUR_D=FUR_D, BELLY=WHITE or FUR_L, coat=coat, speck=0.1, FACE=FUR,
         face_coat=face_coat, head=(4.6, 4.0, 3.6), snout=0.9, snout_w=1.1, snout_h=1.6, MUZZLE=POINTS or WHITE or FUR, NOSE=C.get("NOSE", "#E07A8A"),
         neck=1.2, neck_up=0.6, neck_tilt=-6, head_tilt=6, ears=("fennec", 2.0, 2.4), EAR=POINTS or C.get("EAR", FUR), EAR_IN=C.get("EAR_IN", "#F4B8B0"),
-        ear_rot=[-4, 6, -10], IRIS=C.get("IRIS", "#6AB84A"), IRIS_L=C.get("IRIS_L", "#B8E88A"), PUPIL="#0A0A08", eye_w=2, eye_h=2,
-        eye_grid=["LLLL", "IPJW", "IPII", ".PI."], eye_y=0.52, eye_in=0.9, LEG=LEG, leg_w=1.4, toes=3, foot=Mat(LEG, noise=0.02),
+        ear_rot=[-4, 6, -10], IRIS=C.get("IRIS", "#6AB84A"), IRIS_L=C.get("IRIS_L", "#B8E88A"), PUPIL="#0A0A08", eye_w=2, eye_h=1,
+        eye_grid=["IPIW", "JPII"], eye_y=0.56, eye_in=0.7, LEG=LEG, leg_w=1.4, toes=3, foot=Mat(LEG, noise=0.02),
         tail={"segs": [(1.0, 1.0, 3.0), (1.0, 1.0, 3.0), (1.0, 1.0, 2.6)], "rests": [-10, 30, 40], "y": 0.75, "tip": C.get("TIP", STRIPE or POINTS or FUR_D),
               **({"mat": Mat(POINTS, noise=0.02)} if POINTS else {})},
         moves=("SCRATCH", "GROWL"), walk=0.9, stride=30, k=0.9))

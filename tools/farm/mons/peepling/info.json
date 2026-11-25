@@ -34,8 +34,8 @@
  },
  "move": "GROWL",
  "attack_move": "PECK",
- "scale": 0.761,
- "height": 0.46,
+ "scale": 0.799,
+ "height": 0.438,
  "texture": "retromon:textures/mons/peepling.png",
  "layers": [
   {
@@ -61,7 +61,7 @@
   ],
   "back": [
    0,
-   8.36,
+   8.0,
    0.2
   ],
   "body": [
@@ -70,8 +70,8 @@
    0.2
   ],
   "size": [
-   5.84,
-   7.36,
+   5.76,
+   7.0,
    9.52
   ]
  },
