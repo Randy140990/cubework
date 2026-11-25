@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/area_cave_rock","area_cave_rock":"retromon:block/interior/area_cave_rock"},"elements":[{"from":[0.0,16,11.382],"to":[3.703,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#area_cave_rock","tintindex":144064064}}}]}

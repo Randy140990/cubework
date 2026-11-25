@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_snow","ar_snow":"retromon:block/interior/ar_snow"},"elements":[{"from":[4.407,16,0.0],"to":[16.0,16,2.817],"faces":{"down":{"uv":[0,0,16,16],"texture":"#ar_snow","tintindex":144064064}}}]}

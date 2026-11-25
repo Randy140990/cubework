@@ -48,8 +48,18 @@ public final class Battles {
 	private static String arena(ServerPlayer p, Session s) {
 		// Inside a building (your rival in the lab): fought in the room itself.
 		// (The forest, a room you walk about in, has the forest's set piece, as outside.)
-		if (p.level().dimension() == Interiors.LEVEL && !Interiors.walkabout(p)) return "inside";
+		// (0.63, John's 05:53) A place with its own battle hall (each gym, the ELITE FOUR, the caves, the forests, the
+		// HIDEOUT, SILPH CO., the TOWER...): fought in it ("@" and its key; the client puts it up over you).
+		if (p.level().dimension() == Interiors.LEVEL) {
+			Interiors.Room r = Interiors.roomOf(p);
+			String hall = r == null ? null : Interiors.arenaFor(r.id());
+			if (hall != null) return "@" + hall;
+			if (!Interiors.walkabout(p)) return "inside";
+		}
 		String place = Game.data(p).place;
+		// ((0.63) Outside, a place that's part of one with a hall (the S.S. ANNE's bow, on its deck): that hall.)
+		String hallOf = Interiors.arenaFor(place);
+		if (hallOf != null) return "@" + hallOf;
 		if (s.trainer != null && s.trainer.boss() && !s.trainer.title().contains("ROCKET")) return "gym";
 		// (0.61, John's 17:58: "a battle arena for each specific Kanto area") Kanto's routes by what they are: Routes 3, 4
 		// and 9 rocky and built up; Route 10 rocky by the river; Routes 24 and 25 on NUGGET BRIDGE and the bridges north

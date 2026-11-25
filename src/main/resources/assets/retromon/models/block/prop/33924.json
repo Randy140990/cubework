@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ss_wall","ss_wall":"retromon:block/interior/ss_wall"},"elements":[{"from":[16,0.0,0.0],"to":[16,16.0,16],"faces":{"west":{"uv":[0,0,16,16],"texture":"#ss_wall","tintindex":143064048}}}]}

@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/lg_gilt","lg_gilt":"retromon:block/interior/lg_gilt"},"elements":[{"from":[0.0,16,0.0],"to":[5.925,16,0.274],"faces":{"down":{"uv":[0,0,16,16],"texture":"#lg_gilt","tintindex":144064064}}}]}

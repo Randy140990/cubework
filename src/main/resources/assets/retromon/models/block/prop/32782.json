@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_panel","ar_panel":"retromon:block/interior/ar_panel"},"elements":[{"from":[3.2,0.0,0],"to":[16.0,16,0],"faces":{"south":{"uv":[0.0,0.0,8.0,8.0],"texture":"#ar_panel"}}}]}

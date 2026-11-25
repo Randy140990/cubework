@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/man_pillar","man_pillar":"retromon:block/interior/man_pillar"},"elements":[{"from":[0.0,16,7.255],"to":[0.723,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#man_pillar","tintindex":144064064}}}]}

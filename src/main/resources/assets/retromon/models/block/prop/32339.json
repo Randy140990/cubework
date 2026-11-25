@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_marble","ar_marble":"retromon:block/interior/ar_marble"},"elements":[{"from":[10.075,16,1.874],"to":[16.0,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#ar_marble","tintindex":144064064}}}]}

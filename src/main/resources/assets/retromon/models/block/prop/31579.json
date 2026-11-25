@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_icicle","ar_icicle":"retromon:block/interior/ar_icicle"},"elements":[{"from":[14.08,0,10.88],"to":[16.0,0,14.72],"faces":{"up":{"uv":[0,0,16,16],"texture":"#ar_icicle","tintindex":144064064}}}]}

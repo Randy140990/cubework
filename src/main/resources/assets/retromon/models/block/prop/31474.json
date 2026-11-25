@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/lg_ice_pillar","lg_ice_pillar":"retromon:block/interior/lg_ice_pillar"},"elements":[{"from":[6.4,16,9.6],"to":[16.0,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#lg_ice_pillar","tintindex":144064064}}}]}

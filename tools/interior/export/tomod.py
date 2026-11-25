@@ -450,7 +450,9 @@ def write_textures(mats, res):
                     r, g, b, a = p[x, y]; p[x, y] = (r, g, b, 255)
         pad.save(os.path.join(out, name + ".png"))
         per = m.get("per", 1)
-        info[k] = {"name": name, "tw": tw, "th": th, "W": W, "H": H, "fit": m.get("fit", False), "per": per if isinstance(per, list) else [per, per]}
+        # (0.63) One colour all over (a battlefield's line): where a piece shows it from doesn't matter.
+        plain = len(set(im.getdata())) == 1
+        info[k] = {"name": name, "tw": tw, "th": th, "W": W, "H": H, "fit": m.get("fit", False), "per": per if isinstance(per, list) else [per, per], "plain": plain}
     return info
 
 
@@ -476,8 +478,14 @@ def cuts(a, b, extra):
     return sorted(pts)
 
 
-def slice_face(f, tex, cells):
-    """Cuts one face into pieces, each inside one block and one repeat of its texture, as model elements."""
+def slice_face(f, tex, cells, tiled=False):
+    """Cuts one face into pieces, each inside one block and one repeat of its texture, as model elements.
+
+    (0.63) tiled: a battle hall's. A texture that repeats over more than a block (planks over 4, a wall over 4 by 3)
+    isn't fixed in the model by where the piece is: it's marked (tintindex, below), and the game lays it from where
+    the block stands (PropTiles), the hall put up on a whole number of repeats.
+    So the same piece of wall is one block model wherever it is in any hall.
+    """
     k = f["k"]; t = tex[k]
     bl, R, U, w, h = f["bl"], f["r"], f["u"], f["w"], f["h"]
     n = cross(R, U); an, sn = axis_of(n); ar, sr = axis_of(R); au, su = axis_of(U)
@@ -527,7 +535,15 @@ def slice_face(f, tex, cells):
                 us, ue, vs, ve = us - ku, ue - ku, vs - kv, ve - kv
             sx, sy = t["tw"] / t["W"] * 16, t["th"] / t["H"] * 16
             uv = [round(us * sx, 4), round((1 - ve) * sy, 4), round(ue * sx, 4), round((1 - vs) * sy, 4)]
-            cells.setdefault(tuple(cell), []).append({"from": frm, "to": to, "faces": {face: {"uv": uv, "texture": "#" + t["name"]}}})
+            fc = {"uv": uv, "texture": "#" + t["name"]}
+            sxq, syq = t["tw"] * 64 / t["W"], t["th"] * 64 / t["H"]
+            if t.get("plain"):
+                fc = {"uv": [0, 0, round(sx, 4), round(sy, 4)], "texture": "#" + t["name"]}
+            elif tiled and not t["fit"] and [pu, pv] != [1, 1] and pu == int(pu) and pv == int(pv) and pu < 10 and pv < 10 and sxq == int(sxq) and syq == int(syq):
+                # (The mark: 100000000 + its repeat across x 10000000 + up x 1000000 + the picture's width x 1000 and
+                # height in the padded texture, in 64ths.)
+                fc = {"uv": [0, 0, 16, 16], "texture": "#" + t["name"], "tintindex": 100000000 + int(pu) * 10000000 + int(pv) * 1000000 + int(sxq) * 1000 + int(syq)}
+            cells.setdefault(tuple(cell), []).append({"from": frm, "to": to, "faces": {face: fc}})
 
 
 def collision(room):
@@ -668,7 +684,7 @@ def main():
         cells = {}
         for f in room["faces"]:
             if f["k"] in SKIP or f["k"] not in tex: continue
-            slice_face(f, tex, cells)
+            slice_face(f, tex, cells, rid.startswith("arena_"))
         # (An arena's only for looking at: it's put up on your screen alone, for the battle.)
         col = {} if rid.startswith("arena_") else collision(room)
         placed = []
@@ -767,7 +783,9 @@ def main():
     json.dump({"variants": {"m=%d" % s: {"model": "retromon:block/prop/%d" % st[0]} for s, st in enumerate(state_list)}},
               open(os.path.join(res, "assets/retromon/blockstates/prop.json"), "w"), separators=(",", ":"))
     os.makedirs(os.path.join(res, "retromon/interiors"), exist_ok=True)
-    out = {"version": 1, "states": len(state_list), "shapes": [shape_list[st[1]] for st in state_list], "rooms": rooms_out, "arenas": arenas_out, "doors": DOORS, "start": START}
+    # (0.63) Each battle hall's rooms (by the start of their ids): a battle in any of them is fought in that hall.
+    arena_for = {key: serves for key, serves in data.get("arenaFor", {}).items() if key in arenas_out}
+    out = {"version": 1, "states": len(state_list), "shapes": [shape_list[st[1]] for st in state_list], "rooms": rooms_out, "arenas": arenas_out, "arenaFor": arena_for, "doors": DOORS, "start": START}
     json.dump(out, open(os.path.join(res, "retromon/interiors/rooms.json"), "w"), separators=(",", ":"))
     print("textures", len(tex), "models", len(model_list), "shapes", len(shape_list), "states", len(state_list))
     for rid, r in rooms_out.items(): print(rid, len(r["cells"]) // 4, "blocks,", len(r["people"]), "people,", len(r["acts"]), "acts,", len(r["warps"]), "warps")

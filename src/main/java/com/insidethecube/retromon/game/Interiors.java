@@ -112,6 +112,26 @@ public final class Interiors {
 	public record Arena(double w, double d, double h, int[] cells, List<double[]> panes) {}
 
 	public static final Map<String, Arena> ARENAS = new LinkedHashMap<>();
+	/** (0.63) Each battle hall's rooms, by the start of their ids (the ROCKET HIDEOUT's for all its floors). */
+	public static final Map<String, List<String>> ARENA_FOR = new LinkedHashMap<>();
+
+	/**
+	 * (0.63, John's 05:53: "All locations where a battle can happen, we need to have a setup") The battle hall for a
+	 * room: its own (the LAB's), else the one whose rooms it's among (the longest start that fits), else null.
+	 */
+	public static String arenaFor(String roomId) {
+		if (roomId == null) return null;
+		if (ARENAS.containsKey(roomId)) return roomId;
+		String best = null;
+		int len = -1;
+		for (Map.Entry<String, List<String>> e : ARENA_FOR.entrySet())
+			for (String pre : e.getValue())
+				if (roomId.startsWith(pre) && pre.length() > len && ARENAS.containsKey(e.getKey())) {
+					best = e.getKey();
+					len = pre.length();
+				}
+		return best;
+	}
 
 	/**
 	 * The rooms built in Minecraft's own blocks, each a file of its own beside rooms.json (tools/forest.py). (Before DATA:
@@ -329,6 +349,11 @@ public final class Interiors {
 			int[] cells = new int[c.size()];
 			for (int i = 0; i < cells.length; i++) cells[i] = c.get(i).getAsInt();
 			ARENAS.put(e.getKey(), new Arena(num(a, "W", 24), num(a, "D", 24), num(a, "H", 7), cells, rows(a, "panes")));
+		}
+		if (DATA.has("arenaFor")) for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("arenaFor").entrySet()) {
+			List<String> pres = new ArrayList<>();
+			for (JsonElement p : e.getValue().getAsJsonArray()) pres.add(p.getAsString());
+			ARENA_FOR.put(e.getKey(), pres);
 		}
 		for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("doors").entrySet()) door(e.getKey(), e.getValue().getAsJsonObject());
 		for (String path : BLOCK_ROOMS) {

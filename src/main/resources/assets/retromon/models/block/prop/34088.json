@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gold","gold":"retromon:block/interior/gold"},"elements":[{"from":[15.52,0,15.52],"to":[16.0,0,16.0],"faces":{"up":{"uv":[0,0,16,16],"texture":"#gold","tintindex":144064064}}}]}

@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/lg_rock","lg_rock":"retromon:block/interior/lg_rock"},"elements":[{"from":[0.0,16,0.491],"to":[7.638,16,14.891],"faces":{"down":{"uv":[0,0,16,16],"texture":"#lg_rock","tintindex":144064064}}}]}

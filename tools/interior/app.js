@@ -654,6 +654,7 @@ function menuPlaces() {
 function menuText(label, p) {
   let extra = "";
   for (const [k, v] of Object.entries(MENU_ALSO)) if (p.id.startsWith(k)) extra += " " + v;
+  if (p.also) extra += " " + p.also;
   return (label + " " + p.group + " " + p.name + " " + p.floor + " " + p.id.replace(/_/g, " ") + extra).toLowerCase();
 }
 function fillRoomPick(query) {

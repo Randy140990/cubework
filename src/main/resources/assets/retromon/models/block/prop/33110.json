@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/silph_skirt","silph_skirt":"retromon:block/interior/silph_skirt"},"elements":[{"from":[0,0.0,16],"to":[16.0,16,16],"faces":{"north":{"uv":[0,0,16,16],"texture":"#silph_skirt","tintindex":144064064}}}]}

@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_basalt","ar_basalt":"retromon:block/interior/ar_basalt"},"elements":[{"from":[0.0,16,0.0],"to":[6.4,16,6.4],"faces":{"down":{"uv":[0,0,16,16],"texture":"#ar_basalt","tintindex":144064064}}}]}

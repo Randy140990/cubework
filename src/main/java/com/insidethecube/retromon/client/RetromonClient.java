@@ -35,6 +35,8 @@ public class RetromonClient implements ClientModInitializer {
 		// Looks only some places have (Pallet Town's white fences, red tiled roofs, HeartGold signs, the grass's edge on
 		// the dripstone round the water): drawn by where the block is.
 		AreaLooks.register();
+		// (0.63) The battle halls' planks and walls, laid from where each block stands.
+		PropTiles.register();
 		// 3D figures on screens (Oak, you, the starters, the Pokédex), drawn without a world.
 		net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(ctx -> new Figures.Renderer(ctx.vertexConsumers()));
 		net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry.register(ctx -> new Figures.ShadowRenderer(ctx.vertexConsumers()));

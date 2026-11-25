@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_banner","ar_banner":"retromon:block/interior/ar_banner"},"elements":[{"from":[12.621,0,12.904],"to":[16.0,0,16.0],"faces":{"up":{"uv":[0.0,0.0,3.7544,3.4397],"texture":"#ar_banner"}}}]}

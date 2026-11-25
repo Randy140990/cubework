@@ -193,8 +193,11 @@ public final class BattleScene {
 		Minecraft mc = Minecraft.getInstance();
 		BEFORE.clear();
 		BlockPos you = mc.player.blockPosition();
-		int y = Math.min(level.getMaxY() - 12, you.getY() + 26);
-		int ox = you.getX() - (int) Math.round(a.w() / 2), oz = you.getZ() - (int) Math.round(a.d() / 2);
+		// ((0.63) Put up on a whole number of its pictures' repeats (8 blocks across x, 24 along z and up), so the
+		// planks, walls and rock the game lays from where each block stands (PropTiles) fall as the viewer has them.)
+		int y = Math.ceilDiv(you.getY() + 26, 24) * 24;
+		if (y > level.getMaxY() - 12) y = Math.floorDiv(level.getMaxY() - 12, 24) * 24;
+		int ox = Math.floorDiv(you.getX() - (int) Math.round(a.w() / 2) + 4, 8) * 8, oz = Math.floorDiv(you.getZ() - (int) Math.round(a.d() / 2) + 12, 24) * 24;
 		// Clear the air it goes into first (nothing's there, but just in case), then its blocks, then the lamps.
 		net.minecraft.world.level.block.state.BlockState prop = Retromon.PROP.defaultBlockState();
 		int[] c = a.cells();
@@ -287,6 +290,15 @@ public final class BattleScene {
 		if (kind.equals("inside")) {
 			setUpInside();
 			return;
+		}
+		// (0.63) A place's own battle hall, put up over you.
+		if (kind.startsWith("@")) {
+			com.insidethecube.retromon.game.Interiors.Arena a = com.insidethecube.retromon.game.Interiors.ARENAS.get(kind.substring(1));
+			if (a != null) {
+				setUpArena(a);
+				return;
+			}
+			kind = "route";
 		}
 		build(stageAt);
 		double far = 6.0 + Math.max(0, h - 1.5) * 1.3;
@@ -1213,6 +1225,8 @@ public final class BattleScene {
 			double a = Math.toRadians(i * 360.0 / n + RNG.nextInt(10));
 			int tx = cx + (int) Math.round(Math.sin(a) * radius), tz = cz + (int) Math.round(Math.cos(a) * radius);
 			if (Math.hypot(tx - cam[0], tz - cam[1]) < 6.5) continue;
+			// ((0.63) By the water: no trees out on it, only on the shore.)
+			if (kind.equals("water") && tz - cz < -1) continue;
 			int kindOf = mixed ? RNG.nextInt(3) : 0;
 			BlockState log = kindOf == 1 ? Blocks.SPRUCE_LOG.defaultBlockState() : kindOf == 2 ? Blocks.BIRCH_LOG.defaultBlockState() : Blocks.OAK_LOG.defaultBlockState();
 			BlockState leaves = (kindOf == 1 ? Blocks.SPRUCE_LEAVES : kindOf == 2 ? Blocks.BIRCH_LEAVES : Blocks.OAK_LEAVES).defaultBlockState()

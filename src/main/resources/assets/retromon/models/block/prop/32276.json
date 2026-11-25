@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/lg_horn_base","lg_horn_base":"retromon:block/interior/lg_horn_base"},"elements":[{"from":[0.0,16,0.491],"to":[7.638,16,14.891],"faces":{"down":{"uv":[0,0,16,16],"texture":"#lg_horn_base","tintindex":144064064}}}]}

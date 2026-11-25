@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_crate","ar_crate":"retromon:block/interior/ar_crate"},"elements":[{"from":[1.927,0,0.0],"to":[16.0,0,0.098],"faces":{"up":{"uv":[0,0,16,16],"texture":"#ar_crate","tintindex":144064064}}}]}
