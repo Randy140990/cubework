@@ -56,14 +56,18 @@ KEEP = ("idle", "ground")
 FARM = os.path.join(HERE, "farm")
 FARM_FAMILIES = [("Farm: cattle", ["moopip", "moobelle", "brawnox"]), ("Farm: sheep", ["lamblet", "fleecelle", "curlram"]),
                  ("Farm: pigs", ["oinklet", "trufflesow", "tuskhog"]), ("Farm: chickens", ["peepling", "cluckmaid", "crowcomb"]),
-                 ("Farm: horses", ["foalet", "marebraid", "stormsteed"]), ("Pets: the dog", ["heelhound"]), ("Pets: the cat", ["barnpurr"])]
+                 ("Farm: horses", ["foalet", "marebraid", "stormsteed"]),
+                 # (14:40) The dog's and the cat's coats: one build, one size, a breed's colours each.
+                 ("Pets: the dog", ["heelhound", "heelhound_golden", "heelhound_red", "heelhound_spotted", "heelhound_snow", "heelhound_cocoa", "heelhound_merle"]),
+                 ("Pets: the cat", ["barnpurr", "barnpurr_tuxedo", "barnpurr_pointed", "barnpurr_calico", "barnpurr_silver", "barnpurr_midnight", "barnpurr_blue"])]
 
 
 def resolve(identifier):
     ns, path = identifier.split(":", 1)
     if ns == "retromon" and path.startswith("textures/mons/"):
         fp = os.path.join(FARM, "textures", path[len("textures/mons/"):])
-        if os.path.exists(fp) and os.path.basename(path).split(".")[0].split("_")[0] in {s for _, m in FARM_FAMILIES for s in m}: return fp
+        base = os.path.basename(path).split(".")[0]
+        if os.path.exists(fp) and (base.split("_glow")[0] in {s for _, m in FARM_FAMILIES for s in m}): return fp
     return os.path.join(ROOT, "..", ns, path)
 
 
@@ -76,11 +80,16 @@ def farm_rows():
     for line in open(os.path.join(FARM, "farm.tsv"), encoding="utf-8"):
         if line.startswith("#") or not line.strip(): continue
         f = line.rstrip("\n").split("\t")
-        sid, name, fam, stage, sex, types, st, grows, get, does = f
+        sid, name, fam, stage, sex, types, st, grows, get, does = f[:10]
+        coat = f[10] if len(f) > 10 and f[10] else None
         hp, atk, de, spa, spd, spe = (int(v) for v in st.split("/"))
         out[sid] = {"dex": 0, "name": name, "types": types.split(), "stats": {"HP": hp, "Attack": atk, "Defense": de, "Sp. Atk": spa, "Sp. Def": spd, "Speed": spe},
                     "catch": "-", "exp": "-", "growth": "-", "evolves": None,
                     "farm": {"line": fam, "stage": stage, "sex": sex, "grows": grows if grows != "-" else "", "get": get, "does": does}}
+        if coat:
+            # (A pet's coat: its breed's name on its card, what it looks like in its panel.)
+            out[sid]["name"] = coat.split(":")[0].upper()
+            out[sid]["farm"]["coat"] = coat
     # The grown ones: what they grew from.
     for _, members in FARM_FAMILIES:
         if len(members) == 3:

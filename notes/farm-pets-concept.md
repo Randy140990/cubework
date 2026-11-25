@@ -24,6 +24,23 @@ don't grow up.
 | Dog | HEELHOUND (a collie) | | |
 | Cat | BARNPURR (a ginger tabby) | | |
 
+## The dog's and the cat's coats (John's 14:40)
+
+Every dog and every cat has the same build and size, but each is born in one of seven breeds' colours, so the
+farm's pets vary. In the Creature Viewer, each coat is its own card in the dog's and the cat's groups.
+
+| HEELHOUND (the dog) | BARNPURR (the cat) |
+|---|---|
+| **Collie:** black and white, with tan on its cheeks and brows | **Ginger tabby:** ginger with darker stripes, a white chest and paws |
+| **Golden:** golden all over, with a cream ruff | **Tuxedo:** black, with a white chest, paws and muzzle, and amber eyes |
+| **Red and cream:** fox red, with cream cheeks, chest and paws | **Pointed:** cream, with dark brown ears, face, legs and tail, and blue eyes |
+| **Spotted:** white with black spots and black ears | **Calico:** white with orange and black patches |
+| **Snow:** grey and white, with a white mask and blue eyes | **Silver tabby:** silver grey with darker stripes, a white chest and paws |
+| **Cocoa:** chocolate brown all over, with amber eyes | **Midnight:** black all over, with yellow eyes |
+| **Blue merle:** blue-grey marbled with black, a white ruff and paws, tan points and blue eyes | **Blue grey:** soft blue-grey all over, with green eyes |
+
+The coat could be random when a pet is given or found, or you could pick one at the ranch's litter.
+
 ## How they'd play
 
 These are not caught. You get them in other ways:

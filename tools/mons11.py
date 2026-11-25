@@ -455,67 +455,143 @@ def stormsteed(): horse("stormsteed", "STORMSTEED", 2.0, "stallion")
 # The pets: HEELHOUND (the farm's dog) and BARNPURR (its cat)
 # ======================================================================================================
 
-def heelhound():
-    """The farm's dog, a herding collie: black and white with tan on its cheeks and brows, a deep white ruff on its
-    chest, its ears up but tipped over at the ends, a long plumed tail with a white tip, bright clever eyes. It herds
-    the flock, finds what's lost and keeps watch at night. It doesn't grow into anything else."""
-    BLACK, WHITE, TAN = "#26221F", "#F6F2EA", "#C8823A"
+def dog(sid, coat_name, C):
+    """The farm's dog, a herding dog's build (one size for every coat): a deep ruff on its chest, its ears up but
+    tipped over at the ends, a long plumed tail, bright clever eyes. It herds the flock, finds what's lost and keeps
+    watch at night. It doesn't grow into anything else. (14:40) Its coat by its breed (C): FUR and its light and dark,
+    the CHEST (and ruff), BELLY, LEG, FOOT, a white BLAZE down its face, LOWFACE (its face below the eyes), POINTS (the
+    tan on its cheeks and brows), SPOTS (a dalmatian's), PATCHES (a merle's), the TIP of its tail, its EAR, its eyes."""
+    FUR, FUR_L, FUR_D = C["FUR"], C.get("FUR_L", C["FUR"]), C.get("FUR_D", C["FUR"])
+    CHEST, BELLY, LEG = C.get("CHEST"), C.get("BELLY", C.get("CHEST") or FUR_L), C.get("LEG", FUR)
+    BLAZE, LOW, POINTS, SPOTS, PATCHES = C.get("BLAZE"), C.get("LOWFACE"), C.get("POINTS"), C.get("SPOTS"), C.get("PATCHES")
+    EAR, TIP = C.get("EAR", FUR), C.get("TIP")
 
     def coat(at, base):
-        if at.face == "bottom": return rgb(WHITE)
-        if at.y < 6.0 and at.z < -2: return rgb(WHITE)   # the ruff and chest
+        if at.face == "bottom": return rgb(BELLY)
+        if CHEST and at.y < 6.0 and at.z < -2: return rgb(CHEST)   # the ruff and chest
+        if SPOTS and at.face != "front" and hash01("dspot", int((at.x + 9) / 1.3), int(at.y / 1.3), int((at.z + 9) / 1.3)) < 0.22: return rgb(SPOTS)
+        if PATCHES and hash01("merle", int((at.x + 9) / 2.4), int(at.y / 2.4), int((at.z + 9) / 2.4)) < 0.32: return rgb(PATCHES)
         return None
 
     def face_coat(a):
-        if a.face == "front" and abs(a.lx - 0.5) < 0.12: return rgb(WHITE)
-        if a.face == "front" and a.ly < 0.4: return rgb(WHITE)
-        if a.face in ("front", "nx", "px") and 0.45 < a.ly < 0.6: return rgb(TAN)
+        if BLAZE and a.face == "front" and abs(a.lx - 0.5) < 0.12: return rgb(BLAZE)
+        if LOW and a.face == "front" and a.ly < 0.4: return rgb(LOW)
+        if POINTS and a.face in ("front", "nx", "px") and 0.45 < a.ly < 0.6: return rgb(POINTS)
+        if SPOTS and a.face in ("nx", "px", "top") and hash01("dspotf", int(a.lx * 4), int(a.ly * 4), a.face) < 0.18: return rgb(SPOTS)
         return None
 
     def extra(p):
         m, S, s_ = p["m"], p["S"], p["s"]
         nb = bone_of(m, "neck")
-        ruff = Mat(WHITE, fur(WHITE, "#FFFFFF", "#D8D0C4", speck=0.6), noise=0.03)
+        RUFF = CHEST or FUR
+        ruff = Mat(RUFF, fur(RUFF, mix(RUFF, "#FFFFFF", 0.3), mix(RUFF, "#000000", 0.15), speck=0.6), noise=0.03)
         nb.cubes += blob(S([-p["hw"] * 0.5, p["hy"] - 3.2, p["hz"] - 0.8]), S([p["hw"], 3.2, 2.6]), ruff)
-        # The plume of a tail, its white tip.
+        # The plume of a tail, its tip.
         t = bone_of(m, p["tail"][-1]) if p["tail"] else None
         if t:
-            t.cubes.append(Cube([-1.2 * s_, t.pivot[1] - 1.2 * s_, t.pivot[2] + 1.6 * s_], [n(2.4 * s_), n(2.4 * s_), n(1.6 * s_)], plain(WHITE)))
+            t.cubes.append(Cube([-1.2 * s_, t.pivot[1] - 1.2 * s_, t.pivot[2] + 1.6 * s_], [n(2.4 * s_), n(2.4 * s_), n(1.6 * s_)], plain(TIP or FUR)))
         # Ears tipped over: a little fold at each tip.
         for side in ("ear_right", "ear_left"):
             for b in m.bones:
                 if b.name == side and b.cubes:
                     c = b.cubes[0]
-                    b.cubes.append(Cube([c.origin[0], c.origin[1] + c.size[1] - 0.2, c.origin[2] - 0.1], [c.size[0], 0, n(1.2 * s_)], Mat(BLACK, noise=0.01, edge=0)))
+                    b.cubes.append(Cube([c.origin[0], c.origin[1] + c.size[1] - 0.2, c.origin[2] - 0.1], [c.size[0], 0, n(1.2 * s_)], Mat(EAR, noise=0.01, edge=0)))
 
-    quad("heelhound", "HEELHOUND", 0.85, dict(
-        s=1.0, body=(4.6, 4.4, 9.0), top=4.4, FUR=BLACK, FUR_L="#3A3430", FUR_D="#141210", BELLY=WHITE, coat=coat, speck=0.1, FACE=BLACK, face_coat=face_coat,
-        head=(4.4, 3.8, 3.8), snout=2.4, snout_w=0.9, snout_h=1.8, MUZZLE=WHITE, NOSE="#1A1614", neck=2.4, neck_up=1.0, neck_tilt=-14, head_tilt=12,
-        ears=("fennec", 1.8, 2.4), EAR=BLACK, EAR_IN="#C8A090", ear_rot=[-6, 10, -12], IRIS="#7A4A1A", IRIS_L="#C88A3A", eye_w=2, eye_h=2, eye_grid=["LL", "IP"], eye_y=0.58,
-        LEG=WHITE, leg_w=1.6, toes=2, foot=Mat(WHITE, noise=0.02),
+    quad(sid, "HEELHOUND", 0.85, dict(
+        s=1.0, body=(4.6, 4.4, 9.0), top=4.4, FUR=FUR, FUR_L=FUR_L, FUR_D=FUR_D, BELLY=BELLY, coat=coat, speck=0.1, FACE=LOW or FUR, face_coat=face_coat,
+        head=(4.4, 3.8, 3.8), snout=2.4, snout_w=0.9, snout_h=1.8, MUZZLE=C.get("MUZZLE", LOW or FUR), NOSE=C.get("NOSE", "#1A1614"), neck=2.4, neck_up=1.0,
+        neck_tilt=-14, head_tilt=12, ears=("fennec", 1.8, 2.4), EAR=EAR, EAR_IN=C.get("EAR_IN", "#C8A090"), ear_rot=[-6, 10, -12],
+        IRIS=C.get("IRIS", "#7A4A1A"), IRIS_L=C.get("IRIS_L", "#C88A3A"), eye_w=2, eye_h=2, eye_grid=["LL", "IP"], eye_y=0.58,
+        LEG=LEG, leg_w=1.6, toes=2, foot=Mat(C.get("FOOT", LEG), noise=0.02),
         tail={"segs": [(1.4, 1.4, 2.6), (1.6, 1.6, 2.6), (1.8, 1.8, 2.4)], "rests": [-30, 10, 10], "y": 0.75}, extra=extra,
         moves=("BITE", "ROAR"), walk=0.9, stride=30, k=0.8))
 
 
-def barnpurr():
-    """The farm's cat, a barn tabby: ginger striped in darker orange, a white chest and white paws, a white muzzle,
-    tall pointed ears, a long tail curling up at its end, big green eyes. It keeps the mice from the grain, naps in
-    the sun and leaves you presents on the doorstep. It doesn't grow into anything else."""
-    GINGER, WHITE = "#E89A4A", "#FBF6EE"
+# (14:40: "expand the cat and dog to provide a varying style (breed) ... sizing is the same but colours") The dog's
+# coats: sid, the breed's name, its colours.
+DOG_COATS = [
+    ("heelhound", "Collie", dict(FUR="#26221F", FUR_L="#3A3430", FUR_D="#141210", CHEST="#F6F2EA", BELLY="#F6F2EA", LEG="#F6F2EA", BLAZE="#F6F2EA",
+                                  LOWFACE="#F6F2EA", POINTS="#C8823A", MUZZLE="#F6F2EA", TIP="#F6F2EA")),
+    ("heelhound_golden", "Golden", dict(FUR="#D9A24E", FUR_L="#EBC27A", FUR_D="#B07E34", CHEST="#F0D49A", BELLY="#F0D49A", MUZZLE="#E8C27E",
+                                         TIP="#F0D49A", EAR="#C48A3A", NOSE="#2A1E18", IRIS="#5A3A1A", IRIS_L="#9A6A3A")),
+    ("heelhound_red", "Red and cream", dict(FUR="#C8642E", FUR_L="#E08A50", FUR_D="#9A4A22", CHEST="#F6E8D2", BELLY="#F6E8D2", LOWFACE="#F6E8D2",
+                                             MUZZLE="#F6E8D2", FOOT="#F6E8D2", TIP="#F6E8D2", IRIS="#3A2416", IRIS_L="#7A5A3A")),
+    ("heelhound_spotted", "Spotted", dict(FUR="#F4F2EE", FUR_L="#FFFFFF", FUR_D="#D8D4CC", SPOTS="#1E1C1A", BELLY="#FFFFFF", EAR="#1E1C1A",
+                                           MUZZLE="#F4F2EE", TIP="#F4F2EE", IRIS="#5A3A1A", IRIS_L="#9A6A3A")),
+    ("heelhound_snow", "Snow", dict(FUR="#6E7682", FUR_L="#8C94A0", FUR_D="#4A505A", CHEST="#F6F6F4", BELLY="#F6F6F4", LEG="#F6F6F4", BLAZE="#F6F6F4",
+                                     LOWFACE="#F6F6F4", MUZZLE="#F6F6F4", TIP="#F6F6F4", EAR_IN="#E8D0C8", IRIS="#4A98E0", IRIS_L="#A8D8FF")),
+    ("heelhound_cocoa", "Cocoa", dict(FUR="#6A4028", FUR_L="#845238", FUR_D="#4A2C1C", BELLY="#7A4C30", MUZZLE="#7A4C30", EAR="#5A3420",
+                                       NOSE="#3A2218", IRIS="#C89A3A", IRIS_L="#F0C870")),
+    ("heelhound_merle", "Blue merle", dict(FUR="#8C96A4", FUR_L="#A8B0BC", FUR_D="#6A7280", PATCHES="#2A2E36", CHEST="#F6F2EA", BELLY="#F6F2EA",
+                                            LEG="#F6F2EA", BLAZE="#F6F2EA", LOWFACE="#F6F2EA", POINTS="#C8823A", MUZZLE="#F6F2EA", TIP="#F6F2EA",
+                                            IRIS="#5A9AD0", IRIS_L="#A8D0F0")),
+]
+
+
+def cat(sid, coat_name, C):
+    """The farm's cat (one size for every coat): tall pointed ears, a long tail curling up at its end, big eyes. It
+    keeps the mice from the grain, naps in the sun and leaves you presents on the doorstep. It doesn't grow into
+    anything else. (14:40) Its coat by its breed (C): FUR and its light and dark, WHITE (its chest, paws and muzzle;
+    none for a solid coat), STRIPE (a tabby's), PATCH and PATCH2 (a calico's), POINTS (a pointed coat's ears, face,
+    legs and tail), its eyes and nose."""
+    FUR, FUR_L, FUR_D = C["FUR"], C.get("FUR_L", C["FUR"]), C.get("FUR_D", C["FUR"])
+    WHITE, STRIPE, P1, P2, POINTS = C.get("WHITE"), C.get("STRIPE"), C.get("PATCH"), C.get("PATCH2"), C.get("POINTS")
+    stripes = stripe_coat(STRIPE, every=1.6, width=0.6) if STRIPE else None
 
     def coat(at, base):
-        if at.face == "bottom": return rgb(WHITE)
-        if at.z < -2.6 and at.y < 4.2: return rgb(WHITE)
-        return stripe_coat("#B8642A", every=1.6, width=0.6)(at, base)
+        if at.face == "bottom": return rgb(WHITE or FUR_L)
+        if WHITE and at.z < -2.6 and at.y < 4.2: return rgb(WHITE)
+        if P1:
+            h = hash01("calico", int((at.x + 9) / 2.2), int(at.y / 2.2), int((at.z + 9) / 2.2))
+            if h < 0.26: return rgb(P1)
+            if h < 0.44: return rgb(P2)
+        if POINTS and at.z > 2.8: return rgb(mix(FUR, POINTS, 0.35))   # (a pointed coat darkens towards its tail)
+        return stripes(at, base) if stripes else None
 
-    quad("barnpurr", "BARNPURR", 0.5, dict(
-        s=0.75, body=(4.0, 3.8, 7.6), top=3.6, FUR=GINGER, FUR_L="#F6B870", FUR_D="#B8642A", BELLY=WHITE, coat=coat, speck=0.1, FACE=GINGER,
-        face_coat=lambda a: rgb(WHITE) if a.face == "front" and a.ly < 0.42 else None,
-        head=(4.6, 4.0, 3.6), snout=0.9, snout_w=1.1, snout_h=1.6, MUZZLE=WHITE, NOSE="#E07A8A", neck=1.2, neck_up=0.6, neck_tilt=-6, head_tilt=6,
-        ears=("fennec", 2.0, 2.4), EAR=GINGER, EAR_IN="#F4B8B0", ear_rot=[-4, 6, -10], IRIS="#6AB84A", IRIS_L="#B8E88A", PUPIL="#0A0A08", eye_w=2, eye_h=2,
-        eye_grid=["LLLL", "IPJW", "IPII", ".PI."], eye_y=0.52, eye_in=0.9, LEG=WHITE, leg_w=1.4, toes=3, foot=Mat(WHITE, noise=0.02),
-        tail={"segs": [(1.0, 1.0, 3.0), (1.0, 1.0, 3.0), (1.0, 1.0, 2.6)], "rests": [-10, 30, 40], "y": 0.75, "tip": "#B8642A"},
+    def face_coat(a):
+        if POINTS and a.face == "front" and 0.14 < a.lx < 0.86 and a.ly < 0.85: return rgb(POINTS)
+        if WHITE and a.face == "front" and a.ly < 0.42: return rgb(WHITE)
+        if P1 and a.face in ("front", "top", "nx", "px"):
+            h = hash01("calicof", int(a.lx * 2), int(a.ly * 2), a.face)
+            if h < 0.3: return rgb(P1)
+            if h < 0.5: return rgb(P2)
+        return None
+
+    LEG = POINTS or WHITE or FUR
+    quad(sid, "BARNPURR", 0.5, dict(
+        s=0.75, body=(4.0, 3.8, 7.6), top=3.6, FUR=FUR, FUR_L=FUR_L, FUR_D=FUR_D, BELLY=WHITE or FUR_L, coat=coat, speck=0.1, FACE=FUR,
+        face_coat=face_coat, head=(4.6, 4.0, 3.6), snout=0.9, snout_w=1.1, snout_h=1.6, MUZZLE=POINTS or WHITE or FUR, NOSE=C.get("NOSE", "#E07A8A"),
+        neck=1.2, neck_up=0.6, neck_tilt=-6, head_tilt=6, ears=("fennec", 2.0, 2.4), EAR=POINTS or C.get("EAR", FUR), EAR_IN=C.get("EAR_IN", "#F4B8B0"),
+        ear_rot=[-4, 6, -10], IRIS=C.get("IRIS", "#6AB84A"), IRIS_L=C.get("IRIS_L", "#B8E88A"), PUPIL="#0A0A08", eye_w=2, eye_h=2,
+        eye_grid=["LLLL", "IPJW", "IPII", ".PI."], eye_y=0.52, eye_in=0.9, LEG=LEG, leg_w=1.4, toes=3, foot=Mat(LEG, noise=0.02),
+        tail={"segs": [(1.0, 1.0, 3.0), (1.0, 1.0, 3.0), (1.0, 1.0, 2.6)], "rests": [-10, 30, 40], "y": 0.75, "tip": C.get("TIP", STRIPE or POINTS or FUR_D),
+              **({"mat": Mat(POINTS, noise=0.02)} if POINTS else {})},
         moves=("SCRATCH", "GROWL"), walk=0.9, stride=30, k=0.9))
+
+
+# The cat's coats: sid, the breed's name, its colours.
+CAT_COATS = [
+    ("barnpurr", "Ginger tabby", dict(FUR="#E89A4A", FUR_L="#F6B870", FUR_D="#B8642A", WHITE="#FBF6EE", STRIPE="#B8642A")),
+    ("barnpurr_tuxedo", "Tuxedo", dict(FUR="#22201E", FUR_L="#3A3632", FUR_D="#121110", WHITE="#FBF6EE", IRIS="#E8C23A", IRIS_L="#F8E88A", TIP="#22201E")),
+    ("barnpurr_pointed", "Pointed", dict(FUR="#EFE4D0", FUR_L="#F8F0E2", FUR_D="#D8C8AE", POINTS="#4A3428", NOSE="#4A3428", IRIS="#4A90E0",
+                                          IRIS_L="#A8D0FF", EAR_IN="#8A6A5A")),
+    ("barnpurr_calico", "Calico", dict(FUR="#F6F2EA", FUR_L="#FFFFFF", FUR_D="#DCD6CC", WHITE="#FBF8F2", PATCH="#E8963A", PATCH2="#2A2624",
+                                        IRIS="#8AB84A", IRIS_L="#C8E88A", TIP="#2A2624")),
+    ("barnpurr_silver", "Silver tabby", dict(FUR="#9AA0A8", FUR_L="#B8BEC6", FUR_D="#6E747C", WHITE="#F6F6F4", STRIPE="#4E545C", IRIS="#C8C23A",
+                                              IRIS_L="#F0E88A")),
+    ("barnpurr_midnight", "Midnight", dict(FUR="#1C1A1A", FUR_L="#2E2A2A", FUR_D="#0E0D0D", NOSE="#3A2A2A", IRIS="#E8C23A", IRIS_L="#F8E88A",
+                                            EAR_IN="#5A4A4A", TIP="#1C1A1A")),
+    ("barnpurr_blue", "Blue grey", dict(FUR="#7C8A9C", FUR_L="#94A2B4", FUR_D="#5E6A7A", NOSE="#5A6270", IRIS="#6AC86A", IRIS_L="#B8F0A8",
+                                         EAR_IN="#B8A0A8", TIP="#5E6A7A")),
+]
+
+
+def heelhound():
+    for sid, name, C in DOG_COATS: dog(sid, name, C)
+
+
+def barnpurr():
+    for sid, name, C in CAT_COATS: cat(sid, name, C)
 
 
 ALL11 = (moopip, moobelle, brawnox, lamblet, fleecelle, curlram, oinklet, trufflesow, tuskhog, peepling, cluckmaid, crowcomb, foalet, marebraid, stormsteed,

@@ -536,6 +536,7 @@ function renderFarm(d, st, sz) {
   $("#panel").innerHTML = `
     <div class="title"><div class="big">${esc(d.ours.info.name)}</div><div class="sub">${esc(F.line)} · ${esc(F.stage)}${F.sex !== "either" ? " · " + esc(F.sex === "she" ? "♀ she" : "♂ he") : ""} · Retromon's own (farm and pets)</div></div>
     <div class="types">${st.types.map(t => `<span class="type" style="background:var(${TYPE[t] || "--t-normal"})">${esc(t)}</span>`).join("")}</div>
+    ${F.coat ? `<div class="facts">${fact("Coat", F.coat)}${fact("Coats", "Every one the same build and size: born in one of " + DATA.families[famOf(state.sid)].members.length + " breeds' colours")}</div>` : ""}
     <div class="facts">${fact("How you get it", F.get)}${fact(F.stage === "Young" ? "Grows up" : F.stage === "Pet" ? "Growing up" : "Grew from", F.grows)}</div>
     <div class="facts">${fact("What it gives or does", F.does)}</div>
     <div><h2>Size in game (blocks)</h2><table><thead><tr><th></th><th class="ours">Retromon</th></tr></thead><tbody>
@@ -591,7 +592,7 @@ function fillMonPick() {
       const t = monText(sid) + " " + f.name.toLowerCase();
       if (q.length && !q.every(w => t.includes(w))) continue;
       const d = DATA.species[sid], o = document.createElement("option");
-      o.value = sid; o.textContent = d.stats.farm ? `${title(d.ours.info.name)} · ${d.stats.farm.stage === "Pet" ? "pet" : d.stats.farm.stage.toLowerCase()}${d.stats.farm.sex !== "either" ? " " + (d.stats.farm.sex === "she" ? "♀" : "♂") : ""}` : `${title(d.stats.name)} · ${title(d.ours.info.name)}`; og.appendChild(o); n++;
+      o.value = sid; o.textContent = d.stats.farm ? `${title(d.ours.info.name)} · ${d.stats.farm.coat ? d.stats.farm.coat.split(":")[0].toLowerCase() : d.stats.farm.stage.toLowerCase()}${d.stats.farm.sex !== "either" ? " " + (d.stats.farm.sex === "she" ? "♀" : "♂") : ""}` : `${title(d.stats.name)} · ${title(d.ours.info.name)}`; og.appendChild(o); n++;
     }
     if (og.children.length) sel.appendChild(og);
   }
