@@ -1,8 +1,0 @@
-net/minecraft/client/renderer/blockentity/AbstractSignRenderer.java
-net/minecraft/client/renderer/blockentity/SignRenderer.java
-net/minecraft/client/renderer/blockentity/BlockEntityRenderer.java
-net/minecraft/client/renderer/blockentity/state/SignRenderState.java
-net/minecraft/client/renderer/blockentity/state/BlockEntityRenderState.java
-net/minecraft/client/resources/model/ModelDebugName.java
-net/minecraft/client/resources/model/SpriteGetter.java
-net/minecraft/client/renderer/blockentity/BlockEntityRenderers.java
