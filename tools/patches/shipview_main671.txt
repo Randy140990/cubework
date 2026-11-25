@@ -1,0 +1,72 @@
+def ship_cells(W, sid, box, assets):
+    """One ship's blocks for the viewer: where, which state, which of a whole block's faces show."""
+    import shiplooks
+    x0, x1, y0, y1, z0, z1 = box
+    names, ids = W.box(x0, x1, y0, y1, z0, z1)
+    bn = [bname(n) for n in names]
+    pr = [props(n) for n in names]
+    Y, Z, X = ids.shape
+    part = np.array([partial(b, p) for b, p in zip(bn, pr)])
+    ship = shiplooks.ship_mask(sid, bn, ids, y0)
+    full = ship & ~part[ids]
+    # Each whole block's faces that show: all but those against another whole block of the ship that hides them (glass
+    # and leaves hide only their own kind). Bits: 1 top (+y), 2 bottom, 4 south (+z), 8 north (-z), 16 east (+x), 32 west (-x).
+    seethru = np.array(["glass" in b or b.endswith("_leaves") for b in bn])
+    opaque = full & ~seethru[ids]
+    mask = np.zeros(ids.shape, np.uint8)
+    for bit, ax, d in [(1, 0, 1), (2, 0, -1), (4, 1, 1), (8, 1, -1), (16, 2, 1), (32, 2, -1)]:
+        nb_opaque = np.roll(opaque, -d, axis=ax)
+        nb_same = np.roll(full & seethru[ids], -d, axis=ax) & (np.roll(ids, -d, axis=ax) == ids)
+        hidden = nb_opaque | (nb_same & seethru[ids])
+        sl = [slice(None)] * 3
+        sl[ax] = slice(-1, None) if d == 1 else slice(0, 1)
+        hidden[tuple(sl)] = False
+        mask |= np.where(full & ~hidden, bit, 0).astype(np.uint8)
+    # (A detail's shape is drawn whole; 63 in case its shape isn't one rooms70.js knows: then a whole block.)
+    mask[ship & ~full] = 63
+    keep = ship & (mask > 0)
+    zz = np.nonzero(keep)
+    used = sorted(set(ids[zz].tolist()))
+    remap = {o: i for i, o in enumerate(used)}
+    tex = os.path.join(assets, "textures", "block")
+    kinds, pal = {}, []
+    for o in used:
+        b = bn[o]
+        if b not in kinds: kinds[b] = {"rgb": colour_of(b, tex), "fam": family(b)}
+        pal.append(names[o].replace("minecraft:", ""))
+    ys, zs, xs = zz
+    buf = bytearray()
+    for y, z, x in zip(ys.tolist(), zs.tolist(), xs.tolist()):
+        p = remap[int(ids[y, z, x])]
+        buf += bytes([x, y, z, p & 255, p >> 8, int(mask[y, z, x])])
+    water = np.array([b == "water" for b in bn])[ids]
+    tops = collections.Counter()
+    for z in range(0, Z, 3):
+        for x in range(0, X, 3):
+            col = np.nonzero(water[:, z, x])[0]
+            if len(col): tops[int(col[-1])] += 1
+    sea = tops.most_common(1)[0][0] + 1 if tops else 11
+    print(sid, "ship blocks:", int(ship.sum()), "drawn (some face showing):", len(ys), "kinds:", len(kinds), "states:", len(pal), "sea at", sea)
+    return {"W": X, "H": Y, "D": Z, "sea": sea, "palette": pal, "kinds": kinds, "cells": base64.b64encode(bytes(buf)).decode(), "origin": [x0, y0, z0], "count": len(ys)}
+
+
+def main(world, assets):
+    """Both ships (tools/shiplooks.py's), in the pictures the game draws them in (its ship_looks.json, written first)."""
+    import shiplooks
+    W = spotworld.World(world)
+    looks = json.load(open(os.path.join(HERE, "interior", "ship_looks.json")))
+    out = {"pics": looks["pics"], "ships": {}}
+    for sid, name, moored, box, _ in shiplooks.SHIPS:
+        d = ship_cells(W, sid, box, assets)
+        d.update({"name": name, "moored": moored, "faces": looks["ships"][sid]["faces"]})
+        out["ships"][sid] = d
+    with open(OUT, "w") as f:
+        f.write("// Written by tools/shipview.py from John's world: the S.S. ANNE and the S.S. AQUA, every block of them, for the\n")
+        f.write("// Interior Viewer (rooms70.js) in the very pictures the game draws them in (tools/shiplooks.py). Each block: x, y, z,\n")
+        f.write("// its state (two bytes), its faces that show.\n")
+        f.write("const SHIPS = " + json.dumps(out, separators=(",", ":")) + ";\n")
+    print("bytes", os.path.getsize(OUT))
+
+
+if __name__ == "__main__":
+    main(sys.argv[1], sys.argv[2])

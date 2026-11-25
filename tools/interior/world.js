@@ -55,11 +55,22 @@ function textBoard(key, text, w = 40, ink = "#FFF4D8", board = "#8F5F2F") {
   return key;
 }
 const matCache = {};
+// (0.67.1) A picture given as an image (the game's own PNG: the ships' looks), laid as the drawn ones are.
+const imgCache = {};
+function imgTex(src) {
+  if (imgCache[src]) return imgCache[src];
+  const im = new Image(), t = new THREE.Texture(im);
+  im.onload = () => { t.needsUpdate = true; };
+  im.src = src;
+  t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; t.generateMipmaps = false;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  return (imgCache[src] = t);
+}
 function matFor(key) {
   if (matCache[key]) return matCache[key];
   const d = MATDEF[key];
   if (!d) throw new Error("no material " + key);
-  const map = d.dyn ? d.dyn.tex : pixTex(d.tex);
+  const map = d.dyn ? d.dyn.tex : d.img ? imgTex(d.img) : pixTex(d.tex);
   let m;
   if (d.overlay) m = new THREE.MeshBasicMaterial({ map, transparent: true, depthWrite: false, blending: d.add ? THREE.AdditiveBlending : THREE.NormalBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   else if (d.glow) m = new THREE.MeshLambertMaterial({ map, emissive: 0xffffff, emissiveMap: map, emissiveIntensity: d.glow });

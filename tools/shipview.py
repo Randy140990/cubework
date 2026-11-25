@@ -5,10 +5,12 @@ want you to present me in the viewer ... this will be an exterior kind of, the s
 it ... whatever colours exist now, it's just focusing on those and making them within our textural changes. It's
 purely for review first." (The game's ship stays as John built it: arealooks59c's "keep" rows.)
 
-Reads the ship out of John's Kanto world, keeps what can be seen from outside it (a flood of the open air and water
-round it, from the edges of its box in), and writes tools/interior/ship_data.js: its blocks (where, which state, and
-for a whole block which of its faces show), each kind's colour (its own picture's, from Minecraft's textures) and the
-family of our looks it's drawn in (rooms70.js draws them).
+Reads the ship out of John's Kanto world, every block of it (17:11: "you've not like removed anything ... You've just
+basically updated the textures only, correct?": its insides too, so its windows look into its rooms, and every
+detail, the beds, signs, banners and the rest, in its shape), and writes tools/interior/ship_data.js: its blocks
+(where, which state, and for a whole block which of its faces show), each kind's colour (its own picture's, from
+Minecraft's textures) and the family of our looks it's drawn in (rooms70.js draws them). Left out is only what isn't
+the ship: the sea, the sea bed, and what doesn't touch the ship (the harbour's glass wall, the pier's legs, a tree).
 
     python3 tools/shipview.py <John's world folder> <Minecraft's assets folder (assets/minecraft)>
 """
@@ -25,20 +27,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import spotworld  # noqa: E402
 
-BOX = (-452, -262, 18, 72, 616, 666)  # x0 x1 y0 y1 z0 z1
 OUT = os.path.join(HERE, "interior", "ship_data.js")
 # What isn't the ship: the sea, the sea bed and the bits of land in its box.
 NOT_SHIP = {"air", "cave_air", "water", "dripstone_block", "dirt", "grass_block", "podzol", "short_grass", "tall_grass", "large_fern", "fern", "seagrass", "tall_seagrass", "kelp", "kelp_plant"}
-# Drawn not at all (too small to read from outside, or nothing our looks could show: writing, faces, wiring).
-SKIP_SUFFIX = ("_sign", "_banner", "_coral_fan", "_coral_wall_fan", "_coral", "torch", "_bed")
-SKIP = {"tripwire", "tripwire_hook", "redstone_wire", "redstone_wall_torch", "comparator", "repeater", "cobweb", "lever", "potted_dead_bush", "campfire", "brewing_stand",
-        "bamboo", "rail", "activator_rail", "powered_rail", "detector_rail", "flower_pot", "potted_fern", "fire"}
-# Whole blocks (all six faces a full square; what shows of them is worked out here).
-PARTIAL = ("_slab", "_stairs", "_trapdoor", "_fence", "_fence_gate", "_wall", "_pane", "_carpet", "_button", "_door", "_head", "_wall_head")
-PARTIAL_NAMES = {"iron_bars", "end_rod", "iron_chain", "chain", "ladder", "lantern", "anvil", "grindstone", "cauldron", "daylight_detector", "player_head", "player_wall_head", "snow"}
-# What the air outside passes through (railings, rods, posts): the rest, even half blocks, closes a room off.
-OPEN_SUFFIX = ("_fence", "_fence_gate", "_wall", "_carpet", "_button", "_head", "_wall_head")
-OPEN_NAMES = {"iron_bars", "end_rod", "iron_chain", "chain", "ladder", "lantern"}
+# (Nothing of the ship is left out: what isn't a whole block is drawn in its shape, rooms70.js.)
+SKIP_SUFFIX = ()
+SKIP = set()
+# Whole blocks (all six faces a full square; which of their faces show is worked out here).
+PARTIAL = ("_slab", "_stairs", "_trapdoor", "_fence", "_fence_gate", "_wall", "_pane", "_carpet", "_button", "_door", "_head", "_wall_head", "_bed", "_sign",
+           "_banner", "_fan", "torch", "_rail", "_skull")
+PARTIAL_NAMES = {"iron_bars", "end_rod", "iron_chain", "chain", "ladder", "lantern", "anvil", "grindstone", "daylight_detector", "player_head", "player_wall_head", "snow",
+                 "tripwire_hook", "tripwire", "rail", "cobweb", "lever", "comparator", "repeater", "campfire", "bamboo", "potted_dead_bush", "flower_pot", "brewing_stand",
+                 "redstone_wire", "fire", "dead_bush", "short_grass", "fern"}
 
 
 def bname(n):
@@ -59,10 +59,6 @@ def partial(b, p):
     return b in PARTIAL_NAMES or b.endswith(PARTIAL)
 
 
-def passes(b, p):
-    return b in NOT_SHIP or skipped(b) or b in OPEN_NAMES or b.endswith(OPEN_SUFFIX)
-
-
 # ---------- each kind's own colour (its picture's average, from Minecraft's textures) ----------
 TEXNAME = {
     "smooth_quartz": "quartz_block_bottom", "smooth_quartz_stairs": "quartz_block_bottom", "smooth_quartz_slab": "quartz_block_bottom",
@@ -73,13 +69,21 @@ TEXNAME = {
     "stripped_spruce_wood": "stripped_spruce_log", "oak_wood": "oak_log", "acacia_wood": "acacia_log", "birch_wood": "birch_log",
     "light_gray_shulker_box": "light_gray_shulker_box", "white_shulker_box": "white_shulker_box", "anvil": "anvil", "grindstone": "grindstone_side",
     "cauldron": "cauldron_side", "barrel": "barrel_side", "smoker": "smoker_front", "blast_furnace": "blast_furnace_front", "bookshelf": "bookshelf",
-    "player_head": "white_concrete", "player_wall_head": "white_concrete", "iron_chain": "iron_chain", "lantern": "lantern", "daylight_detector": "daylight_detector_top",
+    "player_head": "light_gray_concrete", "player_wall_head": "light_gray_concrete", "iron_chain": "iron_chain", "lantern": "lantern", "daylight_detector": "daylight_detector_top",
+    "redstone_wall_torch": "redstone_torch", "campfire": "campfire_log", "bamboo": "bamboo_stalk", "potted_dead_bush": "flower_pot", "dead_horn_coral_wall_fan": "dead_horn_coral_fan",
+    "dead_fire_coral_wall_fan": "dead_fire_coral_fan", "brewing_stand": "brewing_stand_base",
 }
+WOOL = ("white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black")
 
 
 def texture_for(b, tex):
     cands = []
     if b in TEXNAME: cands.append(TEXNAME[b])
+    # Beds and banners in their cloth's colour, signs in their wood's.
+    for w in WOOL:
+        if b in (w + "_bed", w + "_banner", w + "_wall_banner"): cands.append(w + "_wool")
+    for suf in ("_wall_hanging_sign", "_hanging_sign", "_wall_sign", "_sign"):
+        if b.endswith(suf): cands.append(b[: -len(suf)] + "_planks"); break
     cands.append(b)
     stem = b
     for suf in ("_stairs", "_slab", "_wall", "_fence_gate", "_fence", "_button", "_pane", "_carpet", "_door", "_trapdoor"):
@@ -109,6 +113,7 @@ def colour_of(b, tex):
 
 def family(b):
     if "glass" in b: return "glass"
+    if b == "cobweb": return "web"
     if b in ("sea_lantern", "end_rod", "glowstone", "shroomlight", "redstone_lamp", "lantern", "ochre_froglight", "pearlescent_froglight", "verdant_froglight"): return "glow"
     if b.endswith("_leaves"): return "leaves"
     if b.startswith("iron_") or b in ("anvil", "chain", "cauldron", "hopper", "grindstone", "polished_basalt", "lightning_rod"): return "metal"
@@ -117,57 +122,38 @@ def family(b):
     return "paint"
 
 
-def main(world, assets):
-    W = spotworld.World(world)
-    x0, x1, y0, y1, z0, z1 = BOX
+def ship_cells(W, sid, box, assets):
+    """One ship's blocks for the viewer: where, which state, which of a whole block's faces show."""
+    import shiplooks
+    x0, x1, y0, y1, z0, z1 = box
     names, ids = W.box(x0, x1, y0, y1, z0, z1)
     bn = [bname(n) for n in names]
     pr = [props(n) for n in names]
     Y, Z, X = ids.shape
-    skip = np.array([skipped(b) for b in bn])
     part = np.array([partial(b, p) for b, p in zip(bn, pr)])
-    open_ = np.array([passes(b, p) for b, p in zip(bn, pr)])
-    S = ~skip[ids]           # the ship's blocks (drawn ones)
-    O = open_[ids]           # where the outside's air can go
-    # The ship itself: the biggest piece of touching blocks (the dock's posts and the harbour wall left out).
-    from scipy import ndimage  # noqa
-    lab, n = ndimage.label(S, structure=np.ones((3, 3, 3)))
-    sizes = ndimage.sum(S, lab, range(1, n + 1))
-    ship = lab == (1 + int(np.argmax(sizes)))
-    # The outside: the open cells joined to the box's edges (the sky and the sea round the ship).
-    olab, on = ndimage.label(O | ~ship & ~S, structure=ndimage.generate_binary_structure(3, 1))
-    edge = set(np.unique(np.concatenate([olab[0].ravel(), olab[-1].ravel(), olab[:, 0].ravel(), olab[:, -1].ravel(), olab[:, :, 0].ravel(), olab[:, :, -1].ravel()]))) - {0}
-    outside = np.isin(olab, list(edge))
+    ship = shiplooks.ship_mask(sid, bn, ids, y0)
     full = ship & ~part[ids]
-    shown = ship & (np.zeros_like(ship))
-    # A block shows if it's in the outside's air (a railing) or has a face on it.
-    near = np.zeros_like(ship)
-    for ax in range(3):
-        for d in (1, -1):
-            near |= np.roll(outside, d, axis=ax) & True
-    shown = ship & (outside | near)
-    # Each whole block's faces that show: those onto the outside's air or onto a part block that's drawn.
-    # Bits: 1 top (+y), 2 bottom, 4 south (+z), 8 north (-z), 16 east (+x), 32 west (-x).
-    dirs = [(1, 0, 0, 1), (2, 0, 0, -1), (4, 1, 0, 1), (8, 1, 0, -1), (16, 2, 0, 1), (32, 2, 0, -1)]
-    glassy = np.array(["glass" in b for b in bn])[ids]
+    # Each whole block's faces that show: all but those against another whole block of the ship that hides them (glass
+    # and leaves hide only their own kind). Bits: 1 top (+y), 2 bottom, 4 south (+z), 8 north (-z), 16 east (+x), 32 west (-x).
+    seethru = np.array(["glass" in b or b.endswith("_leaves") for b in bn])
+    opaque = full & ~seethru[ids]
     mask = np.zeros(ids.shape, np.uint8)
-    for bit, ax, _, d in dirs:
-        nb_out = np.roll(outside, -d, axis=ax)
-        nb_part = np.roll(shown & ~full, -d, axis=ax)
-        nb_glass = np.roll(shown & glassy, -d, axis=ax) & ~glassy
-        f = nb_out | nb_part | nb_glass
-        # (Not round the box's own edges, where the roll wraps.)
+    for bit, ax, d in [(1, 0, 1), (2, 0, -1), (4, 1, 1), (8, 1, -1), (16, 2, 1), (32, 2, -1)]:
+        nb_opaque = np.roll(opaque, -d, axis=ax)
+        nb_same = np.roll(full & seethru[ids], -d, axis=ax) & (np.roll(ids, -d, axis=ax) == ids)
+        hidden = nb_opaque | (nb_same & seethru[ids])
         sl = [slice(None)] * 3
         sl[ax] = slice(-1, None) if d == 1 else slice(0, 1)
-        f[tuple(sl)] = True
-        mask |= np.where(full & shown & f, bit, 0).astype(np.uint8)
-    keep = shown & (~full | (mask > 0))
+        hidden[tuple(sl)] = False
+        mask |= np.where(full & ~hidden, bit, 0).astype(np.uint8)
+    # (A detail's shape is drawn whole; 63 in case its shape isn't one rooms70.js knows: then a whole block.)
+    mask[ship & ~full] = 63
+    keep = ship & (mask > 0)
     zz = np.nonzero(keep)
     used = sorted(set(ids[zz].tolist()))
     remap = {o: i for i, o in enumerate(used)}
     tex = os.path.join(assets, "textures", "block")
-    kinds = {}
-    pal = []
+    kinds, pal = {}, []
     for o in used:
         b = bn[o]
         if b not in kinds: kinds[b] = {"rgb": colour_of(b, tex), "fam": family(b)}
@@ -176,8 +162,7 @@ def main(world, assets):
     buf = bytearray()
     for y, z, x in zip(ys.tolist(), zs.tolist(), xs.tolist()):
         p = remap[int(ids[y, z, x])]
-        buf += bytes([x - 0 if x < 256 else 255, y, z, p & 255, p >> 8, int(mask[y, z, x])])
-    # The sea's top (for the water round it in the viewer).
+        buf += bytes([x, y, z, p & 255, p >> 8, int(mask[y, z, x])])
     water = np.array([b == "water" for b in bn])[ids]
     tops = collections.Counter()
     for z in range(0, Z, 3):
@@ -185,15 +170,26 @@ def main(world, assets):
             col = np.nonzero(water[:, z, x])[0]
             if len(col): tops[int(col[-1])] += 1
     sea = tops.most_common(1)[0][0] + 1 if tops else 11
-    data = {"W": X, "H": Y, "D": Z, "sea": sea, "palette": pal, "kinds": kinds, "cells": base64.b64encode(bytes(buf)).decode(),
-            "origin": [x0, y0, z0], "count": len(ys)}
+    print(sid, "ship blocks:", int(ship.sum()), "drawn (some face showing):", len(ys), "kinds:", len(kinds), "states:", len(pal), "sea at", sea)
+    return {"W": X, "H": Y, "D": Z, "sea": sea, "palette": pal, "kinds": kinds, "cells": base64.b64encode(bytes(buf)).decode(), "origin": [x0, y0, z0], "count": len(ys)}
+
+
+def main(world, assets):
+    """Both ships (tools/shiplooks.py's), in the pictures the game draws them in (its ship_looks.json, written first)."""
+    import shiplooks
+    W = spotworld.World(world)
+    looks = json.load(open(os.path.join(HERE, "interior", "ship_looks.json")))
+    out = {"pics": looks["pics"], "ships": {}}
+    for sid, name, moored, box, _ in shiplooks.SHIPS:
+        d = ship_cells(W, sid, box, assets)
+        d.update({"name": name, "moored": moored, "faces": looks["ships"][sid]["faces"]})
+        out["ships"][sid] = d
     with open(OUT, "w") as f:
-        f.write("// Written by tools/shipview.py from John's Kanto world: the S.S. ANNE as can be seen from outside it, for the\n")
-        f.write("// Interior Viewer to show in our looks (rooms70.js), for review. x, y, z, its state (two bytes), its faces that show.\n")
-        f.write("const SHIP = " + json.dumps(data, separators=(",", ":")) + ";\n")
-    print("ship blocks shown:", len(ys), "kinds:", len(kinds), "states:", len(pal), "sea at", sea, "bytes", os.path.getsize(OUT))
-    fams = collections.Counter(kinds[bn[o]]["fam"] for o in used)
-    print(fams)
+        f.write("// Written by tools/shipview.py from John's world: the S.S. ANNE and the S.S. AQUA, every block of them, for the\n")
+        f.write("// Interior Viewer (rooms70.js) in the very pictures the game draws them in (tools/shiplooks.py). Each block: x, y, z,\n")
+        f.write("// its state (two bytes), its faces that show.\n")
+        f.write("const SHIPS = " + json.dumps(out, separators=(",", ":")) + ";\n")
+    print("bytes", os.path.getsize(OUT))
 
 
 if __name__ == "__main__":

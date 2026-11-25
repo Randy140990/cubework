@@ -81,7 +81,9 @@ def round59b(add, room, G):
         add("swap", "stripped_spruce_wood,stripped_spruce_log", b,
             "block/stripped_spruce_log=hill_top@4|cliff_root@4,block/stripped_spruce_log_top=hill_top@4|cliff_root@4")
     # The S.S. AQUA, John's own.
-    ship = ",".join(json.load(open(os.path.join(HERE, "area_ship59.json"))))
+    # ((0.67.1, 17:13) Retextured now, as the S.S. ANNE (arealooks67): kept only what isn't.)
+    done = set(b for r in json.load(open(os.path.join(HERE, "area_ships67.json")))["rows"] for b in r["blocks"].split(","))
+    ship = ",".join(k for k in json.load(open(os.path.join(HERE, "area_ship59.json"))) if k not in done)
     for z in range(SHIP[1], SHIP[3] + 1, 16):
         add("keep", ship, (SHIP[0], z, SHIP[2], min(SHIP[3], z + 15), "the S.S. AQUA, as John built it"), "-", ys(12, 60))
     # Olivine's pier: its stone head, its posts and bollards, its rails, its deck's edges.

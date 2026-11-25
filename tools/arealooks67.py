@@ -35,6 +35,13 @@ def round67(add, room, G):
     add("swap", "andesite", V, "block/andesite=vr_gold@4", ys(32, 32))
     add("swap", "polished_andesite_slab,polished_andesite_stairs", V, "block/polished_andesite=vr_gold@4", ys(33, 33))
 
+    # (0.67.1, John's 17:13) Both ships retextured: the S.S. ANNE and the S.S. AQUA, every kind of block in its own
+    # colour in our looks (tools/shiplooks.py made the pictures and these rows), in slices along each ship small
+    # enough to win over the places round them.
+    for r in json.load(open(os.path.join(HERE, "area_ships67.json")))["rows"]:
+        x0, z0, x1, z1 = r["box"]
+        add("swap", r["blocks"], (x0, z0, x1, z1, r["note"]), r["spec"], ys(*r["ys"]))
+
     # The buttons on the stones (John's touches of shape on the rocks by Victory Road): each the stone it's on, the
     # rock's picture run on over it (found by a sweep of every button on the map and what it's on).
     for x, y, z, spec in json.load(open(os.path.join(HERE, "area_rock_buttons67.json"))):

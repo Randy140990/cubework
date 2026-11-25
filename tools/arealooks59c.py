@@ -40,11 +40,15 @@ def round59c(add, room, G):
 
     # ---------- the S.S. ANNE (20:47: "do not texture those"): the ship as John built it, its stand, legs and gangway
     # (0.4x) still ours ----------
+    # ((0.67.1, John's 17:13: "both ships obviously get the retouch") Retextured now, block for block (arealooks67 and
+    # tools/shiplooks.py); kept as John built them only the things the game draws apart from the blocks (signs, banners,
+    # beds, heads) and the leaves, webs and fans.)
+    done = set(b for r in json.load(open(os.path.join(HERE, "area_ships67.json")))["rows"] for b in r["blocks"].split(","))
     anne = json.load(open(os.path.join(HERE, "area_anne59.json")))
     for x in range(-450, -265, 16):
         b = (x, 619, min(-266, x + 15), 662, "the S.S. ANNE, as John built it")
-        add("keep", ",".join(anne["low"]), b, "-", ys(21, 37))
-        add("keep", ",".join(anne["high"]), b, "-", ys(38, 70))
+        add("keep", ",".join(k for k in anne["low"] if k not in done), b, "-", ys(21, 37))
+        add("keep", ",".join(k for k in anne["high"] if k not in done), b, "-", ys(38, 70))
 
     # ---------- Vermilion's window sills (20:47: "they're still using the old slabs") ----------
     add("swap", "acacia_slab", (-402, 546, -300, 614, "Vermilion's window sills"), "block/acacia_planks=trim_ver", ys(31, 34))

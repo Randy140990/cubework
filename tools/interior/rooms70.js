@@ -1,4 +1,4 @@
-// ---------- (0.67, John's 16:28) The S.S. ANNE from outside, in our looks: for review only ----------
+// ---------- (0.67, John's 16:28; 0.67.1, 17:13) The S.S. ANNE and the S.S. AQUA, in our looks, as the game has them ----------
 // "I want you to present me in the viewer ... this will be an exterior kind of, the ship updated, and then obviously
 // for me to pan around it ... whatever colours exist now, it's just focusing on those and making them within our
 // textural changes. It's purely for review first."
@@ -6,13 +6,20 @@
 // own colour (its own picture's) drawn in the family of our looks it belongs to: painted steel clean and seamless (no
 // block lines; the hull's whites, its blues and greys, the funnels' stripes), timber in clean boards, metal brushed
 // with a sheen, glass tinted with a soft streak of light, lamps lit. Its shapes as Minecraft has them (slabs, stairs,
-// trapdoors, rails and posts, rods). Only what can be seen from outside it. The game's ship isn't changed: this is to
-// look at first. Drag to turn round it, right-drag or two fingers (or Shift and drag) to move across, the wheel or a
+// trapdoors, rails and posts, rods, and every detail: beds, signs, banners and the rest). (17:11: "you've not like
+// removed anything ... just basically updated the textures only, correct?") Every block of it, its insides too, so its
+// windows look into its rooms; only the player heads are a plain colour (their pictures aren't in the map). The
+// game's ship isn't changed: this is to look at first. Drag to turn round it, right-drag or two fingers (or Shift and drag) to move across, the wheel or a
 // pinch to come in and out; W A S D move across too.
 (function () {
-  if (typeof SHIP === "undefined") return;
-  const D = SHIP;
-  PLACES.push({ id: "ss_anne_outside", name: "S.S. ANNE (outside)", floor: "In our looks, for review: the game's ship unchanged", group: "Ships (for review)" });
+  if (typeof SHIPS === "undefined") return;
+  for (const [sid, D] of Object.entries(SHIPS.ships))
+    PLACES.push({ id: "ship_" + sid, name: D.name + " (outside)", floor: "In our looks, as the game has it (" + D.moored + ")", group: "Ships" });
+  // The game's pictures for the ships (tools/shiplooks.py), each a material laid as the game lays it.
+  for (const [k, p] of Object.entries(SHIPS.pics)) {
+    MATDEF["shp_" + k] = { img: "data:image/png;base64," + p.png, per: p.per, ...(p.cut ? { cut: true } : p.alpha ? { alpha: true } : {}) };
+    TEXDEF["shp_" + k] = [16, 16, (P, r) => P.fill([200, 200, 200], 0, r)];
+  }
 
   // ===================================== materials =====================================
   const clamp = v => Math.max(0, Math.min(255, v));
@@ -45,10 +52,14 @@
     }, { alpha: dark ? 0.9 : 0.62 }),
     // Lamps: lit.
     glow: (k, c) => reg(k, 16, 16, (P, r) => { P.fill(mixc(c, [255, 248, 230], 0.5), 0.02, r); }, { glow: 0.65 }),
+    // A cobweb: fine grey threads.
+    web: (k, c) => reg(k, 16, 16, (P, r) => { for (let i = 0; i < 16; i++) { P.set(i, i, [236, 236, 236], 0.9); P.set(15 - i, i, [236, 236, 236], 0.9); P.set(8, i, [236, 236, 236], 0.9); P.set(i, 8, [236, 236, 236], 0.9); } }, { cut: true }),
     leaves: (k, c) => reg(k, 16, 16, (P, r) => { P.fill(hx("#5AA548"), 0.06, r); for (let i = 0; i < 14; i++) P.set(r() * 16, r() * 16, hx("#86CC68")); }),
   };
+  // Anything the game leaves as it is (signs, banners, beds, heads, leaves, webs, fans): its own colour, as before.
   const KEY = {};
-  for (const [b, kd] of Object.entries(D.kinds)) {
+  for (const D of Object.values(SHIPS.ships)) for (const [b, kd] of Object.entries(D.kinds)) {
+    if (KEY[b]) continue;
     const k = "ship_" + b, c = clean(kd.rgb);
     (STYLE[kd.fam] || STYLE.paint)(k, c, b.startsWith("black_") || b.startsWith("gray_") || b === "glass" || b === "tinted_glass");
     KEY[b] = k;
@@ -133,29 +144,64 @@
     if (b === "player_head") return [[p16(4), 0, p16(4), p16(12), p16(8), p16(12)]];
     if (b === "player_wall_head") return [{ north: [p16(4), p16(4), p16(8), p16(12), p16(12), 1], south: [p16(4), p16(4), 0, p16(12), p16(12), p16(8)], west: [p16(8), p16(4), p16(4), 1, p16(12), p16(12)], east: [0, p16(4), p16(4), p16(8), p16(12), p16(12)] }[p.facing] || [p16(4), p16(4), p16(4), p16(12), p16(12), p16(12)]];
     if (b === "snow") return [[0, 0, 0, 1, p16(2 * (+p.layers || 1)), 1]];
+    // (17:11: every detail, in its shape.) Beds, signs, banners, fans, hooks, rails, webs, levers, the redstone bits,
+    // campfires, bamboo, pots.
+    const onWall = (f, x0, y0, d, x1, y1) => ({ north: [x0, y0, 1 - d, x1, y1, 1], south: [x0, y0, 0, x1, y1, d], west: [1 - d, y0, x0, 1, y1, x1], east: [0, y0, x0, d, y1, x1] }[f] || [x0, y0, 0.45, x1, y1, 0.55]);
+    if (b.endsWith("_bed")) return [[0, p16(3), 0, 1, p16(9), 1], [0, 0, 0, p16(3), p16(3), p16(3)], [p16(13), 0, 0, 1, p16(3), p16(3)], [0, 0, p16(13), p16(3), p16(3), 1], [p16(13), 0, p16(13), 1, p16(3), 1]];
+    if (b.endsWith("_wall_hanging_sign") || b.endsWith("_hanging_sign")) return [[p16(1), 0, p16(7), p16(15), p16(10), p16(9)]];
+    if (b.endsWith("_wall_sign")) return [onWall(p.facing, 0, p16(4.5), p16(2), 1, p16(12.5))];
+    if (b.endsWith("_sign")) return [[p16(7.25), 0, p16(7.25), p16(8.75), p16(9.3), p16(8.75)], [0, p16(9.3), p16(7.25), 1, p16(17.3), p16(8.75)]];
+    if (b.endsWith("_wall_banner")) return [onWall(p.facing, p16(1), -0.75, p16(1.5), p16(15), p16(14))];
+    if (b.endsWith("_banner")) return [[p16(7.25), 0, p16(7.25), p16(8.75), p16(28), p16(8.75)], [p16(1), p16(1), p16(7.25), p16(15), p16(28), p16(8.75)]];
+    if (b.endsWith("_wall_fan")) return [onWall(p.facing, p16(2), p16(4), p16(5), p16(14), p16(12))];
+    if (b.endsWith("_fan") || b.endsWith("_coral")) return [[p16(2), 0, p16(2), p16(14), p16(4), p16(14)]];
+    if (b.endsWith("wall_torch")) return [onWall(p.facing, p16(7), p16(3), p16(6), p16(9), p16(13))];
+    if (b.endsWith("torch")) return [[p16(7), 0, p16(7), p16(9), p16(10), p16(9)]];
+    if (b === "tripwire_hook") return [onWall(p.facing, p16(6), p16(2), p16(3), p16(10), p16(10))];
+    if (b === "tripwire") return [p.east === "true" || p.west === "true" ? [0, p16(1), p16(7.5), 1, p16(1.5), p16(8.5)] : [p16(7.5), p16(1), 0, p16(8.5), p16(1.5), 1]];
+    if (b === "rail" || b.endsWith("_rail")) return [[0, 0, 0, 1, p16(1), 1]];
+    if (b === "cobweb") return [[0, 0, p16(7.5), 1, 1, p16(8.5)], [p16(7.5), 0, 0, p16(8.5), 1, 1]];
+    if (b === "lever") {
+      if (p.face === "floor") return [[p16(5), 0, p16(4), p16(11), p16(3), p16(12)], [p16(7), p16(3), p16(7), p16(9), p16(10), p16(9)]];
+      if (p.face === "ceiling") return [[p16(5), p16(13), p16(4), p16(11), 1, p16(12)], [p16(7), p16(6), p16(7), p16(9), p16(13), p16(9)]];
+      return [onWall(p.facing, p16(5), p16(4), p16(3), p16(11), p16(12))];
+    }
+    if (b === "comparator" || b === "repeater" || b === "redstone_wire") return [[0, 0, 0, 1, p16(2), 1]];
+    if (b === "campfire") return [[0, 0, 0, 1, p16(7), 1]];
+    if (b === "bamboo") return [[p16(6.5), 0, p16(6.5), p16(9.5), 1, p16(9.5)]];
+    if (b === "flower_pot" || b.startsWith("potted_")) return [[p16(5), 0, p16(5), p16(11), p16(6), p16(11)], ...(b.startsWith("potted_") ? [[p16(7), p16(6), p16(7), p16(9), p16(13), p16(9)]] : [])];
+    if (b === "brewing_stand") return [[p16(2), 0, p16(2), p16(14), p16(2), p16(14)], [p16(7), 0, p16(7), p16(9), p16(14), p16(9)]];
+    if (b === "fire") return [[0, 0, p16(7.5), 1, 1, p16(8.5)], [p16(7.5), 0, 0, p16(8.5), 1, 1]];
+    if (b === "dead_bush" || b === "short_grass" || b === "fern") return [[p16(2), 0, p16(7.5), p16(14), p16(12), p16(8.5)], [p16(7.5), 0, p16(2), p16(8.5), p16(12), p16(14)]];
     return null;
   }
 
-  // ===================================== the ship =====================================
-  BUILD.ss_anne_outside = () => {
-    const R = new Room("ss_anne_outside", { name: "S.S. ANNE (outside)", floor: "In our looks, for review: the game's ship unchanged", W: D.W, D: D.D, H: D.H, outside: true });
-    R.orbit = { x: D.W / 2, y: 18, z: D.D / 2, yaw: 0.55, pitch: 0.36, dist: 175 };
+  // ===================================== the ships =====================================
+  for (const [sid, D] of Object.entries(SHIPS.ships)) BUILD["ship_" + sid] = () => {
+    const R = new Room("ship_" + sid, { name: D.name + " (outside)", floor: "In our looks, as the game has it (" + D.moored + ")", W: D.W, D: D.D, H: D.H, outside: true });
+    const big = Math.max(D.W, D.D);
+    R.orbit = { x: D.W / 2, y: 18, z: D.D / 2, yaw: D.W >= D.D ? 0.55 : 0.55 + Math.PI / 2, pitch: 0.36, dist: big * 0.92 };
     R.spawn = { x: D.W / 2, z: D.D / 2, yaw: 0 };
-    R.outsideSize = `${D.W} by ${D.D}, ${D.H} high (${D.count} blocks shown)`;
-    const G = R.geo, bytes = atob(D.cells), shapes = D.palette.map(shape), kinds = D.palette.map(s => KEY[parse(s)[0]] || "paint");
+    R.outsideSize = `${D.W} by ${D.D}, ${D.H} high (${D.count} blocks with a face showing; the rest are inside its solid walls)`;
+    // Each block: the game's pictures for its top, bottom and sides (tools/shiplooks.py), or its own colour where the
+    // game leaves it as it is.
+    const specOf = b => { const f = D.faces[b]; if (f && f.side) return { top: "shp_" + (f.top || f.side), bottom: "shp_" + (f.bottom || f.side), side: "shp_" + f.side }; return null; };
+    const G = R.geo, bytes = atob(D.cells), shapes = D.palette.map(shape);
+    const looks = D.palette.map(s => { const b = parse(s)[0]; return specOf(b) || { all: KEY[b] || "paint" }; });
     for (let i = 0; i + 5 < bytes.length; i += 6) {
       const x = bytes.charCodeAt(i), y = bytes.charCodeAt(i + 1), z = bytes.charCodeAt(i + 2), p = bytes.charCodeAt(i + 3) | (bytes.charCodeAt(i + 4) << 8), m = bytes.charCodeAt(i + 5);
-      const k = kinds[p], s = shapes[p];
+      const L = looks[p], s = shapes[p];
+      const top = L.top || L.all, bottom = L.bottom || L.all, side = L.side || L.all;
       if (!s) {
-        G.box(x, y, z, x + 1, y + 1, z + 1, { top: m & 1 ? k : null, bottom: m & 2 ? k : null, s: m & 4 ? k : null, n: m & 8 ? k : null, e: m & 16 ? k : null, w: m & 32 ? k : null });
+        G.box(x, y, z, x + 1, y + 1, z + 1, { top: m & 1 ? top : null, bottom: m & 2 ? bottom : null, s: m & 4 ? side : null, n: m & 8 ? side : null, e: m & 16 ? side : null, w: m & 32 ? side : null });
         continue;
       }
-      for (const b of s) G.box(x + b[0], y + b[1], z + b[2], x + b[3], y + b[4], z + b[5], k);
+      for (const b of s) G.box(x + b[0], y + b[1], z + b[2], x + b[3], y + b[4], z + b[5], { top, bottom, side });
     }
     // The sea round it.
     const M = 60;
     G.box(-M, D.sea - 0.14, -M, D.W + M, D.sea - 0.12, D.D + M, { top: "shipSea", all: null });
-    R.item("Ship", "John's S.S. ANNE as it stands on the map, each kind of block in its own colour in our looks: painted steel clean and seamless, timber boards, brushed metal, tinted glass, lamps lit. For review: the game's ship is as John built it.");
+    R.item("Ship", "John's " + D.name + " as it stands on the map, every block of it: each kind of block in its own colour in our looks (painted steel clean and seamless, timber boards, brushed metal, tinted glass, lamps lit), in the very pictures the game now draws it in. The things the game draws apart from the blocks (signs, banners, beds, heads) are as John built them.");
     R.item("Looking round", "Drag to turn round it; right-drag, two fingers or Shift and drag to move across; the wheel or a pinch to come in and out; W A S D move across too.");
     return R;
   };
