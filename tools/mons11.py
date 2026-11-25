@@ -564,8 +564,9 @@ def cat(sid, coat_name, C):
         s=0.75, body=(4.0, 3.8, 7.6), top=3.6, FUR=FUR, FUR_L=FUR_L, FUR_D=FUR_D, BELLY=WHITE or FUR_L, coat=coat, speck=0.1, FACE=FUR,
         face_coat=face_coat, head=(4.6, 4.0, 3.6), snout=0.9, snout_w=1.1, snout_h=1.6, MUZZLE=POINTS or WHITE or FUR, NOSE=C.get("NOSE", "#E07A8A"),
         neck=1.2, neck_up=0.6, neck_tilt=-6, head_tilt=6, ears=("fennec", 2.0, 2.4), EAR=POINTS or C.get("EAR", FUR), EAR_IN=C.get("EAR_IN", "#F4B8B0"),
-        ear_rot=[-4, 6, -10], IRIS=C.get("IRIS", "#6AB84A"), IRIS_L=C.get("IRIS_L", "#B8E88A"), PUPIL="#0A0A08", eye_w=2, eye_h=1,
-        eye_grid=["IPIW", "JPII"], eye_y=0.56, eye_in=0.7, LEG=LEG, leg_w=1.4, toes=3, foot=Mat(LEG, noise=0.02),
+        # ((14:48) Its head is drawn at three quarters, its eyes aren't: a unit across, set in from the sides of its face.)
+        ear_rot=[-4, 6, -10], IRIS=C.get("IRIS", "#6AB84A"), IRIS_L=C.get("IRIS_L", "#B8E88A"), PUPIL="#0A0A08", eye_w=1, eye_h=1,
+        eye_grid=["IW", "PI"], eye_y=0.56, eye_in=0.6, LEG=LEG, leg_w=1.4, toes=3, foot=Mat(LEG, noise=0.02),
         tail={"segs": [(1.0, 1.0, 3.0), (1.0, 1.0, 3.0), (1.0, 1.0, 2.6)], "rests": [-10, 30, 40], "y": 0.75, "tip": C.get("TIP", STRIPE or POINTS or FUR_D),
               **({"mat": Mat(POINTS, noise=0.02)} if POINTS else {})},
         moves=("SCRATCH", "GROWL"), walk=0.9, stride=30, k=0.9))
