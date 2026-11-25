@@ -209,6 +209,59 @@ function fitRoom(r) {
   }
   return best;
 }
+// (0.67, John's 16:28: "for me to pan around it") A room to look round from anywhere (the S.S. ANNE from outside, for
+// review): drag to turn round it, right-drag, two fingers or Shift and drag to move across, the wheel or a pinch to come
+// in and out, W A S D to move across. No one walks there (you and your follower aren't shown).
+const orbit = { on: false, yaw: 0.5, pitch: 0.4, dist: 160, x: 0, y: 10, z: 0, pts: new Map(), pinch: null };
+function placeOrbit() {
+  const cp = Math.cos(orbit.pitch);
+  camera.position.set(orbit.x + Math.sin(orbit.yaw) * cp * orbit.dist, orbit.y + Math.sin(orbit.pitch) * orbit.dist, orbit.z + Math.cos(orbit.yaw) * cp * orbit.dist);
+  camera.lookAt(orbit.x, orbit.y, orbit.z); camera.updateMatrixWorld(true);
+}
+function orbitPan(dx, dy) {
+  const k = orbit.dist * 0.0016, cy = Math.cos(orbit.yaw), sy = Math.sin(orbit.yaw);
+  orbit.x += (-dx * cy - dy * sy) * k; orbit.z += (dx * sy - dy * cy) * k;
+  if (room) { orbit.x = Math.max(-40, Math.min(room.W + 40, orbit.x)); orbit.z = Math.max(-40, Math.min(room.D + 40, orbit.z)); }
+}
+function orbitPinch() {
+  const ps = [...orbit.pts.values()];
+  if (ps.length < 2) return null;
+  return { d: Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y), x: (ps[0].x + ps[1].x) / 2, y: (ps[0].y + ps[1].y) / 2 };
+}
+canvas.addEventListener("pointerdown", e => {
+  if (!orbit.on) return;
+  e.preventDefault(); try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  orbit.pts.set(e.pointerId, { x: e.clientX, y: e.clientY, b: e.button, shift: e.shiftKey });
+  orbit.pinch = orbitPinch();
+});
+canvas.addEventListener("pointermove", e => {
+  if (!orbit.on || !orbit.pts.has(e.pointerId)) return;
+  const p = orbit.pts.get(e.pointerId), dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  if (orbit.pts.size >= 2) {
+    const q = orbitPinch();
+    if (q && orbit.pinch) { if (q.d > 4 && orbit.pinch.d > 4) orbit.dist = Math.max(8, Math.min(320, orbit.dist * orbit.pinch.d / q.d)); orbitPan(q.x - orbit.pinch.x, q.y - orbit.pinch.y); }
+    orbit.pinch = q;
+  } else if (p.b === 2 || p.shift || e.shiftKey) orbitPan(dx, dy);
+  else { orbit.yaw -= dx * 0.006; orbit.pitch = Math.max(0.03, Math.min(1.45, orbit.pitch + dy * 0.005)); }
+});
+for (const ev of ["pointerup", "pointercancel"]) canvas.addEventListener(ev, e => { orbit.pts.delete(e.pointerId); orbit.pinch = orbitPinch(); });
+canvas.addEventListener("wheel", e => { if (!orbit.on) return; e.preventDefault(); orbit.dist = Math.max(8, Math.min(320, orbit.dist * Math.exp(e.deltaY * 0.0012))); }, { passive: false });
+canvas.addEventListener("contextmenu", e => { if (orbit.on) e.preventDefault(); });
+function orbitEnter(r) {
+  const was = orbit.on;
+  orbit.on = !!(r && r.orbit);
+  actors.visible = !orbit.on;
+  if (orbit.on) {
+    Object.assign(orbit, r.orbit);
+    scene.background.set(0xa8d8f4);
+    // The sun high in the south-west over the whole ship, its shadows over all of it.
+    sun.position.set(r.W * 0.3, 140, r.D + 90); sun.target.position.set(r.W / 2, 0, r.D / 2);
+    const S = Math.max(r.W, r.D) * 0.62; Object.assign(sun.shadow.camera, { left: -S, right: S, top: S, bottom: -S, near: 1, far: 420 }); sun.shadow.camera.updateProjectionMatrix();
+    sun.intensity = 0.62; hemi.intensity = 0.56; ambient.intensity = 0.08; hemi.color.set(0xeef6ff); hemi.groundColor.set(0x7d8a96);
+    camera.far = 900; camera.updateProjectionMatrix();
+  } else if (was) { scene.background.set(0x000000); camera.far = 400; camera.updateProjectionMatrix(); }
+}
 // Talking to someone: as in the mod, the camera eases in on the two of you, 13 blocks back and 40 degrees down.
 let focus = null;
 function camGoal() {
@@ -257,6 +310,7 @@ function switchRoom(id, spawn) {
   if ($("#camSeg")) { setSeg($("#camSeg"), cam.mode); const bb = $("#camSeg").querySelector('[data-v="battle"]'); if (bb) bb.hidden = !room.battleCam; }
   cam.fit = fitRoom(room); snapCam();
   applyTime();
+  orbitEnter(room);
   $("#roomPick").value = id;
   $("#placeName").textContent = room.name; $("#placeFloor").textContent = room.floor;
   closeTalk(); renderPanel();
@@ -275,7 +329,7 @@ function battleCam() {
     scene.background.set(0xbfe0f4);
     if (!scene.fog) scene.fog = new THREE.Fog(0xbfe0f4, 26, 58);
     scene.fog.near = on ? 26 : 60; scene.fog.far = on ? 58 : 140;
-  } else { scene.background.set(0x000000); if (scene.fog && room && room.battleCam && !room.haze) scene.fog = null; }
+  } else { scene.background.set(orbit.on ? 0xa8d8f4 : 0x000000); if (scene.fog && room && room.battleCam && !room.haze) scene.fog = null; }
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function tween(ms, fn) { return new Promise(res => { const t0 = performance.now(); const step = now => { const k = Math.min(1, (now - t0) / ms); fn(k); if (k < 1) requestAnimationFrame(step); else res(); }; requestAnimationFrame(step); }); }
@@ -583,7 +637,8 @@ let last = performance.now();
 function tickFrame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (room) {
-    updateMe(dt); updateFollower(dt, now); tickTalk(now);
+    if (!orbit.on) { updateMe(dt); updateFollower(dt, now); tickTalk(now); }
+    else { const kx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0), kz = (keys.down ? 1 : 0) - (keys.up ? 1 : 0); if (kx || kz) orbitPan(-kx * dt * 520, -kz * dt * 520); }
     for (const s of room.screens) s.tick(now);
     if (room.arrowMesh) { room.arrowMesh.material.opacity = 0.35 + 0.35 * (0.5 + 0.5 * Math.sin(now / 300)); room.arrowMesh.position.y = 0.06; }
     if (room.puffs) for (const p of room.puffs) { const k = ((now / 2600) + p.k) % 1; p.s.position.set(room.steam.x + Math.sin(k * 7 + p.k * 9) * 0.08, room.steam.y + k * 1.1, room.steam.z); p.s.material.opacity = Math.sin(k * Math.PI) * 0.55; p.s.scale.setScalar(0.18 + k * 0.32); }
@@ -596,6 +651,7 @@ function tickFrame(now) {
     if (Math.abs(cam.pitch - g.p) < 1e-4) cam.pitch = g.p;
     placeCam(camera, cam.tx, cam.ty, cam.tz, cam.dist, cam.pitch);
     battleCam();
+    if (orbit.on) placeOrbit();
     viewerEl.classList.toggle("cine", !!talk);
     updateTags();
   }
