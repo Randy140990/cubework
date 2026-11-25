@@ -55,3 +55,17 @@ tasks.register('printClasspath') {
 		file("classpath.txt").text = sourceSets.main.compileClasspath.asPath
 	}
 }
+
+// (0.67) A probe for the compile check: how Minecraft's block states scale (ci/probe; not in the mod).
+sourceSets {
+	probe {
+		java.srcDir 'ci/probe'
+		compileClasspath += sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath + output
+	}
+}
+tasks.register('probeStates', JavaExec) {
+	classpath = sourceSets.probe.runtimeClasspath
+	mainClass = 'StateProbe'
+	maxHeapSize = '6g'
+}

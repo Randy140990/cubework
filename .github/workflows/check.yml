@@ -37,6 +37,8 @@ jobs:
               if [ -f "$J" ] && [ $(stat -c %s "$J") -gt 95000000 ]; then split -b 90000000 -d "$J" "$J.part"; rm "$J"; fi
             done
           fi
+          # (0.67) How Minecraft's block states scale (numbers only).
+          if [ -d ci/probe ]; then timeout 900 ./gradlew probeStates -q > out/probe.txt 2>&1; echo "exit=$?" >> out/probe.txt; fi
           ./gradlew printClasspath > /dev/null 2>&1
           CP=$(cat classpath.txt 2>/dev/null)
           echo "$CP" | tr ':' '\n' > out/classpath.txt
