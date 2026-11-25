@@ -32,6 +32,10 @@ jobs:
           if grep -q "exit=0" out/compile.txt; then
             ./gradlew build -x test > out/build.txt 2>&1; echo "exit=$?" >> out/build.txt
             cp $(ls build/libs/*.jar | grep -v -- '-sources.jar') out/ 2>/dev/null || true
+            # (0.66) Over 95 MB, in parts (GitHub won't take a file of 100 MB or more): cat them back together.
+            for J in out/*.jar; do
+              if [ -f "$J" ] && [ $(stat -c %s "$J") -gt 95000000 ]; then split -b 90000000 -d "$J" "$J.part"; rm "$J"; fi
+            done
           fi
           ./gradlew printClasspath > /dev/null 2>&1
           CP=$(cat classpath.txt 2>/dev/null)
