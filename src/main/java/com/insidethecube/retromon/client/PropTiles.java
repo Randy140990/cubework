@@ -41,17 +41,21 @@ public final class PropTiles {
 			// Minecraft (retromon/interiors/prop_models.json, in order), not through a blockstates file: Minecraft matches
 			// a blockstates file's every variant against every one of the block's states, and with 37 thousand states that
 			// was more than a billion checks each time it started.
-			if (Retromon.PROP != null) ctx.registerBlockStateResolver(Retromon.PROP, r -> {
-				int[] models = propModels();
-				Map<Integer, BlockStateModel.UnbakedRoot> roots = new HashMap<>();
-				for (BlockState st : r.block().getStateDefinition().getPossibleStates()) {
-					int m = st.getValue(com.insidethecube.retromon.game.Prop.M);
-					int model = m >= 0 && m < models.length ? models[m] : 0;
-					r.setModel(st, roots.computeIfAbsent(model, k -> new SingleVariant.Unbaked(new Variant(Retromon.id("block/prop/" + k))).asRoot()));
-				}
-			});
+			// ((0.67) Over all the rooms' blocks, each state its look's model; looks past the last share the first's.)
+			int[] models = propModels();
+			Map<Integer, BlockStateModel.UnbakedRoot> roots = new HashMap<>();
+			for (com.insidethecube.retromon.game.Prop p : com.insidethecube.retromon.game.Prop.ALL) {
+				if (p == null) continue;
+				ctx.registerBlockStateResolver(p, r -> {
+					for (BlockState st : r.block().getStateDefinition().getPossibleStates()) {
+						int g = com.insidethecube.retromon.game.Prop.look(st);
+						int model = g >= 0 && g < models.length ? models[g] : models.length > 0 ? models[0] : 0;
+						r.setModel(st, roots.computeIfAbsent(model, k -> new SingleVariant.Unbaked(new Variant(Retromon.id("block/prop/" + k))).asRoot()));
+					}
+				});
+			}
 			ctx.modifyBlockModelAfterBake().register((model, c) -> {
-				if (Retromon.PROP == null || c.state().getBlock() != Retromon.PROP || model == null) return model;
+				if (!(c.state().getBlock() instanceof com.insidethecube.retromon.game.Prop) || model == null) return model;
 				return new Tiled(model, c.baker().sprites().spriteFinder(TextureAtlas.LOCATION_BLOCKS));
 			});
 		});

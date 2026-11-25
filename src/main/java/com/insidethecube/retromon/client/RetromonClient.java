@@ -30,7 +30,8 @@ public class RetromonClient implements ClientModInitializer {
 		Adventure.register();
 		Hud.register();
 		// The insides of buildings: cut-out (glass, leaves and the clock face show what's behind them).
-		net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(Retromon.PROP, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
+		for (com.insidethecube.retromon.game.Prop p : com.insidethecube.retromon.game.Prop.ALL)
+			net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putBlock(p, net.minecraft.client.renderer.chunk.ChunkSectionLayer.CUTOUT);
 		Colours.register();
 		// Looks only some places have (Pallet Town's white fences, red tiled roofs, HeartGold signs, the grass's edge on
 		// the dripstone round the water): drawn by where the block is.

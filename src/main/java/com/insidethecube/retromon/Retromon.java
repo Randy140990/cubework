@@ -75,10 +75,16 @@ public class Retromon implements ModInitializer {
 						.clientTrackingRange(0).noLootTable().noSave().noSummon().build(ROOM_LIGHT_KEY));
 		WORLD_MON = Registry.register(BuiltInRegistries.ENTITY_TYPE, WORLD_MON_KEY,
 				EntityType.Builder.<WorldMon>of(WorldMon::new, MobCategory.MISC).sized(1.0F, 1.2F).clientTrackingRange(10).noLootTable().build(WORLD_MON_KEY));
-		PROP = Registry.register(BuiltInRegistries.BLOCK, PROP_KEY, new com.insidethecube.retromon.game.Prop(
-				net.minecraft.world.level.block.state.BlockBehaviour.Properties.of().setId(PROP_KEY).noOcclusion().strength(-1F, 3600000F).noLootTable()
-						.isViewBlocking((st, g, pos) -> false).isSuffocating((st, g, pos) -> false)
-						.pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+		// (0.67) The rooms' blocks: their looks shared out over many blocks of Prop.SIZE states each (game/Prop).
+		for (int k = 0; k < com.insidethecube.retromon.game.Prop.BLOCKS; k++) {
+			ResourceKey<net.minecraft.world.level.block.Block> key = k == 0 ? PROP_KEY : ResourceKey.create(Registries.BLOCK, id("prop_" + k));
+			com.insidethecube.retromon.game.Prop.ALL[k] = Registry.register(BuiltInRegistries.BLOCK, key, new com.insidethecube.retromon.game.Prop(
+					net.minecraft.world.level.block.state.BlockBehaviour.Properties.of().setId(key).noOcclusion().strength(-1F, 3600000F).noLootTable()
+							.isViewBlocking((st, g, pos) -> false).isSuffocating((st, g, pos) -> false)
+							.pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK).sound(net.minecraft.world.level.block.SoundType.WOOD),
+					k * com.insidethecube.retromon.game.Prop.SIZE));
+		}
+		PROP = com.insidethecube.retromon.game.Prop.ALL[0];
 		MAILBOX = Registry.register(BuiltInRegistries.BLOCK, MAILBOX_KEY, new com.insidethecube.retromon.game.Mailbox(
 				net.minecraft.world.level.block.state.BlockBehaviour.Properties.of().setId(MAILBOX_KEY).noOcclusion().strength(-1F, 3600000F).noLootTable()
 						.isViewBlocking((st, g, pos) -> false).isSuffocating((st, g, pos) -> false)

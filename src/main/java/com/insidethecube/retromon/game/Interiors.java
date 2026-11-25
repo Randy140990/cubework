@@ -571,7 +571,7 @@ public final class Interiors {
 
 	private static String makeSignature(Room r) {
 		StringBuilder b = new StringBuilder();
-		b.append(STATES).append('|').append(java.util.Arrays.hashCode(r.cells())).append('|').append(r.schem()).append('|').append(r.base()).append('|')
+		b.append(STATES).append("|p").append(Prop.SIZE).append('|').append(java.util.Arrays.hashCode(r.cells())).append('|').append(r.schem()).append('|').append(r.base()).append('|')
 				.append(r.dark()).append('|').append(r.people()).append('|').append(r.balls()).append('|').append(MONS.getOrDefault(r.id(), List.of())).append('|');
 		for (double[] l : r.lights()) b.append(java.util.Arrays.toString(l));
 		return Integer.toHexString(b.toString().hashCode()) + "-" + Math.round(r.w()) + "x" + Math.round(r.d());
@@ -630,7 +630,7 @@ public final class Interiors {
 		for (int i : new int[] {0, n / 2, n - 1}) {
 			at.set(r.ox() + c[i * 4], r.oy() + c[i * 4 + 1], r.oz() + c[i * 4 + 2]);
 			// (Where a room's own blocks are laid over its props, Cerulean Gym's pool, any block there will do.)
-			if (!level.getBlockState(at).is(Retromon.PROP) && (r.schem() == null || level.getBlockState(at).isAir())) return true;
+			if (!(level.getBlockState(at).getBlock() instanceof Prop) && (r.schem() == null || level.getBlockState(at).isAir())) return true;
 		}
 		return false;
 	}
@@ -665,10 +665,9 @@ public final class Interiors {
 		BlockState black = Blocks.BLACK_CONCRETE.defaultBlockState();
 		for (int x = r.ox() - 24; x <= r.ox() + W + 24; x++)
 			for (int z = r.oz() - 20; z <= r.oz() + D + 24; z++) level.setBlock(at.set(x, r.oy() - 9, z), black, Block.UPDATE_CLIENTS);
-		BlockState prop = Retromon.PROP.defaultBlockState();
 		int[] c = r.cells();
 		for (int i = 0; i + 3 < c.length; i += 4)
-			level.setBlock(at.set(r.ox() + c[i], r.oy() + c[i + 1], r.oz() + c[i + 2]), prop.setValue(Prop.M, Math.min(STATES - 1, c[i + 3])), Block.UPDATE_CLIENTS);
+			level.setBlock(at.set(r.ox() + c[i], r.oy() + c[i + 1], r.oz() + c[i + 2]), Prop.state(c[i + 3]), Block.UPDATE_CLIENTS);
 		// The forest: John's own blocks, as he built them (tools/forest.py), the floor where you stand.
 		if (r.schem() != null) placeBlocks(level, r);
 		if (r.dark()) {

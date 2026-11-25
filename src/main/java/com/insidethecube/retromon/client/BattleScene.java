@@ -202,11 +202,8 @@ public final class BattleScene {
 		if (y > level.getMaxY() - 12) y = Math.floorDiv(level.getMaxY() - 12, 24) * 24;
 		int ox = Math.floorDiv(you.getX() - (int) Math.round(a.w() / 2) + 4, 8) * 8, oz = Math.floorDiv(you.getZ() - (int) Math.round(a.d() / 2) + 12, 24) * 24;
 		// Clear the air it goes into first (nothing's there, but just in case), then its blocks, then the lamps.
-		net.minecraft.world.level.block.state.BlockState prop = Retromon.PROP.defaultBlockState();
 		int[] c = a.cells();
-		int states = com.insidethecube.retromon.game.Interiors.STATES;
-		for (int i = 0; i + 3 < c.length; i += 4)
-			set(ox + c[i], y + c[i + 1], oz + c[i + 2], prop.setValue(com.insidethecube.retromon.game.Prop.M, Math.min(states - 1, c[i + 3])));
+		for (int i = 0; i + 3 < c.length; i += 4) set(ox + c[i], y + c[i + 1], oz + c[i + 2], com.insidethecube.retromon.game.Prop.state(c[i + 3]));
 		net.minecraft.world.level.block.state.BlockState lamp = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 15);
 		double cxr = a.w() / 2, czr = a.d() / 2, rad = Math.min(cxr, czr) - 2;
 		for (int dx = 2; dx < a.w(); dx += 4)

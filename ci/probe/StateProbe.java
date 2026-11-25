@@ -16,16 +16,23 @@ public final class StateProbe {
 		Bootstrap.bootStrap();
 		Runtime rt = Runtime.getRuntime();
 		System.out.println("max heap MB " + rt.maxMemory() / 1048576);
-		for (int size : new int[] {1000, 2000, 4000, 8000, 12000, 16000}) {
+		// One block of 4,000 states (the old way, scaled down), then the rooms' 37,644 looks the 0.67 way: 148 blocks of 256.
+		for (int[] run : new int[][] {{1, 4000}, {148, 256}}) {
 			System.gc();
 			long m0 = rt.totalMemory() - rt.freeMemory(), t0 = System.nanoTime();
-			// (The states as a block makes them: Block's own StateDefinition, owned by stone, nothing registered.)
-			StateDefinition<Block, BlockState> def = new StateDefinition.Builder<Block, BlockState>(Blocks.STONE).add(IntegerProperty.create("m", 0, size - 1))
-					.create(Block::defaultBlockState, BlockState::new);
+			int n = 0;
+			java.util.List<StateDefinition<Block, BlockState>> keep = new java.util.ArrayList<>();
+			for (int k = 0; k < run[0]; k++) {
+				// (The states as a block makes them: Block's own StateDefinition, owned by stone, nothing registered.)
+				StateDefinition<Block, BlockState> def = new StateDefinition.Builder<Block, BlockState>(Blocks.STONE).add(IntegerProperty.create("m", 0, run[1] - 1))
+						.create(Block::defaultBlockState, BlockState::new);
+				keep.add(def);
+				n += def.getPossibleStates().size();
+			}
 			long t1 = System.nanoTime();
 			System.gc();
 			long m1 = rt.totalMemory() - rt.freeMemory();
-			System.out.println("states " + def.getPossibleStates().size() + "  ms " + (t1 - t0) / 1000000 + "  MB held " + (m1 - m0) / 1048576);
+			System.out.println("blocks " + run[0] + " x " + run[1] + "  states " + n + "  ms " + (t1 - t0) / 1000000 + "  MB held " + (m1 - m0) / 1048576 + "  (" + keep.size() + ")");
 		}
 	}
 }
