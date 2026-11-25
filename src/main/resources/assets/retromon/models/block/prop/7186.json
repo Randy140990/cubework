@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cerulean_wall","cerulean_wall":"retromon:block/interior/cerulean_wall"},"elements":[{"from":[16,0.0,0.0],"to":[16,16.0,16.0],"faces":{"west":{"uv":[8.0,0.0,12.0,4.0],"texture":"#cerulean_wall"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/steel","steel":"retromon:block/interior/steel"},"elements":[{"from":[0,0.2,0.0],"to":[0,1.16,0.48],"faces":{"east":{"uv":[7.88,7.71,8.0,7.95],"texture":"#steel"}}}]}

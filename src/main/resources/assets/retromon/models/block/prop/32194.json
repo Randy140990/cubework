@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/lg_wall_hi","lg_wall_hi":"retromon:block/interior/lg_wall_hi"},"elements":[{"from":[0,0.0,16],"to":[16.0,16,16],"faces":{"north":{"uv":[0,0,16,16],"texture":"#lg_wall_hi","tintindex":143064048}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/psy_wall","psy_wall":"retromon:block/interior/psy_wall"},"elements":[{"from":[10.4,16,0.0],"to":[16.0,16,2.4],"faces":{"down":{"uv":[0,0,16,16],"texture":"#psy_wall","tintindex":144064064}}}]}

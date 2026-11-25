@@ -1478,7 +1478,9 @@ const BUILD = {
       talk: () => [{ text: "The professor's writing a book. Every creature in the region, one page each." }, { text: "He's only up to the second page." }] });
     R.npcs.push({ name: "Aide", x: 12.6, z: 9.6, yaw: FACE.n, look: { skin: "scientist_f" },
       talk: () => [{ text: "Have you got a partner yet? The professor gives every new trainer one of their own." }, { text: "Look after it, and it'll look after you." }] });
-    R.npcs.push({ name: "Aide", x: 3.4, z: 9.6, yaw: FACE.n, look: { skin: "scientist_f" },
+    // (0.66, John's 13:36: "why is there somebody stuck behind the whiteboard bottom left?") In front of the NOTES
+    // board now, reading it, where the camera sees her.
+    R.npcs.push({ name: "Aide", x: 3.4, z: 11.4, yaw: FACE.n, look: { skin: "scientist_f" },
       talk: () => [{ text: "I'm filing the notes from ROUTE 1. Bird POKéMON, mostly. And a lot of RATTATA." }] });
     R.spawn = LAB_IN;
     return R;

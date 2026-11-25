@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.model.SpriteFinder;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -51,8 +52,14 @@ public final class PropTiles {
 				wrapped.emitQuads(emitter, view, pos, state, random, cull);
 				return;
 			}
+			// (0.66) In a room that has its light (worked out in the Interior Viewer): each piece's corners coloured with it.
+			RoomShade.At lit = RoomShade.at(pos);
 			emitter.pushTransform(q -> {
 				lay(q, pos, finder);
+				double[] mat = RoomShade.matOf(q, finder);
+				// (0.66) Glass as the viewer draws it: see-through, over what's behind (not cut out).
+				if (mat != null && mat[3] > 0) q.renderLayer(ChunkSectionLayer.TRANSLUCENT);
+				if (lit != null) RoomShade.colour(q, pos, lit, mat);
 				return true;
 			});
 			wrapped.emitQuads(emitter, view, pos, state, random, cull);

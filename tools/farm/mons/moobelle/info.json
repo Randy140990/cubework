@@ -1,0 +1,72 @@
+{
+ "idle": "animation.moobelle.battle_idle",
+ "ground": "animation.moobelle.ground_idle",
+ "actions": {
+  "cry": "animation.moobelle.cry",
+  "recoil": "animation.moobelle.recoil",
+  "attack": "animation.moobelle.attack",
+  "critical": "animation.moobelle.critical",
+  "special": "animation.moobelle.special",
+  "recall": "animation.moobelle.recall",
+  "sendout": "animation.moobelle.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.moobelle.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.moobelle.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.moobelle.faint",
+   "parts": []
+  }
+ },
+ "move": "MILK DRINK",
+ "attack_move": "TACKLE",
+ "scale": 1.166,
+ "height": 1.244,
+ "texture": "retromon:textures/mons/moobelle.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/moobelle_glow_0.png",
+    "retromon:textures/mons/moobelle_glow_1.png",
+    "retromon:textures/mons/moobelle_glow_2.png",
+    "retromon:textures/mons/moobelle_glow_3.png",
+    "retromon:textures/mons/moobelle_glow_4.png",
+    "retromon:textures/mons/moobelle_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "MOOBELLE",
+ "anchors": {
+  "mouth": [
+   0,
+   11.18,
+   -16.36
+  ],
+  "back": [
+   0,
+   14.58,
+   0.0
+  ],
+  "body": [
+   0,
+   7.25,
+   0.0
+  ],
+  "size": [
+   13.0,
+   19.9,
+   29.6
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.trufflesow.battle_idle",
+ "ground": "animation.trufflesow.ground_idle",
+ "actions": {
+  "cry": "animation.trufflesow.cry",
+  "recoil": "animation.trufflesow.recoil",
+  "attack": "animation.trufflesow.attack",
+  "critical": "animation.trufflesow.critical",
+  "special": "animation.trufflesow.special",
+  "recall": "animation.trufflesow.recall",
+  "sendout": "animation.trufflesow.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.trufflesow.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.trufflesow.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.trufflesow.faint",
+   "parts": []
+  }
+ },
+ "move": "DIG",
+ "attack_move": "TACKLE",
+ "scale": 0.96,
+ "height": 1.094,
+ "texture": "retromon:textures/mons/trufflesow.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/trufflesow_glow_0.png",
+    "retromon:textures/mons/trufflesow_glow_1.png",
+    "retromon:textures/mons/trufflesow_glow_2.png",
+    "retromon:textures/mons/trufflesow_glow_3.png",
+    "retromon:textures/mons/trufflesow_glow_4.png",
+    "retromon:textures/mons/trufflesow_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TRUFFLESOW",
+ "anchors": {
+  "mouth": [
+   0,
+   9.5,
+   -14.69
+  ],
+  "back": [
+   0,
+   15.0,
+   1.34
+  ],
+  "body": [
+   0,
+   7.0,
+   1.34
+  ],
+  "size": [
+   11.9,
+   17.5,
+   23.12
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

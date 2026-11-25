@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/psy_cap","psy_cap":"retromon:block/interior/psy_cap"},"elements":[{"from":[14.88,0.0,0],"to":[16.0,3.84,0],"faces":{"south":{"uv":[3.72,15.04,4.0,16.0],"texture":"#psy_cap"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/statue_stone","statue_stone":"retromon:block/interior/statue_stone"},"elements":[{"from":[0.0,16,0.0],"to":[0.6,16,0.6],"faces":{"down":{"uv":[8.0,7.85,8.15,8.0],"texture":"#statue_stone"}}}]}

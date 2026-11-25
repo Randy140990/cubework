@@ -1,0 +1,72 @@
+{
+ "idle": "animation.stormsteed.battle_idle",
+ "ground": "animation.stormsteed.ground_idle",
+ "actions": {
+  "cry": "animation.stormsteed.cry",
+  "recoil": "animation.stormsteed.recoil",
+  "attack": "animation.stormsteed.attack",
+  "critical": "animation.stormsteed.critical",
+  "special": "animation.stormsteed.special",
+  "recall": "animation.stormsteed.recall",
+  "sendout": "animation.stormsteed.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.stormsteed.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.stormsteed.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.stormsteed.faint",
+   "parts": []
+  }
+ },
+ "move": "DOUBLE KICK",
+ "attack_move": "STOMP",
+ "scale": 0.855,
+ "height": 2.338,
+ "texture": "retromon:textures/mons/stormsteed.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/stormsteed_glow_0.png",
+    "retromon:textures/mons/stormsteed_glow_1.png",
+    "retromon:textures/mons/stormsteed_glow_2.png",
+    "retromon:textures/mons/stormsteed_glow_3.png",
+    "retromon:textures/mons/stormsteed_glow_4.png",
+    "retromon:textures/mons/stormsteed_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "STORMSTEED",
+ "anchors": {
+  "mouth": [
+   0,
+   30.38,
+   -23.13
+  ],
+  "back": [
+   0,
+   32.91,
+   0.2
+  ],
+  "body": [
+   0,
+   17.52,
+   0.2
+  ],
+  "size": [
+   11.42,
+   37.41,
+   34.31
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

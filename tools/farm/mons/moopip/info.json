@@ -1,0 +1,72 @@
+{
+ "idle": "animation.moopip.battle_idle",
+ "ground": "animation.moopip.ground_idle",
+ "actions": {
+  "cry": "animation.moopip.cry",
+  "recoil": "animation.moopip.recoil",
+  "attack": "animation.moopip.attack",
+  "critical": "animation.moopip.critical",
+  "special": "animation.moopip.special",
+  "recall": "animation.moopip.recall",
+  "sendout": "animation.moopip.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.moopip.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.moopip.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.moopip.faint",
+   "parts": []
+  }
+ },
+ "move": "GROWL",
+ "attack_move": "TACKLE",
+ "scale": 1.213,
+ "height": 0.742,
+ "texture": "retromon:textures/mons/moopip.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/moopip_glow_0.png",
+    "retromon:textures/mons/moopip_glow_1.png",
+    "retromon:textures/mons/moopip_glow_2.png",
+    "retromon:textures/mons/moopip_glow_3.png",
+    "retromon:textures/mons/moopip_glow_4.png",
+    "retromon:textures/mons/moopip_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "MOOPIP",
+ "anchors": {
+  "mouth": [
+   0,
+   6.08,
+   -10.29
+  ],
+  "back": [
+   0,
+   12.88,
+   0.18
+  ],
+  "body": [
+   0,
+   4.47,
+   0.18
+  ],
+  "size": [
+   8.22,
+   11.88,
+   18.67
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

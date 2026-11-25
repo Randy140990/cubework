@@ -421,6 +421,17 @@ def glassy(im):
     return im
 
 
+def see_through(im, alpha):
+    """(0.66) A see-through material as the Interior Viewer draws it: its picture over what's behind, as much as its
+    alpha (the mod draws these pieces in the translucent layer: client/RoomShade's mats.json says which)."""
+    px = im.load(); w, h = im.size
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            px[x, y] = (r, g, b, max(1, round(a * alpha)))
+    return im
+
+
 def write_textures(mats, res):
     out = os.path.join(res, "assets/retromon/textures/block/interior")
     os.makedirs(out, exist_ok=True)
@@ -439,7 +450,7 @@ def write_textures(mats, res):
             info[k] = {"name": name, "tw": fw, "th": fh, "W": W, "H": H, "fit": True, "per": [1, 1]}
             continue
         im = img_of(m["png"])
-        if m.get("alpha"): im = glassy(im)
+        if m.get("alpha"): im = see_through(im, m["alpha"])
         tw, th = im.size; W, H = pow2(tw), pow2(th)
         pad = Image.new("RGBA", (W, H), (0, 0, 0, 0)); pad.paste(im, (0, 0))
         if not m.get("cut") and not m.get("alpha"):
@@ -478,6 +489,15 @@ def cuts(a, b, extra):
     return sorted(pts)
 
 
+def half_cuts(start, sign, length):
+    """(0.66) Where a face crosses a half block (not a whole one), along it from its start: shade.js's shadeHalfCuts."""
+    out = []
+    a, b = min(start, start + sign * length), max(start, start + sign * length)
+    for k in range(math.floor(a * 2) + 1, math.ceil(b * 2)):
+        if k % 2 != 0: out.append((k * 0.5 - start) * sign)
+    return out
+
+
 def slice_face(f, tex, cells, tiled=False):
     """Cuts one face into pieces, each inside one block and one repeat of its texture, as model elements.
 
@@ -502,6 +522,11 @@ def slice_face(f, tex, cells, tiled=False):
         return out
     ext_r = block_cuts(bl[ar], sr, w)
     ext_u = block_cuts(bl[au], su, h)
+    if not tiled:
+        # (0.66) A room's faces are cut at the half blocks too, so the room's light (worked out at every corner, shade.js)
+        # has a corner every half block across a floor or a wall. The same cuts as shade.js's shadeHalfCuts.
+        ext_r += half_cuts(bl[ar], sr, w)
+        ext_u += half_cuts(bl[au], su, h)
     if not t["fit"]:
         ext_r += [(j - u0) * pu for j in range(math.floor(u0) + 1, math.ceil(u0 + w / pu))]
         ext_u += [(j - v0) * pv for j in range(math.floor(v0) + 1, math.ceil(v0 + h / pv))]
@@ -649,6 +674,29 @@ def write_light(light, res):
 LAMPS = {"lampShade", "lampWhite", "ugLamp", "seaLantern"}
 
 
+def write_shade(data, tex, res):
+    """(0.66) Each room's light, worked out in the Interior Viewer at every corner the game draws (shade.js), as the
+    mod reads it (client/RoomShade): retromon/interiors/light/<room>.bin, and mats.json, each texture's part in it
+    ([its colour, the light it gives off, 1 if it's a lamp, how see-through it is (0 not at all)])."""
+    import base64
+    out = os.path.join(res, "retromon/interiors/light")
+    os.makedirs(out, exist_ok=True)
+    for f in os.listdir(out): os.remove(os.path.join(out, f))
+    n = 0
+    for rid, room in data["rooms"].items():
+        lit = room.get("light")
+        if not lit: continue
+        open(os.path.join(out, rid + ".bin"), "wb").write(base64.b64decode(lit["b64"]))
+        n += 1
+    mats = {}
+    for k, t in tex.items():
+        m = data["mats"].get(k, {})
+        mul = 0x1a / 255 if k in ("window", "doorLight") else 1.0
+        mats[t["name"]] = [round(mul, 5), m.get("glow", 0) or 0, 1 if k in LAMPS else 0, m.get("alpha", 0) or 0]
+    json.dump(mats, open(os.path.join(out, "mats.json"), "w"), separators=(",", ":"), sort_keys=True)
+    print("light:", n, "rooms,", len(mats), "textures")
+
+
 def panes_of(room):
     """A room's windows' glass, facing in: [corner x y z, along it x y z, up it x y z, facing x y z] each (the mod lays
     the dusk and night skies over them)."""
@@ -677,6 +725,7 @@ def main():
     data = json.load(open(src))
     tex = write_textures(data["mats"], res)
     write_light(data.get("light", {}), res)
+    write_shade(data, tex, res)
     models, shapes_t, states = {}, {}, {}
     model_list, shape_list, state_list = [], [], []
     rooms_out, arenas_out = {}, {}

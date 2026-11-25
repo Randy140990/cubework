@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pp_machine","pp_machine":"retromon:block/interior/pp_machine"},"elements":[{"from":[0.0,16,5.149],"to":[4.116,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#pp_machine","tintindex":144064064}}}]}

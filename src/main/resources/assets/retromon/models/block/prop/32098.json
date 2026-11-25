@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/tv_field_cinnabar","tv_field_cinnabar":"retromon:block/interior/tv_field_cinnabar"},"elements":[{"from":[0.0,0,0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[3.0,0.0,4.0,1.0],"texture":"#tv_field_cinnabar"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/tv_field_fuchsia","tv_field_fuchsia":"retromon:block/interior/tv_field_fuchsia"},"elements":[{"from":[0.0,0,0.0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[9.0,13.0,10.0,14.0],"texture":"#tv_field_fuchsia"}}}]}

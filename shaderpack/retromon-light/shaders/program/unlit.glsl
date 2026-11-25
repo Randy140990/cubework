@@ -5,6 +5,11 @@
 
 uniform sampler2D gtexture;
 uniform float alphaTestRef;
+#ifdef INSIDE
+uniform float viewWidth;
+uniform float viewHeight;
+#include "/lib/look.glsl"
+#endif
 
 #ifdef VSH
 out vec2 uv;
@@ -31,6 +36,11 @@ void main() {
     #ifdef GLOW
     c.rgb *= 1.6;
     #endif
+    #ifdef INSIDE
+    // (1.2.9) Inside: the last touches now (final passes the picture through).
+    outColor = vec4(retroLook(pow(c.rgb, vec3(2.2)) / EXPOSURE, gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.xy), c.a);
+    #else
     outColor = vec4(pow(c.rgb, vec3(2.2)) / EXPOSURE, c.a);
+    #endif
 }
 #endif

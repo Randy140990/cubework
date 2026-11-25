@@ -54,6 +54,7 @@ public class RetromonClient implements ClientModInitializer {
 			ClientState.tick(mc);
 			BattleScene.tick(mc);
 			RoomLightRenderer.tick(mc);
+			RoomShade.tick(mc);
 			AreaLooks.keepOnTop(mc);
 			for (int i = 1; i < Adventure.speed && BattleScene.active(); i++) {
 				BattleScene.tick(mc);

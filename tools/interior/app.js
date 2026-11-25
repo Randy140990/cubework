@@ -108,6 +108,14 @@ function applyTime() {
   // Those who keep hours (the Trainer School's teacher and pupils, by day): away at other times.
   if (room) for (const n of room.npcs) if (n.hours && n.fig) { const h = t.clock, [a, b] = n.hours; n.away = !(h >= a && h < b); n.fig.root.visible = !n.away; }
   if (typeof fitTimeLight === "function") fitTimeLight(room, TOD);
+  // (0.66) A room lit as the game lights it: its corners' colours for the time of day, its windows' glass too.
+  if (room && room._shadeMeshes) {
+    shadeTime(room, t);
+    for (const k of ["window", "doorLight"]) {
+      const sm = matCache["shade:" + k];
+      if (sm) { sm.map = pixTex(k === "window" ? (t.m > 0.5 ? "windowNight" : t.k > 0.5 ? "windowDusk" : "window") : (t.m > 0.5 ? "doorNight" : t.k > 0.5 ? "doorDusk" : "doorLight")); sm.needsUpdate = true; }
+    }
+  }
   if (!room || !room.poolMeshes) return;
   const col = poolLight(t.k, t.m);
   for (const mesh of room.poolMeshes) setWash(mesh, mesh.userData.pool, t, col);

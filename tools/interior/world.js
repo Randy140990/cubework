@@ -794,12 +794,12 @@ function tunnelSides(room, wall, a, b) {
   if (wall === "n") {
     G.box(a, 0, 0.11, a + 0.12, h, d, { e: "tunnelWall", all: null });
     G.box(b - 0.12, 0, 0.11, b, h, d, { w: "tunnelWall", all: null });
-    G.box(a, h - 0.22, 0.11, b, h, d, { bottom: "tunnelRoof", s: "tunnelLintel", all: null });
+    // ((0.66, John's 13:36: "the bar at the exit, that doesn't need to be there") No lintel across the top: from
+    // above it was a white bar across the way out.)
   } else {
     const W = room.W, e = wall === "e", x0 = e ? W - d : 0.11, x1 = e ? W - 0.11 : d;
     G.box(x0, 0, a, x1, h, a + 0.12, { s: "tunnelWall", all: null });
     G.box(x0, 0, b - 0.12, x1, h, b, { n: "tunnelWall", all: null });
-    G.box(x0, h - 0.22, a, x1, h, b, { bottom: "tunnelRoof", [e ? "w" : "e"]: "tunnelLintel", all: null });
   }
 }
 // A way through the east or west wall (a sideways gate's): a dark doorway, a mat in front of it (2 deep, its

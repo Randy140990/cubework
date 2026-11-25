@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/trash_can","trash_can":"retromon:block/interior/trash_can"},"elements":[{"from":[3.52,16,0.32],"to":[15.68,16,12.48],"faces":{"down":{"uv":[3.52,3.52,15.68,15.68],"texture":"#trash_can"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cerulean_trim","cerulean_trim":"retromon:block/interior/cerulean_trim"},"elements":[{"from":[0.0,16,0.0],"to":[6.4,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#cerulean_trim","tintindex":144064064}}}]}

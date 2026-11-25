@@ -1,0 +1,72 @@
+{
+ "idle": "animation.curlram.battle_idle",
+ "ground": "animation.curlram.ground_idle",
+ "actions": {
+  "cry": "animation.curlram.cry",
+  "recoil": "animation.curlram.recoil",
+  "attack": "animation.curlram.attack",
+  "critical": "animation.curlram.critical",
+  "special": "animation.curlram.special",
+  "recall": "animation.curlram.recall",
+  "sendout": "animation.curlram.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.curlram.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.curlram.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.curlram.faint",
+   "parts": []
+  }
+ },
+ "move": "TAKE DOWN",
+ "attack_move": "HEADBUTT",
+ "scale": 1.035,
+ "height": 1.256,
+ "texture": "retromon:textures/mons/curlram.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/curlram_glow_0.png",
+    "retromon:textures/mons/curlram_glow_1.png",
+    "retromon:textures/mons/curlram_glow_2.png",
+    "retromon:textures/mons/curlram_glow_3.png",
+    "retromon:textures/mons/curlram_glow_4.png",
+    "retromon:textures/mons/curlram_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "CURLRAM",
+ "anchors": {
+  "mouth": [
+   0,
+   12.74,
+   -14.15
+  ],
+  "back": [
+   0,
+   20.81,
+   0.11
+  ],
+  "body": [
+   0,
+   9.71,
+   0.11
+  ],
+  "size": [
+   13.0,
+   20.1,
+   20.96
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

@@ -1,0 +1,72 @@
+{
+ "idle": "animation.foalet.battle_idle",
+ "ground": "animation.foalet.ground_idle",
+ "actions": {
+  "cry": "animation.foalet.cry",
+  "recoil": "animation.foalet.recoil",
+  "attack": "animation.foalet.attack",
+  "critical": "animation.foalet.critical",
+  "special": "animation.foalet.special",
+  "recall": "animation.foalet.recall",
+  "sendout": "animation.foalet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.foalet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.foalet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.foalet.faint",
+   "parts": []
+  }
+ },
+ "move": "TAIL WHIP",
+ "attack_move": "TACKLE",
+ "scale": 0.99,
+ "height": 1.212,
+ "texture": "retromon:textures/mons/foalet.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/foalet_glow_0.png",
+    "retromon:textures/mons/foalet_glow_1.png",
+    "retromon:textures/mons/foalet_glow_2.png",
+    "retromon:textures/mons/foalet_glow_3.png",
+    "retromon:textures/mons/foalet_glow_4.png",
+    "retromon:textures/mons/foalet_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "FOALET",
+ "anchors": {
+  "mouth": [
+   0,
+   14.8,
+   -11.5
+  ],
+  "back": [
+   0,
+   20.4,
+   0.2
+  ],
+  "body": [
+   0,
+   9.4,
+   0.2
+  ],
+  "size": [
+   7.0,
+   19.4,
+   16.4
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

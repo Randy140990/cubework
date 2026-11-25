@@ -818,6 +818,8 @@ def round50(add, room):
     arealooks60.round60(add, room, globals())
     import arealooks61
     arealooks61.round61(add, room, globals())
+    import arealooks66
+    arealooks66.round66(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")

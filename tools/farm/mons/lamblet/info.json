@@ -1,0 +1,72 @@
+{
+ "idle": "animation.lamblet.battle_idle",
+ "ground": "animation.lamblet.ground_idle",
+ "actions": {
+  "cry": "animation.lamblet.cry",
+  "recoil": "animation.lamblet.recoil",
+  "attack": "animation.lamblet.attack",
+  "critical": "animation.lamblet.critical",
+  "special": "animation.lamblet.special",
+  "recall": "animation.lamblet.recall",
+  "sendout": "animation.lamblet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.lamblet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.lamblet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.lamblet.faint",
+   "parts": []
+  }
+ },
+ "move": "COTTON SPORE",
+ "attack_move": "TACKLE",
+ "scale": 1.108,
+ "height": 0.677,
+ "texture": "retromon:textures/mons/lamblet.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/lamblet_glow_0.png",
+    "retromon:textures/mons/lamblet_glow_1.png",
+    "retromon:textures/mons/lamblet_glow_2.png",
+    "retromon:textures/mons/lamblet_glow_3.png",
+    "retromon:textures/mons/lamblet_glow_4.png",
+    "retromon:textures/mons/lamblet_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "LAMBLET",
+ "anchors": {
+  "mouth": [
+   0,
+   6.12,
+   -8.15
+  ],
+  "back": [
+   0,
+   11.84,
+   0.01
+  ],
+  "body": [
+   0,
+   4.83,
+   0.01
+  ],
+  "size": [
+   6.94,
+   10.84,
+   11.57
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

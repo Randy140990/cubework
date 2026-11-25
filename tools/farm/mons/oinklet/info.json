@@ -1,0 +1,72 @@
+{
+ "idle": "animation.oinklet.battle_idle",
+ "ground": "animation.oinklet.ground_idle",
+ "actions": {
+  "cry": "animation.oinklet.cry",
+  "recoil": "animation.oinklet.recoil",
+  "attack": "animation.oinklet.attack",
+  "critical": "animation.oinklet.critical",
+  "special": "animation.oinklet.special",
+  "recall": "animation.oinklet.recall",
+  "sendout": "animation.oinklet.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.oinklet.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.oinklet.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.oinklet.faint",
+   "parts": []
+  }
+ },
+ "move": "TAIL WHIP",
+ "attack_move": "TACKLE",
+ "scale": 0.991,
+ "height": 0.555,
+ "texture": "retromon:textures/mons/oinklet.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/oinklet_glow_0.png",
+    "retromon:textures/mons/oinklet_glow_1.png",
+    "retromon:textures/mons/oinklet_glow_2.png",
+    "retromon:textures/mons/oinklet_glow_3.png",
+    "retromon:textures/mons/oinklet_glow_4.png",
+    "retromon:textures/mons/oinklet_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "OINKLET",
+ "anchors": {
+  "mouth": [
+   0,
+   4.16,
+   -7.7
+  ],
+  "back": [
+   0,
+   9.88,
+   1.04
+  ],
+  "body": [
+   0,
+   3.6,
+   1.04
+  ],
+  "size": [
+   6.44,
+   8.88,
+   11.92
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

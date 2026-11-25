@@ -1,0 +1,72 @@
+{
+ "idle": "animation.tuskhog.battle_idle",
+ "ground": "animation.tuskhog.ground_idle",
+ "actions": {
+  "cry": "animation.tuskhog.cry",
+  "recoil": "animation.tuskhog.recoil",
+  "attack": "animation.tuskhog.attack",
+  "critical": "animation.tuskhog.critical",
+  "special": "animation.tuskhog.special",
+  "recall": "animation.tuskhog.recall",
+  "sendout": "animation.tuskhog.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.tuskhog.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.tuskhog.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.tuskhog.faint",
+   "parts": []
+  }
+ },
+ "move": "HORN ATTACK",
+ "attack_move": "TAKE DOWN",
+ "scale": 0.919,
+ "height": 1.251,
+ "texture": "retromon:textures/mons/tuskhog.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/tuskhog_glow_0.png",
+    "retromon:textures/mons/tuskhog_glow_1.png",
+    "retromon:textures/mons/tuskhog_glow_2.png",
+    "retromon:textures/mons/tuskhog_glow_3.png",
+    "retromon:textures/mons/tuskhog_glow_4.png",
+    "retromon:textures/mons/tuskhog_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "TUSKHOG",
+ "anchors": {
+  "mouth": [
+   0,
+   11.34,
+   -16.3
+  ],
+  "back": [
+   0,
+   14.05,
+   1.41
+  ],
+  "body": [
+   0,
+   8.42,
+   1.41
+  ],
+  "size": [
+   12.87,
+   20.01,
+   25.64
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

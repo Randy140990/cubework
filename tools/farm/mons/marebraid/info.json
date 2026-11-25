@@ -1,0 +1,72 @@
+{
+ "idle": "animation.marebraid.battle_idle",
+ "ground": "animation.marebraid.ground_idle",
+ "actions": {
+  "cry": "animation.marebraid.cry",
+  "recoil": "animation.marebraid.recoil",
+  "attack": "animation.marebraid.attack",
+  "critical": "animation.marebraid.critical",
+  "special": "animation.marebraid.special",
+  "recall": "animation.marebraid.recall",
+  "sendout": "animation.marebraid.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.marebraid.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.marebraid.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.marebraid.faint",
+   "parts": []
+  }
+ },
+ "move": "DOUBLE KICK",
+ "attack_move": "STOMP",
+ "scale": 0.897,
+ "height": 2.007,
+ "texture": "retromon:textures/mons/marebraid.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/marebraid_glow_0.png",
+    "retromon:textures/mons/marebraid_glow_1.png",
+    "retromon:textures/mons/marebraid_glow_2.png",
+    "retromon:textures/mons/marebraid_glow_3.png",
+    "retromon:textures/mons/marebraid_glow_4.png",
+    "retromon:textures/mons/marebraid_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "MAREBRAID",
+ "anchors": {
+  "mouth": [
+   0,
+   25.48,
+   -20.24
+  ],
+  "back": [
+   0,
+   27.15,
+   -0.2
+  ],
+  "body": [
+   0,
+   15.2,
+   -0.2
+  ],
+  "size": [
+   9.1,
+   32.12,
+   29.88
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

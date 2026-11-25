@@ -46,6 +46,8 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 		double nx, ny, nz;
 		float secs;
 		float k, side, m;
+		/** (0.66) The room's lamps are in its own colours (RoomShade): not laid over again here. */
+		boolean shaded;
 	}
 
 	public RoomLightRenderer(EntityRendererProvider.Context ctx) {
@@ -82,6 +84,7 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 		s.hours = mc.level == null ? 9.25F : (float) ((Math.floorMod(mc.level.getDayTime(), 24000L) / 1000.0 + 6) % 24);
 		s.cx = e.cx;
 		s.cz = e.cz;
+		s.shaded = com.insidethecube.retromon.game.Interiors.in(e) && RoomShade.lit(roomId(e.getX()));
 		float[] sky = sky();
 		s.k = sky[0];
 		s.side = sky[1];
@@ -143,7 +146,7 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 			// and day), on in the evening and at night, and on all the time in a room with no windows.
 			if (!lamps.isEmpty()) {
 				float on = glass.isEmpty() && s.pools.isEmpty() ? 1 : Math.max(night, s.side > 0 ? s.k : 0);
-				if (on > 0.01F) lamps(out, pose, lamps, on, cx, cz);
+				if (on > 0.01F && !s.shaded) lamps(out, pose, lamps, on, cx, cz);
 			}
 			if (dusk > 0.01F) {
 				if (!glass.isEmpty()) panes(out, pose, glass, DUSK, dusk, cx, cz);
@@ -253,6 +256,11 @@ public class RoomLightRenderer extends EntityRenderer<RoomLight, RoomLightRender
 	private static int argb(float[] c, float a) {
 		int ai = Math.max(0, Math.min(255, Math.round(a * 255)));
 		return ai << 24 | Math.round(c[0] * 255) << 16 | Math.round(c[1] * 255) << 8 | Math.round(c[2] * 255);
+	}
+
+	private static String roomId(double x) {
+		com.insidethecube.retromon.game.Interiors.Room r = com.insidethecube.retromon.game.Interiors.roomAt(x);
+		return r == null ? null : r.id();
 	}
 
 	// ---------- the sums (the Interior Viewer's world.js has the same) ----------

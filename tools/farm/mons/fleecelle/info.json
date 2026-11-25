@@ -1,0 +1,72 @@
+{
+ "idle": "animation.fleecelle.battle_idle",
+ "ground": "animation.fleecelle.ground_idle",
+ "actions": {
+  "cry": "animation.fleecelle.cry",
+  "recoil": "animation.fleecelle.recoil",
+  "attack": "animation.fleecelle.attack",
+  "critical": "animation.fleecelle.critical",
+  "special": "animation.fleecelle.special",
+  "recall": "animation.fleecelle.recall",
+  "sendout": "animation.fleecelle.sendout"
+ },
+ "poses": {
+  "walk": {
+   "anim": "animation.fleecelle.ground_walk",
+   "parts": []
+  },
+  "confused": {
+   "anim": "animation.fleecelle.confused",
+   "parts": []
+  },
+  "faint": {
+   "anim": "animation.fleecelle.faint",
+   "parts": []
+  }
+ },
+ "move": "COTTON SPORE",
+ "attack_move": "TACKLE",
+ "scale": 0.996,
+ "height": 1.205,
+ "texture": "retromon:textures/mons/fleecelle.png",
+ "layers": [
+  {
+   "frames": [
+    "retromon:textures/mons/fleecelle_glow_0.png",
+    "retromon:textures/mons/fleecelle_glow_1.png",
+    "retromon:textures/mons/fleecelle_glow_2.png",
+    "retromon:textures/mons/fleecelle_glow_3.png",
+    "retromon:textures/mons/fleecelle_glow_4.png",
+    "retromon:textures/mons/fleecelle_glow_5.png"
+   ],
+   "fps": 10,
+   "emissive": true,
+   "translucent": true
+  }
+ ],
+ "name": "FLEECELLE",
+ "anchors": {
+  "mouth": [
+   0,
+   11.76,
+   -12.86
+  ],
+  "back": [
+   0,
+   20.28,
+   0.1
+  ],
+  "body": [
+   0,
+   8.8,
+   0.1
+  ],
+  "size": [
+   12.0,
+   19.28,
+   18.96
+  ]
+ },
+ "stage": 2,
+ "parts": []
+}

@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cap","cap":"retromon:block/interior/cap"},"elements":[{"from":[0.0,0.0,0],"to":[6.4,16.0,0],"faces":{"south":{"uv":[0.0,4.0,1.6,8.0],"texture":"#cap"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/lab","lab":"retromon:block/interior/lab"},"elements":[{"from":[13.28,16,13.28],"to":[14.24,16,14.24],"faces":{"down":{"uv":[3.32,8.44,3.56,8.68],"texture":"#lab"}}}]}

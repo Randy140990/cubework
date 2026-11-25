@@ -433,11 +433,11 @@ function placeNow() {
   const a = sizeOf(pair.theirs), b = sizeOf(pair.ours);
   pair.sizes = { theirs: a, ours: b };
   const gap = 0.6, half = Math.max(a.w, a.l, b.w, b.l) / 2;
-  const both = state.show === "both";
+  const show = showFor(state.sid), both = show === "both";
   pair.theirs.holder.position.set(both ? half + gap / 2 : 0, 0, 0);
   pair.ours.holder.position.set(both ? -(half + gap / 2) : 0, 0, 0);
-  if (state.show !== "ours") stage.add(pair.theirs.holder);
-  if (state.show !== "theirs") stage.add(pair.ours.holder);
+  if (show !== "ours") stage.add(pair.theirs.holder);
+  if (show !== "theirs") stage.add(pair.ours.holder);
   // The player stands to one side, a little back.
   const right = both ? -(2 * half + gap) : -half;
   player.position.set(right - 0.7, 0, 0.6);
@@ -527,8 +527,26 @@ const TYPE = { GRASS: "--t-grass", POISON: "--t-poison", FIRE: "--t-fire", FLYIN
 function title(s) { return s.charAt(0) + s.slice(1).toLowerCase(); }
 function fmt(n) { return n.toFixed(2); }
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+// (0.66, John's 13:27) The farm's and the pets' creatures: Retromon's own, with no Cobblemon one beside them.
+const farmOf = sid => DATA.species[sid] && DATA.species[sid].stats.farm;
+const showFor = sid => farmOf(sid) ? "ours" : state.show;
+function renderFarm(d, st, sz) {
+  const F = st.farm, total = Object.values(st.stats).reduce((a, b) => a + b, 0);
+  const fact = (k, v) => `<div class="fact"><small>${esc(k)}</small><b>${esc(v)}</b></div>`;
+  $("#panel").innerHTML = `
+    <div class="title"><div class="big">${esc(d.ours.info.name)}</div><div class="sub">${esc(F.line)} · ${esc(F.stage)}${F.sex !== "either" ? " · " + esc(F.sex === "she" ? "♀ she" : "♂ he") : ""} · Retromon's own (farm and pets)</div></div>
+    <div class="types">${st.types.map(t => `<span class="type" style="background:var(${TYPE[t] || "--t-normal"})">${esc(t)}</span>`).join("")}</div>
+    <div class="facts">${fact("How you get it", F.get)}${fact(F.stage === "Young" ? "Grows up" : F.stage === "Pet" ? "Growing up" : "Grew from", F.grows)}</div>
+    <div class="facts">${fact("What it gives or does", F.does)}</div>
+    <div><h2>Size in game (blocks)</h2><table><thead><tr><th></th><th class="ours">Retromon</th></tr></thead><tbody>
+      <tr><td>Height</td><td>${fmt(sz.ours.h)}</td></tr><tr><td>Length</td><td>${fmt(sz.ours.l)}</td></tr><tr><td>Width</td><td>${fmt(sz.ours.w)}</td></tr></tbody></table></div>
+    <div><h2>Base stats · ${total}</h2><div class="stats">${Object.entries(st.stats).map(([k, v]) =>
+      `<div class="stat"><span>${k}</span><span>${v}</span><div class="track"><div class="fill" style="width:${Math.min(100, v / 160 * 100)}%"></div></div></div>`).join("")}</div></div>
+    <p class="note">Not caught: bought, given or born on your farm. Shown here for the story and the gameplay; not in the game yet.</p>`;
+}
 function renderPanel() {
   const d = DATA.species[state.sid], st = d.stats, sz = cur.sizes;
+  if (st.farm) return renderFarm(d, st, sz);
   const total = Object.values(st.stats).reduce((a, b) => a + b, 0);
   const row = (label, a, b, f = v => v, more = true) => {
     const na = typeof a === "number" ? a : null, nb = typeof b === "number" ? b : null;
@@ -573,7 +591,7 @@ function fillMonPick() {
       const t = monText(sid) + " " + f.name.toLowerCase();
       if (q.length && !q.every(w => t.includes(w))) continue;
       const d = DATA.species[sid], o = document.createElement("option");
-      o.value = sid; o.textContent = `${title(d.stats.name)} · ${title(d.ours.info.name)}`; og.appendChild(o); n++;
+      o.value = sid; o.textContent = d.stats.farm ? `${title(d.ours.info.name)} · ${d.stats.farm.stage === "Pet" ? "pet" : d.stats.farm.stage.toLowerCase()}${d.stats.farm.sex !== "either" ? " " + (d.stats.farm.sex === "she" ? "♀" : "♂") : ""}` : `${title(d.stats.name)} · ${title(d.ours.info.name)}`; og.appendChild(o); n++;
     }
     if (og.children.length) sel.appendChild(og);
   }
@@ -1078,9 +1096,9 @@ function frame(now) {
     }
     if (state.spin) stage.rotation.y = Math.PI + t * 0.4;
     labels.innerHTML = "";
-    const d = DATA.species[state.sid];
-    if (state.show !== "ours") label(cur.theirs, "theirs", title(d.stats.name));
-    if (state.show !== "theirs") label(cur.ours, "ours", d.ours.info.name);
+    const d = DATA.species[state.sid], show = showFor(state.sid);
+    if (show !== "ours") label(cur.theirs, "theirs", title(d.stats.name));
+    if (show !== "theirs") label(cur.ours, "ours", d.ours.info.name);
   }
   $("#flash").style.opacity = flash.toFixed(3);
   const te = $("#toast"); te.textContent = toast; te.style.opacity = toast ? "1" : "0";

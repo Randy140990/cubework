@@ -1,0 +1,21 @@
+# Retromon's farm and pet creatures (tools/mons11.py; John's 13:27). Not caught: bought, given or born on your farm.
+# The young grow up after days of care, a she into the first, a he into the second. Shown in the Creature Viewer only;
+# not in the game yet.
+# sid	name	line	stage	sex	types	hp/atk/def/spa/spd/spe	grows	how you get it	what it gives or does
+moopip	MOOPIP	Cattle	Young	either	NORMAL	55/40/45/30/45/35	After 7 days of care (fed, brushed, let out to graze): MOOBELLE if she's a she, BRAWNOX if he's a he	Bought at a ranch, or born in your barn to a MOOBELLE and a BRAWNOX	Follows you about the yard; drinks from a bucket you fill. Too young to milk.
+moobelle	MOOBELLE	Cattle	Grown	she	NORMAL	95/60/75/45/80/40	-	Grows from a MOOPIP	MOOMOO MILK each morning (more the happier she is: a full bottle heals 100 HP). Her bell tells you where she's wandered.
+brawnox	BRAWNOX	Cattle	Grown	he	NORMAL	90/100/85/30/55/55	-	Grows from a MOOPIP	Pulls the plough (a field tilled in one go), shifts the farm's boulders. With a MOOBELLE, a calf in the spring.
+lamblet	LAMBLET	Sheep	Young	either	NORMAL	45/35/45/35/45/40	After 5 days of care: FLEECELLE if she's a she, CURLRAM if he's a he	Bought at a ranch, or born to a FLEECELLE and a CURLRAM	Skips after you; its first fleece too short to shear.
+fleecelle	FLEECELLE	Sheep	Grown	she	NORMAL	80/45/80/65/85/40	-	Grows from a LAMBLET	WOOL every 3 days when sheared (sold, or made into clothes at the tailor's). Her bow you can choose.
+curlram	CURLRAM	Sheep	Grown	he	NORMAL	80/95/90/35/55/50	-	Grows from a LAMBLET	Butts stumps and rocks out of a field. With a FLEECELLE, lambs.
+oinklet	OINKLET	Pigs	Young	either	NORMAL GROUND	50/45/40/30/40/35	After 5 days of care: TRUFFLESOW if she's a she, TUSKHOG if he's a he	Bought at a ranch, or a litter in the sty	Roots about in the mud; finds a dropped coin now and then.
+trufflesow	TRUFFLESOW	Pigs	Grown	she	NORMAL GROUND	95/60/70/40/75/40	-	Grows from an OINKLET	Walked in the woods, she snuffles out TRUFFLES and buried items (a nose for hidden things).
+tuskhog	TUSKHOG	Pigs	Grown	he	NORMAL GROUND	90/95/85/30/55/45	-	Grows from an OINKLET	Digs up roots and clears scrub; guards the sty. With a TRUFFLESOW, a litter.
+peepling	PEEPLING	Chickens	Young	either	NORMAL FLYING	30/30/30/30/30/45	After 3 days of care: CLUCKMAID if she's a she, CROWCOMB if he's a he	Hatched from an egg kept warm in the incubator	Peeps along behind you in a line with the others.
+cluckmaid	CLUCKMAID	Chickens	Grown	she	NORMAL FLYING	60/45/50/40/55/60	-	Grows from a PEEPLING	An EGG most mornings in the coop (eaten, sold, or kept warm to hatch).
+crowcomb	CROWCOMB	Chickens	Grown	he	NORMAL FLYING	60/75/55/40/50/80	-	Grows from a PEEPLING	Crows at dawn: the farm wakes (and so do you, a little earlier). Needed for eggs that hatch.
+foalet	FOALET	Horses	Young	either	NORMAL	55/50/45/30/45/65	After 10 days of care (fed, groomed, walked): MAREBRAID if she's a she, STORMSTEED if he's a he	Bought at a stable, or born to a MAREBRAID and a STORMSTEED	Trots beside you; too young to ride.
+marebraid	MAREBRAID	Horses	Grown	she	NORMAL	85/70/70/50/75/95	-	Grows from a FOALET	Ridden at an easy canter, saddlebags for more in your bag; her mane braided as you like.
+stormsteed	STORMSTEED	Horses	Grown	he	NORMAL	85/100/75/45/55/115	-	Grows from a FOALET	Ridden fast; jumps fences and low walls. With a MAREBRAID, a foal.
+heelhound	HEELHOUND	Dog	Pet	either	NORMAL	70/70/60/40/55/85	Doesn't grow up: a friend for good	Given as a puppy (the ranch's litter), or found as a stray who follows you home	Herds the animals in at dusk, digs up buried things, keeps watch at night; comes when you whistle.
+barnpurr	BARNPURR	Cat	Pet	either	NORMAL	55/60/45/50/55/95	Doesn't grow up: a friend for good	Turns up in the barn and stays if you feed it	Keeps RATTATA off the feed; leaves little gifts on the doorstep; naps in the sun.

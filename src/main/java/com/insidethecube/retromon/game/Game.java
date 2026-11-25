@@ -5314,14 +5314,16 @@ public final class Game {
 			changed = true;
 		}
 		for (Object[] o : ITEM_SPOTS) {
-			String key = (String) o[0], doneKey = "itemspot2:" + key;
+			// ((0.66, John's 13:36: "the Pokeball there is the wrong side of the fence") itemspot3: a ball put down before
+			// a little way off its spot, as Viridian's POTION was (two blocks south, past the lane's fence), is moved too.)
+			String key = (String) o[0], doneKey = "itemspot3:" + key;
 			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
 			if (done.contains(doneKey) || !Trainers.FIELD_ITEMS.containsKey(key)) continue;
 			if (!level.hasChunkAt(BlockPos.containing(x, y, z))) continue;
-			// (A copy the grid put down somewhere else, as on Route 2 by its gate: taken away; 14:18.)
+			// (A copy the grid put down somewhere else, as on Route 2 by its gate, or one off its spot: taken away; 14:18.)
 			net.minecraft.world.phys.AABB wide = new net.minecraft.world.phys.AABB(x - 120, level.getMinY(), z - 120, x + 120, level.getMaxY(), z + 120);
-			for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, wide, w -> ("item:" + key).equals(w.key()) && w.distanceToSqr(x, y, z) > 9)) w.discard();
-			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 3, y - 3, z - 3, x + 3, y + 3, z + 3);
+			for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, wide, w -> ("item:" + key).equals(w.key()) && w.distanceToSqr(x, y, z) > 0.36)) w.discard();
+			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 0.6, y - 1.5, z - 0.6, x + 0.6, y + 1.5, z + 0.6);
 			boolean there = !level.getEntitiesOfClass(WorldMon.class, box, w -> ("item:" + key).equals(w.key())).isEmpty();
 			if (!there && !takenByAnyone("item:" + key)) placeMon(level, "poke_ball", "item:" + key, x, y, z, 0F);
 			placed.add(doneKey);

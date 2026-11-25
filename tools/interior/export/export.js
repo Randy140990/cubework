@@ -14,8 +14,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
     // (0.62, John's 20:37: "Please implement") The game gets the fit-out, as the viewer shows it.
     if (typeof fitOn === 'function') fitOn(true);
     const v = o => [o.x, o.y, o.z];
-    const oface = Geo.prototype.face;
-    Geo.prototype.face = function (k, BL, R, U, w, h, n, sub) { if (k && w > 0 && h > 0) (this._faces || (this._faces = [])).push({ k, bl: v(BL), r: v(R), u: v(U), w, h, n: n ? v(n) : null, sub: sub || null }); return oface.call(this, k, BL, R, U, w, h, n, sub); };
+    // (Every face is kept as it's made: shade.js.)
     const oscreen = Room.prototype.screen;
     Room.prototype.screen = function (key, w, h, draw, glow) { (this._screens || (this._screens = [])).push({ key, w, h, draw: draw.name }); return oscreen.call(this, key, w, h, draw, glow); };
     const oshell = window.shell; window.shell = function (room, o = {}) { room._floors = o.floorRects || [[0, 0, room.W, room.D]]; room._door = o.door || null; room._paper = o.paper; return oshell(room, o); };
@@ -30,12 +29,17 @@ const { chromium } = require('playwright'); const fs = require('fs');
       const rooms = {}, used = window.__used;
 
       const R = BUILD[id]();
+      // (0.66) As the viewer has it: its people on the blocks, the fit-out's plants put in.
+      fitPeople(R);
+      if (!id.startsWith("arena_") && shadeOn(R)) shadeGreen(R);
       const faces = (R.geo._faces || []).slice();
       for (const pt of R.parts) for (const f of (pt.geo._faces || [])) faces.push(f);
       for (const f of faces) used[f.k] = true;
       const ramps = R.ramps.map(rp => { const [x0, z0, x1, z1] = rp.rect, xs = []; for (let x = x0; x <= x1 + 1e-6; x += 0.125) xs.push([x, rp.h(x, (z0 + z1) / 2)]); return { rect: rp.rect, h: xs }; });
+      // (0.66) The room's light, worked out at every corner the game draws (shade.js), for its light file.
+      const lit = !id.startsWith("arena_") && shadeOn(R) ? shadeFile(R) : null;
       rooms[id] = {
-        id, name: R.name, floor: R.floor, W: R.W, D: R.D, H: R.H, faces, solids: R.solids, ramps,
+        light: lit, id, name: R.name, floor: R.floor, W: R.W, D: R.D, H: R.H, faces, solids: R.solids, ramps,
         acts: R.acts.map(a => ({ rect: a.rect, label: a.label || "Look", lines: a.lines || null, ask: !!a.ask, pc: !!a.pc, hit: !!a.hit, map: !!a.map, use: a.use || null })),
         npcs: R.npcs.map(n => ({ name: n.name, x: n.x, z: n.z, y: n.y || 0, yaw: n.yaw, seated: !!n.seated, skin: n.look && n.look.skin, role: n.role || null, key: n.key || null, group: n.group || null, hours: n.hours || null, lines: n.talk ? n.talk(null).map(l => l.text) : [] })),
         spawn: R.spawn, floors: R._floors, door: R._door, pools: R.pools || [], Dm: R.Dm || R.D, mats: R._mats || [], passes: R._passes || [], sides: R._sides || [], grass: R.grass || [], pads: R.pads || [], stairs: R._stairs || [], boxes: R._boxes || [], keys: R._keys || [], balls: R.balls || [], screens: R._screens || [], clocks: R.clocks || [], spin: R._spin || [], mons: R._mons || [],

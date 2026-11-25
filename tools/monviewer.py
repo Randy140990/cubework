@@ -51,10 +51,42 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
 KEEP = ("idle", "ground")
 
 
-def data_uri(identifier):
+# (0.66, John's 13:27) The farm's and the pets' creatures (tools/mons11.py): their models and textures in tools/farm,
+# not the game's; their own data (tools/farm/farm.tsv), with no Cobblemon model beside them.
+FARM = os.path.join(HERE, "farm")
+FARM_FAMILIES = [("Farm: cattle", ["moopip", "moobelle", "brawnox"]), ("Farm: sheep", ["lamblet", "fleecelle", "curlram"]),
+                 ("Farm: pigs", ["oinklet", "trufflesow", "tuskhog"]), ("Farm: chickens", ["peepling", "cluckmaid", "crowcomb"]),
+                 ("Farm: horses", ["foalet", "marebraid", "stormsteed"]), ("Pets: the dog", ["heelhound"]), ("Pets: the cat", ["barnpurr"])]
+
+
+def resolve(identifier):
     ns, path = identifier.split(":", 1)
-    p = os.path.join(ROOT, "..", ns, path)
-    return "data:image/png;base64," + base64.b64encode(open(p, "rb").read()).decode()
+    if ns == "retromon" and path.startswith("textures/mons/"):
+        fp = os.path.join(FARM, "textures", path[len("textures/mons/"):])
+        if os.path.exists(fp) and os.path.basename(path).split(".")[0].split("_")[0] in {s for _, m in FARM_FAMILIES for s in m}: return fp
+    return os.path.join(ROOT, "..", ns, path)
+
+
+def data_uri(identifier):
+    return "data:image/png;base64," + base64.b64encode(open(resolve(identifier), "rb").read()).decode()
+
+
+def farm_rows():
+    out = {}
+    for line in open(os.path.join(FARM, "farm.tsv"), encoding="utf-8"):
+        if line.startswith("#") or not line.strip(): continue
+        f = line.rstrip("\n").split("\t")
+        sid, name, fam, stage, sex, types, st, grows, get, does = f
+        hp, atk, de, spa, spd, spe = (int(v) for v in st.split("/"))
+        out[sid] = {"dex": 0, "name": name, "types": types.split(), "stats": {"HP": hp, "Attack": atk, "Defense": de, "Sp. Atk": spa, "Sp. Def": spd, "Speed": spe},
+                    "catch": "-", "exp": "-", "growth": "-", "evolves": None,
+                    "farm": {"line": fam, "stage": stage, "sex": sex, "grows": grows if grows != "-" else "", "get": get, "does": does}}
+    # The grown ones: what they grew from.
+    for _, members in FARM_FAMILIES:
+        if len(members) == 3:
+            for g in members[1:]:
+                out[g]["farm"]["grows"] = "a " + out[members[0]]["name"] + (" (if she's a she)" if out[g]["farm"]["sex"] == "she" else " (if he's a he)")
+    return out
 
 
 def model(folder):
@@ -72,14 +104,12 @@ def model(folder):
         layers.append({"frames": [data_uri(f) for f in layer["frames"]], "fps": layer.get("fps", 8)})
     from PIL import Image
     import numpy as np
-    ns, path = info["texture"].split(":", 1)
-    im = Image.open(os.path.join(ROOT, "..", ns, path)).convert("RGBA")
+    im = Image.open(resolve(info["texture"])).convert("RGBA")
     # Texels painted: on the texture, or (for parts that only show glowing, such as flames) on a glowing layer.
     painted = np.array(im)[..., 3] > 0
     for layer in info.get("layers", []):
         for f in layer["frames"][:1]:
-            lns, lpath = f.split(":", 1)
-            g_im = Image.open(os.path.join(ROOT, "..", lns, lpath)).convert("RGBA")
+            g_im = Image.open(resolve(f)).convert("RGBA")
             if g_im.size == im.size:
                 painted |= np.array(g_im)[..., 3] > 0
     texels = int(painted.sum())
@@ -192,6 +222,16 @@ def main(out_path):
                       separators=(",", ":"))
             light = lambda d: {k: v for k, v in d.items() if k not in heavy}
             data["species"][sid] = {"stats": rows[sid], "ours": light(ours), "theirs": light(theirs)}
+    # (0.66) The farm's and the pets', after the rest.
+    farm = farm_rows()
+    for fam, members in FARM_FAMILIES:
+        data["families"].append({"name": fam, "members": members})
+        for sid in members:
+            ours = model(os.path.join(FARM, "mons", sid))
+            json.dump({"ours": {k: ours[k] for k in heavy}, "theirs": {k: ours[k] for k in heavy}}, open(os.path.join(mons_dir, sid + ".json"), "w"),
+                      separators=(",", ":"))
+            light = lambda d: {k: v for k, v in d.items() if k not in heavy}
+            data["species"][sid] = {"stats": farm[sid], "ours": light(ours), "theirs": light(ours)}
     for sid, d in data["species"].items():
         ev = d["stats"]["evolves"]
         if ev:

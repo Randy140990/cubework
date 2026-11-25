@@ -21,6 +21,10 @@ uniform vec3 cameraPosition;
 #endif
 #ifndef INSIDE
 #include "/lib/clouds.glsl"
+#else
+uniform float viewWidth;
+uniform float viewHeight;
+#include "/lib/look.glsl"
 #endif
 
 uniform sampler2D gtexture;
@@ -298,7 +302,18 @@ void main() {
         fogTo *= 1.0 - dark;
     }
     col = mix(col, fogTo, fog);
+    #ifdef INSIDE
+    // (1.2.9) Inside: the last touches now (final passes the picture through). A room's own blocks (Retromon's,
+    // retromon:prop) come lit already: each corner coloured with the room's light as the Interior Viewer works it out
+    // (the mod's RoomShade keeps it at a 2.5th), so they're shown just as the viewer shows them.
+    vec3 shown = retroLook(col, gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.xy);
+    #if defined WAVING_PROGRAM || defined WATER_PROGRAM
+    if (int(blockId + 0.5) == 10090) shown = clamp(c.rgb * 2.5, 0.0, 1.0);
+    #endif
+    outColor = vec4(shown, alpha);
+    #else
     outColor = vec4(col, alpha);
+    #endif
 }
 
 #endif
