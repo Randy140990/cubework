@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/st_pillar","st_pillar":"retromon:block/interior/st_pillar"},"elements":[{"from":[2.635,16,0.0],"to":[15.435,16,2.177],"faces":{"down":{"uv":[0,0,16,16],"texture":"#st_pillar","tintindex":144064064}}}]}

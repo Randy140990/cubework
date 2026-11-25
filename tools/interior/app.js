@@ -263,11 +263,11 @@ function battleCam() {
     camera.position.set(b.pos.x, b.pos.y, b.pos.z); camera.lookAt(b.look.x, b.look.y, b.look.z); camera.updateMatrixWorld(true);
     if (camera.fov !== 52) { camera.fov = 52; camera.updateProjectionMatrix(); }
   } else if (camera.fov !== 34) { camera.fov = 34; camera.updateProjectionMatrix(); }
-  if (room && room.battleCam) {
+  if (room && room.battleCam && room.battleCam.sky) {
     scene.background.set(0xbfe0f4);
     if (!scene.fog) scene.fog = new THREE.Fog(0xbfe0f4, 26, 58);
     scene.fog.near = on ? 26 : 60; scene.fog.far = on ? 58 : 140;
-  } else scene.background.set(0x000000);
+  } else { scene.background.set(0x000000); if (scene.fog && room && room.battleCam && !room.haze) scene.fog = null; }
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function tween(ms, fn) { return new Promise(res => { const t0 = performance.now(); const step = now => { const k = Math.min(1, (now - t0) / ms); fn(k); if (k < 1) requestAnimationFrame(step); else res(); }; requestAnimationFrame(step); }); }

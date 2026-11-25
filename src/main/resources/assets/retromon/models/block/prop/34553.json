@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/man_rock","man_rock":"retromon:block/interior/man_rock"},"elements":[{"from":[0.0,16,0.0],"to":[6.4,16,4.8],"faces":{"down":{"uv":[0,0,16,16],"texture":"#man_rock","tintindex":144064064}}}]}

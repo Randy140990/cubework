@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/st_pillar","st_pillar":"retromon:block/interior/st_pillar"},"elements":[{"from":[0.916,0,0.0],"to":[13.716,0,5.149],"faces":{"up":{"uv":[0,0,16,16],"texture":"#st_pillar","tintindex":144064064}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/tw_wall","tw_wall":"retromon:block/interior/tw_wall"},"elements":[{"from":[0.0,16,0.0],"to":[16,16,16],"faces":{"down":{"uv":[0,0,16,16],"texture":"#tw_wall","tintindex":143064048}}}]}

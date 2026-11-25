@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_pool_edge","ar_pool_edge":"retromon:block/interior/ar_pool_edge"},"elements":[{"from":[0.0,0.0,0],"to":[16.0,0.32,0],"faces":{"south":{"uv":[0,0,16,16],"texture":"#ar_pool_edge","tintindex":144064064}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gym_tan","gym_tan":"retromon:block/interior/gym_tan"},"elements":[{"from":[0.0,16,8.399],"to":[0.187,16,11.39],"faces":{"down":{"uv":[0,0,16,16],"texture":"#gym_tan","tintindex":188064064}}}]}

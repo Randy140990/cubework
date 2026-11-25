@@ -84,7 +84,7 @@
       talk: () => [{ text: "(The trainer you're battling, behind their POKéMON.)" }] });
     R.pets = [{ sid: "pikachu", x: mine.x, z: mine.z, y: mine.y + (S.wet.mine ? -0.1 : 0), yaw: 180 - yawTo(mine, enemy) / D2R },
               { sid: S.id.includes("cave") || S.id.includes("moon") || S.id.includes("tunnel") ? "geodude" : S.id.includes("forest") ? "caterpie" : "pidgey", x: enemy.x, z: enemy.z, y: enemy.y + (S.wet.enemy ? -0.1 : 0), yaw: 180 - yawTo(enemy, mine) / D2R }];
-    R.battleCam = { pos: at(S.cam), look: at(S.look) };
+    R.battleCam = { pos: at(S.cam), look: at(S.look), sky: true };
     const moved = Math.hypot(S.moved[0], S.moved[1]);
     R.item("Where", S.note + (moved ? " The battle's moved " + Math.round(moved) + " block" + (moved >= 1.5 ? "s" : "") + " from where you'd stand, to the nearest spot that's open." : " Fought right where you stand."));
     const kinds = Object.entries(S.clearedKinds).map(([k, n]) => k.replace(/_/g, " ") + " (" + n + ")").join(", ");

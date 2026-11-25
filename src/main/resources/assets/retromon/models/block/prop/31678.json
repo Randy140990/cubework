@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/lg_rock","lg_rock":"retromon:block/interior/lg_rock"},"elements":[{"from":[10.075,16,1.874],"to":[16.0,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#lg_rock","tintindex":144064064}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/psy_cap","psy_cap":"retromon:block/interior/psy_cap"},"elements":[{"from":[0.0,16,0.0],"to":[3.2,16,4.8],"faces":{"down":{"uv":[0,0,16,16],"texture":"#psy_cap","tintindex":144064064}}}]}
