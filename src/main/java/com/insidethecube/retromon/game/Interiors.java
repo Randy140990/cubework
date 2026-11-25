@@ -218,15 +218,20 @@ public final class Interiors {
 	}
 
 	private static void read() {
-		JsonArray shapes = DATA.getAsJsonArray("shapes");
-		for (int i = 0; i < STATES; i++) {
-			VoxelShape s = Shapes.empty();
-			for (JsonElement b : shapes.get(i).getAsJsonArray()) {
-				JsonArray a = b.getAsJsonArray();
-				s = Shapes.or(s, Block.box(a.get(0).getAsDouble(), a.get(1).getAsDouble(), a.get(2).getAsDouble(), a.get(3).getAsDouble(), a.get(4).getAsDouble(),
-						a.get(5).getAsDouble()));
+		// (0.67, John's 16:07: "the mod is getting really slow to start") Each shape made once and shared by every state
+		// that has it (some hundreds of shapes for 37 thousand states), so Minecraft's work on them is done once too.
+		JsonArray list = DATA.getAsJsonArray("shapeList"), of = DATA.getAsJsonArray("shapeOf");
+		if (list != null && of != null) {
+			VoxelShape[] made = new VoxelShape[list.size()];
+			for (int k = 0; k < made.length; k++) made[k] = shapeOf(list.get(k).getAsJsonArray());
+			for (int i = 0; i < STATES && i < of.size(); i++) SHAPES[i] = made[of.get(i).getAsInt()];
+		} else {
+			JsonArray shapes = DATA.getAsJsonArray("shapes");
+			Map<String, VoxelShape> seen = new HashMap<>();
+			for (int i = 0; i < STATES; i++) {
+				JsonArray boxes = shapes.get(i).getAsJsonArray();
+				SHAPES[i] = seen.computeIfAbsent(boxes.toString(), k -> shapeOf(boxes));
 			}
-			SHAPES[i] = s.optimize();
 		}
 		for (Map.Entry<String, JsonElement> e : DATA.getAsJsonObject("rooms").entrySet()) room(e.getKey(), e.getValue().getAsJsonObject());
 		StringBuilder more = new StringBuilder();
@@ -404,6 +409,16 @@ public final class Interiors {
 					Trainers.PEOPLE.put(p.key(), new Trainers.Person(p.key(), old != null ? old.place() : "oaks_lab", p.skin(), "any_dir", "walk", old != null ? old.lines() : p.lines()));
 				}
 			}
+	}
+
+	private static VoxelShape shapeOf(JsonArray boxes) {
+		VoxelShape s = Shapes.empty();
+		for (JsonElement b : boxes) {
+			JsonArray a = b.getAsJsonArray();
+			s = Shapes.or(s, Block.box(a.get(0).getAsDouble(), a.get(1).getAsDouble(), a.get(2).getAsDouble(), a.get(3).getAsDouble(), a.get(4).getAsDouble(),
+					a.get(5).getAsDouble()));
+		}
+		return s.optimize();
 	}
 
 	/** A prop state's collision (and outline) shape. */

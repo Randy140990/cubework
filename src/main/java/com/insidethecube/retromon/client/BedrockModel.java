@@ -167,7 +167,9 @@ public final class BedrockModel {
 	private static Optional<Def> load(String species, boolean ours) {
 		try {
 			String folder = "pokemon/";
-			if (ours && Minecraft.getInstance().getResourceManager().getResource(Retromon.id("mons/" + species + "/model.geo.json")).isPresent()) folder = "mons/";
+			// ((0.67) The farm's creatures and the pets have only Retromon's own models: theirs whichever look is chosen.)
+			if ((ours || com.insidethecube.retromon.game.Farm.is(species))
+					&& Minecraft.getInstance().getResourceManager().getResource(Retromon.id("mons/" + species + "/model.geo.json")).isPresent()) folder = "mons/";
 			JsonObject geo = json(folder + species + "/model.geo.json");
 			JsonObject info = json(folder + species + "/info.json");
 			if (geo == null) return Optional.empty();

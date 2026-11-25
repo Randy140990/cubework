@@ -5,7 +5,7 @@ Every face in a room is cut at block edges (and where its texture repeats), and 
 block model (retromon:prop, one state per model and collision shape). Collision comes from the room's solids
 (furniture and walls, 1.5 high), its floor and its stairs. Writes:
   assets/retromon/textures/block/interior/*.png   (the viewer's pixel textures, padded to powers of two)
-  assets/retromon/models/block/prop/*.json, assets/retromon/blockstates/prop.json
+  assets/retromon/models/block/prop/*.json, retromon/interiors/prop_models.json (each state's model)
   retromon/interiors/rooms.json                    (each room's blocks, people, mats, stairs, things to look at)
 
     python3 tools/interior/export/tomod.py export.json src/main/resources
@@ -828,13 +828,17 @@ def main():
     os.makedirs(mdir, exist_ok=True)
     for f in os.listdir(mdir): os.remove(os.path.join(mdir, f))
     for i, m in enumerate(model_list): json.dump(m, open(os.path.join(mdir, "%d.json" % i), "w"), separators=(",", ":"))
-    os.makedirs(os.path.join(res, "assets/retromon/blockstates"), exist_ok=True)
-    json.dump({"variants": {"m=%d" % s: {"model": "retromon:block/prop/%d" % st[0]} for s, st in enumerate(state_list)}},
-              open(os.path.join(res, "assets/retromon/blockstates/prop.json"), "w"), separators=(",", ":"))
+    # (0.67, John's 16:07: "the mod is getting really slow to start") No blockstates/prop.json: Minecraft matches each
+    # of a blockstate file's variants against every one of the block's states, 37 thousand times 37 thousand. Instead
+    # each state's model number, in order (client/PropTiles gives Minecraft the states' models itself).
+    old_bs = os.path.join(res, "assets/retromon/blockstates/prop.json")
+    if os.path.exists(old_bs): os.remove(old_bs)
     os.makedirs(os.path.join(res, "retromon/interiors"), exist_ok=True)
+    json.dump({"models": [st[0] for st in state_list]}, open(os.path.join(res, "retromon/interiors/prop_models.json"), "w"), separators=(",", ":"))
     # (0.63) Each battle hall's rooms (by the start of their ids): a battle in any of them is fought in that hall.
     arena_for = {key: serves for key, serves in data.get("arenaFor", {}).items() if key in arenas_out}
-    out = {"version": 1, "states": len(state_list), "shapes": [shape_list[st[1]] for st in state_list], "rooms": rooms_out, "arenas": arenas_out, "arenaFor": arena_for, "doors": DOORS, "start": START}
+    # ((0.67) The shapes once each, and each state's: there are 37 thousand states and only some hundreds of shapes.)
+    out = {"version": 1, "states": len(state_list), "shapeList": shape_list, "shapeOf": [st[1] for st in state_list], "rooms": rooms_out, "arenas": arenas_out, "arenaFor": arena_for, "doors": DOORS, "start": START}
     json.dump(out, open(os.path.join(res, "retromon/interiors/rooms.json"), "w"), separators=(",", ":"))
     print("textures", len(tex), "models", len(model_list), "shapes", len(shape_list), "states", len(state_list))
     for rid, r in rooms_out.items(): print(rid, len(r["cells"]) // 4, "blocks,", len(r["people"]), "people,", len(r["acts"]), "acts,", len(r["warps"]), "warps")

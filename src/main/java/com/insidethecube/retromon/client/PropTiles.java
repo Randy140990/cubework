@@ -7,7 +7,11 @@ import net.fabricmc.fabric.api.client.model.loading.v1.wrapper.WrapperBlockState
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.model.SpriteFinder;
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.SingleVariant;
+import net.minecraft.client.renderer.block.model.Variant;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -32,10 +36,40 @@ public final class PropTiles {
 	private static final int MARK = 100000000;
 
 	public static void register() {
-		ModelLoadingPlugin.register(ctx -> ctx.modifyBlockModelAfterBake().register((model, c) -> {
-			if (Retromon.PROP == null || c.state().getBlock() != Retromon.PROP || model == null) return model;
-			return new Tiled(model, c.baker().sprites().spriteFinder(TextureAtlas.LOCATION_BLOCKS));
-		}));
+		ModelLoadingPlugin.register(ctx -> {
+			// (0.67, John's 16:07: "the mod is getting really slow to start") Each state's model given straight to
+			// Minecraft (retromon/interiors/prop_models.json, in order), not through a blockstates file: Minecraft matches
+			// a blockstates file's every variant against every one of the block's states, and with 37 thousand states that
+			// was more than a billion checks each time it started.
+			if (Retromon.PROP != null) ctx.registerBlockStateResolver(Retromon.PROP, r -> {
+				int[] models = propModels();
+				Map<Integer, BlockStateModel.UnbakedRoot> roots = new HashMap<>();
+				for (BlockState st : r.block().getStateDefinition().getPossibleStates()) {
+					int m = st.getValue(com.insidethecube.retromon.game.Prop.M);
+					int model = m >= 0 && m < models.length ? models[m] : 0;
+					r.setModel(st, roots.computeIfAbsent(model, k -> new SingleVariant.Unbaked(new Variant(Retromon.id("block/prop/" + k))).asRoot()));
+				}
+			});
+			ctx.modifyBlockModelAfterBake().register((model, c) -> {
+				if (Retromon.PROP == null || c.state().getBlock() != Retromon.PROP || model == null) return model;
+				return new Tiled(model, c.baker().sprites().spriteFinder(TextureAtlas.LOCATION_BLOCKS));
+			});
+		});
+	}
+
+	/** Each prop state's model number, in order. */
+	private static int[] propModels() {
+		try (java.io.InputStream in = PropTiles.class.getResourceAsStream("/retromon/interiors/prop_models.json")) {
+			if (in == null) throw new java.io.IOException("not found");
+			com.google.gson.JsonArray a = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8))
+					.getAsJsonObject().getAsJsonArray("models");
+			int[] out = new int[a.size()];
+			for (int i = 0; i < out.length; i++) out[i] = a.get(i).getAsInt();
+			return out;
+		} catch (Exception e) {
+			Retromon.LOG.error("Retromon: couldn't read the rooms' block models", e);
+			return new int[0];
+		}
 	}
 
 	private static final class Tiled extends WrapperBlockStateModel {

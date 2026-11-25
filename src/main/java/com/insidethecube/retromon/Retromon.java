@@ -234,6 +234,22 @@ public class Retromon implements ModInitializer {
 							}
 							Game.placeMon((ServerLevel) p.level(), st.species(), st.id(), p.getX(), p.getY(), p.getZ(), facingFrom(p));
 							return placed(c, st.id() + " (" + st.kind() + ", L" + st.level() + ")");
+						})))
+						// (0.67) One of the farm's creatures or a pet, where you stand, facing you: /retromon place farm moobelle.
+						.then(Commands.literal("farm").then(Commands.argument("kind", StringArgumentType.word()).suggests((c, b) -> {
+							for (String k : com.insidethecube.retromon.game.Farm.ALL.keySet()) b.suggest(k);
+							return b.buildFuture();
+						}).executes(c -> {
+							ServerPlayer p = c.getSource().getPlayerOrException();
+							String kind = StringArgumentType.getString(c, "kind");
+							com.insidethecube.retromon.game.Farm.Kind f = com.insidethecube.retromon.game.Farm.get(kind);
+							if (f == null) {
+								c.getSource().sendFailure(Component.literal("No farm creature or pet called that"));
+								return 0;
+							}
+							String key = "farm:" + kind + "@" + p.getBlockX() + "," + p.getBlockY() + "," + p.getBlockZ();
+							Game.placeMon((ServerLevel) p.level(), kind, key, p.getX(), p.getY(), p.getZ(), facingFrom(p));
+							return placed(c, f.name() + (f.coat().isEmpty() ? "" : " (" + f.coat().split(":")[0] + ")") + " at " + p.getBlockX() + " " + p.getBlockY() + " " + p.getBlockZ());
 						}))))
 				.then(Commands.literal("remove").executes(c -> {
 					ServerPlayer p = c.getSource().getPlayerOrException();

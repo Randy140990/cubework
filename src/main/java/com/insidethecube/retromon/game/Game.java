@@ -4039,6 +4039,12 @@ public final class Game {
 			return;
 		}
 		if (key.startsWith("wild:")) return;
+		// (0.67) One of the farm's or a pet: its sound, and what it's like (never battled).
+		Farm.Kind farm = Farm.get(w.species());
+		if (farm != null) {
+			dialogue(p, null, "talk", farm.lines(), t, w.getId());
+			return;
+		}
 		if (Scenery.is(key)) {
 			dialogue(p, null, "talk", List.of(Scenery.line(name, key)), t, w.getId());
 			return;

@@ -52,7 +52,7 @@ def corners(el):
 def main(ids):
     data = json.load(open(os.path.join(RES, "retromon", "interiors", "rooms.json")))
     states = data["states"] if isinstance(data["states"], list) else None
-    st = json.load(open(os.path.join(RES, "assets", "retromon", "blockstates", "prop.json")))["variants"]
+    models = json.load(open(os.path.join(RES, "retromon", "interiors", "prop_models.json")))["models"]
     cache = {}
     bad_rooms = 0
     for rid, room in data["rooms"].items():
@@ -63,7 +63,7 @@ def main(ids):
         cells = room["cells"]; miss = near = total = 0
         for i in range(0, len(cells), 4):
             x, y, z, s = cells[i:i + 4]
-            mname = st["m=%d" % s]["model"].split("/")[-1]
+            mname = str(models[s])
             if mname not in cache: cache[mname] = json.load(open(os.path.join(RES, "assets", "retromon", "models", "block", "prop", mname + ".json"))).get("elements", [])
             for el in cache[mname]:
                 for p, d in corners(el):

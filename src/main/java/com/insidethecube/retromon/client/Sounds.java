@@ -104,6 +104,14 @@ public final class Sounds {
 	public static void cry(String species, float pitch) {
 		if (species == null || species.isEmpty()) return;
 		if (Settings.sound() <= 0) return;
+		// (0.67) The farm's creatures and the pets: their kind of animal's own sound (a cow's, a sheep's, a dog's...).
+		com.insidethecube.retromon.game.Farm.Kind farm = com.insidethecube.retromon.game.Farm.get(species);
+		if (farm != null) {
+			if (farm.noise() == null) return;
+			Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(net.minecraft.resources.Identifier.withDefaultNamespace(farm.noise()), SoundSource.NEUTRAL,
+					0.9F * Settings.sound() / 4F, pitch * farm.pitch(), RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true));
+			return;
+		}
 		Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(Retromon.id("cry." + species), SoundSource.NEUTRAL, 0.9F * Settings.sound() / 4F, pitch,
 				RandomSource.create(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true));
 	}

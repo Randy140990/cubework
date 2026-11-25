@@ -51,9 +51,9 @@ FAMILIES = [("Leaf armadillos", ["bulbasaur", "ivysaur", "venusaur"]), ("Ember g
 KEEP = ("idle", "ground")
 
 
-# (0.66, John's 13:27) The farm's and the pets' creatures (tools/mons11.py): their models and textures in tools/farm,
-# not the game's; their own data (tools/farm/farm.tsv), with no Cobblemon model beside them.
-FARM = os.path.join(HERE, "farm")
+# (0.66, John's 13:27) The farm's and the pets' creatures (tools/mons11.py): in the mod with the rest (16:07), their
+# own data (retromon/data/farm.tsv), with no Cobblemon model beside them.
+FARM_TSV = os.path.join(HERE, "..", "src", "main", "resources", "retromon", "data", "farm.tsv")
 FARM_FAMILIES = [("Farm: cattle", ["moopip", "moobelle", "brawnox"]), ("Farm: sheep", ["lamblet", "fleecelle", "curlram"]),
                  ("Farm: pigs", ["oinklet", "trufflesow", "tuskhog"]), ("Farm: chickens", ["peepling", "cluckmaid", "crowcomb"]),
                  ("Farm: horses", ["foalet", "marebraid", "stormsteed"]),
@@ -64,10 +64,6 @@ FARM_FAMILIES = [("Farm: cattle", ["moopip", "moobelle", "brawnox"]), ("Farm: sh
 
 def resolve(identifier):
     ns, path = identifier.split(":", 1)
-    if ns == "retromon" and path.startswith("textures/mons/"):
-        fp = os.path.join(FARM, "textures", path[len("textures/mons/"):])
-        base = os.path.basename(path).split(".")[0]
-        if os.path.exists(fp) and (base.split("_glow")[0] in {s for _, m in FARM_FAMILIES for s in m}): return fp
     return os.path.join(ROOT, "..", ns, path)
 
 
@@ -77,7 +73,7 @@ def data_uri(identifier):
 
 def farm_rows():
     out = {}
-    for line in open(os.path.join(FARM, "farm.tsv"), encoding="utf-8"):
+    for line in open(FARM_TSV, encoding="utf-8"):
         if line.startswith("#") or not line.strip(): continue
         f = line.rstrip("\n").split("\t")
         sid, name, fam, stage, sex, types, st, grows, get, does = f[:10]
@@ -236,7 +232,7 @@ def main(out_path):
     for fam, members in FARM_FAMILIES:
         data["families"].append({"name": fam, "members": members})
         for sid in members:
-            ours = model(os.path.join(FARM, "mons", sid))
+            ours = model(os.path.join(ROOT, "mons", sid))
             json.dump({"ours": {k: ours[k] for k in heavy}, "theirs": {k: ours[k] for k in heavy}}, open(os.path.join(mons_dir, sid + ".json"), "w"),
                       separators=(",", ":"))
             light = lambda d: {k: v for k, v in d.items() if k not in heavy}

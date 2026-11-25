@@ -25,9 +25,8 @@ from mons3 import bone_of, spike, taper_mat, ear_mat  # noqa: E402
 from mons5 import quad, avian, spot_coat, stripe_coat, both, plain, solid, back_row  # noqa: E402
 from mons8 import curtain  # noqa: E402
 
-FARM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "farm")
-monlib.OUT_MODELS = os.path.join(FARM, "mons")
-monlib.OUT_TEX = os.path.join(FARM, "textures")
+# (16:07: "with these new ones ... I need those in the actual release as well") Written into the mod's own creatures
+# (assets/retromon/mons, textures/mons), with the rest; their data in retromon/data/farm.tsv.
 
 # Big bright eyes, drawn in fine texels (two to each unit): dark ovals with a shine, the young ones' taller.
 # (14:44: "the eyes look huge compared to the faces") A small dark eye a unit across, a glint at its top outer corner
