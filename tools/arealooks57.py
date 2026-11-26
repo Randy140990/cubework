@@ -438,7 +438,7 @@ def round57(add, room, G):
     add("grass_onto", "stone_bricks,cracked_stone_bricks,cobblestone", NP, "-", ys(18, 20))
 
     # ---------- Mahogany and the Lake of Rage (16:04) ----------
-    add("swap", "chiseled_quartz_block,smooth_quartz,white_terracotta", MAH, "block/chiseled_quartz_block_top=mah_pave@2,block/quartz_block_bottom=mah_pave@2,block/white_terracotta=mah_pave@2",
+    add("swap", "chiseled_quartz_block,smooth_quartz,white_terracotta", MAH, "block/chiseled_quartz_block_top=mah_pave@2,block/chiseled_quartz_block=mah_pave@2,block/quartz_block_bottom=mah_pave@2,block/white_terracotta=mah_pave@2",
         ys(21, 21))
     add("grass_onto", "chiseled_quartz_block,smooth_quartz,white_terracotta", MAH, "-", ys(21, 21))
     GY = (-1800, 195, -1750, 232, "the Lake of Rage's GYARADOS")

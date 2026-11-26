@@ -75,7 +75,43 @@ def dark_gold(seed=67):
     return im
 
 
+def mat(base, seed=673):
+    """(0.68, the Johto pass) A woven mat: its colour in soft bands across, a fine weave, a darker hem at each end."""
+    n = 16
+    g = random.Random(seed)
+    im = Image.new("RGBA", (n, n))
+    for y in range(n):
+        for x in range(n):
+            k = 0.05 if (x + (y // 2)) % 4 < 2 else -0.03
+            k += 0.06 if y % 4 == 0 else 0.0
+            k += (g.random() - 0.5) * 0.02
+            if x in (0, 15): k -= 0.18
+            c = tuple(clamp(base[i] + (255 - base[i]) * k if k > 0 else base[i] * (1 + k)) for i in range(3))
+            im.putpixel((x, y), c + (255,))
+    return im
+
+
+def grey_path():
+    """(0.68, the Johto pass) The cliffside's grey paths (west of Cianwood): Kanto's path, seamless and soft, in the light
+    grey of John's stone (its own light and dark kept, laid four blocks across)."""
+    src = Image.open(os.path.join(L.TEX, "path_kanto.png")).convert("RGB")
+    w, h = src.size
+    px = src.load()
+    lums = [0.3 * px[x, y][0] + 0.59 * px[x, y][1] + 0.11 * px[x, y][2] for y in range(h) for x in range(w)]
+    lo, hi = min(lums), max(lums)
+    dark, light = (170, 168, 162), (214, 212, 206)
+    im = Image.new("RGBA", (w, h))
+    for y in range(h):
+        for x in range(w):
+            r, g, b = px[x, y]
+            t = (0.3 * r + 0.59 * g + 0.11 * b - lo) / max(1.0, hi - lo)
+            im.putpixel((x, y), tuple(clamp(dark[i] + (light[i] - dark[i]) * t) for i in range(3)) + (255,))
+    return im
+
+
 def build():
+    L.save("cliff_path_grey", grey_path())
+    L.save("mat_cyan", mat((64, 170, 176)))
     L.save("pp_yellow_s", seamless_paint((242, 190, 44), 671))
     L.save("pp_white_s", seamless_paint((241, 240, 236), 672, 0.014))
     L.save("vr_gold", dark_gold())

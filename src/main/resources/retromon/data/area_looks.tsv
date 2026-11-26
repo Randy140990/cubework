@@ -5232,7 +5232,7 @@ swap	quartz_slab,quartz_block,polished_diorite_slab,polished_diorite_stairs,dior
 swap	stone_bricks,cracked_stone_bricks	-2152	448	-2090	515	18	20	block/stone_bricks=park_stone@2,block/cracked_stone_bricks=park_stone@2	the NATIONAL PARK
 swap	cobblestone	-2152	448	-2090	515	18	20	block/cobblestone=park_cobble@2	the NATIONAL PARK
 grass_onto	stone_bricks,cracked_stone_bricks,cobblestone	-2152	448	-2090	515	18	20	-	the NATIONAL PARK
-swap	chiseled_quartz_block,smooth_quartz,white_terracotta	-1800	370	-1725	435	21	21	block/chiseled_quartz_block_top=mah_pave@2,block/quartz_block_bottom=mah_pave@2,block/white_terracotta=mah_pave@2	Mahogany Town
+swap	chiseled_quartz_block,smooth_quartz,white_terracotta	-1800	370	-1725	435	21	21	block/chiseled_quartz_block_top=mah_pave@2,block/chiseled_quartz_block=mah_pave@2,block/quartz_block_bottom=mah_pave@2,block/white_terracotta=mah_pave@2	Mahogany Town
 grass_onto	chiseled_quartz_block,smooth_quartz,white_terracotta	-1800	370	-1725	435	21	21	-	Mahogany Town
 swap	redstone_block	-1800	195	-1750	232	16	50	block/redstone_block=gy_red@4	the Lake of Rage's GYARADOS
 swap	nether_wart_block,red_concrete,red_terracotta,netherrack	-1800	195	-1750	232	16	50	block/nether_wart_block=gy_red_dark@4,block/red_concrete=gy_red_dark@4,block/red_terracotta=gy_red_dark@4,block/netherrack=gy_red_dark@4	the Lake of Rage's GYARADOS
@@ -6435,6 +6435,63 @@ swap	jungle_button,stone_button,oak_button,spruce_button,birch_button,dark_oak_b
 swap	jungle_button,stone_button,oak_button,spruce_button,birch_button,dark_oak_button,acacia_button,mangrove_button,cherry_button,bamboo_button,crimson_button,warped_button,pale_oak_button,polished_blackstone_button	-915	285	-915	285	27	27	block/jungle_planks=boulder_stone_top|boulder_stone@2	a button on a rock
 swap	jungle_button,stone_button,oak_button,spruce_button,birch_button,dark_oak_button,acacia_button,mangrove_button,cherry_button,bamboo_button,crimson_button,warped_button,pale_oak_button,polished_blackstone_button	-917	287	-917	287	27	27	block/jungle_planks=boulder_stone_top|boulder_stone@2	a button on a rock
 swap	jungle_button,stone_button,oak_button,spruce_button,birch_button,dark_oak_button,acacia_button,mangrove_button,cherry_button,bamboo_button,crimson_button,warped_button,pale_oak_button,polished_blackstone_button	-913	289	-913	289	27	27	block/jungle_planks=boulder_stone_top|boulder_stone@2	a button on a rock
+swap	white_concrete,white_carpet,white_wool	-2720	60	-2576	1000	-	-	block/white_concrete=jw_white,block/white_wool=jw_white	the cliffside west of Cianwood
+swap	light_gray_concrete,light_gray_carpet,light_gray_wool	-2720	60	-2576	1000	-	-	block/light_gray_concrete=jw_grey,block/light_gray_wool=jw_grey	the cliffside west of Cianwood
+swap	quartz_block,quartz_slab,quartz_stairs,smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_bricks,chiseled_quartz_block	-2720	60	-2576	1000	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_bricks=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean	the cliffside west of Cianwood
+swap	white_terracotta	-2720	60	-2576	1000	-	-	block/white_terracotta=jhouse_wall	the cliffside west of Cianwood
+cube	stripped_mangrove_log	-2720	60	-2576	1000	-	-	post_bt_top|mah_post	the cliffside west of Cianwood
+cube	stripped_mangrove_wood	-2720	60	-2576	1000	-	-	mah_post	the cliffside west of Cianwood
+swap	cyan_terracotta	-2720	60	-2576	1000	-	-	block/cyan_terracotta=npg_trim	the cliffside west of Cianwood
+swap	polished_tuff	-2720	60	-2576	1000	-	-	block/polished_tuff=npg_stone	the cliffside west of Cianwood
+swap	warped_trapdoor	-2720	60	-2576	1000	-	-	block/warped_trapdoor=npg_trim	the cliffside west of Cianwood
+swap	deepslate_brick_wall	-2720	60	-2576	1000	-	-	block/deepslate_bricks=station_mullion	the cliffside west of Cianwood
+swap	light_blue_wool	-2720	60	-2576	1000	-	-	block/light_blue_wool=ds_blue_light	the cliffside west of Cianwood
+swap	ochre_froglight,sea_lantern	-2720	60	-2576	1000	-	-	block/ochre_froglight_side=door_light!,block/ochre_froglight_top=door_light!,block/sea_lantern=door_light!	the cliffside west of Cianwood
+cube	stripped_spruce_wood,stripped_spruce_log	-2720	60	-2576	1000	-	-	hill_top|cliff_root@4	the cliffside west of Cianwood
+swap	polished_diorite_stairs,polished_diorite_slab,polished_diorite	-2720	60	-2576	1000	-	-	block/polished_diorite=house_trim	the cliffside west of Cianwood
+swap	iron_bars	-2720	60	-2576	1000	-	-	block/iron_bars=railing_dark	the cliffside west of Cianwood
+swap	barrel	-2720	60	-2576	1000	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_bottom=crate_barrel_top	the cliffside west of Cianwood
+swap	composter	-2720	60	-2576	1000	-	-	block/composter_side=bin_side,block/composter_top=bin_top,block/composter_bottom=bin_top	the cliffside west of Cianwood
+swap	end_stone_brick_wall	-2720	60	-2576	1000	-	-	block/end_stone_bricks=banner_foot	the cliffside west of Cianwood
+swap	redstone_lamp	-2720	60	-2576	1000	-	-	block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	the cliffside west of Cianwood
+panel	spruce_shelf	-2720	60	-2576	1000	-	-	block/spruce_shelf=wood_shelf_dark	the cliffside west of Cianwood
+panel	oak_shelf,jungle_shelf	-2720	60	-2576	1000	-	-	block/oak_shelf=band_shelf,block/jungle_shelf=band_shelf	the cliffside west of Cianwood
+panel	pale_oak_shelf	-2720	60	-2576	1000	-	-	block/pale_oak_shelf=panel_white	the cliffside west of Cianwood
+panel	birch_shelf	-2720	60	-2576	1000	-	-	block/birch_shelf=wood_shelf	the cliffside west of Cianwood
+panel	dark_oak_shelf	-2720	60	-2576	1000	-	-	block/dark_oak_shelf=panel_planter_dark	the cliffside west of Cianwood
+panel	mangrove_shelf	-2720	60	-2576	1000	-	-	block/mangrove_shelf=panel_wood_red	the cliffside west of Cianwood
+panel	warped_shelf	-2720	60	-2576	1000	-	-	block/warped_shelf=green_shelf	the cliffside west of Cianwood
+panel	cherry_shelf	-2720	60	-2576	1000	-	-	block/cherry_shelf=panel_cream	the cliffside west of Cianwood
+panel	bamboo_shelf	-2720	60	-2576	1000	-	-	block/bamboo_shelf=panel_gold	the cliffside west of Cianwood
+panel	crimson_shelf	-2720	60	-2576	1000	-	-	block/crimson_shelf=vio_bridge_beam	the cliffside west of Cianwood
+swap	light_gray_terracotta	-2720	60	-2576	1000	-	-	block/light_gray_terracotta=cliff_path_grey@4	the cliffside west of Cianwood
+swap	black_concrete	-2720	60	-2576	1000	-	-	block/black_concrete=cin_post	the cliffside west of Cianwood
+panel	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-2664	785	-2641	792	33	36	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
+swap	andesite_slab,andesite,andesite_stairs	-2664	785	-2641	792	33	36	block/andesite=bridge_boards	a bridge
+panel	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-2628	782	-2616	789	29	32	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
+swap	andesite_slab,andesite,andesite_stairs	-2628	782	-2616	789	29	32	block/andesite=bridge_boards	a bridge
+swap	iron_block	-2648	752	-2642	761	40	52	block/iron_block=ds_steel	the cliffside's signboard
+swap	purple_stained_glass,purple_stained_glass_pane	-2648	752	-2642	761	40	52	block/purple_stained_glass=lamp_globe_violet!	the cliffside's signboard
+swap	sea_lantern	-2648	752	-2642	761	40	52	block/sea_lantern=lamp_globe_warm!	the cliffside's signboard
+cube	stripped_birch_wood,stripped_birch_log	-2648	752	-2642	761	40	52	wood_shelf	the cliffside's signboard
+swap	gold_block	-1992	337	-1964	366	85	96	block/gold_block=spire_gold	the TIN TOWER's spire
+swap	polished_deepslate_wall,oxidized_lightning_rod,lightning_rod,weathered_lightning_rod,exposed_lightning_rod	-1992	337	-1964	366	85	96	block/polished_deepslate=spire_metal,block/lightning_rod=spire_metal,block/oxidized_lightning_rod=spire_metal,block/weathered_lightning_rod=spire_metal,block/exposed_lightning_rod=spire_metal	the TIN TOWER's spire
+swap	nether_bricks	-2048	356	-2022	374	25	36	block/nether_bricks=redb_roof	the house by the BURNED TOWER
+swap	cyan_carpet	-2039	364	-2031	367	22	22	block/cyan_wool=mat_cyan	the mat by the house by the BURNED TOWER
+swap	pale_oak_stairs,pale_oak_slab,pale_oak_planks	-2233	570	-2205	590	20	62	block/pale_oak_planks=lh_white	the lighthouse
+swap	polished_blackstone_button	-2233	570	-2205	590	20	62	block/polished_blackstone=bolt	the lighthouse
+swap	pale_oak_fence_gate,pale_oak_fence	-2323	594	-2321	599	17	22	block/pale_oak_planks=white_fence	Olivine's harbour fences
+swap	pale_oak_trapdoor	-2230	593	-2223	595	24	28	block/pale_oak_trapdoor=pewter_shutter	Olivine's shutters
+swap	pale_oak_trapdoor,iron_trapdoor,oak_stairs	-2128	476	-2114	487	19	40	block/pale_oak_trapdoor=swan_marble,block/iron_trapdoor=swan_marble,block/oak_planks=swan_marble	the NATIONAL PARK's swan
+swap	pale_oak_trapdoor	-2125	468	-2118	496	19	22	block/pale_oak_trapdoor=park_stone@2	the NATIONAL PARK's gate
+swap	pale_oak_trapdoor	-1777	386	-1775	393	20	24	block/pale_oak_trapdoor=pewter_shutter	Mahogany's shutters
+swap	chiseled_stone_bricks	-2124	691	-2118	693	29	33	block/chiseled_stone_bricks=house_trim	Goldenrod City
+swap	spruce_trapdoor,spruce_slab,spruce_stairs	-2457	742	-2451	745	16	20	block/spruce_trapdoor=bench_slat,block/spruce_planks=bench_slat	a bench by the water
+swap	spruce_trapdoor,spruce_slab,spruce_stairs	-2388	600	-2382	603	16	20	block/spruce_trapdoor=bench_slat,block/spruce_planks=bench_slat	a bench by the water
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone	-2257	554	-2252	559	22	28	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	a boulder
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone	-1806	269	-1799	275	22	29	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	a boulder
+swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone	-1827	251	-1821	256	22	29	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	a boulder
+swap	tuff	-2569	740	-2566	745	26	28	block/tuff=drip_rock_top|drip_rock@4	the cliff's rock
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care
