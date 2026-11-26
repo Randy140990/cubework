@@ -286,8 +286,8 @@
  },
  {
   "id": "jgate_r32",
-  "name": "Route 32 gate",
-  "floor": "Violet City to Route 32",
+  "name": "Ruins of Alph gate",
+  "floor": "Route 32 to the Ruins of Alph",
   "place": "route_32",
   "axis": "we",
   "sides": [
@@ -295,7 +295,7 @@
    "w"
   ],
   "a": "ROUTE 32",
-  "b": "VIOLET CITY",
+  "b": "the RUINS OF ALPH",
   "doors": {
    "w": {
     "door": [

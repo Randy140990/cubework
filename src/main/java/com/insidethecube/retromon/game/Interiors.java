@@ -140,7 +140,9 @@ public final class Interiors {
 	private static final String[] BLOCK_ROOMS = {"/retromon/interiors/viridian_forest.json", "/retromon/interiors/digletts_cave.json",
 			"/retromon/interiors/mt_moon.json", "/retromon/interiors/safari_zone.json", "/retromon/interiors/seafoam_islands.json",
 			"/retromon/interiors/rock_tunnel.json", "/retromon/interiors/ilex_forest.json", "/retromon/interiors/cerulean_cave.json",
-			"/retromon/interiors/victory_road.json", "/retromon/interiors/mt_silver.json"};
+			"/retromon/interiors/victory_road.json", "/retromon/interiors/mt_silver.json",
+			// (0.69, John's 26 Nov 15:58) The RUINS OF ALPH, between its two gates (tools/alph.py).
+			"/retromon/interiors/ruins_of_alph.json"};
 
 	/** (0.60) The rooms whose water you can walk into and swim (Cerulean Cave's: FireRed's SURF, which there isn't yet). (Before the rooms are read.) */
 	private static final java.util.Set<String> SWIM = new java.util.HashSet<>();

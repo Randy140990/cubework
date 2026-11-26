@@ -26,20 +26,28 @@
 
   const facing = { n: FACE.n, s: FACE.s, e: FACE.e, w: FACE.w };
   const GATES = JOHTO_GATES;
+  // (0.69, John's 26 Nov 15:58: "we've got the ruins of Alf to incorporate within the 2 gates ... you would go into
+  // them. Those gates obviously need to be open.") The two gates' ruins sides go into the RUINS OF ALPH (tools/alph.py,
+  // rooms71.js), not out into the gap John's left for it in the world: ROUTE 36's gate out of its south side, in
+  // front of the ruins' north gatehouse facing south; ROUTE 32's out of its west side, in front of the east one
+  // facing west.
+  const INTO_RUINS = { jgate_alph: { s: { to: "ruins_of_alph", spawn: { x: 58.0, z: 43.4, yaw: FACE.s } } },
+    jgate_r32: { w: { to: "ruins_of_alph", spawn: { x: 104.6, z: 110.0, yaw: FACE.w } } } };
+  const way = (g, f, dflt) => (INTO_RUINS[g.id] && INTO_RUINS[g.id][f]) || dflt;
   for (const g of GATES) PLACES.push({ id: g.id, name: g.name, floor: g.floor, group: "Johto's gates" });
   for (const g of GATES) {
     BUILD[g.id] = function () {
       const closed = { none: true, lines: ["The way on isn't open yet."] };
       if (g.axis === "we") {
         const R = new Room(g.id, { name: g.name, floor: g.floor, W: 16, D: 10, outsideSize: "16 by 12" });
-        lgGateSide(R, { west: g.sides.includes("w") ? {} : closed, east: g.sides.includes("e") ? {} : closed, view: "Outside: " + g.a + " one way, " + g.b + " the other.",
+        lgGateSide(R, { west: g.sides.includes("w") ? way(g, "w", {}) : closed, east: g.sides.includes("e") ? way(g, "e", {}) : closed, view: "Outside: " + g.a + " one way, " + g.b + " the other.",
           leaflet: "A glass table. There's a leaflet: JOHTO's ROUTES, A WALKER'S GUIDE." });
         R.npcs.push({ name: "Officer", key: g.id + "_p0", x: 7.0, z: 0.8, yaw: facing.s, look: { skin: "guard" }, talk: () => [{ text: "Welcome! Mind how you go." }] });
         R.spawn = g.sides.includes("e") ? { x: 14.4, z: 5.0, yaw: FACE.w } : { x: 1.6, z: 5.0, yaw: FACE.e };
         return R;
       }
       const R = new Room(g.id, { name: g.name, floor: g.floor, W: 14, D: 14, outsideSize: "12 by 16" });
-      lgGate(R, { south: g.sides.includes("s") ? { to: "town" } : closed, north: g.sides.includes("n") ? { to: "town" } : closed, view: "Outside: " + g.a + " to the north, " + g.b + " to the south.",
+      lgGate(R, { south: g.sides.includes("s") ? way(g, "s", { to: "town" }) : closed, north: g.sides.includes("n") ? way(g, "n", { to: "town" }) : closed, view: "Outside: " + g.a + " to the north, " + g.b + " to the south.",
         leaflet: "A glass table. There's a leaflet: JOHTO's ROUTES, A WALKER'S GUIDE.", map: "A glass table. Someone's left a map of JOHTO on it." });
       R.npcs.push({ name: "Officer", key: g.id + "_p0", x: 12.6, z: 6.0, yaw: facing.w, look: { skin: "guard" }, talk: () => [{ text: "Welcome! Mind how you go." }] });
       R.spawn = LG_GATE_IN;

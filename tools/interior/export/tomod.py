@@ -777,8 +777,11 @@ def main():
         for m in room.get("sides", []):
             # Through a side wall: out to the world (or asked where to: the Route 28 Gate's west way).
             east = m["wall"] == "e"
-            warps.append({"kind": "east" if east else "west", "x": room["W"] - 1.0 if east else 1.0, "z0": m["z0"], "z1": m["z1"],
-                          "door": SIDE_DOOR.get((rid, m["wall"])), "to": None, "choice": m.get("choice"), "needs": m.get("needs")})
+            w = {"kind": "east" if east else "west", "x": room["W"] - 1.0 if east else 1.0, "z0": m["z0"], "z1": m["z1"],
+                 "door": SIDE_DOOR.get((rid, m["wall"])), "to": None, "choice": m.get("choice"), "needs": m.get("needs")}
+            # ((0.69) Or through to another room: ROUTE 32's gate west into the RUINS OF ALPH.)
+            if m.get("to") not in (None, "town"): w.update({"door": None, "to": m["to"], "spawn": spawn_of(m["spawn"])})
+            warps.append(w)
         # (0.51) Warp pads (the SAFFRON GYM's): step on one and you're on its partner, in the same room.
         for pd in room.get("pads", []):
             # ((0.53) SILPH CO.'s: a pad's partner may be on another floor.)

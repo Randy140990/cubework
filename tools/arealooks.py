@@ -315,6 +315,11 @@ def main():
     rows[:] = arealooks57.finish(rows, globals())
     import arealooks596
     rows[:] = arealooks596.post(rows, globals())
+    # (0.69) John's 26 Nov 15:58: the RUINS OF ALPH (in the interiors, between its two gates) in Johto's looks, as all
+    # of Johto has them by now.
+    import arealooks69
+    room = lambda look, blocks, area, swaps="-", ys=("-", "-"): rows.append((look, blocks, area[0], area[1], area[2], area[3], ys[0], ys[1], swaps, area[4], "interiors"))
+    arealooks69.round69(add, room, globals(), rows)
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"

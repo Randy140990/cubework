@@ -173,8 +173,25 @@
     if (b === "brewing_stand") return [[p16(2), 0, p16(2), p16(14), p16(2), p16(14)], [p16(7), 0, p16(7), p16(9), p16(14), p16(9)]];
     if (b === "fire") return [[0, 0, p16(7.5), 1, 1, p16(8.5)], [p16(7.5), 0, 0, p16(8.5), 1, 1]];
     if (b === "dead_bush" || b === "short_grass" || b === "fern") return [[p16(2), 0, p16(7.5), p16(14), p16(12), p16(8.5)], [p16(7.5), 0, p16(2), p16(8.5), p16(12), p16(14)]];
+    // ((0.69) The RUINS OF ALPH's plants (rooms71.js): crossed sprites, as Minecraft draws them; its vines flat on the
+    // sides they cling to.)
+    if (b === "short_dry_grass" || b === "tall_dry_grass" || b === "poppy" || b === "dandelion" || b.endsWith("_tulip") || b === "hanging_roots"
+      || b === "tall_grass" || b === "large_fern" || b === "azure_bluet" || b === "oxeye_daisy" || b === "cornflower")
+      return [[0, 0, p16(7.5), 1, b === "short_dry_grass" ? p16(10) : 1, p16(8.5)], [p16(7.5), 0, 0, p16(8.5), b === "short_dry_grass" ? p16(10) : 1, 1]];
+    if (b === "pointed_dripstone") return [[p16(4), 0, p16(7.5), p16(12), 1, p16(8.5)], [p16(7.5), 0, p16(4), p16(8.5), 1, p16(12)]];
+    if (b === "vine") {
+      const o = [], t = p16(0.8);
+      if (p.north === "true") o.push([0, 0, 0, 1, 1, t]);
+      if (p.south === "true") o.push([0, 0, 1 - t, 1, 1, 1]);
+      if (p.west === "true") o.push([0, 0, 0, t, 1, 1]);
+      if (p.east === "true") o.push([1 - t, 0, 0, 1, 1, 1]);
+      if (p.up === "true") o.push([0, 1 - t, 0, 1, 1, 1]);
+      return o.length ? o : [[0, 0, 0, 1, 1, t]];
+    }
     return null;
   }
+  // (0.69) For the RUINS OF ALPH's blocks (rooms71.js): the same shapes.
+  window.blockShape = shape; window.blockParse = parse;
 
   // ===================================== the ships =====================================
   for (const [sid, D] of Object.entries(SHIPS.ships)) BUILD["ship_" + sid] = () => {

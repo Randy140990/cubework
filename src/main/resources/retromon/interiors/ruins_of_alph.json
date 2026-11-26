@@ -1,0 +1,114 @@
+{
+ "rooms": {
+  "ruins_of_alph": {
+   "origin": [
+    18944,
+    64,
+    0
+   ],
+   "W": 148,
+   "D": 192,
+   "H": 12,
+   "name": "Ruins of Alph",
+   "floor": "",
+   "place": "ruins_of_alph_outside",
+   "schem": "ruins_of_alph.bin",
+   "base": -4,
+   "dark": false,
+   "spawn": {
+    "x": 58.0,
+    "z": 43.4,
+    "yaw": 0.0
+   },
+   "entry": {
+    "x": 58.0,
+    "z": 43.4,
+    "yaw": 0.0
+   },
+   "cam": {
+    "x": 74.0,
+    "z": 96.0,
+    "dist": 30
+   },
+   "cells": [],
+   "warps": [
+    {
+     "kind": "north",
+     "x0": 56.6,
+     "x1": 59.4,
+     "z0": 36.5,
+     "z": 38.2,
+     "door": null,
+     "to": "jgate_alph",
+     "spawn": {
+      "x": 7.0,
+      "z": 12.5,
+      "yaw": 180.0
+     }
+    },
+    {
+     "kind": "box",
+     "x0": 108.8,
+     "x1": 110.2,
+     "z0": 108.6,
+     "z1": 111.4,
+     "door": null,
+     "to": "jgate_r32",
+     "spawn": {
+      "x": 1.6,
+      "z": 5.0,
+      "yaw": -90.0
+     }
+    }
+   ],
+   "people": [],
+   "acts": [
+    {
+     "rect": [
+      50.9,
+      54.9,
+      53.1,
+      56.6
+     ],
+     "label": "Read",
+     "lines": [
+      "RUINS OF ALPH.",
+      "Visitors who are interested in archaeology are welcome."
+     ]
+    },
+    {
+     "rect": [
+      51.9,
+      96.9,
+      54.1,
+      98.6
+     ],
+     "label": "Read",
+     "lines": [
+      "RUINS OF ALPH.",
+      "Feel free to explore the ruins and become a fossil professor!"
+     ]
+    },
+    {
+     "rect": [
+      71.9,
+      96.9,
+      74.1,
+      98.6
+     ],
+     "label": "Read",
+     "lines": [
+      "RUINS RESEARCH CENTER"
+     ]
+    }
+   ],
+   "grass": [],
+   "items": [],
+   "lights": [],
+   "pools": [],
+   "panes": [],
+   "clocks": []
+  }
+ },
+ "doors": {}
+}
