@@ -114,6 +114,41 @@ def wordmark_png():
     f = os.path.join(HERE, "..", "src", "main", "resources", "assets", "retromon", "textures", "gui", "v", "wordmark_ours.png")
     return "data:image/png;base64," + base64.b64encode(open(f, "rb").read()).decode()
 
+def kanto_data():
+    """(0.72) KANTO's own for OPTION's admin pages and the slots: the EVENT PICKER's steps, the PLACER's list (and what's
+    placed in the mod already), the campaign's points, the wild POKéMON of each place, and the GAME CORNER's reels."""
+    import re
+    D = os.path.join(HERE, "..", "src", "main", "resources", "retromon", "data")
+    J = os.path.join(HERE, "..", "src", "main", "java", "com", "insidethecube", "retromon")
+    def table(n):
+        return [l.rstrip("\n").split("\t") for l in open(os.path.join(D, n), encoding="utf-8") if l.strip() and not l.startswith("#")]
+    events = [{"n": int(r[0]), "stage": int(r[1]), "main": r[2] == "Main", "stageName": r[6], "where": r[7], "what": r[8], "need": r[9], "get": r[10]}
+              for r in table("kanto_events.tsv") if len(r) >= 11 and r[0].strip().isdigit()]
+    baked = {r[0] for r in table("placed.tsv") if len(r) >= 9 and r[8] == "placed"}
+    places = [{"place": r[1], "kind": r[2], "key": r[3], "label": r[4], "detail": r[5], "gx": int(r[6]), "gy": int(r[7]), "facing": r[8], "sight": int(r[9]),
+               "baked": r[3] in baked} for r in table("placeables.tsv") if len(r) >= 10]
+    names = {r[0]: r[2] for r in table("places.tsv") if len(r) > 2}
+    camp = open(os.path.join(J, "engine", "Campaign.java"), encoding="utf-8").read()
+    body = camp[camp.index("STAGES = List.of("):camp.index("));", camp.index("STAGES = List.of(")) + 2]
+    body = re.sub(r'"\s*\+\s*"', "", body)
+    stages = []
+    for m in re.finditer(r'new Stage\("([^"]*)", "([^"]*)", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+),\s*"([^"]*)",\s*"([^"]*)"\)', body):
+        stages.append({"title": m.group(1), "line": m.group(2), "leadLo": int(m.group(3)), "leadHi": int(m.group(4)), "lo": int(m.group(5)), "hi": int(m.group(6)),
+                       "min": int(m.group(7)), "max": int(m.group(8)), "places": [p for p in m.group(9).split() if not p.startswith("*")],
+                       "gifts": [g.split(":")[0] for g in m.group(10).split()]})
+    wild = {}
+    for r in table("wild.tsv"):
+        if len(r) < 5 or r[1] != "grass": continue
+        for sl in r[4].split(","):
+            sp = sl.split(":")[0]
+            if sp and sp not in wild.setdefault(r[0], []): wild[r[0]].append(sp)
+    ks = open(os.path.join(J, "game", "KantoStory.java"), encoding="utf-8").read()
+    reels = json.loads("[" + re.search(r"REELS = \{(.*?)\};", ks, re.S).group(1).replace("{", "[").replace("}", "]") + "]")
+    pays = json.loads("[" + re.search(r"PAYS = \{(.*?)\};", ks).group(1) + "]")
+    ps = open(os.path.join(J, "client", "PlacerScreen.java"), encoding="utf-8").read()
+    order = re.findall(r'"([a-z0-9_]+)"', ps[ps.index("ORDER = {"):ps.index("};", ps.index("ORDER = {"))])
+    return {"events": events, "placeables": places, "placeNames": names, "stages": stages, "wild": wild, "reels": reels, "pays": pays, "placerOrder": order}
+
 def engine():
     s = open(os.path.join(HERE, "monviewer.html")).read()
     return s[s.index("// ---------- Molang"):s.index("// ---------- the stage ----------")]
@@ -122,7 +157,7 @@ def main():
     page, out = sys.argv[1], sys.argv[2]
     head = open(os.path.join(HERE, "uiviewer", "head.html")).read()
     shared = [os.path.join(HERE, "interior", n) for n in ("tex.js", "world.js", "figure.js", "creature.js", "rooms.js")]
-    own = [os.path.join(HERE, "uiviewer", n) for n in ("lang.js", "ui.js", "items.js", "faces.js", "scenes.js", "screens1.js", "screens2.js", "screens3.js", "roster", "screens4.js", "main.js")]
+    own = [os.path.join(HERE, "uiviewer", n) for n in ("lang.js", "ui.js", "items.js", "faces.js", "scenes.js", "screens1.js", "screens2.js", "screens3.js", "roster", "screens4.js", "screens5.js", "main.js")]
     def src(p):
         # The Person Viewer's roster (everyone in the mod), wrapped so its names don't clash: the cast screens show the same people.
         if p.endswith("roster"):
@@ -132,7 +167,7 @@ def main():
     js = "\n".join(src(p) for p in shared + own)
     data = json.dumps(light_data(page), separators=(",", ":"))
     html = (head + '\n<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>\n<script>\n'
-            + "const DATA = " + data + ";\nconst WORDMARK_OURS = " + json.dumps(wordmark_png()) + ";\nconst EMOTE = " + json.dumps(emote_pngs()) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst MAPDATA = " + json.dumps(mapdata(), separators=(",", ":")) + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
+            + "const DATA = " + data + ";\nconst WORDMARK_OURS = " + json.dumps(wordmark_png()) + ";\nconst EMOTE = " + json.dumps(emote_pngs()) + ";\nconst SKINDATA = " + json.dumps(skindata(), separators=(",", ":")) + ";\nconst KANTO = " + json.dumps(kanto_data(), separators=(",", ":")) + ";\nconst MAPDATA = " + json.dumps(mapdata(), separators=(",", ":")) + ";\nconst WORLDMAP = " + json.dumps(worldmap(), separators=(",", ":")) + ";\nconst PACKTEX = " + json.dumps(packtex(), separators=(",", ":")) + ";\nconst D2R = Math.PI / 180;\nconst $ = (s, el = document) => el.querySelector(s);\n"
             + engine() + "\n" + js + "\n</script>\n")
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
     open(out, "w").write(html)

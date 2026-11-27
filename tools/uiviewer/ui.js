@@ -20,7 +20,7 @@ function title(s) { return String(s).toLowerCase().replace(/(^|[\s-])\w/g, c => 
 const G = {
   lang: "English", name: "RED", rival: "BLUE", money: 3150, badges: 2, seen: 34, caught: 12, time: "12:34", started: "19/11/2026", id: "40217",
   outfit: Object.assign(OUTFIT.defaults(false), { capp: 0, topc: 1, hairc: 9 }),
-  opts: { textSpeed: 1, music: 3, sound: 3, voice: 1, nights: 1, wild: 1, effects: 0, style: 0, follower: 1, look: 1, shaders: 1, cycle: 0, battles: 0, travel: 0 },
+  opts: { textSpeed: 1, music: 3, sound: 3, voice: 1, nights: 1, wild: 1, effects: 0, style: 0, follower: 1, look: 1, shaders: 1, cycle: 0, battles: 0, travel: 0, photo: 0 },
   party: [], place: "PALLET TOWN",
   bag: {
     "ITEMS": [["POTION", 5, "Restores 20 HP to one POKéMON."], ["SUPER POTION", 2, "Restores 50 HP to one POKéMON."], ["ANTIDOTE", 3, "Cures a POKéMON of poison."], ["PARLYZ HEAL", 1, "Cures a POKéMON of paralysis."], ["AWAKENING", 1, "Wakes a sleeping POKéMON."], ["ESCAPE ROPE", 1, "Takes you back out of a cave in a flash."], ["REPEL", 4, "Keeps weak wild POKéMON away for 100 steps."]],

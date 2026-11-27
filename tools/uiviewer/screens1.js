@@ -179,15 +179,22 @@ const OPTS = [
   ["DAY AND NIGHT", "cycle", ["ON", "OFF"], "ON lets the day go by, morning to night. OFF holds it at half past ten in the morning (the day count waits too)."],
   ["BATTLES", "battles", ["ON", "OFF"], "OFF: no wild POKéMON jump out and trainers let you by, to look round quickly. Your rival's and TEAM ROCKET's battles still happen."],
   ["FAST TRAVEL", "travel", ["OFF", "ON"], "ON: the TOWN MAP takes you anywhere. A on any place goes there, or right-click any spot on the map."],
+  ["PHOTO MODE", "photo", ["OFF", "ON"], "ON: the camera leaves you, for high shots of the map (F6 too). WASD move, SPACE/CTRL up and down, Q/E turn, R/F tilt, the wheel zooms, Z/X the lens, P takes a 2K picture."],
+];
+// (0.72) OPTION's admin pages, as the mod's: each opens its own screen.
+const OPT_PAGES = [
+  ["PARTY PICKER", null, null, "For videos: your party as it would be at any point in KANTO (after BROCK, after MISTY...), or your own pick. Your own party is kept aside. In game only.", "party-picker"],
+  ["EVENT PICKER", null, null, "For videos: go to any step of KANTO's story, just before it or into it, with the badges, items and a party for that point. Your own game is kept aside. In game only.", "event-picker"],
+  ["PLACER", null, null, "Put FireRed's trainers, people, items, hidden items and boulders down where they go on the map: stand on the spot, face its way, place it. For whoever runs the game.", "placer"],
 ];
 screen("options", "Start", "Options", {
   what: "Settings, a row each: left and right to change. What the row does is written at the top.",
-  mod: "OptionsPage (the title's OPTION and the menu's): TEXT SPEED, MUSIC, SOUND, POKéDEX VOICE, NIGHTS, WILD POKéMON, BATTLE EFFECTS, BATTLE STYLE, WALK WITH YOU, POKéMON LOOK, SHADERS, DAY AND NIGHT, BATTLES, FAST TRAVEL, CONTROLS.",
-  tags: ["New: BATTLES (off for looking round quickly) and FAST TRAVEL (the TOWN MAP goes anywhere)"],
+  mod: "OptionsPage (the title's OPTION and the menu's): TEXT SPEED, MUSIC, SOUND, POKéDEX VOICE, NIGHTS, WILD POKéMON, BATTLE EFFECTS, BATTLE STYLE, WALK WITH YOU, POKéMON LOOK, SHADERS, DAY AND NIGHT, BATTLES, FAST TRAVEL, PHOTO MODE, PARTY PICKER, EVENT PICKER, PLACER, CONTROLS.",
+  tags: ["New in 0.72: the PLACER", "PARTY PICKER and EVENT PICKER (in game, for whoever runs it)", "PHOTO MODE"],
   make(arg) {
     swirlBackdrop("lime", { lx: 15, ly: 0 }); let sel = 0;
     const desc = box(170, 40, 940, 96, "g-panel", ""); desc.style.padding = "22px 30px"; desc.style.fontSize = "22px"; desc.style.fontWeight = "800";
-    const rows = OPTS.concat([["CONTROLS", null, null, "See every key: what it does in game, and what's turned off."]]);
+    const rows = OPTS.concat(OPT_PAGES, [["CONTROLS", null, null, "See every key: what it does in game, and what's turned off."]]);
     // The rows 44 tall, less with this many (the panel's foot clear of the key buttons), as the mod's.
     const rh = Math.min(44, (720 - 14 - 40 - 18 - 156 - 36) / rows.length);
     const P = box(170, 156, 940, rows.length * rh + 36, "g-panel", ""); P.style.padding = "18px";
@@ -203,6 +210,7 @@ screen("options", "Start", "Options", {
       const [l, key, vals] = rows[sel];
       if (key && (k === "left" || k === "right" || k === "a")) { G.opts[key] = (G.opts[key] + (k === "left" ? vals.length - 1 : 1)) % vals.length; draw(); return true; }
       if (l === "CONTROLS" && k === "a") { go("keymap", arg); return true; }
+      if (rows[sel][4] && k === "a") { go(rows[sel][4], arg); return true; }
       return false;
     };
     draw(); hints([["A", "Change"], ["B", "Back"]]);

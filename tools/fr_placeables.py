@@ -166,6 +166,16 @@ for l in open(os.path.join(FR, "include", "constants", "items.h"), encoding="utf
     if m: ALIAS[m.group(3)] = m.group(2).lower()
 
 
+ITEM_NAME = {r[0]: r[1] for r in table("items.tsv") if len(r) > 1}
+for r in table("tms.tsv"):
+    if len(r) > 4: ITEM_NAME[r[0]] = "%s %s" % (r[3] if r[3] not in ("-", "") else r[4], r[2].replace("_", " ").upper())
+
+
+def item_label(i):
+    """An item as the game names it: ULTRA BALL, TM28 DIG."""
+    return ITEM_NAME.get(i, i.replace("_", " ").upper())
+
+
 def our_item(it):
     """FireRed's item as one of ours (a TM by its move), or None."""
     if it in ALIAS:
@@ -257,7 +267,7 @@ def main():
                     base = "%s_fr_%s" % (place, ours)
                     used_keys[base] += 1
                     key = base if used_keys[base] == 1 else "%s_%d" % (base, used_keys[base])
-                rows.append([key, place, "item", key, ours, "item=" + ours, gx, gy, "none", 0])
+                rows.append([key, place, "item", key, item_label(ours), "item=" + ours, gx, gy, "none", 0])
                 continue
             if place == "route_24" and script == "Route24_EventScript_Rocket":
                 # (NUGGET BRIDGE's ROCKET: a scripted battle, the mod's route_24_0, who gives the NUGGET first.)
@@ -338,7 +348,7 @@ def main():
             base = "%s_hidden_%s" % (place, ours)
             used_keys[base] += 1
             key = base if used_keys[base] == 1 else "%s_%d" % (base, used_keys[base])
-            rows.append([key, place, "hidden", key, ours, "item=" + ours, b.get("x", 0), b.get("y", 0), "none", 0])
+            rows.append([key, place, "hidden", key, item_label(ours), "item=" + ours, b.get("x", 0), b.get("y", 0), "none", 0])
     # The mod's own people outside (people.tsv), for those not standing yet past Viridian, and the field items it has
     # outside that FireRed's don't match (Red and Blue's, at a guessed spot now), so they can be placed or taken away.
     outside = {pl for pl in MAPS.values() if not re.match(r"^(viridian_forest|mt_moon|rock_tunnel|seafoam|cerulean_cave|victory_road|safari|power_plant|digletts|underground)", pl)}
@@ -349,7 +359,7 @@ def main():
         rows.append([r[0], r[1], "person", r[0], r[2].replace("_", " ").upper(), first, r[6] if len(r) > 6 else 0, r[7] if len(r) > 7 else 0, r[3], 0])
     for r in FIELD:
         if len(r) < 5 or r[1] not in outside or r[0] in taken: continue
-        rows.append([r[0], r[1], "item", r[0], r[2], "item=%s (Red and Blue's)" % r[2], r[3], r[4], "none", 0])
+        rows.append([r[0], r[1], "item", r[0], item_label(r[2]), "item=%s (Red and Blue's)" % r[2], r[3], r[4], "none", 0])
     with open(os.path.join(DATA, "placeables.tsv"), "w", encoding="utf-8") as f:
         f.write("# What the PLACER lists (tools/fr_placeables.py, from FireRed's maps): id place kind key label detail gx gy facing sight\n")
         for r in rows: f.write("\t".join(str(v) for v in r) + "\n")
