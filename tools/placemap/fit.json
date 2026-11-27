@@ -339,6 +339,16 @@
   "next": 0.906,
   "sure": true
  },
+ "MAP_SAFFRON_CITY": {
+  "map": "SaffronCity",
+  "ox": -415,
+  "oz": 369,
+  "w": 66,
+  "h": 55,
+  "score": 0.611,
+  "next": 0.611,
+  "sure": false
+ },
  "MAP_VERMILION_CITY": {
   "map": "VermilionCity",
   "ox": -399,

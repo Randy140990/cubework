@@ -106,6 +106,19 @@ while q:
         pos[b] = p
         q.append(b)
 
+# (Saffron joins the routes through a connection map FireRed keeps apart: placed from its own connections instead.)
+for mid in ("MAP_SAFFRON_CITY",):
+    if mid in pos or mid not in maps: continue
+    aw, ah = size(mid)
+    for c in maps[mid][1].get("connections") or []:
+        b = c["map"]
+        if b not in pos: continue
+        bx_, by_ = pos[b]
+        bw, bh = size(b)
+        o, d = c["offset"], c["direction"]
+        pos[mid] = {"up": (bx_ - o, by_ + bh), "down": (bx_ - o, by_ - ah), "left": (bx_ + bw, by_ - o), "right": (bx_ - aw, by_ - o)}[d]
+        break
+
 TS = {os.path.basename(os.path.dirname(f)).replace("_", ""): np.fromfile(f, dtype="<u4")
       for f in glob.glob(os.path.join(FR, "data", "tilesets", "*", "*", "metatile_attributes.bin"))}
 
