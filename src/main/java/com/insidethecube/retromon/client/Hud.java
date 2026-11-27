@@ -24,6 +24,8 @@ public final class Hud {
 		}
 		// (Under everything else: the dust in a cave's air over the world.)
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("haze"), Hud::haze);
+		// (0.71) ROCK TUNNEL's dark: you see only a little way round you till FLASH lights it.
+		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("flash_dark"), Hud::flashDark);
 		HudElementRegistry.addLast(com.insidethecube.retromon.Retromon.id("cinema"), (g, delta) -> {
 			if (!Photo.on) Hud.cinema(g, delta);
 		});
@@ -348,6 +350,24 @@ public final class Hud {
 		g.fill(0, 0, w, h, base);
 		g.fillGradient(0, 0, w, h / 3, edge, clear);
 		g.fillGradient(0, h - h / 4, w, h, clear, edge);
+	}
+
+	/** (0.71) Pitch dark round you in ROCK TUNNEL (FireRed's), a soft circle of sight, till one of yours uses FLASH. */
+	private static void flashDark(GuiGraphics g, DeltaTracker delta) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null || !Adventure.active() || BattleScene.active() || Photo.on || ClientState.data == null) return;
+		com.insidethecube.retromon.game.Interiors.Room r = com.insidethecube.retromon.game.Interiors.roomOf(mc.player);
+		if (r == null || !r.id().startsWith("rock_tunnel") || ClientState.data.story.contains("flash_lit")) return;
+		V.fit(g.guiWidth(), g.guiHeight());
+		float ox = 640, oy = 380;
+		float[] at = Adventure.project(mc.player.getPosition(delta.getGameTimeDeltaPartialTick(true)).add(0, 1.0, 0), g.guiWidth(), g.guiHeight());
+		if (at != null) {
+			ox = Math.max(0, Math.min(1280, V.vx(at[0])));
+			oy = Math.max(0, Math.min(720, V.vy(at[1])));
+		}
+		float far = (float) Math.hypot(g.guiWidth(), g.guiHeight()) / V.s(1) + 40, r0 = 120, r1 = 210;
+		V.annulus(g, ox, oy, r0, r1, 0x00000000, 0xF5000000);
+		V.annulus(g, ox, oy, r1, far * 2, 0xF5000000, 0xF5000000);
 	}
 
 	private static void cinema(GuiGraphics g, DeltaTracker delta) {

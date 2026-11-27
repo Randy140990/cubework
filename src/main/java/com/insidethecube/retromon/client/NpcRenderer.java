@@ -275,6 +275,8 @@ public class NpcRenderer extends HumanoidMobRenderer<Npc, NpcRenderer.State, Hum
 		// TEAM ROCKET in Viridian: JESSIE (the one you battle) and JAMES.
 		if (key.equals("rocket_viridian")) return "jessie";
 		if (key.equals("rocket_james")) return "james";
+		// (0.71) And where Let's Go has them (MT. MOON, the HIDEOUT, the TOWER, ROUTE 17).
+		if (key.startsWith("rocket_jj_")) return key.endsWith("_james") ? "james" : "jessie";
 		return switch (npc.role()) {
 			case Npc.NURSE -> "nurse";
 			case Npc.CLERK -> "clerk";

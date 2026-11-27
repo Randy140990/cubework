@@ -213,9 +213,9 @@ public final class Adventure {
 		return true;
 	}
 
-	/** The game's speed: 1x, 2x, 3x, 4x and round again (the world, and battles with it). */
+	/** The game's speed: 1x up to 8x and round again (the world, and battles with it). (John's 18:24: "do go to x8".) */
 	public static void cycleSpeed() {
-		speed = speed >= 4 ? 1 : speed + 1;
+		speed = speed >= 8 ? 1 : speed + 1;
 		CompoundTag t = new CompoundTag();
 		t.putInt("times", speed);
 		ClientPlayNetworking.send(new Net.Act("speed", t));

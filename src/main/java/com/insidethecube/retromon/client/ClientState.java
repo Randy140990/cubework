@@ -99,6 +99,12 @@ public final class ClientState {
 				String music = t.getStringOr("music", "");
 				if (!music.isEmpty()) Music.setPlace(music);
 			}
+			// (0.71) A GAME CORNER slot machine, and the server's answer to a spin; BILL's PC once he's himself again.
+			case "slots" -> show(() -> new SlotsScreen(t.getIntOr("coins", 0)));
+			case "slot_result" -> {
+				if (mc.screen instanceof SlotsScreen sl) sl.result(t);
+			}
+			case "pc_open" -> mc.setScreen(new PcScreen());
 			case "release" -> {
 				// Someone who was coming over won't now (you went through a door): you can move again.
 				Adventure.frozen = 0;

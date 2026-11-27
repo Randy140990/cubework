@@ -58,6 +58,15 @@ public class PlayerData {
 	public final Set<String> ownBadges = new LinkedHashSet<>();
 	public boolean picking;
 	public String pickedAs = "";
+	/** (0.71) The GAME CORNER's coins, in your COIN CASE (9,999 at most). */
+	public int coins;
+	/**
+	 * (0.71) The EVENT PICKER: while you're at a step of the story, your own game kept aside (its save), where you were
+	 * (x, y, z, yaw: in the world, or in the room ownRoom, from its corner) and which step you're at.
+	 */
+	public CompoundTag ownGame;
+	public double[] ownAt;
+	public String ownRoom = "", eventAs = "";
 	/** How far the story's come: "parcel" (carrying OAK's PARCEL), "pokedex" (Oak gave you the POKéDEX). */
 	public final Set<String> story = new LinkedHashSet<>();
 
@@ -156,6 +165,20 @@ public class PlayerData {
 		t.putDouble("played", played);
 		t.putLong("since", since);
 		t.putLong("day0", day0);
+		t.putInt("coins", coins);
+		if (ownGame != null) {
+			t.put("ownGame", ownGame);
+			if (ownAt != null && ownAt.length >= 4) {
+				CompoundTag at = new CompoundTag();
+				at.putDouble("x", ownAt[0]);
+				at.putDouble("y", ownAt[1]);
+				at.putDouble("z", ownAt[2]);
+				at.putDouble("yaw", ownAt[3]);
+				t.put("ownAt", at);
+			}
+			t.putString("ownRoom", ownRoom);
+			t.putString("eventAs", eventAs);
+		}
 		if (picking) {
 			t.putBoolean("picking", true);
 			t.put("own", MonTag.saveAll(ownParty));
@@ -212,6 +235,14 @@ public class PlayerData {
 		// A save from before the errand (0.8 and older): you already had the POKéDEX.
 		else if (d.started) d.story.add("pokedex");
 		split(t.getStringOr("visited", ""), d.visited);
+		d.coins = Math.max(0, Math.min(9999, t.getIntOr("coins", 0)));
+		if (t.get("ownGame") instanceof CompoundTag og) {
+			d.ownGame = og;
+			if (t.get("ownAt") instanceof CompoundTag at)
+				d.ownAt = new double[] {at.getDoubleOr("x", 0), at.getDoubleOr("y", 0), at.getDoubleOr("z", 0), at.getDoubleOr("yaw", 0)};
+			d.ownRoom = t.getStringOr("ownRoom", "");
+			d.eventAs = t.getStringOr("eventAs", "");
+		}
 		d.picking = t.getBooleanOr("picking", false);
 		if (d.picking) {
 			d.ownParty.addAll(MonTag.loadAll(t.getListOrEmpty("own")));

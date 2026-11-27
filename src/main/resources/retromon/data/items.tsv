@@ -177,3 +177,5 @@ poke_flute	POKé FLUTE	0	KEY_ITEM
 tea	TEA	0	KEY_ITEM
 lift_key	LIFT KEY	0	KEY_ITEM
 silph_scope	SILPH SCOPE	0	KEY_ITEM
+secret_key	SECRET KEY	0	KEY_ITEM
+teachy_tv	TEACHY TV	0	KEY_ITEM

@@ -301,8 +301,17 @@ public final class Interiors {
 			for (JsonElement ae : r.getAsJsonArray("acts")) {
 				JsonObject a = ae.getAsJsonObject();
 				JsonArray rc = a.getAsJsonArray("rect");
-				acts.add(new Act(rc.get(0).getAsDouble(), rc.get(1).getAsDouble(), rc.get(2).getAsDouble(), rc.get(3).getAsDouble(), strings(a.get("lines")),
-						a.has("map") && a.get("map").getAsBoolean(), a.has("pc") && a.get("pc").getAsBoolean(), a.has("use") ? a.get("use").getAsString() : null));
+				List<String> al = strings(a.get("lines"));
+				boolean pc = a.has("pc") && a.get("pc").getAsBoolean();
+				String use = a.has("use") ? a.get("use").getAsString() : null;
+				// (0.71) The GAME CORNER's slot machines (the ones that work) and BILL's PCs (his CELL SEPARATOR first): the game answers.
+				if (use == null && id.equals("game_corner") && !al.isEmpty() && al.get(0).equals("A slot machine!")) use = "slots";
+				if (use == null && id.equals("bills_house") && pc) {
+					use = "bill_pc";
+					pc = false;
+				}
+				acts.add(new Act(rc.get(0).getAsDouble(), rc.get(1).getAsDouble(), rc.get(2).getAsDouble(), rc.get(3).getAsDouble(), al,
+						a.has("map") && a.get("map").getAsBoolean(), pc, use));
 			}
 			List<double[]> grass = new ArrayList<>();
 			if (r.has("grass")) for (JsonElement ge : r.getAsJsonArray("grass")) {
@@ -990,8 +999,10 @@ public final class Interiors {
 		}
 		List<Npc> here = level.getEntitiesOfClass(Npc.class, box, n -> true);
 		for (Person p : r.people()) {
-			if (p.group() == null && p.from() < 0) continue;
-			boolean want = wanted(level, r, p);
+			// ((0.71) The story's say: MR. FUJI on the TOWER's 7F till you've freed him, BILL once he's himself again.)
+			Boolean story = KantoStory.wants(comer, p.key());
+			if (p.group() == null && p.from() < 0 && story == null) continue;
+			boolean want = (story == null || story) && wanted(level, r, p);
 			boolean in = false;
 			for (Npc n : here) if (p.key().equals(n.key())) {
 				if (want && !in) in = true;
@@ -1461,6 +1472,24 @@ public final class Interiors {
 				default -> acrossX && p.getZ() > z1 - 1.0 && p.getZ() < z1 + 0.55 && (dz < -0.01 || facingNorth);
 			};
 			if (at && Math.abs(p.getY() - y) < 1.2) {
+				// (0.71) A door that needs something (the Viridian GYM: the other seven badges; the Cinnabar GYM: the SECRET
+				// KEY; CERULEAN CAVE: the CHAMPION): without it, you're turned back.
+				String need = KantoStory.doorNeeds(d.key());
+				if (need != null && !Game.meets(p, need)) {
+					double bx = p.getX(), bz = p.getZ();
+					switch (d.face()) {
+						case "n" -> bz -= 1.1;
+						case "e" -> bx += 1.1;
+						case "w" -> bx -= 1.1;
+						default -> bz += 1.1;
+					}
+					p.teleportTo(bx, p.getY(), bz);
+					p.setDeltaMovement(Vec3.ZERO);
+					COOL.put(p.getUUID(), 30);
+					KantoStory.doorBlocked(p, d.key(), need);
+					return true;
+				}
+				if (need != null) KantoStory.doorOpened(p, d.key());
 				Room r = ROOMS.get(d.room());
 				if (r != null) {
 					Game.data(p).door = d.key();

@@ -62,7 +62,7 @@ public final class Game {
 	/** Players who switched the adventure on with the key, outside a Retromon save (for trying it out). */
 	private static final Map<UUID, Boolean> TRYING = new HashMap<>();
 	/** Who's in a text box or being walked up to (no encounters, no other trainers). */
-	private static final Map<UUID, Integer> BUSY = new HashMap<>();
+	static final Map<UUID, Integer> BUSY = new HashMap<>();
 	private static boolean ourSave;
 	private static MinecraftServer server;
 	private static JsonObject marker = new JsonObject();
@@ -317,7 +317,7 @@ public final class Game {
 	}
 
 	/** Your rival's first Pokémon: the one strong against yours (as in Red and Blue), kept from then on. */
-	private static String rivalStarter(ServerPlayer p) {
+	static String rivalStarter(ServerPlayer p) {
 		PlayerData d = data(p);
 		for (String k : d.story) if (k.startsWith("rival:")) return k.substring(6);
 		String mine = d.party.isEmpty() ? "charmander" : d.party.get(0).species.id();
@@ -425,7 +425,11 @@ public final class Game {
 			case "rival_22" -> rival22(p);
 			case "rival_ssanne", "rival_tower", "rival_champion" -> rivalLater(p, key);
 			case "trainer_house" -> trainerHouse(p);
-			default -> Trainers.get(key);
+			default -> {
+				// (0.71) The story's: your rival at NUGGET BRIDGE, SILPH CO. and ROUTE 22 again, JESSIE and JAMES, the NUGGET BRIDGE ROCKET.
+				Trainers.Trainer s = KantoStory.trainer(p, key);
+				yield s != null ? s : Trainers.get(key);
+			}
 		};
 	}
 
@@ -508,7 +512,7 @@ public final class Game {
 	// ---------- your rival in person ----------
 
 	/** Where your rival came from (Route 22: along the route), so he goes back that way. */
-	private static final Map<UUID, Vec3> RIVAL_FROM = new HashMap<>();
+	static final Map<UUID, Vec3> RIVAL_FROM = new HashMap<>();
 
 	/**
 	 * Good ground along the way you'd see someone come (dir: -1 0 west), from far to near, on your own level (a step up
@@ -530,7 +534,7 @@ public final class Game {
 	}
 
 	/** Each player's rival when he's about (in the lab, on Route 22, at Oak's), and ticks left as he heads off. */
-	private static final Map<UUID, Npc> RIVALS = new HashMap<>();
+	static final Map<UUID, Npc> RIVALS = new HashMap<>();
 	private static final Map<UUID, Integer> RIVAL_LEAVING = new HashMap<>();
 	private static final int LEAVE_TICKS = 230, WALK_OFF = LEAVE_TICKS - 8;
 	/** What your rival says to you, back in the world after you beat him, before he heads off. */
@@ -541,7 +545,7 @@ public final class Game {
 		if (lines != null && !lines.isEmpty()) RIVAL_SPEECH.put(p.getUUID(), List.copyOf(lines));
 	}
 	/** Who's still looking at their battle's last words (till the battle screen closes, or 30 s). */
-	private static final Map<UUID, Integer> AFTER_BATTLE = new HashMap<>();
+	static final Map<UUID, Integer> AFTER_BATTLE = new HashMap<>();
 
 	/**
 	 * The battle's done with on your screen (its cheering, the Pokédex entry, the nickname, any new moves or evolving):
@@ -566,7 +570,7 @@ public final class Game {
 		return RIVALS.containsValue(n);
 	}
 
-	private static Npc rivalNpc(ServerPlayer p, String key, BlockPos at) {
+	static Npc rivalNpc(ServerPlayer p, String key, BlockPos at) {
 		dropRival(p);
 		Npc n = place((ServerLevel) p.level(), Npc.TRAINER, key, at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
 		if (n == null) return null;
@@ -576,7 +580,29 @@ public final class Game {
 		return n;
 	}
 
-	private static void dropRival(ServerPlayer p) {
+	/** (0.71) The EVENT PICKER's jump: whoever was about for you (your rival, MUM, TEAM ROCKET, a walk-up) goes first. */
+	static void clearAround(ServerPlayer p) {
+		UUID id = p.getUUID();
+		dropRival(p);
+		Walk w = WALKS.remove(id);
+		if (w != null) {
+			w.npc().approaching = 0;
+			w.npc().talker = null;
+		}
+		BUSY.remove(id);
+		Npc mum = MUMS.remove(id);
+		if (mum != null && !mum.isRemoved()) mum.discard();
+		MUM_HOME.remove(id);
+		List<Npc> rk = ROCKETS.remove(id);
+		if (rk != null) for (Npc n : rk) if (!n.isRemoved()) n.discard();
+		RIVAL_SPEECH.remove(id);
+		AFTER_BATTLE.remove(id);
+		RIVAL_FROM.remove(id);
+		SAFARI.remove(id);
+		Net.send(p, "release", new CompoundTag());
+	}
+
+	static void dropRival(ServerPlayer p) {
 		Npc old = RIVALS.remove(p.getUUID());
 		if (old != null && !old.isRemoved()) old.discard();
 		RIVAL_LEAVING.remove(p.getUUID());
@@ -599,6 +625,7 @@ public final class Game {
 			boolean done = switch (n.key()) {
 				case "rival_lab" -> d.beaten.contains("rival_lab");
 				case "rival_22" -> d.beaten.contains("rival_22");
+				case "rival_cerulean", "rival_silph", "rival_22b" -> d.beaten.contains(n.key());
 				default -> d.hasDex() && d.beaten.contains("rival_lab");
 			};
 			if (!done) continue;
@@ -711,10 +738,10 @@ public final class Game {
 		else DEVICES.remove(p.getUUID());
 	}
 
-	/** The game's speed: 1 to 4 times (everything, as an emulator's fast-forward does). */
+	/** The game's speed: 1 to 8 times (everything, as an emulator's fast-forward does). */
 	public static void setSpeed(int times) {
 		if (server == null) return;
-		int k = Math.max(1, Math.min(4, times));
+		int k = Math.max(1, Math.min(8, times));
 		server.tickRateManager().setTickRate(20F * k);
 		// Minecraft never runs your own side faster than 20 ticks a second, so you'd walk at your usual pace while
 		// the world hurried: you walk (and run) faster by the same amount instead.
@@ -756,7 +783,7 @@ public final class Game {
 		if (f != null && p.level().getEntity(f) instanceof WorldMon w) w.discard();
 	}
 
-	private static void toStart(ServerPlayer p) {
+	static void toStart(ServerPlayer p) {
 		// Your room, upstairs at home (an inside of its own; your world's outside is outside its door).
 		if (Interiors.start(p)) return;
 		ServerLevel level = (ServerLevel) p.level();
@@ -780,7 +807,7 @@ public final class Game {
 	}
 
 	/** Good ground to stand on: dry, open above, and on a solid top (not water, a fence, a wall or a tree). */
-	private static boolean goodGround(ServerLevel level, BlockPos at) {
+	static boolean goodGround(ServerLevel level, BlockPos at) {
 		if (!free(level, at) || !free(level, at.above()) || !level.getFluidState(at).isEmpty() || !level.getFluidState(at.above()).isEmpty()) return false;
 		BlockPos below = at.below();
 		BlockState b = level.getBlockState(below);
@@ -1112,10 +1139,13 @@ public final class Game {
 		String nm = r.name().toLowerCase(java.util.Locale.ROOT);
 		t.putString("music", nm.contains("lab") ? "oaks_lab" : nm.contains("center") ? "pokecenter" : pl == null ? "" : pl.music());
 		Net.send(p, "room", t);
+		// (0.71) The story's own in here (MR. FUJI at home, your rival on SILPH CO.'s 7F, JESSIE and JAMES), and FLASH.
+		KantoStory.roomEntered(p, r, banner);
 	}
 
 	/** Back outside: the place's own music again, and its name back on the pill (without its banner). */
 	public static void roomLeft(ServerPlayer p) {
+		KantoStory.roomLeft(p);
 		Places.Place pl = Places.get(data(p).place);
 		CompoundTag t = new CompoundTag();
 		t.putString("name", "");
@@ -1124,7 +1154,7 @@ public final class Game {
 		Net.send(p, "room", t);
 	}
 
-	private static void enter(ServerPlayer p, String place) {
+	static void enter(ServerPlayer p, String place) {
 		PlayerData d = data(p);
 		if (place == null || place.equals(d.place)) return;
 		if (oldManStops(p, place)) return;
@@ -1560,6 +1590,8 @@ public final class Game {
 			// A little tree (Route 2's cherry trees): one that can be CUT down says so; any other tree says nothing.
 			if (Interiors.in(p)) return;
 			CutTrees.Tree tree = CutTrees.at(bx, t.getIntOr("y", p.getBlockY()), bz);
+			// ((0.71) Or one John's placed since, made as Route 2's are.)
+			if (tree == null && p.level() instanceof ServerLevel lv) tree = CutTrees.placed(lv, p, bx, t.getIntOr("y", p.getBlockY()), bz);
 			if (tree != null) CutTrees.use(p, tree);
 			return;
 		}
@@ -1840,7 +1872,9 @@ public final class Game {
 		// TEAM ROCKET (JESSIE and JAMES): as in Let's Go, already standing in VIRIDIAN, just up the steps from ROUTE 1 by
 		// the town's sign, the first time you come with a POKéMON. You see them as you walk up; when you're close,
 		// JESSIE comes over and they stop you.
-		if (!d.story.contains("rocket_viridian") && !d.hasDex() && d.anyHealthy() && !Interiors.in(p)) {
+		// ((0.71, John's 18:24: "we never saw them as we were entering Viridian") Not only before the POKéDEX: any time
+		// till you've met them. And they always have somewhere to stand (the paving by the sign, at its own height).)
+		if (!d.story.contains("rocket_viridian") && d.anyHealthy() && !Interiors.in(p)) {
 			rocketsWait(p, level);
 			if (rocketsNear(p) && p.onGround()) {
 				rocketsMeet(p);
@@ -1858,7 +1892,10 @@ public final class Game {
 				RIVAL_FROM.put(p.getUUID(), Vec3.atBottomCenterOf(from));
 				walkUp(p, n, rival22(p), "meet_rival", null);
 			}
+			return;
 		}
+		// (0.71) The rest of KANTO's story (your rival at NUGGET BRIDGE and on ROUTE 22 again, JESSIE and JAMES, the S.S. ANNE sailing).
+		KantoStory.tick(p);
 	}
 
 	/**
@@ -1866,14 +1903,15 @@ public final class Game {
 	 * rival's battle (its step 33, rows 4 to 6) laid over it at two blocks a step from the gate's door, x0 x1 z0 z1; and
 	 * where he stands waiting on it (FireRed's step 25, row 4), x and z.
 	 */
-	private static final double[] RIVAL_22_TRIGGER = {-871.5, -865.0, 531.5, 539.5};
-	private static final int[] RIVAL_22_SPOT = {-885, 535};
+	static final double[] RIVAL_22_TRIGGER = {-871.5, -865.0, 531.5, 539.5};
+	static final int[] RIVAL_22_SPOT = {-885, 535};
 
 	/** Walked up to the Viridian GYM's door: it's locked (its LEADER's away), said once each time. */
 	private static final Map<UUID, Boolean> GYM_SHUT = new HashMap<>();
 
 	private static void gymShut(ServerPlayer p) {
-		if (!"viridian_city".equals(data(p).place)) return;
+		// ((0.71) Locked till you've the other seven badges, as FireRed has it.)
+		if (!"viridian_city".equals(data(p).place) || KantoStory.sevenBadges(data(p))) return;
 		double x = p.getX(), z = p.getZ();
 		boolean at = x > -769.4 && x < -764.6 && z > 524.6 && z < 527.2 && Math.abs(net.minecraft.util.Mth.wrapDegrees(p.getYRot() - 180)) < 60;
 		if (!at) {
@@ -1885,7 +1923,7 @@ public final class Game {
 	}
 
 	/** JESSIE and JAMES in Viridian (JESSIE comes up to you; JAMES with her), while they're about. */
-	private static final Map<UUID, List<Npc>> ROCKETS = new HashMap<>();
+	static final Map<UUID, List<Npc>> ROCKETS = new HashMap<>();
 
 	private static Trainers.Trainer rocketViridian() {
 		return new Trainers.Trainer("rocket_viridian", "viridian_city", "TEAM ROCKET", "jessie", "none", 0, 20,
@@ -1918,16 +1956,20 @@ public final class Game {
 			if (!level.hasChunkAt(new BlockPos(x, START_Y, z))) return;
 		}
 		for (int i = 0; i < ROCKET_SPOTS.length; i++) {
-			BlockPos at = spot(level, ROCKET_SPOTS[i][0], ROCKET_SPOTS[i][1], 3);
-			if (at == null) continue;
+			BlockPos at = standable(level, ROCKET_SPOTS[i][0], ROCKET_SPOTS[i][1], 25);
 			// Facing south, down the steps: the way you come in.
 			Npc n = place(level, i == 0 ? Npc.TRAINER : Npc.PERSON, i == 0 ? "rocket_viridian" : "rocket_james", at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
 			if (n == null) continue;
 			n.setCustomName(net.minecraft.network.chat.Component.literal(i == 0 ? "JESSIE" : "JAMES"));
 			both.add(n);
 		}
-		if (!both.isEmpty() && both.get(0).key().equals("rocket_viridian")) ROCKETS.put(p.getUUID(), both);
-		else for (Npc n : both) n.discard();
+		if (!both.isEmpty() && both.get(0).key().equals("rocket_viridian")) {
+			ROCKETS.put(p.getUUID(), both);
+			Retromon.LOG.info("Retromon: TEAM ROCKET waiting in VIRIDIAN at {}", both.get(0).blockPosition());
+		} else {
+			for (Npc n : both) n.discard();
+			Retromon.LOG.warn("Retromon: TEAM ROCKET couldn't be put in VIRIDIAN");
+		}
 	}
 
 	/** Whether you've come up close to them (and nothing else is going on). */
@@ -2099,7 +2141,7 @@ public final class Game {
 	}
 
 	/** Lines a dialogue plays a jingle on (line index, then the jingle). */
-	private static CompoundTag cues(Object... at) {
+	static CompoundTag cues(Object... at) {
 		CompoundTag t = new CompoundTag();
 		ListTag l = new ListTag();
 		for (int i = 0; i + 1 < at.length; i += 2) l.add(StringTag.valueOf(at[i] + ":" + at[i + 1]));
@@ -2250,6 +2292,9 @@ public final class Game {
 		PlayerData d = data(p);
 		if (needs.equals("safari")) return SAFARI.containsKey(p.getUUID());
 		if (needs.equals("CHAMPION")) return d.story.contains("champion");
+		// (0.71) The Viridian GYM (the other seven badges first) and the Cinnabar GYM's door (the SECRET KEY).
+		if (needs.equals("BADGES7")) return KantoStory.sevenBadges(d);
+		if (needs.equals("secret_key")) return d.count("secret_key") > 0;
 		// (0.60) The ELITE FOUR's doors (the one in the room beaten), the GAME CORNER's hidden stairs (the switch pushed).
 		if (needs.startsWith("beat:")) return d.beaten.contains(needs.substring(5));
 		if (needs.equals("hideout_open")) return d.statics.contains("hideout_open");
@@ -2357,7 +2402,7 @@ public final class Game {
 		dialogue(p, null, "lift", List.of(now == null ? "Which floor?" : "It's at " + now.floor() + ". Which floor?"), t);
 	}
 
-	private static CompoundTag whoTag(String who) {
+	static CompoundTag whoTag(String who) {
 		CompoundTag t = new CompoundTag();
 		t.putString("who", who);
 		return t;
@@ -2407,7 +2452,7 @@ public final class Game {
 	private record Walk(Npc npc, ServerPlayer player, Trainers.Trainer trainer, Runnable then) {}
 
 	/** The "!" over them, the music, the black bars, and they come to you. */
-	private static void walkUp(ServerPlayer p, Npc n, Trainers.Trainer t, String music, Runnable then) {
+	static void walkUp(ServerPlayer p, Npc n, Trainers.Trainer t, String music, Runnable then) {
 		CompoundTag e = new CompoundTag();
 		e.putInt("npc", n.getId());
 		e.putString("music", music == null ? "" : music);
@@ -2419,7 +2464,7 @@ public final class Game {
 		WALKS.put(p.getUUID(), new Walk(n, p, t, then));
 	}
 
-	private static final Map<UUID, Walk> WALKS = new HashMap<>();
+	static final Map<UUID, Walk> WALKS = new HashMap<>();
 
 	/**
 	 * A walk-up called off (you went through a door before they reached you): you're let go on your screen, and
@@ -2464,7 +2509,7 @@ public final class Game {
 		ServerLevel level = (ServerLevel) p.level();
 		for (Npc n : level.getEntitiesOfClass(Npc.class, p.getBoundingBox().inflate(14))) {
 			if (n.role() != Npc.TRAINER && n.role() != Npc.LEADER || n.approaching > 0 || n.talker != null) continue;
-			Trainers.Trainer t = Trainers.get(n.key());
+			Trainers.Trainer t = trainerFor(p, n.key());
 			if (t == null || t.sight() <= 0 || d.beaten.contains(t.key()) || (battlesOff(p) && !storyBattle(t)) || !spots(n, p, t, prev)) continue;
 			walkUp(p, n, t, spottedMusic(t, Battles.johto(p)), null);
 			return;
@@ -2579,12 +2624,12 @@ public final class Game {
 
 	// ---------- talking ----------
 
-	private static String player(ServerPlayer p) {
+	static String player(ServerPlayer p) {
 		String n = data(p).name;
 		return n.isEmpty() ? p.getGameProfile().name().toUpperCase() : n;
 	}
 
-	private static String rival(ServerPlayer p) {
+	static String rival(ServerPlayer p) {
 		String n = data(p).rival;
 		return n.isEmpty() ? "BLUE" : n;
 	}
@@ -2653,6 +2698,8 @@ public final class Game {
 				dialogue(p, n, "mart", List.of("Hi there! May I help you?"), t);
 			}
 			case Npc.PERSON -> {
+				// (0.71) The story's own (the old man's TEACHY TV, MR. FUJI, BILL, the GAME CORNER, the AIDEs, the TEA...).
+				if (KantoStory.talk(p, n, d)) return;
 				if (n.key().equals(OAK_KEY)) {
 					oakTalk(p, n);
 					return;
@@ -3627,6 +3674,8 @@ public final class Game {
 	public static void roomUse(ServerPlayer p, String use) {
 		Interiors.Room r = Interiors.roomOf(p);
 		if (r == null || Battles.in(p) || BUSY.containsKey(p.getUUID())) return;
+		// (0.71) The GAME CORNER's slot machines, BILL's PC (his CELL SEPARATOR).
+		if (KantoStory.roomUse(p, use)) return;
 		// (0.52) An item FireRed hides in a room ("hidden:item:key": the COPYCAT's NUGGET by her PC): found once.
 		if (use.startsWith("hidden:")) {
 			String[] a = use.split(":");
@@ -3876,7 +3925,7 @@ public final class Game {
 		return 100 + 100 * Math.max(0, d.daycare.level - d.daycareLevel);
 	}
 
-	private static CompoundTag yesNo() {
+	static CompoundTag yesNo() {
 		CompoundTag t = new CompoundTag();
 		ListTag ch = new ListTag();
 		for (String c : List.of("YES", "NO")) ch.add(StringTag.valueOf(c));
@@ -4039,6 +4088,8 @@ public final class Game {
 			return;
 		}
 		if (key.startsWith("wild:")) return;
+		// (0.71) BILL, mixed up with a CLEFAIRY (FireRed's).
+		if (KantoStory.talkMon(p, w)) return;
 		// (0.67) One of the farm's or a pet: its sound, and what it's like (never battled).
 		Farm.Kind farm = Farm.get(w.species());
 		if (farm != null) {
@@ -4110,7 +4161,7 @@ public final class Game {
 		}
 	}
 
-	private static void talkBattle(ServerPlayer p, Npc n, Trainers.Trainer t) {
+	static void talkBattle(ServerPlayer p, Npc n, Trainers.Trainer t) {
 		CompoundTag extra = new CompoundTag();
 		extra.putString("trainer", t.key());
 		dialogue(p, n, "battle", fill(p, t.before().isEmpty() ? List.of(t.title() + " wants to battle!") : t.before()), extra);
@@ -4173,6 +4224,8 @@ public final class Game {
 		Entity e = p.level().getEntity(t.getIntOr("npc", -1));
 		Npc n = e instanceof Npc npc ? npc : null;
 		PlayerData d = data(p);
+		// (0.71) The story's questions: MR. FUJI's way home, BILL's TELEPORTER, the GAME CORNER's coins and prizes, FLASH.
+		if (KantoStory.answer(p, mode, t, n)) return;
 		switch (mode) {
 			case "quiz" -> {
 				int q = t.getIntOr("q", -1);
@@ -4390,7 +4443,10 @@ public final class Game {
 			}
 			case "battle" -> {
 				Trainers.Trainer tr = trainerFor(p, t.getStringOr("trainer", ""));
-				if (tr != null && !d.beaten.contains(tr.key()) && d.anyHealthy() && !(battlesOff(p) && !storyBattle(tr))) Battles.trainer(p, tr);
+				if (tr != null && !d.beaten.contains(tr.key()) && d.anyHealthy() && !(battlesOff(p) && !storyBattle(tr))) {
+					KantoStory.beforeBattle(p, tr);
+					Battles.trainer(p, tr);
+				}
 			}
 			case "static" -> {
 				Trainers.Static st = Trainers.STATICS.get(t.getStringOr("static", ""));
@@ -4686,6 +4742,8 @@ public final class Game {
 		PlayerData d = data(p);
 		Item it = Item.find(t.getStringOr("item", ""));
 		if (it == null || d.count(it.id()) <= 0 || Battles.in(p)) return;
+		// (0.71) The COIN CASE and the TEACHY TV.
+		if (KantoStory.useItem(p, it.id())) return;
 		int i = t.getIntOr("i", -1);
 		if (it.repelSteps() > 0) {
 			d.take(it.id());
@@ -4738,7 +4796,7 @@ public final class Game {
 		PlayerData d = data(p);
 		if (d.started) return;
 		String sp = t.getStringOr("species", "");
-		if (!sp.equals("bulbasaur") && !sp.equals("charmander") && !sp.equals("squirtle") && !sp.equals("pikachu")) return;
+		if (!sp.equals("bulbasaur") && !sp.equals("charmander") && !sp.equals("squirtle")) return;
 		d.add(new Mon(Species.get(sp), 5, RNG));
 		d.started = true;
 		// No POKé BALLs yet: Oak gives you some with the POKéDEX (after his parcel).
@@ -5135,11 +5193,14 @@ public final class Game {
 		}
 		// The S.S. ANNE: the sailor at the foot of the gangway (z 612 on): no further.
 		// ((0.60) With the S.S.TICKET you're let by, up the gangway to the ship's door, and aboard.)
-		if (p.getX() > -366 && p.getX() < -340 && p.getZ() > 612.2 && p.getZ() < 620 && p.getY() > 28 && p.getY() < 36 && d.count("s_s_ticket") <= 0) {
+		// ((0.71) Once she's sailed (you're off her with HM01), nobody goes up.)
+		boolean sailed = d.statics.contains("ss_anne_sailed");
+		if (p.getX() > -366 && p.getX() < -340 && p.getZ() > 612.2 && p.getZ() < 620 && p.getY() > 28 && p.getY() < 36 && (d.count("s_s_ticket") <= 0 || sailed)) {
 			p.teleportTo(p.getX(), p.getY(), 611.6);
 			if (!BLOCKED_SAID.containsKey(p.getUUID())) {
 				BLOCKED_SAID.put(p.getUUID(), 100);
-				message(p, List.of("SAILOR: Welcome to the S.S.ANNE!", "SAILOR: May I see your S.S.TICKET?", "SAILOR: ...Sorry! You need a ticket to come aboard."));
+				message(p, sailed ? List.of("SAILOR: The S.S.ANNE has set sail on her voyage round the world.", "SAILOR: She won't be back in VERMILION for a year!")
+						: List.of("SAILOR: Welcome to the S.S.ANNE!", "SAILOR: May I see your S.S.TICKET?", "SAILOR: ...Sorry! You need a ticket to come aboard."));
 			}
 		}
 	}

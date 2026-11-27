@@ -150,6 +150,9 @@ public class Retromon implements ModInitializer {
 			case "read" -> Game.read(p, t);
 			case "device" -> Game.device(p, t.getBooleanOr("on", false));
 			case "pick_party" -> Game.pickParty(p, t);
+			// (0.71) The EVENT PICKER (OPTION), and a spin of a GAME CORNER slot machine.
+			case "event" -> com.insidethecube.retromon.game.KantoStory.event(p, t);
+			case "slot_spin" -> com.insidethecube.retromon.game.KantoStory.spin(p, t);
 			default -> {
 			}
 		}

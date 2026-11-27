@@ -31,7 +31,7 @@ public final class Campaign {
 
 	public static final String[] BADGES = {"BOULDERBADGE", "CASCADEBADGE", "THUNDERBADGE", "RAINBOWBADGE", "SOULBADGE", "MARSHBADGE", "VOLCANOBADGE",
 			"EARTHBADGE"};
-	public static final String[] STARTERS = {"bulbasaur", "charmander", "squirtle", "pikachu"};
+	public static final String[] STARTERS = {"bulbasaur", "charmander", "squirtle"};
 
 	// Each point: just after that GYM, so the levels sit round its LEADER's strongest (BROCK's ONIX 14, MISTY's STARMIE
 	// 21, LT.SURGE's RAICHU 28, ERIKA's 32, KOGA's WEEZING 43, SABRINA's ALAKAZAM 50, BLAINE's ARCANINE 54, GIOVANNI's

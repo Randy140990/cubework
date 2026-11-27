@@ -164,6 +164,11 @@ public class Npc extends PathfinderMob {
 			discard();
 			return;
 		}
+		// (0.71) JESSIE and JAMES elsewhere (MT. MOON, the HIDEOUT, the TOWER, ROUTE 17), left over in a save: gone too.
+		if (key().startsWith("rocket_jj_") && !KantoStory.jjKnown(this)) {
+			discard();
+			return;
+		}
 		// (15:21) Inside, only ever one of each: a room's people put in again while the old ones were still on their way
 		// in from the save (Viridian Forest, Diglett's Cave) stood twice. The one that came second goes.
 		if (tickCount % 20 == 1 && level().dimension() == Interiors.LEVEL && Game.twin(this, key())) {

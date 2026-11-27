@@ -1,0 +1,89 @@
+# The EVENT PICKER's steps (tools/kanto_events.py, from the Kanto Campaign Events sheet).
+# step	stage	main	before	in	gives	stage name	where	what happens	you need	you get
+1	0	Main	start	start	-	Start	Pallet Town, your house	You start in your room. MUM is downstairs.	-	-
+2	0	Main	out:home	out:home	-	Start	Pallet Town, the way north	Step towards Route 1's grass and PROF. OAK stops you and takes you to his lab.	-	-
+3	0	Main	room:lab	room:lab	-	Start	OAK's lab	Pick BULBASAUR, CHARMANDER or SQUIRTLE. Your rival takes the one strong against yours.	-	Your first POKéMON
+4	0	Main	room:lab	room:lab	-	Start	OAK's lab	Rival battle 1, as you go to leave.	Your first POKéMON	-
+5	0	Side	xz:-802,652	xz:-802,645	item:potion	To BROCK	Route 1	A Mart clerk gives you a free POTION.	-	POTION
+6	0	Main	out:viridian_mart	room:mart|viridian_mart	story:parcel item:oaks_parcel visit:viridian_city story:townmap	To BROCK	Viridian City	The Mart's clerk gives you OAK's PARCEL. The old man lying across the road north won't let you by.	-	OAK's PARCEL
+7	0	Main	out:lab	room:lab	take:oaks_parcel unstory:parcel story:pokedex item:poke_ball:5 beat:rival_lab	To BROCK	OAK's lab	Hand over the parcel. Your rival turns up and OAK gives you each a POKéDEX, and you five POKé BALLs.	OAK's PARCEL	POKéDEX, 5 POKé BALLs
+8	0	Main	out:lab	out:rival	story:townmap	To BROCK	Rival's house, Pallet Town	His sister DAISY gives you the TOWN MAP.	POKéDEX	TOWN MAP
+9	0	Main	xz:-796,531	xz:-796,522	static:gift:viridian_old_man:teachy_tv item:teachy_tv	To BROCK	Viridian City	The old man has had his coffee. He shows you how to catch a POKéMON and gives you the TEACHY TV. The road north opens.	POKéDEX	TEACHY TV; the road north
+10	0	Side	xz:-795,582	xz:-795,569	story:rocket_viridian beat:rocket_viridian	To BROCK	Viridian City	Not in FireRed. In Let's Go, JESSIE and JAMES of TEAM ROCKET battle you here.	-	-
+11	0	Side	xz:-852,535,90	xz:-864,535,90	beat:rival_22	To BROCK	Route 22	Rival battle 2, on your first trip west.	POKéDEX	-
+12	0	Main	xz:-766,534	out:viridian_gym	-	To BROCK	Viridian GYM	Shut: its LEADER is away.	-	-
+13	0	Main	out:forest_south	room:viridian_forest	visit:viridian_forest	To BROCK	Route 2, VIRIDIAN FOREST	Through the forest and its two gates to Pewter City.	-	-
+14	0	Side	out:pewter_museum	room:museum_1f	story:museum_paid static:gift:old_amber item:old_amber	To BROCK	Pewter City, MUSEUM	Pay ¥50 to look round. Round the side, past a tree you CUT, a scientist gives you the OLD AMBER.	¥50; CUT for the side door	OLD AMBER
+15	0	Main	xz:-760,306,270	xz:-754,306,270	-	To BROCK	Pewter City	Head east before you've beaten BROCK and a boy walks you to the GYM.	-	-
+16	0	Main	out:pewter_gym	room:pewter_gym	badge:BOULDERBADGE beat:pewter_gym_0 static:gift:pewter_gym:tm_bide item:tm_bide	To BROCK	Pewter GYM	BROCK.	-	BOULDERBADGE, TM39 ROCK TOMB; the way east
+17	1	Main	xz:-760,306,270	xz:-750,306,270	story:running_shoes item:running_shoes	To BROCK	Pewter City, the way east	OAK's AIDE catches you up and gives you the RUNNING SHOES.	BOULDERBADGE	RUNNING SHOES
+18	1	Side	out:route_4_center	room:center|route_4_center	-	To MISTY	Route 4, POKéMON CENTER	A man sells you a MAGIKARP for ¥500.	¥500	MAGIKARP
+19	1	Side	out:route_4_center	xz:-531,256	-	To MISTY	Route 4	Two BLACK BELTs teach MEGA PUNCH and MEGA KICK, once each.	-	A move
+20	1	Main	out:mt_moon_route_3	room:mt_moon_b2f	beat:rocket_jj_mtmoon,mt_moon_b2f_0 static:item:mt_moon_b2f_dome_fossil item:dome_fossil	To MISTY	MT. MOON	TEAM ROCKET in the caves. On B2F, SUPER NERD MIGUEL guards two fossils: beat him and take the DOME or the HELIX FOSSIL.	-	DOME or HELIX FOSSIL
+21	1	Main	xz:-352,253	xz:-352,243	beat:rival_cerulean	To MISTY	Cerulean City, by NUGGET BRIDGE	Rival battle 3, at the foot of the bridge north.	-	-
+22	1	Main	xz:-352,238	xz:-352,200	beat:route_24_1,route_24_2,route_24_3,route_24_4,route_24_5,route_24_0 static:gift:route_24:nugget item:nugget	To MISTY	Route 24, NUGGET BRIDGE	Five trainers in a row. Then a TEAM ROCKET man gives you a NUGGET, asks you to join, and battles you.	-	NUGGET
+23	1	Main	out:bills_house	room:bills_house	static:bill_in_pod static:bill_separated static:pet:bills_house_clefairy static:gift:bills_house:s_s_ticket item:s_s_ticket	To MISTY	Route 25, BILL's SEA COTTAGE	BILL's mixed up with a POKéMON. Run the machine at his PC to part them, and he gives you the S.S. TICKET.	-	S.S. TICKET
+24	1	Main	out:cerulean_house1	out:cerulean_house1_back	beat:cerulean_city_0 static:gift:cerulean_city:tm_dig item:tm_dig	To MISTY	Cerulean City, the burgled house	The ROCKET out the back gives back the TM he stole.	-	TM28 DIG
+25	1	Main	out:cerulean_gym	room:cerulean_gym	badge:CASCADEBADGE beat:cerulean_gym_0 static:gift:cerulean_gym:tm_bubblebeam item:tm_bubblebeam	To MISTY	Cerulean GYM	MISTY.	-	CASCADEBADGE, TM03 WATER PULSE
+26	2	Main	out:gate_r5_b	room:gate_r5|gate_r5_b	-	To LT. SURGE	Saffron City's gates	The guards won't let you into Saffron: they're thirsty.	-	-
+27	2	Side	out:daycare	room:daycare	-	To LT. SURGE	Route 5, DAY CARE	Leave a POKéMON there to grow.	-	-
+28	2	Main	out:ug_route5	room:ug_r5	-	To LT. SURGE	UNDERGROUND PATH (Route 5 to 6)	Under Saffron, south to Vermilion City.	-	-
+29	2	Side	out:pokemon_fan_club	room:pokemon_fan_club	static:bike_voucher item:bike_voucher	To LT. SURGE	Vermilion City, FAN CLUB	Hear the CHAIRMAN out about his RAPIDASH.	-	BIKE VOUCHER
+30	2	Side	out:bike_shop	room:bike_shop	take:bike_voucher item:bicycle	To LT. SURGE	Cerulean City, BIKE SHOP	Swap the voucher for a bike.	BIKE VOUCHER	BICYCLE
+31	2	Side	out:vermilion_old_rod_house	room:vermilion_old_rod_house	item:old_rod	To LT. SURGE	Vermilion City, the FISHING GURU	He gives you a rod.	-	OLD ROD
+32	2	Main	xz:-353,603	out:ss_anne_gangway	-	To LT. SURGE	Vermilion harbour, S.S. ANNE	Show the sailor your S.S. TICKET and go aboard.	S.S. TICKET	-
+33	2	Main	room:ss_anne_1f|ss_anne_gangway	room:ss_anne_2f|ss_anne_gangway	beat:rival_ssanne	To LT. SURGE	S.S. ANNE, 2F	Rival battle 4.	-	-
+34	2	Main	room:ss_anne_2f|ss_anne_gangway	room:ss_anne_captains_room|ss_anne_gangway	static:gift:ss_anne_captains_room:hm_cut item:hm_cut	To LT. SURGE	S.S. ANNE, CAPTAIN's office	The CAPTAIN is seasick. Rub his back and he gives you HM01 CUT.	-	HM01 CUT
+35	2	Main	room:ss_anne_1f|ss_anne_gangway	out:ss_anne_gangway	static:ss_anne_sailed	To LT. SURGE	Vermilion harbour	Once you're off, the S.S. ANNE sails away.	HM01 CUT	-
+36	2	Main	out:vermilion_gym	room:vermilion_gym	badge:THUNDERBADGE beat:vermilion_gym_0 static:gift:vermilion_gym:tm_thunderbolt item:tm_thunderbolt	To LT. SURGE	Vermilion GYM	CUT the tree in the way. Inside, find the two switches in the trash cans to open the door, then LT. SURGE.	HM01 CUT	THUNDERBADGE (FLY outside battle), TM34 SHOCK WAVE
+37	3	Side	out:route2_gate_s	room:route2_gate	static:gift:route_2_gate:hm_flash item:hm_flash caught:10	To LT. SURGE	DIGLETT's CAVE to Route 2	OAK's AIDE in the Route 2 house gives you HM05 FLASH if you've caught 10 kinds.	10 kinds caught	HM05 FLASH
+38	3	Main	out:cerulean_city_center	out:route_10_center	-	To ERIKA	Route 9 to Route 10	CUT the tree east of Cerulean. The Route 10 POKéMON CENTER.	HM01 CUT	-
+39	3	Main	out:rock_tunnel_north	room:rock_tunnel_1f	-	To ERIKA	ROCK TUNNEL	Through the dark tunnel. FLASH lights it.	FLASH helps	-
+40	3	Main	out:pokemon_tower	room:pokemon_tower_2f	beat:rival_tower	To ERIKA	Lavender Town, POKéMON TOWER 2F	Rival battle 5.	-	-
+41	3	Main	room:pokemon_tower_2f	room:pokemon_tower_3f	-	To ERIKA	POKéMON TOWER 3F to 5F	The CHANNELERS battle you.	-	-
+42	3	Main	room:pokemon_tower_5f	room:pokemon_tower_6f	-	To ERIKA	POKéMON TOWER 6F	MAROWAK's ghost bars the stairs. Without the SILPH SCOPE you can only run.	-	-
+43	3	Main	out:ug_route8	room:ug_r8	-	To ERIKA	UNDERGROUND PATH (Route 8 to 7)	Under Saffron, west to Celadon City.	-	-
+44	3	Main	out:celadon_mansion	room:celadon_mansion_1f	static:gift:celadon_mansion_1f:tea item:tea	To ERIKA	Celadon MANSION, 1F	An old lady gives you TEA: the drink Saffron's guards want (FireRed's).	-	TEA
+45	3	Side	out:celadon_mansion	room:celadon_mansion_roof_house	static:eevee_gift	To ERIKA	Celadon MANSION, the roof house	An EEVEE in a POKé BALL on the table.	-	EEVEE
+46	3	Side	out:celadon_dept_w	room:celadon_mart_1f	-	To ERIKA	Celadon DEPT. STORE	TMs and stones. The roof's drinks: give the thirsty girl one and she gives you a TM.	Money	TMs
+47	3	Side	out:celadon_diner	room:celadon_diner	static:gift:celadon_diner:coin_case item:coin_case	To ERIKA	Celadon DINER, GAME CORNER	A man in the diner gives you the COIN CASE, for the GAME CORNER's slots.	-	COIN CASE
+48	3	Main	out:celadon_game_corner	room:game_corner	static:hideout_open	To ERIKA	Celadon GAME CORNER	The switch behind the poster opens the stairs down to the ROCKET HIDEOUT.	-	The ROCKET HIDEOUT
+49	3	Main	room:game_corner	room:rocket_hideout_b1f	static:item:rocket_hideout_b4f_i4 item:lift_key	To ERIKA	ROCKET HIDEOUT, B1F to B4F	The arrow-tile mazes. A ROCKET on B4F drops the LIFT KEY; the lift takes you to GIOVANNI.	-	LIFT KEY
+50	3	Main	room:rocket_hideout_b3f	room:rocket_hideout_b4f	beat:rocket_jj_hideout,rocket_hideout_b4f_0 static:item:rocket_hideout_b4f_i3 item:silph_scope	To ERIKA	ROCKET HIDEOUT, B4F	Beat GIOVANNI.	LIFT KEY	SILPH SCOPE
+51	3	Main	out:celadon_gym	room:celadon_gym	badge:RAINBOWBADGE beat:celadon_gym_0 static:gift:celadon_gym:tm_mega_drain item:tm_mega_drain	To ERIKA	Celadon GYM	ERIKA.	-	RAINBOWBADGE, TM19 GIGA DRAIN
+52	4	Main	room:pokemon_tower_5f	room:pokemon_tower_6f	static:marowak_calmed	To KOGA	POKéMON TOWER 6F	With the SILPH SCOPE, MAROWAK's ghost shows itself. Battle it and it's laid to rest.	SILPH SCOPE	The stairs up
+53	4	Main	room:pokemon_tower_6f	room:pokemon_tower_7f	beat:rocket_jj_tower,pokemon_tower_7f_fr_team_rocket_grunt_19,pokemon_tower_7f_fr_team_rocket_grunt_20,pokemon_tower_7f_fr_team_rocket_grunt_21 static:fuji_rescued	To KOGA	POKéMON TOWER 7F	Beat the ROCKETs and free MR. FUJI. He takes you home.	-	-
+54	4	Main	out:lavender_volunteer_house	room:lavender_volunteer_house	static:gift:mr_fujis_house:poke_flute item:poke_flute	To KOGA	Lavender Town, MR. FUJI's house	He gives you the POKé FLUTE.	-	POKé FLUTE
+55	4	Main	xz:-124,574	xz:-124,581	static:snorlax_route_12 static:snorlax_route_16	To KOGA	Route 12 and Route 16	A sleeping SNORLAX blocks each road. Play the POKé FLUTE to wake it, then battle it.	POKé FLUTE	The roads south to Fuchsia
+56	4	Side	out:route12_house	room:route12_house	item:super_rod	To KOGA	Route 12, the fishing house	The FISHING GURU's brother gives you a rod.	-	SUPER ROD
+57	4	Side	out:route16_house	room:route16_house	static:gift:route_16_fly_house:hm_fly item:hm_fly	To KOGA	Route 16, the house by the gate	CUT the tree by it. A girl inside gives you HM02 FLY.	HM01 CUT	HM02 FLY
+58	4	Main	out:gate_r16n_a	room:gate_r16n|gate_r16n_a	-	To KOGA	CYCLING ROAD (Route 16 to 18)	The gates only let you through on a BICYCLE.	BICYCLE	-
+59	4	Side	out:fuchsia_house4	room:fuchsia_house4	item:good_rod	To KOGA	Fuchsia City, the FISHING GURU's brother	He gives you a rod.	-	GOOD ROD
+60	4	Main	out:fuchsia_safari	room:safari_gate	static:gift:safari_zone_secret_house:hm_surf item:hm_surf static:item:safari_zone_west_gold_teeth static:item:safari_zone_west_i3 item:gold_teeth	To KOGA	SAFARI ZONE	Pay for a SAFARI GAME (600 steps). In the SECRET HOUSE, HM03 SURF. The WARDEN's GOLD TEETH lie in there too.	¥500	HM03 SURF, GOLD TEETH
+61	4	Main	out:fuchsia_house3	room:fuchsia_house3	take:gold_teeth static:gift:wardens_house:hm_strength item:hm_strength	To KOGA	Fuchsia City, the WARDEN's house	Give the WARDEN his GOLD TEETH.	GOLD TEETH	HM04 STRENGTH
+62	4	Main	out:fuchsia_gym	room:fuchsia_gym	badge:SOULBADGE beat:fuchsia_gym_0 static:gift:fuchsia_gym:tm_toxic item:tm_toxic	To KOGA	Fuchsia GYM	KOGA, past the invisible walls.	-	SOULBADGE, TM06 TOXIC
+63	5	Side	out:gate_r11_a	room:gate_r11_2f|gate_r11_a	static:gift:route_11_gate_2f:itemfinder item:itemfinder caught:30	To KOGA	Route 11 gate, 2F	OAK's AIDE gives you the ITEMFINDER if you've caught 30 kinds.	30 kinds caught	ITEMFINDER
+64	5	Side	out:gate_r15_a	room:gate_r15_2f|gate_r15_a	static:gift:route_15_gate_2f:exp_share item:exp_share caught:50	To KOGA	Route 15 gate, 2F	OAK's AIDE gives you the EXP. SHARE if you've caught 50 kinds.	50 kinds caught	EXP. SHARE
+65	5	Main	out:gate_r7_a	room:gate_r7|gate_r7_a	-	To SABRINA	Saffron City's gates	Give a guard the TEA and he lets you in.	TEA	Saffron City
+66	5	Main	out:silph_co	room:silph_co_5f	static:item:silph_co_5f_i2 item:card_key	To SABRINA	SILPH CO.	TEAM ROCKET have taken it over. The CARD KEY, on 5F, opens its shutters.	-	CARD KEY
+67	5	Main	room:silph_co_5f	room:silph_co_7f	beat:rival_silph static:lapras_gift	To SABRINA	SILPH CO., 7F	Rival battle 6. A worker gives you LAPRAS.	-	LAPRAS
+68	5	Main	room:silph_co_7f	room:silph_co_11f	beat:rocket_jj_silph,silph_co_11f_0 static:gift:silph_co_11f:master_ball item:master_ball	To SABRINA	SILPH CO., 11F	Beat GIOVANNI. The PRESIDENT gives you the MASTER BALL.	CARD KEY	MASTER BALL
+69	5	Side	out:saffron_dojo	room:fighting_dojo	-	To SABRINA	Saffron City, FIGHTING DOJO	Beat the KARATE MASTER and take HITMONLEE or HITMONCHAN.	-	HITMONLEE or HITMONCHAN
+70	5	Side	out:mr_psychics_house	room:mr_psychics_house	static:gift:mr_psychics_house:tm_psychic_m item:tm_psychic_m	To SABRINA	Saffron City, MR. PSYCHIC's house	He gives you a TM.	-	TM29 PSYCHIC
+71	5	Side	out:copycats_house	room:copycats_house_2f	-	To SABRINA	Saffron City, COPYCAT's house	Bring her a POKé DOLL.	POKé DOLL	TM31 MIMIC
+72	5	Main	out:saffron_gym	room:saffron_gym	badge:MARSHBADGE beat:saffron_gym_0 static:gift:saffron_gym:tm_psywave item:tm_psywave	To SABRINA	Saffron GYM	SABRINA, through the warp tiles.	-	MARSHBADGE, TM04 CALM MIND
+73	6	Main	out:seafoam_west	room:seafoam_islands_1f	-	To BLAINE	Routes 19 and 20, SEAFOAM ISLANDS	SURF south from Fuchsia (or from Pallet down Route 21). In the SEAFOAM ISLANDS, push boulders in with STRENGTH to stop the currents. ARTICUNO is deep inside.	HM03 SURF, HM04 STRENGTH	ARTICUNO
+74	6	Side	out:power_plant	room:power_plant	-	To BLAINE	POWER PLANT (Route 10)	SURF to it. ZAPDOS is inside.	HM03 SURF	ZAPDOS
+75	6	Main	out:cinnabar_mansion	room:pokemon_mansion_1f	static:item:pokemon_mansion_b1f_i4 item:secret_key	To BLAINE	Cinnabar Island, POKéMON MANSION	The statues' switches open and shut its gates. The SECRET KEY is on B1F.	-	SECRET KEY
+76	6	Main	out:cinnabar_gym	room:cinnabar_gym	badge:VOLCANOBADGE beat:cinnabar_gym_0 static:gift:cinnabar_gym:tm_fire_blast item:tm_fire_blast static:door:cinnabar_gym	To BLAINE	Cinnabar GYM	Its door needs the SECRET KEY. Answer the quiz machines, then BLAINE.	SECRET KEY	VOLCANOBADGE, TM38 FIRE BLAST
+77	7	Side	out:cinnabar_lab	room:cinnabar_lab_fossil_room|cinnabar_lab	-	To BLAINE	Cinnabar LAB	Bring a fossil and it's brought back to life.	A fossil	OMANYTE, KABUTO or AERODACTYL
+78	7	Main	out:cinnabar_island_center	out:cinnabar_island_center	-	To BLAINE	Cinnabar Island	BILL takes you to the SEVII ISLANDS (One, Two and Three Island) to help his friend CELIO.	VOLCANOBADGE	-
+79	7	Main	out:viridian_gym	room:viridian_gym	badge:EARTHBADGE beat:viridian_gym_0 static:gift:viridian_gym:tm_fissure item:tm_fissure	To GIOVANNI	Viridian GYM	Open once you've the other seven badges. GIOVANNI.	7 badges	EARTHBADGE, TM26 EARTHQUAKE
+80	8	Main	xz:-852,535,90	xz:-864,535,90	beat:rival_22b	The LEAGUE	Route 22	Rival battle 7, on your way to the LEAGUE.	8 badges	-
+81	8	Main	out:league_n	out:league_n	-	The LEAGUE	Route 22 gate and Route 23	The guards check each badge in turn.	8 badges	-
+82	8	Main	out:victory_road_west	room:victory_road_1f	-	The LEAGUE	VICTORY ROAD	Push boulders onto the switches with STRENGTH to open the rock barriers. (FireRed has MOLTRES on the Sevii Islands' MT. EMBER.)	HM04 STRENGTH	-
+83	8	Main	out:indigo_plateau	room:loreleis_room|indigo_plateau	beat:loreleis_room_0,brunos_room_0,agathas_room_0,lances_room_0	The LEAGUE	INDIGO PLATEAU	The ELITE FOUR in turn: LORELEI, BRUNO, AGATHA, then LANCE. Each door opens once you've won.	-	-
+84	8	Main	room:lances_room|indigo_plateau	room:champions_room|indigo_plateau	beat:rival_champion story:champion	The LEAGUE	INDIGO PLATEAU, the CHAMPION's room	Your rival is the CHAMPION: rival battle 8.	-	You're the CHAMPION
+85	9	Main	room:champions_room|indigo_plateau	room:hall_of_fame|indigo_plateau	-	The LEAGUE	HALL OF FAME	OAK, and your team goes in the HALL OF FAME.	-	-
+86	9	Side	out:cerulean_cave	room:cerulean_cave_1f	-	After the LEAGUE	CERULEAN CAVE	Only the CHAMPION may go in (FireRed: once you've the National POKéDEX from the Sevii Islands too). MEWTWO is on B1F.	CHAMPION	MEWTWO
+87	9	Side	out:cinnabar_island_center	out:cinnabar_island_center	-	After the LEAGUE	SEVII ISLANDS (Four to Seven Island)	FireRed's story after the LEAGUE: the RUBY and the SAPPHIRE, and the National POKéDEX.	CHAMPION	-
