@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_basalt","ar_basalt":"retromon:block/interior/ar_basalt"},"elements":[{"from":[0,0.0,16],"to":[16.0,16.0,16],"faces":{"north":{"uv":[0,0,16,16],"texture":"#ar_basalt","tintindex":144064064}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/tv_field_saffron","tv_field_saffron":"retromon:block/interior/tv_field_saffron"},"elements":[{"from":[0.0,0,0.0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[9.0,13.0,10.0,14.0],"texture":"#tv_field_saffron"}}}]}

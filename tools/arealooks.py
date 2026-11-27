@@ -64,7 +64,9 @@ LEAGUE = (GATE.replace("block/polished_deepslate=gate_roof", "block/polished_dee
           + ",block/deepslate_bricks=league_pillar,block/oak_planks=league_arch,block/resin_bricks=league_brick")
 # Its four little trees out front: spruce fence trunks as wood, acacia leaves as a round bush (! : without the
 # biome's tint, the bush's own green).
-LEAGUE_TREES = "block/spruce_planks=league_trunk,block/acacia_leaves=league_bush!"
+LEAGUE_TREES = "block/spruce_planks=league_trunk"
+# ((0.70, John's 27 Nov 14:44) Their leaves "need to go to the style that we have on the main trees, but I'm more than
+# happy that they are like a different shade": out of this row, so Kanto's leafy look has them, in acacia's own green.)
 # (0.54, 12:19 and 12:26) Every Gym's coloured band (the second row up), each its own colour (tools/looks54.py), and
 # the height and blocks of each one's (a scan of the map).
 GYM_BANDS = {"viridian_city": (27, "terracotta"), "pewter_city": (31, "gray_concrete"), "cerulean_city": (35, "yellow_concrete"),
@@ -185,7 +187,7 @@ def main():
         add("swap", LEAGUE_BLOCKS if league else GATE_BLOCKS, (int(x0) - 2, int(z0) - 4, int(x1) + 2, int(z1) + 4, where), LEAGUE if league else GATE,
             (str(ry - 18), str(ry + 2)))
         if league:
-            add("swap", "spruce_fence,acacia_leaves", (int(x0) - 4, int(z0) - 6, int(x1) + 4, int(z1) + 6, "the League gate's trees"), LEAGUE_TREES,
+            add("swap", "spruce_fence", (int(x0) - 4, int(z0) - 6, int(x1) + 4, int(z1) + 6, "the League gate's trees"), LEAGUE_TREES,
                 (str(ry - 12), str(ry - 1)))
     add("swap", "mud_bricks,mud_brick_stairs,mud_brick_slab", ROUTE22, "block/mud_bricks=route_path@4")
     add("swap", "brown_concrete_powder", ROUTE22, "block/brown_concrete_powder=route_path_edge@4")
@@ -320,6 +322,9 @@ def main():
     import arealooks69
     room = lambda look, blocks, area, swaps="-", ys=("-", "-"): rows.append((look, blocks, area[0], area[1], area[2], area[3], ys[0], ys[1], swaps, area[4], "interiors"))
     arealooks69.round69(add, room, globals(), rows)
+    # (0.70) Ilex Forest, in Johto's looks too (John's 14:44: "Make sure they're all universal").
+    import arealooks70
+    arealooks70.round70ilex(room, globals(), rows)
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -710,11 +715,13 @@ def round49(add, room):
     T = LAV_TOWER
     add("swap", "blue_terracotta,light_blue_terracotta", T, "block/blue_terracotta=tower_wall,block/light_blue_terracotta=tower_trim", ("34", "72"))
     add("swap", "nether_brick_slab,nether_bricks,nether_brick_stairs", T, "block/nether_bricks=tower_ledge", ("34", "72"))
-    add("swap", "deepslate_brick_wall", T, "block/deepslate_bricks=tower_column", ("34", "72"))
+    # ((0.70, John's 27 Nov 14:44) Its black beams bottom to top and the pillar on its top "like a metal and shiny":
+    # polished metal laid four blocks across, tools/looks70.py.)
+    add("swap", "deepslate_brick_wall", T, "block/deepslate_bricks=tower_beam_metal@4", ("34", "72"))
     add("swap", "iron_block", T, "block/iron_block=tower_roof", ("55", "72"))
     add("swap", "stone", T, "block/stone=tower_ledge", ("34", "72"))
     add("swap", "tuff_bricks,tuff_brick_stairs,tuff_brick_slab", T, "block/tuff_bricks=tower_plinth", ("32", "36"))
-    add("swap", "polished_diorite,diorite_wall,diorite", T, "block/polished_diorite=tower_spire,block/diorite=tower_spire", ("58", "75"))
+    add("swap", "polished_diorite,diorite_wall,diorite", T, "block/polished_diorite=tower_spire_metal@4,block/diorite=tower_spire_metal@4", ("58", "75"))
     add("glass", "light_blue_stained_glass,light_blue_stained_glass_pane", T, "block/light_blue_stained_glass=glass_tower")
     add("swap", "smooth_stone,smooth_stone_slab,stone_bricks,cracked_stone_bricks", T,
         "block/smooth_stone=lav_court@2,block/smooth_stone_slab_side=lav_kerb,block/stone_bricks=lav_court@2,block/cracked_stone_bricks=lav_court@2", ("32", "34"))
@@ -830,6 +837,9 @@ def round50(add, room):
     arealooks67.round67(add, room, globals())
     # (0.68) John's 26 Nov 09:20: the pass across all of Johto.
     arealooks67.round67j(add, room, globals())
+    # (0.70) John's 27 Nov save: his new west end's rocks and bridges.
+    import arealooks70
+    arealooks70.round70(add, room, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -1265,7 +1275,8 @@ def round53(add, room):
 
 
 # (0.54) Johto (12:24 and 12:26): the whole region, and the places done now.
-JOHTO = (-2720, 60, -1011, 1080, "Johto")
+# (0.70, John's 27 Nov save: his Route 48 and the cliffs on the west end, out to x -2760.)
+JOHTO = (-2770, 60, -1011, 1080, "Johto")
 R26_HOUSES = (-1000, 655, -960, 712, "Route 26's houses")
 ROUTE2627 = (-1310, 600, -940, 800, "Routes 26 and 27, Tohjo Falls")
 NEW_BARK = (-1510, 715, -1395, 830, "New Bark Town")

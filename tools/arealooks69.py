@@ -18,7 +18,7 @@ import os
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPOTS = os.path.join(HERE, "alph", "alph_spots.json")
 # John's Johto boxes (arealooks.py's JOHTO, arealooks59b's JM): the looks over all of it.
-JOHTO_BOX = (-2720, 60, -1011, 1080)
+JOHTO_BOX = (-2770, 60, -1011, 1080)
 JM_BOX = (-2575, 60, -1000, 1000)
 # His Route 36 Ruins of Alph gate on the map: the box its looks are over (tools/arealooks59b.py's gatehouses).
 R36_GATE_BOX = (-1962, 533, -1947, 556)

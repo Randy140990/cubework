@@ -3,8 +3,8 @@
  "ambientocclusion": false,
  "textures": {
   "particle": "retromon:block/area/sign_edge_h",
-  "t0": "retromon:block/area/sign_short_front_s",
-  "t1": "retromon:block/area/sign_short_back_s",
+  "t0": "retromon:block/area/sign_short_front_single",
+  "t1": "retromon:block/area/sign_short_back_single",
   "t2": "retromon:block/area/sign_edge_h",
   "t3": "retromon:block/area/sign_edge_v",
   "t4": "retromon:block/area/sign_stand",

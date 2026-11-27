@@ -112,8 +112,8 @@ def grey_path():
 def build():
     L.save("cliff_path_grey", grey_path())
     L.save("mat_cyan", mat((64, 170, 176)))
-    L.save("pp_yellow_s", seamless_paint((242, 190, 44), 671))
-    L.save("pp_white_s", seamless_paint((241, 240, 236), 672, 0.014))
+    L.save("pp_yellow_seam", seamless_paint((242, 190, 44), 671))
+    L.save("pp_white_seam", seamless_paint((241, 240, 236), 672, 0.014))
     L.save("vr_gold", dark_gold())
 
 

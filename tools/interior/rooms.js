@@ -1343,9 +1343,11 @@ const BUILD = {
     drawerUnit(R, 2.8, 0, "s");
     officeChair(R, 1.55, 1.6, "n");
     windowN(R, 4.6, 1.5, 2.2, 2.0, { curtains: "curtain", curtainIn: 0.35 });
-    framed(R, 7.4, 1.6, 1.1, 1.5, "poster", "n", { frameMat: "honey", act: { label: "Look", lines: ["A poster of a famous trainer mid-throw. GO!"] } });
+    // ((0.70, 14:44: "that Go poster, which is kind of like just to the side") A little further from the curtain, the
+    // clock along with it.)
+    framed(R, 7.75, 1.6, 1.1, 1.5, "poster", "n", { frameMat: "honey", act: { label: "Look", lines: ["A poster of a famous trainer mid-throw. GO!"] } });
     R.item("Poster", "A trainer mid-throw, drawn in silhouette on a sunburst.");
-    clock(R, 8.9, 2.6);
+    clock(R, 9.15, 2.6);
     // (0.55) The side walls: Pallet's beach at sunset and a snapshot by the bed (west); the hills under the stars (east).
     framed(R, 2.2, 1.55, 1.3, 1.0, "picSunset", "w", { frameMat: "honey", act: { label: "Look", lines: ["A painting of the beach south of PALLET TOWN at sunset."] } });
     framed(R, 9.3, 1.7, 0.8, 0.65, "picSnap", "w", { frameMat: "walnut", act: { label: "Look", lines: ["A snapshot of you and MOM on your birthday, in front of the house."] } });
@@ -1409,7 +1411,7 @@ const BUILD = {
     drawerUnit(R, 2.8, 0, "s", 0.9, 1.1, "walnut");
     officeChair(R, 1.55, 1.6, "n", "redFabric");
     windowN(R, 4.6, 1.5, 2.2, 2.0, { curtains: "curtain", curtainIn: 0.35, lines: ["From up here you can see right into your own room."] });
-    framed(R, 7.4, 1.5, 1.2, 1.6, "posterRival", "n", { frame: false, act: { label: "Look", lines: ["A poster: CHAMP OR BUST."] } });
+    framed(R, 7.7, 1.5, 1.2, 1.6, "posterRival", "n", { frame: false, act: { label: "Look", lines: ["A poster: CHAMP OR BUST."] } });
     framed(R, 2.4, 1.6, 1.3, 1.75, "posterDragon", "e", { frame: false, act: { label: "Look", lines: ["A poster of a dragon breathing fire over the stars."] } });
     R.item("Posters", "CHAMP OR BUST, and a dragon over the stars.");
     bunting(R, 0.3, 4.4, 3.1);

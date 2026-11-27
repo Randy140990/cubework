@@ -108,16 +108,46 @@ public class IntroScreen extends GameScreen {
 	private static String pendingLoad;
 	private static Screen pendingParent;
 
+	/**
+	 * (0.70, John's 27 Nov 14:44: "I just started and then it just threw me back ... puts me back at the start ... Now
+	 * if I hit space, and your save is there") A new game's save, until you're in it: should it not open the first time
+	 * (Minecraft giving up on opening it, or its game stopping as it starts, and the title back), it's opened again,
+	 * once, as CONTINUE would. Then only the title.
+	 */
+	private static String retryFolder;
+	private static long retryBy;
+	private static boolean freshLoad;
+
 	/** Called at the end of each client tick: opens the save that's waiting, if there is one. */
 	public static void tickPending() {
+		Minecraft mc = Minecraft.getInstance();
+		if (retryFolder != null && mc.player != null) retryFolder = null;
 		if (pendingLoad == null) return;
 		String folder = pendingLoad;
 		Screen parent = pendingParent;
 		pendingLoad = null;
 		pendingParent = null;
-		Minecraft mc = Minecraft.getInstance();
+		if (freshLoad) {
+			freshLoad = false;
+			retryFolder = folder;
+			retryBy = System.currentTimeMillis() + 180000;
+		}
 		launchedAt = System.currentTimeMillis();
-		mc.createWorldOpenFlows().openWorld(folder, () -> mc.setScreen(new IntroScreen(parent)));
+		mc.createWorldOpenFlows().openWorld(folder, () -> {
+			if (!retryNewGame(parent)) mc.setScreen(new IntroScreen(parent));
+		});
+	}
+
+	/** The new game that didn't open, opened again (once): true if it's on its way. */
+	private static boolean retryNewGame(Screen parent) {
+		Minecraft mc = Minecraft.getInstance();
+		if (retryFolder == null || mc.level != null || System.currentTimeMillis() > retryBy) return false;
+		Retromon.LOG.warn("Retromon: the new game in {} didn't open the first time; opening it again", retryFolder);
+		pendingLoad = retryFolder;
+		pendingParent = parent;
+		retryFolder = null;
+		mc.setScreen(new IntroScreen(parent));
+		return true;
 	}
 
 	/** Where you're arriving (a new game's PALLET TOWN, or where the save you continue was left). */
@@ -210,6 +240,14 @@ public class IntroScreen extends GameScreen {
 	@Override
 	protected void init() {
 		super.init();
+		// (0.70) Back at the title with a new game that never opened: it's opened again, once.
+		if (retryFolder != null && pendingLoad == null && minecraft != null && minecraft.level == null && System.currentTimeMillis() <= retryBy) {
+			Retromon.LOG.warn("Retromon: back at the title before the new game in {} opened; opening it again", retryFolder);
+			pendingLoad = retryFolder;
+			pendingParent = parent;
+			retryFolder = null;
+			return;
+		}
 		if (ticks == 0 && step != Step.OPENING) Music.play("title_screen");
 	}
 
@@ -253,6 +291,7 @@ public class IntroScreen extends GameScreen {
 		}
 		if (copied) {
 			copied = false;
+			freshLoad = true;
 			load(slotName);
 		}
 	}
@@ -473,7 +512,7 @@ public class IntroScreen extends GameScreen {
 
 	private void startOak() {
 		if (bundledMap() == null) {
-			failure = "The map isn't installed. Put Retromon-Map-1.0.0.jar in your mods folder (beside Retromon), then restart.";
+			failure = "The map isn't installed. Put Retromon-Map-1.0.1.jar in your mods folder (beside Retromon), then restart.";
 			step = Step.FAILED;
 			return;
 		}
@@ -1052,7 +1091,7 @@ public class IntroScreen extends GameScreen {
 	}
 
 	/**
-	 * The map: inside Retromon Map (Retromon's second jar, Retromon-Map-1.0.0.jar; the older retromon-kanto-map jar
+	 * The map: inside Retromon Map (Retromon's second jar, Retromon-Map-1.0.1.jar; the older retromon-kanto-map jar
 	 * still works), or a world or zip in .minecraft/retromon (for map makers).
 	 */
 	private static Path bundledMap() {

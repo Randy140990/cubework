@@ -14,8 +14,9 @@ import gzip, json, os, struct, sys
 import numpy as np
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources", "assets", "retromon", "townmap")
-# West of here is the HeartGold & SoulSilver picture made of blocks: drawn on the map, but not where it opens.
-VIEW_WEST = -2240
+# West of here was the HeartGold & SoulSilver picture made of blocks: drawn on the map, but not where it opens.
+# ((0.70) John's 27 Nov save has no picture: Johto's built out to his Route 48 and cliffs at x -2760, all of it in view.)
+VIEW_WEST = -2800
 
 
 def main():

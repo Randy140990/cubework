@@ -94,7 +94,7 @@ def round57(add, room, G):
     # The open sea's rocks all over (the Whirl Islands' chains, Routes 40 and 41, Cherrygrove's bay, Olivine's harbour,
     # Cianwood's shore, Routes 47 and 48, Route 19 to 21): everything rocky standing in the sea.
     for b in ((-2490, 560, -2320, 910, "the Whirl Islands and Routes 40 and 41"), (-1800, 790, -1640, 860, "Cherrygrove's bay"),
-              (-2335, 540, -2170, 680, "Olivine's harbour"), (-2600, 690, -2480, 820, "Cianwood's shore"), (-2720, 600, -2590, 820, "Routes 47 and 48"),
+              (-2335, 540, -2170, 680, "Olivine's harbour"), (-2600, 690, -2480, 820, "Cianwood's shore"), (-2770, 600, -2590, 820, "Routes 47 and 48"),
               (-900, 735, -460, 960, "the sea from Pallet to Fuchsia")):
         add("swap", SEA_ROCK_BLOCKS + ",end_stone_bricks", b, SEA_ROCK + ",block/end_stone_bricks=sea_rock_top|sea_rock@2", ys(10, 19))
     # The caves' dripstone hanging in their mouths: the look pack's (grey stone points, tools/looks57.py).

@@ -18,9 +18,9 @@ def round67(add, room, G):
     # The Power Plant's top: its yellow band (two blocks high) and the white cap along it, seamless ("Instead of
     # things looking like blocks, I think they should be seamless"): one clean colour each, laid four blocks across.
     P = (-160, 305, -120, 333, "the Power Plant's top trim")
-    add("swap", "yellow_terracotta", P, "block/yellow_terracotta=pp_yellow_s@4", ys(43, 44))
+    add("swap", "yellow_terracotta", P, "block/yellow_terracotta=pp_yellow_seam@4", ys(43, 44))
     add("swap", "smooth_quartz_slab,smooth_quartz,quartz_block", P,
-        "block/quartz_block_bottom=pp_white_s@4,block/quartz_block_top=pp_white_s@4,block/quartz_block_side=pp_white_s@4", ys(43, 45))
+        "block/quartz_block_bottom=pp_white_seam@4,block/quartz_block_top=pp_white_seam@4,block/quartz_block_side=pp_white_seam@4", ys(43, 45))
 
     # The strip of packed mud right of Nugget Bridge, along the water's edge (x -340, z 199 to 225): "turned into the
     # same as the dripstone changes for the cliff". The cliff's own rock on it, and the grass's tufts onto it.
@@ -58,7 +58,7 @@ def round67j(add, room, G):
     # The cliffside west of Cianwood (Route 47's way to the SAFARI ZONE's gate): left out of Johto's own looks while
     # John was building it (19:17); built now, so the same as the rest of Johto: its grey paths along the cliff tops,
     # its posts, its shelf trims, its white and grey (arealooks59b's fallbacks, over just that part).
-    JW = (-2720, 60, -2576, 1000, "the cliffside west of Cianwood")
+    JW = (-2770, 60, -2576, 1000, "the cliffside west of Cianwood")   # ((0.70) out to his new west end)
     for look, blocks, swaps in arealooks59b.FALLBACK:
         if blocks == "light_gray_terracotta": continue   # (its paths, below)
         add(look, blocks, JW, swaps)

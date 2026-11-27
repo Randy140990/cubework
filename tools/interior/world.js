@@ -391,11 +391,15 @@ function windowN(room, x, y, w = 2.2, h = 2, o = {}) {
   G.box(x, y, 0.02, x + w, y + 0.02, dp, "windowReveal"); G.box(x, y + h - 0.02, 0.02, x + w, y + h, dp, "windowReveal");
   G.box(x - 0.25, y - t - 0.1, 0, x + w + 0.25, y - t, 0.48, fr);
   if (o.curtains) {
-    const c = o.curtains;
-    G.box(x - 0.45, y + h + 0.3, 0.12, x + w + 0.45, y + h + 0.38, 0.2, "steel");
+    // ((0.70, John's 27 Nov 14:44: "the curtains are clipping the frame instead of being in front of it and looking a
+    // little bit taller") Hung in front of the frame and its sill, from a rail on two brackets out from the wall, and
+    // taller: from above the frame to below the sill.)
+    const c = o.curtains, z0 = 0.52, z1 = 0.66;
+    G.box(x - 0.5, y + h + 0.5, z0 - 0.04, x + w + 0.5, y + h + 0.58, z0 + 0.04, "steel");
+    for (const bx of [x - 0.42, x + w + 0.34]) G.box(bx, y + h + 0.5, 0, bx + 0.08, y + h + 0.58, z0 - 0.04, "steel");
     const k = o.curtainIn || 0;
-    G.box(x - 0.6, y - 0.4, 0.16, x - 0.05 + k, y + h + 0.32, 0.34, c);
-    G.box(x + w + 0.05 - k, y - 0.4, 0.16, x + w + 0.6, y + h + 0.32, 0.34, c);
+    G.box(x - 0.62, y - 0.5, z0, x - 0.05 + k, y + h + 0.5, z1, c);
+    G.box(x + w + 0.05 - k, y - 0.5, z0, x + w + 0.62, y + h + 0.5, z1, c);
   }
   if (o.plant) { G.box(x + 0.15, y - t, 0.05, x + 0.55, y + 0.3 - t, 0.28, "potWhite"); G.box(x + 0.1, y + 0.3 - t, 0.02, x + 0.6, y + 0.85 - t, 0.32, "leafSolid"); }
   if (o.pool !== false) sunPool(room, x - 0.3, 1.2, x + w + 0.3, 1.2 + h * 1.4, 0, null, [0.03, x, x + w, y, y + h]);

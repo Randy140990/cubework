@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_crate","ar_crate":"retromon:block/interior/ar_crate"},"elements":[{"from":[1.927,16,0.098],"to":[16.0,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#ar_crate","tintindex":144064064}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_crate","ar_crate":"retromon:block/interior/ar_crate"},"elements":[{"from":[10.723,16,10.716],"to":[16.0,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#ar_crate","tintindex":144064064}}}]}

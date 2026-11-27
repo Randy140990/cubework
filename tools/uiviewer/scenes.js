@@ -166,14 +166,27 @@ const SCENES = {
     SPOTS.forEach(([sid, x, z, turn, fly]) => mon(sid).then(st => { st.base = "ground"; st.home = [x, z, turn, fly || 0]; group.add(st.m.holder); S.runners.push(st); st.m.holder.visible = S.mode !== "lab"; placeMon(st, x, z, Math.PI + turn, fly || 0); }));
     // Further along, the ones he walks past: a parade of all sorts, big ones further back, little ones near.
     const PARADE = ["growlithe", "exeggutor", "psyduck", "ponyta", "jigglypuff", "onix", "meowth", "machoke", "vulpix", "snorlax", "butterfree", "nidoking", "eevee", "lapras", "pidgeot"];
+    // ((0.70, John's 27 Nov 14:44: "if they could feel a little bit more spread out ... you've got some really large
+    // ones and it looks a bit congested") Further apart than they were (1.15 blocks), the big ones with room either
+    // side for their size, as the mod has them (Scenes.ProfWalk.paradeX): each one's place along his walk once all of
+    // them are in.)
     let pi = 0;
+    const loads = [];
     for (const sid of PARADE) {
       if (!DATA.species[sid]) continue;
-      const i = pi++, x = 3.8 + i * 1.15, row = [-1.5, -2.35, -3.2][i % 3];
-      mon(sid).then(st => { const big = st.m.size.h > 2.2 ? 2.2 / st.m.size.h : 1; if (big < 1) { st.m.holder.scale.multiplyScalar(big); st.m.size = { ...st.m.size, h: st.m.size.h * big, w: st.m.size.w * big, l: st.m.size.l * big, cx: st.m.size.cx * big, cz: st.m.size.cz * big }; }
+      const i = pi++, row = [-1.5, -2.35, -3.2][i % 3];
+      loads.push(mon(sid).then(st => { const h0 = st.m.size.h, big = st.m.size.h > 2.2 ? 2.2 / st.m.size.h : 1; if (big < 1) { st.m.holder.scale.multiplyScalar(big); st.m.size = { ...st.m.size, h: st.m.size.h * big, w: st.m.size.w * big, l: st.m.size.l * big, cx: st.m.size.cx * big, cz: st.m.size.cz * big }; }
         const flyer = ["butterfree", "pidgeot"].includes(sid), z = flyer ? -1.8 : st.m.size.h > 1.3 ? -3.2 : st.m.size.h > 0.9 ? Math.min(row, -2.35) : row;
-        st.base = flyer ? "fly" : "ground"; st.home = [x, z, (i % 3 - 1) * 0.35, flyer ? 1.5 : 0]; group.add(st.m.holder); S.parade.push(st); st.m.holder.visible = S.mode === "intro"; placeMon(st, x, z, Math.PI + st.home[2], st.home[3]); });
+        st.base = flyer ? "fly" : "ground"; st.home = [3.8, z, (i % 3 - 1) * 0.35, flyer ? 1.5 : 0]; st.paradeI = i; st.paradeH = h0; group.add(st.m.holder); S.parade.push(st); st.m.holder.visible = S.mode === "intro"; return st; }));
     }
+    Promise.allSettled(loads).then(rs => {
+      const sts = rs.filter(r => r.status === "fulfilled" && r.value).map(r => r.value);
+      sts.sort((a, b) => a.paradeI - b.paradeI);
+      let x = 3.8, prev = 0;
+      sts.forEach((st, k) => { const size = Math.min(1.4, Math.max(0, Math.min(2.2, Math.max(0.3, st.paradeH)) - 0.6)); if (k > 0) x += 1.45 + 0.35 * (prev + size); prev = size;
+        st.home[0] = x; placeMon(st, x, st.home[1], Math.PI + st.home[2], st.home[3]); });
+      END = x + 1.4 + 7.0;
+    });
     S.nextCry = 2;
     // Yours beside him in his lab (the starter you've just chosen), idling.
     S.withPartner = sid => { if (S.partner) { group.remove(S.partner.m.holder); S.partner = null; }
@@ -181,7 +194,7 @@ const SCENES = {
     S.hop = () => { if (S.hopT == null) { S.hopT = 0; const r = S.runners.find(q => q.sid === "pikachu"); if (r) playOnce(r, "cry"); } };
     // The walk: he sets off to the right along them, talking; the camera goes with him; at the far end he stops and
     // turns to you, and the camera comes in close.
-    const END = 3.8 + Math.max(0, PARADE.length - 1) * 1.15 + 1.4 + 7.0;
+    let END = 3.8 + Math.max(0, PARADE.length - 1) * 1.15 + 1.4 + 7.0;
     S.startWalk = () => { if (S.walk == null) S.walk = { x: 0, speed: 1.25, done: false }; };
     S.stopWalk = () => { S.startWalk(); S.walk.hurry = true; };
     S.enter = o => {

@@ -432,6 +432,12 @@ def see_through(im, alpha):
     return im
 
 
+def pbr_safe(name):
+    """(0.70) A picture's name never ends "_s" or "_n": shaders (Iris) take those for another picture's specular and
+    normal maps and leave them out of the game's textures (Minecraft's missing texture in their place)."""
+    return name + "x" if name.endswith(("_s", "_n")) else name
+
+
 def write_textures(mats, res):
     out = os.path.join(res, "assets/retromon/textures/block/interior")
     os.makedirs(out, exist_ok=True)
@@ -439,7 +445,7 @@ def write_textures(mats, res):
     info = {}
     for k, m in mats.items():
         if k in SKIP or m.get("overlay"): continue
-        name = snake(k)
+        name = pbr_safe(snake(k))
         if m.get("frames"):
             frames = [img_of(u) for u in m["frames"]]
             fw, fh = frames[0].size; W, H = pow2(fw), pow2(fh)

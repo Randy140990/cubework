@@ -275,7 +275,35 @@ public final class Scenes {
 		private float nextCry = 2, cryAt = -9;
 		private int crier = -1;
 		private final java.util.Random rnd = new java.util.Random();
-		private final float end = 3.8F + Math.max(0, PARADE.length - 1) * 1.15F + 1.4F + 7.0F;
+		/**
+		 * (0.70, John's 27 Nov 14:44: "if they could feel a little bit more spread out ... you've got some really large
+		 * ones and it looks a bit congested") Where each of the parade stands along his walk: further apart than they
+		 * were (1.15 blocks), and the big ones with room either side for their size.
+		 */
+		private double[] paradeX;
+
+		private double[] paradeX() {
+			if (paradeX != null) return paradeX;
+			double[] xs = new double[PARADE.length];
+			double x = 3.8, prev = 0;
+			boolean all = true;
+			for (int i = 0; i < PARADE.length; i++) {
+				BedrockModel.Def def = BedrockModel.def(PARADE[i]);
+				if (def == null) all = false;
+				double hh = Math.min(2.2, def == null ? 0.8 : Math.max(0.3, def.height)), size = Math.min(1.4, Math.max(0, hh - 0.6));
+				if (i > 0) x += 1.45 + 0.35 * (prev + size);
+				xs[i] = x;
+				prev = size;
+			}
+			if (all) paradeX = xs;
+			return xs;
+		}
+
+		/** His mark at the far end, past the last of them. */
+		private float end() {
+			double[] xs = paradeX();
+			return (float) (xs.length == 0 ? 3.8 : xs[xs.length - 1]) + 1.4F + 7.0F;
+		}
 
 		public void startWalk() {
 			walking = true;
@@ -299,7 +327,7 @@ public final class Scenes {
 				// once he's told to hurry along), and eases down over his last steps to stop on his mark.
 				float want = t - setOff < TURN ? 0 : hurry ? 3.2F : 1.25F;
 				speed += (want - speed) * Math.min(1, dt * 3.5F);
-				float left = end - walkX;
+				float end = end(), left = end - walkX;
 				if (left < 1.4F) speed = Math.min(speed, Math.max(0.3F, left * 1.5F));
 				walkX = Math.min(end, walkX + dt * speed);
 				if (walkX >= end - 0.01F) {
@@ -399,7 +427,7 @@ public final class Scenes {
 					BedrockModel.Def def = BedrockModel.def(sid);
 					if (def == null) continue;
 					// In three rows behind his path (little ones nearest, big ones at the back), the fliers above them.
-					double h = Math.max(0.3, def.height), big = h > 2.2 ? 2.2 / h : 1, x = 3.8 + i * 1.15, row = new double[] {-1.5, -2.35, -3.2}[i % 3];
+					double h = Math.max(0.3, def.height), big = h > 2.2 ? 2.2 / h : 1, x = paradeX()[i], row = new double[] {-1.5, -2.35, -3.2}[i % 3];
 					boolean flyer = sid.equals("butterfree") || sid.equals("pidgeot");
 					double hh = h * big, z = flyer ? -1.8 : hh > 1.3 ? -3.2 : hh > 0.9 ? Math.min(row, -2.35) : row, fly = flyer ? 1.6 + Math.sin(t * 2.1 + x) * 0.14 : 0;
 					double look = walking ? Math.max(-0.6, Math.min(0.6, (px - x) * 0.4)) : 0;

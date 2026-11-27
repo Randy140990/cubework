@@ -38,7 +38,8 @@ public class TownMapScreen extends DeviceScreen {
 	private static Map<String, String> placeToPoint;
 
 	/** Each region's box (blocks: x0, z0, x1, z1), as the viewer's (tools/uiviewer.py MAP_BOX, JOHTO_BOX). */
-	private static final int[] KANTO_BOX = {-1250, 120, -46, 1000}, JOHTO_BOX = {-2640, 140, -1150, 1000};
+	// ((0.70) Johto out to John's Route 48 and the cliffs at its west end, in his 27 Nov save.)
+	private static final int[] KANTO_BOX = {-1250, 120, -46, 1000}, JOHTO_BOX = {-2780, 140, -1150, 1000};
 	/** West of this you're in Johto. */
 	private static final int JOHTO_X = -1180;
 	/** The map's window on the canvas. */

@@ -34,9 +34,16 @@ def mix(a, b, t):
     return tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3)) + (255,)
 
 
+def pbr_safe(name):
+    """(0.70) A picture's name never ends "_s" or "_n": shaders (Iris) take those for another picture's specular and
+    normal maps and leave them out of the game's textures, so they showed as Minecraft's missing texture (the single
+    signs' "sign_front_s", John's 14:44: the Power Plant's "pp_yellow_s")."""
+    return name[:-2] + "_single" if name.endswith("_s") else name + "x" if name.endswith("_n") else name
+
+
 def save(name, im):
     os.makedirs(TEX, exist_ok=True)
-    im.save(os.path.join(TEX, name + ".png"))
+    im.save(os.path.join(TEX, pbr_safe(name) + ".png"))
 
 
 def write_json(path, obj):
@@ -255,7 +262,7 @@ def sign_models(prefix="sign"):
         for part in ("l", "r", "m", "s"):
             outer_left = part in ("l", "s")    # the end at x = 16 (facing north) is the sign's end
             outer_right = part in ("r", "s")   # the end at x = 0
-            tex = lambda n: "retromon:block/area/" + n
+            tex = lambda n: "retromon:block/area/" + pbr_safe(n)
             # The board: the whole block across, 6 thick.
             faces = {"north": tex(prefix + "_front_" + part), "south": tex(prefix + "_back_" + part),
                      "up": tex(prefix + "_edge_h"), "down": tex(prefix + "_edge_h")}
@@ -346,7 +353,7 @@ def mailbox_textures():
 def mailbox_model():
     """Facing north (the slot towards you as you stand north of it): a small plate, the silver post, the red box
     and its rounded top. The blockstate turns it."""
-    t = lambda n: "retromon:block/area/" + n
+    t = lambda n: "retromon:block/area/" + pbr_safe(n)
     els = [
         {"from": [6, 0, 6], "to": [10, 0.5, 10], "faces": {f: {"texture": t("mailbox_plate")} for f in ("north", "east", "south", "west", "up")}},
         {"from": [7, 0.5, 7], "to": [9, 8, 9], "faces": {f: {"texture": t("mailbox_post")} for f in ("north", "east", "south", "west")}},
@@ -401,7 +408,7 @@ def short_sign_models():
     """A standing pale oak sign (a block high) as HeartGold's sign, built round Minecraft's own (its board, 16 by 8
     from 9.3 to 17.3 up and 1.3 thick in the middle, and its stick, are inside it, so they never show): the board
     from 8.5 to 18.5 up, the stand under it and its foot. Its ends, middles and one-block signs as the shelves'."""
-    tex = lambda n: "retromon:block/area/" + n
+    tex = lambda n: "retromon:block/area/" + pbr_safe(n)
     full = [0, 0, 16, 16]
     for facing, turns in {"north": 0, "east": 1, "south": 2, "west": 3}.items():
         for part in ("l", "r", "m", "s"):
@@ -472,7 +479,7 @@ def wood_face(back=False):
 def wood_sign_models():
     """A standing spruce sign as HeartGold's wooden sign, taller: a board (17 wide, 16 high, from 9 up) on a thick
     post, round Minecraft's own sign (its board and stick inside, so they never show)."""
-    tex = lambda n: "retromon:block/area/" + n
+    tex = lambda n: "retromon:block/area/" + pbr_safe(n)
     for facing, turns in {"north": 0, "east": 1, "south": 2, "west": 3}.items():
         bf = {"north": {"texture": tex("wood_sign_front"), "uv": [0, 0, 16, 16]}, "south": {"texture": tex("wood_sign_back"), "uv": [0, 0, 16, 16]},
               "east": {"texture": tex("wood_sign_edge"), "uv": [6, 0, 9, 16]}, "west": {"texture": tex("wood_sign_edge"), "uv": [6, 0, 9, 16]},

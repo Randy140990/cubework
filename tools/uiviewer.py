@@ -36,7 +36,7 @@ def skindata():
     return out
 
 MAP_BOX = (-1250, 120, -46, 1000)   # Kanto, in blocks (x0, z0, x1, z1); the top stops short of the island to the north
-JOHTO_BOX = (-2640, 140, -1150, 1000)   # Johto: just above the Lake of Rage to just below the forest point in the south
+JOHTO_BOX = (-2780, 140, -1150, 1000)   # Johto: just above the Lake of Rage to just below the forest point in the south; (0.70) out to Route 48 in the west
 
 METHOD = {"grass": "Grass", "water": "Surfing", "old_rod": "Fishing", "good_rod": "Fishing", "super_rod": "Fishing", "headbutt": "Headbutt",
           "rock_smash": "Rock Smash", "contest": "Bug-Catching Contest", "swarm": "Swarms"}

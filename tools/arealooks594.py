@@ -13,7 +13,7 @@ FIRE = "block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/ca
 
 
 def round594(add, room, G):
-    KANTO, JOHTO = G["KANTO"], (-2720, 60, -1011, 1080, "Johto")
+    KANTO, JOHTO = G["KANTO"], G["JOHTO"]
 
     # ---------- every fire, Kanto and Johto (07:31) ----------
     # (The stands' campfire roofs keep their wooden slats: their own rows are smaller; the ships are as John built them.)
