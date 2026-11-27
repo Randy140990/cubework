@@ -77,9 +77,24 @@ def outdoors(pl):
 
 FACING = {"up": "north", "down": "south", "left": "west", "right": "east", "none": "round"}
 
+# (0.72) What the PLACER lists (FireRed's), and what's placed in the mod already.
+PLACEABLES = [r for r in table("placeables.tsv") if len(r) >= 10]
+BAKED = {r[0] for r in table("placed.tsv") if len(r) >= 9 and r[8] == "placed"}
+FIELD_KEYS = {r[0] for r in FIELD}
+
 
 def trainer_rows(place):
     rows = []
+    if outdoors(place) and place not in OUTSIDE_NOW:
+        # (0.72) Outside: FireRed's trainers, there once they're placed with the PLACER.
+        for r in PLACEABLES:
+            if r[1] != place or r[2] != "trainer": continue
+            sight, facing = int(r[9] or 0), r[8]
+            sees = ("Sees you %d step%s ahead, facing %s" % (sight, "" if sight == 1 else "s", FACING.get(facing, facing.replace("_", " ")))) if sight > 0 \
+                else "Only battles if you talk to them"
+            team = r[5]
+            rows.append(("Trainer", "Battle %s" % r[4], "%s. Team: %s. (PLACER: place them where FireRed has them.)" % (sees, team), "Not placed yet", None))
+        return rows
     for r in TRAINERS:
         if r[1] != place or r[8] not in ("-", "") or r[2].startswith("RIVAL"): continue
         key, title, facing, sight = r[0], r[2], r[4], int(r[5] or 0)
@@ -100,20 +115,52 @@ def item_rows(place):
     the mod lays them (FireRed's), each place's by its key."""
     rows = []
     if outdoors(place):
-        for r in FIELD:
-            if r[1] != place or r[0] in GONE: continue
-            rows.append(("Item", "Pick up the %s" % item_name(r[2]), "In a POKé BALL on the ground; once taken it stays gone.",
-                         "In" if r[0] in ITEM_SPOTS else "Not placed yet", None))
+        # (0.72) FireRed's item balls (and Red and Blue's the PLACER lists too): the mod's own lie at a guessed spot till
+        # placed; FireRed's own are there once placed.
+        for r in PLACEABLES:
+            if r[1] != place or r[2] != "item" or r[3] in GONE: continue
+            it = r[5].replace("item=", "").split(" ")[0]
+            rb = "Red and Blue's" in r[5]
+            if r[3] in ITEM_SPOTS: now, note = "In", ""
+            elif r[3] in FIELD_KEYS: now, note = "Partly", " At a guessed spot till you place it with the PLACER."
+            else: now, note = "Not placed yet", " There once you place it with the PLACER."
+            rows.append(("Item", "Pick up the %s" % item_name(it), "In a POKé BALL on the ground; once taken it stays gone.%s%s"
+                         % (" (Red and Blue's: FireRed hasn't this one; take it away with the PLACER if you like.)" if rb else "", note), now, None))
+        rows.extend(hidden_rows(place))
         return rows
     for k in BALL_ORDER:
         if not k.startswith(place + "_"): continue
         it = FIELD_ITEM.get(k) or k.split("_fr_")[-1]
         rows.append(("Item", "Pick up the %s" % item_name(it), "In a POKé BALL on the floor; once taken it stays gone.", "In", None))
+    for r in PLACEABLES:
+        # (0.72) FireRed's item balls this room hadn't: placed already where the floor is on FireRed's grid.
+        if r[1] != place or r[2] != "item" or r[3] in BALLS: continue
+        it = r[5].replace("item=", "").split(" ")[0]
+        rows.append(("Item", "Pick up the %s" % item_name(it), "In a POKé BALL on the floor; once taken it stays gone.",
+                     "In" if r[3] in BAKED else "Not placed yet", None))
+    if any(r[1] == place and r[2] == "boulder" for r in PLACEABLES):
+        if place.startswith("victory_road"):
+            rows.append(("Boulder", "Push the boulders with STRENGTH", "A on one asks to use STRENGTH (one that knows it, and the RAINBOWBADGE). Walk into a boulder: "
+                         "it slides a step. On a floor switch it stays, and that switch's rocks crumble. Leave the floor and the others are back.", "In", None))
+        else:
+            rows.append(("Boulder", "The boulders", "FireRed's, with holes and currents: not placed (in the PLACER's list).", "Left out", None))
+    rows.extend(hidden_rows(place))
+    return rows
+
+
+def hidden_rows(place):
+    rows = []
+    for r in PLACEABLES:
+        if r[1] != place or r[2] != "hidden": continue
+        it = r[5].replace("item=", "").split(" ")[0]
+        now = "In" if r[3] in BAKED or r[3] in BALLS else "Not placed yet"
+        rows.append(("Hidden item", "Find the hidden %s" % item_name(it), "Press A facing the spot: found once. The ITEMFINDER says if one's near and which way."
+                     + ("" if now == "In" else " There once you place it with the PLACER."), now, None))
     return rows
 
 
 STEPS = {int(r[0]): r for r in json.load(open(os.path.join(HERE, "kanto_sheet_rows.json")))}
-# 0.71's statuses, as the sheet has them now.
+# 0.71's statuses, as the sheet has them now (0.72's changes after).
 NOW71 = {
     8: ("In", "MUM brings you the TOWN MAP outside the lab (Let's Go's way)."), 9: ("In", None), 10: ("In", None), 12: ("In", None),
     14: ("Partly", "Place a tree by the side door and it can be CUT."), 16: ("In", None), 19: ("Not placed yet", "The two BLACK BELTs stand outside."),
@@ -123,6 +170,10 @@ NOW71 = {
     47: ("In", None), 51: ("In", None), 53: ("In", None), 54: ("In", None), 57: ("Partly", "Place the tree in the way and it can be CUT."), 63: ("In", None),
     64: ("In", None), 67: ("In", None), 68: ("In", None), 72: ("In", None), 73: ("Partly", "Boulders can't be pushed yet."), 75: ("In", None), 76: ("In", None),
     79: ("In", None), 80: ("In", None), 82: ("Partly", "Boulders can't be pushed yet."), 86: ("In", None)}
+NOW71.update({19: ("Not placed yet", "The two BLACK BELTs stand outside: place them with the PLACER."),
+              22: ("Not placed yet", "The five and the ROCKET stand outside: place them with the PLACER."),
+              24: ("Not placed yet", "The ROCKET stands outside the back door: place him with the PLACER."),
+              73: ("Partly", "You can SURF through; FireRed's boulders, holes and currents aren't in."), 82: ("In", None)})
 
 # What to check, step by step, where it says more than the sheet's line.
 CHECK = {
@@ -271,24 +322,24 @@ ORDER = [
                       ("place", "ss_anne_2f_rooms"), ("place", "ss_anne_2f_room2"), ("place", "ss_anne_bow"), ("step", 34), ("step", 35),
                       ("gym", "vermilion"), ("place", "route_11"), ("step", 37)]),
     ("To ERIKA", [("place", "route_9"), ("step", 38), ("place", "route_10"), ("step", 39), ("place", "rock_tunnel_1f"), ("place", "rock_tunnel_b1f"),
-                  ("step", 40), ("step", 41), ("place", "pokemon_tower_3f"), ("place", "pokemon_tower_4f"), ("place", "pokemon_tower_5f"), ("step", 42),
-                  ("place", "route_8"), ("step", 43), ("place", "underground_path_we"), ("step", 44), ("step", 45), ("step", 46), ("step", 47),
+                  ("step", 40), ("step", 41), ("place", "lavender_town"), ("place", "pokemon_tower_3f"), ("place", "pokemon_tower_4f"), ("place", "pokemon_tower_5f"), ("step", 42),
+                  ("place", "route_8"), ("step", 43), ("place", "underground_path_we"), ("place", "route_7"), ("place", "celadon_city"), ("step", 44), ("step", 45), ("step", 46), ("step", 47),
                   ("step", 48), ("place", "game_corner"), ("step", 49), ("place", "rocket_hideout_b1f"), ("place", "rocket_hideout_b2f"),
                   ("place", "rocket_hideout_b3f"), ("step", 50), ("place", "rocket_hideout_b4f"), ("gym", "celadon")]),
     ("To KOGA", [("step", 52), ("place", "pokemon_tower_6f"), ("step", 53), ("place", "pokemon_tower_7f"), ("step", 54), ("step", 55),
                  ("place", "route_12"), ("step", 56), ("place", "route_13"), ("place", "route_14"), ("place", "route_15"), ("place", "route_16"),
-                 ("step", 57), ("step", 58), ("place", "route_17"), ("place", "route_18"), ("step", 59), ("step", 60), ("place", "safari_zone_center"),
+                 ("step", 57), ("step", 58), ("place", "route_17"), ("place", "route_18"), ("step", 59), ("step", 60), ("place", "fuchsia_city"), ("place", "safari_zone_center"),
                  ("place", "safari_zone_east"), ("place", "safari_zone_north"), ("place", "safari_zone_west"), ("step", 61), ("place", "wardens_house"),
                  ("gym", "fuchsia"), ("step", 63), ("step", 64)]),
-    ("To SABRINA", [("step", 65), ("step", 66)] + [("place", "silph_co_%df" % i) for i in range(2, 7)] + [("step", 67), ("place", "silph_co_7f")]
+    ("To SABRINA", [("place", "saffron_city"), ("step", 65), ("step", 66)] + [("place", "silph_co_%df" % i) for i in range(2, 7)] + [("step", 67), ("place", "silph_co_7f")]
      + [("place", "silph_co_%df" % i) for i in range(8, 11)] + [("step", 68), ("place", "silph_co_11f"), ("step", 69), ("place", "fighting_dojo"),
                                                                   ("step", 70), ("step", 71), ("gym", "saffron")]),
     ("To BLAINE", [("place", "route_19"), ("place", "route_20"), ("step", 73), ("place", "seafoam_islands_1f"), ("place", "seafoam_islands_b1f"),
                    ("place", "seafoam_islands_b2f"), ("place", "seafoam_islands_b3f"), ("place", "seafoam_islands_b4f"), ("step", 74), ("place", "power_plant"),
-                   ("step", 75), ("place", "pokemon_mansion_1f"), ("place", "pokemon_mansion_2f"), ("place", "pokemon_mansion_3f"),
+                   ("step", 75), ("place", "cinnabar_island"), ("place", "pokemon_mansion_1f"), ("place", "pokemon_mansion_2f"), ("place", "pokemon_mansion_3f"),
                    ("place", "pokemon_mansion_b1f"), ("gym", "cinnabar"), ("step", 77), ("step", 78), ("place", "route_21")]),
     ("To GIOVANNI", [("gym", "viridian")]),
-    ("The LEAGUE", [("step", 80), ("step", 81), ("step", 82), ("place", "victory_road_1f"), ("place", "victory_road_2f"), ("place", "victory_road_3f"),
+    ("The LEAGUE", [("step", 80), ("step", 81), ("step", 82), ("place", "route_23"), ("place", "victory_road_1f"), ("place", "victory_road_2f"), ("place", "victory_road_3f"),
                     ("step", 83), ("place", "loreleis_room"), ("place", "brunos_room"), ("place", "agathas_room"), ("place", "lances_room"), ("step", 84),
                     ("step", 85)]),
     ("After the LEAGUE", [("step", 86), ("place", "cerulean_cave_1f"), ("place", "cerulean_cave_2f"), ("place", "cerulean_cave_b1f"), ("step", 87)]),
@@ -338,20 +389,20 @@ def main():
     first, last = 6, 5 + n
     # Above the table: what it is, and how far you've got.
     ws.append(["Kanto in FireRed's order, place by place. Tick DONE as you check each row; set WORKS? and add notes where it doesn't."])
-    ws.append(["Done", "=COUNTIF(I%d:I%d,TRUE)" % (first, last), "of", n, "Works", '=COUNTIF(J%d:J%d,"Works")' % (first, last), "Wrong",
+    ws.append(["Done", "=COUNTIF(B%d:B%d,TRUE)" % (first, last), "of", n, "Works", '=COUNTIF(J%d:J%d,"Works")' % (first, last), "Wrong",
                '=COUNTIF(J%d:J%d,"Wrong")' % (first, last), "Missing", '=COUNTIF(J%d:J%d,"Missing")' % (first, last)])
-    ws.append(["Retromon now is read from the mod's code at 0.71. Picker step: the EVENT PICKER's step (OPTION) to jump there."])
+    ws.append(["Retromon now is read from the mod's code at 0.72. Not placed yet: there once you put it down with the PLACER (OPTION). Picker step: the EVENT PICKER's step (OPTION) to jump there."])
     ws.append([])
-    ws.append(["#", "Leg", "Where", "Kind", "What happens", "Check that", "Retromon now", "Picker step", "Done", "Works?", "Your notes"])
+    ws.append(["#", "Done", "Leg", "Where", "Kind", "What happens", "Check that", "Retromon now", "Picker step", "Works?", "Your notes"])
     for i, (leg, wh, k, do, check, now, st) in enumerate(rows, 1):
-        ws.append([i, leg, wh, k, do, check, now, st, False, None, None])
+        ws.append([i, False, leg, wh, k, do, check, now, st, None, None])
     for c in ws[5]:
         c.font = Font(bold=True)
         c.fill = PatternFill("solid", fgColor="F3F3F3")
     ws["A1"].font = Font(bold=True, size=12)
     for c in ws[2]: c.font = Font(bold=True)
     for row in ws.iter_rows(min_row=first):
-        for c in (row[4], row[5], row[10]): c.alignment = Alignment(wrap_text=True, vertical="top")
+        for c in (row[5], row[6], row[10]): c.alignment = Alignment(wrap_text=True, vertical="top")
     ws.freeze_panes = "A6"
     wb.save(sys.argv[1])
     kinds, nows = {}, {}
