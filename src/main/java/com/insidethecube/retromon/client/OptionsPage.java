@@ -19,7 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 public final class OptionsPage {
 	public static final String[] LABELS = {"TEXT SPEED", "MUSIC", "SOUND", "POKéDEX VOICE", "NIGHTS", "WILD POKéMON", "BATTLE EFFECTS", "BATTLE STYLE", "WALK WITH YOU",
 			"POKéMON LOOK", "SHADERS", "DAY AND NIGHT", "BATTLES", "FAST TRAVEL", "PHOTO MODE",
-			"PARTY PICKER", "EVENT PICKER", "CONTROLS"};
+			"PARTY PICKER", "EVENT PICKER", "PLACER", "CONTROLS"};
 	private static final String[] LINES = {"How quickly words appear in text boxes.", "How loud the music plays.", "How loud cries, steps and menu sounds are.",
 			"Whether the POKéDEX reads its entries out loud.", "How dark nights get outside.", "Whether wild POKéMON show in the grass, or jump out at you.",
 			"Whether moves play their animations in battle.", "SWITCH asks if you want to change POKéMON when a trainer's sends out the next one.",
@@ -31,12 +31,13 @@ public final class OptionsPage {
 			"ON: the camera leaves you, for high shots of the map (F6 too). WASD move, SPACE/CTRL up and down, Q/E turn, R/F tilt, the wheel zooms, Z/X the lens, P takes a 2K picture.",
 			"For videos: your party as it would be at any point in KANTO (after BROCK, after MISTY...), or your own pick. Your own party is kept aside. In game only.",
 			"For videos: go to any step of KANTO's story, just before it or into it, with the badges, items and a party for that point. Your own game is kept aside. In game only.",
+			"Put FireRed's trainers, people, items, hidden items and boulders down where they go on the map: stand on the spot, face its way, place it. For whoever runs the game.",
 			"See every key: what it does in game, and what's turned off."};
 	private static final String[][] VALUES = {{"SLOW", "MID", "FAST"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "LOW", "MID", "HIGH", "MAX"}, {"OFF", "ON"},
-			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"ON", "OFF"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {"ON", "OFF"}, {"ON", "OFF"}, {"OFF", "ON"}, {"OFF", "ON"}, {}, {}, {}};
+			{"DARK", "SOFT", "BRIGHT"}, {"HIDDEN", "SEEN"}, {"ON", "OFF"}, {"SWITCH", "SET"}, {"OFF", "ON"}, {"COBBLEMON", "RETROMON"}, {"OFF", "RETROMON"}, {"ON", "OFF"}, {"ON", "OFF"}, {"OFF", "ON"}, {"OFF", "ON"}, {}, {}, {}, {}};
 	public int row;
-	/** Opens the key map (from CONTROLS), the PARTY PICKER and the EVENT PICKER (null: not in a game). */
-	private final Runnable keymap, picker, events;
+	/** Opens the key map (from CONTROLS), the PARTY PICKER, the EVENT PICKER and the PLACER (null: not in a game). */
+	private final Runnable keymap, picker, events, placer;
 
 	public OptionsPage(Runnable keymap) {
 		this(keymap, null);
@@ -47,15 +48,20 @@ public final class OptionsPage {
 	}
 
 	public OptionsPage(Runnable keymap, Runnable picker, Runnable events) {
+		this(keymap, picker, events, null);
+	}
+
+	public OptionsPage(Runnable keymap, Runnable picker, Runnable events, Runnable placer) {
 		this.keymap = keymap;
 		this.picker = picker;
 		this.events = events;
+		this.placer = placer;
 	}
 
 	private static int[] now() {
 		return new int[] {ClientState.data.textSpeed, Music.level(), Settings.sound(), Settings.voice() ? 1 : 0, Settings.nights(), Settings.seen() ? 1 : 0,
 				Settings.effects() ? 0 : 1, Settings.switchStyle() ? 0 : 1, Settings.follower() ? 1 : 0, Settings.look(), Settings.shaderMode(), Settings.cycle() ? 0 : 1,
-				Settings.battles() ? 0 : 1, Settings.fastTravel() ? 1 : 0, Photo.on ? 1 : 0, 0, 0, 0};
+				Settings.battles() ? 0 : 1, Settings.fastTravel() ? 1 : 0, Photo.on ? 1 : 0, 0, 0, 0, 0};
 	}
 
 	private static boolean online() {
@@ -118,6 +124,11 @@ public final class OptionsPage {
 			case 16 -> {
 				Sounds.press();
 				if (events != null && online()) events.run();
+				return;
+			}
+			case 17 -> {
+				Sounds.press();
+				if (placer != null && online()) placer.run();
 				return;
 			}
 			default -> {

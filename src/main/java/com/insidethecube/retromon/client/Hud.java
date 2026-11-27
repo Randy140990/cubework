@@ -494,6 +494,8 @@ public final class Hud {
 			String far = goalDistance(mc);
 			if (far != null) V.right(g, far, x + w - 18, V.capsTop(cy, 16), 16, V.MUTED, true);
 		}
+		// (0.72) WALK AND PLACE: what you're putting down.
+		PlacerScreen.hud(g);
 	}
 
 	/** What to do next in the story, as far as it goes yet. */

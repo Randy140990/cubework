@@ -32,6 +32,9 @@ public final class ClientState {
 	private static int battleNpc = -1;
 	/** The place you're in: its name for the banner, and how long the banner's been up. */
 	public static String placeName = "";
+	/** (0.72) The PLACER's: each one down (mine, mod or gone), and the file John's are saved in. */
+	public static final java.util.Map<String, String> placed = new java.util.HashMap<>();
+	public static String placerFile = "";
 	/** On a SAFARI GAME (15:29): steps and SAFARI BALLs left (steps -1: not on one). */
 	public static int safariSteps = -1, safariBalls = 0;
 	public static int placeTicks = -1;
@@ -105,6 +108,15 @@ public final class ClientState {
 				if (mc.screen instanceof SlotsScreen sl) sl.result(t);
 			}
 			case "pc_open" -> mc.setScreen(new PcScreen());
+			// (0.72) What the PLACER has down, and where it's saved.
+			case "placer" -> {
+				placed.clear();
+				for (net.minecraft.nbt.Tag e : t.getListOrEmpty("placed")) {
+					if (!(e instanceof CompoundTag o)) continue;
+					placed.put(o.getStringOr("key", ""), o.getStringOr("state", "mod"));
+				}
+				placerFile = t.getStringOr("file", "");
+			}
 			case "release" -> {
 				// Someone who was coming over won't now (you went through a door): you can move again.
 				Adventure.frozen = 0;

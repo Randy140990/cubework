@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class KeyboardHandlerMixin {
 	@Inject(method = "keyPress", at = @At("HEAD"), cancellable = true, require = 0)
 	private void retromon$onlyOurs(long window, int action, KeyEvent event, CallbackInfo ci) {
-		if (com.insidethecube.retromon.client.Photo.key(event, action) || Adventure.menuKey(event, action) || Adventure.blocks(event)) ci.cancel();
+		if (com.insidethecube.retromon.client.Photo.key(event, action) || com.insidethecube.retromon.client.PlacerScreen.fieldKey(event, action)
+				|| Adventure.menuKey(event, action) || Adventure.blocks(event)) ci.cancel();
 	}
 }

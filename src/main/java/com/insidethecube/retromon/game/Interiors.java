@@ -786,6 +786,13 @@ public final class Interiors {
 	private static final int MOONLIGHT = 6;
 
 	private static void ball(ServerLevel level, Room r, Ball b) {
+		// ((0.72) Or where John's moved it with the PLACER; taken away, it isn't put down.)
+		if (Placer.gone(b.key())) return;
+		double[] at = Placer.roomSpot(r.id(), b.key());
+		if (at != null && !Double.isNaN(at[1])) {
+			Game.placeMon(level, "poke_ball", "item:" + b.key(), r.ox() + at[0], r.oy() + at[1], r.oz() + at[2], 0F);
+			return;
+		}
 		Game.placeMon(level, "poke_ball", "item:" + b.key(), r.ox() + b.x(), r.oy() + b.y(), r.oz() + b.z(), 0F);
 	}
 
@@ -866,7 +873,11 @@ public final class Interiors {
 		int role = "nurse".equals(p.role()) ? Npc.NURSE : "clerk".equals(p.role()) ? Npc.CLERK : "trainer".equals(p.role()) ? Npc.TRAINER
 				: "leader".equals(p.role()) ? Npc.LEADER : Npc.PERSON;
 		try {
-			Npc n = Game.place(level, role, p.key(), r.ox() + p.x(), r.oy() + p.y(), r.oz() + p.z(), p.yaw());
+			// ((0.72) Or where John's moved them with the PLACER; taken away, they aren't there.)
+			if (Placer.gone(p.key())) return;
+			double[] ps = Placer.roomSpot(r.id(), p.key());
+			Npc n = ps != null && !Double.isNaN(ps[1]) ? Game.place(level, role, p.key(), r.ox() + ps[0], r.oy() + ps[1], r.oz() + ps[2], (float) ps[3])
+					: Game.place(level, role, p.key(), r.ox() + p.x(), r.oy() + p.y(), r.oz() + p.z(), p.yaw());
 			if (n != null) {
 				n.setCustomName(net.minecraft.network.chat.Component.literal(p.name()));
 				if (p.seated()) n.setSeated(true);

@@ -45,6 +45,8 @@ public class MenuScreen extends DeviceScreen {
 		if (minecraft != null) minecraft.setScreen(new PartyPickerScreen(this));
 	}, () -> {
 		if (minecraft != null) minecraft.setScreen(new EventPickerScreen(this));
+	}, () -> {
+		if (minecraft != null) minecraft.setScreen(new PlacerScreen(this));
 	});
 	/** The menu's rows: 0 your partner's emblem, 1 the five tiles, 2 the five pills. */
 	private int menuRow = 1;
@@ -226,7 +228,7 @@ public class MenuScreen extends DeviceScreen {
 			return;
 		}
 		// ((0.71) The COIN CASE shows your coins; the TEACHY TV plays its lesson.)
-		if (it.repelSteps() > 0 || it.id().equals("escape_rope") || it.id().equals("coin_case") || it.id().equals("teachy_tv")) {
+		if (it.repelSteps() > 0 || it.id().equals("escape_rope") || it.id().equals("coin_case") || it.id().equals("teachy_tv") || it.id().equals("itemfinder")) {
 			use(it.id(), -1);
 			return;
 		}

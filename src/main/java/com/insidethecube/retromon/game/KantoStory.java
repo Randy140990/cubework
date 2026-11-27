@@ -866,6 +866,11 @@ public final class KantoStory {
 	public static boolean useItem(ServerPlayer p, String item) {
 		PlayerData d = data(p);
 		switch (item) {
+			case "itemfinder" -> {
+				// (0.72) Whether one of FireRed's hidden items is near, and which way.
+				Placer.itemfinder(p);
+				return true;
+			}
 			case "coin_case" -> {
 				Game.message(p, List.of("Your COINS: " + d.coins + "."));
 				return true;

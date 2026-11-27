@@ -528,6 +528,13 @@ public final class Adventure {
 				return;
 			}
 		}
+		// ((0.72) Nothing in front of you: the server looks for one of FireRed's hidden items there.)
+		CompoundTag t = new CompoundTag();
+		t.putBoolean("hidden", true);
+		t.putDouble("hx", mc.player.getX() + look.x * 1.2);
+		t.putDouble("hy", mc.player.getY());
+		t.putDouble("hz", mc.player.getZ() + look.z * 1.2);
+		ClientPlayNetworking.send(new Net.Act("read", t));
 	}
 
 	/** Which way to walk for the keys held: screen up is north. Returns the yaw, or NaN. */

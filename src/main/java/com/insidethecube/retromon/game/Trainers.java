@@ -81,6 +81,10 @@ public final class Trainers {
 	public record FieldItem(String key, String place, String item, int x, int y) {}
 
 	public static final Map<String, FieldItem> FIELD_ITEMS = new LinkedHashMap<>();
+	/** (0.72) FireRed's own (trainers and items the mod hadn't): only there where the PLACER has put them. */
+	public static final java.util.Set<String> FR_ONLY = new java.util.HashSet<>();
+	/** (0.72) FireRed's hidden items: found with A (or the ITEMFINDER), never lying in a ball. */
+	public static final java.util.Set<String> HIDDEN = new java.util.HashSet<>();
 
 	public static List<Person> peopleIn(String place) {
 		return PEOPLE.values().stream().filter(p -> p.place().equals(place)).toList();
@@ -133,6 +137,32 @@ public final class Trainers {
 			// The Power Plant's "items" that are really VOLTORB and ELECTRODE stay as they are in the statics.
 			if (Species.ALL.containsKey(r[2])) continue;
 			FIELD_ITEMS.put(r[0], new FieldItem(r[0], r[1], r[2], num(r, 3), num(r, 4)));
+		}
+		// (0.72) FireRed's trainers the mod hadn't (outside, for the PLACER to put down), with FireRed's teams and words.
+		for (String[] r : Species.table("fr_trainers.tsv")) {
+			if (r.length < 14 || ALL.containsKey(r[0])) continue;
+			List<Member> team = new ArrayList<>();
+			for (String m : r[7].split(",")) {
+				String[] p = m.split(":");
+				if (p.length == 2 && Species.ALL.containsKey(p[0])) team.add(new Member(p[0], Integer.parseInt(p[1])));
+			}
+			if (team.isEmpty()) continue;
+			try {
+				ALL.put(r[0], new Trainer(r[0], r[1], r[2], r[3], r[4], Integer.parseInt(r[5]), Integer.parseInt(r[6]), List.copyOf(team), null, lines(r[9]),
+						lines(r[10]), lines(r[11])));
+				POS.put(r[0], new int[] {num(r, 12), num(r, 13)});
+				FR_ONLY.add(r[0]);
+			} catch (NumberFormatException ignored) {}
+		}
+		// (0.72) FireRed's item balls and hidden items (placeables.tsv): those the mod hadn't, so picking one up (or finding
+		// it) gives what FireRed has there. They're only put down where they've been placed.
+		for (String[] r : Species.table("placeables.tsv")) {
+			if (r.length < 10 || !(r[2].equals("item") || r[2].equals("hidden"))) continue;
+			if (r[2].equals("hidden")) HIDDEN.add(r[3]);
+			if (FIELD_ITEMS.containsKey(r[3]) || !r[5].startsWith("item=")) continue;
+			String item = r[5].substring(5).split(" ")[0];
+			FIELD_ITEMS.put(r[3], new FieldItem(r[3], r[1], item, num(r, 6), num(r, 7)));
+			FR_ONLY.add(r[3]);
 		}
 		for (String[] r : Species.table("statics.tsv")) {
 			if (Species.ALL.containsKey(r[1])) STATICS.put(r[0], new Static(r[0], r[1], Integer.parseInt(r[2]), r[3], r[4], r[5]));

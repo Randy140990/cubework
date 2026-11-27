@@ -913,6 +913,8 @@ public final class Game {
 
 	static boolean settle(Npc n) {
 		if (!ourSave || n.role() == Npc.LEADER || n.key().startsWith("rival") || n.swimming() || !(n.level() instanceof ServerLevel level)) return true;
+		// ((0.72) Put down by John with the PLACER: right where he put them.)
+		if (Placer.placed(n.key())) return true;
 		BlockPos at = n.blockPosition();
 		Zone zone = zoneAt(at.getX(), at.getZ());
 		if (zone == null) return true;
@@ -1141,11 +1143,14 @@ public final class Game {
 		Net.send(p, "room", t);
 		// (0.71) The story's own in here (MR. FUJI at home, your rival on SILPH CO.'s 7F, JESSIE and JAMES), and FLASH.
 		KantoStory.roomEntered(p, r, banner);
+		// (0.72) Its boulders where they start (STRENGTH), its rocks in the way.
+		Boulders.entered(p, r);
 	}
 
 	/** Back outside: the place's own music again, and its name back on the pill (without its banner). */
 	public static void roomLeft(ServerPlayer p) {
 		KantoStory.roomLeft(p);
+		Boulders.left(p);
 		Places.Place pl = Places.get(data(p).place);
 		CompoundTag t = new CompoundTag();
 		t.putString("name", "");
@@ -1176,6 +1181,8 @@ public final class Game {
 		if (ourSave && s.getTickCount() % 40 == 0) Mailbox.place(s.overworld());
 		// (0.57) John's small fixes to his map (the DARK CAVE's Route 46 way in a block higher).
 		if (ourSave && s.getTickCount() % 40 == 20) MapFixes.tick(s);
+		// (0.72) What John's PLACER has put down (FireRed's trainers, people, items), there near each player.
+		if (ourSave && s.getTickCount() % 40 == 30) Placer.tick(s);
 		// (0.59.4) The POKéMON that are part of the scenery (Fuchsia's ponds, the SAFARI ZONE's way in).
 		if (ourSave) Scenery.tick(s);
 		// (0.61) The DAY CARE's POKéMON wandering about their pen.
@@ -1211,6 +1218,8 @@ public final class Game {
 			if (Interiors.tick(p)) continue;
 			// Inside a building, the outside's checks (its places, Oak at the town's edge, grass, trainers' sight) don't apply.
 			boolean inside = Interiors.in(p);
+			// (0.72) STRENGTH's boulders: you can't walk through one, and push it with STRENGTH on.
+			if (inside && !Battles.in(p)) Boulders.tick(p);
 			if (!inside && s.getTickCount() % 2 == 0) enter(p, placeNear(p.getX(), p.getZ()));
 			if (!inside && !data(p).started && !BUSY.containsKey(id)) oakStops(p);
 			if (!inside && s.getTickCount() % 2 == 0 && !BUSY.containsKey(id)) gymShut(p);
@@ -1581,6 +1590,12 @@ public final class Game {
 	/** A: reading a sign (or a shelf standing in for one): the words of the games' sign nearest that spot. */
 	public static void read(ServerPlayer p, CompoundTag t) {
 		int bx = t.getIntOr("x", p.getBlockX()), bz = t.getIntOr("z", p.getBlockZ());
+		if (t.getBooleanOr("hidden", false)) {
+			// (0.72) A in front of nothing: one of FireRed's hidden items there, found once.
+			if (!Battles.in(p) && !BUSY.containsKey(p.getUUID()))
+				Placer.hidden(p, t.getDoubleOr("hx", p.getX()), t.getDoubleOr("hy", p.getY()), t.getDoubleOr("hz", p.getZ()));
+			return;
+		}
 		if (t.getBooleanOr("water", false)) {
 			// (0.61) Facing the water: SURF, if one of your team can.
 			Surf.ask(p);
@@ -2528,6 +2543,10 @@ public final class Game {
 		// ahead, as many of its steps as their sight, in a line as wide as a step, and nothing to the side or behind; and
 		// anywhere along the way you've come since they last looked (you can't run past them unseen).
 		double[] tile = Interiors.tileOf(n);
+		// ((0.72, John's 18:24: "more normally like 5 either side depending on which way they're facing ... some of them
+		// you can bypass") Outside, one put down with the PLACER sees as FireRed's do: straight ahead, their sight in
+		// steps (two blocks each on John's map), a step wide; walk past beside or behind them and they don't.)
+		if (tile == null && !Interiors.in(n) && Placer.placed(n.key())) tile = new double[] {2, 2};
 		if (tile != null) {
 			double yaw = Math.toRadians(n.facing());
 			double fx = -Math.sin(yaw), fz = Math.cos(yaw);
@@ -4088,6 +4107,8 @@ public final class Game {
 			return;
 		}
 		if (key.startsWith("wild:")) return;
+		// (0.72) STRENGTH's boulders and the rocks in the way.
+		if (Boulders.talk(p, w)) return;
 		// (0.71) BILL, mixed up with a CLEFAIRY (FireRed's).
 		if (KantoStory.talkMon(p, w)) return;
 		// (0.67) One of the farm's or a pet: its sound, and what it's like (never battled).
@@ -4226,6 +4247,10 @@ public final class Game {
 		PlayerData d = data(p);
 		// (0.71) The story's questions: MR. FUJI's way home, BILL's TELEPORTER, the GAME CORNER's coins and prizes, FLASH.
 		if (KantoStory.answer(p, mode, t, n)) return;
+		if (mode.equals("strength")) {
+			Boulders.strength(p, t.getBooleanOr("answered", false) ? t.getIntOr("choice", 1) == 0 : yes);
+			return;
+		}
 		switch (mode) {
 			case "quiz" -> {
 				int q = t.getIntOr("q", -1);
@@ -5386,6 +5411,8 @@ public final class Game {
 			String key = (String) o[0], doneKey = "itemspot3:" + key;
 			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
 			if (done.contains(doneKey) || !Trainers.FIELD_ITEMS.containsKey(key)) continue;
+			// ((0.72) One the PLACER has: where John's put it.)
+			if (Placer.spot(key) != null) continue;
 			if (!level.hasChunkAt(BlockPos.containing(x, y, z))) continue;
 			// (A copy the grid put down somewhere else, as on Route 2 by its gate, or one off its spot: taken away; 14:18.)
 			net.minecraft.world.phys.AABB wide = new net.minecraft.world.phys.AABB(x - 120, level.getMinY(), z - 120, x + 120, level.getMaxY(), z + 120);
@@ -5445,6 +5472,8 @@ public final class Game {
 	static boolean notOutsideYet(String key) {
 		if (key == null || key.startsWith("rival") || key.startsWith("rocket") || key.equals("pewter_city_aide")) return false;
 		if (key.startsWith("pet:")) key = key.substring(4);
+		// ((0.72) One John's put down with the PLACER stays where he put them.)
+		if (Placer.placed(key)) return false;
 		Trainers.Trainer t = Trainers.get(key);
 		Trainers.Person ps = t == null ? Trainers.PEOPLE.get(key) : null;
 		String pl = t != null ? t.place() : ps != null ? ps.place() : null;
@@ -5479,6 +5508,7 @@ public final class Game {
 		for (Trainers.Trainer t : people ? Trainers.in(place) : List.<Trainers.Trainer>of()) {
 			int[] own = trainerSpot(t.key());
 			if (ownOnly && own == null) continue;
+			if (Placer.spot(t.key()) != null || Trainers.FR_ONLY.contains(t.key())) continue;
 			boolean swims = swimmer(t);
 			BlockPos at = swims ? seaSpot(level, z, size, Trainers.POS.get(t.key()))
 					: own != null ? (level.hasChunkAt(new BlockPos(own[0], START_Y, own[1])) ? spot(level, own[0], own[1], 4) : null)
@@ -5496,6 +5526,7 @@ public final class Game {
 			if (ps.key().equals("cerulean_city_p0") || ps.key().equals("cerulean_city_p8")) continue;
 			int[] own = spotOf(ps.key());
 			if (ownOnly && own == null) continue;
+			if (Placer.spot(ps.key()) != null) continue;
 			BlockPos at = own != null ? (level.hasChunkAt(new BlockPos(own[0], START_Y, own[1])) ? spot(level, own[0], own[1], 6) : null) : gameSpot(level, z, size, Trainers.POS.get(ps.key()));
 			if (at == null) continue;
 			String sp = ps.species();
@@ -5511,6 +5542,8 @@ public final class Game {
 		for (Trainers.FieldItem fi : Trainers.itemsIn(place)) {
 			if (ownOnly) break;
 			if (present.contains("item:" + fi.key()) || takenByAnyone("item:" + fi.key()) || itemSpot(fi.key()) || java.util.Arrays.asList(GONE_ITEMS).contains(fi.key())) continue;
+			// ((0.72) FireRed's own, its hidden ones, and any the PLACER has put down or taken away: the PLACER's.)
+			if (Trainers.FR_ONLY.contains(fi.key()) || Trainers.HIDDEN.contains(fi.key()) || Placer.spot(fi.key()) != null) continue;
 			BlockPos at = gameSpot(level, z, size, new int[] {fi.x(), fi.y()});
 			if (at == null) continue;
 			placeMon(level, "poke_ball", "item:" + fi.key(), at.getX() + 0.5, at.getY(), at.getZ() + 0.5, 0F);
