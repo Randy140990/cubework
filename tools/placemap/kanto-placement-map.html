@@ -1,0 +1,258 @@
+<title>Kanto Placement Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a working map tool. The map fills the left; the routes, the filters and the one you picked sit on the right (below on a phone). */
+:root {
+  --bg: #f3f5f2; --panel: #ffffff; --ink: #1d2a24; --muted: #5d6c64; --line: #dde3de; --soft: #eef2ee;
+  --accent: #2f7d5b; --accent-ink: #ffffff;
+  --trainer: #d9434f; --person: #3a78d6; --item: #e3a21a; --hidden: #8b5cd6; --obstacle: #6f7a73;
+  --sure: #2f8f5c; --check: #c9791a; --sight: rgba(217, 67, 79, 0.34); --sight-edge: rgba(217, 67, 79, 0.9);
+  --map-bg: #3d6fae;
+  --f-head: "Space Grotesk", "Segoe UI", system-ui, sans-serif; --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121815; --panel: #1b231f; --ink: #e5ece8; --muted: #9caba3; --line: #2c3832; --soft: #232d28;
+  --accent: #5fbf8f; --accent-ink: #0f1a14; --sure: #5fbf8f; --check: #e7a24a; --map-bg: #1f3a5c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121815; --panel: #1b231f; --ink: #e5ece8; --muted: #9caba3; --line: #2c3832; --soft: #232d28;
+  --accent: #5fbf8f; --accent-ink: #0f1a14; --sure: #5fbf8f; --check: #e7a24a; --map-bg: #1f3a5c; color-scheme: dark }
+* { box-sizing: border-box }
+html, body { height: 100% }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.45; display: flex; flex-direction: column;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px }
+h1 { font-family: var(--f-head); font-size: 22px; margin: 0; letter-spacing: -0.01em; text-wrap: balance }
+.top { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: baseline; padding-bottom: 10px }
+.top p { margin: 0; color: var(--muted); max-width: 70ch }
+.stats { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto }
+.stat { font-variant-numeric: tabular-nums; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-weight: 600; font-size: 12.5px; white-space: nowrap }
+.stat b { font-weight: 700 }
+.app { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 12px }
+.mapwrap { position: relative; min-height: 0; border-radius: 12px; overflow: hidden; background: var(--map-bg); border: 1px solid var(--line); touch-action: none; cursor: grab }
+.mapwrap.drag { cursor: grabbing }
+.stage { position: absolute; left: 0; top: 0; transform-origin: 0 0 }
+.stage img { display: block; image-rendering: pixelated; max-width: none; user-select: none; -webkit-user-drag: none }
+.stage svg { position: absolute; left: 0; top: 0; overflow: visible }
+.ctl { position: absolute; right: 10px; top: 10px; display: grid; gap: 6px; z-index: 2 }
+.ctl button, .chip, .rbtn { font: inherit; font-weight: 600; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 9px; cursor: pointer }
+.ctl button { width: 36px; height: 36px; font-size: 18px; line-height: 1 }
+.ctl button:focus-visible, .chip:focus-visible, .rbtn:focus-visible, .route:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.legend { position: absolute; left: 10px; bottom: 10px; z-index: 2; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; max-width: calc(100% - 20px) }
+.legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none }
+.side { min-height: 0; display: flex; flex-direction: column; gap: 10px }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px }
+.filters { display: flex; flex-wrap: wrap; gap: 6px }
+.chip { padding: 4px 10px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 6px }
+.chip[aria-pressed="false"] { opacity: 0.45 }
+.search { width: 100%; font: inherit; padding: 7px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--soft); color: var(--ink); margin-top: 8px }
+.routes { flex: 1; min-height: 140px; overflow: auto; padding: 4px }
+.route { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; padding: 7px 9px; border-radius: 9px; cursor: pointer; border: 1px solid transparent }
+.route:hover { background: var(--soft) }
+.route.on { border-color: var(--accent); background: var(--soft) }
+.route .nm { font-weight: 700; font-family: var(--f-head); font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.route .ct { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; grid-column: 1 / -1 }
+.badge { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; align-self: center; white-space: nowrap }
+.badge.sure { color: var(--sure); border: 1px solid var(--sure) }
+.badge.check { color: var(--check); border: 1px solid var(--check) }
+.detail h2 { font-family: var(--f-head); font-size: 18px; margin: 4px 0 2px; text-wrap: balance }
+.detail .kind { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-ink); padding: 2px 8px; border-radius: 999px; display: inline-block }
+.detail dl { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 5px 10px; margin: 10px 0 0 }
+.detail dt { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 1px }
+.detail dd { margin: 0; min-width: 0; overflow-wrap: anywhere }
+.mono { font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums }
+.mons { display: flex; flex-wrap: wrap; gap: 4px }
+.mon { background: var(--soft); border-radius: 7px; padding: 2px 7px; font-weight: 600; font-size: 12.5px }
+.rbtn { padding: 5px 10px; font-size: 12.5px; margin-top: 10px }
+.empty { color: var(--muted) }
+.note { color: var(--muted); font-size: 12.5px; margin: 8px 0 0 }
+.warn { color: var(--check); font-weight: 600 }
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 62vh auto }
+  html, body { height: auto }
+  .routes { max-height: 50vh }
+  .stats { margin-left: 0 }
+}
+@media (prefers-reduced-motion: reduce) { .stage { transition: none !important } }
+</style>
+
+<div class="top">
+  <h1>Kanto Placement Map</h1>
+  <p>FireRed's outside trainers, people and items, put on your map at FireRed's own spots. Click one to see its team, its sight and the block it stands on.</p>
+  <div class="stats" id="stats"></div>
+</div>
+<div class="app">
+  <div class="mapwrap" id="map" aria-label="Map of Kanto">
+    <div class="stage" id="stage"><img id="img" src="kanto.png" alt="Your Kanto from above, one pixel a block"><svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div class="ctl"><button id="zin" title="Zoom in" aria-label="Zoom in">+</button><button id="zout" title="Zoom out" aria-label="Zoom out">&minus;</button><button id="zfit" title="Whole of Kanto" aria-label="Whole of Kanto">&#8962;</button></div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="side">
+    <div class="card">
+      <div class="filters" id="filters"></div>
+      <input class="search" id="q" type="search" placeholder="Search: a name, a POKéMON, an item" aria-label="Search">
+    </div>
+    <div class="card detail" id="detail"><p class="empty">Pick a route on the list, or click a marker on the map.</p></div>
+    <div class="card routes" id="routes" role="list"></div>
+  </div>
+</div>
+
+<script>
+const KINDS = [
+  ["trainer", "Trainers", "--trainer"], ["person", "People", "--person"], ["item", "Item balls", "--item"],
+  ["hidden", "Hidden items", "--hidden"], ["obstacle", "CUT trees and rocks", "--obstacle"]];
+const DIRWORD = { up: "north", down: "south", left: "west", right: "east" };
+const ON = { ground: "ground", water: "water (a SWIMMER)", tree: "a tree: check this one", built: "paving or a building edge" };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let D = null, B = null, show = { trainer: true, person: true, item: true, hidden: true, obstacle: false }, picked = null, route = null, query = "";
+const map = document.getElementById("map"), stage = document.getElementById("stage"), svg = document.getElementById("svg"), img = document.getElementById("img");
+let view = { s: 1, x: 0, y: 0 };
+
+function apply() { stage.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.s})`; draw(); }
+function fitTo(x0, z0, x1, z1, pad = 1.15) {
+  const r = map.getBoundingClientRect(), w = (x1 - x0) * pad, h = (z1 - z0) * pad;
+  view.s = Math.min(r.width / w, r.height / h);
+  view.x = r.width / 2 - ((x0 + x1) / 2 - B[0]) * view.s; view.y = r.height / 2 - ((z0 + z1) / 2 - B[1]) * view.s; apply();
+}
+function zoom(f, cx, cy) {
+  const r = map.getBoundingClientRect(); cx = cx ?? r.width / 2; cy = cy ?? r.height / 2;
+  const ns = Math.max(0.4, Math.min(28, view.s * f)); f = ns / view.s;
+  view.x = cx - (cx - view.x) * f; view.y = cy - (cy - view.y) * f; view.s = ns; apply();
+}
+function visible(t) {
+  if (!show[t.k]) return false;
+  if (!query) return true;
+  return (t.l + " " + (t.d || "") + " " + (t.key || "") + " " + mapName(t.m)).toLowerCase().includes(query);
+}
+const MAPS = {};
+function mapName(id) { return MAPS[id] ? MAPS[id].name : id; }
+
+function draw() {
+  if (!D) return;
+  const s = view.s, r = Math.max(0.9, Math.min(2.4, 7 / s)), sw = Math.max(0.12, 1.2 / s);
+  const NS = "http://www.w3.org/2000/svg";
+  let h = "";
+  // The routes' edges: where each FireRed map lies on your map.
+  for (const m of D.maps) {
+    const on = route === m.id;
+    h += `<rect x="${m.x0}" y="${m.z0}" width="${m.x1 - m.x0}" height="${m.z1 - m.z0}" fill="none" stroke="${on ? css("--accent") : "rgba(255,255,255,0.55)"}" stroke-width="${(on ? 2.4 : 1) / s}" ${m.sure ? "" : `stroke-dasharray="${6 / s} ${4 / s}"`}/>`;
+  }
+  // Sight: the trainer you picked, and every trainer once you're in close.
+  for (const t of D.things) {
+    if (t.k !== "trainer" || !visible(t) || !t.s) continue;
+    if (!(t === picked || s > 3.2)) continue;
+    for (const f of t.f || ["down"]) {
+      const L = t.s * 2;
+      let x = t.x - 1, z = t.z - 1, w = 2, hh = 2;
+      if (f === "up") { z = t.z - 1 - L; hh = L; } else if (f === "down") { z = t.z + 1; hh = L; } else if (f === "left") { x = t.x - 1 - L; w = L; } else { x = t.x + 1; w = L; }
+      h += `<rect x="${x}" y="${z}" width="${w}" height="${hh}" fill="${css("--sight")}" stroke="${t === picked ? css("--sight-edge") : "none"}" stroke-width="${sw}"/>`;
+    }
+  }
+  D.things.forEach((t, i) => {
+    if (!visible(t)) return;
+    const col = css(KINDS.find(k => k[0] === t.k)[2]), sel = t === picked, rr = sel ? r * 1.5 : r;
+    if (t.k === "hidden") h += `<rect data-i="${i}" x="${t.x - rr * 0.8}" y="${t.z - rr * 0.8}" width="${rr * 1.6}" height="${rr * 1.6}" transform="rotate(45 ${t.x} ${t.z})" fill="${col}" stroke="#fff" stroke-width="${sw}"/>`;
+    else if (t.k === "obstacle") h += `<rect data-i="${i}" x="${t.x - rr * 0.8}" y="${t.z - rr * 0.8}" width="${rr * 1.6}" height="${rr * 1.6}" rx="${rr * 0.3}" fill="${col}" stroke="#fff" stroke-width="${sw}"/>`;
+    else h += `<circle data-i="${i}" cx="${t.x}" cy="${t.z}" r="${rr}" fill="${col}" stroke="${sel ? css("--ink") : "#fff"}" stroke-width="${sel ? sw * 2 : sw}"/>`;
+  });
+  svg.innerHTML = h;
+}
+
+function teamHtml(d) {
+  return `<div class="mons">${d.split(",").map(x => x.trim()).filter(Boolean).map(x => { const m = x.match(/^(.*) (\d+)$/); return `<span class="mon">${esc(m ? m[1] : x)}${m ? ` <span class="mono">Lv ${m[2]}</span>` : ""}</span>`; }).join("")}</div>`;
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function pick(t, center) {
+  picked = t; route = t.m;
+  const m = MAPS[t.m], k = KINDS.find(k => k[0] === t.k);
+  const ways = t.f ? (t.f.length === 4 ? "Looks all four ways (it turns about)" : "Faces " + t.f.map(f => DIRWORD[f]).join(" and ")) : "";
+  let rows = `<dt>Where</dt><dd>${esc(m.name)}, FireRed's step <span class="mono">${t.gx}, ${t.gy}</span></dd>`;
+  rows += `<dt>Block</dt><dd class="mono">x ${t.x}, y ${t.y}, z ${t.z}</dd>`;
+  if (t.k === "trainer") {
+    rows += `<dt>Team</dt><dd>${t.d ? teamHtml(t.d) : "<span class='empty'>-</span>"}</dd>`;
+    rows += `<dt>Sight</dt><dd>${t.s ? `Sees you ${t.s} step${t.s === 1 ? "" : "s"} ahead (${t.s * 2} blocks), a step wide` : "Only battles if you talk to them"}</dd>`;
+    rows += `<dt>Facing</dt><dd>${esc(ways)}</dd>`;
+  } else if (t.k === "person") {
+    if (t.d) rows += `<dt>Says</dt><dd>${esc(t.d)}</dd>`;
+    if (ways) rows += `<dt>Facing</dt><dd>${esc(ways)}</dd>`;
+  } else if (t.k === "item" || t.k === "hidden") rows += `<dt>Item</dt><dd>${esc(t.l)}${t.k === "hidden" ? " (hidden: A facing the spot finds it)" : " (in a POKé BALL)"}</dd>`;
+  rows += `<dt>On</dt><dd class="${t.on === "tree" ? "warn" : ""}">${esc(ON[t.on] || t.on)}</dd>`;
+  rows += `<dt>In the mod</dt><dd>${t.key ? `<span class="mono">${esc(t.key)}</span>` : t.k === "person" ? "FireRed's townsperson" : t.k === "obstacle" ? "Your build" : "<span class='empty'>-</span>"}</dd>`;
+  rows += `<dt>Map fit</dt><dd>${m.sure ? "<span class='badge sure'>Lined up</span>" : "<span class='badge check'>Check</span> this route could be a step out"}</dd>`;
+  document.getElementById("detail").innerHTML = `<span class="kind" style="background:${css(k[2])}">${esc(k[1].replace(/s$/, ""))}</span><h2>${esc(t.l)}</h2>${t.n ? `<p class="note">${esc(t.n)}</p>` : ""}<dl>${rows}</dl>
+    <button class="rbtn" id="copytp">Copy /tp to this spot</button> <span class="note" id="copied" aria-live="polite"></span>`;
+  document.getElementById("copytp").onclick = () => {
+    const txt = `/tp @s ${t.x} ${t.y} ${t.z}`, ok = () => (document.getElementById("copied").textContent = "Copied: " + txt);
+    try { navigator.clipboard.writeText(txt).then(ok, () => (document.getElementById("copied").textContent = txt)); } catch (e) { document.getElementById("copied").textContent = txt; }
+  };
+  if (center) { const r = map.getBoundingClientRect(); if (view.s < 6) view.s = 6; view.x = r.width / 2 - (t.x - B[0]) * view.s; view.y = r.height / 2 - (t.z - B[1]) * view.s; apply(); }
+  else draw();
+  renderRoutes();
+}
+
+function renderRoutes() {
+  const el = document.getElementById("routes");
+  el.innerHTML = D.maps.map(m => {
+    const n = { trainer: 0, person: 0, item: 0, hidden: 0 };
+    for (const t of D.things) if (t.m === m.id && n[t.k] !== undefined && visible(t)) n[t.k]++;
+    const ct = [n.trainer && `${n.trainer} trainer${n.trainer === 1 ? "" : "s"}`, n.person && `${n.person} ${n.person === 1 ? "person" : "people"}`, n.item && `${n.item} item${n.item === 1 ? "" : "s"}`, n.hidden && `${n.hidden} hidden`].filter(Boolean).join(" · ") || "nothing here";
+    return `<div class="route${route === m.id ? " on" : ""}" role="listitem" tabindex="0" data-id="${m.id}"><span class="nm">${esc(m.name)}</span><span class="badge ${m.sure ? "sure" : "check"}">${m.sure ? "Lined up" : "Check"}</span><span class="ct">${ct}</span></div>`;
+  }).join("");
+  el.querySelectorAll(".route").forEach(r => {
+    const go = () => { const m = MAPS[r.dataset.id]; route = m.id; picked = null; listRoute(m); fitTo(m.x0, m.z0, m.x1, m.z1); renderRoutes(); };
+    r.onclick = go; r.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
+  });
+}
+
+function listRoute(m) {
+  const list = D.things.filter(t => t.m === m.id && visible(t));
+  const el = document.getElementById("detail");
+  el.innerHTML = `<span class="badge ${m.sure ? "sure" : "check"}">${m.sure ? "Lined up" : "Check"}</span><h2>${esc(m.name)}</h2>
+    <p class="note">${m.sure ? "FireRed's map matches your blocks here." : "Two spots a step apart match your blocks about as well here, so these could be a step out."} Click one to see it.</p>
+    <div style="display:grid;gap:4px;margin-top:8px">${list.map(t => `<button class="rbtn" style="margin:0;text-align:left;display:flex;gap:8px;align-items:center" data-i="${D.things.indexOf(t)}"><span class="dot" style="background:${css(KINDS.find(k => k[0] === t.k)[2])}"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.l)}</span>${t.k === "trainer" && t.d ? `<span class="mono" style="margin-left:auto;color:var(--muted)">Lv ${Math.max(...t.d.match(/\d+/g).map(Number))}</span>` : ""}</button>`).join("") || "<span class='empty'>Nothing shown here with these filters.</span>"}</div>`;
+  el.querySelectorAll("button[data-i]").forEach(b => b.onclick = () => pick(D.things[+b.dataset.i], true));
+}
+
+function setup() {
+  B = D.bounds;
+  for (const m of D.maps) MAPS[m.id] = m;
+  const W = B[2] - B[0], H = B[3] - B[1];
+  img.width = W; img.height = H;
+  svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", `${B[0]} ${B[1]} ${W} ${H}`);
+  const c = {}; for (const t of D.things) c[t.k] = (c[t.k] || 0) + 1;
+  const sure = D.maps.filter(m => m.sure).length;
+  document.getElementById("stats").innerHTML = `<span class="stat"><b>${c.trainer || 0}</b> trainers</span><span class="stat"><b>${c.person || 0}</b> people</span><span class="stat"><b>${c.item || 0}</b> item balls</span><span class="stat"><b>${c.hidden || 0}</b> hidden items</span><span class="stat"><b>${sure}</b> of ${D.maps.length} maps lined up</span>`;
+  document.getElementById("legend").innerHTML = KINDS.map(k => `<span><span class="dot" style="background:var(${k[2]})"></span>${k[1]}</span>`).join("") + `<span>Dashed edge: check that route</span>`;
+  const f = document.getElementById("filters");
+  f.innerHTML = KINDS.map(k => `<button class="chip" aria-pressed="${show[k[0]]}" data-k="${k[0]}"><span class="dot" style="background:var(${k[2]})"></span>${k[1]}</button>`).join("");
+  f.querySelectorAll(".chip").forEach(b => b.onclick = () => { show[b.dataset.k] = !show[b.dataset.k]; b.setAttribute("aria-pressed", show[b.dataset.k]); draw(); renderRoutes(); if (route && !picked) listRoute(MAPS[route]); });
+  document.getElementById("q").oninput = e => { query = e.target.value.trim().toLowerCase(); draw(); renderRoutes(); if (route && !picked) listRoute(MAPS[route]); };
+  renderRoutes();
+  fitTo(B[0], B[1], B[2], B[3], 1.02);
+}
+
+// Panning, zooming, and a click on a marker.
+let drag = null;
+map.addEventListener("pointerdown", e => { if (e.target.closest(".ctl,.legend")) return; drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false, id: e.pointerId }; map.setPointerCapture(e.pointerId); });
+map.addEventListener("pointermove", e => { if (!drag || drag.id !== e.pointerId) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; map.classList.add("drag"); } view.x = drag.vx + dx; view.y = drag.vy + dy; stage.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.s})`; });
+map.addEventListener("pointerup", e => {
+  if (!drag) return; const was = drag; drag = null; map.classList.remove("drag");
+  if (was.moved) { draw(); return; }
+  const r = map.getBoundingClientRect(), bx = (e.clientX - r.left - view.x) / view.s + B[0], bz = (e.clientY - r.top - view.y) / view.s + B[1];
+  let best = null, bd = Math.max(2.5, 10 / view.s);
+  for (const t of D.things) { if (!visible(t)) continue; const d = Math.hypot(t.x - bx, t.z - bz); if (d < bd) { bd = d; best = t; } }
+  if (best) pick(best, false);
+});
+map.addEventListener("wheel", e => { e.preventDefault(); const r = map.getBoundingClientRect(); zoom(e.deltaY < 0 ? 1.18 : 1 / 1.18, e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+document.getElementById("zin").onclick = () => zoom(1.5);
+document.getElementById("zout").onclick = () => zoom(1 / 1.5);
+document.getElementById("zfit").onclick = () => { route = null; picked = null; renderRoutes(); fitTo(B[0], B[1], B[2], B[3], 1.02); };
+window.addEventListener("resize", () => draw());
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => draw());
+
+fetch("placement.json").then(r => r.json()).then(j => { D = j; setup(); }).catch(() => {
+  document.getElementById("detail").innerHTML = "<p class='warn'>The placement data didn't load. Open the page again to retry.</p>";
+});
+</script>

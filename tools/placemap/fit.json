@@ -1,0 +1,362 @@
+{
+ "MAP_CELADON_CITY": {
+  "map": "CeladonCity",
+  "ox": -567,
+  "oz": 385,
+  "w": 60,
+  "h": 40,
+  "score": 0.592,
+  "next": 0.549,
+  "sure": true
+ },
+ "MAP_CERULEAN_CITY": {
+  "map": "CeruleanCity",
+  "ox": -399,
+  "oz": 225,
+  "w": 48,
+  "h": 40,
+  "score": 0.546,
+  "next": 0.509,
+  "sure": false
+ },
+ "MAP_CINNABAR_ISLAND": {
+  "map": "CinnabarIsland",
+  "ox": -810,
+  "oz": 907,
+  "w": 24,
+  "h": 20,
+  "score": 0.243,
+  "next": 0.234,
+  "sure": false
+ },
+ "MAP_FUCHSIA_CITY": {
+  "map": "FuchsiaCity",
+  "ox": -546,
+  "oz": 747,
+  "w": 48,
+  "h": 40,
+  "score": 0.451,
+  "next": 0.468,
+  "sure": false
+ },
+ "MAP_INDIGO_PLATEAU_EXTERIOR": {
+  "map": "IndigoPlateau_Exterior",
+  "ox": -937,
+  "oz": 135,
+  "w": 24,
+  "h": 20,
+  "score": 0.793,
+  "next": 0.792,
+  "sure": false
+ },
+ "MAP_LAVENDER_TOWN": {
+  "map": "LavenderTown",
+  "ox": -156,
+  "oz": 405,
+  "w": 24,
+  "h": 20,
+  "score": 0.595,
+  "next": 0.581,
+  "sure": false
+ },
+ "MAP_PALLET_TOWN": {
+  "map": "PalletTown",
+  "ox": -815,
+  "oz": 665,
+  "w": 24,
+  "h": 20,
+  "score": 0.76,
+  "next": 0.731,
+  "sure": false
+ },
+ "MAP_PEWTER_CITY": {
+  "map": "PewterCity",
+  "ox": -838,
+  "oz": 265,
+  "w": 48,
+  "h": 40,
+  "score": 0.69,
+  "next": 0.668,
+  "sure": false
+ },
+ "MAP_ROUTE1": {
+  "map": "Route1",
+  "ox": -814,
+  "oz": 585,
+  "w": 24,
+  "h": 40,
+  "score": 1.087,
+  "next": 0.932,
+  "sure": true
+ },
+ "MAP_ROUTE10": {
+  "map": "Route10",
+  "ox": -154,
+  "oz": 246,
+  "w": 24,
+  "h": 80,
+  "score": 0.788,
+  "next": 0.743,
+  "sure": true
+ },
+ "MAP_ROUTE11": {
+  "map": "Route11",
+  "ox": -301,
+  "oz": 565,
+  "w": 72,
+  "h": 20,
+  "score": 1.023,
+  "next": 0.995,
+  "sure": false
+ },
+ "MAP_ROUTE12": {
+  "map": "Route12",
+  "ox": -153,
+  "oz": 445,
+  "w": 24,
+  "h": 120,
+  "score": 0.403,
+  "next": 0.371,
+  "sure": false
+ },
+ "MAP_ROUTE13": {
+  "map": "Route13",
+  "ox": -251,
+  "oz": 687,
+  "w": 72,
+  "h": 20,
+  "score": 0.421,
+  "next": 0.416,
+  "sure": false
+ },
+ "MAP_ROUTE14": {
+  "map": "Route14",
+  "ox": -299,
+  "oz": 686,
+  "w": 24,
+  "h": 60,
+  "score": 0.772,
+  "next": 0.722,
+  "sure": true
+ },
+ "MAP_ROUTE15": {
+  "map": "Route15",
+  "ox": -447,
+  "oz": 766,
+  "w": 72,
+  "h": 20,
+  "score": 0.888,
+  "next": 0.888,
+  "sure": false
+ },
+ "MAP_ROUTE16": {
+  "map": "Route16",
+  "ox": -664,
+  "oz": 405,
+  "w": 48,
+  "h": 20,
+  "score": 0.832,
+  "next": 0.804,
+  "sure": false
+ },
+ "MAP_ROUTE17": {
+  "map": "Route17",
+  "ox": -663,
+  "oz": 438,
+  "w": 24,
+  "h": 160,
+  "score": 0.179,
+  "next": 0.176,
+  "sure": false
+ },
+ "MAP_ROUTE18": {
+  "map": "Route18",
+  "ox": -668,
+  "oz": 766,
+  "w": 60,
+  "h": 20,
+  "score": 0.375,
+  "next": 0.352,
+  "sure": false
+ },
+ "MAP_ROUTE19": {
+  "map": "Route19",
+  "ox": -521,
+  "oz": 828,
+  "w": 24,
+  "h": 60,
+  "score": 0.501,
+  "next": 0.493,
+  "sure": false
+ },
+ "MAP_ROUTE2": {
+  "map": "Route2",
+  "ox": -814,
+  "oz": 345,
+  "w": 24,
+  "h": 80,
+  "score": 0.982,
+  "next": 0.843,
+  "sure": true
+ },
+ "MAP_ROUTE20": {
+  "map": "Route20",
+  "ox": -763,
+  "oz": 905,
+  "w": 120,
+  "h": 20,
+  "score": 0.381,
+  "next": 0.364,
+  "sure": false
+ },
+ "MAP_ROUTE21_NORTH": {
+  "map": "Route21_North",
+  "ox": -814,
+  "oz": 705,
+  "w": 24,
+  "h": 50,
+  "score": 0.555,
+  "next": 0.503,
+  "sure": true
+ },
+ "MAP_ROUTE21_SOUTH": {
+  "map": "Route21_South",
+  "ox": -814,
+  "oz": 805,
+  "w": 24,
+  "h": 50,
+  "score": 0.376,
+  "next": 0.308,
+  "sure": false
+ },
+ "MAP_ROUTE22": {
+  "map": "Route22",
+  "ox": -934,
+  "oz": 525,
+  "w": 48,
+  "h": 24,
+  "score": 0.932,
+  "next": 0.874,
+  "sure": true
+ },
+ "MAP_ROUTE23": {
+  "map": "Route23",
+  "ox": -936,
+  "oz": 205,
+  "w": 24,
+  "h": 160,
+  "score": 0.753,
+  "next": 0.701,
+  "sure": true
+ },
+ "MAP_ROUTE24": {
+  "map": "Route24",
+  "ox": -372,
+  "oz": 143,
+  "w": 24,
+  "h": 40,
+  "score": 0.62,
+  "next": 0.603,
+  "sure": false
+ },
+ "MAP_ROUTE25": {
+  "map": "Route25",
+  "ox": -322,
+  "oz": 143,
+  "w": 72,
+  "h": 20,
+  "score": 0.595,
+  "next": 0.553,
+  "sure": true
+ },
+ "MAP_ROUTE3": {
+  "map": "Route3",
+  "ox": -746,
+  "oz": 285,
+  "w": 84,
+  "h": 20,
+  "score": 0.839,
+  "next": 0.83,
+  "sure": false
+ },
+ "MAP_ROUTE4": {
+  "map": "Route4",
+  "ox": -620,
+  "oz": 245,
+  "w": 108,
+  "h": 20,
+  "score": 0.77,
+  "next": 0.739,
+  "sure": true
+ },
+ "MAP_ROUTE5": {
+  "map": "Route5",
+  "ox": -399,
+  "oz": 306,
+  "w": 48,
+  "h": 40,
+  "score": 0.858,
+  "next": 0.831,
+  "sure": false
+ },
+ "MAP_ROUTE6": {
+  "map": "Route6",
+  "ox": -375,
+  "oz": 465,
+  "w": 24,
+  "h": 40,
+  "score": 0.866,
+  "next": 0.822,
+  "sure": true
+ },
+ "MAP_ROUTE7": {
+  "map": "Route7",
+  "ox": -447,
+  "oz": 405,
+  "w": 24,
+  "h": 20,
+  "score": 0.821,
+  "next": 0.782,
+  "sure": true
+ },
+ "MAP_ROUTE8": {
+  "map": "Route8",
+  "ox": -299,
+  "oz": 405,
+  "w": 72,
+  "h": 20,
+  "score": 0.978,
+  "next": 0.908,
+  "sure": true
+ },
+ "MAP_ROUTE9": {
+  "map": "Route9",
+  "ox": -303,
+  "oz": 245,
+  "w": 72,
+  "h": 20,
+  "score": 1.015,
+  "next": 0.906,
+  "sure": true
+ },
+ "MAP_VERMILION_CITY": {
+  "map": "VermilionCity",
+  "ox": -399,
+  "oz": 545,
+  "w": 48,
+  "h": 40,
+  "score": 0.296,
+  "next": 0.273,
+  "sure": false
+ },
+ "MAP_VIRIDIAN_CITY": {
+  "map": "ViridianCity",
+  "ox": -838,
+  "oz": 505,
+  "w": 48,
+  "h": 40,
+  "score": 0.733,
+  "next": 0.694,
+  "sure": true
+ }
+}
