@@ -8,3 +8,11 @@ fuchsia_pond_s_2	poliwag	dive	-525	779	-518	786	29	Fuchsia's big pond by the Cen
 fuchsia_pond_s_big	lapras	swim	-523	781	-520	784	29	Fuchsia's big pond by the Center: our big ferry (13:17: "our Lapras equivalency ... to make it a bit bigger")
 safari_gate_w	doduo	walk	-503	758	-492	763	30	the grass west of the SAFARI ZONE's way in
 safari_gate_e	nidoran_f	walk	-482	760	-472	763	30	the grass east of the SAFARI ZONE's way in
+r39_pond_n_1	wooper	swim	-2327	403	-2322	415	21	Route 39's pen, its top pond (0.70, John's 27 Nov 15:00: "in the water, if we can have some water-based Pokemon")
+r39_pond_n_2	marill	swim	-2327	403	-2322	415	21	Route 39's pen, its top pond
+r39_pond_s_1	psyduck	swim	-2323	422	-2318	434	21	Route 39's pen, its bottom pond
+r39_pond_s_2	goldeen	dive	-2323	422	-2318	434	21	Route 39's pen, its bottom pond
+r39_cow	moobelle	walk	-2319	401	-2298	417	22	Route 39's pen, grazing ("and then a couple of grazing ones ... farm animal Retromon")
+r39_calf	moopip	walk	-2319	401	-2298	417	22	Route 39's pen, grazing by its mother
+r39_ewe	fleecelle	walk	-2317	418	-2312	436	22	Route 39's pen, grazing between the bottom pond and the bushes
+r39_lamb	lamblet	walk	-2317	418	-2312	436	22	Route 39's pen, grazing by its mother

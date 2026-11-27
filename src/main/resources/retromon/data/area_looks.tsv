@@ -269,7 +269,8 @@ cube	stripped_oak_log,stripped_spruce_log	-1046	531	-1026	554	23	43	gate_wall_oa
 cube	stripped_oak_wood,stripped_spruce_wood	-1046	531	-1026	554	23	43	gate_wall_oak	the Johto Gate (Route 28)
 cube	stripped_jungle_log,stripped_warped_stem	-1046	531	-1026	554	23	43	gate_beam_top|gate_beam	the Johto Gate (Route 28)
 cube	stripped_jungle_wood	-1046	531	-1026	554	23	43	gate_beam	the Johto Gate (Route 28)
-swap	mud_bricks,mud_brick_stairs,mud_brick_slab	-1000	495	-831	600	-	-	block/mud_bricks=route_path@4	Route 22
+swap	mud_bricks	-1000	495	-831	600	-	-	block/mud_bricks=route_path@4	Route 22
+swap	mud_brick_stairs,mud_brick_slab	-1000	495	-831	600	-	-	block/mud_bricks=step_boards_d	Route 22
 swap	brown_concrete_powder	-1000	495	-831	600	-	-	block/brown_concrete_powder=route_path_edge@4	Route 22
 swap	mangrove_stairs,mangrove_planks,mangrove_slab	-2012	853	-2000	863	25	28	block/stripped_mangrove_log=center_stripped_mangrove_log,block/stripped_mangrove_log_top=center_stripped_mangrove_log_top,block/mangrove_planks=center_mangrove_planks	azalea_town Pokemon Center
 cube	stripped_mangrove_wood	-2012	853	-2000	863	25	28	center_stripped_mangrove_log	azalea_town Pokemon Center
@@ -564,7 +565,7 @@ swap	pale_oak_fence	-1010	100	60	1060	-	-	block/pale_oak_planks=white_fence	Kant
 swap	dripstone_block	-1010	100	60	1060	-	-	block/dripstone_block=drip_rock_top|drip_rock@4	Kanto
 swap	jungle_stairs,jungle_slab	-1010	100	60	1060	-	-	block/jungle_planks=drip_rock_top|drip_rock@4,block/dripstone_block=drip_rock_top|drip_rock@4	Kanto
 swap	mud_brick_stairs	-1010	100	60	1060	-	-	block/mud_bricks=step_boards_d	Kanto
-swap	mud_brick_slab	-1010	100	60	1060	-	-	block/mud_bricks=mud_rock@4	Kanto
+swap	mud_brick_slab	-1010	100	60	1060	-	-	block/mud_bricks=step_boards_d	Kanto
 swap	mud_brick_wall	-1010	100	60	1060	-	-	block/mud_bricks=wall_tan	Kanto
 chain	iron_chain	-1010	100	60	1060	-	-	-	Kanto
 swap	sand	-1010	100	60	1060	-	-	block/sand=beach_sand@4	Kanto
@@ -2802,28 +2803,6 @@ swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs
 swap	oak_fence,oak_fence_gate	-2770	60	-1011	1080	-	-	block/oak_planks=fence_johto	Johto
 swap	brown_concrete_powder	-2770	60	-1011	1080	-	-	block/brown_concrete_powder=path_kanto@4	Johto
 swap	snow_block,snow	-2770	60	-1011	1080	-	-	block/snow=snow_clean@2	Johto
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-1473	354	-1467	360	30	39	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-1473	354	-1467	360	30	39	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-1497	379	-1491	385	30	39	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-1497	379	-1491	385	30	39	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-1429	379	-1423	385	30	39	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-1429	379	-1423	385	30	39	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-2136	450	-2130	456	19	28	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-2136	450	-2130	456	19	28	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-2114	450	-2108	456	19	28	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-2114	450	-2108	456	19	28	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-2154	468	-2148	474	19	28	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-2154	468	-2148	474	19	28	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-2096	468	-2090	474	19	28	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-2096	468	-2090	474	19	28	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-2154	490	-2148	496	19	28	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-2154	490	-2148	496	19	28	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-2096	490	-2090	496	19	28	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-2096	490	-2090	496	19	28	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-2136	508	-2130	514	19	28	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-2136	508	-2130	514	19	28	block/black_stained_glass=glass_lamp	a Cycling Road lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-2114	508	-2108	514	19	28	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
-glass	black_stained_glass_pane	-2114	508	-2108	514	19	28	block/black_stained_glass=glass_lamp	a Cycling Road lamp
 swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-1004	641	-998	647	19	28	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
 glass	black_stained_glass_pane	-1004	641	-998	647	19	28	block/black_stained_glass=glass_lamp	a Cycling Road lamp
 swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern	-2296	744	-2290	750	12	21	block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,block/orange_wool=lamp_r17_cap,block/sea_lantern=lamp_globe_warm!	a Cycling Road lamp
@@ -2999,9 +2978,9 @@ swap	composter	-2214	616	-2041	774	19	24	block/composter_side=bin_side,block/com
 swap	waxed_cut_copper,waxed_cut_copper_stairs,waxed_cut_copper_slab	-2214	616	-2041	774	19	40	block/cut_copper=gold_emblem	Goldenrod City
 swap	iron_bars	-2214	616	-2041	774	-	-	block/iron_bars=railing_dark	Goldenrod City
 swap	quartz_pillar	-2214	616	-2041	774	20	20	block/quartz_pillar=rail_base,block/quartz_pillar_top=gold_carpet_cap	Goldenrod City
-swap	white_carpet	-2214	616	-2041	774	21	23	block/white_wool=gold_carpet_cap	Goldenrod City
+swap	white_carpet	-2214	616	-2041	774	21	23	block/white_wool=gold_marble@4	Goldenrod City
 swap	smooth_quartz_slab,smooth_quartz,smooth_quartz_stairs	-2214	616	-2041	774	19	23	block/quartz_block_bottom=quartz_clean	Goldenrod City
-swap	smooth_quartz_slab	-2214	616	-2041	774	22	22	block/quartz_block_bottom=gold_carpet_cap	the fence's caps
+swap	smooth_quartz_slab	-2214	616	-2041	774	22	22	block/quartz_block_bottom=gold_marble@4	the fence's caps
 swap	gray_concrete	-2146	684	-2050	684	27	27	block/gray_concrete=track_bed	the Magnet Train's line
 swap	gray_concrete	-2146	685	-2050	685	27	27	block/gray_concrete=track_rail	the Magnet Train's line
 swap	gray_concrete	-2146	686	-2050	686	27	27	block/gray_concrete=track_bed	the Magnet Train's line
@@ -3015,7 +2994,7 @@ swap	black_stained_glass,black_stained_glass_pane	-2215	615	-2040	775	-	-	block/
 swap	smooth_quartz,smooth_quartz_stairs,smooth_quartz_slab,quartz_slab,quartz_block	-2207	672	-2178	712	-	-	block/quartz_block_bottom=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_side=quartz_clean	the Magnet Train station
 swap	stone_bricks,stone_brick_stairs,stone_brick_slab,stone_brick_wall	-2206	697	-2178	711	19	30	block/stone_bricks=cel_fountain_stone	the station's fountains
 swap	cobblestone,gravel	-2206	697	-2178	711	15	19	block/cobblestone=pool_floor,block/gravel=pool_floor	the station's fountains
-swap	green_glazed_terracotta	-2206	697	-2178	711	19	19	block/green_glazed_terracotta=gold_lawn	the station's fountains
+swap	green_glazed_terracotta	-2206	697	-2178	711	19	19	block/green_glazed_terracotta=gold_plaza_green@4	the station's fountains
 swap	polished_deepslate,polished_deepslate_stairs,polished_deepslate_slab	-2148	678	-2130	694	-	-	block/polished_deepslate=radio_panel	the Radio Tower
 swap	white_terracotta	-2148	678	-2130	694	20	70	block/white_terracotta=radio_white	the Radio Tower
 swap	gray_concrete,smooth_stone,smooth_stone_slab	-2148	678	-2130	694	-	-	block/gray_concrete=radio_grey,block/smooth_stone=radio_white,block/smooth_stone_slab_side=radio_white	the Radio Tower
@@ -4424,9 +4403,9 @@ panel	jungle_shelf,birch_shelf	-2563	715	-2550	726	17	27	block/jungle_shelf=cap_
 panel	warped_shelf	-2563	715	-2550	726	17	27	block/warped_shelf=green_shelf	a Johto house
 swap	bricks	-2563	715	-2550	726	17	27	block/bricks=base_cer	a Johto house
 swap	oak_slab	-2563	715	-2550	726	17	27	block/oak_planks=step_boards_d	a Johto house
-roof_white	pale_oak_stairs	-2563	715	-2550	726	17	27	-	a Johto house
+roof_sea	pale_oak_stairs	-2563	715	-2550	726	17	27	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2563	715	-2550	726	17	23	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
-swap	pale_oak_slab,pale_oak_planks	-2563	715	-2550	726	21	27	block/pale_oak_planks=roof_white_tiles	a Johto house
+swap	pale_oak_slab,pale_oak_planks	-2563	715	-2550	726	21	27	block/pale_oak_planks=roof_sea_tiles	a Johto house
 panel	dark_oak_shelf	-2563	715	-2550	726	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 cube	stripped_dark_oak_wood,stripped_spruce_wood	-2563	715	-2550	726	17	27	post_bt	a Johto house
 cube	stripped_spruce_log	-2563	715	-2550	726	17	27	post_bt_top|post_bt	a Johto house
@@ -4449,9 +4428,9 @@ panel	jungle_shelf,birch_shelf	-2524	755	-2511	766	17	28	block/jungle_shelf=cap_
 panel	warped_shelf	-2524	755	-2511	766	17	28	block/warped_shelf=green_shelf	a Johto house
 swap	bricks	-2524	755	-2511	766	17	28	block/bricks=base_cer	a Johto house
 swap	oak_slab	-2524	755	-2511	766	17	28	block/oak_planks=step_boards_d	a Johto house
-roof_white	pale_oak_stairs	-2524	755	-2511	766	17	28	-	a Johto house
+roof_sun	pale_oak_stairs	-2524	755	-2511	766	17	28	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2524	755	-2511	766	17	23	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
-swap	pale_oak_slab,pale_oak_planks	-2524	755	-2511	766	21	28	block/pale_oak_planks=roof_white_tiles	a Johto house
+swap	pale_oak_slab,pale_oak_planks	-2524	755	-2511	766	21	28	block/pale_oak_planks=roof_sun_tiles	a Johto house
 panel	dark_oak_shelf	-2524	755	-2511	766	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 cube	stripped_dark_oak_wood,stripped_spruce_wood	-2524	755	-2511	766	17	28	post_bt	a Johto house
 cube	stripped_spruce_log	-2524	755	-2511	766	17	28	post_bt_top|post_bt	a Johto house
@@ -4474,9 +4453,9 @@ panel	jungle_shelf,birch_shelf	-2553	772	-2540	783	17	27	block/jungle_shelf=cap_
 panel	warped_shelf	-2553	772	-2540	783	17	27	block/warped_shelf=green_shelf	a Johto house
 swap	bricks	-2553	772	-2540	783	17	27	block/bricks=base_cer	a Johto house
 swap	oak_slab	-2553	772	-2540	783	17	27	block/oak_planks=step_boards_d	a Johto house
-roof_white	pale_oak_stairs	-2553	772	-2540	783	17	27	-	a Johto house
+roof_aqua	pale_oak_stairs	-2553	772	-2540	783	17	27	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2553	772	-2540	783	17	23	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
-swap	pale_oak_slab,pale_oak_planks	-2553	772	-2540	783	21	27	block/pale_oak_planks=roof_white_tiles	a Johto house
+swap	pale_oak_slab,pale_oak_planks	-2553	772	-2540	783	21	27	block/pale_oak_planks=roof_aqua_tiles	a Johto house
 panel	dark_oak_shelf	-2553	772	-2540	783	17	19	block/dark_oak_shelf=panel_planter_dark	a Johto house
 cube	stripped_dark_oak_wood,stripped_spruce_wood	-2553	772	-2540	783	17	27	post_bt	a Johto house
 cube	stripped_spruce_log	-2553	772	-2540	783	17	27	post_bt_top|post_bt	a Johto house
@@ -4986,9 +4965,9 @@ panel	jungle_shelf,birch_shelf	-2249	527	-2236	538	22	32	block/jungle_shelf=cap_
 panel	warped_shelf	-2249	527	-2236	538	22	32	block/warped_shelf=green_shelf	a Johto house
 swap	bricks	-2249	527	-2236	538	22	32	block/bricks=base_cer	a Johto house
 swap	oak_slab	-2249	527	-2236	538	22	32	block/oak_planks=step_boards_d	a Johto house
-roof_green3	warped_stairs	-2249	527	-2236	538	22	32	-	a Johto house
+roof_teal	warped_stairs	-2249	527	-2236	538	22	32	-	a Johto house
 panel	jungle_shelf,birch_shelf	-2249	527	-2236	538	22	28	block/jungle_shelf=band_shelf,block/birch_shelf=band_shelf	a Johto house
-swap	warped_slab,warped_planks	-2249	527	-2236	538	26	32	block/warped_planks=roof_green3_tiles	a Johto house
+swap	warped_slab,warped_planks	-2249	527	-2236	538	26	32	block/warped_planks=roof_teal_tiles	a Johto house
 panel	dark_oak_shelf	-2249	527	-2236	538	22	24	block/dark_oak_shelf=panel_planter_dark	a Johto house
 cube	stripped_dark_oak_wood,stripped_spruce_wood	-2249	527	-2236	538	22	32	post_bt	a Johto house
 cube	stripped_spruce_log	-2249	527	-2236	538	22	32	post_bt_top|post_bt	a Johto house
@@ -5425,28 +5404,28 @@ swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-
 glass	black_stained_glass_pane	-1507	513	-1505	515	27	37	block/black_stained_glass=glass_lamp	a lamp up Route 45
 swap	tuff_wall,polished_tuff_wall,chiseled_tuff_bricks,gray_carpet,sea_lantern	-1522	428	-1520	430	31	41	block/tuff=lamp_white_post,block/polished_tuff=lamp_white_post,block/chiseled_tuff_bricks=lamp_white_post,block/chiseled_tuff_bricks_top=lamp_white_post,block/gray_wool=lamp_cer_top,block/sea_lantern=lamp_globe_warm!	a lamp up Route 45
 glass	black_stained_glass_pane	-1522	428	-1520	430	31	41	block/black_stained_glass=glass_lamp	a lamp up Route 45
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-1472	355	-1468	359	30	39	block/red_sandstone=lamp_bt_post,block/chiseled_red_sandstone=lamp_bt_foot,block/red_sandstone_top=lamp_bt_cap,block/orange_wool=lamp_bt_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-1472	355	-1468	359	30	39	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-1496	380	-1492	384	30	39	block/red_sandstone=lamp_bt_post,block/chiseled_red_sandstone=lamp_bt_foot,block/red_sandstone_top=lamp_bt_cap,block/orange_wool=lamp_bt_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-1496	380	-1492	384	30	39	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-1428	380	-1424	384	30	39	block/red_sandstone=lamp_bt_post,block/chiseled_red_sandstone=lamp_bt_foot,block/red_sandstone_top=lamp_bt_cap,block/orange_wool=lamp_bt_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-1428	380	-1424	384	30	39	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2135	451	-2131	455	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-2135	451	-2131	455	19	28	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2113	451	-2109	455	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-2113	451	-2109	455	19	28	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2153	469	-2149	473	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-2153	469	-2149	473	19	28	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2095	469	-2091	473	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-2095	469	-2091	473	19	28	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2153	491	-2149	495	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-2153	491	-2149	495	19	28	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2095	491	-2091	495	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-2095	491	-2091	495	19	28	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2135	509	-2131	513	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-2135	509	-2131	513	19	28	block/black_stained_glass=glass_lamp	a lamp
-swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2113	509	-2109	513	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
-glass	black_stained_glass_pane	-2113	509	-2109	513	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-1473	354	-1467	360	30	39	block/red_sandstone=lamp_bt_post,block/chiseled_red_sandstone=lamp_bt_foot,block/red_sandstone_top=lamp_bt_cap,block/orange_wool=lamp_bt_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-1473	354	-1467	360	30	39	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-1497	379	-1491	385	30	39	block/red_sandstone=lamp_bt_post,block/chiseled_red_sandstone=lamp_bt_foot,block/red_sandstone_top=lamp_bt_cap,block/orange_wool=lamp_bt_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-1497	379	-1491	385	30	39	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-1429	379	-1423	385	30	39	block/red_sandstone=lamp_bt_post,block/chiseled_red_sandstone=lamp_bt_foot,block/red_sandstone_top=lamp_bt_cap,block/orange_wool=lamp_bt_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-1429	379	-1423	385	30	39	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2136	450	-2130	456	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2136	450	-2130	456	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2114	450	-2108	456	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2114	450	-2108	456	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2154	468	-2148	474	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2154	468	-2148	474	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2096	468	-2090	474	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2096	468	-2090	474	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2154	490	-2148	496	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2154	490	-2148	496	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2096	490	-2090	496	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2096	490	-2090	496	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2136	508	-2130	514	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2136	508	-2130	514	19	28	block/black_stained_glass=glass_lamp	a lamp
+swap	red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern,redstone_lamp	-2114	508	-2108	514	19	28	block/red_sandstone=lamp_park_post,block/chiseled_red_sandstone=lamp_park_foot,block/red_sandstone_top=lamp_park_cap,block/orange_wool=lamp_park_cap,block/sea_lantern=lamp_globe_warm!,block/redstone_lamp=lamp_globe_warm!,block/redstone_lamp_on=lamp_globe_warm!	a lamp
+glass	black_stained_glass_pane	-2114	508	-2108	514	19	28	block/black_stained_glass=glass_lamp	a lamp
 swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,cobblestone_stairs,andesite_wall	-1427	338	-1420	346	28	36	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	the rocks by the Ice Path
 swap	bamboo_trapdoor	-1835	540	-1832	542	22	25	block/bamboo_trapdoor=sprout_screen	Earl's Academy's doors
 swap	cauldron,hopper,blackstone_wall,anvil,chipped_anvil,damaged_anvil	-1856	494	-1852	496	21	26	block/cauldron_side=lantern_stone,block/cauldron_top=lantern_stone_top,block/cauldron_bottom=lantern_stone,block/cauldron_inner=lantern_stone,block/hopper_outside=lantern_stone,block/hopper_inside=lantern_stone,block/hopper_top=lantern_stone_top,block/blackstone=lantern_stone,block/blackstone_top=lantern_stone_top,block/anvil=lantern_stone_top,block/anvil_top=lantern_stone_top	a stone lantern by the SPROUT TOWER
@@ -5794,10 +5773,11 @@ keep	bamboo,birch_wall_sign,blue_banner,blue_bed,blue_wall_banner,campfire,cobwe
 keep	bamboo,birch_wall_sign,blue_banner,blue_bed,blue_wall_banner,campfire,cobweb,dead_fire_coral_wall_fan,dead_horn_coral_wall_fan,dirt,gray_bed,gray_wall_banner,jungle_leaves,large_fern,light_blue_wall_banner,light_gray_shulker_box,player_head,player_wall_head,podzol,red_wall_banner,spruce_wall_sign,warped_wall_sign,white_bed,white_shulker_box	-2306	822	-2262	837	12	60	-	the S.S. AQUA, as John built it
 keep	bamboo,birch_wall_sign,blue_banner,blue_bed,blue_wall_banner,campfire,cobweb,dead_fire_coral_wall_fan,dead_horn_coral_wall_fan,dirt,gray_bed,gray_wall_banner,jungle_leaves,large_fern,light_blue_wall_banner,light_gray_shulker_box,player_head,player_wall_head,podzol,red_wall_banner,spruce_wall_sign,warped_wall_sign,white_bed,white_shulker_box	-2306	838	-2262	853	12	60	-	the S.S. AQUA, as John built it
 keep	bamboo,birch_wall_sign,blue_banner,blue_bed,blue_wall_banner,campfire,cobweb,dead_fire_coral_wall_fan,dead_horn_coral_wall_fan,dirt,gray_bed,gray_wall_banner,jungle_leaves,large_fern,light_blue_wall_banner,light_gray_shulker_box,player_head,player_wall_head,podzol,red_wall_banner,spruce_wall_sign,warped_wall_sign,white_bed,white_shulker_box	-2306	854	-2262	856	12	60	-	the S.S. AQUA, as John built it
-swap	andesite,polished_andesite,polished_andesite_slab,polished_andesite_stairs,diorite,diorite_wall,diorite_slab	-2290	598	-2263	625	14	26	block/andesite=pier_ol_stone@2,block/polished_andesite=pier_ol_stone@2,block/diorite=banner_foot	Olivine's pier
+swap	andesite,polished_andesite,polished_andesite_slab,polished_andesite_stairs,diorite,diorite_slab	-2290	598	-2263	625	14	26	block/andesite=ol_gate_stone@4,block/polished_andesite=ol_gate_stone@4,block/diorite=ol_wall_cap	Olivine's pier
+swap	diorite_wall	-2290	598	-2263	625	14	26	block/diorite=ol_post	Olivine's pier
 swap	polished_blackstone_wall	-2290	598	-2263	625	12	22	block/polished_blackstone=cin_post,block/stripped_pale_oak_log=pier_ol,block/stripped_pale_oak_log_top=pier_ol	Olivine's pier
 cube	stripped_pale_oak_wood,stripped_pale_oak_log	-2290	598	-2263	625	12	22	pier_ol	Olivine's pier
-swap	resin_bricks,resin_brick_stairs,birch_planks,birch_stairs,terracotta,yellow_terracotta	-2290	598	-2263	625	14	26	block/resin_bricks=pier_ol_stone@2,block/birch_planks=pier_ol,block/terracotta=pier_ol_stone@2,block/yellow_terracotta=lamp_park_cap	Olivine's pier
+swap	resin_bricks,resin_brick_stairs,birch_planks,birch_stairs,terracotta,yellow_terracotta	-2290	598	-2263	625	14	26	block/resin_bricks=ol_gate_stone@4,block/birch_planks=pier_ol,block/terracotta=ol_gate_stone@4,block/yellow_terracotta=lamp_park_cap	Olivine's pier
 swap	pale_oak_fence_gate,pale_oak_fence	-2320	560	-2235	625	17	22	block/pale_oak_planks=white_fence	Olivine's harbour fences
 swap	coarse_dirt	-2019	869	-2009	871	17	21	block/coarse_dirt=planter_soil	Azalea's planters
 swap	coarse_dirt	-1429	758	-1423	760	17	21	block/coarse_dirt=planter_soil	New Bark's planter
@@ -5823,7 +5803,7 @@ swap	black_concrete	-1992	337	-1964	366	20	30	block/black_concrete=cave_dark	the
 swap	polished_deepslate,polished_deepslate_stairs	-2200	678	-2185	686	40	50	block/polished_deepslate=lab_cin_roof	the station's roof
 swap	diorite_wall	-2196	680	-2138	688	45	66	block/diorite=rod_clean	the aerials over the line
 swap	prismarine_bricks	-2214	616	-2041	774	20	47	block/prismarine_bricks=cel_roof_teal	Goldenrod City
-swap	lime_terracotta	-2207	697	-2178	711	19	19	block/lime_terracotta=gold_lawn	the station's fountains
+swap	lime_terracotta	-2207	697	-2178	711	19	19	block/lime_terracotta=gold_plaza_lime@4	the station's fountains
 swap	tuff,tuff_slab,tuff_stairs,tuff_wall,andesite,andesite_slab,andesite_stairs,andesite_wall,cobblestone,cobblestone_slab,cobblestone_stairs,cobblestone_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,granite,polished_andesite,mossy_cobblestone,stone,stone	-1785	201	-1766	220	12	18	block/tuff=sea_rock_top|sea_rock@2,block/andesite=sea_rock_top|sea_rock@2,block/cobblestone=sea_rock_top|sea_rock@2,block/diorite=sea_rock_top|sea_rock@2,block/granite=sea_rock_top|sea_rock@2,block/polished_andesite=sea_rock_top|sea_rock@2,block/mossy_cobblestone=sea_rock_top|sea_rock@2,block/stone=sea_rock_top|sea_rock@2	the GYARADOS's rock
 swap	tuff,tuff_slab,tuff_stairs,tuff_wall,cobblestone_stairs,cobblestone_wall,andesite_stairs,andesite_wall,diorite_slab	-1827	227	-1776	256	22	36	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	the Lake of Rage's rocks
 swap	exposed_copper,weathered_copper,waxed_exposed_copper,waxed_weathered_copper,brown_concrete	-1800	195	-1750	232	16	50	block/exposed_copper=gy_fin@4,block/weathered_copper=gy_fin@4,block/brown_concrete=gy_fin@4	the Lake of Rage's GYARADOS
@@ -6504,6 +6484,120 @@ panel	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shel
 swap	andesite_slab,andesite,andesite_stairs	-2685	703	-2678	717	33	36	block/andesite=bridge_boards	a bridge
 panel	oak_slab,oak_planks,oak_stairs,stripped_oak_wood,stripped_oak_log,oak_shelf,stone_button,spruce_shelf,spruce_stairs,spruce_slab,spruce_planks,stripped_spruce_wood,stripped_spruce_log	-2682	729	-2664	736	33	36	block/oak_planks=bridge_boards,block/spruce_planks=bridge_boards,block/stripped_oak_log=bridge_beam,block/stripped_oak_log_top=bridge_beam,block/stripped_spruce_log=bridge_beam,block/stripped_spruce_log_top=bridge_beam,block/oak_shelf=bridge_beam,block/spruce_shelf=bridge_beam,block/stone=bolt	a bridge
 swap	andesite_slab,andesite,andesite_stairs	-2682	729	-2664	736	33	36	block/andesite=bridge_boards	a bridge
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1678	419	-1678	419	22	22	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1674	419	-1674	419	22	22	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1670	419	-1670	419	22	22	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1666	419	-1666	419	22	22	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1515	480	-1515	480	29	29	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1515	487	-1515	487	29	29	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1512	665	-1512	665	22	22	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1512	672	-1512	672	22	22	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1511	515	-1511	515	27	27	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1511	522	-1511	522	27	27	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1510	555	-1510	555	26	26	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1510	562	-1510	562	26	26	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1508	665	-1508	665	22	22	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1508	672	-1508	672	22	22	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1508	614	-1508	614	24	24	bridge_beam	a bridge's post
+cube	stripped_spruce_wood,stripped_spruce_log,stripped_oak_wood,stripped_oak_log	-1508	621	-1508	621	24	24	bridge_beam	a bridge's post
+swap	mud_brick_slab	-539	760	-526	767	30	30	block/mud_bricks=mud_rock@4	a pond's rim in Fuchsia
+swap	mud_brick_slab	-528	777	-515	784	30	30	block/mud_bricks=mud_rock@4	a pond's rim in Fuchsia
+swap	mud_brick_slab	-528	788	-528	788	30	30	block/mud_bricks=mud_rock@4	a pond's rim in Fuchsia
+swap	mud_brick_slab	-523	788	-516	788	30	30	block/mud_bricks=mud_rock@4	a pond's rim in Fuchsia
+swap	mud_brick_slab	-519	756	-506	763	30	30	block/mud_bricks=mud_rock@4	a pond's rim in Fuchsia
+swap	mud_brick_slab	-547	452	-547	452	32	32	block/mud_bricks=pave_cel@2	a step in Celadon's paving
+swap	mud_brick_slab	-541	452	-541	452	32	32	block/mud_bricks=pave_cel@2	a step in Celadon's paving
+swap	copper_bars,exposed_copper_bars,weathered_copper_bars,oxidized_copper_bars,waxed_copper_bars,waxed_exposed_copper_bars,waxed_weathered_copper_bars,waxed_oxidized_copper_bars	-2214	616	-2041	774	-	-	block/copper_bars=railing_dark,block/exposed_copper_bars=railing_dark,block/weathered_copper_bars=railing_dark,block/oxidized_copper_bars=railing_dark	Goldenrod City
+chain	iron_chain	-2770	60	-1011	1080	-	-	-	Johto
+swap	iron_chain	-2770	60	-1011	1080	-	-	block/iron_chain=chain_steel	Johto
+swap	terracotta,brown_glazed_terracotta	-2214	668	-2147	720	19	19	block/terracotta=gold_plaza@4,block/brown_glazed_terracotta=gold_plaza_gold@4	Goldenrod's MAGNET TRAIN plaza
+swap	spruce_button	-2126	480	-2126	482	35	35	block/spruce_planks=swan_gem	the NATIONAL PARK swan's eyes
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	337	-1964	337	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	338	-1992	338	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1991	338	-1965	338	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1964	338	-1964	338	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	339	-1991	339	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1990	339	-1966	339	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1965	339	-1964	339	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	340	-1990	340	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1989	340	-1967	340	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1966	340	-1964	340	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	341	-1989	341	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1988	341	-1968	341	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1967	341	-1964	341	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	342	-1988	342	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1987	342	-1969	342	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1968	342	-1964	342	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	343	-1987	343	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1986	343	-1970	343	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1969	343	-1964	343	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	344	-1986	344	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1985	344	-1971	344	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1970	344	-1964	344	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	345	-1985	345	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1984	345	-1972	345	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1971	345	-1964	345	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	346	-1984	346	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1983	346	-1973	346	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1972	346	-1964	346	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	347	-1983	347	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1982	347	-1974	347	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1973	347	-1964	347	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	348	-1982	348	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1981	348	-1975	348	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1974	348	-1964	348	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	349	-1981	349	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1980	349	-1976	349	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1975	349	-1964	349	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	350	-1980	350	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1979	350	-1977	350	20	84	block/crimson_planks=tin_roof_north@4|tin_roof_south@4,block/nether_bricks=tin_ridge_north@4|tin_ridge_south@4	the TIN TOWER's roofs (north)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1976	350	-1964	350	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	351	-1979	351	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1978	351	-1978	351	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1977	351	-1964	351	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	352	-1980	352	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1979	352	-1977	352	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1976	352	-1964	352	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	353	-1981	353	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1980	353	-1976	353	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1975	353	-1964	353	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	354	-1982	354	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1981	354	-1975	354	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1974	354	-1964	354	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	355	-1983	355	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1982	355	-1974	355	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1973	355	-1964	355	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	356	-1984	356	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1983	356	-1973	356	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1972	356	-1964	356	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	357	-1985	357	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1984	357	-1972	357	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1971	357	-1964	357	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	358	-1986	358	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1985	358	-1971	358	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1970	358	-1964	358	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	359	-1987	359	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1986	359	-1970	359	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1969	359	-1964	359	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	360	-1988	360	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1987	360	-1969	360	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1968	360	-1964	360	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	361	-1989	361	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1988	361	-1968	361	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1967	361	-1964	361	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	362	-1990	362	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1989	362	-1967	362	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1966	362	-1964	362	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	363	-1991	363	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1990	363	-1966	363	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1965	363	-1964	363	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	364	-1992	364	20	84	block/crimson_planks=tin_roof_west@4|tin_roof_south@4,block/nether_bricks=tin_ridge_west@4|tin_ridge_south@4	the TIN TOWER's roofs (west)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1991	364	-1965	364	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1964	364	-1964	364	20	84	block/crimson_planks=tin_roof_east@4|tin_roof_south@4,block/nether_bricks=tin_ridge_east@4|tin_ridge_south@4	the TIN TOWER's roofs (east)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	365	-1964	365	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	366	-1964	366	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
+swap	diorite	-2324	594	-2320	598	18	18	block/diorite=ol_wall_cap	Olivine's sea wall by the cliff
+swap	diorite_wall	-2324	594	-2320	598	19	20	block/diorite=ol_post	Olivine's sea wall by the cliff
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care
@@ -6570,7 +6664,7 @@ swap	pale_oak_fence	-1210	505	-1011	590	-	-	block/pale_oak_planks=white_fence	Ro
 swap	dripstone_block	-1210	505	-1011	590	-	-	block/dripstone_block=drip_rock_top|drip_rock@4	Route 28
 swap	jungle_stairs,jungle_slab	-1210	505	-1011	590	-	-	block/jungle_planks=drip_rock_top|drip_rock@4,block/dripstone_block=drip_rock_top|drip_rock@4	Route 28
 swap	mud_brick_stairs	-1210	505	-1011	590	-	-	block/mud_bricks=step_boards_d	Route 28
-swap	mud_brick_slab	-1210	505	-1011	590	-	-	block/mud_bricks=mud_rock@4	Route 28
+swap	mud_brick_slab	-1210	505	-1011	590	-	-	block/mud_bricks=step_boards_d	Route 28
 swap	mud_brick_wall	-1210	505	-1011	590	-	-	block/mud_bricks=wall_tan	Route 28
 chain	iron_chain	-1210	505	-1011	590	-	-	-	Route 28
 swap	sand	-1210	505	-1011	590	-	-	block/sand=beach_sand@4	Route 28
@@ -6604,7 +6698,7 @@ swap	pale_oak_fence	-2215	615	-2040	775	-	-	block/pale_oak_planks=white_fence	Go
 swap	dripstone_block	-2215	615	-2040	775	-	-	block/dripstone_block=drip_rock_top|drip_rock@4	Goldenrod City
 swap	jungle_stairs,jungle_slab	-2215	615	-2040	775	-	-	block/jungle_planks=drip_rock_top|drip_rock@4,block/dripstone_block=drip_rock_top|drip_rock@4	Goldenrod City
 swap	mud_brick_stairs	-2215	615	-2040	775	-	-	block/mud_bricks=step_boards_d	Goldenrod City
-swap	mud_brick_slab	-2215	615	-2040	775	-	-	block/mud_bricks=mud_rock@4	Goldenrod City
+swap	mud_brick_slab	-2215	615	-2040	775	-	-	block/mud_bricks=step_boards_d	Goldenrod City
 swap	mud_brick_wall	-2215	615	-2040	775	-	-	block/mud_bricks=wall_tan	Goldenrod City
 chain	iron_chain	-2215	615	-2040	775	-	-	-	Goldenrod City
 swap	sand	-2215	615	-2040	775	-	-	block/sand=beach_sand@4	Goldenrod City
@@ -6860,6 +6954,8 @@ swap	copper_chain,exposed_copper_chain,weathered_copper_chain,oxidized_copper_ch
 swap	waxed_oxidized_copper_chain,waxed_copper_chain,oxidized_copper_chain,copper_chain	18943	-1	19092	192	66	82	block/copper_chain=banner_cord,block/oxidized_copper_chain=banner_cord,block/exposed_copper_chain=banner_cord,block/weathered_copper_chain=banner_cord	the Ruins of Alph	interiors
 swap	bamboo_fence	18943	-1	19092	192	-	-	block/bamboo_fence=banner_pole_top,block/bamboo_fence_particle=banner_pole_top	the Ruins of Alph	interiors
 swap	campfire	18943	-1	19092	192	-	-	block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/campfire_fire=fire_flame	the Ruins of Alph	interiors
+chain	iron_chain	18943	-1	19092	192	-	-	-	the Ruins of Alph	interiors
+swap	iron_chain	18943	-1	19092	192	-	-	block/iron_chain=chain_steel	the Ruins of Alph	interiors
 grass_edge	dripstone_block	18943	-1	19092	192	-	-	-	the Ruins of Alph	interiors
 swap	daylight_detector	18943	-1	19092	192	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	the Ruins of Alph	interiors
 swap	spruce_log,spruce_fence	18943	-1	19092	192	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	the Ruins of Alph	interiors
@@ -6966,6 +7062,8 @@ swap	copper_chain,exposed_copper_chain,weathered_copper_chain,oxidized_copper_ch
 swap	waxed_oxidized_copper_chain,waxed_copper_chain,oxidized_copper_chain,copper_chain	10239	-1	10392	224	66	82	block/copper_chain=banner_cord,block/oxidized_copper_chain=banner_cord,block/exposed_copper_chain=banner_cord,block/weathered_copper_chain=banner_cord	Ilex Forest	interiors
 swap	bamboo_fence	10239	-1	10392	224	-	-	block/bamboo_fence=banner_pole_top,block/bamboo_fence_particle=banner_pole_top	Ilex Forest	interiors
 swap	campfire	10239	-1	10392	224	-	-	block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/campfire_fire=fire_flame	Ilex Forest	interiors
+chain	iron_chain	10239	-1	10392	224	-	-	-	Ilex Forest	interiors
+swap	iron_chain	10239	-1	10392	224	-	-	block/iron_chain=chain_steel	Ilex Forest	interiors
 grass_edge	dripstone_block	10239	-1	10392	224	-	-	-	Ilex Forest	interiors
 swap	daylight_detector	10239	-1	10392	224	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Ilex Forest	interiors
 swap	spruce_log,spruce_fence	10239	-1	10392	224	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	Ilex Forest	interiors

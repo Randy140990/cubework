@@ -255,6 +255,7 @@ def round57(add, room, G):
     done = set()
     VC59 = (-1912, 500, -1760, 600)
     OLG59 = []
+    CW70 = []
     NOT_HOUSES = [(-1861, 466, -1833, 494), (-1992, 337, -1964, 366), (-2079, 344, -2051, 372), (-2090, 336, -1966, 432), (-2215, 615, -2040, 775),
                   (-2233, 570, -2205, 590), (-2310, 675, -2260, 850)]
     for h in SCAN["houses_johto"] + SCAN["houses_north"]:
@@ -279,8 +280,16 @@ def round57(add, room, G):
         vio = VC59[0] <= x0 <= VC59[2] and VC59[1] <= z0 <= VC59[3]
         if look[0] == "roof_green" and -2335 <= x0 <= -2170 and 495 <= z0 <= 625:
             OLG59.append(1)
-            g = ("green", "green2", "green3")[(len(OLG59) - 1) % 3]
+            # ((0.70, John's 27 Nov 15:00: "Maybe just one of the top ones can just have a different colour ... like a
+            # sort of turquoise blue") The third, the top one to the east, turquoise.)
+            g = ("green", "green2", "teal")[(len(OLG59) - 1) % 3]
             look = ("roof_" + g, look[1], "block/warped_planks=roof_%s_tiles" % g)
+        # ((0.70, 15:00: "I don't mind them all being sort of like a white, but sort of like any sea colours. Maybe one
+        # can have like a yellow roof") Cianwood's four: a sea blue, a yellow, a sea green and one white.)
+        if look[0] == "roof_white" and -2600 <= x0 <= -2480 and 690 <= z0 <= 820:
+            CW70.append(1)
+            c = ("sea", "sun", "aqua", "white")[(len(CW70) - 1) % 4]
+            look = ("roof_" + c, look[1], "block/pale_oak_planks=roof_%s_tiles" % c)
         if look[0] == "roof_vio":
             v = ("vio", "vio2", "vio3", "vio4")[len([1 for d_ in done if VC59[0] <= d_[0] <= VC59[2] and VC59[1] <= d_[1] <= VC59[3]]) % 4]
             look = ("roof_" + v, look[1], "block/crimson_planks=roof_%s_tiles" % v)

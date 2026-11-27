@@ -118,7 +118,8 @@ def round59(add, room, G):
         add("glass", "black_stained_glass_pane", b, "block/black_stained_glass=glass_lamp", ys(y - 8, y + 2))
     NP = (-2152, 448, -2090, 515)
     for x, y0, z, y1 in D["r17_posts"]:
-        b = (x - 2, z - 2, x + 2, z + 2, "a lamp")
+        # ((0.70, 15:00) Three blocks round its post, as the Cycling Road's: a lamp's head reaches three from it.)
+        b = (x - 3, z - 3, x + 3, z + 3, "a lamp")
         if NP[0] <= x <= NP[2] and NP[1] <= z <= NP[3]:
             post, foot, cap, glow = "lamp_park_post", "lamp_park_foot", "lamp_park_cap", "lamp_globe_warm"
         elif -1600 <= x <= -1400 and 290 <= z <= 450:

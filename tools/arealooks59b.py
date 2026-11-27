@@ -88,12 +88,16 @@ def round59b(add, room, G):
         add("keep", ship, (SHIP[0], z, SHIP[2], min(SHIP[3], z + 15), "the S.S. AQUA, as John built it"), "-", ys(12, 60))
     # Olivine's pier: its stone head, its posts and bollards, its rails, its deck's edges.
     OP = (-2290, 598, -2263, 625, "Olivine's pier")
-    add("swap", "andesite,polished_andesite,polished_andesite_slab,polished_andesite_stairs,diorite,diorite_wall,diorite_slab", OP,
-        "block/andesite=pier_ol_stone@2,block/polished_andesite=pier_ol_stone@2,block/diorite=banner_foot", ys(14, 26))
+    # ((0.70, John's 27 Nov 15:00: "the textures at the back haven't been done? The bit which basically blocking you from
+    # going to the boat ... it's gone from white to like a grey") Its stone head (the gate at its end) the sea wall's
+    # white in big dressed stones; the steps down onto it and their posts the sea wall's white cap and posts.)
+    add("swap", "andesite,polished_andesite,polished_andesite_slab,polished_andesite_stairs,diorite,diorite_slab", OP,
+        "block/andesite=ol_gate_stone@4,block/polished_andesite=ol_gate_stone@4,block/diorite=ol_wall_cap", ys(14, 26))
+    add("swap", "diorite_wall", OP, "block/diorite=ol_post", ys(14, 26))
     add("swap", "polished_blackstone_wall,stripped_pale_oak_wood,stripped_pale_oak_log", OP,
         "block/polished_blackstone=cin_post,block/stripped_pale_oak_log=pier_ol,block/stripped_pale_oak_log_top=pier_ol", ys(12, 22))
     add("swap", "resin_bricks,resin_brick_stairs,birch_planks,birch_stairs,terracotta,yellow_terracotta", OP,
-        "block/resin_bricks=pier_ol_stone@2,block/birch_planks=pier_ol,block/terracotta=pier_ol_stone@2,block/yellow_terracotta=lamp_park_cap", ys(14, 26))
+        "block/resin_bricks=ol_gate_stone@4,block/birch_planks=pier_ol,block/terracotta=ol_gate_stone@4,block/yellow_terracotta=lamp_park_cap", ys(14, 26))
     add("swap", "pale_oak_fence_gate,pale_oak_fence", (-2320, 560, -2235, 625, "Olivine's harbour fences"), "block/pale_oak_planks=white_fence", ys(17, 22))
     # The planters' soil (Azalea's, New Bark's, Olivine's); the stepping stones by the Ilex gate and the Day Care.
     for b in ((-2019, 869, -2009, 871, "Azalea's planters"), (-1429, 758, -1423, 760, "New Bark's planter"), (-2313, 595, -2256, 597, "Olivine's planters")):
@@ -133,7 +137,8 @@ def round59b(add, room, G):
     add("swap", "polished_deepslate,polished_deepslate_stairs", (-2200, 678, -2185, 686, "the station's roof"), "block/polished_deepslate=lab_cin_roof", ys(40, 50))
     add("swap", "diorite_wall", (-2196, 680, -2138, 688, "the aerials over the line"), "block/diorite=rod_clean", ys(45, 66))
     add("swap", "prismarine_bricks", GI, "block/prismarine_bricks=cel_roof_teal", ys(20, 47))
-    add("swap", "lime_terracotta", (-2207, 697, -2178, 711, "the station's fountains"), "block/lime_terracotta=gold_lawn", ys(19, 19))
+    # ((0.70, 15:00) Seamless, as the green inside them.)
+    add("swap", "lime_terracotta", (-2207, 697, -2178, 711, "the station's fountains"), "block/lime_terracotta=gold_plaza_lime@4", ys(19, 19))
     # The Lake of Rage: the GYARADOS's rock under the water, the rocks along the shore, the statue's last pieces (its
     # whiskers' copper, its eye's coal, its planks).
     add("swap", SEA_ROCK_BLOCKS + ",stone", (-1785, 201, -1766, 220, "the GYARADOS's rock"), SEA_ROCK, ys(12, 18))

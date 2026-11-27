@@ -189,7 +189,9 @@ def main():
         if league:
             add("swap", "spruce_fence", (int(x0) - 4, int(z0) - 6, int(x1) + 4, int(z1) + 6, "the League gate's trees"), LEAGUE_TREES,
                 (str(ry - 12), str(ry - 1)))
-    add("swap", "mud_bricks,mud_brick_stairs,mud_brick_slab", ROUTE22, "block/mud_bricks=route_path@4")
+    add("swap", "mud_bricks", ROUTE22, "block/mud_bricks=route_path@4")
+    # ((0.70, 15:00: "Victory Road, where the 3 there ... they're the same as the dirt path") Its steps Johto's boards.)
+    add("swap", "mud_brick_stairs,mud_brick_slab", ROUTE22, "block/mud_bricks=step_boards_d")
     add("swap", "brown_concrete_powder", ROUTE22, "block/brown_concrete_powder=route_path_edge@4")
     for line in open(os.path.join(HERE, "interior", "export", "shops.tsv")):
         if not line.strip() or line.startswith("#"):
@@ -374,7 +376,10 @@ def round46(add, room):
     add("swap", "dripstone_block", K, "block/dripstone_block=drip_rock_top|drip_rock@4")
     add("swap", "jungle_stairs,jungle_slab", K, "block/jungle_planks=drip_rock_top|drip_rock@4,block/dripstone_block=drip_rock_top|drip_rock@4")
     add("swap", "mud_brick_stairs", K, "block/mud_bricks=step_boards_d")
-    add("swap", "mud_brick_slab", K, "block/mud_bricks=mud_rock@4")
+    # ((0.70, John's 27 Nov 15:00: "wherever you've got a increase in height ... change all of Kanto to align to the
+    # Johto ones, so to be the planks. Outside obviously the mossy cobblestone ones") Its mud brick slab steps up the
+    # ledges Johto's boards, as its stairs; the slabs round Fuchsia's ponds stay rock (arealooks70b).)
+    add("swap", "mud_brick_slab", K, "block/mud_bricks=step_boards_d")
     add("swap", "mud_brick_wall", K, "block/mud_bricks=wall_tan")
     add("chain", "iron_chain", K)
     add("swap", "sand", K, "block/sand=beach_sand@4")
@@ -840,6 +845,9 @@ def round50(add, room):
     # (0.70) John's 27 Nov save: his new west end's rocks and bridges.
     import arealooks70
     arealooks70.round70(add, room, globals())
+    # (0.70) John's 27 Nov 15:00 Johto pass.
+    import arealooks70b
+    arealooks70b.round70b(add, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -1325,6 +1333,10 @@ def round54(add, room):
     add("swap", "snow_block,snow", J, "block/snow=snow_clean@2")
     # Its lamps: the Cycling Road's (Routes 26 and 27, Blackthorn's), Cerulean's in New Bark, Cherrygrove's own.
     for x, y0, z, y1 in D["r17_posts"]:
+        # ((0.70, John's 27 Nov 15:00: "the row of the carpet on the lights needs updating. It's still the orange") The
+        # NATIONAL PARK's and Blackthorn's have their own look (arealooks59), over the whole of each one's head now: not
+        # this one's too, whose orange cap showed on the side of their heads the old box missed.)
+        if (-2152 <= x <= -2090 and 448 <= z <= 515) or (-1600 <= x <= -1400 and 290 <= z <= 450): continue
         b = (x - 3, z - 3, x + 3, z + 3, "a Cycling Road lamp")
         add("swap", "red_sandstone_wall,red_sandstone,chiseled_red_sandstone,orange_carpet,sea_lantern", b,
             "block/red_sandstone=lamp_r17_post,block/chiseled_red_sandstone=lamp_r17_chisel,block/red_sandstone_top=lamp_r17_cap,"
@@ -1372,9 +1384,12 @@ def round54(add, room):
     add("swap", "waxed_cut_copper,waxed_cut_copper_stairs,waxed_cut_copper_slab", G, "block/cut_copper=gold_emblem", ("19", "40"))
     add("swap", "iron_bars", G, "block/iron_bars=railing_dark")
     add("swap", "quartz_pillar", G, "block/quartz_pillar=rail_base,block/quartz_pillar_top=gold_carpet_cap", ("20", "20"))
-    add("swap", "white_carpet", G, "block/white_wool=gold_carpet_cap", ("21", "23"))
+    # ((0.70, John's 27 Nov 15:00: "the gold trim on the bottom one is fine, but the top I think probably just all needs
+    # to be like seamless white or marble ... Probably not many seams need to be seen") The fences' tops (the rail, the
+    # posts' caps) seamless white marble; the rail's foot keeps its gold trim.)
+    add("swap", "white_carpet", G, "block/white_wool=gold_marble@4", ("21", "23"))
     add("swap", "smooth_quartz_slab,smooth_quartz,smooth_quartz_stairs", G, "block/quartz_block_bottom=quartz_clean", ("19", "23"))
-    add("swap", "smooth_quartz_slab", (G[0], G[1], G[2], G[3], "the fence's caps"), "block/quartz_block_bottom=gold_carpet_cap", ("22", "22"))
+    add("swap", "smooth_quartz_slab", (G[0], G[1], G[2], G[3], "the fence's caps"), "block/quartz_block_bottom=gold_marble@4", ("22", "22"))
     # The Magnet Train's line: its track (two steel rails down the middle of its five rows).
     for z in range(684, 689):
         add("swap", "gray_concrete", (-2146, z, -2050, z, "the Magnet Train's line"), "block/gray_concrete=" + ("track_rail" if z in (685, 687) else "track_bed"), ("27", "27"))
@@ -1392,7 +1407,9 @@ def round54(add, room):
     FT = (-2206, 697, -2178, 711, "the station's fountains")
     add("swap", "stone_bricks,stone_brick_stairs,stone_brick_slab,stone_brick_wall", FT, "block/stone_bricks=cel_fountain_stone", ("19", "30"))
     add("swap", "cobblestone,gravel", FT, "block/cobblestone=pool_floor,block/gravel=pool_floor", ("15", "19"))
-    add("swap", "green_glazed_terracotta", FT, "block/green_glazed_terracotta=gold_lawn", ("19", "19"))
+    # ((0.70, 15:00: "where it would have been a glazed terracotta ... It doesn't look as seamless as it probably could")
+    # A seamless green terrazzo, no tiles.)
+    add("swap", "green_glazed_terracotta", FT, "block/green_glazed_terracotta=gold_plaza_green@4", ("19", "19"))
     # The RADIO TOWER (12:19: "the radio building, which obviously is black"): dark navy metal panels, white panels,
     # steel grey, dark glass; the steps up into it stone; its aerials steel.
     RT = (-2148, 678, -2130, 694, "the Radio Tower")
