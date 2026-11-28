@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/paint","paint":"retromon:block/interior/paint"},"elements":[{"from":[2.8,16,2.0],"to":[3.6,16,8.0],"faces":{"down":{"uv":[0.7,14.0,0.9,15.5],"texture":"#paint"}}},{"from":[2.8,16,8.0],"to":[3.6,16,13.2],"faces":{"down":{"uv":[0.7,12.7,0.9,14.0],"texture":"#paint"}}}]}

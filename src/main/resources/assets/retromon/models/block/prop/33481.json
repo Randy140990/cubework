@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gym_tan_low","gym_tan_low":"retromon:block/interior/gym_tan_low"},"elements":[{"from":[13.955,16,6.974],"to":[16.0,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#gym_tan_low","tintindex":188064064}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/ar_snow","ar_snow":"retromon:block/interior/ar_snow"},"elements":[{"from":[3.2,16,3.2],"to":[16.0,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#ar_snow","tintindex":144064064}}}]}

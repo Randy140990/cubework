@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/elm_skirt","elm_skirt":"retromon:block/interior/elm_skirt"},"elements":[{"from":[15.04,0.8,0],"to":[16.0,2.4,0],"faces":{"south":{"uv":[15.76,3.4,16.0,3.8],"texture":"#elm_skirt"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/elm_gear","elm_gear":"retromon:block/interior/elm_gear"},"elements":[{"from":[0.0,16,13.208],"to":[1.4,16,16.0],"faces":{"down":{"uv":[12.0,12.0,12.35,12.698],"texture":"#elm_gear"}}}]}

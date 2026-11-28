@@ -213,10 +213,12 @@ DOORS = {
     # doorway), out at the north to the PARK (the west part's doorway; the east part's north doorway comes in too, and
     # back out the way you came); ROUTE 36's, in from the route at its east, out at its west to the PARK.
     "np_gate_r35_s": {"room": "route_35_national_park_gate", "door": [[x, 22, 550] for x in range(-2095, -2091)], "out": [-2093.0, 20.5, 555.2]},
+    # ((0.77) HeartGold's wide gate: each north door its own way out of the room, the left one at the room's left, the
+    # right one (the PARK's) over the way in.)
     "np_gate_r35_n": {"room": "route_35_national_park_gate", "door": [[x, 22, 548] for x in range(-2123, -2119)], "out": [-2121.0, 20.5, 543.0], "face": "n", "yaw": 180.0,
-                      "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}, "group": "np_gate_r35_north"},
+                      "in": {"x": 4.5, "z": 1.5, "yaw": 0.0}},
     "np_gate_r35_n2": {"room": "route_35_national_park_gate", "door": [[x, 22, 547] for x in range(-2095, -2091)], "out": [-2093.0, 20.5, 543.0], "face": "n", "yaw": 180.0,
-                       "in": {"x": 7.0, "z": 1.4, "yaw": 0.0}, "group": "np_gate_r35_north"},
+                       "in": {"x": 25.5, "z": 1.5, "yaw": 0.0}},
     "np_gate_r36_e": {"room": "route_36_national_park_gate", "door": [[-2078, 22, 505], [-2078, 22, 506]], "out": [-2073.6, 20.5, 506.0], "face": "e", "yaw": -90.0},
     "np_gate_r36_w": {"room": "route_36_national_park_gate", "door": [[-2080, 22, 505], [-2080, 22, 506]], "out": [-2083.4, 20.5, 506.0], "face": "w", "yaw": 90.0,
                       "in": {"x": 1.6, "z": 5.0, "yaw": -90.0}},
@@ -296,6 +298,8 @@ BALLS["ug_ew"] = [{"key": "underground_path_we_" + k, "x": 9.0 + 7.0 * i, "z": 6
 NORTH_DOOR = {"gate_n": "forest_north", "gate_league": "league_n", "route2_gate": "route2_gate_n", "cerulean_house1": "cerulean_house1_back",
               "cerulean_house2": "cerulean_house2_back", "gate_r5": "gate_r5_b", "gate_r6": "gate_r6_b", "gate_r12": "gate_r12_b",
               "route_35_national_park_gate": "np_gate_r35_n"}
+# ((0.77) A room with more than one way out at the back, each to its own door in the world: by room and the way's west end.)
+NORTH_DOOR_X = {("route_35_national_park_gate", 3): "np_gate_r35_n", ("route_35_national_park_gate", 24): "np_gate_r35_n2"}
 # Ways out through the side walls (a sideways gate's), by room and wall.
 SIDE_DOOR = {("gate_johto", "e"): "johto_e",
              # The sideways route gates: each side's way to the world's door on that side.
@@ -329,7 +333,7 @@ ENTRY = {"house1": {"x": 7.0, "z": 11.5, "yaw": 180.0}, "rival1": {"x": 7.0, "z"
          "gate_r5": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r6": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r7": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r8": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r11": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r12": {"x": 7.0, "z": 12.5, "yaw": 180.0}, "gate_r15": {"x": 1.6, "z": 5.0, "yaw": -90.0}, "gate_r16n": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r16s": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "gate_r18": {"x": 14.4, "z": 5.0, "yaw": 90.0}, "route12_house": {"x": 6.0, "z": 9.5, "yaw": 180.0}, "route16_house": {"x": 6.0, "z": 9.5, "yaw": 180.0},
          "cinnabar_gym": {"x": 25.5, "z": 23.4, "yaw": 180.0}, "cinnabar_lab": {"x": 4.5, "z": 9.4, "yaw": 180.0},
          "pokemon_mansion_1f": {"x": 8.5, "z": 33.4, "yaw": 180.0}, "sprout_tower_1f": {"x": 10.0, "z": 14.4, "yaw": 180.0},
-         "earls_pokemon_academy": {"x": 4.0, "z": 14.4, "yaw": 180.0}, "route_35_national_park_gate": {"x": 7.0, "z": 12.5, "yaw": 180.0},
+         "earls_pokemon_academy": {"x": 4.0, "z": 14.4, "yaw": 180.0}, "route_35_national_park_gate": {"x": 25.5, "z": 10.5, "yaw": 180.0},
          "route_36_national_park_gate": {"x": 14.4, "z": 5.0, "yaw": 90.0}}
 # (0.59.7, John 15:33) Every Johto gatehouse a way through (tools/interior/johto_gates.json, from a scan of the map):
 # its room, a door each side in the world (the dark doorway's faces), and where you come in and go out.
@@ -808,7 +812,7 @@ def main():
                 warps.append({"kind": "mat", "x0": m["x0"], "x1": m["x1"], "z": room["D"] - 1.0, "door": None, "to": m["to"], "spawn": spawn_of(m["spawn"])})
         for m in room.get("passes", []):
             if m.get("to") in (None, "town"):
-                warps.append({"kind": "north", "x0": m["x0"], "x1": m["x1"], "z": 1.0, "door": NORTH_DOOR.get(rid), "to": None, "needs": m.get("needs")})
+                warps.append({"kind": "north", "x0": m["x0"], "x1": m["x1"], "z": 1.0, "door": NORTH_DOOR_X.get((rid, round(m["x0"])), NORTH_DOOR.get(rid)), "to": None, "needs": m.get("needs")})
             else:
                 warps.append({"kind": "north", "x0": m["x0"], "x1": m["x1"], "z": 1.0, "door": None, "to": m["to"], "spawn": spawn_of(m["spawn"]), "needs": m.get("needs")})
         for m in room.get("sides", []):

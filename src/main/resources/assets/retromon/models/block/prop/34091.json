@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/tv_field_lance","tv_field_lance":"retromon:block/interior/tv_field_lance"},"elements":[{"from":[0.0,0,0.0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[1.0,9.0,2.0,10.0],"texture":"#tv_field_lance"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/gr_s5","gr_s5":"retromon:block/interior/gr_s5"},"elements":[{"from":[0.96,16,1.28],"to":[15.04,16,14.72],"faces":{"down":{"uv":[0,0,16,16],"texture":"#gr_s5","tintindex":144064064}}}]}
