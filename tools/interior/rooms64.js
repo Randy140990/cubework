@@ -184,9 +184,25 @@
     const doorCells = new Set();
     for (const w of F.warps) if (["door", "pad", "mat", "stairs", "lift", "exit", "lift_out"].includes(w.kind)) doorCells.add(w.x + "," + w.z);
     const walkable = (x, z) => WALK.includes(cellKind(x, z)) || doorCells.has(x + "," + z) || (cellKind(x, z) === "F");
+    // ((0.74) John's 28 Nov 10:41, the POKéMON TOWER: "it needs to feel like a proper staircase going up instead of like a
+    // little child's one. It's like 4 steps, and you don't even go up the steps. And it'll be the same on all the other
+    // sides.") Each of its stairs a real flight: six steps over three blocks, cut into the tower's thick wall beside the
+    // stair tile (a well going down for the stairs down), walked up (or down) before you're through to the next floor.
+    const flights = [];
+    if (FIT && /^pokemon_tower_/.test(id)) for (const w of F.warps) if (w.kind === "stairs" && w.to) {
+      const dir = stairDir(w), d = dir === "e" ? 1 : dir === "w" ? -1 : 0;
+      if (!d) continue;
+      let n = 1; while (n < 3 && at(w.x + n * d, w.z) === "w") n++;
+      if (n < 2) continue;
+      const cells = []; for (let i = 0; i < n; i++) cells.push([w.x + i * d, w.z]);
+      flights.push({ w, d, n, cells, up: floorNo(w.to) > floorNo(id) });
+      for (const [a, b] of cells) doorCells.add(a + "," + b);
+    }
+    const flightOf = w => flights.find(f => f.w === w);
 
     // ----- the floor -----
     const downAt = new Set(F.warps.filter(w => w.kind === "stairs" && w.to && !(floorNo(w.to) > floorNo(id) || /roof/.test(w.to) && !/roof/.test(id))).map(w => w.x + "," + w.z));
+    for (const f of flights) if (!f.up) for (const [a, b] of f.cells) downAt.add(a + "," + b);
     for (let z = 0; z < D; z++) for (let x = 0; x < W; x++) {
       if (at(x, z) === "v") continue;
       R._floors.push([x, z, x + 1, z + 1]);
@@ -241,7 +257,10 @@
         return wst && est;
       };
       const role0 = role;
-      role = (x, z) => { const r = role0(x, z); if (r === "front" && inside(x, z)) return "wall"; if (r === null && !floorish(x, z) && x >= 0 && z >= 0 && x < W && z < D && at(x, z) !== "v" && inside(x, z)) return "mass"; return r; };
+      // ((0.74) The wall in front of a tower flight (on the camera's side) only a ledge, so the steps are seen going up.)
+      const flightFront = new Set();
+      for (const f of flights) for (const [a, b] of f.cells) if (!(a === f.w.x && b === f.w.z)) flightFront.add(a + "," + (b + 1));
+      role = (x, z) => { if (flightFront.has(x + "," + z) && !floorish(x, z)) return "front"; const r = role0(x, z); if (r === "front" && inside(x, z)) return "wall"; if (r === null && !floorish(x, z) && x >= 0 && z >= 0 && x < W && z < D && at(x, z) !== "v" && inside(x, z)) return "mass"; return r; };
       for (let z = -1; z <= D; z++) {
         let x = -1;
         while (x <= W) {
@@ -452,15 +471,18 @@
       const bx0 = w.x + 0.1, bx1 = w.x + 0.9, bz0 = w.z + 0.1, bz1 = w.z + 0.9;
       const key = w.to + ":" + (w.kind === "mat" ? "m" : w.x + "," + w.z);
       // How it looks: steps for stairs, a door in the wall, the lift's doors.
-      if (w.kind === "stairs") stairBlock(w);
+      if (w.kind === "stairs" && !flightOf(w)) stairBlock(w);
       else if (w.kind === "door" || w.kind === "pad") {
         const wallN = !walkable(w.x, w.z - 1);
         if (wallN) G.box(w.x, 0, w.z + 0.02, w.x + 1, 2.3, w.z + 0.08, { s: kind.match(/lorelei|bruno|agatha|lance|champion|lobby/) ? (BEAT[id] ? "lgDoor" : "lgDoorOpen") : kind === "hideout" ? "silphLiftDoor" : "labDoor", all: null });
+        // ((0.74) John's 10:41: a little mat with arrows before a door through to another room.)
+        if (wallN && w.kind === "door" && window.MAT_DOOR_N) G.box(w.x + 0.12, 0, w.z + 0.16, w.x + 0.88, 0.03, w.z + 0.92, { top: window.MAT_DOOR_N, all: "cap", bottom: null });
       } else if (w.kind === "lift") G.box(w.x, 0, w.z + 0.85, w.x + 1, 2.2, w.z + 0.95, { s: "silphLiftDoor", all: "silphLiftWall" });
       if (back) { if (!seen.has(key)) R.act([w.x - 0.3, w.z - 0.3, w.x + 1.3, w.z + 1.3], { label: "Look", lines: ["The door's shut behind you."] }); seen.add(key); continue; }
       // (0.61) The POKéMON TOWER's 6F: MAROWAK's ghost bars the stairs up (Game.gateBlocked: the GHOST without the
       // SILPH SCOPE, MAROWAK unveiled with it) till it's laid to rest.
       const needs = BEAT[id] && !(w.kind === "mat") ? "beat:" + BEAT[id] : id === "pokemon_tower_6f" && w.to === "pokemon_tower_7f" ? "marowak_calmed" : null;
+      if (flightOf(w)) { buildFlight(flightOf(w), sp, needs); continue; }
       R._boxes.push({ x0: bx0, z0: bz0, x1: bx1, z1: bz1, to: w.to, spawn: sp, needs });
       R.warps.push({ test: p => p.x > bx0 && p.x < bx1 && p.z > bz0 && p.z < bz1, to: w.to, spawn: sp, fx: "fade" });
     }
@@ -504,6 +526,39 @@
       if (w.beh === 109 || w.beh === 111) return "w";
       const solidAt = (x, z) => x < 0 || z < 0 || x >= W || z >= D || !WALK.includes(at(x, z));
       return solidAt(w.x + 1, w.z) ? "e" : solidAt(w.x - 1, w.z) ? "w" : "n";
+    }
+    // (0.74) A tower flight: the steps (half a block deep, 0.3 high), its slope to walk on, the wall shut at its end
+    // with a dark way through above the top step (or the well's dark at the bottom), and the way to the next floor
+    // when you're up (or down) it.
+    function buildFlight(f, sp, needs) {
+      const { w, d, n, up } = f, z0 = w.z, z1 = w.z + 1, xa = d > 0 ? w.x : w.x - n + 1, xb = xa + n, S = 2 * n, RISE = 0.3;
+      const kOf = x => d > 0 ? x - xa : xb - x;
+      const wallMat = L.fitWall || L.wall;
+      for (let i = 0; i < S; i++) {
+        const k0 = i * 0.5, k1 = k0 + 0.5, s0 = d > 0 ? xa + k0 : xb - k1, s1 = d > 0 ? xa + k1 : xb - k0;
+        if (up) G.box(s0, 0, z0, s1, (i + 1) * RISE, z1, { top: "fitTread", all: "fitStepSide", bottom: null });
+        else G.box(s0, -2.1, z0, s1, -(i + 1) * RISE, z1, { top: "fitTread", all: "fitStepSide", bottom: null });
+      }
+      const top = S * RISE, ex = d > 0 ? xb : xa - 1;
+      // The end of the flight: the wall, taller than the tower's, a dark way through it above the top step.
+      G.box(ex, up ? 0 : -2.1, z0, ex + 1, up ? top + 2.0 : TALL, z1, { all: wallMat, top: "cap", bottom: null });
+      if (up) G.box(d > 0 ? xb - 0.03 : xa, top, z0 + 0.1, d > 0 ? xb : xa + 0.03, top + 1.8, z1 - 0.1, { [d > 0 ? "w" : "e"]: "fitArchDark", all: null });
+      else {
+        // The well's sides and its dark end, below the floor.
+        G.box(xa, -2.1, z0 - 0.04, xb, 0, z0, { s: "fitStepSide", all: null });
+        G.box(xa, -2.1, z1, xb, 0, z1 + 0.04, { n: "fitStepSide", all: null });
+        G.box(d > 0 ? xb - 0.03 : xa, -2.1, z0, d > 0 ? xb : xa + 0.03, 0, z1, { [d > 0 ? "w" : "e"]: "fitArchDark", all: null });
+      }
+      R.ramps.push({ rect: [xa, z0, xb, z1], h: x => { const st = Math.max(0, Math.min(S, Math.ceil(kOf(x) / 0.5 - 0.35))); return (up ? 1 : -1) * st * RISE; } });
+      const fx = d > 0 ? xa + 0.3 : xb - 0.3, fz = z0 + 0.5;
+      if (up) {
+        R.warps.push({ test: p => p.y >= 1.2 && p.x > xa - 0.3 && p.x < xb + 0.3 && p.z > z0 - 0.3 && p.z < z1 + 0.3, to: w.to, spawn: sp, fx: "fade", why: "up" });
+        (R._stairs || (R._stairs = [])).push({ dir: "up", x0: xa, x1: xb, z0, depth: 1, to: w.to, spawn: sp, needs, foot: { x: fx, z: fz } });
+      } else {
+        R.warps.push({ test: p => p.y <= -1.45, to: w.to, spawn: sp, fx: "fade", why: "down" });
+        (R._stairs || (R._stairs = [])).push({ dir: "down", x0: xa, x1: xb, z0, depth: 1, to: w.to, spawn: sp });
+      }
+      R.item(up ? "Stairs up" : "Stairs down", "A flight of six steps cut into the tower's wall: walk " + (up ? "up" : "down") + " them to the next floor.");
     }
     function stairBlock(w) {
       const up = floorNo(w.to) > floorNo(id) || /roof/.test(w.to) && !/roof/.test(id);

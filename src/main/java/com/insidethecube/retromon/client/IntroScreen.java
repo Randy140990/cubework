@@ -512,7 +512,7 @@ public class IntroScreen extends GameScreen {
 
 	private void startOak() {
 		if (bundledMap() == null) {
-			failure = "The map isn't installed. Put Retromon-Map-1.0.1.jar in your mods folder (beside Retromon), then restart.";
+			failure = "The map isn't installed. Put Retromon-Map-1.0.3.jar in your mods folder (beside Retromon), then restart.";
 			step = Step.FAILED;
 			return;
 		}

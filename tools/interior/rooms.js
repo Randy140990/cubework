@@ -1410,7 +1410,8 @@ const BUILD = {
     deskPC(R, 0.4, 0, "s", R.screen("pcLocked", 40, 24, drawLocked, 1), { top: "walnut", lines: ["His PC's locked. The password hint just says: ME."] });
     drawerUnit(R, 2.8, 0, "s", 0.9, 1.1, "walnut");
     officeChair(R, 1.55, 1.6, "n", "redFabric");
-    windowN(R, 4.6, 1.5, 2.2, 2.0, { curtains: "curtain", curtainIn: 0.35, lines: ["From up here you can see right into your own room."] });
+    // ((0.74) John's 10:41: "probably don't want red curtains in the bedroom": blue, with his navy walls.)
+    windowN(R, 4.6, 1.5, 2.2, 2.0, { curtains: "curtainBlue", curtainIn: 0.35, lines: ["From up here you can see right into your own room."] });
     framed(R, 7.7, 1.5, 1.2, 1.6, "posterRival", "n", { frame: false, act: { label: "Look", lines: ["A poster: CHAMP OR BUST."] } });
     framed(R, 2.4, 1.6, 1.3, 1.75, "posterDragon", "e", { frame: false, act: { label: "Look", lines: ["A poster of a dragon breathing fire over the stars."] } });
     R.item("Posters", "CHAMP OR BUST, and a dragon over the stars.");

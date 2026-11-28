@@ -38,8 +38,11 @@ public final class MagnetTrain {
 	/** GOLDENROD's: its line (z 684 to 688, its top at y 28) east from the station to its tunnel (its back at x -2047). */
 	static final End GOLDENROD = new End("goldenrod_magnet_train_station", "goldenrod_magnet_train_station_officer", "GOLDENROD", 28.0, 686.5, -2120.5, -2047.0,
 			-2055.0, 1, new Vec3(-2120.5, 21.0, 686.5));
-	/** SAFFRON's (John's copy of GOLDENROD's, flipped east to west): its line (z 389 to 393, top y 41) west to its tunnel. */
-	static final End SAFFRON = new End("saffron_magnet_train_station", "saffron_magnet_train_station_officer", "SAFFRON", 41.0, 391.5, -385.5, -409.0, -401.0, -1,
+	/**
+	 * SAFFRON's (John's copy of GOLDENROD's, flipped east to west): its line (z 389 to 393, top y 41) west to its tunnel;
+	 * ((0.74) his 10:56 save: the line run on west, the tunnel's mouth at x -430, its dark back at -433).
+	 */
+	static final End SAFFRON = new End("saffron_magnet_train_station", "saffron_magnet_train_station_officer", "SAFFRON", 41.0, 391.5, -385.5, -433.0, -430.0, -1,
 			new Vec3(-385.5, 34.0, 391.5));
 
 	/** Half the train's length (tools/train73.py: 16.5 blocks), and a little more, to be out of sight behind the wall. */
@@ -144,6 +147,9 @@ public final class MagnetTrain {
 		t.putDouble("start", a);
 		t.putDouble("y", e.y());
 		t.putDouble("z", e.z());
+		// ((0.74) The tunnel's dark back here: the train's cut off past it, so it's gone into the dark.)
+		t.putDouble("wall", e.wallX());
+		t.putInt("dir", e.toTunnel());
 		Net.send(p, "ride", t);
 	}
 

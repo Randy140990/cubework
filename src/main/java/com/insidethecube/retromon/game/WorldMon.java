@@ -122,9 +122,56 @@ public class WorldMon extends PathfinderMob {
 		yHeadRot = yaw;
 	}
 
+	/**
+	 * (0.74) John's 28 Nov 10:41: "their meow equivalent is not there, which they should be, remember, walking around".
+	 * One that goes about with someone (TEAM ROCKET's MEOWTH, by JESSIE): ambling round near them, along with them when
+	 * they walk off, and gone with them.
+	 */
+	public net.minecraft.world.entity.Entity follow;
+	private double aimX = Double.NaN, aimZ;
+	private int restFor;
+
+	private void followTick() {
+		if (follow == null) {
+			// (Left over in a save, with no one to go about with: gone.)
+			if (tickCount > 40) discard();
+			return;
+		}
+		if (follow.isRemoved() || follow.level() != level()) {
+			discard();
+			return;
+		}
+		setNoGravity(true);
+		noPhysics = true;
+		setWanders(true);
+		boolean moving = follow.getDeltaMovement().horizontalDistanceSqr() > 1e-4 || Math.hypot(follow.getX() - follow.xo, follow.getZ() - follow.zo) > 0.01;
+		double near = Math.hypot(aimX - follow.getX(), aimZ - follow.getZ());
+		if (Double.isNaN(aimX) || moving || near > 3.2) {
+			// Keeping up: just behind and beside them.
+			double a = Math.toRadians(follow.getYRot());
+			aimX = follow.getX() + Math.sin(a) * 1.1 + Math.cos(a) * 0.9;
+			aimZ = follow.getZ() - Math.cos(a) * 1.1 + Math.sin(a) * 0.9;
+			restFor = 0;
+		}
+		double dx = aimX - getX(), dz = aimZ - getZ(), dist = Math.hypot(dx, dz);
+		if (dist < 0.08) {
+			if (--restFor > 0) return;
+			// Somewhere else round them, now and then.
+			double ang = random.nextDouble() * Math.PI * 2, r = 1.3 + random.nextDouble() * 1.4;
+			aimX = follow.getX() + Math.cos(ang) * r;
+			aimZ = follow.getZ() + Math.sin(ang) * r;
+			restFor = 40 + random.nextInt(90);
+			return;
+		}
+		double step = Math.min(dist, moving ? 0.16 : 0.05);
+		setFacing((float) Math.toDegrees(Math.atan2(-dx, dz)));
+		setPos(getX() + dx / dist * step, follow.getY(), getZ() + dz / dist * step);
+	}
+
 	@Override
 	public void tick() {
 		super.tick();
+		if (!level().isClientSide() && key().startsWith("rocket_meowth:")) followTick();
 		// (15:21) An item ball inside, put in twice (one left from the save): the second goes, so one you take is gone.
 		if (!level().isClientSide() && tickCount % 20 == 1 && key().startsWith("item:") && level().dimension() == Interiors.LEVEL && Game.twin(this, key())) {
 			discard();

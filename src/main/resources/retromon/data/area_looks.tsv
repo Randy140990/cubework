@@ -2412,8 +2412,8 @@ swap	polished_deepslate_slab	-537	422	-534	428	33	34	block/polished_deepslate=be
 swap	spruce_trapdoor	-537	422	-534	428	33	34	block/spruce_trapdoor=bench_end_cel	a bench by the fountain
 swap	warped_shelf	-565	385	-452	462	33	60	block/warped_shelf=cel_trim	Celadon City
 swap	quartz_bricks,quartz_stairs,dripstone_block	-521	425	-507	432	27	33	block/quartz_bricks=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_side=quartz_clean,block/dripstone_block=quartz_clean	the pond by the house
-swap	terracotta	-2214	616	-2041	774	18	19	block/terracotta=gold_road	Goldenrod City
-swap	brown_glazed_terracotta	-2214	616	-2041	774	18	19	block/brown_glazed_terracotta=gold_pave	Goldenrod City
+swap	terracotta	-2214	616	-2041	774	18	19	block/terracotta=gold_plaza@4	Goldenrod City
+swap	brown_glazed_terracotta	-2214	616	-2041	774	18	19	block/brown_glazed_terracotta=gold_plaza_path@4	Goldenrod City
 swap	white_terracotta	-2214	616	-2041	774	18	19	block/white_terracotta=gold_kerb	Goldenrod City
 swap	pale_oak_fence	-2214	616	-2041	774	19	40	block/pale_oak_planks=gold_fence	Goldenrod City
 swap	quartz_pillar	-2214	616	-2041	774	19	40	block/quartz_pillar=gold_pillar,block/quartz_pillar_top=gold_pillar_top	Goldenrod City
@@ -5708,7 +5708,7 @@ swap	iron_chain	-2071	735	-2064	745	20	30	block/iron_chain=chain_steel	a Goldenr
 swap	stone_button	-2071	735	-2064	745	20	26	block/stone=bolt	a Goldenrod alley
 swap	cyan_terracotta,light_gray_concrete	-2108	750	-2099	765	19	19	block/cyan_terracotta=path_kanto@4,block/light_gray_concrete=path_kanto@4	Goldenrod's way out south
 grass_onto	cyan_terracotta,light_gray_concrete	-2108	750	-2099	765	19	19	-	Goldenrod's way out south
-swap	terracotta	-2109	746	-2098	747	19	19	block/terracotta=gold_pave	under Goldenrod's south arch
+swap	terracotta	-2109	746	-2098	747	19	19	block/terracotta=gold_plaza_path@4	under Goldenrod's south arch
 swap	sea_lantern	-2093	775	-2070	793	21	26	block/sea_lantern=glass_dark	the Day Care's windows
 swap	oak_stairs,oak_slab,oak_planks	-1963	849	-1951	859	19	25	block/oak_planks=well_roof	the Slowpoke Well
 swap	andesite,andesite_stairs,andesite_slab,andesite_wall,stone_bricks,stone_brick_wall,stone_brick_slab,stone_brick_stairs,cobblestone,cobblestone_wall	-1963	849	-1951	859	14	25	block/andesite=well_stone,block/stone_bricks=well_stone,block/cobblestone=well_stone	the Slowpoke Well
@@ -6649,6 +6649,16 @@ boulder	spruce_fence,oak_fence,dark_oak_fence	-391	429	-388	431	34	39	prefix:ttr
 boulder	spruce_fence,oak_fence,dark_oak_fence	-364	452	-362	453	34	39	prefix:ttrunk	Saffron's tree
 boulder	spruce_fence,oak_fence,dark_oak_fence	-358	452	-357	454	34	39	prefix:ttrunk	Saffron's tree
 boulder	spruce_fence,oak_fence,dark_oak_fence	-361	455	-359	456	34	39	prefix:ttrunk	Saffron's tree
+swap	polished_diorite_slab	-2130	678	-2112	694	27	35	block/polished_diorite=gold_dome@4	Goldenrod's MAGNET TRAIN station
+swap	polished_diorite,polished_diorite_stairs	-2130	678	-2112	694	20	35	block/polished_diorite=saf_white	Goldenrod's MAGNET TRAIN station
+swap	smooth_quartz,smooth_quartz_stairs,smooth_quartz_slab,quartz_slab	-436	383	-409	399	33	44	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean	Saffron's MAGNET TRAIN line, on to its tunnel
+swap	gray_concrete	-433	389	-409	389	40	40	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Saffron
+swap	gray_concrete	-433	390	-409	390	40	40	block/gray_concrete=track_rail	the MAGNET TRAIN's line, Saffron
+swap	gray_concrete	-433	391	-409	391	40	40	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Saffron
+swap	gray_concrete	-433	392	-409	392	40	40	block/gray_concrete=track_rail	the MAGNET TRAIN's line, Saffron
+swap	gray_concrete	-433	393	-409	393	40	40	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Saffron
+swap	black_concrete	-436	385	-433	397	36	45	block/black_concrete=tunnel_dark	Saffron's MAGNET TRAIN tunnel
+cube	stripped_spruce_wood,stripped_spruce_log	-452	360	-400	406	-	-	hill_top|cliff_root@4	the cliff round Saffron's MAGNET TRAIN tunnel
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care

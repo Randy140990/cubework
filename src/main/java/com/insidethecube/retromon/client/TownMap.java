@@ -523,6 +523,14 @@ public final class TownMap {
 					continue;
 				}
 				int ri = Math.floorMod(z, R) * R + Math.floorMod(x, R);
+				// ((0.74) John's 10:41: "the top right is still missing areas". A column that comes in empty (nothing in
+				// it, as a chunk not filled in yet can) never wipes what the map has there.)
+				if (name.equals("minecraft:air")) {
+					names[i] = r.names.get(r.id[ri]);
+					ys[i] = r.y[ri];
+					ds[i] = r.depth[ri];
+					continue;
+				}
 				if (!r.names.get(r.id[ri]).equals(name) || r.y[ri] != ys[i] || (name.equals("minecraft:water") && r.depth[ri] != depth)) changed = true;
 			}
 		}
@@ -536,6 +544,8 @@ public final class TownMap {
 		for (int lz = 0; lz < 16; lz++) {
 			for (int lx = 0; lx < 16; lx++) {
 				int i = lz * 16 + lx, ri = Math.floorMod(cz * 16 + lz, R) * R + Math.floorMod(cx * 16 + lx, R);
+				// ((0.74) An empty column kept from before (a save's older changes): the map's own land stays.)
+				if (names[i] == null || names[i].equals("minecraft:air")) continue;
 				r.id[ri] = (short) r.name(names[i]);
 				r.y[ri] = ys[i];
 				r.depth[ri] = ds[i];

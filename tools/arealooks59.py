@@ -221,7 +221,7 @@ def round59(add, room, G):
     SX = (-2108, 750, -2099, 765, "Goldenrod's way out south")
     add("swap", "cyan_terracotta,light_gray_concrete", SX, "block/cyan_terracotta=path_kanto@4,block/light_gray_concrete=path_kanto@4", ys(19, 19))
     add("grass_onto", "cyan_terracotta,light_gray_concrete", SX, "-", ys(19, 19))
-    add("swap", "terracotta", (-2109, 746, -2098, 747, "under Goldenrod's south arch"), "block/terracotta=gold_pave", ys(19, 19))
+    add("swap", "terracotta", (-2109, 746, -2098, 747, "under Goldenrod's south arch"), "block/terracotta=gold_plaza_path@4", ys(19, 19))
     # The Day Care (18:39: "you can see the sea lanterns inside ... get rid of the lights"): its windows dark glass.
     add("swap", "sea_lantern", (-2093, 775, -2070, 793, "the Day Care's windows"), "block/sea_lantern=glass_dark", ys(21, 26))
     # The Slowpoke Well (18:39: "you haven't done the well"): its shingled roof, its grey stone, its cover.

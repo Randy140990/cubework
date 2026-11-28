@@ -56,6 +56,7 @@ function fitGreen(R) {
   for (let z = 0; z < D; z++) { open.push([]); for (let x = 0; x < W; x++) open[z].push(floorOK(x, z) && !solidIn(x, z)); }
   const flat = (x, z) => [[0.2, 0.2], [0.8, 0.2], [0.2, 0.8], [0.8, 0.8]].every(([u, v]) => Math.abs(R.groundAt(x + u, z + v)) < 0.01) && !R.ramps.some(r => hit(r.rect, x, z, 1));
   const isOpen = (x, z) => x >= 0 && z >= 0 && x < W && z < D && open[z][x];
+  const outer = (a, b) => a < (R.Lx || 0) || a + 1 > (R.Rx || R.W) + 1e-6 || b < (R.Nm || 0) || b + 1 > (R.Dm || R.D) + 1e-6;
   // Where you come in: the spawn, else the way-out arrow, else the first open block.
   let st = R.spawn ? [Math.floor(R.spawn.x), Math.floor(R.spawn.z)] : R.exitArrow ? [Math.floor(R.exitArrow.x), Math.floor(R.exitArrow.z) - 1] : null;
   if (!st || !isOpen(st[0], st[1])) { st = null; for (let z = D - 1; z >= 0 && !st; z--) for (let x = 0; x < W && !st; x++) if (isOpen(x, z)) st = [x, z]; }
@@ -88,6 +89,9 @@ function fitGreen(R) {
     // Against a wall: how many sides are shut (2 is a corner).
     const shut = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dz]) => !isOpen(x + dx, z + dz)).length;
     if (shut < 1 || shut > 2) return false;
+    // ((0.74) John's 10:41, Gary's room: "a couple of plants kind of like in the centre of the room around this stuff on
+    // that right hand side". One of its sides a wall of the room itself: not only furniture, or a stair well's rail.)
+    if (![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dz]) => outer(x + dx, z + dz))) return false;
     return reach(x, z) === all - 1;
   };
   const cand = [];

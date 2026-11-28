@@ -16,6 +16,12 @@ public final class Ride {
 	private Ride() {}
 
 	public static boolean on;
+	/**
+	 * (0.74) The tunnel's dark back (x) at this end, and which way past it the train's cut off (+1 east, -1 west; 0:
+	 * none): the train goes into the dark and is gone, never out the other side (client/ClipConsumer).
+	 */
+	public static double wall;
+	public static int dir;
 	private static int train = -1;
 	private static double x0, x1, start, y, z, follow = Double.NaN;
 
@@ -31,6 +37,8 @@ public final class Ride {
 		start = t.getDoubleOr("start", 0);
 		y = t.getDoubleOr("y", 0);
 		z = t.getDoubleOr("z", 0);
+		wall = t.getDoubleOr("wall", 0);
+		dir = on ? t.getIntOr("dir", 0) : 0;
 		follow = Double.NaN;
 	}
 

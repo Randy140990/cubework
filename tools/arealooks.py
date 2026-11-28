@@ -854,6 +854,9 @@ def round50(add, room):
     # (0.73) John's 28 Nov 09:22 save: Saffron's MAGNET TRAIN station, the tunnels, Saffron's bench and trees.
     import arealooks73
     arealooks73.round73(add, globals())
+    # (0.74) John's 28 Nov 10:42 and 10:56: Goldenrod's floor and station roof, Saffron's line on to its new tunnel.
+    import arealooks74
+    arealooks74.round74(add, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
@@ -1269,8 +1272,10 @@ def round53(add, room):
     # as Celadon's new ones. (Its buildings are Celadon's: main() gives them Celadon's looks.)
     G = GOLD_IN
     g = ("18", "19")
-    add("swap", "terracotta", G, "block/terracotta=gold_road", g)
-    add("swap", "brown_glazed_terracotta", G, "block/brown_glazed_terracotta=gold_pave", g)
+    # ((0.74) John's 28 Nov 10:42: "take that pattern and extend it all the way through goldenrod": the MAGNET TRAIN
+    # plaza's flagstones (arealooks70b) all through the city, the paths in their yellow; tools/arealooks74.py.)
+    add("swap", "terracotta", G, "block/terracotta=gold_plaza@4", g)
+    add("swap", "brown_glazed_terracotta", G, "block/brown_glazed_terracotta=gold_plaza_path@4", g)
     add("swap", "white_terracotta", G, "block/white_terracotta=gold_kerb", g)
     add("swap", "pale_oak_fence", G, "block/pale_oak_planks=gold_fence", ("19", "40"))
     add("swap", "quartz_pillar", G, "block/quartz_pillar=gold_pillar,block/quartz_pillar_top=gold_pillar_top", ("19", "40"))

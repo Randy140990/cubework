@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/mt_rail","mt_rail":"retromon:block/interior/mt_rail"},"elements":[{"from":[16,0.72,2.8],"to":[16,1.52,3.6],"faces":{"west":{"uv":[4.7,15.62,4.9,15.82],"texture":"#mt_rail"}}}]}

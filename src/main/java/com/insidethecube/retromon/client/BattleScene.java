@@ -576,6 +576,11 @@ public final class BattleScene {
 	public static int flashColor, flashTicks, flashMax = 1;
 	/** The camera's move for an attack: a push in towards the attacker, and back. */
 	private static int shotSide = -1, shotTicks, shotMax = 1;
+	/**
+	 * (0.74) John's 28 Nov 10:41: "when you're actually in the battles, is maybe on some of the moves it goes to a side
+	 * profile, so you see the attack". This shot from the side (the two of them across the picture), not pushed in.
+	 */
+	private static boolean shotProfile;
 	/** A lightning bolt to come down on a target (Thunderbolt, Thunder): ticks to wait, and where. */
 	private static int boltIn = -1;
 	private static Vec3 boltAt = Vec3.ZERO;
@@ -716,7 +721,9 @@ public final class BattleScene {
 		}
 		boolean close = contact(m);
 		String id = m.id();
-		shot(side, close ? 16 : 24);
+		// ((0.74) The moves sent across from afar, and the big hits up close: seen from the side.)
+		if (!close || m.power() >= 80) profile(side, close ? 28 : 38);
+		else shot(side, close ? 16 : 24);
 		if (!close) FX.add(new Fx(CHARGE, me, me, ParticleTypes.END_ROD, tint, 7, 0, new int[1], 4));
 		int after = close ? 5 : 7;
 		if (id.equals("thunderbolt") || id.equals("thunder") || id.equals("zap_cannon") || id.equals("thundershock") || id.equals("thunderpunch")) {
@@ -767,6 +774,12 @@ public final class BattleScene {
 	private static void shot(int side, int ticks) {
 		shotSide = side;
 		shotTicks = shotMax = ticks;
+		shotProfile = false;
+	}
+
+	private static void profile(int side, int ticks) {
+		shot(side, ticks);
+		shotProfile = true;
 	}
 
 	private static String sound(Move m) {
@@ -1586,6 +1599,30 @@ public final class BattleScene {
 			x += (front.x - x) * w;
 			y += (front.y - y) * w;
 			z += (front.z - z) * w;
+			Vec3 at = camTarget.lerp(look, w).subtract(x, y, z);
+			yaw = Math.toDegrees(Math.atan2(-at.x, at.z));
+			pitch = Math.toDegrees(Math.atan2(-at.y, Math.sqrt(at.x * at.x + at.z * at.z)));
+		} else if (shotTicks > 0 && shotSide >= 0 && shotProfile) {
+			// (0.74) From the side: round to face the line between the two of them, at their middle, far enough back
+			// to have both in the picture; held while the move goes across, then back.
+			float t = 1 - (shotTicks - partial) / shotMax;
+			double w = t < 0.22 ? t / 0.22 : t > 0.8 ? (1 - t) / 0.2 : 1;
+			w = Math.max(0, Math.min(1, w));
+			w = w * w * (3 - 2 * w);
+			Vec3 a = spot(0), b = spot(1), mid = a.lerp(b, 0.5);
+			Vec3 along = new Vec3(b.x - a.x, 0, b.z - a.z);
+			double sep = along.length();
+			along = sep < 1e-3 ? new Vec3(0, 0, 1) : along.scale(1 / sep);
+			Vec3 across = new Vec3(-along.z, 0, along.x);
+			// (The side the camera's on already, so it swings round the shorter way.)
+			if (across.dot(new Vec3(cam.x - mid.x, 0, cam.z - mid.z)) < 0) across = across.scale(-1);
+			double h = Math.max(height(0), height(1));
+			Vec3 from = mid.add(across.scale(sep * 0.62 + 3.2 + h * 0.8)).add(0, 1.1 + h * 0.45, 0);
+			if (kind.equals("inside")) from = clear(mid.add(0, 0.8, 0), from);
+			Vec3 look = mid.add(0, 0.35 + h * 0.4, 0);
+			x += (from.x - x) * w;
+			y += (from.y - y) * w;
+			z += (from.z - z) * w;
 			Vec3 at = camTarget.lerp(look, w).subtract(x, y, z);
 			yaw = Math.toDegrees(Math.atan2(-at.x, at.z));
 			pitch = Math.toDegrees(Math.atan2(-at.y, Math.sqrt(at.x * at.x + at.z * at.z)));

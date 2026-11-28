@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/tv_field_pewter","tv_field_pewter":"retromon:block/interior/tv_field_pewter"},"elements":[{"from":[0.0,0,0.0],"to":[16.0,0,16.0],"faces":{"up":{"uv":[8.0,12.0,9.0,13.0],"texture":"#tv_field_pewter"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cardboard","cardboard":"retromon:block/interior/cardboard"},"elements":[{"from":[1.6,16,2.4],"to":[14.4,16,13.6],"faces":{"down":{"uv":[0,0,16,16],"texture":"#cardboard","tintindex":144064064}}}]}

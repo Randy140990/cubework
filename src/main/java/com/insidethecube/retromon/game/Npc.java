@@ -153,7 +153,37 @@ public class Npc extends PathfinderMob {
 		face(facing());
 	}
 
+	/** (0.74) Walking off after a story battle (TEAM ROCKET's): ticks left till they're gone; -1 when not. */
+	private int leaveTicks = -1;
+
+	/**
+	 * (0.74) John's 10:41: "when you finish those events, surely they should say something and then walk away, instead
+	 * of just disappearing". Off they go to there (out of the picture), and they're gone once there.
+	 */
+	public void leave(BlockPos to) {
+		talker = null;
+		approaching = 0;
+		home = to;
+		homeFacing = facing();
+		walking = getNavigation().moveTo(to.getX() + 0.5, to.getY(), to.getZ() + 0.5, 0.75);
+		faceAfter = Float.NaN;
+		leaveTicks = 200;
+	}
+
+	public boolean leaving() {
+		return leaveTicks >= 0;
+	}
+
 	private void serverTick() {
+		if (leaveTicks >= 0) {
+			if (--leaveTicks <= 0 || home != null && blockPosition().distManhattan(home) <= 1) {
+				discard();
+				return;
+			}
+			if (getNavigation().isDone() && home != null) getNavigation().moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, 0.75);
+			entityData.set(FACING, getYRot());
+			return;
+		}
 		// Your rival, left over in a save from when he was about: gone.
 		if (key().startsWith("rival") && !Game.rivalKnown(this)) {
 			discard();

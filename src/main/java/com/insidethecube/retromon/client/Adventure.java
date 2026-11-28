@@ -326,7 +326,10 @@ public final class Adventure {
 			double d = to.length();
 			double facing = d < 1e-3 ? 1 : to.normalize().dot(look);
 			// Someone behind a counter (the nurse, a shop's clerk) you're facing: further, but still to talk to.
-			boolean across = e instanceof Npc && facing > 0.8 && d <= 4.2;
+			// ((0.74) John's 10:41, in the MART: "I'm near the shelves. It's trying to interact with the woman behind."
+			// Only the nurse and the clerks, across their counters: anyone else past a shelf you're facing is behind
+			// it, and the shelf is what you look at.)
+			boolean across = e instanceof Npc n && (n.role() == Npc.NURSE || n.role() == Npc.CLERK) && facing > 0.8 && d <= 4.2;
 			if (d > 3.5 && !across) continue;
 			if (facing < 0.35 && d > 1.1) continue;
 			double score = d - facing * 1.5 + (e instanceof WorldMon ? 0.8 : 0);

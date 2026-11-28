@@ -24,6 +24,8 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		float yaw, lift;
 		String pose;
 		boolean asleep;
+		/** (0.74) The MAGNET TRAIN (cut off at its tunnel's dark back while you ride). */
+		boolean train;
 	}
 
 	public WorldMonRenderer(EntityRendererProvider.Context ctx) {
@@ -53,6 +55,7 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		if (!(e.model instanceof BedrockModel m) || m.def != BedrockModel.def(e.species())) e.model = BedrockModel.create(e.species());
 		s.model = e.model instanceof BedrockModel m ? m : null;
 		s.yaw = e.facing();
+		s.train = e.key().startsWith("train:");
 		// (0.61) Your SURF POKéMON: under you, where you are this frame (not a tick behind), its back at your feet,
 		// facing the way you face.
 		var me = net.minecraft.client.Minecraft.getInstance().player;
@@ -109,6 +112,9 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		BedrockModel m = s.model;
 		if (m == null) return;
 		float scale = m.def.scale;
+		// ((0.74) Where the tunnel's dark back is in the drawing's space: the entity's place there, less its place in the
+		// world, plus the wall's.)
+		float wall = s.train && Ride.on && Ride.dir != 0 ? (float) (Ride.wall - s.x + pose.last().pose().m30()) : Float.NaN;
 		pose.pushPose();
 		pose.translate(0, s.lift, 0);
 		pose.mulPose(Axis.YP.rotationDegrees(180F - s.yaw));
@@ -122,6 +128,19 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 		pose.scale(scale, scale, scale);
 		pose.translate(0F, -1.501F, 0F);
 		m.pose(s.ageInTicks / 20.0, s.pose, null, 0);
+		if (!Float.isNaN(wall)) {
+			// (0.74) The MAGNET TRAIN going into its tunnel (or coming out of it): drawn cut off at the dark back.
+			final int light = s.lightCoords, side = Ride.dir;
+			out.submitCustomGeometry(pose, RenderTypes.entityCutoutNoCull(m.def.texture), (pp, vc) -> {
+				PoseStack ps = new PoseStack();
+				ps.last().pose().set(pp.pose());
+				ps.last().normal().set(pp.normal());
+				m.root.render(ps, new ClipConsumer(vc, wall, side), light, OverlayTexture.NO_OVERLAY);
+			});
+			pose.popPose();
+			super.submit(s, pose, out, camera);
+			return;
+		}
 		out.submitModelPart(m.root, pose, RenderTypes.entityCutoutNoCull(m.def.texture), s.lightCoords, OverlayTexture.NO_OVERLAY, null);
 		for (BedrockModel.Layer l : m.def.layers) {
 			out.submitModelPart(m.root, pose, RenderTypes.entityTranslucentEmissive(l.frame(s.ageInTicks / 20F)), FULL_BRIGHT, OverlayTexture.NO_OVERLAY, null);

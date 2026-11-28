@@ -818,8 +818,13 @@ def main():
                           "needs": k.get("needs"), "spawn": spawn_of(k["spawn"])})
         for s in room["stairs"]:
             to = s["to"]; sp = s["spawn"]
-            warps.append({"kind": s["dir"], "x0": s["x0"], "x1": s["x0"] + 4, "z0": s["z0"], "z1": s["z0"] + s["depth"], "to": to,
-                          "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360}})
+            # ((0.74) The POKéMON TOWER's and MANSION's flights: as long as they are, what the way up needs (MAROWAK
+            # laid to rest), and where you're turned back to without it.)
+            w = {"kind": s["dir"], "x0": s["x0"], "x1": s.get("x1", s["x0"] + 4), "z0": s["z0"], "z1": s["z0"] + s["depth"], "to": to,
+                 "spawn": {"x": sp["x"], "z": sp["z"], "yaw": (180 - math.degrees(sp["yaw"])) % 360}}
+            if s.get("needs"): w["needs"] = s["needs"]
+            if s.get("foot"): w["foot"] = {"x": s["foot"]["x"], "z": s["foot"]["z"]}
+            warps.append(w)
         people, aides = [], list(AIDES_FROM_GAMES)
         for i, n in enumerate(room["npcs"]):
             if n["name"] == "Blue": continue  # your rival comes in himself when it's time

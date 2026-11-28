@@ -861,7 +861,12 @@ public final class Game {
 
 	/** The height most of a place's open ground is at (its streets and paths). */
 	private static int streetY(ServerLevel level, Zone z) {
-		return STREET.computeIfAbsent(z.place() + z.x1() + "," + z.z1(), k -> {
+		return streetY(level, z, false);
+	}
+
+	/** (low: the lowest of the heights a good part of the place is at, for GO HERE; see below.) */
+	private static int streetY(ServerLevel level, Zone z, boolean low) {
+		return STREET.computeIfAbsent((low ? "low:" : "") + z.place() + z.x1() + "," + z.z1(), k -> {
 			Map<Integer, Integer> count = new HashMap<>();
 			for (int x = z.x1(); x <= z.x2(); x += 3) {
 				for (int zz = z.z1(); zz <= z.z2(); zz += 3) {
@@ -876,6 +881,12 @@ public final class Game {
 				n = e.getValue();
 				best = e.getKey();
 			}
+			// ((0.74) John's 10:41: GO HERE in SAFFRON "I'm on top of the friggin' roof": its flat roofs cover more of
+			// it than its streets do. For GO HERE, the streets are the lowest of the heights a good part of it is at: the
+			// lowest with a quarter as many as the commonest, and within twelve blocks of it.)
+			int common = best;
+			if (low) for (Map.Entry<Integer, Integer> e : count.entrySet())
+				if (e.getValue() * 4 >= n && e.getKey() < best && e.getKey() >= common - 12) best = e.getKey();
 			return best;
 		});
 	}
@@ -1984,6 +1995,7 @@ public final class Game {
 		}
 		if (!both.isEmpty() && both.get(0).key().equals("rocket_viridian")) {
 			ROCKETS.put(p.getUUID(), both);
+			meowth(level, both.get(0), "viridian");
 			Retromon.LOG.info("Retromon: TEAM ROCKET waiting in VIRIDIAN at {}", both.get(0).blockPosition());
 		} else {
 			for (Npc n : both) n.discard();
@@ -2009,19 +2021,73 @@ public final class Game {
 		walkUp(p, jessie, rocketViridian(), "meet_evil_trainer", null);
 	}
 
-	/** Once their battle's over and done with on your screen, JESSIE and JAMES are off ("blasting off", in a puff). */
+	/**
+	 * Once their battle's over and done with on your screen, JESSIE and JAMES are off: ((0.74) John's 10:41: "surely
+	 * they should say something and then walk away, instead of just disappearing") JESSIE says her parting line, and
+	 * they (and MEOWTH) walk off out of the picture, and are gone.
+	 */
 	private static void rocketsLeave(MinecraftServer s) {
 		for (Map.Entry<UUID, List<Npc>> e : List.copyOf(ROCKETS.entrySet())) {
 			ServerPlayer p = s.getPlayerList().getPlayer(e.getKey());
 			boolean gone = p == null || e.getValue().stream().allMatch(Npc::isRemoved);
-			if (!gone && (engaged(p) || WALKS.containsKey(e.getKey()) || AFTER_BATTLE.containsKey(e.getKey()) || !data(p).beaten.contains("rocket_viridian"))) continue;
-			for (Npc n : e.getValue()) {
-				if (n.isRemoved()) continue;
-				if (n.level() instanceof ServerLevel lv)
-					lv.sendParticles(net.minecraft.core.particles.ParticleTypes.POOF, n.getX(), n.getY() + 1, n.getZ(), 14, 0.3, 0.5, 0.3, 0.04);
-				n.discard();
+			if (gone) {
+				for (Npc n : e.getValue()) if (!n.isRemoved()) n.discard();
+				ROCKETS.remove(e.getKey());
+				continue;
 			}
-			ROCKETS.remove(e.getKey());
+			if (engaged(p) || WALKS.containsKey(e.getKey()) || AFTER_BATTLE.containsKey(e.getKey()) || !data(p).beaten.contains("rocket_viridian")) continue;
+			rocketsOff(p, e.getValue(), rocketViridian().after());
+		}
+	}
+
+	/** (0.74) Whose parting words are being said (their walk off waits for the text box to close). */
+	private static final Map<UUID, List<Npc>> ROCKETS_OFF = new HashMap<>();
+	private static final java.util.Set<UUID> ROCKETS_SAID = new java.util.HashSet<>();
+
+	/** (0.74) JESSIE's parting words, then off they go (Viridian's, and KantoStory's other JESSIE and JAMESes). */
+	static void rocketsOff(ServerPlayer p, List<Npc> group, List<String> lines) {
+		if (group.isEmpty() || group.stream().anyMatch(Npc::leaving) || ROCKETS_OFF.containsKey(p.getUUID())) return;
+		Npc jessie = group.get(0);
+		if (jessie.isRemoved()) return;
+		if (lines == null || lines.isEmpty() || !ROCKETS_SAID.add(p.getUUID())) {
+			walkOff(p, group);
+			return;
+		}
+		for (Npc n : group) if (!n.isRemoved()) n.setFacing(n.yawTo(p));
+		ROCKETS_OFF.put(p.getUUID(), group);
+		dialogue(p, jessie, "rocket_leave", fill(p, lines));
+	}
+
+	/** (0.74) Off they walk: away from you, sixteen blocks or so, side by side. */
+	static void walkOff(ServerPlayer p, List<Npc> group) {
+		ROCKETS_OFF.remove(p.getUUID());
+		ROCKETS_SAID.remove(p.getUUID());
+		Npc lead = null;
+		for (Npc n : group) if (!n.isRemoved()) {
+			lead = n;
+			break;
+		}
+		if (lead == null || !(lead.level() instanceof ServerLevel level)) return;
+		double dx = lead.getX() - p.getX(), dz = lead.getZ() - p.getZ(), len = Math.max(0.01, Math.hypot(dx, dz));
+		dx /= len;
+		dz /= len;
+		for (Npc n : group) {
+			if (n.isRemoved()) continue;
+			BlockPos to = null;
+			for (int far = 16; far >= 6 && to == null; far -= 5)
+				to = spot(level, (int) Math.floor(n.getX() + dx * far), (int) Math.floor(n.getZ() + dz * far), 3);
+			n.leave(to != null ? to : n.blockPosition().offset((int) Math.round(dx * 8), 0, (int) Math.round(dz * 8)));
+		}
+	}
+
+	/** (0.74) TEAM ROCKET's MEOWTH, going about with JESSIE (and off with her). */
+	static void meowth(ServerLevel level, Npc jessie, String where) {
+		String key = "rocket_meowth:" + where;
+		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, jessie.getBoundingBox().inflate(48), w -> key.equals(w.key()))) w.discard();
+		WorldMon m = placeMon(level, "meowth", key, jessie.getX() + 1.0, jessie.getY(), jessie.getZ() + 1.0, jessie.facing());
+		if (m != null) {
+			m.follow = jessie;
+			m.setWanders(true);
 		}
 	}
 
@@ -4260,6 +4326,11 @@ public final class Game {
 			return;
 		}
 		switch (mode) {
+			case "rocket_leave" -> {
+				// (0.74) JESSIE's said her parting words: off they walk.
+				List<Npc> group = ROCKETS_OFF.get(p.getUUID());
+				if (group != null) walkOff(p, group);
+			}
 			case "quiz" -> {
 				int q = t.getIntOr("q", -1);
 				if (q < 0 || q >= QUESTIONS.size() || !t.getBooleanOr("answered", false)) return;
@@ -4672,7 +4743,12 @@ public final class Game {
 			enter(p, placeNear(d.x(), d.z()));
 			return;
 		}
-		BlockPos at = spot(world, t.getIntOr("x", 0), t.getIntOr("z", 0), 24);
+		int tx = t.getIntOr("x", 0), tz = t.getIntOr("z", 0);
+		// ((0.74) In a town: down on its streets, never its roofs.)
+		Zone tzn = zoneAt(tx, tz);
+		world.getChunk(new BlockPos(tx, START_Y, tz));
+		BlockPos at = tzn != null && !tzn.place().startsWith("route_") ? spotNear(world, tx, tz, 28, streetY(world, tzn, true)) : null;
+		if (at == null) at = spot(world, tx, tz, 24);
 		if (at == null) {
 			message(p, List.of("There's nowhere to land there."));
 			return;

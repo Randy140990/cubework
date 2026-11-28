@@ -53,7 +53,7 @@ public final class Interiors {
 	 * 26 and JOHTO); needs: what you must have to go through (a badge: the League gate's guard).
 	 */
 	public record Warp(String kind, double x0, double x1, double z0, double z1, String door, String to, double sx, double sz, float syaw, String choice, String needs,
-			double sy, double by) {}
+			double sy, double by, double fx, double fz) {}
 
 	/** Someone in a room; role: "nurse" (heals), "clerk" (sells) or null (just talks). */
 	/**
@@ -286,7 +286,9 @@ public final class Interiors {
 						w.has("choice") && !w.get("choice").isJsonNull() ? w.get("choice").getAsString() : null,
 						w.has("needs") && !w.get("needs").isJsonNull() ? w.get("needs").getAsString() : null, num(ws, "y", 0),
 						// (0.61) How high over the room's floor a box is (MT. SILVER's ways through, on its upper levels): only there.
-						w.has("y") ? num(w, "y", 0) : Double.NaN));
+						w.has("y") ? num(w, "y", 0) : Double.NaN,
+						// ((0.74) The foot of a flight whose way up needs something: where you're turned back to.)
+						w.has("foot") ? num(w.getAsJsonObject("foot"), "x", 0) : Double.NaN, w.has("foot") ? num(w.getAsJsonObject("foot"), "z", 0) : Double.NaN));
 			}
 			List<Person> people = new ArrayList<>();
 			for (JsonElement pe : r.getAsJsonArray("people")) {
@@ -1448,6 +1450,14 @@ public final class Interiors {
 						boolean cave = r.schem() != null;
 						double m = cave ? 0.45 : 0;
 						if ((ly >= 1.2 || cave && ly > -0.6) && lx > w.x0() - m - 0.3 && lx < w.x1() + m + 0.6 && lz > w.z0() - 0.6 && lz < w.z1() + 0.6) {
+							// ((0.74) A flight's way up that needs something (the POKéMON TOWER's 6F: MAROWAK laid to rest):
+							// without it, back down at the foot of the flight.)
+							if (w.needs() != null && !Game.meets(p, w.needs())) {
+								if (!Double.isNaN(w.fx())) p.teleportTo(r.ox() + w.fx(), r.oy(), r.oz() + w.fz());
+								COOL.put(id, 30);
+								Game.gateBlocked(p, w.needs());
+								return true;
+							}
 							if (w.to() == null) {
 								// Up and out of the cave (Mt. Moon's way out onto Route 4).
 								Door d = doorOut(p, w.door());

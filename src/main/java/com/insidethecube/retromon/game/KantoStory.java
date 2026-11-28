@@ -259,6 +259,7 @@ public final class KantoStory {
 			}
 		}
 		JJ_NOW.put(p.getUUID(), both);
+		Game.meowth(level, jessie, j.where());
 	}
 
 	private static void jjDrop(ServerPlayer p) {
@@ -300,13 +301,11 @@ public final class KantoStory {
 			if (jessie.isRemoved() || jessie.level() != p.level()) {
 				if (!Game.WALKS.containsKey(id)) jjDrop(p);
 			} else if (d.beaten.contains(jessie.key())) {
+				// ((0.74) John's 10:41: "they should say something and then walk away, instead of just disappearing")
+				// JESSIE's parting words, then they walk off (Game.rocketsOff), and they're gone once they're away.
 				if (!Game.engaged(p) && !Game.AFTER_BATTLE.containsKey(id) && !Game.WALKS.containsKey(id)) {
-					for (Npc n : jj)
-						if (!n.isRemoved()) {
-							level.sendParticles(net.minecraft.core.particles.ParticleTypes.POOF, n.getX(), n.getY() + 1, n.getZ(), 14, 0.3, 0.5, 0.3, 0.04);
-							n.discard();
-						}
-					JJ_NOW.remove(id);
+					Trainers.Trainer t = jjTrainer(jessie.key());
+					Game.rocketsOff(p, jj, t == null ? List.of() : t.after());
 				}
 			} else if (!Game.engaged(p) && !Game.WALKS.containsKey(id) && jessie.distanceTo(p) < 5.5 && d.anyHealthy()) {
 				for (Npc n : jj) n.setFacing(n.yawTo(p));
@@ -369,6 +368,7 @@ public final class KantoStory {
 						both.add(james);
 					}
 					JJ_NOW.put(id, both);
+					Game.meowth(level, jessie, "route17");
 					for (Npc n : both) n.setFacing(n.yawTo(p));
 					jessie.talker = p;
 					Game.walkUp(p, jessie, jjTrainer(r17), "meet_evil_trainer", null);

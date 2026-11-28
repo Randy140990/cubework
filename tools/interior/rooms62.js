@@ -116,6 +116,17 @@
   reg("ngCounter", 16, 16, (P, r) => { noise(P, r, "#78B858", 0.02); P.rect(0, 0, 16, 2, hx("#A0D880")); P.rect(0, 14, 16, 2, hx("#4A8830")); });
   reg("ngMat", 16, 16, (P, r) => { noise(P, r, "#C86A4A", 0.02); P.rect(1, 1, 14, 14, hx("#E08A60")); });
 
+  // ((0.74) John's 10:41: "where you can enter stuff, like different rooms ... there should be little mats with a, I guess
+  // like an arrow pointing to it") A small mat before a door through to another room, its arrows pointing in.
+  reg("matDoorN", 32, 32, (P, r) => {
+    const w = P.w, h = P.h, B = hx("#C9433F"), E = hx("#8E2A2A"), cream = hx("#F6F1EA");
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) P.set(x, y, x < 2 || y < 2 || x >= w - 2 || y >= h - 2 ? E : shadec(B, (r() - 0.5) * 0.03));
+    for (let x = 5; x < w - 5; x++) if ((x - 5) % 4 !== 3) { P.set(x, 5, cream); P.set(x, h - 6, cream); }
+    for (let y = 5; y < h - 5; y++) if ((y - 5) % 4 !== 3) { P.set(5, y, cream); P.set(w - 6, y, cream); }
+    for (const ay of [9, 16]) for (let k = 0; k < 6; k++) { P.rect(w / 2 - 1 - k, ay + k, 2, 2, cream); P.rect(w / 2 - 1 + k, ay + k, 2, 2, cream); }
+  }, { fit: true });
+  window.MAT_DOOR_N = "matDoorN";
+
   const FACEOF = { FACE_UP: "n", FACE_DOWN: "s", FACE_LEFT: "w", FACE_RIGHT: "e", WANDER_AROUND: "s", LOOK_AROUND: "s", WANDER_LEFT_AND_RIGHT: "e", n: "n", s: "s", e: "e", w: "w" };
 
   function build(id, F, kind) {
@@ -315,8 +326,71 @@
     }
     for (const h of F.hidden || []) R.act([h.x - 0.15, h.z - 0.15, h.x + 1.15, h.z + 1.15], { label: "Look", lines: ["There's something here!"], use: "hidden:" + h.item + ":" + h.key });
 
+    // ((0.74) John's 28 Nov 10:41, the POKéMON MANSION: "The interior of the Poké Mansion stairs is glitched. They should be
+    // proper stairs, and they don't look like proper stairs at all. And again, you don't interact with them like steps.
+    // I just walked into it and it just kind of didn't do anything.") Each of FireRed's three-by-three stairs a real
+    // flight across its three blocks: six steps up to the wall it stands against (a dark way through above the top
+    // step), or down into a well; a banister on any side the floor's open; through to the next floor when you're up
+    // (or down) it, as the houses' stairs.
+    if (kind === "mansion") {
+      const done = new Set(), RISE = 0.3;
+      for (const { w, up, cells } of stairs) {
+        const key = cells.map(c => c.join(",")).sort().join(";");
+        if (done.has(key)) continue;
+        done.add(key);
+        const xs = cells.map(c => c[0]), zs = cells.map(c => c[1]);
+        const xa = Math.min(...xs), xb = Math.max(...xs) + 1, z0 = Math.min(...zs), z1 = Math.max(...zs) + 1, n = xb - xa, S = 2 * n, top = S * RISE;
+        const open = (x, z) => ".XD".includes(at(x, z)) && !cells.some(c => c[0] === x && c[1] === z);
+        const openCol = x => { let k = 0; for (let z = z0; z < z1; z++) if (open(x, z)) k++; return k; };
+        let d = openCol(xb) <= openCol(xa - 1) ? 1 : -1;
+        if (!up) { const L0 = landing(F, w.x, w.z); if (L0.x < xa) d = 1; else if (L0.x > xb) d = -1; }
+        const kOf = x => d > 0 ? x - xa : xb - x;
+        for (let i = 0; i < S; i++) {
+          const k0 = i * 0.5, k1 = k0 + 0.5, s0 = d > 0 ? xa + k0 : xb - k1, s1 = d > 0 ? xa + k1 : xb - k0;
+          if (up) G.box(s0, 0, z0, s1, (i + 1) * RISE, z1, { top: "manStep", all: "manBrick", bottom: null });
+          else G.box(s0, -2.1, z0, s1, -(i + 1) * RISE, z1, { top: "manStep", all: "manBrick", bottom: null });
+        }
+        const yAt = x => Math.max(0, Math.min(top, kOf(x) / 0.5 * RISE)), stepAt = x => Math.max(0, Math.min(top, Math.ceil(kOf(x) / 0.5 - 1e-3) * RISE));
+        for (const side of ["n", "s"]) {
+          let rowOpen = false;
+          for (let x = xa; x < xb; x++) if (open(x, side === "n" ? z0 - 1 : z1)) rowOpen = true;
+          const rz = side === "n" ? z0 + 0.07 : z1 - 0.07;
+          if (!up) {
+            // The well's side below the floor, and a railing round it at the floor (open at the top step).
+            G.box(xa, -2.1, side === "n" ? z0 - 0.04 : z1, xb, 0, side === "n" ? z0 : z1 + 0.04, { [side === "n" ? "s" : "n"]: "manWell", all: null });
+            if (!rowOpen) continue;
+            const r0 = d > 0 ? xa + 0.9 : xa, r1 = d > 0 ? xb : xb - 0.9;
+            G.box(r0, 1.0, rz - 0.06, r1, 1.12, rz + 0.06, "walnut");
+            for (let x = r0 + 0.2; x < r1 - 0.1; x += 0.4) G.box(x - 0.03, 0, rz - 0.03, x + 0.03, 1.0, rz + 0.03, "walnut");
+            R.solids.push([r0, side === "n" ? z0 - 0.3 : z1 - 0.02, r1, side === "n" ? z0 + 0.02 : z1 + 0.3, 1.5]);
+            continue;
+          }
+          if (!rowOpen) continue;
+          slopeRail(R, xa, xb, yAt, stepAt, rz, { mat: "walnut" });
+          R.solids.push([xa + 0.1, side === "n" ? z0 - 0.3 : z1 - 0.02, xb - 0.05, side === "n" ? z0 + 0.02 : z1 + 0.3, top + 1]);
+        }
+        const ex = d > 0 ? xb : xa - 1;
+        if (up) {
+          // The wall at its top, as tall as the way through it, the dark way above the top step.
+          G.box(ex, 0, z0, ex + 1, top + 2.0, z1, { all: "manRender", top: "manCap", bottom: null });
+          G.box(d > 0 ? xb - 0.03 : xa, top, z0 + 0.15, d > 0 ? xb : xa + 0.03, top + 1.8, z1 - 0.15, { [d > 0 ? "w" : "e"]: "manWell", all: null });
+          R.solids.push([ex, z0, ex + 1, z1, top + 2.5]);
+        } else G.box(d > 0 ? xb - 0.03 : xa, -2.1, z0, d > 0 ? xb : xa + 0.03, 0, z1, { [d > 0 ? "w" : "e"]: "manWell", all: null });
+        R.ramps.push({ rect: [xa, z0, xb, z1], h: x => (up ? 1 : -1) * Math.max(0, Math.min(S, Math.ceil(kOf(x) / 0.5 - 0.35))) * RISE });
+        const T = C[w.to], sp = T ? landing(T, w.tx, w.tz) : { x: 1, z: 1, yaw: FACE.s };
+        const fx = d > 0 ? xa + 0.3 : xb - 0.3;
+        if (up) {
+          R.warps.push({ test: p => p.y >= 1.2 && p.x > xa - 0.3 && p.x < xb + 0.3 && p.z > z0 - 0.3 && p.z < z1 + 0.3, to: w.to, spawn: sp, fx: "fade", why: "up" });
+          (R._stairs || (R._stairs = [])).push({ dir: "up", x0: xa, x1: xb, z0, depth: z1 - z0, to: w.to, spawn: sp, foot: { x: fx, z: (z0 + z1) / 2 } });
+        } else {
+          R.warps.push({ test: p => p.y <= -1.45, to: w.to, spawn: sp, fx: "fade", why: "down" });
+          (R._stairs || (R._stairs = [])).push({ dir: "down", x0: xa, x1: xb, z0, depth: z1 - z0, to: w.to, spawn: sp });
+        }
+        R.item(up ? "Stairs up" : "Stairs down", "A flight of six steps across FireRed's stairs: walk " + (up ? "up" : "down") + " them to the next floor.");
+      }
+    }
     // The stairs (and the SPROUT TOWER's ladders): steps up away from the floor you walk on from, or a well going down.
-    for (const { w, up, cells, from } of stairs) {
+    for (const { w, up, cells, from } of kind === "mansion" ? [] : stairs) {
       const away = [-from[0], -from[1]];
       for (const [a, b] of cells) {
         if (kind === "sprout") { G.box(a + 0.2, 0, b + 0.1, a + 0.8, 2.2, b + 0.25, "stLog"); for (let y = 0.3; y < 2.2; y += 0.4) G.box(a + 0.2, y, b + 0.1, a + 0.8, y + 0.06, b + 0.35, "stLogEnd"); continue; }
@@ -343,6 +417,10 @@
     // The LAB's doors along its hall: in to each room, out onto its mat.
     for (const w of F.warps.filter(w => w.kind === "door")) {
       G.box(w.x, 0, w.z + 0.9, w.x + 1, 2.0, w.z + 1.0, { s: "labDoor", all: "labCap" });
+      // ((0.74) John's 10:41: "I would expect the doors to actually have a bit of a ceiling above them") The wall
+      // over the door, up to the wall's top; and its little mat before it.
+      G.box(w.x, 2.0, w.z, w.x + 1, TALL, w.z + 1, { all: "labWall", top: "labCap", bottom: null });
+      G.box(w.x + 0.12, 0, w.z + 1.06, w.x + 0.88, 0.03, w.z + 1.82, { top: "matDoorN", all: "cap", bottom: null });
       const T = C[w.to], back = T.warps.find(t => t.kind === "back"), sp = { x: back.x + 0.5, z: back.z - 0.6, yaw: FACE.n };
       R._boxes.push({ x0: w.x + 0.1, z0: w.z, x1: w.x + 0.9, z1: w.z + 1.2, to: w.to, spawn: sp });
       R.warps.push({ test: p => p.x > w.x + 0.1 && p.x < w.x + 0.9 && p.z < w.z + 1.2, to: w.to, spawn: sp, fx: "fade" });

@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/mt_trim_goldenrod","mt_trim_goldenrod":"retromon:block/interior/mt_trim_goldenrod"},"elements":[{"from":[15.04,10.4,16],"to":[16.0,12.0,16],"faces":{"north":{"uv":[0.0,1.0,0.24,1.4],"texture":"#mt_trim_goldenrod"}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/st_log_end","st_log_end":"retromon:block/interior/st_log_end"},"elements":[{"from":[0.0,0,0.0],"to":[6.4,0,9.6],"faces":{"up":{"uv":[0,0,16,16],"texture":"#st_log_end","tintindex":144064064}}}]}

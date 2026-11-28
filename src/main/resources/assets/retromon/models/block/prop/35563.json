@@ -1,1 +1,1 @@
-{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/pp_coil","pp_coil":"retromon:block/interior/pp_coil"},"elements":[{"from":[0.0,16,2.4],"to":[0.8,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#pp_coil","tintindex":144064064}}}]}
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/man_pillar","man_pillar":"retromon:block/interior/man_pillar"},"elements":[{"from":[3.923,16,7.255],"to":[16.0,16,16.0],"faces":{"down":{"uv":[0,0,16,16],"texture":"#man_pillar","tintindex":144064064}}}]}
