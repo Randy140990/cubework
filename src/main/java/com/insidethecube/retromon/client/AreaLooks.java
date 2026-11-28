@@ -415,20 +415,26 @@ public final class AreaLooks {
 			// (0.59.3, 20:35) The WHIRL ISLANDS' whirlpools: a turning whirlpool on the water's surface over five blocks,
 			// drawn by a rock beside it ("dx,dz,size": where its middle is from the rock).
 			case "whirlpool" -> {
+				// ((0.72.1, John's 28 Nov 07:41: "they keep like flashing on and off ... they just need to remain, but
+				// actually rotate") "dx,dz,size[,dy]": dy lifts it from the block it's drawn by to the sea's top (0.72.1's
+				// are drawn by the sea bed under them, so moving rocks about can't take one away). Drawn with the solid
+				// blocks (every pixel of its picture there or not), so it isn't sorted in among the sea's see-through
+				// faces, which made it come and go; its picture turns a whole turn as it plays.)
 				String[] p = rule.swaps().split(",");
 				float dx = Float.parseFloat(p[0].trim()), dz = Float.parseFloat(p[1].trim()), size = p.length > 2 ? Float.parseFloat(p[2].trim()) : 5F;
+				float dy = p.length > 3 ? Float.parseFloat(p[3].trim()) : 0F;
 				TextureAtlasSprite sp = sprite(baker, "whirlpool");
 				yield (base, e, view, pos, state, random, cull) -> {
 					base.emitQuads(e, view, pos, state, random, cull);
 					e.square(Direction.UP, 0, 0, 1, 1, 0.07F);
 					for (int i = 0; i < 4; i++) {
 						float cx = e.x(i), cz = e.z(i);
-						e.pos(i, dx + 0.5F + (cx - 0.5F) * size, e.y(i), dz + 0.5F + (cz - 0.5F) * size);
+						e.pos(i, dx + 0.5F + (cx - 0.5F) * size, e.y(i) + dy, dz + 0.5F + (cz - 0.5F) * size);
 						e.uv(i, sp.getU0() + cx * (sp.getU1() - sp.getU0()), sp.getV0() + cz * (sp.getV1() - sp.getV0()));
 					}
 					e.color(-1, -1, -1, -1);
 					e.tintIndex(-1);
-					e.renderLayer(ChunkSectionLayer.TRANSLUCENT);
+					e.renderLayer(ChunkSectionLayer.CUTOUT);
 					e.emit();
 				};
 			}

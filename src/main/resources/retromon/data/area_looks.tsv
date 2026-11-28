@@ -5852,10 +5852,12 @@ swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,a
 swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,cobblestone_stairs,andesite_wall,andesite_stairs,diorite_slab,cobblestone_wall,stone_bricks	-2406	710	-2356	754	18	26	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	the WHIRL ISLANDS' north-east island
 swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,cobblestone_stairs,andesite_wall,andesite_stairs,diorite_slab,cobblestone_wall,stone_bricks	-2480	765	-2428	802	18	26	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	the WHIRL ISLANDS' south-west island
 swap	cobblestone,cobblestone_stairs,cobblestone_slab,cobblestone_wall,andesite,andesite_stairs,andesite_slab,andesite_wall,diorite,diorite_slab,diorite_stairs,diorite_wall,tuff,tuff_slab,tuff_stairs,tuff_wall,stone,mossy_cobblestone,cobblestone_stairs,andesite_wall,andesite_stairs,diorite_slab,cobblestone_wall,stone_bricks	-2400	770	-2352	802	18	26	block/cobblestone=boulder_stone_top|boulder_stone@2,block/andesite=boulder_stone_top|boulder_stone@2,block/diorite=boulder_stone_top|boulder_stone@2,block/tuff=boulder_stone_top|boulder_stone@2,block/stone=boulder_stone_top|boulder_stone@2,block/mossy_cobblestone=boulder_stone_top|boulder_stone@2	the WHIRL ISLANDS' south-east island
-whirlpool	tuff	-2452	716	-2452	716	17	17	-1,-4,5	a whirlpool
-whirlpool	tuff	-2358	734	-2358	734	17	17	-3,-1,5	a whirlpool
-whirlpool	andesite	-2399	793	-2399	793	17	17	-4,3,5	a whirlpool
-whirlpool	diorite_slab	-2472	778	-2472	778	17	17	2,-5,5	a whirlpool
+whirlpool	stone	-2479	712	-2479	712	13	13	0,0,5,4	a whirlpool: the WHIRL ISLANDS' north-west island
+whirlpool	stone	-2361	733	-2361	733	13	13	0,0,5,4	a whirlpool: the WHIRL ISLANDS' north-east island
+whirlpool	stone	-2403	796	-2403	796	13	13	0,0,5,4	a whirlpool: the WHIRL ISLANDS' south-east island
+whirlpool	stone	-2470	773	-2470	773	13	13	0,0,5,4	a whirlpool: the WHIRL ISLANDS' south-west island
+whirlpool	stone	-1136	766	-1136	766	13	13	0,0,5,4	a whirlpool: ROUTE 27, by the grassy strip
+whirlpool	stone	-1205	786	-1205	786	13	13	0,0,5,4	a whirlpool: ROUTE 27, in the rocks
 sign_b	warped_shelf	-2360	597	-2360	597	19	19	-	a blue sign
 sign	pale_oak_shelf	-2360	597	-2360	597	18	18	-	a blue sign's stand
 sign_b	warped_shelf	-2503	767	-2503	767	19	19	-	a blue sign

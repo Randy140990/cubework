@@ -16,8 +16,13 @@ def ys(a, b):
 # rock each is drawn by, and where its middle is from that rock.
 WHIRL_ISLANDS = [(-2490, 712, -2438, 750, "the WHIRL ISLANDS' north-west island"), (-2406, 710, -2356, 754, "the WHIRL ISLANDS' north-east island"),
                  (-2480, 765, -2428, 802, "the WHIRL ISLANDS' south-west island"), (-2400, 770, -2352, 802, "the WHIRL ISLANDS' south-east island")]
-WHIRLPOOLS = [("tuff", (-2452, 17, 716), (-1, -4)), ("tuff", (-2358, 17, 734), (-3, -1)), ("andesite", (-2399, 17, 793), (-4, 3)),
-              ("diorite_slab", (-2472, 17, 778), (2, -5))]
+# ((0.72.1, John's 28 Nov 07:41) Each drawn by the sea bed right under its middle now (the stone at y 13, four below
+# the sea's top), not a rock beside it, so moving rocks can't take one away; the north-west island's moved left (west)
+# to where you come round the island from Cianwood; and ROUTE 27's two, as HeartGold has them: by the rocks south of
+# the grassy strip, and in the line of rocks west of the big sandbank.)
+WHIRLPOOLS = [("stone", (-2479, 13, 712), (0, 0), "the WHIRL ISLANDS' north-west island"), ("stone", (-2361, 13, 733), (0, 0), "the WHIRL ISLANDS' north-east island"),
+              ("stone", (-2403, 13, 796), (0, 0), "the WHIRL ISLANDS' south-east island"), ("stone", (-2470, 13, 773), (0, 0), "the WHIRL ISLANDS' south-west island"),
+              ("stone", (-1136, 13, 766), (0, 0), "ROUTE 27, by the grassy strip"), ("stone", (-1205, 13, 786), (0, 0), "ROUTE 27, in the rocks")]
 # The blue signs (a warped shelf on a pale oak one): the top's x0, x1, y, z.
 BLUE_SIGNS = [(-2360, -2360, 19, 597), (-2503, -2503, 19, 767), (-2075, -2074, 21, 835)]
 
@@ -64,8 +69,8 @@ def round59c(add, room, G):
     # ---------- the WHIRL ISLANDS (20:35) ----------
     for b in WHIRL_ISLANDS:
         add("swap", BOULDER_BLOCKS + ",cobblestone_stairs,andesite_wall,andesite_stairs,diorite_slab,cobblestone_wall,stone_bricks", b, BOULDER, ys(18, 26))
-    for block, (x, y, z), (dx, dz) in WHIRLPOOLS:
-        add("whirlpool", block, (x, z, x, z, "a whirlpool"), "%d,%d,5" % (dx, dz), ys(y, y))
+    for block, (x, y, z), (dx, dz), where in WHIRLPOOLS:
+        add("whirlpool", block, (x, z, x, z, "a whirlpool: " + where), "%d,%d,5,4" % (dx, dz), ys(y, y))
 
     # ---------- the signs (20:35) ----------
     for x0, x1, y, z in BLUE_SIGNS:
