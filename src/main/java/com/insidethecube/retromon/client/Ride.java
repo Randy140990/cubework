@@ -9,7 +9,8 @@ import net.minecraft.world.phys.Vec3;
 /**
  * (0.73) The MAGNET TRAIN's ride (game/MagnetTrain.java): the camera follows the train along John's line, at the
  * adventure's own angle and distance, held between the station and the tunnel's mouth (so as the train goes into the
- * tunnel it's left looking at the mouth, and as it comes out of one it's there waiting).
+ * tunnel it's left looking at the mouth, and as it comes out of one it's there waiting). The MAGNET TRAIN's tune
+ * plays while you ride.
  */
 public final class Ride {
 	private Ride() {}
@@ -19,7 +20,11 @@ public final class Ride {
 	private static double x0, x1, start, y, z, follow = Double.NaN;
 
 	public static void set(CompoundTag t) {
+		boolean was = on;
 		on = t.getBooleanOr("on", false);
+		// The MAGNET TRAIN's own tune while you ride; the place's again once you're off.
+		if (on && !was) Music.play("magnet_train");
+		else if (!on && was) Music.resumePlace();
 		train = t.getIntOr("train", -1);
 		x0 = t.getDoubleOr("x0", 0);
 		x1 = t.getDoubleOr("x1", 0);
