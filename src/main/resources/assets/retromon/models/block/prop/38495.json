@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/nb_sofa_olive","nb_sofa_olive":"retromon:block/interior/nb_sofa_olive"},"elements":[{"from":[1.0,0.0,0],"to":[3.48,3.0,0],"faces":{"south":{"uv":[4.25,11.25,4.87,12.0],"texture":"#nb_sofa_olive"}}}]}

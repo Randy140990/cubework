@@ -398,6 +398,25 @@ DOORS.update({
     "saffron_magnet_train": {"room": "saffron_magnet_train_station", "door": [[x, 34, 398] for x in range(-387, -384)], "out": [-385.5, 33.0, 400.6]},
 })
 MAT_DOOR.update({"goldenrod_magnet_train_station": "goldenrod_magnet_train", "saffron_magnet_train_station": "saffron_magnet_train"})
+# (0.75, John's 28 Nov 11:27 and 11:45) NEW BARK TOWN's insides (rooms74.js), out past the ILEX FOREST: PROF. ELM's LAB
+# (in at its glass doors); PROF. ELM's HOUSE, the LAB's upstairs (HeartGold's ELMS_LAB_2F: up the steps on the LAB's
+# east side and in through its east wall at the top of them, where John's map has no door: you walk into the wall
+# there); your house (John's house north of the street on the right, HeartGold's PLAYER_HOUSE) and your rival's
+# (John's house south of the street in the middle, HeartGold's RIVAL_HOUSE), each with its upstairs.
+for _i, _id in enumerate(("elms_lab", "elms_house", "nb_house1", "nb_house2", "nb_rival1", "nb_rival2")):
+    ORIGIN[_id] = (10432 + 64 * _i, 64, 0)
+    PLACE[_id] = "new_bark_town"
+DOORS.update({
+    "elms_lab": {"room": "elms_lab", "door": [[-1454, 20, 752], [-1453, 20, 752]], "out": [-1453.0, 20.0, 753.6]},
+    "elms_house": {"room": "elms_house", "door": [[-1447, 21, z] for z in range(746, 749)], "out": [-1445.0, 21.5, 747.5], "face": "e", "yaw": -90.0,
+                   "in": {"x": 10.4, "z": 6.0, "yaw": 90.0}},
+    "nb_home": {"room": "nb_house1", "door": [[-1430, 20, 758], [-1429, 20, 758]], "out": [-1429.0, 20.0, 759.6]},
+    "nb_rival": {"room": "nb_rival1", "door": [[-1439, 20, 780], [-1438, 20, 780]], "out": [-1438.0, 20.0, 781.6]},
+})
+MAT_DOOR.update({"elms_lab": "elms_lab", "nb_house1": "nb_home", "nb_rival1": "nb_rival"})
+SIDE_DOOR[("elms_house", "e")] = "elms_house"
+ENTRY.update({"elms_lab": {"x": 8.0, "z": 15.5, "yaw": 180.0}, "elms_house": {"x": 10.4, "z": 6.0, "yaw": 90.0},
+              "nb_house1": {"x": 3.0, "z": 11.5, "yaw": 180.0}, "nb_rival1": {"x": 3.0, "z": 11.5, "yaw": 180.0}})
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {

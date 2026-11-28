@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/red_fabric","red_fabric":"retromon:block/interior/red_fabric"},"elements":[{"from":[1.28,16,14.88],"to":[4.32,16,16.0],"faces":{"down":{"uv":[4.32,8.0,5.08,8.28],"texture":"#red_fabric"}}}]}

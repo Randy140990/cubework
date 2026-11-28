@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/nb_beam","nb_beam":"retromon:block/interior/nb_beam"},"elements":[{"from":[14.88,0,1.76],"to":[16.0,0,4.64],"faces":{"up":{"uv":[7.72,12.44,8.0,13.16],"texture":"#nb_beam"}}}]}

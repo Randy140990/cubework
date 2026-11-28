@@ -43,7 +43,7 @@ function fitPic(R, wall, at, y = 1.5, k = 0, w = 1.2, h = 0.9) {
 // The room's floor as blocks: a block is open if it's floor and nothing solid stands in it. A plant goes on an open
 // block against a wall (a corner first) only if every other open block can still be walked to from the way in, it's
 // clear of the ways in and out, of anyone (and of any TRAINER's line of sight), and of anything you look at or use.
-const FIT_GREEN_SKIP = /^ug_(ns|ew)$|mansion_[0-9b]|hall_of_fame|gym|champion|loreleis|brunos|agathas|lances|_room$|tower|cave|arena|elevator|lift|mt_|tunnel|seafoam|victory|forest|underground|_ug_|ug_path|silver|well|ruins|sprout|burned|tin_|bell|lighthouse|whirl|ice_path|dragons|kitchen|captains|ss_anne_\d?f?$|museum|power_plant|safari/;
+const FIT_GREEN_SKIP = /^elms_|^ug_(ns|ew)$|mansion_[0-9b]|hall_of_fame|gym|champion|loreleis|brunos|agathas|lances|_room$|tower|cave|arena|elevator|lift|mt_|tunnel|seafoam|victory|forest|underground|_ug_|ug_path|silver|well|ruins|sprout|burned|tin_|bell|lighthouse|whirl|ice_path|dragons|kitchen|captains|ss_anne_\d?f?$|museum|power_plant|safari/;
 function fitGreen(R) {
   if (!R || R.outside || R.dark || R.haze || R.night || FIT_GREEN_SKIP.test(R.id)) return 0;
   const W = Math.floor(R.W), D = Math.floor(R.D);

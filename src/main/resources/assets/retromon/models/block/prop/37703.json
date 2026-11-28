@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/cap","cap":"retromon:block/interior/cap"},"elements":[{"from":[0.0,6.4,9.6],"to":[6.4,6.4,16.0],"faces":{"up":{"uv":[0.0,14.4,1.6,16.0],"texture":"#cap"}}}]}

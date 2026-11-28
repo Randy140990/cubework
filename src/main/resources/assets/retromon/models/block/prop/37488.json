@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/elm_paper","elm_paper":"retromon:block/interior/elm_paper"},"elements":[{"from":[16,0.0,0.0],"to":[16,6.4,8.0],"faces":{"west":{"uv":[4.0,2.4,6.0,4.0],"texture":"#elm_paper"}}},{"from":[16,0.0,8.0],"to":[16,6.4,16.0],"faces":{"west":{"uv":[6.0,2.4,8.0,4.0],"texture":"#elm_paper"}}}]}

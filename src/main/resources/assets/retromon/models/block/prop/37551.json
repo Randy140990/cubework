@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/elm_counter","elm_counter":"retromon:block/interior/elm_counter"},"elements":[{"from":[0.0,16,10.6],"to":[8.0,16,16.0],"faces":{"down":{"uv":[12.0,0.0,14.0,1.35],"texture":"#elm_counter"}}},{"from":[8.0,16,10.6],"to":[8.6,16,16.0],"faces":{"down":{"uv":[14.0,0.0,14.15,1.35],"texture":"#elm_counter"}}}]}

@@ -79,6 +79,8 @@
   }
   TEXDEF.matGateEast = [32, 64, matClean("#3A63B8", "#25418A", "e")];
   TEXDEF.matGateWest = [32, 64, matClean("#3A63B8", "#25418A", "w")];
+  // ((0.75) PROF. ELM's HOUSE's way out, through its east wall: a home's red mat, its arrows pointing east.)
+  TEXDEF.matHomeEast = [32, 32, matClean("#C9433F", "#8E2A2A", "e")]; MATDEF.matHomeEast = { tex: "matHomeEast", fit: true };
 
   // A gate's way through (09:05): a tunnel. Its back is a picture of the passage going on, its walls, floor and roof
   // drawn in towards the light at its end (the day outside: the sky and the grass), darker in the middle, the light
