@@ -46,3 +46,22 @@ https://claude.ai/artifact/VFBdGNf4Vyb8pWKLhULcUp
 - New screens, as the mod draws them: PARTY PICKER, EVENT PICKER (the 87 steps), PLACER (the 470) and its WALK AND
   PLACE card, and the GAME CORNER's slot machine (its reels and payouts).
 - The PLACER now names items as the game does (ULTRA BALL, TM28 DIG), in the mod's placeables.tsv too (next jar).
+
+## 28 Nov 07:11: moving things on the map
+
+John: "can I move stuff on the map? ... when I go to Viridian and I look at this potion, it is not in the right spot
+... when I zoom all the way in, they need to align with the pixels or the tiles, so I can then move it."
+
+- **Markers are one step now.** Zoomed in (3 pixels a block or more), each is a 2 by 2 block square on his blocks,
+  with a white dot on the side a trainer or person faces.
+- **Drag one to move it.** It snaps to whole blocks. Arrow keys nudge the one picked a block at a time (SHIFT: a whole
+  step). Facing buttons (North, West, South, East), "Back to FireRed's spot" or "Back to the game's spot", and "Take
+  it away" too. The block under the pointer shows top left.
+- **Saved as he goes,** in the page's database (collection `moves`, one document per thing: `map:kind:gx:gy`, with x, z
+  (the corner at the middle of the step), f (facing) or gone). Claude reads them back with ArtifactData to build them
+  into the mod.
+- **The game's own spots win over FireRed's** where John set them before (Game.java's ITEM_SPOTS, TRAINER_SPOTS and
+  SPOTS): 48 of them, the Viridian POTION among them (the path between the white fences, his 14:15 spot). FireRed's
+  spot shows as a dashed square beside it.
+- **Four maps lined up by his own spots:** where four or more of a map's spots agree on a shift from the fit, the whole
+  map follows (PEWTER +2 x, ROUTE 3 -2 x, ROUTE 4 -8 x and +1 z, VERMILION -1 and -1). 19 of 37 are LINED UP now.

@@ -1,12 +1,13 @@
 <title>Kanto Placement Map</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="artifact-thumbnail" href="thumb.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
 /* Layout: a working map tool. The map fills the left; the routes, the filters and the one you picked sit on the right (below on a phone). */
 :root {
   --bg: #f3f5f2; --panel: #ffffff; --ink: #1d2a24; --muted: #5d6c64; --line: #dde3de; --soft: #eef2ee;
-  --accent: #2f7d5b; --accent-ink: #ffffff;
+  --accent: #2f7d5b; --accent-ink: #ffffff; --moved: #ff7a1a;
   --trainer: #d9434f; --person: #3a78d6; --item: #e3a21a; --hidden: #8b5cd6; --obstacle: #6f7a73;
   --sure: #2f8f5c; --check: #c9791a; --sight: rgba(217, 67, 79, 0.34); --sight-edge: rgba(217, 67, 79, 0.9);
   --map-bg: #3d6fae;
@@ -24,13 +25,15 @@ body { background: var(--bg); color: var(--ink); font-family: var(--f-body); fon
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px }
 h1 { font-family: var(--f-head); font-size: 22px; margin: 0; letter-spacing: -0.01em; text-wrap: balance }
 .top { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: baseline; padding-bottom: 10px }
-.top p { margin: 0; color: var(--muted); max-width: 70ch }
+.top p { margin: 0; color: var(--muted); max-width: 72ch }
 .stats { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto }
 .stat { font-variant-numeric: tabular-nums; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-weight: 600; font-size: 12.5px; white-space: nowrap }
 .stat b { font-weight: 700 }
+.stat.moved { border-color: var(--moved) }
 .app { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 12px }
 .mapwrap { position: relative; min-height: 0; border-radius: 12px; overflow: hidden; background: var(--map-bg); border: 1px solid var(--line); touch-action: none; cursor: grab }
 .mapwrap.drag { cursor: grabbing }
+.mapwrap.moving { cursor: move }
 .stage { position: absolute; left: 0; top: 0; transform-origin: 0 0 }
 .stage img { display: block; image-rendering: pixelated; max-width: none; user-select: none; -webkit-user-drag: none }
 .stage svg { position: absolute; left: 0; top: 0; overflow: visible }
@@ -40,6 +43,7 @@ h1 { font-family: var(--f-head); font-size: 22px; margin: 0; letter-spacing: -0.
 .ctl button:focus-visible, .chip:focus-visible, .rbtn:focus-visible, .route:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 .legend { position: absolute; left: 10px; bottom: 10px; z-index: 2; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; max-width: calc(100% - 20px) }
 .legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap }
+.coord { position: absolute; left: 10px; top: 10px; z-index: 2; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 3px 8px; font-family: var(--f-mono); font-size: 12px }
 .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none }
 .side { min-height: 0; display: flex; flex-direction: column; gap: 10px }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px }
@@ -47,6 +51,7 @@ h1 { font-family: var(--f-head); font-size: 22px; margin: 0; letter-spacing: -0.
 .chip { padding: 4px 10px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 6px }
 .chip[aria-pressed="false"] { opacity: 0.45 }
 .search { width: 100%; font: inherit; padding: 7px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--soft); color: var(--ink); margin-top: 8px }
+.saving { margin: 8px 0 0; font-size: 12.5px; color: var(--muted) }
 .routes { flex: 1; min-height: 140px; overflow: auto; padding: 4px }
 .route { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; padding: 7px 9px; border-radius: 9px; cursor: pointer; border: 1px solid transparent }
 .route:hover { background: var(--soft) }
@@ -56,15 +61,20 @@ h1 { font-family: var(--f-head); font-size: 22px; margin: 0; letter-spacing: -0.
 .badge { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; align-self: center; white-space: nowrap }
 .badge.sure { color: var(--sure); border: 1px solid var(--sure) }
 .badge.check { color: var(--check); border: 1px solid var(--check) }
+.badge.moved { color: var(--moved); border: 1px solid var(--moved) }
+.detail { overflow: auto; max-height: 52vh }
 .detail h2 { font-family: var(--f-head); font-size: 18px; margin: 4px 0 2px; text-wrap: balance }
-.detail .kind { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-ink); padding: 2px 8px; border-radius: 999px; display: inline-block }
+.detail .kind { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; padding: 2px 8px; border-radius: 999px; display: inline-block }
 .detail dl { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 5px 10px; margin: 10px 0 0 }
 .detail dt { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 1px }
 .detail dd { margin: 0; min-width: 0; overflow-wrap: anywhere }
 .mono { font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums }
 .mons { display: flex; flex-wrap: wrap; gap: 4px }
 .mon { background: var(--soft); border-radius: 7px; padding: 2px 7px; font-weight: 600; font-size: 12.5px }
-.rbtn { padding: 5px 10px; font-size: 12.5px; margin-top: 10px }
+.rbtn { padding: 5px 10px; font-size: 12.5px }
+.btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px }
+.face { display: inline-flex; gap: 4px }
+.face .rbtn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
 .empty { color: var(--muted) }
 .note { color: var(--muted); font-size: 12.5px; margin: 8px 0 0 }
 .warn { color: var(--check); font-weight: 600 }
@@ -72,19 +82,20 @@ h1 { font-family: var(--f-head); font-size: 22px; margin: 0; letter-spacing: -0.
   .app { grid-template-columns: 1fr; grid-template-rows: 62vh auto }
   html, body { height: auto }
   .routes { max-height: 50vh }
+  .detail { max-height: none }
   .stats { margin-left: 0 }
 }
-@media (prefers-reduced-motion: reduce) { .stage { transition: none !important } }
 </style>
 
 <div class="top">
   <h1>Kanto Placement Map</h1>
-  <p>FireRed's outside trainers, people and items, put on your map at FireRed's own spots. Click one to see its team, its sight and the block it stands on.</p>
+  <p>FireRed's outside trainers, people and items on your map. Each square is one of FireRed's steps (2 by 2 blocks). Drag one to move it; it snaps to your blocks and is saved straight away.</p>
   <div class="stats" id="stats"></div>
 </div>
 <div class="app">
   <div class="mapwrap" id="map" aria-label="Map of Kanto">
     <div class="stage" id="stage"><img id="img" src="kanto.png" alt="Your Kanto from above, one pixel a block"><svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div class="coord" id="coord" hidden></div>
     <div class="ctl"><button id="zin" title="Zoom in" aria-label="Zoom in">+</button><button id="zout" title="Zoom out" aria-label="Zoom out">&minus;</button><button id="zfit" title="Whole of Kanto" aria-label="Whole of Kanto">&#8962;</button></div>
     <div class="legend" id="legend"></div>
   </div>
@@ -92,6 +103,7 @@ h1 { font-family: var(--f-head); font-size: 22px; margin: 0; letter-spacing: -0.
     <div class="card">
       <div class="filters" id="filters"></div>
       <input class="search" id="q" type="search" placeholder="Search: a name, a POKéMON, an item" aria-label="Search">
+      <p class="saving" id="saving">Loading your moves...</p>
     </div>
     <div class="card detail" id="detail"><p class="empty">Pick a route on the list, or click a marker on the map.</p></div>
     <div class="card routes" id="routes" role="list"></div>
@@ -108,6 +120,18 @@ const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).
 let D = null, B = null, show = { trainer: true, person: true, item: true, hidden: true, obstacle: false }, picked = null, route = null, query = "";
 const map = document.getElementById("map"), stage = document.getElementById("stage"), svg = document.getElementById("svg"), img = document.getElementById("img");
 let view = { s: 1, x: 0, y: 0 };
+// Moves: what you've changed, from the shared store (id -> {x, z, f, gone}); saved as you go.
+let db = null, MOVES = {}, canWrite = false, saveNote = document.getElementById("saving");
+const idOf = t => `${t.m}:${t.k}:${t.gx}:${t.gy}`;
+// Where one is now: your move, else the game's own spot, else FireRed's (each the corner at the middle of a 2 by 2 step).
+function at(t) {
+  const mv = MOVES[idOf(t)];
+  if (mv && !mv.gone && Number.isFinite(mv.x)) return { x: mv.x, z: mv.z, by: "you" };
+  if (t.mx !== undefined) return { x: t.mx, z: t.mz, by: "game" };
+  return { x: t.x, z: t.z, by: "firered" };
+}
+const facing = t => (MOVES[idOf(t)] && MOVES[idOf(t)].f) || t.f;
+const gone = t => !!(MOVES[idOf(t)] && MOVES[idOf(t)].gone);
 
 function apply() { stage.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.s})`; draw(); }
 function fitTo(x0, z0, x1, z1, pad = 1.15) {
@@ -117,7 +141,7 @@ function fitTo(x0, z0, x1, z1, pad = 1.15) {
 }
 function zoom(f, cx, cy) {
   const r = map.getBoundingClientRect(); cx = cx ?? r.width / 2; cy = cy ?? r.height / 2;
-  const ns = Math.max(0.4, Math.min(28, view.s * f)); f = ns / view.s;
+  const ns = Math.max(0.4, Math.min(40, view.s * f)); f = ns / view.s;
   view.x = cx - (cx - view.x) * f; view.y = cy - (cy - view.y) * f; view.s = ns; apply();
 }
 function visible(t) {
@@ -127,78 +151,131 @@ function visible(t) {
 }
 const MAPS = {};
 function mapName(id) { return MAPS[id] ? MAPS[id].name : id; }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
 function draw() {
   if (!D) return;
-  const s = view.s, r = Math.max(0.9, Math.min(2.4, 7 / s)), sw = Math.max(0.12, 1.2 / s);
-  const NS = "http://www.w3.org/2000/svg";
+  const s = view.s, close = s >= 3, r = Math.max(0.9, Math.min(2.4, 7 / s)), sw = Math.max(0.08, 1.2 / s);
   let h = "";
-  // The routes' edges: where each FireRed map lies on your map.
   for (const m of D.maps) {
     const on = route === m.id;
     h += `<rect x="${m.x0}" y="${m.z0}" width="${m.x1 - m.x0}" height="${m.z1 - m.z0}" fill="none" stroke="${on ? css("--accent") : "rgba(255,255,255,0.55)"}" stroke-width="${(on ? 2.4 : 1) / s}" ${m.sure ? "" : `stroke-dasharray="${6 / s} ${4 / s}"`}/>`;
   }
   // Sight: the trainer you picked, and every trainer once you're in close.
   for (const t of D.things) {
-    if (t.k !== "trainer" || !visible(t) || !t.s) continue;
+    if (t.k !== "trainer" || !visible(t) || !t.s || gone(t)) continue;
     if (!(t === picked || s > 3.2)) continue;
-    for (const f of t.f || ["down"]) {
+    const p = at(t);
+    for (const f of facing(t) || ["down"]) {
       const L = t.s * 2;
-      let x = t.x - 1, z = t.z - 1, w = 2, hh = 2;
-      if (f === "up") { z = t.z - 1 - L; hh = L; } else if (f === "down") { z = t.z + 1; hh = L; } else if (f === "left") { x = t.x - 1 - L; w = L; } else { x = t.x + 1; w = L; }
+      let x = p.x - 1, z = p.z - 1, w = 2, hh = 2;
+      if (f === "up") { z = p.z - 1 - L; hh = L; } else if (f === "down") { z = p.z + 1; hh = L; } else if (f === "left") { x = p.x - 1 - L; w = L; } else { x = p.x + 1; w = L; }
       h += `<rect x="${x}" y="${z}" width="${w}" height="${hh}" fill="${css("--sight")}" stroke="${t === picked ? css("--sight-edge") : "none"}" stroke-width="${sw}"/>`;
     }
   }
+  // FireRed's own spot, faint, for one you've moved and picked.
+  if (picked && close) {
+    const p = at(picked);
+    if (p.x !== picked.x || p.z !== picked.z) h += `<rect x="${picked.x - 1}" y="${picked.z - 1}" width="2" height="2" fill="none" stroke="#fff" stroke-dasharray="${0.3} ${0.3}" stroke-width="${sw * 1.5}"/>`;
+  }
   D.things.forEach((t, i) => {
     if (!visible(t)) return;
-    const col = css(KINDS.find(k => k[0] === t.k)[2]), sel = t === picked, rr = sel ? r * 1.5 : r;
-    if (t.k === "hidden") h += `<rect data-i="${i}" x="${t.x - rr * 0.8}" y="${t.z - rr * 0.8}" width="${rr * 1.6}" height="${rr * 1.6}" transform="rotate(45 ${t.x} ${t.z})" fill="${col}" stroke="#fff" stroke-width="${sw}"/>`;
-    else if (t.k === "obstacle") h += `<rect data-i="${i}" x="${t.x - rr * 0.8}" y="${t.z - rr * 0.8}" width="${rr * 1.6}" height="${rr * 1.6}" rx="${rr * 0.3}" fill="${col}" stroke="#fff" stroke-width="${sw}"/>`;
-    else h += `<circle data-i="${i}" cx="${t.x}" cy="${t.z}" r="${rr}" fill="${col}" stroke="${sel ? css("--ink") : "#fff"}" stroke-width="${sel ? sw * 2 : sw}"/>`;
+    const col = css(KINDS.find(k => k[0] === t.k)[2]), sel = t === picked, p = at(t), moved = p.by === "you", g = gone(t);
+    const edge = sel ? css("--ink") : moved ? css("--moved") : "#fff", ew = sel || moved ? sw * 2.2 : sw;
+    if (close) {
+      // One step: 2 by 2 blocks, on your blocks.
+      const inset = t.k === "hidden" ? 0.35 : 0.08;
+      h += `<rect data-i="${i}" x="${p.x - 1 + inset}" y="${p.z - 1 + inset}" width="${2 - 2 * inset}" height="${2 - 2 * inset}" rx="${t.k === "item" || t.k === "hidden" ? 1 : 0.2}" fill="${col}" fill-opacity="${g ? 0.25 : 0.92}" stroke="${edge}" stroke-width="${ew}"/>`;
+      const f = facing(t);
+      if (f && f.length < 4 && (t.k === "trainer" || t.k === "person")) for (const d of f) {
+        const ax = { up: [0, -0.75], down: [0, 0.75], left: [-0.75, 0], right: [0.75, 0] }[d];
+        h += `<circle cx="${p.x + ax[0]}" cy="${p.z + ax[1]}" r="0.18" fill="#fff" pointer-events="none"/>`;
+      }
+    } else if (t.k === "hidden") h += `<rect data-i="${i}" x="${p.x - r * 0.8}" y="${p.z - r * 0.8}" width="${r * 1.6}" height="${r * 1.6}" transform="rotate(45 ${p.x} ${p.z})" fill="${col}" fill-opacity="${g ? 0.25 : 1}" stroke="${edge}" stroke-width="${ew}"/>`;
+    else h += `<circle data-i="${i}" cx="${p.x}" cy="${p.z}" r="${sel ? r * 1.5 : r}" fill="${col}" fill-opacity="${g ? 0.25 : 1}" stroke="${edge}" stroke-width="${ew}"/>`;
   });
   svg.innerHTML = h;
+  renderStats();
 }
 
 function teamHtml(d) {
   return `<div class="mons">${d.split(",").map(x => x.trim()).filter(Boolean).map(x => { const m = x.match(/^(.*) (\d+)$/); return `<span class="mon">${esc(m ? m[1] : x)}${m ? ` <span class="mono">Lv ${m[2]}</span>` : ""}</span>`; }).join("")}</div>`;
 }
-function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
-function pick(t, center) {
+// ---------- saving moves ----------
+async function save(t, body) {
+  if (!db || !canWrite) { saveNote.textContent = "Moves can't be saved here: open this page signed in to Claude to move things."; return false; }
+  const ref = db.collection("moves").doc(idOf(t));
+  try {
+    if (body === null) await ref.delete();
+    else await ref.set(Object.assign({ map: t.m, kind: t.k, label: t.l, gx: t.gx, gy: t.gy, key: t.key || null, at: new Date().toISOString() }, body));
+    saveNote.textContent = "Saved. Claude builds your moves into the game when you say.";
+    return true;
+  } catch (e) {
+    saveNote.textContent = e && e.code === "invalid_argument" ? "You can look but not move things on this page." : "That move didn't save. Try it again.";
+    if (e && e.code === "invalid_argument") canWrite = false;
+    return false;
+  }
+}
+function moveTo(t, x, z) {
+  const mv = Object.assign({}, MOVES[idOf(t)] || {}, { x, z }); delete mv.gone;
+  MOVES[idOf(t)] = mv; draw(); if (t === picked) pick(t, false, true);
+  save(t, { x, z, f: mv.f || null });
+}
+
+function pick(t, center, keepRoute) {
   picked = t; route = t.m;
-  const m = MAPS[t.m], k = KINDS.find(k => k[0] === t.k);
-  const ways = t.f ? (t.f.length === 4 ? "Looks all four ways (it turns about)" : "Faces " + t.f.map(f => DIRWORD[f]).join(" and ")) : "";
+  const m = MAPS[t.m], k = KINDS.find(k => k[0] === t.k), p = at(t), f = facing(t), mv = MOVES[idOf(t)];
+  const ways = f ? (f.length === 4 ? "Looks all four ways (it turns about)" : f.length === 2 ? "Faces " + f.map(x => DIRWORD[x]).join(" and ") : "Faces " + DIRWORD[f[0]]) : "";
   let rows = `<dt>Where</dt><dd>${esc(m.name)}, FireRed's step <span class="mono">${t.gx}, ${t.gy}</span></dd>`;
-  rows += `<dt>Block</dt><dd class="mono">x ${t.x}, y ${t.y}, z ${t.z}</dd>`;
+  rows += `<dt>Block</dt><dd><span class="mono">x ${p.x}, z ${p.z}</span>${p.by === "firered" ? ` <span class="mono">y ${t.y}</span>` : ""}<br><span class="note" style="margin:0">${p.by === "you" ? "Moved by you" : p.by === "game" ? "Where the game has it now (your earlier spot)" : "FireRed's spot on your map"}</span></dd>`;
   if (t.k === "trainer") {
     rows += `<dt>Team</dt><dd>${t.d ? teamHtml(t.d) : "<span class='empty'>-</span>"}</dd>`;
     rows += `<dt>Sight</dt><dd>${t.s ? `Sees you ${t.s} step${t.s === 1 ? "" : "s"} ahead (${t.s * 2} blocks), a step wide` : "Only battles if you talk to them"}</dd>`;
-    rows += `<dt>Facing</dt><dd>${esc(ways)}</dd>`;
   } else if (t.k === "person") {
     if (t.d) rows += `<dt>Says</dt><dd>${esc(t.d)}</dd>`;
-    if (ways) rows += `<dt>Facing</dt><dd>${esc(ways)}</dd>`;
   } else if (t.k === "item" || t.k === "hidden") rows += `<dt>Item</dt><dd>${esc(t.l)}${t.k === "hidden" ? " (hidden: A facing the spot finds it)" : " (in a POKé BALL)"}</dd>`;
-  rows += `<dt>On</dt><dd class="${t.on === "tree" ? "warn" : ""}">${esc(ON[t.on] || t.on)}</dd>`;
+  if (t.k === "trainer" || t.k === "person") rows += `<dt>Facing</dt><dd>${esc(ways)}${canWrite ? `<div class="face" style="margin-top:6px">${["up", "left", "down", "right"].map(d => `<button class="rbtn" data-face="${d}" aria-pressed="${f && f.length === 1 && f[0] === d}">${DIRWORD[d][0].toUpperCase() + DIRWORD[d].slice(1)}</button>`).join("")}</div>` : ""}</dd>`;
+  if (p.by === "firered") rows += `<dt>On</dt><dd class="${t.on === "tree" ? "warn" : ""}">${esc(ON[t.on] || t.on)}</dd>`;
   rows += `<dt>In the mod</dt><dd>${t.key ? `<span class="mono">${esc(t.key)}</span>` : t.k === "person" ? "FireRed's townsperson" : t.k === "obstacle" ? "Your build" : "<span class='empty'>-</span>"}</dd>`;
-  rows += `<dt>Map fit</dt><dd>${m.sure ? "<span class='badge sure'>Lined up</span>" : "<span class='badge check'>Check</span> this route could be a step out"}</dd>`;
-  document.getElementById("detail").innerHTML = `<span class="kind" style="background:${css(k[2])}">${esc(k[1].replace(/s$/, ""))}</span><h2>${esc(t.l)}</h2>${t.n ? `<p class="note">${esc(t.n)}</p>` : ""}<dl>${rows}</dl>
-    <button class="rbtn" id="copytp">Copy /tp to this spot</button> <span class="note" id="copied" aria-live="polite"></span>`;
-  document.getElementById("copytp").onclick = () => {
-    const txt = `/tp @s ${t.x} ${t.y} ${t.z}`, ok = () => (document.getElementById("copied").textContent = "Copied: " + txt);
-    try { navigator.clipboard.writeText(txt).then(ok, () => (document.getElementById("copied").textContent = txt)); } catch (e) { document.getElementById("copied").textContent = txt; }
+  rows += `<dt>Map fit</dt><dd>${m.byYours ? "<span class='badge sure'>Lined up</span> by your own spots there" : m.sure ? "<span class='badge sure'>Lined up</span>" : "<span class='badge check'>Check</span> this route could be a step out"}</dd>`;
+  let btns = `<button class="rbtn" id="copytp">Copy /tp to this spot</button>`;
+  if (canWrite) {
+    if (mv && !mv.gone) btns += `<button class="rbtn" id="undo">${t.mx !== undefined ? "Back to the game's spot" : "Back to FireRed's spot"}</button>`;
+    btns += gone(t) ? `<button class="rbtn" id="putback">Put it back</button>` : `<button class="rbtn" id="takeaway">Take it away</button>`;
+  }
+  document.getElementById("detail").innerHTML = `<span class="kind" style="background:${css(k[2])}">${esc(k[1].replace(/s$/, ""))}</span>${p.by === "you" ? ` <span class="badge moved">Moved</span>` : ""}${gone(t) ? ` <span class="badge check">Taken away</span>` : ""}<h2>${esc(t.l)}</h2>${t.n ? `<p class="note">${esc(t.n)}</p>` : ""}<dl>${rows}</dl>
+    <div class="btns">${btns}</div><p class="note" id="copied" aria-live="polite">${canWrite ? "Drag it on the map, or use the arrow keys (a block at a time; SHIFT for a whole step)." : ""}</p>`;
+  const $ = id => document.getElementById(id);
+  $("copytp").onclick = () => {
+    const txt = `/tp @s ${p.x} ${p.by === "firered" ? t.y : "~"} ${p.z}`, ok = () => ($("copied").textContent = "Copied: " + txt);
+    try { navigator.clipboard.writeText(txt).then(ok, () => ($("copied").textContent = txt)); } catch (e) { $("copied").textContent = txt; }
   };
-  if (center) { const r = map.getBoundingClientRect(); if (view.s < 6) view.s = 6; view.x = r.width / 2 - (t.x - B[0]) * view.s; view.y = r.height / 2 - (t.z - B[1]) * view.s; apply(); }
+  if ($("undo")) $("undo").onclick = () => { const f0 = (MOVES[idOf(t)] || {}).f; if (f0) { MOVES[idOf(t)] = { f: f0 }; save(t, { f: f0 }); } else { delete MOVES[idOf(t)]; save(t, null); } draw(); pick(t, false, true); };
+  if ($("takeaway")) $("takeaway").onclick = () => { MOVES[idOf(t)] = Object.assign({}, MOVES[idOf(t)] || {}, { gone: true }); save(t, MOVES[idOf(t)]); draw(); pick(t, false, true); };
+  if ($("putback")) $("putback").onclick = () => { const mv2 = Object.assign({}, MOVES[idOf(t)]); delete mv2.gone; if (Object.keys(mv2).length) { MOVES[idOf(t)] = mv2; save(t, mv2); } else { delete MOVES[idOf(t)]; save(t, null); } draw(); pick(t, false, true); };
+  document.querySelectorAll("[data-face]").forEach(b => b.onclick = () => {
+    const mv2 = Object.assign({}, MOVES[idOf(t)] || {}, { f: [b.dataset.face] }); MOVES[idOf(t)] = mv2;
+    save(t, mv2); draw(); pick(t, false, true);
+  });
+  if (center) { const r = map.getBoundingClientRect(); if (view.s < 8) view.s = 8; view.x = r.width / 2 - (p.x - B[0]) * view.s; view.y = r.height / 2 - (p.z - B[1]) * view.s; apply(); }
   else draw();
-  renderRoutes();
+  if (!keepRoute) renderRoutes();
+}
+
+function renderStats() {
+  const c = {}; for (const t of D.things) c[t.k] = (c[t.k] || 0) + 1;
+  const sure = D.maps.filter(m => m.sure).length, moved = Object.keys(MOVES).length;
+  document.getElementById("stats").innerHTML = `<span class="stat"><b>${c.trainer || 0}</b> trainers</span><span class="stat"><b>${c.person || 0}</b> people</span><span class="stat"><b>${c.item || 0}</b> item balls</span><span class="stat"><b>${c.hidden || 0}</b> hidden items</span><span class="stat"><b>${sure}</b> of ${D.maps.length} maps lined up</span>${moved ? `<span class="stat moved"><b>${moved}</b> changed by you</span>` : ""}`;
 }
 
 function renderRoutes() {
   const el = document.getElementById("routes");
   el.innerHTML = D.maps.map(m => {
-    const n = { trainer: 0, person: 0, item: 0, hidden: 0 };
-    for (const t of D.things) if (t.m === m.id && n[t.k] !== undefined && visible(t)) n[t.k]++;
-    const ct = [n.trainer && `${n.trainer} trainer${n.trainer === 1 ? "" : "s"}`, n.person && `${n.person} ${n.person === 1 ? "person" : "people"}`, n.item && `${n.item} item${n.item === 1 ? "" : "s"}`, n.hidden && `${n.hidden} hidden`].filter(Boolean).join(" · ") || "nothing here";
-    return `<div class="route${route === m.id ? " on" : ""}" role="listitem" tabindex="0" data-id="${m.id}"><span class="nm">${esc(m.name)}</span><span class="badge ${m.sure ? "sure" : "check"}">${m.sure ? "Lined up" : "Check"}</span><span class="ct">${ct}</span></div>`;
+    const n = { trainer: 0, person: 0, item: 0, hidden: 0 }; let mv = 0;
+    for (const t of D.things) if (t.m === m.id) { if (n[t.k] !== undefined && visible(t)) n[t.k]++; if (MOVES[idOf(t)]) mv++; }
+    const ct = [n.trainer && `${n.trainer} trainer${n.trainer === 1 ? "" : "s"}`, n.person && `${n.person} ${n.person === 1 ? "person" : "people"}`, n.item && `${n.item} item${n.item === 1 ? "" : "s"}`, n.hidden && `${n.hidden} hidden`, mv && `${mv} changed`].filter(Boolean).join(" · ") || "nothing here";
+    return `<div class="route${route === m.id ? " on" : ""}" role="listitem" tabindex="0" data-id="${esc(m.id)}"><span class="nm">${esc(m.name)}</span><span class="badge ${m.sure ? "sure" : "check"}">${m.sure ? "Lined up" : "Check"}</span><span class="ct">${ct}</span></div>`;
   }).join("");
   el.querySelectorAll(".route").forEach(r => {
     const go = () => { const m = MAPS[r.dataset.id]; route = m.id; picked = null; listRoute(m); fitTo(m.x0, m.z0, m.x1, m.z1); renderRoutes(); };
@@ -210,8 +287,8 @@ function listRoute(m) {
   const list = D.things.filter(t => t.m === m.id && visible(t));
   const el = document.getElementById("detail");
   el.innerHTML = `<span class="badge ${m.sure ? "sure" : "check"}">${m.sure ? "Lined up" : "Check"}</span><h2>${esc(m.name)}</h2>
-    <p class="note">${m.sure ? "FireRed's map matches your blocks here." : "Two spots a step apart match your blocks about as well here, so these could be a step out."} Click one to see it.</p>
-    <div style="display:grid;gap:4px;margin-top:8px">${list.map(t => `<button class="rbtn" style="margin:0;text-align:left;display:flex;gap:8px;align-items:center" data-i="${D.things.indexOf(t)}"><span class="dot" style="background:${css(KINDS.find(k => k[0] === t.k)[2])}"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.l)}</span>${t.k === "trainer" && t.d ? `<span class="mono" style="margin-left:auto;color:var(--muted)">Lv ${Math.max(...t.d.match(/\d+/g).map(Number))}</span>` : ""}</button>`).join("") || "<span class='empty'>Nothing shown here with these filters.</span>"}</div>`;
+    <p class="note">${m.byYours ? "Lined up by the spots you set here before." : m.sure ? "FireRed's map matches your blocks here." : "Two spots a step apart match your blocks about as well here, so these could be a step out."} Click one to see it, or drag it on the map.</p>
+    <div style="display:grid;gap:4px;margin-top:8px">${list.map(t => `<button class="rbtn" style="margin:0;text-align:left;display:flex;gap:8px;align-items:center" data-i="${D.things.indexOf(t)}"><span class="dot" style="background:${css(KINDS.find(k => k[0] === t.k)[2])}"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.l)}</span>${MOVES[idOf(t)] ? `<span class="badge moved">${gone(t) ? "Gone" : "Moved"}</span>` : ""}${t.k === "trainer" && t.d ? `<span class="mono" style="margin-left:auto;color:var(--muted)">Lv ${Math.max(...(t.d.match(/\d+/g) || [0]).map(Number))}</span>` : ""}</button>`).join("") || "<span class='empty'>Nothing shown here with these filters.</span>"}</div>`;
   el.querySelectorAll("button[data-i]").forEach(b => b.onclick = () => pick(D.things[+b.dataset.i], true));
 }
 
@@ -221,31 +298,86 @@ function setup() {
   const W = B[2] - B[0], H = B[3] - B[1];
   img.width = W; img.height = H;
   svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", `${B[0]} ${B[1]} ${W} ${H}`);
-  const c = {}; for (const t of D.things) c[t.k] = (c[t.k] || 0) + 1;
-  const sure = D.maps.filter(m => m.sure).length;
-  document.getElementById("stats").innerHTML = `<span class="stat"><b>${c.trainer || 0}</b> trainers</span><span class="stat"><b>${c.person || 0}</b> people</span><span class="stat"><b>${c.item || 0}</b> item balls</span><span class="stat"><b>${c.hidden || 0}</b> hidden items</span><span class="stat"><b>${sure}</b> of ${D.maps.length} maps lined up</span>`;
-  document.getElementById("legend").innerHTML = KINDS.map(k => `<span><span class="dot" style="background:var(${k[2]})"></span>${k[1]}</span>`).join("") + `<span>Dashed edge: check that route</span>`;
+  document.getElementById("legend").innerHTML = KINDS.map(k => `<span><span class="dot" style="background:var(${k[2]})"></span>${k[1]}</span>`).join("") + `<span><span class="dot" style="background:transparent;border:2px solid var(--moved)"></span>Moved by you</span><span>Dashed edge: check that route</span>`;
   const f = document.getElementById("filters");
   f.innerHTML = KINDS.map(k => `<button class="chip" aria-pressed="${show[k[0]]}" data-k="${k[0]}"><span class="dot" style="background:var(${k[2]})"></span>${k[1]}</button>`).join("");
   f.querySelectorAll(".chip").forEach(b => b.onclick = () => { show[b.dataset.k] = !show[b.dataset.k]; b.setAttribute("aria-pressed", show[b.dataset.k]); draw(); renderRoutes(); if (route && !picked) listRoute(MAPS[route]); });
   document.getElementById("q").oninput = e => { query = e.target.value.trim().toLowerCase(); draw(); renderRoutes(); if (route && !picked) listRoute(MAPS[route]); };
   renderRoutes();
   fitTo(B[0], B[1], B[2], B[3], 1.02);
+  connect();
 }
 
-// Panning, zooming, and a click on a marker.
+// The shared store: your moves, live (and from another device too).
+async function connect() {
+  let timer = setTimeout(() => { saveNote.textContent = "Your moves can't be reached yet. What you see may be missing some."; }, 10000);
+  try {
+    const C = window.claude;
+    db = C ? await C.use("db") : null;
+    const user = C ? await C.use("user") : null;
+    const w = user ? await user.can("data.write") : null;
+    canWrite = !!db && w !== false;
+    if (!db) { clearTimeout(timer); saveNote.textContent = "Moving things needs this page open signed in to Claude. You can still look round."; return; }
+    db.collection("moves").onSnapshot(snap => {
+      const next = {};
+      for (const d of snap.docs) { const v = d.data() || {}; next[d.id] = { x: Number.isFinite(v.x) ? v.x : undefined, z: Number.isFinite(v.z) ? v.z : undefined, f: Array.isArray(v.f) ? v.f.filter(x => DIRWORD[x]) : null, gone: !!v.gone }; if (!next[d.id].f || !next[d.id].f.length) delete next[d.id].f; if (next[d.id].x === undefined) { delete next[d.id].x; delete next[d.id].z; } if (!next[d.id].gone) delete next[d.id].gone; }
+      if (!drag || !drag.thing) MOVES = next;
+      if (!snap.metadata.fromCache) { clearTimeout(timer); if (/Loading|can't be reached/.test(saveNote.textContent)) saveNote.textContent = canWrite ? (snap.size ? `${snap.size} change${snap.size === 1 ? "" : "s"} of yours, saved.` : "Drag anything to move it. Each move is saved straight away.") : "You can look but not move things on this page."; }
+      draw(); renderRoutes(); if (picked) pick(picked, false, true);
+    }, () => { clearTimeout(timer); saveNote.textContent = "Your moves can't be loaded just now. Open the page again later."; });
+  } catch (e) { clearTimeout(timer); saveNote.textContent = "Moving things isn't available here. You can still look round."; }
+}
+
+// Panning, zooming, picking, and dragging one to a new spot (whole blocks).
 let drag = null;
-map.addEventListener("pointerdown", e => { if (e.target.closest(".ctl,.legend")) return; drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false, id: e.pointerId }; map.setPointerCapture(e.pointerId); });
-map.addEventListener("pointermove", e => { if (!drag || drag.id !== e.pointerId) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; map.classList.add("drag"); } view.x = drag.vx + dx; view.y = drag.vy + dy; stage.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.s})`; });
+const toBlock = e => { const r = map.getBoundingClientRect(); return { x: (e.clientX - r.left - view.x) / view.s + B[0], z: (e.clientY - r.top - view.y) / view.s + B[1] }; };
+map.addEventListener("pointerdown", e => {
+  if (e.target.closest(".ctl,.legend,.coord")) return;
+  const el = e.target.closest("[data-i]"), t = el ? D.things[+el.dataset.i] : null;
+  drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false, id: e.pointerId, thing: canWrite && t && view.s >= 3 ? t : null, hit: t };
+  if (drag.thing) { const p = at(t), b = toBlock(e); drag.ox = p.x - b.x; drag.oz = p.z - b.z; drag.start = p; }
+  map.setPointerCapture(e.pointerId);
+});
+map.addEventListener("pointermove", e => {
+  const coord = document.getElementById("coord");
+  if (D && view.s >= 3) { const b = toBlock(e); coord.hidden = false; coord.textContent = `x ${Math.floor(b.x)}, z ${Math.floor(b.z)}`; } else coord.hidden = true;
+  if (!drag || drag.id !== e.pointerId) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+  if (drag.thing) {
+    if (!drag.moved) return;
+    map.classList.add("moving");
+    const b = toBlock(e), x = Math.round(b.x + drag.ox), z = Math.round(b.z + drag.oz), mv = MOVES[idOf(drag.thing)] || {};
+    if (mv.x !== x || mv.z !== z) { MOVES[idOf(drag.thing)] = Object.assign({}, mv, { x, z }); delete MOVES[idOf(drag.thing)].gone; picked = drag.thing; draw(); }
+    return;
+  }
+  if (drag.moved) map.classList.add("drag");
+  view.x = drag.vx + dx; view.y = drag.vy + dy; stage.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.s})`;
+});
 map.addEventListener("pointerup", e => {
-  if (!drag) return; const was = drag; drag = null; map.classList.remove("drag");
+  if (!drag) return; const was = drag; drag = null; map.classList.remove("drag", "moving");
+  if (was.thing && was.moved) { const p = at(was.thing); if (p.x !== was.start.x || p.z !== was.start.z) moveTo(was.thing, p.x, p.z); else pick(was.thing, false); return; }
   if (was.moved) { draw(); return; }
-  const r = map.getBoundingClientRect(), bx = (e.clientX - r.left - view.x) / view.s + B[0], bz = (e.clientY - r.top - view.y) / view.s + B[1];
+  if (was.hit) { pick(was.hit, false); return; }
+  const b = toBlock(e);
   let best = null, bd = Math.max(2.5, 10 / view.s);
-  for (const t of D.things) { if (!visible(t)) continue; const d = Math.hypot(t.x - bx, t.z - bz); if (d < bd) { bd = d; best = t; } }
+  for (const t of D.things) { if (!visible(t)) continue; const p = at(t), d = Math.hypot(p.x - b.x, p.z - b.z); if (d < bd) { bd = d; best = t; } }
   if (best) pick(best, false);
 });
+map.addEventListener("pointerleave", () => { document.getElementById("coord").hidden = true; });
 map.addEventListener("wheel", e => { e.preventDefault(); const r = map.getBoundingClientRect(); zoom(e.deltaY < 0 ? 1.18 : 1 / 1.18, e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+// Arrow keys nudge the one you picked: a block at a time, a whole step with SHIFT.
+let nudgeTimer = null;
+document.addEventListener("keydown", e => {
+  if (!picked || !canWrite || e.target.closest("input,textarea")) return;
+  const d = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[e.key];
+  if (!d) return;
+  e.preventDefault();
+  const n = e.shiftKey ? 2 : 1, p = at(picked), t = picked;
+  MOVES[idOf(t)] = Object.assign({}, MOVES[idOf(t)] || {}, { x: p.x + d[0] * n, z: p.z + d[1] * n }); delete MOVES[idOf(t)].gone;
+  draw(); pick(t, false, true);
+  clearTimeout(nudgeTimer); nudgeTimer = setTimeout(() => { const q = at(t); save(t, { x: q.x, z: q.z, f: (MOVES[idOf(t)] || {}).f || null }); }, 500);
+});
 document.getElementById("zin").onclick = () => zoom(1.5);
 document.getElementById("zout").onclick = () => zoom(1 / 1.5);
 document.getElementById("zfit").onclick = () => { route = null; picked = null; renderRoutes(); fitTo(B[0], B[1], B[2], B[3], 1.02); };
