@@ -65,7 +65,7 @@ PEOPLE = [
         "It's fun. Try it with your POKéMON, too!"]),
 ]
 # The lost FARFETCH'D (HeartGold's first, by the shrine's path): it stands in the forest.
-MONS = [("pet:ilex_forest_farfetchd", "farfetchd", (25, 62), 3)]
+MONS = [("pet:ilex_forest_farfetchd", "farfetch_d", (25, 62), 3)]
 # The item balls (data/field_items.tsv's keys) and HeartGold's hidden items (found by looking at the spot).
 ITEMS = [("ilex_forest_revive", "revive", (42, 73)), ("ilex_forest_x_attack", "x_attack", (27, 42)),
          ("ilex_forest_antidote", "antidote", (20, 30)), ("ilex_forest_ether", "ether", (47, 16))]

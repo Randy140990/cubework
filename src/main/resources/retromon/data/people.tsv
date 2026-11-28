@@ -98,10 +98,10 @@ fuchsia_city_p0	fuchsia_city	youngster	left_right	walk	Did you try the SAFARI GA
 fuchsia_city_p1	fuchsia_city	gambler	left_right	walk	SAFARI ZONE has a zoo in front of the entrance. | Out back is the SAFARI GAME for catching POKéMON.	28	17
 fuchsia_city_p2	fuchsia_city	fisher	down	stay	ERIK: Where's SARA? I said I'd meet her here.	30	14
 fuchsia_city_p3	fuchsia_city	youngster	up	stay	That item ball in there is really a POKéMON.	24	8
-fuchsia_city_p4	fuchsia_city	chansey	down	stay	!	31	5
+fuchsia_city_p4	fuchsia_city	chansey	down	stay	CHANSEY: !	31	5
 fuchsia_city_p5	fuchsia_city	monster	left_right	walk	!	12	6
 fuchsia_city_p6	fuchsia_city	monster	left_right	walk	!	30	12
-fuchsia_city_p7	fuchsia_city	seel	any_dir	walk	!	8	17
+fuchsia_city_p7	fuchsia_city	seel	any_dir	walk	SEEL: !	8	17
 fuchsia_good_rod_house_p0	fuchsia_good_rod_house	fishing_guru	right	stay	I'm the FISHING GURU's older brother! | I simply Looove fishing! | Do you like to fish?	5	3
 fuchsia_gym_p0	fuchsia_gym	gym_guide	down	stay	Yo! Champ in making! | FUCHSIA GYM is riddled with invisible walls! | KOGA might appear close, but he's blocked off! | You have to find gaps in the walls to reach him!	7	15
 fuchsia_mart_p0	fuchsia_mart	middle_aged_man	none	stay	Do you have a SAFARI ZONE flag? | What about cards or calendars?	4	2
@@ -397,3 +397,18 @@ saffron_fan_club_fr_rocker	saffron_fan_club	rocker	down	stay	LANCE's cool, huh? 
 saffron_fan_club_fr_beauty	saffron_fan_club	beauty	down	stay	Master LANCE is so dignified... He is so my type. | Why can't the others see the dignity he simply oozes?	-1	-1
 saffron_fan_club_fr_black_belt	saffron_fan_club	hiker	down	stay	Hiyah! There is but one TRAINER who has my respect. | And that is none other than my MASTER at the FIGHTING DOJO. | You should become a fan of my MASTER like me! Hiyah!	-1	-1
 ss_anne_1f_room6_fr_woman	ss_anne_1f_room6	beauty	down	stay	You look tired. Would you like to take a short rest?	-1	-1
+# (0.74) FireRed's own people outside the mod hadn't (tools/place_outside74.py): its words, at its spots
+celadon_city_fr_boy	celadon_city	boy	up	stay	Aaaagh, ow… I scalded my tongue! | This nice old lady in the MANSION gave me some TEA. But it was boiling hot! | Gotta cool it to drink it.	-1	-1
+celadon_city_fr_scientist	celadon_city	scientist	any_dir	walk	Oh, what am I to do… Someone stole our SILPH SCOPE. | The thief came running this way, I'm sure of it. But I lost sight of him! | Where'd he go?	-1	-1
+cerulean_city_fr_slowbro	cerulean_city	monster	down	stay	SLOWBRO: !	-1	-1
+fuchsia_city_fr_slowpoke	fuchsia_city	monster	down	stay	SLOWPOKE: !	-1	-1
+fuchsia_city_fr_voltorb	fuchsia_city	monster	down	stay	VOLTORB: !	-1	-1
+fuchsia_city_fr_lapras	fuchsia_city	monster	any_dir	walk	LAPRAS: !	-1	-1
+fuchsia_city_fr_kangaskhan	fuchsia_city	monster	any_dir	walk	KANGASKHAN: !	-1	-1
+fuchsia_city_fr_bug_catcher	fuchsia_city	bug_catcher	up	stay	Aww, I wish I was a KANGASKHAN baby. I'd love to be a substitute for the baby… | And snuggle in the mother KANGASKHAN's belly pouch. | But only POKéMON can use the technique SUBSTITUTE… | Want me to teach SUBSTITUTE to one of your POKéMON?	-1	-1
+fuchsia_city_fr_lass	fuchsia_city	lass	down	stay	My father is the GYM LEADER of this town. | I'm training to use POISON POKéMON as well as my father.	-1	-1
+route_20_fr_camper	route_20	camper	left_right	walk	Strong TRAINERS and WATER POKéMON are common sights in these parts. | They say that MISTY of the CERULEAN GYM trains here.	-1	-1
+route_25_fr_beauty	route_25	beauty	left	stay	This cape is a famous date spot. | MISTY, the GYM LEADER, has high hopes about this place.	-1	-1
+route_25_fr_man	route_25	middle_aged_man	left	stay	Hello, are you here alone? If you're out at CERULEAN's cape… | Well, it should be as a couple.	-1	-1
+saffron_city_fr_crush_girl	saffron_city	crush_girl	left_right	walk	This FAN CLUB… No one here has a clue! | How could they not recognize the brilliance that is LANCE? | He stands for justice! He's cool, and yet passionate! He's the greatest, LANCE!	-1	-1
+vermilion_city_fr_scientist	vermilion_city	scientist	any_dir	walk	Oh, hello, {player}! How are you doing? It's me, one of PROF. OAK's AIDES. | Did you meet the other AIDE? He had a package from PROF. OAK for you, {player}. | He said he'd look for you around ROUTE 2, {player}. | If you're in the ROUTE 2 area, please look for him.	-1	-1

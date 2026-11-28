@@ -174,6 +174,8 @@ public final class Placer {
 						: new Spot(key, th.kind(), th.place(), r.id(), x - r.ox(), y - r.oy(), z - r.oz(), yaw, false);
 				MINE.put(key, s);
 				FLOORS.remove(key);
+				OUT.remove(key);
+				AT_SEA.remove(key);
 				save();
 				if (rocky(th.kind())) Boulders.refresh(p);
 				else if (!th.kind().equals("hidden")) {
@@ -192,6 +194,8 @@ public final class Placer {
 			case "back" -> {
 				MINE.remove(key);
 				FLOORS.remove(key);
+				OUT.remove(key);
+				AT_SEA.remove(key);
 				save();
 				clear(level, key);
 				if (rocky(th.kind())) Boulders.refresh(p);
@@ -216,11 +220,76 @@ public final class Placer {
 
 	/** Floors found under spots placed without a height (the caves' baked ones). */
 	private static final Map<String, Double> FLOORS = new java.util.HashMap<>();
+	/** (0.74) Where the outside ones placed without a height stand (found once each), and who of them is out at sea. */
+	private static final Map<String, double[]> OUT = new java.util.HashMap<>();
+	private static final java.util.Set<String> AT_SEA = new java.util.HashSet<>();
+
+	/**
+	 * (0.74) Saffron's people as FireRed has them: TEAM ROCKET's grunts in its streets till their BOSS is beaten in
+	 * SILPH CO., the townsfolk out again after.
+	 */
+	private static final String SILPH = "beat:silph_co_11f_0";
+	private static final Map<String, String> WHEN = new java.util.HashMap<>();
+	static {
+		for (String k : new String[] {"saffron_city_p0", "saffron_city_p1", "saffron_city_p2", "saffron_city_p3", "saffron_city_p4", "saffron_city_p5", "saffron_city_p6",
+				"saffron_city_p13"}) WHEN.put(k, "!" + SILPH);
+		for (String k : new String[] {"saffron_city_p7", "saffron_city_p8", "saffron_city_p9", "saffron_city_p10", "saffron_city_p11", "saffron_city_p12"})
+			WHEN.put(k, SILPH);
+	}
+
+	private static boolean showsFor(ServerPlayer p, Spot s) {
+		String w = WHEN.get(s.key());
+		if (w == null) return true;
+		return w.startsWith("!") ? !Game.meets(p, w.substring(1)) : Game.meets(p, w);
+	}
+
+	/**
+	 * (0.74) An outside spot baked without a height (John's 10:28: everyone outside at a best guess): the ground there
+	 * as the game finds it for anyone (the street, not a roof; off a tree), or for a SWIMMER the sea near it.
+	 */
+	private static double[] outside(ServerLevel lv, Spot s, double[] a) {
+		double[] have = OUT.get(s.key());
+		if (have != null) return have;
+		int x = (int) Math.floor(a[0]), z = (int) Math.floor(a[2]);
+		if (!lv.hasChunkAt(new BlockPos(x, 64, z))) return null;
+		Trainers.Trainer t = s.kind().equals("trainer") ? Trainers.get(s.key()) : null;
+		if (t != null && Game.swimmer(t)) {
+			BlockPos w = sea(lv, x, z);
+			if (w != null) {
+				AT_SEA.add(s.key());
+				have = new double[] {w.getX() + 0.5, w.getY() + 0.9, w.getZ() + 0.5};
+			}
+		}
+		if (have == null) {
+			BlockPos g = Game.spot(lv, x, z, 5);
+			if (g == null) return null;
+			have = new double[] {g.getX() + 0.5, g.getY(), g.getZ() + 0.5};
+		}
+		OUT.put(s.key(), have);
+		return have;
+	}
+
+	/** Open sea near a spot (two deep, nothing over it): its top water block; or null. */
+	private static BlockPos sea(ServerLevel lv, int x, int z) {
+		for (int r = 0; r <= 8; r++) {
+			for (int dx = -r; dx <= r; dx++) {
+				for (int dz = -r; dz <= r; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
+					int top = lv.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, x + dx, z + dz) - 1;
+					BlockPos at = new BlockPos(x + dx, top, z + dz);
+					if (lv.getBlockState(at).is(net.minecraft.world.level.block.Blocks.WATER) && lv.getBlockState(at.below()).is(net.minecraft.world.level.block.Blocks.WATER)
+							&& lv.getBlockState(at.above()).isAir() && lv.getBlockState(at.above(2)).isAir()) return at;
+				}
+			}
+		}
+		return null;
+	}
 
 	/** Where a spot is, its height found (the floor there, from the top) where it was placed without one. */
 	private static double[] atIn(ServerLevel lv, Spot s) {
 		double[] a = at(s);
 		if (a == null || !Double.isNaN(a[1])) return a;
+		if (s.room() == null) return outside(lv, s, a);
 		Double y = FLOORS.get(s.key());
 		if (y == null) {
 			Interiors.Room r = Interiors.room(s.room());
@@ -279,7 +348,7 @@ public final class Placer {
 				if (s.room() != null && (here == null || !here.id().equals(s.room()))) continue;
 				double[] a = atIn(lv, s);
 				if (a == null || p.distanceToSqr(a[0], a[1], a[2]) > 96 * 96 || !lv.hasChunkAt(BlockPos.containing(a[0], a[1], a[2]))) continue;
-				if (s.gone()) clearNear(lv, s, a);
+				if (s.gone() || !showsFor(p, s)) clearNear(lv, s, a);
 				else ensureOne(lv, s);
 			}
 		}
@@ -325,6 +394,8 @@ public final class Placer {
 				int role = t != null ? (t.leader() ? Npc.LEADER : Npc.TRAINER) : Npc.PERSON;
 				Npc n = Game.place(lv, role, s.key(), a[0], a[1], a[2], s.yaw());
 				if (n != null) {
+					// ((0.74) A SWIMMER out at sea swims there.)
+					if (AT_SEA.contains(s.key())) n.setSwimming(true);
 					n.setFacing(s.yaw());
 					n.rehome(BlockPos.containing(a[0], a[1], a[2]));
 				}

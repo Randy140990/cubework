@@ -82,7 +82,7 @@ route_10_hidden_berry	route_10	hidden	route_10_hidden_berry	BERRY	item=berry	20	
 route_11_fr_youngster_eddie	route_11	trainer	route_11_fr_youngster_eddie	YOUNGSTER EDDIE	EKANS 21	19	8	down	4
 route_11_fr_gamer_hugo	route_11	trainer	route_11_fr_gamer_hugo	GAMER HUGO	POLIWAG 18, HORSEA 18	16	17	none	1
 route_11_fr_youngster_dillon	route_11	trainer	route_11_fr_youngster_dillon	YOUNGSTER DILLON	SANDSHREW 19, ZUBAT 19	31	8	up	4
-route_11_fr_youngster_dave	route_11	trainer	route_11_fr_youngster_dave	YOUNGSTER DAVE	NIDORAN_M 18, NIDORINO 18	28	10	down	1
+route_11_fr_youngster_dave	route_11	trainer	route_11_fr_youngster_dave	YOUNGSTER DAVE	NIDORAN♂ 18, NIDORINO 18	28	10	down	1
 route_11_fr_gamer_jasper	route_11	trainer	route_11_fr_gamer_jasper	GAMER JASPER	BELLSPROUT 18, ODDISH 18	38	15	none	1
 route_11_fr_gamer_darian	route_11	trainer	route_11_fr_gamer_darian	GAMER DARIAN	GROWLITHE 18, VULPIX 18	50	4	none	1
 route_11_fr_engineer_braxton	route_11	trainer	route_11_fr_engineer_braxton	ENGINEER BRAXTON	MAGNEMITE 21	42	8	left	4
@@ -98,10 +98,10 @@ route_12_fr_fisherman_chip	route_12	trainer	route_12_fr_fisherman_chip	FISHERMAN
 route_12_fr_fisherman_hank	route_12	trainer	route_12_fr_fisherman_hank	FISHERMAN HANK	GOLDEEN 27	16	47	down	4
 route_12_fr_fisherman_elliot	route_12	trainer	route_12_fr_fisherman_elliot	FISHERMAN ELLIOT	POLIWAG 21, SHELLDER 21, GOLDEEN 21, HORSEA 21	13	59	down	1
 route_12_fr_rocker_luca	route_12	trainer	route_12_fr_rocker_luca	ROCKER LUCA	VOLTORB 29, ELECTRODE 29	13	92	left	1
-route_12_fr_camper_justin	route_12	trainer	route_12_fr_camper_justin	CAMPER JUSTIN	NIDORAN_M 29, NIDORINO 29	10	99	down	1
+route_12_fr_camper_justin	route_12	trainer	route_12_fr_camper_justin	CAMPER JUSTIN	NIDORAN♂ 29, NIDORINO 29	10	99	down	1
 route_12_fr_fisherman_andrew	route_12	trainer	route_12_fr_fisherman_andrew	FISHERMAN ANDREW	MAGIKARP 24, MAGIKARP 24	18	108	left	1
 route_12_i1	route_12	item	route_12_i1	IRON	item=iron	9	101	none	0
-route_12_fr_young_couple_gia_jes	route_12	trainer	route_12_fr_young_couple_gia_jes	YOUNG COUPLE GIA & JES	NIDORAN_M 24, NIDORAN_F 24	19	64	right	0
+route_12_fr_young_couple_gia_jes	route_12	trainer	route_12_fr_young_couple_gia_jes	YOUNG COUPLE GIA & JES	NIDORAN♂ 24, NIDORAN♀ 24	19	64	right	0
 route_12_hidden_hyper_potion	route_12	hidden	route_12_hidden_hyper_potion	HYPER POTION	item=hyper_potion	18	57	none	0
 route_12_hidden_leftovers	route_12	hidden	route_12_hidden_leftovers	LEFTOVERS	item=leftovers	14	70	none	0
 route_12_hidden_rare_candy	route_12	hidden	route_12_hidden_rare_candy	RARE CANDY	item=rare_candy	9	116	none	0
@@ -117,7 +117,7 @@ route_13_fr_bird_keeper_perry	route_13	trainer	route_13_fr_bird_keeper_perry	BIR
 route_13_fr_biker_jared	route_13	trainer	route_13_fr_biker_jared	BIKER JARED	KOFFING 28, KOFFING 28, KOFFING 28	14	8	none	1
 route_13_hidden_pp_up	route_13	hidden	route_13_hidden_pp_up	PP UP	item=pp_up	23	14	none	0
 route_14_fr_biker_gerald	route_14	trainer	route_14_fr_biker_gerald	BIKER GERALD	KOFFING 29, MUK 29	7	37	right	2
-route_14_fr_bird_keeper_donald	route_14	trainer	route_14_fr_bird_keeper_donald	BIRD KEEPER DONALD		18	35	none	1
+route_14_fr_bird_keeper_donald	route_14	trainer	route_14_fr_bird_keeper_donald	BIRD KEEPER DONALD	FARFETCH'D 33	18	35	none	1
 route_14_fr_bird_keeper_beck	route_14	trainer	route_14_fr_bird_keeper_beck	BIRD KEEPER BECK	PIDGEOTTO 29, FEAROW 29	10	14	right	4
 route_14_fr_bird_keeper_marlon	route_14	trainer	route_14_fr_bird_keeper_marlon	BIRD KEEPER MARLON	SPEAROW 28, DODUO 28, FEAROW 28	16	16	up	3
 route_14_fr_biker_isaac	route_14	trainer	route_14_fr_biker_isaac	BIKER ISAAC	GRIMER 28, GRIMER 28, KOFFING 28	7	31	right	2
@@ -129,7 +129,7 @@ route_14_fr_bird_keeper_benny	route_14	trainer	route_14_fr_bird_keeper_benny	BIR
 route_14_fr_twins_kiri_jan	route_14	trainer	route_14_fr_twins_kiri_jan	TWINS KIRI & JAN	CHARMANDER 29, SQUIRTLE 29	13	51	down	1
 route_14_hidden_berry	route_14	hidden	route_14_hidden_berry	BERRY	item=berry	19	53	none	0
 route_15_fr_picnicker_yazmin	route_15	trainer	route_15_fr_picnicker_yazmin	PICNICKER YAZMIN	BELLSPROUT 29, ODDISH 29, TANGELA 29	22	13	none	1
-route_15_fr_bird_keeper_edwin	route_15	trainer	route_15_fr_bird_keeper_edwin	BIRD KEEPER EDWIN	PIDGEOTTO 26, DODUO 26, PIDGEY 26	31	12	left	5
+route_15_fr_bird_keeper_edwin	route_15	trainer	route_15_fr_bird_keeper_edwin	BIRD KEEPER EDWIN	PIDGEOTTO 26, FARFETCH'D 26, DODUO 26, PIDGEY 26	31	12	left	5
 route_15_fr_bird_keeper_chester	route_15	trainer	route_15_fr_bird_keeper_chester	BIRD KEEPER CHESTER	DODRIO 28, DODUO 28, DODUO 28	37	14	up	2
 route_15_fr_picnicker_kindra	route_15	trainer	route_15_fr_picnicker_kindra	PICNICKER KINDRA	GLOOM 28, ODDISH 28, ODDISH 28	44	13	none	1
 route_15_fr_beauty_olivia	route_15	trainer	route_15_fr_beauty_olivia	BEAUTY OLIVIA	BULBASAUR 29, IVYSAUR 29	50	12	down	2
@@ -144,7 +144,7 @@ route_16_fr_biker_lao	route_16	trainer	route_16_fr_biker_lao	BIKER LAO	GRIMER 29
 route_16_fr_cue_ball_koji	route_16	trainer	route_16_fr_cue_ball_koji	CUE BALL KOJI	MACHOP 28, MANKEY 28, MACHOP 28	14	14	none	1
 route_16_fr_cue_ball_luke	route_16	trainer	route_16_fr_cue_ball_luke	CUE BALL LUKE	MANKEY 29, MACHOP 29	12	12	none	1
 route_16_fr_biker_ruben	route_16	trainer	route_16_fr_biker_ruben	BIKER RUBEN	WEEZING 28, KOFFING 28, WEEZING 28	8	12	none	1
-route_16_fr_biker_hideo	route_16	trainer	route_16_fr_biker_hideo	BIKER HIDEO		10	14	none	1
+route_16_fr_biker_hideo	route_16	trainer	route_16_fr_biker_hideo	BIKER HIDEO	WEEZING 33	10	14	none	1
 route_16_fr_cue_ball_camron	route_16	trainer	route_16_fr_cue_ball_camron	CUE BALL CAMRON	MANKEY 29, MACHOP 29	6	14	none	1
 route_16_fr_young_couple_lea_jed	route_16	trainer	route_16_fr_young_couple_lea_jed	YOUNG COUPLE LEA & JED	RAPIDASH 29, NINETALES 29	30	5	down	1
 route_16_hidden_leftovers	route_16	hidden	route_16_hidden_leftovers	LEFTOVERS	item=leftovers	31	13	none	0
@@ -210,7 +210,7 @@ route_23_hidden_mysteryberry	route_23	hidden	route_23_hidden_mysteryberry	MYSTER
 route_23_hidden_max_elixer	route_23	hidden	route_23_hidden_max_elixer	MAX ELIXER	item=max_elixer	9	8	none	0
 route_24_0	route_24	trainer	route_24_0	ROCKET	EKANS 15, ZUBAT 15	12	15	left	0
 route_24_fr_camper_ethan	route_24	trainer	route_24_fr_camper_ethan	CAMPER ETHAN	MANKEY 18	12	19	left	2
-route_24_fr_lass_reli	route_24	trainer	route_24_fr_lass_reli	LASS RELI	NIDORAN_M 16, NIDORAN_F 16	10	22	right	2
+route_24_fr_lass_reli	route_24	trainer	route_24_fr_lass_reli	LASS RELI	NIDORAN♂ 16, NIDORAN♀ 16	10	22	right	2
 route_24_fr_youngster_timmy	route_24	trainer	route_24_fr_youngster_timmy	YOUNGSTER TIMMY	SANDSHREW 14, EKANS 14	12	25	left	2
 route_24_fr_lass_ali	route_24	trainer	route_24_fr_lass_ali	LASS ALI	PIDGEY 12, ODDISH 12, BELLSPROUT 12	10	28	right	2
 route_24_fr_bug_catcher_cale	route_24	trainer	route_24_fr_bug_catcher_cale	BUG CATCHER CALE	CATERPIE 10, WEEDLE 10, METAPOD 10, KAKUNA 10	12	31	left	2
@@ -221,7 +221,7 @@ route_25_fr_hiker_franklin	route_25	trainer	route_25_fr_hiker_franklin	HIKER FRA
 route_25_fr_youngster_joey	route_25	trainer	route_25_fr_youngster_joey	YOUNGSTER JOEY	RATTATA 15, SPEAROW 15	18	2	down	2
 route_25_fr_hiker_wayne	route_25	trainer	route_25_fr_hiker_wayne	HIKER WAYNE	ONIX 17	17	7	right	2
 route_25_fr_youngster_dan	route_25	trainer	route_25_fr_youngster_dan	YOUNGSTER DAN	SLOWPOKE 17	22	4	none	2
-route_25_fr_picnicker_kelsey	route_25	trainer	route_25_fr_picnicker_kelsey	PICNICKER KELSEY	NIDORAN_M 15, NIDORAN_F 15	22	8	right	2
+route_25_fr_picnicker_kelsey	route_25	trainer	route_25_fr_picnicker_kelsey	PICNICKER KELSEY	NIDORAN♂ 15, NIDORAN♀ 15	22	8	right	2
 route_25_fr_hiker_nob	route_25	trainer	route_25_fr_hiker_nob	HIKER NOB	GEODUDE 13, GEODUDE 13, MACHOP 13, GEODUDE 13	27	9	up	3
 route_25_fr_camper_flint	route_25	trainer	route_25_fr_camper_flint	CAMPER FLINT	RATTATA 14, EKANS 14	28	4	down	3
 route_25_fr_youngster_chad	route_25	trainer	route_25_fr_youngster_chad	YOUNGSTER CHAD	EKANS 14, SANDSHREW 14	36	4	down	2
@@ -232,12 +232,12 @@ route_25_hidden_oran_berry	route_25	hidden	route_25_hidden_oran_berry	ORAN BERRY
 route_25_hidden_berry	route_25	hidden	route_25_hidden_berry	BERRY	item=berry	40	3	none	0
 route_3_7	route_3	trainer	route_3_7	LASS ROBIN	JIGGLYPUFF 14	40	11	up	3
 route_3_6	route_3	trainer	route_3_6	BUG CATCHER JAMES	CATERPIE 11, METAPOD 11	32	6	right	4
-route_3_4	route_3	trainer	route_3_4	LASS SALLY	RATTATA 10, NIDORAN_F 10	30	3	left	5
+route_3_4	route_3	trainer	route_3_4	LASS SALLY	RATTATA 10, NIDORAN♀ 10	30	3	left	5
 route_3_3	route_3	trainer	route_3_3	BUG CATCHER GREG	WEEDLE 9, KAKUNA 9, CATERPIE 9, METAPOD 9	25	4	down	2
 route_3_5	route_3	trainer	route_3_5	YOUNGSTER CALVIN	SPEAROW 14	29	10	left	5
 route_3_2	route_3	trainer	route_3_2	LASS JANICE	PIDGEY 9, PIDGEY 9	19	9	left	5
 route_3_0	route_3	trainer	route_3_0	BUG CATCHER COLTON	CATERPIE 10, WEEDLE 10, CATERPIE 10	12	6	right	3
-route_3_1	route_3	trainer	route_3_1	YOUNGSTER BEN		17	4	down	2
+route_3_1	route_3	trainer	route_3_1	YOUNGSTER BEN	RATTATA 11, EKANS 11	17	4	down	2
 route_3_hidden_oran_berry	route_3	hidden	route_3_hidden_oran_berry	ORAN BERRY	item=oran_berry	26	9	none	0
 route_4_0	route_4	trainer	route_4_0	LASS CRISSY	PARAS 31, PARAS 31, PARASECT 31	75	3	right	4
 route_4_i0	route_4	item	route_4_i0	TM05 ROAR	item=tm_roar	67	5	none	0
@@ -254,12 +254,12 @@ route_6_hidden_gold_berry	route_6	hidden	route_6_hidden_gold_berry	GOLD BERRY	it
 route_6_hidden_rare_candy	route_6	hidden	route_6_hidden_rare_candy	RARE CANDY	item=rare_candy	19	5	none	0
 route_7_hidden_berry	route_7	hidden	route_7_hidden_berry	BERRY	item=berry	16	15	none	0
 route_8_fr_lass_julia	route_8	trainer	route_8_fr_lass_julia	LASS JULIA	CLEFAIRY 22, CLEFAIRY 22	62	14	left	6
-route_8_fr_gamer_rich	route_8	trainer	route_8_fr_gamer_rich	GAMER RICH		55	15	down	3
+route_8_fr_gamer_rich	route_8	trainer	route_8_fr_gamer_rich	GAMER RICH	GROWLITHE 24, VULPIX 24	55	15	down	3
 route_8_fr_super_nerd_glenn	route_8	trainer	route_8_fr_super_nerd_glenn	SUPER NERD GLENN	GRIMER 22, MUK 22, GRIMER 22	51	6	none	4
-route_8_fr_lass_paige	route_8	trainer	route_8_fr_lass_paige	LASS PAIGE	NIDORAN_F 23, NIDORINA 23	29	3	left	3
+route_8_fr_lass_paige	route_8	trainer	route_8_fr_lass_paige	LASS PAIGE	NIDORAN♀ 23, NIDORINA 23	29	3	left	3
 route_8_fr_super_nerd_leslie	route_8	trainer	route_8_fr_super_nerd_leslie	SUPER NERD LESLIE	KOFFING 26	29	4	right	6
 route_8_fr_lass_andrea	route_8	trainer	route_8_fr_lass_andrea	LASS ANDREA	MEOWTH 24, MEOWTH 24, MEOWTH 24	29	5	left	3
-route_8_fr_lass_megan	route_8	trainer	route_8_fr_lass_megan	LASS MEGAN	PIDGEY 19, RATTATA 19, NIDORAN_M 19, MEOWTH 19, PIKACHU 19	29	6	right	6
+route_8_fr_lass_megan	route_8	trainer	route_8_fr_lass_megan	LASS MEGAN	PIDGEY 19, RATTATA 19, NIDORAN♂ 19, MEOWTH 19, PIKACHU 19	29	6	right	6
 route_8_fr_gamer_stan	route_8	trainer	route_8_fr_gamer_stan	GAMER STAN	POLIWAG 22, POLIWAG 22, POLIWHIRL 22	21	3	none	1
 route_8_fr_super_nerd_aidan	route_8	trainer	route_8_fr_super_nerd_aidan	SUPER NERD AIDAN	VOLTORB 20, KOFFING 20, VOLTORB 20, MAGNEMITE 20	9	6	right	4
 route_8_fr_twins_eli_anne	route_8	trainer	route_8_fr_twins_eli_anne	TWINS ELI & ANNE	CLEFAIRY 22, JIGGLYPUFF 22	40	3	down	1
@@ -271,7 +271,7 @@ route_8_hidden_mysteryberry	route_8	hidden	route_8_hidden_mysteryberry	MYSTERYBE
 route_9_fr_picnicker_alicia	route_9	trainer	route_9_fr_picnicker_alicia	PICNICKER ALICIA	ODDISH 18, BELLSPROUT 18, ODDISH 18, BELLSPROUT 18	14	10	left	3
 route_9_fr_hiker_jeremy	route_9	trainer	route_9_fr_hiker_jeremy	HIKER JEREMY	MACHOP 20, ONIX 20	20	17	up	4
 route_9_fr_hiker_alan	route_9	trainer	route_9_fr_hiker_alan	HIKER ALAN	GEODUDE 21, ONIX 21	61	16	down	1
-route_9_fr_camper_chris	route_9	trainer	route_9_fr_camper_chris	CAMPER CHRIS		26	7	none	3
+route_9_fr_camper_chris	route_9	trainer	route_9_fr_camper_chris	CAMPER CHRIS	GROWLITHE 21, CHARMANDER 21	26	7	none	3
 route_9_fr_bug_catcher_brent	route_9	trainer	route_9_fr_bug_catcher_brent	BUG CATCHER BRENT	BEEDRILL 19, BEEDRILL 19	26	1	down	2
 route_9_fr_bug_catcher_conner	route_9	trainer	route_9_fr_bug_catcher_conner	BUG CATCHER CONNER	CATERPIE 20, WEEDLE 20, VENONAT 20	49	7	right	3
 route_9_fr_hiker_brice	route_9	trainer	route_9_fr_hiker_brice	HIKER BRICE	GEODUDE 20, MACHOP 20, GEODUDE 20	53	2	left	1
@@ -346,7 +346,7 @@ victory_road_2f_3	victory_road_2f	trainer	victory_road_2f_3	POKéMANIAC DAWSON	C
 victory_road_2f_0	victory_road_2f	trainer	victory_road_2f_0	BLACK BELT DAISUKE	MACHOKE 43, MACHOP 43, MACHOKE 43	20	11	down	4
 victory_road_2f_1	victory_road_2f	trainer	victory_road_2f_1	JUGGLER NELSON	DROWZEE 41, HYPNO 41, KADABRA 41, KADABRA 41	31	16	left	4
 victory_road_2f_2	victory_road_2f	trainer	victory_road_2f_2	TAMER VINCENT	PERSIAN 44, GOLDUCK 44	26	6	down	1
-victory_road_2f_4	victory_road_2f	trainer	victory_road_2f_4	JUGGLER GREGORY	MR_MIME 48	36	5	up	3
+victory_road_2f_4	victory_road_2f	trainer	victory_road_2f_4	JUGGLER GREGORY	MR.MIME 48	36	5	up	3
 victory_road_2f_i3	victory_road_2f	item	victory_road_2f_i3	GUARD SPEC.	item=guard_spec	17	6	none	0
 victory_road_2f_i1	victory_road_2f	item	victory_road_2f_i1	FULL HEAL	item=full_heal	25	13	none	0
 victory_road_2f_fr_tm_sandstorm	victory_road_2f	item	victory_road_2f_fr_tm_sandstorm	TM37 SANDSTORM	item=tm_sandstorm	14	13	none	0
@@ -380,7 +380,7 @@ viridian_forest_sammy	viridian_forest	trainer	viridian_forest_sammy	BUG CATCHER 
 viridian_forest_poke_ball	viridian_forest	item	viridian_forest_poke_ball	POKé BALL	item=poke_ball	5	41	none	0
 viridian_forest_antidote	viridian_forest	item	viridian_forest_antidote	ANTIDOTE	item=antidote	40	21	none	0
 viridian_forest_potion	viridian_forest	item	viridian_forest_potion	POTION	item=potion	21	34	none	0
-viridian_forest_anthony	viridian_forest	trainer	viridian_forest_anthony	BUG CATCHER ANTHONY		43	6	down	1
+viridian_forest_anthony	viridian_forest	trainer	viridian_forest_anthony	BUG CATCHER ANTHONY	CATERPIE 7, CATERPIE 8	43	6	down	1
 viridian_forest_charlie	viridian_forest	trainer	viridian_forest_charlie	BUG CATCHER CHARLIE	METAPOD 7, CATERPIE 7, METAPOD 7	16	5	up	1
 viridian_forest_potion_2	viridian_forest	item	viridian_forest_potion_2	POTION	item=potion	49	60	none	0
 viridian_forest_hidden_potion	viridian_forest	hidden	viridian_forest_hidden_potion	POTION	item=potion	3	22	none	0
@@ -391,6 +391,7 @@ celadon_city_p2	celadon_city	person	celadon_city_p2	GIRL	The GAME CORNER is bad 
 celadon_city_p3	celadon_city	person	celadon_city_p3	GRAMPS	Moan! I blew it all at the slots!	25	22	down	0
 celadon_city_p4	celadon_city	person	celadon_city_p4	GRAMPS	Hello, there!	22	16	down	0
 celadon_city_p5	celadon_city	person	celadon_city_p5	FISHER	This is my trusted pal, POLIWRATH!	32	12	left	0
+celadon_city_p6	celadon_city	person	celadon_city_p6	MONSTER	POLIWRATH: Ribi ribit!	30	12	right	0
 celadon_city_p7	celadon_city	person	celadon_city_p7	ROCKET	What are you staring at?	32	29	left_right	0
 celadon_city_p8	celadon_city	person	celadon_city_p8	ROCKET	Keep out of TEAM ROCKET's way!	42	14	left_right	0
 cerulean_city_p1	cerulean_city	person	cerulean_city_p1	COOLTRAINER M	You're a trainer too? Collecting, fighting, it's a tough lif	31	20	down	0
@@ -406,8 +407,8 @@ fuchsia_city_p0	fuchsia_city	person	fuchsia_city_p0	YOUNGSTER	Did you try the SA
 fuchsia_city_p1	fuchsia_city	person	fuchsia_city_p1	GAMBLER	SAFARI ZONE has a zoo in front of the entrance.	28	17	left_right	0
 fuchsia_city_p2	fuchsia_city	person	fuchsia_city_p2	FISHER	ERIK: Where's SARA? I said I'd meet her here.	30	14	down	0
 fuchsia_city_p3	fuchsia_city	person	fuchsia_city_p3	YOUNGSTER	That item ball in there is really a POKéMON.	24	8	up	0
-fuchsia_city_p4	fuchsia_city	person	fuchsia_city_p4	CHANSEY	!	31	5	down	0
-fuchsia_city_p7	fuchsia_city	person	fuchsia_city_p7	SEEL	!	8	17	any_dir	0
+fuchsia_city_p4	fuchsia_city	person	fuchsia_city_p4	CHANSEY	CHANSEY: !	31	5	down	0
+fuchsia_city_p7	fuchsia_city	person	fuchsia_city_p7	SEEL	SEEL: !	8	17	any_dir	0
 lavender_town_p0	lavender_town	person	lavender_town_p0	LITTLE GIRL	Do you believe in GHOSTs?	15	9	any_dir	0
 lavender_town_p1	lavender_town	person	lavender_town_p1	COOLTRAINER M	This town is known as the grave site of POKéMON.	9	10	none	0
 lavender_town_p2	lavender_town	person	lavender_town_p2	SUPER NERD	GHOSTs appeared in POKéMON TOWER.	8	7	left_right	0
@@ -442,6 +443,7 @@ vermilion_city_p0	vermilion_city	person	vermilion_city_p0	COOLTRAINER F	We're ca
 vermilion_city_p1	vermilion_city	person	vermilion_city_p1	GAMBLER	Did you see S.S. ANNE moored in the harbor?	14	6	none	0
 vermilion_city_p2	vermilion_city	person	vermilion_city_p2	SAILOR	Welcome to S.S. ANNE!	19	30	up	0
 vermilion_city_p3	vermilion_city	person	vermilion_city_p3	GAMBLER	I'm putting up a building on this plot of land.	30	7	none	0
+vermilion_city_p4	vermilion_city	person	vermilion_city_p4	MONSTER	MACHOP: Guoh! Gogogoh!	29	9	up_down	0
 vermilion_city_p5	vermilion_city	person	vermilion_city_p5	SAILOR	S.S.ANNE is a famous luxury cruise ship.	25	27	left_right	0
 viridian_city_p0	viridian_city	person	viridian_city_p0	YOUNGSTER	Those POKé BALLs at your waist! You have POKéMON!	13	20	any_dir	0
 viridian_city_p1	viridian_city	person	viridian_city_p1	GAMBLER	Ahh, I've had my coffee now and I feel great!	18	9	none	0
@@ -459,6 +461,20 @@ route_23_guard_4	route_23	person	route_23_guard_4	GUARD	You can pass here only i
 route_23_guard_5	route_23	person	route_23_guard_5	GUARD	You can pass here only if you have the MARSHBADGE.	-1	-1	down	0
 route_23_guard_6	route_23	person	route_23_guard_6	GUARD	You can pass here only if you have the VOLCANOBADGE.	-1	-1	down	0
 route_23_guard_7	route_23	person	route_23_guard_7	GUARD	You can pass here only if you have the EARTHBADGE.	-1	-1	down	0
+celadon_city_fr_boy	celadon_city	person	celadon_city_fr_boy	BOY	Aaaagh, ow… I scalded my tongue!	-1	-1	up	0
+celadon_city_fr_scientist	celadon_city	person	celadon_city_fr_scientist	SCIENTIST	Oh, what am I to do… Someone stole our SILPH SCOPE.	-1	-1	any_dir	0
+cerulean_city_fr_slowbro	cerulean_city	person	cerulean_city_fr_slowbro	MONSTER	SLOWBRO: !	-1	-1	down	0
+fuchsia_city_fr_slowpoke	fuchsia_city	person	fuchsia_city_fr_slowpoke	MONSTER	SLOWPOKE: !	-1	-1	down	0
+fuchsia_city_fr_voltorb	fuchsia_city	person	fuchsia_city_fr_voltorb	MONSTER	VOLTORB: !	-1	-1	down	0
+fuchsia_city_fr_lapras	fuchsia_city	person	fuchsia_city_fr_lapras	MONSTER	LAPRAS: !	-1	-1	any_dir	0
+fuchsia_city_fr_kangaskhan	fuchsia_city	person	fuchsia_city_fr_kangaskhan	MONSTER	KANGASKHAN: !	-1	-1	any_dir	0
+fuchsia_city_fr_bug_catcher	fuchsia_city	person	fuchsia_city_fr_bug_catcher	BUG CATCHER	Aww, I wish I was a KANGASKHAN baby. I'd love to be a substi	-1	-1	up	0
+fuchsia_city_fr_lass	fuchsia_city	person	fuchsia_city_fr_lass	LASS	My father is the GYM LEADER of this town.	-1	-1	down	0
+route_20_fr_camper	route_20	person	route_20_fr_camper	CAMPER	Strong TRAINERS and WATER POKéMON are common sights in these	-1	-1	left_right	0
+route_25_fr_beauty	route_25	person	route_25_fr_beauty	BEAUTY	This cape is a famous date spot.	-1	-1	left	0
+route_25_fr_man	route_25	person	route_25_fr_man	MIDDLE AGED MAN	Hello, are you here alone? If you're out at CERULEAN's cape…	-1	-1	left	0
+saffron_city_fr_crush_girl	saffron_city	person	saffron_city_fr_crush_girl	CRUSH GIRL	This FAN CLUB… No one here has a clue!	-1	-1	left_right	0
+vermilion_city_fr_scientist	vermilion_city	person	vermilion_city_fr_scientist	SCIENTIST	Oh, hello, {player}! How are you doing? It's me, one of PROF	-1	-1	any_dir	0
 route_12_i0	route_12	item	route_12_i0	TM16 PAY DAY	item=tm_pay_day (Red and Blue's)	14	35	none	0
 route_15_i0	route_15	item	route_15_i0	TM20 RAGE	item=tm_rage (Red and Blue's)	18	5	none	0
 route_2_i1	route_2	item	route_2_i1	HP UP	item=hp_up (Red and Blue's)	13	45	none	0
@@ -469,3 +485,4 @@ route_3_oran_berry	route_3	item	route_3_oran_berry	ORAN BERRY	item=oran_berry (R
 route_4_great_ball	route_4	item	route_4_great_ball	GREAT BALL	item=great_ball (Red and Blue's)	-1	-1	none	0
 route_4_persim_berry	route_4	item	route_4_persim_berry	PERSIM BERRY	item=persim_berry (Red and Blue's)	-1	-1	none	0
 route_4_razz_berry	route_4	item	route_4_razz_berry	RAZZ BERRY	item=razz_berry (Red and Blue's)	-1	-1	none	0
+cerulean_city_0	cerulean_city	trainer	cerulean_city_0	ROCKET	MACHOP 17, DROWZEE 17	33	6	up	3

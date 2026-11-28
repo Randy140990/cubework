@@ -25,8 +25,8 @@ kanto	lavender_town	-126	425	town	LAVENDER TOWN	-	Fishing	magikarp,krabby,corsol
 kanto	route_6	-355	505	route	ROUTE 6	-	Grass|Surfing|Fishing	pidgey,rattata,abra,pidgeotto,jigglypuff,meowth,squirtle,psyduck,golduck,goldeen	-
 kanto	vermilion_city	-355	580	town	VERMILION CITY	-	Fishing	tentacool,horsea	-
 kanto	route_11	-230	585	route	ROUTE 11	-	Grass|Fishing	pidgey,rattata,drowzee,pidgeotto,raticate,ekans,tentacool,horsea	-
-kanto	route_12	-124	560	route	ROUTE 12	-	Grass|Surfing|Fishing	oddish,bellsprout,pidgey,pidgeotto,gloom,weepinbell,farfetchd,slowpoke,slowbro,horsea,seadra	-
-kanto	route_13	-195	710	route	ROUTE 13	-	Grass|Surfing|Fishing	oddish,bellsprout,pidgeotto,pidgey,gloom,weepinbell,farfetchd,slowpoke,slowbro,horsea,tentacool,seadra	-
+kanto	route_12	-124	560	route	ROUTE 12	-	Grass|Surfing|Fishing	oddish,bellsprout,pidgey,pidgeotto,gloom,weepinbell,farfetch_d,slowpoke,slowbro,horsea,seadra	-
+kanto	route_13	-195	710	route	ROUTE 13	-	Grass|Surfing|Fishing	oddish,bellsprout,pidgeotto,pidgey,gloom,weepinbell,farfetch_d,slowpoke,slowbro,horsea,tentacool,seadra	-
 kanto	route_14	-270	745	route	ROUTE 14	-	Grass	oddish,bellsprout,venonat,pidgeotto,gloom,weepinbell,venomoth	-
 kanto	route_15	-360	785	route	ROUTE 15	-	Grass	oddish,bellsprout,venonat,pidgeotto,gloom,weepinbell,venomoth	-
 kanto	fuchsia_city	-500	785	town	FUCHSIA CITY	-	Fishing	magikarp,gyarados	-

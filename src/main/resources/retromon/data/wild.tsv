@@ -11,9 +11,9 @@ route_8	grass	any	15	pidgey:20:51,pidgey:22:51,rattata:20:39,abra:15:25,abra:19:
 route_9	grass	any	15	nidoran_m:16:51,nidoran_f:16:51,rattata:18:39,nidoran_m:18:25,nidoran_f:18:25,spearow:17:25,nidorino:18:13,nidorina:18:13,raticate:20:11,fearow:19:3,ekans:11:25,ekans:13:11,ekans:15:25,ekans:17:3
 route_10	grass	any	15	magnemite:16:51,rattata:18:51,magnemite:18:39,magnemite:20:25,nidoran_m:17:25,nidoran_f:17:25,magnemite:22:13,raticate:20:13,machop:16:11,machop:18:3,ekans:11:25,ekans:13:11,ekans:15:25,ekans:17:3
 route_11	grass	any	15	pidgey:16:51,rattata:15:51,pidgey:18:39,drowzee:15:25,rattata:17:25,drowzee:17:25,pidgeotto:18:13,pidgeotto:20:13,drowzee:19:11,raticate:17:3,ekans:12:39,ekans:14:51,ekans:15:13
-route_12	grass	any	15	oddish:25:51,bellsprout:25:51,pidgey:28:39,pidgeotto:28:25,oddish:27:25,bellsprout:27:25,gloom:29:13,weepinbell:29:13,farfetchd:26:11,farfetchd:31:3
+route_12	grass	any	15	oddish:25:51,bellsprout:25:51,pidgey:28:39,pidgeotto:28:25,oddish:27:25,bellsprout:27:25,gloom:29:13,weepinbell:29:13,farfetch_d:26:11,farfetch_d:31:3
 route_12	water	any	3	slowpoke:15:51,slowpoke:15:51,slowpoke:15:39,slowpoke:15:25,slowpoke:15:25,slowpoke:15:25,slowpoke:15:13,slowpoke:15:13,slowbro:15:11,slowbro:20:3
-route_13	grass	any	15	oddish:25:51,bellsprout:25:51,pidgeotto:28:39,pidgey:28:25,oddish:27:25,bellsprout:27:25,gloom:29:13,weepinbell:29:13,farfetchd:26:11,farfetchd:31:3
+route_13	grass	any	15	oddish:25:51,bellsprout:25:51,pidgeotto:28:39,pidgey:28:25,oddish:27:25,bellsprout:27:25,gloom:29:13,weepinbell:29:13,farfetch_d:26:11,farfetch_d:31:3
 route_13	water	any	3	slowpoke:15:51,slowpoke:15:51,slowpoke:15:39,slowpoke:15:25,slowpoke:15:25,slowpoke:15:25,slowpoke:15:13,slowpoke:15:13,slowbro:15:11,slowbro:20:3
 route_14	grass	any	15	oddish:26:51,bellsprout:26:51,venonat:24:39,pidgeotto:30:25,oddish:28:25,bellsprout:28:25,gloom:30:13,weepinbell:30:13,venonat:27:11,venomoth:30:3
 route_15	grass	any	15	oddish:26:51,bellsprout:26:51,venonat:24:39,pidgeotto:32:25,oddish:28:25,bellsprout:28:25,gloom:30:13,weepinbell:30:13,venonat:27:11,venomoth:30:3

@@ -90,7 +90,7 @@ rocket_hideout_b3f_0	rocket_hideout_b3f	ROCKET	rocket	right	2	30	rattata:20,rati
 rocket_hideout_b3f_1	rocket_hideout_b3f	ROCKET	rocket	up	4	30	machop:21,machop:21	-	We got word from upstairs that you were coming!	What? I lost? No!	Go ahead and go! But, you need the LIFT KEY to run the elevator!	26	12
 rocket_hideout_b4f_0	rocket_hideout_b4f	ROCKET BOSS GIOVANNI	leader_giovanni	down	0	99	onix:25,rhyhorn:24,persian:29	-	I see that you raise POKéMON with utmost care. | A child like you would never understand what I hope to achieve. | I shall step aside this time! | I hope we meet again...	No!	...	25	3
 rocket_hideout_b4f_1	rocket_hideout_b4f	ROCKET	rocket	down	3	30	koffing:21,zubat:21	-	-	-	-	11	2
-route_10_0	route_10	POKéMANIAC MARK	super_nerd	left	4	50	rhyhorn:30,lickitung:30	-	Wow, are you a POKéMANIAC too? Want to see my collection?	Humph. I'm not angry!	I have more rare POKéMON at home!	10	44
+route_10_0	route_10	POKéMANIAC MARK	super_nerd	left	4	50	rhyhorn:29,lickitung:29	-	Wow, are you a POKéMANIAC too? Want to see my collection?	Humph. I'm not angry!	I have more rare POKéMON at home!	10	44
 route_10_1	route_10	HIKER	hiker	up	3	35	geodude:21,onix:21	-	Ha-hahah-ah-ha!	Ha-haha! Not laughing! Ha-hay fever! Haha-ha-choo!	Haha-ha-choo! Ha-choo! Snort! Snivel!	3	57
 route_10_2	route_10	POKéMANIAC	super_nerd	left	4	50	cubone:20,slowpoke:20	-	Hi, kid, want to see my POKéMON?	Oh no! My POKéMON!	I don't like you for beating me!	14	64
 route_10_3	route_10	JR.TRAINER♀	cooltrainer_f	left	3	20	jigglypuff:20,clefairy:20	-	I've been to a POKéMON GYM a few times. But, I lost each time.	Ohh! Blew it again!	I noticed some POKéMANIACs prowling around.	7	25
@@ -127,7 +127,7 @@ route_14_0	route_14	BIRD KEEPER	cooltrainer_m	down	2	25	pidgey:28,doduo:28,pidge
 route_14_1	route_14	BIRD KEEPER	cooltrainer_m	down	2	25	pidgey:26,spearow:26,pidgey:26,fearow:26	-	My bird POKéMON should be ready for battle.	Not ready yet!	They need to learn better moves.	15	6
 route_14_2	route_14	BIRD KEEPER	cooltrainer_m	down	4	25	pidgeotto:29,fearow:29	-	TMs are on sale in CELADON! But, only a few people have HMs!	Aww, bummer!	Teach POKéMON moves of the same element type for more power.	12	11
 route_14_3	route_14	BIRD KEEPER	cooltrainer_m	up	3	25	spearow:28,doduo:28,fearow:28	-	Have you taught your bird POKéMON how to FLY?	Shot down in flames!	Bird POKéMON are my true love!	14	15
-route_14_4	route_14	BIRD KEEPER	cooltrainer_m	left	3	25	farfetchd:33	-	Have you heard of the legendary POKéMON?	Why? Why'd I lose?	The 3 legendary POKéMON are all birds of prey.	15	31
+route_14_4	route_14	BIRD KEEPER	cooltrainer_m	left	3	25	farfetch_d:33	-	Have you heard of the legendary POKéMON?	Why? Why'd I lose?	The 3 legendary POKéMON are all birds of prey.	15	31
 route_14_5	route_14	BIRD KEEPER	cooltrainer_m	up	4	25	spearow:29,fearow:29	-	I'm not into it, but OK! Let's go!	I knew it!	Winning, losing, it doesn't matter in the long run!	6	49
 route_14_6	route_14	BIKER	biker	down	4	20	koffing:26,koffing:26,grimer:26,koffing:26	-	C'mon, c'mon. Let's go, let's go, let's go!	Arrg! Lost! Get lost!	What, what, what? What do you want?	5	39
 route_14_7	route_14	BIKER	biker	right	4	20	grimer:28,grimer:28,koffing:28	-	Perfect! I need to burn some time!	What? You!?	Raising POKéMON is a drag, man.	4	30
@@ -135,7 +135,7 @@ route_14_8	route_14	BIKER	biker	left	3	20	koffing:29,muk:29	-	We ride out here b
 route_14_9	route_14	BIKER	biker	right	4	20	koffing:29,grimer:29	-	POKéMON fight? Cool! Rumble!	Blown away!	You know who'd win, you and me one on one!	4	31
 route_15_0	route_15	JR.TRAINER♀	cooltrainer_f	down	2	20	gloom:28,oddish:28,oddish:28	-	Let me try out the POKéMON I just got in a trade!	Not good enough!	You can't change the nickname of any POKéMON you get in a trade. | Only the Original Trainer can.	41	11
 route_15_1	route_15	JR.TRAINER♀	cooltrainer_f	left	3	20	pidgey:29,pidgeotto:29	-	You look gentle, so I think I can beat you!	No, wrong!	I'm afraid of BIKERs, they look so ugly and mean!	53	10
-route_15_2	route_15	BIRD KEEPER	cooltrainer_m	up	3	25	pidgeotto:26,farfetchd:26,doduo:26,pidgey:26	-	When I whistle, I can summon bird POKéMON!	Ow! That's tragic!	Maybe I'm not cut out for battles.	31	13
+route_15_2	route_15	BIRD KEEPER	cooltrainer_m	up	3	25	pidgeotto:26,farfetch_d:26,doduo:26,pidgey:26	-	When I whistle, I can summon bird POKéMON!	Ow! That's tragic!	Maybe I'm not cut out for battles.	31	13
 route_15_3	route_15	BIRD KEEPER	cooltrainer_m	up	3	25	dodrio:28,doduo:28,doduo:28	-	Hmm? My birds are shivering! You're good, aren't you?	Just as I thought!	Did you know moves like EARTHQUAKE don't have any effect on birds?	35	13
 route_15_4	route_15	BEAUTY	beauty	down	2	70	pidgeotto:29,wigglytuff:29	-	Oh, you're a little cutie!	You looked so cute too!	I forgive you! I can take it!	53	11
 route_15_5	route_15	BEAUTY	beauty	right	3	70	bulbasaur:29,ivysaur:29	-	I raise POKéMON because I live alone!	I didn't ask for this!	I just like going home to be with my POKéMON!	41	10
@@ -211,7 +211,7 @@ route_3_0	route_3	BUG CATCHER COLTON	bug_catcher	right	3	10	caterpie:10,weedle:1
 route_3_1	route_3	YOUNGSTER BEN	youngster	down	2	15	rattata:11,ekans:11	-	Hi! I like shorts! They're comfy and easy to wear!	I don't believe it!	Are you storing your POKéMON on PC? Each BOX can hold 20 POKéMON!	14	4
 route_3_2	route_3	LASS JANICE	lass	left	5	15	pidgey:9,pidgey:9	-	You looked at me, didn't you?	You're mean!	Quit staring if you don't want to fight!	16	9
 route_3_3	route_3	BUG CATCHER GREG	bug_catcher_2	down	2	10	weedle:9,kakuna:9,caterpie:9,metapod:9	-	Are you a trainer? Let's fight!	If I had new POKéMON, I would've won!	If a POKéMON BOX on the PC gets full, just switch to another BOX!	19	5
-route_3_4	route_3	LASS SALLY	lass_2	left	5	15	rattata:10,nidoran_m:10	-	That look you gave me, it's so intriguing!	Be nice!	Avoid fights by not letting people see you!	23	4
+route_3_4	route_3	LASS SALLY	lass_2	left	5	15	rattata:10,nidoran_f:10	-	That look you gave me, it's so intriguing!	Be nice!	Avoid fights by not letting people see you!	23	4
 route_3_5	route_3	YOUNGSTER CALVIN	youngster_2	left	5	15	spearow:14	-	Hey! You're not wearing shorts!	Lost! Lost! Lost!	I always wear shorts, even in winter!	22	9
 route_3_6	route_3	BUG CATCHER JAMES	bug_catcher_3	right	4	10	caterpie:11,metapod:11	-	You can fight my new POKéMON!	Done like dinner!	Trained POKéMON are stronger than the wild ones!	24	6
 route_3_7	route_3	LASS ROBIN	lass_3	up	3	15	jigglypuff:14	-	Eek! Did you touch me?	That's it?	ROUTE 4 is at the foot of MT.MOON.	33	10

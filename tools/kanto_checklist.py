@@ -93,7 +93,10 @@ def trainer_rows(place):
             sees = ("Sees you %d step%s ahead, facing %s" % (sight, "" if sight == 1 else "s", FACING.get(facing, facing.replace("_", " ")))) if sight > 0 \
                 else "Only battles if you talk to them"
             team = r[5]
-            rows.append(("Trainer", "Battle %s" % r[4], "%s. Team: %s. (PLACER: place them where FireRed has them.)" % (sees, team), "Not placed yet", None))
+            # ((0.74) Put in at my best guess of FireRed's spot on John's map: the PLACER moves them.)
+            best = r[3] in BAKED
+            rows.append(("Trainer", "Battle %s" % r[4], "%s. Team: %s. (%s)" % (sees, team, "At my best guess of FireRed's spot: move them with the PLACER if it's off."
+                         if best else "PLACER: place them where FireRed has them."), "In (best guess)" if best else "Not placed yet", None))
         return rows
     for r in TRAINERS:
         if r[1] != place or r[8] not in ("-", "") or r[2].startswith("RIVAL"): continue
@@ -122,6 +125,7 @@ def item_rows(place):
             it = r[5].replace("item=", "").split(" ")[0]
             rb = "Red and Blue's" in r[5]
             if r[3] in ITEM_SPOTS: now, note = "In", ""
+            elif r[3] in BAKED: now, note = "In (best guess)", " At my best guess of FireRed's spot: move it with the PLACER if it's off."
             elif r[3] in FIELD_KEYS: now, note = "Partly", " At a guessed spot till you place it with the PLACER."
             else: now, note = "Not placed yet", " There once you place it with the PLACER."
             rows.append(("Item", "Pick up the %s" % item_name(it), "In a POKé BALL on the ground; once taken it stays gone.%s%s"
@@ -154,8 +158,10 @@ def hidden_rows(place):
         if r[1] != place or r[2] != "hidden": continue
         it = r[5].replace("item=", "").split(" ")[0]
         now = "In" if r[3] in BAKED or r[3] in BALLS else "Not placed yet"
+        if now == "In" and outdoors(place): now = "In (best guess)"
         rows.append(("Hidden item", "Find the hidden %s" % item_name(it), "Press A facing the spot: found once. The ITEMFINDER says if one's near and which way."
-                     + ("" if now == "In" else " There once you place it with the PLACER."), now, None))
+                     + (" At my best guess of FireRed's spot: move it with the PLACER if it's off." if now == "In (best guess)" else ""
+                        if now == "In" else " There once you place it with the PLACER."), now, None))
     return rows
 
 
@@ -174,6 +180,10 @@ NOW71.update({19: ("Not placed yet", "The two BLACK BELTs stand outside: place t
               22: ("Not placed yet", "The five and the ROCKET stand outside: place them with the PLACER."),
               24: ("Not placed yet", "The ROCKET stands outside the back door: place him with the PLACER."),
               73: ("Partly", "You can SURF through; FireRed's boulders, holes and currents aren't in."), 82: ("In", None)})
+# ((0.74) John's 10:28: everyone outside put in at my best guess of FireRed's spot.)
+NOW71.update({19: ("In (best guess)", "The two BLACK BELTs stand by the way up to MT. MOON."),
+              22: ("Partly", "The five and the ROCKET stand on the bridge at my best guess and battle you. No NUGGET, no offer to join."),
+              24: ("In (best guess)", "The ROCKET stands out the back of the house.")})
 
 # What to check, step by step, where it says more than the sheet's line.
 CHECK = {
@@ -391,7 +401,7 @@ def main():
     ws.append(["Kanto in FireRed's order, place by place. Tick DONE as you check each row; set WORKS? and add notes where it doesn't."])
     ws.append(["Done", "=COUNTIF(B%d:B%d,TRUE)" % (first, last), "of", n, "Works", '=COUNTIF(J%d:J%d,"Works")' % (first, last), "Wrong",
                '=COUNTIF(J%d:J%d,"Wrong")' % (first, last), "Missing", '=COUNTIF(J%d:J%d,"Missing")' % (first, last)])
-    ws.append(["Retromon now is read from the mod's code at 0.72. Not placed yet: there once you put it down with the PLACER (OPTION). Picker step: the EVENT PICKER's step (OPTION) to jump there."])
+    ws.append(["Retromon now is read from the mod's code at 0.74. In (best guess): at my best guess of FireRed's spot on your map (move it with the PLACER if it's off). Not placed yet: there once you put it down with the PLACER (OPTION). Picker step: the EVENT PICKER's step (OPTION) to jump there."])
     ws.append([])
     ws.append(["#", "Done", "Leg", "Where", "Kind", "What happens", "Check that", "Retromon now", "Picker step", "Works?", "Your notes"])
     for i, (leg, wh, k, do, check, now, st) in enumerate(rows, 1):

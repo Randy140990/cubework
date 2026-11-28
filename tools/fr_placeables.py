@@ -43,6 +43,7 @@ FIELD = table("field_items.tsv")
 TMS = {r[2]: r[0] for r in table("tms.tsv")}  # move -> tm_ id
 ITEM_IDS = {r[0] for r in table("items.tsv")} | {r[0] for r in table("tms.tsv")}
 SPECIES = {r[1] for r in table("species.tsv")}
+SPECIES_NAME = {r[1]: r[2] for r in table("species.tsv") if len(r) > 2}
 
 # FireRed's maps outside and the caves, and the place each is in the mod.
 MAPS = {}
@@ -110,8 +111,8 @@ def say(label):
     return out
 
 
-# FireRed's trainers: class, name, party.
-TR = {}
+# FireRed's trainers: class, name, party (and which are double battles: twice the prize).
+TR, DOUBLE = {}, set()
 src = open(os.path.join(FR, "src", "data", "trainers.h"), encoding="utf-8").read()
 for m in re.finditer(r"\[(TRAINER_\w+)\]\s*=\s*\{(.*?)\n    \},", src, re.S):
     body = m.group(2)
@@ -119,12 +120,19 @@ for m in re.finditer(r"\[(TRAINER_\w+)\]\s*=\s*\{(.*?)\n    \},", src, re.S):
     nm = re.search(r'\.trainerName = _\("([^"]*)"\)', body)
     party = re.search(r"\.party = \w+\((sParty_\w+)\)", body)
     TR[m.group(1)] = (cls.group(1) if cls else "", nm.group(1) if nm else "", party.group(1) if party else "")
+    if re.search(r"\.doubleBattle = TRUE", body): DOUBLE.add(m.group(1))
 PARTY = {}
 src = open(os.path.join(FR, "src", "data", "trainer_parties.h"), encoding="utf-8").read()
-for m in re.finditer(r"(sParty_\w+)\[\]\s*=\s*\{(.*?)\n\};", src, re.S):
+# ((0.73) Each party's body runs to the next definition: the one-line DUMMY parties before the first real one had
+# swallowed it (YOUNGSTER BEN's on Route 3 came out empty). FARFETCH'D is "farfetch_d" in the mod.)
+SPECIES_ALIAS = {"farfetchd": "farfetch_d"}
+for m in re.finditer(r"(sParty_\w+)\[\]\s*=\s*\{", src):
+    end = src.find("static const", m.end())
+    body = src[m.end():end if end > 0 else len(src)]
     mons = []
-    for mm in re.finditer(r"\.lvl = (\d+),\s*\.species = SPECIES_(\w+)", m.group(2)):
-        mons.append((mm.group(2).lower(), int(mm.group(1))))
+    for mm in re.finditer(r"\.lvl = (\d+),\s*\.species = SPECIES_(\w+)", body):
+        sp = mm.group(2).lower()
+        mons.append((SPECIES_ALIAS.get(sp, sp), int(mm.group(1))))
     PARTY[m.group(1)] = mons
 CLASS_NAME = {"BUG_CATCHER": "BUG CATCHER", "COOLTRAINER": "COOLTRAINER", "SUPER_NERD": "SUPER NERD", "TEAM_ROCKET": "TEAM ROCKET GRUNT",
               "PKMN_PROF": "PROF.", "CRUSH_GIRL": "CRUSH GIRL", "TUBER": "TUBER", "PKMN_BREEDER": "PKMN BREEDER", "RUIN_MANIAC": "RUIN MANIAC",
@@ -146,6 +154,38 @@ for r in TRAINERS:
 for cls, c in by_class.items():
     (sp, money), _ = c.most_common(1)[0]
     SPRITE[cls], MONEY[cls] = sp, money
+
+
+# ((0.73) John's 28 Nov 10:28: "making sure that they host the right Pokemon ... as you're going through") FireRed's
+# prize for each class (src/battle_main.c's gTrainerMoneyTable): its value times four (times eight in a double battle),
+# times the last POKéMON's level, as the mod pays it (base times level). And each class in its own look where the mod
+# has one (BIRD KEEPERs, GAMERs, CUE BALLs, LASSes were all in a stand-in), its variants taken in turn.
+MONEY_FR = {}
+_bm = os.path.join(FR, "src", "battle_main.c")
+if os.path.exists(_bm):
+    for mm in re.finditer(r"\{TRAINER_CLASS_(\w+), (\d+)\}", open(_bm, encoding="utf-8").read()): MONEY_FR.setdefault(mm.group(1), int(mm.group(2)))
+SKIN = {"BIRD_KEEPER": ["bird_keeper", "bird_keeper_2", "bird_keeper_3"], "CUE_BALL": ["cue_ball"], "GAMER": ["gambler"], "LASS": ["lass", "lass_2", "lass_3"],
+        "ROCKER": ["rocker"], "ENGINEER": ["engineer"], "POKEMANIAC": ["pokemaniac", "pokemaniac_2", "pokemaniac_3"], "BIKER": ["biker"], "BEAUTY": ["beauty"],
+        "BUG_CATCHER": ["bug_catcher", "bug_catcher_2", "bug_catcher_3"], "CAMPER": ["camper", "camper_2", "camper_3"], "FISHERMAN": ["fisher", "fisher_2", "fisher_3"],
+        "HIKER": ["hiker", "hiker_2", "hiker_3"], "PICNICKER": ["picnicker", "picnicker_2", "picnicker_3"], "SUPER_NERD": ["super_nerd", "super_nerd_2", "super_nerd_3"],
+        "SWIMMER_M": ["swimmer", "swimmer_2", "swimmer_3"], "SWIMMER_F": ["swimmer_f"], "YOUNGSTER": ["youngster", "youngster_2", "youngster_3"],
+        "TWINS": ["twins"], "YOUNG_COUPLE": ["cooltrainer_m"], "SIS_AND_BRO": ["swimmer_f"], "CRUSH_KIN": ["black_belt"], "BLACK_BELT": ["black_belt", "black_belt_2", "black_belt_3"],
+        "CRUSH_GIRL": ["crush_girl"], "TAMER": ["tamer"], "JUGGLER": ["juggler"], "SAILOR": ["sailor"], "GENTLEMAN": ["gentleman"], "BURGLAR": ["burglar"],
+        "CHANNELER": ["channeler"], "SCIENTIST": ["scientist"], "PSYCHIC": ["psychic_m"], "COOLTRAINER": ["cooltrainer_m", "cooltrainer_f"], "TEAM_ROCKET": ["rocket"]}
+SKIN_USED = Counter()
+
+
+def skin_of(cls, gfx):
+    k = list(SKIN.get(cls, []))
+    if cls == "COOLTRAINER": k = ["cooltrainer_f"] if gfx.endswith("_F") else ["cooltrainer_m"]
+    if not k: return None
+    SKIN_USED[cls] += 1
+    return k[(SKIN_USED[cls] - 1) % len(k)]
+
+
+def money_of(tid, cls):
+    v = MONEY_FR.get(cls)
+    return None if v is None else str(4 * v * (2 if tid in DOUBLE else 1))
 
 
 def facing_of(mv):
@@ -321,11 +361,11 @@ def main():
                         post = say(mm.group(1))
                         break
                 ccls = CLASS_NAME.get(cls, cls.replace("_", " "))
-                new_trainers.append([key, place, title, SPRITE.get(ccls, "youngster"), facing, str(sight), MONEY.get(ccls, "20"),
+                new_trainers.append([key, place, title, skin_of(cls, gfx) or SPRITE.get(ccls, "youngster"), facing, str(sight), money_of(tid, cls) or MONEY.get(ccls, "20"),
                                      ",".join("%s:%d" % ml for ml in mons) or "rattata:5", "-", " | ".join(intro) or "-", " | ".join(defeat) or "-",
                                      " | ".join(post) or "-", str(gx), str(gy)])
             used_trainer.add(key)
-            team = ", ".join("%s %d" % (s.upper(), l) for s, l in mons)
+            team = ", ".join("%s %d" % (SPECIES_NAME.get(s, s.upper()), l) for s, l in mons)
             rows.append([key, place, "trainer", key, title, team, gx, gy, facing, sight])
         for c in m.get("coord_events", []):
             if "FloorSwitch" not in c.get("script", ""): continue
@@ -353,7 +393,9 @@ def main():
     # outside that FireRed's don't match (Red and Blue's, at a guessed spot now), so they can be placed or taken away.
     outside = {pl for pl in MAPS.values() if not re.match(r"^(viridian_forest|mt_moon|rock_tunnel|seafoam|cerulean_cave|victory_road|safari|power_plant|digletts|underground)", pl)}
     for r in table("people.tsv"):
-        if len(r) < 6 or r[1] not in outside or r[2] == "monster": continue
+        if len(r) < 6 or r[1] not in outside: continue
+        # ((0.74) A POKéMON standing about outside, as its words name it: placed as the others are.)
+        if r[2] == "monster" and not re.match(r"^[A-Z][A-Z0-9 .'♀♂-]*:", r[5]): continue
         if r[0] in ("pallet_town_p0", "cerulean_city_p0", "cerulean_city_p8"): continue
         first = r[5].split(" | ")[0][:60]
         rows.append([r[0], r[1], "person", r[0], r[2].replace("_", " ").upper(), first, r[6] if len(r) > 6 else 0, r[7] if len(r) > 7 else 0, r[3], 0])
