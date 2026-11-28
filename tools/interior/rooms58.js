@@ -53,6 +53,11 @@
   reg("dsSofa", 16, 16, (P, r) => { P.fill(hx("#F4F2F8"), 0.01, r); P.rect(0, 0, 16, 1, hx("#FFFFFF")); P.rect(0, 13, 16, 3, hx("#CDACDE")); });
   reg("dsSofaArm", 16, 16, (P, r) => { P.fill(hx("#CDACDE"), 0.01, r); P.rect(0, 0, 16, 1, hx("#E2CBEC")); P.rect(0, 15, 16, 1, hx("#A98BB8")); });
   reg("dsLeg", 8, 8, (P, r) => P.fill(hx("#CD8341"), 0.02, r));
+  // (0.78, John's 14:54: "the couch isn't following our style") The house's own sofa, in the store's lilac: fabric as
+  // the houses' sofas are woven, the cushions a shade lighter, a white and a mint pillow.
+  reg("dsSofaFab", 16, 16, (P, r) => fabric(P, r, hx("#9A7FB8")));
+  reg("dsSofaCush", 16, 16, (P, r) => fabric(P, r, hx("#B79BD2")));
+  reg("dsPillowMint", 16, 16, (P, r) => fabric(P, r, hx("#8FD3B6")));
   reg("dsLiftDoor", 16, 32, (P, r) => {
     P.fill(hx("#EEAC52"), 0.01, r);
     for (let y = 0; y < 32; y++) { P.set(7, y, hx("#9E5A34")); P.set(8, y, hx("#F7C982")); }
@@ -354,7 +359,24 @@
       const { x0, x1, z0, z1, cells } = p;
       const near = [x0 - 0.3, z0 - 0.3, x1 + 0.3, z1 + 0.3];
       if (p.c === "k") {
+        // (0.78, John's 14:54: the 1F counter "a white box with the clerk inside a hole") A ring of counter round a
+        // space for the staff (the SERVICE COUNTER): a slim counter on its outer side only, its top lipped over, the
+        // floor inside the store's own.
+        const ring = id === "celadon_mart_1f" && cells.length >= 8 && cells.length < (x1 - x0) * (z1 - z0);
         for (const [a, b] of cells) {
+          if (ring) {
+            // Its outer side only: along the top and bottom rows, down the two ends (a corner has both).
+            const top = b === z0, bot = b === z1 - 1, lft = a === x0, rgt = a === x1 - 1, bx = [];
+            if (top) bx.push([a, b, a + 1, b + 0.65]);
+            if (bot) bx.push([a, b + 0.35, a + 1, b + 1]);
+            if (lft) bx.push([a, b, a + 0.65, b + 1]);
+            if (rgt) bx.push([a + 0.35, b, a + 1, b + 1]);
+            for (const [p0, q0, p1, q1] of bx) {
+              G.box(p0, 0, q0, p1, 0.9, q1, { all: "dsCounter", top: "dsCounterTop" });
+              G.box(p0 - 0.03, 0.9, q0 - 0.03, p1 + 0.03, 0.96, q1 + 0.03, { all: "dsCounterTop" });
+            }
+            continue;
+          }
           if (gc) G.box(a, 0, b, a + 1, 0.95, b + 1, { all: "gcCounter", top: "gcCounterTop" });
           else G.box(a, 0, b, a + 1, 0.92, b + 1, { all: "dsCounter", top: "dsCounterTop" });
           // The GAME CORNER's glass case in the counter's middle.
@@ -369,16 +391,15 @@
         }
         if (!gc) R.act(near, { label: "Look", lines: ["A store terminal. Its screen shows today's special offers."] });
       } else if (p.c === "s") {
-        // A sofa along the wall, its back to the wall it's against.
+        // A sofa along the wall, its back to the wall it's against: (0.78) the houses' sofa (world.js), in lilac.
         const west = x0 === 0, east = x1 === W;
-        const bx0 = west ? x0 + 0.06 : x0 + 0.62, bx1 = west ? x1 - 0.62 : x1 - 0.06;
-        G.box(x0 + 0.1, 0, z0 + 0.1, x1 - 0.1, 0.1, z1 - 0.1, "dsLeg");
-        G.box(x0 + 0.06, 0.1, z0 + 0.08, x1 - 0.06, 0.46, z1 - 0.08, { all: "dsSofa" });
-        G.box(bx0, 0.46, z0 + 0.08, bx1, 0.98, z1 - 0.08, { all: "dsSofaArm" });
-        G.box(x0 + 0.06, 0.46, z0 + 0.08, x1 - 0.06, 0.68, z0 + 0.3, { all: "dsSofaArm" });
-        G.box(x0 + 0.06, 0.46, z1 - 0.3, x1 - 0.06, 0.68, z1 - 0.08, { all: "dsSofaArm" });
-        R.act(near, { label: "Sit", lines: ["A soft white sofa for shoppers to rest on."] });
-        if (!east && !west) R.item("Sofa", "A white sofa with lilac arms.");
+        const along = z1 - z0 >= x1 - x0;
+        const o = { fabric: "dsSofaFab", cushion: "dsSofaCush", pillow: "cushion", pillow2: "dsPillowMint", lines: ["A soft lilac sofa for shoppers to rest on."] };
+        if (along && west) sofa(R, x0 + 0.02, z1, "e", z1 - z0, o);
+        else if (along) sofa(R, x1 - 0.02, z0, "w", z1 - z0, o);
+        else if (z0 === 0) sofa(R, x1, z0 + 0.02, "n", x1 - x0, o);
+        else sofa(R, x0, z1 - 0.02, "s", x1 - x0, o);
+        R.item("Sofa", "Lilac fabric, seat cushions a shade lighter, a white and a mint pillow, walnut feet: the houses' own sofa.");
       } else if (p.c === "h") {
         // Racks of goods (the TRAINER'S MARKET's, the WISEMAN GIFTS'), shelves of bottles (the DRUG STORE's).
         const bottles = id === "celadon_mart_5f" && idAt(x0, z0) >= 0x31f && idAt(x0, z0) <= 0x327;
@@ -497,6 +518,26 @@
         const n = Math.abs(dx ? a - w.x : b - w.z), step = Math.min(n * 0.4, 1.6);
         if (down) G.box(a, -1.2, b, a + 1, -step, b + 1, { top: "dsStep", all: "dsWell", bottom: null });
         else G.box(a, 0, b, a + 1, step, b + 1, { top: "dsStep", all: "dsStepSide", bottom: null });
+      }
+      // (0.78, John's 14:54: "the stairs look a bit dodgy instead of actually looking like they connect to anything") At
+      // the top of a flight up, the way on up: a dark opening in the wall it climbs to, framed, the top step running
+      // into it.
+      if (!down && !roof) {
+        const tops = s.pc.cells.filter(c => !(c[0] === w.x && c[1] === w.z));
+        const far = tops.reduce((m, c) => Math.max(m, Math.abs(dx ? c[0] - w.x : c[1] - w.z)), 0);
+        const ends = tops.filter(c => Math.abs(dx ? c[0] - w.x : c[1] - w.z) === far);
+        const topH = Math.min(far * 0.4, 1.6);
+        if (dx) {
+          const ex = dx < 0 ? Math.min(...ends.map(c => c[0])) : Math.max(...ends.map(c => c[0])) + 1, zs = ends.map(c => c[1]), za = Math.min(...zs), zb = Math.max(...zs) + 1;
+          G.box(dx < 0 ? ex - 0.05 : ex, topH, za, dx < 0 ? ex : ex + 0.05, topH + 1.9, zb, { all: "dsWell" });
+          G.box(dx < 0 ? ex - 0.06 : ex, topH + 1.9, za - 0.1, dx < 0 ? ex + 0.12 : ex - 0.12 + 0.18, topH + 2.05, zb + 0.1, "dsCap");
+        } else {
+          const ez = dz < 0 ? Math.min(...ends.map(c => c[1])) : Math.max(...ends.map(c => c[1])) + 1, xs = ends.map(c => c[0]), xa = Math.min(...xs), xb = Math.max(...xs) + 1;
+          G.box(xa, topH, dz < 0 ? ez - 0.05 : ez, xb, topH + 1.9, dz < 0 ? ez : ez + 0.05, { all: "dsWell" });
+          G.box(xa - 0.1, topH + 1.9, dz < 0 ? ez - 0.06 : ez - 0.12, xb + 0.1, topH + 2.05, dz < 0 ? ez + 0.12 : ez + 0.06, "dsCap");
+        }
+        // The flight's side, under the steps, panelled.
+        for (const [a, b] of tops) { const n = Math.abs(dx ? a - w.x : b - w.z), st = Math.min(n * 0.4, 1.6); G.box(a, 0, b, a + 1, st - 0.02, b + 1, { all: "dsStepSide", top: null, bottom: null }); }
       }
       // Its orange banister along the open side.
       if (dx && !roof) {

@@ -157,7 +157,11 @@ public final class BedrockModel {
 	/** A species' model in the POKéMON LOOK chosen: Retromon's own creature where there's one, else Cobblemon's. */
 	public static Def def(String species) {
 		boolean ours = Look.ours();
-		return DEFS.computeIfAbsent((ours ? "r:" : "c:") + species, k -> load(species, ours)).orElse(null);
+		Def d = DEFS.computeIfAbsent((ours ? "r:" : "c:") + species, k -> load(species, ours)).orElse(null);
+		// ((0.78) A shiny one's own colours (the LAKE OF RAGE's red GYARADOS: gyarados_shiny), where there's a model for
+		// them; else the species' own.)
+		if (d == null && species.endsWith("_shiny")) return def(species.substring(0, species.length() - 6));
+		return d;
 	}
 
 	public static void clearCache() {

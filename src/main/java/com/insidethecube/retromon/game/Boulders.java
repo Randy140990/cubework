@@ -21,6 +21,10 @@ import net.minecraft.world.phys.Vec3;
  * you like to use STRENGTH?" Then walk into a boulder and it slides one step that way, if there's floor for it. On a
  * floor switch it stays put for good, and the rock barrier that switch holds shut crumbles away. Leave the floor and
  * the boulders not on a switch are back where they started, as in the games.
+ *
+ * <p>(0.78) And the ICE PATH's (HeartGold's): push a boulder into one of B1F's holes and it falls through for good
+ * ("The boulder fell through!"), and lies on B2F's ice under that hole, where it's needed to stop on ("It has sunk in
+ * and cannot be moved."). STRENGTH needs the RAINBOWBADGE (FireRed's) or the PLAINBADGE (HeartGold's).
  */
 public final class Boulders {
 	private Boulders() {}
@@ -83,7 +87,15 @@ public final class Boulders {
 				}
 			Double y = floor(level, r, x, Double.isNaN(s.y()) ? 0 : s.y(), z);
 			if (y == null) continue;
+			// (0.78) One that's fallen through a hole (the ICE PATH's) is gone from here.
+			if (s.kind().equals("boulder") && d.statics.contains("boulder_fell:" + s.key())) continue;
 			rocks.put(s.key(), new Rock(s.key(), s.kind(), x, y, z));
+		}
+		// (0.78) The boulders that have fallen into this floor from the one above (B2F's, under B1F's holes).
+		for (Interiors.Hole h : Interiors.FALLEN.getOrDefault(r.id(), List.of())) {
+			if (!d.statics.contains("boulder_in:" + h.key())) continue;
+			Double y = floor(level, r, h.x(), 0, h.z());
+			if (y != null) rocks.put(h.key(), new Rock(h.key(), "fallen", h.x(), y, h.z()));
 		}
 		NOW.put(id, rocks);
 		show(level, r, rocks);
@@ -134,7 +146,7 @@ public final class Boulders {
 		AABB box = new AABB(r.ox() - 4, r.oy() - 10, r.oz() - 4, r.ox() + r.w() + 4, r.oy() + 16, r.oz() + r.d() + 4);
 		java.util.Set<String> want = new java.util.HashSet<>();
 		for (Rock k : rocks.values()) want.add(k.kind + ":" + k.key);
-		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> w.key().startsWith("boulder:") || w.key().startsWith("barrier:")))
+		for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, box, w -> w.key().startsWith("boulder:") || w.key().startsWith("barrier:") || w.key().startsWith("fallen:")))
 			if (!want.contains(w.key())) w.discard();
 		for (Rock k : rocks.values()) {
 			String ek = k.kind + ":" + k.key;
@@ -148,7 +160,11 @@ public final class Boulders {
 
 	/** A on a boulder (or a barrier's rocks). True if it was one. */
 	public static boolean talk(ServerPlayer p, WorldMon w) {
-		if (!w.key().startsWith("boulder:") && !w.key().startsWith("barrier:")) return false;
+		if (!w.key().startsWith("boulder:") && !w.key().startsWith("barrier:") && !w.key().startsWith("fallen:")) return false;
+		if (w.key().startsWith("fallen:")) {
+			Game.message(p, List.of("It has sunk in and cannot be moved."));
+			return true;
+		}
 		if (w.key().startsWith("barrier:")) {
 			Game.message(p, List.of("Rocks block the way.", "There must be a switch somewhere that opens it..."));
 			return true;
@@ -168,7 +184,7 @@ public final class Boulders {
 	/** One of your team who can use STRENGTH (knows it, not fainted) with the RAINBOWBADGE, as FireRed has it; or null. */
 	private static Mon strong(ServerPlayer p) {
 		PlayerData d = Game.data(p);
-		if (!d.badges.contains("RAINBOWBADGE")) return null;
+		if (!d.badges.contains("RAINBOWBADGE") && !d.badges.contains("PLAINBADGE")) return null;
 		for (Mon m : d.party) if (!m.fainted() && m.moves.contains("strength")) return m;
 		return null;
 	}
@@ -244,9 +260,25 @@ public final class Boulders {
 		}
 	}
 
+	/** (0.78) The hole (B1F's in the ICE PATH) whose tile a boulder's middle is on, or null. */
+	private static Interiors.Hole holeAt(Interiors.Room r, double x, double z) {
+		for (Interiors.Hole h : Interiors.HOLES.getOrDefault(r.id(), List.of())) if (Math.abs(h.x() - x) < 0.6 && Math.abs(h.z() - z) < 0.6) return h;
+		return null;
+	}
+
+	/** (0.78) Whether one of the boulders (or a barrier's rocks, or a fallen boulder) is at a spot in the room you're in. */
+	public static boolean solidAt(ServerPlayer p, Interiors.Room r, double x, double y, double z) {
+		Map<String, Rock> rocks = NOW.get(p.getUUID());
+		if (rocks == null || !r.id().equals(ROOM.get(p.getUUID()))) return false;
+		for (Rock k : rocks.values()) if (Math.abs(y - k.y) < 1.6 && Math.abs(x - k.x) < 1.0 && Math.abs(z - k.z) < 1.0) return true;
+		return false;
+	}
+
 	/** Whether a boulder's two-by-two can go there: floor at its height, nothing in the way, no other boulder. */
 	private static boolean free(ServerLevel level, Interiors.Room r, Map<String, Rock> rocks, Rock me, double x, double y, double z) {
 		for (Rock k : rocks.values()) if (k != me && Math.abs(k.x - x) < 1.9 && Math.abs(k.z - z) < 1.9) return false;
+		// (0.78) Into a hole: nothing under it, and that's where it goes.
+		if (holeAt(r, x, z) != null) return true;
 		for (double dx : new double[] {-0.5, 0.5})
 			for (double dz : new double[] {-0.5, 0.5}) {
 				BlockPos b = BlockPos.containing(r.ox() + x + dx, r.oy() + y, r.oz() + z + dz);
@@ -259,6 +291,22 @@ public final class Boulders {
 	/** A boulder's come to rest: on a floor switch, it stays there for good, and the switch's barrier crumbles. */
 	private static void landed(ServerPlayer p, ServerLevel level, Interiors.Room r, Map<String, Rock> rocks, Rock k) {
 		PlayerData d = Game.data(p);
+		// (0.78) Into a hole (the ICE PATH's B1F): it falls through, and lies on the floor below from now on.
+		Interiors.Hole hole = holeAt(r, k.x, k.z);
+		if (hole != null && k.kind.equals("boulder")) {
+			rocks.remove(k.key);
+			d.statics.add("boulder_fell:" + k.key);
+			d.statics.add("boulder_in:" + hole.key());
+			for (WorldMon w : level.getEntitiesOfClass(WorldMon.class, p.getBoundingBox().inflate(80), w -> ("boulder:" + k.key).equals(w.key()))) {
+				level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,
+						net.minecraft.world.level.block.Blocks.PACKED_ICE.defaultBlockState()), w.getX(), w.getY() + 0.5, w.getZ(), 24, 0.6, 0.4, 0.6, 0.1);
+				w.discard();
+			}
+			level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.STONE_FALL, net.minecraft.sounds.SoundSource.BLOCKS, 1F, 0.6F);
+			Game.sync(p);
+			Game.message(p, List.of("The boulder fell through!"));
+			return;
+		}
 		for (Placer.Spot s : Placer.all()) {
 			if (!s.kind().equals("switch") || s.gone() || s.room() == null || !s.room().equals(r.id()) || pressed(d, s.key())) continue;
 			if (Math.abs(s.x() - 0.5 - k.x) > 1.1 || Math.abs(s.z() - 0.5 - k.z) > 1.1) continue;
@@ -284,6 +332,7 @@ public final class Boulders {
 
 	/** Whether a room has boulders or barriers placed in it (so its ticks look after them). */
 	public static boolean has(String room) {
+		if (Interiors.FALLEN.containsKey(room) || Interiors.HOLES.containsKey(room)) return true;
 		for (Placer.Spot s : Placer.all())
 			if (!s.gone() && room.equals(s.room()) && (s.kind().equals("boulder") || s.kind().equals("barrier"))) return true;
 		return false;

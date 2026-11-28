@@ -1,0 +1,55 @@
+{
+ "rooms": {
+  "magnet_train_ride": {
+   "origin": [
+    21248,
+    64,
+    0
+   ],
+   "W": 320,
+   "D": 44,
+   "H": 20,
+   "name": "Magnet Train",
+   "floor": "",
+   "place": "magnet_train_ride",
+   "schem": "magnet_train_ride.bin",
+   "base": -4,
+   "dark": false,
+   "tile": [
+    1.0,
+    1.0
+   ],
+   "spawn": {
+    "x": 160.0,
+    "z": 41.5,
+    "yaw": 180.0
+   },
+   "entry": {
+    "x": 160.0,
+    "z": 41.5,
+    "yaw": 180.0
+   },
+   "cam": {
+    "x": 160.0,
+    "z": 22.0,
+    "dist": 30
+   },
+   "cells": [],
+   "warps": [],
+   "people": [],
+   "acts": [],
+   "grass": [],
+   "items": [],
+   "mons": [],
+   "lights": [],
+   "pools": [],
+   "panes": [],
+   "clocks": [],
+   "line": {
+    "z": 21.5,
+    "y": 8.0
+   }
+  }
+ },
+ "doors": {}
+}

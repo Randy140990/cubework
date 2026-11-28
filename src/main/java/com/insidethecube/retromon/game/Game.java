@@ -1176,6 +1176,8 @@ public final class Game {
 		KantoStory.roomEntered(p, r, banner);
 		// (0.72) Its boulders where they start (STRENGTH), its rocks in the way.
 		Boulders.entered(p, r);
+		// (0.78) Its ROCK SMASH rocks standing again (the ICE PATH's B3F).
+		RockSmash.entered(p, r);
 	}
 
 	/** Back outside: the place's own music again, and its name back on the pill (without its banner). */
@@ -3796,6 +3798,8 @@ public final class Game {
 		if (r == null || Battles.in(p) || BUSY.containsKey(p.getUUID())) return;
 		// (0.71) The GAME CORNER's slot machines, BILL's PC (his CELL SEPARATOR).
 		if (KantoStory.roomUse(p, use)) return;
+		// (0.78) A cave's cracked rock: ROCK SMASH.
+		if (RockSmash.use(p, use)) return;
 		// (0.52) An item FireRed hides in a room ("hidden:item:key": the COPYCAT's NUGGET by her PC): found once.
 		if (use.startsWith("hidden:")) {
 			String[] a = use.split(":");
@@ -4192,7 +4196,7 @@ public final class Game {
 		Species sp = Species.ALL.get(w.species());
 		String name = sp == null ? "POKéMON" : sp.name();
 		CompoundTag t = new CompoundTag();
-		t.putString("cry", w.species());
+		t.putString("cry", w.species().replace("_shiny", ""));
 		if (key.startsWith("item:")) {
 			if (key.contains("_fossil")) fossil(p, w, key.substring(5));
 			else pickUp(p, w, key.substring(5));
@@ -4278,7 +4282,8 @@ public final class Game {
 				return;
 			}
 			dialogue(p, null, "static", st.species().equals("snorlax")
-					? List.of(player(p) + " played the POKé FLUTE!", "SNORLAX woke up!", "It attacked in a grumpy rage!") : List.of("The wild " + wild + " attacked!"), t,
+					? List.of(player(p) + " played the POKé FLUTE!", "SNORLAX woke up!", "It attacked in a grumpy rage!")
+					: st.id().equals("red_gyarados") ? List.of("GYARADOS: Gyashaaan!", "The red GYARADOS attacked!") : List.of("The wild " + wild + " attacked!"), t,
 					w.getId());
 		}
 	}
@@ -4350,6 +4355,7 @@ public final class Game {
 		if (KantoStory.answer(p, mode, t, n)) return;
 		// (0.73) The MAGNET TRAIN: YES to the OFFICER, then on board.
 		if (MagnetTrain.answer(p, mode, t, n) || MagnetTrain.onBoard(p, mode, n)) return;
+		if (RockSmash.answer(p, mode, t)) return;
 		if (mode.equals("strength")) {
 			Boulders.strength(p, t.getBooleanOr("answered", false) ? t.getIntOr("choice", 1) == 0 : yes);
 			return;
@@ -4584,7 +4590,17 @@ public final class Game {
 			case "static" -> {
 				Trainers.Static st = Trainers.STATICS.get(t.getStringOr("static", ""));
 				if (st == null || d.statics.contains(st.id()) || !d.anyHealthy() || battlesOff(p)) return;
-				Battles.wild(p, new Mon(Species.get(st.species()), st.level(), RNG), st.id());
+				Mon wildOne = new Mon(Species.get(st.species()), st.level(), RNG);
+				// (0.78) The red GYARADOS: shiny, as HeartGold's always is (Gold and Silver's shiny DVs), so it's red in the
+				// battle and once you've caught it.
+				if (st.id().equals("red_gyarados")) {
+					wildOne.dvAtk = 10;
+					wildOne.dvDef = 10;
+					wildOne.dvSpe = 10;
+					wildOne.dvSpc = 10;
+					wildOne.hp = wildOne.maxHp();
+				}
+				Battles.wild(p, wildOne, st.id());
 			}
 			case "trade" -> {
 				Trainers.Static st = Trainers.STATICS.get(t.getStringOr("static", ""));
@@ -4760,6 +4776,13 @@ public final class Game {
 		if ("route_4".equals(pin)) {
 			t.putInt("x", -520);
 			t.putInt("z", 262);
+			pin = "";
+		}
+		// ((0.78) John's 14:54: GO HERE on ROUTE 47 "not on the hill": its path along the foot of the cliffs, by the
+		// bridges, not the cliff top its pin is on.)
+		if ("route_47".equals(pin)) {
+			t.putInt("x", -2600);
+			t.putInt("z", 795);
 			pin = "";
 		}
 		for (Interiors.Door d : Interiors.DOORS.values()) {
@@ -5281,8 +5304,15 @@ public final class Game {
 	// (0.57, 15:51: "a bit too far south. He's supposed to block it ... where he's near the sign") Route 12's SNORLAX at the
 	// junction by the sign (FireRed's, a step south-west of it), across the boardwalk. (16:15) Route 36's SUDOWOODO, the odd
 	// tree, in the long grass between its east and west halves (HeartGold's), till it's watered with the SQUIRTBOTTLE.
+	// (0.78, John's 14:54: "we need to have the red Gyarados or our Gyarados equivalent in a primarily different colour,
+	// accessible for battle and then for capturing") The LAKE OF RAGE's red GYARADOS, out on the water west of John's
+	// great statue of it (SURF out to it), in its red (gyarados_shiny: HeartGold's is always shiny).
 	private static final Object[][] STATIC_SPOTS = {{"snorlax_route_12", -124.5, 31.0, 586.5, 90.0}, {"snorlax_route_16", -600.5, 33.0, 432.0, 0.0},
-			{"sudowoodo", -1980.5, 21.0, 516.5, 270.0}};
+			{"sudowoodo", -1980.5, 21.0, 516.5, 270.0}, {"red_gyarados", -1828.5, 23.4, 216.5, 270.0}};
+	/** (0.78) The statics out in the world that stand in your way (a sleeping SNORLAX, the odd tree); not the red GYARADOS. */
+	private static boolean blocksTheWay(String key) {
+		return key.startsWith("snorlax") || key.startsWith("sudowoodo");
+	}
 
 	/** How near a sleeping SNORLAX you can come (blocks from its middle). */
 	private static final double SNORLAX_REACH = 2.7;
@@ -5298,7 +5328,7 @@ public final class Game {
 		BLOCKED_SAID.computeIfPresent(p.getUUID(), (k, v) -> v > 1 ? v - 1 : null);
 		for (Object[] o : STATIC_SPOTS) {
 			String key = (String) o[0];
-			if (d.statics.contains(key)) continue;
+			if (d.statics.contains(key) || !blocksTheWay(key)) continue;
 			double x = (Double) o[1], y = (Double) o[2], z = (Double) o[3];
 			double dx = p.getX() - x, dz = p.getZ() - z, dist = Math.sqrt(dx * dx + dz * dz);
 			if (dist >= SNORLAX_REACH || Math.abs(p.getY() - y) > 3) continue;
@@ -5509,7 +5539,11 @@ public final class Game {
 			net.minecraft.world.phys.AABB box = new net.minecraft.world.phys.AABB(x - 48, y - 8, z - 48, x + 48, y + 8, z + 48);
 			List<WorldMon> there = level.getEntitiesOfClass(WorldMon.class, box, w -> key.equals(w.key()));
 			// (0.50.3) Lying down now: one put down before turns to lie across the way.
-			if (there.isEmpty()) placeMon(level, st.species(), key, x, y, z, ((Double) o[4]).floatValue());
+			if (there.isEmpty()) {
+				// ((0.78) The red GYARADOS in its red, at rest on the water.)
+				WorldMon w = placeMon(level, key.equals("red_gyarados") ? "gyarados_shiny" : st.species(), key, x, y, z, ((Double) o[4]).floatValue());
+				if (w != null && key.equals("red_gyarados")) w.setNoGravity(true);
+			}
 			else for (WorldMon w : there) {
 				w.teleportTo(x, y, z);
 				w.setFacing(((Double) o[4]).floatValue());

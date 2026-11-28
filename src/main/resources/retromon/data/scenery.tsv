@@ -3,8 +3,8 @@
 fuchsia_pond_nw	goldeen	dive	-536	762	-528	765	29	Fuchsia's top-left pond (07:36)
 fuchsia_pond_ne_1	seaking	dive	-516	758	-509	761	29	Fuchsia's top-right pond, past the little bridge
 fuchsia_pond_ne_2	goldeen	dive	-516	758	-509	761	29	Fuchsia's top-right pond
-fuchsia_pond_s_1	psyduck	swim	-525	779	-518	786	29	Fuchsia's big pond by the Center
-fuchsia_pond_s_2	poliwag	dive	-525	779	-518	786	29	Fuchsia's big pond by the Center
+fuchsia_pond_s_1	psyduck	swim	-536	762	-528	765	29	Fuchsia's top-left pond ((0.78) John's 15:03: the big pond by the Center is the big one's alone)
+fuchsia_pond_s_2	poliwag	dive	-516	758	-509	761	29	Fuchsia's top-right pond ((0.78) out of the big one's pond)
 fuchsia_pond_s_big	lapras	swim	-523	781	-520	784	29	Fuchsia's big pond by the Center: our big ferry (13:17: "our Lapras equivalency ... to make it a bit bigger")
 safari_gate_w	doduo	walk	-503	758	-492	763	30	the grass west of the SAFARI ZONE's way in
 safari_gate_e	nidoran_f	walk	-482	760	-472	763	30	the grass east of the SAFARI ZONE's way in
@@ -16,3 +16,17 @@ r39_cow	moobelle	walk	-2319	401	-2298	417	22	Route 39's pen, grazing ("and then 
 r39_calf	moopip	walk	-2319	401	-2298	417	22	Route 39's pen, grazing by its mother
 r39_ewe	fleecelle	walk	-2317	418	-2312	436	22	Route 39's pen, grazing between the bottom pond and the bushes
 r39_lamb	lamblet	walk	-2317	418	-2312	436	22	Route 39's pen, grazing by its mother
+r39_mare	marebraid	walk	-2306	379	-2296	389	22	The MOOMOO FARM's paddock east of the barn (John's 28 Nov 14:54: "a couple of horses or something")
+r39_stallion	stormsteed	walk	-2306	379	-2296	389	22	The MOOMOO FARM's paddock east of the barn, with the mare
+r44_east_1	poliwag	swim	-1650	389	-1617	401	21	Route 44's east pond (14:54: "the two main water sources there ... water-based Pokemon")
+r44_east_2	poliwhirl	swim	-1650	389	-1617	401	21	Route 44's east pond
+r44_east_3	remoraid	dive	-1650	389	-1617	401	21	Route 44's east pond, under the surface
+r44_west_1	poliwag	swim	-1681	407	-1662	417	21	Route 44's west pond
+r44_west_2	remoraid	dive	-1681	407	-1662	417	21	Route 44's west pond, under the surface
+r44_fish_1	goldeen	dive	-1720	420	-1710	423	21	Route 44's little pond by Mahogany (14:54: "a couple of sort of fish and stuff in there as well")
+r44_fish_2	magikarp	dive	-1720	420	-1710	423	21	Route 44's little pond by Mahogany
+lor_1	magikarp	swim	-1850	182	-1705	248	23	The LAKE OF RAGE (14:54: "we probably want a few in there")
+lor_2	magikarp	dive	-1850	182	-1705	248	23	The LAKE OF RAGE, under the surface
+lor_3	gyarados	swim	-1850	182	-1705	248	23	The LAKE OF RAGE: a GYARADOS of the usual colour
+lor_4	magikarp	swim	-1850	182	-1705	248	23	The LAKE OF RAGE
+lor_5	magikarp	dive	-1850	182	-1705	248	23	The LAKE OF RAGE, under the surface

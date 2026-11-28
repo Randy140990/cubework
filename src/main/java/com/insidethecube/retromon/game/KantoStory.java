@@ -139,8 +139,8 @@ public final class KantoStory {
 			}
 		}
 		for (Jj j : JJ) if (j.room().equals(r.id())) jjPut(p, level, r, j);
-		// FLASH (FireRed's): ROCK TUNNEL is pitch dark till one of yours lights it.
-		if (r.id().startsWith("rock_tunnel")) {
+		// FLASH (FireRed's): ROCK TUNNEL is pitch dark till one of yours lights it; (0.78) the DARK CAVE too (HeartGold's).
+		if (r.id().startsWith("rock_tunnel") || Interiors.flashRoom(r)) {
 			if (fromOutside || !d.story.contains("flash_lit")) flashAsk(p);
 			else flashOn(p);
 		} else if (d.story.remove("flash_lit")) {
@@ -892,7 +892,7 @@ public final class KantoStory {
 	/** One of your team who can light the dark (knows FLASH, and isn't fainted), with the BOULDERBADGE; or null. */
 	private static Mon flasher(ServerPlayer p) {
 		PlayerData d = data(p);
-		if (!d.badges.contains("BOULDERBADGE")) return null;
+		if (!d.badges.contains("BOULDERBADGE") && !d.badges.contains("ZEPHYRBADGE")) return null;
 		for (Mon m : d.party) if (!m.fainted() && m.moves.contains("flash")) return m;
 		return null;
 	}

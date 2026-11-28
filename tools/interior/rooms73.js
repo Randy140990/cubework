@@ -45,6 +45,17 @@
     P.rect(4, 21, 8, 1, hx("#3A3E46")); P.rect(3, 26, 10, 4, hx("#C4C8CC"));
   }, { fit: true, glow: 0.3 });
 
+  // (0.78, John's 14:54) The line's end, open: "The right hand side, because that's the way it comes out of goldenrod,
+  // needs to be open, so the track actually looks like it's going out ... from the Saffron City side, the left hand
+  // side should be open." The opening in the side wall the line runs out through: dark going away, the rails running
+  // on into it, a faint light far off.
+  reg("mtTunnel", 32, 32, (P, r) => {
+    P.fill(hx("#07090D"), 0, r);
+    for (let i = 0; i < 6; i++) { const c = shadec(hx("#1E2230"), -i * 0.12); P.rect(i, i, 32 - 2 * i, 1, c); P.rect(i, i, 1, 32 - 2 * i, c); P.rect(31 - i, i, 1, 32 - 2 * i, c); }
+    for (let y = 18; y < 32; y++) { const t = (y - 18) / 14; P.set(Math.round(15 - t * 6), y, hx("#5A5F6A")); P.set(Math.round(16 + t * 6), y, hx("#5A5F6A")); }
+    P.rect(14, 14, 4, 2, hx("#3A3C30")); P.set(15, 14, hx("#8A8660"));
+  }, { fit: true });
+
   // ----- Each station's own colours -----
   const LOOK = {
     // GOLDENROD's: pale blue tiles as Crystal's, the walls white over a teal band with gold trim, Johto's teal seats.
@@ -139,6 +150,15 @@
     for (let x = 0.4; x < W; x += 4) G.box(x - 0.2, 0, 0, x + 0.2, R.H, 0.35, { all: "mtPost", top: "cap" });
     R.act([0, 0, W, 0.6], { label: "Look", lines: L.win });
     train(R, 1.2, W - 1.2, 1.75, L, k);
+    // (0.78) The way the line goes out: GOLDENROD's east end (on to its tunnel), SAFFRON's west end. The side wall open
+    // over the line, framed in the station's trim, the rails running on into the dark.
+    const east = k === "goldenrod", ex = east ? W : 0, sgn = east ? 1 : -1;
+    G.box(east ? W - 0.04 : 0, 0, 0.05, east ? W : 0.04, 2.9, 3.55, { [east ? "w" : "e"]: "mtTunnel", all: null });
+    G.box(ex - sgn * 0.22, 2.9, 0, ex, 3.2, 3.75, "mtTrim_" + k);
+    G.box(ex - sgn * 0.22, 0, 3.55, ex, 2.9, 3.75, "mtTrim_" + k);
+    for (const z of [1.15, 2.35]) G.box(east ? W - 0.3 : 0, 0.02, z, east ? W : 0.3, 0.12, z + 0.1, "mtRail");
+    R.act(east ? [W - 1.2, 0, W, 3.6] : [0, 0, 1.2, 3.6], { label: "Look", lines: ["The line runs on out of the station, to the tunnel and on to " + L.other + "."] });
+    R.item("The line's way out", "The side wall open over the line at its " + (east ? "east" : "west") + " end, framed in the trim: the rails run on out into the dark, on to the tunnel.");
     // ----- The rail across the hall and the gate in it -----
     const zr = 6.8, g0 = 8.8, g1 = 11.2;
     for (const [a, b] of [[0, g0], [g1, W]]) {

@@ -434,7 +434,7 @@ def build(key):
             door["in"] = {"x": round(fx, 2), "z": round(fz, 2), "yaw": 0.0}
         if len(cfg["doors"]) > 1: door["group"] = key + "_mouths"
         doors[dk] = door
-        entry.setdefault(info[dk0]["rid"], door["in"])
+        if "in" in door: entry.setdefault(info[dk0]["rid"], door["in"])
 
     # (0.61) Passages (MT. SILVER's): onto the square on one floor and you're a step off the square on the other, facing
     # away from it; both ways. The square's on its own level (box "y"), so you can't take it from the level under it.
@@ -602,4 +602,5 @@ def main():
     print("viewer data", len(js), "bytes")
 
 
-main()
+if __name__ == "__main__":
+    main()

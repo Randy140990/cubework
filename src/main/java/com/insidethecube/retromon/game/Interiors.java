@@ -142,10 +142,28 @@ public final class Interiors {
 			"/retromon/interiors/rock_tunnel.json", "/retromon/interiors/ilex_forest.json", "/retromon/interiors/cerulean_cave.json",
 			"/retromon/interiors/victory_road.json", "/retromon/interiors/mt_silver.json",
 			// (0.69, John's 26 Nov 15:58) The RUINS OF ALPH, between its two gates (tools/alph.py).
-			"/retromon/interiors/ruins_of_alph.json"};
+			"/retromon/interiors/ruins_of_alph.json",
+			// (0.78, John's 28 Nov 14:54) The DARK CAVE and the ICE PATH (tools/caves78.py).
+			"/retromon/interiors/dark_cave.json", "/retromon/interiors/ice_path.json",
+			// (0.78) The MAGNET TRAIN's ride between the tunnels (tools/trainride.py).
+			"/retromon/interiors/magnet_train_ride.json"};
 
 	/** (0.60) The rooms whose water you can walk into and swim (Cerulean Cave's: FireRed's SURF, which there isn't yet). (Before the rooms are read.) */
 	private static final java.util.Set<String> SWIM = new java.util.HashSet<>();
+	/**
+	 * (0.78) The rooms with ice you slide on (the ICE PATH's blue ice: step onto it and you slide that way, a tile at a
+	 * time, till something stops you or you're off it), and the dark ones FLASH lights (the DARK CAVE's, as ROCK
+	 * TUNNEL's).
+	 */
+	private static final java.util.Set<String> ICE = new java.util.HashSet<>(), FLASH = new java.util.HashSet<>();
+	/** (0.78) A room's ROCK SMASH rocks: each one's blocks (x0, y0, z0, x1, y1, z1 from the room's corner, the ends past it). */
+	public static final Map<String, List<int[]>> SMASH = new HashMap<>();
+	/**
+	 * (0.78) The ICE PATH's B1F holes (a boulder pushed into one falls through) and where each boulder lies on B2F once
+	 * it has: each a key (the hole's) and the middle of its tile, from the room's corner.
+	 */
+	public record Hole(String key, double x, double z) {}
+	public static final Map<String, List<Hole>> HOLES = new HashMap<>(), FALLEN = new HashMap<>();
 	private static final JsonObject DATA = load();
 	/** How many looks the prop block has (one state each). */
 	public static final int STATES = DATA == null ? 1 : DATA.get("states").getAsInt();
@@ -344,6 +362,27 @@ public final class Interiors {
 				SPINS.put(room.id(), sp2);
 			}
 			if (r.has("swim") && r.get("swim").getAsBoolean()) SWIM.add(room.id());
+			if (r.has("ice") && r.get("ice").getAsBoolean()) ICE.add(room.id());
+			if (r.has("flash") && r.get("flash").getAsBoolean()) FLASH.add(room.id());
+			if (r.has("smash")) {
+				List<int[]> sm = new ArrayList<>();
+				for (JsonElement se : r.getAsJsonArray("smash")) {
+					JsonArray a = se.getAsJsonArray();
+					int[] b = new int[6];
+					for (int i = 0; i < 6; i++) b[i] = a.get(i).getAsInt();
+					sm.add(b);
+				}
+				SMASH.put(room.id(), sm);
+			}
+			for (String k : new String[] {"holes", "fallen"}) {
+				if (!r.has(k)) continue;
+				List<Hole> hs = new ArrayList<>();
+				for (JsonElement he : r.getAsJsonArray(k)) {
+					JsonObject h = he.getAsJsonObject();
+					hs.add(new Hole(h.get("key").getAsString(), num(h, "x", 0), num(h, "z", 0)));
+				}
+				(k.equals("holes") ? HOLES : FALLEN).put(room.id(), hs);
+			}
 			if (r.has("mons")) {
 				List<MonSpot> ms = new ArrayList<>();
 				for (JsonElement me : r.getAsJsonArray("mons")) {
@@ -396,7 +435,7 @@ public final class Interiors {
 			JsonObject in = d.has("in") && d.get("in").isJsonObject() ? d.getAsJsonObject("in") : null;
 			DOORS.put(key, new Door(key, d.get("room").getAsString(), blocks, out.get(0).getAsDouble(), out.get(1).getAsDouble(),
 					out.get(2).getAsDouble(), north, (float) num(d, "yaw", north ? 180 : face.equals("e") ? -90 : face.equals("w") ? 90 : 0), face,
-					in == null ? null : new double[] {num(in, "x", 0), num(in, "z", 0), num(in, "yaw", 0)}, d.has("place") ? d.get("place").getAsString() : null,
+					in == null ? null : new double[] {num(in, "x", 0), num(in, "z", 0), num(in, "yaw", 0), num(in, "y", 0)}, d.has("place") ? d.get("place").getAsString() : null,
 					d.has("group") ? d.get("group").getAsString() : null));
 		}
 	}
@@ -501,6 +540,11 @@ public final class Interiors {
 
 	public static Room roomOf(Entity e) {
 		return in(e) ? roomAt(e.getX()) : null;
+	}
+
+	/** (0.78) Whether a room is one FLASH lights (the DARK CAVE's floors). */
+	public static boolean flashRoom(Room r) {
+		return r != null && FLASH.contains(r.id());
 	}
 
 	/** Whether someone's in a room whose water they can swim. */
@@ -1143,6 +1187,29 @@ public final class Interiors {
 	}
 
 	/**
+	 * (0.78) Into a room at a spot (room coordinates, that high over its floor), its blocks there first, with nothing
+	 * else of coming into a room (no name on the screen, nobody told): the MAGNET TRAIN's ride, its walk on and off.
+	 */
+	public static boolean put(ServerPlayer p, Room r, double x, double y, double z, float yaw) {
+		MinecraftServer s = p.level().getServer();
+		ServerLevel level = ensure(s);
+		if (level == null || r == null) return false;
+		ready(level, r);
+		preload(level, r.ox() - 2, r.oz() - 2, r.ox() + r.w() + 2, r.oz() + r.d() + 2);
+		if (p.level() != level) Game.leavingLevel(p);
+		p.teleportTo(level, r.ox() + x, r.oy() + y, r.oz() + z, java.util.Set.of(), yaw, 30F, true);
+		p.setDeltaMovement(Vec3.ZERO);
+		LAST.remove(p.getUUID());
+		settle(p);
+		return true;
+	}
+
+	/** (0.78) The interiors' level (made if it isn't yet), or null. */
+	public static ServerLevel level(MinecraftServer s) {
+		return ensure(s);
+	}
+
+	/**
 	 * (0.73) Through the iris as at a door, for something else that moves you (the MAGNET TRAIN's ride): the screen goes
 	 * black, then move runs, and it opens once you've been moved.
 	 */
@@ -1282,6 +1349,7 @@ public final class Interiors {
 				go(p, r, r.ex(), r.ez(), r.eyaw(), false);
 				return true;
 			}
+			if (ice(p, r, lx, ly, lz, dx, dz, facingNorth, facingSouth, facingEast, facingWest)) return false;
 			if (spin(p, r, lx, ly, lz)) return false;
 			for (Warp w : r.warps()) {
 				switch (w.kind()) {
@@ -1525,7 +1593,7 @@ public final class Interiors {
 				Room r = ROOMS.get(d.room());
 				if (r != null) {
 					Game.data(p).door = d.key();
-					if (d.in() != null) go(p, r, d.in()[0], d.in()[1], (float) d.in()[2], true);
+					if (d.in() != null) go(p, r, d.in()[0], d.in().length > 3 ? d.in()[3] : 0, d.in()[1], (float) d.in()[2], true);
 					else go(p, r, r.ex(), r.ez(), r.eyaw(), true);
 				}
 				return r != null;
@@ -1584,6 +1652,72 @@ public final class Interiors {
 		p.teleportTo(r.ox() + nx, p.getY(), r.oz() + nz);
 		p.setDeltaMovement(Vec3.ZERO);
 		return true;
+	}
+
+	/** (0.78) Who's sliding on the ice now, and which way ('n', 's', 'e', 'w'). */
+	private static final Map<UUID, Character> ICE_SLIDE = new HashMap<>();
+
+	private static boolean blueIce(net.minecraft.world.level.Level l, BlockPos b) {
+		return l.getBlockState(b).is(net.minecraft.world.level.block.Blocks.BLUE_ICE);
+	}
+
+	/**
+	 * (0.78) The ICE PATH's ice, as HeartGold's: step onto it and you slide the way you stepped, down the middle of the
+	 * tile's row (two blocks a tile), till the next tile's a wall (a rock, a crystal, a boulder) or you've slid off the
+	 * ice onto the floor, where you stop. On the ice and stopped, you can walk off it any way, which slides you again.
+	 */
+	private static boolean ice(ServerPlayer p, Room r, double lx, double ly, double lz, double dx, double dz, boolean fN, boolean fS, boolean fE, boolean fW) {
+		UUID id = p.getUUID();
+		if (!ICE.contains(r.id())) {
+			ICE_SLIDE.remove(id);
+			return false;
+		}
+		net.minecraft.world.level.Level l = p.level();
+		BlockPos under = BlockPos.containing(p.getX(), p.getY() - 0.2, p.getZ());
+		Character dir = ICE_SLIDE.get(id);
+		if (dir == null) {
+			// Onto the ice, moving: the way you're going (as you're facing, if it's hard to tell).
+			if (!blueIce(l, under) || !p.onGround() || Math.hypot(dx, dz) < 0.02) return false;
+			if (Math.abs(dx) > Math.abs(dz) * 1.2) dir = dx > 0 ? 'e' : 'w';
+			else if (Math.abs(dz) > Math.abs(dx) * 1.2) dir = dz > 0 ? 's' : 'n';
+			else dir = fN ? 'n' : fS ? 's' : fE ? 'e' : fW ? 'w' : null;
+			if (dir == null) return false;
+			ICE_SLIDE.put(id, dir);
+		}
+		int sx = dir == 'e' ? 1 : dir == 'w' ? -1 : 0, sz = dir == 's' ? 1 : dir == 'n' ? -1 : 0;
+		// The middle of the tile's row or column you slide along (a tile's two blocks, from the room's corner).
+		double mx = Math.floor(lx / 2) * 2 + 1, mz = Math.floor(lz / 2) * 2 + 1;
+		double step = 0.4, nx = sx != 0 ? lx + sx * step : mx, nz = sz != 0 ? lz + sz * step : mz;
+		// What's a little way ahead, at your feet and your head: a wall, a rock, a boulder (an entity) stops you.
+		BlockPos ahead = BlockPos.containing(r.ox() + nx + sx * 0.45, p.getY() + 0.2, r.oz() + nz + sz * 0.45);
+		boolean blocked = !l.getBlockState(ahead).getCollisionShape(l, ahead).isEmpty() || !l.getBlockState(ahead.above()).getCollisionShape(l, ahead.above()).isEmpty()
+				|| Boulders.solidAt(p, r, nx + sx * 0.45, ly, nz + sz * 0.45) || nx < 0.5 || nz < 0.5 || nx > r.w() - 0.5 || nz > r.d() - 0.5;
+		if (blocked) {
+			// Stopped on the ice, in the middle of the tile you're on.
+			ICE_SLIDE.remove(id);
+			p.teleportTo(r.ox() + mx, p.getY(), r.oz() + mz);
+			p.setDeltaMovement(Vec3.ZERO);
+			COOL.put(id, 3);
+			return false;
+		}
+		BlockPos below = BlockPos.containing(r.ox() + nx, p.getY() - 0.2, r.oz() + nz);
+		p.teleportTo(r.ox() + nx, p.getY(), r.oz() + nz);
+		p.setDeltaMovement(Vec3.ZERO);
+		if (!blueIce(l, below)) {
+			// Off the ice: on, to the middle of the floor's first tile, and stop.
+			double tx = Math.floor(nx / 2) * 2 + 1, tz = Math.floor(nz / 2) * 2 + 1;
+			if (sx != 0 && (sx > 0 ? nx >= tx : nx <= tx) || sz != 0 && (sz > 0 ? nz >= tz : nz <= tz)) {
+				ICE_SLIDE.remove(id);
+				p.teleportTo(r.ox() + (sx != 0 ? tx : mx), p.getY(), r.oz() + (sz != 0 ? tz : mz));
+				COOL.put(id, 3);
+			}
+		}
+		return true;
+	}
+
+	/** Whether you're sliding on the ice (your own walking waits). */
+	public static boolean onIce(ServerPlayer p) {
+		return ICE_SLIDE.containsKey(p.getUUID());
 	}
 
 	/** Whether you're sliding on a spinner now (your own walking waits). */

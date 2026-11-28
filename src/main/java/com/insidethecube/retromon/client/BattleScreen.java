@@ -334,7 +334,8 @@ public class BattleScreen extends GameScreen {
 				sd.index = e.a();
 				sd.hp = sd.hpTarget = e.b();
 				if (d != null) {
-					d.species = sd.species;
+					// ((0.78) A shiny one in its own colours: the red GYARADOS.)
+					d.species = e.a() >= 0 && e.a() < list.size() && list.get(e.a()).shiny() ? sd.species + "_shiny" : sd.species;
 					d.size = d.sizeOld = 0;
 					d.sizeTarget = 0;
 					// The next one out is up on its feet (the one before fainted and was lying there).

@@ -6662,6 +6662,37 @@ cube	stripped_spruce_wood,stripped_spruce_log	-452	360	-400	406	-	-	hill_top|cli
 swap	brown_glazed_terracotta	-2106	672	-2101	674	19	19	block/brown_glazed_terracotta=gold_plaza@4	a white-edged square in Goldenrod's street
 swap	brown_glazed_terracotta	-2106	698	-2101	700	19	19	block/brown_glazed_terracotta=gold_plaza@4	a white-edged square in Goldenrod's street
 swap	brown_glazed_terracotta	-2106	729	-2101	731	19	19	block/brown_glazed_terracotta=gold_plaza@4	a white-edged square in Goldenrod's street
+swap	cyan_terracotta,tuff,polished_deepslate,dripstone_block,mud_bricks,mud_brick_stairs,smooth_sandstone	19455	-1	19594	140	-	-	block/cyan_terracotta=ms_floor@4,block/tuff=ms_ground@4,block/polished_deepslate=ms_patch@2,block/dripstone_block=rt_rock_top|rt_rock@2,block/brown_mushroom_block=rt_rock_top@2,block/mushroom_stem=rt_rock_top@2,block/mushroom_block_inside=rt_rock_top@2,block/mud_bricks=ms_step,block/mud_brick_stairs=ms_step,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Dark Cave, Violet side	interiors
+cube	brown_mushroom_block,mushroom_stem	19455	-1	19594	140	-	-	rt_rock_top@2	Dark Cave, Violet side	interiors
+swap	cyan_terracotta,tuff,polished_deepslate,dripstone_block,mud_bricks,mud_brick_stairs,smooth_sandstone	19711	-1	19858	142	-	-	block/cyan_terracotta=ms_floor@4,block/tuff=ms_ground@4,block/polished_deepslate=ms_patch@2,block/dripstone_block=rt_rock_top|rt_rock@2,block/brown_mushroom_block=rt_rock_top@2,block/mushroom_stem=rt_rock_top@2,block/mushroom_block_inside=rt_rock_top@2,block/mud_bricks=ms_step,block/mud_brick_stairs=ms_step,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Dark Cave, Blackthorn side	interiors
+cube	brown_mushroom_block,mushroom_stem	19711	-1	19858	142	-	-	rt_rock_top@2	Dark Cave, Blackthorn side	interiors
+swap	packed_ice,snow_block,light_blue_concrete,lapis_block,blue_ice,polished_diorite,polished_diorite_stairs,smooth_sandstone	19967	-1	20092	140	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow_block=sf_snow_top|sf_snow@2,block/light_blue_concrete=sf_floor@4,block/lapis_block=sf_ice_top@2,block/blue_ice=sf_step@2,block/polished_diorite=sf_snow_top@2,block/polished_diorite_stairs=sf_snow_top@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Ice Path 1F	interiors
+boulder	waxed_weathered_copper_grate	19967	-1	20092	140	-	-	prefix:sboulder	Ice Path 1F	interiors
+swap	packed_ice,snow_block,light_blue_concrete,lapis_block,blue_ice,polished_diorite,polished_diorite_stairs,smooth_sandstone	20223	-1	20304	120	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow_block=sf_snow_top|sf_snow@2,block/light_blue_concrete=sf_floor@4,block/lapis_block=sf_ice_top@2,block/blue_ice=sf_step@2,block/polished_diorite=sf_snow_top@2,block/polished_diorite_stairs=sf_snow_top@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Ice Path B1F	interiors
+boulder	waxed_weathered_copper_grate	20223	-1	20304	120	-	-	prefix:sboulder	Ice Path B1F	interiors
+swap	packed_ice,snow_block,light_blue_concrete,lapis_block,blue_ice,polished_diorite,polished_diorite_stairs,smooth_sandstone	20479	-1	20556	66	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow_block=sf_snow_top|sf_snow@2,block/light_blue_concrete=sf_floor@4,block/lapis_block=sf_ice_top@2,block/blue_ice=sf_step@2,block/polished_diorite=sf_snow_top@2,block/polished_diorite_stairs=sf_snow_top@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Ice Path B2F Mahogany side	interiors
+boulder	waxed_weathered_copper_grate	20479	-1	20556	66	-	-	prefix:sboulder	Ice Path B2F Mahogany side	interiors
+swap	packed_ice,snow_block,light_blue_concrete,lapis_block,blue_ice,polished_diorite,polished_diorite_stairs,smooth_sandstone	20735	-1	20798	76	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow_block=sf_snow_top|sf_snow@2,block/light_blue_concrete=sf_floor@4,block/lapis_block=sf_ice_top@2,block/blue_ice=sf_step@2,block/polished_diorite=sf_snow_top@2,block/polished_diorite_stairs=sf_snow_top@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Ice Path B2F Blackthorn side	interiors
+boulder	waxed_weathered_copper_grate	20735	-1	20798	76	-	-	prefix:sboulder	Ice Path B2F Blackthorn side	interiors
+swap	packed_ice,snow_block,light_blue_concrete,lapis_block,blue_ice,polished_diorite,polished_diorite_stairs,smooth_sandstone	20991	-1	21068	52	-	-	block/packed_ice=sf_ice_top|sf_ice@2,block/snow_block=sf_snow_top|sf_snow@2,block/light_blue_concrete=sf_floor@4,block/lapis_block=sf_ice_top@2,block/blue_ice=sf_step@2,block/polished_diorite=sf_snow_top@2,block/polished_diorite_stairs=sf_snow_top@2,block/smooth_sandstone=cave_mat@2,block/smooth_sandstone_top=cave_mat@2,block/sandstone_top=cave_mat@2	Ice Path B3F	interiors
+boulder	waxed_weathered_copper_grate	20991	-1	21068	52	-	-	prefix:sboulder	Ice Path B3F	interiors
+swap	brown_glazed_terracotta	-2214	616	-2041	774	18	19	block/brown_glazed_terracotta=gold_plaza_gold@4	Goldenrod City
+swap	brown_glazed_terracotta	-2106	672	-2101	674	19	19	block/brown_glazed_terracotta=gold_plaza@4	a white-edged square in Goldenrod's street
+swap	brown_glazed_terracotta	-2106	698	-2101	700	19	19	block/brown_glazed_terracotta=gold_plaza@4	a white-edged square in Goldenrod's street
+swap	brown_glazed_terracotta	-2106	729	-2101	731	19	19	block/brown_glazed_terracotta=gold_plaza@4	a white-edged square in Goldenrod's street
+swap	cobweb	-2664	774	-2615	784	14	30	block/cobweb=wf_foam	the foot of Route 47's waterfalls
+swap	barrel	-2770	60	-1011	1080	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_top_open=crate_barrel_top,block/barrel_bottom=crate_barrel_top	Johto
+swap	barrel	-1010	100	60	1060	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_top_open=crate_barrel_top,block/barrel_bottom=crate_barrel_top	Kanto
+swap	barrel	-402	546	-300	614	-	-	block/barrel_side=barrel_ver_side,block/barrel_top=barrel_ver_top,block/barrel_top_open=barrel_ver_top,block/barrel_bottom=barrel_ver_top	Vermilion City
+cube	stripped_pale_oak_log,stripped_pale_oak_wood	-2281	599	-2274	604	17	18	ol_boardwalk@4	the first stretch of Olivine's pier
+swap	stone_button	-2281	605	-2274	620	18	20	block/stone=pier_bolt	the steps of Olivine's pier
+swap	white_terracotta,yellow_terracotta,white_concrete,light_gray_concrete,terracotta	-2284	619	-2270	625	18	18	block/white_terracotta=ol_pave@2,block/yellow_terracotta=ol_pave@2,block/white_concrete=ol_pave@2,block/light_gray_concrete=ol_pave@2,block/terracotta=ol_pave@2	the floor through Olivine's sea gate
+swap	iron_chain	-2283	598	-2272	622	18	22	block/iron_chain=chain_white	the chains of Olivine's pier and sea gate
+swap	waxed_oxidized_copper_chain,oxidized_copper_chain,waxed_copper_chain,copper_chain,waxed_weathered_copper_chain,waxed_exposed_copper_chain	-2335	495	-2170	625	20	32	block/copper_chain=chain_white,block/exposed_copper_chain=chain_white,block/weathered_copper_chain=chain_white,block/oxidized_copper_chain=chain_white	Olivine City
+swap	pale_oak_shelf	-2279	517	-2274	536	17	22	block/pale_oak_shelf=trim_white	an Olivine hedge planter's rim
+swap	pale_oak_shelf	-2279	556	-2274	575	17	22	block/pale_oak_shelf=trim_white	an Olivine hedge planter's rim
+swap	white_concrete,light_gray_concrete,chiseled_quartz_block,smooth_quartz,white_terracotta	-1800	370	-1725	435	21	21	block/white_concrete=mah_pave@2,block/light_gray_concrete=mah_pave@2,block/chiseled_quartz_block_top=mah_pave@2,block/chiseled_quartz_block=mah_pave@2,block/quartz_block_bottom=mah_pave@2,block/white_terracotta=mah_pave@2	Mahogany Town
+grass_onto	white_concrete,light_gray_concrete,chiseled_quartz_block,smooth_quartz,white_terracotta	-1800	370	-1725	435	21	21	-	Mahogany Town
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care
@@ -6747,6 +6778,7 @@ moss_onto	cobblestone,cobblestone_slab,cobblestone_stairs	-1210	505	-1011	590	-	
 swap	campfire	-1210	505	-1011	590	-	-	block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/campfire_fire=fire_flame	Route 28
 swap	iron_bars	-1210	505	-1011	590	-	-	block/iron_bars=railing_dark	Route 28
 swap	end_rod	-1210	505	-1011	590	-	-	block/end_rod=rod_light	Route 28
+swap	barrel	-1210	505	-1011	590	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_top_open=crate_barrel_top,block/barrel_bottom=crate_barrel_top	Route 28
 grass_edge	dripstone_block	-2215	615	-2040	775	-	-	-	Goldenrod City
 swap	daylight_detector	-2215	615	-2040	775	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Goldenrod City
 swap	spruce_log,spruce_fence	-2215	615	-2040	775	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	Goldenrod City
@@ -6781,6 +6813,7 @@ moss_onto	cobblestone,cobblestone_slab,cobblestone_stairs	-2215	615	-2040	775	-	
 swap	campfire	-2215	615	-2040	775	-	-	block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/campfire_fire=fire_flame	Goldenrod City
 swap	iron_bars	-2215	615	-2040	775	-	-	block/iron_bars=railing_dark	Goldenrod City
 swap	end_rod	-2215	615	-2040	775	-	-	block/end_rod=rod_light	Goldenrod City
+swap	barrel	-2215	615	-2040	775	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_top_open=crate_barrel_top,block/barrel_bottom=crate_barrel_top	Goldenrod City
 grass_edge	dripstone_block	-2770	60	-1011	1080	-	-	-	Johto
 swap	daylight_detector	-2770	60	-1011	1080	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Johto
 swap	spruce_log,spruce_fence	-2770	60	-1011	1080	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	Johto
@@ -6813,6 +6846,7 @@ moss_onto	cobblestone,cobblestone_slab,cobblestone_stairs	-2770	60	-1011	1080	-	
 swap	campfire	-2770	60	-1011	1080	-	-	block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/campfire_fire=fire_flame	Johto
 swap	iron_bars	-2770	60	-1011	1080	-	-	block/iron_bars=railing_dark	Johto
 swap	end_rod	-2770	60	-1011	1080	-	-	block/end_rod=rod_light	Johto
+swap	barrel	-2770	60	-1011	1080	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_top_open=crate_barrel_top,block/barrel_bottom=crate_barrel_top	Johto
 roof	acacia_stairs	-1000	655	-960	712	-	-	-	Route 26's houses (as Pallet's)
 roof	acacia_stairs	-1000	655	-960	712	-	-	-	Route 26's houses (as Pallet's)
 swap	polished_andesite,polished_andesite_slab	-1000	655	-960	712	18	27	block/polished_andesite=house_stone	Route 26's houses (as Pallet's)
@@ -7003,6 +7037,7 @@ panel	oak_shelf,dark_oak_shelf	-299	546	-284	614	31	31	block/oak_shelf=planter_r
 swap	blackstone_wall	-299	546	-284	614	-	-	block/blackstone=dock_post	Vermilion City
 swap	pale_oak_fence	-299	546	-284	614	-	-	block/pale_oak_planks=fence_grey	Vermilion City
 swap	acacia_slab	-299	546	-284	614	31	34	block/acacia_planks=trim_ver	Vermilion's window sills
+swap	barrel	-299	546	-284	614	-	-	block/barrel_side=barrel_ver_side,block/barrel_top=barrel_ver_top,block/barrel_top_open=barrel_ver_top,block/barrel_bottom=barrel_ver_top	Vermilion City
 swap	warped_door	-299	546	-284	614	-	-	block/warped_door_top=door_green_top,block/warped_door_bottom=door_green_bottom	Vermilion City
 swap	mangrove_door	-299	546	-284	614	-	-	block/mangrove_door_top=door_red_top,block/mangrove_door_bottom=door_red_bottom	Vermilion City
 swap	smooth_stone_slab	-299	546	-284	614	31	31	block/smooth_stone_slab_side=step_ver,block/smooth_stone=step_ver	Vermilion City
@@ -7020,6 +7055,7 @@ swap	bamboo_fence	18943	-1	19092	192	-	-	block/bamboo_fence=banner_pole_top,bloc
 swap	campfire	18943	-1	19092	192	-	-	block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/campfire_fire=fire_flame	the Ruins of Alph	interiors
 chain	iron_chain	18943	-1	19092	192	-	-	-	the Ruins of Alph	interiors
 swap	iron_chain	18943	-1	19092	192	-	-	block/iron_chain=chain_steel	the Ruins of Alph	interiors
+swap	barrel	18943	-1	19092	192	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_top_open=crate_barrel_top,block/barrel_bottom=crate_barrel_top	the Ruins of Alph	interiors
 grass_edge	dripstone_block	18943	-1	19092	192	-	-	-	the Ruins of Alph	interiors
 swap	daylight_detector	18943	-1	19092	192	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	the Ruins of Alph	interiors
 swap	spruce_log,spruce_fence	18943	-1	19092	192	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	the Ruins of Alph	interiors
@@ -7052,6 +7088,7 @@ moss_onto	cobblestone,cobblestone_slab,cobblestone_stairs	18943	-1	19092	192	-	-
 swap	campfire	18943	-1	19092	192	-	-	block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/campfire_fire=fire_flame	the Ruins of Alph	interiors
 swap	iron_bars	18943	-1	19092	192	-	-	block/iron_bars=railing_dark	the Ruins of Alph	interiors
 swap	end_rod	18943	-1	19092	192	-	-	block/end_rod=rod_light	the Ruins of Alph	interiors
+swap	barrel	18943	-1	19092	192	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_top_open=crate_barrel_top,block/barrel_bottom=crate_barrel_top	the Ruins of Alph	interiors
 swap	white_concrete,white_carpet,white_wool	18944	0	19091	191	-	-	block/white_concrete=jw_white,block/white_wool=jw_white	the Ruins of Alph	interiors
 swap	light_gray_concrete,light_gray_carpet,light_gray_wool	18944	0	19091	191	-	-	block/light_gray_concrete=jw_grey,block/light_gray_wool=jw_grey	the Ruins of Alph	interiors
 swap	quartz_block,quartz_slab,quartz_stairs,smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_bricks,chiseled_quartz_block	18944	0	19091	191	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_bricks=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean	the Ruins of Alph	interiors
@@ -7128,6 +7165,7 @@ swap	bamboo_fence	10239	-1	10392	224	-	-	block/bamboo_fence=banner_pole_top,bloc
 swap	campfire	10239	-1	10392	224	-	-	block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/campfire_fire=fire_flame	Ilex Forest	interiors
 chain	iron_chain	10239	-1	10392	224	-	-	-	Ilex Forest	interiors
 swap	iron_chain	10239	-1	10392	224	-	-	block/iron_chain=chain_steel	Ilex Forest	interiors
+swap	barrel	10239	-1	10392	224	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_top_open=crate_barrel_top,block/barrel_bottom=crate_barrel_top	Ilex Forest	interiors
 grass_edge	dripstone_block	10239	-1	10392	224	-	-	-	Ilex Forest	interiors
 swap	daylight_detector	10239	-1	10392	224	-	-	block/daylight_detector_top=lamp_solar,block/daylight_detector_side=lamp_solar_side	Ilex Forest	interiors
 swap	spruce_log,spruce_fence	10239	-1	10392	224	-	-	block/spruce_log=fence_post,block/spruce_log_top=fence_post_top,block/spruce_planks=fence_rail	Ilex Forest	interiors
@@ -7160,6 +7198,7 @@ moss_onto	cobblestone,cobblestone_slab,cobblestone_stairs	10239	-1	10392	224	-	-
 swap	campfire	10239	-1	10392	224	-	-	block/campfire_log=fire_log,block/campfire_log_lit=fire_log_lit,block/campfire_fire=fire_flame	Ilex Forest	interiors
 swap	iron_bars	10239	-1	10392	224	-	-	block/iron_bars=railing_dark	Ilex Forest	interiors
 swap	end_rod	10239	-1	10392	224	-	-	block/end_rod=rod_light	Ilex Forest	interiors
+swap	barrel	10239	-1	10392	224	-	-	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_top_open=crate_barrel_top,block/barrel_bottom=crate_barrel_top	Ilex Forest	interiors
 swap	white_concrete,white_carpet,white_wool	10240	0	10391	223	-	-	block/white_concrete=jw_white,block/white_wool=jw_white	Ilex Forest	interiors
 swap	light_gray_concrete,light_gray_carpet,light_gray_wool	10240	0	10391	223	-	-	block/light_gray_concrete=jw_grey,block/light_gray_wool=jw_grey	Ilex Forest	interiors
 swap	quartz_block,quartz_slab,quartz_stairs,smooth_quartz,smooth_quartz_slab,smooth_quartz_stairs,quartz_bricks,chiseled_quartz_block	10240	0	10391	223	-	-	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean,block/quartz_bricks=quartz_clean,block/chiseled_quartz_block=quartz_clean,block/chiseled_quartz_block_top=quartz_clean	Ilex Forest	interiors

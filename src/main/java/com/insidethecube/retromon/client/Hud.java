@@ -357,7 +357,7 @@ public final class Hud {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null || !Adventure.active() || BattleScene.active() || Photo.on || ClientState.data == null) return;
 		com.insidethecube.retromon.game.Interiors.Room r = com.insidethecube.retromon.game.Interiors.roomOf(mc.player);
-		if (r == null || !r.id().startsWith("rock_tunnel") || ClientState.data.story.contains("flash_lit")) return;
+		if (r == null || !(r.id().startsWith("rock_tunnel") || com.insidethecube.retromon.game.Interiors.flashRoom(r)) || ClientState.data.story.contains("flash_lit")) return;
 		V.fit(g.guiWidth(), g.guiHeight());
 		float ox = 640, oy = 380;
 		float[] at = Adventure.project(mc.player.getPosition(delta.getGameTimeDeltaPartialTick(true)).add(0, 1.0, 0), g.guiWidth(), g.guiHeight());

@@ -13,12 +13,19 @@
     // (0.61) MT. SILVER (John's 18:19; tools/looks61.py's textures).
     mt_silver: { floor: "area_ms_floor", sand: "area_ms_ground", step: "area_ms_step", wall: "area_ms_cliff", wallTop: "area_ms_top", ice: "area_ms_cliff", iceTop: "area_ms_top",
       boulder: "area_ms_boulder", pre: "xboulder", haze: 0x96a0b6, night: false },
+    // (0.78) The DARK CAVE and the ICE PATH (John's 14:54; tools/caves78.py, tools/arealooks78.py's looks).
+    dark_cave: { floor: "area_ms_floor", sand: "area_ms_ground", step: "area_ms_step", wall: "area_rt_rock", wallTop: "area_rt_rock_top", ice: "area_rt_rock", iceTop: "area_rt_rock_top",
+      boulder: "area_rt_boulder", pre: "rboulder", haze: 0x343a4e, night: true },
+    ice_path: { floor: "area_sf_floor", sand: "area_sf_step", step: "area_sf_snow_top", wall: "area_sf_snow", wallTop: "area_sf_snow_top", ice: "area_sf_ice", iceTop: "area_sf_ice_top",
+      boulder: "area_rt_smash", pre: "sboulder", haze: 0xb0d0ec, night: false },
   };
   const ABOUT = {
     seafoam: "John's floors stitched as FireRed's: ladders and holes down to B4F and ARTICUNO; its rock ice, its boulders ice shards; the deep water you can swim (SURF comes later).",
     rock_tunnel: "John's two floors stitched as FireRed's: in by the north mouth at 1F's ladder, four ladders between 1F and B1F, out at 1F's south doorway. Dark; craggy rocks; FireRed's trainers.",
     cerulean_cave: "John's three floors stitched as FireRed's: in from the river's north bank onto 1F, its water swum (SURF comes later), ladders up to 2F's maze of boulders and down to B1F and MEWTWO.",
     mt_silver: "John's four rooms stitched as Crystal's SILVER CAVE: in by the mouth on the mountain's south face onto Room 1, its ways through (the sandstone squares) on to Room 2, up to Room 3 and RED at the top, and to the two Item Rooms. Room 1's hop-down ledges are half-block steps (no jumping here).",
+    dark_cave: "The HeartGold build stitched as HeartGold's: in from ROUTE 31 and ROUTE 46 on the Violet side, through the doorway past the big pool (swum, as SURF) to the Blackthorn side, out at its top onto ROUTE 45. Dark till FLASH lights it.",
+    ice_path: "The HeartGold build stitched as HeartGold's: in from ROUTE 44 onto 1F, ladders down to B1F's four STRENGTH boulders and holes, B2F's ice (slide till something stops you; the fallen boulders stop you where you need), B3F's ROCK SMASH rock, back up by B2F's Blackthorn side to 1F and out to BLACKTHORN.",
     victory_road: "John's three floors stitched as FireRed's: in by Route 23's west mouth onto 1F, up to 2F and 3F and back down to 2F's way out by the east mouth. FireRed's trainers; MOLTRES on 2F, where Red and Blue had it; the rock barriers cleared.",
   };
   function caveRoom48(id) {

@@ -210,3 +210,15 @@ silver_cave_room_2_i1	silver_cave_room_2	ultra_ball	22	24
 silver_cave_room_2_i2	silver_cave_room_2	pp_up	4	20
 silver_cave_item_rooms_i0	silver_cave_item_rooms	max_revive	6	3
 silver_cave_item_rooms_i1	silver_cave_item_rooms	full_restore	15	11
+dark_cave_violet_entrance_potion	dark_cave_violet_entrance	potion	13	16
+dark_cave_violet_entrance_hyper_potion	dark_cave_violet_entrance	hyper_potion	54	18
+dark_cave_violet_entrance_full_heal	dark_cave_violet_entrance	full_heal	59	48
+dark_cave_violet_entrance_dire_hit	dark_cave_violet_entrance	dire_hit	49	57
+dark_cave_blackthorn_entrance_revive	dark_cave_blackthorn_entrance	revive	46	49
+ice_path_1f_hm_waterfall	ice_path_1f	hm_waterfall	45	14
+ice_path_1f_protein	ice_path_1f	protein	51	19
+ice_path_1f_pp_up	ice_path_1f	pp_up	51	39
+ice_path_b1f_iron	ice_path_b1f	iron	17	52
+ice_path_b2f_full_heal	ice_path_b2f_mahogany_side	full_heal	17	15
+ice_path_b2f_max_potion	ice_path_b2f_mahogany_side	max_potion	7	12
+ice_path_b3f_nevermeltice	ice_path_b3f	nevermeltice	16	17
