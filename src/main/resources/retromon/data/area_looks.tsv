@@ -1213,19 +1213,11 @@ leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-166	392	-166	392	36	36	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-165	392	-165	392	36	38	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-164	392	-164	392	36	36	azalea	a hedge
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-385	391	-385	393	33	34	azalea	a hedge
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-385	394	-385	394	33	33	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-539	395	-538	396	33	34	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-517	395	-516	396	33	34	azalea	a hedge
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-385	395	-385	397	33	34	azalea	a hedge
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-383	397	-383	397	43	43	azalea	a hedge
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-378	397	-378	397	43	43	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-559	397	-538	398	33	34	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-517	397	-492	398	33	34	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-487	397	-464	398	33	34	azalea	a hedge
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-383	398	-382	398	43	43	azalea	a hedge
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-380	398	-378	398	43	43	azalea	a hedge
-leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-393	399	-387	399	33	34	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-328	398	-325	399	33	34	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-319	398	-316	399	33	34	azalea	a hedge
 leafy_hedge	oak_leaves,acacia_leaves,birch_leaves,azalea_leaves,flowering_azalea_leaves,dark_oak_leaves,jungle_leaves,mangrove_leaves,cherry_leaves,spruce_leaves	-553	400	-551	400	40	40	azalea	a hedge
@@ -6600,6 +6592,63 @@ swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,
 swap	crimson_planks,crimson_slab,crimson_stairs,nether_bricks,nether_brick_slab,nether_brick_stairs	-1992	366	-1964	366	20	84	block/crimson_planks=tin_roof_south@4|tin_roof_south@4,block/nether_bricks=tin_ridge_south@4|tin_ridge_south@4	the TIN TOWER's roofs (south)
 swap	diorite	-2324	594	-2320	598	18	18	block/diorite=ol_wall_cap	Olivine's sea wall by the cliff
 swap	diorite_wall	-2324	594	-2320	598	19	20	block/diorite=ol_post	Olivine's sea wall by the cliff
+swap	white_terracotta	-395	383	-377	399	33	46	block/white_terracotta=saf_cream	Saffron's MAGNET TRAIN station
+swap	polished_diorite_slab	-395	383	-377	399	40	48	block/polished_diorite=saf_dome@4	Saffron's MAGNET TRAIN station
+swap	polished_diorite,polished_diorite_stairs	-395	383	-377	399	33	48	block/polished_diorite=saf_white	Saffron's MAGNET TRAIN station
+swap	chiseled_stone_bricks	-395	383	-377	399	40	48	block/chiseled_stone_bricks=saf_white	Saffron's MAGNET TRAIN station
+swap	cyan_terracotta	-395	383	-377	399	40	46	block/cyan_terracotta=saf_wall	Saffron's MAGNET TRAIN station
+swap	quartz_pillar	-395	383	-377	399	33	38	block/quartz_pillar=saf_post,block/quartz_pillar_top=saf_post_top	Saffron's MAGNET TRAIN station
+swap	waxed_cut_copper,waxed_cut_copper_slab,waxed_cut_copper_stairs	-395	383	-377	399	36	40	block/cut_copper=saf_emblem	Saffron's MAGNET TRAIN station
+swap	light_gray_carpet	-395	383	-377	399	34	34	block/light_gray_wool=saf_grey	Saffron's MAGNET TRAIN station
+swap	end_rod	-395	383	-377	399	33	46	block/end_rod=rod_light	Saffron's MAGNET TRAIN station
+panel	oak_shelf	-395	383	-377	399	33	33	block/oak_shelf=planter_saf_wood	Saffron's MAGNET TRAIN station
+panel	oak_shelf	-395	383	-377	399	34	41	block/oak_shelf=band_shelf	Saffron's MAGNET TRAIN station
+swap	bricks	-395	383	-377	399	33	33	block/bricks=cel_base	Saffron's MAGNET TRAIN station
+swap	deepslate_brick_wall	-395	383	-377	399	33	46	block/deepslate_bricks=saf_blind	Saffron's MAGNET TRAIN station
+swap	barrel	-395	383	-377	399	33	35	block/barrel_side=crate_barrel_side,block/barrel_top=crate_barrel_top,block/barrel_bottom=crate_barrel_top	Saffron's MAGNET TRAIN station
+swap	composter	-395	383	-377	399	33	35	block/composter_side=bin_side,block/composter_top=bin_top,block/composter_bottom=bin_top	Saffron's MAGNET TRAIN station
+swap	smooth_quartz,smooth_quartz_stairs,smooth_quartz_slab,quartz_slab	-409	383	-377	399	33	44	block/quartz_block_side=quartz_clean,block/quartz_block_top=quartz_clean,block/quartz_block_bottom=quartz_clean	Saffron's MAGNET TRAIN station and its line
+swap	gray_concrete	-409	389	-385	389	40	40	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Saffron
+swap	gray_concrete	-409	390	-385	390	40	40	block/gray_concrete=track_rail	the MAGNET TRAIN's line, Saffron
+swap	gray_concrete	-409	391	-385	391	40	40	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Saffron
+swap	gray_concrete	-409	392	-385	392	40	40	block/gray_concrete=track_rail	the MAGNET TRAIN's line, Saffron
+swap	gray_concrete	-409	393	-385	393	40	40	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Saffron
+swap	gray_concrete	-2049	684	-2048	684	27	27	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Goldenrod's tunnel
+swap	gray_concrete	-2049	685	-2048	685	27	27	block/gray_concrete=track_rail	the MAGNET TRAIN's line, Goldenrod's tunnel
+swap	gray_concrete	-2049	686	-2048	686	27	27	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Goldenrod's tunnel
+swap	gray_concrete	-2049	687	-2048	687	27	27	block/gray_concrete=track_rail	the MAGNET TRAIN's line, Goldenrod's tunnel
+swap	gray_concrete	-2049	688	-2048	688	27	27	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Goldenrod's tunnel
+swap	black_concrete	-411	385	-409	397	36	45	block/black_concrete=tunnel_dark	Saffron's MAGNET TRAIN tunnel
+swap	black_concrete	-2048	680	-2046	692	23	32	block/black_concrete=tunnel_dark	Goldenrod's MAGNET TRAIN tunnel
+cube	stripped_spruce_wood,stripped_spruce_log	-440	362	-400	406	-	-	hill_top|cliff_root@4	the cliff round Saffron's MAGNET TRAIN tunnel
+swap	polished_deepslate_slab	-393	401	-391	407	33	34	block/polished_deepslate=bench_seat_cel	Saffron's bench by the station
+swap	spruce_trapdoor	-393	401	-391	407	33	34	block/spruce_trapdoor=bench_end_cel	Saffron's bench by the station
+boulder	spruce_fence,oak_fence,dark_oak_fence	-347	392	-346	394	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-389	404	-387	405	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-378	407	-376	408	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-378	411	-376	412	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-322	420	-321	422	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-323	424	-322	428	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-360	430	-359	432	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-345	430	-344	432	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-323	436	-321	437	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-323	441	-322	443	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-341	450	-340	451	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-335	450	-334	451	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-329	450	-328	451	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-323	450	-322	451	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-341	455	-339	456	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-335	455	-333	456	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-329	455	-327	456	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-323	455	-321	456	33	38	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-314	393	-312	394	34	39	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-308	393	-307	395	34	39	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-311	396	-309	397	34	39	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-391	418	-388	420	34	39	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-391	429	-388	431	34	39	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-364	452	-362	453	34	39	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-358	452	-357	454	34	39	prefix:ttrunk	Saffron's tree
+boulder	spruce_fence,oak_fence,dark_oak_fence	-361	455	-359	456	34	39	prefix:ttrunk	Saffron's tree
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care

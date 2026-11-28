@@ -327,6 +327,9 @@ def main():
     # (0.70) Ilex Forest, in Johto's looks too (John's 14:44: "Make sure they're all universal").
     import arealooks70
     arealooks70.round70ilex(room, globals(), rows)
+    # (0.73) The hedges of the building John took out for Saffron's station.
+    import arealooks73
+    rows[:] = arealooks73.post(rows)
     with open(OUT, "w") as f:
         f.write("# Looks the mod gives some places only (client/AreaLooks), written by tools/arealooks.py: which look, on which blocks,\n"
                 "# over which part of the map (x0 z0 to x1 z1; y0 y1 the heights, - for every height), the textures swapped.\n"
@@ -848,6 +851,9 @@ def round50(add, room):
     # (0.70) John's 27 Nov 15:00 Johto pass.
     import arealooks70b
     arealooks70b.round70b(add, globals())
+    # (0.73) John's 28 Nov 09:22 save: Saffron's MAGNET TRAIN station, the tunnels, Saffron's bench and trees.
+    import arealooks73
+    arealooks73.round73(add, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")
