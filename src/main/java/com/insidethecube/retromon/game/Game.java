@@ -163,6 +163,9 @@ public final class Game {
 		setSpeed(1);
 		sync(p);
 		data(p).place = "";
+		// ((0.76) Just brought up to a newer map (IntroScreen.updateMap): once you're in, if the new land has something
+		// where you stood, you're put on the ground beside it.)
+		if (marker.has("mapUpdated")) TO_GROUND.put(p.getUUID(), 20);
 		// Without a Pokémon: Oak stops you as you head out of Pallet Town (below); on a map without Pallet Town
 		// marked, his welcome comes straight away.
 		if (!data(p).started && town() == null) Net.send(p, "intro", new CompoundTag());
@@ -171,6 +174,22 @@ public final class Game {
 	private static Zone town() {
 		for (Zone z : zones) if (z.place().equals("pallet_town")) return z;
 		return null;
+	}
+
+	/** (0.76) Who to check is standing clear of the new map's land (ticks to wait for it to load round them). */
+	private static final Map<UUID, Integer> TO_GROUND = new HashMap<>();
+
+	/** (0.76) Standing in something the new map built where you were: put on good ground nearby (or on top). */
+	private static void clearOfNewLand(ServerPlayer p) {
+		if (!(p.level() instanceof ServerLevel level) || level.dimension() != net.minecraft.world.level.Level.OVERWORLD || Interiors.in(p)) return;
+		BlockPos feet = p.blockPosition();
+		boolean stuck = !level.getBlockState(feet).getCollisionShape(level, feet).isEmpty()
+				|| !level.getBlockState(feet.above()).getCollisionShape(level, feet.above()).isEmpty();
+		if (!stuck) return;
+		BlockPos at = spotNear(level, feet.getX(), feet.getZ(), 24, feet.getY());
+		if (at == null) at = new BlockPos(feet.getX(), level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, feet.getX(), feet.getZ()), feet.getZ());
+		p.teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
+		Retromon.LOG.info("Retromon: the new map has land where {} stood; moved to {}", p.getName().getString(), at);
 	}
 
 	/** Where each player last stood well inside Pallet Town (to put them back without clipping into a fence). */
@@ -1213,6 +1232,16 @@ public final class Game {
 			COOLDOWN.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			BUSY.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
 			AFTER_BATTLE.computeIfPresent(id, (k, v) -> v > 1 ? v - 1 : null);
+			Integer tg = TO_GROUND.get(id);
+			if (tg != null) {
+				if (tg > 1) TO_GROUND.put(id, tg - 1);
+				else {
+					TO_GROUND.remove(id);
+					clearOfNewLand(p);
+					marker.remove("mapUpdated");
+					saveMarker();
+				}
+			}
 			Integer ts = TO_START.get(id);
 			if (ts != null) {
 				if (ts > 1) TO_START.put(id, ts - 1);

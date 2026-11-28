@@ -16,7 +16,9 @@ DATA = os.path.join(HERE, "..", "src", "main", "resources", "retromon", "data")
 METHOD = {"grass": "Grass", "water": "Surfing", "old_rod": "Fishing", "good_rod": "Fishing", "super_rod": "Fishing", "headbutt": "Headbutt",
           "rock_smash": "Rock Smash", "contest": "Bug-Catching Contest", "swarm": "Swarms"}
 SPOT_NAME = {"viridian_forest": "VIRIDIAN FOREST", "pokemon_tower": "POKéMON TOWER", "safari_zone": "SAFARI ZONE", "pokemon_mansion": "POKéMON MANSION",
-             "cerulean_cave": "CERULEAN CAVE", "digletts_cave": "DIGLETT's CAVE", "power_plant": "POWER PLANT", "tohjo_falls": "TOHJO FALLS"}
+             "cerulean_cave": "CERULEAN CAVE", "digletts_cave": "DIGLETT's CAVE", "power_plant": "POWER PLANT", "tohjo_falls": "TOHJO FALLS",
+             # ((0.76) Johto's far west.)
+             "johto_safari_zone": "SAFARI ZONE", "johto_safari_gate": "SAFARI ZONE GATE", "cliff_edge_gate": "CLIFF EDGE GATE", "cliff_cave": "CLIFF CAVE"}
 
 
 def rows(f):
@@ -58,6 +60,7 @@ def main():
             mp = pts.get(key)
             name = SPOT_NAME.get(key) or (mp[5] if mp else names.get(key, key.upper().replace("_", " ")))
             kind = mp[4] if mp and key not in SPOT_NAME else "spot" if key in SPOT_NAME or not mp else mp[4]
+            if not mp and key.startswith("route_"): kind = "route"
             zone = c[3] if len(c) > 3 and c[3] else ""
             hs = sorted(set(here.get(key, [])) - {name})[:8]
             out.append("\t".join([reg, key, str(x), str(z), kind, name, zone or "-", "|".join(how.get(key, [])) or "-", ",".join(wild.get(key, [])) or "-", "|".join(hs) or "-"]))

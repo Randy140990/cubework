@@ -6659,6 +6659,9 @@ swap	gray_concrete	-433	392	-409	392	40	40	block/gray_concrete=track_rail	the MA
 swap	gray_concrete	-433	393	-409	393	40	40	block/gray_concrete=track_bed	the MAGNET TRAIN's line, Saffron
 swap	black_concrete	-436	385	-433	397	36	45	block/black_concrete=tunnel_dark	Saffron's MAGNET TRAIN tunnel
 cube	stripped_spruce_wood,stripped_spruce_log	-452	360	-400	406	-	-	hill_top|cliff_root@4	the cliff round Saffron's MAGNET TRAIN tunnel
+swap	brown_glazed_terracotta	-2106	672	-2101	674	19	19	block/brown_glazed_terracotta=gold_plaza@4	a white-edged square in Goldenrod's street
+swap	brown_glazed_terracotta	-2106	698	-2101	700	19	19	block/brown_glazed_terracotta=gold_plaza@4	a white-edged square in Goldenrod's street
+swap	brown_glazed_terracotta	-2106	729	-2101	731	19	19	block/brown_glazed_terracotta=gold_plaza@4	a white-edged square in Goldenrod's street
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-142	448	-100	720	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 12
 panel	oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button	-160	708	-143	715	-	-	block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt	Route 13's end of the pier
 roof	mangrove_stairs	-361	317	-342	337	39	45	-	the Day Care

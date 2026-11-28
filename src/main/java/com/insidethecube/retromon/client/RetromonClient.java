@@ -82,6 +82,7 @@ public class RetromonClient implements ClientModInitializer {
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> {
 			SlotSnapshot.leaving(mc);
 			TownMap.leaving();
+			Photo.leave();
 			Adventure.setOn(false, false);
 			ClientState.reset();
 			BattleScene.end();

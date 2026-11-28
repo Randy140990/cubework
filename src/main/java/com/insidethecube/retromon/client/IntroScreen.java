@@ -65,6 +65,8 @@ public class IntroScreen extends GameScreen {
 	private volatile String progress = "";
 	private volatile String failure = "";
 	private volatile boolean copied;
+	/** (0.76) A game whose map has just been brought up to date: opened at the end of the tick. */
+	private volatile String updatedFolder;
 	/** Oak talking: the lines, and what comes after them. */
 	private TextBox talk;
 	private Runnable afterTalk;
@@ -294,6 +296,11 @@ public class IntroScreen extends GameScreen {
 			freshLoad = true;
 			load(slotName);
 		}
+		if (updatedFolder != null) {
+			String f = updatedFolder;
+			updatedFolder = null;
+			load(f);
+		}
 	}
 
 	// ---------- the menu and the save slots ----------
@@ -512,7 +519,14 @@ public class IntroScreen extends GameScreen {
 
 	private void startOak() {
 		if (bundledMap() == null) {
-			failure = "The map isn't installed. Put Retromon-Map-1.0.3.jar in your mods folder (beside Retromon), then restart.";
+			failure = "The map isn't installed. Put " + com.insidethecube.retromon.MapVersion.JAR + " in your mods folder (beside Retromon), then restart.";
+			step = Step.FAILED;
+			return;
+		}
+		// ((0.76) An older map jar is never played without a word: it's named, and the one to put in.)
+		String wrong = com.insidethecube.retromon.MapVersion.problem();
+		if (wrong != null) {
+			failure = wrong;
 			step = Step.FAILED;
 			return;
 		}
@@ -768,6 +782,19 @@ public class IntroScreen extends GameScreen {
 		if (!replacing && !c.empty()) {
 			// The loading page names where this save is (not always PALLET TOWN).
 			arrivingAt = c.str("place", "PALLET TOWN");
+			String wrong = com.insidethecube.retromon.MapVersion.problem();
+			if (wrong != null) {
+				failure = wrong;
+				step = Step.FAILED;
+				return;
+			}
+			// ((0.76, John's 12:43: "if I continue game, it should probably be updating the map as well") A game made
+			// with an older map (or before games noted their map) gets the new map's land first, then opens.
+			String now = com.insidethecube.retromon.MapVersion.installed(), had = saveMap(c.folder());
+			if (now != null && bundledMap() != null && (had == null || com.insidethecube.retromon.MapVersion.compare(had, now) < 0)) {
+				updateMap(c.folder(), had, now);
+				return;
+			}
 			load(c.folder().getFileName().toString());
 			return;
 		}
@@ -1091,7 +1118,7 @@ public class IntroScreen extends GameScreen {
 	}
 
 	/**
-	 * The map: inside Retromon Map (Retromon's second jar, Retromon-Map-1.0.1.jar; the older retromon-kanto-map jar
+	 * The map: inside Retromon Map (Retromon's second jar, Retromon-Map-1.0.4.jar and on; the older retromon-kanto-map jar
 	 * still works), or a world or zip in .minecraft/retromon (for map makers).
 	 */
 	private static Path bundledMap() {
@@ -1269,7 +1296,115 @@ public class IntroScreen extends GameScreen {
 		});
 		NbtIo.writeCompressed(root, dat);
 		Files.deleteIfExists(to.resolve("level.dat_old"));
-		Files.writeString(to.resolve(Game.MARKER), "{\"version\":3,\"player\":\"" + playerName.replace("\"", "") + "\"}", StandardCharsets.UTF_8);
+		// ((0.76) The map it's made with, so a newer map can be brought into it later.)
+		String map = com.insidethecube.retromon.MapVersion.installed();
+		Files.writeString(to.resolve(Game.MARKER), "{\"version\":3,\"player\":\"" + playerName.replace("\"", "") + "\""
+				+ (map == null ? "" : ",\"map\":\"" + map + "\"") + "}", StandardCharsets.UTF_8);
+	}
+
+	/** The map a game was made with (its marker's "map"), or null for a game made before games noted it. */
+	private static String saveMap(Path save) {
+		try {
+			com.google.gson.JsonObject o = com.google.gson.JsonParser.parseString(Files.readString(save.resolve(Game.MARKER), StandardCharsets.UTF_8)).getAsJsonObject();
+			return o.has("map") && o.get("map").isJsonPrimitive() ? o.get("map").getAsString() : null;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * (0.76) A game made with an older map, brought up to the map that's in now: the land (the world's region files,
+	 * what stands on it and its points of interest) comes from the new map; everything that's yours stays (your
+	 * team, bag, badges and story are in your player's data and the game's own files; the insides are in their own
+	 * dimension). What the Town Map remembered of the old land, and which of John's small map fixes were done, are
+	 * cleared, so both start again from the new land. Then the game opens; if you were left standing in something the
+	 * new map built there, the game puts you on the ground beside it (Game.join).
+	 */
+	private void updateMap(Path save, String had, String now) {
+		Path map = bundledMap();
+		if (map == null) return;
+		busy = true;
+		step = Step.COPYING;
+		loadingAt = ticks;
+		progress = "Bringing your game up to map " + now + "...";
+		Thread t = new Thread(() -> {
+			Path tmp = null;
+			try {
+				Path zip = map;
+				if (!map.getFileSystem().equals(java.nio.file.FileSystems.getDefault())) {
+					tmp = Files.createTempFile("retromon-map", ".zip");
+					Files.copy(map, tmp, StandardCopyOption.REPLACE_EXISTING);
+					zip = tmp;
+				}
+				Path root = save.toAbsolutePath().normalize();
+				try (ZipFile z = new ZipFile(zip.toFile())) {
+					String base = null;
+					for (ZipEntry e : java.util.Collections.list(z.entries())) {
+						String n = e.getName().replace('\\', '/');
+						if (n.endsWith("level.dat") && (n.equals("level.dat") || n.endsWith("/level.dat"))) {
+							String b = n.substring(0, n.length() - "level.dat".length());
+							if (base == null || b.length() < base.length()) base = b;
+						}
+					}
+					if (base == null) throw new IOException("There's no level.dat in the map");
+					List<ZipEntry> land = new ArrayList<>();
+					long total = 0;
+					for (ZipEntry e : java.util.Collections.list(z.entries())) {
+						String n = e.getName().replace('\\', '/');
+						if (e.isDirectory() || !n.startsWith(base)) continue;
+						String rel = n.substring(base.length());
+						if ((rel.startsWith("region/") || rel.startsWith("entities/") || rel.startsWith("poi/")) && rel.endsWith(".mca") && rel.indexOf('/') == rel.lastIndexOf('/')) {
+							land.add(e);
+							total += Math.max(0, e.getSize());
+						}
+					}
+					long done = 0;
+					for (ZipEntry e : land) {
+						String rel = e.getName().replace('\\', '/').substring(base.length());
+						Path out = root.resolve(rel).normalize();
+						if (!out.startsWith(root)) continue;
+						Files.createDirectories(out.getParent());
+						Path part = out.resolveSibling(out.getFileName() + ".new");
+						try (InputStream in = z.getInputStream(e)) {
+							Files.copy(in, part, StandardCopyOption.REPLACE_EXISTING);
+						}
+						Files.move(part, out, StandardCopyOption.REPLACE_EXISTING);
+						done += Math.max(0, e.getSize());
+						progress = "Bringing your game up to map " + now + "... " + (total == 0 ? 100 : done * 100 / total) + "%";
+					}
+				}
+				Files.deleteIfExists(root.resolve("retromon_townmap.dat"));
+				Files.deleteIfExists(root.resolve("retromon_map_fixes.txt"));
+				Path m = root.resolve(Game.MARKER);
+				com.google.gson.JsonObject o;
+				try {
+					o = com.google.gson.JsonParser.parseString(Files.readString(m, StandardCharsets.UTF_8)).getAsJsonObject();
+				} catch (Exception e) {
+					o = new com.google.gson.JsonObject();
+				}
+				o.addProperty("map", now);
+				o.addProperty("mapBefore", had == null ? "unknown" : had);
+				o.addProperty("mapUpdated", true);
+				Files.writeString(m, o.toString(), StandardCharsets.UTF_8);
+				Retromon.LOG.info("Retromon: brought {} from map {} up to map {}", save.getFileName(), had == null ? "(not noted)" : had, now);
+				updatedFolder = save.getFileName().toString();
+			} catch (Exception e) {
+				Retromon.LOG.error("Couldn't bring the game up to the new map", e);
+				failure = "Your game couldn't be brought up to map " + now + ": " + (e.getMessage() == null ? e.toString() : e.getMessage());
+				step = Step.FAILED;
+			} finally {
+				busy = false;
+				if (tmp != null) {
+					try {
+						Files.deleteIfExists(tmp);
+					} catch (IOException ignored) {
+						// A temporary file: the system clears it in time.
+					}
+				}
+			}
+		}, "Retromon map update");
+		t.setDaemon(true);
+		t.start();
 	}
 
 	// ---------- drawing (the UI Viewer's screens, on its 1280 by 720 canvas) ----------

@@ -8,7 +8,7 @@ route_31	-1765	556
 violet_city	-1842	542
 sprout_tower	-1846	478
 route_32	-1900	672
-ruins_of_alph	-2060	590
+ruins_of_alph	-1982	600
 union_cave	-1912	838
 route_33	-1950	866
 azalea_town	-2005	866
@@ -16,7 +16,7 @@ slowpoke_well	-1990	848
 ilex_forest	-2075	905
 route_34	-2100	800
 goldenrod_city	-2100	700
-radio_tower	-2080	664
+radio_tower	-2140	685
 route_35	-2095	600
 national_park	-2126	486
 route_36	-1975	512
@@ -46,3 +46,12 @@ route_45	-1506	572
 dark_cave	-1700	546
 route_46	-1585	692
 silver_cave	-1200	545
+# (0.76, John's 28 Nov 12:43: "I will be planting buildings at the entrance of the Safari Zone. I expect to see the labels on there as well.")
+# The far west, read off his 12:43 save: the SAFARI ZONE up on its walled hill, its gate at the foot of it (the way in, where his
+# buildings go), ROUTE 48 down to the CLIFF EDGE GATE, CLIFF CAVE, and ROUTE 47 over the bridges east to Cianwood.
+johto_safari_zone	-2686	640
+johto_safari_gate	-2683	712
+route_48	-2705	750
+cliff_edge_gate	-2664	727
+cliff_cave	-2625	715
+route_47	-2610	790

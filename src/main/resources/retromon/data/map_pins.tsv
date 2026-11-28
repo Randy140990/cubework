@@ -59,7 +59,7 @@ johto	route_31	-1765	556	route	ROUTE 31	-	Grass|Surfing|Fishing|Headbutt	ledyba,
 johto	violet_city	-1842	542	town	VIOLET CITY	-	Surfing|Fishing|Headbutt	poliwag,poliwhirl,magikarp,venonat,abra,venomoth,magnemite	-
 johto	sprout_tower	-1846	478	spot	SPROUT TOWER	-	Grass|Fishing	rattata,gastly,magikarp,krabby,corsola,staryu,kingler	-
 johto	route_32	-1900	672	route	ROUTE 32	-	Grass|Surfing|Fishing|Headbutt	bellsprout,ekans,mareep,hoppip,rattata,wooper,zubat,totodile,tentacool,quagsire,tentacruel,magikarp,qwilfish,spearow,aipom,heracross	-
-johto	ruins_of_alph	-2060	590	spot	RUINS OF ALPH	-	Grass|Surfing|Fishing	natu,smeargle,unown,wooper,quagsire,magikarp,poliwag,krabby,corsola,staryu,kingler	-
+johto	ruins_of_alph	-1982	600	spot	RUINS OF ALPH	-	Grass|Surfing|Fishing	natu,smeargle,unown,wooper,quagsire,magikarp,poliwag,krabby,corsola,staryu,kingler	-
 johto	union_cave	-1912	838	spot	UNION CAVE	-	Grass|Surfing|Fishing	geodude,rattata,zubat,onix,sandshrew,raticate,golbat,wooper,quagsire,tentacool,tentacruel,magikarp,goldeen,seaking,krabby,corsola,staryu,kingler	-
 johto	route_33	-1950	866	route	ROUTE 33	-	Grass|Fishing|Headbutt	hoppip,ekans,spearow,rattata,zubat,magikarp,krabby,corsola,staryu,kingler,aipom,heracross	-
 johto	azalea_town	-2005	866	town	AZALEA TOWN	-	Fishing|Headbutt	magikarp,krabby,corsola,staryu,kingler,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
@@ -67,7 +67,7 @@ johto	slowpoke_well	-1990	848	spot	SLOWPOKE WELL	-	Grass|Surfing|Fishing|Rock Sm
 johto	ilex_forest	-2075	905	spot	ILEX FOREST	-	Grass|Surfing|Fishing|Headbutt	weedle,kakuna,paras,zubat,caterpie,metapod,oddish,psyduck,golduck,magikarp,poliwag,exeggcute,butterfree,pineco,beedrill	-
 johto	route_34	-2100	800	route	ROUTE 34	-	Grass|Surfing|Fishing|Headbutt	drowzee,rattata,abra,ditto,tentacool,tentacruel,magikarp,krabby,corsola,staryu,kingler,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
 johto	goldenrod_city	-2100	700	town	GOLDENROD CITY	-	Fishing	magikarp,krabby,corsola,staryu,kingler	-
-johto	radio_tower	-2080	664	spot	RADIO TOWER	-	-	-	-
+johto	radio_tower	-2140	685	spot	RADIO TOWER	-	-	-	-
 johto	route_35	-2095	600	route	ROUTE 35	-	Grass|Surfing|Fishing|Headbutt|Swarms	nidoran_f,nidoran_m,drowzee,abra,pidgey,ditto,yanma,hoothoot,psyduck,golduck,magikarp,poliwag,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
 johto	national_park	-2126	486	spot	NATIONAL PARK	-	Grass|Fishing|Bug-Catching Contest	weedle,kakuna,pidgey,caterpie,metapod,sunkern,togepi,hoothoot,magikarp,krabby,corsola,staryu,kingler,butterfree,beedrill,venonat,paras,scyther,pinsir	-
 johto	route_36	-1975	512	route	ROUTE 36	-	Grass|Fishing|Headbutt	nidoran_f,nidoran_m,pidgey,vulpix,stantler,growlithe,hoothoot,magikarp,krabby,corsola,staryu,kingler,caterpie,metapod,exeggcute,butterfree,pineco,weedle,kakuna,beedrill	-
@@ -97,3 +97,9 @@ johto	route_45	-1506	572	route	ROUTE 45	-	Grass|Surfing|Fishing|Headbutt	geodude
 johto	dark_cave	-1700	546	spot	DARK CAVE	-	Grass|Surfing|Fishing|Rock Smash|Swarms	geodude,zubat,dunsparce,graveler,wobbuffet,golbat,magikarp,goldeen,seaking,krabby,shuckle	-
 johto	route_46	-1585	692	route	ROUTE 46	-	Grass|Fishing|Headbutt	geodude,spearow,rattata,jigglypuff,chikorita,magikarp,krabby,corsola,staryu,kingler,aipom,heracross	-
 johto	silver_cave	-1200	545	spot	SILVER CAVE	-	Grass|Surfing|Fishing	onix,donphan,graveler,golbat,larvitar,ursaring,quagsire,golduck,misdreavus,tangela,ponyta,rapidash,doduo,dodrio,sneasel,seaking,goldeen,poliwhirl,poliwag,magikarp	-
+johto	johto_safari_zone	-2686	640	spot	SAFARI ZONE	-	-	-	-
+johto	johto_safari_gate	-2683	712	spot	SAFARI ZONE GATE	-	-	-	-
+johto	route_48	-2705	750	route	ROUTE 48	-	-	-	-
+johto	cliff_edge_gate	-2664	727	spot	CLIFF EDGE GATE	-	-	-	-
+johto	cliff_cave	-2625	715	spot	CLIFF CAVE	-	-	-	-
+johto	route_47	-2610	790	route	ROUTE 47	-	-	-	-

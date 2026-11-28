@@ -857,6 +857,9 @@ def round50(add, room):
     # (0.74) John's 28 Nov 10:42 and 10:56: Goldenrod's floor and station roof, Saffron's line on to its new tunnel.
     import arealooks74
     arealooks74.round74(add, globals())
+    # ((0.76) John's 12:24: Goldenrod's white-edged squares in the stony cream, not the street's tile.)
+    import arealooks76
+    arealooks76.round76(add, globals())
     # Route 12's piers as Let's Go's: yellow-tan boards in darker frames, steel bolts.
     add("swap", "oak_stairs,oak_planks,oak_slab,oak_fence,spruce_shelf,stripped_oak_wood,stripped_oak_log,stone_button", ROUTE12,
         "block/oak_planks=pier_boards,block/spruce_shelf=pier_frame,block/stripped_oak_log=pier_frame,block/stripped_oak_log_top=pier_frame,block/stone=pier_bolt")

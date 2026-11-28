@@ -73,6 +73,12 @@ public final class Photo {
 		} else send(false);
 	}
 
+	/** (0.76) Leaving a game: PHOTO MODE off, nothing held, so it can't follow you into another world. */
+	public static void leave() {
+		on = false;
+		DOWN.clear();
+	}
+
 	/** Tells the server: on (and where the camera looks), or off. */
 	private static void send(boolean value) {
 		if (Minecraft.getInstance().getConnection() == null) return;
@@ -98,6 +104,13 @@ public final class Photo {
 			return true;
 		}
 		if (!on) return false;
+		// ((0.76, John's 12:29: "when I load another save, it doesn't let me move around") Only ever in a Retromon game:
+		// anywhere else (another world, the title), PHOTO MODE is off and every key is Minecraft's.)
+		if (!Adventure.active()) {
+			on = false;
+			DOWN.clear();
+			return false;
+		}
 		if (mc.screen != null) {
 			DOWN.clear();
 			return false;
