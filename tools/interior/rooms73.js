@@ -76,7 +76,8 @@
     reg("mtPaper_" + k, 16, 16, (P, r) => { P.fill(hx(L.paper[0]), 0.006, r); P.rect(7, 0, 1, 16, hx(L.paper[1])); });
     reg("mtBand_" + k, 16, 16, (P, r) => { P.fill(hx(L.band), 0.008, r); P.rect(0, 0, 16, 2, shadec(hx(L.band), 0.25)); P.rect(0, 14, 16, 2, shadec(hx(L.band), -0.2)); });
     reg("mtTrim_" + k, 16, 16, (P, r) => { P.fill(hx(L.trim), 0.006, r); P.rect(0, 0, 16, 1, shadec(hx(L.trim), 0.3)); P.rect(0, 15, 16, 1, shadec(hx(L.trim), -0.25)); });
-    reg("mtStripe_" + k, 16, 16, (P, r) => { P.fill(hx("#F3F4F2"), 0.006, r); P.rect(0, 3, 16, 7, hx(L.stripe)); P.rect(0, 11, 16, 2, hx(L.trim)); });
+    // (The same train as the one you ride, tools/train73.py: its deep blue stripe, a gold line under it.)
+    reg("mtStripe_" + k, 16, 16, (P, r) => { P.fill(hx("#F3F4F2"), 0.006, r); P.rect(0, 3, 16, 7, hx("#2B4C9B")); P.rect(0, 11, 16, 1, hx("#E0B84A")); });
     reg(L.seat, 16, 16, (P, r) => { P.fill(hx(L.seatC[0]), 0.01, r); P.rect(0, 0, 16, 1, shadec(hx(L.seatC[0]), 0.25)); P.rect(0, 15, 16, 1, hx(L.seatC[1])); });
     // The board over the gate: where the next train's for, its time ticking over.
     reg("mtBoard_" + k, 64, 16, (P, r) => {
@@ -112,7 +113,7 @@
     for (const dx of [5.6, 10.6, 14.6]) if (dx > x0 + 1.5 && dx < x1 - 1.5) G.box(dx, y0 + 0.42, z + w, dx + 1.0, y0 + 2.0, z + w + 0.01, { s: "mtDoor", all: null });
     R.solid(x0, z - w - 0.2, x1, z + w + 0.2);
     R.act([x0 + 1, z + w, x1 - 1, z + w + 0.6], { label: "Look", lines: ["The MAGNET TRAIN, its doors open, waiting to leave for " + L.other + ".", "Talk to the OFFICER at the gate to ride."] });
-    R.item("The MAGNET TRAIN", "A white two-ended train, its windows in a dark band, a stripe in " + (k === "goldenrod" ? "GOLDENROD's teal" : "SAFFRON's green") + " along it; its doors open onto the platform.");
+    R.item("The MAGNET TRAIN", "A white two-ended train, its windows in a dark band, a deep blue stripe with a gold line along it; its doors open onto the platform.");
   }
 
   function station(id, k) {
