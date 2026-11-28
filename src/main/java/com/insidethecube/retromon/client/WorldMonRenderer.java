@@ -40,6 +40,9 @@ public class WorldMonRenderer extends EntityRenderer<WorldMon, WorldMonRenderer.
 	public boolean shouldRender(WorldMon e, net.minecraft.client.renderer.culling.Frustum frustum, double x, double y, double z) {
 		// Out of the picture in a battle fought in the room itself.
 		if (BattleScene.hides(e)) return false;
+		// (0.73) The MAGNET TRAIN: sixteen blocks long on an entity a block across, so it's never left out for being
+		// off the edge of the picture by its middle.
+		if (e.key().startsWith("train:")) return true;
 		return super.shouldRender(e, frustum, x, y, z);
 	}
 

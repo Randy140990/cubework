@@ -230,6 +230,8 @@ public final class Adventure {
 		if (BattleScene.active()) return lastPose = BattleScene.cameraPose(partial);
 		// (0.53) PHOTO MODE: wherever you send it.
 		if (Photo.on) return lastPose = Photo.pose();
+		// (0.73) Riding the MAGNET TRAIN: the camera on the train along the line.
+		if (Ride.on) return lastPose = Ride.pose(partial);
 		Vec3 p = e.getPosition(partial);
 		// Across the ground it follows you exactly; up and down (steps, slabs) it eases, so it doesn't bob.
 		if (Double.isNaN(smoothY) || Math.abs(smoothY - p.y) > 6) smoothY = p.y;
@@ -372,7 +374,7 @@ public final class Adventure {
 		return new float[] {(float) (w / 2.0 + x / z / t * h / 2.0), (float) (h / 2.0 - y / z / t * h / 2.0)};
 	}
 
-	private static double[] camAt(Vec3 target, double dist, double pitchDeg) {
+	static double[] camAt(Vec3 target, double dist, double pitchDeg) {
 		double yaw = Math.toRadians(YAW), pitch = Math.toRadians(pitchDeg);
 		double lx = -Math.sin(yaw) * Math.cos(pitch), ly = -Math.sin(pitch), lz = Math.cos(yaw) * Math.cos(pitch);
 		return new double[] {target.x - lx * dist, target.y - ly * dist, target.z - lz * dist};

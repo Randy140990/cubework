@@ -1140,6 +1140,17 @@ public final class Interiors {
 		return true;
 	}
 
+	/**
+	 * (0.73) Through the iris as at a door, for something else that moves you (the MAGNET TRAIN's ride): the screen goes
+	 * black, then move runs, and it opens once you've been moved.
+	 */
+	public static void fadeThen(ServerPlayer p, Runnable move) {
+		COOL.put(p.getUUID(), fadeTicks(p) + 20);
+		Net.send(p, "fade", new CompoundTag());
+		PENDING_T.put(p.getUUID(), fadeTicks(p));
+		PENDING.put(p.getUUID(), move);
+	}
+
 	/** The rooms' chunks kept loaded (once you've been in one): going in again is quick. At most this many. */
 	private static final java.util.LinkedHashSet<Long> HELD = new java.util.LinkedHashSet<>();
 

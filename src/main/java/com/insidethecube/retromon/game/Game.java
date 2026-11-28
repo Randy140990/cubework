@@ -683,6 +683,7 @@ public final class Game {
 
 
 	public static void leave(ServerPlayer p) {
+		MagnetTrain.left(p);
 		photo(p, false, 0, 0, 0);
 		DEVICES.remove(p.getUUID());
 		Battles.drop(p);
@@ -1216,6 +1217,9 @@ public final class Game {
 			if (PHOTO.containsKey(id)) continue;
 			// Taken through a door this tick: nothing else about where you were applies until next tick.
 			if (Interiors.tick(p)) continue;
+			// (0.73) Riding the MAGNET TRAIN: the ride's all there is till you're off.
+			if (MagnetTrain.tick(p)) continue;
+			if (s.getTickCount() % 100 == 50) MagnetTrain.sweep(p);
 			// Inside a building, the outside's checks (its places, Oak at the town's edge, grass, trainers' sight) don't apply.
 			boolean inside = Interiors.in(p);
 			// (0.72) STRENGTH's boulders: you can't walk through one, and push it with STRENGTH on.
@@ -1509,7 +1513,7 @@ public final class Game {
 		Integer id = FOLLOWERS.get(uid);
 		WorldMon w = id != null && level.getEntity(id) instanceof WorldMon wm && wm.isAlive() ? wm : null;
 		Mon lead = followMon(d);
-		boolean want = d.started && lead != null && !Battles.in(p) && FOLLOW_ON.getOrDefault(uid, true) && !Surf.on(p);
+		boolean want = d.started && lead != null && !Battles.in(p) && FOLLOW_ON.getOrDefault(uid, true) && !Surf.on(p) && !MagnetTrain.riding(p);
 		java.util.ArrayDeque<Vec3> trail = TRAIL.computeIfAbsent(uid, k -> new java.util.ArrayDeque<>());
 		Vec3 here = p.position();
 		if (trail.isEmpty() || trail.peekFirst().distanceToSqr(here) > 0.04) {
@@ -2717,6 +2721,8 @@ public final class Game {
 				dialogue(p, n, "mart", List.of("Hi there! May I help you?"), t);
 			}
 			case Npc.PERSON -> {
+				// (0.73) The MAGNET TRAIN's OFFICERs.
+				if (MagnetTrain.talk(p, n)) return;
 				// (0.71) The story's own (the old man's TEACHY TV, MR. FUJI, BILL, the GAME CORNER, the AIDEs, the TEA...).
 				if (KantoStory.talk(p, n, d)) return;
 				if (n.key().equals(OAK_KEY)) {
@@ -4247,6 +4253,8 @@ public final class Game {
 		PlayerData d = data(p);
 		// (0.71) The story's questions: MR. FUJI's way home, BILL's TELEPORTER, the GAME CORNER's coins and prizes, FLASH.
 		if (KantoStory.answer(p, mode, t, n)) return;
+		// (0.73) The MAGNET TRAIN: YES to the OFFICER, then on board.
+		if (MagnetTrain.answer(p, mode, t, n) || MagnetTrain.onBoard(p, mode, n)) return;
 		if (mode.equals("strength")) {
 			Boulders.strength(p, t.getBooleanOr("answered", false) ? t.getIntOr("choice", 1) == 0 : yes);
 			return;

@@ -386,6 +386,18 @@ MAT_DOOR.update({"viridian_gym": "viridian_gym", "celadon_gym": "celadon_gym", "
                  "celadon_diner": "celadon_diner", "celadon_chief_house": "celadon_chief_house", "saffron_fan_club": "saffron_fan_club",
                  "saffron_pidgey_house": "saffron_pidgey_house", "pokemon_tower_1f": "pokemon_tower", "indigo_plateau_lobby": "indigo_plateau"})
 NORTH_DOOR["ss_anne_1f"] = "ss_anne_gangway"
+# (0.73, John's 28 Nov 09:22) The MAGNET TRAIN's two stations (rooms73.js), out past the S.S. ANNE's cabins: in from
+# the doorway under each one's roof (GOLDENROD's, and SAFFRON's, his copy of it flipped east to west), out onto its
+# steps.
+for _id, _o in (("goldenrod_magnet_train_station", 15936), ("saffron_magnet_train_station", 16000)):
+    ORIGIN[_id] = (_o, 64, 0)
+    PLACE[_id] = _id
+    ENTRY[_id] = {"x": 10.0, "z": 16.5, "yaw": 180.0}
+DOORS.update({
+    "goldenrod_magnet_train": {"room": "goldenrod_magnet_train_station", "door": [[x, 21, 693] for x in range(-2122, -2119)], "out": [-2120.5, 20.0, 695.6]},
+    "saffron_magnet_train": {"room": "saffron_magnet_train_station", "door": [[x, 34, 398] for x in range(-387, -384)], "out": [-385.5, 33.0, 400.6]},
+})
+MAT_DOOR.update({"goldenrod_magnet_train_station": "goldenrod_magnet_train", "saffron_magnet_train_station": "saffron_magnet_train"})
 START = {"room": "house2", "x": 3.6, "z": 6.4, "yaw": 0.0}
 # People: who they are in the mod (a key from the games' people where there is one, else our own).
 PEOPLE = {

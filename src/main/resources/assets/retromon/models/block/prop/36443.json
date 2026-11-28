@@ -1,0 +1,1 @@
+{"ambientocclusion":false,"textures":{"particle":"retromon:block/interior/mt_post","mt_post":"retromon:block/interior/mt_post"},"elements":[{"from":[0,1.2,13.2],"to":[0,2.0,15.6],"faces":{"east":{"uv":[4.1,11.5,4.7,11.7],"texture":"#mt_post"}}}]}
